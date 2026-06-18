@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
-import DEFAULT_NOTES from '../../content/default-notes.json'
+import DEFAULT_NOTES from './default-notes.json'
 
 // ─── Storage helpers ──────────────────────────────────────────────────────────
 // oc-sticky-notes  = ONLY the user's own writes/edits + tombstones for deleted defaults

@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import katex from 'katex'
-import { REFERENCE_CATEGORIES, ALL_ENTRIES } from '../content/reference-data.js'
-import { PROOFS } from '../content/proofs/index.js'
-import ProofModal from '../components/ui/ProofModal.jsx'
-import MathReferenceBackground from '../components/reference/MathReferenceBackground.jsx'
+import { REFERENCE_CATEGORIES, ALL_ENTRIES } from '../reference/reference-data.js'
+import { PROOFS } from '../reference/proofs/index.js'
+import ProofModal from '../components/reference/ProofModal.jsx'
+import MathReferenceBackground from '../components/backgrounds/MathReferenceBackground.jsx'
 
 const COLOR_CLASSES = {
   blue:    { tab: 'bg-blue-600 text-white',    tabInactive: 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30', cover: 'from-blue-600 via-blue-700 to-indigo-800',    glow: '0 20px 50px -8px rgba(59,130,246,0.45)',    accent: '#60a5fa' },

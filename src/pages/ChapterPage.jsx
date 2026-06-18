@@ -1,11 +1,13 @@
 import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import { CURRICULUM } from '../content/index.js'
+import { getAllChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
+
+const ALL_CHAPTERS = getAllChapters()
 
 export default function ChapterPage() {
   const { chapterId } = useParams()
-  const chapter = CURRICULUM.find((c) => String(c.number) === chapterId)
+  const chapter = ALL_CHAPTERS.find((c) => String(c.number) === chapterId)
   const { getLessonStatus } = useProgress()
 
   useEffect(() => {
@@ -43,10 +45,11 @@ export default function ChapterPage() {
       ) : (
         <div className="space-y-4">
           {chapter.lessons.map((lesson, i) => {
-            const status = getLessonStatus(lesson.id, lesson.checkpoints?.length ?? 1)
+            const progressKey = lesson.id ?? `${chapter.course}/${lesson.slug}`
+            const status = getLessonStatus(progressKey, lesson.checkpoints?.length ?? 1)
             return (
               <Link
-                key={lesson.id}
+                key={lesson.slug}
                 to={`/chapter/${chapter.number}/${lesson.slug}`}
                 className="block p-5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition-all"
               >

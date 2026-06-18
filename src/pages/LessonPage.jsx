@@ -1,18 +1,20 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from "../content/index.js";
+import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from "../courses/index.js";
+import { loadLesson, getAllChapters } from "../courses/courseLoader.js";
 import { useProgress } from "../hooks/useProgress.js";
+
+const ALL_COURSE_CHAPTERS = getAllChapters()
 import MicroCycleLesson from "../components/lesson/MicroCycleLesson.jsx";
 import MobileLessonContent from "../components/lesson/MobileLessonContent.jsx";
 import { useIsMobile } from "../hooks/useIsMobile.js";
 import CrossRef from "../components/lesson/CrossRef.jsx";
 import VizFrame from "../components/viz/VizFrame.jsx";
 import MarkdownProse from "../components/math/MarkdownProse.jsx";
-import { enhanceLessonForUnifiedLearning } from "../content/enhancers/unifiedLessonEnhancer.js";
+import { enhanceLessonForUnifiedLearning } from "../engines/lesson/enhancers/unifiedLessonEnhancer.js";
 import OpenInGrapher from "../components/lesson/OpenInGrapher.jsx";
 import LessonQuizBlock from "../components/lesson/LessonQuizBlock.jsx";
 import { useVideoPlayer } from "../hooks/useVideoPlayer.js";
-import TutorPanel from "../components/tutor/TutorPanel.jsx";
 import { useOptionalLesson } from "../hooks/useOptionalLesson.js";
 import WikiIntro from "../components/lesson/WikiIntro.jsx";
 import WikiDiagrams from "../components/lesson/WikiDiagrams.jsx";
@@ -21,15 +23,38 @@ export default function LessonPage() {
   const slug = lessonSlug + (rest ? `/${rest}` : "");
   const key = `${chapterId}/${slug}`;
   const rawLesson = LESSON_MAP[key];
+
+  // For lessons not in the old LESSON_MAP, load dynamically from courseLoader
+  const [courseLesson, setCourseLesson] = useState(null)
+  const [loadingCourse, setLoadingCourse] = useState(!rawLesson)
+  useEffect(() => {
+    if (rawLesson) { setLoadingCourse(false); return }
+    let cancelled = false
+    setLoadingCourse(true)
+    setCourseLesson(null)
+    loadLesson(chapterId, lessonSlug).then(l => {
+      if (!cancelled) { setCourseLesson(l); setLoadingCourse(false) }
+    }).catch(() => { if (!cancelled) setLoadingCourse(false) })
+    return () => { cancelled = true }
+  }, [chapterId, lessonSlug, rawLesson])
+
+  const builtInLesson = rawLesson ?? courseLesson
+
   const { lessonSource, lessonOverride, isLoadingOverride } = useOptionalLesson(
     key,
-    rawLesson,
+    builtInLesson,
   );
   const lesson = useMemo(
     () =>
       lessonOverride ? enhanceLessonForUnifiedLearning(lessonOverride) : null,
     [lessonOverride],
   );
+
+  // Broadcast the active lesson to TutorPanel (mounted once in AppShell)
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('oc-lesson-context', { detail: lesson ?? null }))
+    return () => window.dispatchEvent(new CustomEvent('oc-lesson-context', { detail: null }))
+  }, [lesson])
   const {
     markCheckpoint,
     getActiveTab,
@@ -46,8 +71,11 @@ export default function LessonPage() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
-    if (lesson?.id) setLessonId(lesson.id);
-  }, [lesson?.id, setLessonId]);
+    // key (chapterId/slug) is what ALL_LESSONS entries can actually be matched
+    // against — lesson.id is a legacy id baked into the lesson source file and
+    // has no relation to the courseLoader-derived tree used by the video panel.
+    if (key) setLessonId(key);
+  }, [key, setLessonId]);
 
   useEffect(() => {
     if (lesson) {
@@ -79,6 +107,14 @@ export default function LessonPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lesson?.id, setReadingProgress]);
 
+  if (!lesson && loadingCourse) {
+    return (
+      <div className="py-20 text-center text-slate-400 dark:text-slate-500 text-sm">
+        Loading lesson…
+      </div>
+    )
+  }
+
   if (!lesson) {
     return (
       <div className="py-20 text-center">
@@ -99,14 +135,17 @@ export default function LessonPage() {
     );
   }
 
-  const lessonIndex = ALL_LESSONS.findIndex((entry) => entry.id === lesson.id);
+  const lessonIndex = ALL_LESSONS.findIndex(
+    (entry) => String(entry.chapterNumber) === String(chapterId) && entry.slug === slug
+  );
   const prevLesson = lessonIndex > 0 ? ALL_LESSONS[lessonIndex - 1] : null;
   const nextLesson =
-    lessonIndex < ALL_LESSONS.length - 1 ? ALL_LESSONS[lessonIndex + 1] : null;
+    lessonIndex !== -1 && lessonIndex < ALL_LESSONS.length - 1
+      ? ALL_LESSONS[lessonIndex + 1]
+      : null;
 
   return (
     <div className="flex-1 min-h-screen relative overflow-x-hidden bg-white dark:bg-slate-950">
-      <TutorPanel lesson={lesson} />
       <article className="mx-auto max-w-[1440px] pb-24 pt-6 px-0 sm:px-8 md:px-12 min-h-screen relative">
 
       <div className="pointer-events-none fixed left-0 top-0 z-[10001] h-1 w-full bg-slate-200 dark:bg-slate-800">
@@ -117,9 +156,8 @@ export default function LessonPage() {
       </div>
 
       {(() => {
-        const chapter = CURRICULUM.find(
-          (entry) => String(entry.number) === chapterId,
-        );
+        const chapter = CURRICULUM.find((entry) => String(entry.number) === chapterId)
+          ?? ALL_COURSE_CHAPTERS.find((ch) => String(ch.number) === chapterId);
         return (
           <nav className="mb-6 px-3 md:px-0 flex flex-wrap items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
             <Link
@@ -158,9 +196,8 @@ export default function LessonPage() {
         <div className="oc-header-gradient px-3 py-10 sm:px-12 sm:py-14">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {(() => {
-              const chapter = CURRICULUM.find(
-                (entry) => String(entry.number) === chapterId,
-              );
+              const chapter = CURRICULUM.find((entry) => String(entry.number) === chapterId)
+                ?? ALL_COURSE_CHAPTERS.find((ch) => String(ch.number) === chapterId);
               return (
                 <>
                   <span className="rounded-full bg-brand-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-lg shadow-brand-500/30">

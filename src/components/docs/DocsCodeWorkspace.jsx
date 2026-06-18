@@ -3,7 +3,7 @@ import { EXAMPLE_PROJECT } from '../../utils/exampleProject.js'
 import Editor from '@monaco-editor/react'
 import { ChevronDown, ChevronLeft, ChevronRight, Columns2, Download, ExternalLink, FilePlus, FolderPlus, Maximize2, Minimize2, Play, RotateCcw, Upload, X } from 'lucide-react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
-import { executeScript } from '../../utils/openmatEngine.js'
+import { executeScript } from '../../engines/openmat/openmatEngine.js'
 import WorkspaceTerminal from './WorkspaceTerminal.jsx'
 import { useIsDark } from '../../utils/useIsDark.js'
 

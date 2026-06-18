@@ -1,6 +1,6 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { getPyodide } from '../../utils/pyodideRuntime.js'
-import { executeScript } from '../../utils/openmatEngine.js'
+import { executeScript } from '../../engines/openmat/openmatEngine.js'
 import {
   MATPLOTLIB_SHIM, PLOT_MARKER,
   runShellInline, runSQLInline, runJSONInline,

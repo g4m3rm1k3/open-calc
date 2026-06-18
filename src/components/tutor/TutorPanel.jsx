@@ -692,8 +692,10 @@ function useChatPanelOpen() {
   return chatOpen
 }
 
-export default function TutorPanel({ lesson, context = null, onApplyCode = null }) {
+export default function TutorPanel({ lesson: lessonProp = null, context = null, onApplyCode = null }) {
   const [open, setOpen] = useState(false)
+  const [lessonFromPage, setLessonFromPage] = useState(null)
+  const lesson = lessonFromPage ?? lessonProp
   const chatPanelOpen = useChatPanelOpen()
   const [view, setView] = useState('chat')
   const [settings, setSettings] = useState(loadSettings)
@@ -734,6 +736,20 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
   const { pos, size, onDragStart, onResizeStart } = useDragResize()
 
   useEffect(() => { persistSettings(settings) }, [settings])
+
+  // Allow taskbar to toggle this panel via custom event
+  useEffect(() => {
+    const handler = () => setOpen(o => !o)
+    window.addEventListener('oc-toggle-tutor', handler)
+    return () => window.removeEventListener('oc-toggle-tutor', handler)
+  }, [])
+
+  // Receive lesson context broadcast from LessonPage
+  useEffect(() => {
+    const handler = (e) => setLessonFromPage(e.detail ?? null)
+    window.addEventListener('oc-lesson-context', handler)
+    return () => window.removeEventListener('oc-lesson-context', handler)
+  }, [])
 
   // Reset chat history when navigating to a different lesson
   useEffect(() => {
@@ -1082,20 +1098,6 @@ export default function TutorPanel({ lesson, context = null, onApplyCode = null 
       )}
 
       {/* Toggle button — Luminous Advisor Orb */}
-      {!open && (
-        <motion.button
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setOpen(true)}
-          className={`fixed z-[10005] w-14 h-14 rounded-2xl shadow-[0_10px_30px_rgba(79,70,229,0.3)] bg-indigo-600 text-white flex items-center justify-center border border-white/20 dark:border-white/10 backdrop-blur-xl transition-all ${chatPanelOpen ? 'bottom-[88px] right-[calc(1rem+400px)] lg:bottom-6 lg:right-[416px]' : 'bottom-[88px] right-4 lg:bottom-6 lg:right-6'}`}
-          title="STEM Coach"
-        >
-          <div className="absolute inset-0 bg-indigo-400/20 blur-xl rounded-full animate-pulse" />
-          <GraduationCap className="w-6 h-6 relative z-10" />
-        </motion.button>
-      )}
     </>
   )
 }

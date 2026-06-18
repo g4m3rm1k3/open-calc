@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { CURRICULUM } from '../../content/index.js'
+import { CURRICULUM } from '../../courses/index.js'
 import { ArrowRight } from 'lucide-react'
 
 function findLesson(slug) {

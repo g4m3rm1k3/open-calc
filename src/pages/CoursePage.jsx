@@ -1,35 +1,22 @@
 import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import { CURRICULUM, COURSES } from '../content/index.js'
+import { getCourseMeta, getChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
-
-const COURSE_GRADIENTS = {
-  indigo:  'from-indigo-500 to-indigo-700',
-  blue:    'from-blue-500 to-blue-700',
-  emerald: 'from-emerald-500 to-emerald-700',
-  red:     'from-red-500 to-red-700',
-  purple:  'from-purple-500 to-purple-700',
-  orange:  'from-orange-500 to-orange-700',
-  teal:    'from-teal-500 to-teal-700',
-  amber:   'from-amber-500 to-amber-700',
-  sky:     'from-sky-500 to-sky-700',
-  cyan:    'from-cyan-500 to-cyan-700',
-  rose:    'from-rose-500 to-rose-700',
-}
+import { GLASS_META } from '../styles/courseColors.js'
 
 export default function CoursePage() {
   const { courseKey } = useParams()
   const { getLessonStatus } = useProgress()
 
-  const course = COURSES.find(c => c.key === courseKey)
-  const chapters = CURRICULUM.filter(ch => ch.course === courseKey)
+  const meta     = getCourseMeta(courseKey)
+  const chapters = getChapters(courseKey)
 
   useEffect(() => {
-    if (course) document.title = `${course.label} — UpSkillOS`
+    if (meta?.label) document.title = `${meta.label} — UpSkillOS`
     return () => { document.title = 'UpSkillOS' }
-  }, [course?.key])
+  }, [meta?.label])
 
-  if (!course || chapters.length === 0) {
+  if (!meta || chapters.length === 0) {
     return (
       <div className="text-center py-20">
         <h2 className="text-xl text-slate-700 dark:text-slate-300">Course not found</h2>
@@ -38,20 +25,19 @@ export default function CoursePage() {
     )
   }
 
-  const grad = COURSE_GRADIENTS[course.color] ?? 'from-slate-500 to-slate-600'
+  const grad = GLASS_META[meta.color]?.header ?? 'from-slate-500 to-slate-600'
   const totalLessons = chapters.reduce((s, ch) => s + ch.lessons.length, 0)
   const completedLessons = chapters.reduce((s, ch) =>
-    s + ch.lessons.filter(l => getLessonStatus(l.id, l.checkpoints?.length ?? 1) === 'complete').length
+    s + ch.lessons.filter(l => getLessonStatus(`${courseKey}/${l.slug}`, 1) === 'complete').length
   , 0)
 
   return (
     <div>
       <Link to="/" className="text-sm text-brand-600 dark:text-brand-400 hover:underline mb-6 inline-block">← All courses</Link>
 
-      {/* Course header */}
       <div className={`bg-gradient-to-r ${grad} rounded-2xl p-8 text-white mb-8`}>
-        <h1 className="text-3xl font-bold mb-1">{course.label}</h1>
-        <p className="text-white/80 mb-4">{course.desc}</p>
+        <h1 className="text-3xl font-bold mb-1">{meta.label}</h1>
+        <p className="text-white/80 mb-4">{meta.description}</p>
         <div className="flex items-center gap-3 text-sm text-white/70 flex-wrap">
           <span>{chapters.length} {chapters.length === 1 ? 'chapter' : 'chapters'}</span>
           <span>·</span>
@@ -73,43 +59,27 @@ export default function CoursePage() {
         )}
       </div>
 
-      {/* Chapter list */}
       <div className="space-y-3">
         {chapters.map((chapter) => {
           const chLessons = chapter.lessons.length
           const chCompleted = chapter.lessons.filter(l =>
-            getLessonStatus(l.id, l.checkpoints?.length ?? 1) === 'complete'
+            getLessonStatus(`${courseKey}/${l.slug}`, 1) === 'complete'
           ).length
           const pct = chLessons > 0 ? chCompleted / chLessons : 0
 
           return (
             <Link
-              key={chapter.id ?? chapter.number}
-              to={chapter.comingSoon ? '#' : `/chapter/${chapter.number}`}
-              className={`block p-5 rounded-xl border bg-white dark:bg-slate-900 transition-all ${
-                chapter.comingSoon
-                  ? 'border-slate-200 dark:border-slate-800 opacity-60 cursor-default'
-                  : 'border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md'
-              }`}
-              onClick={chapter.comingSoon ? (e) => e.preventDefault() : undefined}
+              key={chapter.number}
+              to={`/chapter/${chapter.number}`}
+              className="block p-5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md bg-white dark:bg-slate-900 transition-all"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-mono text-slate-400 dark:text-slate-500">
-                      {typeof chapter.number === 'number'
-                        ? `Ch. ${chapter.number}`
-                        : String(chapter.number)}
-                    </span>
-                    {chapter.comingSoon && (
-                      <span className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">coming soon</span>
-                    )}
-                  </div>
+                  <span className="text-xs font-mono text-slate-400 dark:text-slate-500 mb-1 block">
+                    Ch. {chapter.number.replace(/^.*-/, '')}
+                  </span>
                   <h2 className="font-bold text-slate-900 dark:text-slate-100 mb-1">{chapter.title}</h2>
-                  {chapter.description && (
-                    <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-2">{chapter.description}</p>
-                  )}
-                  {chLessons > 0 && !chapter.comingSoon && (
+                  {chLessons > 0 && (
                     <div className="mt-2">
                       <div className="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 mb-1">
                         <span>{chLessons} {chLessons === 1 ? 'lesson' : 'lessons'}</span>
@@ -125,13 +95,12 @@ export default function CoursePage() {
                   )}
                 </div>
                 <div className="flex-shrink-0 text-sm mt-1">
-                  {!chapter.comingSoon && (
-                    pct === 1
-                      ? <span className="text-emerald-500 font-medium">✓ Done</span>
-                      : pct > 0
-                        ? <span className="text-amber-500">In progress</span>
-                        : <span className="text-slate-400 dark:text-slate-500">→</span>
-                  )}
+                  {pct === 1
+                    ? <span className="text-emerald-500 font-medium">✓ Done</span>
+                    : pct > 0
+                      ? <span className="text-amber-500">In progress</span>
+                      : <span className="text-slate-400 dark:text-slate-500">→</span>
+                  }
                 </div>
               </div>
             </Link>

@@ -1,0 +1,139 @@
+[
+  {
+    "id": "vid-888",
+    "title": "What Are Tensors in PyTorch? Deep Learning with PyTorch",
+    "url": "https://www.youtube.com/embed/Ik4ednouQ94",
+    "source": "data-science-python",
+    "tags": [
+      "deep-learning",
+      "pytorch",
+      "tensors"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-896",
+    "title": "Dimensionality Reduction in Python: Simplifying Data with Pipelines",
+    "url": "https://www.youtube.com/embed/8ckCH08WNRw",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "dimensionality-reduction",
+      "pca"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-912",
+    "title": "Trading Bot with Reinforcement Learning: Gym & AnyTrading",
+    "url": "https://www.youtube.com/embed/LD8rs6Zm88g",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "reinforcement-learning",
+      "finance"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-913",
+    "title": "Predicting Daily Sales | Machine Learning for Revenue Forecasting",
+    "url": "https://www.youtube.com/embed/P3XwjwtJFpo",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "forecasting",
+      "regression"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-921",
+    "title": "Q-Learning with FrozenLake in OpenAI Gym",
+    "url": "https://www.youtube.com/embed/fqo1-G0xDI8",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "reinforcement-learning",
+      "q-learning"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-922",
+    "title": "Types of Encoding Explained | Python Implementation",
+    "url": "https://www.youtube.com/embed/KeqOv-RROwo",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "feature-engineering",
+      "encoding"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-934",
+    "title": "K-Means Clustering Explained & Coded from Scratch in Python",
+    "url": "https://www.youtube.com/embed/wbDU2HCjEKM",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "clustering",
+      "k-means"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-937",
+    "title": "Feature Selection in Machine Learning | Filter Method",
+    "url": "https://www.youtube.com/embed/ywUXqGNJx5E",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "feature-selection"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-938",
+    "title": "Wrapper Methods for Feature Selection in Machine Learning",
+    "url": "https://www.youtube.com/embed/ZzqWtxOdz3Q",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "feature-selection"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  },
+  {
+    "id": "vid-939",
+    "title": "Embedded Methods for Feature Selection | Machine Learning",
+    "url": "https://www.youtube.com/embed/M3c3ffHZnaY",
+    "source": "data-science-python",
+    "tags": [
+      "machine-learning",
+      "feature-selection"
+    ],
+    "chapter": null,
+    "lessonSlug": null,
+    "section": null
+  }
+]

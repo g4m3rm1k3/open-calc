@@ -3,7 +3,7 @@
 // Run: node src/scripts/build-search-index.js
 // Called automatically before dev/build via npm scripts
 
-import { writeFileSync, existsSync, mkdirSync, unlinkSync } from 'fs'
+import { writeFileSync, existsSync, mkdirSync, unlinkSync, readdirSync, statSync } from 'fs'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -79,74 +79,105 @@ function inferAliasTerms(lesson, chapter) {
     .flatMap(([, aliases]) => aliases)
 }
 
-// Dynamically import content
-async function buildIndex() {
-  const { CURRICULUM } = await import('../content/index.js')
+function isDir(p) {
+  try { return statSync(p).isDirectory() } catch { return false }
+}
 
-  const documents = CURRICULUM.flatMap((chapter) =>
-    chapter.lessons.map((lesson) => {
-      const proofsText = [
-        ...(lesson.rigor?.prose ?? []),
-        ...(lesson.rigor?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
-      ]
+function titleFromSlug(slug) {
+  return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
 
-      const applicationsText = [
-        toText(lesson.hook?.realWorldContext),
-        ...(lesson.intuition?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
-      ]
+// Scan src/courses/ and build search docs for all courseLoader-style lessons
+async function buildCourseLoaderDocs(root) {
+  const coursesDir = resolve(root, 'src/courses')
+  const docs = []
 
-      const assignmentText = [
-        ...flattenStepLikeItems(lesson.examples),
-        ...flattenStepLikeItems(lesson.challenges),
-      ]
+  const courseIds = readdirSync(coursesDir).filter(name => {
+    if (name === 'courseLoader.js') return false
+    return isDir(resolve(coursesDir, name))
+  }).sort()
 
-      const aliasTerms = inferAliasTerms(lesson, chapter)
+  for (const courseId of courseIds) {
+    const courseDir = resolve(coursesDir, courseId)
+    const chapterDirs = readdirSync(courseDir)
+      .filter(name => /^\d+-.+$/.test(name) && isDir(resolve(courseDir, name)))
+      .sort()
 
-      const searchableText = [
-        toText(lesson.hook?.question),
-        toText(lesson.hook?.realWorldContext),
-        ...(lesson.intuition?.prose ?? []),
-        ...(lesson.math?.prose ?? []),
-        ...proofsText,
-        ...(lesson.intuition?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
-        ...(lesson.math?.callouts ?? []).flatMap((c) => [toText(c.title), toText(c.body)]),
-        ...(lesson.intuition?.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
-        ...(lesson.math?.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
-        ...(lesson.rigor?.visualizations ?? []).flatMap((viz) => [toText(viz.title), toText(viz.caption)]),
-        ...assignmentText,
-        ...(lesson.crossRefs ?? []).flatMap((ref) => [toText(ref.label), toText(ref.context)]),
-        ...(lesson.searchKeywords ?? []),
-        ...ASSIGNMENT_TERMS,
-        ...aliasTerms,
-      ]
+    for (const chapterDir of chapterDirs) {
+      const chm = chapterDir.match(/^(\d+)-(.+)$/)
+      if (!chm) continue
+      const chapterNum = parseInt(chm[1], 10)
+      const chapterId = `${courseId}-${chapterNum}`
+      const chapterTitle = titleFromSlug(chm[2])
 
-      const content = searchableText
-        .filter((part) => typeof part === 'string' && part.trim().length > 0)
-        .join(' ')
+      const lessonFiles = readdirSync(resolve(courseDir, chapterDir))
+        .filter(f => /^\d+-.+\.js$/.test(f))
+        .sort()
 
-      return {
-        id: lesson.id,
-        slug: lesson.slug,
-        chapterNumber: chapter.number,
-        chapterTitle: chapter.title,
-        title: lesson.title,
-        subtitle: lesson.subtitle,
-        tags: (lesson.tags ?? []).join(' '),
-        aliases: aliasTerms.join(' '),
-        assignment: assignmentText.join(' '),
-        proofs: proofsText.join(' '),
-        applications: applicationsText.join(' '),
-        content,
+      for (const lessonFile of lessonFiles) {
+        const fm = lessonFile.replace(/\.js$/, '').match(/^(\d+)-(.+)$/)
+        if (!fm) continue
+        const lessonSlug = fm[2]
+        const lessonPath = resolve(courseDir, chapterDir, lessonFile)
+
+        let lesson = {}
+        try {
+          const mod = await import(lessonPath)
+          lesson = mod?.default ?? mod?.lesson ?? {}
+        } catch { continue }
+
+        const proofsText = [
+          ...(lesson.rigor?.prose ?? []),
+          ...(lesson.rigor?.callouts ?? []).flatMap(c => [toText(c.title), toText(c.body)]),
+        ]
+        const applicationsText = [
+          toText(lesson.hook?.realWorldContext),
+          ...(lesson.intuition?.callouts ?? []).flatMap(c => [toText(c.title), toText(c.body)]),
+        ]
+        const assignmentText = [
+          ...flattenStepLikeItems(lesson.examples),
+          ...flattenStepLikeItems(lesson.challenges),
+        ]
+        const content = [
+          toText(lesson.hook?.question),
+          toText(lesson.hook?.realWorldContext),
+          ...(lesson.intuition?.prose ?? []),
+          ...(lesson.math?.prose ?? []),
+          ...proofsText,
+          ...assignmentText,
+          ...(lesson.searchKeywords ?? []),
+        ].filter(s => typeof s === 'string' && s.trim()).join(' ')
+
+        docs.push({
+          id: `${chapterId}/${lessonSlug}`,
+          slug: lessonSlug,
+          chapterNumber: chapterId,
+          chapterTitle,
+          title: lesson.title ?? titleFromSlug(lessonSlug),
+          subtitle: lesson.subtitle ?? '',
+          tags: (lesson.tags ?? []).join(' '),
+          aliases: Array.isArray(lesson.aliases) ? lesson.aliases.join(' ') : (lesson.aliases ?? ''),
+          assignment: assignmentText.join(' '),
+          proofs: proofsText.join(' '),
+          applications: applicationsText.join(' '),
+          content,
+        })
       }
-    })
-  )
+    }
+  }
+
+  return docs
+}
+
+async function buildIndex() {
+  // courseLoader is the single source of truth — content/index.js is being retired
+  const documents = await buildCourseLoaderDocs(root)
 
   const publicDir = resolve(root, 'public')
   if (!existsSync(publicDir)) mkdirSync(publicDir, { recursive: true })
 
   const outPath = resolve(publicDir, 'search-index.json')
   const tmpPath = outPath + '.tmp'
-  // Clean up any stale .tmp from a previous failed build
   if (existsSync(tmpPath)) try { unlinkSync(tmpPath) } catch {}
   writeFileSync(outPath, JSON.stringify({ documents }, null, 0))
 

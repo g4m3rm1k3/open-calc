@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import KatexInline from '../math/KatexInline.jsx';
 import KatexBlock from '../math/KatexBlock.jsx';
-import { ALGEBRA_REGISTRY } from '../../content/algebraRegistry.js';
+import { ALGEBRA_REGISTRY } from '../../reference/algebraRegistry.js';
 
 export default function AlgebraMicroLesson({ topicId, children }) {
   const [isOpen, setIsOpen] = useState(false);
