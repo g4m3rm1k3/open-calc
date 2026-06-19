@@ -26,7 +26,7 @@ import {
   X,
   CircleHelp,
 } from "lucide-react";
-import FigureRenderer from "../../courses/calculus/viz/FigureRenderer.jsx";
+import FigureRenderer from "../../components/notebooks/FigureRenderer.jsx";
 import OpenMatGrapher3D from "./OpenMatGrapher3D.jsx";
 import { useLocalStorage } from "../../hooks/useLocalStorage.js";
 import { useGrapher } from "../../context/GrapherContext.jsx";

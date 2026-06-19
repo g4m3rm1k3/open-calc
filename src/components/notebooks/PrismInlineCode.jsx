@@ -2,10 +2,10 @@ import React from "react";
 import Prism from "prismjs";
 import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css";
-import "../../../components/viz/react/prism-inline-override.css";
-import "../../../components/viz/react/prism-inline-override-2.css";
-import "../../../components/viz/react/prism-inline-lightblue.css";
-// import "../../../components/viz/react/prism-inline-darkmode.css";
+import "../viz/react/prism-inline-override.css";
+import "../viz/react/prism-inline-override-2.css";
+import "../viz/react/prism-inline-lightblue.css";
+// import "../viz/react/prism-inline-darkmode.css";
 
 export default function PrismInlineCode({ children, className = "language-js" }) {
   const code = String(children).trim();

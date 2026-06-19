@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Editor from "@monaco-editor/react";
-import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";
+import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 import PrismInlineCode from "./PrismInlineCode";

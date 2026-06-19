@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Terminal } from 'lucide-react'
-import PythonNotebook from '../../courses/python/viz/PythonNotebook'
+import PythonNotebook from '../../components/notebooks/PythonNotebook.jsx'
 
 export const meta = {
   label: 'Python Notebook',

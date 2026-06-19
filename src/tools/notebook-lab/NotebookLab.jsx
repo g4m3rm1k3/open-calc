@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Plus, Trash2, Download, Upload, Link, FileText, ChevronLeft, Pencil, Check } from 'lucide-react'
-import PythonNotebook from '../../courses/python/viz/PythonNotebook.jsx'
+import PythonNotebook from '../../components/notebooks/PythonNotebook.jsx'
 import {
   listNotebooks, getNotebook, saveNotebook, deleteNotebook, createNotebook,
 } from './notebookStorage.js'

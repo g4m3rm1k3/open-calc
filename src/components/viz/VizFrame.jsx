@@ -38,6 +38,17 @@ const VIZ_REGISTRY = Object.fromEntries(
 
 // Residual: things not yet in a course viz folder
 Object.assign(VIZ_REGISTRY, {
+  // ── Shared notebook components ───────────────────────────────────────────
+  // Previously duplicated into every course's viz/ folder under these same
+  // names; the glob registry above silently picked whichever copy sorted
+  // last alphabetically, leaving the rest as unreachable dead code. Now a
+  // single canonical copy, registered explicitly so resolution doesn't
+  // depend on course-folder alphabetical order.
+  PythonNotebook:       lazy(() => import("../notebooks/PythonNotebook.jsx")),
+  FigureRenderer:       lazy(() => import("../notebooks/FigureRenderer.jsx")),
+  JSNotebook:           lazy(() => import("../notebooks/JSNotebook.jsx")),
+  OpenMatNotebook:      lazy(() => import("../notebooks/OpenMatNotebook.jsx")),
+
   // ── Labs & Games (not yet in a course viz package) ──────────────────────
   MiniGolfGame:         lazy(() => import("../../games/golf/MiniGolfGame.jsx")),
   FootballCalculus:     lazy(() => import("../../games/football/FootballCalculus.jsx")),
