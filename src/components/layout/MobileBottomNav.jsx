@@ -1,59 +1,84 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Home, Compass, Calculator, Search, BookOpen, Layers } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 /**
  * MobileBottomNav - A persistent bottom navigation bar for mobile users.
- * Provides quick access to the main sections of the app.
+ * Provides quick access to the main sections of the app with animated indicators.
  */
 export default function MobileBottomNav({ onSearchOpen, onToolsToggle }) {
   const location = useLocation()
+  const navigate = useNavigate()
 
-  const isCalcActive = location.pathname.startsWith('/chapter') || location.pathname.startsWith('/course')
+  const isExploreActive = location.pathname.startsWith('/chapter') || location.pathname.startsWith('/course') || location.pathname.startsWith('/courses')
   const isReferenceActive = location.pathname.startsWith('/reference')
   const isHomeActive = location.pathname === '/'
 
+  const NavItem = ({ active, onClick, icon: Icon, label, activeColor }) => (
+    <motion.button
+      whileTap={{ scale: 0.9 }}
+      onClick={onClick}
+      className={`relative flex flex-col items-center justify-center flex-1 h-16 ${active ? activeColor : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+    >
+      {active && (
+        <motion.div
+          layoutId="mobileNavIndicator"
+          className="absolute inset-x-2 top-2 bottom-2 rounded-2xl bg-current opacity-10 dark:opacity-20"
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        />
+      )}
+      <Icon className={`w-5 h-5 relative z-10 transition-all duration-300 ${active ? 'stroke-[2.5px] -translate-y-1' : ''}`} />
+      <span className={`text-[10px] font-bold tracking-wide relative z-10 transition-all duration-300 absolute bottom-2.5 ${active ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
+        {label}
+      </span>
+    </motion.button>
+  )
+
   return (
-    <nav className="lg:hidden fixed bottom-6 left-6 right-6 z-[60] bg-white/70 dark:bg-slate-950/60 backdrop-blur-3xl border border-white/20 dark:border-white/5 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.15)] ring-1 ring-black/5 px-2">
-      <div className="flex items-center justify-around h-14">
-        <Link
-          to="/"
-          className={`flex flex-col items-center gap-1 p-2 transition-all ${isHomeActive ? 'text-indigo-600 dark:text-white scale-110' : 'text-slate-400 dark:text-slate-500'}`}
-        >
-          <Home className={`w-4 h-4 ${isHomeActive ? 'stroke-[2.5px]' : ''}`} />
-          <span className="text-[8px] font-black uppercase tracking-widest">Home</span>
-        </Link>
-
-        <Link
-          to="/courses"
-          className={`flex flex-col items-center gap-1 p-2 transition-all ${isCalcActive ? 'text-indigo-600 dark:text-white scale-110' : 'text-slate-400 dark:text-slate-500'}`}
-        >
-          <Compass className={`w-4 h-4 ${isCalcActive ? 'stroke-[2.5px]' : ''}`} />
-          <span className="text-[8px] font-black uppercase tracking-widest">Explore</span>
-        </Link>
-
-        <button 
-          onClick={onToolsToggle}
-          className="flex flex-col items-center gap-1 p-2 text-slate-400 dark:text-slate-500"
-        >
-          <Layers className="w-4 h-4" />
-          <span className="text-[8px] font-black uppercase tracking-widest">Tools</span>
-        </button>
-
-        <button 
-          onClick={onSearchOpen}
-          className="flex flex-col items-center gap-1 p-2 text-slate-400 dark:text-slate-500"
-        >
-          <Search className="w-4 h-4" />
-          <span className="text-[8px] font-black uppercase tracking-widest">Search</span>
-        </button>
-
-        <Link 
-          to="/reference"
-          className={`flex flex-col items-center gap-1 p-2 transition-all ${isReferenceActive ? 'text-amber-500 dark:text-amber-400 scale-110' : 'text-slate-400 dark:text-slate-500'}`}
-        >
-          <BookOpen className={`w-4 h-4 ${isReferenceActive ? 'stroke-[2.5px]' : ''}`} />
-          <span className="text-[8px] font-black uppercase tracking-widest">Ref</span>
-        </Link>
+    <nav className="lg:hidden fixed bottom-6 left-4 right-4 z-[60]">
+      {/* Glow effect behind the nav */}
+      <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 blur-2xl rounded-full" />
+      
+      <div className="relative flex items-center justify-between bg-white/80 dark:bg-slate-950/80 backdrop-blur-3xl border border-slate-200/50 dark:border-slate-800/50 rounded-[2rem] shadow-[0_10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-1">
+        <NavItem 
+          active={isHomeActive} 
+          onClick={() => navigate('/')} 
+          icon={Home} 
+          label="Home" 
+          activeColor="text-brand-600 dark:text-brand-400" 
+        />
+        
+        <NavItem 
+          active={isExploreActive} 
+          onClick={() => navigate('/courses')} 
+          icon={Compass} 
+          label="Explore" 
+          activeColor="text-indigo-600 dark:text-indigo-400" 
+        />
+        
+        <NavItem 
+          active={false} 
+          onClick={onToolsToggle} 
+          icon={Layers} 
+          label="Tools" 
+          activeColor="text-slate-900 dark:text-white" 
+        />
+        
+        <NavItem 
+          active={false} 
+          onClick={onSearchOpen} 
+          icon={Search} 
+          label="Search" 
+          activeColor="text-slate-900 dark:text-white" 
+        />
+        
+        <NavItem 
+          active={isReferenceActive} 
+          onClick={() => navigate('/reference')} 
+          icon={BookOpen} 
+          label="Ref" 
+          activeColor="text-amber-600 dark:text-amber-400" 
+        />
       </div>
     </nav>
   )

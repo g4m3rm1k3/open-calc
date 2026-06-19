@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { LABS } from '../../labs/registry.js'
 import { GAMES } from '../../games/registry.js'
 import { TOOLS } from '../../tools/toolLoader.js'
@@ -130,138 +131,170 @@ export default function StartMenu({ onClose }) {
   const showTools = tab === 'all' || tab === 'tools'
   const showNav = tab === 'all' || tab === 'nav'
 
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 }
+  }
+
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 20, scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
       ref={menuRef}
-      className="fixed bottom-11 left-2 z-[1900] w-[620px] max-h-[72vh] flex flex-col rounded-2xl overflow-hidden shadow-2xl border border-black/10 dark:border-white/[0.1] bg-white/95 dark:bg-[#1c1c1e]/95 backdrop-blur-xl"
+      className="fixed bottom-14 left-3 z-[1900] w-[620px] max-h-[75vh] flex flex-col rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-white/50 dark:border-white/10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl ring-1 ring-black/5 dark:ring-white/5"
     >
       {/* Search */}
-      <div className="flex-shrink-0 p-3 border-b border-black/8 dark:border-white/[0.07]">
-        <input
-          autoFocus
-          type="text"
-          placeholder="Search labs, games, tools…"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          className="w-full px-3 py-2 text-sm rounded-lg bg-slate-100 dark:bg-slate-800 border-0 outline-none placeholder-slate-400 dark:placeholder-slate-500 text-slate-800 dark:text-slate-200"
-        />
+      <div className="flex-shrink-0 p-4 border-b border-black/[0.05] dark:border-white/[0.05]">
+        <div className="relative">
+          <input
+            autoFocus
+            type="text"
+            placeholder="Search labs, games, tools…"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 text-sm rounded-2xl bg-black/5 dark:bg-white/5 border border-transparent focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500/50 outline-none placeholder-slate-400 dark:placeholder-slate-500 text-slate-800 dark:text-slate-200 transition-all shadow-sm focus:shadow-md"
+          />
+          <svg className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
       </div>
 
       {/* Tabs */}
       {!query && (
-        <div className="flex-shrink-0 flex gap-1 px-3 pt-2 pb-1 border-b border-black/5 dark:border-white/[0.05]">
+        <div className="flex-shrink-0 flex gap-2 px-4 pt-3 pb-2 border-b border-black/[0.05] dark:border-white/[0.05]">
           {SECTIONS.map(s => (
             <button
               key={s.id}
               onClick={() => setTab(s.id)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+              className={`relative px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
                 tab === s.id
-                  ? 'bg-indigo-500 text-white'
+                  ? 'text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30'
                   : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
-              {s.label}
+              {tab === s.id && (
+                <motion.div layoutId="startMenuTab" className="absolute inset-0 bg-indigo-100 dark:bg-indigo-800/40 rounded-full z-0" />
+              )}
+              <span className="relative z-10">{s.label}</span>
             </button>
           ))}
         </div>
       )}
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto overscroll-contain p-3 space-y-4">
-        {showCourses && filteredCourses.length > 0 && (
-          <section>
-            <h3 className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-1">Courses</h3>
-            <div className="grid grid-cols-3 gap-1.5">
-              {filteredCourses.map(course => (
-                <button
-                  key={course.key}
-                  onClick={() => { onClose(); navigate(course.path) }}
-                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                >
-                  <span className="text-base flex-shrink-0">{course.icon}</span>
-                  <span className="truncate text-slate-700 dark:text-slate-300 font-medium">{course.label}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
+      <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-6">
+        <AnimatePresence mode="popLayout">
+          {showCourses && filteredCourses.length > 0 && (
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+              <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Courses</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {filteredCourses.map(course => (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    key={course.key}
+                    onClick={() => { onClose(); navigate(course.path) }}
+                    className="flex flex-col items-start gap-2 p-3 rounded-2xl text-left bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group"
+                  >
+                    <span className="text-2xl flex-shrink-0">{course.icon}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-2">{course.label}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.section>
+          )}
 
-        {showLabs && filteredLabs.length > 0 && (
-          <section>
-            <h3 className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-1">Labs</h3>
-            <div className="grid grid-cols-3 gap-1.5">
-              {filteredLabs.map(lab => (
-                <button
-                  key={lab.key}
-                  onClick={() => handleOpenLab(lab)}
-                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                >
-                  <span className="text-base flex-shrink-0">{lab.emoji}</span>
-                  <span className="truncate text-slate-700 dark:text-slate-300 font-medium">{lab.label}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
+          {showLabs && filteredLabs.length > 0 && (
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+              <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Labs</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {filteredLabs.map(lab => (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    key={lab.key}
+                    onClick={() => handleOpenLab(lab)}
+                    className="flex flex-col items-start gap-2 p-3 rounded-2xl text-left bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group"
+                  >
+                    <span className="text-2xl flex-shrink-0">{lab.emoji}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-amber-600 dark:group-hover:text-amber-400 line-clamp-2">{lab.label}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.section>
+          )}
 
-        {showGames && filteredGames.length > 0 && (
-          <section>
-            <h3 className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-1">Games</h3>
-            <div className="grid grid-cols-3 gap-1.5">
-              {filteredGames.map(game => (
-                <button
-                  key={game.key}
-                  onClick={() => handleOpenGame(game)}
-                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                >
-                  <span className="text-base flex-shrink-0">{game.emoji}</span>
-                  <span className="truncate text-slate-700 dark:text-slate-300 font-medium">{game.label}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
+          {showGames && filteredGames.length > 0 && (
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+              <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Games</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {filteredGames.map(game => (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    key={game.key}
+                    onClick={() => handleOpenGame(game)}
+                    className="flex flex-col items-start gap-2 p-3 rounded-2xl text-left bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group"
+                  >
+                    <span className="text-2xl flex-shrink-0">{game.emoji}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-rose-600 dark:group-hover:text-rose-400 line-clamp-2">{game.label}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.section>
+          )}
 
-        {showTools && filteredTools.filter(t => t.eventTool).length > 0 && (
-          <section>
-            <h3 className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-1">Tools</h3>
-            <div className="grid grid-cols-3 gap-1.5">
-              {filteredTools.filter(t => t.eventTool).map(tool => (
-                <button
-                  key={tool.key}
-                  onClick={() => handleOpenTool(tool)}
-                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                >
-                  <span className="text-base flex-shrink-0">{tool.glyph || '🔧'}</span>
-                  <span className="truncate text-slate-700 dark:text-slate-300 font-medium">{tool.label}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
+          {showTools && filteredTools.filter(t => t.eventTool).length > 0 && (
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+              <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Tools</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {filteredTools.filter(t => t.eventTool).map(tool => (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    key={tool.key}
+                    onClick={() => handleOpenTool(tool)}
+                    className="flex flex-col items-start gap-2 p-3 rounded-2xl text-left bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group"
+                  >
+                    <span className="text-2xl flex-shrink-0">{tool.glyph || '🔧'}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 line-clamp-2">{tool.label}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.section>
+          )}
 
-        {showNav && filteredNav.length > 0 && (
-          <section>
-            <h3 className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-1">Navigate</h3>
-            <div className="grid grid-cols-3 gap-1.5">
-              {filteredNav.map(link => (
-                <button
-                  key={link.id}
-                  onClick={() => handleNav(link)}
-                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-xs hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                >
-                  <span className="text-base flex-shrink-0">{link.emoji}</span>
-                  <span className="truncate text-slate-700 dark:text-slate-300 font-medium">{link.label}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
+          {showNav && filteredNav.length > 0 && (
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+              <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Navigate</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {filteredNav.map(link => (
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    key={link.id}
+                    onClick={() => handleNav(link)}
+                    className="flex flex-col items-start gap-2 p-3 rounded-2xl text-left bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group"
+                  >
+                    <span className="text-2xl flex-shrink-0">{link.emoji}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 line-clamp-2">{link.label}</span>
+                  </motion.button>
+                ))}
+              </div>
+            </motion.section>
+          )}
+        </AnimatePresence>
 
         {filteredCourses.length === 0 && filteredLabs.length === 0 && filteredGames.length === 0 && filteredTools.length === 0 && filteredNav.length === 0 && (
-          <p className="text-center text-sm text-slate-400 py-8">No results for "{query}"</p>
+          <div className="flex flex-col items-center justify-center py-12 opacity-50">
+            <span className="text-4xl mb-3">🔍</span>
+            <p className="text-center text-sm font-medium">No results for "{query}"</p>
+          </div>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

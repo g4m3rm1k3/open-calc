@@ -27,6 +27,8 @@ import {
   Calculator,
   Terminal,
   PlayCircle,
+  Sun,
+  Moon
 } from "lucide-react";
 import TICalc from "../../tools/calculator/index.jsx";
 import SigmaCalc from "../../tools/sigma/index.jsx";
@@ -96,55 +98,41 @@ function MobileLocationBadge() {
 function ToolButton({ tool }) {
   const Icon = tool.icon;
   return (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.15 }}
+      whileTap={{ scale: 0.9 }}
       onClick={() =>
         window.dispatchEvent(
           new CustomEvent("oc-open-tool", { detail: { tool: tool.eventTool } }),
         )
       }
-      className={`p-1.5 rounded-md transition-all ${tool.colorClass ?? "text-slate-500 hover:bg-black/5 dark:hover:bg-white/8"}`}
+      className={`p-1.5 rounded-xl transition-colors ${tool.colorClass ?? "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
       title={tool.label}
     >
       {Icon ? <Icon className="w-4 h-4" /> : <span className="text-sm leading-none font-medium">{tool.glyph}</span>}
-    </button>
+    </motion.button>
   );
 }
 
-function SunIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-    </svg>
-  )
-}
-
-function MoonIcon() {
-  return (
-    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-    </svg>
-  )
-}
-
 function NavSep() {
-  return <div className="w-px h-4 bg-black/[0.08] dark:bg-white/[0.08] mx-1.5 flex-shrink-0" />
+  return <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1.5 flex-shrink-0 rounded-full" />
 }
 
 function TopBar({ dark, toggleDark }) {
   const { openSearch } = useSearchContext();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] h-12 flex items-center px-4 gap-3 bg-white/90 dark:bg-[#1c1c1e]/90 backdrop-blur-xl border-b border-black/[0.07] dark:border-white/[0.07]">
+    <header className="fixed top-0 left-0 right-0 z-[100] h-[52px] flex items-center px-4 gap-3 bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
 
       {/* LEFT — logo + app name + auth */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <Link to="/" className="flex items-center gap-1.5 group select-none" aria-label="Home">
-          <span className="text-indigo-600 dark:text-indigo-400 font-black text-[22px] leading-none tracking-tight group-hover:text-indigo-500 transition-colors">
-            ∂
-          </span>
-          <span className="text-[13px] font-semibold text-slate-700 dark:text-slate-200 hidden sm:block tracking-tight">
+      <div className="flex items-center gap-3 flex-shrink-0">
+        <Link to="/" className="flex items-center gap-2 group select-none" aria-label="Home">
+          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 shadow-sm group-hover:shadow-brand-500/25 group-hover:scale-105 transition-all duration-300">
+            <span className="text-white font-black text-xl leading-none tracking-tight">
+              ∂
+            </span>
+          </div>
+          <span className="text-[15px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 hidden sm:block tracking-tight">
             UpSkillOS
           </span>
         </Link>
@@ -157,34 +145,42 @@ function TopBar({ dark, toggleDark }) {
       </div>
 
       {/* RIGHT — tools + utilities + clock */}
-      <div className="flex items-center gap-0.5 flex-shrink-0">
+      <div className="flex items-center gap-1 flex-shrink-0">
         {toolsByGroup("math").map((tool) => <ToolButton key={tool.key} tool={tool} />)}
         {toolsByGroup("engine").map((tool) => <ToolButton key={tool.key} tool={tool} />)}
 
         <NavSep />
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => window.dispatchEvent(new CustomEvent("oc-toggle-video"))}
-          className="p-1.5 rounded-md text-slate-500 hover:bg-sky-500/10 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+          className="p-1.5 rounded-xl text-slate-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
           title="Video Player"
         >
           <PlayCircle className="w-4 h-4" />
-        </button>
-        <button
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.9 }}
           onClick={openSearch}
-          className="p-1.5 rounded-md text-slate-500 hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
+          className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           title="Search"
         >
           <Search className="w-4 h-4" />
-        </button>
-        <button
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.15 }}
+          whileTap={{ scale: 0.9 }}
           onClick={toggleDark}
-          className="p-1.5 rounded-md text-slate-500 hover:bg-black/5 dark:hover:bg-white/[0.08] transition-colors"
+          className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           title="Toggle theme"
         >
-          {dark ? <SunIcon /> : <MoonIcon />}
-        </button>
-        <FullscreenButton className="p-1.5 rounded-md text-slate-500 hover:bg-black/5 dark:hover:bg-white/[0.08]" />
+          {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        </motion.button>
+        <div className="hover:scale-110 active:scale-95 transition-transform">
+          <FullscreenButton className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" />
+        </div>
 
         <NavSep />
 
@@ -550,150 +546,138 @@ export default function AppShell({ children }) {
           <AnimatePresence>
             {mobileToolsOpen && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                className="lg:hidden fixed bottom-20 left-4 right-4 z-[55] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 ring-1 ring-black/5 dark:ring-white/5"
+                initial={{ opacity: 0, y: "100%" }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="lg:hidden fixed bottom-[88px] left-4 right-4 z-[55] bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2rem] p-6 shadow-[0_10px_50px_rgba(0,0,0,0.25)] border border-white/50 dark:border-white/10 overflow-hidden"
               >
-                <div className="flex items-center justify-between mb-5">
-                  <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
-                    <Layers className="w-4 h-4" />
-                    Math Tools Hub
-                  </h3>
+                {/* Decorative background glow */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] h-32 bg-indigo-500/10 blur-[50px] pointer-events-none" />
+
+                <div className="flex items-center justify-between mb-6 relative z-10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                      <Layers className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Math Tools</h3>
+                      <p className="text-[11px] font-medium text-slate-500">Quick access to interactive apps</p>
+                    </div>
+                  </div>
                   <button
                     onClick={() => setMobileToolsOpen(false)}
-                    className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500"
+                    className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 transition-colors"
                   >
-                    <Smartphone className="w-3.5 h-3.5" />
+                    <Smartphone className="w-5 h-5" />
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 relative z-10 max-h-[50vh] overflow-y-auto pr-1 pb-2">
                   <motion.button
-                    whileTap={{ scale: 0.96 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       closeAllTools();
                       setGraphOpen(true);
                       setMobileToolsOpen(false);
                     }}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/50 shadow-sm"
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-500/20 shadow-sm"
                   >
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-800/50 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-indigo-500/20 flex items-center justify-center shadow-sm">
                       <Activity className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
-                      2D Grapher
-                    </span>
+                    <span className="text-xs font-bold tracking-wide">2D Grapher</span>
                   </motion.button>
 
                   <motion.button
-                    whileTap={{ scale: 0.96 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       closeAllTools();
                       setGraph3DOpen(true);
                       setMobileToolsOpen(false);
                     }}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 border border-amber-100 dark:border-amber-800/50 shadow-sm"
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-500/20 shadow-sm"
                   >
-                    <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-800/50 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-amber-500/20 flex items-center justify-center shadow-sm">
                       <Box className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
-                      3D Plotter
-                    </span>
+                    <span className="text-xs font-bold tracking-wide">3D Plotter</span>
                   </motion.button>
 
                   <motion.button
-                    whileTap={{ scale: 0.96 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       closeAllTools();
                       setGraphJSXOpen(true);
                       setMobileToolsOpen(false);
                     }}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50 shadow-sm"
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20 shadow-sm"
                   >
-                    <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-emerald-500/20 flex items-center justify-center shadow-sm">
                       <Settings2 className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
-                      Pro Tools
-                    </span>
+                    <span className="text-xs font-bold tracking-wide">Pro Tools</span>
                   </motion.button>
 
                   <motion.button
-                    whileTap={{ scale: 0.96 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       closeAllTools();
                       setScratchOpen(true);
                       setMobileToolsOpen(false);
                     }}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-300 border border-rose-100 dark:border-rose-800/50 shadow-sm"
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-500/20 shadow-sm"
                   >
-                    <div className="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-800/50 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-rose-500/20 flex items-center justify-center shadow-sm">
                       <PenLine className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
-                      Scratchpad
-                    </span>
+                    <span className="text-xs font-bold tracking-wide">Scratchpad</span>
                   </motion.button>
 
                   <motion.button
-                    whileTap={{ scale: 0.96 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       closeAllTools();
                       setCalcOpen(true);
                       setMobileToolsOpen(false);
                     }}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-300 border border-violet-100 dark:border-violet-800/50 shadow-sm"
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-100 dark:border-violet-500/20 shadow-sm"
                   >
-                    <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-800/50 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-violet-500/20 flex items-center justify-center shadow-sm">
                       <Calculator className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
-                      TI Calc
-                    </span>
+                    <span className="text-xs font-bold tracking-wide">TI Calc</span>
                   </motion.button>
 
                   <motion.button
-                    whileTap={{ scale: 0.96 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       closeAllTools();
                       setTerminalOpen(true);
                       setMobileToolsOpen(false);
                     }}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/50 shadow-sm"
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm"
                   >
-                    <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-800/50 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-slate-700/50 flex items-center justify-center shadow-sm">
                       <Terminal className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
-                      Terminal
-                    </span>
+                    <span className="text-xs font-bold tracking-wide">Terminal</span>
                   </motion.button>
 
                   <motion.button
-                    whileTap={{ scale: 0.96 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       closeAllTools();
                       window.dispatchEvent(new CustomEvent("oc-toggle-video"));
                       setMobileToolsOpen(false);
                     }}
-                    className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 border border-sky-100 dark:border-sky-800/50 shadow-sm"
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-500/20 shadow-sm col-span-2 sm:col-span-1"
                   >
-                    <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-800/50 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-sky-500/20 flex items-center justify-center shadow-sm">
                       <PlayCircle className="w-5 h-5" />
                     </div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider">
-                      Video Player
-                    </span>
+                    <span className="text-xs font-bold tracking-wide">Video Player</span>
                   </motion.button>
-                </div>
-
-                {/* Quick stats / tips? */}
-                <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-slate-400 dark:text-slate-500 font-medium whitespace-nowrap overflow-hidden">
-                  <span className="w-1 h-1 rounded-full bg-brand-500 animate-pulse" />
-                  Tap tools to open fullscreen overlays. Close via backdrop.
                 </div>
               </motion.div>
             )}
