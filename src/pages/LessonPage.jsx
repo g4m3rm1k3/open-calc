@@ -22,6 +22,10 @@ export default function LessonPage() {
   const { chapterId, lessonSlug, "*": rest } = useParams();
   const slug = lessonSlug + (rest ? `/${rest}` : "");
   const key = `${chapterId}/${slug}`;
+  // chapterId is "courseId-N" (e.g. "ai-engineering-1"); strip the chapter number
+  // to get the courseId so progress keys match what CoursePage/ChapterPage use.
+  const courseId = chapterId?.replace(/-\d+$/, '') ?? ''
+  const progressKey = courseId ? `${courseId}/${slug}` : ''
   const rawLesson = LESSON_MAP[key];
 
   // For lessons not in the old LESSON_MAP, load dynamically from courseLoader
@@ -65,16 +69,13 @@ export default function LessonPage() {
   } = useProgress();
   const { setLessonId } = useVideoPlayer();
   const isMobile = useIsMobile();
-  const activeTab = getActiveTab(lesson?.id ?? "");
-  const initialReadingProgress = getReadingProgress(lesson?.id ?? "");
+  const activeTab = getActiveTab(progressKey);
+  const initialReadingProgress = getReadingProgress(progressKey);
 
   const [scrollPercent, setScrollPercent] = useState(0);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
-    // key (chapterId/slug) is what ALL_LESSONS entries can actually be matched
-    // against — lesson.id is a legacy id baked into the lesson source file and
-    // has no relation to the courseLoader-derived tree used by the video panel.
     if (key) setLessonId(key);
   }, [key, setLessonId]);
 
@@ -88,12 +89,12 @@ export default function LessonPage() {
   }, [lesson?.id, lesson]);
 
   useEffect(() => {
-    if (!lesson?.id || scrollPercent < 60) return;
-    markCheckpoint(lesson.id, `read-${activeTab}`);
-  }, [lesson?.id, activeTab, scrollPercent, markCheckpoint]);
+    if (!lesson || !progressKey || scrollPercent < 60) return;
+    markCheckpoint(progressKey, `read-${activeTab}`);
+  }, [progressKey, activeTab, scrollPercent, markCheckpoint, lesson]);
 
   useEffect(() => {
-    if (!lesson?.id) return;
+    if (!lesson || !progressKey) return;
     const handleScroll = () => {
       const winScroll = document.documentElement.scrollTop;
       const height =
@@ -102,11 +103,11 @@ export default function LessonPage() {
       if (height === 0) return;
       const scrolled = (winScroll / height) * 100;
       setScrollPercent(scrolled);
-      if (scrolled > 10) setReadingProgress(lesson.id, Math.floor(scrolled));
+      if (scrolled > 10) setReadingProgress(progressKey, Math.floor(scrolled));
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lesson?.id, setReadingProgress]);
+  }, [progressKey, setReadingProgress, lesson]);
 
   if (!lesson && loadingCourse) {
     return (
@@ -312,7 +313,7 @@ export default function LessonPage() {
       {lesson.quiz?.length > 0 && (
         <LessonQuizBlock
           key={key}
-          lessonId={lesson.id}
+          lessonId={progressKey}
           questions={lesson.quiz}
         />
       )}

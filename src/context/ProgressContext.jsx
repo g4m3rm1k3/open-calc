@@ -73,10 +73,48 @@ export function ProgressProvider({ children }) {
     return progress[lessonId]?.quiz ?? null
   }, [progress])
 
+  const setQuizStates = useCallback((lessonId, states) => {
+    setProgress((prev) => ({
+      ...prev,
+      [lessonId]: { ...prev[lessonId], quizStates: states },
+    }))
+    pushNow?.()
+  }, [setProgress, pushNow])
+
+  const getQuizStates = useCallback((lessonId) => {
+    return progress[lessonId]?.quizStates ?? {}
+  }, [progress])
+
+  // Quiz score is the canonical lesson progress metric.
+  // Falls back to reading checkpoints for lessons that have no quiz.
+  const getLessonProgress = useCallback((lessonId) => {
+    const entry = progress[lessonId]
+    if (!entry) return { percent: 0, status: 'not-started', correct: 0, total: 0 }
+
+    if (entry.quiz && entry.quiz.total > 0) {
+      const pct = Math.round((entry.quiz.correct / entry.quiz.total) * 100)
+      return {
+        percent: pct,
+        status: pct >= 100 ? 'complete' : pct > 0 ? 'in-progress' : 'not-started',
+        correct: entry.quiz.correct,
+        total: entry.quiz.total,
+      }
+    }
+
+    const cp = entry.completedCheckpoints?.length ?? 0
+    return {
+      percent: cp > 0 ? 100 : 0,
+      status: cp > 0 ? 'complete' : 'not-started',
+      correct: 0,
+      total: 0,
+    }
+  }, [progress])
+
   return (
     <ProgressContext.Provider value={{
-      progress, markCheckpoint, setActiveTab, getLessonStatus, getActiveTab,
-      setReadingProgress, getReadingProgress, setQuizScore, getQuizScore
+      progress, markCheckpoint, setActiveTab, getLessonStatus, getLessonProgress,
+      getActiveTab, setReadingProgress, getReadingProgress,
+      setQuizScore, getQuizScore, setQuizStates, getQuizStates
     }}>
       {children}
     </ProgressContext.Provider>

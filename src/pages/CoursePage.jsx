@@ -6,7 +6,7 @@ import { GLASS_META } from '../styles/courseColors.js'
 
 export default function CoursePage() {
   const { courseKey } = useParams()
-  const { getLessonStatus } = useProgress()
+  const { getLessonProgress } = useProgress()
 
   const meta     = getCourseMeta(courseKey)
   const chapters = getChapters(courseKey)
@@ -28,7 +28,7 @@ export default function CoursePage() {
   const grad = GLASS_META[meta.color]?.header ?? 'from-slate-500 to-slate-600'
   const totalLessons = chapters.reduce((s, ch) => s + ch.lessons.length, 0)
   const completedLessons = chapters.reduce((s, ch) =>
-    s + ch.lessons.filter(l => getLessonStatus(`${courseKey}/${l.slug}`, 1) === 'complete').length
+    s + ch.lessons.filter(l => getLessonProgress(`${courseKey}/${l.slug}`).status === 'complete').length
   , 0)
 
   return (
@@ -63,7 +63,7 @@ export default function CoursePage() {
         {chapters.map((chapter) => {
           const chLessons = chapter.lessons.length
           const chCompleted = chapter.lessons.filter(l =>
-            getLessonStatus(`${courseKey}/${l.slug}`, 1) === 'complete'
+            getLessonProgress(`${courseKey}/${l.slug}`).status === 'complete'
           ).length
           const pct = chLessons > 0 ? chCompleted / chLessons : 0
 

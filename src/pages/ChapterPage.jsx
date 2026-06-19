@@ -8,7 +8,7 @@ const ALL_CHAPTERS = getAllChapters()
 export default function ChapterPage() {
   const { chapterId } = useParams()
   const chapter = ALL_CHAPTERS.find((c) => String(c.number) === chapterId)
-  const { getLessonStatus } = useProgress()
+  const { getLessonProgress } = useProgress()
 
   useEffect(() => {
     if (chapter) {
@@ -45,8 +45,8 @@ export default function ChapterPage() {
       ) : (
         <div className="space-y-4">
           {chapter.lessons.map((lesson, i) => {
-            const progressKey = lesson.id ?? `${chapter.course}/${lesson.slug}`
-            const status = getLessonStatus(progressKey, lesson.checkpoints?.length ?? 1)
+            const { percent, status, correct, total } = getLessonProgress(`${chapter.course}/${lesson.slug}`)
+            const hasQuizData = total > 0
             return (
               <Link
                 key={lesson.slug}
@@ -64,10 +64,22 @@ export default function ChapterPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="flex-shrink-0 text-right">
-                    {status === 'complete' && <span className="text-emerald-500 text-sm font-medium">✓ Complete</span>}
-                    {status === 'in-progress' && <span className="text-amber-500 text-sm font-medium">In progress</span>}
-                    {status === 'not-started' && <span className="text-slate-400 text-sm">Not started</span>}
+                  <div className="flex-shrink-0 text-right min-w-[80px]">
+                    {status === 'complete' && (
+                      <span className="text-emerald-500 text-sm font-medium">✓ Complete</span>
+                    )}
+                    {status === 'in-progress' && hasQuizData && (
+                      <div className="flex flex-col items-end gap-1">
+                        <span className="text-amber-500 text-sm font-bold">{percent}%</span>
+                        <span className="text-[10px] text-slate-400">{correct}/{total} correct</span>
+                      </div>
+                    )}
+                    {status === 'in-progress' && !hasQuizData && (
+                      <span className="text-amber-500 text-sm font-medium">In progress</span>
+                    )}
+                    {status === 'not-started' && (
+                      <span className="text-slate-400 text-sm">Not started</span>
+                    )}
                   </div>
                 </div>
               </Link>

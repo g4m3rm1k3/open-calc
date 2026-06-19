@@ -40,10 +40,8 @@ function evaluateAnswer(userRaw, correctRaw) {
 }
 
 function normalizeQuestion(q) {
-  // Support both legacy format (type/text/answer-as-string) and new format (question/answer-as-index/explanation)
   const type = q.type ?? 'choice'
   const text = q.text ?? q.question ?? ''
-  // Support both 'answer' and 'correct' as the answer index
   const answerIndex = typeof q.answer === 'number' ? q.answer
     : (typeof q.correct === 'number' ? q.correct : undefined)
   const answer = typeof answerIndex === 'number' && Array.isArray(q.options)
@@ -53,8 +51,8 @@ function normalizeQuestion(q) {
   return { ...q, type, text, answer, hints }
 }
 
-// state shape: { selected, inputVal, hintLevel, submitted, correct }
-function QuizQuestion({ q: rawQ, index, state, onChange, onAnswer }) {
+// state shape per question: { selected, inputVal, hintLevel, submitted, correct }
+function QuizQuestion({ q: rawQ, index, state, onChange }) {
   const q = normalizeQuestion(rawQ)
   const { selected = null, inputVal = '', hintLevel = -1, submitted = false, correct = null } = state ?? {}
 
@@ -65,7 +63,6 @@ function QuizQuestion({ q: rawQ, index, state, onChange, onAnswer }) {
     const userAnswer = q.type === 'choice' ? selected : inputVal
     const isCorrect = evaluateAnswer(userAnswer, String(q.answer))
     onChange(index, { selected, inputVal, hintLevel, submitted: true, correct: isCorrect })
-    onAnswer(index, isCorrect)
   }
 
   const borderColor = submitted
@@ -156,7 +153,7 @@ function QuizQuestion({ q: rawQ, index, state, onChange, onAnswer }) {
             ) : (
               <div className="flex items-center gap-3">
                 <span className={`text-xs font-semibold ${correct ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {correct ? '+1 pt' : 'Incorrect — try again'}
+                  {correct ? 'Correct' : 'Incorrect — try again'}
                 </span>
                 {!correct && (
                   <button
@@ -188,52 +185,46 @@ function QuizQuestion({ q: rawQ, index, state, onChange, onAnswer }) {
 }
 
 export default function LessonQuizBlock({ lessonId, questions }) {
-  const { setQuizScore, getQuizScore, markCheckpoint } = useProgress()
-  const saved = getQuizScore(lessonId)
+  const { setQuizScore, markCheckpoint, setQuizStates, getQuizStates } = useProgress()
   const total = questions.length
 
-  // All question UI state lives here so it resets when lessonId changes
-  // shape: { [index]: { selected, inputVal, hintLevel, submitted, correct } }
-  const [questionStates, setQuestionStates] = useState({})
-  useEffect(() => { setQuestionStates({}) }, [lessonId])
+  // Question states live inside oc-progress so they sync to Firebase automatically.
+  const [questionStates, setQuestionStates] = useState(() => getQuizStates(lessonId))
 
-  const answers = Object.fromEntries(
-    Object.entries(questionStates)
-      .filter(([, s]) => s.submitted)
-      .map(([i, s]) => [i, s.correct])
-  )
-  const liveCorrect = Object.values(answers).filter(Boolean).length
-  const liveAttempted = Object.keys(answers).length
-  const allAttempted = liveAttempted === total
+  useEffect(() => {
+    setQuestionStates(getQuizStates(lessonId))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lessonId])
+
+  // Derive score directly from question state — never from a separate counter.
+  const submitted = Object.entries(questionStates).filter(([, s]) => s.submitted)
+  const correct = submitted.filter(([, s]) => s.correct).length
+  const attempted = submitted.length
+  const allAttempted = attempted === total
+
+  // Keep ProgressContext score in sync whenever the derived score changes.
+  useEffect(() => {
+    if (attempted > 0) {
+      setQuizScore(lessonId, correct, attempted, total)
+    }
+    if (allAttempted && correct === total) {
+      markCheckpoint(lessonId, 'quiz-passed')
+    }
+  }, [lessonId, correct, attempted, allAttempted, total, setQuizScore, markCheckpoint])
 
   const handleQuestionChange = useCallback((index, newState) => {
-    setQuestionStates(prev => ({ ...prev, [index]: newState }))
-  }, [])
-
-  const handleAnswer = useCallback((index, isCorrect) => {
     setQuestionStates(prev => {
-      const allSubmitted = Object.entries(prev).filter(([, s]) => s.submitted).length + 1
-      const correct = Object.entries(prev).filter(([i, s]) => s.submitted && s.correct && Number(i) !== index).length + (isCorrect ? 1 : 0)
-      setQuizScore(lessonId, correct, allSubmitted, total)
-      if (allSubmitted === total && correct / total >= 0.8) {
-        markCheckpoint(lessonId, 'quiz-passed')
-      }
-      return prev
+      const next = { ...prev, [index]: newState }
+      setQuizStates(lessonId, next)
+      return next
     })
-  }, [total, lessonId, setQuizScore, markCheckpoint])
+  }, [lessonId, setQuizStates])
 
-  // What to show in the score badge:
-  // - During session: live count
-  // - On fresh load (no local answers yet): saved score if it exists
-  const displayCorrect = liveAttempted > 0 ? liveCorrect : (saved?.correct ?? null)
-  const displayAttempted = liveAttempted > 0 ? liveAttempted : (saved?.attempted ?? 0)
-  const isComplete = liveAttempted > 0 ? allAttempted : (saved?.attempted === saved?.total && saved?.total === total)
-
-  const scorePct = isComplete ? (displayCorrect / total) : null
+  const scorePct = allAttempted ? correct / total : null
   const masteryLabel = scorePct === null ? null :
-    scorePct >= 0.8
-      ? { text: 'Mastered', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' }
-      : scorePct >= 0.5
+    scorePct >= 1
+      ? { text: 'Complete', color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' }
+      : scorePct >= 0.6
         ? { text: 'Partial Credit', color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' }
         : { text: 'Needs Review', color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' }
 
@@ -249,29 +240,29 @@ export default function LessonQuizBlock({ lessonId, questions }) {
             <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">Lesson Quiz</h2>
           </div>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            {total} questions · Mastery required: 80%
+            {total} questions · All correct to complete
           </p>
         </div>
 
-        {/* Live score counter */}
+        {/* Score display — always derives from persistent question state */}
         <div className="flex flex-col items-end gap-1.5">
-          {displayCorrect !== null && (
+          {attempted > 0 && (
             <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 shadow-sm">
               <span className="text-yellow-400 text-sm">★</span>
               <span className="text-2xl font-black tabular-nums text-slate-900 dark:text-slate-100">
-                {displayCorrect}
+                {correct}
               </span>
               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 pt-1">
-                / {total} Points
+                / {total} Correct
               </span>
             </div>
           )}
           <div className="flex items-center gap-2 pr-2">
             <div className="w-24 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-              <div className="h-full bg-brand-500 transition-all duration-500" style={{ width: `${(displayAttempted / total) * 100}%` }} />
+              <div className="h-full bg-brand-500 transition-all duration-500" style={{ width: `${(attempted / total) * 100}%` }} />
             </div>
             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-              {displayAttempted}/{total} Answered
+              {attempted}/{total} Answered
             </span>
           </div>
         </div>
@@ -285,31 +276,30 @@ export default function LessonQuizBlock({ lessonId, questions }) {
             index={i}
             state={questionStates[i]}
             onChange={handleQuestionChange}
-            onAnswer={handleAnswer}
           />
         ))}
       </div>
 
-      {/* Mastery banner — only after all questions attempted */}
-      {isComplete && masteryLabel && (
+      {/* Result banner — only after all questions answered */}
+      {allAttempted && masteryLabel && (
         <div className={`mt-6 p-4 rounded-xl border ${masteryLabel.bg}`}>
           <p className={`font-semibold ${masteryLabel.color}`}>
-            {displayCorrect}/{total} correct — {masteryLabel.text}
+            {correct}/{total} correct — {masteryLabel.text}
           </p>
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-            {scorePct < 0.5
-              ? 'Go back through the Intuition, Math, and Rigor tabs, then retry.'
-              : scorePct < 0.8
-                ? 'Review the sections flagged above, then work through the challenge problems.'
-                : 'The sidebar star marks this lesson as mastered.'}
+            {scorePct < 0.6
+              ? 'Go back through the lesson tabs, then retry the questions you missed.'
+              : scorePct < 1
+                ? 'Review the sections flagged above, then retry the incorrect questions.'
+                : 'This lesson is marked complete in your progress.'}
           </p>
         </div>
       )}
 
       {/* Encouragement while quiz is in progress */}
-      {!isComplete && liveAttempted > 0 && liveAttempted < total && (
+      {!allAttempted && attempted > 0 && attempted < total && (
         <p className="mt-4 text-xs text-slate-400 dark:text-slate-500 text-center">
-          {total - liveAttempted} question{total - liveAttempted !== 1 ? 's' : ''} remaining — answer all {total} to unlock mastery rating
+          {total - attempted} question{total - attempted !== 1 ? 's' : ''} remaining — answer all {total} to see your result
         </p>
       )}
     </section>
