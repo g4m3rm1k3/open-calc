@@ -14,11 +14,9 @@ export default function DesktopProvider({ children }) {
     () => localStorage.getItem('oc-desktop-style') || 'taskbar'
   )
 
-  // Reserve bottom space for taskbar
-  useEffect(() => {
-    document.body.style.paddingBottom = '44px'
-    return () => { document.body.style.paddingBottom = '' }
-  }, [])
+  // Regular routes use pb-20 lg:pb-11 on <main> to stay above the Taskbar.
+  // Full-screen routes use h-[calc(100vh-44px)] to stop before the Taskbar.
+  // Body padding is not needed and caused every full-screen lab to be scrollable by 44px.
 
   const openWindow = useCallback((config) => {
     setWindows(prev => {
