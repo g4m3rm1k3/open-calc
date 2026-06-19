@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../../firebase'
-import { useAuth } from '../../context/AuthContext'
+import { useReportBug } from '../../hooks/useReportBug.js'
 import { Bug, X, Send, CheckCircle } from 'lucide-react'
 
 const CATEGORIES = [
@@ -13,44 +11,12 @@ const CATEGORIES = [
   { value: 'other',          label: '❓ Other' },
 ]
 
-// Optional Discord / Slack webhook — set VITE_BUG_WEBHOOK_URL in your .env file.
-// Leave it unset to skip notifications (reports still save to Firestore).
-const WEBHOOK_URL = import.meta.env.VITE_BUG_WEBHOOK_URL
-
-async function sendWebhook(report) {
-  if (!WEBHOOK_URL) return
-  try {
-    await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        embeds: [{
-          title: `🐛 ${report.title || 'Bug Report'}`,
-          color: 0xe74c3c,
-          fields: [
-            { name: 'Category',    value: report.category,    inline: true },
-            { name: 'From',        value: report.email || 'anonymous', inline: true },
-            { name: 'Page',        value: report.page,        inline: false },
-            { name: 'Description', value: report.description || '(no description)', inline: false },
-            { name: 'Browser',     value: report.userAgent.slice(0, 120), inline: false },
-          ],
-          timestamp: new Date().toISOString(),
-          footer: { text: `uid: ${report.uid}` },
-        }],
-      }),
-    })
-  } catch {
-    // Webhook failure is non-fatal — report is already in Firestore
-  }
-}
-
 export default function ReportBugButton({ className = '' }) {
-  const { user } = useAuth()
+  const { submit: submitReport, submitting, canSubmit } = useReportBug()
   const [open, setOpen]           = useState(false)
   const [title, setTitle]         = useState('')
   const [description, setDesc]    = useState('')
   const [category, setCategory]   = useState('bug')
-  const [submitting, setSubmitting] = useState(false)
   const [done, setDone]           = useState(false)
   const [error, setError]         = useState('')
 
@@ -63,31 +29,12 @@ export default function ReportBugButton({ className = '' }) {
 
   const submit = async (e) => {
     e.preventDefault()
-    if (!description.trim()) { setError('Please describe the issue.'); return }
-    setSubmitting(true)
     setError('')
-
-    const report = {
-      uid:         user.uid,
-      email:       user.email ?? 'unknown',
-      title:       title.trim() || '(no title)',
-      description: description.trim(),
-      category,
-      page:        window.location.href,
-      userAgent:   navigator.userAgent,
-      status:      'new',
-      createdAt:   serverTimestamp(),
-    }
-
     try {
-      await addDoc(collection(db, 'bugReports'), report)
-      await sendWebhook(report)
+      await submitReport({ title, description, category })
       setDone(true)
     } catch (err) {
-      setError('Failed to submit — please try again.')
-      console.error('[ReportBug]', err)
-    } finally {
-      setSubmitting(false)
+      setError(err instanceof Error ? err.message : 'Failed to submit — please try again.')
     }
   }
 
@@ -115,7 +62,7 @@ export default function ReportBugButton({ className = '' }) {
               </button>
             </div>
 
-            {!user ? (
+            {!canSubmit ? (
               <div className="px-5 py-10 flex flex-col items-center gap-3 text-center">
                 <Bug className="w-10 h-10 text-slate-300 dark:text-slate-600" />
                 <p className="font-semibold text-slate-800 dark:text-slate-100">Sign in to report bugs</p>

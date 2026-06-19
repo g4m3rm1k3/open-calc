@@ -57,6 +57,28 @@ jobs:
             node scripts/check_latex.mjs --files $CHANGED
           fi
 
+      # Actually executes Python cells against headless Pyodide — slower than
+      # the other checks (loads numpy/pandas/matplotlib etc the first time)
+      # but it's the only check that catches real runtime errors like a
+      # function call using a keyword argument that doesn't exist.
+      - name: Check Python notebook cells in changed lesson files
+        run: |
+          CHANGED=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- 'src/courses/**/*.js')
+          if [ -z "$CHANGED" ]; then
+            echo "No lesson files changed — skipping Python cell check."
+          else
+            node scripts/check_python_cells.mjs --files $CHANGED
+          fi
+
+      - name: Check JS sandbox cells in changed lesson files
+        run: |
+          CHANGED=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- 'src/courses/**/*.js')
+          if [ -z "$CHANGED" ]; then
+            echo "No lesson files changed — skipping JS cell check."
+          else
+            node scripts/check_js_cells.mjs --files $CHANGED
+          fi
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 

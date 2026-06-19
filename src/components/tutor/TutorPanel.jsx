@@ -25,6 +25,8 @@ function hasWebGPU() {
   return typeof navigator !== 'undefined' && 'gpu' in navigator
 }
 
+const INTRO_SEEN_KEY = 'oc-tutor-intro-seen'
+
 // ─── SSE / API callers ───────────────────────────────────────────────────────
 async function* parseSSE(response) {
   const reader = response.body.getReader()
@@ -520,6 +522,55 @@ function useDragResize() {
 }
 
 // ─── SettingsView ─────────────────────────────────────────────────────────────
+const INTRO_STEPS = [
+  {
+    title: 'Meet your STEM Coach',
+    body: "A free AI tutor built into every lesson. It runs right in your browser — no account needed, nothing leaves your device by default.",
+  },
+  {
+    title: "It already knows what you're studying",
+    body: 'Open it from any lesson and it has that lesson\'s context automatically — no need to explain what you\'re working on.',
+  },
+  {
+    title: 'Free and private by default',
+    body: "The default model downloads once and runs locally on your device (900MB–2GB, fetched quietly in the background). Prefer something else? Switch to your own API key in Settings anytime.",
+  },
+]
+
+function IntroTour({ onDone }) {
+  const [step, setStep] = useState(0)
+  const isLast = step === INTRO_STEPS.length - 1
+  const { title, body } = INTRO_STEPS[step]
+
+  return (
+    <div className="flex-1 flex flex-col p-6 justify-between min-h-0">
+      <div>
+        <div className="flex items-center gap-1.5 mb-5">
+          {INTRO_STEPS.map((_, i) => (
+            <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+          ))}
+        </div>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{title}</h3>
+        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{body}</p>
+      </div>
+      <div className="flex items-center justify-between pt-6">
+        <button
+          onClick={onDone}
+          className="text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+        >
+          Skip
+        </button>
+        <button
+          onClick={() => (isLast ? onDone() : setStep((s) => s + 1))}
+          className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-colors"
+        >
+          {isLast ? 'Start chatting' : 'Next'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function SettingsView({ settings, onChange, voices = [], voiceURI, onVoiceChange, onPreviewVoice }) {
   const [showKey, setShowKey] = useState(false)
   const provider = getProvider(settings.provider)
@@ -697,7 +748,7 @@ export default function TutorPanel({ lesson: lessonProp = null, context = null, 
   const [lessonFromPage, setLessonFromPage] = useState(null)
   const lesson = lessonFromPage ?? lessonProp
   const chatPanelOpen = useChatPanelOpen()
-  const [view, setView] = useState('chat')
+  const [view, setView] = useState(() => localStorage.getItem(INTRO_SEEN_KEY) ? 'chat' : 'intro')
   const [settings, setSettings] = useState(loadSettings)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -744,6 +795,15 @@ export default function TutorPanel({ lesson: lessonProp = null, context = null, 
     return () => window.removeEventListener('oc-toggle-tutor', handler)
   }, [])
 
+  // First-ever visit: introduce the tutor itself rather than waiting for the
+  // student to discover and click it. Delayed so it doesn't fight the
+  // welcome modal for attention.
+  useEffect(() => {
+    if (localStorage.getItem(INTRO_SEEN_KEY)) return
+    const t = setTimeout(() => setOpen(true), 5000)
+    return () => clearTimeout(t)
+  }, [])
+
   // Receive lesson context broadcast from LessonPage
   useEffect(() => {
     const handler = (e) => setLessonFromPage(e.detail ?? null)
@@ -777,6 +837,13 @@ export default function TutorPanel({ lesson: lessonProp = null, context = null, 
   // Unified effect: handle provider/model/key changes and trigger WebLLM loading.
   // Reads _engine/_engineModelId directly (module singletons) to avoid stale-state
   // race conditions between two separate effects.
+  //
+  // The model (900MB-2GB) used to only start downloading once the student
+  // opened the panel, forcing them to stare at a progress bar. TutorPanel is
+  // always mounted (see AppShell), so when the panel is closed we instead
+  // prefetch quietly in the background after a short delay — by the time
+  // they actually open it, it's often already warm. Skipped on metered/
+  // data-saver connections out of courtesy.
   useEffect(() => {
     if (settings.provider !== 'webllm') {
       // Clear any stale engine reference when switching away from WebLLM
@@ -795,17 +862,24 @@ export default function TutorPanel({ lesson: lessonProp = null, context = null, 
     _engine = null
     _engineModelId = null
 
-    if (!open) {
-      // Panel is closed; reset to idle so load kicks off when it opens
-      setStatus('idle')
+    const startLoad = () => {
+      if (_engine && _engineModelId === settings.model) { setStatus('ready'); return }
+      setStatus('loading-model')
+      setLoadProgress(0)
+      loadWebLLMEngine(settings.model, setLoadProgress)
+        .then(() => setStatus('ready'))
+        .catch((e) => { setStatus('error'); setErrorMsg(e?.message ?? 'Failed to load model') })
+    }
+
+    if (open) {
+      startLoad()
       return
     }
 
-    setStatus('loading-model')
-    setLoadProgress(0)
-    loadWebLLMEngine(settings.model, setLoadProgress)
-      .then(() => setStatus('ready'))
-      .catch((e) => { setStatus('error'); setErrorMsg(e?.message ?? 'Failed to load model') })
+    setStatus('idle')
+    if (typeof navigator !== 'undefined' && navigator.connection?.saveData) return
+    const t = setTimeout(startLoad, 4000)
+    return () => clearTimeout(t)
   }, [open, settings.provider, settings.model, hasKey])
 
   const updateSettings = useCallback((updates) => {
@@ -916,7 +990,12 @@ export default function TutorPanel({ lesson: lessonProp = null, context = null, 
           </div>
 
           {/* ── Content ── */}
-          {view === 'settings' ? (
+          {view === 'intro' ? (
+            <IntroTour onDone={() => {
+              localStorage.setItem(INTRO_SEEN_KEY, '1')
+              setView('chat')
+            }} />
+          ) : view === 'settings' ? (
             <SettingsView settings={settings} onChange={updateSettings}
               voices={englishVoices} voiceURI={voiceURI} onVoiceChange={setVoiceURI}
               onPreviewVoice={(uri) => { setVoiceURI(uri); speak('Hello! This is how I sound.') }} />

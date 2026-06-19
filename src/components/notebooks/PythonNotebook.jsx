@@ -9,6 +9,7 @@ import FigureRenderer from "./FigureRenderer";
 import { parseProse } from "../math/parseProse.jsx";
 import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 import { OPENCALC_LIB_SOURCE } from "./opencalcLibSource.js";
+import { useReportBug } from "../../hooks/useReportBug.js";
 
 // ── Colors hook (same as all viz components) ─────────────────────────────────
 function useColors() {
@@ -76,10 +77,34 @@ const STARTER_CELLS = [
   },
 ];
 
+// Pulls the headline ("ExceptionType: message") out of a Python traceback so
+// it can be shown prominently, with the full multi-line traceback available
+// but secondary — rather than dumping the raw traceback as the only thing a
+// student sees.
+function tracebackHeadline(output) {
+  const lines = output.trim().split('\n')
+  return lines[lines.length - 1] || output
+}
+
 // ── CellOutput ────────────────────────────────────────────────────────────────
 function CellOutput({ cell, C }) {
   const hasMatplotlib = cell.matplotlibImages && cell.matplotlibImages.length > 0;
+  const { submit: submitReport, submitting: reportSubmitting, canSubmit: canReport } = useReportBug();
+  const [reportStatus, setReportStatus] = useState('idle'); // idle | done | error
   if (!cell.output && !cell.figureJson && !hasMatplotlib) return null;
+
+  const report = async () => {
+    try {
+      await submitReport({
+        title: `Notebook cell error: ${tracebackHeadline(cell.output)}`.slice(0, 120),
+        description: `Cell "${cell.cellTitle ?? cell.id}" failed:\n\n${cell.output}`,
+        category: 'bug',
+      });
+      setReportStatus('done');
+    } catch {
+      setReportStatus('error');
+    }
+  };
 
   return (
     <div style={{ borderTop: `0.5px solid ${C.border}` }}>
@@ -117,7 +142,7 @@ function CellOutput({ cell, C }) {
       )}
 
       {/* Text output */}
-      {cell.output && (
+      {cell.output && cell.status !== "error" && (
         <pre
           style={{
             margin: 0,
@@ -125,7 +150,7 @@ function CellOutput({ cell, C }) {
             fontFamily: "monospace",
             fontSize: 13,
             lineHeight: 1.6,
-            color: cell.status === "error" ? C.red : C.text,
+            color: C.text,
             background: "transparent",
             whiteSpace: "pre-wrap",
             wordBreak: "break-word",
@@ -133,6 +158,34 @@ function CellOutput({ cell, C }) {
         >
           {cell.output}
         </pre>
+      )}
+
+      {/* Error output — headline first, full traceback collapsed, with a report action */}
+      {cell.output && cell.status === "error" && (
+        <div style={{ padding: "4px 14px 12px" }}>
+          <p style={{ margin: "0 0 6px", fontFamily: "monospace", fontSize: 13, lineHeight: 1.6, color: C.red, fontWeight: 600, wordBreak: "break-word" }}>
+            {tracebackHeadline(cell.output)}
+          </p>
+          <details>
+            <summary style={{ fontSize: 11, color: C.hint, cursor: "pointer" }}>Show full traceback</summary>
+            <pre style={{ margin: "6px 0 0", fontFamily: "monospace", fontSize: 12, lineHeight: 1.5, color: C.red, opacity: 0.85, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+              {cell.output}
+            </pre>
+          </details>
+          {reportStatus === "done" ? (
+            <p style={{ fontSize: 11, color: C.teal, marginTop: 6 }}>✓ Reported — thanks for flagging it.</p>
+          ) : canReport ? (
+            <button
+              onClick={report}
+              disabled={reportSubmitting}
+              style={{ fontSize: 11, color: C.hint, background: "none", border: "none", padding: 0, marginTop: 6, cursor: "pointer", textDecoration: "underline" }}
+            >
+              {reportSubmitting ? "Reporting…" : reportStatus === "error" ? "Couldn't report — try again?" : "Report this"}
+            </button>
+          ) : (
+            <p style={{ fontSize: 11, color: C.hint, marginTop: 6 }}>Sign in to report this error.</p>
+          )}
+        </div>
       )}
 
       {/* Test Feedback Banner */}

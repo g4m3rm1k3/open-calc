@@ -61,6 +61,8 @@ import GameRules from "../../games/GameRules.jsx";
 import FullscreenButton from "../desktop/FullscreenButton.jsx";
 import NavClock from "../desktop/NavClock.jsx";
 import TutorPanel from "../tutor/TutorPanel.jsx";
+import MobileHomePage from "./MobileHomePage.jsx";
+import { useIsMobile } from "../../hooks/useIsMobile.js";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -114,8 +116,8 @@ function ToolButton({ tool }) {
   );
 }
 
-function NavSep() {
-  return <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1.5 flex-shrink-0 rounded-full" />
+function NavSep({ className = "" }) {
+  return <div className={`w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1.5 flex-shrink-0 rounded-full ${className}`} />
 }
 
 function TopBar({ dark, toggleDark }) {
@@ -146,16 +148,21 @@ function TopBar({ dark, toggleDark }) {
 
       {/* RIGHT — tools + utilities + clock */}
       <div className="flex items-center gap-1 flex-shrink-0">
-        {toolsByGroup("math").map((tool) => <ToolButton key={tool.key} tool={tool} />)}
-        {toolsByGroup("engine").map((tool) => <ToolButton key={tool.key} tool={tool} />)}
+        {/* Math/engine tool shortcuts and video/fullscreen are desktop-only —
+            on mobile they'd overflow the bar, and Search/Tools already cover
+            the same ground via the bottom nav. */}
+        <div className="hidden lg:flex items-center gap-1">
+          {toolsByGroup("math").map((tool) => <ToolButton key={tool.key} tool={tool} />)}
+          {toolsByGroup("engine").map((tool) => <ToolButton key={tool.key} tool={tool} />)}
+        </div>
 
-        <NavSep />
+        <NavSep className="hidden lg:block" />
 
         <motion.button
           whileHover={{ scale: 1.15 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => window.dispatchEvent(new CustomEvent("oc-toggle-video"))}
-          className="p-1.5 rounded-xl text-slate-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+          className="hidden lg:inline-flex p-1.5 rounded-xl text-slate-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
           title="Video Player"
         >
           <PlayCircle className="w-4 h-4" />
@@ -164,7 +171,7 @@ function TopBar({ dark, toggleDark }) {
           whileHover={{ scale: 1.15 }}
           whileTap={{ scale: 0.9 }}
           onClick={openSearch}
-          className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="hidden lg:inline-flex p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           title="Search"
         >
           <Search className="w-4 h-4" />
@@ -178,11 +185,11 @@ function TopBar({ dark, toggleDark }) {
         >
           {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </motion.button>
-        <div className="hover:scale-110 active:scale-95 transition-transform">
+        <div className="hidden lg:block hover:scale-110 active:scale-95 transition-transform">
           <FullscreenButton className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" />
         </div>
 
-        <NavSep />
+        <NavSep className="hidden lg:block" />
 
         <NavClock />
       </div>
@@ -257,6 +264,8 @@ export default function AppShell({ children }) {
   const isDesktopRoute = location.pathname === '/';
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
+  const isMobile = useIsMobile();
+  const isMobileHome = isDesktopRoute && isMobile;
 
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
 
@@ -486,13 +495,13 @@ export default function AppShell({ children }) {
     <ChatProvider>
       <GrapherContext.Provider value={{ openGrapher }}>
         <div className={`min-h-screen transition-colors duration-500 relative overflow-hidden ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
-          {isDesktopRoute && (
+          {isDesktopRoute && !isMobile && (
             <CodeMapBackground
               dark={dark}
               onNodeClick={node => setSelectedNode(node)}
             />
           )}
-          {isDesktopRoute && selectedNode && (
+          {isDesktopRoute && !isMobile && selectedNode && (
             <NodePanel node={selectedNode} onClose={() => setSelectedNode(null)} />
           )}
           <TopBar dark={dark} toggleDark={toggleDark} />
@@ -515,7 +524,7 @@ export default function AppShell({ children }) {
 
           {/* Main content */}
           <main
-            className={`transition-[padding] duration-500 ease-in-out ${isChemistryRoute || isFullPageToolRoute || isScrollableFullPageRoute ? "flex flex-col h-[calc(100vh-44px)] overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen pb-20 lg:pb-11"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-12`}
+            className={`transition-[padding] duration-500 ease-in-out ${isChemistryRoute || isFullPageToolRoute || isScrollableFullPageRoute ? "flex flex-col h-[calc(100vh-44px)] overflow-hidden" : isDesktopRoute && !isMobile ? "h-screen" : "min-h-screen pb-28 lg:pb-11"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-12`}
             style={{
               paddingRight: chatOpen
                 ? (scratchSnap === "right" ? `${scratchSnapW}px` : "var(--chat-width, 380px)")
@@ -527,7 +536,9 @@ export default function AppShell({ children }) {
           >
             <div
               className={
-                isDesktopRoute
+                isMobileHome
+                  ? "w-full"
+                  : isDesktopRoute
                   ? "w-full h-[calc(100vh-48px-44px)]"
                   : isChemistryRoute || isFullPageToolRoute
                     ? "flex-1 min-h-0 w-full flex flex-col overflow-hidden"
@@ -538,7 +549,7 @@ export default function AppShell({ children }) {
                       : `max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-500`
               }
             >
-              {children ?? <Outlet />}
+              {isMobileHome ? <MobileHomePage /> : (children ?? <Outlet />)}
             </div>
           </main>
 

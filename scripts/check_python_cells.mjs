@@ -51,13 +51,33 @@ function findLessonFiles(courseFilter) {
   return files
 }
 
-// The 4 schema variants builderUtils.js's lessonToState() already handles.
+// Lesson schemas vary a lot (same lesson as scripts/check_latex.mjs found),
+// and Python cells turn up in more places than the 4 "official" schema keys
+// builderUtils.js handles (python/PythonNotebook/notebooks.python/pythonLab)
+// — e.g. some lessons seed a notebook visualization's starting cells via
+// math.visualizations[].props.initialCells. Rather than hand-enumerate every
+// nesting pattern, walk the whole lesson object for any array literally
+// named "cells" or "initialCells" whose items look like Python cells (have
+// a "code" string, but no "startCode" — that field marks a JS sandbox cell
+// like the geometry/CNC viz blocks instead).
 function extractPythonCells(lesson) {
-  const sources = [lesson.python, lesson.PythonNotebook, lesson.notebooks?.python, lesson.pythonLab]
   const cells = []
-  for (const source of sources) {
-    if (source?.cells?.length) cells.push(...source.cells)
+  function walk(value, key) {
+    if (value == null || typeof value !== 'object') return
+    if (Array.isArray(value)) {
+      if (key === 'cells' || key === 'initialCells') {
+        for (const item of value) {
+          if (item && typeof item.code === 'string' && typeof item.startCode === 'undefined') {
+            cells.push(item)
+          }
+        }
+      }
+      value.forEach(v => walk(v, key))
+      return
+    }
+    for (const [k, v] of Object.entries(value)) walk(v, k)
   }
+  walk(lesson, null)
   return cells
 }
 
