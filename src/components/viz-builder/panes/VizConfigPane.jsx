@@ -177,7 +177,7 @@ function SaveButton({ vizId, params }) {
   )
 }
 
-export default function VizConfigPane({ vizId }) {
+export default function VizConfigPane({ vizId, onCustomize }) {
   const catalog = VIZ_CATALOG[vizId]
   const defaultProps = catalog?.defaultProps ?? {}
 
@@ -231,6 +231,16 @@ export default function VizConfigPane({ vizId }) {
 
       {/* Props + export */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Customize CTA */}
+        {onCustomize && (
+          <button
+            onClick={() => onCustomize(vizId, params)}
+            className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300 text-xs font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors"
+          >
+            <span>⚙</span> Customize in Build mode →
+          </button>
+        )}
+
         {/* Prop controls */}
         {hasParams && (
           <div>
