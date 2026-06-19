@@ -31,7 +31,10 @@ function fmtValue(v, depth = 1) {
 // Build the final lesson object by overlaying edited state onto the original (_raw).
 // Fields the builder explicitly edits are taken from state; everything else passes
 // through from _raw unchanged — so no field is ever silently dropped.
-export function serializeLesson(state) {
+// Exported separately from serializeLesson() so callers that need the actual
+// object (e.g. running it through checkLessonLatex before submitting a
+// contribution) don't have to re-parse the generated source string.
+export function buildLessonObject(state) {
   const { meta, hook, sections, _raw } = state
 
   // Start from raw if available, otherwise from an empty base
@@ -130,6 +133,11 @@ export function serializeLesson(state) {
   delete base._chapterId
   delete base._lessonSlug
 
+  return base
+}
+
+export function serializeLesson(state) {
+  const base = buildLessonObject(state)
   const lines = Object.entries(base).map(([k, v]) => `  ${k}: ${fmtValue(v, 1)}`)
   return `export default {\n${lines.join(',\n\n')},\n}\n`
 }

@@ -75,7 +75,7 @@ function updatePersonalRecords(existingPRs, entries) {
 }
 
 export function useRPGData() {
-  const { currentUser } = useAuth();
+  const { user: currentUser } = useAuth();
   const [rpgData, setRpgData] = useState(DEFAULT_RPG_STATE);
   const [loading, setLoading] = useState(true);
   const drainAppliedRef = useRef(false);

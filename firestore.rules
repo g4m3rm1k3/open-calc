@@ -1,0 +1,39 @@
+rules_version = '2';
+
+// Covers the only two collections the app actually writes to (see
+// src/context/AuthContext.jsx, src/features/rpg/hooks/useRPGData.js,
+// src/components/ui/ReportBugButton.jsx). No rules existed at all before
+// this — the project was relying on whatever the Firebase console default
+// happened to be. Deploy with: firebase deploy --only firestore:rules
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Progress sync ("snapshot") and RPG/fitness data ("rpgProfile") —
+    // private to the signed-in owner, never readable by anyone else.
+    match /users/{uid}/appData/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Bug reports: any signed-in user can file one, but no one (including
+    // the author) can read, edit, or delete them back through the client —
+    // they're only ever read via the Firebase console / admin SDK, which
+    // bypasses these rules.
+    match /bugReports/{reportId} {
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'new'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.description is string
+        && request.resource.data.description.size() > 0
+        && request.resource.data.description.size() <= 2000;
+      allow read, update, delete: if false;
+    }
+
+    // Default deny — anything not explicitly allowed above stays closed,
+    // including if new collections are added later and rules aren't updated.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

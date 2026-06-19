@@ -1,6 +1,28 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import katex from 'katex'
 import BlockShell from '../BlockShell.jsx'
 import VisualizationBlock from './VisualizationBlock.jsx'
+
+// Renders eq.tex live so a bad \frac or unbalanced brace shows up the moment
+// it's typed, instead of a contributor finding out from a failed CI check
+// after they've already opened a pull request.
+function useTexRender(tex) {
+  return useMemo(() => {
+    if (!tex?.trim()) return { html: null, error: null }
+    try {
+      return { html: katex.renderToString(tex, { throwOnError: true, strict: false, trust: false }), error: null }
+    } catch (error) {
+      return { html: null, error: error.message }
+    }
+  }, [tex])
+}
+
+function EquationPreview({ tex }) {
+  const { html, error } = useTexRender(tex)
+  if (error) return <p className="text-xs text-red-500 font-mono">LaTeX error: {error}</p>
+  if (html) return <div dangerouslySetInnerHTML={{ __html: html }} />
+  return null
+}
 
 function EquationEditor({ eq, onChange, onRemove }) {
   return (
@@ -22,6 +44,7 @@ function EquationEditor({ eq, onChange, onRemove }) {
         rows={2}
         className="field text-sm font-mono resize-none"
       />
+      <EquationPreview tex={eq.tex} />
     </div>
   )
 }
@@ -36,9 +59,9 @@ export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMov
         <p key={i} className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{p}</p>
       ))}
       {(sec.equations ?? []).map((eq, i) => (
-        <div key={i} className="rounded-lg bg-slate-100 dark:bg-slate-800 px-4 py-3 font-mono text-sm">
+        <div key={i} className="rounded-lg bg-slate-100 dark:bg-slate-800 px-4 py-3">
           {eq.label && <p className="text-xs text-slate-400 mb-1">{eq.label}</p>}
-          <code className="text-slate-700 dark:text-slate-200">{eq.tex}</code>
+          <EquationPreview tex={eq.tex} />
         </div>
       ))}
       {(sec.children ?? []).map((child, i) => (

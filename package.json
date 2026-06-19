@@ -23,7 +23,7 @@
     "test": "vitest",
     "check-latex": "node scripts/check_latex.mjs",
     "check-latex:physics": "node scripts/check_latex.mjs physics",
-    "check-latex:calc": "node scripts/check_latex.mjs chapter"
+    "check-latex:calc": "node scripts/check_latex.mjs calculus"
   },
   "dependencies": {
     "@babel/parser": "^7.29.2",

@@ -1,0 +1,67 @@
+name: PR checks
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: '--max-old-space-size=6144'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+
+      - name: Build
+        run: npm run build
+
+      # Both checks below are scoped to this PR's changed lesson files, not
+      # the whole content base — hundreds of pre-existing lessons currently
+      # fail (schema drift, content typos in LaTeX) and fixing those is a
+      # separate, larger pass. This only gates new/edited lessons.
+      - name: Validate changed lesson files
+        run: |
+          CHANGED=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- 'src/courses/**/*.js')
+          if [ -z "$CHANGED" ]; then
+            echo "No lesson files changed — skipping schema validation."
+          else
+            echo "$CHANGED"
+            node scripts/validate-lesson-schema.mjs $CHANGED
+          fi
+
+      - name: Check LaTeX in changed lesson files
+        run: |
+          CHANGED=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.sha }}" -- 'src/courses/**/*.js')
+          if [ -z "$CHANGED" ]; then
+            echo "No lesson files changed — skipping LaTeX check."
+          else
+            node scripts/check_latex.mjs --files $CHANGED
+          fi
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Smoke test
+        run: |
+          npm run preview -- --port 4173 --strictPort &
+          npx wait-on http://localhost:4173 --timeout 60000
+          node scripts/smoke-test.mjs http://localhost:4173
