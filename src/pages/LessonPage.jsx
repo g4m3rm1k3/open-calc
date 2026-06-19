@@ -1,3 +1,10 @@
+export const meta = {
+  title: 'Lesson Page',
+  description: 'Renders any lesson — loads content via courseLoader, tracks reading checkpoints and quiz progress in ProgressContext, and marks the lesson complete at 100%.',
+  concept: 'Dynamic Import',
+  conceptDetail: 'courseLoader.loadLesson() asynchronously imports the lesson module at runtime. The page is generic — one component drives every lesson in every course.',
+}
+
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { LESSON_MAP, ALL_LESSONS, CURRICULUM } from "../courses/index.js";

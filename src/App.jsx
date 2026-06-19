@@ -51,6 +51,13 @@ const Fallback = () => (
   </div>
 );
 
+export const meta = {
+  title: 'App Root',
+  description: 'Entry point — wires every context provider, sets up React Router, and lazy-loads all pages and labs so the initial bundle stays small.',
+  concept: 'Code Splitting',
+  conceptDetail: 'React.lazy() + Suspense defers each page\'s bundle until the user navigates there. Only the code actually needed gets downloaded.',
+}
+
 export default function App() {
   return (
     <AuthProvider>

@@ -1,3 +1,11 @@
+export const meta = {
+  title: 'Calendar',
+  description: 'Full task and event tracker built on FullCalendar. Creates, edits, and deletes user events. Shows lesson completions as read-only progress overlays. Syncs to Firebase.',
+  concept: 'Feature Module',
+  conceptDetail: 'Self-contained feature with its own types, hook, modal, and notification system. The rest of the app only knows the /calendar route — internal wiring is invisible outside.',
+  jumpTo: '/calendar',
+}
+
 import { useState, useRef, useCallback } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'

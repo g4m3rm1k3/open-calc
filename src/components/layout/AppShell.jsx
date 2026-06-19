@@ -46,6 +46,14 @@ import FootballCalculus from "../../games/football/FootballCalculus.jsx";
 import ChemistryPage from "../../labs/chemistry/ChemistryPage.jsx";
 import PhysicsPage from "../../labs/physics/PhysicsPage.jsx";
 import CodeMapBackground from "../backgrounds/CodeMapBackground.jsx";
+import NodePanel from "../backgrounds/NodePanel.jsx";
+
+export const meta = {
+  title: 'App Shell',
+  description: 'Wraps every page with the top bar, sidebar, tools, background graph, and all global overlays. Pages only render content — the shell owns all layout.',
+  concept: 'Layout Composition',
+  conceptDetail: 'Separating shared chrome (nav, modals, overlays) from page content means pages stay focused. The shell can change structure without touching any page component.',
+}
 import AlphaMascot from "../ui/AlphaMascot.jsx";
 import GameRules from "../../games/GameRules.jsx";
 import FullscreenButton from "../desktop/FullscreenButton.jsx";
@@ -265,6 +273,7 @@ export default function AppShell({ children }) {
   const [graphOpen, setGraphOpen] = useState(false);
   const [graph3DOpen, setGraph3DOpen] = useState(false);
   const [graphJSXOpen, setGraphJSXOpen] = useState(false);
+  const [selectedNode, setSelectedNode] = useState(null);
   const [scratchOpen, setScratchOpen] = useState(false);
   const [calcOpen, setCalcOpen] = useState(false);
   const [sigmaOpen, setSigmaOpen] = useState(false);
@@ -481,7 +490,15 @@ export default function AppShell({ children }) {
     <ChatProvider>
       <GrapherContext.Provider value={{ openGrapher }}>
         <div className={`min-h-screen transition-colors duration-500 relative overflow-hidden ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
-          {isDesktopRoute && <CodeMapBackground dark={dark} />}
+          {isDesktopRoute && (
+            <CodeMapBackground
+              dark={dark}
+              onNodeClick={node => setSelectedNode(node)}
+            />
+          )}
+          {isDesktopRoute && selectedNode && (
+            <NodePanel node={selectedNode} onClose={() => setSelectedNode(null)} />
+          )}
           <TopBar dark={dark} toggleDark={toggleDark} />
 
           {/* Mobile tools backdrop */}

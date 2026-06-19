@@ -1,3 +1,10 @@
+export const meta = {
+  title: 'useCalendar',
+  description: 'Custom hook that owns all calendar CRUD — add, update, delete, toggle complete. Persists to localStorage, fires notification scheduling on every change.',
+  concept: 'Custom Hook',
+  conceptDetail: 'Hooks extract stateful logic out of components. CalendarPage just calls useCalendar() and gets ready-to-use actions back. The view layer has zero state management.',
+}
+
 import { useCallback, useEffect, useMemo } from 'react'
 import { useLocalStorage } from '../../hooks/useLocalStorage.js'
 import { useAuth } from '../../context/AuthContext.jsx'

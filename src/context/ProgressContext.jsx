@@ -1,3 +1,10 @@
+export const meta = {
+  title: 'Progress Context',
+  description: 'Tracks lesson completion across the entire app — quiz scores, per-question states, and checkpoints. Persists to localStorage and syncs to Firebase when signed in.',
+  concept: 'React Context',
+  conceptDetail: 'Context lets any component in the tree read or update progress without passing props through every layer. No drilling required — just call useProgress().',
+}
+
 import { createContext, useCallback } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage.js'
 import { useAuth } from './AuthContext.jsx'

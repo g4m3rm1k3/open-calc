@@ -14,6 +14,14 @@
  *   5. Pattern Memory    — episodic memory, visual sequence recall
  */
 
+export const meta = {
+  title: 'Brain Training',
+  description: 'Cognitive training hub with dual n-back, Stroop, mental rotation, arithmetic sprint, and pattern memory. Each puzzle trains a specific cognitive function.',
+  concept: 'Lazy Component Registry',
+  conceptDetail: 'Each puzzle is registered as a lazy import. The hub never loads a puzzle until the user selects it — keeps the initial page fast regardless of how many puzzles exist.',
+  jumpTo: '/brain',
+}
+
 import { lazy, Suspense, useState } from 'react'
 import { Brain, Clock, Star, Lock, ChevronRight, Zap, RotateCcw, Hash, Grid3x3 } from 'lucide-react'
 

@@ -1,3 +1,10 @@
+export const meta = {
+  title: 'Auth Context',
+  description: 'Handles Google/GitHub sign-in and Firebase user state. Also syncs whitelisted localStorage keys (progress, calendar, notes) to Firestore so data follows the user across devices.',
+  concept: 'Auth + Cloud Sync',
+  conceptDetail: 'The SYNC_KEYS list controls exactly which localStorage keys get backed up. Add a key here and it automatically survives browser clears and works on every device.',
+}
+
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
   onAuthStateChanged,

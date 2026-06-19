@@ -1,3 +1,11 @@
+export const meta = {
+  title: 'CodeLens Lab',
+  description: 'Lab shell for the code execution visualizer. Handles back navigation, lesson handoff state, and mounts the full CodeLens experience as a fixed full-screen overlay.',
+  concept: 'Lab Shell Pattern',
+  conceptDetail: 'Each lab has a thin Page wrapper (routing, title, back nav) and a heavy inner component (the experience). Keeps routing concerns out of the feature logic.',
+  jumpTo: '/codelens',
+}
+
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import CodeLens from './codelens/CodeLens.jsx'

@@ -1,3 +1,10 @@
+export const meta = {
+  title: 'Notification Scheduler',
+  description: 'Schedules OS browser notifications and dispatches oc-notification DOM events for in-app toasts. All-day events fire at 9am; timed events fire at each configured offset.',
+  concept: 'Event-Driven Architecture',
+  conceptDetail: 'The oc-notification CustomEvent decouples the scheduler from the UI. NavClock badge and the toast component both listen independently — neither knows the other exists.',
+}
+
 import type { CalendarEvent, NotificationOffset } from './types'
 
 const scheduled = new Map<string, ReturnType<typeof setTimeout>[]>()

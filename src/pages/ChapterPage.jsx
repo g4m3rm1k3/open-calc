@@ -1,3 +1,10 @@
+export const meta = {
+  title: 'Chapter Page',
+  description: 'Lists all lessons in a chapter with live progress badges — showing quiz scores, partial credit, and completion. Entry point for navigating into individual lessons.',
+  concept: 'Progressive Disclosure',
+  conceptDetail: 'Lessons are revealed in sequence. Progress badges give learners a clear sense of where they are without overwhelming them with the full course structure at once.',
+}
+
 import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { getAllChapters } from '../courses/courseLoader.js'

@@ -1,3 +1,11 @@
+export const meta = {
+  title: 'RPG Workout',
+  description: 'Gamified workout tracker — choose a class, log exercises, earn XP, level up. Turns physical training into a progression system with quests and abilities.',
+  concept: 'Gamification',
+  conceptDetail: 'Attaching XP, levels, and class mechanics to real-world habits uses the same reward loops as games. Progress feels tangible and session-to-session momentum builds.',
+  jumpTo: '/rpg-workout',
+}
+
 import React from 'react';
 import { useRPGData } from './hooks/useRPGData';
 import { ClassSelector } from './components/ClassSelector';

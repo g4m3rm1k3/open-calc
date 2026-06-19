@@ -1,3 +1,10 @@
+export const meta = {
+  title: 'Lesson Quiz Block',
+  description: 'Renders and grades the quiz for any lesson. Stores per-question correct/incorrect state in ProgressContext so answers survive navigation and sync to Firebase.',
+  concept: 'Derived State',
+  conceptDetail: 'Score is always computed from question states — never stored separately. This means there is no stale counter. The single source of truth is the question state map.',
+}
+
 import { useState, useCallback, useEffect } from 'react'
 import { evaluate as mathEval, simplify as mathSimplify } from 'mathjs'
 import { useProgress } from '../../hooks/useProgress.js'

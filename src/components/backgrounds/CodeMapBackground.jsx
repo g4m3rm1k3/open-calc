@@ -1,9 +1,21 @@
+export const meta = {
+  title: 'Codebase Graph',
+  description: 'The interactive 3D galaxy you are looking at. Every node is a source file; every edge is an import. Click any node to see what the file does and the CS concept it demonstrates.',
+  concept: 'Force-Directed Graph',
+  conceptDetail: 'Nodes repel each other; import edges act as springs pulling connected files together. After the simulation settles, related files cluster naturally — architecture becomes visible.',
+}
+
 import { useEffect, useRef } from 'react'
 import { NODES, EDGES } from '../../data/codebaseGraph.js'
 
 // Adjacency list for hover highlight
 const ADJ = Array.from({ length: NODES.length }, () => [])
 for (const [a, b] of EDGES) { ADJ[a].push(b); ADJ[b].push(a) }
+
+// Import/export counts per node (directed)
+const IMPORTED_BY = new Array(NODES.length).fill(0)
+const IMPORTS_CNT = new Array(NODES.length).fill(0)
+for (const [a, b] of EDGES) { IMPORTS_CNT[a]++; IMPORTED_BY[b]++ }
 
 // App.jsx is the hub — start view centred on it
 const APP_IDX = NODES.findIndex(n => n.id === 'App.jsx')
@@ -17,11 +29,13 @@ function project(x, y, z, rx, ry, scale, fov) {
   return { px: (x1 * scale) / d, py: (y2 * scale) / d, sz: z2 }
 }
 
-export default function CodeMapBackground({ dark }) {
-  const canvasRef = useRef(null)
-  const labelRef  = useRef(null)
-  const darkRef   = useRef(dark)
+export default function CodeMapBackground({ dark, onNodeClick }) {
+  const canvasRef      = useRef(null)
+  const labelRef       = useRef(null)
+  const darkRef        = useRef(dark)
+  const onNodeClickRef = useRef(onNodeClick)
   useEffect(() => { darkRef.current = dark }, [dark])
+  useEffect(() => { onNodeClickRef.current = onNodeClick }, [onNodeClick])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -38,6 +52,7 @@ export default function CodeMapBackground({ dark }) {
       mx: -99999, my: -99999,
       hovered: -1,
       centred: false,
+      didDrag: false,
     }
 
     const resize = () => {
@@ -66,8 +81,9 @@ export default function CodeMapBackground({ dark }) {
     const onDown = e => {
       if (e.target.closest(ISEL)) return
       if (isOverUI(e.target)) return
-      st.drag = { x: e.clientX, y: e.clientY }
-      st.isPan = e.shiftKey
+      st.drag    = { x: e.clientX, y: e.clientY }
+      st.isPan   = e.shiftKey
+      st.didDrag = false
       st.rxD = st.rx; st.ryD = st.ry
       st.panXD = st.panX; st.panYD = st.panY
     }
@@ -76,6 +92,8 @@ export default function CodeMapBackground({ dark }) {
       st.mx = (e.clientX - rect.left) * devicePixelRatio
       st.my = (e.clientY - rect.top)  * devicePixelRatio
       if (!st.drag) return
+      const dx = e.clientX - st.drag.x, dy = e.clientY - st.drag.y
+      if (Math.hypot(dx, dy) > 4) st.didDrag = true
       if (st.isPan || e.shiftKey) {
         st.panX = st.panXD + (e.clientX - st.drag.x) * devicePixelRatio
         st.panY = st.panYD + (e.clientY - st.drag.y) * devicePixelRatio
@@ -88,6 +106,21 @@ export default function CodeMapBackground({ dark }) {
       }
     }
     const onUp = () => { st.drag = null }
+
+    const onClick = e => {
+      if (e.target.closest(ISEL)) return
+      if (isOverUI(e.target)) return
+      if (st.didDrag) return  // don't open panel after a rotate/pan
+      if (st.hovered >= 0) {
+        onNodeClickRef.current?.({
+          ...NODES[st.hovered],
+          importedBy: IMPORTED_BY[st.hovered],
+          importsCnt: IMPORTS_CNT[st.hovered],
+        })
+      } else {
+        onNodeClickRef.current?.(null)
+      }
+    }
 
     const onWheel = e => {
       if (isOverUI(e.target)) return
@@ -108,6 +141,7 @@ export default function CodeMapBackground({ dark }) {
     window.addEventListener('mousedown', onDown)
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseup',   onUp)
+    window.addEventListener('click',     onClick)
     window.addEventListener('wheel', onWheel, { passive: false })
 
     let raf = null
@@ -151,6 +185,8 @@ export default function CodeMapBackground({ dark }) {
         const d = Math.hypot(p.sx - st.mx, p.sy - st.my)
         if (d < minD) { minD = d; hovIdx = p.i }
       }
+      st.hovered = hovIdx
+      document.body.style.cursor = hovIdx >= 0 ? 'pointer' : ''
       const hovSet = hovIdx >= 0 ? new Set(ADJ[hovIdx]) : null
       const anyHov = hovIdx >= 0
 
@@ -287,9 +323,11 @@ export default function CodeMapBackground({ dark }) {
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
+      document.body.style.cursor = ''
       window.removeEventListener('mousedown', onDown)
       window.removeEventListener('mousemove', onMove)
       window.removeEventListener('mouseup',   onUp)
+      window.removeEventListener('click',     onClick)
       window.removeEventListener('wheel', onWheel)
     }
   }, [])
