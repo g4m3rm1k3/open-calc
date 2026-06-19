@@ -7,8 +7,11 @@ export const meta = {
 
 import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
-import { getAllChapters } from '../courses/courseLoader.js'
+import { getAllChapters, getCourseMeta } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
+import { LessonProgressBadge } from '../components/ui/LessonProgressBadge.jsx'
+import { GLASS_META } from '../styles/courseColors.js'
+import { motion } from 'framer-motion'
 
 const ALL_CHAPTERS = getAllChapters()
 
@@ -26,73 +29,124 @@ export default function ChapterPage() {
 
   if (!chapter) {
     return (
-      <div className="text-center py-20">
-        <h2 className="text-xl text-slate-700 dark:text-slate-300">Chapter not found</h2>
-        <Link to="/" className="text-brand-600 mt-4 block hover:underline">Back to home</Link>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-200 mb-4">Chapter not found</h2>
+        <p className="text-slate-500 mb-8 max-w-md">The chapter you're looking for doesn't exist or might have been moved.</p>
+        <Link to="/" className="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-full transition-colors">
+          Back to home
+        </Link>
       </div>
     )
   }
 
+  const courseMeta = chapter.course ? getCourseMeta(chapter.course) : null
+  const courseColor = courseMeta?.color || 'slate'
+  const theme = GLASS_META[courseColor] || GLASS_META['slate']
+
   return (
-    <div>
-      <Link
-        to={chapter.course ? `/course/${chapter.course}` : '/'}
-        className="text-sm text-brand-600 dark:text-brand-400 hover:underline mb-4 inline-block"
-      >
-        ← {chapter.course ? `All ${chapter.title.split(':')[0].trim().split(' ')[0]} chapters` : 'All courses'}
-      </Link>
-      <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">{chapter.title}</h1>
-      <p className="text-slate-600 dark:text-slate-400 mb-10 leading-relaxed">{chapter.description}</p>
+    <div className="max-w-5xl mx-auto pb-20">
+      <div className="mb-10">
+        <Link
+          to={chapter.course ? `/course/${chapter.course}` : '/'}
+          className={`text-sm ${theme.text} hover:underline mb-6 inline-block font-medium`}
+        >
+          ← {chapter.course ? `All ${courseMeta?.label || 'course'} chapters` : 'All courses'}
+        </Link>
+        <div className={`p-8 md:p-12 rounded-[2rem] bg-gradient-to-br ${theme.header} text-white shadow-xl relative overflow-hidden`} style={{ boxShadow: theme.glow }}>
+          {/* Decorative background blur/circle */}
+          <div className="absolute top-0 right-0 -mt-24 -mr-24 w-96 h-96 bg-white/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-64 h-64 bg-black/10 rounded-full blur-2xl pointer-events-none"></div>
+          
+          <div className="relative z-10">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 tracking-tight drop-shadow-sm">{chapter.title}</h1>
+            <p className="text-white/90 text-lg md:text-xl max-w-3xl leading-relaxed">{chapter.description}</p>
+          </div>
+        </div>
+      </div>
 
       {chapter.comingSoon ? (
-        <div className="text-center py-16 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700">
-          <p className="text-4xl mb-3">🚧</p>
-          <p className="text-slate-600 dark:text-slate-400">This chapter is coming soon!</p>
+        <div className="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full mb-6 text-4xl shadow-sm">
+            🚧
+          </div>
+          <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">Coming Soon</h3>
+          <p className="text-slate-500 dark:text-slate-400 max-w-md mx-auto">We are hard at work building this chapter. Check back later!</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <motion.div 
+          className="grid grid-cols-1 gap-4"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: {
+              opacity: 1,
+              transition: { staggerChildren: 0.08 }
+            }
+          }}
+        >
           {chapter.lessons.map((lesson, i) => {
             const { percent, status, correct, total } = getLessonProgress(`${chapter.course}/${lesson.slug}`)
-            const hasQuizData = total > 0
+            
             return (
-              <Link
+              <motion.div
                 key={lesson.slug}
-                to={`/chapter/${chapter.number}/${lesson.slug}`}
-                className="block p-5 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-600 hover:shadow-md transition-all"
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0 }
+                }}
               >
-                <div className="flex items-start gap-4">
-                  <span className="text-slate-400 dark:text-slate-500 text-sm font-mono mt-1 w-6 text-right">{i + 1}</span>
-                  <div className="flex-1">
-                    <h2 className="font-bold text-slate-900 dark:text-slate-100 mb-1">{lesson.title}</h2>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 italic mb-3">{lesson.subtitle}</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {lesson.tags?.slice(0, 4).map((tag) => (
-                        <span key={tag} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs rounded-full">{tag}</span>
-                      ))}
+                <Link
+                  to={`/chapter/${chapter.number}/${lesson.slug}`}
+                  className={`group flex items-center justify-between p-5 md:p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/60 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xl transition-all duration-300 relative overflow-hidden block`}
+                >
+                  {/* Subtle hover background block using the safelisted color */}
+                  <div className={`absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-current opacity-0 group-hover:opacity-[0.03] dark:group-hover:opacity-[0.05] transition-opacity duration-300 pointer-events-none ${theme.text}`} />
+
+                  <div className="flex items-start gap-5 md:gap-6 relative z-10 flex-1">
+                    <div className={`flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800 ${theme.text} font-bold font-mono text-xl group-hover:scale-110 transition-transform duration-300 shadow-sm border border-slate-100 dark:border-slate-700/50`}>
+                      {i + 1}
+                    </div>
+                    
+                    <div className="flex-1 min-w-0 pr-4 mt-0.5">
+                      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1.5 group-hover:text-slate-800 dark:group-hover:text-white transition-colors truncate">{lesson.title}</h2>
+                      <p className="text-slate-500 dark:text-slate-400 mb-4 line-clamp-2 text-sm leading-relaxed">{lesson.subtitle}</p>
+                      
+                      {lesson.tags && lesson.tags.length > 0 && (
+                        <div className="flex gap-2 flex-wrap">
+                          {lesson.tags.slice(0, 4).map((tag) => (
+                            <span key={tag} className="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold rounded-lg border border-slate-200/50 dark:border-slate-700/50">{tag}</span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div className="flex-shrink-0 text-right min-w-[80px]">
-                    {status === 'complete' && (
-                      <span className="text-emerald-500 text-sm font-medium">✓ Complete</span>
-                    )}
-                    {status === 'in-progress' && hasQuizData && (
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="text-amber-500 text-sm font-bold">{percent}%</span>
-                        <span className="text-[10px] text-slate-400">{correct}/{total} correct</span>
-                      </div>
-                    )}
-                    {status === 'in-progress' && !hasQuizData && (
-                      <span className="text-amber-500 text-sm font-medium">In progress</span>
-                    )}
-                    {status === 'not-started' && (
-                      <span className="text-slate-400 text-sm">Not started</span>
-                    )}
+
+                  <div className="flex-shrink-0 relative z-10 ml-4 hidden sm:block">
+                    <LessonProgressBadge 
+                      status={status} 
+                      percent={percent} 
+                      correct={correct} 
+                      total={total}
+                      courseColorMeta={theme}
+                    />
                   </div>
-                </div>
-              </Link>
+                  
+                  {/* Mobile Badge Container */}
+                  <div className="absolute top-5 right-5 sm:hidden scale-[0.8] origin-top-right">
+                     <LessonProgressBadge 
+                      status={status} 
+                      percent={percent} 
+                      correct={correct} 
+                      total={total}
+                      courseColorMeta={theme}
+                    />
+                  </div>
+                </Link>
+              </motion.div>
             )
           })}
-        </div>
+        </motion.div>
       )}
     </div>
   )
