@@ -214,7 +214,7 @@ function useIsDark() {
   return dark
 }
 
-const DocsCtx = createContext({ isDark: false, onRun: null, codeAlongOpen: false, activeFile: null, onDocLink: null, onNavigate: null })
+const DocsCtx = createContext({ isDark: false, onRun: null, codeAlongOpen: false, activeFile: null, onDocLink: null, onNavigate: null, scrollToHeading: null })
 
 // ── "Open With" helpers ───────────────────────────────────────────────────────
 
@@ -506,6 +506,19 @@ function MdInlineCode({ children }) {
   )
 }
 
+function headingId(text) {
+  return String(text).toLowerCase()
+    .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
+}
+
+function extractText(node) {
+  if (!node) return ''
+  if (typeof node === 'string') return node
+  if (Array.isArray(node)) return node.map(extractText).join('')
+  if (node?.props?.children !== undefined) return extractText(node.props.children)
+  return ''
+}
+
 // Resolve a relative .md href against the current file path.
 // Returns the canonical DOCS_MODULES key if it exists, otherwise null.
 function resolveDocPath(currentFilePath, href) {
@@ -524,19 +537,34 @@ function resolveDocPath(currentFilePath, href) {
 }
 
 function MdLink({ href, children }) {
-  const { activeFile, onDocLink } = useContext(DocsCtx)
-  const docPath = resolveDocPath(activeFile, href)
-  if (docPath) {
+  const { activeFile, onDocLink, scrollToHeading } = useContext(DocsCtx)
+
+  // Same-page anchor — scroll the content container instead of the window
+  if (href?.startsWith('#')) {
+    return (
+      <a href={href} onClick={(e) => { e.preventDefault(); scrollToHeading?.(href.slice(1)) }}>
+        {children}
+      </a>
+    )
+  }
+
+  // Relative .md link — always load in Studio, never navigate away
+  const hrefBase = href?.split('#')[0] ?? ''
+  const isRelativeMd = hrefBase.endsWith('.md') && !href.startsWith('http') && !href.startsWith('//')
+  if (isRelativeMd) {
+    const docPath = resolveDocPath(activeFile, href)
     return (
       <a
         href="#"
-        onClick={(e) => { e.preventDefault(); onDocLink?.(docPath) }}
-        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+        onClick={(e) => { e.preventDefault(); if (docPath) onDocLink?.(docPath) }}
+        style={{ opacity: docPath ? 1 : 0.5, cursor: docPath ? 'pointer' : 'default' }}
+        title={docPath ? undefined : 'Linked document not found in this Studio'}
       >
         {children}
       </a>
     )
   }
+
   const isExternal = href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//'))
   return (
     <a href={href} target={isExternal ? '_blank' : undefined} rel={isExternal ? 'noopener noreferrer' : undefined}>
@@ -559,6 +587,10 @@ function MdImage({ src, alt, title }) {
 }
 
 const MD_COMPONENTS = {
+  h1: ({ children }) => <h1 id={headingId(extractText(children))}>{children}</h1>,
+  h2: ({ children }) => <h2 id={headingId(extractText(children))}>{children}</h2>,
+  h3: ({ children }) => <h3 id={headingId(extractText(children))}>{children}</h3>,
+  h4: ({ children }) => <h4 id={headingId(extractText(children))}>{children}</h4>,
   pre({ node }) {
     // Read directly from the hast node to avoid losing className through custom `code` processing
     const codeNode = node?.children?.[0]
@@ -808,6 +840,24 @@ export default function MarkdownHub() {
   const [adaOpen, setAdaOpen] = useState(false)
   const [workspaceSnap, setWorkspaceSnap] = useState({ code: '', language: '', filename: '', fileList: [], getTerminalOutput: () => '' })
   const isDark = useIsDark()
+  const [sidebarTab, setSidebarTab] = useState('docs') // 'docs' | 'toc'
+  const contentScrollRef = useRef(null)
+  const headings = useMemo(() => {
+    if (!content) return []
+    return content.split('\n')
+      .filter(line => /^#{1,4} /.test(line))
+      .map(line => {
+        const m = line.match(/^(#{1,4}) (.+)/)
+        if (!m) return null
+        const text = m[2].replace(/\*\*/g, '').replace(/`/g, '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').trim()
+        return { level: m[1].length, text, id: headingId(text) }
+      })
+      .filter(Boolean)
+  }, [content])
+  const scrollToHeading = useCallback((id) => {
+    const el = contentScrollRef.current?.querySelector(`[id="${CSS.escape(id)}"]`)
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
   const [studioTheme, setStudioTheme] = useState(() => localStorage.getItem('studio_theme') || 'default')
   const themeStyles = useMemo(() => getThemeStyles(studioTheme, isDark), [studioTheme, isDark])
   const ui = themeStyles.ui
@@ -898,7 +948,8 @@ export default function MarkdownHub() {
     activeFile: tab === 'tutorials' ? activeFile : null,
     onDocLink: selectTutorial,
     onNavigate: navigate,
-  }), [themeStyles, handleRunInCodeAlong, codeAlongOpen, activeFile, selectTutorial, tab, navigate])
+    scrollToHeading,
+  }), [themeStyles, handleRunInCodeAlong, codeAlongOpen, activeFile, selectTutorial, tab, navigate, scrollToHeading])
 
   useEffect(() => {
     refreshDocsIndex()
@@ -1219,7 +1270,7 @@ export default function MarkdownHub() {
         onChange={onImportFile}
       />
 
-      <div className={`flex flex-col h-[100vh] w-full ${ui.bg0} ${ui.txt1} font-sans overflow-hidden inset-0 fixed z-[100]`}>
+      <div className={`flex flex-col h-[100vh] w-full ${ui.bg0} ${ui.txt1} font-sans overflow-hidden inset-0 fixed z-[1650]`}>
         <div className={`h-12 ${ui.bg1} border-b ${ui.border} flex items-center gap-1.5 px-3 shrink-0 z-10 w-full`}>
 
           {/* Nav toggle */}
@@ -1373,10 +1424,30 @@ export default function MarkdownHub() {
 
 
         <DocsCtx.Provider value={docsCtxValue}>
-        <div className={`flex flex-1 overflow-hidden w-full relative ${codeAlongOpen ? 'min-w-0' : ''}`}>
+        <div className={`flex flex-1 min-h-0 overflow-hidden w-full relative ${codeAlongOpen ? 'min-w-0' : ''}`}>
           <div className={`${docsNavOpen ? 'hidden sm:flex' : 'hidden'} ${codeAlongOpen ? 'w-[240px]' : 'w-[300px]'} ${ui.bg1} border-r ${ui.border} flex-col shrink-0 overflow-hidden h-full`}>
-            <div className="flex-1 overflow-y-auto py-3 custom-scrollbar">
-              {tab === 'tutorials' && (
+            {/* Sidebar tab switcher — only in tutorials mode when doc has headings */}
+            {tab === 'tutorials' && headings.length > 0 && (
+              <div className={`flex shrink-0 border-b ${ui.border}`}>
+                <button
+                  onClick={() => setSidebarTab('docs')}
+                  className={`flex-1 py-1.5 text-[11px] font-bold transition-colors border-b-2 ${sidebarTab === 'docs' ? '' : 'border-transparent ' + ui.txt2 + ' ' + ui.hoverBg}`}
+                  style={sidebarTab === 'docs' ? { borderBottomColor: accentColor, color: accentColor } : {}}
+                >
+                  Documents
+                </button>
+                <button
+                  onClick={() => setSidebarTab('toc')}
+                  className={`flex-1 py-1.5 text-[11px] font-bold transition-colors border-b-2 ${sidebarTab === 'toc' ? '' : 'border-transparent ' + ui.txt2 + ' ' + ui.hoverBg}`}
+                  style={sidebarTab === 'toc' ? { borderBottomColor: accentColor, color: accentColor } : {}}
+                >
+                  On This Page
+                </button>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-y-auto py-3 custom-scrollbar min-h-0">
+              {tab === 'tutorials' && (sidebarTab === 'docs' || !headings.length) && (
                 tree.length === 0
                   ? (
                     <div className="p-4 text-xs text-slate-500 dark:text-slate-400">
@@ -1393,6 +1464,23 @@ export default function MarkdownHub() {
                       accentColor={accentColor}
                     />
                     ))
+              )}
+
+              {tab === 'tutorials' && sidebarTab === 'toc' && headings.length > 0 && (
+                <div className="py-1">
+                  {headings.map((h, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { scrollToHeading(h.id); setSidebarTab('docs') }}
+                      className={`w-full text-left py-1 text-[12px] ${ui.txt2} ${ui.hoverBg} transition-colors truncate`}
+                      style={{ paddingLeft: 10 + (h.level - 1) * 12, paddingRight: 8 }}
+                      title={h.text}
+                    >
+                      {h.level > 1 && <span className="opacity-25 mr-1">{'–'.repeat(h.level - 1)}</span>}
+                      {h.text}
+                    </button>
+                  ))}
+                </div>
               )}
 
               {tab === 'editor' && (
@@ -1443,7 +1531,7 @@ export default function MarkdownHub() {
             </div>
 
             {tab === 'editor' && (
-              <div className={`p-3 border-t ${ui.border} ${ui.bg1}`}>
+              <div className={`shrink-0 p-3 border-t ${ui.border} ${ui.bg1}`}>
                 <button
                   onClick={createUserDoc}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400 font-bold text-xs rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors shadow-sm"
@@ -1456,7 +1544,7 @@ export default function MarkdownHub() {
 
           <div className={`flex-1 min-w-0 flex flex-col overflow-hidden ${ui.bg0}`}>
             {tab === 'tutorials' && (
-              <div className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar">
+              <div ref={contentScrollRef} className="flex-1 overflow-y-auto px-6 sm:px-10 lg:px-16 py-8 custom-scrollbar">
                 {loading ? (
                   <div className="text-slate-500 text-sm animate-pulse">Loading document...</div>
                 ) : (

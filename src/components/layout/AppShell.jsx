@@ -246,9 +246,9 @@ export default function AppShell({ children }) {
   const isCodeLensRoute = location.pathname.startsWith("/codelens");
   const isLearnRoute = location.pathname.startsWith("/learn") || location.pathname.startsWith("/web-learn");
   const isFullPageToolRoute = location.pathname.startsWith("/notebook-lab") ||
-    location.pathname.startsWith("/lesson-builder") ||
     location.pathname.startsWith("/viz-builder") ||
     location.pathname.startsWith("/playground");
+  const isScrollableFullPageRoute = location.pathname.startsWith("/lesson-builder");
   const isDesktopRoute = location.pathname === '/';
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
@@ -405,7 +405,7 @@ export default function AppShell({ children }) {
         <div
           className={`h-screen overflow-hidden ${isCadProRoute || isFiveAxisRoute || isCodeLensRoute || isLearnRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
         >
-          <div className="h-full w-full overflow-hidden">
+          <div className="h-[calc(100vh-44px)] w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>
           <SearchModal />
@@ -501,7 +501,7 @@ export default function AppShell({ children }) {
 
           {/* Main content */}
           <main
-            className={`transition-[padding] duration-500 ease-in-out pb-20 lg:pb-11 ${isChemistryRoute || isFullPageToolRoute ? "h-screen overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-12`}
+            className={`transition-[padding] duration-500 ease-in-out ${isChemistryRoute || isFullPageToolRoute || isScrollableFullPageRoute ? "flex flex-col h-[calc(100vh-44px)] overflow-hidden" : isDesktopRoute ? "h-screen" : "min-h-screen pb-20 lg:pb-11"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-12`}
             style={{
               paddingRight: chatOpen
                 ? (scratchSnap === "right" ? `${scratchSnapW}px` : "var(--chat-width, 380px)")
@@ -516,8 +516,10 @@ export default function AppShell({ children }) {
                 isDesktopRoute
                   ? "w-full h-[calc(100vh-48px-44px)]"
                   : isChemistryRoute || isFullPageToolRoute
-                    ? "w-full h-[calc(100vh-48px)] flex flex-col overflow-hidden"
-                    : isUniversalCalcRoute
+                    ? "flex-1 min-h-0 w-full flex flex-col overflow-hidden"
+                    : isScrollableFullPageRoute
+                      ? "flex-1 min-h-0 w-full overflow-y-auto"
+                      : isUniversalCalcRoute
                       ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"
                       : `max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-500`
               }

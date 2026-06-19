@@ -81,7 +81,7 @@ export default function VizBuilderShell() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-48px)] bg-slate-50 dark:bg-slate-950">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950">
       {/* Mode selector bar */}
       <div className="flex items-center gap-1 px-4 py-2 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shrink-0">
         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-3">Mode</span>
