@@ -23,6 +23,7 @@ const NAV_LINKS = [
   { id: 'linear-algebra', label: 'Linear Algebra', emoji: '∑', path: '/linear-algebra' },
   { id: 'studio', label: 'Studio / Docs', emoji: '✏️', path: '/studio' },
   { id: 'health', label: 'Health Tracker', emoji: '❤️', path: '/health' },
+  { id: 'lesson-builder', label: 'Lesson Builder · Contribute', emoji: '🔨', path: '/lesson-builder' },
   { id: 'about', label: 'About', emoji: 'ℹ️', path: '/about' },
   { id: 'game-rules', label: 'Game Reference', emoji: '♠️', action: 'game-rules' },
 ]

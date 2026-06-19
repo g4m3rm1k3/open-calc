@@ -50,7 +50,7 @@ export default function MobileHomePage() {
         </section>
       )}
 
-      <section>
+      <section data-tour="courses-grid">
         <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
           Courses
         </h2>

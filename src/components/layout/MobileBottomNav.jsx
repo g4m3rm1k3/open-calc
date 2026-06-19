@@ -14,8 +14,9 @@ export default function MobileBottomNav({ onSearchOpen, onToolsToggle }) {
   const isReferenceActive = location.pathname.startsWith('/reference')
   const isHomeActive = location.pathname === '/'
 
-  const NavItem = ({ active, onClick, icon: Icon, label, activeColor }) => (
+  const NavItem = ({ active, onClick, icon: Icon, label, activeColor, dataTour }) => (
     <motion.button
+      data-tour={dataTour}
       whileTap={{ scale: 0.9 }}
       onClick={onClick}
       className={`relative flex flex-col items-center justify-center flex-1 h-16 ${active ? activeColor : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
@@ -48,22 +49,24 @@ export default function MobileBottomNav({ onSearchOpen, onToolsToggle }) {
           activeColor="text-brand-600 dark:text-brand-400" 
         />
         
-        <NavItem 
-          active={isExploreActive} 
-          onClick={() => navigate('/courses')} 
-          icon={Compass} 
-          label="Explore" 
-          activeColor="text-indigo-600 dark:text-indigo-400" 
+        <NavItem
+          dataTour="explore-mobile"
+          active={isExploreActive}
+          onClick={() => navigate('/courses')}
+          icon={Compass}
+          label="Explore"
+          activeColor="text-indigo-600 dark:text-indigo-400"
         />
         
-        <NavItem 
-          active={false} 
-          onClick={onToolsToggle} 
-          icon={Layers} 
-          label="Tools" 
-          activeColor="text-slate-900 dark:text-white" 
+        <NavItem
+          dataTour="mobile-tools-btn"
+          active={false}
+          onClick={onToolsToggle}
+          icon={Layers}
+          label="Tools"
+          activeColor="text-slate-900 dark:text-white"
         />
-        
+
         <NavItem 
           active={false} 
           onClick={onSearchOpen} 

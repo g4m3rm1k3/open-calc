@@ -5,6 +5,7 @@ import {
   Outlet,
   useLocation,
   useParams,
+  useNavigate,
 } from "react-router-dom";
 import { LESSON_MAP, CURRICULUM, COURSES } from "../../courses/index.js";
 import SearchModal from "../ui/SearchModal.jsx";
@@ -36,6 +37,7 @@ import PolyCalc from "../../tools/polynomial/index.jsx";
 import LinearAlgebraCalc from "../../tools/linear-algebra/index.jsx";
 import MatrixReducer from "../../tools/matrix-reducer/index.jsx";
 import HelpModal from "../ui/HelpModal.jsx";
+import ReportBugButton from "../ui/ReportBugButton.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import TerminalHub from "../../tools/terminal-hub/TerminalHub.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
@@ -63,6 +65,7 @@ import NavClock from "../desktop/NavClock.jsx";
 import TutorPanel from "../tutor/TutorPanel.jsx";
 import MobileHomePage from "./MobileHomePage.jsx";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
+import WhatsNewModal from "../ui/WhatsNewModal.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -197,54 +200,14 @@ function TopBar({ dark, toggleDark }) {
   );
 }
 
-function WelcomeModal() {
-  const [visible, setVisible] = useState(
-    () => !localStorage.getItem("oc-welcome-seen"),
-  );
-
-  if (!visible) return null;
-
-  const dismiss = () => {
-    localStorage.setItem("oc-welcome-seen", "1");
-    setVisible(false);
-  };
-
-  return (
-    <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-      onClick={dismiss}
-    >
-      <div
-        className="relative max-w-lg w-full bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-8"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-3xl font-bold text-brand-600 dark:text-brand-400">
-            ∂
-          </span>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-            Welcome to UpSkillOS!
-          </h2>
-        </div>
-        <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
-          Concepts here are taught in multiple ways — visually, algebraically,
-          and conceptually. If a specific interactive or explanation doesn't
-          click for you right away, don't worry! Keep scrolling. You will likely
-          find an analogy or visual that perfectly matches how your brain works.
-        </p>
-        <button
-          onClick={dismiss}
-          className="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold transition-colors"
-        >
-          Start Exploring
-        </button>
-      </div>
-    </div>
-  );
-}
+// First-visit onboarding used to be a standalone modal here. It's now hosted
+// by Delta (the AI tutor) instead — see TourContext/TourSpotlight, mounted in
+// App.jsx — so it can point at the real Taskbar/nav buttons it's describing
+// instead of just describing them in a floating card.
 
 export default function AppShell({ children }) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isUniversalCalcRoute = location.pathname.startsWith("/universal-calc");
   const isChemistryRoute = location.pathname.startsWith("/chemistry");
   const isOpenMatRoute = location.pathname.startsWith("/openmat");
@@ -682,13 +645,49 @@ export default function AppShell({ children }) {
                       window.dispatchEvent(new CustomEvent("oc-toggle-video"));
                       setMobileToolsOpen(false);
                     }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-500/20 shadow-sm col-span-2 sm:col-span-1"
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-500/20 shadow-sm"
                   >
                     <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-sky-500/20 flex items-center justify-center shadow-sm">
                       <PlayCircle className="w-5 h-5" />
                     </div>
                     <span className="text-xs font-bold tracking-wide">Video Player</span>
                   </motion.button>
+
+                  <motion.button
+                    data-tour="stem-tutor-mobile"
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      window.dispatchEvent(new CustomEvent("oc-toggle-tutor"));
+                      setMobileToolsOpen(false);
+                    }}
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20 shadow-sm"
+                  >
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-emerald-500/20 flex items-center justify-center shadow-sm">
+                      <GraduationCap className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold tracking-wide">Delta (AI Tutor)</span>
+                  </motion.button>
+
+                  <motion.button
+                    data-tour="lesson-builder-mobile"
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setMobileToolsOpen(false);
+                      navigate("/lesson-builder");
+                    }}
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-500/20 shadow-sm"
+                  >
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-amber-500/20 flex items-center justify-center shadow-sm">
+                      <span className="text-lg leading-none">🔨</span>
+                    </div>
+                    <span className="text-xs font-bold tracking-wide">Lesson Builder</span>
+                  </motion.button>
+
+                  <ReportBugButton
+                    tile
+                    data-tour="report-bug-mobile"
+                    onOpen={() => setMobileToolsOpen(false)}
+                  />
                 </div>
               </motion.div>
             )}
@@ -704,7 +703,7 @@ export default function AppShell({ children }) {
           {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
           {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
           {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
-          <WelcomeModal />
+          <WhatsNewModal />
           <SearchModal />
           <GlobalGrapher
             isOpen={graphOpen}

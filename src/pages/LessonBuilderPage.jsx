@@ -6,6 +6,38 @@ import { emptyState, lessonToState, PALETTE_BLOCKS } from '../components/lesson-
 import ComponentPalette from '../components/lesson-builder/ComponentPalette.jsx'
 import BuilderCanvas from '../components/lesson-builder/BuilderCanvas.jsx'
 import ExportPanel from '../components/lesson-builder/ExportPanel.jsx'
+import StepTour from '../components/ui/StepTour.jsx'
+
+const BUILDER_TOUR_SEEN_KEY = 'oc-lesson-builder-intro-seen'
+
+const BUILDER_TOUR_STEPS = [
+  {
+    title: 'Build a lesson without touching code',
+    body: "Lessons are made of blocks — Intuition, Math, Rigor, Examples, Challenges, Quiz, and Python notebooks. Add blocks from the palette on the left, fill them in, and the builder assembles a real lesson file behind the scenes.",
+  },
+  {
+    title: 'Visualizations connect by ID',
+    body: "Any block can embed an interactive visualization by referencing its component ID (e.g. previewVisualizationId). The Viz Builder lets you create and preview those separately, then drop the ID into a lesson block here.",
+  },
+  {
+    title: 'LaTeX is checked as you type',
+    body: "Math blocks render live with KaTeX — if an equation is broken, you'll see the error immediately instead of finding out after submitting.",
+  },
+  {
+    title: 'Submit it as a real contribution',
+    body: "When you're done, \"Submit as contribution\" in the Export panel signs you in with GitHub and opens a real pull request — fork, branch, and commit handled automatically. No local git setup needed.",
+  },
+]
+
+function BuilderTour({ onDone }) {
+  return (
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="relative max-w-lg w-full bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col min-h-[300px]">
+        <StepTour steps={BUILDER_TOUR_STEPS} onDone={onDone} finalLabel="Start building" />
+      </div>
+    </div>
+  )
+}
 
 export default function LessonBuilderPage() {
   const { chapterId, lessonSlug } = useParams()
@@ -16,6 +48,11 @@ export default function LessonBuilderPage() {
   )
   const [loading, setLoading] = useState(false)
   const [showExport, setShowExport] = useState(false)
+  const [showTour, setShowTour] = useState(() => !localStorage.getItem(BUILDER_TOUR_SEEN_KEY))
+  const dismissTour = () => {
+    localStorage.setItem(BUILDER_TOUR_SEEN_KEY, '1')
+    setShowTour(false)
+  }
 
   useEffect(() => {
     if (!chapterId || !lessonSlug) return
@@ -90,6 +127,8 @@ export default function LessonBuilderPage() {
       {showExport && (
         <ExportPanel state={state} onClose={() => setShowExport(false)} />
       )}
+
+      {showTour && <BuilderTour onDone={dismissTour} />}
     </div>
   )
 }

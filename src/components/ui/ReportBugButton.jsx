@@ -11,7 +11,7 @@ const CATEGORIES = [
   { value: 'other',          label: '❓ Other' },
 ]
 
-export default function ReportBugButton({ className = '' }) {
+export default function ReportBugButton({ className = '', iconOnly = false, tile = false, onOpen, ...rest }) {
   const { submit: submitReport, submitting, canSubmit } = useReportBug()
   const [open, setOpen]           = useState(false)
   const [title, setTitle]         = useState('')
@@ -40,14 +40,32 @@ export default function ReportBugButton({ className = '' }) {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className={`flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors ${className}`}
-        title="Report a bug"
-      >
-        <Bug className="w-3.5 h-3.5" />
-        <span>Report Bug</span>
-      </button>
+      {tile ? (
+        <button
+          {...rest}
+          onClick={() => { setOpen(true); onOpen?.() }}
+          className={`flex flex-col items-start gap-3 p-4 rounded-3xl bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-500/20 shadow-sm w-full ${className}`}
+        >
+          <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-rose-500/20 flex items-center justify-center shadow-sm">
+            <Bug className="w-5 h-5" />
+          </div>
+          <span className="text-xs font-bold tracking-wide">Report a Bug</span>
+        </button>
+      ) : (
+        <button
+          {...rest}
+          onClick={() => { setOpen(true); onOpen?.() }}
+          className={
+            iconOnly
+              ? `flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-500 dark:hover:text-red-400 transition-colors focus:outline-none ${className}`
+              : `flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors ${className}`
+          }
+          title="Report a bug"
+        >
+          <Bug className="w-3.5 h-3.5" />
+          {!iconOnly && <span>Report Bug</span>}
+        </button>
+      )}
 
       {open && (
         <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">

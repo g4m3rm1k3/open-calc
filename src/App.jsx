@@ -12,6 +12,9 @@ import { getLabEntry } from "./labs/labLoader.js";
 import { getGameEntry } from "./games/gameLoader.js";
 import DesktopProvider from "./components/desktop/DesktopProvider.jsx";
 import RootErrorBoundary from "./components/layout/RootErrorBoundary.jsx";
+import { TourProvider } from "./context/TourContext.jsx";
+import TourSpotlight from "./components/ui/TourSpotlight.jsx";
+import TourAutoStart from "./components/ui/TourAutoStart.jsx";
 
 const DesktopPage = lazy(() => import("./pages/DesktopPage.jsx"));
 const ChapterPage = lazy(() => import("./pages/ChapterPage.jsx"));
@@ -69,9 +72,12 @@ export default function App() {
             <HashRouter
               future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
             >
+              <TourProvider>
               <DesktopProvider>
               <FloatingVideoPlayer />
               <Suspense fallback={null}><NotificationToast /></Suspense>
+              <TourAutoStart />
+              <TourSpotlight />
               <RootErrorBoundary>
               <AppShell>
                 <Suspense fallback={<Fallback />}>
@@ -165,6 +171,7 @@ export default function App() {
               </AppShell>
               </RootErrorBoundary>
               </DesktopProvider>
+              </TourProvider>
             </HashRouter>
           </VideoPlayerProvider>
         </PinsProvider>

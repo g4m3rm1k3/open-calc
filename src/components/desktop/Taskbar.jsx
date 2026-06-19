@@ -5,6 +5,7 @@ import StartMenu from './StartMenu.jsx'
 import ChapterNavigator from './ChapterNavigator.jsx'
 import PinsNotesPopup from './PinsNotesPopup.jsx'
 import { useDesktop } from './DesktopProvider.jsx'
+import ReportBugButton from '../ui/ReportBugButton.jsx'
 
 const PINNED_APPS = [
   {
@@ -45,6 +46,7 @@ export default function Taskbar({ windows, onFocus }) {
 
         {/* Start / App launcher */}
         <motion.button
+          data-tour="start-menu"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setMenuOpen(m => !m)}
@@ -146,16 +148,19 @@ export default function Taskbar({ windows, onFocus }) {
 
           <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1 flex-shrink-0 rounded-full" />
 
+          <ReportBugButton iconOnly data-tour="report-bug" />
+
           <motion.button
+            data-tour="stem-tutor"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onClick={toggleTutor}
-            title="STEM Tutor"
+            title="Delta — your STEM tutor"
             className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors focus:outline-none"
           >
             <GraduationCap className="w-5 h-5" />
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}

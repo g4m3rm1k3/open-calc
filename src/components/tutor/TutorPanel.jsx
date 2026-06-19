@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import katex from 'katex'
 import { PROVIDERS, getProvider, STORAGE_KEY, DEFAULT_SETTINGS } from './tutorProviders.js'
+import { useTour } from '../../context/TourContext.jsx'
 
 // ─── WebLLM singleton ────────────────────────────────────────────────────────
 let _engine = null
@@ -25,7 +26,6 @@ function hasWebGPU() {
   return typeof navigator !== 'undefined' && 'gpu' in navigator
 }
 
-const INTRO_SEEN_KEY = 'oc-tutor-intro-seen'
 
 // ─── SSE / API callers ───────────────────────────────────────────────────────
 async function* parseSSE(response) {
@@ -522,54 +522,6 @@ function useDragResize() {
 }
 
 // ─── SettingsView ─────────────────────────────────────────────────────────────
-const INTRO_STEPS = [
-  {
-    title: 'Meet your STEM Coach',
-    body: "A free AI tutor built into every lesson. It runs right in your browser — no account needed, nothing leaves your device by default.",
-  },
-  {
-    title: "It already knows what you're studying",
-    body: 'Open it from any lesson and it has that lesson\'s context automatically — no need to explain what you\'re working on.',
-  },
-  {
-    title: 'Free and private by default',
-    body: "The default model downloads once and runs locally on your device (900MB–2GB, fetched quietly in the background). Prefer something else? Switch to your own API key in Settings anytime.",
-  },
-]
-
-function IntroTour({ onDone }) {
-  const [step, setStep] = useState(0)
-  const isLast = step === INTRO_STEPS.length - 1
-  const { title, body } = INTRO_STEPS[step]
-
-  return (
-    <div className="flex-1 flex flex-col p-6 justify-between min-h-0">
-      <div>
-        <div className="flex items-center gap-1.5 mb-5">
-          {INTRO_STEPS.map((_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? 'bg-indigo-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
-          ))}
-        </div>
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{title}</h3>
-        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{body}</p>
-      </div>
-      <div className="flex items-center justify-between pt-6">
-        <button
-          onClick={onDone}
-          className="text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-        >
-          Skip
-        </button>
-        <button
-          onClick={() => (isLast ? onDone() : setStep((s) => s + 1))}
-          className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold transition-colors"
-        >
-          {isLast ? 'Start chatting' : 'Next'}
-        </button>
-      </div>
-    </div>
-  )
-}
 
 function SettingsView({ settings, onChange, voices = [], voiceURI, onVoiceChange, onPreviewVoice }) {
   const [showKey, setShowKey] = useState(false)
@@ -748,7 +700,8 @@ export default function TutorPanel({ lesson: lessonProp = null, context = null, 
   const [lessonFromPage, setLessonFromPage] = useState(null)
   const lesson = lessonFromPage ?? lessonProp
   const chatPanelOpen = useChatPanelOpen()
-  const [view, setView] = useState(() => localStorage.getItem(INTRO_SEEN_KEY) ? 'chat' : 'intro')
+  const [view, setView] = useState('chat')
+  const { startTour } = useTour()
   const [settings, setSettings] = useState(loadSettings)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -793,15 +746,6 @@ export default function TutorPanel({ lesson: lessonProp = null, context = null, 
     const handler = () => setOpen(o => !o)
     window.addEventListener('oc-toggle-tutor', handler)
     return () => window.removeEventListener('oc-toggle-tutor', handler)
-  }, [])
-
-  // First-ever visit: introduce the tutor itself rather than waiting for the
-  // student to discover and click it. Delayed so it doesn't fight the
-  // welcome modal for attention.
-  useEffect(() => {
-    if (localStorage.getItem(INTRO_SEEN_KEY)) return
-    const t = setTimeout(() => setOpen(true), 5000)
-    return () => clearTimeout(t)
   }, [])
 
   // Receive lesson context broadcast from LessonPage
@@ -963,9 +907,17 @@ export default function TutorPanel({ lesson: lessonProp = null, context = null, 
                <GraduationCap className="w-5 h-5 text-white" />
             </div>
             <div className="flex flex-col flex-1 min-w-0">
-                <span className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] leading-none mb-1">STEM Coach</span>
-                <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest opacity-80 truncate">{provider.label} Advisor v1.0</span>
+                <span className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] leading-none mb-1">Delta</span>
+                <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest opacity-80 truncate">{provider.label} STEM Tutor</span>
             </div>
+            <button
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={() => { setOpen(false); startTour() }}
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-400 dark:text-slate-500"
+              title="Show me around again"
+            >
+              <Compass className="w-4 h-4" />
+            </button>
             <button
               onMouseDown={(e) => e.stopPropagation()}
               onClick={() => setView((v) => v === 'settings' ? 'chat' : 'settings')}
@@ -990,12 +942,7 @@ export default function TutorPanel({ lesson: lessonProp = null, context = null, 
           </div>
 
           {/* ── Content ── */}
-          {view === 'intro' ? (
-            <IntroTour onDone={() => {
-              localStorage.setItem(INTRO_SEEN_KEY, '1')
-              setView('chat')
-            }} />
-          ) : view === 'settings' ? (
+          {view === 'settings' ? (
             <SettingsView settings={settings} onChange={updateSettings}
               voices={englishVoices} voiceURI={voiceURI} onVoiceChange={setVoiceURI}
               onPreviewVoice={(uri) => { setVoiceURI(uri); speak('Hello! This is how I sound.') }} />
