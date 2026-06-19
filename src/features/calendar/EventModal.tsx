@@ -51,6 +51,7 @@ export default function EventModal({ event, defaultStart, defaultEnd, onSave, on
     event ? toLocalInput(event.end) : (defaultEnd ?? toLocalInput(new Date(Date.now() + 3600000).toISOString()))
   )
   const [allDay, setAllDay] = useState(event?.allDay ?? false)
+  const [completed, setCompleted] = useState(event?.completed ?? false)
   const [notifications, setNotifications] = useState<NotificationOffset[]>(event?.notifications ?? [60])
   const [notifStatus, setNotifStatus] = useState(getPermissionStatus())
 
@@ -83,7 +84,7 @@ export default function EventModal({ event, defaultStart, defaultEnd, onSave, on
       allDay,
       color,
       notifications: allDay ? [] : notifications,
-      completed: event?.completed ?? false,
+      completed,
       lessonRef: event?.lessonRef,
       labRef: event?.labRef,
     })
@@ -277,6 +278,29 @@ export default function EventModal({ event, defaultStart, defaultEnd, onSave, on
                   </label>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Completed toggle */}
+          {isEdit && (
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={completed ? 'true' : 'false'}
+                aria-label="Completed"
+                onClick={() => setCompleted(v => !v)}
+                className={`w-10 h-5 rounded-full transition-colors shrink-0 relative ${
+                  completed ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'
+                }`}
+              >
+                <span
+                  className={`block w-4 h-4 rounded-full bg-white shadow absolute top-0.5 transition-transform ${
+                    completed ? 'translate-x-5' : 'translate-x-0.5'
+                  }`}
+                />
+              </button>
+              <span className="text-sm text-slate-700 dark:text-slate-300 select-none">Mark as completed</span>
             </div>
           )}
 

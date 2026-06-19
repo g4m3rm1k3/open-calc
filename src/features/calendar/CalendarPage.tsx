@@ -135,6 +135,14 @@ export default function CalendarPage() {
     })
   }, [updateEvent])
 
+  const handleEventResize = useCallback((info: any) => {
+    if (info.event.id.startsWith('progress-')) { info.revert(); return }
+    updateEvent(info.event.id, {
+      start: info.event.startStr,
+      end: info.event.endStr ?? info.event.startStr,
+    })
+  }, [updateEvent])
+
   // Progress events as compact regular events (interactive, clickable)
   const progressFCEvents: EventInput[] = progressEvents.map(ev => ({
     ...toFCEvent(ev),
@@ -208,8 +216,9 @@ export default function CalendarPage() {
           }
 
           /* Events */
-          .fc .fc-event { border-radius: 5px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
-          .fc .fc-daygrid-event { padding: 1px 4px; margin-top: 1px; }
+          .fc .fc-event { border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease; border: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+          .fc .fc-event:hover { transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10; filter: brightness(1.05); }
+          .fc .fc-daygrid-event { padding: 2px 6px; margin-top: 2px; }
           .fc-event-completed { opacity: 0.5; text-decoration: line-through; }
           .fc-progress-event { opacity: 0.8; font-size: 0.68rem !important; }
 
@@ -266,6 +275,7 @@ export default function CalendarPage() {
           select={handleDateSelect}
           eventClick={handleEventClick}
           eventDrop={handleEventDrop}
+          eventResize={handleEventResize}
           eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}
           height="auto"
         />
