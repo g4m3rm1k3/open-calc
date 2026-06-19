@@ -680,6 +680,7 @@ import {
   Maximize2,
   Volume2,
   Square,
+  Compass,
 } from "lucide-react"
 
 // ─── TutorPanel ───────────────────────────────────────────────────────────────
