@@ -15,7 +15,7 @@
  * Usage: register JSNotebook in VizFrame, then set lesson={LESSON_JS1}
  * ─────────────────────────────────────────────────────────────────────────────
  */
-import JSNotebook from "../../canvas/viz/JSNotebook.jsx";
+import JSNotebook from "../../../components/notebooks/JSNotebook.jsx";
 
 // ── Base styles shared across cells ─────────────────────────────────────────
 const BASE_CSS = `
