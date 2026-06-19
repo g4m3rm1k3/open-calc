@@ -248,7 +248,8 @@ export default function AppShell({ children }) {
   const isFullPageToolRoute = location.pathname.startsWith("/notebook-lab") ||
     location.pathname.startsWith("/viz-builder") ||
     location.pathname.startsWith("/playground");
-  const isScrollableFullPageRoute = location.pathname.startsWith("/lesson-builder");
+  const isScrollableFullPageRoute = location.pathname.startsWith("/lesson-builder") ||
+    location.pathname.startsWith("/calendar");
   const isDesktopRoute = location.pathname === '/';
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;

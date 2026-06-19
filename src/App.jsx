@@ -42,6 +42,8 @@ const LessonBuilderPage = lazy(() => import("./pages/LessonBuilderPage.jsx"));
 const VizBuilderPage    = lazy(() => import("./pages/VizBuilderPage.jsx"));
 const PlaygroundPage    = lazy(() => import("./pages/PlaygroundPage.jsx"))
 const NotebookLabPage   = lazy(() => import("./pages/NotebookLabPage.jsx"))
+const CalendarPage      = lazy(() => import("./features/calendar/CalendarPage.tsx"))
+const NotificationToast = lazy(() => import("./features/calendar/NotificationToast.tsx"))
 
 const Fallback = () => (
   <div className="flex items-center justify-center h-64">
@@ -61,6 +63,7 @@ export default function App() {
             >
               <DesktopProvider>
               <FloatingVideoPlayer />
+              <Suspense fallback={null}><NotificationToast /></Suspense>
               <AppShell>
                 <Suspense fallback={<Fallback />}>
                   <Routes>
@@ -87,6 +90,7 @@ export default function App() {
                     <Route path="health" element={<HealthTrackerPage />} />
                     <Route path="rpg-workout" element={<RPGWorkoutPage />} />
                     <Route path="brain" element={<BrainPage />} />
+                    <Route path="calendar" element={<CalendarPage />} />
 
                     {/* Game auto-discovery */}
                     <Route path="game/:gameKey" element={

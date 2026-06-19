@@ -25,6 +25,7 @@ const IS_LOCAL_ENV =
 // Workspace files, scratch pads, and caches stay local only.
 const SYNC_KEYS = [
   'oc-progress',    // course lesson progress (checkpoints, quiz scores, reading %)
+  'oc-calendar',    // calendar events + notification config
   'oc-health-v1',   // health tracker logs and profile
   'oc-rpg-data',    // RPG fitness progression, workout history
   'oc-pins',        // pinned lessons / tools
