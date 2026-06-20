@@ -11,6 +11,7 @@ import TutorialCard from './components/TutorialCard'
 import PomodoroTimer from './components/PomodoroTimer'
 import FlashcardReview from './components/FlashcardReview'
 import MontyPanel from './components/MontyPanel'
+import GoalMap from './components/GoalMap'
 import { isComplicated, type ActionDraft, type IntakeAnswers } from './playbooks'
 import { computeDailyWin } from './montyStatus'
 
@@ -30,7 +31,7 @@ export const meta = {
 }
 
 const TUTORIALS = [atomicHabits, deepWork, gtd, systemsThinking, pomodoro, spacedRepetition]
-const TABS = ['Notes', 'Plans', 'Cards', 'Focus', 'Learn'] as const
+const TABS = ['Plans', 'Notes', 'Cards', 'Focus', 'Learn'] as const
 type Tab = typeof TABS[number]
 
 export default function CompassPage() {
@@ -121,6 +122,20 @@ export default function CompassPage() {
           </button>
         ))}
       </div>
+
+      {/* Full-width Goal Map — only shown when there are active plans */}
+      {compass.plans.some(p => p.status === 'active' || p.status === 'completed') && (
+        <div className="mb-6">
+          <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">🗺 Goal Map</h2>
+          <GoalMap
+            plans={compass.plans}
+            onNodeClick={(planId, actionId) => {
+              // Switch to Plans tab on mobile when a node is clicked
+              setTab('Plans')
+            }}
+          />
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
         
