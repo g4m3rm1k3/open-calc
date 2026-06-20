@@ -1,0 +1,90 @@
+<svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="230" rx="10" class="svg-bg"/>
+
+  <!-- Title -->
+  <text x="240" y="18" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">Inscribed Angle Theorem: inscribed = ½ central</text>
+
+  <!-- Panel 1: Central angle (left) -->
+  <rect x="12" y="26" width="210" height="196" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="117" y="44" font-size="10" fill="#7c3aed" text-anchor="middle" font-weight="700">Central Angle</text>
+
+  <!-- Circle left panel -->
+  <circle cx="117" cy="130" r="72" fill="rgba(124,58,237,0.05)" stroke="#c4b5fd" stroke-width="1.5"/>
+
+  <!-- Arc: A at 210°, B at 330° (bottom) -->
+  <!-- A at 210° from center (117,130): 117+72*cos(210°), 130+72*sin(210°) = 117-62.4, 130+36 = 54.6,166 -->
+  <!-- B at 330°: 117+72*cos(330°), 130+72*sin(330°) = 117+62.4, 130-36 = 179.4,94 -->
+  <!-- Highlighting arc between A and B (minor, bottom) -->
+  <path d="M 54.6 166 A 72 72 0 0 1 179.4 94" fill="none" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Center O -->
+  <circle cx="117" cy="130" r="3" fill="#7c3aed"/>
+  <text x="122" y="127" font-size="9" fill="#7c3aed" font-weight="700">O</text>
+
+  <!-- Central angle arms: O to A and O to B -->
+  <line x1="117" y1="130" x2="54.6" y2="166" stroke="#7c3aed" stroke-width="2"/>
+  <line x1="117" y1="130" x2="179.4" y2="94" stroke="#7c3aed" stroke-width="2"/>
+
+  <!-- Central angle arc marker -->
+  <path d="M 97 148 A 22 22 0 0 1 133 113" fill="none" stroke="#7c3aed" stroke-width="2"/>
+  <text x="117" y="148" font-size="11" fill="#7c3aed" text-anchor="middle" font-weight="800">2θ</text>
+
+  <!-- A and B labels -->
+  <circle cx="54.6" cy="166" r="3" fill="#7c3aed"/>
+  <circle cx="179.4" cy="94" r="3" fill="#7c3aed"/>
+  <text x="42" y="172" font-size="10" fill="#7c3aed" font-weight="700">A</text>
+  <text x="184" y="90" font-size="10" fill="#7c3aed" font-weight="700">B</text>
+
+  <text x="117" y="210" font-size="9" fill="#7c3aed" text-anchor="middle">∠AOB = 2θ = arc AB</text>
+
+  <!-- Panel 2: Inscribed angle (right) -->
+  <rect x="258" y="26" width="210" height="196" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="363" y="44" font-size="10" fill="#ef4444" text-anchor="middle" font-weight="700">Inscribed Angle</text>
+
+  <!-- Circle right panel -->
+  <circle cx="363" cy="130" r="72" fill="rgba(239,68,68,0.05)" stroke="#fca5a5" stroke-width="1.5"/>
+
+  <!-- Same arc A and B on right circle: A at 210°, B at 330° from (363,130) -->
+  <!-- A = 363-62.4, 130+36 = 300.6,166 -->
+  <!-- B = 363+62.4, 130-36 = 425.4,94 -->
+  <path d="M 300.6 166 A 72 72 0 0 1 425.4 94" fill="none" stroke="#ef4444" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- P at top of circle (363, 58): the inscribed angle vertex -->
+  <!-- P = (363, 130-72) = (363, 58) -->
+  <circle cx="363" cy="58" r="5" fill="#ef4444"/>
+  <text x="370" y="56" font-size="10" fill="#ef4444" font-weight="700">P</text>
+  <text x="342" y="56" font-size="8" fill="#ef4444">(drag)</text>
+
+  <!-- Inscribed angle arms: P to A and P to B -->
+  <line x1="363" y1="58" x2="300.6" y2="166" stroke="#ef4444" stroke-width="2"/>
+  <line x1="363" y1="58" x2="425.4" y2="94" stroke="#ef4444" stroke-width="2"/>
+
+  <!-- Angle arc at P -->
+  <path d="M 346 82 A 26 26 0 0 1 376 72" fill="none" stroke="#ef4444" stroke-width="2"/>
+  <text x="363" y="102" font-size="11" fill="#ef4444" text-anchor="middle" font-weight="800">θ</text>
+
+  <!-- A and B labels -->
+  <circle cx="300.6" cy="166" r="3" fill="#ef4444"/>
+  <circle cx="425.4" cy="94" r="3" fill="#ef4444"/>
+  <text x="288" y="172" font-size="10" fill="#ef4444" font-weight="700">A</text>
+  <text x="430" y="90" font-size="10" fill="#ef4444" font-weight="700">B</text>
+
+  <text x="363" y="210" font-size="9" fill="#ef4444" text-anchor="middle">∠APB = θ = ½ arc AB</text>
+
+  <!-- Divider label between panels -->
+  <text x="240" y="136" font-size="18" class="svg-text" text-anchor="middle" font-weight="800">=</text>
+  <text x="240" y="152" font-size="9" class="svg-muted" text-anchor="middle">Same</text>
+  <text x="240" y="163" font-size="9" class="svg-muted" text-anchor="middle">arc</text>
+</svg>

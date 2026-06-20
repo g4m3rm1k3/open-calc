@@ -48,6 +48,7 @@ Object.assign(VIZ_REGISTRY, {
   FigureRenderer:       lazy(() => import("../notebooks/FigureRenderer.jsx")),
   JSNotebook:           lazy(() => import("../notebooks/JSNotebook.jsx")),
   OpenMatNotebook:      lazy(() => import("../notebooks/OpenMatNotebook.jsx")),
+  ScienceNotebook:      lazy(() => import("../../courses/geometry/viz/ScienceNotebook.jsx")),
 
   // ── Labs & Games (not yet in a course viz package) ──────────────────────
   MiniGolfGame:         lazy(() => import("../../games/golf/MiniGolfGame.jsx")),

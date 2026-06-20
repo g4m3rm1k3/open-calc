@@ -1,0 +1,37 @@
+<svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="300" height="160" rx="8" class="svg-bg"/>
+
+  <!-- Triangle: A(60,125), B(240,125), C(150,30) -->
+  <polygon points="60,125 240,125 150,30" fill="rgba(59,130,246,0.07)" stroke="#1e3a5f" stroke-width="2"/>
+
+  <!-- Vertex labels -->
+  <text x="48" y="138" font-size="11" class="svg-text" font-weight="700">A</text>
+  <text x="246" y="138" font-size="11" class="svg-text" font-weight="700">B</text>
+  <text x="144" y="22" font-size="11" class="svg-text" font-weight="700">C</text>
+
+  <!-- Angle at A: 47° -->
+  <path d="M 82 125 A 22 22 0 0 1 71 106" fill="rgba(30,58,95,0.12)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <text x="86" y="116" font-size="12" fill="#1e3a5f" font-weight="700">47°</text>
+
+  <!-- Angle at B: 65° -->
+  <path d="M 218 125 A 22 22 0 0 0 229 106" fill="rgba(30,58,95,0.12)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <text x="196" y="116" font-size="12" fill="#1e3a5f" font-weight="700">65°</text>
+
+  <!-- Angle at C: x (unknown) -->
+  <path d="M 139 46 A 18 18 0 0 1 161 46" fill="rgba(239,68,68,0.12)" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="150" y="68" font-size="15" fill="#ef4444" font-weight="800" text-anchor="middle">x</text>
+
+  <text x="150" y="150" font-size="9" class="svg-muted" text-anchor="middle">Find angle x at vertex C.</text>
+</svg>

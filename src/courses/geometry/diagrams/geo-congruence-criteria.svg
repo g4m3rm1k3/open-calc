@@ -1,0 +1,77 @@
+<svg viewBox="0 0 540 210" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="540" height="210" rx="10" class="svg-bg"/>
+
+  <!-- Panel 1: SSS -->
+  <rect x="8" y="8" width="160" height="194" rx="7" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="88" y="26" font-size="12" fill="#10b981" text-anchor="middle" font-weight="700">SSS  ✓ Valid</text>
+  <text x="88" y="39" font-size="10" class="svg-muted" text-anchor="middle">Side-Side-Side</text>
+  <!-- Triangle 1 -->
+  <polygon points="25,120 110,120 65,75" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-width="2"/>
+  <!-- Tick marks on all 3 sides -->
+  <line x1="56" y1="95" x2="64" y2="103" stroke="#10b981" stroke-width="2"/>
+  <line x1="80" y1="103" x2="88" y2="95" stroke="#10b981" stroke-width="2"/>
+  <line x1="55" y1="122" x2="60" y2="114" stroke="#10b981" stroke-width="2"/>
+  <line x1="75" y1="114" x2="80" y2="122" stroke="#10b981" stroke-width="2"/>
+  <line x1="62" y1="122" x2="68" y2="114" stroke="#10b981" stroke-width="2"/>
+  <!-- Triangle 2 (≅) -->
+  <polygon points="25,175 110,175 65,132" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-width="2"/>
+  <line x1="56" y1="151" x2="64" y2="159" stroke="#10b981" stroke-width="2"/>
+  <line x1="80" y1="159" x2="88" y2="151" stroke="#10b981" stroke-width="2"/>
+  <line x1="55" y1="177" x2="60" y2="169" stroke="#10b981" stroke-width="2"/>
+  <line x1="75" y1="169" x2="80" y2="177" stroke="#10b981" stroke-width="2"/>
+  <line x1="62" y1="177" x2="68" y2="169" stroke="#10b981" stroke-width="2"/>
+  <text x="88" y="148" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">≅</text>
+  <text x="88" y="195" font-size="10" class="svg-muted" text-anchor="middle">all 3 sides match</text>
+
+  <!-- Panel 2: SAS -->
+  <rect x="190" y="8" width="160" height="194" rx="7" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="270" y="26" font-size="12" fill="#6366f1" text-anchor="middle" font-weight="700">SAS  ✓ Valid</text>
+  <text x="270" y="39" font-size="10" class="svg-muted" text-anchor="middle">Side-Angle-Side</text>
+  <!-- Triangle 1 -->
+  <polygon points="207,120 292,120 247,75" fill="rgba(99,102,241,0.12)" stroke="#6366f1" stroke-width="2"/>
+  <!-- Tick marks on 2 sides, angle arc -->
+  <line x1="224" y1="122" x2="227" y2="114" stroke="#6366f1" stroke-width="2"/>
+  <line x1="236" y1="95" x2="242" y2="101" stroke="#6366f1" stroke-width="2"/>
+  <path d="M 224,120 A 16,16 0 0,1 222,104" fill="none" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- Triangle 2 -->
+  <polygon points="207,175 292,175 247,132" fill="rgba(99,102,241,0.12)" stroke="#6366f1" stroke-width="2"/>
+  <line x1="224" y1="177" x2="227" y2="169" stroke="#6366f1" stroke-width="2"/>
+  <line x1="236" y1="150" x2="242" y2="156" stroke="#6366f1" stroke-width="2"/>
+  <path d="M 224,175 A 16,16 0 0,1 222,159" fill="none" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="270" y="148" font-size="13" fill="#6366f1" font-weight="700" text-anchor="middle">≅</text>
+  <text x="270" y="195" font-size="10" class="svg-muted" text-anchor="middle">2 sides + included ∠</text>
+
+  <!-- Panel 3: SSA invalid + AAA invalid -->
+  <rect x="372" y="8" width="160" height="194" rx="7" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="452" y="26" font-size="12" fill="#ef4444" text-anchor="middle" font-weight="700">SSA ✗  AAA ✗</text>
+  <text x="452" y="39" font-size="10" class="svg-muted" text-anchor="middle">NOT valid criteria</text>
+  <!-- SSA ambiguous: two triangles from same data -->
+  <line x1="385" y1="145" x2="460" y2="145" stroke="#ef4444" stroke-width="2"/>
+  <line x1="385" y1="145" x2="415" y2="88" stroke="#ef4444" stroke-width="2"/>
+  <!-- First position of C -->
+  <line x1="415" y1="88" x2="460" y2="145" stroke="#ef4444" stroke-width="2"/>
+  <!-- Second position of C (ambiguous) -->
+  <line x1="450" y1="98" x2="460" y2="145" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="5 3" opacity="0.7"/>
+  <circle cx="450" cy="98" r="3.5" fill="#ef4444" opacity="0.7"/>
+  <circle cx="415" cy="88" r="3.5" fill="#ef4444"/>
+  <text x="456" y="86" font-size="10" fill="#ef4444" opacity="0.7">C₂</text>
+  <text x="408" y="80" font-size="10" fill="#ef4444">C₁</text>
+  <!-- Arc showing angle at A -->
+  <path d="M 406,145 A 20,20 0 0,1 397,126" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="384" y="122" font-size="9" fill="#ef4444">∠A</text>
+  <text x="452" y="172" font-size="10" fill="#ef4444" text-anchor="middle">same SSA → 2 triangles!</text>
+  <text x="452" y="185" font-size="10" class="svg-muted" text-anchor="middle">AAA → similar, not ≅</text>
+  <text x="452" y="198" font-size="10" class="svg-muted" text-anchor="middle">size can differ</text>
+</svg>

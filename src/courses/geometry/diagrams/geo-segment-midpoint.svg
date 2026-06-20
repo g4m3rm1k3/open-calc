@@ -1,0 +1,45 @@
+<svg viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="500" height="160" rx="10" class="svg-bg"/>
+
+  <!-- Full segment AC -->
+  <line x1="60" y1="80" x2="440" y2="80" stroke="#94a3b8" stroke-width="2.5"/>
+
+  <!-- AM segment (blue) -->
+  <line x1="60" y1="80" x2="250" y2="80" stroke="#6366f1" stroke-width="4" opacity="0.8"/>
+  <!-- MC segment (green) -->
+  <line x1="250" y1="80" x2="440" y2="80" stroke="#10b981" stroke-width="4" opacity="0.8"/>
+
+  <!-- Points -->
+  <circle cx="60" cy="80" r="7" fill="#374151"/>
+  <text x="60" y="68" font-size="14" class="svg-text" text-anchor="middle" font-weight="700" font-style="italic">A</text>
+
+  <circle cx="250" cy="80" r="8" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <text x="250" y="68" font-size="14" fill="#f59e0b" text-anchor="middle" font-weight="700" font-style="italic">M</text>
+
+  <circle cx="440" cy="80" r="7" fill="#374151"/>
+  <text x="440" y="68" font-size="14" class="svg-text" text-anchor="middle" font-weight="700" font-style="italic">C</text>
+
+  <!-- Midpoint tick marks -->
+  <line x1="246" y1="72" x2="254" y2="88" stroke="#f59e0b" stroke-width="2.5"/>
+
+  <!-- AM and MC labels -->
+  <text x="155" y="100" font-size="13" fill="#6366f1" text-anchor="middle" font-weight="700">AM</text>
+  <text x="345" y="100" font-size="13" fill="#10b981" text-anchor="middle" font-weight="700">MC</text>
+
+  <!-- Equation -->
+  <text x="250" y="128" font-size="13" class="svg-text" text-anchor="middle">
+    <tspan fill="#6366f1" font-weight="700">AM</tspan>
+    <tspan> = </tspan>
+    <tspan fill="#10b981" font-weight="700">MC</tspan>
+    <tspan>  →  M is the midpoint of AC</tspan>
+  </text>
+  <text x="250" y="148" font-size="12" class="svg-muted" text-anchor="middle">Midpoint Theorem: AM = AC/2  |  Segment Addition: AM + MC = AC</text>
+</svg>

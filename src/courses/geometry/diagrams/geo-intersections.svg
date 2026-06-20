@@ -1,0 +1,67 @@
+<svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg     { fill: #f8fafc; }
+    .svg-muted  { fill: #94a3b8; stroke: #94a3b8; }
+    .svg-divider{ stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg     { fill: #0f172a; }
+    .dark .svg-muted  { fill: #64748b; stroke: #475569; }
+    .dark .svg-divider{ stroke: #334155; }
+  </style>
+  <rect width="500" height="220" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="a1" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#0891b2"/>
+    </marker>
+    <marker id="a2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#6366f1"/>
+    </marker>
+    <marker id="a3" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="a4" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+
+  <!-- Panel 1: Two lines intersecting at a point -->
+  <text x="80" y="18" font-size="11" fill="#0891b2" text-anchor="middle" font-weight="700">Two Lines → Point</text>
+  <line x1="18" y1="32" x2="145" y2="115" stroke="#0891b2" stroke-width="2"
+        marker-start="url(#a1)" marker-end="url(#a1)"/>
+  <line x1="18" y1="115" x2="145" y2="32" stroke="#0891b2" stroke-width="2"
+        marker-start="url(#a1)" marker-end="url(#a1)"/>
+  <!-- Intersection point -->
+  <circle cx="81.5" cy="73.5" r="5.5" fill="#ef4444" stroke="white" stroke-width="2"/>
+  <text x="90" y="69" font-size="12" fill="#ef4444" font-weight="700" font-style="italic">P</text>
+  <text x="80" y="140" font-size="11" fill="#0891b2" text-anchor="middle">Meet at one point</text>
+
+  <!-- Divider -->
+  <line x1="170" y1="8" x2="170" y2="200" class="svg-divider" stroke-width="1.5"/>
+
+  <!-- Panel 2: Two planes intersecting in a line -->
+  <text x="315" y="18" font-size="11" fill="#6366f1" text-anchor="middle" font-weight="700">Two Planes → Line</text>
+  <!-- Plane 1 (left, tilted) -->
+  <polygon points="185,130 235,45 330,45 280,130" fill="#6366f1" fill-opacity="0.12" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- Plane 2 (right, tilted differently) -->
+  <polygon points="265,130 310,45 420,45 375,130" fill="#f59e0b" fill-opacity="0.12" stroke="#f59e0b" stroke-width="1.5"/>
+  <!-- Intersection line -->
+  <line x1="275" y1="45" x2="280" y2="130" stroke="#ef4444" stroke-width="2.5"
+        marker-start="url(#a2)" marker-end="url(#a2)"/>
+  <text x="260" y="40" font-size="12" fill="#6366f1" font-style="italic" text-anchor="middle">𝒫₁</text>
+  <text x="390" y="40" font-size="12" fill="#f59e0b" font-style="italic">𝒫₂</text>
+  <text x="315" y="155" font-size="11" fill="#6366f1" text-anchor="middle">Intersection is a full line</text>
+
+  <!-- Row 2: parallel cases -->
+  <!-- Parallel lines (no intersection) -->
+  <text x="80" y="175" font-size="11" class="svg-muted" text-anchor="middle">Parallel lines: never meet</text>
+  <line x1="18" y1="185" x2="145" y2="185" class="svg-muted" stroke-width="1.5"
+        marker-start="url(#a3)" marker-end="url(#a3)"/>
+  <line x1="18" y1="205" x2="145" y2="205" class="svg-muted" stroke-width="1.5"
+        marker-start="url(#a4)" marker-end="url(#a4)"/>
+
+  <!-- Line hits plane at one point -->
+  <text x="315" y="175" font-size="11" fill="#10b981" text-anchor="middle">Line pierces plane → one point</text>
+  <polygon points="210,215 265,190 420,190 365,215" fill="#10b981" fill-opacity="0.10" stroke="#10b981" stroke-width="1.2"/>
+  <line x1="315" y1="175" x2="315" y2="215" stroke="#10b981" stroke-width="2.5"
+        marker-start="url(#a2)" marker-end="url(#a2)"/>
+  <circle cx="315" cy="200" r="4.5" fill="#ef4444" stroke="white" stroke-width="1.5"/>
+</svg>

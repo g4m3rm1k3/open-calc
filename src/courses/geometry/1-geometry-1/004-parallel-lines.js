@@ -1,10 +1,14 @@
 // Geometry · Chapter 1 · Lesson 4
 // Parallel Lines and Transversals
+import geoParallelTransversalUrl from '../diagrams/geo-parallel-transversal.svg?url'
+import geoAnglePairsUrl from '../diagrams/geo-angle-pairs.svg?url'
+import quizParallelFindUrl from '../diagrams/quiz-parallel-find-angle.svg?url'
 
 const LESSON_GEO_1_4 = {
   title: "Parallel Lines and Transversals",
   subtitle:
     "How a single crossing line reveals the hidden geometry of parallel lines — and why it all depends on one postulate.",
+  subject: 'Geometry',
   sequential: true,
 
   cells: [
@@ -467,26 +471,14 @@ export default {
     previewVisualizationId: "G1_3_ParallelLines",
   },
   intuition: {
-    prose: [
-      "A transversal crossing two parallel lines creates 8 angles with exact relationships: corresponding = equal, alternate interior = equal, co-interior = supplementary (180°).",
-      "All three theorems derive from the Corresponding Angles Postulate + Vertical Angles + Linear Pair.",
-      "The converses prove lines parallel from angle evidence — equal alternate interior angles guarantee parallelism everywhere.",
-      "All of this only holds in flat Euclidean geometry. Change the Parallel Postulate and the geometry changes.",
-    ],
-    callouts: [
-      {
-        type: "important",
-        title: "Alternate vs. Co-interior",
-        body: "Alternate interior angles (Z-shape, opposite sides): EQUAL. Co-interior angles (C-shape, same side): SUPPLEMENTARY (sum to 180°). Students frequently confuse these — the shape memory helps.",
-      },
-    ],
-    visualizations: [
-      {
-        id: "ScienceNotebook",
-        title: "Parallel Lines and Transversals",
-        props: { lesson: LESSON_GEO_1_4 },
-      },
-      { id: "G1_3_ParallelLines", title: "Transversals and Parallel Patterns" },
+    blocks: [
+      { type: 'prose', md: 'When a **transversal** crosses two parallel lines, it creates 8 angles — 4 at each intersection. These angles are not arbitrary: they obey exact relationships guaranteed by Euclid\'s Fifth Postulate. Every theorem about parallel lines traces back to that single postulate.' },
+      { type: 'image', src: geoParallelTransversalUrl, alt: '8 angles formed by a transversal cutting two parallel lines', caption: 'A transversal creates 8 angles. Angles at each intersection are supplementary pairs (55° and 125°). The parallel lines force the two intersections to mirror each other.' },
+      { type: 'prose', md: 'Three theorems organize the angle relationships: **Corresponding angles** (F-shape, same position at each intersection) are **equal**. **Alternate interior angles** (Z-shape, between the lines on opposite sides) are **equal**. **Co-interior angles** (C-shape, between the lines on the same side) are **supplementary** — they sum to 180°.' },
+      { type: 'image', src: geoAnglePairsUrl, alt: 'Corresponding, alternate interior, and co-interior angle pairs', caption: 'Three angle pair types: F-shape (equal), Z-shape (equal), C-shape (supplementary). The shape tells you the rule.' },
+      { type: 'callout', kind: 'important', title: 'Alternate vs. Co-interior', body: 'Alternate interior angles (Z-shape, opposite sides): EQUAL. Co-interior angles (C-shape, same side): SUPPLEMENTARY (sum to 180°). The shape memory — Z vs C — prevents the most common confusion in this topic.' },
+      { type: 'viz', id: 'ScienceNotebook', props: { lesson: LESSON_GEO_1_4 }, mathBridge: 'Use the interactive to drag the transversal angle and toggle the parallel lock. Watch all six angle pair relationships in the table — observe which ones hold only when the lines are parallel and which ones always hold regardless.' },
+      { type: 'viz', id: 'G1_3_ParallelLines', title: 'Transversals and Parallel Patterns' },
     ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
@@ -504,46 +496,98 @@ export default {
     {
       id: 'q1',
       type: 'choice',
-      text: '"Parallel + transversal → 8 angles. Corresponding = equal." Lines L1 and L2 are parallel. A transversal crosses them. Angle 1 (above L1, right of transversal) = 55°. What is the corresponding angle above L2?',
-      options: [
-        '125°',
-        '55°',
-        '90°',
-      ],
-      correct: 1,
+      diagram: quizParallelFindUrl,
+      diagramAlt: 'Two parallel lines ℓ₁ and ℓ₂ cut by a transversal. The upper-left angle at ℓ₁ is 118°. The lower-right angle x is unknown.',
+      text: 'ℓ₁ ∥ ℓ₂. The marked angle at ℓ₁ is 118°. Find x.',
+      options: ['62° — x is an alternate interior angle (equal to 180°−118°)', '118° — x corresponds to the 118° angle', '62° — x is co-interior (supplementary), so 180°−118°=62°'],
+      correct: 2,
     },
     {
       id: 'q2',
       type: 'choice',
-      text: '"Alternate interior angles = equal." Two parallel lines cut by a transversal. The alternate interior angles are on opposite sides of the transversal, between the parallel lines. If one is 70°, the other is:',
-      options: [
-        '110°',
-        '70°',
-        '90°',
-      ],
+      text: 'Two parallel lines cut by a transversal. One alternate interior angle is 70°. The other is:',
+      options: ['110°', '70°', '90°'],
       correct: 1,
     },
     {
       id: 'q3',
       type: 'choice',
-      text: '"Co-interior angles = supplementary." Two parallel lines, co-interior angles. If one co-interior angle is 65°, the other is:',
-      options: [
-        '115°',
-        '65°',
-        '25°',
-      ],
+      text: 'Co-interior angles between two parallel lines. One measures 65°. The other is:',
+      options: ['115°', '65°', '25°'],
       correct: 0,
     },
     {
       id: 'q4',
       type: 'choice',
-      text: '"Converses: angle evidence → parallel conclusion." A transversal crosses two lines. If corresponding angles are equal, what can you conclude about the two lines?',
+      text: 'A transversal crosses two lines. Corresponding angles are equal. You can conclude the lines are:',
       options: [
-        'The lines are perpendicular',
-        'The lines are parallel — equal corresponding angles is exactly the converse of the Corresponding Angles Postulate',
-        'The lines are the same line',
+        'Perpendicular',
+        'Parallel — equal corresponding angles is the converse of the Corresponding Angles Postulate',
+        'The same line',
       ],
       correct: 1,
+    },
+    {
+      id: 'q5',
+      type: 'choice',
+      text: 'Which shape best describes co-interior angles — and what rule do they follow?',
+      options: [
+        'Z-shape, and they are equal',
+        'C-shape, and they are supplementary (sum to 180°)',
+        'F-shape, and they are supplementary',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q6',
+      type: 'choice',
+      text: 'The proof of the Alternate Interior Angles Theorem depends on which two earlier results?',
+      options: [
+        'Triangle Angle Sum Theorem and Segment Addition Postulate',
+        'Corresponding Angles Postulate and Vertical Angles Theorem',
+        'Linear Pair Theorem and the Pythagorean Theorem',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q7',
+      type: 'choice',
+      text: 'Two lines are cut by a transversal. The alternate interior angles measure 84° and 96°. Are the lines parallel?',
+      options: [
+        'Yes — they are close enough to parallel',
+        'No — parallel lines require alternate interior angles to be exactly equal, and 84° ≠ 96°',
+        'Cannot tell without measuring more angles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q8',
+      type: 'choice',
+      text: 'Co-interior angles are 3x° and (2x + 10)°. For the lines to be parallel, what must x equal?',
+      options: ['x = 34', 'x = 38', 'x = 30'],
+      correct: 0,
+    },
+    {
+      id: 'q9',
+      type: 'choice',
+      text: 'On the surface of a sphere, does the Alternate Interior Angles Theorem hold for parallel lines?',
+      options: [
+        'Yes — angle relationships are universal',
+        'No — on a sphere, "parallel lines" (great circles) always intersect, so the theorem\'s premise never applies',
+        'Yes, but only for small triangles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q10',
+      type: 'choice',
+      text: 'A transversal crosses two parallel lines. An angle at the first intersection is 112°. What are the other three angles at that intersection?',
+      options: [
+        '68°, 112°, 68°',
+        '68°, 68°, 112°',
+        'All equal to 112°',
+      ],
+      correct: 0,
     },
   ],
 };

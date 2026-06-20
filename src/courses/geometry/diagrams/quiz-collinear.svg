@@ -1,0 +1,41 @@
+<svg viewBox="0 0 340 130" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="340" height="130" rx="8" class="svg-bg"/>
+
+  <!-- Left panel: Collinear -->
+  <rect x="8" y="8" width="150" height="114" rx="6" fill="rgba(16,185,129,0.07)" stroke="#10b981" stroke-width="1.2"/>
+  <text x="83" y="24" font-size="10" fill="#065f46" text-anchor="middle" font-weight="700">Collinear</text>
+  <!-- Line through A B C -->
+  <line x1="20" y1="70" x2="145" y2="70" stroke="#1e3a5f" stroke-width="1.8"/>
+  <circle cx="35" cy="70" r="4" fill="#10b981"/>
+  <circle cx="83" cy="70" r="4" fill="#10b981"/>
+  <circle cx="131" cy="70" r="4" fill="#10b981"/>
+  <text x="35" y="60" font-size="11" fill="#065f46" font-weight="700" text-anchor="middle">A</text>
+  <text x="83" y="60" font-size="11" fill="#065f46" font-weight="700" text-anchor="middle">B</text>
+  <text x="131" y="60" font-size="11" fill="#065f46" font-weight="700" text-anchor="middle">C</text>
+  <text x="83" y="108" font-size="9" fill="#065f46" text-anchor="middle">A, B, C all on one line</text>
+
+  <!-- Right panel: Non-collinear -->
+  <rect x="182" y="8" width="150" height="114" rx="6" fill="rgba(239,68,68,0.07)" stroke="#ef4444" stroke-width="1.2"/>
+  <text x="257" y="24" font-size="10" fill="#991b1b" text-anchor="middle" font-weight="700">Non-collinear</text>
+  <!-- Triangle P Q R -->
+  <polygon points="257,35 200,100 314,100" fill="rgba(239,68,68,0.08)" stroke="#ef4444" stroke-width="1.5"/>
+  <circle cx="257" cy="35" r="4" fill="#ef4444"/>
+  <circle cx="200" cy="100" r="4" fill="#ef4444"/>
+  <circle cx="314" cy="100" r="4" fill="#ef4444"/>
+  <text x="257" y="28" font-size="11" fill="#991b1b" font-weight="700" text-anchor="middle">P</text>
+  <text x="190" y="98" font-size="11" fill="#991b1b" font-weight="700">Q</text>
+  <text x="316" y="98" font-size="11" fill="#991b1b" font-weight="700">R</text>
+  <text x="257" y="118" font-size="9" fill="#991b1b" text-anchor="middle">P, Q, R not on one line</text>
+</svg>

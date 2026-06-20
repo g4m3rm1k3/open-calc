@@ -1,0 +1,54 @@
+<svg viewBox="0 0 500 280" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="500" height="280" rx="10" class="svg-bg"/>
+
+  <!-- Triangle ABC -->
+  <!-- A at (80,215), B at (400,215), C at (250,65) -->
+  <polygon points="80,215 400,215 250,65" fill="rgba(99,102,241,0.08)" stroke="#4f46e5" stroke-width="2.5"/>
+
+  <!-- Parallel line ℓ through C (horizontal, parallel to AB) -->
+  <line x1="30" y1="65" x2="470" y2="65" stroke="#7c3aed" stroke-width="2" stroke-dasharray="10 5"/>
+  <text x="472" y="61" font-size="12" fill="#7c3aed" font-style="italic">ℓ ∥ AB</text>
+
+  <!-- Vertices -->
+  <circle cx="80" cy="215" r="5.5" fill="#4f46e5"/>
+  <circle cx="400" cy="215" r="5.5" fill="#4f46e5"/>
+  <circle cx="250" cy="65" r="5.5" fill="#4f46e5"/>
+
+  <!-- Vertex labels -->
+  <text x="68" y="232" font-size="15" fill="#4f46e5" font-weight="700" font-style="italic">A</text>
+  <text x="406" y="232" font-size="15" fill="#4f46e5" font-weight="700" font-style="italic">B</text>
+  <text x="250" y="52" font-size="15" fill="#4f46e5" font-weight="700" font-style="italic" text-anchor="middle">C</text>
+
+  <!-- Angle arcs at A, B, C -->
+  <!-- ∠A at (80, 215) -->
+  <path d="M 110,215 A 30,30 0 0,1 98,188" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="1.8"/>
+  <text x="120" y="202" font-size="12" fill="#ef4444" font-weight="700">∠A</text>
+
+  <!-- ∠B at (400, 215) -->
+  <path d="M 375,200 A 30,30 0 0,1 370,215" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="1.8"/>
+  <text x="352" y="202" font-size="12" fill="#10b981" font-weight="700">∠B</text>
+
+  <!-- ∠C at (250, 65) — the interior angle of triangle -->
+  <path d="M 224,82 A 28,28 0 0,1 276,82" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+  <text x="250" y="100" font-size="12" fill="#f97316" font-weight="700" text-anchor="middle">∠C</text>
+
+  <!-- ∠1 (left of ∠C along ℓ) = ∠A by alt. interior -->
+  <path d="M 222,65 A 26,26 0 0,0 227,84" fill="rgba(239,68,68,0.2)" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="196" y="77" font-size="12" fill="#ef4444" font-weight="700">∠1 = ∠A</text>
+
+  <!-- ∠2 (right of ∠C along ℓ) = ∠B by alt. interior -->
+  <path d="M 273,84 A 26,26 0 0,0 278,65" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="283" y="77" font-size="12" fill="#10b981" font-weight="700">∠2 = ∠B</text>
+
+  <!-- Proof summary -->
+  <text x="250" y="247" font-size="12" class="svg-text" text-anchor="middle">∠1 + ∠C + ∠2 = 180°  →  ∠A + ∠C + ∠B = 180° □</text>
+  <text x="250" y="265" font-size="11" class="svg-muted" text-anchor="middle">Alternate Interior Angles transport ∠A and ∠B to vertex C</text>
+</svg>

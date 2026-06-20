@@ -1,10 +1,15 @@
 // Geometry · Chapter 1 · Lesson 7
 // The Pythagorean Theorem: Three Proofs
+import geoPythagoreanProofUrl from '../diagrams/geo-pythagorean-proof.svg?url'
+import distanceFormulaUrl from '../diagrams/distance-formula.svg?url'
+import quizPythagFindCUrl from '../diagrams/quiz-pythagorean-find-c.svg?url'
+import quizPythagFindLegUrl from '../diagrams/quiz-pythagorean-find-leg.svg?url'
 
 const LESSON_GEO_1_7 = {
   title: "The Pythagorean Theorem: Three Proofs",
   subtitle:
     "Why the most famous theorem in mathematics has been proved over 370 times — and what each approach reveals.",
+  subject: 'Geometry',
   sequential: true,
 
   cells: [
@@ -625,29 +630,14 @@ export default {
     previewVisualizationId: "G1_6_Pythagorean",
   },
   intuition: {
-    prose: [
-      "Proof 1 (Area/Dissection): same four triangles fill the same square two ways, leaving c² or a²+b² empty. Equal by subtraction.",
-      "Proof 2 (Similar Triangles): the altitude to the hypotenuse creates two triangles similar to the original. Ratios give b²=c·AD and a²=c·BD; adding gives a²+b²=c².",
-      "Proof 3 (Distance Formula): place the right triangle on coordinates. Distance from (a,0) to (0,b) is √(a²+b²) = c.",
-      "Each proof is also a technique: area dissection, similarity ratios, and coordinate algebra appear throughout mathematics.",
-    ],
-    callouts: [
-      {
-        type: "definition",
-        title: "Pythagorean Triple",
-        body: "Three positive integers a, b, c satisfying a²+b²=c². Examples: (3,4,5), (5,12,13), (8,15,17). The 3-4-5 triple is used in construction to check for right angles.",
-      },
-    ],
-    visualizations: [
-      {
-        id: "ScienceNotebook",
-        title: "The Pythagorean Theorem: Three Proofs",
-        props: { lesson: LESSON_GEO_1_7 },
-      },
-      {
-        id: "G1_6_Pythagorean",
-        title: "Three Independent Proofs of Pythagoras",
-      },
+    blocks: [
+      { type: 'prose', md: 'In any right triangle with legs **a** and **b** and hypotenuse **c**: **a² + b² = c²**. The theorem has been proved over 370 ways — each proof reveals different mathematics. Three are essential: area dissection (ancient, visual), similar triangles (the key to trigonometry), and the distance formula (the bridge to coordinate geometry).' },
+      { type: 'image', src: geoPythagoreanProofUrl, alt: 'Area dissection proof: two arrangements of four triangles in the same square', caption: 'Proof 1: the same (a+b)² square filled two ways with the same four triangles. The remaining areas must be equal: c² = a² + b².' },
+      { type: 'prose', md: 'The **distance formula** — the Pythagorean Theorem in coordinate form — gives the distance between any two points. Place legs along the x and y axes: the hypotenuse length c = √(a² + b²), so c² = a² + b². This is why Euclidean distance in any dimension always uses this formula.' },
+      { type: 'image', src: distanceFormulaUrl, alt: 'The distance formula as the Pythagorean theorem on a coordinate grid', caption: 'The distance formula is the Pythagorean Theorem expressed algebraically. The legs Δx and Δy are the horizontal and vertical separations; d is the hypotenuse.' },
+      { type: 'callout', kind: 'definition', title: 'Pythagorean Triple', body: 'Three positive integers a, b, c satisfying a²+b²=c². Key triples: (3,4,5), (5,12,13), (8,15,17). Any multiple of a triple is also a triple: (6,8,10), (9,12,15). Carpenters use the 3-4-5 triple to verify right angles.' },
+      { type: 'viz', id: 'ScienceNotebook', props: { lesson: LESSON_GEO_1_7 }, mathBridge: 'Work through all three proofs interactively. Toggle between the two triangle arrangements in Proof 1, explore the three similar triangles created by the altitude in Proof 2, and verify the distance formula in Proof 3.' },
+      { type: 'viz', id: 'G1_6_Pythagorean', title: 'Three Independent Proofs of Pythagoras' },
     ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
@@ -666,32 +656,30 @@ export default {
     {
       id: 'q1',
       type: 'choice',
-      text: '"a² + b² = c². Legs a, b; hypotenuse c (opposite the right angle)." A right triangle has legs 3 and 4. What is the hypotenuse?',
-      options: [
-        '7',
-        '5',
-        '√7',
-      ],
+      diagram: quizPythagFindCUrl,
+      diagramAlt: 'Right triangle with legs 6 and 8, hypotenuse labeled x. Right angle at A.',
+      text: 'Find the hypotenuse x.',
+      options: ['14', '10', '√100'],
       correct: 1,
     },
     {
       id: 'q2',
       type: 'choice',
-      text: '"Proof 1: area dissection — same triangles, two arrangements, equal empty area." What does the area-dissection proof tell you about the relationship between the squares on the three sides?',
+      text: 'What does the area-dissection proof show?',
       options: [
-        'The sum of the perimeters of the two smaller squares equals the perimeter of the largest square',
-        'The total empty area in both square arrangements is the same — proving the square on the hypotenuse equals the sum of the squares on the legs',
-        'The triangles can be rearranged into any polygon with the same area',
+        'The perimeters of the two leg-squares sum to the hypotenuse-square perimeter',
+        'Four identical triangles fill the same outer square two ways, leaving areas c² or a²+b² — so they must be equal',
+        'Area of the triangle equals half the hypotenuse',
       ],
       correct: 1,
     },
     {
       id: 'q3',
       type: 'choice',
-      text: '"Converse: if a² + b² = c², the triangle has a right angle opposite side c." A triangle has sides 5, 12, 13. Is it a right triangle?',
+      text: 'A triangle has sides 5, 12, 13. Is it a right triangle?',
       options: [
         'No — 5+12 ≠ 13',
-        'Yes — 5² + 12² = 25 + 144 = 169 = 13², so by the converse it has a right angle',
+        'Yes — 5² + 12² = 169 = 13², so by the converse it has a right angle',
         'Cannot tell without measuring the angles',
       ],
       correct: 1,
@@ -699,11 +687,67 @@ export default {
     {
       id: 'q4',
       type: 'choice',
-      text: '"Proof 3: coordinates → distance formula → squaring gives a² + b² = c²." The distance formula d = √((x₂−x₁)² + (y₂−y₁)²) comes from which idea?',
+      text: 'The distance formula d = √((x₂−x₁)² + (y₂−y₁)²) is a version of:',
       options: [
-        'The midpoint formula applied twice',
-        'The Pythagorean theorem — the horizontal and vertical separations are the legs, and d is the hypotenuse of a right triangle',
-        'The slope formula converted to absolute distance',
+        'The midpoint formula',
+        'The Pythagorean Theorem — Δx and Δy are the legs, d is the hypotenuse',
+        'The slope formula',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q5',
+      type: 'choice',
+      diagram: quizPythagFindLegUrl,
+      diagramAlt: 'Right triangle with one leg = 5, hypotenuse = 13, and the other leg labeled x.',
+      text: 'Find leg x. (Hypotenuse = 13, one leg = 5.)',
+      options: ['12', '8', '√144'],
+      correct: 0,
+    },
+    {
+      id: 'q6',
+      type: 'choice',
+      text: 'Which set of numbers is a Pythagorean triple?',
+      options: ['(4, 5, 6)', '(8, 15, 17)', '(6, 7, 9)'],
+      correct: 1,
+    },
+    {
+      id: 'q7',
+      type: 'choice',
+      text: 'Find the distance between points (1, 1) and (4, 5).',
+      options: ['5', '6', '√34'],
+      correct: 0,
+    },
+    {
+      id: 'q8',
+      type: 'choice',
+      text: 'In the similar-triangles proof, the altitude from the right angle to the hypotenuse creates:',
+      options: [
+        'Two triangles, each with a right angle and one shared angle with the original — proving similarity by AA',
+        'Two congruent triangles by HL',
+        'A new triangle that is equilateral',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q9',
+      type: 'choice',
+      text: 'The Converse of the Pythagorean Theorem states: if a² + b² = c², then the triangle:',
+      options: [
+        'Is equilateral',
+        'Has a right angle opposite side c',
+        'Is isosceles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q10',
+      type: 'choice',
+      text: 'A carpenter uses a triangle with sides 6, 8, 10 to check for right angles. This works because:',
+      options: [
+        '6+8+10 = 24, a multiple of 6',
+        '(6,8,10) is a multiple of (3,4,5), a Pythagorean triple: 6²+8²=36+64=100=10²',
+        'The angles happen to be 45-45-90',
       ],
       correct: 1,
     },

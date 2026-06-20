@@ -1,0 +1,55 @@
+<svg viewBox="0 0 460 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="460" height="260" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="va1" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#1e3a8a"/>
+    </marker>
+    <marker id="va2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#be123c"/>
+    </marker>
+  </defs>
+
+  <!-- Line 1 (NW-SE) -->
+  <line x1="50" y1="55" x2="410" y2="205" stroke="#1e3a8a" stroke-width="2.5"
+        marker-start="url(#va1)" marker-end="url(#va1)"/>
+  <!-- Line 2 (NE-SW) -->
+  <line x1="410" y1="55" x2="50" y2="205" stroke="#be123c" stroke-width="2.5"
+        marker-start="url(#va2)" marker-end="url(#va2)"/>
+
+  <!-- Intersection vertex -->
+  <circle cx="230" cy="130" r="5" fill="#374151"/>
+
+  <!-- Angle arcs -->
+  <!-- ∠1: top (between NW and NE rays) -->
+  <path d="M 205,110 A 28,28 0 0,1 255,110" fill="rgba(99,102,241,0.15)" stroke="#6366f1" stroke-width="1.8"/>
+  <text x="230" y="100" font-size="14" fill="#6366f1" font-weight="700" text-anchor="middle">∠1</text>
+  <text x="230" y="83" font-size="12" fill="#6366f1" font-weight="600" text-anchor="middle">47°</text>
+
+  <!-- ∠2: right -->
+  <path d="M 250,118 A 28,28 0 0,1 252,150" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+  <text x="290" y="137" font-size="14" fill="#f97316" font-weight="700">∠2</text>
+  <text x="310" y="153" font-size="12" fill="#f97316" font-weight="600">133°</text>
+
+  <!-- ∠3: bottom (vertical to ∠1) -->
+  <path d="M 205,150 A 28,28 0 0,0 255,150" fill="rgba(99,102,241,0.15)" stroke="#6366f1" stroke-width="1.8"/>
+  <text x="230" y="172" font-size="14" fill="#6366f1" font-weight="700" text-anchor="middle">∠3</text>
+  <text x="230" y="188" font-size="12" fill="#6366f1" font-weight="600" text-anchor="middle">47°</text>
+
+  <!-- ∠4: left (vertical to ∠2) -->
+  <path d="M 208,118 A 28,28 0 0,0 208,150" fill="rgba(249,115,22,0.15)" stroke="#f97316" stroke-width="1.8"/>
+  <text x="170" y="137" font-size="14" fill="#f97316" font-weight="700">∠4</text>
+  <text x="144" y="153" font-size="12" fill="#f97316" font-weight="600">133°</text>
+
+  <!-- Equality annotations -->
+  <text x="230" y="228" font-size="12" fill="#6366f1" text-anchor="middle" font-weight="600">∠1 = ∠3 = 47°</text>
+  <text x="230" y="245" font-size="12" fill="#f97316" text-anchor="middle" font-weight="600">∠2 = ∠4 = 133°</text>
+  <text x="230" y="15" font-size="11" class="svg-muted" text-anchor="middle">Vertical Angles Theorem: opposite angles at an intersection are always equal</text>
+</svg>

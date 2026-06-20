@@ -9,6 +9,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { evaluate as mathEval, simplify as mathSimplify } from 'mathjs'
 import { useProgress } from '../../hooks/useProgress.js'
 import { parseProse } from '../math/parseProse.jsx'
+import SVGImage from './SVGImage.jsx'
 
 const MATH_TYPING_GUIDE = (
   <div className="text-xs text-slate-500 dark:text-slate-400 space-y-0.5">
@@ -90,6 +91,13 @@ function QuizQuestion({ q: rawQ, index, state, onChange }) {
         </span>
 
         <div className="flex-1 min-w-0">
+          {q.diagram && (
+            <SVGImage
+              src={q.diagram}
+              alt={q.diagramAlt ?? ''}
+              className="mb-3 !my-0"
+            />
+          )}
           <p className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-3 leading-relaxed">
             {parseProse(q.text)}
           </p>

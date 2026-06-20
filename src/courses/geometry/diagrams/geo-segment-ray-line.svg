@@ -1,0 +1,52 @@
+<svg viewBox="0 0 460 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg   { fill: #f8fafc; }
+    .svg-muted{ fill: #94a3b8; }
+    .dark .svg-bg   { fill: #0f172a; }
+    .dark .svg-muted{ fill: #64748b; }
+  </style>
+  <rect width="460" height="200" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="rarr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#0891b2"/>
+    </marker>
+    <marker id="larr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#10b981"/>
+    </marker>
+    <marker id="barr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#6366f1"/>
+    </marker>
+  </defs>
+
+  <!-- ROW 1: Line Segment -->
+  <text x="18" y="28" font-size="12" fill="#6366f1" font-weight="700">Segment  AB̄</text>
+  <!-- Endpoints with solid dots, no arrows -->
+  <circle cx="110" cy="52" r="5.5" fill="#6366f1"/>
+  <circle cx="260" cy="52" r="5.5" fill="#6366f1"/>
+  <line x1="110" y1="52" x2="260" y2="52" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="110" y="38" font-size="13" fill="#6366f1" font-weight="700" font-style="italic" text-anchor="middle">A</text>
+  <text x="260" y="38" font-size="13" fill="#6366f1" font-weight="700" font-style="italic" text-anchor="middle">B</text>
+  <text x="300" y="57" font-size="11" class="svg-muted">two endpoints, finite length</text>
+
+  <!-- ROW 2: Ray -->
+  <text x="18" y="98" font-size="12" fill="#0891b2" font-weight="700">Ray  AB⃗</text>
+  <!-- One endpoint, one arrow -->
+  <circle cx="110" cy="122" r="5.5" fill="#0891b2"/>
+  <line x1="110" y1="122" x2="390" y2="122" stroke="#0891b2" stroke-width="2.5"
+        marker-end="url(#rarr)"/>
+  <text x="110" y="108" font-size="13" fill="#0891b2" font-weight="700" font-style="italic" text-anchor="middle">A</text>
+  <text x="220" y="108" font-size="13" fill="#0891b2" font-weight="700" font-style="italic" text-anchor="middle">B</text>
+  <circle cx="220" cy="122" r="4" fill="#0891b2" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <text x="300" y="127" font-size="11" class="svg-muted">one endpoint A, extends through B forever →</text>
+
+  <!-- ROW 3: Line -->
+  <text x="18" y="166" font-size="12" fill="#10b981" font-weight="700">Line  ↔AB  or  ℓ</text>
+  <!-- Two arrows (both directions) -->
+  <line x1="30" y1="185" x2="420" y2="185" stroke="#10b981" stroke-width="2.5"
+        marker-start="url(#larr)" marker-end="url(#larr)"/>
+  <circle cx="150" cy="185" r="4.5" fill="#10b981" stroke="white" stroke-width="1.5"/>
+  <text x="150" y="174" font-size="13" fill="#10b981" font-weight="700" font-style="italic" text-anchor="middle">A</text>
+  <circle cx="290" cy="185" r="4.5" fill="#10b981" stroke="white" stroke-width="1.5"/>
+  <text x="290" y="174" font-size="13" fill="#10b981" font-weight="700" font-style="italic" text-anchor="middle">B</text>
+  <text x="430" y="190" font-size="11" class="svg-muted">←→ no endpoints, infinite both ways</text>
+</svg>

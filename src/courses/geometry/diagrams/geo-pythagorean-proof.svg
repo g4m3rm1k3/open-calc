@@ -1,0 +1,80 @@
+<svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="230" rx="10" class="svg-bg"/>
+
+  <!-- Panel 1: arrangement 1 — four triangles around inner c² square -->
+  <rect x="10" y="10" width="210" height="210" rx="7" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="115" y="26" font-size="11" fill="#1e3a8a" text-anchor="middle" font-weight="700">Arrangement 1: c² in center</text>
+
+  <!-- (a+b)² outer square at 20,32 size 190 -->
+  <!-- a=70 pixels, b=120 pixels for visual; scale to fit -->
+  <!-- a:b ≈ 3:4, total side = a+b = 190 -->
+  <!-- triangles: right angle at corners of outer square -->
+  <!-- corner positions of inner c² tilted square -->
+  <!-- bottom-left: (20+70, 32+190) = (90, 222) = (90,222) -->
+  <!-- Let me use simpler: outer square from (22,32) to (212,222) = 190x190 -->
+  <!-- a=72, b=118 -->
+  <!-- The four triangles: each has legs 72 and 118 -->
+  <!-- Triangle 1: (22,32)-(94,32)-(22,150) = top-left, legs right:72, down:118 -->
+  <!-- Let me go with cleaner layout -->
+
+  <!-- Outer square -->
+  <rect x="24" y="33" width="185" height="185" fill="none" stroke="#1e3a8a" stroke-width="1.5"/>
+
+  <!-- Inner tilted square (c²) -->
+  <!-- If a=70, b=115: points at (24+70,33)=94,33 | (24+185,33+70)=209,103 | (24+185-70,33+185)=139,218 | (24,33+185-70)=24,148 -->
+  <polygon points="94,33 209,103 139,218 24,148" fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="2"/>
+  <!-- Four right triangles -->
+  <polygon points="24,33 94,33 24,148" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.5"/>
+  <polygon points="94,33 209,33 209,103" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.5"/>
+  <polygon points="209,103 209,218 139,218" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.5"/>
+  <polygon points="24,148 139,218 24,218" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.5"/>
+
+  <!-- Labels -->
+  <text x="116" y="135" font-size="14" fill="#ef4444" text-anchor="middle" font-weight="700">c²</text>
+  <text x="44" y="95" font-size="11" fill="#6366f1" text-anchor="middle">b</text>
+  <text x="59" y="35" font-size="11" fill="#6366f1">a</text>
+  <text x="92" y="15" font-size="11" fill="#1e3a8a" text-anchor="middle">(a+b)²</text>
+
+  <!-- Panel 2: arrangement 2 — two a² and b² rectangles -->
+  <rect x="260" y="10" width="210" height="210" rx="7" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="365" y="26" font-size="11" fill="#1a3a2a" text-anchor="middle" font-weight="700">Arrangement 2: a² + b²</text>
+
+  <!-- Same outer square (a+b)² -->
+  <rect x="272" y="33" width="185" height="185" fill="none" stroke="#1e3a8a" stroke-width="1.5"/>
+
+  <!-- Triangles rearranged to leave a² and b² squares -->
+  <!-- a²: top-left rectangle, a×a = 70×70 -->
+  <!-- b²: bottom-right = b×b = 115×115 -->
+  <!-- Triangle 1 -->
+  <polygon points="272,33 342,33 342,148" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- Triangle 2 -->
+  <polygon points="342,33 457,33 457,103" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- Triangle 3 -->
+  <polygon points="342,148 457,103 457,218" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- Triangle 4 -->
+  <polygon points="272,218 342,218 272,148" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.5"/>
+
+  <!-- a² region: top-left 70×70 -->
+  <rect x="272" y="33" width="70" height="70" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="2" stroke-dasharray="0"/>
+  <text x="307" y="72" font-size="13" fill="#10b981" text-anchor="middle" font-weight="700">a²</text>
+
+  <!-- b² region: bottom area 115×115 -->
+  <rect x="342" y="103" width="115" height="115" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="2"/>
+  <text x="400" y="165" font-size="13" fill="#f59e0b" text-anchor="middle" font-weight="700">b²</text>
+
+  <!-- Conclusion -->
+  <text x="240" y="17" font-size="14" class="svg-text" text-anchor="middle" font-weight="700" font-size="10">Same (a+b)² with same 4 triangles ⟹</text>
+  <text x="240" y="222" font-size="13" class="svg-text" text-anchor="middle">c² = a² + b² □</text>
+</svg>

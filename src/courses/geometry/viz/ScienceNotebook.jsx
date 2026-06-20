@@ -898,9 +898,11 @@ export default function ScienceNotebook({ lesson: lessonProp, params = {} }) {
       {/* Lesson header */}
       {title && (
         <div style={{ marginBottom: 20, paddingBottom: 14, borderBottom: `1px solid ${T.border}` }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: T.accent, marginBottom: 5 }}>
-            Chemistry
-          </div>
+          {lesson.subject && (
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: T.accent, marginBottom: 5 }}>
+              {lesson.subject}
+            </div>
+          )}
           <div style={{ fontSize: 20, fontWeight: 600, color: T.text, marginBottom: subtitle ? 6 : 0 }}>{title}</div>
           {subtitle && <div style={{ fontSize: 14, color: T.muted, lineHeight: 1.6 }}>{subtitle}</div>}
         </div>
