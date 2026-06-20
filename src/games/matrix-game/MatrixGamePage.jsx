@@ -74,8 +74,11 @@ function MathRainBg() {
   )
 }
 
-export default function MatrixGamePage() {
+export default function MatrixGamePage({ onBack, onClose }) {
   const navigate = useNavigate()
+  // Opened as a route, "back" should leave the page; opened inside the desktop
+  // window manager, it should just close that window instead of changing the URL.
+  const handleBack = onBack || onClose || (() => navigate('/games'))
 
   useEffect(() => {
     document.title = 'Linear Algebra — UpSkillOS'
@@ -92,7 +95,7 @@ export default function MatrixGamePage() {
     }}>
       <MathRainBg />
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1100px', margin: '0 auto' }}>
-        <MatrixGame onBack={() => navigate('/games')} />
+        <MatrixGame onBack={handleBack} />
       </div>
     </div>
   )

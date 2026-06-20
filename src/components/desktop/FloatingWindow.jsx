@@ -62,12 +62,19 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
         style={{ zIndex }}
         onMouseDown={onFocus}
       >
-        <div className="absolute top-2 left-3 z-10 flex items-center gap-[6px] opacity-0 hover:opacity-100 transition-opacity duration-300">
+        {/* Always at least dimly visible — fully hidden-until-hover made the only way
+            to close a maximized game/lab undiscoverable. */}
+        <div className="absolute top-2 left-3 z-10 flex items-center gap-[6px] bg-black/20 rounded-full px-2 py-1 opacity-60 hover:opacity-100 transition-opacity duration-200">
           <MacDots onClose={onClose} onMinimize={undefined} onMaximize={onMaximize} isMaximized />
         </div>
         <div className="flex-1 overflow-hidden" style={{ transform: 'translate(0,0)' }}>
           <LabErrorBoundary label={win.label} backTo={win.backTo}>
-            <Component onBack={onClose} />
+            {/* Games/labs were written against two different close-prop conventions
+                (onBack vs onClose) with no single source of truth — pass both so
+                either works, instead of each one silently no-oping when wired the
+                "wrong" way (this is how golf's close button and fullscreen-detection
+                broke when opened through the window manager). */}
+            <Component onBack={onClose} onClose={onClose} />
           </LabErrorBoundary>
         </div>
       </div>
@@ -92,7 +99,7 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
       {/* transform creates a containing block so fixed-position lab canvases clip to this window */}
       <div className="flex-1 overflow-hidden relative" style={{ transform: 'translate(0,0)' }}>
         <LabErrorBoundary label={win.label} backTo={win.backTo}>
-          <Component onBack={onClose} />
+          <Component onBack={onClose} onClose={onClose} />
         </LabErrorBoundary>
       </div>
     </div>
