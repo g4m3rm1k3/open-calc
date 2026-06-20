@@ -1,0 +1,59 @@
+<svg viewBox="0 0 380 240" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg   { fill: #f8fafc; }
+    .svg-box  { stroke: #cbd5e1; fill: none; }
+    .svg-muted{ fill: #94a3b8; }
+    .dark .svg-bg   { fill: #0f172a; }
+    .dark .svg-box  { stroke: #334155; }
+    .dark .svg-muted{ fill: #64748b; }
+  </style>
+  <rect width="380" height="240" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="ra" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#f43f5e"/>
+    </marker>
+    <marker id="rb" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#f97316"/>
+    </marker>
+  </defs>
+
+  <!-- 3D Box (perspective) -->
+  <!-- Front face -->
+  <rect x="80" y="80" width="160" height="110" fill="none" class="svg-box" stroke-width="1.2"/>
+  <!-- Back top edge (dashed) -->
+  <line x1="110" y1="50" x2="270" y2="50" class="svg-box" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- Top left depth edge -->
+  <line x1="80" y1="80" x2="110" y2="50" class="svg-box" stroke-width="1.2"/>
+  <!-- Top right depth edge -->
+  <line x1="240" y1="80" x2="270" y2="50" class="svg-box" stroke-width="1.2"/>
+  <!-- Back right vertical (dashed) -->
+  <line x1="270" y1="50" x2="270" y2="160" class="svg-box" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- Back bottom edge (dashed) -->
+  <line x1="110" y1="160" x2="270" y2="160" class="svg-box" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- Bottom left depth -->
+  <line x1="80" y1="190" x2="110" y2="160" class="svg-box" stroke-width="1.2"/>
+  <!-- Bottom right depth -->
+  <line x1="240" y1="190" x2="270" y2="160" class="svg-box" stroke-width="1.2"/>
+
+  <!-- Skew line 1: top back edge (red) -->
+  <line x1="95" y1="50" x2="285" y2="50" stroke="#f43f5e" stroke-width="3"
+        marker-start="url(#ra)" marker-end="url(#ra)"/>
+  <text x="180" y="38" font-size="13" fill="#f43f5e" text-anchor="middle" font-weight="700" font-style="italic">m</text>
+
+  <!-- Skew line 2: right front vertical edge (orange) -->
+  <line x1="240" y1="65" x2="240" y2="205" stroke="#f97316" stroke-width="3"
+        marker-start="url(#rb)" marker-end="url(#rb)"/>
+  <text x="256" y="140" font-size="13" fill="#f97316" font-weight="700" font-style="italic">n</text>
+
+  <!-- Label: NOT parallel (no equal angle marks) -->
+  <!-- Label: NEVER meet -->
+  <!-- Annotations -->
+  <text x="190" y="222" font-size="12" fill="#f43f5e" text-anchor="middle" font-weight="600">m and n are SKEW</text>
+  <text x="190" y="237" font-size="11" class="svg-muted" text-anchor="middle">They don't intersect AND they're not parallel — only possible in 3D</text>
+
+  <!-- Tick marks to show "not parallel" -->
+  <line x1="165" y1="46" x2="165" y2="54" stroke="#f43f5e" stroke-width="2"/>
+  <line x1="195" y1="46" x2="195" y2="54" stroke="#f43f5e" stroke-width="2"/>
+  <line x1="236" y1="118" x2="244" y2="118" stroke="#f97316" stroke-width="2"/>
+  <line x1="236" y1="128" x2="244" y2="128" stroke="#f97316" stroke-width="2"/>
+</svg>

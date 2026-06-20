@@ -1,9 +1,12 @@
 // Geometry · Chapter 1 · Lesson 6
 // Congruence: Identical Shapes
+import geoCongruenceCriteriaUrl from '../diagrams/geo-congruence-criteria.svg?url'
+import geoIsoscelesProofUrl from '../diagrams/geo-isosceles-proof.svg?url'
 
 const LESSON_GEO_1_6 = {
   title: 'Congruence: Identical Shapes',
   subtitle: 'How few measurements determine a triangle — and what that tells us about proof.',
+  subject: 'Geometry',
   sequential: true,
 
   cells: [
@@ -653,20 +656,15 @@ export default {
     previewVisualizationId: 'G1_5_Congruence',
   },
   intuition: {
-    prose: [
-      'Two figures are congruent (≅) if one can be placed exactly on the other: all sides and angles match.',
-      'Valid criteria for triangle congruence: SSS, SAS, ASA, AAS, HL (right triangles).',
-      'Invalid criteria: SSA (ambiguous case — two triangles can satisfy the same SSA), AAA (only proves similarity, not congruence).',
-      'CPCTC: once triangles are proven congruent, all corresponding parts are congruent.',
-      'Proof strategy: to prove two segments or angles equal, embed them as corresponding parts of two congruent triangles, then apply CPCTC.',
-    ],
-    callouts: [
-      { type: 'important', title: 'Why SSA fails', body: 'Given two sides and a non-included angle, the second side can "swing" to two positions. Two different triangles can satisfy the same SSA conditions. This is the ambiguous case. Always check that your angle is INCLUDED (between the two sides) when using SAS.' },
-      { type: 'definition', title: 'CPCTC', body: 'Corresponding Parts of Congruent Triangles are Congruent. Once you prove △ABC ≅ △DEF by any criterion, you automatically know AB = DE, BC = EF, CA = FD, ∠A = ∠D, ∠B = ∠E, ∠C = ∠F.' },
-    ],
-    visualizations: [
-      { id: 'ScienceNotebook', title: 'Congruence: Identical Shapes', props: { lesson: LESSON_GEO_1_6 } },
-      { id: 'G1_5_Congruence', title: 'Congruence Criteria: SAS, SSS, and More' }
+    blocks: [
+      { type: 'prose', md: 'Two figures are **congruent** (≅) if one can be placed exactly on top of the other: all corresponding sides equal, all corresponding angles equal. A triangle has six measurements — three sides and three angles. Remarkably, you only need three to guarantee congruence, if you pick the right three.' },
+      { type: 'image', src: geoCongruenceCriteriaUrl, alt: 'SSS, SAS valid; SSA and AAA invalid', caption: 'Valid criteria: SSS (3 sides), SAS (2 sides + included angle). Invalid: SSA (ambiguous — the third vertex can be in two positions), AAA (only proves similarity, not congruence).' },
+      { type: 'prose', md: 'The **Isosceles Triangle Theorem** shows the proof strategy in action: to prove ∠B = ∠C in an isosceles triangle (AB = AC), draw the median from A to midpoint M of BC. This splits the triangle into △ABM and △ACM. By SSS (AB = AC, BM = MC, AM = AM), the triangles are congruent. Then **CPCTC** gives ∠B = ∠C.' },
+      { type: 'image', src: geoIsoscelesProofUrl, alt: 'Isosceles triangle split by median, proving base angles equal via SSS', caption: 'Median AM splits the isosceles triangle into two congruent halves. SSS applies, then CPCTC delivers ∠B = ∠C.' },
+      { type: 'callout', kind: 'important', title: 'Why SSA fails', body: 'Given two sides and a non-included angle, the third vertex can "swing" to two different positions — both satisfy the SSA conditions but produce different triangles. Always verify the angle is INCLUDED (between the two named sides) when using SAS.' },
+      { type: 'callout', kind: 'definition', title: 'CPCTC', body: 'Corresponding Parts of Congruent Triangles are Congruent. CPCTC is used AFTER proving congruence — it is the conclusion, not the criterion. Once △ABC ≅ △DEF is proved, every pair of corresponding parts is automatically equal.' },
+      { type: 'viz', id: 'ScienceNotebook', props: { lesson: LESSON_GEO_1_6 }, mathBridge: 'Explore all four criteria interactively. Select SSS to see matching tick marks, SAS to see the included angle, SSA to see the ambiguous case where two different triangles satisfy the same data, and AAA to see why similar triangles are not congruent.' },
+      { type: 'viz', id: 'G1_5_Congruence', title: 'Congruence Criteria: SAS, SSS, and More' },
     ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
@@ -684,45 +682,99 @@ export default {
     {
       id: 'q1',
       type: 'choice',
-      text: '"Congruence = same shape AND same size. All six measurements match." Two triangles are congruent. Triangle 1 has angle 40°. Triangle 2 must have:',
+      text: '△ABC ≅ △DEF. Triangle 1 has angle A = 40°. Which angle in Triangle 2 equals 40°?',
       options: [
-        'An angle of 40° somewhere',
-        'The corresponding angle of 40° — congruent triangles have equal corresponding angles in the same relative position',
-        'All angles equal to 40°',
+        'Any angle — 40° appears somewhere in the triangle',
+        '∠D — the corresponding vertex in the listed congruence',
+        'All three angles',
       ],
       correct: 1,
     },
     {
       id: 'q2',
       type: 'choice',
-      text: '"Invalid: SSA (ambiguous — two triangles possible)." Why can\'t two sides and a non-included angle prove congruence?',
+      text: 'Why does SSA not prove congruence?',
       options: [
-        'SSA is too much information and creates over-determined systems',
-        'Given two sides and a non-included angle, the third point can swing to two different positions — two different triangles can satisfy the same SSA conditions',
-        'The acronym SSA is reserved for right triangles only',
+        'SSA provides too much information',
+        'Given two sides and a non-included angle, the third vertex can swing to two positions — two different triangles satisfy the same SSA data',
+        'SSA only works for right triangles',
       ],
       correct: 1,
     },
     {
       id: 'q3',
       type: 'choice',
-      text: '"Proof strategy: find congruent triangles containing your target → prove by SSS/SAS/ASA/AAS → apply CPCTC." What does CPCTC stand for and when do you use it?',
+      text: 'When do you apply CPCTC in a proof?',
       options: [
-        'Corresponding Parts of Congruent Triangles are Congruent — used AFTER you have proved two triangles congruent, to conclude their matching parts are equal',
-        'Congruent Parts Create Triangle Congruence — used to establish SSS/SAS/ASA',
-        'Common Postulate for Congruent Triangle Comparison — an axiom used at the start of proofs',
+        'AFTER proving two triangles congruent, to conclude their matching parts are equal',
+        'BEFORE proving congruence, to set up the criterion',
+        'CPCTC is an axiom used at the start of every triangle proof',
       ],
       correct: 0,
     },
     {
       id: 'q4',
       type: 'choice',
-      text: '"HL: right triangles only." The HL criterion applies when two right triangles share the same hypotenuse length and one leg length. Why does HL work when SSA generally does not?',
+      text: 'Why does HL work for right triangles when SSA generally fails?',
       options: [
         'Right triangles have simpler math',
-        'In a right triangle, given the hypotenuse and one leg, the Pythagorean theorem determines the third side uniquely — there is only one possible triangle, eliminating the SSA ambiguity',
+        'Given hypotenuse and one leg, the Pythagorean theorem determines the third side uniquely — the ambiguity of SSA is eliminated',
         'HL is an axiom accepted without justification',
       ],
+      correct: 1,
+    },
+    {
+      id: 'q5',
+      type: 'choice',
+      text: 'For SAS to apply, where must the angle be positioned?',
+      options: [
+        'Anywhere — any angle with two known sides',
+        'The included angle — between the two known sides',
+        'The largest angle of the triangle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q6',
+      type: 'choice',
+      text: 'What auxiliary element is drawn in the isosceles triangle theorem proof?',
+      options: [
+        'An altitude from the apex to the base',
+        'A median from apex A to midpoint M of base BC',
+        'The perpendicular bisector of the apex angle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q7',
+      type: 'choice',
+      text: 'AAA proves that two triangles are:',
+      options: [
+        'Congruent — same shape and size',
+        'Similar — same shape but not necessarily same size',
+        'Neither similar nor congruent',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q8',
+      type: 'choice',
+      text: 'Two triangles have two equal angles and the non-included side between them equal. Which criterion applies?',
+      options: ['ASA', 'SAS', 'AAS'],
+      correct: 2,
+    },
+    {
+      id: 'q9',
+      type: 'choice',
+      text: 'The proof strategy for most triangle theorems: find congruent triangles, prove by SSS/SAS/ASA/AAS, then conclude with:',
+      options: ['Substitution Property', 'CPCTC', 'Linear Pair Theorem'],
+      correct: 1,
+    },
+    {
+      id: 'q10',
+      type: 'choice',
+      text: '△ABC ≅ △DEF. AB = 15. Which segment of △DEF has length 15?',
+      options: ['EF (B corresponds to E, C to F)', 'DE (A corresponds to D, B to E)', 'DF (A corresponds to D, C to F)'],
       correct: 1,
     },
   ],

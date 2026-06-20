@@ -1,0 +1,40 @@
+<svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="300" height="140" rx="8" class="svg-bg"/>
+
+  <!-- Straight horizontal line -->
+  <line x1="30" y1="85" x2="270" y2="85" stroke="#94a3b8" stroke-width="2" class="svg-muted"/>
+
+  <!-- Ray going up-right from point P at (150,85) -->
+  <line x1="150" y1="85" x2="240" y2="25" stroke="#1e293b" stroke-width="2.5" class="svg-text"/>
+
+  <!-- Point P -->
+  <circle cx="150" cy="85" r="3.5" fill="#1e293b" class="svg-text"/>
+  <text x="150" y="104" font-size="12" class="svg-muted" text-anchor="middle">P</text>
+
+  <!-- Known angle arc: left side (angle between left ray and oblique ray = 127°) -->
+  <path d="M 120 85 A 30 30 0 0 1 140 63" fill="rgba(30,58,95,0.1)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <text x="115" y="75" font-size="13" fill="#1e3a5f" font-weight="700" text-anchor="middle">127°</text>
+
+  <!-- Unknown angle arc: right side -->
+  <path d="M 180 85 A 30 30 0 0 0 165 62" fill="rgba(239,68,68,0.1)" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="196" y="70" font-size="15" fill="#ef4444" font-weight="800" text-anchor="middle">x</text>
+
+  <!-- Direction labels -->
+  <text x="38" y="80" font-size="10" class="svg-muted">A</text>
+  <text x="258" y="80" font-size="10" class="svg-muted">B</text>
+  <text x="244" y="24" font-size="10" class="svg-muted">C</text>
+
+  <text x="150" y="128" font-size="9" class="svg-muted" text-anchor="middle">Find x. Line AB is straight.</text>
+</svg>

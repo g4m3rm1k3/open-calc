@@ -25,6 +25,7 @@ import MarkdownProse from "../math/MarkdownProse.jsx";
 import KatexBlock from "../math/KatexBlock.jsx";
 import { useProgress } from "../../hooks/useProgress.js";
 import StickyNote from "../ui/StickyNote.jsx";
+import SVGImage from "./SVGImage.jsx";
 
 // Re-export parseProse so existing imports from IntegratedLesson still work
 export { parseProse } from "../math/parseProse.jsx";
@@ -157,6 +158,26 @@ function SectionContent({ data }) {
           if (block.type === "viz") {
             const norm = normalizeViz(block);
             return norm ? <VizCard key={i} viz={norm} /> : null;
+          }
+          if (block.type === "math") {
+            return (
+              <div key={i} className="my-2 overflow-x-auto rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 px-6 py-5 text-center shadow-sm">
+                <KatexBlock expr={block.tex} />
+                {block.caption && (
+                  <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 italic">{block.caption}</p>
+                )}
+              </div>
+            );
+          }
+          if (block.type === "image") {
+            return (
+              <SVGImage
+                key={i}
+                src={block.src}
+                alt={block.alt}
+                caption={block.caption}
+              />
+            );
           }
           return null;
         })}

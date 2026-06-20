@@ -1,0 +1,51 @@
+<svg viewBox="0 0 420 180" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg     { fill: #f8fafc; }
+    .svg-muted  { fill: #94a3b8; }
+    .svg-divider{ stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg     { fill: #0f172a; }
+    .dark .svg-muted  { fill: #64748b; }
+    .dark .svg-divider{ stroke: #334155; }
+  </style>
+  <rect width="420" height="180" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="arr" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#6366f1"/>
+    </marker>
+    <marker id="arr2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+
+  <!-- Left: COLLINEAR -->
+  <text x="100" y="22" font-size="12" fill="#6366f1" text-anchor="middle" font-weight="700">Collinear ✓</text>
+  <line x1="18" y1="70" x2="190" y2="70" stroke="#6366f1" stroke-width="2"
+        marker-start="url(#arr)" marker-end="url(#arr)"/>
+  <circle cx="50" cy="70" r="5" fill="#6366f1" stroke="white" stroke-width="2"/>
+  <text x="50" y="56" font-size="14" fill="#6366f1" font-weight="700" font-style="italic" text-anchor="middle">A</text>
+  <circle cx="100" cy="70" r="5" fill="#6366f1" stroke="white" stroke-width="2"/>
+  <text x="100" y="56" font-size="14" fill="#6366f1" font-weight="700" font-style="italic" text-anchor="middle">B</text>
+  <circle cx="155" cy="70" r="5" fill="#6366f1" stroke="white" stroke-width="2"/>
+  <text x="155" y="56" font-size="14" fill="#6366f1" font-weight="700" font-style="italic" text-anchor="middle">C</text>
+  <text x="100" y="98" font-size="11" fill="#6366f1" text-anchor="middle">A, B, C lie on the same line</text>
+  <text x="100" y="113" font-size="11" class="svg-muted" text-anchor="middle">→ they are collinear</text>
+
+  <!-- Divider -->
+  <line x1="210" y1="15" x2="210" y2="165" class="svg-divider" stroke-width="1.5"/>
+
+  <!-- Right: NON-COLLINEAR -->
+  <text x="315" y="22" font-size="12" fill="#f59e0b" text-anchor="middle" font-weight="700">Non-Collinear → Triangle</text>
+  <!-- Three points not on same line -->
+  <circle cx="270" cy="40" r="5" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <text x="258" y="35" font-size="14" fill="#f59e0b" font-weight="700" font-style="italic">P</text>
+  <circle cx="240" cy="110" r="5" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <text x="226" y="108" font-size="14" fill="#f59e0b" font-weight="700" font-style="italic">Q</text>
+  <circle cx="380" cy="105" r="5" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <text x="386" y="102" font-size="14" fill="#f59e0b" font-weight="700" font-style="italic">R</text>
+  <!-- Triangle sides -->
+  <line x1="270" y1="40" x2="240" y2="110" stroke="#f59e0b" stroke-width="1.5" opacity="0.6"/>
+  <line x1="240" y1="110" x2="380" y2="105" stroke="#f59e0b" stroke-width="1.5" opacity="0.6"/>
+  <line x1="380" y1="105" x2="270" y2="40" stroke="#f59e0b" stroke-width="1.5" opacity="0.6"/>
+  <text x="315" y="142" font-size="11" fill="#f59e0b" text-anchor="middle">P, Q, R do NOT all share one line</text>
+  <text x="315" y="157" font-size="11" class="svg-muted" text-anchor="middle">→ they are non-collinear (they define a plane)</text>
+</svg>

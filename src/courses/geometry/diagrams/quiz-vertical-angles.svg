@@ -1,0 +1,38 @@
+<svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="300" height="160" rx="8" class="svg-bg"/>
+
+  <!-- Two intersecting lines through (150, 80) -->
+  <!-- Line 1: slightly tilted (30,130) to (270,30) -->
+  <line x1="30" y1="130" x2="270" y2="30" stroke="#94a3b8" stroke-width="2" class="svg-muted"/>
+  <!-- Line 2: slightly tilted other way (30,30) to (270,130) -->
+  <line x1="30" y1="30" x2="270" y2="130" stroke="#94a3b8" stroke-width="2" class="svg-muted"/>
+
+  <!-- Intersection point -->
+  <circle cx="150" cy="80" r="3.5" fill="#1e293b" class="svg-text"/>
+
+  <!-- Top angle label: 62° -->
+  <text x="150" y="44" font-size="13" fill="#1e3a5f" font-weight="700" text-anchor="middle">62°</text>
+
+  <!-- Bottom angle label: x (vertical to top = 62°) -->
+  <text x="150" y="126" font-size="15" fill="#ef4444" font-weight="800" text-anchor="middle">x</text>
+
+  <!-- Left angle label: y -->
+  <text x="68" y="85" font-size="14" fill="#7c3aed" font-weight="700" text-anchor="middle">y</text>
+
+  <!-- Right angle label: z -->
+  <text x="232" y="85" font-size="14" fill="#7c3aed" font-weight="700" text-anchor="middle">z</text>
+
+  <text x="150" y="150" font-size="9" class="svg-muted" text-anchor="middle">Two straight lines intersect. Find x, y, and z.</text>
+</svg>

@@ -1,0 +1,56 @@
+<svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg     { fill: #f8fafc; }
+    .svg-text   { fill: #374151; }
+    .svg-muted  { fill: #94a3b8; }
+    .svg-divider{ stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg     { fill: #0f172a; }
+    .dark .svg-text   { fill: #cbd5e1; }
+    .dark .svg-muted  { fill: #64748b; }
+    .dark .svg-divider{ stroke: #334155; }
+  </style>
+  <rect width="420" height="200" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="a1" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#0891b2"/>
+    </marker>
+    <marker id="a2" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#ef4444"/>
+    </marker>
+    <marker id="a3" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <!-- Left panel: THE unique line through A and B -->
+  <text x="105" y="22" font-size="11" fill="#0891b2" text-anchor="middle" font-weight="700">ONE unique line</text>
+  <line x1="20" y1="75" x2="190" y2="75" stroke="#0891b2" stroke-width="2.5"
+        marker-start="url(#a1)" marker-end="url(#a1)"/>
+  <circle cx="65" cy="75" r="6" fill="#0891b2" stroke="white" stroke-width="2"/>
+  <text x="65" y="60" font-size="15" fill="#0891b2" font-weight="700" font-style="italic" text-anchor="middle">A</text>
+  <circle cx="145" cy="75" r="6" fill="#0891b2" stroke="white" stroke-width="2"/>
+  <text x="145" y="60" font-size="15" fill="#0891b2" font-weight="700" font-style="italic" text-anchor="middle">B</text>
+  <text x="105" y="108" font-size="12" fill="#0891b2" text-anchor="middle">Postulate I: exactly</text>
+  <text x="105" y="124" font-size="12" fill="#0891b2" text-anchor="middle">one line through A, B</text>
+
+  <!-- Divider -->
+  <line x1="210" y1="15" x2="210" y2="175" class="svg-divider" stroke-width="1.5"/>
+
+  <!-- Right panel: rejected extra lines -->
+  <text x="315" y="22" font-size="11" fill="#ef4444" text-anchor="middle" font-weight="700">All other lines? ✗</text>
+  <!-- Same two points -->
+  <circle cx="260" cy="88" r="6" class="svg-text" stroke="white" stroke-width="2"/>
+  <text x="248" y="78" font-size="14" class="svg-text" font-weight="700" font-style="italic">A</text>
+  <circle cx="370" cy="88" r="6" class="svg-text" stroke="white" stroke-width="2"/>
+  <text x="378" y="78" font-size="14" class="svg-text" font-weight="700" font-style="italic">B</text>
+  <!-- Rejected tilted lines (faint red) -->
+  <line x1="230" y1="55" x2="400" y2="120" stroke="#ef4444" stroke-width="1.5" opacity="0.4"
+        marker-start="url(#a2)" marker-end="url(#a2)"/>
+  <line x1="225" y1="110" x2="410" y2="68" stroke="#ef4444" stroke-width="1.5" opacity="0.4"
+        marker-start="url(#a3)" marker-end="url(#a3)"/>
+  <!-- X marks -->
+  <text x="385" y="133" font-size="14" fill="#ef4444" font-weight="700" opacity="0.7">✗</text>
+  <text x="390" y="72" font-size="14" fill="#ef4444" font-weight="700" opacity="0.7">✗</text>
+  <text x="315" y="150" font-size="11" class="svg-muted" text-anchor="middle">Two points cannot</text>
+  <text x="315" y="165" font-size="11" class="svg-muted" text-anchor="middle">determine two different lines</text>
+</svg>

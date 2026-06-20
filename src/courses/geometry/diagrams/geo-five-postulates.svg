@@ -1,0 +1,76 @@
+<svg viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-border { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-border { stroke: #334155; }
+  </style>
+  <defs>
+    <marker id="arr-g" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto">
+      <path d="M1,1 L1,6 L6,3.5 z" fill="#10b981"/>
+    </marker>
+  </defs>
+
+  <rect width="560" height="360" rx="10" class="svg-bg"/>
+
+  <!-- Title -->
+  <text x="280" y="26" font-size="13" font-weight="700" text-anchor="middle" class="svg-text">Euclid's Five Postulates</text>
+
+  <!-- ── P I ── -->
+  <rect x="20" y="42" width="250" height="118" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="32" y="62" font-size="11" font-weight="700" fill="#1d4ed8">P I — Two points, one line</text>
+  <circle cx="80" cy="108" r="5" fill="#3b82f6"/>
+  <circle cx="180" cy="108" r="5" fill="#3b82f6"/>
+  <line x1="40" y1="108" x2="220" y2="108" stroke="#3b82f6" stroke-width="2"/>
+  <text x="80" y="96" font-size="10" fill="#1d4ed8" text-anchor="middle" font-style="italic">A</text>
+  <text x="180" y="96" font-size="10" fill="#1d4ed8" text-anchor="middle" font-style="italic">B</text>
+  <text x="135" y="144" font-size="10" text-anchor="middle" class="svg-muted">Through any 2 points: exactly 1 line</text>
+
+  <!-- ── P II ── -->
+  <rect x="290" y="42" width="250" height="118" rx="8" fill="#f0fdf4" stroke="#10b981" stroke-width="1.5"/>
+  <text x="302" y="62" font-size="11" font-weight="700" fill="#065f46">P II — Lines extend infinitely</text>
+  <circle cx="370" cy="108" r="5" fill="#10b981"/>
+  <circle cx="460" cy="108" r="5" fill="#10b981"/>
+  <line x1="315" y1="108" x2="525" y2="108" stroke="#10b981" stroke-width="2"
+        marker-start="url(#arr-g)" marker-end="url(#arr-g)"/>
+  <text x="415" y="144" font-size="10" text-anchor="middle" class="svg-muted">Any segment can be extended forever</text>
+
+  <!-- ── P III ── -->
+  <rect x="20" y="180" width="250" height="118" rx="8" fill="#fff7ed" stroke="#f97316" stroke-width="1.5"/>
+  <text x="32" y="200" font-size="11" font-weight="700" fill="#c2410c">P III — Circles exist</text>
+  <circle cx="135" cy="258" r="38" fill="none" stroke="#f97316" stroke-width="2"/>
+  <circle cx="135" cy="258" r="4" fill="#f97316"/>
+  <line x1="135" y1="258" x2="173" y2="258" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <text x="135" y="252" font-size="10" fill="#c2410c" text-anchor="middle" font-style="italic">O</text>
+  <text x="157" y="252" font-size="9" fill="#ea580c">r</text>
+  <text x="135" y="284" font-size="10" text-anchor="middle" class="svg-muted">Any center + radius → a circle</text>
+
+  <!-- ── P IV ── -->
+  <rect x="290" y="180" width="250" height="118" rx="8" fill="#faf5ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="302" y="200" font-size="11" font-weight="700" fill="#6b21a8">P IV — Right angles are equal</text>
+  <!-- Left right angle -->
+  <line x1="340" y1="230" x2="340" y2="275" stroke="#a855f7" stroke-width="2"/>
+  <line x1="340" y1="275" x2="390" y2="275" stroke="#a855f7" stroke-width="2"/>
+  <rect x="340" y="263" width="12" height="12" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="365" y="246" font-size="10" fill="#7c3aed" text-anchor="middle">90°</text>
+  <!-- Right right angle -->
+  <line x1="435" y1="230" x2="435" y2="275" stroke="#a855f7" stroke-width="2"/>
+  <line x1="435" y1="275" x2="490" y2="275" stroke="#a855f7" stroke-width="2"/>
+  <rect x="435" y="263" width="12" height="12" fill="none" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="462" y="246" font-size="10" fill="#7c3aed" text-anchor="middle">90°</text>
+  <!-- = sign -->
+  <text x="415" y="262" font-size="18" fill="#6b21a8" text-anchor="middle" font-weight="700">=</text>
+  <text x="415" y="292" font-size="10" text-anchor="middle" class="svg-muted">90° is the same everywhere</text>
+
+  <!-- ── P V ── (full width, highlighted red as the controversial one) -->
+  <rect x="20" y="318" width="520" height="30" rx="6" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="32" y="338" font-size="11" font-weight="700" fill="#b91c1c">P V — Parallel Postulate</text>
+  <text x="200" y="338" font-size="10" fill="#dc2626"> (controversial for 2000 years)</text>
+  <text x="375" y="338" font-size="10" class="svg-muted"> Through 1 external point: exactly 1 parallel</text>
+</svg>

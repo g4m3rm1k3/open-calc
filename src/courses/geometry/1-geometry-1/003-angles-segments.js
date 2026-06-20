@@ -1,9 +1,17 @@
 // Geometry · Chapter 1 · Lesson 3
 // Angles and Segments — The First Real Proofs
+import geoAngleTypesUrl from '../diagrams/geo-angle-types.svg?url'
+import geoLinearPairUrl from '../diagrams/geo-linear-pair.svg?url'
+import geoVerticalAnglesUrl from '../diagrams/geo-vertical-angles.svg?url'
+import geoSegmentMidpointUrl from '../diagrams/geo-segment-midpoint.svg?url'
+import quizLinearPairUrl from '../diagrams/quiz-linear-pair.svg?url'
+import quizVerticalAnglesUrl from '../diagrams/quiz-vertical-angles.svg?url'
+import quizMidpointFindUrl from '../diagrams/quiz-midpoint-find.svg?url'
 
 const LESSON_GEO_1_3 = {
   title: 'Angles and Segments',
   subtitle: 'Your first real proofs — and why "it looks equal" is never good enough.',
+  subject: 'Geometry',
   sequential: true,
 
   cells: [
@@ -667,19 +675,18 @@ export default {
     previewVisualizationId: 'G1_2_AnglesAtAPoint',
   },
   intuition: {
-    prose: [
-      'Angle types: acute (< 90°), right (= 90°), obtuse (90°–180°), straight (= 180°).',
-      'Linear Pair Theorem: two adjacent angles forming a straight line sum to 180°.',
-      'Vertical Angles Theorem: angles across an intersection are equal. Proved using Linear Pair Theorem twice and one algebra step.',
-      'Segment Addition Postulate: if B is between A and C, then AB + BC = AC.',
-      'Midpoint: the point dividing a segment into two equal halves. Midpoint Theorem: AM = AC/2.',
-    ],
-    callouts: [
-      { type: 'important', title: 'The structure of a proof', body: 'Every step must have a justification: Given, Definition, Postulate, Theorem, or Algebraic Property. "It looks equal" is never a justification.' },
-    ],
-    visualizations: [
-      { id: 'ScienceNotebook', title: 'Angles and Segments', props: { lesson: LESSON_GEO_1_3 } },
-      { id: 'G1_2_AnglesAtAPoint', title: 'Vertical Angles and Two-Step Proofs' }
+    blocks: [
+      { type: 'prose', md: 'Angles are classified by measure: **acute** (0°–90°), **right** (90°), **obtuse** (90°–180°), and **straight** (180°). The straight angle — a line — is the fulcrum of every angle proof. It gives you the number 180° to work with.' },
+      { type: 'image', src: geoAngleTypesUrl, alt: 'Four angle types: acute, right, obtuse, straight', caption: 'The four key angle types — each defined by a threshold of 90° or 180°.' },
+      { type: 'prose', md: 'When two angles share a vertex and their outer sides form a straight line, they are a **linear pair**. The **Linear Pair Theorem** says they always sum to 180°. This single fact is enough to prove everything about intersecting lines.' },
+      { type: 'image', src: geoLinearPairUrl, alt: 'Linear pair: two angles summing to 180°', caption: 'A linear pair: ∠1 + ∠2 = 180° because the outer sides form a straight line.' },
+      { type: 'prose', md: 'Two lines crossing form four angles. The angles **across** from each other — not adjacent — are **vertical angles**. The **Vertical Angles Theorem** proves they are always equal: each is supplementary to the same adjacent angle, so they must equal each other. Two uses of the Linear Pair Theorem and one algebra step.' },
+      { type: 'image', src: geoVerticalAnglesUrl, alt: 'Vertical angles at an intersection — equal pairs', caption: 'Vertical angles ∠1 = ∠3 and ∠2 = ∠4. The proof: both ∠1 and ∠3 are supplementary to ∠2, so they must be equal.' },
+      { type: 'prose', md: 'For segments, the **Segment Addition Postulate** is the foundational tool: if B lies between A and C, then AB + BC = AC. The **midpoint** M divides a segment so AM = MC = AC/2. The Midpoint Theorem derives this from the postulate in three steps.' },
+      { type: 'image', src: geoSegmentMidpointUrl, alt: 'Segment with midpoint M: AM = MC', caption: 'The midpoint M splits AC into two equal halves. Midpoint Theorem: AM = AC/2.' },
+      { type: 'callout', kind: 'important', title: 'The structure of a proof', body: 'Every step must have a justification: Given, Definition, Postulate, Theorem, or Algebraic Property. "It looks equal" is never a justification in a two-column proof.' },
+      { type: 'viz', id: 'ScienceNotebook', props: { lesson: LESSON_GEO_1_3 }, mathBridge: 'Work through the interactive notebook. Drag the slider to explore angle types, move the vertex to see the Linear Pair Theorem live, and verify that vertical angles remain equal no matter how you rotate the lines.' },
+      { type: 'viz', id: 'G1_2_AnglesAtAPoint', title: 'Vertical Angles and Two-Step Proofs' },
     ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
@@ -697,44 +704,92 @@ export default {
     {
       id: 'q1',
       type: 'choice',
-      text: '"Straight line = 180°." Two angles form a linear pair. One is 73°. What is the other?',
-      options: [
-        '107°',
-        '117°',
-        '97°',
-      ],
+      diagram: quizLinearPairUrl,
+      diagramAlt: 'A straight line AB with a ray from point P. The left angle is 127°, the right angle is labeled x.',
+      text: 'Line AB is straight and a ray from P creates a linear pair. Find x.',
+      options: ['53°', '63°', '47°'],
       correct: 0,
     },
     {
       id: 'q2',
       type: 'choice',
-      text: '"Vertical Angles Theorem: a + b = 180, c + b = 180 → a = c." Why are vertical angles equal without needing a separate axiom?',
+      diagram: quizVerticalAnglesUrl,
+      diagramAlt: 'Two intersecting lines. Top angle is 62°. Bottom angle is x, left angle is y, right angle is z.',
+      text: 'Two straight lines intersect. The top angle is 62°. Find x, y, and z.',
       options: [
-        'Vertical angles are defined as equal by the definition of intersecting lines',
-        'Both angles are each supplementary to the same angle b — if two things are both supplementary to the same angle, they must be equal to each other',
-        'They look equal and geometry agrees with visual intuition',
+        'x = 62°, y = 118°, z = 118° — vertical angles equal; adjacent angles supplementary',
+        'x = 118°, y = 62°, z = 62°',
+        'x = 62°, y = 62°, z = 62°',
       ],
-      correct: 1,
+      correct: 0,
     },
     {
       id: 'q3',
       type: 'choice',
-      text: '"Segment Addition Postulate: B between A and C → AB + BC = AC." Points on a line: A, B, C. AB = 5, AC = 13. What is BC?',
-      options: [
-        '8',
-        '18',
-        '65',
-      ],
+      text: 'Points A, B, C are collinear with B between A and C. AB = 5, AC = 13. What is BC?',
+      options: ['8', '18', '65'],
       correct: 0,
     },
     {
       id: 'q4',
       type: 'choice',
-      text: '"Two-column proof: left = statement, right = reason (never \'obvious\')." Which is a valid reason in a two-column proof?',
+      text: 'Which is a valid reason in a two-column proof?',
       options: [
         '"Clearly equal by inspection"',
-        '"Vertical Angles Theorem" or "Linear Pair Theorem" — specific named theorems or postulates',
+        '"Vertical Angles Theorem" — a specific named theorem',
         '"From the picture"',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q5',
+      type: 'choice',
+      text: 'An angle measures 145°. Which type is it?',
+      options: ['Acute', 'Right', 'Obtuse'],
+      correct: 2,
+    },
+    {
+      id: 'q6',
+      type: 'choice',
+      text: '∠P and ∠Q are complementary. ∠P = 32°. What is ∠Q?',
+      options: ['58°', '148°', '68°'],
+      correct: 0,
+    },
+    {
+      id: 'q7',
+      type: 'choice',
+      text: 'A ray from point P on a line creates ∠1 = x° and ∠2 = (3x + 20)°. They form a linear pair. Find x.',
+      options: ['x = 40', 'x = 32.5', 'x = 45'],
+      correct: 1,
+    },
+    {
+      id: 'q8',
+      type: 'choice',
+      text: 'In a proof, you write: "m∠1 + m∠2 = m∠2 + m∠3, therefore m∠1 = m∠3." The justification is:',
+      options: [
+        'Reflexive Property of Equality',
+        'Subtraction Property of Equality (subtract m∠2 from both sides)',
+        'Transitive Property of Equality',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q9',
+      type: 'choice',
+      diagram: quizMidpointFindUrl,
+      diagramAlt: 'Segment AC with midpoint M. AM = 3x+4, MC = 5x−6.',
+      text: 'M is the midpoint of AC, so AM = MC. Set up and solve: 3x + 4 = 5x − 6. What is AC?',
+      options: ['AC = 40', 'AC = 26', 'AC = 20'],
+      correct: 0,
+    },
+    {
+      id: 'q10',
+      type: 'choice',
+      text: 'Two lines intersect. One angle is 62°. A student claims the vertical angle is 118°. Is she right?',
+      options: [
+        'Yes — vertical angles are supplementary',
+        'No — vertical angles are equal, so the vertical angle is also 62°. The 118° angle is the adjacent supplementary angle.',
+        'Yes — all angles at an intersection sum to 180°',
       ],
       correct: 1,
     },

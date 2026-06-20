@@ -12,6 +12,7 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import VizFrame from "../viz/VizFrame.jsx";
 import Callout from "../ui/Callout.jsx";
+import SVGImage from "./SVGImage.jsx";
 import StepThrough from "./StepThrough.jsx";
 import DynamicProof from "./DynamicProof.jsx";
 import ScrubbableExample from "./ScrubbableExample.jsx";
@@ -108,6 +109,27 @@ function SectionContent({ data }) {
           if (block.type === "callout") return <Callout key={i} {...block} />;
           if (block.type === "stepthrough") return <StepThrough key={i} {...block} />;
           if (block.type === "viz") { const n = normalizeViz(block); return n ? <MobileVizCard key={i} viz={n} /> : null; }
+          if (block.type === "math") {
+            return (
+              <div key={i} className="my-3 overflow-x-auto rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 px-4 py-4 text-center shadow-sm">
+                <KatexBlock expr={block.tex} />
+                {block.caption && (
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 italic">{block.caption}</p>
+                )}
+              </div>
+            );
+          }
+          if (block.type === "image") {
+            return (
+              <div key={i} className="px-4">
+                <SVGImage
+                  src={block.src}
+                  alt={block.alt}
+                  caption={block.caption}
+                />
+              </div>
+            );
+          }
           return null;
         })}
         {(data.callouts ?? []).map((c, i) => <Callout key={`extra-${i}`} {...c} />)}

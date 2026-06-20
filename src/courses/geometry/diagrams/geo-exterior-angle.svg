@@ -1,0 +1,57 @@
+<svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="500" height="220" rx="10" class="svg-bg"/>
+
+  <!-- Triangle A(80,170) B(330,170) C(180,60) -->
+  <polygon points="80,170 330,170 180,60" fill="rgba(99,102,241,0.07)" stroke="#4f46e5" stroke-width="2.5"/>
+
+  <!-- Extension of AB beyond B -->
+  <line x1="330" y1="170" x2="440" y2="170" stroke="#ef4444" stroke-width="2.5" stroke-dasharray="8 4"/>
+  <polygon points="440,167 440,173 448,170" fill="#ef4444"/>
+
+  <!-- Vertices -->
+  <circle cx="80" cy="170" r="5" fill="#4f46e5"/>
+  <circle cx="330" cy="170" r="5" fill="#4f46e5"/>
+  <circle cx="180" cy="60" r="5" fill="#4f46e5"/>
+
+  <!-- Labels -->
+  <text x="68" y="187" font-size="15" fill="#4f46e5" font-weight="700" font-style="italic">A</text>
+  <text x="335" y="187" font-size="15" fill="#4f46e5" font-weight="700" font-style="italic">B</text>
+  <text x="180" y="48" font-size="15" fill="#4f46e5" font-weight="700" font-style="italic" text-anchor="middle">C</text>
+
+  <!-- ∠A arc -->
+  <path d="M 112,170 A 32,32 0 0,1 99,142" fill="rgba(99,102,241,0.15)" stroke="#6366f1" stroke-width="1.8"/>
+  <text x="122" y="154" font-size="13" fill="#6366f1" font-weight="700">∠A</text>
+  <text x="138" y="168" font-size="11" fill="#6366f1">52°</text>
+
+  <!-- ∠C arc -->
+  <path d="M 160,76 A 26,26 0 0,1 200,76" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="1.8"/>
+  <text x="180" y="100" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">∠C</text>
+  <text x="180" y="115" font-size="11" fill="#10b981" text-anchor="middle">73°</text>
+
+  <!-- ∠B interior arc (small) -->
+  <path d="M 305,170 A 26,26 0 0,1 315,149" fill="rgba(99,102,241,0.1)" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="297" y="154" font-size="11" fill="#4f46e5">55°</text>
+
+  <!-- Exterior angle arc -->
+  <path d="M 343,148 A 26,26 0 0,1 355,170" fill="rgba(239,68,68,0.2)" stroke="#ef4444" stroke-width="2"/>
+  <text x="362" y="158" font-size="13" fill="#ef4444" font-weight="700">ext</text>
+  <text x="362" y="172" font-size="11" fill="#ef4444">125°</text>
+
+  <!-- Equation -->
+  <text x="250" y="200" font-size="13" class="svg-text" text-anchor="middle">
+    <tspan fill="#ef4444" font-weight="700">ext∠ = 125°</tspan>
+    <tspan> = </tspan>
+    <tspan fill="#6366f1" font-weight="700">∠A (52°)</tspan>
+    <tspan> + </tspan>
+    <tspan fill="#10b981" font-weight="700">∠C (73°)</tspan>
+  </text>
+  <text x="250" y="216" font-size="11" class="svg-muted" text-anchor="middle">Exterior Angle Theorem: ext∠ = sum of the two remote interior angles</text>
+</svg>

@@ -1,10 +1,15 @@
 // Geometry · Chapter 1 · Lesson 5
 // The Triangle Angle Sum
+import geoTriangleAuxUrl from '../diagrams/geo-triangle-aux-line.svg?url'
+import geoExteriorAngleUrl from '../diagrams/geo-exterior-angle.svg?url'
+import quizTriangleFindUrl from '../diagrams/quiz-triangle-find-angle.svg?url'
+import quizExteriorAngleUrl from '../diagrams/quiz-exterior-angle.svg?url'
 
 const LESSON_GEO_1_5 = {
   title: "The Triangle Angle Sum",
   subtitle:
     "Why every triangle on a flat plane adds up to exactly 180° — and what happens when it doesn't.",
+  subject: 'Geometry',
   sequential: true,
 
   cells: [
@@ -372,27 +377,14 @@ export default {
     previewVisualizationId: "G1_4_TriangleAngleSum",
   },
   intuition: {
-    prose: [
-      "Draw line ℓ through C, parallel to AB. The three angles at C along ℓ sum to 180° (straight line).",
-      "AC is a transversal: alternate interior angles give ∠1 = ∠A.",
-      "BC is a transversal: alternate interior angles give ∠2 = ∠B.",
-      "Substitution: ∠A + ∠C + ∠B = 180°. □",
-      "Exterior Angle Theorem (corollary): exterior angle = sum of the two remote interior angles.",
-    ],
-    callouts: [
-      {
-        type: "important",
-        title: "Why the parallel line is essential",
-        body: "The auxiliary parallel line through C does two things: creates a 180° straight-angle container at C, and creates transversal relationships that transport ∠A and ∠B to C. Without it, there is no proof.",
-      },
-    ],
-    visualizations: [
-      {
-        id: "ScienceNotebook",
-        title: "The Triangle Angle Sum",
-        props: { lesson: LESSON_GEO_1_5 },
-      },
-      { id: "G1_4_TriangleAngleSum", title: "Proving the 180 Degree Fact" },
+    blocks: [
+      { type: 'prose', md: 'Every triangle\'s interior angles sum to exactly 180° — but why? The proof uses one clever construction: draw a line through vertex C **parallel to the opposite side AB**. This creates a straight angle at C (three parts summing to 180°) and two transversal pairs that transfer ∠A and ∠B to vertex C.' },
+      { type: 'image', src: geoTriangleAuxUrl, alt: 'Triangle with auxiliary parallel line through C showing the proof', caption: 'The auxiliary line ℓ through C (parallel to AB) is the key. Alternate interior angles transfer ∠A and ∠B to C, where they combine with ∠C along a straight line.' },
+      { type: 'prose', md: 'A powerful corollary: the **Exterior Angle Theorem**. Extend any side of a triangle beyond a vertex — the angle formed outside (the exterior angle) equals the sum of the two remote interior angles. It is strictly greater than either remote angle individually.' },
+      { type: 'image', src: geoExteriorAngleUrl, alt: 'Triangle with exterior angle equal to sum of two remote interior angles', caption: 'Exterior angle = ∠A + ∠C. Proof: exterior + ∠B = 180° (linear pair); ∠A + ∠B + ∠C = 180° (angle sum); subtract ∠B.' },
+      { type: 'callout', kind: 'important', title: 'Why the auxiliary line is necessary', body: 'Without drawing ℓ through C, there is no straight-angle container and no transversal mechanism to transport ∠A and ∠B to the same location. The proof literally cannot work. This is what auxiliary constructions do: introduce new structure that creates the logical connection you need.' },
+      { type: 'viz', id: 'ScienceNotebook', props: { lesson: LESSON_GEO_1_5 }, mathBridge: 'Drag the triangle vertices to any shape — the parallel line through C adjusts automatically and the proof panel updates in real time. Notice ∠1 always equals ∠A and ∠2 always equals ∠B, proving the sum is always 180°.' },
+      { type: 'viz', id: 'G1_4_TriangleAngleSum', title: 'Proving the 180 Degree Fact' },
     ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
@@ -411,10 +403,10 @@ export default {
     {
       id: 'q1',
       type: 'choice',
-      text: '"Auxiliary line through C parallel to AB transports ∠A and ∠B to vertex C." Why does an auxiliary line help prove the triangle angle sum?',
+      text: 'Why does drawing a line through C parallel to AB help prove the triangle angle sum?',
       options: [
-        'It creates a right angle at C, making calculation easier',
-        'A line through C parallel to AB creates alternate interior angles equal to ∠A and ∠B at vertex C — then the three angles at C lie on a straight line summing to 180°',
+        'It creates a right angle at C',
+        'It creates alternate interior angles at C equal to ∠A and ∠B — then all three angles at C lie on a straight line summing to 180°',
         'It divides the triangle into two right triangles',
       ],
       correct: 1,
@@ -422,34 +414,76 @@ export default {
     {
       id: 'q2',
       type: 'choice',
-      text: 'In a triangle, two angles are 47° and 83°. What is the third angle?',
-      options: [
-        '60°',
-        '50°',
-        '70°',
-      ],
-      correct: 1,
+      diagram: quizTriangleFindUrl,
+      diagramAlt: 'Triangle ABC with angle A = 47°, angle B = 65°, angle C labeled x.',
+      text: '∠A = 47°, ∠B = 65°. Find angle x at vertex C.',
+      options: ['68°', '58°', '78°'],
+      correct: 0,
     },
     {
       id: 'q3',
       type: 'choice',
-      text: '"Exterior Angle Theorem: exterior angle = sum of the two remote interior angles." A triangle has interior angles 40° and 65°. The exterior angle at the third vertex is:',
-      options: [
-        '105°',
-        '75°',
-        '115°',
-      ],
+      diagram: quizExteriorAngleUrl,
+      diagramAlt: 'Triangle ABC with side AB extended to D. Angle A = 48°, angle C = 73°. Exterior angle x at B.',
+      text: '∠A = 48°, ∠C = 73°. Find the exterior angle x at B.',
+      options: ['121°', '59°', '131°'],
       correct: 0,
     },
     {
       id: 'q4',
       type: 'choice',
-      text: '"On a sphere: angle sum > 180°." Why does a triangle drawn on a globe have an angle sum greater than 180°?',
+      text: 'Why does a triangle drawn on a globe have angle sum greater than 180°?',
       options: [
         'Triangles on spheres use larger units of measurement',
-        'The Parallel Postulate fails on a sphere — lines that are "straight" on a sphere (great circles) always intersect, changing the geometry fundamentally',
+        'The Parallel Postulate fails on a sphere — great circles always intersect, changing the geometry fundamentally',
         'Spheres distort angles making them appear larger',
       ],
+      correct: 1,
+    },
+    {
+      id: 'q5',
+      type: 'choice',
+      text: 'An exterior angle of a triangle is 134°. One remote interior angle is 71°. Find the other remote interior angle.',
+      options: ['63°', '46°', '109°'],
+      correct: 0,
+    },
+    {
+      id: 'q6',
+      type: 'choice',
+      text: 'Can a triangle have two obtuse angles?',
+      options: [
+        'Yes, if both are exactly 91°',
+        'No — two angles of 90° or more would already sum to ≥ 180°, leaving no room for a positive third angle',
+        'Yes, in non-Euclidean geometry only',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q7',
+      type: 'choice',
+      text: 'Each angle of an equilateral triangle equals:',
+      options: ['60°', '90°', '45°'],
+      correct: 0,
+    },
+    {
+      id: 'q8',
+      type: 'choice',
+      text: 'In a right triangle, one acute angle is 37°. What is the other acute angle?',
+      options: ['53°', '63°', '47°'],
+      correct: 0,
+    },
+    {
+      id: 'q9',
+      type: 'choice',
+      text: 'The two remote interior angles of an exterior angle are both equal to x. The exterior angle is:',
+      options: ['x°', '2x°', '180° − x°'],
+      correct: 1,
+    },
+    {
+      id: 'q10',
+      type: 'choice',
+      text: 'On a sphere, a triangle has three 90° angles. What is its angle sum?',
+      options: ['180°', '270°', '360°'],
       correct: 1,
     },
   ],

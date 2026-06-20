@@ -1,7 +1,10 @@
 // Geometry · Chapter 2 · Lesson 1
 // Logic and Statements
+import geoLogicPropositionUrl from '../diagrams/geo-logic-proposition.svg?url'
+import geoConditionalFormsUrl from '../diagrams/geo-conditional-forms.svg?url'
 
 const LESSON_GEO_2_1_LOGIC = {
+  subject: 'Geometry',
   title: "Logic and Statements",
   subtitle:
     "The grammar of mathematical certainty — how geometry converts informal observations into airtight arguments.",
@@ -581,25 +584,49 @@ export default {
     previewVisualizationId: "G2_3_Constructions",
   },
   intuition: {
-    prose: [
-      "A proposition has a definite truth value (T or F). Not all sentences are propositions.",
-      "Every theorem is a conditional P → Q. The converse (Q → P) is NOT automatically true. The contrapositive (¬Q → ¬P) IS equivalent.",
-      "Quantifiers: ∀ (for all) — requires general proof; one counterexample destroys it. ∃ (there exists) — one example suffices.",
-      "Definitions are biconditionals: usable in both directions in proofs.",
-      "Logical connectives: AND, OR, NOT, IF-THEN, IFF. De Morgan: ¬(P∧Q) = ¬P∨¬Q.",
-    ],
-    callouts: [
+    blocks: [
       {
-        type: "important",
-        title: "Converse ≠ Original",
-        body: 'The converse of a true theorem is NOT automatically true. It requires a separate proof. If both directions are true, the theorem is a biconditional (P iff Q). A rhombus disproves "perpendicular diagonals iff square."',
+        type: 'prose',
+        paragraphs: [
+          '**A proposition is a statement with a definite truth value — true or false, not both, not neither.** Commands ("Construct the midpoint"), questions ("Is AB parallel to CD?"), and predicates with unbound variables ("x > 3") are not propositions. Every geometric theorem is a proposition — it is either provably true or provably false within the given system of axioms.',
+        ],
       },
-    ],
-    visualizations: [
       {
-        id: "ScienceNotebook",
-        title: "Logic and Statements",
+        type: 'image',
+        src: geoLogicPropositionUrl,
+        alt: 'Table contrasting propositions (true/false geometric claims) with non-propositions (commands, questions, predicates)',
+        caption: 'The test: does the statement have a definite truth value independent of context? If yes, it is a proposition.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Every geometric theorem is a conditional statement P → Q** — "if [hypothesis], then [conclusion]." A conditional is false only when the hypothesis is true and the conclusion is false. The three related forms — converse, inverse, contrapositive — have precise logical relationships to the original.',
+          'The **contrapositive** (¬Q → ¬P) is always logically equivalent to the original: if P → Q is true, then ¬Q → ¬P is guaranteed true with no extra work. The **converse** (Q → P) is a different statement and requires a separate proof — this is one of the most common errors in student reasoning.',
+        ],
+      },
+      {
+        type: 'image',
+        src: geoConditionalFormsUrl,
+        alt: 'Four forms of a conditional: Original (P→Q), Contrapositive (¬Q→¬P) — equivalent; Converse (Q→P), Inverse (¬P→¬Q) — equivalent to each other but not to original',
+        caption: 'Original ≡ Contrapositive (purple). Converse ≡ Inverse (orange). The two pairs are NOT equivalent to each other.',
+      },
+      {
+        type: 'callout',
+        kind: 'important',
+        title: 'Converse ≠ Original',
+        body: 'The converse of a true theorem is NOT automatically true. It requires a separate proof. When both the theorem and its converse are true, the result is a biconditional (P ↔ Q, "if and only if"). A rhombus has perpendicular diagonals but is not a square — it is the standard counterexample that disproves "perpendicular diagonals → square."',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Quantifiers** determine the scope of a claim. Universal statements (∀, "for all") require a general proof — one counterexample destroys them. Existential statements (∃, "there exists") need only one example to prove, but require a universal argument to disprove. **Definitions** are biconditionals by nature: "M is a midpoint if and only if it lies on the segment and divides it equally." This means definitions are always usable in both directions in proofs.',
+        ],
+      },
+      {
+        type: 'viz',
+        id: 'ScienceNotebook',
         props: { lesson: LESSON_GEO_2_1_LOGIC },
+        mathBridge: 'Work through the interactive exercises: classify propositions, explore the four forms of a conditional theorem, and practice using definitions in both directions. Focus especially on the "Conditional and its relatives" explorer — select each theorem and explain to yourself why the converse is or isn\'t automatically true.',
       },
     ],
   },
@@ -619,44 +646,110 @@ export default {
     {
       id: 'q1',
       type: 'choice',
-      text: '"Conditional P→Q: false only when P=T and Q=F." The statement "If it rains, I carry an umbrella" is:',
+      text: 'Which of these is a proposition?',
       options: [
-        'False when it rains and I carry an umbrella',
-        'False only when it rains (P is true) and I do NOT carry an umbrella (Q is false)',
-        'False whenever I carry an umbrella',
+        '"Draw the perpendicular bisector of AB."',
+        '"Is triangle ABC isosceles?"',
+        '"All squares have four equal sides."',
       ],
-      correct: 1,
+      correct: 2,
     },
     {
       id: 'q2',
       type: 'choice',
-      text: '"Contrapositive ¬Q→¬P always equivalent to P→Q." Which is the contrapositive of "If a figure is a square, it has four sides"?',
+      text: 'A conditional P → Q is false only when…',
       options: [
-        'If a figure has four sides, it is a square',
-        'If a figure does not have four sides, it is not a square',
-        'If a figure is not a square, it does not have four sides',
+        'P is false and Q is true',
+        'P is true and Q is false',
+        'Both P and Q are false',
       ],
       correct: 1,
     },
     {
       id: 'q3',
       type: 'choice',
-      text: '"∀: one counterexample destroys it." You claim "All triangles are equilateral." What do you need to disprove this?',
+      text: 'Which is the contrapositive of "If a figure is a square, it has four right angles"?',
       options: [
-        'A proof that no triangle is equilateral',
-        'A single specific triangle that is not equilateral — one counterexample is enough to falsify a universal claim',
-        'A survey showing most triangles are not equilateral',
+        'If a figure has four right angles, it is a square',
+        'If a figure does not have four right angles, it is not a square',
+        'If a figure is not a square, it does not have four right angles',
       ],
       correct: 1,
     },
     {
       id: 'q4',
       type: 'choice',
-      text: '"Definitions are biconditionals." The definition "A triangle is equilateral if and only if all three sides are equal" means:',
+      text: 'The contrapositive is always logically equivalent to the original. The converse…',
       options: [
-        'You can only use the definition going forward (equilateral → equal sides)',
-        'You can use it in both directions — equilateral implies equal sides, AND equal sides implies equilateral',
-        'The definition is true only for specific types of triangles',
+        'Is also always equivalent to the original',
+        'Requires a separate proof — it may be true or false independently',
+        'Is equivalent to the inverse of the contrapositive',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q5',
+      type: 'choice',
+      text: 'To disprove "All parallelograms are rectangles," you need…',
+      options: [
+        'A proof that no parallelogram is a rectangle',
+        'One specific parallelogram that is not a rectangle (e.g., a rhombus with non-right angles)',
+        'A survey of many parallelograms',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q6',
+      type: 'choice',
+      text: 'To prove "There exists a triangle with all angles equal," you need…',
+      options: [
+        'A general proof for all triangles',
+        'One specific example — the equilateral triangle (60°-60°-60°)',
+        'A proof by contradiction',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q7',
+      type: 'choice',
+      text: 'Definitions in geometry are biconditionals because…',
+      options: [
+        'They are written by convention using "if and only if"',
+        'The term applies exactly when the defining properties hold — both directions are built into the meaning of the definition',
+        'Mathematicians prefer biconditionals for style',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q8',
+      type: 'choice',
+      text: 'Theorem: "If ABCD is a rhombus, then its diagonals are perpendicular." A student concludes from this that a quadrilateral with perpendicular diagonals must be a rhombus. What error is the student making?',
+      options: [
+        'Confusing the theorem with its inverse',
+        'Treating the converse as automatically true — the converse needs its own proof, and is actually false (e.g., a kite has perpendicular diagonals but is not a rhombus)',
+        'Misapplying the contrapositive',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q9',
+      type: 'choice',
+      text: 'De Morgan\'s Law states ¬(P ∧ Q) ≡ ¬P ∨ ¬Q. In a proof by contradiction you assume the negation of "AB ∥ CD and AB = CD." That negation is…',
+      options: [
+        'AB is not parallel to CD and AB ≠ CD',
+        'AB is not parallel to CD or AB ≠ CD',
+        'AB ∥ CD and AB ≠ CD',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q10',
+      type: 'choice',
+      text: 'In a two-column proof you write "M is the midpoint of AB" as a given and on the next step use it to conclude "AM = MB." Which direction of the biconditional definition are you using?',
+      options: [
+        'Backward direction — from property (equal segments) to term (midpoint)',
+        'Forward direction — from the term (midpoint) to the property (equal segments)',
+        'Neither — midpoint and equal segments are independent facts',
       ],
       correct: 1,
     },

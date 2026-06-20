@@ -1,0 +1,36 @@
+<svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="300" height="150" rx="8" class="svg-bg"/>
+
+  <!-- Line ℓ₁: from (20,40) to (260,120) -->
+  <line x1="20" y1="40" x2="260" y2="120" stroke="#1e3a5f" stroke-width="2.5"/>
+  <text x="262" y="118" font-size="11" fill="#1e3a5f" font-style="italic" font-weight="700">ℓ₁</text>
+
+  <!-- Line ℓ₂: from (20,115) to (260,40) -->
+  <line x1="20" y1="115" x2="260" y2="40" stroke="#1a3a2a" stroke-width="2.5"/>
+  <text x="262" y="38" font-size="11" fill="#1a3a2a" font-style="italic" font-weight="700">ℓ₂</text>
+
+  <!-- Actual intersection P: at (140,80) -->
+  <circle cx="140" cy="80" r="5" fill="#1e3a5f"/>
+  <text x="148" y="75" font-size="12" fill="#1e3a5f" font-weight="700">P</text>
+
+  <!-- Ghost second intersection Q (the impossible point) -->
+  <circle cx="80" cy="105" r="5" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="3,2" opacity="0.5"/>
+  <text x="62" y="100" font-size="12" fill="#dc2626" font-weight="700" opacity="0.5">Q ?</text>
+  <!-- X through Q -->
+  <line x1="74" y1="99" x2="86" y2="111" stroke="#dc2626" stroke-width="1.5" opacity="0.5"/>
+  <line x1="86" y1="99" x2="74" y2="111" stroke="#dc2626" stroke-width="1.5" opacity="0.5"/>
+
+  <text x="150" y="140" font-size="9" class="svg-muted" text-anchor="middle">ℓ₁ and ℓ₂ intersect at P. Can they also meet at Q?</text>
+</svg>

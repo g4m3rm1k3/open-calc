@@ -1,0 +1,65 @@
+<svg viewBox="0 0 540 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="540" height="220" rx="10" class="svg-bg"/>
+
+  <!-- Panel 1: Corresponding angles -->
+  <rect x="8" y="8" width="160" height="204" rx="7" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="88" y="26" font-size="11" fill="#6366f1" text-anchor="middle" font-weight="700">Corresponding</text>
+  <text x="88" y="38" font-size="10" class="svg-muted" text-anchor="middle">same position, EQUAL</text>
+  <!-- Two parallel lines + transversal -->
+  <line x1="20" y1="80" x2="155" y2="80" stroke="#1e3a8a" stroke-width="1.8"/>
+  <line x1="20" y1="140" x2="155" y2="140" stroke="#1e3a8a" stroke-width="1.8"/>
+  <line x1="55" y1="50" x2="120" y2="175" stroke="#374151" stroke-width="1.8"/>
+  <!-- Highlight corresponding angles (upper-right at each) -->
+  <path d="M 83,80 A 14,14 0 0,1 88,67" fill="rgba(99,102,241,0.25)" stroke="#6366f1" stroke-width="1.5"/>
+  <path d="M 104,140 A 14,14 0 0,1 109,127" fill="rgba(99,102,241,0.25)" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="92" y="68" font-size="10" fill="#6366f1" font-weight="700">α</text>
+  <text x="112" y="128" font-size="10" fill="#6366f1" font-weight="700">α</text>
+  <text x="88" y="192" font-size="10" fill="#6366f1" text-anchor="middle" font-weight="700">α = α  ✓</text>
+  <text x="88" y="205" font-size="10" class="svg-muted" text-anchor="middle">F-shape</text>
+
+  <!-- Panel 2: Alternate Interior -->
+  <rect x="190" y="8" width="160" height="204" rx="7" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="270" y="26" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">Alternate Interior</text>
+  <text x="270" y="38" font-size="10" class="svg-muted" text-anchor="middle">Z-shape, EQUAL</text>
+  <line x1="202" y1="80" x2="337" y2="80" stroke="#1e3a8a" stroke-width="1.8"/>
+  <line x1="202" y1="140" x2="337" y2="140" stroke="#1e3a8a" stroke-width="1.8"/>
+  <line x1="237" y1="50" x2="302" y2="175" stroke="#374151" stroke-width="1.8"/>
+  <!-- Alternate interior: below ℓ₁ left side, above ℓ₂ right side -->
+  <path d="M 263,87 A 14,14 0 0,0 256,95" fill="rgba(16,185,129,0.25)" stroke="#10b981" stroke-width="1.5"/>
+  <path d="M 282,131 A 14,14 0 0,1 288,125" fill="rgba(16,185,129,0.25)" stroke="#10b981" stroke-width="1.5"/>
+  <text x="251" y="104" font-size="10" fill="#10b981" font-weight="700">β</text>
+  <text x="292" y="124" font-size="10" fill="#10b981" font-weight="700">β</text>
+  <!-- Z-shape indicator -->
+  <path d="M 252,82 L 280,82 L 255,138 L 285,138" fill="none" stroke="#10b981" stroke-width="1" stroke-dasharray="3 2" opacity="0.6"/>
+  <text x="270" y="192" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">β = β  ✓</text>
+  <text x="270" y="205" font-size="10" class="svg-muted" text-anchor="middle">Z-shape</text>
+
+  <!-- Panel 3: Co-interior -->
+  <rect x="372" y="8" width="160" height="204" rx="7" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="452" y="26" font-size="11" fill="#f97316" text-anchor="middle" font-weight="700">Co-interior</text>
+  <text x="452" y="38" font-size="10" class="svg-muted" text-anchor="middle">C-shape, sum = 180°</text>
+  <line x1="384" y1="80" x2="519" y2="80" stroke="#1e3a8a" stroke-width="1.8"/>
+  <line x1="384" y1="140" x2="519" y2="140" stroke="#1e3a8a" stroke-width="1.8"/>
+  <line x1="419" y1="50" x2="484" y2="175" stroke="#374151" stroke-width="1.8"/>
+  <!-- Co-interior: both on same side, between the lines -->
+  <path d="M 445,87 A 14,14 0 0,0 439,95" fill="rgba(249,115,22,0.25)" stroke="#f97316" stroke-width="1.5"/>
+  <path d="M 450,131 A 14,14 0 0,0 457,125" fill="rgba(249,115,22,0.25)" stroke="#f97316" stroke-width="1.5"/>
+  <text x="433" y="104" font-size="10" fill="#f97316" font-weight="700">γ</text>
+  <text x="461" y="124" font-size="10" fill="#f97316" font-weight="700">δ</text>
+  <!-- C-shape indicator -->
+  <path d="M 436,82 L 412,82 L 412,138 L 438,138" fill="none" stroke="#f97316" stroke-width="1" stroke-dasharray="3 2" opacity="0.6"/>
+  <text x="452" y="192" font-size="10" fill="#f97316" text-anchor="middle" font-weight="700">γ + δ = 180°  ✓</text>
+  <text x="452" y="205" font-size="10" class="svg-muted" text-anchor="middle">C-shape</text>
+</svg>

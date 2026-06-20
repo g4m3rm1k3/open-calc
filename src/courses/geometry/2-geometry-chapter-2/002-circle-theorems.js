@@ -1,7 +1,11 @@
-// Geometry · Chapter 2 · Lesson 1
+// Geometry · Chapter 2 · Lesson 2
 // Circle Theorems and Angles
+import geoCircleVocabUrl from '../diagrams/geo-circle-vocab.svg?url'
+import geoInscribedAngleUrl from '../diagrams/geo-inscribed-angle.svg?url'
+import quizInscribedAngleUrl from '../diagrams/quiz-inscribed-angle-find.svg?url'
 
 const LESSON_GEO_2_1 = {
+  subject: 'Geometry',
   title: 'Circle Theorems and Angles',
   subtitle: 'Why the angle in a semicircle is always 90° — and the surprising pattern that connects every inscribed angle to its arc.',
   sequential: true,
@@ -581,20 +585,44 @@ export default {
     previewVisualizationId: 'G2_1_CircleTheorems1',
   },
   intuition: {
-    prose: [
-      'Inscribed angle = half the central angle intercepting the same arc. (Inscribed Angle Theorem)',
-      'Any two inscribed angles intercepting the same arc are equal.',
-      'Thales\' Theorem: angle inscribed in semicircle = 90°. The central angle for a diameter = 180°; half is 90°.',
-      'Tangent ⊥ radius at point of tangency. Tangent segments from an external point are equal (HL congruence).',
-      'Alternate Segment Theorem: tangent-chord angle = inscribed angle in alternate segment.',
-    ],
-    callouts: [
-      { type: 'important', title: 'The master relationship', body: 'Inscribed angle = ½ arc = ½ central angle. This single formula drives all four circle angle theorems.' },
-    ],
-    visualizations: [
-      { id: 'ScienceNotebook', title: 'Circle Theorems', props: { lesson: LESSON_GEO_2_1 } },
-      { id: 'G2_1_CircleTheorems1', title: 'The Inscribed Angle Theorem' },
-      { id: 'G2_2_CircleTheorems2', title: 'Tangents and the Power of a Point' }
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
+          '**A circle\'s geometry is built on one key vocabulary.** Every angle theorem in circles traces back to the relationship between arcs and angles — and that relationship depends on where the angle\'s vertex sits: at the center, on the circle, or outside it.',
+        ],
+      },
+      {
+        type: 'image',
+        src: geoCircleVocabUrl,
+        alt: 'Circle diagram showing center, radius, diameter, chord, arc, and tangent with labels and key relationships',
+        caption: 'Central angle = arc (definition). Inscribed angle = ½ arc (theorem). Tangent ⊥ radius (theorem).',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**The Inscribed Angle Theorem** is the master relationship: an inscribed angle (vertex on the circle) equals exactly half the central angle intercepting the same arc. Because the arc is fixed, any two inscribed angles intercepting the same arc are equal to each other — regardless of where on the circle the vertex sits.',
+          'Thales\' Theorem is a direct corollary: when the intercepted arc is a semicircle (180°), the inscribed angle is half of 180° = 90°. Any angle inscribed in a semicircle is a right angle.',
+        ],
+      },
+      {
+        type: 'image',
+        src: geoInscribedAngleUrl,
+        alt: 'Two circles side by side: left shows central angle 2θ over arc AB; right shows inscribed angle θ from point P over same arc AB',
+        caption: 'Same arc AB, different vertex positions. Central angle = 2θ. Inscribed angle = θ. The arc is the link.',
+      },
+      {
+        type: 'callout',
+        kind: 'important',
+        title: 'The master relationship',
+        body: 'Inscribed angle = ½ arc = ½ central angle. This single formula drives every circle angle theorem: Thales\' Theorem (semicircle → 90°), equal inscribed angles (same arc → same angle), and the tangent-chord angle (equals inscribed angle in alternate segment).',
+      },
+      {
+        type: 'viz',
+        id: 'ScienceNotebook',
+        props: { lesson: LESSON_GEO_2_1 },
+        mathBridge: 'Work through the interactive exercises: drag the inscribed angle point around the circle to confirm it stays constant over the same arc, explore tangent properties, and use the quadrilateral explorer to see why opposite angles in a cyclic quadrilateral sum to 180°.',
+      },
     ],
   },
   math: { prose: [], callouts: [], visualizations: [] },
@@ -612,46 +640,90 @@ export default {
     {
       id: 'q1',
       type: 'choice',
-      text: '"Inscribed angle = ½ arc." An arc is 140°. What is the inscribed angle that subtends it?',
-      options: [
-        '280°',
-        '70°',
-        '140°',
-      ],
+      diagram: quizInscribedAngleUrl,
+      diagramAlt: 'Circle with center O. Arc AB = 116°. Point P on circle with inscribed angle x.',
+      text: 'Arc AB = 116°. Find the inscribed angle x at P.',
+      options: ['232°', '58°', '116°'],
       correct: 1,
     },
     {
       id: 'q2',
       type: 'choice',
-      text: '"Same arc → same inscribed angle, regardless of position on the circle." Two inscribed angles subtend the same arc. Without measuring, what can you say about them?',
+      text: 'Two inscribed angles both subtend the same arc of a circle. Without measuring, what can you conclude?',
       options: [
-        'They are supplementary',
-        'They are equal — inscribed angles over the same arc are always equal',
-        'They add up to the central angle over that arc',
+        'They are supplementary (sum to 180°)',
+        'They are equal — inscribed angles over the same arc are always congruent',
+        'They sum to the central angle over that arc',
       ],
       correct: 1,
     },
     {
       id: 'q3',
       type: 'choice',
-      text: '"Diameter as chord → inscribed angle = 90° (Thales)." Why is any angle inscribed in a semicircle always 90°?',
+      text: 'Why is any angle inscribed in a semicircle always 90°?',
       options: [
-        'A semicircle is 180°, and inscribed angle = ½ arc = ½(180°) = 90°',
-        'Diameters bisect all inscribed angles',
-        'The center of the diameter is always at 90° from the circle',
+        'A semicircle arc = 180°, so inscribed angle = ½ × 180° = 90°',
+        'Diameters always bisect inscribed angles',
+        'The center is equidistant from all points, forcing a right angle',
       ],
       correct: 0,
     },
     {
       id: 'q4',
       type: 'choice',
-      text: '"Quadrilateral inscribed in circle: opposite angles supplementary." An inscribed quadrilateral has angles 85°, 95°, x, and y. What is x + y?',
+      text: 'A cyclic quadrilateral (all four vertices on a circle) has angles 85°, 95°, x, and y. What is x + y?',
+      options: ['180°', '360°', '90°'],
+      correct: 0,
+    },
+    {
+      id: 'q5',
+      type: 'choice',
+      text: 'A central angle is 100°. What is the inscribed angle subtending the same arc?',
+      options: ['200°', '50°', '100°'],
+      correct: 1,
+    },
+    {
+      id: 'q6',
+      type: 'choice',
+      text: 'A tangent line meets a circle at point T. A radius is drawn to T. The angle between the tangent and the radius at T is…',
+      options: ['45°', '90° — tangent is always perpendicular to the radius at the point of tangency', '60°'],
+      correct: 1,
+    },
+    {
+      id: 'q7',
+      type: 'choice',
+      text: 'Two tangent segments are drawn from an external point P to points T₁ and T₂ on a circle. By HL congruence (applied to △OT₁P and △OT₂P), what can you conclude?',
       options: [
-        '180°',
-        '360°',
-        '90°',
+        'PT₁ = PT₂ — the tangent segments are equal in length',
+        'T₁T₂ is a diameter',
+        '∠T₁OT₂ = 90°',
       ],
       correct: 0,
+    },
+    {
+      id: 'q8',
+      type: 'choice',
+      text: 'Triangle ABC is inscribed in a circle with BC as a diameter. ∠ABC = 40°. What is ∠ACB?',
+      options: ['50° (since ∠BAC = 90° and 90° + 40° + ∠ACB = 180°)', '40°', '80°'],
+      correct: 0,
+    },
+    {
+      id: 'q9',
+      type: 'choice',
+      text: 'The Inscribed Angle Theorem proof uses which other theorems?',
+      options: [
+        'Only the definition of a circle',
+        'The Isosceles Triangle Theorem (radii equal → isosceles) and Triangle Angle Sum',
+        'The Pythagorean Theorem and SAS congruence',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q10',
+      type: 'choice',
+      text: 'A chord subtends a minor arc of 80°. What is the inscribed angle from the major arc side that intercepts this minor arc?',
+      options: ['80°', '40°', '140°'],
+      correct: 1,
     },
   ],
 };

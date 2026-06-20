@@ -1,0 +1,52 @@
+<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="300" height="200" rx="8" class="svg-bg"/>
+
+  <!-- Circle: center (150,105), radius 75 -->
+  <circle cx="150" cy="105" r="75" fill="rgba(59,130,246,0.05)" stroke="#93c5fd" stroke-width="1.5"/>
+
+  <!-- Center O -->
+  <circle cx="150" cy="105" r="3" fill="#7c3aed"/>
+  <text x="157" y="102" font-size="10" fill="#7c3aed" font-weight="700">O</text>
+
+  <!-- Arc AB: A at 200° from center, B at 320° -->
+  <!-- A = 150+75*cos(200°), 105+75*sin(200°) = 150-70.5, 105+25.6 = 79.5, 130.6 -->
+  <!-- B = 150+75*cos(320°), 105+75*sin(320°) = 150+57.5, 105-48.2 = 207.5, 56.8 -->
+  <path d="M 79.5 130.6 A 75 75 0 0 1 207.5 56.8" fill="none" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Central angle arms -->
+  <line x1="150" y1="105" x2="79.5" y2="130.6" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="150" y1="105" x2="207.5" y2="56.8" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- Central angle label: 116° (the arc) -->
+  <text x="130" y="105" font-size="11" fill="#7c3aed" font-weight="700" text-anchor="middle">116°</text>
+
+  <!-- P at top of circle (150, 30) -->
+  <circle cx="150" cy="30" r="5" fill="#ef4444"/>
+  <text x="158" y="28" font-size="10" fill="#ef4444" font-weight="700">P</text>
+
+  <!-- Lines from P to A and P to B -->
+  <line x1="150" y1="30" x2="79.5" y2="130.6" stroke="#ef4444" stroke-width="2"/>
+  <line x1="150" y1="30" x2="207.5" y2="56.8" stroke="#ef4444" stroke-width="2"/>
+
+  <!-- Inscribed angle x at P -->
+  <path d="M 134 50 A 22 22 0 0 1 165 42" fill="rgba(239,68,68,0.12)" stroke="#ef4444" stroke-width="1.8"/>
+  <text x="150" y="76" font-size="15" fill="#ef4444" font-weight="800" text-anchor="middle">x</text>
+
+  <!-- A and B labels -->
+  <text x="65" y="135" font-size="10" class="svg-text" font-weight="700">A</text>
+  <text x="212" y="54" font-size="10" class="svg-text" font-weight="700">B</text>
+
+  <text x="150" y="190" font-size="9" class="svg-muted" text-anchor="middle">Arc AB = 116°. Find inscribed angle x at P.</text>
+</svg>

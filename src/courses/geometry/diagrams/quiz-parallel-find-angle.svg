@@ -1,0 +1,50 @@
+<svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="300" height="180" rx="8" class="svg-bg"/>
+
+  <!-- Parallel line 1 (top): y=55, from x=20 to x=240 -->
+  <line x1="20" y1="55" x2="240" y2="55" stroke="#1e3a5f" stroke-width="2.5"/>
+  <!-- Arrow markers for parallel -->
+  <text x="28" y="50" font-size="10" fill="#1e3a5f" font-weight="700">ℓ₁</text>
+  <!-- Tick marks for parallel -->
+  <line x1="120" y1="49" x2="116" y2="61" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="126" y1="49" x2="122" y2="61" stroke="#1e3a5f" stroke-width="2"/>
+
+  <!-- Parallel line 2 (bottom): y=130 -->
+  <line x1="20" y1="130" x2="240" y2="130" stroke="#1e3a5f" stroke-width="2.5"/>
+  <text x="28" y="125" font-size="10" fill="#1e3a5f" font-weight="700">ℓ₂</text>
+  <line x1="120" y1="124" x2="116" y2="136" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="126" y1="124" x2="122" y2="136" stroke="#1e3a5f" stroke-width="2"/>
+
+  <!-- Transversal: from (80,20) to (200,165) -->
+  <line x1="80" y1="20" x2="200" y2="165" stroke="#94a3b8" stroke-width="2"/>
+
+  <!-- Intersection 1: transversal meets ℓ₁ -->
+  <!-- At y=55: x = 80 + (55-20)*(200-80)/(165-20) = 80 + 35*120/145 = 80+29 = 109 -->
+  <circle cx="109" cy="55" r="3" fill="#1e3a5f" class="svg-text"/>
+
+  <!-- Intersection 2: transversal meets ℓ₂ -->
+  <!-- At y=130: x = 80 + (130-20)*120/145 = 80 + 91 = 171 -->
+  <circle cx="171" cy="130" r="3" fill="#1e3a5f" class="svg-text"/>
+
+  <!-- Known angle at intersection 1: upper-left angle = 118° -->
+  <path d="M 87 55 A 22 22 0 0 1 96 36" fill="rgba(30,58,95,0.12)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <text x="72" y="46" font-size="12" fill="#1e3a5f" font-weight="700" text-anchor="middle">118°</text>
+
+  <!-- Unknown angle x at intersection 2: alternate interior (lower right) -->
+  <path d="M 193 130 A 22 22 0 0 0 183 113" fill="rgba(239,68,68,0.12)" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="208" y="120" font-size="15" fill="#ef4444" font-weight="800" text-anchor="middle">x</text>
+
+  <text x="150" y="172" font-size="9" class="svg-muted" text-anchor="middle">ℓ₁ ∥ ℓ₂. Find x.</text>
+</svg>

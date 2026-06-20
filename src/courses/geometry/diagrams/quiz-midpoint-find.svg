@@ -1,0 +1,42 @@
+<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="300" height="120" rx="8" class="svg-bg"/>
+
+  <!-- Segment AC with midpoint M -->
+  <line x1="40" y1="65" x2="260" y2="65" stroke="#1e3a5f" stroke-width="2.5"/>
+
+  <!-- Points -->
+  <circle cx="40" cy="65" r="5" fill="#1e3a5f" class="svg-text"/>
+  <circle cx="150" cy="65" r="5" fill="#10b981"/>
+  <circle cx="260" cy="65" r="5" fill="#1e3a5f" class="svg-text"/>
+
+  <!-- Labels below -->
+  <text x="40" y="84" font-size="12" class="svg-text" font-weight="700" text-anchor="middle">A</text>
+  <text x="150" y="84" font-size="12" fill="#10b981" font-weight="700" text-anchor="middle">M</text>
+  <text x="260" y="84" font-size="12" class="svg-text" font-weight="700" text-anchor="middle">C</text>
+
+  <!-- Tick marks showing AM = MC -->
+  <line x1="94" y1="57" x2="90" y2="73" stroke="#10b981" stroke-width="2"/>
+  <line x1="100" y1="57" x2="96" y2="73" stroke="#10b981" stroke-width="2"/>
+  <line x1="208" y1="57" x2="204" y2="73" stroke="#10b981" stroke-width="2"/>
+  <line x1="214" y1="57" x2="210" y2="73" stroke="#10b981" stroke-width="2"/>
+
+  <!-- AM label: 3x+4 -->
+  <text x="95" y="52" font-size="12" fill="#1e3a5f" font-weight="700" text-anchor="middle">3x + 4</text>
+
+  <!-- MC label: x (unknown but with equation) -->
+  <text x="205" y="52" font-size="12" fill="#ef4444" font-weight="700" text-anchor="middle">5x − 6</text>
+
+  <text x="150" y="108" font-size="9" class="svg-muted" text-anchor="middle">M is the midpoint of AC. Find x, then find AC.</text>
+</svg>

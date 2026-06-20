@@ -144,13 +144,14 @@ export default function LessonPage() {
     );
   }
 
-  const lessonIndex = ALL_LESSONS.findIndex(
+  const sameCourseLesson = ALL_LESSONS.filter(entry => entry.course === courseId)
+  const lessonIndex = sameCourseLesson.findIndex(
     (entry) => String(entry.chapterNumber) === String(chapterId) && entry.slug === slug
   );
-  const prevLesson = lessonIndex > 0 ? ALL_LESSONS[lessonIndex - 1] : null;
+  const prevLesson = lessonIndex > 0 ? sameCourseLesson[lessonIndex - 1] : null;
   const nextLesson =
-    lessonIndex !== -1 && lessonIndex < ALL_LESSONS.length - 1
-      ? ALL_LESSONS[lessonIndex + 1]
+    lessonIndex !== -1 && lessonIndex < sameCourseLesson.length - 1
+      ? sameCourseLesson[lessonIndex + 1]
       : null;
 
   return (
@@ -218,7 +219,7 @@ export default function LessonPage() {
                   <span className="rounded-full bg-brand-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-white shadow-lg shadow-brand-500/30">
                     {chapter?.title ?? chapterId}
                     {lesson.order !== undefined
-                      ? ` · Lesson ${lesson.order + 1}`
+                      ? ` · Lesson ${lesson.order}`
                       : ""}
                   </span>
                   {lessonSource === "override" && (
@@ -291,8 +292,15 @@ export default function LessonPage() {
         </section>
       )}
 
-      <WikiIntro query={lesson.title} tags={lesson.tags} />
-      <WikiDiagrams query={lesson.title} tags={lesson.tags} />
+      {!lesson.intuition?.blocks?.length &&
+       !lesson.cells?.length &&
+       !lesson.intuition?.visualizations?.length &&
+       !lesson.suppressWiki && (
+        <>
+          <WikiIntro query={lesson.title} tags={lesson.tags} />
+          <WikiDiagrams query={lesson.title} tags={lesson.tags} />
+        </>
+      )}
 
       {lesson.tags?.length > 0 && (
         <div className="mb-8 flex flex-wrap gap-2">

@@ -1,0 +1,53 @@
+<svg viewBox="0 0 460 240" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="460" height="240" rx="10" class="svg-bg"/>
+
+  <!-- Triangle ABC: A at apex (230,45), B at (80,195), C at (380,195) -->
+  <!-- Left half ABM filled blue -->
+  <polygon points="230,45 80,195 230,195" fill="rgba(99,102,241,0.12)" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Right half ACM filled green -->
+  <polygon points="230,45 380,195 230,195" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-width="2.5"/>
+
+  <!-- Median AM (dashed) -->
+  <line x1="230" y1="45" x2="230" y2="195" stroke="#f59e0b" stroke-width="2" stroke-dasharray="7 4"/>
+
+  <!-- Equal sides AB = AC tick marks -->
+  <line x1="148" y1="116" x2="156" y2="124" stroke="#374151" stroke-width="2"/>
+  <line x1="154" y1="116" x2="162" y2="124" stroke="#374151" stroke-width="2"/>
+  <line x1="296" y1="124" x2="304" y2="116" stroke="#374151" stroke-width="2"/>
+  <line x1="302" y1="124" x2="310" y2="116" stroke="#374151" stroke-width="2"/>
+
+  <!-- BM = MC midpoint marks -->
+  <line x1="148" y1="192" x2="152" y2="200" stroke="#f59e0b" stroke-width="2"/>
+  <line x1="308" y1="192" x2="312" y2="200" stroke="#f59e0b" stroke-width="2"/>
+
+  <!-- Vertices -->
+  <circle cx="230" cy="45" r="5" fill="#374151"/>
+  <circle cx="80" cy="195" r="5" fill="#6366f1"/>
+  <circle cx="380" cy="195" r="5" fill="#10b981"/>
+  <circle cx="230" cy="195" r="5.5" fill="#f59e0b" stroke="white" stroke-width="1.5"/>
+
+  <!-- Labels -->
+  <text x="230" y="33" font-size="15" class="svg-text" text-anchor="middle" font-weight="700" font-style="italic">A</text>
+  <text x="64" y="210" font-size="15" fill="#6366f1" font-weight="700" font-style="italic">B</text>
+  <text x="386" y="210" font-size="15" fill="#10b981" font-weight="700" font-style="italic">C</text>
+  <text x="230" y="215" font-size="13" fill="#f59e0b" text-anchor="middle" font-weight="700" font-style="italic">M</text>
+
+  <!-- Angle marks at B and C -->
+  <path d="M 105,195 A 26,26 0 0,1 100,172" fill="rgba(99,102,241,0.2)" stroke="#6366f1" stroke-width="1.8"/>
+  <text x="112" y="178" font-size="13" fill="#6366f1" font-weight="700">∠B</text>
+
+  <path d="M 356,175 A 26,26 0 0,1 358,195" fill="rgba(16,185,129,0.2)" stroke="#10b981" stroke-width="1.8"/>
+  <text x="335" y="180" font-size="13" fill="#10b981" font-weight="700">∠C</text>
+
+  <!-- Proof label at bottom -->
+  <text x="230" y="222" font-size="12" class="svg-text" text-anchor="middle">AB = AC  +  BM = MC  +  AM = AM  →  SSS  →  ∠B = ∠C</text>
+  <text x="230" y="237" font-size="11" class="svg-muted" text-anchor="middle">Median AM splits isosceles △ into two ≅ triangles. CPCTC gives ∠B = ∠C.</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg   { fill: #f8fafc; }
+    .svg-muted{ fill: #64748b; }
+    .svg-dash { stroke: #94a3b8; }
+    .dark .svg-bg   { fill: #0f172a; }
+    .dark .svg-muted{ fill: #94a3b8; }
+    .dark .svg-dash { stroke: #475569; }
+  </style>
+  <rect width="300" height="160" rx="10" class="svg-bg"/>
+  <circle cx="150" cy="72" r="7" fill="#6366f1" stroke="white" stroke-width="2.5"/>
+  <text x="165" y="67" font-size="16" fill="#6366f1" font-weight="700" font-style="italic">A</text>
+  <line x1="165" y1="85" x2="210" y2="110" stroke-width="1" stroke-dasharray="3 2" class="svg-dash"/>
+  <text x="215" y="114" font-size="12" class="svg-muted">zero dimensions</text>
+  <line x1="135" y1="85" x2="80" y2="110" stroke-width="1" stroke-dasharray="3 2" class="svg-dash"/>
+  <text x="18" y="114" font-size="12" class="svg-muted">only a location</text>
+  <text x="150" y="148" font-size="11" text-anchor="middle" class="svg-muted">A point has no length, width, or height — it occupies no space</text>
+</svg>
