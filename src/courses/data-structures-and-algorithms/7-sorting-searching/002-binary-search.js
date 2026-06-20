@@ -675,6 +675,53 @@ for step_i, step in enumerate(steps):
             fig.point(i, y, label=str(v), color="#60a5fa", size=6)
 
 fig.show()`,
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Binary search computes `mid = lo + (hi - lo) // 2` instead of `(lo + hi) // 2`. Why?',
+      options: [
+        'The two formulas give different midpoints when lo and hi are both even',
+        'Integer overflow: in languages like C/Java where integers are 32-bit, lo + hi can overflow if both are large (e.g., lo = hi = 10⁹). lo + (hi − lo) // 2 avoids overflow by never adding the two indices together. Python integers are arbitrary precision so overflow is not a concern there, but the pattern is worth knowing',
+        'The subtraction form runs faster on modern CPUs',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Binary search on a sorted array finds a target in O(log n). What breaks if the array is not sorted?',
+      options: [
+        'Python raises an IndexError when mid points to the wrong element',
+        'The algorithm eliminates the wrong half. If the target is to the left of mid but the array is not sorted, the comparison `arr[mid] < target` might incorrectly direct the search to the right half, permanently excluding the target. Correctness relies on monotonicity: everything left of mid is ≤ arr[mid]',
+        'Binary search always finds an element even in unsorted arrays, just not necessarily the right one',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Binary search can solve "find the first index where condition(x) is True" when the condition is monotone (False...False...True...True). What does "monotone" mean here?',
+      options: [
+        'The condition must be based on a numeric comparison',
+        'Once the condition switches from False to True, it stays True for all larger indices. This monotonicity is exactly what binary search exploits: if condition(mid) is True, the answer is at mid or to the left; if False, it must be to the right. Examples: first index where value ≥ target, first day where capacity is sufficient',
+        'The array must be sorted numerically for the condition to be monotone',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Binary search terminates when lo > hi. After the loop, if the target was not found, lo equals the insertion point (where target could be inserted to keep the array sorted). Why?',
+      options: [
+        'lo is always set to mid+1, so it overshoots the target by one',
+        'Each iteration either finds the target or narrows [lo, hi]. When the target is absent, the loop exits with lo pointing to the first element greater than target — which is exactly where the target would be inserted. This is why Python\'s `bisect.bisect_left` (binary search variant) directly returns the insertion point',
+        'hi decreases faster than lo increases so lo ends up at the correct position',
+      ],
+      correct: 1,
+    },
+  ],
               output: `All assertions passed!`,
               status: 'idle',
               figureJson: null,
