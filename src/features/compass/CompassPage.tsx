@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Compass as CompassIcon, Sparkles } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
 import { useCompass } from './useCompass'
 import PlanIntake from './components/PlanIntake'
 import IntakeQuestions from './components/IntakeQuestions'
@@ -199,6 +200,9 @@ export default function CompassPage() {
       {montyOpen && (
         <MontyPanel
           plans={compass.plans}
+          notes={compass.notes}
+          flashcards={compass.flashcards}
+          dueFlashcards={compass.dueFlashcards}
           onClose={() => setMontyOpen(false)}
           questionTitle={questionTitle}
           draftTitle={draftTitle}

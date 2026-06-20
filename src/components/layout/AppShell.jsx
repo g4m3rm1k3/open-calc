@@ -41,6 +41,7 @@ import ReportBugButton from "../ui/ReportBugButton.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import TerminalHub from "../../tools/terminal-hub/TerminalHub.jsx";
 import CompassQuickPanel from "../../features/compass/CompassQuickPanel.jsx";
+import GlobalCompassAgent from "../../features/compass/GlobalCompassAgent.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
 import ChatPanel from "../tutor/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
@@ -818,6 +819,7 @@ export default function AppShell({ children }) {
             </div>
           )}
 
+          <GlobalCompassAgent />
           <AlphaMascot />
         </div>
       </GrapherContext.Provider>
