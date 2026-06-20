@@ -47,6 +47,7 @@ const VizBuilderPage    = lazy(() => import("./pages/VizBuilderPage.jsx"));
 const PlaygroundPage    = lazy(() => import("./pages/PlaygroundPage.jsx"))
 const NotebookLabPage   = lazy(() => import("./pages/NotebookLabPage.jsx"))
 const CalendarPage      = lazy(() => import("./features/calendar/CalendarPage.tsx"))
+const CompassPage       = lazy(() => import("./features/compass/CompassPage.tsx"))
 const NotificationToast = lazy(() => import("./features/calendar/NotificationToast.tsx"))
 
 const Fallback = () => (
@@ -106,6 +107,7 @@ export default function App() {
                     <Route path="rpg-workout" element={<RPGWorkoutPage />} />
                     <Route path="brain" element={<BrainPage />} />
                     <Route path="calendar" element={<CalendarPage />} />
+                    <Route path="compass" element={<CompassPage />} />
 
                     {/* Game auto-discovery */}
                     <Route path="game/:gameKey" element={

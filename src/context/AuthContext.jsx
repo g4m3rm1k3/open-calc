@@ -37,6 +37,7 @@ const SYNC_KEYS = [
   'oc-rpg-data',    // RPG fitness progression, workout history
   'oc-pins',        // pinned lessons / tools
   'oc-theme',       // dark / light preference
+  'oc-compass',     // goals, habits, notes, weekly reviews
 ]
 
 // Timestamp we write to localStorage after every successful Firestore restore,
