@@ -2,6 +2,38 @@
 // You ARE the shooter. Click to lock pointer, aim with mouse, click to shoot.
 import { useRef, useState, useEffect, useCallback } from 'react'
 import * as THREE from 'three'
+import GameHelp from '../shared/GameHelp.jsx'
+
+const SHOT_SPOTS = [
+  { label: 'Free Throw',     dist: 4.6  },
+  { label: '3-Point Line',   dist: 7.7  },
+  { label: 'Half-Court Heave', dist: 12.8 },
+]
+
+function isTouchCapable() {
+  // `'ontouchstart' in window` is unreliable — many desktop Chromium builds
+  // define the property regardless of actual hardware. maxTouchPoints and a
+  // coarse-pointer media query are the signals that actually reflect the
+  // primary input device.
+  if (typeof window === 'undefined') return false
+  return navigator.maxTouchPoints > 0 && window.matchMedia('(pointer: coarse)').matches
+}
+
+// Tiny synthesized sound effects (no audio assets) — lazily created on first
+// user gesture since browsers block AudioContext autoplay before interaction.
+function playTone(ctx, { freq = 440, dur = 0.15, type = 'sine', gain = 0.22, slideTo = null } = {}) {
+  if (!ctx) return
+  const osc = ctx.createOscillator()
+  const g = ctx.createGain()
+  osc.type = type
+  osc.frequency.setValueAtTime(freq, ctx.currentTime)
+  if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, ctx.currentTime + dur)
+  g.gain.setValueAtTime(gain, ctx.currentTime)
+  g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur)
+  osc.connect(g); g.connect(ctx.destination)
+  osc.start()
+  osc.stop(ctx.currentTime + dur)
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const GRAVITY      = -22          // m/s² (pumped up for better game feel)
@@ -58,6 +90,8 @@ export default function BasketballLab({ onClose }) {
   const arrowRef       = useRef(null)
   const replayFrames   = useRef([])
   const savedReplay    = useRef([])
+  const audioCtxRef    = useRef(null)
+  const streakRef      = useRef(0)
 
   // Mutable game-state — inside ref to avoid causing re-renders per frame
   const gs = useRef({
@@ -72,6 +106,7 @@ export default function BasketballLab({ onClose }) {
     makes:    0,
     attempts: 0,
     locked:   false,
+    touchActive: false, // mobile equivalent of `locked` — no pointer lock on touch
     doneTimer:  0,
     doneMsg:   '',
     canReplay:   false,
@@ -80,6 +115,7 @@ export default function BasketballLab({ onClose }) {
     launchAngle: 0.55,
     slowMo:      false,
     scoredTimer: 0,   // >0 means ball is falling through net after score
+    streak:      0,
   })
 
   // React state (for UI only)
@@ -87,10 +123,14 @@ export default function BasketballLab({ onClose }) {
   const [attempts, setAttempts] = useState(0)
   const [power,    setPower]    = useState(0.58)
   const [locked,   setLocked]   = useState(false)
+  const [touchActive, setTouchActive] = useState(false)
+  const [isTouch]      = useState(isTouchCapable)
   const [feedback,     setFeedback]     = useState('')
   const [showReplay,   setShowReplay]   = useState(false)
   const [launchAngle,  setLaunchAngle]  = useState(0.55)
   const [slowMo,       setSlowMo]       = useState(false)
+  const [streak,       setStreak]       = useState(0)
+  const active = locked || touchActive
 
   // ── Shoot ─────────────────────────────────────────────────────────────────
   const shoot = useCallback(() => {
@@ -119,9 +159,19 @@ export default function BasketballLab({ onClose }) {
     g.attempts++
     setAttempts(g.attempts)
     setFeedback('')
+    playTone(audioCtxRef.current, { freq: 320, dur: 0.12, type: 'triangle', gain: 0.12, slideTo: 260 })
 
     const ball = ballMeshRef.current
     if (ball) { ball.position.copy(g.ballPos); ball.visible = true }
+  }, [])
+
+  // ── Teleport to a preset shot spot (works for both desktop and touch) ──────
+  const goToSpot = useCallback((dist) => {
+    const g = gs.current
+    const cam = cameraRef.current
+    if (!cam || g.phase !== 'aim') return
+    cam.position.x = 0
+    cam.position.z = clamp(COURT_L / 2 - 1.2 - dist, -COURT_L / 2 + 0.5, COURT_L / 2 - 0.5)
   }, [])
 
   // ── Three.js setup ────────────────────────────────────────────────────────
@@ -376,8 +426,9 @@ export default function BasketballLab({ onClose }) {
     // absolute basket centre = basketGrp.position + (0, RIM_HEIGHT, 0)
     const BASKET_WORLD = new THREE.Vector3(0, RIM_HEIGHT, COURT_L / 2 - 1.2)
 
-    // ── Pointer lock ──────────────────────────────────────────────────────────
+    // ── Pointer lock (desktop) ─────────────────────────────────────────────────
     const dom = renderer.domElement
+    const touchCapable = isTouchCapable()
 
     function onLockChange() {
       const lk = document.pointerLockElement === dom
@@ -386,12 +437,13 @@ export default function BasketballLab({ onClose }) {
     document.addEventListener('pointerlockchange', onLockChange)
 
     function onDomClick() {
+      if (touchCapable) return // touch devices shoot via tap, handled below
       if (!gs.current.locked) dom.requestPointerLock()
       else                    shoot()
     }
     dom.addEventListener('click', onDomClick)
 
-    // ── Mouse move ────────────────────────────────────────────────────────────
+    // ── Mouse move (desktop look) ───────────────────────────────────────────────
     const SENS = 0.0022
     function onMouseMove(e) {
       const g = gs.current; if (!g.locked) return
@@ -413,6 +465,39 @@ export default function BasketballLab({ onClose }) {
     }
     dom.addEventListener('wheel', onWheel, { passive: true })
 
+    // ── Touch (mobile) — drag to look, tap (no drag) to shoot ─────────────────
+    // Pointer Lock doesn't exist on touch devices, so touch gets its own
+    // "active" flag instead of `locked`, driving the same aim/HUD visuals.
+    const TOUCH_SENS = SENS * 1.5
+    let touchLastX = 0, touchLastY = 0, touchStartX = 0, touchStartY = 0, touchStartT = 0, touchMoved = false
+    function onTouchStart(e) {
+      if (e.touches.length !== 1) return
+      const t = e.touches[0]
+      touchLastX = touchStartX = t.clientX
+      touchLastY = touchStartY = t.clientY
+      touchStartT = performance.now()
+      touchMoved = false
+    }
+    function onTouchMove(e) {
+      const g = gs.current
+      if (!g.touchActive || e.touches.length !== 1) return
+      e.preventDefault()
+      const t = e.touches[0]
+      const dx = t.clientX - touchLastX, dy = t.clientY - touchLastY
+      touchLastX = t.clientX; touchLastY = t.clientY
+      if (Math.abs(t.clientX - touchStartX) > 10 || Math.abs(t.clientY - touchStartY) > 10) touchMoved = true
+      g.yaw   -= dx * TOUCH_SENS
+      g.pitch  = clamp(g.pitch - dy * TOUCH_SENS * 0.65, -0.2, 1.35)
+    }
+    function onTouchEnd() {
+      const g = gs.current
+      if (!g.touchActive) return
+      if (!touchMoved && performance.now() - touchStartT < 280) shoot()
+    }
+    dom.addEventListener('touchstart', onTouchStart, { passive: true })
+    dom.addEventListener('touchmove',  onTouchMove,  { passive: false })
+    dom.addEventListener('touchend',   onTouchEnd,   { passive: true })
+
     // ── Keyboard: WASD move, R = reset, Q/E = power ───────────────────────────
     const keysDown = new Set()
     function onKeyDown(e) {
@@ -421,7 +506,7 @@ export default function BasketballLab({ onClose }) {
       if (e.key === 'r' || e.key === 'R') {
         g.phase = 'aim'; ballMeshRef.current.visible = false; setFeedback('')
       }
-      if ((e.key === 'v' || e.key === 'V') && g.canReplay && g.phase === 'aim') {
+      if ((e.key === 'v' || e.key === 'V') && g.canReplay && (g.phase === 'aim' || g.phase === 'done')) {
         g.phase = 'replay'; g.replayIdx = 0; g.replaySub = 0; g.canReplay = false
         setShowReplay(false)
         if (ballMeshRef.current) ballMeshRef.current.visible = true
@@ -436,12 +521,20 @@ export default function BasketballLab({ onClose }) {
     document.addEventListener('keyup', onKeyUp)
 
     // ── Resize ────────────────────────────────────────────────────────────────
+    // A plain `window.resize` listener misses layout-driven size changes (e.g.
+    // maximizing this lab inside the desktop window manager is a CSS change,
+    // not a browser resize event) — renderer.setSize() pins the canvas to an
+    // inline pixel size, so it stayed stuck at whatever size it was at boot.
+    // Golf had the exact same bug; ResizeObserver catches both cases.
     function onResize() {
       const w = mount.clientWidth, h = mount.clientHeight
+      if (!w || !h) return
       camera.aspect = w / h; camera.updateProjectionMatrix()
       renderer.setSize(w, h)
     }
     window.addEventListener('resize', onResize)
+    const resizeObserver = new ResizeObserver(onResize)
+    resizeObserver.observe(mount)
 
     // ── Animation loop ────────────────────────────────────────────────────────
     const clock = clockRef.current; clock.start()
@@ -458,7 +551,10 @@ export default function BasketballLab({ onClose }) {
       camera.quaternion.copy(_qCamY).multiply(_qCamX)
 
       // ── WASD movement ────────────────────────────────────────────────────
-      if (g.locked && g.phase === 'aim') {
+      // Free movement any time the ball isn't actually in the air — including
+      // during replay, so you can walk around and watch your last shot from a
+      // different angle instead of being stuck at the original launch spot.
+      if (g.locked && g.phase !== 'flight') {
         const spd = 5 * rawDt
         const fwx = -Math.sin(g.yaw), fwz = -Math.cos(g.yaw)
         const rgx =  Math.cos(g.yaw), rgz = -Math.sin(g.yaw)
@@ -473,7 +569,7 @@ export default function BasketballLab({ onClose }) {
       // ── Launch angle arrow update ───────────────────────────────────────────
       const arrow = arrowRef.current
       if (arrow) {
-        arrow.visible = g.locked && g.phase === 'aim'
+        arrow.visible = (g.locked || g.touchActive) && g.phase === 'aim'
         if (arrow.visible) {
           const cosA = Math.cos(g.launchAngle), sinA = Math.sin(g.launchAngle)
           arrow.setDirection(new THREE.Vector3(-Math.sin(g.yaw) * cosA, sinA, -Math.cos(g.yaw) * cosA))
@@ -488,7 +584,7 @@ export default function BasketballLab({ onClose }) {
       // ── Arc preview ──────────────────────────────────────────────────────
       const arcLine = arcLineRef.current
       if (arcLine) {
-        if (g.phase === 'aim' && g.locked) {
+        if (g.phase === 'aim' && (g.locked || g.touchActive)) {
           arcLine.visible = true
           const speed = g.power * 10 + 7
           const cosA = Math.cos(g.launchAngle), sinA = Math.sin(g.launchAngle)
@@ -541,6 +637,7 @@ export default function BasketballLab({ onClose }) {
                   g.ballVel.addScaledVector(diff, -(1 + 0.55) * vn)
                   g.ballVel.multiplyScalar(0.68)   // more energy loss = more rattling
                   g.rimHits++
+                  playTone(audioCtxRef.current, { freq: 200, dur: 0.09, type: 'square', gain: 0.1, slideTo: 140 })
                 }
               }
             }
@@ -575,7 +672,18 @@ export default function BasketballLab({ onClose }) {
               g.doneMsg = 'Miss'
               savedReplay.current = [...replayFrames.current]
               setFeedback('Miss')
-              setTimeout(() => { const g2 = gs.current; g2.phase = 'aim'; g2.canReplay = true; ball.visible = false; setFeedback(''); setShowReplay(true) }, 1800)
+              playTone(audioCtxRef.current, { freq: 110, dur: 0.18, type: 'sine', gain: 0.15, slideTo: 70 })
+              g.streak = 0; setStreak(0)
+              // Replay should be available the instant the result is known, not
+              // after an extra artificial wait — that's what made V feel like it
+              // needed an R press first (canReplay was simply still false).
+              g.canReplay = true; setShowReplay(true)
+              setTimeout(() => {
+                // Guard: don't yank phase back to 'aim' if the player already
+                // started a replay (or shot again) during this window.
+                const g2 = gs.current
+                if (g2.phase === 'done') { g2.phase = 'aim'; ball.visible = false; setFeedback('') }
+              }, 1800)
             }
           }
 
@@ -584,7 +692,12 @@ export default function BasketballLab({ onClose }) {
             g.phase = 'done'; g.doneMsg = 'Miss'
             savedReplay.current = [...replayFrames.current]
             setFeedback('Miss')
-            setTimeout(() => { const g2 = gs.current; g2.phase = 'aim'; g2.canReplay = true; ball.visible = false; setFeedback(''); setShowReplay(true) }, 1500)
+            g.streak = 0; setStreak(0)
+            g.canReplay = true; setShowReplay(true)
+            setTimeout(() => {
+              const g2 = gs.current
+              if (g2.phase === 'done') { g2.phase = 'aim'; ball.visible = false; setFeedback('') }
+            }, 1500)
           }
 
           // ── Score check: ball descends through rim ─────────────────────────
@@ -603,8 +716,18 @@ export default function BasketballLab({ onClose }) {
             const isBankSwish = g.backboardHit && g.rimHits === 0
             const msg = isBankSwish ? 'BANK SHOT! 💥' : isSwish ? 'SWISH! 🏀' : g.rimHits > 1 ? 'Rattle in! 🔥' : 'BUCKET! 💪'
             g.doneMsg = msg
-            savedReplay.current = [...replayFrames.current]
+            // Don't snapshot the replay yet — the ball hasn't actually fallen
+            // through the net. Snapshotting here cut every made-shot replay
+            // off right at the rim, so it never showed the shot landing.
             setMakes(g.makes); setFeedback(msg)
+            g.streak++; setStreak(g.streak)
+            const ctx = audioCtxRef.current
+            if (isSwish) {
+              playTone(ctx, { freq: 880, dur: 0.1, type: 'sine', gain: 0.18 })
+              playTone(ctx, { freq: 1320, dur: 0.16, type: 'sine', gain: 0.14 })
+            } else {
+              playTone(ctx, { freq: 660, dur: 0.12, type: 'sine', gain: 0.18 })
+            }
           }
         }
 
@@ -624,12 +747,20 @@ export default function BasketballLab({ onClose }) {
           g.ballPos.addScaledVector(g.ballVel, effDt)
           sball.position.copy(g.ballPos)
           sball.visible = true   // stays visible while falling through net
+          // Keep recording through the net-fall so the replay actually shows
+          // the ball going in, instead of stopping right at the rim.
+          replayFrames.current.push({
+            px: g.ballPos.x, py: g.ballPos.y, pz: g.ballPos.z,
+            qx: sball.quaternion.x, qy: sball.quaternion.y,
+            qz: sball.quaternion.z, qw: sball.quaternion.w,
+          })
         }
         g.scoredTimer -= rawDt
         if (g.scoredTimer <= 0) {
           g.phase = 'done'
           if (sball) sball.visible = false
           g.canReplay = true
+          savedReplay.current = [...replayFrames.current]
           setFeedback('')
           setShowReplay(true)
         }
@@ -672,7 +803,11 @@ export default function BasketballLab({ onClose }) {
       document.removeEventListener('keyup', onKeyUp)
       dom.removeEventListener('click', onDomClick)
       dom.removeEventListener('wheel', onWheel)
+      dom.removeEventListener('touchstart', onTouchStart)
+      dom.removeEventListener('touchmove', onTouchMove)
+      dom.removeEventListener('touchend', onTouchEnd)
       window.removeEventListener('resize', onResize)
+      resizeObserver.disconnect()
       if (document.pointerLockElement === dom) document.exitPointerLock()
       renderer.dispose()
       if (mount.contains(dom)) mount.removeChild(dom)
@@ -684,19 +819,46 @@ export default function BasketballLab({ onClose }) {
   return (
     <div className="fixed inset-0 z-[200] flex flex-col" style={{ background: '#060a14' }}>
 
+      <GameHelp
+        title="Basketball Lab — First Person"
+        sections={[
+          { heading: 'What you’re learning', body: 'Every shot is a projectile-motion problem: launch angle and speed set the arc, gravity does the rest. Watch the side-view panel while aiming to see the predicted trajectory before you shoot, and how rim hits and backboard bounces lose energy.' },
+          { heading: 'How to play', body: isTouch
+              ? 'Drag anywhere on the court to aim. Tap (without dragging) to shoot. Use the Angle and Power sliders at the bottom to dial in your shot, and the spot buttons up top to change distance.'
+              : 'Click to step onto the court (locks your mouse). Move with WASD, aim by looking around with the mouse, scroll to adjust launch angle (hold Shift to adjust power instead, or use Q/E). Click to shoot.' },
+          { heading: 'Goal', body: 'Make as many shots as you can. Try each preset distance — Free Throw, 3-Point, and the Half-Court Heave — and watch your field-goal % and streak.' },
+        ]}
+      />
+
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-4 py-2 shrink-0 border-b border-slate-800"
+      <div className="flex items-center gap-3 px-4 py-2 shrink-0 border-b border-slate-800 flex-wrap"
         style={{ background: '#0c1225' }}>
         <span className="text-lg leading-none">🏀</span>
         <span className="text-sm font-semibold text-slate-200">Basketball Lab — First Person</span>
+
+        {/* Shot spot presets */}
+        <div className="flex items-center gap-1 ml-2">
+          {SHOT_SPOTS.map(spot => (
+            <button key={spot.label} onClick={() => goToSpot(spot.dist)}
+              className="px-2 py-1 text-[11px] font-mono rounded hover:opacity-80 transition-opacity"
+              style={{ background: '#1e293b', color: '#94a3b8', border: '1px solid #334155' }}>
+              {spot.label}
+            </button>
+          ))}
+        </div>
+
         <div className="flex-1" />
 
-        {/* Score */}
+        {/* Score + streak */}
         <div className="flex items-center gap-1.5 font-mono text-sm">
           <span className="text-emerald-400">{makes}</span>
           <span className="text-slate-600">/</span>
           <span className="text-slate-400">{attempts}</span>
           <span className="text-slate-600 text-xs ml-1">{fgPct}% FG</span>
+          {streak >= 2 && (
+            <span className="ml-2 px-1.5 py-0.5 text-xs font-bold rounded"
+              style={{ background: '#7c2d12', color: '#fdba74' }}>🔥 {streak} streak</span>
+          )}
         </div>
 
         {/* Launch angle + Power bar */}
@@ -725,7 +887,7 @@ export default function BasketballLab({ onClose }) {
       </div>
 
       {/* ── 3D viewport ──────────────────────────────────────────────────── */}
-      <div ref={mountRef} className="flex-1 relative overflow-hidden" style={{ cursor: locked ? 'none' : 'default' }}>
+      <div ref={mountRef} className="flex-1 relative overflow-hidden" style={{ cursor: locked ? 'none' : 'default', touchAction: 'none' }}>
 
         {/* HUD canvas (crosshair + power ring) */}
         <canvas ref={hudRef} className="absolute inset-0 pointer-events-none"
@@ -744,8 +906,8 @@ export default function BasketballLab({ onClose }) {
           </div>
         )}
 
-        {/* Click-to-play overlay */}
-        {!locked && (
+        {/* Click/tap-to-play overlay */}
+        {!active && (
           <div className="absolute inset-0 flex flex-col items-center justify-center"
             style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)' }}>
             <div className="text-7xl mb-5 select-none">🏀</div>
@@ -754,51 +916,103 @@ export default function BasketballLab({ onClose }) {
             <button
               style={{ background: '#ea5a0a', borderRadius: 12 }}
               className="px-7 py-3 text-white font-bold text-lg hover:opacity-90 transition-opacity"
-              onClick={() => rendererRef.current?.domElement.requestPointerLock()}>
-              Click to Step on the Court
+              onClick={() => {
+                if (!audioCtxRef.current) {
+                  const AC = window.AudioContext || window.webkitAudioContext
+                  if (AC) audioCtxRef.current = new AC()
+                }
+                if (isTouch) { gs.current.touchActive = true; setTouchActive(true) }
+                else rendererRef.current?.domElement.requestPointerLock()
+              }}>
+              {isTouch ? 'Tap to Step on the Court' : 'Click to Step on the Court'}
             </button>
-            <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-1 text-xs font-mono text-slate-500">
-              <span>W A S D</span><span className="text-slate-400">Move</span>
-              <span>Mouse</span><span className="text-slate-400">Look / horizontal aim</span>
-              <span>Scroll</span><span className="text-slate-400">Launch angle</span>
-              <span>Shift+Scroll / Q,E</span><span className="text-slate-400">Power</span>
-              <span>P</span><span className="text-slate-400">Slow-mo (flight)</span>
-              <span>Click</span><span className="text-slate-400">Shoot</span>
-              <span>R</span><span className="text-slate-400">Reset ball</span>
-              <span>V</span><span className="text-slate-400">Replay last shot</span>
-              <span>Esc</span><span className="text-slate-400">Unlock mouse</span>
-            </div>
+            {isTouch ? (
+              <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-1 text-xs font-mono text-slate-500">
+                <span>Drag</span><span className="text-slate-400">Aim</span>
+                <span>Tap (no drag)</span><span className="text-slate-400">Shoot</span>
+                <span>Sliders</span><span className="text-slate-400">Angle / power</span>
+                <span>Spot buttons</span><span className="text-slate-400">Change distance</span>
+              </div>
+            ) : (
+              <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-1 text-xs font-mono text-slate-500">
+                <span>W A S D</span><span className="text-slate-400">Move</span>
+                <span>Mouse</span><span className="text-slate-400">Look / horizontal aim</span>
+                <span>Scroll</span><span className="text-slate-400">Launch angle</span>
+                <span>Shift+Scroll / Q,E</span><span className="text-slate-400">Power</span>
+                <span>P</span><span className="text-slate-400">Slow-mo (flight)</span>
+                <span>Click</span><span className="text-slate-400">Shoot</span>
+                <span>R</span><span className="text-slate-400">Reset ball</span>
+                <span>V</span><span className="text-slate-400">Replay last shot</span>
+                <span>Esc</span><span className="text-slate-400">Unlock mouse</span>
+              </div>
+            )}
           </div>
         )}
 
         {/* In-game controls hint (dims after first shot) */}
-        {locked && attempts === 0 && (
+        {active && attempts === 0 && (
           <div className="absolute bottom-5 inset-x-0 flex justify-center pointer-events-none">
             <div className="flex gap-5 text-xs font-mono text-slate-500 bg-black/40 px-4 py-2 rounded-lg">
-              <span>WASD—move</span>
-              <span>Scroll—angle</span>
-              <span>Q,E—power</span>
-              <span>P—slo-mo</span>
-              <span>Click—shoot</span>
-              <span>R—reset | V—replay</span>
+              {isTouch ? (
+                <>
+                  <span>Drag—aim</span>
+                  <span>Tap—shoot</span>
+                  <span>Sliders—angle/power</span>
+                </>
+              ) : (
+                <>
+                  <span>WASD—move</span>
+                  <span>Scroll—angle</span>
+                  <span>Q,E—power</span>
+                  <span>P—slo-mo</span>
+                  <span>Click—shoot</span>
+                  <span>R—reset | V—replay</span>
+                </>
+              )}
             </div>
           </div>
         )}
 
-        {/* V — replay last shot notification */}
-        {locked && showReplay && (
-          <div className="absolute bottom-16 inset-x-0 flex justify-center pointer-events-none">
-            <div className="flex items-center gap-2 text-xs font-mono bg-black/60 px-4 py-1.5 rounded-lg"
-              style={{ border: '1px solid rgba(245,158,11,0.4)' }}>
-              <span className="text-amber-400">V — watch replay in slow-mo</span>
+        {/* What-now prompt after a shot resolves — was easy to miss before,
+            and "you can move during replay" wasn't communicated at all. */}
+        {active && showReplay && !isTouch && (
+          <div className="absolute inset-x-0 flex justify-center pointer-events-none" style={{ top: '40%' }}>
+            <div className="flex items-center gap-3 text-sm font-mono bg-black/75 px-5 py-2.5 rounded-xl"
+              style={{ border: '1px solid rgba(245,158,11,0.5)' }}>
+              <span className="text-amber-400 font-bold">V</span><span className="text-slate-300">replay shot (move freely to watch from anywhere)</span>
+              <span className="text-slate-600">|</span>
+              <span className="text-amber-400 font-bold">R</span><span className="text-slate-300">shoot again</span>
             </div>
           </div>
         )}
 
         {/* Side-view physics panel */}
-        {locked && (
+        {active && (
           <div className="absolute pointer-events-none" style={{ bottom: 12, left: 12 }}>
             <canvas ref={sideCanvasRef} style={{ display: 'block', borderRadius: 8 }} />
+          </div>
+        )}
+
+        {/* Touch-only angle/power controls — no scroll wheel on mobile */}
+        {touchActive && (
+          <div className="absolute bottom-3 right-3 flex flex-col gap-2 px-3 py-2 rounded-xl"
+            style={{ background: 'rgba(0,0,0,0.55)', width: 160 }}>
+            <label className="flex flex-col gap-1">
+              <span className="text-[10px] font-mono text-amber-400">Angle {Math.round(launchAngle * 180 / Math.PI)}°</span>
+              <input type="range" min={0.05} max={1.3} step={0.01} value={launchAngle}
+                onChange={e => {
+                  const v = parseFloat(e.target.value)
+                  gs.current.launchAngle = v; setLaunchAngle(v)
+                }} />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-[10px] font-mono text-emerald-400">Power {Math.round(power * 100)}%</span>
+              <input type="range" min={0.05} max={1} step={0.01} value={power}
+                onChange={e => {
+                  const v = parseFloat(e.target.value)
+                  gs.current.power = v; setPower(v)
+                }} />
+            </label>
           </div>
         )}
       </div>
@@ -812,7 +1026,7 @@ function drawHud(canvas, gs, w, h) {
   if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h }
   const ctx = canvas.getContext('2d')
   ctx.clearRect(0, 0, w, h)
-  if (!gs.locked) return
+  if (!gs.locked && !gs.touchActive) return
 
   const cx = w / 2, cy = h / 2
 

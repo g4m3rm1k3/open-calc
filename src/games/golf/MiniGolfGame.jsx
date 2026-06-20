@@ -888,13 +888,23 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
 
       // ── Ramp jump ─────────────────────────────────────────────────
       if (o.type === 'ramp') {
+        // `dir` selects which axis the ramp climbs along. It used to be stored
+        // and never read — every ramp was built (and collided) as a Z-axis
+        // slope regardless of `dir`, so a 'x'-direction ramp (like Hole 7's,
+        // where the ball travels tee->bridge along +X) visually tilted across
+        // Z instead of lifting the ball in the direction it was actually moving.
         const rampMat = new THREE.MeshLambertMaterial({ color: 0x8B7355 });
-        const ramp = new THREE.Mesh(new THREE.BoxGeometry(o.w||3, 0.2, o.d||5), rampMat);
+        const isX = (o.dir || 'z') === 'x';
+        const ramp = new THREE.Mesh(
+          isX ? new THREE.BoxGeometry(o.d||5, 0.2, o.w||3) : new THREE.BoxGeometry(o.w||3, 0.2, o.d||5),
+          rampMat
+        );
         ramp.position.set(o.x, (o.h||1.5)/2, o.z);
-        ramp.rotation.x = -(o.h||1.5) / (o.d||5) * 1.2; // slope angle
+        if (isX) ramp.rotation.z =  (o.h||1.5) / (o.d||5) * 1.2; // low end at -x, high end at +x
+        else     ramp.rotation.x = -(o.h||1.5) / (o.d||5) * 1.2; // low end at +z, high end at -z
         ramp.castShadow = true;
         scene.add(ramp); obstacles3d.push(ramp);
-        ramp.userData = { wallType:'ramp', x:o.x, z:o.z, w:o.w||3, d:o.d||5, h:o.h||1.5, dir: o.dir||'x' };
+        ramp.userData = { wallType:'ramp', x:o.x, z:o.z, w:o.w||3, d:o.d||5, h:o.h||1.5, dir: o.dir||'z' };
       }
 
       // ── Volcano / pipe launcher ───────────────────────────────────
@@ -1099,6 +1109,18 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
             h += val;
           }
         }
+        // The bridge deck had visual geometry and collision userData
+        // (wallType:'bridge') but resolveCollisions never actually handled
+        // that wallType — there was no floor where the deck visibly was, so
+        // a ball launched onto it by the ramp just fell straight through to
+        // the water underneath. Treat the deck as a raised flat terrain
+        // patch, the same mechanism already used for hills.
+        if (o.type === 'bridge') {
+          const len = o.len || 8, w = o.w || 2.6, bh = o.h || 1.5;
+          if (Math.abs(x - o.x) < len / 2 && Math.abs(z - o.z) < w / 2) {
+            h = Math.max(h, bh + BALL_R);
+          }
+        }
       }
       return h;
     }
@@ -1243,9 +1265,20 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
       const isAirborneHazard = pos.y > groundHazard + BALL_R * 1.5;
       for (let mesh of obstacles3d) {
         if (mesh.userData.type === 'water') {
-          const dist = new THREE.Vector2(pos.x - mesh.userData.x, pos.z - mesh.userData.z).length();
+          // The bridge's underwater patch is rectangular (isRect, lenX/lenZ)
+          // rather than circular (r) — this only ever checked `dist < r`,
+          // which is `dist < undefined` (always false) for that patch, so it
+          // could never actually trigger a splash.
+          const inWater = mesh.userData.isRect
+            // Same x/z footprint as the solid bridge deck above it, so also
+            // require the ball be near true ground level — otherwise a ball
+            // resting on the deck would "splash" into the water underneath it.
+            ? Math.abs(pos.x - mesh.userData.x) < mesh.userData.lenX / 2 &&
+              Math.abs(pos.z - mesh.userData.z) < mesh.userData.lenZ / 2 &&
+              pos.y < BALL_R * 2
+            : new THREE.Vector2(pos.x - mesh.userData.x, pos.z - mesh.userData.z).length() < mesh.userData.r;
           // Only trigger if ball is on or below ground level — not flying over
-          if (dist < mesh.userData.r && !isAirborneHazard) {
+          if (inWater && !isAirborneHazard) {
             toast('Splash! Water hazard. Respun with penalty.');
             ballActive = false;
             setTimeout(resetBall, 600);
@@ -1410,12 +1443,26 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         if (wd.wallType === 'edge') {
           const dx = wd.x2 - wd.x1, dz = wd.z2 - wd.z1, len = Math.sqrt(dx*dx + dz*dz);
           const nx = dz/len, nz = -dx/len;
-          const dist = (p.x - wd.x1)*nx + (p.z - wd.z1)*nz;
-          if (Math.abs(dist) < BALL_R * 1.1) {
-            const t = ((p.x - wd.x1)*dx + (p.z - wd.z1)*dz) / (len*len);
+          const distOld = (oldPos.x - wd.x1)*nx + (oldPos.z - wd.z1)*nz;
+          const distNew = (p.x - wd.x1)*nx + (p.z - wd.z1)*nz;
+          // A fast putt aimed straight at a thin wall (every boundary wall and
+          // any internal blocking wall, e.g. the Dog-Leg hole's forcing wall,
+          // use this same 'edge' type) could end the frame on the far side
+          // with only the end-of-frame distance checked — straight through.
+          // Detect the line-crossing itself, not just proximity at frame end.
+          const crossed = (distOld >= 0) !== (distNew >= 0);
+          let dist = distNew, testX = p.x, testZ = p.z;
+          if (crossed && distOld !== distNew) {
+            const crossT = distOld / (distOld - distNew);
+            testX = oldPos.x + (p.x - oldPos.x) * crossT;
+            testZ = oldPos.z + (p.z - oldPos.z) * crossT;
+            dist = 0;
+          }
+          if (crossed || Math.abs(dist) < BALL_R * 1.1) {
+            const t = ((testX - wd.x1)*dx + (testZ - wd.z1)*dz) / (len*len);
             if (t >= -0.05 && t <= 1.05) {
               const pen  = BALL_R * 1.1 - Math.abs(dist);
-              const sign = dist >= 0 ? 1 : -1;
+              const sign = (crossed ? distOld : dist) >= 0 ? 1 : -1;
               p.x += nx * pen * sign;
               p.z += nz * pen * sign;
               const vn = v.x*nx + v.z*nz;
@@ -1426,18 +1473,28 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
         }
 
         if (wd.wallType === 'bank') {
+          // The mesh is rotated by `rot` (mesh.rotation.y = wd.rot) for its visual
+          // placement. Converting a world offset into the bank's local frame is
+          // the INVERSE of that rotation: local = R(rot) * worldOffset, i.e.
+          // lx = dx*cosR - dz*sinR, lz = dx*sinR + dz*cosR. The previous version
+          // used a sign convention that doesn't invert the mesh's actual rotation,
+          // which swapped the length axis (checked against halfW) with the
+          // thickness/normal axis (checked against the ball radius) — so the bank
+          // only ever registered a hit in a sliver near its exact center, and any
+          // bounce that did happen reflected the wrong velocity component.
           const cosR = Math.cos(wd.rot), sinR = Math.sin(wd.rot);
-          const lx = (p.x - wd.cx)*cosR + (p.z - wd.cz)*sinR;
-          const lz = -(p.x - wd.cx)*sinR + (p.z - wd.cz)*cosR;
+          const dx0 = p.x - wd.cx, dz0 = p.z - wd.cz;
+          const lx = dx0*cosR - dz0*sinR; // position along the bank's length
+          const lz = dx0*sinR + dz0*cosR; // position across the bank's thickness (the true normal axis)
           if (Math.abs(lx) < wd.halfW && Math.abs(lz) < BALL_R*1.1) {
             const sign = lz >= 0 ? 1 : -1;
             const pen  = BALL_R*1.1 - Math.abs(lz);
-            p.x += -sinR*sign*pen; p.z += cosR*sign*pen;
+            p.x += sinR*sign*pen; p.z += cosR*sign*pen;
             const e   = wd.restitution || 0.85;
-            const vl  = v.x*cosR + v.z*sinR;
-            const vn2 = -v.x*sinR + v.z*cosR;
-            v.x = vl*cosR - e*(-vn2)*sinR;
-            v.z = vl*sinR + e*(-vn2)*cosR;
+            const vl  = v.x*cosR - v.z*sinR; // velocity along the length (tangential, unaffected)
+            const vn2 = v.x*sinR + v.z*cosR; // velocity along the thickness (normal, reflected)
+            v.x = vl*cosR + (-e*vn2)*sinR;
+            v.z = -vl*sinR + (-e*vn2)*cosR;
           }
         }
 
@@ -1523,21 +1580,40 @@ export default function MiniGolfGame({ params = {}, height: rootHeight = 640, on
           }
         }
 
-        // Ramp — slope that launches the ball into the air
+        // Ramp — slope that launches the ball into the air. Direction-aware:
+        // the 'x' case (e.g. Hole 7's tee->bridge ramp) lifts a ball moving
+        // along +X; the default 'z' case is the original Windmill-era ramp.
         if (wd.wallType === 'ramp') {
           const halfW = (wd.w || 3) / 2, halfD = (wd.d || 5) / 2;
-          const inX = Math.abs(p.x - wd.x) < halfW;
-          const inZ = Math.abs(p.z - wd.z) < halfD;
-          if (inX && inZ) {
-            // Slope rises from z = wd.z + halfD (bottom, y=0) to z = wd.z - halfD (top, y=wd.h)
-            const tRamp = ((wd.z + halfD) - p.z) / (halfD * 2); // 0 at bottom, 1 at top
-            const rampY = Math.max(0, tRamp * wd.h);
-            if (p.y < rampY + BALL_R) {
-              p.y = rampY + BALL_R;
-              // Convert some horizontal speed to vertical (launch component)
-              const slope = wd.h / (wd.d || 5);
-              if (v.z < 0 && rampY > 0) { // moving up the ramp
-                v.y = Math.max(v.y, Math.abs(v.z) * slope * 0.9);
+          if (wd.dir === 'x') {
+            const inX = Math.abs(p.x - wd.x) < halfD;
+            const inZ = Math.abs(p.z - wd.z) < halfW;
+            if (inX && inZ) {
+              // Slope rises from x = wd.x - halfD (bottom, y=0) to x = wd.x + halfD (top, y=wd.h)
+              const tRamp = (p.x - (wd.x - halfD)) / (halfD * 2); // 0 at bottom, 1 at top
+              const rampY = Math.max(0, tRamp * wd.h);
+              if (p.y < rampY + BALL_R) {
+                p.y = rampY + BALL_R;
+                const slope = wd.h / (wd.d || 5);
+                if (v.x > 0 && rampY > 0) { // moving up the ramp
+                  v.y = Math.max(v.y, v.x * slope * 0.9);
+                }
+              }
+            }
+          } else {
+            const inX = Math.abs(p.x - wd.x) < halfW;
+            const inZ = Math.abs(p.z - wd.z) < halfD;
+            if (inX && inZ) {
+              // Slope rises from z = wd.z + halfD (bottom, y=0) to z = wd.z - halfD (top, y=wd.h)
+              const tRamp = ((wd.z + halfD) - p.z) / (halfD * 2); // 0 at bottom, 1 at top
+              const rampY = Math.max(0, tRamp * wd.h);
+              if (p.y < rampY + BALL_R) {
+                p.y = rampY + BALL_R;
+                // Convert some horizontal speed to vertical (launch component)
+                const slope = wd.h / (wd.d || 5);
+                if (v.z < 0 && rampY > 0) { // moving up the ramp
+                  v.y = Math.max(v.y, Math.abs(v.z) * slope * 0.9);
+                }
               }
             }
           }

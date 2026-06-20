@@ -189,7 +189,7 @@ export default function StartMenu({ onClose }) {
       <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-6">
         <AnimatePresence mode="popLayout">
           {showCourses && filteredCourses.length > 0 && (
-            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+            <motion.section key="courses-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
               <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Courses</h3>
               <div className="grid grid-cols-3 gap-2">
                 {filteredCourses.map(course => (
@@ -209,7 +209,7 @@ export default function StartMenu({ onClose }) {
           )}
 
           {showLabs && filteredLabs.length > 0 && (
-            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+            <motion.section key="labs-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
               <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Labs</h3>
               <div className="grid grid-cols-3 gap-2">
                 {filteredLabs.map(lab => (
@@ -229,7 +229,7 @@ export default function StartMenu({ onClose }) {
           )}
 
           {showGames && filteredGames.length > 0 && (
-            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+            <motion.section key="games-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
               <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Games</h3>
               <div className="grid grid-cols-3 gap-2">
                 {filteredGames.map(game => (
@@ -249,7 +249,7 @@ export default function StartMenu({ onClose }) {
           )}
 
           {showTools && filteredTools.filter(t => t.eventTool).length > 0 && (
-            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+            <motion.section key="tools-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
               <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Tools</h3>
               <div className="grid grid-cols-3 gap-2">
                 {filteredTools.filter(t => t.eventTool).map(tool => (
@@ -269,7 +269,7 @@ export default function StartMenu({ onClose }) {
           )}
 
           {showNav && filteredNav.length > 0 && (
-            <motion.section variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+            <motion.section key="nav-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
               <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Navigate</h3>
               <div className="grid grid-cols-3 gap-2">
                 {filteredNav.map(link => (

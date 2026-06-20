@@ -1,573 +1,501 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import * as Phaser from "phaser";
-import { ArrowLeft, RotateCcw, Target, Waves } from "lucide-react";
+import { ArrowLeft, Lock, RotateCcw, Unlock, Zap } from "lucide-react";
 
-// ── World constants ────────────────────────────────────────────────────────────
-const W        = 1600;
-const H        = 900;
-const GROUND_Y = H - 90;   // 810
-const BALL_R   = 20;
-const SHAFT_HW = 230;       // shaft half-width for fall/climb
-const PB_HW    = 290;       // pinball half-width
-const SHAFT_CX = W / 2;     // center X for fall/climb/pinball columns
+/* ════════════════════════════════════════════════════════════════════════
+   WORLD CONSTANTS
+   Single continuous world. No scene swapping — pits and pinball chambers
+   are zones embedded directly in the ground, entered/exited by position.
+   ════════════════════════════════════════════════════════════════════════ */
+const W = 1600;
+const H = 900;
+const GROUND_Y = H - 90; // 810
+const BALL_R = 18;
 
-// ── Scene list ─────────────────────────────────────────────────────────────────
-const SCENES = [
-  { id: "side",    title: "Side Scroll",  subtitle: "Run and jump — tune gravity and friction in real time." },
-  { id: "fall",    title: "Free Fall",    subtitle: "Drop through the shaft, bounce off pads. KE = ½mv²." },
-  { id: "climb",   title: "Upward Climb", subtitle: "Ride pads upward. Potential energy = mgh." },
-  { id: "pinball", title: "Pinball",      subtitle: "2.5D table — Z/X flippers. Drain = back to run." },
-];
+const PIT_DEPTH = 560;       // how far below GROUND_Y a pit floor sits
+const PIT_FLOOR_Y = GROUND_Y + PIT_DEPTH;
 
-const TUTORIALS = {
-  elasticity: { title: "Euler: Coefficient of Restitution", body: "e = v_after / v_before. e=1 is perfectly elastic — no energy lost. e=0 means the ball sticks. Real rubber: ~0.85. Crank the slider and watch every surface return more speed." },
-  blaster:    { title: "Euler: KE = ½mv²", body: "Double the speed → four times the energy. Your bolt traces x=v₀t, y=½gt² — a literal parabola. High shot power (>0.82) causes ricochet back at you." },
-  crush:      { title: "Euler: F = ma", body: "Super gravity doubles g, doubling the downward force on everything including you. Impulse J=FΔt=mΔv is why landing fast enough crushes enemies. Every gain has a cost." },
-  lightning:  { title: "Euler: Q = CV", body: "You discharged a rod like a capacitor. Q=CV: charge equals capacitance × voltage. Taller rods attract more charge — E=V/d is stronger at the sharp tip." },
-  pi:         { title: "Euler: Pi signal located", body: "π≈3.14159 appears in your ball's arc, wave frequencies, electrical impedance, and probability distributions. The math gets more interesting from here." },
+const PIN_W = 520;           // pinball chamber interior width
+const PIN_TOP = 120;         // pinball chamber ceiling (world Y)
+
+const ABILITY_MILESTONES = {
+  bounce: 0,      // bounce pads always active — they're the starter toy
+  superJump: 1400,
+  crush: 3200,
+  pinballGate: 5200,
 };
 
-function fmt(v, d = 1) { return Number(v || 0).toFixed(d).replace(/\.?0+$/, "") || "0"; }
+function fmt(v, d = 1) {
+  return Number(v || 0).toFixed(d).replace(/\.?0+$/, "") || "0";
+}
+function clamp(v, lo, hi) {
+  return Math.max(lo, Math.min(hi, v));
+}
 
-// ═══════════════════════════════════════════════════════════════════════════════
-//  PHASER SCENE
-//  Design: ALL physics bodies are invisible physics.add.image('px') objects.
-//  ALL visuals are drawn each frame via worldGfx (Graphics). This avoids the
-//  Shape-body offset bugs and gives full rendering control.
-// ═══════════════════════════════════════════════════════════════════════════════
+const TUTORIALS = {
+  bounce: "Bounce pad: e (elasticity) sets how much speed you keep — e=1 is a perfect bounce, e=0 is a dead stop.",
+  superJump: "Ability unlocked: Power Jump (key J). Costs energy, multiplies your jump speed — v0 = jumpSpeed × boost.",
+  crush: "Ability unlocked: Ground Pound (key K). Falling fast enough to break armored squares: impulse breaks armor.",
+  pit: "Free fall! Horizontal walls reflect you (vx flips ×e). Ride the chain of pads back up — or just enjoy the drop.",
+  pinball: "Pinball chamber. Z = left flipper, X = right flipper. Bumpers fling you out fast: J = m·Δv.",
+  rod: "Lightning rod charged. Walk into it to discharge: Q = C·V — stored charge becomes energy + a short jump boost.",
+};
+
+/* ════════════════════════════════════════════════════════════════════════
+   PHASER SCENE
+   ════════════════════════════════════════════════════════════════════════ */
 class GameScene extends Phaser.Scene {
-  constructor() { super({ key: "GameScene" }); }
+  constructor() {
+    super({ key: "GameScene" });
+  }
 
   create() {
-    // ── Inject React refs ─────────────────────────────────────────────────────
-    this.paramsRef  = this.registry.get("paramsRef");
-    this.onScore    = this.registry.get("onScore")  || (() => {});
-    this.onEnergy   = this.registry.get("onEnergy") || (() => {});
-    this.onSceneCb  = this.registry.get("onScene")  || (() => {});
-    this.onMsgCb    = this.registry.get("onMsg")    || (() => {});
-    this.sceneId    = "side";
+    this.paramsRef = this.registry.get("paramsRef");
+    this.onScore = this.registry.get("onScore") || (() => {});
+    this.onEnergy = this.registry.get("onEnergy") || (() => {});
+    this.onAbility = this.registry.get("onAbility") || (() => {});
+    this.onMsg = this.registry.get("onMsg") || (() => {});
+    this.onDead = this.registry.get("onDead") || (() => {});
 
-    // ── Keyboard input (Phaser-native, no React ref needed) ───────────────────
+    /* ---- input ---- */
     this.keys = this.input.keyboard.addKeys({
-      left:  Phaser.Input.Keyboard.KeyCodes.LEFT,
+      left: Phaser.Input.Keyboard.KeyCodes.LEFT,
       right: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-      up:    Phaser.Input.Keyboard.KeyCodes.UP,
-      down:  Phaser.Input.Keyboard.KeyCodes.DOWN,
-      a:     Phaser.Input.Keyboard.KeyCodes.A,
-      d:     Phaser.Input.Keyboard.KeyCodes.D,
-      w:     Phaser.Input.Keyboard.KeyCodes.W,
-      s:     Phaser.Input.Keyboard.KeyCodes.S,
+      a: Phaser.Input.Keyboard.KeyCodes.A,
+      d: Phaser.Input.Keyboard.KeyCodes.D,
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
+      up: Phaser.Input.Keyboard.KeyCodes.UP,
+      w: Phaser.Input.Keyboard.KeyCodes.W,
+      j: Phaser.Input.Keyboard.KeyCodes.J,
+      k: Phaser.Input.Keyboard.KeyCodes.K,
+      z: Phaser.Input.Keyboard.KeyCodes.Z,
+      x: Phaser.Input.Keyboard.KeyCodes.X,
     });
-    this._inp = { left: false, right: false, up: false, down: false, jumpQueued: false, superGravity: false };
-    this.input.keyboard.on("keydown-SPACE", () => { this._inp.jumpQueued = true; });
-    this.input.keyboard.on("keydown-UP",    () => { this._inp.jumpQueued = true; });
-    this.input.keyboard.on("keydown-W",     () => { this._inp.jumpQueued = true; });
-    this.input.keyboard.on("keydown-S",     () => { this._inp.superGravity = true; });
-    this.input.keyboard.on("keyup-S",       () => { this._inp.superGravity = false; });
+    this._jumpQueued = false;
+    this._powerJumpQueued = false;
+    this._poundQueued = false;
+    const queueJump = () => { this._jumpQueued = true; };
+    this.input.keyboard.on("keydown-SPACE", queueJump);
+    this.input.keyboard.on("keydown-UP", queueJump);
+    this.input.keyboard.on("keydown-W", queueJump);
+    this.input.keyboard.on("keydown-J", () => { this._powerJumpQueued = true; });
+    this.input.keyboard.on("keydown-K", () => { this._poundQueued = true; });
 
-    // ── Generate 1×1 white pixel texture for all physics bodies ───────────────
+    /* ---- 1×1 texture used for every physics body (invisible; we draw manually) ---- */
     const pg = this.make.graphics({ add: false });
     pg.fillStyle(0xffffff, 1).fillRect(0, 0, 1, 1);
     pg.generateTexture("px", 1, 1);
     pg.destroy();
 
-    // ── Player physics body (invisible, explicit size) ─────────────────────────
-    // Use setSize(d,d,true) to center the body, then setCircle for round collisions
+    /* ---- player ---- */
     this.player = this.physics.add.image(220, GROUND_Y - BALL_R, "px");
     this.player.setAlpha(0.01);
-    // For a 1×1 "px" sprite, displayOriginX = 0.5.
-    // setCircle(r, offsetX, offsetY): body.x = sprite.x + (offsetX - 0.5)
-    // We want circle center = sprite center, so offsetX = -(r - 0.5) = -19.5
     this.player.body.setCircle(BALL_R, -(BALL_R - 0.5), -(BALL_R - 0.5));
-    this.player.body.setMaxVelocity(900, 1800);
+    this.player.body.setMaxVelocity(1100, 2000);
     this.player.body.setCollideWorldBounds(false);
+    this.player.body.setAllowGravity(true);
 
-    // ── Physics groups ────────────────────────────────────────────────────────
-    // staticPlatforms: solid surfaces + bounce pads (use collider)
-    // portalGroup / spikeGroup / waterGroup / pitGroup: overlap only (no solid block)
-    this.staticPlatforms = this.physics.add.staticGroup();
-    this.enemyGroup      = this.physics.add.group();
-    this.collectGroup    = this.physics.add.group();
-    this.portalGroup     = this.physics.add.staticGroup();
-    this.spikeGroup      = this.physics.add.staticGroup();
+    /* ---- groups ---- */
+    this.solidGroup = this.physics.add.staticGroup();   // ground, walls, normal platforms
+    this.padGroup = this.physics.add.staticGroup();      // bounce pads (own collider, different response)
+    this.flipperGroup = this.physics.add.staticGroup();  // pinball flippers
+    this.spikeGroup = this.physics.add.staticGroup();    // hazards (overlap only)
+    this.enemyGroup = this.physics.add.group();
+    this.collectGroup = this.physics.add.group();
+    this.rodGroup = this.physics.add.group();
 
-    // ── Colliders / overlaps ──────────────────────────────────────────────────
-    this.physics.add.collider(this.player, this.staticPlatforms,
-      (pl, plat) => this._onPlatformCollide(pl, plat), null, this);
-    this.physics.add.overlap(this.player, this.portalGroup,
-      (pl, portal) => this._onPortal(portal), null, this);
-    this.physics.add.overlap(this.player, this.spikeGroup,
-      () => this._damagePlayer("Spike! Lower gravity or find a platform path."), null, this);
-    this.physics.add.overlap(this.player, this.enemyGroup,
-      (pl, e) => this._onEnemyHit(e), null, this);
-    this.physics.add.overlap(this.player, this.collectGroup,
-      (pl, c) => this._onCollect(c), null, this);
+    this.physics.add.collider(this.player, this.solidGroup);
+    this.physics.add.collider(this.player, this.padGroup, (pl, pad) => this._onPad(pad), null, this);
+    this.physics.add.collider(this.player, this.flipperGroup, (pl, fl) => this._onFlipper(fl), null, this);
+    this.physics.add.overlap(this.player, this.spikeGroup, () => this._damage("Spike hit."), null, this);
+    this.physics.add.overlap(this.player, this.enemyGroup, (pl, e) => this._onEnemy(e), null, this);
+    this.physics.add.overlap(this.player, this.collectGroup, (pl, c) => this._onCollect(c), null, this);
+    this.physics.add.overlap(this.player, this.rodGroup, (pl, r) => this._onRod(r), null, this);
 
-    // ── Visual layers ─────────────────────────────────────────────────────────
-    this.worldGfx     = this.add.graphics();  // world-space visuals, redrawn each frame
-    this.lightningGfx = this.add.graphics();  // separate so lightning can be on top
+    /* ---- render layers ---- */
+    this.worldGfx = this.add.graphics();
+    this.fxGfx = this.add.graphics();
+    this.fxGfx.strikeFlashTtl = 0;
+    this.fxGfx.strikeX = 0;
 
-    // ── Data arrays (for rendering & custom logic) ────────────────────────────
-    this.platData    = [];  // { body, cx, cy, w, h, color, type }
-    this.enemyData   = [];  // { body, r, color, behavior, phase, ampY, baseY }
-    this.collectData = [];  // { body, type }
-    this.portalData  = [];  // { body, cx, cy, w, h, target }
-    this.spikeData   = [];  // { x, y, w }
-    this.waterData   = [];  // { x, y, w, h }
-    this.pitData     = [];  // { x, w } — pitfall trigger zones
-    this.rodData     = [];  // { x, y, id, charge }
-    this.bumperData  = [];  // { x, y, r }
-    this.flipperData = [];  // { body, side, cx, cy, w, h }
+    /* ---- data registries (parallel to physics bodies, used for drawing/logic) ---- */
+    this.platData = [];      // {body,cx,cy,w,h,color,kind}
+    this.enemyData = [];     // {body,shape,r,hp,phase,baseY,armored}
+    this.collectData = [];   // {body,type}
+    this.rodData = [];       // {body,x,y,charge}
+    this.bumperData = [];    // {x,y,r}
+    this.flipperData = [];   // {body,side,cx,cy,w,h,baseAngle}
+    this.pitZones = [];      // {x1,x2}
+    this.pinballZones = [];  // {x1,x2,cx}
 
-    // ── Game state ─────────────────────────────────────────────────────────────
-    this.score        = 0;
-    this.lives        = 3;
-    this.energy       = 100;
-    this.invuln       = 0;
-    this.survivedSec  = 0;
-    this.difficulty   = 1;
-    this.unlocks      = { elasticity: false, blaster: false, crush: false };
-    this.pendingTut   = null;
-    this.alive        = true;
-    this.furthestX    = 220;
-    this.goalX        = 18000;
-    this.shotCooldown = 0;
-    this.flipL        = false;
-    this.flipR        = false;
-    this.reason       = "Start running — tune the physics sliders on the left.";
+    /* ---- state ---- */
+    this.score = 0;
+    this.lives = 3;
+    this.energy = 90;
+    this.invuln = 0;
+    this.alive = true;
+    this.survivedDist = 0;
+    this.furthestX = 220;
+    this.flipL = false;
+    this.flipR = false;
+    this.powerJumpTtl = 0;
+    this.abilities = { superJump: false, crush: false };
+    this.lightningTimer = 5;
+    this.lightningWarn = null; // {x, ttl}
+    this.reason = "Run right. Hold J to charge nothing yet — find an ability first.";
+    this.inPit = false;
+    this.inPinball = false;
+    this._recentPinball = false;
 
-    // ── Platform spawn cursor ─────────────────────────────────────────────────
-    this.platCursor    = { x: 320, y: GROUND_Y };
-    this.nextSpawnX    = 320;
-    this.nextSpawnY    = 300;   // for fall/climb scenes
-    this.spawnGuard    = 2.0;   // seconds of protection against immediate re-transition
+    /* ---- ground cursor / procedural generation state ---- */
+    this.cursorX = 360;
+    this.nextSpawnX = 900;
 
-    // ── Lightning ─────────────────────────────────────────────────────────────
-    this.lightningBolts = [];
-    this.lightningTimer = 4;
+    this.cameras.main.setBackgroundColor("#0a1320");
+    this.cameras.main.startFollow(this.player, false, 0.12, 0.06);
+    this.cameras.main.setFollowOffset(0, -40);
+    this.cameras.main.setDeadzone(140, 220);
 
-    // ── Transition overlay ────────────────────────────────────────────────────
-    this.transText = this.add.text(W / 2, H / 2, "", {
-      fontSize: "34px", color: "#ffffff", fontFamily: "sans-serif",
-      backgroundColor: "rgba(8,19,31,0.86)", padding: { x: 28, y: 16 },
-    }).setScrollFactor(0).setOrigin(0.5).setAlpha(0).setDepth(30);
-    this.transTtl = 0;
-
-    // ── Camera: only follows X in side scroll (Y forced to 0) ─────────────────
-    this.cameras.main.setBackgroundColor("#08101b");
-
-    // ── Start first scene ─────────────────────────────────────────────────────
-    this._setupScene(this.sceneId);
+    this._buildWorld();
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  SCENE SETUP
-  // ═══════════════════════════════════════════════════════════════════════════
+  /* ══════════════════════════════════════════════════════════════════════
+     WORLD CONSTRUCTION — flat ground with embedded pit + pinball pockets.
+     Every pocket is hand-shaped to guarantee a way out (no orphaned content).
+     ══════════════════════════════════════════════════════════════════════ */
 
-  _clearScene() {
-    this.staticPlatforms.clear(true, true);
-    this.enemyGroup.clear(true, true);
-    this.collectGroup.clear(true, true);
-    this.portalGroup.clear(true, true);
-    this.spikeGroup.clear(true, true);
-    this.platData    = [];
-    this.enemyData   = [];
-    this.collectData = [];
-    this.portalData  = [];
-    this.spikeData   = [];
-    this.waterData   = [];
-    this.pitData     = [];
-    this.rodData     = [];
-    this.bumperData  = [];
-    this.flipperData = [];
-    this.lightningBolts = [];
-  }
-
-  _setupScene(id) {
-    this.sceneId = id;
-    this.transitioning = false;
-    this.spawnGuard = 2.0;
-    this._clearScene();
-    this.cameras.main.stopFollow();
-
-    if (id === "side")    this._setupSide();
-    if (id === "fall")    this._setupFall();
-    if (id === "climb")   this._setupClimb();
-    if (id === "pinball") this._setupPinball();
-  }
-
-  _setupSide() {
-    // Player starts at ground level, moving right
-    this.player.body.reset(220, GROUND_Y - BALL_R);
-    this.player.body.setVelocity(140, 0);
-
-    // Spawn ground — tiled at 1600px each so static bodies aren't absurdly large
-    for (let i = 0; i < 120; i++) {
-      this._addSolidPlat(W * i + W / 2, GROUND_Y + 22, W, 44, 0x334155);
-    }
-
-    this.platCursor = { x: 320, y: GROUND_Y };
-    this.nextSpawnX = 320;
-    for (let i = 0; i < 14; i++) this._spawnSideChunk();
-
-    // Camera: follow X only, lock Y
-    this.cameras.main.startFollow(this.player, false, 0.1, 0);
-    this.cameras.main.setLerp(0.1, 0);
-    // Y will be forced to 0 in _updateSide each frame
-  }
-
-  _setupFall() {
-    const cx = SHAFT_CX;
-    this.player.body.reset(cx, 80);
-    this.player.body.setVelocity(0, 260);
-    this.nextSpawnY = 260;
-
-    // Shaft walls (solid, tall)
-    this._addSolidPlat(cx - SHAFT_HW - 12, H / 2, 24, H, 0x1e3a5f);
-    this._addSolidPlat(cx + SHAFT_HW + 12, H / 2, 24, H, 0x1e3a5f);
-    // Entry bounce pad
-    this._addBounce(cx, 760, 200, 18);
-
-    for (let i = 0; i < 8; i++) this._spawnFallChunk();
-
-    this.cameras.main.startFollow(this.player, false, 0, 0.1);
-    this.cameras.main.setFollowOffset(0, -H * 0.25);
-  }
-
-  _setupClimb() {
-    const cx = SHAFT_CX;
-    this.player.body.reset(cx, H - 180);
-    this.player.body.setVelocity(0, -340);
-    this.nextSpawnY = H - 380;
-
-    // Shaft walls
-    this._addSolidPlat(cx - SHAFT_HW - 12, H / 2, 24, H, 0x1e3a5f);
-    this._addSolidPlat(cx + SHAFT_HW + 12, H / 2, 24, H, 0x1e3a5f);
-
-    // Guaranteed bounce chain from bottom to top
-    this._addBounce(cx, H - 200, 180, 18);
-    this._addBounce(cx - 120, H - 400, 130, 18);
-    this._addBounce(cx + 100, H - 580, 130, 18);
-    this._addBounce(cx - 80,  H - 750, 130, 18);
-    this._addBounce(cx,       280,     140, 18);
-    // Exit portal at top
-    this._addPortal(cx, 200, 120, 24, "side");
-
-    for (let i = 0; i < 6; i++) this._spawnClimbChunk();
-
-    this.cameras.main.startFollow(this.player, false, 0, 0.1);
-    this.cameras.main.setFollowOffset(0, H * 0.3);
-  }
-
-  _setupPinball() {
-    const cx = SHAFT_CX;
-    this.player.body.reset(cx, 130);
-    this.player.body.setVelocity(60, 320);
-
-    // Walls + ceiling
-    this._addSolidPlat(cx - PB_HW - 12, H / 2, 24, H, 0x1e3a5f);
-    this._addSolidPlat(cx + PB_HW + 12, H / 2, 24, H, 0x1e3a5f);
-    this._addSolidPlat(cx, 52, PB_HW * 2 + 24, 24, 0x1e3a5f);
-
-    // Bumpers
-    this.bumperData = [
-      { x: cx - 80,  y: 260, r: 34 },
-      { x: cx + 110, y: 390, r: 28 },
-      { x: cx - 140, y: 480, r: 30 },
-      { x: cx + 40,  y: 600, r: 32 },
-    ];
-
-    // Flippers (physics + data for rendering)
-    this._addFlipper(cx - 120, H - 158, "left");
-    this._addFlipper(cx + 120, H - 158, "right");
-
-    // Exit portal + collectibles
-    this._addPortal(cx, 96, 120, 24, "side");
-    this._addCollectible(cx - 50, 340, "energy");
-    this._addCollectible(cx + 70, 520, "energy");
-    this._addCollectible(cx, 700, "life");
-
-    this.cameras.main.setScroll(cx - W / 2, 0);
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  SPAWNERS
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  _spawnSideChunk() {
-    const prev = this.platCursor;
-    const TIERS = [GROUND_Y, GROUND_Y - 120, GROUND_Y - 240, GROUND_Y - 360];
-    const MAX_JUMP_H = 148;
-    const reachable = TIERS.filter(ty => ty >= prev.y || (prev.y - ty) <= MAX_JUMP_H);
-    // Weighted pick — prefer going up
-    const w = reachable.map(ty => {
-      if (ty === GROUND_Y) return 0.08;
-      if (ty === prev.y)   return 0.35;
-      if (ty < prev.y)     return 0.42;
-      return 0.15;
-    });
-    const tot = w.reduce((a, b) => a + b, 0);
-    let r = Math.random() * tot;
-    let nextY = reachable[reachable.length - 1];
-    for (let i = 0; i < reachable.length; i++) { r -= w[i]; if (r <= 0) { nextY = reachable[i]; break; } }
-
-    const maxGap = nextY < prev.y ? 215 : 260;
-    const nextX  = prev.x + 55 + Math.random() * (maxGap - 55);
-    const pw     = 90 + Math.random() * 80;
-    const isPad  = nextY < GROUND_Y && Math.random() < 0.26;
-
-    if (nextY < GROUND_Y) {
-      if (isPad) this._addBounce(nextX + pw / 2, nextY, pw, 16);
-      else       this._addSolidPlat(nextX + pw / 2, nextY, pw, 16, 0x475569);
-
-      if (Math.random() < 0.50)
-        this._addCollectible(nextX + pw * 0.45, nextY - 32, Math.random() < 0.65 ? "energy" : "life");
-      if (Math.random() < 0.52 + this.difficulty * 0.04)
-        this._addEnemy(nextX + pw * 0.5, nextY - 38);
-      if (Math.random() < 0.09 && nextX > 800)
-        this._addPortal(nextX + pw * 0.4, nextY - 30, 100, 22, Math.random() < 0.5 ? "fall" : "climb");
-    }
-
-    // Ground hazard between cursor and new platform
-    const hzX = prev.x + 8, hzW = nextX - prev.x - 16;
-    if (hzW > 70) {
-      const roll = Math.random();
-      if (roll < 0.20)       this._addSpikes(hzX, hzW);
-      else if (roll < 0.42)  this._addBounce(hzX + hzW / 2, GROUND_Y - 18, Math.min(hzW * 0.6, 100), 18);
-      else if (roll < 0.60)  this._addWater(hzX, Math.min(hzW * 0.85, 300));
-      else if (roll < 0.78)  this._addPitfall(hzX, Math.min(hzW * 0.75, 280));
-      if (Math.random() < 0.15) this._addLightningRod(hzX + Math.random() * Math.max(1, hzW - 20));
-    }
-
-    this.platCursor  = { x: nextX + pw, y: nextY };
-    this.nextSpawnX  = nextX + pw + 55;
-  }
-
-  _spawnFallChunk() {
-    const cx = SHAFT_CX, y = this.nextSpawnY + 180 + Math.random() * 260;
-    const side = Math.random() < 0.5;
-    this._addBounce(side ? cx - 90 : cx + 90, y, 180, 18);
-    if (Math.random() < 0.5)
-      this._addBounce(side ? cx + 80 : cx - 80, y + 220, 160, 18);
-    if (Math.random() < 0.5)
-      this._addEnemy(cx + (Math.random() - 0.5) * 280, y + 70);
-    this._addCollectible(cx + (Math.random() - 0.5) * 180, y - 60, "energy");
-    this.nextSpawnY = y + 240;
-  }
-
-  _spawnClimbChunk() {
-    const cx = SHAFT_CX, y = this.nextSpawnY;
-    const lx = cx - 130, rx = cx + 10;
-    const side = Math.random() < 0.5;
-    this._addBounce(side ? lx : rx, y, 130, 18);
-    this._addBounce(side ? rx : lx, y - 190, 130, 18);
-    if (Math.random() < 0.4) this._addEnemy(cx + (Math.random() - 0.5) * 220, y - 80);
-    this._addCollectible(cx + (Math.random() - 0.5) * 120, y - 130, "energy");
-    this.nextSpawnY = y - 290;
-  }
-
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  FACTORY HELPERS  — all physics bodies are invisible 'px' images
-  // ═══════════════════════════════════════════════════════════════════════════
-
-  _makePxBody(cx, cy, w, h, group) {
-    // cx, cy = CENTER of hitbox (matches visual rendering)
-    const body = group.create(cx, cy, "px");
-    body.setScale(w, h);
-    body.setAlpha(0.01);
-    body.refreshBody();
+  _addSolid(cx, cy, w, h, color = 0x334155, kind = "solid") {
+    const body = this.solidGroup.create(cx, cy, "px");
+    body.setScale(w, h).setAlpha(0.01).refreshBody();
+    this.platData.push({ cx, cy, w, h, color, kind });
     return body;
   }
 
-  _addSolidPlat(cx, cy, w, h, color) {
-    const body = this._makePxBody(cx, cy, w, h, this.staticPlatforms);
-    body.platformType = "solid";
-    this.platData.push({ body, cx, cy, w, h, color, type: "solid" });
+  _addPad(cx, cy, w, h = 18) {
+    const body = this.padGroup.create(cx, cy, "px");
+    body.setScale(w, h).setAlpha(0.01).refreshBody();
+    this.platData.push({ cx, cy, w, h, color: 0x22c55e, kind: "pad" });
     return body;
   }
 
-  _addBounce(cx, cy, w, h) {
-    const body = this._makePxBody(cx, cy, w, h, this.staticPlatforms);
-    body.platformType = "pad";
-    this.platData.push({ body, cx, cy, w, h, color: 0x22c55e, type: "pad" });
+  _addFlipper(cx, cy, side) {
+    const w = 150, h = 20;
+    const body = this.flipperGroup.create(cx, cy, "px");
+    body.setScale(w, h).setAlpha(0.01).refreshBody();
+    const fd = { body, side, cx, cy, w, h };
+    this.flipperData.push(fd);
+    return fd;
+  }
+
+  _addSpike(x, w) {
+    const body = this.spikeGroup.create(x + w / 2, GROUND_Y - 14, "px");
+    body.setScale(w, 26).setAlpha(0.01).refreshBody();
+    this.platData.push({ cx: x + w / 2, cy: GROUND_Y - 14, w, h: 26, color: 0xfb7185, kind: "spike" });
     return body;
   }
 
-  _addSpikes(x, w) {
-    // x = left edge, centered hitbox
-    const body = this._makePxBody(x + w / 2, GROUND_Y - 14, w, 28, this.spikeGroup);
-    this.spikeData.push({ x, y: GROUND_Y - 28, w });
-    return body;
-  }
-
-  _addWater(x, w) {
-    this.waterData.push({ x, y: GROUND_Y - 38, w, h: 54 });
-    // Hop platforms over water
-    const n = 2 + Math.floor(Math.random() * 2);
-    for (let i = 0; i < n; i++) {
-      const px = x + (w / n) * i + w / (n * 2);
-      const pw = 65 + Math.random() * 35;
-      this._addSolidPlat(px, GROUND_Y - 130, pw, 16, 0x475569);
-    }
-    this._addCollectible(x + w / 2, GROUND_Y - 162, "energy");
-  }
-
-  _addPitfall(x, w) {
-    this.pitData.push({ x, w });
-    // Hop platforms over the pit
-    const n = 2 + Math.floor(Math.random() * 2);
-    for (let i = 0; i < n; i++) {
-      const px = x + (w / n) * i + w / (n * 2);
-      const py = GROUND_Y - 108 - Math.random() * 30;
-      const pw = 70 + Math.random() * 40;
-      this._addSolidPlat(px, py, pw, 16, 0x475569);
-      if (i === 1) this._addCollectible(px, py - 30, Math.random() < 0.6 ? "energy" : "life");
-    }
-  }
-
-  _addPortal(cx, cy, w, h, target) {
-    const body = this._makePxBody(cx, cy, w, h, this.portalGroup);
-    body.portalTarget = target;
-    this.portalData.push({ body, cx, cy, w, h, target });
-    return body;
-  }
-
-  _addEnemy(x, y) {
-    const r = 18 + Math.random() * 10;
+  _addEnemy(x, y, shape) {
+    const r = shape === "square" ? 24 : shape === "triangle" ? 22 : 20;
     const body = this.physics.add.image(x, y, "px");
     body.setAlpha(0.01);
     body.body.setSize(r * 2, r * 2, true);
     body.body.setAllowGravity(false);
     body.body.setImmovable(true);
-    body.body.setVelocityX((Math.random() < 0.5 ? 1 : -1) * (50 + Math.random() * 80));
-    const behavior = ["hover", "patrol", "zigzag"][Math.floor(Math.random() * 3)];
-    const ed = { body, r, color: 0xf87171, behavior, phase: Math.random() * Math.PI * 2, ampY: 18 + Math.random() * 28, baseY: y };
+    const armored = shape === "square";
+    const ed = {
+      body, shape, r, baseY: y, phase: Math.random() * Math.PI * 2,
+      hp: armored ? 2 : 1, armored, dir: Math.random() < 0.5 ? 1 : -1,
+    };
+    if (shape === "triangle") body.body.setVelocityX(ed.dir * 90);
     this.enemyData.push(ed);
     this.enemyGroup.add(body);
-    return body;
+    return ed;
   }
 
-  _addCollectible(x, y, type = "energy") {
+  _addCollectible(x, y, type) {
     const r = 13;
     const body = this.physics.add.image(x, y, "px");
     body.setAlpha(0.01);
     body.body.setSize(r * 2, r * 2, true);
     body.body.setAllowGravity(false);
     body.body.setImmovable(true);
-    body.collectType = type;
-    this.collectData.push({ body, type, x, y });
+    this.collectData.push({ body, type });
     this.collectGroup.add(body);
     return body;
   }
 
-  _addLightningRod(x) {
-    const id = `rod-${x.toFixed(0)}-${Math.random()}`;
-    this.rodData.push({ x, y: GROUND_Y - 100, id, charge: 0 });
+  _addRod(x) {
+    const y = GROUND_Y - 56;
+    const body = this.physics.add.image(x, y, "px");
+    body.setAlpha(0.01);
+    body.body.setSize(28, 28, true);
+    body.body.setAllowGravity(false);
+    body.body.setImmovable(true);
+    const rd = { body, x, y, charge: 0 };
+    this.rodData.push(rd);
+    this.rodGroup.add(body);
+    return rd;
   }
 
-  _addFlipper(cx, cy, side) {
-    const w = 150, h = 18;
-    const body = this._makePxBody(cx, cy, w, h, this.staticPlatforms);
-    body.platformType = "flipper";
-    body.flipperSide = side;
-    this.flipperData.push({ body, side, cx, cy, w, h });
-    return body;
+  /** Flat ground strip from x1 to x2 at GROUND_Y. */
+  _groundStrip(x1, x2) {
+    if (x2 <= x1) return;
+    const w = x2 - x1;
+    this._addSolid(x1 + w / 2, GROUND_Y + 22, w, 44, 0x334155, "ground");
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  COLLISION CALLBACKS
-  // ═══════════════════════════════════════════════════════════════════════════
+  /** A self-contained free-fall pit: walled pocket, bounce-pad chain to climb out, sealed floor. */
+  _buildPit(x1, x2) {
+    const w = x2 - x1;
+    const cx = x1 + w / 2;
+    // Side walls of the pit (so the ball can't fall sideways out of it)
+    this._addSolid(x1, GROUND_Y + PIT_DEPTH / 2, 16, PIT_DEPTH + 60, 0x1e3a5f, "wall");
+    this._addSolid(x2, GROUND_Y + PIT_DEPTH / 2, 16, PIT_DEPTH + 60, 0x1e3a5f, "wall");
+    // Sealed floor — guarantees the ball always lands on something
+    this._addSolid(cx, PIT_FLOOR_Y + 20, w, 40, 0x1e293b, "ground");
+    // Guaranteed bounce-pad chain, alternating sides, that reaches back to GROUND_Y
+    const steps = 4;
+    for (let i = 0; i < steps; i += 1) {
+      const t = i / (steps - 1);
+      const y = PIT_FLOOR_Y - 70 - t * (PIT_DEPTH - 140);
+      const side = i % 2 === 0 ? -1 : 1;
+      const px = cx + side * (w / 2 - 70);
+      this._addPad(px, y, Math.min(150, w - 60));
+      if (i === 1) this._addCollectible(cx, y - 90, "energy");
+    }
+    this.pitZones.push({ x1, x2 });
+  }
 
-  _onPlatformCollide(pl, plat) {
-    if (plat.platformType === "pad") {
-      const params = this.paramsRef.current;
-      if (pl.body.velocity.y > 0) {
-        const bs = Math.max(280, Math.abs(pl.body.velocity.y) * Math.max(0.35, params.elasticity) + params.jumpSpeed * 0.55);
-        pl.body.setVelocityY(-bs);
-        this.reason = `Bounce pad! e=${fmt(params.elasticity, 2)} — v_after/v_before`;
+  /**
+   * A self-contained pinball chamber. Entered at ground level from the left,
+   * exited at ground level on the right — both side walls are partial,
+   * leaving a ground-level gap so the chamber never blocks forward progress.
+   * Bumpers and flippers fill the interior; an entry pad launches the ball
+   * up into play.
+   */
+  _buildPinball(x1) {
+    const cx = x1 + PIN_W / 2;
+    const x2 = x1 + PIN_W;
+    const wallH = GROUND_Y - PIN_TOP;
+    const entranceH = 120;
+    const upperWallH = wallH - entranceH;
+    // Both side walls leave the bottom `entranceH` open as a walk-through gap
+    this._addSolid(x1, PIN_TOP + upperWallH / 2, 16, upperWallH, 0x1e3a5f, "wall");
+    this._addSolid(x2, PIN_TOP + upperWallH / 2, 16, upperWallH, 0x1e3a5f, "wall");
+    // Ceiling
+    this._addSolid(cx, PIN_TOP - 10, PIN_W + 16, 20, 0x1e3a5f, "wall");
+    // Floor continues straight through
+    this._addSolid(cx, GROUND_Y + 22, PIN_W, 44, 0x334155, "ground");
+    // Launch pad just inside the entrance sends the ball up into play
+    this._addPad(x1 + 90, GROUND_Y, 110, 18);
+
+    this.bumperData.push(
+      { x: cx - 110, y: PIN_TOP + 140, r: 34 },
+      { x: cx + 120, y: PIN_TOP + 260, r: 30 },
+      { x: cx - 90, y: PIN_TOP + 390, r: 30 },
+      { x: cx + 60, y: PIN_TOP + 510, r: 32 },
+    );
+
+    this._addFlipper(cx - 120, GROUND_Y - 70, "left");
+    this._addFlipper(cx + 120, GROUND_Y - 70, "right");
+
+    this._addCollectible(cx - 60, PIN_TOP + 210, "energy");
+    this._addCollectible(cx + 70, PIN_TOP + 370, "energy");
+    this._addCollectible(cx, PIN_TOP + 490, "life");
+
+    this.pinballZones.push({ x1, x2, cx });
+    return x2;
+  }
+
+  /** One chunk of normal side-scroll terrain: a few floating platforms, maybe an enemy, maybe a rod. */
+  _buildRunChunk(startX) {
+    let x = startX;
+    const segments = 3 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < segments; i += 1) {
+      const gap = 70 + Math.random() * 140;
+      x += gap;
+      const tierRoll = Math.random();
+      const y = tierRoll < 0.5 ? GROUND_Y : tierRoll < 0.8 ? GROUND_Y - 130 : GROUND_Y - 250;
+      const pw = 110 + Math.random() * 90;
+
+      if (y < GROUND_Y) {
+        if (Math.random() < 0.3) this._addPad(x + pw / 2, y, pw);
+        else this._addSolid(x + pw / 2, y, pw, 18, 0x475569, "plat");
       }
+
+      if (Math.random() < 0.45) {
+        const shapeRoll = Math.random();
+        const dist = this.furthestX;
+        let shape = "triangle";
+        if (dist > ABILITY_MILESTONES.crush && shapeRoll < 0.32) shape = "square";
+        else if (shapeRoll < 0.6) shape = "circle";
+        this._addEnemy(x + pw * 0.5, y - 36, shape);
+      }
+      if (Math.random() < 0.3) {
+        this._addCollectible(x + pw * 0.4, y - 50, Math.random() < 0.7 ? "energy" : "life");
+      }
+      if (Math.random() < 0.16 && y === GROUND_Y) {
+        this._addSpike(x + 20, Math.min(pw - 60, 90));
+      }
+      if (Math.random() < 0.1) {
+        this._addRod(x + pw * 0.6);
+      }
+      x += pw;
+    }
+    return x + 80;
+  }
+
+  /** Master generator: extends the world to the right of the player as needed. */
+  _extendWorld() {
+    let x = this.nextSpawnX;
+    // Decide what comes next: mostly normal run, occasionally a pit or pinball pocket.
+    const roll = Math.random();
+    if (this.furthestX > 900 && roll < 0.16) {
+      const pitW = 260 + Math.random() * 120;
+      this._groundStrip(this.cursorX, x);
+      this._buildPit(x, x + pitW);
+      this.cursorX = x + pitW;
+      x = x + pitW + 60;
+    } else if (
+      this.furthestX > ABILITY_MILESTONES.pinballGate &&
+      roll < 0.30 &&
+      this.furthestX > (this._pinballCooldownX || 0)
+    ) {
+      this._groundStrip(this.cursorX, x);
+      const endX = this._buildPinball(x);
+      this.cursorX = endX;
+      x = endX + 80;
+      this._recentPinball = true;
+      this._pinballCooldownX = this.furthestX + 2400;
+    } else {
+      this._groundStrip(this.cursorX, x);
+      const endX = this._buildRunChunk(x);
+      this.cursorX = endX;
+      x = endX;
+    }
+    this.nextSpawnX = x + 200;
+  }
+
+  _buildWorld() {
+    this._groundStrip(-400, 360);
+    this.cursorX = 360;
+    this.nextSpawnX = 900;
+    for (let i = 0; i < 6; i += 1) this._extendWorld();
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     COLLISION CALLBACKS
+     ══════════════════════════════════════════════════════════════════════ */
+
+  _onPad(padBody) {
+    const pl = this.player;
+    if (pl.body.velocity.y <= 0) return;
+    const params = this.paramsRef.current;
+    const speed = Math.max(300, Math.abs(pl.body.velocity.y) * Math.max(0.35, params.elasticity) + params.jumpSpeed * 0.5);
+    pl.body.setVelocityY(-speed);
+    this.score += 10;
+    this.reason = `Pad bounce — e=${fmt(params.elasticity, 2)} kept ${fmt(params.elasticity * 100, 0)}% of your speed.`;
+  }
+
+  _onFlipper(flBody) {
+    const fd = this.flipperData.find((f) => f.body === flBody);
+    if (!fd) return;
+    const active = fd.side === "left" ? this.flipL : this.flipR;
+    const pl = this.player;
+    if (active) {
+      pl.body.setVelocityY(-820);
+      pl.body.setVelocityX(fd.side === "left" ? 360 : -360);
+      this.score += 15;
+      this.reason = "Flipper launch! Angular motion converted to a linear shot.";
+    } else if (pl.body.velocity.y > 0) {
+      pl.body.setVelocityY(-260);
+    }
+  }
+
+  _onEnemy(enemyBody) {
+    if (this.invuln > 0) return;
+    const ed = this.enemyData.find((e) => e.body === enemyBody);
+    if (!ed) return;
+    const pl = this.player;
+    const params = this.paramsRef.current;
+    const stomping = pl.body.velocity.y > 220 && pl.y < enemyBody.y - 6;
+    const pounding = this._poundActive && pl.body.velocity.y > 380;
+
+    if (ed.armored && !pounding) {
+      // Armored squares only fall to a ground pound — bumping them otherwise hurts you
+      this._damage("Armored enemy — needs Ground Pound (K) to break.");
       return;
     }
-    if (plat.platformType === "flipper") {
-      const active = plat.flipperSide === "left" ? this.flipL : this.flipR;
-      pl.body.setVelocityY(active ? -860 : -300);
-      pl.body.setVelocityX(plat.flipperSide === "left" ? 300 : -300);
-      this.score += 15;
-      this.reason = "Flipper! τ=Iα — angular acceleration becomes linear launch.";
-    }
-  }
 
-  _onPortal(portal) {
-    if (this.transitioning || this.spawnGuard > 0) return;
-    this._transitionTo(portal.portalTarget || "side");
-  }
-
-  _onEnemyHit(enemyBody) {
-    if (this.invuln > 0) return;
-    const params = this.paramsRef.current;
-    const pl = this.player;
-    if (params.superGravity && pl.body.velocity.y > 240) {
-      enemyBody.destroy();
-      this.enemyData = this.enemyData.filter(e => e.body !== enemyBody);
-      pl.body.setVelocityY(-Math.abs(pl.body.velocity.y) * 0.25);
-      this.score += 85;
-      this.reason = "Crush! Super gravity converts mgh into impact force.";
+    if (stomping || pounding) {
+      ed.hp -= pounding ? 2 : 1;
+      if (ed.hp <= 0) {
+        enemyBody.destroy();
+        this.enemyData = this.enemyData.filter((e) => e !== ed);
+        this.score += ed.armored ? 80 : 35;
+        pl.body.setVelocityY(-Math.max(380, Math.abs(pl.body.velocity.y) * 0.5));
+        this.reason = pounding ? "Ground Pound shattered the armor!" : "Stomped an enemy.";
+      } else {
+        pl.body.setVelocityY(-420);
+      }
     } else {
       const dir = pl.x > enemyBody.x ? 1 : -1;
-      this._damagePlayer("Enemy impact! Impulse=FΔt.", dir * 900, -660);
+      this._damage("Enemy collision.", dir * 520, -480);
     }
   }
 
-  _onCollect(collectBody) {
-    const cd = this.collectData.find(c => c.body === collectBody);
+  _onCollect(body) {
+    const cd = this.collectData.find((c) => c.body === body);
     if (!cd) return;
-    collectBody.destroy();
-    this.collectData = this.collectData.filter(c => c.body !== collectBody);
+    body.destroy();
+    this.collectData = this.collectData.filter((c) => c !== cd);
     if (cd.type === "life") {
       this.lives = Math.min(5, this.lives + 1);
       this.reason = "Life collected!";
     } else {
-      this.energy = Math.min(100, this.energy + 24);
+      this.energy = Math.min(100, this.energy + 22);
       this.reason = "Energy collected.";
     }
-    this.score += 50;
-    if (this.pendingTut) { this.onMsgCb(this.pendingTut); this.pendingTut = null; }
-    this._checkUnlocks();
+    this.score += 40;
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  GAME LOGIC
-  // ═══════════════════════════════════════════════════════════════════════════
+  _onRod(body) {
+    const rd = this.rodData.find((r) => r.body === body);
+    if (!rd || rd.charge <= 0) return;
+    this.energy = Math.min(100, this.energy + 26 * rd.charge);
+    this.powerJumpTtl = Math.max(this.powerJumpTtl, 1.6);
+    this.score += 50 * rd.charge;
+    this.reason = TUTORIALS.rod;
+    rd.charge = 0;
+  }
 
-  _damagePlayer(msg, kx = -280, ky = -220) {
+  /* ══════════════════════════════════════════════════════════════════════
+     GAME LOGIC
+     ══════════════════════════════════════════════════════════════════════ */
+
+  _damage(msg, kx = -260, ky = -200) {
     if (this.invuln > 0 || !this.alive) return;
-    this.invuln = 1.8;
-    const hadEnergy = this.energy > 34;
-    this.energy = Math.max(0, this.energy - 34);
-    if (!hadEnergy) this.lives--;
+    this.invuln = 1.6;
+    const hadEnergy = this.energy > 30;
+    this.energy = Math.max(0, this.energy - 30);
+    if (!hadEnergy) this.lives -= 1;
     this.player.body.setVelocity(kx, ky);
     this.reason = msg + (hadEnergy ? " Energy lost." : " Life lost!");
-    if (this.lives <= 0) { this.alive = false; }
-  }
-
-  _transitionTo(id) {
-    if (this.transitioning) return;
-    this.transitioning = true;
-    const scn = SCENES.find(s => s.id === id) || SCENES[0];
-    this.transText.setText(scn.title).setAlpha(1);
-    this.transTtl = 0.9;
-    this.time.delayedCall(900, () => this._setupScene(id));
+    if (this.lives <= 0) {
+      this.alive = false;
+      this.onDead({ score: Math.round(this.score) });
+    }
   }
 
   _checkUnlocks() {
-    if (!this.unlocks.elasticity && this.furthestX >= 1200) {
-      this.unlocks.elasticity = true; this.pendingTut = TUTORIALS.elasticity;
-    } else if (!this.unlocks.blaster && this.furthestX >= 2800) {
-      this.unlocks.blaster = true; this.pendingTut = TUTORIALS.blaster;
-    } else if (!this.unlocks.crush && this.furthestX >= 4600) {
-      this.unlocks.crush = true; this.pendingTut = TUTORIALS.crush;
+    if (!this.abilities.superJump && this.furthestX >= ABILITY_MILESTONES.superJump) {
+      this.abilities.superJump = true;
+      this.reason = TUTORIALS.superJump;
+      this.onAbility("superJump");
+    } else if (!this.abilities.crush && this.furthestX >= ABILITY_MILESTONES.crush) {
+      this.abilities.crush = true;
+      this.reason = TUTORIALS.crush;
+      this.onAbility("crush");
     }
   }
 
@@ -576,496 +504,374 @@ class GameScene extends Phaser.Scene {
     for (const b of this.bumperData) {
       const dx = pl.x - b.x, dy = pl.y - b.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < BALL_R + b.r && dist > 0) {
+      const minDist = BALL_R + b.r;
+      if (dist < minDist && dist > 0.001) {
         const nx = dx / dist, ny = dy / dist;
-        const spd = Math.max(520, Math.hypot(pl.body.velocity.x, pl.body.velocity.y) * 1.35);
+        const spd = Math.max(540, Math.hypot(pl.body.velocity.x, pl.body.velocity.y) * 1.3);
         pl.body.setVelocity(nx * spd, ny * spd);
-        pl.x = b.x + nx * (BALL_R + b.r + 2);
-        pl.y = b.y + ny * (BALL_R + b.r + 2);
-        this.score += 30;
-        this.reason = "Bumper! Elastic collision — J=Δp.";
+        pl.x = b.x + nx * (minDist + 2);
+        pl.y = b.y + ny * (minDist + 2);
+        this.score += 25;
+        this.reason = "Bumper — elastic collision, momentum redirected.";
       }
     }
   }
 
   _tickLightning(dt) {
+    // Only strikes while the player is out in the open run (not inside a pit/pinball pocket)
+    if (this.inPit || this.inPinball) return;
+
+    if (this.lightningWarn) {
+      this.lightningWarn.ttl -= dt;
+      if (this.lightningWarn.ttl <= 0) {
+        const tx = this.lightningWarn.x;
+        // Charge the nearest rod if one is close to the strike
+        let nearestRod = null, nearestDist = 130;
+        for (const rod of this.rodData) {
+          const d = Math.abs(rod.x - tx);
+          if (d < nearestDist) { nearestDist = d; nearestRod = rod; }
+        }
+        if (nearestRod) {
+          nearestRod.charge = Math.min(3, nearestRod.charge + 1);
+          this.reason = "Rod charged! Q=CV — walk into it to discharge.";
+        }
+        this.fxGfx.strikeFlashTtl = 0.25;
+        this.fxGfx.strikeX = tx;
+        if (Math.abs(this.player.x - tx) < 70 && this.invuln <= 0) {
+          this._damage("Lightning strike — stand clear of charging rods.", (Math.random() - 0.5) * 600, -480);
+        }
+        this.lightningWarn = null;
+      }
+      return;
+    }
+
     this.lightningTimer -= dt;
     if (this.lightningTimer > 0) return;
-    this.lightningTimer = 3 + Math.random() * 5;
+    this.lightningTimer = 4.5 + Math.random() * 4;
 
-    const px = this.player.x;
-    // 35% chance to target a nearby rod
-    let tx = Math.random() < 0.55 ? px + 80 + Math.random() * 420 : px - 80 - Math.random() * 320;
-    if (Math.random() < 0.35 && this.rodData.length > 0) {
-      const rod = this.rodData[Math.floor(Math.random() * this.rodData.length)];
+    // Prefer targeting near a rod so charging feels purposeful
+    let tx;
+    if (this.rodData.length > 0 && Math.random() < 0.7) {
+      const candidates = this.rodData.filter((r) => r.x > this.player.x - 200 && r.x < this.player.x + 900);
+      const rod = candidates.length ? candidates[Math.floor(Math.random() * candidates.length)] : this.rodData[0];
       tx = rod.x;
-      rod.charge = Math.min(3, rod.charge + 1);
+    } else {
+      tx = this.player.x + 200 + Math.random() * 500;
     }
-
-    // Build jagged bolt path
-    const pts = [[tx, 0]];
-    let bx = tx;
-    for (let i = 1; i < 12; i++) {
-      const t = i / 12;
-      bx = tx + (Math.random() - 0.5) * 140 * Math.sin(t * Math.PI);
-      pts.push([bx, GROUND_Y * t]);
-    }
-    pts.push([tx + (Math.random() - 0.5) * 20, GROUND_Y]);
-    this.lightningBolts.push({ pts, ttl: 0.55, maxTtl: 0.55 });
-
-    if (Math.abs(px - tx) < 50 && this.invuln <= 0)
-      this._damagePlayer("Lightning strike! V≈300MV — Q=CV, grab a charged rod.", (Math.random() - 0.5) * 700, -540);
-
-    // Rod pickup check
-    for (const rod of this.rodData) {
-      if (rod.charge <= 0) continue;
-      const dx = this.player.x - rod.x, dy = this.player.y - rod.y;
-      if (dx * dx + dy * dy < (BALL_R + 28) * (BALL_R + 28)) {
-        this.energy = Math.min(100, this.energy + 28 * rod.charge);
-        this.score += 40 * rod.charge;
-        this.reason = `Rod discharged! Q=CV — ${rod.charge} charge unit${rod.charge > 1 ? "s" : ""} of energy.`;
-        rod.charge = 0;
-        if (!this.pendingTut) this.pendingTut = TUTORIALS.lightning;
-      }
-    }
+    this.lightningWarn = { x: tx, ttl: 1.0 };
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  RENDER  — all visuals drawn here via worldGfx / lightningGfx
-  // ═══════════════════════════════════════════════════════════════════════════
+  /* ══════════════════════════════════════════════════════════════════════
+     RENDER
+     ══════════════════════════════════════════════════════════════════════ */
 
   _render() {
     const g = this.worldGfx;
     g.clear();
+    const camLeft = this.cameras.main.scrollX - 100;
+    const camRight = camLeft + W + 200;
 
-    // Ground (side scroll only — draw a floor strip)
-    if (this.sceneId === "side") {
-      g.fillStyle(0x334155, 0.88);
-      // draw ground far left to far right
-      g.fillRect(-200, GROUND_Y, this.player.x + W * 2, H - GROUND_Y + 60);
-
-      // Pitfall voids punch holes
-      for (const pit of this.pitData) {
-        g.fillStyle(0x02040c, 1);
-        g.fillRect(pit.x, GROUND_Y, pit.w, H - GROUND_Y + 60);
-        g.lineStyle(1, 0x1e293b, 1);
-        g.strokeRect(pit.x, GROUND_Y, pit.w, H - GROUND_Y + 60);
-      }
-
-      // Water sections
-      for (const w2 of this.waterData) {
-        g.fillStyle(0x38bdf8, 0.16);
-        g.fillRoundedRect(w2.x, w2.y, w2.w, w2.h, 10);
-        // animated wave line
-        g.lineStyle(3, 0x7dd3fc, 0.9);
-        g.beginPath();
-        const t = this.time.now / 420;
-        for (let i = 0; i <= 12; i++) {
-          const wx = w2.x + 6 + ((w2.w - 12) * i) / 12;
-          const wy = w2.y + 12 + Math.sin(t + (i / 12) * Math.PI * 2.5) * 7;
-          i === 0 ? g.moveTo(wx, wy) : g.lineTo(wx, wy);
-        }
-        g.strokePath();
-      }
-
-      // Spikes
-      for (const sp of this.spikeData) {
-        g.fillStyle(0xfb7185, 0.9);
-        const count = Math.max(2, Math.floor(sp.w / 18));
-        const step = sp.w / count;
-        for (let i = 0; i < count; i++) {
-          const sx = sp.x + i * step;
-          g.fillTriangle(sx, sp.y + 28, sx + step / 2, sp.y, sx + step, sp.y + 28);
-        }
-      }
-    }
-
-    // Shaft walls shading (fall/climb/pinball)
-    if (this.sceneId !== "side") {
-      const cx = SHAFT_CX;
-      const hw = this.sceneId === "pinball" ? PB_HW : SHAFT_HW;
-      g.fillStyle(0x0a1628, 0.7);
-      g.fillRect(cx - hw - 24, -120, (hw + 24) * 2 + 48, H + 240);
-      g.lineStyle(2, 0x1e3a5f, 0.8);
-      g.strokeRect(cx - hw - 12, -120, hw * 2 + 24, H + 240);
-    }
-
-    // Platforms (solid + pad)
     for (const pd of this.platData) {
-      if (pd.type === "pad") {
+      if (pd.cx + pd.w / 2 < camLeft || pd.cx - pd.w / 2 > camRight) continue;
+      if (pd.kind === "pad") {
         g.fillStyle(0x22c55e, 0.85);
         g.fillRoundedRect(pd.cx - pd.w / 2, pd.cy - pd.h / 2, pd.w, pd.h, 6);
-        g.lineStyle(2, 0x86efac, 0.6);
+        g.lineStyle(2, 0x86efac, 0.7);
         g.strokeRoundedRect(pd.cx - pd.w / 2, pd.cy - pd.h / 2, pd.w, pd.h, 6);
-      } else if (pd.color !== 0x1e3a5f) { // skip wall platforms (drawn above)
-        g.fillStyle(pd.color || 0x475569, 0.9);
+      } else if (pd.kind === "spike") {
+        g.fillStyle(0xfb7185, 0.92);
+        const count = Math.max(2, Math.floor(pd.w / 16));
+        const step = pd.w / count;
+        const baseX = pd.cx - pd.w / 2;
+        const topY = pd.cy - pd.h / 2;
+        for (let i = 0; i < count; i += 1) {
+          const sx = baseX + i * step;
+          g.fillTriangle(sx, topY + pd.h, sx + step / 2, topY, sx + step, topY + pd.h);
+        }
+      } else if (pd.kind === "wall") {
+        g.fillStyle(0x14233b, 0.92);
+        g.fillRect(pd.cx - pd.w / 2, pd.cy - pd.h / 2, pd.w, pd.h);
+        g.lineStyle(1.5, 0x2c4a72, 0.8);
+        g.strokeRect(pd.cx - pd.w / 2, pd.cy - pd.h / 2, pd.w, pd.h);
+      } else if (pd.kind === "ground") {
+        g.fillStyle(pd.color, 0.92);
+        g.fillRect(pd.cx - pd.w / 2, pd.cy - pd.h / 2, pd.w, pd.h);
+      } else {
+        g.fillStyle(pd.color, 0.92);
         g.fillRoundedRect(pd.cx - pd.w / 2, pd.cy - pd.h / 2, pd.w, pd.h, 5);
       }
     }
 
-    // Portals
-    for (const pd of this.portalData) {
-      const col = pd.target === "side" ? 0x4ade80 : pd.target === "fall" ? 0x22d3ee : 0xc4b5fd;
-      g.lineStyle(3, col, 1);
-      g.fillStyle(col, 0.18);
-      g.fillRoundedRect(pd.cx - pd.w / 2, pd.cy - pd.h / 2, pd.w, pd.h, 8);
-      g.strokeRoundedRect(pd.cx - pd.w / 2, pd.cy - pd.h / 2, pd.w, pd.h, 8);
-      // Label drawn as text separately (see create — not redrawn, stable)
-    }
-
-    // Lightning rods
-    for (const rod of this.rodData) {
-      const glow = rod.charge > 0;
-      g.fillStyle(0x94a3b8, 1);
-      g.fillRect(rod.x - 3, rod.y, 6, 100);       // pole
-      g.fillStyle(glow ? 0xfbbf24 : 0x475569, 1);
-      g.fillCircle(rod.x, rod.y, 10);              // ball tip
-      if (glow) {
-        g.lineStyle(2, 0xfde047, 0.8);
-        g.strokeCircle(rod.x, rod.y, 14);
-      }
-    }
-
-    // Bumpers (pinball)
+    // Bumpers
     for (const b of this.bumperData) {
+      if (b.x < camLeft || b.x > camRight) continue;
       g.fillStyle(0xfbbf24, 0.18);
-      g.fillCircle(b.x, b.y, b.r + 7);
-      g.fillStyle(0xfbbf24, 0.88);
+      g.fillCircle(b.x, b.y, b.r + 8);
+      g.fillStyle(0xfbbf24, 0.9);
       g.fillCircle(b.x, b.y, b.r);
       g.lineStyle(3, 0xfde68a, 1);
       g.strokeCircle(b.x, b.y, b.r);
     }
 
-    // Flippers
-    for (const fl of this.flipperData) {
-      const active = fl.side === "left" ? this.flipL : this.flipR;
-      const tilt = fl.side === "left" ? (active ? -26 : 12) : (active ? 26 : -12);
-      g.fillStyle(active ? 0xfbbf24 : 0x94a3b8, 0.9);
-      // Simple rotated rect approximation: draw as shifted rects
-      // (Phaser Graphics doesn't support rotation on individual shapes, so we draw flat and rely on the tilt being minor)
-      const lx = fl.cx - fl.w / 2, ly = fl.cy - fl.h / 2;
-      g.fillRect(lx, ly, fl.w, fl.h);
+    // Flippers (tilt drawn as a simple angled fill via 4-point poly)
+    for (const fd of this.flipperData) {
+      const active = fd.side === "left" ? this.flipL : this.flipR;
+      const tilt = (fd.side === "left" ? -1 : 1) * (active ? 0.42 : 0.16);
+      const hw = fd.w / 2, hh = fd.h / 2;
+      const cosT = Math.cos(tilt), sinT = Math.sin(tilt);
+      const pts = [
+        [-hw, -hh], [hw, -hh], [hw, hh], [-hw, hh],
+      ].map(([px, py]) => [fd.cx + px * cosT - py * sinT, fd.cy + px * sinT + py * cosT]);
+      g.fillStyle(active ? 0xfbbf24 : 0x94a3b8, 0.92);
+      g.beginPath();
+      g.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i += 1) g.lineTo(pts[i][0], pts[i][1]);
+      g.closePath();
+      g.fillPath();
     }
 
-    // Pinball 2.5D decorative overlay
-    if (this.sceneId === "pinball") {
-      const cx = SHAFT_CX;
-      // Draw table outline as a perspective trapezoid
-      g.lineStyle(3, 0xfbbf24, 0.38);
-      // top edge narrower, bottom wider — gives tilt illusion
-      const tw = PB_HW * 2;
-      g.strokeRect(cx - PB_HW, 64, tw, H - 90);
-      // Score lane lines
-      g.lineStyle(1, 0xfbbf24, 0.12);
-      for (let i = 1; i < 4; i++) {
-        g.lineBetween(cx - PB_HW, 64 + (H - 160) * i / 4, cx + PB_HW, 64 + (H - 160) * i / 4);
+    // Rods
+    for (const rd of this.rodData) {
+      if (rd.x < camLeft || rd.x > camRight) continue;
+      const glow = rd.charge > 0;
+      g.fillStyle(0x94a3b8, 1);
+      g.fillRect(rd.x - 3, rd.y - 4, 6, 96);
+      g.fillStyle(glow ? 0xfbbf24 : 0x475569, 1);
+      g.fillCircle(rd.x, rd.y - 6, 11);
+      if (glow) {
+        g.lineStyle(2, 0xfde047, 0.85);
+        g.strokeCircle(rd.x, rd.y - 6, 15 + Math.sin(this.time.now / 120) * 2);
+        for (let c = 0; c < rd.charge; c += 1) {
+          g.fillStyle(0xfde047, 1);
+          g.fillCircle(rd.x - 14 + c * 14, rd.y - 28, 3.5);
+        }
       }
-      // Cannon label
-      g.fillStyle(0x64748b, 0.8);
-      g.fillRoundedRect(cx + PB_HW - 62, 70, 54, 26, 6);
     }
 
     // Collectibles
     for (const cd of this.collectData) {
+      if (cd.body.x < camLeft || cd.body.x > camRight) continue;
       const col = cd.type === "life" ? 0xfb7185 : 0x4ade80;
-      g.fillStyle(col, 0.18);
+      g.fillStyle(col, 0.2);
       g.fillCircle(cd.body.x, cd.body.y, 20);
       g.fillStyle(col, 1);
-      g.fillCircle(cd.body.x, cd.body.y, 13);
+      g.fillCircle(cd.body.x, cd.body.y, 12);
     }
 
-    // Enemies
+    // Enemies — drawn as actual geometry shapes
     for (const ed of this.enemyData) {
       if (!ed.body.active) continue;
-      g.fillStyle(0xf87171, 0.9);
-      g.fillCircle(ed.body.x, ed.body.y, ed.r);
-      g.lineStyle(2, 0xfecaca, 0.7);
-      g.strokeCircle(ed.body.x, ed.body.y, ed.r);
+      const x = ed.body.x, y = ed.body.y, r = ed.r;
+      const baseCol = ed.armored ? 0x94a3b8 : 0xf87171;
+      const strokeCol = ed.armored ? 0xe2e8f0 : 0xfecaca;
+      g.fillStyle(baseCol, 0.92);
+      g.lineStyle(2.5, strokeCol, 0.85);
+      if (ed.shape === "square") {
+        g.fillRect(x - r, y - r, r * 2, r * 2);
+        g.strokeRect(x - r, y - r, r * 2, r * 2);
+        if (ed.hp > 1) {
+          g.lineStyle(2, 0x1e293b, 0.7);
+          g.strokeRect(x - r + 5, y - r + 5, r * 2 - 10, r * 2 - 10);
+        }
+      } else if (ed.shape === "triangle") {
+        g.fillTriangle(x, y - r, x - r, y + r, x + r, y + r);
+        g.strokeTriangle(x, y - r, x - r, y + r, x + r, y + r);
+      } else {
+        g.fillCircle(x, y, r);
+        g.strokeCircle(x, y, r);
+      }
     }
 
-    // Player — bright cyan ball so it's clearly visible
+    // Player
     const px = this.player.x, py = this.player.y;
-    const invulFlicker = this.invuln > 0 && Math.floor(this.time.now / 80) % 2 === 0;
-    if (!invulFlicker) {
-      g.fillStyle(0x3b82f6, 0.22);
+    const flicker = this.invuln > 0 && Math.floor(this.time.now / 80) % 2 === 0;
+    if (!flicker) {
+      const boosted = this.powerJumpTtl > 0;
+      g.fillStyle(boosted ? 0xfbbf24 : 0x3b82f6, 0.22);
       g.fillCircle(px, py, BALL_R + 8);
       g.fillStyle(0xf0f9ff, 1);
       g.fillCircle(px, py, BALL_R);
-      g.lineStyle(3, 0x38bdf8, 1);
+      g.lineStyle(3, boosted ? 0xfbbf24 : 0x38bdf8, 1);
       g.strokeCircle(px, py, BALL_R);
-      // Velocity direction dot
-      const vx = this.player.body.velocity.x, vy = this.player.body.velocity.y;
-      const spd = Math.hypot(vx, vy);
-      if (spd > 40) {
-        const scale = Math.min(BALL_R - 4, spd * 0.022);
-        g.fillStyle(0x38bdf8, 0.85);
-        g.fillCircle(px + (vx / spd) * (BALL_R - 6), py + (vy / spd) * (BALL_R - 6), scale);
-      }
     }
 
-    // Lightning
-    const lg = this.lightningGfx;
-    lg.clear();
-    this.lightningBolts = this.lightningBolts.filter(b => b.ttl > 0);
-    for (const bolt of this.lightningBolts) {
-      const fade = bolt.ttl / bolt.maxTtl;
-      const flicker = Math.floor(bolt.ttl * 24) % 2 === 0 ? 1 : 0.55;
-      const a = fade * flicker;
-      lg.lineStyle(18, 0x93c5fd, 0.32 * a);
-      lg.beginPath();
-      bolt.pts.forEach(([bx, by], i) => i === 0 ? lg.moveTo(bx, by) : lg.lineTo(bx, by));
-      lg.strokePath();
-      lg.lineStyle(4, 0xe0f2fe, a);
-      lg.beginPath();
-      bolt.pts.forEach(([bx, by], i) => i === 0 ? lg.moveTo(bx, by) : lg.lineTo(bx, by));
-      lg.strokePath();
-      lg.lineStyle(2, 0xffffff, a);
-      lg.beginPath();
-      bolt.pts.forEach(([bx, by], i) => i === 0 ? lg.moveTo(bx, by) : lg.lineTo(bx, by));
-      lg.strokePath();
-      // Strike flash
-      const last = bolt.pts[bolt.pts.length - 1];
-      lg.fillStyle(0xfde047, 0.65 * a);
-      lg.fillCircle(last[0], last[1], 12);
+    // Pit / pinball zone tint (helps the player read where they are)
+    if (this.inPit) {
+      g.fillStyle(0x0ea5e9, 0.04);
+      g.fillRect(camLeft, GROUND_Y, camRight - camLeft, PIT_DEPTH + 80);
+    }
+
+    // Lightning warning + flash
+    const fx = this.fxGfx;
+    fx.clear();
+    if (this.lightningWarn) {
+      const a = 0.35 + 0.35 * Math.sin(this.time.now / 60);
+      fx.lineStyle(3, 0xfde047, a);
+      fx.lineBetween(this.lightningWarn.x, 0, this.lightningWarn.x, GROUND_Y);
+      fx.fillStyle(0xfde047, a * 0.5);
+      fx.fillCircle(this.lightningWarn.x, 40, 10);
+    }
+    if (fx.strikeFlashTtl > 0) {
+      fx.strikeFlashTtl -= 1 / 60;
+      const a = Math.max(0, fx.strikeFlashTtl / 0.25);
+      fx.lineStyle(10, 0xe0f2fe, a * 0.7);
+      fx.lineBetween(fx.strikeX, 0, fx.strikeX, GROUND_Y);
+      fx.lineStyle(3, 0xffffff, a);
+      fx.lineBetween(fx.strikeX, 0, fx.strikeX, GROUND_Y);
+      fx.fillStyle(0xfde047, a * 0.6);
+      fx.fillCircle(fx.strikeX, GROUND_Y, 14);
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  //  MAIN UPDATE LOOP
-  // ═══════════════════════════════════════════════════════════════════════════
+  /* ══════════════════════════════════════════════════════════════════════
+     MAIN UPDATE
+     ══════════════════════════════════════════════════════════════════════ */
 
   update(time, delta) {
-    if (!this.alive || this.transitioning) { this._render(); return; }
+    if (!this.alive) { this._render(); return; }
     const dt = Math.min(delta / 1000, 0.05);
     const params = this.paramsRef.current;
-    // Update held-key axes each frame
-    const k = this.keys;
-    this._inp.left  = k.left.isDown  || k.a.isDown;
-    this._inp.right = k.right.isDown || k.d.isDown;
-    this._inp.up    = k.up.isDown    || k.w.isDown;
-    this._inp.down  = k.down.isDown  || k.s.isDown;
-    const input = this._inp;
-    const pl     = this.player;
+    const pl = this.player;
 
-    // ── Apply live physics params ─────────────────────────────────────────────
+    const k = this.keys;
+    const left = k.left.isDown || k.a.isDown;
+    const right = k.right.isDown || k.d.isDown;
+
     this.physics.world.gravity.y = params.gravity;
-    // elasticity handled in bounce pad callback, drag = friction
     pl.body.setDragX(params.friction * 900);
 
-    // ── Time / score ──────────────────────────────────────────────────────────
-    this.survivedSec += dt;
-    this.spawnGuard   = Math.max(0, this.spawnGuard - dt);
-    this.difficulty   = 1 + this.survivedSec / 18;
-    this.score       += dt * (100 + this.difficulty * 16);
-    this.invuln       = Math.max(0, this.invuln - dt);
-    this.furthestX    = Math.max(this.furthestX, pl.x);
+    this.furthestX = Math.max(this.furthestX, pl.x);
+    this.score += dt * 60;
+    this.invuln = Math.max(0, this.invuln - dt);
+    this.powerJumpTtl = Math.max(0, this.powerJumpTtl - dt);
+    this._poundActive = false;
 
-    // ── Horizontal input ──────────────────────────────────────────────────────
-    const horiz = (input.right ? 1 : 0) - (input.left ? 1 : 0);
-    if (params.mode === "velocity") {
-      const target = horiz * (240 + params.controlGain * 210);
-      const diff   = target - pl.body.velocity.x;
-      const lerpF  = pl.body.blocked.down ? 10.5 : 4.5;
-      pl.body.setVelocityX(pl.body.velocity.x + diff * lerpF * dt);
-    } else {
-      pl.body.setAccelerationX(horiz !== 0 ? horiz * params.controlGain * 760 : 0);
-    }
+    // Horizontal control
+    const horiz = (right ? 1 : 0) - (left ? 1 : 0);
+    const target = horiz * (230 + params.controlGain * 220);
+    const onGround = pl.body.blocked.down;
+    const lerpF = onGround ? 11 : 4.5;
+    pl.body.setVelocityX(pl.body.velocity.x + (target - pl.body.velocity.x) * Math.min(1, lerpF * dt));
 
-    // ── Jump ──────────────────────────────────────────────────────────────────
-    if (input.jumpQueued && pl.body.blocked.down) {
+    // Jump
+    if (this._jumpQueued && onGround) {
       pl.body.setVelocityY(-params.jumpSpeed);
-      this.reason = `Jump! v₀ = ${fmt(params.jumpSpeed, 0)} px/s, max height ≈ ${fmt(params.jumpSpeed * params.jumpSpeed / (2 * params.gravity), 0)} px`;
+      this.reason = `Jump — v0=${fmt(params.jumpSpeed, 0)} px/s, peak height ≈ ${fmt((params.jumpSpeed * params.jumpSpeed) / (2 * params.gravity), 0)} px`;
     }
-    input.jumpQueued = false;
+    this._jumpQueued = false;
 
-    // ── Super gravity ─────────────────────────────────────────────────────────
-    if (input.superGravity && this.unlocks.crush && this.energy >= 30) {
-      pl.body.setVelocityY(pl.body.velocity.y + params.gravity * 1.35 * dt);
-      this.energy = Math.max(0, this.energy - 8 * dt);
+    // Power jump (ability-gated)
+    if (this._powerJumpQueued && this.abilities.superJump && onGround && this.energy >= 18) {
+      pl.body.setVelocityY(-params.jumpSpeed * 1.65);
+      this.energy = Math.max(0, this.energy - 18);
+      this.reason = "Power Jump! 1.65x launch velocity.";
+    }
+    this._powerJumpQueued = false;
+
+    // Ground pound (ability-gated) — drives the ball down fast, flagged for one frame
+    if (this._poundQueued && this.abilities.crush && !onGround) {
+      pl.body.setVelocityY(Math.max(pl.body.velocity.y, params.gravity * 0.5));
+      this._poundActive = true;
+      this.reason = "Ground Pound engaged — break armored enemies on landing.";
+    }
+    if (this.keys.k.isDown && this.abilities.crush && !onGround) {
+      this._poundActive = true;
+    }
+    this._poundQueued = false;
+
+    // Determine current zone (pit / pinball / open run) by X position
+    this.inPit = this.pitZones.some((z) => pl.x > z.x1 + 10 && pl.x < z.x2 - 10);
+    this.inPinball = this.pinballZones.some((z) => pl.x > z.x1 + 10 && pl.x < z.x2 - 10);
+
+    if (this.inPit) {
+      // Side walls already collide via solidGroup; just clamp as a safety net
+      pl.x = clamp(pl.x, -2000, 100000);
     }
 
-    // ── Scene-specific updates ────────────────────────────────────────────────
-    if      (this.sceneId === "side")    this._updateSide(dt, input);
-    else if (this.sceneId === "fall")    this._updateFall(dt);
-    else if (this.sceneId === "climb")   this._updateClimb(dt);
-    else if (this.sceneId === "pinball") this._updatePinball(dt, input);
+    if (this.inPinball) {
+      // Only clamp while airborne above the entrance gap — at ground level the
+      // gap is the walk-through path in and out, so it must stay open.
+      const aboveEntrance = pl.y < GROUND_Y - 130;
+      if (aboveEntrance) {
+        const zone = this.pinballZones.find((z) => pl.x > z.x1 && pl.x < z.x2);
+        if (zone) {
+          if (pl.x < zone.x1 + BALL_R + 20) pl.x = zone.x1 + BALL_R + 20;
+          if (pl.x > zone.x2 - BALL_R - 20) pl.x = zone.x2 - BALL_R - 20;
+        }
+      }
+      this._checkBumpers();
+      this.flipL = this.keys.z.isDown;
+      this.flipR = this.keys.x.isDown;
+    }
 
-    // ── Enemy AI ──────────────────────────────────────────────────────────────
+    // Enemy behavior
     for (const ed of this.enemyData) {
       if (!ed.body.active) continue;
-      ed.phase += dt * 2.4;
-      if (ed.behavior === "hover") {
-        ed.body.y = ed.baseY + Math.sin(ed.phase) * ed.ampY;
-      } else if (ed.behavior === "zigzag") {
-        ed.body.body.setVelocityX(Math.sin(ed.phase * 1.35) * 120);
+      ed.phase += dt * 2.2;
+      if (ed.shape === "circle") {
+        ed.body.y = ed.baseY + Math.sin(ed.phase) * 26;
+      } else if (ed.shape === "triangle") {
+        if (ed.body.body.blocked.left || ed.body.body.velocity.x < -400) ed.dir = 1;
+        if (ed.body.body.blocked.right || ed.body.body.velocity.x > 400) ed.dir = -1;
       }
     }
 
-    // ── Pitfall check (side scroll) ───────────────────────────────────────────
-    if (this.sceneId === "side") {
-      for (const pit of this.pitData) {
-        if (pl.x > pit.x && pl.x < pit.x + pit.w && pl.y > GROUND_Y + 100) {
-          this._transitionTo("fall"); break;
-        }
-      }
+    // Lightning (only in open run zones)
+    this._tickLightning(dt);
+
+    // Fell into a never-ending abyss (shouldn't happen given sealed floors, but a safety net)
+    if (pl.y > PIT_FLOOR_Y + 400) {
+      pl.body.reset(pl.x, GROUND_Y - 200);
+      pl.body.setVelocity(0, 0);
+      this._damage("Fell through the floor — repositioned.", 0, 0);
     }
 
-    // ── Water drag (side scroll) ──────────────────────────────────────────────
-    if (this.sceneId === "side") {
-      for (const wz of this.waterData) {
-        if (pl.x > wz.x && pl.x < wz.x + wz.w && pl.y + BALL_R > wz.y && pl.y - BALL_R < wz.y + wz.h) {
-          pl.body.setVelocityX(pl.body.velocity.x * 0.88);
-          pl.body.setVelocityY(pl.body.velocity.y * 0.78);
-          pl.body.blocked.down = true; // allow jump from water surface
-          this.reason = "Water drag! F=bv — jump to a hop platform above.";
-        }
-      }
-    }
+    this._checkUnlocks();
 
-    // ── Bumpers (pinball) ─────────────────────────────────────────────────────
-    if (this.sceneId === "pinball") this._checkBumpers();
+    // World generation
+    if (pl.x + W * 1.3 > this.nextSpawnX) this._extendWorld();
 
-    // ── Lightning (side scroll) ───────────────────────────────────────────────
-    if (this.sceneId === "side") this._tickLightning(dt);
-
-    // ── Spawn new content ─────────────────────────────────────────────────────
-    if (this.sceneId === "side" && pl.x + W * 1.4 > this.nextSpawnX) this._spawnSideChunk();
-    if (this.sceneId === "fall"  && pl.y + H * 1.2 > this.nextSpawnY)  this._spawnFallChunk();
-    if (this.sceneId === "climb" && pl.y - H * 0.9 < this.nextSpawnY)  this._spawnClimbChunk();
-
-    // ── Goal ─────────────────────────────────────────────────────────────────
-    if (this.furthestX >= this.goalX) {
-      this.onMsgCb(TUTORIALS.pi || "π milestone!");
-      this.goalX += 12000;
-      this.score += 500;
-    }
-
-    // ── Transition text fade ──────────────────────────────────────────────────
-    if (this.transTtl > 0) {
-      this.transTtl -= dt;
-      this.transText.setAlpha(Math.max(0, this.transTtl / 0.9));
-    }
-
-    // ── Bolt ttl ──────────────────────────────────────────────────────────────
-    for (const b of this.lightningBolts) b.ttl -= dt;
-
-    // ── Render ────────────────────────────────────────────────────────────────
     this._render();
 
-    // ── Push stats to React (throttled via simple counter) ───────────────────
     this.onScore(Math.round(this.score));
     this.onEnergy(Math.round(this.energy));
-    this.onSceneCb(this.sceneId);
-    if (this.reason) { this.onMsgCb(this.reason); this.reason = ""; }
-  }
-
-  // ── Per-scene update helpers ─────────────────────────────────────────────────
-
-  _updateSide(dt) {
-    const pl = this.player;
-    // Force camera Y to 0 — no vertical scroll in side scroll
-    this.cameras.main.scrollY = 0;
-    // Prevent player from going off left edge
-    const camLeft = this.cameras.main.scrollX;
-    if (pl.x < camLeft + BALL_R + 28) {
-      pl.x = camLeft + BALL_R + 28;
-      if (pl.body.velocity.x < 0) pl.body.setVelocityX(80);
-    }
-    // Fell below world
-    if (this.spawnGuard <= 0 && pl.y > H + 120) this._transitionTo("fall");
-  }
-
-  _updateFall(dt) {
-    const pl = this.player;
-    const cx = SHAFT_CX;
-    pl.x = Phaser.Math.Clamp(pl.x, cx - SHAFT_HW + BALL_R, cx + SHAFT_HW - BALL_R);
-    // Wall bounce
-    if (pl.x <= cx - SHAFT_HW + BALL_R + 2 || pl.x >= cx + SHAFT_HW - BALL_R - 2) {
-      pl.body.setVelocityX(-pl.body.velocity.x * Math.max(0.25, this.paramsRef.current.elasticity));
-    }
-    // Exit at bottom
-    if (this.spawnGuard <= 0 && pl.y > H - 60) {
-      this.score += 220;
-      this.energy = Math.min(100, this.energy + 18);
-      this._transitionTo("side");
-    }
-  }
-
-  _updateClimb(dt) {
-    const pl = this.player;
-    const cx = SHAFT_CX;
-    pl.x = Phaser.Math.Clamp(pl.x, cx - SHAFT_HW + BALL_R, cx + SHAFT_HW - BALL_R);
-    if (pl.x <= cx - SHAFT_HW + BALL_R + 2 || pl.x >= cx + SHAFT_HW - BALL_R - 2) {
-      pl.body.setVelocityX(-pl.body.velocity.x * Math.max(0.25, this.paramsRef.current.elasticity));
-    }
-    // Danger floor
-    if (pl.y > H - 78) {
-      pl.body.setVelocityY(-Math.max(300, Math.abs(pl.body.velocity.y)));
-      this.energy = Math.max(0, this.energy - 12);
-      this.reason = "Danger floor! Use bounce pads — potential energy PE=mgh.";
-    }
-    // Exit at top
-    if (this.spawnGuard <= 0 && pl.y < 68) {
-      this.score += 260;
-      this.energy = Math.min(100, this.energy + 24);
-      this._transitionTo("side");
-    }
-  }
-
-  _updatePinball(dt, input) {
-    const pl = this.player;
-    const cx = SHAFT_CX;
-    pl.x = Phaser.Math.Clamp(pl.x, cx - PB_HW + BALL_R, cx + PB_HW - BALL_R);
-    if (pl.x <= cx - PB_HW + BALL_R + 2 || pl.x >= cx + PB_HW - BALL_R - 2) {
-      pl.body.setVelocityX(-pl.body.velocity.x * Math.max(0.5, this.paramsRef.current.elasticity));
-    }
-    if (pl.y < 68 + BALL_R) {
-      pl.y = 68 + BALL_R;
-      pl.body.setVelocityY(Math.abs(pl.body.velocity.y) * 0.65);
-    }
-    // Drain
-    if (pl.y > H - 18) {
-      this.energy = Math.max(0, this.energy - 20);
-      this._transitionTo("side");
-    }
-    // Space = both flippers
-    if (input.jumpQueued) {
-      this.flipL = true; this.flipR = true;
-      this.time.delayedCall(130, () => { this.flipL = false; this.flipR = false; });
-    }
+    if (this.reason) { this.onMsg(this.reason); this.reason = ""; }
   }
 }
-// ─── React Component ────────────────────────────────────────────────────────
+
+/* ════════════════════════════════════════════════════════════════════════
+   REACT COMPONENT
+   ════════════════════════════════════════════════════════════════════════ */
 const C = {
-  bg: "#0f172a", panel: "#1e293b", border: "#334155",
-  teal: "#38bdf8", text: "#e2e8f0", sub: "#94a3b8",
+  bg: "#0b1422", panel: "#16202f", border: "#2a3a50",
+  teal: "#38bdf8", text: "#e6eef7", sub: "#8fa3bb",
   green: "#4ade80", yellow: "#fbbf24", red: "#f87171",
 };
 
-const SLIDER_DEFS = [
-  { key: "gravity",     label: "Gravity",      min: 100,  max: 1800, step: 50,  unit: "m/s²", eq: "F=mg" },
-  { key: "jumpSpeed",   label: "Jump Speed",   min: 150,  max: 900,  step: 25,  unit: "m/s",  eq: "v=gt" },
-  { key: "elasticity",  label: "Elasticity",   min: 0.1,  max: 1.0,  step: 0.05,unit: "e",    eq: "e=v₂/v₁" },
-  { key: "friction",    label: "Friction",     min: 0,    max: 1.0,  step: 0.05,unit: "μ",    eq: "f=μN" },
-  { key: "controlGain", label: "Control Gain", min: 0.2,  max: 3.0,  step: 0.1, unit: "×",    eq: "a=Fnet/m" },
+const BASE_SLIDERS = [
+  { key: "gravity", label: "Gravity", min: 300, max: 1600, step: 25, eq: "F = mg" },
+  { key: "jumpSpeed", label: "Jump Speed", min: 250, max: 800, step: 10, eq: "v\u2080 = \u221A(2gh)" },
 ];
+const UNLOCKED_SLIDERS = {
+  superJump: { key: "controlGain", label: "Control Gain", min: 0.3, max: 2.6, step: 0.1, eq: "a = F/m" },
+  crush: { key: "elasticity", label: "Elasticity", min: 0.15, max: 1.0, step: 0.05, eq: "e = v\u2082/v\u2081" },
+};
 
 export default function RealityRunner() {
-  const navigate = useNavigate();
-  const mountRef  = useRef(null);
-  const gameRef   = useRef(null);
+  const mountRef = useRef(null);
+  const gameRef = useRef(null);
   const paramsRef = useRef(null);
 
   const [params, setParams] = useState({
-    gravity: 800, jumpSpeed: 480, elasticity: 0.65,
-    friction: 0.12, controlGain: 1.0, motionMode: "side",
+    gravity: 760, jumpSpeed: 480, elasticity: 0.62, friction: 0.1, controlGain: 1.0,
   });
-  const [score, setScore]   = useState(0);
-  const [energy, setEnergy] = useState(80);
-  const [scene, setScene]   = useState("side");
-  const [msg, setMsg]       = useState("");
+  const [score, setScore] = useState(0);
+  const [energy, setEnergy] = useState(90);
+  const [msg, setMsg] = useState("");
+  const [abilities, setAbilities] = useState({ superJump: false, crush: false });
+  const [dead, setDead] = useState(null);
+  const [runId, setRunId] = useState(0);
 
-  // keep paramsRef in sync — Phaser reads this every frame
   paramsRef.current = params;
 
   useEffect(() => {
@@ -1077,112 +883,135 @@ export default function RealityRunner() {
       width: W,
       height: H,
       parent: mountRef.current,
-      backgroundColor: "#0f172a",
-      physics: {
-        default: "arcade",
-        arcade: { gravity: { y: params.gravity }, debug: false },
-      },
+      backgroundColor: "#0b1422",
+      physics: { default: "arcade", arcade: { gravity: { y: params.gravity }, debug: false } },
       scene: [GameScene],
     };
 
     const game = new Phaser.Game(config);
     game.registry.set("paramsRef", pr);
-    game.registry.set("onScore",  (v) => setScore(v));
+    game.registry.set("onScore", (v) => setScore(v));
     game.registry.set("onEnergy", (v) => setEnergy(v));
-    game.registry.set("onScene",  (v) => setScene(v));
-    game.registry.set("onMsg",    (v) => setMsg(v));
+    game.registry.set("onAbility", (key) => setAbilities((prev) => ({ ...prev, [key]: true })));
+    game.registry.set("onMsg", (v) => setMsg(v));
+    game.registry.set("onDead", (info) => setDead(info));
     gameRef.current = game;
 
     return () => { game.destroy(true); gameRef.current = null; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runId]);
 
   const handleParam = useCallback((key, val) => {
-    setParams(prev => ({ ...prev, [key]: val }));
+    setParams((prev) => ({ ...prev, [key]: val }));
   }, []);
 
   const reset = useCallback(() => {
-    const g = gameRef.current;
-    if (!g) return;
-    const s = g.scene.getScene("GameScene");
-    if (s) s.scene.restart();
-    setScore(0); setEnergy(80); setScene("side"); setMsg("");
+    setScore(0);
+    setEnergy(90);
+    setMsg("");
+    setAbilities({ superJump: false, crush: false });
+    setDead(null);
+    setRunId((id) => id + 1);
   }, []);
 
   const energyColor = energy > 60 ? C.green : energy > 25 ? C.yellow : C.red;
+  const visibleSliders = [
+    ...BASE_SLIDERS,
+    ...(abilities.superJump ? [UNLOCKED_SLIDERS.superJump] : []),
+    ...(abilities.crush ? [UNLOCKED_SLIDERS.crush] : []),
+  ];
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: C.bg, color: C.text, fontFamily: "monospace" }}>
+    <div style={{ display: "flex", height: "100vh", background: C.bg, color: C.text, fontFamily: "ui-monospace, monospace" }}>
       {/* Sidebar */}
-      <div style={{ width: 220, background: C.panel, borderRight: `1px solid ${C.border}`, padding: "14px 12px", display: "flex", flexDirection: "column", gap: 10, overflowY: "auto", flexShrink: 0 }}>
-        <button onClick={() => navigate("/games")} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", color: C.sub, cursor: "pointer", fontSize: 13, padding: 0, marginBottom: 4 }}>
-          <ArrowLeft size={14} /> Back
-        </button>
+      <div style={{ width: 240, background: C.panel, borderRight: `1px solid ${C.border}`, padding: "14px 14px", display: "flex", flexDirection: "column", gap: 12, overflowY: "auto", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, color: C.sub, fontSize: 13 }}>
+          <ArrowLeft size={14} />
+          <span>Reality Runner</span>
+        </div>
+        <div style={{ fontSize: 11, color: C.sub }}>Physics Sandbox · Side-scroll</div>
 
-        <div style={{ fontSize: 15, fontWeight: 700, color: C.teal, letterSpacing: 1 }}>REALITY RUNNER</div>
-        <div style={{ fontSize: 11, color: C.sub }}>Physics Sandbox</div>
-
-        {/* Status */}
-        <div style={{ background: C.bg, borderRadius: 8, padding: "8px 10px", fontSize: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-            <span style={{ color: C.sub }}>Score</span>
-            <span style={{ color: C.teal }}>{score}</span>
-          </div>
+        <div style={{ background: C.bg, borderRadius: 10, padding: "10px 12px", fontSize: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-            <span style={{ color: C.sub }}>Scene</span>
-            <span style={{ color: C.yellow, textTransform: "capitalize" }}>{scene}</span>
+            <span style={{ color: C.sub }}>Score</span>
+            <span style={{ color: C.teal, fontWeight: 700 }}>{score}</span>
           </div>
-          <div style={{ fontSize: 11, color: C.sub, marginBottom: 3 }}>Energy</div>
-          <div style={{ background: C.border, borderRadius: 4, height: 8 }}>
-            <div style={{ width: `${energy}%`, height: "100%", background: energyColor, borderRadius: 4, transition: "width 0.2s" }} />
+          <div style={{ fontSize: 11, color: C.sub, marginBottom: 4 }}>Energy</div>
+          <div style={{ background: C.border, borderRadius: 5, height: 9 }}>
+            <div style={{ width: `${energy}%`, height: "100%", background: energyColor, borderRadius: 5, transition: "width 0.2s" }} />
           </div>
         </div>
 
-        {/* Message */}
         {msg && (
-          <div style={{ background: "#1e3a5f", border: `1px solid ${C.teal}`, borderRadius: 6, padding: "6px 9px", fontSize: 11, color: C.teal, lineHeight: 1.5 }}>
+          <div style={{ background: "#142840", border: `1px solid ${C.teal}55`, borderRadius: 8, padding: "8px 10px", fontSize: 11.5, color: C.teal, lineHeight: 1.5 }}>
             {msg}
           </div>
         )}
 
-        {/* Sliders */}
-        {SLIDER_DEFS.map(({ key, label, min, max, step, unit, eq }) => (
-          <div key={key} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
-              <span style={{ color: C.sub }}>{label}</span>
-              <span style={{ color: C.teal }}>{params[key]}{unit === "×" ? "×" : ""}</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {visibleSliders.map(({ key, label, min, max, step, eq }) => (
+            <div key={key} style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11.5 }}>
+                <span style={{ color: C.sub }}>{label}</span>
+                <span style={{ color: C.teal }}>{fmt(params[key], 2)}</span>
+              </div>
+              <div style={{ fontSize: 10, color: "#5b7290" }}>{eq}</div>
+              <input
+                type="range" min={min} max={max} step={step} value={params[key]}
+                onChange={(e) => handleParam(key, parseFloat(e.target.value))}
+                style={{ width: "100%", accentColor: C.teal }}
+              />
             </div>
-            <div style={{ fontSize: 10, color: "#64748b", marginBottom: 1 }}>{eq}</div>
-            <input type="range" min={min} max={max} step={step} value={params[key]}
-              onChange={e => handleParam(key, parseFloat(e.target.value))}
-              style={{ width: "100%", accentColor: C.teal }} />
-          </div>
-        ))}
-
-        {/* Motion Mode */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <div style={{ fontSize: 11, color: C.sub }}>Motion Mode</div>
-          {["side", "fall", "climb", "pinball"].map(m => (
-            <button key={m} onClick={() => handleParam("motionMode", m)}
-              style={{ padding: "4px 8px", borderRadius: 5, border: `1px solid ${params.motionMode === m ? C.teal : C.border}`, background: params.motionMode === m ? "#1e3a5f" : "transparent", color: params.motionMode === m ? C.teal : C.sub, fontSize: 12, cursor: "pointer", textTransform: "capitalize" }}>
-              {m}
-            </button>
           ))}
         </div>
 
-        {/* Reset */}
-        <button onClick={reset} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: "auto", padding: "8px", borderRadius: 7, border: `1px solid ${C.border}`, background: "transparent", color: C.sub, cursor: "pointer", fontSize: 12 }}>
-          <RotateCcw size={13} /> Reset
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div style={{ fontSize: 11, color: C.sub }}>Abilities</div>
+          {[
+            { key: "superJump", label: "Power Jump (J)" },
+            { key: "crush", label: "Ground Pound (K)" },
+          ].map((a) => (
+            <div key={a.key} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 12, color: abilities[a.key] ? C.green : C.sub, padding: "5px 8px", borderRadius: 7, border: `1px solid ${abilities[a.key] ? C.green + "55" : C.border}` }}>
+              {abilities[a.key] ? <Unlock size={13} /> : <Lock size={13} />}
+              {a.label}
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={reset}
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: "auto", padding: "9px", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.sub, cursor: "pointer", fontSize: 12.5 }}
+        >
+          <RotateCcw size={13} /> Reset run
         </button>
 
-        <div style={{ fontSize: 10, color: "#475569", textAlign: "center" }}>
-          WASD / Arrow keys<br />Space = jump
+        <div style={{ fontSize: 10.5, color: "#5b7290", lineHeight: 1.6 }}>
+          ←/→ or A/D — move<br />
+          Space / Up / W — jump<br />
+          J — power jump (unlocked)<br />
+          K — ground pound (unlocked)<br />
+          Z / X — pinball flippers
         </div>
       </div>
 
-      {/* Game Canvas */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      {/* Canvas */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", position: "relative" }}>
         <div ref={mountRef} style={{ width: W, height: H }} />
+
+        {dead && (
+          <div style={{ position: "absolute", inset: 0, background: "rgba(8,14,24,0.82)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 16, padding: "28px 36px", textAlign: "center" }}>
+              <div style={{ fontSize: 13, color: C.sub, letterSpacing: 1, marginBottom: 6 }}>RUN OVER</div>
+              <div style={{ fontSize: 30, fontWeight: 800, color: C.teal, marginBottom: 18 }}>{dead.score} pts</div>
+              <button
+                onClick={reset}
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", borderRadius: 10, border: "none", background: C.teal, color: "#06121f", fontWeight: 700, cursor: "pointer", fontSize: 14 }}
+              >
+                <Zap size={15} /> Run again
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
