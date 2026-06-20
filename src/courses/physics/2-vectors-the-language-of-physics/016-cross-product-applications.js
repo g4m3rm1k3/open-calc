@@ -576,7 +576,7 @@ cases = {
 };
 disp('Orientation efficiency:')
 for i = 1:3
-    [~, n] = tri_info(cases{i,1}, cases{i,2}, cases{i,3});
+    [area_skip, n] = tri_info(cases{i,1}, cases{i,2}, cases{i,3});
     fprintf('  %s: %.1f%%\\n', cases{i,4}, abs(dot(n, sun))*100)
 end`,
           prose: [

@@ -1,4 +1,4 @@
-﻿export default {
+export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la4-002',
   slug: 'gram-schmidt',
@@ -179,7 +179,7 @@ fprintf('  X-Z: %.6f rad (%.4f arcsec)\\n', VtV(1,3), VtV(1,3)*206265)
 fprintf('  Y-Z: %.6f rad (%.4f arcsec)\\n', VtV(2,3), VtV(2,3)*206265)
 
 % Gram-Schmidt orthogonalization
-[Q, ~] = qr(V);
+[Q, R_skip] = qr(V);
 fprintf('\\nAfter Gram-Schmidt — Q''*Q (perfect identity):\\n')
 disp(Q'*Q)
 fprintf('Max residual: %.2e\\n', max(max(abs(Q'*Q - eye(3)))))`,

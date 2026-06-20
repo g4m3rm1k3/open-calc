@@ -461,7 +461,7 @@ sigma_true = 4.0;
 wear = 5 + 2.8 .* t_obs + sigma_true .* randn(length(t_obs), 1);
 
 T = [ones(length(t_obs), 1) t_obs];
-[b, bint, ~, ~, stats] = regress(wear, T);
+[b, bint, resid, rint, stats] = regress(wear, T);
 
 fprintf('Estimated wear rate: %.3f µm/min  (true: 2.800)\\n', b(2));
 fprintf('95%% CI for slope:  (%.3f, %.3f) µm/min\\n', bint(2,1), bint(2,2));

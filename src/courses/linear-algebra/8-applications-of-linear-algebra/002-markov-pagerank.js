@@ -172,7 +172,7 @@ sum(P, 2)
 disp('Eigenvalues of P^T:')
 diag(D)
 % Find eigenvalue closest to 1
-[~, idx] = min(abs(diag(D) - 1))
+[min_val, idx] = min(abs(diag(D) - 1))
 pi_stat = abs(V(:, idx))
 pi_stat = pi_stat / sum(pi_stat)  % normalize
 disp('Stationary distribution [Sunny, Cloudy, Rainy]:')

@@ -122,8 +122,8 @@ disp('R in basis B (should be rotation matrix still, but different entries):')
 R_new
 
 % Verify: same eigenvalues
-[~, D_std]  = eig(R)
-[~, D_new]  = eig(R_new)
+[V_std, D_std]  = eig(R)
+[V_new, D_new]  = eig(R_new)
 disp('Eigenvalues of R in standard basis:')
 diag(D_std)
 disp('Eigenvalues of R in new basis (same!):')

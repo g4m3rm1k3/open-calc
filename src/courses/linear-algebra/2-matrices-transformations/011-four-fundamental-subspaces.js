@@ -325,7 +325,7 @@ b1 = [1; 2; 3]   % test: is b1 in C(A)?
 b2 = [1; 2; 4]   % test: is b2 in C(A)?
 
 % Find basis for left null space N(A')
-[U, S, ~] = svd(A)
+[U, S, V_skip] = svd(A)
 r = rank(A)
 left_null = U(:, r+1:end)
 disp('Left null space basis:')
