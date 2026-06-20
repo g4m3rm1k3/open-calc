@@ -723,7 +723,52 @@ export default {
     'Three.js: PerspectiveCamera(fov, aspect, near, far) + camera.lookAt() = P and V. mesh.matrix = M.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(localPosition, 1.0)." Which matrix is applied to a vertex first?',
+      options: [
+        'The projection matrix — it runs first because it is leftmost',
+        'The model matrix — matrices apply right-to-left, so the rightmost (model) transforms the local vertex into world space first',
+        'The view matrix — cameras always process geometry before positioning it',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"View = inverse(camera world matrix)." A camera at position (0, 5, 10) looking at the origin. What does the view matrix do to the scene?',
+      options: [
+        'It moves the camera to (0, 5, 10)',
+        'It translates the entire scene by (-0, -5, -10) and rotates it so the camera direction aligns with the -Z axis — placing the viewer at the origin',
+        'It scales the scene to match the camera\'s field of view',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Projection: f = 1/tan(fov/2) — larger = more zoom." You increase the field of view from 45° to 90°. What happens visually?',
+      options: [
+        'The scene zooms in — more detail is visible',
+        'The scene zooms out — more of the scene fits on screen, making objects appear smaller (wider angle)',
+        'The near/far clipping planes change',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Three.js: PerspectiveCamera(fov, aspect, near, far) + camera.lookAt() = P and V." What happens if you set near = 0?',
+      options: [
+        'Everything becomes visible regardless of distance',
+        'Depth precision collapses — the GPU maps all depths in 0..far into a fixed-precision buffer, so near=0 makes the near range infinitely compressed, causing z-fighting everywhere',
+        'No change — near=0 is equivalent to near=0.001',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_1_5 };

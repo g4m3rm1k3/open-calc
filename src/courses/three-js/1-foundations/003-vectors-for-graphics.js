@@ -687,7 +687,52 @@ export default {
     'THREE.Vector3: .length(), .normalize(), .dot(v), .clone().cross(v)',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Dot product = |A||B|cosθ. Unit vectors: A·B = cosθ." In diffuse lighting, max(0, N·L) is used. What does a result of 0 mean?',
+      options: [
+        'The surface faces directly toward the light',
+        'The light hits the surface at 90° or is behind it — no light contribution (clamped to 0 to avoid negative light)',
+        'The normal vector is incorrect',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Cross product = vector ⊥ to both inputs." You have two triangle edges as vectors. Why is their cross product useful?',
+      options: [
+        'It gives the area of the triangle',
+        'It produces a vector perpendicular to the triangle\'s face — the surface normal, needed for lighting calculations',
+        'It finds the midpoint of the triangle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Parallel vectors: cross product = zero vector." A degenerate triangle has vertices A, B, C where C lies on the line AB. What is the cross product of its two edge vectors?',
+      options: [
+        'A large vector pointing away from the plane',
+        'The zero vector — the edges are parallel (or antiparallel) so there is no surface to define a normal for',
+        'The same as a non-degenerate triangle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Normalize: Â = A/|A|. Normalized vectors have length=1." Why must normals and light direction vectors be normalized before the dot product in a shader?',
+      options: [
+        'Normalized vectors are required by the GPU hardware',
+        'The dot product of unit vectors equals cosθ directly. Non-unit vectors produce A·B = |A||B|cosθ — the lengths scale the result, making the lighting incorrectly bright or dim',
+        'Normalization prevents division by zero errors',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_0_2 };

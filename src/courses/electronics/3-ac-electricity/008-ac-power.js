@@ -73,4 +73,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A factory load draws 500kW of real power and 400kVAr of reactive power. What is the apparent power the utility must supply?',
+      options: [
+        '900kVA — add real and reactive power directly',
+        'About 640kVA — S = √(P² + Q²) = √(500² + 400²) ≈ 640kVA',
+        '100kVA — subtract reactive from real power',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A facility operates at 0.65 power factor lagging. Why does this concern the utility even though the customer only pays for real power (kWh)?',
+      options: [
+        'Low PF means the load is consuming more energy than metered, so the utility loses revenue',
+        'The utility\'s generators, cables, and transformers must carry the full apparent current (kVA) to deliver the real power — 0.65 PF means 54% more current than a unity-PF load for the same kW, increasing I²R losses and occupying grid capacity',
+        'Low PF causes the supply voltage to drop, which reduces power delivered to all customers on the same feeder',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A capacitor bank is installed at a motor\'s terminals for power factor correction. What does it change?',
+      options: [
+        'It reduces the motor\'s real power consumption and shaft output',
+        'It supplies the reactive current the motor needs locally — reactive current now flows between the capacitor and motor winding rather than from the utility, reducing total line current without changing the motor\'s real power',
+        'It stores energy during light load and releases it during heavy load, smoothing real power demand',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'After power factor correction from 0.75 to 0.95, the real power consumed by the motor:',
+      options: [
+        'Stays the same — PF correction changes reactive current flow but not how much real work the motor does',
+        'Increases — higher PF means more real work is extracted per amp',
+        'Decreases — the capacitors absorb some of the power that was previously going to the motor',
+      ],
+      correct: 0,
+    },
+  ],
 };

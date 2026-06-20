@@ -941,7 +941,52 @@ export default {
     'Blood buffer: CO₂ + H₂O ⇌ H₂CO₃ ⇌ H⁺ + HCO₃⁻. Lungs regulate [CO₂]; kidneys regulate [HCO₃⁻].',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Brønsted-Lowry: acid = H⁺ donor, base = H⁺ acceptor." Why is the Brønsted-Lowry definition more useful than the Arrhenius definition?',
+      options: [
+        'Brønsted-Lowry only applies to water solutions, making it more precise',
+        'Arrhenius is limited to water — Brønsted-Lowry works in any solvent, covering many more acid-base reactions including those in biological systems',
+        'Brønsted-Lowry predicts reaction rates; Arrhenius does not',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Strong acid: 100% ionised. Weak acid: Ka tells how much." HCl (Ka very large) vs acetic acid (Ka = 1.8 × 10⁻⁵). What does the small Ka of acetic acid mean?',
+      options: [
+        'Acetic acid produces very few H⁺ ions in solution — most stays as undissociated CH₃COOH',
+        'Acetic acid is more acidic than HCl because the Ka denominator includes more species',
+        'Small Ka means the acid reacts faster',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"pH = −log[H₃O⁺]. pH + pOH = 14." A solution has [H₃O⁺] = 10⁻³ M. What is the pH?',
+      options: [
+        'pH = 3 — acidic solution',
+        'pH = −3',
+        'pH = 11',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Buffer: weak acid + conjugate base. Effective within ±1 pH unit of pKa." Blood is buffered at pH 7.4 using carbonic acid (pKa ≈ 6.1). Is this an effective buffer for blood?',
+      options: [
+        'Yes — pH 7.4 is within ±1 of pKa 6.1 (range 5.1–7.1). Wait — 7.4 is outside that range',
+        'No — blood pH 7.4 is more than 1 unit above pKa 6.1, so this buffer alone is not ideal; blood uses multiple coupled buffer systems',
+        'Yes — any weak acid can buffer at any pH',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_4_4 };

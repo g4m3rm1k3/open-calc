@@ -856,5 +856,50 @@ export default {
     '74HC138: G1=1 AND G̅2A=0 AND G̅2B=0 → enabled. A2A1A0 → Y̅ₙ goes LOW.',
   ],
   checkpoints:['read-intuition'],
-  quiz:[],
+  quiz:[
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"N-to-2ᴺ decoder: exactly one output HIGH at a time." A 3-to-8 decoder with input A2A1A0=011. Which output is asserted?',
+      options: [
+        'Y2',
+        'Y3',
+        'Y4',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Enable = AND gate on all outputs. Disabled → all LOW." Why is an enable input useful on a decoder?',
+      options: [
+        'Enable reduces the decoder\'s power consumption when idle',
+        'Enable lets you select one of several decoders in a system — only the enabled decoder asserts its outputs, allowing multiple decoders to share output buses',
+        'Enable adds an extra output bit to the decoder',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Basic encoder fails for simultaneous inputs." A simple 4-to-2 encoder has I2=1 and I3=1 simultaneously. What goes wrong?',
+      options: [
+        'Both outputs assert, which is correct — two inputs can be encoded at once',
+        'The outputs produce the wrong binary code because the logic was designed assuming only one input is active at a time',
+        'The encoder overheats from the conflict',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Priority encoder: highest input wins." Inputs I3=1 and I1=1 are both active. What does the priority encoder output?',
+      options: [
+        'Code for I1 (01) — first active input wins',
+        'Code for I3 (11) — highest-index (highest-priority) input wins',
+        'An error code — two simultaneous inputs are forbidden',
+      ],
+      correct: 1,
+    },
+  ],
 };

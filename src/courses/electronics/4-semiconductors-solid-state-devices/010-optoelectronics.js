@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A photodiode in reverse-biased (photoconductive) mode is illuminated with light. What does the device output?',
+      options: [
+        'A voltage proportional to light intensity, like a solar cell in open-circuit mode',
+        'A current proportional to optical power — photons generate electron-hole pairs in the depletion region; the built-in field sweeps them out as photocurrent',
+        'No output — reverse bias blocks all current including light-generated current',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'An optocoupler has CTR = 100% and the LED is driven at IF = 10 mA. After two years of operation, CTR has degraded to 50%. What happens to the output collector current?',
+      options: [
+        'Output current stays at 10 mA — CTR degradation is compensated by the pull-up resistor',
+        'Output current drops from 10 mA to 5 mA — IC = CTR × IF, and halved CTR halves IC; the circuit may no longer pull the output low enough to register as logic LOW',
+        'Output current doubles to 20 mA — degradation causes the phototransistor to conduct harder to compensate',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why do industrial safety light curtains use pulsed, frequency-modulated LEDs instead of simple continuous DC illumination?',
+      options: [
+        'Pulsed LEDs last longer and consume less power than continuous LEDs',
+        'Synchronous detection of a known pulse frequency rejects all ambient light (sunlight, factory lighting) — only the matching modulated pulse triggers the receiver, preventing false "safe" readings from stray light sources',
+        'Continuous DC LEDs cannot be detected by photodiodes — only pulsed sources produce the sharp rising edges needed to trigger the receiver comparator',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An optocoupler is used to isolate a 24V PLC digital output from the gate driver of a 480V motor drive. The primary reason for using an optocoupler rather than a direct electrical connection is:',
+      options: [
+        'The optocoupler amplifies the 24V signal to the 480V level needed by the gate driver',
+        'The optocoupler provides a galvanic isolation barrier — signals cross via light with no electrical connection, blocking ground loops and protecting the PLC from high-voltage transients in the drive circuit',
+        'Gate driver ICs require optical input signals; they cannot accept direct electrical inputs from PLC outputs',
+      ],
+      correct: 1,
+    },
+  ],
 };

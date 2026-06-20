@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An op-amp has open-loop gain Aol = 100,000. With a 0.1 mV difference between its inputs, what output voltage does it attempt to produce?',
+      options: [
+        '0.1 V — output equals input voltage without amplification in open-loop',
+        '10 V — Vout = Aol × Vd = 100,000 × 0.0001 = 10V; in practice this saturates at the supply rail',
+        '100 V — open-loop gain always drives the output to maximum regardless of input difference',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The "virtual short" principle states that V+ = V− in a closed-loop op-amp circuit. Does this mean the two input terminals are electrically connected?',
+      options: [
+        'Yes — the op-amp internally short-circuits its inputs when in closed-loop mode',
+        'No — the inputs have no direct connection; the op-amp drives its output through the feedback network to make the voltages equal. The inputs are equal in voltage but isolated — no current flows between them',
+        'Only at DC — at AC frequencies the inputs are connected through the internal parasitic capacitances',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'When does the virtual short principle (V+ = V−) NOT apply to an op-amp circuit?',
+      options: [
+        'When the op-amp supply voltage is below 5V',
+        'When the circuit uses open-loop or positive feedback configuration — the virtual short only exists in stable closed-loop negative feedback; without it, the output saturates and V+ ≠ V−',
+        'When the op-amp is used as a current source rather than a voltage amplifier',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An ideal op-amp assumes zero current flows into the input terminals. Why does this matter for circuit analysis?',
+      options: [
+        'It means the op-amp draws no power, making efficiency calculations trivial',
+        'It means all current entering the inverting input through the feedback resistor must come from the input source — this is the basis for KCL analysis of op-amp circuits and why input impedance is set by external resistors, not by the op-amp itself',
+        'It prevents the op-amp from charging its internal capacitors, ensuring consistent frequency response',
+      ],
+      correct: 1,
+    },
+  ],
 };

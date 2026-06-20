@@ -283,4 +283,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The Pythagorean identity sin²θ + cos²θ = 1 can be rearranged to give 1 + tan²θ = sec²θ. How do you get there?',
+      options: [
+        'Divide every term by sin²θ to get cot²θ + 1 = csc²θ, then rearrange — you need two steps to reach 1 + tan²θ = sec²θ',
+        'Divide every term of sin²θ + cos²θ = 1 by cos²θ to get tan²θ + 1 = sec²θ, since sin²θ/cos²θ = tan²θ and 1/cos²θ = sec²θ',
+        'Substitute tan = sin/cos directly into sin²θ + cos²θ and simplify — the sec² term appears as a remainder',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is cos(2θ) in terms of cos²θ?',
+      options: [
+        'cos(2θ) = 2cos²θ − 1, derived from the angle addition formula cos(A+B) = cosA·cosB − sinA·sinB with A = B = θ, then using sin²θ = 1 − cos²θ',
+        'cos(2θ) = cos²θ − 1, because the "2" in 2θ divides out one power of cos',
+        'cos(2θ) = 2cos(θ) − 1, because doubling the angle doubles the cosine and the −1 accounts for the shift',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In trig integration, why is the power-reduction identity cos²θ = (1 + cos2θ)/2 so useful?',
+      options: [
+        'It converts a squared trig function into a linear trig function, making it directly integrable — ∫cos²θ dθ becomes ∫(1 + cos2θ)/2 dθ, which is straightforward',
+        'It cancels the squared term completely so the integrand becomes a constant 1/2',
+        'It allows substitution u = cos θ to remove the angle variable entirely',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is sin(A + B) expanded?',
+      options: [
+        'sin(A)·sin(B) + cos(A)·cos(B)',
+        'sin(A)·cos(B) + cos(A)·sin(B) — each angle contributes a sine and cosine cross term',
+        'sin(A)·cos(B) − cos(A)·sin(B)',
+      ],
+      correct: 1,
+    },
+  ],
 }

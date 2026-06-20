@@ -553,5 +553,50 @@ export default {
     'The project combines: parametric geometry + scene graph + PBR + delta-time loop + raycasting + curves.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"SRP: each class/function does one thing. Swap the renderer without touching surface math." What is the practical benefit of Single Responsibility Principle here?',
+      options: [
+        'It makes the code longer but easier to document',
+        'Changing the renderer (e.g., from WebGL to WebGPU) only requires modifying the renderer class — surface math, curve tracing, and picking are untouched because they do not depend on rendering internals',
+        'SRP only applies to functions, not classes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Project architecture: CONFIG → setup → SurfaceManager → CurveTracer → Picker → HUD → tick." Why put CONFIG at the top of this flow?',
+      options: [
+        'CONFIG must execute last to override defaults',
+        'CONFIG defines shared constants (segment counts, colors, light positions) that every module reads. Placing it first means any module can safely reference it without worrying about initialization order',
+        'CONFIG handles GPU initialization before the renderer is ready',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"The project combines: parametric geometry + scene graph + PBR + delta-time loop + raycasting + curves." Why does this capstone integrate all these systems rather than just one?',
+      options: [
+        'To increase the line count for assessment purposes',
+        'Real interactive 3D applications require all these systems simultaneously — geometry, lighting, camera control, input, and animation work together. Practising integration is as important as learning each system individually',
+        'Three.js requires all systems to be active simultaneously',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Self-referencing ScienceNotebook: the lesson object is the notebook. Cells contain the demos." What architectural pattern does this describe?',
+      options: [
+        'The lesson metadata and the interactive content are the same object — the lesson structure is both the documentation and the executable code, eliminating a separate demo registration step',
+        'The lesson imports itself recursively',
+        'ScienceNotebook is a Three.js built-in for documentation',
+      ],
+      correct: 0,
+    },
+  ],
 }

@@ -482,7 +482,52 @@ export default {
   challenges: [],
   mentalModel: ['HDR FBO → extract brights → blur (bloom) → add back → ACES tone map → gamma. Order: bloom before tonemap. Three.js: HalfFloatType RenderTarget + UnrealBloomPass.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"HDR FBO stores values > 1.0." Why does standard 8-bit rendering limit what bloom can achieve?',
+      options: [
+        '8-bit rendering is too slow for bloom',
+        '8-bit colours clamp at 1.0 — bright highlights clip to white with no information about how bright they actually are. HDR preserves values above 1.0 so the bloom pass knows where to extract highlights',
+        '8-bit renders cannot use render targets',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Order: bloom before tonemap." Why apply bloom before tone mapping?',
+      options: [
+        'Tone mapping compresses HDR values to LDR first — bloom on LDR data would have nothing above 1.0 to work with. Bloom must run while values are still in HDR range',
+        'Bloom is faster on uncompressed data',
+        'Tone mapping breaks the blur kernel calculations',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"ACES tone map." What problem does tone mapping solve?',
+      options: [
+        'It increases the colour gamut of the rendered image',
+        'HDR rendering produces values far exceeding what a display can show. Tone mapping compresses the wide HDR range into 0–1 for display while preserving perceptual contrast and colour relationships',
+        'It converts between colour spaces',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Extract brights → blur → add back." The bloom pipeline adds the blurred bright areas back to the original image. What visual effect does this create?',
+      options: [
+        'It darkens the background to make bright areas stand out',
+        'Bright areas bleed light into surrounding pixels — simulating how a camera lens or the human eye scatters intense light, making very bright objects appear to glow',
+        'It sharpens the edges of bright objects',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_5_2 }

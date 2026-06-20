@@ -622,7 +622,52 @@ export default {
     'In shaders: gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0)',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"NDC = (x/w, y/w, z/w). Done automatically by GPU." What are the valid coordinate ranges in NDC space?',
+      options: [
+        '0.0 to 1.0 on all axes — the GPU maps the screen to a unit cube',
+        '-1.0 to +1.0 on all axes — anything outside this range is clipped and not drawn',
+        '-512 to +512 on X/Y, 0 to 1 on Z',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Barycentric: P = αA + βB + γC, α+β+γ=1. Negative weight → outside triangle → discard." Why are barycentric coordinates useful for the rasteriser?',
+      options: [
+        'They convert world positions to screen pixels efficiently',
+        'They express any point as a weighted sum of the triangle\'s vertices — the weights double as interpolation factors for varyings (colour, UV, normal)',
+        'They are used to compute normal maps',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Pipeline: Object→World→View→Clip→NDC→Screen." Which matrix transforms from World space to View (eye) space?',
+      options: [
+        'The model matrix (M)',
+        'The view matrix (V) — which is the inverse of the camera\'s world transform',
+        'The projection matrix (P)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Homogeneous coords: (x,y,z,w). When w=1: point behaves normally." Why does the projection matrix produce w≠1?',
+      options: [
+        'A non-unit w is an error condition that triggers clipping',
+        'The projection matrix encodes depth into w so that dividing by it (perspective divide) creates the foreshortening effect — farther objects shrink',
+        'w stores the alpha transparency of the vertex',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_0_1 };

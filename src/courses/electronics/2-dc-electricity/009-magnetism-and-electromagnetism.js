@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What did Faraday discover about the relationship between magnetism and electricity?',
+      options: [
+        'A constant magnetic field induces a constant voltage in a nearby conductor',
+        'A changing magnetic flux through a conductor induces a voltage — without change there is no induction',
+        'A magnetic field directly forces electrons to move, creating current proportional to field strength',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A motor drawing rated current produces only 40% of rated torque. Torque is proportional to flux × current. What does this imply?',
+      options: [
+        'The motor is overloaded and needs a larger frame size',
+        'The magnetic flux must be reduced — likely due to low supply voltage, high winding temperature, or a partial winding fault',
+        'The motor is operating correctly — torque and current are never proportional in induction motors',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A transformer has 240 turns on the primary and 24 turns on the secondary, with 480V AC on the primary. What is the secondary voltage?',
+      options: [
+        '4800V — more primary turns means higher secondary voltage',
+        '48V — the turns ratio 240:24 = 10:1 steps voltage down by a factor of 10',
+        '480V — transformer output equals input voltage regardless of turns ratio',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What happens to an iron-core inductor or transformer when it reaches magnetic saturation?',
+      options: [
+        'It becomes more efficient — saturation aligns all domains and reduces energy loss',
+        'The core\'s permeability collapses to near 1, inductance drops dramatically, and current can spike to dangerous levels',
+        'Saturation causes the core to permanently retain its maximum magnetic field',
+      ],
+      correct: 1,
+    },
+  ],
 };

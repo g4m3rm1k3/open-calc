@@ -396,5 +396,50 @@ export default {
     'requestAnimationFrame: fires before repaint, pauses when tab hidden, gives high-res timestamp.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Holy trinity: WebGLRenderer + Scene + PerspectiveCamera." What does the Scene object represent?',
+      options: [
+        'The visible area of the screen',
+        'The container for all 3D objects, lights, and cameras — a tree structure the renderer traverses each frame to produce an image',
+        'The rendering settings and GPU configuration',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"PerspectiveCamera(fov, aspect, near, far) — aspect must match canvas size." You set aspect=1.0 but your canvas is 800×400 (2:1). What visual artifact occurs?',
+      options: [
+        'Objects are stretched horizontally — they appear twice as wide as they should be',
+        'Objects appear squashed — the 1:1 aspect squeezes a 2:1 viewport',
+        'Rendering is correct — aspect does not visually matter',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"renderer.render(scene, camera) → one frame." When should you call this inside requestAnimationFrame?',
+      options: [
+        'Before updating object positions — so the previous frame\'s state is displayed',
+        'After all updates — update positions, animations, and physics first, then call render so the new state is displayed this frame',
+        'Only when something in the scene changes — otherwise skip to save GPU',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"requestAnimationFrame: fires before repaint, pauses when tab hidden." You resize the browser window. What must you update for the scene to look correct?',
+      options: [
+        'Nothing — Three.js handles resize automatically',
+        'camera.aspect (to match the new canvas ratio) + camera.updateProjectionMatrix() + renderer.setSize(newWidth, newHeight)',
+        'Only renderer.setSize — the camera automatically recalculates',
+      ],
+      correct: 1,
+    },
+  ],
 }

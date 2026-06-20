@@ -58,5 +58,50 @@ export default {
     'They map time-delayed logic cleanly.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Promises are asynchronous wrappers." What does a Promise represent?',
+      options: [
+        'A function that will be called later',
+        'A value that may not be available yet — a container for an eventual result',
+        'A timer that runs code after a delay',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Await blocks locally, not globally." What does this mean?',
+      options: [
+        'await freezes the entire page while waiting',
+        'await pauses the current async function and returns control to the caller — the rest of the program continues running',
+        'await is the same as a synchronous delay and blocks everything',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You await a fetch call that takes 2 seconds. Does the user\'s ability to click buttons on the page pause for those 2 seconds?',
+      options: [
+        'Yes — await pauses all JavaScript',
+        'No — only the async function pauses; the event loop continues processing clicks and other events',
+        'It depends on whether the fetch is in a Web Worker',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"They map time-delayed logic cleanly." What problem did Promises solve compared to callback-based async code?',
+      options: [
+        'Callbacks were too slow; Promises are faster',
+        'Deeply nested callbacks ("callback hell") made async code hard to read and error-proof; Promises allow flat, chainable flow',
+        'Callbacks required internet access; Promises work offline',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -833,4 +833,51 @@ print(combination_sum([2,3,5], 8))      # [[2,2,2,2],[2,3,3],[3,5]]`,
       hint: 'Recurse from index i (not i+1) to allow reuse of the same number. Prune when remaining < 0. Sort candidates first to prune earlier.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Backtracking generates candidates and abandons them ("backtracks") when they cannot lead to a valid solution. What makes backtracking more efficient than brute force?',
+      options: [
+        'Backtracking uses memoization to avoid recomputing subtrees',
+        'Pruning: when a partial candidate violates a constraint, the entire subtree below it is skipped. For example, in a sum-to-target problem, if the current partial sum already exceeds the target, no further additions can help — the subtree is abandoned without exploring it. Brute force generates and checks every complete candidate',
+        'Backtracking runs in polynomial time while brute force runs in exponential time',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In the combination sum problem where each number can be reused, the recursion starts the next call at index i (not i+1). What does starting at i rather than i+1 allow?',
+      options: [
+        'It prevents duplicate combinations in the output',
+        'It allows the same number to be selected again in the next step. Starting at i+1 would mean each element can be used at most once (combinations without repetition). Starting at i means element i can appear in the combination multiple times',
+        'It ensures combinations are sorted in the output',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Sorting candidates before backtracking enables earlier pruning. For combination sum with target=7 and candidates=[2,3,5], after trying [5,3] the remaining is −1. What does sorting allow?',
+      options: [
+        'Sorting makes the recursion tree a balanced binary tree',
+        'Once the remaining sum goes negative (we\'ve exceeded the target) with a sorted array, all larger candidates will also exceed it — so we can break out of the loop immediately rather than trying them. With an unsorted array, a smaller candidate might still work, so we cannot prune early',
+        'Sorting ensures combinations appear in lexicographic order',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The N-Queens problem places N queens on an N×N board with no two queens attacking each other. A backtracking solution tries each column in each row and backtracks when a conflict is found. What constraint is checked to detect a conflict?',
+      options: [
+        'Check that no two queens share the same row number',
+        'Check that the new queen does not share a column, main diagonal (row−col = constant), or anti-diagonal (row+col = constant) with any previously placed queen. Tracking three sets (columns, main diagonals, anti-diagonals) makes this check O(1) per placement',
+        'Check that the new queen is not within 2 squares of any other queen',
+      ],
+      correct: 1,
+    },
+  ],
 };

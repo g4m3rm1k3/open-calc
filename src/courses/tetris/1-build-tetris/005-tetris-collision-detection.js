@@ -1023,5 +1023,50 @@ export default {
     'One function. Three call sites. One change fixes the behaviour everywhere.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"isValidPosition(piece, boardData) checks walls + floor + locked cells." Why call isValidPosition BEFORE applying a move?',
+      options: [
+        'For performance — checking is faster than undoing',
+        'To reject invalid moves before they change state — if you apply first and then check, you must undo the change, which is error-prone',
+        'isValidPosition only works on the original position, not after a move',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"boardData[row][col] !== 0 means that cell is occupied." A piece\'s shape cell is 1 at relative [r][c]. The piece is at board position (px, py). What board coordinates do you check for collision?',
+      options: [
+        'boardData[r][c]',
+        'boardData[py + r][px + c]',
+        'boardData[px + c][py + r]',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"every short-circuits on the first false." You use piece.shape.every(row => row.every(cell => cell === 0)) to check if a shape is empty. What does short-circuiting mean here?',
+      options: [
+        'The loop pauses when it finds a 0 and resumes later',
+        'As soon as any cell is not 0, every immediately returns false without checking the remaining cells',
+        'every runs cells in parallel for speed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"After spawnPiece, always check isValidPosition — false means game over." Why does spawning a piece in an invalid position mean the game is over?',
+      options: [
+        'The spawn position is always valid by design',
+        'If the spawn area is already occupied by locked pieces, the board has filled to the top — no room for any new piece, so the game cannot continue',
+        'Spawning failure is a rendering bug, not a game over condition',
+      ],
+      correct: 1,
+    },
+  ],
 };

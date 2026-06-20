@@ -55,4 +55,50 @@ res
     'drop_duplicates() — always check before computing statistics.',
     '.str.upper().str.strip() — standardize string categories before grouping.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'df.dropna() removes rows with any missing value. df.fillna(df.mean()) fills missing values. When is filling better than dropping?',
+      options: [
+        'Always fill — dropping data always reduces model accuracy',
+        'When missing values are scattered randomly across many rows — dropping those rows would remove most of your dataset; filling with the mean preserves sample size while making a reasonable assumption (missing ≈ average). Drop when missingness is concentrated in a few rows or correlated with the target',
+        'Always drop — imputed values introduce bias that corrupts the model',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A column contains "Male", "male", "MALE", "M" as values for the same category. What causes this to be a problem?',
+      options: [
+        'Python cannot compare different-length strings correctly',
+        'Pandas treats them as 4 distinct categories — groupby("gender") would produce 4 groups instead of 1, and value_counts() would undercount each variant. String standardization (.str.lower().str.strip()) collapses them to one consistent value',
+        'The column must be boolean (True/False) for gender data to work correctly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'df["age"].dtype is "object" but it should be numeric. What likely happened and how do you fix it?',
+      options: [
+        'The age column has too many digits — use pd.to_numeric(df["age"]) to convert',
+        'The column contains some non-numeric entries (e.g., "N/A", "unknown", or spaces mixed in) — Pandas stored the whole column as object (string). Fix: pd.to_numeric(df["age"], errors="coerce") converts valid numbers and makes invalid entries NaN',
+        'Integer columns always read as object — use df["age"].astype(int) to convert',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why is detecting outliers an important part of data cleaning?',
+      options: [
+        'Outliers are always errors and must be removed before any analysis',
+        'Outliers can be data entry errors (age=999), sensor failures, or legitimate extreme cases; they disproportionately affect mean and linear regression. Detecting them lets you decide: investigate further, correct, cap, or keep — not blindly remove',
+        'Outlier removal is required by Pandas before calling groupby()',
+      ],
+      correct: 1,
+    },
+  ],
 }

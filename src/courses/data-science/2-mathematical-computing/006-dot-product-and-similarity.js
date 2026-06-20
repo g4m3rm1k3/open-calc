@@ -15,4 +15,50 @@ export default {
     }],
   },
   mentalModel:['Dot product a·b = Σaᵢbᵢ = |a||b|cos(θ).', 'Same direction: cos(0°)=1. Perpendicular: cos(90°)=0. Opposite: cos(180°)=-1.', 'Cosine similarity = a·b/(|a||b|). Measures angle, not magnitude.', 'np.dot(a,b) or a @ b. Both compute the same thing.', 'Dot product underlies: recommendation systems, search, attention in transformers.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'np.dot([1,2,3], [4,5,6]) = ?',
+      options: [
+        '[4,10,18] — element-wise multiplication',
+        '32 — 1×4 + 2×5 + 3×6 = 4 + 10 + 18 = 32',
+        '15 — sum of both vectors: (1+2+3) + (4+5+6) = 6 + 9',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Cosine similarity between two document vectors is 0. What does this mean?',
+      options: [
+        'The documents are identical — cosine similarity of 0 means perfect match',
+        'The documents share no common words (or are orthogonal in feature space) — cosine similarity = cos(90°) = 0 means the angle between the vectors is 90°, indicating no alignment between their feature patterns',
+        'One of the documents is empty — a zero cosine similarity requires at least one zero vector',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is cosine similarity preferred over Euclidean distance for comparing text documents of different lengths?',
+      options: [
+        'Cosine similarity is faster to compute for large vectors',
+        'A short document and a long document on the same topic may have very different magnitudes but point in the same direction — cosine similarity measures the angle between vectors, ignoring length, so documents with the same word distribution score 1.0 regardless of length difference',
+        'Euclidean distance does not work for text data because text is categorical',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'In transformer attention, a query Q and key K are vectors. Large Q·K score means what?',
+      options: [
+        'The key is a long vector with large components',
+        'The query and key are highly aligned — Q·K measures how much the query "matches" the key; large dot products select those key-value pairs to attend to, making the attention mechanism a learned relevance scoring function',
+        'The gradient of Q with respect to K is large, indicating the need for more training',
+      ],
+      correct: 1,
+    },
+  ],
 }

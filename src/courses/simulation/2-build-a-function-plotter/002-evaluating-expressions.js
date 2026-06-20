@@ -499,6 +499,53 @@ app.querySelector('#btn').addEventListener('click', () => {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '`new Function("x", expr)(value)` is used instead of `eval(expr)`. What is the main safety advantage?',
+      options: [
+        'Function constructor runs 10× faster than eval',
+        'new Function creates an isolated function scope. The user\'s expression can only access `x` and Math — it cannot read or modify any other variables in the module. eval runs in the current scope, giving user code access to all local variables including sensitive state',
+        'eval throws an error on any mathematical expression; Function handles them correctly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The evaluator returns `Infinity` when a user types `1/x` and x=0. Why not throw an error instead?',
+      options: [
+        'JavaScript cannot throw errors from mathematical expressions',
+        'Infinity is a valid JavaScript number that the plotter can handle gracefully (skip drawing that point). Throwing would require wrapping every evaluation in try/catch and choosing a fallback value anyway. Returning Infinity lets the drawing code make the decision: skip, clamp, or draw an asymptote',
+        'Division by zero never occurs in practice because the plotter skips x=0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The evaluator injects Math methods into scope so users can write `sin(x)` instead of `Math.sin(x)`. How is this achieved with `with(Math){ ... }`?',
+      options: [
+        'with(Math) copies all Math properties into global scope permanently',
+        'The with statement adds the Math object to the scope chain for the duration of the block, making all Math properties (sin, cos, PI...) directly accessible by name without the "Math." prefix. It is generally avoided in modern code due to ambiguity but is acceptable here because the scope is isolated inside Function constructor',
+        'with(Math) is a shorthand for Math.assign() that binds all methods',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Testing the evaluator with known values before testing unknown inputs ("test with known values first") is a debugging principle. Why start with known values?',
+      options: [
+        'Unknown inputs cannot be tested because their expected output is undefined',
+        'Known values (sin(0)=0, sin(π/2)=1, x²|x=3=9) give you a concrete correct/incorrect verdict. If the evaluator fails on a known value, you have a clear bug. Unknown inputs only tell you "something happened" without revealing whether the result is correct',
+        'The Function constructor caches results for known values, making them faster to compute',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export default sim2_002

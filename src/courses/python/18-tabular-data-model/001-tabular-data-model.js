@@ -581,5 +581,52 @@ df = pd.DataFrame({
         }
       }
     ]
-  }
+  },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'df.loc["Japan"] and df.iloc[2] both return the Japan row in the example DataFrame. When do they diverge?',
+      options: [
+        'They are always equivalent — loc converts labels to positions internally',
+        'When rows are reordered, filtered, or the index is not a default integer range. loc always uses the index label; iloc always uses the physical row number (0, 1, 2...). After df.sort_values(), iloc[0] is the smallest row while loc[original_label] still finds the same country',
+        'iloc is faster than loc so you should always prefer it',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Selecting a single column with df["gdp_trillion"] returns a pandas Series, not a DataFrame. Why does this distinction matter?',
+      options: [
+        'Series has fewer methods than DataFrame, so you lose functionality',
+        'Series is 1-D with an index; DataFrame is 2-D. Many operations (groupby, merge, to_csv) expect a DataFrame. When you need to preserve column context (e.g., for correlation or concatenation), use df[["gdp_trillion"]] (double brackets) to keep a single-column DataFrame',
+        'Pandas converts Series back to DataFrame automatically whenever needed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Pandas stores data in column-oriented format (each column is a contiguous block in memory). Why does this help analytics workloads?',
+      options: [
+        'Column orientation allows pandas to use GPU acceleration',
+        'Analytics queries typically scan a few columns across all rows (e.g., sum GDP across all countries). Column storage keeps those values contiguous in memory, maximising CPU cache hits. Row storage would require jumping over every other column\'s data for each value',
+        'Column storage prevents duplicate index labels from occurring',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You have a DataFrame with a named string index (country names). After df.reset_index(), what changes?',
+      options: [
+        'The existing index is dropped and replaced with a default integer range (0, 1, 2...); the old index becomes a regular column named "index" (or its original name)',
+        'The index is sorted alphabetically and re-numbered',
+        'reset_index only applies to multi-level (hierarchical) indexes',
+      ],
+      correct: 0,
+    },
+  ],
 }

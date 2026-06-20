@@ -235,4 +235,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The average value of a continuous function f on [a, b] is f_avg = (1/(b−a)) ∫[a to b] f(x) dx. What does the factor 1/(b−a) do?',
+      options: [
+        'It converts the area under the curve into a representative single height — the average value is the height of a rectangle with the same width (b−a) and same area as the integral',
+        'It normalizes the integral to account for the units of x and makes the average dimensionless',
+        'It cancels the (b−a) that appears inside the integral, simplifying the computation',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The Mean Value Theorem for Integrals says: if f is continuous on [a, b], there exists c in (a, b) where f(c) = f_avg. What does this mean geometrically?',
+      options: [
+        'The average value must be achieved at the midpoint c = (a+b)/2 of the interval',
+        'There is at least one point c where the function equals its own average — the horizontal line y = f_avg intersects the graph of f somewhere in the interior',
+        'The derivative f\'(c) equals the average rate of change (f(b)−f(a))/(b−a) at some interior point',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'f(x) = x² on [0, 3]. What is the average value?',
+      options: [
+        '3 — the average of the endpoint values (f(0)+f(3))/2 = (0+9)/2 = 4.5, which rounds to 3',
+        '3 — (1/3)∫[0 to 3] x² dx = (1/3)[x³/3] from 0 to 3 = (1/3)(9) = 3',
+        '4.5 — integrating x² from 0 to 3 gives 9, and dividing by 2 endpoints gives 4.5',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why is the integral definition of average value (1/(b−a))∫f dx better than just averaging f(a) and f(b)?',
+      options: [
+        'Averaging endpoints is only valid for linear functions — for nonlinear f, the function\'s values in the interior matter, and the integral weighs every point continuously, not just two endpoints',
+        'The integral definition includes the endpoints twice, giving them extra weight that the simple average lacks',
+        'The integral formula is better only when f is differentiable; for non-smooth functions both formulas give the same result',
+      ],
+      correct: 0,
+    },
+  ],
 }

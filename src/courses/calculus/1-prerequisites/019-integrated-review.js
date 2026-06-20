@@ -277,4 +277,50 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard'
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You see a real-world situation: "a car traveling at a constant 60 mph for 2 hours." Which mathematical model fits this?',
+      options: [
+        'Exponential model d = d₀·eᵏᵗ — constant rate implies exponential change',
+        'Linear model d = 60t — distance is proportional to time at a constant rate, so the relationship is linear with slope 60',
+        'Quadratic model d = 60t² — distance accumulates and therefore must grow faster than linearly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Units are described as a "model check." What does this mean?',
+      options: [
+        'Units tell you which variable is the input and which is the output, identifying the direction of causation',
+        'If the units on both sides of an equation do not match, the formula is wrong — units propagate through algebra just like numbers, so a dimensional mismatch reveals a modeling error',
+        'Unit analysis converts imperial to metric automatically when building math models',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Three seemingly different systems — a spring, a pendulum, and a population near carrying capacity — all involve the same mathematical structure. What is it?',
+      options: [
+        'Linear growth, because all three can be approximated by a straight line for small values',
+        'A restoring force or feedback proportional to displacement from equilibrium, leading to oscillation or logistic growth — the same differential equation structure governs all three despite different physical contexts',
+        'Polynomial equations, because the position, angle, or population can all be expressed as polynomial functions of time',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'How does recognizing the "shape" of a situation help you in calculus?',
+      options: [
+        'It allows you to skip algebraic manipulation entirely and graph the answer directly from pattern recognition',
+        'It lets you choose the right tool before computing — recognizing a rate-of-change problem suggests derivatives, recognizing an accumulation problem suggests integrals, and recognizing periodic behavior suggests trig functions',
+        'Shape recognition only matters for geometry problems; algebraic and rate problems must be solved from scratch each time',
+      ],
+      correct: 1,
+    },
+  ],
 }

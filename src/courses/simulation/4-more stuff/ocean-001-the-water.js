@@ -696,4 +696,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Ocean water is modeled as a sum of sine waves traveling in different directions: waveHeight = Σ Aᵢ·sin(kᵢ·x·cos(dᵢ) + kᵢ·z·sin(dᵢ) + ωᵢ·t). Why sum multiple waves instead of using one?',
+      options: [
+        'A single sine wave exceeds canvas memory limits',
+        'A single sine wave produces perfectly regular, artificial-looking ripples. Summing waves with different amplitudes, frequencies, and directions creates interference patterns that mimic real water\'s irregular, chaotic surface. Each extra wave adds complexity at the cost of just a few arithmetic operations per vertex',
+        'Multiple waves are required so posAttr.needsUpdate works correctly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'After updating vertex Y-positions in the Float32Array, the code calls `geo.computeVertexNormals()`. Why recompute normals every frame?',
+      options: [
+        'Three.js clears normals automatically each frame to prevent memory leaks',
+        'Normals determine how the material reflects light. As wave vertices move up and down, the surface orientation (normal direction) changes. Stale normals from the previous frame would make the lighting appear frozen while the geometry moves — shading would not match the current wave shape',
+        'computeVertexNormals is required by MeshStandardMaterial before render',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'To float a boat on the water, you sample the same waveHeight(x, z, time) function at the boat\'s position. Why use the same formula rather than raycasting down from the boat?',
+      options: [
+        'Three.js raycasting does not work against PlaneGeometry',
+        'The wave formula is analytic — it gives the exact height at any (x, z, t) in O(N_waves) time. Raycasting would traverse the scene graph, check triangle intersections across the whole mesh, and return a result that is only as accurate as the mesh resolution. The formula is faster, more accurate, and works at any point, not just mesh vertices',
+        'Raycasting requires a physics engine like Cannon.js',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The vertex positions are stored in a flat Float32Array with layout [x0, y0, z0, x1, y1, z1, ...]. To access the Y-value of vertex i, you use `posArray[i*3+1]`. Why is this flat layout used rather than an array of {x, y, z} objects?',
+      options: [
+        'JavaScript cannot store objects in typed arrays',
+        'Typed arrays (Float32Array) store raw numbers contiguously in memory — the GPU can upload them directly. An array of objects would require unpacking each object to extract the numbers, adding overhead. Contiguous floats also maximise CPU cache efficiency when iterating through all vertices every frame',
+        'Float32Array is 3× larger than needed to store extra metadata per vertex',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -108,4 +108,50 @@ avg_margin=df["margin"].mean()`},
     'New columns: df["col"] = expression over existing columns. Fully vectorized.',
     'df["col"].mean(), .sum(), .max() etc. are aggregations over the whole column.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'df["age"] selects a column. df[["age", "salary"]] selects two columns. Why the double brackets?',
+      options: [
+        'The extra brackets are just style — both forms work the same way',
+        'df["age"] returns a Series (1D); df[["age","salary"]] passes a LIST of column names, which returns a DataFrame (2D). The outer brackets are the indexing operator; the inner brackets form the Python list',
+        'Double brackets are needed when column names contain spaces',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'df[df["score"] > 80] selects rows where score > 80. What does df["score"] > 80 produce?',
+      options: [
+        'A filtered DataFrame directly — the comparison returns only matching rows',
+        'A boolean Series of True/False for each row — then passing this mask to df[] selects only the rows where the mask is True (boolean indexing)',
+        'A numeric array of all scores above 80',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why does df["new_col"] = df["a"] + df["b"] work without a loop?',
+      options: [
+        'Pandas detects the + operator and calls a special loop internally',
+        'Pandas operations are vectorized — adding two Series aligns them by index and computes the sum element-by-element in C; assigning the result creates a new column without Python iteration',
+        'DataFrames are dictionaries, and dict assignment with + concatenates the values',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'df.loc[2, "salary"] vs df.iloc[2, 1] — what is the difference?',
+      options: [
+        'loc uses position-based indexing; iloc uses label-based indexing',
+        'loc uses label-based indexing (row label 2, column named "salary"); iloc uses integer position indexing (row at position 2, column at position 1). They may differ if the DataFrame index is not 0,1,2,…',
+        'Both are identical — loc and iloc always return the same cell',
+      ],
+      correct: 1,
+    },
+  ],
 }

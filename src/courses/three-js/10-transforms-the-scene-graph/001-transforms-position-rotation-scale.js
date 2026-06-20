@@ -440,5 +440,50 @@ export default {
     'Local vs world: position.x = world translation. translateX() = local-axis movement.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"modelMatrix = T × R × S — translation × rotation × scale." You set scale=(2,2,2) on an object at position (5, 0, 0). What world position does the scaled object appear at?',
+      options: [
+        '(10, 0, 0) — scaling also scales the position',
+        '(5, 0, 0) — TRS order means scale applies first (to local geometry), then rotation, then translation. The position is not scaled',
+        '(7, 0, 0) — the scale adds to the position',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"4×4 because homogeneous coords allow translation as matrix multiplication." Why can\'t a 3×3 matrix encode translation?',
+      options: [
+        '3×3 matrices are too slow for GPU multiplication',
+        'A 3×3 matrix can only encode linear transformations (scale, rotate, shear). Translation is an affine operation — it requires the homogeneous W component and a 4th column to work as matrix multiplication',
+        '3×3 matrices cannot store rotation correctly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Euler.XYZ: X applied first, then Y, then Z. Gimbal lock at Y=±90°." Why does Y=±90° cause gimbal lock?',
+      options: [
+        'The GPU cannot represent angles greater than 89°',
+        'At Y=±90°, the X and Z rotation axes become parallel — two independent degrees of freedom collapse into one, making certain orientations unreachable by adjusting the remaining angles',
+        'Euler angles are undefined beyond ±90° on the Y axis',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Local vs world: position.x = world translation. translateX() = local-axis movement." An object is rotated 90° around Y. You call mesh.translateX(1). Which direction does it actually move in world space?',
+      options: [
+        'World +X direction',
+        'World -Z direction — translateX moves along the object\'s local X axis, which after a 90° Y rotation now points in the -Z world direction',
+        'World +Z direction',
+      ],
+      correct: 1,
+    },
+  ],
 }

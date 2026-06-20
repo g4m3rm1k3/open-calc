@@ -1008,6 +1008,53 @@ requestAnimationFrame(()=>drawFrame(0, 0))`,
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why use `requestAnimationFrame` for animation instead of `setInterval(draw, 16)`?',
+      options: [
+        'setInterval cannot call canvas drawing functions',
+        'rAF fires in sync with the display\'s actual refresh rate (60Hz, 120Hz, etc.), producing smooth animation without tearing. It pauses when the tab is hidden, saving battery and CPU. setInterval fires at fixed wall-clock intervals regardless of the display cycle, causing jank and wasted work when the tab is invisible',
+        'setInterval is limited to 60fps maximum; rAF has no such cap',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The rAF callback receives a timestamp in milliseconds. The code divides by 1000 to get seconds before using it. What goes wrong if you forget the conversion?',
+      options: [
+        'Math.sin(t) only works for values under 1000',
+        'With t in milliseconds, all frequency calculations are off by 1000×. A wave with `frequency * t` would complete 1000 cycles per second instead of per millisecond, making animations appear frozen (they cycle too fast to see) or phase through states in a single frame',
+        'The timestamp is already in seconds in newer browsers',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The animation uses a time offset: `tOffset += elapsed * speed` rather than `t += dt * speed`. When the user changes the speed slider, what does the offset approach preserve?',
+      options: [
+        'It preserves the current phase — the animation continues smoothly from its current position rather than jumping to a position computed with the new speed from t=0. Without the offset, changing speed mid-animation would snap the wave to an unexpected phase',
+        'It preserves the frame rate so speed changes do not cause dropped frames',
+        'It prevents t from overflowing beyond Number.MAX_SAFE_INTEGER',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The code cancels an existing rAF with `cancelAnimationFrame(animId)` before starting a new one. What happens if you start a second loop without cancelling the first?',
+      options: [
+        'The browser automatically cancels the older loop',
+        'Two loops run simultaneously: both call drawFrame every render cycle, doubling the work. Worse, they can interfere — one clears the canvas while the other has just drawn to it, causing flickering or race conditions. Always cancel before restarting',
+        'The second requestAnimationFrame call overwrites the first automatically',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export default sim2_005

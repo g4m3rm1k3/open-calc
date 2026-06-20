@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 's(t) = Ac[1 + ma·cos(2πfm·t)]·cos(2πfc·t)\nma = Am/Ac,   B_AM = 2fm\nη = ma² / (2 + ma²)   ≤ 33.3%' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An AM transmitter modulates a 1 MHz carrier with a 5 kHz audio tone at 100% modulation (ma = 1). What frequencies appear in the transmitted signal?',
+      options: [
+        '1 MHz only — the carrier frequency dominates, sidebands are negligible at 100% modulation',
+        '995 kHz, 1000 kHz, and 1005 kHz — the carrier plus two sidebands at fc ± fm',
+        '990 kHz and 1010 kHz — only the sidebands are transmitted; the carrier is suppressed in standard AM',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'An AM broadcaster transmits at 100% modulation (ma = 1). What percentage of the transmitter power actually carries audio information?',
+      options: [
+        '100% — all transmitted power conveys the audio modulation',
+        '33% — at ma = 1, efficiency η = ma²/(2 + ma²) = 1/3; the other 67% is carrier power that carries no information',
+        '50% — the carrier and sidebands each receive equal power in conventional AM',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'An AM radio station overmodulates (ma > 1). What problem does this cause beyond the station\'s own channel?',
+      options: [
+        'Overmodulation reduces the carrier frequency, shifting the station off its assigned frequency',
+        'When ma > 1, the amplitude envelope clips — the clipping generates harmonic distortion products that create interference in adjacent channels (splatter), disrupting neighboring stations',
+        'Overmodulation increases carrier power but decreases sideband power, reducing audio quality without affecting adjacent stations',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Single sideband (SSB) modulation suppresses the carrier and one sideband. Why does this allow the same communication range with much less transmitter power than conventional AM?',
+      options: [
+        'SSB uses a more efficient antenna that focuses all power toward the receiver',
+        'In conventional AM, two-thirds of power is in the carrier (no information) and one sideband is a redundant copy of the other. SSB puts all power into one information-carrying sideband — achieving the same intelligence content with one-sixth the power of 100%-modulated AM',
+        'SSB signals travel further because they have lower frequency than AM sidebands',
+      ],
+      correct: 1,
+    },
+  ],
 };

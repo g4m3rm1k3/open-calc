@@ -113,4 +113,50 @@ res
     ]}}],
   },
   mentalModel:[`Error taxonomy: Syntax→parse, Name→binding, Type→types, Index/Key→container, Value→bad value.`,`Read tracebacks bottom-up: error type and message are at the bottom.`,`Rubber duck: explain each line out loud — bugs surface during explanation.`,`Decompose: one function, one task. Testable sub-functions make debugging local.`,`Guard against edge cases: empty list, zero divisor, missing key.`],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You see: "IndexError: list index out of range" on a line that accesses lst[5]. What does this tell you?',
+      options: [
+        'The list has exactly 5 elements — the error appears when you access the last element',
+        'The list has 5 or fewer elements (indices 0 through 4 at most) — index 5 does not exist; the error message points to a boundary problem where your expected size and actual size diverged',
+        'The list is empty — IndexError only appears on empty lists',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A traceback shows an error in a function called by another function. Which line should you read first?',
+      options: [
+        'The top line — it shows where Python started executing',
+        'The bottom line — the last frame in the traceback shows the exact line that raised the error and the error type/message; reading bottom-up gives you the immediate cause before the full call chain',
+        'The middle line — the root cause is usually in an intermediate function',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The "rubber duck" technique involves explaining your code out loud to an inanimate object. Why does this help find bugs?',
+      options: [
+        'The physical act of speaking triggers a different area of the brain and improves memory recall for code details',
+        'Explaining forces you to state what each line SHOULD do — when you say it out loud, gaps between what you expect and what the code actually does become obvious because you can\'t skip over them mentally',
+        'The rubber duck provides feedback through an AI model embedded in modern debugging tools',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Your function works for a list of 10 items but crashes on an empty list. What kind of error is this, and how do you fix it?',
+      options: [
+        'A SyntaxError — the empty list reveals a missing comma in the function definition',
+        'An edge-case bug — the function was only tested with non-empty inputs; add a guard at the start: if not lst: return a default value or raise a meaningful error, rather than letting the code reach an unexpected state',
+        'A TypeError — empty lists have a different type than non-empty lists in Python',
+      ],
+      correct: 1,
+    },
+  ],
 }

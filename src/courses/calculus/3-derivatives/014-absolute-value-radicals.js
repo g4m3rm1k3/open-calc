@@ -205,4 +205,50 @@ export default {
     teaser: 'Absolute value appears in calculus in the antiderivative $\\int \\frac{1}{x}\\,dx = \\ln|x| + C$ — the absolute value ensures the formula works for negative $x$ too. Radicals appear constantly in arc length formulas, surface area of revolution, and trig substitution. Simplifying $\\sqrt{1-\\sin^2\\theta} = |\\cos\\theta| = \\cos\\theta$ (in the right quadrant) is a step in every trig substitution problem.',
     linkedLessons: ['factoring-every-method', 'trig-in-calculus'],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why does ∫(1/x)dx = ln|x| + C use absolute value instead of just ln(x) + C?',
+      options: [
+        'The absolute value is a notational convention — both formulas are equivalent for all practical purposes',
+        'ln(x) is only defined for x > 0, but 1/x is defined for x < 0 too and has a valid antiderivative there; ln|x| covers both cases, since for x < 0, d/dx[ln(−x)] = 1/x also',
+        'The absolute value removes the + C constant and makes the antiderivative unique',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Solve |2x − 4| = 6. What are all solutions?',
+      options: [
+        'x = 5 only — 2(5) − 4 = 6 ✓',
+        'x = 5 and x = −1 — absolute value gives two cases: 2x − 4 = 6 (x = 5) and 2x − 4 = −6 (x = −1)',
+        'x = 5 and x = 1 — you add and subtract 6 from both sides then divide by 2',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In a trig substitution problem you reach √(1 − sin²θ). How do you simplify this?',
+      options: [
+        '1 − sin(θ) — take the square root of each term separately',
+        '√(cos²θ) = |cos θ| = cos θ (assuming cos θ ≥ 0 in the chosen integration interval) — use the Pythagorean identity sin²θ + cos²θ = 1, so 1 − sin²θ = cos²θ',
+        'sin(θ)·cos(θ) — a product-to-sum identity applies here',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The domain of f(x) = √(x² − 9) requires x² − 9 ≥ 0. What is the domain?',
+      options: [
+        'x ≥ 3 — only the positive square root bound matters',
+        'x ≤ −3 or x ≥ 3 — the expression under the radical must be non-negative: x² ≥ 9 means |x| ≥ 3',
+        '−3 ≤ x ≤ 3 — you need x² ≤ 9 to keep the radical finite',
+      ],
+      correct: 1,
+    },
+  ],
 }

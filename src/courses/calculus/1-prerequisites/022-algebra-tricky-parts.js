@@ -154,4 +154,50 @@ export default {
       answer: '2x(x-2)(x+2)',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is wrong with the step: 2(x + 3) = 2x + 3?',
+      options: [
+        'Nothing is wrong — when multiplying a coefficient into parentheses, only the first term is affected',
+        'The distributive property requires multiplying 2 by every term inside: 2(x + 3) = 2x + 6, not 2x + 3',
+        'The 2 should be added, not multiplied: 2 + (x + 3) = x + 5',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'If you divide both sides of −3x > 12 by −3, what happens to the inequality sign?',
+      options: [
+        'Nothing — the sign stays the same: x > −4',
+        'The sign flips because dividing by a negative number reverses the order relationship: x < −4',
+        'The inequality becomes an equation when you divide by a negative number',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Solving |x − 2| < 5 requires splitting into two cases. What are they?',
+      options: [
+        'x − 2 < 5 only — the absolute value is already positive, so the negative case cannot occur',
+        'x − 2 < 5 AND x − 2 > −5, giving −3 < x < 7 — absolute value less than 5 means the expression is between −5 and 5',
+        'x − 2 > 5 OR x − 2 < −5 — absolute value less than 5 means outside the range',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'To factor x³ − 8x² + 12x completely, what is the first step?',
+      options: [
+        'Try the rational root theorem — plug in ±1, ±2, ±3 to find a root, then divide by the corresponding factor',
+        'Pull out the GCF first: x(x² − 8x + 12), then factor the quadratic: x(x−6)(x−2)',
+        'Group the first two and last two terms: x³ − 8x² is one group and 12x is the other, then factor each group separately',
+      ],
+      correct: 1,
+    },
+  ],
 }

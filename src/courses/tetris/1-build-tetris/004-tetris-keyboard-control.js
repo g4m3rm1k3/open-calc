@@ -997,5 +997,50 @@ export default {
     'Game loop and keyboard handler share state through the event loop. No conflicts — single thread.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"addEventListener(type, handler) — attaches a function that runs on each event." You call addEventListener(\'keydown\', handler) twice on the same element with the same handler. What happens when a key is pressed?',
+      options: [
+        'The second call replaces the first — only one handler runs',
+        'Both calls are registered — the handler fires twice per keydown event',
+        'addEventListener deduplicates identical handlers — it runs once',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"event.key — string name of the key." What is event.key when the spacebar is pressed?',
+      options: [
+        '"space"',
+        '" " (a single space character)',
+        '"Space"',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"event.preventDefault() — stops browser default behaviour." Why call it for arrow keys in a Tetris game?',
+      options: [
+        'To increase key repeat speed',
+        'Arrow keys normally scroll the page — preventDefault stops the page from scrolling when the player presses them to move pieces',
+        'To prevent the keyboard event from bubbling up to parent elements',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Pure movement: { ...piece, x: piece.x - 1 }. Original unchanged." Why return a new object instead of mutating piece.x directly?',
+      options: [
+        'Creating a new object is faster than modifying the existing one',
+        'The caller can validate the new position first without losing the original — if the move is invalid you simply discard the new object and keep the original',
+        'piece.x is read-only in JavaScript',
+      ],
+      correct: 1,
+    },
+  ],
 };

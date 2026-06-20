@@ -603,6 +603,53 @@ redraw()`,
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Each trace is stored as `{expr, color, _f}` where expr is the string and _f is the compiled function. Why store both?',
+      options: [
+        'expr is needed for display (showing the formula in UI) while _f is needed for fast evaluation (no re-parsing each frame). Compiling the function once and reusing it avoids calling `new Function()` 60 × N times per second during animation',
+        'JavaScript cannot call a function stored inside an object',
+        'The browser caches _f automatically but not expr',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Adding a new function trace is one line: `fns.push({expr, color, _f: makeFunc(expr)})` followed by `redraw()`. Why does the draw loop not need any changes?',
+      options: [
+        'The draw loop is replaced each time a new function is added',
+        'The draw loop iterates over the `fns` array generically: `fns.forEach(fn => drawTrace(fn))`. It draws whatever is in the array without knowing how many traces exist. Data and rendering are separated — a new data item automatically appears in the next render',
+        'JavaScript arrays automatically trigger redraws when pushed to',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A toggle (visible: true/false) hides a trace rather than removing it from the array. What is the advantage over array removal?',
+      options: [
+        'Array splice is an O(n) operation that is too slow',
+        'Toggling preserves the trace\'s position in the list, its color, and its compiled function. Removing and re-adding would require the user to re-enter the expression and pick a color again, losing their work. The toggle is reversible with zero data loss',
+        'Array removal would cause a JavaScript memory leak',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The lesson\'s core concept is "separate data from rendering." What specific maintenance benefit does this provide when you want to add a feature like "export all traces as CSV"?',
+      options: [
+        'The canvas can be converted to CSV format using ctx.getImageData()',
+        'Because all trace data lives in the `fns` array as plain objects, a new feature just reads from that array — it does not need to inspect the canvas or know anything about how drawing works. The rendering code is similarly shielded: adding an export feature does not touch a single drawing function',
+        'Separate data means the rendering thread and the logic thread run in parallel',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export default sim2_007

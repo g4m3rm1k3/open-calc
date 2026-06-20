@@ -835,7 +835,52 @@ export default {
     'Physiological concentrations: blood Na⁺ ~140 mM, glucose ~5 mM. Deviations of ~10% cause serious symptoms.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Mole = 6.022 × 10²³ particles." Why do chemists use moles instead of just counting atoms?',
+      options: [
+        'Counting individual atoms is impossible even with computers',
+        'Atoms are so small that a useful amount of substance contains ~10²³ of them — the mole lets you convert between mass (what you can weigh) and particle count (what chemistry depends on)',
+        'Moles are a historical unit that has no scientific justification',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Molarity M = n / V(L)." You dissolve 0.5 mol NaCl in 2 L of water. What is the molarity?',
+      options: [
+        '1.0 M',
+        '0.25 M',
+        '2.0 M',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Dilution: M₁V₁ = M₂V₂." You have 100 mL of 6 M HCl and dilute it to 300 mL. What is the new concentration?',
+      options: [
+        '18 M',
+        '2 M',
+        '3 M',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Add acid to water, never water to acid." Why is the order of mixing critical when diluting concentrated acids?',
+      options: [
+        'Water reacts chemically with acid if added first, neutralising it',
+        'Mixing generates intense heat — adding acid to water distributes the heat through a large volume of water; adding water to acid concentrates the heat, potentially causing a violent splatter',
+        'The dilution only works correctly if acid is added to water, not the other way',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_3_3 };

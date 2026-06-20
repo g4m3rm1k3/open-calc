@@ -55,4 +55,50 @@ res
     'CLT: sample means are approximately normal for N≥30, regardless of original distribution.',
     'stats.norm.cdf(): P(X≤x). stats.norm.ppf(): inverse — find x given percentile.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A normal distribution has mean 100 and std 15. By the 68-95-99.7 rule, roughly what fraction of values fall between 70 and 130?',
+      options: [
+        '68% — that is the 1σ range',
+        '95.4% — 70 and 130 are each 2 standard deviations from the mean (100 ± 2×15), and 95% of data falls within 2σ',
+        '99.7% — any symmetric range around the mean captures almost all data',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The Central Limit Theorem (CLT) says sample means are approximately normal for large N. Why is this surprising?',
+      options: [
+        'It is not surprising — averages of normal distributions are always normal',
+        'Because the original data can have ANY distribution (uniform, exponential, bimodal) — yet the distribution of sample means becomes bell-shaped regardless. This is why normal-based tests work even on non-normal data',
+        'It only applies to data that is already symmetric',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A student scores 85 on an exam where μ = 70, σ = 10. Their z-score is 1.5. What does this mean?',
+      options: [
+        'They scored 1.5 times the average score',
+        'Their score is 1.5 standard deviations above the mean — z-score measures how many σ units a value is from μ, enabling comparison across different distributions',
+        'They are in the 1.5th percentile',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'stats.norm.cdf(1.96) ≈ 0.975. What does this compute?',
+      options: [
+        'The probability that a normal random variable is exactly 1.96',
+        'P(X ≤ 1.96) for a standard normal — the CDF gives the probability of observing a value at or below x; 0.975 means 97.5% of values fall below z = 1.96 (hence ±1.96σ captures 95%)',
+        'The 1.96th standard deviation of the distribution',
+      ],
+      correct: 1,
+    },
+  ],
 }

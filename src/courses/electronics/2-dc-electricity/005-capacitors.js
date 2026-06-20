@@ -85,4 +85,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A fully charged capacitor is connected in a DC circuit where voltage is no longer changing. What current flows through it?',
+      options: [
+        'A steady current proportional to V/C',
+        'Zero — current only flows when voltage is changing (I = C × dV/dt, and dV/dt = 0 for DC steady state)',
+        'A small leakage current equal to the capacitance times the supply voltage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A 4700μF capacitor is charged to 700V on a VFD DC bus. How much energy is stored?',
+      options: [
+        'About 33J — multiply capacitance by voltage directly',
+        'About 1150J — E = ½CV² = 0.5 × 0.0047 × 700² gives over 1 kilojoule',
+        'About 3290J — E = CV² without the half factor',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Two capacitors C1 = 100μF and C2 = 100μF are connected in parallel. What is the total capacitance?',
+      options: [
+        '50μF — parallel capacitors add as reciprocals like parallel resistors',
+        '200μF — capacitors in parallel add directly',
+        '100μF — the capacitances are equal so they average out',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why do capacitors block DC but pass AC signals?',
+      options: [
+        'Capacitors have zero resistance to AC but infinite resistance to DC',
+        'Current flows through a capacitor only when voltage is changing — AC oscillates continuously so current flows continuously, while DC has constant voltage so current stops once the capacitor is charged',
+        'The dielectric conducts AC but blocks DC because of its molecular structure',
+      ],
+      correct: 1,
+    },
+  ],
 };

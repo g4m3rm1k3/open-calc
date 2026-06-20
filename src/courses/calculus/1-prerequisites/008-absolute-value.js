@@ -298,4 +298,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'completed-example-3', 'completed-example-4', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '|x − 5| < 3 is read geometrically as "x is within distance 3 of 5." Which interval satisfies this inequality?',
+      options: [
+        '(2, 8) — since a − r < x < a + r gives 5 − 3 < x < 5 + 3',
+        '(−3, 3) — the distance 3 becomes the endpoints directly',
+        '(5 − 3, 5) ∪ (5, 5 + 3) — the inequality excludes x = 5 itself because |5 − 5| = 0',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '|x + 2| > 4 describes points that are more than distance 4 from −2. What is the solution?',
+      options: [
+        '(−6, 2) — a single interval between the two boundary points',
+        '(−∞, −6) ∪ (2, ∞) — since |x − (−2)| > 4 gives x < −2 − 4 = −6 OR x > −2 + 4 = 2; points outside radius 4 form two separate rays',
+        '(−2 − 4, −2 + 4) = (−6, 2) — same result as the "less than" case',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A quality control check accepts parts where |diameter − 50| ≤ 0.02 mm. What range of diameters passes inspection?',
+      options: [
+        '49.98 ≤ d ≤ 50.02 — the closed interval (50 − 0.02, 50 + 0.02); the ≤ means boundary values are accepted',
+        '49.98 < d < 50.02 — the open interval excludes diameters exactly at the tolerance boundary',
+        '|d| ≤ 50.02 — interpreting the absolute value as an upper bound on the raw diameter',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'In an epsilon-delta proof, we write |f(x) − L| < ε to mean f(x) is close to L. What is the geometric meaning of this expression?',
+      options: [
+        'f(x) is positive and less than ε + L',
+        'The distance from f(x) to L on the number line is less than ε — f(x) lies in the interval (L − ε, L + ε)',
+        'f(x) minus L is a small negative number bounded by −ε',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -58,5 +58,50 @@ export default {
     'The Loop feeds the empty stack.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"JS is strictly single-threaded." What is the implication for an animation running on the main thread alongside a heavy computation?',
+      options: [
+        'Both run simultaneously — the browser splits the thread',
+        'The heavy computation blocks the animation — the UI freezes until the computation finishes',
+        'The animation is prioritised and the computation is delayed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Heavy sync functions block the UI paint." What is the practical consequence for a user?',
+      options: [
+        'The page becomes unresponsive — clicks and scrolls do not register until the function returns',
+        'The function runs slower but the UI stays responsive',
+        'The browser automatically moves sync functions to a background thread',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"The Loop feeds the empty stack." When does the event loop dispatch a queued callback?',
+      options: [
+        'Immediately when the callback is scheduled, even if code is running',
+        'Only after the current call stack is completely empty — the event loop waits for a clear stack',
+        'After a fixed 100ms delay to batch multiple callbacks together',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'setTimeout(fn, 0) registers a callback with zero delay. Does fn run immediately?',
+      options: [
+        'Yes — zero milliseconds means it runs right away',
+        'No — it is still placed in the macrotask queue and runs only after the current stack empties',
+        'Yes, but only if no other code is running at that moment',
+      ],
+      correct: 1,
+    },
+  ],
 };

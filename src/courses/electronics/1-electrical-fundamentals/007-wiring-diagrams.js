@@ -110,4 +110,50 @@ export default {
       difficulty: 'hard',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A wiring diagram shows wire number 147 at relay K3 pin 14 and also at PLC output Q0.3. What does this tell you?',
+      options: [
+        'Wire 147 is connected at two different electrical potentials — one side is signal, the other is power',
+        'Both points are the same electrical node — the wire number identifies a single continuous conductor',
+        'There are two separate wires numbered 147 which are not connected',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You measure full supply voltage (24V) across a component in a series circuit that should only drop a few volts. What does this indicate?',
+      options: [
+        'The component is shorted — it has near-zero resistance and passes all the current',
+        'There is an open circuit somewhere else in the series loop — no current flows so this component is showing the full supply voltage',
+        'The power supply voltage has increased — check the supply output',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'When troubleshooting, what is the difference between a schematic and a wiring diagram?',
+      options: [
+        'Schematics show AC circuits; wiring diagrams show DC circuits',
+        'A schematic shows how the circuit functions with logical component layout; a wiring diagram shows physical terminal-to-terminal connections and wire routing',
+        'Schematics are always more detailed than wiring diagrams',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A cross-reference notation on a relay coil reads "14/B3". What does this mean?',
+      options: [
+        'The relay requires 14 volts and has 3 contacts on terminal block B',
+        'A contact controlled by this coil can be found on drawing sheet 14, at position row B, column 3',
+        'The relay coil is located on sheet B3, position 14',
+      ],
+      correct: 1,
+    },
+  ],
 };

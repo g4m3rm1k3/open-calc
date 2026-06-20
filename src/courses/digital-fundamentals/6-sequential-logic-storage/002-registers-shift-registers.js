@@ -835,5 +835,50 @@ export default {
     'LFSR: tap positions determine sequence. 2ᴺ−1 states (all-zeros excluded). CRC = LFSR mod-2 division.',
   ],
   checkpoints:['read-intuition'],
-  quiz:[],
+  quiz:[
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Parallel register = N flip-flops + load enable. LD=0: capture D." You have an 8-bit parallel register. How many clock cycles does it take to load a byte?',
+      options: [
+        '8 cycles — one bit per cycle',
+        '1 cycle — all 8 bits are presented in parallel on D0–D7 and captured simultaneously on the clock edge',
+        '2 cycles — two 4-bit halves load sequentially',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Shift register = flip-flop chain. Each clock: every bit moves one position right." You load 8 bits serially into an 8-bit shift register. How many clock cycles does it take?',
+      options: [
+        '1 cycle',
+        '8 cycles — one bit is shifted in per clock pulse',
+        '16 cycles — one cycle in, one cycle to settle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"SIPO: serial in, parallel out." Where is SIPO useful?',
+      options: [
+        'Converting a parallel bus to a serial stream for transmission over a single wire',
+        'Receiving serial data (one bit at a time) and presenting all bits simultaneously for a processor to read in one operation',
+        'Multiplying binary numbers by shifting',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"LFSR: 2ᴺ−1 states (all-zeros excluded). CRC = LFSR mod-2 division." Why is the all-zeros state excluded from an LFSR sequence?',
+      options: [
+        'Zero is not a valid digital state in hardware',
+        'If all flip-flops are zero, every XOR feedback tap also produces zero — the register stays at zero forever and never generates a sequence',
+        'The LFSR design wastes one state for synchronisation',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -405,4 +405,51 @@ print("route requests by user ID, and each shard only needs to do O(1) lookups."
     "Column-family stores optimize for time-series, append-only, high write volume",
     "CAP theorem: distributed systems pick 2 of: Consistency, Availability, Partition Tolerance",
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Vertical scaling (adding RAM/CPU to one server) has a practical ceiling. What does horizontal scaling (adding more servers) require that vertical does not?',
+      options: [
+        'More expensive hardware for each new machine',
+        'Your application must partition and distribute data across machines — queries that touch data on multiple servers require coordination or distribution strategies. SQL\'s strong guarantees (joins, ACID) are hard to implement across machines, which is why NoSQL databases often relax those guarantees to enable horizontal scale',
+        'A cloud provider — horizontal scaling cannot be done on-premises',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A document store retrieves a user profile including their address, preferences, and recent orders in one query. An equivalent SQL schema would need 3 joins. When does the embedded document model win?',
+      options: [
+        'Always — embedding avoids joins which are always slow',
+        'When the data is always read together, is bounded in size, and belongs to one parent. If orders could number in the millions or need to be queried independently, a reference (foreign key equivalent) is better. The document model wins when the read pattern matches the embedded structure',
+        'When the database is under 1GB — embedding becomes slow beyond that',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A key-value store does O(1) lookups by key. What query is impossible with a pure key-value store that SQL handles easily?',
+      options: [
+        'Retrieving a value given its key',
+        'Finding all users whose age is between 25 and 35. Without a secondary index, a key-value store can only look up by exact key. Range scans, filters, and aggregations require scanning all keys — O(n) — or adding indexes that the key-value model does not natively provide',
+        'Storing binary blob data larger than 1MB',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'CAP theorem states distributed systems can guarantee at most 2 of: Consistency (C), Availability (A), Partition Tolerance (P). Why is choosing to sacrifice P not a realistic option?',
+      options: [
+        'P is required by cloud providers',
+        'Network partitions (machines losing contact with each other) happen in any real distributed system — cables fail, switches drop packets, datacenters go offline. You cannot prevent partitions; you can only decide how to behave when they occur. So the real choice is always between C and A during a partition, not whether to tolerate partitions at all',
+        'Partition tolerance is required by the TCP/IP protocol',
+      ],
+      correct: 1,
+    },
+  ],
 };

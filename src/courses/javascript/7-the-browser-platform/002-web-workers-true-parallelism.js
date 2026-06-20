@@ -379,5 +379,50 @@ export default {
     'Terminate with worker.terminate() (main) or self.close() (inside worker).',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You run a heavy computation on the main thread. What happens to the UI while it runs?',
+      options: [
+        'The UI continues normally — the browser prioritises rendering',
+        'The page freezes — the main thread handles both JS and rendering, so blocking JS blocks the UI',
+        'The browser moves the computation to a background thread automatically',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A Web Worker runs on a separate thread. Can it directly access and modify the DOM?',
+      options: [
+        'Yes — workers have full DOM access',
+        'No — workers have no access to the DOM; they communicate with the main thread via postMessage',
+        'Yes, but only to read DOM properties, not write them',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'By default, postMessage copies data to the worker. What is the alternative for large typed arrays?',
+      options: [
+        'Share a reference to the original object — workers share the same memory space',
+        'Transfer ownership of the buffer by passing it in the second argument — the original becomes unusable, but no copy is made',
+        'Use JSON.stringify to send — it avoids the copy overhead',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'How do you stop a running Web Worker from the main thread?',
+      options: [
+        'Call worker.cancel()',
+        'Call worker.terminate() — it immediately stops the worker regardless of what it is doing',
+        'Send a "stop" message via postMessage and the worker stops itself',
+      ],
+      correct: 1,
+    },
+  ],
 };

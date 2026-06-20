@@ -212,4 +212,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'completed-example-1', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You use the Taylor series sin(x) ≈ x − x³/6 to estimate sin(0.1). Why is this a good approximation?',
+      options: [
+        'The series truncation is always accurate when you use at least 2 terms',
+        'At x = 0.1, the omitted term x⁵/120 = (0.1)⁵/120 ≈ 8×10⁻⁸ — extremely small, so the two-term polynomial is accurate to 7 decimal places near the expansion point',
+        'sin(x) ≈ x is always accurate to within 1% for any x since sine is bounded by 1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A limit like lim(x→0) (1 − cos x)/x² appears as 0/0. How do Taylor series help?',
+      options: [
+        'Taylor series avoid the 0/0 form by replacing x with a series variable that never equals 0',
+        'Replace cos x with its Maclaurin series: 1 − cos x = 1 − (1 − x²/2 + x⁴/24 − ⋯) = x²/2 − x⁴/24 + ⋯. Then (1 − cos x)/x² = 1/2 − x²/24 + ⋯ → 1/2 as x → 0, eliminating the indeterminate form',
+        'Applying L\'Hôpital\'s rule twice is equivalent, but Taylor series only help with sums not quotients',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '∫e^(−x²) dx has no elementary antiderivative. How can power series help compute ∫[0 to 0.5] e^(−x²) dx?',
+      options: [
+        'Use e^(−x²) = 1 − x² + x⁴/2! − x⁶/3! + ⋯ and integrate term by term: ∫[0 to 0.5] becomes 0.5 − (0.5)³/3 + (0.5)⁵/10 − ⋯, giving a series that converges quickly for small x',
+        'Integrate the series for e^x and substitute −x² as a final step',
+        'Power series only help for definite integrals from 0 to 1; for other bounds, numerical methods are required',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You need sin(x) accurate to 5 decimal places for x in [0, π/4]. How do you decide how many Taylor terms to include?',
+      options: [
+        'Always use the first 5 terms — one per decimal place of accuracy required',
+        'Use the alternating series error bound: the error is at most the first omitted term |x|²ⁿ⁺³/(2n+3)! — find n such that (π/4)²ⁿ⁺³/(2n+3)! < 5×10⁻⁶, then use n+1 terms. The error bound tells you exactly when to stop',
+        'Include terms until the ratio of consecutive terms drops below 10⁻⁵, which signals the series has converged',
+      ],
+      correct: 1,
+    },
+  ],
 }

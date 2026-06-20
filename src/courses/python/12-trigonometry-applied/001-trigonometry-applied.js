@@ -981,4 +981,51 @@ res
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'math.sin() in Python takes input in RADIANS. If you have an angle in degrees, what do you do?',
+      options: [
+        'math.sin() automatically detects degrees vs radians based on the input magnitude',
+        'Convert first: math.sin(math.radians(degrees)) or equivalently math.sin(degrees * math.pi / 180). Always check units — passing degrees to sin() silently gives wrong answers',
+        'Use math.sindeg(degrees) — Python has separate functions for each unit',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A sine wave y = A·sin(2π·f·t + φ) has frequency f = 60 Hz. What is the period T?',
+      options: [
+        'T = 60 seconds — frequency and period are the same for sine waves',
+        'T = 1/f = 1/60 ≈ 0.0167 seconds — frequency is cycles per second; period is seconds per cycle; they are reciprocals. At 60 Hz, there are 60 full oscillations per second, each taking 1/60 of a second',
+        'T = 2π/60 ≈ 0.105 seconds — you divide by 2π because of the radian convention',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Daily temperature data shows a clear sinusoidal pattern over a year. How do you identify the amplitude A and vertical shift D from the data?',
+      options: [
+        'A = maximum temperature; D = minimum temperature',
+        'A = (max - min) / 2 (half the total swing) and D = (max + min) / 2 (the average — the midline). The maximum is D + A and the minimum is D - A',
+        'A = average deviation from the mean; D = the standard deviation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The Pythagorean identity sin²(x) + cos²(x) = 1 holds for all x. What does this express computationally?',
+      options: [
+        'The sum of sin and cos is always 1 for any angle',
+        'For any angle x, the point (cos(x), sin(x)) lies on the unit circle (radius 1) — x²+y²=1 for those coordinates. Computationally, you can always use this to simplify: if you know sin(x), you can find cos(x) = ±√(1-sin²(x))',
+        'Squaring a trig function always gives the same result as the other squared',
+      ],
+      correct: 1,
+    },
+  ],
 }

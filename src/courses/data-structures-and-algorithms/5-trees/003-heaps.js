@@ -508,6 +508,53 @@ for i, v in enumerate(nums):
     color = "#f59e0b" if v in selected else "#334155"
     fig.bar(i, v, label=str(v)+(" ★" if v in selected else ""), color=color)
 fig.show()`,
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A min-heap guarantees O(1) access to the minimum and O(log n) insert/extract. Why is O(1) min-access possible without sorted order?',
+      options: [
+        'The heap caches the minimum in a separate variable updated on every insert',
+        'The heap property guarantees the minimum is always at the root (index 0). Every node is ≤ its children, so the root — with no parent to be smaller than — must be the global minimum. No traversal needed: just look at index 0',
+        'The array is sorted, so index 0 always holds the minimum',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A heap is stored in an array using index arithmetic: for node at index i, parent is at (i−1)//2, left child at 2i+1, right child at 2i+2. Why store a tree in an array instead of using pointers?',
+      options: [
+        'Arrays are required by Python\'s heapq module',
+        'A complete binary tree maps perfectly to an array with no wasted slots. Index arithmetic replaces pointers with arithmetic — no memory overhead for left/right references, better cache locality (elements are contiguous), and simpler implementation. The completeness property (filled level by level, left to right) ensures no gaps',
+        'Pointer-based trees cannot implement the heap property',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Heapify (building a heap from an unsorted array) is O(n), faster than inserting n elements one by one (O(n log n)). Why is bottom-up heapify O(n)?',
+      options: [
+        'Bottom-up only processes the bottom half of the array (leaf nodes)',
+        'Most nodes are near the bottom of the heap and have little sifting to do. The few nodes near the top can sift down O(log n) levels, but the many nodes near the bottom sift down O(1) or O(2) levels. Summing over all levels gives a geometric series that converges to O(n), not O(n log n)',
+        'The heapify operation uses a faster comparison algorithm than insertion',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Top-K largest elements: one approach sorts all n elements O(n log n) then takes the last K. A heap approach uses a min-heap of size K. What is the heap approach\'s time complexity, and when is it better?',
+      options: [
+        'O(n log K) — process all n elements, maintain heap of size K. Better when K << n: log K << log n, and you avoid sorting the full array. For K=10 from n=10⁶, log₁₀(10) = 1 vs log₁₀(10⁶) = 6 — a 6× saving in the log factor',
+        'O(K log n) — only K heapify operations are needed',
+        'O(n) — the heap lookup is O(1) so the n-pass dominates',
+      ],
+      correct: 0,
+    },
+  ],
               output: 'All assertions passed!',
               status: 'idle',
               figureJson: null,

@@ -989,5 +989,50 @@ export default {
     'MUX: F = A·S̄ + B·S. Majority: F = AB+BC+AC. Equality: XNOR. Double NOT: wire.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Signal tracing: inputs → gate 1 → intermediate → gate 2 → output. One step at a time." A=1, B=0 feed an OR gate whose output feeds a NOT gate. What is the final output?',
+      options: [
+        '1 — OR(1,0)=1, but NOT flips it',
+        '0 — OR(1,0)=1, NOT(1)=0',
+        '1 — NOT of 0 is 1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Truth table: 2ᴺ rows, binary order 000...111." You have a 3-input circuit. In what order do you fill out the input rows?',
+      options: [
+        'Alphabetical order of the input variable names',
+        '000, 001, 010, 011, 100, 101, 110, 111 — binary counting order',
+        'Any order — truth tables do not have a required format',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Boolean expression: write sub-expression at each gate output, substitute left-to-right." In a circuit with AND(A,B) feeding OR with C, what is the Boolean expression?',
+      options: [
+        '(A OR B) AND C',
+        '(A AND B) OR C',
+        'A AND (B OR C)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"MUX: F = A·S̄ + B·S." In a 2-to-1 MUX, when select S=1, which input is passed to output?',
+      options: [
+        'Input A — S=1 selects the first input',
+        'Input B — when S=1, the B·S term is active (B·1=B), and the A·S̄ term is zero',
+        'Both inputs are OR\'d together when S=1',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -208,4 +208,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You are solving (x + 1)/(x − 2) ≤ 0. Why is it wrong to multiply both sides by (x − 2) to clear the denominator?',
+      options: [
+        'Multiplying by a denominator always changes a rational inequality into a polynomial one, which requires starting over with a sign chart',
+        'You do not know the sign of (x − 2) — if it is negative, you must flip the inequality; if positive, you do not. Since x can be anything, you cannot apply one fixed rule. Instead, use a sign chart on the factored form',
+        'You can multiply by (x − 2) as long as you square both sides afterward to eliminate any sign ambiguity',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Solve x² − 3x − 4 > 0 using a sign chart. The factors are (x − 4)(x + 1). On which intervals is the product positive?',
+      options: [
+        '(−1, 4) — the expression is positive between the roots',
+        '(−∞, −1) ∪ (4, ∞) — the product of two negative factors is positive on the left ray, and two positive factors give a positive product on the right ray; between the roots, the factors have opposite signs',
+        '[−1, 4] — the closed interval between the roots where the quadratic is non-negative',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The inequality |x − 3| < 5 is read as "x is within distance 5 of 3." What interval is the solution set?',
+      options: [
+        '(−2, 8) — since −5 < x − 3 < 5 gives 3 − 5 < x < 3 + 5, i.e. −2 < x < 8',
+        '(0, 6) — taking 3 − 5/2 < x < 3 + 5/2',
+        '(−5, 5) — the center is x = 0 because only the radius of 5 matters',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'When solving a linear inequality, you multiply both sides by −2. What must you do to keep the inequality valid?',
+      options: [
+        'Add 2 to both sides to compensate for the multiplication',
+        'Flip the direction of the inequality — multiplying or dividing both sides by any negative number reverses the order of the number line, so < becomes > and ≥ becomes ≤',
+        'Nothing — multiplying by a constant never changes the inequality direction',
+      ],
+      correct: 1,
+    },
+  ],
 }

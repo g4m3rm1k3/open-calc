@@ -50,4 +50,50 @@ res
     'For linear regression GD converges to the same answer as the normal equations.',
     'All deep learning is gradient descent on a very complex loss function.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A gradient descent loss curve oscillates up and down rather than decreasing smoothly. What is the most likely cause?',
+      options: [
+        'The data has outliers that are confusing the gradient calculation',
+        'The learning rate is too high — large steps overshoot the minimum, bouncing back and forth across the valley; dividing the learning rate by 10 should produce a smooth, monotonically decreasing loss curve',
+        'The model needs more iterations — oscillation always stabilizes after enough steps',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'For linear regression, gradient descent and the normal equations converge to the same answer. Why use gradient descent at all?',
+      options: [
+        'Gradient descent is more accurate than the normal equations for small datasets',
+        'For large datasets, computing (XᵀX)⁻¹ in the normal equations is O(p³) in features and O(np²) in data — prohibitively expensive for neural networks with millions of parameters; gradient descent updates weights incrementally and scales to any problem size',
+        'Normal equations only work for two-variable regression; gradient descent handles any number of features',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The gradient of loss at a point is a positive number. Which direction does gradient descent step?',
+      options: [
+        'In the positive direction — toward the steepest increase',
+        'In the negative direction — gradient descent subtracts the gradient (θ -= lr × gradient), moving toward the function\'s minimum; the gradient points uphill, so the negative gradient points downhill',
+        'It depends on the learning rate — a high learning rate steps positive, a low rate steps negative',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Stochastic Gradient Descent (SGD) updates using one random sample at a time instead of the whole dataset. What is the main trade-off?',
+      options: [
+        'SGD is always worse than batch gradient descent — using one sample gives a noisy estimate',
+        'SGD is much faster per update (one sample instead of N) but each gradient estimate is noisier — it still converges and the noise can help escape shallow local minima; the speed gain per update typically outweighs the noise cost for large datasets',
+        'SGD requires a higher learning rate to compensate for the smaller batch size',
+      ],
+      correct: 1,
+    },
+  ],
 }

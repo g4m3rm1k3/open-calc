@@ -135,4 +135,51 @@ export default {
       solution: 'Bit assignment (12 bits, can fit in INT):\n\nBits 0–2: X axis  (0=X_in_pos, 1=X_moving, 2=X_fault)\nBits 3–5: Y axis  (3=Y_in_pos, 4=Y_moving, 5=Y_fault)\nBits 6–8: Z axis  (6=Z_in_pos, 7=Z_moving, 8=Z_fault)\nBits 9–11: A axis (9=A_in_pos, 10=A_moving, 11=A_fault)\n\nPLC ladder to pack:\n  AxisStatus := 0\n  IF X_in_pos: AxisStatus := AxisStatus OR 1       (bit 0)\n  IF X_moving: AxisStatus := AxisStatus OR 2       (bit 1)\n  IF X_fault:  AxisStatus := AxisStatus OR 4       (bit 2)\n  (repeat for Y using shifts 3, 4, 5, etc.)\n\nHMI to unpack X axis fault:\n  X_fault_display := (AxisStatus AND 4) <> 0    (mask bit 2)\n\nThis sends one INT register per scan instead of 12 separate BOOL registers, reducing communication overhead by 12×.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Binary 1011 = decimal 11. How is this computed?',
+      options: [
+        'Add the digits: 1 + 0 + 1 + 1 = 3',
+        '1×2³ + 0×2² + 1×2¹ + 1×2⁰ = 8 + 0 + 2 + 1 = 11 — each bit position is a power of 2 (rightmost = 2⁰); multiply each bit by its position value and sum them',
+        'Multiply the digits in order: 1 × 0 × 1 × 1 = 0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Hex 0xFF = decimal 255. Why is hexadecimal preferred over binary when reading memory addresses or fault codes in PLCs and CNC?',
+      options: [
+        'Hexadecimal is a newer standard that PLCs switched to for compatibility',
+        'Each hex digit represents exactly 4 bits — so 8 bits (one byte) is 2 hex digits (00 to FF), and 16 bits is 4 hex digits (0000 to FFFF). Hex is compact (reading 0x1A3F is easier than 0001101000111111) while still mapping directly to binary without mental arithmetic',
+        'Hexadecimal is required by all ANSI/IEC PLC standards and cannot be avoided',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'To test if bit 3 of a register is set, you AND the register with 8 (binary 1000). If the result is non-zero, bit 3 is set. Why does this work?',
+      options: [
+        'The AND with 8 shifts the bits right by 3 positions to reveal bit 3',
+        'ANDing with a mask that has only bit 3 set (1000 = 8) zeroes all other bits; if bit 3 of the register was 1, the result is 8 (non-zero); if bit 3 was 0, the result is 0. This "bit masking" isolates any individual bit without affecting others',
+        'Only even-numbered bits can be tested with AND; odd bits require OR masking',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A CNC alarm word shows 0x0400. Without a manual, how would you identify which bit is set?',
+      options: [
+        'Read the hex digits as decimal: 0x0400 = 400 decimal = bit 400',
+        'Convert to binary: 0x0400 = 0000_0100_0000_0000 (binary). Count from right starting at bit 0: bit 10 is the only 1. Then look up bit 10 in the alarm bit table — this tells you exactly which fault it represents, regardless of the decimal or hex representation',
+        'Multiply the hex value by 4 to get the bit number: 0x0400 × 4 = bit 16',
+      ],
+      correct: 1,
+    },
+  ],
 };

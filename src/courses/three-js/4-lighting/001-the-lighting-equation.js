@@ -574,7 +574,52 @@ export default {
   challenges: [],
   mentalModel: ['Phong = ambient + diffuse(N·L) + specular(R·V)^shininess. Ambient=constant fill, diffuse=shape, specular=shiny highlight.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Phong = ambient + diffuse(N·L) + specular(R·V)^shininess." Which term accounts for the base brightness of a surface even when no direct light hits it?',
+      options: [
+        'Diffuse — it provides a minimum illumination floor',
+        'Ambient — a constant added to prevent surfaces in shadow from being completely black',
+        'Specular — the highlight is always visible regardless of light angle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Diffuse = shape." A matte sphere lit from the left. Describe the Kd×(N·L) term across the sphere\'s surface.',
+      options: [
+        'It is the same value everywhere because the surface colour is uniform',
+        'It varies smoothly from bright (N·L ≈ 1 where the normal faces the light) to zero (N·L ≤ 0 on the dark side) — revealing the 3D shape',
+        'It only applies at the very edge of the sphere',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Specular = shiny highlight." Why is max(0, R·V)^shininess used instead of just R·V?',
+      options: [
+        'max(0, ...) prevents negative specular contributions when the reflection points away from the viewer, and the exponent concentrates the highlight into a tight spot',
+        'The exponent boosts performance by simplifying the calculation',
+        'max is needed because R and V are not normalised',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Multiple lights are present in the scene. How do their Phong contributions combine?',
+      options: [
+        'Only the brightest light is used per pixel — lights do not add',
+        'Each light\'s ambient + diffuse + specular contribution is computed separately and added together (superposition of light is linear)',
+        'Lights are averaged to prevent oversaturation',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_3_0 }

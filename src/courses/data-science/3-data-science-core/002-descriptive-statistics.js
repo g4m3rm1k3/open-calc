@@ -54,4 +54,50 @@ res
     'IQR outlier fence: below Q1-1.5×IQR or above Q3+1.5×IQR.',
     'describe() rows: count, mean, std, min, Q1(25%), median(50%), Q3(75%), max.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Dataset: [10, 20, 30, 40, 1000]. Mean = 220, Median = 30. Which better represents the "typical" value?',
+      options: [
+        'Mean — it uses all the data, making it more accurate',
+        'Median — the outlier 1000 pulls the mean far from the cluster; median (the middle value when sorted) is not affected by extreme values and better represents where most values fall',
+        'They are equally good — use whichever is easier to compute',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Two datasets have the same mean but different standard deviations (σ = 2 vs σ = 20). What does this mean?',
+      options: [
+        'They have different numbers of data points — larger σ means more data',
+        'The second dataset is more spread out — individual values are farther from the mean on average; σ measures dispersion, not location',
+        'The second dataset has more outliers than the first by definition',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The IQR (interquartile range) = Q3 − Q1. Why is it more robust than standard deviation for outlier detection?',
+      options: [
+        'IQR is faster to compute than standard deviation',
+        'Standard deviation squares all deviations so outliers contribute disproportionately; IQR uses only the middle 50% of data (Q1 to Q3), making it insensitive to extreme values at the tails',
+        'IQR works for categorical data while standard deviation requires numeric data',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A salary dataset is right-skewed (many people earn $40k–80k, a few earn $500k+). Which summary is most informative?',
+      options: [
+        'Mean and standard deviation — these are always the standard descriptive statistics',
+        'Median and IQR — for skewed distributions, the median captures the center without outlier distortion, and IQR captures spread robustly; mean and std would misrepresent the typical employee\'s experience',
+        'Mode and range — for salary data, the most common value and overall spread are most meaningful',
+      ],
+      correct: 1,
+    },
+  ],
 }

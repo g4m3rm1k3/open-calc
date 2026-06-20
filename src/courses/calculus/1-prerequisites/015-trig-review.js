@@ -626,4 +626,50 @@ export default {
     "completed-example-2",
     "solved-challenge",
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'On the unit circle, what do the coordinates (cos θ, sin θ) represent geometrically?',
+      options: [
+        'The angle θ measured in degrees and the radius at that angle',
+        'The x-coordinate and y-coordinate of the point on the unit circle at angle θ from the positive x-axis',
+        'The slope and y-intercept of the radius line drawn at angle θ',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why do mathematicians prefer radians over degrees?',
+      options: [
+        'Radians make the numbers smaller, which reduces rounding errors in calculations',
+        'Radians make the calculus formulas clean — d/dθ[sin θ] = cos θ only holds when θ is in radians; with degrees there is an extra π/180 factor',
+        'Radians were standardized by an international committee, so they are required in scientific work',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is sin²θ + cos²θ for any angle θ?',
+      options: [
+        '0 — the sine and cosine cancel each other on the unit circle',
+        '1 — this is the Pythagorean identity, because (cos θ, sin θ) is on the unit circle of radius 1, so x² + y² = 1',
+        'It depends on θ — there is no single fixed value',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The period of sin(2x) is π. The period of sin(x) is 2π. What causes the period to halve when the argument is doubled?',
+      options: [
+        'Multiplying the argument by 2 doubles the amplitude, which compresses the wave horizontally as a side effect',
+        'The function completes one full cycle when its argument increases by 2π; with argument 2x, that happens after x increases by π, so the period is π',
+        'Doubling the argument shifts the graph by π/2 to the left, which visually appears as a shorter period',
+      ],
+      correct: 1,
+    },
+  ],
 };

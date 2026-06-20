@@ -500,6 +500,53 @@ draw_edges(root)
 for val, (x, y) in positions.items():
     fig.point(x, y, label=str(val), color="#60a5fa", size=8)
 fig.show()`,
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The BST invariant: every node in the left subtree has a smaller value; every node in the right subtree has a larger value. What does this invariant guarantee about in-order traversal?',
+      options: [
+        'In-order traversal returns nodes in the order they were inserted',
+        'In-order traversal (left → root → right) visits nodes in sorted ascending order. At every node, everything to the left is smaller (printed first) and everything to the right is larger (printed last) — the invariant enforces sorted output recursively',
+        'In-order traversal returns nodes in level order',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Deleting a node with two children in a BST: you replace it with its in-order successor (the smallest value in the right subtree). Why the in-order successor specifically?',
+      options: [
+        'The successor is always a leaf, making deletion straightforward',
+        'The in-order successor is the smallest value greater than the deleted node. Replacing with it maintains the BST invariant: the successor is larger than everything in the left subtree (since deleted_node was) and smaller than everything else in the right subtree (since it was the minimum of that subtree)',
+        'The in-order successor is always the right child of the deleted node',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A BST built from inserting [1, 2, 3, 4, 5] in order degenerates to a linked list. What is the practical consequence?',
+      options: [
+        'The tree violates the BST invariant',
+        'Search, insert, and delete all become O(n) instead of O(log n). Each new node is always inserted as the rightmost child (since each new value is larger than all previous). This is why self-balancing BSTs (AVL, red-black) exist: they rebalance on insert/delete to maintain O(log n) height regardless of insertion order',
+        'The tree uses twice as much memory as a balanced BST',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'BST search compares the target against the current node and recurses either left or right. This eliminates half the remaining tree at each step. What makes this similar to binary search on a sorted array?',
+      options: [
+        'Both require the data to be stored contiguously in memory',
+        'Both halve the search space at each comparison: binary search eliminates the wrong half of the array; BST search eliminates the wrong subtree. Both achieve O(log n) on balanced data. The BST is the pointer-based analogue of binary search, enabling O(log n) insert and delete alongside search — which a sorted array cannot do without O(n) shifts',
+        'Both require exactly log₂(n) steps regardless of the data',
+      ],
+      correct: 1,
+    },
+  ],
               output: 'All assertions passed!',
               status: 'idle',
               figureJson: null,

@@ -389,7 +389,52 @@ export default {
   challenges: [],
   mentalModel: ['shadowMap: render from light → store depth. Main pass: fragDepth > shadowDepth+bias → shadow. PCF: average 3×3 comparison. Three.js: renderer.shadowMap.enabled, light.castShadow.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Shadow map = depth texture rendered from light\'s view. Compare each fragment\'s depth to stored depth." A fragment is in shadow when?',
+      options: [
+        'Its depth is less than the stored shadow map depth (it is closer to the light)',
+        'Its depth is greater than the stored shadow map depth — something else was closer to the light at that position, blocking it',
+        'Its depth equals the stored depth exactly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"PointLight shadow = 6 renders (cube map). DirectionalLight = 1 render." Why does a PointLight require 6x the shadow rendering cost?',
+      options: [
+        'Point lights are brighter and need more samples',
+        'A point light emits in all directions — the shadow map must cover all 6 faces of a cube to capture occlusion from every direction',
+        'Three.js shadows are inefficient for point lights',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"shadow.bias = -0.0005: prevents acne without causing peter-pan." What is shadow acne and what causes it?',
+      options: [
+        'A performance issue where too many shadow maps are allocated simultaneously',
+        'Self-shadowing artifacts — a surface\'s own depth compared to the shadow map fails the test due to floating-point imprecision, making the surface shadow itself in a striped pattern',
+        'Shadows that disappear at grazing angles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"PCF: average 3×3 comparison." What visual improvement does PCF (Percentage Closer Filtering) provide?',
+      options: [
+        'It makes shadows more accurate by increasing depth precision',
+        'It softens shadow edges by averaging multiple shadow comparisons around each pixel, producing anti-aliased penumbra instead of hard jagged edges',
+        'It renders soft shadows by ray-casting multiple light rays',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_5_0 }

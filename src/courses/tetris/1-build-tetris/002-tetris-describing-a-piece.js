@@ -1140,5 +1140,50 @@ export default {
     'rotate: result[col][N-1-row] = shape[row][col].',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"shape[row][col] === 1 means that cell is filled." In a 4×4 shape matrix, shape[0][0] = 0 and shape[1][1] = 1. Which cell is part of the piece?',
+      options: [
+        'Row 0, column 0',
+        'Row 1, column 1',
+        'Both — 0 means empty, 1 means filled, so only [1][1] is part of the piece',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"boardData = locked pieces. activePiece = floating piece. Never write activePiece into boardData until it lands." Why keep these separate?',
+      options: [
+        'Writing to boardData would be slower than keeping a separate activePiece object',
+        'The active piece can still move — writing it into boardData would make the occupied cells permanent before the piece has stopped, breaking future collision checks',
+        'boardData is read-only and cannot be written to',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"renderBoard: pass 1 = board data, pass 2 = active piece on top." Why is rendering done in two passes?',
+      options: [
+        'Two passes is faster than one for large boards',
+        'First draw the locked pieces from boardData, then overdraw the active piece on top — this correctly shows the active piece floating over the settled board without merging them in data',
+        'The board and active piece use different rendering APIs',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"A piece is an object: shape, colour, x, y." Where do x and y refer to?',
+      options: [
+        'The pixel position of the piece on the canvas',
+        'The column and row of the piece\'s top-left corner on the board grid',
+        'The center of mass of the piece in the shape matrix',
+      ],
+      correct: 1,
+    },
+  ],
 };

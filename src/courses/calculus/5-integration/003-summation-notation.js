@@ -880,4 +880,50 @@ The inductive step is complete: if the formula holds for $k$, it holds for $k+1$
       ]
     }
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does Σ(k=1 to 4) k² equal?',
+      options: [
+        '1² + 2² + 3² + 4² = 1 + 4 + 9 + 16 = 30 — the sigma unfolds into the sum of each term from k=1 to k=4',
+        '4² = 16 — the sigma means evaluate the expression at the upper limit only',
+        '(1+2+3+4)² = 100 — square the sum of indices',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The closed-form formula Σ(k=1 to n) k = n(n+1)/2. What is Σ(k=1 to 100) k?',
+      options: [
+        '5000 — 100 × 50 by averaging',
+        '5050 — n(n+1)/2 = 100(101)/2 = 5050',
+        '10000 — 100² because there are 100 terms each averaging 100',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A telescoping sum like Σ(k=1 to n) (1/k − 1/(k+1)) has most terms cancel. What does it equal?',
+      options: [
+        '1/(n+1) — only the last term survives after cancellation',
+        '1 − 1/(n+1) = n/(n+1) — the first term 1/1 = 1 and the last term −1/(n+1) survive; all middle terms cancel with their neighbors',
+        '0 — all terms cancel in a telescoping sum',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why does Riemann sum notation Σ f(xᵢ*)Δx use summation? What is Δx?',
+      options: [
+        'Δx is the height of each rectangle; sigma adds the widths across all n strips',
+        'Σ f(xᵢ*)Δx adds up areas of n thin rectangles that approximate the region under f(x); Δx = (b−a)/n is the width of each rectangle, and f(xᵢ*) is the height at the chosen sample point in strip i',
+        'Σ replaces the integral sign and Δx is the derivative of x, so the sum computes the derivative of the area function',
+      ],
+      correct: 1,
+    },
+  ],
 }

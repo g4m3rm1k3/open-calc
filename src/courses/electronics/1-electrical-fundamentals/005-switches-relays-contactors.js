@@ -145,4 +145,50 @@ export default {
       solution: 'Contactor: Select AC-3 rated ≥ 11A at 480V. A standard size is 12A or 18A — choose 18A for headroom.\n\nOverload relay: Set to 11A × 1.15 = 12.65A (NEC requires overload protection at 115% FLA for continuous-duty motors). Most overloads have a dial range — set to 12.7A.\n\nFuse (motor branch circuit): 11A × 2.5 (NEC 430.52 for inverse-time breaker) = 27.5A → use 30A breaker. This protects wiring from short circuits; the overload protects the motor from running overloads.',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A relay coil is de-energized. What is the state of its Normally Open (NO) contact?',
+      options: [
+        'Closed — the contact is ready to conduct current',
+        'Open — no current can flow through it until the coil is energized',
+        'It depends on whether the relay has been energized before',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why can\'t a PLC transistor output rated at 0.1A directly drive a solenoid that draws 1.5A?',
+      options: [
+        'PLCs cannot drive DC solenoids — only AC contactors',
+        'The PLC output transistor would be destroyed by the current exceeding its 0.1A rating',
+        'The solenoid requires a different voltage than the PLC output provides',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A safety relay contact wired in series with a motor contactor coil uses a Normally Closed contact. If the safety relay loses power, what happens to the motor?',
+      options: [
+        'Nothing changes — the NC contact stays closed regardless of coil power',
+        'The motor stops — the NC contact opens when the safety relay de-energizes, breaking the contactor coil circuit',
+        'The motor runs faster — less resistance in the circuit with the safety relay off',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why do relay coils need a flyback diode when switched by a PLC transistor output?',
+      options: [
+        'To prevent current from flowing backward through the coil when the relay releases',
+        'When the coil is de-energized, it generates a voltage spike that can destroy the PLC transistor; the diode clamps this spike',
+        'The diode ensures the coil draws less current, staying within the PLC output rating',
+      ],
+      correct: 1,
+    },
+  ],
 };

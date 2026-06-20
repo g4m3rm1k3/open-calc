@@ -221,4 +221,50 @@ export default {
     'attempted-challenge-medium-1',
     'attempted-challenge-medium-2',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'x(t) = cos t, y(t) = sin t traces a unit circle as t goes from 0 to 2π. Why does parametric form describe this better than y = ±√(1−x²)?',
+      options: [
+        'Parametric form is always more efficient because you use two equations instead of two branches of one equation',
+        'Parametric form captures direction and position at each time t — you know where the point IS and WHEN it is there; y = ±√(1−x²) requires two branches, loses orientation, and gives no time information',
+        'The parametric form avoids the square root, making computation faster for all circle calculations',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'For parametric curve x = f(t), y = g(t), the slope dy/dx = (dy/dt)/(dx/dt). Why is this the slope and not dy/dt alone?',
+      options: [
+        'dy/dt is the vertical rate of change with respect to time; to get the geometric slope (rise/run in x-y space), you divide by dx/dt — the horizontal rate of change. This converts "rate in time" to "slope in space"',
+        'dy/dt alone gives the slope because t is just a renaming of x',
+        'You divide by dx/dt to cancel the dt and get the derivative with respect to x as a pure ratio',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A parametric curve traces the same path twice if t runs from 0 to 4π versus 0 to 2π for x = cos t, y = sin t. Does this matter for arc length calculation?',
+      options: [
+        'No — arc length depends only on the geometric path, so both intervals give the same value',
+        'Yes — arc length ∫√((dx/dt)² + (dy/dt)²) dt integrates over t, not over the path. Running from 0 to 4π integrates two full traversals of the circle, doubling the arc length calculation',
+        'It depends on whether the curve is smooth — for smooth curves both intervals give the same result',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The cycloid (path traced by a point on a rolling wheel) cannot be expressed as y = f(x) for its full extent. Why does parametric form handle it naturally?',
+      options: [
+        'The cycloid is not a function of x because it fails the vertical line test — multiple y values exist for some x values. Parametric form (x(t), y(t)) allows multi-valued paths by using time t as the driver, not x',
+        'The cycloid involves trigonometric functions which cannot appear in explicit y = f(x) form',
+        'Parametric form handles cycloids because the wheel angle t replaces both x and y variables simultaneously',
+      ],
+      correct: 0,
+    },
+  ],
 }

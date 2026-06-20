@@ -882,7 +882,52 @@ export default {
     'Haemoglobin: same Hb + O₂ ⇌ HbO₂ equilibrium shifts right in lungs (high pO₂, Q < K) and left in muscles (low pO₂, Q > K).',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Equilibrium: forward rate = reverse rate. Dynamic — both directions occur." A reaction has reached equilibrium. What is actually happening at the molecular level?',
+      options: [
+        'All molecules have stopped reacting — the system is static',
+        'Both the forward and reverse reactions are still occurring, but at equal rates — so the net concentrations appear constant even though individual molecules keep reacting',
+        'Only the slower reaction direction continues at equilibrium',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"K = Π[products]^n / Π[reactants]^n. Pure solids/liquids omitted." Why are pure solids excluded from the K expression?',
+      options: [
+        'Solid concentrations are zero and cannot be included in the formula',
+        'Pure solids and liquids have fixed, constant "concentrations" (activity = 1) — including them would just multiply K by a constant, so by convention they are omitted',
+        'Solids do not participate in equilibrium reactions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"K >> 1 products favoured; K << 1 reactants favoured. Temperature is the only thing that changes K." You add a catalyst to a reaction at equilibrium. What happens to K?',
+      options: [
+        'K increases — the catalyst speeds up the forward reaction more',
+        'K stays the same — catalysts lower Eₐ equally for both directions, so the equilibrium position doesn\'t change',
+        'K decreases — the catalyst removes energy from the system',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Q < K → forward reaction; Q > K → reverse reaction." You measure Q = 0.5 and K = 5. Which direction will the reaction shift?',
+      options: [
+        'Reverse — Q is less than K so there are too many products',
+        'Forward — Q < K means there are not yet enough products relative to equilibrium; the system shifts forward to produce more',
+        'No shift — the system is already at equilibrium',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_4_3 };

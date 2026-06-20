@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'FM IF = 10.7MHz (broadcast), 455kHz (AM)\nPLL demod: V_audio = Δf(t) / K_VCO\nStereo: L = ½(L+R) + ½(L−R),   R = ½(L+R) − ½(L−R)' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An FM receiver uses a limiter stage that deliberately clips the IF signal to a constant amplitude. How can clipping improve audio quality rather than destroy information?',
+      options: [
+        'Clipping increases IF signal power, improving the signal-to-noise ratio by boosting the signal level',
+        'FM information is encoded in frequency, not amplitude — clipping removes amplitude noise completely without affecting the frequency variations that carry the audio; the square wave output still contains all the FM information',
+        'The limiter eliminates the carrier component of the FM signal, leaving only the audio-frequency sidebands for demodulation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A PLL-based FM demodulator uses a voltage-controlled oscillator (VCO) that locks onto the incoming FM carrier. Where does the audio output come from?',
+      options: [
+        'From the phase detector output — the phase difference between the VCO and input signal contains the audio',
+        'From the VCO control voltage — the error signal the PLL generates to keep the VCO tracking the input frequency is directly proportional to the FM frequency deviation, which is the demodulated audio',
+        'From the VCO output frequency itself — the audio is recovered by subtracting the centre frequency from the VCO output',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'While driving, you suddenly switch from one clear FM station to another, rather than hearing them blend gradually as you enter an area of overlap. What causes this sharp switching?',
+      options: [
+        'Car FM receivers use a band-split filter that automatically selects whichever station has a higher frequency carrier',
+        'The limiter in the FM receiver strongly favors the stronger signal — when one station is even a few dB stronger, the limiter suppresses the other by 20–40 dB (the capture effect), producing a sharp switch rather than a gradual blend',
+        'FM stations broadcast in time slots that prevent two stations from transmitting simultaneously in the same area',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'FM broadcast receivers use 10.7 MHz as the standard IF, while AM receivers use 455 kHz. Why is a higher IF used for FM?',
+      options: [
+        'FM signals are at higher frequencies than AM, so a higher IF is needed to avoid audio-frequency interference from the demodulation process',
+        'A higher IF places the image frequency further away from the desired station — for FM (88–108 MHz band), a 10.7 MHz IF puts the image 21.4 MHz away, making it much easier to reject than with a 455 kHz IF which would put the image only 910 kHz away',
+        'FM demodulation circuits only work above 10 MHz; lower frequencies cannot be demodulated using a discriminator',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -627,4 +627,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Wall collision response: `if (ball.position.x > XL) { velocity.x = -Math.abs(velocity.x) }`. Why use `-Math.abs(velocity.x)` instead of just `velocity.x *= -1`?',
+      options: [
+        'Math.abs is faster than negation',
+        'If the ball somehow tunnels past the wall (e.g., at high speed it skips over in one frame), its velocity might already be negative. `*= -1` would flip it positive, pushing it further into the wall. `-Math.abs` always ensures the velocity points away from the wall, regardless of the current sign',
+        'velocity.x *= -1 does not work for Three.js Vector3 objects',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '`ball.position.addScaledVector(velocity, dt)` advances the ball position. What is the equivalent arithmetic?',
+      options: [
+        'ball.position = velocity * dt',
+        'ball.position.x += velocity.x * dt; ball.position.y += velocity.y * dt; ball.position.z += velocity.z * dt — addScaledVector is a convenience method that does the same component-wise addition in one call',
+        'ball.position.set(velocity.x * dt, velocity.y * dt, velocity.z * dt)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The pinball table applies gravity along the −Z axis: `velocity.z += GRAVITY_Z * dt`. Why Z instead of −Y (which is how real gravity works)?',
+      options: [
+        'Three.js does not support Y-axis gravity',
+        'The table is modeled as lying flat (the XZ plane), so "down the table" is in the −Z direction within the 3D scene. Gravity in the real room acts downward (−Y in Three.js Y-up coordinates) but on the table surface it appears as a force along −Z. The physics is simplified to 2D on the XZ plane',
+        'GRAVITY_Z is a constant that automatically sets the correct axis',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The wall bound is `XL = TABLE_W - BALL_RADIUS`. Why subtract the ball radius rather than just checking against TABLE_W?',
+      options: [
+        'TABLE_W is measured in pixels and BALL_RADIUS in world units so a correction is needed',
+        'The ball\'s position is its center. If the center reaches TABLE_W, half the ball has already passed through the wall. Subtracting BALL_RADIUS means the center stops when the ball\'s edge — not its center — touches the wall, giving physically correct bouncing',
+        'Subtracting prevents floating-point errors at exact boundary values',
+      ],
+      correct: 1,
+    },
+  ],
 }

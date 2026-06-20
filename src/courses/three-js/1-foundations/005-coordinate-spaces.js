@@ -712,7 +712,52 @@ export default {
     'Three.js built-ins: modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix, normalMatrix',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"ViewMatrix = inverse(cameraWorldMatrix). Camera always at origin in view space." Why does the view matrix transform the entire world rather than moving the camera?',
+      options: [
+        'Moving the camera would require updating every object\'s position',
+        'The GPU has no concept of a camera — shaders must transform geometry so it appears as if viewed from origin. Moving the world is equivalent to moving the camera in the opposite direction',
+        'Cameras cannot be represented as matrices',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"normalMatrix = transpose(inverse(mat3(modelViewMatrix)))." Why can\'t you use the model matrix directly to transform normals?',
+      options: [
+        'Normals are colours and don\'t need transformation',
+        'Non-uniform scaling distorts normals — a normal perpendicular to a face stays perpendicular only if transformed by the transpose of the inverse, not the model matrix',
+        'Normals must always stay in world space',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Tangent space TBN: per-triangle space. Normal maps store directions in tangent space." Why store normals in tangent space rather than world space?',
+      options: [
+        'World-space normals would change when the object rotates — tangent space moves with the surface, so the same normal map works on any orientation',
+        'Tangent space uses fewer texture channels',
+        'World-space normals cannot be stored in an 8-bit texture',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Six spaces: Object→World→Eye→Clip→NDC→Screen." At which space is the perspective divide (÷W) applied?',
+      options: [
+        'Between World and Eye space',
+        'Between Clip space and NDC — the GPU divides clip-space (x,y,z) by w to produce NDC coordinates',
+        'Between NDC and Screen space',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_0_4 };

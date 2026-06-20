@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'Braking resistor power: P_brake = (0.5 × J × ω²) / t_decel, where J is load inertia (kg·m²), ω is initial angular velocity (rad/s). For a 100kg·m² load decelerating from 1500rpm (157rad/s) in 5s: P = 0.5×100×157²/5 = 246kW peak.' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A variable frequency drive is supplied from 480 V AC three-phase. What voltage appears on the DC bus capacitors inside the drive?',
+      options: [
+        '480 V DC — the rectifier converts AC RMS directly to the same DC voltage',
+        '679 V DC — the diode rectifier charges capacitors to the peak of the AC supply: V_DC = V_AC_rms × √2 = 480 × 1.414 ≈ 679 V; this is why the warning label on VFDs says capacitors remain charged after power-off',
+        '339 V DC — the three-phase rectifier averages the three phase peaks to give roughly 70% of peak AC',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A centrifugal pump motor runs at 100% speed and consumes 30 kW. A VFD reduces the speed to 80%. How much power does the pump now consume?',
+      options: [
+        '24 kW — power scales linearly with speed for centrifugal loads',
+        '15.4 kW — centrifugal load power scales with speed cubed: P ∝ n³; 0.8³ × 30 kW = 0.512 × 30 = 15.4 kW, saving 49% of energy compared to full-speed throttled operation',
+        '19.2 kW — power scales with speed squared (head × flow) for centrifugal loads',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A VFD uses V/Hz control to run a 460 V, 60 Hz motor at half speed (30 Hz). What output voltage does the drive apply?',
+      options: [
+        '460 V — the motor needs full voltage to maintain flux regardless of frequency',
+        '230 V — V/Hz control maintains a constant voltage-to-frequency ratio (460/60 = 7.67 V/Hz); at 30 Hz, output voltage = 30 × 7.67 = 230 V, keeping motor flux constant at half speed',
+        '130 V — voltage scales with frequency squared to match the motor\'s impedance at lower speed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A maintenance engineer installs power factor correction capacitors between a VFD\'s output and the motor to improve power factor. What dangerous consequence can result?',
+      options: [
+        'The capacitors absorb braking energy, causing the DC bus to overvoltage when the motor decelerates',
+        'The capacitors resonate with the motor winding inductance at a frequency near a PWM switching harmonic, creating catastrophic voltage oscillations that can trip or destroy the drive — PFC capacitors must only be placed on the VFD\'s AC input side, never between the drive output and motor',
+        'Output capacitors increase the effective motor cable length, causing voltage doubling reflections that damage the motor winding insulation',
+      ],
+      correct: 1,
+    },
+  ],
 };

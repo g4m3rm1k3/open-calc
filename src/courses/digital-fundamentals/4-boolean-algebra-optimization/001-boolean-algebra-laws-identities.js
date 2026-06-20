@@ -844,5 +844,50 @@ export default {
     'K-map (next lesson) is just a visual way to find which minterms can be absorbed into others.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Every Boolean identity can be proved by truth table." How would you verify that A + AB = A?',
+      options: [
+        'Substitute A=0 and A=1, check both sides match',
+        'Build a truth table with rows for A=0,B=0 / A=0,B=1 / A=1,B=0 / A=1,B=1 and verify both sides give the same output for all rows',
+        'Simplify algebraically until both sides look the same',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Absorption: A + AB = A." Why does AB get absorbed into A?',
+      options: [
+        'If A is 0, both sides are 0. If A is 1, both sides are 1 regardless of B — so B contributes nothing',
+        'AB is always smaller than A, so it disappears',
+        'Absorption only applies when A and B are different variables',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"SOP canonical form: Σm(minterm numbers)." A 2-variable function F is 1 at A=0,B=1 and A=1,B=0. Which SOP expression is correct?',
+      options: [
+        'F = A + B',
+        'F = Ā·B + A·B̄',
+        'F = A·B',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"NAND-NAND = AND-OR (proved by De Morgan twice)." Why does the industry prefer NAND-only implementations?',
+      options: [
+        'NAND gates are patented, so you need fewer licences',
+        'Any AND-OR circuit can be built entirely from NAND gates, and NAND gates are the fastest and most compact CMOS structure',
+        'NAND gates avoid the need for De Morgan transformations',
+      ],
+      correct: 1,
+    },
+  ],
 };

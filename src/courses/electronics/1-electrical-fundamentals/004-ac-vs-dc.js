@@ -130,4 +130,50 @@ export default {
       solution: 'L1-L2 = 480V: Line-to-line voltage of the three-phase 480V supply — this feeds the spindle drive and servo drives.\n\nL1-N = 277V: Phase-to-neutral (277 = 480/√3) — confirms it\'s a wye system with neutral available.\n\nPE ≈ 0V: Protective earth (green wire) is bonded to neutral and ground — correct and safe.\n\n120V transformer secondary: Steps 480V down to 120VAC for HMI, relays, and lighting circuits.\n\n24.1V DC: Switching power supply output for PLC I/O, sensors, and solenoids — the 0.1V over nominal is normal (regulated within ±5%).',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A standard 120V outlet delivers 120V RMS. What is the actual peak voltage of the AC waveform at that outlet?',
+      options: [
+        '120V — RMS and peak are the same for residential outlets',
+        'About 170V — the peak is V_RMS × √2',
+        'About 85V — the peak is lower than RMS because of the averaging effect',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why does measuring 277V between a phase wire and ground in a 480V three-phase system make sense?',
+      options: [
+        'The meter is incorrect — a 480V system should always read 480V to ground',
+        '480V ÷ √3 ≈ 277V because line-to-neutral voltage is less than line-to-line voltage in a wye system',
+        '277V is the RMS value of the 480V peak voltage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What advantage does three-phase power have over single-phase for industrial motors?',
+      options: [
+        'Three-phase is always 480V, making it higher voltage than single-phase',
+        'Three-phase delivers constant power with no zero crossings, reducing pulsation and enabling simpler motor designs',
+        'Three-phase eliminates the need for transformers in industrial settings',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'After disconnecting AC power from a variable frequency drive, why is it dangerous to immediately open the drive for servicing?',
+      options: [
+        'The AC input voltage lingers in the cables for several minutes after disconnection',
+        'The DC bus capacitors remain charged to ~680V and take several minutes to discharge through internal bleed resistors',
+        'Three-phase systems generate back-EMF that continues to power the drive briefly after disconnection',
+      ],
+      correct: 1,
+    },
+  ],
 };

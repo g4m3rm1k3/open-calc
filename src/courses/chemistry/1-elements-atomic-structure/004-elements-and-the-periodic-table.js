@@ -486,7 +486,52 @@ export default {
     'The table is predictive: Mendeleev left gaps and described undiscovered elements — correctly.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"There are 118 elements because proton counts are discrete whole numbers." Could element 118.5 exist?',
+      options: [
+        'Yes — superheavy elements can have fractional proton counts',
+        'No — protons are indivisible particles, so element identity must be a whole number. There is no atom between element 118 and element 119',
+        'Maybe — at extreme temperatures protons can split',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Groups share valence electron count = shared chemical personality." Sodium and potassium are both in Group 1. What does this predict?',
+      options: [
+        'They have the same atomic mass',
+        'They both have 1 valence electron and will behave similarly — both react vigorously with water, both form +1 ions',
+        'They are both gases at room temperature',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Periods track shell filling." Why does Period 3 have 8 elements?',
+      options: [
+        'Period 3 was discovered last and only 8 elements fit in the space available',
+        'The third shell fills its chemically active 8 slots before electrons start a new shell — so 8 elements complete period 3',
+        'There are always exactly 8 elements per period',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Electronegativity increases right and upward." Why is fluorine the most electronegative element?',
+      options: [
+        'Fluorine has the most electrons of any element',
+        'Fluorine is in the top-right — small atom with a nearly full outer shell and a high nuclear charge that strongly pulls shared electrons toward itself',
+        'Fluorine reacts most violently, and violent reactions indicate high electronegativity',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_CHEM_1_3 }

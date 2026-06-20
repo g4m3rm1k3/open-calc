@@ -162,4 +162,50 @@ res
     'Errors stop execution immediately — nothing below the error line runs.',
     'Read error messages precisely: type, line number, description.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A program encounters a runtime error on line 7. What happens to the code on lines 8–15?',
+      options: [
+        'Lines 8–15 run normally — the error is isolated to line 7',
+        'Lines 8–15 do not execute — errors stop execution immediately and control passes to the error handler or the program terminates',
+        'Lines 8–15 are skipped only if they depend on a variable defined on line 7',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is the key difference between source code and a running program?',
+      options: [
+        'Source code is stored in memory, while a running program is stored on disk',
+        'Source code is static text (instructions); a running program is the active process executing those instructions step by step — the code is the recipe, the program is the cooking',
+        'Source code is in a high-level language, while a running program is always machine code',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A Python script reads a file, computes statistics, and prints results. Which part of this is "output"?',
+      options: [
+        'Reading the file — that is where data enters the program',
+        'Printing the results — output is information the program sends outside itself (to the screen, a file, a network); the statistics computation is internal processing',
+        'Computing the statistics — calculations are the final output of any program',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why are "state" and "control flow" two of the most important concepts in programming?',
+      options: [
+        'State and control flow are just technical terms for variables and loops — they have no deeper meaning',
+        'State (what values are stored in memory at a moment in time) combined with control flow (which instruction runs next) together fully describe what a program does at every step — understanding both is how you trace and debug programs systematically',
+        'State refers to the program\'s progress through a file, and control flow refers to keyboard inputs',
+      ],
+      correct: 1,
+    },
+  ],
 }

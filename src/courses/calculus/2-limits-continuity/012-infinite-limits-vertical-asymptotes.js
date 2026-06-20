@@ -252,4 +252,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does lim(x→2⁺) 1/(x−2) equal, and why?',
+      options: [
+        '0 — dividing by an increasingly large denominator shrinks the fraction toward zero',
+        '+∞ — as x approaches 2 from the right, (x−2) is a small positive number, so 1/(x−2) grows without bound in the positive direction',
+        '−∞ — the function flips sign when the input gets close to the singularity',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'For 1/(x−2), the left-hand limit at x = 2 is −∞ and the right-hand limit is +∞. What does this mean for the two-sided limit?',
+      options: [
+        'The two-sided limit is ∞ — both sides blow up so the combined limit is infinite',
+        'The two-sided limit does not exist — the left and right limits are not equal (they differ in sign)',
+        'The two-sided limit is 0 — the two infinite values cancel each other',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A function has a vertical asymptote at x = a. What must be true?',
+      options: [
+        'f(a) must be undefined — the function cannot be defined at a vertical asymptote',
+        'At least one one-sided limit at x = a must be +∞ or −∞ — the function grows without bound as x approaches a from at least one direction',
+        'Both one-sided limits must be +∞ — the function must blow up symmetrically on both sides',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'How do you find the vertical asymptotes of f(x) = (x+1)/((x−3)(x+2))?',
+      options: [
+        'Set the numerator equal to zero: x + 1 = 0 gives x = −1, so the vertical asymptote is at x = −1',
+        'Set the denominator equal to zero: (x−3)(x+2) = 0 gives x = 3 and x = −2, and since neither cancels with the numerator, both are vertical asymptotes',
+        'Set the whole function equal to infinity and solve for x — this gives the points where the graph goes vertical',
+      ],
+      correct: 1,
+    },
+  ],
 }

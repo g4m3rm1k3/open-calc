@@ -529,5 +529,50 @@ export default {
     'CORS: browser blocks cross-origin responses unless the server sends the right headers.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You fetch a URL and get a response back. Is the data already available in the response object?',
+      options: [
+        'Yes — fetch resolves with the parsed data directly',
+        'No — fetch resolves with a Response object; you must call .json() (which returns another Promise) to get the data',
+        'Yes, but only if the server sends a Content-Type: application/json header',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A server returns a 404 response. Does the fetch Promise reject?',
+      options: [
+        'Yes — any non-200 status rejects the Promise',
+        'No — fetch only rejects on network failure; a 404 resolves, but response.ok will be false',
+        'It depends on the browser — Chrome rejects, Firefox resolves',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You POST data to an API with fetch. What do you need to include in the options object?',
+      options: [
+        'Only the URL — fetch automatically detects POST requests',
+        'method: "POST", a Content-Type header set to application/json, and the body as JSON.stringify(data)',
+        'method: "POST" and the data object directly — fetch serialises it automatically',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Your JavaScript on site A tries to fetch data from site B. The browser blocks the request. What is this called and who enforces it?',
+      options: [
+        'SSL mismatch — the certificate authorities reject cross-site requests',
+        'CORS (Cross-Origin Resource Sharing) — the browser blocks cross-origin responses unless site B sends the correct CORS headers',
+        'CSP (Content Security Policy) — JavaScript files cannot make external requests by design',
+      ],
+      correct: 1,
+    },
+  ],
 };

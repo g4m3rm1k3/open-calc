@@ -57,5 +57,50 @@ export default {
     'Trees map directly to the DOM.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Components are just UI functions." What makes a component reusable?',
+      options: [
+        'Each component must be in its own file',
+        'A component is a function that takes inputs and returns UI — call it with different inputs to get different output',
+        'Components are reusable because they share global state',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Props act as isolated input data." What is the key principle about how a component should treat its props?',
+      options: [
+        'Components can modify their props to communicate back to the parent',
+        'Props are read-only inputs — a component uses them to render but should not mutate them',
+        'Props are optional — components always have access to global data anyway',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Trees map directly to the DOM." How does a component tree relate to the page structure?',
+      options: [
+        'Components are abstract and have no direct DOM relationship',
+        'The hierarchy of components maps to the hierarchy of DOM elements — parent components wrap child elements',
+        'Component trees are only for logic; the DOM is built separately',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You have a Button component used in 50 places. You need to add an aria-label to every button. Where do you make the change?',
+      options: [
+        'In all 50 places where Button is used',
+        'In the Button component definition — one change propagates everywhere the component is used',
+        'You cannot change shared components — you must create a new component',
+      ],
+      correct: 1,
+    },
+  ],
 };

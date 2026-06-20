@@ -405,7 +405,52 @@ export default {
   challenges: [],
   mentalModel: ['GPU resources: explicit dispose(). scene.remove() ≠ free. traverse → geometry.dispose()+material.dispose()+texture.dispose(). Share via Map cache. renderer.info.memory to monitor.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"scene.remove() ≠ free. GPU resources: explicit dispose()." You remove a mesh from the scene but do not call dispose(). What leaks?',
+      options: [
+        'Nothing — Three.js garbage-collects GPU resources when the JavaScript object is freed',
+        'The geometry and material buffers remain allocated on the GPU — VRAM usage keeps growing with each removal, eventually crashing or degrading performance',
+        'Only the texture VRAM leaks; geometry is managed automatically',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"traverse → geometry.dispose() + material.dispose() + texture.dispose()." Why must you dispose of all three separately?',
+      options: [
+        'They are the same resource and one dispose() call would work',
+        'Each is a separate GPU resource — geometry lives in vertex buffers, material defines shader programs, and textures live in texture units. All three must be freed independently',
+        'Three.js only allows disposing geometry; materials and textures free themselves',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Share via Map cache." Two meshes use the same brick texture. How does caching help?',
+      options: [
+        'It reduces the number of draw calls',
+        'Without caching, loading the same texture twice uploads it to VRAM twice, doubling memory use. A Map cache returns the already-uploaded texture, using VRAM once for both meshes',
+        'Caching prevents z-fighting between similar textures',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"renderer.info.memory to monitor." You notice VRAM usage increasing each time a level loads. What does this pattern suggest and how do you confirm it?',
+      options: [
+        'The GPU is allocating shadow maps — check renderer.info.render.calls',
+        'Resources from the previous level are not being disposed — check renderer.info.memory.textures and geometries, and watch them grow across level transitions',
+        'The renderer is recompiling shaders — check renderer.info.programs',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_6_2 }

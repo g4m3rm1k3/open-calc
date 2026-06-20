@@ -473,5 +473,50 @@ export default {
     '.catch() can recover: if it returns a value, the chain continues.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A Promise is settled (fulfilled or rejected). Can you change it back to pending?',
+      options: [
+        'Yes — you can reset a Promise by calling .reset() on it',
+        'No — once a Promise settles, its state and value are immutable forever',
+        'Yes, but only if you hold a reference to the original resolve/reject functions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You chain .then(a).then(b). Inside handler a, you return a new Promise. When does b run?',
+      options: [
+        'Immediately after a starts — chaining does not wait for returned Promises',
+        'After the Promise returned from a settles — returning a Promise from .then() makes the chain wait',
+        'b never runs — returning a Promise from .then() breaks the chain',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You have 3 independent API calls. You want all of them to run in parallel and only proceed when all succeed. Which method do you use?',
+      options: [
+        'Promise.race() — takes the first one to settle',
+        'Promise.all() — starts all in parallel and resolves when every one succeeds (rejects if any fail)',
+        'Promise.allSettled() — waits for all but requires manual success checking',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A .catch() handler returns a value. What happens to the Promise chain after that?',
+      options: [
+        'The chain terminates — once you catch, the Promise is done',
+        'The chain continues in a fulfilled state — .catch() can recover and pass a value forward',
+        'The returned value is ignored — .catch() always returns undefined',
+      ],
+      correct: 1,
+    },
+  ],
 };

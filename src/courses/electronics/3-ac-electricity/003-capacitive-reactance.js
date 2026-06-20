@@ -73,4 +73,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A 10μF capacitor is in a 60Hz AC circuit. What is its reactance?',
+      options: [
+        '600,000Ω — multiply capacitance by frequency by 2π',
+        'About 265Ω — XC = 1/(2π × 60 × 10×10⁻⁶)',
+        'About 3.8Ω — divide capacitance by frequency',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You double the frequency of AC applied to a capacitor. What happens to its reactance?',
+      options: [
+        'Reactance doubles — higher frequency means more opposition to current',
+        'Reactance halves — XC = 1/(2πfC), so doubling f halves XC',
+        'Reactance stays the same — it depends only on capacitance, not frequency',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A bypass capacitor is installed from a signal wire to ground to filter 60Hz noise. Why does it protect the signal but reduce the noise?',
+      options: [
+        'The capacitor stores the noise charge and slowly bleeds it to ground, while passing the signal unchanged',
+        'At 60Hz, the capacitor\'s low XC provides a low-impedance path to ground for the noise; at the lower signal frequency, XC is much higher so the signal passes mostly through the load',
+        'The capacitor acts as a frequency-selective gate, physically blocking frequencies above its rated value',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An ideal capacitor in an AC circuit consumes no real power. Why not?',
+      options: [
+        'The capacitor has zero resistance, so no heat is generated regardless of current',
+        'The instantaneous power averages to zero over each cycle — the capacitor stores energy for half the cycle and returns it the other half',
+        'Current never actually flows through a capacitor, only across it, so no power is consumed',
+      ],
+      correct: 1,
+    },
+  ],
 };

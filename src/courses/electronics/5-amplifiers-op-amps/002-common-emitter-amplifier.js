@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In a common-emitter amplifier, when the input voltage rises, the output voltage falls. Why?',
+      options: [
+        'The transistor saturates when the input rises, clamping the output at VCE(sat)',
+        'Rising input → more base current → more collector current → larger voltage drop across RC → Vout = VCC − IC × RC falls',
+        'The emitter resistor creates an inverse relationship between input and output by dividing the supply voltage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A BJT common-emitter amplifier is biased at IC = 2 mA with RC = 3 kΩ. What is the approximate voltage gain magnitude?',
+      options: [
+        '6 — gain = IC × RC = 0.002 × 3000',
+        'About 231 — |Av| = gm × RC = (IC/VT) × RC = (2mA/26mV) × 3kΩ',
+        '0.13 — gain = VT / (IC × RC)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'An emitter bypass capacitor is added across the emitter resistor RE. What effect does this have on AC voltage gain?',
+      options: [
+        'It reduces gain by introducing negative feedback at high frequencies',
+        'It short-circuits RE at AC frequencies, removing the gain-reducing effect of RE so the full gm × RC gain is restored while DC bias stability is preserved',
+        'It has no effect on gain — bypass capacitors only affect the input impedance of the stage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Two common-emitter stages are cascaded. The first stage output connects to the second stage input. What is the total phase shift of the signal from first input to second output?',
+      options: [
+        '180° — each CE stage contributes 90° of phase shift',
+        '360° — each CE stage inverts (180°) and two inversions cancel, returning the signal to its original phase',
+        '0° — cascaded stages have no net phase shift because gains multiply but phases cancel',
+      ],
+      correct: 1,
+    },
+  ],
 };

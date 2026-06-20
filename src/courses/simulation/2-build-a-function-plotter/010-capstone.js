@@ -837,6 +837,53 @@ render()`,
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The capstone assembles the viewport engine (Lesson 8), trace loop (Lesson 7), analysis layer (Lesson 9), and rAF loop (Lesson 5). What design principle does this demonstrate?',
+      options: [
+        'Monolithic architecture — one file contains everything',
+        'Composition: each lesson built a focused, independently testable piece. The capstone snaps them together with minimal glue. Because each piece has a clean interface (w2c takes a world coordinate; drawTrace takes an fn object), they combine without rewriting. This is why good abstractions pay off at integration time',
+        'Object-oriented inheritance — the capstone class extends each lesson class',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Parametric curves use x(t) and y(t) instead of y = f(x). What kind of curve cannot be drawn as y = f(x) but can be drawn parametrically?',
+      options: [
+        'Any polynomial function — polynomials require parametric form',
+        'Closed curves like circles and ellipses. y = f(x) requires exactly one y per x — a vertical slice through a circle gives two y values, so it fails the vertical-line test. Parametric form (cos(t), sin(t)) traces both halves continuously without restriction',
+        'Discontinuous functions like floor(x)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Including `t` as a variable in expressions allows writing `sin(x + t)`. As t increases from 0, what does the sin(x + t) wave do?',
+      options: [
+        'The amplitude increases proportionally to t',
+        'The wave shifts left (phase shift). sin(x + t) = sin(x − (−t)), so increasing t shifts the pattern in the −x direction. The wave appears to travel to the left across the screen — you are watching a moving wave, which is how all wave animations work',
+        'The frequency doubles each time t passes an integer value',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Building the plotter over 10 incremental lessons rather than all at once has a specific pedagogical and engineering benefit. What is it?',
+      options: [
+        'Each lesson produces a smaller file that is faster to download',
+        'Each increment adds one tested capability on top of a working foundation. If something breaks, you know exactly which new piece caused it. Trying to build the full plotter in one step means debugging an untested system where any of ten interacting parts might be wrong — with no working baseline to compare against',
+        'Incremental lessons allow parallel development by multiple team members',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export default sim2_010;

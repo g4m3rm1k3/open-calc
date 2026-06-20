@@ -242,4 +242,51 @@ export default {
     teaser: 'Every partial fraction decomposition converts an unapproachable rational integral into a sum of $\\ln$ and $\\arctan$ integrals — the two standard forms. This is literally how a computer algebra system integrates rational functions.',
     linkedLessons: ['logarithm-relationships', 'trig-identities-deep-dive'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why must you do polynomial long division FIRST if the degree of the numerator ≥ degree of the denominator before applying partial fractions?',
+      options: [
+        'Long division is optional — partial fractions work on any rational expression',
+        'Partial fractions only applies to PROPER fractions (numerator degree < denominator degree); if the numerator degree is ≥ denominator degree, the fraction is improper — long division extracts a polynomial quotient, leaving a proper remainder fraction to decompose',
+        'Long division simplifies the denominator so partial fractions require fewer steps',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'For the denominator (x+2)(x²+1), the partial fraction form is A/(x+2) + (Bx+C)/(x²+1). Why does the irreducible quadratic factor get Bx+C rather than just B?',
+      options: [
+        'Because x²+1 has degree 2, so you need two constants to match degrees',
+        'The numerator over an irreducible quadratic must have degree one less than the denominator: degree 2 requires a degree-1 numerator (Bx+C); using just B would give a constant over a quadratic, which cannot always reconstruct the original function\'s linear variation in the numerator',
+        'Bx+C is used only when x²+1 appears more than once in the denominator',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The cover-up method finds A in A/(x-a) + ... by substituting x=a into the original numerator over all OTHER factors. Why does this work?',
+      options: [
+        'Substituting x=a zeros out the entire denominator, revealing A',
+        'Multiplying both sides by (x-a) and then substituting x=a zeros out all terms containing (x-a), leaving only A = [numerator/(all other factors)] evaluated at x=a — the other terms vanish because they still contain the factor (x-a) which is zero',
+        'The cover-up method only works when all roots are distinct integers',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Partial fractions are described as "what calculus uses to integrate rational functions." Why does decomposing x/((x+1)(x+2)) into -1/(x+1) + 2/(x+2) help with integration?',
+      options: [
+        'The sum form avoids the product rule when differentiating',
+        'Each simple fraction integrates directly to a logarithm: ∫1/(x+a)dx = ln|x+a|+C; the original product form has no standard antiderivative. Partial fractions transform one hard integral into a sum of standard easy integrals',
+        'Partial fraction form is required by the fundamental theorem of calculus',
+      ],
+      correct: 1,
+    },
+  ],
 }

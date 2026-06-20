@@ -390,7 +390,52 @@ export default {
   challenges: [],
   mentalModel: ['SoA: Float32Array per attribute → cache-friendly. ECS: entity=ID, component=data in SoA, system=query+update. InstancedMesh+setMatrixAt = ECS batch render.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"SoA: Float32Array per attribute → cache-friendly." Why is Structure of Arrays (SoA) faster than Array of Structures (AoS) for processing positions of 1000 entities?',
+      options: [
+        'SoA uses less memory because floats are smaller than objects',
+        'Positions in SoA are contiguous in memory — the CPU fetches a cache line of positions all at once. In AoS, positions interleave with other fields, causing cache misses when only positions are needed',
+        'SoA avoids JavaScript object overhead',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"ECS: entity = ID, component = data in SoA, system = query + update." In ECS, what is the role of a system?',
+      options: [
+        'A system is a JavaScript class that extends Entity',
+        'A system queries all entities that have a specific set of components and processes them — separating logic from data',
+        'A system manages GPU resource allocation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"InstancedMesh + setMatrixAt() = ECS batch render." Why does InstancedMesh fit the ECS philosophy?',
+      options: [
+        'InstancedMesh stores matrices in a flat Float32Array (data), and a single draw call processes all instances (system) — matching ECS\'s data/logic separation and batch processing',
+        'InstancedMesh uses an entity ID system internally',
+        'InstancedMesh replaces the need for a scene graph',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A traditional OOP game engine has class Enemy extends Character. Adding a flying ability requires modifying the inheritance chain. How does ECS handle this instead?',
+      options: [
+        'ECS also uses inheritance — it just uses interfaces instead of classes',
+        'In ECS, "flying" is a component. Adding it to any entity — Enemy, Player, or NPC — immediately gives them flight behaviour without any class hierarchy changes',
+        'ECS does not support entity-specific abilities',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_6_1 }

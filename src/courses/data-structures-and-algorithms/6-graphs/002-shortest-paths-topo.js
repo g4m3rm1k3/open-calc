@@ -353,6 +353,53 @@ for i, node in enumerate(['A','B','C','D','E']):
     d = dist[node]
     fig.bar(i, d, label=f"{node}={d}", color="#60a5fa")
 fig.show()`,
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Dijkstra\'s algorithm uses a min-heap to always process the unvisited node with the smallest known distance. Why must you process the minimum first?',
+      options: [
+        'Processing in any order gives the same result but minimum-first is faster',
+        'When you process a node, you finalize its shortest distance. If you chose a node with distance d, there can be no shorter path through an unprocessed node (all unprocessed distances are ≥ d, and edge weights are non-negative). Processing minimum-first ensures each node is finalized correctly the first time it is popped from the heap',
+        'Min-heaps automatically compute shortest paths without any explicit algorithm',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Dijkstra fails on graphs with negative edge weights. Why?',
+      options: [
+        'Negative weights cause the distance to go below zero, which Python does not support',
+        'Dijkstra finalizes a node when it is popped from the heap, assuming no shorter path exists through unprocessed nodes. With negative edges, a later-processed node could provide a path that is shorter than one already finalized (a negative edge can "reopen" settled distances). Bellman-Ford handles negative weights by relaxing all edges n−1 times',
+        'The min-heap cannot store negative numbers',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Topological sort orders nodes so all edges point from earlier to later in the ordering. What property must a graph have for a topological sort to exist?',
+      options: [
+        'The graph must be fully connected',
+        'The graph must be a DAG (Directed Acyclic Graph). A cycle (A→B→C→A) means A must come before B, B before C, and C before A — impossible to satisfy simultaneously. Any cycle prevents a valid topological ordering',
+        'The graph must have an even number of edges',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Topological sort via Kahn\'s algorithm starts by enqueuing all nodes with in-degree 0. When a cycle exists, what happens?',
+      options: [
+        'The algorithm processes nodes twice, detecting the cycle on the second pass',
+        'Nodes in a cycle always have in-degree ≥ 1 (each is pointed to by someone else in the cycle). They are never enqueued. Kahn\'s algorithm finishes processing only the non-cycle nodes. If the output contains fewer nodes than the total, at least one cycle exists — the "missing" nodes are in cycles',
+        'Kahn\'s algorithm freezes when it encounters a cycle',
+      ],
+      correct: 1,
+    },
+  ],
               output: 'All assertions passed!',
               status: 'idle',
               figureJson: null,

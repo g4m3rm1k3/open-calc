@@ -134,4 +134,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Completing the square on x² − 4x + y² + 6y − 12 = 0 gives (x−2)² + (y+3)² = 25. What conic is this, and what are its center and radius?',
+      options: [
+        'Ellipse with semi-axes 5 and 5, centered at (2, −3)',
+        'Circle with center (2, −3) and radius 5 — both squared terms have equal coefficients with the same sign, and the right side is r²',
+        'Parabola opening rightward with vertex at (2, −3)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The equation (x−3)²/9 − (y+2)²/4 = 1 has one positive and one negative squared term. What type of conic does this indicate?',
+      options: [
+        'Ellipse — opposite signs mean the two axes are oriented perpendicular to each other',
+        'Hyperbola — opposite signs in the two squared terms always produce a hyperbola; same signs (both positive) produce an ellipse or circle',
+        'Parabola — one squared term is larger than the other, causing the curve to open to one side',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A conic has eccentricity e = 0.8. What family does it belong to?',
+      options: [
+        'Circle — e = 0 is a circle, so e close to 0 is nearly circular',
+        'Ellipse — 0 < e < 1 is the defining range for an ellipse; e = 0 is a circle, e = 1 is a parabola, e > 1 is a hyperbola',
+        'Parabola — eccentricity between 0.5 and 1.0 indicates a parabolic shape',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A parabola has focus (0, 2) and directrix y = −2. The parabola is defined as the set of points equidistant from the focus and directrix. Where is the vertex?',
+      options: [
+        '(0, 2) — the vertex is at the focus',
+        '(0, 0) — the vertex lies halfway between the focus and directrix, at y = (2 + (−2))/2 = 0; the equation is x² = 8y',
+        '(0, −2) — the vertex is at the directrix',
+      ],
+      correct: 1,
+    },
+  ],
 }

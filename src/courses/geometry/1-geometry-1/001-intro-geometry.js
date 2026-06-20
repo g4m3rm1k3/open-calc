@@ -527,7 +527,52 @@ export default {
     'Proof by contradiction: assume the opposite, derive a contradiction, conclude the original is true.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Undefined terms: accepted intuitively, never formally defined." Why doesn\'t geometry formally define "point" or "line"?',
+      options: [
+        'Mathematicians haven\'t found the right definition yet',
+        'Any definition requires prior terms to build on — you must start somewhere; undefined terms are the foundation everyone agrees to accept intuitively',
+        'Points and lines are too simple to need definitions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Postulates: accepted as true without proof." What distinguishes a postulate from a theorem?',
+      options: [
+        'Postulates are more important than theorems',
+        'Postulates are assumed true as a starting point; theorems must be derived by logical proof from postulates and prior theorems',
+        'Postulates can be disproved later if wrong; theorems cannot',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Theorems: derived by logic. Every step must be justified." What is wrong with saying "this is obviously true" in a proof?',
+      options: [
+        'Nothing — obvious facts are acceptable in proofs',
+        '"Obviously" is not a mathematical reason. Every step must cite a specific definition, postulate, or previously proved theorem',
+        'Obvious statements must be listed as definitions first',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Proof by contradiction: assume the opposite, derive a contradiction." To prove there is no largest prime, you assume there IS a largest prime. Why does finding a contradiction from that assumption prove the original?',
+      options: [
+        'Because the assumption was made by the opponent, so finding any flaw disproves it',
+        'If assuming ¬P leads to a logical contradiction, then ¬P must be false, so P must be true — the assumption destroyed itself',
+        'Contradiction proofs only work for prime number theorems',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_GEO_1_1 };

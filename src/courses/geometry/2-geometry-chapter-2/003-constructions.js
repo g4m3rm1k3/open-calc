@@ -662,7 +662,52 @@ export default {
     'Impossible ≠ unsolved. Proved impossible by showing required algebraic structure is unreachable.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Every construction step: line through two points (straightedge) or circle with given center and radius (compass)." Which tool is used to bisect a segment?',
+      options: [
+        'Straightedge only',
+        'Both — compass arcs from each endpoint create two intersection points; connecting them with the straightedge gives the perpendicular bisector',
+        'Compass only',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Proof of construction = congruence showing the constructed object has the required property." To prove an angle bisector construction works, you would show:',
+      options: [
+        'The two resulting angles look equal in the diagram',
+        'The two triangles formed by the construction are congruent (by SSS), and therefore their corresponding angles are equal by CPCTC',
+        'The compass arcs were set to the same radius',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Constructible lengths ↔ polynomials of degree 2ⁿ over ℚ. Square roots reachable; cube roots not." Trisecting an arbitrary angle requires solving a cubic equation. Why does this make it impossible with compass and straightedge?',
+      options: [
+        'Angles cannot be divided by 3 in Euclidean geometry',
+        'Compass-and-straightedge constructions can only solve equations up to degree 2 (repeated square roots) — cube roots require degree 3, which is algebraically unreachable by these tools',
+        'Trisection is possible but takes infinitely many steps',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Impossible ≠ unsolved." Many mathematicians tried and failed to trisect an angle. What actually proved it was impossible?',
+      options: [
+        'A computer search verified no construction works within 10,000 steps',
+        'Galois theory and abstract algebra showed the field extensions required for trisection are not achievable by square-root operations alone',
+        'Euclid proved it impossible in his Elements',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_GEO_2_2 };

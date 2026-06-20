@@ -105,4 +105,50 @@ res
     ]}}],
   },
   mentalModel:['NumPy arrays store one type contiguously — math runs in C, not Python.','Vectorization: operate on the whole array at once. No loops.','Boolean indexing: create a boolean mask, use it to filter elements.','np.arange() like range(). np.linspace() for evenly spaced floats.','Aggregates: np.sum, np.mean, np.std, np.min, np.max, np.median.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'a = np.array([1, 2, 3]); b = a * 2 + 1. What is b?',
+      options: [
+        '[3, 5, 7] — each element is multiplied by 2 then 1 is added: 1*2+1=3, 2*2+1=5, 3*2+1=7',
+        '[2, 4, 6, 1] — multiplication creates a new array and 1 is appended',
+        '[3, 5, 7, 1] — NumPy adds 1 as a new element when using scalar addition',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why is a = np.array([1,2,3,4,5]); result = a[a > 3] a key pattern?',
+      options: [
+        'It filters elements using a loop internally — equivalent to [x for x in a if x > 3]',
+        'Boolean indexing: a > 3 produces [False,False,False,True,True], and a[[F,F,F,T,T]] selects only where True, giving [4,5] — all in vectorized C code without Python loops',
+        'It removes elements equal to 3 from the array',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is the key difference between np.arange(0, 1, 0.1) and np.linspace(0, 1, 10)?',
+      options: [
+        'arange gives exactly 10 points from 0 to 1; linspace gives 9',
+        'arange uses a step size (0.1) and may have floating-point imprecision in the number of points; linspace uses the exact number of points (10) evenly spaced between endpoints, guaranteeing endpoint inclusion',
+        'arange is for integers only; linspace works for all numeric types',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Python loops over 1 million numbers take ~1 second. NumPy vectorized operations take ~1 millisecond. Why?',
+      options: [
+        'NumPy skips validation checks that Python requires for safety',
+        'NumPy stores all elements as the same type in contiguous memory and executes operations in compiled C — no Python object creation, type checking, or interpreter overhead per element; the C loop over uniform memory is 100x–1000x faster',
+        'NumPy uses multiple CPU cores automatically while Python loops are single-threaded',
+      ],
+      correct: 1,
+    },
+  ],
 }

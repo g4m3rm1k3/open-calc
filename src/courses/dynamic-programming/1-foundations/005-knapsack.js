@@ -1097,4 +1097,51 @@ plt.tight_layout(); plt.show()
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '0/1 Knapsack: dp[i][w] represents the max value using items 0..i with capacity w. The recurrence: dp[i][w] = max(dp[i-1][w], dp[i-1][w-weights[i]] + values[i]). What do the two options mean?',
+      options: [
+        'Take half the item or all of it',
+        'Skip item i (inherit best from i-1 with same capacity) OR take item i (inherit best from i-1 with capacity reduced by item\'s weight, plus item\'s value) — the "0/1" in the name means each item can only be used at most once (0 times or 1 time)',
+        'Use items in ascending weight order or descending weight order',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The 1D space-optimized knapsack fills the capacity array BACKWARDS (from W down to weights[i]). Why backward?',
+      options: [
+        'Backward iteration is faster because it avoids cache misses',
+        'Forward iteration would allow an item to be counted multiple times in the same pass — if you update dp[w] forward and later compute dp[w + weights[i]], you might use dp[w] which was already updated to include item i; backward ensures each cell still reflects the state BEFORE item i was considered',
+        'The backward loop is equivalent to using two separate arrays and is just a code style choice',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Unbounded Knapsack allows using an item any number of times. The 1D DP iterates FORWARD through capacities instead of backward. Why does this difference matter?',
+      options: [
+        'Unbounded knapsack always fills from the smallest capacity upward to avoid boundary errors',
+        'Forward iteration means dp[w - weights[i]] is already updated for the current item i — so when computing dp[w], using dp[w - weights[i]] can include item i again. This is exactly what unbounded wants: items can be reused any number of times in the same pass',
+        'The iteration direction is irrelevant — both forward and backward give the same result for unbounded knapsack',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Coin Change asks for the minimum number of coins to make amount W. How is this a knapsack variant?',
+      options: [
+        'Coin Change is not a knapsack problem — it uses greedy, not DP',
+        'It is Unbounded Knapsack with minimization: coins are "items" with weight = value = coin denomination, you can use each coin any number of times (unbounded), and you minimize the count (number of coins) instead of maximizing value — the recurrence is dp[w] = min(dp[w], dp[w - coin] + 1)',
+        'Coin Change uses 0/1 Knapsack because each coin denomination appears exactly once in any optimal solution',
+      ],
+      correct: 1,
+    },
+  ],
 };

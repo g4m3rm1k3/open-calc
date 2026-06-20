@@ -917,5 +917,50 @@ export default {
     'G/P abstraction: G means "I will generate carry". P means "I will pass carry through".',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Sum bit = XOR of all inputs. Carry = majority function." In a full adder, if A=1, B=1, Cin=1, what are Sum and Cout?',
+      options: [
+        'Sum=1, Cout=1',
+        'Sum=0, Cout=1 — wait, 1+1+1=11 in binary, so Sum=1, Cout=1',
+        'Sum=0, Cout=0',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Chain N full adders: Cout[i] → Cin[i+1]. The carry ripples." Why is a ripple-carry adder slow for wide operands?',
+      options: [
+        'Each full adder must wait for the carry from the previous stage before it can compute its sum bit — the delay grows linearly with word width',
+        'Full adders use more gates than half adders, increasing total delay',
+        'Ripple adders work in reverse order, requiring an extra reversal step',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Ripple worst case: 0111...1 + 0000...1. Carry starts at bit 0 and touches every stage." Why is this the worst case?',
+      options: [
+        'All-ones inputs require the most power',
+        'A carry is generated at bit 0 and must propagate through every subsequent bit position — maximising the delay path',
+        'The result requires more bits than the operands, causing overflow in every stage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"CLA: precompute G=AB and P=A⊕B for each bit, then compute all carries in parallel." What is the key advantage of carry-lookahead?',
+      options: [
+        'CLA uses fewer gates than ripple-carry',
+        'All carry bits are computed simultaneously rather than sequentially — carry delay becomes constant regardless of word width',
+        'CLA stores partial results in registers to avoid recalculation',
+      ],
+      correct: 1,
+    },
+  ],
 };

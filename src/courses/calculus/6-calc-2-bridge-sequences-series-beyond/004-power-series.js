@@ -198,4 +198,50 @@ export default {
     { id: 'ch5-003-cp2', prompt: 'Can you differentiate a power series term by term?', expectedInsight: 'Yes, within the open interval of convergence. The radius $R$ stays the same, but endpoint behavior may change.' },
     { id: 'ch5-003-cp3', prompt: 'How do you represent $\\ln(1+x)$ as a power series?', expectedInsight: 'Start from $1/(1+x) = \\sum(-1)^n x^n$ and integrate: $\\ln(1+x) = \\sum(-1)^{n+1}x^n/n$ for $-1 < x \\le 1$.' },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A power series Σcₙ(x−a)ⁿ is "centered at a." What does the center a mean geometrically?',
+      options: [
+        'a is the point where the series has its largest term, and all terms decrease away from a',
+        'a is the center of the interval of convergence — the series converges within |x − a| < R and diverges outside; the power series is a function of (x − a), not just x, so it naturally describes behavior near x = a',
+        'a must be 0 for any practical power series; other centers are just shifted versions with no geometric meaning',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The geometric series 1/(1−x) = Σxⁿ for |x| < 1. What is the power series for 1/(1−x²)?',
+      options: [
+        'Σx²ⁿ for |x| < 1 — substitute x² for x in the geometric series formula',
+        'Σxⁿ/n for |x| < 1 — differentiate the original series to introduce a factor of 1/n',
+        'Σ(−1)ⁿxⁿ for |x| < 1 — the x² changes the signs of even-index terms',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A power series has radius of convergence R = 3 centered at a = 2. Where does it definitely converge?',
+      options: [
+        'For −3 < x < 3 — the radius of convergence gives the absolute interval around 0',
+        'For −1 < x < 5 — the interval |x − 2| < 3 means 2−3 < x < 2+3, so −1 < x < 5 (endpoints require separate checking)',
+        'For all x, since R = 3 > 1 means the series converges everywhere',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You have the power series for arctan(x) = x − x³/3 + x⁵/5 − ⋯. How would you find the series for arctan(x²)?',
+      options: [
+        'Differentiate the arctan series and multiply by 2x (chain rule applied to the series)',
+        'Substitute x² for x: arctan(x²) = x² − x⁶/3 + x¹⁰/5 − ⋯, valid wherever the original series converges with x² in place of x',
+        'Integrate the known series for 2x/(1+x⁴) using term-by-term integration',
+      ],
+      correct: 1,
+    },
+  ],
 }

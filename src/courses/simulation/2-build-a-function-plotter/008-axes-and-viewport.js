@@ -707,6 +707,53 @@ redraw()`,
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'w2c converts a math world coordinate to a canvas pixel. When would you need c2w (the inverse)?',
+      options: [
+        'c2w is only needed when the viewport is zoomed in',
+        'When handling mouse events — the browser gives you a pixel position (cx, cy) and you need to know which math coordinate the user clicked. For example, placing an annotation at a mouse click, reading the function value under the cursor, or implementing click-to-zoom all require c2w to translate the pixel back to math coordinates',
+        'c2w is used internally by w2c to verify correctness',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Zooming in 2× around the viewport center halves the visible range. If the viewport was xMin=−5, xMax=5, what does it become after 2× zoom in?',
+      options: [
+        'xMin=−10, xMax=10 — zoom doubles the range',
+        'xMin=−2.5, xMax=2.5 — zoom in halves the range. The center stays at 0, and (5−0) × 0.5 = 2.5. You now see detail that was previously compressed into a few pixels',
+        'xMin=−5, xMax=2.5 — zoom only affects one side',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'After any pan or zoom, all drawing code using w2c automatically shows the correct view. Why does this architecture work without any changes to the drawing functions?',
+      options: [
+        'The browser re-runs all drawing code automatically when the viewport object changes',
+        'w2c reads from the viewport object (xMin, xMax, yMin, yMax) on every call. When zoom or pan updates those four numbers, the next call to w2c maps to different canvas pixels. All drawing code is correct by construction — it never hardcodes pixel positions, only math coordinates',
+        'Canvas has a built-in transform matrix that zoom and pan modify',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An "auto-fit" feature adjusts the viewport so the function fills the canvas vertically. Why is this harder than just using xMin=−10, xMax=10?',
+      options: [
+        'Auto-fit requires WebGL; canvas cannot compute function ranges',
+        'You must evaluate the function over a range of x values to find its yMin and yMax, handle asymptotes (where f(x) = Infinity), and choose sensible padding. The fixed range is trivial to set; auto-fit requires solving a mini-optimization problem and making decisions about how to handle discontinuities',
+        'Auto-fit is not possible because functions can have infinite range',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export default sim2_008

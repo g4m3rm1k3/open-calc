@@ -290,4 +290,50 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why is e ≈ 2.718 the "natural" base for exponential functions in calculus?',
+      options: [
+        'e is natural because it is irrational, and irrational bases simplify calculus formulas by removing fractions',
+        'With base e, the derivative of eˣ is eˣ itself — the function is its own rate of change. For any other base aˣ, the derivative gains a factor of ln(a), making e the unique base where d/dx[eˣ] = eˣ exactly',
+        'e was chosen by convention to make compound interest formulas produce whole numbers at common interest rates',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A population doubles every 10 years. If it starts at 1000, what is the population after 30 years?',
+      options: [
+        '3000 — linear growth of 1000 per decade',
+        '8000 — after 3 doubling periods: 1000 × 2³ = 1000 × 8 = 8000',
+        '6000 — the population doubles twice, adding 1000 each time',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does the natural logarithm ln(x) represent?',
+      options: [
+        'ln(x) is the inverse of eˣ: it answers "to what power must e be raised to get x?" ln(e³) = 3 because e³ = e³',
+        'ln(x) is log base 10 of x, just written with a different notation in calculus',
+        'ln(x) is the area under 1/x from x = 0 to x = x, which makes it negative for all x < 1',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'How does exponential growth differ from polynomial growth for large x?',
+      options: [
+        'Polynomial growth like x¹⁰⁰ eventually dominates exponential growth eˣ, because polynomials have arbitrarily high powers',
+        'Exponential growth eˣ eventually dominates any polynomial xⁿ — the derivative of eˣ is eˣ so it accelerates at the same rate it grows, while polynomials slow down their acceleration',
+        'They grow at the same asymptotic rate; exponentials only appear faster because their initial value is usually higher',
+      ],
+      correct: 1,
+    },
+  ],
 }

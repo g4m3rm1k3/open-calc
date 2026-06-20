@@ -882,4 +882,51 @@ def remove(self, val):
       hint: 'Convert val to string for the key (since your hash function takes strings). Store val as the value. `has()` just checks if `get()` returns something.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A hash table\'s average O(1) lookup relies on the hash function distributing keys evenly. What happens when many keys hash to the same bucket (collision)?',
+      options: [
+        'The hash table automatically resizes to add more buckets',
+        'In chaining, each bucket holds a linked list of colliding entries. Lookup requires scanning that list. In the worst case (all keys in one bucket), lookup degrades to O(n). This is why a good hash function and a low load factor (n_items/n_buckets) matter: fewer collisions = shorter chains',
+        'Hash tables reject keys that collide and return an error',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A hash table resizes when the load factor (n_items / n_buckets) exceeds a threshold like 0.75. Why resize at 0.75 rather than at 1.0 (completely full)?',
+      options: [
+        '0.75 is a mathematical constant that minimizes hash collisions',
+        'As the load factor approaches 1.0, collision probability rises sharply — average chain length grows, degrading O(1) toward O(n). Resizing at 0.75 trades memory (a quarter of slots are empty on average) for keeping collision rates low and maintaining fast average performance',
+        'A full table would cause the program to crash immediately',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Python dicts maintain insertion order (since Python 3.7) while sets do not. How does this affect choosing between `dict` and `set` for checking membership?',
+      options: [
+        'Sets are always faster than dicts because they store less data',
+        'For membership testing alone (`x in collection`), both are O(1) average — use a set. Use a dict when you need to associate a value with each key, or when order matters. The extra overhead of a dict (storing key-value pairs) is unnecessary if you only need presence/absence',
+        'Ordered dicts are slower because they maintain a linked list internally',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Hash tables cannot be used as keys in other hash tables. Why are Python dicts and lists not hashable?',
+      options: [
+        'Python does not support nested data structures as keys',
+        'To be used as a key, an object must be hashable and immutable. Dicts and lists are mutable — if you modified one after inserting it as a key, its hash would change, making it impossible to find in the table. Python enforces this: only immutable types (int, str, tuple of immutables) are hashable and can be used as dict keys',
+        'The hash function does not support container types',
+      ],
+      correct: 1,
+    },
+  ],
 };

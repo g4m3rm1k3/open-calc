@@ -154,4 +154,50 @@ export default {
     'completed-example-2',
     'attempted-challenge-medium',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A problem asks "find the rate of change of the area of a circle as the radius grows." Which calculus operation applies?',
+      options: [
+        'Integration — you need to accumulate infinitely many thin rings to find the total area change',
+        'Differentiation — you want dA/dr, the derivative of A = πr² with respect to r, which gives 2πr',
+        'Limits — you compute the area for many radius values and take the limit as they approach a target',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The universal 5-step workflow starts with "read the prompt and classify the type." Why is classification the first step?',
+      options: [
+        'Classification determines which textbook chapter contains the answer, avoiding calculation entirely',
+        'The correct workflow (derivative rules vs. integration vs. limit algebra) depends on the problem type — applying the wrong tool wastes time and produces wrong setups, so identifying the type first prevents the most common failure mode',
+        'Classification assigns a difficulty score that determines how long to spend on the problem',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'When a calculus solution involves an intermediate step like factoring or rationalizing a numerator, what is the purpose?',
+      options: [
+        'These are style requirements — graders expect factored answers and deduct points for unfactored forms',
+        'They typically cancel a term that would cause a 0/0 indeterminate form or simplify the expression into a recognizable pattern — the algebra is the key move that makes the limit or derivative tractable',
+        'They are optional shortcuts that only matter when the numbers are large',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The most common failure mode is described in the playbook. What is it?',
+      options: [
+        'Arithmetic errors — students compute the derivative correctly but make addition mistakes at the last step',
+        'Skipping the problem classification step and jumping straight into formulas — this leads to applying the chain rule when product rule is needed, or differentiating when you should integrate',
+        'Forgetting constants of integration — the +C is the most commonly missed component',
+      ],
+      correct: 1,
+    },
+  ],
 }

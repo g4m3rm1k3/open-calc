@@ -683,4 +683,51 @@ fig.show()`,
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What are the two necessary conditions for a problem to have a dynamic programming solution?',
+      options: [
+        'Greedy choice property and polynomial time complexity',
+        'Overlapping subproblems (the same smaller problems repeat in the recursion tree) AND optimal substructure (the optimal answer to the whole is built from optimal answers to subproblems) — without both, DP either doesn\'t apply or isn\'t needed',
+        'Recursive structure and input size larger than 100',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Naive recursive fib(40) makes billions of calls. Memoized fib(40) makes ~80 calls. What causes the difference?',
+      options: [
+        'Memoization skips base cases, making recursion shorter',
+        'Without memoization, the same subproblems (e.g., fib(10)) are recomputed exponentially many times across different branches of the recursion tree; memoization stores each result on first computation and returns it instantly on every subsequent call — transforming O(2ⁿ) into O(n)',
+        'Memoization uses iteration instead of recursion, avoiding function call overhead',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Top-down memoization vs bottom-up tabulation: both solve the same problem. When does tabulation have an advantage?',
+      options: [
+        'Tabulation is always better — it is more Pythonic and easier to write',
+        'Tabulation avoids call-stack overhead and makes the dependency order explicit; for very deep recursion (large n), top-down can hit Python\'s recursion limit while tabulation iterates from the smallest subproblems upward with no stack growth',
+        'Tabulation only works for problems with exactly two subproblems per state',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A memoized function has two parameters (n, k) but you only cache on n. What goes wrong?',
+      options: [
+        'Python raises a KeyError when n is already cached with a different k',
+        'You get wrong answers — the cache stores a result computed for one value of k and returns it when n matches but k is different; the cache key must capture ALL state that determines the return value, not just part of it',
+        'Performance is worse but correctness is preserved',
+      ],
+      correct: 1,
+    },
+  ],
 };

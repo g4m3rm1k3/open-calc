@@ -446,4 +446,51 @@ function update(deltaTime) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A narrow FOV (like 25°) vs a wide FOV (75°) on a long bowling lane. What visual effect does a narrow FOV create?',
+      options: [
+        'The lane appears shorter because less of it is visible',
+        'Telephoto compression: the scene appears flattened and the pins look closer. A narrow FOV is like a zoom lens — it captures a small solid angle but shows distant objects larger. This makes an 18m lane look more dramatic and readable than a wide fisheye view',
+        'The ball moves more slowly with a narrow FOV because fewer pixels change per frame',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Rolling motion links linear speed and angular speed: ω = v / r. If the ball has radius 0.12m and rolls at 5 m/s, what is its angular velocity?',
+      options: [
+        '5 × 0.12 = 0.6 rad/s',
+        '5 / 0.12 ≈ 41.7 rad/s — for rolling without slipping, each radian of rotation advances the ball by r meters. Dividing linear speed by radius gives the required spin rate to match the forward motion',
+        '5 + 0.12 = 5.12 rad/s',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The camera follows the ball with `camera.position.lerp(targetPos, factor)`. What does lerp do here and why is it preferred over setting position directly?',
+      options: [
+        'lerp teleports the camera to exactly targetPos every frame',
+        'lerp blends from the current position toward the target by `factor` each frame: `pos = pos + (target - pos) * factor`. This creates a lag — the camera gradually catches up to the ball. Direct assignment would produce a perfectly rigid follow that looks mechanical and reveals every tiny position change as camera jitter',
+        'lerp averages the current and target positions equally (50/50)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '`camera.lookAt(x, 0, z - CAM_LOOK_AHEAD)` aims the camera slightly ahead of the ball. Why look ahead rather than directly at the current ball position?',
+      options: [
+        'Three.js camera.lookAt has a one-frame delay, so looking ahead compensates',
+        'Looking directly at the ball center shows the lane behind the ball but cuts off lane ahead. Looking a few meters ahead keeps the target zone and approaching pins in view — the same reason a racing game camera tilts forward. You want to see where things are going, not just where the ball is now',
+        'The ball\'s position is in world space but lookAt requires local space coordinates',
+      ],
+      correct: 1,
+    },
+  ],
 }

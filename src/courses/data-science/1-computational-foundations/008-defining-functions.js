@@ -150,4 +150,50 @@ res
     'Functions should do one thing and have a name that says what that thing is.',
     'Pure functions (same input → same output, no side effects) are preferred.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'def add(a, b): return a + b. What does add(3, 4) return?',
+      options: [
+        'None — you need to print the result to get a value',
+        '7 — the return statement sends 3 + 4 = 7 back to the caller',
+        '"a + b" — the function returns the string expression',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A function with no return statement returns what?',
+      options: [
+        '0 — Python returns 0 as a default numeric value',
+        'None — Python implicitly adds return None when there is no explicit return; assigning the result of such a function gives you None',
+        'The last computed value — Python returns the last expression evaluated',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is a "pure function" (same input → same output, no side effects) easier to debug?',
+      options: [
+        'Pure functions run faster because Python caches their results automatically',
+        'A pure function\'s output depends only on its inputs — you can test it in isolation with known inputs and verify the output without worrying about what other code has run. Side effects create dependencies on external state that make debugging unpredictable',
+        'Pure functions cannot raise exceptions, so they never need debugging',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A variable defined inside a function — can you access it outside the function?',
+      options: [
+        'Yes — all variables defined anywhere in the program share the same global scope',
+        'No — local variables only exist during the function\'s execution and are destroyed when the function returns; accessing them outside raises a NameError',
+        'Only if you use the global keyword inside the function',
+      ],
+      correct: 1,
+    },
+  ],
 }

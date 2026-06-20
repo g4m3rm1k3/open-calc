@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A comparator has V− connected to a 2.5V reference. The input at V+ is slowly rising from 0V. What happens when it crosses 2.5V?',
+      options: [
+        'The output rises proportionally, tracking the difference between V+ and V−',
+        'The output switches abruptly from its low rail to its high rail — the comparator operates open-loop so any positive difference instantly saturates the output',
+        'The output stays low until V+ reaches at least 3V, due to the comparator\'s built-in hysteresis',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A temperature sensor signal hovers near the thermostat setpoint with 50 mV of noise superimposed. A simple comparator switches the heater relay on and off repeatedly. What solves this chattering problem?',
+      options: [
+        'Replace the comparator with a faster op-amp so it responds before the noise can cause switching',
+        'Add a Schmitt trigger with hysteresis wider than the noise — for example, set UTP = setpoint + 100 mV and LTP = setpoint − 100 mV so noise within the 200 mV dead band causes no switching',
+        'Add a large capacitor across the relay coil to slow the relay\'s mechanical response to the rapid switching',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A Schmitt trigger with Vsat = ±13V uses R1 = 10 kΩ and R2 = 90 kΩ. What are the upper and lower switching thresholds?',
+      options: [
+        'UTP = +1.3V, LTP = −1.3V — hysteresis = 2.6V',
+        'UTP = +13V, LTP = −13V — thresholds equal the supply rails',
+        'UTP = +11.7V, LTP = −11.7V — thresholds are Vsat minus the feedback resistor drop',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The LM339 comparator has an open-collector output. A designer connects the output directly to a microcontroller input without a pull-up resistor. What will the microcontroller read when the comparator output is "high"?',
+      options: [
+        'Logic HIGH (+5V or +3.3V) — the open-collector output sources current when the comparator output is high',
+        'An undefined floating voltage — the open-collector can only pull the output low; without a pull-up resistor to supply, the output floats and reads unpredictably when the comparator is not pulling it low',
+        'Logic LOW (0V) — open-collector outputs are always low because they only sink current',
+      ],
+      correct: 1,
+    },
+  ],
 };

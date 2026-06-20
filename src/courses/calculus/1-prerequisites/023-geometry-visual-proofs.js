@@ -158,4 +158,50 @@ export default {
       answer: 'The centroid G divides each median in ratio 2:1 from vertex to midpoint.',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The area formula for a circle A = πr² can be derived by "unrolling" the circle. What does that mean?',
+      options: [
+        'Cutting the circle into two half-circles and placing them side by side to form a rectangle with sides π and r',
+        'Slicing the circle into thin concentric rings, straightening each ring into a thin rectangle of length 2πr, and stacking them — the stack forms a triangle with base 2πr and height r, giving area (1/2)(2πr)(r) = πr²',
+        'Drawing a square around the circle and subtracting the four corner regions using the formula for circular segments',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The Pythagorean theorem a² + b² = c² is proven by rearranging four copies of the same right triangle. What does this prove?',
+      options: [
+        'That the sum of the four triangle areas equals the area of the square on the hypotenuse',
+        'That the area of the square built on the hypotenuse equals the sum of areas of squares built on the two legs — the same four triangles can be rearranged inside both arrangements, so the remaining areas (the squares) must be equal',
+        'That the perimeter of a right triangle is always greater than the hypotenuse alone',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why does the area of a triangle equal (1/2) × base × height?',
+      options: [
+        'Because a triangle is half as thick as a parallelogram, so its area is halved by default',
+        'Any triangle can be completed into a parallelogram by placing an identical copy rotated 180°; the parallelogram has area base × height, so the triangle is exactly half of that',
+        'The 1/2 comes from averaging the base and height to get the "average side length" of the triangle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Two triangles are similar. One has a base of 4 and the other has a base of 6. If the first triangle has a height of 3, what is the height of the second?',
+      options: [
+        '5 — you add 2 to the height because you added 2 to the base',
+        '4.5 — corresponding sides are proportional; 6/4 = 1.5, so the height is 3 × 1.5 = 4.5',
+        '7 — the height grows by the sum of base and scale factor',
+      ],
+      correct: 1,
+    },
+  ],
 }

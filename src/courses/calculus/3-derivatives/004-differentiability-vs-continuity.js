@@ -236,4 +236,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'f(x) = |x| is continuous at x = 0 but not differentiable there. Why not?',
+      options: [
+        'The function value f(0) = 0 is not in the domain of the derivative formula',
+        'The left-hand derivative (slope approaching from x < 0 is −1) and right-hand derivative (slope from x > 0 is +1) are not equal — the two sides give a corner, so the limit defining f\'(0) does not exist',
+        'Absolute value functions are never differentiable because they contain a condition',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A function is differentiable at x = a. What does this guarantee about continuity at x = a?',
+      options: [
+        'Nothing — differentiability and continuity are completely independent properties',
+        'Differentiability implies continuity: if f\'(a) exists, then f must be continuous at a (but not vice versa)',
+        'Continuity implies differentiability: if f is continuous at a, then f\'(a) must exist',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Which of these creates a point where a function is NOT differentiable?',
+      options: [
+        'A smooth bump — a point where the function has a large but finite value with smooth curves approaching it from both sides',
+        'A corner (like |x| at 0), a cusp (like x^(2/3) at 0), or a vertical tangent (like x^(1/3) at 0) — all three cause the derivative limit to either not exist or be infinite',
+        'Any local maximum or minimum — the derivative is zero there, which counts as undefined',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why does a vertical tangent make a function non-differentiable at that point?',
+      options: [
+        'Vertical lines have undefined slope — the derivative is the slope of the tangent line, so if the tangent is vertical, the derivative limit is +∞ or −∞ (not a finite real number)',
+        'Vertical tangents only occur at endpoints, and endpoints are always excluded from the domain',
+        'The chain rule fails at vertical tangents because the inner function\'s derivative is zero there',
+      ],
+      correct: 0,
+    },
+  ],
 }

@@ -335,7 +335,52 @@ export default {
   challenges: [],
   mentalModel: ['Pass1: geo→G-buffer(albedo,normal,position). Pass2: per light, fullscreen quad reads G-buffer, shades pixels. O(geo)+O(lights×pixels). Transparent: forward pass after.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Pass 1: geo → G-buffer (albedo, normal, position). Pass 2: per light, fullscreen quad." Why separate geometry and lighting into two passes?',
+      options: [
+        'The GPU cannot process geometry and lighting in the same shader',
+        'With forward rendering, every light runs for every geometry fragment even if not visible. Deferred rendering first rasterises only visible fragments into the G-buffer, then applies lights only to those — eliminating wasted light computation on hidden surfaces',
+        'It allows using more texture units per draw call',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"O(geo) + O(lights×pixels)." In a scene with 100 lights and 1M visible pixels, how many lighting calculations does deferred rendering perform?',
+      options: [
+        '100M — one per light per pixel regardless of position',
+        'Up to 100M in the worst case (all lights affect all pixels), but lights with bounded ranges reduce this — only pixels within each light\'s radius are shaded by it',
+        '1M — one per pixel only',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Transparent: forward pass after." Why can\'t transparency use deferred rendering?',
+      options: [
+        'The G-buffer stores one surface per pixel — transparent surfaces stack, and deferred rendering cannot capture multiple overlapping layers at the same pixel',
+        'Transparent materials cannot be stored in texture formats',
+        'Deferred rendering does not support alpha channels',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"G-buffer stores albedo, normal, position." In Pass 2, the shader reads these values from the G-buffer. What does it NOT need at this stage?',
+      options: [
+        'The light\'s position and colour',
+        'The original vertex data — the G-buffer already contains all surface information needed for lighting; the geometry has already been processed',
+        'The camera position for specular calculations',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_5_3 }

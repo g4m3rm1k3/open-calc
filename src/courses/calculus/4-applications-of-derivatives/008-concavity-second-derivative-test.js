@@ -325,4 +325,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'f\'\'(x) < 0 on an interval. How does the graph of f look there?',
+      options: [
+        'f is decreasing — a negative second derivative means the function goes down',
+        'f is concave down — the slope f\' is decreasing, so the graph curves like an inverted bowl (dome shape)',
+        'f is decreasing and concave up — the two signs indicate independent properties that combine',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is an inflection point?',
+      options: [
+        'A point where f\'\' = 0 — any zero of the second derivative is automatically an inflection point',
+        'A point where the concavity changes — f\'\'  changes sign (positive to negative or vice versa). f\'\'  = 0 is a necessary condition but not sufficient; the sign must actually change',
+        'A point where f\' = 0 and f\'\' ≠ 0 — these are the points where the slope is zero but the function curves away',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The Second Derivative Test: f\'(2) = 0 and f\'\'(2) = −5. What can you conclude?',
+      options: [
+        'f has a local minimum at x = 2 — negative second derivative at a critical point indicates a minimum',
+        'f has a local maximum at x = 2 — f\'\'(2) < 0 means the graph is concave down at x = 2, so the critical point is a peak',
+        'The test is inconclusive — a zero first derivative with negative second derivative could be either a max or inflection point',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'f\'(0) = 0 and f\'\'(0) = 0. What does the Second Derivative Test conclude?',
+      options: [
+        'Local minimum — f\'\' = 0 means zero concavity, which is the boundary case of concave up',
+        'Inflection point — when f\'\' = 0, the concavity is zero, indicating an inflection point rather than an extremum',
+        'The test is inconclusive — f\'\'(0) = 0 means the SDT gives no information; you need to use the First Derivative Test or higher-order derivatives',
+      ],
+      correct: 2,
+    },
+  ],
 }

@@ -141,4 +141,50 @@ export default {
       solution: 'Total current: 6 × 100mA = 600mA = 0.6A\n\nWire resistance (there and back): 2 × 25 × 0.013 = 0.65Ω\n\nVoltage drop: V = IR = 0.6 × 0.65 = 0.39V\n\nVoltage at junction box: 24 - 0.39 = 23.61V\n\nAcceptable: 24V ±15% means 20.4–27.6V allowed. 23.61V is well within spec.',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You set a 24V supply across a 480Ω coil. Can you choose a different current than what Ohm\'s Law gives?',
+      options: [
+        'Yes — you can adjust the current by changing the power supply\'s current limit setting',
+        'No — voltage and resistance together fix the current at exactly 50mA with no wiggle room',
+        'Only if the coil is inductive; resistive loads follow Ohm\'s Law but inductors do not',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A relay coil has 240Ω resistance and runs on 24V. What is the fastest way to calculate power dissipated without calculating current first?',
+      options: [
+        'P = IV — you must find current first, then multiply by voltage',
+        'P = V²/R — use voltage and resistance directly to get 2.4W',
+        'P = I²R — square the resistance and multiply by voltage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why does a short circuit (near-zero resistance) cause such extreme heat and current?',
+      options: [
+        'The voltage source increases its output to compensate for the lower load resistance',
+        'With resistance near zero, Ohm\'s Law forces enormous current, and P = I²R means power becomes catastrophic',
+        'Short circuits only create heat if the wire insulation is already damaged',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You need to add 15 more solenoids (80mA each) to an existing 24VDC panel. The feed wire is 18 AWG (rated 2.3A) and currently carries 1.8A. What should you check before adding the load?',
+      options: [
+        'Nothing — adding devices to an existing 24V bus is always safe up to the supply\'s rated output',
+        'Whether 1.8A + 1.2A = 3.0A exceeds the 18 AWG wire\'s 2.3A ampacity, which it does — upgrade the wire',
+        'Whether the solenoids\' resistance adds to the wire resistance, which would prevent Ohm\'s Law from applying',
+      ],
+      correct: 1,
+    },
+  ],
 };

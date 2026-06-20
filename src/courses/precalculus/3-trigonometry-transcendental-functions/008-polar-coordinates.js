@@ -151,4 +151,51 @@ export default {
       answer: '\\text{Area} = \\pi r^2'
     }
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The point (r, θ) = (3, π/2) in polar coordinates converts to which Cartesian point?',
+      options: [
+        '(3, π/2) — the coordinates are the same in Cartesian form',
+        '(0, 3) — using x = r·cos(θ) = 3·cos(π/2) = 3·0 = 0 and y = r·sin(θ) = 3·sin(π/2) = 3·1 = 3; the point is directly above the origin at distance 3',
+        '(π/2, 3) — swap the polar coordinates to get Cartesian',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A polar curve r = 2cos(θ) traces a circle. How do you verify this from the equation?',
+      options: [
+        'Divide both sides by cos(θ) to get r/cos(θ) = 2, and r/cos(θ) = x is always a vertical line',
+        'Multiply both sides by r to get r² = 2r·cos(θ); substitute x = r·cos(θ) and r² = x² + y²: x² + y² = 2x → (x-1)² + y² = 1 — a circle of radius 1 centered at (1,0)',
+        'Any equation of the form r = f(cos θ) is always a circle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The polar area formula is A = (1/2)∫r² dθ. Why r² rather than just r?',
+      options: [
+        'r² is used to avoid taking square roots during integration',
+        'The area element in polar coordinates is a thin "pie slice" with angle dθ and radius r; the area of a circular sector is (1/2)r²·dθ (angle in radians). This is the polar analogue of the Cartesian area strip f(x)dx, but accounting for the two-dimensional "spreading" as θ increases',
+        'r² appears because polar integration always squares the radial variable to normalize distance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why might you choose polar coordinates over Cartesian for describing r = 1 + cos(θ) (a cardioid)?',
+      options: [
+        'Polar coordinates are always easier — Cartesian should only be used for lines',
+        'The Cartesian equation of a cardioid is extremely complex (involves (x²+y²)^(3/2) terms); polar naturally captures shapes that radiate from the origin with varying radius. When a curve\'s essential property is its distance from the origin as a function of angle, polar is the natural coordinate system',
+        'Polar coordinates cannot describe shapes with corners or cusps',
+      ],
+      correct: 1,
+    },
+  ],
 }

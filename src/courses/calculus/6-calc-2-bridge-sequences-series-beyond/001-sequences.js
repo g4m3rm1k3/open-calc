@@ -344,4 +344,50 @@ export default {
     'attempted-challenge-2',
     'attempted-challenge-3',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The sequence aₙ = (−1)ⁿ oscillates between −1 and +1 forever. What is lim(n→∞) aₙ?',
+      options: [
+        '0 — the average of −1 and +1 is 0, so the limit must be 0',
+        'The limit does not exist — a sequence converges only if its terms get and stay close to a single value; aₙ keeps switching between −1 and +1 and never settles',
+        '1 — the last term for any finite n determines the limit',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The Monotone Convergence Theorem says every monotone bounded sequence converges. Why must it be bounded?',
+      options: [
+        'Bounded is required so that the sequence does not have gaps — unbounded sequences always have missing values',
+        'Without an upper bound, an increasing sequence can grow to +∞ and never settle on a finite limit — the bound provides the "ceiling" that forces the sequence to converge rather than diverge',
+        'The theorem requires bounded only for decreasing sequences; increasing sequences always converge regardless of bounds',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'aₙ = n/(n+1). As n grows very large, what behavior do you expect, and why?',
+      options: [
+        'aₙ → ∞ — the numerator n grows larger every step, so the sequence diverges',
+        'aₙ → 1 — divide numerator and denominator by n: n/(n+1) = 1/(1 + 1/n), and 1/n → 0 as n → ∞, so the limit is 1/1 = 1',
+        'aₙ → 1/2 — halfway between 0 and 1 is the natural limit for a fraction approaching a boundary',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Sequences and series are related but different concepts. What is the key distinction?',
+      options: [
+        'A sequence lists terms a₁, a₂, a₃, … in order; a series is the sum a₁+a₂+a₃+⋯ = Σaₙ. A series converges if the sequence of partial sums Sₙ = a₁+⋯+aₙ converges to a finite limit',
+        'A sequence must have a limit, while a series can diverge — the distinction is about convergence requirements',
+        'Sequences contain only real numbers; series can contain complex terms and require different convergence criteria',
+      ],
+      correct: 0,
+    },
+  ],
 }

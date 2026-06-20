@@ -368,4 +368,50 @@ for n in range(30):
     { id: 'ch5-004-cp2', prompt: 'State Taylor\'s Theorem with Lagrange remainder.', expectedInsight: '$f(x) = T_n(x) + R_n(x)$ where $R_n(x) = f^{(n+1)}(z)(x-c)^{n+1}/(n+1)!$ for some $z$ between $c$ and $x$.' },
     { id: 'ch5-004-cp3', prompt: 'How do you prove a Taylor series converges to $f(x)$?', expectedInsight: 'Show $R_n(x) \\to 0$ as $n \\to \\infty$. Typically bound $|f^{(n+1)}(z)|$ and show the resulting expression vanishes (often because $n!$ dominates $|x|^n$).' },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A 3rd-degree Taylor polynomial T₃(x) centered at a = 0 for a function f satisfies T₃(0) = f(0), T₃\'(0) = f\'(0), T₃\'\'(0) = f\'\'(0), T₃\'\'\'(0) = f\'\'\'(0). What is the geometric meaning?',
+      options: [
+        'T₃ passes through the same 4 points on the graph of f as the 4 known function values at x = 0, 1, 2, 3',
+        'T₃ matches f in value, slope, concavity, and third-order curvature at x = 0 — it is the unique cubic that touches f with maximum contact at the center, making it the best cubic approximation near that point',
+        'T₃ is the regression cubic that minimizes the squared distance from f over an interval around 0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The Taylor polynomial for eˣ near x = 0 is 1 + x + x²/2! + x³/3! + ⋯. Why does the approximation get worse as x moves far from 0?',
+      options: [
+        'The derivative of eˣ changes sign away from 0, causing the polynomial to overshoot',
+        'A polynomial matched at x = 0 is optimized for behavior near 0; further from 0, the truncated higher-order terms become significant, and the gap between the polynomial and the true function grows',
+        'The polynomial is periodic but eˣ is not, so they diverge beyond the period',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'How are the Taylor coefficients cₙ = f⁽ⁿ⁾(a)/n! derived?',
+      options: [
+        'By solving a system of equations requiring Tₙ to pass through n+1 specified points near a',
+        'By requiring that the nth derivative of the Taylor polynomial equals f⁽ⁿ⁾(a): differentiating the polynomial n times and setting the result equal to f⁽ⁿ⁾(a) forces cₙ = f⁽ⁿ⁾(a)/n!',
+        'By minimizing the integral of (f − Tₙ)² over a surrounding interval',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A Maclaurin series is a special case of a Taylor series. What is different about a Maclaurin series?',
+      options: [
+        'A Maclaurin series uses only even-degree terms — it is designed for symmetric (even) functions',
+        'A Maclaurin series is a Taylor series centered at a = 0; the general Taylor series can be centered at any point a, while Maclaurin specifically uses a = 0',
+        'A Maclaurin series converges for all x, while a Taylor series centered elsewhere may have a finite radius of convergence',
+      ],
+      correct: 1,
+    },
+  ],
 }

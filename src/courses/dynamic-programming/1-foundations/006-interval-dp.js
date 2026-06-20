@@ -1102,4 +1102,51 @@ for s, want in tests:
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Interval DP iterates by LENGTH first (outer loop), then START position (inner loop). Why not iterate by start position first?',
+      options: [
+        'Iterating by start first would cause negative array indices',
+        'When computing dp[i][j] for interval [i,j], you need all SMALLER subintervals already computed (e.g., dp[i][k] and dp[k+1][j] for all k between i and j). Iterating by length guarantees that all intervals shorter than (j-i+1) are computed before any interval of length (j-i+1) — which is the dependency order. Start-first would compute dp[0][5] before dp[2][4], violating the dependency',
+        'Start-first iteration is equally valid — the loop order is just a convention',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Matrix Chain Multiplication: dp[i][j] = min cost to multiply matrices i through j. The recurrence splits at every k between i and j. Why try every split point k?',
+      options: [
+        'Trying all k points is a brute-force approach — DP would optimize this to just one split',
+        'The optimal parenthesization can split the chain at any position — there is no way to know which split is best without checking all of them. DP memoizes each subinterval\'s answer so each split is computed at most once; the outer minimization over k is what makes it dynamic programming rather than exhaustive enumeration',
+        'k must equal (i+j)/2 — the split must always be at the midpoint for optimal cost',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is the time complexity of interval DP problems like Matrix Chain Multiplication?',
+      options: [
+        'O(n²) — because there are n² cells in the DP table',
+        'O(n³) — there are O(n²) intervals [i,j], and each considers O(n) split points k; the total work is O(n²) × O(n) = O(n³). This is a major improvement over the exponential naive enumeration of all parenthesizations',
+        'O(n!) — all possible orderings must be checked',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The base case for interval DP is dp[i][i] (a single element interval). What is typically its value?',
+      options: [
+        'dp[i][i] = i, because the index is the cost for a single element',
+        'dp[i][i] = 0 for most interval DP problems — a single matrix requires no multiplications, a single stone has no burst cost without neighbors, a single character requires one print turn. The base case represents the trivial problem (length-1 interval)',
+        'dp[i][i] = infinity, since you cannot perform an operation on a single element',
+      ],
+      correct: 1,
+    },
+  ],
 };

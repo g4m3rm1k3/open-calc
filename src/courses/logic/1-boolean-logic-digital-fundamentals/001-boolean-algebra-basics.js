@@ -153,4 +153,51 @@ export default {
       solution: 'Apply the Absorption law: A + A·B = A\n\nOutput = Sensor_A + Sensor_A · Sensor_B = Sensor_A\n\nThe entire second term is redundant. When Sensor_A is 1, the output is 1 regardless of Sensor_B. When Sensor_A is 0, no amount of Sensor_B can make it 1. The original programmer added an unnecessary condition.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A machine starts when: door is closed (D) AND e-stop is released (E) AND start button is pressed (S). Which boolean expression describes this?',
+      options: [
+        'D + E + S',
+        'D · E · S — all three conditions must be true (1) simultaneously; AND (·) is false if any input is 0, which is the correct safe behavior for a machine interlock',
+        'D · (E + S)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In ladder logic, A · B (boolean AND) is drawn as two contacts in what arrangement?',
+      options: [
+        'Parallel — current can flow through either contact',
+        'Series — both contacts must be closed for current to flow; this directly maps to AND because BOTH conditions must be satisfied',
+        'Stacked vertically — each contact is on a separate rung',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Boolean precedence: NOT binds tightest, then AND, then OR. What does A + B · C evaluate to?',
+      options: [
+        '(A + B) · C — OR groups A and B first',
+        'A + (B · C) — AND has higher precedence than OR, so B · C is evaluated first; then OR with A. Without parentheses, A + B · C always means A OR (B AND C)',
+        'The expression is ambiguous without parentheses and cannot be evaluated',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The Absorption law states A + A·B = A. Why is the A·B term completely redundant?',
+      options: [
+        'Because A and A·B always have the same value when A = 0',
+        'When A = 1, the whole OR expression is 1 regardless of B — so A·B adds nothing. When A = 0, A·B = 0·B = 0 anyway. In both cases A·B never contributes anything A doesn\'t already determine; the entire term can be removed',
+        'The Absorption law only holds when B is also 1',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -111,4 +111,50 @@ export default {
       difficulty: 'hard',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A PLC input card is described as "sinking." What does this mean from the module\'s perspective?',
+      options: [
+        'The module provides current out of each input terminal to the field device',
+        'Current flows into each input terminal — the module absorbs (sinks) current from the field device',
+        'The module connects each input terminal to +24V internally when detecting a signal',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A Fanuc PMC has sinking inputs (common terminal = 0V). Which type of sensor should you use?',
+      options: [
+        'NPN (sinking) sensor — it pulls the signal to 0V when active, matching the module\'s common',
+        'PNP (sourcing) sensor — it provides +24V when active, driving current into the sinking input terminal',
+        'Either type works — sinking inputs are compatible with both NPN and PNP sensors',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You wire an NPN sensor to a sinking PLC input. The sensor LED lights when detecting, but the PLC input never activates. Why?',
+      options: [
+        'The sensor is defective — replace it with a new NPN model',
+        'NPN sinks to 0V when active, but the sinking input also expects +24V to detect a 1 — both are pulling toward 0V and neither provides the +24V the module needs',
+        'The sensor needs a higher supply voltage for the PLC input to detect it',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'How do you determine whether a PLC input card is sinking or sourcing from a wiring diagram?',
+      options: [
+        'Sinking cards are always labeled "NPN" on the terminal strip; sourcing cards are labeled "PNP"',
+        'Check what the common (COM) terminal connects to: if it goes to 0V, the card is sinking; if it goes to +24V, the card is sourcing',
+        'Measure the voltage across each input terminal — sinking inputs show higher voltage',
+      ],
+      correct: 1,
+    },
+  ],
 };

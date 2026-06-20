@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A non-inverting amplifier has R1 = 10 kΩ and Rf = 90 kΩ. What is its voltage gain?',
+      options: [
+        '9 — gain = Rf/R1 as in the inverting configuration',
+        '10 — Av = 1 + Rf/R1 = 1 + 9 = 10; the gain is always at least 1 in the non-inverting topology',
+        '−9 — the output is phase-inverted by the feedback network',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A glass pH electrode has 100 MΩ internal impedance. Why must a voltage follower op-amp be used as the first stage rather than connecting the electrode directly to an ADC with 1 MΩ input impedance?',
+      options: [
+        'The op-amp amplifies the small millivolt signal from the electrode to a level the ADC can measure',
+        'The 1 MΩ ADC input would form a voltage divider with the 100 MΩ electrode impedance, measuring only 1/101 of the actual voltage. The voltage follower\'s near-infinite input impedance draws negligible current, preserving the electrode voltage',
+        'ADCs cannot accept analog signals directly; an op-amp converts the signal to digital format first',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A voltage follower (unity-gain buffer) is created by connecting the output directly to the inverting input, with the signal at the non-inverting input. What useful function does it perform given that its voltage gain is only 1?',
+      options: [
+        'No useful function — a wire connecting input to output achieves the same result more simply',
+        'It transforms impedance: it presents near-infinite resistance to the source while driving the load with near-zero output impedance, isolating the source from load effects without changing the voltage',
+        'It converts single-ended signals to differential signals, which is needed for long cable runs',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'How does the non-inverting amplifier\'s input impedance compare to the inverting amplifier\'s for the same gain?',
+      options: [
+        'They are equal — both configurations use the same op-amp so input impedance is the same',
+        'The non-inverting amplifier has much higher input impedance — the signal connects directly to the op-amp\'s input terminal (tens of MΩ to TΩ). The inverting amplifier\'s input impedance is limited to R1 (typically kΩ range)',
+        'The inverting amplifier has higher input impedance because the virtual ground node isolates the op-amp input from the source',
+      ],
+      correct: 1,
+    },
+  ],
 };

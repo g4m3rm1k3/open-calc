@@ -644,5 +644,50 @@ export default {
     'Clock period must exceed the longest path through all gate delays — this is the critical path.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Gate = smallest Boolean unit. Truth table = complete specification." An AND gate has inputs A=1 and B=0. What is the output?',
+      options: [
+        '1',
+        '0',
+        'Depends on which came first',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Any digital circuit = tree of gates. Trace from inputs to outputs." A circuit has NOT then AND. Input A=0, Input B=1. NOT applied to A first, then AND(NOT_A, B). What is the output?',
+      options: [
+        '0 — B is 1 but A was 0',
+        '1 — NOT(0)=1, AND(1,1)=1',
+        '0 — the NOT gate inverts the final output',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Clock period must exceed the longest path through all gate delays." Why does adding more gates in series limit clock speed?',
+      options: [
+        'More gates require more power, which heats the chip and slows it down',
+        'Each gate adds propagation delay — the clock must wait until the slowest chain of gates has finished computing before capturing the result',
+        'Gates in series reduce voltage below the threshold for the final gate',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Memorise NOT, AND, OR; derive NAND/NOR/XOR from those." How do you derive NAND from AND and NOT?',
+      options: [
+        'Connect NOT before AND: first invert both inputs, then AND them',
+        'Connect NOT after AND: AND(A,B) then invert the output — NOT(AND(A,B))',
+        'NAND cannot be derived from AND and NOT — it requires a special transistor configuration',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -418,5 +418,50 @@ export default {
     'CommonJS require() is dynamic and synchronous. ESM import is static and async.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You import the same module in three different files. How many times does the module code execute?',
+      options: [
+        'Three times — once per import',
+        'Once — ESM modules have one canonical instance; subsequent imports receive the same already-evaluated module',
+        'It depends on whether you use static or dynamic import',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is the difference between a default export and a named export?',
+      options: [
+        'Default exports are faster; named exports are typed',
+        'A module can have only one default export but any number of named exports; they are imported with different syntax',
+        'Named exports are private; default exports are public',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You need to load a heavy module only when the user clicks a button. Which feature enables this?',
+      options: [
+        'Static import with a conditional — import is evaluated lazily',
+        'Dynamic import() — it returns a Promise and can appear anywhere in code, enabling on-demand loading',
+        'require() — CommonJS loads modules on demand by default',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is a key advantage of static ESM imports over CommonJS require()?',
+      options: [
+        'ESM imports are synchronous, making code easier to reason about',
+        'ESM imports are statically analyzable at build time — bundlers can tree-shake (remove unused exports)',
+        'ESM allows circular dependencies; CommonJS does not',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -151,4 +151,50 @@ res
     'Ternary expression: value_if_true if condition else value_if_false.',
     'Conditions can call functions — the return value is evaluated as a bool.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'x = 7. The code: "if x > 10: print(\'big\') elif x > 5: print(\'medium\') else: print(\'small\')" — what prints?',
+      options: [
+        'big — 7 > 5 is close to the first condition',
+        'medium — x = 7 fails x > 10, then passes x > 5 (7 > 5 is True), so the elif branch runs',
+        'medium and small — both conditions are true so both branches run',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why is "elif" important — what happens if you use "if" instead of "elif" for every condition?',
+      options: [
+        'Nothing changes — elif and if are interchangeable in Python',
+        'With multiple if statements, all conditions are checked independently; with elif, only the first true branch runs. Multiple ifs can execute multiple branches for the same input',
+        'elif is required by Python syntax whenever you have more than two conditions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does this ternary expression return: "pass" if score >= 60 else "fail", when score = 45?',
+      options: [
+        '"pass" — the ternary checks if score exists (it does)',
+        '"fail" — score >= 60 is False for 45, so the else value "fail" is returned',
+        'None — ternary expressions without assignments return None',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An if block runs when its condition is truthy. A missing key lookup like d.get("x") returns None. Does "if d.get("x"):" run the block when "x" is absent?',
+      options: [
+        'Yes — the block runs because d.get("x") produced a result (None)',
+        'No — None is falsy in Python, so the if block does not run when "x" is absent and .get() returns None',
+        'It raises a KeyError before the if block is reached',
+      ],
+      correct: 1,
+    },
+  ],
 }

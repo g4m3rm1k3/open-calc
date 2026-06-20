@@ -275,5 +275,50 @@ export default {
     'Always serve from http://localhost — file:// blocks ES Module imports via CORS.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"ES Module: a JS file with explicit import/export declarations." How does the browser resolve import \'three\' without an import map?',
+      options: [
+        'It fetches from a CDN automatically',
+        'It fails — bare module specifiers like \'three\' have no URL meaning in browsers. Only relative paths or full URLs are understood without an import map',
+        'It uses the node_modules folder',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"type=\'module\': activates import syntax, defers execution, enables strict mode." Why does deferring execution matter for scripts that manipulate the DOM?',
+      options: [
+        'Deferred scripts run before the HTML is parsed, giving them priority access to DOM elements',
+        'Deferred scripts run after the HTML is parsed — DOM elements exist when the script executes, so no need for DOMContentLoaded event listeners',
+        'Deferring prevents the script from blocking image loading',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Always serve from http://localhost — file:// blocks ES Module imports via CORS." Why does the file:// protocol block module imports?',
+      options: [
+        'file:// URLs do not support JavaScript',
+        'CORS rules treat all file:// URLs as cross-origin — importing modules from a file:// page triggers CORS checks the local file system cannot satisfy',
+        'file:// is only blocked in Firefox',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Import map: maps \'three\' → CDN URL in one place." You upgrade Three.js from r158 to r159. How many files do you change with an import map?',
+      options: [
+        'Every file that imports \'three\'',
+        'One — the import map entry. All files that import \'three\' automatically pick up the new URL',
+        'The import map plus every file that imports a Three.js class',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -417,5 +417,50 @@ export default {
     'Promise.then = microtask. setTimeout = macrotask. Microtasks always win priority.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'JavaScript is single-threaded. Does this mean it cannot handle asynchronous work at all?',
+      options: [
+        'Correct — JavaScript can only do one thing at a time, so async is impossible',
+        'No — async work is deferred and queued; the thread is free while waiting, and callbacks run when the stack is clear',
+        'No — async work runs on a second hidden thread inside the browser',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A Promise .then() callback and a setTimeout callback are both ready. Which runs first?',
+      options: [
+        'setTimeout — it was registered first',
+        'The Promise .then() — microtasks (Promises) are always drained before any macrotask (setTimeout)',
+        'They run in the same order they were created',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You write a loop that takes 5 seconds to complete synchronously. A setTimeout(fn, 0) was registered before the loop started. When does fn run?',
+      options: [
+        'After 0ms — setTimeout ignores synchronous blocking',
+        'After the loop finishes — the event loop can only dispatch callbacks when the call stack is empty',
+        'Concurrently with the loop on a background thread',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The event loop follows a specific tick cycle. What is the correct order?',
+      options: [
+        'Macrotask → microtasks → render → repeat',
+        'Sync code → microtask queue (fully drained) → render → one macrotask → microtask queue → repeat',
+        'Microtasks → sync code → macrotasks → render',
+      ],
+      correct: 1,
+    },
+  ],
 };

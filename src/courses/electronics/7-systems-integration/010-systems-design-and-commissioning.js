@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'Insulation resistance rule of thumb for LV equipment: R_insulation (MΩ) > rated voltage (V) / 1000. For a 480V system: R_min = 0.48MΩ. IEC 60364 requires minimum 1MΩ for new installation — measure with 500V DC megohmmeter before first energisation.' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Before energising a completed motor control panel for the first time, you spend 30 minutes doing a "dead check." What does this check involve and why is it done before applying power?',
+      options: [
+        'Running the motor at reduced load to check for abnormal vibration or heat before applying full voltage',
+        'Measuring insulation resistance between every power conductor and ground with a megohmmeter while power is off — this catches wiring shorts, misrouted cables, and contaminated insulation before they can cause a fault arc, equipment damage, or injury when the breaker is first closed',
+        'Checking that all control panel components are installed per the bill of materials before the customer arrives for acceptance testing',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A capacitor rated for 105°C operation is derated by 20°C and runs at 85°C. According to the Arrhenius model, how does this affect its service life?',
+      options: [
+        'Life increases by about 20% — proportional to the temperature reduction',
+        'Life increases by approximately 4× — the Arrhenius relationship predicts an exponential increase in life with temperature reduction; for typical electrolytic capacitors, every 10°C reduction roughly doubles life, so a 20°C reduction approximately quadruples it',
+        'Life is unchanged — derating only improves reliability for semiconductor devices, not passive components',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A control panel passes all bench tests at no load and light load. The customer requires a full-load acceptance test before handover. Why is the no-load result insufficient?',
+      options: [
+        'The customer requires the test as a contractual formality — the no-load result is technically sufficient to verify all functions',
+        'Voltage drops in undersized cabling, thermal shutdown of undersized components, and harmonic resonance in the motor circuit only manifest at full current — a system that passes all no-load and light-load tests can still fail in service if these full-load conditions were never tested',
+        'PLC programs can only be fully validated with the motor loaded because the timing of the scan cycle depends on the current drawn by the motor',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A design review takes one hour and costs nothing extra. A PCB re-spin takes three weeks and costs $15,000. How does this explain why design reviews are the most cost-effective quality tool in electronics development?',
+      options: [
+        'Design reviews are only valuable for complex designs; simple boards do not need them because errors are easier to fix in hardware',
+        'An error caught on a schematic takes minutes to fix; the same error discovered after PCB fabrication requires a re-spin — weeks of delay and thousands of dollars. An experienced reviewer can find 5–10 such errors per hour, making the review the cheapest possible test, especially when schedule pressure tempts the team to skip it',
+        'Design reviews catch only schematic errors; manufacturing and assembly errors must be found by inspection after production, so the review saves only a portion of potential costs',
+      ],
+      correct: 1,
+    },
+  ],
 };

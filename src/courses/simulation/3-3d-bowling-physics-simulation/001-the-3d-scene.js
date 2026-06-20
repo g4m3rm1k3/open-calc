@@ -331,4 +331,51 @@ function update(deltaTime) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In Three.js, +Y is the up axis. When positioning a ball of radius 0.5 sitting on the floor, what Y-coordinate should its center be at?',
+      options: [
+        '0 — the center is at the floor level',
+        '0.5 — the center is one radius above the floor. If positioned at Y=0, the bottom half of the sphere would be below the floor plane',
+        '1 — the diameter above the floor',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'MeshStandardMaterial responds to lights physically. MeshBasicMaterial ignores lights and renders at full color. When would you choose MeshBasicMaterial?',
+      options: [
+        'For all objects — MeshBasicMaterial renders faster than MeshStandardMaterial',
+        'For objects that should always be fully visible regardless of lighting: lane edge lines, UI overlays, wireframes, or debugging visualizations. Standard is correct for opaque surfaces (the ball, pins, lane) where you want realistic shading and shadow response',
+        'MeshBasicMaterial is required for objects that cast shadows',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A scene hierarchy: `scene.add(mesh)`. The lane is 18m long and placed with `lane.position.z = -9`. Why position it in the −Z direction?',
+      options: [
+        'Three.js cameras always look in the −Z direction by default. The lane extends away from the camera, which starts near Z=0 looking down −Z. Negative Z is "into the scene" — where the pins are',
+        'Positive Z is reserved for the camera position',
+        'The bowling convention is that gutters are along the Z axis',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The bowling app calls `renderer.render(scene, camera)` inside `update(deltaTime)`. Why is rendering inside update correct here, even though more complex apps often separate update and render passes?',
+      options: [
+        'Three.js requires render to be called inside update',
+        'This simple scene has no post-processing or multi-pass rendering. Calling render once per frame at the end of update is the standard Three.js pattern: advance physics, then draw. Separate update/render passes are only needed for shadow maps, reflections, or render-to-texture effects',
+        'Rendering inside update doubles the frame rate',
+      ],
+      correct: 1,
+    },
+  ],
 }

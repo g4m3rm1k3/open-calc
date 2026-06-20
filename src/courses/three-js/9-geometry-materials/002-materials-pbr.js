@@ -376,5 +376,50 @@ export default {
     'MeshNormalMaterial → immediate normal direction feedback, no lights needed.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"BRDF = what fraction of incoming light reflects in each direction — that IS what a material is." Why is the BRDF a better definition of material than "colour and shininess"?',
+      options: [
+        'BRDFs use more parameters, giving higher accuracy',
+        'BRDF captures how reflectance varies with both light direction and view direction — a single colour cannot express why a surface looks different at different viewing angles or under different lighting',
+        'BRDF is required by WebGL but colour is not',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"metalness=0: dielectric. metalness=1: conductor." A chrome sphere (metalness=1) and a white plastic sphere (metalness=0) are in the same scene with a red light. How do their specular highlights differ?',
+      options: [
+        'Both have white specular highlights',
+        'The chrome sphere\'s specular is tinted by its own colour (metal F0 = albedo); the plastic\'s specular is white (dielectric F0 ≈ 0.04)',
+        'The plastic sphere has brighter specular because it has more diffuse light available',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"emissive ≠ light source. Emissive adds to the pixel; it does not illuminate the scene." A neon sign uses MeshStandardMaterial with emissive colour set. What must you also add to light surrounding walls?',
+      options: [
+        'Nothing — emissive materials automatically light nearby surfaces',
+        'A PointLight at the sign\'s position to cast light onto the surrounding geometry',
+        'An AmbientLight to simulate the glow',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"MeshNormalMaterial → immediate normal direction feedback, no lights needed." When is this material useful?',
+      options: [
+        'For final production rendering where accurate normals matter most',
+        'For debugging — it colours surfaces by normal direction, making it easy to spot incorrect normals, flipped faces, or missing computeVertexNormals() calls without setting up any lights',
+        'For transparent surfaces that cannot receive shadows',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Pure silicon at room temperature has very low conductivity. What happens when you add a tiny amount of phosphorus (a group-V element)?',
+      options: [
+        'Phosphorus fills in crystal defects, making the silicon more insulating',
+        'Each phosphorus atom donates one extra free electron — even 1 ppm of doping can increase conductivity by a factor of a million, creating N-type silicon',
+        'Phosphorus replaces silicon atoms but does not change carrier density because it has similar atomic mass',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why do NMOS transistors and NPN bipolar transistors dominate high-speed designs compared to their P-type counterparts?',
+      options: [
+        'N-type devices can handle higher voltages because electrons are smaller than holes',
+        'Electron mobility in silicon (~1350 cm²/V·s) is about three times hole mobility (~450 cm²/V·s), so N-type majority-carrier devices switch faster for the same geometry',
+        'P-type devices require a negative supply voltage which is more expensive to generate',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A technician measures a brand-new MOSFET with a multimeter between drain and source, with the gate left disconnected. The meter reads open circuit in both directions. What does this indicate?',
+      options: [
+        'The MOSFET is damaged — a good device should show a forward-biased diode in one direction',
+        'Normal behavior — with no gate voltage, the MOSFET channel does not exist; the device is off and reads open; a short reading would indicate failure',
+        'The multimeter is faulty — semiconductor testers are needed to properly evaluate MOSFETs',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why are silicon carbide (SiC) power devices preferred over silicon for electric vehicle inverters that run at high temperatures?',
+      options: [
+        'SiC has lower on-resistance than silicon at room temperature',
+        'SiC has a wider band gap (3.26 eV vs 1.12 eV), so thermal excitation does not swamp the intentional doping at high temperatures — junctions remain controlled and leakage stays low above 150°C',
+        'SiC devices are smaller than silicon equivalents, so they fit in more compact EV inverter housings',
+      ],
+      correct: 1,
+    },
+  ],
 };

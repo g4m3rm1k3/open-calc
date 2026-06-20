@@ -734,4 +734,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Verlet integration stores previous position instead of velocity: `newPos = 2*pos - prevPos + accel*dt²`. What advantage does this have over Euler integration for constrained systems like cloth?',
+      options: [
+        'Verlet is more accurate for constant velocity but equally accurate with forces',
+        'Verlet encodes velocity implicitly as (pos - prevPos) and is naturally energy-conserving. Constraints (like keeping two cloth nodes a fixed distance apart) can be applied directly to positions without accumulating velocity errors — Euler accumulates drift that causes cloth to slowly stretch or explode',
+        'Verlet avoids all numerical error because it uses two data points',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A fireworks burst uses one BufferGeometry with 200 positions rather than 200 individual Mesh objects. What is the main performance advantage?',
+      options: [
+        'BufferGeometry supports colors while Mesh does not',
+        'One BufferGeometry = one GPU draw call. 200 Mesh objects = 200 draw calls. GPU draw-call overhead dominates at high particle counts. Updating positions and colors directly in typed Float32Arrays and setting needsUpdate=true lets the GPU re-upload only the changed data, not re-process the full scene graph',
+        'BufferGeometry particles can be larger than standard Mesh spheres',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '`timeSinceLaunch > LAUNCH_INTERVAL` triggers launching a new firework shell. This is an example of which simulation pattern?',
+      options: [
+        'Event-driven architecture — the browser fires an event when the interval expires',
+        'Accumulated-time timer: a running float increments each frame by dt and fires when it crosses a threshold, then resets. This is frame-rate independent (works at 30fps or 144fps) unlike checking frame count, which would fire at different real-world rates on different machines',
+        'A setInterval callback synchronized with requestAnimationFrame',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Boid flocking uses three rules: separation (avoid crowding), alignment (steer toward average heading), and cohesion (steer toward average position). Which rule prevents boids from passing through each other?',
+      options: [
+        'Alignment — matching heading keeps boids moving in the same direction and avoids head-on collisions',
+        'Separation — it pushes each boid away from nearby neighbors when the distance drops below a threshold. Without separation, alignment and cohesion alone would compress all boids into a single point',
+        'Cohesion — pulling toward the group center keeps the flock together',
+      ],
+      correct: 1,
+    },
+  ],
 }

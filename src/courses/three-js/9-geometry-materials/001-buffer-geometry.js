@@ -407,5 +407,50 @@ export default {
     'computeVertexNormals() estimates normals from face geometry — required for lit materials.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"BufferGeometry = named Float32Arrays (attributes) + an index array, uploaded to GPU as VBOs." What is the purpose of the index array?',
+      options: [
+        'It stores the order in which materials are applied',
+        'It references vertices by number, allowing the same vertex to be reused by multiple triangles — reducing duplication in the position array',
+        'It defines the rendering order of triangles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"CCW winding = front face. Swap two vertices to flip normal direction." You see a face from outside an object but it is invisible. What is the likely cause?',
+      options: [
+        'The material is transparent',
+        'The vertices are in CW (clockwise) order from the outside view — the GPU\'s back-face culling discards the face because it thinks you are looking at the back',
+        'The geometry is too small',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"position attribute: itemSize=3 means 3 floats per vertex." You create a BufferAttribute with a Float32Array of 30 floats and itemSize=3. How many vertices does this define?',
+      options: [
+        '30 vertices',
+        '10 vertices — 30 floats ÷ 3 per vertex',
+        '90 vertices — each vertex is stored in triplicate',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"computeVertexNormals() estimates normals from face geometry." When is this not sufficient and manual normals are better?',
+      options: [
+        'computeVertexNormals() is always sufficient',
+        'On a sharp-edged cube — computed normals average adjacent face normals across the edge, producing smooth shading where hard edges are needed. Manual per-face normals or split vertices preserve the hard look',
+        'When the geometry has more than 1000 vertices',
+      ],
+      correct: 1,
+    },
+  ],
 }

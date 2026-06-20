@@ -241,4 +241,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'f\'(x) changes from positive to negative at x = 3. What does the First Derivative Test tell you?',
+      options: [
+        'f has a local minimum at x = 3 — the function was decreasing before and increases after',
+        'f has a local maximum at x = 3 — f was increasing (f\' > 0) then decreasing (f\' < 0), so the function peaked at x = 3',
+        'f has an inflection point at x = 3 — the derivative changing sign indicates a concavity change',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'f\'(x) = x²(x − 4). Sign analysis of f\' near x = 0 shows f\' is positive on both sides. What does this mean?',
+      options: [
+        'f has a local minimum at x = 0 — positive values of f\' make the function increase near minima',
+        'x = 0 is not a local extremum — since f\' does not change sign (it stays positive through x = 0), the function just keeps increasing; x = 0 is a flat point but not an extremum',
+        'f\' = 0 at x = 0, so x = 0 must be either a max or min by Fermat\'s Theorem',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'How do you find the sign of f\'(x) on an interval between critical points?',
+      options: [
+        'Compute f\'\'(x) at the critical points — its sign tells you whether f\' is positive or negative on each side',
+        'Pick any test point in the interval and evaluate f\' there — since f\' is continuous and has no zeros in the interval, its sign is constant throughout, and one test point determines it',
+        'Check the sign of f\'(x) at the endpoints of the interval — the endpoint values determine the sign in between',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'When should you use the First Derivative Test instead of the Second Derivative Test?',
+      options: [
+        'Always use the First Derivative Test — it is more reliable and gives more information',
+        'Use the First Derivative Test when f\'\'(a) = 0 (the Second Derivative Test is inconclusive), or when f\'\' is hard to compute — it works directly from sign changes of f\' regardless of second derivative behavior',
+        'Use the First Derivative Test only for polynomial functions; the Second Derivative Test works for all other function types',
+      ],
+      correct: 1,
+    },
+  ],
 }

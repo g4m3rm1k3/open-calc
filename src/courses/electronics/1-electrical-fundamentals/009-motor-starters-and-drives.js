@@ -118,4 +118,50 @@ export default {
       difficulty: 'hard',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why does a motor draw 500–700% of its rated current at the moment of startup?',
+      options: [
+        'The starting capacitor charges, drawing a brief surge before the motor stabilizes',
+        'At standstill, back-EMF is zero, so only the low winding resistance limits current — as speed builds, back-EMF grows and current drops to rated value',
+        'Motor starters intentionally supply excess current to overcome static friction in the bearings',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is the main advantage of a VFD over a star-delta starter?',
+      options: [
+        'A VFD eliminates the need for motor overload protection',
+        'A VFD limits inrush to ~150% of rated current and provides full torque at any speed, while star-delta only reduces starting current and runs at fixed speed',
+        'A VFD is simpler to wire since it requires only two phases instead of three',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A centrifugal pump motor runs at full speed drawing 45kW. A VFD reduces speed to 75%. What happens to power consumption?',
+      options: [
+        'Power drops to 75% — power scales linearly with speed for centrifugal loads',
+        'Power drops to about 42% — for centrifugal loads, power scales as the cube of the speed ratio',
+        'Power stays the same — the VFD consumes whatever the motor needs regardless of speed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An overload relay trips the motor contactor. The operator resets and restarts immediately. Why might this cause motor damage even if the fault is cleared?',
+      options: [
+        'Repeated resets can damage the contactor contacts from arcing',
+        'The overload relay maintains a thermal model of the motor; resetting before the motor cools means the next start begins with accumulated heat, compounding the overtemperature',
+        'The motor winding resistance changes after each trip, causing higher inrush on the next start',
+      ],
+      correct: 1,
+    },
+  ],
 };

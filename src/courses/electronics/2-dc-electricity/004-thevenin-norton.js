@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'How do you find the Thévenin voltage (Vth) of a two-terminal network?',
+      options: [
+        'Deactivate all sources and measure the resistance at the terminals',
+        'Remove the load and calculate or measure the open-circuit voltage at the terminals',
+        'Short the terminals and measure the resulting current, then multiply by the source resistance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A Thévenin source has Vth = 12V and Rth = 100Ω. What load resistance extracts maximum power from this source?',
+      options: [
+        '0Ω — short circuit extracts the most power',
+        '100Ω — maximum power transfer occurs when RL = Rth',
+        '∞Ω — open circuit has the highest voltage, so it extracts the most power',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A sensor with Rth = 1kΩ is connected to a 10kΩ PLC input. What fraction of the sensor\'s open-circuit voltage reaches the PLC input?',
+      options: [
+        '50% — voltage always splits equally between source resistance and load',
+        'About 91% — the voltage divider gives 10k/(1k+10k) = 0.909',
+        '100% — the PLC input has high impedance so it doesn\'t load the sensor',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why does a 4–20mA transmitter\'s signal remain accurate even over long cables that add resistance to the loop?',
+      options: [
+        'The transmitter adjusts its voltage output to compensate for cable resistance',
+        'The transmitter is a Norton current source with very high Rth — it forces the specified current regardless of loop resistance variations',
+        '4–20mA signals are immune to resistance because they use frequency modulation rather than amplitude',
+      ],
+      correct: 1,
+    },
+  ],
 };

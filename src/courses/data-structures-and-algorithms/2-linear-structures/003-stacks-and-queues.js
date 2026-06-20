@@ -981,4 +981,51 @@ print(q.dequeue())  # 4`,
       hint: 'inbox receives all pushes. When outbox is empty and you need to dequeue, flip the entire inbox into outbox — this reverses the order, making the oldest item the new top of outbox.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A stack is LIFO; a queue is FIFO. When does the call stack in your CPU actually behave like a stack?',
+      options: [
+        'Only during recursive function calls',
+        'Every function call pushes a frame; every return pops it. The most recently called function is the first to return — exactly LIFO. This is why "stack overflow" means the call stack ran out of space from too many nested (not necessarily recursive) function calls',
+        'The CPU call stack is actually a queue — callers are processed in order of arrival',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Implementing a queue with two stacks (inbox and outbox) gives amortized O(1) dequeue. When is the amortized cost worst-case O(n) for a single operation?',
+      options: [
+        'When the inbox has n elements and outbox is empty — one dequeue triggers O(n) flipping',
+        'When n items are enqueued before any dequeue. The first dequeue flips all n items from inbox to outbox in O(n) work. But those n items can now be dequeued one by one at O(1) each. So n operations cost O(n) total — amortized O(1) per operation even though one individual operation cost O(n)',
+        'The single-operation worst case is always O(1) because Python list.pop is O(1)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'BFS (breadth-first search) requires a queue; DFS (depth-first search) naturally uses a stack (or recursion). Why does BFS need a queue?',
+      options: [
+        'BFS only works on trees; queues match tree structures',
+        'BFS explores neighbors in the order they were discovered. A queue\'s FIFO property ensures level 1 nodes are all processed before level 2, which are processed before level 3 — breadth-first order. A stack would cause the last discovered neighbor to be explored first, producing depth-first behavior',
+        'Queues are faster than stacks for graph traversal',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A monotonic stack maintains elements in sorted order. When scanning left-to-right, elements are popped when a larger (or smaller) element arrives. What problem does this solve efficiently?',
+      options: [
+        'Sorting an array — the monotonic stack produces a sorted output',
+        'Finding the "next greater element" for each position. As you process each element, pop everything from the stack smaller than the current element — each popped element\'s "next greater" is the current element. This solves the problem in O(n) instead of O(n²) nested loops',
+        'Checking balanced parentheses — the stack tracks open/close pairs',
+      ],
+      correct: 1,
+    },
+  ],
 };

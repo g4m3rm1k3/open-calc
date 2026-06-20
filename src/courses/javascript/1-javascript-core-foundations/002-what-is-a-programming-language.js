@@ -425,5 +425,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A program\'s code is structurally valid but produces unexpected output. Which aspect of the language does this violate?',
+      options: [
+        'Syntax — the structural grammar is broken',
+        'Semantics — the meaning/behavior is wrong despite valid structure',
+        'The spec — the ECMAScript document has an error',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Chrome and Firefox both run JavaScript. They may have different internal implementations. What guarantees they produce the same result for the same code?',
+      options: [
+        'They share source code, so they behave identically',
+        'Both engines must comply with the ECMAScript specification',
+        'Browsers synchronize behavior through the W3C',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Node.js can read files from disk. A browser cannot. But both run JavaScript. Why the difference?',
+      options: [
+        'Node.js uses a different version of JavaScript',
+        'The runtime context differs — host APIs (like file system) are environment-specific, not part of the core language',
+        'File access requires a different programming language entirely',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What does "deterministic" mean in the context of code?',
+      options: [
+        'The code runs faster than non-deterministic code',
+        'The same input always produces the same output, with no randomness or hidden state',
+        'The code has been formally verified by a proof checker',
+      ],
+      correct: 1,
+    },
+  ],
 }

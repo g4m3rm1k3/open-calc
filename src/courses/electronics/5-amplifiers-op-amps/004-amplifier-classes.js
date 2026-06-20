@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A class A amplifier is biased at IC = 100 mA with VCC = 12V and RC = 60Ω. Even with no audio input signal, how much power does it dissipate?',
+      options: [
+        '0W — class A only draws current when a signal is present',
+        '1.2W — P = VCC × IC = 12V × 0.1A; class A transistors conduct continuously regardless of signal',
+        '0.3W — efficiency is 25% so it only wastes 25% of input power at idle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A class B push-pull amplifier has two transistors. Crossover distortion appears because:',
+      options: [
+        'Both transistors saturate simultaneously near the zero crossing, causing the output to clamp at VCE(sat)',
+        'Both transistors are biased at cutoff (VBE = 0) so there is a dead zone near zero volts where neither transistor conducts, producing a notch in the output waveform',
+        'The two transistors have slightly different β values, causing unequal gain between the positive and negative half-cycles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Class AB amplifiers bias each transistor with a small forward voltage. What specific problem does this solve compared to class B?',
+      options: [
+        'It raises efficiency above the 78.5% class B theoretical maximum',
+        'It keeps both transistors barely conducting at zero signal, eliminating the crossover dead zone and its associated distortion while retaining most of class B\'s efficiency advantage over class A',
+        'It allows the amplifier to operate from a single supply rail without a split supply',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Class C amplifiers conduct for less than 180° of each cycle, producing output pulses rather than a continuous waveform. Why are they still useful in RF transmitters?',
+      options: [
+        'RF receivers can reconstruct a sine wave from any periodic pulse train, so class C distortion doesn\'t matter at radio frequencies',
+        'A tuned resonant tank circuit at the output filters the pulses, reconstructing the full sine wave while the class C efficiency of 85–90% dramatically reduces heat dissipation in high-power transmitters',
+        'Class C amplifiers self-modulate to produce AM signals, which is the dominant modulation used in radio broadcasting',
+      ],
+      correct: 1,
+    },
+  ],
 };

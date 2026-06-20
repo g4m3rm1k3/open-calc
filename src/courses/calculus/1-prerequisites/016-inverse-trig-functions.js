@@ -376,4 +376,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why does arcsin have domain [−1, 1] and range [−π/2, π/2]?',
+      options: [
+        'Arcsin is restricted to this range arbitrarily, by convention — any range containing a full period would work equally well',
+        'Sine outputs values in [−1, 1], so arcsin must accept exactly those inputs; the range [−π/2, π/2] is the restricted domain of sine where it is one-to-one, which is required for the inverse to be a function',
+        'The domain [−1, 1] comes from the Pythagorean identity, and the range is determined by π/2 being the smallest positive number where sine equals 1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does arctan(1) equal, and why?',
+      options: [
+        'arctan(1) = π/4, because tan(π/4) = sin(π/4)/cos(π/4) = (√2/2)/(√2/2) = 1, and π/4 is in the range (−π/2, π/2) of arctan',
+        'arctan(1) = 1, because the inverse of a function always maps a value to itself when the input equals 1',
+        'arctan(1) = π/2, because tangent equals 1 at the boundary of its defined range',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is sin⁻¹(x) ≠ 1/sin(x)?',
+      options: [
+        'The superscript −1 on a function denotes the inverse function (undo), not the reciprocal. The reciprocal of sin is written csc(x) = 1/sin(x)',
+        'sin⁻¹(x) is defined only for |x| ≤ 1, so it cannot equal 1/sin(x) which is defined everywhere sin ≠ 0',
+        'The notation is historically inconsistent — sin⁻¹(x) actually means 1/sin(x) in some older textbooks, but modern calculus redefines it as the inverse function',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is lim(x→∞) arctan(x)?',
+      options: [
+        '∞ — arctan grows without bound, just more slowly than x itself',
+        'π/2 — because tan(θ) → ∞ as θ → π/2 from below, so "undoing" that limit gives arctan(∞) = π/2',
+        '1 — because the ratio of large numbers eventually approaches a constant',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -725,5 +725,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Function A calls function B, which calls function C. C finishes first. What does this tell you about the call stack?',
+      options: [
+        'The stack processes frames in the order they were added (FIFO)',
+        'The stack processes frames in reverse order — last in, first out (LIFO)',
+        'All three functions run simultaneously on separate stacks',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Where do JavaScript objects and arrays live in memory?',
+      options: [
+        'On the call stack, alongside primitive values',
+        'In the heap — a large memory region for reference-type values',
+        'In a separate thread dedicated to object storage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'JavaScript is described as "single-threaded." What does this mean in practice?',
+      options: [
+        'Only one script file can be loaded per page',
+        'Only one piece of code can run at any given moment — there is no true parallelism',
+        'JavaScript can only handle one HTTP request at a time',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A setTimeout callback is ready to run, but a long-running function is still executing. When does the callback actually run?',
+      options: [
+        'Immediately — setTimeout callbacks interrupt whatever is running',
+        'Only after the current call stack is empty — the event loop waits for a clear stack',
+        'Never — setTimeout callbacks are discarded if they miss their window',
+      ],
+      correct: 1,
+    },
+  ],
 }

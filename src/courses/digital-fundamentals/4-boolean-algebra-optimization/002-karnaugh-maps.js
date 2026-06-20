@@ -1116,5 +1116,50 @@ export default {
     'After K-map: each group → one AND gate. All groups → one OR gate.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"K-map = truth table rearranged so adjacency = one-variable difference." Why does grouping adjacent cells in a K-map simplify the expression?',
+      options: [
+        'Adjacent cells always represent the same minterm',
+        'Adjacent cells differ in exactly one variable — when you group them, that variable cancels out, leaving a simpler term with one fewer variable',
+        'Grouping adds cells to create a larger truth table',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Group size 2ᴺ eliminates N variables. Group of 4 → 1-variable term eliminated per pair." A group of 4 cells in a 3-variable K-map produces a term with how many literals?',
+      options: [
+        '3 literals',
+        '1 literal',
+        '2 literals',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Wrap-around: col 0 and col 3 adjacent. All 4 corners = one group." In a 4-variable K-map, the four corner cells can be grouped. What does this produce?',
+      options: [
+        'An invalid grouping — corners cannot be grouped',
+        'A group of 4 adjacent cells (each corner is adjacent to its neighbours via wrap-around), yielding a 2-literal term',
+        'A group of 4 that eliminates all variables',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Find prime implicants (largest groups). Select essential ones." Why should you always use the largest possible group?',
+      options: [
+        'Larger groups are harder to draw and more impressive',
+        'Larger groups eliminate more variables — bigger group = simpler term = fewer gates in the final circuit',
+        'Larger groups cover more 0-cells, which is required for correctness',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -909,7 +909,52 @@ export default {
     'Boiling point = temperature where vapour pressure = atmospheric pressure. Lower pressure → lower boiling point.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Temperature = average molecular kinetic energy." You heat a gas from 20°C to 40°C. What actually changes at the molecular level?',
+      options: [
+        'The molecules get larger',
+        'The average speed of molecules increases — higher temperature means more kinetic energy, so molecules move faster',
+        'The number of molecules increases',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Solid: molecules in fixed positions, only vibrate." Why are solids incompressible?',
+      options: [
+        'Solid molecules are too cold to move, creating rigidity',
+        'Molecules in a solid are already packed tightly in a lattice — there is no space between them to compress into',
+        'Solids are incompressible because the molecules are bonded with covalent bonds',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Liquid: fixed volume, variable shape. Vapour pressure rises with temperature." Why does vapour pressure rise when you heat a liquid?',
+      options: [
+        'Heat adds mass to the liquid, increasing pressure',
+        'At higher temperatures, more molecules have enough energy to escape the liquid surface into the gas phase — so equilibrium vapour pressure is higher',
+        'Hot liquids expand, pushing more vapour out',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Gas pressure comes from molecular collisions." If you halve the volume of a sealed gas (PV = nRT), what happens to pressure?',
+      options: [
+        'Pressure halves — fewer molecules can fit in the smaller space',
+        'Pressure doubles — same number of molecules, half the space, so twice as many collisions per unit area per second',
+        'Pressure stays the same — collisions become less frequent but more forceful',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_3_0 };

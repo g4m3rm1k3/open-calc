@@ -129,4 +129,51 @@ export default {
       solution: 'This is an SR latch where:\n- S = FAULT (rising edge of fault sets the alarm)\n- R = ACK (operator acknowledge clears it)\n- Q = ALARM_ACTIVE\n\nIn ladder (using OTL/OTU):\nRung 1: [FAULT] ---( OTL ALARM_ACTIVE )   -- latches when fault occurs\nRung 2: [ACK]   ---( OTU ALARM_ACTIVE )   -- clears when acknowledged\nRung 3: [ALARM_ACTIVE] ---( ALARM_LIGHT ) -- drives the output\n\nKey behavior: if FAULT goes true and then clears (transient fault), ALARM_ACTIVE remains set. The operator must press ACK — only then does ALARM_ACTIVE clear. This ensures faults cannot silently self-clear without operator awareness. The memory is the OTL bit persisting between scans.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A combinational circuit and a sequential circuit receive the same inputs at two different times. The combinational circuit gives the same output both times. The sequential circuit gives different outputs. Why?',
+      options: [
+        'Sequential circuits have more inputs that were not described in the question',
+        'Sequential circuits have memory — their output depends on current inputs AND the internal state built from past inputs. The same inputs produce different outputs depending on what happened before. Combinational circuits have no memory: identical inputs always produce identical outputs regardless of history',
+        'Sequential circuits use analog signals while combinational circuits use digital',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A motor starter uses a seal-in (latch) circuit: the start button momentarily energizes the motor coil, which then holds itself on via a parallel contact. What SR latch behavior does this implement?',
+      options: [
+        'S = motor running, R = stop button; Q = power to motor',
+        'S = start button press (set), R = stop button press (reset), Q = Motor_Run coil — once Set triggers (Q→1), Q\'s own contact in parallel maintains the path even after S releases. R breaks the series path to reset Q→0',
+        'The seal-in is NOT an SR latch — it is combinational logic that checks both buttons simultaneously',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In a D flip-flop, the output Q updates to match input D only on the rising clock edge. Why does this edge-triggering matter in practice?',
+      options: [
+        'Edge triggering prevents the flip-flop from responding to input glitches — signals only "count" at the exact clock edge, giving the system a deterministic sampling moment; this is why digital systems are synchronous: all state changes happen at the same clock tick',
+        'Edge triggering doubles the speed of the flip-flop compared to level-triggered latches',
+        'D flip-flops without edge triggering would always output the same value as the input, which would make them useless for memory',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An OTL (Output Latch) instruction holds a bit ON until an OTU (Output Unlatch) clears it, even across PLC scan cycles. Why does this matter for fault alarms?',
+      options: [
+        'OTL is faster than a standard output coil, so fault response is quicker',
+        'A fault that clears before the next scan would be missed by a standard output coil (it would turn off when the fault signal clears); OTL persists the bit independently of the triggering condition — the fault is recorded even if it was momentary, requiring explicit operator acknowledgment via OTU',
+        'OTL and standard coils behave identically; OTL is just older ladder syntax',
+      ],
+      correct: 1,
+    },
+  ],
 };

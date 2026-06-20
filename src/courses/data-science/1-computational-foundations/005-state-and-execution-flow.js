@@ -86,4 +86,50 @@ res
     'Save values in intermediate variables before overwriting them.',
     'Tracing state line by line is the foundation of systematic debugging.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'x = 10; x = x * 2; x = x - 3. What is x at the end?',
+      options: [
+        '17 — 10 * 2 = 20, then 20 - 3 = 17',
+        '20 — the multiplication runs last',
+        '7 — the subtraction runs first on the original 10',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why does saving intermediate values in separate variables help with debugging?',
+      options: [
+        'Python requires intermediate variables for multi-step calculations',
+        'Intermediate variables let you inspect each step separately — you can print or check total before using it downstream, making it easy to pinpoint exactly which step produced an unexpected value',
+        'Intermediate variables prevent memory leaks by releasing values after each computation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A function uses a variable named result. You also have a result in the outer scope. After the function call, what is the outer result?',
+      options: [
+        'Changed — function assignments modify the nearest variable with the same name',
+        'Unchanged — Python functions have their own local scope; assigning to result inside a function creates a local variable, not modifying the outer one',
+        'It depends on whether you used global result in the function',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Tracing means following a program\'s execution step by step. What is the goal of tracing a bug?',
+      options: [
+        'To find the line where the error message appeared — that is always where the bug is',
+        'To find the exact step where the state first diverges from what you expected — the error message shows where Python complained, but the root cause may be earlier, where a wrong value was computed or assigned',
+        'To determine how many instructions the program executed before crashing',
+      ],
+      correct: 1,
+    },
+  ],
 }

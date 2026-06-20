@@ -550,5 +550,52 @@ df = pd.DataFrame({"salary": salaries})
         }
       }
     ]
-  }
+  },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A salary dataset has 16 values near $65,000 and two outliers: $180,000 and $3,000. The mean is much higher than the median. Why?',
+      options: [
+        'The median formula is incorrect for datasets with outliers',
+        'The mean sums all values then divides — extreme outliers pull it toward them. The median finds the middle value and ignores magnitude, so $180,000 and $3,000 each count as "one position" rather than shifting the center by their dollar amount',
+        'The mean uses the sample variance while the median uses the population variance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The IQR fence marks values below Q1 − 1.5×IQR or above Q3 + 1.5×IQR as outliers. What does this rule assume?',
+      options: [
+        'The data is normally distributed, so outliers are beyond 3 standard deviations',
+        'Most of the data lies within 1.5 fence-lengths of the central box; values far outside represent unusual observations. It makes no distributional assumption — it is based on percentile spread, so it works for skewed data too',
+        'Exactly 5% of values are outliers by construction',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A dataset has 20% missing values in the "salary" column. When should you drop missing rows rather than impute them?',
+      options: [
+        'Always drop — missing values are always errors in the data',
+        'Drop when missingness is completely random (MCAR) and removing rows will not bias the remaining sample. Impute when missing values are systematic (e.g., low-income workers skipped the question) — dropping those rows would skew the analysis',
+        'Impute only when less than 5% of values are missing; drop otherwise',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'After removing outliers from the salary data, the mean drops significantly but the median barely changes. What does this tell you about the dataset?',
+      options: [
+        'The outliers were errors and should always be removed',
+        'The outliers were extreme high (or low) values that pulled the mean far from the center — the median was already a better measure of the typical salary. This confirms the original distribution was right-skewed, not symmetric',
+        'The dataset is too small to compute a reliable mean',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -693,7 +693,52 @@ export default {
     'Two-column proof: left column = statement, right column = reason (never "obvious").',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Straight line = 180°." Two angles form a linear pair. One is 73°. What is the other?',
+      options: [
+        '107°',
+        '117°',
+        '97°',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Vertical Angles Theorem: a + b = 180, c + b = 180 → a = c." Why are vertical angles equal without needing a separate axiom?',
+      options: [
+        'Vertical angles are defined as equal by the definition of intersecting lines',
+        'Both angles are each supplementary to the same angle b — if two things are both supplementary to the same angle, they must be equal to each other',
+        'They look equal and geometry agrees with visual intuition',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Segment Addition Postulate: B between A and C → AB + BC = AC." Points on a line: A, B, C. AB = 5, AC = 13. What is BC?',
+      options: [
+        '8',
+        '18',
+        '65',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Two-column proof: left = statement, right = reason (never \'obvious\')." Which is a valid reason in a two-column proof?',
+      options: [
+        '"Clearly equal by inspection"',
+        '"Vertical Angles Theorem" or "Linear Pair Theorem" — specific named theorems or postulates',
+        '"From the picture"',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_GEO_1_3 };

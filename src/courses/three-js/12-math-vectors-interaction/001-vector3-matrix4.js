@@ -467,5 +467,50 @@ export default {
     'closest point on line: t = (P-A)·d, closest = A + t*d. Core of CAD constraint solving.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"dot(a,b) = |a||b|cos(θ). Sign tells you angle relationship." A dot product returns a negative value. What does this tell you about the two vectors?',
+      options: [
+        'The vectors are perpendicular',
+        'The angle between them is greater than 90° — they point in broadly opposite directions',
+        'One of the vectors is normalised incorrectly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Matrix multiply is NOT commutative: A×B ≠ B×A." In a shader, you write projection * view * model * vertex. What happens if you reorder to model * view * projection * vertex?',
+      options: [
+        'The result is the same — matrix order does not matter in GLSL',
+        'The result is completely wrong — each matrix must be applied in the correct order (right-to-left: model first, projection last) to correctly transform from local to clip space',
+        'The shader compiles but the renderer corrects the order automatically',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"clone() before any in-place operation if you need the original unchanged." You write: const result = vec.normalize(). What happens to vec?',
+      options: [
+        'vec is unchanged; result is a new normalized vector',
+        'vec is modified in place (normalized) and result points to the same object — the original is lost. Use vec.clone().normalize() to preserve vec',
+        'normalize() always returns a copy',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"closest point on line: t = (P-A)·d, closest = A + t*d." What does t represent geometrically?',
+      options: [
+        'The distance from A to the closest point along the line',
+        'The signed scalar distance along the line direction — how far you travel from point A in direction d to reach the closest point to P',
+        'The angle between d and (P-A)',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -842,5 +842,50 @@ export default {
     'Datapath: RegFile → operand MUXes → ALU → result MUX → RegFile/Memory.',
   ],
   checkpoints:['read-intuition'],
-  quiz:[],
+  quiz:[
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"ALU op select = MUX select for which operation to perform." The op bits come from the decoded instruction. What decodes them?',
+      options: [
+        'The ALU itself decodes its own op bits',
+        'The control unit (part of the CPU) decodes the machine instruction and asserts the correct op-select lines to the ALU',
+        'The register file decodes instructions and sends op codes to the ALU',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"A−B: invert all B bits, set Cin=1." Why does this work?',
+      options: [
+        'Inverting B and adding 1 via the carry-in computes the two\'s complement of B — then A + (−B) = A − B',
+        'Inverting B bits produces the one\'s complement which directly equals subtraction',
+        'Setting Cin=1 bypasses the adder for subtraction operations',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Z flag: one big NOR gate. If any result bit is 1, Z=0." What computation is the Z flag useful for?',
+      options: [
+        'Detecting when the result has overflowed',
+        'Branching on equality — subtract A−B; if Z=1, all result bits are zero, meaning A=B',
+        'Measuring the sign of the result',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"V flag: carry into sign bit XOR carry out of sign bit." When does overflow occur when adding two signed numbers?',
+      options: [
+        'Whenever the carry out of the MSB is 1',
+        'When two positive numbers produce a negative result, or two negative numbers produce a positive result — detected by the carry-in vs carry-out of the sign bit differing',
+        'Overflow only occurs in unsigned arithmetic',
+      ],
+      correct: 1,
+    },
+  ],
 };

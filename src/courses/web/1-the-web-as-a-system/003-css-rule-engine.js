@@ -62,5 +62,50 @@ export default {
     'Higher math weight always trumps load order.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Two CSS rules target the same element and set the same property to different values. What decides which one wins?',
+      options: [
+        'The rule that appears first in the stylesheet always wins',
+        'Specificity — the more specific selector wins; when specificity is equal, the later rule wins',
+        'The browser picks whichever value is alphabetically first',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Which selector has higher specificity: a class (.button) or a tag (button)?',
+      options: [
+        'The tag selector — it is more fundamental to HTML',
+        'The class selector — classes carry more specificity weight than element selectors',
+        'They are equal — specificity only differs for IDs vs classes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Higher math weight always trumps load order." What does this mean when a later stylesheet tries to override an earlier rule?',
+      options: [
+        'The later stylesheet always wins, regardless of specificity',
+        'If the earlier rule has higher specificity, it wins even though it was loaded first — specificity beats order',
+        'You must use !important to override any earlier rule',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'CSS "matches patterns against the DOM." What does this mean about when styles are applied?',
+      options: [
+        'Styles are applied once when the page loads and never update',
+        'The browser continuously matches CSS selectors against the live DOM — when the DOM changes, matching re-runs',
+        'CSS matches only happen when JavaScript explicitly triggers a repaint',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -1055,4 +1055,51 @@ res
       }, // end visualization
     ], // end visualizations
   }, // end intuition
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An algorithm is O(n²). You double the input size. How does runtime change?',
+      options: [
+        'Doubles — adding one factor of 2',
+        'Quadruples — (2n)² = 4n², so runtime scales by 4×. This is why O(n²) algorithms become impractical for n > 10,000: 10× more data → 100× slower',
+        'Increases by n — one extra pass through the data',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A pure Python LCS loop over strings of length 1000 might take seconds. Vectorizing the inner j-loop with np.where can speed it up 10–50×. Why?',
+      options: [
+        'np.where runs on GPU by default',
+        'The inner loop does element-wise comparisons between s[i-1] and all characters of t simultaneously in C, then np.where selects dp values with a single C-level pass. This replaces 1000 Python interpreter dispatch cycles per row with one vectorized call',
+        'np.zeros avoids Python\'s garbage collector, reducing pause times',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In the LCS dynamic programming table, dp[i][j] = 3 for strings s = "ABCBD" and t = "ABCD" at (i=3, j=3). What does this value represent?',
+      options: [
+        'The number of characters compared so far',
+        'The length of the longest common subsequence of s[:3] = "ABC" and t[:3] = "ABC" — the best match achievable using only the first i characters of s and first j characters of t',
+        'The position in t where the third match was found',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The full LCS DP table is O(mn) space. When can you reduce it to O(n) space, and what do you trade away?',
+      options: [
+        'Always — store only two rows (current and previous) since dp[i][j] only depends on dp[i-1][j-1], dp[i-1][j], and dp[i][j-1]. You trade the ability to reconstruct the actual subsequence (not just its length) — backtracking requires the full table',
+        'Only when m = n — the square case simplifies memory layout',
+        'Never — you need all previous rows to reconstruct the answer',
+      ],
+      correct: 0,
+    },
+  ],
 }

@@ -216,4 +216,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In mathematics, the statement "P or Q" (written P ∨ Q) is true in which situations?',
+      options: [
+        'Only when exactly one of P or Q is true — "or" in math is exclusive, like "coffee or tea" in everyday conversation',
+        'When P is true, when Q is true, or when both are true — mathematical "or" is inclusive, unlike everyday English where "or" often means one but not both',
+        'Only when both P and Q are true simultaneously — "or" means the same as "and" in formal logic',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is the correct negation of the statement "For all x ∈ ℝ, x² ≥ 0"?',
+      options: [
+        'For all x ∈ ℝ, x² < 0 — negate the predicate, keep the quantifier',
+        'There exists x ∈ ℝ such that x² < 0 — flip ∀ to ∃ and negate the predicate',
+        'There exists x ∈ ℝ such that x² ≥ 0 — flip ∀ to ∃, leave the predicate unchanged',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The implication P ⟹ Q and its contrapositive ¬Q ⟹ ¬P are logically equivalent. The converse Q ⟹ P is a different statement. Which of the following illustrates this difference?',
+      options: [
+        '"If n² is even then n is even" and its converse "if n is even then n² is even" are both true — but that is a coincidence, not a logical necessity; the converse of a true statement can be false',
+        'The converse and contrapositive are always both true whenever the original implication is true — they are both logically equivalent to P ⟹ Q',
+        'The contrapositive is only valid when the predicate involves numbers; for statements about sets or geometry, only the converse can be used',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The quantifier order matters: "∀x ∈ ℝ, ∃y ∈ ℝ, y > x" versus "∃y ∈ ℝ, ∀x ∈ ℝ, y > x." Which is true and which is false?',
+      options: [
+        'Both are true — any ordering of the quantifiers produces the same logical statement',
+        'The first (∀x then ∃y) is true: for each x you can pick y = x + 1; the second (∃y then ∀x) is false: there is no single real number larger than all others',
+        'The first is false because no finite y can be specified, and the second is true because y can be chosen after seeing all x',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -503,5 +503,50 @@ export default {
     'try/catch in async functions catches rejected awaits — identical to sync error handling.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does marking a function with async actually do to its return value?',
+      options: [
+        'It makes the function run on a separate thread',
+        'It wraps the return value in a Promise automatically — even if you return a plain value',
+        'It pauses the function at every line until that line resolves',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You await two promises sequentially: const a = await p1(); const b = await p2(). How long does this take if each promise takes 1 second?',
+      options: [
+        '1 second — they run in parallel',
+        '2 seconds — each await pauses until the previous resolves before the next starts',
+        'It depends on whether the promises are microtasks or macrotasks',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'How would you run the same two promises in parallel with async/await?',
+      options: [
+        'Remove the await keywords — promises run in parallel without await',
+        'Use Promise.all([p1(), p2()]) and await the result — this starts both simultaneously',
+        'Use two separate async functions and call them without await',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Inside an async function, how do you handle a rejected promise from an awaited call?',
+      options: [
+        'Rejected awaits are silently ignored — the function continues normally',
+        'Wrap the await in a try/catch — a rejected promise throws into the catch block, just like a synchronous error',
+        'You must attach a .catch() to the promise before awaiting it',
+      ],
+      correct: 1,
+    },
+  ],
 };

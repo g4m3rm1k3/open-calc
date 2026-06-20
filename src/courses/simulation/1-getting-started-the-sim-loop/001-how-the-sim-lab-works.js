@@ -443,4 +443,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A ball moves with `ball.x += speed * dt`. Why multiply speed by dt instead of using a fixed step like `speed * 0.016`?',
+      options: [
+        'Multiplying by dt makes the math simpler',
+        'dt is the actual elapsed time since the last frame. If a frame takes 32ms instead of 16ms, `speed * dt` moves the ball twice as far — exactly the right distance for that larger step. A fixed 0.016 would produce double movement at 30fps, making a faster machine simulate faster physics',
+        '0.016 only works at 30fps; dt makes it work at 60fps',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '`init()` is called once; `update(dt)` is called 60 times per second. Which code belongs in init()?',
+      options: [
+        'Creating new geometry, meshes, and adding them to the scene — one-time world setup that would be wasteful and incorrect to repeat every frame',
+        'Applying velocity to positions and advancing animation timers',
+        'Calling renderer.render(scene, camera) to draw the frame',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In the 2D canvas API, the y-axis increases downward. To move a circle visually upward on screen, what do you do to its y coordinate?',
+      options: [
+        'Add a positive value — up means more y in canvas',
+        'Subtract a positive value — because canvas y=0 is the top edge; increasing y moves down, decreasing y moves up',
+        'Negate the x coordinate to swap axes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Euler integration (`position += velocity * dt`) is used in the Sim Lab. Why is it an approximation rather than the exact trajectory?',
+      options: [
+        'Floating-point numbers are imprecise, so any calculation is approximate',
+        'Euler assumes velocity is constant over each dt interval, but velocity is actually changing continuously. The approximation error accumulates over time. Smaller dt means better accuracy — but never perfect except for simple linear motion',
+        'The browser throttles requestAnimationFrame so dt is never exactly right',
+      ],
+      correct: 1,
+    },
+  ],
 }

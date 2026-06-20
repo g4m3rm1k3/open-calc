@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An amplifier uses fixed bias (single base resistor from VCC). You replace the transistor with a different unit of the same part number, but the new transistor has β = 280 vs the original β = 120. What happens to the collector current?',
+      options: [
+        'Collector current stays the same — the base resistor limits IB, and the load resistor limits IC regardless of β',
+        'Collector current nearly doubles — with the same IB, IC = β × IB increases proportionally, shifting the Q-point toward saturation',
+        'Collector current decreases — a higher-β transistor is more efficient and draws less current for the same output',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Voltage divider bias with an emitter resistor stabilizes the Q-point. Why does the emitter resistor specifically reduce the effect of β variation?',
+      options: [
+        'The emitter resistor limits maximum current to IC = VCC / RE regardless of base current',
+        'If IC tries to increase, VE = IC × RE increases, reducing VBE (since VB is fixed by the divider), which reduces IB and IB — negative feedback that opposes the change',
+        'The emitter resistor blocks high-frequency variations in β while passing the DC bias current unchanged',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A power transistor in an audio amplifier begins to get hotter than normal. Its collector current increases. This makes it hotter still. What is this phenomenon called and what causes it?',
+      options: [
+        'Avalanche breakdown — the collector-emitter voltage exceeds the transistor\'s rating',
+        'Thermal runaway — rising temperature increases β and leakage current, increasing IC, which increases dissipation, which increases temperature further in a positive feedback loop',
+        'Core saturation — the magnetic field from increasing current causes the transistor to saturate',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A well-designed voltage divider bias circuit has β × RE >> R_TH (the Thevenin base resistance). What happens to IC if you swap the transistor for one with twice the β?',
+      options: [
+        'IC doubles — same IB, twice the β means twice the IC',
+        'IC stays almost the same — because IC ≈ (VTH − 0.7V) / RE, which depends on resistors not on β',
+        'IC halves — higher β means the transistor is more efficient and needs less collector current',
+      ],
+      correct: 1,
+    },
+  ],
 };

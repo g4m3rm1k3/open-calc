@@ -246,4 +246,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'If position is s(t), what does the second derivative s\'\'(t) represent?',
+      options: [
+        'Velocity — the rate of change of position',
+        'Acceleration — the rate of change of velocity, or equivalently, how fast the velocity is changing',
+        'Jerk — the rate at which acceleration changes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'f\'\'(x) > 0 on an interval. What does this say about the graph of f on that interval?',
+      options: [
+        'f is increasing on that interval — a positive second derivative means f is going up',
+        'f is concave up — the first derivative f\' is increasing, so the slope is getting steeper (the graph curves upward like a bowl)',
+        'f has a local minimum on that interval — positive second derivative always indicates a minimum',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is the nth derivative of sin(x)?',
+      options: [
+        'It alternates in a 4-cycle: sin(x), cos(x), −sin(x), −cos(x), and then repeats — so the nth derivative depends on n mod 4',
+        'It is always ±sin(x) — the derivative of sine cycles only between sine and negative sine',
+        'It is (−1)ⁿ sin(x) — the sign alternates with each differentiation regardless of cosine',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The second derivative test says: if f\'(a) = 0 and f\'\'(a) > 0, then f has a local minimum at a. Why does the positive second derivative indicate a minimum (not maximum)?',
+      options: [
+        'Because f\'\'(a) > 0 means the function is increasing at a, and an increasing function cannot have a maximum',
+        'Because f\'\'(a) > 0 means f\' is increasing at a; since f\'(a) = 0 and the slope is increasing, the slope was negative just before a and positive just after — that pattern is exactly a local minimum',
+        'Because the second derivative test only applies at minima; for maxima you must use the first derivative test instead',
+      ],
+      correct: 1,
+    },
+  ],
 }

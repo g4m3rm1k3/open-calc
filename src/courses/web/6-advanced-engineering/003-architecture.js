@@ -57,5 +57,50 @@ export default {
     'Services strictly coordinate externals.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Views map visual inputs naturally." What is the responsibility of the View layer in an MVC-style architecture?',
+      options: [
+        'Fetching data from external APIs',
+        'Rendering the UI and capturing user inputs — it knows what things look like but not how they work',
+        'Storing application state and business rules',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Logic purely tracks mathematics." What does the Logic (Model/Controller) layer own?',
+      options: [
+        'The HTML template and CSS styles',
+        'The business rules, data transformations, and state — the calculations that determine what is true in the application',
+        'Network requests and database connections only',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Services strictly coordinate externals." What kinds of work belong in a Service layer?',
+      options: [
+        'Rendering buttons and form elements',
+        'Coordinating communication with external systems — API calls, authentication, database queries, third-party integrations',
+        'Managing CSS transitions and animations',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Your app\'s "save to server" logic is currently inside a button\'s click handler. What architectural problem does this create?',
+      options: [
+        'None — click handlers are the correct place for all logic',
+        'The save logic is coupled to the UI — you cannot reuse it elsewhere, test it in isolation, or swap it without touching the View',
+        'Click handlers cannot make async calls',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'G(dBi) = 10 log₁₀(Directivity)\nHalf-wave dipole: G = 2.15 dBi\nEIRP(dBm) = P_TX(dBm) + G_TX(dBi)' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An antenna is rated at 10 dBi gain. A student says "this antenna amplifies my transmitter power by 10×." What is wrong with this statement?',
+      options: [
+        'The antenna amplifies by 10× — dBi directly gives the power multiplication factor',
+        'Antennas are passive — they cannot amplify power. 10 dBi means the antenna concentrates radiated power 10× in its preferred direction by reducing power in other directions, not by adding energy',
+        'The student is wrong about the direction — 10 dBi means power is reduced by 10× in the preferred direction compared to an isotropic radiator',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A Yagi antenna has 12 dBi gain and narrow beamwidth. What is the tradeoff compared to a 2 dBi omnidirectional antenna?',
+      options: [
+        'The Yagi can only transmit; it cannot receive signals',
+        'The Yagi concentrates far more power toward one target (useful for long-distance point-to-point links) but has very limited coverage angle — if the target moves off-axis, signal drops sharply. The omni covers all directions but with much lower power density in any one direction',
+        'The Yagi operates only at higher frequencies while the omni works across all bands',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A car radio monopole antenna is a quarter-wave element mounted on the car roof. How does the car body contribute to the antenna\'s operation?',
+      options: [
+        'The car body shields the antenna from interference, improving signal-to-noise ratio',
+        'The metal car roof acts as a ground plane, creating an electrical mirror image of the missing half of the dipole — the monopole plus its image together behave like a full half-wave dipole',
+        'The car body absorbs the antenna\'s reactive near-field, converting it to useful current in the antenna element',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A transmitter outputs 1W and uses an antenna with 6 dBi gain. What is the EIRP (Effective Isotropic Radiated Power) in the antenna\'s main beam?',
+      options: [
+        '6W — EIRP = transmit power × gain (dBi)',
+        '4W — 6 dBi represents a factor of 4 in power (10^(6/10) ≈ 4); EIRP = 1W × 4 = 4W',
+        '7W — add the gain directly to the transmit power',
+      ],
+      correct: 1,
+    },
+  ],
 };

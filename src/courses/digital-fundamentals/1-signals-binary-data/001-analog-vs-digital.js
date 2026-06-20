@@ -526,5 +526,50 @@ export default {
     'Two states (binary): maximally reliable transistors + complete Boolean logic + elegant error correction.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Digital: noise-immune up to threshold, perfect copies." Why does a cassette tape degrade with each copy but a digital file does not?',
+      options: [
+        'Digital files are larger, so they have more data to fall back on',
+        'A digital copy reads the exact 0/1 values and writes them fresh — noise cannot accumulate because any voltage above the threshold is re-snapped to a perfect 1',
+        'Digital signals travel faster so they have less time to pick up noise',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Sampling rate determines temporal resolution." You sample audio at 44,100 Hz. What does this mean?',
+      options: [
+        'The audio file is 44,100 bits long',
+        '44,100 amplitude measurements are taken per second — sounds that change faster than this cannot be captured accurately',
+        'The audio plays back 44,100 times per second',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"With n bits: 2ⁿ levels. Each extra bit doubles precision." An 8-bit image has 256 shades of grey. A 10-bit image has:',
+      options: [
+        '512 shades — two extra bits means doubling once',
+        '1,024 shades — each extra bit doubles the levels: 2¹⁰ = 1,024',
+        '260 shades — 256 + 4 per extra bit',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Two states: maximally reliable transistors + complete Boolean logic." Why is binary (not ternary or decimal) the basis of all computers?',
+      options: [
+        'Binary was invented first and the industry could not switch',
+        'Two voltage levels (high/low) are easiest to distinguish reliably in a transistor and map directly to Boolean logic, making error-free arithmetic possible at speed',
+        'Binary uses less power than higher-base number systems',
+      ],
+      correct: 1,
+    },
+  ],
 }

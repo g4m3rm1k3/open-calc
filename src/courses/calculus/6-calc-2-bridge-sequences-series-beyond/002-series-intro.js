@@ -217,4 +217,50 @@ export default {
     { id: 'ch5-001-cp2', prompt: 'Does the nth Term Test prove convergence or divergence?', expectedInsight: 'Only divergence. If $a_n \\not\\to 0$, the series diverges. But $a_n \\to 0$ does NOT imply convergence (harmonic series is the counterexample).' },
     { id: 'ch5-001-cp3', prompt: 'Why does the harmonic series diverge even though $1/n \\to 0$?', expectedInsight: 'The terms shrink too slowly. Grouping terms in blocks of $2^k$ shows each block sums to at least $1/2$, so the partial sums grow without bound (at least as fast as $\\ln N$).' },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The partial sum Sₙ of a series is the sum of the first n terms. When does a series "converge"?',
+      options: [
+        'When every individual term aₙ approaches zero — if terms shrink, the series converges',
+        'When the sequence of partial sums Sₙ converges to a finite limit S as n → ∞ — the series sum IS this limit, S = lim Sₙ',
+        'When the terms alternate in sign, ensuring positive and negative parts cancel',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The telescoping series Σ(1/n − 1/(n+1)) has partial sums Sₙ = 1 − 1/(n+1). Why does this telescope?',
+      options: [
+        'Each term equals the reciprocal of the next, so adjacent terms multiply to 1 and cancel',
+        'Most terms cancel with their neighbors: the +1/n in term k cancels the −1/k from term k−1, leaving only the first and last terms in each partial sum',
+        'The series telescopes because both 1/n and 1/(n+1) approach 0, so their difference also approaches 0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'How can adding infinitely many positive numbers give a finite answer?',
+      options: [
+        'It cannot — any sum of infinitely many positive numbers must be infinite',
+        'If the terms shrink fast enough (like a geometric series with |r| < 1), the partial sums are bounded above and increasing — bounded monotone sequences converge, so the series sum is a finite limit',
+        'Only alternating series can give finite sums because the negative terms cancel the positive ones',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Σ(1/2)ⁿ from n=1 to ∞ = 1. Σ(1/2)ⁿ from n=0 to ∞ = 2. What changed?',
+      options: [
+        'Starting at n=0 adds the n=0 term: (1/2)⁰ = 1, so the second series equals the first plus 1',
+        'The index shift doubles every term, so the sum doubles',
+        'The two series are equal — changing the starting index does not affect convergence or the sum',
+      ],
+      correct: 0,
+    },
+  ],
 }

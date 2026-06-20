@@ -609,7 +609,52 @@ export default {
     'Polar covalent: intermediate ΔEN → unequal sharing → partial charges (δ+ and δ−).',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Bonds form because the bonded state has lower energy than separated atoms." What does this tell you about chemical bonding?',
+      options: [
+        'Atoms bond randomly — energy is not involved',
+        'Bonding is driven by thermodynamics — atoms bond because the result is more stable (lower energy) than the separated state',
+        'Atoms only bond when temperature forces them together',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"The energy released when a bond forms equals the energy needed to break it." What does this mean for a chemical reaction?',
+      options: [
+        'Reactions always release energy overall',
+        'Bond breaking costs energy; bond forming releases it — the net energy of a reaction is the difference between what you put in to break bonds and what you get back forming new ones',
+        'You can never get energy from breaking bonds',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Ionic bond: large ΔEN → electron transfer." When does a bond become ionic rather than covalent?',
+      options: [
+        'When the atoms are both metals',
+        'When the electronegativity difference between the atoms is large enough that one atom pulls the shared electrons so strongly it effectively takes them, creating charged ions',
+        'When the bond forms in water',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Covalent bond: small ΔEN → electron sharing." Why does electron sharing give both atoms a more stable configuration?',
+      options: [
+        'Sharing electrons halves the energy cost for both atoms',
+        'Each atom can count the shared electrons as part of its outer shell — both get closer to a full outer shell without fully transferring electrons',
+        'Sharing makes electrons move faster, releasing kinetic energy',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_CHEM_2_0 }

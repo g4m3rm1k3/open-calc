@@ -457,5 +457,50 @@ export default {
     'Plane.distanceToPoint() = signed distance. Positive = same side as normal.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Quaternion = axis-angle without sequential ordering = no gimbal lock." Why does sequential Euler ordering cause gimbal lock but quaternions do not?',
+      options: [
+        'Quaternions use more bits, making precision errors impossible',
+        'Euler angles apply rotations in sequence — the second rotation operates on the already-rotated axes, which can align two axes. Quaternions represent a single rotation in 4D space with no intermediate axis dependencies',
+        'Quaternions always clamp to ±90° on each axis',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"slerp: constant-speed shortest-arc rotation interpolation." You animate a camera from facing North to facing South using Euler lerp at t=0.5. What may look wrong?',
+      options: [
+        'The camera snaps instead of smoothly rotating',
+        'Euler lerp interpolates each angle independently — it can take a longer path or flip unexpectedly. Slerp follows the true shortest arc through 3D orientation space',
+        'Lerp is too fast compared to slerp',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"setFromUnitVectors(from, to): the most useful quaternion factory." An arrow mesh points along +Y by default. You want it to point at a target. What are the arguments?',
+      options: [
+        'setFromUnitVectors(target.normalize(), new Vector3(0,1,0))',
+        'setFromUnitVectors(new Vector3(0,1,0), direction.normalize()) — from = current direction (+Y), to = desired direction toward target',
+        'setFromUnitVectors(new Vector3(0,0,1), target)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Box3.setFromObject(mesh) + intersectsBox(other) = fast broad-phase collision." Why is this called "broad-phase"?',
+      options: [
+        'It only works on large objects',
+        'Axis-aligned bounding box checks are cheap but imprecise — they quickly eliminate pairs of objects that cannot possibly intersect, so expensive narrow-phase (mesh-level) checks only run on candidates',
+        'It tests all 6 faces of the box simultaneously',
+      ],
+      correct: 1,
+    },
+  ],
 }

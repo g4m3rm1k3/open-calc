@@ -338,7 +338,52 @@ export default {
     '"Like dissolves like" — polar dissolves in polar, nonpolar in nonpolar.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Chemistry bridges the invisible atomic world and the visible phenomena we observe." What does this mean?',
+      options: [
+        'Chemistry is only useful for explaining things too small to see',
+        'Observable phenomena like ice melting or things burning are explained by atomic-level events — chemistry connects those two scales',
+        'Chemistry studies the visible world; physics studies the atomic world',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Ice floats on liquid water — an unusual property for a solid. What is the atomic explanation?',
+      options: [
+        'Ice is lighter because it contains fewer water molecules per unit volume',
+        'When water freezes, its molecules form a lattice that is less dense than the disordered liquid structure — so the solid occupies more volume',
+        'Cold temperatures cause molecules to repel each other, expanding outward',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Burning is electrons reacting with oxygen." What chemically happens when something burns?',
+      options: [
+        'The burning material gets hotter until it disappears',
+        'Outer electrons of the fuel interact with oxygen — bonds break and form, releasing energy as light and heat',
+        'Atoms in the fuel are destroyed by the heat',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Like dissolves like." Why does oil not dissolve in water?',
+      options: [
+        'Oil molecules are too large to fit between water molecules',
+        'Oil is nonpolar and water is polar — their intermolecular forces are incompatible, so mixing costs more energy than it releases',
+        'Oil is denser than water so it sinks rather than dissolving',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_CHEM_1_0 }

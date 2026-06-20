@@ -426,7 +426,52 @@ export default {
   challenges: [],
   mentalModel: ['H = normalize(L+V). Blinn-Phong = pow(max(0,dot(N,H)), shininess). No grazing seam. Multiple lights add linearly.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"H = normalize(L+V). Blinn-Phong = pow(max(0, dot(N,H)), shininess)." What is the half-vector H representing physically?',
+      options: [
+        'The midpoint between the light source and the camera positions in world space',
+        'The direction halfway between the light direction and the view direction — a surface whose normal equals H reflects light directly toward the viewer',
+        'The average of the surface normal and the light direction',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"No grazing seam." Blinn-Phong fixes a visual artifact that Phong has at grazing angles. What is that artifact?',
+      options: [
+        'Blinn-Phong prevents z-fighting on reflective surfaces',
+        'In Phong, the reflection vector can swing past the 90° horizon, making the specular highlight cut off sharply at the silhouette edge. Blinn-Phong\'s half-vector avoids this cutoff',
+        'Phong produces incorrect colours at low shininess values',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Multiple lights add linearly." If two point lights each contribute a diffuse colour of (0.4, 0.2, 0.1), what is the combined diffuse output?',
+      options: [
+        '(0.4, 0.2, 0.1) — only the stronger light is used',
+        '(0.8, 0.4, 0.2) — each light\'s contribution is added independently, then summed',
+        '(0.2, 0.1, 0.05) — contributions are averaged',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'When would you prefer Phong shading over Blinn-Phong?',
+      options: [
+        'When performance is critical — Phong is cheaper to compute',
+        'When you need physical accuracy — Phong is the physically correct model',
+        'Rarely — Blinn-Phong is generally preferred for its better behaviour at grazing angles and equivalent or better performance',
+      ],
+      correct: 2,
+    },
+  ],
 }
 
 export { LESSON_3JS_3_1 }

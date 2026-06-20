@@ -158,4 +158,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'completed-example-1', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A vector-valued function r(t) = ⟨x(t), y(t)⟩ has derivative r\'(t) = ⟨x\'(t), y\'(t)⟩. What does r\'(t) represent?',
+      options: [
+        'The length of the curve traced from the starting point to position r(t)',
+        'The velocity vector at time t — it points tangent to the path in the direction of motion and has magnitude equal to the speed |r\'(t)|',
+        'The position on the path after one unit of time has elapsed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The gradient ∇f of a scalar function f(x,y) is a vector. What does it point toward?',
+      options: [
+        'Toward the nearest local minimum — gradient descent always leads downhill',
+        'In the direction of steepest increase of f — the gradient points uphill most steeply, and |∇f| equals the rate of increase in that direction',
+        'Toward the origin — the gradient always points inward for well-behaved functions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In single-variable calculus, ∫f(x)dx is over an interval. In vector calculus, ∮F·dr is a line integral. What key difference does the dot product F·dr introduce?',
+      options: [
+        'The dot product converts the force vector into a scalar so the integral is still a number — without it the integral would be a vector',
+        'F·dr projects the force field F onto the direction of motion dr, computing only the component of force doing work — a force perpendicular to motion does no work, and the dot product captures this geometric fact',
+        'The dot product reverses the limits of integration when F and dr point in opposite directions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Calculus 3 extends single-variable ideas to functions of multiple variables. Which single-variable concept extends to the "partial derivative" ∂f/∂x?',
+      options: [
+        'The definite integral — ∂f/∂x is the limit of ∫f dx as the interval shrinks to zero',
+        'The ordinary derivative — ∂f/∂x differentiates f(x,y) with respect to x while treating y as a constant, exactly like d/dx but acknowledging the other variable is held fixed',
+        'The limit definition — ∂f/∂x is defined only via epsilon-delta and not via any algebraic shortcut',
+      ],
+      correct: 1,
+    },
+  ],
 }

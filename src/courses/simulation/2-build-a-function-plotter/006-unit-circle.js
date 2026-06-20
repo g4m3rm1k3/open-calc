@@ -584,6 +584,53 @@ app.querySelector('#btn').addEventListener('click',()=>{
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In the canvas, y increases downward. To draw a unit circle point (cos(θ), sin(θ)) in the correct orientation, how do you convert the math y-coordinate to canvas pixels?',
+      options: [
+        'cy = centerY + sin(θ) × scale — same sign as math',
+        'cy = centerY − sin(θ) × scale — the minus sign flips the canvas y-axis back to math convention. Without it, the circle would appear reflected vertically: the point that should be at the top (θ=π/2, sin=1) would appear at the bottom',
+        'cy = centerY × sin(θ) — multiply rather than add',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The lesson says "watch the animated dot\'s shadow on the y-axis and you have literally drawn a sine wave." What does this mean?',
+      options: [
+        'The dot casts a shadow that the canvas renders automatically',
+        'As the dot moves around the unit circle, its y-coordinate (height) oscillates smoothly between −1 and +1. Plotting that y-coordinate against time produces the sine wave graph. The circular motion is the "cause" and the wave is its projection — they are the same motion viewed from different angles',
+        'Sine waves are defined as the shadow of a circle on a flat wall',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'cos²(θ) + sin²(θ) = 1. Looking at the unit circle picture, why is this identity geometrically obvious?',
+      options: [
+        'It follows from the quadratic formula applied to the circle equation',
+        '(cos(θ), sin(θ)) is a point on the circle of radius 1. By the Pythagorean theorem, the distance from the origin to that point is √(cos²+sin²). Since the radius is 1, the distance is 1, so cos²+sin² = 1. The algebra is a restatement of the distance formula',
+        'It is not geometrically obvious; it requires calculus to prove',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Constants like `const R = 150` are computed once outside the loop. What would go wrong if you computed them inside the rAF callback?',
+      options: [
+        'JavaScript would not allow const declarations inside functions',
+        'They would be recomputed 60 times per second with identical results — pure wasted work. More importantly, if the computation involved reading a DOM property (like canvas.width), frequent reads trigger style recalculations. Computing once outside the loop is a simple optimization that adds zero code complexity',
+        'Variables declared inside the callback are not visible to drawing functions',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export default sim2_006

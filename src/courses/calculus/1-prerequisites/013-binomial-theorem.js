@@ -109,4 +109,50 @@ export default {
     'completed-example-1',
     'completed-example-2',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does the binomial theorem tell you about expanding (x + h)ⁿ?',
+      options: [
+        'It equals xⁿ + hⁿ — you just raise each term to the nth power separately',
+        'It equals a sum of terms C(n,k)·xⁿ⁻ᵏ·hᵏ for k = 0 to n — each term has a binomial coefficient from Pascal\'s triangle',
+        'It equals nxⁿ⁻¹h — the derivative rule directly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'When expanding (x + h)ⁿ to derive d/dx[xⁿ], which term in the expansion matters after dividing by h and letting h → 0?',
+      options: [
+        'The xⁿ term — it\'s the largest and dominates as h → 0',
+        'The nxⁿ⁻¹h term — after dividing by h it becomes nxⁿ⁻¹, and all other terms still have h as a factor so they vanish as h → 0',
+        'The hⁿ term — it\'s the only pure-h term without x mixed in',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Pascal\'s triangle row for n = 4 is 1, 4, 6, 4, 1. What are the coefficients in the expansion of (a + b)⁴?',
+      options: [
+        'a⁴ + 4a³b + 6a²b² + 4ab³ + b⁴ — coefficients 1, 4, 6, 4, 1 from the n = 4 row',
+        'a⁴ + a³b + a²b² + ab³ + b⁴ — each power contributes one term with coefficient 1',
+        'a⁴ + 4a³b + 4a²b² + 4ab³ + b⁴ — the middle coefficient stays the same as the outer ones',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why is the binomial theorem useful in calculus beyond just expanding polynomials?',
+      options: [
+        'It proves the power rule d/dx[xⁿ] = nxⁿ⁻¹ from the definition of the derivative, because the expansion of (x+h)ⁿ isolates exactly the nxⁿ⁻¹h term that survives the limit',
+        'It lets you avoid limits entirely — you can compute derivatives by counting terms in Pascal\'s triangle',
+        'It extends integration formulas to fractional powers, which can\'t be derived any other way',
+      ],
+      correct: 0,
+    },
+  ],
 };

@@ -885,4 +885,51 @@ res
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A linear relationship y = mx + b has slope m = 3.5 with units $/hour. What does this slope represent?',
+      options: [
+        'The total cost after 3.5 hours',
+        'Each additional hour costs $3.50 more — slope is the rate of change (rise/run = Δy/Δx = $/hour). The units of slope are always (y-units)/(x-units), directly telling you how much y changes per unit of x',
+        'The y-intercept is $3.50 when no hours are worked',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Least-squares regression finds the line minimizing Σ(yᵢ - ŷᵢ)². A "residual" is yᵢ - ŷᵢ. What does a large residual mean?',
+      options: [
+        'The linear model explains the data point very well',
+        'The actual value is far from the model\'s prediction at that x — the model doesn\'t describe that point well. Large residuals reveal where the linear model fits poorly, potentially indicating outliers or nonlinearity',
+        'The x value for that point is an outlier',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'R² = 0.93 means the linear model explains 93% of the variance in y. What does R² = 0.12 indicate?',
+      options: [
+        'A strong inverse relationship — the model explains 12% inversely',
+        'The linear model explains almost nothing about y\'s variation — 88% of the variance is left unexplained. Either the relationship is nonlinear, there is too much noise, or a key variable is missing',
+        'The model predicts 12% of data points correctly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You fit a line to data from x=0 to x=40 (temperature range). Using this model to predict at x=100 is called extrapolation. Why is extrapolation risky?',
+      options: [
+        'Extrapolation is mathematically invalid — linear models cannot evaluate outside the training range',
+        'The model was built assuming linearity holds in [0, 40]; there is no evidence the relationship stays linear beyond 40. Physical limits (freezing, boiling) or nonlinear behavior outside the observed range could make the prediction completely wrong — the model describes the past data, not arbitrary future inputs',
+        'Extrapolation always overestimates the true value',
+      ],
+      correct: 1,
+    },
+  ],
 }

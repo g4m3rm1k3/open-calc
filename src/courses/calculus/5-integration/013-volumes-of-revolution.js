@@ -235,4 +235,50 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Rotating y = f(x) around the x-axis using the disk method gives volume V = π∫[a to b] [f(x)]² dx. Where does the π[f(x)]² come from?',
+      options: [
+        'Each thin slice perpendicular to the x-axis is a disk with radius f(x) and thickness dx — its area is π[f(x)]² (area of circle), so integrating gives total volume',
+        'The π comes from converting degrees to radians during the rotation, and [f(x)]² comes from squaring the arc length',
+        'The formula is the surface area of a cylinder with height f(x) and circumference 2π',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The washer method uses V = π∫[a to b] ([R(x)]² − [r(x)]²) dx. When do you need the washer instead of the disk method?',
+      options: [
+        'When the region has a hole — the solid has an outer radius R(x) and an inner radius r(x) from an inner boundary, and subtracting the inner disk area from the outer disk area gives the washer cross-section',
+        'When the rotation is around the y-axis instead of the x-axis — the washer method is used for vertical rotation',
+        'When the function f(x) is negative somewhere — the r(x) term accounts for the sign correction',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You rotate the region between y = x and y = x² (0 ≤ x ≤ 1) around the x-axis. Which is the outer radius and which is the inner radius?',
+      options: [
+        'R(x) = x² (outer) and r(x) = x (inner) — the squared function is always larger',
+        'R(x) = x (outer) and r(x) = x² (inner) — on [0,1], x ≥ x², so the line y = x is farther from the x-axis and forms the outer boundary',
+        'There is no inner radius because the region touches the x-axis at x = 0 and x = 1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'When is the shell method (V = 2π∫ x·f(x) dx) easier to use than the disk/washer method?',
+      options: [
+        'Always — the shell method requires fewer calculations because you do not need to square the radius',
+        'When rotating around the y-axis and f(x) is hard to invert — solving y = f(x) for x to use disk/washer with horizontal slices may be complex; shells integrate in x directly without inverting',
+        'When the region has a hole — shells handle holes automatically without the subtraction step',
+      ],
+      correct: 1,
+    },
+  ],
 }

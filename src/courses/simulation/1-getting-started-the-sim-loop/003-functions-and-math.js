@@ -400,4 +400,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A Lissajous curve uses x = A·cos(a·t) and y = B·sin(b·t). When a/b is a simple integer ratio (like 2/3), what shape does the curve trace?',
+      options: [
+        'A circle — because cos and sin always make circles',
+        'A closed figure-eight or knot shape. When a/b is rational, the x and y oscillations repeat in sync after a finite number of cycles, closing the curve. Irrational a/b ratios produce curves that never quite repeat and fill a rectangle densely over time',
+        'A spiral that grows outward because t increases without bound',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'At the start of update(), the code does `ctx.fillStyle = "rgba(2,6,15,0.04)"; ctx.fillRect(0,0,W,H)` instead of clearing the canvas. What visual effect does this create?',
+      options: [
+        'Nothing — fillRect with alpha 0.04 is nearly transparent so the canvas stays clear',
+        'A motion trail. Each frame lays a nearly-opaque dark rectangle over everything, dimming old dots slightly without erasing them. Points drawn many frames ago have been dimmed dozens of times and approach black, while the newest dot is at full brightness — creating a fading tail effect',
+        'A blur effect because 0.04 alpha is below the anti-aliasing threshold',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In `x = W/2 + A * Math.cos(a * t)`, A controls the amplitude and a controls the frequency. If you double A while keeping a fixed, what changes?',
+      options: [
+        'The oscillation period doubles — it takes twice as long to complete one cycle',
+        'The horizontal range doubles — the point sweeps from W/2 − 2A to W/2 + 2A instead of ± A. Frequency (how fast it oscillates) is unchanged; only the physical width of the pattern scales up',
+        'The speed of the point doubles because it covers more distance in the same time',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why extract repeated formulas into named helper functions like `lerp(a, b, t)` or `randRange(lo, hi)` rather than writing the expression inline each time?',
+      options: [
+        'JavaScript is faster when functions are named',
+        'A single authoritative place means a bug fix or tweak propagates everywhere at once. With inline expressions, a typo in one of the five copies could silently compute the wrong result without any error. Named helpers also make the intent readable: `lerp(start, end, t)` communicates more than `start + (end-start)*t` scattered in the code',
+        'Helper functions allow the JavaScript engine to cache the result',
+      ],
+      correct: 1,
+    },
+  ],
 }

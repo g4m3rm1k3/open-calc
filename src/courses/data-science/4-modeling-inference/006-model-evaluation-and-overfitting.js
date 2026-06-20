@@ -61,4 +61,50 @@ res
     'Bias-variance tradeoff: too simple = underfits. Too complex = overfits.',
     'Choose model complexity by validation error, not training error.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A polynomial model has train R² = 0.99 and test R² = 0.42. What does this indicate?',
+      options: [
+        'The model is excellent — R² = 0.99 means it has learned the data very well',
+        'The model is overfitting — it has memorized the training data including its noise, but fails to generalize. The large gap between train and test performance is the signature of overfitting; a simpler model with lower train R² but higher test R² would be better',
+        'The test set must have different characteristics than the training set — the split should be redone',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why is the "golden rule" of machine learning to never use the test set during model development?',
+      options: [
+        'Test sets are small and running many evaluations on them wastes memory',
+        'Every time you evaluate on the test set and make a model decision based on it, you are implicitly fitting the model to the test set — even if you never train on it. This makes your final test evaluation optimistically biased, destroying its value as an honest estimate of how the model performs on truly unseen data',
+        'Modern sklearn pipelines automatically prevent test data from leaking into training',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '5-fold cross-validation splits data into 5 folds, trains on 4, evaluates on 1, and rotates. What key advantage does this have over a single train/test split?',
+      options: [
+        'Cross-validation is faster because each fold uses less data',
+        'Every data point is tested exactly once across the 5 rotations — you get 5 performance estimates instead of 1, giving a mean and standard deviation to assess consistency; a single split can be unlucky (easy test set or hard test set) giving a misleading one-off number',
+        'Cross-validation prevents overfitting by training on smaller datasets',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The bias-variance tradeoff: a degree-1 polynomial (straight line) fits a sinusoidal dataset. A degree-15 polynomial fits the same data. What is wrong with each?',
+      options: [
+        'Degree-1 has too many parameters; degree-15 has too few',
+        'Degree-1 underfits (high bias) — its rigid form cannot capture the true curve and performs poorly on both training and test data. Degree-15 overfits (high variance) — it passes through every training point including noise and generalizes poorly; the best model captures the signal without memorizing the noise',
+        'Both are equally bad — only degree-3 polynomials are valid for sinusoidal data',
+      ],
+      correct: 1,
+    },
+  ],
 }

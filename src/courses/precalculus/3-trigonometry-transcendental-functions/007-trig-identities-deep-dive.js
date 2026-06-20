@@ -407,4 +407,51 @@ export default {
       answer: '\\sin A\\cos B = \\frac{1}{2}[\\sin(A+B) + \\sin(A-B)]'
     }
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The Pythagorean identity sin²(x) + cos²(x) = 1. What geometric fact does this express?',
+      options: [
+        'That sine and cosine are both bounded between -1 and 1',
+        'Any point (cos θ, sin θ) on the unit circle satisfies x² + y² = 1 — the equation of the unit circle; the identity is simply the Pythagorean theorem applied to the right triangle formed by the radius, the x-coordinate (cos θ), and the y-coordinate (sin θ)',
+        'That the sum of sine and cosine over any interval equals 1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The double angle formula cos(2θ) = 1 - 2sin²(θ). This rearranges to sin²(θ) = (1 - cos(2θ))/2. Why is this power-reduction form critical in integration?',
+      options: [
+        'Power reduction makes the formula shorter and easier to remember',
+        'Integrals of sin²(x) have no closed form without power reduction; substituting sin²(x) = (1-cos(2x))/2 converts the integral to ∫(1-cos(2x))/2 dx = x/2 - sin(2x)/4 + C — a standard antiderivative. This is the fundamental technique for integrating even powers of trig functions',
+        'Power reduction is needed only when the angle is greater than π',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The sum-to-product formula: sin(A) + sin(B) = 2·sin((A+B)/2)·cos((A-B)/2). Why was this historically important?',
+      options: [
+        'It was used to simplify logarithm calculations before calculators',
+        'It converts a SUM of sines (hard to compute by hand) into a PRODUCT (easier to compute using logarithms — multiplication becomes addition in log space). Astronomers and navigators used these "prostaphaeresis" formulas for hundreds of years to replace expensive multiplication with addition',
+        'It is used to solve triangles when two angles are given without any sides',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'sin(A+B) = sin(A)cos(B) + cos(A)sin(B). If you try to apply this with A=B=x, what identity do you derive?',
+      options: [
+        'sin(2x) = 2sin(x) — the factor of 2 comes from having two equal terms',
+        'sin(2x) = 2sin(x)cos(x) — substituting A=B=x: sin(x)cos(x) + cos(x)sin(x) = 2sin(x)cos(x). This is the double-angle formula for sine, derived directly from the angle addition formula with a simple substitution',
+        'sin(2x) = sin²(x) + cos²(x) = 1, since both terms are the same',
+      ],
+      correct: 1,
+    },
+  ],
 }

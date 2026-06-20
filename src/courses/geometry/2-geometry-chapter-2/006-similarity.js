@@ -379,5 +379,50 @@ export default {
     'Area scales as k² when linear dimensions scale by k.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"AA: two equal angles → similar." Triangle ABC has angles 50° and 70°. Triangle DEF has angles 50° and 70°. Are they similar?',
+      options: [
+        'Only if their sides are also proportional',
+        'Yes — two pairs of equal angles guarantee similarity (the third angles must also match since all three sum to 180°)',
+        'Only if they have the same orientation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Scale factor k = any ratio of corresponding sides." Two similar triangles have sides 3, 4, 5 and 6, 8, 10. What is the scale factor?',
+      options: [
+        '1.5',
+        '2',
+        '3',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"To find unknown length: identify similar triangles, write proportion, cross-multiply." A 6m pole casts a 4m shadow. Simultaneously a tree casts a 10m shadow. How tall is the tree?',
+      options: [
+        '12m',
+        '15m',
+        '8m',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Area scales as k² when linear dimensions scale by k." Two similar triangles have linear scale factor 3. If the smaller has area 10 cm², what is the area of the larger?',
+      options: [
+        '30 cm²',
+        '90 cm²',
+        '100 cm²',
+      ],
+      correct: 1,
+    },
+  ],
 };

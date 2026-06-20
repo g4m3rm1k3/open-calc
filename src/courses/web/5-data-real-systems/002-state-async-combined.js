@@ -57,5 +57,50 @@ export default {
     'Loading states are temporal blockers.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Network returns are highly unreliable." Which of these best describes what makes network responses unreliable?',
+      options: [
+        'Servers sometimes return data in the wrong programming language',
+        'Responses can be slow, time out, return server errors, or return malformed data — none of this is under your control',
+        'Network calls only fail in production, not in development',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"UI mathematically must catch errors." Why is error handling non-optional when fetching data?',
+      options: [
+        'It is optional — if the server is reliable you can skip it',
+        'Without error handling, a failed request leaves the UI in a broken or empty state with no message to the user',
+        'Error handling is only needed when the API returns a 500 status',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Loading states are temporal blockers." What should your UI show while waiting for a network response?',
+      options: [
+        'Nothing — show the data only when it arrives',
+        'A loading indicator so the user knows a request is in progress and the UI is not frozen',
+        'The previous data, silently replacing it when new data arrives',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You combine async data-fetching with reactive state. In what order do you update state when a fetch completes?',
+      options: [
+        'Set loading to false, then set error to null, then set data — order does not matter',
+        'Clear the loading state, store the result in data state (or error state on failure) — the UI re-renders from the new state values',
+        'Update the DOM directly with the result, then sync it back to state',
+      ],
+      correct: 1,
+    },
+  ],
 };

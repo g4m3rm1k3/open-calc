@@ -15,4 +15,50 @@ export default {
     }],
   },
   mentalModel:['Ax=b: find x such that transformation A maps x to b.', 'np.linalg.solve(A,b): exact solution when det(A)≠0.', 'det=0: lines parallel (no solution) or identical (infinite solutions).', 'Overdetermined: more equations than unknowns — use np.linalg.lstsq.', 'Least squares is the foundation of linear regression.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Ax = b represents a linear system. Geometrically in 2D, each equation defines a line. When is there exactly one solution?',
+      options: [
+        'When both lines pass through the origin',
+        'When the two lines intersect at exactly one point — this happens when they are not parallel (det(A) ≠ 0); parallel lines have no intersection (no solution) and identical lines have infinitely many',
+        'When the coefficient matrix A is symmetric',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You have 100 equations in 2 unknowns (100 data points, 2 parameters). np.linalg.solve() fails. What should you use instead?',
+      options: [
+        'np.linalg.inv(A) @ b — the inverse always works for rectangular matrices',
+        'np.linalg.lstsq(A, b) — an overdetermined system (more equations than unknowns) usually has no exact solution; least squares finds the x that minimizes |Ax − b|², which is the best-fit solution and is the foundation of linear regression',
+        'Reduce to 2 equations by averaging every 50 equations, then use solve()',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is solving Ax = b preferred over computing x = A⁻¹b directly?',
+      options: [
+        'np.linalg.solve() is always more accurate because it avoids floating-point matrix inversion errors — inverting a matrix amplifies numerical errors; direct solvers use LU decomposition which is both faster and more numerically stable',
+        'A⁻¹ does not exist for square matrices — only rectangular matrices can be inverted',
+        'solve() works for any b without recomputation; A⁻¹ can only be used once',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Linear regression finds weights w minimizing ||Xw − y||². How is this a linear system?',
+      options: [
+        'It is not a linear system — regression uses gradient descent which is nonlinear',
+        'The least-squares solution satisfies the normal equations (XᵀX)w = Xᵀy, which IS a square linear system in w; np.linalg.solve(X.T@X, X.T@y) solves it exactly when XᵀX is invertible',
+        'Linear regression requires specialized algorithms not related to Ax = b',
+      ],
+      correct: 1,
+    },
+  ],
 }

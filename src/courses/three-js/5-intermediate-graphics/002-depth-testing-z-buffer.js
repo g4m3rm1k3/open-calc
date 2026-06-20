@@ -429,7 +429,52 @@ export default {
   challenges: [],
   mentalModel: ['Z-buffer per pixel, init 1.0, passes if depth<stored. Non-linear: precision at near. far/near<10000. Z-fight fix: polygonOffset or increase near.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Z-buffer per pixel, init 1.0, passes if depth < stored." Two fragments compete for the same pixel. Fragment A has depth 0.3, Fragment B has depth 0.7. Fragment B is drawn first. What is the final colour?',
+      options: [
+        'Fragment B — it was drawn first so it is in the buffer',
+        'Fragment A — when Fragment A\'s depth (0.3) is compared to the stored depth (0.7), 0.3 < 0.7 passes, so Fragment A replaces Fragment B',
+        'A blend of both fragments',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Non-linear: precision at near. far/near < 10000." Why is a far/near ratio of 1,000,000 dangerous?',
+      options: [
+        'The ratio exceeds the GPU\'s texture unit count',
+        'Depth buffer precision is distributed non-linearly — most precision clusters near the camera. With a huge ratio, distant objects get almost no precision, causing z-fighting',
+        'The GPU cannot represent numbers larger than 10000 in depth buffers',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Z-fight fix: polygonOffset." Two co-planar surfaces produce z-fighting. How does polygonOffset fix this without moving the geometry?',
+      options: [
+        'polygonOffset scales the entire depth buffer, pushing all geometry apart',
+        'It nudges the fragment\'s depth value by a small offset at render time, making one surface consistently "closer" without changing its actual position in world space',
+        'It disables depth testing for the second surface',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Increase near to fix z-fighting." You move near from 0.01 to 1.0 in a scene where objects range from 1 to 100 units away. What is the tradeoff?',
+      options: [
+        'Objects closer than 1 unit are now clipped — they disappear. But the precision in the 1–100 range improves significantly, eliminating z-fighting on distant surfaces',
+        'Moving near has no effect on precision — only far matters',
+        'Moving near always makes the scene look incorrect',
+      ],
+      correct: 0,
+    },
+  ],
 }
 
 export { LESSON_3JS_4_1 }

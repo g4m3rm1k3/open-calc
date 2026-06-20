@@ -675,6 +675,53 @@ redraw()`,
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Central difference: f\'(x) ≈ (f(x+h) − f(x−h)) / (2h). Why is this more accurate than the forward difference (f(x+h) − f(x)) / h for the same h?',
+      options: [
+        'Central difference avoids division by 2h, which can cause rounding',
+        'The forward difference error is O(h) — it shrinks linearly as h decreases. The central difference error is O(h²) — it shrinks quadratically. For h=0.001, forward error ~ 0.001 while central error ~ 0.000001. Central difference is symmetric around x, cancelling out the first-order error terms that the forward difference leaves behind',
+        'Central difference uses two function evaluations instead of one, doubling the samples',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'To find zeros, the plotter scans for sign changes: f(xᵢ) and f(xᵢ₊₁) have opposite signs. What does a sign change guarantee mathematically (given f is continuous)?',
+      options: [
+        'The zero is at exactly the midpoint xᵢ + h/2',
+        'By the Intermediate Value Theorem, a continuous function that goes from positive to negative (or vice versa) must pass through zero somewhere in the interval. The scan locates which intervals contain zeros; a refinement step (bisection or linear interpolation) would find the exact location',
+        'There are exactly two zeros in every sign-change interval',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What happens to central difference accuracy when h is too small, like h = 1e-15?',
+      options: [
+        'Accuracy improves without limit as h shrinks toward zero',
+        'Catastrophic cancellation occurs: f(x+h) and f(x−h) become nearly identical (differ only in the last few bits), so their subtraction loses all significant digits. The numerator is dominated by floating-point rounding error, not by the actual derivative. There is an optimal h (around 1e-5 for 64-bit floats) that balances truncation error vs cancellation error',
+        'JavaScript throws a division-by-zero error when h is smaller than 1e-10',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The Riemann sum (area under the curve) counts signed area: regions below the x-axis contribute negative area. Why is this useful for a function plotter tool?',
+      options: [
+        'It allows the plotter to work with complex-valued functions',
+        'Signed area = the definite integral ∫f(x)dx. This lets users compute net displacement from a velocity curve, net charge from a current curve, etc. Unsigned area (summing absolute values) would answer a different question. The sign carries physical meaning that unsigned area discards',
+        'It prevents integer overflow in the summation loop',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export default sim2_009;

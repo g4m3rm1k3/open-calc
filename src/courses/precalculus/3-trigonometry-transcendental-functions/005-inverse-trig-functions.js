@@ -368,4 +368,51 @@ export default {
     teaser: 'The two integrals $\\int \\frac{dx}{\\sqrt{1-x^2}} = \\arcsin x + C$ and $\\int \\frac{dx}{1+x^2} = \\arctan x + C$ are among the most common antiderivatives in calculus. They appear in trig substitution problems, completing the square problems, and in the integral formulas for the arc length of a circle. You will use them constantly.',
     linkedLessons: ['trig-in-calculus', 'logarithm-relationships'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'arcsin has domain [-1, 1] and range [-π/2, π/2]. Why is the range restricted to this interval?',
+      options: [
+        'To match the unit circle, which only has y-values between -1 and 1',
+        'Sine is not one-to-one over its full domain — sin(π/6) = sin(5π/6) = 0.5, so "which angle?" is ambiguous. Restricting to [-π/2, π/2] selects a piece where sine IS one-to-one (each y-value appears exactly once), enabling a well-defined inverse — this is the principal value branch',
+        'The restriction is due to convention about radian measure always being positive',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'arctan(x) has domain all real numbers but arcsin(x) only has domain [-1, 1]. Why the difference?',
+      options: [
+        'Tangent was invented later than sine and gets a wider domain by convention',
+        'Tangent ranges over all real numbers (tan → -∞ to +∞ across each interval), so every real x is a valid output of tangent with a corresponding angle; sine is bounded between -1 and 1, so no angle produces sin = 2, meaning arcsin(2) is undefined',
+        'Arctan is defined differently — it uses cosine values, which have infinite range',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'arcsin(sin(5π/4)) ≠ 5π/4. What DOES it equal?',
+      options: [
+        '5π/4 — inverse functions always cancel when composed',
+        '-π/4 — since 5π/4 is outside the principal range [-π/2, π/2], arcsin first finds the value sin(5π/4) = -√2/2, then returns the principal angle in [-π/2, π/2] with that sine value, which is -π/4',
+        '3π/4 — the supplementary angle of 5π/4',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'To evaluate sin(arctan(3/4)), the recommended approach is to draw a right triangle with opposite=3, adjacent=4. Why is this more useful than computing arctan(3/4) numerically?',
+      options: [
+        'Numerical computation of arctan is impossible without a calculator',
+        'arctan(3/4) means "the angle whose tangent is 3/4"; a right triangle with legs 3 and 4 has hypotenuse 5. sin(that angle) = 3/5 exactly — no approximation needed. The triangle reveals exact ratios that the inverse-function definition guarantees',
+        'Right triangles only apply to inverse sine; arctan problems need the unit circle',
+      ],
+      correct: 1,
+    },
+  ],
 }

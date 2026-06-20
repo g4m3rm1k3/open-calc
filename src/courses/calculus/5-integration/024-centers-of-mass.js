@@ -249,4 +249,50 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The centroid x̄ of a region is x̄ = (1/A)∫ x·f(x) dx. What does the factor "x" inside the integral represent?',
+      options: [
+        'The horizontal distance from the origin — weighting each thin vertical strip by how far it is from the y-axis. Strips farther right pull the centroid right; the integral sums all these position-weighted areas and dividing by total area A gives the balance point',
+        'The width of each thin strip at position x, which determines how much area that strip contributes',
+        'The pressure or density at position x, converting area into mass',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A uniform lamina has density ρ = constant. How does this simplify the centroid calculation compared to a variable-density region?',
+      options: [
+        'Uniform density means the centroid equals the average of the corner coordinates, eliminating integration entirely',
+        'Uniform density factors out of all integrals, so ρ cancels from the centroid formula x̄ = (∫ ρx dA)/(∫ ρ dA) = (∫ x dA)/(∫ dA) — you only need geometric area integrals, not mass integrals',
+        'Uniform density forces the centroid to lie exactly at the geometric center of the bounding rectangle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Pappus\'s Centroid Theorem says the volume of a solid of revolution equals 2π × centroid distance × area. Why does the centroid distance appear?',
+      options: [
+        'The centroid is the only point where the density is exactly the average, so rotating it gives the correct volume',
+        'Each point in the region travels a different circular path when rotated; the centroid is the "effective radius" — integrating all path lengths is equivalent to the centroid distance times 2π, making volume = path × area',
+        'The theorem is a coincidence with no deeper geometric meaning — it is just a computational shortcut',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'For a region between f(x) and g(x) on [a, b] with f(x) ≥ g(x), the ȳ (vertical centroid) uses the average height (f+g)/2. Why the average, not just f or g?',
+      options: [
+        'The average is a requirement of the integration formula, chosen to make the units consistent',
+        'Each thin vertical strip at position x spans from g(x) to f(x); its own center of mass is at the midpoint (f(x)+g(x))/2, so the vertical centroid integrates these midpoints weighted by strip area — averaging the heights gives the strip\'s center',
+        'Using f(x) or g(x) alone gives the top or bottom centroid respectively; the average just splits the difference',
+      ],
+      correct: 1,
+    },
+  ],
 }

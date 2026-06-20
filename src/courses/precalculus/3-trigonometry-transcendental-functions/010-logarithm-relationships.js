@@ -296,4 +296,51 @@ export default {
       answer: '10'
     }
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'log_b(xy) = log_b(x) + log_b(y). What property of exponents does this reflect?',
+      options: [
+        'The product rule — it is just another name for multiplication of logarithms',
+        'Exponents add when you multiply bases: bᵐ · bⁿ = bᵐ⁺ⁿ. If bᵐ = x and bⁿ = y, then xy = bᵐ⁺ⁿ, so log_b(xy) = m+n = log_b(x) + log_b(y). The log-of-product becomes sum-of-logs because logarithms "undo" exponents',
+        'This property only holds for natural logarithm ln; other bases need a conversion factor',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The change-of-base formula: log_b(x) = ln(x)/ln(b). Why can you change to any base?',
+      options: [
+        'All logarithm bases are equivalent — base doesn\'t affect the result',
+        'If log_b(x) = y, then bʸ = x. Taking ln of both sides: y·ln(b) = ln(x), so y = ln(x)/ln(b). The formula works because ALL logarithm functions are proportional to each other — they differ only by a constant scale factor 1/ln(b)',
+        'The change of base formula only applies when converting from base 10 to base e',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The natural logarithm ln(x) is defined as the integral of 1/t from 1 to x. Why define ln this way rather than as the inverse of e^x?',
+      options: [
+        'Because integration was discovered before exponentiation in mathematical history',
+        'Defining ln(x) = ∫(1 to x) 1/t dt makes ln a well-defined function (the area under 1/t) without needing to know e first; you can then DERIVE that d/dx[ln(x)] = 1/x directly from the definition, and discover that the base of the exponential whose inverse is ln is exactly e ≈ 2.718... — everything follows',
+        'The integral definition is only used in analysis; for calculus problems you still use ln as the inverse of e^x',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Solving 5^x = 100: take log of both sides to get x·log(5) = log(100), giving x = log(100)/log(5) = 2/log(5) ≈ 2.86. What law makes this step work?',
+      options: [
+        'The power rule for logs: log(aⁿ) = n·log(a) — the exponent x "comes down" as a multiplier, transforming the exponential equation into a linear equation in x that can be solved by division',
+        'The product rule for logs: log(5x) = log(5) + log(x)',
+        'The change-of-base formula converts 5^x to a natural logarithm',
+      ],
+      correct: 0,
+    },
+  ],
 }

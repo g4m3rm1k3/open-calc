@@ -401,5 +401,50 @@ export default {
     'Memory addresses, file offsets, color codes, and opcodes are all written in hex.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"One nibble (4 bits) = one hex digit." What is binary 1010 1111 in hexadecimal?',
+      options: [
+        '0xAF',
+        '0xFA',
+        '0xAE',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Hex → binary: expand each digit to 4 bits." What is 0x3C in binary?',
+      options: [
+        '0011 1100',
+        '0011 1010',
+        '0100 1100',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"0xFF = 255, the max byte value." A web color is #FF8000 (orange). What are the red, green, blue values as decimals?',
+      options: [
+        'R=255, G=128, B=0',
+        'R=255, G=80, B=0',
+        'R=128, G=255, B=0',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Memory addresses, file offsets, opcodes are written in hex." Why is hex preferred over decimal for memory addresses?',
+      options: [
+        'Hex is faster to type than decimal',
+        'Each hex digit maps directly to 4 bits — a 32-bit address is exactly 8 hex digits, making the binary representation immediately obvious',
+        'Processors only understand hexadecimal input',
+      ],
+      correct: 1,
+    },
+  ],
 }

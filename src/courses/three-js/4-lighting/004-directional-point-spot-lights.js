@@ -468,7 +468,52 @@ export default {
   challenges: [],
   mentalModel: ['Directional: L=-lightDir, no attenuation. Point: L=normalize(lightPos-fragPos), att=1/(a+b*d+c*d²). Spot: add theta=dot(L,-spotDir), intensity=clamp((theta-outer)/epsilon,0,1).'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Directional: L=-lightDir, no attenuation." Why does a directional light not attenuate with distance?',
+      options: [
+        'Directional lights are infinitely bright, overriding distance falloff',
+        'A directional light models an infinitely distant source like the sun — all rays are parallel and equal-strength, so distance from the surface to the "source" is undefined',
+        'Attenuation is disabled by default and must be enabled manually',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Point: att=1/(a+b*d+c*d²)." A point light uses a=0, b=0, c=1. At distance d=2, what is the attenuation factor?',
+      options: [
+        '1.0 — no attenuation',
+        '0.25 — inverse square law: 1/(0 + 0 + 1×4) = 0.25',
+        '0.5 — linear falloff at distance 2',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Spot: intensity=clamp((theta-outer)/epsilon, 0, 1)." A spotlight has inner angle 15° and outer angle 30°. A fragment is at 20° from the spot axis. What is its intensity?',
+      options: [
+        '1.0 — inside the inner cone',
+        '0.0 — outside the outer cone',
+        'Between 0 and 1 — in the penumbra zone between 15° and 30°',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"L = normalize(lightPos - fragPos) for a point light." Why is normalisation critical here?',
+      options: [
+        'It makes the direction vector point toward the light — without it, the vector has the wrong sign',
+        'The raw difference vector has a magnitude equal to the distance. The N·L dot product needs a unit direction — a non-unit L would scale the brightness incorrectly with distance (separate from intentional attenuation)',
+        'Normalisation converts from world space to light space',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_3_3 }

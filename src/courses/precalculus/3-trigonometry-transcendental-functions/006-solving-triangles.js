@@ -359,4 +359,51 @@ export default {
     teaser: 'The area formula $\\frac{1}{2}ab\\sin C$ appears in multivariable calculus as the magnitude of the cross product: $|\\mathbf{u} \\times \\mathbf{v}| = |\\mathbf{u}||\\mathbf{v}|\\sin\\theta$. The Law of Cosines is the algebraic form of the dot product distance formula. Both laws resurface as coordinate-free tools in vector calculus.',
     linkedLessons: ['trig-ratios-right-triangles', 'trig-identities-deep-dive'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The Law of Sines: a/sin(A) = b/sin(B). When is the Law of Cosines needed instead?',
+      options: [
+        'The Law of Cosines is always preferred because it handles more cases',
+        'Law of Cosines is needed when you have SAS (two sides + included angle) or SSS (three sides) — situations where you cannot set up a ratio with a known opposite pair. Law of Sines requires at least one known angle-opposite side pair: ASA, AAS, or SSA',
+        'Law of Cosines only works for right triangles; Law of Sines works for all triangles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The "ambiguous case" (SSA) can give 0, 1, or 2 triangles. When do TWO triangles exist?',
+      options: [
+        'When all three sides are given and two different angles could form a valid triangle',
+        'When the given side a (opposite angle A) is shorter than the other given side b but long enough to reach the opposite side: if a < b·sin(A) there is no triangle; if a = b·sin(A) there is exactly one; if b·sin(A) < a < b there are two different valid triangles',
+        'The ambiguous case only applies when the given angle is obtuse',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Area of a triangle = (1/2)ab·sin(C), where a and b are two sides and C is the included angle. Why does sin(C) appear?',
+      options: [
+        'sin(C) converts the angle to the correct unit system',
+        'Area = (1/2)×base×height; the height of the triangle equals b·sin(C) (the perpendicular from b to the base a, at angle C). So area = (1/2)×a×b·sin(C). When C = 90°, sin(C) = 1, recovering the right triangle formula',
+        'The sine appears because the area formula requires converting between polar and rectangular coordinates',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The Law of Cosines: c² = a² + b² - 2ab·cos(C). What does this reduce to when C = 90°?',
+      options: [
+        'c² = a² + b² + 2ab (the angles add when they are right angles)',
+        'c² = a² + b² — the Pythagorean theorem, since cos(90°) = 0 eliminates the third term; the Law of Cosines is the general version of the Pythagorean theorem for any triangle angle',
+        'c² = a² - b² (the cosine term becomes negative for right angles)',
+      ],
+      correct: 1,
+    },
+  ],
 }

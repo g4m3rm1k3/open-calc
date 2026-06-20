@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'Crowbar trigger threshold: V_trigger = V_nominal × (1 + overvoltage_fraction); for a 5V rail, set trigger at 5.5–6V. After crowbar fires, I_fault = V_supply / R_series; ensure this current is within fuse clearing capability.' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A 10 A fast-blow fuse protects a motor circuit. Every time the motor starts, the fuse blows even though the motor runs normally once it is running. What is the correct fix?',
+      options: [
+        'Install a 15 A fast-blow fuse to handle the startup current',
+        'Switch to a 10 A slow-blow fuse — slow-blow fuses have a much higher I²t rating and tolerate the brief motor inrush current (which can be 5–8× rated current for several hundred milliseconds) without clearing, while still protecting against a sustained overload',
+        'Add a soft starter before the fuse to limit the startup current below 10 A',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A lightning surge hits a control panel. The MOV (metal oxide varistor) at the panel entry is destroyed — it is burnt and discoloured. The PLC inside is undamaged. Was this a failure or a success?',
+      options: [
+        'A failure — the MOV should have deflected the surge without being damaged',
+        'A success — MOVs are sacrificial protective devices designed to absorb surge energy and fail in order to protect the load; a destroyed MOV that saved the PLC performed exactly as intended. Replace the MOV before the next storm season',
+        'Neither — the MOV was too small; a properly sized MOV would have absorbed the surge without damage and also protected the PLC',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A microcontroller UART pin needs protection from ESD pulses that arrive and dissipate in under 10 ns. Should you use an MOV or a TVS diode?',
+      options: [
+        'MOV — metal oxide varistors have higher energy absorption capacity and are better for fast transients',
+        'TVS diode — TVS diodes clamp voltage in nanoseconds (far faster than MOVs, which respond in microseconds); for protecting semiconductor inputs from ESD and fast inductive kickback pulses, only a TVS diode responds quickly enough to clamp before damage occurs',
+        'Either — both devices clamp voltage to the same level and the speed difference is irrelevant for protection purposes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A breaker upstream of a fuse must coordinate so that only the fuse clears a fault downstream, leaving the breaker closed and the rest of the panel energised. What must be true about their I²t ratings?',
+      options: [
+        'The upstream breaker must have a lower I²t rating so it clears the fault faster than the fuse',
+        'The upstream breaker must have a higher I²t rating than the fuse — the fuse clears the fault first (lower I²t = less energy tolerance = faster clearing), and the breaker, having higher I²t, does not trip; this selectivity ensures only the faulted branch goes dark while the rest of the system stays live',
+        'Both devices must have identical I²t ratings so they respond simultaneously to a fault',
+      ],
+      correct: 1,
+    },
+  ],
 };

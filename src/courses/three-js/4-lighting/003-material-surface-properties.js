@@ -364,7 +364,52 @@ export default {
   challenges: [],
   mentalModel: ['Ka,Kd,Ks,shininess define any Phong surface. Kd+Ks≤1 for energy conservation. Metals have tinted specular; dielectrics have white specular.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Kd+Ks≤1 for energy conservation." A material has Kd=0.8 and Ks=0.6. What physical law does this violate?',
+      options: [
+        'A surface cannot reflect more energy than it receives — Kd+Ks=1.4 means the material emits 40% more light than hits it',
+        'The specular component must always be smaller than diffuse',
+        'Energy conservation only applies to metallic materials',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Metals have tinted specular; dielectrics have white specular." Why does gold have a yellow specular highlight while plastic has a white one?',
+      options: [
+        'Metals absorb all diffuse light, leaving only specular — and metals\' reflection is tinted by their own colour (gold reflects yellow frequencies more than blue)',
+        'Plastic is always white-coloured',
+        'The specular colour is set by the light colour, not the material',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Ka, Kd, Ks, shininess define any Phong surface." Increasing shininess from 10 to 200 produces what visual change?',
+      options: [
+        'The object becomes generally brighter across its surface',
+        'The specular highlight shrinks and sharpens — high shininess = mirror-like, low shininess = large diffuse-looking specular',
+        'The ambient term increases',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A rubber ball and a polished chrome sphere are both lit the same way. The chrome sphere has a much higher Ks and shininess. What visible difference does this create?',
+      options: [
+        'The chrome sphere reflects the environment; the rubber ball does not show specular at all',
+        'The chrome sphere has a small, bright, sharp specular highlight; the rubber ball has a large, dim, soft highlight or none',
+        'The rubber ball is brighter because it scatters light more',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_3_2 }

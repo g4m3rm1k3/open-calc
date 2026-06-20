@@ -73,4 +73,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Two parallel branches draw 10A each, but their currents are 90° apart in phase. What is the total current from the source?',
+      options: [
+        '20A — currents in parallel branches always add directly',
+        'About 14.1A — phasor addition: √(10² + 10²) = 14.14A',
+        '5A — currents partially cancel because they are out of phase',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why is admittance Y = G + jB more convenient than impedance for analyzing parallel AC circuits?',
+      options: [
+        'Admittance is always a real number, making calculations simpler',
+        'Parallel admittances add directly, just as conductances do in DC parallel circuits — no reciprocal sums needed',
+        'Admittance eliminates the need to work with complex numbers',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In a parallel RLC circuit at resonance, what happens to the total current drawn from the source?',
+      options: [
+        'Total current reaches its maximum — resonance amplifies current in parallel circuits',
+        'Total current reaches its minimum — inductive and capacitive currents cancel, leaving only resistive current',
+        'Total current becomes zero — the LC tank circuit is self-sustaining',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An industrial plant has motors drawing inductive reactive power. Installing a capacitor bank reduces the total current from the utility. How?',
+      options: [
+        'The capacitors reduce the supply voltage, which reduces current proportionally',
+        'Capacitive current leads voltage while inductive motor current lags — they partially cancel in the phasor sum, reducing the reactive component of total current',
+        'Capacitors increase the system resistance, which limits total current according to Ohm\'s Law',
+      ],
+      correct: 1,
+    },
+  ],
 };

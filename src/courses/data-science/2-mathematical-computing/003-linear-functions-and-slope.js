@@ -98,4 +98,50 @@ b=(sum_y-m*sum_x)/n`},
     ]}}],
   },
   mentalModel:['y=mx+b: m=slope (rate of change), b=intercept (y when x=0).','Slope = (y2-y1)/(x2-x1). Units: y-units per x-unit.','Residual = actual - predicted. Good fit: small, random residuals.','Least squares: find m,b minimizing sum of squared residuals.','np.polyfit(xs,ys,1) gives [m,b] of best-fit line.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A linear model for house prices: price = 200 × sqft + 50000. What does the slope 200 represent?',
+      options: [
+        'The average house price across all data points',
+        'Each additional square foot of area is associated with $200 more in price — the slope is the rate of change: price increases by $200 for every 1 sqft increase in area',
+        'The price of a house with 200 square feet',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A residual is (actual − predicted). What do large residuals indicate?',
+      options: [
+        'The model makes large predictions for large inputs',
+        'The model\'s predictions are far from the actual values for those data points — either the linear model is wrong (nonlinear relationship), there are outliers, or there is high variance unexplained by the predictor',
+        'The slope is too large and needs to be reduced',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why does least squares minimize the SUM OF SQUARED residuals rather than the sum of absolute residuals?',
+      options: [
+        'Squaring avoids negative signs which would make the minimization algorithm fail',
+        'Squaring penalizes large errors disproportionately (a 2x error contributes 4x to the sum) and produces a smooth, differentiable objective with a unique algebraic solution — the derivative equals zero at a closed-form formula for m and b',
+        'Absolute value minimization is NP-hard and cannot be solved efficiently',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The slope formula is (y₂ − y₁)/(x₂ − x₁). What are the units of slope for a dataset where y is in $ and x is in years?',
+      options: [
+        '$ × years — slope multiplies the two units',
+        '$/year — rise over run: the numerator is in $ and denominator is in years, so slope is in $/year (dollars per year)',
+        'dimensionless — ratios always cancel units',
+      ],
+      correct: 1,
+    },
+  ],
 }

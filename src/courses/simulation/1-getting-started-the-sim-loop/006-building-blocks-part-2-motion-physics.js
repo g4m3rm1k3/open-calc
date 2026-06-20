@@ -620,4 +620,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '`curve.getPointAt(t)` takes t in [0, 1] rather than a raw distance. What does t = 0.5 represent?',
+      options: [
+        'The midpoint at 0.5 world units along the curve from the start',
+        'The point at 50% of the arc-length. Three.js normalises by total arc-length, so equal t steps give equal physical spacing — unlike getPoint(t) which uses raw parameter steps and produces bunching on tightly curved sections',
+        'The average position of all control points',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '`car.lookAt(lookAhead)` orients each car toward a point 0.01 ahead on the curve rather than using the tangent vector. Why is this approach simpler?',
+      options: [
+        'lookAt is the only way to set rotation in Three.js',
+        'lookAt takes a world-position and computes the required rotation matrix internally. Using getTangent() would return a direction vector and require manually constructing a quaternion from it. For a smooth curve, sampling 0.01 ahead approximates the tangent well enough with far less code',
+        'The tangent vector points backward along the spline direction',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 't = (t + TRAIN_SPEED * dt) % 1 keeps t in [0, 1]. What happens visually when t wraps from near 1 back toward 0?',
+      options: [
+        'The train teleports to the beginning of the curve',
+        'The train crosses the curve\'s seam seamlessly. Because getPointAt maps [0,1] to the complete arc, the position just before t=1 and just after t=0 are adjacent on the closed loop — the transition is invisible',
+        'The train reverses direction for one frame',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Car spacing: `carT = (t - i * CAR_SPACING + 1) % 1`. Why add 1 before the modulo?',
+      options: [
+        'Adding 1 increases the physical gap between cars by 1 world unit',
+        'When t is small (e.g. 0.02) and i * CAR_SPACING is larger (e.g. 0.25), the subtraction gives a negative number. JavaScript % can return negative values for negative inputs. Adding 1 guarantees the operand is positive before wrapping, keeping all carT values in [0, 1]',
+        'The + 1 places the front car at the correct starting position on load',
+      ],
+      correct: 1,
+    },
+  ],
 }

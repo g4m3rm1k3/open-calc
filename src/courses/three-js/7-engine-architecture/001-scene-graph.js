@@ -351,7 +351,52 @@ export default {
   challenges: [],
   mentalModel: ['worldMatrix = parent.worldMatrix × localMatrix. Dirty flag: only recompute changed nodes. scene.traverse(fn): depth-first. parent.add(child), parent.remove(child).'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"worldMatrix = parent.worldMatrix × localMatrix." A child mesh is positioned at (1, 0, 0) in local space. Its parent is at world position (5, 0, 0). Where is the child in world space?',
+      options: [
+        '(1, 0, 0) — local space is the same as world space',
+        '(6, 0, 0) — the parent\'s world position is added to the child\'s local position through matrix multiplication',
+        '(5, 0, 0) — the child\'s position is overridden by the parent',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Dirty flag: only recompute changed nodes." A parent node moves every frame; its 50 children are static. How many world matrices are recomputed per frame?',
+      options: [
+        'All 51 (parent + 50 children) — world matrices always recompute',
+        '51 — but with dirty flags, only the parent and its descendents that depend on the changed parent need recomputation — which is still 51 here, but unchanged subtrees elsewhere are skipped',
+        '1 — only the parent node',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"scene.traverse(fn): depth-first." You call traverse to collect all meshes. In what order are nodes visited for a tree with root, child A (with subchild A1), and child B?',
+      options: [
+        'root → A → B → A1',
+        'root → A → A1 → B (depth-first: fully descend each branch before moving to the next sibling)',
+        'root → B → A → A1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"parent.add(child): child\'s local transform is relative to parent. World position may jump." You add an existing mesh that is at world (10, 0, 0) to a parent at world (5, 0, 0). Where does the child appear if its local position stays (10, 0, 0)?',
+      options: [
+        'At (10, 0, 0) — adding to a parent does not move the mesh',
+        'At (15, 0, 0) — the child\'s local position (10, 0, 0) is now relative to the parent\'s world (5, 0, 0), so world position becomes (15, 0, 0)',
+        'At (5, 0, 0) — the child resets to match the parent',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_6_0 }

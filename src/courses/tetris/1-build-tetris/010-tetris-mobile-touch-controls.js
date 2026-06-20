@@ -1041,5 +1041,50 @@ export default {
         'executeAction(action) is called by keyboard, touch, and D-pad. One source of truth.',
     ],
     checkpoints: ['read-intuition'],
-    quiz: [],
+    quiz: [
+      {
+        id: 'q1',
+        type: 'choice',
+        text: '"touchstart: record startX, startY. touchend: calculate dx, dy. classifySwipe(dx, dy)." Why record the start position on touchstart rather than calculating it on touchend?',
+        options: [
+          'touchend fires before touchstart',
+          'You need both the start and end positions to compute the delta — touchend only gives you where the finger lifted, not where it began',
+          'touchstart gives more accurate coordinates than touchend',
+        ],
+        correct: 1,
+      },
+      {
+        id: 'q2',
+        type: 'choice',
+        text: '"classifySwipe: abs(dx) < threshold AND abs(dy) < threshold → tap." What does this threshold check accomplish?',
+        options: [
+          'It filters out accidental drags that are too long',
+          'It distinguishes a tap (minimal movement) from a swipe — small displacements in both axes mean the finger barely moved, so treat it as a tap not a directional swipe',
+          'It prevents two swipes from registering simultaneously',
+        ],
+        correct: 1,
+      },
+      {
+        id: 'q3',
+        type: 'choice',
+        text: '"Touch listeners need { passive: false } to allow e.preventDefault()." When must you call e.preventDefault() on touch events in a game?',
+        options: [
+          'Always — games should prevent all default touch behaviour',
+          'When you want to stop the browser\'s default touch behaviour (scrolling, zooming) from interfering with game input — passive:false is required to allow preventDefault on touch events',
+          'Only on touchend events, not touchstart',
+        ],
+        correct: 1,
+      },
+      {
+        id: 'q4',
+        type: 'choice',
+        text: '"pointerdown fires for both mouse and touch." Why is pointerdown preferred over mousedown for D-pad buttons?',
+        options: [
+          'mousedown is deprecated in modern browsers',
+          'pointerdown fires for mouse, touch, and stylus — one handler covers all input methods rather than needing separate mousedown and touchstart handlers',
+          'pointerdown fires faster than mousedown on mobile',
+        ],
+        correct: 1,
+      },
+    ],
 };

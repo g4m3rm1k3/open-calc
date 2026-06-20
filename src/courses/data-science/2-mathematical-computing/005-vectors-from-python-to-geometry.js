@@ -15,4 +15,50 @@ export default {
     }],
   },
   mentalModel:['A NumPy 1D array IS a vector: same object, geometric and algebraic views.', 'Magnitude = np.linalg.norm(v). Unit vector = v / magnitude.', 'Vector addition: component-wise. Matches tip-to-tail geometric addition.', 'Scalar multiplication: all components × scalar. Negative scalar flips direction.', 'Unit vectors encode direction only. Used in cosine similarity, attention, normalization.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'v = np.array([3, 4]). What is np.linalg.norm(v)?',
+      options: [
+        '7 — add the components: 3 + 4 = 7',
+        '5 — magnitude = √(3² + 4²) = √(9 + 16) = √25 = 5',
+        '3.5 — average the components',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is a unit vector and why is it useful?',
+      options: [
+        'A vector with integer components — unit means whole-number values',
+        'A vector with magnitude 1: û = v/|v|. It encodes only direction, not scale. Used in cosine similarity (compare directions independently of magnitude), attention mechanisms, and normalization',
+        'A standard basis vector like [1, 0] or [0, 1] — only those two qualify as unit vectors',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A user\'s movie preference vector is [5, 1, 3] (action, romance, comedy ratings). Another user has [4, 1, 3]. What does their similarity indicate?',
+      options: [
+        'The vectors have different magnitudes so they cannot be compared directly',
+        'Their preference directions are nearly identical — both weight action and comedy high, romance low. Cosine similarity close to 1 means they would likely enjoy the same movies, regardless of how many movies they rated',
+        'The first user watched more movies since their first component (5) is higher',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'np.array([1,2,3]) + np.array([4,5,6]) gives what, and what is the geometric interpretation?',
+      options: [
+        '[5,7,9] — component-wise addition corresponds geometrically to tip-to-tail vector addition: placing the second arrow at the tip of the first gives the resultant displacement [5,7,9]',
+        '[4,10,18] — vectors multiply component-wise when you use +',
+        '[1,2,3,4,5,6] — + concatenates arrays in NumPy',
+      ],
+      correct: 0,
+    },
+  ],
 }

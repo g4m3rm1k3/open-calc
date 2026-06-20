@@ -769,5 +769,50 @@ export default {
     'Overflow: when two positives produce a negative, or two negatives produce a positive.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"1+1=10 in binary. Always. Carry the 1." What is 0110 + 0101 in binary?',
+      options: [
+        '1011',
+        '1100',
+        '1110',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Negate: flip all bits, add 1." What is the two\'s complement of 0101 (decimal 5) in 4-bit binary?',
+      options: [
+        '1010',
+        '1011',
+        '0110',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Signed 8-bit range: −128 to +127. MSB is the sign bit." Why can signed 8-bit represent −128 but only +127?',
+      options: [
+        'The encoding is asymmetric — 0 occupies one positive slot, leaving one fewer positive value than negative',
+        'Negative numbers need an extra bit for the sign, reducing the range by 1 on the positive side',
+        'The hardware arbitrarily reserved +128 for overflow detection',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Overflow: two positives produce a negative." You add 0111 (7) + 0001 (1) in signed 4-bit arithmetic. The result is 1000. What has happened?',
+      options: [
+        'Correct result — 7 + 1 = 8 in signed 4-bit',
+        'Signed overflow — 1000 is interpreted as −8 in two\'s complement. Adding two positive numbers produced a negative result',
+        'Carry out of the MSB indicates the result is stored in a second register',
+      ],
+      correct: 1,
+    },
+  ],
 };

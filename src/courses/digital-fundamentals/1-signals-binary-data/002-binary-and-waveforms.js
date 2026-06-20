@@ -397,5 +397,50 @@ export default {
     'Timing diagrams show digital signals (voltages) changing over time on multiple wires.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Binary → decimal: sum the weights where bits are 1." What is the decimal value of binary 1011?',
+      options: [
+        '9',
+        '11',
+        '13',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Decimal → binary: divide by 2 repeatedly, read remainders upward." What is decimal 13 in binary?',
+      options: [
+        '1101',
+        '1011',
+        '1110',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"8 bits = 1 byte. 1 KB = 1,024 bytes." Why is 1 KB 1,024 bytes and not 1,000?',
+      options: [
+        'Kilobyte was defined arbitrarily in the 1970s',
+        'Memory is addressed in powers of 2 — 2¹⁰ = 1,024 is the nearest power of 2 to 1,000, so it became the standard computer prefix',
+        'Each byte uses 10 bits of physical storage, making 1,000 bytes = 10,000 bits which does not divide evenly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Timing diagrams show digital signals changing over time." A timing diagram shows wire A going HIGH then LOW then HIGH. What does this represent?',
+      options: [
+        'A is damaged — digital signals should not change state',
+        'A sequence of bit values on wire A over time — each transition records a change from 0 to 1 or 1 to 0',
+        'An analog oscillation that has been rounded to digital levels',
+      ],
+      correct: 1,
+    },
+  ],
 }

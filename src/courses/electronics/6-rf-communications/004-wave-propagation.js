@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'FSPL(dB) = 32.45 + 20log(f_MHz) + 20log(d_km)\nFriis: Pr = Pt + Gt + Gr − FSPL   (all in dB/dBm/dBi)' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'AM radio stations (540–1700 kHz) can be received hundreds of miles away at night but only 50–100 miles during the day. Why?',
+      options: [
+        'Transmitter power is reduced during daytime hours as a regulatory requirement',
+        'During daylight, the ionosphere\'s D layer absorbs HF/MF sky waves; at night the D layer disappears, allowing sky waves to bounce off the higher F layer and travel hundreds of miles further',
+        'Ground wave propagation is stronger at night due to lower ground resistance when the soil cools',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A WiFi access point and client are 200 m apart outdoors at 5 GHz. Free-space path loss doubles with each doubling of distance. What happens to path loss if the distance increases from 200 m to 400 m?',
+      options: [
+        'Path loss increases by 6 dB — doubling distance squares the power loss (factor of 4), which is 6 dB',
+        'Path loss doubles in dB — 200 m has 80 dB loss, so 400 m has 160 dB',
+        'Path loss is unchanged — free-space path loss depends only on frequency, not distance',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why are geostationary communication satellites placed at 35,786 km altitude rather than at a lower orbit of 500 km?',
+      options: [
+        'At lower orbits, atmospheric drag causes the satellite to deorbit; 35,786 km is the minimum drag-free altitude',
+        'At 35,786 km, the orbital period equals exactly 24 hours — the satellite appears stationary over one point on Earth, allowing fixed ground antennas to maintain a constant link without tracking',
+        'Lower orbit satellites cannot relay signals because signals are blocked by the ionosphere below 30,000 km altitude',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A 5G base station transmits 30 dBm and has 12 dBi antenna gain. A phone 500 m away has a 3 dBi antenna and free-space path loss is 100 dB. What is the received signal power?',
+      options: [
+        '−55 dBm — Pr = Pt + Gt + Gr − FSPL = 30 + 12 + 3 − 100 = −55 dBm',
+        '−70 dBm — subtract all gains from the path loss',
+        '+145 dBm — add all values together without subtracting path loss',
+      ],
+      correct: 0,
+    },
+  ],
 };

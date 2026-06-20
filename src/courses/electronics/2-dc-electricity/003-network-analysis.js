@@ -79,4 +79,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In the node voltage method, why is it easier to assign unknown voltages to nodes rather than tracking currents through each branch?',
+      options: [
+        'Node voltages are always whole numbers, making calculations simpler',
+        'Every branch current is then derived automatically as (V_A − V_B)/R, eliminating the need to guess current directions independently',
+        'The node voltage method only works for circuits with a single voltage source',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'When should you prefer mesh current analysis over node voltage analysis?',
+      options: [
+        'When the circuit has many series loops and few meshes, making KVL equations compact',
+        'When there are more than two voltage sources in the circuit',
+        'Node voltage is always preferred — mesh current is only used for verification',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Two mesh currents I1 and I2 flow through a shared resistor R3. What is the voltage across R3?',
+      options: [
+        '(I1 + I2) × R3 — both currents add through the shared branch',
+        '(I1 − I2) × R3 — the mesh currents flow in opposite directions through the shared branch and their net effect is the difference',
+        'I1 × R3 — only the primary mesh current counts; the adjacent mesh is handled separately',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why do these systematic methods always produce a unique solution for a properly connected linear DC circuit?',
+      options: [
+        'Because Kirchhoff\'s Laws are exact only for DC circuits, making the equations uniquely solvable',
+        'Because Ohm\'s Law and KVL/KCL are all linear constraints, so the circuit equations form a linear system that always has a unique solution',
+        'Because the number of nodes always equals the number of meshes in any circuit',
+      ],
+      correct: 1,
+    },
+  ],
 };

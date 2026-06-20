@@ -141,4 +141,50 @@ export default {
       solution: 'I = (20×10) + (8×50) + (4×120) + 350\n   = 200 + 400 + 480 + 350 = 1,430mA = 1.43A\n\nPower supply: 1.43A × 1.25 (NEC factor) × 1.25 (headroom) ≈ 2.2A minimum → choose 3A or 5A supply\n\nMain fuse: 3A fast-blow (protects the wiring at the supply output)\n\nNote: supply should be rated ≥ 1.25× continuous load. A 5A supply at 1.43A runs at 29% capacity — ideal.',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In a series circuit with three safety switches and a relay coil, what happens when any single switch opens?',
+      options: [
+        'Current is reduced by one-third — the remaining two switches carry the load',
+        'Current stops everywhere — all switches must be closed for any current to flow',
+        'The relay coil gets more voltage since it now shares with fewer components',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You add a third solenoid in parallel to a 24V bus that already has two. What happens to the voltage each solenoid receives?',
+      options: [
+        'The voltage across each solenoid drops because the supply must share with more devices',
+        'Each solenoid still gets the full 24V — parallel branches all see the same voltage',
+        'The voltage increases because the lower total resistance draws more power',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You measure full supply voltage across a component in a series circuit that should only have a partial voltage drop. What does this tell you?',
+      options: [
+        'That component has a short circuit — its resistance dropped to near zero',
+        'There is an open circuit elsewhere in the loop; no current flows so this component shows full voltage',
+        'The power supply voltage has increased — check the supply output first',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Kirchhoff\'s Current Law says the current at any junction sums to zero. What physical principle does this represent?',
+      options: [
+        'Conservation of energy — the voltage drops around a loop must balance',
+        'Conservation of charge — charge cannot accumulate at a node; current in equals current out',
+        'Ohm\'s Law — resistance determines how current distributes across branches',
+      ],
+      correct: 1,
+    },
+  ],
 };

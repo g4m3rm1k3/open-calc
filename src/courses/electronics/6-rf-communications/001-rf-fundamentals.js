@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'λ = c / f = 3×10⁸ / f   (λ in metres, f in Hz)\nShortcut: λ(m) ≈ 300 / f(MHz)' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A WiFi router transmits at 2.4 GHz. What is the wavelength of this signal?',
+      options: [
+        'About 12.5 cm — λ = c/f = 3×10⁸ / 2.4×10⁹ ≈ 0.125 m',
+        'About 1.25 m — using λ(m) ≈ 300/f(MHz) = 300/2400',
+        'About 7.2 m — multiply frequency by the speed of light',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why do 5G mmWave signals (28 GHz) carry more data than 4G signals (700 MHz)?',
+      options: [
+        'Higher frequency signals travel faster, allowing more data to be sent in the same time',
+        'Higher carrier frequency provides more available bandwidth — the spectrum around 28 GHz can support wider channels (400–800 MHz wide) carrying gigabits per second, while narrow 700 MHz channels are limited to a few MHz of bandwidth',
+        'mmWave uses quantum tunneling through walls, giving better indoor penetration and speed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'An FM radio station broadcasts at 100 MHz. Why is a car antenna approximately 75 cm long?',
+      options: [
+        'Car aerodynamics require antennas shorter than 1 m to reduce drag at highway speeds',
+        'At 100 MHz, λ = 3 m; a quarter-wave antenna (λ/4) is 75 cm — this length resonates at the signal frequency, maximizing reception',
+        'Government regulations restrict FM antennas to 75 cm for interference prevention',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the difference between a "baseband" signal and an "RF carrier"?',
+      options: [
+        'Baseband is the digital version of a signal; RF is the analog version of the same information',
+        'Baseband is the original information signal (audio, data) at low frequency; the RF carrier is a high-frequency electromagnetic wave that transports the baseband information through space',
+        'Baseband signals travel through wires; RF carriers are the same signals filtered for wireless transmission',
+      ],
+      correct: 1,
+    },
+  ],
 };

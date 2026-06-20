@@ -680,7 +680,52 @@ export default {
     'Auxiliary lines introduce new elements (midpoints, angle bisectors, medians) to create the triangles you need.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Congruence = same shape AND same size. All six measurements match." Two triangles are congruent. Triangle 1 has angle 40°. Triangle 2 must have:',
+      options: [
+        'An angle of 40° somewhere',
+        'The corresponding angle of 40° — congruent triangles have equal corresponding angles in the same relative position',
+        'All angles equal to 40°',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Invalid: SSA (ambiguous — two triangles possible)." Why can\'t two sides and a non-included angle prove congruence?',
+      options: [
+        'SSA is too much information and creates over-determined systems',
+        'Given two sides and a non-included angle, the third point can swing to two different positions — two different triangles can satisfy the same SSA conditions',
+        'The acronym SSA is reserved for right triangles only',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Proof strategy: find congruent triangles containing your target → prove by SSS/SAS/ASA/AAS → apply CPCTC." What does CPCTC stand for and when do you use it?',
+      options: [
+        'Corresponding Parts of Congruent Triangles are Congruent — used AFTER you have proved two triangles congruent, to conclude their matching parts are equal',
+        'Congruent Parts Create Triangle Congruence — used to establish SSS/SAS/ASA',
+        'Common Postulate for Congruent Triangle Comparison — an axiom used at the start of proofs',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"HL: right triangles only." The HL criterion applies when two right triangles share the same hypotenuse length and one leg length. Why does HL work when SSA generally does not?',
+      options: [
+        'Right triangles have simpler math',
+        'In a right triangle, given the hypotenuse and one leg, the Pythagorean theorem determines the third side uniquely — there is only one possible triangle, eliminating the SSA ambiguity',
+        'HL is an axiom accepted without justification',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_GEO_1_6 };

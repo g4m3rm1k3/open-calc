@@ -348,4 +348,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A student puts `let t = 0` inside update(dt). The orbit does not animate. Why?',
+      options: [
+        'let is not allowed inside functions in JavaScript',
+        'Every time update(dt) is called, t is reset to 0. The variable is created fresh each frame and discarded when the function returns. Placing it in module scope means it persists between calls and accumulates the elapsed time',
+        'update(dt) is only called once so t only advances one frame',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '`const mesh = new THREE.Mesh(...)` — can you later do `mesh.position.x = 5`?',
+      options: [
+        'No — const makes the entire object immutable',
+        'Yes — const prevents reassigning the variable (mesh = somethingElse would error), but the object the variable points to can still be mutated. Setting mesh.position.x modifies a property, not the binding itself',
+        'Only if you declared position as let inside the Mesh class',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'For one full orbit per 4 seconds, the angular speed is 2π/4 = π/2 rad/s. Why 2π rather than 360?',
+      options: [
+        '2π is used because the period formula only works in radians',
+        'Math.cos and Math.sin take radians as input. One full revolution = 2π radians. Dividing 2π by the period in seconds gives radians per second. Passing degrees would make the orbit 57× slower and never reach a full circle',
+        '360 degrees is less precise than 2π',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A closure captures variables from its surrounding scope. In a particle system, each particle\'s update function captures its own `vy` variable. What makes this useful?',
+      options: [
+        'It avoids declaring vy in module scope, keeping global state clean',
+        'Each closure independently holds its own vy, so 500 particles each track their own velocity without an array. However, for large particle counts, storing state in arrays and indexing by particle ID is more memory-efficient than 500 separate closures',
+        'Closures make functions faster because the variable lookup is local',
+      ],
+      correct: 1,
+    },
+  ],
 }

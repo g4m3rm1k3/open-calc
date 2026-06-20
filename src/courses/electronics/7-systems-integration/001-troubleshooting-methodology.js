@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'Half-split efficiency: k tests → fault within N/2^k stages. For 16 stages, 4 tests suffice.' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A motor drive faults every morning during startup but runs fine after 30 minutes of warm-up. Before opening the enclosure, what is the single most useful question to ask?',
+      options: [
+        'Which component is most likely to fail in this type of drive?',
+        'What changed recently? — a system that worked yesterday and fails today has one new variable: an aged component, a changed setting, a new ambient temperature pattern, or a recent modification',
+        'Is the supply voltage within specification?',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A signal chain has 16 stages. Using the half-split method, how many test points do you need to measure before you can pinpoint the faulty stage?',
+      options: [
+        '8 measurements — you must check half the stages individually',
+        '4 measurements — each test halves the search space: 16→8→4→2→1, so 4 tests locate the fault within one stage',
+        '16 measurements — each stage must be verified in sequence from input to output',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A PCB works on the bench at room temperature but fails intermittently after 20 minutes of operation. What troubleshooting technique best isolates the faulty component?',
+      options: [
+        'Replace all electrolytic capacitors since they are the most common thermal failure',
+        'Apply freeze spray and a heat gun systematically to individual components while monitoring the output — the component whose cooling or heating triggers the fault is the culprit',
+        'Reduce the supply voltage to 90% to lower power dissipation and extend the time before failure',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You replace a blown fuse in a power supply and it immediately blows again. What is the correct next step?',
+      options: [
+        'Install a higher-rated fuse so it can handle the fault current without blowing',
+        'Find the root cause — a fuse blowing a second time confirms a fault is still present; replacing it again wastes the fuse and risks damaging other components that depend on the fuse for protection',
+        'Add a larger filter capacitor on the DC output to absorb the current spike that is blowing the fuse',
+      ],
+      correct: 1,
+    },
+  ],
 };

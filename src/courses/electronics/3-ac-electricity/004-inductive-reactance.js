@@ -73,4 +73,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A 100mH inductor is in a 60Hz AC circuit. What is its reactance?',
+      options: [
+        '6000Ω — multiply inductance by frequency',
+        'About 37.7Ω — XL = 2π × 60 × 0.1 = 37.7Ω',
+        '1.67Ω — divide frequency by inductance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You double the frequency of AC applied to an inductor. What happens to its reactance?',
+      options: [
+        'Reactance halves — higher frequency means less opposition in inductors',
+        'Reactance doubles — XL = 2πfL, so doubling f doubles XL',
+        'Reactance stays the same — it depends only on inductance, not frequency',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is a VFD output choke (series inductor) effective at reducing voltage spikes on long motor cables?',
+      options: [
+        'The inductor stores the spike energy and releases it slowly as heat',
+        'The inductor limits dV/dt by opposing rapid changes in current — V = L × dI/dt — slowing the voltage rise that causes cable reflections',
+        'The inductor filters the PWM carrier frequency while blocking the fundamental motor frequency',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An ideal inductor in an AC circuit consumes no real power. Why not?',
+      options: [
+        'The inductor has zero resistance, so it cannot convert electrical energy to heat',
+        'Energy is stored in the magnetic field during one half-cycle and returned to the circuit during the next — the average power over a full cycle is zero',
+        'Inductors only resist change in current, so they cannot do work on charge carriers',
+      ],
+      correct: 1,
+    },
+  ],
 };

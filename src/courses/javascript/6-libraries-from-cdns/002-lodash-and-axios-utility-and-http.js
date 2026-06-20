@@ -416,5 +416,50 @@ export default {
     'Axios instance = configured axios with base URL and interceptors. Use this, not global axios.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You spread-copy a nested object and modify a deep property. The original is also changed. Which Lodash function solves this?',
+      options: [
+        '_.clone() — it creates a shallow copy just like spread',
+        '_.cloneDeep() — it recursively copies all nested objects so modifications do not affect the original',
+        '_.freeze() — it prevents all modifications to the original',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A search input fires an API call on every keystroke. You want to wait until the user stops typing for 300ms before sending. Which Lodash function is right?',
+      options: [
+        '_.throttle(fn, 300) — limits calls to once every 300ms regardless of typing speed',
+        '_.debounce(fn, 300) — delays the call until 300ms after the last invocation',
+        '_.delay(fn, 300) — runs the function once after a 300ms timeout',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Axios receives a 500 response from the server. What does it do compared to fetch?',
+      options: [
+        'The same as fetch — both resolve with a response object regardless of status code',
+        'Axios automatically throws an error on 4xx/5xx responses; fetch resolves with response.ok = false and you must throw manually',
+        'Axios retries the request automatically on 500 errors',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why would you create an Axios instance instead of using the global axios object directly?',
+      options: [
+        'Instances are faster because they skip the CDN overhead',
+        'An instance lets you configure a base URL and interceptors once — all requests from it share that configuration',
+        'Global axios does not support POST requests; only instances do',
+      ],
+      correct: 1,
+    },
+  ],
 };

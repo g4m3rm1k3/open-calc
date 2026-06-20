@@ -620,7 +620,52 @@ export default {
     'Heron\'s formula: A = √(s(s-a)(s-b)(s-c)) where s = (a+b+c)/2. Area from sides alone.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Rectangle: A = bh. Everything else is a rearrangement." A triangle has base 8 and height 5. What is its area and why?',
+      options: [
+        '40 — same as the rectangle with those dimensions',
+        '20 — a triangle is exactly half a rectangle with the same base and height',
+        '13 — add base and height',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Trapezoid: A = ½(a+b)h." A trapezoid has parallel sides 6 and 10, height 4. What is its area?',
+      options: [
+        '64',
+        '32',
+        '24',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Radian = arc/radius. Arc length s = rθ." A circle of radius 5 has a central angle of π/3 radians. What is the arc length?',
+      options: [
+        '5π/3',
+        'π/15',
+        '15π',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Circle A = πr²." A circle has radius 6. What is its area?',
+      options: [
+        '12π',
+        '36π',
+        '6π²',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_GEO_2_4 };

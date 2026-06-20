@@ -238,4 +238,50 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Vector u = ⟨3, 4⟩. What is |u| (its magnitude) and what is the unit vector û?',
+      options: [
+        '|u| = 7 and û = ⟨3/7, 4/7⟩ — sum the components then normalize by dividing each by the sum',
+        '|u| = 5 and û = ⟨3/5, 4/5⟩ — magnitude = √(3²+4²) = √25 = 5; unit vector = u/|u| = ⟨3/5, 4/5⟩',
+        '|u| = 5 and û = ⟨0.6, 0.8⟩ — same as above with decimal notation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The dot product u·v = |u||v|cos θ. If u·v = 0, what does this tell you about u and v?',
+      options: [
+        'One of the vectors must be the zero vector — a zero dot product means at least one factor is zero',
+        'u and v are perpendicular (orthogonal) — cos θ = 0 means θ = 90°, so the vectors are at right angles',
+        'u and v are parallel — zero dot product means they point in the same or opposite directions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The projection of v onto u is proj_u(v) = (v·u/|u|²)u. What does this vector represent geometrically?',
+      options: [
+        'The component of v perpendicular to u — the part of v pointing sideways relative to u',
+        'The shadow of v cast onto the line of u — how much of v lies along the direction of u, expressed as a vector in the direction of u',
+        'The reflection of v through u — the mirror image across the line defined by u',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Vectors enable displacement without coordinates: "walk 5 km north then 3 km east" = ⟨3, 5⟩ km. Why is adding displacements the same as vector addition?',
+      options: [
+        'Because geographic directions correspond one-to-one with x and y axes, making displacement and vector addition identical by definition',
+        'Displacement is a vector quantity — it has magnitude and direction. Consecutive displacements add head-to-tail (the endpoint of one is the start of the next), which is exactly what vector addition computes: ⟨a,b⟩ + ⟨c,d⟩ = ⟨a+c, b+d⟩',
+        'Displacements only add like vectors when they are perpendicular — non-perpendicular paths require law of cosines instead',
+      ],
+      correct: 1,
+    },
+  ],
 }

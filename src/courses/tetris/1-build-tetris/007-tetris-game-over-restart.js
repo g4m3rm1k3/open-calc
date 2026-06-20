@@ -1018,5 +1018,50 @@ export default {
     'localStorage stores strings. parseInt() when reading back numbers.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"STATE = { IDLE, PLAYING, GAME_OVER } — exactly one active at a time." Why use an explicit state machine instead of boolean flags?',
+      options: [
+        'Booleans cannot represent more than two states',
+        'A single state variable makes impossible combinations impossible — with three booleans you could accidentally have isPlaying=true AND isGameOver=true simultaneously',
+        'State machines are required by the browser for game applications',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"gameState drives all UI. Call renderUI() after every transition." A player presses Restart. In what order should events happen?',
+      options: [
+        'Update the DOM to show the playing screen, then reset game state',
+        'Update gameState to PLAYING first, call resetGame(), then call renderUI() — always update state before rendering so the DOM reflects actual state',
+        'Both can happen in any order since they use different variables',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"resetGame(): wipe boardData rows in place, reset scalars, spawn new piece." Why wipe rows in place instead of reassigning boardData to a new empty array?',
+      options: [
+        'In-place mutation is always faster than creating new arrays',
+        'Other code holds references to boardData — if you reassign it to a new array, those references still point to the old filled board',
+        'JavaScript does not allow array reassignment',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"startOrRestart(): stop → reset → PLAYING → renderUI → start." Why stop the interval before resetting?',
+      options: [
+        'Stopping the interval is required before spawning a new piece',
+        'If a game loop is already running and you reset without stopping it, the old loop continues ticking while the new state is being set up — causing race conditions',
+        'You only need to stop the interval when transitioning to GAME_OVER',
+      ],
+      correct: 1,
+    },
+  ],
 };

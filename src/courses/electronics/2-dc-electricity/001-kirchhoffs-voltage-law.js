@@ -90,4 +90,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why must the sum of all voltages around a closed loop equal zero?',
+      options: [
+        'It is an empirical observation that happens to hold for most circuits',
+        'It is conservation of energy — a charge completing a loop returns to its starting potential, so net energy gained equals net energy lost',
+        'KVL is only valid for series circuits; parallel circuits use a different rule',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A 24V supply drives a series circuit with R1 = 100Ω and R2 = 200Ω. How much voltage drops across R2?',
+      options: [
+        '12V — two resistors in series split the voltage equally',
+        '16V — the voltage divider gives V2 = 24 × (200/300)',
+        '8V — the smaller resistor gets the larger share of voltage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You measure only 22.1V at a solenoid connected to a 24V supply through a long cable run. What does KVL tell you about the missing 1.9V?',
+      options: [
+        'The supply voltage has sagged — the power supply is undersized',
+        'The 1.9V is being dropped somewhere in the series path between the supply and the solenoid, most likely across wire resistance',
+        'The solenoid is drawing more current than rated, reducing the voltage across itself',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You apply KVL and solve for current, getting a negative value. What does this mean?',
+      options: [
+        'You made a sign error — redo the KVL equation with the opposite traversal direction',
+        'The actual current flows opposite to your assumed direction — the negative sign is the answer, not an error',
+        'The circuit has a short circuit somewhere that reversed the current flow',
+      ],
+      correct: 1,
+    },
+  ],
 };

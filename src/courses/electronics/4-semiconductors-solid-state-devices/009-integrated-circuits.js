@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why does IC fabrication make it economically beneficial to add more transistors to a design, even when only a few are needed?',
+      options: [
+        'More transistors lower the chip\'s resistance, which improves power efficiency',
+        'Once the photolithographic masks are made, adding transistors costs only silicon area — the marginal cost per transistor is near zero, so integrating more function on-chip is almost free',
+        'Additional transistors provide redundancy, which increases reliability and justifies a higher selling price',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'An inverting op-amp circuit has Rin = 10 kΩ and Rf = 100 kΩ. The input is +1V. What is the output voltage, and why?',
+      options: [
+        '+10V — non-inverting gain = 1 + Rf/Rin = 11, but the output is positive',
+        '−10V — inverting gain = −Rf/Rin = −10; the virtual short at V− forces current through Rf opposite to input current, inverting the sign',
+        '−1V — the op-amp acts as a unity-gain buffer in the presence of negative feedback',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'An op-amp with GBP = 1 MHz is configured as an inverting amplifier with gain = 200. What is its approximate −3 dB bandwidth?',
+      options: [
+        '1 MHz — the gain-bandwidth product is the bandwidth at any gain',
+        '5 kHz — bandwidth = GBP / |ACL| = 1 MHz / 200 = 5 kHz',
+        '200 MHz — higher gain extends bandwidth in a feedback amplifier',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A 4–20mA process transmitter reads 0mA at the DCS instead of the expected 4mA at zero pressure. What does this most likely indicate?',
+      options: [
+        'The pressure transmitter is reading 0% — a valid measurement; 4mA represents 0% and 0mA is below range',
+        'The loop is broken — a severed wire or failed transmitter circuit produces 0mA; the 4mA live zero deliberately distinguishes a 0% measurement from an open circuit',
+        'The DCS is displaying the wrong engineering units — divide by 5 to convert raw mA to percentage',
+      ],
+      correct: 1,
+    },
+  ],
 };

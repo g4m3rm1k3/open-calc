@@ -643,5 +643,50 @@ export default {
     '8-bit byte: 256 values. 16-bit short: 65,536. 32-bit int: ~4 billion. Each extra bit doubles the range.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Each column\'s weight is 2× the column to its right." In the binary number 1000, what is the value of the 1?',
+      options: [
+        '4',
+        '8',
+        '16',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"To write binary: find the largest power of 2 that fits, mark it 1, subtract, repeat." What is decimal 25 in binary?',
+      options: [
+        '11001',
+        '10110',
+        '11010',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"8-bit byte: 256 values. Each extra bit doubles the range." How many different values can a 4-bit nibble represent?',
+      options: [
+        '8',
+        '16',
+        '32',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"16-bit short: 65,536. 32-bit int: ~4 billion." Why does each doubling of bit width roughly square the number of representable values?',
+      options: [
+        'Wider numbers use more transistors, which increases capacity linearly',
+        'Each additional bit doubles the count — going from N to 2N bits squares the range because 2^(2N) = (2^N)²',
+        'The extra bits add 65,536 new values each time, not double',
+      ],
+      correct: 1,
+    },
+  ],
 };

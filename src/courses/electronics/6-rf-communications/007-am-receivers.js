@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'fLO = fRF + fIF   (for AM: fIF = 455kHz)\nfimage = fRF + 2·fIF\nEnvelope detector: τ = RC,   1/fIF << τ << 1/fm' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An AM superheterodyne receiver has a standard 455 kHz IF. You tune to a station at 1000 kHz. What frequency must the local oscillator produce?',
+      options: [
+        '545 kHz — LO = IF − RF',
+        '1455 kHz — fLO = fRF + fIF = 1000 + 455 = 1455 kHz',
+        '455 kHz — the LO always equals the IF frequency',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A superheterodyne receiver is tuned to 1000 kHz with a 455 kHz IF. An unwanted signal at 1910 kHz also appears at the IF output. Why?',
+      options: [
+        'The 1910 kHz signal is a harmonic of the LO that mixes back down to IF',
+        'This is the image frequency: 1000 + 2 × 455 = 1910 kHz. The LO at 1455 kHz minus 1910 kHz also equals 455 kHz — both signals mix to the same IF and cannot be separated afterward',
+        'The 1910 kHz signal is a spurious emission from the desired 1000 kHz station that appears at twice the carrier frequency',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why does the superheterodyne architecture make it easier to build a selective, high-gain AM receiver than a direct-conversion (tunable RF) design?',
+      options: [
+        'The superheterodyne uses digital signal processing that eliminates the need for analog filters',
+        'All high-gain amplification and sharp filtering happen at a fixed IF (455 kHz) that is designed once and optimized permanently — only a low-gain, loosely tuned front-end filter needs to track the dial, which is far easier to build than a high-gain tunable amplifier',
+        'The superheterodyne cancels AM noise by converting to a lower frequency where electrical interference is weaker',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An AM receiver\'s envelope detector uses a diode followed by an RC low-pass filter. The RC time constant must satisfy two constraints. What are they?',
+      options: [
+        'RC must be much larger than the carrier period AND much larger than the audio period — both act as low-pass filters',
+        'RC must be much larger than the carrier period (to smooth out the carrier ripple) but much smaller than the audio period (to follow the audio envelope without distorting it)',
+        'RC must equal exactly one carrier period to produce the maximum rectified voltage at the diode output',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -293,7 +293,52 @@ export default {
     'Three.js: PointerLockControls (FPS), OrbitControls (orbit), rotation.order="YXZ".',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Yaw: rotate world Y. Pitch: rotate local X. Clamp pitch ±89°." Why clamp pitch instead of allowing full 360° vertical rotation?',
+      options: [
+        'GPUs cannot handle negative Y rotation',
+        'At ±90° the up vector aligns with the look direction, causing a gimbal flip — the camera\'s orientation becomes undefined and the view snaps or flips',
+        'Clamping improves performance by reducing matrix calculations',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Strafe = cross(dir, worldUp). Normalise before movement." Why normalise the strafe vector?',
+      options: [
+        'The cross product always returns a unit vector',
+        'The cross product magnitude varies with the angle between dir and worldUp — normalising ensures strafe speed is consistent regardless of pitch angle',
+        'Normalisation converts the vector from world space to camera space',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Camera direction: dir = (cos(yaw)cos(pitch), sin(pitch), sin(yaw)cos(pitch))." What direction does this produce when yaw=0 and pitch=0?',
+      options: [
+        '(0, 0, -1) — looking along the negative Z axis (standard OpenGL forward)',
+        '(1, 0, 0) — looking along the positive X axis',
+        '(0, 1, 0) — looking straight up',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Orbit: spherical (radius, theta, phi) → Cartesian → camera position → lookAt." Why convert to Cartesian before setting camera position?',
+      options: [
+        'Three.js requires Cartesian coordinates for camera position — it has no spherical coordinate support',
+        'Spherical coordinates describe a point on a sphere conceptually; Three.js needs (x, y, z) world position to place the camera, which is computed from radius × trig functions',
+        'The conversion applies the view matrix automatically',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_2_3 };

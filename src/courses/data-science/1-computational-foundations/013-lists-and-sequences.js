@@ -96,4 +96,50 @@ res
     ]}}],
   },
   mentalModel:['Indexing: starts at 0. Negative: counts from end. lst[-1] is last element.','Slicing: lst[start:stop:step]. Stop is exclusive. Omit for defaults.','Mutation: append, insert, remove, pop, direct index assignment modify the list in place.','+ creates a new list. * repeats. in tests membership.','Nested lists: lst[row][col] for matrix access.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'lst = [10, 20, 30, 40, 50]. What is lst[1:4]?',
+      options: [
+        '[10, 20, 30, 40] — slicing from index 1 to 4 inclusive',
+        '[20, 30, 40] — slicing is lst[start:stop] where start is inclusive and stop is exclusive; indices 1, 2, 3 give elements 20, 30, 40',
+        '[20, 30, 40, 50] — slicing to index 4 includes index 4',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'a = [1, 2, 3]; b = a; b.append(4). What is a?',
+      options: [
+        '[1, 2, 3] — b is a separate copy so modifying b does not affect a',
+        '[1, 2, 3, 4] — b = a makes b point to the same list object as a; appending to b also modifies a because both names reference the same list',
+        '[1, 2, 3, [4]] — append adds a nested list',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'lst = [5, 3, 1, 4, 2]. What is lst[-2]?',
+      options: [
+        '4 — negative indices count from the end: -1 is last, -2 is second-to-last, which is 4',
+        '2 — -2 means "skip 2 from the beginning"',
+        '3 — -2 means the element at position len(lst) - 2 = 3',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the difference between lst.append([1,2]) and lst.extend([1,2])?',
+      options: [
+        'Both add the elements 1 and 2 to lst; they are equivalent',
+        'append([1,2]) adds the list [1,2] as a single element (nesting it); extend([1,2]) adds each element 1 and 2 individually',
+        'append is for integers; extend is for lists',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -106,4 +106,50 @@ outlier_count=int(((df["price"]<Q1-1.5*IQR)|(df["price"]>Q3+1.5*IQR)).sum())`},
     "Anscombe's quartet: identical stats, different shapes. ALWAYS plot.",
     `Bivariate drill: scatter + correlation + linear fit for any pair of interest.`,
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why must EDA happen BEFORE modeling?',
+      options: [
+        'Python requires data exploration before sklearn functions can be called',
+        'EDA reveals data quality issues, unexpected distributions, outliers, and surprising patterns that should inform model choice, preprocessing, and feature engineering — modeling on unchecked data risks learning from noise, errors, or artifacts rather than true signal',
+        'EDA is only needed for large datasets with over 10,000 rows',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A histogram of "response time" shows a unimodal distribution with most values near 50ms, but a long right tail extending to 5000ms. What should you investigate?',
+      options: [
+        'Nothing — long tails are mathematically expected for all timing measurements',
+        'The extreme values: are the 5000ms responses a system failure, a specific type of request, or a separate mode? Multimodal or heavy-tailed distributions often indicate separate subpopulations worth modeling separately or investigating as anomalies',
+        'The mean — you should compute the mean and if it exceeds 100ms, flag the dataset',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A scatter plot of features A vs B shows a strong nonlinear S-curve relationship. A Pearson correlation coefficient is r = 0.2. What does this tell you?',
+      options: [
+        'There is no meaningful relationship between A and B — r = 0.2 is near zero',
+        'Pearson r measures LINEAR correlation only — a low r does not mean no relationship; the S-curve is a strong nonlinear relationship missed by r. Always plot: correlation statistics alone are insufficient',
+        'The S-curve means B is the logarithm of A, so log-transforming B would give r = 1.0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'df.corr() gives a correlation matrix. A correlation of 0.95 between two features. What should you consider?',
+      options: [
+        'High correlation means both features are very useful and should both be kept',
+        'Multicollinearity — two features providing nearly the same information can cause numerical instability in linear models and make coefficients hard to interpret; consider dropping one or using PCA. High correlation also helps identify redundant features',
+        'A correlation of 0.95 is impossible for real data — the data may have been duplicated',
+      ],
+      correct: 1,
+    },
+  ],
 }

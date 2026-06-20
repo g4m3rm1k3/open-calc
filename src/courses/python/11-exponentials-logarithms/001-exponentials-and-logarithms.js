@@ -967,4 +967,51 @@ res
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Bacteria double every 20 minutes. Starting with 100, how many after 2 hours?',
+      options: [
+        '100 × 2 × 6 = 1200 — multiply by 2 for each of the 6 periods',
+        '100 × 2⁶ = 6400 — 2 hours = 120 minutes = 6 doubling periods; each period multiplies by 2, so the exponent counts how many times you double: N = N₀ × 2^(t/T₂) where T₂ = 20 min',
+        '100 × 6² = 3600 — square the number of periods',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Data plotted on a log scale (y-axis is log₁₀(y)) shows a straight line. What does this tell you about the relationship?',
+      options: [
+        'The relationship is linear — log scale straightens any curve',
+        'The relationship is exponential — if log(y) = a + bx is linear, then y = 10^(a+bx) = 10^a × (10^b)^x, which is exponential growth. A straight line on a log scale is the signature of exponential growth',
+        'The relationship is logarithmic — y increases as log(x)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'math.log(x) in Python is the NATURAL log (base e), not log₁₀. If you need log base 10, what do you use?',
+      options: [
+        'math.log(x) / 10 — divide by 10 to convert from natural to base-10',
+        'math.log10(x) or equivalently math.log(x) / math.log(10) — the change-of-base formula: log₁₀(x) = ln(x)/ln(10)',
+        'math.ln(x) — Python uses ln for natural log and log for base-10',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why is e ≈ 2.718 the "natural" base for exponentials in calculus and data science?',
+      options: [
+        'e is used because it is close to 2.5, making mental math easier',
+        'The exponential function e^x is the ONLY function equal to its own derivative — d/dx[eˣ] = eˣ. This self-referential property makes differential equations involving e tractable. Continuous growth rates (compound interest, population growth, radioactive decay) naturally produce e as the base when rates are expressed continuously',
+        'e was standardized internationally for scientific computing',
+      ],
+      correct: 1,
+    },
+  ],
 }

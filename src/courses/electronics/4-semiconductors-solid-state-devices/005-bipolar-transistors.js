@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An NPN transistor is driving a relay coil. After measuring VCE = 0.18V with IC = 200 mA, what operating region is the transistor in, and what does this mean for the circuit?',
+      options: [
+        'Active region — VCE of 0.18V is normal for amplification mode',
+        'Saturation — VCE is below 0.3V, meaning the transistor is fully ON with minimal voltage drop, acting as a closed switch',
+        'Cutoff — VCE near zero means no current is flowing through the transistor',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A BJT has β = 150. You need to switch 300 mA through a collector load. What minimum base current must you supply to guarantee the transistor saturates?',
+      options: [
+        '2 mA — IC / β = 300 mA / 150 = 2 mA, but for reliable saturation you should overdrive to at least 10–20 mA',
+        '300 mA — base current must equal collector current to saturate the transistor',
+        '45 A — multiply IC by β to find the required base current',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A transistor switches off a 24V relay coil and immediately fails. No flyback diode was installed. What destroyed the transistor?',
+      options: [
+        'The 24V supply exceeded the transistor\'s voltage rating when the transistor turned off',
+        'When the transistor switched off, the relay coil\'s inductance produced a voltage spike (V = L × dI/dt) of hundreds of volts across the transistor collector-emitter, exceeding its breakdown voltage',
+        'The transistor drew too much current during the relay pull-in surge, exceeding its current rating',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You measure VBE = 0.7V and VCE = 8V on a transistor in a common-emitter circuit with VCC = 12V and RC = 1kΩ. What operating region is this, and what is the collector current?',
+      options: [
+        'Saturation — IC = VCC / RC = 12 mA',
+        'Active region — IC = (VCC − VCE) / RC = (12 − 8) / 1000 = 4 mA',
+        'Cutoff — VCE near supply voltage means no current is flowing',
+      ],
+      correct: 1,
+    },
+  ],
 };

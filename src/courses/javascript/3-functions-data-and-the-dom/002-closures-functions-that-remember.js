@@ -527,5 +527,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What exactly is a closure?',
+      options: [
+        'A function that has been called and finished executing',
+        'A function paired with the scope chain it was created in — it remembers its surrounding variables',
+        'A design pattern for hiding object properties',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You call a factory function twice to create two counters. Each counter has its own independent count. Why?',
+      options: [
+        'Factory functions reset global state on each call',
+        'Each call to the factory creates a fresh scope — each returned function closes over its own separate variables',
+        'The two counters share a closure but read from different indices',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You write a for loop with var i and register a callback inside it. When the callbacks run later, they all see the same value of i. Why?',
+      options: [
+        'var creates a new binding for each loop iteration',
+        'var has function scope — there is only one i shared across all iterations; by the time callbacks run, the loop has finished',
+        'Callbacks always capture the initial value of i',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Memoization uses a closure to cache results. What is the closure holding in this pattern?',
+      options: [
+        'A reference to the calling function so it can be re-run cheaply',
+        'A cache object — the inner function closes over it and checks it before computing a result',
+        'A copy of the entire function argument list from the first call',
+      ],
+      correct: 1,
+    },
+  ],
 };

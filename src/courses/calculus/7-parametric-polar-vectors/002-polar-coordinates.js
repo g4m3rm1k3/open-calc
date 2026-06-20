@@ -210,4 +210,50 @@ export default {
     'attempted-challenge-medium-1',
     'attempted-challenge-medium-2',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The point (r, θ) = (3, π/2) in polar coordinates. What are its Cartesian coordinates?',
+      options: [
+        'x = 3, y = 0 — r=3 is the distance and θ=π/2 points along the x-axis',
+        'x = 0, y = 3 — x = r·cos(θ) = 3·cos(π/2) = 3·0 = 0 and y = r·sin(θ) = 3·sin(π/2) = 3·1 = 3',
+        'x = 3/2, y = 3√3/2 — from the 30-60-90 triangle ratios',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The rose curve r = cos(2θ) has 4 petals. Why does the "2" create 4 petals, not 2?',
+      options: [
+        'The multiplier 2 doubles the number of oscillations of r from 0 to 1 as θ goes from 0 to 2π — each time r goes from 0 to maximum back to 0, a petal traces out; cos(2θ) does this 4 times in one full rotation',
+        'The curve r = cos(θ) has 1 petal, and r = cos(2θ) doubles the petal count by halving the period — 1 × 2² = 4 petals',
+        'Polar roses with n = 2θ always have 4 petals because the cosine function contributes 2 petals and the negative values add 2 more',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Converting r = 2/(1 − sin θ) to Cartesian: what conic section does this represent?',
+      options: [
+        'Circle — r = constant equations become circles in Cartesian coordinates',
+        'Parabola — polar equations of the form r = ed/(1 ± e·sin θ) are conics with eccentricity e. Here e = 1, so the conic is a parabola',
+        'Ellipse — the denominator (1 − sin θ) means the curve is closed, which characterizes ellipses',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why is the polar equation r = 2cos θ a circle, not an open curve?',
+      options: [
+        'All polar equations with r as a function of θ are closed curves',
+        'Converting: r = 2cos θ → r² = 2r·cos θ → x² + y² = 2x → (x−1)² + y² = 1, which is a circle of radius 1 centered at (1, 0) — the polar form conceals the circular nature that becomes obvious in Cartesian form',
+        'The coefficient 2 and the cosine function together force the curve to close at θ = π',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -79,4 +79,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why is AC voltage described as a sine wave rather than some other shape?',
+      options: [
+        'Engineers chose the sine wave because it is the simplest mathematical function',
+        'It is the natural geometric consequence of rotating a coil in a magnetic field — the projected component of circular motion is sinusoidal',
+        'Sine waves are used because they are easier to filter than square or triangle waves',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A 120V AC outlet has 120V RMS. What is the actual peak voltage of that outlet?',
+      options: [
+        '120V — RMS and peak are the same for a sine wave at this frequency',
+        'About 170V — V_peak = V_rms × √2 = 120 × 1.414 ≈ 170V',
+        'About 85V — the peak is lower than RMS because the waveform spends time near zero',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why do VFDs reduce voltage proportionally when they lower frequency for speed control?',
+      options: [
+        'Lower frequency requires lower voltage to prevent the capacitors from overcharging',
+        'Maintaining a constant V/Hz ratio keeps motor magnetic flux constant, preserving torque at reduced speeds',
+        'The IGBT switches in VFDs automatically produce lower voltage at lower frequencies',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why should you use a true-RMS meter (not a standard averaging meter) when measuring VFD output voltage?',
+      options: [
+        'True-RMS meters can measure higher voltages safely',
+        'VFD output is PWM, not a pure sine wave — averaging meters assume a sine and give errors of 5–40% on non-sinusoidal waveforms',
+        'Standard meters cannot measure AC voltages at VFD operating frequencies',
+      ],
+      correct: 1,
+    },
+  ],
 };

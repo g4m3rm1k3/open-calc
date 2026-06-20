@@ -1955,5 +1955,50 @@ export default {
     'auditSystem() = automated drift detection. Zero violations = CI passes. Drift becomes a build error.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Drift is entropy. Governance is the work that fights entropy." A design system has no review process — designers and engineers add tokens ad hoc. What eventually happens?',
+      options: [
+        'The system improves organically as contributors add what they need',
+        'The token count expands without pruning, names conflict, and the system fractures into inconsistent micro-systems — each team drifts to its own conventions',
+        'Performance degrades as token files grow larger',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Token lifecycle: create → use → deprecate (with replacement) → migrate → delete." Why must deprecated tokens include a replacement before removal?',
+      options: [
+        'Deprecated tokens without replacements require consumers to discover the correct alternative themselves — this causes stalled migrations and teams continuing to use the deprecated token indefinitely',
+        'Build tools throw errors on deprecated tokens with no replacement',
+        'Deprecated tokens cannot be compiled until a replacement exists',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Four naming patterns — global semantic (correct), tier+category+property (enterprise)." Why is a name like button-background-color (component) worse than color-surface-interactive (global semantic)?',
+      options: [
+        'Component names are longer and harder to type',
+        'Component names cannot be reused — every new component needs its own token even when the role is identical, proliferating the token count',
+        'Component names are not valid CSS custom property identifiers',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Conway\'s Law: system structure mirrors team structure." A platform team owns tokens, a web team owns components, and a mobile team owns native implementations — all separately. What does Conway\'s Law predict about the resulting design system?',
+      options: [
+        'The three-team split will produce a unified cross-platform system with clear separation of concerns',
+        'The system will fracture along team boundaries — token decisions will not match component needs, and mobile implementations will diverge from web',
+        'Conway\'s Law only applies to software architecture, not design systems',
+      ],
+      correct: 1,
+    },
+  ],
 };

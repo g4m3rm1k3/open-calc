@@ -57,5 +57,50 @@ export default {
     'UI becomes a singular data expression.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Frameworks solve repeating boundaries." What is the core problem a framework like React solves?',
+      options: [
+        'Frameworks prevent all bugs by checking your code at compile time',
+        'Frameworks handle the repetitive work of syncing state to DOM, routing, and component lifecycle — work every app needs but nobody should reimplement',
+        'Frameworks replace the need for JavaScript entirely',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Logic encapsulation drives rapid scaling." What does encapsulation give you as an app grows?',
+      options: [
+        'Faster network requests because logic is bundled more efficiently',
+        'Self-contained units that can be developed, tested, and reused independently — changes inside one unit don\'t break others',
+        'Automatic code splitting so less JavaScript is downloaded',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"UI becomes a singular data expression." What does this mean architecturally?',
+      options: [
+        'You store all data in a single global variable to keep things simple',
+        'The entire UI is derived from data — given the same data, the UI always looks the same, making it predictable and testable',
+        'You can only have one UI component per page',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You are adding a new feature that already exists in a slightly different form elsewhere in the app. What does good abstraction encourage you to do?',
+      options: [
+        'Copy the existing code and modify it — duplication is safer than abstraction',
+        'Extract the shared logic into a reusable component or hook so both features use the same implementation',
+        'Rewrite the existing feature to match the new one',
+      ],
+      correct: 1,
+    },
+  ],
 };

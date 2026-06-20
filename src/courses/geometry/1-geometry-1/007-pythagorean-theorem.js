@@ -662,6 +662,51 @@ export default {
     "Converse: if a²+b²=c², the triangle has a right angle opposite side c.",
   ],
   checkpoints: ["read-intuition"],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"a² + b² = c². Legs a, b; hypotenuse c (opposite the right angle)." A right triangle has legs 3 and 4. What is the hypotenuse?',
+      options: [
+        '7',
+        '5',
+        '√7',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Proof 1: area dissection — same triangles, two arrangements, equal empty area." What does the area-dissection proof tell you about the relationship between the squares on the three sides?',
+      options: [
+        'The sum of the perimeters of the two smaller squares equals the perimeter of the largest square',
+        'The total empty area in both square arrangements is the same — proving the square on the hypotenuse equals the sum of the squares on the legs',
+        'The triangles can be rearranged into any polygon with the same area',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Converse: if a² + b² = c², the triangle has a right angle opposite side c." A triangle has sides 5, 12, 13. Is it a right triangle?',
+      options: [
+        'No — 5+12 ≠ 13',
+        'Yes — 5² + 12² = 25 + 144 = 169 = 13², so by the converse it has a right angle',
+        'Cannot tell without measuring the angles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Proof 3: coordinates → distance formula → squaring gives a² + b² = c²." The distance formula d = √((x₂−x₁)² + (y₂−y₁)²) comes from which idea?',
+      options: [
+        'The midpoint formula applied twice',
+        'The Pythagorean theorem — the horizontal and vertical separations are the legs, and d is the hypotenuse of a right triangle',
+        'The slope formula converted to absolute distance',
+      ],
+      correct: 1,
+    },
+  ],
 };
 export { LESSON_GEO_1_7 };

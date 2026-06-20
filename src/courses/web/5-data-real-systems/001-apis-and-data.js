@@ -58,5 +58,50 @@ export default {
     'Network calls inherently demand Time.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"APIs are defined data contracts." What does this mean for how you use an API?',
+      options: [
+        'You can request any data format and the server will adapt',
+        'The API specifies exactly what you send and what you get back — you must follow the contract or requests will fail',
+        'APIs are informal — the server will infer what you want from context',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"JSON is just stringified tree logic." What is JSON actually?',
+      options: [
+        'A database format used by browsers',
+        'A text format for representing structured data — objects and arrays serialised as a string for transmission',
+        'A JavaScript function for making network requests',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Network calls inherently demand Time." What does this mean for your UI?',
+      options: [
+        'You should block the UI until data arrives to avoid showing stale content',
+        'Data will not arrive instantly — you must handle the loading state and show the user that something is happening',
+        'Network calls are fast enough that loading states are unnecessary',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You receive data from an API as a JSON string. Before you can access its properties, what must you do?',
+      options: [
+        'Nothing — JSON is already a JavaScript object',
+        'Parse it with JSON.parse() to convert the string into an actual JavaScript object',
+        'Decode it using atob() which converts JSON to objects',
+      ],
+      correct: 1,
+    },
+  ],
 };

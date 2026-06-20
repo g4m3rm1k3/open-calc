@@ -245,4 +245,51 @@ export default {
     teaser: 'In calculus, integrals like $\\int \\sin(Bx)\\,dx = -\\cos(Bx)/B + C$ show the frequency $B$ appearing in the denominator — high-frequency functions integrate to small-amplitude functions. This is why rapidly oscillating integrands can cancel out over a period. Understanding the sinusoidal model formula deeply makes derivative and integral formulas for trig functions feel inevitable rather than arbitrary.',
     linkedLessons: ['derivatives-introduction', 'trig-in-calculus'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A ferris wheel has diameter 40m, with the lowest point at 2m height, and period 30 seconds. What is the amplitude A of the sinusoidal model for rider height?',
+      options: [
+        '40 — the full diameter',
+        '20 — the radius; amplitude is the distance from the midline to the maximum. Midline is at 2 + 20 = 22m (center height), maximum is at 42m, minimum at 2m; A = (max - min)/2 = (42 - 2)/2 = 20',
+        '2 — the height of the lowest point',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A sound wave y = 0.002·sin(2π·440·t) models a 440 Hz tone. What role does 2π·440 play?',
+      options: [
+        'It sets the wavelength — how far the wave travels per second',
+        'It is the angular frequency ω = 2πf; 440 Hz means 440 full cycles per second, and each cycle covers 2π radians, giving ω = 2π·440 radians/second. Period T = 1/440 ≈ 0.00227 seconds',
+        'It amplifies the wave — larger coefficients of t increase volume',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'To build a sinusoidal model from data, you find: A = (max-min)/2, D = (max+min)/2, B = 2π/period. What does D represent?',
+      options: [
+        'The delay — how many seconds before the first cycle begins',
+        'The vertical shift (midline) — D is the average of the maximum and minimum values, representing the center value the function oscillates around. Without D, the function would oscillate around y = 0',
+        'The damping coefficient — D controls how quickly the oscillation decays',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Harmonic motion: a spring has position x(t) = 5cos(3t). What is the initial position (t=0) and what happens at t = π/6?',
+      options: [
+        'x(0) = 0 (at rest); x(π/6) = 5 (maximum stretch)',
+        'x(0) = 5cos(0) = 5 (maximum displacement from equilibrium); x(π/6) = 5cos(3·π/6) = 5cos(π/2) = 0 (at the equilibrium position, passing through center)',
+        'x(0) = 5 (maximum); x(π/6) = -5 (minimum on the other side)',
+      ],
+      correct: 1,
+    },
+  ],
 }

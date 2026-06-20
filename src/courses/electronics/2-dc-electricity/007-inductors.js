@@ -85,4 +85,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In DC steady state, an inductor carries constant current. What voltage appears across it?',
+      options: [
+        'V = L × I — the voltage proportional to the current, like a resistor',
+        'Zero — V = L × dI/dt and dI/dt = 0 in steady state, so the inductor looks like a short circuit',
+        'The full supply voltage — inductors block DC current just as they block rapid changes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What happens to the energy stored in an inductor\'s magnetic field when its current is suddenly interrupted?',
+      options: [
+        'The energy dissipates harmlessly as the current falls to zero',
+        'The inductor generates a flyback voltage spike to maintain current flow — this spike can be thousands of volts and destroys unprotected transistor outputs',
+        'The energy transfers to the capacitor of the nearest parallel circuit',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A flyback diode is placed in antiparallel (reverse) across a relay coil driven by a PLC transistor output. During normal relay operation, what does the diode do?',
+      options: [
+        'The diode conducts and limits the relay current to a safe level',
+        'The diode is reverse-biased and conducts nothing — it only activates during the flyback spike when the transistor switches off',
+        'The diode absorbs the extra voltage that the PLC output produces beyond 24V',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'How does an inductor differ from a capacitor in terms of what quantity it resists changing?',
+      options: [
+        'An inductor resists changes in voltage; a capacitor resists changes in current',
+        'An inductor resists changes in current (V = L × dI/dt); a capacitor resists changes in voltage (I = C × dV/dt) — they are electrical duals',
+        'Both resist changes in voltage; the difference is only in how much energy they store',
+      ],
+      correct: 1,
+    },
+  ],
 };

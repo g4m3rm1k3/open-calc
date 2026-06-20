@@ -747,7 +747,52 @@ export default {
     'Three.js: TextureLoader().load() → uniforms.uTex.value = tex → texture(uTex, vUv) in GLSL.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"UV (0,0) = bottom-left, (1,1) = top-right in WebGL." A texture coordinate of (0.5, 1.0) maps to which part of the texture?',
+      options: [
+        'The center of the texture',
+        'The top-center of the texture (halfway across, at the top edge)',
+        'The bottom-center of the texture',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Wrapping: REPEAT tiles, CLAMP_TO_EDGE stretches edge pixel." A UV coordinate exceeds 1.0 (e.g., 1.5). What does REPEAT produce?',
+      options: [
+        'An error — UV values must stay in 0–1',
+        'The texture tiles — 1.5 maps to 0.5, sampling halfway into the repeated tile',
+        'The edge colour is returned',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Filtering: NEAREST = pixelated. LINEAR_MIPMAP_LINEAR = trilinear, best quality." When would you intentionally choose NEAREST filtering?',
+      options: [
+        'For photorealistic textures on curved surfaces',
+        'For pixel art or retro aesthetics where sharp, blocky pixels are desired — blurring would ruin the look',
+        'For textures that are very small',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"generateMipmap after upload." What problem do mipmaps solve?',
+      options: [
+        'They compress textures to save VRAM',
+        'When a textured surface is far away, sampling the full-resolution texture causes aliasing (sparkle). Mipmaps pre-compute smaller versions the GPU selects at appropriate distances',
+        'They allow textures to be larger than GPU memory',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_2_0 };

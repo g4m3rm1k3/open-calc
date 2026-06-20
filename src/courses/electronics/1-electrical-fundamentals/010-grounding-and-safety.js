@@ -120,4 +120,50 @@ export default {
       difficulty: 'hard',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A live conductor contacts an ungrounded metal panel. A person touches the panel while standing on a concrete floor. Why is this dangerous when the same situation with a grounded panel would not be?',
+      options: [
+        'Grounding adds resistance to the circuit, limiting current through the person',
+        'Without grounding the panel floats at line voltage; the person becomes the fault path. With grounding, fault current flows through the low-resistance ground wire and trips the breaker before the person is harmed',
+        'Grounded panels have lower voltage because grounding dissipates electrical energy',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You power down a machine with a VFD by opening the main disconnect. Why is it still dangerous to immediately open the drive cabinet?',
+      options: [
+        'The motor can spin backward and re-energize the drive through regeneration',
+        'DC bus capacitors inside the drive remain charged to ~680V and take several minutes to discharge through internal bleed resistors',
+        'Opening the disconnect creates a voltage spike in the drive that persists for several seconds',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why does each worker apply their own personal padlock during LOTO, rather than using one shared lock?',
+      options: [
+        'Multiple locks provide higher current-carrying capacity in the grounding path',
+        'Each person\'s lock gives them a physical veto — no one else can remove their lock, so the equipment cannot be re-energized while they are still working inside',
+        'OSHA regulations require the number of locks to equal the number of isolation points',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Arc flash is not the same hazard as electric shock. What makes arc flash uniquely dangerous?',
+      options: [
+        'Arc flash travels through insulated gloves because the insulation melts instantly',
+        'Arc flash creates a plasma explosion reaching ~35,000°F along with a pressure wave, UV/IR radiation, and vaporized metal — PPE is rated in cal/cm² not voltage',
+        'Arc flash affects only AC circuits; DC systems cannot produce arc flash events',
+      ],
+      correct: 1,
+    },
+  ],
 };

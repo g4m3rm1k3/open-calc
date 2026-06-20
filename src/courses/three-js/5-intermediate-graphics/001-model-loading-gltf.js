@@ -451,7 +451,52 @@ export default {
   challenges: [],
   mentalModel: ['glTF: JSON+binary. GLTFLoader.loadAsync() → gltf.scene. traverse(child=>child.isMesh). InstancedMesh(geo,mat,count)+setMatrixAt() = N objects, 1 draw call.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"GLTFLoader.loadAsync() → gltf.scene. traverse(child => child.isMesh)." Why traverse instead of using gltf.scene directly?',
+      options: [
+        'gltf.scene is not accessible directly',
+        'A glTF file contains a scene graph with groups, lights, cameras, and meshes mixed together. traversing lets you find and operate on only the mesh nodes',
+        'traverse runs faster than accessing gltf.scene',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"InstancedMesh(geo, mat, count) + setMatrixAt() = N objects, 1 draw call." What problem does InstancedMesh solve?',
+      options: [
+        'It allows different materials on each instance',
+        'Drawing 1000 separate meshes issues 1000 draw calls — the CPU-GPU overhead dominates. InstancedMesh batches all instances into a single draw call, dramatically reducing overhead',
+        'It automatically generates LODs for distant instances',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"glTF: JSON + binary." What is stored in the binary (.bin) file of a glTF?',
+      options: [
+        'The material definitions and texture filenames',
+        'Vertex buffers, index buffers, and animation data — the dense numeric arrays that would be large and slow to parse as JSON',
+        'The shader source code',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'After calling GLTFLoader.load(), you want to enable shadow casting on all loaded meshes. Where in the code do you do this?',
+      options: [
+        'Before calling load() — pass a shadow config to the loader',
+        'Inside the onLoad callback, traverse the loaded gltf.scene and set mesh.castShadow = true on each mesh node',
+        'After adding gltf.scene to the scene, Three.js applies shadows automatically',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_4_0 }

@@ -388,4 +388,51 @@ for doc in result:
     "Aggregation pipeline = SQL's GROUP BY / JOIN chain expressed as document transforms",
     "$lookup is expensive — if you use it on every read, rethink your schema",
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A blog post has comments. When should comments be embedded in the post document rather than stored in a separate collection?',
+      options: [
+        'Always embed — fetching related data in one trip is always faster',
+        'Embed when comments are always read with the post, are bounded in count (a few dozen), and never queried independently. Reference them if posts can have thousands of comments (unbounded growth) or if you need queries like "all comments by user X across all posts" — that query requires a separate collection',
+        'Embed only when using MongoDB; reference for all other document stores',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Denormalization deliberately duplicates data (e.g., storing user name inside every order document) for read performance. What operational burden does this create?',
+      options: [
+        'Read queries become twice as slow because two copies must be checked',
+        'When data changes (user renames themselves), every document that contains the duplicate must be updated. If a user\'s name appears in 10,000 orders, all 10,000 must be updated atomically — or you accept stale denormalized data. The tradeoff is fast reads at the cost of expensive, multi-document writes',
+        'Denormalization violates MongoDB\'s consistency guarantees',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'MongoDB\'s aggregation pipeline stages (match → group → project) replace which SQL constructs?',
+      options: [
+        'It replaces CREATE TABLE, INSERT, and UPDATE',
+        'match = WHERE, group = GROUP BY (with aggregate functions like sum/count/avg), project = SELECT (choosing/transforming fields), sort = ORDER BY, limit = LIMIT. The pipeline expresses the same analytical query as SQL but as a series of document transforms rather than declarative clauses',
+        'It replaces foreign keys and JOIN operations only',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '$lookup (MongoDB\'s join) is described as expensive. Why is a join expensive in a distributed document database when it is cheap in a single-node relational database?',
+      options: [
+        'MongoDB does not have query optimization, so joins always scan the full collection',
+        'A SQL database co-locates related tables on one server with optimized B-tree indexes and query planner statistics. MongoDB\'s $lookup must scan (or index-scan) a second collection and may involve a network round-trip if collections are on different shards. The document model is designed around the assumption that you embed what belongs together — $lookup signals a schema that fights the model',
+        'JavaScript is slower than SQL for join operations',
+      ],
+      correct: 1,
+    },
+  ],
 };

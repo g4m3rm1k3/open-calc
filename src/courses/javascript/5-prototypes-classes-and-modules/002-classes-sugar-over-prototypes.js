@@ -531,5 +531,50 @@ export default {
     'get/set create computed properties that look like plain access but run code.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'JavaScript classes were introduced in ES6. What new runtime mechanism do they add?',
+      options: [
+        'A new object model separate from prototypes',
+        'No new mechanism — class is syntactic sugar that still compiles to constructor functions and prototype chains',
+        'A real class system that prevents prototype manipulation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A child class extends a parent. What must the child constructor call before using "this"?',
+      options: [
+        'this.init() — a method inherited from the parent',
+        'super() — it calls the parent constructor and sets up the inherited properties before "this" is accessible',
+        'Object.assign(this, parent) — manually copying parent properties',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You declare a field with # prefix: #count = 0. Where can this field be accessed?',
+      options: [
+        'Anywhere — # just signals it should not be modified externally by convention',
+        'Only inside the class body — private fields are enforced by the JavaScript engine, not just convention',
+        'Only inside the constructor — private fields cannot be read in methods',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the difference between a static method and an instance method in a class?',
+      options: [
+        'Static methods are faster; instance methods are slower',
+        'Static methods live on the class itself and cannot access "this" (the instance); instance methods are called on individual objects',
+        'There is no difference — "static" is just documentation metadata',
+      ],
+      correct: 1,
+    },
+  ],
 };

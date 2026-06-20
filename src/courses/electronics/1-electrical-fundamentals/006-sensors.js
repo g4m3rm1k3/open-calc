@@ -120,4 +120,50 @@ export default {
       difficulty: 'hard',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An inductive proximity sensor is rated for an 8mm sensing distance with mild steel. You swap to detecting aluminum parts. Why might detection become unreliable at 6mm?',
+      options: [
+        'Aluminum reflects the sensor\'s electromagnetic field instead of absorbing it, reversing the output signal',
+        'Aluminum has lower conductivity than steel, so it induces fewer eddy currents and the effective sensing distance drops to roughly 40% of the steel rating',
+        'Inductive sensors only detect ferrous metals and will never detect aluminum at any distance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A 4–20mA pressure sensor (range 0–100 bar) reads 12mA. What is the pressure?',
+      options: [
+        '60 bar — 12mA is 60% of the 20mA maximum',
+        '50 bar — 12mA is the midpoint of the 4–20mA span, which maps to 50% of range',
+        '75 bar — subtract 4mA baseline and divide by the remaining range',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You replace an NPN proximity sensor with a physically identical PNP model. The machine faults even though the sensor detects targets correctly. What is the most likely cause?',
+      options: [
+        'The PNP sensor requires a higher supply voltage than the NPN model did',
+        'The PLC input card expects an NPN signal (pulled to 0V when active), but the PNP sensor pulls the signal to +24V — the logic is inverted',
+        'The PNP sensor\'s output current is too high for the PLC input, overloading it',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A 4–20mA analog signal is preferred over a 0–10V signal for long cable runs. What is the key advantage?',
+      options: [
+        'Current signals have a lower impedance, making them less sensitive to electromagnetic interference',
+        'Current is the same at every point in a series circuit, so cable resistance causes no measurement error the way a voltage drop would',
+        '4–20mA transmitters consume less power than voltage-output sensors',
+      ],
+      correct: 1,
+    },
+  ],
 };

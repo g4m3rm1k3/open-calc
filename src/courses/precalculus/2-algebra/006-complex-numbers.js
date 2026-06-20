@@ -230,4 +230,51 @@ export default {
     teaser: 'In calculus, complex exponentials $e^{i\\theta}$ are used in Fourier series and Laplace transforms. The solutions to second-order differential equations with negative discriminant are complex exponentials — which correspond to oscillatory (sinusoidal) behaviour. Understanding complex numbers means understanding oscillation.',
     linkedLessons: ['trig-identities-deep-dive'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'i² = -1. Why was inventing i necessary rather than just declaring √(-1) undefined?',
+      options: [
+        'To make calculators work with negative square roots',
+        'Without i, polynomial equations like x² + 1 = 0 have no solutions — the algebra is "incomplete." Introducing i creates the complex numbers where EVERY polynomial has roots (Fundamental Theorem of Algebra). Declaring negative square roots undefined would leave vast classes of equations unsolvable',
+        'i was invented to simplify trigonometry formulas in the 17th century',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'To divide complex numbers, you multiply numerator and denominator by the conjugate of the denominator. Why the conjugate?',
+      options: [
+        'The conjugate has the same modulus as the denominator, so division preserves length',
+        '(a+bi)(a-bi) = a² + b² — a real number with no imaginary part. Multiplying by the conjugate converts the denominator to a real number, making division straightforward since dividing by a real is just dividing each component',
+        'The conjugate rule only applies when the denominator is purely imaginary',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Complex number z = a + bi has modulus |z| = √(a²+b²). Geometrically, what does |z| represent?',
+      options: [
+        'The imaginary part of z measured on the vertical axis',
+        'The distance from the origin to point (a,b) in the complex plane — the complex plane identifies a+bi with the coordinate (a,b), and |z| is the Euclidean distance from (0,0) to (a,b)',
+        'The real part a, since the imaginary part does not contribute to the magnitude',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The complex conjugate of a+bi is a-bi. If z is a root of a polynomial with REAL coefficients, what can you conclude?',
+      options: [
+        'The conjugate a-bi is also a root — complex roots of real polynomials always come in conjugate pairs; this follows from the fact that if you substitute z̄ into the polynomial and take the conjugate of the whole equation, you get P(z̄) = P̄(z) = 0',
+        'The polynomial must factor completely over the reals with no complex roots',
+        'Nothing — conjugates are only relevant for division, not for polynomial roots',
+      ],
+      correct: 0,
+    },
+  ],
 }

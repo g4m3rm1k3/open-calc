@@ -57,4 +57,50 @@ res
     '.pivot_table() — two-dimensional GroupBy: rows and columns both group.',
     '.resample("M") — time-based groupby by period (month, week, year).',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'df.groupby("department")["salary"].mean() computes what?',
+      options: [
+        'The mean salary across all employees in the entire company',
+        'The mean salary for each department separately — groupby splits the DataFrame into groups by "department", then .mean() is applied independently to each group\'s "salary" values, returning one mean per department',
+        'The department with the highest mean salary',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'df.groupby("city").agg({"sales": "sum", "customers": "count"}). What does this produce?',
+      options: [
+        'Two separate DataFrames — one with total sales and one with customer counts',
+        'One DataFrame with one row per city, showing total sales and customer count for each city — .agg() applies different aggregation functions to different columns simultaneously',
+        'The ratio of sales to customers for each city',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The split-apply-combine pattern: what are the three steps?',
+      options: [
+        'Filter rows → sort values → reset index — the standard three-step data pipeline',
+        'Split the data into groups by a key column → apply an aggregation function to each group independently → combine the group results back into a single output DataFrame',
+        'Load data → transform columns → export results',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'df.groupby(["region", "product"])["revenue"].sum() — what level of breakdown does this give?',
+      options: [
+        'One row per region showing total revenue',
+        'One row per (region, product) combination — grouping by multiple columns creates a multi-level index; you get total revenue for every unique region + product pair',
+        'One row per product showing revenue summed across all regions',
+      ],
+      correct: 1,
+    },
+  ],
 }

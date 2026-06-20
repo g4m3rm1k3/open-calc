@@ -1067,5 +1067,50 @@ export default {
         'rAF fires before each browser repaint (~60fps). Use for smooth JS-driven visual updates.',
     ],
     checkpoints: ['read-intuition'],
-    quiz: [],
+    quiz: [
+      {
+        id: 'q1',
+        type: 'choice',
+        text: '"CSS transition: property + duration + easing declared in CSS. JS just changes the value." Why keep the transition definition in CSS rather than JS?',
+        options: [
+          'CSS transitions run on the GPU; JS transitions do not',
+          'Separation of concerns — CSS owns visual behaviour; JS only triggers state changes. The CSS can be tweaked or disabled without touching game logic',
+          'JS cannot define transition durations',
+        ],
+        correct: 1,
+      },
+      {
+        id: 'q2',
+        type: 'choice',
+        text: '"@keyframes: applied via a class. Removed after duration." Why must you remove the animation class after the animation completes?',
+        options: [
+          'CSS animations that stay active prevent new animations from starting on the same element',
+          'The class keeps the element frozen in its final animation frame — removing it lets the element return to normal and allows the same animation to be triggered again',
+          'Animations consume memory until their class is removed',
+        ],
+        correct: 1,
+      },
+      {
+        id: 'q3',
+        type: 'choice',
+        text: '"classList.add → animation plays. setTimeout(300) → classList.remove." What happens if you call classList.add again before the 300ms setTimeout fires?',
+        options: [
+          'The animation restarts from the beginning',
+          'Nothing visible — the class is already present; the animation does not re-trigger until the class is removed and re-added',
+          'The two animations play simultaneously',
+        ],
+        correct: 1,
+      },
+      {
+        id: 'q4',
+        type: 'choice',
+        text: '"Sequencing: stop() → flash rows → callback: clearLines + updateScore + spawnNext + start()." Why stop the game loop before the flash animation?',
+        options: [
+          'Animations cannot run while setInterval is active',
+          'The game must pause during the flash so pieces don\'t continue falling while lines are being cleared — starting the loop again in the callback resumes after clearing is complete',
+          'Stopping the loop prevents score from incrementing during the animation',
+        ],
+        correct: 1,
+      },
+    ],
 };

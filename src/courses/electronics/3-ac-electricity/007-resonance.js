@@ -68,4 +68,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'At series resonance, what happens to the impedance of a series RLC circuit?',
+      options: [
+        'Impedance reaches its maximum — reactive components combine to block current',
+        'Impedance reaches its minimum value Z = R — XL and XC cancel, leaving only resistance',
+        'Impedance becomes zero — the circuit is a short circuit at resonance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A series resonant circuit has Q = 50. The supply voltage is 10V. What voltage appears across the inductor at resonance?',
+      options: [
+        '10V — the inductor sees the same voltage as the source at resonance',
+        '500V — V_L = Q × V_s = 50 × 10 = 500V at resonance',
+        '0.2V — the voltage divides inversely with Q',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'An FM radio tuner needs to separate 101.1 MHz from a station 200 kHz away. What Q factor is needed?',
+      options: [
+        'Q = 200 — bandwidth must equal the station separation',
+        'Q = 505 — Q = f₀/BW = 101.1MHz/0.2MHz = 505.5',
+        'Q = 0.002 — divide bandwidth by center frequency',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'For a parallel LC tank circuit at resonance, what is the source current at minimum while large current circulates internally?',
+      options: [
+        'This cannot happen — current must be the same everywhere in a closed circuit',
+        'At resonance, inductive and capacitive currents cancel in the source, so the source only supplies resistive losses while Q times that current circulates in the LC tank',
+        'The tank circuit draws maximum source current at resonance because impedance is minimum',
+      ],
+      correct: 1,
+    },
+  ],
 };

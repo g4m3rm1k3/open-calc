@@ -850,5 +850,50 @@ export default {
     'NAND > NOR speed: parallel PMOS (NAND) is faster than series PMOS (NOR).',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"NAND output LOW only when ALL inputs HIGH." NAND with inputs A=1, B=0. What is the output?',
+      options: [
+        '0 — at least one input is low',
+        '1 — not all inputs are HIGH, so NAND outputs 1',
+        'Undefined — mixed inputs cause NAND to float',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Universal gate: NOT = NAND(A,A)." Why does connecting both inputs of a NAND gate together produce a NOT gate?',
+      options: [
+        'When both inputs are the same signal A, the output is NAND(A,A) = NOT(A AND A) = NOT(A)',
+        'Shorting inputs cancels one input, leaving only the complement',
+        'NAND with identical inputs averages them, producing the inverse',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"De Morgan: bubble on output pushes through and splits into two input bubbles, changing AND↔OR." De Morgan says NOT(A AND B) equals what?',
+      options: [
+        'NOT(A) AND NOT(B)',
+        'NOT(A) OR NOT(B)',
+        'NOT(A) AND B',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"NAND is faster than NOR in CMOS." Why does a NAND gate have faster high-to-low output than a NOR gate?',
+      options: [
+        'NAND uses fewer transistors than NOR',
+        'NAND\'s pull-down network has NMOS transistors in series (slow); NOR\'s pull-up has PMOS in series — wait, actually NAND pulls HIGH via parallel PMOS (fast), while NOR pulls HIGH via series PMOS (slow)',
+        'NAND switches less voltage than NOR',
+      ],
+      correct: 1,
+    },
+  ],
 };

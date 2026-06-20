@@ -60,5 +60,50 @@ export default {
     'Black-box logic scales architectures.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Functions map inputs to outputs." What does this mean for writing reliable code?',
+      options: [
+        'Functions should only do one thing — take inputs, compute, and return an output predictably',
+        'Functions must always accept at least one argument',
+        'Functions should never return a value — they should modify the DOM instead',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Scope protects memory mutations." A variable declared inside a function — can code outside the function read it?',
+      options: [
+        'Yes — all variables are globally accessible in JavaScript',
+        'No — the variable is scoped to the function and invisible to outside code',
+        'Only if the function is declared with const',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Black-box logic scales architectures." What does treating a function as a black box mean for how you use it?',
+      options: [
+        'You must read the function body before calling it',
+        'You only need to know what it takes as input and what it returns — the internal implementation does not matter to the caller',
+        'Black-box functions cannot be tested',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You write the same calculation in five different places in your code. Why is extracting it into a function better?',
+      options: [
+        'Functions run faster than inline code',
+        'The logic lives in one place — when it needs to change, you change it once; inline repetition means changing it everywhere',
+        'Functions are required by the browser for multi-step calculations',
+      ],
+      correct: 1,
+    },
+  ],
 };

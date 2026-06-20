@@ -1555,5 +1555,50 @@ export default {
     'Same system in CSS (custom properties), Qt (setSpacing/setContentsMargins), Unity (RectOffset), everywhere.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"One base unit (4px). Eight tokens. No other values." A designer proposes using 6px gap in a new component. What should happen?',
+      options: [
+        'Use 6px — it falls between the tokens so it is fine',
+        'Reject it — 6px is off-grid. Snap to the nearest token (either 4px or 8px)',
+        'Use 6px only if the component is small',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Proximity rule: between-group gap ≥ 2.5× within-group gap." A card has label-value pairs spaced 8px apart. What minimum gap separates the card sections?',
+      options: [
+        '16px',
+        '20px (2.5× of 8)',
+        '24px',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Negative space carries weight, creates sections, controls reading speed." A dense information panel feels overwhelming. Which spacing fix would help most?',
+      options: [
+        'Reduce font size to fit more content in the same space',
+        'Increase gaps between unrelated sections so the eye can pause between groups',
+        'Add more colour to break up the content visually',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Squish token: horizontal padding > vertical padding." When is squish appropriate?',
+      options: [
+        'For decorative elements where appearance matters more than function',
+        'For compact interactive elements like chips, tags, and tight buttons — it gives them enough vertical breathing room without becoming too tall',
+        'For mobile layouts where vertical space is limited',
+      ],
+      correct: 1,
+    },
+  ],
 };

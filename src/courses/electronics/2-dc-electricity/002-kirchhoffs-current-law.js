@@ -90,4 +90,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What physical principle does KCL express?',
+      options: [
+        'Conservation of energy — voltage rises must equal voltage drops around any loop',
+        'Conservation of charge — charge cannot accumulate at a node, so all current entering must exit',
+        'Ohm\'s Law — current at each node is determined by the node voltage divided by resistance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A 24VDC bus feeds 12 solenoids at 120mA each, a PLC at 400mA, and 6 indicator lights at 20mA each. What current must the main supply fuse handle?',
+      options: [
+        '120mA — the fuse only needs to handle the largest single branch current',
+        '1.96A — KCL says the supply wire carries the sum of all branch currents: (12×120) + 400 + (6×20) = 1960mA',
+        '2.4A — you must add a 25% safety factor to all parallel branch currents',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Total current of 6A splits between two parallel branches: R1 = 10Ω and R2 = 30Ω. How much current flows through R1?',
+      options: [
+        '1.5A — R1 is one-third of the total resistance so it gets one-third of the current',
+        '4.5A — the branch with lower resistance gets more current; I1 = 6 × (30/(10+30))',
+        '3A — current always splits equally between two parallel branches',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You add a new parallel device to a 24VDC bus. What happens to the voltage across existing devices?',
+      options: [
+        'The voltage drops slightly because the new device shares the supply voltage with the others',
+        'The voltage stays the same — each parallel branch still has the full supply voltage across it, though total supply current increases',
+        'The voltage increases because the supply compensates for the lower total resistance',
+      ],
+      correct: 1,
+    },
+  ],
 };

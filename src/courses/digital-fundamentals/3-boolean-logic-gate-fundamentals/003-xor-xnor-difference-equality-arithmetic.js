@@ -913,5 +913,50 @@ export default {
     'Self-inverse: applying XOR twice with same key/mask undoes itself. Foundation of encryption.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"XOR = are they different? XNOR = are they the same?" XOR with A=1, B=1. What is the output and what does it mean?',
+      options: [
+        '1 — both are HIGH so they match',
+        '0 — the inputs are the same, so XOR (difference detector) outputs 0',
+        '1 — at least one input is 1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"XOR(A,B) = Sum bit. AND(A,B) = Carry bit." When you add 1+1 in binary, what are the Sum and Carry outputs?',
+      options: [
+        'Sum=1, Carry=0',
+        'Sum=0, Carry=1',
+        'Sum=1, Carry=1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Parity: XOR all N bits. Result = 1 if odd number of 1s." The bits 1,0,1,1 have what parity, and what even-parity bit would you append?',
+      options: [
+        'Odd parity (three 1s) — append 1 to make even parity',
+        'Even parity — append 0',
+        'Odd parity — append 0 to make even parity',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Self-inverse: XOR with same key twice restores original." You XOR byte 0xA5 with key 0xFF. Then XOR the result with 0xFF again. What do you get?',
+      options: [
+        '0x00 — XOR with all ones zeroes everything',
+        '0xA5 — the original byte is restored',
+        '0xFF — the key dominates',
+      ],
+      correct: 1,
+    },
+  ],
 };

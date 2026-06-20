@@ -293,4 +293,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What property makes a relation qualify as a function?',
+      options: [
+        'Each output value must correspond to exactly one input value (the relation is one-to-one)',
+        'Each input value must correspond to exactly one output value — the vertical line test: any vertical line hits the graph at most once',
+        'The domain and range must be the same set',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'If f(x) = x², what is f(x + 1) − f(x)?',
+      options: [
+        '1 — you subtract the input 1 from itself after applying f',
+        '2x + 1 — because (x+1)² − x² = x² + 2x + 1 − x² = 2x + 1',
+        '2x — the derivative of x² is 2x, which gives the difference',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is f(a + b) ≠ f(a) + f(b) in general?',
+      options: [
+        'Functions are always defined on disjoint domains so you cannot add inputs',
+        'Additivity f(a+b) = f(a)+f(b) only holds for linear functions f(x) = cx; for nonlinear functions like f(x) = x², (a+b)² ≠ a² + b²',
+        'The notation f(a + b) means f evaluated at the product a·b, not the sum',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A function is called even if f(−x) = f(x) for all x in its domain. Which of these is even?',
+      options: [
+        'f(x) = x³ — because odd powers flip sign symmetrically around the origin',
+        'f(x) = x² — because (−x)² = x², so the graph is symmetric about the y-axis',
+        'f(x) = x + 1 — because the +1 makes both sides equal when x = 0',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -496,4 +496,51 @@ def deep_copy_matrix(matrix):
       hint: 'A shallow copy of a 2D list copies the outer list but shares references to the inner lists. Use list comprehension with row[:] or Python\'s copy.deepcopy().',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In Python, `b = a` for a list does NOT create a copy. After `b.append(4)`, what happens to `a`?',
+      options: [
+        'a is unchanged — b is a separate list',
+        'a also gains the element 4. Both variables point to the same list object in memory. Assignment copies the reference, not the data. Mutating through either name affects the one shared list',
+        'a is set to None because it lost its reference',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A shallow copy of `[[1,2],[3,4]]` creates a new outer list. If you modify the inner list `copy[0].append(99)`, what happens to the original?',
+      options: [
+        'Nothing — the shallow copy protects all nested data',
+        'The original\'s inner list also gets 99 appended. The shallow copy created a new outer list but the inner lists are still the same objects (shared references). Only a deep copy creates new inner lists too',
+        'The original outer list is also modified',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Python integers and strings are immutable. When you do `x = 5; x = x + 1`, what happens in memory?',
+      options: [
+        'The integer object at x\'s location changes from 5 to 6',
+        'A new integer object with value 6 is created and x is rebound to point at it. The old integer object 5 is unchanged — other variables pointing to 5 are unaffected. Immutability means the object never changes; instead, new objects are created',
+        'x becomes a float because addition creates a new type',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The call stack grows with each function call and shrinks when functions return. What happens if recursion is too deep?',
+      options: [
+        'Python automatically converts deep recursion to iteration',
+        'A RecursionError (stack overflow): each frame consumes memory and Python\'s default limit is ~1000 frames. If the base case is never reached or the input is too large, the stack fills up and Python raises an error. Iterative solutions with an explicit stack avoid this limit',
+        'The function silently returns None after the limit is reached',
+      ],
+      correct: 1,
+    },
+  ],
 };

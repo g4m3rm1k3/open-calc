@@ -940,4 +940,51 @@ function update(deltaTime) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The game tracks state in a single variable: `gameState = "rolling" | "settling" | "scored"`. What problem does a state machine solve compared to many boolean flags?',
+      options: [
+        'State machines are faster than if/else chains with booleans',
+        'Multiple booleans can contradict each other (isRolling=true and isSettling=true simultaneously) and make every state transition require updating several flags in sync. A single state variable makes the current mode unambiguous — exactly one state is active, and transitions are explicit assignments. No invalid combinations are possible',
+        'Boolean flags cannot represent more than two states',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The "settling" phase waits until all pin velocities drop below STOP_SPEED before displaying the score. Why wait rather than showing the score immediately on collision?',
+      options: [
+        'Three.js renders scores asynchronously',
+        'Pins are still moving after impact — some that looked like they would fall might wobble and stay up, or chain-react and knock down more pins. Counting knocked-down pins while motion is ongoing gives an incorrect count. Waiting for the scene to fully settle (all motion stopped) gives the final accurate score',
+        'The score display blocks the physics update',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Between throws, only the ball position resets. Between frames (after 2 throws), everything resets. Why do these two resets differ in scope?',
+      options: [
+        'The browser\'s garbage collector requires a full reset between frames',
+        'A frame in bowling is 2 throws at the same 10 pins (unless a strike). After throw 1, the ball resets but standing pins remain for throw 2. After both throws, the frame is complete and all 10 pins reset to their starting positions for the next frame. The scope mirrors the actual rules of the game',
+        'Resetting everything between throws is too expensive at 60fps',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The capstone combines scene setup, camera follow, vectors, dot/cross product coloring, collision detection, and physics response. Which lesson provides the pattern that makes `update()` readable despite all this complexity?',
+      options: [
+        'Lesson 4 (dot product) — coloring reduces the visual complexity',
+        'Lesson 7 of the function plotter series (separate data from rendering) — but more specifically, the state machine from this lesson: each `if (gameState === "rolling")` block handles only one concern. The update loop reads as a clean sequence of guarded sections rather than a tangle of nested conditions',
+        'There is no pattern — complex simulations always have complex update() functions',
+      ],
+      correct: 1,
+    },
+  ],
 }

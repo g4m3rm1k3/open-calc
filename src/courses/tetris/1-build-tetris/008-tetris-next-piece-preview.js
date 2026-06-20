@@ -978,5 +978,50 @@ export default {
         'Flexbox: display:flex on outer (row), display:flex;flex-direction:column on side panel.',
     ],
     checkpoints: ['read-intuition'],
-    quiz: [],
+    quiz: [
+      {
+        id: 'q1',
+        type: 'choice',
+        text: '"7-bag: one of each piece per bag, shuffled. Never more than 12 pieces between any specific piece." Why use a 7-bag instead of purely random selection?',
+        options: [
+          'Pure random can produce long droughts of one piece type — the bag guarantees each piece appears at least once every 7 draws',
+          'Pure random is slower to compute than the bag system',
+          'The 7-bag system is required by the official Tetris guidelines',
+        ],
+        correct: 0,
+      },
+      {
+        id: 'q2',
+        type: 'choice',
+        text: '"Fisher-Yates: for i from end to 1, swap arr[i] with random arr[0..i]. The correct shuffle." Why is Fisher-Yates unbiased?',
+        options: [
+          'It runs in O(n) time, which guarantees equal probability',
+          'Each element gets exactly one chance to be placed at each position — the probability of any permutation is 1/n!, which is mathematically uniform',
+          'It uses a cryptographic random number generator',
+        ],
+        correct: 1,
+      },
+      {
+        id: 'q3',
+        type: 'choice',
+        text: '"Queue: shift() to consume. [0] to peek." What is the difference between queue[0] and queue.shift()?',
+        options: [
+          'queue[0] reads the first element without removing it; queue.shift() removes and returns it',
+          'Both remove the first element — queue[0] just returns it without the side effect',
+          'queue.shift() reads the last element; queue[0] reads the first',
+        ],
+        correct: 0,
+      },
+      {
+        id: 'q4',
+        type: 'choice',
+        text: '"Refill when length < 7." Why refill the queue when there are fewer than 7 pieces remaining rather than when it is empty?',
+        options: [
+          'To ensure the preview display always has a piece ready to show without waiting for a refill',
+          'Refilling when < 7 keeps at least one full bag\'s worth of pieces buffered, ensuring the preview can always show the next piece',
+          'The queue breaks if it goes below 7',
+        ],
+        correct: 1,
+      },
+    ],
 };

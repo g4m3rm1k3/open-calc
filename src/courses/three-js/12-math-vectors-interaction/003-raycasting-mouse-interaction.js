@@ -549,5 +549,50 @@ export default {
     'raycaster.layers: exclude helpers/grid from picking without a separate pickable array.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Pipeline: pixel → NDC → setFromCamera → ray in world space → intersectObjects → hit records." Why must mouse pixel coordinates be converted to NDC before raycasting?',
+      options: [
+        'NDC is the coordinate space the GPU uses for all calculations',
+        'setFromCamera expects coordinates in NDC (−1 to +1 range) to correctly unproject through the camera\'s view and projection matrices into world space',
+        'Pixel coordinates cannot be used in JavaScript',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"intersects[0] = closest hit." You call raycaster.intersectObjects(meshes) and get 3 results. Which result should you use for picking?',
+      options: [
+        'The last result — it is the most recently processed',
+        'The first result (intersects[0]) — results are sorted by distance, closest first. This is the visible object the user clicked',
+        'All results — combine them for accurate picking',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Drag along plane: raycast against a THREE.Plane on mousemove." Why use a Plane instead of re-raycasting against the mesh during drag?',
+      options: [
+        'Plane raycasting is more accurate than mesh raycasting',
+        'During drag, the cursor may move off the mesh — raycasting against a Plane gives stable, continuous hit points even when the cursor is not directly over the object',
+        'Mesh raycasting is not supported during mouse move events',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"raycaster.layers: exclude helpers/grid from picking without a separate pickable array." How do layers work for this exclusion?',
+      options: [
+        'Layers filter by Z depth — objects on a higher layer are picked first',
+        'You assign helper objects to a layer not included in raycaster.layers.mask. The raycaster skips any object whose layer bits do not intersect the mask, so helpers are never returned as hits',
+        'Layers can only be used for visibility, not raycasting',
+      ],
+      correct: 1,
+    },
+  ],
 }

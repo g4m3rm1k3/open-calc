@@ -144,5 +144,50 @@ p  { color: #94a3b8; margin: 6px 0; font-size: 14px; }`,
     'The renderer translates tree paths into 2D boxes.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A web page is described as a "strict hierarchy of data nodes." What does this mean in practice?',
+      options: [
+        'Every element is independent — there are no parent/child relationships',
+        'Elements are organised as a tree where each node has one parent, and structure determines how the page is rendered',
+        'The hierarchy refers to the order CSS rules are applied, not the HTML elements',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Which of the three layers — HTML, CSS, JavaScript — is responsible for what the user can interact with?',
+      options: [
+        'HTML — it defines the clickable elements',
+        'CSS — it controls hover states and transitions',
+        'JavaScript — it handles behavior: clicks, inputs, and dynamic changes',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The renderer "translates tree paths into 2D boxes." What triggers a re-layout?',
+      options: [
+        'Any change to a CSS color property',
+        'Changes that affect element size or position — like modifying width, height, or adding/removing elements',
+        'Only full page reloads cause the renderer to re-layout',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'HTML defines "parent/child object relations." Why does this matter for CSS?',
+      options: [
+        'CSS rules only apply to the root element',
+        'Many CSS properties inherit down the tree, and selectors like descendant selectors rely on this parent/child structure',
+        'It does not — CSS and HTML are completely independent systems',
+      ],
+      correct: 1,
+    },
+  ],
 };

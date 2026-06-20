@@ -129,4 +129,50 @@ res
     'print() returns None — never nest it expecting it to pass a value outward.',
     'Both arguments of a function can themselves be function calls.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does len(str(12345)) evaluate to?',
+      options: [
+        '12345 — the string is converted to a number before measuring length',
+        '5 — str(12345) converts the integer to the string "12345", then len("12345") = 5',
+        '1 — len counts the number of numbers, and 12345 is one number',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In f(g(x)), which function runs first?',
+      options: [
+        'f — the outermost function always evaluates first',
+        'g — Python evaluates arguments before calling the outer function, so g(x) runs first, producing a value that is then passed to f',
+        'They run simultaneously — Python evaluates all expressions in parallel',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'result = sorted(set([3,1,4,1,5,9,2,6])). What is result?',
+      options: [
+        '[3,1,4,1,5,9,2,6] — set and sorted cancel each other out',
+        '[1,2,3,4,5,6,9] — set() removes duplicates (producing {1,2,3,4,5,6,9}) and sorted() orders the result',
+        '[1,1,2,3,4,5,6,9] — set keeps the extra 1 because it appears twice',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why does nesting print(sorted(numbers)) not let you reuse the sorted result later?',
+      options: [
+        'Because print() consumes the value and marks it as used',
+        'Because the sorted result is passed directly to print() and printed immediately — it is never assigned to a variable, so nothing stores it. You need result = sorted(numbers); print(result) to use result again',
+        'Because sorted() inside print() only partially sorts the list',
+      ],
+      correct: 1,
+    },
+  ],
 }

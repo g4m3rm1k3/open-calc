@@ -537,7 +537,52 @@ export default {
     'Three.js wraps WebGL. ShaderMaterial lets you write GLSL without leaving Three.js.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"GPU = thousands of slow cores running simultaneously." Why is this architecture better suited for rendering than a CPU\'s few fast cores?',
+      options: [
+        'GPUs have more RAM so they can store larger textures',
+        'Each pixel\'s colour calculation is independent — thousands of pixels can be computed in parallel simultaneously, matching the GPU\'s wide core count',
+        'GPUs run at higher clock speeds than CPUs',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"5 pipeline stages: vertex shader → assembly → rasterise → fragment shader → output." Which two stages does the developer write?',
+      options: [
+        'Assembly and rasterise — these define how triangles are formed',
+        'Vertex shader and fragment shader — the developer writes these in GLSL; the other three stages are fixed GPU hardware',
+        'Vertex shader and output — the developer controls geometry and final display',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Three.js wraps WebGL. ShaderMaterial lets you write GLSL without leaving Three.js." What happens when you use a standard MeshStandardMaterial instead of ShaderMaterial?',
+      options: [
+        'Three.js writes GLSL shaders for you automatically — you configure them via material properties rather than writing shader code directly',
+        'The GPU runs a default rendering mode that doesn\'t use shaders',
+        'You lose all lighting support because shaders control lighting',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A scene has 1000 triangles and 1920×1080 pixels. Approximately how many times does the fragment shader run per frame?',
+      options: [
+        'About 1000 times — once per triangle',
+        'About 2 million times — once per pixel covered by any triangle (up to 1920×1080)',
+        'About 3000 times — once per vertex (3 vertices × 1000 triangles)',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_0_0 };

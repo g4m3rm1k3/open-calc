@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'Scope rise time limit: t_rise (ns) ≈ 350 / BW(MHz). A 500MHz scope resolves edges no faster than 0.7ns.' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You use a 20 MHz oscilloscope to view a 10 MHz square wave and the edges look rounded and slow. Is the signal bad, or is the instrument the problem?',
+      options: [
+        'The signal is bad — a proper 10 MHz square wave should have fast edges on any oscilloscope',
+        'The instrument is the problem — oscilloscope bandwidth should be at least 3–5× the signal frequency; a 20 MHz scope has a rise time limit of ~17.5 ns (0.35/20MHz), which rounds the edges of a 10 MHz square wave even if the signal is perfect',
+        'The probe compensation is off — adjusting the trimmer on the probe will restore the fast edges regardless of oscilloscope bandwidth',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A DMM reads 3.2 V AC on a 5 V, 100 kHz PWM signal. Can you trust this reading?',
+      options: [
+        'Yes — a true-RMS DMM accurately measures any waveform regardless of frequency',
+        'No — most DMMs have AC bandwidth limits of a few kHz; at 100 kHz the internal averaging circuit cannot track the waveform, so the reading is unreliable and should be verified with an oscilloscope or a DMM specified for high-frequency AC',
+        'No — a PWM signal must be measured with a power analyser, not a DMM, because it contains harmonics',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A signal generator is set to 1.0 V output and has a 50 Ω source impedance. When connected directly to a 1 MΩ oscilloscope input (no 50 Ω terminator), the scope reads nearly 2.0 V. Why?',
+      options: [
+        'The oscilloscope amplifier has a gain error that doubles the reading on 1× probes',
+        'The generator\'s 50 Ω source forms a voltage divider with the load; with a 1 MΩ load, almost no voltage drops across the 50 Ω source resistance, so the full open-circuit voltage (~2× the specified output) appears at the load — add a 50 Ω terminator to restore the correct 1.0 V reading',
+        'The scope is measuring peak voltage instead of RMS, which doubles the apparent AC amplitude',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A switching power supply causes interference on an AM radio. An oscilloscope shows the supply output looks clean. What instrument would reveal the interference source?',
+      options: [
+        'A current clamp meter — it measures the supply\'s output ripple current more accurately than a voltage probe',
+        'A spectrum analyser — it displays frequency-domain content across a wide range, revealing harmonics and spurious emissions at AM broadcast frequencies (535–1705 kHz) that are invisible to a time-domain oscilloscope',
+        'An LCR meter — it measures the output capacitance, which determines the high-frequency noise filtering capability',
+      ],
+      correct: 1,
+    },
+  ],
 };

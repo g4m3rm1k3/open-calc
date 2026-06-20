@@ -57,5 +57,50 @@ export default {
     'State defines reality entirely.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Imperative dictates the How." What does imperative UI code look like?',
+      options: [
+        'You describe what the UI should look like and let the system figure out how to update it',
+        'You write step-by-step instructions: find this element, set its text, show this div, hide that one',
+        'You declare the rules and the UI engine applies them',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Declarative describes the What." In declarative UI, what do you tell the system?',
+      options: [
+        'Exactly which DOM methods to call and in what order',
+        'The desired end state — what the UI should look like given the current data — not the steps to get there',
+        'Which elements to create and where to insert them',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"State defines reality entirely." If you want to show a loading spinner, what is the reactive approach?',
+      options: [
+        'Directly show the spinner element with spinner.style.display = "block"',
+        'Set a state variable like isLoading = true — the UI re-renders and the spinner appears because state says so',
+        'Add a CSS class "loading" to the body element',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why is reactive thinking easier to debug than direct DOM manipulation?',
+      options: [
+        'Reactive systems run faster so errors are easier to catch',
+        'The UI is always a pure function of state — you inspect state to understand the UI, rather than tracing DOM mutations',
+        'Reactive systems never produce errors',
+      ],
+      correct: 1,
+    },
+  ],
 };

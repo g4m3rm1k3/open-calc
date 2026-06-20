@@ -159,4 +159,50 @@ res
     'Convert explicitly: int(), float(), str(), bool().',
     'In real data, numbers stored as strings are an extremely common problem.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What happens when you write "3" + 4 in Python?',
+      options: [
+        'Python returns 7 — it automatically converts "3" to the integer 3 before adding',
+        'Python raises a TypeError — you cannot add a string to an integer without explicit conversion; "3" + 4 is not the same as 3 + 4',
+        'Python returns "34" — when one operand is a string, the other is also converted to a string',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In Python, what does 7 / 2 evaluate to, and what does 7 // 2 evaluate to?',
+      options: [
+        '7 / 2 = 3 (integer division) and 7 // 2 = 3.5 (float division)',
+        '7 / 2 = 3.5 (always float in Python 3) and 7 // 2 = 3 (floor division, truncates down)',
+        '7 / 2 = 3 and 7 // 2 = 3 — both perform integer division in Python',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A dataset column contains values like "42", "17", "8". Before computing the average, what must you do?',
+      options: [
+        'Sort the values — averaging requires sorted input in Python',
+        'Convert the strings to numbers — "42" + "17" = "4217" (concatenation), not 59. Use int() or float() to convert before any arithmetic',
+        'Nothing — Python\'s sum() function handles strings by converting them automatically',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'type(True) in Python returns what?',
+      options: [
+        'int — True is just an alias for 1 in Python',
+        'bool — Python has a dedicated boolean type; bool is a subclass of int so True == 1, but type(True) is bool, not int',
+        'str — True and False are strings representing boolean values',
+      ],
+      correct: 1,
+    },
+  ],
 }

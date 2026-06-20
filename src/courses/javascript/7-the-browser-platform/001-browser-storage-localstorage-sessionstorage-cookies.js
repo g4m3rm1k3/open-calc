@@ -454,5 +454,50 @@ export default {
     'Cookies: auto-sent in HTTP headers. HttpOnly flag makes them inaccessible to JS — more secure.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The user closes the browser tab and reopens it. Which storage is still there?',
+      options: [
+        'sessionStorage — it persists across sessions',
+        'localStorage — it persists permanently until cleared; sessionStorage is cleared when the tab closes',
+        'Both — all browser storage is permanent',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You store an object in localStorage. When you read it back, you get the string "[object Object]". What went wrong?',
+      options: [
+        'Objects cannot be stored in localStorage at all',
+        'You stored the object directly — you must use JSON.stringify() to write and JSON.parse() to read objects',
+        'You used the wrong key name',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A cookie has the HttpOnly flag set. Can your JavaScript read it?',
+      options: [
+        'Yes — JavaScript can always read cookies via document.cookie',
+        'No — HttpOnly cookies are inaccessible to JavaScript; they are only sent in HTTP headers, which prevents XSS theft',
+        'Only if the cookie was set by your own domain',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The storage event fires when localStorage changes. Which tabs receive this event?',
+      options: [
+        'The tab that made the change',
+        'All OTHER open tabs on the same origin — the tab that wrote the change does not receive the event',
+        'All tabs, including the one that made the change',
+      ],
+      correct: 1,
+    },
+  ],
 };

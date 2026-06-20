@@ -926,5 +926,50 @@ export default {
     'TTL→CMOS: need 74HCT or pull-up. CMOS→TTL: usually OK. 3.3V→5V: level shifter.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Chain of N gates → N × t_pd delay. Clock period ≥ t_path." You have 3 gates in series, each with t_pd = 5 ns. What is the minimum clock period?',
+      options: [
+        '5 ns — only the slowest gate matters',
+        '15 ns — delays accumulate: 3 × 5 ns',
+        '10 ns — you average the delays',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Fan-out: over-limit → add buffer." A CMOS gate drives 50 other inputs. What problem does exceeding fan-out limit cause?',
+      options: [
+        'The gate overheats and burns out immediately',
+        'The output cannot drive all the input capacitances fast enough — rise/fall times increase, which degrades timing and may cause logic errors at speed',
+        'The driven gates switch to a different voltage rail',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Noise margin = gap between output spec and input threshold." A gate outputs at least 3.5V for logic HIGH. The driven gate needs at least 2.0V for HIGH. What is the noise margin?',
+      options: [
+        '3.5V',
+        '1.5V',
+        '5.5V',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"T_clk ≥ t_clk-to-Q + (N × t_pd) + t_setup. Violate this → wrong data captured." What happens if the clock period is too short?',
+      options: [
+        'The circuit stops responding to inputs entirely',
+        'The combinational logic has not finished computing when the clock edge arrives — the flip-flop captures an intermediate (wrong) value',
+        'The flip-flop captures the correct value but stores it for less time',
+      ],
+      correct: 1,
+    },
+  ],
 };

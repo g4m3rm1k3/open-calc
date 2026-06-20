@@ -2086,5 +2086,50 @@ export default {
     'Interaction cost is calculable: each step and each field removes measurable percentage from completion rate.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Every interactive component is an FSM: states, events, transitions. Write the machine before writing CSS." Why does writing the machine first matter?',
+      options: [
+        'Machines generate CSS automatically, saving time',
+        'Defining states and transitions first reveals all the states that need CSS before any are missed — undefined states become impossible',
+        'FSM diagrams are required for design system documentation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Hit target minimum: 44×44px. Extend with padding, not visual size." A link looks like text but must be easily tappable on mobile. How do you achieve this?',
+      options: [
+        'Make the font size large enough that the text itself is 44px tall',
+        'Add padding around the text element so the invisible click area reaches 44×44px while the visual text stays normal size',
+        'Add a visible border to extend the element to 44px',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Three feedback thresholds: <100ms (instant CSS), 100ms–1s (button spinner), >1s (skeleton screen)." A search query takes 400ms. Which feedback is correct?',
+      options: [
+        'No feedback — 400ms is barely noticeable',
+        'A button spinner or inline loading indicator — the response is in the 100ms–1s range where the user notices the wait but a full skeleton would be premature',
+        'A skeleton screen — any delay over 100ms needs a skeleton',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Disable submit immediately on click. Timeout every loading state." What happens if a submit button stays enabled while a request is in flight?',
+      options: [
+        'Nothing — the server will deduplicate the requests',
+        'The user can click multiple times, triggering duplicate submissions — the UI must disable the button on first click to prevent this',
+        'This only matters for payment flows, not general forms',
+      ],
+      correct: 1,
+    },
+  ],
 };

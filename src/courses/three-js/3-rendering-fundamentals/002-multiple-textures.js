@@ -286,7 +286,52 @@ export default {
     'Three.js: material.map, roughnessMap, metalnessMap, aoMap, emissiveMap.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Additive blending: src + dst. Order-independent — fire, glow, particles." Why is additive blending order-independent while alpha blending is not?',
+      options: [
+        'Additive blending does not use the alpha channel',
+        'Addition is commutative — adding A then B equals adding B then A. Alpha over (src×a + dst×(1-a)) depends on what is already in dst, so draw order changes the result',
+        'The GPU sorts particles automatically for additive blending',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Alpha: src×src.a + dst×(1-src.a). Draw transparent back-to-front." A semi-transparent red object is drawn in front of a blue background. What colour result do you get?',
+      options: [
+        'Pure red — the alpha is ignored once blending is active',
+        'A mix of red and blue — red\'s contribution scales by its alpha, blue\'s contribution scales by (1 - red\'s alpha)',
+        'Pure blue — the background is never overwritten by transparent objects',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"mix(a,b,t): linear blend." In GLSL, what does mix(vec3(1,0,0), vec3(0,0,1), 0.25) return?',
+      options: [
+        'vec3(0.75, 0.0, 0.25) — 75% red, 25% blue',
+        'vec3(0.25, 0.0, 0.75) — 25% red, 75% blue',
+        'vec3(0.5, 0.0, 0.5) — 50% red, 50% blue',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"MultiplyBlend: a*b." A roughness map has a value of 0.5 and the material base roughness is 0.8. After multiplying, what is the effective roughness?',
+      options: [
+        '1.3 — the values are added',
+        '0.4 — 0.5 × 0.8 = 0.4 (multiplying darkens or reduces the base value)',
+        '0.8 — the map overrides the base',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_2_1 };

@@ -1607,5 +1607,50 @@ export default {
     'The same system applies in CSS, Qt, game UI — only the syntax changes.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Four levers: size, weight, colour, spacing." A page where everything uses the same font weight and similar sizes is an example of which anti-pattern?',
+      options: [
+        'Rainbow — too many colours',
+        'Grey soup — no differentiation across the four levers means no hierarchy; the eye has no starting point',
+        'CTA camouflage — the call-to-action is hidden',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Size ratio ≥ 1.3× for meaningful hierarchy." An L1 heading is 32px. What is the minimum L2 size to show clear hierarchy below it?',
+      options: [
+        '28px',
+        '22px — 32 / 1.45 ≈ 22, which is ≥ 1.3× smaller than 32',
+        '30px',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Semantic colours are reserved: red = error. Never decorative." You want to make a marketing banner eye-catching using red. What is the problem?',
+      options: [
+        'Red is too common and overused in design',
+        'Users are trained to associate red with errors — using it decoratively will make them assume something went wrong',
+        'Red has poor contrast on most backgrounds',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Hierarchy must survive extreme data: long strings, large numbers, empty states." Why test with extreme data during design?',
+      options: [
+        'Extreme data makes the design look more impressive',
+        'A hierarchy that works for normal data can collapse with real-world edge cases — long labels, overflow, and empty states reveal structural weaknesses before users do',
+        'QA engineers prefer testing with extreme data',
+      ],
+      correct: 1,
+    },
+  ],
 };

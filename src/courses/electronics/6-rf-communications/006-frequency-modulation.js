@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 's(t) = Ac·cos[2πfc·t + β·sin(2πfm·t)]\nβ = Δf / fm\nBW_Carson ≈ 2(Δf + fm)   [98% power]' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Broadcast FM radio uses ±75 kHz frequency deviation with audio up to 15 kHz. What is the approximate bandwidth per station using Carson\'s rule?',
+      options: [
+        '150 kHz — only the deviation is counted in Carson\'s rule',
+        '180 kHz — BW ≈ 2 × (Δf + fm) = 2 × (75 + 15) kHz = 180 kHz',
+        '30 kHz — FM bandwidth equals twice the audio frequency only',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'FM radio sounds cleaner than AM radio in the presence of electrical noise from lightning or power lines. Why can\'t AM use the same noise-rejection technique?',
+      options: [
+        'AM uses different frequencies where lightning is more intense, giving FM an unfair comparison',
+        'FM receivers use a hard limiter that strips amplitude variations before demodulation — noise appears as amplitude changes which are discarded. AM encodes its information in amplitude, so stripping amplitude changes would destroy the audio signal',
+        'AM signals have narrower bandwidth, which concentrates noise into fewer frequencies and makes it harder to filter',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A two-way radio uses narrowband FM with ±2.5 kHz deviation instead of broadcast FM\'s ±75 kHz. What is the tradeoff?',
+      options: [
+        'Narrowband FM is immune to interference but transmits audio only at very low quality',
+        'Narrowband FM uses far less spectrum (fitting in a 12.5 kHz channel vs 200 kHz for broadcast FM) but provides lower noise immunity — acceptable for voice communications where spectrum efficiency matters more than hi-fi audio',
+        'Narrowband FM cannot be demodulated with standard FM receivers — special equipment is required',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'FM broadcasts in North America apply preemphasis (boosting high audio frequencies) before transmission. Why does this improve the received audio quality?',
+      options: [
+        'High frequencies are harder to modulate, so boosting them compensates for the FM modulator\'s limitations',
+        'High frequencies accumulate more noise in the FM demodulation process; pre-boosting them before transmission means the receiver can apply de-emphasis to cut high-frequency noise — the audio is restored while noise is reduced',
+        'Preemphasis extends the FM signal\'s bandwidth, allowing more audio content to be transmitted simultaneously',
+      ],
+      correct: 1,
+    },
+  ],
 };

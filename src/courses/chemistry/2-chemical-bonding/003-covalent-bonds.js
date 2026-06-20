@@ -734,7 +734,52 @@ export default {
     'Network covalent solids (diamond): 3D covalent network — extremely hard.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Covalent bond: atoms share electrons so both reach a full outer shell." How does sharing one electron pair satisfy carbon\'s need for 4 more electrons?',
+      options: [
+        'It doesn\'t — carbon needs to form 4 separate covalent bonds, sharing one pair with each of 4 other atoms',
+        'The shared pair counts for both atoms, so one bond is enough for carbon',
+        'Carbon forms one bond and then gains electrons from the other atom',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Bond order = number of shared pairs. Higher order = shorter + stronger." A C=C double bond vs a C–C single bond: which is harder to break?',
+      options: [
+        'Single bonds are stronger because the atoms are further apart and the bond is more relaxed',
+        'Double bonds are stronger — two shared pairs create more electron density between nuclei, pulling them closer and requiring more energy to separate',
+        'Both have the same strength because they involve the same two atoms',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Sigma bonds allow rotation; pi bonds restrict it." Why does a C=C double bond lock the molecule into a fixed geometry?',
+      options: [
+        'Pi bonds are formed by side-by-side p-orbital overlap — rotating the bond would break that alignment and destroy the pi bond',
+        'Double bonds are too short to rotate',
+        'The electrons in a pi bond spin in one direction, preventing rotation',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Nitrogen (N₂) has a triple bond. Oxygen (O₂) has a double bond. Which molecule requires more energy to break apart into individual atoms?',
+      options: [
+        'O₂ — it has more electrons overall',
+        'N₂ — the triple bond (3 shared pairs) is shorter and stronger than the double bond in O₂',
+        'They require the same energy because both are diatomic molecules',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_CHEM_2_2 }

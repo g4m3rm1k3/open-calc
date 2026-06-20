@@ -1158,5 +1158,50 @@ export default {
     'wouldHitFloor checks if any filled cell would go past row ROWS-1.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"setInterval(fn, ms) → returns ID. clearInterval(id) → stops it." Why do you need to store the interval ID?',
+      options: [
+        'The ID is used as the game score',
+        'Without the ID you cannot stop the interval — clearInterval needs it to know which timer to cancel',
+        'The ID tells you how many ticks have elapsed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"State lives outside the loop. Variables inside the callback reset every tick." Where should `score` be stored?',
+      options: [
+        'Inside the setInterval callback as a local variable',
+        'Outside the setInterval callback — as a module-level variable that persists between ticks',
+        'In the DOM and read back each tick',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Tick pattern: check validity → update state → render. Always in that order." Why must you render AFTER updating state?',
+      options: [
+        'Rendering is expensive and should happen as late as possible',
+        'The DOM should always reflect the current state — rendering first would show stale data, then the update would leave the display out of sync until the next tick',
+        'The browser enforces this order automatically',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"intervalId = null means stopped. intervalId = a number means running." You want to restart the game. What must you do before calling setInterval again?',
+      options: [
+        'Nothing — calling setInterval again creates a replacement',
+        'Call clearInterval(intervalId) first to stop the running loop, then start a new one — otherwise you will have two simultaneous loops',
+        'Set intervalId = 0 to signal the old loop to stop itself',
+      ],
+      correct: 1,
+    },
+  ],
 };

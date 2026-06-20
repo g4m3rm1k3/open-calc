@@ -57,4 +57,50 @@ res
     'One-hot: pd.get_dummies(df, columns=["cat"]) — required before numeric ML.',
     'Feature engineering: create derived columns (area, ratios, logs of targets).',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Min-max normalization scales data to [0, 1]. Z-score standardization scales to mean=0, std=1. When is Z-score preferred?',
+      options: [
+        'Always — Z-score is always more accurate than min-max',
+        'When outliers are present or the algorithm assumes normal distribution (e.g., logistic regression, SVM) — outliers make min-max put most data near 0 while the outlier sits at 1; Z-score distributes points relative to the mean',
+        'Min-max is preferred for neural networks; Z-score is only for statistics',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'pd.get_dummies(df["city"]) converts categorical "city" to one-hot encoding. Why not just map cities to integers (1, 2, 3)?',
+      options: [
+        'Integer encoding is invalid — Pandas cannot store integers and categories in the same column',
+        'Integer codes imply ordering and distance (city 3 is "3x" city 1) which is meaningless for nominal categories; one-hot encoding treats each category as independent by creating a separate binary column, preventing the model from assuming spurious order',
+        'One-hot encoding is only needed for linear models — tree models can use integer codes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A "price" column ranges from $1 to $1,000,000 with exponential distribution. Why apply log(price) before modeling?',
+      options: [
+        'Log reduces the number of decimal places, making computation faster',
+        'Log compresses the wide range — values spanning 6 orders of magnitude become a more linear, Gaussian-like distribution; many models (linear regression, neural nets) work better when features are on similar scales and not heavily skewed',
+        'Logarithms are required when any feature has values greater than 1000',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Feature engineering creates new columns from existing ones (e.g., area = length × width). Why can this improve model performance?',
+      options: [
+        'More features always improve model performance — adding any derived column helps',
+        'Models learn from the features you give them; a linear model fitting area = f(length, width) cannot easily learn length×width is the key relationship. Providing area directly exposes the relevant signal without requiring the model to discover the multiplication — domain knowledge encoded as features beats raw data',
+        'Feature engineering reduces overfitting by adding regularization through redundant columns',
+      ],
+      correct: 1,
+    },
+  ],
 }

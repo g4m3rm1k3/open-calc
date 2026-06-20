@@ -465,5 +465,50 @@ export default {
     'TubeGeometry: wrap any Curve3 in a mesh tube.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Parametric curve: t ∈ [0,1] → (x,y,z). Equal t ≠ equal distance along curve." Why does uniform t sampling produce uneven spacing?',
+      options: [
+        'The curve math uses floats, which are imprecise',
+        'Curves can have sections that curve more tightly or loosely — the same change in t maps to different arc lengths in different regions. Equal t steps are only equal-distance on straight lines',
+        'Parametric curves always have gaps at t=0.5',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"CatmullRom: smooth through all points. Bezier: pulled toward control points, not through them." You have four control points and want the curve to pass exactly through all of them. Which type do you use?',
+      options: [
+        'Bezier — it provides more control',
+        'CatmullRom — it interpolates through all provided points, whereas Bezier only passes through the first and last points',
+        'Both pass through all points',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"getSpacedPoints: uses arc-length LUT for equal world-space intervals." When is this essential vs optional?',
+      options: [
+        'Always optional — equal t spacing looks fine in practice',
+        'Essential for constant-speed motion along a path — without it, objects speed up and slow down on curved sections. Optional for purely visual curves where spacing does not matter',
+        'Only needed for Bezier curves, not CatmullRom',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"mover.quaternion.setFromUnitVectors(up, curve.getTangent(t)): orient object along path." What does getTangent(t) return?',
+      options: [
+        'The position on the curve at parameter t',
+        'The normalised direction the curve is heading at t — the instantaneous direction of travel, used to align the object so it faces forward along the path',
+        'The curvature (how sharply the path bends) at t',
+      ],
+      correct: 1,
+    },
+  ],
 }

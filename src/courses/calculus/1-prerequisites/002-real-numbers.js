@@ -291,4 +291,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'completed-example-3', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Which property of the real numbers makes calculus possible — and which feature of the rationals ℚ makes ℚ insufficient for calculus?',
+      options: [
+        'ℝ is uncountable while ℚ is countable — calculus requires uncountably many numbers to define limits',
+        'ℝ satisfies the Completeness Axiom: every non-empty set bounded above has a supremum in ℝ; ℚ has "holes" where suprema would fall (e.g., sup{x ∈ ℚ : x² < 2} = √2 ∉ ℚ), so limits can "fall through" gaps',
+        'ℝ includes irrational numbers; ℚ does not — and calculus requires irrational inputs to compute derivatives',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Which of the following decimals is rational, and why?',
+      options: [
+        '0.10100100010000… — this is rational because it has a visible pattern in how the 1s appear',
+        '0.142857142857… — this is rational because the block "142857" repeats indefinitely; repeating decimals are always equal to a fraction (here 1/7)',
+        'π = 3.14159265… — this is rational because it begins with a familiar decimal approximation 3.14',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The set S = {n/(n+1) : n ∈ ℕ} = {1/2, 2/3, 3/4, …} has sup S = 1 but no maximum. What is the difference between a supremum and a maximum?',
+      options: [
+        'There is no difference — supremum and maximum always refer to the same number',
+        'The supremum is the least upper bound, which may or may not be an element of S; the maximum is the largest element actually in S. Here every term is less than 1, so 1 ∉ S and max S does not exist, even though 1 is the tightest ceiling',
+        'The supremum is only defined for infinite sets, while the maximum is the largest finite value in the set',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The inequality |x − 4| < 3 is read geometrically as "x is within distance 3 of 4." What interval does this describe?',
+      options: [
+        '(1, 7) — since |x − 4| < 3 means −3 < x − 4 < 3, adding 4 gives 1 < x < 7, an open interval with center 4 and radius 3',
+        '[1, 7] — since we can include the endpoints where the distance equals exactly 3',
+        '(4 − 3, 4) ∪ (4, 4 + 3) — the solution excludes x = 4 itself because |4 − 4| = 0 which is not less than 3',
+      ],
+      correct: 0,
+    },
+  ],
 }

@@ -111,4 +111,50 @@ is_significant=p_value<0.05`},
     `Type I error (false positive): rejecting null when it is true. Rate = α (usually 0.05).`,
     `Multiple testing: 20 tests at p<0.05 expects 1 false positive. Use Bonferroni correction.`,
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A study reports p = 0.03. Which interpretation is correct?',
+      options: [
+        'There is a 3% chance the null hypothesis is true',
+        'If the null hypothesis were true, there is a 3% probability of observing data this extreme or more extreme by chance — it does not tell you the probability the null is true, only how surprising your data would be if it were',
+        'The effect has a 97% probability of being a real finding',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A Type I error is a false positive (rejecting the null when it is true). If α = 0.05, what does this mean?',
+      options: [
+        'Only 5% of experiments will produce results',
+        'When there is truly no effect, you will falsely conclude there is an effect 5% of the time — α is the false positive rate you accept; lower α means fewer false positives but also requires stronger evidence to detect real effects',
+        'Your test is 95% accurate in all cases',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A permutation test and a t-test both give the same conclusion. What advantage does the permutation test have?',
+      options: [
+        'Permutation tests are always more powerful (detect smaller effects)',
+        'Permutation tests make no distributional assumptions — the t-test assumes approximately normal distributions in each group; the permutation test builds the null distribution empirically from the data itself, making it valid for any distribution including heavily skewed or non-normal data',
+        'Permutation tests run faster because they avoid complex calculations',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A researcher runs 100 independent hypothesis tests on random noise data with α = 0.05. How many false positives should they expect?',
+      options: [
+        'Zero — if all null hypotheses are true, no test should be significant',
+        'About 5 — with α = 0.05, each test has a 5% chance of false positive; across 100 independent tests, the expected number of false positives is 100 × 0.05 = 5, which is why multiple testing correction (Bonferroni: α/n) is necessary',
+        'About 50 — most results will be false positives without enough data',
+      ],
+      correct: 1,
+    },
+  ],
 }

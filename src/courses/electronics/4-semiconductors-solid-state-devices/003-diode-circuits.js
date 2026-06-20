@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A technician measures ripple on a 24V DC power supply with a scope set to AC coupling. The ripple waveform appears at 60 Hz (the mains frequency) rather than 120 Hz. What does this indicate?',
+      options: [
+        'The filter capacitor has dried out — reduced capacitance always shifts ripple to line frequency',
+        'One diode in the full-wave bridge has failed — the circuit is now rectifying only one half-cycle, converting full-wave (120 Hz ripple) to half-wave (60 Hz ripple)',
+        'The oscilloscope ground is floating — 60 Hz is always the measured ripple frequency because of AC coupling',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A 24V DC supply has a 2200 μF filter capacitor and supplies 1A of DC load. What is the approximate peak-to-peak ripple voltage?',
+      options: [
+        'About 0.04V — the large capacitor nearly eliminates ripple',
+        'About 3.8V — V_ripple = IL/(2f×C) = 1/(2×60×0.0022)',
+        'About 7.6V — because current flows only during one half-cycle of the ripple',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You connect two silicon diodes in parallel to share current in a rectifier. One diode has a slightly lower forward voltage. What happens?',
+      options: [
+        'The diodes share current equally — any temperature difference causes self-balancing',
+        'The lower-Vf diode carries significantly more current due to the exponential I-V characteristic, potentially overloading while the other diode carries little current',
+        'The higher-Vf diode carries more current because it presents less resistance to current flow',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An LED is connected to a 24V supply. The LED has a forward voltage of 2V and should run at 15 mA. What current-limiting resistor is needed?',
+      options: [
+        '1600Ω — R = V_supply / I_LED = 24 / 0.015',
+        '1333Ω — R = (V_supply − V_f) / I_LED = (24 − 2) / 0.015 = 1466Ω (use 1.5kΩ standard)',
+        '133Ω — R = V_f / I_LED = 2 / 0.015',
+      ],
+      correct: 1,
+    },
+  ],
 };

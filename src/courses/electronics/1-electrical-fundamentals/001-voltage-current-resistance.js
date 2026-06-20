@@ -161,4 +161,50 @@ export default {
       solution: 'Total wire resistance (there and back): 2 × 30 × 0.034 = 2.04 Ω\n\nVoltage drop in wire: V = IR = 0.200 × 2.04 = 0.41 V\n\nVoltage at solenoid: 24 − 0.41 = 23.59 V (acceptable)\n\nWith 16 AWG (0.013 Ω/m): drop = 2 × 30 × 0.013 × 0.200 = 0.16 V — even better. Industrial wiring standards typically require the voltage at the load to remain above 90% of nominal.',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why does a bird sitting on a 10,000V power line not get electrocuted?',
+      options: [
+        'The bird\'s feathers provide insulation from the high voltage',
+        'Both feet are at the same voltage, so there is no potential difference to drive current through the bird',
+        '10,000V is not enough voltage to be dangerous to animals',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In the water analogy for electricity, what does electrical resistance correspond to?',
+      options: [
+        'The volume of water stored in a tank',
+        'The speed at which water molecules move',
+        'The narrowness of the pipe restricting flow',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You connect a 9V battery across a 3Ω resistor. What current flows?',
+      options: [
+        'You can choose any current independently of voltage and resistance',
+        '3A — voltage and resistance together determine it with no wiggle room',
+        '27A — multiply voltage by resistance to get current',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the key limitation of the water analogy for electrical circuits?',
+      options: [
+        'Water flow has no direction, but electrical current always flows in one direction in DC circuits',
+        'Water pressure is absolute, while voltage is always a relative potential difference between two points',
+        'The analogy works perfectly — water and electricity behave identically in all situations',
+      ],
+      correct: 1,
+    },
+  ],
 };

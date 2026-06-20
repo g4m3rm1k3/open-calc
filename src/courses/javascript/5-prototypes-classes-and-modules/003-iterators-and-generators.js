@@ -440,5 +440,50 @@ export default {
     'Infinite generators are safe — values computed only on demand.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does an iterator\'s next() method return?',
+      options: [
+        'The next value directly as a primitive',
+        'An object with two properties: value (the current item) and done (true when the sequence is exhausted)',
+        'A Promise that resolves to the next value',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What makes an object compatible with for...of and array spread?',
+      options: [
+        'It must extend Array or Set',
+        'It must implement [Symbol.iterator]() returning an iterator — this is the iterable protocol',
+        'It must be declared with the iterator keyword',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What happens to local variables inside a generator function when it hits yield?',
+      options: [
+        'They are reset to their initial values',
+        'They are saved — the generator pauses and resumes with all local state intact on the next .next() call',
+        'They are garbage-collected to save memory while the generator is paused',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why is an infinite generator safe to use without causing an infinite loop?',
+      options: [
+        'Generators automatically stop after 1,000 iterations',
+        'Values are computed lazily — the generator only produces the next value when .next() is called, so you control how many you take',
+        'Infinite generators run on a background thread so they do not block the main thread',
+      ],
+      correct: 1,
+    },
+  ],
 };

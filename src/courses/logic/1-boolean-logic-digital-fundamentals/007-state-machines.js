@@ -133,4 +133,51 @@ export default {
       solution: 'States: GREEN(0), YELLOW(1), RED(2)\nInputs: Timer done\n\nState transition table:\nCurrent State | Timer Done | Next State | Outputs (R,Y,G)\n     GREEN    |     0      |   GREEN    |   0, 0, 1\n     GREEN    |     1      |   YELLOW   |   0, 0, 1 → transitions\n    YELLOW    |     0      |   YELLOW   |   0, 1, 0\n    YELLOW    |     1      |    RED     |   0, 1, 0 → transitions\n      RED     |     0      |    RED     |   1, 0, 0\n      RED     |     1      |   GREEN    |   1, 0, 0 → transitions\n\nPLC implementation:\n- Step = 0: GREEN on, timer preset 20s, running\n- Step = 0 AND Timer.DN: Step := 1, reset timer with 3s preset\n- Step = 1: YELLOW on, timer running\n- Step = 1 AND Timer.DN: Step := 2, reset timer with 30s preset\n- Step = 2: RED on, timer running\n- Step = 2 AND Timer.DN: Step := 0, reset timer with 20s preset\n\n3 rungs for outputs, 3 rungs for transitions = 6 rungs total. Clean, readable, no latched bits, no cross-references.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A Finite State Machine (FSM) has states, inputs, and transitions. What property makes it fundamentally different from a combinational circuit?',
+      options: [
+        'FSMs process multiple inputs simultaneously; combinational circuits process one input at a time',
+        'FSMs have internal state — the same input can cause different outputs depending on the current state. A push button in state IDLE triggers START; the same button in state RUNNING triggers ESTOP_OVERRIDE. Combinational circuits have no state: the same input always produces the same output',
+        'FSMs use analog signals; combinational circuits use digital logic',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A pick-and-place robot has states: IDLE → EXTEND → CLAMP → RETRACT → PLACE → UNCLAMP → IDLE. A bug causes it to sometimes skip from CLAMP directly to PLACE without retracting. What FSM design practice would prevent this?',
+      options: [
+        'Add more sensors to detect the current position of the arm',
+        'Enforce state transition guards — each transition is only valid FROM a specific current state AND with a specific condition. PLACE is only reachable from RETRACT (never directly from CLAMP). The one-integer "Step" variable approach enforces this: you can only compare-equal and transition in the right order',
+        'Use a faster PLC scan rate so the transition cannot be missed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is an FSM-based PLC program (one INT "Step" variable, transition rungs, output rungs) preferred over nested if-else rungs for multi-step sequences?',
+      options: [
+        'FSMs use fewer PLC memory tags than if-else logic',
+        'FSMs make the state explicit and visible: Step = 3 tells you exactly where the machine is. If-else nesting can have multiple paths simultaneously active (if latched bits cross-influence). Adding new steps to an FSM is O(1) work; adding a step to nested if-else can require modifying many existing rungs',
+        'Nested if-else is not valid ladder logic syntax; FSMs are the only valid approach',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An FSM for a traffic light has a transition from RED to GREEN only when the timer expires. The timer is reset each time a new state is entered. Why reset the timer on every state entry rather than running one continuous timer?',
+      options: [
+        'PLCs do not support continuous timers across scan cycles',
+        'Each state has a different preset time (GREEN=20s, YELLOW=3s, RED=30s); resetting the timer on state entry configures the preset for the new state\'s duration. A single continuous timer would need complex offset calculations to know when each phase ends — per-state reset is both simpler and immediately readable',
+        'Timer reset prevents the timer value from overflowing 16-bit integers',
+      ],
+      correct: 1,
+    },
+  ],
 };

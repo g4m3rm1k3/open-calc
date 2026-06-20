@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An SCR is triggered with a gate pulse and conducts load current. The gate pulse is then removed. What happens to the SCR?',
+      options: [
+        'The SCR turns off immediately when gate current is removed — the gate controls the on/off state at all times',
+        'The SCR stays latched ON — it can only turn off when anode current falls below the holding current, such as at the next AC zero crossing',
+        'The SCR reduces current proportionally to the gate signal and gradually turns off over one cycle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'An SCR phase controller delays the firing angle α from 0° to 90°. How does this affect average power to a resistive heater?',
+      options: [
+        'Power is halved — the SCR blocks the first 90° of each half-cycle, cutting average voltage to 50%',
+        'Power is unchanged — average voltage depends on peak voltage, not firing angle',
+        'Power drops to about 25% — average output voltage is roughly halved by 90° delay, and power varies as V²',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why do modern variable frequency drives use IGBTs rather than SCRs for the output inverter stage?',
+      options: [
+        'IGBTs cost less than SCRs at industrial current ratings',
+        'SCRs require natural commutation (AC zero crossing) to turn off — IGBTs turn off by removing gate voltage at any time, enabling the arbitrary frequency switching that VFDs need to generate variable-frequency AC',
+        'SCRs can only handle DC loads, while IGBTs can switch AC loads directly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'At voltage ratings above 600V, IGBTs outperform power MOSFETs. Why does a 1200V silicon MOSFET have much higher on-resistance than a 1200V IGBT?',
+      options: [
+        'MOSFETs require thicker gate oxide at high voltage, which limits gate drive voltage and prevents full enhancement',
+        'High-voltage silicon MOSFETs need a thick, high-resistivity drift region to support the blocking voltage — RDS(on) scales as V^2.5; IGBTs use minority carrier injection (conductivity modulation) to reduce the drift region resistance regardless of voltage rating',
+        'IGBTs use silicon carbide while high-voltage MOSFETs use standard silicon, and SiC has inherently lower resistance',
+      ],
+      correct: 1,
+    },
+  ],
 };

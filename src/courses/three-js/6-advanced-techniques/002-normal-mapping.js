@@ -400,7 +400,52 @@ export default {
   challenges: [],
   mentalModel: ['normalMap.rgb*2-1 = tangent-space normal. TBN=mat3(T,B,N) transforms to world. geometry.computeTangents(). material.normalMap + normalScale in Three.js.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"normalMap.rgb * 2 - 1 = tangent-space normal." A normal map pixel has RGB (0.5, 0.5, 1.0). After decoding, what direction does this represent?',
+      options: [
+        '(0.5, 0.5, 1.0) — no change, it is already a direction',
+        '(0.0, 0.0, 1.0) — perfectly flat, no perturbation from the geometric normal (straight up in tangent space)',
+        '(-0.5, -0.5, 0.0) — pointing diagonally into the surface',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"TBN = mat3(T, B, N) transforms tangent-space normal to world space." Why is this transformation needed?',
+      options: [
+        'The GPU only processes world-space normals',
+        'Lighting calculations (N·L, N·H) require normals and light vectors in the same space. The normal map stores directions in tangent space local to the surface; TBN converts them to world space where light vectors live',
+        'It converts the normal map from sRGB to linear',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"geometry.computeTangents()." Why must tangents be computed for normal mapping?',
+      options: [
+        'Tangents define the T axis of the TBN matrix — the local "right" direction on the surface. Without them, there is no way to orient the normal map correctly on the mesh',
+        'Three.js requires tangents for all PBR materials',
+        'Tangents replace the need for UV coordinates',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A flat quad mesh has a brick wall normal map applied. The geometry is still flat — only two triangles. What does normal mapping change visually?',
+      options: [
+        'The geometry silhouette becomes bumpy — normal maps add real geometry',
+        'The per-pixel shading responds to the encoded surface directions, making the surface look like it has bumps under lighting — while the silhouette remains perfectly flat',
+        'Nothing — normal maps only work on high-poly meshes',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_5_1 }

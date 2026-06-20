@@ -378,5 +378,50 @@ export default {
     'Multiple datasets = multiple lines/bars on same axes.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You load Chart.js via a script tag from a CDN. How do you then use it in your code?',
+      options: [
+        'You must import it with import Chart from "chart.js" first',
+        'The CDN script creates a global Chart variable — you access it directly without any import',
+        'You call require("chart.js") to make the global available',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Your chart is already rendered. New data comes in and you push it into the datasets array. What else must you do for the chart to update visually?',
+      options: [
+        'Nothing — Chart.js watches the data arrays and re-renders automatically',
+        'Call chart.update() — Chart.js only re-renders when explicitly told to',
+        'Destroy and recreate the chart with the new data',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You want to show two different data series on the same line chart. How do you structure the data?',
+      options: [
+        'Create two separate Chart instances on the same canvas element',
+        'Add two objects to the datasets array — each object is one series with its own data and styling',
+        'Use a second chart type nested inside the first',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'To create a scrolling real-time chart, you push new data and shift old data. What does shift() do to the data array?',
+      options: [
+        'It moves the last element to the front of the array',
+        'It removes and returns the first element — keeping the array the same length as you add new values',
+        'It sorts the array so the smallest value is first',
+      ],
+      correct: 1,
+    },
+  ],
 };

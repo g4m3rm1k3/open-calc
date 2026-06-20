@@ -479,7 +479,52 @@ export default {
   challenges: [],
   mentalModel: ['FBO: createFramebuffer → attach colourTex + depthRB → render → bind null → fullscreen quad reads colourTex → screen. Three.js: WebGLRenderTarget + EffectComposer.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"FBO: render to texture, then read it on a fullscreen quad." What does rendering to a framebuffer object (FBO) enable that rendering directly to the screen does not?',
+      options: [
+        'Faster rendering — FBOs bypass the GPU pipeline',
+        'The rendered image becomes a texture that subsequent passes can read and process — enabling post-processing effects like blur, bloom, or colour grading',
+        'FBOs support higher resolutions than the screen',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Attach colourTex + depthRB." Why does a framebuffer typically need both a colour texture and a depth renderbuffer?',
+      options: [
+        'Colour stores the pixel values; depth stores the shadow map',
+        'Colour captures the final rendered image; depth enables correct depth testing during the render pass so geometry is drawn in the right order',
+        'Both are required by the WebGL specification regardless of use',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Bind null to render to screen." What happens if you forget to unbind the FBO after your off-screen render pass?',
+      options: [
+        'Nothing — the renderer detects when it should switch to the screen',
+        'Subsequent draw calls continue writing into the FBO texture instead of the screen, and the screen shows the previous frame or nothing',
+        'The FBO texture is automatically displayed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Three.js: WebGLRenderTarget + EffectComposer." You want to add a blur post-process effect. At what point in the rendering sequence should the blur pass run?',
+      options: [
+        'Before the main scene render, on an empty buffer',
+        'After the main scene is rendered into a RenderTarget — the blur pass reads that texture and outputs the blurred result, which can then feed the next pass or the screen',
+        'During the scene render, one object at a time',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_4_3 }

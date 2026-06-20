@@ -1691,5 +1691,50 @@ export default {
     'auditTransfer(): verify any spec is platform-independent before implementation.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Nine invariant principles transfer to every platform. Syntax changes. Intent doesn\'t." In Qt, you need horizontal space between two widgets. Which property maps to CSS gap?',
+      options: [
+        'setMargin() on each widget',
+        'setSpacing() on the layout — the gap concept transfers directly; only the method name changes',
+        'There is no Qt equivalent — spacing must be done with spacer widgets',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Qt QSS = CSS subset. :hover/:disabled work. No flex/grid. Only px/pt." A Qt stylesheet uses `width: 100%` on a QPushButton. What happens?',
+      options: [
+        'The button stretches to fill its container like CSS',
+        'The rule is ignored — QSS does not support percentage units. Layout sizing is controlled by the layout manager (QHBoxLayout/QVBoxLayout), not stylesheets',
+        'The button width defaults to the parent width minus padding',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Unity RectTransform anchors = CSS layout constraints. LayoutElement.flexibleWidth=1 = flex:1." A Unity UI panel should fill all available width alongside a fixed sidebar. Which setting achieves this?',
+      options: [
+        'Set the panel width to Screen.width minus the sidebar width in a script',
+        'Set flexibleWidth=1 on the panel\'s LayoutElement — the Layout Group distributes remaining space proportionally, exactly like flex:1 in CSS',
+        'Use a Canvas Scaler to scale the panel to fit',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Qt signals/slots = CSS event listeners + FSM. State changes require style()->unpolish/polish()." Why does Qt need unpolish/polish after a property change?',
+      options: [
+        'QSS caches computed styles — unpolish clears the cache so the selector re-evaluates against the new property value',
+        'Polish compresses the stylesheet for performance after every change',
+        'It is optional — Qt redraws automatically when any property changes',
+      ],
+      correct: 0,
+    },
+  ],
 };

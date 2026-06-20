@@ -383,4 +383,51 @@ print("Before reaching for MongoDB, check if PostgreSQL JSONB meets your needs."
     "PostgreSQL JSONB blurs the SQL/NoSQL line — check it before adding a new database type",
     "NewSQL (CockroachDB, Spanner) provides horizontal SQL scale if you need both scale and ACID",
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Data access patterns determine your data model." A news site stores articles. Readers always view articles by date range and category. Writers always look up articles by ID. Which access pattern should drive the schema?',
+      options: [
+        'The writer pattern — write operations are more expensive to optimize',
+        'The reader pattern — reads vastly outnumber writes for a news site. Optimize for the dominant access pattern (date + category queries) even if that makes writes slightly more work. If both patterns are equally frequent, you may need secondary indexes or two separate read models',
+        'Both patterns should be equally weighted regardless of frequency',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'PostgreSQL\'s JSONB column type can store and query JSON documents with indexes. How does this blur the SQL/NoSQL line?',
+      options: [
+        'JSONB makes PostgreSQL a document database and it should be used instead of MongoDB always',
+        'You get SQL\'s ACID transactions, joins, and schema enforcement alongside flexible JSON storage for columns that need it. Many "NoSQL" use cases (flexible schemas, nested documents) can be solved within Postgres without adding another database technology and its operational burden',
+        'JSONB only stores strings; it cannot be queried like a real document store',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Polyglot persistence uses multiple databases (SQL for orders, Redis for sessions, Elasticsearch for search). What is the primary operational cost?',
+      options: [
+        'Each database requires a separate programming language',
+        'Each database system requires separate expertise, monitoring, backup procedures, upgrade paths, and failure modes to understand. A bug in the session service might require Redis expertise; a search ranking problem requires Elasticsearch knowledge. The more database types you run, the larger the operational surface area your team must maintain',
+        'Polyglot persistence violates ACID across the system',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'NewSQL databases (CockroachDB, Google Spanner) offer horizontal scaling with full SQL and ACID. When would you choose NewSQL over traditional SQL or NoSQL?',
+      options: [
+        'For any application with more than 1000 users',
+        'When you need both: full ACID transactions (ruling out most NoSQL) AND scale beyond what one machine can handle (ruling out traditional SQL without significant sharding complexity). NewSQL is more operationally complex than a single Postgres instance, so only reach for it when single-node performance is genuinely insufficient',
+        'NewSQL is always the best choice — it combines the advantages of both',
+      ],
+      correct: 1,
+    },
+  ],
 };

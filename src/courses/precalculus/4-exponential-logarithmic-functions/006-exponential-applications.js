@@ -208,4 +208,51 @@ export default {
     teaser: 'The exponential model $A = A_0 e^{kt}$ is the solution to the simplest differential equation: $\\frac{dA}{dt} = kA$ (rate of change is proportional to current amount). This is the first separable ODE you solve in Calculus 2. The logistic model $P\' = kP(1 - P/L)$ is the second most common — its solution is the S-curve. Every model in this lesson is a differential equation solution waiting to be recognised.',
     linkedLessons: ['exponential-functions', 'solving-exponential-log', 'logarithm-relationships'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Exponential growth: A = A₀·eᵏᵗ. What does the constant k represent?',
+      options: [
+        'The amount that grows each time period',
+        'The continuous growth RATE — k > 0 means growth, k < 0 means decay. The rate of change dA/dt = kA, meaning the amount growing at each instant is proportional to the current amount; k is the proportionality constant (e.g., k = 0.03 means 3% continuous growth rate)',
+        'The time constant — how many years until the value doubles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Radioactive decay: A = A₀·e^(-0.05t). The half-life is found by solving e^(-0.05t) = 1/2. Why take ln of both sides?',
+      options: [
+        'Because e^x and ln(x) cancel: ln(e^(-0.05t)) = -0.05t, solving to t = -ln(0.5)/0.05 = ln(2)/0.05',
+        'To convert the exponential to a polynomial for easier computation',
+        'ln is used only because the base is e; for other bases you would use log₂',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Compound interest: A = P(1 + r/n)^(nt). As n → ∞ (compounding continuously), this approaches A = Pe^(rt). Why does e appear?',
+      options: [
+        'e appears as a coincidence of the limit definition of e = lim(1+1/n)ⁿ as n→∞',
+        'lim(n→∞)(1 + r/n)^(nt) = lim(n→∞)[(1 + r/n)^(n/r)]^(rt) → e^(rt); the expression (1 + r/n)^(n/r) matches the definition of e as n→∞. Continuous compounding naturally produces the base e',
+        'e is used for financial calculations because it gives the largest possible return',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The logistic model P(t) = L/(1 + ((L-P₀)/P₀)·e^(-kt)) has an S-shaped curve. What happens as t → ∞?',
+      options: [
+        'P → ∞ — exponential growth eventually overwhelms the logistic term',
+        'P → L (the carrying capacity) — as t → ∞, the term e^(-kt) → 0 for k > 0, making the denominator → 1, so P → L/1 = L. The logistic model captures bounded growth: fast at first, then slowing as the population approaches the environment\'s limit',
+        'P → 0 — eventually the population collapses due to resource exhaustion',
+      ],
+      correct: 1,
+    },
+  ],
 }

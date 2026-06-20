@@ -878,5 +878,50 @@ export default {
     'POS of F = De Morgan applied to SOP of F̄.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"NAND-NAND = AND-OR." If you have an AND-OR two-level circuit and want to convert it to all NAND gates, what is the procedure?',
+      options: [
+        'Replace each AND with NOR and each OR with NAND',
+        'Replace every AND and OR gate with a NAND gate — the bubble pairs at inter-gate connections cancel, leaving the same logic function',
+        'Add an inverter before each OR gate input to convert them to NAND',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Mixed logic: bubble-to-bubble cancels, bubble-to-plain is a real inversion." What happens when a gate with an output bubble drives a gate with an input bubble?',
+      options: [
+        'The two bubbles produce a double inversion, which cancels — equivalent to a wire',
+        'The bubbles create an XOR function on that connection',
+        'Double bubbles always indicate an error in the circuit diagram',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"SOP for mostly-0 functions; POS for mostly-1 functions." A truth table has 14 rows with F=1 and 2 rows with F=0. Which form is simpler?',
+      options: [
+        'SOP — always use SOP as it is more standard',
+        'POS — with only 2 rows at F=0, you write 2 maxterms (POS) instead of 14 minterms (SOP)',
+        'Both are equally complex for this function',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"POS of F = De Morgan applied to SOP of F̄." If you know the SOP of the complement F̄, how do you get the POS of F?',
+      options: [
+        'Negate all the literals in the SOP of F̄',
+        'Apply De Morgan to the SOP of F̄ — change AND to OR, OR to AND, and complement all literals',
+        'Add one more minterm to the SOP of F̄',
+      ],
+      correct: 1,
+    },
+  ],
 };

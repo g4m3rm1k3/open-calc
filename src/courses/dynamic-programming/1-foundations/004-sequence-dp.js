@@ -990,4 +990,51 @@ plt.show()
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'LCS (Longest Common Subsequence) of "ABCDE" and "ACE" is "ACE" (length 3). What does "subsequence" allow that "substring" does not?',
+      options: [
+        'Subsequences allow reversing characters; substrings require forward order',
+        'A subsequence allows skipping characters — the characters must appear in the same relative order but do not need to be contiguous. "ACE" is a subsequence of "ABCDE" because A, C, E appear in order with B and D skipped; a substring would require consecutive characters',
+        'Subsequences allow repeated characters; substrings do not',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Edit distance dp[i][j]: when characters match (s1[i] == s2[j]), dp[i][j] = dp[i-1][j-1]. When they don\'t match, dp[i][j] = 1 + min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]). What do the three min options represent?',
+      options: [
+        'The three options are: insert into s1, delete from s1, or substitute — corresponding to the three edit operations; taking 1 + the minimum of these gives the cheapest single edit plus the cost of the remaining subproblem',
+        'The three options represent left-shift, right-shift, and no-shift of characters',
+        'dp[i-1][j] is the cost if s1 is longer, dp[i][j-1] if s2 is longer, dp[i-1][j-1] if equal length',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'LIS (Longest Increasing Subsequence) O(n²) DP: dp[i] = length of LIS ending at index i. The final answer is max(dp). Why max(dp) rather than dp[n-1]?',
+      options: [
+        'The last element might be part of the longest subsequence, but the LIS might END at any index — not necessarily the last one; dp[n-1] is only the LIS ending at the last element, which may be shorter than the LIS ending at some earlier index',
+        'dp[n-1] could be negative if the sequence is decreasing',
+        'max(dp) is the same as dp[n-1] — they always give the same result',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'LCS has O(m×n) time and space. A common space optimization reduces space to O(min(m,n)). How?',
+      options: [
+        'You can skip every other cell and interpolate the missing values',
+        'Each row of the LCS table only depends on the previous row — so you only need to keep two rows at a time (or one row with careful index handling), reducing space from O(m×n) to O(n) where n is the shorter string length. The time stays O(m×n)',
+        'Space is reduced by sorting both strings before comparison',
+      ],
+      correct: 1,
+    },
+  ],
 };

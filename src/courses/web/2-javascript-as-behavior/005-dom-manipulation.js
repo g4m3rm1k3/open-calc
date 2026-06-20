@@ -60,5 +60,50 @@ export default {
     'UI updates are strictly reactive loops.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"JS pulls node references from RAM." What does this mean when you call document.getElementById()?',
+      options: [
+        'It searches the page HTML source file for the element',
+        'It returns a live JavaScript object that is the element — a reference to the actual DOM node in memory',
+        'It returns a copy of the element that you must re-insert into the page',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Memory modifications trigger paints." When you set element.textContent, what happens next?',
+      options: [
+        'The page must be reloaded to reflect the change',
+        'The browser schedules a repaint — the changed DOM node gets re-rendered on screen',
+        'The change only appears when the user scrolls',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You create a new element with document.createElement("div"). Is it visible on the page yet?',
+      options: [
+        'Yes — creating an element automatically adds it to the page',
+        'No — the element exists in memory but must be inserted into the DOM with appendChild or similar before it appears',
+        'Only if you set its innerHTML before creating it',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"UI updates are strictly reactive loops." What does this say about the ideal approach to building a UI?',
+      options: [
+        'Manually update every element whenever the user interacts',
+        'Update the underlying state, then derive the UI from that state — not the other way around',
+        'Use CSS animations instead of JavaScript for all UI changes',
+      ],
+      correct: 1,
+    },
+  ],
 };

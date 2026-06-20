@@ -501,6 +501,53 @@ app.innerHTML = \`
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why use CSS custom properties like `--color-text: #e2e8f0` instead of hardcoding `color: #e2e8f0` throughout your CSS?',
+      options: [
+        'CSS custom properties load faster than hardcoded hex values',
+        'One change to `--color-text` updates every element that uses it. Essential for dark/light mode: set different values per theme in one block, and the whole UI switches automatically. With hardcoded values, you must hunt down every hex occurrence',
+        'Custom properties allow values that hex codes cannot represent, like gradients',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '`element.innerHTML = "<h2>Hello</h2>"` vs `element.textContent = "<h2>Hello</h2>"`. What is the key difference?',
+      options: [
+        'innerHTML only works on div elements; textContent works on all elements',
+        'innerHTML parses the string as HTML (the h2 becomes a real heading element). textContent treats it as literal text (you see the angle brackets). innerHTML with user-supplied data can introduce XSS vulnerabilities',
+        'textContent is deprecated in modern browsers',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The sandbox gives you an `app` div as root. Why is appending to `document.body` directly a problem here?',
+      options: [
+        'document.body is read-only in the sandbox environment',
+        'The sandbox injects shell UI (nav, theme controls) into the body alongside your app. Appending to body directly places your elements outside the designated container, causing layout collisions with the shell',
+        'CSS custom properties defined on app are not accessible from body children',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '`box-sizing: border-box` is described as "always first." What problem does it solve?',
+      options: [
+        'Without it, borders inherit the wrong color from parent elements',
+        'By default (content-box), padding and border add to an element\'s declared width. width:200px + padding:20px = 240px actual width. border-box includes padding and border inside the declared width, so width:200px is always exactly 200px — predictable for layout arithmetic',
+        'It enables CSS grid and flexbox on elements that would otherwise not support them',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export default sim2_001

@@ -639,5 +639,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is the DOM?',
+      options: [
+        'The JavaScript engine that parses and runs your code',
+        'Your HTML document parsed into a tree of JavaScript objects that code can read and modify',
+        'A CSS feature for selecting elements by class or ID',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You read a number from an input field and try to add it to another number, but get string concatenation instead of addition. Why?',
+      options: [
+        'You used += instead of +',
+        'input.value always returns a string — you must convert it with Number() or the unary + before doing arithmetic',
+        'Form inputs can only store booleans and strings; numbers must come from a data source',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why should you call event.preventDefault() in a form submit handler?',
+      options: [
+        'It is required to fire the submit event at all',
+        'Without it, the browser navigates to a new page (its default form behaviour), losing your JavaScript state',
+        'It prevents other event listeners from firing on the same element',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You add an event listener to a button. The callback runs once, but then the button stops responding. What is the most likely cause?',
+      options: [
+        'Event listeners automatically remove themselves after firing once by default',
+        'The button element was replaced in the DOM — the old listener was attached to the now-gone element',
+        'addEventListener only works with click events registered during page load',
+      ],
+      correct: 1,
+    },
+  ],
 };

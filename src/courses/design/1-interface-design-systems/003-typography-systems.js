@@ -1662,5 +1662,50 @@ export default {
     'WCAG floors: 4.5:1 body, 3:1 large text. Measure with the contrast ratio formula, not by eye.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Type scale: base × ratio^n." You change the ratio from 1.25 to 1.5. What happens to the design?',
+      options: [
+        'Only the largest sizes increase — body text stays the same',
+        'The entire scale recalibrates — headings get proportionally larger and the contrast between levels increases',
+        'Nothing visible changes until you also change the base size',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Line-height is a function, not a flat value." A designer sets line-height: 1.6 on a 48px hero headline. What is the problem?',
+      options: [
+        'The value is too low — large text needs even more space than body text',
+        'Large text should use 1.0–1.2 line-height. 1.6 creates excessive vertical gaps between headline lines',
+        'Line-height should always be a pixel value, not a ratio',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Measure: max-width 65ch on all body text." Why is this described as a biological constraint rather than a convention?',
+      options: [
+        'It was established by law in the printing industry',
+        'Eye-saccade research shows the human eye loses its place when lines exceed 75 characters — the brain must re-scan for the line start',
+        'It is simply a common design pattern, with no scientific basis',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Two weights per component: 600 structural, 400 body. Never more." A component currently uses weights 300, 400, 500, 600, and 700. What is the most likely outcome?',
+      options: [
+        'The component looks polished — more weight variety creates visual richness',
+        'Visual chaos — too many weights dilute hierarchy so the eye cannot identify which element is most important',
+        'Performance degrades because the browser must load extra font files',
+      ],
+      correct: 1,
+    },
+  ],
 };

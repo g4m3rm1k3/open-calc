@@ -434,7 +434,52 @@ export default {
   challenges: [],
   mentalModel: ['textureCube(sampler, dir). Skybox: pos.xyww → depth=1. Reflection: reflect(I,N). Refraction: refract(I,N, n1/n2). scene.environment = CubeTextureLoader result.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Skybox: pos.xyww → depth=1." Why set the W component to W (not 1) for the skybox?',
+      options: [
+        'It makes the skybox infinitely large',
+        'After the perspective divide, z/w = w/w = 1.0 — the maximum depth. This ensures the skybox always renders behind everything else without writing a depth value that blocks real geometry',
+        'It disables depth testing for the skybox faces',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Reflection: reflect(I, N)." A view ray hits a mirror surface. reflect(I, N) returns the outgoing direction. What does this direction represent?',
+      options: [
+        'The direction toward the light source',
+        'The direction the reflected ray travels after bouncing off the surface — used to sample the cubemap to look up what the mirror sees in that direction',
+        'The normal at the hit point',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Refraction: refract(I, N, n1/n2)." n1=1.0 (air), n2=1.5 (glass). What does n1/n2 ≈ 0.667 control?',
+      options: [
+        'The opacity of the glass material',
+        'The ratio of the refractive indices — this determines how much the ray bends as it crosses the material boundary (Snell\'s Law)',
+        'The thickness of the glass surface',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"scene.environment = CubeTextureLoader result." Setting the scene environment affects which material type most significantly?',
+      options: [
+        'MeshBasicMaterial — it ignores lighting so environment maps are its main source',
+        'MeshStandardMaterial (PBR) — it uses the environment map as an image-based light source for ambient reflections and diffuse illumination',
+        'MeshPhongMaterial — it uses the environment map for shadow calculations',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_4_4 }

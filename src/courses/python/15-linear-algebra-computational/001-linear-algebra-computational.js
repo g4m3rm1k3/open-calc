@@ -1043,4 +1043,51 @@ res
       }, // end visualization
     ], // end visualizations
   }, // end intuition
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'PCA finds principal components sorted by explained variance. What does the first principal component (PC1) represent geometrically?',
+      options: [
+        'The axis aligned with the largest individual feature (highest column variance)',
+        'The direction in the original feature space along which the projected data has maximum variance — the "spread-most" axis through the data cloud, regardless of which original feature it aligns with',
+        'The average of all feature vectors, normalised to unit length',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'PCA requires centering the data (subtracting the column means) before computing the covariance matrix. What goes wrong if you skip centering?',
+      options: [
+        'The eigenvalues become negative, which is mathematically invalid',
+        'The first PC will capture the offset from the origin rather than the direction of spread — it points toward the mean instead of along the data\'s main variance axis. Centering ensures the covariance measures variation around the mean, not around zero',
+        'NumPy\'s linalg.eigh only works on zero-mean data',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In NumPy, `A @ B` and `A * B` on two 2-D arrays give different results. What is the difference?',
+      options: [
+        '@ is matrix multiplication (dot product of rows with columns); * is element-wise (Hadamard) multiplication. They agree only when one operand is a scalar',
+        '@ broadcasts while * does not',
+        '* is faster because it avoids the O(n³) matrix multiply loop',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The eigenvalue λ of the data covariance matrix C corresponding to a principal component v represents:',
+      options: [
+        'The length of the eigenvector v in the original feature space',
+        'The variance of the projected data along v — how spread out points are when projected onto that component. Larger λ means more information is captured by that direction',
+        'The correlation between the features that make up v',
+      ],
+      correct: 1,
+    },
+  ],
 }

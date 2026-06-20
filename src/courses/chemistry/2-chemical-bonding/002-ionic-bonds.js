@@ -581,7 +581,52 @@ export default {
     'ΔEN ≥ 1.7 → ionic bond. ΔEN < 0.4 → nonpolar covalent. In between → polar covalent.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Sodium (1 valence electron) and chlorine (7 valence electrons) form NaCl. What happens to the electrons?',
+      options: [
+        'Na and Cl share the electron between them equally',
+        'Na\'s single valence electron transfers to Cl — Na becomes Na⁺ (lost an electron), Cl becomes Cl⁻ (gained one)',
+        'Both atoms lose an electron and become positively charged',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Cation = lost electrons (positive). Anion = gained electrons (negative)." Why does losing electrons make an atom positive?',
+      options: [
+        'Losing electrons makes the atom heavier, which gives it a positive charge',
+        'The proton count stays the same — fewer electrons means the existing protons are no longer fully balanced, giving a net positive charge',
+        'Lost electrons become protons inside the nucleus',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Ions form crystal lattices, not pairs." What does this mean about the structure of table salt (NaCl)?',
+      options: [
+        'NaCl exists as individual Na⁺Cl⁻ pairs floating in space',
+        'Each Na⁺ is surrounded by 6 Cl⁻ ions, and each Cl⁻ by 6 Na⁺ ions — a regular repeating 3D lattice, not discrete molecule pairs',
+        'Salt crystals are made of single giant ions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Ionic compounds have very high melting points. Why does it take so much energy to melt table salt (melting point 801°C)?',
+      options: [
+        'The NaCl molecules are very heavy, requiring more energy to move',
+        'Breaking the lattice means overcoming electrostatic attractions to all 6 surrounding ions simultaneously for every ion — that is an enormous collective energy cost',
+        'Ionic bonds are covalent bonds in disguise, and covalent bonds are strong',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_CHEM_2_1 }

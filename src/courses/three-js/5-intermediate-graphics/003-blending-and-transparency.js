@@ -434,7 +434,52 @@ export default {
   challenges: [],
   mentalModel: ['Alpha over: src×a + dst×(1-a), order-dependent, back-to-front. Additive: src+dst, order-independent. transparent=true disables depthWrite in Three.js.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Alpha over: src×a + dst×(1-a), order-dependent, back-to-front." Two transparent objects overlap. A is behind B. In which order must they be drawn?',
+      options: [
+        'Front-to-back (B first, then A) to save GPU work',
+        'Back-to-front (A first, then B) — so the background is in the buffer when foreground transparency blends with it. Front-to-back would blend B against nothing, then A against B incorrectly',
+        'Any order — alpha blending is commutative',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"transparent=true disables depthWrite in Three.js." Why is depthWrite disabled for transparent objects?',
+      options: [
+        'Transparent objects should not write to the depth buffer — doing so would block opaque geometry behind them from being correctly composited with other transparent layers',
+        'Depth testing is completely disabled for transparent objects',
+        'Writing depth values would cause z-fighting with the transparent surface itself',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Additive: src+dst, order-independent." A fire particle system uses additive blending. What visual property makes additive blending ideal for fire and glow effects?',
+      options: [
+        'It makes each particle fully opaque, creating solid-looking flames',
+        'Overlapping particles accumulate brightness — areas with many particles glow brighter, naturally simulating emissive light accumulation',
+        'Additive blending avoids the need to sort particles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You render a scene with opaque geometry and transparent water surfaces. What is the correct render order?',
+      options: [
+        'All transparent objects first, then opaque objects',
+        'Opaque geometry first (with depthWrite on), then transparent surfaces back-to-front (depthRead on, depthWrite off)',
+        'Both can be rendered in any order if depthTest is disabled',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_4_2 }

@@ -427,4 +427,51 @@ function update(deltaTime) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'dot(a, b) = |a||b|cos(θ). For two unit vectors, what value does the dot product produce when they point in exactly the same direction?',
+      options: [
+        '0 — perpendicular means the angle is 0°',
+        '1 — cos(0°) = 1. For unit vectors, |a| = |b| = 1, so dot = cos(θ). Same direction = angle 0 = cos(0) = 1. Perpendicular gives 0 (cos 90° = 0), opposite gives −1 (cos 180° = −1)',
+        '|a| + |b| = 2 — the sum of their magnitudes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Using the dot product to colour pins by alignment with the ball\'s direction: `dot(pinDir, ballDir)` ranges from −1 to 1. What does a value near 0 indicate?',
+      options: [
+        'The pin is directly in the ball\'s path',
+        'The pin is roughly perpendicular to the ball\'s direction — to the side of the lane. A value near 1 means the pin is directly ahead; near −1 means it is behind the ball',
+        'The pin has been knocked down',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The cross product a × b produces a vector perpendicular to both a and b. What determines which of the two possible perpendicular directions it points?',
+      options: [
+        'It always points toward the camera',
+        'The right-hand rule: curl the fingers of your right hand from a toward b; your thumb points in the direction of a × b. This means a × b = −(b × a) — order matters. For a bowling impact, the cross product gives the spin axis direction, and the order determines clockwise vs counter-clockwise spin',
+        'It points in the direction of the larger input vector',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Normalizing a vector (dividing by its magnitude) converts it to a unit vector. Why is normalization important when using vectors as directions?',
+      options: [
+        'Three.js only accepts unit vectors for position and rotation',
+        'Dot and cross products on unnormalized vectors are scaled by the magnitudes: dot(a,b) = |a||b|cos(θ). For coloring by angle, you want cos(θ) directly, not scaled by distances. A fast ball that travels far would produce larger dot products than a slow one at the same angle — normalization removes the magnitude and leaves only direction',
+        'Unnormalized vectors cause floating-point overflow after many frames',
+      ],
+      correct: 1,
+    },
+  ],
 }

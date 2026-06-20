@@ -92,4 +92,50 @@ res
     'Augmented assignment (+=, -=, *=) is shorthand, not a new operation.',
     'Name variables by what they represent, not how they are computed.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'x = 5 then x = x + 1. What is x after these two statements?',
+      options: [
+        'Still 5 — you can\'t add 1 to x using x itself',
+        '6 — the right side x + 1 evaluates first using the current value 5, producing 6, then that value is bound to the name x',
+        'An error — x appears on both sides of the assignment',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'a = 3; b = a; a = 10. What is b?',
+      options: [
+        '10 — b is linked to a, so when a changes, b changes too',
+        '3 — b = a bound b to the VALUE 3 at that moment; integers are immutable and assignments bind names to values, not to other names',
+        'None — b was defined using a, so it becomes undefined when a is reassigned',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is total_revenue a better variable name than tr?',
+      options: [
+        'Python runs faster with longer names because the interpreter can optimize named variables',
+        'total_revenue says what the value represents, making the code readable without needing comments; tr is ambiguous — it could mean "translation", "trial", or anything else',
+        'Short names like tr cause NameErrors in Python when used inside functions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'x = 5; y = x; x += 3. What are x and y?',
+      options: [
+        'x = 8, y = 8 — y is linked to x so both update',
+        'x = 8, y = 5 — y = x bound y to 5; x += 3 rebinds x to 8 but does not affect y',
+        'x = 5, y = 8 — the += applies to the next unmodified binding',
+      ],
+      correct: 1,
+    },
+  ],
 }

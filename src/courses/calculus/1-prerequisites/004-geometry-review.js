@@ -583,4 +583,50 @@ export default {
     "completed-example-2",
     "solved-challenge",
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is the distance between the points (−1, 3) and (5, −1)?',
+      options: [
+        '√52 = 2√13 — using d = √((5−(−1))² + (−1−3)²) = √(36 + 16) = √52',
+        '10 — the sum of the horizontal and vertical distances: |5−(−1)| + |−1−3| = 6 + 4 = 10',
+        '√28 = 2√7 — taking d = √((5+1)² − (−1+3)²)',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A line has slope 3. What is the slope of any line perpendicular to it?',
+      options: [
+        '3 — parallel lines have the same slope, and perpendicular is the opposite of parallel',
+        '−1/3 — perpendicular slopes are negative reciprocals: m₂ = −1/m₁ = −1/3; their product is 3 × (−1/3) = −1',
+        '−3 — just negate the original slope to get the perpendicular slope',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is the standard equation of the circle with center (3, 4) and radius 5?',
+      options: [
+        '(x + 3)² + (y + 4)² = 5',
+        '(x − 3)² + (y − 4)² = 25 — using (x − h)² + (y − k)² = r²; note r² = 25, not r = 25',
+        '(x − 3)² + (y − 4)² = 5',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The distance formula d = √((x₂ − x₁)² + (y₂ − y₁)²) is really just one familiar theorem in disguise. Which one?',
+      options: [
+        'The Midpoint Theorem — averaging coordinates gives the distance between two points',
+        'The Pythagorean Theorem — the horizontal and vertical separations form the two legs of a right triangle; the distance is the hypotenuse',
+        'The Slope Formula — slope = rise/run already contains horizontal and vertical distances',
+      ],
+      correct: 1,
+    },
+  ],
 };

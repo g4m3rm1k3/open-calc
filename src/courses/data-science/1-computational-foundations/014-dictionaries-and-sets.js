@@ -90,4 +90,50 @@ res
     ]}}],
   },
   mentalModel:['Dict maps keys→values. Lookup is O(1). Keys must be immutable.','Always use .get(key, default) when the key might not exist.','Set stores unique elements. Union |, intersection &, difference -.','Word frequency counter: freq[word] = freq.get(word,0) + 1','Dict comprehension: {k:v for k,v in iterable}'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why is dictionary lookup O(1) rather than O(n) like a list search?',
+      options: [
+        'Dictionaries are sorted, so binary search (O(log n)) applies, which is approximately O(1) for small dicts',
+        'Dictionaries use a hash table — the key is hashed to a memory location directly, so lookup does not need to scan all entries; it computes where to look in one step regardless of dict size',
+        'Python caches the last N lookups, so repeated lookups are O(1) due to caching',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'd = {"a": 1}; d["b"] raises a KeyError. What does d.get("b", 0) return instead?',
+      options: [
+        'None — .get() always returns None for missing keys',
+        '0 — .get(key, default) returns the default value (0 here) when the key is absent, instead of raising KeyError',
+        'KeyError — .get() and direct access behave identically',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'set([1, 2, 2, 3, 3, 3]) produces what?',
+      options: [
+        '[1, 2, 2, 3, 3, 3] — sets preserve the input',
+        '{1, 2, 3} — sets store only unique elements; duplicates are automatically discarded',
+        '{1: 1, 2: 2, 3: 3} — sets convert to dictionaries with keys equal to values',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why must dictionary keys be immutable (e.g., strings, numbers, tuples — not lists)?',
+      options: [
+        'Python syntax requires immutable keys to prevent accidental modification during iteration',
+        'Dict lookup uses a hash of the key to find its slot; mutable objects (lists) can change, which would change their hash and make the key unfindable after it is stored — immutability guarantees the hash stays constant',
+        'Immutable keys are faster to compare because Python can use pointer equality instead of value equality',
+      ],
+      correct: 1,
+    },
+  ],
 }

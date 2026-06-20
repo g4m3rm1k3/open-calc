@@ -1972,5 +1972,50 @@ export default {
     'auditLayout() verifies: no floats, no hardcoded widths, at least one flex/grid context.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Flex = 1D. Grid = 2D." You are building the overall page structure with a sidebar and a main content area. Which tool is correct?',
+      options: [
+        'Flex — it is more flexible and works for any layout',
+        'Grid — page structure is inherently two-dimensional (rows and columns)',
+        'Either works equally well for page structure',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Never explicit pixel widths on layout containers." Why does a 300px sidebar break responsive design?',
+      options: [
+        'It only breaks on mobile — desktop is fine',
+        'The sidebar stays 300px on all screens, so on small viewports it can overflow or crowd the main content with no automatic adjustment',
+        'Pixel values cause slower rendering because the browser cannot cache layout calculations',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"repeat(auto-fill, minmax(min, 1fr)) = responsive grid, zero breakpoints." Why does this pattern eliminate breakpoints?',
+      options: [
+        'It uses JavaScript to recalculate column count on resize',
+        'The browser computes how many columns fit at any container width — the grid reflows automatically without media query thresholds',
+        'auto-fill is a media query shorthand that handles common breakpoints internally',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"gap on the container. Not margin on the children." A flex container has three children each with margin-right: 16px. What problem does this cause?',
+      options: [
+        'No problem — margin and gap produce identical visual results',
+        'The last child also gets 16px right margin, adding unwanted space at the edge. gap only creates space between children, never outside them',
+        'Margin is not supported on flex children',
+      ],
+      correct: 1,
+    },
+  ],
 };

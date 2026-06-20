@@ -762,4 +762,51 @@ print(count_unique_words(""))                         # 0`,
       hint: 'Break the problem into: normalize (handle casing), split (string → list of words), deduplicate (list → set), count (len of set). Each step is one line of code.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The problem-solving step "reduce to a known simpler problem" is applied by recognizing that "count unique words" is equivalent to what simpler operation?',
+      options: [
+        'Sorting the words alphabetically and counting runs',
+        'Converting the list to a set (which deduplicated by definition) and taking its length. Recognizing that uniqueness ≡ set membership is the key reduction — the solution becomes two built-in operations instead of a custom loop',
+        'Counting all words and subtracting the duplicates found by comparison',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Before coding, you sketch examples: `"Hello HELLO world"` → 2 unique words. This reveals a hidden requirement. What is it?',
+      options: [
+        'Punctuation must be removed from all words',
+        'Case normalization — "Hello" and "HELLO" must be treated as the same word. The example exposes this edge case before any code is written. Testing with a trivially correct example (all lowercase, no duplicates) would miss it',
+        'Words shorter than 3 characters should be excluded',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'After writing a working solution, you refactor by replacing a manual deduplication loop with `set(words)`. What risk does this refactor carry?',
+      options: [
+        'Sets are slower than lists for deduplication',
+        'Sets are unordered — if the problem later needs to preserve first-occurrence order of unique words, a set loses that. The refactor is safe here because only the count matters, not the order. But assumptions about order must be checked before substituting a set for an ordered structure',
+        'set() creates a shallow copy and does not remove duplicates',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Decomposing "count unique words" into normalize → split → deduplicate → count makes each step independently testable. What is the testing advantage?',
+      options: [
+        'Each step runs faster because it has fewer operations',
+        'When a bug appears, you can test each sub-step in isolation to narrow down which step is wrong. An all-in-one function fails as a black box — you know the output is wrong but not which part of the logic caused it',
+        'Decomposed functions are automatically type-checked by Python',
+      ],
+      correct: 1,
+    },
+  ],
 };

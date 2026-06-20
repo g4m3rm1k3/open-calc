@@ -86,4 +86,50 @@ while n!=1:
     ]}}],
   },
   mentalModel:[`while runs as long as condition is True — number of iterations not known in advance.`,`Identify the termination variable — the one that will eventually make condition False.`,`Add a max_iterations guard to prevent infinite loops.`,`Convergence loops run until abs(new - old) < tolerance.`,`Binary search and Newton's method are classic while loop patterns.`],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'x = 1; while x < 100: x *= 2. How many times does the loop body run?',
+      options: [
+        '99 — the loop runs from 1 to 99',
+        '7 — x doubles each time: 1, 2, 4, 8, 16, 32, 64, 128. At x=64, x < 100 is True so x becomes 128. At 128, the condition fails. That is 7 iterations',
+        '100 — x starts at 1 and the loop counts to 100',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'When is a while loop preferable to a for loop?',
+      options: [
+        'When you need to iterate over a list — while loops are more memory efficient for lists',
+        'When the number of iterations is not known in advance — e.g., running until convergence (|new - old| < tolerance) or until user input meets a condition; for loops require knowing the count upfront',
+        'Always — while loops are strictly more powerful than for loops',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What causes an infinite loop, and how do you guard against it?',
+      options: [
+        'Infinite loops are caused by syntax errors; fixing the syntax stops them',
+        'An infinite loop occurs when the condition never becomes False — typically because the variable the condition tests is never modified inside the loop. Guard with a max_iterations counter that breaks when exceeded',
+        'Infinite loops happen when the initial condition is True — starting with a False condition prevents them',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A convergence loop runs while abs(new_val - old_val) > 1e-6. What does this idiom check?',
+      options: [
+        'Whether the computation has produced a value smaller than one millionth',
+        'Whether the successive approximations have stopped changing significantly — once the difference between consecutive estimates drops below 10⁻⁶, the algorithm has converged and further iterations give negligible improvement',
+        'Whether the loop has executed more than one million times',
+      ],
+      correct: 1,
+    },
+  ],
 }

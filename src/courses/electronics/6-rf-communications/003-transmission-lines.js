@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'Z₀ = √(L/C)\nΓ = (ZL − Z₀) / (ZL + Z₀)\nSWR = (1 + |Γ|) / (1 − |Γ|)' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A 50Ω coaxial cable connects a transmitter to a 150Ω antenna. What is the reflection coefficient Γ?',
+      options: [
+        '0.5 — Γ = (ZL − Z₀) / (ZL + Z₀) = (150 − 50) / (150 + 50) = 100/200 = 0.5',
+        '3.0 — reflection coefficient equals the SWR for resistive loads',
+        '0 — the reflection coefficient is only nonzero for reactive (capacitive or inductive) loads',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'An antenna system has SWR = 3:1. What fraction of transmitter power is reflected back from the antenna?',
+      options: [
+        '33% — SWR directly gives the reflected fraction',
+        '25% — |Γ| = (SWR−1)/(SWR+1) = (3−1)/(3+1) = 0.5; reflected power = |Γ|² = 0.25 = 25%',
+        '67% — most power is reflected at SWR > 2',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is the characteristic impedance of a coaxial cable independent of its length?',
+      options: [
+        'Cable length doesn\'t affect impedance because resistance per meter is constant for a given wire gauge',
+        'Z₀ = √(L/C) depends only on the inductance and capacitance per unit length — which are determined by the cable geometry (conductor diameters, dielectric), not the total length of cable',
+        'Characteristic impedance is a measured value specified by the manufacturer; its independence of length is a regulatory requirement, not a physical property',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A 50Ω transmitter is connected to a 200Ω antenna. You insert a λ/4 impedance matching transformer section. What should its characteristic impedance be?',
+      options: [
+        '125Ω — average of 50Ω and 200Ω',
+        '100Ω — Z₁ = √(Z₀ × ZL) = √(50 × 200) = √10000 = 100Ω',
+        '10kΩ — multiply the two impedances together',
+      ],
+      correct: 1,
+    },
+  ],
 };

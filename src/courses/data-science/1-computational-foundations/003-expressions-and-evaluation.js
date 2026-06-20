@@ -96,4 +96,50 @@ res
     'Use parentheses to make intent explicit — never rely on memorizing precedence.',
     'Modulo is a core pattern: even/odd testing, digit extraction, cyclic counting.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does 2 + 3 * 4 evaluate to in Python?',
+      options: [
+        '20 — Python evaluates left to right: 2 + 3 = 5, then 5 * 4 = 20',
+        '14 — multiplication has higher precedence than addition, so 3 * 4 = 12 is evaluated first, then 2 + 12 = 14',
+        '24 — the expression is fully combined before applying operators',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does 17 % 5 evaluate to?',
+      options: [
+        '3 — 17 % 5 is the remainder when 17 is divided by 5: 17 = 5×3 + 2, so the remainder is 2... wait, that\'s 2',
+        '2 — 17 = 5 × 3 + 2, so 17 % 5 = 2 (the remainder after dividing by 5)',
+        '3 — the result is the quotient, not the remainder',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'How do you check if a number n is even using the modulo operator?',
+      options: [
+        'n / 2 == 0 — even numbers divide evenly',
+        'n % 2 == 0 — an even number has remainder 0 when divided by 2; n % 2 gives either 0 (even) or 1 (odd)',
+        'n // 2 * 2 == n — reconstruct n from its half and check equality',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the value of (1 + 2) * (3 + 4) and why do parentheses matter here?',
+      options: [
+        '10 — 1 + 2 * 3 + 4 by default; the parentheses just clarify and do not change the result',
+        '21 — parentheses override precedence: (1+2) = 3 and (3+4) = 7, then 3 * 7 = 21, whereas without parentheses 1 + 2*3 + 4 = 11',
+        '24 — the two sums are 3 and 4, and 3 × 4 × 2 = 24',
+      ],
+      correct: 1,
+    },
+  ],
 }

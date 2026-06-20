@@ -222,4 +222,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Complete the square on x² + 6x + 5. What is the vertex form?',
+      options: [
+        '(x + 3)² − 4 — add (6/2)² = 9 to make the perfect square, then subtract 9 to compensate: x² + 6x + 9 − 9 + 5 = (x + 3)² − 4',
+        '(x + 6)² − 31 — square the full x-coefficient instead of half of it',
+        '(x + 3)² + 5 — add 9 to make the square but forget to subtract it',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Complete the square on 2x² − 8x + 3. What is the minimum value of this expression?',
+      options: [
+        '3 — the constant term is the minimum regardless of the x terms',
+        '−5 — from vertex form 2(x − 2)² − 5; the minimum is −5, achieved at x = 2',
+        '−4 — from 2(x − 2)² − 4; half the x-coefficient gives the vertex',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Completing the square reveals the vertex of a parabola. For y = x² − 4x + 7, what are the vertex coordinates?',
+      options: [
+        '(2, 3) — completing the square: (x − 2)² − 4 + 7 = (x − 2)² + 3; vertex is at (h, k) = (2, 3)',
+        '(4, 7) — the vertex is at the coefficient of x and the constant term',
+        '(−2, 3) — vertex x-coordinate is the negative of the value inside the square',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why does completing the square appear in integration (calculus) and not just in algebra?',
+      options: [
+        'Completing the square is used to find the derivative of quadratic functions by converting to power form',
+        'Integrals of the form ∫ dx/(x² + bx + c) cannot be evaluated directly — completing the square converts the denominator to (x + b/2)² + k, which matches the standard arctangent integral formula ∫ du/(u² + a²) = (1/a)arctan(u/a) + C',
+        'Completing the square is used to remove the x term from quadratic expressions so that u-substitution can be applied to any polynomial',
+      ],
+      correct: 1,
+    },
+  ],
 }

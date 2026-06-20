@@ -439,4 +439,50 @@ print(f"   lim comparison with 1/n: L = {a5(100000)/(1/100000):.6f}")
     { id: 'ch5-002-cp3', prompt: 'What is the difference between absolute and conditional convergence?', expectedInsight: 'Absolute: $\\sum |a_n|$ converges. Conditional: $\\sum a_n$ converges but $\\sum |a_n|$ diverges. Absolute convergence is stronger and allows rearrangement.' },
     { id: 'ch5-002-cp4', prompt: 'State the Alternating Series Estimation Theorem.', expectedInsight: 'For a convergent alternating series satisfying AST conditions, the error after $N$ terms is at most $b_{N+1}$ (the first omitted term).' },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The Direct Comparison Test: if 0 ≤ aₙ ≤ bₙ for all n and Σbₙ converges, what can you conclude about Σaₙ?',
+      options: [
+        'Σaₙ diverges — smaller terms cannot sum to the same finite value',
+        'Σaₙ converges — the partial sums of aₙ are bounded above by the sum of bₙ (a finite number), and bounded increasing sequences converge',
+        'No conclusion can be drawn without knowing the exact values of aₙ and bₙ',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The Integral Test connects Σf(n) to ∫f(x) dx. When can you use it?',
+      options: [
+        'Whenever f(n) is a positive sequence — the integral always gives the exact series sum',
+        'When f is positive, continuous, and decreasing on [1,∞) — then Σf(n) converges if and only if ∫[1,∞) f(x) dx converges; both have the same behavior even though they are not equal',
+        'Only for series of the form 1/nᵖ — the integral test is equivalent to the p-series test',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The Ratio Test gives L = lim|aₙ₊₁/aₙ|. The series diverges if L > 1. Why?',
+      options: [
+        'L > 1 means the terms aₙ are eventually bigger than 1, which violates the nth term test',
+        'L > 1 means consecutive terms grow by a factor > 1 eventually — the terms don\'t approach 0 (they grow), so the series cannot converge by the nth term test',
+        'L > 1 means the ratio of consecutive terms exceeds the radius of convergence',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You are testing Σ(n² + 1)/(n³ + 2). Which test is most efficient?',
+      options: [
+        'Ratio test — compute L = lim|(aₙ₊₁)/(aₙ)| for any series regardless of form',
+        'Limit comparison with Σ1/n — for large n, (n²+1)/(n³+2) ≈ n²/n³ = 1/n, and limit comparison gives lim(aₙ/bₙ) = 1 > 0, so both series have the same behavior (diverge, since Σ1/n diverges)',
+        'Alternating series test — the signs alternate once the numerator exceeds the denominator',
+      ],
+      correct: 1,
+    },
+  ],
 }

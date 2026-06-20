@@ -56,5 +56,50 @@ export default {
     'You are executing complete systems.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Everything operates simultaneously." In a full application, what does this mean in practice?',
+      options: [
+        'All code runs in parallel threads simultaneously',
+        'State, async data fetching, UI rendering, and event handling are all active at once — you must design for their interaction, not treat them as sequential steps',
+        'Multiple users can edit the same file at the same time',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"UI translates structural reality natively." When your app data changes, what should the UI do automatically?',
+      options: [
+        'Alert the user that data has changed and ask them to refresh',
+        'Re-render to reflect the new data — the UI is a direct translation of state, so state changes always produce updated UI',
+        'Write the change to localStorage first, then render',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"You are executing complete systems." What distinguishes a complete system from a collection of features?',
+      options: [
+        'A complete system has more features than a collection',
+        'The layers communicate coherently — state, services, and UI work together in a predictable data flow rather than being independently patched together',
+        'A complete system uses a framework; a collection uses vanilla JavaScript',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You built a working app — it fetches data, updates state, and re-renders correctly. A user reports that on slow connections it shows broken UI. Which layer of the system needs attention?',
+      options: [
+        'The View layer — add more CSS to handle empty states',
+        'The async/state layer — you are missing loading and error states that handle the time between request start and data arrival',
+        'The architecture layer — you need to switch to a different framework',
+      ],
+      correct: 1,
+    },
+  ],
 };

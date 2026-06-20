@@ -58,4 +58,50 @@ res
     'Residual plot: random scatter = good model. Any pattern = wrong model.',
     'sklearn.LinearRegression() wraps the normal equations. model.score() = R².',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Linear regression minimizes the sum of SQUARED residuals, not the sum of absolute residuals. Why use squares?',
+      options: [
+        'Squares are easier to compute than absolute values in Python',
+        'Squaring has two advantages: it penalizes large errors disproportionately more than small ones (a residual of 4 contributes 16 vs four residuals of 1 contributing 4 total), and the squared loss is differentiable everywhere — enabling a clean closed-form normal equation solution',
+        'Absolute residuals would require solving a system of equations with no closed form',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A regression model has R² = -0.2. What does this mean?',
+      options: [
+        'R² cannot be negative — this indicates a calculation error',
+        'The model performs WORSE than simply predicting the mean for every point — R² = 1 - SS_residual/SS_total, so R² < 0 means SS_residual > SS_total; the model adds noise rather than explaining variance',
+        'The model explains 20% of variance in the negative direction, equivalent to R² = 0.2',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A residual plot shows residuals are higher at both small and large predicted values, forming a U-shape. What does this indicate?',
+      options: [
+        'The model is overfitting the training data',
+        'The linear model is wrong for this data — the U-shape pattern means the true relationship is nonlinear (e.g., quadratic). Residuals should be random scatter with no pattern; any systematic shape reveals a misspecified model',
+        'The residuals look fine — a U-shape is the expected shape for well-fitted residuals',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The normal equations β = (XᵀX)⁻¹Xᵀy give the exact least-squares solution in one step. When might gradient descent be preferred over the normal equations?',
+      options: [
+        'Gradient descent is always preferred — it is more accurate than the normal equations',
+        'When the dataset has millions of rows or thousands of features — computing (XᵀX)⁻¹ costs O(p³) where p is the number of features and O(np²) to form XᵀX; gradient descent can update incrementally on mini-batches and scales to large datasets',
+        'Gradient descent should only be used when the normal equations give a negative R²',
+      ],
+      correct: 1,
+    },
+  ],
 }

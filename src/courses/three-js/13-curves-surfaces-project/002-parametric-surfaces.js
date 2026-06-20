@@ -466,5 +466,50 @@ export default {
     'Dynamic mesh: posAttr.needsUpdate=true + computeVertexNormals() each frame.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Surface = sampled (u,v) grid → positions + normals + UVs + index buffer." Why does a parametric surface need an index buffer?',
+      options: [
+        'Parametric surfaces cannot use triangle strips',
+        'The (N+1)² grid vertices are shared between adjacent quad triangles — the index buffer lets multiple triangles reference the same vertex, avoiding duplication in the position array',
+        'Index buffers are required for all Three.js geometries',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Normal = normalize(∂P/∂u × ∂P/∂v). Use finite differences with ε=0.001." Why use finite differences instead of computing the derivative analytically?',
+      options: [
+        'Finite differences are more accurate than analytical derivatives',
+        'Many surface functions are too complex or user-defined to differentiate analytically. Finite differences (sampling P at u±ε and v±ε) work for any function without needing a derivative formula',
+        'WebGL does not support mathematical derivatives',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"N×N grid: (N+1)² vertices, 2N² triangles." A surface uses N=10 segments. How many triangles does it have?',
+      options: [
+        '100 — N×N',
+        '200 — 2×N² = 2×100',
+        '242 — (N+1)²×2',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Dynamic mesh: posAttr.needsUpdate=true + computeVertexNormals() each frame." Why must needsUpdate be set to true?',
+      options: [
+        'Three.js tracks changes automatically; needsUpdate is optional',
+        'Three.js caches the GPU buffer — setting needsUpdate=true signals that the CPU-side array has changed and must be re-uploaded to the GPU vertex buffer this frame',
+        'needsUpdate invalidates the material cache',
+      ],
+      correct: 1,
+    },
+  ],
 }

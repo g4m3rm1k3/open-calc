@@ -364,7 +364,52 @@ export default {
   challenges: [],
   mentalModel: ['Pass order: shadows→opaque(F2B)→skybox→transparent(B2F)→post→UI. EffectComposer: addPass(RenderPass,BloomPass,etc), composer.render(). mesh.frustumCulled=true (default).'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Pass order: shadows → opaque (F2B) → skybox → transparent (B2F) → post → UI." Why must the skybox render after opaque geometry?',
+      options: [
+        'The skybox shader requires completed depth buffer data to work',
+        'With skybox depth set to 1.0, opaque geometry always passes the depth test against it. Rendering skybox first would write depth=1.0 everywhere, but rendering opaque first lets the depth buffer cull the skybox behind it — saving fill rate',
+        'The skybox cannot be rendered while there are active shadow maps',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"mesh.frustumCulled=true (default)." What does frustum culling do and why does the default matter?',
+      options: [
+        'It removes meshes from the scene permanently when they move off-screen',
+        'It skips submitting meshes whose bounding sphere does not intersect the view frustum — the default means every mesh is automatically skipped when out of view, saving vertex shader work',
+        'It improves texture filtering for off-screen objects',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"EffectComposer: addPass(RenderPass, BloomPass, etc)." You add passes in order: RenderPass → BloomPass → GammaCorrectionPass. Which pass writes to the screen?',
+      options: [
+        'RenderPass — it is always the output',
+        'The last pass in the chain (GammaCorrectionPass) — EffectComposer chains passes sequentially, with each pass reading the previous pass\'s output. The final pass outputs to the screen',
+        'All passes write to the screen simultaneously',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Opaque front-to-back (F2B)." Why render opaque objects front-to-back?',
+      options: [
+        'To ensure correct alpha blending results',
+        'Fragments that fail the depth test are discarded early (early-Z). Front-to-back means closer objects are drawn first — their depth values reject further fragment shader invocations for covered pixels behind them, reducing wasted GPU work',
+        'It is required for shadow maps to work correctly',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_6_3 }

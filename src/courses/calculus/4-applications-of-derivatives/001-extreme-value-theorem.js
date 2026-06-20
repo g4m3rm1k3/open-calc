@@ -241,4 +241,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The Extreme Value Theorem (EVT) guarantees absolute max and min exist under two conditions. What are they?',
+      options: [
+        'The function must be differentiable and defined on an open interval',
+        'The function must be continuous on a closed bounded interval [a, b] — continuous means no gaps or jumps, and closed+bounded means the endpoints are included and the interval does not extend to infinity',
+        'The function must have at least one critical point in the interior of the interval',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'To find the absolute maximum of a continuous function on [a, b], you evaluate at all critical points in (a, b) and at the endpoints a and b. Why include the endpoints?',
+      options: [
+        'The endpoints are always the location of the absolute max and min — interior points can only be local extrema',
+        'The absolute extreme might occur at an endpoint, not at a critical point — critical points are where f\' = 0 or f\' is undefined in the interior; the endpoints have no derivative constraint and must be checked separately',
+        'Including endpoints is optional — EVT guarantees the max is always at a critical point',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'f(x) = x² on (0, 1) — open interval. Does the absolute minimum exist?',
+      options: [
+        'Yes — f approaches 0 as x → 0 and the minimum value is 0',
+        'No — on the open interval (0, 1), x = 0 is not in the domain; f(x) = x² gets arbitrarily close to 0 but never reaches it, so no minimum is achieved. EVT does not apply to open intervals',
+        'Yes — by EVT, any continuous function on any interval has extreme values',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why does the EVT guarantee matter for optimization problems like "minimize cost subject to constraints"?',
+      options: [
+        'Without EVT, you would have to check infinitely many candidate points and could never confirm you found the global minimum',
+        'EVT tells you the optimal solution EXISTS before you calculate it — if the cost function is continuous on a closed bounded feasible region, you know a minimum cost is achievable (not just approached asymptotically), so the search for it is not futile',
+        'EVT provides the formula for computing the minimum directly from the endpoints',
+      ],
+      correct: 1,
+    },
+  ],
 }

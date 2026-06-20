@@ -1996,5 +1996,50 @@ export default {
     'auditComponent() = all five system audits applied simultaneously. Zero violations = ready to ship.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Four layers: anatomy → structure → rhythm → surface." A designer applies brand colours before deciding which elements are primary vs secondary. What goes wrong?',
+      options: [
+        'Nothing — colour can be applied at any stage and adjusted later',
+        'Surface (colour) depends on hierarchy levels being assigned first. Colour applied before hierarchy produces visually random weight distribution',
+        'The colours will render incorrectly in some browsers',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Three variant dimensions: intent (surface only), size (rhythm only), state (any)." A button has classes .btn-primary .btn-lg .btn-hover. Which dimension does each class represent?',
+      options: [
+        'intent=primary (colour), size=lg (spacing/type), state=hover (any combination) — these are correctly separated',
+        'All three are intent variants — they all change how the button looks',
+        'Size and state should be combined into one class to reduce specificity',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Eight states: default, hover, focus, active, disabled, loading, error, empty. All required." Why must the empty state be designed explicitly?',
+      options: [
+        'Empty state is optional — components with no data simply show nothing',
+        'Without a designed empty state, components render as broken layouts (missing columns, empty containers) rather than communicating that no data exists yet',
+        'Empty state is only required for data tables and lists, not general components',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"States as CSS modifier classes. Never inline style mutations." Why does JavaScript toggling style.color = \'red\' for an error state cause problems?',
+      options: [
+        'Inline styles have higher specificity than CSS, so the theme system cannot override them — the component breaks on theme switch',
+        'JavaScript is too slow for colour changes',
+        'Inline styles work fine for single-property changes but not for multi-property states',
+      ],
+      correct: 0,
+    },
+  ],
 };

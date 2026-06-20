@@ -566,5 +566,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You call a function before its definition appears in the file. It works with a function declaration but fails with a function expression. Why?',
+      options: [
+        'Function expressions use the wrong syntax for early calls',
+        'Function declarations are hoisted to the top of their scope; function expressions are not — they live in a variable',
+        'The JavaScript engine ignores function expressions until the page finishes loading',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You use an arrow function as a method on an object, but "this" inside it is undefined (or the global object). Why?',
+      options: [
+        'Arrow functions don\'t support "this" at all',
+        'Arrow functions inherit "this" from the enclosing scope — they don\'t bind their own "this" when called as a method',
+        'You forgot to bind the arrow function using .bind()',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A variable declared inside a function is not accessible outside it. What concept explains this?',
+      options: [
+        'The variable was garbage-collected immediately after the function ran',
+        'Every function creates its own scope — variables inside are invisible to code outside',
+        'Only const variables are scoped to functions; var leaks out',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'In what order does the scope chain search for a variable?',
+      options: [
+        'Global → enclosing function → local function',
+        'Local function → enclosing function(s) → global',
+        'The entire scope chain is searched simultaneously',
+      ],
+      correct: 1,
+    },
+  ],
 };

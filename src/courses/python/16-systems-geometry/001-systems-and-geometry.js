@@ -1013,4 +1013,51 @@ res
       }, // end visualization
     ], // end visualizations
   }, // end intuition
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A 2×2 linear system Ax = b has no solution. What does this mean geometrically about the two equations?',
+      options: [
+        'Both equations define the same line, so there are infinitely many intersections',
+        'The two equations represent parallel lines (same slope, different intercept) — they never intersect, so no (x, y) satisfies both simultaneously. Algebraically, the coefficient matrix A is singular (det = 0)',
+        'The lines intersect at the origin (0, 0) only',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'For a truss with 5 joints and unknown bar forces + reactions, why does assembling a matrix equation and calling np.linalg.solve work better than solving equations one at a time?',
+      options: [
+        'np.linalg.solve is faster than arithmetic operations in Python',
+        'Equilibrium at each joint gives two equations (x and y), coupling all unknowns. Gaussian elimination via solve handles all equations simultaneously in O(n³) — solving pairwise would require careful ordering and miss coupled dependencies',
+        'Matrix form avoids floating-point errors that individual substitutions accumulate',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'np.linalg.solve(A, b) requires A to be square and invertible. When should you use np.linalg.lstsq instead?',
+      options: [
+        'When the matrix is very large (n > 1000)',
+        'When the system is overdetermined (more equations than unknowns, e.g., fitting a line to noisy data points) — lstsq finds the x that minimizes ‖Ax − b‖² rather than requiring an exact solution',
+        'When A has integer entries rather than floats',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'np.linalg.solve raises a LinAlgError when the coefficient matrix is singular. What physically causes a truss\'s stiffness matrix to be singular?',
+      options: [
+        'The truss has too many joints for the number of bars',
+        'The structure is a mechanism — the bars and supports do not fully constrain motion. A singular matrix means the equilibrium equations have either no unique solution (unstable truss) or infinitely many (redundant / statically indeterminate)',
+        'Two bars in the truss have the same angle, causing duplicate rows',
+      ],
+      correct: 1,
+    },
+  ],
 }

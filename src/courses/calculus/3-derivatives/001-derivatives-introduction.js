@@ -425,4 +425,51 @@ These are theorems — proved once from the limit definition, used forever.`,
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'If f\'(a) = −3, what is the function doing near x = a?',
+      options: [
+        'The function has a minimum at x = a',
+        'The function is decreasing — for a small positive step h, f(a+h) ≈ f(a) − 3h. A negative derivative means the output falls as the input increases',
+        'The function is concave down at x = a',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'f(x) = |x| is continuous everywhere but not differentiable at x = 0. Why?',
+      options: [
+        'The function is not defined at x = 0',
+        'The limit of [f(0+h)−f(0)]/h as h→0⁺ equals +1 while the limit as h→0⁻ equals −1. Since the left and right difference quotients disagree, no single limit exists — there is a sharp corner, not a smooth tangent',
+        'The derivative formula d/dx[|x|] produces division by zero at x = 0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Expanding (x+h)³ = x³ + 3x²h + 3xh² + h³. After subtracting x³ and dividing by h, what survives as h → 0?',
+      options: [
+        '3x² + 3xh + h² → 3x² — only the term without h remains; all terms with h as a factor vanish in the limit. This is why d/dx[x³] = 3x²',
+        '3x²h — the smallest h-containing term stays',
+        'x³ — the original function reappears',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A car\'s speedometer reads 60 mph at exactly noon. This reading is analogous to which mathematical concept?',
+      options: [
+        'The average velocity over the entire trip',
+        'The instantaneous rate of change — the derivative of position with respect to time at t = noon. It is defined as the limit of average velocity over shrinking time intervals around that moment',
+        'The total distance divided by total time',
+      ],
+      correct: 1,
+    },
+  ],
 };

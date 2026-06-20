@@ -352,4 +352,51 @@ print("  which don't face the CAP tradeoff. All distributed systems must choose 
     "Single-node databases (Postgres, MySQL) avoid CAP entirely — no distribution needed",
     "Know where your database sits on the CP/AP spectrum before you rely on it for critical data",
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A CP database during a network partition returns an error rather than a potentially stale value. Why is an error sometimes preferable to a stale answer?',
+      options: [
+        'Errors are easier to log and debug than wrong data',
+        'In domains like bank balances, inventory counts, or distributed locks, a stale answer can cause harm: double-spending, overselling, or two nodes acquiring the same lock. An error tells the caller "I cannot guarantee this answer" — the application can retry or display a safe fallback rather than acting on incorrect data',
+        'CP databases have lower latency than AP databases',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'An AP database (like DynamoDB in eventual-consistency mode) always responds during a partition, but the response might be stale. For which use case is this acceptable?',
+      options: [
+        'Transferring money between bank accounts',
+        'Displaying a like count on a social post. If the count is briefly 200 instead of 201, users will not notice or be harmed. The system stays responsive during outages, and the count will converge to the correct value once the partition heals. Availability matters more than exact accuracy here',
+        'Checking whether a username is already taken during registration',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Eventual consistency" is often misunderstood. What does it actually guarantee?',
+      options: [
+        'Reads will eventually return the correct value within 5 seconds',
+        'If no new updates are made to a data item, all replicas will converge to the same value — but there is no specified time bound. It does not mean "randomly wrong forever"; it means divergence is temporary and bounded by propagation time. Without further writes, all nodes will agree',
+        'The database will eventually upgrade to strong consistency after the partition heals',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A single PostgreSQL instance avoids CAP theorem considerations. Why?',
+      options: [
+        'PostgreSQL implements all three CAP properties simultaneously',
+        'CAP applies to distributed systems — multiple nodes that can be separated by a network partition. A single machine has no network between its components; there is no partition scenario. All data lives in one place, so consistency and availability are always both achievable. The moment you add replicas, you face CAP tradeoffs',
+        'PostgreSQL uses ACID which supersedes CAP theorem',
+      ],
+      correct: 1,
+    },
+  ],
 };

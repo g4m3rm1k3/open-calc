@@ -853,5 +853,50 @@ export default {
     'createBoard() runs once. renderBoard() runs every frame.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"HTML = structure. CSS = appearance. JS = behaviour. Never mix responsibilities." Which layer should change a cell\'s background colour to show a locked piece?',
+      options: [
+        'JS — add a class that CSS already styles; never write inline CSS from JS',
+        'HTML — set the background attribute directly in the HTML file',
+        'Write the colour as a JS variable and apply it with element.style.color',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"The DOM is a live tree. Changing a node immediately updates the screen." You set cell.style.background = \'red\'. When does the cell turn red?',
+      options: [
+        'After the next call to render()',
+        'Immediately — any mutation to a DOM node is reflected live in the browser',
+        'Only after the current JavaScript function returns',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Board state lives in a 2D array. The DOM is just the visual representation." If a player clears a line, what should you update first?',
+      options: [
+        'The DOM cells — then derive the board array from the visual state',
+        'The 2D board array — then re-render the DOM to match the updated state',
+        'Both simultaneously to keep them in sync',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"querySelector(selector) returns null if nothing matches." You call document.querySelector(\'#nonexistent\').style.background = \'red\'. What happens?',
+      options: [
+        'Nothing — null is silently ignored',
+        'TypeError: Cannot set properties of null — you must check for null before accessing properties',
+        'The selector creates the element if it doesn\'t exist',
+      ],
+      correct: 1,
+    },
+  ],
 };

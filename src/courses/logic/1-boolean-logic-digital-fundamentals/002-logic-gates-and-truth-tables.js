@@ -131,4 +131,51 @@ export default {
       solution: 'When E-stop is NOT pressed: CH1 = 1, CH2 = 1 (both contacts closed)\nWhen E-stop IS pressed: CH1 = 0, CH2 = 0 (both contacts open)\n\nFault condition: CH1 ≠ CH2\n\nFAULT = XOR(CH1, CH2) — output is 1 when channels differ.\n\nNormal operation: FAULT = XOR(1,1) = 0 and XOR(0,0) = 0\nFault (stuck contact): FAULT = XOR(1,0) = 1 or XOR(0,1) = 1\n\nIn a safety PLC: this is implemented as a cross-monitoring function in the safety program, exactly this XOR logic.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A NAND gate outputs 0 only when both inputs are 1. Why is NAND called a "universal gate"?',
+      options: [
+        'Because NAND is the most common gate in industrial control systems',
+        'Any boolean function can be built using only NAND gates — NOT, AND, and OR can all be constructed from NAND alone. This makes it possible to manufacture any circuit using only one gate type, simplifying production',
+        'NAND gates are universal because they operate at any voltage level',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'XOR outputs 1 when inputs differ. A=1, B=1 gives XOR = 0 but OR = 1. Why is this distinction useful?',
+      options: [
+        'XOR is just a faster way to compute OR when inputs are equal',
+        'XOR detects disagreement — when two signals SHOULD match (like dual-channel safety contacts), XOR = 1 flags a mismatch; for parity checking, XOR adds the "odd vs even" property; for encryption, XOR is its own inverse (A XOR K XOR K = A)',
+        'XOR is identical to OR except for historical naming conventions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A truth table for a 3-input function has how many rows?',
+      options: [
+        '6 rows — inputs multiply: 2 × 3 = 6',
+        '8 rows — each input is 0 or 1, giving 2³ = 8 total input combinations; a complete truth table must list every combination to fully define the function',
+        '3 rows — one row per input signal',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A NOR gate outputs 1 only when ALL inputs are 0. Why is NOR also a "universal gate"?',
+      options: [
+        'NOR is universal only for 2-input functions; for 3+ inputs you need NAND',
+        'Like NAND, NOR can implement NOT (NOR(A,A) = NOT A), OR, and AND using combinations — any boolean function can be built from NOR alone. NAND and NOR are the two universal single-gate building blocks',
+        'NOR is not actually universal; that claim only applies to NAND',
+      ],
+      correct: 1,
+    },
+  ],
 };

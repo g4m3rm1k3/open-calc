@@ -533,4 +533,51 @@ function update(deltaTime) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Sphere-sphere collision: `ballMesh.position.distanceTo(pin.position) < BALL_RADIUS + PIN_RADIUS`. Why add both radii instead of just checking one?',
+      options: [
+        'Adding both prevents false positives when objects move fast',
+        'The distance is between the two centers. A collision occurs when the surface of the ball (BALL_RADIUS from center) touches the surface of the pin (PIN_RADIUS from center). The surfaces meet when the center distance equals BALL_RADIUS + PIN_RADIUS. Checking only one radius would miss collisions by the amount of the other',
+        'PIN_RADIUS is zero for thin pins, so only BALL_RADIUS matters',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A hit is fired exactly once per contact using `if (!hitPins.has(pin)) { hitPins.add(pin); ... }`. What happens without the Set?',
+      options: [
+        'The ball stops on first contact instead of passing through pins',
+        'The collision condition is true for many consecutive frames while the ball overlaps the pin. Without the Set, the hit response would fire 10–20 times per contact, accelerating the pin to extreme speeds with each additional impulse — pins would fly off unrealistically fast',
+        'hitPins is required by the Three.js physics engine',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Pin fall is animated by incrementing `pin.userData.fallAngle` and setting `pin.rotation.x = -fallAngle` each frame. What visual effect does clamping at PIN_FALL_MAX produce?',
+      options: [
+        'The pin bounces back up after reaching the maximum angle',
+        'The pin tips over and stops flat on the floor (rotation of π/2 ≈ 90°) rather than continuing to spin. Without the clamp, the pin would rotate past horizontal and oscillate or disappear into the floor',
+        'Clamping limits the rotation speed rather than the total angle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '`pin.userData` is a plain JavaScript object that Three.js leaves empty for you to use. Why store simulation state here rather than in a parallel array indexed by pin number?',
+      options: [
+        'Three.js copies userData automatically to the physics engine',
+        'Co-location: the pin\'s physics state (velocity, fallAngle, falling flag) lives on the same object as the pin\'s visual mesh. When looping over pinMeshes, each pin carries its own state — no index synchronization is needed between mesh arrays and state arrays, and no risk of the indices getting out of sync',
+        'Parallel arrays are not supported in JavaScript for Three.js objects',
+      ],
+      correct: 1,
+    },
+  ],
 }

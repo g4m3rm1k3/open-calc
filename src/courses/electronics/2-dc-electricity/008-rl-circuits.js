@@ -79,4 +79,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A relay coil has L = 200mH and R = 400Ω. What is the RL time constant, and what does it tell you about the relay?',
+      options: [
+        'τ = 80,000s — multiply L and R together to get the time constant',
+        'τ = 0.5ms — τ = L/R = 0.2/400 = 0.0005s; the relay current builds to 63.2% of final value in 0.5ms',
+        'τ = 400/0.2 = 2000s — time constant is R divided by L for inductors',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why does adding a flyback diode increase a relay\'s drop-out time compared to running without one?',
+      options: [
+        'The diode increases the total resistance in the flyback path, slowing the current decay',
+        'The diode provides a low-resistance flyback path (only coil resistance), so current decays slowly through τ = L/R_coil rather than snapping off instantly',
+        'The diode stores charge that continues to drive current through the coil after the transistor switches off',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'At the moment an RL circuit is first energized, where does all the supply voltage appear?',
+      options: [
+        'Across the resistor — Ohm\'s Law gives V = IR immediately at t = 0',
+        'Across the inductor — because current is still zero, no voltage drops across R, so all of Vs appears across L',
+        'Split equally between R and L from the first instant',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'How does the RL circuit differ from the RC circuit in terms of what quantity follows the exponential curve?',
+      options: [
+        'RL circuits follow the same exponential pattern for voltage as RC circuits do — the time constant is the only difference',
+        'In RC circuits the capacitor voltage follows the exponential; in RL circuits the inductor current follows the exponential — they are mathematical duals',
+        'RC circuits use exponential charging; RL circuits use linear ramp-up because resistance and inductance oppose each other differently',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -61,5 +61,50 @@ export default {
     'Listeners hook Functions to Events.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"The engine never stops listening." What does this tell you about how a browser waits for user interaction?',
+      options: [
+        'The browser polls the page every second to check for changes',
+        'The browser\'s event loop continuously monitors for events — your listeners are called the moment an event fires',
+        'You must repeatedly call checkForEvents() in a loop',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"User actions spawn Data Events." A user clicks a button. What does JavaScript receive?',
+      options: [
+        'A string with the button\'s text content',
+        'An Event object containing details about what happened — the target element, coordinates, modifiers, etc.',
+        'A boolean indicating the click succeeded',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Listeners hook Functions to Events." What is addEventListener doing conceptually?',
+      options: [
+        'It immediately calls the function once',
+        'It registers a function to be called in the future whenever a specific event fires on that element',
+        'It creates a new DOM element for the event',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A click event on a child element fires. Does the parent element also receive that event?',
+      options: [
+        'No — events are contained to the element they fire on',
+        'Yes — events bubble up through the DOM tree; ancestors also receive the event unless propagation is stopped',
+        'Only if the parent also has a click listener registered',
+      ],
+      correct: 1,
+    },
+  ],
 };

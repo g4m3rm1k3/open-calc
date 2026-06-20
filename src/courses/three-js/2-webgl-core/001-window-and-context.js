@@ -542,7 +542,52 @@ export default {
     'Physical pixels = CSS pixels × devicePixelRatio. gl.viewport() always takes physical pixels.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Context = software bridge to GPU. One canvas, one context." You try to get a second WebGL context on the same canvas. What happens?',
+      options: [
+        'Both contexts work independently and can render simultaneously',
+        'The browser returns null or invalidates the first context — one canvas supports only one rendering context at a time',
+        'The second context overwrites the first silently',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Physical pixels = CSS pixels × devicePixelRatio. gl.viewport() always takes physical pixels." A canvas has CSS size 800×600. On a 2× retina display, what size should you pass to gl.viewport()?',
+      options: [
+        '800, 600 — always use CSS pixels for consistency',
+        '1600, 1200 — multiply by devicePixelRatio (2) to match the physical pixel count',
+        '400, 300 — divide by devicePixelRatio to scale down',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"DeltaTime: move × (currentTime - prevTime) / 1000." Why divide by 1000?',
+      options: [
+        'To convert from milliseconds (what the browser provides) to seconds — movement speeds are typically expressed in units/second',
+        'To normalize the frame rate to 60fps',
+        'To avoid floating point overflow',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"requestAnimationFrame: fires once per screen repaint, pauses when tab hidden." Why does this pausing behaviour matter for game loops?',
+      options: [
+        'It has no impact — games should always run at full speed',
+        'When the tab is hidden, no rendering is needed and the loop would waste CPU/GPU. rAF automatically pauses, saving battery and preventing physics/animation from advancing without being displayed',
+        'It prevents the browser from crashing when too many animations run',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_1_0 };

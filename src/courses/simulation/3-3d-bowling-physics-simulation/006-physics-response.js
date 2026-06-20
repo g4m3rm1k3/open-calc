@@ -720,4 +720,51 @@ function update(deltaTime) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'On collision, the impact normal is the unit vector from the ball center to the pin center. Why this direction rather than the ball\'s velocity direction?',
+      options: [
+        'The ball\'s velocity direction changes on every frame',
+        'The impact normal describes where the ball\'s surface presses against the pin — the direction the force actually acts. The ball pushes the pin away from itself. Velocity direction would only be correct for a head-on hit; off-center hits (which scatter pins sideways) require the geometry of the contact point, not the ball\'s heading',
+        'Three.js computes impact normals automatically',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The impulse magnitude is the dot product of the ball\'s velocity with the impact normal. What does this quantity measure physically?',
+      options: [
+        'The total speed of the ball at impact',
+        'The component of the ball\'s velocity directed along the impact normal — how fast the ball is pushing into the pin in the contact direction. The perpendicular component (tangential velocity) does not contribute to the head-on push, only to spin. Extracting just this component gives the physically correct impulse',
+        'The angle between ball velocity and pin center',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'After impact, pin velocity decays each frame: `pin.userData.vel.multiplyScalar(FLOOR_FRICTION)`. FLOOR_FRICTION is 0.9. After 10 frames, the velocity is 0.9¹⁰ ≈ 0.35× the original. What does this model?',
+      options: [
+        'The pin bouncing 10 times',
+        'Rolling/sliding friction with the floor. Each frame the pin retains 90% of its speed. This is exponential decay — an approximation of real friction that smoothly slows pins to a stop without requiring a full rigid-body solver',
+        'The pin losing mass as it slides',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '`pin.userData.vel.lengthSq() > STOP_SPEED * STOP_SPEED` uses squared length to check speed. Why compare squared lengths instead of `pin.userData.vel.length() > STOP_SPEED`?',
+      options: [
+        'lengthSq avoids a square root operation. Computing length requires √(x²+y²+z²); lengthSq is just x²+y²+z². Comparing squared values is mathematically equivalent (both sides are non-negative and the ordering is preserved) and significantly cheaper, especially in tight loops run 60 times per second per pin',
+        'lengthSq is more numerically stable for very small velocities',
+        'length() does not work for velocities, only for positions',
+      ],
+      correct: 0,
+    },
+  ],
 }

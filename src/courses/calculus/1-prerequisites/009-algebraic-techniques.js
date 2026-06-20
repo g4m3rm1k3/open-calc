@@ -499,4 +499,50 @@ export default {
     "completed-example-3",
     "solved-challenge",
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Computing lim(x→2) (x² − 4)/(x − 2) gives 0/0 by direct substitution. What technique resolves this?',
+      options: [
+        'L\'Hôpital\'s rule — differentiate numerator and denominator separately',
+        'Factor the numerator: x² − 4 = (x − 2)(x + 2), then cancel the common (x − 2). The limit equals lim(x→2)(x + 2) = 4',
+        'The limit does not exist because 0/0 is undefined and no further manipulation is valid',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Computing lim(x→3) (√(x+1) − 2)/(x − 3) gives 0/0. Which technique removes the square root obstacle?',
+      options: [
+        'Multiply top and bottom by the conjugate (√(x+1) + 2) — the product (√(x+1) − 2)(√(x+1) + 2) = (x+1) − 4 = x − 3, which cancels with the denominator, leaving 1/(√(x+1) + 2) → 1/4 at x = 3',
+        'Factor (√(x+1) − 2) as a difference of cubes since the cube root pattern applies to all radicals',
+        'Substitute x = 3 before simplifying — the function is actually defined at x = 3 if you evaluate the square root first',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'When you see a 0/0 form with the expression (1/(x+h) − 1/x)/h (which appears in computing derivatives from the definition), what technique clears the compound fraction?',
+      options: [
+        'Multiply numerator and denominator by x + h to cancel the compound structure',
+        'Find a common denominator for the fractions in the numerator: 1/(x+h) − 1/x = (x − (x+h))/(x(x+h)) = −h/(x(x+h)); then h cancels, leaving −1/(x(x+h)) → −1/x²',
+        'Expand 1/(x+h) using the binomial theorem and collect terms involving h',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the factored form of x³ − 8, and how does this help compute lim(x→2) (x³ − 8)/(x − 2)?',
+      options: [
+        'x³ − 8 = (x − 2)³; cancelling gives (x − 2)², which equals 0 at x = 2, so the limit is 0',
+        'x³ − 8 = (x − 2)(x² + 2x + 4) using the difference-of-cubes formula a³ − b³ = (a−b)(a²+ab+b²); cancelling (x−2) leaves x² + 2x + 4 → 4 + 4 + 4 = 12 at x = 2',
+        'x³ − 8 = (x − 2)(x + 2)² from the same pattern as difference of squares; the limit is (2+2)² = 16',
+      ],
+      correct: 1,
+    },
+  ],
 };

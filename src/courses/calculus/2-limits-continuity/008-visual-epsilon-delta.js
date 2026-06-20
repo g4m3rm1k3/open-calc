@@ -392,4 +392,50 @@ export default {
   ],
 
   checkpoints: ['intuition', 'graph-method', 'example-2', 'example-4', 'challenge-1'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In the ε–δ definition, ε is given first and δ must be found. What is the graphical interpretation of this?',
+      options: [
+        'ε is the horizontal error tolerance and δ is the vertical error tolerance — you choose how far left or right x can stray from a',
+        'ε is the vertical error tolerance (how close the output must be to L) and δ is the horizontal tolerance that guarantees it — on the graph, you draw a horizontal ε-band around L and find a vertical δ-strip around a that maps inside that band',
+        'ε and δ are both horizontal distances measured along the x-axis, one on each side of the limit point',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'For f(x) = 2x, you want the output within ε = 0.1 of f(3) = 6. What δ works?',
+      options: [
+        'δ = 0.1 — you use the same tolerance for input and output',
+        'δ = 0.05 — since f(x) = 2x doubles any x-error, you halve ε: if |x − 3| < 0.05 then |f(x) − 6| = 2|x − 3| < 0.1',
+        'δ = 0.2 — since f doubles inputs you double ε to compensate',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The graphical method for finding δ involves drawing a horizontal band of width 2ε around the target value L. What do you do next?',
+      options: [
+        'Find the y-values where the function enters and exits the band, then project those points down to the x-axis to find the corresponding x-interval — the δ is the smaller of the two distances from a to those x-values',
+        'Extend the band horizontally until it covers the entire function domain, then the width of that horizontal region is δ',
+        'Increase ε until the ε-band contains the entire graph, then set δ equal to the ε value that achieves this',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why does the ε–δ definition require that δ work for ALL x with |x − a| < δ, not just some x?',
+      options: [
+        'For efficiency — checking all x in the interval is faster than checking specific values one by one',
+        'The limit is about the entire neighborhood: the function must be controlled near a, not just at isolated convenient points. A δ that works for some x but fails for others would allow arbitrarily bad behavior near a',
+        'The "for all" quantifier only matters in formal proofs; in practice δ only needs to work for the specific x values in the problem',
+      ],
+      correct: 1,
+    },
+  ],
 }

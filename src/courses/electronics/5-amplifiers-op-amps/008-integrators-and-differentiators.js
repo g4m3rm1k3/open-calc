@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A constant +1V is applied to an op-amp integrator with R = 10 kΩ and C = 1 μF. What shape does the output waveform take?',
+      options: [
+        'A constant −1V — the integrator inverts and buffers DC signals',
+        'A linearly decreasing ramp — Vout = −(1/RC) × ∫1V dt = −(1/RC) × t × 1V; constant input produces a constant slope output',
+        'An exponential decay toward a negative voltage, like a charging capacitor',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'An ideal op-amp integrator will eventually saturate even with zero AC input. Why?',
+      options: [
+        'The feedback capacitor charges to the supply voltage during power-up and cannot discharge',
+        'Any small DC offset voltage or input bias current is continuously integrated over time, causing the output to drift and eventually reach the supply rail — a reset mechanism or leakage resistor across C is needed',
+        'Integration requires infinite bandwidth; the op-amp\'s finite GBP causes the output to saturate at high signal frequencies',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A triangle wave is applied to an op-amp differentiator. What output waveform results?',
+      options: [
+        'A sine wave — the differentiator converts piecewise-linear signals into smooth curves',
+        'A square wave — the derivative of a triangle wave (constant slope each half-period) is a constant in each half-period, which is a square wave',
+        'A triangle wave with opposite phase — the differentiator inverts but preserves the waveform shape',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A practical differentiator adds a small resistor Rs in series with the input capacitor. What problem does this solve?',
+      options: [
+        'Rs prevents the capacitor from charging too quickly, limiting output slew rate',
+        'Without Rs, gain rises at 20 dB/decade indefinitely — Rs creates a gain-limiting pole at high frequencies, preventing the differentiator from amplifying high-frequency noise and oscillation to destructive levels',
+        'Rs ensures the differentiator works at DC frequencies, where a pure capacitor would block the signal',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -500,7 +500,52 @@ export default {
     "Everything depends on the Parallel Postulate. Different postulate = different geometry (spherical, hyperbolic).",
   ],
   checkpoints: ["read-intuition"],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Parallel + transversal → 8 angles. Corresponding = equal." Lines L1 and L2 are parallel. A transversal crosses them. Angle 1 (above L1, right of transversal) = 55°. What is the corresponding angle above L2?',
+      options: [
+        '125°',
+        '55°',
+        '90°',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Alternate interior angles = equal." Two parallel lines cut by a transversal. The alternate interior angles are on opposite sides of the transversal, between the parallel lines. If one is 70°, the other is:',
+      options: [
+        '110°',
+        '70°',
+        '90°',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Co-interior angles = supplementary." Two parallel lines, co-interior angles. If one co-interior angle is 65°, the other is:',
+      options: [
+        '115°',
+        '65°',
+        '25°',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Converses: angle evidence → parallel conclusion." A transversal crosses two lines. If corresponding angles are equal, what can you conclude about the two lines?',
+      options: [
+        'The lines are perpendicular',
+        'The lines are parallel — equal corresponding angles is exactly the converse of the Corresponding Angles Postulate',
+        'The lines are the same line',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_GEO_1_4 };

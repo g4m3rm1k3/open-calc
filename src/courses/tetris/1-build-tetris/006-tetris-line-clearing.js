@@ -980,5 +980,50 @@ export default {
     'Level: Math.floor(lines / 10) + 1 — increases every 10 lines',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Full row: row.every(cell => cell !== 0)." What does this expression evaluate to for a row with 9 filled cells and 1 empty cell?',
+      options: [
+        'true — most cells are filled',
+        'false — every returns false as soon as it finds the empty cell (cell === 0)',
+        'undefined — not all cells are checked',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Remove full rows: boardData.filter(row => !row.every(cell => cell !== 0))." What does filter return?',
+      options: [
+        'The full rows that were cleared',
+        'A new array containing only the rows that are NOT full — the incomplete rows that remain',
+        'undefined — filter modifies boardData in place',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Restore height: unshift empty rows at the top." Why must you add new rows at the TOP after clearing?',
+      options: [
+        'Empty rows should go at the bottom since cleared rows were at the bottom',
+        'Cleared rows were always somewhere in the middle or top — to keep the board the correct height, new empty rows must be prepended at the top so settled pieces stay at the bottom',
+        'unshift adds to the end of an array in JavaScript',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Copy back in place: for each row, boardData[r] = remaining[r]." Why not just set boardData = remaining?',
+      options: [
+        'Assignment is slower than copying rows one by one',
+        'boardData is referenced by many parts of the program — reassigning boardData creates a new array that other code still points to the old array, breaking state synchronisation',
+        'You cannot assign arrays in JavaScript',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -73,4 +73,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A transformer has 480 turns on the primary and 24 turns on the secondary. The primary is connected to 480V AC. What voltage appears at the secondary?',
+      options: [
+        '9600V — voltage multiplies by the turns ratio',
+        '24V — Vs = Vp × (Ns/Np) = 480 × (24/480) = 24V',
+        '456V — subtract the secondary turns from the primary voltage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A step-down transformer converts 480V to 120V and supplies 10A at 120V. Ignoring losses, what current flows in the 480V primary winding?',
+      options: [
+        '40A — current steps up when voltage steps down',
+        '2.5A — Ip = Is × (Ns/Np) = 10 × (120/480) = 2.5A; power is conserved (480V × 2.5A = 120V × 10A)',
+        '10A — current is the same on both sides; only voltage changes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why must a transformer\'s primary be powered from AC rather than DC?',
+      options: [
+        'DC voltages are too low to create adequate flux in the transformer core',
+        'A constant DC current produces a constant (non-changing) flux — Faraday\'s law requires changing flux (dΦ/dt) to induce voltage in the secondary; DC produces no changing flux so no secondary voltage is induced',
+        'DC would cause the iron core to corrode over time, destroying the transformer',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A technician is replacing a current transformer (CT) meter while the system is energized. Before disconnecting the meter, what must they do?',
+      options: [
+        'Short the CT secondary terminals first — an open CT secondary with primary current flowing causes dangerous kilovolt spikes that can destroy insulation and cause injury',
+        'Open the primary circuit to de-energize the CT before touching the secondary',
+        'Nothing special — CTs operate at low voltage so the secondary is safe to disconnect while energized',
+      ],
+      correct: 0,
+    },
+  ],
 };

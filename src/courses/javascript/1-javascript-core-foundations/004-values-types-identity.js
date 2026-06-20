@@ -336,5 +336,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You write: const a = "hello"; const b = a;  What gets copied into b?',
+      options: [
+        'A reference to the same string in memory',
+        'The actual string value — primitives are copied by value, not address',
+        'Nothing — strings are immutable so b will always be undefined',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'const x = {}; const y = {};  Does x === y return true?',
+      options: [
+        'Yes — both are empty objects so they are equal',
+        'No — === on objects compares memory addresses, and x and y point to different objects',
+        'Yes — JavaScript compares object contents when using ===',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Where does JavaScript store primitive values like numbers and booleans?',
+      options: [
+        'On the heap, alongside objects',
+        'On the call stack — primitives are stored directly in the stack frame',
+        'In a dedicated primitive pool separate from both stack and heap',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You call .toUpperCase() on a string. The original string variable still holds the lowercase version. Why?',
+      options: [
+        'You forgot to reassign the result — the method returns a new string, it does not modify the original',
+        'Strings in JavaScript don\'t support mutation, so the method silently fails',
+        'toUpperCase only works on strings stored in the heap',
+      ],
+      correct: 0,
+    },
+  ],
 };

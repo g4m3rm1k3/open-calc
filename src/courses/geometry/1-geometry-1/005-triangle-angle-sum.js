@@ -407,6 +407,51 @@ export default {
     "On a sphere: angle sum > 180°. In hyperbolic geometry: < 180°. The Parallel Postulate is critical.",
   ],
   checkpoints: ["read-intuition"],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Auxiliary line through C parallel to AB transports ∠A and ∠B to vertex C." Why does an auxiliary line help prove the triangle angle sum?',
+      options: [
+        'It creates a right angle at C, making calculation easier',
+        'A line through C parallel to AB creates alternate interior angles equal to ∠A and ∠B at vertex C — then the three angles at C lie on a straight line summing to 180°',
+        'It divides the triangle into two right triangles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In a triangle, two angles are 47° and 83°. What is the third angle?',
+      options: [
+        '60°',
+        '50°',
+        '70°',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Exterior Angle Theorem: exterior angle = sum of the two remote interior angles." A triangle has interior angles 40° and 65°. The exterior angle at the third vertex is:',
+      options: [
+        '105°',
+        '75°',
+        '115°',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"On a sphere: angle sum > 180°." Why does a triangle drawn on a globe have an angle sum greater than 180°?',
+      options: [
+        'Triangles on spheres use larger units of measurement',
+        'The Parallel Postulate fails on a sphere — lines that are "straight" on a sphere (great circles) always intersect, changing the geometry fundamentally',
+        'Spheres distort angles making them appear larger',
+      ],
+      correct: 1,
+    },
+  ],
 };
 export { LESSON_GEO_1_5 };

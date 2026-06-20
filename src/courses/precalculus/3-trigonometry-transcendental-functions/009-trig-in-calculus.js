@@ -376,4 +376,51 @@ export default {
       answer: "f''(x) = 2\\cos 2x"
     }
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'd/dx[sin(x)] = cos(x). What does this say geometrically about the sine graph?',
+      options: [
+        'The derivative of sine is 1 because sine is a unit function',
+        'At each point on the sine curve, the slope equals the cosine value: where sin(x) is rising fastest (x=0), cos(0)=1 (maximum slope); at sin\'s peak (x=π/2), cos(π/2)=0 (flat tangent); where sin is falling (x=π), cos(π)=-1 (steepest descent). The derivative encodes the slope behavior of sine exactly',
+        'The formula d/dx[sin] = cos means sine and cosine cancel each other when integrated',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '∫sin(x)dx = -cos(x) + C. Why the negative sign?',
+      options: [
+        'Integration always introduces a negative sign for periodic functions',
+        'Because d/dx[-cos(x)] = -(-sin(x)) = sin(x) — verifying the antiderivative. The negative sign comes from the chain of derivative rules: cosine\'s derivative is -sine, so the antiderivative of sine must be negative cosine',
+        'The negative sign is a convention to distinguish the integral from the derivative',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'To evaluate ∫sin²(x)dx, you replace sin²(x) with (1-cos(2x))/2. Why can\'t you integrate sin²(x) directly?',
+      options: [
+        'Powers of trig functions cannot be integrated — only first-power trig functions have antiderivatives',
+        'There is no simple antiderivative rule for sin² directly; the power-reduction substitution converts it to a sum of 1/2 and cos(2x)/2 — both standard antiderivatives. The identity "lowers the power" from squared to first-power trig, enabling direct integration',
+        'sin²(x) = sin(x)·sin(x) so you use integration by parts with u = sin(x), dv = sin(x)dx',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Trig substitution: for an integral containing √(1-x²), substitute x = sin(θ). Why?',
+      options: [
+        'Because sin is bounded by 1, matching the range of √(1-x²)',
+        'With x = sin(θ), √(1-x²) = √(1-sin²(θ)) = √(cos²(θ)) = cos(θ) — the square root disappears using the Pythagorean identity. The substitution transforms an algebraically difficult square root into a simple trig function that can be integrated directly',
+        'Trig substitution converts the integral to polar form, which is easier to evaluate',
+      ],
+      correct: 1,
+    },
+  ],
 }

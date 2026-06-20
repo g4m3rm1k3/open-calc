@@ -615,7 +615,52 @@ export default {
     "Definitions are biconditionals — always usable forward (term→property) and backward (property→term).",
   ],
   checkpoints: ["read-intuition"],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Conditional P→Q: false only when P=T and Q=F." The statement "If it rains, I carry an umbrella" is:',
+      options: [
+        'False when it rains and I carry an umbrella',
+        'False only when it rains (P is true) and I do NOT carry an umbrella (Q is false)',
+        'False whenever I carry an umbrella',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Contrapositive ¬Q→¬P always equivalent to P→Q." Which is the contrapositive of "If a figure is a square, it has four sides"?',
+      options: [
+        'If a figure has four sides, it is a square',
+        'If a figure does not have four sides, it is not a square',
+        'If a figure is not a square, it does not have four sides',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"∀: one counterexample destroys it." You claim "All triangles are equilateral." What do you need to disprove this?',
+      options: [
+        'A proof that no triangle is equilateral',
+        'A single specific triangle that is not equilateral — one counterexample is enough to falsify a universal claim',
+        'A survey showing most triangles are not equilateral',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Definitions are biconditionals." The definition "A triangle is equilateral if and only if all three sides are equal" means:',
+      options: [
+        'You can only use the definition going forward (equilateral → equal sides)',
+        'You can use it in both directions — equilateral implies equal sides, AND equal sides implies equilateral',
+        'The definition is true only for specific types of triangles',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_GEO_2_1_LOGIC };

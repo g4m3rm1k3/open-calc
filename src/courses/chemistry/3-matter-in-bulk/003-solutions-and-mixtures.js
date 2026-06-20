@@ -852,7 +852,52 @@ export default {
     'Hydrophobic effect = water pushes nonpolar molecules together to preserve H-bond network. Drives cell membrane formation.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Solution = homogeneous mixture. Phase = solvent phase." Salt dissolves in water. Which is the solvent and which is the solute?',
+      options: [
+        'Salt is the solvent because it determines how the solution behaves',
+        'Water is the solvent (the substance present in greater amount that does the dissolving); salt is the solute (the substance that gets dissolved)',
+        'Both are solvents — a solution is a 50/50 mixture by definition',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Like dissolves like: polar in polar, nonpolar in nonpolar." Why will gasoline (nonpolar) not dissolve in water (polar)?',
+      options: [
+        'Gasoline molecules are too large to fit between water molecules',
+        'Water\'s polar molecules form strong hydrogen bonds with each other — inserting nonpolar gasoline molecules would break those bonds without forming comparable new ones, which is energetically unfavourable',
+        'Gasoline is less dense than water, so it cannot mix',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"ΔH_solution = net of three steps." Dissolving NH₄NO₃ in water feels cold (endothermic). What does this tell you?',
+      options: [
+        'No energy is needed to break apart the NH₄NO₃ lattice',
+        'The energy needed to separate the ions (break the lattice) and separate water molecules is greater than the energy released forming ion-water interactions',
+        'Cold reactions always involve ionic compounds',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Saturated = max dissolved solute at equilibrium. Dynamic — dissolution and crystallisation occur simultaneously." What happens at saturation?',
+      options: [
+        'All dissolving stops — the solution is completely static',
+        'Dissolution and crystallisation continue at equal rates — the concentration appears constant, but molecules are still moving in and out of solution',
+        'Crystallisation completely stops and only dissolution continues',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_3_2 };

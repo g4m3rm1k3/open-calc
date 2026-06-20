@@ -229,4 +229,50 @@ export default {
     'completed-example-5',
     'solved-challenge',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'When evaluating a limit like lim(x→3) (x²−9)/(x−3), why does factoring help?',
+      options: [
+        'Factoring converts the expression to a simpler polynomial so you can substitute x = 3 directly without hitting 0/0',
+        'Factoring avoids the need for L\'Hôpital\'s rule, which is not taught until later in the course',
+        'x²−9 = (x−3)(x+3), so canceling (x−3) leaves x+3, which has the limit 6 at x = 3 — factoring removes the source of the indeterminate form',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In a related-rates problem, you have a right triangle with legs x and y and hypotenuse z. What geometry fact connects them?',
+      options: [
+        'The perimeter x + y + z is constant, so dx/dt + dy/dt + dz/dt = 0',
+        'x² + y² = z² (Pythagorean theorem), so differentiating both sides with respect to t gives 2x(dx/dt) + 2y(dy/dt) = 2z(dz/dt)',
+        'The area (1/2)xy is constant, so x(dy/dt) + y(dx/dt) = 0 by the product rule',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is "cancel factors, not terms" a critical algebra rule in calculus?',
+      options: [
+        '(a²−b²)/(a−b) = a+b (cancel the factor (a−b)), but (a+b)/b ≠ a (b is a term, not a factor). Canceling terms is division applied to only part of the expression — it changes the value',
+        'Terms can be canceled only when they appear on both sides of an equation, not within a single fraction',
+        'Canceling terms is valid in algebra but not in calculus, because limits involve infinitely small quantities',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Similar triangles are used frequently in calculus. What property makes them useful?',
+      options: [
+        'Similar triangles have equal perimeters, so their side lengths can be set equal in equations',
+        'Corresponding sides of similar triangles are proportional — if two triangles are similar with ratio k, every length in one is k times the corresponding length in the other, enabling proportion equations that relate unknown lengths',
+        'Similar triangles always share one side, so you can use the common side to find unknown angles',
+      ],
+      correct: 1,
+    },
+  ],
 }

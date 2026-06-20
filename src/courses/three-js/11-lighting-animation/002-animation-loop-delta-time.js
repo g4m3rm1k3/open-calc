@@ -497,5 +497,50 @@ export default {
     'Cap dt: Math.min(clock.getDelta(), 0.1) prevents spiral of death after hitches.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"position += velocity * dt. velocity in units/second, not units/frame." You set velocity = 5 (units/frame) and run on a 120fps monitor. What happens versus a 60fps monitor?',
+      options: [
+        'The animation runs at the same speed — velocity is frame-independent',
+        'The object moves twice as fast on 120fps — 5 units per frame means 600 units/second at 120fps vs 300 at 60fps. Multiply by dt to fix this',
+        'The object moves twice as slow on 120fps',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"dt = clock.getDelta() = seconds since last frame." On a 60fps display, what is the approximate dt value per frame?',
+      options: [
+        '60 — the frame rate in fps',
+        '0.0167 — one sixtieth of a second (1/60 ≈ 0.0167 seconds)',
+        '16.7 — milliseconds per frame',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Cap dt: Math.min(dt, 0.1) prevents spiral of death." What is the spiral of death?',
+      options: [
+        'A memory leak caused by uncapped animation loops',
+        'When a frame takes too long, dt is large → physics updates take longer → next frame also takes too long → dt grows further. The simulation falls further behind indefinitely. Capping dt breaks the cycle',
+        'An infinite loop caused by recursive animation callbacks',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Fixed timestep: while(acc >= FIXED_DT) { physicsStep(FIXED_DT); acc -= FIXED_DT; }" Why would physics use a fixed step while rendering uses a variable dt?',
+      options: [
+        'Fixed steps are faster to compute',
+        'Physics simulations (spring forces, collision detection) are numerically unstable with large variable steps — a fixed step ensures deterministic, stable results regardless of frame rate variation',
+        'Variable dt causes the physics engine to run at double speed',
+      ],
+      correct: 1,
+    },
+  ],
 }

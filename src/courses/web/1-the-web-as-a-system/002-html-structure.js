@@ -60,5 +60,50 @@ export default {
     'Nesting dictates DOM inheritance.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'HTML "builds the skeleton" of a page. What does this mean for CSS and JavaScript?',
+      options: [
+        'CSS and JavaScript provide structure — HTML only handles colour',
+        'HTML creates the elements and their relationships; CSS styles them and JS adds behavior to what HTML built',
+        'HTML runs after CSS, so it overrides any pre-existing styles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Meaning comes before rendering." What does semantic HTML provide that a div does not?',
+      options: [
+        'Better performance — semantic elements are faster to paint',
+        'Meaning for accessibility tools and search engines — a nav tag signals navigation intent; a div is meaningless',
+        'Automatic styling — semantic elements have built-in CSS',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Nesting dictates DOM inheritance." If a child element inherits font-family, where does it come from?',
+      options: [
+        'The browser default stylesheet only',
+        'Its closest ancestor in the tree that has font-family set — inheritance flows down from parent to child',
+        'The last CSS file loaded on the page',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An element is placed inside another element in HTML. What is their relationship in the DOM?',
+      options: [
+        'They are siblings — nested elements are placed at the same level',
+        'The outer element is the parent and the inner is its child — nesting creates the parent/child tree structure',
+        'They share the same DOM node to save memory',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -211,4 +211,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Partial fractions decompose 1/(x(x+1)) into A/x + B/(x+1). Using the cover-up method, what are A and B?',
+      options: [
+        'A = 1, B = −1 — cover x, plug in x = 0: 1/(0+1) = 1 = A; cover (x+1), plug in x = −1: 1/(−1) = −1 = B',
+        'A = 1, B = 1 — both constants are positive because the denominator factors are both positive',
+        'A = −1, B = 1 — A covers the first factor and B covers the second, with opposite signs',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why does an irreducible quadratic factor like (x² + 4) in the denominator require a numerator of the form (Ax + B) rather than just a constant A?',
+      options: [
+        'Because (x² + 4) has degree 2 and the numerator of each partial fraction must have degree one less than the denominator factor',
+        'Because Ax + B ensures the combined fraction is always defined, while a constant A could make it undefined',
+        'Because this is just a convention; using only A would give the same result with extra zeros for the coefficient',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You are asked to decompose (x³ + 1)/(x² − 1) into partial fractions. What must you do first, before setting up partial fractions?',
+      options: [
+        'Factor x² − 1 = (x−1)(x+1) immediately and write A/(x−1) + B/(x+1)',
+        'Perform polynomial long division first — the numerator degree (3) exceeds the denominator degree (2), so dividing gives a polynomial plus a proper remainder fraction, and only the remainder fraction is decomposed',
+        'Multiply both numerator and denominator by (x + 1) to eliminate the denominator before decomposition',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why does partial fraction decomposition make integrals like ∫ 1/(x² − 1) dx tractable?',
+      options: [
+        'It converts the quadratic denominator into a form where u-substitution u = x² − 1 applies directly',
+        '1/(x² − 1) has no simple antiderivative, but 1/(2(x−1)) − 1/(2(x+1)) does — each piece integrates to a natural log, so the decomposition turns one hard integral into two simple ones',
+        'Partial fractions eliminate the denominator so the integral becomes a polynomial, which is always easy to compute',
+      ],
+      correct: 1,
+    },
+  ],
 }

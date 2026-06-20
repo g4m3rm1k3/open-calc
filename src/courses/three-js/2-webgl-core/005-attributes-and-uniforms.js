@@ -630,7 +630,52 @@ export default {
     'Three.js: uniforms: { uTime: { value: 0 } } → material.uniforms.uTime.value = t each frame.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Attribute: one value per vertex, read from VBO. Uniform: one value for the whole draw call." You want to animate all vertices with the same time value. Which data type do you use?',
+      options: [
+        'An attribute — so each vertex gets the time individually',
+        'A uniform — time is the same for every vertex in the draw call, so uploading it once as a uniform is efficient',
+        'A varying — so the vertex shader can pass it to the fragment shader',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Varying: vertex shader writes → rasteriser interpolates → fragment shader reads." What value does a varying hold at a point halfway between two vertices?',
+      options: [
+        'The value from whichever vertex was processed first',
+        'The average of the two vertex values (linearly interpolated)',
+        'Zero — varyings are only valid at vertex positions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Set order: gl.useProgram(prog) → gl.uniform1f(loc, val) → gl.drawArrays()." What goes wrong if you call gl.uniform1f before gl.useProgram?',
+      options: [
+        'Nothing — uniform locations are global across programs',
+        'The uniform is set on whichever program is currently active, not the intended one — the draw call will use a stale or default value',
+        'The GPU silently buffers the uniform and applies it on the next useProgram call',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Three.js: uniforms: { uTime: { value: 0 } } → material.uniforms.uTime.value = t each frame." Why does Three.js wrap uniform values in an object with a value property?',
+      options: [
+        'It is required by the GLSL specification',
+        'The object reference stays stable — Three.js can inspect the value field each frame without rebinding the uniform location lookup, and it also enables type annotations and default tracking',
+        'It prevents accidental uniform deletion',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_1_4 };

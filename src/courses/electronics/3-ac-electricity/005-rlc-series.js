@@ -72,4 +72,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A series RLC circuit has XL = 80Ω and XC = 50Ω at 60Hz. What is the total impedance magnitude if R = 60Ω?',
+      options: [
+        '190Ω — add R, XL, and XC directly',
+        'About 67.1Ω — |Z| = √(R² + (XL−XC)²) = √(3600 + 900) = 67.1Ω',
+        '60Ω — reactances cancel and leave only resistance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In a series RLC circuit you measure V_R = 100V, V_L = 120V, and V_C = 80V. What is the supply voltage?',
+      options: [
+        '300V — the component voltages must sum to the supply voltage in series circuits',
+        '180V — V_L and V_C partially cancel so only add the larger reactance to V_R',
+        'About 108V — phasor sum: V_s = √(V_R² + (V_L − V_C)²) = √(10000 + 1600) ≈ 108V',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'In a series RLC circuit, when is it possible for voltage across the inductor to exceed the supply voltage?',
+      options: [
+        'It is never possible — component voltages cannot exceed supply voltage by conservation of energy',
+        'When the circuit is near resonance, high Q causes V_L (and V_C) to be Q times the supply voltage',
+        'Only when XL > XC, in which case the capacitor reduces the apparent supply voltage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'If XL = XC in a series RLC circuit, what is the phase angle of the current relative to the voltage?',
+      options: [
+        '90° — the reactive components dominate when they are equal',
+        '0° — net reactance is zero so Z = R (purely resistive), meaning current is in phase with voltage',
+        '45° — the transition between capacitive and inductive behavior',
+      ],
+      correct: 1,
+    },
+  ],
 };

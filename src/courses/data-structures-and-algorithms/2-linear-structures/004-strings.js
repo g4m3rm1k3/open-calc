@@ -916,4 +916,51 @@ print(is_palindrome_phrase("race a car"))                      # False`,
       hint: 'Clean the string first, then apply the exact same two-pointer palindrome check you already built.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The two-pointer technique checks palindromes in O(n) time. It uses a left pointer at index 0 and right pointer at index n-1, moving toward each other. Why is this O(n) while a naive double loop would be O(n²)?',
+      options: [
+        'The two-pointer approach uses bit operations instead of character comparisons',
+        'Each pointer moves at most n/2 steps — a total of n steps combined. The double loop compares every pair (i, j), which is O(n²) pairs. Two pointers replace the inner loop by exploiting the structure: the palindrome check only needs the outermost uncompared pair at each step',
+        'Python string comparison is O(1) so the total remains linear',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Checking for an anagram: "listen" vs "silent". Which approach correctly identifies them as anagrams?',
+      options: [
+        'Check if both strings have the same length',
+        'Compare sorted versions: sorted("listen") == sorted("silent") both give "eilnst". Alternatively, compare character frequency counts. Same length is necessary but not sufficient (e.g., "ab" vs "cc" have the same length but different characters)',
+        'Check if one string is a substring of the other',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'String concatenation in a loop: `result = ""` + `result += char` for each of n characters is O(n²) in many languages. Why?',
+      options: [
+        'String comparison happens after each concatenation',
+        'Strings are immutable in Python/Java/JavaScript. Each `+=` creates a NEW string object by copying the old string plus the new character. After k concatenations, the string has length k and the copy costs O(k). Summing O(1) + O(2) + ... + O(n) = O(n²). Use a list and "".join() instead: collect all chars in a list (O(1) append each), then join once',
+        'Python cannot perform more than O(n) character operations per string',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A sliding window finds the longest substring without repeating characters. The window expands right and shrinks from the left when a duplicate is found. Why does this work in O(n)?',
+      options: [
+        'The window can never expand more than n/2 times',
+        'Each character enters the window exactly once (when the right pointer passes it) and leaves at most once (when the left pointer passes it). So both pointers together make at most 2n moves total — O(n). A brute force that checks every substring would try O(n²) substrings',
+        'Sets allow O(1) character lookup so the outer loop dominates',
+      ],
+      correct: 1,
+    },
+  ],
 };

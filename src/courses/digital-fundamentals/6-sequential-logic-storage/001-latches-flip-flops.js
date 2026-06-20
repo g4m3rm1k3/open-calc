@@ -914,5 +914,50 @@ export default {
     'T_clk ≥ t_clkQ + t_logic + t_su. More logic between registers = lower max frequency.',
   ],
   checkpoints:['read-intuition'],
-  quiz:[],
+  quiz:[
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Cross-coupled NOR: each gate\'s output forces the other\'s input via feedback. Two stable states." Why can an SR latch hold state when S=R=0?',
+      options: [
+        'With S=R=0, both NOR gates receive 0 from the inputs — their outputs are determined entirely by the cross-coupled feedback, which reinforces whatever state was last set',
+        'S=R=0 disables the latch, so it defaults to 0',
+        'Cross-coupling only works when both inputs are HIGH',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"S=R=1: forbidden." Why is asserting both Set and Reset simultaneously illegal in an SR latch?',
+      options: [
+        'The circuit would overheat with both inputs HIGH',
+        'Both NOR gate outputs would be forced to 0, making Q=Q̄=0 — which is logically contradictory (Q should always be the complement of Q̄)',
+        'The feedback loop becomes infinite and the latch oscillates',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"D latch: EN=1 transparent, EN=0 opaque." What does "transparent" mean in a D latch?',
+      options: [
+        'The latch is invisible to the rest of the circuit',
+        'When EN=1, the output Q immediately follows the D input in real time — changes to D pass straight through',
+        'The latch stores the data without any delay when enabled',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"D flip-flop = master-slave latches. Q captures D at clock edge only." Why is edge-triggering better than level-triggering for synchronous circuits?',
+      options: [
+        'Edge-triggering is faster because it samples D for less time',
+        'A level-triggered latch is transparent while EN is HIGH — D can change multiple times and cause glitches. Edge triggering captures D at one precise instant, making timing predictable',
+        'Level-triggering requires more power, making edge-triggering more efficient',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -73,4 +73,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A wye-connected system has 480V line-to-line voltage. What is the voltage from any line to the neutral point?',
+      options: [
+        '480V — line-to-neutral equals line-to-line in a wye system',
+        'About 277V — V_LN = V_LL / √3 = 480 / 1.732 ≈ 277V',
+        '831V — multiply line-to-line by √3',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Three-phase power delivered to a balanced load is constant (no pulsation), unlike single-phase power. Why does this matter for industrial motors?',
+      options: [
+        'Constant power means constant torque — no vibration from twice-per-cycle torque dips that single-phase motors experience, leading to smoother operation and less mechanical stress',
+        'Constant power allows the motor to run at higher RPM without a gearbox',
+        'Constant power means the motor draws the same current regardless of load, simplifying overcurrent protection',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A three-phase motor runs clockwise. A technician needs to reverse its rotation. What is the correct procedure?',
+      options: [
+        'Reverse the polarity of all three phase conductors simultaneously',
+        'Swap any two of the three phase conductors — swapping any pair reverses the phase sequence, which reverses motor rotation',
+        'Replace the motor with one wound for the opposite rotation direction',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A factory with many variable frequency drives (VFDs) uses a transformer with a delta secondary rather than a wye secondary. What is the main reason?',
+      options: [
+        'Delta secondaries provide higher voltage, which improves VFD efficiency',
+        'A delta secondary circulates triple-frequency (3rd harmonic) currents within itself rather than letting them propagate onto the line — important because VFDs generate significant harmonic currents',
+        'Delta secondaries have lower impedance, which reduces voltage sag when VFDs demand inrush current during startup',
+      ],
+      correct: 1,
+    },
+  ],
 };

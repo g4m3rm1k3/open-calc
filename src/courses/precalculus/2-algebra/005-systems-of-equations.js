@@ -218,4 +218,51 @@ export default {
     teaser: 'In multivariable calculus, every optimisation problem with constraints becomes a system of equations (the critical point conditions). Linear algebra — the generalisation of what you learned here — underlies Jacobian matrices, coordinate transformations, and differential equations.',
     linkedLessons: ['derivatives-introduction'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A 2×2 linear system has two lines. What does it mean geometrically when the system has NO solution?',
+      options: [
+        'Both equations define the same line — infinitely many intersections',
+        'The two lines are parallel (same slope, different y-intercepts) and never intersect; parallel lines have identical left-side coefficients in ratio but the constant terms don\'t match, so elimination produces a contradiction like 0 = 5',
+        'The lines intersect at exactly one point that is not an integer',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Elimination: adding equations to cancel a variable. Why does this preserve the solution?',
+      options: [
+        'Adding equations is valid only when both equations have the same constant term',
+        'Adding one true equation to another produces a new true equation — equality is preserved under addition of equals. The resulting equation has fewer variables but all solutions of the original system satisfy it; you haven\'t changed which (x,y) pairs are solutions, just derived a consequence',
+        'Elimination only works for systems with integer solutions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'When does a 2×2 system have infinitely many solutions?',
+      options: [
+        'When the coefficients in both equations are multiples of each other — the equations describe the same line (one is a scalar multiple of the other). Any point on that line satisfies both equations, giving infinitely many solutions parameterizable as (t, expression in t)',
+        'When both equations have the same constant term (right-hand side)',
+        'When the system cannot be solved by substitution',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A 3×3 linear system can be solved with matrices using row reduction (Gaussian elimination). Why is the matrix approach better than symbolic elimination for larger systems?',
+      options: [
+        'Matrices are required by law for systems with more than 3 variables',
+        'Matrix row reduction is a systematic algorithm (no ad-hoc choices) that scales to any n×n system; symbolic elimination becomes unwieldy for 4+ variables as you must track many substitution chains; matrices can also be computed numerically by computers',
+        'Matrix methods always give integer solutions; symbolic elimination may give fractions',
+      ],
+      correct: 1,
+    },
+  ],
 }

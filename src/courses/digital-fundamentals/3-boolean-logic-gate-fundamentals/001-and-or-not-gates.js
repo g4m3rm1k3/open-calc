@@ -459,5 +459,50 @@ export default {
     'Propagation delay accumulates along the longest gate chain — that chain sets the maximum clock speed.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"AND = intersection. OR = union. NOT = complement." A function F = A AND B. When is F = 1?',
+      options: [
+        'When A = 1 or B = 1 (either)',
+        'When both A = 1 AND B = 1',
+        'When A = 1 and B = 0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Two inputs → 4 rows; three inputs → 8 rows (2^n)." How many rows does a truth table for a 4-input gate need?',
+      options: [
+        '8',
+        '16',
+        '12',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"SOP: write AND for each row where F=1, OR them together." F = 1 only when A=1 and B=0. What is the SOP expression?',
+      options: [
+        'A + B̄',
+        'A · B̄',
+        'Ā · B',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Propagation delay accumulates along the longest gate chain." You have 4 gates in series, each with 2 ns delay. What is the minimum clock period?',
+      options: [
+        '2 ns',
+        '8 ns',
+        '4 ns',
+      ],
+      correct: 1,
+    },
+  ],
 };

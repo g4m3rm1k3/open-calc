@@ -390,7 +390,52 @@ export default {
   challenges: [],
   mentalModel: ['roughness=microfacet spread, metalness=0→kD=(1-F)(1-metal),F0=0.04; metal→kD=0,F0=albedo. BRDF=DFG/4. Three.js: MeshStandardMaterial + scene.environment.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"metalness=0: dielectric (plastic). metalness=1: conductor (metal)." A gold material has metalness=1. How does this change the diffuse term compared to metalness=0?',
+      options: [
+        'The diffuse term becomes zero — metals have no diffuse scattering; all light either reflects specularly or is absorbed',
+        'The diffuse term becomes tinted gold',
+        'The diffuse term doubles to compensate for the reduced transmission',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"roughness=0: mirror. roughness=1: matte." A surface transitions from roughness=0 to roughness=1. What changes in the appearance?',
+      options: [
+        'The surface goes from dark to bright as roughness increases',
+        'The specular highlight goes from a sharp, mirror-like reflection to a large, spread, diffuse-looking scatter — all energy is conserved but distributed differently',
+        'The colour becomes desaturated',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"F0=0.04 for dielectrics; F0=albedo for metals." F0 represents Fresnel reflectance at normal incidence. What does F0=0.04 mean for glass or plastic?',
+      options: [
+        'Plastic reflects 4% of light when viewed head-on — most light transmits or scatters diffusely',
+        'Plastic is 4% opaque',
+        'The material has 4% metalness',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"scene.environment = HDR map for PBR." Why does PBR material quality improve significantly with an environment map versus a flat ambient colour?',
+      options: [
+        'Environment maps provide more light samples, which increases frame rate',
+        'PBR materials reflect and respond to directional information — an HDR environment provides realistic image-based lighting with varied directions and intensities, matching how real materials look in natural environments',
+        'Flat ambient colour is not supported by MeshStandardMaterial',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_5_4 }

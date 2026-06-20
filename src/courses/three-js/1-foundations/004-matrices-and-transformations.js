@@ -617,7 +617,52 @@ export default {
     'Quaternion: 4D unit vector (x,y,z,w) = (sin(θ/2)·axis, cos(θ/2)). Immune to gimbal lock.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"TRS order: Scale → Rotate → Translate. M = T × R × S." If you apply translation first and then rotation, what goes wrong?',
+      options: [
+        'Nothing — matrix multiplication is commutative',
+        'Rotating after translating rotates around the world origin, not the object\'s center — the object orbits rather than spins in place',
+        'The scale is applied incorrectly when translation comes first',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"4×4 needed for translation: 3×3 can\'t encode translation." Why does adding a 4th row/column (w component) allow translation as matrix multiplication?',
+      options: [
+        'It stores the translation in the extra column, and multiplying by a point with w=1 adds that column\'s values — translating the point',
+        'The 4th dimension carries colour information',
+        'It doubles the number of operations, making translation faster',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Quaternion: 4D unit vector = (sin(θ/2)·axis, cos(θ/2)). Immune to gimbal lock." When does gimbal lock occur with Euler angles?',
+      options: [
+        'When all three angles are zero',
+        'When the middle rotation (typically Y) hits ±90°, one degree of freedom collapses — two axes align and the rotation loses a dimension',
+        'When the rotation speed is too fast',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"det(M) < 0 → reflection. det = 0 → singular." What does it mean when a matrix is singular (det = 0)?',
+      options: [
+        'The matrix is a pure rotation',
+        'The matrix has no inverse — it collapses 3D space onto a lower dimension (plane or line) and cannot be undone',
+        'The matrix scales everything by zero — a valid operation',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_0_3 };

@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A battery has an open-circuit voltage of 12.6V. Under a 20A load, terminal voltage drops to 11.6V. What is the battery\'s internal resistance?',
+      options: [
+        '0.63Ω — divide open-circuit voltage by load current',
+        '0.05Ω — Rth = (V_oc − V_load) / I = (12.6 − 11.6) / 20 = 0.05Ω',
+        '252Ω — multiply the voltage drop by the load current',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A UPS battery is rated 100Ah at 12V. A server draws 10A continuously. Roughly how long will the battery last (ignoring efficiency losses)?',
+      options: [
+        '120 hours — the battery provides 1200V worth of stored energy',
+        '10 hours — 100Ah ÷ 10A = 10 hours',
+        '1 hour — amp-hours are spent at 10A so 10% of capacity lasts 1 hour',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why do industrial 24VDC control panels use switching-mode power supplies (SMPS) instead of linear regulators?',
+      options: [
+        'SMPS provide better voltage accuracy than linear regulators can achieve',
+        'SMPS achieve 85–95% efficiency by switching rather than dissipating excess voltage — linear regulators waste voltage drop × current as heat, which is impractical for panel loads',
+        'SMPS are simpler to design and more reliable than linear regulators',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why must lithium-ion cells never be charged above their maximum voltage (e.g., 4.2V/cell)?',
+      options: [
+        'Overcharging reduces capacity permanently but is otherwise safe',
+        'Exceeding the maximum voltage causes the electrolyte to decompose, generating heat and gas that can lead to thermal runaway and fire',
+        'The BMS automatically prevents charging above maximum regardless of charger voltage, so this is not a real concern',
+      ],
+      correct: 1,
+    },
+  ],
 };

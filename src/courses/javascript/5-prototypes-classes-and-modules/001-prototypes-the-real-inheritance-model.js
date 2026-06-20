@@ -461,5 +461,50 @@ export default {
     'instanceof walks the prototype chain — true if Constructor.prototype is anywhere in the chain.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You access a property on an object and it is not found directly on the object. What happens next?',
+      options: [
+        'JavaScript returns undefined immediately',
+        'JavaScript looks up the prototype chain — checking the object\'s [[Prototype]], then its [[Prototype]], up to Object.prototype',
+        'JavaScript throws a ReferenceError because the property does not exist',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You define a method inside a constructor with this.greet = function(){}. Each instance gets its own copy. How would you share one copy across all instances?',
+      options: [
+        'Use a static method — static methods are automatically shared',
+        'Put the method on Constructor.prototype — all instances share the same function via the prototype chain',
+        'Use Object.freeze() on the constructor to prevent copies being made',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does the new keyword do when you call new MyConstructor()?',
+      options: [
+        'It clones the constructor object and returns it',
+        'It creates a fresh object, sets its [[Prototype]] to MyConstructor.prototype, runs the constructor with this bound to the new object, and returns it',
+        'It calls Object.create() and then runs the constructor as a plain function',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'obj instanceof MyClass returns true. What does this actually check?',
+      options: [
+        'Whether obj was created using the new keyword with MyClass',
+        'Whether MyClass.prototype appears anywhere in obj\'s prototype chain',
+        'Whether obj has the same properties as an instance of MyClass',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'C = B·log₂(1 + SNR)   [Shannon capacity]\nNF(dB) = SNR_in − SNR_out  (in dB)\nN_floor(dBm) = −174 + 10log(B_Hz) + NF\nMargin = Pr − N_floor − SNR_min' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Shannon\'s theorem states C = B·log₂(1 + SNR). A channel has 10 MHz bandwidth and a linear SNR of 15. What is the theoretical capacity ceiling?',
+      options: [
+        '40 Mbps — C = 10 MHz × log₂(1 + 15) = 10 MHz × log₂(16) = 10 × 4 = 40 Mbps; no modulation or coding scheme can exceed this for this channel',
+        '150 Mbps — C = B × SNR = 10 MHz × 15',
+        '10 Mbps — Shannon capacity equals the bandwidth when SNR is below 20 dB',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A receiver chain has a low-noise amplifier (NF = 1 dB, gain = 20 dB) followed by a mixer (NF = 10 dB). Why is the LNA placed first, directly at the antenna?',
+      options: [
+        'The LNA must come first because mixers cannot operate without a pre-amplified signal above a minimum threshold',
+        'The first stage dominates overall system noise figure — a 1 dB NF LNA with 20 dB gain reduces the mixer\'s 10 dB NF contribution by a factor of 100, keeping total system NF near 1 dB regardless of later noisy stages',
+        'Placing the LNA first protects downstream components from large interfering signals that could cause overload',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A satellite link budget shows 12 dB of margin. The required minimum SNR for the modulation scheme is 8 dB. What does the 12 dB margin protect against?',
+      options: [
+        'It allows the satellite to transmit 12 dB less power than the design value to conserve battery life during normal operations',
+        'Margin is headroom above the minimum required SNR — it absorbs rain fade, equipment aging, pointing errors, and atmospheric absorption that can temporarily reduce received signal power by several dB without breaking the link',
+        'The 12 dB margin compensates for the 12 dB noise figure of the receiver, which Shannon\'s theorem assumes is zero',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A 5G base station receiver has a noise figure of 6 dB and a receive bandwidth of 100 MHz. What is the receiver\'s noise floor?',
+      options: [
+        '−174 dBm — thermal noise density is constant regardless of bandwidth or noise figure',
+        '−88 dBm — noise floor = −174 dBm/Hz + 10·log₁₀(100×10⁶ Hz) + 6 dB = −174 + 80 + 6 = −88 dBm; any signal weaker than this is buried in noise',
+        '−94 dBm — noise floor equals thermal noise at 100 MHz bandwidth without adding noise figure',
+      ],
+      correct: 1,
+    },
+  ],
 };

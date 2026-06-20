@@ -16,4 +16,50 @@ export default {
     }],
   },
   mentalModel:['Exponential: each step multiplies by fixed factor. Rate ∝ current value.', 'Logarithm: inverse of exponential. ln(x) = "what power of e gives x?"', 'Log properties: ln(ab)=ln(a)+ln(b). ln(aⁿ)=n·ln(a). These convert × to +.', 'Log scale plot: exponential data becomes a straight line.', 'Logs appear in ML loss functions to convert product likelihoods to sum log-likelihoods.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A bacteria population doubles every hour, starting at 100. How many bacteria are there after 8 hours?',
+      options: [
+        '900 — 100 + 100×8 (linear growth adding 100 each hour)',
+        '25600 — 100 × 2⁸ = 100 × 256 = 25600 (exponential: each hour multiplies by 2)',
+        '800 — 100 × 8 (constant rate times time)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why do ML loss functions use log(probability) instead of probability itself?',
+      options: [
+        'Logarithms are easier to compute than raw probabilities in Python',
+        'The model predicts a probability for each data point; the joint probability is a product. Products of many small probabilities underflow to 0 in floating-point. Log converts the product to a sum (ln(ab) = ln(a) + ln(b)), which is numerically stable and has the same maximum at the same parameters',
+        'Log loss is required by the scikit-learn API — raw probabilities are not accepted',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You plot data on a log-scale y-axis and it becomes a straight line. What does this tell you about the data?',
+      options: [
+        'The data follows a power law y = xⁿ — power laws become lines on log-log plots',
+        'The data grows exponentially — a straight line on a semi-log plot (log y vs x) means log(y) = ax + b, which means y = e^(ax+b) = Ce^(ax), an exponential function',
+        'The data is normally distributed — the log transformation is used to check for normal distribution',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Using the log property ln(aⁿ) = n·ln(a): how would you compute log(2¹⁰⁰) without overflow?',
+      options: [
+        'Compute 2¹⁰⁰ first in Python using int arithmetic, then take the log',
+        '100 × ln(2) ≈ 100 × 0.693 = 69.3 — the log property avoids computing 2¹⁰⁰ entirely; you only need ln(2) and scalar multiplication',
+        'Break 2¹⁰⁰ into chunks: log(2¹⁰⁰) = log(2⁵⁰) + log(2⁵⁰) = 2 × log(2⁵⁰)',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -97,4 +97,50 @@ fig.show()`},
     ]}}],
   },
   mentalModel:['Always plot data before computing statistics.','fig = Figure() → .grid() → .axes() → drawing calls → .show()','fig.plot(fn) for function curves. fig.scatter(xs,ys) for data points.','fig.fill_between(fn_top, fn_bottom) for regions.','fig.tangent(fn, x0) computes slope numerically and draws the line.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why should you always plot data before computing summary statistics?',
+      options: [
+        'Plotting is required by Python before calling statistical functions',
+        'Anscombe\'s Quartet demonstrates that four very different datasets can have identical means, variances, and correlations — the numbers alone are misleading; the plot reveals the actual structure (linear, curved, outlier-driven)',
+        'Plotting sorts the data automatically, which is required for accurate statistics',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'When do you use scatter plot vs. line plot?',
+      options: [
+        'Scatter for measured data points (x, y pairs where each is an independent observation); line plot for functions or trends over a continuous axis where connecting the dots represents the continuous relationship',
+        'Scatter for big datasets, line for small datasets — the choice is purely about data size',
+        'Line plots are always preferred because they show trends more clearly than scatter plots',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A tangent line at x₀ approximates the function near that point. What does the slope of the tangent tell you?',
+      options: [
+        'The average value of the function over the entire visible plot range',
+        'The instantaneous rate of change of the function at x₀ — how fast the output is changing per unit change in input at that exact point',
+        'The error between the function and a linear approximation over the whole domain',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You plot a region fill between two curves f(x) and g(x) with f > g. What does this shaded region represent?',
+      options: [
+        'The derivative of f minus the derivative of g at each point',
+        'The set of all (x, y) points where g(x) ≤ y ≤ f(x) — geometrically the area between the curves, which integrates to ∫(f − g) dx',
+        'The overlap between the domains of f and g',
+      ],
+      correct: 1,
+    },
+  ],
 }

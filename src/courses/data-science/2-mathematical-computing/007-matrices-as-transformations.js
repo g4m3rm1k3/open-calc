@@ -15,4 +15,50 @@ export default {
     }],
   },
   mentalModel:['Matrix columns show where î and ĵ land under the transformation.', 'A @ v = linear combination of columns of A, with v as coefficients.', 'A @ B: apply B first, then A. AB ≠ BA in general.', 'det(A): area scaling factor. det=0: transformation collapses space (not invertible).', 'np.linalg.det(), np.linalg.solve(), @ for matrix multiply.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Matrix A = [[2,0],[0,3]] applied to vector [1,1] gives what?',
+      options: [
+        '[3,3] — the matrix scales the sum of components',
+        '[2,3] — A @ [1,1] = [2×1 + 0×1, 0×1 + 3×1] = [2, 3]: the x-component scales by 2, y-component by 3',
+        '[1,1] — the identity matrix leaves vectors unchanged',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why does det(A) = 0 mean the transformation A cannot be inverted?',
+      options: [
+        'A determinant of 0 means the matrix has a zero row, so the inverse formula divides by zero',
+        'det = 0 means the transformation collapses at least one dimension — multiple input points map to the same output (information is lost). You cannot recover the original input from the output because the mapping is not one-to-one',
+        'The inverse of a matrix requires all diagonal entries to be nonzero; det=0 forces a diagonal entry to be 0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why does A @ B ≠ B @ A in general?',
+      options: [
+        'NumPy computes @ left-to-right for A@B but right-to-left for B@A',
+        'A @ B means "apply B first then A"; B @ A means "apply A first then B." The order of transformations matters geometrically — rotating then reflecting is different from reflecting then rotating',
+        'Matrix multiplication is commutative for square matrices, so A@B = B@A always',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'In machine learning, a neural network layer computes y = A @ x + b. What is A doing?',
+      options: [
+        'A is adding bias to each input component',
+        'A is a linear transformation of the input vector x — it rotates, scales, and mixes the input features; b shifts the result. Together they implement a learnable affine transformation that maps x to a new feature representation y',
+        'A is computing the activation function applied element-wise to x',
+      ],
+      correct: 1,
+    },
+  ],
 }

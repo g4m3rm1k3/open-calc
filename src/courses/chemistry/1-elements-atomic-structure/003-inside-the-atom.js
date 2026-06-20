@@ -707,5 +707,50 @@ export default {
     'The periodic table is organised by valence electrons — same column = same outer shell count = same chemical behaviour.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Protons = atomic number = element identity." Two atoms have 6 protons each. One has 6 neutrons, the other has 8. What are they?',
+      options: [
+        'Different elements — the different neutron counts make them different',
+        'The same element (carbon) — proton count alone determines the element; neutron count determines the isotope',
+        'The same element only if they also have the same number of electrons',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Neutrons determine isotopes — same chemistry, different mass." What makes some isotopes radioactive?',
+      options: [
+        'Radioactive isotopes have too many protons relative to neutrons',
+        'An unstable ratio of protons to neutrons makes the nucleus energetically unstable — it decays to reach a stable configuration',
+        'Isotopes are radioactive whenever they have more neutrons than protons',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"The outermost shell holds valence electrons." Why do valence electrons matter more than inner electrons?',
+      options: [
+        'Valence electrons have more mass, so they carry more energy',
+        'Valence electrons are the ones that interact with neighbouring atoms — they determine bonding, reactivity, and chemical personality',
+        'Inner electrons are shared between atoms; valence electrons stay fixed in the nucleus',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Incomplete shells create reactivity." Noble gases (helium, neon, argon) are almost completely unreactive. Why?',
+      options: [
+        'Noble gases have no electrons at all',
+        'Noble gases have completely full outer shells — no drive to gain, lose, or share electrons',
+        'Noble gases are too heavy to form bonds',
+      ],
+      correct: 1,
+    },
+  ],
 }

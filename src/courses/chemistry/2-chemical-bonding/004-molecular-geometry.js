@@ -914,7 +914,52 @@ export default {
     'Shape determines whether bond dipoles cancel → polarity → intermolecular forces → bulk properties.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"VSEPR: electron groups repel → spread to maximise separation." A molecule has 4 electron groups around the central atom. What geometry do they spread into?',
+      options: [
+        'Square planar — 4 points evenly spaced in a flat square',
+        'Tetrahedral — 4 points maximally separated in 3D space at ~109.5° angles',
+        'Linear — 4 points spread along a line at 90° intervals',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Electron geometry depends on total electron group count (bonds + lone pairs)." What do you count to determine electron geometry?',
+      options: [
+        'Only the bonding pairs — lone pairs do not affect geometry',
+        'All electron groups: every bond counts as one group, and every lone pair counts as one group',
+        'The total number of electrons in all bonds',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Lone pairs repel more than bonding pairs → compress bond angles." Why does NH₃ have 107° angles instead of the tetrahedral 109.5°?',
+      options: [
+        'N–H bonds are longer than C–H bonds, so the hydrogens are farther apart',
+        'The lone pair on nitrogen takes up more angular space than a bonding pair, pushing the three N–H bonds closer together',
+        'Nitrogen has fewer electrons than carbon, weakening the bond angles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Molecular geometry = electron geometry minus lone pairs." H₂O has 4 electron groups (2 bonds + 2 lone pairs). What is its molecular geometry?',
+      options: [
+        'Tetrahedral — it has 4 electron groups',
+        'Bent — the 2 lone pairs are not atoms, so the molecular shape described by the 2 H atoms and the O atom is a bent (V-shaped) arrangement',
+        'Linear — 2 atoms bonded to a central atom always gives a linear shape',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_2_3 };

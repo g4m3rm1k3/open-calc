@@ -310,7 +310,52 @@ export const GEO_2_PARALLEL_DEFAULT = {
     'Converse: if opposite sides equal (or angles equal, or diagonals bisect) → parallelogram.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Polygon angle sum = (n−2)×180°." What is the interior angle sum of a hexagon?',
+      options: [
+        '540°',
+        '720°',
+        '900°',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Exterior angle sum = 360° for any convex polygon." A regular pentagon has 5 equal exterior angles. What is each exterior angle?',
+      options: [
+        '108°',
+        '72°',
+        '90°',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Parallelogram: opposite sides equal, opposite angles equal, diagonals bisect each other." Which of these is NOT necessarily true about a parallelogram?',
+      options: [
+        'Opposite sides are parallel and equal',
+        'All four angles are 90°',
+        'The diagonals bisect each other',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Converse: if diagonals bisect each other → parallelogram." You observe that the diagonals of a quadrilateral bisect each other. What can you conclude?',
+      options: [
+        'The quadrilateral is a rectangle',
+        'The quadrilateral is a parallelogram — this is the converse of the diagonal-bisection property',
+        'Nothing — bisecting diagonals do not determine the shape',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export default GEO_2_PARALLEL_DEFAULT;

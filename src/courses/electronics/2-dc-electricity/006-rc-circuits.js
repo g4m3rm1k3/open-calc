@@ -79,4 +79,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An RC circuit has R = 10kΩ and C = 100μF. How long does it take to charge to 63.2% of supply voltage?',
+      options: [
+        '1ms — multiply the values and divide by 1000',
+        '1 second — τ = RC = 10,000 × 0.0001 = 1s, and the capacitor reaches 63.2% in exactly one time constant',
+        '5 seconds — you need 5τ to reach 63.2%',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why does an RC debounce circuit filter out switch bounce but still let the real signal through?',
+      options: [
+        'The RC circuit detects the number of transitions and rejects anything with more than one',
+        'Bounce is brief (high-frequency noise above the RC cutoff frequency) while the real signal is sustained — the capacitor smooths over the short bounce but charges up for the real signal',
+        'The resistor blocks the bounce current while the capacitor stores the real signal voltage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A capacitor is fully charged to 12V and then discharged through a 1kΩ resistor. After one time constant, what voltage remains on the capacitor?',
+      options: [
+        '0V — one time constant is enough to fully discharge',
+        '7.56V — after 1τ, 63.2% has discharged so 36.8% remains: 12 × 0.368 = 4.42V',
+        '4.42V — after 1τ, 63.2% has discharged so 36.8% × 12V = 4.42V remains',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What does RC (time constant) control about an RC filter\'s frequency response?',
+      options: [
+        'The amplitude of AC signals that pass through — larger RC passes larger amplitudes',
+        'The corner frequency: f_c = 1/(2πRC). Below f_c signals pass; above f_c they are attenuated at 20dB per decade',
+        'The phase shift of AC signals — larger RC shifts the phase by more degrees at all frequencies',
+      ],
+      correct: 1,
+    },
+  ],
 };

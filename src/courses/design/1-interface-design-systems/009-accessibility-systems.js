@@ -2070,5 +2070,50 @@ export default {
     'auditAccessibility() + auditComponent() + auditInteraction() + auditSystem() = complete quality gate.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Semantic HTML = accessibility contract for free." A developer uses a <div> with a click handler instead of a <button>. What must be added manually?',
+      options: [
+        'Nothing — click handlers work the same on divs and buttons',
+        'role="button", tabindex="0", and keyboard event handlers for Enter/Space — all things <button> provides automatically',
+        'Only tabindex="0" is needed to make a div focusable',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Focus management: opened → focus in, closed → focus back to trigger." A modal opens but focus stays on the page behind it. What is the user experience for a keyboard user?',
+      options: [
+        'No problem — keyboard users can Tab to the modal content from anywhere',
+        'The user must Tab through the entire page again to reach the modal — they may not even know the modal opened',
+        'The modal will close automatically when focus leaves the trigger',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Live regions: role=alert (assertive), role=status (polite). Must pre-exist in DOM." Why must live regions exist in the DOM before content is injected?',
+      options: [
+        'Live regions injected with content already inside are not announced by screen readers — the element must be present and empty, then content added dynamically',
+        'Injected live regions cause layout shift that breaks screen readers',
+        'Screen readers only support live regions defined in the initial HTML, not added via JavaScript',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Keyboard model: Tab between widgets, Arrow within widgets, Escape closes, Enter/Space activates." A tab bar has five tabs. How many Tab presses are needed to move from tab 1 to tab 5?',
+      options: [
+        'Four — Tab moves through each tab individually',
+        'One — Tab enters the tab group, then Arrow keys move between tabs. The whole widget counts as one Tab stop',
+        'Five — Tab must visit each tab once before the user can activate the fifth',
+      ],
+      correct: 1,
+    },
+  ],
 };

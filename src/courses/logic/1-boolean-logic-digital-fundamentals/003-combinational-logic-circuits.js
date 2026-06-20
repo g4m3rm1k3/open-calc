@@ -122,4 +122,51 @@ export default {
       solution: 'Rather than full 4-variable truth table (16 rows), analyze SOP directly:\n\nTerm 1: D·W·C (manual start: door, workpiece, button)\nTerm 2: A·D·W (auto start: auto mode, door, workpiece)\n\nSOP: START = D·W·C + A·D·W\n\nSimplify with distributive law:\nSTART = D·W·(C + A)\n\nResult: Door closed AND workpiece present AND (cycle button pressed OR auto mode active).\n\nGate circuit: AND(D,W) → AND with OR(C,A) → START. 3 gates instead of the 2 AND + 1 OR from raw SOP.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Sum of Products (SOP) form writes a boolean function as ORs of AND terms, one per truth table row where output = 1. What is the key advantage of SOP form?',
+      options: [
+        'SOP form is always the most simplified version of any boolean expression',
+        'SOP form directly maps each output-1 row to one AND gate — you can immediately read off the gate circuit; it is a canonical form that can be derived mechanically from the truth table and then simplified using boolean algebra or K-maps',
+        'SOP form minimizes the number of logic gates by construction',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What distinguishes combinational logic from sequential logic?',
+      options: [
+        'Combinational logic uses transistors; sequential logic uses relays',
+        'Combinational logic output depends only on current inputs — the same inputs always produce the same output. Sequential logic has memory (flip-flops, latches) so the output depends on current inputs AND past state. A full adder is combinational; a counter is sequential',
+        'Combinational logic processes multiple bits at once; sequential logic processes one bit at a time',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'D·W·C + A·D·W simplifies to D·W·(C + A). What boolean law enables this?',
+      options: [
+        'De Morgan\'s theorem: NOT(D·W) = NOT(D) + NOT(W)',
+        'The distributive law: A·B + A·C = A·(B + C) — factoring out D·W from both terms. This reduces 2 three-input AND gates plus an OR to one two-input AND, one OR, and one two-input AND — fewer gates for the same logic',
+        'The idempotent law: A + A = A',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A 4-variable truth table has 16 rows. Why does this grow as 2ⁿ rather than 2×n?',
+      options: [
+        'Because each variable doubles the number of possible input combinations — n variables each independently contribute a factor of 2 (0 or 1), giving 2 × 2 × ... × 2 = 2ⁿ total rows. This exponential growth is why simplification (K-maps, boolean algebra) matters so much',
+        'Because truth tables use binary encoding which adds two columns per variable',
+        'The growth is 2×n for fewer than 4 variables; it only becomes 2ⁿ for 4+ variables',
+      ],
+      correct: 1,
+    },
+  ],
 };

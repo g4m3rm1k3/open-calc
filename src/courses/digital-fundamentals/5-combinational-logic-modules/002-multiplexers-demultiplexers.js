@@ -901,5 +901,50 @@ export default {
     'MUX tree depth = log₂(N). Total gates = N−1 two-input MUXes for an N-to-1 tree.',
   ],
   checkpoints:['read-intuition'],
-  quiz:[],
+  quiz:[
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"MUX select lines = binary address. S1S0=10 → channel D2." A 4-to-1 MUX has select inputs S1=0, S0=1. Which data input is routed to the output?',
+      options: [
+        'D0',
+        'D1',
+        'D2',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Function generator: 2ᴺ-to-1 MUX implements any N-variable function. FPGA LUT = this." How does an 8-to-1 MUX implement any 3-variable Boolean function?',
+      options: [
+        'Connect the 3 input variables to the 3 select lines — the 8 data inputs D0–D7 are set to the desired truth table output values',
+        'Connect the 3 input variables to the 3 data inputs and use the select lines to pick the function',
+        'The MUX automatically generates the function from its gate structure',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"DEMUX with D=1: only addressed output is 1. Binary decoder." A 1-to-4 DEMUX with D=1 and select S1S0=10. Which output is HIGH?',
+      options: [
+        'Y0',
+        'Y2',
+        'Y1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"MUX tree depth = log₂(N)." To build a 32-to-1 MUX from 2-to-1 MUXes, how many stages deep is the tree?',
+      options: [
+        '16 stages',
+        '5 stages — log₂(32) = 5',
+        '32 stages',
+      ],
+      correct: 1,
+    },
+  ],
 };

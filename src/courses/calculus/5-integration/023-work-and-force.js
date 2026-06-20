@@ -246,4 +246,50 @@ export default {
     'attempted-challenge-medium',
     'attempted-challenge-hard',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Why is W = ∫F(x) dx (an integral) rather than just W = F·d (force times distance)?',
+      options: [
+        'Integration is always more accurate than multiplication, even when force is constant',
+        'When force varies with position — like a spring, which exerts force F = kx that increases as it stretches — a single constant force value cannot represent the whole process; the integral sums up infinitely many tiny work contributions F(x)·dx as force changes',
+        'The integral form applies only when force is measured in Newtons; for other units you use multiplication',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A spring has spring constant k = 200 N/m. How much work compresses it from 0 to 0.1 m?',
+      options: [
+        '20 J — work equals force × distance = 200 × 0.1 = 20',
+        '1 J — W = ∫[0 to 0.1] 200x dx = 200[x²/2] from 0 to 0.1 = 100(0.01) = 1 J — the force starts at 0 and increases linearly so the effective average force is half the maximum',
+        '0.5 J — the spring stores potential energy equal to (1/2)kx² = (1/2)(200)(0.01) = 1 J... wait that is also 1 J',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'To pump water out of a tank, you integrate W = ρg∫ x·A(x) dx where x is depth. What does x represent in this formula?',
+      options: [
+        'The total height of water in the tank',
+        'The distance that a thin horizontal slice at depth x must be lifted to exit the tank — deeper slices require more work to lift, and this factor times the slice weight gives the work for each infinitesimal slice',
+        'The pressure at depth x, which determines the force needed to push water up',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Fluid force on a submerged vertical plate is F = ρg∫ depth(y)·w(y) dy, where w(y) is width at height y. Why does depth matter here?',
+      options: [
+        'Greater depth means the plate is further from the observer, so projected area is smaller',
+        'Fluid pressure increases with depth (P = ρgh), so deeper parts of the plate experience more force per unit area — the integral accounts for this varying pressure across the plate\'s height',
+        'The integral converts depth into area so the formula is dimensionally consistent',
+      ],
+      correct: 1,
+    },
+  ],
 }

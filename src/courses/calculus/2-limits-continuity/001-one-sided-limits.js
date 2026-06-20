@@ -282,4 +282,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The left-hand limit lim(x→a⁻) f(x) and right-hand limit lim(x→a⁺) f(x) both exist but are not equal. What does this tell you about lim(x→a) f(x)?',
+      options: [
+        'The two-sided limit equals the average of the left and right limits',
+        'The two-sided limit does not exist — for the two-sided limit to exist, the left and right limits must be equal',
+        'The two-sided limit equals the larger of the two one-sided limits',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'f(x) = |x|/x is defined for x ≠ 0. What are lim(x→0⁻) f(x) and lim(x→0⁺) f(x)?',
+      options: [
+        'Both equal 0 — the absolute value makes the function zero at the origin',
+        'Left limit = −1, right limit = +1 — for x < 0, |x|/x = −x/x = −1; for x > 0, |x|/x = x/x = 1',
+        'Left limit = +1, right limit = −1 — positive values come from the left side',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'At a jump discontinuity, a function f has lim(x→3⁻) f(x) = 2 and lim(x→3⁺) f(x) = 5. What is f(3)?',
+      options: [
+        'f(3) must be 3.5 — the average of the two one-sided limits fills in the gap',
+        'f(3) can be any value — the two one-sided limits determine the behavior approaching x = 3, but they say nothing about the function\'s actual value AT x = 3',
+        'f(3) is undefined — a function cannot be defined at a jump discontinuity',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why are one-sided limits needed when studying piecewise functions like f(x) = {x+1 for x < 2, x²−1 for x ≥ 2}?',
+      options: [
+        'Piecewise functions are not continuous, so ordinary limits do not exist and must be replaced by one-sided limits throughout',
+        'The behavior of the function changes at the boundary x = 2 — each piece applies on a different side, so the left limit uses x+1 and the right limit uses x²−1; checking whether they match tells you if the two-sided limit exists',
+        'One-sided limits are only needed when the function value at the boundary is undefined',
+      ],
+      correct: 1,
+    },
+  ],
 }

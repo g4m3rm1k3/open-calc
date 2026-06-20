@@ -408,5 +408,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In this notebook, what is the role of JavaScript — separate from HTML and CSS?',
+      options: [
+        'It defines the page structure and layout',
+        'It controls behavior — what happens when the user interacts',
+        'It styles colors, fonts, and spacing',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You edit a cell but see no change in the preview. What step are you missing?',
+      options: [
+        'Clicking Reset to reload the original code',
+        'Pressing Run to execute the cell',
+        'Opening a new tab to refresh the page',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A later cell uses a variable set up in an earlier cell. What happens if you try to run the later cell first?',
+      options: [
+        'It runs fine — cells are independent',
+        'It may fail because cells are sequential and earlier ones must run first',
+        'JavaScript automatically runs all prior cells before the one you clicked',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You break the code in a cell and want to go back to the original. What do you use?',
+      options: [
+        'Undo (Ctrl+Z) to reverse the edits',
+        'Reset, which restores the original starter code',
+        'Delete the cell and reopen the lesson',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -608,7 +608,52 @@ export default {
     'Quadrilateral inscribed in circle: opposite angles supplementary (sum 180°).',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Inscribed angle = ½ arc." An arc is 140°. What is the inscribed angle that subtends it?',
+      options: [
+        '280°',
+        '70°',
+        '140°',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Same arc → same inscribed angle, regardless of position on the circle." Two inscribed angles subtend the same arc. Without measuring, what can you say about them?',
+      options: [
+        'They are supplementary',
+        'They are equal — inscribed angles over the same arc are always equal',
+        'They add up to the central angle over that arc',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Diameter as chord → inscribed angle = 90° (Thales)." Why is any angle inscribed in a semicircle always 90°?',
+      options: [
+        'A semicircle is 180°, and inscribed angle = ½ arc = ½(180°) = 90°',
+        'Diameters bisect all inscribed angles',
+        'The center of the diameter is always at 90° from the circle',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Quadrilateral inscribed in circle: opposite angles supplementary." An inscribed quadrilateral has angles 85°, 95°, x, and y. What is x + y?',
+      options: [
+        '180°',
+        '360°',
+        '90°',
+      ],
+      correct: 0,
+    },
+  ],
 };
 
 export { LESSON_GEO_2_1 };

@@ -834,4 +834,51 @@ def calculate_minimum_hp(dungeon: list[list[int]]) -> int:
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In a grid DP problem (count paths from top-left to bottom-right, moving only right or down), why does dp[i][j] = dp[i-1][j] + dp[i][j-1]?',
+      options: [
+        'Because you are averaging the paths from the two adjacent cells',
+        'Every path to cell (i,j) must come from either (i-1,j) (from above) or (i,j-1) (from the left) — those are the only two predecessor cells given the movement constraints. The total number of paths to (i,j) is exactly the sum of paths to each predecessor',
+        'The formula adds the row index and column index to get the path count',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A grid path DP initializes the first row and first column as all 1s. Why?',
+      options: [
+        'To avoid division by zero when computing the ratio of paths',
+        'There is exactly one way to reach any cell in the first row (only move right) and exactly one way to reach any cell in the first column (only move down); these base cases are the foundation the rest of the table is built on',
+        'The first row and column are set to 1 because those cells have cost 1',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A 2D DP table has n×m cells. Each cell takes O(1) to compute. What is the time and space complexity?',
+      options: [
+        'O(n+m) time and O(1) space — only the border cells need to be computed',
+        'O(n×m) time and O(n×m) space — each of the n×m cells is computed exactly once in O(1); space can often be reduced to O(m) or O(n) with rolling array optimization if each row only depends on the previous row',
+        'O(2ⁿ×2ᵐ) time — grids require exponential exploration of all paths',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The Dungeon game fills the DP table from bottom-right to top-left (reverse order). Why work backwards?',
+      options: [
+        'Working backwards avoids having to sort the dungeon values',
+        'The knight\'s minimum health at any cell depends on what health is needed to survive the REST of the path (which comes after). To know "how much health do I need to enter cell (i,j)?", you must already know the answer for cells (i+1,j) and (i,j+1) — which are known only if you\'ve already filled them, requiring right-to-left, bottom-to-top order',
+        'Bottom-right initialization is always required for grid DP to avoid index-out-of-bounds errors',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -303,4 +303,51 @@ export default {
     teaser: 'In calculus, the graphs of trig functions directly explain their derivatives. The sine graph rises from 0 to its peak — and the derivative (cosine) is positive and large there. At the peak of sine, the tangent is horizontal — cosine is zero. Reading derivatives from graphs is only possible if you know the graphs deeply. The asymptotes of tangent and secant also appear as limits: $\\lim_{x\\to\\pi/2^-}\\tan x = +\\infty$.',
     linkedLessons: ['trig-applications', 'inverse-trig-functions'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'f(x) = 3sin(2x - π/4). The period of this function is:',
+      options: [
+        '2π — the standard period of sine',
+        'π — when the coefficient of x is B=2, the period is 2π/B = 2π/2 = π; the 2 compresses the cycle horizontally by half',
+        '4π — the phase shift π/4 extends the period',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The tangent function has vertical asymptotes at x = π/2 + kπ. Why does this happen?',
+      options: [
+        'Tangent is undefined when sine = 0',
+        'tan(x) = sin(x)/cos(x); vertical asymptotes occur where cos(x) = 0 (division by zero). cos(x) = 0 at x = π/2 + kπ for integer k, causing tan to blow up to ±∞ at those points',
+        'Tangent has vertical asymptotes wherever the sine function has local maxima',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A sinusoidal function y = A·sin(Bx + C) + D. What does D (vertical shift) change about the graph?',
+      options: [
+        'D changes the period — larger D means a longer cycle',
+        'D shifts the entire graph up (D > 0) or down (D < 0) without affecting the period, amplitude, or shape; the midline moves from y = 0 to y = D. The amplitude A still measures the distance from midline to maximum',
+        'D changes the phase — the graph shifts left or right by D units',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Secant is defined as sec(x) = 1/cos(x). Why does the secant graph have U-shaped curves rather than looking like cosine?',
+      options: [
+        'Secant is the absolute value of cosine, which creates U-shapes at every cycle',
+        'Taking the reciprocal of cosine inverts values: where cos is near 1 (peak), sec ≈ 1 (small); where cos is near 0 (approaching asymptote), sec → ±∞ (large). The reciprocal transformation stretches values near zero to infinity, creating the U-shaped branches that open toward ±∞ at the asymptotes',
+        'Secant curves are U-shaped only when the cosine has a positive leading coefficient',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -479,5 +479,50 @@ export default {
     'traverse(fn): depth-first walk — use it to batch-enable shadows, collect meshes, etc.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"worldMatrix = parentWorld × ... × localMatrix." An arm group is rotated 45° globally. A hand mesh is a child, unrotated locally. What is the hand\'s world rotation?',
+      options: [
+        '0° — the hand\'s local rotation is unaffected by the parent',
+        '45° — the parent\'s world rotation accumulates through the hierarchy, so the hand inherits the arm\'s rotation',
+        '90° — rotation doubles when passing through a parent',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Group = transform-only Object3D. Use it as a pivot or orbit centre." You want a moon to orbit a planet. The moon is 5 units from the planet. What is the cleanest setup?',
+      options: [
+        'Animate the moon\'s world position directly using sin/cos each frame',
+        'Create a Group at the planet\'s position, add the moon as a child at (5, 0, 0) local offset, then rotate the Group — the moon orbits as the group rotates around its center',
+        'Parent the moon directly to the planet mesh and offset its position',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"object.getWorldPosition(vec) always gives correct world position, even in deep hierarchies." Why not just read object.position directly?',
+      options: [
+        'object.position is unreliable and may be stale',
+        'object.position is the local position relative to the parent — in a deep hierarchy, computing world position means multiplying all ancestor matrices. getWorldPosition does this correctly by traversing up the chain',
+        'object.position uses integers internally',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"traverse(fn): depth-first — use it to batch-enable shadows." You call scene.traverse(obj => obj.castShadow = true). Which objects does this affect?',
+      options: [
+        'Only direct children of the scene',
+        'Every Object3D in the entire scene graph — lights, cameras, groups, meshes — since all inherit from Object3D. You may need to filter by obj.isMesh to target only mesh geometry',
+        'Only Mesh objects — traverse ignores lights and cameras',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -283,7 +283,52 @@ export default {
     'Einstein proved atoms are real by predicting the statistical pattern of Brownian motion.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Atoms explain fixed combination ratios." Why can hydrogen and oxygen only form water as H₂O, never H₁.₅O?',
+      options: [
+        'Chemical reactions happen too fast to make partial molecules',
+        'Atoms are discrete — they combine in whole-number ratios because you cannot have a fraction of an atom',
+        'Only certain temperatures allow H and O to combine, limiting the ratio',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Tiny dense nucleus + vast electron cloud." An atom is ~100,000× wider than its nucleus. What does this imply?',
+      options: [
+        'The nucleus stores most of the atom\'s energy',
+        'An atom is mostly empty space — virtually all the volume is the electron cloud, while virtually all the mass is in the tiny nucleus',
+        'The electron cloud is heavier than the nucleus because it takes up more space',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'How did Einstein prove atoms are real without directly seeing one?',
+      options: [
+        'He calculated the mass of an atom using E = mc²',
+        'He mathematically predicted the exact statistical pattern of Brownian motion (pollen grains jiggling in water) and the prediction matched experiment',
+        'He used a special microscope to photograph individual atoms',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Which statement about atomic structure is correct?',
+      options: [
+        'Almost all the mass is in the electron cloud because it takes up most of the volume',
+        'The nucleus contains almost all the mass but almost none of the volume — the electron cloud is the opposite',
+        'Protons and electrons have roughly equal mass, so mass is evenly distributed',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_CHEM_1_1 }

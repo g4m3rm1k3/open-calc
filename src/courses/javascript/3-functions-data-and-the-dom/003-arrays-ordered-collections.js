@@ -595,5 +595,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You use .map() on an array. What does it return, and what happens to the original array?',
+      options: [
+        'It modifies and returns the original array',
+        'It returns a new same-length array with the transformation applied; the original is unchanged',
+        'It returns undefined — you must save the result to a variable first',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You need a single total from an array of numbers. Which method is the right tool?',
+      options: [
+        '.map() — it transforms each element into the total',
+        '.reduce() — it accumulates a single value across all elements',
+        '.filter() — it returns elements that pass a condition, which you then add up',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You want to sort a copy of an array without altering the original. What must you do before calling .sort()?',
+      options: [
+        'Nothing — .sort() always returns a sorted copy and leaves the original intact',
+        'Create a copy first with spread ([...arr]) or .slice() — .sort() mutates the array in place',
+        'Call .freeze() on the original to protect it from .sort()',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why should you avoid for...in when iterating an array?',
+      options: [
+        'for...in is slower than for...of on arrays',
+        'for...in iterates over all enumerable properties including inherited ones — not just array indexes, leading to unexpected keys',
+        'for...in skips the last element of every array',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -550,5 +550,50 @@ export default {
     'State Machine: current state + event → next state. Invalid = no transition = rejected.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is the key difference between the Observer and Pub/Sub patterns?',
+      options: [
+        'Observer is for UI events; Pub/Sub is for server events',
+        'In Observer, subjects and observers know about each other; in Pub/Sub a message bus decouples publishers and subscribers completely',
+        'They are identical — "Pub/Sub" is just a newer name for Observer',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why would you use the Singleton pattern?',
+      options: [
+        'To make a class faster by caching its prototype',
+        'To ensure only one instance of a class ever exists — useful for shared resources like a config store or event bus',
+        'To prevent subclasses from overriding methods',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You call createThing("circle", ...) and get a Circle instance back. What pattern does createThing implement?',
+      options: [
+        'Singleton — createThing returns the same object each time',
+        'Factory — a function that picks and constructs the right object based on a type argument',
+        'Observer — createThing subscribes to shape events',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A state machine receives an event that has no transition defined for the current state. What should happen?',
+      options: [
+        'The machine transitions to its initial state',
+        'The event is rejected and the machine stays in its current state — invalid transitions are simply ignored',
+        'The machine throws an error and resets',
+      ],
+      correct: 1,
+    },
+  ],
 };

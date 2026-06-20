@@ -853,6 +853,53 @@ render()`,
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Render from state, not from events" — what does this mean for your app\'s architecture?',
+      options: [
+        'Events should modify CSS directly; state is only for JavaScript logic',
+        'When a user interaction occurs (slider moved, button clicked), update the state variables first, then call a single render() that reads those variables and redraws everything. The event handler should not contain any drawing code — it only updates state. This makes the visual output a pure function of state, trivially reproducible',
+        'State variables should be stored in DOM attributes so events can read them',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A slider fires the `input` event while dragging and `change` only when released. For a live-updating plotter, which should you listen to?',
+      options: [
+        '`change` — updating on every pixel of drag is too expensive',
+        '`input` — it fires continuously while the user drags, giving live feedback. `change` would only update when the user releases, making the interaction feel unresponsive. Modern hardware handles continuous canvas redraws at 60fps with no perceptible cost for simple plots',
+        '`mousemove` — it gives the most precise position information',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Slider values come through as strings: `event.target.value === "0.5"` not `0.5`. What happens if you use `speed + 1` without conversion?',
+      options: [
+        'JavaScript throws a TypeError because + cannot mix strings and numbers',
+        'JavaScript converts 1 to a string and concatenates: "0.5" + 1 = "0.51". You get string concatenation instead of arithmetic. Using `parseFloat(event.target.value) + 1` gives the intended numeric result 1.5',
+        'The + operator ignores the string and treats the value as 0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A preset button sets multiple state variables at once and then calls render(). Why is one render() call at the end sufficient rather than rendering after each variable change?',
+      options: [
+        'JavaScript batches DOM changes automatically',
+        'Rendering is a complete canvas redraw that reads all state at once. Calling render() mid-update would draw an inconsistent intermediate state (e.g., new amplitude with old frequency). Updating all state variables first, then rendering once, guarantees the display always reflects a consistent configuration',
+        'Calling render() multiple times in a row causes a canvas memory leak',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export default sim2_004

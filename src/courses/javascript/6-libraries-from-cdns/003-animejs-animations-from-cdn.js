@@ -395,5 +395,50 @@ export default {
     'animate: transform, opacity, SVG attributes, JS object properties.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You pass [0, 100] as a property value in anime(). What does this animate?',
+      options: [
+        'It cycles the property between 0 and 100 continuously',
+        'It animates from 0 to 100 — the two-value array means [from, to]',
+        'It sets the property to 0 for the first half and 100 for the second half with no transition',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You want 10 elements to animate one after another with a 100ms gap. What does anime.stagger(100) do?',
+      options: [
+        'It slows each animation down by 100ms compared to the previous one',
+        'It adds an incremental delay to each target — the nth element starts n × 100ms later',
+        'It groups the elements into batches and animates each batch 100ms apart',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You use anime.timeline() and add a second animation with offset "-=300". What does this mean?',
+      options: [
+        'The second animation is 300ms shorter than the first',
+        'The second animation starts 300ms before the first one ends — they overlap by 300ms',
+        'The second animation starts 300ms after the first one ends',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Anime.js can animate CSS properties like opacity and transform. What other kinds of properties can it also animate?',
+      options: [
+        'Only CSS properties — anime.js is a CSS animation library',
+        'CSS properties, SVG attributes, and plain JavaScript object properties (any numeric value)',
+        'CSS and SVG only — plain JS objects require a separate library',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -122,4 +122,51 @@ export default {
       solution: 'Let P = product present, E = conveyor enabled, J = jam detected.\n\nStop condition: NOT(P AND E AND NOT(J))\n= NOT(P · E · J̄)\n\nApply De Morgan (Law 1, NOT of AND):\n= P̄ + Ē + J̄̄\n= P̄ + Ē + J\n\nSo STOP = NOT(product present) OR NOT(conveyor enabled) OR jam detected.\n\nPLC ladder: Three parallel branches — XIO P (NC), XIO E (NC), XIC J (NO) — any one of these energizes the STOP output. This is equivalent to the original condition but is much easier to read and debug in a ladder rung.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'De Morgan\'s First Law: NOT(A AND B) = NOT(A) OR NOT(B). A safety circuit runs when NOT(fault AND overtemp). Which ladder logic expresses this correctly?',
+      options: [
+        'One series rung with XIO Fault and XIO Overtemp (NOT A AND NOT B) — but wait, that is NOT(A) AND NOT(B), not NOT(A AND B)',
+        'Two parallel branches (OR): one XIO Fault, one XIO Overtemp — this implements NOT(Fault) OR NOT(Overtemp) which equals NOT(Fault AND Overtemp) by De Morgan. The safety runs if EITHER condition is absent',
+        'One XIC rung with both Fault and Overtemp in series — this is A AND B, not NOT(A AND B)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'De Morgan\'s Second Law: NOT(A OR B) = NOT(A) AND NOT(B). A NOR gate outputs 1 only when both inputs are 0. Which expression does NOR compute?',
+      options: [
+        'A OR B — NOR is just a renamed OR gate',
+        'NOT(A OR B) = NOT(A) AND NOT(B) — NOR is a NOT applied to OR; by De Morgan this equals NOT(A) AND NOT(B). NOR gives 1 only when both inputs are 0, which matches NOT(A) AND NOT(B)',
+        'NOT(A) OR NOT(B) — the NOT distributes through the OR',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You have a NAND gate but need an OR gate. De Morgan says NOT(A AND B) = NOT(A) OR NOT(B). How do you build OR from NAND?',
+      options: [
+        'NAND cannot implement OR — you need an additional NOT gate for that',
+        'Feed NOT(A) and NOT(B) into a NAND: NAND(NOT(A), NOT(B)) = NOT(NOT(A) AND NOT(B)) = NOT(NOT(A)) OR NOT(NOT(B)) = A OR B — double negation eliminates. Building NOT from NAND: NAND(A,A) = NOT(A)',
+        'Connect two NAND outputs in series to get OR',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A spec says "stop if NOT(all conditions met)". After De Morgan, the stop condition becomes a sum of NOTs. Why is this preferred for PLC ladder diagrams?',
+      options: [
+        'Summing NOTs uses fewer rungs than the original nested NOT',
+        'The De Morgan form (NOT(A) OR NOT(B) OR NOT(C)) maps directly to parallel normally-closed contacts — a natural PLC ladder pattern. It is also easier to troubleshoot: you can see exactly WHICH missing condition is stopping the machine, rather than a single negated AND blob',
+        'It is not preferred — the original form is always clearer',
+      ],
+      correct: 1,
+    },
+  ],
 };

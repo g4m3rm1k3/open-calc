@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A Zener diode rated 12V is used as a shunt voltage regulator. As load current decreases, what happens to the Zener current?',
+      options: [
+        'Zener current decreases with load — both currents track together',
+        'Zener current increases — the series resistor carries the same total current, so when the load takes less, the Zener absorbs more to hold the voltage constant',
+        'Zener current stays constant regardless of load current — that\'s what makes it a regulator',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Why do blue and white LEDs have a higher forward voltage (3.0–3.4V) than red LEDs (1.8–2.2V)?',
+      options: [
+        'Blue LEDs draw more current and the extra voltage drop is due to internal resistance',
+        'LED forward voltage reflects the junction\'s band gap — blue photons have more energy than red photons, requiring a wider band gap material (GaN vs GaAsP) and thus a higher forward voltage',
+        'Blue LEDs use a different doping technique that raises the built-in junction potential as a manufacturing side effect',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A 100 kHz switching power supply uses Schottky diodes for output rectification instead of standard silicon diodes. Why does reverse recovery time matter at 100 kHz but not at 60 Hz?',
+      options: [
+        'At 60 Hz the diodes heat up less, so reverse recovery is not needed',
+        'At 100 kHz, each switching cycle is 10 μs; a standard silicon diode with 1 μs recovery time wastes ~10% of every cycle in shoot-through current — Schottky diodes recover in nanoseconds, essentially eliminating this loss',
+        'Schottky diodes are required only because 100 kHz signals would bypass a standard diode through its junction capacitance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A 24V sensor rail occasionally spikes to 36V during power restoration. You install a 27V Zener across the sensor terminals. How does it protect the sensor?',
+      options: [
+        'The Zener blocks the spike entirely, preventing any voltage above 27V from reaching the sensor',
+        'When the rail exceeds 27V, the Zener conducts heavily in reverse breakdown, clamping the terminal voltage near 27V and diverting the excess current through the series source impedance rather than through the sensor',
+        'The Zener stores the spike energy and releases it slowly after the transient ends',
+      ],
+      correct: 1,
+    },
+  ],
 };

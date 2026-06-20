@@ -1351,4 +1351,51 @@ print("After: ", to_list(head))  # should be [4, 3, 2, 1]`,
       hint: 'Three variables: prev (starts None), cur (starts head), nxt (temp). Each iteration: save nxt=cur.next, flip cur.next=prev, then advance both prev and cur forward.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Linked lists have O(1) insert and delete at a known node, but O(n) to find that node. Arrays have O(1) random access but O(n) insert/delete. When is a linked list preferable?',
+      options: [
+        'When elements are accessed by index frequently',
+        'When you frequently insert and delete at the front or at a known position (like maintaining a cursor), and rarely need index-based access. Real examples: implementing a deque, an LRU cache (combined with a hash map for O(1) lookup of the node), or OS process scheduling queues',
+        'When the data is sorted, because linked lists sort faster',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The fast/slow pointer technique detects a cycle in a linked list. If a cycle exists, the fast pointer (2 steps) catches the slow pointer (1 step). Why must they eventually meet?',
+      options: [
+        'The fast pointer wraps around and happens to land on the slow pointer\'s position',
+        'Once both pointers are inside the cycle, the fast pointer gains 1 position on the slow pointer per round. The "gap" decreases by 1 each step, cycling modulo the cycle length. It must reach 0 — they meet. If there were no cycle, the fast pointer would exit (reach None) first',
+        'Fast and slow pointers always meet at the midpoint of the list',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'To reverse a singly linked list in-place, you need three pointers (prev, cur, nxt). Why is nxt needed?',
+      options: [
+        'nxt is needed to check if the list has ended',
+        'Flipping cur.next = prev would lose the reference to the next node — you would have no way to advance cur forward. nxt = cur.next saves that link before it is overwritten, allowing the traversal to continue after the pointer is flipped',
+        'nxt points to the tail of the list so prev knows when to stop',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A doubly linked list stores both next and prev pointers. What operation becomes O(1) that is O(n) in a singly linked list?',
+      options: [
+        'Finding the length of the list',
+        'Deleting a node given a pointer to it. In a singly linked list, you must traverse from the head to find the predecessor to update its .next. With a prev pointer, the predecessor is immediately available — deletion is just adjusting two pointers',
+        'Searching for a value in the list',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -736,4 +736,51 @@ print(unique_paths(1, 1))   # 1`,
       hint: 'A 1×k grid has exactly 1 path (go right k times). An m×1 grid has exactly 1 path (go down m times). For any other cell, the number of paths = paths from above + paths from the left.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The unique paths problem: paths(m, n) = paths(m-1, n) + paths(m, n-1). Why is this recurrence correct?',
+      options: [
+        'Every path goes right then down in some order, so we split by direction',
+        'To reach cell (m, n) you must have come from either the cell above (m-1, n) or the cell to the left (m, n-1) — those are the only two predecessors given you can only move right or down. The total paths to (m, n) equals the sum of paths to each predecessor',
+        'The recurrence counts paths by diagonals rather than cells',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Drawing the recursion tree for `paths(3, 3)` reveals that `paths(2, 2)` is called multiple times. What causes this repeated work?',
+      options: [
+        'The function does not have a base case for the center cell',
+        'Both `paths(3, 2)` and `paths(2, 3)` independently call `paths(2, 2)`. The tree branches and later reconverges — "overlapping subproblems." Without memoization, each branch recomputes the subproblem from scratch. This is the exact pattern that makes memoization valuable: identical arguments produce identical results, so store once, reuse many times',
+        'Python recursion does not preserve state between separate call chains',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'After adding memoization with a cache dict, the recursion tree collapses to a grid where each cell (i, j) is computed exactly once. What is the time complexity?',
+      options: [
+        'O(m + n) — linear in the dimensions',
+        'O(m × n) — there are m × n unique (i, j) pairs, each computed in O(1) after the first call. The full exponential call tree is pruned to a rectangle of unique subproblems',
+        'O(m × n²) — n-factor overhead from Python dict lookups',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The cache key is a tuple `(m, n)`. What would go wrong if you keyed only on `m`?',
+      options: [
+        'Python tuples are slower than integers as dictionary keys',
+        'Paths(3, 2) and paths(3, 4) have the same m=3 but different n — they would map to the same cache entry and return the wrong result. The cache key must capture all parameters that affect the output. Missing any parameter causes collisions between different subproblems',
+        'Single-value keys would cause an infinite recursion',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -930,4 +930,51 @@ res
       }, // end visualization
     ], // end visualizations
   }, // end intuition
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A pure Python loop adding two lists of 1 million numbers is ~100× slower than np.add on arrays of the same size. What is the primary reason?',
+      options: [
+        'NumPy uses multiple CPU cores by default while Python loops use one',
+        'Python loops execute in the Python interpreter (overhead per element: type checks, object allocation, dispatch); NumPy executes compiled C code over contiguous memory with a single Python call. The per-element work is identical — the overhead is not',
+        'NumPy numbers use less memory than Python floats so they fit in cache better',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Given a shape-(3, 4) array A and a shape-(4,) array b, the expression A + b produces a shape-(3, 4) result. What rule makes this work?',
+      options: [
+        'NumPy automatically transposes b to match A',
+        'Broadcasting: NumPy aligns shapes from the right (4 matches 4), then b is treated as if repeated 3 times along a new leading axis — no copy is made. Shapes are compatible when each dimension matches or one of them is 1',
+        'NumPy concatenates b to itself until it matches A\'s total size, then reshapes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'After slicing a NumPy array with `b = a[1:4]`, modifying b also changes a. If you do not want this, what should you use?',
+      options: [
+        'b = a[1:4].copy() — slices are views into the same memory; .copy() allocates a new independent array',
+        'b = np.array(a[1:4]) — np.array always returns a copy',
+        'b = a[1:4][:] — double-slicing breaks the view link',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'In a 2-D convolution, the output pixel at position (i, j) is computed as the element-wise product of the kernel with the image patch at (i, j), then summed. What operation does this implement?',
+      options: [
+        'Matrix multiplication of the kernel row with the image patch row',
+        'A weighted local average (or edge detector, depending on kernel) — each output value measures how much the local image region matches the kernel pattern. A kernel of all 1/9 blurs; a kernel with center +1 and neighbours −1/8 detects edges',
+        'A max-pooling that selects the largest pixel in the kernel window',
+      ],
+      correct: 1,
+    },
+  ],
 }

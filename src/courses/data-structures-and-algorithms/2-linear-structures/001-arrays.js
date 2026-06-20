@@ -812,4 +812,51 @@ print(da)          # DA[20, 99, 30, 40, 50]`,
       href: '/lab/dsa-arrays-lab',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Array random access is O(1). What makes this possible compared to a linked list?',
+      options: [
+        'Arrays are stored in the CPU cache while linked lists are not',
+        'Array elements occupy contiguous memory at fixed size. The address of element i = base_address + i × element_size — one multiplication and one addition regardless of i or n. Linked lists require following pointers (one per node) to reach position i, taking O(i) time',
+        'Modern CPUs have special array-fetch hardware instructions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Inserting at the middle of an array is O(n). Why?',
+      options: [
+        'The array must be resized to accommodate the new element',
+        'All elements after the insertion point must be shifted one position to the right to make room. In the worst case (inserting at index 0), all n elements move. Average case is n/2 shifts, still O(n)',
+        'The CPU memory bus can only write one byte at a time',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Dynamic arrays (Python list, Java ArrayList) "amortize" the cost of resizing. What does this mean?',
+      options: [
+        'Each append is guaranteed to take constant time',
+        'Most appends are O(1) — just store at the next slot. Occasionally (when the array is full), a new array 2× the size is allocated and all elements are copied — O(n). But this copy happens so rarely that across n appends, the average cost per append is still O(1). The total work is O(n) spread over n operations',
+        'The resize is done in a background thread so the user never waits',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Binary search on a sorted array is O(log n). If the array has 1 billion elements, what is the maximum number of comparisons needed?',
+      options: [
+        'About 500 million — binary search splits the work in half',
+        'About 30 — log₂(10⁹) ≈ 30. Each comparison eliminates half the remaining elements. The enormous leverage of logarithms means a billion-element sorted array needs only about 30 comparisons — the same as a 1-billion-step reduction in 30 halvings',
+        'About 1000 — the square root of a billion',
+      ],
+      correct: 1,
+    },
+  ],
 };

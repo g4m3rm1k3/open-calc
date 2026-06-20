@@ -741,7 +741,52 @@ export default {
     'Applications: DNA base pairing, protein folding, water anomalies, gecko adhesion, soap action.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"London dispersion forces are present in ALL molecules." Which of these molecules has London dispersion forces?',
+      options: [
+        'Only polar molecules like HCl and H₂O',
+        'Every molecule including nonpolar ones like N₂, CH₄, and noble gases — all have fluctuating electron distributions',
+        'Only large molecules with more than 10 atoms',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Dipole-dipole forces: present when net dipole ≠ 0." Which molecule has dipole-dipole forces in addition to London dispersion?',
+      options: [
+        'CO₂ — it has polar C=O bonds',
+        'HCl — it has a permanent dipole moment because Cl is much more electronegative than H',
+        'H₂ — it has two atoms so it must have a dipole',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Hydrogen bond: H on F/O/N attracted to lone pair on F/O/N." Why can H–Cl form dipole-dipole interactions but NOT hydrogen bonds?',
+      options: [
+        'Cl is not electronegative enough to make H–Cl bonds polar',
+        'Hydrogen bonding specifically requires H bonded to F, O, or N — Cl does not qualify even though H–Cl is polar',
+        'HCl is a gas, and gases cannot form hydrogen bonds',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Methane (CH₄) boils at −161°C. Propane (C₃H₈) boils at −42°C. Both are nonpolar. What explains the difference?',
+      options: [
+        'Propane has stronger dipole-dipole forces because it is asymmetric',
+        'Propane has more electrons and greater surface area — its London dispersion forces are stronger, requiring more energy to vaporise',
+        'Propane contains oxygen, which increases its boiling point',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_3_1 };

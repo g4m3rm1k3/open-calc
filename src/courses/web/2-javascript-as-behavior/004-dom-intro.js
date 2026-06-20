@@ -322,5 +322,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is the DOM?',
+      options: [
+        'The CSS stylesheet applied to the page',
+        'The HTML document parsed into a live tree of JavaScript objects — one object per HTML element',
+        'The JavaScript engine that runs in the browser',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You want to select all paragraph elements with class "note". What querySelector string would you use?',
+      options: [
+        '"p note"',
+        '"p.note"',
+        '"#p note"',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You want to change an element\'s CSS class without overwriting its existing inline styles. Which approach is correct?',
+      options: [
+        'element.style = "new-class" — assigning the style property changes the class',
+        'element.classList.add("new-class") — classList methods change classes without touching inline styles',
+        'element.class = "new-class" — the class property is the direct equivalent of the HTML attribute',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'addEventListener takes two arguments. What is the second argument?',
+      options: [
+        'A string describing what to do when the event fires',
+        'A function — called a callback — that runs every time the specified event fires on that element',
+        'A boolean that enables or disables the event',
+      ],
+      correct: 1,
+    },
+  ],
 }

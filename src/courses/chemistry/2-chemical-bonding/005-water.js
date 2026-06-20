@@ -781,7 +781,52 @@ export default {
     'Hydrophobic effect: nonpolar molecules disrupt H-bond network → water pushes them together to minimise disruption.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Water is bent at 104.5° because O has 2 lone pairs." If you removed one lone pair from oxygen, what would happen to the bond angle?',
+      options: [
+        'The angle would decrease further — fewer lone pairs means less repulsion inward',
+        'The angle would increase — with one fewer lone pair compressing the H–O–H angle, the bonds can spread further apart',
+        'The angle would not change — lone pairs have no effect on geometry',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Bent geometry + polar O–H bonds = large molecular dipole." Why does water\'s shape matter for its dipole moment?',
+      options: [
+        'The bent shape means the two O–H bond dipoles point in similar directions and add together, creating a large net dipole',
+        'The bent shape spreads the dipoles out so they partially cancel',
+        'Dipole moment depends only on bond polarity, not molecular shape',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Hydrogen bond: δ+ H attracted to lone pair of δ− O on a neighbouring molecule." What makes hydrogen bonding between water molecules stronger than typical dipole-dipole forces?',
+      options: [
+        'The H atom is so small that it can approach the lone pair of O on another molecule very closely, making the electrostatic attraction unusually strong',
+        'Hydrogen bonds involve actual sharing of electrons between water molecules',
+        'Hydrogen bonding is weaker than dipole-dipole forces — it just appears stronger because water has so many of them',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Up to 4 H-bonds per molecule: 2 O–H bonds donate, 2 lone pairs accept." What gives each water molecule the ability to both donate AND accept hydrogen bonds?',
+      options: [
+        'Water is amphoteric — it can act as both an acid and a base',
+        'The oxygen\'s 2 lone pairs can accept H-bonds from neighbours while the 2 O–H bonds can donate their δ+ H to other molecules\' lone pairs',
+        'Water molecules bond in groups of 4, each contributing one bond',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_2_4 };

@@ -97,4 +97,50 @@ res
     ]}}],
   },
   mentalModel:['for x in iterable: binds x to each element in turn.','Accumulator: initialize → update in loop → read result after.','range(n) gives 0..n-1. range(a,b) gives a..b-1.','enumerate() gives (index, value) pairs.','List comprehension [expr for x in iterable if cond] is faster and Pythonic.'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'total = 0; for x in [1, 2, 3, 4]: total += x. What is total after the loop?',
+      options: [
+        '4 — total equals the last element',
+        '10 — the accumulator pattern: total starts at 0 and adds 1, 2, 3, 4 in sequence: 0+1=1, 1+2=3, 3+3=6, 6+4=10',
+        '0 — total was initialized to 0 before the loop',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What does list(range(3, 8)) produce?',
+      options: [
+        '[3, 4, 5, 6, 7, 8] — range from 3 to 8 inclusive',
+        '[3, 4, 5, 6, 7] — range(a, b) generates integers from a up to but NOT including b',
+        '[0, 1, 2, 3, 4, 5, 6, 7] — range starts at 0 by default when given two arguments',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '[x**2 for x in range(4)] — what does this list comprehension produce?',
+      options: [
+        '[1, 4, 9, 16] — squares from 1 to 4',
+        '[0, 1, 4, 9] — range(4) gives 0, 1, 2, 3, and squaring gives 0, 1, 4, 9',
+        '[0, 1, 2, 3] — the comprehension returns the range itself',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'for i, name in enumerate(["Alice", "Bob", "Carol"]): — what are i and name on the second iteration?',
+      options: [
+        'i = 1, name = "Bob" — enumerate starts at 0, so the second iteration has index 1 and the second element "Bob"',
+        'i = 2, name = "Bob" — enumerate starts at 1 for human-readable indexing',
+        'i = 0, name = "Bob" — the index does not change, only name changes',
+      ],
+      correct: 0,
+    },
+  ],
 }

@@ -793,4 +793,51 @@ res
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '0.1 + 0.2 == 0.3 evaluates to False in Python. Why?',
+      options: [
+        'Python has a bug in its addition implementation',
+        'Floating point numbers are stored in binary (base 2); 0.1 cannot be represented exactly in binary — it becomes a repeating fraction, like 1/3 in decimal. The accumulated representation error means 0.1 + 0.2 ≈ 0.30000000000000004, not exactly 0.3',
+        '0.1 and 0.2 are integers stored as floats, which requires rounding',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'type(7/2) returns float in Python 3, but type(7//2) returns int. What is 7//2?',
+      options: [
+        '3.5 — floor division is the same as regular division',
+        '3 — floor division (//) discards the decimal, rounding DOWN toward negative infinity; 7//2 = 3 (the largest integer not exceeding 3.5)',
+        '4 — floor division rounds to the nearest integer',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why is Python\'s int type able to represent arbitrarily large integers (like 2**1000) while float has a maximum?',
+      options: [
+        'Python int uses more bytes than float by default',
+        'Python int is arbitrary precision — it allocates more memory as the number grows, with no fixed bit limit. Float uses a fixed 64-bit IEEE 754 format with a limited exponent range, so numbers beyond ~1.8×10³⁰⁸ overflow to inf',
+        'Python stores large ints as strings internally to avoid overflow',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The order of magnitude of 4500 is 3 (since log₁₀(4500) ≈ 3.65, floor = 3). Two numbers differ by 4 orders of magnitude. How many times larger is one than the other?',
+      options: [
+        '4 times larger — order of magnitude difference equals the ratio',
+        '10,000 times larger — a difference of n in order of magnitude means a ratio of 10ⁿ; 10⁴ = 10,000. Each order of magnitude is a factor of 10',
+        '40 times larger — 4 orders × 10 per order = 40',
+      ],
+      correct: 1,
+    },
+  ],
 }

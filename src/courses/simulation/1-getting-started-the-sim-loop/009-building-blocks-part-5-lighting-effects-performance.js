@@ -804,4 +804,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'After modifying a Float32Array backing a BufferAttribute, you must set `burstPosAttr.needsUpdate = true`. Why does Three.js require this flag?',
+      options: [
+        'Setting the flag allocates new GPU memory for the updated array',
+        'Three.js caches buffer data on the GPU. Without the flag, Three.js skips the upload assuming nothing changed — the GPU keeps stale positions. needsUpdate = true tells the renderer to re-upload the typed array to GPU memory on the next render call',
+        'The flag triggers garbage collection of the old array before uploading the new one',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Burst particle color fades with: `burstColArr[i*3] *= fade` where `fade = Math.max(0, 1 - age/lifetime)`. What does multiplying by fade do to the color channel?',
+      options: [
+        'It converts the color from RGB to HSL format',
+        'It scales the color toward zero (black). At age=0, fade=1 and the color is unchanged. At age=lifetime, fade=0 and the channel is zeroed — the particle has faded to black. Applying this each frame causes exponential darkening, not linear, because each frame multiplies the already-dimmed value',
+        'It clamps the color to [0, 1] to prevent overflow',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Ambient light illuminates all surfaces equally. Directional light creates shadows and highlights. For a fireworks simulation, which type of lighting matters most?',
+      options: [
+        'Directional light — firework particles need shadows to look three-dimensional',
+        'Ambient light (or none) — firework particles use MeshBasicMaterial which ignores lighting entirely. The particles are self-emissive colored dots. Adding directional lights would only affect scene geometry like the ground; particle colors come from the BufferAttribute color array, not reflectance',
+        'Point lights placed at each burst center — they illuminate the smoke cloud',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'One BufferGeometry holding 1000 particle positions costs one GPU draw call. Using 1000 Mesh objects costs 1000 draw calls. At 60fps on a typical GPU, how many draw calls per frame is considered a practical limit before performance degrades?',
+      options: [
+        'About 1,000–10,000 draw calls — beyond this, draw-call overhead rather than actual geometry complexity becomes the bottleneck. Batching particles into a single geometry lets you simulate hundreds of thousands of particles within that budget',
+        'Exactly 60 draw calls — one per frame',
+        'There is no limit — modern GPUs handle unlimited draw calls in hardware',
+      ],
+      correct: 0,
+    },
+  ],
 }

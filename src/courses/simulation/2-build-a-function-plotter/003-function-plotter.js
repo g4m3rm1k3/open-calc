@@ -781,6 +781,53 @@ drawGrid()`,
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The coordinate transform converts math coordinates (x, y) to canvas pixels (cx, cy). Why is a transform necessary?',
+      options: [
+        'Canvas only accepts integer coordinates, but math values can be decimals',
+        'Canvas pixels start at (0,0) top-left with y increasing downward, while math coordinates use a centered origin with y increasing upward. The transform maps the math viewport (xMin..xMax, yMin..yMax) to the canvas rectangle, inverting y in the process',
+        'Canvas uses radians while math functions use degrees',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The plotter draws the curve as hundreds of short line segments rather than a smooth curve object. Why?',
+      options: [
+        'Canvas does not support curved lines, only straight segments',
+        'A mathematical function f(x) has no built-in "draw me" operation. Sampling f at many x values and connecting consecutive points with lineTo approximates the curve. Enough segments make the approximation visually indistinguishable from a smooth curve',
+        'Line segments are rendered by the GPU; curved objects use the CPU',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A tangent line at x=a is drawn using the point (a, f(a)) and slope f\'(a). The tangent extends across the entire viewport. What is the y-value of the tangent line at some other x-value b?',
+      options: [
+        'f(b) — the tangent has the same value as the function at every point',
+        'f(a) + f\'(a) · (b − a) — the tangent is the linear function that passes through (a, f(a)) with slope f\'(a). This is also the linear approximation formula for f near a',
+        'f\'(a) · b — slope times x-coordinate',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Zero crossings are found by scanning for sign changes: if f(xᵢ) and f(xᵢ₊₁) have opposite signs, a zero is in that interval. What does a sign change guarantee?',
+      options: [
+        'The exact root position at the midpoint of the interval',
+        'By the Intermediate Value Theorem, if f is continuous and changes sign on [xᵢ, xᵢ₊₁], at least one root exists in that interval. The scan does not find the exact root — that requires bisection or Newton\'s method — but it reliably locates which intervals contain them',
+        'The function has exactly one zero in the interval',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export default sim2_003

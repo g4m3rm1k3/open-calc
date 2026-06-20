@@ -226,4 +226,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The Remainder Theorem says dividing p(x) by (x − c) leaves remainder p(c). What is the remainder when p(x) = x³ − 2x + 1 is divided by (x − 3)?',
+      options: [
+        '22 — compute p(3) = 27 − 6 + 1 = 22 directly; the theorem says this IS the remainder without needing to carry out the full division',
+        '0 — the Remainder Theorem implies all divisions leave zero remainder',
+        '3 — the remainder equals the divisor value c = 3',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The Factor Theorem: (x − c) is a factor of p(x) if and only if p(c) = 0. Is (x − 1) a factor of p(x) = x³ − 3x² + 3x − 1?',
+      options: [
+        'No — p(1) = 1 − 3 + 3 − 1 = 0 means the remainder is zero, but the Factor Theorem requires p(1) > 0',
+        'Yes — p(1) = 1 − 3 + 3 − 1 = 0, so (x − 1) divides p(x) exactly; in fact p(x) = (x − 1)³',
+        'Cannot be determined without performing full polynomial long division first',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Synthetic division of p(x) = 2x³ + x² − 5x + 2 by (x − 1) gives remainder 0 and quotient 2x² + 3x − 2. What does the zero remainder confirm, and what is the next step to fully factor p(x)?',
+      options: [
+        'Zero remainder confirms (x − 1) is a factor; factor the quotient 2x² + 3x − 2 = (2x − 1)(x + 2) to get p(x) = (x − 1)(2x − 1)(x + 2)',
+        'Zero remainder is always expected when the leading coefficient is even; the quotient is the entire factorization',
+        'Zero remainder means x = 1 is the only root; p(x) has no further factors to find',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why must you insert placeholder zero coefficients when dividing x³ + 1 by (x − 1)?',
+      options: [
+        'Because the leading coefficient must always be 1, and zeros adjust it to satisfy this requirement',
+        'Because x³ + 1 has missing x² and x terms — writing x³ + 0x² + 0x + 1 keeps the columns aligned so terms of different degrees are not combined incorrectly during subtraction',
+        'Because synthetic division requires an even number of coefficients and the zeros pad the list to satisfy this rule',
+      ],
+      correct: 1,
+    },
+  ],
 }

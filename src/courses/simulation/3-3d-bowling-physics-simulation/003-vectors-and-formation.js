@@ -432,4 +432,51 @@ function update(deltaTime) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The same THREE.Vector3 object represents a position in one context and a velocity in another. What makes this mathematically valid?',
+      options: [
+        'THREE.Vector3 automatically detects its role and changes behavior',
+        'Both are just three numbers. A position vector describes where something is; a velocity vector describes how fast and in which direction it moves. The arithmetic is identical — addition, scaling, magnitude — only the physical interpretation differs. The type does not encode meaning; your code does',
+        'THREE.Vector3 has separate position and velocity modes toggled by a flag',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Pin positions are built with a loop instead of 10 hardcoded `position.set()` calls. When a rule like "row spacing = 30cm" changes, what is the maintenance difference?',
+      options: [
+        'Both approaches require the same number of changes',
+        'The loop reads from one constant (ROW_SPACING). Change it once and all 10 pins recompute. With hardcoded positions, you must update all 10 coordinate calculations individually — and risk missing one or making arithmetic errors on each',
+        'The loop approach requires recompiling the Three.js scene graph',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Highlighting the closest pin every frame with: loop over pins, track closestDist, then after the loop set that pin\'s color. Why find the closest rather than just checking if distance < threshold?',
+      options: [
+        'Distance thresholds cause flickering when the ball is equidistant between two pins',
+        'The "closest pin" is always well-defined; a threshold would highlight multiple pins simultaneously when the ball is near several, or none when the ball is far from all. The closest-pin metric smoothly transitions highlighting from one pin to the next as the ball rolls',
+        'Three.js does not support threshold-based distance checks',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'THREE.Group lets you move, rotate, and scale many meshes as one unit. What would grouping pin meshes into a formation Group allow you to do that individual mesh manipulation cannot?',
+      options: [
+        'Apply a single rotation or offset to the entire triangle formation at once — spin all pins in place, or shift the whole rack left/right without recalculating each pin\'s position individually. Individual manipulation requires updating every pin\'s transform; the Group moves them all with one parent transform change',
+        'Groups allow pins to collide with each other; ungrouped meshes cannot collide',
+        'Grouped meshes share GPU memory, reducing draw calls to one',
+      ],
+      correct: 0,
+    },
+  ],
 }

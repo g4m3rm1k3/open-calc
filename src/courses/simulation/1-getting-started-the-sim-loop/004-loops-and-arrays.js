@@ -406,4 +406,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A student writes `drops.push(new THREE.Mesh(...))` inside update(dt) to create rain. What goes wrong?',
+      options: [
+        'THREE.Mesh cannot be created inside a function',
+        'Every frame (60× per second) a new mesh is added to the scene and the drops array without limit. After a few seconds the scene holds thousands of invisible meshes consuming memory, and framerates collapse. Mesh creation belongs in init() where it runs exactly once',
+        'The push operation is too slow at 60fps',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Gravity is applied with `p.vy -= 9.8 * dt`. Why does each dt step change vy rather than position directly?',
+      options: [
+        'Position cannot be updated directly in Three.js',
+        'Gravity is an acceleration — it changes velocity, not position. Each frame: velocity grows (vy -= 9.8*dt), then position advances by that velocity (y += vy*dt). This two-step integration (acceleration → velocity → position) is how Euler integration mimics real physics',
+        'Subtracting from vy is faster than adding to position',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'When a rain drop reaches y < −5, the code resets its position to a random point near the top instead of removing it. Why recycle rather than destroy and create?',
+      options: [
+        'JavaScript arrays do not support removal of elements',
+        'Destroying and creating meshes every frame re-triggers geometry allocation, GPU upload, and GC pressure. Recycling keeps a fixed pool of meshes alive and just repositions them — zero allocation, zero garbage, and the scene object count stays constant',
+        'Three.js does not support removing objects from a scene during update()',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The drops array is updated with `drops.forEach(p => { ... })`. When would you use a plain `for` loop instead?',
+      options: [
+        'forEach is always preferred because it is more readable',
+        'When you need to break early on a condition (forEach cannot use break), when you need the index for more than one purpose, or when profiling shows forEach overhead is significant for millions of items. For typical particle counts of a few thousand, forEach and for are equivalent in practice',
+        'for loops run in reverse order, which is needed for collision checks',
+      ],
+      correct: 1,
+    },
+  ],
 }

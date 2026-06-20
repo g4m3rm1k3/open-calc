@@ -1934,5 +1934,50 @@ export default {
     'auditColour() counts unique colour values and flags elements bypassing the token system.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Three layers: primitive → semantic → component tokens." A component uses the raw hex value #E53E3E directly. What is the problem?',
+      options: [
+        'Raw hex values are valid — the three-layer system is optional for simple components',
+        'The component skips Layer 1 and Layer 2, so if the red shifts in a rebrand, every component referencing that hex must be updated individually',
+        'Raw hex is fine for colours that will never change, like brand red',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Theme switch = redefine Layer 2 tokens. Everything updates. Zero component changes." What makes this possible?',
+      options: [
+        'Components reference semantic tokens (roles like --color-danger), not primitive colours. Redefining the semantic layer propagates everywhere',
+        'The browser caches token values and swaps them automatically',
+        'All components must be written in CSS-in-JS for token swapping to work',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Colour is never the only signal (WCAG 1.4.1)." An error state turns the input border red. What else must change?',
+      options: [
+        'Nothing — a red border is universally understood as an error',
+        'An icon, label text, or shape change must accompany the colour shift so users who cannot distinguish red perceive the error state',
+        'The background must also change colour to reinforce the signal',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"HSL: hue picks the family, saturation controls vividity, lightness builds the scale." You need a disabled state for a primary button. Which HSL adjustment is correct?',
+      options: [
+        'Reduce saturation (make it greyer) and increase lightness (make it lighter) — this signals inactivity without changing the hue family',
+        'Change the hue to grey — disabled elements should use a neutral colour',
+        'Keep saturation and lightness the same but reduce opacity',
+      ],
+      correct: 0,
+    },
+  ],
 };

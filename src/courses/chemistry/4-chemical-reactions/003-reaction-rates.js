@@ -907,7 +907,52 @@ export default {
     'Industrial example: Haber process (N₂ + 3H₂ → 2NH₃) uses high P, ~400°C, Fe catalyst to optimise all four factors.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Rate = k[A]^m[B]^n. Orders m, n from experiment only." Why can\'t you determine reaction order from the balanced equation?',
+      options: [
+        'The rate law only applies to slow reactions',
+        'Reaction order depends on the mechanism — the actual step-by-step pathway — not the overall stoichiometry. Only experiments reveal the mechanism',
+        'You can determine order from the equation by looking at the coefficients',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Collision theory: rate ∝ (frequency) × (fraction E≥Eₐ) × (steric factor)." Doubling concentration doubles collision frequency. Why does this increase the reaction rate?',
+      options: [
+        'More molecules means each molecule has more energy',
+        'More collisions per second means more chances for productive collisions with E≥Eₐ and correct orientation — proportionally more reactions occur per second',
+        'Concentration changes the activation energy',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Arrhenius: k = A·e^(−Eₐ/RT)." Why does a small decrease in Eₐ have a large effect on reaction rate?',
+      options: [
+        'The exponential term e^(−Eₐ/RT) amplifies small changes in Eₐ — halving Eₐ doesn\'t double k; it multiplies k exponentially',
+        'Eₐ and k are directly proportional',
+        'A small Eₐ decrease has a small effect; it only matters at very high temperatures',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A pharmacist stores a drug at 4°C instead of room temperature (25°C). Why does cold storage slow the drug\'s decomposition reaction?',
+      options: [
+        'Cold temperatures make molecules smaller, so they collide less',
+        'Lower temperature reduces the average kinetic energy of molecules — the fraction of collisions with E≥Eₐ drops exponentially, dramatically reducing the decomposition rate',
+        'Refrigeration changes the drug\'s chemical formula',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_4_2 };

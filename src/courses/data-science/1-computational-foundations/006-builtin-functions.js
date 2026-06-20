@@ -103,4 +103,50 @@ res
     'Never use print() where you need the value.',
     'Built-in functions are the standard toolkit: abs, len, round, min, max, sum, sorted.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'x = print("hello"). What is the value of x?',
+      options: [
+        '"hello" — print returns what it displays',
+        'None — print() is a function that produces side effects (displaying text) but returns None; assigning its return value gives you None',
+        'True — print returns True on success',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'sorted([3, 1, 4, 1, 5]) returns [1, 1, 3, 4, 5]. Does this modify the original list?',
+      options: [
+        'Yes — sorted sorts the list in place and returns it',
+        'No — sorted returns a NEW sorted list; the original [3, 1, 4, 1, 5] is unchanged. Use list.sort() for in-place sorting',
+        'It depends on whether the list is assigned to a variable',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'len("hello") = 5. What does len([1, [2, 3], 4]) return?',
+      options: [
+        '4 — counting all elements including nested ones: 1, 2, 3, 4',
+        '3 — len counts top-level elements only: 1, [2, 3], and 4 are 3 elements regardless of nesting',
+        '5 — len adds the length of the nested list to the outer count',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'round(2.675, 2) in Python may return 2.67 instead of 2.68. Why?',
+      options: [
+        'Python\'s round() function has a bug that truncates instead of rounding',
+        'Floating-point numbers cannot represent 2.675 exactly — the stored value is slightly less than 2.675, so Python rounds down to 2.67. This is a fundamental limitation of binary floating-point, not a Python bug',
+        'round() with 2 decimal places always rounds down to avoid accumulated rounding errors',
+      ],
+      correct: 1,
+    },
+  ],
 }

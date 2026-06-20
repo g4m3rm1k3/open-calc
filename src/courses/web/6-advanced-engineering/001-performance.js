@@ -58,5 +58,50 @@ export default {
     'Graphics logic belongs strictly on GPUs.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Frames demand 16ms render ceilings." Why is 16ms the critical threshold for smooth animation?',
+      options: [
+        'Browsers can only process one frame every 16ms due to hardware limits',
+        '60 frames per second means each frame has ~16ms to complete — miss it and the animation stutters visibly',
+        'JavaScript timers have a minimum resolution of 16ms',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Geometry math is highly expensive." Why does triggering layout recalculation ("reflow") hurt performance?',
+      options: [
+        'It forces the browser to recalculate position and size for every affected element, which is CPU-intensive',
+        'It reloads the CSS from the server',
+        'It only affects elements inside iframes',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Graphics logic belongs strictly on GPUs." Which CSS properties let the browser offload work to the GPU?',
+      options: [
+        'margin and padding — they are hardware-accelerated in all modern browsers',
+        'transform and opacity — compositing these does not trigger layout or paint, so the GPU handles them cheaply',
+        'background-color and font-size — they are the simplest properties to accelerate',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You want to animate a card sliding across the screen smoothly. Which approach is most performant?',
+      options: [
+        'Change the left CSS property on every animation frame using setInterval',
+        'Use CSS transform: translateX() with a transition — this runs on the GPU and avoids triggering layout',
+        'Use JavaScript to update the margin-left value in a requestAnimationFrame loop',
+      ],
+      correct: 1,
+    },
+  ],
 };

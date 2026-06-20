@@ -892,7 +892,52 @@ export default {
     'Limiting reactant: whichever reactant would produce less product independently. Excess reactant remains.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Chemical reaction: bonds break, bonds form, atoms rearrange." How do you know a chemical reaction has occurred vs a physical change?',
+      options: [
+        'A chemical reaction always produces a gas',
+        'A chemical reaction produces new substances with different chemical identities — atoms are rearranged into different combinations, not just reorganised in space',
+        'Any change you can see with your eyes is a chemical reaction',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Conservation of mass: Σm_reactants = Σm_products." You burn 12 g of carbon in excess oxygen and collect all products. How much mass is in the products?',
+      options: [
+        'Less than 12 g — some mass is lost as heat',
+        'Exactly 12 g from carbon plus the mass of the oxygen consumed — total product mass equals total reactant mass',
+        'More than 12 g because burning adds energy',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Balanced equation: change coefficients only, never subscripts." Why can\'t you change subscripts to balance an equation?',
+      options: [
+        'Subscripts are set by convention and cannot be changed',
+        'Changing a subscript changes the identity of the molecule — H₂O₂ is not the same as H₂O; you\'d be balancing a different reaction',
+        'Subscripts are only for counting electrons, not atoms',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Burning propane (C₃H₈ + O₂ → CO₂ + H₂O) is which type of reaction?',
+      options: [
+        'Decomposition — the propane breaks apart',
+        'Combustion — a fuel reacts with O₂ to produce CO₂ and H₂O',
+        'Double replacement — two compounds exchange partners',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_4_0 };

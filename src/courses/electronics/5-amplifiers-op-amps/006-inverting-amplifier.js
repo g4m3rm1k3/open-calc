@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An inverting op-amp circuit has R1 = 10 kΩ and Rf = 47 kΩ. What is the voltage gain?',
+      options: [
+        '+4.7 — gain is positive in an inverting amplifier',
+        '−4.7 — Av = −Rf/R1 = −47k/10k; negative because the output is phase-inverted relative to the input',
+        '−0.21 — gain = −R1/Rf',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In an inverting amplifier, the inverting input (V−) sits at virtual ground (≈ 0V). What physically holds it there?',
+      options: [
+        'A physical wire connects V− to the ground rail inside the circuit',
+        'The op-amp\'s enormous open-loop gain through negative feedback continuously drives the output to whatever value forces V− equal to V+ (which is grounded), maintaining V− ≈ 0V without a physical connection',
+        'The feedback resistor Rf short-circuits V− to ground whenever current flows through it',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A source with 500 Ω output impedance drives an inverting amplifier with R1 = 1 kΩ. What problem does this create?',
+      options: [
+        'No problem — the op-amp input draws no current so source impedance has no effect',
+        'The source impedance and R1 form a voltage divider: actual input = Vin × R1/(R1 + Rsource) = Vin × 1000/1500 = 0.67 × Vin, reducing effective gain by one-third',
+        'The source impedance causes the virtual ground to shift away from 0V, unpredictably changing the gain',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A summing amplifier has three inputs with resistors R1 = 10 kΩ, R2 = 20 kΩ, R3 = 40 kΩ, and Rf = 40 kΩ. Why can the inputs be summed independently without interacting with each other?',
+      options: [
+        'The inputs are buffered by unity-gain followers before reaching the summing node',
+        'The virtual ground node holds V− at 0V, so each input source sees only its own resistor to ground — the inputs are decoupled from each other by the virtual ground',
+        'Summing is possible because the op-amp has infinite input impedance, blocking current from flowing between input nodes',
+      ],
+      correct: 1,
+    },
+  ],
 };

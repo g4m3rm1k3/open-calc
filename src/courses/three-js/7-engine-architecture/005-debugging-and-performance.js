@@ -478,7 +478,52 @@ export default {
   challenges: [],
   mentalModel: ['Debug: output values as colour. Check gl.getShaderInfoLog(). Bottleneck ablation: halve cost → if fps changes, you found it. renderer.info.render.calls<500, .memory.textures for monitoring.'],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Debug: output values as colour." A fragment shader produces incorrect lighting. You can\'t use console.log. What is the most effective debug technique?',
+      options: [
+        'Add a breakpoint in the browser\'s JavaScript debugger',
+        'Output the suspect value as a colour — e.g., gl_FragColor = vec4(vec3(suspectValue), 1.0) — and inspect the rendered result visually to understand what the shader is computing',
+        'Check the vertex shader output instead',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Bottleneck ablation: halve cost → if fps changes, you found it." You halve draw calls from 1000 to 500 and fps does not change. What does this tell you?',
+      options: [
+        'Draw calls are not the bottleneck — the bottleneck is elsewhere (possibly fragment-bound, memory-bound, or vertex-bound)',
+        'Your GPU is too fast to measure the difference',
+        'The scene is balanced and has no bottleneck',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"renderer.info.render.calls < 500." Why does draw call count matter for performance?',
+      options: [
+        'Each draw call executes the vertex shader once',
+        'Each draw call requires CPU-GPU communication — the driver validates state, submits commands, and synchronises. With hundreds or thousands of calls, CPU overhead becomes the bottleneck even if the GPU has capacity',
+        'Draw calls consume VRAM',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Check gl.getShaderInfoLog()." You compile a shader and it produces no output. What is the first thing to check?',
+      options: [
+        'Whether the GPU driver is up to date',
+        'gl.getShaderInfoLog(shader) and gl.getProgramInfoLog(program) — these return compile/link errors that are silent by default. Missing this step can waste hours on phantom issues',
+        'Whether the vertex buffer is correctly bound',
+      ],
+      correct: 1,
+    },
+  ],
 }
 
 export { LESSON_3JS_6_4 }

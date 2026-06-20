@@ -244,4 +244,51 @@ export default {
     teaser: "Euler's formula $e^{i\\theta} = \\cos\\theta+i\\sin\\theta$ is the bridge between exponential and trig functions in calculus. It explains why $\\int e^{ax}\\cos(bx)\\,dx$ can be solved by treating $\\cos(bx)$ as the real part of $e^{ibx}$. In differential equations, complex characteristic roots $\\alpha \\pm \\beta i$ give solutions $e^{\\alpha t}\\cos(\\beta t)$ and $e^{\\alpha t}\\sin(\\beta t)$ — the polar form of a spiral. Fourier analysis decomposes any periodic function into a sum of complex exponentials $e^{in\\theta}$.",
     linkedLessons: ['polar-coordinates-deep', 'trig-identities-deep-dive'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Euler\'s formula: e^(iθ) = cos(θ) + i·sin(θ). What does this say about e^(iπ)?',
+      options: [
+        'e^(iπ) = cos(π) + i·sin(π) = -1 + i·0 = -1, giving e^(iπ) + 1 = 0 — Euler\'s identity, connecting the five most fundamental constants in mathematics (e, i, π, 1, 0) in one equation',
+        'e^(iπ) = eπ (the real part only, since imaginary parts cancel)',
+        'e^(iπ) is undefined because you cannot raise e to a complex power',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Polar form: z = r·e^(iθ) = r(cos θ + i sin θ). When you MULTIPLY two complex numbers in polar form, what happens to r and θ?',
+      options: [
+        'Both r and θ add: (r₁+r₂)·e^(i(θ₁+θ₂))',
+        'r values multiply and θ values add: r₁e^(iθ₁)·r₂e^(iθ₂) = r₁r₂·e^(i(θ₁+θ₂)); multiplication in the complex plane is a ROTATION by θ₂ and a SCALING by r₂',
+        'Both r and θ multiply: (r₁r₂)·e^(i·θ₁θ₂)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'De Moivre\'s theorem: (cos θ + i sin θ)ⁿ = cos(nθ) + i sin(nθ). How is this used to find cos(3θ) in terms of cos(θ)?',
+      options: [
+        'Substitute 3θ into the cosine power series expansion',
+        'Expand (cos θ + i sin θ)³ using the binomial theorem, then separate real and imaginary parts. The real part gives cos(3θ); collecting cos and sin terms and using sin²θ = 1-cos²θ gives the triple angle formula cos(3θ) = 4cos³θ - 3cos θ',
+        'Apply cos(3θ) = cos(2θ+θ) repeatedly using the addition formula',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The nth roots of unity are the n solutions to zⁿ = 1. Why are they equally spaced around the unit circle?',
+      options: [
+        'By convention — roots are defined to be evenly distributed',
+        'Each root has |z| = 1 (on the unit circle) and argument θ = 2πk/n for k = 0, 1, ..., n-1 (from De Moivre: e^(i·2πk/n))ⁿ = e^(i·2πk) = 1). Equal angle increments of 2π/n between consecutive roots place them exactly evenly around the circle',
+        'The equal spacing is only true for prime values of n',
+      ],
+      correct: 1,
+    },
+  ],
 }

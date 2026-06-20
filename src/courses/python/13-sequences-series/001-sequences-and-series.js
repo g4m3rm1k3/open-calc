@@ -1045,4 +1045,51 @@ res
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A geometric sequence has first term 2 and ratio 3. What is the 10th term?',
+      options: [
+        '2 + 3×9 = 29 — add the ratio multiplied by position',
+        '2 × 3⁹ = 39366 — the nth term is a₁ × r^(n-1); multiplying by r nine times gives exponential growth',
+        '2 × 3 × 10 = 60 — multiply first term by ratio and position',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A geometric series has a = 1 and ratio r = 0.5. Why does the infinite sum converge to a finite value?',
+      options: [
+        'It does not converge — you cannot sum infinitely many terms',
+        'When |r| < 1, each term is a fixed fraction of the previous one, so the terms shrink to zero fast enough that the total stays bounded. S∞ = a/(1−r) = 1/0.5 = 2',
+        'Only the first few terms matter; the rest are too small to count',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The Taylor series for sin(x) is x − x³/6 + x⁵/120 − ... For small x like x=0.1, why does keeping only two terms give excellent accuracy?',
+      options: [
+        'The first two terms are exact for x = 0.1',
+        'Higher-order terms have x raised to higher powers divided by growing factorials; for x=0.1, x³/6 ≈ 0.000167 and x⁵/120 ≈ 8×10⁻⁸ — each additional term is about 100× smaller than the previous',
+        'sin is linear for x < 1, so only the first term matters',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'When computing Taylor series terms, a recurrence (each term = previous × ratio) is preferred over recomputing math.factorial each time. Why?',
+      options: [
+        'math.factorial has rounding errors for large inputs that the recurrence avoids',
+        'Recomputing factorial(2k+1) from scratch for each k is O(k) work; using the recurrence computes each new term in O(1) by multiplying the previous term by −x²/((2k)(2k+1)), dropping total work from O(n²) to O(n)',
+        'Python\'s factorial is not available in all environments, so the recurrence is more portable',
+      ],
+      correct: 1,
+    },
+  ],
 }

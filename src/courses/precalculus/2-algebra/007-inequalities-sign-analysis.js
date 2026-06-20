@@ -217,4 +217,51 @@ export default {
     teaser: 'In calculus, you will use sign charts constantly: to find intervals where $f\'(x) > 0$ (increasing) or $f\'(x) < 0$ (decreasing), and where $f\'\'(x) > 0$ (concave up) or $f\'\'(x) < 0$ (concave down). The method is identical — only the function being analysed changes.',
     linkedLessons: ['derivatives-introduction', 'function-behaviour'],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'To solve (x-2)(x+3) > 0, you find critical points x=2 and x=-3, then test one point in each interval. Why does testing ONE point per interval suffice?',
+      options: [
+        'Testing one point is just a convention — you should really test at least 3 per interval',
+        'A polynomial product is CONTINUOUS and can only change sign at a zero or discontinuity — so within each interval between critical points, the sign is constant throughout. One test point reveals the sign for the entire interval',
+        'Testing one point works only when all factors are linear',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Solving |x - 3| < 5 gives the compound inequality -5 < x-3 < 5, which simplifies to -2 < x < 8. Why does absolute value inequality split into a compound inequality?',
+      options: [
+        'Because absolute value always produces two solutions in different quadrants',
+        '|A| < B means -B < A < B — the distance from zero is less than B in BOTH directions (negative and positive); the absolute value strips the sign, so you must account for both cases where A could be positive or negative while still satisfying the bound',
+        'The splitting rule only applies when B is positive',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'When solving a rational inequality like (x+1)/(x-2) > 0, why must x=2 be included as a critical point even though it is NOT a zero of the expression?',
+      options: [
+        'Because x=2 would make the expression equal to 1, which is a boundary case',
+        'Sign changes can occur where the expression is ZERO (numerator = 0) OR UNDEFINED (denominator = 0); at x=2 the expression blows up to ±∞, which is a sign-change boundary — the sign can flip across a vertical asymptote just as it does across a zero',
+        'x=2 must be excluded from the domain and therefore included as a critical point by convention',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Flipping the inequality sign when multiplying by a NEGATIVE number: 3 > 2 but (-1)×3 < (-1)×2. Why does multiplication by negative flip the inequality?',
+      options: [
+        'This is an arbitrary rule that must be memorized',
+        'Multiplying by -1 reflects all numbers around zero — larger numbers become more negative (smaller). 3 is to the RIGHT of 2 on the number line, but -3 is to the LEFT of -2; the order relationship reverses on reflection, hence the inequality flips',
+        'The sign flips only when both sides of the inequality are positive',
+      ],
+      correct: 1,
+    },
+  ],
 }

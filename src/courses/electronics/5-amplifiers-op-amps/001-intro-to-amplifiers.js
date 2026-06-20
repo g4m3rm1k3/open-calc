@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A microphone outputs 5 mV and a speaker needs 1 V. What voltage gain is required, and how many decibels is that?',
+      options: [
+        'Gain = 200, which is 46 dB — Av = 1000/5 = 200, AdB = 20 × log10(200)',
+        'Gain = 0.005, which is −46 dB — divide output by input',
+        'Gain = 20, which is 26 dB — 1 V / 0.05 V',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'An amplifier\'s gain-bandwidth product (GBW) is 10 MHz. If the closed-loop gain is set to 100, what is the −3 dB bandwidth?',
+      options: [
+        '10 MHz — GBW applies only to open-loop operation',
+        '100 kHz — bandwidth = GBW / gain = 10 MHz / 100',
+        '1 GHz — multiply GBW by gain for the effective bandwidth',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Where does the output power of an amplifier come from?',
+      options: [
+        'The input signal itself — amplification concentrates the input power into a larger output voltage',
+        'The DC power supply — the input signal controls how much supply energy flows to the output; the supply always delivers more power than the input signal',
+        'A resonant circuit inside the amplifier that stores and releases energy each cycle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Three amplifier stages in cascade have voltage gains of 10, 5, and 4. What is the total gain in decibels?',
+      options: [
+        '19 dB — add the individual gains: 10 + 5 + 4',
+        '46 dB — total voltage gain = 10 × 5 × 4 = 200; AdB = 20 × log10(200) ≈ 46 dB',
+        '200 dB — multiply gains then multiply by 10 for dB conversion',
+      ],
+      correct: 1,
+    },
+  ],
 };

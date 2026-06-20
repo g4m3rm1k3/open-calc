@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A JFET is described as "normally ON" while an enhancement-mode MOSFET is "normally OFF." What is the key structural difference that causes this?',
+      options: [
+        'JFETs use P-type material while MOSFETs use N-type material, and P-type naturally conducts at zero bias',
+        'A JFET has a physical conduction channel at VGS = 0; an enhancement MOSFET has no channel at VGS = 0 — the gate voltage must create one by attracting carriers to the surface under the gate oxide',
+        'MOSFETs have a thicker gate oxide that requires more voltage to turn on',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A power MOSFET has RDS(on) = 10 mΩ and carries 50A. What is its conduction power loss?',
+      options: [
+        '0.5W — P = V × I = 0.01 × 50',
+        '25W — P = I² × RDS(on) = 50² × 0.010 = 25W',
+        '250W — P = I × VDS where VDS = I × RDS(on) = 0.5V',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Unlike BJTs, paralleled power MOSFETs naturally share current without emitter ballast resistors. Why?',
+      options: [
+        'MOSFETs are voltage-controlled so they don\'t draw any current from the gate driver, preventing imbalance',
+        'MOSFET RDS(on) has a positive temperature coefficient — if one device runs hotter and tries to take more current, its resistance increases, diverting current to cooler devices and self-balancing the array',
+        'All MOSFETs from the same manufacturer are matched to within 1% on RDS(on), ensuring equal current sharing',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A motor drive MOSFET switches at 100 kHz. The engineer considers a new device with half the RDS(on) but twice the gate charge Qg. What tradeoff must they evaluate?',
+      options: [
+        'Lower RDS(on) always wins — conduction losses are more important than switching losses',
+        'At high frequency, switching losses (∝ Qg × fsw) can dominate over conduction losses (∝ RDS(on)) — doubling Qg at 100 kHz may increase total losses despite the halved RDS(on)',
+        'Gate charge only matters for the gate driver IC selection, not for total power efficiency',
+      ],
+      correct: 1,
+    },
+  ],
 };

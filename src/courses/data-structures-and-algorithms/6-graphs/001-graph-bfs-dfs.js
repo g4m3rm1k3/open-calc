@@ -445,6 +445,53 @@ fig.set_title("BFS discovery order from A")
 for step, node in enumerate(order):
     fig.bar(step, step + 1, label=node, color="#60a5fa")
 fig.show()`,
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'BFS on an unweighted graph finds the shortest path (fewest edges) from source to target. Why does BFS guarantee shortest paths while DFS does not?',
+      options: [
+        'BFS visits more nodes than DFS, so it is guaranteed to find all paths',
+        'BFS explores nodes level by level — all nodes at distance d from the source before any at distance d+1. The first time BFS reaches the target, it has taken the fewest steps possible. DFS may find the target via a long winding path before exploring shorter alternatives',
+        'DFS cannot find paths in graphs with cycles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Graph traversal requires a `visited` set to avoid infinite loops. Why does tree traversal not need one?',
+      options: [
+        'Trees are smaller than graphs so revisiting nodes is less likely',
+        'Trees are acyclic and each node has exactly one parent — there is only one path to any node. Graphs can have cycles: A→B→C→A. Without tracking visited nodes, BFS/DFS would loop forever. Adding nodes to `visited` before processing them (not after) ensures each node is processed exactly once',
+        'Python recursion automatically detects visited nodes in trees',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Counting connected components: iterate over all nodes; for each unvisited node, do a BFS/DFS and mark all reachable nodes as visited; increment a counter. Why does the outer loop need to try every unvisited node?',
+      options: [
+        'BFS and DFS can only find 10 nodes before stopping',
+        'A single BFS/DFS from one starting node only visits nodes reachable from that node (one component). Disconnected components have no edges connecting them — you cannot reach them from the first starting point. The outer loop ensures every component gets a starting point for its traversal',
+        'Python sets do not allow checking if a node is already visited',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'DFS on a graph is implemented with a stack (or recursion). The iterative stack-based DFS may visit nodes in a different order than recursive DFS. Why?',
+      options: [
+        'Iteration is always faster than recursion so it visits nodes earlier',
+        'When the iterative version pushes all neighbors onto the stack, it processes the last-pushed neighbor first (LIFO). Recursive DFS processes neighbors in the order they appear in the adjacency list, with the first neighbor fully explored before the second is started. The exploration strategy is the same (depth-first) but the specific node visitation order within a depth-level can differ',
+        'Recursive DFS runs out of stack space for large graphs while iterative does not',
+      ],
+      correct: 1,
+    },
+  ],
               output: 'All assertions passed!',
               status: 'idle',
               figureJson: null,

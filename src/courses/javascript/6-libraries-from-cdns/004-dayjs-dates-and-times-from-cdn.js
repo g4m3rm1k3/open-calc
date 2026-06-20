@@ -450,5 +450,50 @@ export default {
     'Plugins activate via dayjs.extend(plugin). Load plugin script before calling extend.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You call dayjs().add(7, "day"). What does it return?',
+      options: [
+        'It modifies the original dayjs object in place and returns it',
+        'A new dayjs object representing 7 days from now — dayjs objects are immutable',
+        'A JavaScript Date object, not a dayjs object',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You need to display a date as "2024-12-25". Which format string produces this?',
+      options: [
+        '"DD/MM/YYYY"',
+        '"YYYY-MM-DD"',
+        '"MM-DD-YYYY"',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'date1.diff(date2, "day") returns -3. What does this tell you?',
+      options: [
+        'date2 is 3 days in the future relative to date1',
+        'date1 is 3 days earlier than date2 — the result is negative because date2 is ahead',
+        'The two dates cannot be compared because one is in the past',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You need to use a Day.js plugin like relativeTime. What must you do before calling dayjs().fromNow()?',
+      options: [
+        'Install the plugin with npm — CDN does not support plugins',
+        'Load the plugin script and then call dayjs.extend(relativeTime) to activate it',
+        'Enable plugins in a dayjs configuration file',
+      ],
+      correct: 1,
+    },
+  ],
 };

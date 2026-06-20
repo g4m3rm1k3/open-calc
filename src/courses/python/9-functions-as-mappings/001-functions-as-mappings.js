@@ -874,4 +874,51 @@ res
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A function maps each input to exactly ONE output. Which of these is NOT a valid mathematical function?',
+      options: [
+        'f(x) = x² (each x maps to exactly one squared value)',
+        'A relation where f(4) = 2 AND f(4) = -2 simultaneously — this violates the function definition; one input (4) maps to two outputs (2 and -2). This is the vertical line test failure: the relation is a set of points that does not pass',
+        'f(x) = √x for x ≥ 0 (defined only on non-negative reals)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'g(f(x)) means "apply f first, then g to the result." If f(x) = x+1 and g(x) = x², what is g(f(3))?',
+      options: [
+        '10 — f(3) = 4, then g(4) = 16... wait, that is 16',
+        '16 — f(3) = 3+1 = 4, then g(4) = 4² = 16; composition applies functions right-to-left (inside-out)',
+        '10 — g(3) = 9, then f(9) = 10; composition applies left-to-right',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'math.sqrt(x) raises ValueError for x < 0, but a custom safe_sqrt function could return None instead. What does this say about domain?',
+      options: [
+        'Python functions can accept any input; domain restrictions are only mathematical conventions',
+        'The function\'s domain is the set of inputs for which it is defined and returns a valid output; math.sqrt has domain [0, ∞) because square roots of negative reals don\'t exist in the reals. Defining safe_sqrt to return None for negatives doesn\'t extend the mathematical domain — it just handles the error differently',
+        'Domain restrictions only apply to trigonometric functions, not square roots',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Lambda functions in Python: double = lambda x: x * 2. What is the main use case for lambda?',
+      options: [
+        'Lambda is required for any function that takes more than one argument',
+        'Lambda creates anonymous one-expression functions inline — useful when passing a simple function as an argument (e.g., sorted(data, key=lambda x: x[1]) or map(lambda x: x**2, numbers)) without the overhead of naming it with def. For complex or reusable logic, def is clearer',
+        'Lambda functions are faster than def functions because they skip the naming step',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -121,5 +121,51 @@ To find a tangent line:
       '**Derivatives**: Tangents always follow Point-Slope logic.',
       '**Integrals**: Slope and distance combine to form accumulation areas.'
     ]
-  }
+  },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A line has slope 3. What slope must a perpendicular line have?',
+      options: [
+        '−3 — just negate the slope to get the perpendicular direction',
+        '−1/3 — perpendicular slopes are negative reciprocals; their product equals −1: 3 × (−1/3) = −1, confirming a 90° intersection',
+        '1/3 — take the reciprocal of the slope without negating',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In calculus, why is point-slope form y − y₀ = m(x − x₀) preferred over slope-intercept form y = mx + b?',
+      options: [
+        'Slope-intercept form only works for lines through the origin, so it is too restrictive for calculus problems',
+        'Calculus problems typically give you a point on a curve (x₀, y₀) and a slope from a derivative f\'(x₀); point-slope form plugs those two things in directly, without needing to calculate the y-intercept first',
+        'Point-slope form is easier to graph because the x₀ and y₀ values appear explicitly as coordinates',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The "Zoom-In" principle of calculus says that every smooth curve looks like a straight line when you zoom in close enough. What is the name for that line?',
+      options: [
+        'The secant line — which connects two points on the curve and approximates the slope',
+        'The tangent line — the limiting position of a secant as the two points merge; it is the best linear prediction of the curve at that point and has slope equal to the derivative f\'(x₀)',
+        'The normal line — the perpendicular to the curve, which is always the flattest direction',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'What is the equation of the line through (−2, 5) and (4, −1)?',
+      options: [
+        'y = −x + 3 — slope m = (−1 − 5)/(4 − (−2)) = −6/6 = −1; using point (−2, 5): y − 5 = −1(x + 2) → y = −x + 3',
+        'y = x + 7 — slope from rise over run without sign correction',
+        'y = −x − 3 — correct slope but wrong y-intercept from arithmetic error',
+      ],
+      correct: 0,
+    },
+  ],
 };

@@ -62,4 +62,50 @@ res
     'Bayes: P(A|B) = P(B|A)×P(A)/P(B). Base rate matters enormously.',
     'Monte Carlo: simulate many trials, count outcomes — works for any probability.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'P(A|B) is defined as P(A and B) / P(B). What does this conditional probability actually measure?',
+      options: [
+        'The probability that A causes B',
+        'The probability that A occurs given that B has already occurred — restricting the sample space to outcomes where B is true, then asking what fraction also have A',
+        'The probability that A and B both happen simultaneously without any prior knowledge',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A disease affects 1% of people. A test is 95% sensitive and 5% false-positive rate. A positive test result means the probability you actually have the disease is approximately:',
+      options: [
+        '95% — the test is 95% accurate',
+        'About 16% — the low base rate (1%) swamps the test accuracy; most positives come from false positives among the 99% healthy people, not true positives among the 1% sick',
+        '50% — you either have it or you don\'t',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The Law of Large Numbers says empirical frequency converges to true probability as N grows. What does this NOT guarantee?',
+      options: [
+        'That flipping a fair coin 1,000,000 times will give approximately 50% heads',
+        'That if you flip heads 10 times in a row, the next flip is more likely to be tails to "balance out" — the coin has no memory; each flip is independent and still 50/50',
+        'That larger samples give more reliable probability estimates',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Two events A and B are independent. P(A) = 0.3, P(B) = 0.4. What is P(A and B)?',
+      options: [
+        '0.7 — you add probabilities for "and" relationships',
+        '0.12 — for independent events P(A and B) = P(A) × P(B) = 0.3 × 0.4; independence means knowing B happened gives no information about A',
+        '0.58 — you add P(A) + P(B) then subtract 1',
+      ],
+      correct: 1,
+    },
+  ],
 }

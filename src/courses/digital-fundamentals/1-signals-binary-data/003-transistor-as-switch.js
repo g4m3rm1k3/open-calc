@@ -756,5 +756,50 @@ export default {
     'No transistor = no gate = no logic. The MOSFET is the atom of digital computation.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Relay → BJT → MOSFET: each generation is faster, smaller, less control power." What physical property allows MOSFETs to switch billions of times per second?',
+      options: [
+        'MOSFETs use higher voltage than relays, increasing switching speed',
+        'The gate is voltage-controlled (capacitive) rather than current-controlled — no current flows into the gate at DC, so it switches with almost no power and at extremely high speed',
+        'MOSFETs are made of silicon, which is inherently faster than the metal in relays',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"NMOS on when V_GS > V_th." In an NMOS transistor, what does V_GS represent?',
+      options: [
+        'The voltage between the output and ground',
+        'The voltage between the gate terminal and the source terminal — when this exceeds the threshold, a conductive channel forms and current can flow',
+        'The supply voltage powering the transistor',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"CMOS NOT gate: PMOS pulls to VDD when input LOW; NMOS pulls to GND when input HIGH." Why is CMOS efficient?',
+      options: [
+        'CMOS uses both transistor types simultaneously, doubling output strength',
+        'At any stable logic level, only one transistor is on — current flows only briefly during switching, not continuously, so static power is nearly zero',
+        'PMOS and NMOS cancel each other\'s heat output',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"No transistor = no gate = no logic. The MOSFET is the atom of digital computation." What does this mean for understanding digital circuits?',
+      options: [
+        'You must understand chemistry to design digital circuits',
+        'Every logic gate, memory cell, and processor is ultimately built from MOSFETs — understanding the transistor switch is the foundation of all digital logic',
+        'Transistors only matter for analog circuits; digital logic is purely abstract',
+      ],
+      correct: 1,
+    },
+  ],
 };

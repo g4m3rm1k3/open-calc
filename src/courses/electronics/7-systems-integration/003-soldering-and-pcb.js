@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'IPC-2221 trace width rule of thumb: width (mm) ≈ I(A) for 1oz copper with 10°C rise on external layer. Double width for internal layers (less cooling).' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A technician touches the soldering iron tip directly to the solder and the solder melts onto the tip, then tries to push it onto the joint. What is wrong with this technique?',
+      options: [
+        'The iron temperature is too high, causing the solder to melt before it reaches the joint',
+        'Solder flows toward heat — melting solder on the iron tip creates a cold blob that will not wet the pad or component lead. The correct technique is to heat the pad and lead simultaneously with the iron, then touch solder to the joint itself so it flows by capillary action into a proper intermetallic bond',
+        'Lead-free solder cannot be applied this way; only leaded solder can be applied to the iron tip',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Solder is balling up on a pad and refusing to wet and spread properly. What is the most likely cause and fix?',
+      options: [
+        'The iron is too cold — increase temperature to 450°C to force the solder to flow',
+        'Oxidised surfaces are preventing wetting — apply rosin flux to dissolve the copper oxide on the pad and component lead, then reheat; flux is what enables solder to form an intermetallic bond, not heat alone',
+        'The solder alloy is incompatible with the pad finish — switch from SAC305 to a leaded alloy',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A PCB design has a continuous copper ground plane on the layer directly below the high-speed signal layer. What does this achieve that separate traces could not?',
+      options: [
+        'The ground plane acts as a heatsink that draws heat away from fast-switching ICs and prevents thermal shutdown',
+        'High-speed signals need a constant characteristic impedance — a continuous ground plane provides a uniform return current path directly below each signal trace, controlling impedance, reducing EMI from loop area, and preventing signal integrity problems caused by return current detours around gaps',
+        'The ground plane electrically isolates the signal layer from the power layer, preventing cross-regulation between voltage rails',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'During reflow soldering of 0402 components, the oven temperature rises too quickly through the preheat zone. What assembly defect is most likely to result?',
+      options: [
+        'Bridging — solder between pads melts simultaneously and runs together when heated too fast',
+        'Tombstoning — one end of the component reflows and pulls the other end off the pad before both sides reach temperature simultaneously; uneven heating from skipping the preheat soak causes the thermal asymmetry that lifts the lighter end',
+        'Cold joint — rapid heating prevents the solder from reaching adequate temperature for proper wetting',
+      ],
+      correct: 1,
+    },
+  ],
 };

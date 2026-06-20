@@ -711,4 +711,51 @@ print(longest_consecutive([0,3,7,2,5,8,4,6,0,1])) # 9`,
       hint: 'The key: only start counting from the beginning of a sequence (where n-1 is not in the set). This ensures each number is the start of exactly one counting run, giving O(n) total.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Counting word frequencies with `freq[word] = freq.get(word, 0) + 1` is O(n) for n words. What makes this more efficient than sorting the word list and counting runs?',
+      options: [
+        'Hash map lookups are O(1) vs O(log n) for a sorted search',
+        'The hash map approach is O(n) total. Sorting the list to count runs is O(n log n). For large texts, the difference is significant. The hash map avoids sorting entirely — each word is looked up and incremented in one pass with amortized O(1) per operation',
+        'Sorting requires O(n²) space while the hash map uses O(n)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Two-sum problem: find indices i, j such that nums[i] + nums[j] = target. A hash map solution is O(n) while a brute force double loop is O(n²). What does the hash map store?',
+      options: [
+        'The index of each number as both key and value',
+        'For each number x seen so far, store x → index. When processing a new number y, check if (target − y) is in the map — if so, we found the pair. The map avoids the inner loop by making the "is there a complement?" question O(1) instead of O(n)',
+        'The sorted order of all numbers to enable binary search',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Longest consecutive sequence: [100, 4, 200, 1, 3, 2] → 4 (the sequence 1,2,3,4). The O(n) solution uses a set and only counts sequences starting at their minimum. Why only start counts at the minimum?',
+      options: [
+        'Smaller numbers hash to lower buckets in Python sets',
+        'Starting a count at every number would cause each sequence to be counted multiple times. For example, the sequence [1,2,3,4] could be started at 1, 2, 3, or 4. Checking that `n-1 is not in the set` identifies 1 as the sequence start and skips 2, 3, 4 as potential starts — so each sequence is traversed exactly once',
+        'The set only stores the minimum value of each sequence',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Group anagrams: group ["eat","tea","tan","ate","nat","bat"] into anagram clusters. The key insight is using the sorted string as the hash key. Why does this work?',
+      options: [
+        'Sorted strings are always unique and never collide in a hash map',
+        'All anagrams of a word have the same set of characters — sorting produces the canonical form. "eat", "tea", and "ate" all sort to "aet". Using this as the key groups them into the same bucket automatically, without comparing every pair of strings',
+        'Sorting converts the string to an integer which is faster to hash',
+      ],
+      correct: 1,
+    },
+  ],
 };

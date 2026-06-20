@@ -84,4 +84,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A control panel power supply uses a full-wave bridge rectifier with four silicon diodes. The output is about 1.4V lower than expected. Why?',
+      options: [
+        'Two diodes conduct in series at any instant, each dropping ~0.7V — total 1.4V across the bridge is normal for silicon',
+        'All four diodes share the forward voltage equally, producing only 0.35V drop each',
+        'The transformer is undersized — diode forward voltage should be negligible in a properly designed supply',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The Shockley equation shows diode current is exponential. What happens to current when forward voltage increases by 60 mV at room temperature?',
+      options: [
+        'Current increases by about 60 mA — linear with voltage like a resistor',
+        'Current approximately doubles — because 60 mV ≈ 2.3 × VT and each VT increase multiplies current by e',
+        'Current increases by about 10× — because 60 mV ≈ 2.3 × VT, and e^2.3 ≈ 10',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You are paralleling two diodes to share current in a rectifier. Diode A has a slightly lower forward voltage than Diode B at the same current. What happens?',
+      options: [
+        'The diodes share current equally — any mismatch quickly self-corrects through circuit feedback',
+        'Diode A carries significantly more current because of the exponential I-V curve; a small Vf advantage causes a large current imbalance, potentially overheating Diode A',
+        'Diode B carries more current because a higher Vf diode draws more current to maintain the same voltage',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A power diode runs at high junction temperature during normal operation. How does this affect its forward voltage drop compared to room temperature?',
+      options: [
+        'Forward voltage increases at high temperature because thermal energy excites more carriers, increasing resistance',
+        'Forward voltage decreases — silicon junction voltage drops about 2 mV per °C, so a diode at 125°C drops roughly 0.2V less than at 25°C',
+        'Forward voltage stays constant — the diode self-regulates to maintain 0.7V regardless of temperature',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'Ground loop induced EMF: V = -dΦ/dt = -A × dB/dt. A 0.1m² loop in a 50Hz field of 1mT peak creates V_peak = 2π×50×0.1×0.001 ≈ 31mV — easily overwhelming millivolt sensor signals.' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A sensor in Building A is connected to a data logger in Building B. The signal has persistent 50 Hz noise even though the sensor and cable are shielded. What is the most likely cause?',
+      options: [
+        'The cable shield is picking up radiated 50 Hz magnetic fields from nearby power cables',
+        'A ground loop — the two buildings have separate earth connections at slightly different potentials; current circulates around the loop formed by the signal cable, the sensor ground, and the building earth connections, inducing noise voltage into the measurement',
+        'The sensor\'s output impedance is too high, making the signal line susceptible to capacitive coupling',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You discover that disconnecting the safety earth (PE) from a piece of equipment eliminates the 50 Hz noise on its signal output. Why is this not an acceptable fix?',
+      options: [
+        'Disconnecting PE is acceptable as long as the equipment is labelled "isolated" and placed behind a safety barrier',
+        'The safety earth provides the fault current return path that trips the breaker during an insulation failure — without it, the equipment chassis can charge to mains potential, creating a lethal shock hazard for anyone who touches it; fix the noise with isolation or balanced signalling instead',
+        'Removing PE will increase noise in other equipment on the same supply, so the fix only moves the problem elsewhere',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A measurement system has five sensors daisy-chained to a single ground bus, one sensor per tap point along the bus. Sensor 5 reads 12 mV higher than expected. What grounding topology would eliminate this error?',
+      options: [
+        'Add a larger-diameter ground conductor so the resistance is lower and the voltage drop is negligible',
+        'Star grounding — run a separate return wire from each sensor directly to a single ground point; daisy-chaining means every sensor shares the ground impedance of all upstream connections, and the cumulative voltage drop corrupts downstream measurements',
+        'Use a differential amplifier at sensor 5 to cancel the common-mode offset introduced by the ground bus',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A star grounding topology works well for audio and low-frequency instrumentation. Why does the same star topology fail at RF frequencies above 1 MHz?',
+      options: [
+        'At high frequencies, the star point becomes a common impedance that couples all circuits together, defeating the purpose of separate returns',
+        'Above 1 MHz, the inductance of the long ground leads (roughly 1 nH/mm) dominates over their resistance — a 10 cm lead has ~100 nH of impedance at 160 MHz, making it a poor reference; a solid multi-point ground plane provides many parallel low-inductance paths to a uniform reference',
+        'RF ground currents are too large for star wiring to carry; only heavy copper bus bars can handle the current without resistance drop',
+      ],
+      correct: 1,
+    },
+  ],
 };

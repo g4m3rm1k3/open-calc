@@ -453,5 +453,50 @@ export default {
     'shadow.camera defines the shadow volume — make it just large enough to cover your scene.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Shadow map = depth texture rendered from light\'s view." A DirectionalLight shadow.mapSize is set to 512×512. The scene is 200 units wide. What shadow quality problem will occur?',
+      options: [
+        'Shadows will not render at all below 1024',
+        'Shadows will look blocky/pixelated — 512 texels must cover 200 world units, so each texel covers a large area. Increase mapSize to improve precision',
+        'Shadow maps only need 128×128 for directional lights',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"shadow.bias = -0.0005 typical." A scene shows acne (striped self-shadowing) on a flat floor. You set bias to -0.05. What new problem appears?',
+      options: [
+        'The acne disappears and nothing else changes',
+        'Peter-pan effect — shadows detach from their casters. Too large a bias pushes the depth comparison so far that objects appear to float above their shadows',
+        'The shadows disappear completely',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"PointLight shadow = 6 renders, DirectionalLight = 1 render." Adding a shadow-casting PointLight to a scene costs how much more than a DirectionalLight?',
+      options: [
+        'The same — all shadow-casting lights cost equally',
+        '6× more shadow passes — the point light must render a cubemap (6 faces) to capture shadows in all directions',
+        '2× more — point lights render front and back',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"shadow.camera defines the shadow volume." A DirectionalLight\'s shadow camera is set too small (frustum does not cover the whole scene). What happens to geometry outside the shadow camera frustum?',
+      options: [
+        'It renders without any shadow — outside the shadow volume means no shadow map data, so the comparison always passes and the geometry is fully lit',
+        'It is culled and disappears from view',
+        'It produces black shadows across the entire scene',
+      ],
+      correct: 0,
+    },
+  ],
 }

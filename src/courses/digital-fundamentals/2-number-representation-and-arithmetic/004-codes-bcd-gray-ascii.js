@@ -1072,5 +1072,50 @@ export default {
     'Encoding is a convention. The same 8-bit pattern 0100 0001 can mean: BCD digit 4 then 1, ASCII \'A\', binary 65, or Gray code position 55 — depending on which encoding is in use.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"BCD: 4 bits per decimal digit. Max valid = 9 (1001). Sum > 9 → add 6 correction." Why does BCD add 6 when a digit sum exceeds 9?',
+      options: [
+        'Adding 6 converts the invalid binary result back to valid BCD by skipping the 6 unused states (1010–1111) that don\'t exist in decimal',
+        'BCD uses base 6 encoding underneath',
+        'The correction of 6 accounts for the sign bit in each BCD digit',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Gray code: always 1-bit transition." Why is Gray code used in rotary encoders?',
+      options: [
+        'Gray code values are smaller numbers than binary, reducing reading errors',
+        'Between any two adjacent positions, only one bit changes — so a mechanical encoder that reads multiple bits simultaneously can never produce a false in-between value',
+        'Gray code is encoded in analog voltages rather than digital levels',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"ASCII: uppercase A=65, lowercase a=97. Toggle bit 5 to switch case." The ASCII value of \'B\' is 66. What is the ASCII value of \'b\'?',
+      options: [
+        '82',
+        '98',
+        '34',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Encoding is a convention." The byte 0100 0001 is stored in memory. When does it represent \'A\' vs 65 vs BCD digits?',
+      options: [
+        'It always represents \'A\' — the CPU automatically interprets bytes as ASCII',
+        'The byte itself carries no intrinsic meaning — the code running on the CPU decides whether to interpret it as ASCII, integer, BCD, or anything else',
+        'Different bytes are physically stored in different memory regions for each encoding',
+      ],
+      correct: 1,
+    },
+  ],
 };

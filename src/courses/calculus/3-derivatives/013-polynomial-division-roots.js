@@ -431,4 +431,50 @@ You now have the full detective kit. The next time you meet a stubborn polynomia
     teaser: 'Finding roots of polynomials reappears in calculus when solving $f\'(x) = 0$ to find critical points, and when factoring denominators for partial fraction decomposition before integration. The rational zeros theorem and synthetic division are the manual tools for the same problem that numerical methods (Newton\'s method) solve computationally.',
     linkedLessons: ['factoring-every-method', 'rational-expressions-partial-fractions'],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The Rational Zero Theorem says the possible rational roots of 2x³ − 3x² − 11x + 6 are ±p/q where p divides 6 and q divides 2. What is the complete list?',
+      options: [
+        '±1, ±2, ±3, ±6 only — the divisors of the constant term',
+        '±1, ±2, ±3, ±6, ±1/2, ±3/2 — all fractions (divisors of 6) / (divisors of 2)',
+        '±1, ±2 only — only integer divisors of the leading coefficient matter',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You verify that x = 3 is a root of 2x³ − 3x² − 11x + 6. After synthetic division, the quotient is 2x² + 3x − 2. What does this tell you?',
+      options: [
+        'The polynomial has only one root, x = 3, and the quotient is the remainder after dividing',
+        '2x³ − 3x² − 11x + 6 = (x − 3)(2x² + 3x − 2), so the remaining roots come from factoring 2x² + 3x − 2 further',
+        'The root x = 3 has multiplicity 2, because the quotient is a quadratic',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why does finding polynomial roots matter when computing critical points in calculus?',
+      options: [
+        'Critical points require integration, and polynomial roots determine the limits of integration',
+        'Setting f\'(x) = 0 produces a polynomial equation; solving it means finding its roots — the same rational zeros / synthetic division techniques apply to the derivative polynomial',
+        'Roots of the original function f(x) are always the same as critical points, so the same calculation finds both',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Descartes\' Rule of Signs says a polynomial\'s number of positive real roots equals the number of sign changes in its coefficients, or less by an even number. For 2x³ − 3x² − 11x + 6, the sign pattern is +, −, −, +. How many sign changes are there?',
+      options: [
+        '1 — the only sign change is from − to + at the end',
+        '2 — the sign changes at positions (+ to −) and (− to +)',
+        '3 — every coefficient changes sign relative to its neighbor',
+      ],
+      correct: 1,
+    },
+  ],
 }

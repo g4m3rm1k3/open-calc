@@ -306,7 +306,52 @@ export default {
     'Three.js: normalMatrix built-in. modelMatrix, viewMatrix, projectionMatrix auto-provided.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Normal matrix = transpose(inverse(modelView 3x3))." You scale a mesh by (2, 1, 1) — double width only. What happens to normals transformed by just the model matrix?',
+      options: [
+        'Normals scale correctly alongside the geometry',
+        'Normals tilt in the direction of the scale — a normal perpendicular to the stretched face no longer points the right direction, causing incorrect lighting',
+        'Normals are not affected by scaling, only by rotation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Tangent space TBN: T=tangent, B=cross(N,T), N=normal." Why is the binormal (B) computed as cross(N, T) rather than stored directly in the texture?',
+      options: [
+        'The binormal can always be reconstructed from N and T at zero storage cost — storing it would waste a texture channel',
+        'The binormal is always (0, 1, 0) in world space',
+        'The GPU computes binormals automatically',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Decode normal map: dir = texture.rgb * 2.0 - 1.0. Flat map = (0,0,1)." Why is a completely flat normal map stored as RGB (0.5, 0.5, 1.0)?',
+      options: [
+        'Blue is the Z axis in tangent space — (0, 0, 1) means no perturbation. Since textures store 0–1, (0,0,1) is encoded as (0.5, 0.5, 1.0) before decoding with ×2−1',
+        'The flat colour must be neutral grey',
+        'Normal maps always use a blue tint to indicate they are not colour textures',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Three.js: normalMatrix built-in. modelMatrix, viewMatrix, projectionMatrix auto-provided." When writing a custom Three.js shader, do you need to declare and upload these matrices yourself?',
+      options: [
+        'Yes — all uniforms must be declared and uploaded manually',
+        'No — Three.js injects these as built-in uniforms when you use ShaderMaterial with the correct uniform names',
+        'Only modelMatrix is automatic; view and projection must be uploaded manually',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_2_2 };

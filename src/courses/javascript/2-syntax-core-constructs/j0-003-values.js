@@ -110,5 +110,50 @@ export default {
     'console.log() is how we "look" at values in the console.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Which of the following best describes what a "value" is in JavaScript?',
+      options: [
+        'A named storage location in memory',
+        'A piece of data — the actual thing a program works with',
+        'A line of code that performs an action',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is the difference between null and undefined?',
+      options: [
+        'They are identical — both mean "no value" and can be used interchangeably',
+        'undefined means a variable was declared but never assigned; null is an explicit empty value set intentionally',
+        'null is a number (zero); undefined is an empty string',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You want to see the value of a variable while code runs. What is the standard approach?',
+      options: [
+        'Write the variable name on its own line — JavaScript displays it automatically',
+        'Use console.log() to print the value to the browser console',
+        'You cannot inspect values without stopping execution with a debugger',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Is 42 the same type as "42" in JavaScript?',
+      options: [
+        'Yes — JavaScript automatically converts between numbers and strings',
+        'No — 42 is a Number and "42" is a String; they are different types with different behaviours',
+        'Yes — all values are stored as strings internally',
+      ],
+      correct: 1,
+    },
+  ],
 }

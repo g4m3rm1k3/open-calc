@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'k = log₂(M)  bits/symbol\nRb = Rs · k   bit rate\nη = Rb / B = 2k  bits/s/Hz (Nyquist)\nC = B·log₂(1 + SNR)  [Shannon]' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A wireless link uses 64-QAM modulation. How many bits does each transmitted symbol carry?',
+      options: [
+        '4 bits — 64-QAM places symbols in a 4×4 grid like 16-QAM but with more spacing',
+        '6 bits — k = log₂(M) = log₂(64) = 6; 64-QAM encodes 6 bits per symbol by using 64 distinct amplitude/phase combinations in an 8×8 constellation grid',
+        '8 bits — 64-QAM carries a full byte per symbol, which is why it is used in gigabit WiFi',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'As you walk away from a WiFi access point, your data rate drops significantly even though the channel bandwidth stays the same. What causes this?',
+      options: [
+        'The access point reduces the number of OFDM subcarriers to limit interference from distant stations, narrowing effective bandwidth',
+        'Lower SNR at distance means constellation points can no longer be reliably distinguished in high-order modulation — the AP steps down from 256-QAM through 64-QAM, 16-QAM, to QPSK or BPSK, reducing bits per symbol and therefore throughput',
+        'Multipath reflections cancel out entire OFDM subcarrier groups, removing large chunks of bandwidth at distance',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'OFDM divides a wide channel into hundreds of narrow subcarriers instead of one fast wideband signal. What multipath problem does this solve?',
+      options: [
+        'Multipath causes frequency-selective fading that can deep-null a wideband signal; OFDM\'s narrow subcarriers each experience a nearly flat channel — only a few may fade deeply while the majority remain intact, limiting total signal loss',
+        'Multipath forces a wideband signal to use more transmit power; OFDM reduces power consumption by distributing energy across many subcarriers',
+        'Wideband signals cannot carry QAM modulation in multipath environments; OFDM is required because each subcarrier carries a different modulation type',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A channel has 20 MHz bandwidth and SNR = 1023 (approximately 30 dB). Using Shannon\'s capacity formula C = B·log₂(1 + SNR), what is the theoretical maximum data rate?',
+      options: [
+        '20 Mbps — Shannon capacity equals bandwidth times SNR in linear scale',
+        '200 Mbps — C = 20 MHz × log₂(1 + 1023) = 20 MHz × log₂(1024) = 20 MHz × 10 = 200 Mbps; this is a hard ceiling no modulation scheme can exceed at this SNR',
+        '2 Gbps — C = B × SNR = 20 MHz × 1023; Shannon uses the SNR directly, not its logarithm',
+      ],
+      correct: 1,
+    },
+  ],
 };

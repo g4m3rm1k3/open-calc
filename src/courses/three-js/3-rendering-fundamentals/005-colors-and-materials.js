@@ -353,7 +353,52 @@ export default {
     'MeshPhongMaterial: color, specular, shininess, emissive.',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"sRGB: perceptual encoding. Linear: physical light. Always decode sRGB textures before lighting." What goes wrong if you skip the decode step?',
+      options: [
+        'The texture fails to load',
+        'Lighting calculations run on gamma-encoded values — dark colours appear too bright and highlights too dim, producing washed-out, incorrect lighting',
+        'The GPU automatically handles sRGB decoding',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Phong = ambient + Kd×(N·L) + Ks×(R·V)^shininess." What does the shininess exponent control?',
+      options: [
+        'The overall brightness of the surface',
+        'The tightness of the specular highlight — higher shininess = smaller, sharper highlight (mirror-like); lower = large, spread highlight (rough)',
+        'The amount of ambient light received',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"renderer.outputColorSpace = SRGBColorSpace for correct gamma output." What happens if this is not set (linear output to an sRGB display)?',
+      options: [
+        'Colours look correct — displays handle the conversion automatically',
+        'The scene looks washed out and overly bright — linear values are not re-encoded for sRGB, so the display interprets them as if they were sRGB and displays them too brightly',
+        'The scene looks too dark — linear output is dimmer than sRGB',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"MeshPhongMaterial: color, specular, shininess, emissive." A material has emissive set to bright orange. Does that make the object a light source that illuminates other objects?',
+      options: [
+        'Yes — emissive materials emit light that Three.js ray-traces onto nearby surfaces',
+        'No — emissive only adds to the pixel\'s own colour; it does not illuminate surrounding geometry',
+        'Only if renderer.physicallyCorrectLights is enabled',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_3JS_2_4 };

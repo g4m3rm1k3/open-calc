@@ -272,4 +272,50 @@ export default {
       solution: 'u\'=\\frac{1}{2\\sqrt{x}}, v\'=e^{x^2}\\cdot 2x. Assembly: h\'=\\frac{e^{x^2}}{2\\sqrt{x}}+2x^{3/2}e^{x^2}=e^{x^2}\\!\\left(\\frac{1}{2\\sqrt{x}}+2\\sqrt{x}\\cdot x\\right). At x=1: e^1(0.5+2)=2.5e\\approx 6.796. Numerical check: h(1)=e, h(1.001)=\\sqrt{1.001}\\cdot e^{1.002001}\\approx 1.0005\\cdot 2.7247\\approx 2.726. Difference quotient: (2.726-2.718)/0.001\\approx 6.79. Matches.',
     },
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'To differentiate h(x) = x²·sin(x), you use the product rule: h\'= u\'v + uv\'. What must u\' and v\' be?',
+      options: [
+        'u\' = 2x and v\' = cos(x) — u = x², v = sin(x), differentiated separately, then assembled as (2x)(sin x) + (x²)(cos x)',
+        'u\' = 2 and v\' = cos(x) — the exponent drops by 1 each time you differentiate so x² → 2 → 0',
+        'u\' = 2x² and v\' = sin(x) — squaring the derivative accounts for the squared term in u',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'What is the "chain trap" when computing the product rule on h(x) = sin(x²)·eˣ?',
+      options: [
+        'Applying chain rule to eˣ — eˣ has no inner function so no chain rule is needed there',
+        'Forgetting to apply the chain rule to sin(x²): its derivative is cos(x²)·2x, not just cos(x²). The chain trap is differentiating the outer function only and leaving the inner function undifferentiated',
+        'Applying the product rule when the quotient rule is required',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Why must v\' be fully differentiated (including any chain rule) BEFORE assembling u\'v + uv\'?',
+      options: [
+        'Assembly order matters — computing u\'v first and uv\' second gives a different result than reversing the order',
+        'An incomplete v\' is a factual error: (√x · e^(x²))\'  involves v\' = e^(x²)·2x, not just e^(x²). Plugging in the wrong v\' produces a wrong derivative, not just an unfinished one',
+        'You must fully differentiate v\' to simplify the formula and cancel common factors before plugging in',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A student differentiates (x³)(ln x) and writes 3x²·(1/x) = 3x. What did they do wrong?',
+      options: [
+        'They applied the chain rule when they should have applied the quotient rule',
+        'They multiplied the two derivatives together (d/dx[x³] · d/dx[ln x]) instead of applying the product rule — the correct answer is (3x²)(ln x) + (x³)(1/x) = 3x² ln x + x²',
+        'The derivative of ln x is x, not 1/x, so the final simplification is wrong',
+      ],
+      correct: 1,
+    },
+  ],
 }

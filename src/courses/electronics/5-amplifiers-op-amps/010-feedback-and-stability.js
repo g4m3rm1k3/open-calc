@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An op-amp has open-loop gain Aol = 100,000 and a closed-loop gain of 50 is set by external resistors. What does negative feedback do to the circuit\'s bandwidth compared to open-loop?',
+      options: [
+        'Bandwidth is unchanged — only gain is reduced by feedback',
+        'Bandwidth increases by the same factor that gain decreased — if gain drops by 2000×, bandwidth increases 2000×; the gain-bandwidth product is constant',
+        'Bandwidth decreases proportionally with gain — high gain is needed to maintain usable bandwidth',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'An amplifier oscillates when its loop gain |Aol × β| equals 1 AND the phase around the loop is exactly −180°. Why is that specific combination dangerous?',
+      options: [
+        'At unity gain with −180° phase, the feedback that was negative becomes positive — the amplifier reinforces its own noise at that frequency and sustains oscillation indefinitely',
+        'At unity gain with −180° phase, the output saturates because the op-amp cannot drive 180° phase-shifted current',
+        'Loop gain of exactly 1 means the signal is amplified by infinity at the −180° frequency, instantly destroying the device',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A Bode plot shows the phase margin is only 20°. What does this predict about the amplifier\'s behavior?',
+      options: [
+        'The amplifier is comfortably stable — any phase margin greater than 0° is acceptable',
+        'The amplifier is marginally stable — its step response will show significant ringing (oscillatory transients) and it may oscillate under certain load or temperature conditions; 45–60° is the recommended minimum',
+        'The amplifier will immediately oscillate — 20° phase margin means the phase has already crossed −180°',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Why does connecting a long coaxial cable as a capacitive load to an op-amp output sometimes cause oscillation?',
+      options: [
+        'Long cables attenuate high-frequency signals, reducing loop gain and causing the amplifier to over-compensate',
+        'The cable capacitance forms a pole with the op-amp\'s output resistance, adding extra phase lag in the feedback path; this reduces phase margin and can push the loop into instability',
+        'Coaxial cable impedance mismatches cause signal reflections that arrive 180° out of phase, creating positive feedback',
+      ],
+      correct: 1,
+    },
+  ],
 };

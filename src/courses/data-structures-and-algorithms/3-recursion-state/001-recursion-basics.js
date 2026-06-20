@@ -858,4 +858,51 @@ def pow_fast(x, n):
       hint: 'For even n: x^8 = (x^4)^2. Compute x^4 once, square it — saves half the work. For odd n: fall back to x * x^(n-1) and let the next call handle the now-even exponent.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A recursive function without a base case runs forever (until stack overflow). What makes a base case correct?',
+      options: [
+        'The base case must return 0 or None',
+        'The base case must cover the smallest input(s) where the answer is known directly, without further recursion. And every recursive call must move toward the base case — the input must shrink (or approach termination) with each call. If either fails, the recursion either bottoms out wrong or runs forever',
+        'There must be exactly one base case per recursive function',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Fibonacci computed naively is O(2ⁿ). With memoization it becomes O(n). Where does the exponential growth come from without memoization?',
+      options: [
+        'Each fib call makes two more calls, doubling the work — but the same subproblems (fib(3), fib(4), etc.) are recomputed independently for every branch of the call tree. fib(40) recomputes fib(2) millions of times. Memoization stores each result and reuses it, reducing the total unique computations to n',
+        'Fibonacci numbers grow exponentially so the computation must also be exponential',
+        'The function uses too much stack memory for large inputs',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Fast exponentiation computes xⁿ in O(log n) by using the identity x^(2k) = (x^k)². How many recursive calls does computing x^8 make?',
+      options: [
+        '8 calls — one per multiplication',
+        '3 calls: x^8 → x^4 → x^2 → x^1 (base case). Each call halves the exponent, giving log₂(8) = 3 levels. Standard x*x*x...*x would need 7 multiplications; fast exponentiation needs 3',
+        '4 calls — the log rounds up',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Tail recursion is a special form where the recursive call is the last operation in the function. Why do some languages optimize tail recursion to iteration?',
+      options: [
+        'Tail recursive functions are mathematically equivalent to while loops',
+        'When the recursive call is the last operation, the caller\'s stack frame is no longer needed — the callee can reuse it. This prevents stack growth with recursion depth. Python does NOT optimize tail calls (deliberate design choice); Scala, Haskell, and optimized Lisp dialects do',
+        'Tail recursion always has O(1) space complexity in any language',
+      ],
+      correct: 1,
+    },
+  ],
 };

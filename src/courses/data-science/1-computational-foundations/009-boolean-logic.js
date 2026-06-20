@@ -142,4 +142,50 @@ res
     'Falsy values: 0, 0.0, "", [], {}, None. Everything else is truthy.',
     'Python allows chained comparisons: 5 <= x <= 10 works as expected.',
   ],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'True and False or True evaluates to what in Python?',
+      options: [
+        'False — and has lower precedence than or so it runs last',
+        'True — and has higher precedence than or: (True and False) = False, then False or True = True',
+        'True — all "or" expressions involving True are True',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Python short-circuits boolean expressions. What does x != 0 and 10/x > 2 do when x = 0?',
+      options: [
+        'It raises a ZeroDivisionError — Python always evaluates both sides of and',
+        'It safely returns False — x != 0 is False for x=0, so Python immediately returns False without evaluating 10/x, preventing the division error',
+        'It returns True — the short-circuit makes the second condition irrelevant',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Which of the following values is falsy in Python?',
+      options: [
+        '"False" — the string "False" is truthy because it is a non-empty string; the boolean False is falsy',
+        '[] — an empty list is falsy in Python; non-empty lists are truthy',
+        '0.0001 — small floats are treated as false because they are nearly zero',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'not (a and b) is equivalent to which expression?',
+      options: [
+        'not a and not b — both sides must be False',
+        '(not a) or (not b) — by De Morgan\'s law: the negation of (a and b) equals (not a) or (not b)',
+        'a or b — removing the not flips and to or',
+      ],
+      correct: 1,
+    },
+  ],
 }

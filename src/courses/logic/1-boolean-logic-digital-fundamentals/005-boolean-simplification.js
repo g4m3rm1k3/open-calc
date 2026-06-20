@@ -135,4 +135,51 @@ export default {
       solution: 'Output = 1 for minterms 5,6,7,8,9. Don\'t cares at 10,11,12,13,14,15.\n\n4-variable K-map with A,B on rows and C,D on columns:\n\n         CD=00  CD=01  CD=11  CD=10\nAB=00:     0      0      0      0      (rows 0,1,3,2)\nAB=01:     0      1      1      1      (rows 4,5,7,6)\nAB=11:     X      X      X      X      (rows 12,13,15,14)\nAB=10:     1      1      X      X      (rows 8,9,11,10)\n\nGroup 1: Rows AB=01,AB=11 in CD=01 and CD=11 columns (cells 5,7,13,15) — group of 4.\nA changes (0→1), B=1 constant, C changes, D=1 constant → term: B·D\n\nGroup 2: Rows AB=10,AB=11 in CD=00 and CD=01 columns (cells 8,9,12,13) — group of 4.\nA=1 constant, B changes, C=0 constant, D changes → term: A·C̄\n\nGroup 3: Rows AB=01 in CD=10 and CD=11 (cells 6,7) — could be covered by Group 1 + another, but check: cell 6 (0110) = minterm 6. B=1, D=0 — not covered by B·D (D must be 1). Need separate coverage.\nCells 6,7,14,15 (AB=01,AB=11, CD=10,CD=11): term B·C. Covers minterm 6.\n\nMinimal SOP: OUTPUT = B·D + A·C̄ + B·C\n\nThree 2-literal AND terms instead of five 4-literal minterms. Verified: substituting each valid minterm confirms output = 1.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'K-map groups must be rectangular and contain exactly 1, 2, 4, 8, or 16 cells (powers of 2). Why must the size be a power of 2?',
+      options: [
+        'Powers of 2 are required because boolean variables only have 2 values',
+        'Only power-of-2 groups allow complete variable cancellation — in a group of 4, exactly 2 variables change (covering all 4 combinations of those 2 bits) which eliminates both from the product term. A group of 3 would leave a fractional variable that cannot be expressed as a simple AND term',
+        'The K-map grid dimensions are always powers of 2, so groups must match',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'In a K-map, larger groups produce simpler terms. A group of 8 cells eliminates how many variables from the resulting AND term?',
+      options: [
+        '3 variables — a group of 8 = 2³ means 3 variables change within the group and are eliminated',
+        '4 variables — any group of 8 in a 4-variable K-map produces a single-literal term (one variable that is constant throughout the group)',
+        '8 variables — each cell contributes one variable elimination',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'K-map "don\'t care" cells (marked X) can be treated as 0 OR 1. Why does choosing them as 1 help?',
+      options: [
+        'Don\'t cares should always be treated as 0 for safety — treating them as 1 could enable undefined input behavior',
+        'Treating don\'t cares as 1 allows you to include them in groups, making those groups larger — and larger groups eliminate more variables, producing a simpler final expression. Don\'t cares represent input combinations that never occur, so their output value is irrelevant; you exploit that freedom to get the minimal circuit',
+        'Don\'t cares as 1 are required by the definition of SOP form',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Boolean simplification: A·B·C + A·B·C̄ + A·B̄·C + A·B̄·C̄ = A. What makes this simplification possible?',
+      options: [
+        'The complement law: A·Ā = 0 eliminates all terms but one',
+        'The expression covers ALL combinations of B and C when A=1; since A=1 covers the full domain of B and C, both B and C are irrelevant — the output is determined entirely by A. The 4 terms are just the 4 rows of a truth table where A=1, which simplifies to just A',
+        'Idempotent law: A + A = A combines the four terms into one',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: '4-20mA full-scale resolution: for a 12-bit ADC reading 4-20mA via a 250Ω resistor (1-5V), resolution = 4096 counts / span = 4096/4000mV ≈ 0.024% full scale — more than adequate for most process control applications.' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A 4-20 mA current loop reads exactly 0 mA. What does this indicate, and why does this design allow you to distinguish it from a legitimate zero-scale signal?',
+      options: [
+        'It indicates a 0% process reading — the transmitter outputs 0 mA when the measured variable is at its minimum',
+        'It indicates a broken wire or unpowered transmitter — 4 mA is the live-zero representing 0% of the process range; 0 mA is below the live zero and can only occur if the loop is open. This "live zero" design means every valid signal is between 4 mA and 20 mA, and 0 mA is unambiguously a wiring fault',
+        'It indicates the transmitter is in fault mode and is signalling a diagnostic error by pulling the loop to zero',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A PLC controls a high-speed conveyor. The scan cycle is 20 ms. An optical sensor detects objects passing at one per 5 ms. What will the PLC miss?',
+      options: [
+        'Nothing — the PLC\'s input filter averages multiple readings and will detect the objects statistically',
+        'Most objects — the PLC only reads inputs once per 20 ms scan; an object present for only 5 ms may be missed entirely if it arrives and departs between scans. Time-critical events like this require a high-speed counter input that operates as a hardware interrupt, bypassing the main scan',
+        'Every other object — the PLC scan samples at 20 ms and the object period is 5 ms, so aliasing causes it to detect only objects at 20 ms intervals',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A Modbus RTU network polls 5 sensors and has a 50 ms total cycle time. An engineer adds 15 more sensors to the same RS-485 bus. What happens to the response time?',
+      options: [
+        'Response time stays the same — Modbus RTU polls all slaves simultaneously in broadcast mode',
+        'Response time increases roughly proportionally — Modbus is a master-slave protocol where the master polls each slave sequentially; with 20 slaves instead of 5, the polling cycle takes approximately 4× longer, making the network less suitable for fast control loops',
+        'Response time decreases — more slaves share the bus overhead so each individual transaction is faster',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A safety engineer wants to stop a motor when a guard door opens. Why is Safe Torque Off (STO) required by safety standards rather than simply sending a "stop" command from the PLC?',
+      options: [
+        'STO is faster than a software command — a PLC stop command takes one scan cycle (10–20 ms) while STO acts in under 1 ms',
+        'A software stop can be defeated by a PLC program fault, communication failure, or software bug; STO removes the gate-drive signals at the hardware level inside the drive, removing torque regardless of software state — safety standards require hardware-rated functions for personnel protection because software alone cannot provide the required safety integrity level',
+        'STO saves energy by removing the DC bus voltage, whereas a software stop leaves the drive energised and consuming standby power',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -426,5 +426,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is the key difference between re-assignment and mutation?',
+      options: [
+        'Re-assignment changes the data inside an object; mutation points the variable at a new value',
+        'Re-assignment points the binding to a new value; mutation changes the data inside the object the binding already points to',
+        'There is no difference — both permanently destroy the original value',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You declare a const array and then push an item into it. Does this throw an error?',
+      options: [
+        'Yes — const prevents all changes',
+        'No — const prevents re-assignment, but mutation like push is still allowed',
+        'Yes — arrays declared with const are frozen and immutable',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What is the Temporal Dead Zone (TDZ)?',
+      options: [
+        'A period after a function returns where its variables are cleaned up',
+        'The zone between where a let/const is hoisted and where it is initialised — accessing it throws a ReferenceError',
+        'A memory leak caused by variables that are never reassigned',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A variable is described as a "binding," not a "box." What does that mental model convey?',
+      options: [
+        'Variables store a copy of the value inside themselves, like a box contains an object',
+        'Variables are labels pointing to a location in memory — they are references, not containers',
+        'Variables in JavaScript have no connection to memory at all',
+      ],
+      correct: 1,
+    },
+  ],
 };

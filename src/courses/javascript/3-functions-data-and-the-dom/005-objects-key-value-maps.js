@@ -635,5 +635,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'You pass an object to a function and the function modifies one of its properties. Back in the calling code, the object is changed. Why?',
+      options: [
+        'JavaScript always deep-copies objects when passing them to functions',
+        'Objects are passed by reference — the function receives the same memory address, so mutations are visible to the caller',
+        'The function returned the modified object and it was implicitly re-assigned',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Two objects look identical: { x: 1 } === { x: 1 }. Does this return true?',
+      options: [
+        'Yes — JavaScript compares object contents when using ===',
+        'No — === on objects compares memory addresses; two separately created objects are never ===, even if they look the same',
+        'Yes, but only for objects with fewer than 5 properties',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'You spread-copy an object: const copy = { ...original }. Then you modify copy.nested.value. The original.nested.value also changes. Why?',
+      options: [
+        'Spread creates a deep copy — changes to copy should not affect original',
+        'Spread is a shallow copy — top-level keys are independent, but nested objects are still shared references',
+        'You must use JSON.parse(JSON.stringify()) for any copy to work at all',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'You use an arrow function as a method: const obj = { greet: () => this.name }. "this" is not the object. Why?',
+      options: [
+        'Arrow functions use strict mode and this is always undefined in strict mode',
+        'Arrow functions do not bind their own "this" — they inherit it from the scope where they were defined, which is not the object',
+        'Methods must use the function keyword — arrow functions cannot be used as methods at all',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -73,4 +73,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What does multiplying a phasor by j accomplish geometrically?',
+      options: [
+        'It scales the phasor\'s magnitude by the square root of minus one',
+        'It rotates the phasor 90° counterclockwise, which means the quantity leads by 90°',
+        'It converts the phasor from polar to rectangular form',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A series RL circuit has R = 100Ω and X_L = 37.7Ω. What is the magnitude of the total impedance?',
+      options: [
+        '137.7Ω — add resistance and reactance directly',
+        '62.3Ω — subtract reactance from resistance',
+        'About 106.9Ω — |Z| = √(R² + X_L²) = √(10000 + 1421)',
+      ],
+      correct: 2,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'For a series RL circuit, the current phasor is at −20.7° relative to the voltage. What does the negative angle mean?',
+      options: [
+        'The current is flowing in the opposite direction from the voltage source',
+        'The current lags behind the voltage by 20.7°, which is typical for inductive circuits',
+        'There is an error — current phase angles must always be positive',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'In a series RLC circuit, the voltage across R is 112V and the voltage across L is 42.3V. Why doesn\'t the total voltage equal 112 + 42.3 = 154.3V?',
+      options: [
+        'Some voltage is lost to heat in the resistance before reaching the inductance',
+        'V_R and V_L are 90° out of phase, so they add as phasor sum: √(112² + 42.3²) ≈ 120V, not algebraically',
+        'The voltage divider formula gives the incorrect answer for inductive circuits',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -685,4 +685,51 @@ def rob_circular(nums: list[int]) -> int:
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'House Robber: dp[i] = max(dp[i-1], dp[i-2] + nums[i]). What does dp[i-1] represent in this recurrence?',
+      options: [
+        'The amount stolen from house i-1 alone',
+        'The best total if you SKIP house i (you inherit whatever the best was through house i-1); dp[i-2] + nums[i] is the best if you TAKE house i — the recurrence is an include-vs-exclude decision at each step',
+        'The index of the previous house you robbed',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Min Cost Climbing Stairs: you can climb 1 or 2 steps. dp[i] = cost[i] + min(dp[i-1], dp[i-2]). Why add cost[i] BEFORE taking the min?',
+      options: [
+        'Cost[i] is added after the min to avoid counting it twice',
+        'You pay cost[i] when you STAND on step i, then choose to jump 1 or 2 steps; the total cost at step i includes the landing cost plus the cheapest way to reach the top from here — so cost[i] is always paid regardless of which direction you jump next',
+        'The min is taken first; cost[i] is only added if cost[i] > 0',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Space-optimized 1D DP replaces a full array with just two variables (prev2, prev1). When is this valid?',
+      options: [
+        'Only when each dp[i] depends on exactly dp[i-1], never more history',
+        'When dp[i] depends only on a fixed number of previous states — if dp[i] uses only dp[i-1] and dp[i-2], two variables suffice; if it needed dp[i-k] for large k, you would need to keep more history. Check the recurrence dependencies before compressing',
+        'Space optimization is always valid — you can always compress any DP to O(1)',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'House Robber II: houses are in a circle so house 0 and house n-1 are adjacent. You cannot rob both endpoints. The standard fix is:',
+      options: [
+        'Add a special case: if nums[0] + nums[n-1] > max(nums), take both',
+        'Run the linear House Robber algorithm twice — once on nums[0..n-2] (skip last) and once on nums[1..n-1] (skip first) — then take the max of both results; this guarantees both endpoints are never simultaneously included',
+        'Sort the houses by value and rob every other one starting from the highest',
+      ],
+      correct: 1,
+    },
+  ],
 };

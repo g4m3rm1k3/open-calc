@@ -766,4 +766,51 @@ function update(dt){
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A sun on a circular orbit drives both the light direction and color. At sunrise (angle near 0), the light is orange-red. At midday (angle near π/2), it is white. Why does real sunlight change color with angle?',
+      options: [
+        'The sun changes temperature throughout the day',
+        'At low angles, sunlight travels through more atmosphere. Air scatters short wavelengths (blue) more than long ones (red/orange). The thicker the atmospheric path, the more blue is scattered away, leaving red/orange light. At midday the path is shortest, so less scattering occurs and the light appears white',
+        'The sun emits different colors at different times due to nuclear oscillation cycles',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Cloud sprites use billboard technique — they always face the camera. How is this achieved in Three.js?',
+      options: [
+        'THREE.Sprite objects rotate automatically to face the camera on every render',
+        'Both ways work: THREE.Sprite is the built-in billboard — it auto-orients to the camera. Alternatively, updating the sprite\'s quaternion each frame: `sprite.quaternion.copy(camera.quaternion)`. Either approach makes the flat image always face the viewer, maintaining the 2D illusion',
+        'Cloud sprites are re-rendered from a different camera each frame',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Storm level is lerped from 0 (calm) to 1 (storm) via `stormLevel += (targetLevel - stormLevel) * 0.01`. Wave scale is `(1 + stormLevel * (STORM_SCALE - 1))`. At stormLevel=0.5, how does wave amplitude compare to calm?',
+      options: [
+        'Exactly half the storm amplitude, because stormLevel = 0.5',
+        'At stormLevel = 0.5, scale = 1 + 0.5 × (STORM_SCALE − 1) = midpoint between 1 and STORM_SCALE. If STORM_SCALE = 5, scale = 3 — three times calm amplitude. The lerp formula blends linearly between calm (1×) and full storm (STORM_SCALE ×)',
+        'The same as calm — storm only affects color, not wave height',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The sky lesson wires three independent layers (sky, ocean from Lesson 1, boat from Lesson 2) into one update loop. What makes this composition possible without rewriting those earlier layers?',
+      options: [
+        'Three.js merges update functions automatically when scenes are combined',
+        'Each earlier lesson built a self-contained system with a clear interface: waveHeight(x, z, t) is just a function you can call from anywhere. The sky lesson calls it to scale waves during a storm. The boat lesson calls it for buoyancy. Neither lesson needs to know about the other — they share the same wave formula through a common interface',
+        'JavaScript modules export all functions automatically to parent modules',
+      ],
+      correct: 1,
+    },
+  ],
 }

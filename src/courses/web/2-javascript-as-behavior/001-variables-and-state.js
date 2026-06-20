@@ -61,5 +61,50 @@ export default {
     'Const prevents pointer reassignment.'
   ],
   checkpoints: ['read-intuition', 'read-math'],
-  quiz: []
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Memory holds current state." In a web app, what is "state"?',
+      options: [
+        'The HTML structure of the page',
+        'The data that represents what the application currently knows — things like user input, loaded items, and toggle flags',
+        'The CSS classes currently applied to elements',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"UI physically reflects current state." What is the correct relationship between your data and what the user sees?',
+      options: [
+        'The UI is the source of truth — the data must match the DOM',
+        'The data (state) is the source of truth — the UI should be derived from it, not the other way around',
+        'They are independent — state and UI operate in separate systems',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Const prevents pointer reassignment." You declare const count = 0 and then try count = 1. What happens?',
+      options: [
+        'count silently stays 0',
+        'A TypeError is thrown — const bindings cannot be re-assigned to a new value',
+        'count becomes 1 — const only prevents deletion, not reassignment',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A counter in your app shows the wrong number. You update the variable but the displayed count does not change. What step are you missing?',
+      options: [
+        'You must use let instead of const for the counter to update',
+        'The DOM element displaying the count must also be updated — changing a variable does not automatically update the UI',
+        'You need to reload the page for variable changes to appear',
+      ],
+      correct: 1,
+    },
+  ],
 };

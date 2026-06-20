@@ -787,4 +787,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Planets orbit in the XZ plane: `position.set(r*cos(theta), 0, r*sin(theta))`. Why XZ rather than XY?',
+      options: [
+        'Three.js does not support Y-axis orbits',
+        'Three.js uses Y-up. The XZ plane is the "ground" plane — horizontal in the 3D scene. Orbiting in XZ makes planets circle around the Y axis, which looks horizontal when viewed from above. XY orbits would make planets appear to rotate in a vertical circle like a Ferris wheel',
+        'cos and sin are only valid for X and Z coordinates',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'theta = theta0 + omega * time for each planet. What is omega and why is it different for each planet?',
+      options: [
+        'omega is the orbital radius; larger orbits have larger omega',
+        'omega is angular velocity in radians per second (omega = 2π / period). Inner planets have shorter periods so higher omega — they complete orbits faster. This mirrors Kepler\'s third law: period² ∝ radius³, so inner planets orbit faster than outer ones',
+        'omega is a random seed so planets do not all start at the same angle',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'theta0 gives each planet a different starting angle. What would happen if all planets started with theta0 = 0?',
+      options: [
+        'The simulation would crash because all positions would be identical',
+        'All planets would start at (r, 0, 0) along the +X axis and orbit in phase — they\'d always be in a line. theta0 staggers them so the solar system looks natural at t=0 rather than unrealistically lined up',
+        'Only one planet would be visible because they overlap perfectly',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Procedural geometry (creating a sphere programmatically) vs importing a .glb model — when would you choose procedural?',
+      options: [
+        'Always — procedural geometry is always faster to render',
+        'Procedural is ideal when the shape is mathematically simple (sphere, torus, box) and you need to control parameters like radius or resolution at runtime. Imported .glb models are better for complex organic shapes (characters, buildings) that are impractical to describe mathematically',
+        'Procedural geometry only works for planets; .glb is required for everything else',
+      ],
+      correct: 1,
+    },
+  ],
 }

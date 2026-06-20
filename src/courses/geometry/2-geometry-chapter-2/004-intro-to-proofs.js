@@ -593,7 +593,52 @@ export default {
     "CPCTC: once triangles are proven congruent by SSS/SAS/ASA/AAS/HL, all corresponding parts are equal. Cite this explicitly.",
   ],
   checkpoints: ["read-intuition"],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"Proof = finite logical chain: Given → definitions/theorems → conclusion. Every step justified." What makes a proof different from an explanation?',
+      options: [
+        'Proofs are longer than explanations',
+        'Every step in a proof must cite a specific axiom, definition, or previously proved theorem — no step can rely on intuition or visual appearance',
+        'Proofs use symbols while explanations use words',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Not a proof: diagram argument, \'looks equal\', checking examples." A student measures 10 triangles and finds the angle sum is always 180°. Is this a proof?',
+      options: [
+        'Yes — 10 examples is enough evidence',
+        'No — checking examples only establishes the pattern for those cases; it cannot rule out a counterexample you haven\'t checked. A proof must work for ALL cases',
+        'Yes — if no counterexample was found, the theorem is proved',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Proof by contradiction: assume the opposite, derive a contradiction." When is proof by contradiction especially useful?',
+      options: [
+        'When the conclusion is easy to verify directly',
+        'When the conclusion is a negative ("there is no...") or universal ("for all...") claim that is hard to prove directly',
+        'When you want a shorter proof than direct proof provides',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"CPCTC: once triangles are proven congruent, all corresponding parts are equal." In what order do you use CPCTC in a proof?',
+      options: [
+        'Use CPCTC first to establish which parts are equal, then prove the triangles congruent',
+        'Use SSS/SAS/ASA/AAS/HL to prove the triangles congruent first, THEN cite CPCTC to conclude that specific corresponding parts (like sides or angles) are equal',
+        'CPCTC and SSS/SAS/ASA/AAS/HL are used simultaneously',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_GEO_2_3 };

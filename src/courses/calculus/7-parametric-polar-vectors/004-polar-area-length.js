@@ -152,4 +152,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition', 'read-math', 'read-rigor', 'completed-example-1', 'completed-example-2', 'solved-challenge'],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The polar area formula A = (1/2)∫[α to β] r² dθ uses r², not r. Why?',
+      options: [
+        'r² appears because the area element in polar coordinates is the sector area (1/2)r²·dθ — a thin wedge swept out by rotating through angle dθ at radius r; the area of a circular sector with radius r and angle dθ is (1/2)r²dθ',
+        'The square comes from converting (r, θ) to (x, y) via the Jacobian r² of the polar transformation',
+        'r² is used to make the formula match the Cartesian area formula ∫∫ dA when expressed in coordinates',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'To find the area enclosed between two polar curves r₁(θ) and r₂(θ) with r₂ > r₁, what is the setup?',
+      options: [
+        'A = (1/2)∫[α to β] (r₂ − r₁)² dθ — subtract radii before squaring',
+        'A = (1/2)∫[α to β] (r₂² − r₁²) dθ — subtract the sector areas of the outer and inner curves, since each full sector formula uses r²',
+        'A = (1/2)∫[α to β] (r₂ + r₁)(r₂ − r₁) dθ — factor the difference of squares and integrate the product',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Arc length in polar coordinates is L = ∫√(r² + (dr/dθ)²) dθ. Where does the (dr/dθ)² term come from?',
+      options: [
+        'It comes from converting the Cartesian arc length ds² = dx² + dy² into polar form using x = r·cos θ and y = r·sin θ — differentiating and substituting gives ds² = (r² + (dr/dθ)²)dθ²',
+        'It accounts for the curvature of the path — straight radial motion gives r² and tangential motion gives (dr/dθ)²',
+        'It is the polar analogue of the u-substitution in the Cartesian arc length formula',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The cardioid r = 1 + cos θ. When finding its area, why must the integration limits be 0 to 2π?',
+      options: [
+        'Cardioid areas always require a full revolution because the curve has no symmetry — you cannot use half the integral',
+        'The cardioid traces a complete closed curve exactly once as θ goes from 0 to 2π. If you only integrated 0 to π, you would compute only half the enclosed area, missing the other half swept out in the second half-revolution',
+        'The limits 0 to 2π are required because r = 1 + cos θ has period 2π and you need at least one full period',
+      ],
+      correct: 1,
+    },
+  ],
 }

@@ -45,4 +45,50 @@ export default {
       { type: 'formula', body: 'Lead resistance error in 2-wire RTD: ΔT_error = 2 × R_lead / (R₀ × α); for 10m of 0.5mm² copper (R_lead = 0.68Ω each way), ΔT = 2×0.68/(100×0.00385) ≈ 3.5°C error — unacceptable for precision measurement without 3- or 4-wire correction.' },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'A load cell uses a Wheatstone bridge with only one active strain gauge (the other three arms are fixed resistors). The reading drifts by 5% over an 8-hour shift as ambient temperature rises 15°C. What configuration would eliminate the drift?',
+      options: [
+        'Use a precision op-amp with very low offset drift to amplify the bridge output — the electronics are causing the drift',
+        'Use a full bridge with four active strain gauges (two in tension, two in compression) — all four arms change resistance with strain and with temperature; the temperature changes cancel because they affect all arms equally, while strain-induced changes add, giving 4× the signal and zero temperature error',
+        'Add a temperature sensor and apply a software correction factor to the reading each time temperature changes',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A thermocouple in an industrial furnace produces a 8 mV differential signal in the presence of 5 V of common-mode noise from nearby VFDs. Why is an instrumentation amplifier chosen over a standard op-amp to amplify this signal?',
+      options: [
+        'An instrumentation amplifier has higher gain than a standard op-amp, allowing the 8 mV signal to be amplified to a usable level',
+        'An instrumentation amplifier has very high common-mode rejection ratio (CMRR > 100 dB) — it amplifies only the difference between its two inputs and ignores voltage common to both; the 5 V common-mode noise appears equally on both inputs and is suppressed by 100,000×, while the 8 mV thermocouple signal — which is differential — is amplified normally',
+        'An instrumentation amplifier requires no external gain resistors, simplifying the circuit compared to a standard op-amp differential amplifier',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A PT100 RTD is connected using only two wires. In summer, readings are 3.5°C higher than a calibrated reference. In winter, the error is negligible. What causes the summer error?',
+      options: [
+        'PT100 sensors have a non-linear response at high temperatures that requires polynomial correction — the linear approximation is only accurate below 50°C',
+        'The two wire leads have resistance that adds to the measured RTD resistance; in summer, the cable heats up, increasing lead resistance, which the measurement system interprets as a higher RTD temperature. A three- or four-wire connection separates the current-carrying wires from the voltage-sensing wires, eliminating lead resistance from the measurement entirely',
+        'Two-wire connections pick up ground loop noise in summer when increased soil moisture improves the earth conductor — use shielded cable to prevent this',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'A Type K thermocouple is extended to a measurement instrument using ordinary copper wire. The temperature reading is 35°C higher than actual. What causes this?',
+      options: [
+        'Copper wire has higher resistance than thermocouple alloy, attenuating the Seebeck voltage and causing a high reading',
+        'Where the copper wire meets the thermocouple alloy at the instrument terminal block, a new thermocouple junction is formed that generates its own Seebeck voltage at room temperature, adding to the signal and creating a large temperature error — always use matched thermocouple extension cable (KX for Type K) so no dissimilar-metal junctions are introduced',
+        'Copper wire acts as an antenna in industrial environments, picking up electromagnetic interference that appears as a higher-than-actual temperature reading',
+      ],
+      correct: 1,
+    },
+  ],
 };

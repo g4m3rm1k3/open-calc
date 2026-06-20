@@ -522,5 +522,50 @@ export default {
   ],
 
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is the essential difference between an expression and a statement?',
+      options: [
+        'Expressions appear on one line; statements span multiple lines',
+        'Expressions resolve to a value and can be embedded; statements direct execution and produce no embeddable value',
+        'Expressions are faster to execute; statements require more memory',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'You need to choose a value conditionally inside a function argument, like fn(condition ? "yes" : "no"). Which construct makes this possible?',
+      options: [
+        'An if statement — it can be nested inside function calls',
+        'A ternary expression — it resolves to a value so it can appear anywhere an expression is expected',
+        'A switch statement with a return in each case',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'What does x && doSomething() actually return if x is falsy?',
+      options: [
+        'false — the && operator always returns a boolean',
+        'The value of x itself — short-circuit operators return an operand, not just true/false',
+        'undefined — nothing executes when x is falsy',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'Is assignment (x = 5) an expression or a statement in JavaScript?',
+      options: [
+        'A statement — it performs an action but produces no value',
+        'Both — assignment is an expression that also produces the assigned value as its result',
+        'Neither — assignment is a declaration, not an expression or statement',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -154,4 +154,51 @@ export default {
       answer: 'The region is unbounded in the positive y-direction.'
     }
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'Linear programming finds the maximum or minimum of an objective function over a feasible region defined by constraints. Why is the optimal value always found at a CORNER POINT (vertex) of the feasible region?',
+      options: [
+        'Corner points are checked by convention — the method happens to work there by coincidence',
+        'The objective function is linear, so its level curves are straight lines moving in one direction. As you push a level line toward higher (or lower) values across a convex polygonal region, the last point of contact before leaving the region is always a vertex — the extreme value cannot be in the interior',
+        'The optimal value is at a corner only when all constraints are equalities',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A linear programming problem has an UNBOUNDED feasible region in the direction of maximization. What does this mean about the maximum?',
+      options: [
+        'The maximum exists at the corner with the largest coordinates',
+        'No finite maximum exists — you can always move further in the objective function\'s increasing direction without hitting a constraint boundary. The feasible region has no "lid" — the objective value can grow without bound',
+        'The unbounded region means the problem has infinitely many optimal solutions',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Constraints in LP are inequalities like 2x + 3y ≤ 12. Each inequality defines a half-plane. The feasible region is the INTERSECTION of all half-planes. Why use inequalities rather than equalities?',
+      options: [
+        'Inequalities are used because LP cannot solve equality constraints',
+        'Real constraints are bounds, not exact requirements: a factory has AT MOST 12 hours of machine time (not exactly 12). The feasible region is all combinations that satisfy ALL bounds simultaneously — using equalities would restrict you to the boundary lines only, giving no flexibility',
+        'Equalities are used for constraints; inequalities define the objective function',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'To find the feasible region graphically, you graph each constraint line and shade the correct side. How do you determine which side to shade for 2x + 3y ≤ 12?',
+      options: [
+        'Always shade below the line for ≤ constraints',
+        'Substitute a test point (typically the origin (0,0) if it\'s not on the line): if 2(0)+3(0)=0 ≤ 12, the origin satisfies the inequality, so shade the side containing the origin; if the test point fails, shade the other side',
+        'Shade to the left of the line because ≤ means the x-values are restricted',
+      ],
+      correct: 1,
+    },
+  ],
 };

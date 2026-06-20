@@ -762,4 +762,51 @@ print(max_depth(None))   # 0`,
       hint: 'Almost identical to height(), but count nodes not edges. The base case returns 0 (an empty tree has depth 0), and each node adds 1.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'In-order traversal of a BST (left → node → right) produces nodes in sorted order. For a plain binary tree (not BST), what does in-order traversal produce?',
+      options: [
+        'Nodes in sorted order — trees always have an inherent order',
+        'Nodes in the order they appear when you flatten the tree visiting left subtrees first. The order is determined by the tree structure, not any sorted property. Without the BST invariant, in-order output has no guaranteed meaningful order — it is just a systematic visit pattern',
+        'Nodes from deepest to shallowest level',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Level-order (BFS) traversal uses a queue. Depth-first traversals (inorder, preorder, postorder) use a stack (or recursion). Why does level-order need a queue?',
+      options: [
+        'Trees have more nodes at each level, requiring a queue to manage them',
+        'To process all nodes at level k before any node at level k+1, you enqueue children as you process parents. FIFO ensures parents are processed before their children\'s children. A stack (LIFO) would process the most recently added child first, diving deep before finishing the current level',
+        'Queues support random access which is needed for level calculation',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The height of a balanced binary tree with n nodes is O(log n). An unbalanced tree can have height O(n). What determines the time complexity of tree search?',
+      options: [
+        'Always O(log n) because binary trees split work in half',
+        'O(height) — tree search follows one root-to-leaf path. For a balanced tree, height = O(log n) so search is O(log n). For a degenerate tree (all nodes in a line), height = O(n) so search is O(n). This is why balanced BSTs (AVL, red-black) explicitly maintain O(log n) height',
+        'O(n) always because all nodes must be checked',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The tree recursion template: `if not node: return base_case; left = solve(node.left); right = solve(node.right); return combine(left, right, node.val)`. What category of problems does this template solve?',
+      options: [
+        'Only problems that require visiting every node (like counting nodes)',
+        'Any problem where the answer for a subtree can be computed from the answers for its left and right subtrees plus the current node\'s value. Examples: height (combine = max(left,right)+1), node count (combine = left+right+1), path sum, mirror check, LCA. The template captures the divide-and-conquer structure of tree problems',
+        'Only problems that need in-order traversal',
+      ],
+      correct: 1,
+    },
+  ],
 };

@@ -827,4 +827,51 @@ function update(dt) {
       },
     ],
   },
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'The boat\'s heading changes with arrow keys: `heading += TURN_RATE * dt * input`. Why multiply TURN_RATE by dt?',
+      options: [
+        'dt converts radians to degrees for the Three.js rotation system',
+        'Turn rate is in radians per second. Multiplying by dt (seconds elapsed) gives the angle change for this specific frame. Without dt, the boat would turn faster on a slow machine (large dt) and slower on a fast one — multiplying by dt makes turning speed frame-rate independent',
+        'Multiplying by dt prevents heading from exceeding 2π',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'The spring-follow camera uses: `camPos.x += (_camTarget.x - camPos.x) * CAM_STIFF * dt`. With CAM_STIFF = 3, how many seconds does it take the camera to close roughly 95% of the gap to its target?',
+      options: [
+        'About 1 second — CAM_STIFF is the reciprocal of the time constant',
+        'About 1 second. This is an exponential approach: at stiffness 3, the camera covers ~95% of the gap in 1/CAM_STIFF ≈ 0.33s × 3 ≈ 1s (since 63% per time constant × 3 constants ≈ 95%). Higher stiffness = snappier follow; lower = looser lag',
+        'About 3 seconds — one second per stiffness unit',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'The boat tilts to match the wave: `pitch = waveHeight(x+dx) - waveHeight(x-dx)` gives the slope, and `boatGroup.rotation.x = pitch`. Why sample two points and subtract rather than sampling just one?',
+      options: [
+        'Sampling one point gives the height; subtracting two adjacent points gives the slope (rise over run). The pitch angle is proportional to the slope of the water surface under the boat — a forward-tilting bow means the water is rising ahead. The two-point difference is the discrete equivalent of the derivative of the wave function',
+        'Three.js rotation requires two sample points to compute a quaternion',
+        'A single sample point gives the average height but not the orientation',
+      ],
+      correct: 0,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'The lesson describes "three independent systems bolted together": keyboard input, spring camera, and buoyancy. What is the advantage of designing them independently?',
+      options: [
+        'Independent systems run on separate CPU cores automatically',
+        'Each system has a clear input (keyboard state, boat position, wave function) and output (heading/speed, camera position, boat Y/rotation). They can be developed, tested, and modified in isolation. Changing the camera stiffness does not touch the buoyancy code; adding a joystick only changes the input layer',
+        'Three.js requires each system to be in a separate file',
+      ],
+      correct: 1,
+    },
+  ],
 }

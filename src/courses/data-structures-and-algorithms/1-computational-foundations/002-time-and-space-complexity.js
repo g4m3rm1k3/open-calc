@@ -821,4 +821,51 @@ print(has_duplicate_fast([]))               # False`,
       hint: 'A Python set supports O(1) average-case lookup with `x in s`. Add each element to the set as you encounter it. If you see an element that is already in the set, you found a duplicate.',
     },
   ],
+
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'An algorithm runs in O(n²). You double the input size from n to 2n. By what factor does runtime increase?',
+      options: [
+        '2× — it is proportional to n',
+        '4× — (2n)² = 4n². The quadratic term dominates, so the runtime grows by the square of the size multiplier. This is why O(n²) algorithms become impractical for large inputs: 10× data = 100× slower',
+        '8× — doubling cubes for polynomial algorithms',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'A function uses an explicit stack to avoid recursion. The stack holds at most n items. What is the space complexity?',
+      options: [
+        'O(1) — the stack is bounded by n, not unbounded',
+        'O(n) — the stack can hold up to n items simultaneously, so space grows linearly with input size. A "bounded by n" structure still costs O(n) space compared to the input',
+        'O(log n) — stacks are always log-depth',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'Finding a duplicate in a list: naive approach checks all pairs O(n²); hash-set approach is O(n). What is the space tradeoff?',
+      options: [
+        'The hash-set approach uses O(1) space — only one extra variable',
+        'The hash-set approach uses O(n) space to store seen elements. Speed and space are often traded — the O(n) time algorithm pays with O(n) extra memory. The O(n²) algorithm uses O(1) extra space (just index variables) but is much slower for large n',
+        'The naive approach uses more space because it stores all pairs',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'O(n log n) is the lower bound for comparison-based sorting. Why cannot general sorting be done in O(n)?',
+      options: [
+        'Computer hardware limits sorting speed to n log n',
+        'Any comparison-based sort must distinguish between n! possible orderings. A binary decision tree with enough leaves to cover n! orderings has height ≥ log₂(n!) = Ω(n log n) by Stirling\'s approximation. You need at least that many comparisons in the worst case. Non-comparison sorts (counting sort, radix) can beat this by exploiting key structure',
+        'O(n) sorting would make binary search obsolete',
+      ],
+      correct: 1,
+    },
+  ],
 };

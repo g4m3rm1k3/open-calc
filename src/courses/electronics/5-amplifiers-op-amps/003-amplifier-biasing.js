@@ -55,4 +55,50 @@ export default {
       },
     ],
   },
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: 'What is the Q-point of a BJT amplifier, and why does centering it matter?',
+      options: [
+        'The Q-point is the threshold voltage at which the transistor switches from cutoff to active mode',
+        'The Q-point is the DC operating point (IC, VCE) with no AC signal applied; centering it at VCE ≈ VCC/2 maximizes the output voltage swing before clipping occurs on either peak',
+        'The Q-point is the frequency at which the amplifier gain reaches its maximum value',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: 'Voltage-divider bias uses two resistors (R1, R2) to set the base voltage. Why is this more reliable than a single base resistor from VCC?',
+      options: [
+        'Two resistors have lower noise than a single resistor, improving signal quality',
+        'The voltage divider sets VB from resistor ratio alone, nearly independent of β — so the Q-point stays stable even when transistors from different batches have different current gain values',
+        'The two-resistor divider allows the base to swing both above and below the bias voltage, enabling larger output swings',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: 'A BJT amplifier has an emitter resistor RE with no bypass capacitor. How does RE stabilize the Q-point against thermal drift?',
+      options: [
+        'RE absorbs heat from the transistor, cooling it and preventing thermal runaway directly',
+        'If IC rises due to heat, VE = IC × RE increases, which reduces VBE = VB − VE (VB is fixed by the divider), reducing base drive and pulling IC back down — negative feedback',
+        'RE limits the maximum collector current by being in series with the collector path, acting as a fuse',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: 'An emitter bypass capacitor CE is added across RE. What tradeoff does this introduce?',
+      options: [
+        'CE improves DC bias stability while reducing AC gain — the opposite of the design goal',
+        'CE short-circuits RE at AC signal frequencies, restoring full gm × RC gain, while the DC bias stability provided by RE is unaffected since the capacitor blocks DC',
+        'CE converts the amplifier from common-emitter to common-base configuration at high frequencies',
+      ],
+      correct: 1,
+    },
+  ],
 };

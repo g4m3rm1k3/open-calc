@@ -899,7 +899,52 @@ export default {
     'Kinetic vs. thermodynamic stability: diamond (thermodynamically unstable, kinetically stable = persists forever).',
   ],
   checkpoints: ['read-intuition'],
-  quiz: [],
+  quiz: [
+    {
+      id: 'q1',
+      type: 'choice',
+      text: '"ΔH = Σ(bonds broken) − Σ(bonds formed). Negative = exothermic." In combustion, you break C–H and O=O bonds then form C=O and O–H bonds. Why is combustion exothermic?',
+      options: [
+        'Combustion releases light, which carries away mass',
+        'The bonds formed (C=O and O–H) are collectively stronger than the bonds broken — more energy is released forming them than consumed breaking the reactants',
+        'Oxygen atoms are naturally explosive',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q2',
+      type: 'choice',
+      text: '"Hess\'s Law: ΔH is path-independent." What does path-independence mean practically?',
+      options: [
+        'All reactions occur in a single step',
+        'The total enthalpy change from A→C is the same whether you go A→C directly or A→B→C — you can add known ΔH values from multiple steps',
+        'Enthalpy cannot be measured directly, only calculated',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q3',
+      type: 'choice',
+      text: '"Activation energy Eₐ controls reaction rate, not thermodynamics." A reaction has ΔH = −200 kJ and Eₐ = 150 kJ. What does this mean?',
+      options: [
+        'The reaction is endothermic and slow',
+        'The reaction releases 200 kJ overall (exothermic/favoured), but requires 150 kJ of initial energy to get started — it will proceed slowly without a catalyst or heat',
+        'The reaction will not occur because the activation energy is too high',
+      ],
+      correct: 1,
+    },
+    {
+      id: 'q4',
+      type: 'choice',
+      text: '"Catalyst: lowers Eₐ, unchanged by reaction, does not affect ΔH." Why does a catalyst speed up a reaction without changing the overall energy released?',
+      options: [
+        'A catalyst adds energy to the reaction to make it proceed faster',
+        'The catalyst provides an alternate pathway with a lower energy barrier — the same starting and ending energy levels, just an easier route between them',
+        'A catalyst changes the products, which releases energy faster',
+      ],
+      correct: 1,
+    },
+  ],
 };
 
 export { LESSON_CHEM_4_1 };
