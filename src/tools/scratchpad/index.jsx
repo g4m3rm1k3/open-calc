@@ -92,7 +92,29 @@ function sampleSine(x, y, w, h, cycles, steps = 48) {
 // ─── Math ───────────────────────────────────────────────────────────────────
 
 const dist  = (x1,y1,x2,y2) => Math.sqrt((x2-x1)**2+(y2-y1)**2)
+// Parses an SVG viewBox string ("x y w h") into {x,y,w,h}, or null if malformed.
+function parseViewBoxStr(s) {
+  const p=(s||'').trim().split(/\s+/).map(Number)
+  if(p.length!==4||p.some(Number.isNaN)) return null
+  return {x:p[0],y:p[1],w:p[2],h:p[3]}
+}
 const fmt   = n => (+n).toFixed(1)
+
+// Ported from the old SvgEditor.jsx (retired this session): updates/adds a
+// translate() on an element's transform attribute, preserving any other
+// transform functions already on it. This is what lets passthrough SVG
+// elements — curved paths, <g> groups, anything the shape model can't fully
+// parse — still be moved as a whole, without needing to understand their
+// internal structure at all.
+function applyTranslate(el, dx, dy) {
+  const existing = el.getAttribute('transform') || ''
+  const m = existing.match(/translate\(\s*([^,)]+)(?:,\s*([^)]+))?\)/)
+  let baseDx = 0, baseDy = 0
+  if (m) { baseDx = parseFloat(m[1]) || 0; baseDy = parseFloat(m[2] ?? '0') || 0 }
+  const other = existing.replace(/translate\([^)]*\)/g, '').trim()
+  const newTranslate = `translate(${(baseDx + dx).toFixed(1)},${(baseDy + dy).toFixed(1)})`
+  el.setAttribute('transform', other ? `${newTranslate} ${other}` : newTranslate)
+}
 
 function angleBetween(ax,ay,vx,vy,bx,by) {
   const dax=ax-vx,day=ay-vy,dbx=bx-vx,dby=by-vy
@@ -341,6 +363,36 @@ function getHandles(shape) {
   }
 }
 
+// A single proportional-scale handle for triangle/polygon, anchored just
+// outside the vertex farthest from the centroid — distinct from the
+// per-vertex reshape handles above (those move ONE point; this scales ALL
+// of them together from the shape's center, the "resize the whole thing"
+// counterpart rect/ellipse/sine already get for free via their bounding-box
+// corner handles).
+function getScaleHandle(shape) {
+  if(shape.type!=='triangle'&&shape.type!=='polygon') return null
+  const p=shape.points
+  const [gcx,gcy]=centroidOf(p)
+  let maxD=0,fx=p[0],fy=p[1]
+  for(let i=0;i<p.length;i+=2){
+    const d=dist(gcx,gcy,p[i],p[i+1])
+    if(d>maxD){maxD=d;fx=p[i];fy=p[i+1]}
+  }
+  if(maxD<1e-6) return null
+  const ux=(fx-gcx)/maxD,uy=(fy-gcy)/maxD
+  const anchorD=maxD*1.2
+  return {
+    x:gcx+ux*anchorD, y:gcy+uy*anchorD,
+    fn:(nx,ny)=>{
+      const newD=dist(gcx,gcy,nx,ny)/1.2
+      const factor=Math.max(0.05,newD/maxD)
+      const q=[]
+      for(let i=0;i<p.length;i+=2) q.push(gcx+(p[i]-gcx)*factor, gcy+(p[i+1]-gcy)*factor)
+      return q
+    },
+  }
+}
+
 // ─── Storage ────────────────────────────────────────────────────────────────
 
 const load=(k,fb)=>{try{return JSON.parse(localStorage.getItem(k)??'null')??fb}catch{return fb}}
@@ -387,7 +439,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const [x1,y1,x2,y2]=shape.points
     const len=dist(x1,y1,x2,y2)
     return <Group {...gp}>
-      <Line points={shape.points} stroke={sc} strokeWidth={shape.sw} lineCap="round" hitStrokeWidth={12}/>
+      <Line points={shape.points} stroke={sc} strokeWidth={shape.sw} dash={shape.dash} lineCap="round" hitStrokeWidth={12}/>
       <KonvaCircle x={x1} y={y1} radius={4} fill={sc} listening={false}/>
       <KonvaCircle x={x2} y={y2} radius={4} fill={sc} listening={false}/>
       {showDims&&<KonvaText x={(x1+x2)/2+6} y={(y1+y2)/2-10} text={`${fmt(len)} u`} {...TS} fill={lc}/>}
@@ -400,7 +452,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const rx=Math.min(x1,x2),ry=Math.min(y1,y2)
     const pts=[rx,ry,rx+w,ry,rx+w,ry+h,rx,ry+h]
     return <Group {...gp}>
-      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} fill={sc+'1a'}/>
+      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
       {showDims&&<>
         <KonvaText x={rx+w/2-20} y={ry+h+5}   text={`${fmt(w)} u`}       {...TS} fill={lc}/>
         <KonvaText x={rx+w+5}    y={ry+h/2-6}  text={`${fmt(h)} u`}       {...TS} fill={lc}/>
@@ -413,7 +465,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const [cx,cy,rx,ry]=shape.points
     const r=dist(cx,cy,rx,ry)
     return <Group {...gp}>
-      <KonvaCircle x={cx} y={cy} radius={r} stroke={sc} strokeWidth={shape.sw} fill={sc+'1a'}/>
+      <KonvaCircle x={cx} y={cy} radius={r} stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
       {showDims&&<>
         <Line points={[cx,cy,rx,ry]} stroke={sc} strokeWidth={1} dash={[4,3]} listening={false}/>
         <KonvaCircle x={cx} y={cy} radius={3} fill={sc} listening={false}/>
@@ -428,7 +480,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const ecx=(x1+x2)/2,ecy=(y1+y2)/2
     const erx=Math.abs(x2-x1)/2,ery=Math.abs(y2-y1)/2
     return <Group {...gp}>
-      <KonvaEllipse x={ecx} y={ecy} radiusX={erx} radiusY={ery} stroke={sc} strokeWidth={shape.sw} fill={sc+'1a'}/>
+      <KonvaEllipse x={ecx} y={ecy} radiusX={erx} radiusY={ery} stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
       {showDims&&<>
         <KonvaText x={ecx-30} y={ecy-ery-16} text={`rx=${fmt(erx)} ry=${fmt(ery)}`} {...TS} fill={lc}/>
         <KonvaText x={ecx-32} y={ecy+6}      text={`A≈${fmt(Math.PI*erx*ery)} u²`}   {...TS} fill={lc}/>
@@ -446,7 +498,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const sides=[dist(x1,y1,x2,y2),dist(x2,y2,x3,y3),dist(x3,y3,x1,y1)]
     const angles=[angleBetween(x3,y3,x1,y1,x2,y2),angleBetween(x1,y1,x2,y2,x3,y3),angleBetween(x2,y2,x3,y3,x1,y1)]
     return <Group {...gp}>
-      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} fill={sc+'1a'}/>
+      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
       {showDims&&<>
         {verts.map(([vx,vy],i)=><AngleArc key={i} ax={prev[i][0]} ay={prev[i][1]} vx={vx} vy={vy} bx={next[i][0]} by={next[i][1]} color={sc}/>)}
         {verts.map(([vx,vy],i)=>{const ox=(gcx-vx)*0.3,oy=(gcy-vy)*0.3;return <KonvaText key={i} x={vx+ox-16} y={vy+oy-7} text={`${fmt(angles[i])}°`} {...TS} fill={lc}/>})}
@@ -459,7 +511,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const pts=shape.points
     const [gcx,gcy]=centroidOf(pts)
     return <Group {...gp}>
-      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} fill={sc+'1a'}/>
+      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
       {showDims&&<>
         <KonvaText x={gcx-36} y={gcy-8} text={`P=${fmt(perimeterOf(pts))} u`} {...TS} fill={lc}/>
         <KonvaText x={gcx-36} y={gcy+6} text={`A=${fmt(shoelaceArea(pts))} u²`} {...TS} fill={lc}/>
@@ -552,54 +604,65 @@ function ShapePreview({inProg,mx,my,color,sw,cycles}) {
 const SNAP_COLORS = {endpoint:'#f97316',midpoint:'#22c55e',center:'#06b6d4',quadrant:'#a855f7',tangent:'#ec4899',grid:'#94a3b8'}
 const SNAP_LABELS = {endpoint:'EP',midpoint:'MID',center:'CTR',quadrant:'QD',tangent:'TAN',grid:'GRID'}
 
-function SnapIndicator({snap}) {
+function SnapIndicator({snap, zoom=1}) {
   if(!snap) return null
   const {x,y,type}=snap
   const c=SNAP_COLORS[type]??'#f97316'
-  const s=7
+  // Screen-space size — without dividing by zoom this becomes a "giant
+  // circle" once you zoom in, exactly when snapping matters most.
+  const s=7/zoom, sw=1.5/zoom, sw1=1/zoom
   const marker=()=>{
     if(type==='endpoint')
-      return <Line points={[x-s,y-s,x+s,y-s,x+s,y+s,x-s,y+s]} closed stroke={c} strokeWidth={1.5} listening={false}/>
+      return <Line points={[x-s,y-s,x+s,y-s,x+s,y+s,x-s,y+s]} closed stroke={c} strokeWidth={sw} listening={false}/>
     if(type==='midpoint')
-      return <Line points={[x,y-s,x+s,y+s,x-s,y+s]} closed stroke={c} strokeWidth={1.5} listening={false}/>
+      return <Line points={[x,y-s,x+s,y+s,x-s,y+s]} closed stroke={c} strokeWidth={sw} listening={false}/>
     if(type==='center')
       return <Group listening={false}>
-        <KonvaCircle x={x} y={y} radius={s} stroke={c} strokeWidth={1.5}/>
-        <Line points={[x-s-3,y,x+s+3,y]} stroke={c} strokeWidth={1}/>
-        <Line points={[x,y-s-3,x,y+s+3]} stroke={c} strokeWidth={1}/>
+        <KonvaCircle x={x} y={y} radius={s} stroke={c} strokeWidth={sw}/>
+        <Line points={[x-s-3/zoom,y,x+s+3/zoom,y]} stroke={c} strokeWidth={sw1}/>
+        <Line points={[x,y-s-3/zoom,x,y+s+3/zoom]} stroke={c} strokeWidth={sw1}/>
       </Group>
     if(type==='quadrant')
-      return <KonvaCircle x={x} y={y} radius={s} stroke={c} strokeWidth={1.5} listening={false}/>
+      return <KonvaCircle x={x} y={y} radius={s} stroke={c} strokeWidth={sw} listening={false}/>
     if(type==='tangent')
       return <Group listening={false}>
-        <KonvaCircle x={x} y={y} radius={s} stroke={c} strokeWidth={1.5}/>
-        <Line points={[x-s-2,y-s-2,x+s+2,y-s-2]} stroke={c} strokeWidth={1}/>
+        <KonvaCircle x={x} y={y} radius={s} stroke={c} strokeWidth={sw}/>
+        <Line points={[x-s-2/zoom,y-s-2/zoom,x+s+2/zoom,y-s-2/zoom]} stroke={c} strokeWidth={sw1}/>
       </Group>
-    return <Line points={[x-s,y,x+s,y,x,y,x,y-s,x,y+s]} stroke={c} strokeWidth={1} listening={false}/>
+    return <Line points={[x-s,y,x+s,y,x,y,x,y-s,x,y+s]} stroke={c} strokeWidth={sw1} listening={false}/>
   }
   return <Group listening={false}>
     {marker()}
-    <KonvaText x={x+10} y={y-9} text={SNAP_LABELS[type]??type} fontSize={9} fontFamily="monospace" fill={c}/>
+    <KonvaText x={x+10/zoom} y={y-9/zoom} text={SNAP_LABELS[type]??type} fontSize={9/zoom} fontFamily="monospace" fill={c}/>
   </Group>
 }
 
 // ─── Vertex handles ──────────────────────────────────────────────────────────
 
-function VertexHandles({shape, snapPts, shapes, onUpdate, onSnapChange, darkCanvas}) {
+function VertexHandles({shape, snapPts, shapes, onUpdate, onSnapChange, darkCanvas, zoom=1}) {
   const handles=getHandles(shape)
   const hFill=darkCanvas?'#0f172a':'#fff'
+  // Handle size is screen-space, not world-space — without dividing by zoom,
+  // these balloon to huge circles once you zoom in to line things up, which
+  // is exactly the situation they're most needed in.
+  const r=6/zoom, hit=14/zoom, sw=2/zoom
   return <Group>
     {handles.map((h,i)=>(
-      <KonvaCircle key={i} x={h.x} y={h.y} radius={6}
-        fill={hFill} stroke="#f97316" strokeWidth={2}
-        draggable hitStrokeWidth={14}
+      <KonvaCircle key={i} x={h.x} y={h.y} radius={r}
+        fill={hFill} stroke="#f97316" strokeWidth={sw}
+        draggable hitStrokeWidth={hit}
         onMouseEnter={e=>{e.target.getStage().container().style.cursor='crosshair'}}
         onMouseLeave={e=>{e.target.getStage().container().style.cursor='default'}}
         onDragMove={e=>{
-          const pos=e.target.getStage().getPointerPosition()
+          const pos=e.target.getStage().getRelativePointerPosition()
           const snap=findNearestSnap(pos.x,pos.y,snapPts,shapes)
           onSnapChange(snap)
-          if(snap) e.target.setAbsolutePosition({x:snap.x,y:snap.y})
+          // .position(), not .setAbsolutePosition() — snap.x/y are world
+          // (diagram) coordinates, and this node's parent Group/Layer has no
+          // transform of its own (only the Stage does), so local position
+          // already matches world space. setAbsolutePosition expects
+          // screen-space and would be wrong at any zoom other than 1.
+          if(snap) e.target.position({x:snap.x,y:snap.y})
         }}
         onDragEnd={e=>{
           const {x:nx,y:ny}=e.target.position()
@@ -609,6 +672,28 @@ function VertexHandles({shape, snapPts, shapes, onUpdate, onSnapChange, darkCanv
       />
     ))}
   </Group>
+}
+
+// A single diamond-shaped handle that scales a triangle/polygon proportionally
+// from its centroid — shown in Move mode (alongside whole-shape drag), as the
+// counterpart to the per-vertex reshape handles VertexHandles shows in
+// Edit-points mode. No snapping (scaling doesn't have a natural "nearest
+// point" the way moving a single vertex does).
+function ScaleHandle({shape, onUpdate, darkCanvas, zoom=1}) {
+  const h=getScaleHandle(shape)
+  if(!h) return null
+  const r=6/zoom, hit=14/zoom, sw=2/zoom
+  return <KonvaCircle x={h.x} y={h.y} radius={r}
+    fill={darkCanvas?'#0f172a':'#fff'} stroke="#22c55e" strokeWidth={sw}
+    draggable hitStrokeWidth={hit}
+    onMouseEnter={e=>{e.target.getStage().container().style.cursor='nwse-resize'}}
+    onMouseLeave={e=>{e.target.getStage().container().style.cursor='default'}}
+    onDragMove={e=>{ /* live-resize while dragging, no snap */ }}
+    onDragEnd={e=>{
+      const {x:nx,y:ny}=e.target.position()
+      onUpdate(shape.id,h.fn(nx,ny))
+    }}
+  />
 }
 
 // ─── Grid layer ─────────────────────────────────────────────────────────────
@@ -696,7 +781,7 @@ function Swatch({c,active,onClick}) {
 
 // ─── Shape input panel ──────────────────────────────────────────────────────
 
-function ShapePanel({type, form, setForm, onCreate, onUpdate, selectedId, darkCanvas}) {
+function ShapePanel({type, form, setForm, onCreate, onUpdate, selectedId, onClearSelection, darkCanvas}) {
   const fields = SHAPE_FIELDS[type] || []
   const tbBg   = darkCanvas ? '#162032' : '#eef2f7'
   const bdr    = darkCanvas ? '#2d3f52' : '#d4dbe6'
@@ -712,7 +797,7 @@ function ShapePanel({type, form, setForm, onCreate, onUpdate, selectedId, darkCa
   })
 
   return (
-    <div style={{background:tbBg,borderBottom:`1px solid ${bdr}`,padding:'7px 12px',display:'flex',flexWrap:'wrap',gap:8,alignItems:'flex-end',flexShrink:0}}>
+    <div data-scratchpad-ui style={{background:tbBg,borderBottom:`1px solid ${bdr}`,padding:'7px 12px',display:'flex',flexWrap:'wrap',gap:8,alignItems:'flex-end',flexShrink:0}}>
       {fields.map(([key,label])=>(
         <label key={key} style={{display:'flex',flexDirection:'column',gap:3}}>
           <span style={{fontSize:9,textTransform:'uppercase',letterSpacing:'0.07em',color:ic,fontFamily:'system-ui'}}>{label}</span>
@@ -727,6 +812,7 @@ function ShapePanel({type, form, setForm, onCreate, onUpdate, selectedId, darkCa
       <div style={{display:'flex',gap:6,alignItems:'flex-end',paddingBottom:1}}>
         <button style={btnStyle('#6366f1')} onClick={onCreate}>+ Create</button>
         {selectedId&&<button style={btnStyle('#22c55e')} onClick={onUpdate}>✓ Update</button>}
+        {selectedId&&<button style={btnStyle('#64748b')} onClick={onClearSelection}>✕ Clear selection</button>}
       </div>
     </div>
   )
@@ -760,11 +846,26 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
   const [mode,       setMode]       = useState('draw')
   const [geoTool,    setGeoTool]    = useState('segment')
   const [shapes,     setShapes]     = useState(()=>load(SHAPES_KEY,[]))
+  // Real undo history — a stack of shapes-array snapshots taken right before
+  // each discrete edit (add/move/reshape/update/delete), not the old "pop
+  // the last array element" behavior, which deleted whatever happened to be
+  // last in the array regardless of what was actually just edited.
+  const [history,setHistory]=useState([])
+  const pushHistory=()=>setHistory(h=>[...h.slice(-49),shapes])
+  // Monaco's onMount fires once and closes over whatever pushHistory was at
+  // that moment — this ref keeps a current reference for that one call site.
+  const pushHistoryRef=useRef(pushHistory)
+  useEffect(()=>{ pushHistoryRef.current=pushHistory })
   const [inProg,       setInProg]       = useState(null)
   const [mousePos,     setMousePos]     = useState({x:0,y:0})
   const [selectedId,   setSelectedId]   = useState(null)
   const [snapCandidate,setSnapCandidate]= useState(null)
   const [editingTextId,setEditingTextId]= useState(null) // shape id currently showing the inline edit textarea
+  // 'move' drags the selected shape as a whole; 'points' activates its
+  // vertex/resize handles instead — these used to both be live at once on
+  // any selected multi-point shape, so dragging a triangle near a vertex
+  // reshaped it instead of moving it, with no way to choose which you meant.
+  const [editMode,setEditMode]=useState('move')
 
   // ── shape input panel
   const [form, setForm] = useState(DEFAULTS.segment)
@@ -798,6 +899,7 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
   const dragState   = useRef({active:false,moved:false,startX:0,startY:0,origX:0,origY:0})
   const stageRef    = useRef(null)
   const containerRef= useRef(null)
+  const passthroughSvgRef=useRef(null)
   const [canvasSize,setCanvasSize]=useState({w:0,h:0})
   const [isMobile,  setIsMobile]  =useState(()=>window.innerWidth<640)
 
@@ -826,6 +928,25 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
     zoomBy(e.evt.deltaY<0?1.1:1/1.1, pointer.x, pointer.y)
   },[zoomBy])
   const resetZoom=useCallback(()=>{ setZoom(1); setStagePos({x:0,y:0}) },[])
+  // The editing canvas used to have zero relationship to the file's actual
+  // viewBox — Stage pixel size came from the panel's available space, with
+  // no scaling/fit to the loaded shapes' coordinate space. That's why
+  // "Apply" on viewBox visibly did nothing, and new content placed in the
+  // (much bigger, unrelated-sized) canvas often landed outside the file's
+  // real exportable bounds. This resets zoom/pan to fit-and-center the
+  // given viewBox in the available canvas — called on file open/create and
+  // whenever viewBox is explicitly applied, not continuously (so it doesn't
+  // fight manual zoom/pan afterward).
+  const fitToViewBox=useCallback((vbStr)=>{
+    const vb=parseViewBoxStr(vbStr)
+    if(!vb||vb.w<=0||vb.h<=0||canvasSize.w<=0||canvasSize.h<=0) return
+    const scale=Math.min(ZOOM_MAX,Math.max(ZOOM_MIN,Math.min(canvasSize.w/vb.w,canvasSize.h/vb.h)*0.9))
+    setZoom(scale)
+    setStagePos({
+      x: -vb.x*scale + (canvasSize.w-vb.w*scale)/2,
+      y: -vb.y*scale + (canvasSize.h-vb.h*scale)/2,
+    })
+  },[canvasSize])
 
   useEffect(()=>{
     const chk=()=>setIsMobile(window.innerWidth<640)
@@ -868,22 +989,31 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
     fetch(`${DEV_FS_API}/read?path=${encodeURIComponent(path)}`)
       .then(async r=>(r.ok ? r.text() : null)) // doesn't exist yet — start a blank canvas at this path instead of erroring
       .then(text=>{
+        let vb='0 0 720 480'
         if (text == null) {
           setShapes([])
-          setCurrentViewBox('0 0 720 480')
+          setCurrentViewBox(vb)
         } else {
           const {shapes:parsed,viewBox}=parseSvgToShapes(text)
           setShapes(parsed)
-          setCurrentViewBox(viewBox||'0 0 720 480')
+          vb=viewBox||vb
+          setCurrentViewBox(vb)
         }
+        fitToViewBox(vb)
         setCurrentFilePath(path)
+        // Freehand brush strokes are a separate, persisted "quick doodle"
+        // layer that was never part of the SVG save/load pipeline — leaving
+        // old scribbles from an unrelated session rendered on top of a real
+        // diagram file is debris, not a feature.
+        setLines([])
         setSelectedId(null)
+        setHistory([]) // undo shouldn't be able to cross into a different file's content
         setMode('geo')
         setGeoTool('select') // opening a file is for editing what's there, not placing a new shape on top of it
         setFileSaveMsg('')
       })
       .catch(e=>{ setFileSaveMsg('Load error: '+e.message); setTimeout(()=>setFileSaveMsg(''),4000) })
-  },[])
+  },[fitToViewBox])
 
   // Auto-target a course's diagrams folder (and optionally a specific file)
   // when ScratchPad is opened from the Lesson Builder's diagram buttons —
@@ -936,12 +1066,15 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
     if(!/^[\w-]+\.svg$/i.test(name)){ setFileSaveMsg('Use letters, numbers, - and _ only'); setTimeout(()=>setFileSaveMsg(''),4000); return }
     setShapes([])
     setCurrentViewBox('0 0 720 480')
+    fitToViewBox('0 0 720 480')
     setCurrentFilePath(`${currentDir}/${name}`)
+    setLines([])
     setSelectedId(null)
+    setHistory([])
     setNewFileName('')
     setMode('geo')
     setGeoTool('select')
-  },[newFileName,currentDir])
+  },[newFileName,currentDir,fitToViewBox])
 
   const downloadSvg=useCallback(()=>{
     const filename=currentFilePath?currentFilePath.split('/').pop():'diagram.svg'
@@ -957,14 +1090,22 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
   // other way, so dragging shapes around doesn't fight your typing mid-edit.
   useEffect(()=>{ setVbEdit(currentViewBox) },[currentViewBox])
 
+  // Visible page-boundary rect — the exportable bounds, drawn so "in bounds"
+  // vs "scratch space outside the file" is unmistakable at a glance.
+  const vb=useMemo(()=>parseViewBoxStr(currentViewBox),[currentViewBox])
+
   const applyViewBox=useCallback(()=>{
     const parts=vbEdit.trim().split(/\s+/).map(Number)
     if(parts.length!==4||parts.some(Number.isNaN)){ setFileSaveMsg('viewBox needs 4 numbers: x y width height'); setTimeout(()=>setFileSaveMsg(''),4000); return }
     setCurrentViewBox(vbEdit.trim())
-  },[vbEdit])
+    // Apply used to only update export metadata — the editing canvas never
+    // visibly resized, so "apply a bigger size" looked like it did nothing.
+    fitToViewBox(vbEdit.trim())
+  },[vbEdit,fitToViewBox])
 
   // Sync form ↔ selected shape
   useEffect(()=>{
+    setEditMode('move') // every new selection starts in Move mode
     if(!selectedId) { setForm(DEFAULTS[geoTool]??{}); return }
     const s=shapes.find(s=>s.id===selectedId)
     if(s) setForm(shapeToForm(s))
@@ -981,6 +1122,7 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
     if(!isOpen) return
     const h=e=>{
       if(['Delete','Backspace'].includes(e.key)&&selectedId&&!['INPUT','TEXTAREA'].includes(document.activeElement?.tagName)){
+        pushHistory()
         setShapes(prev=>prev.filter(s=>s.id!==selectedId))
         setSelectedId(null)
       }
@@ -988,7 +1130,7 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
     }
     window.addEventListener('keydown',h)
     return()=>window.removeEventListener('keydown',h)
-  },[isOpen,selectedId])
+  },[isOpen,selectedId,pushHistory])
 
   const handleResize=useCallback((dir,dx,dy)=>{
     const maxW=snapSide?Math.floor(window.innerWidth*0.45):window.innerWidth-24
@@ -1096,8 +1238,11 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
 
   // ── Geo click (point placement)
   const addShape=useCallback(shape=>{
-    setShapes(prev=>[...prev,{...shape,id:Date.now()+Math.random()}])
-  },[])
+    pushHistory()
+    const id=shape.id??(Date.now()+Math.random())
+    setShapes(prev=>[...prev,{...shape,id}])
+    return id
+  },[pushHistory])
 
   // Snap a raw canvas position to the nearest grid intersection when snap is on
   const snapPt = useCallback((x, y) => {
@@ -1109,13 +1254,19 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
   const handleGeoClick=useCallback(e=>{
     if(mode!=='geo') return
     if(e.target!==e.target.getStage()) return
-    if(geoTool==='select') { setSelectedId(null); setEditingTextId(null); return }
+    // Clicking empty canvas always clears whatever was selected, regardless
+    // of which tool is active — not just Select. By this point the click
+    // already missed every shape (the e.target check above), so there's
+    // nothing else this could be interfering with.
+    setSelectedId(null); setEditingTextId(null)
+    if(geoTool==='select') return
     const raw=getPos(e)
     // OSNAP takes priority over grid snap
     const {x,y}=snapCandidate??snapPt(raw.x,raw.y)
     // Text places on a single click and drops straight into inline edit —
     // no multi-click accumulation like the other tools.
     if(geoTool==='text') {
+      pushHistory()
       const id=Date.now()+Math.random()
       setShapes(prev=>[...prev,{type:'text',points:[x,y],color,sw,fontSize:18,text:'',id}])
       setSelectedId(id)
@@ -1136,16 +1287,17 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
       addShape({...inProg,points:newPts,...extra}); setInProg(null)
     }
     else setInProg({...inProg,points:newPts})
-  },[mode,geoTool,inProg,color,sw,addShape,snapPt,snapCandidate,form])
+  },[mode,geoTool,inProg,color,sw,addShape,snapPt,snapCandidate,form,pushHistory])
 
   const handleVertexUpdate=useCallback((shapeId,newPts)=>{
+    pushHistory()
     setShapes(prev=>prev.map(s=>{
       if(s.id!==shapeId) return s
       const updated={...s,points:newPts}
       if(shapeId===selectedId) setForm(shapeToForm(updated))
       return updated
     }))
-  },[selectedId])
+  },[selectedId,pushHistory])
 
   const finishPolygon=()=>{
     if(inProg?.type==='polygon'&&inProg.points.length>=6){ addShape(inProg); setInProg(null) }
@@ -1153,6 +1305,7 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
 
   // ── Shape drag
   const handleShapeDragEnd=useCallback((id,dx,dy)=>{
+    pushHistory()
     setShapes(prev=>prev.map(s=>{
       if(s.id!==id) return s
       let pts=translatePts(s.points,dx,dy)
@@ -1166,7 +1319,7 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
       if(id===selectedId) setForm(shapeToForm(updated))
       return updated
     }))
-  },[selectedId,snapToGrid,gridStep])
+  },[selectedId,snapToGrid,gridStep,pushHistory])
 
   // ── Shape panel create / update
   const handleCreate=()=>{
@@ -1174,9 +1327,13 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
     const pts=formToPoints(activeType,form)
     if(!pts.length) return
     const extra=activeType==='sine'?{cycles:+form.cycles||2}
-      :activeType==='text'?{fontSize:+form.fontSize||18,text:''}
+      :activeType==='text'?{fontSize:+form.fontSize||18,text:'',rotation:+form.rotation||0}
       :{}
-    addShape({type:activeType,points:pts,color,sw,...extra})
+    const id=addShape({type:activeType,points:pts,color,sw,...extra})
+    // Creating text via the form panel should drop straight into edit mode
+    // too, same as clicking the canvas with the Text tool — otherwise a
+    // blank placeholder appears with no obvious way to type into it.
+    if(activeType==='text'){ setSelectedId(id); setEditingTextId(id) }
   }
 
   const handleUpdate=()=>{
@@ -1185,19 +1342,36 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
     if(!shape) return
     const pts=formToPoints(shape.type,form)
     if(!pts.length) return
+    pushHistory()
     const extra=shape.type==='sine'?{cycles:+form.cycles||2}
-      :shape.type==='text'?{fontSize:+form.fontSize||18}
+      :shape.type==='text'?{fontSize:+form.fontSize||18,rotation:+form.rotation||0}
       :{}
-    setShapes(prev=>prev.map(s=>s.id===selectedId?{...s,points:pts,color,...extra}:s))
+    // Don't overwrite color here — `color` is the global toolbar swatch, not
+    // this shape's own color, and was silently recoloring whatever you hit
+    // Update on. Update only ever changes what the form fields show.
+    setShapes(prev=>prev.map(s=>s.id===selectedId?{...s,points:pts,...extra}:s))
   }
 
   // ── Undo / clear
+  // Real undo — restores the last shapes-array snapshot taken right before
+  // an edit, not the old "chop the last array element" behavior (which
+  // deleted whatever happened to be last in the array, regardless of what
+  // was actually just edited).
   const undo=()=>{
     if(inProg){setInProg(null);return}
-    if(mode==='geo') setShapes(prev=>prev.slice(0,-1))
-    else             setLines(prev=>prev.slice(0,-1))
+    if(mode!=='geo'){ setLines(prev=>prev.slice(0,-1)); return }
+    if(!history.length) return
+    const prevShapes=history[history.length-1]
+    setHistory(h=>h.slice(0,-1))
+    setShapes(prevShapes)
+    setSelectedId(null)
   }
-  const clear=()=>{ setLines([]); setShapes([]); setInProg(null); setSelectedId(null) }
+  const clear=()=>{ pushHistory(); setLines([]); setShapes([]); setInProg(null); setSelectedId(null) }
+  // Clears only old freehand brush strokes (e.g. leftover scribbles from a
+  // past doodling session that got persisted to localStorage and were
+  // bleeding through on top of a real diagram) without touching the
+  // diagram's actual shapes.
+  const clearLines=()=>setLines([])
   const handleClose=useCallback(()=>{
     setInProg(null)
     setSelectedId(null)
@@ -1210,7 +1384,7 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
 
   const pickColor=c=>{ setColor(c); if(mode==='draw') setTool('brush') }
   const brushActive=mode==='draw'&&tool==='brush'
-  const canUndo=!!(inProg||(mode==='geo'?shapes.length:lines.length))
+  const canUndo=!!(inProg||(mode==='geo'?history.length:lines.length))
   const canClear=!!(lines.length||shapes.length)
 
   const bg=darkCanvas?'#0f172a':'#f8fafc'
@@ -1272,6 +1446,78 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
   const passthroughShapes=shapes.filter(s=>s.type==='passthrough')
   const codeText=useMemo(()=>buildSvgDocument(shapes,currentViewBox),[shapes,currentViewBox])
 
+  // Merge in the old SvgEditor's universal drag-anything technique for
+  // passthrough elements — curved paths, <g> groups, gradients, anything the
+  // shape model can't parse into a structured shape. It worked directly on
+  // the real SVG DOM: click any element, drag it, it accumulates a
+  // transform="translate(dx,dy)" via getScreenCTM() for the client-to-SVG-
+  // userspace conversion. getScreenCTM() walks the full transform chain
+  // including this SVG's own CSS transform (the zoom/pan translate+scale
+  // below), so it self-corrects for zoom/pan with no manual math needed —
+  // same destination as Konva's getRelativePointerPosition, reached
+  // independently, so passthrough and structured-shape coordinates stay in
+  // the same world-space frame.
+  useEffect(()=>{
+    const svg=passthroughSvgRef.current
+    if(!svg) return
+    const children=Array.from(svg.children)
+    // Tag each top-level element with the shape id it corresponds to, by
+    // document order (matches the order passthroughShapes were joined in) —
+    // lets a drag update the right entry in `shapes`, and keeps Konva's own
+    // selectedId in sync with whichever passthrough element you clicked.
+    children.forEach((el,i)=>{ if(passthroughShapes[i]) el.dataset.shapeId=String(passthroughShapes[i].id) })
+    if(!isDraggable) return // only interactive in Select mode — otherwise it'd intercept placement/drawing clicks
+    const cleanups=[]
+    children.forEach(el=>{
+      const shapeId=el.dataset.shapeId
+      el.style.cursor='grab'
+      const startDrag=e=>{
+        e.stopPropagation()
+        const pt=svg.createSVGPoint()
+        pt.x=e.clientX; pt.y=e.clientY
+        const svgPt=pt.matrixTransform(svg.getScreenCTM().inverse())
+        svg.querySelectorAll('[data-sel]').forEach(s=>{s.removeAttribute('data-sel');s.style.filter=''})
+        el.setAttribute('data-sel','1')
+        el.style.filter='drop-shadow(0 0 6px rgba(249,115,22,0.9))'
+        setEditingTextId(null)
+        if(shapeId) setSelectedId(shapeId)
+        const drag={startX:svgPt.x,startY:svgPt.y,origTransform:el.getAttribute('transform')||'',accDx:0,accDy:0}
+        const onMove=e2=>{
+          const pt2=svg.createSVGPoint()
+          pt2.x=e2.clientX; pt2.y=e2.clientY
+          const cur=pt2.matrixTransform(svg.getScreenCTM().inverse())
+          drag.accDx=cur.x-drag.startX; drag.accDy=cur.y-drag.startY
+          el.setAttribute('transform',drag.origTransform)
+          applyTranslate(el,drag.accDx,drag.accDy)
+        }
+        const onUp=()=>{
+          el.removeEventListener('pointermove',onMove)
+          if((drag.accDx||drag.accDy)&&shapeId){
+            pushHistoryRef.current()
+            // Strip the DOM-only tracking bits (data-shape-id, the
+            // selection drop-shadow, the grab cursor) from a clone before
+            // persisting — the live element keeps them for visual
+            // feedback, but they must never leak into the saved SVG file.
+            const clone=el.cloneNode(true)
+            clone.removeAttribute('data-shape-id')
+            clone.removeAttribute('data-sel')
+            clone.style.filter=''
+            clone.style.cursor=''
+            if(clone.getAttribute('style')==='') clone.removeAttribute('style')
+            const newRaw=clone.outerHTML
+            setShapes(prev=>prev.map(s=>s.id===shapeId?{...s,raw:newRaw}:s))
+          }
+        }
+        el.setPointerCapture?.(e.pointerId)
+        el.addEventListener('pointermove',onMove)
+        el.addEventListener('pointerup',onUp,{once:true})
+      }
+      el.addEventListener('pointerdown',startDrag)
+      cleanups.push(()=>el.removeEventListener('pointerdown',startDrag))
+    })
+    return ()=>cleanups.forEach(fn=>fn())
+  },[passthroughShapes,isDraggable])
+
   if(!isOpen) return null
 
   const mobileStyle={position:'fixed',bottom:0,left:0,right:0,height:Math.max(MIN_H,Math.min(panelH,window.innerHeight-60)),zIndex:120,display:'flex',flexDirection:'column',borderRadius:'16px 16px 0 0',overflow:'hidden',boxShadow:'0 -8px 40px rgba(0,0,0,0.3)',borderTop:`1px solid ${bdr}`,background:darkCanvas?'#1e293b':'#fff'}
@@ -1325,6 +1571,7 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
           <Div c={bdr}/>
           <IBtn onClick={undo}  color={ic}      disabled={!canUndo}><Undo2 size={15}/></IBtn>
           <IBtn onClick={clear} color="#ef4444" disabled={!canClear}><Trash2 size={15}/></IBtn>
+          {mode==='geo'&&lines.length>0&&<IBtn onClick={clearLines} color="#f97316" title="Clear leftover scribbles (keeps the diagram)"><Eraser size={15}/></IBtn>}
           {mode==='geo'&&selectedId&&<><Div c={bdr}/><TBtn active={false} onClick={exportSelectionToOpenMat} dark={darkCanvas}>Send</TBtn></>}
           <Div c={bdr}/>
           <IBtn onClick={handleClose} color={ic}><X size={16}/></IBtn>
@@ -1448,6 +1695,7 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
           onCreate={handleCreate}
           onUpdate={selectedId?handleUpdate:null}
           selectedId={selectedId}
+          onClearSelection={()=>{setSelectedId(null);setEditingTextId(null)}}
           darkCanvas={darkCanvas}
         />
       )}
@@ -1456,16 +1704,25 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
       <div style={{display:'flex',flex:1,minHeight:0,overflow:'hidden'}}>
       <div ref={containerRef} style={{position:'relative',flex:1,overflow:'hidden',background:bg,cursor:isDraggable?'grab':mode==='draw'?tool==='eraser'?'cell':'crosshair':'crosshair',touchAction:'none'}}>
         {/* Reference layer — real SVG markup for imported elements the shape
-            tools can't model (text with custom formatting, curved paths,
-            gradients, <style> blocks). Transformed to track the Konva
-            canvas's zoom/pan so it stays visually aligned. Not interactive —
-            editing those happens in the code pane, not here. */}
+            tools can't fully parse (curved paths, <g> groups, gradients,
+            <style> blocks). Transformed to track the Konva canvas's zoom/pan
+            so it stays visually aligned. Click-and-drag works on these too
+            (in Select mode) via the same getScreenCTM()-based technique the
+            old SvgEditor used — they're draggable as a whole even though
+            they're not reshapeable/recolorable via the shape panel; deeper
+            edits still go through the code pane. */}
         {passthroughShapes.length>0 && (
-          <svg
-            width={canvasSize.w} height={canvasSize.h}
-            style={{position:'absolute',top:0,left:0,pointerEvents:'none',transform:`translate(${stagePos.x}px,${stagePos.y}px) scale(${zoom})`,transformOrigin:'0 0'}}
-            dangerouslySetInnerHTML={{__html: passthroughShapes.map(s=>s.raw).join('')}}
-          />
+          <>
+            <svg
+              ref={passthroughSvgRef}
+              width={canvasSize.w} height={canvasSize.h}
+              style={{position:'absolute',top:0,left:0,pointerEvents:isDraggable?'auto':'none',transform:`translate(${stagePos.x}px,${stagePos.y}px) scale(${zoom})`,transformOrigin:'0 0'}}
+              dangerouslySetInnerHTML={{__html: passthroughShapes.map(s=>s.raw).join('')}}
+            />
+            <div style={{position:'absolute',bottom:8,left:8,fontSize:10,fontFamily:'system-ui, sans-serif',padding:'3px 8px',borderRadius:6,background:darkCanvas?'rgba(15,23,42,0.85)':'rgba(255,255,255,0.9)',color:darkCanvas?'#94a3b8':'#64748b',pointerEvents:'none',zIndex:4}}>
+              {passthroughShapes.length} reference element{passthroughShapes.length===1?'':'s'} — draggable as a whole, not reshapeable (curves/groups/gradients)
+            </div>
+          </>
         )}
         {canvasSize.w>0&&(
           <Stage ref={stageRef} width={canvasSize.w} height={canvasSize.h}
@@ -1479,6 +1736,18 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
           >
             {/* Layer 0: grid */}
             {showGrid&&<GridLayer width={canvasSize.w} height={canvasSize.h} step={gridStep} darkCanvas={darkCanvas}/>}
+            {/* Page boundary — the file's actual viewBox, in world coordinates.
+                Everything inside this dashed rect is "on the page" and will
+                actually show up when the SVG is used; everything outside it
+                is scratch space that gets clipped on export. */}
+            {vb&&mode==='geo'&&(
+              <Layer listening={false}>
+                <Line
+                  points={[vb.x,vb.y, vb.x+vb.w,vb.y, vb.x+vb.w,vb.y+vb.h, vb.x,vb.y+vb.h]}
+                  closed stroke="#f97316" strokeWidth={1.5/zoom} dash={[8/zoom,5/zoom]} fill="transparent"
+                />
+              </Layer>
+            )}
             {/* Layer 1: freehand (eraser uses destination-out on this canvas) */}
             <Layer>
               {lines.map((line,i)=>(
@@ -1495,13 +1764,20 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
                 <ShapeDisplay key={shape.id} shape={shape}
                   selected={shape.id===selectedId}
                   darkCanvas={darkCanvas}
-                  draggable={isDraggable}
+                  draggable={isDraggable && !(shape.id===selectedId && editMode==='points')}
                   selectable={geoTool==='select'}
                   showDims={showAllDims||shape.id===selectedId}
                   onSelect={id=>{
-                    setSelectedId(prev=>prev===id?null:id)
+                    // Always selects the clicked shape — it used to toggle
+                    // off when re-clicking an already-selected shape, which
+                    // fought "hold the selection until something else is
+                    // picked." Also always resolves editingTextId against
+                    // the NEWLY clicked shape (clearing it for non-text),
+                    // instead of leaving a stale text editor open for a
+                    // shape that's no longer selected.
+                    setSelectedId(id)
                     const s=shapes.find(s=>s.id===id)
-                    if(s?.type==='text') setEditingTextId(id)
+                    setEditingTextId(s?.type==='text'?id:null)
                   }}
                   onDragEnd={handleShapeDragEnd}
                 />
@@ -1513,12 +1789,13 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
             </Layer>
             {/* Layer 3: vertex handles + snap indicator (always on top) */}
             <Layer>
-              {isDraggable&&selectedId&&(()=>{
+              {isDraggable&&selectedId&&editMode==='points'&&(()=>{
                 const sel=shapes.find(s=>s.id===selectedId)
                 if(!sel) return null
                 const snapPts=getSnapPoints(shapes.filter(s=>s.id!==selectedId))
                 return <VertexHandles
                   shape={sel}
+                  zoom={zoom}
                   snapPts={snapPts}
                   shapes={shapes.filter(s=>s.id!==selectedId)}
                   onUpdate={handleVertexUpdate}
@@ -1526,23 +1803,33 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
                   darkCanvas={darkCanvas}
                 />
               })()}
-              {mode==='geo'&&<SnapIndicator snap={snapCandidate}/>}
+              {isDraggable&&selectedId&&editMode==='move'&&(()=>{
+                const sel=shapes.find(s=>s.id===selectedId)
+                if(!sel||(sel.type!=='triangle'&&sel.type!=='polygon')) return null
+                return <ScaleHandle shape={sel} zoom={zoom} onUpdate={handleVertexUpdate} darkCanvas={darkCanvas}/>
+              })()}
+              {mode==='geo'&&<SnapIndicator snap={snapCandidate} zoom={zoom}/>}
             </Layer>
           </Stage>
         )}
 
         {/* Inline text editor — a real <textarea> positioned exactly over the
             Konva text node, so typing happens directly on the canvas (not in
-            a popup). Click away or Escape commits; leaving it empty deletes
-            the placeholder shape instead of leaving a blank label behind. */}
+            a popup). Stays open through ShapePanel field interactions (size,
+            rotation, color) — it only closes via Escape, selecting a
+            different shape, or clicking empty canvas, all of which already
+            clear editingTextId explicitly elsewhere. It used to also close
+            (and even delete the shape if still empty) on every blur, which
+            fired the instant focus left the textarea for ANY reason —
+            including clicking another field to keep editing the SAME shape
+            — making selection look like it randomly broke. No onBlur here
+            anymore; abandoned blank text just stays as the existing faint
+            "Text" placeholder, deletable like any other shape. */}
         {editingTextId && (() => {
           const editingShape = shapes.find(s => s.id === editingTextId)
           if (!editingShape) return null
           const [tx, ty] = editingShape.points
-          const commitOrDelete = () => {
-            setShapes(prev => prev.filter(s => s.id !== editingTextId || (s.text && s.text.trim().length > 0)))
-            setEditingTextId(null)
-          }
+          const stopEditing = () => setEditingTextId(null)
           return (
             <textarea
               autoFocus
@@ -1551,15 +1838,24 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
                 const val = e.target.value
                 setShapes(prev => prev.map(s => s.id === editingTextId ? { ...s, text: val } : s))
               }}
-              onBlur={commitOrDelete}
               onKeyDown={e => {
                 e.stopPropagation()
-                if (e.key === 'Escape') commitOrDelete()
+                if (e.key === 'Escape') stopEditing()
               }}
+              rows={1}
               style={{
                 position: 'absolute',
                 left: tx * zoom + stagePos.x,
                 top: ty * zoom + stagePos.y - 2,
+                // Content-driven width so this matches the actual single-line
+                // Konva text render underneath — it used to only have a
+                // minWidth, so the textarea wrapped narrower than the real
+                // text and looked like a duplicated/broken second copy.
+                width: Math.max(60, (editingShape.text ?? '').length * (editingShape.fontSize ?? 18) * zoom * 0.62) + 16,
+                height: (editingShape.fontSize ?? 18) * zoom * 1.4,
+                whiteSpace: 'pre',
+                overflow: 'hidden',
+                resize: 'none',
                 fontSize: (editingShape.fontSize ?? 18) * zoom,
                 fontFamily: 'system-ui, sans-serif',
                 color: editingShape.color,
@@ -1567,7 +1863,6 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
                 border: '1px dashed #f97316',
                 outline: 'none',
                 padding: 0,
-                minWidth: 60,
                 lineHeight: 1.2,
                 zIndex: 5,
               }}
@@ -1592,6 +1887,7 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
               onMount={editor=>{
                 editor.onDidBlurEditorWidget(()=>{
                   if(pendingCodeRef.current==null) return
+                  pushHistoryRef.current()
                   const {shapes:parsed,viewBox}=parseSvgToShapes(pendingCodeRef.current)
                   setShapes(parsed)
                   if(viewBox) setCurrentViewBox(viewBox)
@@ -1605,17 +1901,29 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
       </div>
 
       {/* ══ SELECTED SHAPE INFO BAR ══ */}
-      {selectedId&&(
-        <div style={{padding:'4px 12px',background:tbBg,borderTop:`1px solid ${bdr}`,display:'flex',alignItems:'center',gap:8,flexShrink:0}}>
+      {selectedId&&(()=>{
+        const selShape=shapes.find(s=>s.id===selectedId)
+        const hasHandles=selShape&&getHandles(selShape).length>0
+        return (
+        <div data-scratchpad-ui style={{padding:'4px 12px',background:tbBg,borderTop:`1px solid ${bdr}`,display:'flex',alignItems:'center',gap:8,flexShrink:0}}>
           <span style={{fontSize:11,color:'#f97316',fontWeight:600}}>
-            {shapes.find(s=>s.id===selectedId)?.type}
+            {selShape?.type}
           </span>
-          <span style={{fontSize:11,color:ic,opacity:0.7}}>selected — drag to move · edit fields above · Delete to remove</span>
+          <span style={{fontSize:11,color:ic,opacity:0.7}}>
+            {editMode==='move'?'drag to move whole shape':'drag handles to reshape'} · Delete to remove
+          </span>
+          {hasHandles&&(
+            <div style={{display:'flex',borderRadius:8,overflow:'hidden',border:`1px solid ${bdr}`}}>
+              <button onClick={()=>setEditMode('move')} style={{padding:'4px 10px',border:'none',cursor:'pointer',fontSize:11,fontWeight:600,background:editMode==='move'?'#6366f1':'transparent',color:editMode==='move'?'#fff':ic}}>✥ Move</button>
+              <button onClick={()=>setEditMode('points')} style={{padding:'4px 10px',border:'none',cursor:'pointer',fontSize:11,fontWeight:600,background:editMode==='points'?'#6366f1':'transparent',color:editMode==='points'?'#fff':ic}}>⌖ Edit points</button>
+            </div>
+          )}
           <div style={{flex:1}}/>
           <button onClick={exportSelectionToOpenMat} style={{padding:'4px 10px',borderRadius:8,border:'none',background:'#2563eb',color:'#fff',fontSize:11,fontWeight:600,cursor:'pointer'}}>Send to OpenMAT</button>
-          <IBtn onClick={()=>{setShapes(prev=>prev.filter(s=>s.id!==selectedId));setSelectedId(null)}} color="#ef4444"><Trash2 size={13}/></IBtn>
+          <IBtn onClick={()=>{pushHistory();setShapes(prev=>prev.filter(s=>s.id!==selectedId));setSelectedId(null)}} color="#ef4444"><Trash2 size={13}/></IBtn>
         </div>
-      )}
+        )
+      })()}
     </div>
     </>
   )
