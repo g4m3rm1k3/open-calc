@@ -30,12 +30,14 @@ import {
   PlayCircle,
   Sun,
   Moon,
+  GraduationCap,
 } from "lucide-react";
+import MatrixReducer from "../../tools/matrix-reducer/index.jsx";
+import MathOS from "../../tools/math-os/MathOS.jsx";
 import TICalc from "../../tools/calculator/index.jsx";
 import SigmaCalc from "../../tools/sigma/index.jsx";
 import PolyCalc from "../../tools/polynomial/index.jsx";
 import LinearAlgebraCalc from "../../tools/linear-algebra/index.jsx";
-import MatrixReducer from "../../tools/matrix-reducer/index.jsx";
 import HelpModal from "../ui/HelpModal.jsx";
 import ReportBugButton from "../ui/ReportBugButton.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
@@ -246,8 +248,6 @@ export default function AppShell({ children }) {
   const [graphJSXOpen, setGraphJSXOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
   const [scratchOpen, setScratchOpen] = useState(false);
-  const [calcOpen, setCalcOpen] = useState(false);
-  const [sigmaOpen, setSigmaOpen] = useState(false);
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [poolOpen, setPoolOpen] = useState(false);
@@ -256,10 +256,13 @@ export default function AppShell({ children }) {
   const [basketOpen, setBasketOpen] = useState(false);
   const [golfOpen, setGolfOpen] = useState(false);
   const [footballOpen, setFootballOpen] = useState(false);
-  const [polyOpen, setPolyOpen] = useState(false);
-  const [laOpen, setLAOpen] = useState(false);
   const [matrixReducerOpen, setMatrixReducerOpen] = useState(false);
   const [compassQuickOpen, setCompassQuickOpen] = useState(false);
+  const [mathOsOpen, setMathOsOpen] = useState(false);
+  const [calcOpen, setCalcOpen] = useState(false);
+  const [sigmaOpen, setSigmaOpen] = useState(false);
+  const [polyOpen, setPolyOpen] = useState(false);
+  const [laOpen, setLaOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [gameRulesOpen, setGameRulesOpen] = useState(false);
   const [scratchSnap, setScratchSnap] = useState(null);
@@ -280,10 +283,6 @@ export default function AppShell({ children }) {
     setGraph3DOpen(false);
     setGraphJSXOpen(false);
     setScratchOpen(false);
-    setCalcOpen(false);
-    setSigmaOpen(false);
-    setPolyOpen(false);
-    setLAOpen(false);
     setTerminalOpen(false);
     setPoolOpen(false);
     setChemOpen(false);
@@ -338,10 +337,11 @@ export default function AppShell({ children }) {
   useEffect(() => {
     const handler = (e) => {
       const { tool } = e.detail ?? {};
-      if (tool === "calculator") setCalcOpen(true);
+      if (tool === "math-os") setMathOsOpen(true);
+      else if (tool === "calculator") setCalcOpen(true);
       else if (tool === "sigma") setSigmaOpen(true);
       else if (tool === "polynomial") setPolyOpen(true);
-      else if (tool === "linear-algebra") setLAOpen(true);
+      else if (tool === "linear-algebra") setLaOpen(true);
       else if (tool === "python" || tool === "terminal") {
         setTerminalOpen(true);
         if (tool === "python") {
@@ -445,16 +445,13 @@ export default function AppShell({ children }) {
             onClose={() => setScratchOpen(false)}
             onSnap={handleScratchSnap}
           />
-          {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
-          {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
-          {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
-          {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
           {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
           {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
           <TerminalHub
             isOpen={terminalOpen}
             onClose={() => setTerminalOpen(false)}
           />
+          <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} />
         </div>
       </GrapherContext.Provider>
     );
@@ -618,15 +615,15 @@ export default function AppShell({ children }) {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       closeAllTools();
-                      setCalcOpen(true);
                       setMobileToolsOpen(false);
+                      setCalcOpen(true);
                     }}
                     className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-100 dark:border-violet-500/20 shadow-sm"
                   >
                     <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-violet-500/20 flex items-center justify-center shadow-sm">
                       <Calculator className="w-5 h-5" />
                     </div>
-                    <span className="text-xs font-bold tracking-wide">TI Calc</span>
+                    <span className="text-xs font-bold tracking-wide">Calculator</span>
                   </motion.button>
 
                   <motion.button
@@ -704,10 +701,6 @@ export default function AppShell({ children }) {
             onToolsToggle={() => setMobileToolsOpen((o) => !o)}
           />
 
-          {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
-          {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
-          {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
-          {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
           {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
           {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
           <WhatsNewModal />
@@ -773,6 +766,18 @@ export default function AppShell({ children }) {
             onClose={() => setTerminalOpen(false)}
           />
           <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
+          <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} />
+          {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
+          {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
+          {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
+          {laOpen && (
+            <div className="fixed inset-0 z-[1999] flex items-start justify-center pt-16 pointer-events-none">
+              <div className="pointer-events-auto relative">
+                <button onClick={() => setLaOpen(false)} className="absolute top-2 right-2 z-10 text-slate-400 hover:text-white bg-slate-800 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
+                <LinearAlgebraCalc />
+              </div>
+            </div>
+          )}
           {gameRulesOpen && (
             <div style={{ position: "fixed", inset: 0, zIndex: 300 }}>
               <GameRules onClose={() => setGameRulesOpen(false)} />
