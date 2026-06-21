@@ -228,7 +228,7 @@ function SectionContent({ data }) {
             </div>
           )
         }
-        if (block.type === 'callout') return <Callout key={i} {...block} />
+        if (block.type === 'callout') return <Callout key={i} {...(block.callout ?? block)} />
         if (block.type === 'proof') {
           return (
             <div key={i} className="my-6">

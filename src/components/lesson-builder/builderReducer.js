@@ -114,6 +114,7 @@ export function builderReducer(state, action) {
         prose: { type: 'prose', paragraphs: [''] },
         image: { type: 'image', importPath: '', alt: '', caption: '' },
         viz: { type: 'viz', vizId: '', title: '', caption: '', mathBridge: '', props: {} },
+        callout: { type: 'callout', calloutType: 'insight', title: '', body: '' },
       }
       const newBlock = { _id: newId(), ...(defaults[action.blockType] ?? defaults.prose) }
       return {

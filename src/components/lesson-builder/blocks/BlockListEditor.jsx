@@ -1,13 +1,16 @@
 // Editor for Intuition/Rigor sections using the prose+image `blocks[]`
 // pattern (see src/courses/geometry/*/*.js, and
 // src/courses/linear-algebra/1-vectors-spaces/001-what-is-a-vector.js).
-// Each entry is one of: prose (paragraphs), image (diagram + caption), or
-// viz (embedded interactive component) — rendered and edited in the exact
-// order they'll appear on the real lesson page.
+// Each entry is one of: prose (paragraphs), image (diagram + caption), viz
+// (embedded interactive component), or callout (inline insight/definition/
+// warning box) — rendered and edited in the exact order they'll appear on
+// the real lesson page. Any other block type still renders, just as raw
+// editable JSON (see GenericBlockEditor below) rather than disappearing.
 //
-// Callouts are NOT part of this list — MicroCycleLesson.jsx renders them
-// after the block sequence regardless of prose-vs-blocks mode, so they
-// keep using the separate, untouched CalloutEditor in ProseCalloutBlock.jsx.
+// Note: the separate sec.callouts[] array (rendered after the block
+// sequence) is a different, older pattern — still handled by the untouched
+// CalloutEditor in ProseCalloutBlock.jsx. This file's `callout` block type
+// is for callouts interleaved inline within the blocks[] sequence itself.
 
 import { useState, lazy, Suspense } from 'react'
 import MarkdownEditButton from '../MarkdownEditButton.jsx'
@@ -15,12 +18,12 @@ import LiveSvgPreview from './LiveSvgPreview.jsx'
 import VizFrame from '../../viz/VizFrame.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
-const SvgEditor = lazy(() => import('./SvgEditor.jsx'))
 
 const BLOCK_TYPE_META = {
   prose: { icon: '📝', label: 'Prose' },
   image: { icon: '🖼️', label: 'Image' },
   viz: { icon: '🔭', label: 'Visualization' },
+  callout: { icon: '💡', label: 'Callout' },
 }
 
 function ProseBlockEditor({ block, onChange }) {
@@ -49,7 +52,6 @@ function ProseBlockEditor({ block, onChange }) {
 }
 
 function ImageBlockEditor({ block, onChange, courseId = 'geometry' }) {
-  const [showSvgEditor, setShowSvgEditor] = useState(false)
   const [previewKey, setPreviewKey] = useState(0)
   const diagramsDir = `src/courses/${courseId}/diagrams`
 
@@ -62,8 +64,18 @@ function ImageBlockEditor({ block, onChange, courseId = 'geometry' }) {
     ? `${diagramsDir}/${block.importPath.split('/').pop()}`
     : ''
 
+  const openInScratchpad = () => {
+    window.dispatchEvent(new CustomEvent('oc-open-scratchpad', {
+      detail: resolvedPath ? { filePath: resolvedPath, dir: diagramsDir } : { dir: diagramsDir },
+    }))
+  }
+
   return (
     <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Preview</span>
+        <button type="button" onClick={() => setPreviewKey(k => k + 1)} className="text-[10px] text-slate-400 hover:text-slate-600">↻ Refresh</button>
+      </div>
       <LiveSvgPreview key={previewKey} path={resolvedPath} />
       <div className="flex items-center justify-between">
         <label className="flex-1 flex flex-col gap-1">
@@ -79,29 +91,16 @@ function ImageBlockEditor({ block, onChange, courseId = 'geometry' }) {
         </label>
         <button
           type="button"
-          onClick={() => setShowSvgEditor(true)}
+          onClick={openInScratchpad}
           className="ml-2 mt-4 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors shrink-0"
         >
-          🖼 Open SVG Editor
+          🎨 Open in Scratchpad
         </button>
       </div>
       {!block.importPath && (
         <span className="text-[10px] text-amber-600 dark:text-amber-400 block">
-          No path set yet — use "Open SVG Editor" to pick an existing diagram or load a new one from disk.
+          No path set yet — "Open in Scratchpad" will start a new diagram; type its filename above to match what you save there, then click ↻ Refresh.
         </span>
-      )}
-      {showSvgEditor && (
-        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
-          <SvgEditor
-            initialPath={resolvedPath || undefined}
-            dir={diagramsDir}
-            onSaved={savedPath => {
-              onChange({ importPath: `../diagrams/${savedPath.split('/').pop()}` })
-              setPreviewKey(k => k + 1)
-            }}
-            onClose={() => setShowSvgEditor(false)}
-          />
-        </Suspense>
       )}
       <label className="flex flex-col gap-1">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Alt text</span>
@@ -176,6 +175,56 @@ function VizBlockEditor({ block, onChange }) {
   )
 }
 
+const CALLOUT_TYPES = ['insight', 'definition', 'theorem', 'tip', 'warning', 'intuition', 'prior-knowledge', 'real-world', 'geometric', 'mnemonic', 'procedure', 'proof', 'example', 'misconception', 'history', 'strategy', 'application']
+
+function CalloutBlockEditor({ block, onChange }) {
+  const [editingBody, setEditingBody] = useState(false)
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <select value={block.calloutType ?? 'insight'} onChange={e => onChange({ calloutType: e.target.value })} className="field text-xs py-1 font-mono">
+          {CALLOUT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+        <div className="ml-auto"><MarkdownEditButton onClick={() => setEditingBody(true)} /></div>
+      </div>
+      <input value={block.title ?? ''} onChange={e => onChange({ title: e.target.value })} placeholder="Callout title" className="field text-sm" />
+      <textarea value={block.body ?? ''} onChange={e => onChange({ body: e.target.value })} rows={2} placeholder="Callout body — markdown/LaTeX ok" className="field text-sm resize-none" />
+      {editingBody && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor value={block.body ?? ''} onChange={v => onChange({ body: v })} onClose={() => setEditingBody(false)} title="💡 Callout Body" />
+        </Suspense>
+      )}
+    </div>
+  )
+}
+
+// Catches any block type without a dedicated editor above — instead of a
+// dead "isn't editable here yet" message, this makes it actually editable
+// as raw JSON. Nothing in a lesson should ever be invisible or stuck.
+function GenericBlockEditor({ block, onChange }) {
+  const [text, setText] = useState(() => JSON.stringify(block, null, 2))
+  const [error, setError] = useState('')
+  const apply = () => {
+    try {
+      const parsed = JSON.parse(text)
+      onChange(parsed)
+      setError('')
+    } catch (e) {
+      setError('Invalid JSON: ' + e.message)
+    }
+  }
+  return (
+    <div className="space-y-2">
+      <p className="text-[10px] text-amber-600 dark:text-amber-400">
+        No dedicated editor for "{block.type}" blocks yet — editing as raw data. Click Apply to commit changes.
+      </p>
+      <textarea value={text} onChange={e => setText(e.target.value)} rows={8} spellCheck={false} className="field font-mono text-xs resize-y w-full" />
+      {error && <p className="text-xs text-red-500">{error}</p>}
+      <button onClick={apply} className="px-3 py-1 text-xs font-semibold rounded-lg bg-brand-600 hover:bg-brand-700 text-white">Apply</button>
+    </div>
+  )
+}
+
 function BlockItem({ block, sectionId, dispatch, index, total, courseId }) {
   const meta = BLOCK_TYPE_META[block.type] ?? { icon: '❓', label: block.type }
   const onChange = updates => dispatch({ type: 'UPDATE_BLOCK_ITEM', sectionId, blockId: block._id, updates })
@@ -206,10 +255,9 @@ function BlockItem({ block, sectionId, dispatch, index, total, courseId }) {
         {block.type === 'prose' && <ProseBlockEditor block={block} onChange={onChange} />}
         {block.type === 'image' && <ImageBlockEditor block={block} onChange={onChange} courseId={courseId} />}
         {block.type === 'viz' && <VizBlockEditor block={block} onChange={onChange} />}
-        {!['prose', 'image', 'viz'].includes(block.type) && (
-          <p className="text-xs text-slate-400 italic">
-            Type "{block.type}" isn't editable here yet — preserved as-is on export.
-          </p>
+        {block.type === 'callout' && <CalloutBlockEditor block={block} onChange={onChange} />}
+        {!['prose', 'image', 'viz', 'callout'].includes(block.type) && (
+          <GenericBlockEditor block={block} onChange={onChange} />
         )}
       </div>
     </div>
@@ -245,6 +293,9 @@ export default function BlockListEditor({ sec, sectionId, dispatch, courseId }) 
         </button>
         <button onClick={() => addBlock('viz')} className="px-3 py-1.5 text-xs text-brand-600 border border-brand-300 hover:bg-brand-50 dark:hover:bg-brand-950/30 rounded-lg font-semibold">
           + Visualization
+        </button>
+        <button onClick={() => addBlock('callout')} className="px-3 py-1.5 text-xs text-brand-600 border border-brand-300 hover:bg-brand-50 dark:hover:bg-brand-950/30 rounded-lg font-semibold">
+          + Callout
         </button>
       </div>
     </div>

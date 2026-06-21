@@ -4,11 +4,20 @@ const API = '/api/dev-fs'
 
 // Fetches an SVG file's current content from disk and renders it inline —
 // unlike a bundler-resolved <img src>, this re-reads on every path/refresh so
-// edits made in SvgEditor show up immediately without a page reload.
+// edits made in Scratchpad show up immediately without a page reload.
 export default function LiveSvgPreview({ path }) {
   const [xml, setXml] = useState('')
   const [error, setError] = useState('')
+  const [refreshKey, setRefreshKey] = useState(0)
   const containerRef = useRef(null)
+
+  // Re-fetch when Scratchpad saves this exact file, so the thumbnail updates
+  // without needing a manual refresh click.
+  useEffect(() => {
+    const onSaved = e => { if (e.detail?.path === path) setRefreshKey(k => k + 1) }
+    window.addEventListener('oc-svg-file-saved', onSaved)
+    return () => window.removeEventListener('oc-svg-file-saved', onSaved)
+  }, [path])
 
   useEffect(() => {
     if (!path) { setXml(''); setError(''); return }
@@ -19,7 +28,7 @@ export default function LiveSvgPreview({ path }) {
       })
       .then(text => { setXml(text); setError('') })
       .catch(e => { setXml(''); setError(e.message) })
-  }, [path])
+  }, [path, refreshKey])
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -28,6 +37,10 @@ export default function LiveSvgPreview({ path }) {
     const svgEl = doc.querySelector('svg')
     if (!svgEl || doc.querySelector('parsererror')) return
     const clone = svgEl.cloneNode(true)
+    // Match the app's current theme so the diagram's own .dark CSS rules
+    // (most course diagrams define both) kick in instead of always showing
+    // the light variant regardless of what theme you're actually in.
+    if (document.documentElement.classList.contains('dark')) clone.classList.add('dark')
     clone.style.width = '100%'
     clone.style.height = 'auto'
     clone.style.display = 'block'
@@ -43,5 +56,7 @@ export default function LiveSvgPreview({ path }) {
       </p>
     )
   }
-  return <div ref={containerRef} className="max-h-40 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 p-2 bg-white dark:bg-slate-950" />
+  // Sized generously (diagrams are often text-heavy at small font sizes —
+  // squeezing them into a thumbnail-sized box makes labels illegible).
+  return <div ref={containerRef} className="max-h-96 overflow-auto rounded-lg border border-slate-200 dark:border-slate-700 p-3 bg-white dark:bg-slate-950" />
 }

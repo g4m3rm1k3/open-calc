@@ -2,7 +2,6 @@ import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
 import MarkdownEditButton from '../MarkdownEditButton.jsx'
 import VizCellEditor from './VizCellEditor.jsx'
-import SvgEditor from './SvgEditor.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
@@ -261,7 +260,6 @@ export default function CellsBlock({ sec, dispatch, index, total, onMoveUp, onMo
   const [openIdx, setOpenIdx] = useState(null)
   const [vizEditCell, setVizEditCell] = useState(null)    // { cell, cellIndex }
   const [mdEditCell, setMdEditCell] = useState(null)      // { cell, cellIndex }
-  const [showSvgEditor, setShowSvgEditor] = useState(false)
 
   const cells = sec.cells ?? []
   const update = updates => dispatch({ type: 'UPDATE_SECTION', id: sec._id, updates })
@@ -299,13 +297,13 @@ export default function CellsBlock({ sec, dispatch, index, total, onMoveUp, onMo
         isEditing={true}
       >
         <div className="space-y-3">
-          {/* SVG Editor button */}
+          {/* Scratchpad — sketch/edit diagram files for this course */}
           <div className="flex justify-end">
             <button
-              onClick={() => setShowSvgEditor(true)}
+              onClick={() => window.dispatchEvent(new CustomEvent('oc-open-scratchpad', { detail: { dir: `src/courses/${courseId}/diagrams` } }))}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
             >
-              🖼 SVG Diagram Editor
+              🎨 Open Scratchpad
             </button>
           </div>
 
@@ -389,8 +387,6 @@ export default function CellsBlock({ sec, dispatch, index, total, onMoveUp, onMo
         </Suspense>
       )}
 
-      {/* SVG diagram editor modal */}
-      {showSvgEditor && <SvgEditor dir={`src/courses/${courseId}/diagrams`} onClose={() => setShowSvgEditor(false)} />}
     </>
   )
 }

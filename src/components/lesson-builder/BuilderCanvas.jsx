@@ -9,7 +9,56 @@ import CheckpointsBlock from './blocks/CheckpointsBlock.jsx'
 import QuizBlock from './blocks/QuizBlock.jsx'
 import PythonBlock from './blocks/PythonBlock.jsx'
 import CellsBlock from './blocks/CellsBlock.jsx'
+import BlockShell from './BlockShell.jsx'
 import { HANDLED_SECTION_KEYS, HANDLED_META_KEYS } from './builderUtils.js'
+
+// Catches any top-level section type without a dedicated block component —
+// editable as raw JSON instead of an inert "Unknown section type" message,
+// so no lesson's content is ever invisible just because the builder hasn't
+// special-cased its shape yet.
+function GenericSectionBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove }) {
+  const [editing, setEditing] = useState(false)
+  const [text, setText] = useState(() => JSON.stringify(sec, null, 2))
+  const [error, setError] = useState('')
+
+  const apply = () => {
+    try {
+      const parsed = JSON.parse(text)
+      dispatch({ type: 'UPDATE_SECTION', id: sec._id, updates: parsed })
+      setError('')
+    } catch (e) {
+      setError('Invalid JSON: ' + e.message)
+    }
+  }
+
+  const preview = (
+    <div className="space-y-1">
+      <p className="text-xs text-amber-600 dark:text-amber-400">
+        No dedicated editor for "{sec.type}" sections yet — click to edit as raw data. Nothing is hidden or dropped on export.
+      </p>
+      <pre className="text-[11px] font-mono text-slate-500 dark:text-slate-400 max-h-20 overflow-hidden">
+        {JSON.stringify(sec, null, 2).slice(0, 240)}
+      </pre>
+    </div>
+  )
+
+  const editor = (
+    <div className="space-y-2">
+      <textarea value={text} onChange={e => setText(e.target.value)} rows={16} spellCheck={false} className="field font-mono text-xs resize-y w-full" />
+      {error && <p className="text-xs text-red-500">{error}</p>}
+      <div className="flex gap-2">
+        <button onClick={apply} className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">Apply</button>
+        <button onClick={() => setEditing(false)} className="px-4 py-1.5 text-sm text-slate-500">Done</button>
+      </div>
+    </div>
+  )
+
+  return (
+    <BlockShell label={sec.type} icon="❓" index={index} total={total} onMoveUp={onMoveUp} onMoveDown={onMoveDown} onRemove={onRemove} isEditing={editing} onEdit={() => setEditing(true)}>
+      {editing ? editor : preview}
+    </BlockShell>
+  )
+}
 
 function DropZone({ onDrop, label }) {
   const [over, setOver] = useState(false)
@@ -83,11 +132,7 @@ function SectionBlock({ sec, dispatch, index, total, courseId }) {
     case 'cells':
       return <CellsBlock {...common} />
     default:
-      return (
-        <div className="rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm text-slate-400">
-          Unknown section type: {sec.type}
-        </div>
-      )
+      return <GenericSectionBlock {...common} />
   }
 }
 

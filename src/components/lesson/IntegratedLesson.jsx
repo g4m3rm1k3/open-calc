@@ -72,7 +72,7 @@ function SectionContent({ data }) {
             </div>
           )
         }
-        if (block.type === 'callout') return <Callout key={i} {...block} />
+        if (block.type === 'callout') return <Callout key={i} {...(block.callout ?? block)} />
         if (block.type === 'stepthrough') return <StepThrough key={i} {...block} />
         return null
       })}
