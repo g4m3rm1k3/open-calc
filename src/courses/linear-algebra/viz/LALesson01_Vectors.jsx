@@ -4,6 +4,8 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Grid } from "@react-three/drei";
 import Katex from "katex-react";
 import 'katex/dist/katex.min.css';
+import { useIsDark } from "../../../hooks/useIsDark.js";
+import { panel, card, cardSoft, label, mutedText, divider, buttonSecondary, getSceneColors } from "./styles.js";
 
 // ─── Arrow with axis label ────────────────────────────────────────────────────
 function LabeledArrow({ direction, origin = [0, 0, 0], length, color }) {
@@ -67,9 +69,10 @@ function ScalarArrow({ vector, scalar }) {
 }
 
 // ─── 3D Scene ─────────────────────────────────────────────────────────────────
-function VectorScene({ vector, scalar, showComponents, showScaled }) {
+function VectorScene({ vector, scalar, showComponents, showScaled, isDark }) {
   const len = vector.length();
   const dir = [vector.x, vector.y, vector.z];
+  const scene = getSceneColors(isDark);
 
   return (
     <>
@@ -79,8 +82,8 @@ function VectorScene({ vector, scalar, showComponents, showScaled }) {
         args={[10, 10]}
         rotation={[Math.PI / 2, 0, 0]}
         position={[0, 0, 0]}
-        cellColor="#444"
-        sectionColor="#666"
+        cellColor={scene.cellColor}
+        sectionColor={scene.sectionColor}
         fadeDistance={12}
         infiniteGrid
       />
@@ -107,14 +110,14 @@ function Slider({ label, value, min, max, step, onChange, color = "#e2e8f0" }) {
     <div className="mb-2">
       <div className="flex justify-between text-sm mb-1">
         <span style={{ color }}>{label}</span>
-        <span className="font-mono text-slate-300">{Number(value).toFixed(2)}</span>
+        <span className="font-mono text-slate-600 dark:text-slate-300">{Number(value).toFixed(2)}</span>
       </div>
       <input
         type="range"
         min={min} max={max} step={step}
         value={value}
         onChange={e => onChange(parseFloat(e.target.value))}
-        className="w-full accent-red-400"
+        className="w-full accent-red-500"
       />
     </div>
   );
@@ -187,6 +190,7 @@ function buildSteps(v, scalar) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 export default function LALesson01_Vectors() {
+  const isDark = useIsDark();
   const [x, setX] = useState(2);
   const [y, setY] = useState(3);
   const [z, setZ] = useState(1);
@@ -198,39 +202,47 @@ export default function LALesson01_Vectors() {
   const vector = useMemo(() => new THREE.Vector3(x, y, z), [x, y, z]);
   const steps  = useMemo(() => buildSteps(vector, scalar), [vector, scalar]);
 
+  // Slider accent colors need a darker variant in light mode — the pastel
+  // values were tuned only for a dark background and wash out on white.
+  const axisColors = isDark
+    ? { x: "#ff8888", y: "#88ff88", z: "#88aaff", scalar: "#00bfff" }
+    : { x: "#dc2626", y: "#16a34a", z: "#2563eb", scalar: "#0284c7" };
+
   return (
     <div className="p-4 max-w-5xl mx-auto">
-      <h2 className="text-xl font-bold mb-4 text-slate-100">
+      <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-slate-100">
         Interactive: Vectors in 3D
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
         {/* ── 3D canvas ── */}
-        <div className="md:col-span-2 h-80 md:h-[460px] rounded-lg overflow-hidden border border-slate-700">
+        <div className={`md:col-span-2 h-80 md:h-[460px] overflow-hidden ${card}`}>
           <Canvas camera={{ position: [6, 5, 6], fov: 40 }}>
+            <color attach="background" args={[isDark ? "#020617" : "#f8fafc"]} />
             <VectorScene
               vector={vector}
               scalar={scalar}
               showComponents={showComponents}
               showScaled={showScaled}
+              isDark={isDark}
             />
             <OrbitControls makeDefault />
           </Canvas>
         </div>
 
         {/* ── Controls ── */}
-        <div className="bg-slate-800 rounded-lg p-4 flex flex-col gap-3">
-          <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">
+        <div className={`${panel} flex flex-col gap-3`}>
+          <p className={`${label} mb-1`}>
             Vector v — drag to reshape
           </p>
-          <Slider label="x" value={x} min={-4} max={4} step={0.1} onChange={setX} color="#ff8888" />
-          <Slider label="y" value={y} min={-4} max={4} step={0.1} onChange={setY} color="#88ff88" />
-          <Slider label="z" value={z} min={-4} max={4} step={0.1} onChange={setZ} color="#88aaff" />
+          <Slider label="x" value={x} min={-4} max={4} step={0.1} onChange={setX} color={axisColors.x} />
+          <Slider label="y" value={y} min={-4} max={4} step={0.1} onChange={setY} color={axisColors.y} />
+          <Slider label="z" value={z} min={-4} max={4} step={0.1} onChange={setZ} color={axisColors.z} />
 
-          <hr className="border-slate-600 my-1" />
+          <hr className={`${divider} my-1`} />
 
-          <p className="text-xs text-slate-400 uppercase tracking-wider">
+          <p className={label}>
             Scalar c (step 4)
           </p>
           <Slider
@@ -240,33 +252,33 @@ export default function LALesson01_Vectors() {
             max={3}
             step={0.05}
             onChange={setScalar}
-            color="#00bfff"
+            color={axisColors.scalar}
           />
 
-          <hr className="border-slate-600 my-1" />
+          <hr className={`${divider} my-1`} />
 
-          <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer select-none">
+          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={showComponents}
               onChange={e => setShowComponents(e.target.checked)}
-              className="accent-teal-400"
+              className="accent-teal-500"
             />
             Show Components (step 3)
           </label>
-          <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer select-none">
+          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={showScaled}
               onChange={e => setShowScaled(e.target.checked)}
-              className="accent-blue-400"
+              className="accent-blue-500"
             />
             Show Scaled Vector (step 4)
           </label>
 
-          <div className="mt-2 bg-slate-900 rounded p-3 text-center">
-            <p className="text-xs text-slate-400 mb-1">Magnitude ‖v‖</p>
-            <p className="text-2xl font-mono font-bold text-red-400">
+          <div className={`mt-2 ${cardSoft} p-3 text-center`}>
+            <p className={`${mutedText} text-xs mb-1`}>Magnitude ‖v‖</p>
+            <p className="text-2xl font-mono font-bold text-red-600 dark:text-red-400">
               {vector.length().toFixed(4)}
             </p>
           </div>
@@ -283,7 +295,7 @@ export default function LALesson01_Vectors() {
               className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
                 i === step
                   ? "bg-red-600 text-white font-semibold"
-                  : "bg-slate-700 text-slate-200 hover:bg-slate-600"
+                  : `${buttonSecondary} hover:bg-slate-100 dark:hover:bg-slate-700`
               }`}
             >
               {i + 1}. {s.label}
@@ -292,16 +304,16 @@ export default function LALesson01_Vectors() {
         </div>
 
         {/* ── Step explanation ── */}
-        <div className="bg-slate-800 rounded-lg p-4">
-          <h3 className="text-base font-semibold text-slate-100 mb-2">
+        <div className={panel}>
+          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-2">
             {steps[step].label}
           </h3>
-          <div className="text-slate-300 text-sm leading-relaxed mb-3 prose prose-invert max-w-none">
+          <div className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mb-3 prose dark:prose-invert max-w-none">
             <Katex>{steps[step].explanation}</Katex>
           </div>
           {steps[step].formula && (
-            <div className="bg-slate-900 rounded p-4 text-center overflow-x-auto">
-              <Katex block>{steps[step].formula}</Katex>
+            <div className={`${cardSoft} p-4 text-center overflow-x-auto`}>
+              <Katex displayMode>{`\\[${steps[step].formula}\\]`}</Katex>
             </div>
           )}
         </div>

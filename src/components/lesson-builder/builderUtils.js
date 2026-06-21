@@ -48,6 +48,76 @@ export function childrenToVizs(children) {
   })
 }
 
+// An image block's `src` is an imported identifier in the source file
+// (`import droneDisplacementUrl from '../diagrams/foo.svg?url'`), but the
+// evaluated lesson module only has the final resolved URL string — the
+// import path is gone by then. Recover it from raw source text instead:
+// find every `{ type: 'image', ..., src: <identifier> }` block and resolve
+// <identifier> against the file's own `import X from 'PATH?url'` lines.
+// Good enough for this codebase's consistent one-import-per-image style —
+// not a real parser, just two regexes correlated by document order.
+export function extractImageImports(sourceText) {
+  if (!sourceText) return []
+  const importMap = new Map()
+  const importRe = /import\s+(\w+)\s+from\s+['"]([^'"]+?)\?url['"]/g
+  let m
+  while ((m = importRe.exec(sourceText))) importMap.set(m[1], m[2])
+
+  const blockRe = /\{\s*type:\s*['"]image['"][^}]*?src:\s*(\w+)[^}]*?\}/g
+  const results = []
+  while ((m = blockRe.exec(sourceText))) {
+    const identifier = m[1]
+    results.push({ identifier, importPath: importMap.get(identifier) ?? '' })
+  }
+  return results
+}
+
+// Raw lesson blocks[] → builder state blocks[]. `imageImportQueue` is
+// consumed in document order (shared across intuition + rigor, since
+// that's the order they appear in the source file too).
+export function blocksToState(blocks, imageImportQueue) {
+  return (blocks ?? []).map(b => {
+    const _id = newId()
+    if (b.type === 'image') {
+      const recovered = imageImportQueue.shift()
+      return { _id, type: 'image', importPath: recovered?.importPath ?? '', alt: b.alt ?? '', caption: b.caption ?? '', _previewSrc: b.src ?? '' }
+    }
+    if (b.type === 'prose') {
+      return { _id, type: 'prose', paragraphs: b.paragraphs ?? [] }
+    }
+    if (b.type === 'viz') {
+      return { _id, type: 'viz', vizId: b.id ?? '', title: b.title ?? '', caption: b.caption ?? '', mathBridge: b.mathBridge ?? '', props: b.props ?? {} }
+    }
+    // math / stepthrough / anything else the editor doesn't special-case —
+    // preserved verbatim so re-export doesn't drop it.
+    return { _id, type: b.type, _raw: b }
+  })
+}
+
+// Builder state blocks[] → plain lesson blocks[] for export. Image blocks
+// emit an __importRef marker instead of a real value — lessonSerializer's
+// fmtValue() recognizes it and writes a bare identifier (not a string),
+// plus collects the import line that needs to go at the top of the file.
+export function stateToBlocks(blocks) {
+  return (blocks ?? []).map(b => {
+    if (b.type === 'image') {
+      return { type: 'image', src: { __importRef: true, path: b.importPath }, alt: b.alt ?? '', caption: b.caption ?? '' }
+    }
+    if (b.type === 'prose') {
+      return { type: 'prose', paragraphs: b.paragraphs ?? [] }
+    }
+    if (b.type === 'viz') {
+      const v = { type: 'viz', id: b.vizId }
+      if (b.title)      v.title = b.title
+      if (b.caption)    v.caption = b.caption
+      if (b.mathBridge) v.mathBridge = b.mathBridge
+      if (b.props && Object.keys(b.props).length) v.props = b.props
+      return v
+    }
+    return b._raw ?? b
+  })
+}
+
 export function defaultSection(type) {
   const _id = newId()
   switch (type) {
@@ -73,17 +143,30 @@ export function defaultSection(type) {
   }
 }
 
-export function lessonToState(lesson, chapterId, lessonSlug) {
+export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
   const sections = []
   const add = (type, extra) => sections.push({ _id: newId(), type, ...extra })
+
+  // Shared queue: image blocks are consumed in document order across
+  // intuition then rigor, matching the order they appear in source.
+  const imageImportQueue = extractImageImports(sourceText)
 
   // ScienceNotebook cells — map before old-format sections so they appear first
   if (lesson.cells?.length) add('cells', { cells: lesson.cells })
 
-  // Old-format sections — skip intuition if it uses blocks[] (ScienceNotebook style) rather than prose[]
-  if (lesson.intuition && lesson.intuition.prose) add('intuition', { prose: lesson.intuition.prose ?? [], callouts: lesson.intuition.callouts ?? [], children: vizsToChildren(lesson.intuition.visualizations) })
+  // Intuition / Rigor: blocks[] (new prose+image pattern) takes priority
+  // over the legacy prose[]/callouts[] shape when present.
+  if (lesson.intuition?.blocks?.length) {
+    add('intuition', { blocks: blocksToState(lesson.intuition.blocks, imageImportQueue), callouts: lesson.intuition.callouts ?? [] })
+  } else if (lesson.intuition?.prose) {
+    add('intuition', { prose: lesson.intuition.prose ?? [], callouts: lesson.intuition.callouts ?? [], children: vizsToChildren(lesson.intuition.visualizations) })
+  }
   if (lesson.math)      add('math',      { prose: lesson.math.prose ?? [],      equations: lesson.math.equations ?? [],   children: vizsToChildren(lesson.math.visualizations) })
-  if (lesson.rigor)     add('rigor',     { prose: lesson.rigor.prose ?? [],     callouts: lesson.rigor.callouts ?? [],    children: vizsToChildren(lesson.rigor.visualizations) })
+  if (lesson.rigor?.blocks?.length) {
+    add('rigor', { blocks: blocksToState(lesson.rigor.blocks, imageImportQueue), callouts: lesson.rigor.callouts ?? [] })
+  } else if (lesson.rigor?.prose) {
+    add('rigor', { prose: lesson.rigor.prose ?? [], callouts: lesson.rigor.callouts ?? [], children: vizsToChildren(lesson.rigor.visualizations) })
+  }
   if (lesson.examples?.length)    add('examples',    { items: lesson.examples.map(ex => ({ ...ex, steps: ex.steps ?? [] })) })
   if (lesson.challenges?.length)  add('challenges',  { items: lesson.challenges })
   if (lesson.checkpoints?.length) add('checkpoints', { items: lesson.checkpoints })

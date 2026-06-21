@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import BlockShell from '../BlockShell.jsx'
 import VisualizationBlock from './VisualizationBlock.jsx'
+import BlockListEditor from './BlockListEditor.jsx'
 
 // Shared editor for Intuition and Rigor (both have prose[] + callouts[])
 
@@ -38,6 +39,10 @@ function CalloutEditor({ callout, onChange, onRemove }) {
 
 export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, total, onMoveUp, onMoveDown, onRemove, sectionId }) {
   const [editing, setEditing] = useState(false)
+  // blocks[] (new prose+image pattern, see BlockListEditor.jsx) vs legacy
+  // prose[] — both render through this same component; only the
+  // content portion (not callouts) differs between the two modes.
+  const isBlocksMode = Array.isArray(sec.blocks)
 
   const updateSec = (updates) => dispatch({ type: 'UPDATE_SECTION', id: sec._id, updates })
 
@@ -45,9 +50,32 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
 
   const preview = (
     <div className="space-y-3">
-      {(sec.prose ?? []).map((p, i) => (
-        <p key={i} className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{p}</p>
-      ))}
+      {isBlocksMode
+        ? (sec.blocks ?? []).map(b => {
+            if (b.type === 'prose') {
+              return (b.paragraphs ?? []).map((p, j) => (
+                <p key={`${b._id}-${j}`} className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{p}</p>
+              ))
+            }
+            if (b.type === 'image') {
+              return (
+                <div key={b._id} className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 italic">
+                  🖼️ {b.caption || b.importPath || 'image block (no path set)'}
+                </div>
+              )
+            }
+            if (b.type === 'viz') {
+              return (
+                <div key={b._id} className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 italic">
+                  🔭 {b.title || b.vizId || 'visualization block'}
+                </div>
+              )
+            }
+            return null
+          })
+        : (sec.prose ?? []).map((p, i) => (
+            <p key={i} className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">{p}</p>
+          ))}
       {(sec.callouts ?? []).map((c, i) => (
         <div key={i} className="rounded-lg border-l-4 border-brand-400 bg-brand-50 dark:bg-brand-900/20 px-4 py-3">
           <p className="text-xs font-bold text-brand-700 dark:text-brand-300 uppercase mb-1">{c.type}</p>
@@ -55,7 +83,7 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
           <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{c.body}</p>
         </div>
       ))}
-      {(sec.children ?? []).map((child, i) => (
+      {!isBlocksMode && (sec.children ?? []).map((child, i) => (
         <VisualizationBlock
           key={child._id}
           child={child}
@@ -65,26 +93,45 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
           total={(sec.children ?? []).length}
         />
       ))}
-      {!sec.prose?.length && !sec.callouts?.length && !sec.children?.length && (
+      {!isBlocksMode && !sec.prose?.length && !sec.callouts?.length && !sec.children?.length && (
         <p className="text-slate-300 dark:text-slate-600 italic text-sm">Click to add content…</p>
+      )}
+      {isBlocksMode && !sec.blocks?.length && !sec.callouts?.length && (
+        <p className="text-slate-300 dark:text-slate-600 italic text-sm">No blocks yet — click to add some.</p>
       )}
     </div>
   )
 
   const editor = (
     <div className="space-y-4">
-      <label className="flex flex-col gap-1">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-          Prose paragraphs — separate with blank lines
-        </span>
-        <textarea
-          value={proseText}
-          onChange={e => updateSec({ prose: e.target.value.split(/\n{2,}/).map(s => s.trim()).filter(Boolean) })}
-          rows={8}
-          placeholder="First paragraph…&#10;&#10;Second paragraph…"
-          className="field font-mono text-sm resize-y"
-        />
-      </label>
+      {isBlocksMode ? (
+        <BlockListEditor sec={sec} sectionId={sectionId ?? sec._id} dispatch={dispatch} />
+      ) : (
+        <>
+          <label className="flex flex-col gap-1">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              Prose paragraphs — separate with blank lines
+            </span>
+            <textarea
+              value={proseText}
+              onChange={e => updateSec({ prose: e.target.value.split(/\n{2,}/).map(s => s.trim()).filter(Boolean) })}
+              rows={8}
+              placeholder="First paragraph…&#10;&#10;Second paragraph…"
+              className="field font-mono text-sm resize-y"
+            />
+          </label>
+          <button
+            onClick={() => {
+              if (window.confirm('Switch this section to blocks (prose + images), like the geometry course uses? Existing prose becomes the first block.')) {
+                dispatch({ type: 'CONVERT_TO_BLOCKS', sectionId: sec._id })
+              }
+            }}
+            className="text-xs text-brand-600 hover:text-brand-700 font-semibold"
+          >
+            🧩 Switch to blocks (prose + images, like Geometry)
+          </button>
+        </>
+      )}
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -110,8 +157,8 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
         ))}
       </div>
 
-      {/* Nested visualizations */}
-      {(sec.children ?? []).length > 0 && (
+      {/* Nested visualizations — legacy mode only; blocks mode embeds viz inline via BlockListEditor */}
+      {!isBlocksMode && (sec.children ?? []).length > 0 && (
         <div className="space-y-3">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Embedded Visualizations</span>
           {(sec.children ?? []).map((child, i) => (
@@ -131,12 +178,14 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
         <button onClick={() => setEditing(false)} className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">
           Done
         </button>
-        <button
-          onClick={() => dispatch({ type: 'ADD_CHILD', sectionId: sectionId ?? sec._id, vizId: 'PythonNotebook' })}
-          className="px-3 py-1.5 text-sm text-brand-600 border border-brand-300 hover:bg-brand-50 rounded-lg font-semibold"
-        >
-          + Add Notebook
-        </button>
+        {!isBlocksMode && (
+          <button
+            onClick={() => dispatch({ type: 'ADD_CHILD', sectionId: sectionId ?? sec._id, vizId: 'PythonNotebook' })}
+            className="px-3 py-1.5 text-sm text-brand-600 border border-brand-300 hover:bg-brand-50 rounded-lg font-semibold"
+          >
+            + Add Notebook
+          </button>
+        )}
       </div>
     </div>
   )

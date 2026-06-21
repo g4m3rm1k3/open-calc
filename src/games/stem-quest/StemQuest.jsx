@@ -365,6 +365,18 @@ function MapSync({ pos, zoom }) {
     map.setView([pos.lat, pos.lng], zoom, { animate: false });
   }, [map, pos, zoom]);
 
+  // Leaflet measures its container once at mount and never re-measures on
+  // its own. This game is rendered inside a floating window whose flex
+  // layout can settle to its real size a moment after mount, so the map
+  // is left rendering at a stale (smaller) size — the visible symptom is
+  // dead space / "the map is half screen." Re-measure on every real resize.
+  useEffect(() => {
+    const container = map.getContainer();
+    const observer = new ResizeObserver(() => map.invalidateSize());
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [map]);
+
   return null;
 }
 
@@ -1441,7 +1453,7 @@ export default function StemQuest() {
       : '© <a href="https://carto.com/">CARTO</a>';
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: "#020617", overflow: "hidden" }}>
+    <div style={{ display: "flex", height: "100%", background: "#020617", overflow: "hidden" }}>
       <div style={{ position: "relative", flex: 1, overflow: "hidden" }}>
         {!progress.dismissedQuestIntro && activeQuest && <StoryBanner quest={activeQuest} onDismiss={dismissQuestIntro} />}
 
@@ -1449,7 +1461,7 @@ export default function StemQuest() {
           center={[homePos.lat, homePos.lng]}
           zoom={WORLD_ZOOM}
           zoomControl={false}
-          style={{ height: "100vh", width: "100%", background: "#0f172a" }}
+          style={{ height: "100%", width: "100%", background: "#0f172a" }}
           attributionControl={false}
           dragging={false}
           scrollWheelZoom={false}

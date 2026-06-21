@@ -1,3 +1,9 @@
+import droneDisplacementUrl from '../diagrams/la-drone-displacement.svg?url'
+import scalarMultiplicationUrl from '../diagrams/la-scalar-multiplication.svg?url'
+import threePerspectivesUrl from '../diagrams/la-three-perspectives.svg?url'
+import magnitudeTriangleUrl from '../diagrams/la-magnitude-triangle.svg?url'
+import unitVectorUrl from '../diagrams/la-unit-vector.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────────────────
   id: 'la1-001',
@@ -22,15 +28,94 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────────────────
   intuition: {
-    prose: [
-      '**Start with a movement.** A delivery drone must move 3 meters east and 4 meters north to reach the next package. We record that as $[3,\\; 4]$ — two numbers, one per axis. The first says "go this far east"; the second says "go this far north." That list, encoding both a direction and a distance, is a **vector**. The total distance traveled is the straight-line diagonal: $\\sqrt{3^2 + 4^2} = \\sqrt{25} = 5$ meters (the Pythagorean theorem).',
-      '**Before reading on, predict:** if you doubled the movement — same direction, twice as far — what would the new vector be, and how far would the drone travel? Work it out before continuing.',
-      '**The doubled movement is $[6,\\; 8]$**, and the total distance is $\\sqrt{6^2 + 8^2} = \\sqrt{100} = 10$ meters — exactly twice the original 5. This is **scalar multiplication**: multiplying a vector by 2 stretches it by 2 while keeping the same direction. The distance (magnitude) scales by the same factor.',
-      '**Three perspectives on the same object.** The vector $[3, 4]$ can be read three ways:\n\n**Physics:** an arrow pointing 3 right and 4 up — length 5, angle about 53°. Sliding the arrow to a new position does not change it.\n**Computer science:** an ordered list `[3, 4]`. A house might be `[1200, 3, 2, 450000]` (sqft, bedrooms, bathrooms, price). Every dataset is a collection of vectors.\n**Mathematics:** anything you can add to another and scale by a number — polynomials and functions qualify too.',
-      '**Scalars change size, not shape.** A **scalar** is a single real number from $\\mathbb{R}$. Multiplying vector $\\mathbf{v}$ by scalar $c$ produces these four behaviors:\n\n• $c > 1$: stretches $\\mathbf{v}$ (longer, same direction)\n• $0 < c < 1$: shrinks it\n• $c = -1$: reverses direction exactly\n• $c = 0$: collapses to $\\mathbf{0}$ (the zero vector — length 0, no direction)',
-      '**The magnitude formula.** The length of a vector is called its **magnitude**, written $\\|\\mathbf{v}\\|$. For $\\mathbf{v} = [x, y]^\\top$, the formula comes directly from the Pythagorean theorem — the components form the two legs of a right triangle, and the vector is the hypotenuse:\n$$\\|\\mathbf{v}\\| = \\sqrt{x^2 + y^2}$$\nFor our drone: $\\|[3,4]^\\top\\| = \\sqrt{9+16} = 5$.',
-      '**Unit vectors: pure direction.** Divide any nonzero vector by its own magnitude. The result has length exactly 1. It is called the **unit vector** $\\hat{u} = \\mathbf{v}/\\|\\mathbf{v}\\|$. For $\\mathbf{v} = [3,4]^\\top$: $\\hat{u} = [3/5,\\; 4/5]^\\top = [0.6,\\; 0.8]^\\top$. Same direction as $\\mathbf{v}$, length exactly 1.',
-      '**CNC connection.** The command $G00\\; X3.0\\; Y2.0\\; Z{-1.5}$ moves a cutting tool to position $[3.0, 2.0, -1.5]^\\top$. Distance traveled: $\\sqrt{3^2+2^2+1.5^2} \\approx 3.9$ mm. Every displacement between waypoints is vector subtraction; every feed distance is a magnitude.',
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Start with a movement.** A delivery drone must move 3 meters east and 4 meters north to reach the next package. We record that as $[3,\\; 4]$ — two numbers, one per axis. The first says "go this far east"; the second says "go this far north." That list, encoding both a direction and a distance, is a **vector**. The total distance traveled is the straight-line diagonal: $\\sqrt{3^2 + 4^2} = \\sqrt{25} = 5$ meters (the Pythagorean theorem).',
+        ],
+      },
+      {
+        type: 'image',
+        src: droneDisplacementUrl,
+        alt: 'A vector arrow from the origin to (3,4) on a grid, with dashed legs labeled 3 m east and 4 m north forming a right triangle',
+        caption: 'The drone\'s displacement [3, 4]: the vector is the hypotenuse of the right triangle formed by its components.',
+      },
+      {
+        type: 'viz',
+        id: 'LALesson01_Vectors',
+        title: 'Vector Components — Geometry meets Algebra',
+        mathBridge: 'Drag the vector tip to change its direction and length. Watch how the coordinate list $[x, y]^T$ updates in real-time. This is the core connection: every geometric arrow has exactly one algebraic representation, and every list of numbers has exactly one geometric arrow.',
+        caption: 'Moving the tip horizontally changes only the $x$ component. Moving vertically changes only $y$. They are independent.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Before reading on, predict:** if you doubled the movement — same direction, twice as far — what would the new vector be, and how far would the drone travel? Work it out before continuing.',
+          '**The doubled movement is $[6,\\; 8]$**, and the total distance is $\\sqrt{6^2 + 8^2} = \\sqrt{100} = 10$ meters — exactly twice the original 5. This is **scalar multiplication**: multiplying a vector by 2 stretches it by 2 while keeping the same direction. The distance (magnitude) scales by the same factor.',
+        ],
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Three perspectives on the same object.** The vector $[3, 4]$ can be read three ways:\n\n**Physics:** an arrow pointing 3 right and 4 up — length 5, angle about 53°. Sliding the arrow to a new position does not change it.\n**Computer science:** an ordered list `[3, 4]`. A house might be `[1200, 3, 2, 450000]` (sqft, bedrooms, bathrooms, price). Every dataset is a collection of vectors.\n**Mathematics:** anything you can add to another and scale by a number — polynomials and functions qualify too.',
+        ],
+      },
+      {
+        type: 'image',
+        src: threePerspectivesUrl,
+        alt: 'Three panels: Physics shows an arrow, Computer Science shows the list [3, 4], Mathematics shows u+v and c·v',
+        caption: 'Same vector, three vocabularies: an arrow, a list of numbers, and an object you can add and scale.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Scalars change size, not shape.** A **scalar** is a single real number from $\\mathbb{R}$. Multiplying vector $\\mathbf{v}$ by scalar $c$ produces these four behaviors:\n\n• $c > 1$: stretches $\\mathbf{v}$ (longer, same direction)\n• $0 < c < 1$: shrinks it\n• $c = -1$: reverses direction exactly\n• $c = 0$: collapses to $\\mathbf{0}$ (the zero vector — length 0, no direction)',
+        ],
+      },
+      {
+        type: 'image',
+        src: scalarMultiplicationUrl,
+        alt: 'One vector v shown alongside 2v (stretched), 0.5v (shrunk), and -v (reversed), all drawn from the same origin',
+        caption: 'The same vector v under four scalars: stretch, shrink, reverse — and (not shown) collapse to 0 when c = 0.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**The magnitude formula.** The length of a vector is called its **magnitude**, written $\\|\\mathbf{v}\\|$. For $\\mathbf{v} = [x, y]^\\top$, the formula comes directly from the Pythagorean theorem — the components form the two legs of a right triangle, and the vector is the hypotenuse:\n$$\\|\\mathbf{v}\\| = \\sqrt{x^2 + y^2}$$\nFor our drone: $\\|[3,4]^\\top\\| = \\sqrt{9+16} = 5$.',
+        ],
+      },
+      {
+        type: 'image',
+        src: magnitudeTriangleUrl,
+        alt: 'A generic right triangle with horizontal leg x, vertical leg y, and hypotenuse labeled magnitude of v equals square root of x squared plus y squared',
+        caption: 'Every vector hides a right triangle — magnitude is always the hypotenuse, by the Pythagorean theorem.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Unit vectors: pure direction.** Divide any nonzero vector by its own magnitude. The result has length exactly 1. It is called the **unit vector** $\\hat{u} = \\mathbf{v}/\\|\\mathbf{v}\\|$. For $\\mathbf{v} = [3,4]^\\top$: $\\hat{u} = [3/5,\\; 4/5]^\\top = [0.6,\\; 0.8]^\\top$. Same direction as $\\mathbf{v}$, length exactly 1.',
+        ],
+      },
+      {
+        type: 'image',
+        src: unitVectorUrl,
+        alt: 'Vector v = [3,4] with magnitude 5, and its unit vector u-hat = [0.6, 0.8] with magnitude 1, both drawn from the origin pointing the same direction',
+        caption: 'v and its unit vector û point the same way — û is just v scaled down to length exactly 1.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**CNC connection.** The command $G00\\; X3.0\\; Y2.0\\; Z{-1.5}$ moves a cutting tool to position $[3.0, 2.0, -1.5]^\\top$. Distance traveled: $\\sqrt{3^2+2^2+1.5^2} \\approx 3.9$ mm. Every displacement between waypoints is vector subtraction; every feed distance is a magnitude.',
+        ],
+      },
+      {
+        type: 'viz',
+        id: 'LALesson11_OrthogonalProjections',
+        title: 'Where This Is All Heading: Orthogonal Projection',
+        mathBridge: 'This is a teaser from much later in the course (LA4). Every vector can be decomposed into two perpendicular pieces: the "shadow" onto a target direction, and the remainder perpendicular to it. This decomposition is the mathematical engine behind GPS, least-squares fitting, PCA in machine learning, and noise-canceling audio.',
+        caption: 'The goal of LA4: decomposing vectors into orthogonal components.',
+      },
     ],
     callouts: [
       {
@@ -82,20 +167,6 @@ export default {
         type: 'insight',
         title: 'Stop and Think: Can Two Vectors Have the Same Magnitude but Point Different Ways?',
         body: 'Yes — infinitely many. The vector $[3, 4]$ and the vector $[-3, 4]$ both have magnitude 5, yet they point in entirely different directions. **Magnitude alone does not determine a vector.** This is why we need both magnitude AND direction.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson01_Vectors',
-        title: 'Vector Components — Geometry meets Algebra',
-        mathBridge: 'Drag the vector tip to change its direction and length. Watch how the coordinate list $[x, y]^T$ updates in real-time. This is the core connection: every geometric arrow has exactly one algebraic representation, and every list of numbers has exactly one geometric arrow.',
-        caption: 'Moving the tip horizontally changes only the $x$ component. Moving vertically changes only $y$. They are independent.',
-      },
-      {
-        id: 'LALesson11_OrthogonalProjections',
-        title: 'Where This Is All Heading: Orthogonal Projection',
-        mathBridge: 'This is a teaser from much later in the course (LA4). Every vector can be decomposed into two perpendicular pieces: the "shadow" onto a target direction, and the remainder perpendicular to it. This decomposition is the mathematical engine behind GPS, least-squares fitting, PCA in machine learning, and noise-canceling audio.',
-        caption: 'The goal of LA4: decomposing vectors into orthogonal components.',
       },
     ],
   },

@@ -1,0 +1,55 @@
+<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-grid  { stroke: #e2e8f0; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-axis-fill { fill: #94a3b8; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-text  { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-grid  { stroke: #1e293b; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-axis-fill { fill: #475569; }
+    .dark .svg-muted { fill: #64748b; }
+    .dark .svg-text  { fill: #94a3b8; }
+  </style>
+  <rect width="400" height="300" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="dr-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Grid -->
+  <line x1="110" y1="10" x2="110" y2="270" class="svg-grid" stroke-width="1"/>
+  <line x1="160" y1="10" x2="160" y2="270" class="svg-grid" stroke-width="1"/>
+  <line x1="210" y1="10" x2="210" y2="270" class="svg-grid" stroke-width="1"/>
+  <line x1="260" y1="10" x2="260" y2="270" class="svg-grid" stroke-width="1"/>
+  <line x1="60" y1="220" x2="340" y2="220" class="svg-grid" stroke-width="1"/>
+  <line x1="60" y1="170" x2="340" y2="170" class="svg-grid" stroke-width="1"/>
+  <line x1="60" y1="120" x2="340" y2="120" class="svg-grid" stroke-width="1"/>
+  <line x1="60" y1="70" x2="340" y2="70" class="svg-grid" stroke-width="1"/>
+
+  <!-- Axes -->
+  <line x1="60" y1="270" x2="345" y2="270" class="svg-axis" stroke-width="2"/>
+  <line x1="60" y1="280" x2="60" y2="15" class="svg-axis" stroke-width="2"/>
+  <polygon points="345,266 345,274 353,270" class="svg-axis-fill"/>
+  <polygon points="56,15 64,15 60,7" class="svg-axis-fill"/>
+  <text x="358" y="274" font-size="13" class="svg-text" font-style="italic">east</text>
+  <text x="38" y="16" font-size="13" class="svg-text" font-style="italic">north</text>
+
+  <!-- Right-triangle legs (dashed) -->
+  <line x1="60" y1="70" x2="210" y2="70" stroke="#2563eb" stroke-width="2" stroke-dasharray="6 3" opacity="0.8"/>
+  <line x1="210" y1="270" x2="210" y2="70" stroke="#2563eb" stroke-width="2" stroke-dasharray="6 3" opacity="0.8"/>
+  <polyline points="200,70 200,80 210,80" fill="none" stroke="#2563eb" stroke-width="1.5" opacity="0.8"/>
+
+  <!-- The displacement vector itself (hypotenuse) -->
+  <line x1="60" y1="270" x2="206" y2="74" stroke="#2563eb" stroke-width="3" marker-end="url(#dr-arrow)"/>
+
+  <!-- Labels -->
+  <text x="135" y="288" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">3 m east</text>
+  <text x="222" y="175" font-size="13" fill="#2563eb" font-weight="700">4 m north</text>
+  <text x="120" y="160" font-size="14" fill="#2563eb" font-weight="700" transform="rotate(-53, 120, 160)">[3, 4]</text>
+
+  <text x="200" y="295" font-size="12" class="svg-muted" text-anchor="middle">distance = √(3² + 4²) = √25 = 5 m</text>
+</svg>

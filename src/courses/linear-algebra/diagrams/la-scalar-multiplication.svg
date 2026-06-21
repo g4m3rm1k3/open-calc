@@ -1,0 +1,54 @@
+<svg viewBox="0 0 400 320" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-grid  { stroke: #e2e8f0; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-axis-fill { fill: #94a3b8; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-grid  { stroke: #1e293b; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-axis-fill { fill: #475569; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="400" height="320" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="sc-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+    <marker id="sc-green" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#10b981"/></marker>
+    <marker id="sc-amber" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#d97706"/></marker>
+    <marker id="sc-red" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#dc2626"/></marker>
+  </defs>
+
+  <!-- Grid -->
+  <line x1="40" y1="10" x2="40" y2="310" class="svg-grid" stroke-width="1"/>
+  <line x1="130" y1="10" x2="130" y2="310" class="svg-grid" stroke-width="1"/>
+  <line x1="190" y1="10" x2="190" y2="310" class="svg-grid" stroke-width="1"/>
+  <line x1="220" y1="10" x2="220" y2="310" class="svg-grid" stroke-width="1"/>
+  <line x1="280" y1="10" x2="280" y2="310" class="svg-grid" stroke-width="1"/>
+  <line x1="10" y1="260" x2="390" y2="260" class="svg-grid" stroke-width="1"/>
+  <line x1="10" y1="200" x2="390" y2="200" class="svg-grid" stroke-width="1"/>
+  <line x1="10" y1="140" x2="390" y2="140" class="svg-grid" stroke-width="1"/>
+  <line x1="10" y1="80" x2="390" y2="80" class="svg-grid" stroke-width="1"/>
+
+  <!-- Axes through origin (160, 200) -->
+  <line x1="10" y1="200" x2="390" y2="200" class="svg-axis" stroke-width="2"/>
+  <line x1="160" y1="310" x2="160" y2="10" class="svg-axis" stroke-width="2"/>
+
+  <!-- v = [1, 2]: origin (160,200) to (190, 140) -->
+  <line x1="160" y1="200" x2="186" y2="146" stroke="#2563eb" stroke-width="3" marker-end="url(#sc-blue)"/>
+  <text x="196" y="138" font-size="13" fill="#2563eb" font-weight="700">v</text>
+
+  <!-- 2v = [2, 4]: origin to (220, 80) -->
+  <line x1="160" y1="200" x2="216" y2="86" stroke="#10b981" stroke-width="3" marker-end="url(#sc-green)"/>
+  <text x="222" y="80" font-size="13" fill="#10b981" font-weight="700">2v — stretched</text>
+
+  <!-- 0.5v = [0.5, 1]: origin to (175, 170) -->
+  <line x1="160" y1="200" x2="173" y2="173" stroke="#d97706" stroke-width="3" marker-end="url(#sc-amber)"/>
+  <text x="160" y="232" font-size="12" fill="#d97706" font-weight="700" text-anchor="end">0.5v — shrunk</text>
+
+  <!-- -1v = [-1, -2]: origin to (130, 260) -->
+  <line x1="160" y1="200" x2="134" y2="254" stroke="#dc2626" stroke-width="3" marker-end="url(#sc-red)"/>
+  <text x="100" y="272" font-size="13" fill="#dc2626" font-weight="700">-v — reversed</text>
+
+  <text x="200" y="305" font-size="12" class="svg-muted" text-anchor="middle">Same starting vector v, four different scalars c</text>
+</svg>

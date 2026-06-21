@@ -1014,7 +1014,14 @@ function splitTopLevelSemicolons(str) {
   let cur = "", depth = 0, inStr = false, strCh = null;
   for (let i = 0; i < str.length; i++) {
     const c = str[i];
-    if (inStr) { cur += c; if (c === strCh) inStr = false; continue; }
+    if (inStr) {
+      cur += c;
+      if (c === strCh) {
+        if (str[i + 1] === strCh) { cur += str[++i]; continue; } // '' / "" escape
+        inStr = false;
+      }
+      continue;
+    }
     if (c === "'" || c === '"') { inStr = true; strCh = c; cur += c; continue; }
     if ("([{".includes(c)) depth++;
     else if (")]}".includes(c)) depth = Math.max(0, depth - 1);
@@ -1439,8 +1446,18 @@ function replaceIndexing(line, variables, functionNames = new Set()) {
 function replaceBackslash(expr) {
   let hasTopLevelEquals = false;
   let depth = 0;
+  let inStr = false, strCh = null;
   for (let i = 0; i < expr.length; i += 1) {
     const char = expr[i];
+    if (inStr) {
+      if (char === strCh) {
+        if (expr[i + 1] === strCh) { i++; continue; } // '' / "" escape
+        if (char === "'" && expr[i - 1] === "\\") continue; // \' escape (post convertMatlabStringEscapes)
+        inStr = false; strCh = null;
+      }
+      continue;
+    }
+    if (char === "'" || char === '"') { inStr = true; strCh = char; continue; }
     if (char === "[" || char === "(" || char === "{") depth += 1;
     if (char === "]" || char === ")" || char === "}") depth -= 1;
     if (char === "=" && depth === 0) hasTopLevelEquals = true;
@@ -1452,6 +1469,21 @@ function replaceBackslash(expr) {
     }
   }
   return expr;
+}
+
+// MATLAB escapes a literal apostrophe inside a single-quoted string by
+// doubling it ('it''s' means the 4-character string it's). mathjs's own
+// parser doesn't know that convention — it only understands a backslash
+// escape (\') — so without this conversion, mathjs sees 'it' followed
+// immediately by another string 's' with no operator between them and
+// throws "End of string ' expected". Re-uses the same string-span regex
+// already trusted in replaceIndexing() to find true MATLAB string
+// literals (vs. transpose quotes), so it must run AFTER replaceIndexing,
+// not before — replaceIndexing's own masking regex looks for literal ''
+// pairs to recognize string boundaries, which this step would otherwise
+// have already converted away.
+function convertMatlabStringEscapes(line) {
+  return line.replace(/'(?:[^']|'')*'/g, (match) => `'${match.slice(1, -1).replace(/''/g, "\\'")}'`);
 }
 
 export function preprocessLine(line, variables, functionNames = new Set()) {
@@ -1470,6 +1502,7 @@ export function preprocessLine(line, variables, functionNames = new Set()) {
   output = replaceElementwiseBinaryOperators(output);
   output = normalizeMatrixSyntax(output);
   output = replaceIndexing(output, variables, functionNames);
+  output = convertMatlabStringEscapes(output);
   return output;
 }
 
@@ -3179,8 +3212,16 @@ export function executeScript(source, options = {}) {
       if (!code.includes(";")) { result.push(rawLine); continue; }
       const parts = [];
       let cur = "", depth = 0, inStr = false, strCh = null;
-      for (const ch of code) {
-        if (inStr) { cur += ch; if (ch === strCh) inStr = false; continue; }
+      for (let ci = 0; ci < code.length; ci++) {
+        const ch = code[ci];
+        if (inStr) {
+          cur += ch;
+          if (ch === strCh) {
+            if (code[ci + 1] === strCh) { cur += code[++ci]; continue; } // '' / "" escape
+            inStr = false;
+          }
+          continue;
+        }
         if (ch === "'" || ch === '"') { inStr = true; strCh = ch; cur += ch; continue; }
         if ("[(".includes(ch)) depth++;
         else if ("])".includes(ch)) depth = Math.max(0, depth - 1);
@@ -3227,7 +3268,10 @@ export function executeScript(source, options = {}) {
       for (let i = 0; i < working.length; i++) {
         const c = working[i];
         if (inStr) {
-          if (c === strCh) { inStr = false; strCh = null; }
+          if (c === strCh) {
+            if (working[i + 1] === strCh) { i++; continue; } // '' / "" escape
+            inStr = false; strCh = null;
+          }
         } else {
           if (c === "%") break;
           if (c === '"') { inStr = true; strCh = c; }
@@ -3254,7 +3298,12 @@ export function executeScript(source, options = {}) {
       let inStr = false, strCh = null;
       for (let i = 0; i < line.length; i++) {
         const c = line[i];
-        if (inStr) { if (c === strCh) { inStr = false; strCh = null; } }
+        if (inStr) {
+          if (c === strCh) {
+            if (line[i + 1] === strCh) { i++; continue; } // '' / "" escape
+            inStr = false; strCh = null;
+          }
+        }
         else if (c === "'" || c === '"') { inStr = true; strCh = c; }
         else if (c === "%") return line.slice(0, i);
       }
@@ -3264,7 +3313,12 @@ export function executeScript(source, options = {}) {
       let inStr = false, strCh = null, delta = 0;
       for (let i = 0; i < text.length; i++) {
         const c = text[i];
-        if (inStr) { if (c === strCh) { inStr = false; strCh = null; } }
+        if (inStr) {
+          if (c === strCh) {
+            if (text[i + 1] === strCh) { i++; continue; } // '' / "" escape
+            inStr = false; strCh = null;
+          }
+        }
         else if (c === "%") break;
         else if (c === '"') { inStr = true; strCh = c; }
         else if (c === "'") {
@@ -3312,7 +3366,10 @@ export function executeScript(source, options = {}) {
         const c = line[i];
         if (inStr) {
           result += c;
-          if (c === strCh) { inStr = false; strCh = null; }
+          if (c === strCh) {
+            if (line[i + 1] === strCh) { result += line[i + 1]; i += 2; continue; } // '' / "" escape
+            inStr = false; strCh = null;
+          }
           i++;
           continue;
         }
@@ -3451,7 +3508,12 @@ export function executeScript(source, options = {}) {
       const bsPos = [];
       for (let i = 0; i < line.length; i++) {
         const c = line[i];
-        if (inStr) { if (c === strCh) { inStr = false; strCh = null; } }
+        if (inStr) {
+          if (c === strCh) {
+            if (line[i + 1] === strCh) { i++; continue; } // '' / "" escape
+            inStr = false; strCh = null;
+          }
+        }
         else if (c === "%") break;
         else if (c === '"') { inStr = true; strCh = c; }
         else if (c === "'") {

@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useReducer, useEffect, useState } from 'react'
-import { loadLesson } from '../courses/courseLoader.js'
+import { loadLesson, loadLessonSource } from '../courses/courseLoader.js'
 import { builderReducer } from '../components/lesson-builder/builderReducer.js'
 import { emptyState, lessonToState, PALETTE_BLOCKS } from '../components/lesson-builder/builderUtils.js'
 import ComponentPalette from '../components/lesson-builder/ComponentPalette.jsx'
@@ -58,13 +58,14 @@ export default function LessonBuilderPage() {
     if (!chapterId || !lessonSlug) return
     let cancelled = false
     setLoading(true)
-    loadLesson(chapterId, lessonSlug).then(lesson => {
-      if (cancelled) return
-      if (lesson) {
-        dispatch({ type: 'LOAD', payload: lessonToState(lesson, chapterId, lessonSlug) })
-      }
-      setLoading(false)
-    }).catch(() => { if (!cancelled) setLoading(false) })
+    Promise.all([loadLesson(chapterId, lessonSlug), loadLessonSource(chapterId, lessonSlug)])
+      .then(([lesson, sourceText]) => {
+        if (cancelled) return
+        if (lesson) {
+          dispatch({ type: 'LOAD', payload: lessonToState(lesson, chapterId, lessonSlug, sourceText) })
+        }
+        setLoading(false)
+      }).catch(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [chapterId, lessonSlug])
 

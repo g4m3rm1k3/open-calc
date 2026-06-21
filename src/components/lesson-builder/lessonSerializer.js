@@ -1,10 +1,34 @@
-import { HANDLED_SECTION_KEYS, childrenToVizs } from './builderUtils.js'
+import { HANDLED_SECTION_KEYS, childrenToVizs, stateToBlocks } from './builderUtils.js'
 
-function fmtValue(v, depth = 1) {
+// Deterministic identifier for a diagram import, matching the hand-authored
+// convention (e.g. '../diagrams/la-drone-displacement.svg' -> 'laDroneDisplacementUrl').
+function pathToImportName(path) {
+  const base = (path.split('/').pop() ?? path).replace(/\.svg$/i, '')
+  const camel = base.replace(/[-_]+([a-zA-Z0-9])/g, (_, c) => c.toUpperCase())
+  return camel.charAt(0).toLowerCase() + camel.slice(1) + 'Url'
+}
+
+// Walk the built lesson object collecting every { __importRef, path }
+// marker (see builderUtils.js stateToBlocks) into path -> identifier,
+// de-duplicated by path so re-used diagrams don't get re-imported.
+function collectImports(v, importsMap) {
+  if (v === null || typeof v !== 'object') return
+  if (v.__importRef) {
+    if (v.path && !importsMap.has(v.path)) importsMap.set(v.path, pathToImportName(v.path))
+    return
+  }
+  if (Array.isArray(v)) { v.forEach(x => collectImports(x, importsMap)); return }
+  for (const val of Object.values(v)) collectImports(val, importsMap)
+}
+
+function fmtValue(v, depth = 1, importsMap = new Map()) {
   const pad = '  '.repeat(depth)
   const innerPad = '  '.repeat(depth + 1)
 
   if (v === null || v === undefined) return 'null'
+  if (typeof v === 'object' && v.__importRef) {
+    return v.path ? (importsMap.get(v.path) ?? 'undefined /* missing diagram path */') : 'undefined /* no diagram path set */'
+  }
   if (typeof v === 'string') return JSON.stringify(v)
   if (typeof v === 'number' || typeof v === 'boolean') return String(v)
 
@@ -14,14 +38,14 @@ function fmtValue(v, depth = 1) {
       const inline = '[' + v.map(x => JSON.stringify(x)).join(', ') + ']'
       if (inline.length < 72) return inline
     }
-    const items = v.map(x => innerPad + fmtValue(x, depth + 1))
+    const items = v.map(x => innerPad + fmtValue(x, depth + 1, importsMap))
     return '[\n' + items.join(',\n') + ',\n' + pad + ']'
   }
 
   if (typeof v === 'object') {
     const entries = Object.entries(v).filter(([, val]) => val !== undefined && val !== null)
     if (entries.length === 0) return '{}'
-    const lines = entries.map(([k, val]) => innerPad + k + ': ' + fmtValue(val, depth + 1))
+    const lines = entries.map(([k, val]) => innerPad + k + ': ' + fmtValue(val, depth + 1, importsMap))
     return '{\n' + lines.join(',\n') + ',\n' + pad + '}'
   }
 
@@ -94,11 +118,24 @@ export function buildLessonObject(state) {
   // are preserved verbatim.
   for (const sec of sections) {
     if (sec.type === 'intuition' || sec.type === 'rigor') {
-      base[sec.type] = {
-        ...(_raw?.[sec.type] ?? {}),
-        prose: sec.prose ?? [],
-        callouts: sec.callouts ?? [],
-        visualizations: childrenToVizs(sec.children),
+      if (Array.isArray(sec.blocks)) {
+        // blocks[] mode (prose+image pattern) supersedes prose/visualizations —
+        // both are dropped so MicroCycleLesson.jsx doesn't have a stale prose[]
+        // sitting unused alongside the real blocks[] content.
+        const { prose: _prose, visualizations: _viz, ...rest } = _raw?.[sec.type] ?? {}
+        base[sec.type] = {
+          ...rest,
+          blocks: stateToBlocks(sec.blocks),
+          callouts: sec.callouts ?? [],
+        }
+      } else {
+        base[sec.type] = {
+          ...(_raw?.[sec.type] ?? {}),
+          prose: sec.prose ?? [],
+          callouts: sec.callouts ?? [],
+          visualizations: childrenToVizs(sec.children),
+        }
+        delete base[sec.type].blocks
       }
     } else if (sec.type === 'math') {
       base.math = {
@@ -140,8 +177,13 @@ export function buildLessonObject(state) {
 
 export function serializeLesson(state) {
   const base = buildLessonObject(state)
-  const lines = Object.entries(base).map(([k, v]) => `  ${k}: ${fmtValue(v, 1)}`)
-  return `export default {\n${lines.join(',\n\n')},\n}\n`
+  const importsMap = new Map()
+  collectImports(base, importsMap)
+  const importLines = [...importsMap.entries()]
+    .map(([path, name]) => `import ${name} from '${path}?url'`)
+  const lines = Object.entries(base).map(([k, v]) => `  ${k}: ${fmtValue(v, 1, importsMap)}`)
+  const importBlock = importLines.length ? importLines.join('\n') + '\n\n' : ''
+  return `${importBlock}export default {\n${lines.join(',\n\n')},\n}\n`
 }
 
 export function getFilePath(state) {

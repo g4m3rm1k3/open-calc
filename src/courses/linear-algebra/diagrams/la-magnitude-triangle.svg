@@ -1,0 +1,33 @@
+<svg viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg     { fill: #f8fafc; }
+    .svg-muted  { fill: #94a3b8; }
+    .svg-text   { fill: #64748b; }
+    .svg-axis   { stroke: #94a3b8; }
+    .dark .svg-bg     { fill: #0f172a; }
+    .dark .svg-muted  { fill: #64748b; }
+    .dark .svg-text   { fill: #94a3b8; }
+    .dark .svg-axis   { stroke: #475569; }
+  </style>
+  <rect width="400" height="260" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="mt-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Right triangle: origin (70,210) -> (300,210) -> (300,50) -->
+  <line x1="70" y1="210" x2="300" y2="210" class="svg-axis" stroke-width="2.5"/>
+  <line x1="300" y1="210" x2="300" y2="50" class="svg-axis" stroke-width="2.5"/>
+  <polyline points="288,210 288,198 300,198" fill="none" class="svg-axis" stroke-width="1.5"/>
+
+  <!-- Hypotenuse = the vector -->
+  <line x1="70" y1="210" x2="296" y2="54" stroke="#2563eb" stroke-width="3.5" marker-end="url(#mt-arrow)"/>
+
+  <!-- Labels -->
+  <text x="185" y="230" font-size="16" class="svg-text" font-weight="700" text-anchor="middle" font-style="italic">x</text>
+  <text x="318" y="135" font-size="16" class="svg-text" font-weight="700" font-style="italic">y</text>
+  <text x="150" y="115" font-size="16" fill="#2563eb" font-weight="700" transform="rotate(-37, 150, 115)">‖v‖ = √(x² + y²)</text>
+
+  <text x="200" y="248" font-size="12" class="svg-muted" text-anchor="middle">Every vector hides a right triangle — magnitude is always the hypotenuse</text>
+</svg>

@@ -7,6 +7,14 @@ import LESSON_TITLES from '../data/lessonTitles.json'
 let ALL_MODULES = {}
 try { ALL_MODULES = import.meta.glob('./**/*.js') } catch {}   // lazy — paths only at init
 
+// Raw source text, for tooling (Lesson Builder) that needs to recover things
+// the evaluated module loses — e.g. an image block's `src` is an imported
+// identifier in the source file, but by the time the module is evaluated
+// it's just the final resolved URL string with no trace of which import
+// produced it.
+let ALL_MODULES_RAW = {}
+try { ALL_MODULES_RAW = import.meta.glob('./**/*.js', { query: '?raw', import: 'default' }) } catch {}
+
 let META_MODULES = {}
 try { META_MODULES = import.meta.glob('./*/meta.json', { eager: true }) } catch {}
 
@@ -113,6 +121,18 @@ export async function loadLesson(chapterId, slug) {
   if (!entry) return null
   const mod = await ALL_MODULES[entry._path]?.()
   return mod?.default ?? mod?.lesson ?? null
+}
+
+// Raw .js source text for a lesson — see ALL_MODULES_RAW comment above.
+export async function loadLessonSource(chapterId, slug) {
+  const m = chapterId.match(/^(.+)-(\d+)$/)
+  if (!m) return ''
+  const courseId = m[1]
+  const chNum = parseInt(m[2], 10)
+  const entry = tree[courseId]?.[chNum]?.lessons.find(l => l.slug === slug)
+  if (!entry) return ''
+  const text = await ALL_MODULES_RAW[entry._path]?.()
+  return text ?? ''
 }
 
 export function getVideos(courseId) {

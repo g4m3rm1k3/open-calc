@@ -1,0 +1,37 @@
+<svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; stroke: #e2e8f0; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-text  { fill: #334155; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; stroke: #334155; }
+    .dark .svg-muted { fill: #64748b; }
+    .dark .svg-text  { fill: #cbd5e1; }
+  </style>
+  <rect width="520" height="220" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="tp-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Panel 1: Physics -->
+  <rect x="16" y="16" width="152" height="188" rx="10" class="svg-panel" stroke-width="1.5"/>
+  <text x="92" y="38" font-size="12" fill="#2563eb" font-weight="700" text-anchor="middle">PHYSICS</text>
+  <line x1="60" y1="160" x2="120" y2="100" stroke="#2563eb" stroke-width="3" marker-end="url(#tp-arrow)"/>
+  <text x="92" y="186" font-size="11" class="svg-muted" text-anchor="middle">an arrow: length + direction</text>
+
+  <!-- Panel 2: Computer Science -->
+  <rect x="184" y="16" width="152" height="188" rx="10" class="svg-panel" stroke-width="1.5"/>
+  <text x="260" y="38" font-size="12" fill="#0891b2" font-weight="700" text-anchor="middle">COMPUTER SCIENCE</text>
+  <rect x="214" y="90" width="92" height="36" rx="6" fill="none" stroke="#0891b2" stroke-width="1.5"/>
+  <text x="260" y="113" font-size="15" fill="#0891b2" font-weight="700" text-anchor="middle" font-family="ui-monospace, monospace">[3, 4]</text>
+  <text x="260" y="186" font-size="11" class="svg-muted" text-anchor="middle">an ordered list of numbers</text>
+
+  <!-- Panel 3: Math -->
+  <rect x="352" y="16" width="152" height="188" rx="10" class="svg-panel" stroke-width="1.5"/>
+  <text x="428" y="38" font-size="12" fill="#7c3aed" font-weight="700" text-anchor="middle">MATHEMATICS</text>
+  <text x="428" y="108" font-size="16" fill="#7c3aed" font-weight="700" text-anchor="middle">u + v   and   c·v</text>
+  <text x="428" y="186" font-size="11" class="svg-muted" text-anchor="middle">anything you can add &amp; scale</text>
+</svg>
