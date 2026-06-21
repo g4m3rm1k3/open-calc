@@ -1,0 +1,50 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="200" rx="8" class="svg-bg"/>
+
+  <!-- Axes -->
+  <line x1="20" y1="100" x2="230" y2="100" stroke="#94a3b8" stroke-width="1.2"/>
+  <line x1="110" y1="20" x2="110" y2="190" stroke="#94a3b8" stroke-width="1.2"/>
+  <text x="232" y="104" font-size="10" class="svg-muted">x</text>
+  <text x="112" y="18" font-size="10" class="svg-muted">y</text>
+
+  <!-- Circle: center at (3,-2) in coords = pixel (140, 120) with r=5 = 40px -->
+  <circle cx="140" cy="120" r="52" fill="rgba(30,58,95,0.07)" stroke="#1e3a5f" stroke-width="2"/>
+
+  <!-- Center dot and label -->
+  <circle cx="140" cy="120" r="4" fill="#dc2626"/>
+  <text x="148" y="118" font-size="11" fill="#dc2626" font-weight="700">(3, −2)</text>
+
+  <!-- Radius line + label -->
+  <line x1="140" y1="120" x2="192" y2="120" stroke="#dc2626" stroke-width="1.8"/>
+  <text x="162" y="115" font-size="11" fill="#dc2626" font-weight="700">r = 5</text>
+
+  <!-- Point on circle at top + distance annotation -->
+  <circle cx="140" cy="68" r="3.5" fill="#7c3aed"/>
+  <text x="143" y="64" font-size="10" fill="#7c3aed">(x, y)</text>
+
+  <!-- Dashed lines showing horizontal + vertical distances -->
+  <line x1="140" y1="68" x2="140" y2="120" stroke="#7c3aed" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <line x1="140" y1="120" x2="192" y2="120" stroke="#dc2626" stroke-width="1.5"/>
+
+  <!-- Equation box -->
+  <rect x="252" y="30" width="220" height="140" rx="8" fill="rgba(30,58,95,0.05)" stroke="#1e3a5f" stroke-width="1.3"/>
+  <text x="362" y="58" font-size="12" fill="#1e3a5f" font-weight="700" text-anchor="middle">Standard Form</text>
+  <text x="362" y="82" font-size="13" fill="#1e3a5f" font-weight="700" text-anchor="middle">(x−h)²+(y−k)²=r²</text>
+  <line x1="265" y1="93" x2="462" y2="93" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="362" y="113" font-size="11" fill="#374151" text-anchor="middle">Example:</text>
+  <text x="362" y="131" font-size="12" fill="#1e3a5f" font-weight="700" text-anchor="middle">(x−3)²+(y+2)²=25</text>
+  <text x="362" y="150" font-size="10" fill="#64748b" text-anchor="middle">Center: (3, −2)  ·  Radius: 5</text>
+  <text x="362" y="165" font-size="10" fill="#64748b" text-anchor="middle">( ✓ because √25 = 5 )</text>
+</svg>

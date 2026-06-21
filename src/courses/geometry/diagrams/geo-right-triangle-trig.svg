@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; }
+    .svg-panel-s { stroke: #1e3a5f; fill: #eff6ff; }
+    .svg-panel-p { fill: #fdf4ff; stroke: #7c3aed; }
+    .svg-panel-b { fill: #f0f9ff; stroke: #1e3a5f; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f55; }
+    .dark .svg-panel-s { stroke: #93c5fd; fill: #1e3a5f44; }
+    .dark .svg-panel-p { fill: #4c1d9522; stroke: #a78bfa; }
+    .dark .svg-panel-b { fill: #0c4a6e22; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- Triangle: A=bottom-left (80,300), B=bottom-right (480,300), C=top-right (480,80) -->
+  <line x1="80"  y1="300" x2="480" y2="80"  stroke="#1e3a5f" stroke-width="3.5" class="svg-text" style="fill:none"/>
+  <line x1="480" y1="300" x2="480" y2="80"  stroke="#dc2626" stroke-width="3"   style="fill:none"/>
+  <line x1="80"  y1="300" x2="480" y2="300" stroke="#166534" stroke-width="3"   style="fill:none"/>
+
+  <!-- Right angle at B=(480,300) -->
+  <rect x="460" y="280" width="20" height="20" fill="none" stroke="#374151" stroke-width="2" class="svg-sub" style="fill:none"/>
+
+  <!-- Angle arc at A -->
+  <path d="M 130 300 A 50 50 0 0 0 97 261" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+  <text x="148" y="290" font-size="22" fill="#7c3aed" font-style="italic">θ</text>
+
+  <!-- Side labels -->
+  <text x="240" y="175" font-size="18" fill="#1e3a5f" font-weight="bold" class="svg-text" transform="rotate(-27,240,175)">Hypotenuse (c)</text>
+  <text x="492" y="198" font-size="17" fill="#dc2626" font-weight="bold">Opposite</text>
+  <text x="492" y="219" font-size="14" fill="#dc2626">(side across from θ)</text>
+  <text x="245" y="326" font-size="17" fill="#166534" font-weight="bold" text-anchor="middle">Adjacent (side next to θ)</text>
+
+  <!-- SOH-CAH-TOA panel -->
+  <rect x="20" y="20" width="320" height="155" rx="10" class="svg-panel-s" stroke-width="1.5"/>
+  <text x="180" y="48" font-size="17" font-weight="bold" class="svg-text" text-anchor="middle">SOH · CAH · TOA</text>
+  <text x="36" y="76"  font-size="14" class="svg-sub"><tspan font-weight="bold" fill="#7c3aed">S</tspan>OH:  sin θ = <tspan font-weight="bold" fill="#dc2626">Opposite</tspan> / <tspan font-weight="bold" class="svg-text">Hypotenuse</tspan></text>
+  <text x="36" y="102" font-size="14" class="svg-sub"><tspan font-weight="bold" fill="#7c3aed">C</tspan>AH:  cos θ = <tspan font-weight="bold" fill="#166534">Adjacent</tspan> / <tspan font-weight="bold" class="svg-text">Hypotenuse</tspan></text>
+  <text x="36" y="128" font-size="14" class="svg-sub"><tspan font-weight="bold" fill="#7c3aed">T</tspan>OA:  tan θ = <tspan font-weight="bold" fill="#dc2626">Opposite</tspan> / <tspan font-weight="bold" fill="#166534">Adjacent</tspan></text>
+  <text x="36" y="160" font-size="12" class="svg-muted" font-style="italic">Inverse: sin⁻¹, cos⁻¹, tan⁻¹ recover the angle from ratios</text>
+
+  <!-- Six trig functions panel -->
+  <rect x="540" y="20" width="165" height="195" rx="10" class="svg-panel-p" stroke-width="1.5"/>
+  <text x="622" y="45" font-size="14" fill="#7c3aed" font-weight="bold" text-anchor="middle">All 6 Ratios</text>
+  <text x="552" y="68"  font-size="13" class="svg-sub">sin θ = opp/hyp</text>
+  <text x="552" y="88"  font-size="13" class="svg-sub">cos θ = adj/hyp</text>
+  <text x="552" y="108" font-size="13" class="svg-sub">tan θ = opp/adj</text>
+  <line x1="550" y1="116" x2="695" y2="116" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="552" y="133" font-size="13" fill="#7c3aed">csc θ = hyp/opp</text>
+  <text x="552" y="153" font-size="13" fill="#7c3aed">sec θ = hyp/adj</text>
+  <text x="552" y="173" font-size="13" fill="#7c3aed">cot θ = adj/opp</text>
+  <text x="552" y="203" font-size="11" class="svg-muted" font-style="italic">↑ reciprocals of sin, cos, tan</text>
+
+  <!-- Pythagorean identity -->
+  <rect x="20" y="342" width="690" height="30" rx="6" class="svg-panel-b" stroke-width="1"/>
+  <text x="360" y="362" font-size="13" class="svg-text" text-anchor="middle">Pythagorean identity: sin²θ + cos²θ = 1  (follows from a² + b² = c² divided by c²)</text>
+</svg>

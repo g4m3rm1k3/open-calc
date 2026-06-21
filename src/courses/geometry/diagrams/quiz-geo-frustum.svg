@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="300" class="svg-bg"/>
+
+  <!-- Q1–Q5: Frustum problems -->
+  <text x="178" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q5: Frustum</text>
+
+  <!-- Frustum drawing: top r=3, bottom R=7, h=12 -->
+  <ellipse cx="178" cy="250" rx="100" ry="24" fill="#1e3a5f11" stroke="#1e3a5f" stroke-width="2"/>
+  <ellipse cx="178" cy="100" rx="44"  ry="10" fill="#1e3a5f22" stroke="#1e3a5f" stroke-width="1.5"/>
+  <line x1="134" y1="100" x2="78"  y2="250" stroke="#1e3a5f" stroke-width="2" style="fill:none"/>
+  <line x1="222" y1="100" x2="278" y2="250" stroke="#1e3a5f" stroke-width="2" style="fill:none"/>
+
+  <!-- Labels -->
+  <line x1="178" y1="100" x2="222" y2="100" stroke="#dc2626" stroke-width="1.5" style="fill:none"/>
+  <text x="200" y="93"  font-size="14" fill="#dc2626"  font-weight="bold" font-style="italic">r = 3</text>
+  <line x1="178" y1="250" x2="278" y2="250" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+  <text x="286" y="254" font-size="14" fill="#166534"  font-weight="bold" font-style="italic">R = 7</text>
+  <line x1="300" y1="100" x2="300" y2="250" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="293" y1="100" x2="307" y2="100" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="293" y1="250" x2="307" y2="250" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <text x="310" y="182" font-size="14" fill="#7c3aed"  font-weight="bold" font-style="italic">h = 12</text>
+
+  <!-- Slant -->
+  <line x1="222" y1="100" x2="278" y2="250" stroke="#b45309" stroke-width="2" stroke-dasharray="4,3" style="fill:none"/>
+  <text x="258" y="178" font-size="12" fill="#b45309" font-style="italic">l = ?</text>
+
+  <!-- Divider -->
+  <line x1="365" y1="15" x2="365" y2="275" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Q6–Q10: Composite -->
+  <text x="544" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q6–Q10: Composite solid</text>
+  <!-- Hemisphere on top of cylinder -->
+  <ellipse cx="544" cy="240" rx="80" ry="18" fill="#1e3a5f11" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="464" y1="140" x2="464" y2="240" stroke="#1e3a5f" stroke-width="2" style="fill:none"/>
+  <line x1="624" y1="140" x2="624" y2="240" stroke="#1e3a5f" stroke-width="2" style="fill:none"/>
+  <ellipse cx="544" cy="140" rx="80" ry="18" fill="#1e3a5f18" stroke="#1e3a5f88" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <path d="M 464 140 A 80 80 0 0 1 624 140" fill="#dc262614" stroke="#dc2626" stroke-width="2"/>
+
+  <!-- Labels -->
+  <line x1="544" y1="140" x2="624" y2="140" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+  <text x="587" y="133" font-size="14" fill="#166534" font-weight="bold" font-style="italic">r=5</text>
+  <line x1="638" y1="140" x2="638" y2="240" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="630" y1="140" x2="646" y2="140" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="630" y1="240" x2="646" y2="240" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <text x="650" y="196" font-size="14" fill="#7c3aed" font-weight="bold" font-style="italic">h=8</text>
+  <text x="544" y="92" font-size="12" fill="#dc2626" text-anchor="middle" font-style="italic">hemisphere r=5</text>
+
+  <!-- Formula strip -->
+  <rect x="10" y="275" width="700" height="22" rx="5" class="svg-rule" stroke-width="1"/>
+  <text x="360" y="290" font-size="12" class="svg-text" text-anchor="middle">Frustum V=(πh/3)(R²+Rr+r²) · l=√(h²+(R−r)²) · Composite: add/subtract component volumes</text>
+</svg>

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="280" class="svg-bg"/>
+
+  <!-- Left: Area and length probability -->
+  <text x="178" y="18" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q5: Area and length models</text>
+
+  <!-- Square with inscribed circle -->
+  <rect x="20" y="28" width="140" height="140" fill="#eff6ff" stroke="#1e3a5f" stroke-width="2"/>
+  <circle cx="90" cy="98" r="70" fill="#bbf7d0" stroke="#166534" stroke-width="2"/>
+  <text x="90" y="98" font-size="11" fill="#166534" text-anchor="middle" font-weight="bold">r=70</text>
+  <text x="90" y="178" font-size="11" class="svg-sub" text-anchor="middle">Square 140×140</text>
+  <text x="90" y="194" font-size="11" class="svg-muted" text-anchor="middle">P(point in circle) = ?</text>
+
+  <!-- Length model: [0,10] segment, favorable [3,7] -->
+  <line x1="20" y1="234" x2="310" y2="234" stroke="#94a3b8" stroke-width="2" style="fill:none"/>
+  <rect x="20" y="220" width="290" height="14" fill="#eff6ff" stroke="#94a3b8" stroke-width="1" opacity="0.7"/>
+  <rect x="107" y="220" width="116" height="14" fill="#bbf7d0" stroke="#166534" stroke-width="1.5"/>
+  <text x="20" y="250" font-size="11" class="svg-muted">0</text>
+  <text x="305" y="250" font-size="11" class="svg-muted">10</text>
+  <text x="107" y="260" font-size="11" fill="#166534">3</text>
+  <text x="223" y="260" font-size="11" fill="#166534">7</text>
+  <text x="175" y="275" font-size="11" class="svg-sub" text-anchor="middle">P(uniform on [0,10] lands in [3,7]) = ?</text>
+
+  <!-- Divider -->
+  <line x1="330" y1="10" x2="330" y2="268" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Right: Dartboard / angle probability -->
+  <text x="525" y="18" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q6–Q10: Sectors and compound</text>
+
+  <!-- Dartboard: ring target -->
+  <circle cx="440" cy="128" r="90" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+  <circle cx="440" cy="128" r="60" fill="#fde68a" stroke="#b45309" stroke-width="2"/>
+  <circle cx="440" cy="128" r="30" fill="#dc2626" stroke="#b45309" stroke-width="2"/>
+  <text x="440" y="132" font-size="10" fill="#fff" text-anchor="middle">r=30</text>
+  <text x="440" y="172" font-size="10" fill="#b45309" text-anchor="middle">r=60</text>
+  <text x="440" y="210" font-size="10" fill="#b45309" text-anchor="middle">r=90</text>
+  <text x="440" y="232" font-size="11" class="svg-sub" text-anchor="middle">P(bullseye | hits board) = ?</text>
+  <text x="440" y="248" font-size="11" class="svg-muted" text-anchor="middle">P(yellow ring | hits board) = ?</text>
+
+  <!-- Sector angle model -->
+  <path d="M 600 140 L 600 50 A 90 90 0 0 1 690 140 Z" fill="#bbf7d0" stroke="#166534" stroke-width="1.5"/>
+  <path d="M 600 140 L 690 140 A 90 90 0 0 1 600 230 Z" fill="#eff6ff" stroke="#1e3a5f" stroke-width="1.5"/>
+  <path d="M 600 140 L 600 230 A 90 90 0 0 1 510 140 Z" fill="#fde68a" stroke="#b45309" stroke-width="1.5"/>
+  <path d="M 600 140 L 510 140 A 90 90 0 0 1 600 50 Z" fill="#fdf4ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="640" y="105" font-size="10" fill="#166534" text-anchor="middle">90°</text>
+  <text x="640" y="178" font-size="10" class="svg-text" text-anchor="middle">90°</text>
+  <text x="558" y="192" font-size="10" fill="#b45309" text-anchor="middle">90°</text>
+  <text x="558" y="112" font-size="10" fill="#7c3aed" text-anchor="middle">90°</text>
+  <text x="600" y="258" font-size="11" class="svg-sub" text-anchor="middle">P(land on green) = ?</text>
+
+  <!-- Formula strip -->
+  <rect x="10" y="255" width="700" height="20" rx="4" class="svg-rule" stroke-width="1"/>
+  <text x="360" y="269" font-size="11" class="svg-text" text-anchor="middle">P = favorable area / total area · P = favorable length / total length · P = sector angle / 360°</text>
+</svg>

@@ -1,0 +1,72 @@
+<svg viewBox="0 0 480 210" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="210" rx="8" class="svg-bg"/>
+
+  <!-- ── 45-45-90 Triangle (left) ── -->
+  <rect x="8" y="8" width="225" height="195" rx="7" fill="rgba(30,58,95,0.04)" stroke="#1e3a5f" stroke-width="1.2"/>
+  <text x="117" y="28" font-size="12" fill="#1e3a5f" font-weight="700" text-anchor="middle">45°-45°-90° Triangle</text>
+
+  <!-- Triangle: right angle at bottom-right -->
+  <!-- A=(40,170), B=(40,80), C=(140,170) — legs both = 90px (equal!) -->
+  <polygon points="40,170 40,80 140,170" fill="rgba(30,58,95,0.09)" stroke="#1e3a5f" stroke-width="2"/>
+  <rect x="40" y="158" width="12" height="12" fill="none" stroke="#1e3a5f" stroke-width="1.5"/>
+
+  <!-- Angle labels -->
+  <text x="30" y="77" font-size="11" fill="#1e3a5f" font-weight="700">45°</text>
+  <text x="104" y="166" font-size="11" fill="#1e3a5f" font-weight="700">45°</text>
+  <text x="18" y="165" font-size="10" fill="#dc2626" font-weight="700">90°</text>
+
+  <!-- Side labels -->
+  <text x="27" y="132" font-size="13" fill="#1e3a5f" font-weight="700" text-anchor="middle">1</text>
+  <text x="90" y="183" font-size="13" fill="#1e3a5f" font-weight="700" text-anchor="middle">1</text>
+  <text x="102" y="115" font-size="13" fill="#dc2626" font-weight="700">√2</text>
+
+  <!-- Reference box -->
+  <rect x="155" y="80" width="70" height="80" rx="6" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="1.2"/>
+  <text x="190" y="100" font-size="10" fill="#1e3a5f" font-weight="700" text-anchor="middle">Ratio</text>
+  <text x="190" y="118" font-size="11" fill="#1e3a5f" text-anchor="middle">1 : 1 : √2</text>
+  <text x="190" y="138" font-size="9" fill="#64748b" text-anchor="middle">legs equal</text>
+  <text x="190" y="152" font-size="9" fill="#64748b" text-anchor="middle">hyp = leg√2</text>
+
+  <text x="117" y="198" font-size="9" class="svg-muted" text-anchor="middle">From half a square: diagonal = side × √2</text>
+
+  <!-- ── 30-60-90 Triangle (right) ── -->
+  <rect x="248" y="8" width="225" height="195" rx="7" fill="rgba(26,58,42,0.04)" stroke="#1a3a2a" stroke-width="1.2"/>
+  <text x="360" y="28" font-size="12" fill="#1a3a2a" font-weight="700" text-anchor="middle">30°-60°-90° Triangle</text>
+
+  <!-- Triangle: A=(270,170), B=(270,80), C=(390,170) — short leg=45 (∝1), long leg=78 (∝√3) -->
+  <!-- Vertices: 30° at top, 60° at bottom-right, 90° at bottom-left -->
+  <!-- Short leg (opp 30°): 90px = 1 unit. Long leg (opp 60°): 90√3 ≈ 156px — that's too big. Scale: short leg = 55px, long leg = 95px, hyp = 110px -->
+  <polygon points="275,170 275,80 385,170" fill="rgba(26,58,42,0.09)" stroke="#1a3a2a" stroke-width="2"/>
+  <rect x="275" y="158" width="12" height="12" fill="none" stroke="#1a3a2a" stroke-width="1.5"/>
+
+  <!-- Angle labels -->
+  <text x="263" y="77" font-size="11" fill="#1a3a2a" font-weight="700">30°</text>
+  <text x="344" y="163" font-size="11" fill="#1a3a2a" font-weight="700">60°</text>
+  <text x="255" y="163" font-size="10" fill="#dc2626" font-weight="700">90°</text>
+
+  <!-- Side labels: short leg (vertical, opp 30°)=1, long leg (horizontal, opp 60°)=√3, hypotenuse=2 -->
+  <text x="263" y="132" font-size="13" fill="#1a3a2a" font-weight="700" text-anchor="middle">1</text>
+  <text x="330" y="185" font-size="13" fill="#1a3a2a" font-weight="700" text-anchor="middle">√3</text>
+  <text x="348" y="110" font-size="13" fill="#dc2626" font-weight="700">2</text>
+
+  <!-- Reference box -->
+  <rect x="395" y="80" width="70" height="80" rx="6" fill="rgba(26,58,42,0.08)" stroke="#1a3a2a" stroke-width="1.2"/>
+  <text x="430" y="100" font-size="10" fill="#1a3a2a" font-weight="700" text-anchor="middle">Ratio</text>
+  <text x="430" y="118" font-size="11" fill="#1a3a2a" text-anchor="middle">1 : √3 : 2</text>
+  <text x="430" y="138" font-size="9" fill="#64748b" text-anchor="middle">short : long : hyp</text>
+  <text x="430" y="152" font-size="9" fill="#64748b" text-anchor="middle">opp 30°: opp 60°: hyp</text>
+
+  <text x="360" y="198" font-size="9" class="svg-muted" text-anchor="middle">From half an equilateral triangle: hyp = 2 × short side</text>
+</svg>

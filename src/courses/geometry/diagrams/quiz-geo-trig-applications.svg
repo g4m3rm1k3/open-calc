@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="300" class="svg-bg"/>
+
+  <!-- Scene 1: Two angles, one tower -->
+  <text x="175" y="22" font-size="14" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q3: Two angles, one tower</text>
+
+  <!-- Ground line -->
+  <line x1="20" y1="240" x2="350" y2="240" stroke="#374151" stroke-width="2" style="fill:none"/>
+  <!-- Tower -->
+  <rect x="300" y="100" width="20" height="140" fill="#1e3a5f22" stroke="#1e3a5f" stroke-width="2"/>
+  <text x="310" y="96" font-size="12" class="svg-text" text-anchor="middle">T</text>
+  <text x="332" y="175" font-size="13" class="svg-text">h = ?</text>
+
+  <!-- Point A -->
+  <circle cx="100" cy="240" r="5" fill="#dc2626"/>
+  <text x="88" y="258" font-size="12" fill="#dc2626">A</text>
+  <!-- Point B -->
+  <circle cx="180" cy="240" r="5" fill="#166534"/>
+  <text x="168" y="258" font-size="12" fill="#166534">B</text>
+
+  <!-- Sight lines -->
+  <line x1="100" y1="240" x2="300" y2="100" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="5,4" style="fill:none"/>
+  <path d="M 150 240 A 50 50 0 0 0 128 204" fill="none" stroke="#dc2626" stroke-width="2"/>
+  <text x="155" y="232" font-size="13" fill="#dc2626">30°</text>
+
+  <line x1="180" y1="240" x2="300" y2="100" stroke="#166534" stroke-width="1.8" stroke-dasharray="5,4" style="fill:none"/>
+  <path d="M 225 240 A 45 45 0 0 0 204 206" fill="none" stroke="#166534" stroke-width="2"/>
+  <text x="228" y="234" font-size="13" fill="#166534">45°</text>
+
+  <!-- Distance labels -->
+  <text x="136" y="256" font-size="11" class="svg-sub" text-anchor="middle">20 m</text>
+  <text x="240" y="256" font-size="11" class="svg-sub" text-anchor="middle">d m</text>
+  <line x1="100" y1="250" x2="180" y2="250" stroke="#374151" stroke-width="1" style="fill:none"/>
+  <line x1="180" y1="250" x2="300" y2="250" stroke="#374151" stroke-width="1" style="fill:none"/>
+
+  <!-- Divider -->
+  <line x1="365" y1="20" x2="365" y2="280" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Scene 2: Ship navigation -->
+  <text x="542" y="22" font-size="14" font-weight="bold" class="svg-sub" text-anchor="middle">Q4–Q6: Ship navigation</text>
+
+  <!-- Ship starts at S -->
+  <circle cx="420" cy="250" r="5" class="svg-text" style="fill:#1e3a5f;stroke:none"/>
+  <text x="404" y="265" font-size="12" class="svg-text">S</text>
+  <!-- N line from S -->
+  <line x1="420" y1="160" x2="420" y2="250" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3" style="fill:none"/>
+  <text x="415" y="155" font-size="12" class="svg-muted">N</text>
+
+  <!-- Leg 1: bearing 050°, 60km -->
+  <line x1="420" y1="250" x2="466" y2="211" stroke="#dc2626" stroke-width="2.5" style="fill:none"/>
+  <circle cx="466" cy="211" r="5" fill="#dc2626"/>
+  <text x="472" y="208" font-size="12" fill="#dc2626">P</text>
+  <text x="442" y="228" font-size="11" fill="#dc2626">060 km</text>
+  <path d="M 420 180 A 70 70 0 0 1 455 214" fill="none" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="432" y="196" font-size="11" fill="#dc2626">050°</text>
+
+  <!-- Leg 2: bearing 140°, 80km -->
+  <line x1="466" y1="211" x2="517" y2="272" stroke="#1e3a5f" stroke-width="2.5" style="fill:none"/>
+  <circle cx="517" cy="272" r="5" class="svg-text" style="fill:#1e3a5f;stroke:none"/>
+  <text x="523" y="274" font-size="12" class="svg-text">Q</text>
+  <text x="490" y="250" font-size="11" class="svg-text">080 km</text>
+  <!-- N line from P -->
+  <line x1="466" y1="155" x2="466" y2="215" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3" style="fill:none"/>
+  <text x="462" y="150" font-size="12" class="svg-muted">N</text>
+  <path d="M 466 175 A 60 60 0 0 1 514 208" fill="none" stroke="#1e3a5f" stroke-width="1.5"/>
+  <text x="488" y="180" font-size="11" class="svg-text">140°</text>
+
+  <!-- Return distance S→Q -->
+  <line x1="420" y1="250" x2="517" y2="272" stroke="#b45309" stroke-width="1.5" stroke-dasharray="6,4" style="fill:none"/>
+  <text x="462" y="276" font-size="11" fill="#b45309">SQ = ?</text>
+
+  <!-- Formula strip -->
+  <rect x="10" y="280" width="700" height="18" rx="4" class="svg-rule" stroke-width="1"/>
+  <text x="360" y="293" font-size="12" class="svg-text" text-anchor="middle">Multi-step: set up equations from each angle · Bearing: angle from North, clockwise, 3 digits</text>
+</svg>

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="300" class="svg-bg"/>
+
+  <!-- Q1–Q5: Identify V, E, F for solids -->
+  <text x="178" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q5: Count V, E, F and verify</text>
+
+  <!-- Triangular prism -->
+  <text x="90" y="44" font-size="12" class="svg-sub" text-anchor="middle">Triangular prism</text>
+  <!-- front triangle: (30,200)(150,200)(90,130) back: (60,175)(180,175)(120,105) -->
+  <polygon points="30,200 150,200 90,130" fill="#dc262614" stroke="#dc2626" stroke-width="2"/>
+  <line x1="30"  y1="200" x2="60"  y2="175" stroke="#dc2626" stroke-width="2" style="fill:none"/>
+  <line x1="150" y1="200" x2="180" y2="175" stroke="#dc2626" stroke-width="2" style="fill:none"/>
+  <line x1="90"  y1="130" x2="120" y2="105" stroke="#dc2626" stroke-width="2" style="fill:none"/>
+  <polygon points="60,175 180,175 120,105" fill="#dc262620" stroke="#dc2626" stroke-width="2"/>
+  <line x1="30"  y1="200" x2="150" y2="200" stroke="#dc2626" stroke-width="2" style="fill:none"/>
+  <line x1="60"  y1="175" x2="120" y2="105" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="60"  y1="175" x2="180" y2="175" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <!-- V dots -->
+  <circle cx="30"  cy="200" r="4" fill="#dc2626"/>
+  <circle cx="150" cy="200" r="4" fill="#dc2626"/>
+  <circle cx="90"  cy="130" r="4" fill="#dc2626"/>
+  <circle cx="60"  cy="175" r="4" fill="#dc2626"/>
+  <circle cx="180" cy="175" r="4" fill="#dc2626"/>
+  <circle cx="120" cy="105" r="4" fill="#dc2626"/>
+  <text x="90" y="234" font-size="12" class="svg-sub" text-anchor="middle">V=?  E=?  F=?</text>
+
+  <!-- Divider -->
+  <line x1="230" y1="30" x2="230" y2="260" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Square pyramid -->
+  <text x="345" y="44" font-size="12" class="svg-sub" text-anchor="middle">Square pyramid</text>
+  <!-- Base: (260,210)(390,210)(420,175)(290,175) -->
+  <polygon points="260,210 390,210 420,175 290,175" fill="#16653414" stroke="#166534" stroke-width="2"/>
+  <!-- Apex at (340,100) -->
+  <line x1="260" y1="210" x2="340" y2="100" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <line x1="390" y1="210" x2="340" y2="100" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <line x1="420" y1="175" x2="340" y2="100" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <line x1="290" y1="175" x2="340" y2="100" stroke="#166534" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="290" y1="175" x2="420" y2="175" stroke="#166534" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <!-- V dots -->
+  <circle cx="260" cy="210" r="4" fill="#166534"/>
+  <circle cx="390" cy="210" r="4" fill="#166534"/>
+  <circle cx="420" cy="175" r="4" fill="#166534"/>
+  <circle cx="290" cy="175" r="4" fill="#166534"/>
+  <circle cx="340" cy="100" r="4" fill="#166534"/>
+  <text x="345" y="244" font-size="12" class="svg-sub" text-anchor="middle">V=?  E=?  F=?</text>
+
+  <!-- Divider -->
+  <line x1="465" y1="30" x2="465" y2="260" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Q6-Q10: Euler formula applications -->
+  <text x="590" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q6–Q10: Apply V−E+F=2</text>
+  <!-- Table -->
+  <rect x="474" y="36" width="236" height="205" rx="8" class="svg-rule" stroke-width="1"/>
+  <text x="592" y="56" font-size="12" class="svg-text" font-weight="bold" text-anchor="middle">Polyhedron  V  E  F</text>
+  <line x1="476" y1="62" x2="708" y2="62" stroke="#94a3b8" stroke-width="1" style="fill:none"/>
+  <text x="484" y="78" font-size="12" class="svg-sub">Tetrahedron  4  6  ?</text>
+  <text x="484" y="96" font-size="12" class="svg-sub">Cube         8  ?  6</text>
+  <text x="484" y="114" font-size="12" class="svg-sub">Octahedron   ?  12  8</text>
+  <text x="484" y="132" font-size="12" class="svg-sub">Dodecahedron 20  ?  12</text>
+  <text x="484" y="150" font-size="12" class="svg-sub">Icosahedron  12  30  ?</text>
+  <line x1="476" y1="158" x2="708" y2="158" stroke="#94a3b8" stroke-width="1" style="fill:none"/>
+  <text x="484" y="174" font-size="12" fill="#7c3aed">Use V − E + F = 2</text>
+  <text x="484" y="190" font-size="12" fill="#7c3aed">to find missing values</text>
+  <text x="484" y="210" font-size="11" class="svg-muted">χ = V−E+F is Euler characteristic</text>
+  <text x="484" y="226" font-size="11" class="svg-muted">= 2 for all convex polyhedra</text>
+
+  <!-- Formula strip -->
+  <rect x="10" y="270" width="700" height="22" rx="5" class="svg-rule" stroke-width="1"/>
+  <text x="360" y="285" font-size="12" class="svg-text" text-anchor="middle">V − E + F = 2  (Euler's formula) — holds for any convex polyhedron</text>
+</svg>

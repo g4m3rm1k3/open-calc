@@ -1,0 +1,68 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="200" rx="8" class="svg-bg"/>
+  <text x="240" y="16" font-size="10" class="svg-muted" text-anchor="middle" font-weight="600">Four Conic Sections — from One Double Cone</text>
+
+  <!-- CIRCLE (n=1) -->
+  <circle cx="55" cy="100" r="40" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="2"/>
+  <text x="55" y="155" font-size="11" fill="#1e3a5f" font-weight="700" text-anchor="middle">Circle</text>
+  <text x="55" y="169" font-size="9" class="svg-muted" text-anchor="middle">slice ⊥ axis</text>
+  <text x="55" y="183" font-size="9" class="svg-muted" text-anchor="middle">x²+y²=r²</text>
+
+  <!-- Divider -->
+  <line x1="108" y1="20" x2="108" y2="190" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- ELLIPSE -->
+  <ellipse cx="173" cy="100" rx="55" ry="35" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="2"/>
+  <!-- Foci -->
+  <circle cx="143" cy="100" r="3" fill="#dc2626"/>
+  <circle cx="203" cy="100" r="3" fill="#dc2626"/>
+  <text x="143" y="94" font-size="9" fill="#dc2626">F₁</text>
+  <text x="203" y="94" font-size="9" fill="#dc2626">F₂</text>
+  <text x="173" y="155" font-size="11" fill="#1e3a5f" font-weight="700" text-anchor="middle">Ellipse</text>
+  <text x="173" y="169" font-size="9" class="svg-muted" text-anchor="middle">slice at angle</text>
+  <text x="173" y="183" font-size="9" class="svg-muted" text-anchor="middle">x²/a²+y²/b²=1</text>
+
+  <!-- Divider -->
+  <line x1="240" y1="20" x2="240" y2="190" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- PARABOLA -->
+  <!-- y = x²/600 scaled: vertex at (300,140), opens up -->
+  <path d="M 255 145 Q 300 30 345 145" fill="rgba(26,58,42,0.08)" stroke="#1a3a2a" stroke-width="2"/>
+  <!-- Focus and directrix -->
+  <circle cx="300" cy="95" r="3" fill="#dc2626"/>
+  <text x="308" y="94" font-size="9" fill="#dc2626">F</text>
+  <line x1="255" y1="150" x2="345" y2="150" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <text x="350" y="153" font-size="9" fill="#dc2626">directrix</text>
+  <text x="300" y="165" font-size="11" fill="#1a3a2a" font-weight="700" text-anchor="middle">Parabola</text>
+  <text x="300" y="179" font-size="9" class="svg-muted" text-anchor="middle">slice ∥ slant edge</text>
+  <text x="300" y="193" font-size="9" class="svg-muted" text-anchor="middle">y = ax²</text>
+
+  <!-- Divider -->
+  <line x1="360" y1="20" x2="360" y2="190" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- HYPERBOLA -->
+  <!-- Left branch -->
+  <path d="M 375 30 Q 385 100 375 170" fill="none" stroke="#7c3aed" stroke-width="2"/>
+  <!-- Right branch -->
+  <path d="M 465 30 Q 455 100 465 170" fill="none" stroke="#7c3aed" stroke-width="2"/>
+  <!-- Asymptotes (dashed) -->
+  <line x1="370" y1="25" x2="470" y2="175" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+  <line x1="470" y1="25" x2="370" y2="175" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+  <!-- Foci -->
+  <circle cx="400" cy="100" r="3" fill="#dc2626"/>
+  <circle cx="440" cy="100" r="3" fill="#dc2626"/>
+  <text x="420" y="175" font-size="11" fill="#7c3aed" font-weight="700" text-anchor="middle">Hyperbola</text>
+  <text x="420" y="189" font-size="9" class="svg-muted" text-anchor="middle">x²/a²−y²/b²=1</text>
+</svg>

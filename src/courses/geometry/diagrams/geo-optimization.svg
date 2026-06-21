@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .svg-warn  { fill: #fff7ed; stroke: #b45309; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+    .dark .svg-warn  { fill: #7c2d1222; stroke: #fb923c; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- Title -->
+  <text x="360" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Optimization with Geometry</text>
+
+  <!-- ===== Problem 1: Maximize area, fixed perimeter ===== -->
+  <text x="120" y="44" font-size="13" class="svg-sub" font-weight="bold" text-anchor="middle">Max area, fixed perimeter</text>
+  <text x="120" y="60" font-size="12" class="svg-muted" text-anchor="middle">P = 40m — which shape wins?</text>
+
+  <!-- Rectangle 10×10 = 100 -->
+  <rect x="20" y="68" width="80" height="80" fill="#bbf7d0" stroke="#166534" stroke-width="2"/>
+  <text x="60" y="114" font-size="11" fill="#166534" text-anchor="middle" font-weight="bold">Square</text>
+  <text x="60" y="128" font-size="11" fill="#166534" text-anchor="middle">10×10=100m²</text>
+
+  <!-- Rectangle 16×4 = 64 -->
+  <rect x="118" y="88" width="64" height="16" fill="#eff6ff" stroke="#1e3a5f" stroke-width="2"/>
+  <text x="150" y="121" font-size="11" class="svg-text" text-anchor="middle">16×4=64m²</text>
+
+  <!-- Circle r=40/2π ≈ 6.37, A = 400/π ≈ 127.3 -->
+  <circle cx="38" cy="195" r="28" fill="#fde68a" stroke="#b45309" stroke-width="2"/>
+  <text x="38" y="198" font-size="10" fill="#b45309" text-anchor="middle">Circle</text>
+  <text x="38" y="210" font-size="10" fill="#b45309" text-anchor="middle">≈127.3m²</text>
+  <text x="38" y="226" font-size="9" fill="#b45309" text-anchor="middle">WINNER!</text>
+
+  <!-- Insight box -->
+  <rect x="8" y="238" width="224" height="58" rx="6" class="svg-panel" stroke-width="1"/>
+  <text x="120" y="256" font-size="12" class="svg-text" font-weight="bold" text-anchor="middle">Isoperimetric inequality</text>
+  <text x="120" y="273" font-size="12" class="svg-sub" text-anchor="middle">A ≤ P²/(4π)</text>
+  <text x="120" y="289" font-size="12" class="svg-sub" text-anchor="middle">Equality iff shape is a circle</text>
+
+  <!-- ===== Problem 2: Min perimeter, fixed area ===== -->
+  <text x="365" y="44" font-size="13" class="svg-sub" font-weight="bold" text-anchor="middle">Farmer fence problem</text>
+  <text x="365" y="60" font-size="12" class="svg-muted" text-anchor="middle">200m fence, one wall = river</text>
+
+  <!-- River line -->
+  <line x1="248" y1="170" x2="502" y2="170" stroke="#1e3a5f" stroke-width="3" style="fill:none"/>
+  <text x="375" y="185" font-size="12" class="svg-text" text-anchor="middle">RIVER (free wall)</text>
+
+  <!-- Optimal enclosure: w=50, l=100 -->
+  <rect x="290" y="68" width="160" height="102" fill="#bbf7d088" stroke="#166534" stroke-width="2"/>
+  <line x1="290" y1="68" x2="290" y2="170" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <line x1="450" y1="68" x2="450" y2="170" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <line x1="290" y1="68" x2="450" y2="68" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <!-- Labels -->
+  <text x="278" y="120" font-size="12" fill="#166534" text-anchor="end">w</text>
+  <text x="462" y="120" font-size="12" fill="#166534">w</text>
+  <text x="370" y="57" font-size="12" fill="#166534" text-anchor="middle">l = 200 - 2w</text>
+  <text x="370" y="122" font-size="13" fill="#166534" font-weight="bold" text-anchor="middle">A = w(200-2w)</text>
+  <text x="370" y="140" font-size="12" class="svg-sub" text-anchor="middle">max at w=50: A=50×100=5000m²</text>
+
+  <!-- Parabola sketch -->
+  <path d="M 254 165 Q 375 60 500 165" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <circle cx="375" cy="80" r="4" fill="#dc2626"/>
+  <text x="382" y="78" font-size="10" fill="#dc2626">max (w=50)</text>
+
+  <!-- ===== Problem 3: Open box from sheet ===== -->
+  <text x="615" y="44" font-size="13" class="svg-sub" font-weight="bold" text-anchor="middle">Open box (corner cuts)</text>
+
+  <!-- Sheet outline -->
+  <rect x="548" y="58" width="134" height="100" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+  <!-- Corner cuts -->
+  <rect x="548" y="58"  width="18" height="18" fill="#fafaf8" stroke="#b45309" stroke-width="1.5"/>
+  <rect x="664" y="58"  width="18" height="18" fill="#fafaf8" stroke="#b45309" stroke-width="1.5"/>
+  <rect x="548" y="140" width="18" height="18" fill="#fafaf8" stroke="#b45309" stroke-width="1.5"/>
+  <rect x="664" y="140" width="18" height="18" fill="#fafaf8" stroke="#b45309" stroke-width="1.5"/>
+  <text x="557" y="70" font-size="9" fill="#b45309" text-anchor="middle">x</text>
+  <text x="557" y="84" font-size="9" fill="#b45309" text-anchor="middle">x</text>
+  <text x="615" y="74" font-size="11" fill="#b45309" text-anchor="middle">sheet: a×b</text>
+  <text x="615" y="90" font-size="11" fill="#b45309" text-anchor="middle">cut corner x</text>
+  <text x="615" y="106" font-size="11" fill="#b45309" text-anchor="middle">Box: (a-2x)×(b-2x)×x</text>
+
+  <!-- Volume formula -->
+  <rect x="538" y="175" width="174" height="56" rx="6" class="svg-warn" stroke-width="1"/>
+  <text x="625" y="193" font-size="12" fill="#b45309" font-weight="bold" text-anchor="middle">V(x) = x(a-2x)(b-2x)</text>
+  <text x="625" y="210" font-size="12" class="svg-sub" text-anchor="middle">Expand, differentiate, set =0</text>
+  <text x="625" y="226" font-size="12" class="svg-sub" text-anchor="middle">→ cubic in x (use calc or graph)</text>
+
+  <!-- Bottom strip: approach summary -->
+  <rect x="10" y="298" width="700" height="76" rx="8" class="svg-panel" stroke-width="1.5"/>
+  <text x="360" y="316" font-size="13" class="svg-text" font-weight="bold" text-anchor="middle">Optimization Strategy (No Calculus)</text>
+  <text x="20" y="334" font-size="12" class="svg-sub">1. Write the objective function in terms of ONE variable using a constraint to eliminate others</text>
+  <text x="20" y="351" font-size="12" class="svg-sub">2. For a quadratic f(x) = ax² + bx + c, vertex is at x = -b/(2a) — this is the extremum</text>
+  <text x="20" y="368" font-size="12" class="svg-sub">3. Check the boundary values too — the answer may be at an endpoint, not the interior</text>
+</svg>

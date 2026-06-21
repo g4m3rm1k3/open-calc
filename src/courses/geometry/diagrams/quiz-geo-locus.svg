@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="300" class="svg-bg"/>
+
+  <!-- Q1–Q5: Perp bisector / circle locus problems -->
+  <text x="178" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q5: Identify or find the locus</text>
+
+  <!-- Grid -->
+  <line x1="20"  y1="165" x2="338" y2="165" stroke="#e2e8f0" stroke-width="1" style="fill:none"/>
+  <line x1="178" y1="25"  x2="178" y2="285" stroke="#e2e8f0" stroke-width="1" style="fill:none"/>
+  <text x="340" y="169" font-size="10" class="svg-muted">x</text>
+  <text x="180" y="22"  font-size="10" class="svg-muted">y</text>
+
+  <!-- Two points A=(1,2) and B=(7,2), origin=(18,165), unit=40 -->
+  <!-- A→(58,85) B→(298,85) -->
+  <circle cx="58"  cy="85" r="6" fill="#dc2626"/>
+  <circle cx="298" cy="85" r="6" fill="#166534"/>
+  <text x="36" y="78" font-size="13" fill="#dc2626"  font-weight="bold">A(1,2)</text>
+  <text x="300" y="78" font-size="13" fill="#166534" font-weight="bold">B(7,2)</text>
+
+  <!-- Perpendicular bisector shown as dashed — student must identify -->
+  <line x1="178" y1="30" x2="178" y2="270" stroke="#7c3aed" stroke-width="2" stroke-dasharray="6,4" style="fill:none"/>
+  <text x="182" y="275" font-size="12" fill="#7c3aed" font-weight="bold">Locus = ?</text>
+
+  <!-- Example circle (distance r=3 from point P=(4,2)→(178,85)) -->
+  <circle cx="178" cy="85" r="5" fill="#b45309"/>
+  <text x="183" y="80" font-size="11" fill="#b45309">P(4,2)</text>
+  <circle cx="178" cy="85" r="120" fill="none" stroke="#b45309" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <text x="178" y="210" font-size="11" fill="#b45309" text-anchor="middle">all pts 3 units from P</text>
+
+  <!-- Tick marks on AB -->
+  <line x1="105" y1="79" x2="113" y2="91" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="109" y1="77" x2="117" y2="89" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="243" y1="79" x2="251" y2="91" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="247" y1="77" x2="255" y2="89" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Divider -->
+  <line x1="355" y1="20" x2="355" y2="285" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Q6–Q10: angle bisector locus -->
+  <text x="540" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q6–Q10: Angle bisector locus</text>
+
+  <!-- Two intersecting lines at V=(540,165) -->
+  <line x1="390" y1="285" x2="690" y2="45" stroke="#dc2626" stroke-width="2" style="fill:none"/>
+  <line x1="390" y1="45"  x2="690" y2="285" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <text x="374" y="285" font-size="13" fill="#dc2626">ℓ₁</text>
+  <text x="374" y="48"  font-size="13" fill="#166534">ℓ₂</text>
+
+  <!-- The two angle bisectors -->
+  <line x1="378" y1="165" x2="702" y2="165" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,4" style="fill:none"/>
+  <line x1="540" y1="28"  x2="540" y2="285" stroke="#b45309" stroke-width="2" stroke-dasharray="5,4" style="fill:none"/>
+  <text x="700" y="162" font-size="11" fill="#7c3aed">b₁</text>
+  <text x="543" y="288" font-size="11" fill="#b45309">b₂</text>
+
+  <!-- V -->
+  <circle cx="540" cy="165" r="4" class="svg-sub" style="fill:#374151;stroke:none"/>
+  <text x="544" y="161" font-size="11" class="svg-sub">V</text>
+
+  <!-- Sample P on b₁ with perp distance indicators to ℓ₁, ℓ₂ -->
+  <circle cx="620" cy="165" r="5" fill="#7c3aed"/>
+  <text x="623" y="160" font-size="11" fill="#7c3aed">P</text>
+  <!-- perp to ℓ₁ (rough) -->
+  <line x1="620" y1="165" x2="648" y2="125" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="3,3" style="fill:none"/>
+  <!-- perp to ℓ₂ -->
+  <line x1="620" y1="165" x2="648" y2="205" stroke="#166534" stroke-width="1.2" stroke-dasharray="3,3" style="fill:none"/>
+  <text x="652" y="122" font-size="10" fill="#dc2626">d₁</text>
+  <text x="652" y="207" font-size="10" fill="#166534">d₂</text>
+  <text x="540" y="248" font-size="12" class="svg-sub" text-anchor="middle">d₁ = d₂ on both bisectors</text>
+
+  <!-- Formula strip -->
+  <rect x="10" y="275" width="700" height="22" rx="5" class="svg-rule" stroke-width="1"/>
+  <text x="360" y="290" font-size="12" class="svg-text" text-anchor="middle">Equidist. from 2 pts → perp bisector · From 1 pt → circle · From 2 lines → angle bisectors</text>
+</svg>

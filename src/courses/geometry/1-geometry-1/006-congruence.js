@@ -62,6 +62,20 @@ The interactive below shows a triangle and all six of its measurements. Drag the
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
 
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 function getCol(light, dark) { return document.documentElement.classList.contains('dark') ? dark : light; }
 
 var pts=[
@@ -228,6 +242,20 @@ canvas{display:block}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var expEl=document.getElementById('crit-exp');
 
 // Helper for dynamic colors
@@ -473,6 +501,20 @@ The proof split the isosceles triangle into two congruent triangles using the me
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
 
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 function getCol(light, dark) { return document.documentElement.classList.contains('dark') ? dark : light; }
 
 var apex={x:W/2,y:80};
@@ -644,6 +686,7 @@ Geometry is not a collection of facts to memorize. It is a toolkit and a methodo
 
 export default {
   id: 'geo-1-6',
+  subject: 'Geometry',
   slug: 'congruence',
   chapter: 'geometry-1',
   order: 6,

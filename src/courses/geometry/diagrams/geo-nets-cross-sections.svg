@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- ===== Net of a Cube (left) ===== -->
+  <text x="160" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Net of a Cube</text>
+
+  <!-- Cross shape net of cube, face size=50px, starting at left=20 -->
+  <!-- Row 1: face at (70,60) -->
+  <rect x="70"  y="60"  width="50" height="50" fill="#1e3a5f22" stroke="#1e3a5f" stroke-width="2"/>
+  <!-- Row 2: 4 faces in a row: (20,110)(70,110)(120,110)(170,110) -->
+  <rect x="20"  y="110" width="50" height="50" fill="#dc262622" stroke="#dc2626" stroke-width="2"/>
+  <rect x="70"  y="110" width="50" height="50" fill="#1e3a5f22" stroke="#1e3a5f" stroke-width="2"/>
+  <rect x="120" y="110" width="50" height="50" fill="#16653422" stroke="#166534" stroke-width="2"/>
+  <rect x="170" y="110" width="50" height="50" fill="#b4530922" stroke="#b45309" stroke-width="2"/>
+  <!-- Row 3: (70,160) -->
+  <rect x="70"  y="160" width="50" height="50" fill="#7c3aed22" stroke="#7c3aed" stroke-width="2"/>
+  <!-- Row 4: (70,210) -->
+  <rect x="70"  y="210" width="50" height="50" fill="#1e3a5f11" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+  <!-- Face labels -->
+  <text x="95"  y="90"  font-size="11" class="svg-text" text-anchor="middle">top</text>
+  <text x="45"  y="140" font-size="11" fill="#dc2626" text-anchor="middle">left</text>
+  <text x="95"  y="140" font-size="11" class="svg-text" text-anchor="middle">front</text>
+  <text x="145" y="140" font-size="11" fill="#166534" text-anchor="middle">right</text>
+  <text x="195" y="140" font-size="11" fill="#b45309" text-anchor="middle">back</text>
+  <text x="95"  y="190" font-size="11" fill="#7c3aed" text-anchor="middle">bottom</text>
+  <text x="95"  y="240" font-size="10" class="svg-muted" text-anchor="middle">(folds up)</text>
+
+  <!-- Fold arrows -->
+  <path d="M 68 88 Q 50 100 48 108" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="280" y="155" font-size="12" class="svg-muted" text-anchor="middle">→ folds into →</text>
+
+  <!-- Cube 3D diagram (right side of left panel) -->
+  <!-- Front face: (280,120)(340,120)(340,200)(280,200) -->
+  <polygon points="280,200 340,200 340,130 280,130" fill="#1e3a5f22" stroke="#1e3a5f" stroke-width="2.5"/>
+  <!-- Top face: (280,130)(340,130)(355,115)(295,115) -->
+  <polygon points="280,130 340,130 355,115 295,115" fill="#1e3a5f33" stroke="#1e3a5f" stroke-width="2.5"/>
+  <!-- Right face: (340,130)(355,115)(355,195)(340,200)→ -->
+  <polygon points="340,130 355,115 355,195 340,200" fill="#1e3a5f18" stroke="#1e3a5f" stroke-width="2.5"/>
+  <text x="310" y="168" font-size="13" class="svg-text" text-anchor="middle">a</text>
+  <text x="318" y="126" font-size="13" class="svg-text" text-anchor="middle">a</text>
+  <text x="350" y="162" font-size="13" class="svg-text">a</text>
+  <text x="310" y="225" font-size="12" class="svg-sub" text-anchor="middle">SA = 6a²</text>
+
+  <!-- Divider -->
+  <line x1="380" y1="30" x2="380" y2="370" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- ===== Cross-sections (right) ===== -->
+  <text x="552" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Cross-Sections of a Cone</text>
+
+  <!-- Cone outline at (552,80) apex, base at y=220 -->
+  <ellipse cx="552" cy="220" rx="100" ry="24" fill="#1e3a5f11" stroke="#1e3a5f" stroke-width="1.5"/>
+  <line x1="452" y1="220" x2="552" y2="60" stroke="#1e3a5f" stroke-width="2" style="fill:none"/>
+  <line x1="652" y1="220" x2="552" y2="60" stroke="#1e3a5f" stroke-width="2" style="fill:none"/>
+  <text x="552" y="56" font-size="12" class="svg-text" text-anchor="middle">apex</text>
+
+  <!-- Circle cross-section (horizontal cut): ellipse at y=150 -->
+  <ellipse cx="552" cy="155" rx="62" ry="15" fill="#dc262622" stroke="#dc2626" stroke-width="2"/>
+  <text x="618" y="152" font-size="12" fill="#dc2626">circle</text>
+  <text x="618" y="165" font-size="11" class="svg-muted">(horiz. cut)</text>
+
+  <!-- Ellipse cross-section: tilt the cut slightly, shown as ellipse at y=130 -->
+  <ellipse cx="540" cy="128" rx="72" ry="14" fill="#b4530922" stroke="#b45309" stroke-width="1.5" transform="rotate(-10 540 128)"/>
+  <text x="618" y="120" font-size="12" fill="#b45309">ellipse</text>
+  <text x="618" y="133" font-size="11" class="svg-muted">(angled cut)</text>
+
+  <!-- Parabola cross-section: vertical plane through axis (shown as curved line) -->
+  <path d="M 496 60 Q 552 210 608 60" fill="none" stroke="#7c3aed" stroke-width="2"/>
+  <text x="618" y="90" font-size="12" fill="#7c3aed">parabola</text>
+  <text x="618" y="103" font-size="11" class="svg-muted">(|| to slant)</text>
+
+  <!-- Hyperbola: two branches (only right side visible) -->
+  <path d="M 560 220 Q 600 175 580 60" fill="none" stroke="#166534" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="618" y="60" font-size="12" fill="#166534">hyperbola</text>
+  <text x="618" y="73" font-size="11" class="svg-muted">(steep cut)</text>
+
+  <!-- Bottom summary -->
+  <rect x="385" y="268" width="325" height="82" rx="8" class="svg-panel" stroke-width="1.5"/>
+  <text x="547" y="287" font-size="13" class="svg-text" font-weight="bold" text-anchor="middle">Conic Sections Summary</text>
+  <text x="395" y="306" font-size="12" class="svg-sub">Horizontal cut → circle</text>
+  <text x="395" y="322" font-size="12" class="svg-sub">Angled cut (not past base) → ellipse</text>
+  <text x="395" y="338" font-size="12" class="svg-sub">Cut parallel to slant edge → parabola</text>
+  <text x="395" y="354" font-size="12" class="svg-sub">Steeper cut (through both nappes) → hyperbola</text>
+
+  <!-- Net caption -->
+  <rect x="10" y="285" width="360" height="52" rx="6" class="svg-use" stroke-width="1"/>
+  <text x="190" y="304" font-size="13" fill="#166534" font-weight="bold" text-anchor="middle">Net = unfolded surface of a 3D shape</text>
+  <text x="190" y="322" font-size="12" class="svg-sub" text-anchor="middle">Count faces to find SA: cube has 6 squares</text>
+  <text x="190" y="335" font-size="12" class="svg-sub" text-anchor="middle">Cylinder net: rectangle + 2 circles</text>
+</svg>

@@ -1,0 +1,64 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="200" rx="8" class="svg-bg"/>
+
+  <!-- Title -->
+  <text x="240" y="20" font-size="11" class="svg-muted" text-anchor="middle" font-weight="600">Four Proof Strategies</text>
+
+  <!-- Box 1: Direct -->
+  <rect x="8" y="28" width="108" height="165" rx="7" fill="rgba(30,58,95,0.06)" stroke="#1e3a5f" stroke-width="1.3"/>
+  <text x="62" y="47" font-size="11" fill="#1e3a5f" font-weight="700" text-anchor="middle">Direct</text>
+  <text x="62" y="65" font-size="9" fill="#374151" text-anchor="middle">Assume P</text>
+  <text x="62" y="79" font-size="9" fill="#374151" text-anchor="middle">↓ chain of</text>
+  <text x="62" y="93" font-size="9" fill="#374151" text-anchor="middle">  logic</text>
+  <text x="62" y="110" font-size="9" fill="#1e3a5f" text-anchor="middle">→ conclude Q</text>
+  <text x="62" y="132" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">Best when</text>
+  <text x="62" y="146" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">path is clear</text>
+  <text x="62" y="162" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">from P to Q</text>
+
+  <!-- Box 2: Contradiction -->
+  <rect x="124" y="28" width="108" height="165" rx="7" fill="rgba(220,38,38,0.05)" stroke="#dc2626" stroke-width="1.3"/>
+  <text x="178" y="47" font-size="11" fill="#dc2626" font-weight="700" text-anchor="middle">Contradiction</text>
+  <text x="178" y="65" font-size="9" fill="#374151" text-anchor="middle">Assume ¬Q</text>
+  <text x="178" y="79" font-size="9" fill="#374151" text-anchor="middle">↓ derive</text>
+  <text x="178" y="93" font-size="9" fill="#374151" text-anchor="middle">  absurdity</text>
+  <text x="178" y="110" font-size="9" fill="#dc2626" text-anchor="middle">→ ¬Q is false</text>
+  <text x="178" y="128" font-size="9" fill="#dc2626" text-anchor="middle">→ Q is true</text>
+  <text x="178" y="148" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">Best for</text>
+  <text x="178" y="162" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">negatives/existence</text>
+  <text x="178" y="176" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">claims</text>
+
+  <!-- Box 3: Contrapositive -->
+  <rect x="240" y="28" width="108" height="165" rx="7" fill="rgba(124,58,237,0.05)" stroke="#7c3aed" stroke-width="1.3"/>
+  <text x="294" y="47" font-size="11" fill="#7c3aed" font-weight="700" text-anchor="middle">Contrapositive</text>
+  <text x="294" y="65" font-size="9" fill="#374151" text-anchor="middle">Prove ¬Q → ¬P</text>
+  <text x="294" y="79" font-size="9" fill="#374151" text-anchor="middle">(logically same</text>
+  <text x="294" y="93" font-size="9" fill="#374151" text-anchor="middle"> as P → Q)</text>
+  <text x="294" y="110" font-size="9" fill="#7c3aed" text-anchor="middle">→ P → Q proved</text>
+  <text x="294" y="132" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">Best when</text>
+  <text x="294" y="146" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">¬Q → ¬P is</text>
+  <text x="294" y="160" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">easier to see</text>
+
+  <!-- Box 4: Cases -->
+  <rect x="356" y="28" width="116" height="165" rx="7" fill="rgba(26,58,42,0.06)" stroke="#1a3a2a" stroke-width="1.3"/>
+  <text x="414" y="47" font-size="11" fill="#1a3a2a" font-weight="700" text-anchor="middle">Cases</text>
+  <text x="414" y="65" font-size="9" fill="#374151" text-anchor="middle">Split into</text>
+  <text x="414" y="79" font-size="9" fill="#374151" text-anchor="middle">exhaustive</text>
+  <text x="414" y="93" font-size="9" fill="#374151" text-anchor="middle">subcases</text>
+  <text x="414" y="110" font-size="9" fill="#1a3a2a" text-anchor="middle">Prove each case</text>
+  <text x="414" y="128" font-size="9" fill="#1a3a2a" text-anchor="middle">→ done</text>
+  <text x="414" y="148" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">Best when</text>
+  <text x="414" y="162" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">situations differ</text>
+  <text x="414" y="176" font-size="9" fill="#64748b" text-anchor="middle" font-style="italic">qualitatively</text>
+</svg>

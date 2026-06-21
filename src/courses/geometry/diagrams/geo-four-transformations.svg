@@ -1,0 +1,69 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="200" rx="8" class="svg-bg"/>
+
+  <!-- ── TRANSLATION ──────────────────────────────── -->
+  <text x="60" y="18" font-size="11" fill="#1e3a5f" font-weight="700" text-anchor="middle">Translation</text>
+  <!-- Original triangle (blue) -->
+  <polygon points="20,90 55,55 90,90" fill="rgba(30,58,95,0.12)" stroke="#1e3a5f" stroke-width="1.8" stroke-dasharray="4,2"/>
+  <!-- Translated triangle (solid) -->
+  <polygon points="35,145 70,110 105,145" fill="rgba(30,58,95,0.25)" stroke="#1e3a5f" stroke-width="1.8"/>
+  <!-- Arrow -->
+  <line x1="55" y1="80" x2="70" y2="120" stroke="#dc2626" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="80" y="100" font-size="10" fill="#dc2626">(+a,+b)</text>
+  <text x="60" y="175" font-size="9" class="svg-muted" text-anchor="middle">Same shape, new position</text>
+
+  <!-- Divider -->
+  <line x1="118" y1="10" x2="118" y2="190" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- ── REFLECTION ──────────────────────────────── -->
+  <text x="178" y="18" font-size="11" fill="#1a3a2a" font-weight="700" text-anchor="middle">Reflection</text>
+  <!-- Mirror line (y-axis at x=178) -->
+  <line x1="178" y1="25" x2="178" y2="165" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4,3"/>
+  <!-- Original (left) -->
+  <polygon points="130,50 158,95 130,140" fill="rgba(26,58,42,0.12)" stroke="#1a3a2a" stroke-width="1.8" stroke-dasharray="4,2"/>
+  <!-- Reflected (right) -->
+  <polygon points="226,50 198,95 226,140" fill="rgba(26,58,42,0.25)" stroke="#1a3a2a" stroke-width="1.8"/>
+  <text x="178" y="175" font-size="9" class="svg-muted" text-anchor="middle">Flip over a mirror line</text>
+
+  <!-- Divider -->
+  <line x1="238" y1="10" x2="238" y2="190" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- ── ROTATION ──────────────────────────────── -->
+  <text x="298" y="18" font-size="11" fill="#7c3aed" font-weight="700" text-anchor="middle">Rotation</text>
+  <!-- Center point -->
+  <circle cx="298" cy="100" r="3" fill="#7c3aed"/>
+  <!-- Original triangle -->
+  <polygon points="298,100 340,80 330,125" fill="rgba(124,58,237,0.12)" stroke="#7c3aed" stroke-width="1.8" stroke-dasharray="4,2"/>
+  <!-- Rotated triangle (~90°) -->
+  <polygon points="298,100 280,142 255,100" fill="rgba(124,58,237,0.25)" stroke="#7c3aed" stroke-width="1.8"/>
+  <!-- Arc showing rotation -->
+  <path d="M 325 80 A 30 30 0 0 0 275 100" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="305" y="70" font-size="10" fill="#dc2626">θ</text>
+  <text x="298" y="175" font-size="9" class="svg-muted" text-anchor="middle">Rotate by angle θ</text>
+
+  <!-- Divider -->
+  <line x1="358" y1="10" x2="358" y2="190" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- ── DILATION ──────────────────────────────── -->
+  <text x="418" y="18" font-size="11" fill="#92400e" font-weight="700" text-anchor="middle">Dilation</text>
+  <!-- Original (small) -->
+  <polygon points="400,125 420,90 440,125" fill="rgba(146,64,14,0.12)" stroke="#92400e" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <!-- Dilated (larger, k=2) -->
+  <polygon points="382,155 418,75 454,155" fill="rgba(146,64,14,0.2)" stroke="#92400e" stroke-width="1.8"/>
+  <!-- Center of dilation -->
+  <circle cx="418" cy="75" r="3" fill="#92400e"/>
+  <text x="418" y="68" font-size="9" fill="#92400e">center</text>
+  <text x="418" y="175" font-size="9" class="svg-muted" text-anchor="middle">Scale by factor k</text>
+</svg>

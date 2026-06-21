@@ -200,7 +200,9 @@ This proof uses **contradiction** — assume the opposite, derive an impossibili
 <div id="stepBox" style="padding:14px 16px;background:var(--color-background-primary,#fff);border-top:1px solid var(--color-border-primary,#e2e8f0);min-height:80px"></div>
 </div>`,
       css: `body{margin:0;font-family:Georgia,serif}canvas{display:block}`,
-      startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+      startCode: `var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8',L1C=isDark?'#93c5fd':'#1e3a5f',L2C=isDark?'#4ade80':'#1a3a2a';
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 
 // Two intersecting lines
@@ -230,7 +232,7 @@ var steps=[
   {
     tag:'Step 1 — Assume the opposite',color:'#dc2626',
     title:'Suppose lines ℓ₁ and ℓ₂ intersect at two distinct points P and Q.',
-    body:'We start the contradiction: assume both P <em>and</em> Q lie on both lines. We don\'t believe this is true — we\'re going to show it leads to an impossibility.',
+    body:"We start the contradiction: assume both P <em>and</em> Q lie on both lines. We don't believe this is true — we're going to show it leads to an impossibility.",
     draw:function(){
       drawLines(1,1);
       dot(P,'P','#dc2626');
@@ -248,9 +250,9 @@ var steps=[
       // Draw the "unique" line from Postulate I through P and Q
       var dx=Q.x-P.x,dy=Q.y-P.y,len=Math.hypot(dx,dy);
       var ux=dx/len,uy=dy/len;
-      ctx.strokeStyle='#7c3aed';ctx.lineWidth=3;
+      ctx.strokeStyle=PURPLE;ctx.lineWidth=3;
       ctx.beginPath();ctx.moveTo(P.x-ux*200,P.y-uy*200);ctx.lineTo(Q.x+ux*200,Q.y+uy*200);ctx.stroke();
-      ctx.fillStyle='#7c3aed';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+      ctx.fillStyle=PURPLE;ctx.font='bold 11px sans-serif';ctx.textAlign='center';
       ctx.fillText('one line through P and Q (Postulate I)',P.x+(Q.x-P.x)/2,P.y+(Q.y-P.y)/2-14);
       dot(P,'P','#7c3aed');dot(Q,'Q','#7c3aed');
     }
@@ -268,7 +270,7 @@ var steps=[
       ctx.strokeStyle='#dc2626';ctx.lineWidth=4;
       ctx.beginPath();ctx.moveTo(mx-18,my-18);ctx.lineTo(mx+18,my+18);ctx.stroke();
       ctx.beginPath();ctx.moveTo(mx+18,my-18);ctx.lineTo(mx-18,my+18);ctx.stroke();
-      ctx.fillStyle='#dc2626';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+      ctx.fillStyle=RED;ctx.font='bold 11px sans-serif';ctx.textAlign='center';
       ctx.fillText('2 lines through P and Q — impossible! (Postulate I)',mx,my-28);
     }
   },
@@ -280,7 +282,7 @@ var steps=[
       drawLines(1,1);
       dot(P,'P','#1a3a2a');
       // Show only one intersection point — the theorem is proved
-      ctx.fillStyle='#1a3a2a';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+      ctx.fillStyle=GREEN;ctx.font='bold 13px Georgia';ctx.textAlign='center';
       ctx.fillText('exactly one intersection point — proved □',P.x,P.y-18);
     }
   }
@@ -288,14 +290,14 @@ var steps=[
 
 function drawLines(a1,a2){
   ctx.globalAlpha=a1;
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2.5;
+  ctx.strokeStyle=NAVY;ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(L1.x1,L1.y1);ctx.lineTo(L1.x2,L1.y2);ctx.stroke();
-  ctx.fillStyle='#1e3a5f';ctx.font='italic 13px Georgia';ctx.textAlign='left';
+  ctx.fillStyle=NAVY;ctx.font='italic 13px Georgia';ctx.textAlign='left';
   ctx.fillText('ℓ₁',L1.x2+4,L1.y2+4);
   ctx.globalAlpha=a2;
-  ctx.strokeStyle='#1a3a2a';ctx.lineWidth=2.5;
+  ctx.strokeStyle=GREEN;ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(L2.x1,L2.y1);ctx.lineTo(L2.x2,L2.y2);ctx.stroke();
-  ctx.fillStyle='#1a3a2a';
+  ctx.fillStyle=GREEN;
   ctx.fillText('ℓ₂',L2.x2+4,L2.y2-8);
   ctx.globalAlpha=1;
 }

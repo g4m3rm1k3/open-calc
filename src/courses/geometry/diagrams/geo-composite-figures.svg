@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .svg-warn  { fill: #fff7ed; stroke: #b45309; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+    .dark .svg-warn  { fill: #7c2d1222; stroke: #fb923c; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- Title -->
+  <text x="360" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Composite Figures: Add and Subtract</text>
+
+  <!-- ===== Example 1: L-shape (add rectangles) ===== -->
+  <text x="120" y="46" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Example 1: L-shape</text>
+
+  <!-- L-shape outline -->
+  <polygon points="30,60 180,60 180,120 100,120 100,200 30,200" fill="#eff6ff" stroke="#1e3a5f" stroke-width="2"/>
+  <!-- Dashed split line -->
+  <line x1="30" y1="120" x2="180" y2="120" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5,4" style="fill:none"/>
+  <!-- Rect A label -->
+  <text x="105" y="96" font-size="12" fill="#1e3a5f" text-anchor="middle" font-weight="bold">A</text>
+  <text x="105" y="110" font-size="11" fill="#dc2626" text-anchor="middle">150×60</text>
+  <!-- Rect B label -->
+  <text x="65" y="167" font-size="12" fill="#1e3a5f" text-anchor="middle" font-weight="bold">B</text>
+  <text x="65" y="181" font-size="11" fill="#dc2626" text-anchor="middle">70×80</text>
+  <!-- Dimension labels -->
+  <text x="9" y="134" font-size="11" class="svg-muted" text-anchor="middle">80</text>
+  <text x="105" y="218" font-size="11" class="svg-muted" text-anchor="middle">150</text>
+  <text x="192" y="90" font-size="11" class="svg-muted" text-anchor="middle">60</text>
+  <!-- Formula -->
+  <rect x="8" y="228" width="224" height="42" rx="6" class="svg-panel" stroke-width="1"/>
+  <text x="120" y="244" font-size="12" class="svg-text" text-anchor="middle" font-weight="bold">Area = A + B</text>
+  <text x="120" y="260" font-size="12" class="svg-sub" text-anchor="middle">= 150×60 + 70×80 = 14,600</text>
+
+  <!-- ===== Example 2: Rectangle minus circle ===== -->
+  <text x="358" y="46" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Example 2: Rectangle − circle</text>
+
+  <rect x="250" y="60" width="220" height="150" fill="#f0fdf4" stroke="#166534" stroke-width="2"/>
+  <circle cx="360" cy="135" r="50" fill="#fafaf8" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,3"/>
+  <!-- Labels -->
+  <text x="360" y="200" font-size="11" class="svg-muted" text-anchor="middle">220</text>
+  <text x="236" y="140" font-size="11" class="svg-muted" text-anchor="middle">150</text>
+  <line x1="360" y1="135" x2="410" y2="135" stroke="#dc2626" stroke-width="1.5" style="fill:none"/>
+  <text x="385" y="129" font-size="12" fill="#dc2626">r=50</text>
+  <!-- Formula -->
+  <rect x="248" y="228" width="224" height="42" rx="6" class="svg-use" stroke-width="1"/>
+  <text x="360" y="244" font-size="12" fill="#166534" text-anchor="middle" font-weight="bold">Area = Rectangle − Circle</text>
+  <text x="360" y="260" font-size="12" class="svg-sub" text-anchor="middle">= 220×150 − π(50)² ≈ 25,143</text>
+
+  <!-- ===== Example 3: Stadium / compound curved ===== -->
+  <text x="607" y="46" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Example 3: Stadium</text>
+
+  <!-- Rectangle in center -->
+  <rect x="530" y="95" width="140" height="90" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+  <!-- Semicircle left -->
+  <path d="M 530 95 A 45 45 0 0 0 530 185" fill="#fff7ed" stroke="#b45309" stroke-width="2" style="fill:#fff7ed"/>
+  <!-- Semicircle right -->
+  <path d="M 670 95 A 45 45 0 0 1 670 185" fill="#fff7ed" stroke="#b45309" stroke-width="2" style="fill:#fff7ed"/>
+  <!-- Labels -->
+  <text x="600" y="145" font-size="12" fill="#b45309" text-anchor="middle">140</text>
+  <text x="600" y="158" font-size="11" fill="#b45309" text-anchor="middle">r=45</text>
+  <!-- Formula -->
+  <rect x="518" y="228" width="184" height="42" rx="6" class="svg-warn" stroke-width="1"/>
+  <text x="610" y="244" font-size="12" fill="#b45309" text-anchor="middle" font-weight="bold">Area = Rect + Full circle</text>
+  <text x="610" y="260" font-size="12" class="svg-sub" text-anchor="middle">= 140×90 + π(45)² ≈ 18,962</text>
+
+  <!-- ===== Method strip ===== -->
+  <rect x="10" y="285" width="700" height="80" rx="8" class="svg-panel" stroke-width="1.5"/>
+  <text x="360" y="303" font-size="13" class="svg-text" font-weight="bold" text-anchor="middle">Strategy for Composite Figures</text>
+  <text x="20" y="320" font-size="12" class="svg-sub">1. Identify each simple region (rectangle, triangle, circle, semicircle, trapezoid, etc.)</text>
+  <text x="20" y="337" font-size="12" class="svg-sub">2. Add regions that make up the figure; subtract regions that are cut out (holes)</text>
+  <text x="20" y="354" font-size="12" class="svg-sub">3. Find each sub-area using the standard formula; sum with correct ± sign</text>
+  <text x="20" y="371" font-size="12" class="svg-sub">4. Include only the boundary that is part of the OUTER perimeter (no interior partition lines)</text>
+</svg>

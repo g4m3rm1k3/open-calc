@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .svg-warn  { fill: #fff7ed; stroke: #b45309; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+    .dark .svg-warn  { fill: #7c2d1222; stroke: #fb923c; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- Title -->
+  <text x="360" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Geometric Probability</text>
+
+  <!-- Core formula -->
+  <rect x="220" y="28" width="280" height="32" rx="8" class="svg-panel" stroke-width="1.5"/>
+  <text x="360" y="49" font-size="14" class="svg-text" font-weight="bold" text-anchor="middle">P(event) = Favorable measure / Total measure</text>
+
+  <!-- ===== Example 1: Point in circle inside square ===== -->
+  <text x="120" y="82" font-size="13" class="svg-sub" font-weight="bold" text-anchor="middle">Area model: point in circle?</text>
+
+  <rect x="30" y="90" width="180" height="180" fill="#eff6ff" stroke="#1e3a5f" stroke-width="2"/>
+  <circle cx="120" cy="180" r="72" fill="#bbf7d0" stroke="#166534" stroke-width="2"/>
+  <!-- Random dots -->
+  <circle cx="95" cy="160" r="3" fill="#dc2626"/>
+  <circle cx="140" cy="190" r="3" fill="#166534"/>
+  <circle cx="55" cy="108" r="3" fill="#dc2626"/>
+  <circle cx="170" cy="252" r="3" fill="#dc2626"/>
+  <circle cx="115" cy="210" r="3" fill="#166534"/>
+  <circle cx="148" cy="148" r="3" fill="#166534"/>
+  <circle cx="48" cy="200" r="3" fill="#dc2626"/>
+  <circle cx="188" cy="130" r="3" fill="#dc2626"/>
+  <!-- Labels -->
+  <text x="120" y="180" font-size="12" fill="#166534" text-anchor="middle" font-weight="bold">r = 72</text>
+  <text x="120" y="284" font-size="12" class="svg-sub" text-anchor="middle">Square side = 180</text>
+  <!-- Formula box -->
+  <rect x="8" y="296" width="224" height="60" rx="6" class="svg-use" stroke-width="1"/>
+  <text x="120" y="312" font-size="12" fill="#166534" text-anchor="middle" font-weight="bold">P(in circle)</text>
+  <text x="120" y="328" font-size="12" class="svg-sub" text-anchor="middle">= π(72)² / 180²</text>
+  <text x="120" y="344" font-size="12" class="svg-sub" text-anchor="middle">= 5184π / 32400 ≈ 0.5027</text>
+  <text x="120" y="360" font-size="12" fill="#166534" text-anchor="middle">≈ 50.3%</text>
+
+  <!-- ===== Example 2: Length model — chord on segment ===== -->
+  <text x="370" y="82" font-size="13" class="svg-sub" font-weight="bold" text-anchor="middle">Length model: bus arrives in time?</text>
+
+  <!-- Number line 0 to 60 minutes -->
+  <line x1="242" y1="130" x2="512" y2="130" stroke="#94a3b8" stroke-width="2" style="fill:none"/>
+  <text x="242" y="146" font-size="11" class="svg-muted" text-anchor="middle">0</text>
+  <text x="512" y="146" font-size="11" class="svg-muted" text-anchor="middle">60 min</text>
+  <!-- Bus arrives uniformly in [0,60] -->
+  <rect x="242" y="113" width="270" height="17" fill="#eff6ff" stroke="#94a3b8" stroke-width="1" opacity="0.8"/>
+  <!-- Favorable: arrive in [10,30] -->
+  <rect x="287" y="113" width="90" height="17" fill="#bbf7d0" stroke="#166534" stroke-width="1.5"/>
+  <text x="287" y="108" font-size="11" fill="#166534" text-anchor="middle">10</text>
+  <text x="377" y="108" font-size="11" fill="#166534" text-anchor="middle">30</text>
+  <text x="332" y="124" font-size="11" fill="#166534" text-anchor="middle">favorable</text>
+  <text x="370" y="162" font-size="12" class="svg-sub" text-anchor="middle">P(bus in [10,30]) = 20/60 = 1/3 ≈ 33.3%</text>
+
+  <!-- ===== Example 3: Monte Carlo dart board ===== -->
+  <text x="630" y="82" font-size="13" class="svg-sub" font-weight="bold" text-anchor="middle">Monte Carlo π estimate</text>
+
+  <rect x="546" y="90" width="160" height="160" fill="#eff6ff" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="626" cy="170" r="80" fill="#fde68a44" stroke="#b45309" stroke-width="2"/>
+  <!-- Some random dots -->
+  <circle cx="600" cy="140" r="3" fill="#166534"/>
+  <circle cx="660" cy="180" r="3" fill="#166534"/>
+  <circle cx="580" cy="200" r="3" fill="#166534"/>
+  <circle cx="650" cy="130" r="3" fill="#166534"/>
+  <circle cx="556" cy="108" r="3" fill="#dc2626"/>
+  <circle cx="700" cy="250" r="3" fill="#dc2626"/>
+  <circle cx="560" cy="240" r="3" fill="#dc2626"/>
+  <text x="626" y="170" font-size="11" fill="#b45309" text-anchor="middle">r=80</text>
+  <!-- Formula -->
+  <rect x="538" y="264" width="176" height="60" rx="6" class="svg-warn" stroke-width="1"/>
+  <text x="626" y="280" font-size="12" fill="#b45309" text-anchor="middle" font-weight="bold">P(in circle) = π/4</text>
+  <text x="626" y="296" font-size="12" class="svg-sub" text-anchor="middle">π ≈ 4 × (hits / total)</text>
+  <text x="626" y="312" font-size="12" class="svg-muted" text-anchor="middle">Monte Carlo simulation!</text>
+  <text x="626" y="328" font-size="11" class="svg-muted" text-anchor="middle">(unit square, r=1)</text>
+
+  <!-- Method strip -->
+  <rect x="10" y="340" width="700" height="32" rx="6" class="svg-panel" stroke-width="1"/>
+  <text x="360" y="353" font-size="11" class="svg-text" text-anchor="middle">Three models: Area (region/total area) · Length (interval/total length) · Angle (sector/360°)</text>
+  <text x="360" y="368" font-size="11" class="svg-sub" text-anchor="middle">Assume uniform distribution — every point/position equally likely</text>
+</svg>

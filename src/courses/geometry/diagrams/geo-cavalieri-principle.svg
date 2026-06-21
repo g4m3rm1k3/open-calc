@@ -1,0 +1,57 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="200" rx="8" class="svg-bg"/>
+  <text x="240" y="16" font-size="10" class="svg-muted" text-anchor="middle" font-weight="600">Cavalieri's Principle: Same Height + Same Cross-Section Area → Same Volume</text>
+
+  <!-- Stack of coins (straight) — cylinder -->
+  <text x="90" y="38" font-size="11" fill="#1e3a5f" font-weight="700" text-anchor="middle">Straight Stack</text>
+  <!-- Coins (5 discs) -->
+  <ellipse cx="90" cy="150" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="90" cy="130" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="90" cy="110" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="90" cy="90" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="90" cy="70" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="90" cy="50" rx="40" ry="10" fill="rgba(30,58,95,0.22)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <!-- Side lines -->
+  <line x1="50" y1="50" x2="50" y2="150" stroke="#1e3a5f" stroke-width="1.5"/>
+  <line x1="130" y1="50" x2="130" y2="150" stroke="#1e3a5f" stroke-width="1.5"/>
+  <!-- Height label -->
+  <line x1="138" y1="50" x2="138" y2="150" stroke="#dc2626" stroke-width="1.3"/>
+  <text x="145" y="105" font-size="11" fill="#dc2626" font-weight="700">h</text>
+
+  <!-- Arrow = same volume -->
+  <text x="220" y="90" font-size="24" fill="#1e3a5f" text-anchor="middle">⟺</text>
+  <text x="220" y="115" font-size="11" fill="#1a3a2a" text-anchor="middle">same V</text>
+  <text x="220" y="132" font-size="9" class="svg-muted" text-anchor="middle">if slices equal</text>
+
+  <!-- Stack of coins (tilted/slanted) — oblique cylinder -->
+  <text x="370" y="38" font-size="11" fill="#1e3a5f" font-weight="700" text-anchor="middle">Slanted Stack</text>
+  <!-- Slanted coins — each shifted right by 8px per level -->
+  <ellipse cx="370" cy="150" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="362" cy="130" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="354" cy="110" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="346" cy="90" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="338" cy="70" rx="40" ry="10" fill="rgba(30,58,95,0.15)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <ellipse cx="330" cy="50" rx="40" ry="10" fill="rgba(30,58,95,0.22)" stroke="#1e3a5f" stroke-width="1.5"/>
+  <!-- Side lines (slanted) -->
+  <line x1="330" y1="150" x2="290" y2="50" stroke="#1e3a5f" stroke-width="1.5"/>
+  <line x1="410" y1="150" x2="370" y2="50" stroke="#1e3a5f" stroke-width="1.5"/>
+  <!-- Height label (perpendicular) -->
+  <line x1="418" y1="150" x2="418" y2="50" stroke="#dc2626" stroke-width="1.3"/>
+  <text x="425" y="105" font-size="11" fill="#dc2626" font-weight="700">h</text>
+
+  <!-- Equal sign for cross section area label -->
+  <text x="220" y="167" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="700">Each horizontal slice: equal area</text>
+  <text x="240" y="185" font-size="9" class="svg-muted" text-anchor="middle">Cavalieri (1635): equal height + equal cross-sections → equal volume</text>
+</svg>

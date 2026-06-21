@@ -1,0 +1,49 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="200" rx="8" class="svg-bg"/>
+  <text x="240" y="18" font-size="10" class="svg-muted" text-anchor="middle" font-weight="600">Polygon Angle Sum = (n−2)×180° — Proved by Triangulation</text>
+
+  <!-- Triangle (n=3): 1 triangle, sum = 180° -->
+  <polygon points="55,160 20,160 38,110" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="1.8"/>
+  <text x="38" y="180" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="700">n = 3</text>
+  <text x="38" y="193" font-size="9" class="svg-muted" text-anchor="middle">1 triangle = 180°</text>
+
+  <!-- Quadrilateral (n=4): 2 triangles, sum = 360° -->
+  <polygon points="130,160 88,160 88,110 130,110" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="1.8"/>
+  <line x1="88" y1="160" x2="130" y2="110" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <text x="109" y="180" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="700">n = 4</text>
+  <text x="109" y="193" font-size="9" class="svg-muted" text-anchor="middle">2 triangles = 360°</text>
+
+  <!-- Pentagon (n=5): 3 triangles, sum = 540° -->
+  <polygon points="200,108 172,130 180,162 220,162 228,130" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="1.8"/>
+  <line x1="200" y1="108" x2="180" y2="162" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <line x1="200" y1="108" x2="220" y2="162" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <text x="200" y="180" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="700">n = 5</text>
+  <text x="200" y="193" font-size="9" class="svg-muted" text-anchor="middle">3 triangles = 540°</text>
+
+  <!-- Hexagon (n=6): 4 triangles, sum = 720° -->
+  <polygon points="310,108 281,125 281,155 310,172 339,155 339,125" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="1.8"/>
+  <line x1="310" y1="108" x2="281" y2="155" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <line x1="310" y1="108" x2="310" y2="172" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <line x1="310" y1="108" x2="339" y2="155" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,2"/>
+  <text x="310" y="188" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="700">n = 6</text>
+  <text x="310" y="198" font-size="9" class="svg-muted" text-anchor="middle">4 triangles = 720°</text>
+
+  <!-- Formula box -->
+  <rect x="368" y="90" width="104" height="80" rx="7" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="1.3"/>
+  <text x="420" y="112" font-size="11" fill="#1e3a5f" font-weight="700" text-anchor="middle">Sum</text>
+  <text x="420" y="130" font-size="13" fill="#1e3a5f" font-weight="700" text-anchor="middle">= (n−2)·180°</text>
+  <text x="420" y="150" font-size="9" class="svg-muted" text-anchor="middle">(n−2) triangles</text>
+  <text x="420" y="165" font-size="9" class="svg-muted" text-anchor="middle">× 180° each</text>
+</svg>

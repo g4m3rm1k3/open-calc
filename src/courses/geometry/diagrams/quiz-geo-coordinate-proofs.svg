@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="300" class="svg-bg"/>
+
+  <!-- Left: Quadrilateral for classification -->
+  <text x="178" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q5: Classify and prove</text>
+
+  <!-- Axes -->
+  <line x1="20"  y1="180" x2="345" y2="180" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="45"  y1="275" x2="45"  y2="30"  stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <text x="347" y="184" font-size="10" class="svg-muted">x</text>
+  <text x="47"  y="26"  font-size="10" class="svg-muted">y</text>
+
+  <!-- A=(1,1)(5,1)(6,4)(2,4): parallelogram? origin=(45,180),unit=32 -->
+  <!-- A=(77,148) B=(205,148) C=(237,84) D=(109,84) -->
+  <polygon points="77,148 205,148 237,84 109,84" fill="#1e3a5f11" stroke="#1e3a5f" stroke-width="2"/>
+  <circle cx="77"  cy="148" r="5" fill="#dc2626"/>
+  <circle cx="205" cy="148" r="5" fill="#166534"/>
+  <circle cx="237" cy="84"  r="5" fill="#b45309"/>
+  <circle cx="109" cy="84"  r="5" fill="#7c3aed"/>
+  <text x="57"  y="163" font-size="12" fill="#dc2626">A(1,1)</text>
+  <text x="207" y="163" font-size="12" fill="#166534">B(5,1)</text>
+  <text x="239" y="80"  font-size="12" fill="#b45309">C(6,4)</text>
+  <text x="55"  y="80"  font-size="12" fill="#7c3aed">D(2,4)</text>
+  <!-- Diagonals -->
+  <line x1="77"  y1="148" x2="237" y2="84"  stroke="#dc2626" stroke-width="1" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="205" y1="148" x2="109" y2="84"  stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,3" style="fill:none"/>
+  <text x="178" y="250" font-size="12" class="svg-sub" text-anchor="middle">What type of quadrilateral is ABCD?</text>
+
+  <!-- Axis labels -->
+  <text x="77"  y="190" font-size="9" class="svg-muted" text-anchor="middle">1</text>
+  <text x="109" y="190" font-size="9" class="svg-muted" text-anchor="middle">2</text>
+  <text x="141" y="190" font-size="9" class="svg-muted" text-anchor="middle">3</text>
+  <text x="173" y="190" font-size="9" class="svg-muted" text-anchor="middle">4</text>
+  <text x="205" y="190" font-size="9" class="svg-muted" text-anchor="middle">5</text>
+  <text x="237" y="190" font-size="9" class="svg-muted" text-anchor="middle">6</text>
+  <text x="37"  y="148" font-size="9" class="svg-muted" text-anchor="right">1</text>
+  <text x="37"  y="116" font-size="9" class="svg-muted">2</text>
+  <text x="37"  y="84"  font-size="9" class="svg-muted">3</text>
+
+  <!-- Divider -->
+  <line x1="360" y1="15" x2="360" y2="285" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Right: Rectangle verification -->
+  <text x="540" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q6–Q10: Rectangle / rhombus</text>
+
+  <!-- Axes -->
+  <line x1="375" y1="200" x2="710" y2="200" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="395" y1="280" x2="395" y2="30"  stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Rectangle: A=(0,0)(4,0)(4,3)(0,3) → origin=(395,200),unit=36 -->
+  <!-- A=(395,200) B=(539,200) C=(539,92) D=(395,92) -->
+  <polygon points="395,200 539,200 539,92 395,92" fill="#166534" fill-opacity="0.1" stroke="#166534" stroke-width="2.5"/>
+  <circle cx="395" cy="200" r="5" fill="#166534"/>
+  <circle cx="539" cy="200" r="5" fill="#166534"/>
+  <circle cx="539" cy="92"  r="5" fill="#166534"/>
+  <circle cx="395" cy="92"  r="5" fill="#166534"/>
+  <text x="375" y="216" font-size="12" fill="#166534">A(0,0)</text>
+  <text x="541" y="216" font-size="12" fill="#166534">B(4,0)</text>
+  <text x="541" y="89"  font-size="12" fill="#166534">C(4,3)</text>
+  <text x="375" y="89"  font-size="12" fill="#166534">D(0,3)</text>
+  <!-- Right angle markers -->
+  <rect x="395" y="188" width="12" height="12" fill="none" stroke="#166534" stroke-width="1.5"/>
+  <rect x="527" y="188" width="12" height="12" fill="none" stroke="#166534" stroke-width="1.5"/>
+  <rect x="527" y="92"  width="12" height="12" fill="none" stroke="#166534" stroke-width="1.5"/>
+  <rect x="395" y="92"  width="12" height="12" fill="none" stroke="#166534" stroke-width="1.5"/>
+  <!-- Diagonals -->
+  <line x1="395" y1="200" x2="539" y2="92"  stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="539" y1="200" x2="395" y2="92"  stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4,3" style="fill:none"/>
+  <text x="467" y="218" font-size="12" fill="#dc2626" text-anchor="middle">diag = 5</text>
+
+  <!-- y labels -->
+  <text x="384" y="200" font-size="9" class="svg-muted">0</text>
+  <text x="384" y="164" font-size="9" class="svg-muted">1</text>
+  <text x="384" y="128" font-size="9" class="svg-muted">2</text>
+  <text x="384" y="92"  font-size="9" class="svg-muted">3</text>
+
+  <!-- Formula strip -->
+  <rect x="10" y="270" width="700" height="26" rx="5" class="svg-rule" stroke-width="1"/>
+  <text x="360" y="283" font-size="12" class="svg-text" text-anchor="middle">Parallelogram: opp sides equal &amp; || · Rectangle: right angles (slopes ⊥) · Rhombus: all sides equal · Square: both</text>
+  <text x="360" y="295" font-size="11" class="svg-muted" text-anchor="middle">Slope test: m₁×m₂=−1 → perpendicular · distance = √((Δx)²+(Δy)²)</text>
+</svg>

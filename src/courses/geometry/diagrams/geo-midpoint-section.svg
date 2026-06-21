@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-proof { fill: #fff7ed; stroke: #b45309; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-proof { fill: #451a0322; stroke: #fbbf24; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- ====== Midpoint Formula (left) ====== -->
+  <text x="178" y="26" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Midpoint Formula</text>
+
+  <!-- Coordinate axes -->
+  <line x1="30" y1="200" x2="340" y2="200" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="50"  y1="320" x2="50"  y2="60"  stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <text x="344" y="204" font-size="11" class="svg-muted">x</text>
+  <text x="52"  y="55"  font-size="11" class="svg-muted">y</text>
+
+  <!-- Point A at (80,280) = coord (1,−2)... let's use (2,1)→(120,180) and (8,5)→(240,100) -->
+  <!-- Scale: origin at (50,200), 1unit=30px, y inverted -->
+  <!-- A=(2,4)→(50+60,200-120)=(110,80), B=(8,2)→(50+240,200-60)=(290,140) -->
+  <!-- Midpoint M=((2+8)/2,(4+2)/2)=(5,3)→(50+150,200-90)=(200,110) -->
+  <line x1="110" y1="80" x2="290" y2="140" stroke="#1e3a5f" stroke-width="2.5" style="fill:none"/>
+  <circle cx="110" cy="80"  r="6" fill="#dc2626"/>
+  <circle cx="290" cy="140" r="6" fill="#166534"/>
+  <circle cx="200" cy="110" r="6" fill="#7c3aed"/>
+  <text x="94"  y="72"  font-size="14" fill="#dc2626"  font-weight="bold">A(2, 4)</text>
+  <text x="296" y="136" font-size="14" fill="#166534"  font-weight="bold">B(8, 2)</text>
+  <text x="206" y="104" font-size="14" fill="#7c3aed"  font-weight="bold">M</text>
+
+  <!-- Equal segment marks -->
+  <line x1="148" y1="87"  x2="155" y2="97"  stroke="#7c3aed" stroke-width="2" style="fill:none"/>
+  <line x1="152" y1="84"  x2="159" y2="94"  stroke="#7c3aed" stroke-width="2" style="fill:none"/>
+  <line x1="240" y1="120" x2="247" y2="130" stroke="#7c3aed" stroke-width="2" style="fill:none"/>
+  <line x1="244" y1="117" x2="251" y2="127" stroke="#7c3aed" stroke-width="2" style="fill:none"/>
+
+  <!-- Grid lines at A and B -->
+  <line x1="110" y1="80"  x2="110" y2="200" stroke="#dc2626" stroke-width="1" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="290" y1="140" x2="290" y2="200" stroke="#166534" stroke-width="1" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="200" y1="110" x2="200" y2="200" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,3" style="fill:none"/>
+
+  <!-- Axis labels -->
+  <text x="107" y="214" font-size="11" fill="#dc2626" text-anchor="middle">x₁=2</text>
+  <text x="200" y="214" font-size="11" fill="#7c3aed" text-anchor="middle">5</text>
+  <text x="290" y="214" font-size="11" fill="#166534" text-anchor="middle">x₂=8</text>
+
+  <!-- Formula box -->
+  <rect x="30" y="240" width="310" height="90" rx="8" class="svg-panel" stroke-width="1.5"/>
+  <text x="185" y="262" font-size="14" class="svg-text" font-weight="bold" text-anchor="middle">Midpoint M of A(x₁,y₁) and B(x₂,y₂)</text>
+  <text x="185" y="286" font-size="16" fill="#7c3aed" font-weight="bold" text-anchor="middle">M = ((x₁+x₂)/2 , (y₁+y₂)/2)</text>
+  <text x="185" y="308" font-size="13" class="svg-sub" text-anchor="middle">Example: M = ((2+8)/2, (4+2)/2) = (5, 3)</text>
+  <text x="185" y="324" font-size="12" class="svg-muted" text-anchor="middle">Average the x-coordinates; average the y-coordinates</text>
+
+  <!-- Divider -->
+  <line x1="360" y1="30" x2="360" y2="370" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- ====== Section Formula (right) ====== -->
+  <text x="540" y="26" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Section Formula (m:n ratio)</text>
+
+  <!-- Axes -->
+  <line x1="375" y1="200" x2="710" y2="200" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="395" y1="320" x2="395" y2="60"  stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+
+  <!-- A=(1,4)→(425,80), B=(7,1)→(605,155), P divides AB in 1:2 from A -->
+  <!-- P = A + (1/3)(B-A) = (1+2,4-1) = (3,3) → (455,110) approx -->
+  <!-- actual: P=((1·7+2·1)/(1+2), (1·1+2·4)/(1+2))=(9/3,9/3)=(3,3) -->
+  <!-- (3,3)→(395+3*30,200-3*30)=(485,110) -->
+  <line x1="425" y1="80" x2="605" y2="155" stroke="#1e3a5f" stroke-width="2.5" style="fill:none"/>
+  <circle cx="425" cy="80"  r="6" fill="#dc2626"/>
+  <circle cx="605" cy="155" r="6" fill="#166534"/>
+  <circle cx="485" cy="105" r="6" fill="#b45309"/>
+
+  <text x="400" y="72"  font-size="13" fill="#dc2626"  font-weight="bold">A(1, 4)</text>
+  <text x="610" y="152" font-size="13" fill="#166534"  font-weight="bold">B(7, 1)</text>
+  <text x="490" y="100" font-size="13" fill="#b45309"  font-weight="bold">P(3, 3)</text>
+
+  <!-- Ratio marks: m=1 part, n=2 parts -->
+  <text x="452" y="85"  font-size="13" fill="#b45309" font-style="italic">m=1</text>
+  <text x="538" y="122" font-size="13" fill="#b45309" font-style="italic">n=2</text>
+
+  <!-- Formula box -->
+  <rect x="370" y="190" width="340" height="115" rx="8" class="svg-proof" stroke-width="1.5"/>
+  <text x="540" y="210" font-size="14" fill="#b45309" font-weight="bold" text-anchor="middle">Section Formula (internal, ratio m:n)</text>
+  <text x="540" y="233" font-size="13" class="svg-sub" text-anchor="middle">P divides AB internally in ratio m:n from A:</text>
+  <text x="540" y="255" font-size="15" fill="#b45309" font-weight="bold" text-anchor="middle">P = ((mx₂+nx₁)/(m+n) , (my₂+ny₁)/(m+n))</text>
+  <text x="540" y="277" font-size="13" class="svg-sub" text-anchor="middle">Example: m=1,n=2, A(1,4), B(7,1)</text>
+  <text x="540" y="294" font-size="13" fill="#b45309" text-anchor="middle">P = ((1·7+2·1)/3 , (1·1+2·4)/3) = (3, 3)</text>
+
+  <!-- Centroid strip -->
+  <rect x="10" y="340" width="700" height="34" rx="6" class="svg-use" stroke-width="1"/>
+  <text x="360" y="357" font-size="13" fill="#166534" font-weight="bold" text-anchor="middle">Centroid of triangle A(x₁,y₁), B(x₂,y₂), C(x₃,y₃):</text>
+  <text x="360" y="370" font-size="13" class="svg-sub" text-anchor="middle">G = ((x₁+x₂+x₃)/3 , (y₁+y₂+y₃)/3)   — each median is cut 2:1 from vertex</text>
+</svg>

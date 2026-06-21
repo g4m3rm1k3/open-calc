@@ -1,0 +1,59 @@
+<svg viewBox="0 0 440 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="440" height="220" rx="8" class="svg-bg"/>
+
+  <!-- Vertex V at (80, 170) -->
+  <!-- Ray 1: V → (360, 60) upper ray -->
+  <line x1="80" y1="170" x2="360" y2="60" stroke="#1e3a5f" stroke-width="2.2"/>
+  <!-- Ray 2: V → (360, 200) lower ray -->
+  <line x1="80" y1="170" x2="360" y2="200" stroke="#1e3a5f" stroke-width="2.2"/>
+  <!-- Arrowheads -->
+  <polygon points="360,60 344,67 347,74" fill="#1e3a5f"/>
+  <polygon points="360,200 344,195 346,203" fill="#1e3a5f"/>
+
+  <circle cx="80" cy="170" r="5" fill="#1e3a5f"/>
+  <text x="62" y="174" font-size="13" fill="#1e3a5f" font-weight="700">V</text>
+
+  <!-- Arc from V (r=110) hitting upper ray at D and lower at E -->
+  <!-- Upper ray direction: (360-80, 60-170) = (280, -110), unit ≈ (0.931, -0.366), at r=110: D ≈ (80+102, 170-40) = (182, 130) -->
+  <!-- Lower ray direction: (360-80, 200-170) = (280, 30), unit ≈ (0.994, 0.106), at r=110: E ≈ (80+109, 170+12) = (189, 182) -->
+  <path d="M 182 130 A 110 110 0 0 1 189 182" fill="none" stroke="#1e3a5f" stroke-width="1.8" stroke-dasharray="5,3" opacity="0.6"/>
+
+  <!-- D and E points -->
+  <circle cx="182" cy="130" r="4.5" fill="#1e3a5f"/>
+  <text x="178" y="120" font-size="12" fill="#1e3a5f" font-weight="700" text-anchor="middle">D</text>
+  <circle cx="189" cy="182" r="4.5" fill="#1e3a5f"/>
+  <text x="195" y="196" font-size="12" fill="#1e3a5f" font-weight="700">E</text>
+
+  <!-- Equal arcs from D and E meeting at F -->
+  <!-- F approx at (260, 155) (midpoint bisector direction) -->
+  <path d="M 260 120 A 82 82 0 0 1 260 190" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="4,3" opacity="0.6"/>
+  <circle cx="260" cy="155" r="4.5" fill="#dc2626"/>
+  <text x="268" y="158" font-size="12" fill="#dc2626" font-weight="700">F</text>
+
+  <!-- Bisector ray VF extended -->
+  <line x1="80" y1="170" x2="360" y2="130" stroke="#1a3a2a" stroke-width="2.2" stroke-dasharray="6,3"/>
+  <polygon points="360,130 344,133 344,126" fill="#1a3a2a"/>
+
+  <!-- Angle arc labels -->
+  <text x="145" y="147" font-size="10" fill="#1a3a2a" font-weight="700">θ/2</text>
+  <text x="140" y="168" font-size="10" fill="#1a3a2a" font-weight="700">θ/2</text>
+
+  <!-- Equal tick marks on VD and VE -->
+  <line x1="136" y1="153" x2="132" y2="144" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="142" y1="178" x2="148" y2="169" stroke="#1e3a5f" stroke-width="2"/>
+
+  <text x="220" y="214" font-size="10" class="svg-muted" text-anchor="middle">Bisector VF: ∠DVF = ∠FVE = θ/2 (proved by SSS congruence)</text>
+</svg>

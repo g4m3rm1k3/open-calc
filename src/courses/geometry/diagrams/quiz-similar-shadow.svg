@@ -1,0 +1,52 @@
+<svg viewBox="0 0 380 170" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="380" height="170" rx="8" class="svg-bg"/>
+
+  <!-- Ground line -->
+  <line x1="10" y1="140" x2="370" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Sun rays direction (top-right to bottom-left) -->
+  <line x1="360" y1="20" x2="40" y2="140" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="5,3" opacity="0.6"/>
+  <text x="355" y="16" font-size="11" fill="#f59e0b">☀</text>
+
+  <!-- Pole: 6m tall -->
+  <line x1="80" y1="140" x2="80" y2="80" stroke="#1e3a5f" stroke-width="3"/>
+  <text x="65" y="112" font-size="11" fill="#1e3a5f" font-weight="700">6 m</text>
+
+  <!-- Pole shadow: 4m -->
+  <line x1="40" y1="140" x2="80" y2="140" stroke="#1e3a5f" stroke-width="2.5"/>
+  <text x="60" y="155" font-size="10" fill="#1e3a5f" text-anchor="middle" font-weight="700">4 m</text>
+
+  <!-- Hypotenuse of small triangle -->
+  <line x1="40" y1="140" x2="80" y2="80" stroke="#1e3a5f" stroke-width="1.2" stroke-dasharray="4,2"/>
+
+  <!-- Tree: tall (unknown height x) -->
+  <!-- Tree trunk -->
+  <line x1="270" y1="140" x2="270" y2="30" stroke="#1a3a2a" stroke-width="3"/>
+  <!-- Tree top (triangle shape) -->
+  <polygon points="270,15 250,55 290,55" fill="#1a3a2a" opacity="0.7"/>
+  <text x="284" y="78" font-size="13" fill="#dc2626" font-weight="700">x</text>
+
+  <!-- Tree shadow: 10m -->
+  <line x1="170" y1="140" x2="270" y2="140" stroke="#1a3a2a" stroke-width="2.5"/>
+  <text x="220" y="155" font-size="10" fill="#1a3a2a" text-anchor="middle" font-weight="700">10 m</text>
+
+  <!-- Hypotenuse of big triangle -->
+  <line x1="170" y1="140" x2="270" y2="30" stroke="#1a3a2a" stroke-width="1.2" stroke-dasharray="4,2"/>
+
+  <!-- Similar triangle labels -->
+  <text x="200" y="100" font-size="9" class="svg-muted">∼ (AA)</text>
+
+  <text x="190" y="165" font-size="9" class="svg-muted" text-anchor="middle">Same sun angle → similar triangles: 6/4 = x/10, find x</text>
+</svg>

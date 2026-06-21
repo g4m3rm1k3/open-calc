@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="300" class="svg-bg"/>
+
+  <!-- Q1–Q4: SAS triangle: b=7, c=10, A=60°, find a -->
+  <text x="165" y="22" font-size="14" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q4: SAS triangle</text>
+  <!-- A=(40,250) B=(290,250) C=(160,80) -->
+  <line x1="40"  y1="250" x2="290" y2="250" stroke="#166534" stroke-width="2.5" style="fill:none"/>
+  <line x1="40"  y1="250" x2="160" y2="80"  stroke="#1e3a5f" stroke-width="2.5" style="fill:none"/>
+  <line x1="290" y1="250" x2="160" y2="80"  stroke="#dc2626" stroke-width="2.5" style="fill:none"/>
+  <!-- Angle at A -->
+  <path d="M 88 250 A 48 48 0 0 0 67 216" fill="none" stroke="#dc2626" stroke-width="2"/>
+  <text x="92" y="240" font-size="13" fill="#dc2626">60°</text>
+  <text x="25" y="265" font-size="12" class="svg-sub">A</text>
+  <text x="293" y="265" font-size="12" class="svg-sub">B</text>
+  <text x="153" y="72" font-size="12" class="svg-sub">C</text>
+  <!-- Side labels -->
+  <text x="92" y="183" font-size="14" class="svg-text" font-weight="bold" font-style="italic">b = 7</text>
+  <text x="218" y="183" font-size="14" fill="#dc2626" font-weight="bold" font-style="italic">a = ?</text>
+  <text x="155" y="272" font-size="14" fill="#166534" font-weight="bold" font-style="italic">c = 10</text>
+
+  <!-- Divider -->
+  <line x1="355" y1="15" x2="355" y2="275" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Q5–Q8: SSS triangle: a=6, b=8, c=10, find angles -->
+  <text x="538" y="22" font-size="14" font-weight="bold" class="svg-sub" text-anchor="middle">Q5–Q8: SSS triangle</text>
+  <!-- A=(380,250) B=(640,250) C=(500,80) -->
+  <line x1="380" y1="250" x2="640" y2="250" stroke="#166534" stroke-width="2.5" style="fill:none"/>
+  <line x1="380" y1="250" x2="500" y2="80"  stroke="#1e3a5f" stroke-width="2.5" style="fill:none"/>
+  <line x1="640" y1="250" x2="500" y2="80"  stroke="#dc2626" stroke-width="2.5" style="fill:none"/>
+  <!-- All angles dashed/unknown -->
+  <path d="M 428 250 A 46 46 0 0 0 407 217" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="433" y="241" font-size="12" fill="#dc2626">A=?</text>
+  <path d="M 592 250 A 46 46 0 0 1 616 217" fill="none" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="540" y="241" font-size="12" class="svg-text">B=?</text>
+  <path d="M 480 109 A 30 30 0 0 1 520 109" fill="none" stroke="#b45309" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="486" y="74" font-size="12" fill="#b45309">C=?</text>
+  <text x="373" y="265" font-size="12" class="svg-sub">A</text>
+  <text x="643" y="265" font-size="12" class="svg-sub">B</text>
+  <!-- Side labels -->
+  <text x="421" y="180" font-size="14" class="svg-text" font-weight="bold" font-style="italic">b = 8</text>
+  <text x="568" y="180" font-size="14" fill="#dc2626" font-weight="bold" font-style="italic">a = 6</text>
+  <text x="497" y="272" font-size="14" fill="#166534" font-weight="bold" font-style="italic">c = 10</text>
+
+  <!-- Formula strip -->
+  <rect x="10" y="277" width="700" height="20" rx="4" class="svg-rule" stroke-width="1"/>
+  <text x="360" y="291" font-size="12" class="svg-text" text-anchor="middle">SAS: a² = b²+c²−2bc·cosA  ·  SSS: cosC = (a²+b²−c²)/(2ab)</text>
+</svg>

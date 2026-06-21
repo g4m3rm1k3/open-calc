@@ -1,0 +1,68 @@
+<svg viewBox="0 0 480 190" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="190" rx="8" class="svg-bg"/>
+  <text x="240" y="17" font-size="10" class="svg-muted" text-anchor="middle" font-weight="600">Two Similar Triangles: Same Angles, Proportional Sides (scale factor k = 2)</text>
+
+  <!-- Small triangle △ABC: right triangle 3-4-5 at left -->
+  <!-- A at (40,150), B at (40,90), C at (100,150) — legs 60,60(scaled) -->
+  <!-- Actually let me use specific coords: right angle at B -->
+  <!-- A=(40,160), B=(40,100), C=(100,160) — vertical leg=60 (∝4), horiz leg=45 (∝3), hyp=75 (∝5) -->
+  <polygon points="40,160 40,100 100,160" fill="rgba(30,58,95,0.08)" stroke="#1e3a5f" stroke-width="2"/>
+  <!-- Right angle marker at A (bottom-left) actually at B (top-left) -->
+  <rect x="40" y="100" width="10" height="10" fill="none" stroke="#1e3a5f" stroke-width="1.5"/>
+  <!-- Labels -->
+  <text x="28" y="165" font-size="12" fill="#1e3a5f" font-weight="700">A</text>
+  <text x="28" y="97" font-size="12" fill="#1e3a5f" font-weight="700">B</text>
+  <text x="104" y="165" font-size="12" fill="#1e3a5f" font-weight="700">C</text>
+  <!-- Side length labels -->
+  <text x="27" y="135" font-size="11" fill="#1e3a5f" text-anchor="middle">4</text>
+  <text x="70" y="173" font-size="11" fill="#1e3a5f" text-anchor="middle">3</text>
+  <text x="82" y="122" font-size="11" fill="#1e3a5f" text-anchor="middle">5</text>
+  <!-- Angle marks -->
+  <text x="48" y="155" font-size="9" fill="#7c3aed">α</text>
+  <text x="88" y="158" font-size="9" fill="#1a3a2a">β</text>
+  <text x="44" y="113" font-size="9" fill="#dc2626">90°</text>
+
+  <!-- Scale factor arrow -->
+  <text x="175" y="133" font-size="14" fill="#64748b" text-anchor="middle">→</text>
+  <text x="175" y="148" font-size="10" fill="#64748b" text-anchor="middle">k = 2</text>
+  <text x="175" y="162" font-size="9" fill="#64748b" text-anchor="middle">~</text>
+
+  <!-- Large triangle △DEF: scaled by 2, right triangle 6-8-10 -->
+  <!-- D=(220,170), E=(220,50), F=(340,170) — legs 120, 120, but proportional: vert=120(=8×15), horiz=90(=6×15), hyp=150 -->
+  <!-- Hmm let me use actual 6-8-10 scaled to pixel (×15): vert=120, horiz=90 -->
+  <polygon points="220,170 220,50 340,170" fill="rgba(30,58,95,0.12)" stroke="#1e3a5f" stroke-width="2.2"/>
+  <!-- Right angle marker at D (220,170) — actually right angle at E -->
+  <rect x="220" y="50" width="12" height="12" fill="none" stroke="#1e3a5f" stroke-width="1.5"/>
+  <!-- Labels -->
+  <text x="204" y="176" font-size="12" fill="#1e3a5f" font-weight="700">D</text>
+  <text x="204" y="47" font-size="12" fill="#1e3a5f" font-weight="700">E</text>
+  <text x="344" y="176" font-size="12" fill="#1e3a5f" font-weight="700">F</text>
+  <!-- Side labels -->
+  <text x="208" y="115" font-size="11" fill="#1e3a5f" text-anchor="middle">8</text>
+  <text x="280" y="183" font-size="11" fill="#1e3a5f" text-anchor="middle">6</text>
+  <text x="302" y="100" font-size="11" fill="#1e3a5f" text-anchor="middle">10</text>
+  <!-- Angle marks -->
+  <text x="229" y="162" font-size="9" fill="#7c3aed">α</text>
+  <text x="324" y="166" font-size="9" fill="#1a3a2a">β</text>
+  <text x="226" y="67" font-size="9" fill="#dc2626">90°</text>
+
+  <!-- Proportion box -->
+  <rect x="370" y="60" width="102" height="100" rx="7" fill="rgba(30,58,95,0.06)" stroke="#1e3a5f" stroke-width="1.2"/>
+  <text x="421" y="82" font-size="11" fill="#1e3a5f" font-weight="700" text-anchor="middle">Proportion</text>
+  <text x="421" y="100" font-size="10" fill="#374151" text-anchor="middle">AB/DE = 4/8 = ½</text>
+  <text x="421" y="116" font-size="10" fill="#374151" text-anchor="middle">BC/EF = 3/6 = ½</text>
+  <text x="421" y="132" font-size="10" fill="#374151" text-anchor="middle">AC/DF = 5/10 = ½</text>
+  <text x="421" y="150" font-size="10" fill="#1e3a5f" text-anchor="middle">k = 2  (DF/AC)</text>
+</svg>

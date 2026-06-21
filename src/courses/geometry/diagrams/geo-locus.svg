@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-proof { fill: #fff7ed; stroke: #b45309; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-proof { fill: #451a0322; stroke: #fbbf24; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- ===== Locus 1: Equidistant from two points = perpendicular bisector ===== -->
+  <text x="178" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Equidistant from Two Points</text>
+
+  <!-- Axes (light) -->
+  <line x1="30"  y1="175" x2="335" y2="175" stroke="#e2e8f0" stroke-width="1" style="fill:none"/>
+  <line x1="182" y1="40"  x2="182" y2="340" stroke="#e2e8f0" stroke-width="1" style="fill:none"/>
+
+  <!-- Two fixed points A=(2,5)→(102,75) and B=(8,5)→(282,75); coords: origin=(22,175),unit=40 -->
+  <!-- A=(2,2)→(22+80,175-80)=(102,95), B=(8,2)→(22+320,175-80)=(342... too wide) -->
+  <!-- Let's use A=(1,3)→(62,55), B=(7,3)→(302,55), midpoint M=(4,3)→(182,55) -->
+  <!-- Perp bisector: x=4, vertical line through M -->
+  <circle cx="62"  cy="55" r="6" fill="#dc2626"/>
+  <circle cx="302" cy="55" r="6" fill="#166534"/>
+  <text x="42"  y="46" font-size="13" fill="#dc2626"  font-weight="bold">A</text>
+  <text x="308" y="46" font-size="13" fill="#166534"  font-weight="bold">B</text>
+  <text x="42"  y="62" font-size="11" class="svg-muted">(1,3)</text>
+  <text x="308" y="62" font-size="11" class="svg-muted">(7,3)</text>
+
+  <!-- Perpendicular bisector: x=4 → x=182 vertical -->
+  <line x1="182" y1="35" x2="182" y2="335" stroke="#7c3aed" stroke-width="2.5" style="fill:none"/>
+  <text x="186" y="350" font-size="12" fill="#7c3aed" font-weight="bold">Locus: x = 4</text>
+
+  <!-- Midpoint M marker -->
+  <circle cx="182" cy="55" r="5" fill="#7c3aed"/>
+  <text x="188" y="50" font-size="11" fill="#7c3aed">M(4,3)</text>
+
+  <!-- Right angle at M -->
+  <line x1="62" y1="55" x2="302" y2="55" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <rect x="182" y="55" width="10" height="10" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+
+  <!-- Sample point P on locus, equal distances shown -->
+  <circle cx="182" cy="155" r="5" fill="#b45309"/>
+  <text x="188" y="152" font-size="11" fill="#b45309">P</text>
+  <line x1="62"  cy="55" x1="62"  y1="55" x2="182" y2="155" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="302" y1="55" x2="182" y2="155" stroke="#166534" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <text x="105" y="125" font-size="12" fill="#dc2626" font-style="italic">r</text>
+  <text x="248" y="125" font-size="12" fill="#166534" font-style="italic">r</text>
+
+  <!-- Rule box -->
+  <rect x="18" y="250" width="310" height="80" rx="8" class="svg-panel" stroke-width="1.5"/>
+  <text x="173" y="270" font-size="13" class="svg-text" font-weight="bold" text-anchor="middle">Locus Rule 1</text>
+  <text x="28" y="290" font-size="12" class="svg-sub">Set of all points equidistant</text>
+  <text x="28" y="306" font-size="12" class="svg-sub">from two fixed points A and B</text>
+  <text x="28" y="322" font-size="13" fill="#7c3aed" font-weight="bold">= Perpendicular bisector of AB</text>
+
+  <!-- Divider -->
+  <line x1="360" y1="30" x2="360" y2="370" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- ===== Locus 2: Equidistant from two lines = angle bisector ===== -->
+  <text x="540" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Equidistant from Two Lines</text>
+
+  <!-- Two intersecting lines meeting at V=(540,190) -->
+  <line x1="390" y1="320" x2="690" y2="60" stroke="#dc2626" stroke-width="2" style="fill:none"/>
+  <line x1="390" y1="60"  x2="690" y2="320" stroke="#166534" stroke-width="2" style="fill:none"/>
+
+  <!-- Labels -->
+  <text x="374" y="318" font-size="13" fill="#dc2626">ℓ₁</text>
+  <text x="374" y="62"  font-size="13" fill="#166534">ℓ₂</text>
+
+  <!-- Angle bisectors (two): one is y=190 (horiz) passing through V and the vertical x=540 -->
+  <line x1="380" y1="190" x2="700" y2="190" stroke="#7c3aed" stroke-width="2.5" style="fill:none"/>
+  <line x1="540" y1="35"  x2="540" y2="345" stroke="#b45309" stroke-width="2" stroke-dasharray="8,5" style="fill:none"/>
+
+  <text x="696" y="186" font-size="12" fill="#7c3aed" font-weight="bold">bisector 1</text>
+  <text x="543" y="348" font-size="12" fill="#b45309" font-weight="bold">bisector 2</text>
+
+  <!-- Angle arc at V -->
+  <circle cx="540" cy="190" r="4" class="svg-sub" style="fill:#374151;stroke:none"/>
+  <text x="546" y="186" font-size="11" class="svg-sub">V</text>
+  <path d="M 560 165 A 30 30 0 0 0 564 214" fill="none" stroke="#1e3a5f" stroke-width="1.5"/>
+
+  <!-- Sample P on bisector 1, equal perp distances to ℓ₁ and ℓ₂ -->
+  <circle cx="620" cy="190" r="5" fill="#7c3aed"/>
+  <text x="624" y="185" font-size="11" fill="#7c3aed">P</text>
+
+  <!-- Rule box -->
+  <rect x="370" y="250" width="340" height="95" rx="8" class="svg-panel" stroke-width="1.5"/>
+  <text x="540" y="270" font-size="13" class="svg-text" font-weight="bold" text-anchor="middle">Locus Rule 2</text>
+  <text x="380" y="290" font-size="12" class="svg-sub">Set of all points equidistant</text>
+  <text x="380" y="306" font-size="12" class="svg-sub">from two intersecting lines ℓ₁ and ℓ₂</text>
+  <text x="380" y="322" font-size="13" fill="#7c3aed" font-weight="bold">= The two angle bisectors at the vertex</text>
+  <text x="380" y="338" font-size="11" class="svg-muted">(perpendicular to each other)</text>
+
+  <!-- Bottom summary -->
+  <rect x="10" y="345" width="700" height="30" rx="6" class="svg-use" stroke-width="1"/>
+  <text x="360" y="357" font-size="12" fill="#166534" font-weight="bold" text-anchor="middle">Also: equidistant from one line → two parallel lines; from one point → circle</text>
+  <text x="360" y="370" font-size="11" class="svg-muted" text-anchor="middle">Locus = describe the shape traced by all points satisfying the given condition</text>
+</svg>

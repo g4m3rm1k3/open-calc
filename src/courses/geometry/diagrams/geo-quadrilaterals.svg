@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .svg-warn  { fill: #fff7ed; stroke: #b45309; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+    .dark .svg-warn  { fill: #7c2d1222; stroke: #fb923c; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- Title -->
+  <text x="360" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Quadrilateral Family Tree</text>
+
+  <!-- ===== Hierarchy tree ===== -->
+  <!-- Quadrilateral root -->
+  <rect x="270" y="30" width="180" height="30" rx="6" class="svg-panel" stroke-width="1.5"/>
+  <text x="360" y="50" font-size="13" class="svg-text" font-weight="bold" text-anchor="middle">Quadrilateral</text>
+
+  <!-- branch lines down -->
+  <line x1="360" y1="60" x2="360" y2="80" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="150" y1="80" x2="570" y2="80" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="150" y1="80" x2="150" y2="98" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="360" y1="80" x2="360" y2="98" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="570" y1="80" x2="570" y2="98" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Trapezoid -->
+  <rect x="72" y="98" width="156" height="30" rx="6" class="svg-warn" stroke-width="1.5"/>
+  <text x="150" y="118" font-size="12" fill="#b45309" font-weight="bold" text-anchor="middle">Trapezoid</text>
+
+  <!-- Kite -->
+  <rect x="282" y="98" width="156" height="30" rx="6" style="fill:#fdf4ff;stroke:#7c3aed" stroke-width="1.5"/>
+  <text x="360" y="118" font-size="12" fill="#7c3aed" font-weight="bold" text-anchor="middle">Kite</text>
+
+  <!-- Parallelogram -->
+  <rect x="492" y="98" width="156" height="30" rx="6" class="svg-use" stroke-width="1.5"/>
+  <text x="570" y="118" font-size="12" fill="#166534" font-weight="bold" text-anchor="middle">Parallelogram</text>
+
+  <!-- Parallelogram branches -->
+  <line x1="570" y1="128" x2="570" y2="148" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="480" y1="148" x2="660" y2="148" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="480" y1="148" x2="480" y2="166" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="570" y1="148" x2="570" y2="166" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="660" y1="148" x2="660" y2="166" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Rectangle -->
+  <rect x="402" y="166" width="104" height="28" rx="6" class="svg-panel" stroke-width="1.5"/>
+  <text x="454" y="184" font-size="12" class="svg-text" font-weight="bold" text-anchor="middle">Rectangle</text>
+
+  <!-- Rhombus -->
+  <rect x="516" y="166" width="104" height="28" rx="6" class="svg-panel" stroke-width="1.5"/>
+  <text x="568" y="184" font-size="12" class="svg-text" font-weight="bold" text-anchor="middle">Rhombus</text>
+
+  <!-- Square -->
+  <rect x="512" y="166" width="104" height="28" rx="6" style="fill:#fef9c3;stroke:#b45309" stroke-width="0" opacity="0"/>
+  <!-- Square node from rectangle+rhombus -->
+  <line x1="454" y1="194" x2="454" y2="210" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="568" y1="194" x2="568" y2="210" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="454" y1="210" x2="568" y2="210" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="511" y1="210" x2="511" y2="225" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <rect x="455" y="225" width="112" height="28" rx="6" style="fill:#fef9c3;stroke:#b45309;stroke-width:1.5"/>
+  <text x="511" y="243" font-size="12" fill="#b45309" font-weight="bold" text-anchor="middle">Square</text>
+
+  <!-- ===== Shape panels across bottom ===== -->
+  <!-- Trapezoid shape -->
+  <polygon points="48,290 132,290 118,330 42,330" fill="#fff7ed" stroke="#b45309" stroke-width="1.5"/>
+  <text x="87" y="308" font-size="9" fill="#b45309" text-anchor="middle">one pair</text>
+  <text x="87" y="320" font-size="9" fill="#b45309" text-anchor="middle">parallel sides</text>
+  <line x1="48" y1="290" x2="132" y2="290" stroke="#b45309" stroke-width="2.5" style="fill:none"/>
+  <line x1="42" y1="330" x2="118" y2="330" stroke="#b45309" stroke-width="2.5" style="fill:none"/>
+
+  <!-- Parallelogram shape -->
+  <polygon points="158,290 250,290 240,330 148,330" fill="#f0fdf4" stroke="#166534" stroke-width="1.5"/>
+  <text x="199" y="306" font-size="9" fill="#166534" text-anchor="middle">opp. sides ‖ &amp;</text>
+  <text x="199" y="318" font-size="9" fill="#166534" text-anchor="middle">equal; diags</text>
+  <text x="199" y="330" font-size="9" fill="#166534" text-anchor="middle">bisect each other</text>
+
+  <!-- Rectangle shape -->
+  <rect x="268" y="290" width="90" height="44" fill="#eff6ff" stroke="#1e3a5f" stroke-width="1.5"/>
+  <text x="313" y="308" font-size="9" class="svg-text" text-anchor="middle">all angles 90°;</text>
+  <text x="313" y="320" font-size="9" class="svg-text" text-anchor="middle">diags equal</text>
+  <!-- right-angle marks -->
+  <path d="M 268 330 l 8 0 l 0 -8" fill="none" stroke="#1e3a5f" stroke-width="1.2"/>
+  <path d="M 358 330 l -8 0 l 0 -8" fill="none" stroke="#1e3a5f" stroke-width="1.2"/>
+
+  <!-- Rhombus shape -->
+  <polygon points="415,290 454,312 415,334 376,312" fill="#fdf4ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="415" y="310" font-size="9" fill="#7c3aed" text-anchor="middle">all sides equal;</text>
+  <text x="415" y="322" font-size="9" fill="#7c3aed" text-anchor="middle">diags ⊥ bisect</text>
+
+  <!-- Square shape -->
+  <rect x="476" y="290" width="46" height="46" fill="#fef9c3" stroke="#b45309" stroke-width="1.5"/>
+  <path d="M 476 336 l 8 0 l 0 -8" fill="none" stroke="#b45309" stroke-width="1.2"/>
+  <text x="499" y="308" font-size="9" fill="#b45309" text-anchor="middle">all sides</text>
+  <text x="499" y="320" font-size="9" fill="#b45309" text-anchor="middle">equal +</text>
+  <text x="499" y="332" font-size="9" fill="#b45309" text-anchor="middle">all 90°</text>
+
+  <!-- Kite shape -->
+  <polygon points="575,290 615,320 575,338 535,320" fill="#fdf4ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="575" y="308" font-size="9" fill="#7c3aed" text-anchor="middle">2 pairs adj.</text>
+  <text x="575" y="320" font-size="9" fill="#7c3aed" text-anchor="middle">equal sides;</text>
+  <text x="575" y="332" font-size="9" fill="#7c3aed" text-anchor="middle">1 diag ⊥ bisects</text>
+
+  <!-- Property table: side strip -->
+  <rect x="10" y="356" width="700" height="20" rx="4" class="svg-panel" stroke-width="1"/>
+  <text x="360" y="370" font-size="11" class="svg-text" text-anchor="middle">Angle sum = 360° for all quadrilaterals · Area = base × height (parallelogram) · Area = ½ d₁d₂ (rhombus/kite)</text>
+</svg>

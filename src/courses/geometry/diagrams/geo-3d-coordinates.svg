@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- ===== 3D Coordinate System (left) ===== -->
+  <text x="178" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">3D Coordinate System</text>
+
+  <!-- Origin O=(160,200) -->
+  <!-- x-axis → right and slightly down (isometric) -->
+  <!-- y-axis → up -->
+  <!-- z-axis → right-forward (into page) -->
+
+  <!-- z-axis (into page/right-down) -->
+  <line x1="160" y1="200" x2="50"  y2="270" stroke="#dc2626" stroke-width="2" style="fill:none"/>
+  <text x="34"  y="278" font-size="14" fill="#dc2626" font-weight="bold" font-style="italic">z</text>
+  <!-- x-axis (right) -->
+  <line x1="160" y1="200" x2="320" y2="200" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <text x="325" y="204" font-size="14" fill="#166534" font-weight="bold" font-style="italic">x</text>
+  <!-- y-axis (up) -->
+  <line x1="160" y1="200" x2="160" y2="50"  stroke="#1e3a5f" stroke-width="2" style="fill:none"/>
+  <text x="165" y="44"  font-size="14" class="svg-text" font-weight="bold" font-style="italic">y</text>
+
+  <!-- Arrowheads -->
+  <polygon points="320,200 308,195 308,205" fill="#166534"/>
+  <polygon points="160,50 155,62 165,62" class="svg-text" style="fill:#1e3a5f;stroke:none"/>
+  <polygon points="50,270 62,261 55,274" fill="#dc2626"/>
+
+  <!-- Origin dot -->
+  <circle cx="160" cy="200" r="5" class="svg-sub" style="fill:#374151;stroke:none"/>
+  <text x="145" y="218" font-size="12" class="svg-sub">O(0,0,0)</text>
+
+  <!-- Point P=(4,3,2) — plot it -->
+  <!-- In isometric: screen=(Ox + x*1 - z*0.5, Oy - y*1 + z*0.4) approx -->
+  <!-- x-component: +40*4=+160 (to the right), z-component: -15*2=-30 x, +12*2=+24 y -->
+  <!-- y-component: -40*3 = -120 upward -->
+  <!-- P_screen = (160+160-30, 200-120+24) = (290, 104) approx -->
+  <!-- Let's use x-step=(30,0), z-step=(-15,12), y-step=(0,-35) -->
+  <!-- P(4,3,2): x=4: (120,0); z=2: (-30,24); y=3: (0,-105) -->
+  <!-- screen P = (160+120-30, 200+0+24-105) = (250, 119) -->
+
+  <!-- Projection lines from axes to P -->
+  <line x1="160" y1="200" x2="280" y2="200" stroke="#166534" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="280" y1="200" x2="250" y2="224" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="250" y1="224" x2="250" y2="119" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+
+  <!-- P dot -->
+  <circle cx="250" cy="119" r="7" fill="#b45309"/>
+  <text x="258" y="115" font-size="14" fill="#b45309" font-weight="bold">P(4, 3, 2)</text>
+
+  <!-- Axis tick labels -->
+  <text x="280" y="214" font-size="11" fill="#166534" text-anchor="middle">x=4</text>
+  <text x="232" y="233" font-size="11" fill="#dc2626">z=2</text>
+  <text x="258" y="170" font-size="11" class="svg-text">y=3</text>
+
+  <!-- Formula panel -->
+  <rect x="18" y="295" width="330" height="78" rx="8" class="svg-panel" stroke-width="1.5"/>
+  <text x="183" y="315" font-size="13" class="svg-text" font-weight="bold" text-anchor="middle">3D Formulas</text>
+  <text x="28" y="333" font-size="13" class="svg-sub">Distance: |PQ|=√((Δx)²+(Δy)²+(Δz)²)</text>
+  <text x="28" y="351" font-size="13" class="svg-sub">Midpoint: M=((x₁+x₂)/2,(y₁+y₂)/2,(z₁+z₂)/2)</text>
+  <text x="28" y="369" font-size="13" class="svg-sub">Section: same as 2D extended to 3 components</text>
+
+  <!-- Divider -->
+  <line x1="370" y1="30" x2="370" y2="375" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- ===== Distance in 3D (right) ===== -->
+  <text x="548" y="22" font-size="15" class="svg-text" font-weight="bold" text-anchor="middle">Distance Formula in 3D</text>
+
+  <!-- Two points P and Q on simple 3D grid -->
+  <!-- P=(1,2,3) Q=(5,5,7) relative to origin=(420,220) -->
+  <!-- scaling: x→30, y→-28, z→-15,+12 -->
+
+  <!-- Simple rectangular box illustrating Pythagorean extension -->
+  <!-- Base corners: (420,220) (540,220) at y=0 plane -->
+  <line x1="420" y1="220" x2="540" y2="220" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+  <line x1="540" y1="220" x2="510" y2="244" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="420" y1="220" x2="390" y2="244" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <!-- Heights -->
+  <line x1="540" y1="220" x2="540" y2="120" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="420" y1="220" x2="420" y2="120" stroke="#1e3a5f" stroke-width="1.5" stroke-dasharray="4,3" style="fill:none"/>
+
+  <!-- P at (420,120) Q at (540,120) -->
+  <circle cx="420" cy="120" r="6" fill="#dc2626"/>
+  <circle cx="540" cy="120" r="6" fill="#166534"/>
+  <text x="396" y="115" font-size="13" fill="#dc2626"  font-weight="bold">P</text>
+  <text x="546" y="115" font-size="13" fill="#166534"  font-weight="bold">Q</text>
+
+  <!-- Hypotenuse PQ -->
+  <line x1="420" y1="120" x2="540" y2="120" stroke="#b45309" stroke-width="2.5" style="fill:none"/>
+  <text x="480" y="112" font-size="13" fill="#b45309" font-weight="bold" text-anchor="middle">d = ?</text>
+
+  <!-- Intermediate diagonal in base -->
+  <line x1="420" y1="220" x2="540" y2="220" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+  <!-- Labels -->
+  <text x="480" y="238" font-size="12" fill="#166534" text-anchor="middle">Δx</text>
+  <text x="395" y="234" font-size="12" fill="#dc2626">Δz</text>
+  <text x="555" y="172" font-size="12" class="svg-text">Δy</text>
+
+  <!-- Step 1: base diagonal = √(Δx²+Δz²) -->
+  <line x1="420" y1="220" x2="540" y2="220" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3" style="fill:none"/>
+  <line x1="420" y1="220" x2="540" y2="120" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5,3" style="fill:none"/>
+  <text x="504" y="192" font-size="11" fill="#7c3aed">√(Δx²+Δz²)</text>
+
+  <!-- Final formula derivation -->
+  <rect x="375" y="270" width="335" height="100" rx="8" class="svg-use" stroke-width="1.5"/>
+  <text x="542" y="290" font-size="13" fill="#166534" font-weight="bold" text-anchor="middle">Two-Step Pythagoras</text>
+  <text x="385" y="308" font-size="12" class="svg-sub">Step 1: base diagonal d₁ = √(Δx²+Δz²)</text>
+  <text x="385" y="326" font-size="12" class="svg-sub">Step 2: d = √(d₁²+Δy²)</text>
+  <text x="385" y="344" font-size="12" class="svg-sub">      = √(Δx²+Δz²+Δy²)</text>
+  <text x="385" y="362" font-size="15" fill="#b45309" font-weight="bold">d = √(Δx²+Δy²+Δz²) ✓</text>
+</svg>

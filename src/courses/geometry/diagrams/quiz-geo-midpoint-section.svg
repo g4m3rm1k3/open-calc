@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="300" class="svg-bg"/>
+
+  <!-- Q1–Q4: Midpoint problems -->
+  <text x="175" y="22" font-size="14" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q4: Midpoint</text>
+
+  <!-- Axes -->
+  <line x1="20"  y1="165" x2="330" y2="165" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="40"  y1="265" x2="40"  y2="40"  stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <text x="333" y="169" font-size="10" class="svg-muted">x</text>
+  <text x="42"  y="36"  font-size="10" class="svg-muted">y</text>
+
+  <!-- A=(1,4)→(70,85), B=(7,2)→(190,125), M=? -->
+  <!-- Scale: 1unit=20px, origin=(40,165) -->
+  <!-- A=(1,4): (40+20,165-80)=(60,85), B=(7,2): (40+140,165-40)=(180,125) -->
+  <!-- M=(4,3): (40+80,165-60)=(120,105) -->
+  <line x1="60" y1="85" x2="180" y2="125" stroke="#1e3a5f" stroke-width="2.5" style="fill:none"/>
+  <circle cx="60"  cy="85"  r="6" fill="#dc2626"/>
+  <circle cx="180" cy="125" r="6" fill="#166534"/>
+  <circle cx="120" cy="105" r="6" fill="#7c3aed" stroke-dasharray="3,2" stroke="#7c3aed" fill-opacity="0.3"/>
+  <text x="38"  y="78"  font-size="13" fill="#dc2626"  font-weight="bold">A(1, 4)</text>
+  <text x="183" y="122" font-size="13" fill="#166534"  font-weight="bold">B(7, 2)</text>
+  <text x="124" y="100" font-size="13" fill="#7c3aed"  font-weight="bold">M=?</text>
+
+  <!-- Q3: find endpoint when M given -->
+  <!-- A=(2,5): (80,65), M=(5,3): (140,105), find B -->
+  <line x1="80" y1="65" x2="200" y2="145" stroke="#b45309" stroke-width="2" stroke-dasharray="5,3" style="fill:none"/>
+  <circle cx="80"  cy="65"  r="5" fill="#dc2626"/>
+  <circle cx="140" cy="105" r="5" fill="#b45309"/>
+  <circle cx="200" cy="145" r="5" fill="#dc2626" fill-opacity="0.3" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="50"  y="58"  font-size="11" fill="#dc2626">A(2,5)</text>
+  <text x="143" y="100" font-size="11" fill="#b45309">M(5,3)</text>
+  <text x="202" y="148" font-size="11" fill="#dc2626">B=?</text>
+
+  <!-- Grid lines -->
+  <line x1="40" y1="165" x2="330" y2="165" stroke="#e2e8f0" stroke-width="0.8" style="fill:none"/>
+  <!-- x tick marks -->
+  <text x="60"  y="175" font-size="9" class="svg-muted" text-anchor="middle">1</text>
+  <text x="80"  y="175" font-size="9" class="svg-muted" text-anchor="middle">2</text>
+  <text x="100" y="175" font-size="9" class="svg-muted" text-anchor="middle">3</text>
+  <text x="120" y="175" font-size="9" class="svg-muted" text-anchor="middle">4</text>
+  <text x="140" y="175" font-size="9" class="svg-muted" text-anchor="middle">5</text>
+  <text x="160" y="175" font-size="9" class="svg-muted" text-anchor="middle">6</text>
+  <text x="180" y="175" font-size="9" class="svg-muted" text-anchor="middle">7</text>
+
+  <!-- Divider -->
+  <line x1="355" y1="20" x2="355" y2="280" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Q5–Q10: Section formula + centroid -->
+  <text x="540" y="22" font-size="14" font-weight="bold" class="svg-sub" text-anchor="middle">Q5–Q10: Section &amp; centroid</text>
+
+  <!-- Axes -->
+  <line x1="375" y1="165" x2="710" y2="165" stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+  <line x1="395" y1="265" x2="395" y2="40"  stroke="#94a3b8" stroke-width="1.5" style="fill:none"/>
+
+  <!-- A=(1,5)→(415,65), B=(7,2)→(535,125), P divides 2:1 -->
+  <!-- P = ((2*7+1*1)/3,(2*2+1*5)/3)=(5,3)→(495,105) -->
+  <line x1="415" y1="65" x2="535" y2="125" stroke="#1e3a5f" stroke-width="2.5" style="fill:none"/>
+  <circle cx="415" cy="65"  r="6" fill="#dc2626"/>
+  <circle cx="535" cy="125" r="6" fill="#166534"/>
+  <circle cx="495" cy="105" r="6" fill="#b45309"/>
+  <text x="388" y="58"  font-size="13" fill="#dc2626"  font-weight="bold">A(1,5)</text>
+  <text x="538" y="122" font-size="13" fill="#166534"  font-weight="bold">B(7,2)</text>
+  <text x="498" y="99"  font-size="13" fill="#b45309"  font-weight="bold">P=?</text>
+  <text x="445" y="82"  font-size="11" fill="#b45309"  font-style="italic">2 parts</text>
+  <text x="508" y="122" font-size="11" fill="#b45309"  font-style="italic">1 part</text>
+  <text x="540" y="150" font-size="12" class="svg-sub">P divides AB in ratio 2:1 from A</text>
+
+  <!-- Triangle centroid Q8-Q10 -->
+  <!-- Vertices: A=(1,5)→(415,65), B=(5,1)→(495,145), C=(7,5)→(535,65) -->
+  <!-- G=((1+5+7)/3,(5+1+5)/3)=(13/3,11/3)≈(4.3,3.7)→(481,91) -->
+  <polygon points="415,65 495,145 535,65" fill="#7c3aed22" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <circle cx="415" cy="65" r="4" fill="#7c3aed" fill-opacity="0.7"/>
+  <circle cx="495" cy="145" r="4" fill="#7c3aed" fill-opacity="0.7"/>
+  <circle cx="535" cy="65"  r="4" fill="#7c3aed" fill-opacity="0.7"/>
+  <text x="390" y="62"  font-size="10" fill="#7c3aed">A(1,5)</text>
+  <text x="497" y="158" font-size="10" fill="#7c3aed">B(5,1)</text>
+  <text x="537" y="62"  font-size="10" fill="#7c3aed">C(7,5)</text>
+  <!-- Medians -->
+  <line x1="415" y1="65" x2="515" y2="105" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,3" style="fill:none"/>
+  <line x1="495" y1="145" x2="475" y2="65" stroke="#7c3aed" stroke-width="1" stroke-dasharray="4,3" style="fill:none"/>
+  <!-- centroid G -->
+  <circle cx="482" cy="92" r="5" fill="#7c3aed"/>
+  <text x="488" y="90" font-size="11" fill="#7c3aed" font-weight="bold">G=?</text>
+
+  <!-- Formula strip -->
+  <rect x="10" y="272" width="700" height="22" rx="5" class="svg-rule" stroke-width="1"/>
+  <text x="360" y="287" font-size="12" class="svg-text" text-anchor="middle">M=((x₁+x₂)/2,(y₁+y₂)/2) · P=(mx₂+nx₁)/(m+n),(my₂+ny₁)/(m+n)) · G=((x₁+x₂+x₃)/3,(y₁+y₂+y₃)/3)</text>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-warn  { fill: #fef2f2; stroke: #dc2626; }
+    .svg-proof { fill: #fff7ed; stroke: #b45309; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-warn  { fill: #7f1d1d22; stroke: #f87171; }
+    .dark .svg-proof { fill: #451a0322; stroke: #fbbf24; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- Triangle: A=(80,310) B=(470,310) C=(300,80) -->
+  <line x1="80"  y1="310" x2="470" y2="310" stroke="#166534" stroke-width="3" style="fill:none"/>
+  <line x1="80"  y1="310" x2="300" y2="80"  stroke="#1e3a5f" stroke-width="3" style="fill:none"/>
+  <line x1="470" y1="310" x2="300" y2="80"  stroke="#dc2626" stroke-width="3" style="fill:none"/>
+
+  <!-- Altitude (dashed) -->
+  <line x1="300" y1="80" x2="300" y2="310" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="6,4" style="fill:none"/>
+  <rect x="288" y="298" width="12" height="12" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="310" y="206" font-size="12" fill="#7c3aed" font-style="italic">h</text>
+
+  <!-- Angle arcs -->
+  <path d="M 128 310 A 48 48 0 0 0 103 272" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+  <text x="78"  y="272" font-size="19" fill="#dc2626"  font-style="italic">A</text>
+  <path d="M 422 310 A 48 48 0 0 1 446 272" fill="none" stroke="#1e3a5f" stroke-width="2.5"/>
+  <text x="476" y="272" font-size="19" class="svg-text" font-style="italic">B</text>
+  <path d="M 280 111 A 36 36 0 0 1 320 111" fill="none" stroke="#b45309" stroke-width="2.5"/>
+  <text x="293" y="74"  font-size="19" fill="#b45309" font-style="italic">C</text>
+
+  <!-- Vertex dots -->
+  <circle cx="80"  cy="310" r="5" fill="#dc2626"/>
+  <circle cx="470" cy="310" r="5" fill="#1e3a5f" class="svg-text" style="stroke:none"/>
+  <circle cx="300" cy="80"  r="5" fill="#b45309"/>
+
+  <!-- Side labels -->
+  <text x="414" y="212" font-size="18" fill="#dc2626" font-weight="bold" font-style="italic">a</text>
+  <text x="382" y="232" font-size="12" fill="#dc2626">(opp A)</text>
+  <text x="148" y="197" font-size="18" font-weight="bold" font-style="italic" class="svg-text">b</text>
+  <text x="116" y="217" font-size="12" class="svg-muted">(opp B)</text>
+  <text x="280" y="338" font-size="18" fill="#166534" font-weight="bold" font-style="italic">c</text>
+  <text x="253" y="355" font-size="12" fill="#166534">(opp C)</text>
+
+  <!-- Law of Sines box -->
+  <rect x="548" y="60" width="160" height="130" rx="10" class="svg-panel" stroke-width="1.5"/>
+  <text x="628" y="83"  font-size="14" font-weight="bold" class="svg-text" text-anchor="middle">Law of Sines</text>
+  <text x="628" y="108" font-size="16" class="svg-text" text-anchor="middle" font-style="italic">a / sin A</text>
+  <text x="628" y="124" font-size="13" class="svg-sub" text-anchor="middle">= b / sin B</text>
+  <text x="628" y="140" font-size="13" class="svg-sub" text-anchor="middle">= c / sin C</text>
+  <text x="628" y="162" font-size="11" class="svg-muted" text-anchor="middle">= 2R (circumradius)</text>
+  <text x="628" y="180" font-size="11" fill="#7c3aed" text-anchor="middle" font-style="italic">each ratio equals same constant</text>
+
+  <!-- Proof -->
+  <rect x="10" y="20" width="340" height="56" rx="8" class="svg-proof" stroke-width="1.5"/>
+  <text x="180" y="40" font-size="13" fill="#b45309" font-weight="bold" text-anchor="middle">Proof via altitude h</text>
+  <text x="20" y="58" font-size="13" class="svg-sub">From A: h = b sin A  ·  From B: h = a sin B</text>
+  <text x="20" y="74" font-size="13" class="svg-sub">∴ b sin A = a sin B  →  a/sin A = b/sin B</text>
+
+  <!-- Ambiguous case -->
+  <rect x="548" y="210" width="160" height="110" rx="10" class="svg-warn" stroke-width="1.5"/>
+  <text x="628" y="230" font-size="13" fill="#dc2626" font-weight="bold" text-anchor="middle">⚠ Ambiguous Case</text>
+  <text x="555" y="252" font-size="12" class="svg-sub">SSA: given A, a, b</text>
+  <text x="555" y="270" font-size="12" class="svg-sub">• a ≥ b → 1 triangle</text>
+  <text x="555" y="287" font-size="12" class="svg-sub">• a = b·sinA → 1 (right)</text>
+  <text x="555" y="304" font-size="12" class="svg-sub">• b·sinA &lt; a &lt; b → 2 triangles</text>
+
+  <!-- When to use -->
+  <rect x="10" y="330" width="520" height="42" rx="6" class="svg-use" stroke-width="1"/>
+  <text x="20" y="349" font-size="13" fill="#166534" font-weight="bold">Use Law of Sines when you know:</text>
+  <text x="20" y="366" font-size="12" class="svg-sub">AAS · ASA · SSA (check ambiguous case)</text>
+</svg>

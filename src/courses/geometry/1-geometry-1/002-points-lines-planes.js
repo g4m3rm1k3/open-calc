@@ -44,6 +44,20 @@ Click **Reset** to start again.`,
       css: `body{margin:0;background:var(--color-background-secondary,#f8fafc);font-family:Georgia,serif}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var pts=[];
 var labels=['A','B','C'];
 var colors=['#1e3a5f','#1a3a2a','#7c3aed'];
@@ -54,7 +68,7 @@ function collinear(a,b,c){
 
 function draw(){
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
 
   var msg='';
 
@@ -76,7 +90,7 @@ function draw(){
     if(isColl){
       var dx=pts[1].x-pts[0].x,dy=pts[1].y-pts[0].y;
       var len=Math.hypot(dx,dy)||1;var ux=dx/len,uy=dy/len;
-      ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2.5;ctx.setLineDash([]);
+      ctx.strokeStyle=NAVY;ctx.lineWidth=2.5;ctx.setLineDash([]);
       ctx.beginPath();
       ctx.moveTo(pts[0].x-ux*600,pts[0].y-uy*600);
       ctx.lineTo(pts[0].x+ux*600,pts[0].y+uy*600);
@@ -89,7 +103,7 @@ function draw(){
       ctx.lineTo(pts[2].x,pts[2].y);
       ctx.closePath();
       ctx.fillStyle='rgba(124,58,237,0.12)';ctx.fill();
-      ctx.strokeStyle='#7c3aed';ctx.lineWidth=2;ctx.stroke();
+      ctx.strokeStyle=PURPLE;ctx.lineWidth=2;ctx.stroke();
       msg='<strong style="color:#7c3aed">Non-collinear!</strong> A, B, C are not on one line — they determine exactly one unique plane (shaded). This is why architecture uses triangles: 3 non-collinear points = rigidity.';
     }
   }
@@ -166,7 +180,7 @@ items.forEach(function(item){
       b.style.borderColor=right?'#86efac':'#fca5a5';
       b.style.color=right?'#166534':'#991b1b';
       fb.style.display='block';
-      fb.innerHTML='<strong style="color:'+(right?'#166534':'#991b1b')+'">'+(right?'Correct':'Incorrect — it\'s a '+item.correct)+'. </strong>'+item.note;
+      fb.innerHTML='<strong style="color:'+(right?'#166534':'#991b1b')+'">'+(right?'Correct':"Incorrect — it's a "+item.correct)+'. </strong>'+item.note;
     };
     btns.appendChild(b);
   });
@@ -210,6 +224,7 @@ export default {
   id: 'geo-1-2',
   slug: 'points-lines-planes',
   chapter: 'geometry-1',
+  subject: 'Geometry',
   title: 'Points, Lines, and Planes',
   subtitle: 'The three undefined terms that all of geometry is built on',
   tags: ['geometry', 'points-lines-planes', 'undefined-terms', 'collinear', 'coplanar', 'postulates'],
@@ -349,6 +364,14 @@ export default {
         caption: 'Skew lines m and n: not parallel, do not intersect. They live in different planes. Only possible in 3D.',
       },
 
+      // ── INTERACTIVE ───────────────────────────────────────────────────────
+      {
+        type: 'viz',
+        id: 'ScienceNotebook',
+        props: { lesson: LESSON_GEO_1_2 },
+        mathBridge: 'Work through the notebook in order: (1) click to place 2 then 3 points in the canvas — see Postulate I lock in the unique line, then watch whether your three points define a plane or stay collinear; (2) in the classifier, identify each object as segment, ray, or line; (3) answer the two postulate challenges. Each cell builds directly on the definitions above.',
+      },
+
     ],
   },
   mentalModel: [
@@ -379,7 +402,9 @@ export default {
     {
       id: 'q3',
       type: 'choice',
-      text: 'Three points are collinear. What is guaranteed?',
+      diagram: quizCollinearUrl,
+      diagramAlt: 'Left: collinear points A, B, C all on one line. Right: non-collinear points P, Q, R forming a triangle.',
+      text: 'Looking at the diagram — points A, B, C are collinear. What is guaranteed about them?',
       options: [
         'They form a triangle',
         'They all lie on the same single line',
@@ -415,7 +440,9 @@ export default {
     {
       id: 'q7',
       type: 'choice',
-      text: 'A ray starts at an endpoint and extends forever in one direction. How does it differ from a full line?',
+      diagram: quizSegmentRayUrl,
+      diagramAlt: 'Object A: segment with two endpoints. Object B: ray with one endpoint and one arrow. Object C: line with arrows on both ends.',
+      text: 'Looking at object B in the diagram — it starts at endpoint C, passes through D, and extends forever to the right. How does it differ from a full line?',
       options: [
         'A ray has finite length',
         'A ray has one endpoint; a line has none',
@@ -454,3 +481,5 @@ export default {
     },
   ],
 };
+
+export { LESSON_GEO_1_2 };

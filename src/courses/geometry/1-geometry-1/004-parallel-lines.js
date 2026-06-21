@@ -72,6 +72,20 @@ Drag the transversal angle slider. Toggle the parallel lock to see the relations
       css: `body{margin:0;background:var(--color-background-secondary, #f8fafc);font-family:Georgia,serif}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var parCk=document.getElementById('par-ck');
 var tangSl=document.getElementById('tang-sl'),tangLbl=document.getElementById('tang-lbl');
 var tiltSl=document.getElementById('tilt-sl'),tiltLbl=document.getElementById('tilt-lbl');
@@ -88,21 +102,21 @@ tangSl.oninput=function(){tangLbl.textContent=tangSl.value+'°';draw();};
 tiltSl.oninput=function(){tiltLbl.textContent=tiltSl.value+'°';draw();};
 
 function draw(){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
   var t=+tangSl.value,tilt=+tiltSl.value*(parCk.checked?0:1);
   var y1=H*0.28,y2=H*0.72,mx=W/2;
   var tRad=(180-t)*Math.PI/180;
   var L=250;
 
   // Line 1
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2.5;
+  ctx.strokeStyle=NAVY;ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(24,y1);ctx.lineTo(W-24,y1);ctx.stroke();
   // Line 2 (possibly tilted)
   var tr2=tilt*Math.PI/180;
   ctx.strokeStyle=parCk.checked?'#1e3a5f':'#dc2626';ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(24,y2+Math.sin(tr2)*(mx-24));ctx.lineTo(W-24,y2-Math.sin(tr2)*(W-24-mx));ctx.stroke();
   // Transversal
-  ctx.strokeStyle='#374151';ctx.lineWidth=2;
+  ctx.strokeStyle=TEXT;ctx.lineWidth=2;
   var tx1=mx-L*Math.cos(tRad),ty1=y1-L*Math.sin(tRad)-30;
   var tx2=mx+L*Math.cos(tRad),ty2=y2+L*Math.sin(tRad)+30;
   ctx.beginPath();ctx.moveTo(tx1,ty1);ctx.lineTo(tx2,ty2);ctx.stroke();
@@ -112,7 +126,7 @@ function draw(){
   var ix2=mx-(y2-H/2)/Math.tan(tRad);
   [ix1,ix2].forEach(function(ix,i){
     var iy=i===0?y1:y2;
-    ctx.beginPath();ctx.arc(ix,iy,5,0,2*Math.PI);ctx.fillStyle='#374151';ctx.fill();
+    ctx.beginPath();ctx.arc(ix,iy,5,0,2*Math.PI);ctx.fillStyle=TEXT;ctx.fill();
   });
 
   // Angles
@@ -152,11 +166,11 @@ function draw(){
   }
 
   // Line labels
-  ctx.fillStyle='#1e3a5f';ctx.font='italic 12px Georgia';ctx.textAlign='left';
+  ctx.fillStyle=NAVY;ctx.font='italic 12px Georgia';ctx.textAlign='left';
   ctx.fillText('ℓ₁',28,y1-14);
   ctx.fillStyle=parCk.checked?'#1e3a5f':'#dc2626';
   ctx.fillText('ℓ₂',28,y2-14);
-  ctx.fillStyle='#374151';ctx.textAlign='right';
+  ctx.fillStyle=TEXT;ctx.textAlign='right';
   ctx.fillText('t',W-14,ty1+14);
 
   // Table
@@ -240,6 +254,20 @@ The three theorems form a logical chain. Click each theorem to see which earlier
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
 
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var theorems=[
   {
     id:'CA',label:'Corresponding Angles',color:'#1e3a5f',
@@ -287,7 +315,7 @@ theorems.forEach(function(thm,i){
 });
 
 function render(){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
   var thm=theorems[selected];
   var t=58;
   var y1=H*0.27,y2=H*0.73,mx=W/2;
@@ -297,16 +325,16 @@ function render(){
   var ix2=mx-(y2-H/2)/Math.tan(tRad);
 
   // Lines
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2.5;
+  ctx.strokeStyle=NAVY;ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(24,y1);ctx.lineTo(W-24,y1);ctx.stroke();
   ctx.beginPath();ctx.moveTo(24,y2);ctx.lineTo(W-24,y2);ctx.stroke();
   // Transversal
-  ctx.strokeStyle='#374151';ctx.lineWidth=2;
+  ctx.strokeStyle=TEXT;ctx.lineWidth=2;
   var tx1=mx-L*Math.cos(tRad),ty1=y1-70;
   var tx2=mx+L*Math.cos(tRad),ty2=y2+70;
   ctx.beginPath();ctx.moveTo(tx1,ty1);ctx.lineTo(tx2,ty2);ctx.stroke();
   [ix1,ix2].forEach(function(ix,i){
-    ctx.beginPath();ctx.arc(ix,i===0?y1:y2,5,0,2*Math.PI);ctx.fillStyle='#374151';ctx.fill();
+    ctx.beginPath();ctx.arc(ix,i===0?y1:y2,5,0,2*Math.PI);ctx.fillStyle=TEXT;ctx.fill();
   });
 
   var a=t,s=180-t;
@@ -448,6 +476,7 @@ The converses are how parallelism is detected and verified in practice — in co
 
 export default {
   id: "geo-1-4",
+  subject: 'Geometry',
   slug: "parallel-lines",
   chapter: "geometry-1",
   order: 4,

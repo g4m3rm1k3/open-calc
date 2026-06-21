@@ -1,0 +1,44 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="200" rx="8" class="svg-bg"/>
+
+  <!-- Left panel: Constructible -->
+  <rect x="8" y="8" width="218" height="184" rx="7" fill="rgba(16,185,129,0.07)" stroke="#10b981" stroke-width="1.3"/>
+  <text x="117" y="28" font-size="11" fill="#065f46" text-anchor="middle" font-weight="700">✓ Constructible</text>
+  <text x="117" y="48" font-size="10" fill="#374151" text-anchor="middle">(degree 2ⁿ polynomials over ℚ)</text>
+
+  <text x="40" y="73" font-size="13" fill="#065f46" font-weight="700">√2</text>
+  <text x="90" y="73" font-size="11" fill="#374151">= side of unit square diagonal</text>
+  <text x="40" y="97" font-size="13" fill="#065f46" font-weight="700">√5</text>
+  <text x="90" y="97" font-size="11" fill="#374151">= diagonal of 1×2 rectangle</text>
+  <text x="40" y="121" font-size="13" fill="#065f46" font-weight="700">φ</text>
+  <text x="90" y="121" font-size="11" fill="#374151">= (1+√5)/2  golden ratio</text>
+  <text x="40" y="145" font-size="13" fill="#065f46" font-weight="700">30°, 45°, 60°, 90°</text>
+  <text x="40" y="162" font-size="11" fill="#374151">standard angles (equilateral + ⊥)</text>
+  <text x="40" y="181" font-size="13" fill="#065f46" font-weight="700">Regular 3, 4, 5, 6, 15, 17-gons</text>
+
+  <!-- Right panel: Not Constructible -->
+  <rect x="254" y="8" width="218" height="184" rx="7" fill="rgba(239,68,68,0.07)" stroke="#ef4444" stroke-width="1.3"/>
+  <text x="363" y="28" font-size="11" fill="#991b1b" text-anchor="middle" font-weight="700">✗ Not Constructible</text>
+  <text x="363" y="48" font-size="10" fill="#374151" text-anchor="middle">(require degree 3 or transcendental)</text>
+
+  <text x="274" y="73" font-size="13" fill="#dc2626" font-weight="700">∛2</text>
+  <text x="314" y="73" font-size="11" fill="#374151">cube root (degree 3)</text>
+  <text x="274" y="97" font-size="13" fill="#dc2626" font-weight="700">π</text>
+  <text x="314" y="97" font-size="11" fill="#374151">transcendental — "squares circle"</text>
+  <text x="274" y="121" font-size="13" fill="#dc2626" font-weight="700">cos(20°)</text>
+  <text x="274" y="137" font-size="11" fill="#374151">satisfies 8x³−6x−1=0 (cubic)</text>
+  <text x="274" y="158" font-size="13" fill="#dc2626" font-weight="700">Regular 7-gon, 9-gon, 11-gon</text>
+  <text x="274" y="175" font-size="11" fill="#374151">(no Fermat-prime factorization)</text>
+</svg>

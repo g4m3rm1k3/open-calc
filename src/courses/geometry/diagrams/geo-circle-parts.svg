@@ -1,0 +1,84 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="200" rx="8" class="svg-bg"/>
+
+  <!-- Main circle: center (200, 100), r=80 -->
+  <circle cx="200" cy="100" r="80" fill="rgba(30,58,95,0.05)" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Center point -->
+  <circle cx="200" cy="100" r="3.5" fill="#1e3a5f"/>
+  <text x="205" y="97" font-size="10" fill="#1e3a5f" font-weight="700">O</text>
+
+  <!-- RADIUS: center to point A on circle (top-right, ~45°) -->
+  <!-- A at (200+80cos45, 100-80sin45) ≈ (257, 43) -->
+  <line x1="200" y1="100" x2="257" y2="43" stroke="#dc2626" stroke-width="2"/>
+  <circle cx="257" cy="43" r="3.5" fill="#dc2626"/>
+  <text x="262" y="40" font-size="10" fill="#dc2626" font-weight="700">A</text>
+  <text x="220" y="60" font-size="10" fill="#dc2626" font-weight="700">radius</text>
+
+  <!-- CHORD: B to C (two points on circle) -->
+  <!-- B at ~200°: (200+80cos200, 100-80sin200) = (200-75, 100+27) = (125, 127) -->
+  <!-- C at ~340°: (200+80cos340, 100-80sin340) = (200+75, 100+27) = (275, 127) -->
+  <line x1="125" y1="127" x2="275" y2="127" stroke="#1a3a2a" stroke-width="2"/>
+  <circle cx="125" cy="127" r="3.5" fill="#1a3a2a"/>
+  <circle cx="275" cy="127" r="3.5" fill="#1a3a2a"/>
+  <text x="110" y="124" font-size="10" fill="#1a3a2a">B</text>
+  <text x="278" y="124" font-size="10" fill="#1a3a2a">C</text>
+  <text x="200" y="143" font-size="10" fill="#1a3a2a" font-weight="700" text-anchor="middle">chord BC</text>
+
+  <!-- ARC: from A to D (D at top-left: ~135°: (200-57, 100-57) = (143, 43)) -->
+  <path d="M 257 43 A 80 80 0 0 0 143 43" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+  <circle cx="143" cy="43" r="3.5" fill="#7c3aed"/>
+  <text x="130" y="40" font-size="10" fill="#7c3aed" font-weight="700">D</text>
+  <text x="200" y="24" font-size="10" fill="#7c3aed" font-weight="700" text-anchor="middle">arc AD</text>
+
+  <!-- CENTRAL ANGLE: angle AOD at center -->
+  <line x1="200" y1="100" x2="143" y2="43" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <path d="M 257 43 A 80 80 0 0 0 143 43" fill="none" stroke="none"/>
+  <!-- Mark central angle -->
+  <path d="M 230 74 A 30 30 0 0 0 170 74" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="200" y="88" font-size="10" fill="#7c3aed" font-weight="700" text-anchor="middle">central ∠</text>
+
+  <!-- SECTOR: shaded pie slice for sector AOD -->
+  <path d="M 200 100 L 257 43 A 80 80 0 0 0 143 43 Z" fill="rgba(124,58,237,0.1)" stroke="none"/>
+
+  <!-- INSCRIBED ANGLE: from point E on circle looking at arc AD -->
+  <!-- E at bottom: (200, 180) -->
+  <circle cx="200" cy="180" r="3.5" fill="#92400e"/>
+  <text x="206" y="184" font-size="10" fill="#92400e">E</text>
+  <line x1="200" y1="180" x2="257" y2="43" stroke="#92400e" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
+  <line x1="200" y1="180" x2="143" y2="43" stroke="#92400e" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.7"/>
+
+  <!-- Legend on right -->
+  <rect x="300" y="20" width="172" height="160" rx="7" fill="rgba(30,58,95,0.04)" stroke="#e2e8f0" stroke-width="1.2"/>
+  <text x="386" y="40" font-size="10" fill="#1e3a5f" font-weight="700" text-anchor="middle">Key Relationships</text>
+
+  <line x1="312" y1="58" x2="322" y2="58" stroke="#dc2626" stroke-width="2"/>
+  <text x="328" y="62" font-size="9" fill="#374151">Radius: center to edge</text>
+
+  <line x1="312" y1="76" x2="322" y2="76" stroke="#1a3a2a" stroke-width="2"/>
+  <text x="328" y="80" font-size="9" fill="#374151">Chord: two circle points</text>
+
+  <line x1="312" y1="94" x2="322" y2="94" stroke="#7c3aed" stroke-width="2"/>
+  <text x="328" y="98" font-size="9" fill="#374151">Arc: curve portion</text>
+
+  <rect x="312" y="107" width="10" height="10" fill="rgba(124,58,237,0.2)" stroke="#7c3aed" stroke-width="1"/>
+  <text x="328" y="117" font-size="9" fill="#374151">Sector: pie slice</text>
+
+  <line x1="312" y1="130" x2="322" y2="130" stroke="#92400e" stroke-width="2" stroke-dasharray="3,2"/>
+  <text x="328" y="134" font-size="9" fill="#374151">Inscribed ∠: on circle</text>
+
+  <text x="386" y="155" font-size="9" fill="#1e3a5f" text-anchor="middle" font-weight="700">Inscribed ∠ = ½ central ∠</text>
+  <text x="386" y="169" font-size="8" class="svg-muted" text-anchor="middle">∠AED = ½ ∠AOD</text>
+</svg>

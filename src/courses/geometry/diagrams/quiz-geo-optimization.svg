@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="280" class="svg-bg"/>
+
+  <!-- Left: fence and enclosure problems -->
+  <text x="178" y="18" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q5: Area / perimeter optimization</text>
+
+  <!-- River + fence -->
+  <line x1="20" y1="130" x2="330" y2="130" stroke="#1e3a5f" stroke-width="2.5" style="fill:none"/>
+  <text x="175" y="144" font-size="11" class="svg-text" text-anchor="middle">RIVER</text>
+  <rect x="80" y="56" width="200" height="74" fill="#bbf7d044" stroke="#166534" stroke-width="2"/>
+  <line x1="80"  y1="56" x2="80"  y2="130" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <line x1="280" y1="56" x2="280" y2="130" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <line x1="80"  y1="56" x2="280" y2="56" stroke="#166534" stroke-width="2" style="fill:none"/>
+  <text x="176" y="76" font-size="11" fill="#166534" text-anchor="middle">l = 120-2w</text>
+  <text x="62"  y="96" font-size="11" fill="#166534" text-anchor="end">w</text>
+  <text x="292" y="96" font-size="11" fill="#166534">w</text>
+  <text x="176" y="100" font-size="12" fill="#166534" text-anchor="middle">A = w(120-2w)</text>
+  <text x="176" y="165" font-size="11" class="svg-sub" text-anchor="middle">120m of fence, one river wall. Max A = ?</text>
+
+  <!-- Fixed perimeter rectangle comparison -->
+  <text x="176" y="200" font-size="12" class="svg-sub" text-anchor="middle">Perimeter P=48m rectangle. Max A?</text>
+  <rect x="66" y="213" width="52" height="52" fill="#bbf7d0" stroke="#166534" stroke-width="2"/>
+  <text x="92" y="244" font-size="10" fill="#166534" text-anchor="middle">12×12</text>
+  <rect x="136" y="226" width="80" height="26" fill="#eff6ff" stroke="#1e3a5f" stroke-width="2"/>
+  <text x="176" y="242" font-size="10" class="svg-text" text-anchor="middle">20×4</text>
+  <text x="92" y="275" font-size="11" class="svg-sub" text-anchor="middle">Square always wins</text>
+
+  <!-- Divider -->
+  <line x1="340" y1="10" x2="340" y2="270" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Right: corner-cut box and can problems -->
+  <text x="530" y="18" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q6–Q10: Box and 3D optimization</text>
+
+  <!-- Corner cut box -->
+  <rect x="360" y="30" width="150" height="120" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+  <rect x="360" y="30"  width="20" height="20" fill="#fafaf8" stroke="#b45309" stroke-width="1.5"/>
+  <rect x="490" y="30"  width="20" height="20" fill="#fafaf8" stroke="#b45309" stroke-width="1.5"/>
+  <rect x="360" y="130" width="20" height="20" fill="#fafaf8" stroke="#b45309" stroke-width="1.5"/>
+  <rect x="490" y="130" width="20" height="20" fill="#fafaf8" stroke="#b45309" stroke-width="1.5"/>
+  <text x="372" y="44" font-size="9" fill="#b45309">x</text>
+  <text x="435" y="28" font-size="11" fill="#b45309" text-anchor="middle">sheet 20×16</text>
+  <text x="435" y="48" font-size="11" fill="#b45309" text-anchor="middle">cut x from corners</text>
+  <text x="435" y="88" font-size="12" fill="#b45309" text-anchor="middle">V = x(20-2x)(16-2x)</text>
+  <text x="435" y="106" font-size="12" fill="#b45309" text-anchor="middle">Find x for max V</text>
+  <text x="435" y="162" font-size="11" class="svg-sub" text-anchor="middle">(use graph or factor)</text>
+
+  <!-- Can optimization diagram -->
+  <!-- Cylinder with r, h labeled -->
+  <ellipse cx="600" cy="62" rx="40" ry="12" fill="#f0fdf4" stroke="#166534" stroke-width="1.5"/>
+  <rect x="560" y="62" width="80" height="80" fill="#f0fdf4" stroke="#166534" stroke-width="1.5"/>
+  <ellipse cx="600" cy="142" rx="40" ry="12" fill="#f0fdf4" stroke="#166534" stroke-width="1.5"/>
+  <line x1="600" y1="62" x2="640" y2="62" stroke="#dc2626" stroke-width="1.5" style="fill:none"/>
+  <text x="622" y="58" font-size="12" fill="#dc2626">r</text>
+  <line x1="640" y1="62" x2="640" y2="142" stroke="#dc2626" stroke-width="1.5" style="fill:none"/>
+  <text x="644" y="104" font-size="12" fill="#dc2626">h</text>
+  <text x="600" y="176" font-size="11" class="svg-sub" text-anchor="middle">V = πr²h = 250cm³</text>
+  <text x="600" y="192" font-size="11" class="svg-sub" text-anchor="middle">Minimize SA = 2πr²+2πrh</text>
+  <text x="600" y="208" font-size="11" class="svg-muted" text-anchor="middle">Optimal: h = 2r</text>
+
+  <!-- Formula strip -->
+  <rect x="10" y="254" width="700" height="20" rx="4" class="svg-rule" stroke-width="1"/>
+  <text x="360" y="268" font-size="11" class="svg-text" text-anchor="middle">Vertex of A(w)=w(L-2w): w=-(-L)/(2·-2)=L/4 → l=L/2 (rectangular pen with one free side)</text>
+</svg>

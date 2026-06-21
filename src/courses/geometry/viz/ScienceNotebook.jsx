@@ -14,6 +14,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Editor from '@monaco-editor/react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 import { setupOpenCalcMonaco } from '../../../utils/monacoThemes.js'
 
 // ── Theme ──────────────────────────────────────────────────────────────────────
@@ -99,6 +101,11 @@ ${css}
 ${html}
 <script>
 (function(){try{window.localStorage}catch(_){var _s={};var _m={getItem:function(k){return Object.prototype.hasOwnProperty.call(_s,k)?_s[k]:null},setItem:function(k,v){_s[String(k)]=String(v)},removeItem:function(k){delete _s[k]},clear:function(){_s={}},key:function(i){return Object.keys(_s)[i]||null},get length(){return Object.keys(_s).length}};try{Object.defineProperty(window,'localStorage',{value:_m,writable:true,configurable:true})}catch(__){}}})();
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';var TEXT=isDark?'#e2e8f0':'#1e293b';var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';var NAVY=isDark?'#93c5fd':'#1e3a5f';var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';var PURPLE=isDark?'#a78bfa':'#7c3aed';var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
 try{(function(){
 ${escapedJs}
 })()}catch(e){console.error(e.message)}
@@ -151,6 +158,11 @@ window.__snCellId='${cellId}';
   window.addEventListener('error',function(ev){post('error',[ev.message||'Runtime error']);ev.preventDefault();},true);
 })();
 (function(){try{window.localStorage}catch(_){var _s={};var _m={getItem:function(k){return Object.prototype.hasOwnProperty.call(_s,k)?_s[k]:null},setItem:function(k,v){_s[String(k)]=String(v)},removeItem:function(k){delete _s[k]},clear:function(){_s={}},key:function(i){return Object.keys(_s)[i]||null},get length(){return Object.keys(_s).length}};try{Object.defineProperty(window,'localStorage',{value:_m,writable:true,configurable:true})}catch(__){}}})();
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';var TEXT=isDark?'#e2e8f0':'#1e293b';var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';var NAVY=isDark?'#93c5fd':'#1e3a5f';var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';var PURPLE=isDark?'#a78bfa':'#7c3aed';var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
 try{(function(){
 ${escapedJs}
 })()}catch(e){console.error(e.message)}
@@ -230,6 +242,11 @@ function pick(btn) {
   window.parent.postMessage({type:'sn_answer',label:label,correct:isCorrect},'*');
 }
 (function(){try{window.localStorage}catch(_){var _s={};var _m={getItem:function(k){return Object.prototype.hasOwnProperty.call(_s,k)?_s[k]:null},setItem:function(k,v){_s[String(k)]=String(v)},removeItem:function(k){delete _s[k]},clear:function(){_s={}},key:function(i){return Object.keys(_s)[i]||null},get length(){return Object.keys(_s).length}};try{Object.defineProperty(window,'localStorage',{value:_m,writable:true,configurable:true})}catch(__){}}})();
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';var TEXT=isDark?'#e2e8f0':'#1e293b';var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';var NAVY=isDark?'#93c5fd':'#1e3a5f';var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';var PURPLE=isDark?'#a78bfa':'#7c3aed';var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
 try{(function(){
 ${escapedJs}
 })()}catch(e){}
@@ -249,7 +266,7 @@ function MDText({ text, T }) {
   if (!text) return null
   return (
     <div style={{ fontSize: 14, lineHeight: 1.8, color: T.text }}>
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
+      <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={{
         h3: ({...p}) => <h3 style={{fontSize:'1.05rem',fontWeight:600,marginBottom:'0.5rem',color:T.accent}} {...p}/>,
         p:  ({...p}) => <p  style={{marginBottom:'1rem'}} {...p}/>,
         ul: ({...p}) => <ul style={{listStyleType:'disc',paddingLeft:'1.5rem',marginBottom:'1rem'}} {...p}/>,

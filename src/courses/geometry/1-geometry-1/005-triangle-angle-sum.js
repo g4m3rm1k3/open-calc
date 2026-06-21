@@ -77,6 +77,20 @@ Drag the vertices to any triangle shape. The parallel line through C is construc
       css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var pts=[{x:150,y:270},{x:530,y:270},{x:290,y:80}];
 var drag=-1;
 
@@ -90,7 +104,7 @@ addDrag(cv);
 function angD(v,p,q){var a=Math.atan2(p.y-v.y,p.x-v.x),b=Math.atan2(q.y-v.y,q.x-v.x);var d=Math.abs(b-a);if(d>Math.PI)d=2*Math.PI-d;return Math.round(d*180/Math.PI);}
 
 function draw(){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
   var A=pts[0],B=pts[1],C=pts[2];
   var aA=angD(A,B,C),aB=angD(B,A,C),aC=angD(C,A,B);
   var sum=aA+aB+aC;
@@ -101,10 +115,10 @@ function draw(){
   var ext=300;
 
   // Parallel line through C
-  ctx.strokeStyle='#7c3aed';ctx.lineWidth=1.8;ctx.setLineDash([9,5]);
+  ctx.strokeStyle=PURPLE;ctx.lineWidth=1.8;ctx.setLineDash([9,5]);
   ctx.beginPath();ctx.moveTo(C.x-ext*ux,C.y-ext*uy);ctx.lineTo(C.x+ext*ux,C.y+ext*uy);ctx.stroke();
   ctx.setLineDash([]);
-  ctx.fillStyle='#7c3aed';ctx.font='italic 12px Georgia';ctx.textAlign='right';
+  ctx.fillStyle=PURPLE;ctx.font='italic 12px Georgia';ctx.textAlign='right';
   ctx.fillText('ℓ ∥ AB',C.x-ext*ux+40,C.y-ext*uy-8);
 
   // Triangle fill
@@ -129,7 +143,7 @@ function draw(){
   // ∠1 arc at C (between parallel-left direction and CA)
   var parLeftAngle=Math.atan2(-uy,-ux);
   var caAngle=Math.atan2(A.y-C.y,A.x-C.x);
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=1.5;ctx.setLineDash([3,2]);
+  ctx.strokeStyle=NAVY;ctx.lineWidth=1.5;ctx.setLineDash([3,2]);
   var lo1=Math.min(parLeftAngle,caAngle),hi1=Math.max(parLeftAngle,caAngle);
   if(hi1-lo1>Math.PI){var t=lo1;lo1=hi1;hi1=t+2*Math.PI;}
   ctx.beginPath();ctx.arc(C.x,C.y,20,lo1,hi1);ctx.stroke();
@@ -138,7 +152,7 @@ function draw(){
   // ∠2 arc at C (between CB and parallel-right direction)
   var parRightAngle=Math.atan2(uy,ux);
   var cbAngle=Math.atan2(B.y-C.y,B.x-C.x);
-  ctx.strokeStyle='#1a3a2a';ctx.lineWidth=1.5;ctx.setLineDash([3,2]);
+  ctx.strokeStyle=GREEN;ctx.lineWidth=1.5;ctx.setLineDash([3,2]);
   var lo2=Math.min(parRightAngle,cbAngle),hi2=Math.max(parRightAngle,cbAngle);
   if(hi2-lo2>Math.PI){var t2=lo2;lo2=hi2;hi2=t2+2*Math.PI;}
   ctx.beginPath();ctx.arc(C.x,C.y,20,lo2,hi2);ctx.stroke();
@@ -156,9 +170,9 @@ function draw(){
     ctx.fillText(v.l+' = '+v.ang+'°',v.p.x+v.ox,v.p.y+v.oy);
   });
 
-  ctx.fillStyle='#1e3a5f';ctx.font='11px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=NAVY;ctx.font='11px Georgia';ctx.textAlign='center';
   ctx.fillText('∠1='+aA+'°',C.x-42,C.y+14);
-  ctx.fillStyle='#1a3a2a';
+  ctx.fillStyle=GREEN;
   ctx.fillText('∠2='+aB+'°',C.x+42,C.y+14);
 
   // Sum
@@ -220,6 +234,20 @@ The exterior angle at any vertex equals the sum of the two remote interior angle
       css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var pts=[{x:140,y:220},{x:510,y:220},{x:270,y:75}];
 var drag=-1;
 cv.addEventListener('mousedown',function(e){var r=cv.getBoundingClientRect(),mx=(e.clientX-r.left)*(W/r.width),my=(e.clientY-r.top)*(H/r.height);pts.forEach(function(p,i){if(Math.hypot(mx-p.x,my-p.y)<18)drag=i;});});
@@ -229,7 +257,7 @@ cv.addEventListener('mousemove',function(e){if(drag<0)return;var r=cv.getBoundin
 function angD(v,p,q){var a=Math.atan2(p.y-v.y,p.x-v.x),b=Math.atan2(q.y-v.y,q.x-v.x);var d=Math.abs(b-a);if(d>Math.PI)d=2*Math.PI-d;return Math.round(d*180/Math.PI);}
 
 function draw(){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
   var A=pts[0],B=pts[1],C=pts[2];
   var aA=angD(A,B,C),aB=angD(B,A,C),aC=angD(C,A,B);
   var ext=aA+aB;
@@ -249,18 +277,18 @@ function draw(){
   ctx.beginPath();ctx.moveTo(B.x,B.y);ctx.lineTo(extPt.x,extPt.y);ctx.stroke();ctx.setLineDash([]);
 
   // Labels
-  ctx.fillStyle='#1e3a5f';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=NAVY;ctx.font='bold 13px Georgia';ctx.textAlign='center';
   ctx.fillText('∠A = '+aA+'°',A.x-14,A.y+18);
-  ctx.fillStyle='#1a3a2a';ctx.fillText('∠C = '+aC+'°',C.x,C.y-16);
-  ctx.fillStyle='#374151';ctx.fillText('∠B = '+aB+'°',B.x+14,B.y+18);
-  ctx.fillStyle='#dc2626';ctx.fillText('ext = '+ext+'°',extPt.x+10,extPt.y-14);
+  ctx.fillStyle=GREEN;ctx.fillText('∠C = '+aC+'°',C.x,C.y-16);
+  ctx.fillStyle=TEXT;ctx.fillText('∠B = '+aB+'°',B.x+14,B.y+18);
+  ctx.fillStyle=RED;ctx.fillText('ext = '+ext+'°',extPt.x+10,extPt.y-14);
 
   // Dots
-  [A,B,C].forEach(function(p){ctx.beginPath();ctx.arc(p.x,p.y,5,0,2*Math.PI);ctx.fillStyle='#374151';ctx.fill();});
-  ctx.beginPath();ctx.arc(extPt.x,extPt.y,4,0,2*Math.PI);ctx.fillStyle='#dc2626';ctx.fill();
+  [A,B,C].forEach(function(p){ctx.beginPath();ctx.arc(p.x,p.y,5,0,2*Math.PI);ctx.fillStyle=TEXT;ctx.fill();});
+  ctx.beginPath();ctx.arc(extPt.x,extPt.y,4,0,2*Math.PI);ctx.fillStyle=RED;ctx.fill();
 
   // Equation
-  ctx.fillStyle='#dc2626';ctx.font='bold 14px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=RED;ctx.font='bold 14px Georgia';ctx.textAlign='center';
   ctx.fillText('ext∠ = ∠A + ∠C = '+aA+'° + '+aC+'° = '+ext+'°',W/2,H-10);
 
   document.getElementById('ext-info').innerHTML=
@@ -355,6 +383,7 @@ The 180° angle sum is an extraordinarily good approximation for everyday engine
 
 export default {
   id: "geo-1-5",
+  subject: 'Geometry',
   slug: "triangle-angle-sum",
   chapter: "geometry-1",
   order: 5,

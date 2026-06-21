@@ -82,6 +82,20 @@ canvas{display:block}`,
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var sl=document.getElementById('ang-sl');
 var lbl=document.getElementById('ang-lbl');
 
@@ -89,7 +103,7 @@ function draw(){
   var deg=parseInt(sl.value);
   lbl.textContent=deg+'°';
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
 
   var cx=W/2,cy=H/2+20,r=110;
 
@@ -142,7 +156,7 @@ function draw(){
   // Right angle square if 90
   if(deg===90){
     var sq=16;
-    ctx.strokeStyle='#1a3a2a';ctx.lineWidth=1.5;
+    ctx.strokeStyle=GREEN;ctx.lineWidth=1.5;
     ctx.strokeRect(cx,cy-sq,sq,sq);
   }
 
@@ -202,6 +216,20 @@ Two angles forming a straight line. Drag the vertex to change the angles. Watch 
       startCode: `var canvas=document.getElementById('cv');
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var algEl=document.getElementById('algebra');
 
 var vertexX=W/2;
@@ -224,7 +252,7 @@ canvas.addEventListener('touchmove',function(e){
 
 function draw(){
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
 
   var lineY=H/2+20;
   var rayTipY=lineY-100;
@@ -258,7 +286,7 @@ function draw(){
   var a2=180-a1;
 
   // Arc for angle 1 (left side, below ray)
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2;
+  ctx.strokeStyle=NAVY;ctx.lineWidth=2;
   ctx.beginPath();
   ctx.arc(vertexX,lineY,38,Math.PI,-a1*Math.PI/180,false);
   ctx.stroke();
@@ -266,14 +294,14 @@ function draw(){
   // Arc for angle 2 (right side)
   ctx.strokeStyle='#dc2626';ctx.lineWidth=2;
   ctx.beginPath();
-  ctx.arc(vertexX,lineY,-a2*Math.PI/180,0,false);
+  ctx.arc(vertexX,lineY,38,0,a2*Math.PI/180,false);
   ctx.stroke();
 
   // Ray (going up at angle based on position)
   var rayAngleRad=Math.PI-a1*Math.PI/180;
   var rx=vertexX+110*Math.cos(rayAngleRad);
   var ry=lineY+110*Math.sin(rayAngleRad);
-  ctx.strokeStyle='#374151';ctx.lineWidth=2.5;
+  ctx.strokeStyle=TEXT;ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(vertexX,lineY);ctx.lineTo(rx,ry);ctx.stroke();
   // Arrowhead
   ctx.beginPath();
@@ -289,9 +317,9 @@ function draw(){
   // Angle labels
   var la1x=vertexX-50,la1y=lineY-22;
   var la2x=vertexX+50,la2y=lineY-22;
-  ctx.fillStyle='#1e3a5f';ctx.font='bold 15px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=NAVY;ctx.font='bold 15px Georgia';ctx.textAlign='center';
   ctx.fillText('∠1 = '+a1+'°',la1x,la1y);
-  ctx.fillStyle='#dc2626';
+  ctx.fillStyle=RED;
   ctx.fillText('∠2 = '+a2+'°',la2x,la2y);
 
   // Labels
@@ -351,6 +379,20 @@ The interactive below lets you drag the crossing point to any position and verif
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
 
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var cx=W/2,cy=H/2;
 var line1Angle=35; // degrees above horizontal
 var line2Angle=140;
@@ -372,7 +414,7 @@ canvas.addEventListener('touchmove',function(e){
 
 function draw(){
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
 
   var L=200;
   var a1=line1Angle*Math.PI/180;
@@ -405,14 +447,14 @@ function draw(){
   var p2={x:cx+L*Math.cos(a2),y:cy-L*Math.sin(a2)};
   var p2b={x:cx-L*Math.cos(a2),y:cy+L*Math.sin(a2)};
 
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=2.5;
+  ctx.strokeStyle=NAVY;ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p1b.x,p1b.y);ctx.stroke();
   ctx.strokeStyle='#dc2626';ctx.lineWidth=2.5;
   ctx.beginPath();ctx.moveTo(p2.x,p2.y);ctx.lineTo(p2b.x,p2b.y);ctx.stroke();
 
   // Vertex
   ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);
-  ctx.fillStyle='#374151';ctx.fill();
+  ctx.fillStyle=TEXT;ctx.fill();
 
   // Angle arcs and labels
   var positions=[
@@ -432,9 +474,9 @@ function draw(){
   });
 
   // Labels for lines
-  ctx.fillStyle='#1e3a5f';ctx.font='italic 13px Georgia';ctx.textAlign='left';
+  ctx.fillStyle=NAVY;ctx.font='italic 13px Georgia';ctx.textAlign='left';
   ctx.fillText('ℓ₁',p1.x-18,p1.y-10);
-  ctx.fillStyle='#dc2626';
+  ctx.fillStyle=RED;
   ctx.fillText('ℓ₂',p2.x+6,p2.y-10);
 
   ctx.fillStyle='#94a3b8';ctx.font='11px Georgia';ctx.textAlign='center';
@@ -510,6 +552,20 @@ The construction below demonstrates the Midpoint Theorem. Drag point M along the
 var ctx=canvas.getContext('2d');
 var W=canvas.width,H=canvas.height;
 
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var A={x:80,y:H/2};
 var C={x:W-80,y:H/2};
 var Mx=W/2;
@@ -532,7 +588,7 @@ canvas.addEventListener('touchmove',function(e){
 
 function draw(){
   ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
 
   var AC=C.x-A.x;
   var AM=Mx-A.x;
@@ -545,7 +601,7 @@ function draw(){
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(C.x,C.y);ctx.stroke();
 
   // AM colored
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=4;
+  ctx.strokeStyle=NAVY;ctx.lineWidth=4;
   ctx.beginPath();ctx.moveTo(A.x,A.y);ctx.lineTo(Mx,A.y);ctx.stroke();
 
   // MC colored
@@ -556,24 +612,24 @@ function draw(){
   [[A.x,'A','#374151'],[Mx,'M',midColor],[C.x,'C','#374151']].forEach(function(pt){
     ctx.beginPath();ctx.arc(pt[0],H/2,pt[0]===Mx?7:5,0,Math.PI*2);
     ctx.fillStyle=pt[2];ctx.fill();
-    if(pt[0]===Mx&&isMidpoint){ctx.strokeStyle='#1a3a2a';ctx.lineWidth=2;ctx.stroke();}
+    if(pt[0]===Mx&&isMidpoint){ctx.strokeStyle=GREEN;ctx.lineWidth=2;ctx.stroke();}
     ctx.fillStyle=pt[2];ctx.font='bold 14px Georgia';ctx.textAlign='center';
     ctx.fillText(pt[1],pt[0],H/2-16);
   });
 
   // Measure labels
-  ctx.fillStyle='#1e3a5f';ctx.font='13px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=NAVY;ctx.font='13px Georgia';ctx.textAlign='center';
   ctx.fillText('AM = '+Math.round(AM),(A.x+Mx)/2,H/2+26);
-  ctx.fillStyle='#dc2626';
+  ctx.fillStyle=RED;
   ctx.fillText('MC = '+Math.round(MC),(Mx+C.x)/2,H/2+26);
 
   // AC
-  ctx.fillStyle='#374151';ctx.font='11px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=TEXT;ctx.font='11px Georgia';ctx.textAlign='center';
   ctx.fillText('AC = '+Math.round(AC),W/2,H-10);
 
   // Midpoint marker
   if(isMidpoint){
-    ctx.strokeStyle='#1a3a2a';ctx.lineWidth=1.5;
+    ctx.strokeStyle=GREEN;ctx.lineWidth=1.5;
     ctx.beginPath();ctx.moveTo(Mx-8,H/2-14);ctx.lineTo(Mx,H/2-4);ctx.lineTo(Mx+8,H/2-14);ctx.stroke();
   }
 

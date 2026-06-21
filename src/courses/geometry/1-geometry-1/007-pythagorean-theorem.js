@@ -68,7 +68,7 @@ $$c^2 + 2ab = a^2 + b^2 + 2ab$$
 
 Subtract 2ab from both sides:
 
-$$c^2 = a^2 + b^2 \quad \square$$
+$$c^2 = a^2 + b^2 \\quad \\square$$
 
 The key insight: the same four triangles can be arranged two ways inside the same square, leaving different empty regions. Since the triangles are identical in both arrangements, the empty regions must have equal total area. One empty region is c²; the other is a² + b².`,
     },
@@ -90,6 +90,20 @@ Toggle between the two arrangements of four identical triangles inside the same 
       css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var arr=1;
 var ratioSl=document.getElementById('ratio-sl');
 var ratioLbl=document.getElementById('ratio-lbl');
@@ -103,7 +117,7 @@ toggleBtn.onclick=function(){
 ratioSl.oninput=function(){draw();};
 
 function draw(){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
   var a=parseInt(ratioSl.value),b=100-a;
   ratioLbl.textContent='a='+a+', b='+b;
   var scale=2.6;
@@ -138,7 +152,7 @@ function draw(){
     ctx.beginPath();ctx.moveTo(ox+a_,oy);ctx.lineTo(ox+s_,oy+a_);ctx.lineTo(ox+s_-a_,oy+s_);ctx.lineTo(ox,oy+s_-a_);ctx.closePath();ctx.stroke();
 
     // Label inner square
-    ctx.fillStyle='#dc2626';ctx.font='bold 16px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillStyle=RED;ctx.font='bold 16px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText('c²',W/2,H/2);
 
   } else {
@@ -156,20 +170,20 @@ function draw(){
     // a² square (top right area)
     ctx.fillStyle='rgba(26,58,42,0.18)';
     ctx.fillRect(ox+b_,oy,a_,a_);
-    ctx.strokeStyle='#1a3a2a';ctx.lineWidth=2;ctx.strokeRect(ox+b_,oy,a_,a_);
-    ctx.fillStyle='#1a3a2a';ctx.font='bold 15px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.strokeStyle=GREEN;ctx.lineWidth=2;ctx.strokeRect(ox+b_,oy,a_,a_);
+    ctx.fillStyle=GREEN;ctx.font='bold 15px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText('a²',ox+b_+a_/2,oy+a_/2);
 
     // b² square (bottom left area)
     ctx.fillStyle='rgba(124,58,237,0.18)';
     ctx.fillRect(ox,oy+a_,b_,b_);
-    ctx.strokeStyle='#7c3aed';ctx.lineWidth=2;ctx.strokeRect(ox,oy+a_,b_,b_);
-    ctx.fillStyle='#7c3aed';ctx.font='bold 15px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.strokeStyle=PURPLE;ctx.lineWidth=2;ctx.strokeRect(ox,oy+a_,b_,b_);
+    ctx.fillStyle=PURPLE;ctx.font='bold 15px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText('b²',ox+b_/2,oy+a_+b_/2);
   }
 
   // Side labels
-  ctx.fillStyle='#374151';ctx.font='13px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=TEXT;ctx.font='13px Georgia';ctx.textAlign='center';
   ctx.fillText('a',ox+a_/2,oy-10);
   ctx.fillText('b',ox+a_+b_/2,oy-10);
   ctx.fillText('a+b',ox+s_/2,oy+s_+18);
@@ -241,6 +255,20 @@ The altitude from the right angle to the hypotenuse creates three similar triang
       css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 // Right angle at C, A and B on base
 var A={x:80,y:250},B={x:580,y:250};
 var Cy=90; // C height adjustable
@@ -290,7 +318,7 @@ btnData.forEach(function(b,i){
 });
 
 function draw(){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
   var Cx=A.x+(B.x-A.x)*cFrac,Cy2=Cy;
   var C={x:Cx,y:Cy2};
 
@@ -327,7 +355,7 @@ function draw(){
   ctx.strokeRect(D.x,D.y-sq,sq,sq);
 
   // Right angle at C
-  ctx.strokeStyle='#374151';ctx.lineWidth=1.5;
+  ctx.strokeStyle=TEXT;ctx.lineWidth=1.5;
   var cSq=10;
   var cA=Math.atan2(A.y-C.y,A.x-C.x),cB=Math.atan2(B.y-C.y,B.x-C.x);
   // Small square at C indicating right angle
@@ -336,13 +364,13 @@ function draw(){
   var s2x=C.x+cSq*Math.cos(cB),s2y=C.y+cSq*Math.sin(cB);
   var cornerX=s1x+(s2x-C.x),cornerY=s1y+(s2y-C.y);
   ctx.moveTo(s1x,s1y);ctx.lineTo(cornerX,cornerY);ctx.lineTo(s2x,s2y);
-  ctx.strokeStyle='#374151';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.strokeStyle=TEXT;ctx.lineWidth=1.5;ctx.stroke();
 
   // Labels
   var pts=[{p:A,l:'A',ox:-14,oy:16},{p:B,l:'B',ox:14,oy:16},{p:C,l:'C',ox:0,oy:-14},{p:D,l:'D',ox:14,oy:16}];
   pts.forEach(function(v){
-    ctx.beginPath();ctx.arc(v.p.x,v.p.y,5,0,2*Math.PI);ctx.fillStyle='#374151';ctx.fill();
-    ctx.fillStyle='#374151';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+    ctx.beginPath();ctx.arc(v.p.x,v.p.y,5,0,2*Math.PI);ctx.fillStyle=TEXT;ctx.fill();
+    ctx.fillStyle=TEXT;ctx.font='bold 13px Georgia';ctx.textAlign='center';
     ctx.fillText(v.l,v.p.x+v.ox,v.p.y+v.oy);
   });
 
@@ -389,13 +417,13 @@ This proof places the right triangle in a coordinate system and uses algebra to 
 The hypotenuse is segment AB, with length c.
 
 **The distance formula** states that the distance between two points (x₁, y₁) and (x₂, y₂) is:
-$$d = \sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$$
+$$d = \\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}$$
 
 Apply this to find the length of AB:
-$$c = \sqrt{(a-0)^2 + (0-b)^2} = \sqrt{a^2 + b^2}$$
+$$c = \\sqrt{(a-0)^2 + (0-b)^2} = \\sqrt{a^2 + b^2}$$
 
 Squaring both sides:
-$$c^2 = a^2 + b^2 \quad \square$$
+$$c^2 = a^2 + b^2 \\quad \\square$$
 
 But wait — where does the distance formula come from? It is derived by applying the Pythagorean Theorem to a right triangle formed by the horizontal and vertical differences between the two points. So this proof is circular if the distance formula was derived from Pythagoras!
 
@@ -424,6 +452,20 @@ Enter any values of a and b to verify the theorem. All three proof approaches ar
       css: `body{margin:0;background:var(--color-background-secondary, #f8fafc)}canvas{display:block}`,
       startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 var W=cv.width,H=cv.height;
+
+// dark-mode palette
+var isDark=document.documentElement.classList.contains('dark');
+var BG=isDark?'#1e293b':'#fafaf8';
+var TEXT=isDark?'#e2e8f0':'#1e293b';
+var MUTED=isDark?'#94a3b8':'#64748b';
+var GRID=isDark?'#334155':'#e2e8f0';
+var NAVY=isDark?'#93c5fd':'#1e3a5f';
+var GREEN=isDark?'#4ade80':'#1a3a2a';
+var AMBER=isDark?'#fb923c':'#92400e';
+var PURPLE=isDark?'#a78bfa':'#7c3aed';
+var RED=isDark?'#f87171':'#dc2626';
+var BORDER=isDark?'#475569':'#d1d5db';
+
 var aSl=document.getElementById('a-sl'),bSl=document.getElementById('b-sl');
 var aLbl=document.getElementById('a-lbl'),bLbl=document.getElementById('b-lbl');
 
@@ -431,7 +473,7 @@ function draw(){
   var a=parseInt(aSl.value),b=parseInt(bSl.value);
   aLbl.textContent=a;bLbl.textContent=b;
   var c2=a*a+b*b,c=Math.sqrt(c2).toFixed(3);
-  ctx.clearRect(0,0,W,H);ctx.fillStyle='#fafaf8';ctx.fillRect(0,0,W,H);
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
 
   var panels=[
     {x:10,w:220,title:'Proof 1: Area',color:'#1e3a5f'},
@@ -455,12 +497,12 @@ function draw(){
   ctx.beginPath();ctx.moveTo(ox+as,oy);ctx.lineTo(ox+ss,oy+as);ctx.lineTo(ox+ss-as,oy+ss);ctx.lineTo(ox,oy+ss-as);ctx.closePath();ctx.fill();
   ctx.strokeStyle='#dc2626';ctx.lineWidth=2;
   ctx.beginPath();ctx.moveTo(ox+as,oy);ctx.lineTo(ox+ss,oy+as);ctx.lineTo(ox+ss-as,oy+ss);ctx.lineTo(ox,oy+ss-as);ctx.closePath();ctx.stroke();
-  ctx.strokeStyle='#1e3a5f';ctx.lineWidth=1.5;ctx.strokeRect(ox,oy,ss,ss);
-  ctx.fillStyle='#dc2626';ctx.font='bold 14px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.strokeStyle=NAVY;ctx.lineWidth=1.5;ctx.strokeRect(ox,oy,ss,ss);
+  ctx.fillStyle=RED;ctx.font='bold 14px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
   ctx.fillText('c²='+c2,ox+ss/2,oy+ss/2);
-  ctx.fillStyle='#1e3a5f';ctx.font='12px Georgia';ctx.textBaseline='alphabetic';
+  ctx.fillStyle=NAVY;ctx.font='12px Georgia';ctx.textBaseline='alphabetic';
   ctx.fillText('a²+b²='+a*a+'+'+b*b+'='+c2,p1.x+p1.w/2,H-30);
-  ctx.fillStyle='#1a3a2a';ctx.font='bold 13px Georgia';
+  ctx.fillStyle=GREEN;ctx.font='bold 13px Georgia';
   ctx.fillText('✓ c²=a²+b²='+c2,p1.x+p1.w/2,H-14);
 
   // Panel 2: Similar triangles diagram
@@ -477,19 +519,19 @@ function draw(){
   // Triangle
   ctx.fillStyle='rgba(26,58,42,0.1)';
   ctx.beginPath();ctx.moveTo(p2A.x,p2A.y);ctx.lineTo(p2B.x,p2B.y);ctx.lineTo(p2C.x,p2C.y);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='#1a3a2a';ctx.lineWidth=2;
+  ctx.strokeStyle=GREEN;ctx.lineWidth=2;
   ctx.beginPath();ctx.moveTo(p2A.x,p2A.y);ctx.lineTo(p2B.x,p2B.y);ctx.lineTo(p2C.x,p2C.y);ctx.closePath();ctx.stroke();
   // Altitude
   ctx.strokeStyle='#9333ea';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
   ctx.beginPath();ctx.moveTo(p2C.x,p2C.y);ctx.lineTo(p2D.x,p2D.y);ctx.stroke();ctx.setLineDash([]);
   ctx.strokeStyle='#9333ea';ctx.lineWidth=1;ctx.strokeRect(p2D.x,p2D.y-8,8,8);
 
-  ctx.fillStyle='#1a3a2a';ctx.font='11px Georgia';ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  ctx.fillStyle=GREEN;ctx.font='11px Georgia';ctx.textAlign='center';ctx.textBaseline='alphabetic';
   ctx.fillText('A',p2A.x-8,p2A.y+14);ctx.fillText('B',p2B.x+8,p2A.y+14);ctx.fillText('C',p2C.x,p2C.y-10);ctx.fillText('D',p2D.x+10,p2D.y+14);
   ctx.font='12px Georgia';
   ctx.fillText('b²=c·AD; a²=c·BD',p2cx,55);
   ctx.fillText('a²+b²=c(AD+BD)=c²',p2cx,70);
-  ctx.fillStyle='#1a3a2a';ctx.font='bold 13px Georgia';
+  ctx.fillStyle=GREEN;ctx.font='bold 13px Georgia';
   ctx.fillText('✓ c²='+c2,p2cx,H-14);
 
   // Panel 3: Coordinate grid
@@ -498,30 +540,30 @@ function draw(){
   var p3A={x:p3ox+a*cscale,y:p3oy};var p3B={x:p3ox,y:p3oy-b*cscale};var p3C={x:p3ox,y:p3oy};
 
   // Axes
-  ctx.strokeStyle='#d1d5db';ctx.lineWidth=1;
+  ctx.strokeStyle=BORDER;ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(p3.x+15,p3oy);ctx.lineTo(p3.x+p3.w-10,p3oy);ctx.stroke();
   ctx.beginPath();ctx.moveTo(p3ox,H-20);ctx.lineTo(p3ox,50);ctx.stroke();
 
   // Triangle
   ctx.fillStyle='rgba(124,58,237,0.12)';
   ctx.beginPath();ctx.moveTo(p3A.x,p3A.y);ctx.lineTo(p3B.x,p3B.y);ctx.lineTo(p3C.x,p3C.y);ctx.closePath();ctx.fill();
-  ctx.strokeStyle='#7c3aed';ctx.lineWidth=2;
+  ctx.strokeStyle=PURPLE;ctx.lineWidth=2;
   ctx.beginPath();ctx.moveTo(p3A.x,p3A.y);ctx.lineTo(p3B.x,p3B.y);ctx.lineTo(p3C.x,p3C.y);ctx.closePath();ctx.stroke();
 
   // Right angle marker
-  ctx.strokeStyle='#374151';ctx.lineWidth=1;ctx.strokeRect(p3ox,p3oy-10,10,10);
+  ctx.strokeStyle=TEXT;ctx.lineWidth=1;ctx.strokeRect(p3ox,p3oy-10,10,10);
 
   // Labels
-  ctx.fillStyle='#7c3aed';ctx.font='11px Georgia';ctx.textAlign='center';
+  ctx.fillStyle=PURPLE;ctx.font='11px Georgia';ctx.textAlign='center';
   ctx.fillText('('+a+',0)',p3A.x,p3A.y+14);ctx.fillText('(0,'+b+')',p3B.x-22,p3B.y);ctx.fillText('(0,0)',p3ox-16,p3oy+14);
   ctx.font='italic 12px Georgia';
   ctx.fillText('a='+a,p3ox+a*cscale/2,p3oy+12);ctx.fillText('b='+b,p3ox-16,p3oy-b*cscale/2);
   // Hypotenuse label
-  ctx.fillStyle='#7c3aed';ctx.font='12px Georgia';
+  ctx.fillStyle=PURPLE;ctx.font='12px Georgia';
   ctx.fillText('c=√(a²+b²)='+c,(p3A.x+p3B.x)/2+16,(p3A.y+p3B.y)/2-6);
   ctx.font='12px Georgia';ctx.textAlign='center';
   ctx.fillText('d=√('+a+'²+'+b+'²)=√'+c2+'='+c,p3.x+p3.w/2,55);
-  ctx.fillStyle='#7c3aed';ctx.font='bold 13px Georgia';
+  ctx.fillStyle=PURPLE;ctx.font='bold 13px Georgia';
   ctx.fillText('✓ c²='+c2,p3.x+p3.w/2,H-14);
 }
 aSl.oninput=draw;bSl.oninput=draw;
@@ -608,6 +650,7 @@ Learning three proofs of one theorem gives you three proof tools for free.`,
 
 export default {
   id: "geo-1-7",
+  subject: 'Geometry',
   slug: "pythagorean-theorem",
   chapter: "geometry-1",
   order: 7,

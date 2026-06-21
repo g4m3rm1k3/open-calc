@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="Georgia, serif">
+  <style>
+    .svg-bg    { fill: #fafaf8; }
+    .svg-text  { fill: #1e3a5f; }
+    .svg-sub   { fill: #374151; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-panel { fill: #eff6ff; stroke: #1e3a5f; }
+    .svg-proof { fill: #fff7ed; stroke: #b45309; }
+    .svg-use   { fill: #f0fdf4; stroke: #166534; }
+    .svg-note  { fill: #fef9c3; stroke: #b45309; }
+    .dark .svg-bg    { fill: #1e293b; }
+    .dark .svg-text  { fill: #93c5fd; }
+    .dark .svg-sub   { fill: #cbd5e1; }
+    .dark .svg-muted { fill: #475569; }
+    .dark .svg-panel { fill: #1e3a5f44; stroke: #93c5fd; }
+    .dark .svg-proof { fill: #451a0322; stroke: #fbbf24; }
+    .dark .svg-use   { fill: #14532d22; stroke: #4ade80; }
+    .dark .svg-note  { fill: #71350022; stroke: #fbbf24; }
+  </style>
+
+  <rect width="720" height="380" class="svg-bg"/>
+
+  <!-- Triangle: A=(70,310) B=(470,310) C=(310,80) -->
+  <line x1="70"  y1="310" x2="470" y2="310" stroke="#166534" stroke-width="3" style="fill:none"/>
+  <line x1="70"  y1="310" x2="310" y2="80"  stroke="#1e3a5f" stroke-width="3" style="fill:none"/>
+  <line x1="470" y1="310" x2="310" y2="80"  stroke="#dc2626" stroke-width="3" style="fill:none"/>
+
+  <!-- Altitude from C to AB -->
+  <line x1="310" y1="80" x2="310" y2="310" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="6,4" style="fill:none"/>
+  <rect x="298" y="298" width="12" height="12" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="318" y="208" font-size="12" fill="#7c3aed" font-style="italic">h</text>
+  <text x="175" y="330" font-size="12" class="svg-muted" font-style="italic">d</text>
+  <text x="368" y="330" font-size="12" class="svg-muted" font-style="italic">c−d</text>
+
+  <!-- Angle arcs -->
+  <path d="M 118 310 A 48 48 0 0 0 97 273" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+  <text x="68"  y="273" font-size="18" fill="#dc2626"  font-style="italic">A</text>
+  <circle cx="70"  cy="310" r="5" fill="#dc2626"/>
+  <path d="M 422 310 A 48 48 0 0 1 446 273" fill="none" stroke="#1e3a5f" stroke-width="2.5"/>
+  <text x="476" y="273" font-size="18" class="svg-text" font-style="italic">B</text>
+  <circle cx="470" cy="310" r="5" class="svg-text" style="fill:#1e3a5f;stroke:none"/>
+  <path d="M 290 111 A 36 36 0 0 1 330 111" fill="none" stroke="#b45309" stroke-width="2.5"/>
+  <text x="302" y="74"  font-size="18" fill="#b45309" font-style="italic">C</text>
+  <circle cx="310" cy="80"  r="5" fill="#b45309"/>
+
+  <!-- Side labels -->
+  <text x="418" y="218" font-size="18" fill="#dc2626"  font-weight="bold" font-style="italic">a</text>
+  <text x="163" y="213" font-size="18" class="svg-text" font-weight="bold" font-style="italic">b</text>
+  <text x="258" y="338" font-size="18" fill="#166534"  font-weight="bold" font-style="italic">c</text>
+
+  <!-- Law of Cosines panel -->
+  <rect x="518" y="30" width="190" height="168" rx="10" class="svg-panel" stroke-width="1.5"/>
+  <text x="613" y="55" font-size="14" font-weight="bold" class="svg-text" text-anchor="middle">Law of Cosines</text>
+  <text x="530" y="80"  font-size="14" fill="#dc2626" font-weight="bold">a² = b²+c²−2bc·cosA</text>
+  <text x="530" y="102" font-size="14" class="svg-text" font-weight="bold">b² = a²+c²−2ac·cosB</text>
+  <text x="530" y="124" font-size="14" fill="#b45309" font-weight="bold">c² = a²+b²−2ab·cosC</text>
+  <line x1="528" y1="134" x2="698" y2="134" stroke="#94a3b8" stroke-width="1"/>
+  <text x="530" y="152" font-size="12" class="svg-sub">To find angle:</text>
+  <text x="530" y="170" font-size="12" class="svg-sub">cosA = (b²+c²−a²)/2bc</text>
+  <text x="530" y="188" font-size="11" class="svg-muted" font-style="italic">Same pattern for cosB, cosC</text>
+
+  <!-- Proof sketch -->
+  <rect x="10" y="20" width="380" height="90" rx="8" class="svg-proof" stroke-width="1.5"/>
+  <text x="200" y="40" font-size="13" fill="#b45309" font-weight="bold" text-anchor="middle">Proof (Pythagorean theorem twice)</text>
+  <text x="20" y="58" font-size="12.5" class="svg-sub">h² = b²−d²  and  h² = a²−(c−d)²  (two right triangles)</text>
+  <text x="20" y="75" font-size="12.5" class="svg-sub">b²−d² = a²−c²+2cd−d²  →  b² = a²−c²+2cd</text>
+  <text x="20" y="92" font-size="12.5" class="svg-sub">Since d = b cosA:  a² = b²+c²−2bc cosA  ✓</text>
+
+  <!-- When to use -->
+  <rect x="10" y="330" width="500" height="42" rx="6" class="svg-use" stroke-width="1"/>
+  <text x="20" y="349" font-size="13" fill="#166534" font-weight="bold">Use Law of Cosines when you know:</text>
+  <text x="20" y="366" font-size="12" class="svg-sub">SAS — two sides + included angle  ·  SSS — all three sides (to find angles)</text>
+
+  <!-- Pythagoras special case -->
+  <rect x="518" y="215" width="190" height="62" rx="8" class="svg-note" stroke-width="1"/>
+  <text x="613" y="234" font-size="13" fill="#b45309" font-weight="bold" text-anchor="middle">When C = 90°</text>
+  <text x="530" y="253" font-size="12" class="svg-sub">cos 90° = 0, so:</text>
+  <text x="530" y="269" font-size="12" class="svg-sub">c² = a²+b² (Pythagorean!)</text>
+</svg>

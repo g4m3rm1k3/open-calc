@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" font-family="Georgia, serif">
+  <style>
+    .svg-bg   { fill: #fafaf8; }
+    .svg-text { fill: #1e3a5f; }
+    .svg-sub  { fill: #374151; }
+    .svg-muted{ fill: #94a3b8; }
+    .svg-rule { fill: #eff6ff; stroke: #1e3a5f; }
+    .dark .svg-bg   { fill: #1e293b; }
+    .dark .svg-text { fill: #93c5fd; }
+    .dark .svg-sub  { fill: #cbd5e1; }
+    .dark .svg-muted{ fill: #475569; }
+    .dark .svg-rule { fill: #1e3a5f44; stroke: #93c5fd; }
+  </style>
+
+  <rect width="720" height="280" class="svg-bg"/>
+
+  <!-- Left: classify these quadrilaterals -->
+  <text x="178" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q1–Q5: Identify the quadrilateral</text>
+
+  <!-- Shape A: Rectangle (with right-angle marks) -->
+  <rect x="20" y="34" width="100" height="58" fill="#eff6ff" stroke="#1e3a5f" stroke-width="1.8"/>
+  <path d="M 20 92 l 8 0 l 0 -8" fill="none" stroke="#1e3a5f" stroke-width="1.2"/>
+  <path d="M 120 92 l -8 0 l 0 -8" fill="none" stroke="#1e3a5f" stroke-width="1.2"/>
+  <text x="70" y="108" font-size="12" class="svg-sub" text-anchor="middle">Shape A</text>
+
+  <!-- Shape B: Rhombus -->
+  <polygon points="222,35 258,62 222,89 186,62" fill="#fdf4ff" stroke="#7c3aed" stroke-width="1.8"/>
+  <text x="222" y="105" font-size="12" class="svg-sub" text-anchor="middle">Shape B</text>
+  <!-- tick marks all sides equal -->
+  <line x1="204" y1="48" x2="208" y2="52" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="242" y1="48" x2="238" y2="52" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="204" y1="76" x2="208" y2="72" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+  <line x1="242" y1="76" x2="238" y2="72" stroke="#7c3aed" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Shape C: Trapezoid -->
+  <polygon points="286,34 346,34 358,88 274,88" fill="#fff7ed" stroke="#b45309" stroke-width="1.8"/>
+  <text x="316" y="105" font-size="12" class="svg-sub" text-anchor="middle">Shape C</text>
+  <!-- parallel mark top and bottom -->
+  <text x="312" y="30" font-size="10" fill="#b45309" text-anchor="middle">‖</text>
+  <text x="316" y="100" font-size="10" fill="#b45309" text-anchor="middle">‖</text>
+
+  <!-- Shape D: Square -->
+  <rect x="376" y="34" width="68" height="54" fill="#fef9c3" stroke="#b45309" stroke-width="1.8"/>
+  <path d="M 376 88 l 8 0 l 0 -8" fill="none" stroke="#b45309" stroke-width="1.2"/>
+  <!-- tick marks all sides equal -->
+  <line x1="408" y1="34" x2="412" y2="38" stroke="#b45309" stroke-width="1.5" style="fill:none"/>
+  <line x1="408" y1="88" x2="412" y2="84" stroke="#b45309" stroke-width="1.5" style="fill:none"/>
+  <line x1="376" y1="61" x2="382" y2="61" stroke="#b45309" stroke-width="1.5" style="fill:none"/>
+  <line x1="444" y1="61" x2="438" y2="61" stroke="#b45309" stroke-width="1.5" style="fill:none"/>
+  <text x="410" y="105" font-size="12" class="svg-sub" text-anchor="middle">Shape D</text>
+
+  <!-- Shape E: Kite -->
+  <polygon points="476,34 508,58 476,90 444,58" fill="#f0fdf4" stroke="#166534" stroke-width="1.8"/>
+  <text x="476" y="106" font-size="12" class="svg-sub" text-anchor="middle">Shape E</text>
+  <!-- tick pairs -->
+  <line x1="460" y1="46" x2="463" y2="49" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+  <line x1="492" y1="46" x2="489" y2="49" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+  <!-- double tick bottom pair -->
+  <line x1="459" y1="74" x2="462" y2="71" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+  <line x1="456" y1="76" x2="459" y2="73" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+  <line x1="493" y1="74" x2="490" y2="71" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+  <line x1="496" y1="76" x2="493" y2="73" stroke="#166534" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Q5 label box -->
+  <text x="178" y="128" font-size="11" class="svg-muted" text-anchor="middle">A=Rectangle B=Rhombus C=Trapezoid D=Square E=Kite</text>
+
+  <!-- Divider -->
+  <line x1="530" y1="12" x2="530" y2="268" stroke="#e2e8f0" stroke-width="1.5" style="fill:none"/>
+
+  <!-- Right: area and diagonal problems -->
+  <text x="625" y="20" font-size="13" font-weight="bold" class="svg-sub" text-anchor="middle">Q6–Q10: Properties and area</text>
+
+  <!-- Parallelogram with b, h -->
+  <polygon points="545,55 630,55 620,105 535,105" fill="#f0fdf4" stroke="#166534" stroke-width="1.8"/>
+  <line x1="535" y1="105" x2="535" y2="55" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="3,3" style="fill:none"/>
+  <text x="587" y="76" font-size="12" fill="#166534" text-anchor="middle">b = 14</text>
+  <text x="524" y="84" font-size="12" fill="#dc2626">h = 8</text>
+  <text x="587" y="120" font-size="11" class="svg-sub" text-anchor="middle">Area = b × h = ?</text>
+
+  <!-- Rhombus with diagonals d1, d2 -->
+  <polygon points="625,148 670,178 625,208 580,178" fill="#fdf4ff" stroke="#7c3aed" stroke-width="1.8"/>
+  <line x1="580" y1="178" x2="670" y2="178" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="3,3" style="fill:none"/>
+  <line x1="625" y1="148" x2="625" y2="208" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="3,3" style="fill:none"/>
+  <text x="625" y="175" font-size="11" fill="#7c3aed" text-anchor="middle">d₁=12</text>
+  <text x="640" y="192" font-size="11" fill="#7c3aed">d₂=10</text>
+  <text x="625" y="222" font-size="11" class="svg-sub" text-anchor="middle">Area = ½d₁d₂ = ?</text>
+
+  <!-- Isosceles trapezoid -->
+  <polygon points="548,234 622,234 630,265 540,265" fill="#fff7ed" stroke="#b45309" stroke-width="1.8"/>
+  <text x="585" y="247" font-size="10" fill="#b45309" text-anchor="middle">a=12, b=18, h=6</text>
+  <text x="585" y="275" font-size="11" class="svg-sub" text-anchor="middle">Area = ½(a+b)h = ?</text>
+
+  <!-- Bottom formula strip -->
+  <rect x="10" y="254" width="510" height="20" rx="4" class="svg-rule" stroke-width="1"/>
+  <text x="265" y="268" font-size="11" class="svg-text" text-anchor="middle">∠ sum=360° · Parallelogram A=bh · Rhombus A=½d₁d₂ · Trapezoid A=½(a+b)h</text>
+</svg>
