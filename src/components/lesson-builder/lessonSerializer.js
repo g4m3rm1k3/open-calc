@@ -115,6 +115,8 @@ export function buildLessonObject(state) {
       base.checkpoints = sec.items ?? []
     } else if (sec.type === 'quiz') {
       base.quiz = sec.items ?? []
+    } else if (sec.type === 'cells') {
+      base.cells = sec.cells ?? []
     } else if (sec.type === 'python') {
       const origKey = sec._origKey ?? 'python'
       if (origKey === 'notebooks') {

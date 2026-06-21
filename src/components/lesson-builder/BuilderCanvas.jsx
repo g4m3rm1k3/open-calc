@@ -8,6 +8,7 @@ import ChallengesBlock from './blocks/ChallengesBlock.jsx'
 import CheckpointsBlock from './blocks/CheckpointsBlock.jsx'
 import QuizBlock from './blocks/QuizBlock.jsx'
 import PythonBlock from './blocks/PythonBlock.jsx'
+import CellsBlock from './blocks/CellsBlock.jsx'
 import { HANDLED_SECTION_KEYS, HANDLED_META_KEYS } from './builderUtils.js'
 
 function DropZone({ onDrop, label }) {
@@ -36,6 +37,7 @@ const SECTION_LABELS = {
   challenges: 'Challenges',
   checkpoints: 'Checkpoints',
   quiz: 'Quiz',
+  cells: 'Cells',
 }
 
 const SECTION_ICONS = {
@@ -46,6 +48,7 @@ const SECTION_ICONS = {
   challenges: '🎯',
   checkpoints: '✅',
   quiz: '🧪',
+  cells: '⚗️',
 }
 
 function SectionBlock({ sec, dispatch, index, total }) {
@@ -77,6 +80,8 @@ function SectionBlock({ sec, dispatch, index, total }) {
       return <QuizBlock {...common} />
     case 'python':
       return <PythonBlock {...common} />
+    case 'cells':
+      return <CellsBlock {...common} />
     default:
       return (
         <div className="rounded-xl border-2 border-dashed border-slate-200 p-4 text-sm text-slate-400">

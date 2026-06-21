@@ -6,6 +6,8 @@ export const HANDLED_SECTION_KEYS = new Set([
   'intuition', 'math', 'rigor', 'examples', 'challenges', 'checkpoints', 'quiz',
   // All Python notebook variant keys
   'python', 'PythonNotebook', 'notebooks', 'pythonLab',
+  // ScienceNotebook cell array
+  'cells',
 ])
 export const HANDLED_META_KEYS = new Set(['id', 'slug', 'chapter', 'order', 'title', 'subtitle', 'tags', 'coreConcept', 'prerequisites', 'timeToComplete', 'aliases', 'nextLesson'])
 
@@ -18,6 +20,7 @@ export const PALETTE_BLOCKS = [
   { type: 'checkpoints', label: 'Checkpoints',  icon: '✅', desc: 'Progress tracking items' },
   { type: 'quiz',         label: 'Quiz',         icon: '🧪', desc: 'Multiple-choice quiz questions' },
   { type: 'python',       label: 'Python',       icon: '🐍', desc: 'Python notebook cells with runnable code' },
+  { type: 'cells',        label: 'Cells',        icon: '⚗️', desc: 'ScienceNotebook cells (markdown, js, challenge, coding, walkthrough)' },
 ]
 
 // Convert lesson.*.visualizations array → builder children array
@@ -63,6 +66,8 @@ export function defaultSection(type) {
       return { _id, type, items: [{ id: `q${Date.now()}`, type: 'choice', text: '', options: ['', '', '', ''], answer: '', hints: [], reviewSection: '' }] }
     case 'python':
       return { _id, type, cells: [{ id: 'py1', cellTitle: '', prose: '', code: '' }] }
+    case 'cells':
+      return { _id, type, cells: [{ type: 'markdown', instruction: '' }] }
     default:
       return { _id, type, prose: [] }
   }
@@ -72,7 +77,11 @@ export function lessonToState(lesson, chapterId, lessonSlug) {
   const sections = []
   const add = (type, extra) => sections.push({ _id: newId(), type, ...extra })
 
-  if (lesson.intuition) add('intuition', { prose: lesson.intuition.prose ?? [], callouts: lesson.intuition.callouts ?? [], children: vizsToChildren(lesson.intuition.visualizations) })
+  // ScienceNotebook cells — map before old-format sections so they appear first
+  if (lesson.cells?.length) add('cells', { cells: lesson.cells })
+
+  // Old-format sections — skip intuition if it uses blocks[] (ScienceNotebook style) rather than prose[]
+  if (lesson.intuition && lesson.intuition.prose) add('intuition', { prose: lesson.intuition.prose ?? [], callouts: lesson.intuition.callouts ?? [], children: vizsToChildren(lesson.intuition.visualizations) })
   if (lesson.math)      add('math',      { prose: lesson.math.prose ?? [],      equations: lesson.math.equations ?? [],   children: vizsToChildren(lesson.math.visualizations) })
   if (lesson.rigor)     add('rigor',     { prose: lesson.rigor.prose ?? [],     callouts: lesson.rigor.callouts ?? [],    children: vizsToChildren(lesson.rigor.visualizations) })
   if (lesson.examples?.length)    add('examples',    { items: lesson.examples.map(ex => ({ ...ex, steps: ex.steps ?? [] })) })
