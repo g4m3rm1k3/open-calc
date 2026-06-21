@@ -3,6 +3,7 @@ import Editor from '@monaco-editor/react'
 
 const API = '/api/dev-fs'
 const MOPTS = { fontSize: 12, minimap: { enabled: false }, wordWrap: 'off', scrollBeyondLastLine: false, automaticLayout: true }
+const BLANK_SVG = '<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">\n  \n</svg>'
 
 // Update/add a translate() on an element's transform attribute
 function applyTranslate(el, dx, dy) {
@@ -23,32 +24,41 @@ function parseVB(s) {
   return { x: p[0], y: p[1], w: p[2], h: p[3] }
 }
 
-export default function SvgEditor({ onClose }) {
+export default function SvgEditor({ onClose, initialPath, onSaved, dir = 'src/courses/geometry/diagrams' }) {
   const [files, setFiles] = useState([])
-  const [selectedPath, setSelectedPath] = useState(null)
+  const [filesLoaded, setFilesLoaded] = useState(false)
+  const [selectedPath, setSelectedPath] = useState(initialPath ?? null)
   const [xml, setXml] = useState('')
   const [viewBox, setViewBox] = useState('')
   const [vbEdit, setVbEdit] = useState('')
   const [selectedInfo, setSelectedInfo] = useState(null)
   const [saveMsg, setSaveMsg] = useState('')
   const [dark, setDark] = useState(false)
+  const [browseAll, setBrowseAll] = useState(!initialPath)
+  const [newFileName, setNewFileName] = useState('')
   const containerRef = useRef(null)
   const dragRef = useRef(null)
   const editorRef = useRef(null)
 
   // Load file list
   useEffect(() => {
-    fetch(`${API}/list?dir=src/courses/geometry/diagrams`)
+    setFilesLoaded(false)
+    fetch(`${API}/list?dir=${encodeURIComponent(dir)}`)
       .then(r => r.json())
-      .then(data => Array.isArray(data) ? setFiles(data) : setFiles([]))
+      .then(data => setFiles(Array.isArray(data) ? data : []))
       .catch(() => setFiles([]))
-  }, [])
+      .finally(() => setFilesLoaded(true))
+  }, [dir])
 
-  // Load selected file
+  // Load selected file — if it doesn't exist yet (new diagram), start from a blank skeleton
+  // instead of surfacing the raw error as if it were file content.
   useEffect(() => {
     if (!selectedPath) return
     fetch(`${API}/read?path=${encodeURIComponent(selectedPath)}`)
-      .then(r => r.text())
+      .then(async r => {
+        if (!r.ok) return BLANK_SVG
+        return r.text()
+      })
       .then(text => {
         setXml(text)
         const vb = text.match(/viewBox="([^"]+)"/)
@@ -156,6 +166,16 @@ export default function SvgEditor({ onClose }) {
     setViewBox(vbEdit.trim())
   }
 
+  const createNewFile = () => {
+    const name = newFileName.trim().replace(/\.svg$/i, '') + '.svg'
+    if (!/^[\w-]+\.svg$/i.test(name)) {
+      setSaveMsg('Error: use letters, numbers, - and _ only')
+      return
+    }
+    setSelectedPath(`${dir}/${name}`)
+    setNewFileName('')
+  }
+
   const handleSave = async () => {
     if (!selectedPath) return
     setSaveMsg('Saving…')
@@ -167,6 +187,12 @@ export default function SvgEditor({ onClose }) {
       })
       const data = await r.json()
       setSaveMsg(data.ok ? 'Saved!' : 'Error: ' + (data.error || '?'))
+      if (data.ok) {
+        onSaved?.(selectedPath)
+        if (!files.some(f => f.path === selectedPath)) {
+          setFiles(prev => [...prev, { name: selectedPath.split('/').pop(), path: selectedPath }])
+        }
+      }
     } catch (e) {
       setSaveMsg('Error: ' + e.message)
     }
@@ -213,6 +239,11 @@ export default function SvgEditor({ onClose }) {
         {selectedPath && (
           <span className="text-xs font-mono" style={{ color: '#8b949e' }}>{selectedPath.split('/').pop()}</span>
         )}
+        {initialPath && !browseAll && (
+          <button onClick={() => setBrowseAll(true)} className="text-xs px-2 py-0.5 rounded hover:bg-white/10 transition-colors" style={{ color: '#8b949e' }}>
+            Browse other files…
+          </button>
+        )}
 
         {/* ViewBox editor */}
         {viewBox && (
@@ -257,27 +288,50 @@ export default function SvgEditor({ onClose }) {
 
       {/* Body */}
       <div className="flex flex-1 min-h-0">
-        {/* Left sidebar: file list */}
-        <div className="flex flex-col w-52 shrink-0 border-r overflow-y-auto" style={{ background: '#161b22', borderColor: '#30363d' }}>
-          <div className="px-3 pt-3 pb-2 text-xs font-bold uppercase tracking-widest" style={{ color: '#8b949e' }}>
-            Diagram files
+        {/* Left sidebar: file list — hidden when bound to a single file via initialPath */}
+        {browseAll && (
+          <div className="flex flex-col w-52 shrink-0 border-r overflow-y-auto" style={{ background: '#161b22', borderColor: '#30363d' }}>
+            <div className="px-3 pt-3 pb-2 text-xs font-bold uppercase tracking-widest" style={{ color: '#8b949e' }}>
+              Diagram files
+            </div>
+            <div className="flex items-center gap-1 px-3 pb-2">
+              <input
+                value={newFileName}
+                onChange={e => setNewFileName(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && createNewFile()}
+                placeholder="new-diagram.svg"
+                className="text-xs font-mono rounded px-2 py-1 flex-1 min-w-0"
+                style={{ background: '#21262d', border: '1px solid #30363d', color: '#e6edf3' }}
+              />
+              <button
+                onClick={createNewFile}
+                disabled={!newFileName.trim()}
+                className="text-xs px-2 py-1 rounded disabled:opacity-40"
+                style={{ background: '#238636', color: '#fff' }}
+              >+ New</button>
+            </div>
+            {!filesLoaded && files.length === 0 && (
+              <div className="px-3 text-xs italic" style={{ color: '#8b949e' }}>Loading…</div>
+            )}
+            {filesLoaded && files.length === 0 && (
+              <div className="px-3 text-xs italic" style={{ color: '#8b949e' }}>
+                No diagrams yet for this course — name one above to create it.
+              </div>
+            )}
+            {files.map(f => (
+              <button
+                key={f.path}
+                onClick={() => setSelectedPath(f.path)}
+                className="text-left px-3 py-1.5 text-xs truncate transition-colors"
+                style={selectedPath === f.path
+                  ? { background: '#21262d', color: '#e6edf3' }
+                  : { color: '#8b949e' }}
+              >
+                {f.name}
+              </button>
+            ))}
           </div>
-          {files.length === 0 && (
-            <div className="px-3 text-xs italic" style={{ color: '#8b949e' }}>Loading…</div>
-          )}
-          {files.map(f => (
-            <button
-              key={f.path}
-              onClick={() => setSelectedPath(f.path)}
-              className="text-left px-3 py-1.5 text-xs truncate transition-colors"
-              style={selectedPath === f.path
-                ? { background: '#21262d', color: '#e6edf3' }
-                : { color: '#8b949e' }}
-            >
-              {f.name}
-            </button>
-          ))}
-        </div>
+        )}
 
         {/* Center: visual SVG preview */}
         <div className="flex flex-col flex-1 min-w-0" style={{ borderRight: '1px solid #30363d' }}>

@@ -1,7 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, lazy, Suspense } from 'react'
 import katex from 'katex'
 import BlockShell from '../BlockShell.jsx'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
 import VisualizationBlock from './VisualizationBlock.jsx'
+
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
 // Renders eq.tex live so a bad \frac or unbalanced brace shows up the moment
 // it's typed, instead of a contributor finding out from a failed CI check
@@ -51,7 +54,10 @@ function EquationEditor({ eq, onChange, onRemove }) {
 
 export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove, sectionId }) {
   const [editing, setEditing] = useState(false)
+  const [editingProse, setEditingProse] = useState(false)
   const update = updates => dispatch({ type: 'UPDATE_SECTION', id: sec._id, updates })
+  const proseText = (sec.prose ?? []).join('\n\n')
+  const setProse = next => update({ prose: next.split(/\n{2,}/).map(s => s.trim()).filter(Boolean) })
 
   const preview = (
     <div className="space-y-3">
@@ -83,17 +89,25 @@ export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMov
   const editor = (
     <div className="space-y-4">
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-          Prose — separate paragraphs with blank lines
-        </span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+            Prose — separate paragraphs with blank lines
+          </span>
+          <MarkdownEditButton onClick={() => setEditingProse(true)} />
+        </div>
         <textarea
-          value={(sec.prose ?? []).join('\n\n')}
-          onChange={e => update({ prose: e.target.value.split(/\n{2,}/).map(s => s.trim()).filter(Boolean) })}
+          value={proseText}
+          onChange={e => setProse(e.target.value)}
           rows={6}
           className="field font-mono text-sm resize-y"
           placeholder="Formal mathematical prose…"
         />
       </label>
+      {editingProse && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor value={proseText} onChange={setProse} onClose={() => setEditingProse(false)} title="📐 Math Prose" />
+        </Suspense>
+      )}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Equations</span>

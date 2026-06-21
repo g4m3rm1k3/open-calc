@@ -51,9 +51,9 @@ const SECTION_ICONS = {
   cells: '⚗️',
 }
 
-function SectionBlock({ sec, dispatch, index, total }) {
+function SectionBlock({ sec, dispatch, index, total, courseId }) {
   const common = {
-    sec, dispatch, index, total,
+    sec, dispatch, index, total, courseId,
     onMoveUp: () => dispatch({ type: 'MOVE_UP', id: sec._id }),
     onMoveDown: () => dispatch({ type: 'MOVE_DOWN', id: sec._id }),
     onRemove: () => {
@@ -133,6 +133,11 @@ function PassthroughPanel({ raw }) {
 
 export default function BuilderCanvas({ state, dispatch }) {
   const { meta, hook, sections, _raw } = state
+  // Diagrams live at src/courses/<courseId>/diagrams/, one folder per course —
+  // derive courseId from the chapter id (e.g. 'linear-algebra-1' -> 'linear-algebra')
+  // the same way lessonSerializer.js's getFilePath() does, so SVG blocks resolve
+  // to the right course's diagrams folder instead of always assuming geometry.
+  const courseId = (state._chapterId || meta.chapter || 'geometry').replace(/-\d+$/, '')
 
   return (
     <div className="flex-1 min-w-0 space-y-3">
@@ -156,7 +161,7 @@ export default function BuilderCanvas({ state, dispatch }) {
           />
           {sections.map((sec, i) => (
             <div key={sec._id}>
-              <SectionBlock sec={sec} dispatch={dispatch} index={i} total={sections.length} />
+              <SectionBlock sec={sec} dispatch={dispatch} index={i} total={sections.length} courseId={courseId} />
               <DropZone
                 label="+"
                 onDrop={type => dispatch({ type: 'ADD_SECTION', blockType: type, insertAt: i + 1 })}

@@ -1,8 +1,13 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
+import VizFrame from '../../viz/VizFrame.jsx'
+
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
 export default function HookBlock({ hook, dispatch }) {
   const [editing, setEditing] = useState(false)
+  const [editingContext, setEditingContext] = useState(false)
   const set = (key, value) => dispatch({ type: 'SET_HOOK', key, value })
 
   const preview = (
@@ -34,7 +39,10 @@ export default function HookBlock({ hook, dispatch }) {
         />
       </label>
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Real-world context (prose, markdown ok)</span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Real-world context (prose, markdown ok)</span>
+          <MarkdownEditButton onClick={() => setEditingContext(true)} />
+        </div>
         <textarea
           value={hook.realWorldContext}
           onChange={e => set('realWorldContext', e.target.value)}
@@ -52,9 +60,25 @@ export default function HookBlock({ hook, dispatch }) {
           className="field font-mono"
         />
       </label>
+      {hook.previewVisualizationId && (
+        <div className="pt-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Live preview</p>
+          <VizFrame id={hook.previewVisualizationId} />
+        </div>
+      )}
       <button onClick={() => setEditing(false)} className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">
         Done
       </button>
+      {editingContext && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor
+            value={hook.realWorldContext}
+            onChange={v => set('realWorldContext', v)}
+            onClose={() => setEditingContext(false)}
+            title="📝 Real-world Context"
+          />
+        </Suspense>
+      )}
     </div>
   )
 

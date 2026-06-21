@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
 import VisualizationBlock from './VisualizationBlock.jsx'
 import BlockListEditor from './BlockListEditor.jsx'
+
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
 // Shared editor for Intuition and Rigor (both have prose[] + callouts[])
 
 const CALLOUT_TYPES = ['insight', 'sequencing', 'procedure', 'warning', 'tip']
 
 function CalloutEditor({ callout, onChange, onRemove }) {
+  const [editingBody, setEditingBody] = useState(false)
   return (
     <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-2 bg-slate-50 dark:bg-slate-800/50">
       <div className="flex items-center gap-2">
@@ -18,7 +22,10 @@ function CalloutEditor({ callout, onChange, onRemove }) {
         >
           {CALLOUT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
-        <button onClick={onRemove} className="ml-auto text-xs text-red-400 hover:text-red-600">✕ Remove</button>
+        <div className="ml-auto flex items-center gap-2">
+          <MarkdownEditButton onClick={() => setEditingBody(true)} />
+          <button onClick={onRemove} className="text-xs text-red-400 hover:text-red-600">✕ Remove</button>
+        </div>
       </div>
       <input
         value={callout.title ?? ''}
@@ -33,12 +40,23 @@ function CalloutEditor({ callout, onChange, onRemove }) {
         rows={2}
         className="field text-sm resize-none"
       />
+      {editingBody && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor
+            value={callout.body ?? ''}
+            onChange={v => onChange({ ...callout, body: v })}
+            onClose={() => setEditingBody(false)}
+            title="💡 Callout Body"
+          />
+        </Suspense>
+      )}
     </div>
   )
 }
 
-export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, total, onMoveUp, onMoveDown, onRemove, sectionId }) {
+export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, total, onMoveUp, onMoveDown, onRemove, sectionId, courseId }) {
   const [editing, setEditing] = useState(false)
+  const [editingProse, setEditingProse] = useState(false)
   // blocks[] (new prose+image pattern, see BlockListEditor.jsx) vs legacy
   // prose[] — both render through this same component; only the
   // content portion (not callouts) differs between the two modes.
@@ -47,6 +65,7 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
   const updateSec = (updates) => dispatch({ type: 'UPDATE_SECTION', id: sec._id, updates })
 
   const proseText = (sec.prose ?? []).join('\n\n')
+  const setProse = next => updateSec({ prose: next.split(/\n{2,}/).map(s => s.trim()).filter(Boolean) })
 
   const preview = (
     <div className="space-y-3">
@@ -105,21 +124,29 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
   const editor = (
     <div className="space-y-4">
       {isBlocksMode ? (
-        <BlockListEditor sec={sec} sectionId={sectionId ?? sec._id} dispatch={dispatch} />
+        <BlockListEditor sec={sec} sectionId={sectionId ?? sec._id} dispatch={dispatch} courseId={courseId} />
       ) : (
         <>
           <label className="flex flex-col gap-1">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-              Prose paragraphs — separate with blank lines
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                Prose paragraphs — separate with blank lines
+              </span>
+              <MarkdownEditButton onClick={() => setEditingProse(true)} />
+            </div>
             <textarea
               value={proseText}
-              onChange={e => updateSec({ prose: e.target.value.split(/\n{2,}/).map(s => s.trim()).filter(Boolean) })}
+              onChange={e => setProse(e.target.value)}
               rows={8}
               placeholder="First paragraph…&#10;&#10;Second paragraph…"
               className="field font-mono text-sm resize-y"
             />
           </label>
+          {editingProse && (
+            <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+              <MarkdownCellEditor value={proseText} onChange={setProse} onClose={() => setEditingProse(false)} title={`${icon ?? '📝'} ${label ?? 'Prose'}`} />
+            </Suspense>
+          )}
           <button
             onClick={() => {
               if (window.confirm('Switch this section to blocks (prose + images), like the geometry course uses? Existing prose becomes the first block.')) {

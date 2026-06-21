@@ -1,7 +1,13 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
+import VizFrame from '../../viz/VizFrame.jsx'
+
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
 // Cell editor for PythonNotebook initialCells
 function CellEditor({ cell, onChange, onRemove }) {
+  const [editingProse, setEditingProse] = useState(false)
+  const [editingInstructions, setEditingInstructions] = useState(false)
   return (
     <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
@@ -20,7 +26,10 @@ function CellEditor({ cell, onChange, onRemove }) {
         <button onClick={onRemove} className="text-xs text-red-400 hover:text-red-600 shrink-0 ml-2">✕</button>
       </div>
       <label className="flex flex-col gap-1 p-3 border-b border-slate-100 dark:border-slate-800">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prose (shown above code)</span>
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prose (shown above code)</span>
+          <MarkdownEditButton onClick={() => setEditingProse(true)} />
+        </div>
         <textarea
           value={cell.prose ?? ''}
           onChange={e => onChange({ ...cell, prose: e.target.value })}
@@ -29,9 +38,17 @@ function CellEditor({ cell, onChange, onRemove }) {
           className="field text-sm resize-none"
         />
       </label>
+      {editingProse && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor value={cell.prose ?? ''} onChange={v => onChange({ ...cell, prose: v })} onClose={() => setEditingProse(false)} title="🔭 Cell Prose" />
+        </Suspense>
+      )}
       {cell.instructions != null && (
         <label className="flex flex-col gap-1 p-3 border-b border-slate-100 dark:border-slate-800">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Instructions</span>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Instructions</span>
+            <MarkdownEditButton onClick={() => setEditingInstructions(true)} />
+          </div>
           <textarea
             value={cell.instructions ?? ''}
             onChange={e => onChange({ ...cell, instructions: e.target.value })}
@@ -39,6 +56,11 @@ function CellEditor({ cell, onChange, onRemove }) {
             className="field text-sm resize-none"
           />
         </label>
+      )}
+      {editingInstructions && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor value={cell.instructions ?? ''} onChange={v => onChange({ ...cell, instructions: v })} onClose={() => setEditingInstructions(false)} title="🔭 Cell Instructions" />
+        </Suspense>
       )}
       <label className="flex flex-col gap-1 p-3">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Python code</span>
@@ -90,6 +112,7 @@ function NotebookCellsEditor({ cells, onChange }) {
 export default function VisualizationBlock({ child, sectionId, dispatch, index, total }) {
   const [expanded, setExpanded] = useState(false)
   const [editingMeta, setEditingMeta] = useState(false)
+  const [editingBridge, setEditingBridge] = useState(false)
 
   const updateChild = updates => dispatch({ type: 'UPDATE_CHILD', sectionId, childId: child._id, updates })
   const cells = child.props?.initialCells ?? []
@@ -181,7 +204,10 @@ export default function VisualizationBlock({ child, sectionId, dispatch, index, 
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Math bridge</span>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Math bridge</span>
+              <MarkdownEditButton onClick={() => setEditingBridge(true)} />
+            </div>
             <textarea
               value={child.mathBridge}
               onChange={e => updateChild({ mathBridge: e.target.value })}
@@ -190,6 +216,16 @@ export default function VisualizationBlock({ child, sectionId, dispatch, index, 
               placeholder="Connects the math to the code…"
             />
           </label>
+          {editingBridge && (
+            <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+              <MarkdownCellEditor
+                value={child.mathBridge ?? ''}
+                onChange={v => updateChild({ mathBridge: v })}
+                onClose={() => setEditingBridge(false)}
+                title="🔭 Math Bridge"
+              />
+            </Suspense>
+          )}
         </div>
       )}
 
@@ -215,6 +251,12 @@ export default function VisualizationBlock({ child, sectionId, dispatch, index, 
                 className="field font-mono text-xs resize-y"
                 spellCheck={false}
               />
+              {child.vizId && (
+                <div className="pt-3 mt-2 border-t border-brand-100 dark:border-brand-900">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Live preview</p>
+                  <VizFrame id={child.vizId} initialProps={child.props} title={child.title} />
+                </div>
+              )}
             </div>
           )}
         </div>

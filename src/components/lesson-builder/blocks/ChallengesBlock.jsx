@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
+
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
 function ChallengeEditor({ ch, onChange, onRemove }) {
+  const [editingProblem, setEditingProblem] = useState(false)
   return (
     <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3 bg-slate-50 dark:bg-slate-800/50">
       <div className="flex items-center justify-between">
@@ -14,13 +18,26 @@ function ChallengeEditor({ ch, onChange, onRemove }) {
         <button onClick={onRemove} className="text-xs text-red-400 hover:text-red-600 shrink-0">✕</button>
       </div>
       <label className="flex flex-col gap-1">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Problem</span>
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Problem</span>
+          <MarkdownEditButton onClick={() => setEditingProblem(true)} />
+        </div>
         <textarea value={ch.problem ?? ''} onChange={e => onChange({ ...ch, problem: e.target.value })} rows={3} className="field text-sm resize-none" placeholder="Problem statement…" />
       </label>
       <label className="flex flex-col gap-1">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Hint (optional)</span>
         <input value={ch.hint ?? ''} onChange={e => onChange({ ...ch, hint: e.target.value })} placeholder="Optional hint" className="field text-sm" />
       </label>
+      {editingProblem && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor
+            value={ch.problem ?? ''}
+            onChange={v => onChange({ ...ch, problem: v })}
+            onClose={() => setEditingProblem(false)}
+            title="🎯 Challenge Problem"
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

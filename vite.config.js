@@ -59,6 +59,7 @@ function devFsPlugin() {
                 const { filePath, content } = JSON.parse(body);
                 const absPath = path.resolve(root, filePath);
                 if (!absPath.startsWith(root)) return json({ error: "Forbidden" }, 403);
+                fs.mkdirSync(path.dirname(absPath), { recursive: true });
                 fs.writeFileSync(absPath, content, "utf-8");
                 json({ ok: true });
               } catch (e) {

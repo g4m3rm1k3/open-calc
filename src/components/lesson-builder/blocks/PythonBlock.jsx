@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
+
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
 function CellEditor({ cell, onChange, onRemove }) {
+  const [editingProse, setEditingProse] = useState(false)
   return (
     <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
@@ -21,7 +25,10 @@ function CellEditor({ cell, onChange, onRemove }) {
         <button onClick={onRemove} className="text-xs text-red-400 hover:text-red-600 shrink-0 ml-2">✕</button>
       </div>
       <label className="flex flex-col gap-1 p-3 border-b border-slate-100 dark:border-slate-800">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description / prose (shown above code)</span>
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Description / prose (shown above code)</span>
+          <MarkdownEditButton onClick={() => setEditingProse(true)} />
+        </div>
         <textarea
           value={cell.prose ?? ''}
           onChange={e => onChange({ ...cell, prose: e.target.value })}
@@ -30,6 +37,16 @@ function CellEditor({ cell, onChange, onRemove }) {
           className="field text-sm resize-none"
         />
       </label>
+      {editingProse && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor
+            value={cell.prose ?? ''}
+            onChange={v => onChange({ ...cell, prose: v })}
+            onClose={() => setEditingProse(false)}
+            title="🐍 Cell Description"
+          />
+        </Suspense>
+      )}
       <label className="flex flex-col gap-1 p-3">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Python code</span>
         <textarea

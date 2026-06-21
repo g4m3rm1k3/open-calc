@@ -9,6 +9,14 @@
 // after the block sequence regardless of prose-vs-blocks mode, so they
 // keep using the separate, untouched CalloutEditor in ProseCalloutBlock.jsx.
 
+import { useState, lazy, Suspense } from 'react'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
+import LiveSvgPreview from './LiveSvgPreview.jsx'
+import VizFrame from '../../viz/VizFrame.jsx'
+
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
+const SvgEditor = lazy(() => import('./SvgEditor.jsx'))
+
 const BLOCK_TYPE_META = {
   prose: { icon: '📝', label: 'Prose' },
   image: { icon: '🖼️', label: 'Image' },
@@ -16,40 +24,85 @@ const BLOCK_TYPE_META = {
 }
 
 function ProseBlockEditor({ block, onChange }) {
+  const [editing, setEditing] = useState(false)
   const text = (block.paragraphs ?? []).join('\n\n')
+  const setText = next => onChange({ paragraphs: next.split(/\n{2,}/).map(s => s.trim()).filter(Boolean) })
   return (
-    <textarea
-      value={text}
-      onChange={e => onChange({ paragraphs: e.target.value.split(/\n{2,}/).map(s => s.trim()).filter(Boolean) })}
-      rows={5}
-      placeholder="Short prose chunk — a paragraph or two, then move to the next block…"
-      className="field font-mono text-sm resize-y w-full"
-    />
+    <div className="space-y-1">
+      <div className="flex justify-end">
+        <MarkdownEditButton onClick={() => setEditing(true)} />
+      </div>
+      <textarea
+        value={text}
+        onChange={e => setText(e.target.value)}
+        rows={5}
+        placeholder="Short prose chunk — a paragraph or two, then move to the next block…"
+        className="field font-mono text-sm resize-y w-full"
+      />
+      {editing && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor value={text} onChange={setText} onClose={() => setEditing(false)} title="📝 Prose Block" />
+        </Suspense>
+      )}
+    </div>
   )
 }
 
-function ImageBlockEditor({ block, onChange }) {
+function ImageBlockEditor({ block, onChange, courseId = 'geometry' }) {
+  const [showSvgEditor, setShowSvgEditor] = useState(false)
+  const [previewKey, setPreviewKey] = useState(0)
+  const diagramsDir = `src/courses/${courseId}/diagrams`
+
+  // importPath is stored relative to the lesson's folder (e.g. '../diagrams/foo.svg')
+  // but the dev-fs API needs a repo-root-relative path — every course keeps its
+  // diagrams in its own src/courses/<courseId>/diagrams/ folder, so resolve by
+  // filename against that course's folder regardless of the '../' prefix style
+  // used in the lesson source.
+  const resolvedPath = block.importPath
+    ? `${diagramsDir}/${block.importPath.split('/').pop()}`
+    : ''
+
   return (
     <div className="space-y-2">
-      {block._previewSrc && (
-        <img src={block._previewSrc} alt={block.alt ?? ''} className="max-h-40 rounded-lg border border-slate-200 dark:border-slate-700" />
-      )}
-      <label className="flex flex-col gap-1">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-          Diagram path (relative to this lesson's folder, e.g. <code>../diagrams/foo.svg</code>)
-        </span>
-        <input
-          value={block.importPath ?? ''}
-          onChange={e => onChange({ importPath: e.target.value })}
-          placeholder="../diagrams/my-diagram.svg"
-          className="field font-mono text-xs"
-        />
-        {!block.importPath && (
-          <span className="text-[10px] text-amber-600 dark:text-amber-400">
-            No path set — the diagram must already exist on disk; this builder doesn't create SVGs.
+      <LiveSvgPreview key={previewKey} path={resolvedPath} />
+      <div className="flex items-center justify-between">
+        <label className="flex-1 flex flex-col gap-1">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            Diagram path (relative to this lesson's folder, e.g. <code>../diagrams/foo.svg</code>)
           </span>
-        )}
-      </label>
+          <input
+            value={block.importPath ?? ''}
+            onChange={e => onChange({ importPath: e.target.value })}
+            placeholder="../diagrams/my-diagram.svg"
+            className="field font-mono text-xs"
+          />
+        </label>
+        <button
+          type="button"
+          onClick={() => setShowSvgEditor(true)}
+          className="ml-2 mt-4 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors shrink-0"
+        >
+          🖼 Open SVG Editor
+        </button>
+      </div>
+      {!block.importPath && (
+        <span className="text-[10px] text-amber-600 dark:text-amber-400 block">
+          No path set yet — use "Open SVG Editor" to pick an existing diagram or load a new one from disk.
+        </span>
+      )}
+      {showSvgEditor && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <SvgEditor
+            initialPath={resolvedPath || undefined}
+            dir={diagramsDir}
+            onSaved={savedPath => {
+              onChange({ importPath: `../diagrams/${savedPath.split('/').pop()}` })
+              setPreviewKey(k => k + 1)
+            }}
+            onClose={() => setShowSvgEditor(false)}
+          />
+        </Suspense>
+      )}
       <label className="flex flex-col gap-1">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Alt text</span>
         <input
@@ -73,6 +126,7 @@ function ImageBlockEditor({ block, onChange }) {
 }
 
 function VizBlockEditor({ block, onChange }) {
+  const [editingBridge, setEditingBridge] = useState(false)
   return (
     <div className="grid grid-cols-2 gap-2">
       <label className="flex flex-col gap-1 col-span-2">
@@ -92,20 +146,37 @@ function VizBlockEditor({ block, onChange }) {
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Caption</span>
         <input value={block.caption ?? ''} onChange={e => onChange({ caption: e.target.value })} className="field text-sm" />
       </label>
-      <label className="flex flex-col gap-1 col-span-2">
+      <div className="col-span-2 flex items-center justify-between">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Math bridge</span>
-        <textarea
-          value={block.mathBridge ?? ''}
-          onChange={e => onChange({ mathBridge: e.target.value })}
-          rows={2}
-          className="field text-sm resize-none"
-        />
-      </label>
+        <MarkdownEditButton onClick={() => setEditingBridge(true)} label="📝 Edit + Preview" />
+      </div>
+      <textarea
+        value={block.mathBridge ?? ''}
+        onChange={e => onChange({ mathBridge: e.target.value })}
+        rows={2}
+        className="field text-sm resize-none col-span-2"
+      />
+      {editingBridge && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor
+            value={block.mathBridge ?? ''}
+            onChange={v => onChange({ mathBridge: v })}
+            onClose={() => setEditingBridge(false)}
+            title="📝 Math Bridge"
+          />
+        </Suspense>
+      )}
+      {block.vizId && (
+        <div className="col-span-2 mt-2 pt-3 border-t border-slate-200 dark:border-slate-700">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Live preview</p>
+          <VizFrame id={block.vizId} title={block.title} />
+        </div>
+      )}
     </div>
   )
 }
 
-function BlockItem({ block, sectionId, dispatch, index, total }) {
+function BlockItem({ block, sectionId, dispatch, index, total, courseId }) {
   const meta = BLOCK_TYPE_META[block.type] ?? { icon: '❓', label: block.type }
   const onChange = updates => dispatch({ type: 'UPDATE_BLOCK_ITEM', sectionId, blockId: block._id, updates })
 
@@ -133,7 +204,7 @@ function BlockItem({ block, sectionId, dispatch, index, total }) {
       </div>
       <div className="px-3 py-3">
         {block.type === 'prose' && <ProseBlockEditor block={block} onChange={onChange} />}
-        {block.type === 'image' && <ImageBlockEditor block={block} onChange={onChange} />}
+        {block.type === 'image' && <ImageBlockEditor block={block} onChange={onChange} courseId={courseId} />}
         {block.type === 'viz' && <VizBlockEditor block={block} onChange={onChange} />}
         {!['prose', 'image', 'viz'].includes(block.type) && (
           <p className="text-xs text-slate-400 italic">
@@ -145,7 +216,7 @@ function BlockItem({ block, sectionId, dispatch, index, total }) {
   )
 }
 
-export default function BlockListEditor({ sec, sectionId, dispatch }) {
+export default function BlockListEditor({ sec, sectionId, dispatch, courseId }) {
   const blocks = sec.blocks ?? []
   const addBlock = blockType => dispatch({ type: 'ADD_BLOCK_ITEM', sectionId, blockType })
 
@@ -158,7 +229,7 @@ export default function BlockListEditor({ sec, sectionId, dispatch }) {
       </div>
 
       {blocks.map((block, i) => (
-        <BlockItem key={block._id} block={block} sectionId={sectionId} dispatch={dispatch} index={i} total={blocks.length} />
+        <BlockItem key={block._id} block={block} sectionId={sectionId} dispatch={dispatch} index={i} total={blocks.length} courseId={courseId} />
       ))}
 
       {blocks.length === 0 && (

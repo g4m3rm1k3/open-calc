@@ -8,6 +8,7 @@ import rehypeRaw from 'rehype-raw'
 import 'katex/dist/katex.min.css'
 import Editor from '@monaco-editor/react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
+import MarkdownToolbar, { stripSnippetSyntax } from '../markdown-toolbar/MarkdownToolbar.jsx'
 import {
   X,
   ChevronDown,
@@ -829,6 +830,25 @@ export default function MarkdownHub() {
   const [activeOverridePath, setActiveOverridePath] = useState(null)
   const [editorName, setEditorName] = useState('')
   const [editorContent, setEditorContent] = useState('')
+  const editorTextareaRef = useRef(null)
+
+  // Toolbar insert for the plain <textarea> editor below — no real Monaco
+  // snippet/tabstop support here, so strip that syntax and just drop the
+  // placeholder text in at the cursor.
+  const insertIntoEditor = useCallback((btn) => {
+    const ta = editorTextareaRef.current
+    const text = btn.plain != null ? btn.plain : stripSnippetSyntax(btn.snippet)
+    if (!ta) {
+      setEditorContent(c => c + text)
+      return
+    }
+    const s = ta.selectionStart, e = ta.selectionEnd
+    setEditorContent(c => c.slice(0, s) + text + c.slice(e))
+    requestAnimationFrame(() => {
+      ta.focus()
+      ta.selectionStart = ta.selectionEnd = s + text.length
+    })
+  }, [])
   const [previewMode, setPreviewMode] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [tutorialOverrideActive, setTutorialOverrideActive] = useState(false)
@@ -1610,7 +1630,9 @@ export default function MarkdownHub() {
                     {isSaving ? 'Saving' : 'Saved'}
                   </span>
                 </div>
+                <MarkdownToolbar onInsert={insertIntoEditor} />
                 <textarea
+                  ref={editorTextareaRef}
                   value={editorContent}
                   onChange={(event) => setEditorContent(event.target.value)}
                   spellCheck={false}

@@ -1,5 +1,6 @@
 import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
 import VizCellEditor from './VizCellEditor.jsx'
 import SvgEditor from './SvgEditor.jsx'
 
@@ -88,12 +89,9 @@ function MarkdownEditor({ cell, onChange, onLiveEdit }) {
     <div className="space-y-1">
       <div className="flex items-center justify-between">
         <MdToolbar onInsert={insertMd} />
-        <button
-          onClick={onLiveEdit}
-          className="ml-2 flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-lg border border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors shrink-0"
-        >
-          📝 Full Editor + Preview
-        </button>
+        <div className="ml-2">
+          <MarkdownEditButton onClick={onLiveEdit} label="📝 Full Editor + Preview" />
+        </div>
       </div>
       <Field label="Markdown content">
         <TA taRef={taRef} value={cell.instruction} onChange={v => onChange({ ...cell, instruction: v })} rows={8} placeholder="### Heading&#10;&#10;Prose here. Use $$x^2$$ for inline math." />
@@ -259,7 +257,7 @@ function CellEditor({ cell, onChange, onLiveEdit, onMarkdownLiveEdit }) {
 
 // ── Main CellsBlock ───────────────────────────────────────────────────────────
 
-export default function CellsBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove }) {
+export default function CellsBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove, courseId = 'geometry' }) {
   const [openIdx, setOpenIdx] = useState(null)
   const [vizEditCell, setVizEditCell] = useState(null)    // { cell, cellIndex }
   const [mdEditCell, setMdEditCell] = useState(null)      // { cell, cellIndex }
@@ -384,15 +382,15 @@ export default function CellsBlock({ sec, dispatch, index, total, onMoveUp, onMo
       {mdEditCell && (
         <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
           <MarkdownCellEditor
-            cell={mdEditCell.cell}
-            onSave={updated => updateCell(mdEditCell.cellIndex, updated)}
+            value={mdEditCell.cell.instruction}
+            onChange={v => updateCell(mdEditCell.cellIndex, { ...mdEditCell.cell, instruction: v })}
             onClose={() => setMdEditCell(null)}
           />
         </Suspense>
       )}
 
       {/* SVG diagram editor modal */}
-      {showSvgEditor && <SvgEditor onClose={() => setShowSvgEditor(false)} />}
+      {showSvgEditor && <SvgEditor dir={`src/courses/${courseId}/diagrams`} onClose={() => setShowSvgEditor(false)} />}
     </>
   )
 }
