@@ -1,64 +1,95 @@
 // ── Compass Data Types ──────────────────────────────────────────────
 // localStorage key: 'oc-compass'
+//
+// Plan replaces the old Goal/Habit/Milestone split — see buildplan.md
+// "The core architectural change: one concept, not three." A Plan is
+// something the user wants to accomplish, made of one or more PlanActions.
+// An action's cadence ('once' vs recurring) is what used to distinguish a
+// "goal milestone" from a "habit" — same engine now, no separate forms.
 
-export interface Milestone {
+export type ActionCadence = 'once' | 'daily' | 'weekdays' | 'weekly'
+export type ActionStatus = 'pending' | 'active' | 'done'
+export type ActionOutcome = 'done' | 'blocked' | 'skipped'
+
+export interface PlanActionLogEntry {
+  date: string              // ISO date the action was due
+  outcome: ActionOutcome
+  blocker?: string           // free text — only ever set by the user, never inferred
+  note?: string              // the real answer when the action requiresNote — see PlanAction.requiresNote
+}
+
+export interface PlanAction {
   id: string
   label: string
-  done: boolean
-}
-
-export interface Goal {
-  id: string
-  identity: string          // "I am a person who..."
-  title: string
-  system: string            // The daily/weekly actions
-  milestones: Milestone[]
+  cadence: ActionCadence
+  time?: string              // HH:MM — if absent, no calendar reminder is created
+  durationMinutes?: number
   calendarEventIds: string[]
-  createdAt: string         // ISO 8601
-  status: 'active' | 'paused' | 'completed'
+  log: PlanActionLogEntry[]
+  status: ActionStatus
+  // Which real, structurally-applied methods this action follows — see
+  // methods.ts. Only ever set from a playbook, never invented per-action.
+  methodIds?: string[]
+  // The actual HOW — a domain-general technique instruction. See
+  // playbooks.ts ActionDraft for why this is never subject-specific.
+  instructions?: string
+  // Why THIS step exists in THIS sequence — always visible, not collapsed.
+  why?: string
+  // A concrete fallback for a hard day — the obstacle-anticipation piece.
+  fallback?: string
+  // When set, marking this action "Done" requires a real one-line answer
+  // to this prompt instead of just a click
+  requiresNote?: string
+  narrows?: boolean
 }
 
-export interface Habit {
+export interface Plan {
   id: string
-  cue: string               // "After I pour my morning coffee"
-  routine: string            // "I will study for 2 minutes"
-  reward: string             // "I mark it on my streak calendar"
-  twoMinVersion: string      // "Open the app and read 1 paragraph"
-  streak: string[]           // ISO date strings of completed days
-  goalId?: string
+  title: string
+  createdAt: string
+  status: 'active' | 'paused' | 'completed'
+  actions: PlanAction[]
+  // Decided in advance, in the user's own words — never invented.
+  reward?: string
+  // The specific thing this plan actually narrowed down to.
+  focus?: string
 }
+
+export type NoteStatus = 'inbox' | 'clarified' | 'archived'
 
 export interface Note {
   id: string
   content: string            // markdown
-  tags: string[]
+  category?: string
+  status: NoteStatus
   linkedNoteIds: string[]
   courseRef?: string
-  goalRef?: string
   createdAt: string
   updatedAt: string
-}
-
-export interface WeeklyReviewEntry {
-  id: string
-  weekOf: string             // ISO date of Monday
-  content: string            // AI-generated review text
-  createdAt: string
 }
 
 export interface CompassSettings {
   pomodoroWork: number       // minutes, default 25
   pomodoroBreak: number      // minutes, default 5
   pomodoroLongBreak: number  // minutes, default 15
-  morningReviewTime?: string // HH:MM
-  eveningReviewTime?: string // HH:MM
+}
+
+// Cards always come from something the user actually wrote (a note)
+export interface Flashcard {
+  id: string
+  front: string
+  back: string
+  noteId?: string
+  step: number               // index into spacedRepetition.ts's STEP_DAYS
+  dueDate: string            // ISO — when it's next due for review
+  reviewCount: number
+  createdAt: string
 }
 
 export interface CompassStore {
-  goals: Goal[]
-  habits: Habit[]
+  plans: Plan[]
   notes: Note[]
-  reviews: WeeklyReviewEntry[]
+  flashcards: Flashcard[]
   settings: CompassSettings
 }
 
@@ -69,9 +100,8 @@ export const DEFAULT_SETTINGS: CompassSettings = {
 }
 
 export const EMPTY_STORE: CompassStore = {
-  goals: [],
-  habits: [],
+  plans: [],
   notes: [],
-  reviews: [],
+  flashcards: [],
   settings: DEFAULT_SETTINGS,
 }

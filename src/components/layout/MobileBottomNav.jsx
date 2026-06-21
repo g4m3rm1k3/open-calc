@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Compass, Calculator, Search, BookOpen, Layers } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Home, MapPin, Calculator, Search, BookOpen, Layers } from 'lucide-react'
+import { motion } from 'framer-motion'
 
 /**
  * MobileBottomNav - A persistent bottom navigation bar for mobile users.
@@ -13,6 +13,7 @@ export default function MobileBottomNav({ onSearchOpen, onToolsToggle }) {
   const isExploreActive = location.pathname.startsWith('/chapter') || location.pathname.startsWith('/course') || location.pathname.startsWith('/courses')
   const isReferenceActive = location.pathname.startsWith('/reference')
   const isHomeActive = location.pathname === '/'
+  const isCompassActive = location.pathname.startsWith('/compass')
 
   const NavItem = ({ active, onClick, icon: Icon, label, activeColor, dataTour }) => (
     <motion.button
@@ -53,10 +54,29 @@ export default function MobileBottomNav({ onSearchOpen, onToolsToggle }) {
           dataTour="explore-mobile"
           active={isExploreActive}
           onClick={() => navigate('/courses')}
-          icon={Compass}
+          icon={BookOpen}
           label="Explore"
           activeColor="text-indigo-600 dark:text-indigo-400"
         />
+
+        {/* Compass — center prominent button */}
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => navigate('/compass')}
+          className={`relative flex flex-col items-center justify-center flex-1 h-16 ${isCompassActive ? 'text-sky-500' : 'text-slate-400 dark:text-slate-500'}`}
+        >
+          {isCompassActive && (
+            <motion.div
+              layoutId="mobileNavIndicator"
+              className="absolute inset-x-2 top-2 bottom-2 rounded-2xl bg-current opacity-10 dark:opacity-20"
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            />
+          )}
+          <MapPin className={`w-5 h-5 relative z-10 transition-all duration-300 ${isCompassActive ? 'stroke-[2.5px] -translate-y-1' : ''}`} />
+          <span className={`text-[10px] font-bold tracking-wide relative z-10 transition-all duration-300 absolute bottom-2.5 ${isCompassActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
+            Compass
+          </span>
+        </motion.button>
         
         <NavItem
           dataTour="mobile-tools-btn"
@@ -73,14 +93,6 @@ export default function MobileBottomNav({ onSearchOpen, onToolsToggle }) {
           icon={Search} 
           label="Search" 
           activeColor="text-slate-900 dark:text-white" 
-        />
-        
-        <NavItem 
-          active={isReferenceActive} 
-          onClick={() => navigate('/reference')} 
-          icon={BookOpen} 
-          label="Ref" 
-          activeColor="text-amber-600 dark:text-amber-400" 
         />
       </div>
     </nav>

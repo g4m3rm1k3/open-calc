@@ -29,7 +29,7 @@ import {
   Terminal,
   PlayCircle,
   Sun,
-  Moon
+  Moon,
 } from "lucide-react";
 import TICalc from "../../tools/calculator/index.jsx";
 import SigmaCalc from "../../tools/sigma/index.jsx";
@@ -40,6 +40,7 @@ import HelpModal from "../ui/HelpModal.jsx";
 import ReportBugButton from "../ui/ReportBugButton.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
 import TerminalHub from "../../tools/terminal-hub/TerminalHub.jsx";
+import CompassQuickPanel from "../../features/compass/CompassQuickPanel.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
 import ChatPanel from "../tutor/ChatPanel.jsx";
 import { motion, AnimatePresence } from "framer-motion";
@@ -125,6 +126,8 @@ function NavSep({ className = "" }) {
 
 function TopBar({ dark, toggleDark }) {
   const { openSearch } = useSearchContext();
+  const location = useLocation();
+  const isCompassActive = location.pathname.startsWith('/compass');
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] h-[52px] flex items-center px-4 gap-3 bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
@@ -256,6 +259,7 @@ export default function AppShell({ children }) {
   const [polyOpen, setPolyOpen] = useState(false);
   const [laOpen, setLAOpen] = useState(false);
   const [matrixReducerOpen, setMatrixReducerOpen] = useState(false);
+  const [compassQuickOpen, setCompassQuickOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [gameRulesOpen, setGameRulesOpen] = useState(false);
   const [scratchSnap, setScratchSnap] = useState(null);
@@ -350,6 +354,7 @@ export default function AppShell({ children }) {
       else if (tool === "grapher-3d") setGraph3DOpen(true);
       else if (tool === "jsxgraph") setGraphJSXOpen(true);
       else if (tool === "matrix-reducer") setMatrixReducerOpen(true);
+      else if (tool === "compass-quick") setCompassQuickOpen(true);
     };
     window.addEventListener("oc-open-tool", handler);
     return () => window.removeEventListener("oc-open-tool", handler);
@@ -445,6 +450,7 @@ export default function AppShell({ children }) {
           {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
           {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
           {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
+          {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
           <TerminalHub
             isOpen={terminalOpen}
             onClose={() => setTerminalOpen(false)}
@@ -703,6 +709,7 @@ export default function AppShell({ children }) {
           {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
           {laOpen && <LinearAlgebraCalc onClose={() => setLAOpen(false)} />}
           {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
+          {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
           <WhatsNewModal />
           <SearchModal />
           <GlobalGrapher

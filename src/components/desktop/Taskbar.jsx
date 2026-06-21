@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import StartMenu from './StartMenu.jsx'
 import ChapterNavigator from './ChapterNavigator.jsx'
@@ -17,14 +17,16 @@ const PINNED_APPS = [
     loader: () => import('../../features/brain/BrainPage.jsx').then(m => m.default),
   },
 ]
-import { LayoutGrid, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap } from 'lucide-react'
+import { LayoutGrid, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap, Compass } from 'lucide-react'
 
 export default function Taskbar({ windows, onFocus }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [chapNavOpen, setChapNavOpen] = useState(false)
   const [pinsNotesOpen, setPinsNotesOpen] = useState(null) // 'pins' | 'notes' | null
   const location = useLocation()
+  const navigate = useNavigate()
   const { openWindow } = useDesktop()
+  const isCompassActive = location.pathname.startsWith('/compass')
 
   const isLessonRoute = /^\/chapter\/[^/]+\/.+/.test(location.pathname)
 
@@ -144,6 +146,20 @@ export default function Taskbar({ windows, onFocus }) {
             }`}
           >
             <StickyNote className="w-5 h-5" />
+          </motion.button>
+
+          <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1 flex-shrink-0 rounded-full" />
+
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/compass')}
+            title="Compass"
+            className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none ${
+              isCompassActive ? 'bg-sky-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:text-sky-600 dark:hover:text-sky-400'
+            }`}
+          >
+            <Compass className="w-5 h-5" />
           </motion.button>
 
           <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1 flex-shrink-0 rounded-full" />

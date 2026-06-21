@@ -680,53 +680,6 @@ for i, v in enumerate(dp):
     color = "#f59e0b" if i == amount else "#60a5fa"
     fig.bar(i, val, label=f"{i}:{val}", color=color)
 fig.show()`,
-
-  quiz: [
-    {
-      id: 'q1',
-      type: 'choice',
-      text: 'Greedy algorithms make the locally optimal choice at each step without reconsidering. The coin change problem with coins [1,5,10,25]: greedy picks the largest coin that fits. For what coin system does greedy fail?',
-      options: [
-        'Greedy always fails for coin change — dynamic programming is always needed',
-        'For coins [1,3,4] and amount=6: greedy picks 4, then needs 2 more → picks 1,1 for total 3 coins. Optimal is 3+3 → 2 coins. Greedy fails when a slightly smaller coin enables a better total. Standard US coins (1,5,10,25) have a special structure that makes greedy always optimal — this is not true for arbitrary coin systems',
-        'Greedy fails when the amount is odd',
-      ],
-      correct: 1,
-    },
-    {
-      id: 'q2',
-      type: 'choice',
-      text: 'Divide and conquer splits the problem, solves each part independently, and merges. Dynamic programming also splits but memoizes subproblem results. What structural difference determines which approach to use?',
-      options: [
-        'Divide and conquer works on arrays; DP works on graphs',
-        'Divide and conquer applies when subproblems are independent (the left half of merge sort does not share data with the right half). DP applies when subproblems overlap (fib(5) and fib(6) both need fib(4)). Overlapping subproblems make memoization worthwhile; independent subproblems make it unnecessary',
-        'Divide and conquer is always faster because it uses parallelism',
-      ],
-      correct: 1,
-    },
-    {
-      id: 'q3',
-      type: 'choice',
-      text: 'Coin change DP: dp[i] = min coins to make amount i. The recurrence is dp[i] = min(dp[i-c]+1 for c in coins if c≤i). Why is dp[0]=0 the correct base case?',
-      options: [
-        'dp[0]=0 represents the empty coin — a coin of value 0',
-        '0 amount requires 0 coins — nothing is needed to make change for 0. This base case seeds all other values: dp[c] = dp[0]+1 = 1 for each coin c (one coin makes its own value). Without dp[0]=0, the base case would be missing and dp[c] would never be correctly initialized to 1',
-        'dp[0]=0 means the algorithm starts at index 0',
-      ],
-      correct: 1,
-    },
-    {
-      id: 'q4',
-      type: 'choice',
-      text: 'A greedy interval scheduling algorithm selects intervals with the earliest finish time to maximize the number of non-overlapping intervals. Why "earliest finish" rather than "shortest interval" or "earliest start"?',
-      options: [
-        'Earliest finish is a mathematical convention with no specific reason',
-        'Selecting earliest finish leaves the maximum remaining time for future intervals. Shortest intervals might still end late, blocking many future options. Earliest start includes long intervals that end late, blocking the slot for many shorter future ones. Earliest finish is the correct greedy choice that can be proven optimal by an exchange argument',
-        'Earliest finish guarantees the selected intervals never overlap',
-      ],
-      correct: 1,
-    },
-  ],
               output: `All assertions passed!`,
               status: 'idle',
               figureJson: null,
