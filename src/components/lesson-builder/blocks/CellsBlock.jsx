@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
 import VizCellEditor from './VizCellEditor.jsx'
 import SvgEditor from './SvgEditor.jsx'
-import MarkdownCellEditor from './MarkdownCellEditor.jsx'
+
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
 const CELL_TYPES = ['markdown', 'js', 'challenge', 'coding', 'walkthrough']
 const CELL_ICONS = { markdown: '📝', js: '⚡', challenge: '❓', coding: '✎', walkthrough: '⟳' }
@@ -381,11 +382,13 @@ export default function CellsBlock({ sec, dispatch, index, total, onMoveUp, onMo
 
       {/* Markdown live editor modal */}
       {mdEditCell && (
-        <MarkdownCellEditor
-          cell={mdEditCell.cell}
-          onSave={updated => updateCell(mdEditCell.cellIndex, updated)}
-          onClose={() => setMdEditCell(null)}
-        />
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor
+            cell={mdEditCell.cell}
+            onSave={updated => updateCell(mdEditCell.cellIndex, updated)}
+            onClose={() => setMdEditCell(null)}
+          />
+        </Suspense>
       )}
 
       {/* SVG diagram editor modal */}
