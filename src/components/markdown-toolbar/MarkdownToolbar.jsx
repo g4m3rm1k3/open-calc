@@ -205,9 +205,12 @@ export const GROUPS = [
 
 // ── Quick-insert wizards: ask what you want, build the syntax for you ─────────
 
-function QuickAddPopover({ title, onClose, children }) {
+function QuickAddPopover({ title, onClose, wide, children }) {
   return (
-    <div className="absolute z-10 top-full left-0 mt-1 w-72 rounded-lg shadow-xl p-3 space-y-2" style={{ background: '#1c2128', border: '1px solid #30363d' }}>
+    <div
+      className={`absolute z-10 top-full left-0 mt-1 rounded-lg shadow-xl p-3 space-y-2 ${wide ? 'w-auto max-w-[min(90vw,640px)]' : 'w-72'}`}
+      style={{ background: '#1c2128', border: '1px solid #30363d' }}
+    >
       <div className="flex items-center justify-between">
         <span className="text-xs font-bold" style={{ color: '#e6edf3' }}>{title}</span>
         <button onClick={onClose} className="text-xs px-1 hover:text-white" style={{ color: '#8b949e' }}>✕</button>
@@ -231,32 +234,83 @@ function NumField({ label, value, onChange, min = 1, max = 20 }) {
   )
 }
 
+// Builds an r×c grid, reusing whatever values already exist at surviving
+// indices so resizing rows/cols doesn't throw away what you've typed.
+function resizeGrid(prev, rows, cols, fill) {
+  return Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => prev[r]?.[c] ?? fill(r, c))
+  )
+}
+
+function GridInput({ value, onChange, placeholder, isHeader, width = 80 }) {
+  return (
+    <input
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      style={{
+        width, background: isHeader ? '#2d2410' : '#21262d',
+        border: '1px solid #30363d', color: '#e6edf3',
+        borderRadius: 4, padding: '3px 6px', fontSize: 11,
+      }}
+    />
+  )
+}
+
 function TableQuickAdd({ onInsert, onClose }) {
-  const [rows, setRows] = useState(3)
+  const [rows, setRows] = useState(3) // total rows, including the header row if any
   const [cols, setCols] = useState(3)
   const [header, setHeader] = useState(true)
+  const [cells, setCells] = useState(() =>
+    resizeGrid([], 3, 3, (r, c) => (r === 0 ? `Header ${c + 1}` : ''))
+  )
+
+  const resize = (newRows, newCols) => setCells(prev =>
+    resizeGrid(prev, newRows, newCols, (r, c) => (r === 0 && header ? `Header ${c + 1}` : ''))
+  )
+  const setCell = (r, c, val) => setCells(prev => {
+    const next = prev.map(row => row.slice())
+    next[r][c] = val
+    return next
+  })
 
   const insert = () => {
-    const headerCells = Array.from({ length: cols }, (_, c) => `Header ${c + 1}`)
-    const sepCells = Array.from({ length: cols }, () => '---')
-    const line = cells => `| ${cells.join(' | ')} |`
-    const lines = [line(header ? headerCells : Array.from({ length: cols }, (_, c) => `Cell 1-${c + 1}`)), line(sepCells)]
-    const dataRowCount = header ? rows : rows - 1
-    for (let r = 0; r < dataRowCount; r++) {
-      lines.push(line(Array.from({ length: cols }, (_, c) => `Cell ${r + (header ? 1 : 2)}-${c + 1}`)))
-    }
-    onInsert({ snippet: '\n' + lines.join('\n') + '\n' })
+    const line = row => `| ${row.map(v => v.trim()).join(' | ')} |`
+    const sep = `| ${cols && Array.from({ length: cols }, () => '---').join(' | ')} |`
+    const lines = [line(cells[0] ?? []), sep, ...cells.slice(1).map(line)]
+    onInsert({ plain: '\n' + lines.join('\n') + '\n' })
     onClose()
   }
 
   return (
-    <QuickAddPopover title="▦ Insert table" onClose={onClose}>
-      <NumField label="Rows" value={rows} onChange={setRows} min={1} max={20} />
-      <NumField label="Columns" value={cols} onChange={setCols} min={1} max={10} />
-      <label className="flex items-center gap-2 text-xs" style={{ color: '#8b949e' }}>
-        <input type="checkbox" checked={header} onChange={e => setHeader(e.target.checked)} />
-        Header row
-      </label>
+    <QuickAddPopover title="▦ Insert table" onClose={onClose} wide>
+      <div className="flex items-center gap-3">
+        <NumField label="Rows" value={rows} onChange={v => { setRows(v); resize(v, cols) }} min={1} max={12} />
+        <NumField label="Columns" value={cols} onChange={v => { setCols(v); resize(rows, v) }} min={1} max={8} />
+        <label className="flex items-center gap-1.5 text-xs" style={{ color: '#8b949e' }}>
+          <input type="checkbox" checked={header} onChange={e => setHeader(e.target.checked)} />
+          First row is a header
+        </label>
+      </div>
+      <p className="text-[10px]" style={{ color: '#6e7681' }}>Type the actual cell values below — they'll be inserted exactly as written.</p>
+      <div className="overflow-x-auto">
+        <table className="border-collapse"><tbody>
+          {cells.map((row, r) => (
+            <tr key={r}>
+              {row.map((val, c) => (
+                <td key={c} className="p-0.5">
+                  <GridInput
+                    value={val}
+                    onChange={v => setCell(r, c, v)}
+                    isHeader={r === 0 && header}
+                    placeholder={r === 0 && header ? `Header ${c + 1}` : `r${r + 1}c${c + 1}`}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody></table>
+      </div>
       <button onClick={insert} className="w-full text-xs font-bold py-1.5 rounded" style={{ background: '#238636', color: '#fff' }}>Insert</button>
     </QuickAddPopover>
   )
@@ -272,26 +326,47 @@ function MatrixQuickAdd({ onInsert, onClose }) {
   const [rows, setRows] = useState(2)
   const [cols, setCols] = useState(2)
   const [style, setStyle] = useState('pmatrix')
+  const [cells, setCells] = useState(() => resizeGrid([], 2, 2, () => ''))
+
+  const resize = (newRows, newCols) => setCells(prev => resizeGrid(prev, newRows, newCols, () => ''))
+  const setCell = (r, c, val) => setCells(prev => {
+    const next = prev.map(row => row.slice())
+    next[r][c] = val
+    return next
+  })
 
   const insert = () => {
-    const rowStrs = Array.from({ length: rows }, (_, r) =>
-      Array.from({ length: cols }, (_, c) => `a_{${r + 1}${c + 1}}`).join(' & ')
-    )
-    const body = rowStrs.join(' \\\\ ')
+    const body = cells.map(row => row.map(v => v.trim() || '0').join(' & ')).join(' \\\\ ')
     onInsert({ plain: `$\\begin{${style}} ${body} \\end{${style}}$` })
     onClose()
   }
 
   return (
-    <QuickAddPopover title="⊞ Insert matrix" onClose={onClose}>
-      <NumField label="Rows" value={rows} onChange={setRows} min={1} max={8} />
-      <NumField label="Columns" value={cols} onChange={setCols} min={1} max={8} />
-      <label className="flex flex-col gap-1 text-xs" style={{ color: '#8b949e' }}>
-        Style
-        <select value={style} onChange={e => setStyle(e.target.value)} className="text-xs rounded px-1.5 py-1" style={{ background: '#21262d', border: '1px solid #30363d', color: '#e6edf3' }}>
-          {MATRIX_STYLES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
-        </select>
-      </label>
+    <QuickAddPopover title="⊞ Insert matrix" onClose={onClose} wide>
+      <div className="flex items-center gap-3">
+        <NumField label="Rows" value={rows} onChange={v => { setRows(v); resize(v, cols) }} min={1} max={6} />
+        <NumField label="Columns" value={cols} onChange={v => { setCols(v); resize(rows, v) }} min={1} max={6} />
+        <label className="flex items-center gap-1.5 text-xs" style={{ color: '#8b949e' }}>
+          Style
+          <select value={style} onChange={e => setStyle(e.target.value)} className="text-xs rounded px-1.5 py-1" style={{ background: '#21262d', border: '1px solid #30363d', color: '#e6edf3' }}>
+            {MATRIX_STYLES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+          </select>
+        </label>
+      </div>
+      <p className="text-[10px]" style={{ color: '#6e7681' }}>Type each entry — numbers, variables, or LaTeX like \frac&#123;1&#125;&#123;2&#125;. Blank cells become 0.</p>
+      <div className="overflow-x-auto">
+        <table className="border-collapse"><tbody>
+          {cells.map((row, r) => (
+            <tr key={r}>
+              {row.map((val, c) => (
+                <td key={c} className="p-0.5">
+                  <GridInput value={val} onChange={v => setCell(r, c, v)} placeholder="0" width={56} />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody></table>
+      </div>
       <button onClick={insert} className="w-full text-xs font-bold py-1.5 rounded" style={{ background: '#238636', color: '#fff' }}>Insert</button>
     </QuickAddPopover>
   )
