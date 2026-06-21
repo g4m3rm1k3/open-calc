@@ -88,8 +88,12 @@ export function blocksToState(blocks, imageImportQueue) {
     if (b.type === 'viz') {
       return { _id, type: 'viz', vizId: b.id ?? '', title: b.title ?? '', caption: b.caption ?? '', mathBridge: b.mathBridge ?? '', props: b.props ?? {} }
     }
+    if (b.type === 'callout') {
+      return { _id, type: 'callout', calloutType: b.callout?.type ?? 'insight', title: b.callout?.title ?? '', body: b.callout?.body ?? '' }
+    }
     // math / stepthrough / anything else the editor doesn't special-case —
-    // preserved verbatim so re-export doesn't drop it.
+    // preserved verbatim so re-export doesn't drop it, and still editable
+    // as raw JSON (see GenericBlockEditor) rather than silently invisible.
     return { _id, type: b.type, _raw: b }
   })
 }
@@ -113,6 +117,9 @@ export function stateToBlocks(blocks) {
       if (b.mathBridge) v.mathBridge = b.mathBridge
       if (b.props && Object.keys(b.props).length) v.props = b.props
       return v
+    }
+    if (b.type === 'callout') {
+      return { type: 'callout', callout: { type: b.calloutType, title: b.title, body: b.body } }
     }
     return b._raw ?? b
   })

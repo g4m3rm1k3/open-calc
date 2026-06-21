@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useReducer, useEffect, useState, lazy, Suspense } from 'react'
+import { useReducer, useEffect, useState } from 'react'
 import { loadLesson, loadLessonSource } from '../courses/courseLoader.js'
 import { builderReducer } from '../components/lesson-builder/builderReducer.js'
 import { emptyState, lessonToState, PALETTE_BLOCKS } from '../components/lesson-builder/builderUtils.js'
@@ -7,8 +7,6 @@ import ComponentPalette from '../components/lesson-builder/ComponentPalette.jsx'
 import BuilderCanvas from '../components/lesson-builder/BuilderCanvas.jsx'
 import ExportPanel from '../components/lesson-builder/ExportPanel.jsx'
 import StepTour from '../components/ui/StepTour.jsx'
-
-const SvgEditor = lazy(() => import('../components/lesson-builder/blocks/SvgEditor.jsx'))
 
 const BUILDER_TOUR_SEEN_KEY = 'oc-lesson-builder-intro-seen'
 
@@ -50,7 +48,6 @@ export default function LessonBuilderPage() {
   )
   const [loading, setLoading] = useState(false)
   const [showExport, setShowExport] = useState(false)
-  const [showSvgEditor, setShowSvgEditor] = useState(false)
   const [showTour, setShowTour] = useState(() => !localStorage.getItem(BUILDER_TOUR_SEEN_KEY))
   // Diagrams live one folder per course (src/courses/<courseId>/diagrams/) —
   // derive courseId from chapterId the same way BuilderCanvas/lessonSerializer
@@ -111,10 +108,10 @@ export default function LessonBuilderPage() {
             <span className="text-xs text-slate-400 animate-pulse">Loading lesson…</span>
           )}
           <button
-            onClick={() => setShowSvgEditor(true)}
+            onClick={() => window.dispatchEvent(new CustomEvent('oc-open-scratchpad', { detail: { dir: `src/courses/${courseId}/diagrams` } }))}
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-xl border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
           >
-            🖼 SVG Diagram Editor
+            🎨 Open Scratchpad
           </button>
           <button
             onClick={() => setShowExport(true)}
@@ -140,13 +137,6 @@ export default function LessonBuilderPage() {
       {/* Export panel overlay */}
       {showExport && (
         <ExportPanel state={state} onClose={() => setShowExport(false)} />
-      )}
-
-      {/* SVG editor — works for any lesson, regardless of which sections it has */}
-      {showSvgEditor && (
-        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
-          <SvgEditor dir={`src/courses/${courseId}/diagrams`} onClose={() => setShowSvgEditor(false)} />
-        </Suspense>
       )}
 
       {showTour && <BuilderTour onDone={dismissTour} />}

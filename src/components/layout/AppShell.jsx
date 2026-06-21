@@ -248,6 +248,7 @@ export default function AppShell({ children }) {
   const [graphJSXOpen, setGraphJSXOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState(null);
   const [scratchOpen, setScratchOpen] = useState(false);
+  const [scratchOpenFile, setScratchOpenFile] = useState(null);
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [poolOpen, setPoolOpen] = useState(false);
@@ -283,6 +284,11 @@ export default function AppShell({ children }) {
     setGraph3DOpen(false);
     setGraphJSXOpen(false);
     setScratchOpen(false);
+    setScratchOpenFile(null);
+    setCalcOpen(false);
+    setSigmaOpen(false);
+    setPolyOpen(false);
+    setLaOpen(false);
     setTerminalOpen(false);
     setPoolOpen(false);
     setChemOpen(false);
@@ -329,7 +335,10 @@ export default function AppShell({ children }) {
   }, []);
 
   useEffect(() => {
-    const openScratch = () => setScratchOpen(true);
+    const openScratch = (e) => {
+      if (e?.detail?.filePath || e?.detail?.dir) setScratchOpenFile({ filePath: e.detail.filePath, dir: e.detail.dir });
+      setScratchOpen(true);
+    };
     window.addEventListener("oc-open-scratchpad", openScratch);
     return () => window.removeEventListener("oc-open-scratchpad", openScratch);
   }, []);
@@ -442,7 +451,8 @@ export default function AppShell({ children }) {
           />
           <ScratchPad
             isOpen={scratchOpen}
-            onClose={() => setScratchOpen(false)}
+            openFile={scratchOpenFile}
+            onClose={() => { setScratchOpen(false); setScratchOpenFile(null); }}
             onSnap={handleScratchSnap}
           />
           {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
@@ -755,9 +765,11 @@ export default function AppShell({ children }) {
           />
           <ScratchPad
             isOpen={scratchOpen}
+            openFile={scratchOpenFile}
             onClose={() => {
               setScratchOpen(false);
               setScratchSnap(null);
+              setScratchOpenFile(null);
             }}
             onSnap={handleScratchSnap}
           />
