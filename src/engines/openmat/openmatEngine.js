@@ -26,28 +26,33 @@ math.config({ matrix: "Array", number: "number" });
 
 // Predicates used by symbolic-aware overrides
 function isSymObj(v)   { return v != null && typeof v === 'object' && !Array.isArray(v) && '__sym' in v; }
-function isSymArr(v)   { return Array.isArray(v) && v.length > 0 && isSymObj(v[0]); }
-function symShape(v)   { return isSymArr(v) ? [1, v.length] : (v.__shape ?? [1, 1]); }
+function isSymArr(v)   { return Array.isArray(v) && v.length > 0 && isSymObj(v[0]); } // 1D row of __sym
+function isSym2DArr(v) { return Array.isArray(v) && v.length > 0 && Array.isArray(v[0]) && isSymObj(v[0][0]); } // matrix of __sym
+function symShape(v) {
+  if (isSym2DArr(v)) return [v.length, v[0].length];
+  if (isSymArr(v)) return [1, v.length];
+  return v.__shape ?? [1, 1];
+}
 
 // Override size / length so that symbolic objects/arrays don't crash the engine.
 {
   const _size = math.size.bind(math);
   math.import({
     size: function(x, dim) {
-      if (isSymObj(x) || isSymArr(x)) {
+      if (isSymObj(x) || isSymArr(x) || isSym2DArr(x)) {
         const s = symShape(x);
         return dim !== undefined ? (s[Number(dim) - 1] ?? 1) : s;
       }
       return dim !== undefined ? _size(x, dim) : _size(x);
     },
     length: function(x) {
-      if (isSymObj(x) || isSymArr(x)) return Math.max(...symShape(x));
+      if (isSymObj(x) || isSymArr(x) || isSym2DArr(x)) return Math.max(...symShape(x));
       const p = x && typeof x.valueOf === 'function' ? x.valueOf() : x;
       if (Array.isArray(p)) return Math.max(p.length, Array.isArray(p[0]) ? p[0].length : 0);
       return 1;
     },
     numel: function(x) {
-      if (isSymObj(x) || isSymArr(x)) { const s = symShape(x); return s[0] * s[1]; }
+      if (isSymObj(x) || isSymArr(x) || isSym2DArr(x)) { const s = symShape(x); return s[0] * s[1]; }
       const p = x && typeof x.valueOf === 'function' ? x.valueOf() : x;
       if (!Array.isArray(p)) return 1;
       return p.flat(Infinity).length;
@@ -631,6 +636,8 @@ export function formatValue(value) {
   if (typeof value === "string") return value;
   if (Array.isArray(value) && value.length > 0 && isSymObj(value[0]))
     return '[' + value.map(v => v.__sym).join(', ') + ']';
+  if (Array.isArray(value) && value.length > 0 && Array.isArray(value[0]) && isSymObj(value[0][0]))
+    return '[' + value.map(row => '[' + row.map(v => v.__sym).join(', ') + ']').join(', ') + ']';
   if (value && typeof value === "object" && "__sym" in value) return String(value.__sym);
   if (value && value.__multi) {
     return value.__multi.map((item) => formatValue(item)).join("\n\n");
@@ -2738,6 +2745,44 @@ export function executeScript(source, options = {}) {
         parser.set(name, { __sym: name, toString: () => name });
       });
       return hasSemicolon ? null : names.join('  ');
+    }
+
+    // ── sym(...) — MATLAB's symbolic constructor ──────────────────────────────
+    // sym('x') declares a symbolic scalar, exactly like `syms x` — reuses the
+    // same __sym sentinel + symVars bookkeeping so diff/simplify/expand/subs
+    // work on it identically either way.
+    // sym(numericExprOrMatrix) wraps an already-numeric value (no algebraic
+    // variables involved) as __sym so it displays/stores as an exact value
+    // rather than a float — this covers the common "convert literal numbers
+    // to symbolic form" usage (e.g. A = sym([7 -10; 2 -2])).
+    // NOTE on scope: this does not make arithmetic on a __sym matrix exact —
+    // mathjs has no symbolic linear algebra (no exact eig/det/* for __sym
+    // matrices). It covers construction, display, size/length/numel, and the
+    // scalar CAS path (diff/simplify/expand/subs); matrix-valued symbolic
+    // *operations* are a separate, larger feature, not implemented here.
+    const symFnMatch = withoutSemicolon.match(/^([A-Za-z_]\w*\s*=\s*)?sym\(\s*(.+?)\s*\)$/i);
+    if (symFnMatch) {
+      const [, assignLhs, rawArg] = symFnMatch;
+      const lhsName = assignLhs ? assignLhs.replace(/\s*=\s*$/, "").trim() : null;
+      const wrap = (v) => { const s = String(v); return { __sym: s, toString: () => s }; };
+      const quotedNameMatch = rawArg.match(/^['"]([A-Za-z_]\w*)['"]$/);
+      let result;
+      if (quotedNameMatch) {
+        const name = quotedNameMatch[1];
+        symVars.add(name);
+        variables.add(name);
+        result = { __sym: name, toString: () => name };
+      } else {
+        const argVal = toPlain(parser.evaluate(preprocessLine(rawArg, variables, functionNames)));
+        result = Array.isArray(argVal)
+          ? argVal.map((row) => (Array.isArray(row) ? row.map(wrap) : wrap(row)))
+          : wrap(argVal);
+      }
+      if (lhsName) { parser.set(lhsName, result); variables.add(lhsName); }
+      if (!hasSemicolon) {
+        logs.push(`${lhsName ?? "ans"} =\n${formatValue(result)}`);
+      }
+      return hasSemicolon ? null : result;
     }
 
     // Build a __sym result from a mathjs Node.
