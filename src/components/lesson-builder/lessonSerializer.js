@@ -59,7 +59,7 @@ function fmtValue(v, depth = 1, importsMap = new Map()) {
 // object (e.g. running it through checkLessonLatex before submitting a
 // contribution) don't have to re-parse the generated source string.
 export function buildLessonObject(state) {
-  const { meta, hook, sections, _raw } = state
+  const { meta, hook, mentalModel, sections, _raw } = state
 
   // Start from raw if available, otherwise from an empty base
   const base = _raw ? { ..._raw } : {}
@@ -80,18 +80,35 @@ export function buildLessonObject(state) {
   if (meta.nextLesson) base.nextLesson = meta.nextLesson
   else if (_raw?.nextLesson !== undefined) delete base.nextLesson
 
-  // Overlay hook
-  base.hook = {
-    question: hook.question,
-    realWorldContext: hook.realWorldContext,
-    ...(hook.previewVisualizationId ? { previewVisualizationId: hook.previewVisualizationId } : {}),
-  }
-  // Preserve any extra hook fields from raw (visualizations, etc.)
-  if (_raw?.hook) {
-    for (const [k, v] of Object.entries(_raw.hook)) {
-      if (!(k in base.hook)) base.hook[k] = v
+  // Overlay hook — some lessons have hook as a plain string instead of the
+  // {question, realWorldContext, previewVisualizationId} shape (see
+  // lessonToState's _legacyString handling). If it's untouched, round-trip
+  // it back exactly as the original string rather than promoting it to the
+  // object shape just because the builder opened the lesson.
+  if (hook._legacyString && hook.question === _raw?.hook && !hook.realWorldContext && !hook.previewVisualizationId) {
+    base.hook = _raw.hook
+  } else {
+    base.hook = {
+      question: hook.question,
+      realWorldContext: hook.realWorldContext,
+      ...(hook.previewVisualizationId ? { previewVisualizationId: hook.previewVisualizationId } : {}),
+    }
+    // Preserve any extra hook fields from raw (visualizations, etc.) — only
+    // when _raw.hook is actually an object. Object.entries on a STRING
+    // iterates character-by-character (each index becomes a "key"), which
+    // used to corrupt base.hook with one property per character whenever
+    // the original hook was a plain string.
+    if (_raw?.hook && typeof _raw.hook === 'object') {
+      for (const [k, v] of Object.entries(_raw.hook)) {
+        if (!(k in base.hook)) base.hook[k] = v
+      }
     }
   }
+
+  // Overlay mentalModel (array of strings) — omit the key entirely if empty,
+  // same delete-if-empty convention as aliases/nextLesson above.
+  if (mentalModel?.length) base.mentalModel = mentalModel
+  else if (_raw?.mentalModel !== undefined) delete base.mentalModel
 
   // Use the original key (for python variants) to decide what to delete/overlay.
   // sec._origKey is set for PythonNotebook / notebooks / pythonLab variants.

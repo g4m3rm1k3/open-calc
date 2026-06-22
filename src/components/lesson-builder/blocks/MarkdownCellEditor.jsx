@@ -6,6 +6,7 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import Toolbar from '../../markdown-toolbar/MarkdownToolbar.jsx'
+import { CodeBlockPre, CodeBlockCode } from '../../math/CodeBlock.jsx'
 
 // ── Main component ────────────────────────────────────────────────────────────
 
@@ -116,9 +117,19 @@ export default function MarkdownCellEditor({ value, onChange, onClose, title = '
                 p: ({children}) => <p className="mb-4 leading-7" style={{ color: '#c9d1d9' }}>{children}</p>,
                 strong: ({children}) => <strong style={{ color: '#e6edf3', fontWeight: 700 }}>{children}</strong>,
                 em: ({children}) => <em style={{ color: '#c9d1d9' }}>{children}</em>,
-                code: ({inline, children}) => inline
-                  ? <code className="px-1.5 py-0.5 rounded text-sm font-mono" style={{ background: '#21262d', color: '#f97316', border: '1px solid #30363d' }}>{children}</code>
-                  : <pre className="p-4 rounded-lg overflow-x-auto mb-4" style={{ background: '#161b22', border: '1px solid #30363d' }}><code className="text-sm font-mono" style={{ color: '#e6edf3' }}>{children}</code></pre>,
+                // react-markdown v10 doesn't pass an `inline` boolean (that
+                // was removed years ago) — this used to check `inline`
+                // directly, which is always undefined now, so every code
+                // span (even single-backtick inline code) rendered as a
+                // full block. Checking className (only set on fenced
+                // blocks) is the correct v10 way to tell them apart, and
+                // also gets real Prism syntax highlighting for free.
+                pre: CodeBlockPre,
+                code: ({ className, children }) => (
+                  <CodeBlockCode className={className} inlineClassName="px-1.5 py-0.5 rounded text-sm font-mono bg-[#21262d] text-[#f97316] border border-[#30363d]">
+                    {children}
+                  </CodeBlockCode>
+                ),
                 blockquote: ({children}) => <blockquote className="pl-4 my-4 italic" style={{ borderLeft: '4px solid #388bfd', color: '#8b949e' }}>{children}</blockquote>,
                 ul: ({children}) => <ul className="list-disc pl-6 mb-4 space-y-1" style={{ color: '#c9d1d9' }}>{children}</ul>,
                 ol: ({children}) => <ol className="list-decimal pl-6 mb-4 space-y-1" style={{ color: '#c9d1d9' }}>{children}</ol>,

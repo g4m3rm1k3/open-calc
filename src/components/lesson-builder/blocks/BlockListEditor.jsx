@@ -18,6 +18,7 @@ import LiveSvgPreview from './LiveSvgPreview.jsx'
 import VizFrame from '../../viz/VizFrame.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
+const VizSourceEditor = lazy(() => import('./VizSourceEditor.jsx'))
 
 const BLOCK_TYPE_META = {
   prose: { icon: '📝', label: 'Prose' },
@@ -124,8 +125,9 @@ function ImageBlockEditor({ block, onChange, courseId = 'geometry' }) {
   )
 }
 
-function VizBlockEditor({ block, onChange }) {
+function VizBlockEditor({ block, onChange, courseId = 'geometry' }) {
   const [editingBridge, setEditingBridge] = useState(false)
+  const [editingSource, setEditingSource] = useState(false)
   return (
     <div className="grid grid-cols-2 gap-2">
       <label className="flex flex-col gap-1 col-span-2">
@@ -167,9 +169,23 @@ function VizBlockEditor({ block, onChange }) {
       )}
       {block.vizId && (
         <div className="col-span-2 mt-2 pt-3 border-t border-slate-200 dark:border-slate-700">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Live preview</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Live preview</p>
+            <button
+              type="button"
+              onClick={() => setEditingSource(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
+            >
+              ✎ Edit source
+            </button>
+          </div>
           <VizFrame id={block.vizId} title={block.title} />
         </div>
+      )}
+      {editingSource && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <VizSourceEditor vizId={block.vizId} courseId={courseId} onClose={() => setEditingSource(false)} />
+        </Suspense>
       )}
     </div>
   )
@@ -254,7 +270,7 @@ function BlockItem({ block, sectionId, dispatch, index, total, courseId }) {
       <div className="px-3 py-3">
         {block.type === 'prose' && <ProseBlockEditor block={block} onChange={onChange} />}
         {block.type === 'image' && <ImageBlockEditor block={block} onChange={onChange} courseId={courseId} />}
-        {block.type === 'viz' && <VizBlockEditor block={block} onChange={onChange} />}
+        {block.type === 'viz' && <VizBlockEditor block={block} onChange={onChange} courseId={courseId} />}
         {block.type === 'callout' && <CalloutBlockEditor block={block} onChange={onChange} />}
         {!['prose', 'image', 'viz', 'callout'].includes(block.type) && (
           <GenericBlockEditor block={block} onChange={onChange} />

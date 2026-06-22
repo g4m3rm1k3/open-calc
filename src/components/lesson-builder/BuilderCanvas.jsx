@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import IdentityBlock from './blocks/IdentityBlock.jsx'
 import HookBlock from './blocks/HookBlock.jsx'
+import MentalModelBlock from './blocks/MentalModelBlock.jsx'
 import ProseCalloutBlock from './blocks/ProseCalloutBlock.jsx'
 import MathBlock from './blocks/MathBlock.jsx'
 import ExamplesBlock from './blocks/ExamplesBlock.jsx'
@@ -177,7 +178,7 @@ function PassthroughPanel({ raw }) {
 }
 
 export default function BuilderCanvas({ state, dispatch }) {
-  const { meta, hook, sections, _raw } = state
+  const { meta, hook, mentalModel, sections, _raw } = state
   // Diagrams live at src/courses/<courseId>/diagrams/, one folder per course —
   // derive courseId from the chapter id (e.g. 'linear-algebra-1' -> 'linear-algebra')
   // the same way lessonSerializer.js's getFilePath() does, so SVG blocks resolve
@@ -190,7 +191,11 @@ export default function BuilderCanvas({ state, dispatch }) {
       <IdentityBlock meta={meta} dispatch={dispatch} />
 
       {/* Rigid: hook */}
-      <HookBlock hook={hook} dispatch={dispatch} />
+      <HookBlock hook={hook} dispatch={dispatch} courseId={courseId} />
+
+      {/* Rigid: mental model — optional, only shows meaningfully once it has content,
+          but always present so it's easy to add even when a lesson didn't have one */}
+      <MentalModelBlock mentalModel={mentalModel} dispatch={dispatch} />
 
       {/* Drop zone before first flexible section */}
       {sections.length === 0 ? (

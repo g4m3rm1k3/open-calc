@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
 import MarkdownEditButton from '../MarkdownEditButton.jsx'
 import VizCellEditor from './VizCellEditor.jsx'
+import CodeField from '../CodeField.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
@@ -116,12 +117,12 @@ function JsEditor({ cell, onChange, onLiveEdit }) {
           ⚡ Live edit + preview
         </button>
       </div>
-      <TA value={cell.startCode} onChange={v => onChange({ ...cell, startCode: v })} rows={10} mono placeholder="var canvas = document.getElementById('cv');" />
+      <CodeField value={cell.startCode} onChange={v => onChange({ ...cell, startCode: v })} language="javascript" height={220} placeholder="var canvas = document.getElementById('cv');" />
       <Field label="HTML (optional)">
-        <TA value={cell.html} onChange={v => onChange({ ...cell, html: v })} rows={3} mono placeholder="<canvas id='cv' width='700' height='300'></canvas>" />
+        <CodeField value={cell.html} onChange={v => onChange({ ...cell, html: v })} language="html" height={120} placeholder="<canvas id='cv' width='700' height='300'></canvas>" />
       </Field>
       <Field label="CSS (optional)">
-        <TA value={cell.css} onChange={v => onChange({ ...cell, css: v })} rows={2} mono placeholder="body { margin: 0; }" />
+        <CodeField value={cell.css} onChange={v => onChange({ ...cell, css: v })} language="css" height={100} placeholder="body { margin: 0; }" />
       </Field>
       <Field label="Output height (px)">
         <input
@@ -174,7 +175,7 @@ function ChallengeEditor({ cell, onChange }) {
         <input value={cell.failMessage ?? ''} onChange={e => onChange({ ...cell, failMessage: e.target.value })} className="field text-sm" placeholder="Not quite — try again." />
       </Field>
       <Field label="Visual JS (optional diagram above options)">
-        <TA value={cell.startCode} onChange={v => onChange({ ...cell, startCode: v })} rows={5} mono placeholder="// optional diagram code" />
+        <CodeField value={cell.startCode} onChange={v => onChange({ ...cell, startCode: v })} language="javascript" height={140} placeholder="// optional diagram code" />
       </Field>
     </div>
   )
@@ -187,10 +188,10 @@ function CodingEditor({ cell, onChange }) {
         <TA value={cell.instruction} onChange={v => onChange({ ...cell, instruction: v })} rows={3} placeholder="Write a function that…" />
       </Field>
       <Field label="Starter code">
-        <TA value={cell.startCode} onChange={v => onChange({ ...cell, startCode: v })} rows={8} mono placeholder="function solve() {&#10;  // your code here&#10;}" />
+        <CodeField value={cell.startCode} onChange={v => onChange({ ...cell, startCode: v })} language="javascript" height={180} placeholder="function solve() { /* your code here */ }" />
       </Field>
       <Field label="Solution code">
-        <TA value={cell.solutionCode} onChange={v => onChange({ ...cell, solutionCode: v })} rows={8} mono placeholder="function solve() {&#10;  return 42;&#10;}" />
+        <CodeField value={cell.solutionCode} onChange={v => onChange({ ...cell, solutionCode: v })} language="javascript" height={180} placeholder="function solve() { return 42; }" />
       </Field>
       <Field label="Success message">
         <input value={cell.successMessage ?? ''} onChange={e => onChange({ ...cell, successMessage: e.target.value })} className="field text-sm" placeholder="✓ Challenge complete!" />
@@ -210,7 +211,7 @@ function StepEditor({ step, onChange, onRemove }) {
         <button onClick={onRemove} className="ml-2 text-xs text-red-400 hover:text-red-600">✕</button>
       </div>
       <TA value={step.explanation} onChange={v => onChange({ ...step, explanation: v })} rows={2} placeholder="Explanation…" />
-      <TA value={step.code} onChange={v => onChange({ ...step, code: v })} rows={4} mono placeholder="// code" />
+      <CodeField value={step.code} onChange={v => onChange({ ...step, code: v })} language="javascript" height={120} placeholder="// code" />
     </div>
   )
 }
@@ -223,7 +224,7 @@ function WalkthroughEditor({ cell, onChange }) {
         <TA value={cell.instruction} onChange={v => onChange({ ...cell, instruction: v })} rows={2} placeholder="Build a triangle step by step…" />
       </Field>
       <Field label="Base HTML (optional)">
-        <TA value={cell.html} onChange={v => onChange({ ...cell, html: v })} rows={3} mono placeholder="<canvas id='cv'></canvas>" />
+        <CodeField value={cell.html} onChange={v => onChange({ ...cell, html: v })} language="html" height={100} placeholder="<canvas id='cv'></canvas>" />
       </Field>
       <div className="space-y-2">
         <div className="flex items-center justify-between">

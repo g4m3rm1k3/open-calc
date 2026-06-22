@@ -110,6 +110,7 @@ export default function ProseCalloutBlock({ sec, label, icon, dispatch, index, t
           dispatch={dispatch}
           index={i}
           total={(sec.children ?? []).length}
+          courseId={courseId}
         />
       ))}
       {!isBlocksMode && !sec.prose?.length && !sec.callouts?.length && !sec.children?.length && (

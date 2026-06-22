@@ -3,6 +3,7 @@ import MarkdownEditButton from '../MarkdownEditButton.jsx'
 import VizFrame from '../../viz/VizFrame.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
+const VizSourceEditor = lazy(() => import('./VizSourceEditor.jsx'))
 
 // Cell editor for PythonNotebook initialCells
 function CellEditor({ cell, onChange, onRemove }) {
@@ -109,10 +110,11 @@ function NotebookCellsEditor({ cells, onChange }) {
   )
 }
 
-export default function VisualizationBlock({ child, sectionId, dispatch, index, total }) {
+export default function VisualizationBlock({ child, sectionId, dispatch, index, total, courseId = 'geometry' }) {
   const [expanded, setExpanded] = useState(false)
   const [editingMeta, setEditingMeta] = useState(false)
   const [editingBridge, setEditingBridge] = useState(false)
+  const [editingSource, setEditingSource] = useState(false)
 
   const updateChild = updates => dispatch({ type: 'UPDATE_CHILD', sectionId, childId: child._id, updates })
   const cells = child.props?.initialCells ?? []
@@ -253,9 +255,23 @@ export default function VisualizationBlock({ child, sectionId, dispatch, index, 
               />
               {child.vizId && (
                 <div className="pt-3 mt-2 border-t border-brand-100 dark:border-brand-900">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Live preview</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Live preview</p>
+                    <button
+                      type="button"
+                      onClick={() => setEditingSource(true)}
+                      className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
+                    >
+                      ✎ Edit source
+                    </button>
+                  </div>
                   <VizFrame id={child.vizId} initialProps={child.props} title={child.title} />
                 </div>
+              )}
+              {editingSource && (
+                <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+                  <VizSourceEditor vizId={child.vizId} courseId={courseId} onClose={() => setEditingSource(false)} />
+                </Suspense>
               )}
             </div>
           )}

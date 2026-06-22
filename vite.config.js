@@ -35,10 +35,13 @@ function devFsPlugin() {
         try {
           if (action === "list" && req.method === "GET") {
             const dir = url.searchParams.get("dir") || "src/courses/geometry/diagrams";
+            // Comma-separated extensions, e.g. "jsx,js" — defaults to "svg"
+            // so existing callers (ScratchPad) are unaffected.
+            const exts = (url.searchParams.get("ext") || "svg").split(",").map(e => e.trim().replace(/^\./, ""));
             const absDir = path.resolve(root, dir);
             if (!absDir.startsWith(root)) return json({ error: "Forbidden" }, 403);
             const files = fs.existsSync(absDir)
-              ? fs.readdirSync(absDir).filter(f => f.endsWith(".svg")).map(f => ({ name: f, path: `${dir}/${f}` }))
+              ? fs.readdirSync(absDir).filter(f => exts.some(e => f.endsWith(`.${e}`))).map(f => ({ name: f, path: `${dir}/${f}` }))
               : [];
             return json(files);
 

@@ -17,6 +17,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { preprocess } from "./latexPreprocess.js";
+import { CodeBlockPre, CodeBlockCode } from "./CodeBlock.jsx";
 
 // ─── Tailwind class maps for ReactMarkdown elements ───────────────────────────
 
@@ -58,15 +59,17 @@ const PROSE_COMPONENTS = {
   em: ({ children }) => (
     <em className="italic text-slate-700 dark:text-slate-400">{children}</em>
   ),
-  // Inline code
-  code: ({ className, children }) =>
-    className?.startsWith("language-") ? (
-      <code className="block">{children}</code>
-    ) : (
-      <code className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 font-mono text-[0.85em] text-brand-700 dark:text-brand-300 border border-slate-200 dark:border-slate-700/50">
-        {children}
-      </code>
-    ),
+  // Fenced code blocks get the shared pre wrapper + Prism highlighting;
+  // inline code (single backtick) keeps its own pill styling.
+  pre: CodeBlockPre,
+  code: ({ className, children }) => (
+    <CodeBlockCode
+      className={className}
+      inlineClassName="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 font-mono text-[0.85em] text-brand-700 dark:text-brand-300 border border-slate-200 dark:border-slate-700/50"
+    >
+      {children}
+    </CodeBlockCode>
+  ),
   // Unordered list
   ul: ({ children }) => (
     <ul className="list-disc pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-400 font-serif tracking-[0.01em] max-w-[75ch]">

@@ -9,7 +9,7 @@ export const HANDLED_SECTION_KEYS = new Set([
   // ScienceNotebook cell array
   'cells',
 ])
-export const HANDLED_META_KEYS = new Set(['id', 'slug', 'chapter', 'order', 'title', 'subtitle', 'tags', 'coreConcept', 'prerequisites', 'timeToComplete', 'aliases', 'nextLesson'])
+export const HANDLED_META_KEYS = new Set(['id', 'slug', 'chapter', 'order', 'title', 'subtitle', 'tags', 'coreConcept', 'prerequisites', 'timeToComplete', 'aliases', 'nextLesson', 'mentalModel'])
 
 export const PALETTE_BLOCKS = [
   { type: 'intuition',    label: 'Intuition',   icon: '🧠', desc: 'Prose + callouts explaining the core idea' },
@@ -204,11 +204,21 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
       timeToComplete: lesson.timeToComplete ?? 15,
       nextLesson: lesson.nextLesson ?? '',
     },
-    hook: {
-      question: lesson.hook?.question ?? '',
-      realWorldContext: lesson.hook?.realWorldContext ?? '',
-      previewVisualizationId: lesson.hook?.previewVisualizationId ?? '',
-    },
+    // Most lessons have hook as {question, realWorldContext, previewVisualizationId},
+    // but some (e.g. src/courses/sql/1-sql-zero-to-mastery/001-what-is-data.js)
+    // have it as a plain string. Reading .question off a string silently
+    // returns undefined for every field — the original text would vanish the
+    // instant this lesson got saved. Treat the whole string as the question
+    // instead, and flag it as legacy so the serializer can round-trip it back
+    // to a plain string unless the user actually edits the hook.
+    hook: typeof lesson.hook === 'string'
+      ? { question: lesson.hook, realWorldContext: '', previewVisualizationId: '', _legacyString: true }
+      : {
+          question: lesson.hook?.question ?? '',
+          realWorldContext: lesson.hook?.realWorldContext ?? '',
+          previewVisualizationId: lesson.hook?.previewVisualizationId ?? '',
+        },
+    mentalModel: lesson.mentalModel ?? [],
     sections,
     // Full original lesson — anything not explicitly edited passes through unchanged
     _raw: lesson,
@@ -234,6 +244,7 @@ export function emptyState(_chapterId = '', _lessonSlug = '') {
       nextLesson: '',
     },
     hook: { question: '', realWorldContext: '', previewVisualizationId: '' },
+    mentalModel: [],
     sections: [],
     _raw: null,
     _chapterId,

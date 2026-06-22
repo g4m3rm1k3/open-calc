@@ -52,7 +52,7 @@ function EquationEditor({ eq, onChange, onRemove }) {
   )
 }
 
-export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove, sectionId }) {
+export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove, sectionId, courseId }) {
   const [editing, setEditing] = useState(false)
   const [editingProse, setEditingProse] = useState(false)
   const update = updates => dispatch({ type: 'UPDATE_SECTION', id: sec._id, updates })
@@ -78,6 +78,7 @@ export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMov
           dispatch={dispatch}
           index={i}
           total={(sec.children ?? []).length}
+          courseId={courseId}
         />
       ))}
       {!sec.prose?.length && !sec.equations?.length && !sec.children?.length && (

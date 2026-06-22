@@ -4,10 +4,12 @@ import MarkdownEditButton from '../MarkdownEditButton.jsx'
 import VizFrame from '../../viz/VizFrame.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
+const VizSourceEditor = lazy(() => import('./VizSourceEditor.jsx'))
 
-export default function HookBlock({ hook, dispatch }) {
+export default function HookBlock({ hook, dispatch, courseId = 'geometry' }) {
   const [editing, setEditing] = useState(false)
   const [editingContext, setEditingContext] = useState(false)
+  const [editingSource, setEditingSource] = useState(false)
   const set = (key, value) => dispatch({ type: 'SET_HOOK', key, value })
 
   const preview = (
@@ -28,6 +30,11 @@ export default function HookBlock({ hook, dispatch }) {
 
   const editor = (
     <div className="space-y-3">
+      {hook._legacyString && (
+        <p className="text-xs px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+          This lesson's hook is a plain string (a legacy shape) — it's shown here as the question. Editing any field below converts it to the structured format on save; leaving it untouched keeps the original string exactly as-is.
+        </p>
+      )}
       <label className="flex flex-col gap-1">
         <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Hook question (italic lead-in)</span>
         <textarea
@@ -62,13 +69,27 @@ export default function HookBlock({ hook, dispatch }) {
       </label>
       {hook.previewVisualizationId && (
         <div className="pt-2">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Live preview</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Live preview</p>
+            <button
+              type="button"
+              onClick={() => setEditingSource(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg border border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors"
+            >
+              ✎ Edit source
+            </button>
+          </div>
           <VizFrame id={hook.previewVisualizationId} />
         </div>
       )}
       <button onClick={() => setEditing(false)} className="px-4 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold rounded-lg">
         Done
       </button>
+      {editingSource && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <VizSourceEditor vizId={hook.previewVisualizationId} courseId={courseId} onClose={() => setEditingSource(false)} />
+        </Suspense>
+      )}
       {editingContext && (
         <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
           <MarkdownCellEditor

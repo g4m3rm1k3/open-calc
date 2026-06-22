@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
 import MarkdownEditButton from '../MarkdownEditButton.jsx'
+import CodeField from '../CodeField.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
@@ -49,13 +50,12 @@ function CellEditor({ cell, onChange, onRemove }) {
       )}
       <label className="flex flex-col gap-1 p-3">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Python code</span>
-        <textarea
+        <CodeField
           value={cell.code ?? ''}
-          onChange={e => onChange({ ...cell, code: e.target.value })}
-          rows={12}
-          placeholder="import numpy as np&#10;&#10;# Your code here…"
-          className="field font-mono text-xs resize-y leading-relaxed"
-          spellCheck={false}
+          onChange={v => onChange({ ...cell, code: v })}
+          language="python"
+          height={260}
+          placeholder="import numpy as np"
         />
       </label>
     </div>

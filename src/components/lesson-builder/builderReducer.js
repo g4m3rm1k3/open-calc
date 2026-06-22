@@ -11,6 +11,9 @@ export function builderReducer(state, action) {
     case 'SET_HOOK':
       return { ...state, hook: { ...state.hook, [action.key]: action.value } }
 
+    case 'SET_MENTAL_MODEL':
+      return { ...state, mentalModel: action.value }
+
     case 'ADD_SECTION': {
       const sec = defaultSection(action.blockType)
       const sections = [...state.sections]
