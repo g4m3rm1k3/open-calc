@@ -90,6 +90,7 @@
     "cross-env": "^10.1.0",
     "electron": "^35.5.1",
     "electron-builder": "^26.0.12",
+    "happy-dom": "^20.10.6",
     "playwright": "^1.61.0",
     "postcss": "^8.4.45",
     "prisma": "^7.8.0",

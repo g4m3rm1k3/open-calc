@@ -66,7 +66,7 @@ function EdgeSVG({ nodes, edges, nodeRefs, pending, mousePos }) {
   )
 }
 
-function GraphNode({ node, onUpdate, onStartEdge, onCompleteEdge, onDelete, nodeRef }) {
+function GraphNode({ node, onUpdate, onStartEdge, onCompleteEdge, onDelete, onStartDrag, nodeRef }) {
   const def = NODE_TYPES[node.type]
   if (!def) return null
 
@@ -79,18 +79,20 @@ function GraphNode({ node, onUpdate, onStartEdge, onCompleteEdge, onDelete, node
   return (
     <div
       ref={nodeRef}
+      data-nodeid={node.id}
       className={`absolute rounded-xl border-2 bg-white dark:bg-slate-800 shadow-lg select-none ${CATEGORY_COLORS[def.category] ?? 'border-slate-300'}`}
       style={{ left: node.x, top: node.y, width: NODE_WIDTH, zIndex: 10 }}
       onMouseDown={e => e.stopPropagation()}
     >
-      {/* Header — drag handle */}
+      {/* Header — drag handle. Calls onStartDrag directly instead of relying
+          on the event bubbling up to the canvas (it used to stopPropagation
+          AND dispatch a custom event nothing listened for — dragging could
+          never start at all). */}
       <div
         className="flex items-center gap-2 px-3 py-2 cursor-grab active:cursor-grabbing rounded-t-xl bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-700"
         onMouseDown={e => {
           e.stopPropagation()
-          e.currentTarget.closest('[data-nodeid]').dispatchEvent(
-            new CustomEvent('nodedrагstart', { bubbles: true, detail: { nodeId: node.id } }),
-          )
+          onStartDrag(node.id, e)
         }}
         data-drag-handle
       >
@@ -186,28 +188,23 @@ export default function NodeCanvas({ nodes, edges, onNodesChange, onEdgesChange 
     }])
   }, [nodes, onNodesChange])
 
-  // Mouse drag to move nodes
-  const onMouseDown = useCallback((e) => {
-    const handle = e.target.closest('[data-drag-handle]')
-    if (!handle) return
-    const nodeEl = handle.closest('[data-nodeid]') ?? handle.closest('.absolute')
-    if (!nodeEl) return
-    const nodeId = nodeEl.dataset?.nodeid ?? [...nodeEl.classList].join('')
-    // find by position match
+  // Mouse drag to move nodes — called directly from the node header's
+  // onMouseDown (see GraphNode) with the real nodeId already known, instead
+  // of the old approach of guessing which node was clicked by matching
+  // bounding-rect positions within 5px (fragile, and unreachable anyway
+  // since the header stopped propagation before this could ever run).
+  const startDrag = useCallback((nodeId, e) => {
+    const nodeEl = nodeRefs.current[nodeId]
+    const canvasEl = canvasRef.current
+    if (!nodeEl || !canvasEl) return
     const rect = nodeEl.getBoundingClientRect()
-    const canvasRect = canvasRef.current.getBoundingClientRect()
-    const node = nodes.find(n =>
-      Math.abs(n.x - (rect.left - canvasRect.left)) < 5 &&
-      Math.abs(n.y - (rect.top - canvasRect.top)) < 5,
-    )
-    if (!node) return
     dragging.current = {
-      nodeId: node.id,
+      nodeId,
       offsetX: e.clientX - rect.left,
       offsetY: e.clientY - rect.top,
     }
     e.preventDefault()
-  }, [nodes])
+  }, [])
 
   const onMouseMove = useCallback((e) => {
     if (pendingEdge) {
@@ -251,7 +248,6 @@ export default function NodeCanvas({ nodes, edges, onNodesChange, onEdgesChange 
         ref={canvasRef}
         className="flex-1 relative overflow-hidden bg-[radial-gradient(circle,_#e2e8f0_1px,_transparent_1px)] dark:bg-[radial-gradient(circle,_#1e293b_1px,_transparent_1px)] bg-[size:24px_24px]"
         style={{ cursor: pendingEdge ? 'crosshair' : 'default' }}
-        onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onClick={() => { if (pendingEdge) { setPendingEdge(null); setMousePos(null) } }}
@@ -259,22 +255,27 @@ export default function NodeCanvas({ nodes, edges, onNodesChange, onEdgesChange 
         <EdgeSVG nodes={nodes} edges={edges} nodeRefs={nodeRefs} pending={pendingEdge ? { ...pendingEdge, _pending: true } : null} mousePos={mousePos} />
 
         {nodes.map(node => (
-          <div key={node.id} data-nodeid={node.id} style={{ position: 'absolute', left: node.x, top: node.y }}>
-            <GraphNode
-              node={node}
-              onUpdate={updateNode}
-              onDelete={deleteNode}
-              onStartEdge={port => setPendingEdge({ from: port })}
-              onCompleteEdge={toPort => {
-                if (pendingEdge?.from) {
-                  const newEdge = { id: `e-${Date.now()}`, from: pendingEdge.from, to: toPort }
-                  onEdgesChange([...edges.filter(e => !(e.to.nodeId === toPort.nodeId && e.to.port === toPort.port)), newEdge])
-                  setPendingEdge(null); setMousePos(null)
-                }
-              }}
-              nodeRef={el => { nodeRefs.current[node.id] = el }}
-            />
-          </div>
+          // GraphNode is the only absolutely-positioned element per node —
+          // it used to be wrapped in a SECOND div that ALSO set
+          // position:absolute + the same left/top, doubling the offset
+          // (and throwing off EdgeSVG's port math, which assumes a node's
+          // rendered position matches its data-model x/y exactly).
+          <GraphNode
+            key={node.id}
+            node={node}
+            onUpdate={updateNode}
+            onDelete={deleteNode}
+            onStartEdge={port => setPendingEdge({ from: port })}
+            onStartDrag={startDrag}
+            onCompleteEdge={toPort => {
+              if (pendingEdge?.from) {
+                const newEdge = { id: `e-${Date.now()}`, from: pendingEdge.from, to: toPort }
+                onEdgesChange([...edges.filter(e => !(e.to.nodeId === toPort.nodeId && e.to.port === toPort.port)), newEdge])
+                setPendingEdge(null); setMousePos(null)
+              }
+            }}
+            nodeRef={el => { nodeRefs.current[node.id] = el }}
+          />
         ))}
 
         {nodes.length === 0 && (

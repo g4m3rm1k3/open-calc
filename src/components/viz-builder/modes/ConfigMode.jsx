@@ -1,5 +1,7 @@
 // Mode A — pick a viz template, fill a form, get live preview
 
+import { useEffect } from 'react'
+
 const TEMPLATES = [
   {
     vizId: 'PythonNotebook',
@@ -112,6 +114,40 @@ export default function ConfigMode({ vizConfig, onChange }) {
     onChange({ ...vizConfig, vizId: newId, props: newProps })
   }
 
+  // SVG element selection/highlighting/color-editing already exists and
+  // works in ScratchPad — rather than building a second SVG editor inside
+  // this panel, "Edit in ScratchPad" opens it pointed at this diagram (same
+  // pattern the Lesson Builder's image blocks already use). If `src` looks
+  // like a real repo-relative .svg path, open that file directly; otherwise
+  // (empty, or raw inline SVG markup typed into the field) just open
+  // ScratchPad's default diagrams folder so a new file can be created there.
+  const openInScratchpad = () => {
+    const src = (vizConfig.props?.src ?? '').trim()
+    const looksLikePath = /^src\/.*\.svg$/i.test(src)
+    // Always pass a dir, even with no specific file — without one, AppShell's
+    // listener only flips ScratchPad open without touching its target,
+    // which could reopen whatever file was loaded from an earlier session
+    // instead of starting fresh.
+    window.dispatchEvent(new CustomEvent('oc-open-scratchpad', {
+      detail: looksLikePath
+        ? { filePath: src, dir: src.slice(0, src.lastIndexOf('/')) }
+        : { dir: 'src/courses/geometry/diagrams' },
+    }))
+  }
+
+  // When ScratchPad saves a file while this panel is open on the SVG
+  // Diagram template, pull the saved path straight into the src field —
+  // closes the loop instead of making you copy/paste the path back in.
+  useEffect(() => {
+    if (vizConfig.vizId !== 'SVGDiagram') return
+    const handleSaved = (e) => {
+      const path = e?.detail?.path
+      if (path) updateProp('src', path)
+    }
+    window.addEventListener('oc-svg-file-saved', handleSaved)
+    return () => window.removeEventListener('oc-svg-file-saved', handleSaved)
+  }, [vizConfig.vizId, vizConfig.props])
+
   return (
     <div className="flex flex-col h-full overflow-y-auto p-4 space-y-5">
       {/* Template picker */}
@@ -158,7 +194,18 @@ export default function ConfigMode({ vizConfig, onChange }) {
 
       {selected?.fields?.filter(f => f.key !== '_customId' || selected.custom === 'id').map(field => (
         <label key={field.key} className="flex flex-col gap-1">
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{field.label}</span>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{field.label}</span>
+            {selected.vizId === 'SVGDiagram' && field.key === 'src' && (
+              <button
+                type="button"
+                onClick={openInScratchpad}
+                className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-semibold rounded-lg border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
+              >
+                🎨 Edit in ScratchPad
+              </button>
+            )}
+          </div>
           <input
             value={vizConfig.props?.[field.key] ?? ''}
             onChange={e => updateProp(field.key, e.target.value)}

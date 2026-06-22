@@ -1,7 +1,11 @@
 // Inline chart renderer for node graph output nodes
 
 function LinePlotSVG({ inputs, data }) {
-  const xs = inputs?.x?.values ?? []
+  // The y-side already checked both shapes a connected node might output
+  // (.y from a formula node, .values from a numberRange/scale node) — the
+  // x-side only checked .values, so wiring a formula node straight into an
+  // x port (unusual, but valid) silently showed an empty plot.
+  const xs = inputs?.x?.values ?? inputs?.x?.y ?? []
   const ys = inputs?.y?.y ?? inputs?.y?.values ?? []
   if (!xs.length || !ys.length) return <p className="text-slate-400 text-sm text-center py-8">Connect x and y inputs to see the plot</p>
 
@@ -61,7 +65,11 @@ function LinePlotSVG({ inputs, data }) {
 }
 
 function ScatterSVG({ inputs, data }) {
-  const xs = inputs?.x?.values ?? []
+  // The y-side already checked both shapes a connected node might output
+  // (.y from a formula node, .values from a numberRange/scale node) — the
+  // x-side only checked .values, so wiring a formula node straight into an
+  // x port (unusual, but valid) silently showed an empty plot.
+  const xs = inputs?.x?.values ?? inputs?.x?.y ?? []
   const ys = inputs?.y?.y ?? inputs?.y?.values ?? []
   if (!xs.length || !ys.length) return <p className="text-slate-400 text-sm text-center py-8">Connect x and y inputs</p>
 

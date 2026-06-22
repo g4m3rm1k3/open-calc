@@ -15,7 +15,12 @@
 
 const dist = (x1, y1, x2, y2) => Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 const fillFor = color => `${color}1a`
+// Prefer a captured/explicit fill (real diagrams' independent fill colors)
+// over the auto-tinted-from-stroke approximation, which is only meant for
+// hand-drawn shapes that never had a real fill to begin with.
+const fillAttr = shape => shape.fill ?? fillFor(shape.color)
 const dashAttr = shape => (shape.dash?.length ? ` stroke-dasharray="${shape.dash.join(',')}"` : '')
+const rxAttr = shape => (shape.rx ? ` rx="${shape.rx.toFixed(1)}"` : '')
 
 // ─── Shapes → SVG ───────────────────────────────────────────────────────────
 
@@ -28,27 +33,27 @@ function rectToSvg(shape) {
   const [x1, y1, x2, y2] = shape.points
   const x = Math.min(x1, x2), y = Math.min(y1, y2)
   const w = Math.abs(x2 - x1), h = Math.abs(y2 - y1)
-  return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" stroke="${shape.color}" stroke-width="${shape.sw}" fill="${fillFor(shape.color)}"${dashAttr(shape)}/>`
+  return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" stroke="${shape.color}" stroke-width="${shape.sw}" fill="${fillAttr(shape)}"${rxAttr(shape)}${dashAttr(shape)}/>`
 }
 
 function circleToSvg(shape) {
   const [cx, cy, rx, ry] = shape.points
   const r = dist(cx, cy, rx, ry)
-  return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" stroke="${shape.color}" stroke-width="${shape.sw}" fill="${fillFor(shape.color)}"${dashAttr(shape)}/>`
+  return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" stroke="${shape.color}" stroke-width="${shape.sw}" fill="${fillAttr(shape)}"${dashAttr(shape)}/>`
 }
 
 function ellipseToSvg(shape) {
   const [x1, y1, x2, y2] = shape.points
   const cx = (x1 + x2) / 2, cy = (y1 + y2) / 2
   const rx = Math.abs(x2 - x1) / 2, ry = Math.abs(y2 - y1) / 2
-  return `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" stroke="${shape.color}" stroke-width="${shape.sw}" fill="${fillFor(shape.color)}"${dashAttr(shape)}/>`
+  return `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" stroke="${shape.color}" stroke-width="${shape.sw}" fill="${fillAttr(shape)}"${dashAttr(shape)}/>`
 }
 
 function polygonToSvg(shape) {
   const p = shape.points
   const pts = []
   for (let i = 0; i < p.length; i += 2) pts.push(`${p[i].toFixed(1)},${p[i + 1].toFixed(1)}`)
-  return `<polygon points="${pts.join(' ')}" stroke="${shape.color}" stroke-width="${shape.sw}" fill="${fillFor(shape.color)}"${dashAttr(shape)}/>`
+  return `<polygon points="${pts.join(' ')}" stroke="${shape.color}" stroke-width="${shape.sw}" fill="${fillAttr(shape)}"${dashAttr(shape)}/>`
 }
 
 function sineToSvg(shape) {
@@ -127,14 +132,12 @@ const EDITABLE_TAGS = new Set(['line', 'rect', 'circle', 'ellipse', 'polygon', '
 // can't be mapped onto a single `rotation` field safely).
 const DISQUALIFYING_ATTRS = []
 
-// Look up a class's light-mode fill/stroke from the document's own <style>
-// block (e.g. `.svg-text { fill: #1e3a5f; }`), skipping `.dark .x` overrides.
-// Best-effort: a regex scan of the CSS text, not a real parser — good enough
-// for the simple `.name { decl: val; }` rules these diagrams actually use.
-function resolveClassColor(svgDoc, className) {
-  const styleEl = svgDoc.querySelector('style')
-  if (!styleEl || !className) return {}
-  const css = styleEl.textContent || ''
+// Look up ONE class's light-mode fill/stroke from the document's own
+// <style> block (e.g. `.svg-text { fill: #1e3a5f; }`), skipping `.dark .x`
+// overrides. Best-effort: a regex scan of the CSS text, not a real parser —
+// good enough for the simple `.name { decl: val; }` rules these diagrams
+// actually use.
+function resolveOneClass(css, className) {
   const re = new RegExp(`(?<!\\.dark\\s+)\\.${className}\\s*\\{([^}]*)\\}`)
   const m = css.match(re)
   if (!m) return {}
@@ -142,6 +145,26 @@ function resolveClassColor(svgDoc, className) {
   const fillM = decl.match(/fill:\s*([^;]+);?/)
   const strokeM = decl.match(/stroke:\s*([^;]+);?/)
   return { fill: fillM?.[1]?.trim(), stroke: strokeM?.[1]?.trim() }
+}
+
+// `class` is often more than one space-separated name (e.g.
+// class="svg-panel svg-div", combining a fill-only rule with a
+// stroke-only rule) — treating the whole attribute as one literal class
+// name (the original implementation) never matches anything for multi-class
+// elements, silently falling back to passthrough for every one of them.
+// Resolve each class separately and merge, first class with a usable value
+// for a given property wins.
+function resolveClassColor(svgDoc, classAttr) {
+  const styleEl = svgDoc.querySelector('style')
+  if (!styleEl || !classAttr) return {}
+  const css = styleEl.textContent || ''
+  const result = {}
+  for (const className of classAttr.trim().split(/\s+/)) {
+    const { fill, stroke } = resolveOneClass(css, className)
+    if (fill && result.fill === undefined) result.fill = fill
+    if (stroke && result.stroke === undefined) result.stroke = stroke
+  }
+  return result
 }
 
 // Parse inline style="fill:...;stroke:...;" — same idea, simpler source.
@@ -163,6 +186,20 @@ function resolveColor(el, svgDoc) {
   const fill = el.getAttribute('fill') || fromStyle.fill || fromClass.fill
   const usable = v => v && v !== 'none'
   return usable(stroke) ? stroke : (usable(fill) ? fill : null)
+}
+
+// Real diagrams often use an independent fill, unrelated to the stroke
+// color (e.g. a pastel box fill="#eff6ff" with a saturated stroke="#3b82f6")
+// — resolveColor() above prioritizes stroke as the shape's main "color" and
+// only falls back to fill when there's no stroke at all, so it can't be
+// reused here. This always captures the literal fill verbatim when present,
+// so it can be preserved exactly instead of being replaced by the
+// auto-tinted-from-stroke approximation used for hand-drawn shapes.
+function resolveFill(el, svgDoc) {
+  const fromStyle = parseInlineStyle(el.getAttribute('style'))
+  const fromClass = resolveClassColor(svgDoc, el.getAttribute('class'))
+  const fill = el.getAttribute('fill') || fromStyle.fill || fromClass.fill
+  return (fill && fill !== 'none') ? fill : null
 }
 
 function parseDash(el) {
@@ -196,24 +233,25 @@ function elementToShape(el, svgDoc) {
   if (!color) return null
   const sw = parseFloat(el.getAttribute('stroke-width')) || 2
   const dash = parseDash(el)
+  const fill = resolveFill(el, svgDoc)
   const num = name => parseFloat(el.getAttribute(name)) || 0
 
   switch (tag) {
     case 'line':
       return { type: 'segment', points: [num('x1'), num('y1'), num('x2'), num('y2')], color, sw, dash }
     case 'rect':
-      return { type: 'rect', points: [num('x'), num('y'), num('x') + num('width'), num('y') + num('height')], color, sw, dash }
+      return { type: 'rect', points: [num('x'), num('y'), num('x') + num('width'), num('y') + num('height')], color, sw, dash, fill, rx: num('rx') }
     case 'circle':
-      return { type: 'circle', points: [num('cx'), num('cy'), num('cx') + num('r'), num('cy')], color, sw, dash }
+      return { type: 'circle', points: [num('cx'), num('cy'), num('cx') + num('r'), num('cy')], color, sw, dash, fill }
     case 'ellipse':
-      return { type: 'ellipse', points: [num('cx') - num('rx'), num('cy') - num('ry'), num('cx') + num('rx'), num('cy') + num('ry')], color, sw, dash }
+      return { type: 'ellipse', points: [num('cx') - num('rx'), num('cy') - num('ry'), num('cx') + num('rx'), num('cy') + num('ry')], color, sw, dash, fill }
     case 'polygon':
     case 'polyline': {
       const raw = (el.getAttribute('points') || '').trim()
       if (!raw) return null
       const pts = raw.split(/[\s,]+/).map(Number)
       if (pts.length < 6 || pts.some(Number.isNaN)) return null
-      return { type: pts.length === 6 ? 'triangle' : 'polygon', points: pts, color, sw, dash }
+      return { type: pts.length === 6 ? 'triangle' : 'polygon', points: pts, color, sw, dash, fill }
     }
     case 'text': {
       const x = num('x'), y = num('y')

@@ -55,9 +55,9 @@ export default function NodeGraphMode({ onGraphOutput }) {
               <div key={i} className="rounded-lg border border-slate-200 dark:border-slate-700 px-3 py-2 text-xs font-mono text-slate-500">
                 <span className="font-bold text-brand-500">{NODE_TYPES[out.type]?.label}</span>
                 <span className="ml-2 text-slate-400">
-                  {out.type === 'linePlot' && `${out.inputs?.x?.values?.length ?? 0} points`}
-                  {out.type === 'barChart' && `${out.inputs?.values?.values?.length ?? 0} bars`}
-                  {out.type === 'scatterPlot' && `${out.inputs?.x?.values?.length ?? 0} points`}
+                  {out.type === 'linePlot' && `${(out.inputs?.x?.values ?? out.inputs?.x?.y ?? []).length} points`}
+                  {out.type === 'barChart' && `${(out.inputs?.values?.values ?? out.inputs?.values?.y ?? []).length} bars`}
+                  {out.type === 'scatterPlot' && `${(out.inputs?.x?.values ?? out.inputs?.x?.y ?? []).length} points`}
                 </span>
               </div>
             ))}

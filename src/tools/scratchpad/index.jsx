@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react'
-import { Stage, Layer, Line, Circle as KonvaCircle, Ellipse as KonvaEllipse, Arc, Text as KonvaText, Group } from 'react-konva'
+import { Stage, Layer, Line, Rect as KonvaRect, Circle as KonvaCircle, Ellipse as KonvaEllipse, Arc, Text as KonvaText, Group } from 'react-konva'
 import Editor from '@monaco-editor/react'
 import {
   X, Trash2, Undo2, Pencil, Eraser, Sun, Moon, Minus, Plus,
@@ -55,7 +55,7 @@ const GEO_TOOLS = [
 // Fields shown in the shape panel per type
 const SHAPE_FIELDS = {
   segment:  [['x1','X1'],['y1','Y1'],['x2','X2'],['y2','Y2']],
-  rect:     [['x','X'],['y','Y'],['w','W'],['h','H']],
+  rect:     [['x','X'],['y','Y'],['w','W'],['h','H'],['rx','Corner R']],
   circle:   [['cx','CX'],['cy','CY'],['r','R']],
   ellipse:  [['cx','CX'],['cy','CY'],['rx','RX'],['ry','RY']],
   triangle: [['x1','X1'],['y1','Y1'],['x2','X2'],['y2','Y2'],['x3','X3'],['y3','Y3']],
@@ -64,9 +64,13 @@ const SHAPE_FIELDS = {
   text:     [['x','X'],['y','Y'],['fontSize','Size'],['rotation','Rotate °']],
 }
 
+// Shape types that render a fill at all — text/segment/sine are stroke-only,
+// so they don't get the optional fill-color field in ShapePanel.
+const FILL_CAPABLE = new Set(['rect','circle','ellipse','triangle','polygon'])
+
 const DEFAULTS = {
   segment:  { x1:80,  y1:160, x2:280, y2:160 },
-  rect:     { x:80,   y:80,   w:200,  h:140  },
+  rect:     { x:80,   y:80,   w:200,  h:140,  rx:0 },
   circle:   { cx:180, cy:180, r:80           },
   ellipse:  { cx:180, cy:180, rx:100, ry:50  },
   triangle: { x1:180, y1:60,  x2:80,  y2:260, x3:280, y3:260 },
@@ -163,33 +167,40 @@ function ptSeg([x0,y0],[x1,y1],[x2,y2]) {
 
 function shapeToForm(shape) {
   const p=shape.points
-  switch(shape.type) {
-    case 'segment':  return {x1:+fmt(p[0]),y1:+fmt(p[1]),x2:+fmt(p[2]),y2:+fmt(p[3])}
-    case 'rect': {
-      const w=Math.abs(p[2]-p[0]),h=Math.abs(p[3]-p[1])
-      return {x:+fmt(Math.min(p[0],p[2])),y:+fmt(Math.min(p[1],p[3])),w:+fmt(w),h:+fmt(h)}
+  // fill is tracked outside SHAPE_FIELDS's numeric-input loop (it's a color
+  // picker, rendered separately in ShapePanel) but still needs to land in
+  // `form` so selecting a shape shows its captured fill, if any.
+  const fillField=FILL_CAPABLE.has(shape.type)?{fill:shape.fill??''}:{}
+  const base=(()=>{
+    switch(shape.type) {
+      case 'segment':  return {x1:+fmt(p[0]),y1:+fmt(p[1]),x2:+fmt(p[2]),y2:+fmt(p[3])}
+      case 'rect': {
+        const w=Math.abs(p[2]-p[0]),h=Math.abs(p[3]-p[1])
+        return {x:+fmt(Math.min(p[0],p[2])),y:+fmt(Math.min(p[1],p[3])),w:+fmt(w),h:+fmt(h),rx:shape.rx??0}
+      }
+      case 'sine': {
+        const w=Math.abs(p[2]-p[0]),h=Math.abs(p[3]-p[1])
+        return {x:+fmt(Math.min(p[0],p[2])),y:+fmt(Math.min(p[1],p[3])),w:+fmt(w),h:+fmt(h),cycles:shape.cycles??2}
+      }
+      case 'circle': {
+        const r=dist(p[0],p[1],p[2],p[3])
+        return {cx:+fmt(p[0]),cy:+fmt(p[1]),r:+fmt(r)}
+      }
+      case 'ellipse': {
+        const rx=Math.abs(p[2]-p[0])/2,ry=Math.abs(p[3]-p[1])/2
+        return {cx:+fmt((p[0]+p[2])/2),cy:+fmt((p[1]+p[3])/2),rx:+fmt(rx),ry:+fmt(ry)}
+      }
+      case 'text': return {x:+fmt(p[0]),y:+fmt(p[1]),fontSize:shape.fontSize??18}
+      case 'triangle': return {x1:+fmt(p[0]),y1:+fmt(p[1]),x2:+fmt(p[2]),y2:+fmt(p[3]),x3:+fmt(p[4]),y3:+fmt(p[5])}
+      case 'polygon': {
+        const [gcx,gcy]=centroidOf(p)
+        const r=dist(gcx,gcy,p[0],p[1])
+        return {sides:p.length/2,cx:+fmt(gcx),cy:+fmt(gcy),r:+fmt(r)}
+      }
+      default: return {}
     }
-    case 'sine': {
-      const w=Math.abs(p[2]-p[0]),h=Math.abs(p[3]-p[1])
-      return {x:+fmt(Math.min(p[0],p[2])),y:+fmt(Math.min(p[1],p[3])),w:+fmt(w),h:+fmt(h),cycles:shape.cycles??2}
-    }
-    case 'circle': {
-      const r=dist(p[0],p[1],p[2],p[3])
-      return {cx:+fmt(p[0]),cy:+fmt(p[1]),r:+fmt(r)}
-    }
-    case 'ellipse': {
-      const rx=Math.abs(p[2]-p[0])/2,ry=Math.abs(p[3]-p[1])/2
-      return {cx:+fmt((p[0]+p[2])/2),cy:+fmt((p[1]+p[3])/2),rx:+fmt(rx),ry:+fmt(ry)}
-    }
-    case 'text': return {x:+fmt(p[0]),y:+fmt(p[1]),fontSize:shape.fontSize??18}
-    case 'triangle': return {x1:+fmt(p[0]),y1:+fmt(p[1]),x2:+fmt(p[2]),y2:+fmt(p[3]),x3:+fmt(p[4]),y3:+fmt(p[5])}
-    case 'polygon': {
-      const [gcx,gcy]=centroidOf(p)
-      const r=dist(gcx,gcy,p[0],p[1])
-      return {sides:p.length/2,cx:+fmt(gcx),cy:+fmt(gcy),r:+fmt(r)}
-    }
-    default: return {}
-  }
+  })()
+  return {...base,...fillField}
 }
 
 function formToPoints(type,f) {
@@ -449,14 +460,18 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
   if(shape.type==='rect') {
     const [x1,y1,x2,y2]=shape.points
     const w=Math.abs(x2-x1),h=Math.abs(y2-y1)
-    const rx=Math.min(x1,x2),ry=Math.min(y1,y2)
-    const pts=[rx,ry,rx+w,ry,rx+w,ry+h,rx,ry+h]
+    // bx/by (box origin), not to be confused with shape.rx (corner radius) —
+    // native KonvaRect (not a closed Line polygon, like before) so
+    // cornerRadius can actually round the corners; imported rects with a
+    // real rx="10" used to render sharp-cornered because Line has no
+    // corner-radius concept at all.
+    const bx=Math.min(x1,x2),by=Math.min(y1,y2)
     return <Group {...gp}>
-      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
+      <KonvaRect x={bx} y={by} width={w} height={h} cornerRadius={shape.rx||0} stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={shape.fill??(sc+'1a')}/>
       {showDims&&<>
-        <KonvaText x={rx+w/2-20} y={ry+h+5}   text={`${fmt(w)} u`}       {...TS} fill={lc}/>
-        <KonvaText x={rx+w+5}    y={ry+h/2-6}  text={`${fmt(h)} u`}       {...TS} fill={lc}/>
-        <KonvaText x={rx+w/2-34} y={ry+h/2-6}  text={`A≈${fmt(w*h)} u²`} {...TS} fill={lc}/>
+        <KonvaText x={bx+w/2-20} y={by+h+5}   text={`${fmt(w)} u`}       {...TS} fill={lc}/>
+        <KonvaText x={bx+w+5}    y={by+h/2-6}  text={`${fmt(h)} u`}       {...TS} fill={lc}/>
+        <KonvaText x={bx+w/2-34} y={by+h/2-6}  text={`A≈${fmt(w*h)} u²`} {...TS} fill={lc}/>
       </>}
     </Group>
   }
@@ -465,7 +480,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const [cx,cy,rx,ry]=shape.points
     const r=dist(cx,cy,rx,ry)
     return <Group {...gp}>
-      <KonvaCircle x={cx} y={cy} radius={r} stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
+      <KonvaCircle x={cx} y={cy} radius={r} stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={shape.fill??(sc+'1a')}/>
       {showDims&&<>
         <Line points={[cx,cy,rx,ry]} stroke={sc} strokeWidth={1} dash={[4,3]} listening={false}/>
         <KonvaCircle x={cx} y={cy} radius={3} fill={sc} listening={false}/>
@@ -480,7 +495,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const ecx=(x1+x2)/2,ecy=(y1+y2)/2
     const erx=Math.abs(x2-x1)/2,ery=Math.abs(y2-y1)/2
     return <Group {...gp}>
-      <KonvaEllipse x={ecx} y={ecy} radiusX={erx} radiusY={ery} stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
+      <KonvaEllipse x={ecx} y={ecy} radiusX={erx} radiusY={ery} stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={shape.fill??(sc+'1a')}/>
       {showDims&&<>
         <KonvaText x={ecx-30} y={ecy-ery-16} text={`rx=${fmt(erx)} ry=${fmt(ery)}`} {...TS} fill={lc}/>
         <KonvaText x={ecx-32} y={ecy+6}      text={`A≈${fmt(Math.PI*erx*ery)} u²`}   {...TS} fill={lc}/>
@@ -498,7 +513,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const sides=[dist(x1,y1,x2,y2),dist(x2,y2,x3,y3),dist(x3,y3,x1,y1)]
     const angles=[angleBetween(x3,y3,x1,y1,x2,y2),angleBetween(x1,y1,x2,y2,x3,y3),angleBetween(x2,y2,x3,y3,x1,y1)]
     return <Group {...gp}>
-      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
+      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={shape.fill??(sc+'1a')}/>
       {showDims&&<>
         {verts.map(([vx,vy],i)=><AngleArc key={i} ax={prev[i][0]} ay={prev[i][1]} vx={vx} vy={vy} bx={next[i][0]} by={next[i][1]} color={sc}/>)}
         {verts.map(([vx,vy],i)=>{const ox=(gcx-vx)*0.3,oy=(gcy-vy)*0.3;return <KonvaText key={i} x={vx+ox-16} y={vy+oy-7} text={`${fmt(angles[i])}°`} {...TS} fill={lc}/>})}
@@ -511,7 +526,7 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
     const pts=shape.points
     const [gcx,gcy]=centroidOf(pts)
     return <Group {...gp}>
-      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={sc+'1a'}/>
+      <Line points={pts} closed stroke={sc} strokeWidth={shape.sw} dash={shape.dash} fill={shape.fill??(sc+'1a')}/>
       {showDims&&<>
         <KonvaText x={gcx-36} y={gcy-8} text={`P=${fmt(perimeterOf(pts))} u`} {...TS} fill={lc}/>
         <KonvaText x={gcx-36} y={gcy+6} text={`A=${fmt(shoelaceArea(pts))} u²`} {...TS} fill={lc}/>
@@ -549,7 +564,15 @@ function ShapeDisplay({shape,selected,darkCanvas,onSelect,onDragEnd,draggable,se
       }}
     >
       <KonvaText x={tx} y={ty} rotation={shape.rotation??0} text={shape.text || 'Text'} fontSize={shape.fontSize??18}
-        fill={sc} fontFamily="system-ui, sans-serif" hitStrokeWidth={8}
+        fill={sc} fontFamily={shape.fontFamily||"system-ui, sans-serif"} hitStrokeWidth={8}
+        // Konva takes one combined fontStyle string ("bold italic"), not
+        // separate weight/style props — these were captured on import
+        // (font-weight="700" etc.) but never actually applied here, so
+        // bold/italic text from real diagrams rendered as plain text.
+        fontStyle={[
+          (shape.fontWeight==='700'||shape.fontWeight==='bold')?'bold':'',
+          shape.fontStyle==='italic'?'italic':'',
+        ].filter(Boolean).join(' ')||'normal'}
         opacity={shape.text ? 1 : 0.4}
       />
     </Group>
@@ -809,6 +832,28 @@ function ShapePanel({type, form, setForm, onCreate, onUpdate, selectedId, onClea
           />
         </label>
       ))}
+      {FILL_CAPABLE.has(type)&&(
+        <label style={{display:'flex',flexDirection:'column',gap:3}}>
+          <span style={{fontSize:9,textTransform:'uppercase',letterSpacing:'0.07em',color:ic,fontFamily:'system-ui'}}>Fill</span>
+          <div style={{display:'flex',gap:3,alignItems:'center'}}>
+            <input
+              type="color"
+              value={form.fill||'#ffffff'}
+              onChange={e=>setForm(prev=>({...prev,fill:e.target.value}))}
+              title="Set an explicit fill — overrides the auto stroke-tint"
+              style={{width:28,height:24,padding:0,border:`1px solid ${bdr}`,borderRadius:6,cursor:'pointer',background:'none'}}
+            />
+            {form.fill&&(
+              <button
+                type="button"
+                onClick={()=>setForm(prev=>({...prev,fill:''}))}
+                title="Clear — back to auto stroke-tint"
+                style={{fontSize:10,color:ic,background:'none',border:'none',cursor:'pointer',padding:'0 2px'}}
+              >✕</button>
+            )}
+          </div>
+        </label>
+      )}
       <div style={{display:'flex',gap:6,alignItems:'flex-end',paddingBottom:1}}>
         <button style={btnStyle('#6366f1')} onClick={onCreate}>+ Create</button>
         {selectedId&&<button style={btnStyle('#22c55e')} onClick={onUpdate}>✓ Update</button>}
@@ -1019,11 +1064,26 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
   // when ScratchPad is opened from the Lesson Builder's diagram buttons —
   // dir alone (no file yet) still needs to point file-list/save at the right
   // course folder, not whatever ScratchPad's own default happens to be.
+  //
+  // openFileByPathRef (not openFileByPath directly) is deliberate: openFileByPath
+  // depends on fitToViewBox, which depends on canvasSize — and canvasSize
+  // changes on practically any layout shift (e.g. the selected-shape info bar
+  // appearing/disappearing resizes the canvas container, which the
+  // ResizeObserver picks up). If openFileByPath were a dependency here, EVERY
+  // such layout shift would re-run this effect and reload the file from
+  // disk again — wiping selectedId/geoTool/history and re-fitting zoom each
+  // time. That was the actual cause of "selection won't hold," "tool snaps
+  // back to Select," and "zoom doesn't track the cursor": all three state
+  // resets live inside openFileByPath, which was silently re-firing on
+  // nearly every click. The ref keeps this effect reacting only to genuine
+  // new open-requests (isOpen/openFile actually changing).
+  const openFileByPathRef=useRef(openFileByPath)
+  useEffect(()=>{ openFileByPathRef.current=openFileByPath })
   useEffect(()=>{
     if(!isOpen||!openFile) return
     if(openFile.dir) setCurrentDir(openFile.dir)
-    if(openFile.filePath) openFileByPath(openFile.filePath)
-  },[isOpen,openFile,openFileByPath])
+    if(openFile.filePath) openFileByPathRef.current(openFile.filePath)
+  },[isOpen,openFile])
 
   // File list for the current course's diagrams folder
   useEffect(()=>{
@@ -1326,9 +1386,12 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
     const activeType=selectedId ? shapes.find(s=>s.id===selectedId)?.type??geoTool : geoTool
     const pts=formToPoints(activeType,form)
     if(!pts.length) return
-    const extra=activeType==='sine'?{cycles:+form.cycles||2}
-      :activeType==='text'?{fontSize:+form.fontSize||18,text:'',rotation:+form.rotation||0}
-      :{}
+    const extra={
+      ...(activeType==='sine'?{cycles:+form.cycles||2}:{}),
+      ...(activeType==='text'?{fontSize:+form.fontSize||18,text:'',rotation:+form.rotation||0}:{}),
+      ...(activeType==='rect'?{rx:+form.rx||0}:{}),
+      ...(FILL_CAPABLE.has(activeType)&&form.fill?{fill:form.fill}:{}),
+    }
     const id=addShape({type:activeType,points:pts,color,sw,...extra})
     // Creating text via the form panel should drop straight into edit mode
     // too, same as clicking the canvas with the Text tool — otherwise a
@@ -1343,9 +1406,12 @@ export default function ScratchPad({isOpen,onClose,onSnap,openFile}) {
     const pts=formToPoints(shape.type,form)
     if(!pts.length) return
     pushHistory()
-    const extra=shape.type==='sine'?{cycles:+form.cycles||2}
-      :shape.type==='text'?{fontSize:+form.fontSize||18,rotation:+form.rotation||0}
-      :{}
+    const extra={
+      ...(shape.type==='sine'?{cycles:+form.cycles||2}:{}),
+      ...(shape.type==='text'?{fontSize:+form.fontSize||18,rotation:+form.rotation||0}:{}),
+      ...(shape.type==='rect'?{rx:+form.rx||0}:{}),
+      ...(FILL_CAPABLE.has(shape.type)?{fill:form.fill||null}:{}),
+    }
     // Don't overwrite color here — `color` is the global toolbar swatch, not
     // this shape's own color, and was silently recoloring whatever you hit
     // Update on. Update only ever changes what the form fields show.
