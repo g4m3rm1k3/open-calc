@@ -336,12 +336,13 @@ export default function AppShell({ children }) {
 
   useEffect(() => {
     const openScratch = (e) => {
+      if (isMobile) return;
       if (e?.detail?.filePath || e?.detail?.dir) setScratchOpenFile({ filePath: e.detail.filePath, dir: e.detail.dir });
       setScratchOpen(true);
     };
     window.addEventListener("oc-open-scratchpad", openScratch);
     return () => window.removeEventListener("oc-open-scratchpad", openScratch);
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
     const handler = (e) => {
@@ -358,7 +359,7 @@ export default function AppShell({ children }) {
         }
       }
       else if (tool === "javascript") setTerminalOpen(true);
-      else if (tool === "scratchpad") setScratchOpen(true);
+      else if (tool === "scratchpad" && !isMobile) setScratchOpen(true);
       else if (tool === "grapher") setGraphOpen(true);
       else if (tool === "grapher-3d") setGraph3DOpen(true);
       else if (tool === "jsxgraph") setGraphJSXOpen(true);
@@ -449,12 +450,14 @@ export default function AppShell({ children }) {
               setGraph3DOpen(true);
             }}
           />
-          <ScratchPad
-            isOpen={scratchOpen}
-            openFile={scratchOpenFile}
-            onClose={() => { setScratchOpen(false); setScratchOpenFile(null); }}
-            onSnap={handleScratchSnap}
-          />
+          {!isMobile && (
+            <ScratchPad
+              isOpen={scratchOpen}
+              openFile={scratchOpenFile}
+              onClose={() => { setScratchOpen(false); setScratchOpenFile(null); }}
+              onSnap={handleScratchSnap}
+            />
+          )}
           {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
           {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
           <TerminalHub
@@ -763,16 +766,18 @@ export default function AppShell({ children }) {
               setGraph3DOpen(true);
             }}
           />
-          <ScratchPad
-            isOpen={scratchOpen}
-            openFile={scratchOpenFile}
-            onClose={() => {
-              setScratchOpen(false);
-              setScratchSnap(null);
-              setScratchOpenFile(null);
-            }}
-            onSnap={handleScratchSnap}
-          />
+          {!isMobile && (
+            <ScratchPad
+              isOpen={scratchOpen}
+              openFile={scratchOpenFile}
+              onClose={() => {
+                setScratchOpen(false);
+                setScratchSnap(null);
+                setScratchOpenFile(null);
+              }}
+              onSnap={handleScratchSnap}
+            />
+          )}
           <TerminalHub
             isOpen={terminalOpen}
             onClose={() => setTerminalOpen(false)}

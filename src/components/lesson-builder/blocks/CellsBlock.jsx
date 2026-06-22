@@ -156,7 +156,7 @@ function ChallengeOptionEditor({ options, onChange }) {
 function ChallengeEditor({ cell, onChange }) {
   const correctLabel = (() => {
     if (!cell.check) return ''
-    const m = String(cell.check).match(/return\s+label\s*===\s*['"]([^'"]+)['"]/)
+    const m = String(cell.check).match(/label\s*===\s*['"]([^'"]+)['"]/)
     return m ? m[1] : ''
   })()
   return (
