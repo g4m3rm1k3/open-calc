@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "fabric": "^7.4.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"

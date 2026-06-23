@@ -25,20 +25,29 @@ const TOOLS = [
 
 function uid() { return Math.random().toString(36).slice(2, 9) }
 
-// Returns vertical + horizontal snap reference lines from canvas edges/center,
-// grid, and all sibling objects' edges/centers.
+// ---------- snap helpers ----------
+// Returns the set of vertical/horizontal reference lines (in scene coords)
+// an object can snap against: canvas edges/center, grid, and every sibling's
+// edges/center/midpoints.
 function collectSnapLines(canvas, excluding) {
   const vLines = new Set([0, CANVAS_W / 2, CANVAS_W])
   const hLines = new Set([0, CANVAS_H / 2, CANVAS_H])
+
   for (let x = 0; x <= CANVAS_W; x += GRID_SIZE) vLines.add(x)
   for (let y = 0; y <= CANVAS_H; y += GRID_SIZE) hLines.add(y)
-  canvas.getObjects().forEach(o => {
+
+  canvas.getObjects().forEach((o) => {
     if (o === excluding) return
     if (excluding?.type === "activeSelection" && excluding.getObjects?.().includes(o)) return
     const b = o.getBoundingRect()
-    vLines.add(b.left); vLines.add(b.left + b.width / 2); vLines.add(b.left + b.width)
-    hLines.add(b.top);  hLines.add(b.top + b.height / 2); hLines.add(b.top + b.height)
+    vLines.add(b.left)
+    vLines.add(b.left + b.width / 2)
+    vLines.add(b.left + b.width)
+    hLines.add(b.top)
+    hLines.add(b.top + b.height / 2)
+    hLines.add(b.top + b.height)
   })
+
   return { vLines: [...vLines], hLines: [...hLines] }
 }
 
@@ -47,7 +56,9 @@ function closestSnap(values, candidates, threshold) {
   for (const v of values) {
     for (const c of candidates) {
       const d = Math.abs(v - c)
-      if (d <= threshold && (!best || d < best.dist)) best = { dist: d, target: c, from: v, delta: c - v }
+      if (d <= threshold && (!best || d < best.dist)) {
+        best = { dist: d, target: c, from: v, delta: c - v }
+      }
     }
   }
   return best
@@ -61,6 +72,7 @@ export default function SvgStudioPage({ onBack, onClose }) {
   const overlayRef   = useRef(null)
   const monacoRef    = useRef(null)
   const editorRef    = useRef(null)
+  const svgIdMapRef  = useRef(new Map()) // tag-order-index -> __id, rebuilt each serialize
 
   const [tool, setTool]               = useState("select")
   const [zoom, setZoom]               = useState(1)
@@ -73,27 +85,39 @@ export default function SvgStudioPage({ onBack, onClose }) {
   const [snapEnabled, setSnapEnabled] = useState(true)
   const [showCode, setShowCode]       = useState(false)
   const [svgCode, setSvgCode]         = useState("")
-
-  const isRestoring          = useRef(false)
-  const drawStart            = useRef(null)
-  const drawShape            = useRef(null)
   const codeSyncingFromCanvas = useRef(false)
   const canvasSyncingFromCode = useRef(false)
 
-  // ---------- SVG ↔ canvas sync ----------
-  // Fabric's toSVG() doesn't carry __id so we inject data-obj-id by matching
-  // serialization order (fabric serializes in z-order, same as getObjects()).
+  const isRestoring = useRef(false)
+  const drawStart   = useRef(null)
+  const drawShape   = useRef(null)
+
+  // ---------- SVG <-> canvas sync ----------
+  // Fabric's toSVG() doesn't keep our __id, so we inject data-obj-id into the
+  // markup by matching serialization order against canvas.getObjects() order
+  // (fabric serializes objects in the same z-order it stores them in).
   const generateAnnotatedSVG = useCallback(() => {
-    const canvas = fabricRef.current; if (!canvas) return ""
+    const canvas = fabricRef.current
+    if (!canvas) return ""
     const raw = canvas.toSVG()
     const objects = canvas.getObjects()
+    // Parse, then walk top-level drawable nodes in document order and tag them.
     const doc = new DOMParser().parseFromString(raw, "image/svg+xml")
-    const drawable = doc.querySelectorAll("rect,ellipse,circle,polygon,polyline,path,line,text,image,g")
+    const drawable = doc.querySelectorAll(
+      "rect, ellipse, circle, polygon, polyline, path, line, text, image, g"
+    )
+    // Fabric nests each object in its own <g> wrapper typically; take the
+    // outermost drawable nodes only (direct children of svg or of a clip g).
     let i = 0
-    drawable.forEach(node => {
+    drawable.forEach((node) => {
+      // skip if this node's parent is itself one of the drawable nodes we'll tag
+      // (avoids double-tagging children inside a group)
       if (node.closest("[data-obj-id]")) return
       const obj = objects[i]
-      if (obj) { node.setAttribute("data-obj-id", obj.__id); i++ }
+      if (obj) {
+        node.setAttribute("data-obj-id", obj.__id)
+        i++
+      }
     })
     return new XMLSerializer().serializeToString(doc)
   }, [])
@@ -102,25 +126,37 @@ export default function SvgStudioPage({ onBack, onClose }) {
     if (canvasSyncingFromCode.current) return
     codeSyncingFromCanvas.current = true
     setSvgCode(generateAnnotatedSVG())
+    // release on next tick so the editor's onChange (fired by our own setValue)
+    // doesn't bounce back into the canvas
     setTimeout(() => { codeSyncingFromCanvas.current = false }, 0)
   }, [generateAnnotatedSVG])
 
-  // ---------- init Fabric canvas ----------
+  // ---------- init fabric canvas ----------
   useEffect(() => {
     const canvas = new fabric.Canvas(canvasElRef.current, {
-      width: CANVAS_W, height: CANVAS_H, backgroundColor: "#ffffff", preserveObjectStacking: true,
+      width: CANVAS_W,
+      height: CANVAS_H,
+      backgroundColor: "#ffffff",
+      preserveObjectStacking: true,
     })
     fabricRef.current = canvas
 
-    const refreshLayers = () => setLayers(
-      canvas.getObjects().map(o => ({ id: o.__id, type: o.type, name: o.__name || o.type, visible: o.visible !== false })).reverse()
-    )
-    const onSelection = () => { const obj = canvas.getActiveObject(); setSelected(obj || null); highlightCodeForObject(obj) }
+    const refreshLayers = () => {
+      setLayers(canvas.getObjects().map(o => ({
+        id: o.__id, type: o.type, name: o.__name || o.type, visible: o.visible !== false,
+      })).reverse())
+    }
+
+    const onSelection = () => {
+      const obj = canvas.getActiveObject()
+      setSelected(obj || null)
+      highlightCodeForObject(obj)
+    }
     canvas.on("selection:created", onSelection)
     canvas.on("selection:updated", onSelection)
     canvas.on("selection:cleared", () => setSelected(null))
-    canvas.on("object:added",    e => { if (e.target && !e.target.__id) e.target.__id = uid(); refreshLayers() })
-    canvas.on("object:removed",  refreshLayers)
+    canvas.on("object:added", e => { if (e.target && !e.target.__id) e.target.__id = uid(); refreshLayers() })
+    canvas.on("object:removed", refreshLayers)
     canvas.on("object:modified", () => { refreshLayers(); refreshCodeFromCanvas() })
 
     let saveTimer = null
@@ -129,86 +165,128 @@ export default function SvgStudioPage({ onBack, onClose }) {
       clearTimeout(saveTimer)
       saveTimer = setTimeout(() => {
         const json = JSON.stringify(canvas.toDatalessJSON(["__id","__name"]))
-        setHistory(h => { const stack = h.stack.slice(0, h.idx + 1); stack.push(json); return { stack, idx: stack.length - 1 } })
+        setHistory(h => {
+          const stack = h.stack.slice(0, h.idx + 1)
+          stack.push(json)
+          return { stack, idx: stack.length - 1 }
+        })
       }, 250)
     }
-    canvas.on("object:added",    pushHistory)
+    canvas.on("object:added", pushHistory)
     canvas.on("object:modified", pushHistory)
-    canvas.on("object:removed",  pushHistory)
-    canvas.on("path:created",    pushHistory)
-    canvas.on("path:created",    refreshCodeFromCanvas)
+    canvas.on("object:removed", pushHistory)
+    canvas.on("path:created", pushHistory)
+    canvas.on("path:created", refreshCodeFromCanvas)
 
     setHistory({ stack: [JSON.stringify(canvas.toDatalessJSON(["__id","__name"]))], idx: 0 })
     refreshCodeFromCanvas()
     return () => canvas.dispose()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // ---------- keyboard shortcuts ----------
   useEffect(() => {
     const onKey = e => {
-      const canvas = fabricRef.current; if (!canvas) return
+      const canvas = fabricRef.current
+      if (!canvas) return
       const tag = document.activeElement?.tagName
       if (tag === "INPUT" || tag === "TEXTAREA") return
 
       if (e.key === "Delete" || e.key === "Backspace") {
         const active = canvas.getActiveObjects()
-        if (active.length) { active.forEach(o => canvas.remove(o)); canvas.discardActiveObject(); canvas.requestRenderAll(); e.preventDefault() }
+        if (active.length) {
+          active.forEach(o => canvas.remove(o))
+          canvas.discardActiveObject(); canvas.requestRenderAll(); e.preventDefault()
+        }
       }
-      if ((e.metaKey||e.ctrlKey) && e.key==="z" && !e.shiftKey)               { e.preventDefault(); undo() }
-      if ((e.metaKey||e.ctrlKey) && (e.key==="y"||(e.key==="z"&&e.shiftKey))) { e.preventDefault(); redo() }
-      if ((e.metaKey||e.ctrlKey) && e.key==="d")                              { e.preventDefault(); duplicateSelected() }
-      if ((e.metaKey||e.ctrlKey) && e.key==="g" && !e.shiftKey)               { e.preventDefault(); groupSelected() }
-      if ((e.metaKey||e.ctrlKey) && e.shiftKey && e.key.toLowerCase()==="g")  { e.preventDefault(); ungroupSelected() }
-      if ((e.metaKey||e.ctrlKey) && e.key==="a") {
+      if ((e.metaKey || e.ctrlKey) && e.key === "z" && !e.shiftKey) { e.preventDefault(); undo() }
+      if ((e.metaKey || e.ctrlKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) { e.preventDefault(); redo() }
+      if ((e.metaKey || e.ctrlKey) && e.key === "d") { e.preventDefault(); duplicateSelected() }
+      if ((e.metaKey || e.ctrlKey) && e.key === "g" && !e.shiftKey) { e.preventDefault(); groupSelected() }
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key.toLowerCase() === "g") { e.preventDefault(); ungroupSelected() }
+      if ((e.metaKey || e.ctrlKey) && e.key === "a") {
         e.preventDefault()
         canvas.discardActiveObject()
-        canvas.setActiveObject(new fabric.ActiveSelection(canvas.getObjects(), { canvas }))
-        canvas.requestRenderAll()
+        const sel = new fabric.ActiveSelection(canvas.getObjects(), { canvas })
+        canvas.setActiveObject(sel); canvas.requestRenderAll()
       }
     }
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [history]) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [history])
 
-  // ---------- snap guides ----------
+  // ---------- snapping during move/scale ----------
   useEffect(() => {
-    const canvas = fabricRef.current; if (!canvas) return
-    const clearGuides = () => { const ov = overlayRef.current; if (ov) ov.innerHTML = "" }
+    const canvas = fabricRef.current
+    if (!canvas) return
+
+    const clearGuides = () => {
+      const ov = overlayRef.current
+      if (ov) ov.innerHTML = ""
+    }
+
     const drawGuide = (orientation, pos) => {
-      const ov = overlayRef.current; if (!ov) return
+      const ov = overlayRef.current
+      if (!ov) return
       const line = document.createElement("div")
       line.className = orientation === "v" ? "snap-guide snap-guide--v" : "snap-guide snap-guide--h"
-      if (orientation === "v") line.style.left = `${pos}px`; else line.style.top = `${pos}px`
+      if (orientation === "v") line.style.left = `${pos}px`
+      else line.style.top = `${pos}px`
       ov.appendChild(line)
     }
-    const onMoving = opt => {
-      clearGuides(); if (!snapEnabled) return
-      const obj = opt.target, b = obj.getBoundingRect()
+
+    const onMoving = (opt) => {
+      clearGuides()
+      if (!snapEnabled) return
+      const obj = opt.target
+      const b = obj.getBoundingRect()
       const { vLines, hLines } = collectSnapLines(canvas, obj)
-      const snapV = closestSnap([b.left, b.left+b.width/2, b.left+b.width], vLines, SNAP_THRESHOLD)
-      const snapH = closestSnap([b.top,  b.top+b.height/2, b.top+b.height],  hLines, SNAP_THRESHOLD)
+
+      const objVs = [b.left, b.left + b.width / 2, b.left + b.width]
+      const objHs = [b.top, b.top + b.height / 2, b.top + b.height]
+
+      const snapV = closestSnap(objVs, vLines, SNAP_THRESHOLD)
+      const snapH = closestSnap(objHs, hLines, SNAP_THRESHOLD)
+
       if (snapV) { obj.left += snapV.delta; drawGuide("v", snapV.target) }
-      if (snapH) { obj.top  += snapH.delta; drawGuide("h", snapH.target) }
+      if (snapH) { obj.top += snapH.delta; drawGuide("h", snapH.target) }
       obj.setCoords()
     }
-    const onScaling = opt => {
-      clearGuides(); if (!snapEnabled) return
-      const obj = opt.target, b = obj.getBoundingRect()
+
+    const onScaling = (opt) => {
+      clearGuides()
+      if (!snapEnabled) return
+      const obj = opt.target
+      const b = obj.getBoundingRect()
       const { vLines, hLines } = collectSnapLines(canvas, obj)
-      const snapR = closestSnap([b.left+b.width],  vLines, SNAP_THRESHOLD)
-      const snapB = closestSnap([b.top+b.height],  hLines, SNAP_THRESHOLD)
-      if (snapR) drawGuide("v", snapR.target)
-      if (snapB) drawGuide("h", snapB.target)
+
+      // snap the edge being dragged (right/bottom most common case covers corner handles)
+      const right = b.left + b.width
+      const bottom = b.top + b.height
+      const snapRight = closestSnap([right], vLines, SNAP_THRESHOLD)
+      const snapBottom = closestSnap([bottom], hLines, SNAP_THRESHOLD)
+      if (snapRight) drawGuide("v", snapRight.target)
+      if (snapBottom) drawGuide("h", snapBottom.target)
     }
-    canvas.on("object:moving",  onMoving)
+
+    const onUp = () => clearGuides()
+
+    canvas.on("object:moving", onMoving)
     canvas.on("object:scaling", onScaling)
-    canvas.on("mouse:up",       clearGuides)
-    return () => { canvas.off("object:moving", onMoving); canvas.off("object:scaling", onScaling); canvas.off("mouse:up", clearGuides) }
+    canvas.on("mouse:up", onUp)
+    return () => {
+      canvas.off("object:moving", onMoving)
+      canvas.off("object:scaling", onScaling)
+      canvas.off("mouse:up", onUp)
+    }
   }, [snapEnabled])
 
   // ---------- drawing tool mouse handlers ----------
   useEffect(() => {
-    const canvas = fabricRef.current; if (!canvas) return
+    const canvas = fabricRef.current
+    if (!canvas) return
+
     canvas.isDrawingMode = tool === "pen"
     if (tool === "pen") {
       canvas.freeDrawingBrush = new fabric.PencilBrush(canvas)
@@ -220,7 +298,8 @@ export default function SvgStudioPage({ onBack, onClose }) {
 
     const onDown = opt => {
       if (tool === "select" || tool === "pen") return
-      const p = canvas.getScenePoint(opt.e); drawStart.current = p
+      const p = canvas.getScenePoint(opt.e)
+      drawStart.current = p
       if (tool === "text") {
         const t = new fabric.IText("Edit me", { left: p.x, top: p.y, fontSize: 28, fill: fillColor, fontFamily: "-apple-system, sans-serif" })
         t.__id = uid(); t.__name = "Text"
@@ -234,6 +313,7 @@ export default function SvgStudioPage({ onBack, onClose }) {
       if (tool === "line")     shape = new fabric.Line([p.x, p.y, p.x, p.y], { stroke: strokeColor, strokeWidth })
       if (shape) { shape.__id = uid(); shape.__name = tool[0].toUpperCase() + tool.slice(1); drawShape.current = shape; canvas.add(shape) }
     }
+
     const onMove = opt => {
       if (!drawShape.current || !drawStart.current) return
       const p = canvas.getScenePoint(opt.e), s = drawStart.current, shape = drawShape.current
@@ -245,9 +325,14 @@ export default function SvgStudioPage({ onBack, onClose }) {
         shape.set({ x2: p.x, y2: p.y })
       canvas.requestRenderAll()
     }
+
     const onUp = () => {
-      if (drawShape.current) { canvas.setActiveObject(drawShape.current); canvas.fire("object:modified"); drawShape.current = null; drawStart.current = null; setTool("select") }
+      if (drawShape.current) {
+        canvas.setActiveObject(drawShape.current); canvas.fire("object:modified")
+        drawShape.current = null; drawStart.current = null; setTool("select")
+      }
     }
+
     canvas.on("mouse:down", onDown); canvas.on("mouse:move", onMove); canvas.on("mouse:up", onUp)
     return () => { canvas.off("mouse:down", onDown); canvas.off("mouse:move", onMove); canvas.off("mouse:up", onUp) }
   }, [tool, fillColor, strokeColor, strokeWidth])
@@ -256,48 +341,37 @@ export default function SvgStudioPage({ onBack, onClose }) {
   const restore = useCallback(json => {
     const canvas = fabricRef.current; if (!canvas || !json) return
     isRestoring.current = true
-    canvas.loadFromJSON(JSON.parse(json), () => { canvas.requestRenderAll(); isRestoring.current = false; refreshCodeFromCanvas() })
+    canvas.loadFromJSON(JSON.parse(json), () => {
+      canvas.requestRenderAll(); isRestoring.current = false; refreshCodeFromCanvas()
+    })
   }, [refreshCodeFromCanvas])
 
   const undo = useCallback(() => setHistory(h => {
-    if (h.idx <= 0) return h; const idx = h.idx - 1; restore(h.stack[idx]); return { ...h, idx }
+    if (h.idx <= 0) return h
+    const idx = h.idx - 1; restore(h.stack[idx]); return { ...h, idx }
   }), [restore])
 
   const redo = useCallback(() => setHistory(h => {
-    if (h.idx >= h.stack.length - 1) return h; const idx = h.idx + 1; restore(h.stack[idx]); return { ...h, idx }
+    if (h.idx >= h.stack.length - 1) return h
+    const idx = h.idx + 1; restore(h.stack[idx]); return { ...h, idx }
   }), [restore])
 
   const duplicateSelected = useCallback(async () => {
-    const canvas = fabricRef.current, active = canvas?.getActiveObject(); if (!active) return
+    const canvas = fabricRef.current; const active = canvas?.getActiveObject(); if (!active) return
     const clone = await active.clone()
     clone.set({ left: active.left + 16, top: active.top + 16, __id: uid() })
     canvas.add(clone); canvas.setActiveObject(clone); canvas.requestRenderAll(); canvas.fire("object:modified")
   }, [])
 
   const deleteSelected = useCallback(() => {
-    const canvas = fabricRef.current, active = canvas?.getActiveObjects(); if (!active?.length) return
+    const canvas = fabricRef.current; const active = canvas?.getActiveObjects(); if (!active?.length) return
     active.forEach(o => canvas.remove(o)); canvas.discardActiveObject(); canvas.requestRenderAll()
   }, [])
 
-  const groupSelected = useCallback(() => {
-    const canvas = fabricRef.current, active = canvas?.getActiveObject()
-    if (!active || active.type !== "activeSelection" || active._objects.length < 2) return
-    const group = active.toGroup(); group.__id = uid(); group.__name = "Group"
-    canvas.requestRenderAll(); canvas.fire("object:modified")
-  }, [])
-
-  const ungroupSelected = useCallback(() => {
-    const canvas = fabricRef.current, active = canvas?.getActiveObject()
-    if (!active || active.type !== "group") return
-    const sel = active.toActiveSelection()
-    sel.getObjects().forEach(o => { if (!o.__id) o.__id = uid() })
-    canvas.requestRenderAll(); canvas.fire("object:modified")
-  }, [])
-
-  const bringToFront = () => { const c=fabricRef.current,o=c?.getActiveObject(); if(o){c.bringObjectToFront(o);c.requestRenderAll();c.fire("object:modified")} }
-  const bringForward = () => { const c=fabricRef.current,o=c?.getActiveObject(); if(o){c.bringObjectForward(o);c.requestRenderAll();c.fire("object:modified")} }
-  const sendBackward = () => { const c=fabricRef.current,o=c?.getActiveObject(); if(o){c.sendObjectBackwards(o);c.requestRenderAll();c.fire("object:modified")} }
-  const sendToBack   = () => { const c=fabricRef.current,o=c?.getActiveObject(); if(o){c.sendObjectToBack(o);c.requestRenderAll();c.fire("object:modified")} }
+  const bringToFront  = () => { const c=fabricRef.current, o=c?.getActiveObject(); if(o){c.bringObjectToFront(o);c.requestRenderAll();c.fire("object:modified")} }
+  const bringForward  = () => { const c=fabricRef.current, o=c?.getActiveObject(); if(o){c.bringObjectForward(o);c.requestRenderAll();c.fire("object:modified")} }
+  const sendBackward  = () => { const c=fabricRef.current, o=c?.getActiveObject(); if(o){c.sendObjectBackwards(o);c.requestRenderAll();c.fire("object:modified")} }
+  const sendToBack    = () => { const c=fabricRef.current, o=c?.getActiveObject(); if(o){c.sendObjectToBack(o);c.requestRenderAll();c.fire("object:modified")} }
 
   const align = where => {
     const c = fabricRef.current, o = c?.getActiveObject(); if (!o) return
@@ -311,13 +385,38 @@ export default function SvgStudioPage({ onBack, onClose }) {
     o.setCoords(); c.requestRenderAll(); c.fire("object:modified")
   }
 
+  // ---------- grouping / ungrouping ----------
+  const groupSelected = useCallback(() => {
+    const canvas = fabricRef.current
+    const active = canvas?.getActiveObject()
+    if (!active || active.type !== "activeSelection" || active._objects.length < 2) return
+    const group = active.toGroup()
+    group.__id = uid()
+    group.__name = "Group"
+    canvas.requestRenderAll()
+    canvas.fire("object:modified")
+  }, [])
+
+  const ungroupSelected = useCallback(() => {
+    const canvas = fabricRef.current
+    const active = canvas?.getActiveObject()
+    if (!active || active.type !== "group") return
+    const sel = active.toActiveSelection()
+    sel.getObjects().forEach(o => { if (!o.__id) o.__id = uid() })
+    canvas.requestRenderAll()
+    canvas.fire("object:modified")
+  }, [])
+
+  // ---------- zoom ----------
   const applyZoom = z => {
-    const canvas = fabricRef.current, clamped = Math.min(4, Math.max(0.1, z))
+    const canvas = fabricRef.current; const clamped = Math.min(4, Math.max(0.1, z))
     canvas.setZoom(clamped); canvas.setDimensions({ width: CANVAS_W*clamped, height: CANVAS_H*clamped }); setZoom(clamped)
   }
 
+  // ---------- import / export ----------
   const exportSVG = () => {
-    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([fabricRef.current.toSVG()], {type:"image/svg+xml"})), download: "drawing.svg" })
+    const svg = fabricRef.current.toSVG()
+    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([svg], {type:"image/svg+xml"})), download: "drawing.svg" })
     a.click(); URL.revokeObjectURL(a.href)
   }
 
@@ -345,7 +444,8 @@ export default function SvgStudioPage({ onBack, onClose }) {
   const newCanvas = () => {
     if (!window.confirm("Clear the canvas? This can't be undone.")) return
     const canvas = fabricRef.current; canvas.clear(); canvas.backgroundColor="#ffffff"; canvas.requestRenderAll()
-    setHistory({ stack: [JSON.stringify(canvas.toDatalessJSON(["__id","__name"]))], idx: 0 }); refreshCodeFromCanvas()
+    setHistory({ stack: [JSON.stringify(canvas.toDatalessJSON(["__id","__name"]))], idx: 0 })
+    refreshCodeFromCanvas()
   }
 
   const updateSelected = props => {
@@ -353,24 +453,33 @@ export default function SvgStudioPage({ onBack, onClose }) {
     o.set(props); o.setCoords(); canvas.requestRenderAll(); canvas.fire("object:modified"); setSelected(o)
   }
 
-  const selectLayer  = id => { const c=fabricRef.current,o=c.getObjects().find(x=>x.__id===id); if(o){c.setActiveObject(o);c.requestRenderAll();setTool("select")} }
-  const removeLayer  = (id,e) => { e.stopPropagation(); const c=fabricRef.current,o=c.getObjects().find(x=>x.__id===id); if(o){c.remove(o);c.requestRenderAll()} }
-  const toggleVisible= (id,e) => { e.stopPropagation(); const c=fabricRef.current,o=c.getObjects().find(x=>x.__id===id); if(o){o.visible=!o.visible;c.requestRenderAll();c.fire("object:modified")} }
+  const selectLayer = id => {
+    const canvas = fabricRef.current, obj = canvas.getObjects().find(o => o.__id === id); if (!obj) return
+    canvas.setActiveObject(obj); canvas.requestRenderAll(); setTool("select")
+  }
+  const removeLayer = (id, e) => { e.stopPropagation(); const c=fabricRef.current, o=c.getObjects().find(x=>x.__id===id); if(o){c.remove(o);c.requestRenderAll()} }
+  const toggleVisible = (id, e) => { e.stopPropagation(); const c=fabricRef.current, o=c.getObjects().find(x=>x.__id===id); if(o){o.visible=!o.visible;c.requestRenderAll();c.fire("object:modified")} }
 
-  // ---------- code ↔ canvas selection sync ----------
+  // ---------- code <-> canvas selection sync ----------
   function highlightCodeForObject(obj) {
     if (!showCode || !editorRef.current || !monacoRef.current) return
-    if (!obj?.__id) { editorRef.current.deltaDecorations(editorRef.current.__decorIds||[], []); return }
-    const model = editorRef.current.getModel(); if (!model) return
+    if (!obj || !obj.__id) {
+      editorRef.current.deltaDecorations(editorRef.current.__decorIds || [], [])
+      return
+    }
+    const model = editorRef.current.getModel()
+    if (!model) return
     const text = model.getValue()
-    const idx = text.search(new RegExp(`data-obj-id="${obj.__id}"`))
+    const re = new RegExp(`data-obj-id="${obj.__id}"`)
+    const idx = text.search(re)
     if (idx === -1) return
     const pos = model.getPositionAt(idx)
+    // find the start of this tag (walk back to the preceding '<')
     const lineText = model.getLineContent(pos.lineNumber)
     const tagStartCol = lineText.lastIndexOf("<", pos.column) + 1
     const range = new monacoRef.current.Range(pos.lineNumber, tagStartCol, pos.lineNumber, lineText.length + 1)
     editorRef.current.__decorIds = editorRef.current.deltaDecorations(
-      editorRef.current.__decorIds||[],
+      editorRef.current.__decorIds || [],
       [{ range, options: { isWholeLine: false, className: "svg-code-highlight" } }]
     )
     editorRef.current.revealLineInCenter(pos.lineNumber)
@@ -379,17 +488,33 @@ export default function SvgStudioPage({ onBack, onClose }) {
   useEffect(() => { highlightCodeForObject(selected) }, [selected, showCode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleEditorMount = (editor, monaco) => {
-    editorRef.current = editor; monacoRef.current = monaco
-    editor.onDidChangeCursorPosition(e => {
+    editorRef.current = editor
+    monacoRef.current = monaco
+    editor.onDidChangeCursorPosition((e) => {
       if (codeSyncingFromCanvas.current) return
-      const model = editor.getModel(), offset = model.getOffsetAt(e.position), text = model.getValue()
-      const upto = text.slice(0, offset), tagStart = upto.lastIndexOf("<"), tagEnd = text.indexOf(">", tagStart)
-      const match = text.slice(tagStart, tagEnd === -1 ? undefined : tagEnd).match(/data-obj-id="([^"]+)"/)
+      const model = editor.getModel()
+      const offset = model.getOffsetAt(e.position)
+      const text = model.getValue()
+      // find nearest preceding data-obj-id attr on the same tag the cursor sits in
+      const upto = text.slice(0, offset)
+      const tagStart = upto.lastIndexOf("<")
+      const tagEnd = text.indexOf(">", tagStart)
+      const tagSlice = text.slice(tagStart, tagEnd === -1 ? undefined : tagEnd)
+      const match = tagSlice.match(/data-obj-id="([^"]+)"/)
       if (match) {
-        const canvas = fabricRef.current, obj = canvas.getObjects().find(o => o.__id === match[1])
-        if (obj && canvas.getActiveObject() !== obj) { canvas.setActiveObject(obj); canvas.requestRenderAll() }
+        const canvas = fabricRef.current
+        const obj = canvas.getObjects().find(o => o.__id === match[1])
+        if (obj && canvas.getActiveObject() !== obj) {
+          canvas.setActiveObject(obj)
+          canvas.requestRenderAll()
+        }
       }
     })
+  }
+
+  const handleCodeChange = (value) => {
+    if (codeSyncingFromCanvas.current) return
+    setSvgCode(value)
   }
 
   const applyCodeToCanvas = async () => {
@@ -398,11 +523,16 @@ export default function SvgStudioPage({ onBack, onClose }) {
     try {
       const result = await fabric.loadSVGFromString(svgCode)
       const objects = result.objects.filter(Boolean)
-      canvas.clear(); canvas.backgroundColor = "#ffffff"
+      canvas.clear()
+      canvas.backgroundColor = "#ffffff"
       objects.forEach(o => { o.__id = uid(); canvas.add(o) })
-      canvas.requestRenderAll(); canvas.fire("object:modified")
-    } catch (err) { window.alert("Couldn't parse that SVG: " + err.message) }
-    finally { canvasSyncingFromCode.current = false }
+      canvas.requestRenderAll()
+      canvas.fire("object:modified")
+    } catch (err) {
+      window.alert("Couldn't parse that SVG: " + err.message)
+    } finally {
+      canvasSyncingFromCode.current = false
+    }
   }
 
   return (
@@ -431,12 +561,17 @@ export default function SvgStudioPage({ onBack, onClose }) {
           disabled={!selected || selected.type !== "group"}>Ungroup</button>
 
         <div className="svg-studio__topbar divider" />
-        <button className={`svg-studio__btn${snapEnabled ? " svg-studio__btn--toggled" : ""}`}
-          onClick={() => setSnapEnabled(s => !s)} title="Snap to grid, edges, and other objects">
+        <button
+          className={`svg-studio__btn${snapEnabled ? " svg-studio__btn--toggled" : ""}`}
+          onClick={() => setSnapEnabled(s => !s)}
+          title="Snap to grid, canvas edges/center, and other objects"
+        >
           ⌗ Snap
         </button>
-        <button className={`svg-studio__btn${showCode ? " svg-studio__btn--toggled" : ""}`}
-          onClick={() => { setShowCode(s => !s); if (!showCode) refreshCodeFromCanvas() }}>
+        <button
+          className={`svg-studio__btn${showCode ? " svg-studio__btn--toggled" : ""}`}
+          onClick={() => { setShowCode(s => !s); if (!showCode) refreshCodeFromCanvas() }}
+        >
           {"</>"} Code
         </button>
 
@@ -455,6 +590,7 @@ export default function SvgStudioPage({ onBack, onClose }) {
             <span className="svg-studio__tool-icon">{t.icon}</span>{t.label}
           </button>
         ))}
+
         <div className="svg-studio__rail-label">Fill</div>
         <div className="svg-studio__field" style={{padding:"0 6px"}}>
           <input type="color" value={fillColor} onChange={e => { setFillColor(e.target.value); if(selected) updateSelected({fill:e.target.value}) }} />
@@ -466,6 +602,7 @@ export default function SvgStudioPage({ onBack, onClose }) {
               onClick={() => { setFillColor(c); if(selected) updateSelected({fill:c}) }} />
           ))}
         </div>
+
         <div className="svg-studio__rail-label">Stroke</div>
         <div className="svg-studio__field" style={{padding:"0 6px"}}>
           <input type="color" value={strokeColor} onChange={e => { setStrokeColor(e.target.value); if(selected) updateSelected({stroke:e.target.value}) }} />
@@ -476,13 +613,13 @@ export default function SvgStudioPage({ onBack, onClose }) {
 
       {/* Canvas */}
       <div className="svg-studio__canvas-wrap">
-        <div className="svg-studio__canvas-shadow" style={{position:"relative"}}>
+        <div className="svg-studio__canvas-shadow" style={{ position: "relative" }}>
           <canvas ref={canvasElRef} />
           <div ref={overlayRef} className="svg-studio__snap-overlay" />
         </div>
       </div>
 
-      {/* SVG code panel */}
+      {/* Code panel (conditionally shown, replaces right panel's vertical space below canvas row) */}
       {showCode && (
         <div className="svg-studio__codepanel">
           <div className="svg-studio__panel-title">
@@ -496,12 +633,19 @@ export default function SvgStudioPage({ onBack, onClose }) {
             defaultLanguage="xml"
             theme="vs-dark"
             value={svgCode}
-            onChange={v => { if (!codeSyncingFromCanvas.current) setSvgCode(v) }}
+            onChange={handleCodeChange}
             onMount={handleEditorMount}
-            options={{ minimap:{enabled:false}, fontSize:12, wordWrap:"on", scrollBeyondLastLine:false }}
+            options={{
+              minimap: { enabled: false },
+              fontSize: 12,
+              wordWrap: "on",
+              scrollBeyondLastLine: false,
+            }}
           />
-          <div className="svg-studio__hint" style={{padding:"8px 4px"}}>
-            Click object → jumps to tag here. Click inside a tag → selects on canvas. Edit and hit "Apply to canvas" to rebuild.
+          <div className="svg-studio__hint" style={{ padding: "8px 4px" }}>
+            Click an object on the canvas to jump to its tag here. Click inside
+            a tag here to select it on the canvas. Edit the markup and hit
+            "Apply to canvas" to rebuild the scene from this code.
           </div>
         </div>
       )}
@@ -571,14 +715,22 @@ export default function SvgStudioPage({ onBack, onClose }) {
             <button onClick={sendBackward}>Backward</button>
             <button onClick={sendToBack}>To back</button>
           </div>
-          {selected.type === "activeSelection" && (<>
-            <div className="svg-studio__divider" />
-            <button className="svg-studio__btn" style={{width:"100%"}} onClick={groupSelected}>Attach into one object</button>
-          </>)}
-          {selected.type === "group" && (<>
-            <div className="svg-studio__divider" />
-            <button className="svg-studio__btn" style={{width:"100%"}} onClick={ungroupSelected}>Detach group</button>
-          </>)}
+          {selected.type === "activeSelection" && (
+            <>
+              <div className="svg-studio__divider" />
+              <button className="svg-studio__btn" style={{width:"100%"}} onClick={groupSelected}>
+                Attach into one object
+              </button>
+            </>
+          )}
+          {selected.type === "group" && (
+            <>
+              <div className="svg-studio__divider" />
+              <button className="svg-studio__btn" style={{width:"100%"}} onClick={ungroupSelected}>
+                Detach group
+              </button>
+            </>
+          )}
         </>)}
 
         <div className="svg-studio__divider" />
@@ -594,6 +746,7 @@ export default function SvgStudioPage({ onBack, onClose }) {
             </div>
           ))}
         </div>
+
         <div className="svg-studio__hint">
           Del removes · ⌘D duplicates · ⌘Z undo · ⌘⇧Z redo · ⌘A select all<br/>
           ⌘G group · ⌘⇧G ungroup · Corner handles to scale · top handle to rotate
