@@ -51,6 +51,7 @@ const FiveAxisKinematicsPage = lazy(
   () => import("./labs/five-axis/FiveAxisKinematicsPage.jsx"),
 );
 const CodeLensPage = lazy(() => import("./labs/codelens/CodeLensPage.jsx"));
+const SvgStudioPage = lazy(() => import("./labs/svg-studio/SvgStudioPage.jsx"));
 const SICPPage = lazy(() => import("./labs/sicp-js/SICPPage.jsx"));
 const DSAPatternsPage = lazy(
   () => import("./labs/dsa-patterns/DSAPatternsPage.jsx"),
@@ -281,6 +282,7 @@ export default function App() {
                               element={<FiveAxisKinematicsPage />}
                             />
                             <Route path="codelens" element={<CodeLensPage />} />
+                            <Route path="svg-studio" element={<SvgStudioPage />} />
 
                             {/* Web Learn Curriculums */}
                             <Route

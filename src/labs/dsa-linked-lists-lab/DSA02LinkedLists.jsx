@@ -1986,170 +1986,65 @@ export default function DSA02LinkedLists({ onBack }) {
   };
 
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        background: T.bg,
-        fontFamily: T.sans,
-        color: T.text,
-        overflow: "hidden",
-        position: "relative",
-      }}
-    >
-      <div style={scanlineStyle} />
-
+    <div className="h-screen flex flex-col bg-slate-900/80 backdrop-blur-3xl text-slate-200 font-sans overflow-hidden relative">
       {/* ═══ HEADER ═══ */}
-      <div
-        style={{
-          height: 46,
-          background: T.surface,
-          borderBottom: `1px solid ${T.border}`,
-          display: "flex",
-          alignItems: "center",
-          padding: "0 18px",
-          gap: 14,
-          flexShrink: 0,
-        }}
-      >
+      <div className="h-12 bg-black/20 border-b border-white/5 flex items-center px-5 gap-4 shrink-0 shadow-sm relative z-10 backdrop-blur-md">
         {onBack && (
           <button
             onClick={onBack}
-            style={{
-              height: 28,
-              padding: "0 10px",
-              borderRadius: 4,
-              background: "transparent",
-              border: `1px solid ${T.border2}`,
-              color: T.muted,
-              fontSize: 11,
-              cursor: "pointer",
-              fontFamily: T.mono,
-              display: "flex",
-              alignItems: "center",
-              gap: 5,
-              flexShrink: 0,
-            }}
+            className="h-7 px-3 rounded-md bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 text-slate-400 hover:text-slate-200 text-[11px] cursor-pointer font-mono flex items-center gap-2 shrink-0 transition-colors"
           >
             ‹ Back
           </button>
         )}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "4px 10px",
-            borderRadius: 4,
-            background: `${T.green}12`,
-            border: `1px solid ${T.green}30`,
-          }}
-        >
-          <div
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              background: T.green,
-              boxShadow: `0 0 6px ${T.green}`,
-            }}
-          />
-          <span
-            style={{
-              fontSize: 10,
-              fontFamily: T.mono,
-              color: T.green,
-              letterSpacing: "0.12em",
-              fontWeight: 700,
-            }}
-          >
+        <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 shadow-inner">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399] animate-pulse" />
+          <span className="text-[10px] font-mono text-emerald-400 tracking-widest font-bold uppercase">
             DSA SERIES
           </span>
         </div>
-        <div
-          style={{
-            fontSize: 14,
-            fontWeight: 700,
-            color: T.textBright,
-            letterSpacing: -0.3,
-          }}
-        >
+        <div className="text-sm font-bold text-white tracking-tight">
           02 — Linked Lists
         </div>
-        <div style={{ fontSize: 11, color: T.textDim, fontFamily: T.mono }}>
-          node → node → node → null &nbsp;|&nbsp; O(1) insert &nbsp;|&nbsp; O(n)
-          access
+        <div className="text-[11px] text-slate-500 font-mono flex items-center gap-2 opacity-80">
+          <span>node → node → node → null</span>
+          <span className="text-white/10">|</span>
+          <span className="text-emerald-400/80">O(1) insert</span>
+          <span className="text-white/10">|</span>
+          <span className="text-amber-400/80">O(n) access</span>
         </div>
-        <div
-          style={{
-            marginLeft: "auto",
-            display: "flex",
-            gap: 5,
-            alignItems: "center",
-          }}
-        >
+        <div className="ml-auto flex gap-1.5 items-center bg-black/20 p-1.5 rounded-full border border-white/5 shadow-inner">
           {LESSONS.map((_, i) => (
             <div
               key={i}
               onClick={() => switchLesson(i)}
+              className="w-2 h-2 rounded-full cursor-pointer transition-all duration-300"
               style={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                cursor: "pointer",
                 background: completed.has(i)
                   ? LESSONS[i].color
                   : i === lessonIdx
-                    ? LESSONS[i].color + "55"
-                    : T.dim,
-                border: `1px solid ${completed.has(i) || i === lessonIdx ? LESSONS[i].color : T.border2}`,
+                    ? LESSONS[i].color + "88"
+                    : "rgba(255,255,255,0.1)",
                 boxShadow: completed.has(i)
-                  ? `0 0 6px ${LESSONS[i].color}66`
+                  ? `0 0 8px ${LESSONS[i].color}`
                   : "none",
-                transition: "all .2s",
+                transform: i === lessonIdx ? "scale(1.2)" : "scale(1)",
               }}
             />
           ))}
-          <span
-            style={{
-              fontSize: 10,
-              color: T.muted,
-              marginLeft: 6,
-              fontFamily: T.mono,
-            }}
-          >
+          <span className="text-[10px] text-slate-500 font-mono ml-2 mr-1 font-semibold">
             {completed.size}/{LESSONS.length}
           </span>
         </div>
       </div>
 
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+      <div className="flex flex-1 overflow-hidden relative z-0">
         {/* ═══ SIDEBAR ═══ */}
-        <div
-          style={{
-            width: 240,
-            background: T.panel,
-            borderRight: `1px solid ${T.border}`,
-            display: "flex",
-            flexDirection: "column",
-            flexShrink: 0,
-          }}
-        >
-          <div
-            style={{
-              padding: "12px 14px 6px",
-              fontSize: 9,
-              fontWeight: 700,
-              color: T.muted,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              fontFamily: T.mono,
-            }}
-          >
+        <div className="w-60 bg-black/20 border-r border-white/5 flex flex-col shrink-0 shadow-[4px_0_24px_rgba(0,0,0,0.2)] z-10">
+          <div className="px-4 pt-4 pb-2 text-[10px] font-bold text-slate-500 tracking-widest uppercase font-mono">
             Lessons
           </div>
-          <div style={{ overflowY: "auto", flex: 1 }}>
+          <div className="overflow-y-auto flex-1 px-2 pb-4 space-y-1">
             {LESSONS.map((l, i) => {
               const active = i === lessonIdx,
                 done = completed.has(i);
@@ -2157,55 +2052,33 @@ export default function DSA02LinkedLists({ onBack }) {
                 <div
                   key={i}
                   onClick={() => switchLesson(i)}
-                  style={{
-                    padding: "10px 14px",
-                    cursor: "pointer",
-                    background: active ? `${l.color}08` : "transparent",
-                    borderLeft: `2px solid ${active ? l.color : "transparent"}`,
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: 10,
-                    transition: "background .1s",
-                  }}
+                  className={`px-3 py-2.5 rounded-xl cursor-pointer flex items-start gap-3 transition-all duration-200 border group ${
+                    active 
+                      ? 'bg-white/10 border-white/10 shadow-inner' 
+                      : 'bg-transparent border-transparent hover:bg-white/5'
+                  }`}
                 >
                   <div
+                    className={`w-5 h-5 rounded-md shrink-0 flex items-center justify-center text-[10px] font-bold font-mono transition-colors shadow-sm ${
+                      done 
+                        ? 'text-black' 
+                        : active 
+                          ? 'text-white' 
+                          : 'text-slate-500 bg-white/5 border border-white/10 group-hover:bg-white/10'
+                    }`}
                     style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: 4,
-                      flexShrink: 0,
-                      background: done ? l.color : T.dim,
-                      border: `1px solid ${done ? l.color : active ? l.color + "66" : T.border2}`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 9,
-                      fontWeight: 700,
-                      color: done ? "#000" : active ? l.color : T.muted,
-                      fontFamily: T.mono,
+                      background: done ? l.color : active ? l.color : undefined,
+                      border: done ? `1px solid ${l.color}` : active ? `1px solid ${l.color}` : undefined,
+                      boxShadow: (done || active) ? `0 2px 8px ${l.color}40` : undefined,
                     }}
                   >
                     {done ? "✓" : i + 1}
                   </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: active ? 600 : 400,
-                        color: active ? T.textBright : T.textDim,
-                        lineHeight: 1.3,
-                      }}
-                    >
+                  <div className="flex-1 min-w-0">
+                    <div className={`text-xs leading-snug truncate transition-colors ${active ? 'font-bold text-white' : 'font-medium text-slate-400 group-hover:text-slate-200'}`}>
                       {l.shortTitle}
                     </div>
-                    <div
-                      style={{
-                        fontSize: 9,
-                        color: T.muted,
-                        marginTop: 2,
-                        fontFamily: T.mono,
-                      }}
-                    >
+                    <div className="text-[9px] text-slate-500 mt-0.5 font-mono truncate uppercase tracking-wide opacity-80">
                       {l.osHook}
                     </div>
                   </div>
@@ -2217,63 +2090,26 @@ export default function DSA02LinkedLists({ onBack }) {
         </div>
 
         {/* ═══ MAIN ═══ */}
-        <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+        <div className="flex-1 flex overflow-hidden">
           {/* ── LEFT: Lesson ── */}
-          <div
-            style={{
-              width: 380,
-              background: T.panel,
-              borderRight: `1px solid ${T.border}`,
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                padding: "14px 16px 12px",
-                borderBottom: `1px solid ${T.border}`,
-                flexShrink: 0,
-              }}
-            >
+          <div className="w-[380px] bg-black/40 border-r border-white/5 flex flex-col overflow-hidden shrink-0 shadow-lg relative z-0">
+            <div className="px-5 pt-5 pb-4 border-b border-white/5 shrink-0 bg-gradient-to-b from-white/[0.02] to-transparent">
               <div
+                className="text-[9px] font-bold tracking-widest px-2.5 py-1 rounded-md inline-block mb-3 font-mono shadow-sm"
                 style={{
-                  fontSize: 9,
-                  fontWeight: 700,
-                  letterSpacing: "0.1em",
                   color: lc,
                   background: `${lc}15`,
                   border: `1px solid ${lc}30`,
-                  borderRadius: 3,
-                  padding: "2px 8px",
-                  fontFamily: T.mono,
-                  display: "inline-block",
-                  marginBottom: 6,
                 }}
               >
                 {lesson.osHook.toUpperCase()}
               </div>
-              <div
-                style={{
-                  fontSize: 17,
-                  fontWeight: 700,
-                  color: T.textBright,
-                  letterSpacing: -0.5,
-                  lineHeight: 1.2,
-                }}
-              >
+              <div className="text-xl font-bold text-white tracking-tight leading-tight">
                 {lesson.title}
               </div>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                background: T.bg,
-                borderBottom: `1px solid ${T.border}`,
-                flexShrink: 0,
-              }}
-            >
+            <div className="flex px-4 py-2 bg-black/20 border-b border-white/5 shrink-0 gap-1 overflow-x-auto no-scrollbar">
               {[
                 ["concept", "Concept"],
                 ["pseudo", "Pseudocode"],
@@ -2282,18 +2118,14 @@ export default function DSA02LinkedLists({ onBack }) {
                 <button
                   key={id}
                   onClick={() => setTab(id)}
+                  className={`flex-1 py-1.5 px-3 rounded-full text-[11px] font-mono transition-all duration-200 ${
+                    tab === id 
+                      ? 'font-bold bg-white/10 shadow-sm' 
+                      : 'font-medium text-slate-500 hover:text-slate-300 hover:bg-white/5'
+                  }`}
                   style={{
-                    flex: 1,
-                    padding: "8px 0",
-                    fontSize: 11,
-                    fontWeight: tab === id ? 700 : 400,
-                    color: tab === id ? lc : T.muted,
-                    background: "transparent",
-                    border: "none",
-                    borderBottom: `2px solid ${tab === id ? lc : "transparent"}`,
-                    cursor: "pointer",
-                    fontFamily: T.mono,
-                    transition: "color .12s",
+                    color: tab === id ? lc : undefined,
+                    border: `1px solid ${tab === id ? lc + '40' : 'transparent'}`,
                   }}
                 >
                   {label}
@@ -2301,33 +2133,17 @@ export default function DSA02LinkedLists({ onBack }) {
               ))}
             </div>
 
-            <div style={{ flex: 1, overflowY: "auto", padding: "14px 16px" }}>
+            <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6">
               {tab === "concept" &&
                 lesson.concept.map((b, i) => (
-                  <div key={i} style={{ marginBottom: 20 }}>
+                  <div key={i} className="group">
                     <div
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: lc,
-                        letterSpacing: "0.1em",
-                        marginBottom: 6,
-                        textTransform: "uppercase",
-                        fontFamily: T.mono,
-                      }}
+                      className="text-[10px] font-bold tracking-widest mb-2 uppercase font-mono transition-colors"
+                      style={{ color: lc }}
                     >
                       {b.head}
                     </div>
-                    <pre
-                      style={{
-                        fontSize: 11.5,
-                        color: T.textDim,
-                        lineHeight: 1.85,
-                        whiteSpace: "pre-wrap",
-                        margin: 0,
-                        fontFamily: T.mono,
-                      }}
-                    >
+                    <pre className="text-[11.5px] text-slate-400 leading-[1.85] whitespace-pre-wrap m-0 font-mono group-hover:text-slate-300 transition-colors">
                       {b.body}
                     </pre>
                   </div>
@@ -2335,46 +2151,20 @@ export default function DSA02LinkedLists({ onBack }) {
 
               {tab === "pseudo" && (
                 <div>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      fontWeight: 700,
-                      color: T.muted,
-                      letterSpacing: "0.1em",
-                      marginBottom: 10,
-                      textTransform: "uppercase",
-                      fontFamily: T.mono,
-                    }}
-                  >
+                  <div className="text-[9px] font-bold text-slate-500 tracking-widest mb-3 uppercase font-mono">
                     Algorithm
                   </div>
-                  <pre
-                    style={{
-                      fontSize: 11.5,
-                      color: "#a8c8a8",
-                      lineHeight: 2,
-                      whiteSpace: "pre-wrap",
-                      margin: 0,
-                      fontFamily: T.mono,
-                      background: "#080f08",
-                      border: `1px solid #1a3020`,
-                      borderRadius: 6,
-                      padding: "14px",
-                    }}
-                  >
-                    {lesson.pseudo}
-                  </pre>
+                  <div className="p-4 bg-black/40 border border-emerald-900/30 rounded-xl shadow-inner relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <pre className="text-[11.5px] text-emerald-200/70 leading-loose whitespace-pre-wrap m-0 font-mono relative z-10">
+                      {lesson.pseudo}
+                    </pre>
+                  </div>
                   <div
+                    className="mt-4 p-3 rounded-lg text-[10.5px] text-slate-400 leading-relaxed font-mono shadow-sm"
                     style={{
-                      marginTop: 12,
-                      padding: "8px 12px",
                       background: `${lc}0a`,
                       border: `1px solid ${lc}20`,
-                      borderRadius: 5,
-                      fontSize: 10.5,
-                      color: T.textDim,
-                      lineHeight: 1.6,
-                      fontFamily: T.mono,
                     }}
                   >
                     Each <span style={{ color: lc }}>___</span> blank maps to
@@ -2385,194 +2175,76 @@ export default function DSA02LinkedLists({ onBack }) {
 
               {tab === "inputs" && (
                 <div>
-                  <div
-                    style={{
-                      fontSize: 9,
-                      color: T.muted,
-                      letterSpacing: "0.1em",
-                      marginBottom: 10,
-                      fontFamily: T.mono,
-                      textTransform: "uppercase",
-                    }}
-                  >
+                  <div className="text-[9px] text-slate-500 tracking-widest mb-3 font-mono uppercase font-bold">
                     Demo List
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 3,
-                      flexWrap: "wrap",
-                      marginBottom: 14,
-                    }}
-                  >
+                  <div className="flex gap-1.5 flex-wrap mb-5 bg-black/20 p-3 rounded-xl border border-white/5 shadow-inner">
                     {demoArr.map((v, i) => (
-                      <div
-                        key={i}
-                        style={{ display: "flex", alignItems: "center" }}
-                      >
-                        <div
-                          style={{
-                            width: 40,
-                            height: 36,
-                            background: T.dim,
-                            border: `1px solid ${T.border2}`,
-                            borderRadius: 3,
-                            display: "flex",
-                            flexDirection: "column",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontFamily: T.mono,
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: 12,
-                              color: T.textBright,
-                              fontWeight: 700,
-                            }}
-                          >
-                            {v}
-                          </span>
-                          <span style={{ fontSize: 7, color: T.muted }}>
-                            node
-                          </span>
+                      <div key={i} className="flex items-center">
+                        <div className="w-10 h-9 bg-white/5 border border-white/10 rounded-md flex flex-col items-center justify-center font-mono shadow-sm hover:bg-white/10 transition-colors cursor-default">
+                          <span className="text-xs text-white font-bold">{v}</span>
+                          <span className="text-[7px] text-slate-500 uppercase tracking-wider">node</span>
                         </div>
                         {i < demoArr.length - 1 && (
-                          <div
-                            style={{
-                              width: 12,
-                              height: 1,
-                              background: T.border2,
-                            }}
-                          />
+                          <div className="w-3 h-[1px] bg-white/10" />
                         )}
                       </div>
                     ))}
-                    <div
-                      style={{
-                        marginLeft: 4,
-                        fontSize: 11,
-                        color: T.muted,
-                        fontFamily: T.mono,
-                        alignSelf: "center",
-                      }}
-                    >
+                    <div className="ml-2 text-[11px] text-slate-500 font-mono self-center">
                       → null
                     </div>
                   </div>
 
                   {/* Trace controls */}
                   {(lessonIdx === 1 || lessonIdx === 2) && (
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 8,
-                      }}
-                    >
+                    <div className="flex flex-col gap-3">
                       {lessonIdx === 1 && (
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: 6,
-                            alignItems: "center",
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: 10,
-                              color: T.textDim,
-                              fontFamily: T.mono,
-                              width: 40,
-                            }}
-                          >
-                            value
-                          </span>
+                        <div className="flex gap-2 items-center bg-black/20 p-2 rounded-lg border border-white/5 shadow-inner">
+                          <span className="text-[10px] text-slate-500 font-mono w-10 uppercase tracking-wider">value</span>
                           <input
                             type="number"
                             value={demoVal}
                             onChange={(e) => setDemoVal(+e.target.value)}
-                            style={{
-                              width: 55,
-                              padding: "3px 6px",
-                              background: T.dim,
-                              border: `1px solid ${T.border2}`,
-                              borderRadius: 3,
-                              color: T.text,
-                              fontFamily: T.mono,
-                              fontSize: 11,
-                            }}
+                            className="w-14 px-2 py-1 bg-white/5 border border-white/10 rounded-md text-white font-mono text-[11px] focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all text-center"
                           />
                           <button
                             onClick={() => {
                               setTraceSteps(tracePrepend(demoArr, demoVal));
                               setTraceIdx(0);
                             }}
+                            className="px-3 py-1.5 rounded-md text-[10px] cursor-pointer font-mono font-bold transition-all hover:brightness-110 active:scale-95 shadow-sm ml-auto"
                             style={{
-                              padding: "4px 8px",
                               background: `${lc}18`,
                               border: `1px solid ${lc}44`,
-                              borderRadius: 3,
                               color: lc,
-                              fontSize: 10,
-                              cursor: "pointer",
-                              fontFamily: T.mono,
                             }}
                           >
-                            prepend trace
+                            PREPEND
                           </button>
                         </div>
                       )}
                       {lessonIdx === 2 && (
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: 6,
-                            alignItems: "center",
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: 10,
-                              color: T.textDim,
-                              fontFamily: T.mono,
-                              width: 50,
-                            }}
-                          >
-                            delete
-                          </span>
+                        <div className="flex gap-2 items-center bg-black/20 p-2 rounded-lg border border-white/5 shadow-inner">
+                          <span className="text-[10px] text-slate-500 font-mono w-12 uppercase tracking-wider">delete</span>
                           <input
                             type="number"
                             value={demoTarget}
                             onChange={(e) => setDemoTarget(+e.target.value)}
-                            style={{
-                              width: 55,
-                              padding: "3px 6px",
-                              background: T.dim,
-                              border: `1px solid ${T.border2}`,
-                              borderRadius: 3,
-                              color: T.text,
-                              fontFamily: T.mono,
-                              fontSize: 11,
-                            }}
+                            className="w-14 px-2 py-1 bg-white/5 border border-white/10 rounded-md text-white font-mono text-[11px] focus:outline-none focus:border-white/30 focus:bg-white/10 transition-all text-center"
                           />
                           <button
                             onClick={() => {
                               setTraceSteps(traceDelete(demoArr, demoTarget));
                               setTraceIdx(0);
                             }}
+                            className="px-3 py-1.5 rounded-md text-[10px] cursor-pointer font-mono font-bold transition-all hover:brightness-110 active:scale-95 shadow-sm ml-auto"
                             style={{
-                              padding: "4px 8px",
                               background: `${lc}18`,
                               border: `1px solid ${lc}44`,
-                              borderRadius: 3,
                               color: lc,
-                              fontSize: 10,
-                              cursor: "pointer",
-                              fontFamily: T.mono,
                             }}
                           >
-                            trace
+                            TRACE
                           </button>
                         </div>
                       )}
@@ -2585,57 +2257,35 @@ export default function DSA02LinkedLists({ onBack }) {
                         setTraceSteps(traceReverse(demoArr));
                         setTraceIdx(0);
                       }}
+                      className="px-4 py-2 rounded-lg text-[10px] cursor-pointer font-mono font-bold transition-all hover:brightness-110 active:scale-95 shadow-sm w-full tracking-wider"
                       style={{
-                        padding: "5px 12px",
                         background: `${lc}18`,
                         border: `1px solid ${lc}44`,
-                        borderRadius: 3,
                         color: lc,
-                        fontSize: 10,
-                        cursor: "pointer",
-                        fontFamily: T.mono,
                       }}
                     >
-                      trace reverse
+                      TRACE REVERSE
                     </button>
                   )}
                   {lessonIdx === 4 && (
-                    <div style={{ display: "flex", gap: 6 }}>
+                    <div className="flex gap-2 bg-black/20 p-2 rounded-lg border border-white/5 shadow-inner">
                       <button
                         onClick={() => {
                           setTraceSteps(traceCycle([1, 2, 3, 4, 5], 1));
                           setTraceIdx(0);
                         }}
-                        style={{
-                          padding: "5px 10px",
-                          background: `${T.red}18`,
-                          border: `1px solid ${T.red}44`,
-                          borderRadius: 3,
-                          color: T.red,
-                          fontSize: 10,
-                          cursor: "pointer",
-                          fontFamily: T.mono,
-                        }}
+                        className="flex-1 px-3 py-2 bg-red-500/10 border border-red-500/30 rounded-md text-red-400 text-[10px] cursor-pointer font-mono font-bold hover:bg-red-500/20 active:scale-95 transition-all uppercase tracking-wider"
                       >
-                        with cycle
+                        With Cycle
                       </button>
                       <button
                         onClick={() => {
                           setTraceSteps(traceCycle([1, 2, 3, 4, 5], -1));
                           setTraceIdx(0);
                         }}
-                        style={{
-                          padding: "5px 10px",
-                          background: `${T.green}18`,
-                          border: `1px solid ${T.green}44`,
-                          borderRadius: 3,
-                          color: T.green,
-                          fontSize: 10,
-                          cursor: "pointer",
-                          fontFamily: T.mono,
-                        }}
+                        className="flex-1 px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-md text-emerald-400 text-[10px] cursor-pointer font-mono font-bold hover:bg-emerald-500/20 active:scale-95 transition-all uppercase tracking-wider"
                       >
-                        no cycle
+                        No Cycle
                       </button>
                     </div>
                   )}
@@ -2645,119 +2295,58 @@ export default function DSA02LinkedLists({ onBack }) {
           </div>
 
           {/* ── CENTER: Editor ── */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              background: T.bg,
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                height: 40,
-                background: T.surface,
-                borderBottom: `1px solid ${T.border}`,
-                display: "flex",
-                alignItems: "center",
-                padding: "0 14px",
-                gap: 8,
-                flexShrink: 0,
-              }}
-            >
+          <div className="flex-1 flex flex-col bg-black/60 overflow-hidden shadow-inner relative">
+            <div className="h-10 bg-black/40 border-b border-white/5 flex items-center px-4 gap-2 shrink-0 z-10 backdrop-blur-sm shadow-sm">
               <button
                 onClick={handleRun}
                 disabled={running}
+                className={`h-7 px-4 rounded-md text-[11px] font-bold font-mono tracking-wide flex items-center gap-1.5 transition-all duration-300 shadow-sm ${
+                  running 
+                    ? 'opacity-60 cursor-default' 
+                    : 'cursor-pointer hover:-translate-y-0.5 active:translate-y-0 active:scale-95 hover:shadow-lg'
+                }`}
                 style={{
-                  height: 26,
-                  padding: "0 16px",
-                  borderRadius: 4,
                   background: isComplete ? `${T.green}18` : `${lc}15`,
                   border: `1px solid ${isComplete ? T.green2 : lc + "55"}`,
                   color: isComplete ? T.green : lc,
-                  fontSize: 11,
-                  fontWeight: 700,
-                  cursor: running ? "default" : "pointer",
-                  fontFamily: T.mono,
-                  letterSpacing: "0.04em",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  opacity: running ? 0.6 : 1,
-                  boxShadow: isComplete ? `0 0 8px ${T.green}22` : "none",
+                  boxShadow: isComplete ? `0 0 12px ${T.green}30` : `0 0 12px ${lc}20`,
                 }}
               >
-                <span style={{ fontSize: 8 }}>{running ? "⟳" : "▶"}</span>
+                <span className="text-[9px]">{running ? "⟳" : "▶"}</span>
                 {running ? "Running…" : "Run"}
               </button>
               <button
                 onClick={() => setShowHint((h) => !h)}
-                style={{
-                  height: 26,
-                  padding: "0 10px",
-                  borderRadius: 4,
-                  background: "transparent",
-                  border: `1px solid ${T.border2}`,
-                  color: showHint ? lc : T.muted,
-                  fontSize: 11,
-                  cursor: "pointer",
-                  fontFamily: T.mono,
-                }}
+                className="h-7 px-3 rounded-md bg-transparent hover:bg-white/5 border border-white/10 hover:border-white/20 text-[11px] cursor-pointer font-mono transition-colors ml-2"
+                style={{ color: showHint ? lc : T.muted }}
               >
                 {showHint ? "Hide Hint" : "Hint"}
               </button>
               <button
                 onClick={handleReveal}
-                style={{
-                  height: 26,
-                  padding: "0 10px",
-                  borderRadius: 4,
-                  background: "transparent",
-                  border: `1px solid ${T.border2}`,
-                  color: T.muted,
-                  fontSize: 11,
-                  cursor: "pointer",
-                  fontFamily: T.mono,
-                }}
+                className="h-7 px-3 rounded-md bg-transparent hover:bg-white/5 border border-white/10 hover:border-white/20 text-[11px] text-slate-500 hover:text-slate-300 cursor-pointer font-mono transition-colors"
               >
                 Reveal
               </button>
               {lesson.hasTrace && (
                 <button
                   onClick={buildTrace}
+                  className="h-7 px-3 rounded-md text-[11px] cursor-pointer font-mono font-bold transition-all hover:bg-purple-500/20 active:scale-95 shadow-sm"
                   style={{
-                    height: 26,
-                    padding: "0 10px",
-                    borderRadius: 4,
                     background: `${T.purple}15`,
                     border: `1px solid ${T.purple}44`,
                     color: T.purple,
-                    fontSize: 11,
-                    cursor: "pointer",
-                    fontFamily: T.mono,
                   }}
                 >
                   Step Through
                 </button>
               )}
               {isComplete && (
-                <span
-                  style={{
-                    fontSize: 10,
-                    color: T.green,
-                    background: `${T.green}10`,
-                    border: `1px solid ${T.green}30`,
-                    borderRadius: 3,
-                    padding: "3px 8px",
-                    fontFamily: T.mono,
-                    boxShadow: `0 0 6px ${T.green}22`,
-                  }}
-                >
+                <span className="text-[10px] font-mono px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.2)] ml-2 animate-pulse">
                   ✓ passing
                 </span>
               )}
-              <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
+              <div className="ml-auto flex gap-1 p-0.5 bg-black/40 rounded-lg border border-white/5 shadow-inner">
                 {[
                   ["js", "JS"],
                   ["python", "Python"],
@@ -2768,25 +2357,15 @@ export default function DSA02LinkedLists({ onBack }) {
                       setLang(id);
                       setRunResult(null);
                     }}
+                    className={`h-6 px-2.5 rounded-md text-[10px] font-bold cursor-pointer font-mono transition-all duration-200 ${
+                      lang === id 
+                        ? 'shadow-sm' 
+                        : 'text-slate-500 hover:text-slate-300 hover:bg-white/5 border-transparent'
+                    }`}
                     style={{
-                      height: 22,
-                      padding: "0 8px",
-                      borderRadius: 3,
-                      background:
-                        lang === id
-                          ? `${id === "js" ? "#f7df1e" : "#7dd3fc"}18`
-                          : "transparent",
-                      border: `1px solid ${lang === id ? (id === "js" ? "#f7df1e" : "#7dd3fc") : T.border2}`,
-                      color:
-                        lang === id
-                          ? id === "js"
-                            ? "#f7df1e"
-                            : "#7dd3fc"
-                          : T.muted,
-                      fontSize: 10,
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      fontFamily: T.mono,
+                      background: lang === id ? `${id === "js" ? "#f7df1e" : "#7dd3fc"}18` : undefined,
+                      border: lang === id ? `1px solid ${id === "js" ? "#f7df1e" : "#7dd3fc"}` : '1px solid transparent',
+                      color: lang === id ? (id === "js" ? "#f7df1e" : "#7dd3fc") : undefined,
                     }}
                   >
                     {label}
@@ -2796,49 +2375,41 @@ export default function DSA02LinkedLists({ onBack }) {
             </div>
 
             {showHint && (
-              <div
-                style={{
-                  padding: "8px 14px",
-                  background: "#1a1400",
-                  borderBottom: `1px solid #3a2800`,
-                  fontSize: 11,
-                  color: "#c8a040",
-                  fontFamily: T.mono,
-                  lineHeight: 1.6,
-                  flexShrink: 0,
-                }}
-              >
-                <span style={{ color: "#705010", marginRight: 6 }}>hint</span>
+              <div className="px-5 py-3 bg-amber-950/40 border-b border-amber-900/50 text-[11px] font-mono leading-relaxed shrink-0 shadow-inner">
+                <span className="text-amber-600/80 font-bold uppercase tracking-widest mr-2 text-[9px]">hint</span>
                 {currentBlanks.map((b, i) => (
-                  <div key={i} style={{ color: "#c8a840", marginTop: 2 }}>
-                    {b}: {currentSols[i]}
+                  <div key={i} className="text-amber-400/90 mt-1">
+                    {b}: <span className="text-amber-200 font-bold">{currentSols[i]}</span>
                   </div>
                 ))}
               </div>
             )}
 
-            <Editor
-              height="100%"
-              language={lang === "python" ? "python" : "javascript"}
-              value={currentCode}
-              onChange={(val) => setCurrentCode(val || "")}
-              beforeMount={setupOpenCalcMonaco}
-              theme="open-calc-dark"
-              options={{
-                fontSize: 13,
-                lineHeight: 22,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                wordWrap: "on",
-                tabSize: 2,
-                renderLineHighlight: "line",
-                padding: { top: 12, bottom: 12 },
-                smoothScrolling: true,
-                cursorBlinking: "smooth",
-                fontLigatures: true,
-                fontFamily: "'JetBrains Mono','Fira Code','Cascadia Code',monospace",
-              }}
-            />
+            <div className="flex-1 relative">
+              <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent pointer-events-none z-10 h-4" />
+              <Editor
+                height="100%"
+                language={lang === "python" ? "python" : "javascript"}
+                value={currentCode}
+                onChange={(val) => setCurrentCode(val || "")}
+                beforeMount={setupOpenCalcMonaco}
+                theme="open-calc-dark"
+                options={{
+                  fontSize: 13,
+                  lineHeight: 22,
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  wordWrap: "on",
+                  tabSize: 2,
+                  renderLineHighlight: "line",
+                  padding: { top: 16, bottom: 16 },
+                  smoothScrolling: true,
+                  cursorBlinking: "smooth",
+                  fontLigatures: true,
+                  fontFamily: "'JetBrains Mono','Fira Code','Cascadia Code',monospace",
+                }}
+              />
+            </div>
           </div>
 
           {/* ── RIGHT: Results + Trace ── */}
