@@ -6,7 +6,7 @@ import { buildProgressKey } from '../context/progressMigration.js'
 import { getAllCourses, getChapters } from '../courses/courseLoader.js'
 import { GLASS_META } from '../styles/courseColors.js'
 import AuthButton from '../components/ui/AuthButton.jsx'
-import { CheckCircle2, Play, BookOpen, Clock } from 'lucide-react'
+import { CheckCircle2, Play, BookOpen, Clock, RotateCcw } from 'lucide-react'
 
 const ALL_COURSES = getAllCourses()
 
@@ -21,7 +21,7 @@ function StatCard({ label, value }) {
 
 export default function ProfilePage() {
   const { user, syncing, signOut } = useAuth()
-  const { progress, getLessonProgress } = useProgress()
+  const { progress, getLessonProgress, resetCourseProgress } = useProgress()
   const [failedPhotoURL, setFailedPhotoURL] = useState(null)
 
   useEffect(() => {
@@ -193,26 +193,40 @@ export default function ProfilePage() {
               .map(({ course, total, completed, pct }) => {
                 const theme = GLASS_META[course.color] ?? GLASS_META.slate
                 return (
-                  <Link
-                    key={course.key}
-                    to={course.path}
-                    className="block p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg transition-all"
-                  >
-                    <div className="flex items-center justify-between mb-2 gap-2">
-                      <span className="font-semibold text-slate-800 dark:text-slate-100 text-sm truncate">{course.label}</span>
-                      {pct === 1 && <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />}
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5">
-                      <span>{completed} / {total} lessons</span>
-                      <span className={`font-bold ${theme.text}`}>{Math.round(pct * 100)}%</span>
-                    </div>
-                    <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${pct === 1 ? 'bg-emerald-500' : theme.bar} transition-all`}
-                        style={{ width: `${Math.max(4, pct * 100)}%` }}
-                      />
-                    </div>
-                  </Link>
+                  <div key={course.key} className="relative group">
+                    <Link
+                      to={course.path}
+                      className="block p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg transition-all"
+                    >
+                      <div className="flex items-center justify-between mb-2 gap-2 pr-6">
+                        <span className="font-semibold text-slate-800 dark:text-slate-100 text-sm truncate">{course.label}</span>
+                        {pct === 1 && <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" />}
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1.5">
+                        <span>{completed} / {total} lessons</span>
+                        <span className={`font-bold ${theme.text}`}>{Math.round(pct * 100)}%</span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${pct === 1 ? 'bg-emerald-500' : theme.bar} transition-all`}
+                          style={{ width: `${Math.max(4, pct * 100)}%` }}
+                        />
+                      </div>
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        if (window.confirm(`Reset all progress for ${course.label}? This can't be undone.`)) {
+                          resetCourseProgress(course.key)
+                        }
+                      }}
+                      title={`Reset progress for ${course.label}`}
+                      className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
                 )
               })}
           </div>

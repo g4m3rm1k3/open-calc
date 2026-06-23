@@ -18,6 +18,7 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 import { mergeProgress, SYNC_MERGE_STRATEGIES } from './progressMigration.js'
+import { writeLocalStorageKey } from '../hooks/useLocalStorage.js'
 
 // ── Localhost guard ───────────────────────────────────────────────────────────
 // Never write to production Firestore from a dev machine.
@@ -95,9 +96,7 @@ function snapshotLocalStorage() {
 function restoreToLocalStorage(data) {
   for (const [key, value] of Object.entries(data)) {
     if (key.startsWith('_')) continue // skip metadata fields like _syncedAt
-    try {
-      localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value))
-    } catch {}
+    writeLocalStorageKey(key, value)
   }
 }
 
@@ -132,7 +131,7 @@ async function syncOnSignIn(uid) {
     const localProgress = safeJSON(localStorage.getItem('oc-progress'))
     const mergedProgress = mergeProgress(localProgress, remote['oc-progress'] ?? null)
     if (mergedProgress) {
-      localStorage.setItem('oc-progress', JSON.stringify(mergedProgress))
+      writeLocalStorageKey('oc-progress', mergedProgress)
       if (JSON.stringify(mergedProgress) !== JSON.stringify(remote['oc-progress'] ?? null)) {
         toPushUp['oc-progress'] = mergedProgress
       }
@@ -150,7 +149,7 @@ async function syncOnSignIn(uid) {
       const remoteVal = remote[key] ?? null
       if (localVal == null && remoteVal == null) continue
       const merged = strategy(localVal, remoteVal)
-      localStorage.setItem(key, JSON.stringify(merged))
+      writeLocalStorageKey(key, merged)
       if (JSON.stringify(merged) !== JSON.stringify(remoteVal)) {
         toPushUp[key] = merged
       }

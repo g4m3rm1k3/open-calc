@@ -150,6 +150,26 @@ export function ProgressProvider({ children }) {
     return progress[lessonId]?.quizStates ?? {}
   }, [progress])
 
+  // Clears every progress entry belonging to one course — matches both the
+  // current key scheme ("<courseId>::<lessonId>") and the legacy one
+  // ("<courseId>/<slug>", for any entry that predates migrateOldProgressKeys
+  // or that this course's migration couldn't resolve). Pushed immediately:
+  // this is an explicit, deliberate action, not incidental bookkeeping.
+  const resetCourseProgress = useCallback((courseId) => {
+    setProgress((prev) => {
+      const next = { ...prev }
+      let changed = false
+      for (const key of Object.keys(next)) {
+        if (key.startsWith(`${courseId}::`) || key.startsWith(`${courseId}/`)) {
+          delete next[key]
+          changed = true
+        }
+      }
+      return changed ? next : prev
+    })
+    pushNow?.()
+  }, [setProgress, pushNow])
+
   // Quiz score is the canonical lesson progress metric.
   // Falls back to reading checkpoints for lessons that have no quiz.
   const getLessonProgress = useCallback((lessonId) => {
@@ -179,7 +199,8 @@ export function ProgressProvider({ children }) {
     <ProgressContext.Provider value={{
       progress, markCheckpoint, markVisited, setActiveTab, getLessonStatus, getLessonProgress,
       getActiveTab, setReadingProgress, getReadingProgress,
-      setQuizScore, getQuizScore, setQuizStates, getQuizStates, ensureQuizTotal
+      setQuizScore, getQuizScore, setQuizStates, getQuizStates, ensureQuizTotal,
+      resetCourseProgress
     }}>
       {children}
     </ProgressContext.Provider>
