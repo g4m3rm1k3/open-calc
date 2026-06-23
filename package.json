@@ -74,6 +74,7 @@
     "react-konva": "^18.2.14",
     "react-leaflet": "^4.2.1",
     "react-markdown": "^10.1.0",
+    "react-moveable": "^0.56.0",
     "react-router-dom": "^6.26.2",
     "rehype-katex": "^7.0.1",
     "rehype-raw": "^7.0.0",

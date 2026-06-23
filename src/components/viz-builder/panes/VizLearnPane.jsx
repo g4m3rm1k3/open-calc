@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { lazy, Suspense } from 'react'
 import { VIZ_CATALOG, CATEGORIES } from '../vizCatalog.js'
 
@@ -124,16 +124,63 @@ function AboutTab({ vizId }) {
   )
 }
 
+// Minimal JSX-stripping preview builder — same logic as VizSourceEditor's buildPreviewDoc
+// but self-contained so VizLearnPane has no cross-directory import dep.
+const LOCAL_STUBS_LP = {
+  useIsDark:       'function useIsDark() { return false; }',
+  useAuth:         'function useAuth() { return { user: null, syncing: false }; }',
+  usePins:         'function usePins() { return { isPinned: function(){ return false; }, addPin: function(){}, removePin: function(){} }; }',
+  useLocalStorage: 'function useLocalStorage(_k, def) { return [def, function(){}]; }',
+  useProgress:     `function useProgress() { return { progress: {}, getLessonProgress: function(){ return { percent:0,status:'not-started',correct:0,total:0 }; }, markCheckpoint:function(){}, setQuizScore:function(){}, getQuizScore:function(){ return null; }, getQuizStates:function(){ return {}; }, setQuizStates:function(){}, getReadingProgress:function(){ return 0; }, setReadingProgress:function(){}, getLessonStatus:function(){ return 'not-started'; } }; }`,
+}
+
+function buildLearnPreviewDoc(source) {
+  const dark = document.documentElement.classList.contains('dark')
+  const reactImports = new Set()
+  const localImports = new Set()
+  let processed = source
+    .replace(/import\s*\{([^}]+)\}\s*from\s*['"]react['"]/g, (_, names) => {
+      names.split(',').map(n => n.trim().split(/\s+as\s+/)[0].trim()).filter(Boolean).forEach(n => reactImports.add(n))
+      return ''
+    })
+    .replace(/import\s+\w+\s+from\s*['"]react['"]/g, '')
+    .replace(/import\s*\{([^}]+)\}\s*from\s*['"][^'"]+['"]/g, (_, names) => {
+      names.split(',').map(n => n.trim().split(/\s+as\s+/)[0].trim()).filter(Boolean).forEach(n => localImports.add(n))
+      return ''
+    })
+    .replace(/import\s+(\w+)\s+from\s*['"][^'"]+['"]/g, (_, name) => { localImports.add(name); return '' })
+    .replace(/^import\s+.+$/gm, '')
+    .replace(/export\s+default\s+function\s+(\w+)/, 'function __VizComp')
+    .replace(/export\s+default\s+(\w+)\s*;?\s*$/, 'var __vizNamedDefault = $1')
+  const destr = reactImports.size ? `var { ${[...reactImports].join(', ')} } = React;\n` : ''
+  const stubs = [...localImports].map(n => LOCAL_STUBS_LP[n] ?? `var ${n} = null;`).join('\n')
+  return `<!DOCTYPE html><html class="${dark ? 'dark' : ''}"><head>
+<script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
+<script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"><\/script>
+<style>*{box-sizing:border-box}body{margin:0;padding:10px;font-family:system-ui,sans-serif;font-size:14px;background:${dark ? '#0f172a' : '#f8fafc'};color:${dark ? '#e2e8f0' : '#1e293b'}}pre.error{color:#ef4444;background:#1f0707;padding:10px;border-radius:6px;font-size:12px;white-space:pre-wrap;margin:0}</style>
+</head><body><div id="root"></div>
+<script type="text/babel" data-presets="react">
+${destr}
+${stubs}
+${processed}
+;(function(){var Comp=typeof __VizComp!=='undefined'?__VizComp:typeof __vizNamedDefault!=='undefined'?__vizNamedDefault:null;if(!Comp){document.getElementById('root').innerHTML='<pre class="error">No default export found<\/pre>';return;}try{ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(Comp,{params:{},onParamChange:function(){}}));}catch(e){document.getElementById('root').innerHTML='<pre class="error">'+e.message+'<\/pre>';}})();
+<\/script></body></html>`
+}
+
 function SourceTab({ vizId }) {
   const [source, setSource] = useState(null)
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState(null)
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
+  const [previewDoc, setPreviewDoc] = useState('')
+  const sourceRef = useRef('')
 
   useEffect(() => {
     setLoading(true)
     setErr(null)
     setSource(null)
+    setPreviewDoc('')
 
     const loader = SOURCE_MAP[vizId] ?? EXTRA_RAW[vizId]
     if (!loader) {
@@ -146,6 +193,8 @@ function SourceTab({ vizId }) {
       const raw = typeof mod === 'string' ? mod : (mod?.default ?? null)
       if (raw == null) { setErr('Could not load source.'); setLoading(false); return }
       setSource(raw)
+      sourceRef.current = raw
+      setPreviewDoc(buildLearnPreviewDoc(raw))
       setLoading(false)
     }).catch(e => {
       setErr(e.message ?? 'Failed to load source')
@@ -154,7 +203,10 @@ function SourceTab({ vizId }) {
   }, [vizId])
 
   useEffect(() => {
-    const obs = new MutationObserver(() => setDark(document.documentElement.classList.contains('dark')))
+    const obs = new MutationObserver(() => {
+      setDark(document.documentElement.classList.contains('dark'))
+      if (sourceRef.current) setPreviewDoc(buildLearnPreviewDoc(sourceRef.current))
+    })
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
     return () => obs.disconnect()
   }, [])
@@ -179,30 +231,38 @@ function SourceTab({ vizId }) {
   }
 
   return (
-    <div className="flex-1 min-h-0">
-      <Suspense fallback={
-        <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin w-5 h-5 border-2 border-brand-400 border-t-transparent rounded-full" />
+    <div className="flex flex-1 min-h-0">
+      {/* Left: source code */}
+      <div className="flex-1 min-h-0 min-w-0">
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="animate-spin w-5 h-5 border-2 border-brand-400 border-t-transparent rounded-full" /></div>}>
+          <Editor
+            height="100%"
+            language="javascript"
+            value={source}
+            theme={dark ? 'vs-dark' : 'light'}
+            options={{
+              readOnly: true,
+              minimap: { enabled: false },
+              fontSize: 12,
+              lineNumbers: 'on',
+              scrollBeyondLastLine: false,
+              wordWrap: 'off',
+              folding: true,
+              renderLineHighlight: 'line',
+              padding: { top: 12, bottom: 12 },
+            }}
+          />
+        </Suspense>
+      </div>
+      {/* Right: live preview */}
+      <div className="w-80 shrink-0 border-l border-slate-200 dark:border-slate-700 flex flex-col">
+        <div className="px-3 py-1 text-[10px] font-black uppercase tracking-widest text-slate-400 shrink-0 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+          Live preview
         </div>
-      }>
-        <Editor
-          height="100%"
-          language="javascript"
-          value={source}
-          theme={dark ? 'vs-dark' : 'light'}
-          options={{
-            readOnly: true,
-            minimap: { enabled: false },
-            fontSize: 12,
-            lineNumbers: 'on',
-            scrollBeyondLastLine: false,
-            wordWrap: 'off',
-            folding: true,
-            renderLineHighlight: 'line',
-            padding: { top: 12, bottom: 12 },
-          }}
-        />
-      </Suspense>
+        <div className="flex-1">
+          <iframe srcDoc={previewDoc} title="viz-preview" className="border-0 w-full h-full" />
+        </div>
+      </div>
     </div>
   )
 }

@@ -20,7 +20,7 @@ function devFsPlugin() {
     name: "dev-fs-api",
     apply: "serve",
     configureServer(server) {
-      server.middlewares.use(async (req, res, next) => {
+      server.middlewares.use((req, res, next) => {
         if (!req.url?.startsWith("/api/dev-fs")) return next();
         const url = new URL(req.url, "http://localhost");
         const action = url.pathname.replace("/api/dev-fs/", "").replace("/api/dev-fs", "");

@@ -19,6 +19,7 @@ import VizFrame from '../../viz/VizFrame.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 const VizSourceEditor = lazy(() => import('./VizSourceEditor.jsx'))
+const SvgSourceEditor = lazy(() => import('./SvgSourceEditor.jsx'))
 
 const BLOCK_TYPE_META = {
   prose: { icon: '📝', label: 'Prose' },
@@ -54,6 +55,7 @@ function ProseBlockEditor({ block, onChange }) {
 
 function ImageBlockEditor({ block, onChange, courseId = 'geometry' }) {
   const [previewKey, setPreviewKey] = useState(0)
+  const [editingSvg, setEditingSvg] = useState(false)
   const diagramsDir = `src/courses/${courseId}/diagrams`
 
   // importPath is stored relative to the lesson's folder (e.g. '../diagrams/foo.svg')
@@ -78,7 +80,7 @@ function ImageBlockEditor({ block, onChange, courseId = 'geometry' }) {
         <button type="button" onClick={() => setPreviewKey(k => k + 1)} className="text-[10px] text-slate-400 hover:text-slate-600">↻ Refresh</button>
       </div>
       <LiveSvgPreview key={previewKey} path={resolvedPath} />
-      <div className="flex items-center justify-between">
+      <div className="flex items-start gap-2">
         <label className="flex-1 flex flex-col gap-1">
           <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
             Diagram path (relative to this lesson's folder, e.g. <code>../diagrams/foo.svg</code>)
@@ -90,14 +92,33 @@ function ImageBlockEditor({ block, onChange, courseId = 'geometry' }) {
             className="field font-mono text-xs"
           />
         </label>
-        <button
-          type="button"
-          onClick={openInScratchpad}
-          className="ml-2 mt-4 flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors shrink-0"
-        >
-          🎨 Open in Scratchpad
-        </button>
+        <div className="flex flex-col gap-1.5 mt-4 shrink-0">
+          <button
+            type="button"
+            onClick={openInScratchpad}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
+          >
+            🎨 Scratchpad
+          </button>
+          <button
+            type="button"
+            onClick={() => resolvedPath && setEditingSvg(true)}
+            disabled={!resolvedPath}
+            title={resolvedPath ? 'Open full SVG source editor' : 'Set a diagram path first'}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            ✎ Edit SVG
+          </button>
+        </div>
       </div>
+      {editingSvg && resolvedPath && (
+        <Suspense fallback={null}>
+          <SvgSourceEditor
+            filePath={resolvedPath}
+            onClose={() => { setEditingSvg(false); setPreviewKey(k => k + 1) }}
+          />
+        </Suspense>
+      )}
       {!block.importPath && (
         <span className="text-[10px] text-amber-600 dark:text-amber-400 block">
           No path set yet — "Open in Scratchpad" will start a new diagram; type its filename above to match what you save there, then click ↻ Refresh.

@@ -148,7 +148,7 @@ function GraphNode({ node, onUpdate, onStartEdge, onCompleteEdge, onDelete, onSt
             <span className="text-[10px] text-slate-400 font-mono">{port}</span>
             <button
               data-port={`output-${port}`}
-              onMouseDown={e => { e.stopPropagation(); onStartEdge({ nodeId: node.id, port }) }}
+              onClick={e => { e.stopPropagation(); onStartEdge({ nodeId: node.id, port }) }}
               className="w-3 h-3 rounded-full border-2 border-brand-400 dark:border-brand-500 bg-white dark:bg-slate-900 hover:bg-brand-200 transition-colors -mr-4 shrink-0 cursor-crosshair"
               title={`Output: ${port}`}
             />
