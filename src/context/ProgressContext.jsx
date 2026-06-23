@@ -120,6 +120,24 @@ export function ProgressProvider({ children }) {
     return progress[lessonId]?.quiz ?? null
   }, [progress])
 
+  // Seeds quiz.total the moment a lesson's quiz block mounts — before any
+  // question is answered. getLessonProgress uses entry.quiz's presence to
+  // decide "this lesson is graded by its quiz" vs "no quiz, fall back to
+  // checkpoints"; without this seed, an unattempted quiz looked identical
+  // to "no quiz at all" and a scroll-triggered reading checkpoint could
+  // mark the lesson complete before the quiz was ever touched (real bug).
+  // Local-only, no pushNow — losing this seed to a crash before any real
+  // answer is harmless, it's just bookkeeping.
+  const ensureQuizTotal = useCallback((lessonId, total) => {
+    setProgress((prev) => {
+      if (prev[lessonId]?.quiz) return prev // a real quiz record already exists — don't clobber it
+      return {
+        ...prev,
+        [lessonId]: { ...prev[lessonId], quiz: { correct: 0, attempted: 0, total, attemptedAt: 0 } },
+      }
+    })
+  }, [setProgress])
+
   const setQuizStates = useCallback((lessonId, states) => {
     setProgress((prev) => ({
       ...prev,
@@ -161,7 +179,7 @@ export function ProgressProvider({ children }) {
     <ProgressContext.Provider value={{
       progress, markCheckpoint, markVisited, setActiveTab, getLessonStatus, getLessonProgress,
       getActiveTab, setReadingProgress, getReadingProgress,
-      setQuizScore, getQuizScore, setQuizStates, getQuizStates
+      setQuizScore, getQuizScore, setQuizStates, getQuizStates, ensureQuizTotal
     }}>
       {children}
     </ProgressContext.Provider>

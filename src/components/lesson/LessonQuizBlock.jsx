@@ -200,7 +200,7 @@ function QuizQuestion({ q: rawQ, index, state, onChange }) {
 }
 
 export default function LessonQuizBlock({ lessonId, questions }) {
-  const { setQuizScore, markCheckpoint, setQuizStates, getQuizStates } = useProgress()
+  const { setQuizScore, markCheckpoint, setQuizStates, getQuizStates, ensureQuizTotal } = useProgress()
   const total = questions.length
 
   // Question states live inside oc-progress so they sync to Firebase automatically.
@@ -210,6 +210,15 @@ export default function LessonQuizBlock({ lessonId, questions }) {
     setQuestionStates(getQuizStates(lessonId))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonId])
+
+  // Seed quiz.total as soon as this block mounts — see ensureQuizTotal's
+  // comment in ProgressContext.jsx for why this matters (otherwise an
+  // unattempted quiz is indistinguishable from "no quiz" and a reading
+  // checkpoint can wrongly mark the lesson complete).
+  useEffect(() => {
+    ensureQuizTotal(lessonId, total)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lessonId, total])
 
   // Derive score directly from question state — never from a separate counter.
   const submitted = Object.entries(questionStates).filter(([, s]) => s.submitted)
@@ -228,12 +237,16 @@ export default function LessonQuizBlock({ lessonId, questions }) {
   }, [lessonId, correct, attempted, allAttempted, total, setQuizScore, markCheckpoint])
 
   const handleQuestionChange = useCallback((index, newState) => {
-    setQuestionStates(prev => {
-      const next = { ...prev, [index]: newState }
-      setQuizStates(lessonId, next)
-      return next
-    })
-  }, [lessonId, setQuizStates])
+    // Compute `next` directly instead of inside setQuestionStates' updater —
+    // React invokes that updater during this component's render phase, so
+    // calling setQuizStates (a different provider's setState) from in there
+    // triggered a real "update while rendering a different component"
+    // warning. Only called from the click handler below, so questionStates
+    // is never stale here.
+    const next = { ...questionStates, [index]: newState }
+    setQuestionStates(next)
+    setQuizStates(lessonId, next)
+  }, [questionStates, lessonId, setQuizStates])
 
   const scorePct = allAttempted ? correct / total : null
   const masteryLabel = scorePct === null ? null :
