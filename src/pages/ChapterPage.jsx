@@ -9,6 +9,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { getAllChapters, getCourseMeta } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
+import { buildProgressKey } from '../context/progressMigration.js'
 import { LessonProgressBadge } from '../components/ui/LessonProgressBadge.jsx'
 import { GLASS_META } from '../styles/courseColors.js'
 import { motion } from 'framer-motion'
@@ -86,7 +87,7 @@ export default function ChapterPage() {
           }}
         >
           {chapter.lessons.map((lesson, i) => {
-            const { percent, status, correct, total } = getLessonProgress(`${chapter.course}/${lesson.slug}`)
+            const { percent, status, correct, total } = getLessonProgress(buildProgressKey(chapter.course, lesson))
             
             return (
               <motion.div

@@ -17,6 +17,7 @@ import {
 } from 'firebase/auth'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
+import { mergeProgress, SYNC_MERGE_STRATEGIES } from './progressMigration.js'
 
 // ── Localhost guard ───────────────────────────────────────────────────────────
 // Never write to production Firestore from a dev machine.
@@ -38,6 +39,13 @@ const SYNC_KEYS = [
   'oc-pins',        // pinned lessons / tools
   'oc-theme',       // dark / light preference
   'oc-compass',     // goals, habits, notes, weekly reviews
+  // Previously local-only and wiped on every sign-out with no backup ever
+  // made — real user work/progress, not caches, so they belong here too.
+  'open-calc-pinned-videos',  // pinned video ids
+  'open-calc-video-progress', // per-video watch percent
+  'oc_formulas',              // saved formulas in Math OS
+  'cnc_tool_libraries_v1',    // CNC mill/lathe tool definitions
+  'rfl-completed-v2',         // robot-arm-lab mission completions
 ]
 
 // Timestamp we write to localStorage after every successful Firestore restore,
@@ -93,35 +101,6 @@ function restoreToLocalStorage(data) {
   }
 }
 
-// ── Progress merge ────────────────────────────────────────────────────────────
-// Course progress is accumulative — checkpoints are never un-done.
-// Union both versions so no work is ever lost, regardless of which device was newer.
-function mergeProgress(local, remote) {
-  if (!local && !remote) return null
-  if (!local) return remote
-  if (!remote) return local
-  const merged = { ...remote }
-  for (const [id, localLesson] of Object.entries(local)) {
-    if (!merged[id]) {
-      merged[id] = localLesson
-      continue
-    }
-    const r = merged[id]
-    merged[id] = {
-      ...r,
-      completedCheckpoints: [
-        ...new Set([...(r.completedCheckpoints ?? []), ...(localLesson.completedCheckpoints ?? [])]),
-      ],
-      readingProgress: Math.max(r.readingProgress ?? 0, localLesson.readingProgress ?? 0),
-      // Keep whichever quiz attempt is more recent
-      quiz: ((localLesson.quiz?.attemptedAt ?? 0) > (r.quiz?.attemptedAt ?? 0))
-        ? localLesson.quiz
-        : r.quiz,
-    }
-  }
-  return merged
-}
-
 // ── Firestore operations ──────────────────────────────────────────────────────
 async function pushToFirestore(uid) {
   if (IS_LOCAL_ENV) return // never write dev data to production
@@ -146,27 +125,51 @@ async function syncOnSignIn(uid) {
   if (snap.exists()) {
     const remote = snap.data()
     const remoteTs = remote._syncedAt ?? 0
+    const toPushUp = {} // any key whose merge result differs from what Firestore already had
 
-    // Always merge progress — accumulative data, take the union
+    // oc-progress — lesson-keyed union semantics (checkpoints unioned,
+    // reading % takes the max, latest quiz attempt wins).
     const localProgress = safeJSON(localStorage.getItem('oc-progress'))
-    const merged = mergeProgress(localProgress, remote['oc-progress'] ?? null)
-
-    if (remoteTs >= localTs) {
-      // Firestore is the authority for most keys
-      restoreToLocalStorage(remote)
+    const mergedProgress = mergeProgress(localProgress, remote['oc-progress'] ?? null)
+    if (mergedProgress) {
+      localStorage.setItem('oc-progress', JSON.stringify(mergedProgress))
+      if (JSON.stringify(mergedProgress) !== JSON.stringify(remote['oc-progress'] ?? null)) {
+        toPushUp['oc-progress'] = mergedProgress
+      }
     }
 
-    // Apply merged progress (may be better than what Firestore had)
-    if (merged) {
-      localStorage.setItem('oc-progress', JSON.stringify(merged))
+    // Every other SYNC_KEY with a known merge strategy (see
+    // progressMigration.js's SYNC_MERGE_STRATEGIES) — merging is always
+    // safe regardless of which side is "newer," unlike an overwrite, so
+    // these don't need the remoteTs/localTs comparison at all.
+    for (const key of SYNC_KEYS) {
+      if (key === 'oc-progress') continue
+      const strategy = SYNC_MERGE_STRATEGIES[key]
+      if (!strategy) continue
+      const localVal = safeJSON(localStorage.getItem(key))
+      const remoteVal = remote[key] ?? null
+      if (localVal == null && remoteVal == null) continue
+      const merged = strategy(localVal, remoteVal)
+      localStorage.setItem(key, JSON.stringify(merged))
+      if (JSON.stringify(merged) !== JSON.stringify(remoteVal)) {
+        toPushUp[key] = merged
+      }
+    }
+
+    // Keys with no merge strategy (just oc-theme today) — a simple
+    // preference with nothing to lose either way, so the original
+    // last-sync-wins behavior is fine as-is.
+    const plainKeys = SYNC_KEYS.filter(k => k !== 'oc-progress' && !SYNC_MERGE_STRATEGIES[k])
+    if (remoteTs >= localTs) {
+      const remotePlain = {}
+      for (const key of plainKeys) if (remote[key] !== undefined) remotePlain[key] = remote[key]
+      restoreToLocalStorage(remotePlain)
     }
 
     localStorage.setItem(TS_KEY, String(remoteTs))
 
-    // If merged progress is richer than what Firestore had, push the improvement up
-    const remoteProgressStr = JSON.stringify(remote['oc-progress'] ?? null)
-    if (merged && JSON.stringify(merged) !== remoteProgressStr) {
-      await setDoc(ref, { 'oc-progress': merged, _syncedAt: Date.now() }, { merge: true })
+    if (Object.keys(toPushUp).length > 0) {
+      await setDoc(ref, { ...toPushUp, _syncedAt: Date.now() }, { merge: true })
     }
 
   } else {

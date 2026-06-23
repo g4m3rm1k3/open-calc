@@ -30,9 +30,8 @@ export default function LessonPage() {
   const slug = lessonSlug + (rest ? `/${rest}` : "");
   const key = `${chapterId}/${slug}`;
   // chapterId is "courseId-N" (e.g. "ai-engineering-1"); strip the chapter number
-  // to get the courseId so progress keys match what CoursePage/ChapterPage use.
+  // to get the courseId.
   const courseId = chapterId?.replace(/-\d+$/, '') ?? ''
-  const progressKey = courseId ? `${courseId}/${slug}` : ''
   const rawLesson = LESSON_MAP[key];
 
   // For lessons not in the old LESSON_MAP, load dynamically from courseLoader
@@ -61,6 +60,16 @@ export default function LessonPage() {
     [lessonOverride],
   );
 
+  // Progress is keyed by the lesson's own stable `id` field, not by the URL
+  // (route segments mirror file/folder names under src/courses/, and a
+  // rename there used to silently orphan every existing user's progress —
+  // confirmed real incident). Namespaced by course because lesson ids are
+  // NOT globally unique (confirmed real collisions across different
+  // courses, e.g. "ch3-001" exists in both calculus and precalculus).
+  // Empty until `lesson` resolves — every call site below already guards
+  // on `!progressKey`, so this brief gap during initial load is harmless.
+  const progressKey = courseId && lesson?.id ? `${courseId}::${lesson.id}` : ''
+
   // Broadcast the active lesson to TutorPanel (mounted once in AppShell)
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('oc-lesson-context', { detail: lesson ?? null }))
@@ -69,6 +78,7 @@ export default function LessonPage() {
   const navigate = useNavigate();
   const {
     markCheckpoint,
+    markVisited,
     getActiveTab,
     getLessonStatus,
     setReadingProgress,
@@ -115,6 +125,13 @@ export default function LessonPage() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [progressKey, setReadingProgress, lesson]);
+
+  // Stamp "last visited" once the lesson (and its stable progressKey) has
+  // resolved — powers the profile page's "continue where you left off".
+  useEffect(() => {
+    if (!progressKey) return;
+    markVisited(progressKey);
+  }, [progressKey, markVisited]);
 
   if (!lesson && loadingCourse) {
     return (

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 const GOOGLE_ICON = (
@@ -116,6 +117,13 @@ function UserMenu({ user, syncing, signOut, onClose }) {
         <div className="text-[11px] text-slate-400 px-1 mb-3 leading-relaxed">
           {syncing ? 'Syncing…' : 'Data synced across devices'}
         </div>
+        <Link
+          to="/profile"
+          onClick={onClose}
+          className="block w-full text-left text-sm px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-colors"
+        >
+          View profile
+        </Link>
         <button
           onClick={() => { onClose(); signOut() }}
           className="w-full text-left text-sm px-3 py-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium transition-colors"
@@ -132,6 +140,7 @@ export default function AuthButton() {
   const { user, syncing, signOut } = useAuth()
   const [showSignIn, setShowSignIn] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [failedPhotoURL, setFailedPhotoURL] = useState(null)
 
   if (user === undefined) return null
 
@@ -156,8 +165,13 @@ export default function AuthButton() {
           <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center animate-pulse">
             <span className="text-[10px] text-slate-400">…</span>
           </div>
-        ) : user.photoURL ? (
-          <img src={user.photoURL} alt="" className="w-7 h-7 rounded-full ring-2 ring-brand-500/60" />
+        ) : user.photoURL && user.photoURL !== failedPhotoURL ? (
+          <img
+            src={user.photoURL}
+            alt=""
+            className="w-7 h-7 rounded-full ring-2 ring-brand-500/60"
+            onError={() => setFailedPhotoURL(user.photoURL)}
+          />
         ) : (
           <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
             {(user.displayName || user.email || '?')[0].toUpperCase()}

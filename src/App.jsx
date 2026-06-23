@@ -19,6 +19,7 @@ import TourAutoStart from "./components/ui/TourAutoStart.jsx";
 const DesktopPage = lazy(() => import("./pages/DesktopPage.jsx"));
 const ChapterPage = lazy(() => import("./pages/ChapterPage.jsx"));
 const LessonPage = lazy(() => import("./pages/LessonPage.jsx"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage.jsx"));
 const SearchPage = lazy(() => import("./pages/SearchPage.jsx"));
 const AboutPage = lazy(() => import("./pages/AboutPage.jsx"));
 const ReferencePage = lazy(() => import("./pages/ReferencePage.jsx"));
@@ -122,6 +123,7 @@ export default function App() {
                               element={<LessonPage />}
                             />
                             <Route path="search" element={<SearchPage />} />
+                            <Route path="profile" element={<ProfilePage />} />
                             <Route path="about" element={<AboutPage />} />
                             <Route
                               path="reference"

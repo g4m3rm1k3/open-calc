@@ -3,6 +3,12 @@
 
 import { GLASS_META } from '../styles/courseColors.js'
 import LESSON_TITLES from '../data/lessonTitles.json'
+// "<courseId>/<slug>" -> the lesson's own hardcoded `id` field, pre-built by
+// scripts/build-lesson-ids.mjs (runs automatically before dev/build). Used
+// to construct stable, rename-proof progress keys instead of the old
+// route-derived ones (which broke when lesson files got renamed — confirmed
+// real incident).
+import LESSON_IDS from '../data/lessonIds.json'
 
 let ALL_MODULES = {}
 try { ALL_MODULES = import.meta.glob('./**/*.js') } catch {}   // lazy — paths only at init
@@ -56,6 +62,7 @@ for (const filePath of Object.keys(ALL_MODULES)) {
   tree[courseId][chapterNum].lessons.push({
     title: LESSON_TITLES[`${courseId}-${chapterNum}/${lessonSlug}`] ?? slugToTitle(lessonSlug),
     slug: lessonSlug,
+    id: LESSON_IDS[`${courseId}/${lessonSlug}`] ?? null,
     _order: lessonOrder,
     _path: filePath,
   })
@@ -75,6 +82,12 @@ export function getChapters(courseId) {
 
 export function getAllChapters() {
   return Object.keys(tree).flatMap(getChapters)
+}
+
+// Plain "<courseId>/<slug>" -> id map, pre-built at dev/build time (see the
+// LESSON_IDS import above) — synchronous, no lazy module loading needed.
+export function getLessonIdLookup() {
+  return LESSON_IDS
 }
 
 const courseIds = Object.keys(META_MODULES)

@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { getCourseMeta, getChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
+import { buildProgressKey } from '../context/progressMigration.js'
 import { GLASS_META } from '../styles/courseColors.js'
 import { motion } from 'framer-motion'
 import { CheckCircle2, Play, BookOpen } from 'lucide-react'
@@ -35,7 +36,7 @@ export default function CoursePage() {
   
   const totalLessons = chapters.reduce((s, ch) => s + ch.lessons.length, 0)
   const completedLessons = chapters.reduce((s, ch) =>
-    s + ch.lessons.filter(l => getLessonProgress(`${courseKey}/${l.slug}`).status === 'complete').length
+    s + ch.lessons.filter(l => getLessonProgress(buildProgressKey(courseKey, l)).status === 'complete').length
   , 0)
 
   return (
@@ -103,7 +104,7 @@ export default function CoursePage() {
         {chapters.map((chapter) => {
           const chLessons = chapter.lessons.length
           const chCompleted = chapter.lessons.filter(l =>
-            getLessonProgress(`${courseKey}/${l.slug}`).status === 'complete'
+            getLessonProgress(buildProgressKey(courseKey, l)).status === 'complete'
           ).length
           const pct = chLessons > 0 ? chCompleted / chLessons : 0
 

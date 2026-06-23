@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { getAllCourses, getChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
+import { buildProgressKey } from '../context/progressMigration.js'
 import UniverseBackground from '../components/backgrounds/UniverseBackground.jsx'
 import AppCard from '../components/ui/AppCard.jsx'
 import { LABS } from '../labs/registry.js'
@@ -78,7 +79,7 @@ export default function HomePage() {
   const totalLessons     = COURSE_ENTRIES.reduce((s, { chapters }) => s + chapters.reduce((n, ch) => n + ch.lessons.length, 0), 0)
   const completedLessons = COURSE_ENTRIES.reduce((s, { course, chapters }) =>
     s + chapters.reduce((n, ch) =>
-      n + ch.lessons.filter(l => getLessonStatus(`${course.key}/${l.slug}`, 1) === 'complete').length, 0), 0)
+      n + ch.lessons.filter(l => getLessonStatus(buildProgressKey(course.key, l), 1) === 'complete').length, 0), 0)
 
   return (
     <div className="relative min-h-screen">

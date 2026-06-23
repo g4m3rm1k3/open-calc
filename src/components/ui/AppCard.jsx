@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { GLASS_META } from '../../styles/courseColors.js'
+import { buildProgressKey } from '../../context/progressMigration.js'
 
 const GRID_OVL = {
   backgroundImage: [
@@ -80,7 +81,7 @@ function GameBody({ item }) {
 function CourseCard({ item, chapters, getLessonStatus, meta, ref }) {
   const total = chapters.reduce((s, ch) => s + ch.lessons.length, 0)
   const done  = chapters.reduce((s, ch) =>
-    s + ch.lessons.filter(l => getLessonStatus(`${item.key}/${l.slug}`, 1) === 'complete').length, 0)
+    s + ch.lessons.filter(l => getLessonStatus(buildProgressKey(item.key, l), 1) === 'complete').length, 0)
   const pct = total > 0 ? done / total : 0
   return (
     <div ref={ref} className="group flex flex-col overflow-hidden rounded-2xl transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.3),0_1px_4px_rgba(0,0,0,0.2)] hover:-translate-y-2">

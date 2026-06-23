@@ -5,15 +5,42 @@ export const meta = {
   conceptDetail: 'Context lets any component in the tree read or update progress without passing props through every layer. No drilling required — just call useProgress().',
 }
 
-import { createContext, useCallback } from 'react'
+import { createContext, useCallback, useEffect, useRef } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage.js'
 import { useAuth } from './AuthContext.jsx'
+import { getLessonIdLookup } from '../courses/courseLoader.js'
+import { migrateOldProgressKeys } from './progressMigration.js'
+
+const MIGRATION_FLAG = '_oc_progress_migrated_v1'
 
 export const ProgressContext = createContext(null)
 
 export function ProgressProvider({ children }) {
   const [progress, setProgress] = useLocalStorage('oc-progress', {})
   const { pushNow } = useAuth() ?? {}
+
+  // One-time migration off the old route-derived progress key shape
+  // ("<courseId>/<slug>", which breaks the moment a lesson file gets
+  // renamed — confirmed real incident) onto a stable, content-derived one
+  // ("<courseId>::<lesson.id>"). getLessonIdLookup() is a plain, pre-built
+  // synchronous map (see courseLoader.js), so this runs once on mount with
+  // no loading gap.
+  const ranMigration = useRef(false)
+  useEffect(() => {
+    if (ranMigration.current) return
+    ranMigration.current = true
+    if (localStorage.getItem(MIGRATION_FLAG)) return
+    const { migrated, changed } = migrateOldProgressKeys(progress, getLessonIdLookup())
+    if (changed) {
+      setProgress(migrated)
+      // Persist the recovered progress to Firestore right away — don't wait
+      // for the next checkpoint/quiz/5-minute interval, since this IS the
+      // recovery of previously-orphaned data.
+      pushNow?.()
+    }
+    localStorage.setItem(MIGRATION_FLAG, '1')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const markCheckpoint = useCallback((lessonId, checkpoint) => {
     setProgress((prev) => {
@@ -30,6 +57,19 @@ export function ProgressProvider({ children }) {
     // Immediately persist to Firestore so progress is never lost on a crash
     pushNow?.()
   }, [setProgress, pushNow])
+
+  // Stamps when a lesson was last opened — powers "continue where you left
+  // off" on the profile page. Not pushed immediately (unlike checkpoints/
+  // quizzes): a page visit isn't a meaningful completion event worth a
+  // dedicated Firestore write, it'll ride along on the next one of those or
+  // the periodic sync.
+  const markVisited = useCallback((lessonId) => {
+    if (!lessonId) return
+    setProgress((prev) => ({
+      ...prev,
+      [lessonId]: { ...prev[lessonId], lastVisitedAt: Date.now() },
+    }))
+  }, [setProgress])
 
   const setActiveTab = useCallback((lessonId, tab) => {
     setProgress((prev) => ({
@@ -119,7 +159,7 @@ export function ProgressProvider({ children }) {
 
   return (
     <ProgressContext.Provider value={{
-      progress, markCheckpoint, setActiveTab, getLessonStatus, getLessonProgress,
+      progress, markCheckpoint, markVisited, setActiveTab, getLessonStatus, getLessonProgress,
       getActiveTab, setReadingProgress, getReadingProgress,
       setQuizScore, getQuizScore, setQuizStates, getQuizStates
     }}>
