@@ -13,6 +13,8 @@ const port = Number(readOption('--port') ?? process.env.OPEN_CALC_BACKEND_PORT ?
 const runtimeRoot = path.resolve(process.env.OPEN_CALC_RUNTIME_ROOT ?? process.cwd())
 const distDir = path.resolve(process.env.OPEN_CALC_DIST_DIR ?? path.join(runtimeRoot, 'dist'))
 const dataDir = resolveDataDir()
+const srcDir  = path.join(runtimeRoot, 'src')
+const pubDir  = path.join(runtimeRoot, 'public')
 const overridesDir = path.join(dataDir, 'overrides', 'lessons')
 const docsDir = path.join(dataDir, 'docs')
 const userDocsDir = path.join(docsDir, 'user')
@@ -99,6 +101,9 @@ const server = createServer(async (request, response) => {
       const tools = await checkTools()
       return json(response, 200, tools)
     }
+
+    if (url.pathname.startsWith('/api/dev-fs')) return handleDevFs(request, response, url)
+    if (request.method === 'POST' && url.pathname === '/api/github/pr') return handleGitHubPR(request, response)
 
     if (request.method === 'GET') {
       const staticServed = await tryServeStatic(url.pathname, response)
@@ -263,6 +268,144 @@ server.listen(port, host, () => {
   console.log(`[open-calc backend] data dir: ${dataDir}`)
   console.log(`[open-calc backend] lesson overrides: ${overridesDir}`)
 })
+
+// ── Source file editing ───────────────────────────────────────────────────────
+
+async function handleDevFs(request, response, url) {
+  applyCors(response)
+  const action = url.pathname.replace(/^\/api\/dev-fs\/?/, '')
+
+  // ping — lets the frontend know the editing API is reachable
+  if (action === 'ping') {
+    return json(response, 200, { ok: true, runtimeRoot })
+  }
+
+  // list — enumerate files in a directory
+  if (action === 'list' && request.method === 'GET') {
+    const dir  = url.searchParams.get('dir') || 'src'
+    const exts = (url.searchParams.get('ext') || 'svg').split(',').map(e => e.trim().replace(/^\./, ''))
+    const absDir = path.resolve(runtimeRoot, dir)
+    if (!absDir.startsWith(runtimeRoot)) return json(response, 403, { error: 'Forbidden' })
+    const entries = await fs.readdir(absDir).catch(() => [])
+    const files = entries
+      .filter(f => exts.some(e => f.endsWith(`.${e}`)))
+      .map(f => ({ name: f, path: `${dir}/${f}` }))
+    return json(response, 200, files)
+  }
+
+  // read — return raw file content
+  if (action === 'read' && request.method === 'GET') {
+    const filePath = url.searchParams.get('path') || ''
+    const absPath  = path.resolve(runtimeRoot, filePath)
+    if (!absPath.startsWith(runtimeRoot)) return json(response, 403, { error: 'Forbidden' })
+    try {
+      const content = await fs.readFile(absPath, 'utf-8')
+      response.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-cache' })
+      response.end(content)
+    } catch (e) {
+      json(response, 404, { error: e.message })
+    }
+    return
+  }
+
+  // write — save file; only allows writes inside src/ or public/
+  if (action === 'write' && request.method === 'POST') {
+    const body = await readJsonBody(request)
+    const { filePath, content } = body || {}
+    if (!filePath || content === undefined) return json(response, 400, { error: 'Missing filePath or content' })
+    const absPath = path.resolve(runtimeRoot, filePath)
+    const inSrc = absPath.startsWith(srcDir + path.sep) || absPath.startsWith(pubDir + path.sep)
+    if (!inSrc) return json(response, 403, { error: 'Writes are only allowed inside src/ or public/' })
+    await fs.mkdir(path.dirname(absPath), { recursive: true })
+    await fs.writeFile(absPath, content, 'utf-8')
+    return json(response, 200, { ok: true })
+  }
+
+  return json(response, 404, { error: `Unknown dev-fs action: ${action}` })
+}
+
+// ── GitHub PR creation ────────────────────────────────────────────────────────
+
+async function handleGitHubPR(request, response) {
+  const body = await readJsonBody(request)
+  const { title, description, branchName, files, githubToken: bodyToken } = body || {}
+
+  if (!title || !branchName || !Array.isArray(files) || files.length === 0) {
+    return json(response, 400, { error: 'Required: title, branchName, files[]' })
+  }
+
+  // Body token overrides config so users can supply it from the PR modal
+  const token = bodyToken || config.githubToken
+  const owner = config.githubOwner
+  const repo  = config.githubRepo
+  const base  = config.githubBaseBranch
+
+  if (!token || !owner || !repo) {
+    return json(response, 503, {
+      error: 'GitHub not configured',
+      hint: 'Set githubToken, githubOwner, githubRepo in config.json or via GITHUB_TOKEN / GITHUB_OWNER / GITHUB_REPO env vars',
+    })
+  }
+
+  try {
+    const prUrl = await createGitHubPR({ token, owner, repo, base }, { title, body: description || '', branch: branchName, files })
+    return json(response, 200, { ok: true, prUrl })
+  } catch (e) {
+    return json(response, 500, { error: e.message })
+  }
+}
+
+async function createGitHubPR({ token, owner, repo, base }, { title, body, branch, files }) {
+  const apiBase = `https://api.github.com/repos/${owner}/${repo}`
+  const headers = {
+    Authorization:        `Bearer ${token}`,
+    'Content-Type':       'application/json',
+    Accept:               'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+  }
+
+  // 1. Get base branch SHA
+  const refResp = await fetch(`${apiBase}/git/ref/heads/${base}`, { headers })
+  if (!refResp.ok) throw new Error(`Could not fetch base branch "${base}": ${await refResp.text()}`)
+  const { object: { sha: baseSha } } = await refResp.json()
+
+  // 2. Create new branch
+  const branchResp = await fetch(`${apiBase}/git/refs`, {
+    method: 'POST', headers,
+    body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: baseSha }),
+  })
+  if (!branchResp.ok) throw new Error(`Could not create branch "${branch}": ${await branchResp.text()}`)
+
+  // 3. Commit each file to the new branch
+  for (const file of files) {
+    const ghPath = file.path.replace(/\\/g, '/').replace(/^\//, '')
+    // Get existing file SHA (needed for updates, not for new files)
+    let existingSha
+    const existing = await fetch(`${apiBase}/contents/${ghPath}?ref=${branch}`, { headers })
+    if (existing.ok) existingSha = (await existing.json()).sha
+
+    const content = Buffer.from(file.content, 'utf-8').toString('base64')
+    const putResp = await fetch(`${apiBase}/contents/${ghPath}`, {
+      method: 'PUT', headers,
+      body: JSON.stringify({
+        message: `Update ${ghPath}`,
+        content,
+        branch,
+        ...(existingSha ? { sha: existingSha } : {}),
+      }),
+    })
+    if (!putResp.ok) throw new Error(`Could not write ${ghPath}: ${await putResp.text()}`)
+  }
+
+  // 4. Open the PR
+  const prResp = await fetch(`${apiBase}/pulls`, {
+    method: 'POST', headers,
+    body: JSON.stringify({ title, body, head: branch, base }),
+  })
+  if (!prResp.ok) throw new Error(`Could not create PR: ${await prResp.text()}`)
+  const pr = await prResp.json()
+  return pr.html_url
+}
 
 async function handleLessonOverride(request, response, url) {
   const lessonKey = url.searchParams.get('key')
@@ -519,6 +662,10 @@ async function loadConfig() {
   const defaults = {
     serveFrontend: true,
     updateManifestUrl: '',
+    githubToken:      process.env.GITHUB_TOKEN       || '',
+    githubOwner:      process.env.GITHUB_OWNER       || 'g4m3rm1k3',
+    githubRepo:       process.env.GITHUB_REPO        || 'upskillos',
+    githubBaseBranch: process.env.GITHUB_BASE_BRANCH || 'main',
   }
   const existing = await readJsonIfExists(configPath)
   if (existing) {

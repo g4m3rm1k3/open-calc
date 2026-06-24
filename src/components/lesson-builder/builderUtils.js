@@ -8,6 +8,8 @@ export const HANDLED_SECTION_KEYS = new Set([
   'python', 'PythonNotebook', 'notebooks', 'pythonLab',
   // ScienceNotebook cell array
   'cells',
+  // Guided walkthroughs
+  'walkthroughs',
 ])
 export const HANDLED_META_KEYS = new Set(['id', 'slug', 'chapter', 'order', 'title', 'subtitle', 'tags', 'coreConcept', 'prerequisites', 'timeToComplete', 'aliases', 'nextLesson', 'mentalModel'])
 
@@ -21,6 +23,7 @@ export const PALETTE_BLOCKS = [
   { type: 'quiz',         label: 'Quiz',         icon: '🧪', desc: 'Multiple-choice quiz questions' },
   { type: 'python',       label: 'Python',       icon: '🐍', desc: 'Python notebook cells with runnable code' },
   { type: 'cells',        label: 'Cells',        icon: '⚗️', desc: 'ScienceNotebook cells (markdown, js, challenge, coding, walkthrough)' },
+  { type: 'walkthroughs', label: 'Walkthroughs', icon: '🚶', desc: 'Step-by-step guided problem walkthroughs with LaTeX math' },
 ]
 
 // Convert lesson.*.visualizations array → builder children array
@@ -145,6 +148,8 @@ export function defaultSection(type) {
       return { _id, type, cells: [{ id: 'py1', cellTitle: '', prose: '', code: '' }] }
     case 'cells':
       return { _id, type, cells: [{ type: 'markdown', instruction: '' }] }
+    case 'walkthroughs':
+      return { _id, type: 'walkthroughs', items: [] }
     default:
       return { _id, type, prose: [] }
   }
@@ -158,8 +163,20 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
   // intuition then rigor, matching the order they appear in source.
   const imageImportQueue = extractImageImports(sourceText)
 
-  // ScienceNotebook cells — map before old-format sections so they appear first
-  if (lesson.cells?.length) add('cells', { cells: lesson.cells })
+  // ScienceNotebook cells — map before old-format sections so they appear first.
+  // For cells with { type: 'image', src: <identifier> }, the dynamic import resolves
+  // the identifier to a URL string — recover the original import path from sourceText
+  // so the serializer can round-trip the correct `import X from '...?url'` line.
+  if (lesson.cells?.length) {
+    const cells = lesson.cells.map(cell => {
+      if (cell.type === 'image') {
+        const r = imageImportQueue.shift()
+        if (r?.importPath) return { ...cell, _importPath: r.importPath }
+      }
+      return cell
+    })
+    add('cells', { cells })
+  }
 
   // Intuition / Rigor: blocks[] (new prose+image pattern) takes priority
   // over the legacy prose[]/callouts[] shape when present.
@@ -180,6 +197,8 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
   if (lesson.quiz?.length)        add('quiz',        { items: lesson.quiz })
 
   // Python notebooks — four possible field shapes across the codebase
+  if (lesson.walkthroughs?.length) add('walkthroughs', { items: lesson.walkthroughs })
+
   if (lesson.python?.cells?.length)
     add('python', { cells: lesson.python.cells })
   else if (lesson.PythonNotebook?.cells?.length)
@@ -188,6 +207,11 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
     add('python', { cells: lesson.notebooks.python.cells, _origKey: 'notebooks' })
   else if (lesson.pythonLab?.cells?.length)
     add('python', { cells: lesson.pythonLab.cells, _origKey: 'pythonLab' })
+
+  // Detect old-format lessons: they have subject/sequential but no id/slug/chapter.
+  // Store the const variable name so the serializer can round-trip the exact same wrapper.
+  const _oldFormat = !lesson.id && !lesson.slug && !!(lesson.subject || lesson.sequential != null)
+  const _varName = sourceText.match(/\bconst\s+([A-Z_][A-Z0-9_]*)\s*=\s*\{/)?.[1] ?? null
 
   return {
     meta: {
@@ -224,6 +248,8 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
     _raw: lesson,
     _chapterId: chapterId ?? '',
     _lessonSlug: lessonSlug ?? '',
+    _oldFormat,
+    _varName,
   }
 }
 

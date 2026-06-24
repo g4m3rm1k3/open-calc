@@ -133,7 +133,13 @@ export async function loadLesson(chapterId, slug) {
   const entry = tree[courseId]?.[chNum]?.lessons.find(l => l.slug === slug)
   if (!entry) return null
   const mod = await ALL_MODULES[entry._path]?.()
-  return mod?.default ?? mod?.lesson ?? null
+  if (!mod) return null
+  if (mod.default) return mod.default
+  if (mod.lesson) return mod.lesson
+  // Old-format lessons use a named export (e.g. `export { LESSON_GEO_1_1 }`).
+  // Pick the first non-default own key that resolves to a plain object.
+  const named = Object.entries(mod).find(([k, v]) => k !== 'default' && v && typeof v === 'object' && !Array.isArray(v))
+  return named?.[1] ?? null
 }
 
 // Raw .js source text for a lesson — see ALL_MODULES_RAW comment above.

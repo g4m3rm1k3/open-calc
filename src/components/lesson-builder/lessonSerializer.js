@@ -59,26 +59,43 @@ function fmtValue(v, depth = 1, importsMap = new Map()) {
 // object (e.g. running it through checkLessonLatex before submitting a
 // contribution) don't have to re-parse the generated source string.
 export function buildLessonObject(state) {
-  const { meta, hook, mentalModel, sections, _raw } = state
+  const { meta, hook, mentalModel, sections, _raw, _oldFormat } = state
 
   // Start from raw if available, otherwise from an empty base
   const base = _raw ? { ..._raw } : {}
 
-  // Overlay meta fields
-  base.id             = meta.id
-  base.slug           = meta.slug
-  base.chapter        = meta.chapter
-  base.order          = Number(meta.order) || 1
-  base.title          = meta.title
-  base.subtitle       = meta.subtitle
-  base.tags           = meta.tags ?? []
-  if (meta.aliases)    base.aliases = meta.aliases
-  else if (_raw?.aliases !== undefined) delete base.aliases  // removed
-  base.coreConcept    = meta.coreConcept
-  base.prerequisites  = meta.prerequisites ?? []
-  base.timeToComplete = Number(meta.timeToComplete) || 15
-  if (meta.nextLesson) base.nextLesson = meta.nextLesson
-  else if (_raw?.nextLesson !== undefined) delete base.nextLesson
+  if (_oldFormat) {
+    // Old-format lesson (const NAME = { subject, sequential, cells }).
+    // Only update the fields the user can actually edit in the builder.
+    // Everything else stays exactly as it was in _raw — no new-format
+    // fields (id, slug, chapter, tags, hook, etc.) get injected.
+    base.title = meta.title
+    if (meta.subtitle) base.subtitle = meta.subtitle
+  } else {
+    // New-format lesson: overlay all meta fields
+    base.id             = meta.id
+    base.slug           = meta.slug
+    base.chapter        = meta.chapter
+    base.order          = Number(meta.order) || 1
+    base.title          = meta.title
+    base.subtitle       = meta.subtitle
+    base.tags           = meta.tags ?? []
+    if (meta.aliases)    base.aliases = meta.aliases
+    else if (_raw?.aliases !== undefined) delete base.aliases
+    base.coreConcept    = meta.coreConcept
+    base.prerequisites  = meta.prerequisites ?? []
+    base.timeToComplete = Number(meta.timeToComplete) || 15
+    if (meta.nextLesson) base.nextLesson = meta.nextLesson
+    else if (_raw?.nextLesson !== undefined) delete base.nextLesson
+  }
+
+  // Old-format lessons don't have hook/mentalModel — skip them entirely
+  if (_oldFormat) {
+    delete base._raw
+    delete base._chapterId
+    delete base._lessonSlug
+    return base
+  }
 
   // Overlay hook — some lessons have hook as a plain string instead of the
   // {question, realWorldContext, previewVisualizationId} shape (see
@@ -169,8 +186,19 @@ export function buildLessonObject(state) {
       base.checkpoints = sec.items ?? []
     } else if (sec.type === 'quiz') {
       base.quiz = sec.items ?? []
+    } else if (sec.type === 'walkthroughs') {
+      base.walkthroughs = sec.items ?? []
     } else if (sec.type === 'cells') {
-      base.cells = sec.cells ?? []
+      // Image cells store their import path separately (_importPath) so the
+      // serializer can output the correct `import X from '...?url'` identifier
+      // rather than the runtime-resolved URL string the dynamic import produced.
+      base.cells = (sec.cells ?? []).map(cell => {
+        if (cell.type === 'image' && cell._importPath) {
+          const { _importPath, src: _resolvedSrc, ...rest } = cell
+          return { ...rest, src: { __importRef: true, path: _importPath } }
+        }
+        return cell
+      })
     } else if (sec.type === 'python') {
       const origKey = sec._origKey ?? 'python'
       if (origKey === 'notebooks') {
@@ -193,6 +221,7 @@ export function buildLessonObject(state) {
 }
 
 export function serializeLesson(state) {
+  const { _oldFormat, _varName } = state
   const base = buildLessonObject(state)
   const importsMap = new Map()
   collectImports(base, importsMap)
@@ -200,6 +229,10 @@ export function serializeLesson(state) {
     .map(([path, name]) => `import ${name} from '${path}?url'`)
   const lines = Object.entries(base).map(([k, v]) => `  ${k}: ${fmtValue(v, 1, importsMap)}`)
   const importBlock = importLines.length ? importLines.join('\n') + '\n\n' : ''
+
+  if (_oldFormat && _varName) {
+    return `${importBlock}const ${_varName} = {\n${lines.join(',\n\n')},\n};\n\nexport { ${_varName} };\n`
+  }
   return `${importBlock}export default {\n${lines.join(',\n\n')},\n}\n`
 }
 

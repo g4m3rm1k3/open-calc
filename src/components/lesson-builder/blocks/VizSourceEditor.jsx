@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Editor from '@monaco-editor/react'
+import { useContributorMode } from '../../../hooks/useContributorMode.js'
+import CreatePRModal from '../../contributor/CreatePRModal.jsx'
 
 const API = '/api/dev-fs'
 const MOPTS = { fontSize: 13, minimap: { enabled: false }, wordWrap: 'on', scrollBeyondLastLine: false, automaticLayout: true }
@@ -132,6 +134,8 @@ ${processed}
 }
 
 export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose }) {
+  const { available: canEdit } = useContributorMode()
+  const [showPR, setShowPR] = useState(false)
   const [loading, setLoading] = useState(true)
   const [retryCount, setRetryCount] = useState(0)
   const [filePath, setFilePath] = useState(null)
@@ -219,6 +223,13 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
   }
 
   return (
+    <>
+    {showPR && filePath && (
+      <CreatePRModal
+        files={[{ path: filePath, content: source }]}
+        onClose={() => setShowPR(false)}
+      />
+    )}
     <div className="fixed inset-0 z-[600] flex flex-col" style={{ background: '#0d1117' }}>
       <div className="flex items-center gap-3 px-4 py-2.5 shrink-0 border-b" style={{ background: '#161b22', borderColor: '#30363d' }}>
         <button onClick={onClose} className="text-sm px-2 py-1 rounded hover:bg-white/10 transition-colors" style={{ color: '#8b949e' }}>← Close</button>
@@ -226,10 +237,19 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
         {filePath && <span className="text-xs font-mono" style={{ color: '#8b949e' }}>{filePath}</span>}
         <div className="ml-auto flex items-center gap-2">
           {saveMsg && <span className="text-xs" style={{ color: /error/i.test(saveMsg) ? '#f87171' : '#4ade80' }}>{saveMsg}</span>}
-          {exists && (
-            <button onClick={handleSave} className="px-4 py-1.5 text-sm font-bold rounded-lg" style={{ background: '#238636', color: '#fff' }}>
-              Save
-            </button>
+          {exists && canEdit && (
+            <>
+              <button onClick={handleSave} className="px-4 py-1.5 text-sm font-bold rounded-lg" style={{ background: '#238636', color: '#fff' }}>
+                Save
+              </button>
+              <button
+                onClick={() => setShowPR(true)}
+                className="px-3 py-1.5 text-sm font-bold rounded-lg"
+                style={{ background: '#1f6feb', color: '#fff' }}
+              >
+                ⬆ Create PR
+              </button>
+            </>
           )}
         </div>
       </div>
@@ -287,5 +307,6 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
         </div>
       )}
     </div>
+    </>
   )
 }

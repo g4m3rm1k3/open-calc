@@ -10,6 +10,7 @@ import CheckpointsBlock from './blocks/CheckpointsBlock.jsx'
 import QuizBlock from './blocks/QuizBlock.jsx'
 import PythonBlock from './blocks/PythonBlock.jsx'
 import CellsBlock from './blocks/CellsBlock.jsx'
+import WalkthroughsBlock from './blocks/WalkthroughsBlock.jsx'
 import BlockShell from './BlockShell.jsx'
 import { HANDLED_SECTION_KEYS, HANDLED_META_KEYS } from './builderUtils.js'
 
@@ -88,6 +89,7 @@ const SECTION_LABELS = {
   checkpoints: 'Checkpoints',
   quiz: 'Quiz',
   cells: 'Cells',
+  walkthroughs: 'Walkthroughs',
 }
 
 const SECTION_ICONS = {
@@ -99,6 +101,7 @@ const SECTION_ICONS = {
   checkpoints: '✅',
   quiz: '🧪',
   cells: '⚗️',
+  walkthroughs: '🚶',
 }
 
 function SectionBlock({ sec, dispatch, index, total, courseId }) {
@@ -132,6 +135,8 @@ function SectionBlock({ sec, dispatch, index, total, courseId }) {
       return <PythonBlock {...common} />
     case 'cells':
       return <CellsBlock {...common} />
+    case 'walkthroughs':
+      return <WalkthroughsBlock {...common} />
     default:
       return <GenericSectionBlock {...common} />
   }

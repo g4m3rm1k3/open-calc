@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
 import Editor from '@monaco-editor/react'
+import { useContributorMode } from '../../../hooks/useContributorMode.js'
+import CreatePRModal from '../../contributor/CreatePRModal.jsx'
 
 const SvgVisualEditor = lazy(() => import('./SvgVisualEditor.jsx'))
 
@@ -94,6 +96,8 @@ function findAndReveal(editorRef, hint) {
 }
 
 export default function SvgSourceEditor({ filePath, onClose }) {
+  const { available: canEdit } = useContributorMode()
+  const [showPR, setShowPR] = useState(false)
   const [source, setSource] = useState('')
   const [previewXml, setPreviewXml] = useState('')
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
@@ -173,6 +177,13 @@ export default function SvgSourceEditor({ filePath, onClose }) {
   }, [])
 
   return (
+    <>
+    {showPR && filePath && (
+      <CreatePRModal
+        files={[{ path: filePath, content: source }]}
+        onClose={() => setShowPR(false)}
+      />
+    )}
     <div className="fixed inset-0 z-[620] flex flex-col" style={{ background: '#0d1117' }}>
       {/* Top bar */}
       <div
@@ -217,6 +228,15 @@ export default function SvgSourceEditor({ filePath, onClose }) {
           >
             Save
           </button>
+          {canEdit && filePath && (
+            <button
+              onClick={() => setShowPR(true)}
+              className="px-3 py-1.5 text-sm font-bold rounded-lg"
+              style={{ background: '#1f6feb', color: '#fff' }}
+            >
+              ⬆ Create PR
+            </button>
+          )}
         </div>
       </div>
 
@@ -286,5 +306,6 @@ export default function SvgSourceEditor({ filePath, onClose }) {
         </div>
       )}
     </div>
+    </>
   )
 }
