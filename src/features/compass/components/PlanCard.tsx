@@ -29,26 +29,26 @@ export default function PlanCard({
   const canMarkComplete = plan.status !== 'completed' && (!hasRecurring && allOnceDone)
 
   return (
-    <div className={`bg-slate-900 border rounded-xl overflow-hidden transition-colors ${plan.status === 'completed' ? 'border-emerald-500/50' : 'border-slate-800'}`}>
+    <div className={`bg-white dark:bg-slate-900 border rounded-2xl overflow-hidden transition-all shadow-sm hover:shadow-md ${plan.status === 'completed' ? 'border-emerald-500/50 dark:border-emerald-500/50' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'}`}>
       <div className="p-4 flex items-start justify-between group">
         <div>
-          <h3 className="font-bold text-slate-200 text-lg flex items-center gap-2">
-            {plan.status === 'completed' && <Trophy size={16} className="text-emerald-400" />}
-            <span className={plan.status === 'completed' ? 'line-through text-slate-500' : ''}>{plan.title}</span>
+          <h3 className="font-bold text-slate-900 dark:text-slate-200 text-lg flex items-center gap-2 transition-colors">
+            {plan.status === 'completed' && <Trophy size={16} className="text-emerald-500 dark:text-emerald-400" />}
+            <span className={plan.status === 'completed' ? 'line-through text-slate-400 dark:text-slate-500' : ''}>{plan.title}</span>
           </h3>
           {plan.focus && <p className="text-xs font-semibold text-emerald-500 mt-1">Narrowed to: {plan.focus}</p>}
         </div>
         
         <div className="flex items-center gap-2">
           {canMarkComplete && (
-            <button onClick={() => onComplete(plan.id)} className="text-xs font-bold text-emerald-950 bg-emerald-500 px-2 py-1 rounded hover:bg-emerald-400 transition-colors">
+            <button onClick={() => onComplete(plan.id)} className="text-xs font-bold text-white bg-emerald-500 px-3 py-1.5 rounded-lg hover:bg-emerald-400 transition-colors shadow-sm shadow-emerald-500/20">
               Mark Complete
             </button>
           )}
-          <button onClick={() => setExpanded(!expanded)} className="p-1 text-slate-500 hover:text-slate-300">
+          <button onClick={() => setExpanded(!expanded)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-colors">
             {expanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
           </button>
-          <button onClick={() => onDelete(plan.id)} className="p-1 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button onClick={() => onDelete(plan.id)} className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:text-slate-600 dark:hover:text-red-400 dark:hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all">
             ✕
           </button>
         </div>
@@ -56,7 +56,7 @@ export default function PlanCard({
 
       {plan.status === 'completed' && plan.reward && (
         <div className="px-4 pb-4">
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 text-sm text-emerald-400">
+          <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 rounded-xl p-3 text-sm text-emerald-700 dark:text-emerald-400">
             <strong>Reward Earned:</strong> {plan.reward}
           </div>
         </div>
@@ -74,13 +74,13 @@ export default function PlanCard({
             const loggedToday = action.log.find(l => l.date === today)
 
             return (
-              <div key={action.id} className="bg-slate-950 border border-slate-800 rounded-lg p-3">
+              <div key={action.id} className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-4 transition-all">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className={`font-semibold text-sm ${action.status === 'done' ? 'text-slate-500 line-through' : 'text-slate-200'}`}>
+                    <span className={`font-semibold text-sm transition-colors ${action.status === 'done' ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-900 dark:text-slate-200'}`}>
                       {action.label}
                     </span>
-                    <span className="text-[10px] uppercase tracking-wider text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">
+                    <span className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-white border border-slate-200 dark:border-transparent dark:bg-slate-800 px-1.5 py-0.5 rounded shadow-sm">
                       {action.cadence}
                     </span>
                   </div>
@@ -140,14 +140,14 @@ function ActionCheckIn({ action, onLog }: { action: PlanAction, onLog: (outcome:
           value={text}
           onChange={e => setText(e.target.value)}
           placeholder={action.requiresNote}
-          className="flex-1 bg-slate-900 border border-emerald-500/50 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-emerald-500"
+          className="flex-1 bg-white dark:bg-slate-900 border border-emerald-500/50 rounded-lg px-2 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all shadow-sm"
           onKeyDown={e => {
             if (e.key === 'Enter' && text.trim()) {
               onLog('done', undefined, text.trim())
             }
           }}
         />
-        <button onClick={() => setMode('buttons')} className="text-slate-500 hover:text-slate-300"><XCircle size={14} /></button>
+        <button onClick={() => setMode('buttons')} className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-colors"><XCircle size={16} /></button>
       </div>
     )
   }
@@ -161,14 +161,14 @@ function ActionCheckIn({ action, onLog }: { action: PlanAction, onLog: (outcome:
           value={text}
           onChange={e => setText(e.target.value)}
           placeholder="What stopped you?"
-          className="flex-1 bg-slate-900 border border-red-500/50 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-red-500"
+          className="flex-1 bg-white dark:bg-slate-900 border border-red-500/50 rounded-lg px-2 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all shadow-sm"
           onKeyDown={e => {
             if (e.key === 'Enter' && text.trim()) {
               onLog('blocked', text.trim())
             }
           }}
         />
-        <button onClick={() => setMode('buttons')} className="text-slate-500 hover:text-slate-300"><XCircle size={14} /></button>
+        <button onClick={() => setMode('buttons')} className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-300 dark:hover:bg-slate-800 transition-colors"><XCircle size={16} /></button>
       </div>
     )
   }
@@ -177,17 +177,17 @@ function ActionCheckIn({ action, onLog }: { action: PlanAction, onLog: (outcome:
     <>
       <button 
         onClick={() => action.requiresNote ? setMode('note') : onLog('done')}
-        className="p-1.5 text-slate-500 hover:text-emerald-400 hover:bg-emerald-400/10 rounded transition-colors"
+        className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:text-slate-500 dark:hover:text-emerald-400 dark:hover:bg-emerald-400/10 rounded-lg transition-colors"
         title="Mark Done"
       ><Check size={16} /></button>
       <button 
         onClick={() => setMode('blocker')}
-        className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-400/10 rounded transition-colors"
+        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:text-slate-500 dark:hover:text-red-400 dark:hover:bg-red-400/10 rounded-lg transition-colors"
         title="Blocked"
       ><XCircle size={16} /></button>
       <button 
         onClick={() => onLog('skipped')}
-        className="p-1.5 text-slate-500 hover:text-slate-300 hover:bg-slate-800 rounded transition-colors"
+        className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:text-slate-500 dark:hover:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors"
         title="Skip Today"
       ><SkipForward size={16} /></button>
     </>

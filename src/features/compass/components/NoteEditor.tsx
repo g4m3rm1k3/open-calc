@@ -51,34 +51,34 @@ export default function NoteEditor({ notes, categories, onAdd, onUpdate, onDelet
 
   return (
     <div className="space-y-3">
-      <button onClick={() => setWhyOpen((o) => !o)} className="flex items-center gap-1 text-[10px] text-slate-500 hover:text-slate-300">
+      <button onClick={() => setWhyOpen((o) => !o)} className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors">
         Why notes work this way <ChevronDown size={10} className={`transition-transform ${whyOpen ? 'rotate-180' : ''}`} />
       </button>
       {whyOpen && (
-        <div className="text-[11px] text-slate-400 bg-slate-800/60 rounded-lg p-2 -mt-1">
-          <span className="text-slate-300 font-semibold">{gtd.name}</span>
-          <span className="text-slate-600"> · {gtd.source}</span>
+        <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/60 rounded-lg p-2 -mt-1">
+          <span className="text-slate-700 dark:text-slate-300 font-semibold">{gtd.name}</span>
+          <span className="text-slate-400 dark:text-slate-600"> · {gtd.source}</span>
           <p className="mt-0.5">{gtd.why}</p>
         </div>
       )}
-      <div className="bg-slate-900/80 border border-slate-700 rounded-xl p-3">
+      <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm">
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Capture anything — markdown supported…"
           rows={3}
-          className="w-full bg-transparent text-sm text-slate-200 placeholder:text-slate-500 resize-none outline-none"
+          className="w-full bg-transparent text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-none outline-none"
         />
         <div className="flex items-center gap-2 mt-2 min-w-0">
           <select value={category} onChange={(e) => { setCategory(e.target.value); setNewCategory('') }}
-            className="shrink-0 max-w-[40%] bg-slate-800 rounded-lg px-2 py-1 text-xs text-slate-300 outline-none">
+            className="shrink-0 max-w-[40%] bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-sky-500 transition-colors">
             <option value="">No category</option>
             {categories.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
           <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)}
             placeholder="or create new…"
-            className="flex-1 min-w-0 bg-slate-800 rounded-lg px-2 py-1 text-xs text-slate-300 placeholder:text-slate-500 outline-none" />
-          <button onClick={submit} disabled={!draft.trim()} className="shrink-0 text-xs font-semibold bg-sky-500 text-slate-950 px-3 py-1.5 rounded-lg disabled:opacity-40">
+            className="flex-1 min-w-0 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-700 dark:text-slate-300 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-sky-500 transition-colors" />
+          <button onClick={submit} disabled={!draft.trim()} className="shrink-0 text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-white px-4 py-1.5 rounded-lg shadow-sm shadow-sky-500/20 disabled:opacity-40 transition-all">
             Save
           </button>
         </div>
@@ -87,7 +87,7 @@ export default function NoteEditor({ notes, categories, onAdd, onUpdate, onDelet
       <div className="flex items-center gap-1.5 flex-wrap">
         {STATUS_TABS.map((t) => (
           <button key={t.id} onClick={() => setStatusTab(t.id)}
-            className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${statusTab === t.id ? 'bg-sky-500 text-slate-950' : 'bg-slate-800 text-slate-400'}`}>
+            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${statusTab === t.id ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20' : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-slate-700'}`}>
             {t.label}{t.id === 'inbox' && inboxCount > 0 ? ` (${inboxCount})` : ''}
           </button>
         ))}
@@ -121,7 +121,7 @@ function NoteRow({ note, onUpdate, onDelete, onClarifyToPlan, onArchive, onResto
   const [makingCards, setMakingCards] = useState(false)
 
   return (
-    <div className="bg-slate-800/60 border border-slate-700/60 rounded-lg p-2.5">
+    <div className="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3 shadow-sm transition-all hover:shadow-md">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           {editing ? (
@@ -131,47 +131,47 @@ function NoteRow({ note, onUpdate, onDelete, onClarifyToPlan, onArchive, onResto
               onBlur={() => { onUpdate(note.id, { content }); setEditing(false) }}
               rows={3}
               autoFocus
-              className="w-full bg-transparent text-sm text-slate-200 resize-none outline-none"
+              className="w-full bg-transparent text-sm text-slate-900 dark:text-slate-200 resize-none outline-none"
             />
           ) : (
-            <div className="text-sm text-slate-300 prose-invert prose-sm">
+            <div className="text-sm text-slate-700 dark:text-slate-300 prose-slate dark:prose-invert prose-sm">
               <ReactMarkdown>{note.content}</ReactMarkdown>
             </div>
           )}
           {note.category && (
-            <span className="inline-block mt-1.5 text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded-full">{note.category}</span>
+            <span className="inline-block mt-1.5 text-[10px] bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-transparent text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full">{note.category}</span>
           )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          <button onClick={() => setEditing((e) => !e)} className="text-slate-500 hover:text-sky-400 p-0.5">
+          <button onClick={() => setEditing((e) => !e)} className="text-slate-400 hover:text-sky-500 dark:text-slate-500 dark:hover:text-sky-400 p-1 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             {editing ? <Eye size={13} /> : <Pencil size={13} />}
           </button>
-          <button onClick={() => onDelete(note.id)} className="text-slate-500 hover:text-rose-400 p-0.5">
+          <button onClick={() => onDelete(note.id)} className="text-slate-400 hover:text-rose-500 dark:text-slate-500 dark:hover:text-rose-400 p-1 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
             <Trash2 size={13} />
           </button>
         </div>
       </div>
 
       {note.status === 'inbox' && (
-        <div className="flex items-center gap-3 mt-2 pt-2 border-t border-slate-700/60">
-          <button onClick={() => onClarifyToPlan(note.id, note.content)} className="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 font-semibold">
+        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+          <button onClick={() => onClarifyToPlan(note.id, note.content)} className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition-colors">
             <ArrowRight size={12} /> Turn into a Plan
           </button>
-          <button onClick={() => setMakingCards((m) => !m)} className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 font-semibold">
+          <button onClick={() => setMakingCards((m) => !m)} className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300 font-semibold transition-colors">
             <Layers size={12} /> Make cards
           </button>
-          <button onClick={() => onArchive(note.id)} className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300">
+          <button onClick={() => onArchive(note.id)} className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors">
             <Archive size={12} /> Archive
           </button>
         </div>
       )}
       {note.status !== 'inbox' && (
-        <div className="flex items-center gap-3 mt-2 pt-2 border-t border-slate-700/60">
-          <button onClick={() => setMakingCards((m) => !m)} className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 font-semibold">
+        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+          <button onClick={() => setMakingCards((m) => !m)} className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300 font-semibold transition-colors">
             <Layers size={12} /> Make cards
           </button>
           {note.status === 'archived' && (
-            <button onClick={() => onRestore(note.id)} className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300">
+            <button onClick={() => onRestore(note.id)} className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors">
               <RotateCcw size={12} /> Restore to inbox
             </button>
           )}

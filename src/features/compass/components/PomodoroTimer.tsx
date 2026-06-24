@@ -50,20 +50,20 @@ export default function PomodoroTimer({ settings }: { settings: CompassSettings 
   const pct = 1 - secondsLeft / phaseLength(phase)
 
   return (
-    <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-4 text-center">
+    <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 text-center shadow-sm">
       <p className={`text-xs font-bold uppercase tracking-wide ${PHASE_COLOR[phase]}`}>{PHASE_LABEL[phase]}</p>
-      <div className="text-4xl font-black text-slate-100 my-2 font-mono">{mm}:{ss}</div>
-      <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden mb-3">
+      <div className="text-5xl font-black text-slate-900 dark:text-slate-100 my-3 font-mono tracking-tight">{mm}:{ss}</div>
+      <div className="h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4">
         <div className="h-full bg-sky-500 transition-all" style={{ width: `${Math.round(pct * 100)}%` }} />
       </div>
       <div className="flex items-center justify-center gap-2">
         <button
           onClick={() => setRunning((r) => !r)}
-          className="flex items-center gap-1.5 text-sm font-semibold bg-sky-500 text-slate-950 px-4 py-1.5 rounded-lg"
+          className="flex items-center gap-1.5 text-sm font-semibold bg-sky-500 hover:bg-sky-400 text-white px-5 py-2 rounded-xl transition-all shadow-sm shadow-sky-500/20"
         >
           {running ? <Pause size={14} /> : <Play size={14} />} {running ? 'Pause' : 'Start'}
         </button>
-        <button onClick={reset} className="text-slate-500 hover:text-slate-300 p-1.5" title="Reset">
+        <button onClick={reset} className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Reset">
           <RotateCcw size={15} />
         </button>
       </div>

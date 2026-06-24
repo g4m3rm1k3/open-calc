@@ -23,12 +23,12 @@ interface MapEdge {
   label?: string
 }
 
-const STATUS_COLORS = {
-  done: { fill: '#10b981', stroke: '#059669', text: '#fff' },
-  active: { fill: '#0ea5e9', stroke: '#0284c7', text: '#fff' },
-  pending: { fill: '#1e293b', stroke: '#334155', text: '#94a3b8' },
-  start: { fill: '#6366f1', stroke: '#4f46e5', text: '#fff' },
-  goal: { fill: '#f59e0b', stroke: '#d97706', text: '#fff' },
+const STATUS_CLASSES = {
+  done: { fill: 'fill-emerald-500', stroke: 'stroke-emerald-600 dark:stroke-emerald-400', text: 'fill-white' },
+  active: { fill: 'fill-sky-500', stroke: 'stroke-sky-600 dark:stroke-sky-400', text: 'fill-white' },
+  pending: { fill: 'fill-slate-100 dark:fill-slate-800/80', stroke: 'stroke-slate-300 dark:stroke-slate-700', text: 'fill-slate-600 dark:fill-slate-400' },
+  start: { fill: 'fill-indigo-500', stroke: 'stroke-indigo-600 dark:stroke-indigo-400', text: 'fill-white' },
+  goal: { fill: 'fill-amber-500', stroke: 'stroke-amber-600 dark:stroke-amber-400', text: 'fill-white' },
 }
 
 function buildMapForPlan(plan: Plan, offsetY: number): { nodes: MapNode[]; edges: MapEdge[] } {
@@ -121,8 +121,8 @@ export default function GoalMap({ plans, onNodeClick }: GoalMapProps) {
   const totalWidth = Math.max(...nodes.map(n => n.x)) + 80
 
   return (
-    <div className="w-full overflow-x-auto rounded-xl bg-slate-950 border border-slate-800 p-3">
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Goal Map</p>
+    <div className="w-full overflow-x-auto rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-3 shadow-sm">
+      <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Goal Map</p>
       <svg
         width="100%"
         viewBox={`0 0 ${totalWidth} ${totalHeight}`}
@@ -130,7 +130,7 @@ export default function GoalMap({ plans, onNodeClick }: GoalMapProps) {
       >
         <defs>
           <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-            <polygon points="0 0, 8 3, 0 6" fill="#334155" />
+            <polygon points="0 0, 8 3, 0 6" className="fill-slate-300 dark:fill-slate-700" />
           </marker>
         </defs>
 
@@ -146,12 +146,12 @@ export default function GoalMap({ plans, onNodeClick }: GoalMapProps) {
               <path
                 d={`M ${from.x} ${from.y} Q ${mx} ${my} ${to.x} ${to.y}`}
                 fill="none"
-                stroke="#334155"
+                className="stroke-slate-300 dark:stroke-slate-700"
                 strokeWidth="1.5"
                 markerEnd="url(#arrowhead)"
               />
               {edge.label && (
-                <text x={mx} y={my - 4} textAnchor="middle" fill="#475569" fontSize="8" fontWeight="600">
+                <text x={mx} y={my - 4} textAnchor="middle" className="fill-slate-600 dark:fill-slate-400" fontSize="8" fontWeight="600">
                   {edge.label.slice(0, 16)}
                 </text>
               )}
@@ -161,7 +161,7 @@ export default function GoalMap({ plans, onNodeClick }: GoalMapProps) {
 
         {/* Nodes */}
         {nodes.map(node => {
-          const colors = STATUS_COLORS[node.status]
+          const colors = STATUS_CLASSES[node.status]
           const r = 28
           return (
             <g
@@ -172,29 +172,29 @@ export default function GoalMap({ plans, onNodeClick }: GoalMapProps) {
                 onNodeClick?.(planId.replace('-start', '').replace('-goal', ''), actionId)
               }}
               style={{ cursor: 'pointer' }}
+              className="group transition-opacity hover:opacity-90 duration-300"
             >
               <circle
                 r={r}
-                fill={colors.fill}
-                stroke={colors.stroke}
+                className={`${colors.fill} ${colors.stroke} drop-shadow-sm`}
                 strokeWidth="2"
-                opacity={node.status === 'pending' ? 0.6 : 1}
+                opacity={node.status === 'pending' ? 0.8 : 1}
               />
               {/* Pulse ring for active nodes */}
               {node.status === 'active' && (
-                <circle r={r + 4} fill="none" stroke={colors.stroke} strokeWidth="1" opacity="0.4">
+                <circle r={r + 4} fill="none" className={colors.stroke} strokeWidth="1" opacity="0.4">
                   <animate attributeName="r" values={`${r + 2};${r + 8};${r + 2}`} dur="2s" repeatCount="indefinite" />
                   <animate attributeName="opacity" values="0.4;0;0.4" dur="2s" repeatCount="indefinite" />
                 </circle>
               )}
-              <text y="-8" textAnchor="middle" fill={colors.text} fontSize="8.5" fontWeight="700">
+              <text y="-8" textAnchor="middle" className={colors.text} fontSize="8.5" fontWeight="700">
                 {node.label.split(' ').slice(0, 2).join(' ')}
               </text>
-              <text y="3" textAnchor="middle" fill={colors.text} fontSize="7.5" fontWeight="500">
+              <text y="3" textAnchor="middle" className={colors.text} fontSize="7.5" fontWeight="500">
                 {node.label.split(' ').slice(2).join(' ')}
               </text>
               {node.sublabel && (
-                <text y="14" textAnchor="middle" fill={colors.text} fontSize="6.5" opacity="0.75">
+                <text y="14" textAnchor="middle" className={colors.text} fontSize="6.5" opacity="0.75">
                   {node.sublabel}
                 </text>
               )}
@@ -205,10 +205,10 @@ export default function GoalMap({ plans, onNodeClick }: GoalMapProps) {
 
       {/* Legend */}
       <div className="flex items-center gap-4 mt-3 px-1">
-        {Object.entries(STATUS_COLORS).map(([status, colors]) => (
+        {Object.entries(STATUS_CLASSES).map(([status, colors]) => (
           <div key={status} className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ background: colors.fill }} />
-            <span className="text-[10px] text-slate-500 capitalize">{status}</span>
+            <div className={`w-2.5 h-2.5 rounded-full ${colors.fill}`} />
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 capitalize">{status}</span>
           </div>
         ))}
       </div>

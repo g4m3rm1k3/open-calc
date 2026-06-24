@@ -90,15 +90,15 @@ export default function CompassPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-4 md:p-8 pb-32 md:pb-8">
-      <header className="flex items-center justify-between mb-6">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 via-slate-50 to-slate-100 dark:from-sky-950/20 dark:via-slate-950 dark:to-slate-950 text-slate-900 dark:text-slate-200 p-4 md:p-8 pb-32 md:pb-8 transition-colors duration-300">
+      <header className="flex items-center justify-between mb-6 sticky top-0 z-50 -mx-4 px-4 py-3 md:-mx-8 md:px-8 bg-white/70 dark:bg-slate-950/70 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-sky-500/15 flex items-center justify-center text-sky-400">
+          <div className="w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-500/15 flex items-center justify-center text-sky-500 dark:text-sky-400 shadow-sm border border-sky-200/50 dark:border-transparent">
             <CompassIcon size={18} />
           </div>
           <div>
-            <h1 className="text-xl font-black text-slate-100">Compass</h1>
-            <p className="text-xs text-slate-500">Say what you want to accomplish — the system builds the plan</p>
+            <h1 className="text-xl font-black text-slate-900 dark:text-slate-100">Compass</h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Say what you want to accomplish — the system builds the plan</p>
           </div>
         </div>
         
@@ -106,7 +106,7 @@ export default function CompassPage() {
           const win = computeDailyWin(compass.plans)
           if (win.dueToday === 0) return null
           return (
-            <div className={`text-xs font-bold px-3 py-1.5 rounded-full ${win.won ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-400'}`}>
+            <div className={`text-xs font-bold px-3 py-1.5 rounded-full shadow-sm border ${win.won ? 'bg-emerald-50 border-emerald-200 text-emerald-600 dark:bg-emerald-500/20 dark:border-transparent dark:text-emerald-300' : 'bg-white border-slate-200 text-slate-500 dark:bg-slate-800 dark:border-transparent dark:text-slate-400'}`}>
               {win.won ? '🏆 ' : ''}{win.doneToday}/{win.dueToday} done today{win.won ? ' — you won the day' : ''}
             </div>
           )
@@ -117,7 +117,7 @@ export default function CompassPage() {
       <div className="flex md:hidden gap-1.5 mb-4 overflow-x-auto">
         {TABS.map((t) => (
           <button key={t} onClick={() => setTab(t)}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap ${tab === t ? 'bg-sky-500 text-slate-950' : 'bg-slate-800 text-slate-400'}`}>
+            className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${tab === t ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-transparent dark:text-slate-400 dark:hover:bg-slate-700'}`}>
             {t}
           </button>
         ))}
@@ -207,7 +207,7 @@ export default function CompassPage() {
       {/* Monty — coach/mentor/assistant, click to open */}
       {!montyOpen && (
         <button onClick={() => setMontyOpen(true)}
-          className="fixed bottom-16 right-4 z-[1700] flex items-center gap-2 bg-sky-500 text-slate-950 font-semibold text-sm rounded-full pl-3 pr-4 py-2.5 shadow-lg hover:bg-sky-400">
+          className="fixed bottom-16 right-4 z-[1700] flex items-center gap-2 bg-sky-500 text-white font-semibold text-sm rounded-full pl-3 pr-4 py-2.5 shadow-lg shadow-sky-500/30 hover:bg-sky-400 hover:-translate-y-0.5 transition-all">
           <Sparkles size={16} /> Monty
         </button>
       )}

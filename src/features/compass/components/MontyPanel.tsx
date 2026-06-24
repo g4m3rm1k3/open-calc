@@ -56,21 +56,21 @@ function ActionConfirmCard({
     <Check size={13} />
 
   return (
-    <div className="flex items-center justify-between gap-2 bg-slate-800 border border-emerald-500/20 rounded-lg px-3 py-2 text-xs">
-      <div className="flex items-center gap-2 text-slate-300">
-        <span className="text-emerald-400">{icon}</span>
+    <div className="flex items-center justify-between gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-emerald-500/20 rounded-xl px-3 py-2.5 text-xs shadow-sm">
+      <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+        <span className="text-emerald-600 dark:text-emerald-400">{icon}</span>
         <span>{label}</span>
       </div>
       <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={onConfirm}
-          className="bg-emerald-600 text-white font-bold px-2 py-1 rounded hover:bg-emerald-500 transition-colors"
+          className="bg-emerald-500 hover:bg-emerald-400 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm shadow-emerald-500/20 transition-all"
         >
           Do it
         </button>
         <button
           onClick={onDismiss}
-          className="text-slate-500 hover:text-slate-300 p-1"
+          className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
         >
           <X size={12} />
         </button>
@@ -173,26 +173,26 @@ export default function MontyPanel({
   const hasActivePlans = plans.some(p => p.status === 'active')
 
   return (
-    <div className="fixed bottom-4 right-4 z-[1700] w-[360px] h-[620px] max-h-[85vh] flex flex-col bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="fixed bottom-4 right-4 z-[1700] w-[360px] h-[620px] max-h-[85vh] flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
       {/* Header */}
-      <div className="p-3 border-b border-slate-800 bg-slate-800/60 flex items-center justify-between shrink-0">
+      <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 backdrop-blur flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center">
             <Sparkles className="text-sky-400" size={14} />
           </div>
           <div>
-            <h3 className="font-bold text-slate-100 text-sm leading-none">Compass</h3>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-none">Compass</h3>
             <p className="text-[10px] text-slate-500 mt-0.5">Your achievement operating system</p>
           </div>
         </div>
-        <button onClick={onClose} className="p-1.5 text-slate-500 hover:text-slate-300 transition-colors">
+        <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700 transition-colors">
           <X size={16} />
         </button>
       </div>
 
       {/* Daily Win Bar */}
       {win.dueToday > 0 && (
-        <div className={`px-4 py-2 text-xs font-semibold flex items-center gap-2 shrink-0 ${win.won ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-800/60 text-slate-400'}`}>
+        <div className={`px-4 py-2.5 text-xs font-semibold flex items-center gap-2 shrink-0 border-b border-slate-200 dark:border-slate-800 ${win.won ? 'bg-emerald-50/80 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400' : 'bg-slate-50/50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400'}`}>
           {win.won ? '🏆' : '🎯'}
           <span>{win.doneToday} / {win.dueToday} actions done today{win.won ? ' — you won the day!' : ''}</span>
         </div>
@@ -200,16 +200,16 @@ export default function MontyPanel({
 
       {/* Tabs */}
       {hasActivePlans && (
-        <div className="flex border-b border-slate-800 shrink-0">
+        <div className="flex border-b border-slate-200 dark:border-slate-800 shrink-0">
           <button
             onClick={() => setActiveTab('chat')}
-            className={`flex-1 py-2 text-xs font-bold transition-colors ${activeTab === 'chat' ? 'text-sky-400 border-b-2 border-sky-500' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`flex-1 py-2.5 text-xs font-bold transition-all ${activeTab === 'chat' ? 'text-sky-600 dark:text-sky-400 border-b-2 border-sky-500 bg-sky-50/50 dark:bg-sky-900/10' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
           >
             Chat
           </button>
           <button
             onClick={() => setActiveTab('map')}
-            className={`flex-1 py-2 text-xs font-bold transition-colors ${activeTab === 'map' ? 'text-sky-400 border-b-2 border-sky-500' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`flex-1 py-2.5 text-xs font-bold transition-all ${activeTab === 'map' ? 'text-sky-600 dark:text-sky-400 border-b-2 border-sky-500 bg-sky-50/50 dark:bg-sky-900/10' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
           >
             Goal Map
           </button>
@@ -242,9 +242,9 @@ export default function MontyPanel({
           {/* Empty state */}
           {chatLog.length === 0 && !questionTitle && !draftTitle && (
             <div className="space-y-3">
-              <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-sm text-slate-300">
-                <p className="font-semibold text-slate-100 mb-1">What do you want to accomplish?</p>
-                <p className="text-xs text-slate-400">I'll build you a plan, schedule it, and hold you to it.</p>
+              <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-4 text-sm text-slate-700 dark:text-slate-300 shadow-sm">
+                <p className="font-semibold text-slate-900 dark:text-slate-100 mb-1">What do you want to accomplish?</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">I'll build you a plan, schedule it, and hold you to it.</p>
               </div>
               <PlanIntake onSubmit={onIntake} />
               <div className="grid grid-cols-2 gap-2">
@@ -252,7 +252,7 @@ export default function MontyPanel({
                   <button
                     key={q}
                     onClick={() => { setInput(q); }}
-                    className="text-left text-xs text-slate-400 bg-slate-800/50 border border-slate-700/50 rounded-lg px-3 py-2 hover:border-sky-500/40 hover:text-slate-200 transition-colors"
+                    className="text-left text-xs text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 hover:border-sky-500/40 hover:shadow-sm transition-all hover:-translate-y-0.5"
                   >
                     {q}
                   </button>
@@ -267,8 +267,8 @@ export default function MontyPanel({
               <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`px-3 py-2.5 rounded-xl max-w-[88%] text-sm leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-sky-600 text-white'
-                    : 'bg-slate-800 text-slate-200 border border-slate-700/60'
+                    ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 shadow-sm'
                 }`}>
                   {msg.content || (msg.actions?.length ? '↓ Suggested actions:' : '(no response)')}
                 </div>
@@ -318,12 +318,12 @@ export default function MontyPanel({
 
       {/* Input */}
       {activeTab === 'chat' && (
-        <div className="p-3 border-t border-slate-800 bg-slate-950 shrink-0">
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shrink-0">
           <div className="relative">
             <input
               type="text"
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl py-2.5 pl-4 pr-11 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
-              placeholder="Goal or question — e.g. 'master linear algebra' or 'how am I doing?'"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 pl-4 pr-11 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+              placeholder="Goal or question — e.g. 'master linear algebra'"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
@@ -332,7 +332,7 @@ export default function MontyPanel({
             <button
               onClick={handleSend}
               disabled={isThinking || !input.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-sky-400 hover:text-sky-300 disabled:opacity-40 transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-300 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-lg disabled:opacity-40 transition-colors"
             >
               <Send size={15} />
             </button>
