@@ -1,3 +1,5 @@
+import dimensionGrowthUrl from '../diagrams/la-dimension-growth.svg?url'
+
 export default {
   id: 'la1-007',
   slug: 'linear-independence',
@@ -20,14 +22,29 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take two vectors $\\mathbf{v}_1 = [1, 0]^T$ and $\\mathbf{v}_2 = [2, 0]^T$. Both point rightward along the $x$-axis. No matter how you combine them — $c_1[1,0]^T + c_2[2,0]^T$ — the result always has a zero $y$-component. You can never reach $[0, 1]^T$. These vectors are **linearly dependent**: $\\mathbf{v}_2$ is just a scaled copy of $\\mathbf{v}_1$ and adds zero new information.',
       'Now replace $\\mathbf{v}_2$ with $[0, 1]^T$ — straight up. Now you CAN reach $[0,1]^T$ (use $c_1=0$, $c_2=1$). And $[3, -5]^T$ (use $c_1=3$, $c_2=-5$). And every other 2D point. These vectors are **linearly independent**: each one introduces a genuinely new direction that the other cannot replicate.',
+      ] },
+      { type: 'viz', id: 'LinearDependenceViz',
+        title: 'Dependence: Trapped on a Line vs. Full Plane',
+        mathBridge: 'Toggle between the dependent pair (two vectors on the same line) and an independent pair (vectors in different directions). Watch how the span — the full set of reachable points — collapses from the entire plane down to a single 1D line when dependence is introduced. Drag a vector until it aligns with another and observe the exact moment the span shrinks.',
+        caption: 'Dependent vectors: their span is always strictly smaller than the space they live in.' },
+      { type: 'prose', paragraphs: [
       '**The core test:** Can you find scalars — NOT all zero — that make the combination equal the zero vector? Formally: does $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 + \\cdots + c_k\\mathbf{v}_k = \\mathbf{0}$ have any solution other than $c_1 = c_2 = \\cdots = c_k = 0$?',
       '**If YES** → the set is **linearly dependent**. Some vector is redundant — you can express it as a combination of the others.',
       '**If NO** (only all-zero works) → the set is **linearly independent**. Every vector contributes a brand-new direction.',
       '**Predict before reading:** Consider $\\mathbf{v}_1 = [3, 1]^T$ and $\\mathbf{v}_2 = [6, 2]^T$. Without computing, can you guess whether they are independent? Look at the ratio of components: $6/3 = 2$ and $2/1 = 2$. Equal ratios mean $\\mathbf{v}_2 = 2\\mathbf{v}_1$ — they are parallel, thus dependent. The zero-sum test will confirm this with $c_1 = 2, c_2 = -1$ (both non-zero).',
       '**The geometric picture:** Independent vectors point in different directions — like the $x$- and $y$-axes. Dependent vectors are parallel (or anti-parallel, or one is zero). In 3D, three independent vectors each add a new dimension: the span grows from a line to a plane to all of space. A dependent third vector lies flat inside the plane the first two already define.',
+      ] },
+      { type: 'image', src: dimensionGrowthUrl,
+        alt: 'Three panels: one vector spanning a line, two independent vectors spanning a plane, and a third vector either lying flat in the plane (dependent, redundant) or popping straight up out of it (independent, a genuinely new dimension)',
+        caption: 'Each independent vector adds one new dimension to the span — a dependent vector adds nothing, no matter where you place it.' },
+      { type: 'viz', id: 'LALesson02_Combinations',
+        title: 'Sweeping the Plane with Independent vs. Dependent Pairs',
+        mathBridge: 'Set $c_1$ and $c_2$ using the sliders. When two vectors are independent, every point in the plane is reachable with some $(c_1, c_2)$. Set $\\mathbf{v}_2 = 2\\mathbf{v}_1$ to simulate dependence — notice how the result vector is always constrained to the same line through the origin regardless of the sliders. You cannot escape the 1D span by changing scalars alone.',
+        caption: 'Independence means every slider combination reaches a new point. Dependence means you are locked to a line.' },
     ],
     callouts: [
       {
@@ -54,20 +71,6 @@ export default {
         type: 'insight',
         title: 'The Zero Vector is Always Dependent',
         body: 'Any set containing $\\mathbf{0}$ is automatically linearly dependent. Proof: $1 \\cdot \\mathbf{0} + 0 \\cdot \\mathbf{v}_2 + \\cdots = \\mathbf{0}$ uses a non-zero scalar ($c_1 = 1$). This is why a basis can never include the zero vector.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LinearDependenceViz',
-        title: 'Dependence: Trapped on a Line vs. Full Plane',
-        mathBridge: 'Toggle between the dependent pair (two vectors on the same line) and an independent pair (vectors in different directions). Watch how the span — the full set of reachable points — collapses from the entire plane down to a single 1D line when dependence is introduced. Drag a vector until it aligns with another and observe the exact moment the span shrinks.',
-        caption: 'Dependent vectors: their span is always strictly smaller than the space they live in.',
-      },
-      {
-        id: 'LALesson02_Combinations',
-        title: 'Sweeping the Plane with Independent vs. Dependent Pairs',
-        mathBridge: 'Set $c_1$ and $c_2$ using the sliders. When two vectors are independent, every point in the plane is reachable with some $(c_1, c_2)$. Set $\\mathbf{v}_2 = 2\\mathbf{v}_1$ to simulate dependence — notice how the result vector is always constrained to the same line through the origin regardless of the sliders. You cannot escape the 1D span by changing scalars alone.',
-        caption: 'Independence means every slider combination reaches a new point. Dependence means you are locked to a line.',
       },
     ],
   },

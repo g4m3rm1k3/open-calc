@@ -1,0 +1,57 @@
+<svg viewBox="0 0 400 305" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-grid  { stroke: #e2e8f0; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-grid  { stroke: #1e293b; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="400" height="305" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="cl-gray" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#94a3b8"/></marker>
+    <marker id="cl-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+    <marker id="cl-amber" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#d97706"/></marker>
+    <marker id="cl-green" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#10b981"/></marker>
+  </defs>
+
+  <!-- Grid: x in [-1,6], y in [-2,3], 45px/unit, origin (85,175) -->
+  <line x1="40" y1="20" x2="40" y2="265" class="svg-grid" stroke-width="1"/>
+  <line x1="130" y1="20" x2="130" y2="265" class="svg-grid" stroke-width="1"/>
+  <line x1="175" y1="20" x2="175" y2="265" class="svg-grid" stroke-width="1"/>
+  <line x1="220" y1="20" x2="220" y2="265" class="svg-grid" stroke-width="1"/>
+  <line x1="265" y1="20" x2="265" y2="265" class="svg-grid" stroke-width="1"/>
+  <line x1="310" y1="20" x2="310" y2="265" class="svg-grid" stroke-width="1"/>
+  <line x1="355" y1="20" x2="355" y2="265" class="svg-grid" stroke-width="1"/>
+  <line x1="20" y1="40" x2="380" y2="40" class="svg-grid" stroke-width="1"/>
+  <line x1="20" y1="85" x2="380" y2="85" class="svg-grid" stroke-width="1"/>
+  <line x1="20" y1="130" x2="380" y2="130" class="svg-grid" stroke-width="1"/>
+  <line x1="20" y1="220" x2="380" y2="220" class="svg-grid" stroke-width="1"/>
+  <line x1="20" y1="265" x2="380" y2="265" class="svg-grid" stroke-width="1"/>
+
+  <!-- Axes -->
+  <line x1="20" y1="175" x2="380" y2="175" class="svg-axis" stroke-width="2"/>
+  <line x1="85" y1="265" x2="85" y2="20" class="svg-axis" stroke-width="2"/>
+
+  <!-- Reference (unscaled) columns a1=[2,1] and a2=[1,-1], dashed gray -->
+  <line x1="85" y1="175" x2="170" y2="130" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#cl-gray)"/>
+  <text x="174" y="126" font-size="11" class="svg-muted">a₁</text>
+  <line x1="85" y1="175" x2="126" y2="216" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#cl-gray)"/>
+  <text x="100" y="232" font-size="11" class="svg-muted">a₂</text>
+
+  <!-- x*a1 = 2*[2,1] = [4,2]: origin to (265,85) -->
+  <line x1="85" y1="175" x2="259" y2="85" stroke="#2563eb" stroke-width="3" marker-end="url(#cl-blue)"/>
+  <text x="155" y="115" font-size="13" fill="#2563eb" font-weight="700">x·a₁ = 2[2,1]</text>
+
+  <!-- y*a2 = 1*[1,-1] placed tip-to-tail at (265,85) to (310,130) -->
+  <line x1="265" y1="85" x2="304" y2="124" stroke="#d97706" stroke-width="3" marker-end="url(#cl-amber)"/>
+  <text x="305" y="108" font-size="13" fill="#d97706" font-weight="700">y·a₂ = 1[1,-1]</text>
+
+  <!-- Sum b = [5,1]: origin straight to (310,130) -->
+  <line x1="85" y1="175" x2="305" y2="131" stroke="#10b981" stroke-width="3.5" marker-end="url(#cl-green)"/>
+  <text x="150" y="160" font-size="13" fill="#10b981" font-weight="700">x·a₁ + y·a₂ = b = [5,1]</text>
+
+  <text x="200" y="290" font-size="11" class="svg-muted" text-anchor="middle">Solving Ax=b is asking: what combination of A's columns reaches b?</text>
+</svg>

@@ -1,0 +1,37 @@
+<svg viewBox="0 0 420 240" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="420" height="240" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="sh-gray" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#64748b"/></marker>
+    <marker id="sh-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+    <marker id="sh-green" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#10b981"/></marker>
+  </defs>
+
+  <!-- w along the x-axis from origin (50,190) to (340,190) -->
+  <line x1="50" y1="190" x2="340" y2="190" stroke="#64748b" stroke-width="3" marker-end="url(#sh-gray)"/>
+  <text x="345" y="195" font-size="14" fill="#64748b" font-weight="700">w</text>
+
+  <!-- v at an angle, from origin to (230,80) -->
+  <line x1="50" y1="190" x2="226" y2="82" stroke="#2563eb" stroke-width="3" marker-end="url(#sh-blue)"/>
+  <text x="230" y="76" font-size="14" fill="#2563eb" font-weight="700">v</text>
+
+  <!-- angle arc at origin -->
+  <path d="M 90 190 A 40 40 0 0 1 79 156" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="96" y="172" font-size="12" fill="#94a3b8">θ</text>
+
+  <!-- dashed perpendicular drop from tip of v down to the w-axis -->
+  <line x1="226" y1="82" x2="226" y2="190" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- the shadow segment itself, bold green, from origin to foot of perpendicular -->
+  <line x1="50" y1="190" x2="222" y2="190" stroke="#10b981" stroke-width="5" marker-end="url(#sh-green)"/>
+  <text x="100" y="212" font-size="13" fill="#10b981" font-weight="700">shadow of v onto w  =  ‖v‖cos θ</text>
+
+  <circle cx="50" cy="190" r="3" fill="#1e293b"/>
+
+  <text x="210" y="230" font-size="12" class="svg-muted" text-anchor="middle">w · v  =  (shadow length) × ‖w‖  =  ‖v‖‖w‖cos θ</text>
+</svg>

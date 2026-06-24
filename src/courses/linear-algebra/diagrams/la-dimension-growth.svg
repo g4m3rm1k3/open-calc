@@ -1,0 +1,50 @@
+<svg viewBox="0 0 540 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="540" height="220" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="dg-blue" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+    <marker id="dg-amber" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#d97706"/></marker>
+    <marker id="dg-gray" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#94a3b8"/></marker>
+    <marker id="dg-green" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#10b981"/></marker>
+  </defs>
+
+  <text x="270" y="16" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">Every genuinely new direction adds one dimension to the span</text>
+
+  <!-- Panel 1: 1 vector -> line -->
+  <rect x="12" y="24" width="160" height="178" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <line x1="92" y1="100" x2="92" y2="190" class="svg-div" stroke-width="1" stroke-dasharray="3,3"/>
+  <line x1="92" y1="160" x2="92" y2="60" stroke="#2563eb" stroke-width="3" marker-end="url(#dg-blue)"/>
+  <circle cx="92" cy="160" r="2.5" fill="#64748b"/>
+  <text x="92" y="195" font-size="10" fill="#2563eb" text-anchor="middle">1 vector — span = a line</text>
+
+  <!-- Panel 2: 2 independent vectors -> plane -->
+  <rect x="187" y="24" width="160" height="178" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <rect x="199" y="36" width="136" height="120" fill="rgba(16,185,129,0.08)"/>
+  <line x1="267" y1="156" x2="318" y2="96" stroke="#2563eb" stroke-width="3" marker-end="url(#dg-blue)"/>
+  <line x1="267" y1="156" x2="232" y2="106" stroke="#d97706" stroke-width="3" marker-end="url(#dg-amber)"/>
+  <circle cx="267" cy="156" r="2.5" fill="#64748b"/>
+  <text x="267" y="195" font-size="10" fill="#10b981" text-anchor="middle">2 independent — span = a plane</text>
+
+  <!-- Panel 3: third vector — dependent (flat) vs independent (pops out) -->
+  <rect x="362" y="24" width="160" height="178" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <polygon points="442,180 492,162 505,118 455,136" fill="rgba(16,185,129,0.10)" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="442" y1="180" x2="486" y2="164" stroke="#2563eb" stroke-width="2.5" marker-end="url(#dg-blue)"/>
+  <line x1="442" y1="180" x2="460" y2="140" stroke="#d97706" stroke-width="2.5" marker-end="url(#dg-amber)"/>
+  <line x1="442" y1="180" x2="412" y2="152" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="4,3" marker-end="url(#dg-gray)"/>
+  <line x1="442" y1="180" x2="442" y2="42" stroke="#10b981" stroke-width="3" marker-end="url(#dg-green)"/>
+  <circle cx="442" cy="180" r="2.5" fill="#64748b"/>
+  <text x="442" y="158" font-size="9" fill="#64748b">dependent</text>
+  <text x="448" y="55" font-size="9" fill="#10b981" font-weight="700">independent</text>
+  <text x="442" y="195" font-size="9.5" fill="#64748b" text-anchor="middle">flat = redundant · upward = new dimension</text>
+</svg>

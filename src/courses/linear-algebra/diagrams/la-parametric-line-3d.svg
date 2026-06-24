@@ -1,0 +1,44 @@
+<svg viewBox="0 0 420 270" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-axis  { stroke: #cbd5e1; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-axis  { stroke: #334155; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="420" height="270" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="pl-gray" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#64748b"/></marker>
+    <marker id="pl-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+  </defs>
+
+  <!-- small 3D axis tripod, bottom-left, for context -->
+  <line x1="50" y1="235" x2="108" y2="235" class="svg-axis" stroke-width="1.5"/>
+  <line x1="50" y1="235" x2="50" y2="185" class="svg-axis" stroke-width="1.5"/>
+  <line x1="50" y1="235" x2="22" y2="252" class="svg-axis" stroke-width="1.5"/>
+  <text x="112" y="239" font-size="10" class="svg-muted">x</text>
+  <text x="44" y="180" font-size="10" class="svg-muted">y</text>
+  <text x="10" y="260" font-size="10" class="svg-muted">z</text>
+
+  <!-- the infinite line, with arrowheads both ends -->
+  <line x1="90" y1="235" x2="370" y2="70" stroke="#64748b" stroke-width="2.5" marker-start="url(#pl-gray)" marker-end="url(#pl-gray)"/>
+
+  <!-- t=-1 point -->
+  <circle cx="188" cy="177" r="4" fill="#d97706"/>
+  <text x="172" y="195" font-size="11" fill="#d97706" font-weight="700">t=-1</text>
+
+  <!-- P0 (t=0) -->
+  <circle cx="216" cy="161" r="5" fill="#1e293b"/>
+  <text x="225" y="180" font-size="12" fill="#1e293b" font-weight="700">P₀ (t=0)</text>
+
+  <!-- t=1 point -->
+  <circle cx="244" cy="144" r="4" fill="#10b981"/>
+  <text x="252" y="128" font-size="11" fill="#10b981" font-weight="700">t=1</text>
+
+  <!-- direction vector d, overlaid from P0 to t=1 -->
+  <line x1="216" y1="161" x2="241" y2="146" stroke="#2563eb" stroke-width="3.5" marker-end="url(#pl-blue)"/>
+  <text x="270" y="100" font-size="13" fill="#2563eb" font-weight="700">d — direction vector</text>
+
+  <text x="210" y="255" font-size="11" class="svg-muted" text-anchor="middle">r(t) = P₀ + t·d — one parameter t sweeps out the whole line</text>
+</svg>

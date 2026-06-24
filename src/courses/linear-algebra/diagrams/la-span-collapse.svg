@@ -1,0 +1,60 @@
+<svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="230" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="sp-blue" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+    <marker id="sp-amber" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#d97706"/></marker>
+  </defs>
+
+  <text x="240" y="18" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">Span depends entirely on direction, not on how many vectors you have</text>
+
+  <!-- Panel 1: Independent vectors -> span = full plane -->
+  <rect x="12" y="26" width="210" height="188" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="117" y="44" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">Independent: v₁, v₂ point apart</text>
+
+  <!-- shaded plane fill -->
+  <rect x="24" y="54" width="186" height="148" fill="rgba(16,185,129,0.08)"/>
+  <!-- scatter of reachable points -->
+  <circle cx="60" cy="180" r="2.5" fill="#10b981"/>
+  <circle cx="90" cy="150" r="2.5" fill="#10b981"/>
+  <circle cx="150" cy="170" r="2.5" fill="#10b981"/>
+  <circle cx="180" cy="100" r="2.5" fill="#10b981"/>
+  <circle cx="140" cy="80" r="2.5" fill="#10b981"/>
+  <circle cx="70" cy="90" r="2.5" fill="#10b981"/>
+  <circle cx="190" cy="180" r="2.5" fill="#10b981"/>
+
+  <!-- v1, v2 from a center origin -->
+  <line x1="117" y1="138" x2="160" y2="100" stroke="#2563eb" stroke-width="2.5" marker-end="url(#sp-blue)"/>
+  <text x="166" y="96" font-size="10" fill="#2563eb" font-weight="700">v₁</text>
+  <line x1="117" y1="138" x2="95" y2="180" stroke="#d97706" stroke-width="2.5" marker-end="url(#sp-amber)"/>
+  <text x="78" y="190" font-size="10" fill="#d97706" font-weight="700">v₂</text>
+  <circle cx="117" cy="138" r="2" fill="#64748b"/>
+
+  <text x="117" y="206" font-size="9" fill="#10b981" text-anchor="middle">Reaches every point — span = ℝ²</text>
+
+  <!-- Panel 2: Dependent vectors -> span = single line -->
+  <rect x="258" y="26" width="210" height="188" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="363" y="44" font-size="10" fill="#dc2626" text-anchor="middle" font-weight="700">Dependent: v₁, v₂ point the same way</text>
+
+  <!-- the single line they're trapped on -->
+  <line x1="280" y1="195" x2="445" y2="55" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.6"/>
+
+  <line x1="363" y1="138" x2="400" y2="105" stroke="#2563eb" stroke-width="2.5" marker-end="url(#sp-blue)"/>
+  <text x="405" y="100" font-size="10" fill="#2563eb" font-weight="700">v₁</text>
+  <line x1="363" y1="138" x2="333" y2="164" stroke="#d97706" stroke-width="2.5" marker-end="url(#sp-amber)"/>
+  <text x="298" y="172" font-size="10" fill="#d97706" font-weight="700">v₂ = -0.6v₁</text>
+  <circle cx="363" cy="138" r="2" fill="#64748b"/>
+
+  <text x="363" y="206" font-size="9" fill="#dc2626" text-anchor="middle">Trapped on one line — span ≠ ℝ²</text>
+</svg>

@@ -1,3 +1,6 @@
+import rowPictureUrl from '../diagrams/la-row-picture-three-cases.svg?url'
+import columnPictureUrl from '../diagrams/la-column-picture.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la1-004',
@@ -23,15 +26,37 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Start with a concrete example: $2x + y = 5$ and $x - y = 1$. Check that $(x, y) = (2, 1)$ works: $4 + 1 = 5$ \u2713 and $2 - 1 = 1$ \u2713. But how do we find $(2, 1)$ without guessing, and what do we do with 10 equations in 10 unknowns? The answer is Gaussian elimination \u2014 a systematic algorithm that applies three simple operations to transform any system into a form you can read off directly.',
       'Let\'s start with two unknowns. Suppose you want to find numbers $x$ and $y$ that satisfy both of these at once: $2x + y = 5$ and $x - y = 1$. Geometrically, each equation is a LINE in the $xy$-plane. The solution is the point where those lines cross.',
       '**The Row Picture.** Each equation draws a line (in 2D) or a plane (in 3D). You are looking for the intersection point. If the lines cross, there is exactly one solution. If the lines are parallel, there is no solution — the system is inconsistent. If the lines are identical, every point on the line works — infinitely many solutions.',
+      ] },
+      { type: 'image', src: rowPictureUrl,
+        alt: 'Three panels: lines crossing at one point labeled one unique solution, two parallel lines never meeting labeled no solution, and two identical overlapping lines labeled infinitely many solutions',
+        caption: 'Every linear system, viewed by rows, is just lines or planes — and there are only ever three possible outcomes.' },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on:** Take the system $x + 2y = 4$ and $2x + 4y = 8$. Notice that equation 2 = $2\\times$ equation 1. Without any computation, predict: how many solutions does this system have? Hold your answer until Example 3.',
       '**The Column Picture.** Rewrite the same system as a single vector equation: $x \\begin{bmatrix}2\\\\1\\end{bmatrix} + y \\begin{bmatrix}1\\\\-1\\end{bmatrix} = \\begin{bmatrix}5\\\\1\\end{bmatrix}$. Now you are asking: what scalar combination of the two column vectors reaches the target vector $[5, 1]$? This is a span question — and you already know exactly what that means.',
+      ] },
+      { type: 'image', src: columnPictureUrl,
+        alt: 'Column vector a1 scaled by x and column vector a2 scaled by y placed tip-to-tail, summing to the target vector b, illustrating that solving Ax=b asks what combination of the columns reaches b',
+        caption: "The same system, viewed by columns: solving Ax=b is asking which combination of A's columns reaches b." },
+      { type: 'prose', paragraphs: [
       'These two pictures (row and column) are the same system viewed from different angles. Learning to flip between them is one of the most powerful habits in linear algebra.',
       '**Gaussian Elimination: the algorithm.** The key insight is that you can do three things to a system of equations without changing the solution: (1) swap two equations, (2) multiply an equation by a non-zero number, (3) add a multiple of one equation to another. These are the three elementary row operations. Gaussian elimination uses them systematically to create zeros below each leading entry, turning the system into a staircase shape — called row echelon form — where back-substitution becomes trivial.',
+      ] },
+      { type: 'viz', id: 'GaussianEliminationStepper',
+        title: 'Gaussian Elimination Step by Step',
+        mathBridge: 'Step through Gaussian elimination on a live system. Each step applies one row operation and shows how the augmented matrix changes. Observe how a contradiction row $[0\\ 0\\ |\\ c]$ signals inconsistency, while a zero row $[0\\ 0\\ |\\ 0]$ signals a free variable.',
+        caption: 'Watch the staircase form emerge one row operation at a time.' },
+      { type: 'prose', paragraphs: [
       '**Where this is heading:** Once you master systems, the natural next move is to ask: can we represent this whole process as a single object that encodes the system AND the transformation we are performing? Yes — that object is a matrix. Phase 2 begins exactly there.',
+      ] },
+      { type: 'viz', id: 'LALinearSystemsModule',
+        title: 'Linear Systems — Concept to CNC',
+        mathBridge: 'A five-tab module: Concept reviews the three outcomes and EROs; Canonical walks through a full 3×3 solve step by step; Real World shows how CNC firmware solves a sensor system every millisecond; Interactive lets you perform swap/scale/replace on any system and auto-RREF it; Practice gives five applied problems to work by hand.',
+        caption: 'From row operations to real machine positioning — one unified module.' },
     ],
     callouts: [
       {
@@ -68,20 +93,6 @@ export default {
         type: 'warning',
         title: 'Three Possible Outcomes — No In-Between',
         body: 'A system of linear equations always has exactly:\n• **One solution** (lines/planes intersect at a single point)\n• **No solution** (lines/planes are parallel — inconsistent)\n• **Infinitely many solutions** (lines/planes overlap — free variables exist)\n\nThere is no such thing as "exactly two solutions" in a linear system.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'GaussianEliminationStepper',
-        title: 'Gaussian Elimination Step by Step',
-        mathBridge: 'Step through Gaussian elimination on a live system. Each step applies one row operation and shows how the augmented matrix changes. Observe how a contradiction row $[0\ 0\ |\  c]$ signals inconsistency, while a zero row $[0\ 0\ |\  0]$ signals a free variable.',
-        caption: 'Watch the staircase form emerge one row operation at a time.',
-      },
-      {
-        id: 'LALinearSystemsModule',
-        title: 'Linear Systems — Concept to CNC',
-        mathBridge: 'A five-tab module: Concept reviews the three outcomes and EROs; Canonical walks through a full 3×3 solve step by step; Real World shows how CNC firmware solves a sensor system every millisecond; Interactive lets you perform swap/scale/replace on any system and auto-RREF it; Practice gives five applied problems to work by hand.',
-        caption: 'From row operations to real machine positioning — one unified module.',
       },
     ],
   },

@@ -1,3 +1,7 @@
+import linearCombinationUrl from '../diagrams/la-linear-combination.svg?url'
+import spanCollapseUrl from '../diagrams/la-span-collapse.svg?url'
+import basisCoordinatesUrl from '../diagrams/la-basis-coordinates.svg?url'
+
 export default {
   id: 'la1-002',
   slug: 'linear-combinations',
@@ -20,14 +24,68 @@ export default {
   },
 
   intuition: {
-    prose: [
-      'Take $\\mathbf{v}_1 = [2, 0]^T$ and $\\mathbf{v}_2 = [0, 1]^T$. Scale $\\mathbf{v}_1$ by $3$ to get $[6, 0]^T$. Scale $\\mathbf{v}_2$ by $-2$ to get $[0, -2]^T$. Add them: $[6, -2]^T$. Change the scalars to $c_1 = 5$, $c_2 = 4$: you get $[10, 4]^T$. Every choice of scalars $(c_1, c_2)$ lands you at a different output vector. This operation — scaling vectors and adding the results — is called a **linear combination**, and it is the engine that drives all of linear algebra.',
-      'There are exactly two operations in linear algebra: **scalar multiplication** (stretching or shrinking a vector) and **vector addition** (placing the tail of one vector at the tip of another). When you do both at once — scaling a bunch of vectors and adding them — you have created a **Linear Combination**.',
-      'If you have two vectors $\\mathbf{v}$ and $\\mathbf{w}$, ask: "If I scale and add these two vectors in every possible way, what set of points can I reach?" The answer is called the **Span**.',
-      '**Predict before reading on:** Take $\\mathbf{v} = [1, 0]^T$ and $\\mathbf{w} = [2, 0]^T$. Can you reach the point $[0, 1]^T$ using some linear combination $c_1\\mathbf{v} + c_2\\mathbf{w}$? Try to find $c_1, c_2$ that work — hold your answer until the next paragraph.',
-      'If $\\mathbf{v}$ and $\\mathbf{w}$ point in totally different directions, you can reach every single point on the 2D plane — their span is the entire 2D universe. But if they point in the exact same direction, you are trapped on a single 1D line. The second vector is redundant. That is **Linearly Dependent**.',
-      'If the vectors point in different directions, they are **Linearly Independent**. When a set of vectors spans the entire space AND has zero redundancies, we call it a **Basis** — the absolute minimum number of building blocks needed to construct a universe.',
-      '**Where this is heading:** The coordinates $[3, -2]$ are a secret linear combination of the standard basis (3 steps right, 2 steps down). Later, when we get to matrices, a matrix is a machine that moves the basis vectors to new locations, dragging all of space with them.',
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
+          'Take $\\mathbf{v}_1 = [2, 0]^T$ and $\\mathbf{v}_2 = [0, 1]^T$. Scale $\\mathbf{v}_1$ by $3$ to get $[6, 0]^T$. Scale $\\mathbf{v}_2$ by $-2$ to get $[0, -2]^T$. Add them: $[6, -2]^T$. Change the scalars to $c_1 = 5$, $c_2 = 4$: you get $[10, 4]^T$. Every choice of scalars $(c_1, c_2)$ lands you at a different output vector. This operation — scaling vectors and adding the results — is called a **linear combination**, and it is the engine that drives all of linear algebra.',
+          'There are exactly two operations in linear algebra: **scalar multiplication** (stretching or shrinking a vector) and **vector addition** (placing the tail of one vector at the tip of another). When you do both at once — scaling a bunch of vectors and adding them — you have created a **Linear Combination**.',
+        ],
+      },
+      {
+        type: 'image',
+        src: linearCombinationUrl,
+        alt: 'Vector 3v1 = [6,0] drawn from the origin, then -2v2 = [0,-2] placed tip-to-tail at its end, with the sum vector [6,-2] drawn directly from the origin',
+        caption: 'Scale each vector independently, then place the results tip-to-tail — the sum is the linear combination.',
+      },
+      {
+        type: 'viz',
+        id: 'LALesson02_Combinations',
+        title: 'Linear Combinations Sweeping the Plane',
+        mathBridge: 'Adjust the scalar multipliers $c_1$ and $c_2$ using the sliders. Watch the result vector sweep across the plane. When both vectors are independent, you can reach every point on the 2D plane — the span IS the full plane.',
+        caption: 'Every point you can reach with any $c_1, c_2$ is in the span of those two vectors.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          'If you have two vectors $\\mathbf{v}$ and $\\mathbf{w}$, ask: "If I scale and add these two vectors in every possible way, what set of points can I reach?" The answer is called the **Span**.',
+          '**Predict before reading on:** Take $\\mathbf{v} = [1, 0]^T$ and $\\mathbf{w} = [2, 0]^T$. Can you reach the point $[0, 1]^T$ using some linear combination $c_1\\mathbf{v} + c_2\\mathbf{w}$? Try to find $c_1, c_2$ that work — hold your answer until the next paragraph.',
+          'If $\\mathbf{v}$ and $\\mathbf{w}$ point in totally different directions, you can reach every single point on the 2D plane — their span is the entire 2D universe. But if they point in the exact same direction, you are trapped on a single 1D line. The second vector is redundant. That is **Linearly Dependent**.',
+          'If the vectors point in different directions, they are **Linearly Independent**. When a set of vectors spans the entire space AND has zero redundancies, we call it a **Basis** — the absolute minimum number of building blocks needed to construct a universe.',
+        ],
+      },
+      {
+        type: 'image',
+        src: spanCollapseUrl,
+        alt: 'Left panel: two vectors pointing apart, with scattered points filling the whole panel, labeled span equals R-squared. Right panel: two vectors pointing along the same dashed line, labeled trapped on one line, span not equal to R-squared',
+        caption: 'Direction is everything: vectors pointing apart span the whole plane; vectors pointing the same way collapse to a line.',
+      },
+      {
+        type: 'viz',
+        id: 'BasisVectorProof',
+        title: 'Coordinates as Linear Combination Weights',
+        mathBridge: 'This visualizer decomposes any vector into its standard-basis components. When you point to $(3, -2)$, it shows $3 \\cdot \\hat{\\mathbf{i}} + (-2) \\cdot \\hat{\\mathbf{j}}$ — not just the numbers, but the full linear combination with labeled arrows. The $x$-coordinate IS the $\\hat{\\mathbf{i}}$ scalar weight; the $y$-coordinate IS the $\\hat{\\mathbf{j}}$ scalar weight. Drag any point and watch the two component arrows resize — this makes the abstract definition of a linear combination concrete.',
+        caption: 'Every coordinate pair = a linear combination of the standard basis vectors.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Where this is heading:** The coordinates $[3, -2]$ are a secret linear combination of the standard basis (3 steps right, 2 steps down). Later, when we get to matrices, a matrix is a machine that moves the basis vectors to new locations, dragging all of space with them.',
+        ],
+      },
+      {
+        type: 'image',
+        src: basisCoordinatesUrl,
+        alt: 'Standard basis vectors i-hat and j-hat shown faintly, with 3 times i-hat drawn from the origin and -2 times j-hat placed tip-to-tail, summing to the vector [3,-2]',
+        caption: 'Writing a coordinate pair already IS performing a linear combination of the standard basis.',
+      },
+      {
+        type: 'viz',
+        id: 'CartesianGridLab',
+        title: 'Build Any Vector by Scaling and Adding Basis Vectors',
+        mathBridge: 'Use the sliders to pick $c_1$ and $c_2$. The lab draws $c_1 \\hat{\\mathbf{i}}$ (horizontal arrow) and $c_2 \\hat{\\mathbf{j}}$ (vertical arrow) separately, then places them tip-to-tail to show the resultant $c_1 \\hat{\\mathbf{i}} + c_2 \\hat{\\mathbf{j}}$. Try $c_1 = 4$, $c_2 = -3$: the result arrow lands exactly at $(4, -3)$ — confirming that the two scalar weights ARE the coordinates. Change $c_1$ and $c_2$ to any real numbers and observe that you can reach every point in the plane with just these two basis vectors.',
+        caption: 'Scaling and adding the two basis vectors can reach every point in the plane.',
+      },
     ],
     callouts: [
       {
@@ -54,26 +112,6 @@ export default {
         type: 'insight',
         title: 'When to Use This',
         body: 'Use the **span** test to answer: "Can I reach target $\\mathbf{b}$ using these building blocks?" Use **independence** to check: "Are any of my vectors redundant?" Use a **basis** whenever you need a minimal, non-redundant coordinate system.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson02_Combinations',
-        title: 'Linear Combinations Sweeping the Plane',
-        mathBridge: 'Adjust the scalar multipliers $c_1$ and $c_2$ using the sliders. Watch the result vector sweep across the plane. When both vectors are independent, you can reach every point on the 2D plane — the span IS the full plane.',
-        caption: 'Every point you can reach with any $c_1, c_2$ is in the span of those two vectors.',
-      },
-      {
-        id: 'BasisVectorProof',
-        title: 'Coordinates as Linear Combination Weights',
-        mathBridge: 'This visualizer decomposes any vector into its standard-basis components. When you point to $(3, -2)$, it shows $3 \\cdot \\hat{\\mathbf{i}} + (-2) \\cdot \\hat{\\mathbf{j}}$ — not just the numbers, but the full linear combination with labeled arrows. The $x$-coordinate IS the $\\hat{\\mathbf{i}}$ scalar weight; the $y$-coordinate IS the $\\hat{\\mathbf{j}}$ scalar weight. Drag any point and watch the two component arrows resize — this makes the abstract definition of a linear combination concrete.',
-        caption: 'Every coordinate pair = a linear combination of the standard basis vectors.',
-      },
-      {
-        id: 'CartesianGridLab',
-        title: 'Build Any Vector by Scaling and Adding Basis Vectors',
-        mathBridge: 'Use the sliders to pick $c_1$ and $c_2$. The lab draws $c_1 \\hat{\\mathbf{i}}$ (horizontal arrow) and $c_2 \\hat{\\mathbf{j}}$ (vertical arrow) separately, then places them tip-to-tail to show the resultant $c_1 \\hat{\\mathbf{i}} + c_2 \\hat{\\mathbf{j}}$. Try $c_1 = 4$, $c_2 = -3$: the result arrow lands exactly at $(4, -3)$ — confirming that the two scalar weights ARE the coordinates. Change $c_1$ and $c_2$ to any real numbers and observe that you can reach every point in the plane with just these two basis vectors.',
-        caption: 'Scaling and adding the two basis vectors can reach every point in the plane.',
       },
     ],
   },
@@ -193,13 +231,13 @@ origin = np.zeros(2)
 # Left: independent vectors
 ax = axes[0]
 ax.set_title(f"Independent (rank={np.linalg.matrix_rank(indep)}): span = full plane", fontsize=11)
-for i, (v, color, label) in enumerate(zip(indep, [‘steelblue’, ‘darkorange’], [‘v1’, ‘v2’])):
-    ax.annotate(‘’, xy=v, xytext=origin,
-                arrowprops=dict(arrowstyle=’->’, color=color, lw=2.5))
-    ax.text(v[0]+0.05, v[1]+0.05, label, fontsize=11, color=color, fontweight=’bold’)
+for i, (v, color, label) in enumerate(zip(indep, ['steelblue', 'darkorange'], ['v1', 'v2'])):
+    ax.annotate('', xy=v, xytext=origin,
+                arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+    ax.text(v[0]+0.05, v[1]+0.05, label, fontsize=11, color=color, fontweight='bold')
 ax.set_xlim(-0.5, 1.5); ax.set_ylim(-0.5, 1.5)
-ax.set_aspect(‘equal’); ax.grid(True, alpha=0.3)
-ax.axhline(0, color=’k’, lw=0.5); ax.axvline(0, color=’k’, lw=0.5)
+ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
 
 # Right: dependent vectors
 ax2 = axes[1]
@@ -207,14 +245,14 @@ ax2.set_title(f"Dependent (rank={np.linalg.matrix_rank(dep)}): span = 1D line", 
 # Draw the 1D line they span
 t = np.linspace(-1, 2.5, 100)
 direction = dep[0] / np.linalg.norm(dep[0])
-ax2.plot(t * dep[0][0], t * dep[0][1], ‘gray’, lw=1, linestyle=’--’, alpha=0.5, label=’span (1D line)’)
-for v, color, label in zip(dep, [‘steelblue’, ‘darkorange’], [‘v1’, ‘v2’]):
-    ax2.annotate(‘’, xy=v, xytext=origin,
-                 arrowprops=dict(arrowstyle=’->’, color=color, lw=2.5))
-    ax2.text(v[0]+0.05, v[1]+0.05, label, fontsize=11, color=color, fontweight=’bold’)
+ax2.plot(t * dep[0][0], t * dep[0][1], 'gray', lw=1, linestyle='--', alpha=0.5, label='span (1D line)')
+for v, color, label in zip(dep, ['steelblue', 'darkorange'], ['v1', 'v2']):
+    ax2.annotate('', xy=v, xytext=origin,
+                 arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+    ax2.text(v[0]+0.05, v[1]+0.05, label, fontsize=11, color=color, fontweight='bold')
 ax2.set_xlim(-1, 5); ax2.set_ylim(-1, 3)
-ax2.set_aspect(‘equal’); ax2.grid(True, alpha=0.3)
-ax2.axhline(0, color=’k’, lw=0.5); ax2.axvline(0, color=’k’, lw=0.5)
+ax2.set_aspect('equal'); ax2.grid(True, alpha=0.3)
+ax2.axhline(0, color='k', lw=0.5); ax2.axvline(0, color='k', lw=0.5)
 ax2.legend(fontsize=9)
 
 plt.tight_layout()

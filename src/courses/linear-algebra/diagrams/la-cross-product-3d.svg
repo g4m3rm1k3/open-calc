@@ -1,0 +1,42 @@
+<svg viewBox="0 0 420 280" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-floor { stroke: #cbd5e1; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-floor { stroke: #334155; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="420" height="280" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="cp-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+    <marker id="cp-amber" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#d97706"/></marker>
+    <marker id="cp-green" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#10b981"/></marker>
+  </defs>
+
+  <!-- floor: dashed reference grid lines through the origin, parallel to u and v -->
+  <line x1="40" y1="240" x2="380" y2="105" class="svg-floor" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="60" y1="240" x2="280" y2="60" class="svg-floor" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Origin O -->
+  <circle cx="160" cy="210" r="3" fill="#1e293b"/>
+  <text x="148" y="226" font-size="12" fill="#1e293b">O</text>
+
+  <!-- the floor parallelogram spanned by u and v, shaded -->
+  <polygon points="160,210 290,185 330,95 200,120" fill="rgba(37,99,235,0.10)" stroke="#94a3b8" stroke-width="1"/>
+
+  <!-- u: floor vector, blue -->
+  <line x1="160" y1="210" x2="284" y2="186" stroke="#2563eb" stroke-width="3" marker-end="url(#cp-blue)"/>
+  <text x="288" y="196" font-size="13" fill="#2563eb" font-weight="700">u</text>
+
+  <!-- v: floor vector, amber -->
+  <line x1="160" y1="210" x2="196" y2="123" stroke="#d97706" stroke-width="3" marker-end="url(#cp-amber)"/>
+  <text x="174" y="112" font-size="13" fill="#d97706" font-weight="700">v</text>
+
+  <!-- u x v: straight up out of the floor, green -->
+  <line x1="160" y1="210" x2="160" y2="40" stroke="#10b981" stroke-width="3.5" marker-end="url(#cp-green)"/>
+  <text x="168" y="48" font-size="13" fill="#10b981" font-weight="700">u × v</text>
+
+  <text x="210" y="255" font-size="11" class="svg-muted" text-anchor="middle">u × v is perpendicular to the floor —</text>
+  <text x="210" y="270" font-size="11" class="svg-muted" text-anchor="middle">its length equals the shaded area</text>
+</svg>

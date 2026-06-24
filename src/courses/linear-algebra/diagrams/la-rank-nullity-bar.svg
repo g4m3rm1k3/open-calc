@@ -1,0 +1,41 @@
+<svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="420" height="200" rx="10" class="svg-bg"/>
+
+  <text x="210" y="22" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">Every column is either a pivot column or a free column</text>
+
+  <!-- rank(A) bracket -->
+  <path d="M 40 50 L 40 42 L 244 42 L 244 50" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="142" y="36" font-size="11" fill="#2563eb" text-anchor="middle" font-weight="700">rank(A) = 3 pivot columns</text>
+
+  <!-- nullity(A) bracket -->
+  <path d="M 244 50 L 244 42 L 380 42 L 380 50" fill="none" stroke="#d97706" stroke-width="1.5"/>
+  <text x="312" y="36" font-size="11" fill="#d97706" text-anchor="middle" font-weight="700">nullity(A) = 2 free columns</text>
+
+  <!-- segmented bar -->
+  <rect x="40"  y="52" width="68" height="50" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.5"/>
+  <rect x="108" y="52" width="68" height="50" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.5"/>
+  <rect x="176" y="52" width="68" height="50" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.5"/>
+  <rect x="244" y="52" width="68" height="50" fill="rgba(217,119,6,0.18)" stroke="#d97706" stroke-width="1.5"/>
+  <rect x="312" y="52" width="68" height="50" fill="rgba(217,119,6,0.18)" stroke="#d97706" stroke-width="1.5"/>
+
+  <text x="74"  y="82" font-size="10" fill="#2563eb" text-anchor="middle">pivot</text>
+  <text x="142" y="82" font-size="10" fill="#2563eb" text-anchor="middle">pivot</text>
+  <text x="210" y="82" font-size="10" fill="#2563eb" text-anchor="middle">pivot</text>
+  <text x="278" y="82" font-size="10" fill="#d97706" text-anchor="middle">free</text>
+  <text x="346" y="82" font-size="10" fill="#d97706" text-anchor="middle">free</text>
+
+  <!-- total n bracket -->
+  <path d="M 40 112 L 40 120 L 380 120 L 380 112" fill="none" stroke="#64748b" stroke-width="1.5"/>
+  <text x="210" y="135" font-size="11" class="svg-muted" text-anchor="middle">n = 5 total columns</text>
+
+  <text x="210" y="170" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">rank(A) + nullity(A) = n   →   3 + 2 = 5</text>
+  <text x="210" y="188" font-size="10" class="svg-muted" text-anchor="middle">(pivot and free columns can appear in any order — grouped here just for clarity)</text>
+</svg>

@@ -1,3 +1,6 @@
+import parametricLine3dUrl from '../diagrams/la-parametric-line-3d.svg?url'
+import planeNormalVectorUrl from '../diagrams/la-plane-normal-vector.svg?url'
+
 export default {
   id: 'la1-005',
   slug: 'lines-and-planes',
@@ -20,15 +23,33 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Start at the point $(1, 2, -1)$ and walk in direction $[3, -1, 2]$. After $t = 0$: you are at $(1, 2, -1)$. After $t = 1$: $(4, 1, 1)$. After $t = -1$: $(-2, 3, -3)$. The formula $(1+3t,\\ 2-t,\\ -1+2t)$ visits every point on an infinite straight line — one free parameter $t$ traces the whole thing. This is the **parametric form** of a line. Now, to describe a flat surface (a plane) in 3D, a direction to walk *along* the surface is not enough — you need the one direction that is perpendicular to the entire surface: the **normal vector**.',
       'Think of a line in 3D. You need two pieces of information: a **point** you start from, and a **direction** to travel. If you start at point $P_0$ and walk in direction $\\mathbf{d}$, after time $t$ you are at $P_0 + t\\mathbf{d}$. That simple idea is the parametric equation of a line.',
+      ] },
+      { type: 'image', src: parametricLine3dUrl,
+        alt: 'A point P0 at t=0 on an infinite line, with a nearby point at t=1 and t=-1 marked, and a direction vector d drawn from P0 to the t=1 point',
+        caption: 'One base point P₀ and one direction vector d are enough to sweep out every point on the line.' },
+      { type: 'prose', paragraphs: [
       'A plane needs a different description. Instead of a direction to travel ALONG the plane, it is easier to give a direction PERPENDICULAR to the plane — the **normal vector** $\\mathbf{n}$. Every point $\\mathbf{x}$ on the plane satisfies $\\mathbf{n} \\cdot (\\mathbf{x} - P_0) = 0$: the vector from $P_0$ to $\\mathbf{x}$ is perpendicular to $\\mathbf{n}$.',
+      ] },
+      { type: 'image', src: planeNormalVectorUrl,
+        alt: 'A plane patch with base point P0, a normal vector n drawn straight up perpendicular to the plane, and another point x in the plane with the vector x minus P0 drawn lying flat within the plane',
+        caption: 'The normal vector n is perpendicular to every direction inside the plane — that single fact defines the equation n·(x−P₀)=0.' },
+      { type: 'prose', paragraphs: [
       '**Why does the cross product appear here?** If you know two vectors lying IN a plane (say the edges of a triangle), their cross product is perpendicular to both — it IS the normal vector. So the cross product is the machine for finding plane equations from geometric data.',
       '**Predict before reading the intersection formula:** the line $\\mathbf{r}(t) = (2,0,1) + t[1,-1,3]$ and the plane $x + 2y - z = 4$. Compute $\\mathbf{n} \\cdot \\mathbf{d}_{\\text{line}} = [1,2,-1]\\cdot[1,-1,3]$ mentally: $1 - 2 - 3 = -4 \\neq 0$. The denominator is nonzero, so the line will intersect the plane at exactly one point. Verify this in Example 3.',
       'Lines and planes are the 1D and 2D linear subspaces (shifted by a point) of 3D space. Every linear algebra concept — span, basis, orthogonality — has a concrete geometric home in lines and planes.',
       '**CNC and robotics applications.** Every CNC toolpath segment is a line in 3D space — parametrically $\\mathbf{r}(t) = P_0 + t\\mathbf{d}$ where $\\mathbf{d}$ is the feed direction and $t$ is proportional to time. The machined surface is (locally) a plane with a specific normal. The controller must constantly check: is the tool axis aligned with the surface normal? Is the feedrate vector tangent to the surface (dot product with normal = 0)? In 5-axis machining, the tool orientation is defined by two vectors — the tool axis and the surface normal — and keeping these properly aligned is a geometric problem entirely expressed through lines, planes, and their intersections.',
+      ] },
+      { type: 'viz', id: 'ProjectionMatrixViz',
+        title: 'Lines and Planes: Geometric Intuition',
+        mathBridge: 'Visualize parametric lines and normal-vector planes in 3D. The normal vector is always perpendicular to every in-plane direction. The line-plane intersection is the single point where a moving ray meets a flat surface.',
+        caption: 'Direction vectors drive lines; normal vectors define planes.' },
+      { type: 'prose', paragraphs: [
       '**Where this is heading.** When you have multiple plane equations (a system of linear equations), finding where the planes all intersect simultaneously is a system of equations problem — which is exactly what Gauss-Jordan RREF (the next lesson) solves. Every row of an $m \\times n$ linear system is one plane in $n$-dimensional space, and the solution is the set of points where all those hyperplanes meet.',
+      ] },
     ],
     callouts: [
       {
@@ -65,14 +86,6 @@ export default {
         type: 'insight',
         title: 'When to Use This',
         body: `Use **parametric line form** when you need to:\n- Trace a path through space (robotics, animation, physics)\n- Test if a point lies on a line (check whether all components give the same $t$)\n- Find where a ray hits a surface (ray tracing, collision detection)\n\nUse **plane normal form** when you need to:\n- Test if a point is on a plane: evaluate $\\mathbf{n} \\cdot \\mathbf{x} - d$; zero means on the plane, sign tells which side\n- Measure distance from a point to a plane: $\\frac{|\\mathbf{n} \\cdot Q - d|}{\\|\\mathbf{n}\\|}$\n- Find the normal to a surface given two edges: take the cross product`,
-      },
-    ],
-    visualizations: [
-      {
-        id: 'ProjectionMatrixViz',
-        title: 'Lines and Planes: Geometric Intuition',
-        mathBridge: 'Visualize parametric lines and normal-vector planes in 3D. The normal vector is always perpendicular to every in-plane direction. The line-plane intersection is the single point where a moving ray meets a flat surface.',
-        caption: 'Direction vectors drive lines; normal vectors define planes.',
       },
     ],
   },

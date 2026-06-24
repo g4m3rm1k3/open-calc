@@ -1,3 +1,7 @@
+import dotProductSignUrl from '../diagrams/la-dot-product-sign.svg?url'
+import dotProductShadowUrl from '../diagrams/la-dot-product-shadow.svg?url'
+import crossProduct3dUrl from '../diagrams/la-cross-product-3d.svg?url'
+
 export default {
   id: 'la1-003',
   slug: 'dot-and-cross-products',
@@ -20,14 +24,64 @@ export default {
   },
 
   intuition: {
-    prose: [
-      'Take $\\mathbf{u} = [3, 0]^T$ and $\\mathbf{v} = [0, 4]^T$. Multiply matching components and sum: $(3)(0) + (0)(4) = 0$. Zero means exactly perpendicular. Now try $\\mathbf{u} = [3, 0]^T$ and $\\mathbf{w} = [1, 0]^T$ (both pointing right): $(3)(1) + (0)(0) = 3$ — positive, because they fully agree in direction. This component-multiply-and-sum operation is the **dot product**, and its sign is the universal test for directional agreement between any two vectors in any dimension.',
-      'Think of the **Dot Product** as the ultimate measure of agreement. If two vectors point in exactly the same direction, their dot product is large. If they point in opposite directions, it is large and negative. If they are perfectly perpendicular — they have absolutely nothing in common — their dot product is exactly zero. The dot product crushes two vectors down into a single scalar.',
-      '**Predict before reading on:** Take $\\mathbf{p} = [1, 1]^T$ (pointing at 45°) and $\\mathbf{q} = [-1, 1]^T$ (pointing at 135°). Predict the sign of $\\mathbf{p}\\cdot\\mathbf{q}$: positive, zero, or negative? Compute it and check whether the result matches your geometric intuition.',
-      'Geometrically, the dot product is shining a flashlight down onto one vector and seeing how long its shadow is on the other vector. This "shadow" is called a *projection*. Multiplying the shadow length by the length of the vector it lies on gives the dot product.',
-      'The **Cross Product** is the opposite: it measures disagreement. Defined only in 3D, when you cross two 3D arrows, the result is a brand new 3D vector with two magical properties: (1) Its length equals the area of the parallelogram formed by the original two vectors, and (2) it points completely perpendicular to BOTH original vectors.',
-      '**Real-world application — CNC toolpath geometry.** In 5-axis CNC machining, the dot product tells the controller whether the cutting tool is properly oriented. The tool axis vector $\\hat{\\mathbf{t}}$ and the surface normal $\\hat{\\mathbf{n}}$ satisfy $\\hat{\\mathbf{t}} \\cdot \\hat{\\mathbf{n}} = \\cos\\theta$ where $\\theta$ is the tilt angle. Most surface operations want $\\theta \\approx 0°$ (tool perpendicular to surface — $\\hat{\\mathbf{t}} \\cdot \\hat{\\mathbf{n}} \\approx 1$). Flank milling of ruled surfaces instead requires the tool to be nearly parallel to the surface ($\\theta \\approx 90°$, dot product $\\approx 0$). The cross product $\\hat{\\mathbf{t}} \\times \\hat{\\mathbf{n}}$ gives the lead direction — the axis around which the tilted tool rotates — and its magnitude gives $\\sin\\theta$, the amount of tilt.',
-      '**Where this is heading:** The dot product is the foundation of matrix multiplication. When you multiply a row of a matrix by a column vector, you are doing a dot product. Orthogonality (dot product = 0) will eventually lead to the Singular Value Decomposition (SVD).',
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
+          'Take $\\mathbf{u} = [3, 0]^T$ and $\\mathbf{v} = [0, 4]^T$. Multiply matching components and sum: $(3)(0) + (0)(4) = 0$. Zero means exactly perpendicular. Now try $\\mathbf{u} = [3, 0]^T$ and $\\mathbf{w} = [1, 0]^T$ (both pointing right): $(3)(1) + (0)(0) = 3$ — positive, because they fully agree in direction. This component-multiply-and-sum operation is the **dot product**, and its sign is the universal test for directional agreement between any two vectors in any dimension.',
+          'Think of the **Dot Product** as the ultimate measure of agreement. If two vectors point in exactly the same direction, their dot product is large. If they point in opposite directions, it is large and negative. If they are perfectly perpendicular — they have absolutely nothing in common — their dot product is exactly zero. The dot product crushes two vectors down into a single scalar.',
+        ],
+      },
+      {
+        type: 'image',
+        src: dotProductSignUrl,
+        alt: 'A fixed reference vector w pointing right, with v1 thirty degrees above it labeled dot product greater than zero, v2 straight up perpendicular labeled dot product equals zero, and v3 mostly opposite labeled dot product less than zero',
+        caption: 'The sign of u·v tells you which half-plane the vectors share — positive, perpendicular, or opposite.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Predict before reading on:** Take $\\mathbf{p} = [1, 1]^T$ (pointing at 45°) and $\\mathbf{q} = [-1, 1]^T$ (pointing at 135°). Predict the sign of $\\mathbf{p}\\cdot\\mathbf{q}$: positive, zero, or negative? Compute it and check whether the result matches your geometric intuition.',
+        ],
+      },
+      {
+        type: 'viz',
+        id: 'LALesson03_DotCross',
+        title: 'The Shadow of the Dot Product',
+        mathBridge: 'Drag $\\mathbf{w}$ closer to $\\mathbf{v}$. Watch the dot product increase as they align. Make them perpendicular (an L shape) to see the dot product hit zero. Drag them to opposite directions and watch the value go negative.',
+        caption: 'The dot product is a continuous measure of directional alignment.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          'Geometrically, the dot product is shining a flashlight down onto one vector and seeing how long its shadow is on the other vector. This "shadow" is called a *projection*. Multiplying the shadow length by the length of the vector it lies on gives the dot product.',
+        ],
+      },
+      {
+        type: 'image',
+        src: dotProductShadowUrl,
+        alt: 'Vector v at an angle theta above vector w, with a dashed perpendicular line dropping from the tip of v onto w, and the shadow segment along w drawn in bold labeled the projection of v onto w equals the magnitude of v times cosine theta',
+        caption: 'The dot product is the shadow length of v on w, times the length of w: ‖v‖‖w‖cos θ.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          'The **Cross Product** is the opposite: it measures disagreement. Defined only in 3D, when you cross two 3D arrows, the result is a brand new 3D vector with two magical properties: (1) Its length equals the area of the parallelogram formed by the original two vectors, and (2) it points completely perpendicular to BOTH original vectors.',
+        ],
+      },
+      {
+        type: 'image',
+        src: crossProduct3dUrl,
+        alt: 'Two vectors u and v lying in a floor plane, spanning a shaded parallelogram, with the cross product vector u cross v drawn straight up out of the floor, perpendicular to both',
+        caption: 'u × v stands straight up out of the plane of u and v — its length equals the shaded area.',
+      },
+      {
+        type: 'prose',
+        paragraphs: [
+          '**Real-world application — CNC toolpath geometry.** In 5-axis CNC machining, the dot product tells the controller whether the cutting tool is properly oriented. The tool axis vector $\\hat{\\mathbf{t}}$ and the surface normal $\\hat{\\mathbf{n}}$ satisfy $\\hat{\\mathbf{t}} \\cdot \\hat{\\mathbf{n}} = \\cos\\theta$ where $\\theta$ is the tilt angle. Most surface operations want $\\theta \\approx 0°$ (tool perpendicular to surface — $\\hat{\\mathbf{t}} \\cdot \\hat{\\mathbf{n}} \\approx 1$). Flank milling of ruled surfaces instead requires the tool to be nearly parallel to the surface ($\\theta \\approx 90°$, dot product $\\approx 0$). The cross product $\\hat{\\mathbf{t}} \\times \\hat{\\mathbf{n}}$ gives the lead direction — the axis around which the tilted tool rotates — and its magnitude gives $\\sin\\theta$, the amount of tilt.',
+          '**Where this is heading:** The dot product is the foundation of matrix multiplication. When you multiply a row of a matrix by a column vector, you are doing a dot product. Orthogonality (dot product = 0) will eventually lead to the Singular Value Decomposition (SVD).',
+        ],
+      },
     ],
     callouts: [
       {
@@ -64,14 +118,6 @@ export default {
         type: 'insight',
         title: 'When to Use This',
         body: '**Use dot product when:** checking orthogonality (result = 0?), finding angles between vectors, computing projections, measuring how much two things "agree".\n\n**Use cross product when:** finding a normal vector to a plane, computing the area of a parallelogram or triangle, or generating a vector perpendicular to two given vectors.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson03_DotCross',
-        title: 'The Shadow of the Dot Product',
-        mathBridge: 'Drag $\\mathbf{w}$ closer to $\\mathbf{v}$. Watch the dot product increase as they align. Make them perpendicular (an L shape) to see the dot product hit zero. Drag them to opposite directions and watch the value go negative.',
-        caption: 'The dot product is a continuous measure of directional alignment.',
       },
     ],
   },

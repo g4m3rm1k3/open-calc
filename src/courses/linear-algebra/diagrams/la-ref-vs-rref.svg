@@ -1,0 +1,83 @@
+<svg viewBox="0 0 460 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+  </style>
+  <rect width="460" height="230" rx="10" class="svg-bg"/>
+
+  <text x="115" y="22" font-size="11" fill="#d97706" text-anchor="middle" font-weight="700">REF — zeros only below pivots</text>
+  <text x="345" y="22" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">RREF — zeros above AND below</text>
+
+  <!-- ===== Panel 1: REF, origin (30,40) ===== -->
+  <!-- column x: 30,60,90 ; augmented col x: 132 ; row y: 40,70,100 -->
+  <!-- row 1 -->
+  <rect x="30" y="40" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="45" y="60" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">1</text>
+  <rect x="60" y="40" width="30" height="30" fill="rgba(217,119,6,0.12)" stroke="#d97706" stroke-width="1"/>
+  <text x="75" y="60" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">*</text>
+  <rect x="90" y="40" width="30" height="30" fill="rgba(217,119,6,0.12)" stroke="#d97706" stroke-width="1"/>
+  <text x="105" y="60" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">*</text>
+  <rect x="132" y="40" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="147" y="60" font-size="12" class="svg-text" text-anchor="middle">b₁</text>
+  <!-- row 2 -->
+  <rect x="30" y="70" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="45" y="90" font-size="13" class="svg-muted" text-anchor="middle">0</text>
+  <rect x="60" y="70" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="75" y="90" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">1</text>
+  <rect x="90" y="70" width="30" height="30" fill="rgba(217,119,6,0.12)" stroke="#d97706" stroke-width="1"/>
+  <text x="105" y="90" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">*</text>
+  <rect x="132" y="70" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="147" y="90" font-size="12" class="svg-text" text-anchor="middle">b₂</text>
+  <!-- row 3 -->
+  <rect x="30" y="100" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="45" y="120" font-size="13" class="svg-muted" text-anchor="middle">0</text>
+  <rect x="60" y="100" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="75" y="120" font-size="13" class="svg-muted" text-anchor="middle">0</text>
+  <rect x="90" y="100" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="105" y="120" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">1</text>
+  <rect x="132" y="100" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="147" y="120" font-size="12" class="svg-text" text-anchor="middle">b₃</text>
+
+  <line x1="126" y1="38" x2="126" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="95" y="148" font-size="10" fill="#d97706" text-anchor="middle">★ still needs back-substitution</text>
+
+  <!-- ===== Panel 2: RREF, origin (260,40) ===== -->
+  <!-- row 1 -->
+  <rect x="260" y="40" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="275" y="60" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">1</text>
+  <rect x="290" y="40" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="305" y="60" font-size="13" class="svg-muted" text-anchor="middle">0</text>
+  <rect x="320" y="40" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="335" y="60" font-size="13" class="svg-muted" text-anchor="middle">0</text>
+  <rect x="362" y="40" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="377" y="60" font-size="12" class="svg-text" text-anchor="middle">c₁</text>
+  <!-- row 2 -->
+  <rect x="260" y="70" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="275" y="90" font-size="13" class="svg-muted" text-anchor="middle">0</text>
+  <rect x="290" y="70" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="305" y="90" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">1</text>
+  <rect x="320" y="70" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="335" y="90" font-size="13" class="svg-muted" text-anchor="middle">0</text>
+  <rect x="362" y="70" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="377" y="90" font-size="12" class="svg-text" text-anchor="middle">c₂</text>
+  <!-- row 3 -->
+  <rect x="260" y="100" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="275" y="120" font-size="13" class="svg-muted" text-anchor="middle">0</text>
+  <rect x="290" y="100" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="305" y="120" font-size="13" class="svg-muted" text-anchor="middle">0</text>
+  <rect x="320" y="100" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="335" y="120" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">1</text>
+  <rect x="362" y="100" width="30" height="30" class="svg-cell" stroke-width="1"/>
+  <text x="377" y="120" font-size="12" class="svg-text" text-anchor="middle">c₃</text>
+
+  <line x1="356" y1="38" x2="356" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="325" y="148" font-size="10" fill="#10b981" text-anchor="middle">✓ solution reads off directly</text>
+
+  <text x="230" y="195" font-size="11" class="svg-muted" text-anchor="middle">One extra pass — eliminating ABOVE each pivot, not just below — turns REF into RREF</text>
+</svg>

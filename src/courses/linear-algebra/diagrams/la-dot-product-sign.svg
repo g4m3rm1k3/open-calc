@@ -1,0 +1,38 @@
+<svg viewBox="0 0 440 240" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="440" height="240" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="ds-gray" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#94a3b8"/></marker>
+    <marker id="ds-green" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#10b981"/></marker>
+    <marker id="ds-amber" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#d97706"/></marker>
+    <marker id="ds-red" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#dc2626"/></marker>
+  </defs>
+
+  <text x="220" y="20" font-size="11" class="svg-muted" text-anchor="middle">w is the fixed "compass needle" — every other vector is compared to it</text>
+
+  <!-- Origin at (170,165) -->
+  <!-- Reference vector w, fixed pointing right -->
+  <line x1="170" y1="165" x2="314" y2="165" stroke="#94a3b8" stroke-width="3" marker-end="url(#ds-gray)"/>
+  <text x="225" y="183" font-size="13" class="svg-muted" font-weight="700">w</text>
+
+  <!-- v1: ~25 deg above w, aligned -> dot > 0 -->
+  <line x1="170" y1="165" x2="300" y2="102" stroke="#10b981" stroke-width="3" marker-end="url(#ds-green)"/>
+  <text x="306" y="98" font-size="13" fill="#10b981" font-weight="700">v₁ — w·v₁ &gt; 0</text>
+
+  <!-- v2: perpendicular, straight up -> dot = 0 -->
+  <line x1="170" y1="165" x2="170" y2="45" stroke="#d97706" stroke-width="3" marker-end="url(#ds-amber)"/>
+  <text x="176" y="52" font-size="13" fill="#d97706" font-weight="700">v₂ — w·v₂ = 0</text>
+
+  <!-- v3: ~155 deg, mostly opposite -> dot < 0 -->
+  <line x1="170" y1="165" x2="34" y2="102" stroke="#dc2626" stroke-width="3" marker-end="url(#ds-red)"/>
+  <text x="14" y="92" font-size="13" fill="#dc2626" font-weight="700">v₃ — w·v₃ &lt; 0</text>
+
+  <circle cx="170" cy="165" r="3" fill="#64748b"/>
+
+  <text x="220" y="222" font-size="11" class="svg-muted" text-anchor="middle">Same half-plane as w → positive. Perpendicular → zero. Opposite half-plane → negative.</text>
+</svg>

@@ -1,3 +1,6 @@
+import refVsRrefUrl from '../diagrams/la-ref-vs-rref.svg?url'
+import rankNullityBarUrl from '../diagrams/la-rank-nullity-bar.svg?url'
+
 export default {
   id: 'la1-006',
   slug: 'gauss-jordan-rref',
@@ -20,63 +23,35 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take the $2 \\times 2$ system: $2x + 4y = 10$ and $x + 3y = 8$. Gaussian elimination gets you to REF in two steps: you end up with $\\left[\\begin{array}{cc|c}1&3&8\\\\0&1&3\\end{array}\\right]$. That is Row Echelon Form \u2014 you still need to back-substitute ($y=3$ \u2192 $x=8-9=-1$). Gauss-Jordan goes one step further: apply $R_1 \\to R_1 - 3R_2$ to get $\\left[\\begin{array}{cc|c}1&0&-1\\\\0&1&3\\end{array}\\right]$. Now the solution reads directly from the last column: $x=-1$, $y=3$. No substitution. That one extra pass is the difference between REF and RREF.',
+      ] },
+      { type: 'image', src: refVsRrefUrl,
+        alt: 'Two matrix grids side by side: REF has nonzero star entries above the pivots and needs back-substitution, RREF has zeros above and below every pivot and reads off directly',
+        caption: 'REF stops at the staircase; RREF takes one more pass and zeroes out everything above each pivot too.' },
+      { type: 'prose', paragraphs: [
       '**The three-step Gauss-Jordan process:** (1) Forward elimination — create zeros below each pivot (same as Gaussian elimination). (2) Scale — divide each pivot row by its pivot so the pivot becomes 1. (3) Back-elimination — create zeros ABOVE each pivot as well. The resulting matrix is in RREF.',
+      ] },
+      { type: 'viz', id: 'GaussianEliminationStepper',
+        title: 'RREF Step-by-Step Visualizer',
+        mathBridge: 'Enter a 3×4 or 4×5 augmented matrix and step through the full Gauss-Jordan reduction. Each pivot is highlighted in red. The pivot columns turn green once complete. Watch how the three outcome types appear.',
+        caption: 'Interactive Gauss-Jordan elimination showing all three solution types.' },
+      { type: 'prose', paragraphs: [
       '**Pivot positions matter enormously.** A pivot column is a column that contains a leading 1 (after reduction) with zeros everywhere else in that column. A non-pivot column is a free variable column. The number of pivot columns equals the rank. The number of free variable columns equals the dimension of the null space (the nullity).',
+      ] },
+      { type: 'image', src: rankNullityBarUrl,
+        alt: 'A segmented bar split into pivot columns colored blue and free columns colored amber, with brackets labeling rank(A) over the pivot segments and nullity(A) over the free segments, totaling n columns',
+        caption: 'Every column is either a pivot column (counted by rank) or a free column (counted by nullity) — together they account for all n columns.' },
+      { type: 'prose', paragraphs: [
       '**Three outcome cases:**',
       '**Predict before reading:** You are given the augmented matrix $\\left[\\begin{array}{ccc|c}1&2&3&4\\\\2&4&6&9\\\\3&6&9&12\\end{array}\\right]$. Look at the coefficient block (first three columns). All three rows are multiples of $[1,2,3]$. Without computing, predict: does this system have 0, 1, or infinitely many solutions? Write your answer before working through Challenge 1.',
       '• **Unique solution:** Every variable is a pivot variable (no free variables). The RREF augmented matrix looks like $[I | \\mathbf{c}]$.',
       '• **No solution:** A row of the form $[0\\ 0\\ \\cdots\\ 0\\ |\\ k]$ with $k \\neq 0$ appears — this is a contradiction.',
       '• **Infinitely many solutions:** There are free variables (non-pivot columns in the coefficient part) and no contradictions. The solution is a parametric family.',
       '**The "row of zeros" test is your diagnostic:** If you see $[0\\ 0\\ \\cdots\\ 0\\ |\\ k \\neq 0]$, the system is inconsistent. If you see only $[0\\ 0\\ \\cdots\\ 0\\ |\\ 0]$, the system is consistent with free variables.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'Procedure: Gauss-Jordan Elimination (Full RREF)',
-        body: 'Step 1. Form the augmented matrix $[A \\mid \\mathbf{b}]$.\nStep 2. Forward pass \u2014 for each column left to right:\n  a. If no nonzero entry in that column at or below current row: skip (free variable column).\n  b. Swap to bring the best nonzero entry to the current pivot row.\n  c. Scale: divide the pivot row by the pivot entry so pivot = 1.\n  d. Eliminate BELOW: subtract multiples of the pivot row from all rows BELOW.\nStep 3. Back pass \u2014 for each pivot row (bottom to top): eliminate ABOVE by subtracting multiples of the pivot row from all rows ABOVE.\nStep 4. Check the augmented column: any row $[0\\cdots 0 \\mid k \\ne 0]$ \u2192 INCONSISTENT.\nStep 5. Assign parameter $t$ to each free variable. Express pivot variables in terms of parameters.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 6 of 6 — Vectors & Spaces',
-        body: '**Previous:** Lines and Planes — geometric picture of linear constraints.\n**This lesson:** Gauss-Jordan RREF — the complete algorithm for any linear system, from augmented matrix to solution.\n**Next (Chapter 2):** Matrices as Linear Transformations — the matrix not as a spreadsheet but as a function that warps space.',
-      },
-      {
-        type: 'definition',
-        title: 'Reduced Row Echelon Form (RREF)',
-        body: 'A matrix is in RREF if:\n1. The first nonzero entry in each row is 1 (called a **leading 1** or **pivot**).\n2. All other entries in each pivot column are 0.\n3. The pivot in row $i+1$ is to the right of the pivot in row $i$.\n4. Zero rows (all zeros) are at the bottom.\n\nEvery matrix has a unique RREF.',
-      },
-      {
-        type: 'insight',
-        title: 'Rank-Nullity Preview',
-        body: 'For an $m \\times n$ matrix $A$:\n$$\\text{rank}(A) + \\text{nullity}(A) = n$$\n\n**rank** = number of pivot columns = number of nonzero rows in RREF.\n**nullity** = number of free variable columns.\n\nThis identity (proven in Chapter 6) is one of the deepest theorems in linear algebra.',
-      },
-      {
-        type: 'warning',
-        title: 'Common Mistake: Skipping Back-Elimination',
-        body: `Gaussian elimination creates zeros only **below** each pivot — stopping at Row Echelon Form (REF). Gauss-Jordan elimination creates zeros **above AND below** each pivot — reaching RREF.\n\n**Wrong (stops at REF):**\n$\\left[\\begin{array}{cc|c}1&2&5\\\\0&1&3\\end{array}\\right]$ — this is REF, NOT RREF (the $2$ above the second pivot is still there).\n\n**Correct (RREF):** Apply $R_1 \\to R_1 - 2R_2$ to get $\\left[\\begin{array}{cc|c}1&0&-1\\\\0&1&3\\end{array}\\right]$.\n\nREF requires back-substitution to read the solution; RREF lets you read it directly.`,
-      },
-      {
-        type: 'warning',
-        title: 'Free Variables Need a Parameter Name',
-        body: 'When a variable $x_3$ is free, assign it a parameter: $x_3 = t \\in \\mathbb{R}$. Then express all pivot variables in terms of $t$. If there are two free variables, use $s$ and $t$. The solution set is $\\{\\mathbf{x}_p + s\\,\\mathbf{v}_1 + t\\,\\mathbf{v}_2 : s, t \\in \\mathbb{R}\\}$ — a translate of the null space.',
-      },
-      {
-        type: 'insight',
-        title: 'When to Use This',
-        body: `Use RREF (Gauss-Jordan) when you need to:\n\n- **Read the solution directly** with no back-substitution — ideal for paper-and-pencil work\n- **Find all free variables** in a system — each non-pivot column is one\n- **Determine the rank** of a matrix — count the nonzero rows in RREF\n- **Test linear independence** of vectors — form a matrix with them as rows and check if RREF has all nonzero rows\n\nUse plain Gaussian elimination (REF only) when you just need a numerical solution quickly — it is slightly fewer operations. For code, use \`np.linalg.solve\` (faster, numerically stable) or \`sympy.Matrix.rref()\` (exact, shows work).`,
-      },
-    ],
-    visualizations: [
-      {
-        id: 'GaussianEliminationStepper',
-        title: 'RREF Step-by-Step Visualizer',
-        mathBridge: 'Enter a 3×4 or 4×5 augmented matrix and step through the full Gauss-Jordan reduction. Each pivot is highlighted in red. The pivot columns turn green once complete. Watch how the three outcome types appear.',
-        caption: 'Interactive Gauss-Jordan elimination showing all three solution types.',
-      },
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'RREF in OpenMAT',
         mathBridge: 'Use rref() to reduce any augmented matrix. Experiment with the three outcome cases.',
         caption: 'Interactive OpenMAT cells for RREF practice.',
@@ -153,7 +128,43 @@ else
 end`,
             },
           ]
-        }
+        } },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'Procedure: Gauss-Jordan Elimination (Full RREF)',
+        body: 'Step 1. Form the augmented matrix $[A \\mid \\mathbf{b}]$.\nStep 2. Forward pass \u2014 for each column left to right:\n  a. If no nonzero entry in that column at or below current row: skip (free variable column).\n  b. Swap to bring the best nonzero entry to the current pivot row.\n  c. Scale: divide the pivot row by the pivot entry so pivot = 1.\n  d. Eliminate BELOW: subtract multiples of the pivot row from all rows BELOW.\nStep 3. Back pass \u2014 for each pivot row (bottom to top): eliminate ABOVE by subtracting multiples of the pivot row from all rows ABOVE.\nStep 4. Check the augmented column: any row $[0\\cdots 0 \\mid k \\ne 0]$ \u2192 INCONSISTENT.\nStep 5. Assign parameter $t$ to each free variable. Express pivot variables in terms of parameters.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 6 of 6 — Vectors & Spaces',
+        body: '**Previous:** Lines and Planes — geometric picture of linear constraints.\n**This lesson:** Gauss-Jordan RREF — the complete algorithm for any linear system, from augmented matrix to solution.\n**Next (Chapter 2):** Matrices as Linear Transformations — the matrix not as a spreadsheet but as a function that warps space.',
+      },
+      {
+        type: 'definition',
+        title: 'Reduced Row Echelon Form (RREF)',
+        body: 'A matrix is in RREF if:\n1. The first nonzero entry in each row is 1 (called a **leading 1** or **pivot**).\n2. All other entries in each pivot column are 0.\n3. The pivot in row $i+1$ is to the right of the pivot in row $i$.\n4. Zero rows (all zeros) are at the bottom.\n\nEvery matrix has a unique RREF.',
+      },
+      {
+        type: 'insight',
+        title: 'Rank-Nullity Preview',
+        body: 'For an $m \\times n$ matrix $A$:\n$$\\text{rank}(A) + \\text{nullity}(A) = n$$\n\n**rank** = number of pivot columns = number of nonzero rows in RREF.\n**nullity** = number of free variable columns.\n\nThis identity (proven in Chapter 6) is one of the deepest theorems in linear algebra.',
+      },
+      {
+        type: 'warning',
+        title: 'Common Mistake: Skipping Back-Elimination',
+        body: `Gaussian elimination creates zeros only **below** each pivot — stopping at Row Echelon Form (REF). Gauss-Jordan elimination creates zeros **above AND below** each pivot — reaching RREF.\n\n**Wrong (stops at REF):**\n$\\left[\\begin{array}{cc|c}1&2&5\\\\0&1&3\\end{array}\\right]$ — this is REF, NOT RREF (the $2$ above the second pivot is still there).\n\n**Correct (RREF):** Apply $R_1 \\to R_1 - 2R_2$ to get $\\left[\\begin{array}{cc|c}1&0&-1\\\\0&1&3\\end{array}\\right]$.\n\nREF requires back-substitution to read the solution; RREF lets you read it directly.`,
+      },
+      {
+        type: 'warning',
+        title: 'Free Variables Need a Parameter Name',
+        body: 'When a variable $x_3$ is free, assign it a parameter: $x_3 = t \\in \\mathbb{R}$. Then express all pivot variables in terms of $t$. If there are two free variables, use $s$ and $t$. The solution set is $\\{\\mathbf{x}_p + s\\,\\mathbf{v}_1 + t\\,\\mathbf{v}_2 : s, t \\in \\mathbb{R}\\}$ — a translate of the null space.',
+      },
+      {
+        type: 'insight',
+        title: 'When to Use This',
+        body: `Use RREF (Gauss-Jordan) when you need to:\n\n- **Read the solution directly** with no back-substitution — ideal for paper-and-pencil work\n- **Find all free variables** in a system — each non-pivot column is one\n- **Determine the rank** of a matrix — count the nonzero rows in RREF\n- **Test linear independence** of vectors — form a matrix with them as rows and check if RREF has all nonzero rows\n\nUse plain Gaussian elimination (REF only) when you just need a numerical solution quickly — it is slightly fewer operations. For code, use \`np.linalg.solve\` (faster, numerically stable) or \`sympy.Matrix.rref()\` (exact, shows work).`,
       },
     ],
   },

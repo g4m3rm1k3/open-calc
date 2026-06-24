@@ -34,15 +34,14 @@ const STATUS_TABS: { id: NoteStatus; label: string }[] = [
 export default function NoteEditor({ notes, categories, onAdd, onUpdate, onDelete, onClarifyToPlan, onArchive, onRestore, onSaveCards }: NoteEditorProps) {
   const [draft, setDraft] = useState('')
   const [category, setCategory] = useState('')
-  const [newCategory, setNewCategory] = useState('')
   const [statusTab, setStatusTab] = useState<NoteStatus>('inbox')
   const [whyOpen, setWhyOpen] = useState(false)
 
   const submit = () => {
     if (!draft.trim()) return
-    onAdd(draft.trim(), (newCategory || category || undefined)?.trim() || undefined)
+    onAdd(draft.trim(), category.trim() || undefined)
     setDraft('')
-    setNewCategory('')
+    setCategory('')
   }
 
   const visible = notes.filter((n) => n.status === statusTab)
@@ -61,27 +60,33 @@ export default function NoteEditor({ notes, categories, onAdd, onUpdate, onDelet
           <p className="mt-0.5">{gtd.why}</p>
         </div>
       )}
-      <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm">
+      <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm focus-within:ring-2 focus-within:ring-sky-500/20 transition-all">
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Capture anything — markdown supported…"
-          rows={3}
-          className="w-full bg-transparent text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-none outline-none"
+          placeholder="Capture a thought, task, or note..."
+          rows={draft.trim().length > 0 ? 3 : 2}
+          className="w-full bg-transparent text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 resize-none outline-none transition-all"
         />
-        <div className="flex items-center gap-2 mt-2 min-w-0">
-          <select value={category} onChange={(e) => { setCategory(e.target.value); setNewCategory('') }}
-            className="shrink-0 max-w-[40%] bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-700 dark:text-slate-300 outline-none focus:border-sky-500 transition-colors">
-            <option value="">No category</option>
-            {categories.map((c) => <option key={c} value={c}>{c}</option>)}
-          </select>
-          <input value={newCategory} onChange={(e) => setNewCategory(e.target.value)}
-            placeholder="or create new…"
-            className="flex-1 min-w-0 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-700 dark:text-slate-300 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-sky-500 transition-colors" />
-          <button onClick={submit} disabled={!draft.trim()} className="shrink-0 text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-white px-4 py-1.5 rounded-lg shadow-sm shadow-sky-500/20 disabled:opacity-40 transition-all">
-            Save
-          </button>
-        </div>
+        {draft.trim().length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="flex-1 min-w-0">
+              <input 
+                list="category-suggestions"
+                value={category} 
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder="Assign a category (optional)"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-700 dark:text-slate-300 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none focus:border-sky-500 transition-colors" 
+              />
+              <datalist id="category-suggestions">
+                {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+              </datalist>
+            </div>
+            <button onClick={submit} className="w-full sm:w-auto shrink-0 text-xs font-semibold bg-sky-500 hover:bg-sky-400 text-white px-5 py-2 rounded-xl shadow-sm shadow-sky-500/20 transition-all">
+              Save Note
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-1.5 flex-wrap">
@@ -153,26 +158,26 @@ function NoteRow({ note, onUpdate, onDelete, onClarifyToPlan, onArchive, onResto
       </div>
 
       {note.status === 'inbox' && (
-        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
-          <button onClick={() => onClarifyToPlan(note.id, note.content)} className="flex items-center gap-1 text-xs text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition-colors">
-            <ArrowRight size={12} /> Turn into a Plan
+        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+          <button onClick={() => onClarifyToPlan(note.id, note.content)} className="flex items-center gap-1.5 text-xs text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 font-semibold transition-colors">
+            <ArrowRight size={14} /> Turn into Plan
           </button>
-          <button onClick={() => setMakingCards((m) => !m)} className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300 font-semibold transition-colors">
-            <Layers size={12} /> Make cards
+          <button onClick={() => setMakingCards((m) => !m)} className="flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300 font-semibold transition-colors">
+            <Layers size={14} /> Make Cards
           </button>
-          <button onClick={() => onArchive(note.id)} className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors">
-            <Archive size={12} /> Archive
+          <button onClick={() => onArchive(note.id)} className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors ml-auto sm:ml-0">
+            <Archive size={14} /> Archive
           </button>
         </div>
       )}
       {note.status !== 'inbox' && (
-        <div className="flex items-center gap-3 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
-          <button onClick={() => setMakingCards((m) => !m)} className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300 font-semibold transition-colors">
-            <Layers size={12} /> Make cards
+        <div className="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+          <button onClick={() => setMakingCards((m) => !m)} className="flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300 font-semibold transition-colors">
+            <Layers size={14} /> Make Cards
           </button>
           {note.status === 'archived' && (
-            <button onClick={() => onRestore(note.id)} className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors">
-              <RotateCcw size={12} /> Restore to inbox
+            <button onClick={() => onRestore(note.id)} className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors">
+              <RotateCcw size={14} /> Restore to Inbox
             </button>
           )}
         </div>
