@@ -11,6 +11,13 @@ import QuizBlock from './blocks/QuizBlock.jsx'
 import PythonBlock from './blocks/PythonBlock.jsx'
 import CellsBlock from './blocks/CellsBlock.jsx'
 import WalkthroughsBlock from './blocks/WalkthroughsBlock.jsx'
+import SemanticsBlock from './blocks/SemanticsBlock.jsx'
+import SpiralBlock from './blocks/SpiralBlock.jsx'
+import AssessmentBlock from './blocks/AssessmentBlock.jsx'
+import MisconceptionsBlock from './blocks/MisconceptionsBlock.jsx'
+import TransferPromptsBlock from './blocks/TransferPromptsBlock.jsx'
+import DebuggingBlock from './blocks/DebuggingBlock.jsx'
+import MasteryBlock from './blocks/MasteryBlock.jsx'
 import BlockShell from './BlockShell.jsx'
 import { HANDLED_SECTION_KEYS, HANDLED_META_KEYS } from './builderUtils.js'
 
@@ -81,27 +88,21 @@ function DropZone({ onDrop, label }) {
 }
 
 const SECTION_LABELS = {
-  intuition: 'Intuition',
-  math: 'Math',
-  rigor: 'Rigor',
-  examples: 'Examples',
-  challenges: 'Challenges',
-  checkpoints: 'Checkpoints',
-  quiz: 'Quiz',
-  cells: 'Cells',
-  walkthroughs: 'Walkthroughs',
+  intuition: 'Intuition', math: 'Math', rigor: 'Rigor',
+  examples: 'Examples', challenges: 'Challenges', checkpoints: 'Checkpoints', quiz: 'Quiz',
+  cells: 'Cells', walkthroughs: 'Walkthroughs',
+  semantics: 'Semantics', spiral: 'Spiral', assessment: 'Assessment',
+  misconceptions: 'Misconceptions', transferPrompts: 'Transfer Prompts',
+  debugging: 'Debugging', mastery: 'Mastery',
 }
 
 const SECTION_ICONS = {
-  intuition: '🧠',
-  math: '📐',
-  rigor: '∴',
-  examples: '✏️',
-  challenges: '🎯',
-  checkpoints: '✅',
-  quiz: '🧪',
-  cells: '⚗️',
-  walkthroughs: '🚶',
+  intuition: '🧠', math: '📐', rigor: '∴',
+  examples: '✏️', challenges: '🎯', checkpoints: '✅', quiz: '🧪',
+  cells: '⚗️', walkthroughs: '🚶',
+  semantics: '🔣', spiral: '🌀', assessment: '📋',
+  misconceptions: '⚠️', transferPrompts: '🚀',
+  debugging: '🐛', mastery: '🎓',
 }
 
 function SectionBlock({ sec, dispatch, index, total, courseId }) {
@@ -137,6 +138,20 @@ function SectionBlock({ sec, dispatch, index, total, courseId }) {
       return <CellsBlock {...common} />
     case 'walkthroughs':
       return <WalkthroughsBlock {...common} />
+    case 'semantics':
+      return <SemanticsBlock {...common} />
+    case 'spiral':
+      return <SpiralBlock {...common} />
+    case 'assessment':
+      return <AssessmentBlock {...common} />
+    case 'misconceptions':
+      return <MisconceptionsBlock {...common} />
+    case 'transferPrompts':
+      return <TransferPromptsBlock {...common} />
+    case 'debugging':
+      return <DebuggingBlock {...common} />
+    case 'mastery':
+      return <MasteryBlock {...common} />
     default:
       return <GenericSectionBlock {...common} />
   }

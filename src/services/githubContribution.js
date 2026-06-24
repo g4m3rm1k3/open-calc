@@ -156,10 +156,23 @@ export async function openContributionPR(token, { forkOwner, branch, baseBranch,
 }
 
 // lessonSerializer.getFilePath() returns a path with a literal "[N-chapter-folder]"
-// segment. Resolve that against the contributor's fork before committing.
+// segment AND a numeric prefix derived from meta.order (which may differ from the
+// actual file's prefix). Resolve the real folder, then match by slug so the commit
+// updates the correct file even when order != file number.
 export async function resolveLessonFilePath(token, forkOwner, defaultBranch, courseId, chapterNumber, chapterSlugFallback, placeholderPath) {
   const chapterFolder = await resolveChapterFolder(token, forkOwner, UPSTREAM_REPO, courseId, chapterNumber, chapterSlugFallback, defaultBranch)
-  return placeholderPath.replace(/\[[^/]*chapter-folder\]/, chapterFolder)
+  const withFolder = placeholderPath.replace(/\[[^/]*chapter-folder\]/, chapterFolder)
+
+  // Extract the slug portion (strip the numeric prefix) and find the real filename
+  const slugMatch = withFolder.match(/^(.+\/)(\d+)-(.+\.js)$/)
+  if (!slugMatch) return withFolder
+  const [, dir, , slugFile] = slugMatch
+  try {
+    const entries = await gh(token, `/repos/${forkOwner}/${UPSTREAM_REPO}/contents/${dir.replace(/\/$/, '')}?ref=${defaultBranch}`)
+    const actual = Array.isArray(entries) && entries.find(e => e.name === slugFile || e.name.endsWith(`-${slugFile}`))
+    if (actual) return `${dir}${actual.name}`
+  } catch { /* new file — fall through */ }
+  return withFolder
 }
 
 // Check whether the token has push access to the upstream repo.

@@ -46,57 +46,88 @@ const LOCAL_STUBS = {
 
 const isDarkNow = () => document.documentElement.classList.contains('dark')
 
+// Third-party packages the preview iframe loads from CDN rather than stubbing.
+// Maps npm package name → { url, global } where `global` is the window property set by the UMD build.
+const KNOWN_CDNS = {
+  'd3':        { url: 'https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js',             global: 'd3' },
+  'three':     { url: 'https://cdn.jsdelivr.net/npm/three@0.164/build/three.min.js',  global: 'THREE' },
+  'plotly.js': { url: 'https://cdn.plot.ly/plotly-2.26.0.min.js',                     global: 'Plotly' },
+  'chart.js':  { url: 'https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js', global: 'Chart' },
+  'mathjs':    { url: 'https://cdn.jsdelivr.net/npm/mathjs@12/mathjs.min.js',          global: 'math' },
+  'katex':     { url: 'https://cdn.jsdelivr.net/npm/katex@0.16/dist/katex.min.js',    global: 'katex' },
+}
+const getCdnForPkg = pkg => KNOWN_CDNS[pkg] ?? KNOWN_CDNS[pkg.split('/')[0]] ?? null
+
 // Builds a standalone HTML document for the iframe live preview.
-// React and ReactDOM are loaded as UMD globals from CDN so we don't need
-// a bundler. Babel standalone transforms JSX in the iframe. No sandbox so
-// CDN <script> tags can load (this is a dev-only tool on localhost).
+// React/ReactDOM are UMD globals from CDN; Babel standalone transforms JSX; Tailwind Play CDN
+// provides utility classes; known third-party packages (d3, three, etc.) are loaded from CDN
+// rather than stubbed as null so vizzes that use them render correctly.
 function buildPreviewDoc(source, dark = isDarkNow()) {
   const reactImports = new Set()
   const localImports = new Set()
+  const cdnScripts = new Set()   // CDN URLs that need <script> tags
+  const cdnSetupLines = []       // JS lines to run inside the Babel block after CDN globals are set
 
   let processed = source
-    // Collect named React imports, strip the import line
+    // React named imports: `import { useState, useEffect } from 'react'`
     .replace(/import\s*\{([^}]+)\}\s*from\s*['"]react['"]/g, (_, names) => {
-      names.split(',')
-        .map(n => n.trim().split(/\s+as\s+/)[0].trim())
-        .filter(Boolean)
-        .forEach(n => reactImports.add(n))
+      names.split(',').map(n => n.trim().split(/\s+as\s+/)[0].trim()).filter(Boolean).forEach(n => reactImports.add(n))
       return ''
     })
-    // Strip bare `import React from 'react'` (React is a global here)
+    // Bare React default: `import React from 'react'`
     .replace(/import\s+\w+\s+from\s*['"]react['"]/g, '')
-    // Strip named imports from all other paths — collect names so we can stub them
-    .replace(/import\s*\{([^}]+)\}\s*from\s*['"][^'"]+['"]/g, (_, names) => {
-      names.split(',')
-        .map(n => n.trim().split(/\s+as\s+/)[0].trim())
-        .filter(Boolean)
-        .forEach(n => localImports.add(n))
+    // Namespace imports: `import * as d3 from 'd3'` — load CDN, alias if needed
+    .replace(/import\s*\*\s*as\s+(\w+)\s+from\s*['"]([^'"]+)['"]/g, (_, alias, pkg) => {
+      const cdn = getCdnForPkg(pkg)
+      if (cdn) {
+        cdnScripts.add(cdn.url)
+        // UMD global might differ from the alias used in source (e.g. THREE vs three)
+        if (cdn.global !== alias) cdnSetupLines.push(`var ${alias} = ${cdn.global};`)
+      } else {
+        localImports.add(alias)
+      }
       return ''
     })
-    // Strip default imports from other paths
+    // Named imports: `import { select, scaleLinear as scale } from 'd3'`
+    .replace(/import\s*\{([^}]+)\}\s*from\s*['"]([^'"]+)['"]/g, (_, names, pkg) => {
+      const cdn = getCdnForPkg(pkg)
+      if (cdn) {
+        cdnScripts.add(cdn.url)
+        // Build JS destructure: `var { select, scaleLinear: scale } = d3;`
+        const parts = names.split(',').map(n => {
+          const [orig, aliasRaw] = n.trim().split(/\s+as\s+/)
+          const alias = aliasRaw?.trim()
+          return alias ? `${orig.trim()}: ${alias}` : orig.trim()
+        }).filter(Boolean)
+        cdnSetupLines.push(`var { ${parts.join(', ')} } = ${cdn.global};`)
+      } else {
+        names.split(',').map(n => n.trim().split(/\s+as\s+/)[0].trim()).filter(Boolean).forEach(n => localImports.add(n))
+      }
+      return ''
+    })
+    // Default imports from other paths: `import Foo from './Foo'`
     .replace(/import\s+(\w+)\s+from\s*['"][^'"]+['"]/g, (_, name) => {
       localImports.add(name)
       return ''
     })
-    // Strip any remaining import lines (namespace imports, side-effect imports)
+    // Strip any remaining import lines (side-effect, re-export, etc.)
     .replace(/^import\s+.+$/gm, '')
     // `export default function Foo` → `function __VizComp`
     .replace(/export\s+default\s+function\s+(\w+)/, 'function __VizComp')
     // `export default Foo` at end of file → stash in a var
     .replace(/export\s+default\s+(\w+)\s*;?\s*$/, 'var __vizNamedDefault = $1')
 
-  const destr = reactImports.size
-    ? `var { ${[...reactImports].join(', ')} } = React;\n`
-    : ''
-
-  // Inject stubs for every local import so call sites don't throw ReferenceError
-  const stubs = [...localImports].map(name =>
-    LOCAL_STUBS[name] ?? `var ${name} = null;`
-  ).join('\n')
+  const destr = reactImports.size ? `var { ${[...reactImports].join(', ')} } = React;\n` : ''
+  const stubs = [...localImports].map(name => LOCAL_STUBS[name] ?? `var ${name} = null;`).join('\n')
+  const cdnTags = [...cdnScripts].map(url => `<script src="${url}"><\/script>`).join('\n')
+  const cdnSetup = cdnSetupLines.join('\n')
 
   return `<!DOCTYPE html>
 <html class="${dark ? 'dark' : ''}">
 <head>
+<script src="https://cdn.tailwindcss.com"><\/script>
+<script>tailwind.config = { darkMode: 'class' }<\/script>
+${cdnTags}
 <script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
 <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"><\/script>
@@ -111,6 +142,7 @@ pre.error{color:#ef4444;background:#1f0707;padding:10px;border-radius:6px;font-s
 <script type="text/babel" data-presets="react">
 ${destr}
 ${stubs}
+${cdnSetup}
 ${processed}
 ;(function () {
   var Comp =
@@ -140,10 +172,13 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
   const [retryCount, setRetryCount] = useState(0)
   const [filePath, setFilePath] = useState(null)
   const [exists, setExists] = useState(false)
-  const [apiError, setApiError] = useState(null)  // distinct from "file not found"
+  const [apiError, setApiError] = useState(null)
   const [source, setSource] = useState('')
+  const [originalSource, setOriginalSource] = useState('')
   const [saveMsg, setSaveMsg] = useState('')
   const [previewDoc, setPreviewDoc] = useState('')
+  const [diffMode, setDiffMode] = useState(false)
+  const [DiffEditorComp, setDiffEditorComp] = useState(null)
   const debounceRef = useRef(null)
   const sourceRef = useRef('')
   const dir = `src/courses/${courseId}/viz`
@@ -162,6 +197,7 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
     setLoading(true)
     setApiError(null)
     setExists(false)
+    setDiffMode(false)
     fetch(`${API}/list?dir=${encodeURIComponent(dir)}&ext=jsx,js&_=${Date.now()}`)
       .then(r => {
         const ct = r.headers.get('content-type') || ''
@@ -172,13 +208,14 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
       })
       .then(files => {
         const match = (Array.isArray(files) ? files : []).find(f => f.name === `${vizId}.jsx` || f.name === `${vizId}.js`)
-        if (!match) { setExists(false); setFilePath(null); setSource(''); setLoading(false); return }
+        if (!match) { setExists(false); setFilePath(null); setSource(''); setOriginalSource(''); setLoading(false); return }
         return fetch(`${API}/read?path=${encodeURIComponent(match.path)}&_=${Date.now()}`)
           .then(r => r.text())
           .then(text => {
             setExists(true)
             setFilePath(match.path)
             setSource(text)
+            setOriginalSource(text)
             sourceRef.current = text
             setPreviewDoc(buildPreviewDoc(text))
             setLoading(false)
@@ -189,8 +226,10 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
 
   const createNew = useCallback(() => {
     const tmpl = starterTemplate(vizId)
+    const path = `${dir}/${vizId}.jsx`
     setSource(tmpl)
-    setFilePath(`${dir}/${vizId}.jsx`)
+    setOriginalSource('')
+    setFilePath(path)
     setExists(true)
     setPreviewDoc(buildPreviewDoc(tmpl))
   }, [vizId, dir])
@@ -215,12 +254,28 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
         body: JSON.stringify({ filePath, content: source }),
       })
       const data = await r.json()
-      setSaveMsg(data.ok ? 'Saved ✓' : 'Error: ' + (data.error || '?'))
+      if (data.ok) {
+        setSaveMsg('Saved ✓')
+        setOriginalSource(source)
+        setDiffMode(false)
+      } else {
+        setSaveMsg('Error: ' + (data.error || '?'))
+      }
     } catch (e) {
       setSaveMsg('Error: ' + e.message)
     }
     setTimeout(() => setSaveMsg(''), 3000)
   }
+
+  const showDiff = async () => {
+    if (!DiffEditorComp) {
+      const mod = await import('@monaco-editor/react')
+      setDiffEditorComp(() => mod.DiffEditor)
+    }
+    setDiffMode(true)
+  }
+
+  const noChanges = exists && source === originalSource
 
   return (
     <>
@@ -231,16 +286,47 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
       />
     )}
     <div className="fixed inset-0 z-[600] flex flex-col" style={{ background: '#0d1117' }}>
+      {/* Header */}
       <div className="flex items-center gap-3 px-4 py-2.5 shrink-0 border-b" style={{ background: '#161b22', borderColor: '#30363d' }}>
         <button onClick={onClose} className="text-sm px-2 py-1 rounded hover:bg-white/10 transition-colors" style={{ color: '#8b949e' }}>← Close</button>
         <span className="text-sm font-semibold" style={{ color: '#e6edf3' }}>✎ Viz source — {vizId || '(no vizId set)'}</span>
         {filePath && <span className="text-xs font-mono" style={{ color: '#8b949e' }}>{filePath}</span>}
+        {noChanges && exists && (
+          <span className="text-xs" style={{ color: '#4ade80' }}>✓ No changes</span>
+        )}
+
         <div className="ml-auto flex items-center gap-2">
           {saveMsg && <span className="text-xs" style={{ color: /error/i.test(saveMsg) ? '#f87171' : '#4ade80' }}>{saveMsg}</span>}
+
+          {exists && canEdit && !diffMode && !noChanges && (
+            <button
+              onClick={showDiff}
+              className="px-3 py-1.5 text-sm font-bold rounded-lg"
+              style={{ background: '#21262d', color: '#8b949e', border: '1px solid #30363d' }}
+            >
+              Preview changes
+            </button>
+          )}
+
+          {diffMode && (
+            <button
+              onClick={() => setDiffMode(false)}
+              className="px-3 py-1.5 text-sm font-bold rounded-lg"
+              style={{ background: '#21262d', color: '#8b949e', border: '1px solid #30363d' }}
+            >
+              ← Code
+            </button>
+          )}
+
           {exists && canEdit && (
             <>
-              <button onClick={handleSave} className="px-4 py-1.5 text-sm font-bold rounded-lg" style={{ background: '#238636', color: '#fff' }}>
-                Save
+              <button
+                onClick={handleSave}
+                disabled={noChanges}
+                className="px-4 py-1.5 text-sm font-bold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ background: '#238636', color: '#fff' }}
+              >
+                💾 Save
               </button>
               <button
                 onClick={() => setShowPR(true)}
@@ -282,7 +368,32 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
             + Create new visualization
           </button>
         </div>
+      ) : diffMode && DiffEditorComp ? (
+        /* Diff view: full-width, no preview panel */
+        <div className="flex-1 min-h-0">
+          <div className="px-3 py-1 text-xs shrink-0" style={{ background: '#161b22', borderBottom: '1px solid #30363d', color: '#8b949e' }}>
+            Changes vs disk — left: saved file · right: current editor
+          </div>
+          <div style={{ height: 'calc(100% - 28px)' }}>
+            <DiffEditorComp
+              height="100%"
+              original={originalSource}
+              modified={source}
+              language="javascript"
+              theme="vs-dark"
+              options={{
+                readOnly: true,
+                renderSideBySide: true,
+                minimap: { enabled: false },
+                fontSize: 13,
+                wordWrap: 'on',
+                scrollBeyondLastLine: false,
+              }}
+            />
+          </div>
+        </div>
       ) : (
+        /* Normal editor + preview split */
         <div className="flex flex-1 min-h-0">
           <div className="flex flex-col min-h-0" style={{ width: '55%', borderRight: '1px solid #30363d' }}>
             <div className="px-3 py-1 text-xs shrink-0" style={{ background: '#161b22', borderBottom: '1px solid #30363d', color: '#8b949e' }}>
@@ -294,7 +405,7 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
           </div>
           <div className="flex flex-col min-h-0" style={{ width: '45%' }}>
             <div className="px-3 py-1 text-xs shrink-0" style={{ background: '#161b22', borderBottom: '1px solid #30363d', color: '#8b949e' }}>
-              Live preview — React + JSX via Babel · local imports stripped
+              Live preview — React + JSX via Babel + Tailwind · local imports stripped
             </div>
             <div className="flex-1 min-h-0">
               <iframe

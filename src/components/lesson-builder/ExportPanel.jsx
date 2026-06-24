@@ -5,16 +5,23 @@ import { checkLessonLatex } from '../math/checkLessonLatex.js'
 
 const API = '/api/dev-fs'
 
-// Resolve [N-chapter-folder] placeholder using local dev-fs (no GitHub token needed)
+// Resolve [N-chapter-folder] placeholder using local dev-fs (no GitHub token needed).
+// Also matches the file by slug rather than the numeric prefix, because meta.order
+// and the actual file number can differ (e.g. order:6 but file is 010-optimization.js).
 async function resolveLocalFilePath(filePath) {
-  const match = filePath.match(/^(src\/courses\/([^/]+))\/\[(\d+)-chapter-folder\]\/(.+)$/)
+  const match = filePath.match(/^(src\/courses\/([^/]+))\/\[(\d+)-chapter-folder\]\/\d+-(.+)$/)
   if (!match) return filePath
-  const [, coursePath, , chNum, filename] = match
+  const [, coursePath, , chNum, slugFile] = match  // slugFile = "optimization.js"
   try {
-    const entries = await fetch(`${API}/list?dir=${encodeURIComponent(coursePath)}`).then(r => r.json())
-    const found = Array.isArray(entries) && entries.find(e => e.type === 'dir' && e.name.startsWith(`${chNum}-`))
-    const folder = found?.name ?? `${chNum}-chapter`
-    return `${coursePath}/${folder}/${filename}`
+    // 1. Resolve chapter folder name
+    const dirEntries = await fetch(`${API}/list?dir=${encodeURIComponent(coursePath)}`).then(r => r.json())
+    const folder = (Array.isArray(dirEntries) && dirEntries.find(e => e.type === 'dir' && e.name.startsWith(`${chNum}-`)))?.name ?? `${chNum}-chapter`
+    const chapterPath = `${coursePath}/${folder}`
+
+    // 2. Find the actual file by slug (ignore numeric prefix mismatch)
+    const fileEntries = await fetch(`${API}/list?dir=${encodeURIComponent(chapterPath)}&ext=js`).then(r => r.json())
+    const actual = Array.isArray(fileEntries) && fileEntries.find(f => f.name === slugFile || f.name.endsWith(`-${slugFile}`))
+    return `${chapterPath}/${actual?.name ?? slugFile}`
   } catch {
     return filePath
   }

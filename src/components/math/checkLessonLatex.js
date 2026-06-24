@@ -6,7 +6,10 @@
 import katex from 'katex'
 import { preprocess, extractMathSegments } from './latexPreprocess.js'
 
-const RAW_TEX_KEYS = new Set(['tex', 'expression'])
+// 'math' is used in walkthrough steps and similar fields — always raw LaTeX,
+// never prose with embedded delimiters. Must bypass preprocess/wrapBareLatex
+// (which mangles subscripted operators like A_{\max} into A_{$\max}$}).
+const RAW_TEX_KEYS = new Set(['tex', 'expression', 'math'])
 const KATEX_OPTIONS = { throwOnError: true, strict: false, trust: false }
 
 function checkRawTex(tex, path, errors) {

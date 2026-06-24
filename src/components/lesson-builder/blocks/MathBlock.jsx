@@ -6,6 +6,56 @@ import VisualizationBlock from './VisualizationBlock.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
+const CALLOUT_TYPES = ['insight', 'sequencing', 'procedure', 'strategy', 'warning', 'tip', 'theorem', 'definition']
+const MATH_BODY_TYPES = new Set(['theorem', 'definition'])
+const wrapMath = v => (v?.trim() ? `$$\n${v}\n$$` : '')
+const unwrapMath = v => v?.replace(/^\$\$\s*\n?/, '').replace(/\n?\s*\$\$$/, '').trim() ?? ''
+
+function CalloutEditor({ callout, onChange, onRemove }) {
+  const [editingBody, setEditingBody] = useState(false)
+  const isMathBody = MATH_BODY_TYPES.has(callout.type)
+  return (
+    <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-2 bg-slate-50 dark:bg-slate-800/50">
+      <div className="flex items-center gap-2">
+        <select
+          value={callout.type ?? 'insight'}
+          onChange={e => onChange({ ...callout, type: e.target.value })}
+          className="field text-xs py-1"
+        >
+          {CALLOUT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+        <div className="ml-auto flex items-center gap-2">
+          <MarkdownEditButton onClick={() => setEditingBody(true)} />
+          <button onClick={onRemove} className="text-xs text-red-400 hover:text-red-600">✕ Remove</button>
+        </div>
+      </div>
+      <input
+        value={callout.title ?? ''}
+        onChange={e => onChange({ ...callout, title: e.target.value })}
+        placeholder="Callout title"
+        className="field text-sm"
+      />
+      <textarea
+        value={callout.body ?? ''}
+        onChange={e => onChange({ ...callout, body: e.target.value })}
+        placeholder={isMathBody ? 'Raw LaTeX (no $ needed)…' : 'Callout body text…'}
+        rows={2}
+        className="field text-sm resize-none font-mono"
+      />
+      {editingBody && (
+        <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
+          <MarkdownCellEditor
+            value={isMathBody ? wrapMath(callout.body) : (callout.body ?? '')}
+            onChange={v => onChange({ ...callout, body: isMathBody ? unwrapMath(v) : v })}
+            onClose={() => setEditingBody(false)}
+            title={isMathBody ? '∑ Theorem / Definition (LaTeX)' : '💡 Callout Body'}
+          />
+        </Suspense>
+      )}
+    </div>
+  )
+}
+
 // Renders eq.tex live so a bad \frac or unbalanced brace shows up the moment
 // it's typed, instead of a contributor finding out from a failed CI check
 // after they've already opened a pull request.
@@ -70,6 +120,13 @@ export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMov
           <EquationPreview tex={eq.tex} />
         </div>
       ))}
+      {(sec.callouts ?? []).map((c, i) => (
+        <div key={i} className="rounded-lg border-l-4 border-brand-400 bg-brand-50 dark:bg-brand-900/20 px-4 py-3">
+          <p className="text-xs font-bold text-brand-700 dark:text-brand-300 uppercase mb-1">{c.type}</p>
+          <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{c.title}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-mono">{c.body}</p>
+        </div>
+      ))}
       {(sec.children ?? []).map((child, i) => (
         <VisualizationBlock
           key={child._id}
@@ -81,7 +138,7 @@ export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMov
           courseId={courseId}
         />
       ))}
-      {!sec.prose?.length && !sec.equations?.length && !sec.children?.length && (
+      {!sec.prose?.length && !sec.equations?.length && !sec.callouts?.length && !sec.children?.length && (
         <p className="text-slate-300 dark:text-slate-600 italic text-sm">Click to add math content…</p>
       )}
     </div>
@@ -131,6 +188,30 @@ export default function MathBlock({ sec, dispatch, index, total, onMoveUp, onMov
           />
         ))}
       </div>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Callouts</span>
+          <button
+            onClick={() => update({ callouts: [...(sec.callouts ?? []), { type: 'theorem', title: '', body: '' }] })}
+            className="text-xs text-brand-600 hover:text-brand-700 font-semibold"
+          >
+            + Add callout
+          </button>
+        </div>
+        {(sec.callouts ?? []).map((c, i) => (
+          <CalloutEditor
+            key={i}
+            callout={c}
+            onChange={updated => {
+              const callouts = [...(sec.callouts ?? [])]
+              callouts[i] = updated
+              update({ callouts })
+            }}
+            onRemove={() => update({ callouts: (sec.callouts ?? []).filter((_, j) => j !== i) })}
+          />
+        ))}
+      </div>
+
       {/* Nested visualizations */}
       {(sec.children ?? []).length > 0 && (
         <div className="space-y-3">

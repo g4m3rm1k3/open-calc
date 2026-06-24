@@ -4,7 +4,8 @@ import MarkdownEditButton from '../MarkdownEditButton.jsx'
 
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
-function QuizItemEditor({ q, onChange, onRemove }) {
+// Assessment questions use `hint` (single string) — distinct from quiz `hints` (array).
+function AssessmentItemEditor({ q, onChange, onRemove }) {
   const [editingText, setEditingText] = useState(false)
   return (
     <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4 space-y-3 bg-slate-50 dark:bg-slate-800/50">
@@ -12,8 +13,8 @@ function QuizItemEditor({ q, onChange, onRemove }) {
         <input
           value={q.id ?? ''}
           onChange={e => onChange({ ...q, id: e.target.value })}
-          placeholder="Question ID (e.g. q1)"
-          className="field font-mono text-xs w-28"
+          placeholder="Question ID (e.g. la1-001-assess-1)"
+          className="field font-mono text-xs w-48"
         />
         <button onClick={onRemove} className="text-xs text-red-400 hover:text-red-600">✕ Remove</button>
       </div>
@@ -22,11 +23,11 @@ function QuizItemEditor({ q, onChange, onRemove }) {
           <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Question text</span>
           <MarkdownEditButton onClick={() => setEditingText(true)} />
         </div>
-        <textarea value={q.text ?? ''} onChange={e => onChange({ ...q, text: e.target.value })} rows={2} className="field text-sm resize-none" placeholder="What does a vector represent?" />
+        <textarea value={q.text ?? ''} onChange={e => onChange({ ...q, text: e.target.value })} rows={2} className="field text-sm resize-none" placeholder="What is the magnitude of [3, 4]?" />
       </label>
       {editingText && (
         <Suspense fallback={null}>
-          <MarkdownCellEditor value={q.text ?? ''} onChange={v => onChange({ ...q, text: v })} onClose={() => setEditingText(false)} title="🧪 Quiz Question" />
+          <MarkdownCellEditor value={q.text ?? ''} onChange={v => onChange({ ...q, text: v })} onClose={() => setEditingText(false)} title="📋 Assessment Question" />
         </Suspense>
       )}
       <label className="flex flex-col gap-1">
@@ -41,27 +42,23 @@ function QuizItemEditor({ q, onChange, onRemove }) {
       </label>
       <label className="flex flex-col gap-1">
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Correct answer (exact match to one option)</span>
-        <input value={q.answer ?? ''} onChange={e => onChange({ ...q, answer: e.target.value })} placeholder="Option A" className="field text-sm" />
+        <input value={q.answer ?? ''} onChange={e => onChange({ ...q, answer: e.target.value })} placeholder="Option B" className="field text-sm" />
       </label>
       <label className="flex flex-col gap-1">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Hints — one per line</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Hint (single hint string)</span>
         <textarea
-          value={(q.hints ?? []).join('\n')}
-          onChange={e => onChange({ ...q, hints: e.target.value.split('\n').filter(Boolean) })}
+          value={q.hint ?? ''}
+          onChange={e => onChange({ ...q, hint: e.target.value })}
           rows={2}
           className="field text-sm resize-none"
-          placeholder="Think about direction…"
+          placeholder="Think about the Pythagorean theorem…"
         />
-      </label>
-      <label className="flex flex-col gap-1">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Review section</span>
-        <input value={q.reviewSection ?? ''} onChange={e => onChange({ ...q, reviewSection: e.target.value })} placeholder="intuition" className="field text-sm" />
       </label>
     </div>
   )
 }
 
-export default function QuizBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove }) {
+export default function AssessmentBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove }) {
   const [editing, setEditing] = useState(false)
   const update = updates => dispatch({ type: 'UPDATE_SECTION', id: sec._id, updates })
   const updateItem = (i, updated) => { const items = [...(sec.items ?? [])]; items[i] = updated; update({ items }) }
@@ -82,14 +79,14 @@ export default function QuizBlock({ sec, dispatch, index, total, onMoveUp, onMov
           )}
         </div>
       ))}
-      {!sec.items?.length && <p className="text-slate-300 dark:text-slate-600 italic text-sm">No quiz questions yet…</p>}
+      {!sec.items?.length && <p className="text-slate-300 dark:text-slate-600 italic text-sm">No assessment questions yet…</p>}
     </div>
   )
 
   const editor = (
     <div className="space-y-4">
       {(sec.items ?? []).map((q, i) => (
-        <QuizItemEditor
+        <AssessmentItemEditor
           key={i} q={q}
           onChange={updated => updateItem(i, updated)}
           onRemove={() => update({ items: (sec.items ?? []).filter((_, j) => j !== i) })}
@@ -97,7 +94,7 @@ export default function QuizBlock({ sec, dispatch, index, total, onMoveUp, onMov
       ))}
       <div className="flex gap-3">
         <button
-          onClick={() => update({ items: [...(sec.items ?? []), { id: `q${Date.now()}`, type: 'choice', text: '', options: ['', '', '', ''], answer: '', hints: [], reviewSection: '' }] })}
+          onClick={() => update({ items: [...(sec.items ?? []), { id: `assess-${Date.now()}`, type: 'choice', text: '', options: ['', '', '', ''], answer: '', hint: '' }] })}
           className="px-3 py-1.5 text-sm text-brand-600 hover:text-brand-700 font-semibold border border-brand-200 rounded-lg"
         >
           + Add question
@@ -108,7 +105,7 @@ export default function QuizBlock({ sec, dispatch, index, total, onMoveUp, onMov
   )
 
   return (
-    <BlockShell label="Quiz" icon="🧪" index={index} total={total} onMoveUp={onMoveUp} onMoveDown={onMoveDown} onRemove={onRemove} isEditing={editing} onEdit={() => setEditing(true)}>
+    <BlockShell label="Assessment" icon="📋" index={index} total={total} onMoveUp={onMoveUp} onMoveDown={onMoveDown} onRemove={onRemove} isEditing={editing} onEdit={() => setEditing(true)}>
       {editing ? editor : preview}
     </BlockShell>
   )

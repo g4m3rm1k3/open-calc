@@ -8,6 +8,7 @@ const VizSourceEditor = lazy(() => import('./VizSourceEditor.jsx'))
 
 export default function HookBlock({ hook, dispatch, courseId = 'geometry' }) {
   const [editing, setEditing] = useState(false)
+  const [editingQuestion, setEditingQuestion] = useState(false)
   const [editingContext, setEditingContext] = useState(false)
   const [editingSource, setEditingSource] = useState(false)
   const set = (key, value) => dispatch({ type: 'SET_HOOK', key, value })
@@ -36,7 +37,10 @@ export default function HookBlock({ hook, dispatch, courseId = 'geometry' }) {
         </p>
       )}
       <label className="flex flex-col gap-1">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Hook question (italic lead-in)</span>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Hook question (italic lead-in)</span>
+          <MarkdownEditButton onClick={() => setEditingQuestion(true)} />
+        </div>
         <textarea
           value={hook.question}
           onChange={e => set('question', e.target.value)}
@@ -45,6 +49,11 @@ export default function HookBlock({ hook, dispatch, courseId = 'geometry' }) {
           className="field resize-none"
         />
       </label>
+      {editingQuestion && (
+        <Suspense fallback={null}>
+          <MarkdownCellEditor value={hook.question} onChange={v => set('question', v)} onClose={() => setEditingQuestion(false)} title="🪝 Hook Question" />
+        </Suspense>
+      )}
       <label className="flex flex-col gap-1">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Real-world context (prose, markdown ok)</span>

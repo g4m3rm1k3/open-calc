@@ -8,10 +8,17 @@ const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
 // Shared editor for Intuition and Rigor (both have prose[] + callouts[])
 
-const CALLOUT_TYPES = ['insight', 'sequencing', 'procedure', 'warning', 'tip']
+const CALLOUT_TYPES = ['insight', 'sequencing', 'procedure', 'strategy', 'warning', 'tip', 'theorem', 'definition']
+
+// theorem and definition bodies are raw LaTeX (no $ delimiters) — wrap for
+// MarkdownCellEditor preview so KaTeX renders them, strip the wrapper on save.
+const MATH_BODY_TYPES = new Set(['theorem', 'definition'])
+const wrapMath = v => (v?.trim() ? `$$\n${v}\n$$` : '')
+const unwrapMath = v => v?.replace(/^\$\$\s*\n?/, '').replace(/\n?\s*\$\$$/, '').trim() ?? ''
 
 function CalloutEditor({ callout, onChange, onRemove }) {
   const [editingBody, setEditingBody] = useState(false)
+  const isMathBody = MATH_BODY_TYPES.has(callout.type)
   return (
     <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-2 bg-slate-50 dark:bg-slate-800/50">
       <div className="flex items-center gap-2">
@@ -36,17 +43,17 @@ function CalloutEditor({ callout, onChange, onRemove }) {
       <textarea
         value={callout.body ?? ''}
         onChange={e => onChange({ ...callout, body: e.target.value })}
-        placeholder="Callout body text…"
+        placeholder={isMathBody ? 'Raw LaTeX (no $ needed)…' : 'Callout body text…'}
         rows={2}
-        className="field text-sm resize-none"
+        className="field text-sm resize-none font-mono"
       />
       {editingBody && (
         <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
           <MarkdownCellEditor
-            value={callout.body ?? ''}
-            onChange={v => onChange({ ...callout, body: v })}
+            value={isMathBody ? wrapMath(callout.body) : (callout.body ?? '')}
+            onChange={v => onChange({ ...callout, body: isMathBody ? unwrapMath(v) : v })}
             onClose={() => setEditingBody(false)}
-            title="💡 Callout Body"
+            title={isMathBody ? '∑ Theorem / Definition (LaTeX)' : '💡 Callout Body'}
           />
         </Suspense>
       )}

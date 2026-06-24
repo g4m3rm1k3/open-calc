@@ -10,20 +10,29 @@ export const HANDLED_SECTION_KEYS = new Set([
   'cells',
   // Guided walkthroughs
   'walkthroughs',
+  // Semantic / pedagogical layers
+  'semantics', 'spiral', 'assessment', 'misconceptions', 'transferPrompts', 'debugging', 'mastery',
 ])
 export const HANDLED_META_KEYS = new Set(['id', 'slug', 'chapter', 'order', 'title', 'subtitle', 'tags', 'coreConcept', 'prerequisites', 'timeToComplete', 'aliases', 'nextLesson', 'mentalModel'])
 
 export const PALETTE_BLOCKS = [
-  { type: 'intuition',    label: 'Intuition',   icon: '🧠', desc: 'Prose + callouts explaining the core idea' },
-  { type: 'math',         label: 'Math',         icon: '📐', desc: 'Formal math content with equations' },
-  { type: 'rigor',        label: 'Rigor',        icon: '∴',  desc: 'Formal proof or rigorous derivation' },
-  { type: 'examples',    label: 'Examples',     icon: '✏️', desc: 'Worked examples with step-by-step solutions' },
-  { type: 'challenges',  label: 'Challenges',   icon: '🎯', desc: 'Practice problems for the learner' },
-  { type: 'checkpoints', label: 'Checkpoints',  icon: '✅', desc: 'Progress tracking items' },
-  { type: 'quiz',         label: 'Quiz',         icon: '🧪', desc: 'Multiple-choice quiz questions' },
-  { type: 'python',       label: 'Python',       icon: '🐍', desc: 'Python notebook cells with runnable code' },
-  { type: 'cells',        label: 'Cells',        icon: '⚗️', desc: 'ScienceNotebook cells (markdown, js, challenge, coding, walkthrough)' },
-  { type: 'walkthroughs', label: 'Walkthroughs', icon: '🚶', desc: 'Step-by-step guided problem walkthroughs with LaTeX math' },
+  { type: 'intuition',      label: 'Intuition',       icon: '🧠', desc: 'Prose + callouts explaining the core idea' },
+  { type: 'math',           label: 'Math',            icon: '📐', desc: 'Formal math content with equations and callouts' },
+  { type: 'rigor',          label: 'Rigor',           icon: '∴',  desc: 'Formal proof or rigorous derivation' },
+  { type: 'examples',       label: 'Examples',        icon: '✏️', desc: 'Worked examples with step-by-step solutions' },
+  { type: 'challenges',     label: 'Challenges',      icon: '🎯', desc: 'Practice problems with difficulty, answer, and walkthrough' },
+  { type: 'checkpoints',    label: 'Checkpoints',     icon: '✅', desc: 'Progress tracking items' },
+  { type: 'quiz',           label: 'Quiz',            icon: '🧪', desc: 'Multiple-choice quiz questions' },
+  { type: 'python',         label: 'Python',          icon: '🐍', desc: 'Python notebook cells with runnable code' },
+  { type: 'cells',          label: 'Cells',           icon: '⚗️', desc: 'ScienceNotebook cells (markdown, js, challenge, coding, walkthrough)' },
+  { type: 'walkthroughs',   label: 'Walkthroughs',    icon: '🚶', desc: 'Step-by-step guided problem walkthroughs with LaTeX math' },
+  { type: 'semantics',      label: 'Semantics',       icon: '🔣', desc: 'Core symbol definitions and rules of thumb' },
+  { type: 'spiral',         label: 'Spiral',          icon: '🌀', desc: 'Recovery points (prerequisites) and future lesson links' },
+  { type: 'assessment',     label: 'Assessment',      icon: '📋', desc: 'Standalone assessment questions (separate from the quiz)' },
+  { type: 'misconceptions', label: 'Misconceptions',  icon: '⚠️', desc: 'Common false beliefs and how to correct them' },
+  { type: 'transferPrompts',label: 'Transfer Prompts',icon: '🚀', desc: 'Situations where students must apply the concept to unfamiliar contexts' },
+  { type: 'debugging',      label: 'Debugging',       icon: '🐛', desc: 'Common errors, symptoms, causes, and repair strategies' },
+  { type: 'mastery',        label: 'Mastery',         icon: '🎓', desc: 'Target level and mastery criteria for this lesson' },
 ]
 
 // Convert lesson.*.visualizations array → builder children array
@@ -36,17 +45,24 @@ export function vizsToChildren(vizs) {
     caption: viz.caption ?? '',
     mathBridge: viz.mathBridge ?? '',
     props: viz.props ?? {},
+    // Preserve the full original so fields the builder doesn't edit (initialProps, etc.)
+    // pass through unchanged on export. Never serialized — consumed only by childrenToVizs.
+    _rawViz: viz,
   }))
 }
 
 // Convert builder children array → lesson.*.visualizations array
 export function childrenToVizs(children) {
   return (children ?? []).map(child => {
-    const v = { id: child.vizId }
-    if (child.title)      v.title = child.title
-    if (child.caption)    v.caption = child.caption
-    if (child.mathBridge) v.mathBridge = child.mathBridge
-    v.props = child.props ?? {}
+    // Start from the full original viz so unrecognized fields (initialProps, etc.) survive.
+    const v = { ...(child._rawViz ?? { id: child.vizId }) }
+    v.id = child.vizId || v.id
+    if (child.title) v.title = child.title; else delete v.title
+    if (child.caption) v.caption = child.caption; else delete v.caption
+    if (child.mathBridge) v.mathBridge = child.mathBridge; else delete v.mathBridge
+    // Only write props when non-empty — don't inject {} when the source didn't have it
+    if (child.props && Object.keys(child.props).length) v.props = child.props
+    else delete v.props
     return v
   })
 }
@@ -83,7 +99,7 @@ export function blocksToState(blocks, imageImportQueue) {
     const _id = newId()
     if (b.type === 'image') {
       const recovered = imageImportQueue.shift()
-      return { _id, type: 'image', importPath: recovered?.importPath ?? '', alt: b.alt ?? '', caption: b.caption ?? '', _previewSrc: b.src ?? '' }
+      return { _id, type: 'image', importPath: recovered?.importPath ?? '', _importIdentifier: recovered?.identifier ?? '', alt: b.alt ?? '', caption: b.caption ?? '', _previewSrc: b.src ?? '' }
     }
     if (b.type === 'prose') {
       return { _id, type: 'prose', paragraphs: b.paragraphs ?? [] }
@@ -108,7 +124,7 @@ export function blocksToState(blocks, imageImportQueue) {
 export function stateToBlocks(blocks) {
   return (blocks ?? []).map(b => {
     if (b.type === 'image') {
-      return { type: 'image', src: { __importRef: true, path: b.importPath }, alt: b.alt ?? '', caption: b.caption ?? '' }
+      return { type: 'image', src: { __importRef: true, path: b.importPath, identifier: b._importIdentifier || '' }, alt: b.alt ?? '', caption: b.caption ?? '' }
     }
     if (b.type === 'prose') {
       return { type: 'prose', paragraphs: b.paragraphs ?? [] }
@@ -150,6 +166,20 @@ export function defaultSection(type) {
       return { _id, type, cells: [{ type: 'markdown', instruction: '' }] }
     case 'walkthroughs':
       return { _id, type: 'walkthroughs', items: [] }
+    case 'semantics':
+      return { _id, type: 'semantics', core: [], rulesOfThumb: [] }
+    case 'spiral':
+      return { _id, type: 'spiral', recoveryPoints: [], futureLinks: [] }
+    case 'assessment':
+      return { _id, type: 'assessment', items: [] }
+    case 'misconceptions':
+      return { _id, type: 'misconceptions', items: [] }
+    case 'transferPrompts':
+      return { _id, type: 'transferPrompts', items: [] }
+    case 'debugging':
+      return { _id, type: 'debugging', items: [] }
+    case 'mastery':
+      return { _id, type: 'mastery', targetLevel: 1, solveIndependently: '', explainVerbally: '', detectIncorrectApplication: '', transferToUnfamiliar: '' }
     default:
       return { _id, type, prose: [] }
   }
@@ -171,7 +201,7 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
     const cells = lesson.cells.map(cell => {
       if (cell.type === 'image') {
         const r = imageImportQueue.shift()
-        if (r?.importPath) return { ...cell, _importPath: r.importPath }
+        if (r?.importPath) return { ...cell, _importPath: r.importPath, _importIdentifier: r.identifier ?? '' }
       }
       return cell
     })
@@ -185,7 +215,7 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
   } else if (lesson.intuition?.prose) {
     add('intuition', { prose: lesson.intuition.prose ?? [], callouts: lesson.intuition.callouts ?? [], children: vizsToChildren(lesson.intuition.visualizations) })
   }
-  if (lesson.math)      add('math',      { prose: lesson.math.prose ?? [],      equations: lesson.math.equations ?? [],   children: vizsToChildren(lesson.math.visualizations) })
+  if (lesson.math)      add('math',      { prose: lesson.math.prose ?? [], equations: lesson.math.equations ?? [], callouts: lesson.math.callouts ?? [], children: vizsToChildren(lesson.math.visualizations) })
   if (lesson.rigor?.blocks?.length) {
     add('rigor', { blocks: blocksToState(lesson.rigor.blocks, imageImportQueue), callouts: lesson.rigor.callouts ?? [] })
   } else if (lesson.rigor?.prose) {
@@ -207,6 +237,21 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
     add('python', { cells: lesson.notebooks.python.cells, _origKey: 'notebooks' })
   else if (lesson.pythonLab?.cells?.length)
     add('python', { cells: lesson.pythonLab.cells, _origKey: 'pythonLab' })
+
+  // Semantic / pedagogical layers
+  if (lesson.semantics)                      add('semantics',       { core: lesson.semantics.core ?? [], rulesOfThumb: lesson.semantics.rulesOfThumb ?? [] })
+  if (lesson.spiral)                         add('spiral',          { recoveryPoints: lesson.spiral.recoveryPoints ?? [], futureLinks: lesson.spiral.futureLinks ?? [] })
+  if (lesson.assessment)                     add('assessment',      { items: lesson.assessment.questions ?? [] })
+  if (lesson.misconceptions?.length)         add('misconceptions',  { items: lesson.misconceptions })
+  if (lesson.transferPrompts?.length)        add('transferPrompts', { items: lesson.transferPrompts })
+  if (lesson.debugging?.length)              add('debugging',       { items: lesson.debugging })
+  if (lesson.mastery)                        add('mastery',         {
+    targetLevel:               lesson.mastery.targetLevel ?? 1,
+    solveIndependently:        lesson.mastery.solveIndependently ?? '',
+    explainVerbally:           lesson.mastery.explainVerbally ?? '',
+    detectIncorrectApplication: lesson.mastery.detectIncorrectApplication ?? '',
+    transferToUnfamiliar:      lesson.mastery.transferToUnfamiliar ?? '',
+  })
 
   // Detect old-format lessons: they have subject/sequential but no id/slug/chapter.
   // Store the const variable name so the serializer can round-trip the exact same wrapper.

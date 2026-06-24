@@ -14,7 +14,10 @@ function pathToImportName(path) {
 function collectImports(v, importsMap) {
   if (v === null || typeof v !== 'object') return
   if (v.__importRef) {
-    if (v.path && !importsMap.has(v.path)) importsMap.set(v.path, pathToImportName(v.path))
+    if (v.path && !importsMap.has(v.path)) {
+      // Prefer the original identifier from source text; fall back to generating one
+      importsMap.set(v.path, v.identifier || pathToImportName(v.path))
+    }
     return
   }
   if (Array.isArray(v)) { v.forEach(x => collectImports(x, importsMap)); return }
@@ -176,6 +179,7 @@ export function buildLessonObject(state) {
         ...(_raw?.math ?? {}),
         prose: sec.prose ?? [],
         equations: sec.equations ?? [],
+        callouts: sec.callouts ?? [],
         visualizations: childrenToVizs(sec.children),
       }
     } else if (sec.type === 'examples') {
@@ -194,11 +198,31 @@ export function buildLessonObject(state) {
       // rather than the runtime-resolved URL string the dynamic import produced.
       base.cells = (sec.cells ?? []).map(cell => {
         if (cell.type === 'image' && cell._importPath) {
-          const { _importPath, src: _resolvedSrc, ...rest } = cell
-          return { ...rest, src: { __importRef: true, path: _importPath } }
+          const { _importPath, _importIdentifier, src: _resolvedSrc, ...rest } = cell
+          return { ...rest, src: { __importRef: true, path: _importPath, identifier: _importIdentifier || '' } }
         }
         return cell
       })
+    } else if (sec.type === 'assessment') {
+      base.assessment = { questions: sec.items ?? [] }
+    } else if (sec.type === 'misconceptions') {
+      base.misconceptions = sec.items ?? []
+    } else if (sec.type === 'transferPrompts') {
+      base.transferPrompts = sec.items ?? []
+    } else if (sec.type === 'debugging') {
+      base.debugging = sec.items ?? []
+    } else if (sec.type === 'semantics') {
+      base.semantics = { core: sec.core ?? [], rulesOfThumb: sec.rulesOfThumb ?? [] }
+    } else if (sec.type === 'spiral') {
+      base.spiral = { recoveryPoints: sec.recoveryPoints ?? [], futureLinks: sec.futureLinks ?? [] }
+    } else if (sec.type === 'mastery') {
+      const m = {}
+      if (sec.targetLevel != null)            m.targetLevel = sec.targetLevel
+      if (sec.solveIndependently)             m.solveIndependently = sec.solveIndependently
+      if (sec.explainVerbally)                m.explainVerbally = sec.explainVerbally
+      if (sec.detectIncorrectApplication)     m.detectIncorrectApplication = sec.detectIncorrectApplication
+      if (sec.transferToUnfamiliar)           m.transferToUnfamiliar = sec.transferToUnfamiliar
+      base.mastery = m
     } else if (sec.type === 'python') {
       const origKey = sec._origKey ?? 'python'
       if (origKey === 'notebooks') {
