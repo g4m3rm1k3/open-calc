@@ -1,0 +1,47 @@
+<svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="230" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="cn-blue" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+    <marker id="cn-red" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#dc2626"/></marker>
+    <marker id="cn-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#1e293b"/></marker>
+  </defs>
+
+  <text x="240" y="16" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">A = [1 2; 2 4] — rank 1: one direction survives, one is crushed</text>
+
+  <!-- Left panel: domain, with null space line -->
+  <rect x="12" y="24" width="208" height="190" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="116" y="42" font-size="10.5" fill="#64748b" text-anchor="middle" font-weight="700">Domain ℝ²</text>
+  <line x1="70" y1="172" x2="160" y2="128" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="92" y="190" font-size="9.5" fill="#dc2626">null space: Ax = 0</text>
+  <line x1="116" y1="150" x2="148" y2="166" stroke="#dc2626" stroke-width="2.5" marker-end="url(#cn-red)" opacity="0.7"/>
+  <text x="150" y="172" font-size="9.5" fill="#dc2626">→ crushed to 0</text>
+  <line x1="116" y1="150" x2="134" y2="132" stroke="#2563eb" stroke-width="2.5" marker-end="url(#cn-blue)"/>
+  <text x="138" y="128" font-size="11" fill="#2563eb" font-weight="700">x</text>
+  <circle cx="116" cy="150" r="2.5" fill="#1e293b"/>
+
+  <!-- Arrow between panels -->
+  <line x1="226" y1="120" x2="254" y2="120" stroke="#1e293b" stroke-width="2" marker-end="url(#cn-arrow)"/>
+  <text x="240" y="110" font-size="12" class="svg-text" text-anchor="middle" font-weight="700">A</text>
+
+  <!-- Right panel: column space (1D line) -->
+  <rect x="260" y="24" width="208" height="190" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="364" y="42" font-size="10.5" fill="#10b981" text-anchor="middle" font-weight="700">Column space ⊂ ℝ²</text>
+  <line x1="324" y1="192" x2="396" y2="78" stroke="#10b981" stroke-width="2.5"/>
+  <text x="330" y="200" font-size="9.5" fill="#10b981">span{[1,2]}</text>
+  <circle cx="360" cy="150" r="3" fill="#1e293b"/>
+  <text x="330" y="168" font-size="9.5" fill="#1e293b">0 — crushed vectors land here</text>
+  <circle cx="414" cy="42" r="4" fill="#2563eb"/>
+  <text x="392" y="34" font-size="10.5" fill="#2563eb" font-weight="700">Ax</text>
+</svg>

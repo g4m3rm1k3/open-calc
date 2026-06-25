@@ -1,3 +1,6 @@
+import cofactorMinorUrl from '../diagrams/la-cofactor-minor.svg?url'
+import adjugateFormulaUrl from '../diagrams/la-adjugate-formula.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-012',
@@ -24,14 +27,26 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Start with a 3×3 matrix and the goal of computing its determinant. You already know $ad - bc$ for 2×2. The 3×3 case generalizes that formula by repeatedly using it.',
       'Pick any row. Say row 1: $\\begin{bmatrix} a & b & c \\\\ d & e & f \\\\ g & h & k \\end{bmatrix}$. For each entry in that row, delete its entire row and column. What is left is a 2×2 matrix — compute its determinant. Attach a sign based on which position you are at (column 1 gets $+$, column 2 gets $-$, column 3 gets $+$). Multiply each entry by its signed 2×2 determinant and sum. That is cofactor expansion.',
       'The signed 2×2 determinant for entry $(1,j)$ is the **cofactor** $C_{1j}$. The 2×2 determinant without the sign is the **minor** $M_{1j}$. They are related by the simple rule $C_{ij} = (-1)^{i+j} M_{ij}$.',
+      ] },
+      { type: 'image', src: cofactorMinorUrl,
+        alt: 'A 3x3 matrix grid with row 1 and column 1 grayed out as deleted, the remaining 2x2 minor M11 boxed in blue, and a checkerboard of plus and minus signs shown as a legend',
+        caption: 'Delete a row and a column, sign it by checkerboard position — that signed minor is the cofactor.' },
+      { type: 'prose', paragraphs: [
       '**You can expand along any row or column** and always get the same answer. This is the key strategic fact: if a row or column has mostly zeros, expand along it — every zero entry contributes nothing to the sum.',
       'Now the deeper idea: what if you organize all nine cofactors into a 3×3 matrix? The entry in position $(i,j)$ of that matrix is $C_{ij}$. Transposing this matrix (swapping rows and columns) gives the **adjugate matrix** $\\text{adj}(A)$. It turns out that $A \\cdot \\text{adj}(A) = \\det(A) \\cdot I$. Dividing by $\\det(A)$ immediately gives $A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$. This is the only explicit, formula-based inverse that works for any size matrix.',
+      ] },
+      { type: 'image', src: adjugateFormulaUrl,
+        alt: 'Flow diagram: a 2x2 cofactor matrix grid transposes into the adjugate matrix, then divides by det(A) to produce the inverse matrix',
+        caption: 'A⁻¹ = adj(A) / det(A) — works for any size, any invertible matrix.' },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on.** For the matrix $A = \\begin{bmatrix} 2 & 1 \\\\ 5 & 3 \\end{bmatrix}$, compute $\\det(A)$, then compute the four cofactors $C_{11}, C_{12}, C_{21}, C_{22}$, and write $A^{-1}$ using the adjugate formula. Check your answer against $A^{-1} = \\frac{1}{1}\\begin{bmatrix}3&-1\\\\-5&2\\end{bmatrix}$.',
       '**Where this connects.** The adjugate formula is the algebraic foundation for Cramer\'s rule (Lesson LA2-008): solving $Ax = b$ by replacing one column at a time and using determinants. Both depend on the same machinery you are building now.',
+      ] },
     ],
     callouts: [
       {
@@ -65,7 +80,6 @@ export default {
         body: 'The **adjugate** of $A$, written $\\text{adj}(A)$, is the **transpose of the cofactor matrix**.\n\nThe cofactor matrix has $C_{ij}$ in position $(i,j)$. The adjugate has $C_{ji}$ in position $(i,j)$ — rows and columns swapped.\n\n$$A^{-1} = \\frac{1}{\\det(A)}\\,\\text{adj}(A) \\qquad(\\det(A) \\neq 0)$$\n\nFor a 2×2 matrix $\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}$, $\\text{adj}(A) = \\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$ — exactly the formula you already know.',
       },
     ],
-    visualizations: [],
   },
 
   // ── Math ───────────────────────────────────────────────────────
@@ -949,7 +963,12 @@ plt.show()`,
   },
 
   // ── Mental Model ──────────────────────────────────────────────
-  mentalModel: `Think of cofactor expansion as dismantling a building floor by floor. Each floor (row or column) has some structural pillars (nonzero entries). For each pillar, you remove that entire floor and column, compute the determinant of the smaller building that remains (the minor), then attach a sign based on the pillar\'s grid position. Summing all pillar contributions gives the full volume. Strategically, start dismantling from the floor with the fewest pillars (most zeros). The adjugate collects all the sub-building determinants into a matrix, and the identity A·adj(A) = det(A)·I says: the original building\'s volume appears on the diagonal, while mixing floors from different buildings always gives zero (two identical floors collapse everything).`,
+  mentalModel: [
+    'Cofactor expansion is dismantling a building floor by floor: each floor (row or column) has structural pillars (nonzero entries).',
+    'For each pillar, remove its entire floor and column, take the determinant of what remains (the minor), then sign it by checkerboard position — that is the cofactor.',
+    'Summing all pillar contributions along one floor gives the full volume (the determinant). Start from the floor with the fewest pillars (most zeros) to save work.',
+    'The adjugate collects every sub-building determinant into a matrix; A·adj(A) = det(A)·I says the original volume sits on the diagonal, while mixing floors from different buildings always collapses to zero.',
+  ],
 
   // ── Debugging ─────────────────────────────────────────────────
   debugging: [

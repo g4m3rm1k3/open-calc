@@ -1,0 +1,44 @@
+<svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="460" height="220" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="sv-blue" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+    <marker id="sv-amber" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#d97706"/></marker>
+    <marker id="sv-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#1e293b"/></marker>
+  </defs>
+
+  <!-- Panel 1: input unit circle -->
+  <rect x="12" y="20" width="216" height="180" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="38" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">Input: unit circle</text>
+  <circle cx="120" cy="110" r="50" fill="rgba(37,99,235,0.06)" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="120" y1="110" x2="166" y2="110" stroke="#2563eb" stroke-width="2.5" marker-end="url(#sv-blue)"/>
+  <text x="172" y="106" font-size="11" fill="#2563eb" font-weight="700">v₁</text>
+  <line x1="120" y1="110" x2="120" y2="64" stroke="#d97706" stroke-width="2.5" marker-end="url(#sv-amber)"/>
+  <text x="126" y="60" font-size="11" fill="#d97706" font-weight="700">v₂</text>
+
+  <text x="230" y="104" font-size="13" class="svg-text" text-anchor="middle" font-weight="700">A</text>
+
+  <!-- Panel 2: output ellipse -->
+  <rect x="232" y="20" width="216" height="180" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="340" y="38" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">Output: ellipse</text>
+  <ellipse cx="340" cy="110" rx="70" ry="30" fill="rgba(37,99,235,0.10)" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="340" y1="110" x2="410" y2="110" stroke="#2563eb" stroke-width="2.5" marker-end="url(#sv-blue)"/>
+  <text x="412" y="106" font-size="11" fill="#2563eb" font-weight="700">σ₁u₁</text>
+  <line x1="340" y1="110" x2="340" y2="80" stroke="#d97706" stroke-width="2.5" marker-end="url(#sv-amber)"/>
+  <text x="346" y="76" font-size="11" fill="#d97706" font-weight="700">σ₂u₂</text>
+
+  <text x="230" y="68" font-size="16" class="svg-text" text-anchor="middle">→</text>
+
+  <text x="230" y="212" font-size="10.5" class="svg-muted" text-anchor="middle">Every matrix sends the unit circle to an ellipse — the singular values are its semi-axes</text>
+</svg>

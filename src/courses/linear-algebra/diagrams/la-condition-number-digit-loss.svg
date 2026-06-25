@@ -1,0 +1,43 @@
+<svg viewBox="0 0 360 210" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="360" height="210" rx="10" class="svg-bg"/>
+
+  <text x="180" y="16" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">Digits lost ≈ log₁₀(κ) — double precision has 16 to spend</text>
+
+  <line x1="50" y1="170" x2="330" y2="170" class="svg-axis" stroke-width="1.3"/>
+  <line x1="50" y1="170" x2="50" y2="36" class="svg-axis" stroke-width="1.3"/>
+  <text x="20" y="40" font-size="9" class="svg-muted">16 digits</text>
+  <line x1="50" y1="38" x2="330" y2="38" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- bars: kappa = 1, 1e4, 1e8, 1e12, 1e16 -> retained digits 16,12,8,4,0 -->
+  <rect x="62" y="38" width="38" height="132" fill="rgba(16,185,129,0.55)" stroke="#10b981" stroke-width="1"/>
+  <text x="81" y="184" font-size="9.5" class="svg-muted" text-anchor="middle">κ=1</text>
+  <text x="81" y="32" font-size="9.5" fill="#10b981" text-anchor="middle" font-weight="700">16</text>
+
+  <rect x="114" y="71" width="38" height="99" fill="rgba(16,185,129,0.4)" stroke="#10b981" stroke-width="1"/>
+  <text x="133" y="184" font-size="9.5" class="svg-muted" text-anchor="middle">κ=10⁴</text>
+  <text x="133" y="65" font-size="9.5" fill="#10b981" text-anchor="middle" font-weight="700">12</text>
+
+  <rect x="166" y="104" width="38" height="66" fill="rgba(217,119,6,0.4)" stroke="#d97706" stroke-width="1"/>
+  <text x="185" y="184" font-size="9.5" class="svg-muted" text-anchor="middle">κ=10⁸</text>
+  <text x="185" y="98" font-size="9.5" fill="#d97706" text-anchor="middle" font-weight="700">8</text>
+
+  <rect x="218" y="137" width="38" height="33" fill="rgba(220,38,38,0.4)" stroke="#dc2626" stroke-width="1"/>
+  <text x="237" y="184" font-size="9.5" class="svg-muted" text-anchor="middle">κ=10¹²</text>
+  <text x="237" y="131" font-size="9.5" fill="#dc2626" text-anchor="middle" font-weight="700">4</text>
+
+  <rect x="270" y="167" width="38" height="3" fill="rgba(220,38,38,0.7)" stroke="#dc2626" stroke-width="1"/>
+  <text x="289" y="184" font-size="9.5" class="svg-muted" text-anchor="middle">κ=10¹⁶</text>
+  <text x="289" y="161" font-size="9.5" fill="#dc2626" text-anchor="middle" font-weight="700">0</text>
+
+  <text x="180" y="202" font-size="10" class="svg-muted" text-anchor="middle">reliable significant digits remaining in the computed answer</text>
+</svg>

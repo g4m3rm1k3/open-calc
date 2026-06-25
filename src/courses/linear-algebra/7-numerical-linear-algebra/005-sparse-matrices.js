@@ -1,3 +1,6 @@
+import csrStorageUrl from '../diagrams/la-csr-sparse-storage.svg?url';
+import fillinUrl from '../diagrams/la-sparse-fillin.svg?url';
+
 export default {
   id: 'la7-005',
   slug: 'sparse-matrices',
@@ -14,53 +17,33 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       '**Where you are in the story.** Everything covered so far — QR, Cholesky, condition numbers, pivoting — assumes dense matrices. Dense means you store every entry. Dense means every operation touches every element. This works fine when $n$ is a few thousand. But the problems that matter most to engineers and scientists have $n$ in the millions or billions. A finite-element mesh with a million nodes produces a $10^6 \\times 10^6$ matrix — dense storage would require 8 terabytes and dense LU would take $10^{18}$ floating-point operations. Sparse matrices are how you solve these problems at all.',
 
       '**The key observation: most entries are zero.** In a finite-element mesh, each node only connects to a few physical neighbors. In the web graph, each page links to maybe 40 others out of a billion. In a power grid, each bus connects to a few transmission lines. When you represent these systems as matrices, the vast majority of entries are zero — often more than $99.99\\%$. A matrix is "sparse" when its non-zero count $nnz$ is $O(n)$ rather than $O(n^2)$.',
 
       '**Storage: only keep the non-zeros.** The most common sparse format is Compressed Sparse Row (CSR). For $A = \\begin{bmatrix}1&0&2\\\\0&3&0\\\\4&0&5\\end{bmatrix}$: CSR stores `values = [1, 2, 3, 4, 5]` (just the non-zeros), `col_idx = [0, 2, 1, 0, 2]` (column of each non-zero), `row_ptr = [0, 2, 3, 5]` (where each row starts in the arrays). Memory: $O(nnz)$ instead of $O(n^2)$. For the million-node mesh with 5 neighbors each: 5 million entries instead of $10^{12}$ — 200,000 times smaller.',
-
+      ] },
+      { type: 'image', src: csrStorageUrl,
+        alt: 'A 3x3 matrix with most entries faded as zero, next to three arrays: values holding the non-zeros, col_idx holding their column positions, and row_ptr marking where each row starts',
+        caption: 'CSR keeps only the non-zeros and a map of where they belong — memory drops from O(n²) to O(nnz).' },
+      { type: 'prose', paragraphs: [
       '**Matrix-vector products are the foundation.** Every iterative solver — conjugate gradient, GMRES, multigrid — reduces to repeating the operation $\\mathbf{y} = A\\mathbf{x}$. With CSR, this costs $O(nnz)$ flops: iterate over non-zeros, multiply by $\\mathbf{x}$ at the matching column, accumulate. For $nnz = O(n)$, this is linear time. The entire iterative solver becomes $O(k \\cdot n)$ where $k$ is the number of iterations — feasible even for $n = 10^6$.',
 
       '**Predict before reading on.** Consider a $5 \\times 5$ tridiagonal matrix (2 on the diagonal, $-1$ on the super- and sub-diagonals). When you run Gaussian elimination on it, do you expect any fill-in — new non-zeros appearing where there were zeros? Think about what happens when row 1 eliminates from row 2. Write your prediction.',
 
       '**Fill-in: the complication for direct solvers.** When you run Gaussian elimination on a sparse matrix, the $L$ and $U$ factors are generally denser than $A$ — new non-zeros appear in positions that were zero in $A$. A tridiagonal 1D problem has no fill. A 2D mesh problem fills within its bandwidth. A poorly ordered 3D problem can fill so densely that the direct solve is infeasible. This is why sparse direct solvers always reorder first.',
-
+      ] },
+      { type: 'image', src: fillinUrl,
+        alt: 'A tridiagonal 4x4 matrix before elimination next to its L+U factors after elimination, with new red-highlighted non-zero entries appearing where A had zeros',
+        caption: 'Elimination can manufacture new non-zeros (red) in spots that were zero in A — fill-in is the price of factoring sparse matrices directly.' },
+      { type: 'prose', paragraphs: [
       '**Reordering minimizes fill-in.** Permuting the rows and columns of $A$ (which does not change its solution) can dramatically reduce fill. The Cuthill-McKee ordering reduces bandwidth for banded matrices. AMD (Approximate Minimum Degree) works well for unstructured meshes. METIS partitions the graph to create a nested dissection ordering that gives optimal fill for 2D and 3D problems. NumPy and scipy.sparse support sparse operations natively; MATLAB has built-in sparse support since the 1980s.',
 
       '**Where this is heading.** Sparse matrices are not a dead end — they connect to the next lesson on the Schur decomposition and to iterative methods like conjugate gradient. For very large systems, iterative methods (which only need matrix-vector products, not the full factorization) are the only feasible approach. Understanding sparse structure tells you which method to pick.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Solve a Large Sparse Linear System (4 Steps)',
-        body: '1. **Identify sparsity.** Estimate $nnz$ and density $= nnz/n^2$. If density $< 1\\%$ and $n > 10^4$, sparse methods are mandatory — dense LU will run out of memory or time.\n2. **Reorder.** Apply AMD (symmetric SPD matrices) or METIS/nested dissection (2D/3D meshes) to get a permutation $P$; work with $PAP^\\top$. This step alone can reduce fill-in by 100×.\n3. **Choose method.** For 2D problems or $n < 10^5$: sparse direct solver (CHOLMOD, SuperLU). For 3D problems or $n > 10^5$ updated at each time step: iterative solver (CG for SPD, GMRES otherwise) with a preconditioner.\n4. **Factor and solve.** Direct: compute $L$ of $PAP^\\top = LL^\\top$, solve $Lz = Pb$ then $L^\\top y = z$, recover $x = P^\\top y$. Iterative: run preconditioned CG — each iteration costs one matvec $O(nnz)$; monitor $\\|b - Ax_k\\|/\\|b\\| < \\text{tol}$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 5 of 7 — Numerical Linear Algebra',
-        body: '**Previous (Lesson 4):** Numerical stability — catastrophic cancellation, machine epsilon, partial pivoting.\n**This lesson:** Sparse matrices — CSR storage, sparse matvec, fill-in, and reordering for direct solvers.\n**Next (Lesson 6):** Schur decomposition — the block upper triangular form for eigenvalue computation.',
-      },
-      {
-        type: 'insight',
-        title: 'Sparse Storage: CSR Format',
-        body: 'For $n \\times n$ matrix with $nnz$ non-zeros:\n- `values[nnz]` — the non-zero values in row-major order\n- `col_idx[nnz]` — column index of each value\n- `row_ptr[n+1]` — row_ptr[i] is the start of row $i$ in values/col_idx\n\nMemory: $O(nnz + n)$ instead of $O(n^2)$.',
-      },
-      {
-        type: 'insight',
-        title: 'Sparse vs Dense Complexity',
-        body: 'For $n \\times n$ sparse ($nnz = O(n)$) vs dense:\n\nStorage: $O(n)$ vs $O(n^2)$\nMatvec $Ax$: $O(n)$ vs $O(n^2)$\nDirect LU: $O(n^{1.5})$ (2D mesh) vs $O(n^3)$\nIterative solve: $O(k \\cdot n)$ vs not applicable\n\nFor $n = 10^6$: dense LU is $10^{18}$ flops (impossible); sparse iterative is $10^8$ (seconds).',
-      },
-      {
-        type: 'insight',
-        title: 'Sparsity and Graphs',
-        body: 'Every sparse matrix $A$ corresponds to a graph: node $i$ connects to $j$ iff $A_{ij} \\neq 0$. Fill-in during LU = edges added in the elimination graph. Reordering to minimize fill = finding the ordering that minimizes the chordal completion of the graph. This is why sparse solver packages (METIS, CHOLMOD) have graph partitioning algorithms.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Sparse Matrices with scipy.sparse',
         mathBridge: 'Build sparse matrices using CSR format, perform sparse matvec, compare memory use and timing vs dense, and observe fill-in.',
         caption: 'scipy.sparse is the Python standard for sparse matrix operations — used in scikit-learn, NetworkX, and FEniCS.',
@@ -164,8 +147,7 @@ print("For 3D mesh: use iterative solvers instead")
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Sparse Matrix Operations',
         mathBridge: 'Build sparse matrices, visualize sparsity patterns, and compare performance.',
         caption: 'Sparse storage and matvec scale linearly with the number of non-zeros.',
@@ -231,6 +213,33 @@ nnz(L) + nnz(U)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Solve a Large Sparse Linear System (4 Steps)',
+        body: '1. **Identify sparsity.** Estimate $nnz$ and density $= nnz/n^2$. If density $< 1\\%$ and $n > 10^4$, sparse methods are mandatory — dense LU will run out of memory or time.\n2. **Reorder.** Apply AMD (symmetric SPD matrices) or METIS/nested dissection (2D/3D meshes) to get a permutation $P$; work with $PAP^\\top$. This step alone can reduce fill-in by 100×.\n3. **Choose method.** For 2D problems or $n < 10^5$: sparse direct solver (CHOLMOD, SuperLU). For 3D problems or $n > 10^5$ updated at each time step: iterative solver (CG for SPD, GMRES otherwise) with a preconditioner.\n4. **Factor and solve.** Direct: compute $L$ of $PAP^\\top = LL^\\top$, solve $Lz = Pb$ then $L^\\top y = z$, recover $x = P^\\top y$. Iterative: run preconditioned CG — each iteration costs one matvec $O(nnz)$; monitor $\\|b - Ax_k\\|/\\|b\\| < \\text{tol}$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 5 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 4):** Numerical stability — catastrophic cancellation, machine epsilon, partial pivoting.\n**This lesson:** Sparse matrices — CSR storage, sparse matvec, fill-in, and reordering for direct solvers.\n**Next (Lesson 6):** Schur decomposition — the block upper triangular form for eigenvalue computation.',
+      },
+      {
+        type: 'insight',
+        title: 'Sparse Storage: CSR Format',
+        body: 'For $n \\times n$ matrix with $nnz$ non-zeros:\n- `values[nnz]` — the non-zero values in row-major order\n- `col_idx[nnz]` — column index of each value\n- `row_ptr[n+1]` — row_ptr[i] is the start of row $i$ in values/col_idx\n\nMemory: $O(nnz + n)$ instead of $O(n^2)$.',
+      },
+      {
+        type: 'insight',
+        title: 'Sparse vs Dense Complexity',
+        body: 'For $n \\times n$ sparse ($nnz = O(n)$) vs dense:\n\nStorage: $O(n)$ vs $O(n^2)$\nMatvec $Ax$: $O(n)$ vs $O(n^2)$\nDirect LU: $O(n^{1.5})$ (2D mesh) vs $O(n^3)$\nIterative solve: $O(k \\cdot n)$ vs not applicable\n\nFor $n = 10^6$: dense LU is $10^{18}$ flops (impossible); sparse iterative is $10^8$ (seconds).',
+      },
+      {
+        type: 'insight',
+        title: 'Sparsity and Graphs',
+        body: 'Every sparse matrix $A$ corresponds to a graph: node $i$ connects to $j$ iff $A_{ij} \\neq 0$. Fill-in during LU = edges added in the elimination graph. Reordering to minimize fill = finding the ordering that minimizes the chordal completion of the graph. This is why sparse solver packages (METIS, CHOLMOD) have graph partitioning algorithms.',
       },
     ],
   },

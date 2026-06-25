@@ -1,0 +1,39 @@
+<svg viewBox="0 0 380 280" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="380" height="280" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="ce-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+  </defs>
+
+  <!-- axes -->
+  <line x1="20" y1="200" x2="300" y2="200" class="svg-axis" stroke-width="1.5"/>
+  <line x1="110" y1="260" x2="110" y2="40" class="svg-axis" stroke-width="1.5"/>
+  <text x="305" y="204" font-size="11" class="svg-muted">Re</text>
+  <text x="116" y="44" font-size="11" class="svg-muted">Im</text>
+
+  <!-- unit circle reference -->
+  <circle cx="110" cy="200" r="80" fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="4,3"/>
+  <text x="195" y="116" font-size="9.5" class="svg-muted">|λ| = 1</text>
+
+  <!-- eigenvalue point lambda = 0.8 + 0.6i -->
+  <line x1="110" y1="200" x2="171" y2="155" stroke="#2563eb" stroke-width="3" marker-end="url(#ce-blue)"/>
+  <circle cx="174" cy="152" r="3.5" fill="#2563eb"/>
+  <text x="180" y="148" font-size="12" fill="#2563eb" font-weight="700">λ = a + bi</text>
+
+  <!-- angle arc -->
+  <path d="M 150 200 A 40 40 0 0 1 138 165" fill="none" stroke="#d97706" stroke-width="1.5"/>
+  <text x="146" y="186" font-size="11" fill="#d97706">θ</text>
+
+  <!-- radius label -->
+  <text x="125" y="184" font-size="10" fill="#2563eb">r = |λ|</text>
+
+  <text x="190" y="240" font-size="10.5" class="svg-text" fill="#1e293b" text-anchor="middle">r &lt; 1 spirals in · r = 1 pure rotation · r &gt; 1 spirals out</text>
+  <text x="190" y="258" font-size="10" class="svg-muted" text-anchor="middle">θ = rotation per application, r = stretch per application</text>
+</svg>

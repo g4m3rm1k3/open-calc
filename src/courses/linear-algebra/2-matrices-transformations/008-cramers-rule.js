@@ -1,3 +1,5 @@
+import cramersRuleUrl from '../diagrams/la-cramers-rule.svg?url'
+
 export default {
   id: 'la2-008',
   slug: 'cramers-rule',
@@ -19,51 +21,26 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       '**What Gaussian elimination cannot tell you directly.** You have solved $A\\mathbf{x} = \\mathbf{b}$ many times with row reduction. But row reduction hides where the answer comes from — it is an algorithm, not a formula. Cramer\'s Rule gives you a formula: each unknown $x_i$ is a single fraction whose numerator and denominator are determinants. This means you can write $x_i$ as an explicit algebraic expression in the entries of $A$ and $\\mathbf{b}$. That is a different and powerful thing — it lets you ask "how does $x_1$ change if I change $b_2$?" without running the entire algorithm again.',
       'Solve $2x_1 + x_2 = 5$, $x_1 - 3x_2 = -2$. Here $A = \\begin{bmatrix}2&1\\\\1&-3\\end{bmatrix}$, $\\mathbf{b} = \\begin{bmatrix}5\\\\-2\\end{bmatrix}$, $\\det(A) = -7$. Replace column 1 with $\\mathbf{b}$: $\\det\\begin{bmatrix}5&1\\\\-2&-3\\end{bmatrix} = -13$. So $x_1 = -13/(-7) = 13/7$. Replace column 2 with $\\mathbf{b}$: $\\det\\begin{bmatrix}2&5\\\\1&-2\\end{bmatrix} = -9$. So $x_2 = -9/(-7) = 9/7$. This is **Cramer\'s Rule**: each solution variable = (determinant with that variable\'s column replaced by $\\mathbf{b}$) / $\\det(A)$. The general formula: $x_i = \\det(A_i(\\mathbf{b})) / \\det(A)$.',
+      ] },
+      { type: 'image', src: cramersRuleUrl,
+        alt: 'Three 2x2 matrix grids: A, A1 with column 1 replaced by b highlighted green, and A2 with column 2 replaced by b highlighted green, with the determinant ratio for x1 and x2 shown below each',
+        caption: 'One determinant ratio per unknown: xᵢ = det(Aᵢ) / det(A), where Aᵢ swaps in b for column i.' },
+      { type: 'prose', paragraphs: [
       '**Why does this work geometrically?** Think in 2D. The solution $\\mathbf{x} = [x_1, x_2]^\\top$ must satisfy $A\\mathbf{x} = \\mathbf{b}$. The determinant $\\det(A)$ is the area of the parallelogram formed by $A$\'s columns. When you replace column 1 with $\\mathbf{b}$, you get $\\det(A_1)$, which is the area of a different parallelogram. Cramer\'s rule says these area ratios directly give you the coordinates.',
       '**The Adjugate and the Inverse Formula.** The adjugate (also called the classical adjoint) of $A$ is the transpose of the cofactor matrix. It gives the explicit formula:\n$$A^{-1} = \\frac{1}{\\det(A)} \\text{adj}(A)$$\nThis is the theoretical origin of the formula you may have used for 2×2 inverses: $\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}^{-1} = \\frac{1}{ad-bc}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
       '**When to use Cramer\'s Rule.** In practice: almost never for computation. In theory: constantly. Cramer\'s Rule appears in proofs, in symbolic computation, in understanding how the solution depends continuously on the data (implicit function theorem), and in control theory (transfer functions).',
       '**Predict before reading on.** A system $A\\mathbf{x} = \\mathbf{b}$ has $\\det(A) = 4$ and you replace column 2 with $\\mathbf{b}$ to get a matrix with $\\det = 12$. What is $x_2$? Write your answer, then check with the formula.',
       '**Where this is heading.** Cramer\'s Rule is the theoretical basis for several deeper results. The adjugate formula $A^{-1} = \\text{adj}(A)/\\det(A)$ leads directly to Cofactor Expansion (next lesson), which is how you compute determinants of larger matrices by reducing to smaller ones. In Chapter 4, Cramer\'s Rule appears inside the proof of the spectral theorem — the connection between eigenvalues and orthogonality. And in applied mathematics, it underpins the implicit function theorem: when can you locally solve $F(x, y) = 0$ for $y$ as a function of $x$? The answer involves exactly the determinant of a submatrix.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: "Procedure: Apply Cramer's Rule to Solve Ax = b",
-        body: 'Step 1. Compute $\\det(A)$. If it is zero, the system has no unique solution — stop.\nStep 2. For each variable $x_i$ ($i = 1, \\ldots, n$): form the matrix $A_i$ by replacing column $i$ of $A$ with the vector $\\mathbf{b}$. All other columns stay unchanged.\nStep 3. Compute $\\det(A_i)$ using cofactor expansion (or row reduction).\nStep 4. Apply the formula: $x_i = \\det(A_i) / \\det(A)$.\nStep 5. Repeat steps 2–4 for every variable. You will compute $n+1$ determinants total.\nStep 6. Verify: substitute $\\mathbf{x}$ back into $A\\mathbf{x}$ and confirm it equals $\\mathbf{b}$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 8 of 12 — Matrices & Transformations',
-        body: '**Previous:** Special Matrices — symmetric, orthogonal, and positive definite.\n**This lesson:** Cramer\'s Rule — explicit determinant-based formulas for each solution variable; the adjugate inverse formula.\n**Next:** Matrix Calculus — how to differentiate functions of matrices and vectors.',
-      },
-      {
-        type: 'insight',
-        title: "Cramer's Rule: 2×2 Example",
-        body: "Solve $\\begin{cases}2x_1 + x_2 = 5 \\\\ x_1 - 3x_2 = -2\\end{cases}$:\n\n$\\det(A) = (2)(-3) - (1)(1) = -7$\n\n$x_1 = \\frac{\\det\\begin{bmatrix}5&1\\\\-2&-3\\end{bmatrix}}{-7} = \\frac{-15+2}{-7} = \\frac{-13}{-7} = \\frac{13}{7}$\n\n$x_2 = \\frac{\\det\\begin{bmatrix}2&5\\\\1&-2\\end{bmatrix}}{-7} = \\frac{-4-5}{-7} = \\frac{-9}{-7} = \\frac{9}{7}$",
-      },
-      {
-        type: 'warning',
-        title: 'Complexity Makes Cramer Impractical',
-        body: "For an $n \\times n$ system, Cramer's Rule requires computing $n+1$ determinants of size $n \\times n$. Each $n \\times n$ determinant via cofactor expansion costs $O(n \\cdot n!)$ operations — combinatorially explosive. Gaussian elimination costs $O(n^3)$. For $n = 20$: Cramer ≈ $10^{20}$ ops; Gaussian ≈ $10^4$ ops. This is not a small difference.",
-      },
-      {
-        type: 'definition',
-        title: 'Cofactor and Adjugate',
-        body: 'The **cofactor** $C_{ij}$ of matrix $A$ is $C_{ij} = (-1)^{i+j} M_{ij}$ where $M_{ij}$ is the $(i,j)$ **minor** (the determinant of $A$ with row $i$ and column $j$ deleted).\n\nThe **cofactor matrix** has $C_{ij}$ in position $(i,j)$.\n\nThe **adjugate** is $\\text{adj}(A) = (\\text{cofactor matrix})^\\top$.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson06_Inverses',
+      ] },
+      { type: 'viz', id: 'LALesson06_Inverses',
         title: "Cramer's Rule: Area Interpretation",
         mathBridge: "Adjust the matrix entries and observe how det(A) (the signed area of the parallelogram formed by the columns) changes. Cramer's rule says $x_1 = \\det(A_1)/\\det(A)$ and $x_2 = \\det(A_2)/\\det(A)$, where $A_1$ and $A_2$ are formed by replacing columns with \\mathbf{b}. When det(A) = 0 (parallelogram collapses), the system has no unique solution.",
-        caption: 'Cramer\'s Rule as ratios of signed areas.',
-      },
-      {
-        id: 'OpenMatNotebook',
+        caption: 'Cramer\'s Rule as ratios of signed areas.' },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: "Verify Cramer's Rule and the Adjugate",
         mathBridge: 'Compute solutions via both Cramer\'s Rule and backslash, then compare.',
         caption: 'Computational verification of determinant-based formulas.',
@@ -180,7 +157,33 @@ for i = 1:n
 end`,
             },
           ]
-        }
+        } },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: "Procedure: Apply Cramer's Rule to Solve Ax = b",
+        body: 'Step 1. Compute $\\det(A)$. If it is zero, the system has no unique solution — stop.\nStep 2. For each variable $x_i$ ($i = 1, \\ldots, n$): form the matrix $A_i$ by replacing column $i$ of $A$ with the vector $\\mathbf{b}$. All other columns stay unchanged.\nStep 3. Compute $\\det(A_i)$ using cofactor expansion (or row reduction).\nStep 4. Apply the formula: $x_i = \\det(A_i) / \\det(A)$.\nStep 5. Repeat steps 2–4 for every variable. You will compute $n+1$ determinants total.\nStep 6. Verify: substitute $\\mathbf{x}$ back into $A\\mathbf{x}$ and confirm it equals $\\mathbf{b}$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 8 of 12 — Matrices & Transformations',
+        body: '**Previous:** Special Matrices — symmetric, orthogonal, and positive definite.\n**This lesson:** Cramer\'s Rule — explicit determinant-based formulas for each solution variable; the adjugate inverse formula.\n**Next:** Matrix Calculus — how to differentiate functions of matrices and vectors.',
+      },
+      {
+        type: 'insight',
+        title: "Cramer's Rule: 2×2 Example",
+        body: "Solve $\\begin{cases}2x_1 + x_2 = 5 \\\\ x_1 - 3x_2 = -2\\end{cases}$:\n\n$\\det(A) = (2)(-3) - (1)(1) = -7$\n\n$x_1 = \\frac{\\det\\begin{bmatrix}5&1\\\\-2&-3\\end{bmatrix}}{-7} = \\frac{-15+2}{-7} = \\frac{-13}{-7} = \\frac{13}{7}$\n\n$x_2 = \\frac{\\det\\begin{bmatrix}2&5\\\\1&-2\\end{bmatrix}}{-7} = \\frac{-4-5}{-7} = \\frac{-9}{-7} = \\frac{9}{7}$",
+      },
+      {
+        type: 'warning',
+        title: 'Complexity Makes Cramer Impractical',
+        body: "For an $n \\times n$ system, Cramer's Rule requires computing $n+1$ determinants of size $n \\times n$. Each $n \\times n$ determinant via cofactor expansion costs $O(n \\cdot n!)$ operations — combinatorially explosive. Gaussian elimination costs $O(n^3)$. For $n = 20$: Cramer ≈ $10^{20}$ ops; Gaussian ≈ $10^4$ ops. This is not a small difference.",
+      },
+      {
+        type: 'definition',
+        title: 'Cofactor and Adjugate',
+        body: 'The **cofactor** $C_{ij}$ of matrix $A$ is $C_{ij} = (-1)^{i+j} M_{ij}$ where $M_{ij}$ is the $(i,j)$ **minor** (the determinant of $A$ with row $i$ and column $j$ deleted).\n\nThe **cofactor matrix** has $C_{ij}$ in position $(i,j)$.\n\nThe **adjugate** is $\\text{adj}(A) = (\\text{cofactor matrix})^\\top$.',
       },
     ],
   },

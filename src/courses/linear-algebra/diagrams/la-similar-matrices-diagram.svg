@@ -1,0 +1,52 @@
+<svg viewBox="0 0 380 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-box   { fill: #ffffff; stroke: #cbd5e1; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-box   { fill: #1e293b; stroke: #475569; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="380" height="230" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="sm-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#1e293b"/></marker>
+  </defs>
+
+  <text x="190" y="18" font-size="11" class="svg-muted" text-anchor="middle">The same map T, read in two different bases</text>
+
+  <!-- top-left: [v]_B -->
+  <rect x="40" y="34" width="90" height="36" rx="6" class="svg-box" stroke-width="1.3"/>
+  <text x="85" y="56" font-size="12" class="svg-text" text-anchor="middle">[v]_B</text>
+
+  <!-- top-right: [Tv]_B -->
+  <rect x="250" y="34" width="90" height="36" rx="6" class="svg-box" stroke-width="1.3"/>
+  <text x="295" y="56" font-size="12" class="svg-text" text-anchor="middle">[Tv]_B</text>
+
+  <!-- bottom-left: [v]_B' -->
+  <rect x="40" y="150" width="90" height="36" rx="6" class="svg-box" stroke-width="1.3"/>
+  <text x="85" y="172" font-size="12" class="svg-text" text-anchor="middle">[v]_B'</text>
+
+  <!-- bottom-right: [Tv]_B' -->
+  <rect x="250" y="150" width="90" height="36" rx="6" class="svg-box" stroke-width="1.3"/>
+  <text x="295" y="172" font-size="12" class="svg-text" text-anchor="middle">[Tv]_B'</text>
+
+  <!-- top arrow: A -->
+  <line x1="134" y1="52" x2="246" y2="52" stroke="#2563eb" stroke-width="2" marker-end="url(#sm-arrow)"/>
+  <text x="190" y="44" font-size="12" fill="#2563eb" font-weight="700" text-anchor="middle">A</text>
+
+  <!-- bottom arrow: B = P^-1 A P -->
+  <line x1="134" y1="168" x2="246" y2="168" stroke="#10b981" stroke-width="2" marker-end="url(#sm-arrow)"/>
+  <text x="190" y="194" font-size="12" fill="#10b981" font-weight="700" text-anchor="middle">B = P⁻¹AP</text>
+
+  <!-- left vertical arrow: P -->
+  <line x1="85" y1="74" x2="85" y2="146" stroke="#d97706" stroke-width="2" marker-end="url(#sm-arrow)"/>
+  <text x="65" y="112" font-size="12" fill="#d97706" font-weight="700">P</text>
+
+  <!-- right vertical arrow: P -->
+  <line x1="295" y1="74" x2="295" y2="146" stroke="#d97706" stroke-width="2" marker-end="url(#sm-arrow)"/>
+  <text x="305" y="112" font-size="12" fill="#d97706" font-weight="700">P</text>
+
+  <text x="190" y="216" font-size="10.5" class="svg-muted" text-anchor="middle">Either path around the square gives the same answer</text>
+</svg>

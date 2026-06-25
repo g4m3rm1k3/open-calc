@@ -1,3 +1,5 @@
+import leastSquaresFitUrl from '../diagrams/la-least-squares-fit.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la4-003',
@@ -18,15 +20,27 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Three data points $(0,1),(1,2),(2,4)$. Set up $A\\mathbf{x} \\approx \\mathbf{b}$: $A = \\begin{bmatrix}0&1\\\\1&1\\\\2&1\\end{bmatrix}$, $\\mathbf{b} = [1,2,4]^\\top$ (columns are $x$-values and 1s). No line passes through all three points exactly — the system is overdetermined. Normal equations: $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$ gives $\\begin{bmatrix}5&3\\\\3&3\\end{bmatrix}\\hat{\\mathbf{x}} = \\begin{bmatrix}10\\\\7\\end{bmatrix}$, solution $\\hat{\\mathbf{x}} = [3/2,\\, 5/6]^\\top$ — slope $3/2$, intercept $5/6$. This minimizes the sum of squared vertical distances from the line to the points.',
       'When you have more equations than unknowns, the system is called **overdetermined**. Think of fitting a line to 100 data points: you have 100 equations ($y_i = ax_i + b$) but only 2 unknowns ($a$ and $b$). Almost certainly, no single line passes through all 100 points. The system has no solution.',
+      ] },
+      { type: 'image', src: leastSquaresFitUrl,
+        alt: 'Scatter plot of three points (0,1), (1,2), (2,4) with a best-fit line through them and dashed red vertical residual segments connecting each point to the line',
+        caption: 'The best-fit line minimizes the sum of squared residuals — the vertical gaps between the points and the line.' },
+      { type: 'prose', paragraphs: [
       '**The geometric picture.** The target vector $\\mathbf{b}$ (your data) does not lie in the column space of $A$. No matter what $\\mathbf{x}$ you pick, $A\\mathbf{x}$ can only reach points in the column space. The best you can do is get as close as possible — meaning: find the point $A\\hat{\\mathbf{x}}$ in the column space that is closest to $\\mathbf{b}$. That closest point is the orthogonal projection of $\\mathbf{b}$ onto the column space.',
       'The error vector $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ is the residual — the gap between your best approximation and the actual target. The least squares solution minimizes $\\|\\mathbf{e}\\|^2$ (the sum of squared errors), which is where the name comes from.',
       '**The key insight.** The residual $\\mathbf{e}$ is perpendicular to every column of $A$. This is not a coincidence — it is the defining property of orthogonal projection. The residual points in the direction you cannot reach, which is exactly perpendicular to the column space.',
       'Saying "$\\mathbf{e}$ is perpendicular to every column of $A$" is the same as saying $A^T\\mathbf{e} = \\mathbf{0}$. Substituting $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$ gives the famous **normal equations**: $A^TA\\hat{\\mathbf{x}} = A^T\\mathbf{b}$.',
       '**CNC workpiece probing — fitting a plane to touch-probe data.** A touch probe on a CNC machine measures the surface of a raw workpiece at multiple points before machining. Each probe touch gives one point $(x_i, y_i, z_i)$ on the surface. To establish the workpiece datum, the controller needs the equation of the best-fit plane: $z = ax + by + c$. With 5 or more probe touches, you have 5 equations in 3 unknowns ($a$, $b$, $c$) — an overdetermined system. Least squares finds the best-fit plane that minimizes the sum of squared deviations of probe points from the plane. This is exactly the normal equations with $A = [x_i, y_i, 1]$ rows and $\\mathbf{b} = [z_i]$. The result: a datum that best represents the actual workpiece surface despite measurement noise.',
       '**Where this is heading:** The least squares solution is the workhorse of data science. When you learn about the SVD in the next lesson, you will see an even deeper way to compute it — using the pseudoinverse — that works even when $A^TA$ is not invertible.',
+      ] },
+      { type: 'viz', id: 'LeastSquaresFit',
+        title: 'Best-Fit Line: Minimizing Squared Residuals',
+        mathBridge: 'The visualization shows scattered data points and a adjustable line. Drag the line\'s slope and intercept. Watch the vertical red segments (residuals) update in real time. The squared residuals are shown as red squares on the right. The least squares solution (the best fit line) minimizes the total area of those red squares. Notice that no line eliminates the residuals — the best fit line makes them as small as possible.',
+        caption: 'Least squares = minimize the total area of the squared residuals.',
+      },
     ],
     callouts: [
       {
@@ -63,14 +77,6 @@ export default {
         type: 'warning',
         title: 'Normal Equations Can Be Ill-Conditioned',
         body: 'Squaring the matrix ($A^TA$) also squares the condition number, amplifying numerical errors. In practice, solve least squares via QR decomposition ($A = QR$, so $\\hat{\\mathbf{x}} = R^{-1}Q^T\\mathbf{b}$) rather than forming $A^TA$ explicitly.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LeastSquaresFit',
-        title: 'Best-Fit Line: Minimizing Squared Residuals',
-        mathBridge: 'The visualization shows scattered data points and a adjustable line. Drag the line\'s slope and intercept. Watch the vertical red segments (residuals) update in real time. The squared residuals are shown as red squares on the right. The least squares solution (the best fit line) minimizes the total area of those red squares. Notice that no line eliminates the residuals — the best fit line makes them as small as possible.',
-        caption: 'Least squares = minimize the total area of the squared residuals.',
       },
     ],
   },

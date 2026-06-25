@@ -1,3 +1,5 @@
+import invertibleEquivalenceUrl from '../diagrams/la-invertible-equivalence.svg?url'
+
 export default {
   id: 'la2-010',
   slug: 'invertible-matrix-theorem',
@@ -18,40 +20,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$: $\\det(A) = 1 \\neq 0$, rank $= 2$, RREF $= I$, null space $= \\{\\mathbf{0}\\}$, eigenvalues $\\approx 0.27$ and $4.73$ (both nonzero). All conditions pass. Now take $B = \\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$: $\\det(B) = 0$, rank $= 1 < 2$, RREF $\\neq I$, eigenvalue $0$ exists, $B\\mathbf{x} = \\mathbf{b}$ has no unique solution. Every condition fails. This is the Invertible Matrix Theorem: twelve seemingly different conditions are all the same condition. A matrix passes all twelve at once or fails all twelve at once — there is no middle ground.',
+      ] },
+      { type: 'image', src: invertibleEquivalenceUrl,
+        alt: 'Two panels: left lists seven invertibility conditions all checked green under the heading Invertible all 12 hold, right lists the same seven conditions all marked red X under the heading Singular all 12 fail',
+        caption: 'Checking one condition proves all twelve; failing one proves all twelve fail.' },
+      { type: 'prose', paragraphs: [
       '**The theorem says: you either have it all or you have nothing.** For an $n \\times n$ matrix $A$, there is no middle ground. Either $A$ is a fully functional, information-preserving transformation — and then every one of the twelve conditions holds — or $A$ is a broken, information-losing transformation — and then every single condition fails simultaneously.',
       '**Think geometrically.** An invertible matrix maps $\\mathbb{R}^n$ to $\\mathbb{R}^n$ in a one-to-one, onto way. Every output has exactly one input. No two different inputs land on the same output. No output is unreachable. This geometric "bijectivity" is what all twelve conditions are secretly saying, in twelve different algebraic languages.',
       '**The null space test.** If $A\\mathbf{x} = \\mathbf{0}$ has a non-trivial solution $\\mathbf{x} \\neq \\mathbf{0}$, then $A$ maps two vectors ($\\mathbf{0}$ and $\\mathbf{x}$) to the same output ($\\mathbf{0}$). A function that maps two inputs to the same output can never be inverted — which one would the inverse pick? Non-trivial null space → not invertible.',
       '**The determinant test.** The determinant measures how much $A$ scales $n$-dimensional volume. If det$(A) = 0$, the transformation collapses space — it smashes a full $n$-dimensional solid flat into a lower-dimensional shadow. That squishing can never be undone, so $A$ is not invertible. If det$(A) \\neq 0$, volume is preserved (up to a constant factor), and the transformation is reversible.',
       '**The rank test.** Rank is the number of independent directions the columns span. An $n \\times n$ matrix is invertible iff all $n$ columns are independent — meaning the columns together span all of $\\mathbb{R}^n$ with no redundancy. Full rank means full coverage with no waste.',
       '**Predict before reading on.** You are told that $A$ is a $3 \\times 3$ matrix with $\\text{rank}(A) = 2$. Without computing det or eigenvalues, how many of the 12 IMT conditions fail? What is the dimension of the null space? Write your answers before continuing.',
-    ],
-    callouts: [
-      {
-        type: 'insight',
-        title: 'The Twelve Equivalent Conditions',
-        body: 'For an $n \\times n$ matrix $A$, these are all equivalent:\n1. $A$ is invertible (has an inverse $A^{-1}$)\n2. $\\det(A) \\neq 0$\n3. $\\text{rank}(A) = n$ (full rank)\n4. $\\text{RREF}(A) = I_n$ (reduces to identity)\n5. $A$ has $n$ pivot positions\n6. $A\\mathbf{x} = \\mathbf{0}$ has only the trivial solution $\\mathbf{x} = \\mathbf{0}$\n7. $\\text{Nul}(A) = \\{\\mathbf{0}\\}$ (trivial null space)\n8. Columns of $A$ are linearly independent\n9. Columns of $A$ span $\\mathbb{R}^n$\n10. $A\\mathbf{x} = \\mathbf{b}$ has a unique solution for every $\\mathbf{b}$\n11. $A^\\top$ is invertible\n12. $0$ is not an eigenvalue of $A$',
-      },
-      {
-        type: 'warning',
-        title: 'The IMT Applies Only to Square Matrices',
-        body: 'The Invertible Matrix Theorem requires $A$ to be $n \\times n$. For non-square matrices, you can still have full column rank or full row rank, but you cannot have a two-sided inverse.',
-      },
-      {
-        type: 'procedure',
-        title: 'Procedure: Apply the IMT to Determine Invertibility',
-        body: 'Step 1. Choose the cheapest condition: det(A) for 2×2 or 3×3 matrices; rank via row reduction for larger ones.\nStep 2. Compute it. If det(A) ≠ 0, rank(A) = n, or RREF(A) = I — stop: A is invertible.\nStep 3. If the condition fails, A is singular — all 12 IMT conditions fail simultaneously.\nStep 4. For an invertible A, immediately state all equivalents: trivial null space, columns linearly independent, columns span ℝⁿ, unique solution for every b, no zero eigenvalue.\nStep 5. For a singular A, immediately state all failures: nullity = n − rank, det = 0, 0 is an eigenvalue, A·x = b has no unique solution for every b.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 10 of 12 — Matrices & Transformations',
-        body: '**Previous:** Cramer\'s Rule — using determinants to solve systems one variable at a time.\n**This lesson:** The Invertible Matrix Theorem — twelve equivalent conditions that all say the same thing: this matrix is invertible.\n**Next:** Four Fundamental Subspaces — column space, null space, row space, and left null space.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Testing All Conditions Simultaneously',
         mathBridge: 'Check every condition of the IMT on both an invertible and a singular matrix.',
         caption: 'Either all conditions hold at once, or all fail at once.',
@@ -142,6 +126,28 @@ fprintf('norm of perturbation: %.4f  (equals sigma_min)\\n', norm(A - A_perturbe
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'insight',
+        title: 'The Twelve Equivalent Conditions',
+        body: 'For an $n \\times n$ matrix $A$, these are all equivalent:\n1. $A$ is invertible (has an inverse $A^{-1}$)\n2. $\\det(A) \\neq 0$\n3. $\\text{rank}(A) = n$ (full rank)\n4. $\\text{RREF}(A) = I_n$ (reduces to identity)\n5. $A$ has $n$ pivot positions\n6. $A\\mathbf{x} = \\mathbf{0}$ has only the trivial solution $\\mathbf{x} = \\mathbf{0}$\n7. $\\text{Nul}(A) = \\{\\mathbf{0}\\}$ (trivial null space)\n8. Columns of $A$ are linearly independent\n9. Columns of $A$ span $\\mathbb{R}^n$\n10. $A\\mathbf{x} = \\mathbf{b}$ has a unique solution for every $\\mathbf{b}$\n11. $A^\\top$ is invertible\n12. $0$ is not an eigenvalue of $A$',
+      },
+      {
+        type: 'warning',
+        title: 'The IMT Applies Only to Square Matrices',
+        body: 'The Invertible Matrix Theorem requires $A$ to be $n \\times n$. For non-square matrices, you can still have full column rank or full row rank, but you cannot have a two-sided inverse.',
+      },
+      {
+        type: 'procedure',
+        title: 'Procedure: Apply the IMT to Determine Invertibility',
+        body: 'Step 1. Choose the cheapest condition: det(A) for 2×2 or 3×3 matrices; rank via row reduction for larger ones.\nStep 2. Compute it. If det(A) ≠ 0, rank(A) = n, or RREF(A) = I — stop: A is invertible.\nStep 3. If the condition fails, A is singular — all 12 IMT conditions fail simultaneously.\nStep 4. For an invertible A, immediately state all equivalents: trivial null space, columns linearly independent, columns span ℝⁿ, unique solution for every b, no zero eigenvalue.\nStep 5. For a singular A, immediately state all failures: nullity = n − rank, det = 0, 0 is an eigenvalue, A·x = b has no unique solution for every b.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 10 of 12 — Matrices & Transformations',
+        body: '**Previous:** Cramer\'s Rule — using determinants to solve systems one variable at a time.\n**This lesson:** The Invertible Matrix Theorem — twelve equivalent conditions that all say the same thing: this matrix is invertible.\n**Next:** Four Fundamental Subspaces — column space, null space, row space, and left null space.',
       },
     ],
   },

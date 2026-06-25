@@ -1,0 +1,41 @@
+<svg viewBox="0 0 460 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="460" height="200" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="sd-red" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#dc2626"/></marker>
+    <marker id="sd-green" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#10b981"/></marker>
+  </defs>
+
+  <!-- Panel 1: diagonalization, near-parallel eigenvectors -->
+  <rect x="12" y="20" width="216" height="166" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="38" font-size="11.5" fill="#dc2626" text-anchor="middle" font-weight="700">A = PDP⁻¹: eigenvectors</text>
+  <line x1="60" y1="150" x2="170" y2="80" stroke="#dc2626" stroke-width="2.5" marker-end="url(#sd-red)"/>
+  <text x="172" y="78" font-size="11" fill="#dc2626" font-weight="700">p₁</text>
+  <line x1="60" y1="150" x2="175" y2="92" stroke="#dc2626" stroke-width="2.5" marker-end="url(#sd-red)" opacity="0.6"/>
+  <text x="178" y="98" font-size="11" fill="#dc2626" font-weight="700" opacity="0.8">p₂</text>
+  <circle cx="60" cy="150" r="3" fill="#1e293b"/>
+  <text x="120" y="170" font-size="10" fill="#dc2626" text-anchor="middle">nearly parallel → κ(P) huge</text>
+
+  <!-- Panel 2: Schur, orthogonal columns -->
+  <rect x="232" y="20" width="216" height="166" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="340" y="38" font-size="11.5" fill="#10b981" text-anchor="middle" font-weight="700">A = QTQ*: Schur columns</text>
+  <line x1="290" y1="150" x2="380" y2="150" stroke="#10b981" stroke-width="2.5" marker-end="url(#sd-green)"/>
+  <text x="384" y="154" font-size="11" fill="#10b981" font-weight="700">q₁</text>
+  <line x1="290" y1="150" x2="290" y2="78" stroke="#10b981" stroke-width="2.5" marker-end="url(#sd-green)"/>
+  <text x="296" y="74" font-size="11" fill="#10b981" font-weight="700">q₂</text>
+  <rect x="290" y="140" width="10" height="10" fill="none" stroke="#64748b" stroke-width="1"/>
+  <text x="340" y="170" font-size="10" fill="#10b981" text-anchor="middle">always orthogonal → κ(Q) = 1</text>
+
+  <text x="230" y="68" font-size="11" class="svg-muted" text-anchor="middle">vs</text>
+</svg>

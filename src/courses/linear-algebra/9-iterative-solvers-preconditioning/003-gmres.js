@@ -1,3 +1,6 @@
+import arnoldiHessenbergUrl from '../diagrams/la-arnoldi-hessenberg.svg?url';
+import gmresRestartUrl from '../diagrams/la-gmres-restart.svg?url';
+
 export default {
   id: 'la9-003',
   slug: 'gmres',
@@ -14,42 +17,29 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Where you are in the story: Conjugate Gradient is a beautiful algorithm, but it comes with a hard requirement — the matrix must be symmetric positive definite. In computational fluid dynamics, you are solving the Navier-Stokes equations, which produce non-symmetric matrices because fluid flowing in one direction couples unknowns asymmetrically. In electromagnetics, in convection-dominated transport, in any time-dependent PDE with explicit time stepping, the system matrix is non-symmetric. CG will simply give wrong answers on these problems. You need a Krylov method that does not require symmetry.',
       'GMRES — Generalized Minimal Residual — takes the core Krylov idea and generalizes it. Instead of minimizing the energy norm error (which requires $A$ to define a valid inner product via symmetry), GMRES minimizes the standard 2-norm of the residual: $\\|\\mathbf{b} - A\\mathbf{x}_k\\|_2$. Minimizing the residual norm is always meaningful regardless of the symmetry of $A$. The residual norm is also directly observable — you can check it at each step — whereas the energy norm requires knowing $A$\'s eigendecomposition.',
       'The algorithmic engine behind GMRES is the **Arnoldi process**: a way to build an orthonormal basis for the Krylov subspace $\\mathcal{K}_k(A, \\mathbf{r}_0) = \\text{span}\\{\\mathbf{r}_0, A\\mathbf{r}_0, A^2\\mathbf{r}_0, \\ldots, A^{k-1}\\mathbf{r}_0\\}$ without ever storing the raw vectors $A^j \\mathbf{r}_0$ (which become catastrophically ill-conditioned). Arnoldi is just modified Gram-Schmidt applied to the sequence produced by repeatedly multiplying by $A$: start with $\\mathbf{q}_1 = \\mathbf{r}_0 / \\|\\mathbf{r}_0\\|$, compute $A\\mathbf{q}_1$, orthogonalize against $\\mathbf{q}_1$ to get $\\mathbf{q}_2$, compute $A\\mathbf{q}_2$, orthogonalize against both $\\mathbf{q}_1$ and $\\mathbf{q}_2$ to get $\\mathbf{q}_3$, and so on.',
       'The Arnoldi process encodes a beautiful structure. After $k$ steps, the relation $AQ_k = Q_{k+1}\\tilde{H}_k$ holds exactly, where $Q_k$ has the orthonormal Krylov basis as columns and $\\tilde{H}_k$ is a $(k+1) \\times k$ upper Hessenberg matrix — all the inner products from the Gram-Schmidt orthogonalization. Now the minimization problem $\\min_\\mathbf{x} \\|\\mathbf{b} - A\\mathbf{x}\\|_2$ over the Krylov subspace becomes a small least-squares problem: $\\min_\\mathbf{y} \\| \\|\\mathbf{r}_0\\| \\mathbf{e}_1 - \\tilde{H}_k \\mathbf{y}\\|_2$. That is a $(k+1) \\times k$ system, easily solved with a QR factorization of $\\tilde{H}_k$ using $k$ Givens rotations.',
+      ] },
+      { type: 'image', src: arnoldiHessenbergUrl,
+        alt: 'A matrix grid showing an upper Hessenberg structure: nonzero amber entries on and above the diagonal plus one subdiagonal band, with green zero entries below that band',
+        caption: 'The Hessenberg matrix is the Gram-Schmidt bookkeeping from Arnoldi — one nonzero band below the diagonal, zero everywhere further down.' },
+      { type: 'prose', paragraphs: [
       'A concrete first step: take $A = \\begin{bmatrix}3&1\\\\0&2\\end{bmatrix}$, $\\mathbf{b} = (7,4)^\\top$, exact solution $\\mathbf{x}^* = (2,2)^\\top$. Start at $\\mathbf{x}_0 = \\mathbf{0}$, $\\mathbf{r}_0 = (7,4)^\\top$. GMRES step 1: search over $\\mathbf{x} = \\alpha \\mathbf{r}_0$ and minimize $\\|\\mathbf{b} - A\\alpha\\mathbf{r}_0\\|_2$. We get $A\\mathbf{r}_0 = (25, 8)^\\top$, so $\\alpha^* = \\mathbf{r}_0^\\top A\\mathbf{r}_0 / \\|A\\mathbf{r}_0\\|^2 \\approx 0.298$. New iterate: $\\mathbf{x}_1 \\approx (2.09, 1.19)^\\top$, residual $\\|\\mathbf{r}_1\\| \\approx 1.68$ vs $\\|\\mathbf{r}_0\\| \\approx 8.06$ — an 80% reduction in one step. Step 2 finds the exact solution by spanning all of $\\mathbb{R}^2$.',
       '**Predict before reading on:** For a $2 \\times 2$ system, GMRES is guaranteed to find the exact solution in at most how many steps? And for an $n \\times n$ system with $m$ distinct eigenvalues ($m < n$), how many steps are needed? Think about what it means for the Krylov subspace to span the full space.',
       'For an $n \\times n$ system, GMRES finds the exact solution in at most $n$ steps because after $n$ Arnoldi iterations, $Q_n$ spans all of $\\mathbb{R}^n$ and the minimization over the Krylov subspace is unconstrained. More practically, if $A$ has only $m$ distinct eigenvalues, the Krylov subspace already spans the relevant space after $m$ steps — just as in CG. This is why preconditioning matters just as much for GMRES: a good preconditioner clusters eigenvalues and reduces the effective $m$.',
       'The key practical limitation of GMRES is memory. Full GMRES stores all $k$ Arnoldi vectors: $O(kn)$ memory. After 1000 steps on a million-variable system, that is 8 gigabytes of Krylov vectors alone. GMRES($m$) — restarted GMRES — addresses this by discarding the Krylov basis every $m$ steps and restarting from the current residual. Restarting loses the global minimization property, which can cause stagnation. The tradeoff between convergence speed and memory is the central engineering decision when deploying GMRES in practice.',
+      ] },
+      { type: 'image', src: gmresRestartUrl,
+        alt: 'A chart comparing memory use over iterations: full GMRES growing linearly forever in red, versus GMRES(m) in blue resetting back down every m steps in a sawtooth pattern',
+        caption: 'Restarting trades away the global minimization guarantee for bounded memory — the central engineering tradeoff of GMRES(m).' },
+      { type: 'prose', paragraphs: [
       'Where this is heading: GMRES is powerful but naked — without preconditioning it can converge slowly for hard problems. The next lesson dives into preconditioning: how to build a matrix $M \\approx A^{-1}$ that is cheap to apply and transforms the system so eigenvalues cluster near 1. Incomplete LU (ILU) factorizations and algebraic multigrid (AMG) are the workhorse preconditioners that make GMRES practical for the world\'s hardest linear systems.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Apply GMRES to $A\\mathbf{x} = \\mathbf{b}$ (5 Steps)',
-        body: '1. **Initialize.** Compute $\\mathbf{r}_0 = \\mathbf{b} - A\\mathbf{x}_0$. Set $\\beta = \\|\\mathbf{r}_0\\|_2$, $\\mathbf{q}_1 = \\mathbf{r}_0/\\beta$.\n2. **Arnoldi step $k$.** Compute $\\mathbf{v} = A\\mathbf{q}_k$. For $j = 1, \\ldots, k$: $h_{jk} = \\mathbf{q}_j^\\top \\mathbf{v}$; $\\mathbf{v} \\leftarrow \\mathbf{v} - h_{jk}\\mathbf{q}_j$. Then $h_{k+1,k} = \\|\\mathbf{v}\\|_2$; $\\mathbf{q}_{k+1} = \\mathbf{v}/h_{k+1,k}$. One matrix-vector product per step; orthogonalize against ALL previous $\\mathbf{q}_j$.\n3. **Least-squares solve.** Minimize $\\|\\beta\\mathbf{e}_1 - \\tilde{H}_k\\mathbf{y}\\|_2$ over $\\mathbf{y} \\in \\mathbb{R}^k$. This is a $(k+1)\\times k$ system — solve efficiently with $k$ Givens rotations applied incrementally.\n4. **Form iterate.** $\\mathbf{x}_k = \\mathbf{x}_0 + Q_k\\mathbf{y}_k$. The residual norm is $\\|\\beta\\mathbf{e}_1 - \\tilde{H}_k\\mathbf{y}_k\\|_2$ (no extra matrix multiply needed).\n5. **Check and restart.** Stop if residual $< \\text{tol}$. If $k = m$ (restart parameter): set $\\mathbf{x}_0 \\leftarrow \\mathbf{x}_m$, discard $Q_m$, and go to step 1.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 3 of 5 — Iterative Solvers & Preconditioning',
-        body: '**Previous (Lesson 2):** Conjugate Gradient — Krylov subspace optimization for SPD systems, eigenvalue clustering, $\\sqrt{\\kappa}$ convergence.\n**This lesson:** GMRES — Arnoldi orthogonalization, Hessenberg least squares, restarting, convergence for non-symmetric systems.\n**Next (Lesson 4):** Preconditioning — ILU, SSOR, AMG; how to cluster eigenvalues and make iterative methods practical.',
-      },
-      {
-        type: 'insight',
-        title: 'GMRES vs CG',
-        body: 'Both are Krylov methods, but:\n\n| | CG | GMRES |\n|---|---|---|\n| Applicability | SPD only | Any non-singular |\n| Optimality | Min $\\|e\\|_A$ | Min $\\|r\\|_2$ |\n| Memory | $O(n)$ | $O(kn)$ |\n| Orthogonalization | Implicit (3-term) | Explicit (Arnoldi) |\n| Monotone residual | No | Yes |\n\nCG is preferred for SPD; GMRES for non-symmetric.',
-      },
-      {
-        type: 'warning',
-        title: 'GMRES Stagnation',
-        body: 'GMRES(m) (restarted) can stagnate — the residual fails to decrease across restarts if the Krylov subspace does not contain useful directions. This happens for matrices with complex spectrum or highly non-normal $A$.\n\nFix: use a better preconditioner, increase restart parameter $m$, or switch to flexible GMRES (FGMRES) which allows varying preconditioners.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'GMRES in Python',
         mathBridge: 'Build the Arnoldi process from scratch and solve a non-symmetric system — compare against CG to see why symmetry matters.',
         caption: 'GMRES monotonically reduces the residual norm; CG on a non-symmetric matrix diverges.',
@@ -166,8 +156,7 @@ plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'GMRES Arnoldi Process',
         mathBridge: 'Build the Arnoldi basis and solve a non-symmetric system.',
         caption: 'GMRES: each iteration extends the Krylov basis and solves a growing least-squares problem.',
@@ -244,6 +233,28 @@ norm(x_gmres - x_exact) / norm(x_exact)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Apply GMRES to $A\\mathbf{x} = \\mathbf{b}$ (5 Steps)',
+        body: '1. **Initialize.** Compute $\\mathbf{r}_0 = \\mathbf{b} - A\\mathbf{x}_0$. Set $\\beta = \\|\\mathbf{r}_0\\|_2$, $\\mathbf{q}_1 = \\mathbf{r}_0/\\beta$.\n2. **Arnoldi step $k$.** Compute $\\mathbf{v} = A\\mathbf{q}_k$. For $j = 1, \\ldots, k$: $h_{jk} = \\mathbf{q}_j^\\top \\mathbf{v}$; $\\mathbf{v} \\leftarrow \\mathbf{v} - h_{jk}\\mathbf{q}_j$. Then $h_{k+1,k} = \\|\\mathbf{v}\\|_2$; $\\mathbf{q}_{k+1} = \\mathbf{v}/h_{k+1,k}$. One matrix-vector product per step; orthogonalize against ALL previous $\\mathbf{q}_j$.\n3. **Least-squares solve.** Minimize $\\|\\beta\\mathbf{e}_1 - \\tilde{H}_k\\mathbf{y}\\|_2$ over $\\mathbf{y} \\in \\mathbb{R}^k$. This is a $(k+1)\\times k$ system — solve efficiently with $k$ Givens rotations applied incrementally.\n4. **Form iterate.** $\\mathbf{x}_k = \\mathbf{x}_0 + Q_k\\mathbf{y}_k$. The residual norm is $\\|\\beta\\mathbf{e}_1 - \\tilde{H}_k\\mathbf{y}_k\\|_2$ (no extra matrix multiply needed).\n5. **Check and restart.** Stop if residual $< \\text{tol}$. If $k = m$ (restart parameter): set $\\mathbf{x}_0 \\leftarrow \\mathbf{x}_m$, discard $Q_m$, and go to step 1.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 3 of 5 — Iterative Solvers & Preconditioning',
+        body: '**Previous (Lesson 2):** Conjugate Gradient — Krylov subspace optimization for SPD systems, eigenvalue clustering, $\\sqrt{\\kappa}$ convergence.\n**This lesson:** GMRES — Arnoldi orthogonalization, Hessenberg least squares, restarting, convergence for non-symmetric systems.\n**Next (Lesson 4):** Preconditioning — ILU, SSOR, AMG; how to cluster eigenvalues and make iterative methods practical.',
+      },
+      {
+        type: 'insight',
+        title: 'GMRES vs CG',
+        body: 'Both are Krylov methods, but:\n\n| | CG | GMRES |\n|---|---|---|\n| Applicability | SPD only | Any non-singular |\n| Optimality | Min $\\|e\\|_A$ | Min $\\|r\\|_2$ |\n| Memory | $O(n)$ | $O(kn)$ |\n| Orthogonalization | Implicit (3-term) | Explicit (Arnoldi) |\n| Monotone residual | No | Yes |\n\nCG is preferred for SPD; GMRES for non-symmetric.',
+      },
+      {
+        type: 'warning',
+        title: 'GMRES Stagnation',
+        body: 'GMRES(m) (restarted) can stagnate — the residual fails to decrease across restarts if the Krylov subspace does not contain useful directions. This happens for matrices with complex spectrum or highly non-normal $A$.\n\nFix: use a better preconditioner, increase restart parameter $m$, or switch to flexible GMRES (FGMRES) which allows varying preconditioners.',
       },
     ],
   },

@@ -1,0 +1,39 @@
+<svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-box   { fill: #ffffff; stroke: #cbd5e1; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-box   { fill: #1e293b; stroke: #475569; }
+  </style>
+  <rect width="460" height="160" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="ch-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#1e293b"/></marker>
+  </defs>
+
+  <text x="230" y="18" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">Every power of A collapses back to just A and I</text>
+
+  <rect x="14" y="38" width="78" height="36" rx="6" class="svg-box" stroke-width="1.3"/>
+  <text x="53" y="61" font-size="12" class="svg-text" text-anchor="middle">A⁰ = I</text>
+
+  <line x1="92" y1="56" x2="112" y2="56" stroke="#1e293b" stroke-width="1.5" marker-end="url(#ch-arrow)"/>
+
+  <rect x="116" y="38" width="78" height="36" rx="6" class="svg-box" stroke-width="1.3"/>
+  <text x="155" y="61" font-size="12" class="svg-text" text-anchor="middle">A¹ = A</text>
+
+  <line x1="194" y1="56" x2="214" y2="56" stroke="#1e293b" stroke-width="1.5" marker-end="url(#ch-arrow)"/>
+
+  <rect x="218" y="38" width="100" height="36" rx="6" class="svg-box" stroke-width="1.3"/>
+  <text x="268" y="61" font-size="12" fill="#2563eb" text-anchor="middle" font-weight="700">A² = 5A − I</text>
+
+  <line x1="318" y1="56" x2="338" y2="56" stroke="#1e293b" stroke-width="1.5" marker-end="url(#ch-arrow)"/>
+
+  <rect x="342" y="38" width="104" height="36" rx="6" class="svg-box" stroke-width="1.3"/>
+  <text x="394" y="61" font-size="12" fill="#10b981" text-anchor="middle" font-weight="700">A³ = 24A − 5I</text>
+
+  <text x="230" y="108" font-size="13" class="svg-text" text-anchor="middle" font-weight="700">Aᵏ = αₖ A + βₖ I  for every k</text>
+  <text x="230" y="130" font-size="10.5" class="svg-muted" text-anchor="middle">p(A) = A² − 5A + I = 0 is the recurrence that generates every αₖ, βₖ</text>
+</svg>

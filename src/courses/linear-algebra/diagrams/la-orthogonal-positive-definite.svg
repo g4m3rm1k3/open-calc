@@ -1,0 +1,41 @@
+<svg viewBox="0 0 460 210" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="460" height="210" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="op-blue" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+    <marker id="op-amber" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#d97706"/></marker>
+  </defs>
+
+  <!-- Panel 1: orthogonal -->
+  <rect x="12" y="20" width="216" height="178" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="38" font-size="11.5" fill="#2563eb" text-anchor="middle" font-weight="700">Orthogonal: a rigid motion</text>
+  <polygon points="70,170 120,170 120,120 70,120" fill="none" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="4,3"/>
+  <line x1="70" y1="170" x2="116" y2="170" stroke="#2563eb" stroke-width="2.5" marker-end="url(#op-blue)"/>
+  <text x="100" y="186" font-size="10" fill="#2563eb">q₁</text>
+  <line x1="70" y1="170" x2="70" y2="124" stroke="#d97706" stroke-width="2.5" marker-end="url(#op-amber)"/>
+  <text x="48" y="130" font-size="10" fill="#d97706">q₂</text>
+  <rect x="70" y="160" width="10" height="10" fill="none" stroke="#64748b" stroke-width="1"/>
+  <text x="140" y="150" font-size="10" class="svg-muted">q₁ ⟂ q₂, both unit length</text>
+  <text x="120" y="195" font-size="10" fill="#2563eb" text-anchor="middle">QᵗQ = I — lengths and angles preserved</text>
+
+  <!-- Panel 2: positive definite -->
+  <rect x="232" y="20" width="216" height="178" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="340" y="38" font-size="11.5" fill="#10b981" text-anchor="middle" font-weight="700">Positive definite: a bowl</text>
+  <path d="M 273 88 Q 343 168 413 88 L 413 88 Q 343 230 273 88 Z" fill="rgba(16,185,129,0.15)" stroke="none"/>
+  <path d="M 273 88 Q 343 168 413 88" fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <line x1="255" y1="88" x2="431" y2="88" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3"/>
+  <circle cx="343" cy="166" r="4" fill="#10b981"/>
+  <text x="343" y="186" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">unique minimum at 0</text>
+  <text x="340" y="60" font-size="10" class="svg-muted" text-anchor="middle">f(x) = xᵗAx &gt; 0 everywhere else</text>
+</svg>

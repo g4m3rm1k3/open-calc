@@ -1,3 +1,6 @@
+import arrowReorderUrl from '../diagrams/la-arrow-matrix-reorder.svg?url';
+import nestedDissectionUrl from '../diagrams/la-nested-dissection.svg?url';
+
 export default {
   id: 'la9-005',
   slug: 'sparse-direct-solvers',
@@ -14,42 +17,29 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Where you are in the story: you have now seen the full spectrum of iterative solvers — stationary methods (Jacobi, Gauss-Seidel), Krylov methods (CG, GMRES), and preconditioning strategies that make them practical. But iterative methods are not always the answer. They can stagnate on hard problems, they require tuning the preconditioner, and they produce approximate solutions that need careful monitoring. Sometimes you need the exact answer, robustly, without worrying about convergence. That is when you reach for sparse direct solvers.',
       'The challenge with sparse direct solvers is **fill-in**: when you perform Gaussian elimination on a sparse matrix, the factors $L$ and $U$ typically contain many more nonzero entries than the original $A$. This is because the elimination process creates new connections between variables that were not directly connected in $A$. In the worst case, a sparse matrix with $O(n)$ nonzeros can produce dense $L$ and $U$ factors with $O(n^2)$ nonzeros — eliminating all the sparsity benefit.',
       'A concrete 4-variable example reveals the key insight. Consider the arrow matrix: nonzeros on the diagonal and in the first row and column, all other entries zero. If you eliminate variables in natural order $(1,2,3,4)$: after eliminating variable 1, every pair of remaining variables $(2,3,4)$ that were both connected to variable 1 now needs a direct connection in $L$ or $U$. Variables 2, 3, and 4 all connect through variable 1, so the $\\{2,3,4\\} \\times \\{2,3,4\\}$ block fills in completely — 9 new nonzeros. Now reverse the order to $(4,3,2,1)$: variables 4, 3, 2 are "leaves" — they only connect to variable 1. Eliminating leaf 4 creates no new connections because 4 is not connected to any other remaining variable. Same for leaves 3 and 2. When you finally eliminate variable 1, all others are already gone. Total fill-in: **zero**.',
+      ] },
+      { type: 'image', src: arrowReorderUrl,
+        alt: 'Two graphs of the same 4-node star: eliminating the center node 1 first creates 3 new fill-in edges among leaves 2,3,4, while eliminating the leaves first creates no new edges at all',
+        caption: 'Same matrix, different elimination order: one produces fill-in, the other produces none — order is everything.' },
+      { type: 'prose', paragraphs: [
       'This example is not a special trick — it reveals a general principle. Fill-in occurs when two variables that both connect to the variable being eliminated are not themselves directly connected. A permutation matrix $P$ reorders the variables: instead of factoring $A$, you factor $PAP^\\top$ (same matrix, reordered), solve $PAP^\\top(P\\mathbf{x}) = P\\mathbf{b}$, then unpermute. The fill-in depends entirely on the order chosen by $P$. The graph interpretation is clean: fill-in equals new edges added to the adjacency graph of $A$ during elimination.',
       '**Predict before reading on:** For a tridiagonal (path graph) matrix eliminated in natural order, does fill-in occur? For an arrow matrix (star graph) in natural order, how much fill-in? For the 2D Poisson matrix — a grid graph — how does fill-in scale with problem size $n$?',
       'The answers: a tridiagonal matrix produces zero fill-in in natural order because when you eliminate variable $i$, variables $i-1$ and $i+1$ are already directly connected (the tridiagonal entry $a_{i-1,i+1}$ … wait, it is not! But $i-1$ has already been eliminated by the time you reach $i$, so no new connections are created). Actually, the tridiagonal stays tridiagonal throughout — no fill-in. For the 2D Poisson grid, natural order produces $O(n^{3/2})$ fill-in. Nested dissection — finding a small separator that splits the graph, reordering it last, recursing on the two halves — achieves $O(n \\log n)$ fill-in and $O(n^{3/2})$ flops. The **AMD (Approximate Minimum Degree)** algorithm provides a practical greedy heuristic: at each step, eliminate the variable whose elimination creates the fewest new connections. AMD is used by MATLAB\'s backslash operator, CHOLMOD, and most industrial sparse direct solvers.',
+      ] },
+      { type: 'image', src: nestedDissectionUrl,
+        alt: 'A grid graph split into a left half and right half by a thin red separator strip, illustrating nested dissection ordering',
+        caption: 'Nested dissection eliminates both halves first, the thin separator last — recursing gives O(n log n) fill-in for 2D grids.' },
+      { type: 'prose', paragraphs: [
       'The major sparse direct solver libraries — CHOLMOD (for SPD), SuperLU and PARDISO (for general), MUMPS (for distributed memory) — implement these ideas at industrial scale. Their workflow is: (1) analyze sparsity and compute reordering, (2) symbolic factorization (determine the fill-in pattern without computing values), (3) numerical factorization (fill in the values), (4) triangular solves. Steps 1-3 are expensive and done once; step 4 is cheap and done for each right-hand side. This is why direct solvers are preferred when you need to solve many linear systems with the same $A$ but different $\\mathbf{b}$: factorize once, solve hundreds of times at $O(\\text{nnz}(L))$ each.',
       'For 3D problems, even nested dissection gives $O(n^{4/3})$ fill-in and $O(n^2)$ flops. For a million-variable 3D problem, that is $10^{12}$ operations — not feasible. This is the fundamental reason why iterative methods dominate in 3D: for large 3D systems, CG+AMG at $O(n)$ total work will always beat any direct factorization. The practical rule of thumb: use sparse direct for 2D problems and small 3D problems (up to $10^4$–$10^5$ unknowns), and preconditioned iterative methods for large 3D problems. Many production codes combine both: iterative outer loop, direct solver as a subdomain preconditioner.',
       'Where this is heading: this lesson completes the Iterative Solvers & Preconditioning chapter. You have now seen the entire landscape of linear system solvers — from the $O(n^3)$ dense LU of Chapter 7, through sparse iterative methods (Jacobi, GS, CG, GMRES), to the $O(n)$ dream of AMG-preconditioned Krylov methods. Chapter 10 will step back to the mathematical foundations: dual spaces, tensors, and operator theory — the abstract framework that unifies everything you have seen in Chapters 1-9.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Use a Sparse Direct Solver (4 Steps)',
-        body: '1. **Reorder.** Compute a fill-reducing permutation: AMD (`amd(A)` in MATLAB/SciPy) for general sparse; nested dissection for regular grids. Form $PAP^\\top$ (same sparsity, different order). Never skip reordering for non-trivial problems.\n2. **Symbolic factorization.** Determine the sparsity pattern of $L$ and $U$ (or $L$ and $L^\\top$ for SPD) from the graph of $PAP^\\top$ without computing any values. This step identifies and allocates all memory needed for the factors — fast ($O(\\text{nnz})$) and done once per sparsity pattern.\n3. **Numerical factorization.** Compute the actual values of $L$ and $U$. This is the expensive step: $O(N^{3/2})$ flops for 2D with ND, $O(N^2)$ for 3D. Partial pivoting is applied (or diagonal dominance is assumed for Cholesky). Done once per matrix value; reused for all right-hand sides.\n4. **Solve.** For each right-hand side $\\mathbf{b}$: (a) permute: $\\hat{\\mathbf{b}} = P\\mathbf{b}$; (b) forward solve: $L\\mathbf{y} = \\hat{\\mathbf{b}}$; (c) backward solve: $U\\mathbf{x} = \\mathbf{y}$; (d) unpermute: $\\mathbf{x}^{\\text{true}} = P^\\top\\mathbf{x}$. Cost: $O(\\text{nnz}(L) + \\text{nnz}(U))$ per RHS.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 5 of 5 — Iterative Solvers & Preconditioning',
-        body: '**Previous (Lesson 4):** Preconditioning — Jacobi, ILU, AMG; eigenvalue clustering for Krylov efficiency.\n**This lesson:** Sparse Direct Solvers — fill-in, reordering (AMD, nested dissection), CHOLMOD/SuperLU/PARDISO, direct vs iterative tradeoffs.\n**Next (Chapter 10):** Dual Spaces and Advanced Theory — the abstract framework that unifies everything in Chapters 1–9.',
-      },
-      {
-        type: 'insight',
-        title: 'Fill-in Summary by Problem Type',
-        body: 'Problem | No reorder | After reorder\n1D Poisson | $O(n)$ | $O(n)$ (already optimal)\n2D Poisson | $O(n^{3/2})$ | $O(n \\log n)$ (ND)\n3D Poisson | $O(n^2)$ | $O(n^{4/3})$ (ND)\nGeneral | $O(n^2)$ worst | AMD: heuristic reduction\n\nFor 3D problems, $O(n^{4/3})$ fill-in makes direct methods expensive — often iterative + preconditioner wins.',
-      },
-      {
-        type: 'insight',
-        title: 'When Direct vs Iterative',
-        body: 'Use **sparse direct** (CHOLMOD, SuperLU, PARDISO) when:\n- Multiple right-hand sides with same $A$\n- $n < 10^5$ (2D) or $n < 10^4$ (3D)\n- Robust factorization needed (Jacobian in Newton\'s method)\n- Iterative method stagnates or is slow\n\nUse **iterative** (CG, GMRES + preconditioner) when:\n- Single right-hand side\n- $n > 10^5$ and matrix has good structure\n- 3D problem (direct too expensive)\n- Memory limited',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Sparse Direct Solvers in Python',
         mathBridge: 'Measure fill-in with and without reordering, then benchmark direct vs iterative on multiple right-hand sides.',
         caption: 'AMD reordering reduces fill-in dramatically; factorize once, solve many times at low cost.',
@@ -160,8 +150,7 @@ print(f"\\nSolution agreement: {np.max(np.abs(X1 - X2)):.2e} (should be ~0)")
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Sparse Factorization and Fill-in',
         mathBridge: 'Observe fill-in in sparse LU and compare reorderings.',
         caption: 'Reordering the matrix before factorization dramatically reduces fill-in.',
@@ -247,6 +236,28 @@ disp('Factorized once, solved 10 RHS cheaply.')
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Use a Sparse Direct Solver (4 Steps)',
+        body: '1. **Reorder.** Compute a fill-reducing permutation: AMD (`amd(A)` in MATLAB/SciPy) for general sparse; nested dissection for regular grids. Form $PAP^\\top$ (same sparsity, different order). Never skip reordering for non-trivial problems.\n2. **Symbolic factorization.** Determine the sparsity pattern of $L$ and $U$ (or $L$ and $L^\\top$ for SPD) from the graph of $PAP^\\top$ without computing any values. This step identifies and allocates all memory needed for the factors — fast ($O(\\text{nnz})$) and done once per sparsity pattern.\n3. **Numerical factorization.** Compute the actual values of $L$ and $U$. This is the expensive step: $O(N^{3/2})$ flops for 2D with ND, $O(N^2)$ for 3D. Partial pivoting is applied (or diagonal dominance is assumed for Cholesky). Done once per matrix value; reused for all right-hand sides.\n4. **Solve.** For each right-hand side $\\mathbf{b}$: (a) permute: $\\hat{\\mathbf{b}} = P\\mathbf{b}$; (b) forward solve: $L\\mathbf{y} = \\hat{\\mathbf{b}}$; (c) backward solve: $U\\mathbf{x} = \\mathbf{y}$; (d) unpermute: $\\mathbf{x}^{\\text{true}} = P^\\top\\mathbf{x}$. Cost: $O(\\text{nnz}(L) + \\text{nnz}(U))$ per RHS.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 5 of 5 — Iterative Solvers & Preconditioning',
+        body: '**Previous (Lesson 4):** Preconditioning — Jacobi, ILU, AMG; eigenvalue clustering for Krylov efficiency.\n**This lesson:** Sparse Direct Solvers — fill-in, reordering (AMD, nested dissection), CHOLMOD/SuperLU/PARDISO, direct vs iterative tradeoffs.\n**Next (Chapter 10):** Dual Spaces and Advanced Theory — the abstract framework that unifies everything in Chapters 1–9.',
+      },
+      {
+        type: 'insight',
+        title: 'Fill-in Summary by Problem Type',
+        body: 'Problem | No reorder | After reorder\n1D Poisson | $O(n)$ | $O(n)$ (already optimal)\n2D Poisson | $O(n^{3/2})$ | $O(n \\log n)$ (ND)\n3D Poisson | $O(n^2)$ | $O(n^{4/3})$ (ND)\nGeneral | $O(n^2)$ worst | AMD: heuristic reduction\n\nFor 3D problems, $O(n^{4/3})$ fill-in makes direct methods expensive — often iterative + preconditioner wins.',
+      },
+      {
+        type: 'insight',
+        title: 'When Direct vs Iterative',
+        body: 'Use **sparse direct** (CHOLMOD, SuperLU, PARDISO) when:\n- Multiple right-hand sides with same $A$\n- $n < 10^5$ (2D) or $n < 10^4$ (3D)\n- Robust factorization needed (Jacobian in Newton\'s method)\n- Iterative method stagnates or is slow\n\nUse **iterative** (CG, GMRES + preconditioner) when:\n- Single right-hand side\n- $n > 10^5$ and matrix has good structure\n- 3D problem (direct too expensive)\n- Memory limited',
       },
     ],
   },

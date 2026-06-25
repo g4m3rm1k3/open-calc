@@ -1,3 +1,6 @@
+import homogeneousUrl from '../diagrams/la-homogeneous-coordinates.svg?url';
+import mvpPipelineUrl from '../diagrams/la-mvp-pipeline.svg?url';
+
 export default {
   id: 'la8-004',
   slug: 'computer-graphics-transformations',
@@ -14,48 +17,33 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       '**Where you are in the story.** Chapter 8 has shown you linear algebra applied to data (PCA), networks (PageRank), and differential equations (ODEs). This final lesson brings it home to something you interact with every day: 3D graphics. Every frame of every video game, every rendered 3D model, every AR effect on your phone is computed using the same $4 \\times 4$ matrix multiplication you have been practicing for months. The abstract machinery becomes concrete here in a way you can see and feel.',
 
       '**The problem with translation.** Rotation and scaling are linear maps: $R(\\mathbf{x} + \\mathbf{y}) = R\\mathbf{x} + R\\mathbf{y}$. But translation is not — adding a displacement vector is not a matrix multiplication in 3D. This is inconvenient: if you want to compose "scale, then rotate, then translate," you need two different types of operations mixed together. The GPU cannot efficiently handle that. The fix: work in one higher dimension.',
 
       '**Homogeneous coordinates: embed 3D in 4D.** Represent a 3D point $(x, y, z)$ as the 4D vector $(x, y, z, 1)^\\top$. Represent a direction as $(x, y, z, 0)^\\top$. Now translation by $(t_x, t_y, t_z)$ becomes a $4 \\times 4$ matrix with the translation in the last column. The key: now translation, rotation, and scaling are ALL $4 \\times 4$ matrix multiplications. Composing them is just matrix multiplication. The GPU does one matrix multiply per vertex — extremely fast.',
-
+      ] },
+      { type: 'image', src: homogeneousUrl,
+        alt: 'A 4x4 matrix grid split into a blue 3x3 rotation/scale block, an amber 3x1 translation column, and a gray bottom row of 0 0 0 1',
+        caption: 'Embedding 3D points as (x,y,z,1) lets rotation, scale, and translation all become a single 4×4 matrix multiply.' },
+      { type: 'prose', paragraphs: [
       '**Concrete: rotate then translate.** Rotate $(1,0,0)$ by $90°$ around the $z$-axis, then translate by $(3,2,0)$. Encode as one matrix product: $T \\cdot R_z(90°) \\cdot (1,0,0,1)^\\top$. The rotation gives $(0,1,0,1)^\\top$, then the translation adds $(3,2,0)$ to get $(3,3,0,1)^\\top$ — world position $(3,3,0)$. Order matters: matrix multiplication is not commutative, and the matrices are applied right-to-left (rightmost first).',
 
       '**Predict before reading on.** You want to scale a point by 2, then rotate $90°$ around the $z$-axis. Is the combined matrix $R_z \\cdot S$ or $S \\cdot R_z$? Which applies the scale first? Write your answer before continuing.',
 
       '**The MVP pipeline.** In a 3D game engine, every vertex goes through three transforms: the Model matrix $M$ (places the object in world space), the View matrix $V$ (positions the camera — inverse of camera\'s own transform), and the Projection matrix $P$ (creates perspective by dividing by depth). The combined MVP matrix $M_{mvp} = P \\cdot V \\cdot M$ is computed once per draw call on the CPU, then every vertex just multiplies: $\\mathbf{v}_{clip} = M_{mvp}\\mathbf{v}_{model}$. After that, dividing each coordinate by the $w$ component gives the 2D screen position.',
-
+      ] },
+      { type: 'image', src: mvpPipelineUrl,
+        alt: 'A pipeline diagram showing Model space transformed by M into World space, then by V into Camera space, then by P into Clip and screen space',
+        caption: 'The Model, View, and Projection matrices multiply together once per draw call — each vertex then needs only one matrix-vector product.' },
+      { type: 'prose', paragraphs: [
       '**Rotation matrices are orthogonal — and that has consequences.** Every rotation matrix $R$ satisfies $R^\\top R = I$, which means $R^{-1} = R^\\top$. To undo a rotation (go back to camera space from world space), you just take the transpose — no matrix inversion needed. Since all rotations preserve vector lengths ($\\|R\\mathbf{v}\\| = \\|\\mathbf{v}\\|$), the GPU can apply millions of rotations per frame without any accumulating distortion. This orthogonality is why the Schur decomposition (unitary matrices) is so powerful numerically — the same reason rotation matrices are so elegant in graphics.',
 
       '**Where this is heading.** Chapter 8 showed applications across data science, networks, dynamical systems, and graphics. Chapter 9 returns to numerical methods: iterative solvers for large sparse systems. The conjugate gradient method, GMRES, and preconditioning let you solve million-variable linear systems that would be impossible with direct methods. The tools are different but the core ideas — eigenvalues, condition numbers, orthogonality — are everything you have built so far.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Build and Compose 4×4 Transformation Matrices (4 Steps)',
-        body: '1. **Identify the transforms needed** and their order (stated left-to-right in English, e.g., "scale, then rotate, then translate").\n2. **Write each as a 4×4 matrix.** Translation: identity with $(t_x,t_y,t_z)^\\top$ in the last column. Rotation $R_z(\\theta)$: top-left $2\\times2$ is $\\begin{bmatrix}\\cos\\theta&-\\sin\\theta\\\\\\sin\\theta&\\cos\\theta\\end{bmatrix}$, rest is identity. Scaling: diagonal $(s_x, s_y, s_z, 1)$.\n3. **Compose right-to-left.** If you want "scale first, rotate second, translate third": form $M = T \\cdot R \\cdot S$. The rightmost matrix acts on the vertex first.\n4. **Apply to vertices.** Points as $(x,y,z,1)^\\top$; directions as $(x,y,z,0)^\\top$. After perspective projection, divide $x,y,z$ by $w$ to get normalized device coordinates.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 4 of 4 — Applications of Linear Algebra',
-        body: '**Previous (Lesson 3):** ODEs and linear systems — eigenvalues determine stability; matrix exponential.\n**This lesson:** Computer graphics — homogeneous coordinates, 4×4 MVP pipeline, rotation matrices are orthogonal.\n**Next (Chapter 9):** Iterative solvers — conjugate gradient, GMRES, preconditioning for large sparse systems.',
-      },
-      {
-        type: 'insight',
-        title: 'Transformation Composition Order',
-        body: 'Transformations applied right-to-left: $M_{total}\\mathbf{v} = M_n \\cdots M_2 M_1 \\mathbf{v}$\n\nIn graphics: $M_{mvp} = P \\cdot V \\cdot M$\n- $M$: model → world (object placement)\n- $V$: world → camera (inverse camera transform)\n- $P$: camera → clip (perspective)\n\n**Matrix multiplication is NOT commutative. Order is critical.**',
-      },
-      {
-        type: 'insight',
-        title: 'Rotation Matrices Are Orthogonal',
-        body: 'All $3 \\times 3$ (or $4 \\times 4$) rotation matrices $R$ satisfy $R^\\top R = I$:\n\n$R^{-1} = R^\\top$ (fast inversion: just transpose)\n$\\det(R) = 1$ (preserves orientation)\n$\\|R\\mathbf{v}\\| = \\|\\mathbf{v}\\|$ (preserves lengths)\nAngles and dot products preserved',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Graphics Transformations with NumPy',
         mathBridge: 'Build 4x4 homogeneous transformation matrices, compose them with matrix multiplication, and implement a simple MVP pipeline.',
         caption: 'Every vertex in a 3D game executes exactly this matrix multiply — just at GPU speed, a billion times per second.',
@@ -177,8 +165,7 @@ print("Objects at z=-2 appear larger than z=-5 (perspective effect)")
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Graphics Transformation Matrices',
         mathBridge: 'Build and compose 4x4 homogeneous transformation matrices.',
         caption: 'Compose rotation, translation, and scaling via 4x4 matrix multiplication.',
@@ -290,11 +277,32 @@ p_ndc
           ],
         },
       },
-      {
-        id: 'TransformLab',
+      { type: 'viz', id: 'TransformLab',
         title: 'Transform Lab — 2D Intuition Before 4×4 Matrices',
         mathBridge: 'Before diving into 4×4 homogeneous coordinates, build 2D intuition: place a shape, rotate it by constructing a rotation matrix, reflect it across an axis, then chain two transforms. Every concept — columns encode basis vector destinations, order matters, composition collapses to a product — carries directly into 3D and the graphics pipeline.',
         caption: 'The 4×4 homogeneous matrix is just this 2×2 story extended into 3D with a translation row appended.',
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Build and Compose 4×4 Transformation Matrices (4 Steps)',
+        body: '1. **Identify the transforms needed** and their order (stated left-to-right in English, e.g., "scale, then rotate, then translate").\n2. **Write each as a 4×4 matrix.** Translation: identity with $(t_x,t_y,t_z)^\\top$ in the last column. Rotation $R_z(\\theta)$: top-left $2\\times2$ is $\\begin{bmatrix}\\cos\\theta&-\\sin\\theta\\\\\\sin\\theta&\\cos\\theta\\end{bmatrix}$, rest is identity. Scaling: diagonal $(s_x, s_y, s_z, 1)$.\n3. **Compose right-to-left.** If you want "scale first, rotate second, translate third": form $M = T \\cdot R \\cdot S$. The rightmost matrix acts on the vertex first.\n4. **Apply to vertices.** Points as $(x,y,z,1)^\\top$; directions as $(x,y,z,0)^\\top$. After perspective projection, divide $x,y,z$ by $w$ to get normalized device coordinates.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 4 of 4 — Applications of Linear Algebra',
+        body: '**Previous (Lesson 3):** ODEs and linear systems — eigenvalues determine stability; matrix exponential.\n**This lesson:** Computer graphics — homogeneous coordinates, 4×4 MVP pipeline, rotation matrices are orthogonal.\n**Next (Chapter 9):** Iterative solvers — conjugate gradient, GMRES, preconditioning for large sparse systems.',
+      },
+      {
+        type: 'insight',
+        title: 'Transformation Composition Order',
+        body: 'Transformations applied right-to-left: $M_{total}\\mathbf{v} = M_n \\cdots M_2 M_1 \\mathbf{v}$\n\nIn graphics: $M_{mvp} = P \\cdot V \\cdot M$\n- $M$: model → world (object placement)\n- $V$: world → camera (inverse camera transform)\n- $P$: camera → clip (perspective)\n\n**Matrix multiplication is NOT commutative. Order is critical.**',
+      },
+      {
+        type: 'insight',
+        title: 'Rotation Matrices Are Orthogonal',
+        body: 'All $3 \\times 3$ (or $4 \\times 4$) rotation matrices $R$ satisfy $R^\\top R = I$:\n\n$R^{-1} = R^\\top$ (fast inversion: just transpose)\n$\\det(R) = 1$ (preserves orientation)\n$\\|R\\mathbf{v}\\| = \\|\\mathbf{v}\\|$ (preserves lengths)\nAngles and dot products preserved',
       },
     ],
   },

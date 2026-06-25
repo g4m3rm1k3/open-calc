@@ -1,3 +1,5 @@
+import functionInnerProductUrl from '../diagrams/la-function-inner-product.svg?url'
+
 export default {
   id: 'la4-005',
   slug: 'inner-product-spaces',
@@ -14,50 +16,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Two polynomials: $f(x) = x$ and $g(x) = x^2$ on $[0,1]$. Their "similarity": $\\langle f,g \\rangle = \\int_0^1 x \\cdot x^2\\,dx = \\int_0^1 x^3\\,dx = 1/4$. Their "lengths": $\\|f\\| = \\sqrt{1/3}$, $\\|g\\| = \\sqrt{1/5}$. Angle: $\\cos\\theta = (1/4)/(\\sqrt{1/3}\\sqrt{1/5}) = (\\sqrt{15}/4) \\approx 0.968$ — these polynomials are nearly aligned ($\\theta \\approx 15°$). There are no components here, just an integral — yet we get length, angle, and orthogonality exactly like in $\\mathbb{R}^n$. An inner product is any function that extends this geometry to any vector space.',
+      ] },
+      { type: 'image', src: functionInnerProductUrl,
+        alt: 'Graph on [0,1] showing the line f(x) equals x and the curve g(x) equals x squared, with the inner product computed as the integral of their product equal to one quarter and angle approximately 15 degrees',
+        caption: 'No coordinates here — just an integral — yet it gives the same length, angle, and orthogonality as the dot product.' },
+      { type: 'prose', paragraphs: [
       '**The standard dot product.** On $\\mathbb{R}^n$: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\mathbf{u}^\\top \\mathbf{v} = \\sum_{i=1}^n u_i v_i$. This is the canonical example. The norm it induces is $\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle} = \\sqrt{\\sum v_i^2}$ — Euclidean length.',
       '**A weighted inner product.** On $\\mathbb{R}^n$ with positive weights $w_1, \\ldots, w_n$: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\sum w_i u_i v_i = \\mathbf{u}^\\top W \\mathbf{v}$ where $W = \\text{diag}(w_1, \\ldots, w_n)$. This inner product arises in statistics (weighted least squares) and finite elements (energy-based norms).',
       '**Inner products on function spaces.** On the space of continuous functions $C[a,b]$: $\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx$. Two functions are orthogonal if this integral is zero. This makes the sine and cosine functions of different frequencies orthogonal — the basis for Fourier series.',
       '**CNC and signal processing applications.** In CNC machining, vibration sensors record acceleration signals $f(t)$ during cutting. To detect **chatter**, engineers compute the inner product $\\langle f, \\sin(\\omega_{\\text{chatter}} t) \\rangle = \\int_0^T f(t)\\sin(\\omega t)\\,dt$ — if this is large, the cutting force contains that frequency. This is exactly the Fourier coefficient: how much of the chatter basis function lives in the measured signal. In **finite element analysis** for CNC frame design, the stiffness matrix entries are $K_{ij} = \\int_{\\Omega} \\nabla\\phi_i \\cdot \\nabla\\phi_j\\,d\\Omega$ — an inner product of basis function gradients over the material domain. The weighted inner product appears in **weighted least squares**, where measurement noise with unequal variance $\\sigma_i^2$ gets inner product weights $w_i = 1/\\sigma_i^2$ so that precise measurements count more.',
       '**What makes an inner product valid — the three axioms.** Not every formula that takes two vectors and returns a number qualifies. A valid inner product must satisfy: (1) **Positive definiteness** — $\\langle \\mathbf{v}, \\mathbf{v} \\rangle > 0$ for $\\mathbf{v} \\neq \\mathbf{0}$ and $\\langle \\mathbf{0}, \\mathbf{0} \\rangle = 0$ (you cannot have zero length unless you are the zero vector); (2) **Symmetry** — $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\langle \\mathbf{v}, \\mathbf{u} \\rangle$ (distance from $A$ to $B$ equals distance from $B$ to $A$); (3) **Linearity** — $\\langle c\\mathbf{u} + \\mathbf{w}, \\mathbf{v} \\rangle = c\\langle \\mathbf{u}, \\mathbf{v} \\rangle + \\langle \\mathbf{w}, \\mathbf{v} \\rangle$ (scaling and adding vectors commutes with the inner product). The weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = \\mathbf{u}^T W \\mathbf{v}$ satisfies all three whenever $W$ is symmetric positive definite.',
       '**Where this is heading.** The abstract inner product is the gateway to infinite-dimensional analysis. The Spectral Theorem in the next lesson says that every symmetric matrix can be diagonalized with orthonormal eigenvectors — and orthonormality here means exactly the dot-product inner product. After that, the same ideas extend to infinite dimensions: $L^2$ function spaces, Fourier series, and quantum mechanics all live in Hilbert spaces (complete inner product spaces). The abstract framework you are building here is the same one used to prove that Fourier series converge, that quantum observables have real eigenvalues, and that finite element approximations improve as the mesh is refined.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'Procedure: Verify an Inner Product and Compute Geometry',
-        body: 'Step 1. **Check the three axioms.** For $\\langle \\mathbf{u}, \\mathbf{v} \\rangle$ to be a valid inner product, verify: (1) Symmetry: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\langle \\mathbf{v}, \\mathbf{u} \\rangle$; (2) Linearity: $\\langle c\\mathbf{u}+\\mathbf{w}, \\mathbf{v} \\rangle = c\\langle \\mathbf{u}, \\mathbf{v} \\rangle + \\langle \\mathbf{w}, \\mathbf{v} \\rangle$; (3) Positive definiteness: $\\langle \\mathbf{v}, \\mathbf{v} \\rangle > 0$ for $\\mathbf{v} \\neq \\mathbf{0}$.\n\nStep 2. **Compute norms.** $\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}$. For functions: $\\|f\\| = \\sqrt{\\int_a^b f(x)^2\\,dx}$.\n\nStep 3. **Check Cauchy-Schwarz.** $|\\langle \\mathbf{u}, \\mathbf{v} \\rangle| \\leq \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$. Equality holds iff one is a scalar multiple of the other.\n\nStep 4. **Find angle.** $\\cos\\theta = \\langle \\mathbf{u}, \\mathbf{v} \\rangle / (\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)$. Two vectors are orthogonal iff $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 0$.\n\nStep 5. **Project.** $\\text{proj}_{\\mathbf{v}} \\mathbf{u} = \\frac{\\langle \\mathbf{u}, \\mathbf{v} \\rangle}{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}\\mathbf{v}$. Same formula in any inner product space — just swap the dot product for $\\langle \\cdot, \\cdot \\rangle$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 5 of 9 — Orthogonality & SVD',
-        body: '**Previous (Lesson 4):** SVD — the universal factorization $A = U\\Sigma V^T$.\n**This lesson:** Inner Product Spaces — abstracting the dot product to define geometry in any vector space.\n**Next (Lesson 6):** Spectral Theorem — why symmetric matrices are always diagonalizable with orthogonal eigenvectors.',
-      },
-      {
-        type: 'theorem',
-        title: 'Cauchy-Schwarz Inequality',
-        body: '|\\langle \\mathbf{u}, \\mathbf{v} \\rangle| \\leq \\|\\mathbf{u}\\| \\cdot \\|\\mathbf{v}\\|\n\nEquality holds iff $\\mathbf{u}$ and $\\mathbf{v}$ are linearly dependent (one is a scalar multiple of the other). This is the universal law of angles: the cosine of the angle between $\\mathbf{u}$ and $\\mathbf{v}$ is $\\cos\\theta = \\langle \\mathbf{u}, \\mathbf{v} \\rangle / (\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|) \\in [-1, 1]$.',
-      },
-      {
-        type: 'insight',
-        title: 'From Inner Product to Geometry',
-        body: '**Norm:** $\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}$\n**Distance:** $d(\\mathbf{u}, \\mathbf{v}) = \\|\\mathbf{u} - \\mathbf{v}\\|$\n**Angle:** $\\cos\\theta = \\langle \\mathbf{u}, \\mathbf{v} \\rangle / (\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)$\n**Orthogonality:** $\\mathbf{u} \\perp \\mathbf{v}$ iff $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 0$\n**Projection:** $\\text{proj}_{\\mathbf{v}} \\mathbf{u} = \\frac{\\langle \\mathbf{u}, \\mathbf{v} \\rangle}{\\langle \\mathbf{v}, \\mathbf{v} \\rangle} \\mathbf{v}$',
-      },
-      {
-        type: 'insight',
-        title: 'Gram-Schmidt in an Inner Product Space',
-        body: 'Gram-Schmidt works in any inner product space. Given linearly independent $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$, produce orthonormal $\\{\\mathbf{q}_1, \\ldots, \\mathbf{q}_k\\}$ using the same algorithm — just replace the dot product with $\\langle \\cdot, \\cdot \\rangle$ throughout.',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction',
-        body: 'For the weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 2u_1v_1 + 5u_2v_2$: are $\\mathbf{u} = [5,-2]^T$ and $\\mathbf{v} = [1,1]^T$ orthogonal under this inner product? Are they orthogonal under the standard dot product? Predict both answers, then compute.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Inner Products and Norms',
         mathBridge: 'Compute standard and weighted inner products; verify Cauchy-Schwarz.',
         caption: 'Different inner products define different geometries on the same vector space.',
@@ -125,6 +99,38 @@ abs(lhs - rhs) < 1e-9
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'Procedure: Verify an Inner Product and Compute Geometry',
+        body: 'Step 1. **Check the three axioms.** For $\\langle \\mathbf{u}, \\mathbf{v} \\rangle$ to be a valid inner product, verify: (1) Symmetry: $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = \\langle \\mathbf{v}, \\mathbf{u} \\rangle$; (2) Linearity: $\\langle c\\mathbf{u}+\\mathbf{w}, \\mathbf{v} \\rangle = c\\langle \\mathbf{u}, \\mathbf{v} \\rangle + \\langle \\mathbf{w}, \\mathbf{v} \\rangle$; (3) Positive definiteness: $\\langle \\mathbf{v}, \\mathbf{v} \\rangle > 0$ for $\\mathbf{v} \\neq \\mathbf{0}$.\n\nStep 2. **Compute norms.** $\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}$. For functions: $\\|f\\| = \\sqrt{\\int_a^b f(x)^2\\,dx}$.\n\nStep 3. **Check Cauchy-Schwarz.** $|\\langle \\mathbf{u}, \\mathbf{v} \\rangle| \\leq \\|\\mathbf{u}\\|\\|\\mathbf{v}\\|$. Equality holds iff one is a scalar multiple of the other.\n\nStep 4. **Find angle.** $\\cos\\theta = \\langle \\mathbf{u}, \\mathbf{v} \\rangle / (\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)$. Two vectors are orthogonal iff $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 0$.\n\nStep 5. **Project.** $\\text{proj}_{\\mathbf{v}} \\mathbf{u} = \\frac{\\langle \\mathbf{u}, \\mathbf{v} \\rangle}{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}\\mathbf{v}$. Same formula in any inner product space — just swap the dot product for $\\langle \\cdot, \\cdot \\rangle$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 5 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 4):** SVD — the universal factorization $A = U\\Sigma V^T$.\n**This lesson:** Inner Product Spaces — abstracting the dot product to define geometry in any vector space.\n**Next (Lesson 6):** Spectral Theorem — why symmetric matrices are always diagonalizable with orthogonal eigenvectors.',
+      },
+      {
+        type: 'theorem',
+        title: 'Cauchy-Schwarz Inequality',
+        body: '|\\langle \\mathbf{u}, \\mathbf{v} \\rangle| \\leq \\|\\mathbf{u}\\| \\cdot \\|\\mathbf{v}\\|\n\nEquality holds iff $\\mathbf{u}$ and $\\mathbf{v}$ are linearly dependent (one is a scalar multiple of the other). This is the universal law of angles: the cosine of the angle between $\\mathbf{u}$ and $\\mathbf{v}$ is $\\cos\\theta = \\langle \\mathbf{u}, \\mathbf{v} \\rangle / (\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|) \\in [-1, 1]$.',
+      },
+      {
+        type: 'insight',
+        title: 'From Inner Product to Geometry',
+        body: '**Norm:** $\\|\\mathbf{v}\\| = \\sqrt{\\langle \\mathbf{v}, \\mathbf{v} \\rangle}$\n**Distance:** $d(\\mathbf{u}, \\mathbf{v}) = \\|\\mathbf{u} - \\mathbf{v}\\|$\n**Angle:** $\\cos\\theta = \\langle \\mathbf{u}, \\mathbf{v} \\rangle / (\\|\\mathbf{u}\\|\\|\\mathbf{v}\\|)$\n**Orthogonality:** $\\mathbf{u} \\perp \\mathbf{v}$ iff $\\langle \\mathbf{u}, \\mathbf{v} \\rangle = 0$\n**Projection:** $\\text{proj}_{\\mathbf{v}} \\mathbf{u} = \\frac{\\langle \\mathbf{u}, \\mathbf{v} \\rangle}{\\langle \\mathbf{v}, \\mathbf{v} \\rangle} \\mathbf{v}$',
+      },
+      {
+        type: 'insight',
+        title: 'Gram-Schmidt in an Inner Product Space',
+        body: 'Gram-Schmidt works in any inner product space. Given linearly independent $\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$, produce orthonormal $\\{\\mathbf{q}_1, \\ldots, \\mathbf{q}_k\\}$ using the same algorithm — just replace the dot product with $\\langle \\cdot, \\cdot \\rangle$ throughout.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction',
+        body: 'For the weighted inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_W = 2u_1v_1 + 5u_2v_2$: are $\\mathbf{u} = [5,-2]^T$ and $\\mathbf{v} = [1,1]^T$ orthogonal under this inner product? Are they orthogonal under the standard dot product? Predict both answers, then compute.',
       },
     ],
   },

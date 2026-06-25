@@ -1,3 +1,5 @@
+import jordanBlockUrl from '../diagrams/la-jordan-block.svg?url'
+
 export default {
   id: 'la3-004',
   slug: 'jordan-normal-form',
@@ -14,51 +16,23 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $A = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$. It has eigenvalue $\\lambda = 3$ with algebraic multiplicity 2. But $(A-3I) = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}$ has only one independent null vector: $\\mathbf{v}_1 = [1,0]^\\top$. One eigenvector, two needed — diagonalization fails. Jordan form is the answer: $A$ itself IS already in Jordan form $J_2(3) = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$. The 1 on the superdiagonal encodes the "missing" eigenvector. Powers: $A^n = \\begin{bmatrix}3^n & n\\cdot3^{n-1}\\\\0&3^n\\end{bmatrix}$ — not just $3^n$ on the diagonal, but a polynomial growth term $n\\cdot3^{n-1}$ that diagonalization cannot capture.',
       '**Review: what diagonalization requires.** From la3-002, an $n \\times n$ matrix is diagonalizable iff it has $n$ linearly independent eigenvectors. When a matrix has a repeated eigenvalue $\\lambda$ but fewer independent eigenvectors than the multiplicity of $\\lambda$, it is called **defective** — and diagonalization is impossible. Jordan form is the answer to the question: if we cannot fully diagonalize, what is the closest we can get?',
       '**What a Jordan block looks like.** A Jordan block $J_k(\\lambda)$ is a $k \\times k$ matrix with $\\lambda$ on the main diagonal and 1s on the superdiagonal, zeros elsewhere:\n\n$J_k(\\lambda) = \\begin{bmatrix}\\lambda & 1 & 0 & 0 \\\\ 0 & \\lambda & 1 & 0 \\\\ 0 & 0 & \\lambda & 1 \\\\ 0 & 0 & 0 & \\lambda\\end{bmatrix}$\n\nA $1\\times 1$ block is just $[\\lambda]$. When all blocks are $1\\times 1$, you have the diagonal form you know. The 1s on the superdiagonal are the mark of a defective matrix — they encode the "missing" eigenvectors.',
+      ] },
+      { type: 'image', src: jordanBlockUrl,
+        alt: 'Left panel: a diagonal 3x3 matrix with lambda on the diagonal and zeros elsewhere, labeled diagonalizable with 3 eigenvectors. Right panel: a Jordan block with lambda on the diagonal, 1s on the superdiagonal highlighted amber, labeled defective, only 1 eigenvector',
+        caption: 'A 1 above the diagonal is the fingerprint of a missing eigenvector — the closest thing to diagonal that still exists.' },
+      { type: 'prose', paragraphs: [
       '**The Jordan Normal Form theorem.** Every $n \\times n$ complex matrix is similar to a block-diagonal matrix whose blocks are Jordan blocks. This is the Jordan Normal Form (JNF). The block structure is unique (up to reordering blocks): the sizes and eigenvalues of the blocks are fingerprints of the matrix. What is not unique is the change-of-basis matrix $P$.',
       '**Generalized eigenvectors — filling the gap.** For a size-$k$ Jordan block, there is only ONE linearly independent eigenvector. The remaining $k-1$ basis vectors are **generalized eigenvectors**: they satisfy $(A - \\lambda I)^j \\mathbf{v}_j = \\mathbf{0}$ for some $j > 1$ but not for $j-1$. Together they form a **Jordan chain**: starting from the true eigenvector $\\mathbf{v}_1$ (satisfying $(A-\\lambda I)\\mathbf{v}_1 = 0$), each next vector is found by solving $(A - \\lambda I)\\mathbf{v}_{i+1} = \\mathbf{v}_i$.',
       '**CNC application: critically damped axes.** A CNC axis controller modeled as a second-order system has a characteristic equation $s^2 + 2\\zeta\\omega_n s + \\omega_n^2 = 0$. At **critical damping** ($\\zeta = 1$), this has a repeated root: $s = -\\omega_n$ with multiplicity 2. The corresponding state matrix is a Jordan block $J_2(-\\omega_n)$ — defective by design. The solution is $x(t) = (c_1 + c_2 t)e^{-\\omega_n t}$: the polynomial factor $c_2 t$ is the signature of the Jordan block. CNC axes are often tuned near critical damping for the fastest non-oscillatory response. Overdamped axes settle more slowly; underdamped axes ring. The Jordan block is the math behind the "sweet spot."',
       '**Predict before reading on.** A $4 \\times 4$ matrix has eigenvalue $\\lambda = 5$ with algebraic multiplicity 4 and geometric multiplicity 2. How many Jordan blocks are there? What are the possible block size configurations? Write your answers before continuing.',
       '**Why Jordan form matters theoretically.** Jordan form classifies all linear maps up to change-of-basis — two matrices are similar (represent the same transformation) if and only if they have the same Jordan form. It also makes computing matrix exponentials tractable: $e^{Jt}$ for a Jordan block has a clean formula involving polynomials in $t$ multiplied by exponentials, which is exactly the solution structure of differential equations with repeated eigenvalues.',
-    ],
-    callouts: [
-      {
-        type: 'sequencing',
-        title: 'Lesson 4 of 7 — Eigenvalues & Eigenvectors',
-        body: '**Previous (Lesson 3):** Complex Eigenvalues — rotation and oscillation encoded as $a \\pm bi$.\n**This lesson:** Jordan Normal Form — what to do when a matrix cannot be diagonalized; the structure of defective matrices.\n**Next (Lesson 5):** Markov Chains — applying eigenvalues to probability transitions and steady states.',
-      },
-      {
-        type: 'procedure',
-        title: 'Procedure: Find the Jordan Normal Form',
-        body: 'Step 1. **Find all eigenvalues.** Compute the characteristic polynomial $\\det(A - \\lambda I) = 0$ and factor it. Record the algebraic multiplicity $m_a(\\lambda)$ of each root.\n\nStep 2. **Check geometric multiplicity.** For each $\\lambda$, compute $m_g(\\lambda) = n - \\text{rank}(A - \\lambda I)$. If $m_g(\\lambda) < m_a(\\lambda)$ for any $\\lambda$, the matrix is defective.\n\nStep 3. **Determine block structure.** For each eigenvalue $\\lambda$: number of Jordan blocks = $m_g(\\lambda)$; sizes of those blocks must sum to $m_a(\\lambda)$. Use rank$(A - \\lambda I)^k$ for $k = 1, 2, \\ldots$ to pin down the exact sizes.\n\nStep 4. **Build each Jordan chain.** Find the true eigenvector $\\mathbf{v}_1$ (null vector of $A - \\lambda I$). Solve $(A - \\lambda I)\\mathbf{v}_2 = \\mathbf{v}_1$ for the generalized eigenvector $\\mathbf{v}_2$. Continue until the chain length equals the block size.\n\nStep 5. **Assemble $S$ and verify.** Form $S$ with Jordan chain columns in order. Verify $S^{-1}AS = J$ — the Jordan blocks should appear on the diagonal.',
-      },
-      {
-        type: 'definition',
-        title: 'Defective Matrix',
-        body: 'A matrix is **defective** if for some eigenvalue $\\lambda$:\n\n$m_g(\\lambda) < m_a(\\lambda)$\n\nwhere $m_g(\\lambda) = \\dim \\ker(A - \\lambda I)$ is the **geometric multiplicity** (number of independent eigenvectors) and $m_a(\\lambda)$ is the **algebraic multiplicity** (root multiplicity in char. poly.).\n\nA defective matrix cannot be diagonalized.',
-      },
-      {
-        type: 'insight',
-        title: 'Reading the Jordan Structure',
-        body: 'For each eigenvalue $\\lambda$:\n\n- **Number of Jordan blocks** = geometric multiplicity = number of independent eigenvectors\n- **Sum of block sizes** = algebraic multiplicity = multiplicity in char. poly.\n- **Diagonalizable** iff every Jordan block is $1 \\times 1$\n\nExample: algebraic mult = 4, geometric mult = 2 → exactly two Jordan blocks whose sizes sum to 4 (could be $3+1$, or $2+2$).',
-      },
-      {
-        type: 'insight',
-        title: 'Jordan Form vs Diagonal Form',
-        body: 'Diagonal: $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$ — all Jordan blocks are $1 \\times 1$.\nJordan: $J = J_{k_1}(\\lambda_1) \\oplus J_{k_2}(\\lambda_2) \\oplus \\cdots$ — some blocks can be larger.\n\nDiagonal form is the special case of Jordan form where the matrix is not defective.',
-      },
-      {
-        type: 'warning',
-        title: 'Jordan Form Is Numerically Unstable',
-        body: 'Jordan form is sensitive to perturbations: adding $\\epsilon$ to one entry of a defective matrix can make it fully diagonalizable with eigenvalues splitting by $\\sim \\epsilon^{1/k}$. Never use Jordan form computationally. For numerical work, use **Schur decomposition** instead — upper triangular, numerically stable, same theoretical content.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Jordan Structure in OpenMAT',
         mathBridge: 'Build a defective matrix and examine why diagonalization fails.',
         caption: 'A Jordan block with a 1 on the superdiagonal is irreducible — it cannot be split further.',
@@ -126,6 +100,38 @@ J^4
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 4 of 7 — Eigenvalues & Eigenvectors',
+        body: '**Previous (Lesson 3):** Complex Eigenvalues — rotation and oscillation encoded as $a \\pm bi$.\n**This lesson:** Jordan Normal Form — what to do when a matrix cannot be diagonalized; the structure of defective matrices.\n**Next (Lesson 5):** Markov Chains — applying eigenvalues to probability transitions and steady states.',
+      },
+      {
+        type: 'procedure',
+        title: 'Procedure: Find the Jordan Normal Form',
+        body: 'Step 1. **Find all eigenvalues.** Compute the characteristic polynomial $\\det(A - \\lambda I) = 0$ and factor it. Record the algebraic multiplicity $m_a(\\lambda)$ of each root.\n\nStep 2. **Check geometric multiplicity.** For each $\\lambda$, compute $m_g(\\lambda) = n - \\text{rank}(A - \\lambda I)$. If $m_g(\\lambda) < m_a(\\lambda)$ for any $\\lambda$, the matrix is defective.\n\nStep 3. **Determine block structure.** For each eigenvalue $\\lambda$: number of Jordan blocks = $m_g(\\lambda)$; sizes of those blocks must sum to $m_a(\\lambda)$. Use rank$(A - \\lambda I)^k$ for $k = 1, 2, \\ldots$ to pin down the exact sizes.\n\nStep 4. **Build each Jordan chain.** Find the true eigenvector $\\mathbf{v}_1$ (null vector of $A - \\lambda I$). Solve $(A - \\lambda I)\\mathbf{v}_2 = \\mathbf{v}_1$ for the generalized eigenvector $\\mathbf{v}_2$. Continue until the chain length equals the block size.\n\nStep 5. **Assemble $S$ and verify.** Form $S$ with Jordan chain columns in order. Verify $S^{-1}AS = J$ — the Jordan blocks should appear on the diagonal.',
+      },
+      {
+        type: 'definition',
+        title: 'Defective Matrix',
+        body: 'A matrix is **defective** if for some eigenvalue $\\lambda$:\n\n$m_g(\\lambda) < m_a(\\lambda)$\n\nwhere $m_g(\\lambda) = \\dim \\ker(A - \\lambda I)$ is the **geometric multiplicity** (number of independent eigenvectors) and $m_a(\\lambda)$ is the **algebraic multiplicity** (root multiplicity in char. poly.).\n\nA defective matrix cannot be diagonalized.',
+      },
+      {
+        type: 'insight',
+        title: 'Reading the Jordan Structure',
+        body: 'For each eigenvalue $\\lambda$:\n\n- **Number of Jordan blocks** = geometric multiplicity = number of independent eigenvectors\n- **Sum of block sizes** = algebraic multiplicity = multiplicity in char. poly.\n- **Diagonalizable** iff every Jordan block is $1 \\times 1$\n\nExample: algebraic mult = 4, geometric mult = 2 → exactly two Jordan blocks whose sizes sum to 4 (could be $3+1$, or $2+2$).',
+      },
+      {
+        type: 'insight',
+        title: 'Jordan Form vs Diagonal Form',
+        body: 'Diagonal: $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$ — all Jordan blocks are $1 \\times 1$.\nJordan: $J = J_{k_1}(\\lambda_1) \\oplus J_{k_2}(\\lambda_2) \\oplus \\cdots$ — some blocks can be larger.\n\nDiagonal form is the special case of Jordan form where the matrix is not defective.',
+      },
+      {
+        type: 'warning',
+        title: 'Jordan Form Is Numerically Unstable',
+        body: 'Jordan form is sensitive to perturbations: adding $\\epsilon$ to one entry of a defective matrix can make it fully diagonalizable with eigenvalues splitting by $\\sim \\epsilon^{1/k}$. Never use Jordan form computationally. For numerical work, use **Schur decomposition** instead — upper triangular, numerically stable, same theoretical content.',
       },
     ],
   },

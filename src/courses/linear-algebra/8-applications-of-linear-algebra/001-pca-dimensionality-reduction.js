@@ -1,3 +1,6 @@
+import pcaCloudUrl from '../diagrams/la-pca-data-cloud.svg?url';
+import screePlotUrl from '../diagrams/la-pca-scree-plot.svg?url';
+
 export default {
   id: 'la8-001',
   slug: 'pca-dimensionality-reduction',
@@ -14,7 +17,8 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       '**Where you are in the story.** Chapters 1–7 built the mathematical machinery: vectors, matrices, eigenvalues, SVD, orthogonality, numerical methods. Chapter 8 shows where all of that machinery goes — the real problems it was built to solve. Principal Component Analysis is perhaps the single most-applied technique in quantitative science. It is the eigenvalue problem applied to data. You have been building toward this for several chapters; now you see it in action.',
 
       '**The problem: too many dimensions.** Your dataset has 500 stock returns measured daily for 10 years — a $2500 \\times 500$ matrix. You could work with all 500 dimensions, but most of the variation in stock prices is driven by a handful of underlying factors: market risk, sector effects, interest rate sensitivity. PCA finds those few directions that explain most of the variance. You reduce 500 dimensions to maybe 10, losing almost no information. The 10 directions it finds are not arbitrary — they are the directions of maximum variance, computed via the eigenvalue decomposition of the covariance matrix.',
@@ -22,40 +26,24 @@ export default {
       '**Concrete first: three points in 2D.** Data: $(0,0)$, $(2,1)$, $(4,2)$. Step 1 — center: subtract mean $(2,1)$, giving $(-2,-1)$, $(0,0)$, $(2,1)$. Covariance matrix: $C = \\frac{1}{2}X^\\top X = \\begin{bmatrix}4&2\\\\2&1\\end{bmatrix}$. Eigenvalues: trace $= 5$, determinant $= 0$, so $\\lambda_1 = 5$, $\\lambda_2 = 0$. Eigenvector for $\\lambda_1 = 5$: $(2/\\sqrt{5}, 1/\\sqrt{5})^\\top$. The data has zero variance in the perpendicular direction and all variance in the $(2,1)$ direction — PCA found that the three points are perfectly collinear, lying on a single line.',
 
       '**The geometric idea: find the axis of maximum stretch.** Think of the data as a cloud of points. PCA finds the direction through the cloud that is "longest" (maximum variance), then the perpendicular direction that is "next longest," and so on. These are the principal components. They are orthogonal to each other (the eigenvectors of a symmetric matrix are always orthogonal) and ordered by how much variance they capture.',
-
+      ] },
+      { type: 'image', src: pcaCloudUrl,
+        alt: 'An elongated cloud of scattered points with two arrows from the centroid: a long PC1 arrow along the main spread and a short PC2 arrow perpendicular to it',
+        caption: 'PC1 is the direction of maximum spread; PC2 is whatever spread is left over, perpendicular to PC1.' },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on.** If all your data points satisfy exactly $y = 2x$, what is the rank of the covariance matrix? How many principal components are needed to capture 100% of the variance? Write your answer before continuing.',
 
       '**SVD and PCA are the same computation.** The SVD $X = U\\Sigma V^\\top$ gives the principal components directly: columns of $V$ are the directions (principal axes), $\\sigma_i^2/(n-1)$ are the variances along each axis. The covariance matrix approach ($C = X^\\top X/(n-1) = V\\Lambda V^\\top$) and the SVD approach give exactly the same directions — but SVD is numerically preferred because it does not square the matrix (recall: squaring squares the condition number).',
 
       '**How many components to keep: the scree plot.** The explained variance ratio of component $i$ is $\\lambda_i/\\sum_j \\lambda_j$ — the fraction of total variance captured by that direction. A "scree plot" shows these fractions in decreasing order. Look for the "elbow" where the curve bends — adding more components after that gives diminishing returns. In practice, keeping enough components to explain 95% of variance is a common threshold.',
-
+      ] },
+      { type: 'image', src: screePlotUrl,
+        alt: 'A bar chart of explained variance ratio per principal component, decreasing from PC1 to PC6, with an elbow circled around PC3',
+        caption: 'The elbow marks where added components stop paying for themselves — keep what is before it.' },
+      { type: 'prose', paragraphs: [
       '**Where this is heading.** The next lesson applies eigenvalue ideas to a completely different setting: Markov chains and PageRank. The stationary distribution of a random walk is an eigenvector problem. The tools are the same (eigendecomposition, power method) but the interpretation is completely different. After that, you will see eigenvalues drive coupled ODE systems and 3D computer graphics.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Perform PCA on a Dataset (5 Steps)',
-        body: '1. **Center.** Subtract column means: $X_c = X - \\bar{X}$. PCA measures variance around the mean; without this, PC1 points toward the data centroid, not the spread direction.\n2. **SVD.** Compute $X_c = U\\Sigma V^\\top$ via `np.linalg.svd(X_c, full_matrices=False)`. Columns of $V$ are the principal directions; $\\sigma_i^2/(n-1)$ is the variance along direction $i$.\n3. **Scree plot.** Compute explained ratios $e_i = \\sigma_i^2 / \\sum_j \\sigma_j^2$. Plot $e_i$ vs $i$; find the "elbow" where adding more components gives diminishing returns.\n4. **Choose $k$.** Keep the smallest $k$ satisfying $\\sum_{i=1}^k e_i \\geq 0.95$ (or another threshold). Fewer components = more compression; more = less reconstruction error.\n5. **Project and reconstruct.** Scores: $Z = X_c V_k$ ($n\\times k$). Reconstruction: $\\hat{X}_c = ZV_k^\\top$. Eckart-Young guarantees $\\|X_c - \\hat{X}_c\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$ — the minimum possible for rank-$k$ approximations.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 1 of 4 — Applications of Linear Algebra',
-        body: '**Chapter 7 (Numerical Methods):** QR, Cholesky, conditioning, stability, sparse matrices.\n**Chapter 8 (Applications), this chapter:** Where the math meets real problems.\n**This lesson:** PCA — eigenvalue decomposition of data covariance; dimensionality reduction.\n**Next:** Markov chains and PageRank — stationary distributions as eigenvectors.',
-      },
-      {
-        type: 'insight',
-        title: 'PCA Recipe',
-        body: '1. Mean-center: $X \\leftarrow X - \\bar{X}$\n2. SVD: $X = U\\Sigma V^\\top$ (columns of $V$ are principal components)\n3. Choose $k$ by explained variance: keep $\\sigma_1,\\ldots,\\sigma_k$\n4. Project: $Z = X V_k$ ($n \\times k$ score matrix)\n5. Reconstruct: $\\hat{X} = Z V_k^\\top$ (rank-$k$ approximation)\n\nVariance captured: $\\sum_{i=1}^k \\sigma_i^2 / \\sum_i \\sigma_i^2$',
-      },
-      {
-        type: 'insight',
-        title: 'Eckart-Young: SVD gives the best approximation',
-        body: 'The rank-$k$ approximation $X_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$ is the best rank-$k$ approximation of $X$ in both the 2-norm and Frobenius norm.\n\nError: $\\|X - X_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$\n\nNo other $k$-dimensional subspace captures more variance.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'PCA with NumPy',
         mathBridge: 'Perform PCA from scratch using SVD, compute explained variance, project to 2D, and verify the Eckart-Young approximation.',
         caption: 'sklearn.decomposition.PCA uses the same SVD under the hood — but implementing it yourself makes the linear algebra visible.',
@@ -175,8 +163,7 @@ for cls, label in enumerate(["setosa", "versicolor", "virginica"]):
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'PCA via SVD',
         mathBridge: 'Perform PCA on a dataset and examine explained variance.',
         caption: 'Principal components = directions of maximum variance = left singular vectors.',
@@ -243,6 +230,28 @@ var_explained
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Perform PCA on a Dataset (5 Steps)',
+        body: '1. **Center.** Subtract column means: $X_c = X - \\bar{X}$. PCA measures variance around the mean; without this, PC1 points toward the data centroid, not the spread direction.\n2. **SVD.** Compute $X_c = U\\Sigma V^\\top$ via `np.linalg.svd(X_c, full_matrices=False)`. Columns of $V$ are the principal directions; $\\sigma_i^2/(n-1)$ is the variance along direction $i$.\n3. **Scree plot.** Compute explained ratios $e_i = \\sigma_i^2 / \\sum_j \\sigma_j^2$. Plot $e_i$ vs $i$; find the "elbow" where adding more components gives diminishing returns.\n4. **Choose $k$.** Keep the smallest $k$ satisfying $\\sum_{i=1}^k e_i \\geq 0.95$ (or another threshold). Fewer components = more compression; more = less reconstruction error.\n5. **Project and reconstruct.** Scores: $Z = X_c V_k$ ($n\\times k$). Reconstruction: $\\hat{X}_c = ZV_k^\\top$. Eckart-Young guarantees $\\|X_c - \\hat{X}_c\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$ — the minimum possible for rank-$k$ approximations.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 1 of 4 — Applications of Linear Algebra',
+        body: '**Chapter 7 (Numerical Methods):** QR, Cholesky, conditioning, stability, sparse matrices.\n**Chapter 8 (Applications), this chapter:** Where the math meets real problems.\n**This lesson:** PCA — eigenvalue decomposition of data covariance; dimensionality reduction.\n**Next:** Markov chains and PageRank — stationary distributions as eigenvectors.',
+      },
+      {
+        type: 'insight',
+        title: 'PCA Recipe',
+        body: '1. Mean-center: $X \\leftarrow X - \\bar{X}$\n2. SVD: $X = U\\Sigma V^\\top$ (columns of $V$ are principal components)\n3. Choose $k$ by explained variance: keep $\\sigma_1,\\ldots,\\sigma_k$\n4. Project: $Z = X V_k$ ($n \\times k$ score matrix)\n5. Reconstruct: $\\hat{X} = Z V_k^\\top$ (rank-$k$ approximation)\n\nVariance captured: $\\sum_{i=1}^k \\sigma_i^2 / \\sum_i \\sigma_i^2$',
+      },
+      {
+        type: 'insight',
+        title: 'Eckart-Young: SVD gives the best approximation',
+        body: 'The rank-$k$ approximation $X_k = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$ is the best rank-$k$ approximation of $X$ in both the 2-norm and Frobenius norm.\n\nError: $\\|X - X_k\\|_F = \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$\n\nNo other $k$-dimensional subspace captures more variance.',
       },
     ],
   },

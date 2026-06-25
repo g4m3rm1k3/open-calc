@@ -1,0 +1,41 @@
+<svg viewBox="0 0 320 212" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+  </style>
+  <rect width="320" height="212" rx="10" class="svg-bg"/>
+
+  <text x="160" y="16" font-size="10.5" class="svg-text" text-anchor="middle" font-weight="700">Real Schur form</text>
+  <text x="160" y="29" font-size="9.5" class="svg-muted" text-anchor="middle">1×1 blocks for real λ, 2×2 for complex pairs</text>
+
+  <!-- 4x4 grid: row/col 0 is 1x1 real block, rows/cols 1-2 are 2x2 complex block, row/col 3 is 1x1 real -->
+  <g transform="translate(60,34)">
+    <rect x="0" y="0" width="36" height="36" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.5"/>
+    <rect x="36" y="0" width="36" height="36" class="svg-cell" stroke-width="1"/>
+    <rect x="72" y="0" width="36" height="36" class="svg-cell" stroke-width="1"/>
+    <rect x="108" y="0" width="36" height="36" class="svg-cell" stroke-width="1"/>
+
+    <rect x="0" y="36" width="36" height="36" fill="#94a3b8" opacity="0.12" stroke="#64748b" stroke-width="0.8"/>
+    <rect x="36" y="36" width="72" height="72" fill="rgba(217,119,6,0.16)" stroke="#d97706" stroke-width="1.8"/>
+    <rect x="108" y="36" width="36" height="72" class="svg-cell" stroke-width="1"/>
+
+    <rect x="0" y="72" width="36" height="36" fill="#94a3b8" opacity="0.12" stroke="#64748b" stroke-width="0.8"/>
+
+    <rect x="0" y="108" width="36" height="36" fill="#94a3b8" opacity="0.12" stroke="#64748b" stroke-width="0.8"/>
+    <rect x="36" y="108" width="72" height="36" fill="#94a3b8" opacity="0.12" stroke="#64748b" stroke-width="0.8"/>
+    <rect x="108" y="108" width="36" height="36" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.5"/>
+
+    <text x="18" y="23" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">λ₁</text>
+    <text x="72" y="78" font-size="10.5" fill="#d97706" font-weight="700" text-anchor="middle">α ± iβ</text>
+    <text x="126" y="131" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">λ₄</text>
+  </g>
+
+  <text x="160" y="186" font-size="9.5" class="svg-muted" text-anchor="middle">gray = forced zero below the block diagonal</text>
+  <text x="160" y="199" font-size="9.5" class="svg-muted" text-anchor="middle">— orthogonally similar to A, real arithmetic only</text>
+</svg>

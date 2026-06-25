@@ -1,3 +1,6 @@
+import cgVsSteepestUrl from '../diagrams/la-cg-vs-steepest-descent.svg?url';
+import cgEigenvaluesUrl from '../diagrams/la-cg-distinct-eigenvalues.svg?url';
+
 export default {
   id: 'la9-002',
   slug: 'conjugate-gradient',
@@ -14,42 +17,29 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Where you are in the story: Jacobi and Gauss-Seidel showed that iteration can replace direct elimination, but both have a fundamental weakness — their convergence rate is controlled by a fixed spectral radius that you cannot easily change. For the 2D Poisson equation on an $n$-point grid, $\\rho_{GS} \\approx 1 - O(1/n)$, meaning you need $O(n)$ iterations to converge. Combined with $O(n)$ work per iteration, the total cost is $O(n^2)$ — barely better than LU for 2D problems and still hopeless for 3D. Conjugate Gradient breaks this barrier. It is not a stationary iteration at all; it is something conceptually different that achieves $O(\\sqrt{\\kappa(A)})$ iterations for any SPD system.',
       'The key insight starts with a geometric reinterpretation. For a symmetric positive definite matrix $A$, the linear system $A\\mathbf{x} = \\mathbf{b}$ is equivalent to minimizing a quadratic function: $f(\\mathbf{x}) = \\frac{1}{2}\\mathbf{x}^\\top A\\mathbf{x} - \\mathbf{b}^\\top\\mathbf{x}$. Since $A$ is positive definite, this function is strictly convex — it looks like a bowl in $n$ dimensions, with a unique minimum at exactly $\\mathbf{x}^* = A^{-1}\\mathbf{b}$. Solving the linear system is the same as finding the bottom of the bowl. Gradient-based optimization is suddenly on the table.',
       'The simplest strategy is steepest descent: at each step, compute the gradient $\\nabla f(\\mathbf{x}_k) = A\\mathbf{x}_k - \\mathbf{b} = -\\mathbf{r}_k$ (the negative residual), then take a step in the residual direction with the optimal step length. Steepest descent works, but it is famously inefficient — on an elongated bowl (large condition number), it zig-zags back and forth, making tiny progress per step. The problem is that consecutive steepest descent steps are always perpendicular to each other in the standard inner product, which forces you to keep revisiting the same directions.',
       'CG fixes this by choosing directions that are **$A$-conjugate**: $\\mathbf{d}_i^\\top A \\mathbf{d}_j = 0$ for $i \\neq j$. The $A$-inner product $\\langle \\mathbf{u}, \\mathbf{v} \\rangle_A = \\mathbf{u}^\\top A \\mathbf{v}$ is the natural geometry for this problem — it measures angles in the energy norm $\\|\\mathbf{x}\\|_A = \\sqrt{\\mathbf{x}^\\top A \\mathbf{x}}$. If you have $n$ mutually $A$-conjugate directions, you can decompose the entire space into $n$ independent components and minimize each one independently, reaching the exact solution in exactly $n$ steps. The magic of CG is that you can build these conjugate directions on-the-fly, one per iteration, using only the previous residual and direction — no storage of all past vectors needed.',
+      ] },
+      { type: 'image', src: cgVsSteepestUrl,
+        alt: 'An elongated elliptical contour bowl with a red zig-zagging steepest-descent path taking many short bouncing steps, versus a blue conjugate-gradient path reaching the center directly in two steps',
+        caption: 'Steepest descent keeps revisiting the same directions on an elongated bowl; CG never does — each step is conjugate to every step before it.' },
+      { type: 'prose', paragraphs: [
       'A concrete first step makes this tangible. Take $A = \\begin{bmatrix}4&1\\\\1&3\\end{bmatrix}$, $\\mathbf{b} = (9,7)^\\top$, start at $\\mathbf{x}_0 = (0,0)^\\top$. Residual $\\mathbf{r}_0 = (9,7)^\\top$. First direction $\\mathbf{d}_0 = \\mathbf{r}_0 = (9,7)^\\top$. Compute $A\\mathbf{d}_0 = (43,30)^\\top$. Optimal step: $\\alpha_0 = \\mathbf{r}_0^\\top\\mathbf{r}_0 / (\\mathbf{d}_0^\\top A\\mathbf{d}_0) = 130/597 \\approx 0.2178$. New iterate: $\\mathbf{x}_1 \\approx (1.960, 1.525)^\\top$. New residual: $\\mathbf{r}_1 = \\mathbf{r}_0 - \\alpha_0 A\\mathbf{d}_0 \\approx (-0.36, 0.47)^\\top$. Then CG constructs a new direction $\\mathbf{d}_1$ that is $A$-conjugate to $\\mathbf{d}_0$, and one more step reaches $\\mathbf{x}^* = (2, 5/3)^\\top$ exactly.',
       '**Predict before reading on:** In the 2×2 example, CG needed 2 steps for a $2 \\times 2$ system. Now suppose $A$ is $4 \\times 4$ with eigenvalues $\\{1, 1, 1, 100\\}$. Will CG need 4 steps (one per dimension), or something different? And what if the eigenvalues were $\\{1, 2, 3, 4\\}$ — four distinct values? What feature of the eigenvalue distribution controls the iteration count?',
       'The answer reveals CG\'s deepest property. CG converges in at most $m$ steps where $m$ is the number of **distinct eigenvalues** of $A$ — not the matrix size $n$. For the first case ($\\{1,1,1,100\\}$), there are only 2 distinct eigenvalues, so CG converges in 2 steps despite being a $4 \\times 4$ system. For $\\{1,2,3,4\\}$ with 4 distinct values, CG needs 4 steps. This explains why CG is so effective in practice: for matrices arising from discretizing smooth PDEs, eigenvalues naturally cluster, and CG exploits that clustering automatically. The search directions live in the **Krylov subspace** $\\mathcal{K}_k(A, \\mathbf{r}_0) = \\text{span}\\{\\mathbf{r}_0, A\\mathbf{r}_0, A^2\\mathbf{r}_0, \\ldots, A^{k-1}\\mathbf{r}_0\\}$ — the same subspace built by the Arnoldi process you will see in GMRES.',
+      ] },
+      { type: 'image', src: cgEigenvaluesUrl,
+        alt: 'Two number lines: one with eigenvalues 1,1,1,100 needing only 2 CG steps since there are 2 distinct values, another with eigenvalues 1,2,3,4 needing 4 steps since all four are distinct',
+        caption: 'CG converges in as many steps as there are distinct eigenvalues — clustered eigenvalues mean fast convergence regardless of matrix size.' },
+      { type: 'prose', paragraphs: [
       'The convergence rate is quantified by the condition number: $\\|\\mathbf{e}^{(k)}\\|_A \\leq 2\\left(\\frac{\\sqrt{\\kappa}-1}{\\sqrt{\\kappa}+1}\\right)^k \\|\\mathbf{e}^{(0)}\\|_A$ where $\\kappa = \\lambda_{\\max}/\\lambda_{\\min}$. To reduce error by $10^{-6}$, you need $k \\approx \\frac{1}{2}\\sqrt{\\kappa} \\cdot \\ln(2 \\times 10^6)$ iterations. For the 2D Poisson equation with $n = 10^6$ unknowns, $\\kappa = O(n^{2/3})$, so CG needs $O(n^{1/3})$ iterations — a massive improvement over the $O(n)$ needed by Gauss-Seidel. But the real unlock is preconditioning: if you can find a matrix $P \\approx A^{-1}$ that is cheap to apply, you can transform the system to have $\\kappa(PA) \\approx 1$, and CG on the preconditioned system converges in very few iterations.',
       'Where this is heading: the next lesson covers preconditioning in depth — how to build preconditioners that slash the condition number and make CG practical for the hardest problems. After that, GMRES generalizes the Krylov approach to non-symmetric matrices, where the energy norm no longer makes sense but the Krylov subspace idea still works. Together, preconditioned CG and GMRES are the algorithms that actually power the largest simulations in science and engineering today.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Apply the Conjugate Gradient Method (5 Steps)',
-        body: '1. **Verify $A$ is SPD.** Check $A = A^\\top$ and that all eigenvalues are positive (or that $A$ arises from a positive definite assembly). CG will diverge or produce nonsense if $A$ is not SPD.\n2. **Initialize.** Compute residual $\\mathbf{r}_0 = \\mathbf{b} - A\\mathbf{x}_0$ (use $\\mathbf{x}_0 = \\mathbf{0}$ if no better guess). Set direction $\\mathbf{d}_0 = \\mathbf{r}_0$. Store $\\rho_0 = \\mathbf{r}_0^\\top \\mathbf{r}_0$.\n3. **Compute step length.** One matrix-vector product: $\\mathbf{q} = A\\mathbf{d}_k$. Then $\\alpha_k = \\rho_k / (\\mathbf{d}_k^\\top \\mathbf{q})$. This is the EXACT minimizer of $f(\\mathbf{x}_k + \\alpha \\mathbf{d}_k)$ along direction $\\mathbf{d}_k$.\n4. **Update iterate and residual.** $\\mathbf{x}_{k+1} = \\mathbf{x}_k + \\alpha_k \\mathbf{d}_k$. $\\mathbf{r}_{k+1} = \\mathbf{r}_k - \\alpha_k \\mathbf{q}$. Reuse $\\mathbf{q}$ from step 3 — no extra matrix-vector product needed.\n5. **Update direction and loop.** $\\rho_{k+1} = \\mathbf{r}_{k+1}^\\top \\mathbf{r}_{k+1}$. $\\beta_k = \\rho_{k+1}/\\rho_k$. $\\mathbf{d}_{k+1} = \\mathbf{r}_{k+1} + \\beta_k \\mathbf{d}_k$. Stop when $\\sqrt{\\rho_{k+1}} < \\text{tol} \\cdot \\|\\mathbf{b}\\|$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 2 of 5 — Iterative Solvers & Preconditioning',
-        body: '**Previous (Lesson 1):** Jacobi and Gauss-Seidel — stationary iterations, matrix splitting, spectral radius convergence criterion.\n**This lesson:** Conjugate Gradient — Krylov subspace optimization, $A$-conjugate directions, $\\sqrt{\\kappa}$ convergence rate, eigenvalue clustering.\n**Next (Lesson 3):** GMRES — Krylov methods for non-symmetric systems via Arnoldi orthogonalization.',
-      },
-      {
-        type: 'theorem',
-        title: 'Conjugate Gradient Optimality',
-        body: 'The $k$-th CG iterate $\\mathbf{x}_k$ satisfies:\n$\\mathbf{x}_k = \\arg\\min_{\\mathbf{x} \\in \\mathbf{x}_0 + \\mathcal{K}_k} \\|\\mathbf{x} - \\mathbf{x}^*\\|_A$\n\n(Minimizes energy norm error over the $k$-th Krylov subspace.)\n\nFinite termination: in exact arithmetic, CG finds the exact solution in at most $n$ steps (and fewer if eigenvalues cluster).',
-      },
-      {
-        type: 'insight',
-        title: 'Eigenvalue Clustering Speeds CG',
-        body: 'CG converges in $m$ steps if the matrix has at most $m$ distinct eigenvalues.\n\nIf eigenvalues cluster into $m$ groups (even approximately), CG converges in roughly $m$ steps.\n\nThis is why **preconditioning** helps: a preconditioner $M \\approx A^{-1}$ transforms the system so eigenvalues cluster near 1, drastically reducing $\\kappa$ and the number of iterations.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Conjugate Gradient in Python',
         mathBridge: 'Implement CG from scratch and verify that convergence depends on eigenvalue distribution, not matrix size.',
         caption: 'A matrix with $m$ distinct eigenvalues converges in $m$ CG steps — independent of $n$.',
@@ -166,8 +156,7 @@ print("\\nConclusion: CG iteration count = number of DISTINCT eigenvalues, not m
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Conjugate Gradient Implementation',
         mathBridge: 'Implement CG from scratch and verify convergence rate.',
         caption: 'CG minimizes the energy norm error optimally over Krylov subspaces.',
@@ -259,6 +248,28 @@ disp('sqrt(kappa) heuristic:')
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Apply the Conjugate Gradient Method (5 Steps)',
+        body: '1. **Verify $A$ is SPD.** Check $A = A^\\top$ and that all eigenvalues are positive (or that $A$ arises from a positive definite assembly). CG will diverge or produce nonsense if $A$ is not SPD.\n2. **Initialize.** Compute residual $\\mathbf{r}_0 = \\mathbf{b} - A\\mathbf{x}_0$ (use $\\mathbf{x}_0 = \\mathbf{0}$ if no better guess). Set direction $\\mathbf{d}_0 = \\mathbf{r}_0$. Store $\\rho_0 = \\mathbf{r}_0^\\top \\mathbf{r}_0$.\n3. **Compute step length.** One matrix-vector product: $\\mathbf{q} = A\\mathbf{d}_k$. Then $\\alpha_k = \\rho_k / (\\mathbf{d}_k^\\top \\mathbf{q})$. This is the EXACT minimizer of $f(\\mathbf{x}_k + \\alpha \\mathbf{d}_k)$ along direction $\\mathbf{d}_k$.\n4. **Update iterate and residual.** $\\mathbf{x}_{k+1} = \\mathbf{x}_k + \\alpha_k \\mathbf{d}_k$. $\\mathbf{r}_{k+1} = \\mathbf{r}_k - \\alpha_k \\mathbf{q}$. Reuse $\\mathbf{q}$ from step 3 — no extra matrix-vector product needed.\n5. **Update direction and loop.** $\\rho_{k+1} = \\mathbf{r}_{k+1}^\\top \\mathbf{r}_{k+1}$. $\\beta_k = \\rho_{k+1}/\\rho_k$. $\\mathbf{d}_{k+1} = \\mathbf{r}_{k+1} + \\beta_k \\mathbf{d}_k$. Stop when $\\sqrt{\\rho_{k+1}} < \\text{tol} \\cdot \\|\\mathbf{b}\\|$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 2 of 5 — Iterative Solvers & Preconditioning',
+        body: '**Previous (Lesson 1):** Jacobi and Gauss-Seidel — stationary iterations, matrix splitting, spectral radius convergence criterion.\n**This lesson:** Conjugate Gradient — Krylov subspace optimization, $A$-conjugate directions, $\\sqrt{\\kappa}$ convergence rate, eigenvalue clustering.\n**Next (Lesson 3):** GMRES — Krylov methods for non-symmetric systems via Arnoldi orthogonalization.',
+      },
+      {
+        type: 'theorem',
+        title: 'Conjugate Gradient Optimality',
+        body: 'The $k$-th CG iterate $\\mathbf{x}_k$ satisfies:\n$\\mathbf{x}_k = \\arg\\min_{\\mathbf{x} \\in \\mathbf{x}_0 + \\mathcal{K}_k} \\|\\mathbf{x} - \\mathbf{x}^*\\|_A$\n\n(Minimizes energy norm error over the $k$-th Krylov subspace.)\n\nFinite termination: in exact arithmetic, CG finds the exact solution in at most $n$ steps (and fewer if eigenvalues cluster).',
+      },
+      {
+        type: 'insight',
+        title: 'Eigenvalue Clustering Speeds CG',
+        body: 'CG converges in $m$ steps if the matrix has at most $m$ distinct eigenvalues.\n\nIf eigenvalues cluster into $m$ groups (even approximately), CG converges in roughly $m$ steps.\n\nThis is why **preconditioning** helps: a preconditioner $M \\approx A^{-1}$ transforms the system so eigenvalues cluster near 1, drastically reducing $\\kappa$ and the number of iterations.',
       },
     ],
   },

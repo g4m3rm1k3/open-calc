@@ -1,3 +1,6 @@
+import cofactorMinorUrl from '../diagrams/la-cofactor-minor.svg?url'
+import sarrusRuleUrl from '../diagrams/la-sarrus-rule.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-005',
@@ -24,21 +27,45 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Expand $\\det\\begin{bmatrix}1&2&3\\\\4&5&6\\\\7&8&9\\end{bmatrix}$ along row 1: $1\\cdot\\det\\begin{bmatrix}5&6\\\\8&9\\end{bmatrix} - 2\\cdot\\det\\begin{bmatrix}4&6\\\\7&9\\end{bmatrix} + 3\\cdot\\det\\begin{bmatrix}4&5\\\\7&8\\end{bmatrix}$. The three $2\\times 2$ determinants: $(45-48)=-3$, $(36-42)=-6$, $(32-35)=-3$. Total: $1(-3)-2(-6)+3(-3) = -3+12-9 = 0$. Zero — space collapses. Notice: row 3 = row 1 + row 2. Dependent rows ALWAYS give $\\det = 0$. The pattern for $3\\times 3$ (expand along a row, peel off $2\\times 2$ minors) extends the $ad-bc$ idea to any size matrix.',
       'The key insight is: **a 3×3 determinant can be reduced to a sum of three 2×2 determinants**. Pick any row or column. Multiply each entry by the determinant of the "leftover" 2×2 matrix you get by deleting that entry\'s row and column. Apply a checkerboard of plus and minus signs. Add everything up. This is called **cofactor expansion**.',
       '**Before cofactor expansion makes sense, two terms must be defined:**',
       '**Minor $M_{ij}$** — For the entry at row $i$, column $j$, delete that entire row and that entire column from the matrix. The determinant of what remains is the minor $M_{ij}$. For a 3×3 matrix, each minor is a 2×2 determinant you already know how to compute.',
       '**Cofactor $C_{ij}$** — The cofactor attaches a sign to the minor based on position. The sign is $(-1)^{i+j}$. This creates a checkerboard pattern across the matrix: corners get $+$, their neighbors get $-$, then $+$ again, alternating like a chess board. So $C_{ij} = (-1)^{i+j} M_{ij}$.',
       '**Cofactor expansion** — To compute $\\det(A)$, pick any row (say row 1). Multiply each entry $a_{1j}$ by its cofactor $C_{1j}$, then add all three results. You can also expand along any column — you get the same determinant regardless of which row or column you choose. This gives you a strategic choice: **always expand along the row or column with the most zeros**, since each zero entry contributes nothing to the sum and eliminates one 2×2 computation.',
+      ] },
+      { type: 'image', src: cofactorMinorUrl,
+        alt: 'A 3x3 matrix grid with row 1 and column 1 grayed out as deleted, the remaining 2x2 minor M11 boxed in blue, and a checkerboard of plus and minus signs shown as a legend',
+        caption: 'Cofactor expansion peels off one row and one column at a time, sign-checkered, down to a 2×2 you already know.' },
+      { type: 'prose', paragraphs: [
       'Beyond the formula, determinants obey a set of **algebraic properties** that each have a geometric meaning:',
       '• **Row swap**: Flipping two rows flips the orientation of the space. The determinant changes sign. Two swaps cancel, restoring the original sign.',
       '• **Row scaling**: If you double one row, you double the "height" of the parallelepiped in that direction. Volume doubles. Determinant scales by the same factor.',
       '• **Row replacement**: Adding a multiple of one row to another row is a shear — it does not change volume. Determinant is unchanged. This is the most important property for computation.',
       '• **Triangular matrices**: All the volume information lives on the diagonal. $\\det = $ product of diagonal entries — no cofactor expansion needed.',
       '• **$\\det(AB) = \\det(A) \\cdot \\det(B)$**: If $A$ scales volume by 3 and $B$ scales it by 2, composing them scales by 6. This is the most important property for theory.',
+      ] },
+      { type: 'image', src: sarrusRuleUrl,
+        alt: 'A 3 by 5 grid with the first two columns repeated, showing three green diagonals going down-right summed and three red diagonals going down-left subtracted, the classic Sarrus rule pattern for a 3x3 determinant',
+        caption: "Sarrus's rule: a fast 3×3-only shortcut — three diagonals summed, three subtracted. It does not generalize to 4×4." },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on.** If you double row 2 of a $3\\times 3$ matrix $A$, what happens to $\\det(A)$? If you swap rows 1 and 2? Write your guesses, then verify with the Seven Properties callout.',
       '**Where this is heading:** The next lesson (LU Decomposition) is Gaussian elimination tracked as a product of matrices. Because row replacements do not change the determinant, the LU process computes $\\det(A)$ as a free byproduct — just the product of the diagonal of $U$, adjusted for any row swaps.',
+      ] },
+      { type: 'viz', id: 'DeterminantGeometricViz',
+        title: 'Determinant as Signed Parallelogram Area — Draggable',
+        mathBridge: 'Drag the red vector tip (v₁) and blue vector tip (v₂) to reshape the parallelogram. The |det| updates live inside the shape. When v₂ is counterclockwise from v₁ the determinant is positive (green); clockwise makes it negative (red). Drag them to be parallel to see det = 0 — the parallelogram collapses to a line, the matrix is singular.',
+        caption: 'The sign of the determinant encodes orientation — positive means counterclockwise, negative means the coordinate system has been flipped.' },
+      { type: 'viz', id: 'LALesson06_Inverses',
+        title: 'Determinant as Volume Scaling',
+        mathBridge: 'The yellow shape starts as the unit square (area = 1). Watch the determinant value as you adjust the matrix entries. The key insight extends to 3×3: the determinant is the signed volume of the parallelepiped formed by the three column vectors. A determinant of 2 means volumes double. A determinant of 0 means the three column vectors are coplanar and volume collapses to zero — space is irreversibly flattened.',
+        caption: 'The determinant measures signed volume scaling.' },
+      { type: 'viz', id: 'LALinearAlgebraRealWorld',
+        title: 'Linear Algebra in the Real World — Applied Module',
+        mathBridge: 'A six-tab applied module spanning chapters 1 and 2: Systems→CNC shows two sensor equations as intersecting lines and computes the tool position via RREF; Matrices→Graphics applies rotation/scale/shear to a 2D shape and displays the combined matrix T with det(T); Vectors→Forces decomposes two cable tensions into a linear system and solves for T₁ and T₁; Dot→Normals shows how the dot product controls surface brightness and cutting-tool contact angle; Det→Area/Vol draws the parallelogram spanned by two vectors and shows area = |det|; Practice has five hand-calculation problems with real manufacturing context.',
+        caption: 'The five core tools of linear algebra — systems, matrices, vectors, dot products, determinants — each doing real engineering work.' },
     ],
     callouts: [
       {
@@ -70,26 +97,6 @@ export default {
         type: 'warning',
         title: 'Career Signal',
         body: 'Computing 3×3 determinants by cofactor expansion is on every linear algebra exam and in many interviews. Interviewers also ask: "What does a zero determinant mean geometrically?" and "What property does det(AB) satisfy?" Both follow directly from what you are learning now. Knowing the answers cold — not just having computed one before — is what separates someone who took linear algebra from someone who understands it.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'DeterminantGeometricViz',
-        title: 'Determinant as Signed Parallelogram Area — Draggable',
-        mathBridge: 'Drag the red vector tip (v₁) and blue vector tip (v₂) to reshape the parallelogram. The |det| updates live inside the shape. When v₂ is counterclockwise from v₁ the determinant is positive (green); clockwise makes it negative (red). Drag them to be parallel to see det = 0 — the parallelogram collapses to a line, the matrix is singular.',
-        caption: 'The sign of the determinant encodes orientation — positive means counterclockwise, negative means the coordinate system has been flipped.',
-      },
-      {
-        id: 'LALesson06_Inverses',
-        title: 'Determinant as Volume Scaling',
-        mathBridge: 'The yellow shape starts as the unit square (area = 1). Watch the determinant value as you adjust the matrix entries. The key insight extends to 3×3: the determinant is the signed volume of the parallelepiped formed by the three column vectors. A determinant of 2 means volumes double. A determinant of 0 means the three column vectors are coplanar and volume collapses to zero — space is irreversibly flattened.',
-        caption: 'The determinant measures signed volume scaling.',
-      },
-      {
-        id: 'LALinearAlgebraRealWorld',
-        title: 'Linear Algebra in the Real World — Applied Module',
-        mathBridge: 'A six-tab applied module spanning chapters 1 and 2: Systems→CNC shows two sensor equations as intersecting lines and computes the tool position via RREF; Matrices→Graphics applies rotation/scale/shear to a 2D shape and displays the combined matrix T with det(T); Vectors→Forces decomposes two cable tensions into a linear system and solves for T₁ and T₁; Dot→Normals shows how the dot product controls surface brightness and cutting-tool contact angle; Det→Area/Vol draws the parallelogram spanned by two vectors and shows area = |det|; Practice has five hand-calculation problems with real manufacturing context.',
-        caption: 'The five core tools of linear algebra — systems, matrices, vectors, dot products, determinants — each doing real engineering work.',
       },
     ],
   },

@@ -1,3 +1,6 @@
+import functionalMachineUrl from '../diagrams/la-linear-functional-machine.svg?url';
+import dualDoubleDualUrl from '../diagrams/la-dual-double-dual.svg?url';
+
 export default {
   id: 'la10-001',
   slug: 'dual-spaces',
@@ -14,42 +17,29 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Where you are in the story: for nine chapters you have worked with vectors as columns of numbers, matrices as grids of numbers, and linear maps as matrix multiplications. This has been powerful, but it has obscured something subtle. When you write $\\mathbf{a}^\\top \\mathbf{x}$ — a row vector times a column vector — you are doing something conceptually different from $\\mathbf{a}^\\top$ times $\\mathbf{x}$: you are applying a function to a vector. The row vector is not a vector; it is a **linear functional** — a machine that eats a vector and produces a scalar. Chapter 10 lifts the entire subject into the abstract setting where this distinction becomes precise and powerful.',
       'Start with a concrete linear functional. Let $V = \\mathbb{R}^2$ and define $f(x,y) = 3x - 2y$. Check that $f$ is linear: $f(u+v) = f(u)+f(v)$ and $f(cv) = cf(v)$ both hold. The function $f$ takes a 2D vector and produces a single number. There are infinitely many such functions — one for each choice of coefficients $(a,b)$ in $f(x,y) = ax+by$. The collection of all linear functionals $V \\to \\mathbb{R}$ is itself a vector space, called the **dual space** $V^*$, with addition $(f+g)(v) = f(v)+g(v)$ and scalar multiplication $(cf)(v) = c f(v)$. A fundamental theorem: $\\dim V^* = \\dim V$.',
+      ] },
+      { type: 'image', src: functionalMachineUrl,
+        alt: 'A vector (1,1) flowing into a box labeled f(x,y) = 3x - 2y, producing the scalar output 1',
+        caption: 'A functional is a machine: feed it a vector, it returns one number — never another vector.' },
+      { type: 'prose', paragraphs: [
       'Every basis $\\{\\mathbf{e}_1, \\ldots, \\mathbf{e}_n\\}$ of $V$ has a corresponding **dual basis** $\\{e^1, \\ldots, e^n\\}$ of $V^*$ defined by $e^i(\\mathbf{e}_j) = \\delta^i_j$ (1 if $i=j$, 0 otherwise). For the standard basis of $\\mathbb{R}^2$: $e^1(x,y) = x$ (picks out the first component) and $e^2(x,y) = y$ (picks out the second). Any functional decomposes as $f = f(\\mathbf{e}_1)\\, e^1 + f(\\mathbf{e}_2)\\, e^2 + \\cdots$. So $f(x,y) = 3x-2y$ becomes $f = 3\\cdot e^1 + (-2)\\cdot e^2$ — the coefficients of $f$ in the dual basis are exactly the values of $f$ on the primal basis vectors.',
       'Now the reason for row vs column vectors becomes precise. A column vector $\\mathbf{x} \\in \\mathbb{R}^n$ represents a point in the original space $V$. A row vector $\\mathbf{a}^\\top$ represents an element of $V^*$ — a linear functional. The product $\\mathbf{a}^\\top \\mathbf{x}$ is the application of the functional $\\mathbf{a}^\\top$ to the vector $\\mathbf{x}$, producing a scalar. This is not just a notational distinction — it explains why the transpose arises so naturally. In physics, "bra" vectors $\\langle \\phi |$ live in the dual space; "ket" vectors $|\\psi\\rangle$ live in the original space; and the inner product $\\langle \\phi | \\psi \\rangle$ is a functional applied to a vector.',
       '**Predict before reading on:** Let $B = \\{\\mathbf{b}_1 = (1,1), \\mathbf{b}_2 = (1,-1)\\}$ be a basis of $\\mathbb{R}^2$. The dual basis vector $e^1_B$ must satisfy $e^1_B(\\mathbf{b}_1) = 1$ and $e^1_B(\\mathbf{b}_2) = 0$. If $e^1_B(x,y) = ax + by$, what are $a$ and $b$? Set up the equations and solve before reading on.',
       'The system $a + b = 1$, $a - b = 0$ gives $a = b = 1/2$, so $e^1_B(x,y) = \\frac{x+y}{2}$. In matrix language: if $B$ is the matrix with $\\mathbf{b}_1, \\mathbf{b}_2$ as columns, then the dual basis vectors are the rows of $B^{-1}$. This is the computational way to find dual bases: $\\text{dual\\_basis} = (B^{-1})^\\top$, whose rows are the dual basis vectors. Verification: $(B^{-1})^\\top B$ should be the identity — the Kronecker delta condition in matrix form.',
       'The **dual map** (or transpose) has a beautiful coordinate-free definition. If $T: V \\to W$ is linear, its dual map $T^*: W^* \\to V^*$ is defined by $(T^* g)(\\mathbf{v}) = g(T\\mathbf{v})$ — pre-compose with $T$. In matrix coordinates, if $T$ has matrix $A$, then $T^*$ has matrix $A^\\top$. This is the abstract definition of the transpose: not "flip along the diagonal" but "precompose the output functionals with $T$". The fundamental identity $\\langle T\\mathbf{v}, g \\rangle = \\langle \\mathbf{v}, T^*g \\rangle$ (where $\\langle \\cdot, \\cdot \\rangle$ is the dual pairing $g(\\mathbf{v})$) is the abstract adjoint relation that unifies the transpose, the Hermitian conjugate, and the adjoint operator in functional analysis.',
       'The **double dual** $V^{**} = (V^*)^*$ is the space of linear functionals on $V^*$. There is a natural map $\\iota: V \\to V^{**}$ defined by $\\iota(\\mathbf{v})(f) = f(\\mathbf{v})$ — a vector $\\mathbf{v}$ defines a functional on $V^*$ by evaluating each $f$ at $\\mathbf{v}$. For finite-dimensional $V$, this map is an isomorphism: $V \\cong V^{**}$. The word "natural" here is technical and important — the isomorphism $V \\cong V^*$ requires choosing an inner product (not natural), but $V \\cong V^{**}$ requires no extra structure at all. This is the first hint of category theory: isomorphisms that are "natural" in a precise sense.',
+      ] },
+      { type: 'image', src: dualDoubleDualUrl,
+        alt: 'Three circles labeled V, V star, and V double-star, with a dashed arrow from V to V star requiring an inner product, and a solid green natural arrow from V directly to V double-star',
+        caption: 'V ≅ V* requires choosing extra structure (an inner product); V ≅ V** is canonical — it needs nothing beyond V itself.' },
+      { type: 'prose', paragraphs: [
       'Where this is heading: the next lesson extends scalar-valued linear functionals to multilinear maps on multiple copies of $V$ and $V^*$ — that is, tensors. Tensors are how the dual space perspective on vectors naturally generalizes: stress tensors in mechanics, metric tensors in relativity, and the curvature tensor in differential geometry are all multilinear maps built from copies of $V$ and $V^*$. The abstract formalism you are building now is the foundation for all of it.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Find the Dual Basis and Apply the Dual Map (4 Steps)',
-        body: '1. **Write the Kronecker delta conditions.** For each dual basis vector $e^i$, require $e^i(\\mathbf{b}_j) = \\delta^i_j$ — equals 1 if $i=j$, else 0. Write $e^i(\\mathbf{x}) = a_1 x_1 + \\cdots + a_n x_n$ with unknowns $a_1, \\ldots, a_n$.\n2. **Solve the linear system.** Substituting each basis vector $\\mathbf{b}_j$ gives $n$ equations in $n$ unknowns. This is equivalent to solving $B^\\top \\mathbf{a} = \\mathbf{e}_i$ where $B$ has columns $\\mathbf{b}_j$. Equivalently, the dual basis vectors are the rows of $B^{-1}$.\n3. **Express any functional in the dual basis.** For $f \\in V^*$, compute its coordinates by evaluating $f$ on each primal basis vector: $f = f(\\mathbf{b}_1)\\, e^1 + \\cdots + f(\\mathbf{b}_n)\\, e^n$.\n4. **Apply the dual map.** If $T: V \\to W$ has matrix $A$, the dual map $T^*: W^* \\to V^*$ sends $g \\mapsto g \\circ T$. In coordinates: represent $g$ as a row vector $\\mathbf{g}^\\top$; then $T^*(g)$ has row vector $\\mathbf{g}^\\top A = (A^\\top \\mathbf{g})^\\top$. The matrix of $T^*$ is $A^\\top$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 1 of 5 — Advanced Theory',
-        body: '**Previous (Chapter 9):** Iterative Solvers — Jacobi, CG, GMRES, preconditioning, sparse direct solvers.\n**This lesson:** Dual Spaces — linear functionals, dual basis, row vectors as covectors, dual map = transpose, double dual.\n**Next (Lesson 2):** Tensor Products — multilinear maps, tensor algebra, Kronecker product in computation.',
-      },
-      {
-        type: 'theorem',
-        title: 'Dual Basis Theorem',
-        body: 'If $\\{\\mathbf{e}_1, \\ldots, \\mathbf{e}_n\\}$ is a basis of $V$, there exists a unique dual basis $\\{\\mathbf{e}^1, \\ldots, \\mathbf{e}^n\\}$ of $V^*$ satisfying $\\mathbf{e}^i(\\mathbf{e}_j) = \\delta^i_j$.\n\nEvery $f \\in V^*$ can be written $f = \\sum_i f(\\mathbf{e}_i)\\mathbf{e}^i$.\n\n$\\dim V = \\dim V^*$ (for finite-dimensional $V$).',
-      },
-      {
-        type: 'insight',
-        title: 'Transpose as the Dual Map',
-        body: 'If $T: V \\to W$ is linear, the **dual map** (transpose) $T^*: W^* \\to V^*$ is defined by $T^*(g) = g \\circ T$ (pre-compose with $T$).\n\nIn matrix terms: if $T$ has matrix $A$, then $T^*$ has matrix $A^\\top$. This is the coordinate-free definition of the transpose.\n\nKey identity: $\\langle T\\mathbf{v}, \\mathbf{w}^* \\rangle = \\langle \\mathbf{v}, T^*\\mathbf{w}^* \\rangle$ (adjoint relation).',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Dual Spaces in Python',
         mathBridge: 'Compute dual bases, verify the Kronecker delta property, and confirm that the matrix transpose is the dual map.',
         caption: 'Dual basis = rows of $B^{-1}$; the transpose is not a coincidence — it is the coordinate expression of the dual map.',
@@ -149,8 +139,7 @@ print("\\nConclusion: transpose is not an accident — it IS the dual map in coo
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Dual Basis and Linear Functionals',
         mathBridge: 'Compute dual basis vectors and verify the Kronecker delta property.',
         caption: 'Dual basis picks out coordinates: $e^i(e_j) = \\delta^i_j$.',
@@ -214,6 +203,28 @@ disp('Adjoint check: (Av)^T w = v^T (A^T w):')
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Find the Dual Basis and Apply the Dual Map (4 Steps)',
+        body: '1. **Write the Kronecker delta conditions.** For each dual basis vector $e^i$, require $e^i(\\mathbf{b}_j) = \\delta^i_j$ — equals 1 if $i=j$, else 0. Write $e^i(\\mathbf{x}) = a_1 x_1 + \\cdots + a_n x_n$ with unknowns $a_1, \\ldots, a_n$.\n2. **Solve the linear system.** Substituting each basis vector $\\mathbf{b}_j$ gives $n$ equations in $n$ unknowns. This is equivalent to solving $B^\\top \\mathbf{a} = \\mathbf{e}_i$ where $B$ has columns $\\mathbf{b}_j$. Equivalently, the dual basis vectors are the rows of $B^{-1}$.\n3. **Express any functional in the dual basis.** For $f \\in V^*$, compute its coordinates by evaluating $f$ on each primal basis vector: $f = f(\\mathbf{b}_1)\\, e^1 + \\cdots + f(\\mathbf{b}_n)\\, e^n$.\n4. **Apply the dual map.** If $T: V \\to W$ has matrix $A$, the dual map $T^*: W^* \\to V^*$ sends $g \\mapsto g \\circ T$. In coordinates: represent $g$ as a row vector $\\mathbf{g}^\\top$; then $T^*(g)$ has row vector $\\mathbf{g}^\\top A = (A^\\top \\mathbf{g})^\\top$. The matrix of $T^*$ is $A^\\top$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 1 of 5 — Advanced Theory',
+        body: '**Previous (Chapter 9):** Iterative Solvers — Jacobi, CG, GMRES, preconditioning, sparse direct solvers.\n**This lesson:** Dual Spaces — linear functionals, dual basis, row vectors as covectors, dual map = transpose, double dual.\n**Next (Lesson 2):** Tensor Products — multilinear maps, tensor algebra, Kronecker product in computation.',
+      },
+      {
+        type: 'theorem',
+        title: 'Dual Basis Theorem',
+        body: 'If $\\{\\mathbf{e}_1, \\ldots, \\mathbf{e}_n\\}$ is a basis of $V$, there exists a unique dual basis $\\{\\mathbf{e}^1, \\ldots, \\mathbf{e}^n\\}$ of $V^*$ satisfying $\\mathbf{e}^i(\\mathbf{e}_j) = \\delta^i_j$.\n\nEvery $f \\in V^*$ can be written $f = \\sum_i f(\\mathbf{e}_i)\\mathbf{e}^i$.\n\n$\\dim V = \\dim V^*$ (for finite-dimensional $V$).',
+      },
+      {
+        type: 'insight',
+        title: 'Transpose as the Dual Map',
+        body: 'If $T: V \\to W$ is linear, the **dual map** (transpose) $T^*: W^* \\to V^*$ is defined by $T^*(g) = g \\circ T$ (pre-compose with $T$).\n\nIn matrix terms: if $T$ has matrix $A$, then $T^*$ has matrix $A^\\top$. This is the coordinate-free definition of the transpose.\n\nKey identity: $\\langle T\\mathbf{v}, \\mathbf{w}^* \\rangle = \\langle \\mathbf{v}, T^*\\mathbf{w}^* \\rangle$ (adjoint relation).',
       },
     ],
   },

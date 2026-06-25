@@ -1,3 +1,7 @@
+import choleskyBowlUrl from '../diagrams/la-cholesky-bowl.svg?url';
+import choleskyGridUrl from '../diagrams/la-cholesky-factorization-grid.svg?url';
+import svdCircleEllipseUrl from '../diagrams/la-svd-circle-ellipse.svg?url';
+
 export default {
   id: 'la7-002',
   slug: 'cholesky-decomposition',
@@ -14,53 +18,37 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       '**Where you are in the story.** The last lesson showed that QR decomposition turns least squares into a well-conditioned triangular solve. But QR works for any matrix. When your matrix is symmetric and positive definite — a covariance matrix, a stiffness matrix, a kernel matrix — you can do far better. Cholesky decomposition is the purpose-built algorithm for this case: twice as fast as LU, half the storage, and it tells you whether your matrix is actually positive definite as a free bonus.',
 
       '**What positive definite actually means, concretely.** Say $A = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$. For any vector $\\mathbf{x} = (x_1, x_2)^\\top$, the quadratic form $\\mathbf{x}^\\top A \\mathbf{x} = 4x_1^2 + 4x_1x_2 + 3x_2^2$. Pick any nonzero $\\mathbf{x}$ you like — this expression is always positive. That is positive definiteness: the matrix "curves upward" in every direction, like a bowl. Negative eigenvalues would create directions where the bowl curves downward. Zero eigenvalues would create flat directions. Positive definiteness rules both out, and that is why Cholesky works: it never encounters a negative number under a square root.',
-
+      ] },
+      { type: 'image', src: choleskyBowlUrl,
+        alt: 'A bowl-shaped curve representing the quadratic form x-transpose A x, with a unique minimum at the origin',
+        caption: 'Positive definite means the quadratic form curves upward in every direction — a bowl with one minimum, never a saddle.' },
+      { type: 'prose', paragraphs: [
       '**The idea: A is a perfect square.** The Cholesky factorization $A = LL^\\top$ says the matrix $A$ is a perfect square of a lower triangular matrix. Think of it as a matrix analogue of $a = (\\sqrt{a})^2$ for positive real numbers. The positivity of $A$ (all eigenvalues positive) is exactly the condition that makes this square root exist. The triangular structure of $L$ makes the factorization unique (given positive diagonal) and efficient to compute.',
 
       '**Walk through the algorithm on a 2×2 example.** $A = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$. You want $L = \\begin{bmatrix}l_{11}&0\\\\l_{21}&l_{22}\\end{bmatrix}$ with $LL^\\top = A$. Matching the $(1,1)$ entry: $l_{11}^2 = 4$, so $l_{11} = 2$. Matching the $(2,1)$ entry: $l_{21} \\cdot l_{11} = 2$, so $l_{21} = 2/2 = 1$. Matching the $(2,2)$ entry: $l_{21}^2 + l_{22}^2 = 3$, so $l_{22} = \\sqrt{3-1} = \\sqrt{2}$. Check: $LL^\\top = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&\\sqrt{2}\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$ ✓. The algorithm is just arithmetic — no eigenvalues needed.',
-
+      ] },
+      { type: 'image', src: choleskyGridUrl,
+        alt: 'Matrix grid showing A factored as L times L-transpose, with L lower triangular and L-transpose its upper triangular mirror, zero entries highlighted',
+        caption: 'A = LLᵗ stores only the lower triangle — half the numbers of LU, and no row swaps are ever needed.' },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on.** For $A = \\begin{bmatrix}9&3\\\\3&2\\end{bmatrix}$, what is $l_{11}$, the first diagonal entry of the Cholesky factor? Write your answer before looking at Example 2.',
 
       '**Solving systems with Cholesky.** Once you have $A = LL^\\top$, solving $A\\mathbf{x} = \\mathbf{b}$ costs $O(n^2)$ — you do two triangular solves. First forward substitution: $L\\mathbf{y} = \\mathbf{b}$. Then back substitution: $L^\\top\\mathbf{x} = \\mathbf{y}$. This is faster than the general LU approach, and numerically at least as stable (SPD matrices are well-behaved — pivoting is never needed).',
 
       '**The covariance matrix application.** In statistics and machine learning, covariance matrices are the most common SPD matrices you encounter. Fitting a Gaussian process, sampling from a multivariate normal, computing a Mahalanobis distance — all require factoring the covariance matrix $\\Sigma$. The Cholesky factor $L$ (where $\\Sigma = LL^\\top$) is used to generate correlated random samples: if $\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, I)$, then $L\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, \\Sigma)$. This is how NumPy\'s `np.random.multivariate_normal` works internally.',
-
+      ] },
+      { type: 'image', src: svdCircleEllipseUrl,
+        alt: 'A unit circle of independent samples on the left, transformed by L into a correlated elliptical cloud on the right',
+        caption: 'L bends an independent, circular cloud of samples into a correlated, elliptical one with covariance Σ = LLᵗ.' },
+      { type: 'prose', paragraphs: [
       '**Where this is heading.** Cholesky is numerically ideal when you know $A$ is SPD. But what if you only suspect it might be, or what if near-zero eigenvalues make the factorization marginal? That is the topic of the next two lessons: matrix norms and condition numbers tell you how sensitive a factorization is to perturbations, and numerical stability analysis tells you when to trust your computed answers.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Compute the Cholesky Factor Column by Column (4 Steps)',
-        body: '**Given:** An $n \\times n$ symmetric positive definite matrix $A$.\n**Step 1.** For each column $j = 1, \\ldots, n$, compute the diagonal entry: $l_{jj} = \\sqrt{a_{jj} - \\sum_{k=1}^{j-1} l_{jk}^2}$. If the quantity under the square root is $\\leq 0$, stop — $A$ is not positive definite.\n**Step 2.** For each row $i = j+1, \\ldots, n$, compute the subdiagonal entry: $l_{ij} = \\bigl(a_{ij} - \\sum_{k=1}^{j-1} l_{ik} l_{jk}\\bigr) \\big/ l_{jj}$.\n**Step 3.** Set all entries above the diagonal to zero: $l_{ij} = 0$ for $i < j$.\n**Step 4.** Assemble $L$ and verify: compute $LL^\\top$ and confirm it equals $A$ (spot-check 2–3 entries).',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 2 of 7 — Numerical Linear Algebra',
-        body: '**Previous (Lesson 1):** QR decomposition — orthonormal basis, least squares, condition number $\\kappa(A)$ vs $\\kappa(A)^2$.\n**This lesson:** Cholesky — the fast, stable factorization for symmetric positive definite matrices. Connection: $A^\\top A = R^\\top R$ links QR and Cholesky.\n**Next (Lesson 3):** Matrix norms and condition numbers — quantifying sensitivity of factorizations.',
-      },
-      {
-        type: 'theorem',
-        title: 'Cholesky Existence and Uniqueness',
-        body: '$A$ has a Cholesky factorization $A = LL^\\top$ (with $L$ lower triangular, positive diagonal) iff $A$ is symmetric positive definite (SPD).\n\n**Consequence:** you can test if $A$ is SPD by attempting Cholesky — if it succeeds, $A$ is SPD; if the algorithm encounters a non-positive pivot, it is not.',
-      },
-      {
-        type: 'insight',
-        title: 'Cholesky for Sampling Normals',
-        body: 'To sample $\\mathbf{z} \\sim \\mathcal{N}(\\boldsymbol{\\mu}, \\Sigma)$:\n1. Compute Cholesky $\\Sigma = LL^\\top$\n2. Sample $\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, I)$ (independent standard normals)\n3. Return $\\mathbf{z} = \\boldsymbol{\\mu} + L\\mathbf{w}$\n\nCovariance of $L\\mathbf{w}$ = $L \\cdot I \\cdot L^\\top = LL^\\top = \\Sigma$ ✓',
-      },
-      {
-        type: 'insight',
-        title: 'Cholesky vs LU: Flop Count',
-        body: 'LU (general): $\\frac{2}{3}n^3$ flops\nCholesky (SPD): $\\frac{1}{3}n^3$ flops — exactly half\n\nStorage: LU fills $n^2$ entries; Cholesky only stores the lower triangle — $\\frac{n(n+1)}{2}$ entries. For $n = 10000$, this saves 50 million doubles.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Cholesky Decomposition with NumPy/SciPy',
         mathBridge: 'Factor an SPD matrix with numpy, solve a system using two triangular solves, and use Cholesky to sample correlated random variables.',
         caption: 'scipy.linalg.cholesky uses LAPACK\'s dpotrf — the same routine run in every scientific computing pipeline.',
@@ -159,8 +147,7 @@ print("(should be close to Sigma for large n)")
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Cholesky Factorization — OpenMAT',
         mathBridge: 'Factor an SPD matrix and use it to solve systems efficiently.',
         caption: 'A = L * L^T — the square root of a matrix.',
@@ -220,6 +207,33 @@ round(empirical_cov, 2)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Compute the Cholesky Factor Column by Column (4 Steps)',
+        body: '**Given:** An $n \\times n$ symmetric positive definite matrix $A$.\n**Step 1.** For each column $j = 1, \\ldots, n$, compute the diagonal entry: $l_{jj} = \\sqrt{a_{jj} - \\sum_{k=1}^{j-1} l_{jk}^2}$. If the quantity under the square root is $\\leq 0$, stop — $A$ is not positive definite.\n**Step 2.** For each row $i = j+1, \\ldots, n$, compute the subdiagonal entry: $l_{ij} = \\bigl(a_{ij} - \\sum_{k=1}^{j-1} l_{ik} l_{jk}\\bigr) \\big/ l_{jj}$.\n**Step 3.** Set all entries above the diagonal to zero: $l_{ij} = 0$ for $i < j$.\n**Step 4.** Assemble $L$ and verify: compute $LL^\\top$ and confirm it equals $A$ (spot-check 2–3 entries).',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 2 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 1):** QR decomposition — orthonormal basis, least squares, condition number $\\kappa(A)$ vs $\\kappa(A)^2$.\n**This lesson:** Cholesky — the fast, stable factorization for symmetric positive definite matrices. Connection: $A^\\top A = R^\\top R$ links QR and Cholesky.\n**Next (Lesson 3):** Matrix norms and condition numbers — quantifying sensitivity of factorizations.',
+      },
+      {
+        type: 'theorem',
+        title: 'Cholesky Existence and Uniqueness',
+        body: '$A$ has a Cholesky factorization $A = LL^\\top$ (with $L$ lower triangular, positive diagonal) iff $A$ is symmetric positive definite (SPD).\n\n**Consequence:** you can test if $A$ is SPD by attempting Cholesky — if it succeeds, $A$ is SPD; if the algorithm encounters a non-positive pivot, it is not.',
+      },
+      {
+        type: 'insight',
+        title: 'Cholesky for Sampling Normals',
+        body: 'To sample $\\mathbf{z} \\sim \\mathcal{N}(\\boldsymbol{\\mu}, \\Sigma)$:\n1. Compute Cholesky $\\Sigma = LL^\\top$\n2. Sample $\\mathbf{w} \\sim \\mathcal{N}(\\mathbf{0}, I)$ (independent standard normals)\n3. Return $\\mathbf{z} = \\boldsymbol{\\mu} + L\\mathbf{w}$\n\nCovariance of $L\\mathbf{w}$ = $L \\cdot I \\cdot L^\\top = LL^\\top = \\Sigma$ ✓',
+      },
+      {
+        type: 'insight',
+        title: 'Cholesky vs LU: Flop Count',
+        body: 'LU (general): $\\frac{2}{3}n^3$ flops\nCholesky (SPD): $\\frac{1}{3}n^3$ flops — exactly half\n\nStorage: LU fills $n^2$ entries; Cholesky only stores the lower triangle — $\\frac{n(n+1)}{2}$ entries. For $n = 10000$, this saves 50 million doubles.',
       },
     ],
   },

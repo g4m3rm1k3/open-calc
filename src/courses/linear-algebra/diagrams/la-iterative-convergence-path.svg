@@ -1,0 +1,34 @@
+<svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="300" height="220" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="ic-blue" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+  </defs>
+
+  <text x="150" y="16" font-size="11" class="svg-muted" text-anchor="middle">Jacobi iterates spiral inward, overshooting each side</text>
+
+  <line x1="30" y1="190" x2="270" y2="190" class="svg-axis" stroke-width="1.3"/>
+  <line x1="30" y1="190" x2="30" y2="30" class="svg-axis" stroke-width="1.3"/>
+
+  <!-- iterates: (0,0) -> (2.25,2.33) -> (1.667,1.583) -> (2.083, 1.7) -> (2, 1.667) scaled to plot -->
+  <polyline points="40,180 200,55 122,98 158,77 138,86" fill="none" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="3,3" marker-end="url(#ic-blue)"/>
+  <circle cx="40" cy="180" r="3.5" fill="#64748b"/>
+  <circle cx="200" cy="55" r="3.5" fill="#64748b"/>
+  <circle cx="122" cy="98" r="3.5" fill="#64748b"/>
+  <circle cx="158" cy="77" r="3.5" fill="#64748b"/>
+  <circle cx="138" cy="86" r="4" fill="#10b981"/>
+
+  <text x="40" y="195" font-size="9" class="svg-muted" text-anchor="middle">x⁽⁰⁾=(0,0)</text>
+  <text x="200" y="48" font-size="9" class="svg-muted" text-anchor="middle">x⁽¹⁾</text>
+  <text x="190" y="100" font-size="9.5" fill="#10b981" font-weight="700">x* ≈ (2, 1.667)</text>
+  <line x1="186" y1="98" x2="140" y2="87" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2"/>
+
+  <text x="150" y="208" font-size="9.5" class="svg-muted" text-anchor="middle">negative eigenvalue of the iteration matrix → sign flips every step</text>
+</svg>

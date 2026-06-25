@@ -1,3 +1,5 @@
+import markovChainStatesUrl from '../diagrams/la-markov-chain-states.svg?url'
+
 export default {
   id: 'la3-005',
   slug: 'markov-chains',
@@ -14,45 +16,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'A simple weather model has two states: Sunny and Rainy. Transition matrix $P = \\begin{bmatrix}0.8&0.4\\\\0.2&0.6\\end{bmatrix}$ (columns sum to 1). Start with $\\mathbf{x}_0 = [1,0]^\\top$ (all Sunny). After one step: $P\\mathbf{x}_0 = [0.8, 0.2]^\\top$. After many steps, $P^k\\mathbf{x}_0 \\to \\mathbf{q}$. Solve $(P-I)\\mathbf{q} = \\mathbf{0}$ with $q_1+q_2=1$: $\\mathbf{q} = [2/3, 1/3]^\\top$. Long run: 67% sunny, 33% rainy — regardless of where you started.',
+      ] },
+      { type: 'image', src: markovChainStatesUrl,
+        alt: 'Two-state transition diagram with Sunny and Rainy circles, self-loop arrows labeled 0.8 and 0.6 for staying in the same state, and cross arrows labeled 0.2 and 0.4 for switching states, with the steady state q equals two thirds, one third labeled inside each circle',
+        caption: 'Any starting mix converges to the same steady state q — the eigenvector for λ = 1.' },
+      { type: 'prose', paragraphs: [
       '**What is a Markov chain?** A Markov chain describes a system that jumps between states over time, where the probability of jumping from state $i$ to state $j$ depends only on the current state (not the history). This "memoryless" property is the Markov property. The transition probabilities are encoded in a matrix.',
       '**Transition matrix.** For a system with $n$ states, the transition matrix $P$ has $P_{ij} = $ probability of moving from state $j$ to state $i$ (column-stochastic convention). Each column sums to 1 (all probability from state $j$ must go somewhere). A column vector $\\mathbf{x}$ where $x_i \\geq 0$ and $\\sum x_i = 1$ represents a probability distribution over states.',
       '**Matrix-vector product = one time step.** If $\\mathbf{x}_t$ is the distribution at time $t$, then $\\mathbf{x}_{t+1} = P\\mathbf{x}_t$. After $k$ steps: $\\mathbf{x}_k = P^k \\mathbf{x}_0$. As $k \\to \\infty$, the distribution often converges to a **steady state** $\\mathbf{q}$ satisfying $P\\mathbf{q} = \\mathbf{q}$ — an eigenvector of $P$ with eigenvalue 1.',
       '**Why eigenvalue 1 always exists.** For any column-stochastic matrix, the vector of all ones $\\mathbf{1}$ satisfies $P^\\top \\mathbf{1} = \\mathbf{1}$ (each row of $P^\\top$ sums to 1). Therefore $P^\\top - I$ has $\\mathbf{1}$ in its null space, so $\\det(P^\\top - I) = \\det(P - I) = 0$, which means $\\lambda = 1$ is an eigenvalue of $P$. The steady-state distribution is the normalized eigenvector corresponding to $\\lambda = 1$.',
       '**Predict before reading on.** The weather matrix $P = \\begin{bmatrix}0.9&0.3\\\\0.1&0.7\\end{bmatrix}$ has larger diagonal entries (the system tends to stay in its current state). Will the steady state be closer to $[1,0]^\\top$ (all Sunny) or $[0.5, 0.5]^\\top$ (equal)? Which eigenvalue equals 1? Predict, then verify.',
       '**CNC machine availability — Markov analysis.** A CNC machine cycles through states: Cutting, Setup/Tool-change, Idle (waiting for parts), and Fault. From shift data, you can estimate transition probabilities between these states. The steady-state distribution tells you the long-run fraction of time in each state — and therefore machine **availability** (fraction of time Cutting). Availability = $q_{\\text{Cutting}}$ where $\\mathbf{q}$ is the steady-state distribution. If the fault-recovery probability is low, availability can be optimized by improving it — eigenvalue analysis shows exactly how much the steady state shifts per unit improvement.',
-    ],
-    callouts: [
-      {
-        type: 'sequencing',
-        title: 'Lesson 5 of 7 — Eigenvalues & Eigenvectors',
-        body: '**Previous (Lesson 4):** Jordan Normal Form — handling non-diagonalizable matrices.\n**This lesson:** Markov Chains — stochastic matrices, eigenvalue 1, steady-state distributions, and the Perron-Frobenius theorem.\n**Next (Lesson 6):** Cayley-Hamilton Theorem — every matrix satisfies its own characteristic equation.',
-      },
-      {
-        type: 'procedure',
-        title: 'Procedure: Find the Steady-State Distribution',
-        body: 'Step 1. **Verify stochastic.** Confirm that each column of $P$ sums to 1 and all entries are non-negative.\n\nStep 2. **Set up the eigenvector equation.** Form $A = P - I$. The steady state $\\mathbf{q}$ satisfies $A\\mathbf{q} = \\mathbf{0}$ (null space of $P - I$).\n\nStep 3. **Solve the null space.** Row-reduce $[A | \\mathbf{0}]$ to find the free variable and the general solution.\n\nStep 4. **Normalize.** Divide the null-space vector by the sum of its entries so all components sum to 1. This makes $\\mathbf{q}$ a valid probability distribution.\n\nStep 5. **Sanity-check.** Verify $P\\mathbf{q} = \\mathbf{q}$ and $\\sum_i q_i = 1$. Also confirm $q_i \\geq 0$ — if any entry is negative, check your null-space computation.',
-      },
-      {
-        type: 'insight',
-        title: 'The Perron-Frobenius Theorem (Informal)',
-        body: 'For a regular stochastic matrix (all entries positive, or some power has all positive entries), there is exactly one steady-state distribution, and it is the unique normalized eigenvector for $\\lambda = 1$. Starting from ANY initial distribution, $P^k \\mathbf{x}_0 \\to \\mathbf{q}$ as $k \\to \\infty$. The starting point does not matter — you always end up at $\\mathbf{q}$.',
-      },
-      {
-        type: 'insight',
-        title: 'All Other Eigenvalues Satisfy $|\\lambda| \\leq 1$',
-        body: 'For a column-stochastic matrix, all eigenvalues satisfy $|\\lambda| \\leq 1$. If $|\\lambda_2| < 1$ (the second-largest eigenvalue in magnitude), then the contribution of $\\lambda_2^k \\mathbf{v}_2$ to $P^k \\mathbf{x}_0$ shrinks exponentially. The gap $1 - |\\lambda_2|$ is the **spectral gap** — larger gap means faster convergence to steady state.',
-      },
-      {
-        type: 'insight',
-        title: 'PageRank in One Paragraph',
-        body: 'Model the web as $n$ pages and a transition matrix $P$ where $P_{ij} = $ (probability surfer clicks link from page $j$ to page $i$). Add a "teleportation" probability $\\alpha$ to handle pages with no outlinks: $\\hat{P} = (1-\\alpha)P + \\alpha \\frac{\\mathbf{1}\\mathbf{1}^\\top}{n}$. The PageRank vector is the steady-state distribution $\\hat{P}\\mathbf{q} = \\mathbf{q}$. Pages with high $q_i$ are authoritative.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Markov Chain Simulation',
         mathBridge: 'Build a transition matrix, find the steady state, and simulate convergence.',
         caption: 'Any starting distribution converges to the same steady-state eigenvector.',
@@ -130,6 +109,33 @@ spectral_gap
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'sequencing',
+        title: 'Lesson 5 of 7 — Eigenvalues & Eigenvectors',
+        body: '**Previous (Lesson 4):** Jordan Normal Form — handling non-diagonalizable matrices.\n**This lesson:** Markov Chains — stochastic matrices, eigenvalue 1, steady-state distributions, and the Perron-Frobenius theorem.\n**Next (Lesson 6):** Cayley-Hamilton Theorem — every matrix satisfies its own characteristic equation.',
+      },
+      {
+        type: 'procedure',
+        title: 'Procedure: Find the Steady-State Distribution',
+        body: 'Step 1. **Verify stochastic.** Confirm that each column of $P$ sums to 1 and all entries are non-negative.\n\nStep 2. **Set up the eigenvector equation.** Form $A = P - I$. The steady state $\\mathbf{q}$ satisfies $A\\mathbf{q} = \\mathbf{0}$ (null space of $P - I$).\n\nStep 3. **Solve the null space.** Row-reduce $[A | \\mathbf{0}]$ to find the free variable and the general solution.\n\nStep 4. **Normalize.** Divide the null-space vector by the sum of its entries so all components sum to 1. This makes $\\mathbf{q}$ a valid probability distribution.\n\nStep 5. **Sanity-check.** Verify $P\\mathbf{q} = \\mathbf{q}$ and $\\sum_i q_i = 1$. Also confirm $q_i \\geq 0$ — if any entry is negative, check your null-space computation.',
+      },
+      {
+        type: 'insight',
+        title: 'The Perron-Frobenius Theorem (Informal)',
+        body: 'For a regular stochastic matrix (all entries positive, or some power has all positive entries), there is exactly one steady-state distribution, and it is the unique normalized eigenvector for $\\lambda = 1$. Starting from ANY initial distribution, $P^k \\mathbf{x}_0 \\to \\mathbf{q}$ as $k \\to \\infty$. The starting point does not matter — you always end up at $\\mathbf{q}$.',
+      },
+      {
+        type: 'insight',
+        title: 'All Other Eigenvalues Satisfy $|\\lambda| \\leq 1$',
+        body: 'For a column-stochastic matrix, all eigenvalues satisfy $|\\lambda| \\leq 1$. If $|\\lambda_2| < 1$ (the second-largest eigenvalue in magnitude), then the contribution of $\\lambda_2^k \\mathbf{v}_2$ to $P^k \\mathbf{x}_0$ shrinks exponentially. The gap $1 - |\\lambda_2|$ is the **spectral gap** — larger gap means faster convergence to steady state.',
+      },
+      {
+        type: 'insight',
+        title: 'PageRank in One Paragraph',
+        body: 'Model the web as $n$ pages and a transition matrix $P$ where $P_{ij} = $ (probability surfer clicks link from page $j$ to page $i$). Add a "teleportation" probability $\\alpha$ to handle pages with no outlinks: $\\hat{P} = (1-\\alpha)P + \\alpha \\frac{\\mathbf{1}\\mathbf{1}^\\top}{n}$. The PageRank vector is the steady-state distribution $\\hat{P}\\mathbf{q} = \\mathbf{q}$. Pages with high $q_i$ are authoritative.',
       },
     ],
   },

@@ -1,0 +1,38 @@
+<svg viewBox="0 0 360 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-muted { fill: #94a3b8; }
+    .svg-ellipse { fill: none; stroke: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-muted { fill: #64748b; }
+    .dark .svg-ellipse { stroke: #475569; }
+  </style>
+  <rect width="360" height="220" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="gc-red" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#dc2626"/></marker>
+    <marker id="gc-green" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#10b981"/></marker>
+  </defs>
+
+  <text x="180" y="16" font-size="11.5" fill="#1e293b" text-anchor="middle" font-weight="700">∇f points uphill, perpendicular to the level curve — descent goes the other way</text>
+
+  <!-- contour ellipses (level sets of f), centered on the minimum -->
+  <ellipse cx="170" cy="120" rx="40" ry="28" class="svg-ellipse" stroke-width="1.3"/>
+  <ellipse cx="170" cy="120" rx="70" ry="49" class="svg-ellipse" stroke-width="1.3"/>
+  <ellipse cx="170" cy="120" rx="100" ry="70" class="svg-ellipse" stroke-width="1.3"/>
+  <circle cx="170" cy="120" r="3" fill="#1e293b"/>
+  <text x="170" y="138" font-size="9.5" class="svg-muted" text-anchor="middle">minimum</text>
+
+  <!-- point P on the middle ellipse -->
+  <circle cx="240" cy="120" r="3.5" fill="#1e293b"/>
+  <text x="240" y="106" font-size="10" fill="#1e293b">P</text>
+
+  <!-- gradient: uphill, outward -->
+  <line x1="240" y1="120" x2="290" y2="120" stroke="#dc2626" stroke-width="3" marker-end="url(#gc-red)"/>
+  <text x="295" y="116" font-size="11" fill="#dc2626" font-weight="700">∇f (steepest ascent)</text>
+
+  <!-- descent: inward -->
+  <line x1="240" y1="120" x2="195" y2="120" stroke="#10b981" stroke-width="3" marker-end="url(#gc-green)"/>
+  <text x="180" y="140" font-size="11" fill="#10b981" font-weight="700" text-anchor="middle">-∇f</text>
+
+  <text x="180" y="200" font-size="10.5" class="svg-muted" text-anchor="middle">Gradient descent always steps opposite the gradient, straight toward lower f</text>
+</svg>

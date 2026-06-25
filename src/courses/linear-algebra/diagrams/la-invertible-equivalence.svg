@@ -1,0 +1,41 @@
+<svg viewBox="0 0 460 250" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="460" height="250" rx="10" class="svg-bg"/>
+
+  <text x="230" y="18" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">All or nothing — every condition flips together</text>
+
+  <!-- Panel 1: invertible -->
+  <rect x="12" y="28" width="216" height="210" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="48" font-size="12" fill="#10b981" text-anchor="middle" font-weight="700">Invertible — all 12 hold</text>
+  <text x="28" y="74" font-size="11" fill="#10b981">✓ det(A) ≠ 0</text>
+  <text x="28" y="96" font-size="11" fill="#10b981">✓ rank(A) = n</text>
+  <text x="28" y="118" font-size="11" fill="#10b981">✓ RREF(A) = I</text>
+  <text x="28" y="140" font-size="11" fill="#10b981">✓ null space = {0}</text>
+  <text x="28" y="162" font-size="11" fill="#10b981">✓ columns independent &amp; span ℝⁿ</text>
+  <text x="28" y="184" font-size="11" fill="#10b981">✓ Ax = b has a unique solution</text>
+  <text x="28" y="206" font-size="11" fill="#10b981">✓ 0 is not an eigenvalue</text>
+  <text x="120" y="228" font-size="9.5" class="svg-muted" text-anchor="middle">checking ONE proves all twelve</text>
+
+  <!-- Panel 2: singular -->
+  <rect x="232" y="28" width="216" height="210" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="340" y="48" font-size="12" fill="#dc2626" text-anchor="middle" font-weight="700">Singular — all 12 fail</text>
+  <text x="248" y="74" font-size="11" fill="#dc2626">✗ det(A) = 0</text>
+  <text x="248" y="96" font-size="11" fill="#dc2626">✗ rank(A) &lt; n</text>
+  <text x="248" y="118" font-size="11" fill="#dc2626">✗ RREF(A) ≠ I</text>
+  <text x="248" y="140" font-size="11" fill="#dc2626">✗ null space ≠ {0}</text>
+  <text x="248" y="162" font-size="11" fill="#dc2626">✗ columns dependent, span &lt; ℝⁿ</text>
+  <text x="248" y="184" font-size="11" fill="#dc2626">✗ Ax = b: no solution or infinite</text>
+  <text x="248" y="206" font-size="11" fill="#dc2626">✗ 0 is an eigenvalue</text>
+  <text x="340" y="228" font-size="9.5" class="svg-muted" text-anchor="middle">failing ONE proves all twelve fail</text>
+</svg>

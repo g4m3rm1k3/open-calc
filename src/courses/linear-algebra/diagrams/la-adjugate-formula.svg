@@ -1,0 +1,55 @@
+<svg viewBox="0 0 460 170" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+  </style>
+  <rect width="460" height="170" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="aj-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#1e293b"/></marker>
+  </defs>
+
+  <text x="230" y="16" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">From cofactors to the inverse, in two steps</text>
+
+  <!-- Box 1: cofactor matrix -->
+  <rect x="22" y="46" width="26" height="26" class="svg-cell" stroke-width="1"/>
+  <rect x="48" y="46" width="26" height="26" class="svg-cell" stroke-width="1"/>
+  <rect x="22" y="72" width="26" height="26" class="svg-cell" stroke-width="1"/>
+  <rect x="48" y="72" width="26" height="26" class="svg-cell" stroke-width="1"/>
+  <text x="35" y="63" font-size="10" fill="#2563eb" text-anchor="middle">C₁₁</text>
+  <text x="61" y="63" font-size="10" fill="#2563eb" text-anchor="middle">C₁₂</text>
+  <text x="35" y="89" font-size="10" fill="#2563eb" text-anchor="middle">C₂₁</text>
+  <text x="61" y="89" font-size="10" fill="#2563eb" text-anchor="middle">C₂₂</text>
+  <text x="48" y="112" font-size="10" class="svg-muted" text-anchor="middle">cofactor matrix</text>
+
+  <line x1="90" y1="72" x2="130" y2="72" stroke="#1e293b" stroke-width="2" marker-end="url(#aj-arrow)"/>
+  <text x="110" y="62" font-size="9.5" class="svg-muted" text-anchor="middle">transpose</text>
+
+  <!-- Box 2: adjugate -->
+  <rect x="142" y="46" width="26" height="26" class="svg-cell" stroke-width="1"/>
+  <rect x="168" y="46" width="26" height="26" class="svg-cell" stroke-width="1"/>
+  <rect x="142" y="72" width="26" height="26" class="svg-cell" stroke-width="1"/>
+  <rect x="168" y="72" width="26" height="26" class="svg-cell" stroke-width="1"/>
+  <text x="155" y="63" font-size="10" fill="#d97706" text-anchor="middle">C₁₁</text>
+  <text x="181" y="63" font-size="10" fill="#d97706" text-anchor="middle">C₂₁</text>
+  <text x="155" y="89" font-size="10" fill="#d97706" text-anchor="middle">C₁₂</text>
+  <text x="181" y="89" font-size="10" fill="#d97706" text-anchor="middle">C₂₂</text>
+  <text x="168" y="112" font-size="10" class="svg-muted" text-anchor="middle">adj(A) = Cᵗ</text>
+
+  <line x1="210" y1="72" x2="255" y2="72" stroke="#1e293b" stroke-width="2" marker-end="url(#aj-arrow)"/>
+  <text x="232" y="62" font-size="9.5" class="svg-muted" text-anchor="middle">÷ det(A)</text>
+
+  <!-- Box 3: inverse -->
+  <rect x="268" y="46" width="26" height="26" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+  <rect x="294" y="46" width="26" height="26" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+  <rect x="268" y="72" width="26" height="26" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+  <rect x="294" y="72" width="26" height="26" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+  <text x="307" y="112" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">A⁻¹</text>
+
+  <text x="230" y="148" font-size="10.5" class="svg-muted" text-anchor="middle">A⁻¹ = adj(A) / det(A) — works for any size, any invertible matrix</text>
+</svg>

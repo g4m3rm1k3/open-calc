@@ -1,0 +1,55 @@
+<svg viewBox="0 0 340 190" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+  </style>
+  <rect width="340" height="190" rx="10" class="svg-bg"/>
+
+  <text x="170" y="18" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">A = L × Lᵗ — a matrix square root, triangular style</text>
+
+  <!-- A grid 2x2 -->
+  <rect x="20" y="40" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="54" y="40" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="20" y="74" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="54" y="74" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <text x="37" y="62" font-size="14" class="svg-text" text-anchor="middle">4</text>
+  <text x="71" y="62" font-size="14" class="svg-text" text-anchor="middle">2</text>
+  <text x="37" y="96" font-size="14" class="svg-text" text-anchor="middle">2</text>
+  <text x="71" y="96" font-size="14" class="svg-text" text-anchor="middle">3</text>
+  <text x="54" y="128" font-size="11" class="svg-muted" text-anchor="middle">A</text>
+
+  <text x="104" y="65" font-size="16" class="svg-text" text-anchor="middle">=</text>
+
+  <!-- L grid 2x2, lower triangular, zero above diagonal highlighted green -->
+  <rect x="120" y="40" width="34" height="34" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+  <rect x="154" y="40" width="34" height="34" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+  <rect x="120" y="74" width="34" height="34" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+  <rect x="154" y="74" width="34" height="34" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+  <text x="137" y="62" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">2</text>
+  <text x="171" y="62" font-size="11" fill="#10b981" text-anchor="middle">0</text>
+  <text x="137" y="96" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">1</text>
+  <text x="171" y="96" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">√2</text>
+  <text x="154" y="128" font-size="11" class="svg-muted" text-anchor="middle">L</text>
+
+  <text x="204" y="65" font-size="16" class="svg-text" text-anchor="middle">×</text>
+
+  <!-- L^T grid 2x2, upper triangular mirror -->
+  <rect x="220" y="40" width="34" height="34" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+  <rect x="254" y="40" width="34" height="34" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+  <rect x="220" y="74" width="34" height="34" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+  <rect x="254" y="74" width="34" height="34" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+  <text x="237" y="62" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">2</text>
+  <text x="271" y="62" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">1</text>
+  <text x="237" y="96" font-size="11" fill="#10b981" text-anchor="middle">0</text>
+  <text x="271" y="96" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">√2</text>
+  <text x="254" y="128" font-size="11" class="svg-muted" text-anchor="middle">Lᵗ</text>
+
+  <text x="170" y="155" font-size="10" class="svg-muted" text-anchor="middle">Half the entries of LU — only L is stored, since Lᵗ is just its mirror</text>
+  <text x="170" y="172" font-size="10" class="svg-muted" text-anchor="middle">No pivoting, no row swaps needed: SPD guarantees the square roots stay real</text>
+</svg>

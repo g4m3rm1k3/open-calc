@@ -1,0 +1,32 @@
+<svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="460" height="220" rx="10" class="svg-bg"/>
+
+  <!-- Panel 1: positive definite -> ellipse -->
+  <rect x="12" y="20" width="216" height="186" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="38" font-size="11.5" fill="#10b981" text-anchor="middle" font-weight="700">λ₁, λ₂ &gt; 0 — ellipse</text>
+  <line x1="55" y1="115" x2="185" y2="115" class="svg-div" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="120" y1="65" x2="120" y2="165" class="svg-div" stroke-width="1" stroke-dasharray="3,2"/>
+  <ellipse cx="120" cy="115" rx="62" ry="32" fill="rgba(16,185,129,0.10)" stroke="#10b981" stroke-width="2.5"/>
+  <text x="120" y="190" font-size="9.5" fill="#10b981" text-anchor="middle">bounded — a bowl shape</text>
+
+  <!-- Panel 2: indefinite -> hyperbola -->
+  <rect x="232" y="20" width="216" height="186" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="340" y="38" font-size="11.5" fill="#dc2626" text-anchor="middle" font-weight="700">mixed signs — hyperbola</text>
+  <line x1="290" y1="60" x2="400" y2="170" class="svg-div" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="400" y1="60" x2="290" y2="170" class="svg-div" stroke-width="1" stroke-dasharray="3,2"/>
+  <path d="M 405 65 Q 378 115 405 165" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+  <path d="M 285 65 Q 312 115 285 165" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+  <text x="340" y="190" font-size="9.5" fill="#dc2626" text-anchor="middle">unbounded — a saddle shape</text>
+</svg>

@@ -1,3 +1,6 @@
+import eigenClusterUrl from '../diagrams/la-preconditioning-eigenvalue-cluster.svg?url';
+import amgVcycleUrl from '../diagrams/la-amg-vcycle.svg?url';
+
 export default {
   id: 'la9-004',
   slug: 'preconditioning',
@@ -14,42 +17,29 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Where you are in the story: CG and GMRES are powerful, but their convergence depends critically on the condition number $\\kappa(A)$. CG needs $O(\\sqrt{\\kappa})$ iterations; GMRES up to $O(\\kappa)$. For the 2D Poisson equation on an $n$-point grid, $\\kappa \\sim n$, so CG needs $O(\\sqrt{n})$ iterations. On a $1000 \\times 1000$ grid ($n = 10^6$ unknowns), that is 1000 CG iterations just to converge. And the hardest practical problems — fluid dynamics at high Reynolds number, electromagnetics near resonance — can have $\\kappa = 10^8$ or more. Preconditioning is how you make Krylov methods practical for these cases.',
       'The core idea is transformation. Instead of solving $A\\mathbf{x} = \\mathbf{b}$ directly, you solve the equivalent system $M^{-1}A\\mathbf{x} = M^{-1}\\mathbf{b}$, where $M$ is a matrix you choose. If $M \\approx A$, then $M^{-1}A \\approx I$, so $\\kappa(M^{-1}A) \\ll \\kappa(A)$ and the Krylov iteration converges in far fewer steps. The catch: $M$ must be cheap to apply (solving $M\\mathbf{z} = \\mathbf{r}$ must cost much less than solving $A\\mathbf{x} = \\mathbf{b}$), and it must be a good enough approximation of $A$ that the eigenvalues of $M^{-1}A$ cluster near 1.',
       'A concrete illustration: take $A = \\text{diag}(1, 100)$, $\\mathbf{b} = (1, 100)^\\top$. Without preconditioning, $\\kappa(A) = 100$. CG needs about 30 iterations to reduce error by $10^{-6}$. Now precondition with $M = \\text{diag}(A) = \\text{diag}(1, 100)$. The preconditioned system is $M^{-1}A = I$ with condition number 1. Preconditioned CG solves this in exactly 1 step. That is the extreme case — the preconditioner is the matrix itself — but it illustrates the principle vividly: the condition number controls everything, and a good preconditioner eliminates it.',
+      ] },
+      { type: 'image', src: eigenClusterUrl,
+        alt: 'Two number lines: the top showing eigenvalues of A spread from 1 to 100, the bottom showing eigenvalues of the preconditioned system all tightly clustered near 1',
+        caption: 'A good preconditioner squeezes the eigenvalue spread down to almost nothing — that clustering is exactly what fast convergence needs.' },
+      { type: 'prose', paragraphs: [
       'The simplest family of preconditioners are **splitting-based**: they derive from the same matrix splittings used in stationary iterations. The **Jacobi preconditioner** sets $M = D = \\text{diag}(A)$: applying it costs $O(n)$ (just divide each component by the diagonal). This helps when the bad conditioning comes from poorly scaled rows — all it does is normalize each row by its diagonal entry. For many practical matrices where the off-diagonal entries are the problem, Jacobi preconditioning barely helps. **SSOR** uses $M = (D - L)D^{-1}(D - U)$ (the symmetric Gauss-Seidel preconditioner) and works significantly better for elliptic PDEs, reducing $\\kappa$ from $O(h^{-2})$ to $O(h^{-1})$.',
       '**Predict before reading on:** Suppose $A$ has $\\kappa(A) = 10^6$ and you apply the Jacobi preconditioner $M = \\text{diag}(A)$. Without knowing the specific off-diagonal entries, would you expect $\\kappa(M^{-1}A)$ to be much less than $10^6$, or could it still be large? When would diagonal scaling actually help?',
       'The answer: diagonal scaling helps most when the large condition number is caused by row scaling differences — when the diagonal entries span many orders of magnitude. If row 1 has $a_{11} = 1$ and row 2 has $a_{22} = 10^6$ but everything is otherwise well-behaved, scaling by the diagonal fixes the problem. But if all diagonal entries are the same and the problem comes from off-diagonal coupling or near-singularity of some directions, Jacobi does almost nothing. This is why **ILU(0)** — incomplete LU factorization — is the workhorse of practical computing. ILU(0) computes a sparse LU factorization of $A$ that ignores fill-in: it performs Gaussian elimination but drops any new nonzero entry that would appear in a position that was originally zero. The result is $LU \\approx A$ with the same sparsity pattern, costing $O(\\text{nnz})$ to apply (two triangular solves).',
       'The gold standard for elliptic PDEs is **Algebraic Multigrid (AMG)**. The idea: if the slow convergence of iterative methods comes from low-frequency, smooth error components that are hard to eliminate on a fine grid, perhaps you can represent those components cheaply on a coarser grid. AMG automatically identifies a coarse set of degrees of freedom, builds restriction ($A_c = R A P$) and prolongation operators, and creates a hierarchy of smaller problems. A V-cycle applies smoothing on the fine grid, restricts the residual to the coarse grid, solves there, prolongates the correction back, and smooths again. With AMG as a preconditioner, $\\kappa(M^{-1}A)$ is bounded independently of $n$ — CG+AMG achieves $O(n)$ total work for the largest finite element problems in the world.',
+      ] },
+      { type: 'image', src: amgVcycleUrl,
+        alt: 'A V-shaped diagram: starting at the fine grid, smoothing, restricting down through coarser grids to a coarsest direct solve, then prolongating and smoothing back up to the fine grid',
+        caption: 'A V-cycle smooths on the way down and up, solving directly only at the coarsest, cheapest level — the multigrid trick.' },
+      { type: 'prose', paragraphs: [
       'Left vs right preconditioning is a practical detail but matters for GMRES. **Left preconditioning** applies $M^{-1}$ to the residual: the iteration minimizes $\\|M^{-1}(\\mathbf{b} - A\\mathbf{x})\\|$, which is the preconditioned residual. **Right preconditioning** solves $AM^{-1}\\mathbf{y} = \\mathbf{b}$ then recovers $\\mathbf{x} = M^{-1}\\mathbf{y}$: the iteration minimizes the true residual $\\|\\mathbf{b} - A\\mathbf{x}\\|$. Right preconditioning is generally preferred for GMRES because convergence is measured in the unpreconditioned residual — you know exactly how close you are to the true solution.',
       'Where this is heading: the final lesson in this chapter covers sparse direct solvers — the algorithms used when you absolutely need the exact solution and cannot afford iterative convergence failures. Sparse direct solvers (CHOLMOD, UMFPACK, SuperLU) use sophisticated reordering strategies to minimize fill-in during LU factorization. Understanding when to use direct vs iterative methods, and how to combine them (direct solve as a preconditioner for iterative refinement), is the capstone of large-scale linear algebra in practice.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Choose and Apply a Preconditioner (4 Steps)',
-        body: '1. **Diagnose the problem.** Compute $\\kappa(A)$ (or estimate it from eigenvalue bounds). Identify the source: if diagonal entries vary widely → diagonal scaling. If $A$ is SPD from an elliptic PDE → IC(0) or AMG. If $A$ is non-symmetric from convection → ILU(k). If $A$ is block-structured → block Jacobi.\n2. **Build the preconditioner.** Jacobi: $O(n)$, one pass over diagonal. ILU(0): $O(\\text{nnz})$, same sparsity as $A$. IC(0): same but enforces symmetry (SPD systems only). AMG: $O(n\\log n)$ setup, good for elliptic PDEs.\n3. **Apply $M^{-1}$ each Krylov step.** For ILU: solve $L\\mathbf{z}_1 = \\mathbf{r}$ (forward), then $U\\mathbf{z} = \\mathbf{z}_1$ (backward). This is one preconditioner application. For PCG (SPD): use split form $M = LL^\\top$; the implicit system is $L^{-1}AL^{-\\top}$.\n4. **Monitor and adapt.** If residual stagnates after few iterations: increase ILU fill level (try ILU(1) or ILU(2)), or switch to AMG. If applying $M^{-1}$ is too slow: revert to lighter preconditioner. Profile time per iteration, not just iteration count.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 4 of 5 — Iterative Solvers & Preconditioning',
-        body: '**Previous (Lesson 3):** GMRES — Arnoldi orthogonalization, Hessenberg least squares, convergence for non-symmetric systems.\n**This lesson:** Preconditioning — Jacobi, SSOR, ILU(0), AMG; how to cluster eigenvalues and make Krylov methods practical.\n**Next (Lesson 5):** Sparse Direct Solvers — fill-in reduction, reordering, when to use direct vs iterative methods.',
-      },
-      {
-        type: 'insight',
-        title: 'ILU(0): Incomplete LU Factorization',
-        body: 'ILU(0) computes LU factorization of $A$ but drops fill-in (sets it to zero when the entry was zero in $A$). Result: $LU \\approx A$ with $\\text{nnz}(L) + \\text{nnz}(U) = \\text{nnz}(A)$ (no new memory).\n\nApplying preconditioner: solve $L\\mathbf{z}_1 = \\mathbf{r}$ (forward substitution), then $U\\mathbf{z} = \\mathbf{z}_1$ (back substitution). Cost: $O(\\text{nnz}(A))$ per apply.\n\nILU(k) allows $k$ levels of fill-in — better approximation, more memory, cheaper per iteration than direct solve.',
-      },
-      {
-        type: 'insight',
-        title: 'Algebraic Multigrid (AMG)',
-        body: 'AMG extends classical multigrid to general sparse matrices without requiring a geometric mesh. Key idea: identify "coarse" degrees of freedom via strength of connection. Restriction operator $R$ coarsens, prolongation $P = R^\\top$ extends. Coarse-grid problem: $A_c = R A P$. V-cycle: smooth on fine, restrict, solve coarsely, prolongate, smooth again.\n\nFor SPD matrices (via BoomerAMG, HYPRE library): $\\kappa$ bounded independent of $n$. CG+AMG is $O(n)$ — the practical gold standard for elliptic PDE solves.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Preconditioning in Python',
         mathBridge: 'Compare Jacobi, ILU, and no preconditioner on a Poisson-like system — see the eigenvalue clustering effect directly.',
         caption: 'Better preconditioners cluster eigenvalues of $M^{-1}A$ near 1, cutting CG iterations.',
@@ -172,8 +162,7 @@ plt.legend(); plt.grid(True); plt.tight_layout(); plt.show()
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Preconditioning in Action',
         mathBridge: 'Compare convergence with and without preconditioners.',
         caption: 'Good preconditioner clusters eigenvalues near 1, dramatically cutting CG iterations.',
@@ -248,6 +237,28 @@ kappa_prec = eig_prec(end)/eig_prec(1)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Choose and Apply a Preconditioner (4 Steps)',
+        body: '1. **Diagnose the problem.** Compute $\\kappa(A)$ (or estimate it from eigenvalue bounds). Identify the source: if diagonal entries vary widely → diagonal scaling. If $A$ is SPD from an elliptic PDE → IC(0) or AMG. If $A$ is non-symmetric from convection → ILU(k). If $A$ is block-structured → block Jacobi.\n2. **Build the preconditioner.** Jacobi: $O(n)$, one pass over diagonal. ILU(0): $O(\\text{nnz})$, same sparsity as $A$. IC(0): same but enforces symmetry (SPD systems only). AMG: $O(n\\log n)$ setup, good for elliptic PDEs.\n3. **Apply $M^{-1}$ each Krylov step.** For ILU: solve $L\\mathbf{z}_1 = \\mathbf{r}$ (forward), then $U\\mathbf{z} = \\mathbf{z}_1$ (backward). This is one preconditioner application. For PCG (SPD): use split form $M = LL^\\top$; the implicit system is $L^{-1}AL^{-\\top}$.\n4. **Monitor and adapt.** If residual stagnates after few iterations: increase ILU fill level (try ILU(1) or ILU(2)), or switch to AMG. If applying $M^{-1}$ is too slow: revert to lighter preconditioner. Profile time per iteration, not just iteration count.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 4 of 5 — Iterative Solvers & Preconditioning',
+        body: '**Previous (Lesson 3):** GMRES — Arnoldi orthogonalization, Hessenberg least squares, convergence for non-symmetric systems.\n**This lesson:** Preconditioning — Jacobi, SSOR, ILU(0), AMG; how to cluster eigenvalues and make Krylov methods practical.\n**Next (Lesson 5):** Sparse Direct Solvers — fill-in reduction, reordering, when to use direct vs iterative methods.',
+      },
+      {
+        type: 'insight',
+        title: 'ILU(0): Incomplete LU Factorization',
+        body: 'ILU(0) computes LU factorization of $A$ but drops fill-in (sets it to zero when the entry was zero in $A$). Result: $LU \\approx A$ with $\\text{nnz}(L) + \\text{nnz}(U) = \\text{nnz}(A)$ (no new memory).\n\nApplying preconditioner: solve $L\\mathbf{z}_1 = \\mathbf{r}$ (forward substitution), then $U\\mathbf{z} = \\mathbf{z}_1$ (back substitution). Cost: $O(\\text{nnz}(A))$ per apply.\n\nILU(k) allows $k$ levels of fill-in — better approximation, more memory, cheaper per iteration than direct solve.',
+      },
+      {
+        type: 'insight',
+        title: 'Algebraic Multigrid (AMG)',
+        body: 'AMG extends classical multigrid to general sparse matrices without requiring a geometric mesh. Key idea: identify "coarse" degrees of freedom via strength of connection. Restriction operator $R$ coarsens, prolongation $P = R^\\top$ extends. Coarse-grid problem: $A_c = R A P$. V-cycle: smooth on fine, restrict, solve coarsely, prolongate, smooth again.\n\nFor SPD matrices (via BoomerAMG, HYPRE library): $\\kappa$ bounded independent of $n$. CG+AMG is $O(n)$ — the practical gold standard for elliptic PDE solves.',
       },
     ],
   },

@@ -1,0 +1,29 @@
+<svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="300" height="220" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="orb-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+  </defs>
+
+  <text x="150" y="16" font-size="11" class="svg-muted" text-anchor="middle">A = [[0,-1],[1,0]], λ = ±i — a perfect circle</text>
+
+  <line x1="40" y1="115" x2="260" y2="115" class="svg-axis" stroke-width="1.3"/>
+  <line x1="150" y1="210" x2="150" y2="25" class="svg-axis" stroke-width="1.3"/>
+
+  <circle cx="150" cy="115" r="65" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+  <!-- direction arrowhead on the circle -->
+  <path d="M 150 50 L 162 56" stroke="#2563eb" stroke-width="2.5" fill="none" marker-end="url(#orb-blue)"/>
+
+  <circle cx="215" cy="115" r="4" fill="#1e293b"/>
+  <text x="222" y="112" font-size="11" fill="#1e293b" font-weight="700">x₀ = (1, 0)</text>
+
+  <text x="150" y="195" font-size="10" class="svg-muted" text-anchor="middle">purely imaginary eigenvalues → perpetual rotation</text>
+  <text x="150" y="208" font-size="10" class="svg-muted" text-anchor="middle">no growth, no decay — the orbit just repeats</text>
+</svg>

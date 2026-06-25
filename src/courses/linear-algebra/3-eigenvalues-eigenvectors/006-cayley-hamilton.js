@@ -1,3 +1,5 @@
+import cayleyHamiltonReductionUrl from '../diagrams/la-cayley-hamilton-reduction.svg?url'
+
 export default {
   id: 'la3-006',
   slug: 'cayley-hamilton',
@@ -14,46 +16,23 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       '**A strange idea: plug a matrix into a polynomial.** The characteristic polynomial of $A$ is $p(\\lambda) = \\det(A - \\lambda I)$ — a polynomial in a scalar variable $\\lambda$. Normally you evaluate $p$ at a number to find eigenvalues. But what happens if you replace $\\lambda$ with the matrix $A$ itself? This sounds absurd — the polynomial was built from $A$ in the first place. Yet every time you do it, you get the zero matrix. That is the Cayley-Hamilton theorem, and it is far from obvious.',
       '**Verify the claim on a $2 \\times 2$.** Let $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$. Trace $= 5$, det $= 1$, so $p(\\lambda) = \\lambda^2 - 5\\lambda + 1$. Now compute $p(A) = A^2 - 5A + I$. First, $A^2 = \\begin{bmatrix}9&5\\\\25&14\\end{bmatrix}$. Then $5A = \\begin{bmatrix}10&5\\\\25&15\\end{bmatrix}$. Subtract: $A^2 - 5A = \\begin{bmatrix}-1&0\\\\0&-1\\end{bmatrix} = -I$. Add $I$: result is $\\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}$. The matrix zeroes out its own characteristic polynomial.',
       '**Application 1: computing the inverse symbolically.** From $A^2 - 5A + I = 0$, multiply both sides by $A^{-1}$: $A - 5I + A^{-1} = 0$, so $A^{-1} = 5I - A = \\begin{bmatrix}3&-1\\\\-5&2\\end{bmatrix}$. No row reduction, no formula lookup — Cayley-Hamilton gives the inverse directly from the characteristic polynomial. This works whenever det$(A) \\neq 0$ (so that $c_0 = \\det(A)$ in the characteristic polynomial is nonzero).',
       '**Application 2: reducing high powers.** From $A^2 = 5A - I$, compute $A^3 = A \\cdot A^2 = A(5A - I) = 5A^2 - A = 5(5A - I) - A = 24A - 5I$. Every higher power follows the same pattern: $A^k$ is always a linear combination $\\alpha_k A + \\beta_k I$ for some scalars $\\alpha_k, \\beta_k$. The characteristic polynomial acts as a recurrence relation for the coefficients. For an $n \\times n$ matrix, any $A^k$ reduces to a linear combination of $I, A, A^2, \\ldots, A^{n-1}$.',
+      ] },
+      { type: 'image', src: cayleyHamiltonReductionUrl,
+        alt: 'A chain of boxes showing A to the 0 equals I, A to the 1 equals A, A squared equals 5A minus I, A cubed equals 24A minus 5I, with the general formula A to the k equals alpha k A plus beta k I',
+        caption: 'p(A) = 0 is a recurrence: every power of A folds back down to just a multiple of A plus a multiple of I.' },
+      { type: 'prose', paragraphs: [
       '**Minimal polynomial.** The minimal polynomial $m(\\lambda)$ is the monic polynomial of smallest degree that annihilates $A$: $m(A) = 0$. The characteristic polynomial is always an annihilating polynomial, but it may not be the smallest. For a diagonalizable matrix with distinct eigenvalues, $m = p$. For the identity matrix $I_n$, $p(\\lambda) = (\\lambda - 1)^n$ but $m(\\lambda) = \\lambda - 1$ (since $I - I = 0$). The minimal polynomial divides the characteristic polynomial.',
       '**Predict before reading on.** For $B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$, trace $= 4$, det $= 3$, so $p(\\lambda) = \\lambda^2 - 4\\lambda + 3$. Before computing: what is $B^2 - 4B + 3I$? And what is $B^{-1}$ using Cayley-Hamilton? Write your predictions, then verify by computing $B^2 = \\begin{bmatrix}1&8\\\\0&9\\end{bmatrix}$ and checking.',
       '**CNC robot kinematics — Rodrigues\' formula.** In 5-axis CNC and robotic arms, every joint rotation is a $3 \\times 3$ rotation matrix $R$. To compute the path of the tool, you need $e^{\\hat{\\omega}t}$ where $\\hat{\\omega}$ is the skew-symmetric angular velocity matrix. Cayley-Hamilton says $\\hat{\\omega}^3 = -\\|\\omega\\|^2 \\hat{\\omega}$ for any skew-symmetric matrix, so $e^{\\hat{\\omega}t} = I + \\sin(t)\\hat{\\omega} + (1 - \\cos t)\\hat{\\omega}^2$. This is Rodrigues\' rotation formula — and it comes directly from Cayley-Hamilton. CNC controllers compute this 50—200 times per second for every joint.',
       '**Where this is heading.** Cayley-Hamilton is the bridge from eigenvalues to functions of matrices. If you know $p(A) = 0$ and $p$ factors as $(\\lambda - \\lambda_1)\\cdots(\\lambda - \\lambda_n)$, then the matrix exponential $e^{At}$ reduces to a sum involving $e^{\\lambda_i t}$ times low-degree matrix polynomials — that is the next lesson, Matrix Exponential. Understanding Cayley-Hamilton also unlocks the theory of linear recurrences: any sequence satisfying a linear recurrence is secretly computing powers of a companion matrix.',
-    ],
-    callouts: [
-      {
-        type: 'theorem',
-        title: 'Cayley-Hamilton Theorem',
-        body: 'Let $A$ be an $n \\times n$ matrix and $p(\\lambda) = \\det(A - \\lambda I)$ its characteristic polynomial. Then $p(A) = 0$ (the zero matrix).',
-      },
-      {
-        type: 'insight',
-        title: 'Computing the Inverse via Cayley-Hamilton',
-        body: 'If $p(\\lambda) = \\lambda^n + c_{n-1}\\lambda^{n-1} + \\cdots + c_1 \\lambda + c_0$ and $c_0 = (-1)^n \\det(A) \\neq 0$, then:\n$A^n + c_{n-1}A^{n-1} + \\cdots + c_1 A + c_0 I = 0$\nMultiply by $A^{-1}$:\n$A^{-1} = -c_0^{-1}(A^{n-1} + c_{n-1}A^{n-2} + \\cdots + c_1 I)$',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 6 of 7 — Eigenvalues & Eigenvectors',
-        body: '**Previous (Lesson 5):** Markov Chains — eigenvalue 1, steady-state distributions.\n**This lesson:** Cayley-Hamilton Theorem — every matrix satisfies its own characteristic equation; using it to compute powers and inverses symbolically.\n**Next (Lesson 7):** Matrix Exponential — solving differential equations $\\dot{\\mathbf{x}} = A\\mathbf{x}$ via $e^{At}$.',
-      },
-      {
-        type: 'procedure',
-        title: 'Procedure: Apply Cayley-Hamilton',
-        body: 'Step 1. **Find the characteristic polynomial.** For a $2\\times 2$ matrix: $p(\\lambda) = \\lambda^2 - \\text{tr}(A)\\lambda + \\det(A)$. For larger matrices, expand $\\det(A - \\lambda I)$.\n\nStep 2. **Interpret $p(A)$.** Replace every $\\lambda^k$ with $A^k$, and replace every scalar constant $c$ with $cI$. For example, $p(\\lambda) = \\lambda^2 - 5\\lambda + 1$ becomes $p(A) = A^2 - 5A + I$.\n\nStep 3. **Verify $p(A) = 0$.** Compute each term and sum — you should get the zero matrix.\n\nStep 4. **Derive consequences.** From $p(A) = 0$:\n- Multiply by $A^{-1}$ to get the **inverse**: $A^{-1} = (\\text{tr}(A)I - A)/\\det(A)$.\n- Rearrange to express $A^n$ as a lower-degree combination: e.g., $A^2 = \\text{tr}(A)A - \\det(A)I$, then use this recurrence for $A^3, A^4, \\ldots$',
-      },
-      {
-        type: 'warning',
-        title: 'Do Not Prove It by Substitution',
-        body: 'A common mistake: writing $p(A) = \\det(A - A \\cdot I) = \\det(0) = 0$ and thinking the theorem is obvious. This is wrong — $\\det(A - \\lambda I)$ is a scalar polynomial, and you cannot just substitute a matrix for the scalar and call it done. The actual proof requires care with polynomial rings and matrix algebra.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Cayley-Hamilton Verification',
         mathBridge: 'Compute the characteristic polynomial and verify that plugging A into it gives zero.',
         caption: 'The matrix satisfies its own characteristic equation.',
@@ -131,6 +110,33 @@ a(end)*A + b(end)*eye(2)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'theorem',
+        title: 'Cayley-Hamilton Theorem',
+        body: 'Let $A$ be an $n \\times n$ matrix and $p(\\lambda) = \\det(A - \\lambda I)$ its characteristic polynomial. Then $p(A) = 0$ (the zero matrix).',
+      },
+      {
+        type: 'insight',
+        title: 'Computing the Inverse via Cayley-Hamilton',
+        body: 'If $p(\\lambda) = \\lambda^n + c_{n-1}\\lambda^{n-1} + \\cdots + c_1 \\lambda + c_0$ and $c_0 = (-1)^n \\det(A) \\neq 0$, then:\n$A^n + c_{n-1}A^{n-1} + \\cdots + c_1 A + c_0 I = 0$\nMultiply by $A^{-1}$:\n$A^{-1} = -c_0^{-1}(A^{n-1} + c_{n-1}A^{n-2} + \\cdots + c_1 I)$',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 6 of 7 — Eigenvalues & Eigenvectors',
+        body: '**Previous (Lesson 5):** Markov Chains — eigenvalue 1, steady-state distributions.\n**This lesson:** Cayley-Hamilton Theorem — every matrix satisfies its own characteristic equation; using it to compute powers and inverses symbolically.\n**Next (Lesson 7):** Matrix Exponential — solving differential equations $\\dot{\\mathbf{x}} = A\\mathbf{x}$ via $e^{At}$.',
+      },
+      {
+        type: 'procedure',
+        title: 'Procedure: Apply Cayley-Hamilton',
+        body: 'Step 1. **Find the characteristic polynomial.** For a $2\\times 2$ matrix: $p(\\lambda) = \\lambda^2 - \\text{tr}(A)\\lambda + \\det(A)$. For larger matrices, expand $\\det(A - \\lambda I)$.\n\nStep 2. **Interpret $p(A)$.** Replace every $\\lambda^k$ with $A^k$, and replace every scalar constant $c$ with $cI$. For example, $p(\\lambda) = \\lambda^2 - 5\\lambda + 1$ becomes $p(A) = A^2 - 5A + I$.\n\nStep 3. **Verify $p(A) = 0$.** Compute each term and sum — you should get the zero matrix.\n\nStep 4. **Derive consequences.** From $p(A) = 0$:\n- Multiply by $A^{-1}$ to get the **inverse**: $A^{-1} = (\\text{tr}(A)I - A)/\\det(A)$.\n- Rearrange to express $A^n$ as a lower-degree combination: e.g., $A^2 = \\text{tr}(A)A - \\det(A)I$, then use this recurrence for $A^3, A^4, \\ldots$',
+      },
+      {
+        type: 'warning',
+        title: 'Do Not Prove It by Substitution',
+        body: 'A common mistake: writing $p(A) = \\det(A - A \\cdot I) = \\det(0) = 0$ and thinking the theorem is obvious. This is wrong — $\\det(A - \\lambda I)$ is a scalar polynomial, and you cannot just substitute a matrix for the scalar and call it done. The actual proof requires care with polynomial rings and matrix algebra.',
       },
     ],
   },

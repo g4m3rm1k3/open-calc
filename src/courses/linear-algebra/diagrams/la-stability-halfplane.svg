@@ -1,0 +1,38 @@
+<svg viewBox="0 0 380 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="380" height="260" rx="12" class="svg-bg"/>
+
+  <!-- half-plane shading -->
+  <rect x="20" y="30" width="170" height="200" fill="rgba(16,185,129,0.08)"/>
+  <rect x="190" y="30" width="170" height="200" fill="rgba(220,38,38,0.07)"/>
+
+  <text x="105" y="46" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">Re(λ) &lt; 0 — decays</text>
+  <text x="275" y="46" font-size="11" fill="#dc2626" text-anchor="middle" font-weight="700">Re(λ) &gt; 0 — grows</text>
+
+  <!-- axes -->
+  <line x1="20" y1="140" x2="360" y2="140" class="svg-axis" stroke-width="1.5"/>
+  <line x1="190" y1="230" x2="190" y2="30" class="svg-axis" stroke-width="1.5"/>
+  <text x="365" y="144" font-size="11" class="svg-muted">Re</text>
+  <text x="196" y="34" font-size="11" class="svg-muted">Im</text>
+
+  <!-- lambda1 = -2, real, decays -->
+  <circle cx="130" cy="140" r="4.5" fill="#10b981"/>
+  <text x="130" y="160" font-size="10.5" fill="#10b981" text-anchor="middle">λ = -2</text>
+
+  <!-- lambda2 = 1.5i, pure imaginary, oscillates -->
+  <circle cx="190" cy="95" r="4.5" fill="#d97706"/>
+  <text x="222" y="99" font-size="10.5" fill="#d97706">λ = 1.5i — oscillates</text>
+
+  <!-- lambda3 = 1.2+1.3i, right half, grows -->
+  <circle cx="226" cy="101" r="4.5" fill="#dc2626"/>
+  <text x="232" y="86" font-size="10.5" fill="#dc2626">λ = 1.2+1.3i</text>
+
+  <text x="190" y="250" font-size="10.5" class="svg-muted" text-anchor="middle">Stable iff every eigenvalue of A lies strictly in the left half-plane</text>
+</svg>

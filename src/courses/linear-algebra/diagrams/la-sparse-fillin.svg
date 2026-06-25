@@ -1,0 +1,69 @@
+<svg viewBox="0 0 360 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .svg-axis  { stroke: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+    .dark .svg-axis  { stroke: #475569; }
+  </style>
+  <rect width="360" height="200" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="fi-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" class="svg-axis" fill="#94a3b8"/></marker>
+  </defs>
+
+  <text x="180" y="16" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">Elimination can create non-zeros where A had none: "fill-in"</text>
+
+  <!-- Before: 4x4 banded, only tridiagonal nonzero -->
+  <text x="90" y="36" font-size="10.5" class="svg-text" text-anchor="middle" font-weight="700">A — tridiagonal</text>
+  <g>
+    <rect x="40" y="44" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="64" y="44" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="88" y="44" width="24" height="24" class="svg-cell" stroke-width="0.8"/>
+    <rect x="112" y="44" width="24" height="24" class="svg-cell" stroke-width="0.8"/>
+    <rect x="40" y="68" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="64" y="68" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="88" y="68" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="112" y="68" width="24" height="24" class="svg-cell" stroke-width="0.8"/>
+    <rect x="40" y="92" width="24" height="24" class="svg-cell" stroke-width="0.8"/>
+    <rect x="64" y="92" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="88" y="92" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="112" y="92" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="40" y="116" width="24" height="24" class="svg-cell" stroke-width="0.8"/>
+    <rect x="64" y="116" width="24" height="24" class="svg-cell" stroke-width="0.8"/>
+    <rect x="88" y="116" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="112" y="116" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+  </g>
+  <text x="90" y="148" font-size="9" class="svg-muted" text-anchor="middle">nnz = 10 of 16</text>
+
+  <line x1="158" y1="90" x2="198" y2="90" class="svg-axis" stroke-width="1.4" marker-end="url(#fi-arrow)"/>
+  <text x="178" y="82" font-size="8.5" class="svg-muted" text-anchor="middle">eliminate</text>
+
+  <!-- After: L+U with fill-in cells in red -->
+  <text x="270" y="36" font-size="10.5" class="svg-text" text-anchor="middle" font-weight="700">L + U — denser</text>
+  <g>
+    <rect x="220" y="44" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="244" y="44" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="268" y="44" width="24" height="24" fill="rgba(220,38,38,0.28)" stroke="#dc2626" stroke-width="1.3"/>
+    <rect x="292" y="44" width="24" height="24" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="1"/>
+    <rect x="220" y="68" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="244" y="68" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="268" y="68" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="292" y="68" width="24" height="24" fill="rgba(220,38,38,0.28)" stroke="#dc2626" stroke-width="1.3"/>
+    <rect x="220" y="92" width="24" height="24" fill="rgba(220,38,38,0.28)" stroke="#dc2626" stroke-width="1.3"/>
+    <rect x="244" y="92" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="268" y="92" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="292" y="92" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="220" y="116" width="24" height="24" fill="rgba(220,38,38,0.18)" stroke="#dc2626" stroke-width="1"/>
+    <rect x="244" y="116" width="24" height="24" fill="rgba(220,38,38,0.28)" stroke="#dc2626" stroke-width="1.3"/>
+    <rect x="268" y="116" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+    <rect x="292" y="116" width="24" height="24" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.2"/>
+  </g>
+  <text x="270" y="148" font-size="9" fill="#dc2626" text-anchor="middle">red = new fill-in entries</text>
+
+  <text x="180" y="176" font-size="10" class="svg-muted" text-anchor="middle">Reordering before elimination is how solvers keep fill-in (and cost) small</text>
+</svg>

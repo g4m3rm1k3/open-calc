@@ -1,3 +1,6 @@
+import convergencePathUrl from '../diagrams/la-iterative-convergence-path.svg?url';
+import jacobiGsSplittingUrl from '../diagrams/la-jacobi-gauss-seidel-splitting.svg?url';
+
 export default {
   id: 'la9-001',
   slug: 'jacobi-gauss-seidel',
@@ -14,42 +17,29 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Where you are in the story: Chapter 7 gave you powerful direct solvers — LU factorization, Cholesky, QR — that find the exact answer in a finite number of steps. Chapter 8 showed why you need to solve linear systems in the first place: PageRank on billions of web links, differential equations modeling physical phenomena, 3D graphics pipelines. Now those two threads collide. The systems arising from real applications are enormous — a finite element mesh for an aircraft wing can have ten million unknowns — and direct solvers simply cannot handle them. $O(n^3)$ flops for $n = 10^6$ is $10^{18}$ operations. Even at a billion operations per second, that is thirty years of compute time. Something fundamentally different is needed.',
       'The escape hatch is iteration. Instead of computing the exact answer in one pass, you start with a guess — any guess, even all zeros — and repeatedly improve it until it is close enough. Each improvement is cheap: just a sparse matrix-vector multiply plus some arithmetic, costing $O(\\text{nnz})$ where nnz is the number of nonzero entries. For a sparse system, nnz is $O(n)$, so each iteration costs $O(n)$. If you need $k$ iterations to converge, the total work is $O(kn)$. When $k$ is modest (say, a few hundred), this beats $O(n^3)$ by orders of magnitude.',
       'The key insight behind stationary iterative methods is matrix splitting: write $A = M - N$ where $M$ is easy to invert. The system $A\\mathbf{x} = \\mathbf{b}$ becomes $M\\mathbf{x} = N\\mathbf{x} + \\mathbf{b}$, which suggests the iteration $M\\mathbf{x}^{(k+1)} = N\\mathbf{x}^{(k)} + \\mathbf{b}$. Solving for the update: $\\mathbf{x}^{(k+1)} = M^{-1}N\\mathbf{x}^{(k)} + M^{-1}\\mathbf{b}$. The matrix $G = M^{-1}N$ is called the iteration matrix. Applying $G$ once costs $O(n)$ if $M$ is triangular or diagonal. The question is: does the sequence $\\mathbf{x}^{(0)}, \\mathbf{x}^{(1)}, \\mathbf{x}^{(2)}, \\ldots$ actually converge to the true solution $\\mathbf{x}^*$?',
       'The **Jacobi method** uses the simplest possible splitting: $M = D$, the diagonal of $A$. To update component $i$, take equation $i$, move all the off-diagonal terms to the right using old values, and divide by the diagonal: $x_i^{(k+1)} = \\frac{1}{a_{ii}}\\left(b_i - \\sum_{j \\neq i} a_{ij} x_j^{(k)}\\right)$. Every component is updated using the same snapshot of $\\mathbf{x}^{(k)}$. This is beautifully parallelizable — all $n$ updates are independent — which is why Jacobi still appears in GPU solvers today.',
       'A concrete walk-through makes this tangible. Take $\\begin{bmatrix}4&1\\\\1&3\\end{bmatrix}\\begin{bmatrix}x\\\\y\\end{bmatrix} = \\begin{bmatrix}9\\\\7\\end{bmatrix}$, exact solution $(x,y) = (2, 5/3)$. Start at $(0,0)$. Step 1: $x^{(1)} = (9 - 1\\cdot 0)/4 = 2.25$, $y^{(1)} = (7 - 1\\cdot 0)/3 \\approx 2.333$. Step 2: $x^{(2)} = (9 - 2.333)/4 = 1.667$, $y^{(2)} = (7 - 2.25)/3 = 1.583$. The iterates are spiraling inward toward $(2, 1.667)$, overshooting on each side. By step 15 the error is below $10^{-4}$.',
+      ] },
+      { type: 'image', src: convergencePathUrl,
+        alt: 'A dashed zigzag path showing Jacobi iterates starting at (0,0), overshooting past the solution on alternating sides, and spiraling inward to (2, 1.667)',
+        caption: 'The iterates overshoot on alternating sides and spiral inward — a signature of a negative eigenvalue in the iteration matrix.' },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on:** In that 2×2 example, the iterates oscillated — $x$ went 0 → 2.25 → 1.667 → 2.083 → … — crossing the true value repeatedly. Will this always happen, or can the iterates approach from one side without oscillating? What feature of the matrix determines which behavior you get?',
       'The answer lies in the eigenvalues of the iteration matrix $G_J = -D^{-1}(L+U)$. For the 2×2 example, $G_J = -\\begin{bmatrix}0&1/4\\\\1/3&0\\end{bmatrix}$ has eigenvalues $\\pm 1/\\sqrt{12} \\approx \\pm 0.289$. The negative eigenvalue causes the oscillation — each step flips sign. If all eigenvalues were positive real, the iterates would approach monotonically. The convergence condition is simply $\\rho(G) = \\max_i |\\lambda_i(G)| < 1$: the spectral radius must be less than 1. Every iteration multiplies the error by roughly $\\rho(G)$, so you lose $-\\log_{10}\\rho(G)$ decimal digits of accuracy per step. For Jacobi on this example: $\\rho = 0.289$, so each step gains $\\log_{10}(1/0.289) \\approx 0.54$ decimal digits — you need about 11 steps per digit.',
       '**Gauss-Seidel** makes one improvement: instead of waiting until the end of the sweep to use fresh values, it uses each $x_i^{(k+1)}$ as soon as it is computed. When updating component $i$, the components $j < i$ already have their new values: $x_i^{(k+1)} = \\frac{1}{a_{ii}}\\left(b_i - \\sum_{j < i} a_{ij} x_j^{(k+1)} - \\sum_{j > i} a_{ij} x_j^{(k)}\\right)$. The splitting becomes $M = D - L$ (lower triangular). For many important matrices — particularly those from elliptic PDEs — the spectral radius satisfies $\\rho_{GS} \\approx \\rho_J^2$, meaning Gauss-Seidel converges roughly twice as fast as Jacobi with the same work per iteration.',
+      ] },
+      { type: 'image', src: jacobiGsSplittingUrl,
+        alt: 'Two small matrix diagrams comparing Jacobi, which uses only old values from the previous sweep, against Gauss-Seidel, which reuses already-updated values within the same sweep',
+        caption: 'Gauss-Seidel reuses fresh values the moment they are computed — same cost per step, roughly double the convergence rate.' },
+      { type: 'prose', paragraphs: [
       'Where this is heading: Jacobi and Gauss-Seidel converge, but often slowly — especially near the solution, where only low-frequency error components remain. The next lesson introduces **Conjugate Gradient**, which does not use a fixed splitting at all; it adaptively constructs a search direction from the residual and the matrix\'s geometry, achieving convergence in at most $n$ steps for any SPD system. After that, GMRES generalizes CG to non-symmetric systems. These Krylov methods will reduce the iteration count from hundreds to tens, making iterative methods truly competitive for the largest linear systems in science and engineering.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Apply Jacobi Iteration to $A\\mathbf{x} = \\mathbf{b}$ (4 Steps)',
-        body: '1. **Check convergence.** Verify strict diagonal dominance: $|a_{ii}| > \\sum_{j \\neq i}|a_{ij}|$ for every row $i$. If not, compute $\\rho(G_J) = \\rho(-D^{-1}(L+U))$ explicitly — iteration converges iff $\\rho(G_J) < 1$.\n2. **Initialize.** Set $\\mathbf{x}^{(0)}$ to any vector (zeros works fine). The iteration converges regardless of starting point when $\\rho(G_J) < 1$.\n3. **Sweep.** For $k = 0, 1, 2, \\ldots$: compute every component simultaneously using OLD values only: $x_i^{(k+1)} = \\frac{1}{a_{ii}}\\!\\left(b_i - \\sum_{j \\neq i} a_{ij} x_j^{(k)}\\right)$. Storing $\\mathbf{x}^{(k)}$ and $\\mathbf{x}^{(k+1)}$ separately is critical — do NOT overwrite $x_j^{(k)}$ until the full sweep is done.\n4. **Stop** when the residual $\\|A\\mathbf{x}^{(k)} - \\mathbf{b}\\|$ falls below tolerance, OR when the step size $\\|\\mathbf{x}^{(k+1)} - \\mathbf{x}^{(k)}\\|$ is small. Always report the residual, not just the step size.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 1 of 5 — Iterative Solvers & Preconditioning',
-        body: '**Previous (Chapter 8):** Applications — PCA, PageRank, ODEs, computer graphics.\n**This lesson:** Jacobi and Gauss-Seidel — stationary iterative methods, matrix splitting $A = M - N$, spectral radius convergence criterion, SOR acceleration.\n**Next (Lesson 2):** Conjugate Gradient — Krylov subspace methods that converge in far fewer steps than stationary iterations.',
-      },
-      {
-        type: 'theorem',
-        title: 'Convergence Theorem',
-        body: 'Stationary iteration $\\mathbf{x}^{(k+1)} = G\\mathbf{x}^{(k)} + \\mathbf{c}$ converges to the unique fixed point for every starting $\\mathbf{x}^{(0)}$ if and only if $\\rho(G) < 1$.\n\nError reduction per step: $\\|\\mathbf{e}^{(k)}\\| \\leq \\rho(G)^k \\|\\mathbf{e}^{(0)}\\|$\n\nFor Gauss-Seidel: $\\rho_{GS} = \\rho_{Jac}^2$ (for many important matrices — Gauss-Seidel is 2× faster).',
-      },
-      {
-        type: 'insight',
-        title: 'SOR: Successive Over-Relaxation',
-        body: 'SOR interpolates between old and Gauss-Seidel update:\n$x_i^{(k+1)} = (1-\\omega)x_i^{(k)} + \\omega x_i^{GS}$\n\n$\\omega = 1$: Gauss-Seidel\n$1 < \\omega < 2$: over-relaxation (usually faster)\n$0 < \\omega < 1$: under-relaxation (can stabilize non-convergent GS)\n\nOptimal $\\omega$ for Poisson equation: $\\omega^* = \\frac{2}{1+\\sqrt{1-\\rho_{Jac}^2}}$, giving $\\rho_{SOR} = \\omega^* - 1$.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Jacobi and Gauss-Seidel in Python',
         mathBridge: 'Implement both methods from scratch and track convergence — spectral radius predicts exact iteration count.',
         caption: 'Watch how $\\rho(G)$ governs the convergence rate: halving $\\rho$ doubles the decimal digits gained per step.',
@@ -173,8 +163,7 @@ print(f"Gauss-Seidel iterations: {len(errs_gs)}")
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Jacobi and Gauss-Seidel Iteration',
         mathBridge: 'Implement both methods and observe convergence.',
         caption: 'Spectral radius < 1 guarantees convergence. Smaller = faster.',
@@ -265,6 +254,28 @@ disp('rho_jac^2 vs rho_gs:')
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Apply Jacobi Iteration to $A\\mathbf{x} = \\mathbf{b}$ (4 Steps)',
+        body: '1. **Check convergence.** Verify strict diagonal dominance: $|a_{ii}| > \\sum_{j \\neq i}|a_{ij}|$ for every row $i$. If not, compute $\\rho(G_J) = \\rho(-D^{-1}(L+U))$ explicitly — iteration converges iff $\\rho(G_J) < 1$.\n2. **Initialize.** Set $\\mathbf{x}^{(0)}$ to any vector (zeros works fine). The iteration converges regardless of starting point when $\\rho(G_J) < 1$.\n3. **Sweep.** For $k = 0, 1, 2, \\ldots$: compute every component simultaneously using OLD values only: $x_i^{(k+1)} = \\frac{1}{a_{ii}}\\!\\left(b_i - \\sum_{j \\neq i} a_{ij} x_j^{(k)}\\right)$. Storing $\\mathbf{x}^{(k)}$ and $\\mathbf{x}^{(k+1)}$ separately is critical — do NOT overwrite $x_j^{(k)}$ until the full sweep is done.\n4. **Stop** when the residual $\\|A\\mathbf{x}^{(k)} - \\mathbf{b}\\|$ falls below tolerance, OR when the step size $\\|\\mathbf{x}^{(k+1)} - \\mathbf{x}^{(k)}\\|$ is small. Always report the residual, not just the step size.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 1 of 5 — Iterative Solvers & Preconditioning',
+        body: '**Previous (Chapter 8):** Applications — PCA, PageRank, ODEs, computer graphics.\n**This lesson:** Jacobi and Gauss-Seidel — stationary iterative methods, matrix splitting $A = M - N$, spectral radius convergence criterion, SOR acceleration.\n**Next (Lesson 2):** Conjugate Gradient — Krylov subspace methods that converge in far fewer steps than stationary iterations.',
+      },
+      {
+        type: 'theorem',
+        title: 'Convergence Theorem',
+        body: 'Stationary iteration $\\mathbf{x}^{(k+1)} = G\\mathbf{x}^{(k)} + \\mathbf{c}$ converges to the unique fixed point for every starting $\\mathbf{x}^{(0)}$ if and only if $\\rho(G) < 1$.\n\nError reduction per step: $\\|\\mathbf{e}^{(k)}\\| \\leq \\rho(G)^k \\|\\mathbf{e}^{(0)}\\|$\n\nFor Gauss-Seidel: $\\rho_{GS} = \\rho_{Jac}^2$ (for many important matrices — Gauss-Seidel is 2× faster).',
+      },
+      {
+        type: 'insight',
+        title: 'SOR: Successive Over-Relaxation',
+        body: 'SOR interpolates between old and Gauss-Seidel update:\n$x_i^{(k+1)} = (1-\\omega)x_i^{(k)} + \\omega x_i^{GS}$\n\n$\\omega = 1$: Gauss-Seidel\n$1 < \\omega < 2$: over-relaxation (usually faster)\n$0 < \\omega < 1$: under-relaxation (can stabilize non-convergent GS)\n\nOptimal $\\omega$ for Poisson equation: $\\omega^* = \\frac{2}{1+\\sqrt{1-\\rho_{Jac}^2}}$, giving $\\rho_{SOR} = \\omega^* - 1$.',
       },
     ],
   },

@@ -1,0 +1,40 @@
+<svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="480" height="260" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="cm-gray" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#64748b"/></marker>
+    <marker id="cm-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+    <marker id="cm-green" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#10b981"/></marker>
+    <marker id="cm-dash" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M1,1 L1,5 L5,3 z" fill="#94a3b8"/></marker>
+  </defs>
+
+  <!-- Origin O=(110,200) -->
+  <circle cx="110" cy="200" r="3" fill="#1e293b"/>
+
+  <!-- v0 = [3,1], gray -->
+  <line x1="110" y1="200" x2="212" y2="167" stroke="#64748b" stroke-width="3" marker-end="url(#cm-gray)"/>
+  <text x="216" y="163" font-size="12" fill="#64748b" font-weight="700">v = [3,1]</text>
+
+  <!-- v1 = R*v0 = [-1,3], blue -->
+  <line x1="110" y1="200" x2="78" y2="98" stroke="#2563eb" stroke-width="3" marker-end="url(#cm-blue)"/>
+  <text x="20" y="92" font-size="12" fill="#2563eb" font-weight="700">Rv = [-1,3]</text>
+
+  <!-- v2 = S*R*v0 = [2,3], green -->
+  <line x1="110" y1="200" x2="177" y2="98" stroke="#10b981" stroke-width="3.5" marker-end="url(#cm-green)"/>
+  <text x="184" y="92" font-size="12" fill="#10b981" font-weight="700">SRv = [2,3]</text>
+
+  <!-- connector: v0 tip -> v1 tip, "apply R" -->
+  <path d="M 212 167 Q 130 100 80 98" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#cm-dash)"/>
+  <text x="155" y="140" font-size="11" fill="#2563eb">step 1: apply R (rotate)</text>
+
+  <!-- connector: v1 tip -> v2 tip, "apply S" -->
+  <path d="M 78 98 Q 128 70 175 98" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#cm-dash)"/>
+  <text x="90" y="68" font-size="11" fill="#10b981">step 2: apply S (shear)</text>
+
+  <text x="240" y="240" font-size="12" class="svg-muted" text-anchor="middle">One matrix SR does both steps at once: SRv lands exactly where S(Rv) does</text>
+</svg>

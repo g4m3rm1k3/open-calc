@@ -1,0 +1,39 @@
+<svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="460" height="220" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="bc-blue" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+    <marker id="bc-amber" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#d97706"/></marker>
+  </defs>
+
+  <text x="230" y="16" font-size="11" class="svg-muted" text-anchor="middle">Same polynomial, same dot — the ruler changes, not the point</text>
+
+  <!-- Panel 1: standard basis -->
+  <rect x="12" y="24" width="216" height="182" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="42" font-size="11" fill="#2563eb" text-anchor="middle" font-weight="700">Basis {1, x, x²}</text>
+  <line x1="60" y1="150" x2="190" y2="150" stroke="#2563eb" stroke-width="1.6" marker-end="url(#bc-blue)"/>
+  <line x1="60" y1="150" x2="60" y2="60" stroke="#2563eb" stroke-width="1.6" marker-end="url(#bc-blue)"/>
+  <circle cx="140" cy="100" r="5" fill="#1e293b"/>
+  <line x1="140" y1="150" x2="140" y2="100" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="60" y1="100" x2="140" y2="100" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="120" y="180" font-size="10.5" fill="#2563eb" text-anchor="middle" font-weight="700">coords: (3, 2, -5)</text>
+
+  <!-- Panel 2: skewed basis, same dot -->
+  <rect x="232" y="24" width="216" height="182" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="340" y="42" font-size="11" fill="#d97706" text-anchor="middle" font-weight="700">Basis {1+x, 1-x, x²}</text>
+  <line x1="290" y1="150" x2="410" y2="120" stroke="#d97706" stroke-width="1.6" marker-end="url(#bc-amber)"/>
+  <line x1="290" y1="150" x2="320" y2="65" stroke="#d97706" stroke-width="1.6" marker-end="url(#bc-amber)"/>
+  <circle cx="360" cy="100" r="5" fill="#1e293b"/>
+  <text x="340" y="180" font-size="10.5" fill="#d97706" text-anchor="middle" font-weight="700">coords: (5/2, 1/2, -5)</text>
+</svg>

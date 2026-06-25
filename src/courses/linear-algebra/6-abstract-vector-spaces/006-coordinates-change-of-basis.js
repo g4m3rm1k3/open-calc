@@ -1,3 +1,5 @@
+import coordinatesTwoBasesUrl from '../diagrams/la-coordinates-two-bases.svg?url'
+
 export default {
   id: 'la6-006',
   slug: 'coordinates-change-of-basis',
@@ -14,8 +16,14 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $\\mathbf{v} = (5, 3)$ and two bases for $\\mathbb{R}^2$: standard $\\mathcal{E} = \\{(1,0),(0,1)\\}$ and $\\mathcal{B} = \\{(1,1),(1,-1)\\}$. In $\\mathcal{E}$, the coordinates are just $(5,3)$ — no work needed. In $\\mathcal{B}$, you need $c_1(1,1) + c_2(1,-1) = (5,3)$. That gives $c_1+c_2=5$ and $c_1-c_2=3$, so $c_1=4, c_2=1$. Check: $4(1,1)+1(1,-1)=(5,3)$ ✓. The **same vector**, two completely different lists of numbers — $(5,3)$ vs $(4,1)$. Coordinates depend on the basis.',
+      ] },
+      { type: 'image', src: coordinatesTwoBasesUrl,
+        alt: 'A single vector v drawn from the origin, with solid standard axes and dashed basis B axes at 45 degrees overlaid, labeled standard coordinates (5,3) and basis B coordinates (4,1)',
+        caption: 'Same arrow, same point — only the ruler (basis) changes, and the numbers you read off change with it.' },
+      { type: 'prose', paragraphs: [
       '**The change-of-basis matrix.** Given two ordered bases $\\mathcal{B}$ and $\\mathcal{B}\'$ for $V$, the **change-of-basis matrix from $\\mathcal{B}$ to $\\mathcal{B}\'$** is the matrix $P_{\\mathcal{B} \\to \\mathcal{B}\'} = [P]$ whose $j$-th column is $[\\mathbf{b}_j]_{\\mathcal{B}\'} =$ coordinates of the old basis vector $\\mathbf{b}_j$ in the new basis $\\mathcal{B}\'$. Then: $[\\mathbf{v}]_{\\mathcal{B}\'} = P_{\\mathcal{B} \\to \\mathcal{B}\'} \\cdot [\\mathbf{v}]_{\\mathcal{B}}$.',
       '**The inverse goes the other way.** If $P$ converts from $\\mathcal{B}$-coordinates to $\\mathcal{B}\'$-coordinates, then $P^{-1}$ converts from $\\mathcal{B}\'$-coordinates back to $\\mathcal{B}$-coordinates. Since $P$ is always invertible (it converts between two bases — its columns are linearly independent), $P^{-1}$ always exists. When converting in $\\mathbb{R}^n$ with the standard basis as one of the bases: if $P = [\\mathbf{b}_1 | \\cdots | \\mathbf{b}_n]$ converts from $\\mathcal{B}$-coordinates to standard coordinates, then $P^{-1}$ converts from standard coordinates to $\\mathcal{B}$-coordinates. Concretely: $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$ where $\\mathbf{v}$ is the standard-coordinate vector.',
       '**In $\\mathbb{R}^n$.** When $\\mathcal{C}$ is the standard basis and $\\mathcal{B}$ is a non-standard basis with basis vectors $\\mathbf{b}_1, \\ldots, \\mathbf{b}_n$, the matrix $P = [\\mathbf{b}_1 | \\cdots | \\mathbf{b}_n]$ converts from $\\mathcal{B}$-coordinates to standard coordinates: $\\mathbf{v} = P[\\mathbf{v}]_{\\mathcal{B}}$. To go the other way: $[\\mathbf{v}]_{\\mathcal{B}} = P^{-1}\\mathbf{v}$.',
@@ -23,48 +31,13 @@ export default {
       '**Diagonalization is change of basis to eigenvectors.** When $A$ is diagonalizable with eigenvector matrix $P$ and diagonal matrix $D$: $D = P^{-1}AP$. This says: in the eigenvector basis, the map $T$ simply scales each coordinate independently by the corresponding eigenvalue — the simplest possible matrix. The eigenvalues $\\lambda_1, \\ldots, \\lambda_n$ do not change when you change basis (they are similarity invariants). Only the matrix entries change. The eigenvector basis is the "optimal" basis for understanding a diagonalizable linear map.',
       '**CNC coordinate frames.** In multi-axis CNC machining, every component of the machine has its own coordinate frame: the machine frame (absolute), the workpiece frame (offset by fixture), the tool frame (tip of cutting tool). Moving between these is a change of basis. The transformation matrices are rigid body motions: rotation $R$ (change of orientation basis) combined with translation $\\mathbf{t}$ (origin shift), represented as $4 \\times 4$ homogeneous matrices $\\begin{bmatrix}R & \\mathbf{t} \\\\ \\mathbf{0} & 1\\end{bmatrix}$. Composing two frame changes multiplies the matrices — the matrix algebra of change of basis, applied to machining geometry.',
       '**Where this is heading.** This completes the chapter on Abstract Vector Spaces. Looking forward, all the key algorithms of linear algebra — eigendecomposition, SVD, QR factorization, LU factorization, Gram-Schmidt — can now be understood as: finding the right basis for the problem, computing in that basis, and converting back. The question "what is the best basis?" drives the entire field of applied linear algebra.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Convert Vectors and Matrices Between Two Bases (4 Steps)',
-        body: '**Given:** Two ordered bases $\\mathcal{B}$ and $\\mathcal{B}\'$ for $\\mathbb{R}^n$ (or any finite-dim space over $\\mathbb{F}$).\n**Step 1.** Form $P$: write each $\\mathcal{B}\'$ basis vector in $\\mathcal{B}$-coordinates and use these as columns. When $\\mathcal{B}$ is the standard basis, $P$ simply has the $\\mathcal{B}\'$ vectors as columns.\n**Step 2.** Convert a vector: $[\\mathbf{v}]_{\\mathcal{B}\'} = P^{-1} [\\mathbf{v}]_{\\mathcal{B}}$. (Equivalently, $[\\mathbf{v}]_{\\mathcal{B}} = P [\\mathbf{v}]_{\\mathcal{B}\'} $).\n**Step 3.** Convert a matrix (linear map $T: V \\to V$): $[T]_{\\mathcal{B}\'} = P^{-1} [T]_{\\mathcal{B}} P$.\n**Step 4.** Verify: $P \\cdot [\\mathbf{v}]_{\\mathcal{B}\'} = [\\mathbf{v}]_{\\mathcal{B}}$ (round-trip) and $\\det([T]_{\\mathcal{B}\'}) = \\det([T]_{\\mathcal{B}})$ (determinant is invariant).',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 6 of 6 — Abstract Vector Spaces',
-        body: '**Previous:** Isomorphisms — bijective linear maps and the classification of finite-dimensional spaces.\n**This lesson:** Coordinates and Change of Basis — the mechanics of converting vectors and matrices between different bases, and why $P^{-1}AP$ is the right formula.\n**Next:** End of Chapter 6.',
-      },
-      {
-        type: 'insight',
-        title: 'Predict Before You Compute',
-        body: 'Let $\\mathcal{B} = \\{(2,1),(1,1)\\}$ and $\\mathbf{v} = (3,2)$.\n\nBefore computing: will the $\\mathcal{B}$-coordinates of $\\mathbf{v}$ be integers? Will they be positive? Will either coordinate be zero? Make your guess, then solve $c_1(2,1)+c_2(1,1)=(3,2)$ and see.',
-      },
-      {
-        type: 'insight',
-        title: 'Change of Basis Summary',
-        body: 'Let $P$ = matrix with columns = new basis vectors (in old coordinates).\n\n**Convert vectors:** $[\\mathbf{v}]_{\\text{new}} = P^{-1} [\\mathbf{v}]_{\\text{old}}$\n\n**Convert matrices:** $[T]_{\\text{new}} = P^{-1} [T]_{\\text{old}} P$\n\n**Compose:** $(P_{B \\to C}) \\cdot (P_{A \\to B}) = P_{A \\to C}$',
-      },
-      {
-        type: 'insight',
-        title: 'Why Diagonalization Works',
-        body: 'If $A$ is diagonalizable with eigenvector matrix $P$:\n$P^{-1}AP = D$ (diagonal)\n\nThis says: in the eigenvector basis, $A$ just scales each direction independently. Choosing the eigenvector basis is the "ideal" basis change for understanding $A$.',
-      },
-      {
-        type: 'warning',
-        title: 'Direction Convention',
-        body: 'There are two conventions for change-of-basis matrices. Always track: does column $j$ of $P$ contain the new basis vectors written in old coordinates, or vice versa? And do you multiply vectors by $P$ or $P^{-1}$ to convert them? Be consistent — the formulas work out oppositely depending on the convention.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'ChangeOfBasisViz',
+      ] },
+      { type: 'viz', id: 'ChangeOfBasisViz',
         title: 'Two Grids, One Vector — Draggable Basis Explorer',
         mathBridge: 'The standard grid is fixed (gray). The B-grid (colored) shows the new basis vectors b₁ and b₂ — drag their tips to reshape it. The purple vector stays fixed in space but its coordinates update in both systems. Key observation: as you squish the B-basis vectors closer together, the B-coordinates grow larger — you need more copies of a small ruler to reach the same point.',
         caption: 'A vector does not change when you change basis — only its coordinate description changes.',
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Change-of-Basis Computations',
         mathBridge: 'Compute change-of-basis matrices and verify coordinate conversions.',
         caption: 'The same vector, two different coordinate systems.',
@@ -132,6 +105,38 @@ diag(D_new)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Convert Vectors and Matrices Between Two Bases (4 Steps)',
+        body: '**Given:** Two ordered bases $\\mathcal{B}$ and $\\mathcal{B}\'$ for $\\mathbb{R}^n$ (or any finite-dim space over $\\mathbb{F}$).\n**Step 1.** Form $P$: write each $\\mathcal{B}\'$ basis vector in $\\mathcal{B}$-coordinates and use these as columns. When $\\mathcal{B}$ is the standard basis, $P$ simply has the $\\mathcal{B}\'$ vectors as columns.\n**Step 2.** Convert a vector: $[\\mathbf{v}]_{\\mathcal{B}\'} = P^{-1} [\\mathbf{v}]_{\\mathcal{B}}$. (Equivalently, $[\\mathbf{v}]_{\\mathcal{B}} = P [\\mathbf{v}]_{\\mathcal{B}\'} $).\n**Step 3.** Convert a matrix (linear map $T: V \\to V$): $[T]_{\\mathcal{B}\'} = P^{-1} [T]_{\\mathcal{B}} P$.\n**Step 4.** Verify: $P \\cdot [\\mathbf{v}]_{\\mathcal{B}\'} = [\\mathbf{v}]_{\\mathcal{B}}$ (round-trip) and $\\det([T]_{\\mathcal{B}\'}) = \\det([T]_{\\mathcal{B}})$ (determinant is invariant).',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 6 of 6 — Abstract Vector Spaces',
+        body: '**Previous:** Isomorphisms — bijective linear maps and the classification of finite-dimensional spaces.\n**This lesson:** Coordinates and Change of Basis — the mechanics of converting vectors and matrices between different bases, and why $P^{-1}AP$ is the right formula.\n**Next:** End of Chapter 6.',
+      },
+      {
+        type: 'insight',
+        title: 'Predict Before You Compute',
+        body: 'Let $\\mathcal{B} = \\{(2,1),(1,1)\\}$ and $\\mathbf{v} = (3,2)$.\n\nBefore computing: will the $\\mathcal{B}$-coordinates of $\\mathbf{v}$ be integers? Will they be positive? Will either coordinate be zero? Make your guess, then solve $c_1(2,1)+c_2(1,1)=(3,2)$ and see.',
+      },
+      {
+        type: 'insight',
+        title: 'Change of Basis Summary',
+        body: 'Let $P$ = matrix with columns = new basis vectors (in old coordinates).\n\n**Convert vectors:** $[\\mathbf{v}]_{\\text{new}} = P^{-1} [\\mathbf{v}]_{\\text{old}}$\n\n**Convert matrices:** $[T]_{\\text{new}} = P^{-1} [T]_{\\text{old}} P$\n\n**Compose:** $(P_{B \\to C}) \\cdot (P_{A \\to B}) = P_{A \\to C}$',
+      },
+      {
+        type: 'insight',
+        title: 'Why Diagonalization Works',
+        body: 'If $A$ is diagonalizable with eigenvector matrix $P$:\n$P^{-1}AP = D$ (diagonal)\n\nThis says: in the eigenvector basis, $A$ just scales each direction independently. Choosing the eigenvector basis is the "ideal" basis change for understanding $A$.',
+      },
+      {
+        type: 'warning',
+        title: 'Direction Convention',
+        body: 'There are two conventions for change-of-basis matrices. Always track: does column $j$ of $P$ contain the new basis vectors written in old coordinates, or vice versa? And do you multiply vectors by $P$ or $P^{-1}$ to convert them? Be consistent — the formulas work out oppositely depending on the convention.',
       },
     ],
   },

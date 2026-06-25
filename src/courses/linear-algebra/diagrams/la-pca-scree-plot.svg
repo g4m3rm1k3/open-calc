@@ -1,0 +1,40 @@
+<svg viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="340" height="210" rx="10" class="svg-bg"/>
+
+  <text x="170" y="16" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">Scree plot: variance explained drops off, then the "elbow"</text>
+
+  <line x1="40" y1="170" x2="310" y2="170" class="svg-axis" stroke-width="1.3"/>
+  <line x1="40" y1="170" x2="40" y2="34" class="svg-axis" stroke-width="1.3"/>
+
+  <!-- bars: explained variance ratio per component, decreasing -->
+  <rect x="52" y="44" width="30" height="126" fill="rgba(37,99,235,0.45)" stroke="#2563eb" stroke-width="1"/>
+  <rect x="90" y="78" width="30" height="92" fill="rgba(37,99,235,0.35)" stroke="#2563eb" stroke-width="1"/>
+  <rect x="128" y="120" width="30" height="50" fill="rgba(217,119,6,0.4)" stroke="#d97706" stroke-width="1.3"/>
+  <rect x="166" y="142" width="30" height="28" fill="#94a3b8" opacity="0.45" stroke="#64748b" stroke-width="1"/>
+  <rect x="204" y="154" width="30" height="16" fill="#94a3b8" opacity="0.35" stroke="#64748b" stroke-width="1"/>
+  <rect x="242" y="161" width="30" height="9" fill="#94a3b8" opacity="0.25" stroke="#64748b" stroke-width="1"/>
+
+  <text x="67" y="184" font-size="9" class="svg-muted" text-anchor="middle">PC1</text>
+  <text x="105" y="184" font-size="9" class="svg-muted" text-anchor="middle">PC2</text>
+  <text x="143" y="184" font-size="9" class="svg-muted" text-anchor="middle">PC3</text>
+  <text x="181" y="184" font-size="9" class="svg-muted" text-anchor="middle">PC4</text>
+  <text x="219" y="184" font-size="9" class="svg-muted" text-anchor="middle">PC5</text>
+  <text x="257" y="184" font-size="9" class="svg-muted" text-anchor="middle">PC6</text>
+
+  <!-- elbow marker -->
+  <circle cx="143" cy="120" r="4" fill="none" stroke="#d97706" stroke-width="1.8"/>
+  <text x="143" y="106" font-size="9.5" fill="#d97706" font-weight="700" text-anchor="middle">elbow</text>
+
+  <text x="20" y="40" font-size="9" class="svg-muted">var %</text>
+  <text x="170" y="200" font-size="9.5" class="svg-muted" text-anchor="middle">keep components before the elbow — past it, each adds little signal</text>
+</svg>

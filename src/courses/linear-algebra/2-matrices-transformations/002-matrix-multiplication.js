@@ -1,3 +1,6 @@
+import matrixCompositionUrl from '../diagrams/la-matrix-composition.svg?url'
+import noncommutativeUrl from '../diagrams/la-noncommutative.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-002',
@@ -24,15 +27,40 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Apply $R = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (90° CCW rotation) to $[3,1]^T$: result is $[-1,3]^T$. Now apply shear $S = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ to $[-1,3]^T$: result is $[2,3]^T$. Two steps: rotate then shear, and $[3,1]^T$ lands at $[2,3]^T$. The matrix that does BOTH steps at once is the product $SR = \\begin{bmatrix}0&-1\\\\1&1\\end{bmatrix}$ — a single matrix capturing both transformations. **Matrix multiplication IS transformation composition.** This lesson shows you how to compute that product and why the order of multiplication matches the order of applying transformations.',
+      ] },
+      { type: 'image', src: matrixCompositionUrl,
+        alt: 'Vector v shown in gray, then the rotated vector Rv shown in blue with a curved connector labeled step 1 apply R, then the final vector SRv shown in green with a curved connector labeled step 2 apply S',
+        caption: 'One matrix SR does both steps at once: SRv lands exactly where S(Rv) does.' },
+      { type: 'prose', paragraphs: [
       '**The shortcut insight.** Imagine applying matrix $A$ to every point in the plane. The plane warps into a new shape. Now apply matrix $B$ to the already-warped plane. The plane warps again. You have performed two transformations. But since both warps are linear, the *combined* effect is itself a linear transformation. That means a single matrix could have done both steps at once. That single matrix is the **product** $BA$ (B after A).',
       '**Why right-to-left?** We write $B(A(\\mathbf{x}))$ because functions compose from inside to outside. The matrix closest to the vector $\\mathbf{x}$ acts first, like nested function calls in code: `B(A(x))`. Reading $BA\\mathbf{x}$ correctly means: A acts on $\\mathbf{x}$ first, then B acts on the result.',
       '**The Pixar connection.** When animating a character\'s arm wave, the studio must account for: shoulder rotation, elbow rotation relative to shoulder, wrist rotation relative to elbow. Every frame, every polygon on the arm needs all three transformations applied. If you applied them one at a time to millions of polygons, the movie would take decades to render. Instead: multiply the three matrices together *first* to get one master matrix. Apply that single matrix to every polygon. One matrix product replaces three passes.',
       '**CNC parallel.** A CNC machining center moving a 5-axis part from fixtured position to cutting position does the same thing. The post-processor (the software that converts CAD moves to G-code) computes a chain of transformation matrices: work coordinate offset → coordinate rotation (G68) → tool length compensation → machine kinematics. Each step is a matrix. The post-processor multiplies them together before outputting a single G-code block. The machine\'s controller never sees the individual steps — only the composite result.',
       '**Order is everything.** "First rotate 90°, then shear horizontally" warps space to a completely different shape than "first shear horizontally, then rotate 90°." In matrix language: $BA \\neq AB$ in general. This is called **non-commutativity**, and it is not an accident — it reflects the physical reality that the order of physical operations matters.',
+      ] },
+      { type: 'image', src: noncommutativeUrl,
+        alt: 'Two panels showing the same starting vector [1,0]: left panel applies rotate-then-shear and ends at [1,1], right panel applies shear-then-rotate and ends at [0,1] — different final destinations',
+        caption: 'BA ≠ AB: applying the same two matrices in opposite orders sends the same starting vector to different places.' },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on.** You want to apply $A = \\begin{bmatrix}2&0\\\\0&3\\end{bmatrix}$ (scale $x$ by 2, $y$ by 3) and then $B = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ (horizontal shear). What is the product $BA$? Without computing the full matrix, predict: where does $[1,0]^T$ end up after both transformations? Check your answer in Example 1.',
       '**How to compute the product.** The $(i,j)$ entry of $AB$ is the dot product of row $i$ of $A$ with column $j$ of $B$. Geometrically: you are asking where the $j$-th basis vector goes under $B$, and then where *that* resulting vector goes under $A$. That landing coordinate is row $i$ of the result.',
+      ] },
+      { type: 'viz', id: 'LALesson05_MatrixMult',
+        title: 'Composing Two Warps — Interactive',
+        mathBridge: 'Two transformation buttons (Shear A, Rotate B) apply in sequence. Use the playback slider to watch the plane undergo shear first, then rotation. Notice that the final positions of $\\hat{i}$ and $\\hat{j}$ match the columns of the algebraically computed product $BA$. Also try applying them in reverse order ($AB$) to see non-commutativity.',
+        caption: 'Applying A then B is the same as applying the single matrix BA. The product captures both transformations simultaneously.' },
+      { type: 'viz', id: 'LAMatrixAlgebraModule',
+        title: 'Matrix Algebra — Concept to Graphics Pipeline',
+        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), A⁻¹, and A⁻¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
+        caption: 'The same math that renders every polygon in a 3D game — rotation, scale, and shear combined into a single matrix multiply.' },
+      { type: 'viz', id: 'TransformLab',
+        title: 'Transform Lab — Chaining Transforms',
+        mathBridge: 'Jump straight to Step 4: Chain Transforms. Enter two matrices $A$ and $B$, apply them separately, then chain them as $BA$ in one step. This is exactly what matrix multiplication means geometrically — applying two linear maps in sequence collapses to a single matrix product.',
+        caption: 'Matrix multiplication = geometry composition. The product BA encodes "apply A first, then B."',
+        initialProps: { startStep: 3 } },
     ],
     callouts: [
       {
@@ -64,27 +92,6 @@ export default {
         type: 'definition',
         title: 'Dimension Compatibility',
         body: 'You can only multiply $A \\times B$ if the number of **columns** in $A$ equals the number of **rows** in $B$.\n\n$$(m \\times k)(k \\times n) = (m \\times n)$$\n\nThe inner dimension $k$ must match. The result has the outer dimensions. Violating this is one of the most common errors in scientific computing — NumPy will throw a shape mismatch error.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson05_MatrixMult',
-        title: 'Composing Two Warps — Interactive',
-        mathBridge: 'Two transformation buttons (Shear A, Rotate B) apply in sequence. Use the playback slider to watch the plane undergo shear first, then rotation. Notice that the final positions of $\\hat{i}$ and $\\hat{j}$ match the columns of the algebraically computed product $BA$. Also try applying them in reverse order ($AB$) to see non-commutativity.',
-        caption: 'Applying A then B is the same as applying the single matrix BA. The product captures both transformations simultaneously.',
-      },
-      {
-        id: 'LAMatrixAlgebraModule',
-        title: 'Matrix Algebra — Concept to Graphics Pipeline',
-        mathBridge: 'A five-tab module: Concept covers addition, multiplication, identity, inverse, and LU; Canonical walks through a 2×3 × 3×2 product entry by entry, a 2×2 inverse by row reduction, and an LU factorisation; Real World shows the 3D graphics pipeline and FEA usage; Interactive lets you enter any 2×2 matrices A and B and instantly computes AB, BA, det(A), A⁻¹, and A⁻¹b, plus a live graphics canvas with rotation/scale/shear sliders; Practice has five hand-calculation problems.',
-        caption: 'The same math that renders every polygon in a 3D game — rotation, scale, and shear combined into a single matrix multiply.',
-      },
-      {
-        id: 'TransformLab',
-        title: 'Transform Lab — Chaining Transforms',
-        mathBridge: 'Jump straight to Step 4: Chain Transforms. Enter two matrices $A$ and $B$, apply them separately, then chain them as $BA$ in one step. This is exactly what matrix multiplication means geometrically — applying two linear maps in sequence collapses to a single matrix product.',
-        caption: 'Matrix multiplication = geometry composition. The product BA encodes "apply A first, then B."',
-        initialProps: { startStep: 3 },
       },
     ],
   },

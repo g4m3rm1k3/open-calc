@@ -1,3 +1,5 @@
+import gradientContourUrl from '../diagrams/la-gradient-contour.svg?url'
+
 export default {
   id: 'la2-009',
   slug: 'matrix-calculus',
@@ -18,45 +20,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $\\mathbf{x}_0 = [1, 2]^\\top$ and $A = \\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}$. The function $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ evaluates to $15$ at $\\mathbf{x}_0$. One formula gives the gradient instantly: $\\nabla f = 2A\\mathbf{x}_0 = 2\\begin{bmatrix}3&1\\\\1&2\\end{bmatrix}\\begin{bmatrix}1\\\\2\\end{bmatrix} = \\begin{bmatrix}10\\\\10\\end{bmatrix}$. This tells you: from $\\mathbf{x}_0$, moving in direction $[10,10]^\\top$ increases $f$ fastest; gradient descent steps the opposite way. That single formula — $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ — drives least squares, ridge regression, and neural network training.',
       '**Derivatives of scalars with respect to vectors — the gradient.** If $f(\\mathbf{x})$ maps a vector $\\mathbf{x} \\in \\mathbb{R}^n$ to a scalar, the gradient $\\nabla f$ is a column vector of partial derivatives: $\\nabla f = \\bigl[\\partial f/\\partial x_1, \\ldots, \\partial f/\\partial x_n\\bigr]^\\top$. The gradient points in the direction of steepest ascent. Gradient descent moves opposite to it.',
+      ] },
+      { type: 'image', src: gradientContourUrl,
+        alt: 'Concentric ellipse contour lines around a minimum point, with the gradient vector drawn pointing outward (uphill) perpendicular to the contour at a point P, and a shorter vector pointing inward labeled negative gradient',
+        caption: 'The gradient points perpendicular to the level curve, uphill; gradient descent steps the opposite way.' },
+      { type: 'prose', paragraphs: [
       '**Derivatives of vectors with respect to vectors — the Jacobian.** If $\\mathbf{f}(\\mathbf{x})$ maps $\\mathbf{x} \\in \\mathbb{R}^n$ to $\\mathbf{f} \\in \\mathbb{R}^m$, the Jacobian $J$ is an $m \\times n$ matrix where $J_{ij} = \\partial f_i / \\partial x_j$. The Jacobian is the best linear approximation to $\\mathbf{f}$ at a point — the multivariable analogue of the single-variable derivative.',
       '**The Hessian — second-order information.** For a scalar function $f: \\mathbb{R}^n \\to \\mathbb{R}$, the Hessian $H$ is the $n \\times n$ matrix of second partial derivatives: $H_{ij} = \\partial^2 f / \\partial x_i \\partial x_j$. By Schwarz\'s theorem, the Hessian is always symmetric ($H = H^\\top$). Its eigenvalues tell you the curvature in each principal direction. Positive definite Hessian → local minimum. Indefinite Hessian → saddle point.',
       '**Two critical formulas to memorize.** For $f(\\mathbf{x}) = \\mathbf{a}^\\top \\mathbf{x}$ (linear), the gradient is $\\nabla f = \\mathbf{a}$. For $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ (quadratic form with symmetric $A$), the gradient is $\\nabla f = 2A\\mathbf{x}$, and the Hessian is $H = 2A$. These two formulas appear everywhere in statistics (least squares), physics (energy), and ML (loss functions).',
       '**Predict before reading on.** A neural network has two layers: $\\mathbf{z} = W_1\\mathbf{x}$ then $\\mathbf{y} = W_2\\mathbf{z}$, so $\\mathbf{y} = W_2 W_1 \\mathbf{x}$. If the loss is $L = \\frac{1}{2}\\|\\mathbf{y} - \\mathbf{t}\\|^2$, what is $\\partial L/\\partial \\mathbf{x}$? Write your answer in terms of $W_1$, $W_2$, $\\mathbf{y}$, and $\\mathbf{t}$ before continuing.',
       '**Where this is heading.** The formula $\\nabla(\\|A\\mathbf{x} - \\mathbf{b}\\|^2) = 2A^\\top(A\\mathbf{x} - \\mathbf{b})$ is why we study least squares (Chapter 4) — setting the gradient to zero gives the normal equations $A^\\top A \\mathbf{x} = A^\\top \\mathbf{b}$. The Hessian $H = 2A$ being positive definite is precisely the condition (from Chapter 4\'s spectral theorem) that guarantees the normal equations have a unique solution. And backpropagation in neural networks — the algorithm that trains every language model and image classifier — is pure Jacobian chain rule, layer by layer. Every formula in this lesson is used daily in production ML systems.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'Procedure: Compute the Gradient of a Scalar Function of a Vector',
-        body: 'Step 1. Identify the function type: linear ($\\mathbf{a}^\\top\\mathbf{x}$), quadratic ($\\mathbf{x}^\\top A\\mathbf{x}$), or composite (chain rule needed).\nStep 2. Apply the matching formula: $\\nabla(\\mathbf{a}^\\top\\mathbf{x}) = \\mathbf{a}$; $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ (symmetric $A$); $\\nabla\\|A\\mathbf{x}-\\mathbf{b}\\|^2 = 2A^\\top(A\\mathbf{x}-\\mathbf{b})$.\nStep 3. Verify the shape: $\\nabla f$ must be a column vector of the same dimension as $\\mathbf{x}$.\nStep 4. Verify numerically: compute $[f(\\mathbf{x}+\\epsilon\\mathbf{e}_i) - f(\\mathbf{x}-\\epsilon\\mathbf{e}_i)]/(2\\epsilon)$ for each $i$ and compare to the analytic formula.\nStep 5. To find the minimizer: set $\\nabla f = \\mathbf{0}$ and solve the resulting linear system. Check the Hessian is positive definite to confirm a minimum.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 9 of 12 — Matrices & Transformations',
-        body: '**Previous:** Cramer\'s Rule — determinant-based formulas for solutions and inverses.\n**This lesson:** Matrix Calculus — gradients, Jacobians, and Hessians; how to differentiate functions of vectors and matrices.\n**Next:** The Invertible Matrix Theorem — twelve equivalent conditions that unify all of Chapters 1 and 2.',
-      },
-      {
-        type: 'insight',
-        title: 'The Matrix Calculus Cheat Sheet',
-        body: '| Expression | Derivative | Shape |\n|---|---|---|\n| $\\mathbf{a}^\\top \\mathbf{x}$ | $\\mathbf{a}$ | $n \\times 1$ |\n| $\\mathbf{x}^\\top A \\mathbf{x}$ | $2A\\mathbf{x}$ (if $A$ symmetric) | $n \\times 1$ |\n| $A\\mathbf{x}$ w.r.t. $\\mathbf{x}$ | $A$ (Jacobian) | $m \\times n$ |\n| $\\|\\mathbf{x}\\|^2$ | $2\\mathbf{x}$ | $n \\times 1$ |\n| $\\|A\\mathbf{x} - \\mathbf{b}\\|^2$ | $2A^\\top(A\\mathbf{x}-\\mathbf{b})$ | $n \\times 1$ |',
-      },
-      {
-        type: 'insight',
-        title: 'The Chain Rule in Matrix Form',
-        body: 'If $\\mathbf{h}(\\mathbf{x}) = \\mathbf{f}(\\mathbf{g}(\\mathbf{x}))$, the Jacobian of the composition is the product of Jacobians:\n$J_h = J_f \\cdot J_g$\nThis is why backpropagation in neural networks is just repeated matrix multiplication of Jacobians — the chain rule applied layer by layer.',
-      },
-      {
-        type: 'warning',
-        title: 'Numerator vs Denominator Layout',
-        body: 'There are two conventions: numerator layout (gradient is a row vector) and denominator layout (gradient is a column vector). This course uses denominator layout — the gradient $\\nabla f$ is a column vector of the same shape as the input $\\mathbf{x}$. Be careful when reading ML papers which often switch conventions.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Gradients and Jacobians in OpenMAT',
         mathBridge: 'Compute gradients numerically using finite differences, then verify against analytic formulas.',
         caption: 'Matrix calculus: from formula to computation.',
@@ -178,6 +157,33 @@ disp('Step size alpha used:'); disp(alpha)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'Procedure: Compute the Gradient of a Scalar Function of a Vector',
+        body: 'Step 1. Identify the function type: linear ($\\mathbf{a}^\\top\\mathbf{x}$), quadratic ($\\mathbf{x}^\\top A\\mathbf{x}$), or composite (chain rule needed).\nStep 2. Apply the matching formula: $\\nabla(\\mathbf{a}^\\top\\mathbf{x}) = \\mathbf{a}$; $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ (symmetric $A$); $\\nabla\\|A\\mathbf{x}-\\mathbf{b}\\|^2 = 2A^\\top(A\\mathbf{x}-\\mathbf{b})$.\nStep 3. Verify the shape: $\\nabla f$ must be a column vector of the same dimension as $\\mathbf{x}$.\nStep 4. Verify numerically: compute $[f(\\mathbf{x}+\\epsilon\\mathbf{e}_i) - f(\\mathbf{x}-\\epsilon\\mathbf{e}_i)]/(2\\epsilon)$ for each $i$ and compare to the analytic formula.\nStep 5. To find the minimizer: set $\\nabla f = \\mathbf{0}$ and solve the resulting linear system. Check the Hessian is positive definite to confirm a minimum.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 9 of 12 — Matrices & Transformations',
+        body: '**Previous:** Cramer\'s Rule — determinant-based formulas for solutions and inverses.\n**This lesson:** Matrix Calculus — gradients, Jacobians, and Hessians; how to differentiate functions of vectors and matrices.\n**Next:** The Invertible Matrix Theorem — twelve equivalent conditions that unify all of Chapters 1 and 2.',
+      },
+      {
+        type: 'insight',
+        title: 'The Matrix Calculus Cheat Sheet',
+        body: '| Expression | Derivative | Shape |\n|---|---|---|\n| $\\mathbf{a}^\\top \\mathbf{x}$ | $\\mathbf{a}$ | $n \\times 1$ |\n| $\\mathbf{x}^\\top A \\mathbf{x}$ | $2A\\mathbf{x}$ (if $A$ symmetric) | $n \\times 1$ |\n| $A\\mathbf{x}$ w.r.t. $\\mathbf{x}$ | $A$ (Jacobian) | $m \\times n$ |\n| $\\|\\mathbf{x}\\|^2$ | $2\\mathbf{x}$ | $n \\times 1$ |\n| $\\|A\\mathbf{x} - \\mathbf{b}\\|^2$ | $2A^\\top(A\\mathbf{x}-\\mathbf{b})$ | $n \\times 1$ |',
+      },
+      {
+        type: 'insight',
+        title: 'The Chain Rule in Matrix Form',
+        body: 'If $\\mathbf{h}(\\mathbf{x}) = \\mathbf{f}(\\mathbf{g}(\\mathbf{x}))$, the Jacobian of the composition is the product of Jacobians:\n$J_h = J_f \\cdot J_g$\nThis is why backpropagation in neural networks is just repeated matrix multiplication of Jacobians — the chain rule applied layer by layer.',
+      },
+      {
+        type: 'warning',
+        title: 'Numerator vs Denominator Layout',
+        body: 'There are two conventions: numerator layout (gradient is a row vector) and denominator layout (gradient is a column vector). This course uses denominator layout — the gradient $\\nabla f$ is a column vector of the same shape as the input $\\mathbf{x}$. Be careful when reading ML papers which often switch conventions.',
       },
     ],
   },

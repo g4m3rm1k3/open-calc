@@ -1,4 +1,6 @@
-﻿export default {
+﻿import subspaceTestUrl from '../diagrams/la-subspace-test.svg?url'
+
+export default {
   id: 'la6-001',
   slug: 'abstract-vector-spaces',
   chapter: 'la6',
@@ -14,50 +16,22 @@
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take the polynomials $p(x) = 1 + 2x$ and $q(x) = 3 - x$ in $P_1$ (degree $\\leq 1$). Add them: $(p+q)(x) = 4 + x$. Scale: $(5p)(x) = 5 + 10x$. Negate: $(-p)(x) = -1 - 2x$, so $p + (-p) = 0$. The zero polynomial $0(x) = 0$ acts as the additive identity. These operations feel exactly like $\\mathbb{R}^2$ — and that is not a coincidence: $P_1$ and $\\mathbb{R}^2$ satisfy the same ten rules, making them both vector spaces. Now try $W_1 = \\{(x,y) : x + y = 0\\}$ vs. $W_2 = \\{(x,y) : x + y = 1\\}$: check closure under addition for $W_2$: $(1,0) + (0,1) = (1,1)$ — but $1 + 1 = 2 \\neq 1$, so $W_2$ is closed under NOTHING. $W_1$ works (closed under all linear combinations). The homogeneous constraint defines a subspace; the inhomogeneous does not.',
+      ] },
+      { type: 'image', src: subspaceTestUrl,
+        alt: 'Left panel: the line x plus y equals 0 passing through the origin, marked as a subspace. Right panel: the parallel line x plus y equals 1 missing the origin, marked with an X and labeled not a subspace',
+        caption: 'The homogeneous constraint passes through the origin and is a subspace; the inhomogeneous one misses it and is not.' },
+      { type: 'prose', paragraphs: [
       '**Why the axioms matter.** The axioms say nothing about what vectors "look like." They only specify how vectors behave under the two operations. Anything that satisfies all ten axioms is a vector space, and every theorem proved from those axioms applies automatically. This is the power of abstraction: prove once, apply everywhere.',
       '**Key examples.** $\\mathbb{R}^n$ (columns of $n$ real numbers) — the prototype. $P_n$ (polynomials of degree $\\leq n$) — with $(p+q)(x) = p(x) + q(x)$ and $(cp)(x) = c \\cdot p(x)$. $M_{m \\times n}$ (all $m \\times n$ matrices) — with entry-wise addition and scalar multiplication. $C[a,b]$ (continuous functions on $[a,b]$) — with pointwise operations. All are vector spaces.',
       '**Subspaces.** A subset $W \\subseteq V$ is a subspace if (1) $\\mathbf{0} \\in W$, (2) closed under addition, and (3) closed under scalar multiplication. The three-condition check is all you need — the other axioms are inherited from $V$. Examples: any line through the origin in $\\mathbb{R}^2$; the set of polynomials with zero constant term; the set of all solutions to a homogeneous linear ODE.',
       '**The zero vector is unique.** The axioms guarantee that every vector space has exactly one zero vector. Proof: suppose $\\mathbf{0}$ and $\\mathbf{0}\'$ are both zero vectors. Then $\\mathbf{0} = \\mathbf{0} + \\mathbf{0}\' = \\mathbf{0}\'$ (using axioms 4 on each). Similarly, every vector has a unique additive inverse. This means you cannot have "multiple zeros" — if you find yourself computing with a set that has two different zero-like objects, it is not a vector space. This uniqueness property is why the zero polynomial $0(x)=0$, the zero matrix $\\mathbf{0}$, and the zero function $f(x)=0$ are each the unique zero of their respective spaces.',
       '**Why not every set with addition and scaling is a vector space.** Consider the positive reals $\\mathbb{R}_{>0}$ with "addition" $a \\oplus b = ab$ (multiplication) and "scalar multiplication" $c \\otimes a = a^c$. Check: associativity $(a \\oplus b) \\oplus c = (ab)c = a(bc) = a \\oplus (b \\oplus c)$ ✓. Zero element: $1$ (since $a \\oplus 1 = a \\cdot 1 = a$) ✓. Inverse: $a \\oplus a^{-1} = a \\cdot a^{-1} = 1$ ✓. Scalar mult: $c \\otimes a = a^c$ with $(c+d) \\otimes a = a^{c+d} = a^c \\cdot a^d = (c \\otimes a) \\oplus (d \\otimes a)$ ✓. This actually IS a vector space — just with unusual-looking operations. The point: what matters is the algebraic structure (the axioms), not the visual appearance of the objects.',
       '**Abstract vector spaces in engineering.** The solution set of any homogeneous linear ODE $y\'\' + p(t)y\' + q(t)y = 0$ is a vector space (of functions!) — you can add solutions and scale them. In CNC motion control, the set of all possible velocity profiles satisfying $v(0) = v(T) = 0$ (zero start/end speed) forms a function space; finding the "smoothest" profile is a minimization in that space. The set of all $3\\times 3$ rotation matrices is NOT a vector space (you can\'t add two rotations and get a rotation), but the space of antisymmetric matrices $\\mathfrak{so}(3)$ (the Lie algebra) is — it is the tangent space to rotations at the identity, directly relevant to CNC axis interpolation and robot kinematics.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Test Whether a Subset Is a Subspace (3 Steps)',
-        body: '**Given:** A subset $W$ of a known vector space $V$.\n**Step 1.** Check $\\mathbf{0} \\in W$: substitute the zero vector and verify it satisfies the defining condition. If it fails, stop — $W$ is not a subspace.\n**Step 2.** Check closure under addition: take two arbitrary elements $\\mathbf{u}, \\mathbf{v} \\in W$ and verify $\\mathbf{u} + \\mathbf{v} \\in W$.\n**Step 3.** Check closure under scalar multiplication: take arbitrary $\\mathbf{v} \\in W$ and $c \\in \\mathbb{F}$, verify $c\\mathbf{v} \\in W$.\n**Result:** All three pass → $W$ is a subspace (the remaining 7 axioms are inherited from $V$). Any single failure → not a subspace.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 1 of 6 — Abstract Vector Spaces',
-        body: '**Previous:** This is the start of Chapter 6.\n**This lesson:** Abstract Vector Spaces — defining vector spaces by ten axioms, recognizing when a set qualifies, and testing subspaces.\n**Next:** Basis and Dimension — how to measure the "size" of any vector space with a single number.',
-      },
-      {
-        type: 'insight',
-        title: 'The Ten Axioms (Compressed)',
-        body: 'For all $\\mathbf{u}, \\mathbf{v}, \\mathbf{w} \\in V$ and scalars $c, d \\in \\mathbb{F}$:\n1. $\\mathbf{u} + \\mathbf{v} \\in V$ (closure under addition)\n2. $\\mathbf{u} + \\mathbf{v} = \\mathbf{v} + \\mathbf{u}$ (commutativity)\n3. $(\\mathbf{u} + \\mathbf{v}) + \\mathbf{w} = \\mathbf{u} + (\\mathbf{v} + \\mathbf{w})$ (associativity)\n4. $\\exists \\mathbf{0}$: $\\mathbf{v} + \\mathbf{0} = \\mathbf{v}$ (zero vector)\n5. $\\exists (-\\mathbf{v})$: $\\mathbf{v} + (-\\mathbf{v}) = \\mathbf{0}$ (negatives)\n6. $c\\mathbf{v} \\in V$ (closure under scalar mult.)\n7. $c(\\mathbf{u}+\\mathbf{v}) = c\\mathbf{u} + c\\mathbf{v}$\n8. $(c+d)\\mathbf{v} = c\\mathbf{v} + d\\mathbf{v}$\n9. $c(d\\mathbf{v}) = (cd)\\mathbf{v}$\n10. $1 \\cdot \\mathbf{v} = \\mathbf{v}$',
-      },
-      {
-        type: 'insight',
-        title: 'Subspace Test (Three Conditions)',
-        body: '$W$ is a subspace of $V$ iff:\n1. $\\mathbf{0} \\in W$\n2. $\\mathbf{u}, \\mathbf{v} \\in W \\Rightarrow \\mathbf{u} + \\mathbf{v} \\in W$\n3. $\\mathbf{v} \\in W, c \\in \\mathbb{F} \\Rightarrow c\\mathbf{v} \\in W$\n\nEquivalently: $W$ is closed under all linear combinations.',
-      },
-      {
-        type: 'warning',
-        title: 'Not Everything Is a Vector Space',
-        body: 'The set $\\{(x,y) : x \\geq 0, y \\geq 0\\}$ (first quadrant) is NOT a vector space — it fails closure under scalar multiplication (multiplying by $-1$ leaves the quadrant). A vector space must contain $\\mathbf{0}$ and be closed under all linear combinations, including those with negative and non-integer scalars.',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction',
-        body: 'Before working through the subspace examples: which of these is a subspace of $\\mathbb{R}^3$? (a) $\\{(x,y,z) : x + y + z = 0\\}$; (b) $\\{(x,y,z) : x + y + z = 1\\}$; (c) $\\{(x,y,z) : x \\geq 0\\}$; (d) $\\{(x,y,z) : x = 0\\}$. For each, ask: does it contain $\\mathbf{0}$? Is it closed under addition and scalar multiplication?',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Subspace Tests',
         mathBridge: 'Verify the three subspace conditions for sets defined by linear constraints.',
         caption: 'Any set closed under linear combinations is a subspace.',
@@ -121,6 +95,38 @@ disp('It is isomorphic to R^3')
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Test Whether a Subset Is a Subspace (3 Steps)',
+        body: '**Given:** A subset $W$ of a known vector space $V$.\n**Step 1.** Check $\\mathbf{0} \\in W$: substitute the zero vector and verify it satisfies the defining condition. If it fails, stop — $W$ is not a subspace.\n**Step 2.** Check closure under addition: take two arbitrary elements $\\mathbf{u}, \\mathbf{v} \\in W$ and verify $\\mathbf{u} + \\mathbf{v} \\in W$.\n**Step 3.** Check closure under scalar multiplication: take arbitrary $\\mathbf{v} \\in W$ and $c \\in \\mathbb{F}$, verify $c\\mathbf{v} \\in W$.\n**Result:** All three pass → $W$ is a subspace (the remaining 7 axioms are inherited from $V$). Any single failure → not a subspace.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 1 of 6 — Abstract Vector Spaces',
+        body: '**Previous:** This is the start of Chapter 6.\n**This lesson:** Abstract Vector Spaces — defining vector spaces by ten axioms, recognizing when a set qualifies, and testing subspaces.\n**Next:** Basis and Dimension — how to measure the "size" of any vector space with a single number.',
+      },
+      {
+        type: 'insight',
+        title: 'The Ten Axioms (Compressed)',
+        body: 'For all $\\mathbf{u}, \\mathbf{v}, \\mathbf{w} \\in V$ and scalars $c, d \\in \\mathbb{F}$:\n1. $\\mathbf{u} + \\mathbf{v} \\in V$ (closure under addition)\n2. $\\mathbf{u} + \\mathbf{v} = \\mathbf{v} + \\mathbf{u}$ (commutativity)\n3. $(\\mathbf{u} + \\mathbf{v}) + \\mathbf{w} = \\mathbf{u} + (\\mathbf{v} + \\mathbf{w})$ (associativity)\n4. $\\exists \\mathbf{0}$: $\\mathbf{v} + \\mathbf{0} = \\mathbf{v}$ (zero vector)\n5. $\\exists (-\\mathbf{v})$: $\\mathbf{v} + (-\\mathbf{v}) = \\mathbf{0}$ (negatives)\n6. $c\\mathbf{v} \\in V$ (closure under scalar mult.)\n7. $c(\\mathbf{u}+\\mathbf{v}) = c\\mathbf{u} + c\\mathbf{v}$\n8. $(c+d)\\mathbf{v} = c\\mathbf{v} + d\\mathbf{v}$\n9. $c(d\\mathbf{v}) = (cd)\\mathbf{v}$\n10. $1 \\cdot \\mathbf{v} = \\mathbf{v}$',
+      },
+      {
+        type: 'insight',
+        title: 'Subspace Test (Three Conditions)',
+        body: '$W$ is a subspace of $V$ iff:\n1. $\\mathbf{0} \\in W$\n2. $\\mathbf{u}, \\mathbf{v} \\in W \\Rightarrow \\mathbf{u} + \\mathbf{v} \\in W$\n3. $\\mathbf{v} \\in W, c \\in \\mathbb{F} \\Rightarrow c\\mathbf{v} \\in W$\n\nEquivalently: $W$ is closed under all linear combinations.',
+      },
+      {
+        type: 'warning',
+        title: 'Not Everything Is a Vector Space',
+        body: 'The set $\\{(x,y) : x \\geq 0, y \\geq 0\\}$ (first quadrant) is NOT a vector space — it fails closure under scalar multiplication (multiplying by $-1$ leaves the quadrant). A vector space must contain $\\mathbf{0}$ and be closed under all linear combinations, including those with negative and non-integer scalars.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction',
+        body: 'Before working through the subspace examples: which of these is a subspace of $\\mathbb{R}^3$? (a) $\\{(x,y,z) : x + y + z = 0\\}$; (b) $\\{(x,y,z) : x + y + z = 1\\}$; (c) $\\{(x,y,z) : x \\geq 0\\}$; (d) $\\{(x,y,z) : x = 0\\}$. For each, ask: does it contain $\\mathbf{0}$? Is it closed under addition and scalar multiplication?',
       },
     ],
   },

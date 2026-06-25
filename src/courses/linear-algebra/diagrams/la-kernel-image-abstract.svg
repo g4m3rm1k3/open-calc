@@ -1,0 +1,43 @@
+<svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="460" height="220" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="ki-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#1e293b"/></marker>
+  </defs>
+
+  <!-- Domain: P3 -->
+  <rect x="12" y="24" width="208" height="180" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="116" y="42" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">Domain: P₃ (dim 4)</text>
+  <circle cx="100" cy="160" r="32" fill="rgba(217,119,6,0.14)" stroke="#d97706" stroke-width="1.5"/>
+  <text x="100" y="156" font-size="10" fill="#d97706" text-anchor="middle" font-weight="700">ker(D) = P₀</text>
+  <text x="100" y="170" font-size="9" fill="#d97706" text-anchor="middle">constants, dim 1</text>
+
+  <!-- Arrow D between boxes -->
+  <line x1="226" y1="100" x2="246" y2="100" stroke="#1e293b" stroke-width="2" marker-end="url(#ki-arrow)"/>
+  <text x="236" y="90" font-size="13" class="svg-text" text-anchor="middle" font-weight="700">D</text>
+
+  <!-- Codomain: P3, image is P2 -->
+  <rect x="252" y="24" width="208" height="180" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="356" y="42" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">Codomain: P₃ (dim 4)</text>
+  <ellipse cx="356" cy="125" rx="92" ry="70" fill="rgba(37,99,235,0.10)" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="356" y="122" font-size="10" fill="#2563eb" text-anchor="middle" font-weight="700">im(D) = P₂</text>
+  <text x="356" y="136" font-size="9" fill="#2563eb" text-anchor="middle">degree ≤ 2, dim 3</text>
+
+  <!-- dashed arrow showing kernel maps to 0 -->
+  <line x1="100" y1="160" x2="290" y2="178" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <circle cx="290" cy="178" r="3" fill="#1e293b"/>
+  <text x="296" y="182" font-size="9.5" fill="#d97706">0</text>
+
+  <text x="230" y="212" font-size="10.5" class="svg-muted" text-anchor="middle">dim ker(D) + dim im(D) = 1 + 3 = 4 = dim P₃ — rank-nullity, abstractly</text>
+</svg>

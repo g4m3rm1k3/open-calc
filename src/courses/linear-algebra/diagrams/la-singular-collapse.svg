@@ -1,0 +1,35 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="220" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="sc-blue" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+    <marker id="sc-amber" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#d97706"/></marker>
+  </defs>
+
+  <!-- Panel 1: det != 0, reversible -->
+  <rect x="12" y="20" width="216" height="186" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="38" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">det ≠ 0 — reversible</text>
+  <polygon points="60,175 110,150 130,90 80,115" fill="rgba(16,185,129,0.15)" stroke="#10b981" stroke-width="1.5"/>
+  <line x1="60" y1="175" x2="106" y2="153" stroke="#2563eb" stroke-width="2.5" marker-end="url(#sc-blue)"/>
+  <line x1="60" y1="175" x2="78" y2="118" stroke="#d97706" stroke-width="2.5" marker-end="url(#sc-amber)"/>
+  <text x="120" y="195" font-size="10" fill="#10b981" text-anchor="middle">area exists — A⁻¹ exists</text>
+
+  <!-- Panel 2: det = 0, irreversible -->
+  <rect x="252" y="20" width="216" height="186" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="360" y="38" font-size="11" fill="#dc2626" text-anchor="middle" font-weight="700">det = 0 — irreversible</text>
+  <line x1="300" y1="175" x2="430" y2="90" stroke="#dc2626" stroke-width="1.3" stroke-dasharray="4,3" opacity="0.6"/>
+  <line x1="300" y1="175" x2="365" y2="132" stroke="#2563eb" stroke-width="2.5" marker-end="url(#sc-blue)"/>
+  <line x1="300" y1="175" x2="397" y2="111" stroke="#d97706" stroke-width="2.5" marker-end="url(#sc-amber)"/>
+  <text x="360" y="195" font-size="10" fill="#dc2626" text-anchor="middle">flattened to a line — no inverse</text>
+</svg>

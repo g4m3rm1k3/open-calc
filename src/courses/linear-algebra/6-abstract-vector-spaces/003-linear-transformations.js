@@ -1,3 +1,5 @@
+import kernelImageAbstractUrl from '../diagrams/la-kernel-image-abstract.svg?url'
+
 export default {
   id: 'la6-003',
   slug: 'linear-transformations',
@@ -14,50 +16,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take differentiation $D: P_3 \\to P_3$, $D(p) = p\'$. Test linearity: $D(p+q) = (p+q)\' = p\'+q\' = D(p)+D(q)$ ✓; $D(cp) = (cp)\' = cp\' = cD(p)$ ✓. Now find the kernel: $D(p) = 0$ iff $p\' = 0$ iff $p$ is constant — $\\ker(D) = P_0$ (constants), dimension 1. Image: $D(a_0 + a_1x + a_2x^2 + a_3x^3) = a_1 + 2a_2x + 3a_3x^2$ — any polynomial of degree $\\leq 2$ appears, so $\\text{im}(D) = P_2$, dimension 3. Rank-Nullity: $1 + 3 = 4 = \\dim P_3$ ✓. Contrast: $T(p) = p^2$ is NOT linear — $T(p+q) = (p+q)^2 = p^2 + 2pq + q^2 \\neq p^2 + q^2$. Linearity is preserved-combinations, not any function.',
       '**Key structural maps.** The **kernel** (or null space) of $T$ is $\\ker(T) = \\{\\mathbf{v} \\in V : T(\\mathbf{v}) = \\mathbf{0}_W\\}$ — the set of vectors that get mapped to zero. The **image** (or range) is $\\text{im}(T) = \\{T(\\mathbf{v}) : \\mathbf{v} \\in V\\} \\subseteq W$ — the set of all possible outputs. Both the kernel and image are subspaces (of $V$ and $W$ respectively).',
+      ] },
+      { type: 'image', src: kernelImageAbstractUrl,
+        alt: 'Domain box P3 with a small circle marked ker(D) equals P0, constants, dimension 1, an arrow D pointing to a codomain box P3 containing a large ellipse marked im(D) equals P2, degree at most 2, dimension 3, with a dashed line showing the kernel mapping to 0',
+        caption: 'dim ker(D) + dim im(D) = 1 + 3 = 4 = dim P₃ — rank-nullity holds for any linear map, not just matrices.' },
+      { type: 'prose', paragraphs: [
       '**Rank-nullity for linear transformations.** $\\dim(\\ker T) + \\dim(\\text{im } T) = \\dim V$. This is the abstract version of the rank-nullity theorem. The "rank" of $T$ is $\\dim(\\text{im } T)$ and the "nullity" is $\\dim(\\ker T)$.',
       '**From abstract to matrix.** Given a linear transformation $T: V \\to W$ and bases $\\mathcal{B}$ for $V$ and $\\mathcal{C}$ for $W$, there is a unique matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ that represents $T$ in those coordinates: $[T(\\mathbf{v})]_{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}} [\\mathbf{v}]_{\\mathcal{B}}$. Every linear transformation between finite-dimensional spaces is represented by a matrix — once you pick bases.',
       '**The composition of linear maps is linear.** If $S: U \\to V$ and $T: V \\to W$ are both linear, then $T \\circ S: U \\to W$ is also linear. Proof: $(T \\circ S)(\mathbf{u}+\\mathbf{v}) = T(S(\\mathbf{u}+\\mathbf{v})) = T(S(\\mathbf{u})+S(\\mathbf{v})) = T(S(\\mathbf{u}))+T(S(\\mathbf{v})) = (T \\circ S)(\\mathbf{u})+(T \\circ S)(\\mathbf{v})$. The corresponding matrix operation is matrix multiplication: $[T \\circ S] = [T][S]$. This is why matrix multiplication is defined the way it is — it is the coordinate version of function composition for linear maps.',
       '**Projection as a linear transformation.** The orthogonal projection $P_{\\mathbf{a}}: \\mathbb{R}^n \\to \\mathbb{R}^n$ onto a subspace spanned by $\\mathbf{a}$, given by $P_{\\mathbf{a}}(\\mathbf{v}) = \\frac{\\mathbf{v} \\cdot \\mathbf{a}}{\\mathbf{a} \\cdot \\mathbf{a}} \\mathbf{a}$, is linear. The corresponding matrix is $P = \\frac{\\mathbf{a}\\mathbf{a}^T}{\\mathbf{a}^T\\mathbf{a}}$. This is a special linear transformation: $P^2 = P$ (projecting twice = projecting once — idempotent) and $P^T = P$ (symmetric). The kernel is the orthogonal complement of $\\mathbf{a}$, and the image is the span of $\\mathbf{a}$.',
       '**CNC motion and linear transformations.** In CNC 5-axis machining, the relationship between joint space (angle vector $\\boldsymbol{\\theta}$) and Cartesian task space (position $\\mathbf{p}$) is given by forward kinematics $\\mathbf{p} = f(\\boldsymbol{\\theta})$. While $f$ itself is nonlinear, the Jacobian $J = \\partial f / \\partial \\boldsymbol{\\theta}$ is a linear map that approximates $f$ near each configuration: $\\delta\\mathbf{p} \\approx J \\delta\\boldsymbol{\\theta}$. The kernel of $J$ is the **null space of the Jacobian** — the set of joint velocity vectors that produce zero end-effector motion. These are the "self-motions" of a redundant robot: joint configurations it can change without moving the tool. The image of $J$ is the set of end-effector velocities the robot can currently achieve.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Find the Kernel and Image of a Linear Map (5 Steps)',
-        body: '**Given:** A linear map $T: V \\to W$.\n**Step 1.** Verify linearity: check $T(\\mathbf{u}+\\mathbf{v}) = T(\\mathbf{u})+T(\\mathbf{v})$ and $T(c\\mathbf{v}) = cT(\\mathbf{v})$ (or equivalently $T(c\\mathbf{u}+d\\mathbf{v}) = cT(\\mathbf{u})+dT(\\mathbf{v})$).\n**Step 2.** Find $\\ker(T)$: set $T(\\mathbf{v}) = \\mathbf{0}$ and solve. For a matrix $A$: find the null space via RREF.\n**Step 3.** Find $\\text{im}(T)$: apply $T$ to each basis vector of $V$. The span of the resulting vectors is the image.\n**Step 4.** State rank $= \\dim(\\text{im}\\,T)$ and nullity $= \\dim(\\ker T)$.\n**Step 5.** Verify rank-nullity: rank + nullity $= \\dim(V)$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 3 of 6 — Abstract Vector Spaces',
-        body: '**Previous:** Basis and Dimension — measuring the size of a vector space.\n**This lesson:** Linear Transformations — maps between vector spaces that preserve addition and scalar multiplication, with kernel and image as the key structural subspaces.\n**Next:** Matrix Representations — how to write any linear transformation as a matrix once you choose bases.',
-      },
-      {
-        type: 'insight',
-        title: 'Injective, Surjective, Bijective',
-        body: '$T$ is **injective** (one-to-one) iff $\\ker(T) = \\{\\mathbf{0}\\}$ (distinct inputs give distinct outputs)\n$T$ is **surjective** (onto) iff $\\text{im}(T) = W$ (every output is reachable)\n$T$ is **bijective** (isomorphism) iff both — then $T$ has an inverse $T^{-1}: W \\to V$\n\nFor finite-dimensional $V$ and $W$ of the same dimension: injective $\\Leftrightarrow$ surjective $\\Leftrightarrow$ bijective.',
-      },
-      {
-        type: 'insight',
-        title: 'Differentiation as a Linear Map',
-        body: '$D: P_n \\to P_{n-1}$, $D(p) = p\'$\n$\\ker(D) = P_0 = \\{$constants$\\}$ (dim 1 — constant polynomials have zero derivative)\n$\\text{im}(D) = P_{n-1}$ (dim $n$ — every polynomial of degree ≤ $n-1$ is a derivative)\nRank-Nullity: $1 + n = n+1 = \\dim P_n$ ✓',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction',
-        body: 'Before reading on: the map $T: P_2 \\to P_3$ defined by $T(p) = \\int_0^x p(t)\\,dt$ — is it linear? What is $T(1)$, $T(x)$, $T(x^2)$? What is $\\ker(T)$? What is $\\dim(\\text{im}(T))$?',
-      },
-      {
-        type: 'warning',
-        title: 'Linear Does NOT Mean "Passes Through Origin"',
-        body: 'Translation $T(\\mathbf{v}) = \\mathbf{v} + \\mathbf{c}$ (for $\\mathbf{c} \\neq \\mathbf{0}$) is NOT a linear transformation: $T(\\mathbf{0}) = \\mathbf{c} \\neq \\mathbf{0}$. A linear transformation must always satisfy $T(\\mathbf{0}) = \\mathbf{0}$. This eliminates all affine (but non-linear) maps.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Kernel and Image of a Linear Map',
         mathBridge: 'Find the kernel and image of matrix transformations.',
         caption: 'Kernel = what gets destroyed; image = what can be reached.',
@@ -114,6 +88,38 @@ rank(D_matrix)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Find the Kernel and Image of a Linear Map (5 Steps)',
+        body: '**Given:** A linear map $T: V \\to W$.\n**Step 1.** Verify linearity: check $T(\\mathbf{u}+\\mathbf{v}) = T(\\mathbf{u})+T(\\mathbf{v})$ and $T(c\\mathbf{v}) = cT(\\mathbf{v})$ (or equivalently $T(c\\mathbf{u}+d\\mathbf{v}) = cT(\\mathbf{u})+dT(\\mathbf{v})$).\n**Step 2.** Find $\\ker(T)$: set $T(\\mathbf{v}) = \\mathbf{0}$ and solve. For a matrix $A$: find the null space via RREF.\n**Step 3.** Find $\\text{im}(T)$: apply $T$ to each basis vector of $V$. The span of the resulting vectors is the image.\n**Step 4.** State rank $= \\dim(\\text{im}\\,T)$ and nullity $= \\dim(\\ker T)$.\n**Step 5.** Verify rank-nullity: rank + nullity $= \\dim(V)$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 3 of 6 — Abstract Vector Spaces',
+        body: '**Previous:** Basis and Dimension — measuring the size of a vector space.\n**This lesson:** Linear Transformations — maps between vector spaces that preserve addition and scalar multiplication, with kernel and image as the key structural subspaces.\n**Next:** Matrix Representations — how to write any linear transformation as a matrix once you choose bases.',
+      },
+      {
+        type: 'insight',
+        title: 'Injective, Surjective, Bijective',
+        body: '$T$ is **injective** (one-to-one) iff $\\ker(T) = \\{\\mathbf{0}\\}$ (distinct inputs give distinct outputs)\n$T$ is **surjective** (onto) iff $\\text{im}(T) = W$ (every output is reachable)\n$T$ is **bijective** (isomorphism) iff both — then $T$ has an inverse $T^{-1}: W \\to V$\n\nFor finite-dimensional $V$ and $W$ of the same dimension: injective $\\Leftrightarrow$ surjective $\\Leftrightarrow$ bijective.',
+      },
+      {
+        type: 'insight',
+        title: 'Differentiation as a Linear Map',
+        body: '$D: P_n \\to P_{n-1}$, $D(p) = p\'$\n$\\ker(D) = P_0 = \\{$constants$\\}$ (dim 1 — constant polynomials have zero derivative)\n$\\text{im}(D) = P_{n-1}$ (dim $n$ — every polynomial of degree ≤ $n-1$ is a derivative)\nRank-Nullity: $1 + n = n+1 = \\dim P_n$ ✓',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction',
+        body: 'Before reading on: the map $T: P_2 \\to P_3$ defined by $T(p) = \\int_0^x p(t)\\,dt$ — is it linear? What is $T(1)$, $T(x)$, $T(x^2)$? What is $\\ker(T)$? What is $\\dim(\\text{im}(T))$?',
+      },
+      {
+        type: 'warning',
+        title: 'Linear Does NOT Mean "Passes Through Origin"',
+        body: 'Translation $T(\\mathbf{v}) = \\mathbf{v} + \\mathbf{c}$ (for $\\mathbf{c} \\neq \\mathbf{0}$) is NOT a linear transformation: $T(\\mathbf{0}) = \\mathbf{c} \\neq \\mathbf{0}$. A linear transformation must always satisfy $T(\\mathbf{0}) = \\mathbf{0}$. This eliminates all affine (but non-linear) maps.',
       },
     ],
   },

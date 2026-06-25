@@ -1,3 +1,5 @@
+import singularValueDecayUrl from '../diagrams/la-singular-value-decay.svg?url'
+
 export default {
   id: 'la4-009',
   slug: 'low-rank-approximation',
@@ -14,41 +16,23 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Imagine a $256 \\times 256$ grayscale image — a matrix of 65,536 pixel values. Computing its SVD reveals something striking: most of the visual information sits in the first 10—20 singular values, while the remaining 236+ are near zero. If you keep only the top $k$ singular values and discard the rest, you get a matrix that looks almost identical to the original image — but stores only $k(256 + 256 + 1)$ numbers instead of 65,536. For $k=20$, that is 10,260 numbers versus 65,536 — an 84% reduction with barely visible quality loss. The mathematics that makes this exact and optimal is the Eckart-Young theorem.',
       '**Best rank-1 approximation with numbers.** Take $A = \\begin{pmatrix}4&3\\\\2&1\\end{pmatrix}$. SVD: singular values $\\sigma_1 \\approx 5.46$, $\\sigma_2 \\approx 0.37$. Top singular vectors: $u_1 \\approx (0.86, 0.51)^\\top$, $v_1 \\approx (0.90, 0.44)^\\top$. Best rank-1 approximation: $A_1 = \\sigma_1 u_1 v_1^\\top \\approx 5.46 \\cdot \\begin{pmatrix}0.77&0.38\\\\0.46&0.22\\end{pmatrix} \\approx \\begin{pmatrix}4.2&2.1\\\\2.5&1.2\\end{pmatrix}$. Error $\\|A - A_1\\|_2 = \\sigma_2 \\approx 0.37$ — the best possible for any rank-1 matrix. The singular value $\\sigma_2$ is the "cost" of discarding the second component.',
       '**The Eckart-Young theorem.** For $A = \\sum_{i=1}^r \\sigma_i u_i v_i^\\top$, the rank-$k$ truncation $A_k = \\sum_{i=1}^k \\sigma_i u_i v_i^\\top$ satisfies: (1) $\\|A - A_k\\|_2 = \\sigma_{k+1}$ (the $(k+1)$-th singular value). (2) $\\|A - A_k\\|_F^2 = \\sigma_{k+1}^2 + \\cdots + \\sigma_r^2$ (sum of discarded singular values squared). (3) For any rank-$k$ matrix $B$: $\\|A - B\\|_2 \\geq \\sigma_{k+1}$ and $\\|A - B\\|_F \\geq \\|A - A_k\\|_F$. $A_k$ is the BEST rank-$k$ approximation in BOTH norms simultaneously.',
+      ] },
+      { type: 'image', src: singularValueDecayUrl,
+        alt: 'A bar chart of decreasing singular values, with the first few tall bars colored green and labeled keep top k, and the remaining short bars colored gray and labeled discard, near zero energy',
+        caption: 'For real data, singular values decay fast — keep the few big ones, discard the rest, lose almost no information.' },
+      { type: 'prose', paragraphs: [
       '**Compression ratio and energy.** The Frobenius norm $\\|A\\|_F^2 = \\sum_i \\sigma_i^2$ is the total "energy." Keeping the top $k$ singular values captures energy fraction $\\sum_{i=1}^k \\sigma_i^2 / \\sum_{i=1}^r \\sigma_i^2$. For images, often 90% of the energy is in the top 1-5% of singular values. Storage: $A$ needs $mn$ numbers; $A_k = U_k \\Sigma_k V_k^\\top$ needs $mk + k + nk = k(m+n+1)$ numbers. Compression ratio: $mn / (k(m+n+1))$.',
       '**Why the singular values decay fast for natural data.** Real-world data matrices — images, user ratings, genomic data — tend to have rapidly decaying singular values because the data has structure. A natural image is not random noise: nearby pixels are correlated, and the image can be described as a sum of a few dominant patterns (edges, gradients, textures) plus small corrections. Random noise has singular values of roughly equal size (all $\\approx \\sqrt{n}$ by random matrix theory). The faster the singular values decay, the more compressible the matrix — and the better low-rank approximation works.',
       '**PCA is low-rank approximation applied to a covariance matrix.** Given data matrix $X$ ($m$ samples, $n$ features, zero-centered), the covariance is $C = X^TX / m$ (symmetric). By the spectral theorem, $C = Q\\Lambda Q^T$. The top eigenvector $\\mathbf{q}_1$ is the direction of maximum variance — the first principal component. Projecting each sample onto $\\mathbf{q}_1,\\ldots,\\mathbf{q}_k$ reduces the data from $n$-dimensional to $k$-dimensional while preserving the maximum variance. This is exactly the rank-$k$ approximation: project data onto the top $k$ principal directions, discard the rest. Eckart-Young guarantees this is the best possible $k$-dimensional linear projection.',
       '**CNC toolpath compression with SVD.** A 3D CNC toolpath with $m$ waypoints is stored as a $3 \\times m$ matrix $T$ (each column is a 3D point). For smooth paths — circles, spirals, polynomial splines — the matrix $T$ has low rank: all the geometry lives in 2 or 3 directions. The rank-$k$ approximation $T_k = U_k \\Sigma_k V_k^T$ keeps only the dominant shape components. For a helical toolpath, $k=2$ captures $>99\\%$ of the path geometry. In CAM software, this is essentially what happens when the system converts waypoints to NURBS splines: it finds a low-dimensional representation of the toolpath. The approximation error in the SVD sense gives a bound on how far the compressed path deviates from the original.',
       '**Where this is heading.** Low-rank approximation is the final major idea of the linear algebra curriculum. Looking forward: in data science, it connects to **matrix completion** (fill in missing entries from a partially-observed matrix — the Netflix problem), **robust PCA** (separate a low-rank signal from sparse noise), and **tensor decompositions** (generalizing SVD to 3D+ arrays). Every one of these builds on the same core idea: real data has low-dimensional structure, and SVD is the optimal tool for finding it.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'Procedure: Compute the Best Rank-$k$ Approximation',
-        body: 'Step 1. **Compute the full SVD.** $A = U\\Sigma V^\\top$ with $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq \\sigma_r > 0$.\n\nStep 2. **Choose $k$.** Either specify $k$ directly, or choose $k$ to capture a target energy fraction: find smallest $k$ with $\\sum_{i=1}^k \\sigma_i^2 / \\sum_i \\sigma_i^2 \\geq$ target.\n\nStep 3. **Form $A_k$.** Keep only the first $k$ columns of $U$, first $k$ singular values, and first $k$ rows of $V^\\top$:\n$A_k = U_k \\Sigma_k V_k^\\top = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$\n\nStep 4. **Compute the error.** 2-norm error $= \\sigma_{k+1}$. Frobenius error $= \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$. Eckart-Young guarantees no rank-$k$ matrix does better.\n\nStep 5. **Verify the compression.** Storage: $k(m+n+1)$ numbers vs $mn$ original. Check that $A_k$ is close enough to $A$ for the intended use case.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 9 of 9 — Orthogonality & SVD',
-        body: '**Previous (Lesson 8):** Pseudoinverse — the minimum-norm least-squares solution via $A^+ = V\\Sigma^+U^T$.\n**This lesson:** Low-Rank Approximation — the Eckart-Young theorem and why keeping the top $k$ singular values is the best possible rank-$k$ approximation in both the 2-norm and Frobenius norm.\n**Next (Chapter 6):** Abstract Vector Spaces — extending the ideas of bases, dimension, and linear transformations beyond $\\mathbb{R}^n$.',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction: how much rank-1 captures',
-        body: 'Let $A = \\begin{pmatrix}3&0\\\\0&1\\end{pmatrix}$ (diagonal). Singular values: $\\sigma_1=3$, $\\sigma_2=1$. **Before computing:** predict what fraction of the Frobenius energy the rank-1 approximation captures. After predicting: $\\|A\\|_F^2 = 9+1=10$. $A_1 = 3e_1e_1^\\top = \\begin{pmatrix}3&0\\\\0&0\\end{pmatrix}$. Energy captured: $9/10 = 90\\%$. Error $\\|A-A_1\\|_F = 1 = \\sigma_2$. So throwing away the second singular value loses only 10% of the energy but drops rank from 2 to 1.',
-      },
-      {
-        type: 'theorem',
-        title: 'Eckart-Young Theorem',
-        body: 'Let $A = U\\Sigma V^\\top$ with $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq \\sigma_r > 0$. Define $A_k = \\sum_{i=1}^k \\sigma_i u_i v_i^\\top$ (truncated SVD).\n\n**Best 2-norm:** $\\min_{\\text{rank}(B)\\leq k}\\|A-B\\|_2 = \\sigma_{k+1}$, achieved by $B=A_k$.\n\n**Best Frobenius:** $\\min_{\\text{rank}(B)\\leq k}\\|A-B\\|_F = \\sqrt{\\sigma_{k+1}^2+\\cdots+\\sigma_r^2}$, achieved by $B=A_k$.\n\nThe same $A_k$ is optimal for both norms simultaneously.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Low-Rank Approximation',
         mathBridge: 'Compute truncated SVD approximations and measure approximation quality.',
         caption: 'Rank-k approximation = sum of top k singular value × outer product terms.',
@@ -126,6 +110,28 @@ end
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'Procedure: Compute the Best Rank-$k$ Approximation',
+        body: 'Step 1. **Compute the full SVD.** $A = U\\Sigma V^\\top$ with $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq \\sigma_r > 0$.\n\nStep 2. **Choose $k$.** Either specify $k$ directly, or choose $k$ to capture a target energy fraction: find smallest $k$ with $\\sum_{i=1}^k \\sigma_i^2 / \\sum_i \\sigma_i^2 \\geq$ target.\n\nStep 3. **Form $A_k$.** Keep only the first $k$ columns of $U$, first $k$ singular values, and first $k$ rows of $V^\\top$:\n$A_k = U_k \\Sigma_k V_k^\\top = \\sum_{i=1}^k \\sigma_i \\mathbf{u}_i \\mathbf{v}_i^\\top$\n\nStep 4. **Compute the error.** 2-norm error $= \\sigma_{k+1}$. Frobenius error $= \\sqrt{\\sigma_{k+1}^2 + \\cdots + \\sigma_r^2}$. Eckart-Young guarantees no rank-$k$ matrix does better.\n\nStep 5. **Verify the compression.** Storage: $k(m+n+1)$ numbers vs $mn$ original. Check that $A_k$ is close enough to $A$ for the intended use case.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 9 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 8):** Pseudoinverse — the minimum-norm least-squares solution via $A^+ = V\\Sigma^+U^T$.\n**This lesson:** Low-Rank Approximation — the Eckart-Young theorem and why keeping the top $k$ singular values is the best possible rank-$k$ approximation in both the 2-norm and Frobenius norm.\n**Next (Chapter 6):** Abstract Vector Spaces — extending the ideas of bases, dimension, and linear transformations beyond $\\mathbb{R}^n$.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction: how much rank-1 captures',
+        body: 'Let $A = \\begin{pmatrix}3&0\\\\0&1\\end{pmatrix}$ (diagonal). Singular values: $\\sigma_1=3$, $\\sigma_2=1$. **Before computing:** predict what fraction of the Frobenius energy the rank-1 approximation captures. After predicting: $\\|A\\|_F^2 = 9+1=10$. $A_1 = 3e_1e_1^\\top = \\begin{pmatrix}3&0\\\\0&0\\end{pmatrix}$. Energy captured: $9/10 = 90\\%$. Error $\\|A-A_1\\|_F = 1 = \\sigma_2$. So throwing away the second singular value loses only 10% of the energy but drops rank from 2 to 1.',
+      },
+      {
+        type: 'theorem',
+        title: 'Eckart-Young Theorem',
+        body: 'Let $A = U\\Sigma V^\\top$ with $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq \\sigma_r > 0$. Define $A_k = \\sum_{i=1}^k \\sigma_i u_i v_i^\\top$ (truncated SVD).\n\n**Best 2-norm:** $\\min_{\\text{rank}(B)\\leq k}\\|A-B\\|_2 = \\sigma_{k+1}$, achieved by $B=A_k$.\n\n**Best Frobenius:** $\\min_{\\text{rank}(B)\\leq k}\\|A-B\\|_F = \\sqrt{\\sigma_{k+1}^2+\\cdots+\\sigma_r^2}$, achieved by $B=A_k$.\n\nThe same $A_k$ is optimal for both norms simultaneously.',
       },
     ],
   },

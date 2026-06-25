@@ -1,0 +1,48 @@
+<svg viewBox="0 0 420 170" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="420" height="170" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="mvp-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#94a3b8"/></marker>
+  </defs>
+
+  <text x="210" y="16" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">Mvp = P · V · M — one matrix per vertex, computed once per draw call</text>
+
+  <rect x="10" y="36" width="80" height="56" rx="6" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="50" y="58" font-size="10.5" class="svg-text" text-anchor="middle" font-weight="700">Model</text>
+  <text x="50" y="72" font-size="9" class="svg-muted" text-anchor="middle">space</text>
+
+  <line x1="92" y1="64" x2="122" y2="64" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#mvp-arrow)"/>
+  <text x="107" y="56" font-size="9" fill="#2563eb" font-weight="700" text-anchor="middle">M</text>
+
+  <rect x="124" y="36" width="80" height="56" rx="6" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="164" y="58" font-size="10.5" class="svg-text" text-anchor="middle" font-weight="700">World</text>
+  <text x="164" y="72" font-size="9" class="svg-muted" text-anchor="middle">space</text>
+
+  <line x1="206" y1="64" x2="236" y2="64" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#mvp-arrow)"/>
+  <text x="221" y="56" font-size="9" fill="#d97706" font-weight="700" text-anchor="middle">V</text>
+
+  <rect x="238" y="36" width="80" height="56" rx="6" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="278" y="58" font-size="10.5" class="svg-text" text-anchor="middle" font-weight="700">Camera</text>
+  <text x="278" y="72" font-size="9" class="svg-muted" text-anchor="middle">space</text>
+
+  <line x1="320" y1="64" x2="350" y2="64" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#mvp-arrow)"/>
+  <text x="335" y="56" font-size="9" fill="#10b981" font-weight="700" text-anchor="middle">P</text>
+
+  <rect x="352" y="36" width="58" height="56" rx="6" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="381" y="58" font-size="10.5" class="svg-text" text-anchor="middle" font-weight="700">Clip /</text>
+  <text x="381" y="72" font-size="9" class="svg-muted" text-anchor="middle">screen</text>
+
+  <text x="210" y="124" font-size="10" class="svg-muted" text-anchor="middle">v_clip = (P·V·M) · v_model — every vertex needs just one matrix-vector multiply</text>
+  <text x="210" y="142" font-size="10" class="svg-muted" text-anchor="middle">dividing by the w component then gives the final 2D screen position</text>
+</svg>

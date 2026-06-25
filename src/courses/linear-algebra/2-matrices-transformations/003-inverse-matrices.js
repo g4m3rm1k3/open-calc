@@ -1,3 +1,6 @@
+import determinantAreaUrl from '../diagrams/la-determinant-area.svg?url'
+import singularCollapseUrl from '../diagrams/la-singular-collapse.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-003',
@@ -24,15 +27,35 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $A = \\begin{bmatrix}2&1\\\\5&3\\end{bmatrix}$. Compute $\\det(A) = 2 \\cdot 3 - 1 \\cdot 5 = 1$. Because $\\det \\neq 0$, the inverse exists: $A^{-1} = \\begin{bmatrix}3&-1\\\\-5&2\\end{bmatrix}$. Verify: $A^{-1}A = \\begin{bmatrix}6-5&3-3\\\\-10+10&-5+6\\end{bmatrix} = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = I$. Now try $B = \\begin{bmatrix}2&4\\\\1&2\\end{bmatrix}$: $\\det(B) = 4-4 = 0$. Column 2 is twice column 1 — $B$ squishes the whole plane onto a single line. Once that happens, information is lost forever and no inverse can recover it. The **determinant** is the test: non-zero means reversible, zero means irreversible.',
       '**The inverse machine.** If you apply $A$ then immediately apply $A^{-1}$, the vector must return to where it started. So $A^{-1}A\\mathbf{v} = \\mathbf{v}$ for every vector — which means $A^{-1}A = I$, the identity matrix (the "do nothing" transformation). The inverse undoes the warp completely.',
       '**Not every matrix has an inverse.** Here is where the **determinant** enters. The determinant, written $\\det(A)$ or $|A|$, is a single number measuring how much $A$ scales area. A $2 \\times 2$ matrix with $\\det = 3$ triples all areas. With $\\det = -2$ it doubles areas AND flips space like a mirror (the negative sign is the flip).',
+      ] },
+      { type: 'image', src: determinantAreaUrl,
+        alt: 'A parallelogram spanned by column vectors a1 and a2 of matrix A, shaded green, labeled area equals det(A) equals 5',
+        caption: "det(A) is the signed area of the parallelogram spanned by A's columns." },
+      { type: 'prose', paragraphs: [
       '**The fatal case: $\\det(A) = 0$.** This means $A$ squishes the entire 2D plane flat onto a line (or a point). Once space collapses, information is destroyed permanently — infinitely many different input vectors land on the same output. You cannot reconstruct the input from the output. No inverse exists.',
       '**The 3D projection example.** When a 3D video game is projected onto your 2D screen, depth information (the Z-coordinate) is permanently discarded. Short character far away = tall character close up — you cannot distinguish them from the flat image. This is a linear transformation with $\\det = 0$: the 3D space was collapsed to 2D. The projection matrix has no inverse.',
+      ] },
+      { type: 'image', src: singularCollapseUrl,
+        alt: 'Left panel: two column vectors spanning a shaded parallelogram, labeled det not zero, reversible, area exists. Right panel: two parallel column vectors collapsed onto the same dashed line, labeled det equals zero, irreversible, flattened to a line, no inverse',
+        caption: 'Non-zero determinant means the columns span real area and the map can be undone; zero determinant means everything collapses onto a line.' },
+      { type: 'prose', paragraphs: [
       '**CNC application: workpiece coordinate frame.** When a CNC machine calibrates its work coordinate system, it measures 3 reference points on the workpiece. These 3 points define three vectors, and the machine computes their determinant. If the determinant is 0 (or near 0), the three points are collinear — they all lie on a single line, which is not enough to define a unique flat plane. The calibration fails. A well-set-up fixture keeps the three points spread wide apart, maximizing the determinant and ensuring a stable, invertible coordinate frame.',
       '**Predict before reading on.** You are given $A = \\begin{bmatrix}3&6\\\\2&4\\end{bmatrix}$. Without computing the full inverse formula: does $A$ have an inverse? Compute $\\det(A) = 3 \\cdot 4 - 6 \\cdot 2 = ?$. Write your answer, then check in Example 2.',
       '**Where this is heading:** When $\\det(A) = 0$, the transformation crushes space onto a line. The next lesson (Null Space and Column Space) names exactly what that line is and what input vectors got annihilated in the crush.',
+      ] },
+      { type: 'viz', id: 'LALesson06_Inverses',
+        title: 'The Collapsing Determinant',
+        mathBridge: 'Observe the yellow 1x1 unit square. Its area is exactly 1. As you slide the transformation matrix slider, watch the matrix morph. Note how the area of the yellow square perfectly matches the calculated Determinant at all times. Finally, push the slider until the columns become parallel (Dependent). Watch the determinant hit exactly 0 as the square flattens into a 1D line. The key lesson: A determinant of 0 destroys area irreparably.',
+        caption: 'The determinant visually tracks the scaling factor of the grid\'s area.' },
+      { type: 'viz', id: 'LALesson05_MatrixMult',
+        title: 'A then A⁻¹ = Identity',
+        mathBridge: 'Set the first transformation to any invertible matrix A (try a shear or rotation). Then set the second transformation to its inverse A⁻¹ (use the formula: swap main diagonal, negate off-diagonal, scale by 1/det). Press "compose" and watch the combined transformation snap back to the identity — the grid returns to its original, undistorted state. This is the meaning of $A^{-1}A = I$: the inverse perfectly cancels the original warp.',
+        caption: 'Composing A with its inverse returns the grid exactly to where it started — the identity transformation.' },
     ],
     callouts: [
       {
@@ -59,20 +82,6 @@ export default {
         type: 'definition',
         title: 'Determinant — 2×2 Formula and Meaning',
         body: 'For $A = \\begin{bmatrix}a & b \\\\ c & d\\end{bmatrix}$:\n\n$$\\det(A) = ad - bc$$\n\nGeometrically: the signed area of the parallelogram formed by the two column vectors. Positive = not flipped. Negative = orientation reversed. Zero = degenerate (collapsed to a line).',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson06_Inverses',
-        title: 'The Collapsing Determinant',
-        mathBridge: 'Observe the yellow 1x1 unit square. Its area is exactly 1. As you slide the transformation matrix slider, watch the matrix morph. Note how the area of the yellow square perfectly matches the calculated Determinant at all times. Finally, push the slider until the columns become parallel (Dependent). Watch the determinant hit exactly 0 as the square flattens into a 1D line. The key lesson: A determinant of 0 destroys area irreparably.',
-        caption: 'The determinant visually tracks the scaling factor of the grid\'s area.',
-      },
-      {
-        id: 'LALesson05_MatrixMult',
-        title: 'A then A⁻¹ = Identity',
-        mathBridge: 'Set the first transformation to any invertible matrix A (try a shear or rotation). Then set the second transformation to its inverse A⁻¹ (use the formula: swap main diagonal, negate off-diagonal, scale by 1/det). Press "compose" and watch the combined transformation snap back to the identity — the grid returns to its original, undistorted state. This is the meaning of $A^{-1}A = I$: the inverse perfectly cancels the original warp.',
-        caption: 'Composing A with its inverse returns the grid exactly to where it started — the identity transformation.',
       },
     ],
   },
@@ -252,16 +261,16 @@ origin = np.zeros(2)
 for ax, M, title in [(axes[0], A, f"A: det={np.linalg.det(A):.1f} (invertible)"),
                      (axes[1], S, f"S: det={np.linalg.det(S):.1f} (singular)")]:
     c1, c2 = M[:, 0], M[:, 1]
-    para = plt.Polygon([origin, c1, c1+c2, c2], alpha=0.2, color=’steelblue’)
+    para = plt.Polygon([origin, c1, c1+c2, c2], alpha=0.2, color='steelblue')
     ax.add_patch(para)
-    ax.annotate(‘’, xy=c1, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=’steelblue’, lw=2.5))
-    ax.annotate(‘’, xy=c2, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=’darkorange’, lw=2.5))
-    ax.text(c1[0]*0.5+0.1, c1[1]*0.5+0.1, ‘col1’, color=’steelblue’, fontsize=11)
-    ax.text(c2[0]*0.5+0.1, c2[1]*0.5+0.1, ‘col2’, color=’darkorange’, fontsize=11)
+    ax.annotate('', xy=c1, xytext=origin, arrowprops=dict(arrowstyle='->', color='steelblue', lw=2.5))
+    ax.annotate('', xy=c2, xytext=origin, arrowprops=dict(arrowstyle='->', color='darkorange', lw=2.5))
+    ax.text(c1[0]*0.5+0.1, c1[1]*0.5+0.1, 'col1', color='steelblue', fontsize=11)
+    ax.text(c2[0]*0.5+0.1, c2[1]*0.5+0.1, 'col2', color='darkorange', fontsize=11)
     ax.set_title(title, fontsize=11)
     ax.set_xlim(-1, 5); ax.set_ylim(-1, 5)
-    ax.set_aspect(‘equal’); ax.grid(True, alpha=0.3)
-    ax.axhline(0, color=’k’, lw=0.5); ax.axvline(0, color=’k’, lw=0.5)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
 plt.suptitle("|det| = area of parallelogram spanned by columns", fontsize=11)
 plt.tight_layout()
 plt.show()`,

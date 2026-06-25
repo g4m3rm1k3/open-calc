@@ -1,3 +1,6 @@
+import symmetricMatrixUrl from '../diagrams/la-symmetric-matrix.svg?url'
+import orthogonalPositiveDefiniteUrl from '../diagrams/la-orthogonal-positive-definite.svg?url'
+
 export default {
   id: 'la2-007',
   slug: 'special-matrices',
@@ -19,56 +22,31 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Matrix $A = \\begin{bmatrix}1&2\\\\2&5\\end{bmatrix}$: note $a_{12} = a_{21} = 2$ — it equals its own transpose, so it is **symmetric**. Its eigenvalues are real: $(3 \\pm \\sqrt{5})/2 \\approx 0.38$ and $2.62$ — both positive, so it is also **positive definite**. Compare $Q = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$: $Q^\\top Q = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = I$ — it is **orthogonal** (rotation 90°). Structure is not just notation: symmetric → real eigenvalues → special algorithms. Orthogonal → inverse = transpose → near-zero round-off error. The structures in this lesson unlock specific, faster algorithms.',
       '**Symmetric matrices ($A = A^\\top$):** A matrix is symmetric if it equals its own transpose. Geometrically, this means the entry $a_{ij}$ (row $i$, column $j$) always equals $a_{ji}$. These matrices arise whenever a relationship is mutual: if node $i$ connects to node $j$ with weight $w$, then $j$ connects to $i$ with the same weight. The **spectral theorem** guarantees symmetric matrices have real eigenvalues and orthogonal eigenvectors.',
+      ] },
+      { type: 'image', src: symmetricMatrixUrl,
+        alt: 'A 3x3 matrix grid with diagonal cells gray and each off-diagonal pair color-matched across the dashed diagonal line of symmetry, showing a12 equals a21, a13 equals a31, a23 equals a32',
+        caption: 'Matched colors = matched values, reflected across the diagonal.' },
+      { type: 'prose', paragraphs: [
       '**Orthogonal matrices ($A^{-1} = A^\\top$):** An orthogonal matrix has columns that are orthonormal — pairwise perpendicular unit vectors. The key property is $A^\\top A = I$, which means the inverse equals the transpose. Multiplying by $A$ is a **rigid motion** (rotation or reflection) — it preserves lengths and angles. Rotation matrices, reflection matrices, and the $Q$ in QR decomposition are all orthogonal.',
       '**Positive definite matrices:** A symmetric matrix $A$ is **positive definite** (SPD) if $\\mathbf{x}^\\top A \\mathbf{x} > 0$ for all nonzero $\\mathbf{x}$. This means the associated quadratic form $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ is like a bowl — it has a single minimum at the origin. SPD matrices have all positive eigenvalues, admit a Cholesky factorization $A = LL^\\top$, and are what optimization algorithms (gradient descent, conjugate gradient) require to guarantee convergence.',
+      ] },
+      { type: 'image', src: orthogonalPositiveDefiniteUrl,
+        alt: 'Left panel: two perpendicular unit vectors q1 and q2 forming the sides of a unit square, labeled QtQ equals I, lengths and angles preserved. Right panel: a bowl-shaped curve with a single marked minimum at the origin, labeled f(x) equals x transpose A x greater than zero everywhere else',
+        caption: "Orthogonal matrices move things rigidly; positive definite matrices' quadratic form has one clean bottom." },
+      { type: 'prose', paragraphs: [
       '**Diagonal matrices** are the simplest: operations reduce to scalar operations on each diagonal entry. **Triangular matrices** (upper and lower) make linear systems trivially solvable by substitution. These are not just special cases — they are the targets of most matrix factorization algorithms (LU produces triangular matrices, Schur decomposition produces triangular, eigendecomposition of symmetric matrices produces diagonal).',
       '**Predict before reading on.** Matrix $B = \\begin{bmatrix}4&1\\\\1&2\\end{bmatrix}$. Is $B$ symmetric? Is $B$ positive definite? (Compute $\\det(B) = 8-1 = 7 > 0$ and check the top-left entry $4 > 0$.) Write your answer before checking with the Sylvester criterion callout.',
       '**Where this is heading.** Special structure is not a curiosity — it is the key that unlocks the rest of the course. The spectral theorem (Chapter 4) applies exclusively to symmetric matrices. Positive definiteness is the condition that makes Cholesky decomposition (Chapter 7) and conjugate gradient (Chapter 9) work. The QR decomposition (Chapter 7) produces orthogonal matrices by design. Every time you see "assume $A$ is symmetric" in a theorem, you are seeing the authors exploit the guaranteed real eigenvalues and orthogonal eigenvectors that make the proof possible.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'Procedure: Classify a Matrix by Its Structure',
-        body: 'Step 1. Check symmetry: compute $A - A^\\top$. If it is the zero matrix, $A$ is symmetric.\nStep 2. Check orthogonality: compute $A^\\top A$. If it equals $I$, $A$ is orthogonal (inverse = transpose, $\\det = \\pm 1$).\nStep 3. If symmetric, check positive definiteness: (a) all leading principal minors positive? (Sylvester), or (b) compute eigenvalues — all positive → SPD.\nStep 4. If SPD: use Cholesky ($A = LL^\\top$) instead of LU. Faster ($n^3/6$ vs $n^3/3$) and more stable.\nStep 5. If orthogonal: never invert — just transpose. $A^{-1} = A^\\top$ costs $O(n^2)$ vs $O(n^3)$ for LU.\nStep 6. If triangular: solve by substitution directly — no factorization needed.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 7 of 12 — Matrices & Transformations',
-        body: '**Previous:** LU Decomposition — Gaussian elimination as a factorization $A = LU$.\n**This lesson:** Special matrix types — symmetric, orthogonal, positive definite, diagonal, triangular — and why each type unlocks faster algorithms.\n**Next:** Cramer\'s Rule — using determinants to solve small systems explicitly.',
-      },
-      {
-        type: 'insight',
-        title: 'The Matrix Zoo — Quick Reference',
-        body: '| Type | Condition | Key Property |\n|---|---|---|\n| Symmetric | $A = A^\\top$ | Real eigenvalues, orthogonal eigenvectors |\n| Orthogonal | $A^\\top A = I$ | Preserves lengths and angles |\n| Pos. Definite | $\\mathbf{x}^\\top A\\mathbf{x} > 0$ | All $\\lambda_i > 0$, Cholesky exists |\n| Diagonal | $a_{ij} = 0$ for $i \\neq j$ | Trivial eigenvalues/inverses |\n| Triangular | Zeros above/below diagonal | Solvable by substitution |\n| Idempotent | $A^2 = A$ | Projection matrices |',
-      },
-      {
-        type: 'insight',
-        title: 'When to Use Which Matrix Type — Decision Guide',
-        body: '**Given a matrix $A$, ask these questions in order:**\n\n1. Is $A = A^\\top$? → **Symmetric.** Use `eigh()` not `eig()` (faster, guaranteed real eigenvalues).\n2. Does $A^\\top A = I$? → **Orthogonal.** Inverse is free: $A^{-1} = A^\\top$. Condition number = 1.\n3. Symmetric AND all eigenvalues positive? → **SPD.** Use Cholesky ($A = LL^\\top$) — twice as fast as LU, stable.\n4. Symmetric AND all eigenvalues ≥ 0? → **PSD.** Arises from covariance matrices; Cholesky may fail near zero eigenvalues.\n5. Zeros above diagonal? → **Lower triangular.** Solve by forward substitution in $O(n^2)$.\n6. Zeros below diagonal? → **Upper triangular.** Solve by back substitution in $O(n^2)$.\n\n**Rule of thumb:** Structure → algorithm. Never use general LU on a symmetric matrix; never invert an orthogonal matrix.',
-      },
-      {
-        type: 'insight',
-        title: 'Why Orthogonal Matrices Are Numerically Perfect',
-        body: 'The condition number of an orthogonal matrix is always exactly 1 — the best possible. This means solving $Qx = b$ (i.e., $x = Q^\\top b$) introduces zero amplification of errors. Algorithms like Gram-Schmidt and QR decomposition intentionally produce orthogonal matrices to keep computations stable.',
-      },
-      {
-        type: 'warning',
-        title: '"Orthogonal" is Overloaded',
-        body: 'An **orthogonal matrix** is a square matrix with orthonormal columns ($Q^\\top Q = I$). Two **vectors** are orthogonal if their dot product is 0. These are different uses of the same word. To add confusion: a non-square matrix $Q$ with $Q^\\top Q = I$ is called **unitary** (in the complex case) or just described as "having orthonormal columns" — it is NOT called an orthogonal matrix unless it is square.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson04_Matrices',
+      ] },
+      { type: 'viz', id: 'LALesson04_Matrices',
         title: 'Special Matrices as Transformations',
         mathBridge: 'Adjust the matrix entries to explore how structure constrains transformations. An orthogonal matrix (QᵀQ=I) rotates or reflects the unit square without changing its area. A symmetric positive definite matrix stretches but never flips. A singular (zero-determinant) matrix flattens space irreversibly. Observe how each structural condition restricts which transformations are possible.',
-        caption: 'Visualize how structure constrains the transformation.',
-      },
-      {
-        id: 'OpenMatNotebook',
+        caption: 'Visualize how structure constrains the transformation.' },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Verify Special Matrix Properties in OpenMAT',
         mathBridge: 'Test the properties of each matrix type computationally.',
         caption: 'Interactive verification of special matrix identities.',
@@ -166,6 +144,38 @@ fprintf('Verify A*x = b: [%g; %g]\\n', A*x)`,
             },
           ]
         }
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'Procedure: Classify a Matrix by Its Structure',
+        body: 'Step 1. Check symmetry: compute $A - A^\\top$. If it is the zero matrix, $A$ is symmetric.\nStep 2. Check orthogonality: compute $A^\\top A$. If it equals $I$, $A$ is orthogonal (inverse = transpose, $\\det = \\pm 1$).\nStep 3. If symmetric, check positive definiteness: (a) all leading principal minors positive? (Sylvester), or (b) compute eigenvalues — all positive → SPD.\nStep 4. If SPD: use Cholesky ($A = LL^\\top$) instead of LU. Faster ($n^3/6$ vs $n^3/3$) and more stable.\nStep 5. If orthogonal: never invert — just transpose. $A^{-1} = A^\\top$ costs $O(n^2)$ vs $O(n^3)$ for LU.\nStep 6. If triangular: solve by substitution directly — no factorization needed.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 7 of 12 — Matrices & Transformations',
+        body: '**Previous:** LU Decomposition — Gaussian elimination as a factorization $A = LU$.\n**This lesson:** Special matrix types — symmetric, orthogonal, positive definite, diagonal, triangular — and why each type unlocks faster algorithms.\n**Next:** Cramer\'s Rule — using determinants to solve small systems explicitly.',
+      },
+      {
+        type: 'insight',
+        title: 'The Matrix Zoo — Quick Reference',
+        body: '| Type | Condition | Key Property |\n|---|---|---|\n| Symmetric | $A = A^\\top$ | Real eigenvalues, orthogonal eigenvectors |\n| Orthogonal | $A^\\top A = I$ | Preserves lengths and angles |\n| Pos. Definite | $\\mathbf{x}^\\top A\\mathbf{x} > 0$ | All $\\lambda_i > 0$, Cholesky exists |\n| Diagonal | $a_{ij} = 0$ for $i \\neq j$ | Trivial eigenvalues/inverses |\n| Triangular | Zeros above/below diagonal | Solvable by substitution |\n| Idempotent | $A^2 = A$ | Projection matrices |',
+      },
+      {
+        type: 'insight',
+        title: 'When to Use Which Matrix Type — Decision Guide',
+        body: '**Given a matrix $A$, ask these questions in order:**\n\n1. Is $A = A^\\top$? → **Symmetric.** Use `eigh()` not `eig()` (faster, guaranteed real eigenvalues).\n2. Does $A^\\top A = I$? → **Orthogonal.** Inverse is free: $A^{-1} = A^\\top$. Condition number = 1.\n3. Symmetric AND all eigenvalues positive? → **SPD.** Use Cholesky ($A = LL^\\top$) — twice as fast as LU, stable.\n4. Symmetric AND all eigenvalues ≥ 0? → **PSD.** Arises from covariance matrices; Cholesky may fail near zero eigenvalues.\n5. Zeros above diagonal? → **Lower triangular.** Solve by forward substitution in $O(n^2)$.\n6. Zeros below diagonal? → **Upper triangular.** Solve by back substitution in $O(n^2)$.\n\n**Rule of thumb:** Structure → algorithm. Never use general LU on a symmetric matrix; never invert an orthogonal matrix.',
+      },
+      {
+        type: 'insight',
+        title: 'Why Orthogonal Matrices Are Numerically Perfect',
+        body: 'The condition number of an orthogonal matrix is always exactly 1 — the best possible. This means solving $Qx = b$ (i.e., $x = Q^\\top b$) introduces zero amplification of errors. Algorithms like Gram-Schmidt and QR decomposition intentionally produce orthogonal matrices to keep computations stable.',
+      },
+      {
+        type: 'warning',
+        title: '"Orthogonal" is Overloaded',
+        body: 'An **orthogonal matrix** is a square matrix with orthonormal columns ($Q^\\top Q = I$). Two **vectors** are orthogonal if their dot product is 0. These are different uses of the same word. To add confusion: a non-square matrix $Q$ with $Q^\\top Q = I$ is called **unitary** (in the complex case) or just described as "having orthonormal columns" — it is NOT called an orthogonal matrix unless it is square.',
       },
     ],
   },

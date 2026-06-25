@@ -1,0 +1,36 @@
+<svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="230" rx="10" class="svg-bg"/>
+
+  <!-- Panel 1: Linear — origin fixed -->
+  <rect x="12" y="22" width="218" height="192" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="121" y="40" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">Linear: origin fixed</text>
+  <rect x="70" y="110" width="60" height="60" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="70,170 130,170 190,110 130,110" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="2"/>
+  <circle cx="70" cy="170" r="5" fill="#1e293b"/>
+  <text x="50" y="190" font-size="10" fill="#1e293b" font-weight="700">(0,0) stays fixed</text>
+
+  <!-- Panel 2: Affine — origin moves -->
+  <rect x="250" y="22" width="218" height="192" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="359" y="40" font-size="11" fill="#dc2626" text-anchor="middle" font-weight="700">Affine: origin moves</text>
+  <rect x="310" y="110" width="60" height="60" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="380,152 440,152 500,92 440,92" fill="rgba(220,38,38,0.10)" stroke="#dc2626" stroke-width="2"/>
+  <circle cx="310" cy="170" r="4" fill="none" stroke="#64748b" stroke-width="1.5"/>
+  <text x="288" y="190" font-size="9" class="svg-muted">expected (0,0)</text>
+  <circle cx="380" cy="152" r="5" fill="#dc2626"/>
+  <line x1="310" y1="170" x2="378" y2="153" stroke="#dc2626" stroke-width="1.3" stroke-dasharray="3,3"/>
+  <text x="388" y="148" font-size="10" fill="#dc2626" font-weight="700">moved! not linear</text>
+
+  <text x="240" y="222" font-size="10.5" class="svg-muted" text-anchor="middle">Linear maps always fix the origin — translations (affine) carry it away too</text>
+</svg>

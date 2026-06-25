@@ -1,0 +1,53 @@
+<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .svg-dead  { fill: #e2e8f0; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+    .dark .svg-dead  { fill: #1e293b88; }
+  </style>
+  <rect width="400" height="220" rx="10" class="svg-bg"/>
+
+  <text x="100" y="18" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">Delete row 1, column 1 → minor M₁₁</text>
+
+  <!-- 3x3 grid, cells 46x46 starting at (30,28) -->
+  <!-- row1 (deleted) -->
+  <rect x="30" y="28" width="46" height="46" class="svg-dead" stroke="#cbd5e1" stroke-width="1"/>
+  <rect x="80" y="28" width="46" height="46" class="svg-dead" stroke="#cbd5e1" stroke-width="1"/>
+  <rect x="130" y="28" width="46" height="46" class="svg-dead" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="53" y="55" font-size="13" class="svg-muted" text-anchor="middle">1</text>
+  <text x="103" y="55" font-size="13" class="svg-muted" text-anchor="middle">2</text>
+  <text x="153" y="55" font-size="13" class="svg-muted" text-anchor="middle">3</text>
+  <!-- row2 -->
+  <rect x="30" y="78" width="46" height="46" class="svg-dead" stroke="#cbd5e1" stroke-width="1"/>
+  <rect x="80" y="78" width="46" height="46" class="svg-cell" stroke-width="1.5"/>
+  <rect x="130" y="78" width="46" height="46" class="svg-cell" stroke-width="1.5"/>
+  <text x="53" y="105" font-size="13" class="svg-muted" text-anchor="middle">4</text>
+  <text x="103" y="105" font-size="14" fill="#2563eb" font-weight="700" text-anchor="middle">5</text>
+  <text x="153" y="105" font-size="14" fill="#2563eb" font-weight="700" text-anchor="middle">6</text>
+  <!-- row3 -->
+  <rect x="30" y="128" width="46" height="46" class="svg-dead" stroke="#cbd5e1" stroke-width="1"/>
+  <rect x="80" y="128" width="46" height="46" class="svg-cell" stroke-width="1.5"/>
+  <rect x="130" y="128" width="46" height="46" class="svg-cell" stroke-width="1.5"/>
+  <text x="53" y="155" font-size="13" class="svg-muted" text-anchor="middle">7</text>
+  <text x="103" y="155" font-size="14" fill="#2563eb" font-weight="700" text-anchor="middle">8</text>
+  <text x="153" y="155" font-size="14" fill="#2563eb" font-weight="700" text-anchor="middle">9</text>
+
+  <!-- box around the surviving 2x2 minor -->
+  <rect x="78" y="76" width="100" height="100" fill="none" stroke="#2563eb" stroke-width="2.5" rx="4"/>
+  <text x="128" y="190" font-size="12" fill="#2563eb" font-weight="700" text-anchor="middle">M₁₁ = det[5,6;8,9] = -3</text>
+
+  <!-- checkerboard sign legend -->
+  <text x="280" y="40" font-size="11" class="svg-text" font-weight="700">Checkerboard signs (-1)^(i+j):</text>
+  <text x="280" y="64" font-size="13" class="svg-muted" font-family="ui-monospace,monospace"> +  -  +</text>
+  <text x="280" y="84" font-size="13" class="svg-muted" font-family="ui-monospace,monospace"> -  +  -</text>
+  <text x="280" y="104" font-size="13" class="svg-muted" font-family="ui-monospace,monospace"> +  -  +</text>
+  <text x="280" y="130" font-size="10" class="svg-muted">C₁₁ = (+1)·M₁₁</text>
+
+  <text x="200" y="210" font-size="10.5" class="svg-muted" text-anchor="middle">Cofactor expansion: peel off one row/column at a time, sign-checkered, down to 2×2</text>
+</svg>

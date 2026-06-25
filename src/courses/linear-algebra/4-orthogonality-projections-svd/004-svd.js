@@ -1,3 +1,5 @@
+import svdCircleEllipseUrl from '../diagrams/la-svd-circle-ellipse.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la4-004',
@@ -18,14 +20,31 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $A = \\begin{bmatrix}4&3\\\\0&0\\end{bmatrix}$. Compute $A^TA = \\begin{bmatrix}16&12\\\\12&9\\end{bmatrix}$ — eigenvalues 25 and 0, eigenvectors $\\mathbf{v}_1 = [4/5,3/5]^\\top$, $\\mathbf{v}_2 = [-3/5,4/5]^\\top$. Singular values: $\\sigma_1 = 5$, $\\sigma_2 = 0$. Left singular vector: $\\mathbf{u}_1 = (1/5)A\\mathbf{v}_1 = [1,0]^\\top$. SVD: $A = 5\\cdot[1,0]^\\top[4/5,3/5] = \\begin{bmatrix}4&3\\\\0&0\\end{bmatrix}$ ✓. Any matrix — any shape, any rank — factors this way as $A = U\\Sigma V^T$. The singular values tell you how much stretching happens in each direction.',
       'We need SVD because diagonalization has a limitation: it only works for square matrices with enough independent eigenvectors. SVD has no such restriction. It works for any matrix, any shape, any rank.',
       '**The geometric picture.** Any linear transformation — any matrix $A$ — takes a sphere in $\\mathbb{R}^n$ and maps it to an ellipse (possibly flattened) in $\\mathbb{R}^m$. SVD breaks this down into three clean steps:\n\n1. **Rotate** the input sphere to align it with the "right" coordinate axes ($V^T$)\n2. **Stretch** each axis independently — no mixing, no rotating — by the singular values ($\\Sigma$)\n3. **Rotate** again to place the ellipse in the output space ($U$)\n\nEvery matrix does exactly this, no matter how complicated it looks.',
+      ] },
+      { type: 'image', src: svdCircleEllipseUrl,
+        alt: 'Left panel: a unit circle with two perpendicular radius vectors v1 and v2. An arrow labeled A points to the right panel showing an ellipse with semi-axes sigma1 u1 and sigma2 u2',
+        caption: 'Every matrix sends the unit circle to an ellipse — the singular values are exactly its semi-axis lengths.' },
+      { type: 'prose', paragraphs: [
       'The stretching amounts $\\sigma_1 \\geq \\sigma_2 \\geq \\cdots \\geq 0$ are the **singular values**. They are always non-negative real numbers, even if the original matrix has complex entries. The largest singular value tells you the maximum amount any unit vector gets stretched by $A$. The smallest tells you the minimum.',
       '**The low-rank approximation idea.** SVD can be written as a sum of rank-1 "slices": $A = \\sigma_1 \\mathbf{u}_1 \\mathbf{v}_1^T + \\sigma_2 \\mathbf{u}_2 \\mathbf{v}_2^T + \\cdots$. Each term $\\sigma_i \\mathbf{u}_i \\mathbf{v}_i^T$ is a rank-1 matrix — the simplest possible building block. The singular values measure how important each piece is. If $\\sigma_{50} = 0.001$ and $\\sigma_1 = 1000$, then the 50th piece contributes almost nothing to the full matrix, and you can discard it. Keep only the first $k$ terms and you get the best possible rank-$k$ approximation to $A$ (in a precise mathematical sense).',
       '**Where this is heading:** This is the end of the linear algebra curriculum. But SVD is really a beginning — it is the entry point to data science, machine learning, signal processing, and numerical analysis. Every major field of applied mathematics uses it.',
       '**CNC machine intelligence via SVD.** (1) **Tool wear detection:** Record the $n$-dimensional cutting force vector over $m$ time steps. Stack these into an $m \\times n$ data matrix $X$. SVD $X = U\\Sigma V^T$ reveals the dominant cutting force pattern: $\\mathbf{v}_1$ is the direction of maximum force variance, $\\sigma_1$ its magnitude. As the tool wears, $\\sigma_1$ grows and the ratio $\\sigma_1/\\sigma_2$ increases — the cutting becomes more "one-dimensional" as chatter dominates. (2) **G-code path compression:** A 3D CNC toolpath with $m$ waypoints is a $3 \\times m$ matrix. Its SVD rank-$k$ approximation keeps the $k$ dominant shape components. For smooth paths, $k = 2$ or $3$ captures 99\\%+ of the path geometry while reducing data by 90\\% — the core idea behind spline fitting in CAM software. (3) **Probe calibration:** When calibrating a touch probe, you collect $m$ probe contact points as an $m \\times 3$ matrix. The singular values reveal probe eccentricity: if $\\sigma_3 \\ll \\sigma_1$, the contacts are nearly coplanar — a surface is being probed. The condition number $\\sigma_1/\\sigma_3$ measures how nearly parallel the probe axes are.',
+      ] },
+      { type: 'viz', id: 'SVDGeometricViz',
+        title: 'SVD — Watch Any Matrix Decompose in Real Time',
+        mathBridge: 'Drag the four matrix entries and watch σ₁, σ₂, and both rotation angles update live. The animated sequence shows Vᵀ then Σ then U applied one at a time. Try making the matrix a pure rotation (a=cosθ, b=-sinθ, c=sinθ, d=cosθ) and observe both singular values are 1. Try a rank-1 matrix and see σ₂ drop to zero — the unit circle flattens to a line segment.',
+        caption: 'Singular values measure the "stretching power" of a matrix along its best-aligned axes — they are always non-negative and always real.',
+      },
+      { type: 'viz', id: 'LALesson12_SVD',
+        title: 'SVD: Rotate → Stretch → Rotate',
+        mathBridge: 'The visualization shows the unit circle (all unit vectors in $\\mathbb{R}^2$) being transformed by $A$. Use the step slider: Step 0 = unit circle. Step 1 = apply $V^T$ (first rotation — the circle rotates but stays circular). Step 2 = apply $\\Sigma$ (axis-aligned stretch — the circle becomes an ellipse). Step 3 = apply $U$ (final rotation — the ellipse rotates to its final position). The lengths of the ellipse axes are the singular values $\\sigma_1$ and $\\sigma_2$.',
+        caption: 'Any transformation = two rotations and a diagonal stretch.',
+      },
     ],
     callouts: [
       {
@@ -57,20 +76,6 @@ export default {
         type: 'insight',
         title: 'Singular Values ≠ Eigenvalues',
         body: 'Singular values are always non-negative real numbers — even for matrices whose eigenvalues are complex or negative.\n\nFor symmetric positive definite matrices, singular values = eigenvalues. Otherwise, they are different objects.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'SVDGeometricViz',
-        title: 'SVD — Watch Any Matrix Decompose in Real Time',
-        mathBridge: 'Drag the four matrix entries and watch σ₁, σ₂, and both rotation angles update live. The animated sequence shows Vᵀ then Σ then U applied one at a time. Try making the matrix a pure rotation (a=cosθ, b=-sinθ, c=sinθ, d=cosθ) and observe both singular values are 1. Try a rank-1 matrix and see σ₂ drop to zero — the unit circle flattens to a line segment.',
-        caption: 'Singular values measure the "stretching power" of a matrix along its best-aligned axes — they are always non-negative and always real.',
-      },
-      {
-        id: 'LALesson12_SVD',
-        title: 'SVD: Rotate → Stretch → Rotate',
-        mathBridge: 'The visualization shows the unit circle (all unit vectors in $\\mathbb{R}^2$) being transformed by $A$. Use the step slider: Step 0 = unit circle. Step 1 = apply $V^T$ (first rotation — the circle rotates but stays circular). Step 2 = apply $\\Sigma$ (axis-aligned stretch — the circle becomes an ellipse). Step 3 = apply $U$ (final rotation — the ellipse rotates to its final position). The lengths of the ellipse axes are the singular values $\\sigma_1$ and $\\sigma_2$.',
-        caption: 'Any transformation = two rotations and a diagonal stretch.',
       },
     ],
   },

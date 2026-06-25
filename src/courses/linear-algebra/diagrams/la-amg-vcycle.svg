@@ -1,0 +1,36 @@
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="340" height="200" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="vc-arrow" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+  </defs>
+
+  <text x="170" y="16" font-size="11" class="svg-muted" text-anchor="middle">One V-cycle: smooth, restrict, solve coarse, prolongate, smooth</text>
+
+  <!-- V shape: fine (top-left) -> coarse (bottom) -> fine (top-right) -->
+  <polyline points="50,40 170,160 290,40" fill="none" stroke="#2563eb" stroke-width="2.5" marker-end="url(#vc-arrow)"/>
+
+  <circle cx="50" cy="40" r="5" fill="#2563eb"/>
+  <text x="50" y="28" font-size="9.5" fill="#2563eb" font-weight="700" text-anchor="middle">fine grid</text>
+  <text x="50" y="56" font-size="8.5" class="svg-muted" text-anchor="middle">smooth</text>
+
+  <circle cx="110" cy="100" r="4.5" fill="#d97706"/>
+  <text x="95" y="92" font-size="8.5" fill="#d97706" text-anchor="middle">restrict</text>
+
+  <circle cx="170" cy="160" r="5.5" fill="#10b981"/>
+  <text x="170" y="178" font-size="9.5" fill="#10b981" font-weight="700" text-anchor="middle">coarsest — direct solve</text>
+
+  <circle cx="230" cy="100" r="4.5" fill="#d97706"/>
+  <text x="248" y="92" font-size="8.5" fill="#d97706" text-anchor="middle">prolongate</text>
+
+  <circle cx="290" cy="40" r="5" fill="#2563eb"/>
+  <text x="290" y="28" font-size="9.5" fill="#2563eb" font-weight="700" text-anchor="middle">fine grid</text>
+  <text x="290" y="56" font-size="8.5" class="svg-muted" text-anchor="middle">smooth</text>
+
+  <text x="170" y="194" font-size="9.5" class="svg-muted" text-anchor="middle">smoothing is cheap; only low frequencies need the coarse grid</text>
+</svg>

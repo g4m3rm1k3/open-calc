@@ -1,3 +1,6 @@
+import hilbertProjectionUrl from '../diagrams/la-hilbert-projection-pythagorean.svg?url';
+import fourierApproxUrl from '../diagrams/la-fourier-approximation.svg?url';
+
 export default {
   id: 'la10-005',
   slug: 'banach-hilbert-spaces',
@@ -14,42 +17,29 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Where you are in the story: operator theory described what bounded linear operators look like on abstract spaces. But we have been sloppy about one crucial question: what exactly are these spaces? You cannot do analysis — limits, sequences, projections — without a completeness guarantee. The rational numbers $\\mathbb{Q}$ have an addition and a distance, but the sequence $3, 3.1, 3.14, 3.141, \\ldots$ converges to $\\pi$, which is not rational. If you are doing calculus on $\\mathbb{Q}$, your limits can escape the space. Banach spaces fix this by requiring completeness: every Cauchy sequence must converge to something inside the space.',
       'A **Banach space** is a normed vector space that is complete: every Cauchy sequence (a sequence where $\\|\\mathbf{x}_m - \\mathbf{x}_n\\| \\to 0$ as $m, n \\to \\infty$) converges to a limit in the space. The integers $\\mathbb{Z}$ are not a Banach space (not a vector space). The rationals $\\mathbb{Q}$ are not complete. The reals $\\mathbb{R}$, the $n$-dimensional spaces $\\mathbb{R}^n$, and the function spaces $L^p[a,b]$ (p-integrable functions with $\\|f\\|_p = (\\int |f|^p)^{1/p}$) are all Banach spaces. Completeness is what makes the intermediate value theorem, the Picard-Lindelöf existence theorem for ODEs, and the open mapping theorem for linear operators all work.',
       'A **Hilbert space** is a Banach space whose norm comes from an inner product: $\\|\\mathbf{x}\\|^2 = \\langle \\mathbf{x}, \\mathbf{x}\\rangle$. The inner product adds angles and orthogonality — the geometry of Euclidean space — to the abstract setting. The key examples: $\\mathbb{R}^n$ with the dot product; the space $\\ell^2$ of square-summable sequences with $\\langle \\mathbf{a}, \\mathbf{b}\\rangle = \\sum_n a_n b_n$; and the function space $L^2[a,b]$ with $\\langle f, g \\rangle = \\int_a^b f(x)g(x)\\,dx$. Note that $L^p$ for $p \\neq 2$ is a Banach space but NOT a Hilbert space: you cannot define an inner product from the $p$-norm for $p \\neq 2$.',
       'Start with $H = \\mathbb{R}^2$ to build intuition. The subspace $M = \\{(x,0) : x \\in \\mathbb{R}\\}$ (the $x$-axis) is closed. Take $\\mathbf{v} = (3,4)$. The orthogonal projection onto $M$ is $P_M \\mathbf{v} = (3,0)$, and the remainder $(0,4)$ is perpendicular to $M$: $(0,4) \\cdot (x,0) = 0$ for all $(x,0) \\in M$. Pythagorean theorem: $\\|(3,4)\\|^2 = \\|(3,0)\\|^2 + \\|(0,4)\\|^2 = 9+16 = 25$. The functional $f(x_1,x_2) = 3x_1+4x_2$ can be written $f(\\mathbf{v}) = \\langle \\mathbf{v}, (3,4)\\rangle$: the representing vector for $f$ is the vector $(3,4)$ whose components are the coefficients of $f$. All three observations — projection theorem, Pythagorean theorem, Riesz representation — extend to any Hilbert space.',
+      ] },
+      { type: 'image', src: hilbertProjectionUrl,
+        alt: 'The vector (3,4) projected onto the x-axis subspace M, giving (3,0), with the perpendicular remainder (0,4) shown as a dashed segment forming a right angle',
+        caption: 'The projection P_M v is the closest point in M to v — and the remainder v − P_M v is always perpendicular to M.' },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on:** In $L^2[0,1]$, the functions $e_1(x) = 1$ and $e_2(x) = \\sqrt{3}(2x-1)$ form an orthonormal set. What are the Fourier coefficients (inner products $\\langle f, e_1 \\rangle$ and $\\langle f, e_2 \\rangle$) of $f(x) = x^2$ in this basis? What polynomial does the truncated Fourier expansion give?',
       'Computing: $c_1 = \\langle x^2, 1\\rangle = \\int_0^1 x^2\\,dx = 1/3$. And $c_2 = \\langle x^2, \\sqrt{3}(2x-1)\\rangle = \\sqrt{3}\\int_0^1 x^2(2x-1)\\,dx = \\sqrt{3}(2/4 - 1/3) = \\sqrt{3}/12$. The two-term approximation is $c_1 e_1 + c_2 e_2 = \\frac{1}{3} + \\frac{\\sqrt{3}}{12}\\cdot\\sqrt{3}(2x-1) = \\frac{1}{3} + \\frac{3}{12}(2x-1) = x - \\frac{1}{12}$. This is the best linear approximation to $x^2$ in the $L^2$ sense — the least-squares polynomial fit. Parseval\'s identity says $\\|f\\|^2 = \\sum_n |c_n|^2$: if you sum all Fourier coefficients, you reconstruct the full $L^2$ norm.',
-      'The **Riesz representation theorem** is the Hilbert space version of the dual space result from la10-001. For any bounded linear functional $f: H \\to \\mathbb{R}$, there is a unique $\\mathbf{y} \\in H$ such that $f(\\mathbf{x}) = \\langle \\mathbf{x}, \\mathbf{y}\\rangle$ for all $\\mathbf{x}$. This gives a canonical isomorphism $H^* \\cong H$: Hilbert spaces are self-dual. In la10-001, we saw that the natural isomorphism $V \\cong V^*$ requires choosing an inner product (not canonical). Here, the Hilbert space comes equipped with its own inner product, so the isomorphism $H \\cong H^*$ is part of the structure. In machine learning, reproducing kernel Hilbert spaces use this: every evaluation functional $f \mapsto f(x_0)$ is a bounded linear functional, so it is represented by a "kernel" function $k(\\cdot, x_0) \\in H$.',
+      ] },
+      { type: 'image', src: fourierApproxUrl,
+        alt: 'A plot on [0,1] showing the curve x squared in blue and the two-term Fourier approximation x minus one-twelfth in dashed amber, the two curves nearly overlapping',
+        caption: 'Just two orthonormal terms already trace the shape of x² closely — adding more terms only sharpens the fit.' },
+      { type: 'prose', paragraphs: [
+      'The **Riesz representation theorem** is the Hilbert space version of the dual space result from la10-001. For any bounded linear functional $f: H \\to \\mathbb{R}$, there is a unique $\\mathbf{y} \\in H$ such that $f(\\mathbf{x}) = \\langle \\mathbf{x}, \\mathbf{y}\\rangle$ for all $\\mathbf{x}$. This gives a canonical isomorphism $H^* \\cong H$: Hilbert spaces are self-dual. In la10-001, we saw that the natural isomorphism $V \\cong V^*$ requires choosing an inner product (not canonical). Here, the Hilbert space comes equipped with its own inner product, so the isomorphism $H \\cong H^*$ is part of the structure. In machine learning, reproducing kernel Hilbert spaces use this: every evaluation functional $f \\mapsto f(x_0)$ is a bounded linear functional, so it is represented by a "kernel" function $k(\\cdot, x_0) \\in H$.',
       'The **projection theorem** is the geometric heart of Hilbert space theory: for any closed subspace $M \\subseteq H$ and any $\\mathbf{x} \\in H$, the nearest point in $M$ to $\\mathbf{x}$ exists and is unique. This nearest point $P_M \\mathbf{x}$ is the orthogonal projection, and the error $\\mathbf{x} - P_M \\mathbf{x}$ is perpendicular to all of $M$. In $\\mathbb{R}^n$ this is obvious; in an infinite-dimensional Hilbert space it requires the completeness of $H$ and the closedness of $M$ — without these, the infimum might not be achieved. Least-squares regression, the Gram-Schmidt process, Fourier series truncation, and principal component analysis are all special cases of orthogonal projection in a Hilbert space.',
       'Where this is heading: this lesson concludes the linear algebra course. You started with systems of equations and row reduction (Chapter 1), built up to the spectral theorem for symmetric matrices (Chapter 3), learned the numerical algorithms that make the theory computable (Chapters 7-9), saw the applications that motivate the whole subject (Chapter 8), and finally arrived at the abstract framework — dual spaces, tensors, exterior algebra, operator theory, Hilbert spaces — that unifies everything. The structures you studied are not just tools for solving equations: they are the mathematical language in which physics, signal processing, machine learning, and differential geometry are written.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Work in a Hilbert Space (4 Steps)',
-        body: '1. **Identify the inner product.** Write $\\langle \\cdot, \\cdot \\rangle$ explicitly and verify three properties: bilinearity/sesquilinearity, symmetry ($\\langle x,y\\rangle = \\overline{\\langle y,x\\rangle}$), positive-definiteness ($\\langle x,x\\rangle > 0$ for $x \\neq 0$). The induced norm is $\\|x\\| = \\sqrt{\\langle x,x\\rangle}$.\n2. **Build an orthonormal basis (ONB).** Apply Gram-Schmidt to a spanning set $\\{v_1, \\ldots\\}$: subtract projections, normalize. Verify $\\langle e_i, e_j \\rangle = \\delta_{ij}$.\n3. **Compute Fourier coefficients.** For any $\\mathbf{x} \\in H$, the coefficient on $e_k$ is $c_k = \\langle \\mathbf{x}, e_k \\rangle$. The projection onto $\\text{span}\\{e_1,\\ldots,e_N\\}$ is $P_N\\mathbf{x} = \\sum_{k=1}^N c_k\\, e_k$.\n4. **Use Parseval\'s identity.** For a complete ONB: $\\|\\mathbf{x}\\|^2 = \\sum_k |c_k|^2$. For a finite truncation: $\\|\\mathbf{x} - P_N\\mathbf{x}\\|^2 = \\|\\mathbf{x}\\|^2 - \\sum_{k=1}^N |c_k|^2$ (Bessel\'s inequality gives $\\leq$, not $=$, for incomplete sets).',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 5 of 5 — Advanced Theory',
-        body: '**Previous (Lesson 4):** Operator Theory — bounded operators, spectrum, compact operators, spectral theorem.\n**This lesson:** Banach and Hilbert Spaces — completeness, projection theorem, Parseval\'s identity, Riesz representation, $L^2$ space.\n**This is the final lesson of the linear algebra course.**',
-      },
-      {
-        type: 'theorem',
-        title: 'Projection Theorem',
-        body: 'Let $M$ be a closed subspace of a Hilbert space $H$. For any $\\mathbf{x} \\in H$, there exists a unique decomposition $\\mathbf{x} = P_M\\mathbf{x} + \\mathbf{x}^\\perp$ with $P_M\\mathbf{x} \\in M$ and $\\mathbf{x}^\\perp \\in M^\\perp$.\n\n$P_M\\mathbf{x}$ is the **orthogonal projection** of $\\mathbf{x}$ onto $M$: the unique nearest point in $M$:\n$\\|\\mathbf{x} - P_M\\mathbf{x}\\| = \\min_{\\mathbf{m} \\in M}\\|\\mathbf{x} - \\mathbf{m}\\|$\n\nNote: The closed subspace condition is crucial — open or non-closed subspaces may not have projections.',
-      },
-      {
-        type: 'theorem',
-        title: 'Riesz Representation Theorem',
-        body: 'If $H$ is a Hilbert space and $f: H \\to \\mathbb{F}$ is a bounded linear functional, then there exists a unique $\\mathbf{y} \\in H$ with $\\|\\mathbf{y}\\| = \\|f\\|$ such that:\n$f(\\mathbf{x}) = \\langle\\mathbf{x}, \\mathbf{y}\\rangle$ for all $\\mathbf{x} \\in H$\n\nConsequence: $H^* \\cong H$ (Hilbert spaces are self-dual). Unlike general Banach spaces, the dual of a Hilbert space is the space itself.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Hilbert Spaces in Python',
         mathBridge: 'Compute Fourier coefficients as inner products, verify Parseval\'s identity, and demonstrate orthogonal projection as best approximation.',
         caption: 'Fourier expansion = orthogonal projection in L²; Parseval\'s identity verifies completeness.',
@@ -160,8 +150,7 @@ print("\\nThis is the Riesz representation theorem: every functional is an inner
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Hilbert Space Concepts',
         mathBridge: 'Explore Fourier series as Hilbert space projections and Parseval\'s identity.',
         caption: 'Fourier series = orthogonal projection onto span of trigonometric basis in L^2.',
@@ -240,6 +229,28 @@ disp(['sum c_k^2 = ', num2str(sum(c.^2))])
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Work in a Hilbert Space (4 Steps)',
+        body: '1. **Identify the inner product.** Write $\\langle \\cdot, \\cdot \\rangle$ explicitly and verify three properties: bilinearity/sesquilinearity, symmetry ($\\langle x,y\\rangle = \\overline{\\langle y,x\\rangle}$), positive-definiteness ($\\langle x,x\\rangle > 0$ for $x \\neq 0$). The induced norm is $\\|x\\| = \\sqrt{\\langle x,x\\rangle}$.\n2. **Build an orthonormal basis (ONB).** Apply Gram-Schmidt to a spanning set $\\{v_1, \\ldots\\}$: subtract projections, normalize. Verify $\\langle e_i, e_j \\rangle = \\delta_{ij}$.\n3. **Compute Fourier coefficients.** For any $\\mathbf{x} \\in H$, the coefficient on $e_k$ is $c_k = \\langle \\mathbf{x}, e_k \\rangle$. The projection onto $\\text{span}\\{e_1,\\ldots,e_N\\}$ is $P_N\\mathbf{x} = \\sum_{k=1}^N c_k\\, e_k$.\n4. **Use Parseval\'s identity.** For a complete ONB: $\\|\\mathbf{x}\\|^2 = \\sum_k |c_k|^2$. For a finite truncation: $\\|\\mathbf{x} - P_N\\mathbf{x}\\|^2 = \\|\\mathbf{x}\\|^2 - \\sum_{k=1}^N |c_k|^2$ (Bessel\'s inequality gives $\\leq$, not $=$, for incomplete sets).',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 5 of 5 — Advanced Theory',
+        body: '**Previous (Lesson 4):** Operator Theory — bounded operators, spectrum, compact operators, spectral theorem.\n**This lesson:** Banach and Hilbert Spaces — completeness, projection theorem, Parseval\'s identity, Riesz representation, $L^2$ space.\n**This is the final lesson of the linear algebra course.**',
+      },
+      {
+        type: 'theorem',
+        title: 'Projection Theorem',
+        body: 'Let $M$ be a closed subspace of a Hilbert space $H$. For any $\\mathbf{x} \\in H$, there exists a unique decomposition $\\mathbf{x} = P_M\\mathbf{x} + \\mathbf{x}^\\perp$ with $P_M\\mathbf{x} \\in M$ and $\\mathbf{x}^\\perp \\in M^\\perp$.\n\n$P_M\\mathbf{x}$ is the **orthogonal projection** of $\\mathbf{x}$ onto $M$: the unique nearest point in $M$:\n$\\|\\mathbf{x} - P_M\\mathbf{x}\\| = \\min_{\\mathbf{m} \\in M}\\|\\mathbf{x} - \\mathbf{m}\\|$\n\nNote: The closed subspace condition is crucial — open or non-closed subspaces may not have projections.',
+      },
+      {
+        type: 'theorem',
+        title: 'Riesz Representation Theorem',
+        body: 'If $H$ is a Hilbert space and $f: H \\to \\mathbb{F}$ is a bounded linear functional, then there exists a unique $\\mathbf{y} \\in H$ with $\\|\\mathbf{y}\\| = \\|f\\|$ such that:\n$f(\\mathbf{x}) = \\langle\\mathbf{x}, \\mathbf{y}\\rangle$ for all $\\mathbf{x} \\in H$\n\nConsequence: $H^* \\cong H$ (Hilbert spaces are self-dual). Unlike general Banach spaces, the dual of a Hilbert space is the space itself.',
       },
     ],
   },

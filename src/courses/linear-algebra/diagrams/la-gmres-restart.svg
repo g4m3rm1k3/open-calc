@@ -1,0 +1,30 @@
+<svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-axis  { stroke: #94a3b8; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-axis  { stroke: #475569; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="340" height="200" rx="10" class="svg-bg"/>
+
+  <text x="170" y="16" font-size="10.5" class="svg-text" text-anchor="middle" font-weight="700">Memory: full GMRES keeps growing</text>
+  <text x="170" y="29" font-size="9.5" class="svg-muted" text-anchor="middle">GMRES(m) resets every m steps instead</text>
+
+  <line x1="40" y1="170" x2="310" y2="170" class="svg-axis" stroke-width="1.3"/>
+  <line x1="40" y1="170" x2="40" y2="34" class="svg-axis" stroke-width="1.3"/>
+  <text x="20" y="40" font-size="9" class="svg-muted">memory</text>
+  <text x="300" y="184" font-size="9" class="svg-muted">iteration</text>
+
+  <!-- full GMRES: straight growing line -->
+  <line x1="40" y1="160" x2="280" y2="44" stroke="#dc2626" stroke-width="2.2"/>
+  <text x="250" y="56" font-size="9.5" fill="#dc2626" font-weight="700">full GMRES: O(kn)</text>
+
+  <!-- GMRES(m): sawtooth resetting every m steps -->
+  <polyline points="40,160 100,110 100,160 160,110 160,160 220,110 220,160 280,110"
+            fill="none" stroke="#2563eb" stroke-width="2.2"/>
+  <text x="225" y="100" font-size="9.5" fill="#2563eb" font-weight="700">GMRES(m): resets</text>
+</svg>

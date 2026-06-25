@@ -1,0 +1,44 @@
+<svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .svg-axis  { stroke: #cbd5e1; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+    .dark .svg-axis  { stroke: #475569; }
+  </style>
+  <rect width="420" height="200" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="iso-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+    <marker id="iso-end1" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#1e293b"/></marker>
+    <marker id="iso-end2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M7,1 L7,7 L1,4 z" fill="#1e293b"/></marker>
+  </defs>
+
+  <text x="210" y="16" font-size="11" class="svg-muted" text-anchor="middle">Same structure, different labels — T is invertible</text>
+
+  <!-- Left: P1 -->
+  <rect x="12" y="24" width="170" height="150" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="97" y="44" font-size="12" class="svg-text" text-anchor="middle" font-weight="700">P₁</text>
+  <text x="97" y="105" font-size="16" fill="#2563eb" text-anchor="middle" font-weight="700">3 + 5x</text>
+
+  <!-- Right: R2 -->
+  <rect x="238" y="24" width="170" height="150" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="323" y="44" font-size="12" class="svg-text" text-anchor="middle" font-weight="700">ℝ²</text>
+  <line x1="270" y1="150" x2="365" y2="65" stroke="#2563eb" stroke-width="2.5" marker-end="url(#iso-blue)"/>
+  <text x="368" y="60" font-size="13" fill="#2563eb" font-weight="700">(3, 5)</text>
+  <line x1="270" y1="150" x2="350" y2="150" class="svg-axis" stroke-width="1"/>
+  <line x1="270" y1="150" x2="270" y2="75" class="svg-axis" stroke-width="1"/>
+
+  <!-- bidirectional arrow between panels -->
+  <line x1="190" y1="98" x2="230" y2="98" stroke="#1e293b" stroke-width="2" marker-start="url(#iso-end2)" marker-end="url(#iso-end1)"/>
+  <text x="210" y="88" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">T</text>
+  <text x="210" y="114" font-size="10" class="svg-muted" text-anchor="middle">T⁻¹</text>
+
+  <text x="210" y="192" font-size="10" class="svg-muted" text-anchor="middle">dim P₁ = dim ℝ² = 2 — that alone guarantees they're isomorphic</text>
+</svg>

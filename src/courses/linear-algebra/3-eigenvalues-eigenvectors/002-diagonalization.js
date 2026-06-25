@@ -1,3 +1,5 @@
+import diagonalizationPipelineUrl from '../diagrams/la-diagonalization-pipeline.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la3-002',
@@ -18,15 +20,27 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $A = \\begin{bmatrix}4&2\\\\1&3\\end{bmatrix}$ with eigenvectors $\\mathbf{v}_1 = [2,1]^\\top$ ($\\lambda_1=5$) and $\\mathbf{v}_2 = [1,-1]^\\top$ ($\\lambda_2=2$). Build $P = \\begin{bmatrix}2&1\\\\1&-1\\end{bmatrix}$ and $D = \\begin{bmatrix}5&0\\\\0&2\\end{bmatrix}$. Then $A^{100} = PD^{100}P^{-1}$ where $D^{100} = \\begin{bmatrix}5^{100}&0\\\\0&2^{100}\\end{bmatrix}$ — two scalar exponentiations and three matrix multiplications, regardless of the power. Without diagonalization: 99 matrix multiplications.',
       '**Where you are in the story:** You just found eigenvectors — the directions a matrix never rotates. You know the defining equation $A\\mathbf{v} = \\lambda\\mathbf{v}$. Now comes the payoff: what happens if you rebuild your entire coordinate system so its axes ARE the eigenvectors?',
       'In your regular coordinate system, a matrix looks messy — a grid of numbers with no obvious meaning. But in the eigenvector coordinate system, something beautiful happens: the matrix becomes **diagonal** — zeros everywhere except the main diagonal, where the eigenvalues sit. A diagonal matrix does the simplest possible thing: it just scales each axis independently.',
       'Here is the key idea: a change of basis is just a matrix multiplication. If $P$ is the matrix whose columns are the eigenvectors, then $P^{-1}$ transforms coordinates from the eigenvector basis back to the standard basis, and $P$ transforms the other way. The whole pipeline looks like:\n\n$A = P D P^{-1}$\n\nwhere $D$ is the diagonal matrix of eigenvalues.',
       '**Why this unlocks matrix powers.** Watch what happens when you square $A$:\n\n$A^2 = (PDP^{-1})(PDP^{-1}) = PD(P^{-1}P)DP^{-1} = PD^2P^{-1}$\n\nThe $P^{-1}P$ in the middle collapses to $I$. So $A^2 = PD^2P^{-1}$. By the same logic, $A^k = PD^kP^{-1}$ for any power $k$. And $D^k$ is trivial — you just raise each diagonal entry to the $k$th power. A matrix that would take hundreds of multiplications now takes three.',
       'Think of it this way: $P^{-1}$ rotates from standard coordinates into the eigenvector coordinate system. $D$ does the scaling — trivially — in that clean system. $P$ rotates back to standard coordinates. Three operations replace a hundred.',
+      ] },
+      { type: 'image', src: diagonalizationPipelineUrl,
+        alt: 'Flow diagram showing vector x passing through box P inverse labeled into eigenbasis, then box D labeled scale each axis, then box P labeled back to standard, producing Ax, with the equation A equals PDP inverse implies A to the k equals P D to the k P inverse',
+        caption: "P⁻¹ rotates into the eigenbasis, D scales trivially, P rotates back — three cheap steps replace a hundred matrix multiplications." },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on.** You are given $A = \\begin{bmatrix}3&0\\\\0&-2\\end{bmatrix}$ (diagonal). What are $P$, $D$, and $P^{-1}$ in the diagonalization $A = PDP^{-1}$? What is $A^{50}$? Write your answers before continuing.',
       '**Where this is heading:** Not every matrix has enough eigenvectors to diagonalize — some are defective. And some matrices have complex eigenvalues, which produce rotation instead of scaling. The next lesson explores what happens when the characteristic equation has no real solutions.',
+      ] },
+      { type: 'viz', id: 'LALesson09_Diagonalization',
+        title: 'Change of Basis: Standard vs. Eigenvector Coordinates',
+        mathBridge: 'The visualization shows two grids side by side: the standard coordinate grid (left) and the eigenvector coordinate grid (right). Apply matrix $A$ in the left grid — watch the complex shear/stretch. Switch to the right grid — the same transformation is now pure axis-aligned scaling. Drag a vector in either grid and watch it transform. Notice: in eigenvector coordinates, only the lengths change, never the grid lines\' angles.',
+        caption: 'Same transformation, two views. Eigenvector coordinates reveal the simple truth.',
+      },
     ],
     callouts: [
       {
@@ -53,14 +67,6 @@ export default {
         type: 'warning',
         title: 'Not Every Matrix is Diagonalizable',
         body: 'Diagonalization requires $n$ linearly independent eigenvectors for an $n \\times n$ matrix. A **defective** matrix (one where geometric multiplicity < algebraic multiplicity for some eigenvalue) does not have enough eigenvectors and cannot be diagonalized over the reals.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson09_Diagonalization',
-        title: 'Change of Basis: Standard vs. Eigenvector Coordinates',
-        mathBridge: 'The visualization shows two grids side by side: the standard coordinate grid (left) and the eigenvector coordinate grid (right). Apply matrix $A$ in the left grid — watch the complex shear/stretch. Switch to the right grid — the same transformation is now pure axis-aligned scaling. Drag a vector in either grid and watch it transform. Notice: in eigenvector coordinates, only the lengths change, never the grid lines\' angles.',
-        caption: 'Same transformation, two views. Eigenvector coordinates reveal the simple truth.',
       },
     ],
   },

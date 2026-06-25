@@ -1,3 +1,6 @@
+import cancellationUrl from '../diagrams/la-catastrophic-cancellation.svg?url';
+import pivotingSwapUrl from '../diagrams/la-partial-pivoting-swap.svg?url';
+
 export default {
   id: 'la7-004',
   slug: 'numerical-stability',
@@ -14,13 +17,18 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       '**Where you are in the story.** You now know that condition numbers measure how much a problem amplifies input errors. But there is a second source of error in numerical computation: the algorithm itself. Even a perfectly conditioned problem can produce a wrong answer if implemented carelessly. This lesson is about the other half of the error story — what happens inside the computer when you subtract two nearly equal numbers, and how pivoting keeps Gaussian elimination from catastrophically amplifying floating-point noise.',
 
       '**Floating-point is not exact arithmetic.** A double-precision float stores about 15-17 significant decimal digits. Machine epsilon $\\varepsilon_\\text{mach} \\approx 2.2 \\times 10^{-16}$ is the gap between 1.0 and the next representable number. Every floating-point operation introduces a relative error of at most $\\varepsilon_\\text{mach}$: computing $x + y$ gives $fl(x+y) = (x+y)(1+\\delta)$ where $|\\delta| \\leq \\varepsilon_\\text{mach}$. This is usually harmless — one operation, one tiny error. The danger is when many operations chain together and errors accumulate, or when one operation wipes out all significant digits at once.',
 
       '**Catastrophic cancellation: the worst single-operation failure.** Compute $f(x) = (1 - \\cos x)/x^2$ at $x = 10^{-8}$. The true answer is $1/2$. On a computer: $\\cos(10^{-8})$ rounds to exactly $1.0000000000000000$ in double precision — all 16 significant digits are used for the integer part. So $1 - \\cos(10^{-8}) = 0$ exactly in floating-point, not $5 \\times 10^{-17}$. Division gives $0$, not $0.5$. The subtraction of two nearly equal numbers destroyed all 16 significant digits in a single operation. This is catastrophic cancellation.',
-
+      ] },
+      { type: 'image', src: cancellationUrl,
+        alt: 'Two nearly equal numbers 1.0000000000000000 and 0.9999999999999999 stacked, with their subtraction shown to give exactly 0 in floating point instead of the true tiny difference',
+        caption: 'When two numbers agree to 17 digits, the subtraction has nothing left to work with — the answer floors to 0.' },
+      { type: 'prose', paragraphs: [
       '**The fix: algebraic rewriting.** Often you can rearrange the formula to avoid cancellation. For $\\sqrt{x+1} - \\sqrt{x}$ with large $x$: multiply top and bottom by $\\sqrt{x+1}+\\sqrt{x}$ to get $1/(\\sqrt{x+1}+\\sqrt{x})$. No subtraction of nearly equal quantities. For the cosine example: use the identity $1 - \\cos x = 2\\sin^2(x/2)$, giving $f(x) = 2\\sin^2(x/2)/x^2$. Near $x=0$, $\\sin(x/2) \\approx x/2$, so $f \\approx 2(x/2)^2/x^2 = 1/2$ ✓. The key insight: find a mathematically equivalent form that avoids subtracting nearly equal quantities.',
 
       '**Predict before reading on.** For $A = \\begin{bmatrix}0.001&1\\\\1&1\\end{bmatrix}$, standard Gaussian elimination uses the $(1,1)$ entry as pivot, giving multiplier $1/0.001 = 1000$. Without pivoting, do you expect the solution to be accurate? Write your prediction, then trace Example 2 to see what happens.',
@@ -28,39 +36,14 @@ export default {
       '**Gaussian elimination without pivoting amplifies errors.** When the pivot is tiny, the elimination multiplier is huge. If that pivot has floating-point errors of relative size $\\varepsilon_\\text{mach}$, multiplying by $1/\\varepsilon_\\text{mach}$ blows those errors up to order 1 — losing all accuracy. The matrix $\\begin{bmatrix}0.001&1\\\\1&1\\end{bmatrix}$ has a perfectly good solution, but naive LU without pivoting can compute it completely wrong when the first pivot is tiny.',
 
       '**Partial pivoting: the fix that is always used.** Before eliminating column $k$, scan all entries in that column below row $k$ and swap row $k$ with the row having the largest absolute value. This forces the pivot to be at least as large as any entry it will multiply, keeping all multipliers $|l_{ij}| \\leq 1$. With bounded multipliers, floating-point errors in the elimination do not get magnified. Partial pivoting makes LU backward stable: the computed $L, U$ satisfy $PA = LU + E$ where $\\|E\\| \\approx \\varepsilon_\\text{mach}\\|A\\|$. LAPACK\'s `dgetrf` (which NumPy calls internally) always uses partial pivoting.',
-
+      ] },
+      { type: 'image', src: pivotingSwapUrl,
+        alt: 'Two 2x2 matrices side by side: without pivoting the pivot is 0.001 giving a multiplier of 1000, with pivoting the rows are swapped so the pivot is 1 giving a multiplier of 0.001',
+        caption: 'Swapping in the largest available entry as pivot keeps every multiplier bounded by 1 — errors can no longer be amplified.' },
+      { type: 'prose', paragraphs: [
       '**Where this is heading.** The sparse matrix lesson applies all these ideas at massive scale. When you solve finite-element systems with millions of unknowns, every floating-point decision — pivoting strategy, storage format, stopping criteria for iterative solvers — determines whether you get an answer at all. The stability concepts here are the foundation for understanding when any large-scale computation can be trusted.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Identify and Fix Catastrophic Cancellation (4 Steps)',
-        body: '**Given:** A formula that computes a quantity involving subtraction of two terms.\n**Step 1.** Identify the cancellation: is there a step where two nearly equal quantities are subtracted? If $|a - b| \\ll |a|$, relative error in $a$ and $b$ can dominate the result.\n**Step 2.** Estimate the digits lost: if $a \\approx b$ to $k$ decimal digits, you lose $k$ digits of precision in $a - b$.\n**Step 3.** Find an algebraically equivalent form that avoids the cancellation. Common techniques: multiply by conjugate ($\\sqrt{x+h} - \\sqrt{x}$ → $h/(\\sqrt{x+h}+\\sqrt{x})$); use Taylor series for small arguments ($e^x - 1$ → $x + x^2/2 + \\ldots$ for $|x| \\ll 1$); use trig identities ($1 - \\cos x$ → $2\\sin^2(x/2)$).\n**Step 4.** Verify the stable form gives the same answer for ordinary inputs and does not cancel for small/extreme inputs.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 4 of 7 — Numerical Linear Algebra',
-        body: '**Previous (Lesson 3):** Matrix norms and condition numbers — problem sensitivity to input perturbations.\n**This lesson:** Numerical stability — algorithm-introduced errors: catastrophic cancellation, floating-point, pivoting.\n**Next (Lesson 5):** Sparse matrices — exploiting near-zero structure at massive scale.',
-      },
-      {
-        type: 'insight',
-        title: 'Machine Epsilon by Precision',
-        body: 'Double precision: $\\varepsilon_\\text{mach} \\approx 2.22 \\times 10^{-16}$ (~16 significant digits)\nSingle precision: $\\varepsilon_\\text{mach} \\approx 1.19 \\times 10^{-7}$ (~7 digits)\nHalf precision: $\\varepsilon_\\text{mach} \\approx 9.77 \\times 10^{-4}$ (~3 digits)\n\nEvery arithmetic operation: $fl(x \\circ y) = (x \\circ y)(1+\\delta)$, $|\\delta| \\leq \\varepsilon_\\text{mach}$',
-      },
-      {
-        type: 'insight',
-        title: 'Backward Stability',
-        body: 'Algorithm $\\tilde{f}$ is **backward stable** if for any input $x$:\n$\\tilde{f}(x) = f(x + \\delta x)$ for some $\\|\\delta x\\|/\\|x\\| = O(\\varepsilon_\\text{mach})$\n\nMeaning: the computed answer is the *exact* answer to a *slightly perturbed* problem.\n**Backward stable + well-conditioned → accurate answer.**',
-      },
-      {
-        type: 'warning',
-        title: 'Growth Factor',
-        body: 'Partial pivoting bounds multipliers $|l_{ij}| \\leq 1$, but the growth factor $\\rho_n = \\|U\\|_\\infty / \\|A\\|_\\infty$ can still be $2^{n-1}$ in theory. In practice, catastrophic growth essentially never occurs for real-world matrices. Partial pivoting is safe for virtually all applications.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Numerical Stability with NumPy',
         mathBridge: 'Observe catastrophic cancellation, measure machine epsilon, and compare LU with and without pivoting.',
         caption: 'Python floats are IEEE 754 double precision — same arithmetic as MATLAB and C.',
@@ -138,8 +121,7 @@ print("The multiplier without pivoting was:", round(m, 2))
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Floating-Point Pitfalls and Pivoting',
         mathBridge: 'Observe catastrophic cancellation and the effect of pivoting.',
         caption: 'Machine epsilon: every fl-op introduces relative error of about 10^-16.',
@@ -212,6 +194,33 @@ residual
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Identify and Fix Catastrophic Cancellation (4 Steps)',
+        body: '**Given:** A formula that computes a quantity involving subtraction of two terms.\n**Step 1.** Identify the cancellation: is there a step where two nearly equal quantities are subtracted? If $|a - b| \\ll |a|$, relative error in $a$ and $b$ can dominate the result.\n**Step 2.** Estimate the digits lost: if $a \\approx b$ to $k$ decimal digits, you lose $k$ digits of precision in $a - b$.\n**Step 3.** Find an algebraically equivalent form that avoids the cancellation. Common techniques: multiply by conjugate ($\\sqrt{x+h} - \\sqrt{x}$ → $h/(\\sqrt{x+h}+\\sqrt{x})$); use Taylor series for small arguments ($e^x - 1$ → $x + x^2/2 + \\ldots$ for $|x| \\ll 1$); use trig identities ($1 - \\cos x$ → $2\\sin^2(x/2)$).\n**Step 4.** Verify the stable form gives the same answer for ordinary inputs and does not cancel for small/extreme inputs.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 4 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 3):** Matrix norms and condition numbers — problem sensitivity to input perturbations.\n**This lesson:** Numerical stability — algorithm-introduced errors: catastrophic cancellation, floating-point, pivoting.\n**Next (Lesson 5):** Sparse matrices — exploiting near-zero structure at massive scale.',
+      },
+      {
+        type: 'insight',
+        title: 'Machine Epsilon by Precision',
+        body: 'Double precision: $\\varepsilon_\\text{mach} \\approx 2.22 \\times 10^{-16}$ (~16 significant digits)\nSingle precision: $\\varepsilon_\\text{mach} \\approx 1.19 \\times 10^{-7}$ (~7 digits)\nHalf precision: $\\varepsilon_\\text{mach} \\approx 9.77 \\times 10^{-4}$ (~3 digits)\n\nEvery arithmetic operation: $fl(x \\circ y) = (x \\circ y)(1+\\delta)$, $|\\delta| \\leq \\varepsilon_\\text{mach}$',
+      },
+      {
+        type: 'insight',
+        title: 'Backward Stability',
+        body: 'Algorithm $\\tilde{f}$ is **backward stable** if for any input $x$:\n$\\tilde{f}(x) = f(x + \\delta x)$ for some $\\|\\delta x\\|/\\|x\\| = O(\\varepsilon_\\text{mach})$\n\nMeaning: the computed answer is the *exact* answer to a *slightly perturbed* problem.\n**Backward stable + well-conditioned → accurate answer.**',
+      },
+      {
+        type: 'warning',
+        title: 'Growth Factor',
+        body: 'Partial pivoting bounds multipliers $|l_{ij}| \\leq 1$, but the growth factor $\\rho_n = \\|U\\|_\\infty / \\|A\\|_\\infty$ can still be $2^{n-1}$ in theory. In practice, catastrophic growth essentially never occurs for real-world matrices. Partial pivoting is safe for virtually all applications.',
       },
     ],
   },

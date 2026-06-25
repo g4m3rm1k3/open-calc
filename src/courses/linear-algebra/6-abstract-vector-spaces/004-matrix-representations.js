@@ -1,3 +1,5 @@
+import similarMatricesDiagramUrl from '../diagrams/la-similar-matrices-diagram.svg?url'
+
 export default {
   id: 'la6-004',
   slug: 'matrix-representations',
@@ -14,50 +16,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Let $T: \\mathbb{R}^2 \\to \\mathbb{R}^2$ be rotation by $90°$ counterclockwise. Where do the standard basis vectors go? $T(\\mathbf{e}_1) = T(1,0) = (0,1)$ and $T(\\mathbf{e}_2) = T(0,1) = (-1,0)$. Write these as columns: the matrix is $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. To verify: $T(3,2) = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}\\begin{bmatrix}3\\\\2\\end{bmatrix} = \\begin{bmatrix}-2\\\\3\\end{bmatrix}$ ✓. That\'s the whole algorithm — apply $T$ to each basis vector, use the outputs as columns.',
       '**Coordinates.** For a vector $\\mathbf{v} \\in V$, write $\\mathbf{v} = x_1 \\mathbf{b}_1 + \\cdots + x_n \\mathbf{b}_n$. The coordinate vector is $[\\mathbf{v}]_{\\mathcal{B}} = (x_1, \\ldots, x_n)^\\top \\in \\mathbb{R}^n$. Then matrix multiplication gives: $[T(\\mathbf{v})]_{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}} \\cdot [\\mathbf{v}]_{\\mathcal{B}}$. This is the fundamental formula: matrices multiply coordinate vectors.',
       '**Change of basis.** If $T: V \\to V$ (same space) and you switch from basis $\\mathcal{B}$ to basis $\\mathcal{B}\'$, the matrix changes by conjugation: $[T]_{\\mathcal{B}\'} = P^{-1}[T]_{\\mathcal{B}}P$, where $P$ is the **change-of-basis matrix** — its $j$-th column is $[\\mathbf{b}_j]_{\\mathcal{B}\'} =$ coordinates of the old basis vectors in the new basis. Two matrices $A$ and $B$ represent the same linear map in different bases iff $B = P^{-1}AP$ for some invertible $P$.',
+      ] },
+      { type: 'image', src: similarMatricesDiagramUrl,
+        alt: 'A commutative square diagram: top arrow A maps [v]_B to [Tv]_B, bottom arrow B equals P inverse A P maps [v]_B prime to [Tv]_B prime, with vertical arrows labeled P connecting the top row to the bottom row on both sides',
+        caption: 'Either path around the square gives the same answer — A and B = P⁻¹AP are the same map, just read in different bases.' },
+      { type: 'prose', paragraphs: [
       '**The matrix is always constructed the same way.** To build $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ step by step: (1) Apply $T$ to the first basis vector $\\mathbf{b}_1$ to get $T(\\mathbf{b}_1) \\in W$. (2) Express $T(\\mathbf{b}_1)$ as a linear combination of the $\\mathcal{C}$ basis vectors. (3) Write the coefficients as the first column of the matrix. Repeat for each basis vector $\\mathbf{b}_2, \\ldots, \\mathbf{b}_n$. The columns go left to right, one per input basis vector. This construction works for any two vector spaces and any two bases — including polynomial spaces, function spaces, and matrix spaces.',
       '**Similar matrices share invariants.** Since $B = P^{-1}AP$ represents the same linear map in a different basis, any property of the map that does not depend on the choice of basis is preserved. These are called **similarity invariants**: $\\det(A) = \\det(B)$ (determinant is basis-free), $\\text{tr}(A) = \\text{tr}(B)$ (trace is basis-free), and the characteristic polynomial $\\det(\\lambda I - A) = \\det(\\lambda I - B)$ (eigenvalues are basis-free). This is why eigenvalues are intrinsic to the linear map, not to its matrix representation.',
       '**The DFT is a change of basis.** The Discrete Fourier Transform (DFT) is a change of basis in $\\mathbb{C}^n$ — from the standard basis (sample values in time) to the Fourier basis (complex exponentials $e^{2\\pi i k/n}$). In the Fourier basis, convolution (which is a complicated sum in the time basis) becomes pointwise multiplication (trivial). The DFT matrix $F$ is the change-of-basis matrix: $F_{jk} = e^{2\\pi i jk/n}/\\sqrt{n}$. This is why FFT-based convolution is so much faster than direct convolution — the right basis makes the computation trivial.',
       '**Where this is heading.** Once you understand that every linear map is represented by a matrix, and that changing the basis changes the matrix by $P^{-1}AP$, diagonalization becomes simple to interpret: finding a basis in which $A$ is diagonal is exactly finding a basis in which the map just scales each direction independently. The next lesson (isomorphisms) formalizes when two spaces are "the same" — meaning there is a bijective linear map between them — which connects directly to when two matrix representations are interchangeable.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Build the Matrix of a Linear Map (5 Steps)',
-        body: '**Given:** $T: V \\to W$ and ordered bases $\\mathcal{B} = (\\mathbf{b}_1,\\ldots,\\mathbf{b}_n)$ for $V$ and $\\mathcal{C} = (\\mathbf{c}_1,\\ldots,\\mathbf{c}_m)$ for $W$.\n**Step 1.** Apply $T$ to the first basis vector: compute $T(\\mathbf{b}_1) \\in W$.\n**Step 2.** Express $T(\\mathbf{b}_1)$ in the output basis $\\mathcal{C}$: find scalars $a_1,\\ldots,a_m$ such that $T(\\mathbf{b}_1) = a_1\\mathbf{c}_1 + \\cdots + a_m\\mathbf{c}_m$.\n**Step 3.** Write $(a_1,\\ldots,a_m)^\\top$ as the first column of $[T]$.\n**Step 4.** Repeat steps 1–3 for each remaining basis vector $\\mathbf{b}_2,\\ldots,\\mathbf{b}_n$. Each gives one column.\n**Step 5.** Verify: $[T]\\,[\\mathbf{v}]_{\\mathcal{B}} = [T(\\mathbf{v})]_{\\mathcal{C}}$ for a test vector $\\mathbf{v}$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 4 of 6 — Abstract Vector Spaces',
-        body: '**Previous:** Linear Transformations — maps between vector spaces that preserve linear structure.\n**This lesson:** Matrix Representations — how to encode any linear transformation as a matrix once you choose bases, and how the matrix changes when you change the bases.\n**Next:** Isomorphisms — when two vector spaces are "structurally identical" and the precise meaning of that statement.',
-      },
-      {
-        type: 'insight',
-        title: 'The Fundamental Formula',
-        body: 'If $T: V \\to W$, $\\mathbf{v} \\in V$:\n$[T(\\mathbf{v})]_{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}} \\cdot [\\mathbf{v}]_{\\mathcal{B}}$\n\nThis converts abstract linear algebra into concrete matrix multiplication.',
-      },
-      {
-        type: 'insight',
-        title: 'Why Diagonalization Is Basis Change',
-        body: 'If $A$ is diagonalizable with $A = PDP^{-1}$, then $D = P^{-1}AP$. This says: the matrix $A$ represents some linear map $T$ in the standard basis. The same map $T$ in the eigenvector basis is the diagonal matrix $D$. Diagonalization = finding the right basis to make the map look simple.',
-      },
-      {
-        type: 'warning',
-        title: 'Order of Bases Matters',
-        body: 'The matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ is not just "the matrix of $T$" — it depends on the ordered pair of bases $(\\mathcal{B}, \\mathcal{C})$. Reordering either basis permutes rows or columns. Swapping to a different basis entirely changes the matrix significantly. Always track which bases you\'re using.',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction',
-        body: 'Before reading the math section: if you apply differentiation $D$ to the polynomial basis $\\{1, x, x^2, x^3\\}$ and write each result as a coordinate vector, what shape will the resulting matrix be, and where will the non-zero entries appear? Write down your prediction, then check it in the lab.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Matrix Representations and Basis Change',
         mathBridge: 'Build matrix representations and verify change-of-basis formulas.',
         caption: 'Same map, different bases: the matrix changes by P^{-1}AP.',
@@ -112,6 +86,38 @@ norm(A - A_check)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Build the Matrix of a Linear Map (5 Steps)',
+        body: '**Given:** $T: V \\to W$ and ordered bases $\\mathcal{B} = (\\mathbf{b}_1,\\ldots,\\mathbf{b}_n)$ for $V$ and $\\mathcal{C} = (\\mathbf{c}_1,\\ldots,\\mathbf{c}_m)$ for $W$.\n**Step 1.** Apply $T$ to the first basis vector: compute $T(\\mathbf{b}_1) \\in W$.\n**Step 2.** Express $T(\\mathbf{b}_1)$ in the output basis $\\mathcal{C}$: find scalars $a_1,\\ldots,a_m$ such that $T(\\mathbf{b}_1) = a_1\\mathbf{c}_1 + \\cdots + a_m\\mathbf{c}_m$.\n**Step 3.** Write $(a_1,\\ldots,a_m)^\\top$ as the first column of $[T]$.\n**Step 4.** Repeat steps 1–3 for each remaining basis vector $\\mathbf{b}_2,\\ldots,\\mathbf{b}_n$. Each gives one column.\n**Step 5.** Verify: $[T]\\,[\\mathbf{v}]_{\\mathcal{B}} = [T(\\mathbf{v})]_{\\mathcal{C}}$ for a test vector $\\mathbf{v}$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 4 of 6 — Abstract Vector Spaces',
+        body: '**Previous:** Linear Transformations — maps between vector spaces that preserve linear structure.\n**This lesson:** Matrix Representations — how to encode any linear transformation as a matrix once you choose bases, and how the matrix changes when you change the bases.\n**Next:** Isomorphisms — when two vector spaces are "structurally identical" and the precise meaning of that statement.',
+      },
+      {
+        type: 'insight',
+        title: 'The Fundamental Formula',
+        body: 'If $T: V \\to W$, $\\mathbf{v} \\in V$:\n$[T(\\mathbf{v})]_{\\mathcal{C}} = [T]_{\\mathcal{B}}^{\\mathcal{C}} \\cdot [\\mathbf{v}]_{\\mathcal{B}}$\n\nThis converts abstract linear algebra into concrete matrix multiplication.',
+      },
+      {
+        type: 'insight',
+        title: 'Why Diagonalization Is Basis Change',
+        body: 'If $A$ is diagonalizable with $A = PDP^{-1}$, then $D = P^{-1}AP$. This says: the matrix $A$ represents some linear map $T$ in the standard basis. The same map $T$ in the eigenvector basis is the diagonal matrix $D$. Diagonalization = finding the right basis to make the map look simple.',
+      },
+      {
+        type: 'warning',
+        title: 'Order of Bases Matters',
+        body: 'The matrix $[T]_{\\mathcal{B}}^{\\mathcal{C}}$ is not just "the matrix of $T$" — it depends on the ordered pair of bases $(\\mathcal{B}, \\mathcal{C})$. Reordering either basis permutes rows or columns. Swapping to a different basis entirely changes the matrix significantly. Always track which bases you\'re using.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction',
+        body: 'Before reading the math section: if you apply differentiation $D$ to the polynomial basis $\\{1, x, x^2, x^3\\}$ and write each result as a coordinate vector, what shape will the resulting matrix be, and where will the non-zero entries appear? Write down your prediction, then check it in the lab.',
       },
     ],
   },

@@ -1,3 +1,6 @@
+import columnNullSpaceUrl from '../diagrams/la-column-null-space.svg?url'
+import rankNullityBarUrl from '../diagrams/la-rank-nullity-bar.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-004',
@@ -24,15 +27,39 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $A = \\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$. Apply $A$ to $[2,-1]^T$: result is $[1\\cdot2+2\\cdot(-1),\\ 2\\cdot2+4\\cdot(-1)]^T = [0,0]^T$. The vector $[2,-1]^T$ gets crushed to zero. So does every scalar multiple: $[-4,2]^T \\to \\mathbf{0}$, $[6,-3]^T \\to \\mathbf{0}$. This entire line is the **null space**. Now ask: what outputs CAN $A$ produce? $A\\mathbf{x} = x_1[1,2]^T + x_2[2,4]^T = (x_1 + 2x_2)[1,2]^T$ — always a multiple of $[1,2]^T$. Every output lives on that single line: the **column space**. One direction is crushed (null space); one direction survives (column space). Rank-Nullity: $1 + 1 = 2$ columns.',
+      ] },
+      { type: 'image', src: columnNullSpaceUrl,
+        alt: 'Left domain panel showing the null space line where vectors get crushed to zero, an arrow A pointing to the right panel showing the column space as a 1D line in R-squared, with the crushed vector landing at the origin and a surviving input vector landing at a marked point on the line',
+        caption: 'One direction survives the transformation (the column space); the other is annihilated (the null space).' },
+      { type: 'prose', paragraphs: [
       '**The column space — the range of the transformation.** When you apply matrix $A$ to every possible input vector $\\mathbf{x} \\in \\mathbb{R}^n$, the set of all resulting output vectors $A\\mathbf{x}$ is called the **column space** of $A$ (written $\\text{col}(A)$ or $C(A)$, or in abstract algebra, the **image** $\\text{im}(A)$). Geometrically, it is the subspace spanned by the columns of $A$. If $A$ maps $\\mathbb{R}^3$ to a 2D plane, that plane is the column space. Any point *not* on that plane is unreachable — no input exists that lands there.',
       '**The null space — the graveyard.** The **null space** of $A$ (written $N(A)$, $\\ker(A)$, or the **kernel**) is the set of all vectors that $A$ sends to the zero vector: $N(A) = \\{\\mathbf{x} : A\\mathbf{x} = \\mathbf{0}\\}$. If $A$ squishes a 3D space to a 2D plane, one entire direction (a line through the origin) collapses to the origin. Every vector along that line maps to $\\mathbf{0}$. That line is the null space.',
       '**The Rank-Nullity theorem.** Dimensions balance perfectly:\n\n$$\\underbrace{\\text{rank}(A)}_{\\text{dim of column space}} + \\underbrace{\\text{nullity}(A)}_{\\text{dim of null space}} = \\underbrace{n}_{\\text{number of columns}}$$\n\nA $3 \\times 3$ matrix with rank 2 must have a 1D null space. $2 + 1 = 3$. Dimensions are conserved — they just get rerouted from "useful output" into "crushed directions."',
+      ] },
+      { type: 'image', src: rankNullityBarUrl,
+        alt: 'A segmented bar split into pivot columns and free columns, with brackets labeling rank(A) over the pivot segments and nullity(A) over the free segments, totaling n columns',
+        caption: 'rank(A) (surviving, pivot directions) and nullity(A) (crushed, free directions) always add up to the total number of columns.' },
+      { type: 'prose', paragraphs: [
       '**The MRI connection.** An MRI scanner captures 2D cross-sectional slices (the column space of the scan operator). Depth — the coordinate pointing into the scanner — is not recorded per-slice: it is in the null space. Reconstruction algorithms like filtered back-projection implicitly compute the pre-image of each slice, combining many slices to recover the 3D structure. They are inverting the operator over its column space while knowing that the null space is informationless.',
       '**CNC probe calibration.** A CNC machine probes the workpiece at reference points to establish its coordinate frame. If you probe only collinear points (all on one line), the probe data matrix has rank 1 — its column space is 1D. You cannot recover the 2D plane of the part surface. The null space of the measurement matrix has dimension 1, meaning one direction of the surface is completely undetermined. Quality standards require probe points spread in 2D (non-collinear) so that rank = 2 and the full surface plane is uniquely determined.',
       '**Predict before reading on.** Matrix $A = \\begin{bmatrix}1&0&2\\\\0&1&-1\\\\0&0&0\\end{bmatrix}$. Without computing: what is the rank? What is the nullity? What is the dimension of the column space? Write your answers, then check in Example 2.',
       '**Where this is heading:** We understand the four fundamental subspaces of any matrix. The next chapter asks: which special vectors completely resist rotation — they only get scaled by a factor? Those are the eigenvectors, and they are built from the null space idea applied to shifted matrices.',
+      ] },
+      { type: 'viz', id: 'NullSpaceColumnSpaceViz',
+        title: 'Column Space & Null Space — Input Fan Visualization',
+        mathBridge: 'The cyan arrows show outputs of M for a fan of unit input vectors — they land in the column space (the image). The yellow dashed line (when visible) is the null space — all inputs that map to zero. Switch examples: Full rank 2×2 (null = {0}, col space = all of ℝ²), Rank 1 (null = a LINE, col space = a LINE), Zero map (null = all of ℝ², col space = {0}), and Projection (null = y-axis, col space = x-axis). Watch how rank + nullity always equals 2.',
+        caption: 'Every input direction either lands somewhere nonzero (in the column space) or gets crushed to zero (in the null space). Together they cover all of ℝ².' },
+      { type: 'viz', id: 'LALesson07_NullSpace',
+        title: 'Visualizing the Crushed Space',
+        mathBridge: 'Observe the 3D space being flattened into a 2D plane. Step 1: Drag the camera to see how the Column Space (the purple plane) contains all final destinations. Step 2: Notice the glowing red line piercing straight through the plane. That is the Null Space. Every vector that started on that red line was physically crushed directly into the origin $(0,0,0)$.',
+        caption: 'The Column Space is what survives. The Null Space is what gets crushed to zero.' },
+      { type: 'viz', id: 'LALesson06_Inverses',
+        title: 'Null Space Grows as Determinant Shrinks',
+        mathBridge: 'Slide the transformation matrix toward singularity and watch two things happen simultaneously: the determinant approaches 0, and the column space collapses from a 2D plane to a 1D line. The null space grows from just the origin to a full line through the origin. At det = 0, the null space has dimension 1 and the Rank-Nullity theorem snaps into view: rank drops by 1, nullity rises by 1. Total dimensions are conserved.',
+        caption: 'As det → 0, column space collapses and null space grows — Rank-Nullity in motion.' },
     ],
     callouts: [
       {
@@ -54,26 +81,6 @@ export default {
         type: 'definition',
         title: 'Four Fundamental Subspaces',
         body: 'Every $m \\times n$ matrix $A$ has four fundamental subspaces:\n\n1. **Column space** $C(A) \\subseteq \\mathbb{R}^m$ — span of columns, dim = rank\n2. **Null space** $N(A) \\subseteq \\mathbb{R}^n$ — kernel of $A$, dim = nullity\n3. **Row space** $C(A^T) \\subseteq \\mathbb{R}^n$ — span of rows, dim = rank\n4. **Left null space** $N(A^T) \\subseteq \\mathbb{R}^m$ — kernel of $A^T$, dim = $m$ − rank\n\nFundamental theorem: $N(A) \\perp C(A^T)$ and $N(A^T) \\perp C(A)$.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'NullSpaceColumnSpaceViz',
-        title: 'Column Space & Null Space — Input Fan Visualization',
-        mathBridge: 'The cyan arrows show outputs of M for a fan of unit input vectors — they land in the column space (the image). The yellow dashed line (when visible) is the null space — all inputs that map to zero. Switch examples: Full rank 2×2 (null = {0}, col space = all of ℝ²), Rank 1 (null = a LINE, col space = a LINE), Zero map (null = all of ℝ², col space = {0}), and Projection (null = y-axis, col space = x-axis). Watch how rank + nullity always equals 2.',
-        caption: 'Every input direction either lands somewhere nonzero (in the column space) or gets crushed to zero (in the null space). Together they cover all of ℝ².',
-      },
-      {
-        id: 'LALesson07_NullSpace',
-        title: 'Visualizing the Crushed Space',
-        mathBridge: 'Observe the 3D space being flattened into a 2D plane. Step 1: Drag the camera to see how the Column Space (the purple plane) contains all final destinations. Step 2: Notice the glowing red line piercing straight through the plane. That is the Null Space. Every vector that started on that red line was physically crushed directly into the origin $(0,0,0)$.',
-        caption: 'The Column Space is what survives. The Null Space is what gets crushed to zero.',
-      },
-      {
-        id: 'LALesson06_Inverses',
-        title: 'Null Space Grows as Determinant Shrinks',
-        mathBridge: 'Slide the transformation matrix toward singularity and watch two things happen simultaneously: the determinant approaches 0, and the column space collapses from a 2D plane to a 1D line. The null space grows from just the origin to a full line through the origin. At det = 0, the null space has dimension 1 and the Rank-Nullity theorem snaps into view: rank drops by 1, nullity rises by 1. Total dimensions are conserved.',
-        caption: 'As det → 0, column space collapses and null space grows — Rank-Nullity in motion.',
       },
     ],
   },

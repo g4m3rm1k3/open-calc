@@ -1,3 +1,5 @@
+import basisChangeCoordsUrl from '../diagrams/la-basis-change-coords.svg?url'
+
 export default {
   id: 'la6-002',
   slug: 'basis-and-dimension',
@@ -14,50 +16,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Consider $P_2$ (polynomials of degree $\\leq 2$). Standard basis: $\\{1, x, x^2\\}$. Every polynomial $3 + 2x - 5x^2$ has a unique representation: coefficients $(3, 2, -5)$. Now try $\\{1+x,\\; 1-x,\\; x^2\\}$: solve $a(1+x) + b(1-x) + cx^2 = 3 + 2x - 5x^2$ by matching coefficients: $a+b=3$, $a-b=2$, $c=-5$, giving $a = 5/2$, $b = 1/2$, $c=-5$ — unique, different numbers but same polynomial. Both sets are bases: they span (every polynomial has a representation) and are independent (the representation is unique). Any basis of $P_2$ has exactly 3 vectors — no matter which 3 you choose. That count, 3, is the dimension.',
       '**Uniqueness of coefficients.** If $\\{\\mathbf{b}_1, \\ldots, \\mathbf{b}_n\\}$ is a basis, every $\\mathbf{v} \\in V$ can be written uniquely as $\\mathbf{v} = c_1 \\mathbf{b}_1 + \\cdots + c_n \\mathbf{b}_n$. The scalars $(c_1, \\ldots, c_n)$ are the **coordinates** of $\\mathbf{v}$ with respect to this basis. Different bases give different coordinate representations of the same vector.',
+      ] },
+      { type: 'image', src: basisChangeCoordsUrl,
+        alt: 'Left panel showing the standard basis axes with a dot labeled coordinates 3, 2, -5. Right panel showing skewed basis axes with the same dot labeled coordinates 5/2, 1/2, -5',
+        caption: 'Same polynomial, same dot — only the ruler (basis) changes, and so do the numbers you read off it.' },
+      { type: 'prose', paragraphs: [
       '**Dimension is basis-independent.** The most important theorem about bases: every basis of a vector space has the same number of elements. This common number is the **dimension** of $V$. It does not matter which basis you use — any two bases have the same size. This is the theorem that makes "dimension" a well-defined property of $V$, not just of a particular basis.',
       '**Standard examples.** $\\dim \\mathbb{R}^n = n$ (standard basis $\\mathbf{e}_1, \\ldots, \\mathbf{e}_n$). $\\dim P_n = n+1$ (basis $1, x, x^2, \\ldots, x^n$). $\\dim M_{m\\times n} = mn$ (basis of matrices with a single 1 and rest 0s). $\\dim C[a,b] = \\infty$ (no finite basis exists).',
       '**Finding a basis for a subspace defined by a constraint.** Suppose $W = \\{(x,y,z,w) \\in \\mathbb{R}^4 : x - 2y + z = 0 \\text{ and } y + w = 0\\}$. Two equations, four unknowns: two free variables. Set $y = s$, $z = t$ (free), then $x = 2s - t$ and $w = -s$. The general element is $s(2,-1,0,1)^T \\cdot 0 + \\ldots$ — wait, parametrize: $(2s-t, s, t, -s)^T = s(2,1,0,-1)^T + t(-1,0,1,0)^T$. So a basis for $W$ is $\\{(2,1,0,-1)^T, (-1,0,1,0)^T\\}$ and $\\dim W = 2$. The rank-nullity theorem confirms: 4 variables, 2 independent equations → $4 - 2 = 2$ free variables.',
       '**Coordinates change with the basis, but the vector does not.** The polynomial $p(x) = 3 + 2x - 5x^2$ is the same polynomial regardless of which basis you use to represent it. In the standard basis $\\{1, x, x^2\\}$, its coordinates are $(3, 2, -5)$. In a different basis $\\{1+x, 1-x, x^2\\}$, the coordinates are different numbers but describe the same function. Understanding that a vector and its coordinates are different objects — the vector is the mathematical reality, the coordinates are a choice of reference frame — is one of the key insights that separates abstract linear algebra from concrete computation.',
       '**Where this is heading.** The next lesson studies linear transformations — maps that preserve the vector space structure. Once you have dimension, you can count: a linear map from a $k$-dimensional space to an $m$-dimensional space is represented by an $m \\times k$ matrix, and the rank-nullity theorem constrains how much it can compress or expand information. Change of basis (Lesson 6 of this chapter) lets you choose the coordinate system that best reveals the structure of the transformation.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Find a Basis for a Subspace Defined by Constraints (5 Steps)',
-        body: '**Given:** A subspace $W$ defined by linear constraints on a vector space $V$.\n**Step 1.** Write the general element of $V$ with all unknowns free: e.g., $p(x) = a_0 + a_1x + \\cdots$ or $\\mathbf{v} = (x_1, x_2, \\ldots)$.\n**Step 2.** Apply each constraint to eliminate variables. Each independent constraint removes one free parameter.\n**Step 3.** Express the remaining general element as a linear combination of coefficient vectors, one per free parameter.\n**Step 4.** Read off the coefficient vectors — these form the basis for $W$.\n**Step 5.** Count the basis vectors = $\\dim(W)$. Verify: $\\dim(W) = \\dim(V) - (\\text{number of independent constraints})$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 2 of 6 — Abstract Vector Spaces',
-        body: '**Previous:** Abstract Vector Spaces — the ten axioms that define what a vector space is.\n**This lesson:** Basis and Dimension — how to measure the size of any vector space, and why all bases have the same number of vectors.\n**Next:** Linear Transformations — maps between vector spaces that preserve the vector space structure.',
-      },
-      {
-        type: 'theorem',
-        title: 'All Bases Have the Same Size',
-        body: 'If $V$ has a finite basis, then every basis of $V$ contains exactly the same number of vectors. This number is $\\dim V$.\n\nConsequently:\n• Any spanning set of size $\\dim V$ is a basis\n• Any independent set of size $\\dim V$ is a basis\n• You only need to check ONE of the two conditions if you know the set has the right size',
-      },
-      {
-        type: 'insight',
-        title: 'Basis Hunting Strategy',
-        body: 'To find a basis for a subspace $W$:\n**Method 1:** Find the null space or column space, extract pivot columns.\n**Method 2:** Write the general element with free parameters, pull out each coefficient vector.\n**Method 3:** Start with too many vectors, reduce using Gram-Schmidt or row reduction.',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction',
-        body: 'Before computing: the subspace $W = \\{p \\in P_3 : p(0) = 0\\}$ (degree $\\leq 3$ polynomials vanishing at $0$). How many free parameters does a polynomial in $W$ have? What is $\\dim(W)$? Name a basis for $W$ without computing — use the structure of the constraint.',
-      },
-      {
-        type: 'insight',
-        title: 'Dimension Formulas',
-        body: 'For a subspace $W \\subseteq V$:\n$\\dim W \\leq \\dim V$\n$\\dim W = \\dim V \\Leftrightarrow W = V$\n\nRank-Nullity: $\\text{rank}(A) + \\text{nullity}(A) = n$ (columns of $A$)\n$\\dim(W_1 + W_2) = \\dim W_1 + \\dim W_2 - \\dim(W_1 \\cap W_2)$',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Bases for Polynomial and Matrix Spaces',
         mathBridge: 'Find bases and compute coordinates in abstract spaces.',
         caption: 'The dimension is the number of independent directions — regardless of the objects involved.',
@@ -114,6 +88,38 @@ disp('Dimension of W: 2')
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Find a Basis for a Subspace Defined by Constraints (5 Steps)',
+        body: '**Given:** A subspace $W$ defined by linear constraints on a vector space $V$.\n**Step 1.** Write the general element of $V$ with all unknowns free: e.g., $p(x) = a_0 + a_1x + \\cdots$ or $\\mathbf{v} = (x_1, x_2, \\ldots)$.\n**Step 2.** Apply each constraint to eliminate variables. Each independent constraint removes one free parameter.\n**Step 3.** Express the remaining general element as a linear combination of coefficient vectors, one per free parameter.\n**Step 4.** Read off the coefficient vectors — these form the basis for $W$.\n**Step 5.** Count the basis vectors = $\\dim(W)$. Verify: $\\dim(W) = \\dim(V) - (\\text{number of independent constraints})$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 2 of 6 — Abstract Vector Spaces',
+        body: '**Previous:** Abstract Vector Spaces — the ten axioms that define what a vector space is.\n**This lesson:** Basis and Dimension — how to measure the size of any vector space, and why all bases have the same number of vectors.\n**Next:** Linear Transformations — maps between vector spaces that preserve the vector space structure.',
+      },
+      {
+        type: 'theorem',
+        title: 'All Bases Have the Same Size',
+        body: 'If $V$ has a finite basis, then every basis of $V$ contains exactly the same number of vectors. This number is $\\dim V$.\n\nConsequently:\n• Any spanning set of size $\\dim V$ is a basis\n• Any independent set of size $\\dim V$ is a basis\n• You only need to check ONE of the two conditions if you know the set has the right size',
+      },
+      {
+        type: 'insight',
+        title: 'Basis Hunting Strategy',
+        body: 'To find a basis for a subspace $W$:\n**Method 1:** Find the null space or column space, extract pivot columns.\n**Method 2:** Write the general element with free parameters, pull out each coefficient vector.\n**Method 3:** Start with too many vectors, reduce using Gram-Schmidt or row reduction.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction',
+        body: 'Before computing: the subspace $W = \\{p \\in P_3 : p(0) = 0\\}$ (degree $\\leq 3$ polynomials vanishing at $0$). How many free parameters does a polynomial in $W$ have? What is $\\dim(W)$? Name a basis for $W$ without computing — use the structure of the constraint.',
+      },
+      {
+        type: 'insight',
+        title: 'Dimension Formulas',
+        body: 'For a subspace $W \\subseteq V$:\n$\\dim W \\leq \\dim V$\n$\\dim W = \\dim V \\Leftrightarrow W = V$\n\nRank-Nullity: $\\text{rank}(A) + \\text{nullity}(A) = n$ (columns of $A$)\n$\\dim(W_1 + W_2) = \\dim W_1 + \\dim W_2 - \\dim(W_1 \\cap W_2)$',
       },
     ],
   },

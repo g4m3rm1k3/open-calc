@@ -1,3 +1,5 @@
+import stabilityHalfplaneUrl from '../diagrams/la-stability-halfplane.svg?url'
+
 export default {
   id: "la3-007",
   slug: "matrix-exponential",
@@ -27,46 +29,23 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       "**You already know the scalar case.** If $\\dot{x} = ax$, the unique solution satisfying $x(0) = x_0$ is $x(t) = e^{at}x_0$. When $a < 0$ the solution decays; when $a > 0$ it blows up. Now suppose you have a system: $\\dot{x}_1 = -2x_1$, $\\dot{x}_2 = -3x_2$. In matrix form, $\\dot{\\mathbf{x}} = A\\mathbf{x}$ with $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$. By analogy, the solution should be $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ — and it is. The object $e^{At}$ is the **matrix exponential**, defined by the same power series as its scalar cousin: $e^{At} = I + At + \\frac{(At)^2}{2!} + \\frac{(At)^3}{3!} + \\cdots$",
       "**Verify it works on the diagonal case.** For $A = \\begin{bmatrix}-2&0\\\\0&-3\\end{bmatrix}$, each power $A^k = \\begin{bmatrix}(-2)^k&0\\\\0&(-3)^k\\end{bmatrix}$, so the power series sums to $e^{At} = \\begin{bmatrix}e^{-2t}&0\\\\0&e^{-3t}\\end{bmatrix}$. With $\\mathbf{x}_0 = [1,1]^\\top$, the solution at $t=1$ is $\\mathbf{x}(1) = [e^{-2}, e^{-3}]^\\top \\approx [0.135, 0.050]^\\top$. Both components decay because both eigenvalues are negative. Change $-2$ to $+2$ and $x_1$ explodes — the sign of the eigenvalue controls stability directly.",
       "**Why it solves the ODE.** Differentiate $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$ term by term: $\\frac{d}{dt}(I + At + \\frac{A^2t^2}{2} + \\cdots) = A + A^2 t + \\cdots = A(I + At + \\cdots) = Ae^{At}$. So $\\dot{\\mathbf{x}} = Ae^{At}\\mathbf{x}_0 = A\\mathbf{x}(t)$ ✓. And $\\mathbf{x}(0) = e^0 \\mathbf{x}_0 = I\\mathbf{x}_0 = \\mathbf{x}_0$ ✓. No numerical integration needed — the entire solution from $t = 0$ to $\\infty$ is captured in one matrix formula.",
       "**Computing $e^{At}$ for non-diagonal matrices via diagonalization.** If $A = PDP^{-1}$ where $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$, then $(A)^k = PD^kP^{-1}$, so the power series sums to $e^{At} = Pe^{Dt}P^{-1}$ where $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$. This reduces the computation to: (1) find eigenvalues and eigenvectors, (2) form $P$ and $D$, (3) exponentiate the diagonal, (4) transform back. For non-diagonalizable matrices, use the Jordan form from the previous lesson.",
       "**Predict before reading on.** For $A = \\begin{bmatrix}0&-\\omega\\\\\\omega&0\\end{bmatrix}$ with eigenvalues $\\pm i\\omega$, the exponential $e^{At}$ must involve $e^{\\pm i\\omega t}$. Use Euler's formula $e^{i\\theta} = \\cos\\theta + i\\sin\\theta$ to predict the form of $e^{At}$. Should solutions grow, decay, or oscillate? Write your prediction before continuing.",
       "**The eigenvalue tells you everything about long-time behavior.** Real $\\lambda < 0$: exponential decay. Real $\\lambda > 0$: exponential growth. Purely imaginary $\\pm i\\omega$: perpetual oscillation at frequency $\\omega/(2\\pi)$. Complex $a \\pm bi$ with $a < 0$: decaying spiral (stable oscillation). Complex $a \\pm bi$ with $a > 0$: growing spiral (unstable). The system $\\dot{\\mathbf{x}} = A\\mathbf{x}$ is globally stable if and only if ALL eigenvalues of $A$ have negative real part.",
+      ] },
+      { type: 'image', src: stabilityHalfplaneUrl,
+        alt: 'A complex plane split into a green left half labeled Re(lambda) less than 0, decays, and a red right half labeled Re(lambda) greater than 0, grows, with three example eigenvalues plotted: a negative real one that decays, a pure imaginary one that oscillates, and one in the right half that grows',
+        caption: 'A system is stable exactly when every eigenvalue of A sits in the left half-plane.' },
+      { type: 'prose', paragraphs: [
       "**CNC servo drives — why eigenvalues matter in manufacturing.** A CNC axis servo is modeled by $\\dot{\\mathbf{x}} = A\\mathbf{x} + B u$ where $\\mathbf{x} = [\\text{position}, \\text{velocity}]^\\top$. With no input ($u = 0$), the axis coasts according to $\\mathbf{x}(t) = e^{At}\\mathbf{x}_0$. Complex eigenvalues $a \\pm bi$ mean the axis rings (oscillates) at frequency $b/(2\\pi)$ Hz as it settles. In machining, this ringing is the source of chatter marks on the workpiece surface — a distinctive corrugated pattern. Servo tuning shifts eigenvalues deep into the left half-plane to kill the ringing. Machine tool designers use the eigenvalues of the servo loop matrix as a direct design criterion.",
       "**Where this is heading.** The matrix exponential closes the loop on eigenvalues: we found eigenvalues (la3-001), diagonalized with them (la3-002), handled complex cases (la3-003), and now use them to propagate dynamical systems through time. Chapter 4 shifts focus from dynamics to geometry — orthogonal projections, least squares, and the SVD. The eigenvalues of $A^\\top A$ are the squared singular values of $A$, connecting the eigenvalue theory of this chapter to the geometric theory of the next.",
-    ],
-    callouts: [
-      {
-        type: "insight",
-        title: "Eigenvalue → Solution Behavior",
-        body: "| Eigenvalue type | Solution behavior |\n|---|---|\n| Real $\\lambda < 0$ | Exponential decay: $e^{\\lambda t} \\to 0$ |\n| Real $\\lambda > 0$ | Exponential growth: $e^{\\lambda t} \\to \\infty$ |\n| Pure imaginary $\\pm i\\omega$ | Oscillation: $\\cos(\\omega t) \\pm i\\sin(\\omega t)$ |\n| Complex $a \\pm bi$, $a < 0$ | Decaying oscillation |\n| Repeated eigenvalue (Jordan) | $t^k e^{\\lambda t}$ terms |",
-      },
-      {
-        type: "theorem",
-        title: "Properties of the Matrix Exponential",
-        body: "• $e^{A \\cdot 0} = I$\n• $\\frac{d}{dt} e^{At} = A e^{At} = e^{At} A$\n• $\\det(e^A) = e^{\\text{tr}(A)}$\n• If $AB = BA$: $e^{A+B} = e^A e^B$ (commutativity required!)\n• $(e^A)^{-1} = e^{-A}$",
-      },
-      {
-        type: "sequencing",
-        title: "Lesson 7 of 7 — Eigenvalues & Eigenvectors",
-        body: "**Previous (Lesson 6):** Cayley-Hamilton Theorem — matrices satisfy their own characteristic polynomial.\n**This lesson:** Matrix Exponential — $e^{At}$ solves $\\dot{\\mathbf{x}} = A\\mathbf{x}$; connection to eigenvalues via diagonalization.\n**Next (Chapter 4):** Orthogonal Projections — projecting vectors onto subspaces; the foundation of least squares.",
-      },
-      {
-        type: "procedure",
-        title: "Procedure: Compute e^(At) and Solve the ODE",
-        body: "Step 1. **Find eigenvalues and eigenvectors.** Compute $\\det(A - \\lambda I) = 0$ for eigenvalues, then find eigenvectors $\\mathbf{v}_i$ for each $\\lambda_i$.\n\nStep 2. **Diagonalize.** Form $P = [\\mathbf{v}_1 \\mid \\cdots \\mid \\mathbf{v}_n]$ and $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$. Verify $A = PDP^{-1}$.\n\nStep 3. **Exponentiate the diagonal.** $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$.\n\nStep 4. **Transform back.** $e^{At} = P e^{Dt} P^{-1}$.\n\nStep 5. **Apply initial condition.** $\\mathbf{x}(t) = e^{At} \\mathbf{x}_0$. Expand as $c_1 e^{\\lambda_1 t} \\mathbf{v}_1 + \\cdots$ where $c_i$ match $\\mathbf{x}_0 = P\\mathbf{c}$.\n\nStep 6. **Check stability.** All $\\text{Re}(\\lambda_i) < 0$ → asymptotically stable (all solutions → 0). Any $\\text{Re}(\\lambda_i) > 0$ → unstable.",
-      },
-      {
-        type: "warning",
-        title: "Commutativity Is Required for $e^{A+B} = e^A e^B$",
-        body: "In general, $e^{A+B} \\neq e^A e^B$ unless $AB = BA$. This fails for most pairs of matrices. The Baker-Campbell-Hausdorff formula gives the correction terms involving commutators $[A,B] = AB - BA$.",
-      },
-    ],
-    visualizations: [
-      {
-        id: "OpenMatNotebook",
+      ] },
+      { type: 'viz', id: "OpenMatNotebook",
         title: "Matrix Exponential and ODE Solutions",
         mathBridge:
           "Compute e^(At) for a 2x2 system and visualize the phase portrait.",
@@ -144,6 +123,33 @@ end
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: "insight",
+        title: "Eigenvalue → Solution Behavior",
+        body: "| Eigenvalue type | Solution behavior |\n|---|---|\n| Real $\\lambda < 0$ | Exponential decay: $e^{\\lambda t} \\to 0$ |\n| Real $\\lambda > 0$ | Exponential growth: $e^{\\lambda t} \\to \\infty$ |\n| Pure imaginary $\\pm i\\omega$ | Oscillation: $\\cos(\\omega t) \\pm i\\sin(\\omega t)$ |\n| Complex $a \\pm bi$, $a < 0$ | Decaying oscillation |\n| Repeated eigenvalue (Jordan) | $t^k e^{\\lambda t}$ terms |",
+      },
+      {
+        type: "theorem",
+        title: "Properties of the Matrix Exponential",
+        body: "• $e^{A \\cdot 0} = I$\n• $\\frac{d}{dt} e^{At} = A e^{At} = e^{At} A$\n• $\\det(e^A) = e^{\\text{tr}(A)}$\n• If $AB = BA$: $e^{A+B} = e^A e^B$ (commutativity required!)\n• $(e^A)^{-1} = e^{-A}$",
+      },
+      {
+        type: "sequencing",
+        title: "Lesson 7 of 7 — Eigenvalues & Eigenvectors",
+        body: "**Previous (Lesson 6):** Cayley-Hamilton Theorem — matrices satisfy their own characteristic polynomial.\n**This lesson:** Matrix Exponential — $e^{At}$ solves $\\dot{\\mathbf{x}} = A\\mathbf{x}$; connection to eigenvalues via diagonalization.\n**Next (Chapter 4):** Orthogonal Projections — projecting vectors onto subspaces; the foundation of least squares.",
+      },
+      {
+        type: "procedure",
+        title: "Procedure: Compute e^(At) and Solve the ODE",
+        body: "Step 1. **Find eigenvalues and eigenvectors.** Compute $\\det(A - \\lambda I) = 0$ for eigenvalues, then find eigenvectors $\\mathbf{v}_i$ for each $\\lambda_i$.\n\nStep 2. **Diagonalize.** Form $P = [\\mathbf{v}_1 \\mid \\cdots \\mid \\mathbf{v}_n]$ and $D = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$. Verify $A = PDP^{-1}$.\n\nStep 3. **Exponentiate the diagonal.** $e^{Dt} = \\text{diag}(e^{\\lambda_1 t}, \\ldots, e^{\\lambda_n t})$.\n\nStep 4. **Transform back.** $e^{At} = P e^{Dt} P^{-1}$.\n\nStep 5. **Apply initial condition.** $\\mathbf{x}(t) = e^{At} \\mathbf{x}_0$. Expand as $c_1 e^{\\lambda_1 t} \\mathbf{v}_1 + \\cdots$ where $c_i$ match $\\mathbf{x}_0 = P\\mathbf{c}$.\n\nStep 6. **Check stability.** All $\\text{Re}(\\lambda_i) < 0$ → asymptotically stable (all solutions → 0). Any $\\text{Re}(\\lambda_i) > 0$ → unstable.",
+      },
+      {
+        type: "warning",
+        title: "Commutativity Is Required for $e^{A+B} = e^A e^B$",
+        body: "In general, $e^{A+B} \\neq e^A e^B$ unless $AB = BA$. This fails for most pairs of matrices. The Baker-Campbell-Hausdorff formula gives the correction terms involving commutators $[A,B] = AB - BA$.",
       },
     ],
   },

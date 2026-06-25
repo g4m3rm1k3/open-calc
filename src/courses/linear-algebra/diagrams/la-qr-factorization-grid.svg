@@ -1,0 +1,73 @@
+<svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+  </style>
+  <rect width="340" height="220" rx="10" class="svg-bg"/>
+
+  <text x="170" y="18" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">A = Q × R — R is a ledger of Gram-Schmidt</text>
+
+  <!-- A grid 3x3 -->
+  <g>
+    <rect x="18" y="36" width="22" height="22" class="svg-cell" stroke-width="1"/>
+    <rect x="40" y="36" width="22" height="22" class="svg-cell" stroke-width="1"/>
+    <rect x="62" y="36" width="22" height="22" class="svg-cell" stroke-width="1"/>
+    <rect x="18" y="58" width="22" height="22" class="svg-cell" stroke-width="1"/>
+    <rect x="40" y="58" width="22" height="22" class="svg-cell" stroke-width="1"/>
+    <rect x="62" y="58" width="22" height="22" class="svg-cell" stroke-width="1"/>
+    <rect x="18" y="80" width="22" height="22" class="svg-cell" stroke-width="1"/>
+    <rect x="40" y="80" width="22" height="22" class="svg-cell" stroke-width="1"/>
+    <rect x="62" y="80" width="22" height="22" class="svg-cell" stroke-width="1"/>
+    <text x="51" y="116" font-size="11" class="svg-muted" text-anchor="middle">A</text>
+  </g>
+
+  <text x="96" y="72" font-size="15" class="svg-text" text-anchor="middle">=</text>
+
+  <!-- Q grid 3x3, orthonormal columns highlighted blue -->
+  <g>
+    <rect x="110" y="36" width="22" height="22" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="132" y="36" width="22" height="22" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="154" y="36" width="22" height="22" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="110" y="58" width="22" height="22" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="132" y="58" width="22" height="22" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="154" y="58" width="22" height="22" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="110" y="80" width="22" height="22" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="132" y="80" width="22" height="22" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="1.3"/>
+    <rect x="154" y="80" width="22" height="22" fill="rgba(37,99,235,0.12)" stroke="#2563eb" stroke-width="1.3"/>
+    <text x="143" y="116" font-size="11" fill="#2563eb" font-weight="700" text-anchor="middle">Q</text>
+    <text x="143" y="130" font-size="9" fill="#2563eb" text-anchor="middle">orthonormal cols</text>
+  </g>
+
+  <text x="190" y="72" font-size="15" class="svg-text" text-anchor="middle">×</text>
+
+  <!-- R grid 3x3, upper triangular: zeros below diagonal highlighted green -->
+  <g>
+    <rect x="204" y="36" width="22" height="22" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+    <rect x="226" y="36" width="22" height="22" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+    <rect x="248" y="36" width="22" height="22" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+    <rect x="204" y="58" width="22" height="22" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+    <rect x="226" y="58" width="22" height="22" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+    <rect x="248" y="58" width="22" height="22" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+    <rect x="204" y="80" width="22" height="22" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+    <rect x="226" y="80" width="22" height="22" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+    <rect x="248" y="80" width="22" height="22" fill="rgba(217,119,6,0.15)" stroke="#d97706" stroke-width="1.5"/>
+    <text x="215" y="50" font-size="10" fill="#d97706" font-weight="700" text-anchor="middle">r₁₁</text>
+    <text x="237" y="72" font-size="10" fill="#d97706" font-weight="700" text-anchor="middle">r₂₂</text>
+    <text x="259" y="94" font-size="10" fill="#d97706" font-weight="700" text-anchor="middle">r₃₃</text>
+    <text x="215" y="72" font-size="9" fill="#10b981" text-anchor="middle">0</text>
+    <text x="215" y="94" font-size="9" fill="#10b981" text-anchor="middle">0</text>
+    <text x="237" y="94" font-size="9" fill="#10b981" text-anchor="middle">0</text>
+    <text x="237" y="116" font-size="11" class="svg-muted" text-anchor="middle">R</text>
+  </g>
+
+  <text x="170" y="155" font-size="9.5" class="svg-muted" text-anchor="middle">amber diagonal = norms ‖q̃ⱼ‖</text>
+  <text x="170" y="171" font-size="9.5" class="svg-muted" text-anchor="middle">amber upper = inner products, green = zero</text>
+  <text x="170" y="187" font-size="9.5" class="svg-muted" text-anchor="middle">column j of A only ever projects onto q₁ … qⱼ₋₁</text>
+  <text x="170" y="206" font-size="9.5" class="svg-muted" text-anchor="middle">— never later columns</text>
+</svg>

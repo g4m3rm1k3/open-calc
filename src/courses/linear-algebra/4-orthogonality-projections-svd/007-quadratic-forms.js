@@ -1,3 +1,5 @@
+import quadraticFormConicsUrl from '../diagrams/la-quadratic-form-conics.svg?url'
+
 export default {
   id: 'la4-007',
   slug: 'quadratic-forms',
@@ -14,50 +16,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $Q(x,y) = 3x^2 + 4xy + 3y^2$. Evaluate at a few points: $Q(1,0) = 3$, $Q(0,1) = 3$, $Q(1,1) = 10$, $Q(1,-1) = 2$ — always positive. Write it as $Q(\\mathbf{x}) = \\mathbf{x}^\\top A\\mathbf{x}$ with $A = \\begin{bmatrix}3&2\\\\2&3\\end{bmatrix}$ (off-diagonal entry = half the $xy$ coefficient: $4/2 = 2$). Eigenvalues of $A$: $(3-\\lambda)^2 - 4 = 0 \\Rightarrow \\lambda = 1, 5$ — both positive. Now try $Q(x,y) = 2x^2 + 6xy + 2y^2$ with $A = \\begin{bmatrix}2&3\\\\3&2\\end{bmatrix}$: eigenvalues $\\lambda = -1$ and $5$ (mixed signs). Check: $Q(1,1) = 10 > 0$ but $Q(1,-1) = -2 < 0$ — the form takes both signs. The eigenvalue signs completely encode the geometry of the level set $Q(\\mathbf{x}) = c$.',
       '**Definiteness classifies the form.** A quadratic form (and its matrix $A$) is:\n- **Positive definite (PD):** $Q(\\mathbf{x}) > 0$ for all $\\mathbf{x} \\neq 0$ — all eigenvalues positive\n- **Positive semidefinite (PSD):** $Q(\\mathbf{x}) \\geq 0$ for all $\\mathbf{x}$ — all eigenvalues $\\geq 0$\n- **Negative definite (ND):** $Q(\\mathbf{x}) < 0$ for all $\\mathbf{x} \\neq 0$ — all eigenvalues negative\n- **Indefinite:** $Q$ takes both positive and negative values — mixed eigenvalue signs',
       '**The Principal Axes Theorem.** By the Spectral Theorem, $A = Q\\Lambda Q^\\top$. Change variables: $\\mathbf{x} = Q\\mathbf{y}$ (rotate to the eigenvector coordinate system). Then:\n\n$Q(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x} = (Q\\mathbf{y})^\\top A (Q\\mathbf{y}) = \\mathbf{y}^\\top Q^\\top A Q \\mathbf{y} = \\mathbf{y}^\\top \\Lambda \\mathbf{y} = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$\n\nIn the rotated coordinates, the cross terms vanish. The form is purely diagonal — just a sum of scaled squares.',
       '**Classifying conics.** The equation $Q(\\mathbf{x}) = 1$ defines a level set of the quadratic form. In the principal axis coordinates ($y_1, y_2$), it becomes $\\lambda_1 y_1^2 + \\lambda_2 y_2^2 = 1$. If both $\\lambda_i > 0$: ellipse (ratio of semi-axes = $1/\\sqrt{\\lambda_i}$). If $\\lambda_1 > 0 > \\lambda_2$: hyperbola. If any $\\lambda_i = 0$: degenerate.',
+      ] },
+      { type: 'image', src: quadraticFormConicsUrl,
+        alt: 'Left panel: an ellipse aligned with dashed principal axes, labeled lambda1 and lambda2 both positive, bounded, a bowl shape. Right panel: two hyperbola branches with dashed asymptotes, labeled mixed signs, unbounded, a saddle shape',
+        caption: 'The eigenvalue signs alone determine the shape — both positive bounds an ellipse, mixed signs opens a hyperbola.' },
+      { type: 'prose', paragraphs: [
       '**Completing the square reveals the eigenvectors.** You can diagonalize a $2 \\times 2$ quadratic form by hand without computing eigenvalues: just complete the square. For $Q(x,y) = ax^2 + 2bxy + cy^2$: group by $x$ and complete the square, then read off the structure. For example, $Q = 3x^2 + 4xy + 3y^2 = 3(x + \\frac{2}{3}y)^2 + \\frac{5}{3}y^2$. This shows $Q > 0$ for all nonzero $(x,y)$, confirming positive definiteness. The rotation that eliminates the cross term points in the eigenvector directions. The standard test to check positive definiteness without eigenvalues is **Sylvester\'s criterion**: $A$ is positive definite iff all leading principal minors (determinants of the upper-left $k \\times k$ submatrices) are positive.',
       '**Where this is heading.** Quadratic forms are the second-order lens on functions — any twice-differentiable function $f(\\mathbf{x})$ near a critical point $\\mathbf{x}^*$ behaves like $f(\\mathbf{x}^*) + \\frac{1}{2}(\\mathbf{x}-\\mathbf{x}^*)^T H(\\mathbf{x}-\\mathbf{x}^*)$ where $H$ is the Hessian matrix (symmetric). Positive definite Hessian means local minimum, negative definite means local maximum, indefinite means saddle. This is multivariable calculus from a linear algebra perspective. In the next lesson, the pseudoinverse extends all of this to matrices that are not invertible — which happens exactly when the quadratic form $\\mathbf{x}^T A^T A \\mathbf{x}$ has a zero eigenvalue, meaning multiple inputs map to the same output.',
       '**CNC applications of quadratic forms.** (1) **Cutting energy and tool wear:** the energy delivered to the workpiece per unit volume is $U = \\frac{1}{2}\\boldsymbol{\\epsilon}^\\top C \\boldsymbol{\\epsilon}$ where $\\boldsymbol{\\epsilon}$ is the strain vector and $C$ is the symmetric stiffness tensor — a quadratic form. Positive definiteness of $C$ guarantees $U > 0$ (energy stored, not extracted). (2) **Optimization of surface finish:** the surface roughness objective function $f(\\mathbf{p})$ near the optimal parameter vector $\\mathbf{p}^*$ behaves like $f \\approx f^* + (\\mathbf{p}-\\mathbf{p}^*)^\\top H (\\mathbf{p}-\\mathbf{p}^*)$ where $H$ is the Hessian (symmetric). Positive definiteness of $H$ confirms the parameter is a minimum of roughness, not a saddle. (3) **Tolerance ellipsoids:** the set of positions $\\mathbf{x}$ within tolerance of a nominal point satisfies $\\mathbf{x}^\\top \\Sigma^{-1} \\mathbf{x} \\leq \\chi^2_{\\alpha,n}$ — a quadratic form with matrix $\\Sigma^{-1}$. The tolerance ellipsoid semi-axes are $\\sqrt{\\lambda_i \\cdot \\chi^2_\\alpha}$ in the principal directions, showing which axes have tighter tolerances.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'Procedure: Analyze a Quadratic Form',
-        body: 'Step 1. **Write the symmetric matrix.** For $Q = ax_1^2 + bx_1x_2 + cx_2^2$: set $A_{11}=a$, $A_{22}=c$, $A_{12}=A_{21}=b/2$ (half the cross-term coefficient).\n\nStep 2. **Classify the form.** Find eigenvalues of $A$ (or use Sylvester: check all leading principal minors). All positive → PD. Mixed signs → indefinite. All non-negative with some zero → PSD.\n\nStep 3. **Apply the Principal Axes Theorem.** Change variables $\\mathbf{x} = Q\\mathbf{y}$ (orthogonal), where $Q$ has eigenvectors as columns. In the new coordinates: $Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$ — no cross terms.\n\nStep 4. **Identify the level set.** For $Q(\\mathbf{x}) = c$ with $c > 0$: if all $\\lambda_i > 0$, this is an ellipse/ellipsoid with semi-axes $a_i = \\sqrt{c/\\lambda_i}$ along the eigenvector directions. Mixed signs give a hyperbola/hyperboloid.\n\nStep 5. **Interpret definiteness geometrically.** Positive definite → bowl shape (local min possible). Indefinite → saddle shape.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 7 of 9 — Orthogonality & SVD',
-        body: '**Previous (Lesson 6):** Spectral Theorem — symmetric matrices are orthogonally diagonalizable with real eigenvalues.\n**This lesson:** Quadratic Forms — how symmetric matrices define a scalar-valued function $Q(\\mathbf{x}) = \\mathbf{x}^T A\\mathbf{x}$, and what the eigenvalue signs tell you about its geometry.\n**Next (Lesson 8):** Pseudoinverse — the generalization of matrix inverse to non-square and rank-deficient matrices.',
-      },
-      {
-        type: 'insight',
-        title: 'Sylvester\'s Criterion: Testing Positive Definiteness',
-        body: 'A symmetric matrix $A$ is positive definite iff all leading principal minors are positive:\n$\\det(A_{1\\times 1}) > 0$, $\\det(A_{2\\times 2}) > 0$, ..., $\\det(A) > 0$\nThis gives a determinant-based test that avoids computing eigenvalues.',
-      },
-      {
-        type: 'insight',
-        title: 'Connecting to Optimization',
-        body: 'At a critical point where $\\nabla f = 0$:\n• Hessian $H$ positive definite → local minimum\n• Hessian $H$ negative definite → local maximum\n• Hessian $H$ indefinite → saddle point\nQuadratic forms are exactly the second-order behavior of smooth functions near critical points.',
-      },
-      {
-        type: 'theorem',
-        title: 'Principal Axes Theorem',
-        body: 'Every quadratic form $Q(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ can be diagonalized by an orthogonal change of variables $\\mathbf{x} = Q\\mathbf{y}$:\n$Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\lambda_2 y_2^2 + \\cdots + \\lambda_n y_n^2$\nThe axes of the resulting ellipsoid/hyperboloid are the eigenvectors (principal axes) of $A$.',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction',
-        body: 'Before computing: the quadratic form $Q(x,y) = x^2 - 4xy + 4y^2$ has matrix $A = \\begin{bmatrix}1&-2\\\\-2&4\\end{bmatrix}$. Notice $\\det(A) = 4 - 4 = 0$. What does that tell you about one of the eigenvalues? What kind of conic (or degenerate shape) should $Q(x,y) = 1$ trace out? What happens to the level set $Q(x,y) = c$ for different $c$?',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Quadratic Forms and Level Sets',
         mathBridge: 'Compute eigenvalues to classify a quadratic form and find the principal axes.',
         caption: 'Eigenvalues determine the shape; eigenvectors determine the orientation.',
@@ -133,6 +107,38 @@ Q'*Q
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'Procedure: Analyze a Quadratic Form',
+        body: 'Step 1. **Write the symmetric matrix.** For $Q = ax_1^2 + bx_1x_2 + cx_2^2$: set $A_{11}=a$, $A_{22}=c$, $A_{12}=A_{21}=b/2$ (half the cross-term coefficient).\n\nStep 2. **Classify the form.** Find eigenvalues of $A$ (or use Sylvester: check all leading principal minors). All positive → PD. Mixed signs → indefinite. All non-negative with some zero → PSD.\n\nStep 3. **Apply the Principal Axes Theorem.** Change variables $\\mathbf{x} = Q\\mathbf{y}$ (orthogonal), where $Q$ has eigenvectors as columns. In the new coordinates: $Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\cdots + \\lambda_n y_n^2$ — no cross terms.\n\nStep 4. **Identify the level set.** For $Q(\\mathbf{x}) = c$ with $c > 0$: if all $\\lambda_i > 0$, this is an ellipse/ellipsoid with semi-axes $a_i = \\sqrt{c/\\lambda_i}$ along the eigenvector directions. Mixed signs give a hyperbola/hyperboloid.\n\nStep 5. **Interpret definiteness geometrically.** Positive definite → bowl shape (local min possible). Indefinite → saddle shape.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 7 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 6):** Spectral Theorem — symmetric matrices are orthogonally diagonalizable with real eigenvalues.\n**This lesson:** Quadratic Forms — how symmetric matrices define a scalar-valued function $Q(\\mathbf{x}) = \\mathbf{x}^T A\\mathbf{x}$, and what the eigenvalue signs tell you about its geometry.\n**Next (Lesson 8):** Pseudoinverse — the generalization of matrix inverse to non-square and rank-deficient matrices.',
+      },
+      {
+        type: 'insight',
+        title: 'Sylvester\'s Criterion: Testing Positive Definiteness',
+        body: 'A symmetric matrix $A$ is positive definite iff all leading principal minors are positive:\n$\\det(A_{1\\times 1}) > 0$, $\\det(A_{2\\times 2}) > 0$, ..., $\\det(A) > 0$\nThis gives a determinant-based test that avoids computing eigenvalues.',
+      },
+      {
+        type: 'insight',
+        title: 'Connecting to Optimization',
+        body: 'At a critical point where $\\nabla f = 0$:\n• Hessian $H$ positive definite → local minimum\n• Hessian $H$ negative definite → local maximum\n• Hessian $H$ indefinite → saddle point\nQuadratic forms are exactly the second-order behavior of smooth functions near critical points.',
+      },
+      {
+        type: 'theorem',
+        title: 'Principal Axes Theorem',
+        body: 'Every quadratic form $Q(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ can be diagonalized by an orthogonal change of variables $\\mathbf{x} = Q\\mathbf{y}$:\n$Q(\\mathbf{x}) = \\lambda_1 y_1^2 + \\lambda_2 y_2^2 + \\cdots + \\lambda_n y_n^2$\nThe axes of the resulting ellipsoid/hyperboloid are the eigenvectors (principal axes) of $A$.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction',
+        body: 'Before computing: the quadratic form $Q(x,y) = x^2 - 4xy + 4y^2$ has matrix $A = \\begin{bmatrix}1&-2\\\\-2&4\\end{bmatrix}$. Notice $\\det(A) = 4 - 4 = 0$. What does that tell you about one of the eigenvalues? What kind of conic (or degenerate shape) should $Q(x,y) = 1$ trace out? What happens to the level set $Q(x,y) = c$ for different $c$?',
       },
     ],
   },

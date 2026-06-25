@@ -1,0 +1,59 @@
+<svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+  </style>
+  <rect width="420" height="200" rx="10" class="svg-bg"/>
+
+  <text x="210" y="18" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">A 1 above the diagonal is the fingerprint of a missing eigenvector</text>
+
+  <!-- Panel 1: diagonalizable -->
+  <text x="105" y="38" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">Diagonalizable — 3 eigenvectors</text>
+  <rect x="40" y="46" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="74" y="46" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="108" y="46" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="40" y="80" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="74" y="80" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="108" y="80" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="40" y="114" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="74" y="114" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="108" y="114" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <text x="57" y="67" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">λ</text>
+  <text x="91" y="101" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">λ</text>
+  <text x="125" y="135" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">λ</text>
+  <text x="91" y="67" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="125" y="67" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="57" y="101" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="125" y="101" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="57" y="135" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="91" y="135" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="91" y="166" font-size="10" class="svg-muted" text-anchor="middle">D = diag(λ,λ,λ)</text>
+
+  <!-- Panel 2: defective / Jordan block -->
+  <text x="315" y="38" font-size="11" fill="#d97706" text-anchor="middle" font-weight="700">Defective — Jordan block</text>
+  <rect x="250" y="46" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="284" y="46" width="34" height="34" fill="rgba(217,119,6,0.18)" stroke="#d97706" stroke-width="1.3"/>
+  <rect x="318" y="46" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="250" y="80" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="284" y="80" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="318" y="80" width="34" height="34" fill="rgba(217,119,6,0.18)" stroke="#d97706" stroke-width="1.3"/>
+  <rect x="250" y="114" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="284" y="114" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <rect x="318" y="114" width="34" height="34" class="svg-cell" stroke-width="1"/>
+  <text x="267" y="67" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">λ</text>
+  <text x="301" y="101" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">λ</text>
+  <text x="335" y="135" font-size="13" fill="#10b981" font-weight="700" text-anchor="middle">λ</text>
+  <text x="301" y="67" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">1</text>
+  <text x="335" y="101" font-size="13" fill="#d97706" font-weight="700" text-anchor="middle">1</text>
+  <text x="335" y="67" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="267" y="101" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="267" y="135" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="301" y="135" font-size="12" class="svg-muted" text-anchor="middle">0</text>
+  <text x="301" y="166" font-size="10" class="svg-muted" text-anchor="middle">J₃(λ) — only 1 eigenvector</text>
+</svg>

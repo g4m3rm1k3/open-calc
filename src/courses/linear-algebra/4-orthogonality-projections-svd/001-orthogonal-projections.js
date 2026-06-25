@@ -1,3 +1,5 @@
+import orthogonalProjectionUrl from '../diagrams/la-orthogonal-projection.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la4-001',
@@ -18,15 +20,27 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $\\mathbf{b} = [3,4]^\\top$ and the $x$-axis spanned by $\\mathbf{a} = [1,0]^\\top$. The point on the $x$-axis closest to $\\mathbf{b}$: drop a perpendicular and land at $\\mathbf{p} = [3,0]^\\top$. Error: $\\mathbf{e} = \\mathbf{b} - \\mathbf{p} = [0,4]^\\top$. Check perpendicularity: $\\mathbf{a} \\cdot \\mathbf{e} = 1\\cdot 0 + 0\\cdot 4 = 0$ ✓. The formula: $c = \\mathbf{a}^\\top\\mathbf{b}/\\mathbf{a}^\\top\\mathbf{a} = 3/1 = 3$, so $\\mathbf{p} = 3\\mathbf{a} = [3,0]^\\top$. That perpendicularity condition $\\mathbf{a}\\cdot(\\mathbf{b}-c\\mathbf{a}) = 0$ is what determines $c$ — and why orthogonal projection is the closest point.',
       'Here is the core picture. Imagine a line drawn through the origin in 2D (or a plane in 3D). You have a target vector $\\mathbf{b}$ that does not lie on that line. The question is: what point ON the line is closest to $\\mathbf{b}$? The answer is the point you reach by dropping a perpendicular from $\\mathbf{b}$ straight down to the line. That foot of the perpendicular is the **orthogonal projection** of $\\mathbf{b}$.',
       'The word "orthogonal" means perpendicular. The projection is orthogonal because the error vector — the gap between $\\mathbf{b}$ and its projection — is perpendicular to the line (or subspace). This is not just aesthetically pleasing; it is the mathematical definition of "closest." Any other point on the line is farther from $\\mathbf{b}$ than the orthogonal projection, because the orthogonal path is the shortest path.',
+      ] },
+      { type: 'image', src: orthogonalProjectionUrl,
+        alt: 'Vector b drawn from the origin, a line spanned by a along the horizontal, the projection p of b onto the line, and the dashed perpendicular error vector e connecting the tip of b down to p, with a right-angle mark',
+        caption: 'e is perpendicular to the line — that is exactly what makes p the closest point.' },
+      { type: 'prose', paragraphs: [
       '**From a line to a subspace.** When the target line is spanned by a single unit vector $\\hat{u}$, the projection is $(\\mathbf{b} \\cdot \\hat{u})\\hat{u}$ — the dot product picks off how much of $\\mathbf{b}$ points in the $\\hat{u}$ direction, and then we scale $\\hat{u}$ by that amount. For a non-unit vector $\\mathbf{a}$, we need to divide by the length: $\\text{proj} = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\mathbf{a}\\cdot\\mathbf{a}}\\mathbf{a}$.',
       'When the subspace is larger — a plane in 3D, or the column space of a matrix $A$ — we need the full **projection matrix** $P = A(A^TA)^{-1}A^T$. Multiplying any vector $\\mathbf{b}$ by $P$ gives its orthogonal projection onto the column space of $A$.',
       '**The orthogonal decomposition.** Every vector can be split uniquely into two perpendicular pieces: the part inside the subspace (the projection) and the part outside (the error/residual). These two pieces are always perpendicular to each other. $\\mathbf{b} = \\underbrace{P\\mathbf{b}}_{\\text{in subspace}} + \\underbrace{(\\mathbf{b} - P\\mathbf{b})}_{\\perp \\text{ subspace}}$.',
       '**CNC application: closest point on a tool path.** In 5-axis CNC, the controller continuously checks whether the tool tip is on the programmed path. Given the current tool position $\\mathbf{b}$ and a programmed path segment spanned by direction $\\mathbf{a}$ (from the last waypoint), the closest point on the path to the tool tip is exactly the orthogonal projection $\\text{proj}_{\\mathbf{a}}\\mathbf{b}$. The error $\\mathbf{e} = \\mathbf{b} - \\text{proj}$ is the perpendicular deviation from the path — the **cross-track error** that the servo controller must correct. Minimizing cross-track error is projection in action at thousands of times per second.',
       '**Where this is heading:** The projection formula $P = A(A^TA)^{-1}A^T$ is exactly what Gram-Schmidt uses to subtract contamination in each step. It is also exactly what Least Squares uses to find the best approximate solution to $A\\mathbf{x}=\\mathbf{b}$. And SVD generalizes it to reveal the projection structure of any matrix. This lesson is the foundation for everything in Phase 4.',
+      ] },
+      { type: 'viz', id: 'LALesson11_OrthogonalProjections',
+        title: 'Orthogonal Projection onto a Line',
+        mathBridge: 'Drag the red vector $\\mathbf{b}$ to different positions. The blue vector is the projection $\\mathbf{p}$ — the closest point on the line to $\\mathbf{b}$. The green vector is the error $\\mathbf{e} = \\mathbf{b} - \\mathbf{p}$. Confirm: the green error vector is always exactly perpendicular (90°) to the line, no matter where you drag $\\mathbf{b}$. That right angle is not a coincidence — it is the definition of orthogonal projection.',
+        caption: 'The shadow on the line, with a perpendicular error vector.',
+      },
     ],
     callouts: [
       {
@@ -58,14 +72,6 @@ export default {
         type: 'insight',
         title: 'Predict: Projection onto a Line',
         body: 'For $\\mathbf{b} = [2,5]^\\top$ and the line spanned by $\\mathbf{a} = [3,4]^\\top$: before computing, estimate the projection. Is it closer to $[0,0]^\\top$ or to $\\mathbf{b}$? Predict $c = \\mathbf{a}\\cdot\\mathbf{b}/\\mathbf{a}\\cdot\\mathbf{a}$ — is $c < 1$ or $c > 1$? Then verify: does the error vector $\\mathbf{e} = \\mathbf{b} - c\\mathbf{a}$ dot with $\\mathbf{a}$ to give 0?',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson11_OrthogonalProjections',
-        title: 'Orthogonal Projection onto a Line',
-        mathBridge: 'Drag the red vector $\\mathbf{b}$ to different positions. The blue vector is the projection $\\mathbf{p}$ — the closest point on the line to $\\mathbf{b}$. The green vector is the error $\\mathbf{e} = \\mathbf{b} - \\mathbf{p}$. Confirm: the green error vector is always exactly perpendicular (90°) to the line, no matter where you drag $\\mathbf{b}$. That right angle is not a coincidence — it is the definition of orthogonal projection.',
-        caption: 'The shadow on the line, with a perpendicular error vector.',
       },
     ],
   },

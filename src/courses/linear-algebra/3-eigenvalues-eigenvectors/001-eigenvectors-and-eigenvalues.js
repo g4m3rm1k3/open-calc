@@ -1,4 +1,7 @@
-﻿export default {
+﻿import eigenvectorInvariantLineUrl from '../diagrams/la-eigenvector-invariant-line.svg?url'
+import scalarMultiplicationUrl from '../diagrams/la-scalar-multiplication.svg?url'
+
+export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la3-001',
   slug: 'eigenvectors-and-eigenvalues',
@@ -18,16 +21,33 @@
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $A = \\begin{bmatrix}4&2\\\\1&3\\end{bmatrix}$ and apply it to $\\mathbf{v} = [2,1]^\\top$: $A\\mathbf{v} = [8+2, 2+3]^\\top = [10, 5]^\\top = 5[2,1]^\\top$. The output is exactly 5 times the input — $\\mathbf{v}$ was not rotated at all, only stretched. That is an eigenvector ($\\mathbf{v} = [2,1]^\\top$) with eigenvalue ($\\lambda = 5$). Now try $\\mathbf{u} = [1,-1]^\\top$: $A\\mathbf{u} = [4-2, 1-3]^\\top = [2,-2]^\\top = 2[1,-1]^\\top$. Another eigenvector with $\\lambda = 2$. Any other vector you try will come out pointing in a new direction — these two are the only invariant directions for $A$.',
       '**Where you are in the story:** You have spent all of Phase 2 learning what matrices DO — they stretch, squish, shear, and rotate space. You can multiply them, invert them, find what they destroy (null space) and what they can reach (column space). Now we ask the deepest question yet: does a matrix have any preferred directions? Any directions it never rotates, only scales?',
       'Here is the core idea. When a matrix $A$ acts on a vector $\\mathbf{v}$, it generally knocks that vector off its original line — both the direction and magnitude change. But there exist special vectors where the matrix only changes the magnitude, not the direction. The output $A\\mathbf{v}$ points in exactly the same direction as $\\mathbf{v}$, just scaled by some factor. Those are the **eigenvectors**. The scaling factor is the **eigenvalue**.',
+      ] },
+      { type: 'image', src: eigenvectorInvariantLineUrl,
+        alt: 'Vector v and its image Av both lying on the same dashed line through the origin, just longer, labeled an eigenvector. Vector w and its image Aw point in different directions, labeled knocked off its line, not an eigenvector',
+        caption: 'v is an eigenvector — it stays on its own line, only stretched. w is not — it gets rotated onto a new line.' },
+      { type: 'prose', paragraphs: [
       'Think about stretching a rubber sheet along two perpendicular axes — say, horizontally and vertically. Draw any diagonal line on the sheet. After the stretch, that diagonal gets rotated to a new angle. But the two lines you pulled along (horizontal and vertical) do not rotate at all — they only get longer or shorter. Those are the eigenvectors of the stretch.',
       'For a 3D rotation around an axis (like the Earth rotating around its polar axis), the rotation axis itself is an eigenvector — it does not move at all under the rotation. Its eigenvalue is $\\lambda = 1$, meaning it is scaled by a factor of 1 (not stretched or squished, just left alone).',
       'The equation that captures this is beautifully compact:\n\n$A\\mathbf{v} = \\lambda\\mathbf{v}$\n\nMatrix multiplication on the left equals scalar multiplication on the right. The vector $\\mathbf{v}$ is treated identically whether $A$ acts on it as a full transformation or $\\lambda$ scales it as a plain number. That equivalence is what makes eigenvectors special.',
+      ] },
+      { type: 'image', src: scalarMultiplicationUrl,
+        alt: 'One vector v shown alongside 2v stretched, 0.5v shrunk, and -v reversed, all drawn from the same origin',
+        caption: 'The eigenvalue λ is just this scalar — positive stretches, a fraction shrinks, negative flips, and zero collapses the eigenvector to the origin.' },
+      { type: 'prose', paragraphs: [
       '**CNC machine resonance — eigenvalues determine danger zones.** A CNC machine frame is a physical structure with mass and stiffness. The equation of motion for the frame is $M\\ddot{\\mathbf{x}} + K\\mathbf{x} = \\mathbf{0}$, where $M$ is the mass matrix and $K$ is the stiffness matrix. The natural vibration frequencies of the machine are $\\omega_i = \\sqrt{\\lambda_i}$, where $\\lambda_i$ are eigenvalues of $M^{-1}K$. The eigenvectors are the **mode shapes** — which parts of the machine shake in which direction for each frequency.\n\nWhy this matters: if the spindle rotation frequency matches a natural frequency (an eigenvalue), the machine enters resonance and you get **chatter** — violent vibration that destroys surface finish and can break tools. A machine shop engineer consults a Frequency Response Function (FRF) — essentially a plot of eigenvalues — to choose spindle speeds that stay away from the danger zones.',
       '**Predict before reading on.** You have $A = \\begin{bmatrix}3&0\\\\0&-2\\end{bmatrix}$ (diagonal). Without computing anything, predict: what are the eigenvalues? What are the eigenvectors? If you apply $A$ many times to $\\mathbf{u} = [1,1]^\\top$, which direction does the output eventually dominate? Write your answers before continuing.',
       '**Where this is heading:** Eigenvectors are the natural axes of a transformation — the directions where everything is simplest. In the very next lesson, you will rebuild your entire coordinate system so the $x$- and $y$-axes align with the eigenvectors. When you do, the complicated matrix $A$ becomes a beautiful diagonal matrix where the only non-zero entries are the eigenvalues themselves.',
+      ] },
+      { type: 'viz', id: 'LALesson08_Eigen',
+        title: 'Finding Eigenvectors Geometrically',
+        mathBridge: 'The visualization shows a 2D transformation (default: a shear or stretch). Rotate the input vector $\\mathbf{v}$ by dragging its tip. Watch the output $A\\mathbf{v}$ (shown in red). Most of the time, $A\\mathbf{v}$ points in a completely different direction than $\\mathbf{v}$. But at certain angles, $A\\mathbf{v}$ lines up exactly with $\\mathbf{v}$ — only longer or shorter. Lock in those angles. You have found the eigenvectors. Note the scaling factor: that is $\\lambda$.',
+        caption: 'Eigenvectors are the directions where input and output align.',
+      },
     ],
     callouts: [
       {
@@ -54,14 +74,6 @@
         type: 'warning',
         title: 'The Zero Vector is Never an Eigenvector',
         body: 'The equation $A\\mathbf{0} = \\lambda\\mathbf{0}$ holds for ANY $\\lambda$ — so the zero vector carries no information about the transformation. By definition, eigenvectors must be non-zero.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson08_Eigen',
-        title: 'Finding Eigenvectors Geometrically',
-        mathBridge: 'The visualization shows a 2D transformation (default: a shear or stretch). Rotate the input vector $\\mathbf{v}$ by dragging its tip. Watch the output $A\\mathbf{v}$ (shown in red). Most of the time, $A\\mathbf{v}$ points in a completely different direction than $\\mathbf{v}$. But at certain angles, $A\\mathbf{v}$ lines up exactly with $\\mathbf{v}$ — only longer or shorter. Lock in those angles. You have found the eigenvectors. Note the scaling factor: that is $\\lambda$.',
-        caption: 'Eigenvectors are the directions where input and output align.',
       },
     ],
   },

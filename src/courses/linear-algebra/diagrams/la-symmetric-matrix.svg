@@ -1,0 +1,45 @@
+<svg viewBox="0 0 280 190" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+  </style>
+  <rect width="280" height="190" rx="10" class="svg-bg"/>
+
+  <text x="140" y="16" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">A = Aᵗ — every off-diagonal pair mirrors across the diagonal</text>
+
+  <!-- diagonal of symmetry -->
+  <line x1="28" y1="28" x2="136" y2="136" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="4,3"/>
+
+  <!-- grid cells 36x36 from (28,28) -->
+  <rect x="28" y="28" width="36" height="36" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+  <rect x="64" y="28" width="36" height="36" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.3"/>
+  <rect x="100" y="28" width="36" height="36" fill="rgba(217,119,6,0.18)" stroke="#d97706" stroke-width="1.3"/>
+
+  <rect x="28" y="64" width="36" height="36" fill="rgba(37,99,235,0.18)" stroke="#2563eb" stroke-width="1.3"/>
+  <rect x="64" y="64" width="36" height="36" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+  <rect x="100" y="64" width="36" height="36" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+
+  <rect x="28" y="100" width="36" height="36" fill="rgba(217,119,6,0.18)" stroke="#d97706" stroke-width="1.3"/>
+  <rect x="64" y="100" width="36" height="36" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.3"/>
+  <rect x="100" y="100" width="36" height="36" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+
+  <text x="46" y="51" font-size="14" class="svg-text" text-anchor="middle">1</text>
+  <text x="82" y="51" font-size="14" fill="#2563eb" font-weight="700" text-anchor="middle">2</text>
+  <text x="118" y="51" font-size="14" fill="#d97706" font-weight="700" text-anchor="middle">3</text>
+  <text x="46" y="87" font-size="14" fill="#2563eb" font-weight="700" text-anchor="middle">2</text>
+  <text x="82" y="87" font-size="14" class="svg-text" text-anchor="middle">5</text>
+  <text x="118" y="87" font-size="14" fill="#10b981" font-weight="700" text-anchor="middle">6</text>
+  <text x="46" y="123" font-size="14" fill="#d97706" font-weight="700" text-anchor="middle">3</text>
+  <text x="82" y="123" font-size="14" fill="#10b981" font-weight="700" text-anchor="middle">6</text>
+  <text x="118" y="123" font-size="14" class="svg-text" text-anchor="middle">9</text>
+
+  <text x="200" y="50" font-size="10.5" fill="#2563eb">a₁₂ = a₂₁</text>
+  <text x="200" y="86" font-size="10.5" fill="#d97706">a₁₃ = a₃₁</text>
+  <text x="200" y="122" font-size="10.5" fill="#10b981">a₂₃ = a₃₂</text>
+
+  <text x="140" y="172" font-size="10.5" class="svg-muted" text-anchor="middle">Matched colors = matched values, reflected across the diagonal</text>
+</svg>

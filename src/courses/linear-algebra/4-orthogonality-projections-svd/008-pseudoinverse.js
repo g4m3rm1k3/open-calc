@@ -1,3 +1,5 @@
+import pseudoinverseMinnormUrl from '../diagrams/la-pseudoinverse-minnorm.svg?url'
+
 export default {
   id: 'la4-008',
   slug: 'pseudoinverse',
@@ -14,40 +16,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'When a matrix is not invertible — because it is rectangular, or because it is square but rank-deficient — the equation $A\\mathbf{x} = \\mathbf{b}$ may have no solution, infinitely many solutions, or both problems at once. The **pseudoinverse** $A^+$ resolves all three cases with one formula. For any $\\mathbf{b}$, $\\hat{\\mathbf{x}} = A^+\\mathbf{b}$ gives the unique vector that minimizes $\\|A\\mathbf{x} - \\mathbf{b}\\|$ (least squares fit) and, among all such minimizers, has the smallest norm $\\|\\mathbf{x}\\|$. This is the best possible answer to any linear system.',
       '**A concrete example.** Take $A = \\begin{pmatrix}3&0\\\\0&2\\\\0&0\\end{pmatrix}$ (3×2, rank 2). The SVD is $A = U\\Sigma V^T$ with $\\Sigma = \\begin{pmatrix}3&0\\\\0&2\\\\0&0\\end{pmatrix}$ and $U,V$ as identity matrices in this case. To build $A^+$: flip $\\Sigma$ to get a 2×3 matrix, and replace each nonzero entry by its reciprocal: $\\Sigma^+ = \\begin{pmatrix}1/3&0&0\\\\0&1/2&0\\end{pmatrix}$. Then $A^+ = V\\Sigma^+U^T = \\begin{pmatrix}1/3&0&0\\\\0&1/2&0\\end{pmatrix}$. Check: $A^+A = I_2$ (left inverse — A has full column rank). But $AA^+ = \\begin{pmatrix}1&0&0\\\\0&1&0\\\\0&0&0\\end{pmatrix}$ — not the identity, but the projection onto the column space of $A$.',
       '**The three cases the pseudoinverse handles.** (1) **Overdetermined ($m > n$, full column rank):** no exact solution, $A^+\\mathbf{b}$ is the unique least-squares minimizer. This is $\\hat{\\mathbf{x}} = (A^TA)^{-1}A^T\\mathbf{b}$ from the normal equations. (2) **Underdetermined ($m < n$, full row rank):** infinitely many exact solutions, $A^+\\mathbf{b}$ picks the minimum-norm one. This is $\\hat{\\mathbf{x}} = A^T(AA^T)^{-1}\\mathbf{b}$. (3) **Square invertible:** exactly one exact solution, and $A^+ = A^{-1}$ exactly — the pseudoinverse reduces to the regular inverse. In all three cases, the same SVD formula $A^+ = V\\Sigma^+U^T$ works.',
       '**Why minimum norm?** In the underdetermined case ($m < n$), there are infinitely many vectors $\\mathbf{x}$ with $A\\mathbf{x} = \\mathbf{b}$ exactly. They form the set $\\hat{\\mathbf{x}} + N(A)$ — the particular solution plus any null space vector. Among these, $A^+\\mathbf{b}$ is the unique solution in the **row space** $C(A^T)$ — perpendicular to the null space. This is the minimum-norm solution. Geometrically, you are projecting the origin onto the solution set and taking the closest point.',
+      ] },
+      { type: 'image', src: pseudoinverseMinnormUrl,
+        alt: 'A line representing all exact solutions, with two gray points marked as larger-norm solutions, one green point marked x-plus equals A-plus b as the minimum norm solution, and a dashed perpendicular segment from the origin to that green point',
+        caption: 'Among infinitely many exact solutions, x⁺ = A⁺b is the one closest to the origin — the minimum-norm answer.' },
+      { type: 'prose', paragraphs: [
       '**The four Moore-Penrose conditions.** $A^+$ is the unique matrix satisfying: (1) $AA^+A = A$, (2) $A^+AA^+ = A^+$, (3) $(AA^+)^T = AA^+$, (4) $(A^+A)^T = A^+A$. Conditions (3) and (4) are the orthogonality conditions: they require $AA^+$ and $A^+A$ to be symmetric, which forces them to be orthogonal projections. Any matrix that satisfies all four is the pseudoinverse — uniquely.',
       '**CNC robot kinematics — the Jacobian pseudoinverse.** A robotic CNC machine with $n$ joints and $m$ degrees of freedom at the end effector has a Jacobian $J(\\mathbf{q})$ relating joint velocities to end-effector velocities: $\\dot{\\mathbf{p}} = J\\dot{\\mathbf{q}}$. To move the end effector at velocity $\\dot{\\mathbf{p}}$, compute $\\dot{\\mathbf{q}} = J^+\\dot{\\mathbf{p}}$. If $n > m$ (more joints than DOF — kinematically redundant), there are infinitely many joint velocity solutions. The pseudoinverse gives the minimum-norm joint velocities — the smoothest motion. If the robot passes through a **singularity** (where $J$ drops rank), some singular values of $J$ go to zero, and $J^+$ would amplify small errors catastrophically. In practice, a regularized pseudoinverse $(J^TJ + \\lambda I)^{-1}J^T$ is used near singularities.',
       '**Where this is heading.** The pseudoinverse is the last major tool in this chapter — it unifies least squares, projection, and the four fundamental subspaces into one formula. The final lesson applies these ideas to data: low-rank approximation and dimensionality reduction using the SVD, where the pseudoinverse determines how to reconstruct compressed data.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'Procedure: Compute the Pseudoinverse and Solve $A\\mathbf{x}=\\mathbf{b}$',
-        body: 'Step 1. **Compute the SVD.** Find $A = U\\Sigma V^\\top$ with singular values $\\sigma_1 \\geq \\cdots \\geq \\sigma_r > 0$.\n\nStep 2. **Build $\\Sigma^+$.** Transpose $\\Sigma$ (so $\\Sigma^+$ is $n \\times m$), then replace each nonzero $\\sigma_i$ with $1/\\sigma_i$ and leave zeros as zeros.\n\nStep 3. **Compute $A^+ = V\\Sigma^+ U^\\top$.**\n\nStep 4. **Solve: $\\hat{\\mathbf{x}} = A^+\\mathbf{b}$.** This is simultaneously: the least-squares minimizer of $\\|A\\mathbf{x}-\\mathbf{b}\\|$, and the minimum-norm solution among all such minimizers.\n\nStep 5. **Verify using Moore-Penrose conditions.** Check $AA^+A = A$, $A^+AA^+ = A^+$, $(AA^+)^\\top = AA^+$, $(A^+A)^\\top = A^+A$. Any of these failing means $A^+$ was computed incorrectly.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 8 of 9 — Orthogonality & SVD',
-        body: '**Previous (Lesson 7):** Quadratic Forms — how symmetric matrices define curvature and classify critical points.\n**This lesson:** Pseudoinverse — the Moore-Penrose generalization of the matrix inverse to any matrix, giving the minimum-norm least-squares solution.\n**Next (Lesson 9):** Low-Rank Approximation — using SVD to compress matrices and find the most important structure in data.',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction: pseudoinverse of a rank-1 matrix',
-        body: 'Let $A = \\begin{pmatrix}2\\\\1\\end{pmatrix}$ (2×1 column vector). **Before computing:** what should $A^+$ be? It must map $\\mathbb{R}^2 \\to \\mathbb{R}^1$ (a row vector). For $\\mathbf{b} = (2,1)^\\top$ (in $C(A)$), the exact solution is $x=1$. For $\\mathbf{b} = (1,0)^\\top$, the least-squares solution minimizes $(2x-1)^2+x^2$. After predicting: $A^+ = \\frac{A^\\top}{\\|A\\|^2} = \\frac{1}{5}(2,1)$. Check: $A^+A = (4+1)/5 = 1$ ✓. $A^+(2,1)^\\top = (4+1)/5 = 1$ (exact solution ✓).',
-      },
-      {
-        type: 'theorem',
-        title: 'Pseudoinverse via SVD',
-        body: 'For $A = U\\Sigma V^\\top$ with singular values $\\sigma_1 \\geq \\cdots \\geq \\sigma_r > 0 = \\sigma_{r+1} = \\cdots$:\n\n$A^+ = V\\Sigma^+ U^\\top$\n\nwhere $\\Sigma^+$ replaces each nonzero singular value $\\sigma_i$ by $1/\\sigma_i$ (and leaves zeros as zeros).\n\nProperties:\n- $A^+\\mathbf{b}$ = minimum-norm least-squares solution\n- $AA^+$ = orthogonal projector onto $C(A)$\n- $A^+A$ = orthogonal projector onto $C(A^\\top)$\n- $(A^+)^+ = A$',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Pseudoinverse Computations',
         mathBridge: 'Compute pseudoinverses and solve overdetermined/underdetermined systems.',
         caption: 'A+ gives the unique minimum-norm least-squares solution.',
@@ -130,6 +114,28 @@ null_A'' * x_min
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'Procedure: Compute the Pseudoinverse and Solve $A\\mathbf{x}=\\mathbf{b}$',
+        body: 'Step 1. **Compute the SVD.** Find $A = U\\Sigma V^\\top$ with singular values $\\sigma_1 \\geq \\cdots \\geq \\sigma_r > 0$.\n\nStep 2. **Build $\\Sigma^+$.** Transpose $\\Sigma$ (so $\\Sigma^+$ is $n \\times m$), then replace each nonzero $\\sigma_i$ with $1/\\sigma_i$ and leave zeros as zeros.\n\nStep 3. **Compute $A^+ = V\\Sigma^+ U^\\top$.**\n\nStep 4. **Solve: $\\hat{\\mathbf{x}} = A^+\\mathbf{b}$.** This is simultaneously: the least-squares minimizer of $\\|A\\mathbf{x}-\\mathbf{b}\\|$, and the minimum-norm solution among all such minimizers.\n\nStep 5. **Verify using Moore-Penrose conditions.** Check $AA^+A = A$, $A^+AA^+ = A^+$, $(AA^+)^\\top = AA^+$, $(A^+A)^\\top = A^+A$. Any of these failing means $A^+$ was computed incorrectly.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 8 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 7):** Quadratic Forms — how symmetric matrices define curvature and classify critical points.\n**This lesson:** Pseudoinverse — the Moore-Penrose generalization of the matrix inverse to any matrix, giving the minimum-norm least-squares solution.\n**Next (Lesson 9):** Low-Rank Approximation — using SVD to compress matrices and find the most important structure in data.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction: pseudoinverse of a rank-1 matrix',
+        body: 'Let $A = \\begin{pmatrix}2\\\\1\\end{pmatrix}$ (2×1 column vector). **Before computing:** what should $A^+$ be? It must map $\\mathbb{R}^2 \\to \\mathbb{R}^1$ (a row vector). For $\\mathbf{b} = (2,1)^\\top$ (in $C(A)$), the exact solution is $x=1$. For $\\mathbf{b} = (1,0)^\\top$, the least-squares solution minimizes $(2x-1)^2+x^2$. After predicting: $A^+ = \\frac{A^\\top}{\\|A\\|^2} = \\frac{1}{5}(2,1)$. Check: $A^+A = (4+1)/5 = 1$ ✓. $A^+(2,1)^\\top = (4+1)/5 = 1$ (exact solution ✓).',
+      },
+      {
+        type: 'theorem',
+        title: 'Pseudoinverse via SVD',
+        body: 'For $A = U\\Sigma V^\\top$ with singular values $\\sigma_1 \\geq \\cdots \\geq \\sigma_r > 0 = \\sigma_{r+1} = \\cdots$:\n\n$A^+ = V\\Sigma^+ U^\\top$\n\nwhere $\\Sigma^+$ replaces each nonzero singular value $\\sigma_i$ by $1/\\sigma_i$ (and leaves zeros as zeros).\n\nProperties:\n- $A^+\\mathbf{b}$ = minimum-norm least-squares solution\n- $AA^+$ = orthogonal projector onto $C(A)$\n- $A^+A$ = orthogonal projector onto $C(A^\\top)$\n- $(A^+)^+ = A$',
       },
     ],
   },

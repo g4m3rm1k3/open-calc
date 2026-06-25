@@ -1,0 +1,46 @@
+<svg viewBox="0 0 280 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="280" height="230" rx="10" class="svg-bg"/>
+
+  <text x="140" y="16" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">Sarrus's rule: repeat the first two columns</text>
+
+  <!-- forward diagonals (sum), green -->
+  <line x1="42" y1="50" x2="138" y2="138" stroke="#10b981" stroke-width="2"/>
+  <line x1="90" y1="50" x2="186" y2="138" stroke="#10b981" stroke-width="2"/>
+  <line x1="138" y1="50" x2="234" y2="138" stroke="#10b981" stroke-width="2"/>
+
+  <!-- backward diagonals (subtract), red -->
+  <line x1="138" y1="50" x2="42" y2="138" stroke="#dc2626" stroke-width="2"/>
+  <line x1="186" y1="50" x2="90" y2="138" stroke="#dc2626" stroke-width="2"/>
+  <line x1="234" y1="50" x2="138" y2="138" stroke="#dc2626" stroke-width="2"/>
+
+  <!-- the 3x5 numbers, columns 4-5 are repeats (muted) -->
+  <text x="42" y="55" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">1</text>
+  <text x="90" y="55" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">2</text>
+  <text x="138" y="55" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">3</text>
+  <text x="186" y="55" font-size="14" class="svg-muted" text-anchor="middle">1</text>
+  <text x="234" y="55" font-size="14" class="svg-muted" text-anchor="middle">2</text>
+
+  <text x="42" y="99" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">4</text>
+  <text x="90" y="99" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">5</text>
+  <text x="138" y="99" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">6</text>
+  <text x="186" y="99" font-size="14" class="svg-muted" text-anchor="middle">4</text>
+  <text x="234" y="99" font-size="14" class="svg-muted" text-anchor="middle">5</text>
+
+  <text x="42" y="143" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">7</text>
+  <text x="90" y="143" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">8</text>
+  <text x="138" y="143" font-size="14" class="svg-text" text-anchor="middle" font-weight="700">9</text>
+  <text x="186" y="143" font-size="14" class="svg-muted" text-anchor="middle">7</text>
+  <text x="234" y="143" font-size="14" class="svg-muted" text-anchor="middle">8</text>
+
+  <text x="140" y="178" font-size="11" fill="#10b981" text-anchor="middle">+ : sum the three ↘ diagonals</text>
+  <text x="140" y="196" font-size="11" fill="#dc2626" text-anchor="middle">− : subtract the three ↙ diagonals</text>
+  <text x="140" y="218" font-size="10" class="svg-muted" text-anchor="middle">Only works for 3×3 — does not generalize to 4×4</text>
+</svg>

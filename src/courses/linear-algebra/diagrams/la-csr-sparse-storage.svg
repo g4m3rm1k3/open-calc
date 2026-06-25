@@ -1,0 +1,52 @@
+<svg viewBox="0 0 380 210" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+  </style>
+  <rect width="380" height="210" rx="10" class="svg-bg"/>
+
+  <text x="190" y="16" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">CSR storage: keep only the non-zeros and where they live</text>
+
+  <!-- A grid 3x3 -->
+  <g>
+    <rect x="30" y="32" width="30" height="30" fill="rgba(37,99,235,0.16)" stroke="#2563eb" stroke-width="1.4"/>
+    <rect x="60" y="32" width="30" height="30" class="svg-cell" stroke-width="1"/>
+    <rect x="90" y="32" width="30" height="30" fill="rgba(37,99,235,0.16)" stroke="#2563eb" stroke-width="1.4"/>
+    <rect x="30" y="62" width="30" height="30" class="svg-cell" stroke-width="1"/>
+    <rect x="60" y="62" width="30" height="30" fill="rgba(37,99,235,0.16)" stroke="#2563eb" stroke-width="1.4"/>
+    <rect x="90" y="62" width="30" height="30" class="svg-cell" stroke-width="1"/>
+    <rect x="30" y="92" width="30" height="30" fill="rgba(37,99,235,0.16)" stroke="#2563eb" stroke-width="1.4"/>
+    <rect x="60" y="92" width="30" height="30" class="svg-cell" stroke-width="1"/>
+    <rect x="90" y="92" width="30" height="30" fill="rgba(37,99,235,0.16)" stroke="#2563eb" stroke-width="1.4"/>
+    <text x="45" y="53" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">1</text>
+    <text x="105" y="53" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">2</text>
+    <text x="75" y="83" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">3</text>
+    <text x="45" y="113" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">4</text>
+    <text x="105" y="113" font-size="13" fill="#2563eb" font-weight="700" text-anchor="middle">5</text>
+    <text x="75" y="138" font-size="10.5" class="svg-muted" text-anchor="middle">A (mostly zero, faded)</text>
+  </g>
+
+  <line x1="150" y1="75" x2="180" y2="75" class="svg-muted" stroke="#94a3b8" stroke-width="1.4" marker-end="url(#csr-arrow)"/>
+  <defs><marker id="csr-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#94a3b8"/></marker></defs>
+
+  <!-- arrays -->
+  <g font-family="monospace" font-size="11">
+    <text x="195" y="44" fill="#2563eb" font-weight="700">values</text>
+    <text x="255" y="44" class="svg-text">[1, 2, 3, 4, 5]</text>
+
+    <text x="195" y="68" fill="#d97706" font-weight="700">col_idx</text>
+    <text x="255" y="68" class="svg-text">[0, 2, 1, 0, 2]</text>
+
+    <text x="195" y="92" fill="#10b981" font-weight="700">row_ptr</text>
+    <text x="255" y="92" class="svg-text">[0, 2, 3, 5]</text>
+  </g>
+
+  <text x="190" y="160" font-size="10" class="svg-muted" text-anchor="middle">row_ptr[i] : row_ptr[i+1] slices out row i's values and column indices</text>
+  <text x="190" y="178" font-size="10" class="svg-muted" text-anchor="middle">memory: O(nnz) instead of O(n²) — the zeros are never stored or touched</text>
+</svg>

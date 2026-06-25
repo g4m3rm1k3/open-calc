@@ -1,3 +1,6 @@
+import matrixColumnsSecretUrl from '../diagrams/la-matrix-columns-secret.svg?url'
+import linearVsAffineUrl from '../diagrams/la-linear-vs-affine.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-001',
@@ -24,15 +27,43 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $[3, 1]^T$ and apply $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$. Output: $[-1, 3]^T$. Apply $A$ to $[5, 2]^T$: output is $[-2, 5]^T$. Apply $A$ to $[0, -4]^T$: output is $[4, 0]^T$. Every vector rotates 90° counter-clockwise. The matrix $A$ is not storing data — it is a **function** that warps the entire plane simultaneously. This lesson is about that shift: from matrix as spreadsheet to matrix as **verb** that transforms space.',
       'You may have seen matrices before as grids of data — like a spreadsheet. That is the database view. The **geometric view** is far more powerful: a matrix is a *function* that transforms every point in space simultaneously.',
       'Picture a rubber sheet covered in a grid. A matrix transformation grabs that sheet and stretches it, rotates it, or shears it into a new shape. Every point on the sheet moves with it. The key constraint of a **linear** transformation: the rubber sheet cannot crinkle, tear, or move the origin. Grid lines stay parallel and evenly spaced — just scaled, rotated, or skewed.',
+      ] },
+      { type: 'image', src: linearVsAffineUrl,
+        alt: 'Left panel: a square sheared into a parallelogram while its corner stays anchored at the origin, labeled linear, origin fixed. Right panel: the same shape additionally slid away from the origin, with the origin marked as having moved, labeled affine, not linear',
+        caption: 'A linear map can stretch, rotate, or shear the rubber sheet — but the origin never moves. Translation breaks that rule.' },
+      { type: 'prose', paragraphs: [
       '**The basis vector shortcut.** Because the grid stays uniform, you do not need to track where every point goes. Track only two points: where $\\hat{i} = [1,0]$ and $\\hat{j} = [0,1]$ land. Once you know those, every other point is forced — because every vector is a linear combination of $\\hat{i}$ and $\\hat{j}$, and the combination rules do not change under a linear transformation.',
       '**The matrix is the cheat sheet.** A $2 \\times 2$ matrix stores exactly two pieces of information: the new coordinates of $\\hat{i}$ (first column) and the new coordinates of $\\hat{j}$ (second column). That is the whole secret.',
+      ] },
+      { type: 'image', src: matrixColumnsSecretUrl,
+        alt: 'Before panel showing the standard basis vectors i-hat and j-hat on a grid, and an after panel showing the same grid sheared with i-hat unchanged at column 1 and j-hat now at column 2 of matrix A',
+        caption: "The columns of A are exactly the new locations of î and ĵ — read them and you know everything the matrix does." },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on.** You have the shear matrix $S = \\begin{bmatrix}1&3\\\\0&1\\end{bmatrix}$. Without computing: what does $S$ send $\\hat{i} = [1,0]^T$ to? What does it send $\\hat{j} = [0,1]^T$ to? Where does the corner $(0,1)$ of the unit square end up? Write your prediction, then check it against Example 3.',
       '**CNC machine connection — G68 coordinate rotation.** On a CNC milling machine, parts are sometimes clamped at an angle. Rather than rewriting every coordinate in the G-code program, the operator uses `G68` (Coordinate Rotation). The CNC controller secretly multiplies every tool position by a rotation matrix:\n\n$$\\begin{bmatrix}X\' \\\\ Y\'\\end{bmatrix} = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}\\begin{bmatrix}X \\\\ Y\\end{bmatrix}$$\n\nIf the part is clamped 5° off — the controller applies this matrix to every single move, invisibly rotating the entire work coordinate system. You write the G-code as if the part were perfectly aligned; the transformation matrix handles the rest.',
       '**Where this is heading:** Once we understand what ONE matrix does to space, we chain matrices together (Matrix Multiplication) and ask whether transformations can be undone (Matrix Inverses).',
+      ] },
+      { type: 'viz', id: 'MatrixTransformViz',
+        title: 'Live Grid Deformation — Edit Any 2×2 Matrix',
+        mathBridge: 'Edit the four entries a, b, c, d and watch the entire grid deform in real time. The red arrow shows where î lands (first column) and green shows where ĵ lands (second column). Use the t-slider to animate the transformation smoothly from identity to your matrix. Presets include Shear, Rotate 45°, Reflect X, and Singular (det=0).',
+        caption: 'Every matrix entry you change instantly reshapes the grid — making the column-as-destination rule visceral and immediate.' },
+      { type: 'viz', id: 'LALesson04_Matrices',
+        title: 'Warping the Grid — Interactive',
+        mathBridge: 'The red arrow is $\\hat{i}$ and the green arrow is $\\hat{j}$. Click the transformation buttons (Shear, Rotate, Scale, Reflect) and watch the entire grid morph. At all times, the final coordinates of the red and green arrows equal the first and second columns of the matrix that was applied. The grid stays a uniform grid — no crinkles, no tears.',
+        caption: 'A linear transformation is completely determined by where it sends the two basis vectors.' },
+      { type: 'viz', id: 'BasisVectorProof',
+        title: 'Why Columns Equal Basis Vector Destinations',
+        mathBridge: 'This visualization proves the column secret geometrically. Set $\\mathbf{v} = 1 \\cdot \\hat{i} + 0 \\cdot \\hat{j}$, then apply a transformation $A$. By linearity, $A\\hat{i} = 1 \\cdot (\\text{first column})$. Drag the sliders to see how any vector is just a scaled sum of the two column vectors.',
+        caption: 'The linear combination law forces column 1 = destination of î, column 2 = destination of ĵ.' },
+      { type: 'viz', id: 'TransformLab',
+        title: 'Transform Lab — Place, Rotate, Mirror, Chain',
+        mathBridge: 'Work through all four steps: place a shape, rotate it by entering a matrix, reflect it across an axis, then chain two transforms together. Each step reinforces the same core idea — a matrix tells the plane where to send $\\hat{i}$ and $\\hat{j}$, and everything else follows.',
+        caption: 'Build hands-on intuition by constructing rotation, reflection, and composition matrices yourself.' },
     ],
     callouts: [
       {
@@ -64,32 +95,6 @@ export default {
         type: 'strategy',
         title: 'When to Read a Matrix Geometrically',
         body: '**Use the column-reading method when you want to understand WHAT a matrix does:** Is it a rotation? A stretch? A shear? Does it collapse the plane onto a line?\n\n**Use the row-dot-column formula when you just need the number:** computing $A\\mathbf{v}$ for a specific $\\mathbf{v}$, or running machine computations.\n\n**The test for linearity:** if a transformation preserves the origin AND satisfies $T(\\mathbf{u}+\\mathbf{v})=T(\\mathbf{u})+T(\\mathbf{v})$, it can be represented as a matrix. If it moves the origin or bends grid lines, it cannot.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'MatrixTransformViz',
-        title: 'Live Grid Deformation — Edit Any 2×2 Matrix',
-        mathBridge: 'Edit the four entries a, b, c, d and watch the entire grid deform in real time. The red arrow shows where î lands (first column) and green shows where ĵ lands (second column). Use the t-slider to animate the transformation smoothly from identity to your matrix. Presets include Shear, Rotate 45°, Reflect X, and Singular (det=0).',
-        caption: 'Every matrix entry you change instantly reshapes the grid — making the column-as-destination rule visceral and immediate.',
-      },
-      {
-        id: 'LALesson04_Matrices',
-        title: 'Warping the Grid — Interactive',
-        mathBridge: 'The red arrow is $\\hat{i}$ and the green arrow is $\\hat{j}$. Click the transformation buttons (Shear, Rotate, Scale, Reflect) and watch the entire grid morph. At all times, the final coordinates of the red and green arrows equal the first and second columns of the matrix that was applied. The grid stays a uniform grid — no crinkles, no tears.',
-        caption: 'A linear transformation is completely determined by where it sends the two basis vectors.',
-      },
-      {
-        id: 'BasisVectorProof',
-        title: 'Why Columns Equal Basis Vector Destinations',
-        mathBridge: 'This visualization proves the column secret geometrically. Set $\\mathbf{v} = 1 \\cdot \\hat{i} + 0 \\cdot \\hat{j}$, then apply a transformation $A$. By linearity, $A\\hat{i} = 1 \\cdot (\\text{first column})$. Drag the sliders to see how any vector is just a scaled sum of the two column vectors.',
-        caption: 'The linear combination law forces column 1 = destination of î, column 2 = destination of ĵ.',
-      },
-      {
-        id: 'TransformLab',
-        title: 'Transform Lab — Place, Rotate, Mirror, Chain',
-        mathBridge: 'Work through all four steps: place a shape, rotate it by entering a matrix, reflect it across an axis, then chain two transforms together. Each step reinforces the same core idea — a matrix tells the plane where to send $\\hat{i}$ and $\\hat{j}$, and everything else follows.',
-        caption: 'Build hands-on intuition by constructing rotation, reflection, and composition matrices yourself.',
       },
     ],
   },
@@ -287,16 +292,16 @@ fig, axes = plt.subplots(1, 2, figsize=(10, 4))
 origin = np.zeros(2)
 
 for ax, title, vecs in [
-    (axes[0], "Before (original)", [(i_hat,’steelblue’,’i’), (j_hat,’darkorange’,’j’), (v,’green’,’v’)]),
-    (axes[1], "After 90 deg rotation", [(A@i_hat,’steelblue’,"A*i"), (A@j_hat,’darkorange’,"A*j"), (A@v,’green’,"A*v")]),
+    (axes[0], "Before (original)", [(i_hat,'steelblue','i'), (j_hat,'darkorange','j'), (v,'green','v')]),
+    (axes[1], "After 90 deg rotation", [(A@i_hat,'steelblue',"A*i"), (A@j_hat,'darkorange',"A*j"), (A@v,'green',"A*v")]),
 ]:
     ax.set_title(title, fontsize=12)
     for vec, color, lbl in vecs:
-        ax.annotate(‘’, xy=vec, xytext=origin, arrowprops=dict(arrowstyle=’->’, color=color, lw=2.5))
-        ax.text(vec[0]+0.08, vec[1]+0.08, lbl, color=color, fontsize=11, fontweight=’bold’)
+        ax.annotate('', xy=vec, xytext=origin, arrowprops=dict(arrowstyle='->', color=color, lw=2.5))
+        ax.text(vec[0]+0.08, vec[1]+0.08, lbl, color=color, fontsize=11, fontweight='bold')
     ax.set_xlim(-2, 4); ax.set_ylim(-2, 4)
-    ax.set_aspect(‘equal’); ax.grid(True, alpha=0.3)
-    ax.axhline(0, color=’k’, lw=0.5); ax.axvline(0, color=’k’, lw=0.5)
+    ax.set_aspect('equal'); ax.grid(True, alpha=0.3)
+    ax.axhline(0, color='k', lw=0.5); ax.axvline(0, color='k', lw=0.5)
 
 plt.tight_layout()
 plt.show()`,

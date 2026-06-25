@@ -1,3 +1,6 @@
+import luFactorizationUrl from '../diagrams/la-lu-factorization.svg?url'
+import forwardBackSubUrl from '../diagrams/la-forward-back-substitution.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la2-006',
@@ -24,14 +27,25 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Gaussian-eliminate $A = \\begin{bmatrix}2&1\\\\4&3\\end{bmatrix}$: $R_2 \\to R_2 - 2R_1$ gives $U = \\begin{bmatrix}2&1\\\\0&1\\end{bmatrix}$. The multiplier used was $m_{21} = 4/2 = 2$. Store it below the diagonal: $L = \\begin{bmatrix}1&0\\\\2&1\\end{bmatrix}$. Verify: $LU = \\begin{bmatrix}1&0\\\\2&1\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\4+0&2+1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\4&3\\end{bmatrix} = A$. The elimination multipliers ARE the entries of $L$. This is LU decomposition — you get it for free while running Gaussian elimination.',
       '**The core observation:** When you perform Gaussian elimination on $A$, you subtract multiples of rows from each other to create zeros below the diagonal. Each multiplier you use — the number you multiply the pivot row by before subtracting — gets recorded into a matrix called $L$ (Lower). The resulting upper triangular matrix is $U$ (Upper). Together, $A = L \\cdot U$.',
       'Concretely: if you eliminate column 1 of $A$ by subtracting $m_{21}$ times row 1 from row 2, and $m_{31}$ times row 1 from row 3, those multipliers $m_{21}$ and $m_{31}$ go directly into $L$ at positions $(2,1)$ and $(3,1)$. The $L$ matrix has 1s on its diagonal and the elimination multipliers below the diagonal.',
+      ] },
+      { type: 'image', src: luFactorizationUrl,
+        alt: 'Matrix A equals matrix L times matrix U, with L shown lower triangular with 1s on the diagonal and the elimination multiplier 2 highlighted below the diagonal, and U shown upper triangular as the result of elimination',
+        caption: 'L stores every elimination multiplier below its diagonal of 1s; U is what elimination leaves behind.' },
+      { type: 'prose', paragraphs: [
       '**Why this is useful: the two-phase solve**',
       'Once you have $A = LU$, solving $A\\mathbf{x} = \\mathbf{b}$ splits into two easy steps:',
       '1. **Forward substitution**: Solve $L\\mathbf{y} = \\mathbf{b}$ for $\\mathbf{y}$. Because $L$ is lower triangular, $y_1$ is immediate, then $y_2$, then $y_3$ — each using only previously computed values.',
       '2. **Back substitution**: Solve $U\\mathbf{x} = \\mathbf{y}$ for $\\mathbf{x}$. Because $U$ is upper triangular, $x_n$ is immediate, then $x_{n-1}$, working backwards.',
+      ] },
+      { type: 'image', src: forwardBackSubUrl,
+        alt: 'Left panel: lower triangular shape for L with an arrow showing forward substitution solving y1 then y2 then y3 top to bottom. Right panel: upper triangular shape for U with an arrow showing back substitution solving x3 then x2 then x1 bottom to top',
+        caption: 'Forward substitution sweeps top to bottom through L; back substitution sweeps bottom to top through U.' },
+      { type: 'prose', paragraphs: [
       'Each substitution phase is $O(n^2)$ operations. The factorization $A = LU$ costs $O(n^3)$ once. For 1,000 different right-hand sides, you pay $O(n^3)$ once instead of $O(n^3)$ a thousand times.',
       '**The problem with zero pivots: Partial Pivoting**',
       'LU decomposition fails if a pivot (diagonal entry during elimination) is zero — you cannot divide by zero. It also fails numerically if a pivot is very small — dividing by a near-zero number amplifies rounding errors. The fix is **partial pivoting**: before each elimination step, swap rows to bring the largest entry in the current column to the pivot position. This introduces a permutation matrix $P$ (recording the swaps), giving the formula $PA = LU$ instead of $A = LU$.',
@@ -40,6 +54,11 @@ export default {
       'Once you have $PA = LU$, the determinant is immediate: $\\det(A) = \\det(P^{-1}) \\cdot \\det(U)$. Since $L$ has 1s on its diagonal, $\\det(L) = 1$. Since $P$ is a permutation, $\\det(P^{-1}) = \\pm 1$ (depending on the number of row swaps). And $\\det(U)$ is just the product of $U$\'s diagonal entries. This is exactly why NumPy computes determinants via LU — never via cofactor expansion.',
       '**Predict before reading on.** If you use LU decomposition to factor $A$ once ($O(n^3)$ cost), then solve $A\\mathbf{x} = \\mathbf{b}$ for 100 different right-hand sides: how many total $O(n^2)$ solves do you perform? What is the total cost vs. factoring fresh each time? Write your estimate, then check the Computational Complexity callout.',
       '**Where this is heading:** LU decomposition is foundational for numerical linear algebra. The QR decomposition (used in eigenvalue algorithms and least squares) and the SVD (the ultimate factorization) both rely on the same factorization-then-solve pattern.',
+      ] },
+      { type: 'viz', id: 'GaussianEliminationStepper',
+        title: 'Gaussian Elimination — Tracking the Multipliers',
+        mathBridge: 'Watch each elimination step. Every time a multiple of one row is subtracted from another, the multiplier used is the exact number that gets placed into matrix L. After all eliminations, the matrix that remains is U. Step through the full process and observe how L accumulates the multipliers bottom-up while U is built top-down.',
+        caption: 'LU decomposition is Gaussian elimination with the multipliers stored.' },
     ],
     callouts: [
       {
@@ -66,14 +85,6 @@ export default {
         type: 'warning',
         title: 'Career Signal — LU Decomposition',
         body: 'LU decomposition is the backbone of scipy.linalg.solve, MATLAB\'s backslash operator, and virtually every scientific computing library. Interview questions include: "How does np.linalg.solve work internally?" (LU with pivoting), "When would you use np.linalg.inv vs np.linalg.solve?" (never invert — always solve), and "What is O(n³) vs O(n²) and why does it matter?" Knowing these separates someone who has used a library from someone who understands it.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'GaussianEliminationStepper',
-        title: 'Gaussian Elimination — Tracking the Multipliers',
-        mathBridge: 'Watch each elimination step. Every time a multiple of one row is subtracted from another, the multiplier used is the exact number that gets placed into matrix L. After all eliminations, the matrix that remains is U. Step through the full process and observe how L accumulates the multipliers bottom-up while U is built top-down.',
-        caption: 'LU decomposition is Gaussian elimination with the multipliers stored.',
       },
     ],
   },

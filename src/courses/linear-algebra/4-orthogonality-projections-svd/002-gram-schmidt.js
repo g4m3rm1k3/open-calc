@@ -1,3 +1,5 @@
+import gramSchmidtBeforeAfterUrl from '../diagrams/la-gram-schmidt-before-after.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la4-002',
@@ -18,16 +20,28 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $\\mathbf{v}_1 = [3,4]^\\top$ and $\\mathbf{v}_2 = [2,0]^\\top$ — two vectors at an awkward angle. After one Gram-Schmidt step: $\\mathbf{e}_1 = [3/5,4/5]^\\top$ (normalize $\\mathbf{v}_1$). Subtract the shadow: $\\mathbf{v}_2 - (\\mathbf{v}_2 \\cdot \\mathbf{e}_1)\\mathbf{e}_1 = [32/25, -24/25]^\\top$, then normalize to $\\mathbf{e}_2 = [4/5, -3/5]^\\top$. Check: $\\mathbf{e}_1 \\cdot \\mathbf{e}_2 = 12/25 - 12/25 = 0$ ✓. Same 2D span, now perfectly perpendicular. That subtraction step — removing the shadow — is the entire algorithm.',
       'Here is the core idea in plain language: imagine you have two vectors in 2D that are *not* perpendicular — they are tilted at some weird angle to each other. You want to replace them with two perpendicular vectors that span the exact same space. Gram-Schmidt tells you how.',
       '**Step 1: Keep the first vector as-is.** There is nothing to clean yet. Just normalize it to length 1: $\\mathbf{e}_1 = \\mathbf{v}_1 / \\|\\mathbf{v}_1\\|$.',
+      ] },
+      { type: 'image', src: gramSchmidtBeforeAfterUrl,
+        alt: 'Left panel showing two tilted, non-perpendicular vectors v1 and v2. Right panel showing the resulting orthonormal vectors e1 and e2, perpendicular to each other and both unit length',
+        caption: 'Gram-Schmidt takes any tilted basis and manufactures a perpendicular, unit-length one spanning the same space.' },
+      { type: 'prose', paragraphs: [
       '**Step 2: Subtract off the "contamination."** Take your second vector $\\mathbf{v}_2$. It has some component that points in the direction of $\\mathbf{e}_1$ (the part that overlaps). Subtract that component away, leaving only the part that is perpendicular to $\\mathbf{e}_1$. That remainder is already orthogonal to $\\mathbf{e}_1$ by construction. Normalize it to get $\\mathbf{e}_2$.',
       '**Step 3: Repeat for every remaining vector.** For $\\mathbf{v}_3$: subtract its projection onto $\\mathbf{e}_1$ AND its projection onto $\\mathbf{e}_2$. What is left is perpendicular to both. Normalize. Repeat until done.',
       'The beautiful guarantee: at every step, what remains after subtracting all prior projections is perpendicular to every previously computed basis vector. You are peeling off contamination one direction at a time.',
       '**Why orthonormal bases are worth the effort.** When your basis is orthonormal, nearly everything becomes simpler. Coordinates are just dot products. The inverse of the basis matrix $Q$ is just its transpose $Q^T$ (no computation needed!). Projections are $QQ^T\\mathbf{b}$. The entire least squares algorithm simplifies. Orthonormal bases are the "clean room" of linear algebra.',
       '**CNC machine axis calibration.** A CNC machine\'s $X$, $Y$, $Z$ axis directions are ideally perfectly orthogonal. In practice, a precision ball-bar probe measures the actual axis directions as unit vectors $\\mathbf{v}_X, \\mathbf{v}_Y, \\mathbf{v}_Z$ — and they are slightly non-orthogonal due to mechanical tolerances. Gram-Schmidt converts these measured directions into a perfectly orthonormal frame $\\{\\mathbf{e}_X, \\mathbf{e}_Y, \\mathbf{e}_Z\\}$ that the CNC controller uses as its reference. The "squareness" error of the machine is precisely the deviation of the original vectors from orthogonality — and Gram-Schmidt quantifies and removes it.',
       '**Where this is heading:** Gram-Schmidt is the constructive proof that every subspace has an orthonormal basis. It directly produces the QR decomposition ($A = QR$, where $Q$ has orthonormal columns and $R$ is upper triangular). The next lesson on Least Squares uses this heavily, and SVD generalizes it further.',
+      ] },
+      { type: 'viz', id: 'GramSchmidtProcess',
+        title: 'Gram-Schmidt in 2D',
+        mathBridge: 'Start with two non-perpendicular vectors (the default, shown in red and blue). Press "Step 1" to see $\\mathbf{v}_1$ normalized to $\\mathbf{e}_1$. Press "Step 2" to see the projection of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$ subtracted away — watch the remainder (green) snap to exactly 90° from $\\mathbf{e}_1$. Drag the original vectors to different angles and run the process again. Confirm that no matter how tilted the input, the output is always perpendicular.',
+        caption: 'Projection peels off contamination, leaving perpendicularity behind.',
+      },
     ],
     callouts: [
       {
@@ -59,14 +73,6 @@ export default {
         type: 'insight',
         title: 'Predict: Gram-Schmidt on a Simple Pair',
         body: 'For $\\mathbf{v}_1 = [1,1]^\\top$ and $\\mathbf{v}_2 = [1,0]^\\top$: after Gram-Schmidt, what direction does $\\mathbf{e}_2$ point? Will it point up-right, straight up, or up-left? Predict, then compute: $\\mathbf{e}_1 = [1/\\sqrt{2}, 1/\\sqrt{2}]^\\top$, find $\\mathbf{v}_2 \\cdot \\mathbf{e}_1$, subtract, and normalize.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'GramSchmidtProcess',
-        title: 'Gram-Schmidt in 2D',
-        mathBridge: 'Start with two non-perpendicular vectors (the default, shown in red and blue). Press "Step 1" to see $\\mathbf{v}_1$ normalized to $\\mathbf{e}_1$. Press "Step 2" to see the projection of $\\mathbf{v}_2$ onto $\\mathbf{e}_1$ subtracted away — watch the remainder (green) snap to exactly 90° from $\\mathbf{e}_1$. Drag the original vectors to different angles and run the process again. Confirm that no matter how tilted the input, the output is always perpendicular.',
-        caption: 'Projection peels off contamination, leaving perpendicularity behind.',
       },
     ],
   },

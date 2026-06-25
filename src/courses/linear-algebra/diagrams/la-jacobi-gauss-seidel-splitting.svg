@@ -1,0 +1,46 @@
+<svg viewBox="0 0 380 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-cell  { stroke: #cbd5e1; fill: #ffffff; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-cell  { stroke: #475569; fill: #1e293b; }
+  </style>
+  <rect width="380" height="200" rx="10" class="svg-bg"/>
+
+  <text x="190" y="16" font-size="11" class="svg-text" text-anchor="middle" font-weight="700">Jacobi uses only old values; Gauss-Seidel reuses fresh ones</text>
+
+  <!-- Jacobi: M = D, off-diagonal uses x^(k) -->
+  <text x="90" y="36" font-size="10.5" fill="#2563eb" text-anchor="middle" font-weight="700">Jacobi: M = D</text>
+  <g transform="translate(40,44)">
+    <rect x="0" y="0" width="32" height="32" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.5"/>
+    <rect x="32" y="0" width="32" height="32" fill="#94a3b8" opacity="0.18" stroke="#64748b" stroke-width="1"/>
+    <rect x="0" y="32" width="32" height="32" fill="#94a3b8" opacity="0.18" stroke="#64748b" stroke-width="1"/>
+    <rect x="32" y="32" width="32" height="32" fill="rgba(16,185,129,0.18)" stroke="#10b981" stroke-width="1.5"/>
+    <text x="16" y="20" font-size="10" fill="#10b981" font-weight="700" text-anchor="middle">D</text>
+    <text x="48" y="52" font-size="10" fill="#10b981" font-weight="700" text-anchor="middle">D</text>
+    <text x="48" y="20" font-size="9" class="svg-muted" text-anchor="middle">x⁽ᵏ⁾</text>
+    <text x="16" y="52" font-size="9" class="svg-muted" text-anchor="middle">x⁽ᵏ⁾</text>
+  </g>
+  <text x="90" y="122" font-size="9" class="svg-muted" text-anchor="middle">all off-diagonal terms: old sweep</text>
+
+  <!-- Gauss-Seidel: M = D - L, off-diagonal below uses fresh x^(k+1) -->
+  <text x="290" y="36" font-size="10.5" fill="#d97706" text-anchor="middle" font-weight="700">Gauss-Seidel: M = D − L</text>
+  <g transform="translate(240,44)">
+    <rect x="0" y="0" width="32" height="32" fill="rgba(217,119,6,0.18)" stroke="#d97706" stroke-width="1.5"/>
+    <rect x="32" y="0" width="32" height="32" fill="#94a3b8" opacity="0.18" stroke="#64748b" stroke-width="1"/>
+    <rect x="0" y="32" width="32" height="32" fill="rgba(16,185,129,0.22)" stroke="#10b981" stroke-width="1.5"/>
+    <rect x="32" y="32" width="32" height="32" fill="rgba(217,119,6,0.18)" stroke="#d97706" stroke-width="1.5"/>
+    <text x="16" y="20" font-size="10" fill="#d97706" font-weight="700" text-anchor="middle">D</text>
+    <text x="48" y="52" font-size="10" fill="#d97706" font-weight="700" text-anchor="middle">D</text>
+    <text x="48" y="20" font-size="9" class="svg-muted" text-anchor="middle">x⁽ᵏ⁾</text>
+    <text x="16" y="52" font-size="9" fill="#10b981" font-weight="700" text-anchor="middle">x⁽ᵏ⁺¹⁾</text>
+  </g>
+  <text x="290" y="122" font-size="9" fill="#10b981" text-anchor="middle">lower terms: already-updated this sweep</text>
+
+  <text x="190" y="170" font-size="10" class="svg-muted" text-anchor="middle">Reusing fresh values costs nothing extra but roughly doubles the convergence rate</text>
+  <text x="190" y="186" font-size="9.5" class="svg-muted" text-anchor="middle">for many elliptic-PDE matrices: ρ_GS ≈ ρ_J²</text>
+</svg>

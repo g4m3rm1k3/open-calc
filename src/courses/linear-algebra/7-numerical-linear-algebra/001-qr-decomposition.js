@@ -1,3 +1,7 @@
+import gramSchmidtUrl from '../diagrams/la-gram-schmidt-before-after.svg?url';
+import qrGridUrl from '../diagrams/la-qr-factorization-grid.svg?url';
+import qrAlgoUrl from '../diagrams/la-qr-algorithm-iteration.svg?url';
+
 export default {
   id: 'la7-001',
   slug: 'qr-decomposition',
@@ -14,15 +18,24 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       '**Where you are in the story.** Chapters 1–6 built your conceptual toolkit: vector spaces, linear maps, eigenvalues, orthogonality, projections. You learned what matrices *mean*. Chapter 7 asks a harder question: how do we compute with them reliably? Real matrices have rounding errors, near-zero pivots, and condition numbers in the billions. The factorizations you will learn here — QR, Cholesky, Schur, Householder — are not just theoretical objects. They are the algorithms that run inside NumPy, MATLAB, and every scientific computing library. This lesson is the most important of the chapter: QR decomposition underpins least squares, eigenvalue computation, and stability analysis all at once.',
 
       '**The problem with squaring the condition number.** You need to fit a line to 100 data points — a classic least squares problem. The normal equations $A^\\top A \\mathbf{x} = A^\\top \\mathbf{b}$ look clean on paper. But forming $A^\\top A$ has a hidden cost: it squares the condition number. If $\\kappa(A) = 10^8$ (plausible for a polynomial regression matrix), then $\\kappa(A^\\top A) = 10^{16}$ — right at the limit of 64-bit floating point. Your normal equations answer will be pure noise. Every numerical linear algebra library avoids normal equations for precisely this reason. QR decomposition is the fix.',
 
       '**The geometric idea: build an orthonormal basis for the column space.** The columns of $A$ span some subspace, but they are not in general orthogonal or unit-length. Gram-Schmidt orthogonalization takes those columns and systematically builds a set of orthonormal vectors $\\mathbf{q}_1, \\mathbf{q}_2, \\ldots$ that span the same space. The first column direction becomes $\\mathbf{q}_1$. The second column, minus whatever piece lies along $\\mathbf{q}_1$, becomes $\\mathbf{q}_2$. And so on. By the end, you have a matrix $Q$ whose columns are orthonormal — and the key insight is that $Q$ and the original $A$ span exactly the same column space.',
-
+      ] },
+      { type: 'image', src: gramSchmidtUrl,
+        alt: 'Two tilted vectors v1, v2 next to the orthonormal basis e1, e2 that Gram-Schmidt produces from them',
+        caption: 'Gram-Schmidt straightens any basis into an orthonormal one — same span, but now perpendicular and unit length.' },
+      { type: 'prose', paragraphs: [
       '**The R matrix is just a record of what you computed.** As you carry out Gram-Schmidt, you compute two types of numbers: norms (how long is each new vector?) and inner products (how much of each original column lies along each $\\mathbf{q}_i$?). Pack those numbers into a matrix $R$ — norms on the diagonal, inner products above the diagonal, zeros below — and you have $A = QR$. Nothing magic: $R$ is a ledger of the Gram-Schmidt arithmetic. The upper triangular shape of $R$ reflects the fact that column $j$ only projects onto $\\mathbf{q}_1$ through $\\mathbf{q}_{j-1}$, never onto later ones.',
-
+      ] },
+      { type: 'image', src: qrGridUrl,
+        alt: 'Matrix grid showing A = Q times R, with Q columns highlighted as orthonormal and R upper triangular with forced zero entries below the diagonal',
+        caption: 'R is a ledger: diagonal entries are norms, upper entries are inner products, and the zeros below are forced by the order columns are processed.' },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on.** For $A = \\begin{bmatrix}3 & 1 \\\\ 4 & 0\\end{bmatrix}$, what is $r_{11}$? Write your answer before moving on — $r_{11}$ is the first thing you compute in Gram-Schmidt. Think about what $r_{11}$ represents in terms of the first column of $A$.',
 
       '**Least squares becomes a back-substitution.** With $A = QR$, the least squares problem $\\min \\|A\\mathbf{x} - \\mathbf{b}\\|$ simplifies dramatically. Substituting: $\\|QR\\mathbf{x} - \\mathbf{b}\\|^2 = \\|R\\mathbf{x} - Q^\\top\\mathbf{b}\\|^2 + \\|\\mathbf{b} - QQ^\\top\\mathbf{b}\\|^2$. The second term does not involve $\\mathbf{x}$, so you minimize the first term, which means solving $R\\mathbf{x} = Q^\\top\\mathbf{b}$. That is a triangular system — solve it by back substitution in $O(n^2)$ time. The condition number of $R$ is $\\kappa(A)$, not $\\kappa(A)^2$. That is why every serious numerical library does this.',
@@ -30,39 +43,14 @@ export default {
       '**Why Gram-Schmidt is not what is actually used.** You will implement Gram-Schmidt because it explains QR conceptually. But classical Gram-Schmidt has a nasty problem: small floating-point errors accumulate when you subtract projections. After 20–30 steps on a large matrix, the computed $\\mathbf{q}$ vectors are no longer orthogonal — they drift. Modified Gram-Schmidt re-orthogonalizes at each step and is better, but still not perfect. The production algorithm is Householder reflections: instead of building $Q$ column by column, you apply a sequence of orthogonal reflections that zero out subdiagonals of $A$ column by column. Householder QR is fully backward stable and is what NumPy and MATLAB actually run.',
 
       '**The QR algorithm: a surprise application.** There is a completely different use of QR that has nothing to do with least squares. To find all eigenvalues of a matrix $A$: decompose $A_0 = A$ as $Q_0 R_0$, then form $A_1 = R_0 Q_0$ (flip the order). Decompose $A_1 = Q_1 R_1$, form $A_2 = R_1 Q_1$. Repeat. Each step is a similarity transformation, so eigenvalues are preserved. Under mild conditions, the sequence $A_k$ converges to upper triangular form with eigenvalues on the diagonal. This is how LAPACK computes eigenvalues of dense matrices. A single factorization method powers both least squares and eigenvalue computation.',
-
+      ] },
+      { type: 'image', src: qrAlgoUrl,
+        alt: 'Three matrix grids showing the QR algorithm: a dense matrix, a quieter one, and a converged upper-triangular matrix with eigenvalues on the diagonal',
+        caption: 'Each QR step is a similarity transform — eigenvalues are preserved while off-diagonal entries decay toward zero.' },
+      { type: 'prose', paragraphs: [
       '**Where this is heading.** The next lesson is Cholesky decomposition — the special-case version of QR when $A$ is symmetric positive definite. You will see that the Cholesky factor of $A^\\top A$ is exactly the $R$ from the QR of $A$ (because $A^\\top A = R^\\top Q^\\top QR = R^\\top R$). After Cholesky, you will study how these factorizations degrade as matrices become ill-conditioned — that is the topic of matrix norms and conditioning.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Compute QR via Gram-Schmidt (5 Steps)',
-        body: '**Given:** An $m \\times n$ matrix $A = [\\mathbf{a}_1 | \\cdots | \\mathbf{a}_n]$ with linearly independent columns.\n**Step 1.** Set $\\tilde{\\mathbf{q}}_1 = \\mathbf{a}_1$. Compute $r_{11} = \\|\\tilde{\\mathbf{q}}_1\\|$ and normalize: $\\mathbf{q}_1 = \\tilde{\\mathbf{q}}_1 / r_{11}$.\n**Step 2.** For $j = 2, \\ldots, n$: compute each off-diagonal $r_{ij} = \\mathbf{q}_i^\\top \\mathbf{a}_j$ for $i = 1, \\ldots, j-1$.\n**Step 3.** Orthogonalize: $\\tilde{\\mathbf{q}}_j = \\mathbf{a}_j - \\sum_{i=1}^{j-1} r_{ij}\\mathbf{q}_i$.\n**Step 4.** Compute $r_{jj} = \\|\\tilde{\\mathbf{q}}_j\\|$ and normalize: $\\mathbf{q}_j = \\tilde{\\mathbf{q}}_j / r_{jj}$.\n**Step 5.** Assemble $Q = [\\mathbf{q}_1 | \\cdots | \\mathbf{q}_n]$ and $R$ with entries $r_{ij}$ in positions $(i,j)$, zeros below the diagonal. Verify: $Q^\\top Q = I_n$ and $QR = A$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 1 of 7 — Numerical Linear Algebra',
-        body: '**Chapter 6 (Abstract Algebra):** Abstract vector spaces, bases, coordinates, change of basis.\n**Chapter 7 (Numerical Methods), this chapter:** How to compute reliably — factorizations that control condition numbers.\n**This lesson:** QR decomposition — orthonormal column basis, least squares, QR eigenvalue algorithm.\n**Next:** Cholesky decomposition — the efficient factorization for symmetric positive definite matrices.',
-      },
-      {
-        type: 'insight',
-        title: 'QR via Gram-Schmidt: The Recipe',
-        body: 'Given columns $\\mathbf{a}_1, \\ldots, \\mathbf{a}_n$ of $A$:\n1. $\\tilde{\\mathbf{q}}_1 = \\mathbf{a}_1$, $\\mathbf{q}_1 = \\tilde{\\mathbf{q}}_1 / \\|\\tilde{\\mathbf{q}}_1\\|$\n2. For $j = 2, \\ldots, n$: subtract projections onto $\\mathbf{q}_1, \\ldots, \\mathbf{q}_{j-1}$:\n   $\\tilde{\\mathbf{q}}_j = \\mathbf{a}_j - (\\mathbf{q}_1^\\top \\mathbf{a}_j)\\mathbf{q}_1 - \\cdots - (\\mathbf{q}_{j-1}^\\top \\mathbf{a}_j)\\mathbf{q}_{j-1}$\n   $\\mathbf{q}_j = \\tilde{\\mathbf{q}}_j / \\|\\tilde{\\mathbf{q}}_j\\|$\n\nThe $R$ matrix: $r_{ij} = \\mathbf{q}_i^\\top \\mathbf{a}_j$ for $i < j$, $r_{jj} = \\|\\tilde{\\mathbf{q}}_j\\|$, $r_{ij} = 0$ for $i > j$.',
-      },
-      {
-        type: 'insight',
-        title: 'Least Squares via QR',
-        body: 'To solve $\\min \\|A\\mathbf{x}-\\mathbf{b}\\|$ with $A = QR$:\n1. Compute $Q^\\top \\mathbf{b}$ ($m$ inner products)\n2. Solve $R\\mathbf{x} = Q^\\top \\mathbf{b}$ by back substitution\n\nCondition number: $\\kappa(R) = \\kappa(A)$ instead of $\\kappa(A)^2$ from normal equations.',
-      },
-      {
-        type: 'warning',
-        title: 'Gram-Schmidt vs Householder',
-        body: 'Classical Gram-Schmidt is unstable: small errors compound as you subtract projections. Modified Gram-Schmidt is better but still not optimal. **Householder reflections** are the numerically stable way to compute QR in practice — they use orthogonal reflections $H = I - 2\\mathbf{u}\\mathbf{u}^\\top$ to zero out subdiagonal entries column by column. NumPy and MATLAB use Householder QR.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'QR Decomposition with NumPy',
         mathBridge: 'Use numpy to compute QR, verify orthogonality, solve least squares, and compare condition numbers between the QR approach and normal equations.',
         caption: 'np.linalg.qr uses Householder reflections internally — the same algorithm behind LAPACK.',
@@ -152,8 +140,7 @@ print("QR approach uses kappa(A) — far more headroom")
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'QR Decomposition — OpenMAT',
         mathBridge: 'Compute QR, verify orthogonality, and solve least squares in MATLAB-style syntax.',
         caption: 'Q has orthonormal columns; R is upper triangular; Q^T Q = I.',
@@ -202,6 +189,33 @@ x_normal
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Compute QR via Gram-Schmidt (5 Steps)',
+        body: '**Given:** An $m \\times n$ matrix $A = [\\mathbf{a}_1 | \\cdots | \\mathbf{a}_n]$ with linearly independent columns.\n**Step 1.** Set $\\tilde{\\mathbf{q}}_1 = \\mathbf{a}_1$. Compute $r_{11} = \\|\\tilde{\\mathbf{q}}_1\\|$ and normalize: $\\mathbf{q}_1 = \\tilde{\\mathbf{q}}_1 / r_{11}$.\n**Step 2.** For $j = 2, \\ldots, n$: compute each off-diagonal $r_{ij} = \\mathbf{q}_i^\\top \\mathbf{a}_j$ for $i = 1, \\ldots, j-1$.\n**Step 3.** Orthogonalize: $\\tilde{\\mathbf{q}}_j = \\mathbf{a}_j - \\sum_{i=1}^{j-1} r_{ij}\\mathbf{q}_i$.\n**Step 4.** Compute $r_{jj} = \\|\\tilde{\\mathbf{q}}_j\\|$ and normalize: $\\mathbf{q}_j = \\tilde{\\mathbf{q}}_j / r_{jj}$.\n**Step 5.** Assemble $Q = [\\mathbf{q}_1 | \\cdots | \\mathbf{q}_n]$ and $R$ with entries $r_{ij}$ in positions $(i,j)$, zeros below the diagonal. Verify: $Q^\\top Q = I_n$ and $QR = A$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 1 of 7 — Numerical Linear Algebra',
+        body: '**Chapter 6 (Abstract Algebra):** Abstract vector spaces, bases, coordinates, change of basis.\n**Chapter 7 (Numerical Methods), this chapter:** How to compute reliably — factorizations that control condition numbers.\n**This lesson:** QR decomposition — orthonormal column basis, least squares, QR eigenvalue algorithm.\n**Next:** Cholesky decomposition — the efficient factorization for symmetric positive definite matrices.',
+      },
+      {
+        type: 'insight',
+        title: 'QR via Gram-Schmidt: The Recipe',
+        body: 'Given columns $\\mathbf{a}_1, \\ldots, \\mathbf{a}_n$ of $A$:\n1. $\\tilde{\\mathbf{q}}_1 = \\mathbf{a}_1$, $\\mathbf{q}_1 = \\tilde{\\mathbf{q}}_1 / \\|\\tilde{\\mathbf{q}}_1\\|$\n2. For $j = 2, \\ldots, n$: subtract projections onto $\\mathbf{q}_1, \\ldots, \\mathbf{q}_{j-1}$:\n   $\\tilde{\\mathbf{q}}_j = \\mathbf{a}_j - (\\mathbf{q}_1^\\top \\mathbf{a}_j)\\mathbf{q}_1 - \\cdots - (\\mathbf{q}_{j-1}^\\top \\mathbf{a}_j)\\mathbf{q}_{j-1}$\n   $\\mathbf{q}_j = \\tilde{\\mathbf{q}}_j / \\|\\tilde{\\mathbf{q}}_j\\|$\n\nThe $R$ matrix: $r_{ij} = \\mathbf{q}_i^\\top \\mathbf{a}_j$ for $i < j$, $r_{jj} = \\|\\tilde{\\mathbf{q}}_j\\|$, $r_{ij} = 0$ for $i > j$.',
+      },
+      {
+        type: 'insight',
+        title: 'Least Squares via QR',
+        body: 'To solve $\\min \\|A\\mathbf{x}-\\mathbf{b}\\|$ with $A = QR$:\n1. Compute $Q^\\top \\mathbf{b}$ ($m$ inner products)\n2. Solve $R\\mathbf{x} = Q^\\top \\mathbf{b}$ by back substitution\n\nCondition number: $\\kappa(R) = \\kappa(A)$ instead of $\\kappa(A)^2$ from normal equations.',
+      },
+      {
+        type: 'warning',
+        title: 'Gram-Schmidt vs Householder',
+        body: 'Classical Gram-Schmidt is unstable: small errors compound as you subtract projections. Modified Gram-Schmidt is better but still not optimal. **Householder reflections** are the numerically stable way to compute QR in practice — they use orthogonal reflections $H = I - 2\\mathbf{u}\\mathbf{u}^\\top$ to zero out subdiagonal entries column by column. NumPy and MATLAB use Householder QR.',
       },
     ],
   },

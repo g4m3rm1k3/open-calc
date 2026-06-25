@@ -1,3 +1,6 @@
+import conditionEllipseUrl from '../diagrams/la-condition-number-ellipse.svg?url';
+import digitLossUrl from '../diagrams/la-condition-number-digit-loss.svg?url';
+
 export default {
   id: 'la7-003',
   slug: 'matrix-norms-conditioning',
@@ -14,53 +17,33 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       '**Where you are in the story.** QR and Cholesky give you numerically stable ways to factorize matrices. But "stable" is not a binary property — it comes in degrees. A matrix with condition number 2 is practically indestructible. A matrix with condition number $10^{15}$ will give you garbage even with the best algorithm. This lesson gives you the tools to measure where any given matrix falls on that spectrum, and to understand exactly how much error your computed answer might contain.',
 
       '**A concrete disaster.** Take $A = \\begin{bmatrix}3&0\\\\0&0.001\\end{bmatrix}$ and solve $A\\mathbf{x} = \\mathbf{b}$ for $\\mathbf{b} = (3, 0.001)^\\top$. Exact solution: $\\mathbf{x} = (1,1)^\\top$. Now add a tiny perturbation $\\delta\\mathbf{b} = (0, 0.001)^\\top$. The relative input error is $\\|\\delta\\mathbf{b}\\|/\\|\\mathbf{b}\\| \\approx 0.03\\%$. The new solution is $(1, 2)^\\top$. Relative error in the answer: $71\\%$. A three-hundredths-of-a-percent perturbation caused a seventy-percent error. The matrix amplified the error by a factor of about 2300. That amplification factor has a name: the condition number.',
 
       '**What the condition number measures geometrically.** The matrix $A = \\begin{bmatrix}3&0\\\\0&0.001\\end{bmatrix}$ stretches the $x$-axis by 3 and the $y$-axis by 0.001. The ratio of largest to smallest stretch is $3/0.001 = 3000$. That is $\\kappa_2(A)$. A unit sphere under $A$ becomes an ellipse with axes 3 and 0.001. The tiny-axis direction is the source of the problem — points spread out along the fat direction collapse together when $A$ acts on them, so the inverse map fans them back out enormously.',
-
+      ] },
+      { type: 'image', src: conditionEllipseUrl,
+        alt: 'A unit circle transformed into a needle-thin ellipse, stretched by 3 in one direction and shrunk by 0.001 in the other, with condition number 3000 labeled',
+        caption: 'κ₂(A) = 3000 — the ratio of the longest to shortest stretch tells you exactly how much input error gets amplified.' },
+      { type: 'prose', paragraphs: [
       '**Norms measure "size" for vectors and matrices.** The Euclidean norm $\\|\\mathbf{x}\\|_2$ is what you already know. The 1-norm $\\|\\mathbf{x}\\|_1 = \\sum |x_i|$ and $\\infty$-norm $\\|\\mathbf{x}\\|_\\infty = \\max |x_i|$ measure size differently. For matrices, the induced 2-norm $\\|A\\|_2 = \\max_{\\mathbf{x}\\neq 0} \\|A\\mathbf{x}\\|_2/\\|\\mathbf{x}\\|_2$ measures the maximum stretching factor — which equals $\\sigma_1$, the largest singular value. The Frobenius norm $\\|A\\|_F = \\sqrt{\\sum a_{ij}^2}$ counts all entries equally and is not an induced norm.',
 
       '**Predict before reading on.** A $5 \\times 5$ Hilbert matrix has condition number around $5 \\times 10^5$. If you solve $H\\mathbf{x} = \\mathbf{b}$ in double precision (about 16 significant digits), how many reliable digits will the answer have? Write your estimate before looking at Example 1.',
 
       '**The rule of thumb: digits lost = $\\log_{10}(\\kappa)$.** Double precision has ~16 significant decimal digits. If $\\kappa(A) \\approx 10^k$, solving $A\\mathbf{x} = \\mathbf{b}$ loses about $k$ digits. With $\\kappa = 10^5$, you retain ~11 digits. With $\\kappa = 10^{12}$, only ~4 digits survive. With $\\kappa > 10^{16}$, the answer is meaningless. The Hilbert matrix of size 12 already hits that wall. This is not exotic — it appears in polynomial fitting, integral equations, and machine learning with bad feature scaling.',
-
+      ] },
+      { type: 'image', src: digitLossUrl,
+        alt: 'Bar chart showing reliable significant digits remaining versus condition number, from 16 digits at kappa=1 down to 0 digits at kappa=10^16',
+        caption: 'Each factor of 10 in κ costs roughly one decimal digit of accuracy — by κ=10¹⁶, nothing reliable is left.' },
+      { type: 'prose', paragraphs: [
       '**The condition number is norm-dependent but qualitatively universal.** $\\kappa_1$, $\\kappa_2$, $\\kappa_\\infty$ can differ by up to $\\sqrt{n}$, but they all agree on whether a matrix is well- or ill-conditioned. In practice, use $\\kappa_2(A) = \\sigma_1/\\sigma_n$: ratio of largest to smallest singular value. An orthogonal matrix (like $Q$ from QR) has $\\kappa_2 = 1$ — perfectly conditioned. A singular matrix has $\\kappa_2 = \\infty$. Everything else is in between.',
 
       '**Where this is heading.** The next lesson on numerical stability goes deeper: it asks whether the algorithm itself introduces extra errors on top of what conditioning predicts. An algorithm is backward stable if it solves a slightly perturbed problem exactly. Combining perturbation bounds (this lesson) with backward stability (next) gives you a complete picture of how much to trust any numerical result.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Assess the Conditioning of a Linear System (4 Steps)',
-        body: '**Given:** A square matrix $A$ and a linear system $A\\mathbf{x} = \\mathbf{b}$.\n**Step 1.** Compute $\\kappa_2(A) = \\sigma_{\\max}/\\sigma_{\\min}$ (ratio of largest to smallest singular value). For SPD matrices, use $\\kappa_2 = \\lambda_{\\max}/\\lambda_{\\min}$ instead.\n**Step 2.** Apply the digits-lost rule: $\\kappa_2 \\approx 10^k$ means $k$ significant digits are lost in double precision (~16 digits). If $k \\geq 16$, the system is numerically singular.\n**Step 3.** Bound the error: if $\\mathbf{b}$ has relative error $\\varepsilon$, the relative error in $\\mathbf{x}$ is at most $\\kappa(A) \\cdot \\varepsilon$. Include perturbations in $A$ too: total bound $\\lesssim \\kappa(A)(\\|\\delta A\\|/\\|A\\| + \\|\\delta\\mathbf{b}\\|/\\|\\mathbf{b}\\|)$.\n**Step 4.** If $\\kappa(A)$ is too large, consider: row/column equilibration (diagonal scaling), preconditioning, or Tikhonov regularization $(A^\\top A + \\lambda I)$ to cap the effective condition number.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 3 of 7 — Numerical Linear Algebra',
-        body: '**Previous (Lesson 2):** Cholesky decomposition — fast SPD factorization, $\\frac{1}{3}n^3$ flops.\n**This lesson:** Matrix norms and condition numbers — how much can input errors corrupt the output?\n**Next (Lesson 4):** Numerical stability — does the algorithm introduce extra error beyond what conditioning predicts?',
-      },
-      {
-        type: 'theorem',
-        title: 'Perturbation Bound',
-        body: 'If $A\\mathbf{x} = \\mathbf{b}$ and $A(\\mathbf{x}+\\delta\\mathbf{x}) = \\mathbf{b}+\\delta\\mathbf{b}$, then:\n$\\frac{\\|\\delta\\mathbf{x}\\|}{\\|\\mathbf{x}\\|} \\leq \\kappa(A) \\cdot \\frac{\\|\\delta\\mathbf{b}\\|}{\\|\\mathbf{b}\\|}$\n\nThe condition number $\\kappa(A) = \\|A\\| \\cdot \\|A^{-1}\\|$ is the worst-case relative error amplification.',
-      },
-      {
-        type: 'insight',
-        title: 'Matrix Norm Summary',
-        body: '$\\|A\\|_1 = \\max_j \\sum_i |a_{ij}|$ (max column abs-sum)\n$\\|A\\|_\\infty = \\max_i \\sum_j |a_{ij}|$ (max row abs-sum)\n$\\|A\\|_2 = \\sigma_1$ (largest singular value)\n$\\|A\\|_F = \\sqrt{\\sum_{ij} a_{ij}^2} = \\sqrt{\\sum_i \\sigma_i^2}$ (not induced)\n\nAll induced norms satisfy submultiplicativity: $\\|AB\\| \\leq \\|A\\| \\cdot \\|B\\|$',
-      },
-      {
-        type: 'warning',
-        title: 'Condition Number Is Norm-Dependent',
-        body: '$\\kappa_1$ and $\\kappa_2$ can differ by a factor of $\\sqrt{n}$, but they agree qualitatively. Use $\\kappa_2 = \\sigma_{\\max}/\\sigma_{\\min}$ for the cleanest interpretation.\n\n**Rule of thumb:** $\\kappa \\approx 10^k$ → lose $k$ digits of accuracy in double precision.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Matrix Norms and Condition Numbers with NumPy',
         mathBridge: 'Compute norms and condition numbers, observe error amplification, and see the Hilbert matrix as the classic ill-conditioned example.',
         caption: 'np.linalg.cond uses the ratio of largest to smallest singular value — the most interpretable condition number.',
@@ -145,8 +128,7 @@ print("H_12 is numerically singular in float64")
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Computing Norms and Condition Numbers',
         mathBridge: 'Measure matrix norms and condition numbers; observe error amplification.',
         caption: 'High condition number = solutions amplify errors dramatically.',
@@ -219,6 +201,33 @@ cond(A)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Assess the Conditioning of a Linear System (4 Steps)',
+        body: '**Given:** A square matrix $A$ and a linear system $A\\mathbf{x} = \\mathbf{b}$.\n**Step 1.** Compute $\\kappa_2(A) = \\sigma_{\\max}/\\sigma_{\\min}$ (ratio of largest to smallest singular value). For SPD matrices, use $\\kappa_2 = \\lambda_{\\max}/\\lambda_{\\min}$ instead.\n**Step 2.** Apply the digits-lost rule: $\\kappa_2 \\approx 10^k$ means $k$ significant digits are lost in double precision (~16 digits). If $k \\geq 16$, the system is numerically singular.\n**Step 3.** Bound the error: if $\\mathbf{b}$ has relative error $\\varepsilon$, the relative error in $\\mathbf{x}$ is at most $\\kappa(A) \\cdot \\varepsilon$. Include perturbations in $A$ too: total bound $\\lesssim \\kappa(A)(\\|\\delta A\\|/\\|A\\| + \\|\\delta\\mathbf{b}\\|/\\|\\mathbf{b}\\|)$.\n**Step 4.** If $\\kappa(A)$ is too large, consider: row/column equilibration (diagonal scaling), preconditioning, or Tikhonov regularization $(A^\\top A + \\lambda I)$ to cap the effective condition number.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 3 of 7 — Numerical Linear Algebra',
+        body: '**Previous (Lesson 2):** Cholesky decomposition — fast SPD factorization, $\\frac{1}{3}n^3$ flops.\n**This lesson:** Matrix norms and condition numbers — how much can input errors corrupt the output?\n**Next (Lesson 4):** Numerical stability — does the algorithm introduce extra error beyond what conditioning predicts?',
+      },
+      {
+        type: 'theorem',
+        title: 'Perturbation Bound',
+        body: 'If $A\\mathbf{x} = \\mathbf{b}$ and $A(\\mathbf{x}+\\delta\\mathbf{x}) = \\mathbf{b}+\\delta\\mathbf{b}$, then:\n$\\frac{\\|\\delta\\mathbf{x}\\|}{\\|\\mathbf{x}\\|} \\leq \\kappa(A) \\cdot \\frac{\\|\\delta\\mathbf{b}\\|}{\\|\\mathbf{b}\\|}$\n\nThe condition number $\\kappa(A) = \\|A\\| \\cdot \\|A^{-1}\\|$ is the worst-case relative error amplification.',
+      },
+      {
+        type: 'insight',
+        title: 'Matrix Norm Summary',
+        body: '$\\|A\\|_1 = \\max_j \\sum_i |a_{ij}|$ (max column abs-sum)\n$\\|A\\|_\\infty = \\max_i \\sum_j |a_{ij}|$ (max row abs-sum)\n$\\|A\\|_2 = \\sigma_1$ (largest singular value)\n$\\|A\\|_F = \\sqrt{\\sum_{ij} a_{ij}^2} = \\sqrt{\\sum_i \\sigma_i^2}$ (not induced)\n\nAll induced norms satisfy submultiplicativity: $\\|AB\\| \\leq \\|A\\| \\cdot \\|B\\|$',
+      },
+      {
+        type: 'warning',
+        title: 'Condition Number Is Norm-Dependent',
+        body: '$\\kappa_1$ and $\\kappa_2$ can differ by a factor of $\\sqrt{n}$, but they agree qualitatively. Use $\\kappa_2 = \\sigma_{\\max}/\\sigma_{\\min}$ for the cleanest interpretation.\n\n**Rule of thumb:** $\\kappa \\approx 10^k$ → lose $k$ digits of accuracy in double precision.',
       },
     ],
   },

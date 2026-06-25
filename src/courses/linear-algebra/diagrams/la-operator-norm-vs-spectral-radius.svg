@@ -1,0 +1,36 @@
+<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="320" height="200" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="on-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+  </defs>
+
+  <!-- Panel 1: normal matrix, r(A) = ||A|| -->
+  <rect x="10" y="20" width="146" height="160" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="83" y="38" font-size="10.5" fill="#10b981" text-anchor="middle" font-weight="700">normal: r(A) = ‖A‖ = 5</text>
+  <line x1="83" y1="130" x2="83" y2="60" stroke="#2563eb" stroke-width="2.5" marker-end="url(#on-blue)"/>
+  <text x="95" y="68" font-size="10" fill="#2563eb">stretch by 5</text>
+  <circle cx="83" cy="130" r="3" fill="#1e293b"/>
+  <text x="83" y="150" font-size="9" class="svg-muted" text-anchor="middle">eigenvalue = stretch factor</text>
+
+  <!-- Panel 2: nilpotent, r(N)=0 but ||N||=1 -->
+  <rect x="166" y="20" width="146" height="160" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="239" y="38" font-size="10.5" fill="#dc2626" text-anchor="middle" font-weight="700">nilpotent: r(N) = 0, ‖N‖ = 1</text>
+  <line x1="239" y1="130" x2="280" y2="130" stroke="#2563eb" stroke-width="2.5" marker-end="url(#on-blue)"/>
+  <text x="240" y="146" font-size="9.5" fill="#2563eb">e₂ ↦ e₁ (length 1)</text>
+  <line x1="280" y1="90" x2="280" y2="130" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="3,2"/>
+  <text x="284" y="86" font-size="9" class="svg-muted">e₂</text>
+  <circle cx="239" cy="130" r="3" fill="#1e293b"/>
+  <text x="239" y="166" font-size="9" fill="#dc2626" text-anchor="middle">moves a vector, but every eigenvalue is 0</text>
+</svg>

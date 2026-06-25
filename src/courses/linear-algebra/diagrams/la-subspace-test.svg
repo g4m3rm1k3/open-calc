@@ -1,0 +1,39 @@
+<svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .svg-axis  { stroke: #cbd5e1; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+    .dark .svg-axis  { stroke: #475569; }
+  </style>
+  <rect width="460" height="220" rx="10" class="svg-bg"/>
+
+  <!-- Panel 1: W1 = {x+y=0}, a subspace -->
+  <rect x="12" y="20" width="216" height="186" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="38" font-size="11.5" fill="#10b981" text-anchor="middle" font-weight="700">W₁ = {x+y=0} — a subspace</text>
+  <line x1="60" y1="115" x2="180" y2="115" class="svg-axis" stroke-width="1.3"/>
+  <line x1="120" y1="60" x2="120" y2="170" class="svg-axis" stroke-width="1.3"/>
+  <line x1="60" y1="175" x2="180" y2="55" stroke="#10b981" stroke-width="2.5"/>
+  <circle cx="120" cy="115" r="5" fill="#10b981"/>
+  <text x="128" y="112" font-size="10" fill="#10b981" font-weight="700">0 ∈ W₁</text>
+  <text x="120" y="190" font-size="9.5" fill="#10b981" text-anchor="middle">passes through the origin</text>
+
+  <!-- Panel 2: W2 = {x+y=1}, not a subspace -->
+  <rect x="232" y="20" width="216" height="186" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="340" y="38" font-size="11.5" fill="#dc2626" text-anchor="middle" font-weight="700">W₂ = {x+y=1} — not a subspace</text>
+  <line x1="280" y1="115" x2="400" y2="115" class="svg-axis" stroke-width="1.3"/>
+  <line x1="340" y1="60" x2="340" y2="170" class="svg-axis" stroke-width="1.3"/>
+  <line x1="290" y1="145" x2="410" y2="55" stroke="#dc2626" stroke-width="2.5"/>
+  <circle cx="340" cy="115" r="5" fill="none" stroke="#dc2626" stroke-width="2"/>
+  <line x1="336" y1="111" x2="344" y2="119" stroke="#dc2626" stroke-width="1.5"/>
+  <line x1="344" y1="111" x2="336" y2="119" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="346" y="112" font-size="10" fill="#dc2626" font-weight="700">0 ∉ W₂</text>
+  <text x="340" y="190" font-size="9.5" fill="#dc2626" text-anchor="middle">misses the origin entirely</text>
+</svg>

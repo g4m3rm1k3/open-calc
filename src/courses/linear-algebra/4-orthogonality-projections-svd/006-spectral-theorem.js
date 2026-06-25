@@ -1,3 +1,5 @@
+import spectralOrthogonalEigvecsUrl from '../diagrams/la-spectral-orthogonal-eigvecs.svg?url'
+
 export default {
   id: 'la4-006',
   slug: 'spectral-theorem',
@@ -14,50 +16,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$ — a real symmetric matrix ($A = A^\\top$). Characteristic polynomial: $(3-\\lambda)^2 - 1 = \\lambda^2 - 6\\lambda + 8 = (\\lambda-2)(\\lambda-4) = 0$, giving $\\lambda_1 = 2$, $\\lambda_2 = 4$ — both real. Eigenvectors: $\\mathbf{v}_1 = (1,-1)^\\top$ and $\\mathbf{v}_2 = (1,1)^\\top$. Check: $\\mathbf{v}_1 \\cdot \\mathbf{v}_2 = 1 \\cdot 1 + (-1) \\cdot 1 = 0$ ✓. Two facts emerge: eigenvalues are real, and eigenvectors are perpendicular — nobody forced them to be, the symmetry made it happen. Contrast with $B = \\begin{bmatrix}1&2\\\\0&3\\end{bmatrix}$ (not symmetric): eigenvalues $1$ and $3$ are also real, but eigenvectors $(1,0)^\\top$ and $(1,1)^\\top$ give dot product $1 \\neq 0$ — not orthogonal. Symmetry is what forces the eigenvectors to be perpendicular.',
+      ] },
+      { type: 'image', src: spectralOrthogonalEigvecsUrl,
+        alt: 'Left panel: symmetric matrix A with eigenvectors v1 and v2 drawn perpendicular to each other. Right panel: non-symmetric matrix B with eigenvectors v1 and v2 drawn at a non-right angle',
+        caption: 'Symmetry is the only thing required to guarantee perpendicular eigenvectors — nothing else forces it.' },
+      { type: 'prose', paragraphs: [
       '**Why eigenvalues are real.** Suppose $\\lambda$ is an eigenvalue with eigenvector $\\mathbf{v}$ (potentially complex): $A\\mathbf{v} = \\lambda \\mathbf{v}$. Take the conjugate transpose: $\\bar{\\mathbf{v}}^\\top A^\\top = \\bar{\\lambda} \\bar{\\mathbf{v}}^\\top$. Since $A = A^\\top$ (real, symmetric): $\\bar{\\mathbf{v}}^\\top A = \\bar{\\lambda} \\bar{\\mathbf{v}}^\\top$. Multiply the original equation on the left by $\\bar{\\mathbf{v}}^\\top$: $\\bar{\\mathbf{v}}^\\top A \\mathbf{v} = \\lambda \\bar{\\mathbf{v}}^\\top \\mathbf{v}$. Also $\\bar{\\mathbf{v}}^\\top A \\mathbf{v} = \\bar{\\lambda} \\bar{\\mathbf{v}}^\\top \\mathbf{v}$. So $\\lambda = \\bar{\\lambda}$, meaning $\\lambda$ is real.',
       '**Why eigenvectors for distinct eigenvalues are orthogonal.** Let $A\\mathbf{u} = \\lambda\\mathbf{u}$ and $A\\mathbf{v} = \\mu\\mathbf{v}$ with $\\lambda \\neq \\mu$. Then $\\lambda \\mathbf{u}^\\top \\mathbf{v} = (A\\mathbf{u})^\\top \\mathbf{v} = \\mathbf{u}^\\top A^\\top \\mathbf{v} = \\mathbf{u}^\\top A \\mathbf{v} = \\mu \\mathbf{u}^\\top \\mathbf{v}$. So $(\\lambda - \\mu) \\mathbf{u}^\\top \\mathbf{v} = 0$. Since $\\lambda \\neq \\mu$: $\\mathbf{u}^\\top \\mathbf{v} = 0$.',
       '**The spectral theorem.** Every real symmetric $n \\times n$ matrix $A$ can be written as $A = Q\\Lambda Q^\\top$ where $Q$ is orthogonal ($Q^\\top = Q^{-1}$, columns are orthonormal eigenvectors) and $\\Lambda = \\text{diag}(\\lambda_1, \\ldots, \\lambda_n)$ has real eigenvalues. This is **orthogonal diagonalization** — special because $P^{-1} = P^\\top$.',
       '**The spectral decomposition writes $A$ as a sum of rank-1 projections.** Since the columns $\\mathbf{q}_i$ of $Q$ are orthonormal, we can write $A = Q\\Lambda Q^T = \\sum_{i=1}^n \\lambda_i \\mathbf{q}_i \\mathbf{q}_i^T$. Each term $\\mathbf{q}_i \\mathbf{q}_i^T$ is the projection matrix onto the $i$-th eigenvector direction, scaled by the eigenvalue $\\lambda_i$. This is the same rank-1 sum structure as the SVD — in fact, for symmetric matrices, the left and right singular vectors coincide, and the singular values are $|\\lambda_i|$. Functions of $A$ become easy: $A^k = Q\\Lambda^k Q^T$ (raise each eigenvalue to the $k$th power), $A^{-1} = Q\\Lambda^{-1}Q^T$ (invert each eigenvalue), $e^A = Q e^\\Lambda Q^T$ (exponentiate each eigenvalue).',
       '**Positive definite matrices are symmetric matrices with all positive eigenvalues.** A symmetric matrix $A$ is **positive definite** when $\\mathbf{x}^T A \\mathbf{x} > 0$ for all $\\mathbf{x} \\neq \\mathbf{0}$. By the spectral theorem, this is equivalent to all eigenvalues being strictly positive. Positive definite matrices arise as: Gram matrices $B^T B$ (when $B$ has full column rank), covariance matrices in statistics, stiffness matrices in finite elements, and the Hessian of a strictly convex function at a minimum. A positive semidefinite matrix allows zero eigenvalues — the covariance matrix of data that lies exactly on a lower-dimensional subspace will have zero eigenvalues, revealing the dimension of the actual data.',
       '**CNC structural analysis and PCA.** The spectral theorem is everywhere in CNC engineering. (1) **Modal analysis:** the equation of motion for a vibrating CNC frame is $M\\ddot{\\mathbf{x}} + K\\mathbf{x} = \\mathbf{0}$ where $M$ and $K$ are symmetric (mass and stiffness matrices). The natural frequencies are $\\omega_i = \\sqrt{\\lambda_i(M^{-1/2}KM^{-1/2})}$ — eigenvalues of a symmetric matrix, all real and non-negative. (2) **Tool wear monitoring by PCA:** attach $n$ vibration sensors to the spindle; form the covariance matrix $C = \\frac{1}{N}X^\\top X$ (symmetric, PSD). The spectral decomposition $C = Q\\Lambda Q^\\top$ gives principal axes $\\mathbf{q}_i$ and explained variances $\\lambda_i$. As the tool wears, the dominant principal direction rotates and the leading eigenvalue grows — a real-time wear indicator. (3) **Elliptical tolerance zones:** the error ellipsoid for a machined feature is $\\mathbf{e}^\\top C^{-1} \\mathbf{e} \\leq 1$ where $C = Q\\Lambda Q^\\top$; the principal axes of the ellipsoid are the eigenvectors, and the semi-axes are $\\sqrt{\\lambda_i}$.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'Procedure: Orthogonally Diagonalize a Symmetric Matrix',
-        body: 'Step 1. **Verify symmetry.** Check $A = A^\\top$. The spectral theorem only applies to symmetric matrices.\n\nStep 2. **Find all eigenvalues.** Solve $\\det(A - \\lambda I) = 0$. The spectral theorem guarantees all roots are real.\n\nStep 3. **Find orthonormal eigenvectors for each eigenvalue.** For each eigenvalue $\\lambda_k$, solve $(A - \\lambda_k I)\\mathbf{v} = \\mathbf{0}$. If the eigenvalue has multiplicity $> 1$, apply Gram-Schmidt within the eigenspace.\n\nStep 4. **Assemble $Q$.** Arrange the orthonormal eigenvectors as columns. Verify $Q^\\top Q = I$ — if not, something went wrong.\n\nStep 5. **Write $A = Q\\Lambda Q^\\top$.** Confirm numerically: $Q \\Lambda Q^\\top$ should equal $A$ to machine precision.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 6 of 9 — Orthogonality & SVD',
-        body: '**Previous (Lesson 5):** Inner Product Spaces — abstract geometry via inner products and orthogonality.\n**This lesson:** Spectral Theorem — symmetric matrices always have real eigenvalues and orthogonal eigenvectors, making them diagonalizable in the best possible way.\n**Next (Lesson 7):** Quadratic Forms — how symmetric matrices define curvature, energy, and the shape of level curves.',
-      },
-      {
-        type: 'theorem',
-        title: 'Spectral Theorem (Real Case)',
-        body: 'Every real symmetric matrix $A = A^\\top$ satisfies:\n1. All eigenvalues of $A$ are real\n2. Eigenvectors for distinct eigenvalues are orthogonal\n3. $A$ is orthogonally diagonalizable: $A = Q\\Lambda Q^\\top$\n4. $Q$ is an orthogonal matrix ($Q^{-1} = Q^\\top$)',
-      },
-      {
-        type: 'insight',
-        title: 'Spectral Decomposition',
-        body: '$A = Q\\Lambda Q^\\top = \\lambda_1 \\mathbf{q}_1 \\mathbf{q}_1^\\top + \\lambda_2 \\mathbf{q}_2 \\mathbf{q}_2^\\top + \\cdots + \\lambda_n \\mathbf{q}_n \\mathbf{q}_n^\\top$\n\nThis writes $A$ as a sum of rank-1 projection matrices $\\mathbf{q}_i \\mathbf{q}_i^\\top$, each scaled by the corresponding eigenvalue. This is the spectral decomposition — the deepest way to understand what a symmetric matrix does.',
-      },
-      {
-        type: 'insight',
-        title: 'Symmetric vs Non-symmetric Diagonalization',
-        body: 'General: $A = PDP^{-1}$ (P not necessarily orthogonal, eigenvalues may be complex)\nSymmetric: $A = Q\\Lambda Q^\\top$ (Q orthogonal, all eigenvalues real)\nThe orthogonal version is much better: no matrix inverse needed ($Q^{-1} = Q^\\top$), numerically stable, and geometrically natural.',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction',
-        body: 'Before reading on: take $A = \\begin{bmatrix}5&0\\\\0&3\\end{bmatrix}$ (diagonal and symmetric). Without computing, predict: What are the eigenvalues? What are the eigenvectors? Are they orthogonal? Now perturb to $B = \\begin{bmatrix}5&1\\\\1&3\\end{bmatrix}$. Will the eigenvectors still be orthogonal? Will they point in the same directions as before, or rotate?',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Orthogonal Diagonalization',
         mathBridge: 'Find the spectral decomposition of a symmetric matrix and verify its properties.',
         caption: 'Symmetric matrices have orthogonal eigenvectors and real eigenvalues.',
@@ -127,6 +101,38 @@ imag(eigenvalues_B)
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'Procedure: Orthogonally Diagonalize a Symmetric Matrix',
+        body: 'Step 1. **Verify symmetry.** Check $A = A^\\top$. The spectral theorem only applies to symmetric matrices.\n\nStep 2. **Find all eigenvalues.** Solve $\\det(A - \\lambda I) = 0$. The spectral theorem guarantees all roots are real.\n\nStep 3. **Find orthonormal eigenvectors for each eigenvalue.** For each eigenvalue $\\lambda_k$, solve $(A - \\lambda_k I)\\mathbf{v} = \\mathbf{0}$. If the eigenvalue has multiplicity $> 1$, apply Gram-Schmidt within the eigenspace.\n\nStep 4. **Assemble $Q$.** Arrange the orthonormal eigenvectors as columns. Verify $Q^\\top Q = I$ — if not, something went wrong.\n\nStep 5. **Write $A = Q\\Lambda Q^\\top$.** Confirm numerically: $Q \\Lambda Q^\\top$ should equal $A$ to machine precision.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 6 of 9 — Orthogonality & SVD',
+        body: '**Previous (Lesson 5):** Inner Product Spaces — abstract geometry via inner products and orthogonality.\n**This lesson:** Spectral Theorem — symmetric matrices always have real eigenvalues and orthogonal eigenvectors, making them diagonalizable in the best possible way.\n**Next (Lesson 7):** Quadratic Forms — how symmetric matrices define curvature, energy, and the shape of level curves.',
+      },
+      {
+        type: 'theorem',
+        title: 'Spectral Theorem (Real Case)',
+        body: 'Every real symmetric matrix $A = A^\\top$ satisfies:\n1. All eigenvalues of $A$ are real\n2. Eigenvectors for distinct eigenvalues are orthogonal\n3. $A$ is orthogonally diagonalizable: $A = Q\\Lambda Q^\\top$\n4. $Q$ is an orthogonal matrix ($Q^{-1} = Q^\\top$)',
+      },
+      {
+        type: 'insight',
+        title: 'Spectral Decomposition',
+        body: '$A = Q\\Lambda Q^\\top = \\lambda_1 \\mathbf{q}_1 \\mathbf{q}_1^\\top + \\lambda_2 \\mathbf{q}_2 \\mathbf{q}_2^\\top + \\cdots + \\lambda_n \\mathbf{q}_n \\mathbf{q}_n^\\top$\n\nThis writes $A$ as a sum of rank-1 projection matrices $\\mathbf{q}_i \\mathbf{q}_i^\\top$, each scaled by the corresponding eigenvalue. This is the spectral decomposition — the deepest way to understand what a symmetric matrix does.',
+      },
+      {
+        type: 'insight',
+        title: 'Symmetric vs Non-symmetric Diagonalization',
+        body: 'General: $A = PDP^{-1}$ (P not necessarily orthogonal, eigenvalues may be complex)\nSymmetric: $A = Q\\Lambda Q^\\top$ (Q orthogonal, all eigenvalues real)\nThe orthogonal version is much better: no matrix inverse needed ($Q^{-1} = Q^\\top$), numerically stable, and geometrically natural.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction',
+        body: 'Before reading on: take $A = \\begin{bmatrix}5&0\\\\0&3\\end{bmatrix}$ (diagonal and symmetric). Without computing, predict: What are the eigenvalues? What are the eigenvectors? Are they orthogonal? Now perturb to $B = \\begin{bmatrix}5&1\\\\1&3\\end{bmatrix}$. Will the eigenvectors still be orthogonal? Will they point in the same directions as before, or rotate?',
       },
     ],
   },

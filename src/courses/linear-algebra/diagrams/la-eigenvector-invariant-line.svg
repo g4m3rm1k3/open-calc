@@ -1,0 +1,35 @@
+<svg viewBox="0 0 460 280" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-muted { fill: #94a3b8; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-muted { fill: #64748b; }
+  </style>
+  <rect width="460" height="280" rx="12" class="svg-bg"/>
+  <defs>
+    <marker id="ei-blue" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#2563eb"/></marker>
+    <marker id="ei-blue2" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto"><path d="M1,1 L1,8 L8,4.5 z" fill="#2563eb"/></marker>
+    <marker id="ei-gray" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#94a3b8"/></marker>
+    <marker id="ei-red" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto"><path d="M1,1 L1,8 L8,4.5 z" fill="#dc2626"/></marker>
+  </defs>
+
+  <!-- eigen-line, dashed, the invariant direction -->
+  <line x1="50" y1="260" x2="350" y2="110" stroke="#2563eb" stroke-width="1.3" stroke-dasharray="4,3" opacity="0.5"/>
+  <!-- v and Av, both on the eigen-line -->
+  <line x1="90" y1="240" x2="127" y2="221" stroke="#2563eb" stroke-width="2.5" marker-end="url(#ei-blue)"/>
+  <text x="100" y="214" font-size="11" fill="#2563eb" font-weight="700">v</text>
+  <line x1="90" y1="240" x2="284" y2="143" stroke="#2563eb" stroke-width="3.5" marker-end="url(#ei-blue2)"/>
+  <text x="288" y="138" font-size="12" fill="#2563eb" font-weight="700">Av = 5v — same line</text>
+
+  <!-- w's original ray (where it would land if not rotated), thin gray dashed -->
+  <line x1="90" y1="240" x2="183" y2="52" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="3,3"/>
+  <line x1="90" y1="240" x2="107" y2="202" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#ei-gray)"/>
+  <text x="60" y="198" font-size="11" class="svg-muted">w</text>
+  <!-- Aw, rotated OFF the gray ray -->
+  <line x1="90" y1="240" x2="246" y2="103" stroke="#dc2626" stroke-width="3" marker-end="url(#ei-red)"/>
+  <text x="250" y="98" font-size="12" fill="#dc2626" font-weight="700">Aw — off its line</text>
+
+  <circle cx="90" cy="240" r="3" fill="#1e293b"/>
+
+  <text x="230" y="270" font-size="11" class="svg-muted" text-anchor="middle">v is an eigenvector (stays on its line) — w is not (it rotates)</text>
+</svg>

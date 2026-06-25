@@ -1,3 +1,6 @@
+import outerProductUrl from '../diagrams/la-outer-product-grid.svg?url';
+import kroneckerBlockUrl from '../diagrams/la-kronecker-block-structure.svg?url';
+
 export default {
   id: 'la10-002',
   slug: 'tensor-products',
@@ -14,42 +17,29 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Where you are in the story: the dual space gave you a new perspective on row vectors — they are linear functionals, not just transposes of column vectors. Now push further: what if you want a function that takes two vectors and produces a scalar, and is linear in each argument separately? This is a **bilinear map**, and it appears everywhere: the inner product is bilinear, the determinant of a 2×2 matrix is bilinear in its rows, the stress tensor in mechanics maps two vectors (a surface normal and a force direction) to a scalar. Tensor products are the algebraic structure that tames bilinear maps.',
       'Start with the simplest example. Take $\\mathbf{u} = (2,1) \\in \\mathbb{R}^2$ and $\\mathbf{v} = (3,4) \\in \\mathbb{R}^2$. Their **outer product** is $\\mathbf{u}\\mathbf{v}^\\top = \\begin{pmatrix}6&8\\\\3&4\\end{pmatrix}$ — a $2 \\times 2$ matrix. This matrix is the tensor $\\mathbf{u} \\otimes \\mathbf{v}$: an "elementary tensor" or "rank-1 tensor." Given any bilinear function $B: \\mathbb{R}^2 \\times \\mathbb{R}^2 \\to \\mathbb{R}$, we can evaluate it as a linear function of the outer product matrix: $B(\\mathbf{u},\\mathbf{v}) = \\sum_{i,j} w_{ij} u_i v_j = \\text{tr}(W^\\top (\\mathbf{u}\\mathbf{v}^\\top))$ for some weight matrix $W$. The outer product is the "universal" way to store the information from a pair of vectors that a bilinear map needs.',
+      ] },
+      { type: 'image', src: outerProductUrl,
+        alt: 'A grid showing the outer product of u=(2,1) and v=(3,4): column u on the left, row v on top, and the resulting 2x2 matrix with entries 6, 8, 3, 4',
+        caption: 'Every entry of u ⊗ v is just one product uᵢvⱼ — the whole grid is the elementary tensor.' },
+      { type: 'prose', paragraphs: [
       'The tensor product space $V \\otimes W$ is the vector space spanned by all elementary tensors $\\mathbf{v} \\otimes \\mathbf{w}$ (for $\\mathbf{v} \\in V$, $\\mathbf{w} \\in W$), subject to the bilinearity rules: $(\\alpha \\mathbf{v}) \\otimes \\mathbf{w} = \\alpha(\\mathbf{v} \\otimes \\mathbf{w}) = \\mathbf{v} \\otimes (\\alpha \\mathbf{w})$ and $(\\mathbf{v}_1 + \\mathbf{v}_2) \\otimes \\mathbf{w} = \\mathbf{v}_1 \\otimes \\mathbf{w} + \\mathbf{v}_2 \\otimes \\mathbf{w}$. A basis for $V \\otimes W$ is $\\{\\mathbf{e}_i \\otimes \\mathbf{f}_j\\}$ where $\\{\\mathbf{e}_i\\}$ and $\\{\\mathbf{f}_j\\}$ are bases of $V$ and $W$. Counting: $\\dim(V \\otimes W) = (\\dim V)(\\dim W)$. For $\\mathbb{R}^2 \\otimes \\mathbb{R}^3$: dimension 6, exactly matching the 6 entries of a $2 \\times 3$ matrix.',
       'The key theorem: the tensor product has the **universal property** for bilinear maps. For any bilinear map $B: V \\times W \\to U$, there is a unique linear map $\\tilde{B}: V \\otimes W \\to U$ such that $B(\\mathbf{v}, \\mathbf{w}) = \\tilde{B}(\\mathbf{v} \\otimes \\mathbf{w})$. In pictures: $V \\times W \\xrightarrow{\\otimes} V \\otimes W \\xrightarrow{\\tilde{B}} U$. This is profound: any bilinear problem can be converted into a linear problem on a (higher-dimensional) space. Bilinearity is "compiled away" by the tensor product.',
       '**Predict before reading on:** Let $A = \\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}$ and $B = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$. The Kronecker product $A \\otimes B$ is the matrix representation of the tensor product. What is its size? What does the $(1,1)$ block look like? Is $A \\otimes B$ itself a rank-1 matrix (an elementary tensor)? Make all three predictions before continuing.',
       'The Kronecker product $A \\otimes B$ is a $4 \\times 4$ matrix (since $2 \\cdot 2 \\times 2 \\cdot 2$): it replaces each entry $a_{ij}$ of $A$ with the block $a_{ij}B$. So the $(1,1)$ block is $a_{11}B = 1 \\cdot B = B = \\begin{pmatrix}0&1\\\\1&0\\end{pmatrix}$. Is $A \\otimes B$ rank-1? No: $A \\otimes B$ has rank $= \\text{rank}(A) \\cdot \\text{rank}(B) = 2 \\cdot 1 = 2$ (using the Kronecker product rank identity). Only elementary tensors $\\mathbf{u} \\otimes \\mathbf{v}$ — i.e., outer products — are rank-1.',
+      ] },
+      { type: 'image', src: kroneckerBlockUrl,
+        alt: 'A 4x4 grid divided into four 2x2 blocks, each block a scaled copy of matrix B (1B, 2B, 3B, 4B), illustrating the Kronecker product of A and B',
+        caption: 'A⊗B replaces every entry of A with a scaled whole copy of B — the block (1,1) is literally 1·B, shown with its actual entries.' },
+      { type: 'prose', paragraphs: [
       'The most useful computational identity involving the Kronecker product is the **vectorization trick**: $\\text{vec}(AXB) = (B^\\top \\otimes A)\\,\\text{vec}(X)$, where $\\text{vec}(X)$ stacks the columns of $X$ into a single vector. This converts a matrix equation into a standard linear system. For example, the Sylvester equation $AX + XB = C$ (which appears in control theory, eigenvalue problems, and covariance propagation) becomes $(I \\otimes A + B^\\top \\otimes I)\\,\\text{vec}(X) = \\text{vec}(C)$ — a single linear system of size $mn \\times mn$ where $X \\in \\mathbb{R}^{m \\times n}$.',
       'In modern machine learning, tensors are everywhere. The weight tensor of a convolutional layer maps an input feature map tensor to an output feature map tensor; the attention matrix in a Transformer is a bilinear form evaluated on query and key tensors; a system of $n$ qubits in quantum computing lives in $\\mathbb{C}^2 \\otimes \\mathbb{C}^2 \\otimes \\cdots \\otimes \\mathbb{C}^2$ ($2^n$ dimensions). When you call `torch.einsum` or `np.tensordot`, you are performing tensor contractions — compositions of tensor products and traces — on structured multilinear objects.',
-      'Where this is heading: tensor products extend to higher order by taking more copies — $V \\otimes V \\otimes V^*$ is a (2,1)-tensor, which is exactly what a connection coefficient in differential geometry is. The next lesson introduces exterior algebra, which takes tensor products and imposes antisymmetry: $\mathbf{v} \\wedge \\mathbf{w} = -\\mathbf{w} \\wedge \\mathbf{v}$. This antisymmetry is what makes determinants, volumes, and differential forms work.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Use Tensor Products and the Kronecker Product (4 Steps)',
-        body: '1. **Identify the bilinear map.** Confirm your map $B: V \\times W \\to U$ is linear in each argument separately. Determine $\\dim V$ and $\\dim W$ — the resulting tensor space has dimension $(\\dim V)(\\dim W)$.\n2. **Build the basis.** Use $\\{\\mathbf{e}_i \\otimes \\mathbf{f}_j\\}$ as the canonical basis for $V \\otimes W$. Any element is a sum of elementary tensors $\\sum_{ij} c_{ij}\\, \\mathbf{e}_i \\otimes \\mathbf{f}_j$ — in matrix coordinates, the coefficient matrix $[c_{ij}]$.\n3. **Compute the Kronecker product.** $A \\otimes B$: replace each scalar entry $a_{ij}$ by the block $a_{ij}B$. Result size: $(m_A m_B) \\times (n_A n_B)$. Properties: $(A \\otimes B)(C \\otimes D) = AC \\otimes BD$; $(A \\otimes B)^{-1} = A^{-1} \\otimes B^{-1}$ (when invertible); eigenvalues are all products $\\lambda_i(A)\\lambda_j(B)$.\n4. **Apply the vec identity.** To solve $AXB = C$ or $AX + XB = C$: vectorize using $\\text{vec}(AXB) = (B^\\top \\otimes A)\\,\\text{vec}(X)$. The Sylvester equation $AX + XB = C$ becomes $(I \\otimes A + B^\\top \\otimes I)\\,\\text{vec}(X) = \\text{vec}(C)$ — a standard linear system of size $mn \\times mn$.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 2 of 5 — Advanced Theory',
-        body: '**Previous (Lesson 1):** Dual Spaces — linear functionals, dual basis, row vectors as covectors, transpose as dual map.\n**This lesson:** Tensor Products — bilinear maps, universal property, matrices as rank-1 tensors, Kronecker product, vectorization identity.\n**Next (Lesson 3):** Exterior Algebra — antisymmetric tensors, wedge product, determinants as volume forms, differential forms.',
-      },
-      {
-        type: 'theorem',
-        title: 'Universal Property of Tensor Products',
-        body: 'For any bilinear map $B: V \\times W \\to U$, there exists a unique linear map $\\tilde{B}: V \\otimes W \\to U$ such that $B(\\mathbf{v}, \\mathbf{w}) = \\tilde{B}(\\mathbf{v} \\otimes \\mathbf{w})$:\n\n$V \\times W \\xrightarrow{\\otimes} V \\otimes W \\xrightarrow{\\tilde{B}} U$\n\n$B = \\tilde{B} \\circ \\otimes$\n\nThis "linearizes" bilinear maps — any bilinear problem can be reduced to a linear one on a larger space.',
-      },
-      {
-        type: 'insight',
-        title: 'Vectorization and Kronecker Products',
-        body: 'The vectorization $\\text{vec}(X)$ stacks columns of $X$ into a vector.\n\nKey identity: $\\text{vec}(AXB) = (B^\\top \\otimes A)\\text{vec}(X)$\n\nApplication: the Sylvester equation $AX + XB = C$ becomes $(I \\otimes A + B^\\top \\otimes I)\\text{vec}(X) = \\text{vec}(C)$ — a linear system!\n\nThis trick converts matrix equations into vector equations solvable by standard linear solvers.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'PythonNotebook',
+      'Where this is heading: tensor products extend to higher order by taking more copies — $V \\otimes V \\otimes V^*$ is a (2,1)-tensor, which is exactly what a connection coefficient in differential geometry is. The next lesson introduces exterior algebra, which takes tensor products and imposes antisymmetry: $\\mathbf{v} \\wedge \\mathbf{w} = -\\mathbf{w} \\wedge \\mathbf{v}$. This antisymmetry is what makes determinants, volumes, and differential forms work.',
+      ] },
+      { type: 'viz', id: 'PythonNotebook',
         title: 'Tensor Products in Python',
         mathBridge: 'Build Kronecker products, verify the vec identity, and solve a Sylvester equation via vectorization.',
         caption: 'vec(AXB) = (B^T ⊗ A) vec(X) converts any matrix equation into a standard linear system.',
@@ -147,8 +137,7 @@ print(C_s)
           ],
         },
       },
-      {
-        id: 'OpenMatNotebook',
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Kronecker Products',
         mathBridge: 'Compute Kronecker products and use the vec identity.',
         caption: 'Kronecker product encodes tensor products of matrices.',
@@ -223,6 +212,28 @@ residual
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Use Tensor Products and the Kronecker Product (4 Steps)',
+        body: '1. **Identify the bilinear map.** Confirm your map $B: V \\times W \\to U$ is linear in each argument separately. Determine $\\dim V$ and $\\dim W$ — the resulting tensor space has dimension $(\\dim V)(\\dim W)$.\n2. **Build the basis.** Use $\\{\\mathbf{e}_i \\otimes \\mathbf{f}_j\\}$ as the canonical basis for $V \\otimes W$. Any element is a sum of elementary tensors $\\sum_{ij} c_{ij}\\, \\mathbf{e}_i \\otimes \\mathbf{f}_j$ — in matrix coordinates, the coefficient matrix $[c_{ij}]$.\n3. **Compute the Kronecker product.** $A \\otimes B$: replace each scalar entry $a_{ij}$ by the block $a_{ij}B$. Result size: $(m_A m_B) \\times (n_A n_B)$. Properties: $(A \\otimes B)(C \\otimes D) = AC \\otimes BD$; $(A \\otimes B)^{-1} = A^{-1} \\otimes B^{-1}$ (when invertible); eigenvalues are all products $\\lambda_i(A)\\lambda_j(B)$.\n4. **Apply the vec identity.** To solve $AXB = C$ or $AX + XB = C$: vectorize using $\\text{vec}(AXB) = (B^\\top \\otimes A)\\,\\text{vec}(X)$. The Sylvester equation $AX + XB = C$ becomes $(I \\otimes A + B^\\top \\otimes I)\\,\\text{vec}(X) = \\text{vec}(C)$ — a standard linear system of size $mn \\times mn$.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 2 of 5 — Advanced Theory',
+        body: '**Previous (Lesson 1):** Dual Spaces — linear functionals, dual basis, row vectors as covectors, transpose as dual map.\n**This lesson:** Tensor Products — bilinear maps, universal property, matrices as rank-1 tensors, Kronecker product, vectorization identity.\n**Next (Lesson 3):** Exterior Algebra — antisymmetric tensors, wedge product, determinants as volume forms, differential forms.',
+      },
+      {
+        type: 'theorem',
+        title: 'Universal Property of Tensor Products',
+        body: 'For any bilinear map $B: V \\times W \\to U$, there exists a unique linear map $\\tilde{B}: V \\otimes W \\to U$ such that $B(\\mathbf{v}, \\mathbf{w}) = \\tilde{B}(\\mathbf{v} \\otimes \\mathbf{w})$:\n\n$V \\times W \\xrightarrow{\\otimes} V \\otimes W \\xrightarrow{\\tilde{B}} U$\n\n$B = \\tilde{B} \\circ \\otimes$\n\nThis "linearizes" bilinear maps — any bilinear problem can be reduced to a linear one on a larger space.',
+      },
+      {
+        type: 'insight',
+        title: 'Vectorization and Kronecker Products',
+        body: 'The vectorization $\\text{vec}(X)$ stacks columns of $X$ into a vector.\n\nKey identity: $\\text{vec}(AXB) = (B^\\top \\otimes A)\\text{vec}(X)$\n\nApplication: the Sylvester equation $AX + XB = C$ becomes $(I \\otimes A + B^\\top \\otimes I)\\text{vec}(X) = \\text{vec}(C)$ — a linear system!\n\nThis trick converts matrix equations into vector equations solvable by standard linear solvers.',
       },
     ],
   },

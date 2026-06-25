@@ -1,3 +1,5 @@
+import complexEigenvaluePlaneUrl from '../diagrams/la-complex-eigenvalue-plane.svg?url'
+
 export default {
   // ── Identity ───────────────────────────────────────────────────
   id: 'la3-003',
@@ -18,17 +20,29 @@ export default {
 
   // ── Intuition ──────────────────────────────────────────────────
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Take the rotation matrix $A = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$ (90° counterclockwise). The characteristic equation: $\\det(A - \\lambda I) = \\lambda^2 + 1 = 0$, so $\\lambda = \\pm i$. No real solutions. Yet the algebra forced a clean answer: eigenvalue $i = 0+1\\cdot i$ has magnitude $|i| = 1$ (no scaling), angle $\\arg(i) = 90°$ (rotation by 90°). After $k$ applications of $A$: eigenvalue $i^k$ spirals around the unit circle. After 4 steps: $i^4 = 1$ — back to the start. The imaginary number $i$ is encoding the rotation you can see geometrically.',
       '**Where you are in the story:** You know how to find eigenvalues from the characteristic equation $\\det(A - \\lambda I) = 0$, and you know how to diagonalize a matrix when it has enough real eigenvectors. But what about a matrix that only rotates — like a 90° rotation? Geometrically, it pushes every single vector off its original line. There are no real eigenvectors at all.',
       'Yet the characteristic equation is a polynomial — and by the Fundamental Theorem of Algebra, every polynomial with real coefficients has roots. They might just be complex numbers. This is not a failure of linear algebra; it is algebra doing exactly what it is supposed to do.',
       'Here is the key: when a matrix has complex eigenvalues, those eigenvalues come in **conjugate pairs** $a + bi$ and $a - bi$ (for real matrices). The real part $a$ controls stretching/shrinking, and the imaginary part $b$ controls rotation.',
       'Think of the complex eigenvalue $\\lambda = a + bi$ in polar form: its **magnitude** is $r = \\sqrt{a^2 + b^2}$ (the stretch factor) and its **angle** is $\\theta = \\arctan(b/a)$ (the rotation angle). Multiplying repeatedly by $\\lambda$ spirals outward if $r > 1$, spirals inward if $r < 1$, and circles if $r = 1$.',
       'For the 90° rotation matrix, $\\lambda = i = 0 + 1\\cdot i$. The real part is 0 (no stretching), the imaginary part is 1. Magnitude = $\\sqrt{0^2+1^2} = 1$ (no scaling), angle = 90° (pure rotation). Exactly what a rotation matrix should do.',
+      ] },
+      { type: 'image', src: complexEigenvaluePlaneUrl,
+        alt: 'A complex plane with a unit circle drawn dashed, and the eigenvalue lambda equals a plus b i plotted as a point with a vector from the origin, its angle theta and radius r labeled',
+        caption: 'r = |λ| is the stretch per application, θ is the rotation per application — together they decide spiral in, circle, or spiral out.' },
+      { type: 'prose', paragraphs: [
       '**Predict before reading on.** Matrix $A = \\begin{bmatrix}0.8&-0.6\\\\0.6&0.8\\end{bmatrix}$. Without computing: do you expect real or complex eigenvalues? Will repeated application spiral inward, outward, or circle? Write your prediction, then compute $\\det(A - \\lambda I)$.',
       '**Why this matters practically.** If you are analyzing a dynamical system — anything that evolves over time — the eigenvalues of its matrix tell you everything about long-term behavior: do things grow, shrink, or oscillate? Complex eigenvalues with $|\\lambda| > 1$ mean spiral growth. $|\\lambda| < 1$ means spiral decay toward equilibrium. $|\\lambda| = 1$ means perfect sustained oscillation. The eigenvalues are the system\'s fate, written in complex numbers.',
       '**CNC spindle control — when complex eigenvalues cause chatter.** A CNC spindle speed controller has a transfer function with a characteristic equation — and its roots are eigenvalues. When all roots are real and negative (continuous-time) or inside the unit circle (discrete-time), the spindle holds stable speed. When a root crosses into the right half-plane (or outside the unit circle), the controller becomes unstable and the spindle oscillates — this is **chatter**, the ringing vibration that ruins surface finish and tool life. Complex eigenvalues near the stability boundary ($|\\lambda| \\approx 1$) produce lightly-damped oscillations: the spindle "rings" but eventually settles. The frequency of the chatter ring is exactly $\\omega = \\arctan(b/a)$ radians per sample — the imaginary part of the eigenvalue.',
       '**Where this is heading:** Phase 4 moves to non-square matrices and the most powerful factorization in linear algebra: the Singular Value Decomposition (SVD), which generalizes everything you have learned about eigenvalues.',
+      ] },
+      { type: 'viz', id: 'LALesson10_ComplexEigen',
+        title: 'Complex Eigenvalues and Spiral Behavior',
+        mathBridge: 'Drag the slider from "Shear" to "Rotation." Watch the real eigenvectors vanish from the 2D plane — no arrow stays on its line after a rotation. Now enter a matrix with complex eigenvalues $a + bi$. Apply the matrix repeatedly to a starting vector. When $|\\lambda| > 1$, the vector spirals outward. When $|\\lambda| < 1$, it spirals in. When $|\\lambda| = 1$, it traces a circle. The magnitude $r = \\sqrt{a^2+b^2}$ determines the spiral direction.',
+        caption: 'Complex eigenvalues encode the spiral rate and rotation angle of a transformation.',
+      },
     ],
     callouts: [
       {
@@ -55,14 +69,6 @@ export default {
         type: 'warning',
         title: 'No Real Eigenvectors for Pure Rotations',
         body: 'A matrix that purely rotates space (no fixed directions) has no real eigenvectors. This is not a problem — it just means diagonalization over $\\mathbb{R}$ fails. Over $\\mathbb{C}$ (complex numbers), the matrix is still diagonalizable.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'LALesson10_ComplexEigen',
-        title: 'Complex Eigenvalues and Spiral Behavior',
-        mathBridge: 'Drag the slider from "Shear" to "Rotation." Watch the real eigenvectors vanish from the 2D plane — no arrow stays on its line after a rotation. Now enter a matrix with complex eigenvalues $a + bi$. Apply the matrix repeatedly to a starting vector. When $|\\lambda| > 1$, the vector spirals outward. When $|\\lambda| < 1$, it spirals in. When $|\\lambda| = 1$, it traces a circle. The magnitude $r = \\sqrt{a^2+b^2}$ determines the spiral direction.',
-        caption: 'Complex eigenvalues encode the spiral rate and rotation angle of a transformation.',
       },
     ],
   },

@@ -1,0 +1,38 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="220" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="nc-gray" markerWidth="7" markerHeight="7" refX="3.5" refY="3.5" orient="auto"><path d="M1,1 L1,6 L6,3.5 z" fill="#94a3b8"/></marker>
+    <marker id="nc-blue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#2563eb"/></marker>
+    <marker id="nc-amber" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#d97706"/></marker>
+  </defs>
+
+  <text x="240" y="18" font-size="12" class="svg-text" text-anchor="middle" font-weight="700">Same starting vector, same two matrices — different order, different answer</text>
+
+  <!-- Panel 1: SR — rotate then shear -->
+  <rect x="12" y="26" width="216" height="178" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="44" font-size="11" fill="#2563eb" text-anchor="middle" font-weight="700">SR: rotate then shear</text>
+  <line x1="60" y1="170" x2="140" y2="170" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="4,3" marker-end="url(#nc-gray)"/>
+  <text x="100" y="186" font-size="10" class="svg-muted" text-anchor="middle">start [1,0]</text>
+  <line x1="60" y1="170" x2="135" y2="95" stroke="#2563eb" stroke-width="3" marker-end="url(#nc-blue)"/>
+  <text x="140" y="92" font-size="11" fill="#2563eb" font-weight="700">ends at [1,1]</text>
+
+  <!-- Panel 2: RS — shear then rotate -->
+  <rect x="252" y="26" width="216" height="178" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="360" y="44" font-size="11" fill="#d97706" text-anchor="middle" font-weight="700">RS: shear then rotate</text>
+  <line x1="300" y1="170" x2="380" y2="170" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="4,3" marker-end="url(#nc-gray)"/>
+  <text x="340" y="186" font-size="10" class="svg-muted" text-anchor="middle">start [1,0]</text>
+  <line x1="300" y1="170" x2="300" y2="90" stroke="#d97706" stroke-width="3" marker-end="url(#nc-amber)"/>
+  <text x="306" y="86" font-size="11" fill="#d97706" font-weight="700">ends at [0,1]</text>
+</svg>

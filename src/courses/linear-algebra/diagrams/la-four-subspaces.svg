@@ -1,0 +1,48 @@
+<svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <style>
+    .svg-bg    { fill: #f8fafc; }
+    .svg-panel { fill: #ffffff; }
+    .svg-text  { fill: #1e293b; }
+    .svg-muted { fill: #64748b; }
+    .svg-div   { stroke: #e2e8f0; fill: none; }
+    .dark .svg-bg    { fill: #0f172a; }
+    .dark .svg-panel { fill: #1e293b; }
+    .dark .svg-text  { fill: #e2e8f0; }
+    .dark .svg-muted { fill: #94a3b8; }
+    .dark .svg-div   { stroke: #334155; }
+  </style>
+  <rect width="480" height="260" rx="10" class="svg-bg"/>
+  <defs>
+    <marker id="fs-arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L1,7 L7,4 z" fill="#1e293b"/></marker>
+  </defs>
+
+  <!-- Domain box -->
+  <rect x="12" y="24" width="216" height="212" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="120" y="42" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">Domain ℝⁿ</text>
+  <circle cx="78" cy="100" r="48" fill="rgba(37,99,235,0.14)" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="78" y="96" font-size="10.5" fill="#2563eb" text-anchor="middle" font-weight="700">Row space</text>
+  <text x="78" y="110" font-size="9.5" fill="#2563eb" text-anchor="middle">C(Aᵗ), dim r</text>
+  <circle cx="165" cy="178" r="32" fill="rgba(217,119,6,0.16)" stroke="#d97706" stroke-width="1.5"/>
+  <text x="165" y="176" font-size="9.5" fill="#d97706" text-anchor="middle" font-weight="700">Null space</text>
+  <text x="165" y="189" font-size="9" fill="#d97706" text-anchor="middle">N(A), dim n−r</text>
+  <text x="124" y="150" font-size="11" class="svg-muted">⊥</text>
+
+  <!-- Codomain box -->
+  <rect x="252" y="24" width="216" height="212" rx="8" class="svg-panel svg-div" stroke-width="1"/>
+  <text x="360" y="42" font-size="11.5" class="svg-text" text-anchor="middle" font-weight="700">Codomain ℝᵐ</text>
+  <circle cx="318" cy="100" r="48" fill="rgba(37,99,235,0.14)" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="318" y="96" font-size="10.5" fill="#2563eb" text-anchor="middle" font-weight="700">Column space</text>
+  <text x="318" y="110" font-size="9.5" fill="#2563eb" text-anchor="middle">C(A), dim r</text>
+  <circle cx="405" cy="178" r="32" fill="rgba(100,116,139,0.16)" stroke="#64748b" stroke-width="1.5"/>
+  <text x="405" y="176" font-size="9.5" fill="#64748b" text-anchor="middle" font-weight="700">Left null space</text>
+  <text x="405" y="189" font-size="9" fill="#64748b" text-anchor="middle">N(Aᵗ), dim m−r</text>
+  <text x="364" y="150" font-size="11" class="svg-muted">⊥</text>
+
+  <!-- Arrows between domain and codomain -->
+  <line x1="126" y1="92" x2="270" y2="92" stroke="#2563eb" stroke-width="2.5" marker-end="url(#fs-arrow)"/>
+  <text x="198" y="84" font-size="9.5" fill="#2563eb" text-anchor="middle">A — bijective on this part</text>
+
+  <line x1="165" y1="210" x2="318" y2="210" stroke="#d97706" stroke-width="2" marker-end="url(#fs-arrow)" stroke-dasharray="4,3"/>
+  <circle cx="318" cy="210" r="3" fill="#1e293b"/>
+  <text x="244" y="222" font-size="9.5" fill="#d97706" text-anchor="middle">A sends the whole null space to 0</text>
+</svg>

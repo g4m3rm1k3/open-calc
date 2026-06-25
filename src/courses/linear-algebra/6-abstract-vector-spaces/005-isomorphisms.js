@@ -1,3 +1,5 @@
+import isomorphismBijectionUrl from '../diagrams/la-isomorphism-bijection.svg?url'
+
 export default {
   id: 'la6-005',
   slug: 'isomorphisms',
@@ -14,50 +16,22 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      { type: 'prose', paragraphs: [
       'Consider the polynomial $p = 3 + 5x \\in P_1$ and the vector $(3, 5) \\in \\mathbb{R}^2$. Define $T: P_1 \\to \\mathbb{R}^2$ by $T(a + bx) = (a, b)$. Is this a bijective linear map? Linearity: $T((a+bx)+(c+dx)) = T((a+c)+(b+d)x) = (a+c, b+d) = (a,b)+(c,d) = T(a+bx)+T(c+dx)$ ✓. Injective: $T(a+bx) = (0,0)$ forces $a=0, b=0$, so only the zero polynomial maps to zero ✓. Surjective: any $(a,b) \\in \\mathbb{R}^2$ is hit by $a+bx$ ✓. Inverse: $T^{-1}(a,b) = a+bx$. So $P_1 \\cong \\mathbb{R}^2$ — same structure, different notation.',
+      ] },
+      { type: 'image', src: isomorphismBijectionUrl,
+        alt: 'Left box P1 containing the polynomial 3 plus 5x, right box R2 containing the vector (3,5) drawn as an arrow, with a bidirectional arrow labeled T and T inverse connecting the two boxes',
+        caption: "Same structure, different labels — T and T⁻¹ translate freely between them because dim P₁ = dim ℝ² = 2." },
+      { type: 'prose', paragraphs: [
       '**The grand theorem.** For finite-dimensional vector spaces over the same field: $V \\cong W$ if and only if $\\dim V = \\dim W$. Dimension is the ONLY invariant — if two spaces have the same dimension, they are isomorphic. Every $n$-dimensional vector space over $\\mathbb{R}$ is isomorphic to $\\mathbb{R}^n$.',
       '**How to construct an isomorphism.** Given $V$ with basis $(\\mathbf{b}_1, \\ldots, \\mathbf{b}_n)$: define $T: V \\to \\mathbb{R}^n$ by $T(c_1\\mathbf{b}_1 + \\cdots + c_n\\mathbf{b}_n) = (c_1, \\ldots, c_n)^\\top$. This "coordinate map" is always an isomorphism. It is well-defined (because the basis representation is unique), linear (by direct verification), injective (only $\\mathbf{0}$ maps to $\\mathbf{0}$), and surjective (every coordinate vector is achieved).',
       '**Natural vs basis-dependent.** The coordinate isomorphism $V \\cong \\mathbb{R}^n$ requires a choice of basis. Change the basis, change the isomorphism. A **natural isomorphism** would work the same way regardless of basis. For example, $V \\cong V^{**}$ (double dual) is natural — no basis needed.',
       '**Isomorphism is an equivalence relation.** Every space is isomorphic to itself (identity map is an isomorphism). If $V \\cong W$ then $W \\cong V$ (the inverse of an isomorphism is an isomorphism). If $V \\cong W$ and $W \\cong X$ then $V \\cong X$ (composition of isomorphisms is an isomorphism). So "is isomorphic to" partitions the class of all vector spaces over $\\mathbb{F}$ into equivalence classes — and the classification theorem says exactly one invariant (dimension) determines which class a finite-dimensional space belongs to.',
       '**What isomorphisms let you do.** If you have a hard problem in an abstract space $V$, find an isomorphism $T: V \\to \\mathbb{R}^n$, translate the problem to $\\mathbb{R}^n$ using $T$, solve it there using matrices and Gaussian elimination, then translate the answer back using $T^{-1}$. This is the entire strategy of coordinate-based linear algebra: turn abstract problems into concrete matrix problems by choosing a basis, and understand that any two choices of basis give equivalent problems (just with different matrices representing the same map). The solution you compute is independent of which basis you used — only its coordinates change.',
       '**Where this is heading.** The last lesson in this chapter is change of basis — the practical mechanics of converting between coordinate systems. Once you can fluently change bases, you can always find the basis that makes a computation easiest: the eigenvector basis for a diagonalizable map, the SVD basis for any matrix, or the Gram-Schmidt basis for projection problems. Every important algorithm in numerical linear algebra is, at its core, a change of basis.',
-    ],
-    callouts: [
-      {
-        type: 'procedure',
-        title: 'How to Verify a Map Is an Isomorphism (5 Steps)',
-        body: '**Given:** A proposed map $T: V \\to W$.\n**Step 1.** Verify linearity: check $T(c\\mathbf{u}+d\\mathbf{v}) = cT(\\mathbf{u}) + dT(\\mathbf{v})$ for arbitrary vectors and scalars.\n**Step 2.** Find $\\ker(T)$: solve $T(\\mathbf{v}) = \\mathbf{0}$. If the only solution is $\\mathbf{v} = \\mathbf{0}$, then $T$ is injective.\n**Step 3.** Compare dimensions: if $\\dim V = \\dim W$, then injectivity alone implies surjectivity (by rank-nullity) → $T$ is an isomorphism.\n**Step 4.** If dimensions are equal and the matrix of $T$ is available, check $\\det([T]) \\neq 0$ — equivalent to bijectivity.\n**Step 5.** Write $T^{-1}$ explicitly and verify $T^{-1}(T(\\mathbf{v})) = \\mathbf{v}$ for a test vector.',
-      },
-      {
-        type: 'sequencing',
-        title: 'Lesson 5 of 6 — Abstract Vector Spaces',
-        body: '**Previous:** Matrix Representations — encoding linear maps as matrices in a chosen basis.\n**This lesson:** Isomorphisms — bijective linear maps that identify two vector spaces as structurally identical, with dimension as the complete invariant.\n**Next:** Coordinates and Change of Basis — the mechanics of converting between different coordinate systems.',
-      },
-      {
-        type: 'theorem',
-        title: 'Classification of Finite-Dimensional Spaces',
-        body: 'Over the same field $\\mathbb{F}$:\n$V \\cong W \\Leftrightarrow \\dim V = \\dim W$\n\nConsequently: Every $n$-dimensional space over $\\mathbb{R}$ is isomorphic to $\\mathbb{R}^n$. Dimension is the COMPLETE invariant of finite-dimensional vector spaces.',
-      },
-      {
-        type: 'insight',
-        title: 'Isomorphisms Preserve All Linear Algebra',
-        body: 'If $T: V \\to W$ is an isomorphism:\n• Linearly independent sets in $V$ map to linearly independent sets in $W$\n• Bases in $V$ map to bases in $W$\n• $\\dim V = \\dim W$\n• Subspaces correspond bijectively\n• Dimension of subspaces is preserved\n\nAn isomorphism is a "dictionary" that translates all linear algebra between the two spaces.',
-      },
-      {
-        type: 'insight',
-        title: 'Inverse of an Isomorphism',
-        body: 'If $T: V \\to W$ is an isomorphism, then $T^{-1}: W \\to V$ is also a linear map (and an isomorphism). This is not obvious! Proof: for $T^{-1}(\\mathbf{u}+\\mathbf{v})$, write $\\mathbf{u} = T(\\mathbf{a})$, $\\mathbf{v} = T(\\mathbf{b})$. Then $T^{-1}(\\mathbf{u}+\\mathbf{v}) = T^{-1}(T(\\mathbf{a}+\\mathbf{b})) = \\mathbf{a}+\\mathbf{b} = T^{-1}(\\mathbf{u}) + T^{-1}(\\mathbf{v})$.',
-      },
-      {
-        type: 'insight',
-        title: 'Prediction',
-        body: 'Before reading the math section: $P_2$ has dimension 3 and $\\mathbb{R}^3$ has dimension 3. Can you write down an explicit bijective linear map $T: P_2 \\to \\mathbb{R}^3$ right now? What would $T(1 + 2x - x^2)$ equal under your map? Write down your candidate map and check it satisfies linearity before reading on.',
-      },
-    ],
-    visualizations: [
-      {
-        id: 'OpenMatNotebook',
+      ] },
+      { type: 'viz', id: 'OpenMatNotebook',
         title: 'Coordinate Isomorphism in Action',
         mathBridge: 'Use the coordinate map to translate between abstract and concrete linear algebra.',
         caption: 'The coordinate isomorphism converts abstract problems into matrix problems.',
@@ -119,6 +93,38 @@ end
             },
           ],
         },
+      },
+    ],
+    callouts: [
+      {
+        type: 'procedure',
+        title: 'How to Verify a Map Is an Isomorphism (5 Steps)',
+        body: '**Given:** A proposed map $T: V \\to W$.\n**Step 1.** Verify linearity: check $T(c\\mathbf{u}+d\\mathbf{v}) = cT(\\mathbf{u}) + dT(\\mathbf{v})$ for arbitrary vectors and scalars.\n**Step 2.** Find $\\ker(T)$: solve $T(\\mathbf{v}) = \\mathbf{0}$. If the only solution is $\\mathbf{v} = \\mathbf{0}$, then $T$ is injective.\n**Step 3.** Compare dimensions: if $\\dim V = \\dim W$, then injectivity alone implies surjectivity (by rank-nullity) → $T$ is an isomorphism.\n**Step 4.** If dimensions are equal and the matrix of $T$ is available, check $\\det([T]) \\neq 0$ — equivalent to bijectivity.\n**Step 5.** Write $T^{-1}$ explicitly and verify $T^{-1}(T(\\mathbf{v})) = \\mathbf{v}$ for a test vector.',
+      },
+      {
+        type: 'sequencing',
+        title: 'Lesson 5 of 6 — Abstract Vector Spaces',
+        body: '**Previous:** Matrix Representations — encoding linear maps as matrices in a chosen basis.\n**This lesson:** Isomorphisms — bijective linear maps that identify two vector spaces as structurally identical, with dimension as the complete invariant.\n**Next:** Coordinates and Change of Basis — the mechanics of converting between different coordinate systems.',
+      },
+      {
+        type: 'theorem',
+        title: 'Classification of Finite-Dimensional Spaces',
+        body: 'Over the same field $\\mathbb{F}$:\n$V \\cong W \\Leftrightarrow \\dim V = \\dim W$\n\nConsequently: Every $n$-dimensional space over $\\mathbb{R}$ is isomorphic to $\\mathbb{R}^n$. Dimension is the COMPLETE invariant of finite-dimensional vector spaces.',
+      },
+      {
+        type: 'insight',
+        title: 'Isomorphisms Preserve All Linear Algebra',
+        body: 'If $T: V \\to W$ is an isomorphism:\n• Linearly independent sets in $V$ map to linearly independent sets in $W$\n• Bases in $V$ map to bases in $W$\n• $\\dim V = \\dim W$\n• Subspaces correspond bijectively\n• Dimension of subspaces is preserved\n\nAn isomorphism is a "dictionary" that translates all linear algebra between the two spaces.',
+      },
+      {
+        type: 'insight',
+        title: 'Inverse of an Isomorphism',
+        body: 'If $T: V \\to W$ is an isomorphism, then $T^{-1}: W \\to V$ is also a linear map (and an isomorphism). This is not obvious! Proof: for $T^{-1}(\\mathbf{u}+\\mathbf{v})$, write $\\mathbf{u} = T(\\mathbf{a})$, $\\mathbf{v} = T(\\mathbf{b})$. Then $T^{-1}(\\mathbf{u}+\\mathbf{v}) = T^{-1}(T(\\mathbf{a}+\\mathbf{b})) = \\mathbf{a}+\\mathbf{b} = T^{-1}(\\mathbf{u}) + T^{-1}(\\mathbf{v})$.',
+      },
+      {
+        type: 'insight',
+        title: 'Prediction',
+        body: 'Before reading the math section: $P_2$ has dimension 3 and $\\mathbb{R}^3$ has dimension 3. Can you write down an explicit bijective linear map $T: P_2 \\to \\mathbb{R}^3$ right now? What would $T(1 + 2x - x^2)$ equal under your map? Write down your candidate map and check it satisfies linearity before reading on.',
       },
     ],
   },
