@@ -363,7 +363,7 @@ print("Same map, different basis — det and tr preserved:",
         {
           label: 'Verify: $D^2(3+2x+x^2) = 2$',
           strategy: 'Apply $[D^2]$ to the coordinate vector of $3+2x+x^2$ and interpret.',
-          explanation: '$[D^2]_\\mathcal{B}[3,2,1]^\\top = [2,0,0]^\\top \\to 2 \\cdot 1 = 2$ ✓. And directly: $(3+2x+x^2)'' = 2$ ✓.',
+          explanation: '$[D^2]_\\mathcal{B}[3,2,1]^\\top = [2,0,0]^\\top \\to 2 \\cdot 1 = 2$ ✓. And directly: $(3+2x+x^2)\'\' = 2$ ✓.',
           math: '[D^2][3,2,1]^\\top = [2,0,0]^\\top \\leftrightarrow 2 \\checkmark',
           gotcha: '$[D^3]_\\mathcal{B} = ([D]_\\mathcal{B})^3 = 0$ (zero matrix) — differentiating a degree-2 polynomial three times gives 0. Algebraically: $[D]_\\mathcal{B}$ is nilpotent.',
         },

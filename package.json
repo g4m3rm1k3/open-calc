@@ -7,7 +7,7 @@
   "main": "desktop/app/main.mjs",
   "scripts": {
     "dev": "node scripts/generate-graph.mjs && node src/scripts/build-search-index.js && node scripts/build-lesson-ids.mjs && vite",
-    "build": "node scripts/generate-graph.mjs && node src/scripts/build-search-index.js && node scripts/build-lesson-ids.mjs && vite build",
+    "build": "node scripts/generate-graph.mjs && node src/scripts/build-search-index.js && node scripts/build-lesson-ids.mjs && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "preview": "vite preview",
     "index": "node src/scripts/build-search-index.js",
     "lesson-ids": "node scripts/build-lesson-ids.mjs",

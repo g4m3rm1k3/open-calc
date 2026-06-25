@@ -283,7 +283,7 @@ for A_test, b_test, label in [
       { symbol: '\\mathtt{scipy.linalg.lu\\_factor}(A)', meaning: 'Computes PA=LU factorization once ($O(n^3)$). Returns (lu, piv) packed representation. Pair with lu_solve for reuse.' },
       { symbol: '\\mathtt{scipy.linalg.lu\\_solve}((lu, piv), b)', meaning: 'Solves Ax=b using precomputed LU factorization. Cost: $O(n^2)$. Two triangular solves (forward + backward substitution).' },
       { symbol: '\\mathtt{scipy.linalg.cho\\_factor}(A)', meaning: 'Cholesky factorization A=LLᵀ for SPD A. ~2× faster than LU. Raises LinAlgError if A is not positive definite.' },
-      { symbol: '\\mathtt{scipy.linalg.qr}(A, \\mathtt{mode=\\'economic\\'})', meaning: 'Thin QR factorization. Q is m×n, R is n×n upper triangular. Use for least squares (solve Rx = Qᵀb) and avoids squaring the condition number.' },
+      { symbol: '\\mathtt{scipy.linalg.qr}(A, \\mathtt{mode=\'economic\'})', meaning: 'Thin QR factorization. Q is m×n, R is n×n upper triangular. Use for least squares (solve Rx = Qᵀb) and avoids squaring the condition number.' },
     ],
     rulesOfThumb: [
       'Same A, multiple b? Factor once with lu_factor/cho_factor.',
