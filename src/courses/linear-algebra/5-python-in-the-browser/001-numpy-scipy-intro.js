@@ -212,6 +212,70 @@ norm(A - U*S*V')`,
     visualizations: [],
   },
 
+  walkthroughs: [
+    {
+      id: 'wt-la5-001-array-mechanics',
+      title: 'From Python List to NumPy Array: What Changes and Why',
+      prereqs: ['Python lists', 'Matrix multiplication'],
+      problem: 'Trace through what happens when you write `A @ v` for a NumPy matrix and vector, and explain why `A * v` gives a different result.',
+      steps: [
+        {
+          label: 'Create the array and inspect its shape',
+          strategy: 'Before doing any operation, check the shape. NumPy shape is always `(rows, cols)` for 2D arrays. Shape mismatches are the most common NumPy error.',
+          explanation: '`np.array([[1,2],[3,4]])` creates a 2D array with shape `(2,2)`. `np.array([5,6])` creates a 1D array with shape `(2,)` — not `(2,1)`. This distinction matters: `A @ v` works but `A @ v.reshape(2,1)` gives shape `(2,1)` not `(2,)`. NumPy 1D arrays are neither row nor column vectors until you say so.',
+          math: 'A.\\text{shape} = (2,2),\\quad v.\\text{shape} = (2,)',
+          gotcha: 'A 1D array `[5,6]` has shape `(2,)`, NOT `(1,2)` or `(2,1)`. NumPy treats it as a flat vector and silently broadcasts it to whichever shape the operation needs. This is convenient but hides bugs when you expect a specific orientation.',
+        },
+        {
+          label: 'The `@` operator: matrix multiplication (dot product)',
+          strategy: '`A @ v` dispatches to BLAS `dgemv` — a highly optimised matrix-vector multiply. It follows the rule: (m×n) @ (n,) → (m,).',
+          explanation: '`A @ v` computes $A\\mathbf{v}$ exactly as defined in linear algebra: row 0 of $A$ dotted with $v$ gives output[0], row 1 dotted with $v$ gives output[1]. For `A=[[1,2],[3,4]]` and `v=[5,6]`: output[0] = 1×5+2×6 = 17, output[1] = 3×5+4×6 = 39.',
+          math: 'A @ v = \\begin{bmatrix}1\\cdot5+2\\cdot6\\\\3\\cdot5+4\\cdot6\\end{bmatrix} = \\begin{bmatrix}17\\\\39\\end{bmatrix}',
+        },
+        {
+          label: 'The `*` operator: element-wise multiplication',
+          strategy: '`A * v` is NOT matrix multiplication. It broadcasts `v` across each ROW of `A` and multiplies element-by-element.',
+          explanation: 'NumPy broadcasts `v=[5,6]` (shape `(2,)`) to match `A` shape `(2,2)` by treating it as `[[5,6],[5,6]]`. Then multiplies entry-by-entry: `[[1×5,2×6],[3×5,4×6]] = [[5,12],[15,24]]`. This is the Hadamard (entry-wise) product, not the matrix product.',
+          math: 'A * v = \\begin{bmatrix}1\\cdot5&2\\cdot6\\\\3\\cdot5&4\\cdot6\\end{bmatrix} = \\begin{bmatrix}5&12\\\\15&24\\end{bmatrix}',
+          gotcha: 'In MATLAB, `A * B` is matrix multiplication and `A .* B` is element-wise. NumPy reverses this: `*` is element-wise, `@` is matrix. Every MATLAB-to-Python port has this bug at least once.',
+        },
+        {
+          label: 'Connect to theory: `A @ A.T` computes $AA^\\top$',
+          strategy: '`A.T` is the transpose — no data is copied, just the strides change. So `A @ A.T` computes $AA^\\top$ and is always symmetric positive semidefinite.',
+          explanation: '`A.T` returns a view (not a copy) of `A` with axes swapped. `A @ A.T` then gives the Gram matrix $AA^\\top$. For our example: eigenvalues of $AA^\\top$ are the squares of the singular values of $A$ — this is how NumPy\'s `svd` and `eigh` connect internally.',
+          math: 'A @ A.T = AA^\\top = \\begin{bmatrix}5&11\\\\11&25\\end{bmatrix}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la5-001-solve-not-inv',
+      title: 'Why `solve(A, b)` Beats `inv(A) @ b`',
+      prereqs: ['LU factorization', 'Condition number', 'Triangular solves'],
+      problem: 'Show that `np.linalg.solve(A, b)` and `np.linalg.inv(A) @ b` give the same mathematical answer, then explain why `solve` is always preferred in practice.',
+      steps: [
+        {
+          label: 'What `inv(A) @ b` actually does (two passes)',
+          strategy: 'Computing `inv(A)` requires forming an $n\\times n$ matrix of results. Then `@ b` multiplies each row by `b`. This is two $O(n^3)$ operations.',
+          explanation: '`np.linalg.inv(A)` computes $A^{-1}$ by LU-factoring $A$ and then solving $n$ systems with $n$ different right-hand sides (one per column of $I$). That\'s $O(n^3)$ to factor plus $n \\times O(n^2)$ = $O(n^3)$ to back-solve. Then `@ b` is another $O(n^2)$. Total: $2\\times O(n^3)$.',
+          math: '\\text{inv(A) @ b}: 2 \\times O(n^3)',
+        },
+        {
+          label: 'What `solve(A, b)` actually does (one pass)',
+          strategy: '`solve` LU-factors $A$ once ($O(n^3)$), then solves two triangular systems for $b$ ($O(n^2)$). It never forms $A^{-1}$ at all.',
+          explanation: 'Internally: `np.linalg.solve(A, b)` calls LAPACK `dgesv`, which computes the LU factorization $PA = LU$ and then solves $L\\mathbf{y}=P\\mathbf{b}$ (forward substitution, $O(n^2)$) and $U\\mathbf{x}=\\mathbf{y}$ (back substitution, $O(n^2)$). Total: $O(n^3) + O(n^2) \\approx O(n^3)$ — half the work of `inv`.',
+          math: '\\text{solve(A, b)}: O(n^3) + O(n^2)',
+        },
+        {
+          label: 'The stability argument: `inv` accumulates more rounding error',
+          strategy: 'Every arithmetic operation introduces a rounding error of size $\\varepsilon_{\\text{machine}} \\approx 10^{-16}$. More operations = more accumulated error. `inv` performs $\\sim 2n^3/3$ extra operations vs `solve`.',
+          explanation: 'For an ill-conditioned matrix (large $\\kappa(A)$), the extra operations in forming $A^{-1}$ amplify rounding errors $\\kappa$ times more than necessary. With `solve`, the error in the solution is bounded by $\\kappa \\cdot \\varepsilon_{\\text{machine}}$. With `inv`, it can be $\\kappa^2 \\cdot \\varepsilon_{\\text{machine}}$ in the worst case.',
+          math: '\\text{solve error} \\approx \\kappa \\varepsilon_{\\text{mach}};\\quad \\text{inv error} \\lesssim \\kappa^2 \\varepsilon_{\\text{mach}}',
+          gotcha: 'The one valid use case for `inv(A)` is when you need to solve $AX = B$ for many different right-hand sides $B$ in non-sequential code (e.g., passing the inverse to another function). Even then, prefer `lu_factor` + `lu_solve` over `inv` — it\'s the same idea but explicit about what\'s happening.',
+        },
+      ],
+    },
+  ],
+
   examples: [
     {
       id: 'la8-001-ex1',
