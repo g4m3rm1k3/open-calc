@@ -45,7 +45,7 @@ const PROSE_COMPONENTS = {
   ),
   // Paragraphs
   p: ({ children }) => (
-    <p className="mb-6 last:mb-0 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-400 font-serif tracking-[0.01em] max-w-[75ch]">
+    <p className="mb-6 last:mb-0 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
       {children}
     </p>
   ),
@@ -57,7 +57,7 @@ const PROSE_COMPONENTS = {
   ),
   // Italic
   em: ({ children }) => (
-    <em className="italic text-slate-700 dark:text-slate-400">{children}</em>
+    <em className="italic text-slate-700 dark:text-slate-300">{children}</em>
   ),
   // Fenced code blocks get the shared pre wrapper + Prism highlighting;
   // inline code (single backtick) keeps its own pill styling.
@@ -72,20 +72,20 @@ const PROSE_COMPONENTS = {
   ),
   // Unordered list
   ul: ({ children }) => (
-    <ul className="list-disc pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-400 font-serif tracking-[0.01em] max-w-[75ch]">
+    <ul className="list-disc pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
       {children}
     </ul>
   ),
   // Ordered list
   ol: ({ children }) => (
-    <ol className="list-decimal pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-400 font-serif tracking-[0.01em] max-w-[75ch]">
+    <ol className="list-decimal pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
       {children}
     </ol>
   ),
   li: ({ children }) => <li className="pl-2">{children}</li>,
   // Block quote
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-brand-300 dark:border-brand-600 pl-6 py-1 my-8 italic text-slate-700 dark:text-slate-400 font-serif text-[19px] sm:text-[21px] leading-[1.8] bg-slate-50 dark:bg-slate-900/50 rounded-r-2xl shadow-sm tracking-[0.01em] max-w-[70ch]">
+    <blockquote className="border-l-4 border-brand-300 dark:border-brand-600 pl-6 py-1 my-8 italic text-slate-700 dark:text-slate-300 font-serif text-[19px] sm:text-[21px] leading-[1.8] bg-slate-50 dark:bg-slate-900/50 rounded-r-2xl shadow-sm tracking-[0.01em] max-w-[70ch]">
       {children}
     </blockquote>
   ),

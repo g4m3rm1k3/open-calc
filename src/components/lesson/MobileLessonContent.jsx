@@ -33,20 +33,20 @@ const HEADING_PREFIX = /^\*\*([^*\n]+)\*\*\s*/;
 const BULLET_RE = /^[•\-*]\s+/;
 const ORDERED_RE = /^\d+\.\s+/;
 
-function ProseParagraph({ text, isFirst }) {
+function ProseParagraph({ text }) {
   const match = text.match(HEADING_PREFIX);
   if (match) {
     const heading = match[1];
     const body = text.slice(match[0].length).trim();
     return (
-      <div className={`${isFirst ? "" : "pt-5 border-t border-slate-100 dark:border-slate-800"} pb-2 last:pb-0`}>
+      <div className="mt-8 mb-4">
         <p className="text-[11px] font-black uppercase tracking-[0.14em] text-brand-600 dark:text-sky-400 mb-2">{heading}</p>
         {body && <MarkdownProse text={body} />}
       </div>
     );
   }
   return (
-    <div className={`${isFirst ? "" : "pt-4 border-t border-slate-100 dark:border-slate-800"} last:pb-0`}>
+    <div className="mb-6 last:mb-0">
       <MarkdownProse text={text} />
     </div>
   );
@@ -239,24 +239,11 @@ function MobileVizCard({ viz, borderColor = "border-slate-200 dark:border-slate-
 // All cards use mx-4 for screen-edge gutter. Inner content uses px-4 —
 // one layer total, never nested.
 
-const CARD_THEMES = {
-  slate:   { card: "border-slate-200 dark:border-slate-700",   header: "bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700", icon: "border-slate-200 dark:border-slate-700", kicker: "text-slate-500 dark:text-slate-400", label: "text-slate-800 dark:text-slate-100" },
-  brand:   { card: "border-brand-100 dark:border-brand-900/60", header: "bg-brand-50/80 dark:bg-brand-950/40 border-b border-brand-100 dark:border-brand-900/60", icon: "border-brand-200 dark:border-brand-800", kicker: "text-brand-600 dark:text-brand-400", label: "text-brand-800 dark:text-brand-200" },
-  purple:  { card: "border-purple-100 dark:border-purple-900/60", header: "bg-purple-50/80 dark:bg-purple-950/40 border-b border-purple-100 dark:border-purple-900/60", icon: "border-purple-200 dark:border-purple-800", kicker: "text-purple-600 dark:text-purple-400", label: "text-purple-800 dark:text-purple-200" },
-  emerald: { card: "border-emerald-100 dark:border-emerald-900/60", header: "bg-emerald-50/80 dark:bg-emerald-950/40 border-b border-emerald-100 dark:border-emerald-900/60", icon: "border-emerald-200 dark:border-emerald-800", kicker: "text-emerald-600 dark:text-emerald-400", label: "text-emerald-800 dark:text-emerald-200" },
-  amber:   { card: "border-amber-100 dark:border-amber-900/60", header: "bg-amber-50/80 dark:bg-amber-950/40 border-b border-amber-100 dark:border-amber-900/60", icon: "border-amber-200 dark:border-amber-800", kicker: "text-amber-600 dark:text-amber-400", label: "text-amber-800 dark:text-amber-200" },
-};
-
-function CardHeader({ icon, kicker, label, color, noteId, right }) {
-  const t = CARD_THEMES[color] ?? CARD_THEMES.slate;
+function CardHeader({ icon, kicker, label, noteId, right }) {
   return (
-    <div className={`flex items-center gap-3 px-0 py-3.5 ${t.header}`}>
-      <div className={`w-9 h-9 rounded-xl bg-white dark:bg-slate-900 border ${t.icon} flex items-center justify-center text-lg shadow-sm flex-shrink-0`}>
-        {icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className={`text-[9px] font-black uppercase tracking-[0.18em] ${t.kicker} mb-0.5`}>{kicker}</p>
-        <p className={`font-bold text-[13px] uppercase tracking-wide leading-tight ${t.label}`}>{label}</p>
+    <div className={`flex items-center gap-3 px-4 py-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950`}>
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 m-0">{label}</p>
       </div>
       {noteId && <span className="flex-shrink-0" onClick={(e) => e.stopPropagation()}><StickyNote noteId={noteId} /></span>}
       {right && <div className="flex-shrink-0">{right}</div>}
@@ -264,24 +251,20 @@ function CardHeader({ icon, kicker, label, color, noteId, right }) {
   );
 }
 
-// Static card (Intuition, Practice headers)
-function MobileCard({ id, icon, kicker, label, color = "slate", noteId, children }) {
-  const t = CARD_THEMES[color] ?? CARD_THEMES.slate;
+function MobileCard({ id, icon, kicker, label, noteId, children }) {
   return (
-    <div id={id} className={`rounded-none sm:rounded-2xl border-x-0 sm:border-x border overflow-hidden bg-white dark:bg-slate-900 ${t.card} scroll-mt-24`}>
-      <CardHeader icon={icon} kicker={kicker} label={label} color={color} noteId={noteId} />
-      <div className="px-0 pb-5 pt-3">{children}</div>
+    <div id={id} className={`rounded-none border-x-0 bg-white dark:bg-slate-950 scroll-mt-24`}>
+      <CardHeader icon={icon} kicker={kicker} label={label} noteId={noteId} />
+      <div className="px-4 pb-8 pt-4">{children}</div>
     </div>
   );
 }
 
-// Collapsible card (Math, Proof, Labs)
-function MobileCollapsible({ id, icon, kicker, label, color = "slate", defaultOpen = false, noteId, children }) {
+function MobileCollapsible({ id, icon, kicker, label, defaultOpen = false, noteId, children }) {
   const [open, setOpen] = useState(defaultOpen);
-  const t = CARD_THEMES[color] ?? CARD_THEMES.slate;
-  const toggle = <span className={`text-[10px] font-bold uppercase tracking-wide ${t.kicker}`}>{open ? "▲" : "▼"}</span>;
+  const toggle = <span className={`text-[10px] font-bold uppercase tracking-wide text-slate-400`}>{open ? "▲" : "▼"}</span>;
   return (
-    <div id={id} className={`rounded-none sm:rounded-2xl border-x-0 sm:border-x border overflow-hidden bg-white dark:bg-slate-900 ${t.card} scroll-mt-24`}>
+    <div id={id} className={`rounded-none border-x-0 bg-white dark:bg-slate-950 scroll-mt-24`}>
       <button
         onClick={() => setOpen((v) => !v)}
         className={`w-full text-left active:opacity-80 transition-opacity`}
@@ -290,12 +273,11 @@ function MobileCollapsible({ id, icon, kicker, label, color = "slate", defaultOp
           icon={icon}
           kicker={kicker}
           label={label}
-          color={color}
           noteId={noteId}
           right={toggle}
         />
       </button>
-      {open && <div className="px-0 py-5">{children}</div>}
+      {open && <div className="px-4 py-6">{children}</div>}
     </div>
   );
 }
@@ -417,17 +399,17 @@ export default function MobileLessonContent({ lesson }) {
 
       {/* ── Intuition ─────────────────────────────────────────────── */}
       {sectionExists(lesson, "intuition") && (
-        <Anchor id="intuition" className="pt-4 pb-2">
-          <MobileCard icon="🧠" kicker="Conceptual" label="Intuition" color="slate" noteId={lesson.id ? `${lesson.id}:intuition` : undefined}>
+        <Anchor id="intuition" className="pt-2 pb-2">
+          <MobileCard icon="🧠" kicker="Conceptual" label="Intuition" noteId={lesson.id ? `${lesson.id}:intuition` : undefined}>
             <SectionContent data={intuition} />
             {intuitionVizzes.length > 0 && (
-              <div className="mt-4 space-y-3">
+              <div className="mt-6 space-y-4">
                 {intuitionVizzes.map((viz, i) => <MobileVizCard key={i} viz={viz} />)}
               </div>
             )}
             {(intuition?.alternate?.prose?.length > 0 || intuition?.alternate?.blocks?.length > 0) && (
-              <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800">
-                <p className="text-[9px] font-black uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500 mb-3 text-center">Another Perspective</p>
+              <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400 dark:text-slate-500 mb-4 text-center">Another Perspective</p>
                 <SectionContent data={intuition.alternate} />
                 {getSectionVizzes(intuition.alternate).map((viz, i) => <MobileVizCard key={i} viz={viz} />)}
               </div>
@@ -454,14 +436,14 @@ export default function MobileLessonContent({ lesson }) {
       {/* ── Math ──────────────────────────────────────────────────── */}
       {sectionExists(lesson, "math") && (
         <Anchor id="math" className="pt-2 pb-2">
-          <MobileCollapsible icon="📐" kicker="Operational" label="Mathematics" color="brand" defaultOpen={true} noteId={lesson.id ? `${lesson.id}:math` : undefined}>
+          <MobileCollapsible icon="📐" kicker="Operational" label="Mathematics" defaultOpen={true} noteId={lesson.id ? `${lesson.id}:math` : undefined}>
             {mathWithoutLabs?.processDefinition?.length > 0 && (
-              <div className="mb-5 p-4 rounded-xl bg-brand-600 text-white shadow-lg shadow-brand-500/20">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-brand-200 mb-2">Operational Thinking</p>
-                <ol className="space-y-2">
+              <div className="mb-6 p-5 rounded-2xl bg-brand-600 text-white shadow-lg shadow-brand-500/20">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-brand-200 mb-3">Operational Thinking</p>
+                <ol className="space-y-3">
                   {mathWithoutLabs.processDefinition.map((step, i) => (
-                    <li key={i} className="flex gap-3 text-sm font-semibold border-l-2 border-brand-400/30 pl-3 items-center">
-                      <span className="w-5 h-5 rounded-full bg-brand-700 flex items-center justify-center text-[10px] text-brand-300 flex-shrink-0">{i + 1}</span>
+                    <li key={i} className="flex gap-4 text-sm font-semibold border-l-2 border-brand-400/30 pl-4 items-center">
+                      <span className="w-6 h-6 rounded-full bg-brand-700 flex items-center justify-center text-[11px] text-brand-300 flex-shrink-0">{i + 1}</span>
                       {step}
                     </li>
                   ))}
@@ -470,8 +452,8 @@ export default function MobileLessonContent({ lesson }) {
             )}
             <SectionContent data={mathWithoutLabs} />
             {mathVizzes.length > 0 && (
-              <div className="mt-4 space-y-3">
-                {mathVizzes.map((viz, i) => <MobileVizCard key={i} viz={viz} borderColor="border-brand-100 dark:border-brand-900" />)}
+              <div className="mt-6 space-y-4">
+                {mathVizzes.map((viz, i) => <MobileVizCard key={i} viz={viz} borderColor="border-slate-200 dark:border-slate-800" />)}
               </div>
             )}
           </MobileCollapsible>
@@ -492,14 +474,14 @@ export default function MobileLessonContent({ lesson }) {
       {/* ── Rigor / Proof ──────────────────────────────────────────── */}
       {sectionExists(lesson, "rigor") && (
         <Anchor id="rigor" className="pt-2 pb-2">
-          <MobileCollapsible icon="∴" kicker="Formal" label="Rigor & Proof" color="purple" defaultOpen={false} noteId={lesson.id ? `${lesson.id}:rigor` : undefined}>
+          <MobileCollapsible icon="∴" kicker="Formal" label="Rigor & Proof" defaultOpen={false} noteId={lesson.id ? `${lesson.id}:rigor` : undefined}>
             {(rigor?.prose?.length > 0 || rigor?.callouts?.length > 0 || isRigorBlocks) && <SectionContent data={rigor} />}
             {rigor?.proofSteps?.length > 0 && (
-              <DynamicProof steps={rigor.proofSteps} visualizationId={rigor.visualizationId} visualizationProps={rigor.visualizationProps ?? {}} />
+              <div className="mt-6"><DynamicProof steps={rigor.proofSteps} visualizationId={rigor.visualizationId} visualizationProps={rigor.visualizationProps ?? {}} /></div>
             )}
             {rigorExtraVizzes.length > 0 && (
-              <div className="mt-4 space-y-3">
-                {rigorExtraVizzes.map((viz, i) => <MobileVizCard key={i} viz={viz} borderColor="border-purple-100 dark:border-purple-900" />)}
+              <div className="mt-6 space-y-4">
+                {rigorExtraVizzes.map((viz, i) => <MobileVizCard key={i} viz={viz} borderColor="border-slate-200 dark:border-slate-800" />)}
               </div>
             )}
           </MobileCollapsible>

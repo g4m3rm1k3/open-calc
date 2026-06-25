@@ -70,13 +70,18 @@ function useColors() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function toPlain(value) {
+  // Check re/im (complex) shape before valueOf(): mathjs's Complex.valueOf()
+  // returns a display string like "2 + i", not the numeric value.
+  if (value && typeof value === "object" && !Array.isArray(value) &&
+      "re" in value && "im" in value && Object.keys(value).length <= 3) {
+    return value;
+  }
   if (value && typeof value.valueOf === "function") {
     const p = value.valueOf();
     if (p !== value) return toPlain(p);
   }
   if (Array.isArray(value)) return value.map(toPlain);
   if (value && typeof value === "object") {
-    if ("re" in value && "im" in value && Object.keys(value).length <= 3) return value;
     return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, toPlain(v)]));
   }
   return value;

@@ -126,63 +126,111 @@
 
   /* Callout boxes */
   .callout {
-    @apply rounded-lg p-4 my-4 border-l-4;
+    @apply rounded-lg p-5 sm:p-6 my-6 border-l-4;
   }
+  /* NOTE: these callout-type rules are written as plain CSS, not @apply.
+     ~19 sibling @apply rules in this exact spot were silently dropped by the
+     Tailwind/PostCSS pipeline (reproduced across two independent dev server
+     processes) — root cause undetermined, but plain CSS sidesteps it entirely
+     and is just as easy to maintain for a fixed, finite color list. */
   .callout-definition {
-    @apply bg-blue-50 dark:bg-blue-950/40 border-blue-500 text-blue-900 dark:text-blue-300;
+    background-color: #eff6ff; border-color: #60a5fa; color: #1e3a8a;
   }
+  .dark .callout-definition { background-color: rgba(23,37,84,0.3); color: #93c5fd; }
+
   .callout-theorem {
-    @apply bg-purple-50 dark:bg-purple-950/40 border-purple-500 text-purple-900 dark:text-purple-300;
+    background-color: #faf5ff; border-color: #c084fc; color: #581c87;
   }
+  .dark .callout-theorem { background-color: rgba(59,7,100,0.3); color: #d8b4fe; }
+
   .callout-tip {
-    @apply bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500 text-emerald-900 dark:text-emerald-300;
+    background-color: #ecfdf5; border-color: #34d399; color: #064e3b;
   }
+  .dark .callout-tip { background-color: rgba(2,44,34,0.3); color: #6ee7b7; }
+
   .callout-warning {
-    @apply bg-amber-50 dark:bg-amber-950/40 border-amber-500 text-amber-900 dark:text-amber-300;
+    background-color: #fffbeb; border-color: #fbbf24; color: #78350f;
   }
+  .dark .callout-warning { background-color: rgba(69,26,3,0.3); color: #fcd34d; }
+
   .callout-intuition {
-    @apply bg-orange-50 dark:bg-orange-950/40 border-orange-400 text-orange-900 dark:text-orange-300;
+    background-color: #fff7ed; border-color: #fb923c; color: #7c2d12;
   }
+  .dark .callout-intuition { background-color: rgba(67,20,7,0.3); color: #fdba74; }
+
   .callout-prior-knowledge {
-    @apply bg-sky-50 dark:bg-sky-950/40 border-sky-400 text-sky-900 dark:text-sky-300;
+    background-color: #f0f9ff; border-color: #38bdf8; color: #0c4a6e;
   }
+  .dark .callout-prior-knowledge { background-color: rgba(8,47,73,0.3); color: #7dd3fc; }
+
   .callout-real-world {
-    @apply bg-teal-50 dark:bg-teal-950/40 border-teal-500 text-teal-900 dark:text-teal-300;
+    background-color: #f0fdfa; border-color: #2dd4bf; color: #134e4a;
   }
+  .dark .callout-real-world { background-color: rgba(4,47,46,0.3); color: #5eead4; }
+
   .callout-geometric {
-    @apply bg-indigo-50 dark:bg-indigo-950/40 border-indigo-400 text-indigo-900 dark:text-indigo-300;
+    background-color: #eef2ff; border-color: #818cf8; color: #312e81;
   }
+  .dark .callout-geometric { background-color: rgba(30,27,75,0.3); color: #a5b4fc; }
+
   .callout-mnemonic {
-    @apply bg-pink-50 dark:bg-pink-950/40 border-pink-400 text-pink-900 dark:text-pink-300;
+    background-color: #fdf2f8; border-color: #f472b6; color: #831843;
   }
+  .dark .callout-mnemonic { background-color: rgba(80,7,36,0.3); color: #f9a8d4; }
+
   .callout-procedure {
-    @apply bg-slate-50 dark:bg-slate-800/60 border-slate-400 text-slate-900 dark:text-slate-300;
+    background-color: #f8fafc; border-color: #94a3b8; color: #0f172a;
   }
+  .dark .callout-procedure { background-color: rgba(30,41,59,0.5); color: #cbd5e1; }
+
   .callout-insight {
-    @apply bg-yellow-50 dark:bg-yellow-950/40 border-yellow-500 text-yellow-900 dark:text-yellow-300;
+    background-color: #fefce8; border-color: #facc15; color: #713f12;
   }
+  .dark .callout-insight { background-color: rgba(66,32,6,0.3); color: #fde047; }
+
   .callout-proof {
-    @apply bg-violet-50 dark:bg-violet-950/40 border-violet-500 text-violet-900 dark:text-violet-300;
+    background-color: #f5f3ff; border-color: #a78bfa; color: #4c1d95;
   }
+  .dark .callout-proof { background-color: rgba(46,16,101,0.3); color: #c4b5fd; }
+
   .callout-example {
-    @apply bg-cyan-50 dark:bg-cyan-950/40 border-cyan-400 text-cyan-900 dark:text-cyan-300;
+    background-color: #ecfeff; border-color: #22d3ee; color: #164e63;
   }
+  .dark .callout-example { background-color: rgba(8,51,68,0.3); color: #67e8f9; }
+
   .callout-misconception {
-    @apply bg-red-50 dark:bg-red-950/40 border-red-500 text-red-900 dark:text-red-300;
+    background-color: #fef2f2; border-color: #f87171; color: #7f1d1d;
   }
+  .dark .callout-misconception { background-color: rgba(69,10,10,0.3); color: #fca5a5; }
+
   .callout-history {
-    @apply bg-amber-50 dark:bg-amber-950/40 border-amber-600 text-amber-900 dark:text-amber-300;
+    background-color: #fffbeb; border-color: #d97706; color: #78350f;
   }
+  .dark .callout-history { background-color: rgba(69,26,3,0.3); color: #fcd34d; }
+
+  .callout-strategy {
+    background-color: #fff1f2; border-color: #fb7185; color: #881337;
+  }
+  .dark .callout-strategy { background-color: rgba(76,5,25,0.3); color: #fda4af; }
+
+  .callout-application {
+    background-color: #fdf4ff; border-color: #e879f9; color: #701a75;
+  }
+  .dark .callout-application { background-color: rgba(74,4,78,0.3); color: #f0abfc; }
 
   /* Example / step table */
   .step-row {
-    @apply flex items-start gap-4 py-3 border-b border-slate-100 dark:border-slate-800 last:border-0;
+    display: flex; align-items: flex-start; gap: 1rem; padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
   }
+  .step-row:last-child { border-bottom: none; }
+  .dark .step-row { border-bottom-color: #1e293b; }
   .step-number {
-    @apply flex-shrink-0 w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-900/40
-           text-brand-700 dark:text-brand-300 text-xs font-bold
-           flex items-center justify-center mt-1;
+    flex-shrink: 0; width: 1.75rem; height: 1.75rem; border-radius: 9999px;
+    background-color: #e0e9ff; color: #4341ca; font-size: 0.75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; margin-top: 0.25rem;
   }
+  .dark .step-number { background-color: rgba(50,52,129,0.4); color: #a5b8fc; }
 
   /* Viz frame */
   .viz-frame {
@@ -234,13 +282,36 @@
   }
 }
 
-/* KaTeX overrides for dark mode */
-.dark .katex {
-  color: inherit;
+/* KaTeX — given its own accent color (instead of inheriting the surrounding
+   prose color) so formulas read as distinct notation, not blended-in text. */
+.katex {
+  color: #4341ca;
 }
-.dark .katex .mord,
-.dark .katex .minner {
-  color: inherit;
+.dark .katex {
+  color: #a5b8fc;
+}
+
+/* Base sizing for math to match prose */
+.katex {
+  font-size: 1.15em !important;
+}
+
+/* Inline math (mid-paragraph) must never break internally — a fraction or
+   equation splitting mid-symbol across two lines reads as a layout bug. If it
+   doesn't fit, let it wrap as a whole unit instead. */
+.katex:not(.katex-display .katex) {
+  white-space: nowrap;
+}
+
+.katex-display {
+  margin: 1.5em 0 !important;
+  padding: 1.5em;
+  background: var(--math-well-bg);
+  border: 1px solid var(--math-well-border);
+  border-radius: 1rem;
+  box-shadow: var(--math-well-shadow);
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .katex-inline {

@@ -40,21 +40,17 @@ function ProseParagraph({ text, isFirst }) {
     const heading = match[1];
     const body = text.slice(match[0].length).trim();
     return (
-      <div
-        className={`${isFirst ? "" : "pt-6 border-t border-slate-100 dark:border-slate-800"} pb-2 last:pb-0`}
-      >
-        <h3 className="text-xl font-bold text-slate-900 dark:text-sky-400 mb-4 mt-8 flex items-center gap-3">
+      <div className={`mt-8 mb-4 ${isFirst ? "" : "pt-8 border-t border-slate-200 dark:border-slate-800"}`}>
+        <h3 className="text-xl font-bold text-slate-900 dark:text-sky-400 mb-4 flex items-center gap-3">
           <span className="w-2 h-6 bg-brand-500 dark:bg-brand-400 rounded-full inline-block"></span>
-          {heading}
+          {parseProse(heading)}
         </h3>
         {body && <MarkdownProse text={body} />}
       </div>
     );
   }
   return (
-    <div
-      className={`${isFirst ? "" : "pt-5 border-t border-slate-100 dark:border-slate-800"} last:pb-0`}
-    >
+    <div className="mb-6 last:mb-0">
       <MarkdownProse text={text} />
     </div>
   );
@@ -161,10 +157,10 @@ function SectionContent({ data }) {
           }
           if (block.type === "math") {
             return (
-              <div key={i} className="my-2 overflow-x-auto rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 px-6 py-5 text-center shadow-sm">
+              <div key={i} className="my-6">
                 <KatexBlock expr={block.tex} />
                 {block.caption && (
-                  <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 italic">{block.caption}</p>
+                  <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 italic text-center">{block.caption}</p>
                 )}
               </div>
             );
@@ -333,54 +329,46 @@ function VizTabGroup({ vizzes, lessonId }) {
 function SemanticsBlock({ semantics }) {
   if (!semantics) return null;
   return (
-    <div className="mb-10 rounded-3xl border border-sky-100 dark:border-sky-900/40 bg-gradient-to-br from-sky-50/80 via-white/90 to-sky-100/80 dark:from-slate-900 dark:via-slate-950 dark:to-sky-900/40 overflow-hidden shadow-2xl shadow-sky-200/40 dark:shadow-sky-900/60">
-      <div className="px-4 py-4 bg-gradient-to-r from-sky-200/80 via-sky-100/80 to-white/80 dark:from-sky-900 dark:via-slate-900 dark:to-slate-800 border-b border-sky-100 dark:border-sky-900/40">
-        <h3 className="text-[11px] font-black uppercase tracking-[0.22em] text-sky-800 dark:text-sky-200 drop-shadow-md">
-          Semantic Layer: Symbols & Meaning
-        </h3>
-      </div>
-      <div className="px-4 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div className="mb-12 mt-4">
+      <h3 className="text-[13px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-3">
+        <span className="w-8 h-px bg-slate-200 dark:bg-slate-700"></span>
+        Symbols & Meaning
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {semantics.core?.map((item, i) => (
             <div
               key={i}
-              className="flex flex-col items-stretch gap-2 p-4 rounded-2xl bg-gradient-to-br from-white/90 via-sky-50/80 to-sky-100/80 dark:from-slate-900 dark:via-slate-950 dark:to-sky-900/60 border border-sky-200 dark:border-sky-800 shadow-xl shadow-sky-200/40 dark:shadow-sky-900/60 min-h-[120px] transition-all duration-200 hover:border-sky-400 hover:shadow-2xl hover:shadow-sky-300/50 dark:hover:border-sky-400 dark:hover:shadow-sky-800/80 relative overflow-hidden"
-              style={{
-                boxShadow:
-                  "0 4px 32px 0 rgba(56,189,248,0.10), 0 1.5px 8px 0 rgba(56,189,248,0.10) inset",
-              }}
+              className="flex flex-col items-stretch gap-3 p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-200"
             >
               <div className="flex-shrink-0 w-full flex justify-center mb-1">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-white via-sky-50 to-sky-100 dark:from-slate-900 dark:via-slate-800 dark:to-sky-900 border border-sky-100 dark:border-sky-800 text-center font-mono text-base font-bold text-sky-600 dark:text-sky-300 shadow-inner w-full">
+                <div className="p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center font-mono text-lg font-bold text-slate-800 dark:text-slate-200 shadow-sm w-full">
                   <KatexBlock expr={item.symbol} />
                 </div>
               </div>
-              <div className="flex-1 min-h-[2.5rem] text-[15px] text-slate-700 dark:text-slate-200 leading-relaxed break-words drop-shadow-sm">
+              <div className="flex-1 min-h-[2.5rem] text-[16px] text-slate-700 dark:text-slate-300 leading-relaxed text-center">
                 <MarkdownProse text={item.meaning} />
               </div>
-              <div className="pointer-events-none absolute inset-0 rounded-2xl border-2 border-transparent hover:border-sky-300 dark:hover:border-sky-400 transition-all duration-200" />
             </div>
           ))}
         </div>
         {semantics.rulesOfThumb?.length > 0 && (
-          <div className="rounded-xl bg-gradient-to-br from-white via-sky-50 to-sky-100 dark:from-slate-900 dark:via-slate-800 dark:to-sky-900/60 border border-sky-100 dark:border-sky-800/50 p-4 shadow-md shadow-sky-100/30 dark:shadow-sky-900/40">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-sky-500 mb-2">
+          <div className="rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-5 mt-6 shadow-sm">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3">
               Rules of Thumb
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {semantics.rulesOfThumb.map((rule, i) => (
                 <li
                   key={i}
-                  className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300"
+                  className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300"
                 >
-                  <span className="text-sky-500 mt-0.5">→</span>
-                  {parseProse(rule)}
+                  <span className="text-slate-400 mt-0.5">→</span>
+                  <span className="flex-1">{parseProse(rule)}</span>
                 </li>
               ))}
             </ul>
           </div>
         )}
-      </div>
     </div>
   );
 }
@@ -390,13 +378,12 @@ function SemanticsBlock({ semantics }) {
 function PerspectiveSync({ perspectives, bridge }) {
   if (!perspectives?.length) return null;
   return (
-    <div className="mb-10 rounded-3xl border border-indigo-100 dark:border-indigo-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
-      <div className="px-4 py-4 oc-header-gradient border-b border-indigo-100 dark:border-indigo-900/40">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-800 dark:text-indigo-300">
-          Perspective Synchronization
-        </h3>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+    <div className="mb-12 mt-8">
+      <h3 className="text-[13px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-3">
+        <span className="w-8 h-px bg-slate-200 dark:bg-slate-700"></span>
+        Perspective Synchronization
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         {perspectives.map((p, i) => (
           <div
             key={i}
@@ -412,8 +399,8 @@ function PerspectiveSync({ perspectives, bridge }) {
         ))}
       </div>
       {bridge && (
-        <div className="mt-4 pt-4 border-t border-indigo-100 dark:border-indigo-800 text-center">
-          <p className="inline-block px-4 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg shadow-indigo-500/30">
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-4 text-center">
+          <p className="text-[16px] text-slate-800 dark:text-slate-200 font-medium">
             {bridge}
           </p>
         </div>
@@ -427,40 +414,39 @@ function PerspectiveSync({ perspectives, bridge }) {
 function FailureModes({ modes }) {
   if (!modes?.length) return null;
   return (
-    <div className="mb-10 rounded-3xl border border-rose-100 dark:border-rose-900/40 bg-white dark:bg-slate-900 overflow-hidden shadow-premium">
-      <div className="px-4 py-4 oc-header-gradient border-b border-rose-100 dark:border-rose-900/40">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-800 dark:text-rose-400 flex items-center gap-2">
-          <span>🚨</span> Failure Modes: Where Logic Breaks
-        </h3>
-      </div>
-      <div className="px-4 py-4 overflow-x-auto">
-        <table className="w-full text-left text-sm">
+    <div className="mb-12 mt-8">
+      <h3 className="text-[13px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-3">
+        <span className="w-8 h-px bg-slate-200 dark:bg-slate-700"></span>
+        Failure Modes: Where Logic Breaks
+      </h3>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-sm border-collapse">
           <thead>
-            <tr className="border-b border-rose-100 dark:border-rose-900/50">
-              <th className="pb-2 font-bold text-rose-600 dark:text-rose-400">
+            <tr className="border-b-2 border-slate-200 dark:border-slate-800">
+              <th className="pb-3 font-semibold text-slate-700 dark:text-slate-300">
                 Case
               </th>
-              <th className="pb-2 font-bold text-rose-600 dark:text-rose-400">
+              <th className="pb-3 font-semibold text-slate-700 dark:text-slate-300">
                 Example
               </th>
-              <th className="pb-2 font-bold text-rose-600 dark:text-rose-400">
+              <th className="pb-3 font-semibold text-slate-700 dark:text-slate-300">
                 Internal Logic Failure
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-rose-50 dark:divide-rose-900/20">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
             {modes.map((m, i) => (
               <tr
                 key={i}
-                className="hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-colors"
+                className="hover:bg-slate-50 dark:hover:bg-slate-900/40 transition-colors"
               >
-                <td className="py-3 pr-4 font-bold text-slate-800 dark:text-slate-200">
+                <td className="py-4 pr-4 font-medium text-slate-800 dark:text-slate-200">
                   {m.case}
                 </td>
-                <td className="py-3 pr-4 text-slate-600 dark:text-slate-400 font-mono">
+                <td className="py-4 pr-4 text-slate-700 dark:text-slate-300">
                   <KatexBlock expr={m.example} />
                 </td>
-                <td className="py-3 italic text-rose-700 dark:text-rose-300">
+                <td className="py-4 text-slate-600 dark:text-slate-400">
                   {m.reason}
                 </td>
               </tr>
@@ -477,24 +463,22 @@ function FailureModes({ modes }) {
 function LocalLinearity({ config }) {
   if (!config) return null;
   return (
-    <div className="mb-8 p-5  rounded-2xl border-2 border-dashed border-emerald-200 dark:border-emerald-900/40 bg-emerald-50/10 dark:bg-emerald-950/5">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-          🔍
+    <div className="mb-10 mt-8">
+      <h3 className="text-[13px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-3">
+        <span className="w-8 h-px bg-slate-200 dark:bg-slate-700"></span>
+        Local Linearity Principle
+      </h3>
+      <div className="pl-6 border-l-4 border-slate-200 dark:border-slate-800">
+        <p className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4 leading-relaxed font-serif">
+          {config.statement}
+        </p>
+        <div className="mb-4">
+          <KatexBlock expr={config.formula} />
         </div>
-        <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-300 uppercase tracking-widest">
-          Local Linearity Principle
-        </h3>
+        <p className="text-[16px] text-slate-600 dark:text-slate-400 font-serif">
+          <span className="font-semibold text-slate-700 dark:text-slate-300">Meaning:</span> {config.meaning}
+        </p>
       </div>
-      <p className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-3 leading-snug">
-        {config.statement}
-      </p>
-      <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-emerald-100 dark:border-emerald-900 shadow-sm mb-3 text-center">
-        <KatexBlock expr={config.formula} />
-      </div>
-      <p className="text-sm text-emerald-800 dark:text-emerald-400 font-medium">
-        Meaning: {config.meaning}
-      </p>
     </div>
   );
 }
@@ -504,27 +488,28 @@ function LocalLinearity({ config }) {
 function TriggerSystem({ triggers }) {
   if (!triggers?.length) return null;
   return (
-    <div className="mt-8 space-y-3">
-      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
+    <div className="mt-12 space-y-3">
+      <h3 className="text-[13px] font-bold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 mb-6 flex items-center gap-3">
+        <span className="w-8 h-px bg-slate-200 dark:bg-slate-700"></span>
         Internal Trigger & Recall System
-      </p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {triggers.map((p, i) => (
           <div
             key={i}
-            className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-brand-300 dark:hover:border-brand-700 transition-colors cursor-default group"
+            className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 transition-colors"
           >
-            <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-tight mb-1">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-2">
               Trigger
             </p>
-            <p className="text-xs font-bold text-slate-700 dark:text-slate-300 group-hover:text-brand-600 transition-colors">
+            <p className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
               "{p.prompt}"
             </p>
-            <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800">
-              <p className="text-[10px] text-brand-500 font-bold uppercase mb-1">
+            <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800/60">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mb-2">
                 Recall
               </p>
-              <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 italic">
+              <p className="text-sm text-slate-600 dark:text-slate-400 italic leading-relaxed">
                 {p.recall}
               </p>
             </div>
@@ -556,19 +541,11 @@ function IntuitionBlock({ data, lesson }) {
 
   return (
     <div className="mb-16">
-      <div className="oc-header-gradient rounded-3xl px-6 py-5 mb-8 border border-slate-200 dark:border-slate-800 flex items-center gap-4 shadow-sm">
-        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-2xl shadow-sm">
-          🧠
-        </div>
-        <div className="flex flex-col">
-          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-            Conceptual
-          </span>
-          <span className="font-bold text-slate-800 dark:text-slate-100 text-lg uppercase tracking-wider">
-            Intuition
-          </span>
-        </div>
-        <div className="flex-1" />
+      <div className="mb-8 flex items-center gap-4">
+        <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 font-serif">
+          Conceptual Intuition
+        </h2>
+        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
         {lesson?.id && <StickyNote noteId={`${lesson.id}:intuition`} />}
       </div>
 
@@ -635,19 +612,11 @@ function MathBlock({ data, lessonId }) {
       id={lessonId ? `${lessonId}-math` : undefined}
       className="mb-16 group"
     >
-      <div className="oc-header-gradient rounded-3xl w-full flex items-center gap-4 px-6 py-5 mb-8 border border-brand-100 dark:border-brand-900/60 shadow-sm">
-        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-brand-200 dark:border-brand-800 flex items-center justify-center text-2xl shadow-sm">
-          📐
-        </div>
-        <div className="flex flex-col">
-          <span className="font-black text-brand-900 dark:text-brand-100 text-[11px] uppercase tracking-[0.2em]">
-            Operational
-          </span>
-          <span className="font-bold text-brand-800 dark:text-brand-200 text-lg uppercase tracking-wider">
-            Mathematics
-          </span>
-        </div>
-        <div className="flex-1" />
+      <div className="mb-8 flex items-center gap-4">
+        <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 font-serif">
+          Operational Mathematics
+        </h2>
+        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
         {lessonId && <StickyNote noteId={`${lessonId}:math`} />}
       </div>
       <div className="py-2 space-y-6">
@@ -714,19 +683,11 @@ function RigorBlock({ data, lessonId }) {
       id={lessonId ? `${lessonId}-rigor` : undefined}
       className="mb-16 group"
     >
-      <div className="oc-header-gradient rounded-3xl w-full flex items-center gap-4 px-6 py-5 mb-8 border border-purple-100 dark:border-purple-900/60 shadow-sm">
-        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 flex items-center justify-center text-2xl shadow-sm">
-          ∴
-        </div>
-        <div className="flex flex-col">
-          <span className="font-black text-purple-900 dark:text-purple-100 text-[11px] uppercase tracking-[0.2em]">
-            Formal
-          </span>
-          <span className="font-bold text-purple-800 dark:text-purple-200 text-lg uppercase tracking-wider">
-            Rigor & Proof
-          </span>
-        </div>
-        <div className="flex-1" />
+      <div className="mb-8 flex items-center gap-4">
+        <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 font-serif">
+          Formal Rigor & Proof
+        </h2>
+        <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
         {lessonId && <StickyNote noteId={`${lessonId}:rigor`} />}
       </div>
       <div className="py-2 space-y-6">

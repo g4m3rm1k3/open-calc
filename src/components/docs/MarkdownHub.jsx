@@ -98,6 +98,15 @@ const TERM_REFS = {
   'JSON.stringify':       { desc: 'Converts a JavaScript value to a JSON string.', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify', src: 'mdn' },
 }
 
+function sortTree(nodes) {
+  nodes.sort((a, b) => {
+    if (a.type !== b.type) return a.type === 'dir' ? -1 : 1
+    return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+  })
+  nodes.forEach((node) => { if (node.type === 'dir') sortTree(node.children) })
+  return nodes
+}
+
 function buildTree(modulePaths) {
   const root = []
   ;[...modulePaths].sort().forEach((modulePath) => {
@@ -119,7 +128,9 @@ function buildTree(modulePaths) {
       }
     })
   })
-  return root
+  // Folders first, then files, alphanumeric within each group — matching how a
+  // normal file explorer (and the real src/docs directory listing) would sort.
+  return sortTree(root)
 }
 
 function displayName(value) {

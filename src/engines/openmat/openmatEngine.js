@@ -69,6 +69,14 @@ function symShape(v) {
 // ── Pure type/value helpers ───────────────────────────────────────────────────
 
 export function toPlain(value) {
+  // Check re/im (complex number) shape BEFORE unwrapping via valueOf(): mathjs's
+  // Complex.prototype.valueOf() returns a display STRING like "2 + i", not the
+  // numeric value, so unwrapping first would silently turn every complex result
+  // (e.g. from eig() on a non-symmetric matrix) into NaN downstream.
+  if (value && typeof value === "object" && !Array.isArray(value) &&
+      "re" in value && "im" in value && Object.keys(value).length <= 3) {
+    return value;
+  }
   if (value && typeof value.valueOf === "function") {
     const p = value.valueOf();
     if (p !== value) return toPlain(p);
@@ -82,7 +90,6 @@ export function toPlain(value) {
     return mapped;
   }
   if (value && typeof value === "object") {
-    if ("re" in value && "im" in value && Object.keys(value).length <= 3) return value;
     return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, toPlain(v)]));
   }
   return value;
@@ -1307,11 +1314,16 @@ function normalizeMatrixSyntax(line) {
 
     const rows = splitTopLevel(inner, ";").map(r => splitTopLevelCells(r));
 
-    // Detect whether any cell looks like a variable/matrix reference (not a plain number)
+    // Detect whether any cell looks like a variable/matrix reference (not a plain number).
+    // Plain imaginary literals (i, -i, 1i, 2.5i) must also count as "scalar" — otherwise
+    // this falls through to the horzcat/vertcat path below, which normalizes each cell
+    // through realValue() and silently zeroes out the imaginary part.
     const hasNonScalar = rows.some(row =>
       row.some(cell => {
         const t = cell.trim();
-        return t !== "" && !/^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(t);
+        return t !== ""
+          && !/^[+-]?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(t)
+          && !/^[+-]?(\d+(\.\d+)?)?i$/.test(t);
       })
     );
 
@@ -1925,12 +1937,25 @@ export function createExecutionEngine(options = {}) {
   parser.set("eig", (A) => {
     const result = math.eigs(A);
     const rawValues = toPlain(result.values);
-    const values = (Array.isArray(rawValues) ? rawValues : [rawValues]).map(realValue);
+    const valuesArr = Array.isArray(rawValues) ? rawValues : [rawValues];
+    // Non-symmetric matrices can have genuine complex-conjugate eigenvalue pairs
+    // (e.g. eig([2 0 1; 0 5 0; -1 0 2]) = 5, 2+i, 2-i). Keep them as real Complex
+    // values when that happens instead of forcing realValue() (which used to
+    // produce NaN, and even after the toPlain fix would silently drop the
+    // imaginary part and report a wrong, purely-real answer).
+    const hasComplex = valuesArr.some((v) => isComplexLike(v) && Number(v.im) !== 0);
+    const values = hasComplex ? valuesArr : valuesArr.map(realValue);
     // Build V where each COLUMN is an eigenvector (MATLAB convention)
-    const eigvecs = result.eigenvectors.map((entry) => normalizeVector(entry.vector));
+    const eigvecs = result.eigenvectors.map((entry) => {
+      const plainVec = toPlain(entry.vector);
+      const vec = Array.isArray(plainVec) ? plainVec : [plainVec];
+      return hasComplex ? vec : vec.map(realValue);
+    });
     const n = eigvecs[0]?.length || 0;
     const V = Array.from({ length: n }, (_, row) => eigvecs.map((col) => col[row] ?? 0));
-    const D = makeDiagonal(values);
+    const D = hasComplex
+      ? values.map((value, index) => values.map((_, column) => (column === index ? value : 0)))
+      : makeDiagonal(values);
     return { __multi: [V, D], values, eigenvectors: eigvecs };
   });
   parser.set("qr", (A, economy) => {
@@ -2279,6 +2304,19 @@ export function createExecutionEngine(options = {}) {
   parser.set("str2double", (s) => Number(s));
   parser.set("char", (v) => { if (typeof v === "number") return String.fromCharCode(v); return normalizeVector(v).map((x) => String.fromCharCode(Number(x))).join(""); });
   parser.set("int2str", (v) => String(Math.round(Number(v))));
+  parser.set("double", (v) => {
+    const toNum = (x) => {
+      if (Array.isArray(x)) return x.map(toNum);
+      if (isComplexLike(x)) return x; // a complex value stays complex when cast to double
+      if (typeof x === "string") {
+        const codes = Array.from(x).map((ch) => ch.charCodeAt(0));
+        return codes.length === 1 ? codes[0] : codes;
+      }
+      if (typeof x === "boolean") return x ? 1 : 0;
+      return Number(x);
+    };
+    return toNum(toPlain(v));
+  });
 
   // ── Timing ──────────────────────────────────────────────────────────────────
   const _ticStart = { t: 0 };

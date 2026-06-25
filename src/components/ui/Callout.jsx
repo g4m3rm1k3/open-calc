@@ -52,7 +52,7 @@ function renderBody(body) {
   return (
     <MarkdownProse
       text={body}
-      className="[&_p]:text-inherit [&_p]:text-sm [&_p]:leading-relaxed [&_strong]:text-inherit [&_strong]:font-bold [&_em]:text-inherit [&_li]:text-inherit [&_ul]:text-inherit [&_ol]:text-inherit"
+      className="[&_p]:text-inherit [&_p]:text-base [&_p]:leading-[1.9] [&_strong]:text-inherit [&_strong]:font-bold [&_em]:text-inherit [&_li]:text-inherit [&_ul]:text-inherit [&_ol]:text-inherit"
     />
   )
 }
@@ -83,7 +83,7 @@ export default function Callout({ type = 'tip', title, body }) {
   const headerColor = HEADER_COLORS[type] || 'text-current'
 
   return (
-    <div className={`callout callout-${type} my-4`}>
+    <div className={`callout callout-${type}`}>
       <div className={`flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-3 font-sans ${headerColor}`}>
         <div className="flex items-center gap-2">
           <span className="text-[22px] drop-shadow-sm" aria-hidden>{icon}</span>
