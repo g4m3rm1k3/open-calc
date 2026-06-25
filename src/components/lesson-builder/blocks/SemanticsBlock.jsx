@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
+
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 
 function CoreSymbolEditor({ item, onChange, onRemove }) {
+  const [editingMeaning, setEditingMeaning] = useState(false)
   return (
     <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-2 bg-slate-50 dark:bg-slate-800/50">
       <div className="flex items-center justify-between">
@@ -14,13 +18,24 @@ function CoreSymbolEditor({ item, onChange, onRemove }) {
         placeholder="e.g. \|\mathbf{v}\|"
         className="field text-sm font-mono"
       />
-      <textarea
-        value={item.meaning ?? ''}
-        onChange={e => onChange({ ...item, meaning: e.target.value })}
-        placeholder="Plain-language meaning of this symbol…"
-        rows={2}
-        className="field text-sm resize-none"
-      />
+      <label className="flex flex-col gap-1">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Meaning</span>
+          <MarkdownEditButton onClick={() => setEditingMeaning(true)} />
+        </div>
+        <textarea
+          value={item.meaning ?? ''}
+          onChange={e => onChange({ ...item, meaning: e.target.value })}
+          placeholder="Plain-language meaning of this symbol…"
+          rows={2}
+          className="field text-sm resize-none"
+        />
+      </label>
+      {editingMeaning && (
+        <Suspense fallback={null}>
+          <MarkdownCellEditor value={item.meaning ?? ''} onChange={v => onChange({ ...item, meaning: v })} onClose={() => setEditingMeaning(false)} title="🔣 Symbol Meaning" />
+        </Suspense>
+      )}
     </div>
   )
 }

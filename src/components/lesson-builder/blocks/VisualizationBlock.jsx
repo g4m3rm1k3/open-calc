@@ -5,10 +5,16 @@ import VizFrame from '../../viz/VizFrame.jsx'
 const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
 const VizSourceEditor = lazy(() => import('./VizSourceEditor.jsx'))
 
-// Cell editor for PythonNotebook initialCells
-function CellEditor({ cell, onChange, onRemove }) {
+// Cell editor for PythonNotebook / OpenMatNotebook initialCells.
+// prose can be a string or an array of paragraph strings — handle both.
+function CellEditor({ cell, onChange, onRemove, language = 'python' }) {
   const [editingProse, setEditingProse] = useState(false)
   const [editingInstructions, setEditingInstructions] = useState(false)
+
+  const proseIsArray = Array.isArray(cell.prose)
+  const proseStr = proseIsArray ? cell.prose.join('\n\n') : (cell.prose ?? '')
+  const setProse = v => onChange({ ...cell, prose: proseIsArray ? v.split(/\n{2,}/).map(s => s.trim()).filter(Boolean) : v })
+
   return (
     <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700">
@@ -32,8 +38,8 @@ function CellEditor({ cell, onChange, onRemove }) {
           <MarkdownEditButton onClick={() => setEditingProse(true)} />
         </div>
         <textarea
-          value={cell.prose ?? ''}
-          onChange={e => onChange({ ...cell, prose: e.target.value })}
+          value={proseStr}
+          onChange={e => setProse(e.target.value)}
           rows={2}
           placeholder="What this cell demonstrates…"
           className="field text-sm resize-none"
@@ -41,7 +47,7 @@ function CellEditor({ cell, onChange, onRemove }) {
       </label>
       {editingProse && (
         <Suspense fallback={<div className="fixed inset-0 z-[600] flex items-center justify-center bg-slate-950 text-slate-400">Loading editor…</div>}>
-          <MarkdownCellEditor value={cell.prose ?? ''} onChange={v => onChange({ ...cell, prose: v })} onClose={() => setEditingProse(false)} title="🔭 Cell Prose" />
+          <MarkdownCellEditor value={proseStr} onChange={setProse} onClose={() => setEditingProse(false)} title="🔭 Cell Prose" />
         </Suspense>
       )}
       {cell.instructions != null && (
@@ -64,12 +70,12 @@ function CellEditor({ cell, onChange, onRemove }) {
         </Suspense>
       )}
       <label className="flex flex-col gap-1 p-3">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Python code</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{language === 'openmat' ? 'OpenMAT code' : 'Python code'}</span>
         <textarea
           value={cell.code ?? ''}
           onChange={e => onChange({ ...cell, code: e.target.value })}
           rows={10}
-          placeholder="import numpy as np&#10;&#10;# Your code here…"
+          placeholder={language === 'openmat' ? 'A = [1 2; 3 4]\neig(A)' : 'import numpy as np\n\n# Your code here…'}
           className="field font-mono text-xs resize-y leading-relaxed"
           spellCheck={false}
         />
@@ -78,7 +84,7 @@ function CellEditor({ cell, onChange, onRemove }) {
   )
 }
 
-function NotebookCellsEditor({ cells, onChange }) {
+function NotebookCellsEditor({ cells, onChange, language = 'python' }) {
   const updateCell = (i, updated) => {
     const next = [...cells]
     next[i] = updated
@@ -96,6 +102,7 @@ function NotebookCellsEditor({ cells, onChange }) {
         <CellEditor
           key={i}
           cell={cell}
+          language={language}
           onChange={updated => updateCell(i, updated)}
           onRemove={() => removeCell(i)}
         />
@@ -117,9 +124,14 @@ export default function VisualizationBlock({ child, sectionId, dispatch, index, 
   const [editingSource, setEditingSource] = useState(false)
 
   const updateChild = updates => dispatch({ type: 'UPDATE_CHILD', sectionId, childId: child._id, updates })
-  const cells = child.props?.initialCells ?? []
 
+  // _initialCells is set by vizsToChildren() for PythonNotebook / OpenMatNotebook
+  // from whichever key the lesson used (initialProps.initialCells or props.initialCells).
+  const isNotebook = child.vizId === 'PythonNotebook' || child.vizId === 'OpenMatNotebook'
   const isPythonNotebook = child.vizId === 'PythonNotebook'
+  const isOpenMatNotebook = child.vizId === 'OpenMatNotebook'
+  const notebookLanguage = isOpenMatNotebook ? 'openmat' : 'python'
+  const cells = child._initialCells ?? child.props?.initialCells ?? []
 
   return (
     <div className="rounded-xl border border-brand-200 dark:border-brand-800 overflow-hidden bg-brand-50/30 dark:bg-brand-950/20">
@@ -129,8 +141,8 @@ export default function VisualizationBlock({ child, sectionId, dispatch, index, 
         <span className="text-[10px] font-black uppercase tracking-widest text-brand-600 dark:text-brand-400">
           {child.vizId || 'Visualization'}
         </span>
-        {isPythonNotebook && (
-          <span className="text-[10px] text-slate-400 font-mono ml-1">🐍 {cells.length} cells</span>
+        {isNotebook && (
+          <span className="text-[10px] text-slate-400 font-mono ml-1">{isOpenMatNotebook ? '🧮' : '🐍'} {cells.length} cells</span>
         )}
         {child.title && <span className="text-xs text-slate-500 dark:text-slate-400 truncate flex-1">{child.title}</span>}
 
@@ -149,7 +161,7 @@ export default function VisualizationBlock({ child, sectionId, dispatch, index, 
               title="Move down"
             >↓</button>
           )}
-          {isPythonNotebook && (
+          {isNotebook && (
             <button
               onClick={() => dispatch({ type: 'EJECT_CHILD', sectionId, childId: child._id })}
               className="text-[10px] font-semibold text-amber-600 hover:text-amber-700 border border-amber-300 rounded px-1.5 py-0.5"
@@ -234,10 +246,11 @@ export default function VisualizationBlock({ child, sectionId, dispatch, index, 
       {/* Expandable content */}
       {expanded && (
         <div className="px-4 py-4">
-          {isPythonNotebook ? (
+          {isNotebook ? (
             <NotebookCellsEditor
               cells={cells}
-              onChange={next => updateChild({ props: { ...child.props, initialCells: next } })}
+              language={notebookLanguage}
+              onChange={next => updateChild({ _initialCells: next })}
             />
           ) : (
             <div className="space-y-2">

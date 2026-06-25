@@ -1,7 +1,11 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import BlockShell from '../BlockShell.jsx'
+import MarkdownEditButton from '../MarkdownEditButton.jsx'
 
-function LinkEditor({ item, onChange, onRemove, placeholder }) {
+const MarkdownCellEditor = lazy(() => import('./MarkdownCellEditor.jsx'))
+
+function LinkEditor({ item, onChange, onRemove, placeholder, title }) {
+  const [editingNote, setEditingNote] = useState(false)
   return (
     <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-2 bg-slate-50 dark:bg-slate-800/50">
       <div className="flex items-center gap-2">
@@ -19,13 +23,24 @@ function LinkEditor({ item, onChange, onRemove, placeholder }) {
         />
         <button onClick={onRemove} className="text-xs text-red-400 hover:text-red-600 shrink-0">✕</button>
       </div>
-      <textarea
-        value={item.note ?? ''}
-        onChange={e => onChange({ ...item, note: e.target.value })}
-        placeholder={placeholder}
-        rows={2}
-        className="field text-sm resize-none"
-      />
+      <label className="flex flex-col gap-1">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Note</span>
+          <MarkdownEditButton onClick={() => setEditingNote(true)} />
+        </div>
+        <textarea
+          value={item.note ?? ''}
+          onChange={e => onChange({ ...item, note: e.target.value })}
+          placeholder={placeholder}
+          rows={2}
+          className="field text-sm resize-none"
+        />
+      </label>
+      {editingNote && (
+        <Suspense fallback={null}>
+          <MarkdownCellEditor value={item.note ?? ''} onChange={v => onChange({ ...item, note: v })} onClose={() => setEditingNote(false)} title={title} />
+        </Suspense>
+      )}
     </div>
   )
 }
@@ -85,6 +100,7 @@ export default function SpiralBlock({ sec, dispatch, index, total, onMoveUp, onM
             onChange={updated => { const next = [...recovery]; next[i] = updated; update({ recoveryPoints: next }) }}
             onRemove={() => update({ recoveryPoints: recovery.filter((_, j) => j !== i) })}
             placeholder="How this earlier concept connects to today's lesson…"
+            title="🌀 Recovery Point Note"
           />
         ))}
         {!recovery.length && <p className="text-xs text-slate-400 italic">No recovery points yet.</p>}
@@ -106,6 +122,7 @@ export default function SpiralBlock({ sec, dispatch, index, total, onMoveUp, onM
             onChange={updated => { const next = [...future]; next[i] = updated; update({ futureLinks: next }) }}
             onRemove={() => update({ futureLinks: future.filter((_, j) => j !== i) })}
             placeholder="How today's concept enables this future lesson…"
+            title="🌀 Future Link Note"
           />
         ))}
         {!future.length && <p className="text-xs text-slate-400 italic">No future links yet.</p>}

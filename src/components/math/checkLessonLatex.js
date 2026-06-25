@@ -34,11 +34,13 @@ function checkProse(text, path, errors) {
 // Deliberately doesn't hand-enumerate fields by name, since lesson schemas
 // vary across course tracks. Any string under a "tex"/"expression" key is
 // raw LaTeX; every other string is prose that may contain delimited math —
-// except "props", which is opaque pass-through data handed directly to a
-// visualization component (code-editor file contents, numeric config, etc,
-// per builderUtils.js's childrenToVizs/vizsToChildren) and was never meant
-// to go through MarkdownProse/KaTeX at all.
-const SKIP_KEYS = new Set(['props'])
+// except keys in SKIP_KEYS, which hold opaque/non-prose content that was
+// never meant to go through KaTeX:
+//   props        — opaque pass-through data for viz components
+//   code         — Python/MATLAB/JS source; \n \t etc. are escape sequences, not LaTeX
+//   initialProps — entire notebook initialProps subtree (contains code cells)
+//   output       — cell output text, not authored prose
+const SKIP_KEYS = new Set(['props', 'code', 'initialProps', 'output'])
 
 function walk(value, path, parentKey, errors) {
   if (value == null) return

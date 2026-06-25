@@ -35,20 +35,35 @@ export const PALETTE_BLOCKS = [
   { type: 'mastery',        label: 'Mastery',         icon: '🎓', desc: 'Target level and mastery criteria for this lesson' },
 ]
 
+// Viz IDs that embed editable notebook cells inside initialProps.initialCells
+// (vs props.initialCells which some older vizzes use).
+const NOTEBOOK_VIZ_IDS = new Set(['PythonNotebook', 'OpenMatNotebook'])
+
 // Convert lesson.*.visualizations array → builder children array
 export function vizsToChildren(vizs) {
-  return (vizs ?? []).map(viz => ({
-    _id: newId(),
-    type: 'visualization',
-    vizId: viz.id ?? '',
-    title: viz.title ?? '',
-    caption: viz.caption ?? '',
-    mathBridge: viz.mathBridge ?? '',
-    props: viz.props ?? {},
-    // Preserve the full original so fields the builder doesn't edit (initialProps, etc.)
-    // pass through unchanged on export. Never serialized — consumed only by childrenToVizs.
-    _rawViz: viz,
-  }))
+  return (vizs ?? []).map(viz => {
+    // Cells can live in either initialProps.initialCells (LA-style) or
+    // props.initialCells (older style). Extract them into _initialCells so
+    // VisualizationBlock can edit them without touching the _rawViz structure.
+    const _initialCells = NOTEBOOK_VIZ_IDS.has(viz.id)
+      ? (viz.initialProps?.initialCells ?? viz.props?.initialCells ?? null)
+      : null
+    return {
+      _id: newId(),
+      type: 'visualization',
+      vizId: viz.id ?? '',
+      title: viz.title ?? '',
+      caption: viz.caption ?? '',
+      mathBridge: viz.mathBridge ?? '',
+      props: viz.props ?? {},
+      // _initialCells is null for non-notebook vizzes — undefined would be
+      // ambiguous with "never had cells"; null means "notebook with 0 cells".
+      ...(_initialCells !== null ? { _initialCells } : {}),
+      // Preserve the full original so fields the builder doesn't edit (initialProps, etc.)
+      // pass through unchanged on export. Never serialized — consumed only by childrenToVizs.
+      _rawViz: viz,
+    }
+  })
 }
 
 // Convert builder children array → lesson.*.visualizations array
@@ -63,6 +78,14 @@ export function childrenToVizs(children) {
     // Only write props when non-empty — don't inject {} when the source didn't have it
     if (child.props && Object.keys(child.props).length) v.props = child.props
     else delete v.props
+    // Write edited notebook cells back to whichever key the original used
+    if (child._initialCells !== undefined) {
+      if (v.initialProps !== undefined) {
+        v.initialProps = { ...v.initialProps, initialCells: child._initialCells }
+      } else if (v.props !== undefined) {
+        v.props = { ...v.props, initialCells: child._initialCells }
+      }
+    }
     return v
   })
 }

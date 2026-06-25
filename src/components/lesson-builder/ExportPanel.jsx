@@ -35,6 +35,7 @@ export default function ExportPanel({ state, onClose }) {
   const [devMode, setDevMode] = useState(false)
   const [diff, setDiff] = useState({ status: 'idle', original: '', resolvedPath: '', error: '' })
   const [DiffEditorComp, setDiffEditorComp] = useState(null)
+  const [ignoreLatex, setIgnoreLatex] = useState(false)
 
   useEffect(() => {
     fetch(`${API}/ping`).then(r => r.ok && setDevMode(true)).catch(() => {})
@@ -219,13 +220,24 @@ export default function ExportPanel({ state, onClose }) {
         {/* Footer */}
         <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-700 shrink-0 space-y-3">
           {latexErrors.length > 0 && (
-            <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 px-3 py-2 space-y-1">
-              <p className="text-xs font-bold text-red-600 dark:text-red-400">
-                {latexErrors.length} LaTeX error{latexErrors.length > 1 ? 's' : ''} — fix before submitting
-              </p>
+            <div className={`rounded-lg border px-3 py-2 space-y-2 ${ignoreLatex ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800' : 'bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-900'}`}>
+              <div className="flex items-start justify-between gap-3">
+                <p className={`text-xs font-bold ${ignoreLatex ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {latexErrors.length} LaTeX error{latexErrors.length > 1 ? 's' : ''} {ignoreLatex ? '— ignored, proceeding anyway' : '— fix or ignore to proceed'}
+                </p>
+                <button
+                  onClick={() => setIgnoreLatex(v => !v)}
+                  className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded border ${ignoreLatex ? 'border-amber-400 text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/30' : 'border-red-300 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30'}`}
+                >
+                  {ignoreLatex ? 'Un-ignore' : 'Ignore'}
+                </button>
+              </div>
               {latexErrors.slice(0, 5).map((err, i) => (
-                <p key={i} className="text-xs text-red-500 font-mono break-all">{err.path}: {err.message}</p>
+                <p key={i} className="text-xs text-red-500 dark:text-red-400 font-mono break-all">{err.path}: {err.message}</p>
               ))}
+              {latexErrors.length > 5 && (
+                <p className="text-[10px] text-slate-400">…and {latexErrors.length - 5} more</p>
+              )}
             </div>
           )}
 
@@ -307,7 +319,7 @@ export default function ExportPanel({ state, onClose }) {
             {devMode && (
               <button
                 onClick={saveToDisk}
-                disabled={latexErrors.length > 0 || submitState.status === 'submitting' || noChanges}
+                disabled={(latexErrors.length > 0 && !ignoreLatex) || submitState.status === 'submitting' || noChanges}
                 className="px-5 py-2 text-sm font-bold rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {submitState.status === 'submitting' ? 'Saving…' : '💾 Save to disk'}
@@ -316,7 +328,7 @@ export default function ExportPanel({ state, onClose }) {
 
             <button
               onClick={submitAsContribution}
-              disabled={!agreedToLicense || !token.trim() || latexErrors.length > 0 || submitState.status === 'submitting'}
+              disabled={!agreedToLicense || !token.trim() || (latexErrors.length > 0 && !ignoreLatex) || submitState.status === 'submitting'}
               className="px-5 py-2 text-sm font-bold rounded-xl bg-slate-900 text-white hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-white dark:text-slate-900"
             >
               {submitState.status === 'submitting' ? 'Submitting…' : 'Submit as contribution'}
@@ -327,8 +339,8 @@ export default function ExportPanel({ state, onClose }) {
                 ? 'No changes to save'
                 : devMode
                 ? 'Save to disk skips GitHub entirely'
-                : latexErrors.length > 0
-                ? 'Fix the LaTeX errors above first'
+                : latexErrors.length > 0 && !ignoreLatex
+                ? 'Fix or ignore the LaTeX errors above first'
                 : 'Opens a real pull request on GitHub'}
             </p>
           </div>
