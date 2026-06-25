@@ -21,19 +21,19 @@ const SECTIONS = [
 
 const GRID_OVL = {
   backgroundImage: [
-    'repeating-linear-gradient(rgba(255,255,255,0.04) 0 1px, transparent 1px 100%)',
-    'repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 100%)',
+    'repeating-linear-gradient(rgba(255,255,255,0.15) 0 1px, transparent 1px 100%)',
+    'repeating-linear-gradient(90deg, rgba(255,255,255,0.15) 0 1px, transparent 1px 100%)',
   ].join(','),
   backgroundSize: '22px 22px',
 }
 
 const DOTS_OVL = {
-  backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.10) 1.5px, transparent 1.5px)',
+  backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.25) 1.5px, transparent 1.5px)',
   backgroundSize: '13px 13px',
 }
 
 const STRIPES_OVL = {
-  backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 2px, transparent 2px, transparent 6px)',
+  backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.12) 0px, rgba(255,255,255,0.12) 2px, transparent 2px, transparent 6px)',
   backgroundSize: '10px 10px',
 }
 
@@ -203,7 +203,7 @@ export default function StartMenu({ onClose }) {
     const meta = pin.color && GLASS_META[pin.color]
     let overlay = null
     if (meta) {
-      if (pin.type === 'course') overlay = { backgroundImage: GRID_TEXTURE, opacity: 0.055 }
+      if (pin.type === 'course') overlay = { backgroundImage: GRID_TEXTURE, opacity: 0.15 }
       else if (pin.type === 'lab') overlay = GRID_OVL
       else if (pin.type === 'game') overlay = DOTS_OVL
       else if (pin.type === 'nav') overlay = STRIPES_OVL
@@ -222,6 +222,9 @@ export default function StartMenu({ onClose }) {
         }`}
         style={meta ? { boxShadow: meta.glow.replace('32px', '16px').replace('0.50', '0.20') } : undefined}
       >
+        {meta && (
+          <div className="absolute inset-0 bg-white/20 dark:bg-transparent pointer-events-none" />
+        )}
         {meta && overlay && (
           <div className="absolute inset-0 pointer-events-none" style={overlay} />
         )}
@@ -233,7 +236,7 @@ export default function StartMenu({ onClose }) {
         )}
         <span className="text-2xl flex-shrink-0 relative z-10">{pin.emoji}</span>
         <span className={`text-sm font-bold line-clamp-2 relative z-10 pr-2 ${
-          meta ? 'text-white drop-shadow-sm' : 'text-slate-700 dark:text-slate-300'
+          meta ? 'text-white drop-shadow-sm' : 'text-slate-700 dark:text-slate-100'
         }`}>
           {pin.label}
         </span>
@@ -250,10 +253,16 @@ export default function StartMenu({ onClose }) {
         exit={{ opacity: 0, y: 20, scale: 0.98 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
         ref={menuRef}
-        className="fixed bottom-14 left-3 z-[1900] w-[620px] max-h-[75vh] flex flex-col rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.15)] border border-white/50 dark:border-white/10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl ring-1 ring-black/5 dark:ring-white/5"
+        className="fixed bottom-14 left-3 z-[1900] w-[620px] max-h-[75vh] flex flex-col rounded-[28px] overflow-hidden shadow-[0_20px_80px_-10px_rgba(0,0,0,0.3)] border border-white/60 dark:border-white/10 bg-white/70 dark:bg-slate-900/70 backdrop-blur-[48px] saturate-[180%] ring-1 ring-white/50 dark:ring-white/5 text-slate-800 dark:text-slate-100"
       >
+        {/* Ambient background glow */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[28px]">
+          <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-indigo-400/15 dark:bg-indigo-500/15 rounded-full blur-[80px] mix-blend-multiply dark:mix-blend-screen" />
+          <div className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-cyan-400/15 dark:bg-cyan-500/15 rounded-full blur-[80px] mix-blend-multiply dark:mix-blend-screen" />
+        </div>
+
         {/* Search */}
-        <div className="flex-shrink-0 p-4 border-b border-black/[0.05] dark:border-white/[0.05]">
+        <div className="relative z-10 flex-shrink-0 p-4 border-b border-black/[0.05] dark:border-white/[0.05]">
           <div className="relative">
             <input
               autoFocus
@@ -261,9 +270,9 @@ export default function StartMenu({ onClose }) {
               placeholder="Search labs, games, tools…"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 text-sm rounded-2xl bg-black/5 dark:bg-white/5 border border-transparent focus:bg-white dark:focus:bg-slate-800 focus:border-indigo-500/50 outline-none placeholder-slate-400 dark:placeholder-slate-500 text-slate-800 dark:text-slate-200 transition-all shadow-sm focus:shadow-md"
+              className="w-full pl-10 pr-4 py-3 text-sm rounded-2xl bg-white/40 dark:bg-white/10 border border-white/40 dark:border-white/5 focus:bg-white/80 dark:focus:bg-white/20 focus:border-indigo-500/50 outline-none placeholder-slate-400 dark:placeholder-slate-300 text-slate-800 dark:text-white transition-all shadow-sm focus:shadow-md backdrop-blur-md"
             />
-            <svg className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
@@ -271,7 +280,7 @@ export default function StartMenu({ onClose }) {
 
         {/* Tabs */}
         {!query && (
-          <div className="flex-shrink-0 flex gap-2 px-4 pt-3 pb-2 border-b border-black/[0.05] dark:border-white/[0.05] overflow-x-auto scrollbar-none">
+          <div className="relative z-10 flex-shrink-0 flex gap-2 px-4 pt-3 pb-2 border-b border-black/[0.05] dark:border-white/[0.05] overflow-x-auto scrollbar-none">
             {SECTIONS.map(s => (
               <button
                 key={s.id}
@@ -279,9 +288,9 @@ export default function StartMenu({ onClose }) {
                 className={`relative flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
                   tab === s.id
                     ? s.id === 'favourites'
-                      ? 'text-amber-600 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30'
-                      : 'text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30'
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                      ? 'text-amber-700 dark:text-amber-200 bg-amber-50 dark:bg-amber-900/30'
+                      : 'text-indigo-700 dark:text-indigo-200 bg-indigo-50 dark:bg-indigo-900/30'
+                    : 'text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 {tab === s.id && (
@@ -297,14 +306,14 @@ export default function StartMenu({ onClose }) {
         )}
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-6">
+        <div className="relative z-10 flex-1 overflow-y-auto overscroll-contain p-4 space-y-6">
           <AnimatePresence mode="popLayout">
 
             {/* ---- Favourites ---- */}
             {showFavourites && filteredPins.length > 0 && (
               <motion.section key="fav-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
                 <div className="flex items-center justify-between mb-3 px-2">
-                  <h3 className="text-[11px] font-black text-amber-500 dark:text-amber-400 uppercase tracking-widest">
+                  <h3 className="text-[11px] font-black text-amber-600 dark:text-amber-300 uppercase tracking-widest">
                     ★ Favourites
                   </h3>
                   <span className="text-[10px] text-slate-400 dark:text-slate-500">Right-click any item to pin / unpin</span>
@@ -338,7 +347,7 @@ export default function StartMenu({ onClose }) {
             {/* ---- Courses ---- */}
             {showCourses && filteredCourses.length > 0 && (
               <motion.section key="courses-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
-                <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Courses</h3>
+                <h3 className="text-[11px] font-black text-slate-600 dark:text-slate-200 uppercase tracking-widest mb-3 px-2">Courses</h3>
                 <div className="grid grid-cols-3 gap-2">
                   {filteredCourses.map(course => {
                     const pin = toPin(course, 'course')
@@ -353,7 +362,7 @@ export default function StartMenu({ onClose }) {
             {/* ---- Labs ---- */}
             {showLabs && filteredLabs.length > 0 && (
               <motion.section key="labs-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
-                <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Labs</h3>
+                <h3 className="text-[11px] font-black text-slate-600 dark:text-slate-200 uppercase tracking-widest mb-3 px-2">Labs</h3>
                 <div className="grid grid-cols-3 gap-2">
                   {filteredLabs.map(lab => {
                     const pin = toPin(lab, 'lab')
@@ -368,7 +377,7 @@ export default function StartMenu({ onClose }) {
             {/* ---- Games ---- */}
             {showGames && filteredGames.length > 0 && (
               <motion.section key="games-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
-                <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Games</h3>
+                <h3 className="text-[11px] font-black text-slate-600 dark:text-slate-200 uppercase tracking-widest mb-3 px-2">Games</h3>
                 <div className="grid grid-cols-3 gap-2">
                   {filteredGames.map(game => {
                     const pin = toPin(game, 'game')
@@ -383,7 +392,7 @@ export default function StartMenu({ onClose }) {
             {/* ---- Navigate ---- */}
             {showNav && filteredNav.length > 0 && (
               <motion.section key="nav-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
-                <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Navigate</h3>
+                <h3 className="text-[11px] font-black text-slate-600 dark:text-slate-200 uppercase tracking-widest mb-3 px-2">Navigate</h3>
                 <div className="grid grid-cols-3 gap-2">
                   {filteredNav.map(link => {
                     const pin = toPin(link, 'nav')
