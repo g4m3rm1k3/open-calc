@@ -498,6 +498,70 @@ plt.show()`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la3-007-diagonal-exp',
+      title: 'Matrix Exponential of a Diagonal Matrix',
+      prereqs: ['Scalar exponential', 'Diagonal matrices'],
+      problem: 'Compute $e^{Dt}$ where $D = \\begin{bmatrix}2&0\\\\0&-3\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Recall the definition of the matrix exponential',
+          strategy: '$e^M = \\sum_{k=0}^\\infty \\frac{M^k}{k!}$. For diagonal matrices, powers are computed entry-by-entry, so the series simplifies to entry-by-entry scalar exponentials.',
+          explanation: "For a diagonal matrix, powers stay diagonal: $D^k = \\begin{bmatrix}2^k&0\\\\0&(-3)^k\\end{bmatrix}$. The series $\\sum \\frac{D^k t^k}{k!}$ is then $\\sum \\frac{d_{ii}^k t^k}{k!} = e^{d_{ii}t}$ for each diagonal entry $d_{ii}$.",
+          math: 'e^{Dt} = \\begin{bmatrix}e^{2t}&0\\\\0&e^{-3t}\\end{bmatrix}',
+        },
+        {
+          label: 'Verify a simple case: $t=0$',
+          strategy: 'At $t=0$, $e^{D \\cdot 0} = e^0 = I$ for any matrix.',
+          explanation: '$e^{D\\cdot 0} = \\begin{bmatrix}e^0&0\\\\0&e^0\\end{bmatrix} = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = I$ ✓.',
+          math: 'e^{Dt}\\big|_{t=0} = I \\checkmark',
+        },
+        {
+          label: 'Interpret the entries as ODE solutions',
+          strategy: 'Each diagonal entry $e^{\\lambda_i t}$ is the solution to the scalar ODE $\\dot{x} = \\lambda_i x$.',
+          explanation: 'For a system $\\dot{\\mathbf{x}} = D\\mathbf{x}$, the first component solves $\\dot{x}_1=2x_1 \\Rightarrow x_1=x_1(0)e^{2t}$ (grows); the second solves $\\dot{x}_2=-3x_2 \\Rightarrow x_2=x_2(0)e^{-3t}$ (decays).',
+          math: '\\dot{\\mathbf{x}} = D\\mathbf{x} \\Rightarrow \\mathbf{x}(t) = e^{Dt}\\mathbf{x}(0)',
+          gotcha: 'Positive diagonal entries → exponential growth (unstable). Negative → decay (stable). Mixed → saddle point. Stability is determined by the SIGN of each eigenvalue.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la3-007-ode-solution',
+      title: 'Solving a System of ODEs via the Matrix Exponential',
+      prereqs: ['Matrix exponential', 'Diagonalization', 'Eigenvalues'],
+      problem: 'Solve $\\dot{\\mathbf{x}} = A\\mathbf{x}$ with $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$ and $\\mathbf{x}(0) = \\begin{bmatrix}1\\\\0\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Use the formula $\\mathbf{x}(t) = e^{At}\\mathbf{x}(0)$',
+          strategy: 'For $A = PDP^{-1}$ (diagonalizable), $e^{At} = P e^{Dt} P^{-1}$. This converts the matrix exponential into diagonal form, which is easy to compute.',
+          explanation: '$A = PDP^{-1}$ where $P = \\begin{bmatrix}-1&1\\\\1&1\\end{bmatrix}$, $D = \\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}$.',
+          math: 'e^{At} = P e^{Dt} P^{-1} = \\begin{bmatrix}-1&1\\\\1&1\\end{bmatrix}\\begin{bmatrix}e^{2t}&0\\\\0&e^{4t}\\end{bmatrix}\\begin{bmatrix}-1&1\\\\1&1\\end{bmatrix}^{-1}',
+        },
+        {
+          label: 'Substitute $P^{-1}$ and multiply',
+          strategy: 'Work right-to-left: first apply $P^{-1}$ to $\\mathbf{x}(0)$, scale by $e^{Dt}$, then apply $P$.',
+          explanation: '$P^{-1}\\mathbf{x}(0) = \\frac{1}{-2}\\begin{bmatrix}1&-1\\\\-1&-1\\end{bmatrix}\\begin{bmatrix}1\\\\0\\end{bmatrix} = \\frac{1}{-2}\\begin{bmatrix}1\\\\-1\\end{bmatrix} = \\begin{bmatrix}-1/2\\\\1/2\\end{bmatrix}$.',
+          math: 'P^{-1}\\mathbf{x}(0) = \\begin{bmatrix}-\\tfrac{1}{2}\\\\\\tfrac{1}{2}\\end{bmatrix}',
+        },
+        {
+          label: 'Apply $e^{Dt}$ then $P$',
+          strategy: 'Multiply each component by its corresponding exponential, then transform back.',
+          explanation: '$e^{Dt}\\begin{bmatrix}-1/2\\\\1/2\\end{bmatrix} = \\begin{bmatrix}-e^{2t}/2\\\\e^{4t}/2\\end{bmatrix}$. Then $P\\cdot$ this gives $\\mathbf{x}(t)$.',
+          math: '\\mathbf{x}(t) = \\frac{1}{2}\\begin{bmatrix}e^{2t}+e^{4t}\\\\-e^{2t}+e^{4t}\\end{bmatrix}',
+          gotcha: 'Both eigenvalues $\\lambda_1=2$ and $\\lambda_2=4$ are positive, so both components grow — the system is unstable. If even one eigenvalue has positive real part, the system is unstable.',
+        },
+        {
+          label: 'Verify at $t=0$',
+          strategy: 'At $t=0$, the solution must equal the initial condition.',
+          explanation: '$\\mathbf{x}(0) = \\frac{1}{2}\\begin{bmatrix}1+1\\\\-1+1\\end{bmatrix} = \\begin{bmatrix}1\\\\0\\end{bmatrix}$ ✓.',
+          math: '\\mathbf{x}(0) = \\begin{bmatrix}1\\\\0\\end{bmatrix} \\checkmark',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: "ch-la3-007-1",

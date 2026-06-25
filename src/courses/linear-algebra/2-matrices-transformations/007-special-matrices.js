@@ -519,6 +519,75 @@ for i, M in enumerate([M1, M2, M3], 1):
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-007-classify',
+      title: 'Classifying a Matrix — The Four Diagnostic Questions',
+      prereqs: ['Transpose', 'Determinant', 'Eigenvalues (conceptual)'],
+      problem: 'Classify $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$: is it symmetric? orthogonal? positive definite? positive semidefinite?',
+      steps: [
+        {
+          label: 'Question 1: Is $A$ symmetric? Check $A^\\top = A$.',
+          strategy: 'Symmetric means the matrix equals its own transpose — equivalently, entry $(i,j)$ equals entry $(j,i)$.',
+          explanation: '$A^\\top = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix} = A$ ✓. The off-diagonal entries $(1,2)$ and $(2,1)$ are both 1 — equal. $A$ is symmetric.',
+          math: 'A^\\top = A \\checkmark \\quad \\text{(symmetric)}',
+        },
+        {
+          label: 'Question 2: Is $A$ orthogonal? Check $A^\\top A = I$.',
+          strategy: 'Orthogonal means the columns are orthonormal — each has length 1 and all pairs are perpendicular.',
+          explanation: 'Column 1 is $[3,1]^\\top$ with magnitude $\\sqrt{10} \\neq 1$. So the columns are not unit vectors — $A$ is NOT orthogonal.',
+          math: '\\|[3,1]^\\top\\| = \\sqrt{10} \\neq 1 \\implies \\text{not orthogonal}',
+        },
+        {
+          label: 'Question 3: Is $A$ positive definite? Compute $\\mathbf{x}^\\top A \\mathbf{x}$ or check eigenvalues.',
+          strategy: 'For a symmetric matrix, check the leading principal minors (Sylvester\'s criterion).',
+          explanation: 'Leading minors: $a_{11}=3>0$, $\\det(A) = 9-1=8>0$. All positive — $A$ is positive definite. Equivalently: the eigenvalues are $3+1=4$ and $3-1=2$, both positive.',
+          math: 'a_{11}=3>0 \\quad \\det(A)=8>0 \\implies \\text{positive definite}',
+        },
+        {
+          label: 'Summarize the classification',
+          strategy: 'State which special classes apply and which do not.',
+          explanation: '$A$ is symmetric and positive definite (SPD) — the most desirable class for numerical algorithms. It is not orthogonal (columns are not unit-length). Every SPD matrix is invertible (all eigenvalues positive implies det > 0).',
+          math: 'A \\in \\{\\text{symmetric, PD}\\} \\quad A \\notin \\{\\text{orthogonal}\\}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-007-orthogonal-verify',
+      title: 'Verifying an Orthogonal Matrix — Column Orthonormality',
+      prereqs: ['Dot product', 'Transpose', 'Matrix multiplication'],
+      problem: 'Verify that the rotation matrix $Q = \\begin{bmatrix}\\cos\\theta & -\\sin\\theta \\\\ \\sin\\theta & \\cos\\theta\\end{bmatrix}$ satisfies $Q^\\top Q = I$.',
+      steps: [
+        {
+          label: 'Write the transpose',
+          strategy: '$Q^\\top$ swaps rows and columns: entry $(i,j)$ becomes entry $(j,i)$.',
+          explanation: 'Swapping rows and columns of $Q$: row 1 becomes column 1, row 2 becomes column 2.',
+          math: 'Q^\\top = \\begin{bmatrix}\\cos\\theta & \\sin\\theta \\\\ -\\sin\\theta & \\cos\\theta\\end{bmatrix}',
+        },
+        {
+          label: 'Compute $(Q^\\top Q)_{11}$: column 1 of $Q$ dotted with itself',
+          strategy: 'Diagonal entries of $Q^\\top Q$ are squared norms of the columns of $Q$.',
+          explanation: 'Column 1 of $Q$ is $[\\cos\\theta, \\sin\\theta]^\\top$. Its squared norm: $\\cos^2\\theta + \\sin^2\\theta = 1$ (Pythagorean identity).',
+          math: '(Q^\\top Q)_{11} = \\cos^2\\theta+\\sin^2\\theta = 1',
+        },
+        {
+          label: 'Compute $(Q^\\top Q)_{12}$: column 1 and column 2 of $Q$ dotted',
+          strategy: 'Off-diagonal entries of $Q^\\top Q$ are dot products between distinct columns.',
+          explanation: 'Column 1: $[\\cos\\theta, \\sin\\theta]^\\top$. Column 2: $[-\\sin\\theta, \\cos\\theta]^\\top$. Dot: $\\cos\\theta(-\\sin\\theta) + \\sin\\theta\\cos\\theta = -\\cos\\theta\\sin\\theta + \\sin\\theta\\cos\\theta = 0$.',
+          math: '(Q^\\top Q)_{12} = -\\cos\\theta\\sin\\theta+\\sin\\theta\\cos\\theta = 0',
+        },
+        {
+          label: 'Conclude $Q^\\top Q = I$ and interpret geometrically',
+          strategy: 'All column norms are 1 (diagonal entries) and all columns are perpendicular (off-diagonal entries = 0).',
+          explanation: 'By symmetry (same calculation for the $(2,2)$ and $(2,1)$ entries), $Q^\\top Q = I$. Geometrically: rotation preserves all lengths and all angles. It is an isometry — a rigid body motion.',
+          math: 'Q^\\top Q = I \\implies Q^{-1} = Q^\\top',
+          gotcha: 'For orthogonal matrices, the inverse is free: just transpose. This is exploited constantly in numerical methods — transposing is $O(n^2)$, inverting is $O(n^3)$.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'la2-007-ch1',

@@ -476,6 +476,70 @@ A = np.array([[1., 2.],
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la4-004-svd-compute',
+      title: 'Computing the SVD of a 2×2 Matrix Step by Step',
+      prereqs: ['Eigenvalues', 'Eigenvectors', 'Square root'],
+      problem: 'Find the SVD $A = U\\Sigma V^\\top$ for $A = \\begin{bmatrix}3&0\\\\0&2\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Recognize diagonal matrices are already in SVD form',
+          strategy: 'For a diagonal matrix with positive entries, the SVD is trivial: $U = I$, $\\Sigma = A$, $V = I$. Use this example to understand the general pattern.',
+          explanation: '$A = I \\cdot \\begin{bmatrix}3&0\\\\0&2\\end{bmatrix} \\cdot I^\\top$. Singular values are $\\sigma_1=3 \\geq \\sigma_2=2 > 0$ — listed in decreasing order.',
+          math: 'A = \\underbrace{I}_{U}\\underbrace{\\begin{bmatrix}3&0\\\\0&2\\end{bmatrix}}_{\\Sigma}\\underbrace{I^\\top}_{V^\\top}',
+          gotcha: 'Singular values are ALWAYS non-negative. If a diagonal entry is negative, you absorb the sign into $U$: $-3 = (-1)(3)(1)$, putting $-1$ into the corresponding column of $U$.',
+        },
+        {
+          label: 'For a general matrix: find $V$ from $A^\\top A$',
+          strategy: '$V$\'s columns are the eigenvectors of $A^\\top A$. The singular values are $\\sigma_i = \\sqrt{\\lambda_i(A^\\top A)}$.',
+          explanation: 'The key identity: $A^\\top A = V\\Sigma^2 V^\\top$. So diagonalizing $A^\\top A$ gives $V$ and $\\Sigma^2$ in one step.',
+          math: 'A^\\top A = V\\Sigma^2 V^\\top \\Rightarrow \\sigma_i = \\sqrt{\\lambda_i(A^\\top A)}',
+        },
+        {
+          label: 'For a general matrix: recover $U$ from $U = AV\\Sigma^{-1}$',
+          strategy: 'Once $V$ and $\\Sigma$ are known, $U$\'s columns are $\\mathbf{u}_i = A\\mathbf{v}_i/\\sigma_i$ (normalized images of the right singular vectors).',
+          explanation: 'From $A = U\\Sigma V^\\top$: multiply by $V\\Sigma^{-1}$: $AV\\Sigma^{-1} = U$. Each column $\\mathbf{u}_i = A\\mathbf{v}_i/\\sigma_i$. These are automatically unit vectors when $A$ has full column rank.',
+          math: '\\mathbf{u}_i = \\frac{A\\mathbf{v}_i}{\\sigma_i}',
+        },
+        {
+          label: 'Interpret the three matrices geometrically',
+          strategy: '$V^\\top$ rotates, $\\Sigma$ scales, $U$ rotates again. Any matrix = rotate → scale → rotate.',
+          explanation: 'Every matrix $A$ decomposes as: (1) $V^\\top$ rotates input to the "natural" input axes; (2) $\\Sigma$ stretches each axis independently; (3) $U$ rotates the result to the output space. The singular values measure how much $A$ stretches in each direction.',
+          math: 'A = U\\Sigma V^\\top = \\underbrace{U}_{\\text{rotate}}\\underbrace{\\Sigma}_{\\text{scale}}\\underbrace{V^\\top}_{\\text{rotate}}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la4-004-svd-rank1',
+      title: 'Best Rank-1 Approximation via Truncated SVD',
+      prereqs: ['SVD', 'Matrix rank', 'Frobenius norm'],
+      problem: 'Find the best rank-1 approximation to $A = \\begin{bmatrix}2&2\\\\-1&2\\end{bmatrix}$ using the SVD.',
+      steps: [
+        {
+          label: 'Compute $A^\\top A$ and its eigenvalues',
+          strategy: 'The singular values come from $\\sqrt{\\lambda(A^\\top A)}$.',
+          explanation: '$A^\\top A = \\begin{bmatrix}5&2\\\\2&8\\end{bmatrix}$. Characteristic polynomial: $\\lambda^2-13\\lambda+36 = (\\lambda-9)(\\lambda-4)$. Eigenvalues: 9 and 4. Singular values: $\\sigma_1=3$, $\\sigma_2=2$.',
+          math: '\\sigma_1=3,\\quad \\sigma_2=2',
+        },
+        {
+          label: 'The rank-1 approximation uses only the largest singular value',
+          strategy: '$A_1 = \\sigma_1\\mathbf{u}_1\\mathbf{v}_1^\\top$ — the outer product of the first left and right singular vectors, scaled by $\\sigma_1$.',
+          explanation: 'Eckart-Young theorem: truncating the SVD at rank $k$ gives the best rank-$k$ approximation in both Frobenius and 2-norm.',
+          math: 'A_1 = \\sigma_1\\mathbf{u}_1\\mathbf{v}_1^\\top',
+          gotcha: 'The error in the rank-1 approximation is exactly $\\sigma_2 = 2$ in the 2-norm: $\\|A - A_1\\|_2 = \\sigma_2$. The Frobenius error is $\\|A-A_1\\|_F = \\sqrt{\\sigma_2^2+\\cdots} = \\sigma_2$ for rank-1.',
+        },
+        {
+          label: 'Quantify the information retained',
+          strategy: 'The fraction of "energy" in the rank-1 approximation is $\\sigma_1^2 / (\\sigma_1^2+\\sigma_2^2)$.',
+          explanation: '$\\sigma_1^2/(\\sigma_1^2+\\sigma_2^2) = 9/(9+4) = 9/13 \\approx 69\\%$. The rank-1 approximation retains about 69% of the matrix\'s variance.',
+          math: '\\frac{\\sigma_1^2}{\\sigma_1^2+\\sigma_2^2} = \\frac{9}{13} \\approx 69\\%',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

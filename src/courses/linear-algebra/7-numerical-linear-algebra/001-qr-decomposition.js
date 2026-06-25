@@ -362,6 +362,70 @@ x_normal
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la7-001-qr-least-squares',
+      title: 'Solving Least Squares via QR (More Stable than Normal Equations)',
+      prereqs: ['QR decomposition', 'Least squares', 'Back substitution'],
+      problem: 'Solve the least-squares problem $A\\mathbf{x}\\approx\\mathbf{b}$ for $A = \\begin{bmatrix}1&1\\\\1&2\\\\1&3\\end{bmatrix}$, $\\mathbf{b}=[1,2,2]^\\top$ using QR.',
+      steps: [
+        {
+          label: 'Why prefer QR over normal equations?',
+          strategy: 'Forming $A^\\top A$ squares the condition number: $\\kappa(A^\\top A) = \\kappa(A)^2$. For ill-conditioned $A$, this amplifies errors. QR avoids squaring.',
+          explanation: 'Normal equations: $A^\\top A\\hat{\\mathbf{x}}=A^\\top\\mathbf{b}$ works but loses digits when $A$ is nearly rank-deficient. QR decomposition is numerically preferred for the same reason Gaussian elimination beats Cramer\'s rule.',
+          math: '\\kappa(A^\\top A) = \\kappa(A)^2 \\Rightarrow \\text{QR preferred}',
+        },
+        {
+          label: 'Compute QR (via Gram-Schmidt on columns of $A$)',
+          strategy: 'Apply Gram-Schmidt to the columns of $A$ to get $Q$ (orthonormal columns), then $R = Q^\\top A$ (upper triangular).',
+          explanation: 'For this $A$: $R = Q^\\top A$ is 2×2 upper triangular. The details are algebraic; the key result is $A = QR$ where $Q^\\top Q = I$.',
+          math: 'A = QR,\\quad Q^\\top Q = I_2',
+        },
+        {
+          label: 'Reduce $A\\mathbf{x}=\\mathbf{b}$ to $R\\mathbf{x}=Q^\\top\\mathbf{b}$',
+          strategy: 'Substitute $A=QR$: $QR\\mathbf{x}=\\mathbf{b}$. Multiply by $Q^\\top$: $R\\mathbf{x}=Q^\\top\\mathbf{b}$ (since $Q^\\top Q=I$).',
+          explanation: '$Q^\\top\\mathbf{b}$ is cheap (just a matrix-vector multiply). Then solve $R\\mathbf{x}=Q^\\top\\mathbf{b}$ by back substitution — $R$ is upper triangular.',
+          math: 'R\\hat{\\mathbf{x}} = Q^\\top\\mathbf{b}',
+          gotcha: 'The system $R\\mathbf{x}=Q^\\top\\mathbf{b}$ is square and triangular — NOT overdetermined. We reduced a 3×2 system to a 2×2 triangular system.',
+        },
+        {
+          label: 'Interpret: QR splits the residual automatically',
+          strategy: '$\\mathbf{b} = QR\\hat{\\mathbf{x}} + (\\mathbf{b}-QQ^\\top\\mathbf{b})$. The first part is the projection; the second is the residual, perpendicular to $\\text{col}(A)$.',
+          explanation: '$QQ^\\top\\mathbf{b}$ is the projection of $\\mathbf{b}$ onto $\\text{col}(A)$. $Q^\\perp(\\mathbf{b}-QQ^\\top\\mathbf{b})=\\mathbf{0}$ automatically — no need to separately verify the residual is orthogonal.',
+          math: '\\mathbf{b} = \\underbrace{QQ^\\top\\mathbf{b}}_{\\in\\text{col}(A)} + \\underbrace{(I-QQ^\\top)\\mathbf{b}}_{\\perp\\text{col}(A)}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la7-001-qr-eigenvalues',
+      title: 'The QR Algorithm for Eigenvalues (Conceptual)',
+      prereqs: ['QR decomposition', 'Eigenvalues', 'Schur decomposition'],
+      problem: 'Describe one iteration of the QR algorithm for finding eigenvalues, and explain why it works.',
+      steps: [
+        {
+          label: 'One QR iteration: factor, then reverse',
+          strategy: 'Decompose $A_k = Q_k R_k$, then set $A_{k+1} = R_k Q_k$ (flip the order).',
+          explanation: '$A_{k+1} = R_k Q_k = Q_k^\\top (Q_k R_k) Q_k = Q_k^\\top A_k Q_k$. Each iteration is a similarity transformation, so eigenvalues are preserved.',
+          math: 'A_{k+1} = R_k Q_k = Q_k^\\top A_k Q_k \\sim A_k',
+        },
+        {
+          label: 'Why does the sequence converge to upper triangular form?',
+          strategy: 'The QR algorithm converges to the Schur form (upper triangular, with eigenvalues on diagonal) for generic matrices. The convergence is driven by the ratio of consecutive eigenvalues.',
+          explanation: 'If $|\\lambda_1| > |\\lambda_2| > \\cdots$, the sub-diagonal entries shrink like $(\\lambda_{i+1}/\\lambda_i)^k$ after $k$ iterations — analogous to power iteration on blocks.',
+          math: '(A_k)_{i+1,i} \\sim \\left(\\frac{\\lambda_{i+1}}{\\lambda_i}\\right)^k \\to 0',
+        },
+        {
+          label: 'In practice: use shifts for faster convergence',
+          strategy: 'Each iteration, shift $A_k - \\mu_k I$ before factoring (where $\\mu_k$ is near an eigenvalue). This accelerates convergence dramatically.',
+          explanation: 'With the Wilkinson shift, the QR algorithm converges cubically near eigenvalues — typically 2–3 iterations per eigenvalue. LAPACK\'s `DGEEV` uses exactly this.',
+          math: 'A_k - \\mu_k I = Q_k R_k,\\quad A_{k+1} = R_k Q_k + \\mu_k I',
+          gotcha: 'The QR algorithm is NOT Gram-Schmidt applied repeatedly. It\'s a similarity iteration that uses QR decomposition as a tool. The connection: each step preserves eigenvalues via $Q^\\top A Q$.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la7-001-1',

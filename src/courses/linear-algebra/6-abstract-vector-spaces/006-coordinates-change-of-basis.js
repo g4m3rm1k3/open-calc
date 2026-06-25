@@ -338,6 +338,64 @@ print("Same tr:", np.isclose(np.trace(A), np.trace(A_new)))`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la6-006-change-of-basis',
+      title: 'Converting Coordinates Between Two Bases',
+      prereqs: ['Basis', 'Coordinates', 'Matrix inverse'],
+      problem: 'In $\\mathbb{R}^2$: standard basis $\\mathcal{E} = \\{[1,0]^\\top,[0,1]^\\top\\}$, new basis $\\mathcal{B} = \\{[1,1]^\\top,[1,-1]^\\top\\}$. Given $\\mathbf{v} = [3,1]^\\top$ in $\\mathcal{E}$-coordinates, find $[\\mathbf{v}]_\\mathcal{B}$.',
+      steps: [
+        {
+          label: 'Build the change-of-basis matrix $P_{\\mathcal{E}\\leftarrow\\mathcal{B}}$',
+          strategy: 'The change-of-basis matrix from $\\mathcal{B}$ to $\\mathcal{E}$ has the $\\mathcal{B}$-basis vectors as columns (expressed in $\\mathcal{E}$-coordinates).',
+          explanation: 'Columns are the $\\mathcal{B}$ basis vectors in standard coordinates: $P = \\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}$.',
+          math: 'P = \\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}',
+        },
+        {
+          label: 'Invert $P$ to get $P_{\\mathcal{B}\\leftarrow\\mathcal{E}}$',
+          strategy: 'To convert FROM standard TO $\\mathcal{B}$-coordinates, multiply by $P^{-1}$.',
+          explanation: '$\\det(P) = -2$. $P^{-1} = \\frac{1}{-2}\\begin{bmatrix}-1&-1\\\\-1&1\\end{bmatrix} = \\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}$.',
+          math: 'P^{-1} = \\begin{bmatrix}1/2&1/2\\\\1/2&-1/2\\end{bmatrix}',
+        },
+        {
+          label: 'Apply $P^{-1}$ to $\\mathbf{v}$',
+          strategy: '$[\\mathbf{v}]_\\mathcal{B} = P^{-1}\\mathbf{v}$.',
+          explanation: '$P^{-1}[3,1]^\\top = [(3+1)/2,(3-1)/2]^\\top = [2,1]^\\top$. In $\\mathcal{B}$-coordinates: $\\mathbf{v} = 2\\cdot[1,1]^\\top+1\\cdot[1,-1]^\\top = [3,1]^\\top$ ✓.',
+          math: '[\\mathbf{v}]_\\mathcal{B} = \\begin{bmatrix}2\\\\1\\end{bmatrix} \\Rightarrow \\mathbf{v} = 2\\mathbf{b}_1+1\\cdot\\mathbf{b}_2 \\checkmark',
+          gotcha: 'Direction matters: $P$ converts $\\mathcal{B}\\to\\mathcal{E}$ (multiply on the right by $\\mathcal{B}$-coords to get $\\mathcal{E}$-coords). $P^{-1}$ converts $\\mathcal{E}\\to\\mathcal{B}$. The subscript notation $P_{\\mathcal{E}\\leftarrow\\mathcal{B}}$ clarifies this.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la6-006-similar-matrices',
+      title: 'Change of Basis for a Linear Map: Similar Matrices',
+      prereqs: ['Change of basis', 'Matrix representations'],
+      problem: 'The matrix of $T: \\mathbb{R}^2\\to\\mathbb{R}^2$ in the standard basis is $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$. Find its matrix $B$ in the eigenvector basis $\\mathcal{B} = \\{[-1,1]^\\top,[1,1]^\\top\\}$.',
+      steps: [
+        {
+          label: 'Build the change-of-basis matrix $P$',
+          strategy: 'Columns of $P$ are the new basis vectors in standard coordinates.',
+          explanation: '$P = \\begin{bmatrix}-1&1\\\\1&1\\end{bmatrix}$ (eigenvectors as columns).',
+          math: 'P = \\begin{bmatrix}-1&1\\\\1&1\\end{bmatrix}',
+        },
+        {
+          label: 'Compute $B = P^{-1}AP$',
+          strategy: 'The change-of-basis formula for a linear map: $[T]_\\mathcal{B} = P^{-1}AP$.',
+          explanation: '$P^{-1} = \\frac{1}{-2}\\begin{bmatrix}1&-1\\\\-1&-1\\end{bmatrix}$. $AP = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}\\begin{bmatrix}-1&1\\\\1&1\\end{bmatrix} = \\begin{bmatrix}-2&4\\\\2&4\\end{bmatrix}$. $B = P^{-1}\\cdot\\begin{bmatrix}-2&4\\\\2&4\\end{bmatrix} = \\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}$.',
+          math: 'B = P^{-1}AP = \\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}',
+          gotcha: 'The result is diagonal — because we chose the EIGENVECTOR basis. Diagonalization IS change of basis: the diagonal matrix $D = P^{-1}AP$ is the matrix of $T$ in its own eigenvector basis.',
+        },
+        {
+          label: 'Interpret: diagonalization is change of basis',
+          strategy: 'Every diagonalization $A = PDP^{-1}$ says: "$A$ acts like the diagonal matrix $D$ in the eigenvector coordinate system."',
+          explanation: '$B = \\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}$ — $T$ stretches the first eigenvector by 2 and the second by 4. No mixing, no cross-terms.',
+          math: 'A = PDP^{-1} \\Leftrightarrow D = P^{-1}AP = [T]_\\mathcal{B}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la6-006-1',

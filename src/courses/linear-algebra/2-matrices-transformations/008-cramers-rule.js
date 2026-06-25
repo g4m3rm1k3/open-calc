@@ -578,6 +578,81 @@ x2_t = 1 / (t + 1)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-008-cramers-2x2',
+      title: "Cramer's Rule for a 2×2 System — Determinants as Solution Formulas",
+      prereqs: ['2×2 determinant', 'Linear systems'],
+      problem: 'Solve the system $2x + y = 5$ and $x + 3y = 10$ using Cramer\'s rule.',
+      steps: [
+        {
+          label: 'Write the system in matrix form and identify $A$ and $\\mathbf{b}$',
+          strategy: 'Cramer\'s rule requires the coefficient matrix $A$ and the right-hand side $\\mathbf{b}$.',
+          explanation: '$A = \\begin{bmatrix}2&1\\\\1&3\\end{bmatrix}$, $\\mathbf{b} = [5,10]^\\top$. Cramer\'s rule gives each variable as a ratio of two determinants.',
+          math: 'A = \\begin{bmatrix}2&1\\\\1&3\\end{bmatrix}, \\quad \\mathbf{b} = \\begin{bmatrix}5\\\\10\\end{bmatrix}',
+        },
+        {
+          label: 'Compute $\\det(A)$ — this is the denominator for both variables',
+          strategy: 'If $\\det(A) = 0$, Cramer\'s rule fails (the system has no unique solution).',
+          explanation: '$\\det(A) = 2\\cdot3 - 1\\cdot1 = 5$. Non-zero, so a unique solution exists.',
+          math: '\\det(A) = 6-1 = 5',
+        },
+        {
+          label: 'Form $A_1$ by replacing column 1 with $\\mathbf{b}$, then compute $\\det(A_1)$',
+          strategy: 'Cramer\'s rule: $x_1 = \\det(A_1)/\\det(A)$ where $A_1$ is $A$ with column 1 replaced by $\\mathbf{b}$.',
+          explanation: '$A_1 = \\begin{bmatrix}5&1\\\\10&3\\end{bmatrix}$, $\\det(A_1) = 5\\cdot3-1\\cdot10=15-10=5$.',
+          math: 'x = \\frac{\\det(A_1)}{\\det(A)} = \\frac{5}{5} = 1',
+        },
+        {
+          label: 'Form $A_2$ by replacing column 2 with $\\mathbf{b}$, then compute $\\det(A_2)$',
+          strategy: 'Repeat for the second variable.',
+          explanation: '$A_2 = \\begin{bmatrix}2&5\\\\1&10\\end{bmatrix}$, $\\det(A_2) = 2\\cdot10-5\\cdot1=20-5=15$.',
+          math: 'y = \\frac{\\det(A_2)}{\\det(A)} = \\frac{15}{5} = 3',
+        },
+        {
+          label: 'Verify and discuss when to use Cramer\'s rule vs. row reduction',
+          strategy: 'Cramer\'s rule is exact and elegant; it is best for 2×2 or symbolic systems.',
+          explanation: 'Check: $2(1)+3=5$ ✓, $1+3(3)=10$ ✓. For numerical 3×3+ systems, row reduction is faster. Cramer\'s rule shines when entries are symbolic (e.g., contain a parameter $t$) — the formula gives the answer for all $t$ at once.',
+          math: '2(1)+3=5 \\checkmark \\quad 1+3(3)=10 \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-008-singular-detection',
+      title: "Cramer's Rule Fails — What a Zero Determinant Means for Solvability",
+      prereqs: ["Cramer's rule", 'Inconsistent systems'],
+      problem: 'Apply Cramer\'s rule to $x + 2y = 3$ and $2x + 4y = 5$. What happens?',
+      steps: [
+        {
+          label: 'Compute $\\det(A)$',
+          strategy: 'Always compute the determinant before anything else.',
+          explanation: '$A = \\begin{bmatrix}1&2\\\\2&4\\end{bmatrix}$, $\\det(A) = 1\\cdot4-2\\cdot2=0$.',
+          math: '\\det(A) = 4-4 = 0',
+        },
+        {
+          label: 'Recognize that Cramer\'s rule cannot proceed',
+          strategy: '$\\det(A) = 0$ means the denominator is zero — division is undefined.',
+          explanation: 'We cannot compute $x = \\det(A_1)/0$ — division by zero. This signals that the system does NOT have a unique solution: it is either inconsistent (no solution) or has infinitely many.',
+          math: 'x = \\frac{\\det(A_1)}{0} \\;\\text{(undefined)}',
+          gotcha: "Cramer's rule requires $\\det(A) \\neq 0$. If it's zero, switch to row reduction to determine whether there are zero solutions or infinitely many.",
+        },
+        {
+          label: 'Use row reduction to determine the actual situation',
+          strategy: 'Row-reduce the augmented matrix to read off whether there is a contradiction.',
+          explanation: '$R_2 \\leftarrow R_2-2R_1$: $(0,0,5-6)=(0,0,-1)$. Row 2 reads $0=-1$ — a contradiction. No solution.',
+          math: '\\begin{bmatrix}1&2&|&3\\\\0&0&|&-1\\end{bmatrix} \\implies \\text{no solution}',
+        },
+        {
+          label: 'Contrast: a consistent but dependent system',
+          strategy: 'If the last row were $[0,0,0]$ instead of $[0,0,-1]$, there would be infinitely many solutions.',
+          explanation: 'Change $\\mathbf{b}=[3,6]^\\top$: $R_2-2R_1=(0,0,6-6)=(0,0,0)$ — consistent with one free variable. Both cases have $\\det(A)=0$; only row reduction tells you which one you have.',
+          math: '\\mathbf{b}=[3,6]^\\top: \\text{infinitely many} \\quad \\mathbf{b}=[3,5]^\\top: \\text{none}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'la2-008-ch1',

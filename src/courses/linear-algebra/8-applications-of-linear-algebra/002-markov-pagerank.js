@@ -286,6 +286,64 @@ order
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la8-002-pagerank-small',
+      title: 'Computing PageRank for a 4-Page Web Graph',
+      prereqs: ['Markov chains', 'Steady-state distribution', 'Matrix-vector multiply'],
+      problem: 'Four pages with link structure: 1→{2,3}, 2→{1}, 3→{1,4}, 4→{3}. Compute the PageRank scores.',
+      steps: [
+        {
+          label: 'Build the column-stochastic transition matrix $G$',
+          strategy: 'Column $j$ = probability of jumping from page $j$ to page $i$. Divide each column by its out-degree.',
+          explanation: 'Out-degrees: page 1 has 2 outlinks, page 2 has 1, page 3 has 2, page 4 has 1. $G_{ij} = 1/\\text{out-degree}(j)$ if $j\\to i$, else 0.',
+          math: 'G = \\begin{bmatrix}0&1&1/2&0\\\\1/2&0&0&0\\\\1/2&0&0&1\\\\0&0&1/2&0\\end{bmatrix}',
+        },
+        {
+          label: 'Apply the damping factor $d=0.85$ (Google\'s original value)',
+          strategy: 'The teleportation matrix handles dangling nodes and ensures convergence: $M = dG + (1-d)\\mathbf{1}\\mathbf{1}^\\top/n$.',
+          explanation: 'With probability $1-d=0.15$, a random surfer teleports to any page uniformly. This ensures the matrix is irreducible and aperiodic, guaranteeing a unique steady state.',
+          math: 'M = 0.85G + 0.15\\cdot\\frac{1}{4}\\mathbf{1}\\mathbf{1}^\\top',
+        },
+        {
+          label: 'Find the steady-state by power iteration',
+          strategy: 'Start with uniform $\\boldsymbol{\\pi}^{(0)} = [1/4,1/4,1/4,1/4]^\\top$ and repeatedly multiply: $\\boldsymbol{\\pi}^{(k+1)} = M\\boldsymbol{\\pi}^{(k)}$.',
+          explanation: 'After convergence, the PageRank scores reflect link authority: pages that many high-PageRank pages link to score higher. Page 1 (most linked-to) will rank highest here.',
+          math: '\\boldsymbol{\\pi}^* = M\\boldsymbol{\\pi}^* \\Rightarrow \\text{solve }(M-I)\\boldsymbol{\\pi}^*=\\mathbf{0}',
+          gotcha: 'PageRank is an eigenvector problem: $M\\boldsymbol{\\pi}=\\boldsymbol{\\pi}$ (eigenvalue 1). Power iteration converges because $d<1$ ensures the second-largest eigenvalue $|\\lambda_2| \\leq d < 1$. The spectral gap $1-d$ determines convergence speed.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la8-002-power-iteration',
+      title: 'Power Iteration: Finding the Dominant Eigenvector',
+      prereqs: ['Matrix-vector multiply', 'Eigenvalues', 'Convergence'],
+      problem: 'Apply 3 steps of power iteration to find the dominant eigenvector of $A = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$ starting from $\\mathbf{x}^{(0)}=[1,0]^\\top$.',
+      steps: [
+        {
+          label: 'Multiply and normalize: step 1',
+          strategy: 'Multiply $A\\mathbf{x}^{(0)}$, then normalize to get $\\mathbf{x}^{(1)}$.',
+          explanation: '$A[1,0]^\\top=[2,1]^\\top$. Normalize: $\\|[2,1]\\|=\\sqrt{5}$. $\\mathbf{x}^{(1)}=[2/\\sqrt{5},1/\\sqrt{5}]^\\top\\approx[0.894,0.447]^\\top$.',
+          math: '\\mathbf{x}^{(1)} = \\frac{[2,1]^\\top}{\\sqrt{5}} \\approx [0.894,0.447]^\\top',
+        },
+        {
+          label: 'Continue: steps 2 and 3',
+          strategy: 'Each iteration multiplies by $A$ and normalizes.',
+          explanation: 'After step 2: $\\approx [0.924,0.383]^\\top$. After step 3: $\\approx [0.937, 0.350]^\\top$. The sequence is converging toward $[1,1]^\\top/\\sqrt{2}=[0.707,0.707]^\\top$ — the eigenvector for $\\lambda=3$.',
+          math: '\\mathbf{x}^{(k)} \\to \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\end{bmatrix} \\text{ as }k\\to\\infty',
+          gotcha: 'Power iteration converges to the DOMINANT eigenvector (largest $|\\lambda|$). For $A = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$: eigenvalues are 3 and 1, so convergence rate $\\approx (1/3)^k$ — halves every $\\log_2(3)\\approx 1.6$ steps.',
+        },
+        {
+          label: 'Estimate the Rayleigh quotient for the eigenvalue',
+          strategy: 'At each step, $\\mathbf{x}^{(k)\\top} A \\mathbf{x}^{(k)} \\approx \\lambda_1$ (the Rayleigh quotient converges to the dominant eigenvalue).',
+          explanation: 'After step 1: $R(\\mathbf{x}^{(1)}) = [0.894,0.447]\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}[0.894,0.447]^\\top \\approx 2.8$. True value: 3. After more steps: converges to 3.',
+          math: 'R(\\mathbf{x}) = \\frac{\\mathbf{x}^\\top A\\mathbf{x}}{\\mathbf{x}^\\top\\mathbf{x}} \\to \\lambda_1',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la8-002-1',

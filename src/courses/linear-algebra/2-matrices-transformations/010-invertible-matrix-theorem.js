@@ -497,6 +497,86 @@ print(f"Perturbation Frobenius norm = {np.linalg.norm(A0 - A_nearest_sing):.4f} 
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-010-imt-chain',
+      title: 'Using One IMT Condition to Chain to All Others',
+      prereqs: ['Invertible Matrix Theorem', 'Determinant', 'Rank'],
+      problem: 'You know $\\det(A) = 7$ for a $3\\times 3$ matrix $A$. List every additional conclusion the IMT guarantees.',
+      steps: [
+        {
+          label: 'The starting fact: $\\det(A) \\neq 0$',
+          strategy: 'The IMT says all 12 conditions are EQUIVALENT — knowing one means knowing all.',
+          explanation: '$\\det(A) = 7 \\neq 0$ is one IMT condition. Because all conditions are equivalent for square matrices, every other condition must also hold. There is no additional computation needed.',
+          math: '\\det(A)=7\\neq 0 \\implies \\text{all IMT conditions hold}',
+        },
+        {
+          label: 'Conclude: $A$ is invertible',
+          strategy: 'Invertibility is the central IMT condition — everything flows from it.',
+          explanation: 'A non-zero determinant means $A$ has an inverse $A^{-1}$ with $AA^{-1}=I$.',
+          math: '\\exists A^{-1}: AA^{-1}=I',
+        },
+        {
+          label: 'Conclude: columns are linearly independent; columns span $\\mathbb{R}^3$; rank = 3',
+          strategy: 'Rank tells you about linear independence and span simultaneously.',
+          explanation: 'For an $n\\times n$ matrix, $\\det \\neq 0 \\iff$ rank $= n \\iff$ columns are independent $\\iff$ columns span $\\mathbb{R}^n$. All three at once.',
+          math: '\\text{rank}(A)=3,\\; \\text{cols independent},\\; \\text{cols span } \\mathbb{R}^3',
+        },
+        {
+          label: 'Conclude: null space is $\\{\\mathbf{0}\\}$; $A\\mathbf{x}=\\mathbf{b}$ has a unique solution for every $\\mathbf{b}$',
+          strategy: 'A full-rank matrix never crushes a non-zero vector to zero.',
+          explanation: 'If rank = 3 and the matrix is $3\\times 3$, nullity = $3-3=0$. The null space contains only the zero vector. For every $\\mathbf{b}\\in\\mathbb{R}^3$, $A\\mathbf{x}=\\mathbf{b}$ has exactly one solution: $\\mathbf{x}=A^{-1}\\mathbf{b}$.',
+          math: 'N(A)=\\{\\mathbf{0}\\},\\; \\forall\\mathbf{b}: \\text{unique solution}',
+        },
+        {
+          label: 'Conclude: 0 is NOT an eigenvalue of $A$',
+          strategy: 'Eigenvalues of zero are equivalent to singularity.',
+          explanation: 'If $\\lambda=0$ were an eigenvalue, $A\\mathbf{x}=\\mathbf{0}$ would have a non-zero solution — contradicting that the null space is trivial. Since $A$ is invertible, all its eigenvalues are non-zero.',
+          math: '\\lambda_i \\neq 0 \\text{ for all eigenvalues}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-010-find-k-singular',
+      title: 'Find the Parameter That Makes a Matrix Singular',
+      prereqs: ['Determinant', 'Setting determinant to zero'],
+      problem: 'Find all values of $k$ for which $A = \\begin{bmatrix}k&3\\\\2&k\\end{bmatrix}$ is singular.',
+      steps: [
+        {
+          label: 'Recognize: singular means $\\det(A) = 0$',
+          strategy: 'The IMT says $A$ is singular exactly when its determinant is zero.',
+          explanation: 'We want to find $k$ such that $A$ fails to be invertible. By the IMT, this happens iff $\\det(A) = 0$. Write an equation for $\\det(A)$ in terms of $k$ and solve.',
+          math: '\\det(A) = 0 \\iff A \\text{ is singular}',
+        },
+        {
+          label: 'Compute $\\det(A)$ in terms of $k$',
+          strategy: 'Apply the $2\\times 2$ formula: $ad - bc$.',
+          explanation: '$\\det(A) = k\\cdot k - 3\\cdot 2 = k^2 - 6$.',
+          math: '\\det(A) = k^2 - 6',
+        },
+        {
+          label: 'Set $\\det(A) = 0$ and solve for $k$',
+          strategy: 'The resulting equation is a polynomial in $k$.',
+          explanation: '$k^2-6=0 \\Rightarrow k^2=6 \\Rightarrow k = \\pm\\sqrt{6}$.',
+          math: 'k = \\pm\\sqrt{6}',
+        },
+        {
+          label: 'Verify geometrically',
+          strategy: 'When $k=\\sqrt{6}$, the columns of $A$ are linearly dependent — one is a scalar multiple of the other.',
+          explanation: 'At $k=\\sqrt{6}$: $A = \\begin{bmatrix}\\sqrt{6}&3\\\\2&\\sqrt{6}\\end{bmatrix}$. Column ratio check: $3/\\sqrt{6} = \\sqrt{6}/2 = \\sqrt{6}/2$ ✓ — both equal $\\sqrt{6}/2$. Column 2 is $\\sqrt{6}/2$ times column 1.',
+          math: 'k=\\sqrt{6}: \\text{col}_2 = \\tfrac{\\sqrt{6}}{2}\\cdot\\text{col}_1',
+        },
+        {
+          label: 'Interpret: for all other $k$, the matrix is invertible',
+          strategy: 'Singular values of a parameter are isolated points — the generic matrix is invertible.',
+          explanation: 'For every $k \\neq \\pm\\sqrt{6}$, $\\det(A)\\neq 0$ and $A$ is invertible. The "dangerous" values are $k = \\pm\\sqrt{6}$. This technique — setting $\\det=0$ to find parameter values that kill invertibility — appears in stability analysis, eigenvalue equations, and design optimization.',
+          math: 'k \\neq \\pm\\sqrt{6} \\implies A \\text{ invertible}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'la2-010-ch1',

@@ -696,6 +696,81 @@ C = np.array([0.0, 0.0, 3.0])
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la1-005-line-two-points',
+      title: 'Parametric Line Through Two Points',
+      prereqs: ['Vector subtraction', 'Scalar multiplication'],
+      problem: 'Write the parametric equation of the line through $P = (2, -1, 3)$ and $Q = (4, 1, 2)$.',
+      steps: [
+        {
+          label: 'Find the direction vector: subtract the two position vectors',
+          strategy: 'The direction vector is $\\mathbf{d} = Q - P$ — the arrow from the starting point to the ending point.',
+          explanation: 'We need a vector that points along the line. Subtracting the coordinates: $(4-2, 1-(-1), 2-3) = (2, 2, -1)$. This is the direction of travel from $P$ to $Q$. Any scalar multiple of this vector would also work — the direction is what matters, not the scale.',
+          math: '\\mathbf{d} = Q - P = \\begin{bmatrix}4-2\\\\1-(-1)\\\\2-3\\end{bmatrix} = \\begin{bmatrix}2\\\\2\\\\-1\\end{bmatrix}',
+          gotcha: 'The order matters for the sign but not for the line itself: $P - Q = [-2,-2,1]^\\top$ gives the same line, just the opposite direction of travel.',
+        },
+        {
+          label: 'Write the parametric equation: anchor point + $t$ times direction',
+          strategy: 'Start at the anchor point $P$ and add any scalar multiple of $\\mathbf{d}$.',
+          explanation: 'Every point on the line is reached by some value of the parameter $t$: at $t=0$ we are at $P$, at $t=1$ we reach $Q$, at $t=-1$ we go one step in the opposite direction from $P$.',
+          math: '\\mathbf{r}(t) = \\begin{bmatrix}2\\\\-1\\\\3\\end{bmatrix} + t\\begin{bmatrix}2\\\\2\\\\-1\\end{bmatrix}, \\quad t \\in \\mathbb{R}',
+        },
+        {
+          label: 'Verify: plug in $t=0$ and $t=1$',
+          strategy: 'At $t=0$, the formula must give $P$; at $t=1$, it must give $Q$.',
+          explanation: '$t=0$: $[2,-1,3]^\\top + 0 = [2,-1,3]^\\top = P$ ✓. $t=1$: $[2,-1,3]^\\top + [2,2,-1]^\\top = [4,1,2]^\\top = Q$ ✓. Verification confirms the direction vector and anchor are correct.',
+          math: 't=0: P=(2,-1,3) \\checkmark \\qquad t=1: Q=(4,1,2) \\checkmark',
+        },
+        {
+          label: 'Midpoint: $t = \\frac{1}{2}$ gives the point halfway between $P$ and $Q$',
+          strategy: 'The parameter $t$ interpolates (and extrapolates) continuously along the line.',
+          explanation: '$t = 1/2$: $[2,-1,3]^\\top + \\tfrac{1}{2}[2,2,-1]^\\top = [2+1, -1+1, 3-0.5]^\\top = [3, 0, 2.5]^\\top$. This is the midpoint of segment $PQ$ — the average of their coordinates. Parametric form makes interpolation natural: set $t$ to anything between 0 and 1 for a point between $P$ and $Q$.',
+          math: 't=\\tfrac{1}{2}: \\left(3,\\, 0,\\, \\tfrac{5}{2}\\right)',
+        },
+      ],
+    },
+    {
+      id: 'wt-la1-005-plane-three-points',
+      title: 'Plane Through Three Points — Normal Via Cross Product',
+      prereqs: ['Cross product', 'Dot product', 'Point-normal form of a plane'],
+      problem: 'Find the equation of the plane through $A = (1, 0, 0)$, $B = (0, 2, 0)$, and $C = (0, 0, 3)$.',
+      steps: [
+        {
+          label: 'Build two edge vectors lying in the plane',
+          strategy: 'Any two non-parallel vectors in the plane work; subtract the anchor point from the other two points.',
+          explanation: 'Using $A$ as the anchor: $\\mathbf{u} = B - A = (-1, 2, 0)$ and $\\mathbf{v} = C - A = (-1, 0, 3)$. Both vectors lie in the plane, so their cross product will point perpendicular to it.',
+          math: '\\mathbf{u} = B - A = \\begin{bmatrix}-1\\\\2\\\\0\\end{bmatrix}, \\quad \\mathbf{v} = C - A = \\begin{bmatrix}-1\\\\0\\\\3\\end{bmatrix}',
+        },
+        {
+          label: 'Cross product gives the normal vector',
+          strategy: '$\\mathbf{n} = \\mathbf{u} \\times \\mathbf{v}$ is perpendicular to the plane.',
+          explanation: 'Expanding the determinant: $\\hat{i}$: $(2)(3)-(0)(0) = 6$. $\\hat{j}$: $-[(-1)(3)-(0)(-1)] = -(-3) = 3$. $\\hat{k}$: $(-1)(0)-(2)(-1) = 0+2 = 2$.',
+          math: '\\mathbf{n} = \\mathbf{u}\\times\\mathbf{v} = \\begin{bmatrix}6\\\\3\\\\2\\end{bmatrix}',
+        },
+        {
+          label: 'Write the point-normal form using anchor $A$',
+          strategy: 'The plane equation is $\\mathbf{n}\\cdot(\\mathbf{r} - \\mathbf{A}) = 0$, which expands to $n_1 x + n_2 y + n_3 z = d$.',
+          explanation: '$6(x-1) + 3(y-0) + 2(z-0) = 0$, which simplifies to $6x + 3y + 2z = 6$.',
+          math: '6(x-1) + 3y + 2z = 0 \\implies 6x + 3y + 2z = 6',
+        },
+        {
+          label: 'Verify all three points satisfy the equation',
+          strategy: 'Substitute each point — all three should give the same value on the left as the right.',
+          explanation: '$A=(1,0,0)$: $6+0+0=6$ ✓. $B=(0,2,0)$: $0+6+0=6$ ✓. $C=(0,0,3)$: $0+0+6=6$ ✓. All three intercept points satisfy the equation.',
+          math: 'A: 6(1)=6 \\checkmark \\quad B: 3(2)=6 \\checkmark \\quad C: 2(3)=6 \\checkmark',
+        },
+        {
+          label: 'Interpret: the intercept form $x/a + y/b + z/c = 1$',
+          strategy: 'Dividing by 6 reveals the intercept form, which makes the geometry instantly readable.',
+          explanation: 'Divide by 6: $x/1 + y/2 + z/3 = 1$. This directly shows the plane crosses the $x$-axis at 1, the $y$-axis at 2, and the $z$-axis at 3 — which are exactly the three given points $A$, $B$, $C$.',
+          math: '\\frac{x}{1} + \\frac{y}{2} + \\frac{z}{3} = 1',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'la1-005-ch1',

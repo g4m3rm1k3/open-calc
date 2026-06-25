@@ -314,6 +314,63 @@ max(max(abs(tril(Ak,-1))))
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la7-006-schur-vs-eigen',
+      title: 'Schur Decomposition vs Eigendecomposition: When Each Applies',
+      prereqs: ['Eigendecomposition', 'Orthogonal matrices', 'Triangular matrices'],
+      problem: 'Compare $A = P\\Lambda P^{-1}$ (eigendecomposition) and $A = QUQ^*$ (Schur) for $A = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Attempt the eigendecomposition',
+          strategy: 'Find eigenvalues and eigenvectors. If there are not enough independent eigenvectors, eigendecomposition fails.',
+          explanation: '$p(\\lambda)=(1-\\lambda)^2$: repeated eigenvalue $\\lambda=1$. $(A-I)=\\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}$ has null space $\\text{span}\\{[1,0]^\\top\\}$ — only ONE eigenvector. Eigendecomposition fails (defective matrix).',
+          math: 'A-I=\\begin{bmatrix}0&1\\\\0&0\\end{bmatrix} \\Rightarrow \\text{one eigenvector} \\Rightarrow \\text{not diagonalizable}',
+        },
+        {
+          label: 'Schur decomposition always exists',
+          strategy: 'The Schur theorem: every square matrix (real or complex) has a Schur decomposition $A = QUQ^*$ with $Q$ unitary and $U$ upper triangular. For real matrices with real eigenvalues, $Q$ is orthogonal.',
+          explanation: 'For $A = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$: $U = A$ (it\'s already upper triangular) and $Q = I$. Eigenvalues appear on the diagonal of $U$.',
+          math: 'A = I \\cdot \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix} \\cdot I^\\top \\Rightarrow \\text{Schur form}',
+          gotcha: 'Schur $\\neq$ eigendecomposition. Schur always produces an upper-triangular $U$ (not diagonal). Eigendecomposition produces a diagonal $\\Lambda$ — but only if $A$ is diagonalizable.',
+        },
+        {
+          label: 'Why Schur is numerically preferred',
+          strategy: 'The QR algorithm computes the Schur form. It avoids finding explicit eigenvectors (which can be ill-conditioned) and works for ALL matrices.',
+          explanation: 'Eigendecomposition is unstable for nearly-defective matrices: computing $P^{-1}$ when eigenvectors are nearly parallel amplifies errors. Schur decomposition only uses orthogonal $Q$ (always well-conditioned: $\\kappa(Q)=1$).',
+          math: '\\kappa(Q)=1 \\Rightarrow \\text{Schur is always numerically stable}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la7-006-normal-matrix',
+      title: 'Normal Matrices: When Schur Decomposition Is Unitary Diagonalization',
+      prereqs: ['Schur decomposition', 'Adjoint', 'Spectral theorem'],
+      problem: 'Show that if $A$ is normal ($A^*A = AA^*$), the Schur decomposition gives a unitary diagonalization.',
+      steps: [
+        {
+          label: 'Start from the Schur form $A = QUQ^*$',
+          strategy: 'Substitute into the normality condition $A^*A = AA^*$ and see what constraint this places on $U$.',
+          explanation: '$A^* = QU^*Q^*$. $A^*A = QU^*Q^* \\cdot QUQ^* = QU^*UQ^*$. $AA^* = QUU^*Q^*$. Equality requires $U^*U = UU^*$.',
+          math: 'A^*A=AA^* \\Rightarrow U^*U = UU^*',
+        },
+        {
+          label: 'Show that a normal triangular matrix must be diagonal',
+          strategy: 'If $U$ is upper triangular and normal, its off-diagonal entries must be zero (proved by comparing $(U^*U)_{11} = (UU^*)_{11}$).',
+          explanation: '$(U^*U)_{11} = \\sum_j |u_{1j}|^2$ (sum of squares of row 1). $(UU^*)_{11} = |u_{11}|^2$ (just the diagonal entry). Setting equal: $|u_{12}|^2+\\cdots=0$, forcing $u_{12}=\\cdots=0$. Row 1 is zero off-diagonal. Repeat for all rows.',
+          math: 'U \\text{ normal + triangular} \\Rightarrow U \\text{ diagonal}',
+        },
+        {
+          label: 'Conclude: normal matrices are unitarily diagonalizable',
+          strategy: 'Examples of normal matrices: all symmetric, unitary/orthogonal, and skew-symmetric matrices.',
+          explanation: '$A = QDQ^*$ with $Q$ unitary and $D$ diagonal. This generalizes the real spectral theorem: all real symmetric matrices are normal ($A^\\top A = AA^\\top$ for symmetric $A$), but the class is larger (includes unitary, skew-symmetric, etc.).',
+          math: 'A \\text{ normal} \\Leftrightarrow A = QDQ^*\\text{ (unitarily diagonalizable)}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la7-006-1',

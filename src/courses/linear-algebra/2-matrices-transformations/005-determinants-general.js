@@ -646,6 +646,87 @@ A = np.array([[2., 0., 1.],
     }
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-005-det-zeros',
+      title: '3×3 Determinant — Choose the Row with the Most Zeros',
+      prereqs: ['Cofactor expansion', '2×2 determinant'],
+      problem: 'Compute $\\det(A)$ for $A = \\begin{bmatrix}2&0&1\\\\3&-1&2\\\\0&0&4\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Scan for the best row or column to expand along',
+          strategy: 'Every zero in the chosen row/column eliminates one 2×2 determinant computation.',
+          explanation: 'Row 3 has two zeros: $[0, 0, 4]$. Only the third entry is non-zero, so expanding along row 3 requires computing just ONE cofactor. This is the key strategic move: always look for zeros before expanding.',
+          math: '\\text{Row 3: } [0, 0, 4] \\quad \\to \\quad \\text{only one nonzero cofactor}',
+        },
+        {
+          label: 'Write the cofactor expansion along row 3',
+          strategy: 'Expansion along row $i$: sum $a_{i1}C_{i1} + a_{i2}C_{i2} + a_{i3}C_{i3}$.',
+          explanation: 'Only the $a_{33}=4$ term is non-zero. Its cofactor $C_{33}$ carries a positive sign (the $(3,3)$ position has sign $(-1)^{3+3}=+1$).',
+          math: '\\det(A) = 0\\cdot C_{31} + 0\\cdot C_{32} + 4\\cdot C_{33} = 4 C_{33}',
+        },
+        {
+          label: 'Compute the 2×2 minor $M_{33}$ (delete row 3 and column 3)',
+          strategy: 'The minor is the determinant of the sub-matrix formed by removing the row and column of the chosen entry.',
+          explanation: 'Removing row 3 and column 3 leaves $\\begin{bmatrix}2&0\\\\3&-1\\end{bmatrix}$. Determinant: $(2)(-1)-(0)(3)=-2$.',
+          math: 'M_{33} = \\det\\begin{bmatrix}2&0\\\\3&-1\\end{bmatrix} = -2-0 = -2',
+        },
+        {
+          label: 'Assemble: $\\det(A) = 4 \\cdot (+1) \\cdot M_{33}$',
+          strategy: 'Cofactor = sign × minor. Multiply by the entry and the sign.',
+          explanation: '$\\det(A) = 4 \\cdot (-2) = -8$. The negative determinant means $A$ reverses orientation — it flips the handedness of the basis vectors while scaling volume by 8.',
+          math: '\\det(A) = 4 \\cdot (-2) = -8',
+        },
+        {
+          label: 'Sanity check: what does the sign of the determinant mean?',
+          strategy: '$|\\det(A)|$ is the volume-scaling factor; $\\text{sign}(\\det(A))$ indicates whether orientation is preserved.',
+          explanation: '$\\det(A) = -8$: the transformation scales area by 8 AND flips orientation (like reflecting in a mirror). If $\\det(A) = 0$, the transformation would have collapsed the 3D input to a plane or line.',
+          math: '|\\det(A)| = 8 \\;\\text{(volume scale)} \\quad \\text{sign}(-) \\;\\text{(orientation flip)}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-005-det-row-ops',
+      title: 'Determinant Via Row Operations — Tracking the Rules',
+      prereqs: ['Row operations', 'Cofactor expansion'],
+      problem: 'Compute $\\det\\begin{bmatrix}2&4&2\\\\1&3&2\\\\3&7&4\\end{bmatrix}$ by using row operations to simplify first.',
+      steps: [
+        {
+          label: 'Remember the three rules for determinants under row operations',
+          strategy: 'Knowing what operations change the determinant prevents sign errors.',
+          explanation: '(1) Swapping two rows multiplies $\\det$ by $-1$. (2) Multiplying a row by scalar $k$ multiplies $\\det$ by $k$. (3) Adding a multiple of one row to another leaves $\\det$ unchanged. Rule (3) is the workhorse: it is free.',
+          math: 'R_i \\leftrightarrow R_j: \\det \\to -\\det \\qquad kR_i: \\det \\to k\\cdot\\det \\qquad R_i+cR_j: \\det \\text{ unchanged}',
+          gotcha: 'Do NOT factor out a common factor unless you explicitly account for it. If you multiply a row by 2 to create nicer numbers, the determinant of the modified matrix is twice the original.',
+        },
+        {
+          label: 'Apply $R_2 \\leftarrow R_2 - \\frac{1}{2}R_1$ (type 3: free)',
+          strategy: 'Use the first row to create a zero below the first pivot.',
+          explanation: '$R_2$: $(1-1, 3-2, 2-1) = (0, 1, 1)$.',
+          math: '\\begin{bmatrix}2&4&2\\\\0&1&1\\\\3&7&4\\end{bmatrix} \\quad (\\det\\text{ unchanged})',
+        },
+        {
+          label: 'Apply $R_3 \\leftarrow R_3 - \\frac{3}{2}R_1$ (type 3: free)',
+          strategy: 'Create zero below the pivot in column 1 for row 3.',
+          explanation: '$R_3$: $(3-3, 7-6, 4-3)=(0,1,1)$.',
+          math: '\\begin{bmatrix}2&4&2\\\\0&1&1\\\\0&1&1\\end{bmatrix} \\quad (\\det\\text{ unchanged})',
+        },
+        {
+          label: 'Spot the identical rows — the determinant must be zero',
+          strategy: 'Two identical rows mean the matrix is singular: $\\det = 0$.',
+          explanation: 'Rows 2 and 3 are now identical. Swapping them would give $\\det \\to -\\det$, but swapping identical rows changes nothing, so $\\det = -\\det \\Rightarrow \\det = 0$. No further computation needed.',
+          math: 'R_2 = R_3 \\implies \\det(A) = 0',
+        },
+        {
+          label: 'Interpret: what does $\\det = 0$ tell you?',
+          strategy: 'Singular matrix — the original rows were linearly dependent.',
+          explanation: 'Column 3 = column 2 of $A$ minus column 1 (check: $[2,2,4] = [4,3,7]-[2,1,3]$). The three columns lie in a 2D subspace, so the 3D volume they enclose is zero. The matrix cannot be inverted.',
+          math: '\\det(A)=0 \\implies A \\text{ is singular, columns are dependent}',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

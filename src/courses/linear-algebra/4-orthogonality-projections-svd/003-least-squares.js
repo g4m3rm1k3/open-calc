@@ -458,6 +458,70 @@ y = np.array([1., 3., 9., 19., 33., 51., 73.])  # roughly 2x² + x + 1
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la4-003-least-squares-line',
+      title: 'Fitting a Line to Three Points via Least Squares',
+      prereqs: ['Overdetermined systems', 'Normal equations', '2×2 inverse'],
+      problem: 'Find the best-fit line $y = c_0 + c_1 t$ through the points $(0,6)$, $(1,0)$, $(2,0)$.',
+      steps: [
+        {
+          label: 'Set up the overdetermined system $A\\mathbf{x} = \\mathbf{b}$',
+          strategy: 'Each data point gives one equation. With 3 points and 2 unknowns, the system is overdetermined — no exact solution exists unless the points are collinear.',
+          explanation: 'Substituting each point: $c_0=6$, $c_0+c_1=0$, $c_0+2c_1=0$. In matrix form:',
+          math: 'A = \\begin{bmatrix}1&0\\\\1&1\\\\1&2\\end{bmatrix},\\quad \\mathbf{b} = \\begin{bmatrix}6\\\\0\\\\0\\end{bmatrix}',
+          gotcha: 'The "1" column in $A$ is for the constant term $c_0$ (the intercept). Always include it — omitting it forces the line through the origin.',
+        },
+        {
+          label: 'Form the normal equations $A^\\top A\\hat{\\mathbf{x}} = A^\\top\\mathbf{b}$',
+          strategy: 'The normal equations minimize $\\|A\\mathbf{x}-\\mathbf{b}\\|^2$. Compute $A^\\top A$ and $A^\\top\\mathbf{b}$.',
+          explanation: '$A^\\top A = \\begin{bmatrix}3&3\\\\3&5\\end{bmatrix}$, $A^\\top\\mathbf{b} = \\begin{bmatrix}6\\\\0\\end{bmatrix}$.',
+          math: '\\begin{bmatrix}3&3\\\\3&5\\end{bmatrix}\\hat{\\mathbf{x}} = \\begin{bmatrix}6\\\\0\\end{bmatrix}',
+        },
+        {
+          label: 'Solve the 2×2 normal equations',
+          strategy: 'Use the 2×2 inverse formula or elimination.',
+          explanation: '$\\det(A^\\top A)=15-9=6$. $(A^\\top A)^{-1} = \\frac{1}{6}\\begin{bmatrix}5&-3\\\\-3&3\\end{bmatrix}$. $\\hat{\\mathbf{x}} = \\frac{1}{6}\\begin{bmatrix}30\\\\-18\\end{bmatrix} = \\begin{bmatrix}5\\\\-3\\end{bmatrix}$.',
+          math: '\\hat{\\mathbf{x}} = \\begin{bmatrix}5\\\\-3\\end{bmatrix} \\Rightarrow y = 5 - 3t',
+        },
+        {
+          label: 'Compute the residual and verify it minimizes error',
+          strategy: 'Residual $\\mathbf{e} = \\mathbf{b} - A\\hat{\\mathbf{x}}$. Check $A^\\top\\mathbf{e} = \\mathbf{0}$ (normal equations confirm optimality).',
+          explanation: '$A\\hat{\\mathbf{x}} = [5, 2, -1]^\\top$. $\\mathbf{e} = [1, -2, 1]^\\top$. $\\|\\mathbf{e}\\|^2 = 6$. $A^\\top\\mathbf{e} = \\mathbf{0}$ ✓ — the residual is perpendicular to the column space.',
+          math: '\\mathbf{e} = \\begin{bmatrix}1\\\\-2\\\\1\\end{bmatrix},\\quad \\|\\mathbf{e}\\|^2 = 6,\\quad A^\\top\\mathbf{e}=\\mathbf{0}\\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la4-003-when-to-use-ls',
+      title: 'Diagnosing When to Use Least Squares (vs Exact Solve)',
+      prereqs: ['Overdetermined systems', 'Consistency'],
+      problem: 'Given a system $A\\mathbf{x}=\\mathbf{b}$, determine: (a) when the exact solution exists, and (b) when to fall back to least squares.',
+      steps: [
+        {
+          label: 'Check if $\\mathbf{b} \\in \\text{col}(A)$',
+          strategy: 'Augment $A$ with $\\mathbf{b}$ and row reduce. If $\\text{rank}([A|\\mathbf{b}]) = \\text{rank}(A)$, the system is consistent and an exact solution exists.',
+          explanation: 'If the RREF produces a row $[0\\;0\\;\\cdots\\;0\\;|\\;c]$ with $c\\neq 0$, the system is inconsistent — no exact solution. That\'s when you switch to least squares.',
+          math: '\\text{rank}([A|\\mathbf{b}]) = \\text{rank}(A) \\Leftrightarrow \\text{consistent}',
+        },
+        {
+          label: 'For inconsistent systems: use the normal equations',
+          strategy: 'The least squares solution minimizes $\\|A\\mathbf{x}-\\mathbf{b}\\|^2$. Geometrically, it projects $\\mathbf{b}$ onto $\\text{col}(A)$.',
+          explanation: 'The normal equations $A^\\top A\\hat{\\mathbf{x}}=A^\\top\\mathbf{b}$ always have a solution. When $A$ has full column rank, $A^\\top A$ is invertible and the solution is unique.',
+          math: 'A^\\top A\\hat{\\mathbf{x}} = A^\\top\\mathbf{b}',
+          gotcha: "Never form $A^\\top A$ and invert it numerically if $A$ is large — $A^\\top A$ is twice as ill-conditioned as $A$ itself. Use QR decomposition instead: $\\hat{\\mathbf{x}} = R^{-1}Q^\\top\\mathbf{b}$.",
+        },
+        {
+          label: 'Interpret the residual $\\|A\\hat{\\mathbf{x}}-\\mathbf{b}\\|$',
+          strategy: 'Small residual = the model fits well. Large residual = either wrong model class or noisy data.',
+          explanation: 'Residual $= 0$: $\\mathbf{b}$ was exactly in $\\text{col}(A)$ — no approximation needed. Residual large: the assumed functional form (e.g., line) is a poor fit — consider a higher-degree polynomial or a different model.',
+          math: '\\|A\\hat{\\mathbf{x}}-\\mathbf{b}\\| = 0 \\Leftrightarrow \\text{exact solution existed}',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

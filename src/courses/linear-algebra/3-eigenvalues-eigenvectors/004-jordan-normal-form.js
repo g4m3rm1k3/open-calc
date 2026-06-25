@@ -442,6 +442,70 @@ plt.show()`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la3-004-detect-defective',
+      title: 'Detecting a Defective Matrix: Repeated Eigenvalue, One Eigenvector',
+      prereqs: ['Eigenvalues', 'Null space', 'Geometric vs algebraic multiplicity'],
+      problem: 'Determine whether $A = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$ (a shear) is diagonalizable.',
+      steps: [
+        {
+          label: 'Find the eigenvalue(s)',
+          strategy: '$\\det(A-\\lambda I)=0$. For an upper-triangular matrix, eigenvalues are the diagonal entries.',
+          explanation: '$\\det(A-\\lambda I) = (3-\\lambda)^2$. Double root: $\\lambda = 3$ with algebraic multiplicity 2.',
+          math: 'p(\\lambda) = (3-\\lambda)^2 = 0 \\Rightarrow \\lambda = 3 \\text{ (alg. mult. 2)}',
+        },
+        {
+          label: 'Find the eigenspace for $\\lambda = 3$',
+          strategy: 'Compute $\\text{null}(A - 3I)$ — the geometric multiplicity is $\\dim(\\text{null}(A-3I))$.',
+          explanation: '$A - 3I = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}$. Row reduction: $v_2 = 0$, $v_1$ free. Only one free variable → eigenspace is 1-dimensional.',
+          math: 'A-3I = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix} \\Rightarrow \\text{null} = \\text{span}\\left\\{\\begin{bmatrix}1\\\\0\\end{bmatrix}\\right\\}',
+          gotcha: 'Geometric multiplicity (dim of eigenspace) can be less than algebraic multiplicity (power in char. poly). When they differ, the matrix is defective and NOT diagonalizable.',
+        },
+        {
+          label: 'Compare algebraic and geometric multiplicities',
+          strategy: 'If geometric mult. < algebraic mult. for any eigenvalue, the matrix is defective.',
+          explanation: 'Algebraic multiplicity of $\\lambda=3$ is 2; geometric multiplicity is 1. They differ → not enough independent eigenvectors to form an invertible $P$.',
+          math: '\\underbrace{2}_{\\text{alg. mult.}} > \\underbrace{1}_{\\text{geom. mult.}} \\Rightarrow \\text{defective (not diagonalizable)}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la3-004-jordan-form',
+      title: 'Building the Jordan Normal Form for a Defective Matrix',
+      prereqs: ['Defective matrix detection', 'Generalized eigenvectors'],
+      problem: 'Find the Jordan normal form $J$ and the generalized eigenvector matrix $P$ for $A = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Write the Jordan block for eigenvalue $\\lambda = 3$',
+          strategy: 'A Jordan block for eigenvalue $\\lambda$ with one eigenvector is $\\begin{bmatrix}\\lambda&1\\\\0&\\lambda\\end{bmatrix}$ — eigenvalue on diagonal, 1 on the superdiagonal.',
+          explanation: 'Since $\\lambda=3$ has alg. mult. 2 and geom. mult. 1, we get a single $2\\times 2$ Jordan block. The "1" on the superdiagonal captures the defect.',
+          math: 'J = \\begin{bmatrix}3&1\\\\0&3\\end{bmatrix}',
+          gotcha: 'In this example, $A$ is already in Jordan form! In general, you need $P$ such that $A = PJP^{-1}$.',
+        },
+        {
+          label: 'Find the eigenvector $\\mathbf{v}_1$',
+          strategy: 'The first column of $P$ is the ordinary eigenvector from $(A-3I)\\mathbf{v}=\\mathbf{0}$.',
+          explanation: 'From the previous walkthrough: $(A-3I)\\mathbf{v}=\\mathbf{0}$ gives $\\mathbf{v}_1=[1,0]^\\top$.',
+          math: '\\mathbf{v}_1 = \\begin{bmatrix}1\\\\0\\end{bmatrix}',
+        },
+        {
+          label: 'Find the generalized eigenvector $\\mathbf{v}_2$',
+          strategy: 'Solve $(A-3I)\\mathbf{v}_2 = \\mathbf{v}_1$ — the generalized eigenvector satisfies a "one level up" equation.',
+          explanation: '$(A-3I)\\mathbf{v}_2 = \\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}\\mathbf{v}_2 = \\begin{bmatrix}1\\\\0\\end{bmatrix}$. This gives $v_{2,2}=1$, $v_{2,1}$ free. Take $\\mathbf{v}_2=[0,1]^\\top$.',
+          math: '\\begin{bmatrix}0&1\\\\0&0\\end{bmatrix}\\begin{bmatrix}0\\\\1\\end{bmatrix} = \\begin{bmatrix}1\\\\0\\end{bmatrix} = \\mathbf{v}_1 \\checkmark',
+        },
+        {
+          label: 'Assemble $P$ and verify $AP = PJ$',
+          strategy: 'Build $P = [\\mathbf{v}_1 \\;|\\; \\mathbf{v}_2]$ and verify $AP = PJ$ directly.',
+          explanation: '$P = I_2$ here (columns $[1,0]^\\top$ and $[0,1]^\\top$), so trivially $AP=PJ=A=J$. In non-trivial examples, $P$ rotates the "natural" Jordan basis into the standard basis.',
+          math: 'P = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix},\\quad AP = PJ \\checkmark',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la3-004-1',

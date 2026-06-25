@@ -330,6 +330,64 @@ print(f"\\nAlternative solution ||q_other||: {np.linalg.norm(q_other):.4f} (larg
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la4-008-pseudoinverse-compute',
+      title: 'Computing the Moore-Penrose Pseudoinverse via SVD',
+      prereqs: ['SVD', 'Matrix inverse'],
+      problem: 'Find the pseudoinverse $A^+$ of $A = \\begin{bmatrix}1&0\\\\0&2\\\\0&0\\end{bmatrix}$ (3×2, full column rank).',
+      steps: [
+        {
+          label: 'Find the SVD of $A$',
+          strategy: 'For a matrix with full column rank and distinct singular values, the SVD is straightforward. $A^\\top A$ gives the singular values.',
+          explanation: '$A^\\top A = \\begin{bmatrix}1&0\\\\0&4\\end{bmatrix}$. Eigenvalues: 1 and 4. Singular values: $\\sigma_1=2$, $\\sigma_2=1$ (listed in decreasing order). $V = I_2$, $\\Sigma = \\begin{bmatrix}2&0\\\\0&1\\\\0&0\\end{bmatrix}$, $U$ from $A\\mathbf{v}_i/\\sigma_i$.',
+          math: 'A = U\\begin{bmatrix}2&0\\\\0&1\\\\0&0\\end{bmatrix}V^\\top,\\quad V=I_2',
+        },
+        {
+          label: 'Form $\\Sigma^+$ by inverting the non-zero singular values',
+          strategy: 'The pseudoinverse of $\\Sigma$ is $\\Sigma^+$: transpose, replace each non-zero diagonal entry $\\sigma_i$ with $1/\\sigma_i$, leave zeros as zeros.',
+          explanation: '$\\Sigma = \\begin{bmatrix}2&0\\\\0&1\\\\0&0\\end{bmatrix}$ (3×2). $\\Sigma^+ = \\begin{bmatrix}1/2&0&0\\\\0&1&0\\end{bmatrix}$ (2×3).',
+          math: '\\Sigma^+ = \\begin{bmatrix}1/2&0&0\\\\0&1&0\\end{bmatrix}',
+        },
+        {
+          label: 'Compute $A^+ = V\\Sigma^+ U^\\top$',
+          strategy: 'The pseudoinverse formula mirrors the SVD: $A^+ = V\\Sigma^+ U^\\top$.',
+          explanation: 'With $V=I$ and $U$ from the column directions: $A^+ = I \\cdot \\Sigma^+ \\cdot U^\\top = \\Sigma^+ U^\\top$. The key shape check: $A$ is 3×2, so $A^+$ is 2×3.',
+          math: 'A^+ = \\begin{bmatrix}1&0&0\\\\0&1/2&0\\end{bmatrix}',
+          gotcha: '$A^+$ is NOT $(A^\\top A)^{-1}A^\\top$ in general — that formula only works when $A$ has full column rank AND no numerical rank deficiency. For rank-deficient matrices, you must use the SVD.',
+        },
+        {
+          label: 'Verify $AA^+A = A$',
+          strategy: 'The defining property of a pseudoinverse: $AA^+A=A$.',
+          explanation: '$AA^+ = \\begin{bmatrix}1&0\\\\0&1\\\\0&0\\end{bmatrix}$. $(AA^+)A = \\begin{bmatrix}1&0\\\\0&1\\\\0&0\\end{bmatrix}\\begin{bmatrix}1&0\\\\0&2\\\\0&0\\end{bmatrix} = A$ ✓.',
+          math: 'AA^+A = A \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la4-008-pseudoinverse-solve',
+      title: 'Using the Pseudoinverse to Solve Inconsistent and Underdetermined Systems',
+      prereqs: ['Pseudoinverse', 'Least squares', 'Minimum norm solution'],
+      problem: 'Solve $A\\mathbf{x}=\\mathbf{b}$ for $A = \\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$, $\\mathbf{b} = \\begin{bmatrix}2\\\\2\\end{bmatrix}$ (underdetermined + consistent).',
+      steps: [
+        {
+          label: 'Identify the system type',
+          strategy: '$A$ has rank 1 (rows are identical). The system is consistent ($\\mathbf{b}=[2,2]^\\top$ is in the column space). Infinitely many solutions exist. We want the minimum-norm one.',
+          explanation: 'Any $\\mathbf{x}$ with $x_1+x_2=2$ is a solution. The minimum-norm solution lies perpendicular to the null space of $A$.',
+          math: '\\text{solution set: }x_1+x_2=2 \\Rightarrow \\mathbf{x}=\\begin{bmatrix}1\\\\1\\end{bmatrix} + t\\begin{bmatrix}-1\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Compute $A^+\\mathbf{b}$ to get the minimum-norm solution',
+          strategy: '$\\hat{\\mathbf{x}} = A^+\\mathbf{b}$ always gives the minimum-norm least-squares solution — consistent system → exact solution with smallest $\\|\\mathbf{x}\\|$.',
+          explanation: 'For $A = \\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$, SVD gives $\\sigma_1=2$, so $A^+ = \\frac{1}{4}\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$. $A^+\\mathbf{b} = \\frac{1}{4}[4,4]^\\top = [1,1]^\\top$.',
+          math: '\\hat{\\mathbf{x}} = A^+\\mathbf{b} = \\begin{bmatrix}1\\\\1\\end{bmatrix}',
+          gotcha: 'The minimum-norm solution $[1,1]^\\top$ is symmetric (equal components), which makes geometric sense: it lies on the line $x_1+x_2=2$ at the point closest to the origin (minimizes $x_1^2+x_2^2$).',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la4-008-1',

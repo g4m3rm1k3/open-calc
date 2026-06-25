@@ -469,6 +469,70 @@ plt.show()`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la3-005-steady-state',
+      title: 'Finding the Steady-State Distribution of a Markov Chain',
+      prereqs: ['Eigenvalues', 'Null space', 'Stochastic matrices'],
+      problem: 'Find the steady-state distribution $\\boldsymbol{\\pi}$ for the Markov chain with transition matrix $T = \\begin{bmatrix}0.8&0.3\\\\0.2&0.7\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Recognize what "steady state" means algebraically',
+          strategy: 'The steady state is an eigenvector with eigenvalue $\\lambda = 1$: applying the matrix once leaves it unchanged. Solve $(T-I)\\boldsymbol{\\pi}=\\mathbf{0}$ with the normalization $\\pi_1+\\pi_2=1$.',
+          explanation: '$T\\boldsymbol{\\pi} = \\boldsymbol{\\pi}$ is the eigenvalue equation with $\\lambda=1$. Every stochastic matrix (columns sum to 1) has $\\lambda=1$ as an eigenvalue — this is guaranteed by the Perron-Frobenius theorem.',
+          math: '(T - I)\\boldsymbol{\\pi} = \\mathbf{0},\\quad \\pi_1+\\pi_2=1',
+          gotcha: 'The steady state is a probability vector: all entries non-negative and summing to 1. Just finding the null space gives the direction; you must normalize to get probabilities.',
+        },
+        {
+          label: 'Form $T - I$ and row reduce',
+          strategy: 'Subtract the identity from $T$. Both rows will be proportional (since $\\lambda=1$ is indeed an eigenvalue) — use just one equation plus normalization.',
+          explanation: '$T-I = \\begin{bmatrix}-0.2&0.3\\\\0.2&-0.3\\end{bmatrix}$. Row 1 says $-0.2\\pi_1+0.3\\pi_2=0$, i.e., $\\pi_1 = 1.5\\pi_2$.',
+          math: 'T-I = \\begin{bmatrix}-0.2&0.3\\\\0.2&-0.3\\end{bmatrix} \\Rightarrow \\pi_1 = 1.5\\,\\pi_2',
+        },
+        {
+          label: 'Apply normalization to solve',
+          strategy: 'Substitute $\\pi_1 = 1.5\\pi_2$ into $\\pi_1+\\pi_2=1$.',
+          explanation: '$1.5\\pi_2+\\pi_2=1 \\Rightarrow 2.5\\pi_2=1 \\Rightarrow \\pi_2=0.4$, $\\pi_1=0.6$.',
+          math: '\\boldsymbol{\\pi} = \\begin{bmatrix}0.6\\\\0.4\\end{bmatrix}',
+        },
+        {
+          label: 'Verify: $T\\boldsymbol{\\pi} = \\boldsymbol{\\pi}$',
+          strategy: 'Multiply and check each component.',
+          explanation: '$T\\boldsymbol{\\pi} = \\begin{bmatrix}0.8(0.6)+0.3(0.4)\\\\0.2(0.6)+0.7(0.4)\\end{bmatrix} = \\begin{bmatrix}0.48+0.12\\\\0.12+0.28\\end{bmatrix} = \\begin{bmatrix}0.6\\\\0.4\\end{bmatrix} = \\boldsymbol{\\pi}$ ✓.',
+          math: 'T\\boldsymbol{\\pi} = \\begin{bmatrix}0.6\\\\0.4\\end{bmatrix} = \\boldsymbol{\\pi} \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la3-005-convergence',
+      title: 'How Fast Does a Markov Chain Converge? The Spectral Gap',
+      prereqs: ['Steady state', 'Eigenvalues', 'Matrix powers'],
+      problem: 'Determine the convergence rate of the Markov chain with $T = \\begin{bmatrix}0.8&0.3\\\\0.2&0.7\\end{bmatrix}$ from an arbitrary starting distribution.',
+      steps: [
+        {
+          label: 'Find both eigenvalues of $T$',
+          strategy: 'The steady-state eigenvector has $\\lambda_1=1$ (guaranteed). The second eigenvalue $\\lambda_2$ controls convergence speed.',
+          explanation: '$\\text{tr}(T) = 1.5 = \\lambda_1+\\lambda_2 = 1+\\lambda_2$, so $\\lambda_2=0.5$. (Or: $\\det(T)=0.56-0.06=0.5 = \\lambda_1\\lambda_2 = 1\\cdot\\lambda_2$.)',
+          math: '\\lambda_1 = 1,\\quad \\lambda_2 = 0.5',
+        },
+        {
+          label: 'Write any starting distribution in the eigenbasis',
+          strategy: 'Decompose the initial distribution $\\mathbf{x}_0 = c_1\\boldsymbol{\\pi} + c_2\\mathbf{v}_2$. After $k$ steps: $T^k\\mathbf{x}_0 = c_1\\boldsymbol{\\pi} + c_2\\lambda_2^k\\mathbf{v}_2$.',
+          explanation: 'As $k\\to\\infty$, $\\lambda_2^k = 0.5^k \\to 0$, so the $\\mathbf{v}_2$ component decays and the distribution converges to $c_1\\boldsymbol{\\pi}$. Since $\\mathbf{x}_0$ is a probability vector, $c_1=1$.',
+          math: 'T^k\\mathbf{x}_0 = \\boldsymbol{\\pi} + c_2 (0.5)^k \\mathbf{v}_2',
+          gotcha: 'The eigenvalue $\\lambda_2$ of the transition matrix directly controls convergence, NOT the eigenvalue of $(T-I)$. These are different matrices.',
+        },
+        {
+          label: 'Quantify the convergence rate via the spectral gap',
+          strategy: 'Spectral gap $= 1 - |\\lambda_2|$. Larger gap → faster convergence.',
+          explanation: 'Spectral gap $= 1 - 0.5 = 0.5$. Error decays as $0.5^k$: halves each step. After 10 steps, error is $0.5^{10} \\approx 0.001$ — within 0.1% of steady state.',
+          math: '\\text{spectral gap} = 1 - |\\lambda_2| = 0.5 \\Rightarrow \\text{error} \\sim 0.5^k',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la3-005-1',

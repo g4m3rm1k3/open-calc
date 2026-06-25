@@ -335,6 +335,69 @@ print(kernel_basis.round(10))
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la6-003-verify-linearity',
+      title: 'Verifying (and Disproving) Linearity of a Transformation',
+      prereqs: ['Two linearity axioms: additivity and homogeneity'],
+      problem: '(a) Is $T(p) = p\'(x)$ (differentiation) a linear map $\\mathcal{P}_2 \\to \\mathcal{P}_1$? (b) Is $T(p) = p(x) + 1$ linear?',
+      steps: [
+        {
+          label: '(a) Check additivity: $T(p+q) = T(p)+T(q)$',
+          strategy: 'Compute $T(p+q)$ and $T(p)+T(q)$ separately and compare.',
+          explanation: '$(p+q)\'(x) = p\'(x)+q\'(x)$ — this is just the sum rule of differentiation. So $T(p+q) = T(p)+T(q)$ ✓.',
+          math: 'T(p+q) = (p+q)\'= p\'+q\' = T(p)+T(q) \\checkmark',
+        },
+        {
+          label: '(a) Check homogeneity: $T(cp) = cT(p)$',
+          strategy: '$(cp)\'(x) = c\\cdot p\'(x)$ — the constant-multiple rule.',
+          explanation: '$T(cp) = (cp)\'= c p\' = cT(p)$ ✓. Differentiation is linear.',
+          math: 'T(cp) = (cp)\'= cp\' = cT(p) \\checkmark',
+        },
+        {
+          label: '(b) Test $T(p) = p(x)+1$ for linearity',
+          strategy: 'Test additivity: $T(p+q) = (p+q)+1$ vs $T(p)+T(q) = (p+1)+(q+1) = p+q+2$. These differ.',
+          explanation: '$T(p+q) = p+q+1 \\neq p+q+2 = T(p)+T(q)$. Additivity fails. (Also: $T(0) = 0+1=1\\neq 0$ — a linear map must send zero to zero.)',
+          math: 'T(0) = 1 \\neq 0 \\Rightarrow \\text{not linear}',
+          gotcha: 'Quick check: any linear map must satisfy $T(\\mathbf{0})=\\mathbf{0}$. If the zero vector maps to anything other than zero, the map is not linear — no further checking needed.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la6-003-kernel-image',
+      title: 'Finding the Kernel and Image of a Linear Map',
+      prereqs: ['Linear map', 'Null space', 'Column space'],
+      problem: 'Find $\\ker(T)$ and $\\text{im}(T)$ for $T: \\mathcal{P}_2 \\to \\mathcal{P}_2$ defined by $T(a+bx+cx^2) = b + 2cx$.',
+      steps: [
+        {
+          label: 'Identify what $T$ does (it is differentiation again)',
+          strategy: '$T(p) = p\'(x)$ for $p \\in \\mathcal{P}_2$. The output is degree $\\leq 1$.',
+          explanation: '$T(a+bx+cx^2) = b+2cx$ — differentiates and reduces degree by 1.',
+          math: 'T(a+bx+cx^2) = b + 2cx',
+        },
+        {
+          label: 'Find the kernel: $T(p) = 0$',
+          strategy: 'Set $b+2cx = 0$ for all $x$. Both coefficients must be zero.',
+          explanation: '$b=0$ and $c=0$; $a$ is free. So $\\ker(T) = \\{a : a \\in \\mathbb{R}\\}$ — the constant polynomials.',
+          math: '\\ker(T) = \\text{span}\\{1\\},\\quad \\dim(\\ker T)=1',
+        },
+        {
+          label: 'Find the image: all possible outputs',
+          strategy: 'The image is the set of all $b+2cx$ — polynomials of degree $\\leq 1$, i.e., $\\mathcal{P}_1$.',
+          explanation: 'Every element of $\\mathcal{P}_1$ has the form $b+cx$ for some $b,c$. Given target $b+cx$, the input $bx+\\frac{c}{2}x^2$ maps to it. So $\\text{im}(T) = \\mathcal{P}_1$.',
+          math: '\\text{im}(T) = \\mathcal{P}_1,\\quad \\dim(\\text{im}T)=2',
+        },
+        {
+          label: 'Verify rank-nullity',
+          strategy: '$\\dim(\\ker T) + \\dim(\\text{im}T) = \\dim(\\mathcal{P}_2)$.',
+          explanation: '$1 + 2 = 3 = \\dim(\\mathcal{P}_2)$ ✓.',
+          math: '1 + 2 = 3 \\checkmark',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la6-003-1',

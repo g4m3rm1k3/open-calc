@@ -478,6 +478,76 @@ C = np.array([[0.5, 0.2],
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la3-003-complex-eigenvalues',
+      title: 'Eigenvalues of a Rotation Matrix Are Complex',
+      prereqs: ['Characteristic polynomial', 'Complex numbers'],
+      problem: 'Find the eigenvalues of the 90° rotation matrix $R = \\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Set up the characteristic polynomial',
+          strategy: 'Same procedure: $\\det(R - \\lambda I) = 0$.',
+          explanation: '$R - \\lambda I = \\begin{bmatrix}-\\lambda & -1\\\\1&-\\lambda\\end{bmatrix}$. Determinant: $(-\\lambda)(-\\lambda)-(-1)(1) = \\lambda^2+1$.',
+          math: '\\det(R-\\lambda I) = \\lambda^2 + 1 = 0',
+        },
+        {
+          label: 'Solve $\\lambda^2 + 1 = 0$',
+          strategy: 'No real solution — this polynomial has only complex roots. Expect $a \\pm bi$ for a rotation.',
+          explanation: '$\\lambda^2 = -1$, so $\\lambda = \\pm i$. These are complex conjugate eigenvalues. Geometrically: a pure rotation has no real invariant direction (no vector maps to a scalar multiple of itself), so real eigenvalues cannot exist.',
+          math: '\\lambda_1 = i,\\quad \\lambda_2 = -i',
+          gotcha: 'Real matrices can still have complex eigenvalues — they always come in conjugate pairs $a \\pm bi$. Never assume a real matrix has real eigenvalues.',
+        },
+        {
+          label: 'Extract the angle from the eigenvalues',
+          strategy: 'Write $\\lambda = e^{i\\theta} = \\cos\\theta + i\\sin\\theta$. Match real and imaginary parts.',
+          explanation: '$\\lambda_1 = i = \\cos 90° + i\\sin 90°$, so $\\theta = 90°$. The matrix encodes a rotation of 90°. For a general $n°$ rotation matrix, eigenvalues are $e^{\\pm in\\pi/180}$.',
+          math: '\\lambda_1 = e^{i\\pi/2},\\quad \\lambda_2 = e^{-i\\pi/2}',
+        },
+        {
+          label: 'Check: trace and determinant',
+          strategy: 'Trace = sum of eigenvalues = $2a$ (the real part doubled); determinant = product of eigenvalues = $a^2+b^2$.',
+          explanation: '$\\text{tr}(R) = 0 + 0 = 0 = i + (-i)$ ✓. $\\det(R) = (0)(0)-(-1)(1) = 1 = i \\cdot (-i) = 1$ ✓. Determinant equals 1 confirms it is a rotation (area-preserving).',
+          math: '\\text{tr}=0 \\checkmark,\\quad \\det=1 \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la3-003-polar-form',
+      title: 'Reading Complex Eigenvalues: Scaling and Rotation',
+      prereqs: ['Complex eigenvalues', 'Polar form of complex numbers'],
+      problem: 'A matrix has eigenvalues $\\lambda = 2 \\pm 2i$. What does this tell you about the transformation geometrically?',
+      steps: [
+        {
+          label: 'Convert to polar form $r e^{i\\theta}$',
+          strategy: 'Any complex number $a+bi$ has $r = \\sqrt{a^2+b^2}$ (magnitude) and $\\theta = \\arctan(b/a)$ (angle). These give the scaling and rotation.',
+          explanation: '$a=2$, $b=2$. $r = \\sqrt{4+4} = 2\\sqrt{2}$. $\\theta = \\arctan(2/2) = \\arctan(1) = 45°$.',
+          math: 'r = \\sqrt{2^2+2^2} = 2\\sqrt{2},\\quad \\theta = 45°',
+        },
+        {
+          label: 'Interpret the magnitude $r$',
+          strategy: 'The magnitude $r = |\\lambda|$ is the scaling factor applied each iteration.',
+          explanation: '$r = 2\\sqrt{2} \\approx 2.83 > 1$, so vectors grow in length with each application of $A$. If $r < 1$, vectors shrink (stable spiral); $r = 1$, they orbit (center); $r > 1$, they spiral outward (unstable).',
+          math: '|\\lambda| = 2\\sqrt{2} > 1 \\Rightarrow \\text{unstable spiral outward}',
+          gotcha: 'Stability is determined by $|\\lambda|$, not the sign of the real part. $\\lambda = -1+0.1i$ has $|\\lambda| > 1$ and is unstable despite the negative real part.',
+        },
+        {
+          label: 'Interpret the argument $\\theta$',
+          strategy: 'The argument gives the rotation angle per step.',
+          explanation: '$\\theta = 45°$, so each multiplication by $A$ rotates the (complex) eigenvector by 45°. After 8 applications, it has completed one full revolution.',
+          math: '\\theta = 45° \\Rightarrow \\text{full revolution in 8 steps}',
+        },
+        {
+          label: 'State the complete geometric picture',
+          strategy: 'Combine: $r > 1$ (growing) + $\\theta = 45°$ (rotating) = outward spiral at 45° per step.',
+          explanation: 'The transformation acts as a spiral: each iteration scales vectors by $2\\sqrt{2}$ and rotates by $45°$. This is the 2D real representation of multiplying complex numbers by $2+2i$.',
+          math: 'A \\sim r e^{i\\theta} = 2\\sqrt{2}\\, e^{i\\pi/4}: \\text{scale}\\times\\text{rotate}',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

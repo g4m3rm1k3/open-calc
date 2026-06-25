@@ -326,6 +326,64 @@ disp('sqrt(kappa) heuristic:')
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la9-002-cg-two-steps',
+      title: 'Two Steps of Conjugate Gradient',
+      prereqs: ['Steepest descent', 'A-conjugate vectors', 'Inner products'],
+      problem: 'Apply 2 CG steps to $A = \\begin{bmatrix}4&0\\\\0&1\\end{bmatrix}$, $\\mathbf{b}=[4,1]^\\top$, $\\mathbf{x}^{(0)}=[0,0]^\\top$. (True solution: $[1,1]^\\top$.)',
+      steps: [
+        {
+          label: 'Initialize: $\\mathbf{r}^{(0)} = \\mathbf{b}-A\\mathbf{x}^{(0)} = \\mathbf{b}$, $\\mathbf{p}^{(0)}=\\mathbf{r}^{(0)}$',
+          strategy: 'The residual is the negative gradient of $\\frac{1}{2}\\mathbf{x}^\\top A\\mathbf{x}-\\mathbf{b}^\\top\\mathbf{x}$. The first search direction is the steepest descent direction.',
+          explanation: '$\\mathbf{r}^{(0)}=[4,1]^\\top$, $\\mathbf{p}^{(0)}=[4,1]^\\top$.',
+          math: '\\mathbf{r}^{(0)} = \\mathbf{b} = [4,1]^\\top,\\quad\\mathbf{p}^{(0)}=[4,1]^\\top',
+        },
+        {
+          label: 'Step 1: compute step size $\\alpha_0$',
+          strategy: '$\\alpha_0 = \\frac{\\mathbf{r}^{(0)\\top}\\mathbf{r}^{(0)}}{\\mathbf{p}^{(0)\\top}A\\mathbf{p}^{(0)}}$.',
+          explanation: '$A\\mathbf{p}^{(0)} = [16,1]^\\top$. $\\mathbf{r}^{(0)\\top}\\mathbf{r}^{(0)}=17$. $\\mathbf{p}^{(0)\\top}A\\mathbf{p}^{(0)}=64+1=65$. $\\alpha_0=17/65$.',
+          math: '\\alpha_0 = \\frac{17}{65}',
+        },
+        {
+          label: 'Update $\\mathbf{x}^{(1)}$ and $\\mathbf{r}^{(1)}$',
+          strategy: '$\\mathbf{x}^{(1)}=\\mathbf{x}^{(0)}+\\alpha_0\\mathbf{p}^{(0)}$; $\\mathbf{r}^{(1)}=\\mathbf{r}^{(0)}-\\alpha_0 A\\mathbf{p}^{(0)}$.',
+          explanation: '$\\mathbf{x}^{(1)}=[68/65,17/65]^\\top\\approx[1.046,0.262]^\\top$. $\\mathbf{r}^{(1)}=[4,1]^\\top-(17/65)[16,1]^\\top=[(4-272/65),(1-17/65)]=[(-12/65),(48/65)]^\\top$.',
+          math: '\\mathbf{r}^{(1)} = \\begin{bmatrix}-12/65\\\\48/65\\end{bmatrix}',
+        },
+        {
+          label: 'Step 2: compute new direction $\\mathbf{p}^{(1)}$ (A-conjugate to $\\mathbf{p}^{(0)}$)',
+          strategy: '$\\beta_0 = \\|\\mathbf{r}^{(1)}\\|^2/\\|\\mathbf{r}^{(0)}\\|^2$. Then $\\mathbf{p}^{(1)}=\\mathbf{r}^{(1)}+\\beta_0\\mathbf{p}^{(0)}$.',
+          explanation: '$\\|\\mathbf{r}^{(1)}\\|^2=(144+2304)/4225=2448/4225$. $\\beta_0 = 2448/(4225\\cdot17/65^2) = \\ldots$. After step 2, CG EXACTLY solves a 2×2 SPD system in at most 2 steps.',
+          math: '\\mathbf{x}^{(2)} = \\begin{bmatrix}1\\\\1\\end{bmatrix} \\text{ (exact, in 2 steps)}',
+          gotcha: 'CG solves an $n\\times n$ SPD system in at most $n$ steps exactly (in infinite precision). In practice, rounding errors force more iterations, and we stop when the residual is small enough.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la9-002-cg-vs-sd',
+      title: 'Why CG Beats Steepest Descent: Non-Repeating Directions',
+      prereqs: ['Steepest descent', 'Conjugate directions', 'Ellipsoid geometry'],
+      problem: 'Explain geometrically why CG converges in $\\leq n$ steps while steepest descent can take infinitely many.',
+      steps: [
+        {
+          label: 'Steepest descent: zig-zag oscillation',
+          strategy: 'In steepest descent, consecutive directions are always perpendicular ($\\mathbf{r}^{(k+1)} \\perp \\mathbf{r}^{(k)}$). For elongated ellipsoids, this causes slow zig-zagging.',
+          explanation: 'For $\\kappa(A) = \\kappa$ (condition number), steepest descent converges at rate $\\left(\\frac{\\kappa-1}{\\kappa+1}\\right)^2$ per step. For $\\kappa=100$: convergence factor $\\approx 0.96$ — very slow.',
+          math: '\\text{SD rate} = \\left(\\frac{\\kappa-1}{\\kappa+1}\\right)^2 \\approx 1 \\text{ for large }\\kappa',
+        },
+        {
+          label: 'CG: $A$-conjugate directions, each new direction is independent',
+          strategy: 'CG chooses directions $\\mathbf{p}^{(0)},\\mathbf{p}^{(1)},\\ldots$ that are $A$-conjugate ($\\mathbf{p}^{(i)\\top}A\\mathbf{p}^{(j)}=0$ for $i\\neq j$). This means each direction explores a NEW subspace.',
+          explanation: 'After $k$ CG steps, the solution is optimal over the $k$-dimensional Krylov subspace $K_k(A,\\mathbf{r}^{(0)})$. You never revisit a direction. In $n$ steps, the Krylov subspace is all of $\\mathbb{R}^n$, so the exact solution is found.',
+          math: 'K_k(A,\\mathbf{r}^{(0)}) = \\text{span}\\{\\mathbf{r}^{(0)}, A\\mathbf{r}^{(0)}, A^2\\mathbf{r}^{(0)},\\ldots,A^{k-1}\\mathbf{r}^{(0)}\\}',
+          gotcha: 'CG convergence depends on the EIGENVALUE DISTRIBUTION, not just $\\kappa$. If eigenvalues cluster into $k$ groups, CG converges in $k$ steps. Preconditioning works by clustering eigenvalues.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la9-002-1',

@@ -592,6 +592,75 @@ A = np.array([[5., 2.],
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la3-001-char-poly',
+      title: 'Finding Eigenvalues via the Characteristic Polynomial',
+      prereqs: ['Determinant', '2×2 matrix operations'],
+      problem: 'Find all eigenvalues of $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Set up the eigenvalue equation',
+          strategy: '$\\lambda$ is an eigenvalue iff $A\\mathbf{v} = \\lambda\\mathbf{v}$ has a non-zero solution — equivalently, iff $\\det(A-\\lambda I)=0$.',
+          explanation: 'Rewrite $A\\mathbf{v}=\\lambda\\mathbf{v}$ as $(A-\\lambda I)\\mathbf{v}=\\mathbf{0}$. A non-zero solution exists iff $(A-\\lambda I)$ is singular, i.e., its determinant is zero. This determinant is a polynomial in $\\lambda$ called the characteristic polynomial.',
+          math: '\\det(A-\\lambda I)=0',
+        },
+        {
+          label: 'Form $A - \\lambda I$ and compute its determinant',
+          strategy: 'Subtract $\\lambda$ from each diagonal entry, leaving the off-diagonal entries unchanged.',
+          explanation: '$A-\\lambda I = \\begin{bmatrix}3-\\lambda&1\\\\1&3-\\lambda\\end{bmatrix}$. Determinant: $(3-\\lambda)^2 - 1\\cdot1 = (3-\\lambda)^2-1$.',
+          math: '\\det(A-\\lambda I) = (3-\\lambda)^2 - 1',
+          gotcha: 'Subtract $\\lambda$ from the DIAGONAL entries only. A common mistake is subtracting from every entry.',
+        },
+        {
+          label: 'Expand and factor the characteristic polynomial',
+          strategy: 'Expand, then factor — look for difference of squares or simple roots.',
+          explanation: '$(3-\\lambda)^2-1 = \\lambda^2-6\\lambda+9-1=\\lambda^2-6\\lambda+8=(\\lambda-2)(\\lambda-4)$.',
+          math: 'p(\\lambda) = (\\lambda-2)(\\lambda-4) = 0',
+        },
+        {
+          label: 'Read off the eigenvalues',
+          strategy: 'Each root of the characteristic polynomial is an eigenvalue.',
+          explanation: '$\\lambda_1=2$ and $\\lambda_2=4$. This symmetric matrix has real eigenvalues — symmetric matrices always do. The trace $3+3=6=\\lambda_1+\\lambda_2$ ✓ and the determinant $9-1=8=\\lambda_1\\lambda_2$ ✓ — two quick checks.',
+          math: '\\lambda_1=2,\\; \\lambda_2=4 \\quad \\text{trace}=6 \\checkmark,\\; \\det=8 \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la3-001-eigenvectors',
+      title: 'Finding Eigenvectors for a Known Eigenvalue',
+      prereqs: ['Eigenvalues', 'Null space', 'Row reduction'],
+      problem: 'Find eigenvectors of $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$ for $\\lambda_1=2$ and $\\lambda_2=4$.',
+      steps: [
+        {
+          label: 'For $\\lambda_1=2$: form $(A-2I)$ and solve $(A-2I)\\mathbf{v}=\\mathbf{0}$',
+          strategy: 'Each eigenvalue has its own eigenvector — plug $\\lambda$ into $(A-\\lambda I)\\mathbf{v}=\\mathbf{0}$ and find the null space.',
+          explanation: '$A-2I = \\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$. Both rows say $v_1+v_2=0$, i.e., $v_1=-v_2$.',
+          math: 'A-2I = \\begin{bmatrix}1&1\\\\1&1\\end{bmatrix} \\to v_1 = -v_2',
+        },
+        {
+          label: 'Write the eigenvector for $\\lambda_1=2$',
+          strategy: 'Let the free variable equal 1 to get the simplest eigenvector.',
+          explanation: 'Let $v_2=1$: eigenvector is $[{-1},1]^\\top$. Any scalar multiple works — eigenvectors are a whole line (the eigenspace), not a single vector.',
+          math: '\\mathbf{v}_1 = \\begin{bmatrix}-1\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'For $\\lambda_2=4$: form $(A-4I)$ and solve',
+          strategy: 'Same procedure for the second eigenvalue.',
+          explanation: '$A-4I = \\begin{bmatrix}-1&1\\\\1&-1\\end{bmatrix}$. Both rows give $-v_1+v_2=0$, i.e., $v_1=v_2$.',
+          math: 'A-4I = \\begin{bmatrix}-1&1\\\\1&-1\\end{bmatrix} \\to v_1=v_2',
+        },
+        {
+          label: 'Write the eigenvector for $\\lambda_2=4$ and interpret',
+          strategy: 'Eigenvectors of different eigenvalues are always linearly independent; for a symmetric matrix, they are also orthogonal.',
+          explanation: '$\\mathbf{v}_2 = [1,1]^\\top$. Check: $\\mathbf{v}_1 \\cdot \\mathbf{v}_2 = (-1)(1)+(1)(1)=0$ ✓ — perpendicular, as expected for a symmetric matrix. The two eigenvectors give the "natural axes" of the transformation.',
+          math: '\\mathbf{v}_2 = \\begin{bmatrix}1\\\\1\\end{bmatrix},\\quad \\mathbf{v}_1\\cdot\\mathbf{v}_2=0 \\checkmark',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

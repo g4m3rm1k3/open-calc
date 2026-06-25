@@ -332,6 +332,64 @@ disp('rho_jac^2 vs rho_gs:')
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la9-001-jacobi-iterate',
+      title: 'Three Steps of Jacobi Iteration',
+      prereqs: ['System of linear equations', 'Diagonal dominance'],
+      problem: 'Apply 3 Jacobi iterations to $4x+y=9$, $x+3y=7$ starting from $x^{(0)}=y^{(0)}=0$.',
+      steps: [
+        {
+          label: 'Isolate each variable (Jacobi update formula)',
+          strategy: 'Rewrite each equation for its diagonal variable: $x = (b_1 - a_{12}y)/a_{11}$, $y = (b_2 - a_{21}x)/a_{22}$.',
+          explanation: '$x = (9-y)/4$, $y = (7-x)/3$. Jacobi: use ALL values from the previous iteration to compute the next.',
+          math: 'x^{(k+1)} = \\frac{9-y^{(k)}}{4},\\quad y^{(k+1)} = \\frac{7-x^{(k)}}{3}',
+        },
+        {
+          label: 'Iteration 1: from $(0,0)$',
+          strategy: 'Plug in $(x^{(0)},y^{(0)})=(0,0)$.',
+          explanation: '$x^{(1)}=(9-0)/4=2.25$, $y^{(1)}=(7-0)/3\\approx2.333$.',
+          math: 'x^{(1)}=2.25,\\quad y^{(1)}\\approx2.333',
+        },
+        {
+          label: 'Iterations 2 and 3',
+          strategy: 'Continue, using values from the previous step (not the current one — that would be Gauss-Seidel).',
+          explanation: 'Step 2: $x^{(2)}=(9-2.333)/4\\approx1.667$, $y^{(2)}=(7-2.25)/3=1.583$. Step 3: $x^{(3)}=(9-1.583)/4\\approx1.854$, $y^{(3)}=(7-1.667)/3\\approx1.778$. True solution: $(x,y)=(2,1)$.',
+          math: 'x^{(3)}\\approx1.854,\\; y^{(3)}\\approx1.778 \\to (2,1)\\text{ (converging)}',
+          gotcha: 'Jacobi uses the PREVIOUS iteration\'s values for ALL variables simultaneously. Gauss-Seidel uses the LATEST available value immediately. For the same convergence criterion, Gauss-Seidel usually needs fewer iterations.',
+        },
+        {
+          label: 'Verify convergence: diagonal dominance',
+          strategy: 'Jacobi converges when $|a_{ii}| > \\sum_{j\\neq i}|a_{ij}|$ for all $i$ (strictly diagonally dominant).',
+          explanation: 'Row 1: $|4| > |1|$ ✓. Row 2: $|3| > |1|$ ✓. Diagonal dominance guarantees convergence.',
+          math: '|4|>|1|\\checkmark,\\quad|3|>|1|\\checkmark \\Rightarrow \\text{converges}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la9-001-gauss-seidel',
+      title: 'Gauss-Seidel: Immediate Updates and Faster Convergence',
+      prereqs: ['Jacobi iteration'],
+      problem: 'Apply 2 Gauss-Seidel iterations to the same system $4x+y=9$, $x+3y=7$ and compare convergence to Jacobi.',
+      steps: [
+        {
+          label: 'Gauss-Seidel: use the freshest values immediately',
+          strategy: 'When computing $x^{(k+1)}$, use $y^{(k)}$. When computing $y^{(k+1)}$, use the JUST-computed $x^{(k+1)}$ (not $x^{(k)}$).',
+          explanation: '$x^{(1)}=(9-y^{(0)})/4 = (9-0)/4=2.25$. Immediately use this: $y^{(1)}=(7-x^{(1)})/3=(7-2.25)/3\\approx1.583$.',
+          math: 'x^{(1)}=2.25,\\quad y^{(1)} = \\frac{7-2.25}{3}\\approx1.583',
+        },
+        {
+          label: 'Iteration 2',
+          strategy: 'Apply the update again, using freshest values.',
+          explanation: '$x^{(2)}=(9-1.583)/4\\approx1.854$. $y^{(2)}=(7-1.854)/3\\approx1.715$. Compare to Jacobi step 3: $(1.854, 1.778)$ vs Gauss-Seidel step 2: $(1.854, 1.715)$. Both are at $x\\approx1.854$, but Gauss-Seidel got there in one fewer step.',
+          math: 'x^{(2)}\\approx1.854,\\quad y^{(2)}\\approx1.715',
+          gotcha: 'Gauss-Seidel is NOT always faster than Jacobi — for some matrices, Jacobi converges and Gauss-Seidel diverges, or vice versa. For symmetric positive definite matrices, Gauss-Seidel always converges and is always at least as fast as Jacobi.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la9-001-1',

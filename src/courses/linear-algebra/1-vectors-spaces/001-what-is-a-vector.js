@@ -629,6 +629,88 @@ fprintf('Reconstructed pos: [%.2f; %.2f; %.2f]  (= next)\\n', check(1), check(2)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la1-001-magnitude',
+      title: 'Magnitude — the Hypotenuse Every Time',
+      prereqs: ['Pythagorean theorem'],
+      problem: 'Find the magnitude of $\\mathbf{v} = [8, 15]^\\top$.',
+      steps: [
+        {
+          label: 'Recognize the right triangle hiding in the vector',
+          strategy: 'Every 2D vector is the hypotenuse of a right triangle formed by its components.',
+          explanation: 'Before reaching for the formula, picture it. The vector $[8, 15]^\\top$ moves 8 units right and 15 units up. Those two movements are the legs of a right triangle. The vector itself is the diagonal — the hypotenuse. Magnitude is just that diagonal\'s length, which is why the Pythagorean theorem gives it.',
+          math: '\\text{legs} = 8 \\text{ and } 15, \\quad \\text{hypotenuse} = \\|\\mathbf{v}\\| = ?',
+        },
+        {
+          label: 'Square each component individually',
+          strategy: 'Squaring removes any negative sign before the components combine.',
+          explanation: 'Both components are positive here, but the square step still matters — for a vector like $[-8, 15]^\\top$ you would get $(-8)^2 = 64$, not $-64$. Negatives silently vanish under squaring. A common mistake is to add the raw components ($8 + 15 = 23$) — that would give the perimeter of the triangle, not the hypotenuse.',
+          math: '8^2 = 64 \\qquad 15^2 = 225',
+          gotcha: 'Never add unsquared components. $8 + 15 = 23$ has no geometric meaning here.',
+        },
+        {
+          label: 'Add the squares',
+          strategy: 'The sum of squares is what sits under the radical.',
+          explanation: 'Adding $64 + 225 = 289$. Recognize this number — $289 = 17^2$. The triple $(8, 15, 17)$ is a Pythagorean triple, a sibling of the familiar $(3, 4, 5)$.',
+          math: '64 + 225 = 289',
+        },
+        {
+          label: 'Take the square root',
+          strategy: 'The square root converts the sum of squared legs back into a length.',
+          explanation: 'Since $17^2 = 289$, the magnitude is exactly 17. No decimal approximation needed. Recognizing Pythagorean triples — $(3,4,5)$, $(5,12,13)$, $(8,15,17)$, $(7,24,25)$ — lets you avoid a calculator entirely.',
+          math: '\\|\\mathbf{v}\\| = \\sqrt{289} = 17',
+        },
+        {
+          label: 'Sanity-check the answer',
+          strategy: 'The magnitude must be at least as large as the largest component.',
+          explanation: 'The largest component is 15. Our answer is 17, which is greater than 15 — consistent with the hypotenuse always being the longest side of a right triangle. If the answer were less than 15, a computation error occurred.',
+          math: '\\|\\mathbf{v}\\| = 17 > 15 = \\max(|8|,\\,|15|) \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la1-001-reverse',
+      title: 'Working Backward — Finding a Component from the Magnitude',
+      prereqs: ['Pythagorean theorem', 'Solving equations'],
+      problem: 'A vector $\\mathbf{v} = \\begin{bmatrix} a \\\\ 5 \\end{bmatrix}$ has magnitude $\\sqrt{41}$. Find all possible values of $a$.',
+      steps: [
+        {
+          label: 'Plug the known values into the magnitude formula',
+          strategy: 'The magnitude formula is an equation — when the output is known, solve for the unknown input.',
+          explanation: 'We know $\\|\\mathbf{v}\\| = \\sqrt{41}$ and the second component is $5$. Substituting into $\\|\\mathbf{v}\\| = \\sqrt{a^2 + y^2}$ gives an equation with one unknown, $a$.',
+          math: '\\sqrt{a^2 + 5^2} = \\sqrt{41}',
+        },
+        {
+          label: 'Square both sides to remove the radicals',
+          strategy: 'Squaring eliminates square roots and produces a simpler polynomial equation.',
+          explanation: '$\\left(\\sqrt{a^2 + 25}\\right)^2 = a^2 + 25$ and $\\left(\\sqrt{41}\\right)^2 = 41$. The square-root symbols are gone.',
+          math: 'a^2 + 25 = 41',
+          gotcha: 'Squaring introduces no false solutions here because both sides were already non-negative. In general, always check solutions after squaring.',
+        },
+        {
+          label: 'Isolate $a^2$',
+          strategy: 'Subtract to get $a^2$ alone on one side.',
+          explanation: 'Subtract 25 from both sides.',
+          math: 'a^2 = 41 - 25 = 16',
+        },
+        {
+          label: 'Take the square root — two solutions',
+          strategy: 'Solving $a^2 = k$ always produces $a = \\pm\\sqrt{k}$.',
+          explanation: 'There are genuinely two answers: $a = 4$ gives vector $[4, 5]^\\top$ and $a = -4$ gives vector $[-4, 5]^\\top$. Two different vectors can share the same magnitude — they just point in mirror-image directions across the $y$-axis.',
+          math: 'a = \\pm 4',
+        },
+        {
+          label: 'Verify both answers by substitution',
+          strategy: 'Substitute back into the original magnitude formula to confirm.',
+          explanation: 'For $a = 4$: $\\sqrt{16 + 25} = \\sqrt{41}$ ✓. For $a = -4$: $\\sqrt{16 + 25} = \\sqrt{41}$ ✓. Both are valid. If additional context says $a > 0$, then $a = 4$ is the unique answer.',
+          math: '\\sqrt{4^2 + 5^2} = \\sqrt{41} \\checkmark \\qquad \\sqrt{(-4)^2 + 5^2} = \\sqrt{41} \\checkmark',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────────────────
   challenges: [
     {

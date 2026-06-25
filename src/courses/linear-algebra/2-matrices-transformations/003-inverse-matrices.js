@@ -524,6 +524,75 @@ C = np.array([[2., -1.], [4., 3.]])
     }
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-003-2x2-inverse',
+      title: 'The 2×2 Inverse Formula — When Does It Break?',
+      prereqs: ['Determinant (2×2)', 'Matrix multiplication'],
+      problem: 'Find $A^{-1}$ for $A = \\begin{bmatrix}2 & 5\\\\1 & 3\\end{bmatrix}$, then verify $A A^{-1} = I$.',
+      steps: [
+        {
+          label: 'Compute the determinant — it controls everything',
+          strategy: 'The formula for $A^{-1}$ requires dividing by $\\det(A) = ad - bc$. Check this first.',
+          explanation: 'For $A = \\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}$: $\\det(A) = ad - bc = (2)(3) - (5)(1) = 6 - 5 = 1$. The determinant is 1 — the inverse formula will produce integers, no fractions.',
+          math: '\\det(A) = (2)(3)-(5)(1) = 1',
+        },
+        {
+          label: 'Apply the 2×2 inverse formula',
+          strategy: 'Swap the diagonal, negate the off-diagonal, divide by the determinant.',
+          explanation: 'The formula: $A^{-1} = \\frac{1}{\\det(A)}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$. Swap $a=2$ and $d=3$, negate $b=5$ to $-5$ and $c=1$ to $-1$, divide by 1.',
+          math: 'A^{-1} = \\frac{1}{1}\\begin{bmatrix}3&-5\\\\-1&2\\end{bmatrix} = \\begin{bmatrix}3&-5\\\\-1&2\\end{bmatrix}',
+          gotcha: 'Two common errors: (1) forgetting to divide by $\\det(A)$; (2) negating the diagonal instead of swapping it. The diagonal entries SWAP; the off-diagonal entries get negated.',
+        },
+        {
+          label: 'Verify: $A A^{-1}$ must equal $I$',
+          strategy: 'Multiply out — if even one entry fails to give 0 or 1, there is a calculation error.',
+          explanation: '$(AA^{-1})_{11} = 2\\cdot3+5\\cdot(-1)=6-5=1$. $(AA^{-1})_{12}=2\\cdot(-5)+5\\cdot2=-10+10=0$. $(AA^{-1})_{21}=1\\cdot3+3\\cdot(-1)=3-3=0$. $(AA^{-1})_{22}=1\\cdot(-5)+3\\cdot2=-5+6=1$.',
+          math: '\\begin{bmatrix}2&5\\\\1&3\\end{bmatrix}\\begin{bmatrix}3&-5\\\\-1&2\\end{bmatrix} = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} \\checkmark',
+        },
+        {
+          label: 'What if $\\det(A) = 0$? The singular case.',
+          strategy: 'Zero determinant means no inverse exists — the transformation crushed space and cannot be undone.',
+          explanation: 'If $A = \\begin{bmatrix}2&4\\\\1&2\\end{bmatrix}$: $\\det = 2\\cdot2-4\\cdot1=0$. No inverse. This matrix maps the whole plane onto a single line through the origin — information is destroyed, and you cannot recover the original input.',
+          math: '\\det(A)=0 \\implies A^{-1} \\text{ does not exist}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-003-inverse-to-solve',
+      title: 'Solve a System Using the Inverse — When and Why',
+      prereqs: ['2×2 inverse formula', 'Matrix-vector multiplication'],
+      problem: 'Solve the system $2x+5y=4$ and $x+3y=1$ by finding and using $A^{-1}$.',
+      steps: [
+        {
+          label: 'Write the system as the matrix equation $A\\mathbf{x} = \\mathbf{b}$',
+          strategy: 'Recognizing the matrix form is the bridge between algebra and linear algebra.',
+          explanation: 'The coefficient matrix is $A = \\begin{bmatrix}2&5\\\\1&3\\end{bmatrix}$, the unknown vector is $\\mathbf{x} = [x,y]^\\top$, and the right-hand side is $\\mathbf{b} = [4,1]^\\top$.',
+          math: '\\begin{bmatrix}2&5\\\\1&3\\end{bmatrix}\\begin{bmatrix}x\\\\y\\end{bmatrix} = \\begin{bmatrix}4\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Multiply both sides on the left by $A^{-1}$',
+          strategy: 'If $A\\mathbf{x} = \\mathbf{b}$ and $A$ is invertible, then $\\mathbf{x} = A^{-1}\\mathbf{b}$.',
+          explanation: 'We already know $A^{-1} = \\begin{bmatrix}3&-5\\\\-1&2\\end{bmatrix}$ from the previous walkthrough. Multiply: $\\mathbf{x} = A^{-1}\\mathbf{b} = \\begin{bmatrix}3&-5\\\\-1&2\\end{bmatrix}\\begin{bmatrix}4\\\\1\\end{bmatrix}$.',
+          math: '\\mathbf{x} = A^{-1}\\mathbf{b} = \\begin{bmatrix}3&-5\\\\-1&2\\end{bmatrix}\\begin{bmatrix}4\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Compute the product',
+          strategy: 'Row-dot-column as usual.',
+          explanation: '$x = 3\\cdot4+(-5)\\cdot1=12-5=7$. $y = (-1)\\cdot4+2\\cdot1=-4+2=-2$.',
+          math: '\\mathbf{x} = \\begin{bmatrix}7\\\\-2\\end{bmatrix}',
+        },
+        {
+          label: 'When should you use the inverse vs. row reduction?',
+          strategy: 'Inverse is efficient when solving many systems with the same $A$; row reduction is more robust for a single system.',
+          explanation: 'Solving $A\\mathbf{x}=\\mathbf{b}$ once: row reduction is often faster and numerically more stable. Solving $A\\mathbf{x}=\\mathbf{b}_1$, $A\\mathbf{x}=\\mathbf{b}_2$, ..., $A\\mathbf{x}=\\mathbf{b}_{100}$ with the same $A$: compute $A^{-1}$ once and then it is just matrix-vector multiplication each time. LU decomposition is the practical alternative that gives similar reuse benefits.',
+          math: '\\text{Reuse: } A^{-1}\\mathbf{b}_1,\\; A^{-1}\\mathbf{b}_2,\\; \\ldots',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

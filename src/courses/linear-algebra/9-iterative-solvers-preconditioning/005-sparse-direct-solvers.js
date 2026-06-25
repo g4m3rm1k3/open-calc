@@ -356,6 +356,64 @@ disp('Factorized once, solved 10 RHS cheaply.')
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la9-005-direct-vs-iterative',
+      title: 'Choosing Between Direct and Iterative Solvers',
+      prereqs: ['LU factorization', 'Iterative methods', 'Sparse matrices'],
+      problem: 'You have three systems: (a) $n=1000$, $\\kappa=100$, solved once; (b) $n=10^6$, $\\kappa=100$, from a 3D PDE; (c) $n=10^4$, $\\kappa=10^{10}$. Recommend a solver for each.',
+      steps: [
+        {
+          label: 'Direct solvers: $O(n^3)$ work, exact (in principle), store the factor',
+          strategy: 'For small to medium $n$: direct solvers (LU, Cholesky) are reliable and exact. Use them unless memory or time force otherwise.',
+          explanation: '(a) $n=1000$: $n^3=10^9$ operations — fine on a modern CPU in seconds. Direct solver recommended. Solving multiple right-hand sides with the SAME $A$ is $O(n^2)$ each after the $O(n^3)$ factorization.',
+          math: 'n=1000:\\; O(n^3)=10^9\\text{ ops} \\Rightarrow \\text{direct}',
+        },
+        {
+          label: 'Iterative solvers: $O(nk)$ per iteration, approximate, memory $O(n)$',
+          strategy: 'For large sparse PDE problems: iterative methods (CG, GMRES + preconditioner) are the only practical choice.',
+          explanation: '(b) $n=10^6$, $\\kappa=100$: Direct $O(n^3) = 10^{18}$ — infeasible. CG with good preconditioner: $O(\\sqrt{\\kappa})\\approx10$ iterations × $O(n)$ per iteration = $10^7$ operations. Iterative wins by $10^{11}\\times$.',
+          math: 'n=10^6:\\; O(n^3)=10^{18}\\text{ (infeasible)} \\Rightarrow \\text{iterative}',
+        },
+        {
+          label: 'Ill-conditioned systems: direct is safer',
+          strategy: 'High $\\kappa$ ($10^{10}$) means iterative methods converge very slowly (many iterations) or diverge. Direct solvers produce a result (possibly inaccurate, but at least computable).',
+          explanation: '(c) $\\kappa=10^{10}$: CG convergence rate $\\approx 1 - 2/\\sqrt{\\kappa} \\approx 1 - 6\\times10^{-6}$ — needs $\\sim\\!10^5$ iterations. Direct solver: $O(n^3) = 10^{12}$ with $n=10^4$ is borderline. Answer: direct + preconditioning, or reformulate the problem.',
+          math: '\\kappa=10^{10} \\Rightarrow \\text{direct or direct+precond}',
+          gotcha: 'For very ill-conditioned systems, NO solver can give a reliable answer unless the problem is reformulated. Condition number $\\kappa \\approx 10^{16}$ (machine precision) means the problem is effectively singular.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la9-005-lu-reuse',
+      title: 'The Main Advantage of Direct Solvers: Factoring Once, Solving Many Times',
+      prereqs: ['LU factorization', 'Back substitution'],
+      problem: 'Explain why direct solvers are preferred when solving $A\\mathbf{x} = \\mathbf{b}_1, \\mathbf{b}_2, \\ldots, \\mathbf{b}_m$ for multiple right-hand sides.',
+      steps: [
+        {
+          label: 'Factor once: $A = LU$ costs $O(n^3)$',
+          strategy: 'The expensive part is the factorization. It does not depend on $\\mathbf{b}$.',
+          explanation: 'LU factorization: $O(n^3/3)$ floating-point operations. This is done ONCE for the matrix $A$.',
+          math: 'A = LU \\text{ costs }O(n^3)',
+        },
+        {
+          label: 'Solve cheaply: each $L\\mathbf{y}=\\mathbf{b}$, $U\\mathbf{x}=\\mathbf{y}$ costs $O(n^2)$',
+          strategy: 'Two triangular solves per right-hand side. Each is $O(n^2)$ — far cheaper than re-factoring.',
+          explanation: 'For $m$ right-hand sides: total cost = $O(n^3) + m\\cdot O(n^2)$. For $m=100$ and $n=1000$: $10^9 + 100\\times10^6 = 1.1\\times10^9$ — just 10% overhead for 100 extra solves.',
+          math: '\\text{total} = O(n^3) + m\\cdot O(n^2) \\ll m\\cdot O(n^3)',
+          gotcha: 'This amortization only works if the matrix $A$ is the SAME for all right-hand sides. If $A$ changes each time (e.g., nonlinear iteration), you must re-factor each time and iterative methods may be competitive.',
+        },
+        {
+          label: 'Common use case: time-stepping PDEs with fixed $A$',
+          strategy: 'In implicit time integration: $A\\mathbf{x}^{(t+1)} = \\mathbf{b}^{(t)}$ at each time step. $A$ is constant; only $\\mathbf{b}^{(t)}$ changes.',
+          explanation: 'Factor $A$ once at the start. Each time step: one triangular solve $O(n^2)$. Without LU reuse: $n$ time steps × $O(n^3) = O(n^4)$ total. With reuse: $O(n^3) + n\\cdot O(n^2) = O(n^3)$ — an $n$-fold speedup.',
+          math: 'O(n^3) + T\\cdot O(n^2) \\text{ vs } T\\cdot O(n^3)\\text{ without reuse}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la9-005-1',

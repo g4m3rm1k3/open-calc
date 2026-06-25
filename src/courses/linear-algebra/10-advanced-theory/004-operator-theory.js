@@ -297,6 +297,58 @@ S(k+1,k+1)  % should match
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la10-004-adjoint-operator',
+      title: 'Finding the Adjoint of a Linear Map',
+      prereqs: ['Inner product', 'Transpose', 'Self-adjoint operators'],
+      problem: 'Find the adjoint $T^*$ of the differentiation operator $T = d/dx$ on $L^2([0,1])$ with the boundary condition $f(0)=f(1)=0$.',
+      steps: [
+        {
+          label: 'The adjoint satisfies $\\langle Tf, g\\rangle = \\langle f, T^*g\\rangle$',
+          strategy: 'Use integration by parts to move the derivative from $f$ to $g$.',
+          explanation: '$\\langle Tf, g\\rangle = \\int_0^1 f\'(x)g(x)\\,dx$. Integrate by parts: $= [f(x)g(x)]_0^1 - \\int_0^1 f(x)g\'(x)\\,dx$.',
+          math: '\\langle Tf, g\\rangle = \\int_0^1 f\'g\\,dx = [fg]_0^1 - \\int_0^1 fg\'\\,dx',
+        },
+        {
+          label: 'Apply boundary conditions',
+          strategy: 'The boundary term $[f(x)g(x)]_0^1 = f(1)g(1)-f(0)g(0) = 0$ because $f(0)=f(1)=0$.',
+          explanation: '$[fg]_0^1 = 0$. So $\\langle Tf,g\\rangle = -\\int_0^1 f(x)g\'(x)\\,dx = \\langle f, -g\'\\rangle = \\langle f, T^*g\\rangle$.',
+          math: '\\langle Tf, g\\rangle = \\langle f, -g\'\\rangle \\Rightarrow T^* = -\\frac{d}{dx}',
+          gotcha: '$T^* = -T$ (skew-adjoint), NOT $T^* = T$ (self-adjoint). Differentiation is NOT self-adjoint in general — whether or not it is depends critically on the boundary conditions and the domain.',
+        },
+        {
+          label: 'Interpret: $T^* = -T$ means $T$ is skew-adjoint',
+          strategy: 'Skew-adjoint operators ($T^*=-T$) have purely imaginary spectrum ($\\lambda = i\\mu$ for real $\\mu$) and generate unitary flows ($e^{tT}$ is unitary).',
+          explanation: 'The Hamiltonian in quantum mechanics is $H = -i\\hbar\\,d/dx$ — the factor $-i$ makes it self-adjoint (since $(-i\\,d/dx)^* = -i\\cdot(-d/dx) = i\\,d/dx$... actually $H^* = H$ after accounting for $i$). Real physical quantities are eigenvalues of self-adjoint operators.',
+          math: 'T^*=-T \\Rightarrow \\text{spectrum}\\subset i\\mathbb{R}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la10-004-spectrum-operator',
+      title: 'The Spectrum of a Compact Self-Adjoint Operator',
+      prereqs: ['Eigenvalues', 'Self-adjoint', 'Infinite-dimensional spaces'],
+      problem: 'Describe the spectrum of the integral operator $(Tf)(x) = \\int_0^1 \\min(x,y)f(y)\\,dy$ on $L^2([0,1])$, and contrast with finite-dimensional case.',
+      steps: [
+        {
+          label: 'The kernel is symmetric: $K(x,y)=\\min(x,y)=K(y,x)$',
+          strategy: 'Symmetric kernel → $T$ is self-adjoint. Compact (Hilbert-Schmidt) self-adjoint operators have a countably infinite discrete spectrum with 0 as the only accumulation point.',
+          explanation: '$T$ is compact: it maps bounded sets to precompact sets. The spectral theorem for compact self-adjoint operators: eigenvalues $\\lambda_n\\to 0$; orthonormal eigenfunctions form a basis for $L^2$.',
+          math: '\\lambda_n \\to 0 \\text{ as } n\\to\\infty',
+        },
+        {
+          label: 'Find the eigenvalues explicitly',
+          strategy: 'Eigenvalue equation: $(Tf)(x) = \\lambda f(x)$. Differentiate twice to convert integral equation to ODE.',
+          explanation: 'Differentiating $(Tf)(x)=\\int_0^x yf(y)dy + x\\int_x^1 f(y)dy$ twice gives $f\'\'(x) = -\\lambda^{-1}f(x)$ (a harmonic oscillator ODE). With boundary conditions $f(0)=0$, $f\'(1)=0$: eigenvalues $\\lambda_n = \\frac{4}{(2n-1)^2\\pi^2}$ for $n=1,2,\\ldots$',
+          math: '\\lambda_n = \\frac{4}{(2n-1)^2\\pi^2} \\to 0',
+          gotcha: 'In infinite dimensions, the spectrum has three parts: point spectrum (eigenvalues), continuous spectrum (no eigenvectors, but $(T-\\lambda I)^{-1}$ is unbounded), and residual spectrum. Compact operators have only point spectrum plus $\\{0\\}$.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la10-004-1',

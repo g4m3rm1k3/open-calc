@@ -418,6 +418,64 @@ print(f"  Worn:  {ev_worn[1]/ev_worn[0]:.3f}  (higher = more chatter energy in s
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la4-006-spectral-decomposition',
+      title: 'The Spectral Decomposition: Writing $A$ as a Sum of Projections',
+      prereqs: ['Eigenvalues', 'Eigenvectors', 'Outer products'],
+      problem: 'Write $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$ as a sum of rank-1 projections using the spectral theorem.',
+      steps: [
+        {
+          label: 'Find the orthonormal eigenvectors',
+          strategy: 'The spectral theorem guarantees symmetric matrices have orthonormal eigenvectors. From the previous walkthrough: $\\lambda_1=2$, $\\lambda_2=4$.',
+          explanation: 'Normalized eigenvectors: $\\hat{\\mathbf{v}}_1 = \\frac{1}{\\sqrt{2}}[-1,1]^\\top$ and $\\hat{\\mathbf{v}}_2 = \\frac{1}{\\sqrt{2}}[1,1]^\\top$.',
+          math: '\\hat{\\mathbf{v}}_1=\\frac{1}{\\sqrt{2}}\\begin{bmatrix}-1\\\\1\\end{bmatrix},\\quad \\hat{\\mathbf{v}}_2=\\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Form the outer products $\\hat{\\mathbf{v}}_i\\hat{\\mathbf{v}}_i^\\top$',
+          strategy: 'Each outer product $\\hat{\\mathbf{v}}_i\\hat{\\mathbf{v}}_i^\\top$ is a rank-1 matrix that projects onto the direction $\\hat{\\mathbf{v}}_i$.',
+          explanation: '$P_1 = \\hat{\\mathbf{v}}_1\\hat{\\mathbf{v}}_1^\\top = \\frac{1}{2}\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix}$ and $P_2 = \\hat{\\mathbf{v}}_2\\hat{\\mathbf{v}}_2^\\top = \\frac{1}{2}\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$.',
+          math: 'P_1 = \\frac{1}{2}\\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix},\\quad P_2 = \\frac{1}{2}\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}',
+        },
+        {
+          label: 'Assemble $A = \\lambda_1 P_1 + \\lambda_2 P_2$',
+          strategy: 'Weight each projection by its eigenvalue and sum.',
+          explanation: '$2P_1+4P_2 = \\begin{bmatrix}1&-1\\\\-1&1\\end{bmatrix}+\\begin{bmatrix}2&2\\\\2&2\\end{bmatrix} = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix} = A$ ✓.',
+          math: 'A = 2P_1 + 4P_2 = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix} \\checkmark',
+          gotcha: 'This is equivalent to $A = Q\\Lambda Q^\\top$ (eigendecomposition) but expressed as a sum of rank-1 pieces. The two forms are identical; the outer-product form makes the "frequency decomposition" interpretation concrete.',
+        },
+        {
+          label: 'Use the spectral decomposition to compute $A^{-1}$ instantly',
+          strategy: 'Since $A = \\sum_i \\lambda_i P_i$, the inverse is $A^{-1} = \\sum_i \\frac{1}{\\lambda_i} P_i$ — just invert the eigenvalues.',
+          explanation: '$A^{-1} = \\frac{1}{2}P_1 + \\frac{1}{4}P_2$. No row reduction needed.',
+          math: 'A^{-1} = \\frac{1}{2}P_1 + \\frac{1}{4}P_2 = \\frac{1}{8}\\begin{bmatrix}3&-1\\\\-1&3\\end{bmatrix}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la4-006-spectral-theorem-conditions',
+      title: 'When Does the Spectral Theorem Apply?',
+      prereqs: ['Symmetric matrices', 'Eigenvalues', 'Diagonalization'],
+      problem: 'Determine which of the following matrices are guaranteed by the spectral theorem to have a real orthonormal eigenbasis: (a) $\\begin{bmatrix}1&2\\\\2&3\\end{bmatrix}$, (b) $\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}$, (c) $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Check symmetry: $A = A^\\top$',
+          strategy: 'The real spectral theorem applies exactly to real symmetric matrices. Check whether each matrix equals its transpose.',
+          explanation: '(a) $\\begin{bmatrix}1&2\\\\2&3\\end{bmatrix}^\\top = \\begin{bmatrix}1&2\\\\2&3\\end{bmatrix}$ ✓ symmetric. (b) $\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}^\\top = \\begin{bmatrix}1&3\\\\2&4\\end{bmatrix} \\neq$ (b) ✗. (c) $\\begin{bmatrix}0&-1\\\\1&0\\end{bmatrix}^\\top = \\begin{bmatrix}0&1\\\\-1&0\\end{bmatrix} \\neq$ (c) ✗.',
+          math: '(a)\\; A^\\top=A\\checkmark,\\quad (b)\\; A^\\top\\neq A,\\quad (c)\\; A^\\top\\neq A',
+        },
+        {
+          label: 'Conclusion for each case',
+          strategy: 'Real symmetric → real eigenvalues + orthonormal eigenvectors (spectral theorem). General → may have complex eigenvalues or non-orthogonal eigenvectors.',
+          explanation: '(a) Spectral theorem applies: real eigenvalues, orthogonal eigenvectors guaranteed. (b) Not symmetric: may still be diagonalizable (it is), but eigenvectors are NOT orthogonal. (c) Rotation matrix: complex eigenvalues $\\pm i$ — fails to have real eigenvalues, let alone orthonormal ones.',
+          math: '(a)\\;\\text{spectral theorem applies},\\quad (b),(c)\\;\\text{does not apply}',
+          gotcha: 'Being diagonalizable and having real eigenvalues is NOT sufficient for the spectral theorem. You need symmetry ($A=A^\\top$) to guarantee orthogonality of eigenvectors.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la4-006-1',

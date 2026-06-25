@@ -331,6 +331,64 @@ print("This is: 2*B1 + (-1)*B2 + 3*B3 = [[2,-1],[-1,3]] ✓")`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la6-005-verify-isomorphism',
+      title: 'Verifying That a Map Is an Isomorphism',
+      prereqs: ['Linear maps', 'Kernel', 'Dimension'],
+      problem: 'Show that $\\phi: \\mathcal{P}_2 \\to \\mathbb{R}^3$ defined by $\\phi(a+bx+cx^2) = [a,b,c]^\\top$ is an isomorphism.',
+      steps: [
+        {
+          label: 'Verify $\\phi$ is linear',
+          strategy: 'Check additivity and homogeneity.',
+          explanation: '$\\phi((a+bx+cx^2)+(d+ex+fx^2)) = [a+d,b+e,c+f]^\\top = [a,b,c]^\\top+[d,e,f]^\\top = \\phi(p)+\\phi(q)$ ✓. $\\phi(cp) = [ca,cb,cc]^\\top = c[a,b,c]^\\top = c\\phi(p)$ ✓.',
+          math: '\\phi(p+q)=\\phi(p)+\\phi(q)\\checkmark,\\quad \\phi(cp)=c\\phi(p)\\checkmark',
+        },
+        {
+          label: 'Verify $\\phi$ is injective (one-to-one): $\\ker\\phi = \\{0\\}$',
+          strategy: 'If $\\phi(p) = \\mathbf{0}$, then $[a,b,c]^\\top=[0,0,0]^\\top$, so $a=b=c=0$, meaning $p=0$.',
+          explanation: '$\\ker(\\phi) = \\{0\\}$ ✓ — the only polynomial that maps to the zero vector is the zero polynomial.',
+          math: '\\ker(\\phi) = \\{0\\} \\Rightarrow \\phi \\text{ is injective}',
+        },
+        {
+          label: 'Verify $\\phi$ is surjective (onto): $\\text{im}(\\phi) = \\mathbb{R}^3$',
+          strategy: 'Every $[a,b,c]^\\top \\in \\mathbb{R}^3$ is the image of $a+bx+cx^2 \\in \\mathcal{P}_2$.',
+          explanation: 'For any target $[a,b,c]^\\top$, the preimage is $a+bx+cx^2 \\in \\mathcal{P}_2$. So every vector in $\\mathbb{R}^3$ is hit. $\\phi$ is surjective ✓.',
+          math: '\\text{im}(\\phi) = \\mathbb{R}^3 \\Rightarrow \\phi \\text{ is surjective}',
+          gotcha: 'By rank-nullity, if $\\dim(V) = \\dim(W)$ and a linear map $T: V\\to W$ is injective, it is automatically surjective. So for same-dimensional spaces, just check injectivity.',
+        },
+        {
+          label: 'Conclude: $\\mathcal{P}_2 \\cong \\mathbb{R}^3$',
+          strategy: 'Isomorphic spaces are "the same" up to renaming — they have the same dimension and structure.',
+          explanation: '$\\mathcal{P}_2$ and $\\mathbb{R}^3$ are both 3-dimensional real vector spaces → they are isomorphic. This is why we can study $\\mathcal{P}_2$ using matrices: every computation in $\\mathcal{P}_2$ transfers to $\\mathbb{R}^3$ via $\\phi$.',
+          math: '\\mathcal{P}_2 \\cong \\mathbb{R}^3',
+        },
+      ],
+    },
+    {
+      id: 'wt-la6-005-dimension-determines-iso',
+      title: 'Dimension Is the Complete Invariant of Finite-Dimensional Real Vector Spaces',
+      prereqs: ['Isomorphism', 'Dimension'],
+      problem: 'For each pair, determine whether the spaces are isomorphic: (a) $\\mathbb{R}^4$ and $M_{2\\times 2}(\\mathbb{R})$, (b) $\\mathcal{P}_3$ and $\\mathbb{R}^3$.',
+      steps: [
+        {
+          label: 'Compute dimensions and compare',
+          strategy: 'Two finite-dimensional real vector spaces are isomorphic if and only if they have the same dimension.',
+          explanation: '(a) $\\dim(\\mathbb{R}^4)=4$; $\\dim(M_{2\\times 2})=4$ (four entries, each a free real number). Equal → isomorphic. (b) $\\dim(\\mathcal{P}_3)=4$ (coefficients $a_0,a_1,a_2,a_3$); $\\dim(\\mathbb{R}^3)=3$. Unequal → not isomorphic.',
+          math: '(a)\\;4=4\\Rightarrow\\cong,\\quad (b)\\;4\\neq3\\Rightarrow\\not\\cong',
+          gotcha: 'The "if and only if" is what makes this powerful: to prove two spaces are NOT isomorphic, you only need to show their dimensions differ. No need to check every possible map.',
+        },
+        {
+          label: 'Exhibit an explicit isomorphism for (a)',
+          strategy: 'Write down a bijective linear map $\\phi: \\mathbb{R}^4 \\to M_{2\\times 2}$.',
+          explanation: '$\\phi(a,b,c,d) = \\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}$. This is linear and bijective — it just reshapes a column vector into a matrix.',
+          math: '\\phi:\\begin{bmatrix}a\\\\b\\\\c\\\\d\\end{bmatrix}\\mapsto\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la6-005-1',

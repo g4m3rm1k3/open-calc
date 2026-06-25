@@ -430,6 +430,70 @@ b = np.array([1., 2., 3.])
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la4-001-project-onto-line',
+      title: 'Projecting a Vector onto a Line',
+      prereqs: ['Dot product', 'Vector magnitude'],
+      problem: 'Project $\\mathbf{b} = [1, 2, 3]^\\top$ onto the line spanned by $\\mathbf{a} = [1, 1, 0]^\\top$.',
+      steps: [
+        {
+          label: 'Recognize the task: find the closest point on a line to $\\mathbf{b}$',
+          strategy: 'Any point on the line through $\\mathbf{a}$ is $x\\mathbf{a}$ for some scalar $x$. We want the $x$ that minimizes $\\|\\mathbf{b} - x\\mathbf{a}\\|$. The closest point is where the error $\\mathbf{b}-x\\mathbf{a}$ is perpendicular to $\\mathbf{a}$.',
+          explanation: 'The orthogonality condition $\\mathbf{a}^\\top(\\mathbf{b}-x\\mathbf{a})=0$ gives $x = \\mathbf{a}^\\top\\mathbf{b}/(\\mathbf{a}^\\top\\mathbf{a})$.',
+          math: 'x = \\frac{\\mathbf{a}^\\top\\mathbf{b}}{\\mathbf{a}^\\top\\mathbf{a}}',
+        },
+        {
+          label: 'Compute the scalar $x$',
+          strategy: 'Dot products: numerator $\\mathbf{a}^\\top\\mathbf{b}$ and denominator $\\mathbf{a}^\\top\\mathbf{a}$ (= $\\|\\mathbf{a}\\|^2$).',
+          explanation: '$\\mathbf{a}^\\top\\mathbf{b} = 1\\cdot1+1\\cdot2+0\\cdot3=3$. $\\mathbf{a}^\\top\\mathbf{a}=1+1+0=2$. So $x=3/2$.',
+          math: 'x = \\frac{3}{2}',
+        },
+        {
+          label: 'Compute the projection $\\mathbf{p} = x\\mathbf{a}$',
+          strategy: 'Multiply the direction vector by the scalar.',
+          explanation: '$\\mathbf{p} = \\frac{3}{2}[1,1,0]^\\top = [3/2, 3/2, 0]^\\top$.',
+          math: '\\mathbf{p} = \\frac{3}{2}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix} = \\begin{bmatrix}3/2\\\\3/2\\\\0\\end{bmatrix}',
+        },
+        {
+          label: 'Verify: error $\\mathbf{e}$ is perpendicular to $\\mathbf{a}$',
+          strategy: 'Compute $\\mathbf{e} = \\mathbf{b} - \\mathbf{p}$ and check $\\mathbf{a}^\\top\\mathbf{e}=0$.',
+          explanation: '$\\mathbf{e} = [1-3/2, 2-3/2, 3]^\\top = [-1/2, 1/2, 3]^\\top$. $\\mathbf{a}^\\top\\mathbf{e} = -1/2+1/2+0 = 0$ ✓.',
+          math: '\\mathbf{a}^\\top\\mathbf{e} = 0 \\checkmark',
+          gotcha: 'The projection $\\mathbf{p}$ lies on the line; the error $\\mathbf{e}$ points perpendicular to it. Together $\\mathbf{b} = \\mathbf{p} + \\mathbf{e}$ decomposes $\\mathbf{b}$ into parallel and perpendicular components.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la4-001-project-onto-subspace',
+      title: 'Projection onto a Subspace: The Projection Matrix',
+      prereqs: ['Line projection', 'Matrix multiplication', 'Normal equations'],
+      problem: 'Find the projection of $\\mathbf{b} = [1,2,3]^\\top$ onto the column space of $A = \\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix}$ using the projection matrix $P = A(A^\\top A)^{-1}A^\\top$.',
+      steps: [
+        {
+          label: 'Compute $A^\\top A$',
+          strategy: '$A^\\top A$ is a 2×2 matrix — much smaller than $AA^\\top$ (3×3). Always invert the smaller one.',
+          explanation: '$A^\\top A = \\begin{bmatrix}1&0&1\\\\0&1&1\\end{bmatrix}\\begin{bmatrix}1&0\\\\0&1\\\\1&1\\end{bmatrix} = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$.',
+          math: 'A^\\top A = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}',
+        },
+        {
+          label: 'Invert $A^\\top A$',
+          strategy: '2×2 inverse: swap diagonal, negate off-diagonal, divide by determinant.',
+          explanation: '$\\det = 4-1=3$. $(A^\\top A)^{-1} = \\frac{1}{3}\\begin{bmatrix}2&-1\\\\-1&2\\end{bmatrix}$.',
+          math: '(A^\\top A)^{-1} = \\frac{1}{3}\\begin{bmatrix}2&-1\\\\-1&2\\end{bmatrix}',
+        },
+        {
+          label: 'Compute $\\hat{\\mathbf{x}} = (A^\\top A)^{-1}A^\\top\\mathbf{b}$, then $\\mathbf{p} = A\\hat{\\mathbf{x}}$',
+          strategy: 'Solve the normal equations first, then multiply by $A$. Avoids forming the full projection matrix explicitly.',
+          explanation: '$A^\\top\\mathbf{b} = \\begin{bmatrix}1+3\\\\2+3\\end{bmatrix} = \\begin{bmatrix}4\\\\5\\end{bmatrix}$. $\\hat{\\mathbf{x}} = \\frac{1}{3}\\begin{bmatrix}8-5\\\\-4+10\\end{bmatrix} = \\begin{bmatrix}1\\\\2\\end{bmatrix}$. $\\mathbf{p} = A\\hat{\\mathbf{x}} = [1,2,3]^\\top$.',
+          math: '\\mathbf{p} = A\\hat{\\mathbf{x}} = \\begin{bmatrix}1\\\\2\\\\3\\end{bmatrix} = \\mathbf{b}',
+          gotcha: '$\\mathbf{b}$ is exactly in the column space of $A$ — the projection equals $\\mathbf{b}$ itself and the residual is zero. Always check: if $\\mathbf{b} \\in \\text{col}(A)$, projection is exact.',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

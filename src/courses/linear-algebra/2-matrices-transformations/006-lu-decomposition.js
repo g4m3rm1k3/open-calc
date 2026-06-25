@@ -632,6 +632,80 @@ b = np.array([6., 14., 10.])
     }
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-006-lu-factor',
+      title: 'LU Factorization — Recording the Multipliers as You Go',
+      prereqs: ['Gaussian elimination', 'Row operations'],
+      problem: 'Factor $A = \\begin{bmatrix}2&1\\\\6&5\\end{bmatrix}$ into $A = LU$.',
+      steps: [
+        {
+          label: 'Understand the goal: $L$ records multipliers, $U$ is the result of elimination',
+          strategy: 'You already know Gaussian elimination. LU just records the multipliers used in a separate matrix $L$.',
+          explanation: '$U$ (upper) is the row-echelon form you get after elimination. $L$ (lower) is built from the multipliers you used to create zeros below each pivot. $L$ always has 1s on the diagonal.',
+          math: 'A = LU \\quad L = \\begin{bmatrix}1&0\\\\?&1\\end{bmatrix} \\quad U = \\begin{bmatrix}\\cdot&\\cdot\\\\0&\\cdot\\end{bmatrix}',
+        },
+        {
+          label: 'First elimination step: eliminate the $(2,1)$ entry',
+          strategy: 'The multiplier is $\\ell_{21} = a_{21}/a_{11}$ — this is the ratio that makes the subtraction exact.',
+          explanation: 'Multiplier: $\\ell_{21} = 6/2 = 3$. Apply $R_2 \\leftarrow R_2 - 3R_1$: $(6-6, 5-3) = (0, 2)$. Record $\\ell_{21} = 3$ in the lower-left of $L$.',
+          math: '\\ell_{21} = 3 \\qquad U \\text{ so far: }\\begin{bmatrix}2&1\\\\0&2\\end{bmatrix}',
+        },
+        {
+          label: 'Read off $L$ and $U$',
+          strategy: '$L$ has 1s on the diagonal and the multipliers below; $U$ is the upper triangular result.',
+          explanation: 'We used one multiplier: $\\ell_{21}=3$. So $L = \\begin{bmatrix}1&0\\\\3&1\\end{bmatrix}$ and $U = \\begin{bmatrix}2&1\\\\0&2\\end{bmatrix}$.',
+          math: 'L = \\begin{bmatrix}1&0\\\\3&1\\end{bmatrix} \\qquad U = \\begin{bmatrix}2&1\\\\0&2\\end{bmatrix}',
+        },
+        {
+          label: 'Verify: $LU$ must reconstruct $A$',
+          strategy: 'Multiply $L$ and $U$ and confirm the product equals the original $A$.',
+          explanation: '$(LU)_{11}=1\\cdot2+0\\cdot0=2$, $(LU)_{12}=1\\cdot1+0\\cdot2=1$, $(LU)_{21}=3\\cdot2+1\\cdot0=6$, $(LU)_{22}=3\\cdot1+1\\cdot2=5$.',
+          math: 'LU = \\begin{bmatrix}2&1\\\\6&5\\end{bmatrix} = A \\checkmark',
+        },
+        {
+          label: 'Why bother? The reuse argument.',
+          strategy: 'Computing $LU$ once costs roughly as much as one Gaussian elimination; solving for any $\\mathbf{b}$ afterward costs much less.',
+          explanation: 'Once you have $LU$: to solve $A\\mathbf{x}=\\mathbf{b}$, first solve $L\\mathbf{y}=\\mathbf{b}$ (forward substitution, trivial since $L$ is lower triangular), then solve $U\\mathbf{x}=\\mathbf{y}$ (back substitution). Each substitution is $O(n^2)$ instead of the $O(n^3)$ cost of re-running elimination.',
+          math: 'L\\mathbf{y}=\\mathbf{b} \\;\\text{(forward)} \\to U\\mathbf{x}=\\mathbf{y} \\;\\text{(back)}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-006-lu-solve',
+      title: 'Solving Ax = b Using LU — Two Triangular Systems',
+      prereqs: ['LU factorization', 'Forward and back substitution'],
+      problem: 'Use the LU factorization from the previous walkthrough to solve $A\\mathbf{x} = \\mathbf{b}$ for $\\mathbf{b} = [1, 3]^\\top$.',
+      steps: [
+        {
+          label: 'Split $A\\mathbf{x}=\\mathbf{b}$ into two triangular systems',
+          strategy: 'Since $A = LU$, write $LU\\mathbf{x}=\\mathbf{b}$, then let $\\mathbf{y} = U\\mathbf{x}$.',
+          explanation: 'If $\\mathbf{y} = U\\mathbf{x}$, then $L\\mathbf{y} = \\mathbf{b}$. So we first solve $L\\mathbf{y}=\\mathbf{b}$ (forward substitution), then solve $U\\mathbf{x}=\\mathbf{y}$ (back substitution).',
+          math: 'L\\mathbf{y}=\\mathbf{b}: \\begin{bmatrix}1&0\\\\3&1\\end{bmatrix}\\mathbf{y}=\\begin{bmatrix}1\\\\3\\end{bmatrix}',
+        },
+        {
+          label: 'Forward substitution to solve $L\\mathbf{y}=\\mathbf{b}$',
+          strategy: 'Lower triangular systems are solved from the top down — each row gives the next unknown.',
+          explanation: 'Row 1: $y_1 = 1$. Row 2: $3y_1 + y_2 = 3 \\Rightarrow 3(1)+y_2=3 \\Rightarrow y_2=0$.',
+          math: '\\mathbf{y} = \\begin{bmatrix}1\\\\0\\end{bmatrix}',
+        },
+        {
+          label: 'Back substitution to solve $U\\mathbf{x}=\\mathbf{y}$',
+          strategy: 'Upper triangular systems are solved from the bottom up.',
+          explanation: '$U\\mathbf{x}=\\mathbf{y}$: $\\begin{bmatrix}2&1\\\\0&2\\end{bmatrix}\\mathbf{x}=\\begin{bmatrix}1\\\\0\\end{bmatrix}$. Row 2: $2x_2=0 \\Rightarrow x_2=0$. Row 1: $2x_1+x_2=1 \\Rightarrow 2x_1=1 \\Rightarrow x_1=1/2$.',
+          math: '\\mathbf{x} = \\begin{bmatrix}1/2\\\\0\\end{bmatrix}',
+        },
+        {
+          label: 'Verify $A\\mathbf{x}=\\mathbf{b}$',
+          strategy: 'Multiply the original $A$ by the found $\\mathbf{x}$ and confirm.',
+          explanation: '$A\\mathbf{x} = \\begin{bmatrix}2&1\\\\6&5\\end{bmatrix}\\begin{bmatrix}1/2\\\\0\\end{bmatrix} = \\begin{bmatrix}1\\\\3\\end{bmatrix} = \\mathbf{b}$ ✓.',
+          math: '\\begin{bmatrix}2&1\\\\6&5\\end{bmatrix}\\begin{bmatrix}1/2\\\\0\\end{bmatrix}=\\begin{bmatrix}1\\\\3\\end{bmatrix} \\checkmark',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

@@ -616,6 +616,88 @@ b = np.array([3.0, 3.0])
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la1-003-angle',
+      title: 'The Dot Product as an Angle Detector',
+      prereqs: ['Vector magnitude', 'Inverse cosine'],
+      problem: 'Find the angle between $\\mathbf{a} = [1, 2, 2]^\\top$ and $\\mathbf{b} = [2, 1, -2]^\\top$.',
+      steps: [
+        {
+          label: 'Spot the nice magnitudes before doing any angle work',
+          strategy: 'Always compute magnitudes first — recognizing clean numbers saves effort later.',
+          explanation: 'For $\\mathbf{a} = [1,2,2]^\\top$: $\\|\\mathbf{a}\\| = \\sqrt{1+4+4} = \\sqrt{9} = 3$. For $\\mathbf{b} = [2,1,-2]^\\top$: $\\|\\mathbf{b}\\| = \\sqrt{4+1+4} = \\sqrt{9} = 3$. Both vectors have magnitude 3 — this is designed to make the final arithmetic clean.',
+          math: '\\|\\mathbf{a}\\| = 3 \\qquad \\|\\mathbf{b}\\| = 3',
+        },
+        {
+          label: 'Compute the dot product: multiply matching components and sum',
+          strategy: 'The dot product computes "how much" the vectors point in the same direction.',
+          explanation: 'Pair up the components by position: $(1)(2) + (2)(1) + (2)(-2) = 2 + 2 + (-4) = 0$. The result is zero. Stop and think: what does a zero dot product mean geometrically before moving on?',
+          math: '\\mathbf{a} \\cdot \\mathbf{b} = (1)(2) + (2)(1) + (2)(-2) = 2 + 2 - 4 = 0',
+          gotcha: 'Do not forget to include the sign when a component is negative. $(2)(-2) = -4$, not $+4$.',
+        },
+        {
+          label: 'Apply the angle formula',
+          strategy: 'The angle formula connects dot product to magnitudes: $\\cos\\theta = \\frac{\\mathbf{a}\\cdot\\mathbf{b}}{\\|\\mathbf{a}\\|\\|\\mathbf{b}\\|}$.',
+          explanation: 'Substituting: $\\cos\\theta = 0 / (3 \\cdot 3) = 0/9 = 0$. When cosine is zero, the angle is $90°$. This means the two vectors are perpendicular — they are orthogonal.',
+          math: '\\cos\\theta = \\frac{0}{3 \\cdot 3} = 0 \\implies \\theta = 90^\\circ',
+        },
+        {
+          label: 'Interpret: dot product zero means perpendicular — always',
+          strategy: 'A zero dot product is the algebraic definition of perpendicularity in any dimension.',
+          explanation: 'No trigonometry needed: in 2D, 3D, or 1000D, $\\mathbf{a} \\cdot \\mathbf{b} = 0$ means the vectors are perpendicular. This is the most used fact from the dot product — you will apply it constantly when checking if basis vectors are orthogonal or if a normal vector is truly perpendicular to a surface.',
+          math: '\\mathbf{a} \\cdot \\mathbf{b} = 0 \\iff \\mathbf{a} \\perp \\mathbf{b}',
+        },
+        {
+          label: 'What would a non-right angle look like? Build your intuition.',
+          strategy: 'Compare with a nearby vector to feel how dot product relates to angle size.',
+          explanation: 'Change $\\mathbf{b}$ to $[2,1,2]^\\top$ (flip the last component positive): $\\mathbf{a} \\cdot \\mathbf{b}$ becomes $2 + 2 + 4 = 8 > 0$, meaning the angle is acute (less than 90°). Flip it to $[2,1,-3]^\\top$: $2 + 2 - 6 = -2 < 0$, meaning obtuse (greater than 90°). The sign of the dot product tells you which side of perpendicular you are on.',
+          math: '\\mathbf{a}\\cdot\\mathbf{b} > 0 \\iff \\theta < 90^\\circ \\qquad \\mathbf{a}\\cdot\\mathbf{b} < 0 \\iff \\theta > 90^\\circ',
+        },
+      ],
+    },
+    {
+      id: 'wt-la1-003-cross-product',
+      title: 'Cross Product — Computing the Perpendicular and Verifying It',
+      prereqs: ['Dot product', '3D vectors', 'Determinants (basic 2×2)'],
+      problem: 'Find $\\mathbf{a} \\times \\mathbf{b}$ for $\\mathbf{a} = [2, 1, 0]^\\top$ and $\\mathbf{b} = [0, 1, 2]^\\top$. Then verify the result is perpendicular to both.',
+      steps: [
+        {
+          label: 'Set up the 3×3 determinant with unit vectors in the first row',
+          strategy: 'The cross product is computed as the determinant of a 3×3 matrix with $\\hat{i}, \\hat{j}, \\hat{k}$ in row one.',
+          explanation: 'Write the matrix: first row is the unit vectors $[\\hat{i}, \\hat{j}, \\hat{k}]$, second row is the components of $\\mathbf{a} = [2, 1, 0]$, third row is the components of $\\mathbf{b} = [0, 1, 2]$. Expanding along the first row extracts each unit vector\'s coefficient.',
+          math: '\\mathbf{a} \\times \\mathbf{b} = \\begin{vmatrix}\\hat{i}&\\hat{j}&\\hat{k}\\\\ 2&1&0\\\\ 0&1&2\\end{vmatrix}',
+        },
+        {
+          label: 'Compute the $\\hat{i}$ component — cover row 1 and column 1',
+          strategy: 'The $\\hat{i}$ coefficient is the 2×2 determinant of the remaining entries in rows 2 and 3, columns 2 and 3.',
+          explanation: 'Cover the first row and first column. The remaining 2×2 sub-matrix is $\\begin{vmatrix}1&0\\\\1&2\\end{vmatrix} = (1)(2) - (0)(1) = 2$. So the $\\hat{i}$ component is $+2$.',
+          math: '\\hat{i}: \\begin{vmatrix}1&0\\\\1&2\\end{vmatrix} = 2 - 0 = 2',
+        },
+        {
+          label: 'Compute the $\\hat{j}$ component — note the minus sign',
+          strategy: 'The $\\hat{j}$ coefficient carries a minus sign in the cofactor expansion.',
+          explanation: 'Cover row 1 and column 2. The sub-matrix is $\\begin{vmatrix}2&0\\\\0&2\\end{vmatrix} = (2)(2) - (0)(0) = 4$. The $\\hat{j}$ component is $-4$ (because of the alternating sign pattern: $+, -, +$ across the first row).',
+          math: '\\hat{j}: -\\begin{vmatrix}2&0\\\\0&2\\end{vmatrix} = -(4-0) = -4',
+          gotcha: 'Students forget the minus sign on the $\\hat{j}$ term. The cofactor signs alternate: $+\\hat{i}$, $-\\hat{j}$, $+\\hat{k}$.',
+        },
+        {
+          label: 'Compute the $\\hat{k}$ component',
+          strategy: 'Cover row 1 and column 3; the sign is positive.',
+          explanation: 'Cover row 1 and column 3. The sub-matrix is $\\begin{vmatrix}2&1\\\\0&1\\end{vmatrix} = (2)(1) - (1)(0) = 2$. The $\\hat{k}$ component is $+2$.',
+          math: '\\hat{k}: \\begin{vmatrix}2&1\\\\0&1\\end{vmatrix} = 2 - 0 = 2',
+        },
+        {
+          label: 'Assemble the cross product and verify perpendicularity with dot products',
+          strategy: 'The cross product must satisfy $\\mathbf{c}\\cdot\\mathbf{a} = 0$ and $\\mathbf{c}\\cdot\\mathbf{b} = 0$.',
+          explanation: '$\\mathbf{a} \\times \\mathbf{b} = [2, -4, 2]^\\top$. Check: $[2,-4,2]\\cdot[2,1,0] = 4 - 4 + 0 = 0$ ✓ and $[2,-4,2]\\cdot[0,1,2] = 0 - 4 + 4 = 0$ ✓. Both dot products are zero, confirming the cross product is perpendicular to both original vectors.',
+          math: '\\mathbf{a}\\times\\mathbf{b} = \\begin{bmatrix}2\\\\-4\\\\2\\end{bmatrix}, \\quad \\mathbf{c}\\cdot\\mathbf{a} = 0 \\checkmark, \\quad \\mathbf{c}\\cdot\\mathbf{b} = 0 \\checkmark',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'la1-003-ch1',

@@ -407,6 +407,70 @@ for freq in [120, 300, 500, 650, 800]:
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la4-005-function-inner-product',
+      title: 'Computing an Inner Product in Function Space',
+      prereqs: ['Definite integrals', 'Dot product analogy'],
+      problem: 'Compute $\\langle f, g \\rangle = \\int_0^\\pi f(x)g(x)\\,dx$ for $f(x) = \\sin x$ and $g(x) = \\cos x$, then determine if they are orthogonal.',
+      steps: [
+        {
+          label: 'Recognize this as a vector dot product on an infinite-dimensional space',
+          strategy: 'The integral inner product $\\langle f,g\\rangle = \\int f(x)g(x)\\,dx$ plays the role of the dot product. Orthogonality means $\\langle f,g\\rangle = 0$, and the "length" of $f$ is $\\sqrt{\\langle f,f\\rangle}$.',
+          explanation: 'In $\\mathbb{R}^n$, the dot product sums products of components. In function space, integrating the product sums contributions over all "components" (values of $x$).',
+          math: '\\langle f, g\\rangle = \\int_0^\\pi f(x)g(x)\\,dx',
+        },
+        {
+          label: 'Compute the integral using the product-to-sum identity',
+          strategy: '$\\sin x \\cos x = \\frac{1}{2}\\sin(2x)$. This simplifies the integral to a standard form.',
+          explanation: '$\\int_0^\\pi \\sin x \\cos x\\,dx = \\frac{1}{2}\\int_0^\\pi \\sin(2x)\\,dx = \\frac{1}{2}\\left[-\\frac{\\cos(2x)}{2}\\right]_0^\\pi$.',
+          math: '\\int_0^\\pi \\sin x \\cos x\\,dx = \\frac{1}{2}\\left[-\\frac{\\cos(2x)}{2}\\right]_0^\\pi',
+        },
+        {
+          label: 'Evaluate and conclude',
+          strategy: 'Compute the boundary terms.',
+          explanation: '$= -\\frac{1}{4}[\\cos(2\\pi) - \\cos(0)] = -\\frac{1}{4}[1-1] = 0$. They are orthogonal.',
+          math: '\\langle \\sin, \\cos \\rangle = 0 \\Rightarrow \\text{orthogonal}',
+          gotcha: 'Orthogonality depends on the interval and the inner product definition. $\\sin x$ and $\\cos x$ are orthogonal on $[0,\\pi]$ with this inner product, but they would not be orthogonal on a different interval.',
+        },
+        {
+          label: 'Compute the norms for normalization',
+          strategy: '$\\|f\\|^2 = \\langle f,f\\rangle = \\int_0^\\pi \\sin^2 x\\,dx$. Use $\\sin^2 x = \\frac{1-\\cos(2x)}{2}$.',
+          explanation: '$\\int_0^\\pi \\sin^2 x\\,dx = \\int_0^\\pi \\frac{1-\\cos(2x)}{2}dx = \\frac{\\pi}{2}$. So $\\|\\sin\\| = \\sqrt{\\pi/2}$. Same for $\\cos$.',
+          math: '\\|\\sin x\\|=\\|\\cos x\\|=\\sqrt{\\pi/2} \\Rightarrow \\hat{f}_1 = \\sqrt{\\tfrac{2}{\\pi}}\\sin x',
+        },
+      ],
+    },
+    {
+      id: 'wt-la4-005-verify-inner-product-axioms',
+      title: 'Verifying That a Proposed Inner Product Satisfies the Axioms',
+      prereqs: ['Inner product definition', 'Positive definiteness'],
+      problem: 'Check whether $\\langle \\mathbf{x}, \\mathbf{y}\\rangle_A = \\mathbf{x}^\\top A \\mathbf{y}$ is an inner product for $A = \\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Check symmetry: $\\langle \\mathbf{x},\\mathbf{y}\\rangle = \\langle \\mathbf{y},\\mathbf{x}\\rangle$',
+          strategy: '$\\langle \\mathbf{x},\\mathbf{y}\\rangle_A = \\mathbf{x}^\\top A\\mathbf{y}$. Transpose both sides: $(\\mathbf{x}^\\top A\\mathbf{y})^\\top = \\mathbf{y}^\\top A^\\top \\mathbf{x}$. Symmetry holds iff $A = A^\\top$.',
+          explanation: '$A = A^\\top$ ✓ (it is symmetric). So $\\langle \\mathbf{x},\\mathbf{y}\\rangle_A = \\langle \\mathbf{y},\\mathbf{x}\\rangle_A$.',
+          math: 'A = A^\\top \\Rightarrow \\text{symmetry holds}',
+        },
+        {
+          label: 'Check positive definiteness: $\\langle \\mathbf{x},\\mathbf{x}\\rangle > 0$ for $\\mathbf{x}\\neq\\mathbf{0}$',
+          strategy: '$\\mathbf{x}^\\top A\\mathbf{x} > 0$ iff $A$ is positive definite. Check: all eigenvalues positive, or equivalently all leading principal minors positive.',
+          explanation: 'Eigenvalues of $A$: $\\lambda = 1$ and $\\lambda = 3$ (both positive) ✓. Leading minors: $2>0$ and $\\det(A)=3>0$ ✓. So $A$ is positive definite.',
+          math: '\\lambda_1=1>0,\\; \\lambda_2=3>0 \\Rightarrow A \\succ 0 \\Rightarrow \\text{positive definite}',
+          gotcha: 'If $A$ has any non-positive eigenvalue, $\\langle \\mathbf{x},\\mathbf{x}\\rangle_A \\leq 0$ for some $\\mathbf{x}$, and the axiom fails. For example, $A=\\begin{bmatrix}1&0\\\\0&-1\\end{bmatrix}$ would NOT define an inner product.',
+        },
+        {
+          label: 'Linearity in the first argument holds automatically',
+          strategy: 'Linearity follows from the bilinearity of matrix multiplication: $(\\alpha\\mathbf{x}+\\beta\\mathbf{z})^\\top A\\mathbf{y} = \\alpha\\mathbf{x}^\\top A\\mathbf{y}+\\beta\\mathbf{z}^\\top A\\mathbf{y}$.',
+          explanation: 'No extra condition needed — any bilinear form $\\mathbf{x}^\\top A\\mathbf{y}$ is automatically linear in each argument.',
+          math: '\\langle\\alpha\\mathbf{x}+\\beta\\mathbf{z},\\mathbf{y}\\rangle_A = \\alpha\\langle\\mathbf{x},\\mathbf{y}\\rangle_A + \\beta\\langle\\mathbf{z},\\mathbf{y}\\rangle_A \\checkmark',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la4-005-1',

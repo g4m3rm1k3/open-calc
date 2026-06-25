@@ -468,6 +468,64 @@ plt.show()`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la3-006-cayley-hamilton-verify',
+      title: 'Verifying the Cayley-Hamilton Theorem',
+      prereqs: ['Characteristic polynomial', 'Matrix multiplication'],
+      problem: 'Verify Cayley-Hamilton for $A = \\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}$: show that $p(A) = 0$ where $p(\\lambda)$ is the characteristic polynomial.',
+      steps: [
+        {
+          label: 'Find the characteristic polynomial $p(\\lambda)$',
+          strategy: '$p(\\lambda) = \\det(A-\\lambda I)$. For a 2×2 matrix: $p(\\lambda)=\\lambda^2 - \\text{tr}(A)\\lambda + \\det(A)$.',
+          explanation: '$\\text{tr}(A)=1+4=5$, $\\det(A)=4-6=-2$. So $p(\\lambda)=\\lambda^2-5\\lambda-2$.',
+          math: 'p(\\lambda) = \\lambda^2 - 5\\lambda - 2',
+        },
+        {
+          label: 'Substitute $A$ into $p(\\lambda)$ to get $p(A)$',
+          strategy: 'Replace every $\\lambda$ with $A$ and every scalar $c$ with $cI$. Compute $A^2 - 5A - 2I$.',
+          explanation: '$A^2 = \\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}^2 = \\begin{bmatrix}7&10\\\\15&22\\end{bmatrix}$.',
+          math: 'A^2 = \\begin{bmatrix}7&10\\\\15&22\\end{bmatrix}',
+        },
+        {
+          label: 'Compute $A^2 - 5A - 2I$',
+          strategy: 'Subtract entry by entry.',
+          explanation: '$A^2-5A-2I = \\begin{bmatrix}7&10\\\\15&22\\end{bmatrix} - \\begin{bmatrix}5&10\\\\15&20\\end{bmatrix} - \\begin{bmatrix}2&0\\\\0&2\\end{bmatrix} = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix}$ ✓.',
+          math: 'p(A) = A^2 - 5A - 2I = \\begin{bmatrix}0&0\\\\0&0\\end{bmatrix} \\checkmark',
+          gotcha: 'Cayley-Hamilton says $p(A) = \\mathbf{0}$ (zero matrix), NOT $p(A) = 0$ (scalar zero). You are plugging in a matrix, so the result is a matrix equation.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la3-006-inverse-via-ch',
+      title: 'Computing $A^{-1}$ Using Cayley-Hamilton',
+      prereqs: ['Cayley-Hamilton', 'Matrix inverse'],
+      problem: 'Use Cayley-Hamilton to express $A^{-1}$ as a polynomial in $A$ for $A = \\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Start from $p(A) = 0$',
+          strategy: 'Cayley-Hamilton gives $A^2 - 5A - 2I = 0$. Isolate $I$ and then $A^{-1}$.',
+          explanation: 'Rearrange: $A^2 - 5A = 2I$. Multiply both sides by $A^{-1}$ on the right (assuming $A$ is invertible, i.e., $\\det A \\neq 0$).',
+          math: 'A^2 - 5A - 2I = 0 \\Rightarrow A^2 - 5A = 2I',
+        },
+        {
+          label: 'Multiply through by $A^{-1}$',
+          strategy: '$A^{-1}$ exists since $\\det(A)=-2\\neq 0$. Multiplying $A^2-5A=2I$ by $A^{-1}$: left side becomes $A-5I$, right side becomes $2A^{-1}$.',
+          explanation: '$A(A-5I) = 2I \\Rightarrow A^{-1} = \\frac{1}{2}(A-5I)$.',
+          math: 'A^{-1} = \\frac{1}{2}(A - 5I)',
+          gotcha: "This only works when $A$ is invertible — equivalently, when the constant term of $p(\\lambda)$ is $\\pm\\det(A) \\neq 0$. If $\\det(A)=0$, you can't divide and $A$ has no inverse.",
+        },
+        {
+          label: 'Compute and verify',
+          strategy: 'Substitute $A$ and simplify; check $A \\cdot A^{-1} = I$.',
+          explanation: '$\\frac{1}{2}(A-5I) = \\frac{1}{2}\\begin{bmatrix}-4&2\\\\3&-1\\end{bmatrix} = \\begin{bmatrix}-2&1\\\\3/2&-1/2\\end{bmatrix}$. Matches the standard 2×2 inverse formula ✓.',
+          math: 'A^{-1} = \\begin{bmatrix}-2&1\\\\\\tfrac{3}{2}&-\\tfrac{1}{2}\\end{bmatrix}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la3-006-1',

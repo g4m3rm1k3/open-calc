@@ -528,6 +528,76 @@ plt.show()`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la3-002-diagonalize',
+      title: 'Diagonalizing a Symmetric Matrix: Full $P D P^{-1}$ Decomposition',
+      prereqs: ['Eigenvalues', 'Eigenvectors', '2×2 matrix inverse'],
+      problem: 'Diagonalize $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$ by finding $P$, $D$, and verifying $A = PDP^{-1}$.',
+      steps: [
+        {
+          label: 'Recall eigenvalues and eigenvectors (from the prior walkthrough)',
+          strategy: 'Diagonalization needs eigenvalues on the diagonal of $D$ and corresponding eigenvectors as columns of $P$. Do eigenvalues first, then eigenvectors.',
+          explanation: 'From the characteristic polynomial $(\\lambda-2)(\\lambda-4)=0$: eigenvalues $\\lambda_1=2$, $\\lambda_2=4$. Eigenvectors: $\\mathbf{v}_1=[-1,1]^\\top$ for $\\lambda_1=2$, and $\\mathbf{v}_2=[1,1]^\\top$ for $\\lambda_2=4$.',
+          math: '\\lambda_1=2,\\;\\mathbf{v}_1=\\begin{bmatrix}-1\\\\1\\end{bmatrix};\\quad \\lambda_2=4,\\;\\mathbf{v}_2=\\begin{bmatrix}1\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Build $P$ and $D$',
+          strategy: 'Columns of $P$ are eigenvectors; diagonal of $D$ holds matching eigenvalues IN THE SAME ORDER.',
+          explanation: 'Column 1 of $P$ is $\\mathbf{v}_1$, column 2 is $\\mathbf{v}_2$. The diagonal of $D$ uses $\\lambda_1=2$ and $\\lambda_2=4$ in that same order.',
+          math: 'P = \\begin{bmatrix}-1&1\\\\1&1\\end{bmatrix},\\quad D = \\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}',
+          gotcha: 'The order must match: if eigenvector $\\mathbf{v}_1$ is in column 1 of $P$, then $\\lambda_1$ must be the (1,1) entry of $D$. Mixing up the order produces a wrong factorization.',
+        },
+        {
+          label: 'Compute $P^{-1}$ using the 2×2 formula',
+          strategy: 'For a 2×2 matrix $\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix}$, the inverse is $\\frac{1}{ad-bc}\\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}$.',
+          explanation: '$\\det(P) = (-1)(1)-(1)(1)=-2$. Swap diagonal, negate off-diagonal, divide by $-2$.',
+          math: 'P^{-1} = \\frac{1}{-2}\\begin{bmatrix}1&-1\\\\-1&-1\\end{bmatrix} = \\begin{bmatrix}-\\tfrac{1}{2}&\\tfrac{1}{2}\\\\\\tfrac{1}{2}&\\tfrac{1}{2}\\end{bmatrix}',
+        },
+        {
+          label: 'Verify $PDP^{-1} = A$',
+          strategy: 'Multiply left-to-right: first compute $DP^{-1}$, then multiply by $P$ on the left.',
+          explanation: '$DP^{-1} = \\begin{bmatrix}2&0\\\\0&4\\end{bmatrix}\\begin{bmatrix}-1/2&1/2\\\\1/2&1/2\\end{bmatrix} = \\begin{bmatrix}-1&1\\\\2&2\\end{bmatrix}$. Then $P(DP^{-1}) = \\begin{bmatrix}-1&1\\\\1&1\\end{bmatrix}\\begin{bmatrix}-1&1\\\\2&2\\end{bmatrix} = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix} = A$ ✓.',
+          math: 'PDP^{-1} = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix} = A \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la3-002-matrix-power',
+      title: 'Computing $A^{10}$ Efficiently via Diagonalization',
+      prereqs: ['Diagonalization', 'Matrix multiplication'],
+      problem: 'Use the diagonalization $A = PDP^{-1}$ to compute $A^{10}$ for $A = \\begin{bmatrix}3&1\\\\1&3\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Recognize why diagonalization makes powers easy',
+          strategy: 'Direct multiplication of $A\\cdot A\\cdot A\\cdots$ requires $O(n^3 k)$ work. With $A=PDP^{-1}$, the $P^{-1}P$ pairs cancel and you only raise a diagonal matrix to a power.',
+          explanation: '$A^k = (PDP^{-1})^k = PD^kP^{-1}$. This telescopes because $P^{-1}P = I$ at every interior step.',
+          math: 'A^k = PD^kP^{-1}',
+        },
+        {
+          label: 'Raise the diagonal matrix to the 10th power',
+          strategy: 'For a diagonal matrix, raise each diagonal entry to the power independently.',
+          explanation: '$D^{10} = \\begin{bmatrix}2^{10}&0\\\\0&4^{10}\\end{bmatrix} = \\begin{bmatrix}1024&0\\\\0&1048576\\end{bmatrix}$.',
+          math: 'D^{10} = \\begin{bmatrix}2^{10}&0\\\\0&4^{10}\\end{bmatrix} = \\begin{bmatrix}1024&0\\\\0&1{,}048{,}576\\end{bmatrix}',
+          gotcha: 'You can only do this for diagonal (or diagonalized) matrices. Raising a general matrix to a power entry-by-entry gives the wrong answer.',
+        },
+        {
+          label: 'Assemble $A^{10} = P D^{10} P^{-1}$',
+          strategy: 'Substitute known $P$, $D^{10}$, $P^{-1}$ and multiply.',
+          explanation: 'Let $s = 2^{10}=1024$ and $t=4^{10}=1048576$. Then $A^{10} = \\frac{1}{2}\\begin{bmatrix}s+t & t-s \\\\ t-s & s+t\\end{bmatrix}$.',
+          math: 'A^{10} = \\frac{1}{2}\\begin{bmatrix}2^{10}+4^{10} & 4^{10}-2^{10} \\\\ 4^{10}-2^{10} & 2^{10}+4^{10}\\end{bmatrix}',
+        },
+        {
+          label: 'Interpret: what does a large power reveal?',
+          strategy: 'As $k\\to\\infty$, the dominant eigenvalue $\\lambda_2=4$ swamps $\\lambda_1=2$ (ratio $2^k$). $A^k \\approx \\frac{4^k}{2}\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix}$, the rank-1 outer product of the dominant eigenvector.',
+          explanation: 'This is the basis of the power iteration algorithm: repeatedly multiply by $A$ and normalize — you converge to the eigenvector of the largest eigenvalue.',
+          math: 'A^k \\approx 4^k \\cdot \\frac{1}{2}\\begin{bmatrix}1&1\\\\1&1\\end{bmatrix} \\text{ as } k\\to\\infty',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

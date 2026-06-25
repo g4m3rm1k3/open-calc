@@ -368,6 +368,70 @@ round(empirical_cov, 2)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la7-002-cholesky-compute',
+      title: 'Computing the Cholesky Factorization $A = LL^\\top$',
+      prereqs: ['Positive definite matrices', 'LU decomposition'],
+      problem: 'Find the Cholesky factor $L$ for $A = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Verify $A$ is positive definite',
+          strategy: 'Cholesky only exists for positive definite matrices. Check: all leading principal minors positive, or all eigenvalues positive.',
+          explanation: '$\\Delta_1=4>0$, $\\Delta_2=12-4=8>0$. Positive definite ✓.',
+          math: '\\Delta_1=4>0,\\quad \\Delta_2=8>0 \\Rightarrow A\\succ 0',
+        },
+        {
+          label: 'Set up $A = LL^\\top$ and match entries',
+          strategy: 'Write $L = \\begin{bmatrix}l_{11}&0\\\\l_{21}&l_{22}\\end{bmatrix}$ (lower triangular). Expand $LL^\\top$ and equate entries of $A$.',
+          explanation: '$LL^\\top = \\begin{bmatrix}l_{11}^2 & l_{11}l_{21}\\\\l_{11}l_{21} & l_{21}^2+l_{22}^2\\end{bmatrix}$. Match: $l_{11}^2=4$, $l_{11}l_{21}=2$, $l_{21}^2+l_{22}^2=3$.',
+          math: 'LL^\\top = \\begin{bmatrix}l_{11}^2&l_{11}l_{21}\\\\l_{11}l_{21}&l_{21}^2+l_{22}^2\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}',
+        },
+        {
+          label: 'Solve for $L$ entry by entry (top-left to bottom-right)',
+          strategy: 'Always solve in order: diagonal first, then off-diagonal below, moving left-to-right on each column.',
+          explanation: '$l_{11}=\\sqrt{4}=2$. $l_{21}=2/l_{11}=2/2=1$. $l_{22}=\\sqrt{3-l_{21}^2}=\\sqrt{3-1}=\\sqrt{2}$.',
+          math: 'L = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}',
+          gotcha: "If any diagonal entry $l_{ii}^2$ would be negative, the matrix is NOT positive definite and Cholesky fails. This is actually an efficient positive-definiteness check: run Cholesky and see if it completes.",
+        },
+        {
+          label: 'Verify $LL^\\top = A$',
+          strategy: 'Multiply $L$ by $L^\\top$ and check.',
+          explanation: '$\\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}\\begin{bmatrix}2&1\\\\0&\\sqrt{2}\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&1+2\\end{bmatrix} = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$ ✓.',
+          math: 'LL^\\top = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix} = A \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la7-002-cholesky-solve',
+      title: 'Solving $A\\mathbf{x}=\\mathbf{b}$ Efficiently Using Cholesky',
+      prereqs: ['Cholesky factorization', 'Forward/back substitution'],
+      problem: 'Solve $A\\mathbf{x}=[8,5]^\\top$ where $A = \\begin{bmatrix}4&2\\\\2&3\\end{bmatrix}$ using the Cholesky factor $L = \\begin{bmatrix}2&0\\\\1&\\sqrt{2}\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Split into two triangular solves: $L\\mathbf{y}=\\mathbf{b}$, then $L^\\top\\mathbf{x}=\\mathbf{y}$',
+          strategy: 'Since $A=LL^\\top$, $A\\mathbf{x}=LL^\\top\\mathbf{x}=\\mathbf{b}$. Let $\\mathbf{y}=L^\\top\\mathbf{x}$, so $L\\mathbf{y}=\\mathbf{b}$ first.',
+          explanation: 'Two triangular solves, each $O(n^2)$, vs one general solve $O(n^3)$. The Cholesky factorization is precomputed; subsequent solves with the same $A$ cost only $O(n^2)$.',
+          math: 'A\\mathbf{x}=\\mathbf{b} \\Rightarrow L\\mathbf{y}=\\mathbf{b},\\; L^\\top\\mathbf{x}=\\mathbf{y}',
+        },
+        {
+          label: 'Forward substitution: solve $L\\mathbf{y}=[8,5]^\\top$',
+          strategy: 'Work top-to-bottom since $L$ is lower triangular.',
+          explanation: 'Row 1: $2y_1=8 \\Rightarrow y_1=4$. Row 2: $y_1+\\sqrt{2}y_2=5 \\Rightarrow \\sqrt{2}y_2=1 \\Rightarrow y_2=1/\\sqrt{2}$.',
+          math: '\\mathbf{y} = \\begin{bmatrix}4\\\\1/\\sqrt{2}\\end{bmatrix}',
+        },
+        {
+          label: 'Back substitution: solve $L^\\top\\mathbf{x}=\\mathbf{y}$',
+          strategy: '$L^\\top=\\begin{bmatrix}2&1\\\\0&\\sqrt{2}\\end{bmatrix}$ — upper triangular. Work bottom-to-top.',
+          explanation: 'Row 2: $\\sqrt{2}x_2=1/\\sqrt{2} \\Rightarrow x_2=1/2$. Row 1: $2x_1+x_2=4 \\Rightarrow 2x_1=4-1/2=7/2 \\Rightarrow x_1=7/4$.',
+          math: '\\mathbf{x} = \\begin{bmatrix}7/4\\\\1/2\\end{bmatrix}',
+          gotcha: 'Cholesky exploits symmetry: $L^\\top$ is automatically the upper triangular factor — no separate $U$ computation needed. This makes Cholesky about twice as fast as LU for symmetric positive definite systems.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la7-002-1',

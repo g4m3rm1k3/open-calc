@@ -482,6 +482,87 @@ fprintf('norm(x_row + x_null - x) (should be ~0): %.2e\\n', norm(x_row+x_null-x)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-011-four-subspaces',
+      title: 'All Four Subspaces of a Matrix — One Computation, Four Results',
+      prereqs: ['RREF', 'Null space', 'Column space', 'Transpose'],
+      problem: 'Find all four fundamental subspaces of $A = \\begin{bmatrix}1&2&3\\\\2&4&7\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Row-reduce $A$ — the RREF reveals everything',
+          strategy: 'A single row reduction gives the column space, row space, and null space simultaneously.',
+          explanation: '$R_2 \\leftarrow R_2-2R_1$: $(0,0,1)$. Back-substitute: $R_1\\leftarrow R_1-3R_2$: $(1,2,0)$. RREF: $\\begin{bmatrix}1&2&0\\\\0&0&1\\end{bmatrix}$. Rank = 2 (two pivots).',
+          math: '\\text{rref}(A) = \\begin{bmatrix}1&2&0\\\\0&0&1\\end{bmatrix}',
+        },
+        {
+          label: 'Column space $\\mathrm{Col}(A)$: use the pivot COLUMNS of the ORIGINAL matrix',
+          strategy: 'Pivot positions are in columns 1 and 3 of RREF — use those columns from $A$ itself.',
+          explanation: 'Columns 1 and 3 of RREF have pivots. The corresponding columns of $A$ are $[1,2]^\\top$ and $[3,7]^\\top$. These two vectors form a basis for $\\mathrm{Col}(A)$.',
+          math: '\\mathrm{Col}(A) = \\mathrm{span}\\left\\{\\begin{bmatrix}1\\\\2\\end{bmatrix},\\begin{bmatrix}3\\\\7\\end{bmatrix}\\right\\}',
+          gotcha: 'Use pivot columns from the ORIGINAL $A$, not from RREF. RREF changes the column space.',
+        },
+        {
+          label: 'Null space $N(A)$: free variable in column 2',
+          strategy: 'Column 2 of RREF has no pivot — $x_2$ is free.',
+          explanation: 'Let $x_2=t$. From RREF row 1: $x_1+2t=0 \\Rightarrow x_1=-2t$. Row 2: $x_3=0$. Null space is a line in $\\mathbb{R}^3$.',
+          math: 'N(A) = \\mathrm{span}\\left\\{\\begin{bmatrix}-2\\\\1\\\\0\\end{bmatrix}\\right\\}',
+        },
+        {
+          label: 'Row space $\\mathrm{Row}(A)$: non-zero rows of RREF',
+          strategy: 'The non-zero rows of RREF form a basis for the row space.',
+          explanation: 'The two non-zero rows of RREF: $[1,2,0]$ and $[0,0,1]$. These are the canonical basis for the row space.',
+          math: '\\mathrm{Row}(A) = \\mathrm{span}\\left\\{[1,2,0],\\,[0,0,1]\\right\\}',
+        },
+        {
+          label: 'Left null space $N(A^\\top)$: row-reduce $A^\\top$',
+          strategy: 'The left null space is the null space of $A^\\top$ — vectors $\\mathbf{y}$ satisfying $A^\\top\\mathbf{y}=\\mathbf{0}$.',
+          explanation: '$A^\\top = \\begin{bmatrix}1&2\\\\2&4\\\\3&7\\end{bmatrix}$. Row reducing: $R_2\\leftarrow R_2-2R_1$: $(0,0)$, $R_3\\leftarrow R_3-3R_1$: $(0,1)$. Back-sub: $R_1\\leftarrow R_1-2R_3$: $(1,0)$. RREF: $\\begin{bmatrix}1&0\\\\0&1\\\\0&0\\end{bmatrix}$, rank 2 (same), nullity $2-2=0$. Left null space is $\\{\\mathbf{0}\\}$.',
+          math: 'N(A^\\top) = \\{\\mathbf{0}\\} \\;(\\text{trivial, since }m=2=\\text{rank})',
+        },
+        {
+          label: 'Verify the dimension count: rank-nullity theorem',
+          strategy: '$\\mathrm{rank}(A) + \\mathrm{nullity}(A) = n$ and $\\mathrm{rank}(A) + \\dim N(A^\\top) = m$.',
+          explanation: '$n=3$: $2 + 1 = 3$ ✓. $m=2$: $2 + 0 = 2$ ✓. All four subspace dimensions add up correctly.',
+          math: '2+1=3 \\checkmark \\quad 2+0=2 \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-011-rank-nullity',
+      title: 'Rank-Nullity — Verifying the Dimension Budget',
+      prereqs: ['RREF', 'Null space dimension', 'Rank'],
+      problem: 'For a $3\\times 5$ matrix $A$ with rank 2, find the dimensions of all four fundamental subspaces without computing any of them explicitly.',
+      steps: [
+        {
+          label: 'Identify the two "budgets": $m$ rows and $n$ columns',
+          strategy: 'The row dimension budget governs the row space and left null space; the column budget governs the column space and null space.',
+          explanation: '$A$ is $3\\times 5$: $m=3$ rows, $n=5$ columns. Rank = 2.',
+          math: 'm=3,\\; n=5,\\; \\text{rank}=2',
+        },
+        {
+          label: 'Column side: $\\dim\\mathrm{Col}(A) + \\dim N(A) = n$',
+          strategy: 'Rank equals the dimension of the column space; nullity is the remainder.',
+          explanation: '$\\dim\\mathrm{Col}(A) = 2$ (rank). $\\dim N(A) = 5-2 = 3$ (rank-nullity theorem applied to columns).',
+          math: '\\dim N(A) = n - \\text{rank} = 5-2=3',
+        },
+        {
+          label: 'Row side: $\\dim\\mathrm{Row}(A) + \\dim N(A^\\top) = m$',
+          strategy: 'The row space has the same dimension as the column space (both equal rank).',
+          explanation: '$\\dim\\mathrm{Row}(A) = 2$ (always equals rank). $\\dim N(A^\\top) = 3-2=1$.',
+          math: '\\dim N(A^\\top) = m - \\text{rank} = 3-2=1',
+        },
+        {
+          label: 'Summarize all four dimensions',
+          strategy: 'These four numbers must be consistent with the rank-nullity theorem in both directions.',
+          explanation: 'Col$(A)$: 2 (in $\\mathbb{R}^3$). $N(A)$: 3 (in $\\mathbb{R}^5$). Row$(A)$: 2 (in $\\mathbb{R}^5$). $N(A^\\top)$: 1 (in $\\mathbb{R}^3$).',
+          math: '\\dim\\mathrm{Col}=2,\\;\\dim N(A)=3,\\;\\dim\\mathrm{Row}=2,\\;\\dim N(A^\\top)=1',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la2-011-1',

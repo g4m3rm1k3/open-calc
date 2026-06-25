@@ -561,6 +561,80 @@ A = np.array([[1., 2., 3.],
     }
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-004-null-space',
+      title: 'The Null Space — What Gets Crushed to Zero?',
+      prereqs: ['RREF', 'Free variables', 'Homogeneous systems'],
+      problem: 'Find a basis for the null space of $A = \\begin{bmatrix}1 & 2 & 3\\\\2 & 4 & 7\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Set up the homogeneous system $A\\mathbf{x} = \\mathbf{0}$',
+          strategy: 'The null space is the set of all $\\mathbf{x}$ that $A$ maps to the zero vector — find them by row-reducing the augmented matrix $[A | \\mathbf{0}]$.',
+          explanation: 'Any vector in the null space gets "killed" — sent to the zero vector. Finding the null space tells us what information $A$ destroys. Write the augmented matrix with a column of zeros.',
+          math: '\\left[\\begin{array}{ccc|c}1&2&3&0\\\\2&4&7&0\\end{array}\\right]',
+        },
+        {
+          label: 'Row reduce: eliminate the first entry of row 2',
+          strategy: '$R_2 \\leftarrow R_2 - 2R_1$ creates a zero below the first pivot.',
+          explanation: '$R_2$: $(2-2, 4-4, 7-6, 0-0) = (0, 0, 1, 0)$.',
+          math: '\\left[\\begin{array}{ccc|c}1&2&3&0\\\\0&0&1&0\\end{array}\\right]',
+        },
+        {
+          label: 'Back-substitute: clear column 3 in row 1',
+          strategy: '$R_1 \\leftarrow R_1 - 3R_2$ zeros out the entry above the second pivot.',
+          explanation: '$R_1$: $(1-0, 2-0, 3-3, 0) = (1,2,0,0)$. Now RREF: pivots in columns 1 and 3.',
+          math: '\\left[\\begin{array}{ccc|c}1&2&0&0\\\\0&0&1&0\\end{array}\\right]',
+        },
+        {
+          label: 'Identify the free variable',
+          strategy: 'Columns with no pivot are free — they can be anything.',
+          explanation: 'Column 2 has no pivot: $x_2 = t$ is free. From row 1: $x_1 + 2t = 0 \\Rightarrow x_1 = -2t$. From row 2: $x_3 = 0$.',
+          math: 'x_1 = -2t,\\quad x_2 = t,\\quad x_3 = 0',
+        },
+        {
+          label: 'Write the null space as a span',
+          strategy: 'Factor out the free parameter to find the null space basis vector.',
+          explanation: 'Every null space vector has the form $t[-2, 1, 0]^\\top$. The null space is a line through the origin in $\\mathbb{R}^3$. The matrix has rank 2, so the null space has dimension 1 (rank-nullity: $2 + 1 = 3$).',
+          math: 'N(A) = \\mathrm{span}\\left\\{\\begin{bmatrix}-2\\\\1\\\\0\\end{bmatrix}\\right\\}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-004-column-space-membership',
+      title: 'Is b in the Column Space? — Testing Consistency',
+      prereqs: ['Column space definition', 'Augmented matrix', 'Row reduction'],
+      problem: 'Is $\\mathbf{b} = \\begin{bmatrix}3\\\\7\\end{bmatrix}$ in the column space of $A = \\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}$?',
+      steps: [
+        {
+          label: 'Rephrase as: is $A\\mathbf{x} = \\mathbf{b}$ consistent?',
+          strategy: '$\\mathbf{b}$ is in $\\text{Col}(A)$ if and only if the system $A\\mathbf{x} = \\mathbf{b}$ has at least one solution.',
+          explanation: 'The column space is the set of all possible outputs of $A$. Asking "is $\\mathbf{b}$ in $\\text{Col}(A)$?" is the same as asking "can $A$ produce $\\mathbf{b}$?" — i.e., does $A\\mathbf{x}=\\mathbf{b}$ have a solution?',
+          math: '\\mathbf{b} \\in \\text{Col}(A) \\iff A\\mathbf{x}=\\mathbf{b} \\text{ is consistent}',
+        },
+        {
+          label: 'Row reduce the augmented matrix $[A | \\mathbf{b}]$',
+          strategy: 'If no contradiction row appears, the system is consistent.',
+          explanation: '$R_2 \\leftarrow R_2 - 3R_1$: $(3-3, 4-6, 7-9) = (0,-2,-2)$.',
+          math: '\\left[\\begin{array}{cc|c}1&2&3\\\\0&-2&-2\\end{array}\\right]',
+        },
+        {
+          label: 'Back-substitute to find the solution',
+          strategy: 'No contradiction row means $\\mathbf{b}$ IS in the column space — find the coefficients.',
+          explanation: 'From row 2: $-2x_2 = -2 \\Rightarrow x_2 = 1$. From row 1: $x_1 + 2 = 3 \\Rightarrow x_1 = 1$. The solution is $\\mathbf{x} = [1,1]^\\top$.',
+          math: 'x_1=1,\\; x_2=1 \\implies \\mathbf{b} = 1\\cdot\\text{col}_1(A) + 1\\cdot\\text{col}_2(A)',
+        },
+        {
+          label: 'Verify: the linear combination should reconstruct $\\mathbf{b}$',
+          strategy: 'Substitute back: $1\\cdot [1,3]^\\top + 1\\cdot [2,4]^\\top$ should equal $[3,7]^\\top$.',
+          explanation: '$[1,3]^\\top + [2,4]^\\top = [3,7]^\\top = \\mathbf{b}$ ✓. The vector $\\mathbf{b}$ is a "sum of equal parts" of the two columns.',
+          math: '\\begin{bmatrix}1\\\\3\\end{bmatrix}+\\begin{bmatrix}2\\\\4\\end{bmatrix}=\\begin{bmatrix}3\\\\7\\end{bmatrix} \\checkmark',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

@@ -596,6 +596,82 @@ v = np.array([1.0, 0.0])
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-002-row-dot-column',
+      title: 'Matrix Multiplication — One Entry at a Time',
+      prereqs: ['Dot product', 'Matrix dimensions'],
+      problem: 'Compute $AB$ where $A = \\begin{bmatrix}1 & 2\\\\3 & 4\\end{bmatrix}$ and $B = \\begin{bmatrix}5 & 0\\\\1 & 3\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Check dimensions first',
+          strategy: 'The product $AB$ requires that the number of columns of $A$ equals the number of rows of $B$.',
+          explanation: 'Both are $2\\times 2$, so $AB$ is defined and the result is $2\\times 2$. For non-square matrices: $(m\\times k)(k\\times n) \\to m\\times n$. The inner dimensions ($k$) must match.',
+          math: '(2\\times 2)(2\\times 2) \\to 2\\times 2',
+        },
+        {
+          label: 'Entry $(AB)_{11}$: row 1 of $A$ $\\cdot$ column 1 of $B$',
+          strategy: 'Each entry of $AB$ is a single dot product.',
+          explanation: 'Row 1 of $A$: $[1,2]$. Column 1 of $B$: $[5,1]^\\top$. Dot: $1\\cdot5+2\\cdot1=7$.',
+          math: '(AB)_{11} = 1\\cdot5+2\\cdot1 = 7',
+        },
+        {
+          label: 'Entry $(AB)_{12}$: row 1 of $A$ $\\cdot$ column 2 of $B$',
+          strategy: 'Keep row 1, advance to the next column.',
+          explanation: 'Column 2 of $B$: $[0,3]^\\top$. Dot: $1\\cdot0+2\\cdot3=6$.',
+          math: '(AB)_{12} = 1\\cdot0+2\\cdot3 = 6',
+        },
+        {
+          label: 'Second row: move to row 2 of $A$, repeat for both columns of $B$',
+          strategy: 'Systematic march: for each row of $A$, dot with every column of $B$.',
+          explanation: 'Row 2 of $A$: $[3,4]$. Column 1: $3\\cdot5+4\\cdot1=19$. Column 2: $3\\cdot0+4\\cdot3=12$.',
+          math: '(AB)_{21}=19 \\qquad (AB)_{22}=12',
+        },
+        {
+          label: 'Assemble and sanity check',
+          strategy: 'Fill entries in row-by-row order; verify that no entry was skipped.',
+          explanation: 'The result is $\\begin{bmatrix}7&6\\\\19&12\\end{bmatrix}$. Quick sense-check: the top-left entry 7 is roughly "row 1 of $A$ scaled by column 1 of $B$" — both rows/columns have moderate magnitude, so 7 is plausible.',
+          math: 'AB = \\begin{bmatrix}7&6\\\\19&12\\end{bmatrix}',
+          gotcha: 'Matrix multiplication is NOT entry-by-entry. $AB \\neq \\begin{bmatrix}1\\cdot5&2\\cdot0\\\\3\\cdot1&4\\cdot3\\end{bmatrix}$. That operation (Hadamard product) exists but is rarely used.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-002-non-commutative',
+      title: 'Why AB ≠ BA — Composition Order Changes Everything',
+      prereqs: ['Matrix multiplication', 'Linear transformations'],
+      problem: 'Let $A = \\begin{bmatrix}1&1\\\\0&1\\end{bmatrix}$ (horizontal shear) and $B = \\begin{bmatrix}2&0\\\\0&1\\end{bmatrix}$ (horizontal stretch). Compute $AB$ and $BA$. Are they equal?',
+      steps: [
+        {
+          label: 'Understand what each matrix does before multiplying',
+          strategy: 'Identifying the geometry first helps you predict whether the order should matter.',
+          explanation: '$B$ stretches: $x \\mapsto 2x$, $y \\mapsto y$. $A$ shears: $x \\mapsto x+y$, $y \\mapsto y$. Intuitively: stretching then shearing operates on already-stretched coordinates; shearing then stretching doubles the sheared $x$ directly.',
+          math: 'B: x\\mapsto 2x \\qquad A: x\\mapsto x+y',
+        },
+        {
+          label: 'Compute $AB$ — $B$ acts first, $A$ acts second (read right-to-left)',
+          strategy: 'In the product $AB$, the right matrix is applied to the input first.',
+          explanation: '$(AB)_{11}=1\\cdot2+1\\cdot0=2$, $(AB)_{12}=1\\cdot0+1\\cdot1=1$, $(AB)_{21}=0$, $(AB)_{22}=1$.',
+          math: 'AB = \\begin{bmatrix}2&1\\\\0&1\\end{bmatrix}',
+        },
+        {
+          label: 'Compute $BA$ — $A$ acts first, $B$ acts second',
+          strategy: 'Swap the order and recompute.',
+          explanation: '$(BA)_{11}=2\\cdot1+0\\cdot0=2$, $(BA)_{12}=2\\cdot1+0\\cdot1=2$, $(BA)_{21}=0$, $(BA)_{22}=1$.',
+          math: 'BA = \\begin{bmatrix}2&2\\\\0&1\\end{bmatrix}',
+        },
+        {
+          label: 'Compare: the $(1,2)$ entry differs — $1$ vs $2$',
+          strategy: '$AB \\neq BA$ in general; matrices almost never commute.',
+          explanation: 'The top-right entry differs: $AB$ has 1, $BA$ has 2. Geometrically: in $AB$, the shear factor is 1 (acting in unstretched space). In $BA$, the stretch doubles whatever shear offset was created first. The two pipelines produce different final states.',
+          math: 'AB \\neq BA \\quad (\\text{shear factor } 1 \\neq 2)',
+          gotcha: 'The order of operations reads right-to-left: $ABC$ means $C$ first, then $B$, then $A$. This matches function composition $f(g(h(x)))$.',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

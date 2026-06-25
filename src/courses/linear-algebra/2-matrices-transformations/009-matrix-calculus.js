@@ -568,6 +568,87 @@ print(f"cond(A.T @ A + 0.1*I) = {np.linalg.cond(AtA + 0.1*np.eye(n)):.1f}")`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-009-quadratic-gradient',
+      title: 'Gradient of a Quadratic Form $\\mathbf{x}^\\top A \\mathbf{x}$',
+      prereqs: ['Partial derivatives', 'Matrix-vector multiplication', 'Symmetric matrices'],
+      problem: 'Find the gradient of $f(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$ where $A = \\begin{bmatrix}2&1\\\\1&3\\end{bmatrix}$ and $\\mathbf{x} = [x_1, x_2]^\\top$.',
+      steps: [
+        {
+          label: 'Expand the quadratic form into a scalar polynomial',
+          strategy: 'Write out the sum explicitly before differentiating — it reveals the structure.',
+          explanation: '$\\mathbf{x}^\\top A \\mathbf{x} = [x_1,x_2]\\begin{bmatrix}2&1\\\\1&3\\end{bmatrix}\\begin{bmatrix}x_1\\\\x_2\\end{bmatrix} = [x_1,x_2]\\begin{bmatrix}2x_1+x_2\\\\x_1+3x_2\\end{bmatrix} = 2x_1^2 + x_1x_2 + x_1x_2 + 3x_2^2 = 2x_1^2+2x_1x_2+3x_2^2$.',
+          math: 'f = 2x_1^2 + 2x_1x_2 + 3x_2^2',
+        },
+        {
+          label: 'Compute $\\partial f/\\partial x_1$',
+          strategy: 'Differentiate with respect to one variable, treating the other as a constant.',
+          explanation: '$\\partial f/\\partial x_1 = 4x_1 + 2x_2$.',
+          math: '\\frac{\\partial f}{\\partial x_1} = 4x_1 + 2x_2',
+        },
+        {
+          label: 'Compute $\\partial f/\\partial x_2$',
+          strategy: 'Now differentiate with respect to $x_2$.',
+          explanation: '$\\partial f/\\partial x_2 = 2x_1 + 6x_2$.',
+          math: '\\frac{\\partial f}{\\partial x_2} = 2x_1 + 6x_2',
+        },
+        {
+          label: 'Assemble the gradient vector and recognize the pattern',
+          strategy: 'The gradient is the vector of partial derivatives.',
+          explanation: '$\\nabla f = [4x_1+2x_2,\\; 2x_1+6x_2]^\\top = \\begin{bmatrix}4&2\\\\2&6\\end{bmatrix}\\mathbf{x} = 2A\\mathbf{x}$ (since $A$ is symmetric, $A=A^\\top$, and $\\nabla_\\mathbf{x}(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$).',
+          math: '\\nabla f = 2A\\mathbf{x} = 2\\begin{bmatrix}2&1\\\\1&3\\end{bmatrix}\\mathbf{x}',
+          gotcha: 'The formula $\\nabla(\\mathbf{x}^\\top A\\mathbf{x}) = 2A\\mathbf{x}$ requires $A$ to be symmetric. For non-symmetric $A$, the formula is $(A+A^\\top)\\mathbf{x}$.',
+        },
+        {
+          label: 'Connect to optimization: gradient = 0 finds the minimum',
+          strategy: 'When $A$ is positive definite, $\\nabla f = 0$ has a unique solution at the global minimum.',
+          explanation: '$2A\\mathbf{x} = \\mathbf{0}$ has the unique solution $\\mathbf{x} = \\mathbf{0}$ when $A$ is invertible. Since $A$ is positive definite (eigenvalues $>0$, $\\det=5>0$), the quadratic form has a global minimum at the origin.',
+          math: '\\nabla f = \\mathbf{0} \\implies \\mathbf{x} = \\mathbf{0} \\text{ (global min, since $A$ is PD)}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-009-jacobian',
+      title: 'The Jacobian — Linearizing a Vector Function',
+      prereqs: ['Partial derivatives', 'Matrix-vector multiplication'],
+      problem: 'Find the Jacobian of $\\mathbf{f}(x, y) = \\begin{bmatrix}x^2 + y \\\\ xy + 2y^2\\end{bmatrix}$ at the point $(1, 1)$.',
+      steps: [
+        {
+          label: 'Set up the Jacobian matrix structure',
+          strategy: 'The Jacobian is an $m\\times n$ matrix where entry $(i,j)$ is $\\partial f_i/\\partial x_j$.',
+          explanation: '$\\mathbf{f}$ maps $\\mathbb{R}^2 \\to \\mathbb{R}^2$, so the Jacobian is $2\\times 2$. Row $i$ contains all partial derivatives of component $f_i$.',
+          math: 'J = \\begin{bmatrix}\\partial f_1/\\partial x & \\partial f_1/\\partial y\\\\ \\partial f_2/\\partial x & \\partial f_2/\\partial y\\end{bmatrix}',
+        },
+        {
+          label: 'Compute partial derivatives of $f_1 = x^2 + y$',
+          strategy: 'Differentiate each component function with respect to each input variable.',
+          explanation: '$\\partial f_1/\\partial x = 2x$. $\\partial f_1/\\partial y = 1$.',
+          math: '\\nabla f_1 = [2x,\\; 1]',
+        },
+        {
+          label: 'Compute partial derivatives of $f_2 = xy + 2y^2$',
+          strategy: 'Same process for the second output component.',
+          explanation: '$\\partial f_2/\\partial x = y$. $\\partial f_2/\\partial y = x + 4y$.',
+          math: '\\nabla f_2 = [y,\\; x+4y]',
+        },
+        {
+          label: 'Assemble the Jacobian and evaluate at $(1,1)$',
+          strategy: 'Stack the gradient rows, then substitute the specific point.',
+          explanation: 'General Jacobian: $J(x,y) = \\begin{bmatrix}2x&1\\\\y&x+4y\\end{bmatrix}$. At $(1,1)$: $J(1,1) = \\begin{bmatrix}2&1\\\\1&5\\end{bmatrix}$.',
+          math: 'J(1,1) = \\begin{bmatrix}2&1\\\\1&5\\end{bmatrix}',
+        },
+        {
+          label: 'Interpret: the Jacobian IS the best linear approximation at the point',
+          strategy: 'Near $(1,1)$, the nonlinear function $\\mathbf{f}$ behaves like the linear function $J(1,1)\\Delta\\mathbf{x}$.',
+          explanation: 'A small perturbation $[\\Delta x, \\Delta y]^\\top$ near $(1,1)$ produces the approximate output change $J(1,1)[\\Delta x, \\Delta y]^\\top = [2\\Delta x + \\Delta y, \\Delta x + 5\\Delta y]^\\top$. In robotics: the Jacobian at a joint configuration tells you how joint velocity maps to end-effector velocity.',
+          math: '\\mathbf{f}(\\mathbf{x}_0 + \\Delta\\mathbf{x}) \\approx \\mathbf{f}(\\mathbf{x}_0) + J(\\mathbf{x}_0)\\Delta\\mathbf{x}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'la2-009-ch1',

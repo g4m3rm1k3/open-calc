@@ -306,6 +306,64 @@ abs(vol_2d - area_cross)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la10-003-wedge-product',
+      title: 'Computing the Wedge Product and Its Geometric Meaning',
+      prereqs: ['Determinant', 'Cross product', 'Parallelogram area'],
+      problem: 'Compute $\\mathbf{u}\\wedge\\mathbf{v}$ for $\\mathbf{u}=[2,1]^\\top$ and $\\mathbf{v}=[1,3]^\\top$ in $\\mathbb{R}^2$, and interpret the result.',
+      steps: [
+        {
+          label: 'The 2-form $\\mathbf{u}\\wedge\\mathbf{v}$ in $\\mathbb{R}^2$ is a scalar (the determinant)',
+          strategy: 'In $\\mathbb{R}^2$, the exterior product $\\mathbf{u}\\wedge\\mathbf{v}$ is identified with the signed area of the parallelogram spanned by $\\mathbf{u}$ and $\\mathbf{v}$.',
+          explanation: '$\\mathbf{u}\\wedge\\mathbf{v} = \\det\\begin{bmatrix}u_1&v_1\\\\u_2&v_2\\end{bmatrix} = u_1v_2-u_2v_1 = 2\\cdot3-1\\cdot1=5$.',
+          math: '\\mathbf{u}\\wedge\\mathbf{v} = \\det\\begin{bmatrix}2&1\\\\1&3\\end{bmatrix} = 5',
+        },
+        {
+          label: 'The key property: antisymmetry $\\mathbf{u}\\wedge\\mathbf{v} = -\\mathbf{v}\\wedge\\mathbf{u}$',
+          strategy: 'Swapping the two vectors negates the signed area (changes orientation).',
+          explanation: '$\\mathbf{v}\\wedge\\mathbf{u} = \\det\\begin{bmatrix}1&2\\\\3&1\\end{bmatrix} = 1-6=-5 = -(\\mathbf{u}\\wedge\\mathbf{v})$ ✓.',
+          math: '\\mathbf{v}\\wedge\\mathbf{u} = -5 = -(\\mathbf{u}\\wedge\\mathbf{v})\\checkmark',
+          gotcha: 'Antisymmetry implies $\\mathbf{v}\\wedge\\mathbf{v}=0$ for any $\\mathbf{v}$: a zero-area "parallelogram" with two equal sides. This is the algebraic capture of the geometric fact that parallel vectors span no area.',
+        },
+        {
+          label: 'In $\\mathbb{R}^3$: the wedge product $\\mathbf{u}\\wedge\\mathbf{v}$ becomes the cross product',
+          strategy: 'In $\\mathbb{R}^3$, $\\mathbf{u}\\wedge\\mathbf{v}$ is a 2-form — identified with a vector (the normal to the parallelogram) via the Hodge star.',
+          explanation: '$\\mathbf{u}\\wedge\\mathbf{v} \\leftrightarrow \\mathbf{u}\\times\\mathbf{v}$ in $\\mathbb{R}^3$. The cross product is the special 3D case of the exterior product — which generalizes to any dimension (cross product does not).',
+          math: '\\mathbf{u}\\wedge\\mathbf{v} \\leftrightarrow \\mathbf{u}\\times\\mathbf{v}\\text{ (via Hodge star in }\\mathbb{R}^3)',
+        },
+      ],
+    },
+    {
+      id: 'wt-la10-003-determinant-as-exterior-product',
+      title: 'Determinants as $n$-Forms: the Exterior Algebra Connection',
+      prereqs: ['Determinant', 'Wedge product', 'Multilinearity'],
+      problem: 'Show that $\\det(A) = \\mathbf{a}_1\\wedge\\mathbf{a}_2\\wedge\\cdots\\wedge\\mathbf{a}_n$ (where $\\mathbf{a}_i$ are columns of $A$) and explain why this is natural.',
+      steps: [
+        {
+          label: 'The $n$-dimensional exterior product is the signed volume',
+          strategy: 'Generalizing area (2D) and volume (3D): the $n$-form $\\mathbf{v}_1\\wedge\\cdots\\wedge\\mathbf{v}_n$ measures the signed $n$-volume of the parallelepiped spanned by the vectors.',
+          explanation: 'For $n=3$: $\\mathbf{a}_1\\wedge\\mathbf{a}_2\\wedge\\mathbf{a}_3 = \\det(A)$ = signed volume of the parallelepiped with edges $\\mathbf{a}_1,\\mathbf{a}_2,\\mathbf{a}_3$.',
+          math: '\\mathbf{a}_1\\wedge\\cdots\\wedge\\mathbf{a}_n = \\det(A)\\cdot (\\mathbf{e}_1\\wedge\\cdots\\wedge\\mathbf{e}_n)',
+        },
+        {
+          label: 'Antisymmetry explains the row-swap rule',
+          strategy: 'Swapping two vectors in a wedge product negates it — just like swapping two rows of a determinant negates it.',
+          explanation: '$\\mathbf{a}_1\\wedge\\mathbf{a}_2 = -\\mathbf{a}_2\\wedge\\mathbf{a}_1$. Applying to the full $n$-form: swapping any two columns negates $\\det(A)$. This is NOT a separate rule — it is the DEFINITION of the exterior product.',
+          math: '\\text{swap rows} \\Rightarrow \\det \\to -\\det',
+          gotcha: 'This unifies ALL the determinant properties: they all follow from the single axiom that the exterior product is alternating (antisymmetric in each pair of inputs) and normalized ($\\det(I)=1$).',
+        },
+        {
+          label: 'Why $\\det(AB) = \\det(A)\\det(B)$',
+          strategy: 'Composing two linear maps multiplies the volume scaling factors: if $A$ scales $n$-volume by $\\det(A)$ and $B$ by $\\det(B)$, then $AB$ scales by $\\det(A)\\det(B)$.',
+          explanation: 'The exterior product provides the intrinsic "measuring stick" for $n$-volume. The determinant is the scaling factor when you change coordinates — multiplicativity is then obvious geometrically.',
+          math: '\\det(AB) = \\det(A)\\det(B)',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la10-003-1',

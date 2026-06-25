@@ -391,6 +391,64 @@ p_ndc
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la8-004-homogeneous-coords',
+      title: 'Why Homogeneous Coordinates? Combining Translation with a Matrix',
+      prereqs: ['2D transformations', 'Matrix multiplication', 'Affine maps'],
+      problem: 'Translate the point $P=(3,2)$ by $[5,-1]^\\top$ and then rotate by 90°. Show why 3×3 homogeneous coordinates make this a single matrix multiplication.',
+      steps: [
+        {
+          label: 'The problem with standard 2D: translation is not linear',
+          strategy: 'A translation $T(P)=P+\\mathbf{t}$ does not satisfy $T(cP)=cT(P)$ — it is affine, not linear. So it cannot be represented by a 2×2 matrix.',
+          explanation: 'If we could represent translation as a 2×2 matrix $M$: $MP = P+\\mathbf{t}$ must hold for ALL $P$. But $M(2P) = 2MP = 2P+2\\mathbf{t} \\neq 2P+\\mathbf{t}$ — contradiction.',
+          math: 'T(P)=P+\\mathbf{t} \\Rightarrow \\text{not representable as 2×2 matrix}',
+        },
+        {
+          label: 'Embed in 3D: add a homogeneous coordinate $w=1$',
+          strategy: 'Represent 2D point $(x,y)$ as $[x,y,1]^\\top$ in homogeneous coordinates. Translation becomes a 3×3 matrix.',
+          explanation: 'Translation matrix $T_{(5,-1)} = \\begin{bmatrix}1&0&5\\\\0&1&-1\\\\0&0&1\\end{bmatrix}$. Apply: $T\\cdot[3,2,1]^\\top=[8,1,1]^\\top \\leftrightarrow (8,1)$ ✓.',
+          math: 'T_{\\mathbf{t}}=\\begin{bmatrix}1&0&t_x\\\\0&1&t_y\\\\0&0&1\\end{bmatrix},\\quad T[3,2,1]^\\top=[8,1,1]^\\top\\checkmark',
+        },
+        {
+          label: 'Compose translation + rotation into one matrix',
+          strategy: 'Matrix multiplication: first translate (right), then rotate (left). $M = R_{90°}\\cdot T_{(5,-1)}$.',
+          explanation: '$R_{90°} = \\begin{bmatrix}0&-1&0\\\\1&0&0\\\\0&0&1\\end{bmatrix}$. $M = R_{90°}T = \\begin{bmatrix}0&-1&1\\\\1&0&5\\\\0&0&1\\end{bmatrix}$. Apply: $M[3,2,1]^\\top=[0-2+1,3+0+5,1]^\\top=[-1,8,1]^\\top\\leftrightarrow(-1,8)$.',
+          math: 'M=R_{90°}T_{(5,-1)},\\quad M[3,2,1]^\\top=[-1,8,1]^\\top',
+          gotcha: 'Order matters: $R\\cdot T \\neq T\\cdot R$ (rotate-then-translate $\\neq$ translate-then-rotate). In graphics, transformations are applied RIGHT to LEFT — the rightmost matrix acts first.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la8-004-3d-rotation',
+      title: 'Composing 3D Rotations: Why the Order Matters',
+      prereqs: ['Rotation matrices', 'Matrix multiplication', 'Non-commutativity'],
+      problem: 'Rotate the point $(1,0,0)$ by: (a) 90° around $z$, then 90° around $x$; (b) same rotations in opposite order. Show the results differ.',
+      steps: [
+        {
+          label: 'Write the rotation matrices $R_z(90°)$ and $R_x(90°)$',
+          strategy: 'Standard rotation matrices: $R_z$ rotates in the $xy$-plane, $R_x$ rotates in the $yz$-plane.',
+          explanation: '$R_z(90°)=\\begin{bmatrix}0&-1&0\\\\1&0&0\\\\0&0&1\\end{bmatrix}$, $R_x(90°)=\\begin{bmatrix}1&0&0\\\\0&0&-1\\\\0&1&0\\end{bmatrix}$.',
+          math: 'R_z=\\begin{bmatrix}0&-1&0\\\\1&0&0\\\\0&0&1\\end{bmatrix},\\quad R_x=\\begin{bmatrix}1&0&0\\\\0&0&-1\\\\0&1&0\\end{bmatrix}',
+        },
+        {
+          label: '(a) Apply $R_z$ first, then $R_x$: compute $R_x R_z (1,0,0)^\\top$',
+          strategy: 'Work right-to-left. First $R_z$: $(1,0,0)\\to(0,1,0)$. Then $R_x$: $(0,1,0)\\to(0,0,1)$.',
+          explanation: '$R_z[1,0,0]^\\top=[0,1,0]^\\top$. $R_x[0,1,0]^\\top=[0,0,1]^\\top$.',
+          math: 'R_x R_z\\begin{bmatrix}1\\\\0\\\\0\\end{bmatrix}=\\begin{bmatrix}0\\\\0\\\\1\\end{bmatrix}',
+        },
+        {
+          label: '(b) Apply $R_x$ first, then $R_z$: compute $R_z R_x (1,0,0)^\\top$',
+          strategy: 'First $R_x$: $(1,0,0)\\to(1,0,0)$ (unchanged, it\'s on the $x$-axis). Then $R_z$: $(1,0,0)\\to(0,1,0)$.',
+          explanation: '$R_x[1,0,0]^\\top=[1,0,0]^\\top$ (rotation around $x$ leaves the $x$-axis fixed). $R_z[1,0,0]^\\top=[0,1,0]^\\top$.',
+          math: 'R_z R_x\\begin{bmatrix}1\\\\0\\\\0\\end{bmatrix}=\\begin{bmatrix}0\\\\1\\\\0\\end{bmatrix}',
+          gotcha: '3D rotations do NOT commute: $R_x R_z \\neq R_z R_x$. This is a fundamental fact of 3D geometry (SO(3) is non-abelian). In animation and robotics, applying rotations in the wrong order is a common source of bugs.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la8-004-1',

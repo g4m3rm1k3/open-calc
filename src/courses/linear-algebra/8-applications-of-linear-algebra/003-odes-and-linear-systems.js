@@ -287,6 +287,70 @@ traj(:, end)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la8-003-stability-analysis',
+      title: 'Stability of a Linear ODE System: Eigenvalue Classification',
+      prereqs: ['Eigenvalues', 'Matrix exponential', 'ODE solutions'],
+      problem: 'Classify the stability of $\\dot{\\mathbf{x}} = A\\mathbf{x}$ for each case: (a) eigenvalues $-2,-3$; (b) eigenvalues $1,-2$; (c) eigenvalues $\\pm 2i$; (d) eigenvalues $-1\\pm 2i$.',
+      steps: [
+        {
+          label: 'Rule: stability is determined by the real parts of eigenvalues',
+          strategy: 'For $\\dot{\\mathbf{x}}=A\\mathbf{x}$: each eigenvalue $\\lambda=a+bi$ contributes a term $e^{at}(\\cos bt, \\sin bt)$ to the solution. The $e^{at}$ factor determines growth or decay.',
+          explanation: 'If all eigenvalues have negative real parts → $e^{at}\\to 0$ → asymptotically stable. Any positive real part → exponential growth → unstable. Pure imaginary → $e^{0\\cdot t}=1$ → oscillates forever (neutrally stable).',
+          math: '\\text{Re}(\\lambda)<0\\;\\forall\\lambda \\Rightarrow \\text{stable}',
+        },
+        {
+          label: 'Classify each case',
+          strategy: 'Apply the rule to each set of eigenvalues.',
+          explanation: '(a) $-2,-3$: all real parts negative → asymptotically stable. (b) $1,-2$: one positive real part → unstable (saddle). (c) $\\pm 2i$: zero real parts → neutrally stable (center, oscillates). (d) $-1\\pm 2i$: real parts $-1<0$ → asymptotically stable (stable spiral inward).',
+          math: '(a)\\;\\text{stable},\\;(b)\\;\\text{unstable},\\;(c)\\;\\text{neutral},\\;(d)\\;\\text{stable spiral}',
+          gotcha: 'Neutral stability (c) is fragile: any small perturbation to the matrix can make it stable or unstable. In applications, pure imaginary eigenvalues should be treated with caution.',
+        },
+        {
+          label: 'Connect to the phase portrait',
+          strategy: 'Each stability type has a characteristic phase portrait.',
+          explanation: '(a) Node (trajectories converge to origin). (b) Saddle (one stable direction, one unstable). (c) Center (closed ellipses). (d) Stable spiral (trajectories spiral in).',
+          math: '\\text{stable node (a)},\\;\\text{saddle (b)},\\;\\text{center (c)},\\;\\text{stable spiral (d)}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la8-003-coupled-odes',
+      title: 'Decoupling and Solving a 2×2 ODE System',
+      prereqs: ['Eigenvalues', 'Matrix exponential', 'Change of variables'],
+      problem: 'Solve $\\dot{\\mathbf{x}} = \\begin{bmatrix}-2&1\\\\0&-1\\end{bmatrix}\\mathbf{x}$ with $\\mathbf{x}(0)=[1,2]^\\top$.',
+      steps: [
+        {
+          label: 'Read eigenvalues from the triangular matrix',
+          strategy: 'Triangular matrices have eigenvalues on the diagonal.',
+          explanation: '$\\lambda_1=-2$, $\\lambda_2=-1$. Both negative → asymptotically stable.',
+          math: '\\lambda_1=-2,\\quad\\lambda_2=-1',
+        },
+        {
+          label: 'Find eigenvectors',
+          strategy: 'Solve $(A-\\lambda_i I)\\mathbf{v}_i=\\mathbf{0}$ for each.',
+          explanation: 'For $\\lambda_1=-2$: $(A+2I)=\\begin{bmatrix}0&1\\\\0&1\\end{bmatrix}\\Rightarrow\\mathbf{v}_1=[1,0]^\\top$. For $\\lambda_2=-1$: $(A+I)=\\begin{bmatrix}-1&1\\\\0&0\\end{bmatrix}\\Rightarrow\\mathbf{v}_2=[1,1]^\\top$.',
+          math: '\\mathbf{v}_1=\\begin{bmatrix}1\\\\0\\end{bmatrix},\\quad\\mathbf{v}_2=\\begin{bmatrix}1\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Write the general solution',
+          strategy: '$\\mathbf{x}(t) = c_1 e^{\\lambda_1 t}\\mathbf{v}_1 + c_2 e^{\\lambda_2 t}\\mathbf{v}_2$.',
+          explanation: '$\\mathbf{x}(t) = c_1 e^{-2t}[1,0]^\\top + c_2 e^{-t}[1,1]^\\top$.',
+          math: '\\mathbf{x}(t) = c_1 e^{-2t}\\begin{bmatrix}1\\\\0\\end{bmatrix}+c_2 e^{-t}\\begin{bmatrix}1\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Apply the initial condition to find $c_1, c_2$',
+          strategy: 'At $t=0$: $c_1\\mathbf{v}_1+c_2\\mathbf{v}_2=\\mathbf{x}(0)$.',
+          explanation: '$c_1[1,0]+c_2[1,1]=[1,2]$. Row 2: $c_2=2$. Row 1: $c_1+2=1\\Rightarrow c_1=-1$.',
+          math: 'c_1=-1,\\quad c_2=2 \\Rightarrow \\mathbf{x}(t)=-e^{-2t}\\begin{bmatrix}1\\\\0\\end{bmatrix}+2e^{-t}\\begin{bmatrix}1\\\\1\\end{bmatrix}',
+          gotcha: 'As $t\\to\\infty$: $e^{-2t}\\to 0$ faster than $e^{-t}$. The long-term behavior is dominated by the LEAST negative eigenvalue ($\\lambda_2=-1$): $\\mathbf{x}(t)\\approx 2e^{-t}[1,1]^\\top$. The "slowest mode" controls long-term behavior.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la8-003-1',

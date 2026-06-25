@@ -553,6 +553,75 @@ v = np.array([4.0, 2.0])
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-001-apply-matrix',
+      title: 'Applying a Matrix — Reading the Output as a Column Recipe',
+      prereqs: ['Vector addition', 'Scalar multiplication'],
+      problem: 'Compute $A\\mathbf{v}$ for $A = \\begin{bmatrix}1 & -2\\\\3 & 1\\end{bmatrix}$ and $\\mathbf{v} = \\begin{bmatrix}2\\\\1\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Recognize the column picture before computing',
+          strategy: 'Matrix-vector multiplication is a weighted sum of the columns of $A$, where the weights come from $\\mathbf{v}$.',
+          explanation: 'The vector $\\mathbf{v} = [2, 1]^\\top$ says: "take 2 of the first column of $A$ and 1 of the second column." This is the column interpretation of $A\\mathbf{v}$. Understanding this before computing reduces the operation from an abstract rule to a concrete geometric action.',
+          math: 'A\\mathbf{v} = 2\\begin{bmatrix}1\\\\3\\end{bmatrix} + 1\\begin{bmatrix}-2\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Scale each column by its weight',
+          strategy: 'Multiply each column of $A$ by its corresponding component of $\\mathbf{v}$.',
+          explanation: 'Column 1 scaled by 2: $2[1,3]^\\top = [2,6]^\\top$. Column 2 scaled by 1: $1[-2,1]^\\top = [-2,1]^\\top$.',
+          math: '2\\begin{bmatrix}1\\\\3\\end{bmatrix} = \\begin{bmatrix}2\\\\6\\end{bmatrix} \\qquad 1\\begin{bmatrix}-2\\\\1\\end{bmatrix} = \\begin{bmatrix}-2\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Add the scaled columns',
+          strategy: 'The output is the component-wise sum.',
+          explanation: 'Adding: $[2,6]^\\top + [-2,1]^\\top = [0, 7]^\\top$. The matrix $A$ transformed $[2,1]^\\top$ into $[0,7]^\\top$. The point moved from the first quadrant to the positive $y$-axis.',
+          math: 'A\\mathbf{v} = \\begin{bmatrix}2-2\\\\6+1\\end{bmatrix} = \\begin{bmatrix}0\\\\7\\end{bmatrix}',
+        },
+        {
+          label: 'Verify with the row picture (dot each row with $\\mathbf{v}$)',
+          strategy: 'Row 1 of $A$ dotted with $\\mathbf{v}$ gives the first component of the output.',
+          explanation: 'Row 1: $[1,-2] \\cdot [2,1] = 2 - 2 = 0$ ✓. Row 2: $[3,1] \\cdot [2,1] = 6 + 1 = 7$ ✓. Both methods agree. Use whichever gives you more insight: columns for geometric understanding, rows for mechanical computation.',
+          math: '[1,-2]\\cdot[2,1]=0 \\checkmark \\quad [3,1]\\cdot[2,1]=7 \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-001-build-matrix',
+      title: 'Build a Matrix from Geometry — Where Do the Basis Vectors Land?',
+      prereqs: ['Basis vectors $\\hat{e}_1, \\hat{e}_2$', 'Geometric transformations'],
+      problem: 'Find the $2\\times 2$ matrix that reflects every vector across the $y$-axis (negates the $x$-component, keeps the $y$-component).',
+      steps: [
+        {
+          label: 'Apply the transformation to $\\hat{e}_1 = [1, 0]^\\top$',
+          strategy: 'Column 1 of the matrix is where the first basis vector lands.',
+          explanation: 'The reflection across the $y$-axis sends $[1,0]^\\top$ to $[-1,0]^\\top$ — it flips the $x$-component. This result becomes the first column of the matrix.',
+          math: '\\hat{e}_1 = \\begin{bmatrix}1\\\\0\\end{bmatrix} \\xrightarrow{\\text{reflect}} \\begin{bmatrix}-1\\\\0\\end{bmatrix}',
+        },
+        {
+          label: 'Apply the transformation to $\\hat{e}_2 = [0, 1]^\\top$',
+          strategy: 'Column 2 of the matrix is where the second basis vector lands.',
+          explanation: 'The $y$-axis reflection fixes any point on the $y$-axis. So $[0,1]^\\top$ maps to $[0,1]^\\top$ — it does not move.',
+          math: '\\hat{e}_2 = \\begin{bmatrix}0\\\\1\\end{bmatrix} \\xrightarrow{\\text{reflect}} \\begin{bmatrix}0\\\\1\\end{bmatrix}',
+        },
+        {
+          label: 'Assemble the matrix: the images of basis vectors are the columns',
+          strategy: 'Stack the two transformed basis vectors as column 1 and column 2.',
+          explanation: 'Column 1 is $[-1,0]^\\top$, column 2 is $[0,1]^\\top$. The reflection matrix is $\\begin{bmatrix}-1&0\\\\0&1\\end{bmatrix}$. This construction works for ANY linear transformation: find where $\\hat{e}_1$ and $\\hat{e}_2$ go, and you have the matrix.',
+          math: 'R_y = \\begin{bmatrix}-1&0\\\\0&1\\end{bmatrix}',
+          gotcha: 'This only works for LINEAR transformations. Translations (shifting by a constant vector) cannot be represented by a 2×2 matrix — they require a 3×3 homogeneous matrix.',
+        },
+        {
+          label: 'Verify: apply the matrix to a test vector',
+          strategy: 'Test with $[3, 4]^\\top$ — the reflected version should be $[-3, 4]^\\top$.',
+          explanation: '$R_y [3,4]^\\top = [-1 \\cdot 3 + 0 \\cdot 4,\\; 0 \\cdot 3 + 1 \\cdot 4]^\\top = [-3, 4]^\\top$ ✓. The $y$-component is unchanged, the $x$-component is negated.',
+          math: '\\begin{bmatrix}-1&0\\\\0&1\\end{bmatrix}\\begin{bmatrix}3\\\\4\\end{bmatrix} = \\begin{bmatrix}-3\\\\4\\end{bmatrix} \\checkmark',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

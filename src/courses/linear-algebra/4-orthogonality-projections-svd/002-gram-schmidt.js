@@ -459,6 +459,70 @@ v2 = np.array([2.0, 2.0])
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la4-002-gram-schmidt',
+      title: 'Gram-Schmidt: Turning Two Independent Vectors into an Orthonormal Basis',
+      prereqs: ['Dot product', 'Vector projection', 'Normalization'],
+      problem: 'Apply Gram-Schmidt to $\\mathbf{a}_1 = [1, 1, 0]^\\top$ and $\\mathbf{a}_2 = [1, 0, 1]^\\top$ to produce orthonormal vectors $\\mathbf{e}_1, \\mathbf{e}_2$.',
+      steps: [
+        {
+          label: 'Normalize $\\mathbf{a}_1$ to get $\\mathbf{e}_1$',
+          strategy: 'The first vector just gets normalized — divide by its length.',
+          explanation: '$\\|\\mathbf{a}_1\\| = \\sqrt{1+1+0} = \\sqrt{2}$. So $\\mathbf{e}_1 = \\mathbf{a}_1/\\sqrt{2} = [1/\\sqrt{2}, 1/\\sqrt{2}, 0]^\\top$.',
+          math: '\\mathbf{e}_1 = \\frac{1}{\\sqrt{2}}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}',
+        },
+        {
+          label: 'Subtract the projection of $\\mathbf{a}_2$ onto $\\mathbf{e}_1$',
+          strategy: 'Remove from $\\mathbf{a}_2$ whatever component it has along $\\mathbf{e}_1$. The remainder is orthogonal to $\\mathbf{e}_1$.',
+          explanation: 'Projection coefficient: $\\mathbf{e}_1^\\top\\mathbf{a}_2 = \\frac{1}{\\sqrt{2}}(1+0+0) = \\frac{1}{\\sqrt{2}}$. Subtract: $\\mathbf{u}_2 = \\mathbf{a}_2 - \\frac{1}{\\sqrt{2}}\\mathbf{e}_1 = [1,0,1]^\\top - \\frac{1}{2}[1,1,0]^\\top = [1/2, -1/2, 1]^\\top$.',
+          math: '\\mathbf{u}_2 = \\begin{bmatrix}1/2\\\\-1/2\\\\1\\end{bmatrix}',
+          gotcha: 'Subtract the projection onto the UNIT vector $\\mathbf{e}_1$, not the original $\\mathbf{a}_1$. Using $\\mathbf{a}_1$ instead of $\\mathbf{e}_1$ requires an extra normalization step in the coefficient.',
+        },
+        {
+          label: 'Normalize $\\mathbf{u}_2$ to get $\\mathbf{e}_2$',
+          strategy: 'Divide by the length of $\\mathbf{u}_2$.',
+          explanation: '$\\|\\mathbf{u}_2\\|^2 = 1/4+1/4+1 = 3/2$, so $\\|\\mathbf{u}_2\\| = \\sqrt{3/2} = \\sqrt{6}/2$.',
+          math: '\\mathbf{e}_2 = \\sqrt{\\tfrac{2}{3}}\\begin{bmatrix}1/2\\\\-1/2\\\\1\\end{bmatrix} = \\begin{bmatrix}1/\\sqrt{6}\\\\-1/\\sqrt{6}\\\\2/\\sqrt{6}\\end{bmatrix}',
+        },
+        {
+          label: 'Verify orthonormality: $\\mathbf{e}_1^\\top\\mathbf{e}_2=0$, $\\|\\mathbf{e}_1\\|=\\|\\mathbf{e}_2\\|=1$',
+          strategy: 'Check both conditions explicitly.',
+          explanation: '$\\mathbf{e}_1^\\top\\mathbf{e}_2 = \\frac{1}{\\sqrt{2}}\\cdot\\frac{1}{\\sqrt{6}} + \\frac{1}{\\sqrt{2}}\\cdot\\frac{-1}{\\sqrt{6}} + 0 = 0$ ✓. Magnitudes are 1 by construction ✓.',
+          math: '\\mathbf{e}_1^\\top\\mathbf{e}_2 = 0 \\checkmark,\\quad \\|\\mathbf{e}_1\\|=\\|\\mathbf{e}_2\\|=1 \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la4-002-qr-from-gs',
+      title: 'Reading Off the QR Factorization from Gram-Schmidt',
+      prereqs: ['Gram-Schmidt', 'Matrix multiplication'],
+      problem: 'Express the Gram-Schmidt computation above as a QR factorization $A = QR$.',
+      steps: [
+        {
+          label: 'Build $Q$ from the orthonormal vectors',
+          strategy: '$Q$\'s columns are the orthonormal vectors $\\mathbf{e}_1, \\mathbf{e}_2$.',
+          explanation: '$Q = \\begin{bmatrix}\\mathbf{e}_1 & \\mathbf{e}_2\\end{bmatrix}$ — a matrix with orthonormal columns ($Q^\\top Q = I$). Note: $Q$ is not square here (it\'s $3\\times 2$), so it is not orthogonal in the full sense, but its columns are orthonormal.',
+          math: 'Q = \\begin{bmatrix}1/\\sqrt{2}&1/\\sqrt{6}\\\\1/\\sqrt{2}&-1/\\sqrt{6}\\\\0&2/\\sqrt{6}\\end{bmatrix}',
+        },
+        {
+          label: 'Recover $R = Q^\\top A$',
+          strategy: 'Since $A = QR$, multiply both sides on the left by $Q^\\top$ (and $Q^\\top Q = I$): $R = Q^\\top A$.',
+          explanation: '$R = Q^\\top A$ is upper triangular — this is guaranteed by Gram-Schmidt. The diagonal entries are $\\|\\mathbf{a}_1\\|$ and $\\|\\mathbf{u}_2\\|$; the off-diagonal is the projection coefficient $\\mathbf{e}_1^\\top\\mathbf{a}_2$.',
+          math: 'R = Q^\\top A = \\begin{bmatrix}\\sqrt{2}&1/\\sqrt{2}\\\\0&\\sqrt{3/2}\\end{bmatrix}',
+          gotcha: '$R$ is always upper triangular from Gram-Schmidt. If you get a non-zero entry below the diagonal, you made an error in the orthogonalization step.',
+        },
+        {
+          label: 'State what QR is used for',
+          strategy: 'Knowing the factorization exists is less important than knowing why it\'s useful.',
+          explanation: 'QR is the workhorse factorization for solving least-squares: $A\\mathbf{x}=\\mathbf{b}$ becomes $R\\mathbf{x} = Q^\\top\\mathbf{b}$ — $Q^\\top$ is free to apply (just a transposition), then $R$ is triangular (back-substitution). Much more numerically stable than forming $A^\\top A$.',
+          math: 'A\\mathbf{x} = \\mathbf{b} \\Rightarrow QR\\mathbf{x}=\\mathbf{b} \\Rightarrow R\\mathbf{x} = Q^\\top\\mathbf{b}',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

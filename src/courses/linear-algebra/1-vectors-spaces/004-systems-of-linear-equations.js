@@ -552,6 +552,88 @@ b = np.array([9.0, 3.0, 1.0])
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la1-004-gaussian',
+      title: 'Gaussian Elimination — One Row Operation at a Time',
+      prereqs: ['Augmented matrices', 'Elementary row operations'],
+      problem: 'Solve the system: $3x + 2y = 7$ and $x + 4y = 9$.',
+      steps: [
+        {
+          label: 'Write the augmented matrix',
+          strategy: 'An augmented matrix compactly captures the coefficients and right-hand side — drop the variables and work with numbers.',
+          explanation: 'The coefficients of $x$ go in column 1, coefficients of $y$ in column 2, and the right-hand sides after the vertical bar. The matrix is now our worksheet. Every row operation we do to the matrix is equivalent to a legal step we would do to the equation system.',
+          math: '\\begin{bmatrix}3 & 2 & | & 7 \\\\ 1 & 4 & | & 9\\end{bmatrix}',
+        },
+        {
+          label: 'Swap rows to put a simpler pivot in row 1',
+          strategy: 'A leading 1 is easier to work with than a leading 3 — swap rows when it helps.',
+          explanation: 'Row 2 has a leading coefficient of 1, which is cleaner to use as a pivot. Swap rows 1 and 2 (written $R_1 \\leftrightarrow R_2$). This does not change the solution.',
+          math: '\\begin{bmatrix}1 & 4 & | & 9 \\\\ 3 & 2 & | & 7\\end{bmatrix}',
+        },
+        {
+          label: 'Eliminate the $x$ term from row 2',
+          strategy: 'Subtract a multiple of row 1 from row 2 to create a zero in the first column of row 2.',
+          explanation: 'Row 1 has a leading 1 in column 1. To eliminate the 3 in row 2 column 1, compute: $R_2 \\leftarrow R_2 - 3 \\cdot R_1$. Row 2 becomes: $(3 - 3 \\cdot 1,\\; 2 - 3 \\cdot 4,\\; 7 - 3 \\cdot 9) = (0, -10, -20)$.',
+          math: 'R_2 \\leftarrow R_2 - 3R_1: \\quad \\begin{bmatrix}1 & 4 & | & 9 \\\\ 0 & -10 & | & -20\\end{bmatrix}',
+          gotcha: 'Apply the row operation to ALL three entries in the row, including the right-hand side. A common error is to forget the constant column.',
+        },
+        {
+          label: 'Scale row 2 to get a leading 1',
+          strategy: 'Divide a row by its leading coefficient to create a pivot of 1.',
+          explanation: '$R_2 \\leftarrow R_2 / (-10)$ gives $(0, 1, 2)$. Now row 2 reads $y = 2$.',
+          math: 'R_2 \\leftarrow \\tfrac{1}{-10}R_2: \\quad \\begin{bmatrix}1 & 4 & | & 9 \\\\ 0 & 1 & | & 2\\end{bmatrix}',
+        },
+        {
+          label: 'Back-substitute to find $x$',
+          strategy: 'Substitute the known value of $y$ into the first equation.',
+          explanation: 'Row 1 says $x + 4y = 9$. Substituting $y = 2$: $x + 8 = 9$, so $x = 1$. The solution is $(x, y) = (1, 2)$.',
+          math: 'x = 9 - 4(2) = 1 \\implies (x,y) = (1,2)',
+        },
+        {
+          label: 'Check in both original equations',
+          strategy: 'Substitute back into the ORIGINAL system, not the row-reduced version.',
+          explanation: 'Eq. 1: $3(1) + 2(2) = 3 + 4 = 7$ ✓. Eq. 2: $1 + 4(2) = 1 + 8 = 9$ ✓. Both equations are satisfied.',
+          math: '3(1)+2(2)=7 \\checkmark \\qquad 1+4(2)=9 \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la1-004-no-solution',
+      title: 'No Solution — Reading the Contradiction in the Matrix',
+      prereqs: ['Augmented matrices', 'Row echelon form'],
+      problem: 'Determine the solution set of: $x + 2y = 3$ and $2x + 4y = 7$.',
+      steps: [
+        {
+          label: 'Notice a suspicious relationship before doing any row operations',
+          strategy: 'Scan for proportional rows — if the left sides are multiples but right sides are not, expect no solution.',
+          explanation: 'The left side of equation 2 is exactly $2 \\times$ the left side of equation 1: $2x + 4y = 2(x + 2y)$. But the right side is $7$, not $2 \\times 3 = 6$. This mismatch is a red flag. Two equations that describe parallel lines cannot intersect.',
+          math: '2(x+2y) = 6 \\neq 7',
+          gotcha: 'This pattern is easy to miss if you jump straight into row operations without glancing at the structure.',
+        },
+        {
+          label: 'Write the augmented matrix and eliminate',
+          strategy: 'Row reduce to confirm the intuition rigorously.',
+          explanation: 'Set up the augmented matrix, then apply $R_2 \\leftarrow R_2 - 2R_1$.',
+          math: '\\begin{bmatrix}1&2&|&3\\\\2&4&|&7\\end{bmatrix} \\xrightarrow{R_2-2R_1} \\begin{bmatrix}1&2&|&3\\\\0&0&|&1\\end{bmatrix}',
+        },
+        {
+          label: 'Read the contradiction from the last row',
+          strategy: 'A row of the form $[0 \\;\\cdots\\; 0 \\;|\\; c]$ with $c \\neq 0$ means: $0 = c$. Impossible.',
+          explanation: 'Row 2 now says $0 \\cdot x + 0 \\cdot y = 1$, i.e., $0 = 1$. No real values of $x$ and $y$ can make this true. The system has no solution — it is called **inconsistent**.',
+          math: '0x + 0y = 1 \\implies 0 = 1 \\; (\\text{contradiction})',
+        },
+        {
+          label: 'Interpret geometrically: parallel lines never meet',
+          strategy: 'Visualize both equations as lines to understand why there is no solution.',
+          explanation: 'Equation 1, $x + 2y = 3$, is a line with slope $-1/2$ passing through $(3, 0)$. Equation 2, $2x + 4y = 7$, simplifies to $x + 2y = 3.5$ — the same slope, different intercept. Two parallel lines never intersect, so no point $(x, y)$ lies on both simultaneously.',
+          math: 'x + 2y = 3 \\parallel x + 2y = 3.5',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ─────────────────────────────────────────────────
   challenges: [
     {

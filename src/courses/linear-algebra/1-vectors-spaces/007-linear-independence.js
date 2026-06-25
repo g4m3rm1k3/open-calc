@@ -594,6 +594,81 @@ fprintf('Minimum for 3D observability: 3 linearly independent sensors.\\n')`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la1-007-det-test',
+      title: 'The Determinant Shortcut for Two Vectors in $\\mathbb{R}^2$',
+      prereqs: ['2×2 determinant', 'Definition of linear independence'],
+      problem: 'Are $\\mathbf{u} = [3, 1]^\\top$ and $\\mathbf{v} = [6, 2]^\\top$ linearly independent?',
+      steps: [
+        {
+          label: 'First, look at the vectors geometrically',
+          strategy: 'Visual inspection often reveals dependence instantly — before any computation.',
+          explanation: 'Is $\\mathbf{v}$ a scalar multiple of $\\mathbf{u}$? Check component ratios: $6/3 = 2$ and $2/1 = 2$. Both ratios are equal, so $\\mathbf{v} = 2\\mathbf{u}$. The vectors lie on the same line through the origin — they are parallel.',
+          math: '\\mathbf{v} = 2\\mathbf{u}',
+          gotcha: 'Parallel vectors are ALWAYS linearly dependent — one is just a scaled copy of the other and adds no new direction.',
+        },
+        {
+          label: 'Confirm with the determinant: form the $2\\times 2$ matrix',
+          strategy: 'Place $\\mathbf{u}$ and $\\mathbf{v}$ as columns (or rows). The determinant is the signed area of the parallelogram they span.',
+          explanation: 'The matrix with columns $\\mathbf{u}$ and $\\mathbf{v}$: $\\begin{bmatrix}3&6\\\\1&2\\end{bmatrix}$. The determinant is $ad - bc$.',
+          math: '\\det\\begin{bmatrix}3&6\\\\1&2\\end{bmatrix} = (3)(2) - (6)(1) = 6 - 6 = 0',
+        },
+        {
+          label: 'Interpret: determinant zero means the parallelogram has collapsed to a line',
+          strategy: '$\\det = 0 \\iff$ the columns are linearly dependent.',
+          explanation: 'A non-zero determinant means the two vectors span a non-degenerate parallelogram — they point in different enough directions to cover area. A zero determinant means the parallelogram has collapsed to a line segment: both vectors lie on the same line through the origin.',
+          math: '\\det(A) = 0 \\iff \\{\\mathbf{u}, \\mathbf{v}\\} \\text{ linearly dependent}',
+        },
+        {
+          label: 'Contrast: what does an independent pair look like?',
+          strategy: 'Compare with $\\mathbf{w} = [3, 2]^\\top$ to build intuition for the independent case.',
+          explanation: 'Replace $\\mathbf{v}$ with $\\mathbf{w} = [3, 2]^\\top$. The component ratio is $2/1 \\neq 3/3$, so they are not parallel. The determinant: $(3)(2) - (3)(1) = 6 - 3 = 3 \\neq 0$. Non-zero determinant confirms they span a genuine parallelogram — they are linearly independent.',
+          math: '\\det\\begin{bmatrix}3&3\\\\1&2\\end{bmatrix} = 3 \\neq 0 \\implies \\text{independent}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la1-007-rref-independence',
+      title: 'Testing Independence in $\\mathbb{R}^3$ by Row Reduction',
+      prereqs: ['RREF', 'Pivot columns', 'Rank'],
+      problem: 'Are $\\mathbf{a} = [1, 2, 3]^\\top$, $\\mathbf{b} = [2, 4, 7]^\\top$, and $\\mathbf{c} = [1, 0, 1]^\\top$ linearly independent?',
+      steps: [
+        {
+          label: 'Form the matrix with the vectors as columns',
+          strategy: 'Place each vector as a column — row-reducing this matrix reveals the rank and thus the number of independent vectors.',
+          explanation: 'Three vectors in $\\mathbb{R}^3$. If the rank equals 3 (all three pivots), they are independent. If rank is less than 3, some vector lies in the span of the others.',
+          math: 'A = \\begin{bmatrix}1&2&1\\\\2&4&0\\\\3&7&1\\end{bmatrix}',
+        },
+        {
+          label: 'Forward elimination: clear column 1 below the first pivot',
+          strategy: 'Use $R_1$ to eliminate the leading entries in $R_2$ and $R_3$.',
+          explanation: '$R_2 \\leftarrow R_2 - 2R_1$: $(0, 0, -2)$. $R_3 \\leftarrow R_3 - 3R_1$: $(0, 1, -2)$.',
+          math: '\\begin{bmatrix}1&2&1\\\\0&0&-2\\\\0&1&-2\\end{bmatrix}',
+        },
+        {
+          label: 'Swap rows 2 and 3 to bring a non-zero pivot to column 2',
+          strategy: 'When the current pivot position is zero, look below for a non-zero entry and swap.',
+          explanation: 'Row 2 has a zero in column 2 but row 3 has a 1 there. Swap: $R_2 \\leftrightarrow R_3$.',
+          math: '\\begin{bmatrix}1&2&1\\\\0&1&-2\\\\0&0&-2\\end{bmatrix}',
+        },
+        {
+          label: 'Count the pivots',
+          strategy: 'The number of pivots equals the rank — compare to the number of vectors.',
+          explanation: 'The matrix now has pivots in columns 1, 2, and 3 — rank 3. Three vectors, three pivots. Rank equals the number of vectors, so they are linearly independent.',
+          math: '\\text{rank}(A) = 3 = \\text{number of vectors} \\implies \\text{independent}',
+        },
+        {
+          label: 'What would dependence look like? The contrast case.',
+          strategy: 'Replace $\\mathbf{b}$ with $2\\mathbf{a}$ and see how the row reduction exposes the relationship.',
+          explanation: 'If $\\mathbf{b} = [2, 4, 6]^\\top = 2\\mathbf{a}$, then $R_2 \\leftarrow R_2 - 2R_1$ gives $(0, 0, -2) \\to (0, 0, 0)$ — a zero row. The rank drops to 2. RREF would show a free variable in column 2, and the dependency relation $2\\mathbf{a} - \\mathbf{b} = \\mathbf{0}$ becomes visible.',
+          math: '\\mathbf{b} = 2\\mathbf{a} \\implies \\text{rank} = 2 < 3 \\implies \\text{dependent}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'la1-007-ch1',

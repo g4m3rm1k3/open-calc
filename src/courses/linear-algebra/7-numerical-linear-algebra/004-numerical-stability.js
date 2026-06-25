@@ -319,6 +319,64 @@ residual
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la7-004-catastrophic-cancellation',
+      title: 'Catastrophic Cancellation: When Subtraction Destroys Precision',
+      prereqs: ['Floating point representation', 'Relative error'],
+      problem: 'Compute $f(x) = \\sqrt{x+1}-\\sqrt{x}$ for $x = 10^8$ in finite-precision arithmetic. Show the cancellation error and find a stable equivalent formula.',
+      steps: [
+        {
+          label: 'Identify the danger: subtracting nearly equal quantities',
+          strategy: 'When two nearly equal floats are subtracted, their significant digits cancel, leaving only the low-order digits — which are noise. This is catastrophic cancellation.',
+          explanation: 'At $x=10^8$: $\\sqrt{x}=10^4=10000$ and $\\sqrt{x+1}\\approx 10000.000049999...$. Subtracting: the leading 4 digits cancel, leaving 5 significant digits of precision in a number that started with 16.',
+          math: '\\sqrt{10^8+1}-\\sqrt{10^8}\\approx 10000.00005 - 10000 = 0.00005',
+          gotcha: 'The absolute error is tiny, but the relative error in the RESULT is huge: the difference is $\\approx 5\\times10^{-5}$ but we only computed it to a few digits, losing 11 significant figures.',
+        },
+        {
+          label: 'Derive a numerically stable form by rationalizing',
+          strategy: 'Multiply and divide by the conjugate: $(\\sqrt{x+1}-\\sqrt{x})\\cdot\\frac{\\sqrt{x+1}+\\sqrt{x}}{\\sqrt{x+1}+\\sqrt{x}} = \\frac{1}{\\sqrt{x+1}+\\sqrt{x}}$.',
+          explanation: 'The new form has no subtraction of large numbers — you add $\\sqrt{x+1}+\\sqrt{x}\\approx 2\\times10^4$ and then divide 1 by it. No cancellation possible.',
+          math: 'f(x) = \\frac{1}{\\sqrt{x+1}+\\sqrt{x}}',
+        },
+        {
+          label: 'Compare results at $x=10^8$',
+          strategy: 'Evaluate both formulas.',
+          explanation: 'Unstable: $\\approx 5\\times10^{-5}$ (only a few significant digits). Stable: $1/(10000+10000.00005)\\approx 4.9999975\\times10^{-5}$ — 16 significant figures.',
+          math: 'f(10^8) = \\frac{1}{2\\sqrt{10^8}+\\text{tiny}} \\approx 5\\times10^{-5} \\text{ (accurate)}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la7-004-partial-pivoting',
+      title: 'Why Partial Pivoting Stabilizes Gaussian Elimination',
+      prereqs: ['Gaussian elimination', 'Row operations', 'Multipliers'],
+      problem: 'Show why eliminating $\\begin{bmatrix}\\varepsilon&1\\\\1&1\\end{bmatrix}\\mathbf{x}=[1,2]^\\top$ without pivoting fails numerically, and how partial pivoting fixes it.',
+      steps: [
+        {
+          label: 'Eliminate without pivoting ($\\varepsilon \\approx 10^{-15}$)',
+          strategy: 'The multiplier $m = 1/\\varepsilon \\approx 10^{15}$ — astronomically large. Any rounding in row 1 gets amplified by $10^{15}$ in the elimination step.',
+          explanation: '$m = 1/\\varepsilon$. Row 2 $\\leftarrow$ Row 2 $- m\\times$ Row 1: the (2,2) entry becomes $1 - m \\cdot 1 = 1 - 1/\\varepsilon \\approx -1/\\varepsilon$. In floating point, "$1 - 1/\\varepsilon$" loses the "1" entirely.',
+          math: '\\text{multiplier} = \\frac{1}{\\varepsilon} \\approx 10^{15} \\Rightarrow \\text{amplifies rounding errors}',
+          gotcha: 'The mathematical solution is perfectly well-conditioned ($\\kappa\\approx 1$); the problem is entirely in the ALGORITHM. Choosing the wrong pivot order creates numerical instability that does not exist in the problem itself.',
+        },
+        {
+          label: 'Apply partial pivoting: swap rows first',
+          strategy: 'Partial pivoting: always use the largest absolute entry in the current column as the pivot.',
+          explanation: '$|1| > |\\varepsilon|$: swap rows. New matrix: $\\begin{bmatrix}1&1\\\\\\varepsilon&1\\end{bmatrix}$. Multiplier: $m=\\varepsilon$. Row 2 $\\leftarrow$ Row 2 $- \\varepsilon \\times$ Row 1: entry becomes $1-\\varepsilon\\approx 1$. No amplification.',
+          math: '\\text{swap} \\Rightarrow m=\\varepsilon \\approx 0 \\Rightarrow \\text{stable}',
+        },
+        {
+          label: 'Summarize the rule',
+          strategy: 'Partial pivoting keeps all multipliers $|m_{ij}|\\leq 1$, bounding error amplification.',
+          explanation: 'With partial pivoting: the growth factor (worst-case error amplification) is bounded by $2^{n-1}$ in theory. In practice, it stays small. Without pivoting, growth can be unbounded.',
+          math: '|m_{ij}| \\leq 1 \\Rightarrow \\text{bounded error growth}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la7-004-1',

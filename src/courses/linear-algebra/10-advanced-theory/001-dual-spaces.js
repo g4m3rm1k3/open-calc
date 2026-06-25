@@ -297,6 +297,58 @@ disp('Adjoint check: (Av)^T w = v^T (A^T w):')
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la10-001-dual-basis',
+      title: 'Finding the Dual Basis',
+      prereqs: ['Basis', 'Linear functionals', 'Dot product'],
+      problem: 'For the basis $\\mathcal{B} = \\{\\mathbf{v}_1=[1,1]^\\top, \\mathbf{v}_2=[1,-1]^\\top\\}$ of $\\mathbb{R}^2$, find the dual basis $\\{f_1, f_2\\}$ satisfying $f_i(\\mathbf{v}_j) = \\delta_{ij}$.',
+      steps: [
+        {
+          label: 'Understand the dual basis condition',
+          strategy: 'The dual basis vectors $f_i$ are linear functionals (row vectors) such that $f_i(\\mathbf{v}_j) = \\delta_{ij}$ — $f_i$ "reads off" the $i$-th coordinate in the $\\mathcal{B}$-basis.',
+          explanation: 'In $\\mathbb{R}^n$, a linear functional is a row vector. So $f_i = \\mathbf{w}_i^\\top$ for some $\\mathbf{w}_i$. The condition $\\mathbf{w}_i^\\top\\mathbf{v}_j=\\delta_{ij}$ means $P^\\top W = I$ where $P=[\\mathbf{v}_1,\\mathbf{v}_2]$ and $W=[\\mathbf{w}_1,\\mathbf{w}_2]$.',
+          math: 'f_i(\\mathbf{v}_j) = \\delta_{ij} \\Leftrightarrow W = (P^\\top)^{-1} = (P^{-1})^\\top',
+        },
+        {
+          label: 'Invert $P^\\top$',
+          strategy: '$P = \\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}$. $P^{-1} = \\frac{1}{-2}\\begin{bmatrix}-1&-1\\\\-1&1\\end{bmatrix}$. Dual basis vectors are ROWS of $P^{-1}$.',
+          explanation: '$P^{-1} = \\frac{1}{2}\\begin{bmatrix}1&1\\\\1&-1\\end{bmatrix}$. Rows: $\\mathbf{w}_1^\\top = [1/2, 1/2]$ and $\\mathbf{w}_2^\\top = [1/2, -1/2]$.',
+          math: 'f_1 = \\frac{1}{2}[1,1],\\quad f_2 = \\frac{1}{2}[1,-1]',
+        },
+        {
+          label: 'Verify the dual basis conditions',
+          strategy: 'Check all four: $f_1(\\mathbf{v}_1)=1$, $f_1(\\mathbf{v}_2)=0$, $f_2(\\mathbf{v}_1)=0$, $f_2(\\mathbf{v}_2)=1$.',
+          explanation: '$f_1(\\mathbf{v}_1) = \\frac{1}{2}(1+1)=1$ ✓. $f_1(\\mathbf{v}_2) = \\frac{1}{2}(1-1)=0$ ✓. $f_2(\\mathbf{v}_1) = \\frac{1}{2}(1-1)=0$ ✓. $f_2(\\mathbf{v}_2) = \\frac{1}{2}(1+1)=1$ ✓.',
+          math: 'f_i(\\mathbf{v}_j) = \\delta_{ij} \\checkmark',
+          gotcha: 'The dual basis is NOT the same as the original basis. For a non-orthogonal basis $\\mathcal{B}$, the dual basis is NOT the result of just normalizing the primal vectors. They coincide ONLY when $\\mathcal{B}$ is orthonormal.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la10-001-riesz-representation',
+      title: 'Riesz Representation: Every Linear Functional Is a Dot Product',
+      prereqs: ['Inner product', 'Linear functionals', 'Cauchy-Schwarz'],
+      problem: 'Find the vector $\\mathbf{v}$ such that $f(\\mathbf{x}) = 3x_1 - 2x_2 + x_3 = \\langle \\mathbf{v}, \\mathbf{x}\\rangle$ for the standard inner product on $\\mathbb{R}^3$.',
+      steps: [
+        {
+          label: 'Apply the Riesz representation theorem',
+          strategy: 'In a Hilbert space with inner product $\\langle\\cdot,\\cdot\\rangle$: every continuous linear functional $f$ has a unique "representer" $\\mathbf{v}$ with $f(\\mathbf{x}) = \\langle \\mathbf{v},\\mathbf{x}\\rangle$.',
+          explanation: 'For $\\mathbb{R}^n$ with standard dot product, the representer is exactly the coefficient vector of $f$: $f(\\mathbf{x}) = a_1x_1+\\cdots+a_nx_n = [a_1,\\ldots,a_n]\\cdot\\mathbf{x}$.',
+          math: 'f(\\mathbf{x}) = 3x_1-2x_2+x_3 \\Rightarrow \\mathbf{v} = [3,-2,1]^\\top',
+        },
+        {
+          label: 'Verify: $\\langle [3,-2,1]^\\top, \\mathbf{x}\\rangle = f(\\mathbf{x})$',
+          strategy: 'Standard dot product: $\\langle\\mathbf{v},\\mathbf{x}\\rangle = 3x_1+(-2)x_2+1\\cdot x_3 = f(\\mathbf{x})$ ✓.',
+          explanation: 'The dual space $V^*$ and the space $V$ are "naturally identified" via the inner product. This is why we rarely distinguish row vectors (functionals) from column vectors (elements) in $\\mathbb{R}^n$.',
+          math: '\\langle[3,-2,1]^\\top,\\mathbf{x}\\rangle = 3x_1-2x_2+x_3 = f(\\mathbf{x})\\checkmark',
+          gotcha: 'The Riesz identification is inner-product-dependent. Change the inner product and the representer changes. In general Hilbert spaces (e.g., $L^2$), the representer is an element of the function space, not a finite list of numbers.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la10-001-1',

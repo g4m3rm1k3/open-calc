@@ -322,6 +322,64 @@ disp(['sum c_k^2 = ', num2str(sum(c.^2))])
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la10-005-hilbert-vs-banach',
+      title: 'Hilbert vs Banach: When the Inner Product Is Missing',
+      prereqs: ['Norms', 'Inner products', 'Completeness'],
+      problem: 'Show that $L^1([0,1])$ (Banach, not Hilbert) and $L^2([0,1])$ (Hilbert) behave differently with respect to orthogonality and projection.',
+      steps: [
+        {
+          label: 'Hilbert space: inner product enables orthogonal projection',
+          strategy: 'In $L^2$: $\\langle f, g\\rangle = \\int_0^1 f(x)g(x)\\,dx$. Orthogonality, projection, ONB expansions all work.',
+          explanation: 'Projection of $f$ onto a closed subspace $W \\subset L^2$: unique closest element $P_W f \\in W$ satisfying $f - P_W f \\perp W$. Fourier series is the prototype: project onto $\\text{span}\\{\\sin(n\\pi x)\\}$.',
+          math: '\\|f - P_W f\\| \\leq \\|f - g\\|\\; \\forall g \\in W \\quad (L^2)',
+        },
+        {
+          label: 'Banach space: best approximation still exists, but may not be unique',
+          strategy: 'In $L^1$: no inner product → no orthogonal projection formula. Best approximation still exists (Banach spaces are complete), but uniqueness requires strict convexity.',
+          explanation: '$L^1$ has the unit ball $\\{f : \\int|f|\\leq1\\}$ — a flat-faced polyhedron in finite dimensions. For a point near a flat face, multiple closest points can exist. $L^1$ optimization arises in compressed sensing (sparse signal recovery).',
+          math: '\\min_{g\\in W}\\|f-g\\|_1 \\text{ may have multiple solutions}',
+          gotcha: 'The parallelogram law $\\|u+v\\|^2+\\|u-v\\|^2=2(\\|u\\|^2+\\|v\\|^2)$ holds in every Hilbert space — and ONLY in Hilbert spaces. If a Banach space satisfies the parallelogram law, it must be a Hilbert space. $L^1$ does not satisfy it, confirming it is not a Hilbert space.',
+        },
+        {
+          label: 'The Riesz-Fischer theorem: $L^2$ is complete',
+          strategy: 'Completeness means every Cauchy sequence converges. This is the difference between $\\mathbb{Q}$ (not complete) and $\\mathbb{R}$ (complete).',
+          explanation: 'The Riesz-Fischer theorem proves $L^2$ is complete: if $\\int|f_n-f_m|^2\\to0$, then there exists $f\\in L^2$ with $\\int|f_n-f|^2\\to0$. This is NON-TRIVIAL — the limit function $f$ exists as an $L^2$ function even if pointwise convergence fails.',
+          math: '\\|f_n-f_m\\|_2\\to0 \\Rightarrow \\exists f\\in L^2:\\|f_n-f\\|_2\\to0',
+        },
+      ],
+    },
+    {
+      id: 'wt-la10-005-fourier-hilbert',
+      title: 'Fourier Series as an ONB Expansion in $L^2$',
+      prereqs: ['Hilbert space', 'ONB', 'Fourier series'],
+      problem: 'Explain why Fourier series $f(x) = \\sum_{n=-\\infty}^\\infty c_n e^{inx}$ is an ONB expansion in $L^2([-\\pi,\\pi])$ and compute $c_n$ for $f(x) = x$.',
+      steps: [
+        {
+          label: 'The functions $e_n(x) = e^{inx}/\\sqrt{2\\pi}$ form an ONB for $L^2([-\\pi,\\pi])$',
+          strategy: 'Check orthonormality: $\\langle e_m, e_n\\rangle = \\frac{1}{2\\pi}\\int_{-\\pi}^\\pi e^{-imx}e^{inx}dx = \\delta_{mn}$.',
+          explanation: '$\\int_{-\\pi}^\\pi e^{i(n-m)x}dx = \\begin{cases}2\\pi & n=m \\\\ 0 & n\\neq m\\end{cases}$ (geometric series sum = 0 for $n\\neq m$). So $\\{e_n\\}$ is orthonormal.',
+          math: '\\langle e_m, e_n\\rangle = \\delta_{mn} \\checkmark',
+        },
+        {
+          label: 'Compute Fourier coefficients of $f(x)=x$ as inner products',
+          strategy: '$c_n = \\langle f, e_n\\rangle = \\frac{1}{2\\pi}\\int_{-\\pi}^\\pi x e^{-inx}dx$ for $n\\neq 0$.',
+          explanation: 'Integrate by parts: $c_n = \\frac{1}{2\\pi}\\left[\\frac{xe^{-inx}}{-in}\\right]_{-\\pi}^\\pi - \\frac{1}{2\\pi}\\int\\frac{e^{-inx}}{-in}dx$. Result: $c_n = \\frac{(-1)^n i}{n}$ for $n\\neq0$; $c_0=0$ (odd function).',
+          math: 'c_n = \\frac{(-1)^n i}{n},\\quad c_0=0',
+        },
+        {
+          label: 'Parseval\'s theorem: $\\sum_n|c_n|^2 = \\|f\\|^2$',
+          strategy: 'In a Hilbert space, the ONB expansion preserves the norm: $\\|f\\|^2 = \\sum_n |\\langle f, e_n\\rangle|^2$.',
+          explanation: '$\\|x\\|^2 = \\int_{-\\pi}^\\pi x^2 dx = 2\\pi^3/3$. Parseval: $\\sum_{n\\neq0}\\frac{1}{n^2} = \\frac{\\pi^2}{3}$ (the famous Basel problem, $\\sum_{n=1}^\\infty 1/n^2 = \\pi^2/6$) ✓.',
+          math: '\\sum_{n\\neq0}\\frac{1}{n^2} = \\frac{\\pi^2}{3} \\Rightarrow \\sum_{n=1}^\\infty\\frac{1}{n^2}=\\frac{\\pi^2}{6} \\checkmark',
+          gotcha: 'Parseval\'s theorem holds with equality ONLY in a Hilbert space with a complete ONB. If the ONB is incomplete (some directions missing), you get $\\sum|c_n|^2 \\leq \\|f\\|^2$ — the Bessel inequality.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la10-005-1',

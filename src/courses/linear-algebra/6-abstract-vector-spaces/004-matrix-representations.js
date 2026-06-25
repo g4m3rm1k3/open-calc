@@ -319,6 +319,58 @@ print("Same map, different basis — det and tr preserved:",
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la6-004-matrix-of-derivative',
+      title: 'Building the Matrix of Differentiation in $\\mathcal{P}_2$',
+      prereqs: ['Basis', 'Coordinates', 'Linear transformations'],
+      problem: 'Find the matrix $[D]_\\mathcal{B}$ representing differentiation $D(p) = p\'$ in the standard basis $\\mathcal{B} = \\{1, x, x^2\\}$ of $\\mathcal{P}_2$.',
+      steps: [
+        {
+          label: 'Apply $D$ to each basis vector and write the result in coordinates',
+          strategy: 'The $j$-th column of the matrix is the coordinate vector of $T(\\mathbf{b}_j)$ in the basis $\\mathcal{B}$.',
+          explanation: '$D(1) = 0 = 0\\cdot1+0\\cdot x+0\\cdot x^2 \\to [0,0,0]^\\top$. $D(x) = 1 = 1\\cdot1+0\\cdot x+0\\cdot x^2 \\to [1,0,0]^\\top$. $D(x^2) = 2x = 0\\cdot1+2\\cdot x+0\\cdot x^2 \\to [0,2,0]^\\top$.',
+          math: 'D(1)=0,\\quad D(x)=1,\\quad D(x^2)=2x',
+        },
+        {
+          label: 'Assemble the columns into the matrix',
+          strategy: 'Columns are the coordinate vectors from left to right.',
+          explanation: '$[D]_\\mathcal{B} = \\begin{bmatrix}0&1&0\\\\0&0&2\\\\0&0&0\\end{bmatrix}$ — an upper-shift matrix.',
+          math: '[D]_\\mathcal{B} = \\begin{bmatrix}0&1&0\\\\0&0&2\\\\0&0&0\\end{bmatrix}',
+        },
+        {
+          label: 'Verify by applying to $p = 3+2x+x^2$',
+          strategy: 'Convert $p$ to coordinates, multiply by the matrix, convert back.',
+          explanation: '$[p]_\\mathcal{B} = [3,2,1]^\\top$. $[D]_\\mathcal{B}[p]_\\mathcal{B} = [2,2,0]^\\top \\to 2+2x = p\'(x)$ ✓.',
+          math: '[D]_\\mathcal{B}\\begin{bmatrix}3\\\\2\\\\1\\end{bmatrix} = \\begin{bmatrix}2\\\\2\\\\0\\end{bmatrix} \\leftrightarrow 2+2x \\checkmark',
+          gotcha: 'The matrix depends on the choice of basis. A different ordering of the basis vectors gives a different (but equivalent) matrix. The transformation $D$ is basis-independent; its matrix representation is not.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la6-004-matrix-composition',
+      title: 'Composition of Transformations = Matrix Multiplication',
+      prereqs: ['Matrix representations', 'Function composition'],
+      problem: 'Using the matrix $[D]_\\mathcal{B}$ from the previous walkthrough, find the matrix of $D^2$ (differentiate twice) and verify.',
+      steps: [
+        {
+          label: 'Compute $(\\[D]_\\mathcal{B})^2$',
+          strategy: '$D^2 = D \\circ D$, so $[D^2]_\\mathcal{B} = ([D]_\\mathcal{B})^2$. Composition of transformations = product of their matrices.',
+          explanation: '$([D]_\\mathcal{B})^2 = \\begin{bmatrix}0&1&0\\\\0&0&2\\\\0&0&0\\end{bmatrix}^2 = \\begin{bmatrix}0&0&2\\\\0&0&0\\\\0&0&0\\end{bmatrix}$.',
+          math: '[D^2]_\\mathcal{B} = \\begin{bmatrix}0&0&2\\\\0&0&0\\\\0&0&0\\end{bmatrix}',
+        },
+        {
+          label: 'Verify: $D^2(3+2x+x^2) = 2$',
+          strategy: 'Apply $[D^2]$ to the coordinate vector of $3+2x+x^2$ and interpret.',
+          explanation: '$[D^2]_\\mathcal{B}[3,2,1]^\\top = [2,0,0]^\\top \\to 2 \\cdot 1 = 2$ ✓. And directly: $(3+2x+x^2)'' = 2$ ✓.',
+          math: '[D^2][3,2,1]^\\top = [2,0,0]^\\top \\leftrightarrow 2 \\checkmark',
+          gotcha: '$[D^3]_\\mathcal{B} = ([D]_\\mathcal{B})^3 = 0$ (zero matrix) — differentiating a degree-2 polynomial three times gives 0. Algebraically: $[D]_\\mathcal{B}$ is nilpotent.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la6-004-1',

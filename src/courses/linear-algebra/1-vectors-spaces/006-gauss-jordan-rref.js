@@ -599,6 +599,100 @@ A = np.array([
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la1-006-full-rref',
+      title: 'Full RREF — Forward Pass Then Backward Pass',
+      prereqs: ['Augmented matrices', 'Row echelon form'],
+      problem: 'Solve the system by reducing to RREF: $x + y + z = 6$, $2x - y + z = 3$, $x + 2y - z = 4$.',
+      steps: [
+        {
+          label: 'Write the augmented matrix',
+          strategy: 'Drop the variables and work entirely with numbers — the structure of the solution is encoded in the matrix.',
+          explanation: 'Each equation becomes a row. The vertical bar separates coefficients (left) from constants (right).',
+          math: '\\begin{bmatrix}1&1&1&|&6\\\\2&-1&1&|&3\\\\1&2&-1&|&4\\end{bmatrix}',
+        },
+        {
+          label: 'Forward pass: eliminate entries below pivot in column 1',
+          strategy: 'Use row operations to create zeros below the leading 1 in column 1.',
+          explanation: '$R_2 \\leftarrow R_2 - 2R_1$: $(0, -3, -1, -9)$. $R_3 \\leftarrow R_3 - R_1$: $(0, 1, -2, -2)$.',
+          math: '\\begin{bmatrix}1&1&1&|&6\\\\0&-3&-1&|&-9\\\\0&1&-2&|&-2\\end{bmatrix}',
+        },
+        {
+          label: 'Swap rows 2 and 3 to get a nicer pivot',
+          strategy: 'The leading 1 in what is now row 3 is simpler — swap to avoid fractions.',
+          explanation: '$R_2 \\leftrightarrow R_3$ puts the row with leading 1 on top.',
+          math: '\\begin{bmatrix}1&1&1&|&6\\\\0&1&-2&|&-2\\\\0&-3&-1&|&-9\\end{bmatrix}',
+        },
+        {
+          label: 'Forward pass: eliminate below pivot in column 2',
+          strategy: 'Use the leading 1 in row 2 to clear column 2 below it.',
+          explanation: '$R_3 \\leftarrow R_3 + 3R_2$: $(0+0, -3+3, -1-6, -9-6) = (0, 0, -7, -15)$.',
+          math: '\\begin{bmatrix}1&1&1&|&6\\\\0&1&-2&|&-2\\\\0&0&-7&|&-15\\end{bmatrix}',
+        },
+        {
+          label: 'Scale row 3 to create the third pivot',
+          strategy: 'Divide row 3 by $-7$ so the pivot is 1.',
+          explanation: '$R_3 \\leftarrow R_3/(-7)$: $(0, 0, 1, 15/7)$. Now read off $z = 15/7$ directly.',
+          math: '\\begin{bmatrix}1&1&1&|&6\\\\0&1&-2&|&-2\\\\0&0&1&|&15/7\\end{bmatrix}',
+        },
+        {
+          label: 'Backward pass: eliminate ABOVE each pivot (this is the "Jordan" in Gauss-Jordan)',
+          strategy: 'Go back up and zero out every entry above each pivot column.',
+          explanation: 'Using $R_3$ to clear column 3: $R_2 \\leftarrow R_2 + 2R_3$: $(0, 1, 0, -2+30/7) = (0,1,0,16/7)$. $R_1 \\leftarrow R_1 - R_3$: $(1,1,0,6-15/7) = (1,1,0,27/7)$. Then using $R_2$ to clear column 2 of $R_1$: $R_1 \\leftarrow R_1 - R_2$: $(1,0,0,27/7-16/7) = (1,0,0,11/7)$.',
+          math: '\\begin{bmatrix}1&0&0&|&11/7\\\\0&1&0&|&16/7\\\\0&0&1&|&15/7\\end{bmatrix}',
+          gotcha: 'Gauss (forward only) gets REF; Gauss-Jordan (forward + backward) gets RREF. RREF has 1s on the diagonal and 0s EVERYWHERE else in pivot columns.',
+        },
+        {
+          label: 'Read off the solution directly',
+          strategy: 'In RREF, each pivot row reads $x_i = $ constant with no further algebra.',
+          explanation: '$x = 11/7$, $y = 16/7$, $z = 15/7$. Verify: $11/7 + 16/7 + 15/7 = 42/7 = 6$ ✓.',
+          math: 'x = \\tfrac{11}{7},\\; y = \\tfrac{16}{7},\\; z = \\tfrac{15}{7}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la1-006-free-variable',
+      title: 'Infinitely Many Solutions — Reading the Free Variable from RREF',
+      prereqs: ['RREF', 'Pivot columns vs. free columns'],
+      problem: 'Find all solutions to: $x + 2y + 3z = 9$ and $2x + 5y + 8z = 23$.',
+      steps: [
+        {
+          label: 'Set up and begin row reduction',
+          strategy: 'Start with the augmented matrix and apply the forward pass.',
+          explanation: 'Two equations, three unknowns — expect a free variable. The system is underdetermined.',
+          math: '\\begin{bmatrix}1&2&3&|&9\\\\2&5&8&|&23\\end{bmatrix} \\xrightarrow{R_2-2R_1} \\begin{bmatrix}1&2&3&|&9\\\\0&1&2&|&5\\end{bmatrix}',
+        },
+        {
+          label: 'Backward pass: clear column 2 above the second pivot',
+          strategy: 'Apply $R_1 \\leftarrow R_1 - 2R_2$ to get a 0 above the pivot in column 2.',
+          explanation: '$R_1 \\leftarrow R_1 - 2R_2$: $(1-0, 2-2, 3-4, 9-10) = (1, 0, -1, -1)$.',
+          math: '\\begin{bmatrix}1&0&-1&|&-1\\\\0&1&2&|&5\\end{bmatrix}',
+        },
+        {
+          label: 'Identify pivot columns and free columns',
+          strategy: 'Pivot columns (containing a leading 1) give basic variables; all other columns are free variables.',
+          explanation: 'Pivots are in columns 1 ($x$) and 2 ($y$). Column 3 ($z$) has no pivot — it is the free variable. There is no row that forces $z$ to a specific value, so $z$ can be anything. Set $z = t$ where $t \\in \\mathbb{R}$.',
+          math: 'z = t \\;\\; (\\text{free})',
+          gotcha: 'Free variables come from columns with NO leading 1. Count the pivots — with $n$ unknowns and $r$ pivots, there are $n - r$ free variables.',
+        },
+        {
+          label: 'Express basic variables in terms of the free variable',
+          strategy: 'Solve for each basic variable using the free variable as a parameter.',
+          explanation: 'From row 2: $y + 2t = 5 \\Rightarrow y = 5 - 2t$. From row 1: $x - t = -1 \\Rightarrow x = -1 + t$.',
+          math: 'x = -1 + t, \\quad y = 5 - 2t, \\quad z = t',
+        },
+        {
+          label: 'Write the general solution as a vector sum',
+          strategy: 'Separate the constant part from the free-variable part to see the solution geometry.',
+          explanation: 'Every solution looks like a particular solution $(-1, 5, 0)$ plus a multiple of the direction vector $(1, -2, 1)$. This is a **line** in 3D space — infinitely many solutions, but they all lie on a single straight line.',
+          math: '\\begin{bmatrix}x\\\\y\\\\z\\end{bmatrix} = \\begin{bmatrix}-1\\\\5\\\\0\\end{bmatrix} + t\\begin{bmatrix}1\\\\-2\\\\1\\end{bmatrix}, \\quad t \\in \\mathbb{R}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'la1-006-ch3',

@@ -305,6 +305,58 @@ residual
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la10-002-tensor-outer-product',
+      title: 'The Outer Product as a Rank-1 Tensor',
+      prereqs: ['Vectors', 'Matrix multiplication', 'Rank'],
+      problem: 'Compute $\\mathbf{u}\\otimes\\mathbf{v}$ for $\\mathbf{u}=[1,2]^\\top$ and $\\mathbf{v}=[3,4]^\\top$, and explain how this relates to the outer product.',
+      steps: [
+        {
+          label: 'The tensor product $\\mathbf{u}\\otimes\\mathbf{v}$ as a matrix',
+          strategy: 'For two vectors $\\mathbf{u}\\in\\mathbb{R}^m$ and $\\mathbf{v}\\in\\mathbb{R}^n$: $\\mathbf{u}\\otimes\\mathbf{v} = \\mathbf{u}\\mathbf{v}^\\top$ (outer product). Result is an $m\\times n$ matrix.',
+          explanation: '$\\mathbf{u}\\otimes\\mathbf{v} = \\mathbf{u}\\mathbf{v}^\\top = [1,2]^\\top[3,4] = \\begin{bmatrix}3&4\\\\6&8\\end{bmatrix}$.',
+          math: '\\mathbf{u}\\otimes\\mathbf{v} = \\begin{bmatrix}1\\cdot3&1\\cdot4\\\\2\\cdot3&2\\cdot4\\end{bmatrix} = \\begin{bmatrix}3&4\\\\6&8\\end{bmatrix}',
+        },
+        {
+          label: 'Key property: always rank 1',
+          strategy: '$\\mathbf{u}\\mathbf{v}^\\top$ has rank 1 — all rows are multiples of $\\mathbf{v}^\\top$, all columns are multiples of $\\mathbf{u}$.',
+          explanation: '$\\det = 3\\cdot8-4\\cdot6=24-24=0$ ✓ — singular, rank 1. Any matrix $A$ can be written as a sum of rank-1 tensors: $A = \\sum_i \\sigma_i \\mathbf{u}_i\\otimes\\mathbf{v}_i$ (this is the SVD!). Truncating the sum gives low-rank approximation.',
+          math: '\\text{rank}(\\mathbf{u}\\otimes\\mathbf{v})=1,\\quad A=\\sum_i\\sigma_i\\mathbf{u}_i\\mathbf{v}_i^\\top',
+          gotcha: 'NOT every matrix is a single tensor product (rank-1). $\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}$ has rank 2 and cannot be written as $\\mathbf{u}\\mathbf{v}^\\top$ for any $\\mathbf{u},\\mathbf{v}$.',
+        },
+        {
+          label: 'Tensors of higher order: $A\\otimes B$ (Kronecker product)',
+          strategy: 'The Kronecker product $A\\otimes B$ stacks scaled copies of $B$: block matrix with $(A\\otimes B)_{ij} = a_{ij}B$.',
+          explanation: 'For 2×2 matrices: $A\\otimes B$ is 4×4 with blocks $a_{ij}B$. Used in quantum mechanics, PDEs on product grids, and the vectorization of matrix equations ($AXB = C \\leftrightarrow (B^\\top\\otimes A)\\text{vec}(X)=\\text{vec}(C)$).',
+          math: 'A\\otimes B = \\begin{bmatrix}a_{11}B&a_{12}B\\\\a_{21}B&a_{22}B\\end{bmatrix}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la10-002-vec-operator',
+      title: 'The Vec Operator: Turning Matrix Equations into Linear Systems',
+      prereqs: ['Kronecker product', 'Matrix equations'],
+      problem: 'Use $\\text{vec}$ and the Kronecker product to convert the Sylvester equation $AX + XB = C$ into a standard linear system.',
+      steps: [
+        {
+          label: 'The vec operator stacks columns',
+          strategy: '$\\text{vec}(X)$ stacks the columns of $X$ into a single column vector.',
+          explanation: 'For $X = \\begin{bmatrix}x_{11}&x_{12}\\\\x_{21}&x_{22}\\end{bmatrix}$: $\\text{vec}(X) = [x_{11},x_{21},x_{12},x_{22}]^\\top$ (column 1 then column 2).',
+          math: '\\text{vec}\\begin{bmatrix}x_{11}&x_{12}\\\\x_{21}&x_{22}\\end{bmatrix} = [x_{11},x_{21},x_{12},x_{22}]^\\top',
+        },
+        {
+          label: 'Key identities: $\\text{vec}(AXB) = (B^\\top\\otimes A)\\text{vec}(X)$',
+          strategy: 'This identity converts matrix multiplication into a Kronecker product. Apply it to each term of $AX+XB=C$.',
+          explanation: '$\\text{vec}(AX) = (I\\otimes A)\\text{vec}(X)$ and $\\text{vec}(XB) = (B^\\top\\otimes I)\\text{vec}(X)$. Adding: $(I\\otimes A + B^\\top\\otimes I)\\text{vec}(X) = \\text{vec}(C)$.',
+          math: '(I\\otimes A + B^\\top\\otimes I)\\,\\text{vec}(X) = \\text{vec}(C)',
+          gotcha: 'The resulting system is $n^2\\times n^2$ — much larger than the original $n\\times n$ equation. This is computationally expensive for large $n$. Dedicated Sylvester solvers (Bartels-Stewart algorithm) are $O(n^3)$ and much more efficient.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la10-002-1',

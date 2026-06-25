@@ -567,6 +567,87 @@ fprintf('Distance P1-P2 (machine coords): %.2f mm  (same -- offset cancels)\n', 
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la1-002-find-coefficients',
+      title: 'Find the Coefficients — Linear Combination in Reverse',
+      prereqs: ['Vector addition', 'Scalar multiplication', 'Solving 2×2 systems'],
+      problem: 'Express $\\mathbf{t} = \\begin{bmatrix}5\\\\1\\end{bmatrix}$ as a linear combination of $\\mathbf{u} = \\begin{bmatrix}1\\\\3\\end{bmatrix}$ and $\\mathbf{v} = \\begin{bmatrix}2\\\\-1\\end{bmatrix}$. Find scalars $c_1, c_2$ such that $c_1\\mathbf{u} + c_2\\mathbf{v} = \\mathbf{t}$.',
+      steps: [
+        {
+          label: 'Translate the vector equation into a system of scalar equations',
+          strategy: 'A vector equation is secretly two scalar equations — one for each component.',
+          explanation: 'Writing the combination component by component: the top row gives $1 \\cdot c_1 + 2 \\cdot c_2 = 5$, the bottom row gives $3 \\cdot c_1 + (-1) \\cdot c_2 = 1$. Every "express as a linear combination" problem immediately becomes a system of equations. The scalars $c_1$ and $c_2$ are the unknowns.',
+          math: 'c_1 + 2c_2 = 5 \\qquad 3c_1 - c_2 = 1',
+        },
+        {
+          label: 'Eliminate $c_2$ by scaling and adding equations',
+          strategy: 'Multiply the second equation by 2 so the $c_2$ terms cancel when added.',
+          explanation: 'Multiplying the second equation by 2 gives $6c_1 - 2c_2 = 2$. Adding to the first equation $(c_1 + 2c_2 = 5)$: the $c_2$ terms are $+2c_2$ and $-2c_2$, which sum to zero.',
+          math: '(c_1 + 2c_2) + (6c_1 - 2c_2) = 5 + 2 \\implies 7c_1 = 7',
+        },
+        {
+          label: 'Solve for $c_1$',
+          strategy: 'Divide both sides by the coefficient.',
+          explanation: '$7c_1 = 7$ gives $c_1 = 1$ immediately. Now we have one known.',
+          math: 'c_1 = 1',
+        },
+        {
+          label: 'Back-substitute to find $c_2$',
+          strategy: 'Plug the known value into the simpler original equation.',
+          explanation: 'Using the first equation: $1 + 2c_2 = 5 \\Rightarrow 2c_2 = 4 \\Rightarrow c_2 = 2$.',
+          math: 'c_2 = 2',
+        },
+        {
+          label: 'Verify by reconstructing $\\mathbf{t}$',
+          strategy: 'Always check: plug $c_1$ and $c_2$ back in and confirm the sum equals $\\mathbf{t}$.',
+          explanation: '$1 \\cdot [1,3]^\\top + 2 \\cdot [2,-1]^\\top = [1,3]^\\top + [4,-2]^\\top = [5,1]^\\top = \\mathbf{t}$ ✓. The verification also tells you that $(c_1, c_2) = (1, 2)$ ARE the coordinates of $\\mathbf{t}$ in the $\\{\\mathbf{u},\\mathbf{v}\\}$ basis — same point, different coordinate system.',
+          math: '1 \\cdot \\begin{bmatrix}1\\\\3\\end{bmatrix} + 2 \\cdot \\begin{bmatrix}2\\\\-1\\end{bmatrix} = \\begin{bmatrix}5\\\\1\\end{bmatrix} \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la1-002-span-test',
+      title: 'Span Membership Test — What Row Reduction Really Tells You',
+      prereqs: ['Linear combinations', 'Dependent vectors'],
+      problem: 'Is $\\mathbf{b} = \\begin{bmatrix}3\\\\-1\\end{bmatrix}$ in $\\mathrm{span}\\left\\{\\begin{bmatrix}1\\\\2\\end{bmatrix},\\, \\begin{bmatrix}-1\\\\-2\\end{bmatrix}\\right\\}$?',
+      steps: [
+        {
+          label: 'Inspect the spanning vectors before computing anything',
+          strategy: 'Two vectors that are scalar multiples of each other span only a line, not a plane.',
+          explanation: 'Look at $[1,2]^\\top$ and $[-1,-2]^\\top$. Notice: $[-1,-2]^\\top = (-1)\\cdot[1,2]^\\top$. They are parallel — they both point along the exact same line through the origin. Two parallel vectors cannot reach vectors off that line no matter how we scale and add them.',
+          math: '\\begin{bmatrix}-1\\\\-2\\end{bmatrix} = -1 \\cdot \\begin{bmatrix}1\\\\2\\end{bmatrix}',
+          gotcha: 'Having TWO vectors does not guarantee you can reach all of $\\mathbb{R}^2$. The vectors must point in genuinely different directions.',
+        },
+        {
+          label: 'Set up the membership equation',
+          strategy: 'Ask: do there exist $c_1, c_2$ such that the combination equals $\\mathbf{b}$?',
+          explanation: '$c_1[1,2]^\\top + c_2[-1,-2]^\\top = [3,-1]^\\top$. Writing component equations: $c_1 - c_2 = 3$ (top row) and $2c_1 - 2c_2 = -1$ (bottom row).',
+          math: 'c_1 - c_2 = 3 \\qquad 2c_1 - 2c_2 = -1',
+        },
+        {
+          label: 'Spot the contradiction',
+          strategy: 'An inconsistent system means the target is unreachable from those spanning vectors.',
+          explanation: 'Multiply the first equation by 2: $2c_1 - 2c_2 = 6$. But the second equation demands $2c_1 - 2c_2 = -1$. We have $6 = -1$ — a contradiction. No values of $c_1, c_2$ can satisfy both equations at once.',
+          math: '2(3) = 6 \\neq -1',
+        },
+        {
+          label: 'Conclude: $\\mathbf{b}$ is NOT in the span',
+          strategy: 'Inconsistency proves the target lies outside the span.',
+          explanation: '$[3,-1]^\\top$ is not a scalar multiple of $[1,2]^\\top$: the ratio test $-1/2 \\neq 3/1$ confirms they point in different directions. To reach $[3,-1]^\\top$ we would need a second independent direction, which a pair of parallel vectors cannot provide.',
+          math: '\\mathbf{b} \\notin \\mathrm{span}\\left\\{\\begin{bmatrix}1\\\\2\\end{bmatrix},\\begin{bmatrix}-1\\\\-2\\end{bmatrix}\\right\\}',
+        },
+        {
+          label: 'What would membership look like? Contrast with a vector that IS in the span.',
+          strategy: 'Solidify the concept by identifying vectors that DO satisfy the membership test.',
+          explanation: 'The vector $[2, 4]^\\top = 2 \\cdot [1,2]^\\top$ is in the span (with $c_1 = 2, c_2 = 0$). The entire span is the set of vectors of the form $[t, 2t]^\\top$ — a straight line through the origin. Our target $[3,-1]^\\top$ cannot have ratio $-1/3 = 2$ so it lies off that line.',
+          math: '\\mathrm{span} = \\left\\{t\\begin{bmatrix}1\\\\2\\end{bmatrix} : t \\in \\mathbb{R}\\right\\} = \\{[t,\\,2t]^\\top\\}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'la1-002-ch1',

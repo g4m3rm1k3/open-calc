@@ -321,6 +321,70 @@ for k in [1, 2, 3]:
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la4-009-eckart-young',
+      title: 'Best Rank-$k$ Approximation: Eckart-Young Theorem',
+      prereqs: ['SVD', 'Frobenius norm', 'Rank'],
+      problem: 'Find the best rank-2 approximation to $A = \\begin{bmatrix}3&0&0\\\\0&2&0\\\\0&0&1\\end{bmatrix}$ and compute the approximation error.',
+      steps: [
+        {
+          label: 'Identify the SVD of $A$',
+          strategy: 'For a diagonal matrix with positive entries, $U=V=I$ and singular values equal the diagonal entries (in decreasing order).',
+          explanation: '$A = I\\cdot\\begin{bmatrix}3&0&0\\\\0&2&0\\\\0&0&1\\end{bmatrix}\\cdot I^\\top$. Singular values: $\\sigma_1=3$, $\\sigma_2=2$, $\\sigma_3=1$.',
+          math: '\\sigma_1=3,\\;\\sigma_2=2,\\;\\sigma_3=1',
+        },
+        {
+          label: 'Form the rank-2 truncated SVD',
+          strategy: 'Keep the $k=2$ largest singular values; zero out the rest. $A_2 = \\sum_{i=1}^2 \\sigma_i\\mathbf{u}_i\\mathbf{v}_i^\\top$.',
+          explanation: 'With $U=V=I$: $A_2 = \\text{diag}(3,2,0)$. The smallest singular value $\\sigma_3=1$ and its corresponding directions are discarded.',
+          math: 'A_2 = \\begin{bmatrix}3&0&0\\\\0&2&0\\\\0&0&0\\end{bmatrix}',
+        },
+        {
+          label: 'Compute the approximation error',
+          strategy: 'Eckart-Young: the error in Frobenius norm equals $\\sqrt{\\sum_{i>k}\\sigma_i^2}$; in 2-norm it equals $\\sigma_{k+1}$.',
+          explanation: '$\\|A-A_2\\|_F = \\sqrt{\\sigma_3^2} = 1$. $\\|A-A_2\\|_2 = \\sigma_3 = 1$. No rank-2 matrix can do better.',
+          math: '\\|A-A_2\\|_F = 1,\\quad \\|A-A_2\\|_2 = 1',
+          gotcha: "Eckart-Young says this IS the best rank-2 approximation — no other rank-2 matrix is closer to $A$ in either norm. It's not just 'a good approximation'; it's provably optimal.",
+        },
+        {
+          label: 'Compute the information retained',
+          strategy: '$\\text{variance explained} = \\sum_{i=1}^k\\sigma_i^2 / \\sum_{i=1}^r\\sigma_i^2$.',
+          explanation: '$\\frac{\\sigma_1^2+\\sigma_2^2}{\\sigma_1^2+\\sigma_2^2+\\sigma_3^2} = \\frac{9+4}{9+4+1} = \\frac{13}{14} \\approx 93\\%$. The rank-2 approximation retains 93% of the "energy".',
+          math: '\\frac{13}{14} \\approx 93\\% \\text{ variance retained}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la4-009-image-compression-intuition',
+      title: 'Why Low-Rank Approximation Works: Structure vs Noise',
+      prereqs: ['Eckart-Young', 'Rank', 'Signal vs noise'],
+      problem: 'A data matrix has singular values $\\sigma_1=100$, $\\sigma_2=50$, $\\sigma_3=1$, $\\sigma_4=0.8$, $\\sigma_5=0.5$. Decide which rank captures the "signal" and which captures "noise".',
+      steps: [
+        {
+          label: 'Plot or inspect the singular value spectrum',
+          strategy: 'Look for a "gap" or "elbow" in the singular values. A large drop indicates where structured signal ends and noise begins.',
+          explanation: 'Here: $100 \\to 50$ (factor 2) then $50 \\to 1$ (factor 50) — a dramatic gap between $\\sigma_2$ and $\\sigma_3$. The first two singular values are dominant structure; the rest are noise.',
+          math: '100,\\; 50,\\; \\underbrace{1,\\; 0.8,\\; 0.5}_{\\text{noise floor}}',
+        },
+        {
+          label: 'Choose rank based on the gap',
+          strategy: 'Truncate at the gap: keep singular values above the noise floor, discard the rest.',
+          explanation: 'Rank-2 truncation: keep $\\sigma_1=100$, $\\sigma_2=50$. Variance explained: $(100^2+50^2)/(100^2+50^2+1^2+0.8^2+0.5^2) \\approx 99.99\\%$.',
+          math: '\\text{rank-2: }\\approx 99.99\\%\\text{ variance explained}',
+        },
+        {
+          label: 'Interpret the storage savings',
+          strategy: 'A rank-2 approximation of an $m\\times n$ matrix stores $2(m+n+1)$ numbers instead of $mn$.',
+          explanation: 'For a $1000\\times1000$ matrix: full storage = $10^6$ entries; rank-2 stores $2(1000+1000+1)=4002$ numbers — a 250× compression. The trade-off: $(100^2+50^2)$ vs $(mn-4002)$ entries discarded.',
+          math: '\\text{compression ratio: }\\frac{mn}{k(m+n+1)} = \\frac{10^6}{4002} \\approx 250\\times',
+          gotcha: 'Low-rank approximation assumes the matrix has low-rank structure (e.g., a few dominant patterns). A truly random matrix has no gap in singular values and cannot be compressed this way.',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la4-009-1',

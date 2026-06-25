@@ -308,6 +308,70 @@ var_explained
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la8-001-pca-steps',
+      title: 'PCA Step by Step: From Data to Principal Components',
+      prereqs: ['Covariance matrix', 'Eigenvalues', 'SVD'],
+      problem: 'Given centered data matrix $X = \\begin{bmatrix}1&2\\\\3&1\\\\-2&-1\\\\-2&-2\\end{bmatrix}$ (4 samples, 2 features), find the first principal component.',
+      steps: [
+        {
+          label: 'Verify the data is centered (mean = 0)',
+          strategy: 'PCA requires zero-mean data. Check column means.',
+          explanation: 'Column 1 mean: $(1+3-2-2)/4=0$ ✓. Column 2 mean: $(2+1-1-2)/4=0$ ✓. Already centered.',
+          math: '\\bar{x}_1=0,\\quad \\bar{x}_2=0 \\checkmark',
+        },
+        {
+          label: 'Compute the sample covariance matrix $C = X^\\top X/(n-1)$',
+          strategy: '$X^\\top X$ sums the outer products of all data points. Dividing by $n-1$ gives unbiased covariance.',
+          explanation: '$X^\\top X = \\begin{bmatrix}1^2+3^2+(-2)^2+(-2)^2&1\\cdot2+3\\cdot1+(-2)(-1)+(-2)(-2)\\\\\\cdots&4+1+1+4\\end{bmatrix} = \\begin{bmatrix}18&9\\\\9&10\\end{bmatrix}$. $C = X^\\top X/3 = \\begin{bmatrix}6&3\\\\3&10/3\\end{bmatrix}$.',
+          math: 'C = \\frac{X^\\top X}{n-1} = \\frac{1}{3}\\begin{bmatrix}18&9\\\\9&10\\end{bmatrix}',
+        },
+        {
+          label: 'Find the largest eigenvalue and eigenvector of $C$',
+          strategy: 'The first principal component is the eigenvector of $C$ with the largest eigenvalue.',
+          explanation: '$C$ has eigenvalues $\\lambda_1 \\approx 7.3$ and $\\lambda_2 \\approx 1.7$. The corresponding eigenvector $\\mathbf{v}_1 \\approx [0.89,0.45]^\\top$ is the first principal component direction.',
+          math: '\\text{PC1} \\approx \\begin{bmatrix}0.89\\\\0.45\\end{bmatrix},\\quad \\lambda_1\\approx 7.3',
+        },
+        {
+          label: 'Project data onto PC1',
+          strategy: 'The 1D representation of the data is $\\mathbf{z} = X\\mathbf{v}_1$ — each sample\'s coordinate along PC1.',
+          explanation: '$\\mathbf{z} = X\\mathbf{v}_1$ gives a 4×1 vector of scores. Variance explained: $\\lambda_1/(\\lambda_1+\\lambda_2) = 7.3/9 \\approx 81\\%$ — one component captures 81% of the variance.',
+          math: '\\text{variance explained} = \\frac{\\lambda_1}{\\lambda_1+\\lambda_2} \\approx 81\\%',
+          gotcha: 'PCA finds the directions of maximum VARIANCE, not the directions most relevant to any outcome. High variance does not mean high predictive power. For supervised tasks, use supervised dimensionality reduction (LDA, etc.).',
+        },
+      ],
+    },
+    {
+      id: 'wt-la8-001-choose-k',
+      title: 'Choosing the Number of Components: Variance Threshold and Scree Plot',
+      prereqs: ['PCA', 'Cumulative sum'],
+      problem: 'A dataset has singular values $\\sigma = [10, 6, 3, 1, 0.5]$. How many components are needed to explain at least 90% of variance?',
+      steps: [
+        {
+          label: 'Convert singular values to variance (eigenvalues of covariance)',
+          strategy: '$\\lambda_i = \\sigma_i^2 / (n-1)$. For the ratio, only the $\\sigma_i^2$ proportions matter.',
+          explanation: '$\\sigma^2 = [100, 36, 9, 1, 0.25]$. Total = 146.25.',
+          math: '\\sigma_i^2: 100,\\;36,\\;9,\\;1,\\;0.25 \\quad \\text{total}=146.25',
+        },
+        {
+          label: 'Compute cumulative explained variance',
+          strategy: 'Sum $\\sigma_i^2$ left to right and divide by total at each step.',
+          explanation: 'After 1: $100/146.25\\approx68.4\\%$. After 2: $136/146.25\\approx93.0\\%$. 2 components exceed the 90% threshold.',
+          math: 'k=1:\\;68.4\\%,\\quad k=2:\\;93.0\\% \\geq 90\\% \\Rightarrow k^*=2',
+          gotcha: 'The 90% threshold is a heuristic, not a law. In some domains (genomics, images) 95% or 99% is standard. In others (exploratory analysis), even 60% may be acceptable. Always state your threshold explicitly.',
+        },
+        {
+          label: 'Scree plot interpretation',
+          strategy: 'Look for the "elbow" where the curve bends sharply — the point where additional components add little variance.',
+          explanation: 'After component 2, the curve flattens ($9+1+0.25$ remaining vs $136$ already captured). The elbow at $k=2$ confirms the variance threshold choice.',
+          math: '\\text{elbow at }k=2 \\Rightarrow \\text{2 components}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la8-001-1',

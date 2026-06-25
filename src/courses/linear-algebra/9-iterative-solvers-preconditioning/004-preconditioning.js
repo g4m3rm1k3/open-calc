@@ -357,6 +357,70 @@ kappa_prec = eig_prec(end)/eig_prec(1)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la9-004-preconditioner-effect',
+      title: 'How a Preconditioner Changes the Condition Number',
+      prereqs: ['Condition number', 'CG convergence', 'Matrix inverse'],
+      problem: 'System $A = \\begin{bmatrix}10&0\\\\0&1\\end{bmatrix}$. Compare solving $A\\mathbf{x}=\\mathbf{b}$ directly vs with Jacobi preconditioner $M = D = \\begin{bmatrix}10&0\\\\0&1\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Compute $\\kappa(A)$ before preconditioning',
+          strategy: '$\\kappa_2(A) = \\sigma_{\\max}/\\sigma_{\\min} = \\lambda_{\\max}/\\lambda_{\\min}$ for SPD.',
+          explanation: 'Eigenvalues: 10 and 1. $\\kappa(A) = 10$. CG convergence rate: $\\left(\\frac{\\sqrt{\\kappa}-1}{\\sqrt{\\kappa}+1}\\right)^2 = \\left(\\frac{\\sqrt{10}-1}{\\sqrt{10}+1}\\right)^2 \\approx 0.27^2\\approx0.07$.',
+          math: '\\kappa(A)=10,\\quad \\text{CG rate}\\approx0.07',
+        },
+        {
+          label: 'Form the preconditioned system $M^{-1}A\\mathbf{x}=M^{-1}\\mathbf{b}$',
+          strategy: 'Left preconditioning: replace $A$ with $M^{-1}A$. Convergence depends on $\\kappa(M^{-1}A)$.',
+          explanation: '$M^{-1} = D^{-1} = \\begin{bmatrix}1/10&0\\\\0&1\\end{bmatrix}$. $M^{-1}A = \\begin{bmatrix}1&0\\\\0&1\\end{bmatrix} = I$. $\\kappa(M^{-1}A) = 1$.',
+          math: 'M^{-1}A = I \\Rightarrow \\kappa(M^{-1}A)=1',
+          gotcha: 'Jacobi preconditioning ($M=D$) gives $\\kappa=1$ ONLY when $A$ is diagonal. For general SPD matrices, Jacobi reduces $\\kappa$ but rarely to 1. Its value is cheapness, not perfection.',
+        },
+        {
+          label: 'Interpret: $\\kappa=1$ means CG converges in 1 step',
+          strategy: 'CG on a system with $\\kappa=1$ has all eigenvalues equal to 1 — one Krylov step spans the solution.',
+          explanation: '$M^{-1}A=I$ means $A\\mathbf{x}=\\mathbf{b}$ is just $I\\mathbf{x}=\\mathbf{b}$, i.e., $\\mathbf{x}=M^{-1}\\mathbf{b}$. In general, perfect preconditioning means $M^{-1}A \\approx I$ — equivalent to approximate inversion of $A$.',
+          math: '\\kappa(M^{-1}A)=1 \\Rightarrow \\text{1 CG step (exact solve)}',
+        },
+        {
+          label: 'The trade-off: cost of applying $M^{-1}$',
+          strategy: 'An ideal preconditioner has $M \\approx A$ (good condition reduction) but $M^{-1}\\mathbf{v}$ cheap (fast to solve). These two goals conflict.',
+          explanation: 'Hierarchy: Jacobi ($O(n)$, mild improvement) → ILU($O(n\\log n)$, good) → AMG ($O(n)$, excellent for PDEs) → $M=A$ (perfect but useless — solving $M^{-1}$ is as hard as solving $A$).',
+          math: 'M=A \\Rightarrow \\kappa=1\\text{ but }M^{-1}\\mathbf{v}\\text{ = original problem}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la9-004-incomplete-cholesky',
+      title: 'Incomplete Cholesky: A Practical Preconditioner for SPD Systems',
+      prereqs: ['Cholesky decomposition', 'Sparse matrices', 'Fill-in'],
+      problem: 'Describe how Incomplete Cholesky (IC(0)) builds a preconditioner without fill-in, and when it works well.',
+      steps: [
+        {
+          label: 'Complete Cholesky: $A = LL^\\top$ but with fill-in',
+          strategy: 'Cholesky introduces new non-zeros (fill-in) in $L$ beyond the sparsity pattern of $A$. For large sparse $A$, storing $L$ may be too expensive.',
+          explanation: 'For a 2D Poisson matrix ($n\\times n$ grid): $A$ has $O(n^2)$ entries; $L$ has $O(n^2\\log n)$ entries — 50% more fill even with optimal ordering.',
+          math: '\\text{Cholesky fill: }O(n^2\\log n) \\text{ vs }O(n^2)\\text{ for }A',
+        },
+        {
+          label: 'IC(0): perform Cholesky but DROP fill-in',
+          strategy: 'IC(0) uses the SAME sparsity pattern as $A$ for $L$. Whenever an entry would fill in outside the pattern, simply drop it.',
+          explanation: 'The result $\\tilde{L}$ satisfies $A \\approx \\tilde{L}\\tilde{L}^\\top$ — not exact, but close. Set $M = \\tilde{L}\\tilde{L}^\\top$ as the preconditioner.',
+          math: 'A \\approx \\tilde{L}\\tilde{L}^\\top \\Rightarrow M = \\tilde{L}\\tilde{L}^\\top',
+          gotcha: 'IC(0) is not guaranteed to exist (some pivot may be negative during the incomplete factorization). This happens when $A$ is poorly structured. In that case, use IC with a small diagonal shift: $A + \\alpha I$.',
+        },
+        {
+          label: 'When IC works well',
+          strategy: 'IC is effective when $A$ arises from elliptic PDEs (Poisson, diffusion). It reduces $\\kappa$ from $O(h^{-2})$ to $O(h^{-1})$ — squaring the condition number reduction.',
+          explanation: 'For 2D Poisson on an $n$-point grid: no preconditioner → $O(n)$ CG iterations; IC(0) → $O(\\sqrt{n})$ iterations; multigrid → $O(1)$ iterations (independent of $n$).',
+          math: '\\text{IC: }O(\\sqrt{n})\\text{ CG iters vs }O(n)\\text{ unpreconditioned}',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la9-004-1',

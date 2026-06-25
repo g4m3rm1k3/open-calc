@@ -353,6 +353,64 @@ norm(x_gmres - x_exact) / norm(x_exact)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la9-003-krylov-subspace',
+      title: 'Building the Krylov Subspace and Understanding Why GMRES Works',
+      prereqs: ['Matrix-vector products', 'Orthogonalization', 'Minimization'],
+      problem: 'For $A$ and initial residual $\\mathbf{r}_0$, explain what $K_3(A,\\mathbf{r}_0) = \\text{span}\\{\\mathbf{r}_0, A\\mathbf{r}_0, A^2\\mathbf{r}_0\\}$ represents and why GMRES minimizes the residual over it.',
+      steps: [
+        {
+          label: 'The Krylov subspace contains all reachable updates after $k$ matrix-vector products',
+          strategy: 'After $k$ matrix-vector products, any polynomial $p_{k-1}(A)\\mathbf{r}_0$ of degree $k-1$ in $A$ is reachable. $K_k$ is exactly this set.',
+          explanation: 'GMRES update: $\\mathbf{x}^{(k)} = \\mathbf{x}^{(0)} + \\delta$, where $\\delta \\in K_k(A,\\mathbf{r}_0)$. Each step adds one new direction (one matrix-vector product) to the search space.',
+          math: 'K_k(A,\\mathbf{r}_0) = \\text{span}\\{\\mathbf{r}_0, A\\mathbf{r}_0, A^2\\mathbf{r}_0,\\ldots,A^{k-1}\\mathbf{r}_0\\}',
+        },
+        {
+          label: 'GMRES minimizes $\\|\\mathbf{b}-A\\mathbf{x}^{(k)}\\|$ over $K_k$',
+          strategy: 'At each step, find the vector in $K_k$ that gives the smallest residual. This requires an orthonormal basis (Arnoldi process) and a least-squares solve.',
+          explanation: 'The Arnoldi process builds an orthonormal basis $Q_k$ for $K_k$ one vector at a time (modified Gram-Schmidt on the Krylov vectors). The minimization problem then reduces to a small $(k+1)\\times k$ least-squares problem.',
+          math: '\\min_{\\mathbf{x}\\in\\mathbf{x}_0+K_k} \\|\\mathbf{b}-A\\mathbf{x}\\|',
+        },
+        {
+          label: 'Why GMRES terminates in at most $n$ steps',
+          strategy: '$K_n = \\mathbb{R}^n$ for generic $A$ (after $n$ steps the subspace spans everything). So the minimum over $K_n$ is the exact solution.',
+          explanation: 'In practice: if $A$ has only $m < n$ distinct eigenvalues, the minimal polynomial has degree $m$ and GMRES terminates in exactly $m$ steps. Preconditioning clusters eigenvalues to reduce $m$.',
+          math: 'K_n = \\mathbb{R}^n \\Rightarrow \\text{exact solution in }\\leq n\\text{ steps}',
+          gotcha: 'GMRES stores ALL previous Krylov vectors — memory grows as $O(nk)$ after $k$ steps. For large $k$, use GMRES(m): restart every $m$ steps, discarding old vectors. Restarting sacrifices the optimality guarantee.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la9-003-gmres-vs-cg',
+      title: 'When to Use GMRES vs Conjugate Gradient',
+      prereqs: ['CG', 'GMRES', 'Symmetric positive definite'],
+      problem: 'You have three systems: (a) $A$ SPD, (b) $A$ symmetric but indefinite, (c) $A$ non-symmetric. Which solver should you use for each?',
+      steps: [
+        {
+          label: '(a) SPD matrix: use Conjugate Gradient',
+          strategy: 'CG exploits symmetry ($A=A^\\top$) and positive definiteness to guarantee convergence with shorter recurrences (no need to store all Krylov vectors).',
+          explanation: 'CG requires only the last 2 iterates in memory ($O(n)$). GMRES for an $n\\times n$ problem requires $O(nk)$ memory after $k$ steps. If $A$ is SPD: always use CG.',
+          math: 'A \\succ 0 \\Rightarrow \\text{use CG: } O(n)\\text{ memory, optimal for SPD}',
+        },
+        {
+          label: '(b) Symmetric indefinite: use MINRES',
+          strategy: 'CG requires positive definiteness to ensure the step sizes are always well-defined. For symmetric indefinite, use MINRES (a Krylov method that minimizes the residual over symmetric Krylov subspaces).',
+          explanation: 'MINRES also uses short recurrences ($O(n)$ memory) because of symmetry, but does not require positive definiteness.',
+          math: 'A = A^\\top,\\; A\\not\\succ 0 \\Rightarrow \\text{MINRES}',
+          gotcha: 'Using CG on an indefinite matrix can cause breakdown (division by zero when the denominator $\\mathbf{p}^\\top A\\mathbf{p}$ is zero or negative). Always check definiteness before applying CG.',
+        },
+        {
+          label: '(c) Non-symmetric: use GMRES',
+          strategy: 'GMRES makes no symmetry assumption and guarantees monotone decrease in residual. It is the standard choice for non-symmetric systems.',
+          explanation: 'Downside: $O(nk)$ memory. Mitigation: restart GMRES(m) when memory is limiting. Alternative: BiCGSTAB (short recurrences but non-monotone convergence).',
+          math: 'A \\neq A^\\top \\Rightarrow \\text{GMRES or GMRES}(m)',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la9-003-1',

@@ -350,6 +350,70 @@ fprintf('G^T*G - I: %.2e\\n', norm(G_13''*G_13 - eye(2)))
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la7-007-householder-reflection',
+      title: 'Building a Householder Reflector to Zero Out a Column',
+      prereqs: ['Unit vectors', 'Outer products', 'Orthogonal matrices'],
+      problem: 'Find the Householder matrix $H$ that maps $\\mathbf{x} = [3,4]^\\top$ to $[5,0]^\\top$ (a vector parallel to $\\mathbf{e}_1$).',
+      steps: [
+        {
+          label: 'Compute the target: $\\|\\mathbf{x}\\|\\mathbf{e}_1$',
+          strategy: 'A Householder reflector maps $\\mathbf{x}$ to $\\pm\\|\\mathbf{x}\\|\\mathbf{e}_1$. Choose the sign to avoid cancellation.',
+          explanation: '$\\|\\mathbf{x}\\| = \\sqrt{9+16}=5$. Target: $\\alpha\\mathbf{e}_1 = [5,0]^\\top$ (use $+$ since $x_1=3>0$; using $-\\|\\mathbf{x}\\|$ when $x_1<0$ avoids cancellation in step 2).',
+          math: '\\|\\mathbf{x}\\|=5,\\quad \\text{target}=[5,0]^\\top',
+        },
+        {
+          label: 'Form the Householder vector $\\mathbf{v} = \\mathbf{x} - \\|\\mathbf{x}\\|\\mathbf{e}_1$',
+          strategy: '$\\mathbf{v}$ bisects the angle between $\\mathbf{x}$ and the target. Reflecting through the plane normal to $\\mathbf{v}$ maps $\\mathbf{x}$ to the target.',
+          explanation: '$\\mathbf{v} = [3,4]^\\top - [5,0]^\\top = [-2,4]^\\top$.',
+          math: '\\mathbf{v} = \\begin{bmatrix}-2\\\\4\\end{bmatrix}',
+        },
+        {
+          label: 'Build $H = I - 2\\mathbf{v}\\mathbf{v}^\\top/\\|\\mathbf{v}\\|^2$',
+          strategy: 'The Householder formula: reflect through the hyperplane orthogonal to $\\mathbf{v}$.',
+          explanation: '$\\|\\mathbf{v}\\|^2 = 4+16=20$. $\\mathbf{v}\\mathbf{v}^\\top = \\begin{bmatrix}4&-8\\\\-8&16\\end{bmatrix}$. $H = I - \\frac{1}{10}\\begin{bmatrix}4&-8\\\\-8&16\\end{bmatrix} = \\begin{bmatrix}3/5&4/5\\\\4/5&-3/5\\end{bmatrix}$.',
+          math: 'H = \\begin{bmatrix}3/5&4/5\\\\4/5&-3/5\\end{bmatrix}',
+          gotcha: '$H$ is symmetric ($H^\\top=H$) and orthogonal ($H^\\top H=I$) — but $H\\neq I$. These two properties mean $H^2=I$ (reflecting twice = identity), i.e., $H$ is its own inverse.',
+        },
+        {
+          label: 'Verify $H\\mathbf{x} = [5,0]^\\top$',
+          strategy: 'Multiply $H$ by $\\mathbf{x}$.',
+          explanation: '$H[3,4]^\\top = [9/5+16/5, 12/5-12/5]^\\top = [25/5, 0]^\\top = [5,0]^\\top$ ✓.',
+          math: 'H\\mathbf{x} = \\begin{bmatrix}5\\\\0\\end{bmatrix} \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la7-007-givens-rotation',
+      title: 'Givens Rotation: Zeroing a Single Entry',
+      prereqs: ['Rotation matrices', 'Trigonometry', 'Sparse updates'],
+      problem: 'Find the Givens rotation $G$ that maps $\\mathbf{x}=[3,4]^\\top$ to $[5,0]^\\top$, and explain when to prefer Givens over Householder.',
+      steps: [
+        {
+          label: 'Set up: $G$ rotates the $(i,j)$ plane to zero out entry $j$',
+          strategy: 'A Givens rotation $G(i,j,\\theta)$ applies a 2×2 rotation in the $(i,j)$ plane: $c=\\cos\\theta$, $s=\\sin\\theta$, chosen so $(cx_i+sx_j)=r$ and $(-sx_i+cx_j)=0$.',
+          explanation: 'We want $-sx_i+cx_j=0$ (zero out the second component). $-3s+4c=0 \\Rightarrow s/c = 4/3$.',
+          math: '-sx_i+cx_j=0 \\Rightarrow \\tan\\theta = s/c = 4/3',
+        },
+        {
+          label: 'Compute $c$ and $s$ from $r=\\|\\mathbf{x}\\|$',
+          strategy: '$c=x_i/r$, $s=x_j/r$ where $r=\\sqrt{x_i^2+x_j^2}$.',
+          explanation: '$r=5$, $c=3/5$, $s=4/5$.',
+          math: 'c=\\frac{3}{5},\\quad s=\\frac{4}{5},\\quad r=5',
+        },
+        {
+          label: 'Build and apply $G$',
+          strategy: '$G = \\begin{bmatrix}c&s\\\\-s&c\\end{bmatrix} = \\begin{bmatrix}3/5&4/5\\\\-4/5&3/5\\end{bmatrix}$.',
+          explanation: '$G\\mathbf{x} = [3/5\\cdot3+4/5\\cdot4, -4/5\\cdot3+3/5\\cdot4]^\\top = [5,0]^\\top$ ✓.',
+          math: 'G = \\begin{bmatrix}3/5&4/5\\\\-4/5&3/5\\end{bmatrix},\\quad G\\mathbf{x}=[5,0]^\\top\\checkmark',
+          gotcha: 'Givens $\\neq$ Householder: Givens zeros ONE entry (modifies 2 rows); Householder zeros a whole column below the pivot (modifies ALL rows). Givens is preferred for sparse matrices (fewer entries modified) or when only a few zeros are needed (e.g., tridiagonalization, QR updating).',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la7-007-1',

@@ -621,6 +621,87 @@ plt.show()`,
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la2-012-cofactor-col1',
+      title: '3×3 Cofactor Expansion Along Column 1',
+      prereqs: ['2×2 determinant', 'Cofactor signs'],
+      problem: 'Compute $\\det\\begin{bmatrix}2&1&-1\\\\3&0&2\\\\1&-1&3\\end{bmatrix}$ by expanding along column 1.',
+      steps: [
+        {
+          label: 'Set up the column-1 expansion',
+          strategy: 'Expanding along a column or row — you pick whichever has the most zeros.',
+          explanation: 'Column 1 entries: $a_{11}=2$, $a_{21}=3$, $a_{31}=1$. Signs for column 1: $(1,1)$ is $+$, $(2,1)$ is $-$, $(3,1)$ is $+$ (the checkerboard alternates: $(-1)^{i+j}$).',
+          math: '\\det(A) = 2C_{11} + 3C_{21} + 1C_{31}',
+          gotcha: 'The sign pattern is $(-1)^{i+j}$, not always positive. For column 1: $+$, $-$, $+$, $-$, ...',
+        },
+        {
+          label: 'Compute minor $M_{11}$ (delete row 1, column 1)',
+          strategy: 'The minor is the 2×2 determinant from the remaining entries.',
+          explanation: 'Delete row 1 and column 1: $\\begin{bmatrix}0&2\\\\-1&3\\end{bmatrix}$. $M_{11}=0\\cdot3-2\\cdot(-1)=2$.',
+          math: 'C_{11} = (+1)(0\\cdot3-2\\cdot(-1)) = 2',
+        },
+        {
+          label: 'Compute minor $M_{21}$ (delete row 2, column 1) with negative sign',
+          strategy: 'Entry $(2,1)$: $i+j=3$, so sign is $(-1)^3=-1$.',
+          explanation: 'Delete row 2 and column 1: $\\begin{bmatrix}1&-1\\\\-1&3\\end{bmatrix}$. $M_{21}=1\\cdot3-(-1)(-1)=3-1=2$. With sign: $C_{21}=(-1)(2)=-2$.',
+          math: 'C_{21} = (-1)(1\\cdot3-(-1)(-1)) = -2',
+        },
+        {
+          label: 'Compute minor $M_{31}$ (delete row 3, column 1)',
+          strategy: 'Entry $(3,1)$: $i+j=4$, so sign is $(-1)^4=+1$.',
+          explanation: 'Delete row 3 and column 1: $\\begin{bmatrix}1&-1\\\\0&2\\end{bmatrix}$. $M_{31}=1\\cdot2-(-1)\\cdot0=2$. With sign: $C_{31}=+2$.',
+          math: 'C_{31} = (+1)(1\\cdot2-(-1)\\cdot0) = 2',
+        },
+        {
+          label: 'Assemble the determinant',
+          strategy: 'Multiply each entry by its cofactor and sum.',
+          explanation: '$\\det(A) = 2\\cdot2 + 3\\cdot(-2) + 1\\cdot2 = 4-6+2=0$. The determinant is zero — the matrix is singular.',
+          math: '\\det(A) = 2(2)+3(-2)+1(2) = 4-6+2=0',
+        },
+      ],
+    },
+    {
+      id: 'wt-la2-012-adjugate-inverse',
+      title: 'From Cofactors to Adjugate to Inverse',
+      prereqs: ['Cofactor expansion', '2×2 inverse formula'],
+      problem: 'Use the cofactor matrix to find $A^{-1}$ for $A = \\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Compute all four cofactors',
+          strategy: 'The cofactor $C_{ij} = (-1)^{i+j} M_{ij}$ where $M_{ij}$ is the minor.',
+          explanation: '$C_{11}=(-1)^2\\cdot4=4$, $C_{12}=(-1)^3\\cdot3=-3$, $C_{21}=(-1)^3\\cdot2=-2$, $C_{22}=(-1)^4\\cdot1=1$.',
+          math: '\\text{Cof}(A) = \\begin{bmatrix}4&-3\\\\-2&1\\end{bmatrix}',
+        },
+        {
+          label: 'Transpose the cofactor matrix to get the adjugate',
+          strategy: 'The adjugate (classical adjoint) is $\\text{adj}(A) = \\text{Cof}(A)^\\top$.',
+          explanation: 'Transposing swaps the off-diagonal entries: $\\begin{bmatrix}4&-3\\\\-2&1\\end{bmatrix}^\\top = \\begin{bmatrix}4&-2\\\\-3&1\\end{bmatrix}$.',
+          math: '\\text{adj}(A) = \\begin{bmatrix}4&-2\\\\-3&1\\end{bmatrix}',
+        },
+        {
+          label: 'Compute $\\det(A)$ and divide',
+          strategy: '$A^{-1} = \\frac{1}{\\det(A)}\\text{adj}(A)$.',
+          explanation: '$\\det(A) = 1\\cdot4-2\\cdot3=4-6=-2$. Divide: $A^{-1} = \\frac{1}{-2}\\begin{bmatrix}4&-2\\\\-3&1\\end{bmatrix} = \\begin{bmatrix}-2&1\\\\3/2&-1/2\\end{bmatrix}$.',
+          math: 'A^{-1} = \\frac{1}{-2}\\begin{bmatrix}4&-2\\\\-3&1\\end{bmatrix} = \\begin{bmatrix}-2&1\\\\3/2&-1/2\\end{bmatrix}',
+        },
+        {
+          label: 'Verify $A A^{-1} = I$',
+          strategy: 'Multiply out and confirm all entries match the identity.',
+          explanation: '$(1)(-2)+(2)(3/2)=-2+3=1$. $(1)(1)+(2)(-1/2)=1-1=0$. $(3)(-2)+(4)(3/2)=-6+6=0$. $(3)(1)+(4)(-1/2)=3-2=1$.',
+          math: '\\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}\\begin{bmatrix}-2&1\\\\3/2&-1/2\\end{bmatrix}=\\begin{bmatrix}1&0\\\\0&1\\end{bmatrix}\\checkmark',
+        },
+        {
+          label: 'Connect to the 2×2 shortcut',
+          strategy: 'The formula "swap diagonal, negate off-diagonal, divide by det" is exactly the adjugate method for 2×2.',
+          explanation: 'The adjugate of a 2×2 matrix swaps $a,d$ and negates $b,c$ — that is EXACTLY the standard $2\\times2$ inverse shortcut you already know. The cofactor/adjugate approach is the general version that extends to $3\\times3$, $4\\times4$, etc.',
+          math: '\\text{For } 2\\times2: \\text{adj}\\begin{bmatrix}a&b\\\\c&d\\end{bmatrix} = \\begin{bmatrix}d&-b\\\\-c&a\\end{bmatrix}',
+        },
+      ],
+    },
+  ],
+
   // ── Challenges ────────────────────────────────────────────────
   challenges: [
     {

@@ -401,6 +401,64 @@ c
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la6-001-verify-axioms',
+      title: 'Verifying the Vector Space Axioms for a New Space',
+      prereqs: ['10 vector space axioms', 'Polynomial addition'],
+      problem: 'Verify that $\\mathcal{P}_2$ (polynomials of degree $\\leq 2$) with the usual addition and scalar multiplication is a vector space.',
+      steps: [
+        {
+          label: 'Identify the objects and operations',
+          strategy: 'Before checking axioms, be precise: what are the "vectors," what is addition, what is scalar multiplication?',
+          explanation: 'Vectors: $p(x) = a_0 + a_1 x + a_2 x^2$ for $a_i \\in \\mathbb{R}$. Addition: $(p+q)(x) = p(x)+q(x)$ (add coefficients). Scalar multiplication: $(cp)(x) = c\\cdot p(x)$.',
+          math: '\\mathcal{P}_2 = \\{a_0+a_1x+a_2x^2 : a_i \\in \\mathbb{R}\\}',
+        },
+        {
+          label: 'Check closure under addition',
+          strategy: 'If $p, q \\in \\mathcal{P}_2$, is $p+q \\in \\mathcal{P}_2$? Degree cannot exceed 2.',
+          explanation: '$(a_0+a_1x+a_2x^2)+(b_0+b_1x+b_2x^2) = (a_0+b_0)+(a_1+b_1)x+(a_2+b_2)x^2$ — still degree $\\leq 2$. ✓',
+          math: 'p+q \\in \\mathcal{P}_2 \\checkmark',
+        },
+        {
+          label: 'Check closure under scalar multiplication',
+          strategy: 'If $p \\in \\mathcal{P}_2$ and $c \\in \\mathbb{R}$, is $cp \\in \\mathcal{P}_2$?',
+          explanation: '$c(a_0+a_1x+a_2x^2) = ca_0+ca_1x+ca_2x^2$ — still degree $\\leq 2$. ✓',
+          math: 'cp \\in \\mathcal{P}_2 \\checkmark',
+        },
+        {
+          label: 'Identify the zero vector and additive inverses',
+          strategy: 'The zero vector must satisfy $p + \\mathbf{0} = p$ for all $p$. The additive inverse of $p$ satisfies $p + (-p) = \\mathbf{0}$.',
+          explanation: 'Zero polynomial: $\\mathbf{0}(x) = 0$ (all coefficients zero) ✓. Additive inverse: $(-p)(x) = -p(x)$ ✓. The remaining 7 axioms hold because real-number arithmetic applies coefficient-wise.',
+          math: '\\mathbf{0} = 0 + 0x + 0x^2 \\in \\mathcal{P}_2 \\checkmark',
+          gotcha: 'The set $\\mathcal{P}_{\\geq 3}$ (polynomials of degree $\\geq 3$) is NOT a vector space — the zero polynomial has degree $-\\infty$ (or is excluded), so the zero vector is not in the set.',
+        },
+      ],
+    },
+    {
+      id: 'wt-la6-001-non-example',
+      title: 'Disqualifying a Set: Finding the Failing Axiom',
+      prereqs: ['Vector space axioms'],
+      problem: 'Show that the set of $2\\times 2$ matrices with determinant 1 is NOT a vector space.',
+      steps: [
+        {
+          label: 'Test zero-vector membership',
+          strategy: 'The simplest axiom: is the zero vector in the set? Check whether the zero matrix has determinant 1.',
+          explanation: '$\\det\\begin{bmatrix}0&0\\\\0&0\\end{bmatrix} = 0 \\neq 1$ — the zero matrix is not in the set. This alone disqualifies it.',
+          math: '\\det(0) = 0 \\neq 1 \\Rightarrow \\mathbf{0} \\notin \\text{SL}(2)',
+          gotcha: 'You only need ONE failing axiom to disqualify a set. Find the simplest violation and stop — do not check all 10 axioms.',
+        },
+        {
+          label: 'Confirm: also fails closure under scalar multiplication',
+          strategy: 'If $A$ has $\\det A=1$, is $2A$ in the set?',
+          explanation: '$\\det(2A) = 2^2\\det(A) = 4 \\neq 1$. So $2A \\notin \\text{SL}(2)$.',
+          math: '\\det(cA) = c^n\\det A \\Rightarrow \\det(2A)=4\\neq 1',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la6-001-1',

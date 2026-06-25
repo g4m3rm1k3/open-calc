@@ -326,6 +326,70 @@ cond(A)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la7-003-condition-number',
+      title: 'Computing and Interpreting the Condition Number',
+      prereqs: ['Matrix inverse', 'Induced norms', 'SVD'],
+      problem: 'Find the 2-norm condition number $\\kappa_2(A)$ for $A = \\begin{bmatrix}3&0\\\\0&1\\end{bmatrix}$ and explain what it means for solving $A\\mathbf{x}=\\mathbf{b}$.',
+      steps: [
+        {
+          label: 'Compute $\\kappa_2(A) = \\|A\\|_2 \\|A^{-1}\\|_2$',
+          strategy: 'For the 2-norm: $\\|A\\|_2 = \\sigma_{\\max}$ (largest singular value) and $\\|A^{-1}\\|_2 = 1/\\sigma_{\\min}$.',
+          explanation: '$A$ is diagonal: singular values are 3 and 1. $\\sigma_{\\max}=3$, $\\sigma_{\\min}=1$. $\\kappa_2(A) = \\sigma_{\\max}/\\sigma_{\\min} = 3/1 = 3$.',
+          math: '\\kappa_2(A) = \\frac{\\sigma_{\\max}}{\\sigma_{\\min}} = \\frac{3}{1} = 3',
+        },
+        {
+          label: 'Interpret: how much does the solution error get amplified?',
+          strategy: 'The relative error bound: $\\frac{\\|\\delta\\mathbf{x}\\|}{\\|\\mathbf{x}\\|} \\leq \\kappa(A)\\frac{\\|\\delta\\mathbf{b}\\|}{\\|\\mathbf{b}\\|}$.',
+          explanation: '$\\kappa=3$: a 1% error in $\\mathbf{b}$ (e.g., measurement noise) can cause up to 3% error in the solution $\\mathbf{x}$. For $\\kappa=10^{10}$, 1% input error → up to $10^{10}\\%$ output error — the solution is meaningless.',
+          math: '\\frac{\\|\\delta\\mathbf{x}\\|}{\\|\\mathbf{x}\\|} \\leq \\kappa(A)\\frac{\\|\\delta\\mathbf{b}\\|}{\\|\\mathbf{b}\\|}',
+          gotcha: 'The condition number measures sensitivity, not absolute error. A well-conditioned system ($\\kappa$ near 1) can still have a wrong answer if the algorithm introduces large errors. But an ill-conditioned system ($\\kappa \\gg 1$) cannot be reliably solved by ANY algorithm.',
+        },
+        {
+          label: 'Rule of thumb: how many digits are lost?',
+          strategy: 'If you have $d$ digits of precision and $\\kappa \\approx 10^k$, you lose about $k$ significant digits in the solution.',
+          explanation: 'Double precision gives about 16 significant digits. If $\\kappa = 10^{12}$, you lose 12 digits — the solution has only 4 reliable digits.',
+          math: '\\text{digits lost} \\approx \\log_{10}(\\kappa)',
+        },
+      ],
+    },
+    {
+      id: 'wt-la7-003-norms-comparison',
+      title: 'Comparing the 1-Norm, 2-Norm, and ∞-Norm of a Matrix',
+      prereqs: ['Vector norms', 'Induced matrix norms'],
+      problem: 'Compute $\\|A\\|_1$, $\\|A\\|_\\infty$, and $\\|A\\|_F$ for $A = \\begin{bmatrix}1&2\\\\3&4\\end{bmatrix}$.',
+      steps: [
+        {
+          label: 'Compute the 1-norm: maximum column sum',
+          strategy: '$\\|A\\|_1 = \\max_j \\sum_i |a_{ij}|$ — max over columns of the sum of absolute values.',
+          explanation: 'Column 1: $|1|+|3|=4$. Column 2: $|2|+|4|=6$. $\\|A\\|_1 = 6$.',
+          math: '\\|A\\|_1 = \\max(4,6) = 6',
+        },
+        {
+          label: 'Compute the ∞-norm: maximum row sum',
+          strategy: '$\\|A\\|_\\infty = \\max_i \\sum_j |a_{ij}|$ — max over rows.',
+          explanation: 'Row 1: $1+2=3$. Row 2: $3+4=7$. $\\|A\\|_\\infty = 7$.',
+          math: '\\|A\\|_\\infty = \\max(3,7) = 7',
+          gotcha: 'The 1-norm is max column sum; the ∞-norm is max row sum. These are transposes of each other: $\\|A\\|_1 = \\|A^\\top\\|_\\infty$. Confusing the two is a common error.',
+        },
+        {
+          label: 'Compute the Frobenius norm: square root of sum of squares',
+          strategy: '$\\|A\\|_F = \\sqrt{\\sum_{i,j} a_{ij}^2}$ — NOT an induced norm, but often the most convenient to compute.',
+          explanation: '$\\|A\\|_F = \\sqrt{1+4+9+16} = \\sqrt{30}$.',
+          math: '\\|A\\|_F = \\sqrt{1^2+2^2+3^2+4^2} = \\sqrt{30}',
+        },
+        {
+          label: 'Verify the norm inequalities',
+          strategy: 'For $n\\times n$ matrices: $\\|A\\|_2 \\leq \\|A\\|_F \\leq \\sqrt{n}\\|A\\|_2$ and $\\|A\\|_2 \\leq \\|A\\|_1$, $\\|A\\|_2 \\leq \\|A\\|_\\infty$.',
+          explanation: '$\\|A\\|_2 = \\sigma_{\\max}(A)$. For this $A$, $\\sigma_{\\max} \\approx 5.46$ (from $A^\\top A$ eigenvalues). Check: $\\sqrt{30} \\approx 5.48 \\geq 5.46$ ✓.',
+          math: '\\|A\\|_2 \\leq \\|A\\|_F \\leq \\sqrt{n}\\|A\\|_2 \\checkmark',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la7-003-1',

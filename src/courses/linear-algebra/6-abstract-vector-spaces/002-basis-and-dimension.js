@@ -336,6 +336,64 @@ print("Standard coordinates of v:", coords_std, "(same as v itself)")
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la6-002-find-basis',
+      title: 'Finding a Basis and Dimension of a Subspace',
+      prereqs: ['Span', 'Linear independence', 'Row reduction'],
+      problem: 'Find a basis for the subspace of $\\mathbb{R}^3$ spanned by $\\mathbf{v}_1=[1,2,1]^\\top$, $\\mathbf{v}_2=[2,4,2]^\\top$, $\\mathbf{v}_3=[1,0,-1]^\\top$.',
+      steps: [
+        {
+          label: 'Spot redundancy before computing',
+          strategy: 'Scan for proportional vectors. $\\mathbf{v}_2 = 2\\mathbf{v}_1$ — immediately redundant.',
+          explanation: '$\\mathbf{v}_2 = 2\\mathbf{v}_1$, so it contributes nothing to the span. The candidates reduce to $\\{\\mathbf{v}_1, \\mathbf{v}_3\\}$.',
+          math: '\\mathbf{v}_2 = 2\\mathbf{v}_1 \\Rightarrow \\text{redundant}',
+          gotcha: 'Scanning for proportional pairs first is faster than immediately running row reduction. Row reduction is the fallback when no obvious linear dependence is visible.',
+        },
+        {
+          label: 'Check whether $\\mathbf{v}_1$ and $\\mathbf{v}_3$ are independent',
+          strategy: 'Two vectors are independent iff they are not proportional. Check $\\mathbf{v}_3 \\neq c\\mathbf{v}_1$ for any $c$.',
+          explanation: '$\\mathbf{v}_3/\\mathbf{v}_1$ componentwise: $1/1=1$, $0/2=0$, $-1/1=-1$ — not constant. So $\\mathbf{v}_3$ and $\\mathbf{v}_1$ are independent.',
+          math: '\\mathbf{v}_3 \\neq c\\mathbf{v}_1 \\Rightarrow \\{\\mathbf{v}_1,\\mathbf{v}_3\\}\\text{ independent}',
+        },
+        {
+          label: 'State the basis and dimension',
+          strategy: 'A basis = a linearly independent spanning set. Dimension = number of basis vectors.',
+          explanation: '$\\{\\mathbf{v}_1, \\mathbf{v}_3\\} = \\{[1,2,1]^\\top, [1,0,-1]^\\top\\}$ is a basis. Dimension = 2.',
+          math: '\\dim(\\text{span}) = 2,\\quad \\text{basis} = \\{[1,2,1]^\\top,\\,[1,0,-1]^\\top\\}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la6-002-dimension-theorem',
+      title: 'Using the Dimension Theorem: Rank + Nullity = n',
+      prereqs: ['Rank', 'Null space', 'Dimension'],
+      problem: 'A linear map $T: \\mathbb{R}^5 \\to \\mathbb{R}^3$ has $\\text{rank}(T) = 2$. What is $\\dim(\\ker T)$?',
+      steps: [
+        {
+          label: 'Apply the rank-nullity theorem',
+          strategy: 'For any linear map $T: V \\to W$ from a finite-dimensional $V$: $\\dim(V) = \\text{rank}(T) + \\text{nullity}(T)$.',
+          explanation: '$\\dim(\\mathbb{R}^5) = 5 = \\text{rank}(T) + \\text{nullity}(T) = 2 + \\text{nullity}(T)$. So $\\text{nullity}(T) = 3$.',
+          math: '\\dim(\\ker T) = 5 - 2 = 3',
+        },
+        {
+          label: 'Sanity check: what are the constraints on rank?',
+          strategy: '$\\text{rank}(T) \\leq \\min(\\dim(V), \\dim(W))$.',
+          explanation: '$\\text{rank}(T) \\leq \\min(5,3)=3$. The claimed rank 2 is valid. If $T$ were claimed to have rank 4, that would be impossible ($4 > 3$).',
+          math: '\\text{rank}(T) \\leq \\min(5,3) = 3',
+          gotcha: 'Rank is bounded by BOTH the domain and codomain dimensions. A 5→3 map cannot have rank greater than 3, regardless of how many dimensions the domain has.',
+        },
+        {
+          label: 'Geometric interpretation',
+          strategy: 'The kernel is the "collapsed" directions; the image is the "surviving" directions.',
+          explanation: '$T$ takes 5-dimensional input, kills 3 dimensions (null space), and maps the remaining 2 dimensions faithfully into $\\mathbb{R}^3$. The image is a 2-dimensional plane inside $\\mathbb{R}^3$.',
+          math: '\\mathbb{R}^5 \\xrightarrow{T} \\mathbb{R}^3:\\; \\underbrace{3}_{\\ker} + \\underbrace{2}_{\\text{image}} = 5',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la6-002-1',

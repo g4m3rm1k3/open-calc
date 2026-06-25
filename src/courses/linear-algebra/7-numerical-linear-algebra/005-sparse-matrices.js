@@ -344,6 +344,64 @@ nnz(L) + nnz(U)
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la7-005-csr-format',
+      title: 'Storing a Sparse Matrix in CSR Format',
+      prereqs: ['Matrix representation', 'Array indexing'],
+      problem: 'Store $A = \\begin{bmatrix}5&0&0\\\\0&8&1\\\\0&0&4\\end{bmatrix}$ in Compressed Sparse Row (CSR) format and count the memory savings.',
+      steps: [
+        {
+          label: 'Identify the non-zero entries',
+          strategy: 'List all non-zero values with their row and column indices.',
+          explanation: '$(0,0)=5$, $(1,1)=8$, $(1,2)=1$, $(2,2)=4$. 4 non-zeros out of 9 entries — about 44% fill.',
+          math: '\\text{nnz} = 4',
+        },
+        {
+          label: 'Build the three CSR arrays',
+          strategy: 'CSR uses three 1D arrays: `values` (non-zeros), `col_idx` (column of each non-zero), `row_ptr` (where each row starts in `values`).',
+          explanation: '`values = [5, 8, 1, 4]`. `col_idx = [0, 1, 2, 2]`. `row_ptr = [0, 1, 3, 4]` — row 0 starts at index 0 (1 entry), row 1 at index 1 (2 entries), row 2 at index 3 (1 entry), sentinel 4 at the end.',
+          math: '\\text{values}=[5,8,1,4],\\; \\text{col}=[0,1,2,2],\\; \\text{row\\_ptr}=[0,1,3,4]',
+          gotcha: '`row_ptr` has $n+1$ entries for an $n\\times n$ matrix. The last entry is always `nnz`. The number of non-zeros in row $i$ is `row_ptr[i+1] - row_ptr[i]`.',
+        },
+        {
+          label: 'Count the memory: sparse vs dense',
+          strategy: 'CSR stores $3 \\cdot \\text{nnz} + n + 1$ numbers (roughly); dense stores $n^2$.',
+          explanation: 'Dense: $3\\times3=9$ floats. CSR: 4 values + 4 col indices + 4 row_ptr entries = 12 integers/floats total. For this tiny example, sparse is not smaller — the benefit appears for large, sparse matrices. At $n=10^4$ with $\\text{nnz}=5n$: dense = $10^8$; CSR = $\\approx 3\\times5\\times10^4 = 1.5\\times10^5$ — 667× smaller.',
+          math: '\\text{CSR savings ratio: }\\frac{n^2}{3\\cdot\\text{nnz}} \\approx \\frac{n}{15} \\text{ for 5-diagonal matrices}',
+        },
+      ],
+    },
+    {
+      id: 'wt-la7-005-sparsity-fill-in',
+      title: 'Fill-In: Why Gaussian Elimination Destroys Sparsity',
+      prereqs: ['Gaussian elimination', 'Sparse storage', 'Reordering'],
+      problem: 'Show that eliminating a dense row in a sparse matrix causes fill-in, and explain how reordering prevents it.',
+      steps: [
+        {
+          label: 'What is fill-in?',
+          strategy: 'During elimination, a zero entry can become non-zero when a row is subtracted from another. Each new non-zero is "fill-in."',
+          explanation: 'If row $i$ has non-zeros in columns $\\{1,5,10\\}$ and row $j$ has a non-zero in column 1 (the pivot column), then the update row $j$ $\\leftarrow$ row $j$ $-$ (multiplier)$\\times$ row $i$ introduces non-zeros in columns 5 and 10 for row $j$.',
+          math: 'A_{j,\\text{new}} = A_j - m_{ji}A_i \\Rightarrow \\text{fills columns 5, 10}',
+          gotcha: 'Fill-in is catastrophic for dense rows: eliminating a row with $k$ non-zeros can add up to $k-1$ non-zeros to every row below it. A single dense row in a large sparse matrix can cause the factorization to be completely dense.',
+        },
+        {
+          label: 'Reordering to minimize fill-in: eliminate low-degree nodes first',
+          strategy: 'The Approximate Minimum Degree (AMD) ordering permutes rows/columns so that sparse nodes (few neighbors in the graph) are eliminated first.',
+          explanation: 'Think of $A$ as a graph: each row is a node, each non-zero $A_{ij}$ is an edge. Elimination merges nodes. High-degree nodes (many edges) create fill-in. Eliminating low-degree nodes first creates much less fill-in.',
+          math: 'A \\to P A P^\\top \\text{ (reorder)} \\Rightarrow L,U \\text{ much sparser}',
+        },
+        {
+          label: 'Practical impact',
+          strategy: 'For a $n\\times n$ 2D Poisson matrix (the prototypical sparse matrix): natural ordering → $O(n^{3/2})$ fill-in; nested dissection → $O(n\\log n)$ fill-in.',
+          explanation: 'For $n=10^6$: natural ordering fills $\\sim10^9$ entries; nested dissection fills $\\sim2\\times10^7$ — 50× less. The best reorderings (nested dissection) are optimal in theory.',
+          math: '\\text{natural: }O(n^{3/2})\\text{ fill},\\quad \\text{nested dissection: }O(n\\log n)',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la7-005-1',

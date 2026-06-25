@@ -454,6 +454,64 @@ print(f"Min Ra = {result.fun:.4f} μm")
     },
   ],
 
+  // ── Walkthroughs ───────────────────────────────────────────────────────────
+  walkthroughs: [
+    {
+      id: 'wt-la4-007-classify-quadratic',
+      title: 'Classifying a Quadratic Form: Definite, Indefinite, or Semidefinite',
+      prereqs: ['Eigenvalues', 'Symmetric matrices'],
+      problem: 'Classify the quadratic form $Q(\\mathbf{x}) = 2x_1^2 + 4x_1x_2 + 5x_2^2$.',
+      steps: [
+        {
+          label: 'Write the quadratic form as $Q(\\mathbf{x}) = \\mathbf{x}^\\top A \\mathbf{x}$',
+          strategy: 'The diagonal entries of $A$ are the squared-term coefficients; the off-diagonal entries split the cross-term coefficient equally.',
+          explanation: '$2x_1^2+4x_1x_2+5x_2^2 \\to A_{11}=2$, $A_{22}=5$, cross-term $4x_1x_2 \\to A_{12}=A_{21}=2$.',
+          math: 'A = \\begin{bmatrix}2&2\\\\2&5\\end{bmatrix}',
+          gotcha: 'The cross-term coefficient $4$ is split as $2+2$, not placed as a single entry. Always halve the cross-term coefficient to fill the two off-diagonal slots.',
+        },
+        {
+          label: 'Find the eigenvalues of $A$',
+          strategy: 'Definiteness is determined by the signs of the eigenvalues. Use $\\det(A-\\lambda I)=0$.',
+          explanation: '$\\det(A-\\lambda I) = (2-\\lambda)(5-\\lambda)-4 = \\lambda^2-7\\lambda+6 = (\\lambda-1)(\\lambda-6)$. Eigenvalues: $\\lambda_1=1$ and $\\lambda_2=6$.',
+          math: '\\lambda_1=1>0,\\quad \\lambda_2=6>0',
+        },
+        {
+          label: 'Classify based on eigenvalue signs',
+          strategy: 'All positive → positive definite. All negative → negative definite. Mixed signs → indefinite. Any zero → semidefinite.',
+          explanation: 'Both eigenvalues are positive → $A$ is positive definite → $Q(\\mathbf{x}) > 0$ for all $\\mathbf{x}\\neq\\mathbf{0}$.',
+          math: 'Q(\\mathbf{x}) = \\mathbf{x}^\\top A\\mathbf{x} > 0\\;\\forall\\,\\mathbf{x}\\neq\\mathbf{0} \\Rightarrow \\text{positive definite}',
+        },
+        {
+          label: 'Check using Sylvester\'s criterion (quicker for 2×2)',
+          strategy: 'Leading principal minors: $\\Delta_1 = A_{11} > 0$ and $\\Delta_2 = \\det(A) > 0$ iff $A \\succ 0$.',
+          explanation: '$\\Delta_1 = 2 > 0$ ✓. $\\Delta_2 = 10-4 = 6 > 0$ ✓. Positive definite confirmed without computing eigenvalues.',
+          math: '\\Delta_1=2>0,\\quad \\Delta_2=6>0 \\Rightarrow A \\succ 0 \\checkmark',
+        },
+      ],
+    },
+    {
+      id: 'wt-la4-007-diagonalize-quadratic',
+      title: 'Diagonalizing a Quadratic Form (Completing the Square via Eigenvectors)',
+      prereqs: ['Quadratic form classification', 'Spectral theorem', 'Change of variables'],
+      problem: 'Diagonalize $Q(\\mathbf{x}) = 2x_1^2+4x_1x_2+5x_2^2$ by a change of variables $\\mathbf{x} = P\\mathbf{y}$.',
+      steps: [
+        {
+          label: 'Use the orthogonal diagonalization $A = P\\Lambda P^\\top$',
+          strategy: 'Since $A$ is symmetric, the spectral theorem gives $A = P\\Lambda P^\\top$ with $P$ orthogonal. Substituting $\\mathbf{x}=P\\mathbf{y}$: $Q = \\mathbf{y}^\\top\\Lambda\\mathbf{y} = \\lambda_1 y_1^2+\\lambda_2 y_2^2$.',
+          explanation: 'The cross-term $4x_1x_2$ vanishes in the new coordinates — that\'s the whole point of diagonalizing the quadratic form.',
+          math: 'Q(P\\mathbf{y}) = \\mathbf{y}^\\top P^\\top AP\\,\\mathbf{y} = \\mathbf{y}^\\top\\Lambda\\mathbf{y} = y_1^2+6y_2^2',
+          gotcha: 'The change of variables is $\\mathbf{x}=P\\mathbf{y}$, NOT $\\mathbf{y}=P\\mathbf{x}$. The columns of $P$ give the new coordinate axes, so you multiply $P$ on the left when converting from new coordinates to old.',
+        },
+        {
+          label: 'Interpret: the principal axes',
+          strategy: 'The columns of $P$ (eigenvectors of $A$) are the "principal axes" — the natural coordinate system where the quadratic form has no cross-terms.',
+          explanation: 'In the $\\mathbf{y}$-coordinates, $Q = y_1^2+6y_2^2$ is a pure ellipse equation. The level set $Q=1$ is an ellipse with semi-axes $1$ (along $\\mathbf{v}_1$) and $1/\\sqrt{6}$ (along $\\mathbf{v}_2$).',
+          math: 'Q=1 \\Rightarrow y_1^2+6y_2^2=1 \\text{ (ellipse with axes } 1,\\,1/\\sqrt{6})',
+        },
+      ],
+    },
+  ],
+
   challenges: [
     {
       id: 'ch-la4-007-1',
