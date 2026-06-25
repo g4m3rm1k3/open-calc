@@ -17,7 +17,7 @@ const PINNED_APPS = [
     loader: () => import('../../features/brain/BrainPage.jsx').then(m => m.default),
   },
 ]
-import { LayoutGrid, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap, Compass } from 'lucide-react'
+import { LayoutGrid, Command, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap, Compass } from 'lucide-react'
 
 export default function Taskbar({ windows, onFocus }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -54,13 +54,15 @@ export default function Taskbar({ windows, onFocus }) {
           onClick={() => setMenuOpen(m => !m)}
           title="Start"
           aria-label="Open Start Menu"
-          className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none flex-shrink-0 ${
+          className={`relative flex items-center justify-center w-10 h-10 rounded-[12px] transition-all focus:outline-none flex-shrink-0 border border-white/30 dark:border-white/20 ${
             menuOpen
-              ? 'bg-brand-500 text-white shadow-[0_0_15px_rgba(99,102,241,0.5)]'
-              : 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20'
+              ? 'bg-gradient-to-br from-cyan-400 via-indigo-500 to-purple-600 text-white shadow-[0_0_30px_rgba(99,102,241,0.8)]'
+              : 'bg-gradient-to-br from-cyan-500 via-indigo-500 to-purple-500 text-white shadow-[0_6px_15px_rgba(99,102,241,0.4)] hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] hover:from-cyan-400 hover:via-indigo-400 hover:to-purple-400'
           }`}
         >
-          <LayoutGrid className="w-5 h-5" />
+          {/* Inner glass highlight */}
+          <div className="absolute inset-0 rounded-[12px] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+          <Command className="w-[20px] h-[20px] relative z-10" />
         </motion.button>
 
         {/* Pinned apps */}

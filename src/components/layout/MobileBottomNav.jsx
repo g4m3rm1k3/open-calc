@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, MapPin, Calculator, Search, BookOpen, Layers } from 'lucide-react'
+import { Home, MapPin, Calculator, Search, BookOpen, Layers, Command } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 /**
@@ -78,14 +78,21 @@ export default function MobileBottomNav({ onSearchOpen, onToolsToggle }) {
           </span>
         </motion.button>
         
-        <NavItem
-          dataTour="mobile-tools-btn"
-          active={false}
+        {/* Tools Menu Button — Made to "Pop" */}
+        <motion.button
+          data-tour="mobile-tools-btn"
+          whileTap={{ scale: 0.9 }}
           onClick={onToolsToggle}
-          icon={Layers}
-          label="Tools"
-          activeColor="text-slate-900 dark:text-white"
-        />
+          className="relative flex flex-col items-center justify-center flex-1 h-16"
+        >
+          <div className="flex items-center justify-center w-[38px] h-[38px] rounded-[12px] bg-gradient-to-br from-cyan-500 via-indigo-500 to-purple-500 shadow-[0_6px_15px_rgba(99,102,241,0.4)] border border-white/30 dark:border-white/20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+            <Command className="w-[18px] h-[18px] text-white relative z-10" />
+          </div>
+          <span className="text-[10px] font-bold tracking-wide mt-1.5 text-indigo-600 dark:text-indigo-400">
+            Menu
+          </span>
+        </motion.button>
 
         <NavItem 
           active={false} 
