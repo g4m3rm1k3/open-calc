@@ -100,6 +100,18 @@
     @apply transition-all duration-200 active:scale-[0.94] active:brightness-90 hover:brightness-105 hover:shadow-xl hover:-translate-y-0.5;
   }
 
+  .nav-tool-btn {
+    @apply flex items-center justify-center w-[34px] h-[34px] flex-shrink-0 rounded-[10px] 
+           border border-slate-200 dark:border-slate-700/80 
+           bg-white dark:bg-slate-800/90
+           bg-gradient-to-b from-white/60 to-transparent dark:from-white/10 dark:to-transparent
+           shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.6)] 
+           dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)]
+           hover:border-slate-300 dark:hover:border-slate-500 
+           hover:shadow-[0_3px_6px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,1)] 
+           active:scale-[0.96] active:shadow-inner transition-all;
+  }
+
   .oc-header-gradient {
     @apply bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_32%),linear-gradient(180deg,rgba(255,255,255,0.42),transparent)]
            dark:bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.14),transparent_32%),linear-gradient(180deg,rgba(15,23,42,0.42),transparent)];

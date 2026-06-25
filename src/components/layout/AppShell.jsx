@@ -106,19 +106,17 @@ function MobileLocationBadge() {
 function ToolButton({ tool }) {
   const Icon = tool.icon;
   return (
-    <motion.button
-      whileHover={{ scale: 1.15 }}
-      whileTap={{ scale: 0.9 }}
+    <button
       onClick={() =>
         window.dispatchEvent(
           new CustomEvent("oc-open-tool", { detail: { tool: tool.eventTool } }),
         )
       }
-      className={`p-1.5 rounded-xl transition-colors ${tool.colorClass ?? "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"}`}
+      className={`nav-tool-btn ${tool.colorClass ?? "text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"}`}
       title={tool.label}
     >
-      {Icon ? <Icon className="w-4 h-4" /> : <span className="text-sm leading-none font-medium">{tool.glyph}</span>}
-    </motion.button>
+      {Icon ? <Icon className="w-[18px] h-[18px]" /> : <span className="text-[13px] leading-none font-semibold">{tool.glyph}</span>}
+    </button>
   );
 }
 
@@ -166,35 +164,29 @@ function TopBar({ dark, toggleDark }) {
 
         <NavSep className="hidden lg:block" />
 
-        <motion.button
-          whileHover={{ scale: 1.15 }}
-          whileTap={{ scale: 0.9 }}
+        <button
           onClick={() => window.dispatchEvent(new CustomEvent("oc-toggle-video"))}
-          className="hidden lg:inline-flex p-1.5 rounded-xl text-slate-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+          className="hidden lg:flex nav-tool-btn text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400"
           title="Video Player"
         >
-          <PlayCircle className="w-4 h-4" />
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.15 }}
-          whileTap={{ scale: 0.9 }}
+          <PlayCircle className="w-[18px] h-[18px]" />
+        </button>
+        <button
           onClick={openSearch}
-          className="hidden lg:inline-flex p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="hidden lg:flex nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
           title="Search"
         >
-          <Search className="w-4 h-4" />
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.15 }}
-          whileTap={{ scale: 0.9 }}
+          <Search className="w-[18px] h-[18px]" />
+        </button>
+        <button
           onClick={toggleDark}
-          className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
           title="Toggle theme"
         >
-          {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </motion.button>
-        <div className="hidden lg:block hover:scale-110 active:scale-95 transition-transform">
-          <FullscreenButton className="p-1.5 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" />
+          {dark ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
+        </button>
+        <div className="hidden lg:block">
+          <FullscreenButton className="nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 [&>svg]:w-[18px] [&>svg]:h-[18px]" />
         </div>
 
         <NavSep className="hidden lg:block" />
