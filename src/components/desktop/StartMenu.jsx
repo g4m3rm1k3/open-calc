@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LABS } from '../../labs/registry.js'
 import { GAMES } from '../../games/registry.js'
-import { TOOLS } from '../../tools/toolLoader.js'
 import { COURSES } from '../../courses/index.js'
 import { getLabEntry } from '../../labs/labLoader.js'
 import { getGameEntry } from '../../games/gameLoader.js'
 import { useDesktop } from './DesktopProvider.jsx'
 import { usePins } from '../../context/PinsContext.jsx'
+import { GLASS_META } from '../../styles/courseColors.js'
 
 const SECTIONS = [
   { id: 'all',        label: 'All' },
@@ -16,34 +16,51 @@ const SECTIONS = [
   { id: 'courses',    label: 'Courses' },
   { id: 'labs',       label: 'Labs' },
   { id: 'games',      label: 'Games' },
-  { id: 'tools',      label: 'Tools' },
   { id: 'nav',        label: 'Navigate' },
 ]
 
+const GRID_OVL = {
+  backgroundImage: [
+    'repeating-linear-gradient(rgba(255,255,255,0.04) 0 1px, transparent 1px 100%)',
+    'repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 100%)',
+  ].join(','),
+  backgroundSize: '22px 22px',
+}
+
+const DOTS_OVL = {
+  backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.10) 1.5px, transparent 1.5px)',
+  backgroundSize: '13px 13px',
+}
+
+const STRIPES_OVL = {
+  backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 2px, transparent 2px, transparent 6px)',
+  backgroundSize: '10px 10px',
+}
+
+const GRID_TEXTURE = 'repeating-linear-gradient(0deg,transparent,transparent 11px,rgba(255,255,255,0.8) 11px,rgba(255,255,255,0.8) 12px),repeating-linear-gradient(90deg,transparent,transparent 11px,rgba(255,255,255,0.8) 11px,rgba(255,255,255,0.8) 12px)'
+
 const NAV_LINKS = [
-  { id: 'reference',      label: 'Reference Library',          emoji: '📐', path: '/reference' },
-  { id: 'linear-algebra', label: 'Linear Algebra',             emoji: '∑',  path: '/linear-algebra' },
-  { id: 'studio',         label: 'Studio / Docs',              emoji: '✏️', path: '/studio' },
-  { id: 'health',         label: 'Health Tracker',             emoji: '❤️', path: '/health' },
-  { id: 'compass',        label: 'Compass',                    emoji: '🧭', path: '/compass' },
-  { id: 'lesson-builder', label: 'Lesson Builder · Contribute',emoji: '🔨', path: '/lesson-builder' },
-  { id: 'about',          label: 'About',                      emoji: 'ℹ️', path: '/about' },
-  { id: 'game-rules',     label: 'Game Reference',             emoji: '♠️', action: 'game-rules' },
+  { id: 'reference',      label: 'Reference Library',          emoji: '📐', path: '/reference', color: 'slate' },
+  { id: 'linear-algebra', label: 'Linear Algebra',             emoji: '∑',  path: '/linear-algebra', color: 'cyan' },
+  { id: 'studio',         label: 'Studio / Docs',              emoji: '✏️', path: '/studio', color: 'fuchsia' },
+  { id: 'health',         label: 'Health Tracker',             emoji: '❤️', path: '/health', color: 'rose' },
+  { id: 'compass',        label: 'Compass',                    emoji: '🧭', path: '/compass', color: 'sky' },
+  { id: 'lesson-builder', label: 'Lesson Builder · Contribute',emoji: '🔨', path: '/lesson-builder', color: 'amber' },
+  { id: 'about',          label: 'About',                      emoji: 'ℹ️', path: '/about', color: 'indigo' },
+  { id: 'game-rules',     label: 'Game Reference',             emoji: '♠️', action: 'game-rules', color: 'violet' },
 ]
 
 // Converts any item in the menu to a serialisable pin shape.
 function toPin(item, type) {
   switch (type) {
     case 'course':
-      return { id: item.key, label: item.label, emoji: item.icon, type: 'course', path: item.path }
+      return { id: item.key, label: item.label, emoji: item.icon, type: 'course', path: item.path, color: item.color }
     case 'lab':
-      return { id: item.key, label: item.label, emoji: item.emoji, type: 'lab', path: item.path, labKey: item.key, event: item.event }
+      return { id: item.key, label: item.label, emoji: item.emoji, type: 'lab', path: item.path, labKey: item.key, event: item.event, color: item.color }
     case 'game':
-      return { id: item.key, label: item.label, emoji: item.emoji, type: 'game', path: item.path, gameKey: item.key, event: item.event }
-    case 'tool':
-      return { id: item.key, label: item.label, emoji: item.glyph || '🔧', type: 'tool', eventTool: item.eventTool }
+      return { id: item.key, label: item.label, emoji: item.emoji, type: 'game', path: item.path, gameKey: item.key, event: item.event, color: item.color }
     case 'nav':
-      return { id: item.id, label: item.label, emoji: item.emoji, type: 'nav', path: item.path, action: item.action }
+      return { id: item.id, label: item.label, emoji: item.emoji, type: 'nav', path: item.path, action: item.action, color: item.color }
     default:
       return null
   }
@@ -121,12 +138,6 @@ export default function StartMenu({ onClose }) {
     }
   }
 
-  const handleOpenTool = (tool) => {
-    onClose()
-    if (tool.eventTool)
-      window.dispatchEvent(new CustomEvent('oc-open-tool', { detail: { tool: tool.eventTool } }))
-  }
-
   const handleNav = (link) => {
     onClose()
     if (link.action === 'game-rules') window.dispatchEvent(new CustomEvent('oc-game-rules'))
@@ -140,10 +151,7 @@ export default function StartMenu({ onClose }) {
       if (pin.path) navigate(pin.path)
       return
     }
-    if (pin.type === 'tool') {
-      if (pin.eventTool) window.dispatchEvent(new CustomEvent('oc-open-tool', { detail: { tool: pin.eventTool } }))
-      return
-    }
+
     if (pin.type === 'game') {
       if (pin.gameKey) {
         const entry = await getGameEntry(pin.gameKey)
@@ -176,7 +184,6 @@ export default function StartMenu({ onClose }) {
   const filteredCourses = COURSES.filter(c => !q || c.label.toLowerCase().includes(q))
   const filteredLabs    = LABS.filter(l    => !q || l.label.toLowerCase().includes(q) || l.tags?.some(t => t.toLowerCase().includes(q)))
   const filteredGames   = GAMES.filter(g   => !q || g.label.toLowerCase().includes(q) || g.tags?.some(t => t.toLowerCase().includes(q)))
-  const filteredTools   = TOOLS.filter(t   => !q || t.label?.toLowerCase().includes(q))
   const filteredNav     = NAV_LINKS.filter(n => !q || n.label.toLowerCase().includes(q))
   const filteredPins    = pins.filter(p    => !q || p.label?.toLowerCase().includes(q))
 
@@ -184,7 +191,6 @@ export default function StartMenu({ onClose }) {
   const showCourses    = tab === 'all' || tab === 'courses'
   const showLabs       = tab === 'all' || tab === 'labs'
   const showGames      = tab === 'all' || tab === 'games'
-  const showTools      = tab === 'all' || tab === 'tools'
   const showNav        = tab === 'all' || tab === 'nav'
 
   const sectionVariants = {
@@ -193,20 +199,48 @@ export default function StartMenu({ onClose }) {
   }
 
   // Shared item button — used in every section
-  const ItemBtn = ({ pin, onClick, hoverColor, children }) => (
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onClick}
-      onContextMenu={(e) => showCtxMenu(e, pin)}
-      className="relative flex flex-col items-start gap-2 p-3 rounded-2xl text-left bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md transition-all group"
-    >
-      {isPinned(pin.id) && (
-        <span className="absolute top-1.5 right-1.5 text-[10px] leading-none opacity-60 select-none">⭐</span>
-      )}
-      {children}
-    </motion.button>
-  )
+  const ItemBtn = ({ pin, onClick, children }) => {
+    const meta = pin.color && GLASS_META[pin.color]
+    let overlay = null
+    if (meta) {
+      if (pin.type === 'course') overlay = { backgroundImage: GRID_TEXTURE, opacity: 0.055 }
+      else if (pin.type === 'lab') overlay = GRID_OVL
+      else if (pin.type === 'game') overlay = DOTS_OVL
+      else if (pin.type === 'nav') overlay = STRIPES_OVL
+    }
+    
+    return (
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        onClick={onClick}
+        onContextMenu={(e) => showCtxMenu(e, pin)}
+        className={`relative flex flex-col items-start gap-2 p-3 rounded-2xl text-left transition-all group overflow-hidden ${
+          meta
+            ? `bg-gradient-to-br ${meta.header} border ${meta.border} text-white`
+            : 'bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md'
+        }`}
+        style={meta ? { boxShadow: meta.glow.replace('32px', '16px').replace('0.50', '0.20') } : undefined}
+      >
+        {meta && overlay && (
+          <div className="absolute inset-0 pointer-events-none" style={overlay} />
+        )}
+        {meta && (
+          <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none" />
+        )}
+        {isPinned(pin.id) && (
+          <span className="absolute top-1.5 right-1.5 text-[10px] leading-none opacity-80 select-none z-10 drop-shadow-md">⭐</span>
+        )}
+        <span className="text-2xl flex-shrink-0 relative z-10">{pin.emoji}</span>
+        <span className={`text-sm font-bold line-clamp-2 relative z-10 pr-2 ${
+          meta ? 'text-white drop-shadow-sm' : 'text-slate-700 dark:text-slate-300'
+        }`}>
+          {pin.label}
+        </span>
+        {children}
+      </motion.button>
+    )
+  }
 
   return (
     <>
@@ -277,26 +311,15 @@ export default function StartMenu({ onClose }) {
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {filteredPins.map(pin => (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      key={pin.id}
-                      onClick={() => handleOpenPin(pin)}
-                      onContextMenu={(e) => showCtxMenu(e, pin)}
-                      className="relative flex flex-col items-start gap-2 p-3 rounded-2xl text-left bg-amber-50/60 dark:bg-amber-900/10 hover:bg-amber-100/80 dark:hover:bg-amber-900/20 border border-amber-200/50 dark:border-amber-700/30 shadow-sm hover:shadow-md transition-all group"
-                    >
-                      <span className="text-2xl flex-shrink-0">{pin.emoji}</span>
-                      <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-amber-600 dark:group-hover:text-amber-400 line-clamp-2">
-                        {pin.label}
-                      </span>
+                    <ItemBtn key={pin.id} pin={pin} onClick={() => handleOpenPin(pin)}>
                       <button
                         title="Remove from Favourites"
                         onClick={(e) => { e.stopPropagation(); removePin(pin.id) }}
-                        className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-60 hover:!opacity-100 text-slate-400 hover:text-red-500 transition-all text-xs leading-none w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/50 dark:hover:bg-slate-800/50"
+                        className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 hover:!opacity-100 text-white/50 hover:text-white transition-all text-xs leading-none w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/20 z-20"
                       >
                         ✕
                       </button>
-                    </motion.button>
+                    </ItemBtn>
                   ))}
                 </div>
               </motion.section>
@@ -320,10 +343,7 @@ export default function StartMenu({ onClose }) {
                   {filteredCourses.map(course => {
                     const pin = toPin(course, 'course')
                     return (
-                      <ItemBtn key={course.key} pin={pin} onClick={() => { onClose(); navigate(course.path) }} hoverColor="indigo">
-                        <span className="text-2xl flex-shrink-0">{course.icon}</span>
-                        <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 line-clamp-2">{course.label}</span>
-                      </ItemBtn>
+                      <ItemBtn key={course.key} pin={pin} onClick={() => { onClose(); navigate(course.path) }} />
                     )
                   })}
                 </div>
@@ -338,10 +358,7 @@ export default function StartMenu({ onClose }) {
                   {filteredLabs.map(lab => {
                     const pin = toPin(lab, 'lab')
                     return (
-                      <ItemBtn key={lab.key} pin={pin} onClick={() => handleOpenLab(lab)} hoverColor="amber">
-                        <span className="text-2xl flex-shrink-0">{lab.emoji}</span>
-                        <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-amber-600 dark:group-hover:text-amber-400 line-clamp-2">{lab.label}</span>
-                      </ItemBtn>
+                      <ItemBtn key={lab.key} pin={pin} onClick={() => handleOpenLab(lab)} />
                     )
                   })}
                 </div>
@@ -356,28 +373,7 @@ export default function StartMenu({ onClose }) {
                   {filteredGames.map(game => {
                     const pin = toPin(game, 'game')
                     return (
-                      <ItemBtn key={game.key} pin={pin} onClick={() => handleOpenGame(game)} hoverColor="rose">
-                        <span className="text-2xl flex-shrink-0">{game.emoji}</span>
-                        <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-rose-600 dark:group-hover:text-rose-400 line-clamp-2">{game.label}</span>
-                      </ItemBtn>
-                    )
-                  })}
-                </div>
-              </motion.section>
-            )}
-
-            {/* ---- Tools ---- */}
-            {showTools && filteredTools.filter(t => t.eventTool).length > 0 && (
-              <motion.section key="tools-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
-                <h3 className="text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-2">Tools</h3>
-                <div className="grid grid-cols-3 gap-2">
-                  {filteredTools.filter(t => t.eventTool).map(tool => {
-                    const pin = toPin(tool, 'tool')
-                    return (
-                      <ItemBtn key={tool.key} pin={pin} onClick={() => handleOpenTool(tool)} hoverColor="emerald">
-                        <span className="text-2xl flex-shrink-0">{tool.glyph || '🔧'}</span>
-                        <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 line-clamp-2">{tool.label}</span>
-                      </ItemBtn>
+                      <ItemBtn key={game.key} pin={pin} onClick={() => handleOpenGame(game)} />
                     )
                   })}
                 </div>
@@ -392,10 +388,7 @@ export default function StartMenu({ onClose }) {
                   {filteredNav.map(link => {
                     const pin = toPin(link, 'nav')
                     return (
-                      <ItemBtn key={link.id} pin={pin} onClick={() => handleNav(link)} hoverColor="sky">
-                        <span className="text-2xl flex-shrink-0">{link.emoji}</span>
-                        <span className="text-sm text-slate-700 dark:text-slate-300 font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 line-clamp-2">{link.label}</span>
-                      </ItemBtn>
+                      <ItemBtn key={link.id} pin={pin} onClick={() => handleNav(link)} />
                     )
                   })}
                 </div>
@@ -404,7 +397,7 @@ export default function StartMenu({ onClose }) {
 
           </AnimatePresence>
 
-          {query && filteredCourses.length === 0 && filteredLabs.length === 0 && filteredGames.length === 0 && filteredTools.length === 0 && filteredNav.length === 0 && (
+          {query && filteredCourses.length === 0 && filteredLabs.length === 0 && filteredGames.length === 0 && filteredNav.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 opacity-50">
               <span className="text-4xl mb-3">🔍</span>
               <p className="text-center text-sm font-medium">No results for "{query}"</p>
