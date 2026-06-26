@@ -6,7 +6,7 @@ export const meta = {
   jumpTo: '/rpg-workout',
 }
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useRPGData } from './hooks/useRPGData';
 import { ClassSelector } from './components/ClassSelector';
 import { HeroPanel } from './components/HeroPanel';
@@ -22,16 +22,9 @@ import { WorkoutHistoryChart } from './components/WorkoutHistoryChart';
 import RPGContributeModal from './components/RPGContributeModal';
 import { AchievementsPanel } from './components/AchievementsPanel';
 import { BodyWeightTracker } from './components/BodyWeightTracker';
-import { Sword, ScrollText, BarChart2, Plus } from 'lucide-react';
-
-const TABS = [
-  { id: 'workout', label: 'Workout', icon: Sword },
-  { id: 'quests',  label: 'Quests',  icon: ScrollText },
-  { id: 'progress',label: 'Progress',icon: BarChart2 },
-]
+import { Plus } from 'lucide-react';
 
 export default function RPGWorkoutPage() {
-  const [activeTab, setActiveTab] = useState('workout');
   const [showContribute, setShowContribute] = useState(false);
   const {
     rpgData,
@@ -71,7 +64,7 @@ export default function RPGWorkoutPage() {
     <div className="min-h-screen text-slate-200 relative">
       <RPGFantasyBackground />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 pt-4 pb-24 md:pb-8 space-y-4">
+      <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-6 pt-4 pb-32 md:pb-16 space-y-4">
 
         {/* Header */}
         <header className="flex items-start justify-between gap-4 pt-2">
@@ -90,7 +83,7 @@ export default function RPGWorkoutPage() {
           </button>
         </header>
 
-        {/* Hero + Radar — always visible */}
+        {/* Hero + Radar */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2">
             <HeroPanel rpgData={rpgData} workoutsThisWeek={workoutsThisWeek} />
@@ -106,84 +99,46 @@ export default function RPGWorkoutPage() {
           </div>
         </div>
 
-        {/* Tab bar */}
-        <div className="flex gap-1 bg-slate-900/60 backdrop-blur-sm border border-slate-700/60 rounded-xl p-1">
-          {TABS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => setActiveTab(id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-black uppercase tracking-wide transition-all ${
-                activeTab === id
-                  ? 'bg-slate-800 text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-300'
-              }`}
-            >
-              <Icon size={13} />
-              {label}
-            </button>
-          ))}
+        {/* Plan + Workout */}
+        <PlanBuilder rpgData={rpgData} setActivePlan={setActivePlan} saveCustomPlan={saveCustomPlan} />
+        <WorkoutLogger
+          logDetailedWorkout={logDetailedWorkout}
+          activePlan={activePlan}
+          personalRecords={rpgData.personalRecords || {}}
+          sessionLogs={rpgData.sessionLogs || []}
+        />
+
+        {/* Quests */}
+        <QuestBoard rpgData={rpgData} acceptQuest={acceptQuest} completeQuest={completeQuest} />
+
+        {/* Progress */}
+        <div className="bg-slate-900/70 border border-slate-700 rounded-2xl p-5 backdrop-blur-xl">
+          <WorkoutHistoryChart workoutLogs={rpgData.workoutLogs} />
+          <h3 className="text-slate-400 font-bold mb-3 mt-4 text-xs uppercase tracking-widest">Recent Activity</h3>
+          {rpgData.workoutLogs.length === 0 ? (
+            <p className="text-slate-500 text-sm italic">No logs yet — complete a workout to see history.</p>
+          ) : (
+            <ul className="space-y-2">
+              {rpgData.workoutLogs.slice(0, 6).map(log => {
+                const ex = getExerciseDetails(log.exerciseId);
+                const m = log.metrics || {};
+                const detail = m.reps ? `${m.sets || 1}×${m.reps}` : m.distance ? `${m.distance}km` : m.duration ? `${m.duration}m` : '';
+                return (
+                  <li key={log.id} className="flex justify-between items-center text-sm border-b border-slate-800/60 pb-1.5 last:border-0">
+                    <div className="min-w-0">
+                      <span className="font-bold text-slate-300 truncate block">{ex?.name || log.exerciseId}</span>
+                      {detail && <span className="text-slate-500 text-xs">{detail}</span>}
+                    </div>
+                    <span className="text-emerald-400 font-mono text-xs shrink-0 ml-2">+{log.xpEarned} XP</span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
 
-        {/* Tab: Workout */}
-        {activeTab === 'workout' && (
-          <div className="space-y-4">
-            <PlanBuilder rpgData={rpgData} setActivePlan={setActivePlan} saveCustomPlan={saveCustomPlan} />
-            <WorkoutLogger
-              logDetailedWorkout={logDetailedWorkout}
-              activePlan={activePlan}
-              personalRecords={rpgData.personalRecords || {}}
-              sessionLogs={rpgData.sessionLogs || []}
-            />
-          </div>
-        )}
-
-        {/* Tab: Quests */}
-        {activeTab === 'quests' && (
-          <QuestBoard
-            rpgData={rpgData}
-            acceptQuest={acceptQuest}
-            completeQuest={completeQuest}
-          />
-        )}
-
-        {/* Tab: Progress */}
-        {activeTab === 'progress' && (
-          <div className="space-y-4">
-            {/* Recent activity */}
-            <div className="bg-slate-900/70 border border-slate-700 rounded-2xl p-5 backdrop-blur-xl">
-              <WorkoutHistoryChart workoutLogs={rpgData.workoutLogs} />
-              <h3 className="text-slate-400 font-bold mb-3 mt-4 text-xs uppercase tracking-widest">Recent Activity</h3>
-              {rpgData.workoutLogs.length === 0 ? (
-                <p className="text-slate-500 text-sm italic">No logs yet — complete a workout to see history.</p>
-              ) : (
-                <ul className="space-y-2">
-                  {rpgData.workoutLogs.slice(0, 6).map(log => {
-                    const ex = getExerciseDetails(log.exerciseId);
-                    const m = log.metrics || {};
-                    const detail = m.reps ? `${m.sets || 1}×${m.reps}` : m.distance ? `${m.distance}km` : m.duration ? `${m.duration}m` : '';
-                    return (
-                      <li key={log.id} className="flex justify-between items-center text-sm border-b border-slate-800/60 pb-1.5 last:border-0">
-                        <div className="min-w-0">
-                          <span className="font-bold text-slate-300 truncate block">{ex?.name || log.exerciseId}</span>
-                          {detail && <span className="text-slate-500 text-xs">{detail}</span>}
-                        </div>
-                        <span className="text-emerald-400 font-mono text-xs shrink-0 ml-2">+{log.xpEarned} XP</span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-
-            <BodyWeightTracker
-              bodyWeightLog={rpgData.bodyWeightLog || []}
-              onLog={logBodyWeight}
-            />
-
-            <AchievementsPanel achievements={rpgData.achievements || []} />
-          </div>
-        )}
+        <BodyWeightTracker bodyWeightLog={rpgData.bodyWeightLog || []} onLog={logBodyWeight} />
+        <AchievementsPanel achievements={rpgData.achievements || []} />
       </div>
 
       {showContribute && <RPGContributeModal onClose={() => setShowContribute(false)} />}

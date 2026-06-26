@@ -179,7 +179,7 @@ export default function BrainPage() {
         <div className="absolute bottom-20 right-10 w-64 h-64 rounded-full bg-indigo-400/10 dark:bg-indigo-600/10 blur-3xl" />
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 pb-32 md:pb-16">
         {/* Page header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
