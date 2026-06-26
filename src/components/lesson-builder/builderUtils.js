@@ -15,6 +15,26 @@ export const HANDLED_SECTION_KEYS = new Set([
 ])
 export const HANDLED_META_KEYS = new Set(['id', 'slug', 'chapter', 'order', 'title', 'subtitle', 'tags', 'coreConcept', 'prerequisites', 'timeToComplete', 'aliases', 'nextLesson', 'mentalModel'])
 
+export const SECTION_COLORS = {
+  intuition:      'sky',
+  rigor:          'teal',
+  math:           'amber',
+  examples:       'emerald',
+  challenges:     'orange',
+  walkthroughs:   'cyan',
+  quiz:           'pink',
+  checkpoints:    'lime',
+  cells:          'violet',
+  python:         'green',
+  semantics:      'blue',
+  spiral:         'rose',
+  assessment:     'red',
+  misconceptions: 'yellow',
+  transferPrompts:'indigo',
+  debugging:      'red',
+  mastery:        'fuchsia',
+}
+
 export const PALETTE_BLOCKS = [
   { type: 'intuition',      label: 'Intuition',       icon: '🧠', desc: 'Prose + callouts explaining the core idea' },
   { type: 'math',           label: 'Math',            icon: '📐', desc: 'Formal math content with equations and callouts' },

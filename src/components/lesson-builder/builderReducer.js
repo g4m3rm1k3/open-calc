@@ -41,6 +41,17 @@ export function builderReducer(state, action) {
       return { ...state, sections }
     }
 
+    case 'MOVE_TO': {
+      const fromIdx = state.sections.findIndex(s => s._id === action.id)
+      if (fromIdx === -1) return state
+      const toIdx = Math.max(0, Math.min(action.toIndex, state.sections.length - 1))
+      if (fromIdx === toIdx) return state
+      const sections = [...state.sections]
+      const [moved] = sections.splice(fromIdx, 1)
+      sections.splice(toIdx, 0, moved)
+      return { ...state, sections }
+    }
+
     case 'UPDATE_SECTION': {
       return {
         ...state,

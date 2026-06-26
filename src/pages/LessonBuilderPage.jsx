@@ -5,6 +5,7 @@ import { builderReducer } from '../components/lesson-builder/builderReducer.js'
 import { emptyState, lessonToState, PALETTE_BLOCKS } from '../components/lesson-builder/builderUtils.js'
 import ComponentPalette from '../components/lesson-builder/ComponentPalette.jsx'
 import BuilderCanvas from '../components/lesson-builder/BuilderCanvas.jsx'
+import LessonTreePanel from '../components/lesson-builder/LessonTreePanel.jsx'
 import ExportPanel from '../components/lesson-builder/ExportPanel.jsx'
 import StepTour from '../components/ui/StepTour.jsx'
 
@@ -16,8 +17,8 @@ const BUILDER_TOUR_STEPS = [
     body: "Lessons are made of blocks — Intuition, Math, Rigor, Examples, Challenges, Quiz, and Python notebooks. Add blocks from the palette on the left, fill them in, and the builder assembles a real lesson file behind the scenes.",
   },
   {
-    title: 'Visualizations connect by ID',
-    body: "Any block can embed an interactive visualization by referencing its component ID (e.g. previewVisualizationId). The Viz Builder lets you create and preview those separately, then drop the ID into a lesson block here.",
+    title: 'Lesson Map — the right panel',
+    body: "The Lesson Map on the right shows the full structure of your lesson as a tree. Click any node to scroll to it in the canvas. Drag section rows to reorder them. Expand walkthroughs to see individual steps.",
   },
   {
     title: 'LaTeX is checked as you type',
@@ -25,7 +26,7 @@ const BUILDER_TOUR_STEPS = [
   },
   {
     title: 'Submit it as a real contribution',
-    body: "When you're done, \"Submit as contribution\" in the Export panel signs you in with GitHub and opens a real pull request — fork, branch, and commit handled automatically. No local git setup needed.",
+    body: "When you're done, \"Export .js\" in the top bar downloads the file. Use the GitHub contributor flow (coming soon) to open a pull request directly from the app.",
   },
 ]
 
@@ -46,13 +47,13 @@ export default function LessonBuilderPage() {
   const [state, dispatch] = useReducer(builderReducer, undefined, () =>
     emptyState(chapterId ?? '', lessonSlug ?? ''),
   )
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading]       = useState(false)
   const [showExport, setShowExport] = useState(false)
-  const [showTour, setShowTour] = useState(() => !localStorage.getItem(BUILDER_TOUR_SEEN_KEY))
-  // Diagrams live one folder per course (src/courses/<courseId>/diagrams/) —
-  // derive courseId from chapterId the same way BuilderCanvas/lessonSerializer
-  // do, so this works for whichever lesson/course happens to be open.
+  const [showTour, setShowTour]     = useState(() => !localStorage.getItem(BUILDER_TOUR_SEEN_KEY))
+  const [selectedId, setSelectedId] = useState(null)
+
   const courseId = (chapterId || state.meta.chapter || 'geometry').replace(/-\d+$/, '')
+
   const dismissTour = () => {
     localStorage.setItem(BUILDER_TOUR_SEEN_KEY, '1')
     setShowTour(false)
@@ -65,24 +66,23 @@ export default function LessonBuilderPage() {
     Promise.all([loadLesson(chapterId, lessonSlug), loadLessonSource(chapterId, lessonSlug)])
       .then(([lesson, sourceText]) => {
         if (cancelled) return
-        if (lesson) {
-          dispatch({ type: 'LOAD', payload: lessonToState(lesson, chapterId, lessonSlug, sourceText) })
-        }
+        if (lesson) dispatch({ type: 'LOAD', payload: lessonToState(lesson, chapterId, lessonSlug, sourceText) })
         setLoading(false)
       }).catch(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }
   }, [chapterId, lessonSlug])
 
-  const presentTypes = state.sections.map(s => s.type)
-
   const backPath = chapterId && lessonSlug
     ? `/chapter/${chapterId}/${lessonSlug}`
     : '/'
 
+  // Header height ~57px — body fills the rest and each column scrolls independently
+  const HEADER_H = 57
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      {/* Top bar */}
-      <header className="sticky top-0 z-50 flex items-center gap-4 px-6 py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div className="flex-1 min-h-0 flex flex-col bg-slate-50 dark:bg-slate-950 overflow-hidden">
+      {/* ── Top bar ── */}
+      <header className="shrink-0 flex items-center gap-4 px-6 py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm z-50">
         <button
           onClick={() => navigate(backPath)}
           className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
@@ -111,7 +111,7 @@ export default function LessonBuilderPage() {
             onClick={() => window.dispatchEvent(new CustomEvent('oc-open-scratchpad', { detail: { dir: `src/courses/${courseId}/diagrams` } }))}
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-xl border border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"
           >
-            🎨 Open Scratchpad
+            🎨 Scratchpad
           </button>
           <button
             onClick={() => setShowExport(true)}
@@ -122,16 +122,36 @@ export default function LessonBuilderPage() {
         </div>
       </header>
 
-      {/* Body */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex gap-6 items-start">
-        {/* Left: palette */}
-        <ComponentPalette
-          presentTypes={presentTypes}
-          onAdd={type => dispatch({ type: 'ADD_SECTION', blockType: type })}
-        />
+      {/* ── Three-column body — each column scrolls independently ── */}
+      <div className="flex-1 flex gap-0 overflow-hidden">
 
-        {/* Center: canvas */}
-        <BuilderCanvas state={state} dispatch={dispatch} />
+        {/* Left: palette */}
+        <div className="shrink-0 w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-y-auto">
+          <ComponentPalette
+            presentTypes={state.sections.map(s => s.type)}
+            onAdd={type => dispatch({ type: 'ADD_SECTION', blockType: type })}
+          />
+        </div>
+
+        {/* Center: canvas — no max-width cap, uses available space */}
+        <div className="flex-1 min-w-0 overflow-y-auto px-8 py-6">
+          <BuilderCanvas
+            state={state}
+            dispatch={dispatch}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+          />
+        </div>
+
+        {/* Right: lesson tree */}
+        <div className="shrink-0 w-80 border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+          <LessonTreePanel
+            state={state}
+            dispatch={dispatch}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+          />
+        </div>
       </div>
 
       {/* Export panel overlay */}

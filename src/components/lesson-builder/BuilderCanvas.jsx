@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import IdentityBlock from './blocks/IdentityBlock.jsx'
 import HookBlock from './blocks/HookBlock.jsx'
 import MentalModelBlock from './blocks/MentalModelBlock.jsx'
@@ -19,12 +19,44 @@ import TransferPromptsBlock from './blocks/TransferPromptsBlock.jsx'
 import DebuggingBlock from './blocks/DebuggingBlock.jsx'
 import MasteryBlock from './blocks/MasteryBlock.jsx'
 import BlockShell from './BlockShell.jsx'
-import { HANDLED_SECTION_KEYS, HANDLED_META_KEYS } from './builderUtils.js'
+import { BlockColorCtx } from './BlockColorContext.js'
+import { HANDLED_SECTION_KEYS, HANDLED_META_KEYS, SECTION_COLORS } from './builderUtils.js'
 
-// Catches any top-level section type without a dedicated block component —
-// editable as raw JSON instead of an inert "Unknown section type" message,
-// so no lesson's content is ever invisible just because the builder hasn't
-// special-cased its shape yet.
+export const SECTION_LABELS = {
+  intuition: 'Intuition', math: 'Math', rigor: 'Rigor',
+  examples: 'Examples', challenges: 'Challenges', checkpoints: 'Checkpoints', quiz: 'Quiz',
+  cells: 'Cells', walkthroughs: 'Walkthroughs',
+  semantics: 'Semantics', spiral: 'Spiral', assessment: 'Assessment',
+  misconceptions: 'Misconceptions', transferPrompts: 'Transfer Prompts',
+  debugging: 'Debugging', mastery: 'Mastery',
+}
+
+export const SECTION_ICONS = {
+  intuition: '🧠', math: '📐', rigor: '∴',
+  examples: '✏️', challenges: '🎯', checkpoints: '✅', quiz: '🧪',
+  cells: '⚗️', walkthroughs: '🚶',
+  semantics: '🔣', spiral: '🌀', assessment: '📋',
+  misconceptions: '⚠️', transferPrompts: '🚀',
+  debugging: '🐛', mastery: '🎓',
+}
+
+// Wrapper that injects the color context value and renders the selection ring
+function BlockWrapper({ id, color, selected, onSelect, children }) {
+  return (
+    <BlockColorCtx.Provider value={color}>
+      <div
+        data-block-id={id}
+        onClick={() => onSelect?.(id)}
+        className={`relative rounded-xl transition-all duration-150 ${
+          selected ? 'ring-2 ring-brand-400 ring-offset-2 dark:ring-offset-slate-950' : ''
+        }`}
+      >
+        {children}
+      </div>
+    </BlockColorCtx.Provider>
+  )
+}
+
 function GenericSectionBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown, onRemove }) {
   const [editing, setEditing] = useState(false)
   const [text, setText] = useState(() => JSON.stringify(sec, null, 2))
@@ -43,7 +75,7 @@ function GenericSectionBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown
   const preview = (
     <div className="space-y-1">
       <p className="text-xs text-amber-600 dark:text-amber-400">
-        No dedicated editor for "{sec.type}" sections yet — click to edit as raw data. Nothing is hidden or dropped on export.
+        No dedicated editor for "{sec.type}" sections yet — click to edit as raw data.
       </p>
       <pre className="text-[11px] font-mono text-slate-500 dark:text-slate-400 max-h-20 overflow-hidden">
         {JSON.stringify(sec, null, 2).slice(0, 240)}
@@ -63,7 +95,12 @@ function GenericSectionBlock({ sec, dispatch, index, total, onMoveUp, onMoveDown
   )
 
   return (
-    <BlockShell label={sec.type} icon="❓" index={index} total={total} onMoveUp={onMoveUp} onMoveDown={onMoveDown} onRemove={onRemove} isEditing={editing} onEdit={() => setEditing(true)}>
+    <BlockShell
+      label={sec.type} icon="❓"
+      index={index} total={total}
+      onMoveUp={onMoveUp} onMoveDown={onMoveDown} onRemove={onRemove}
+      isEditing={editing} onEdit={() => setEditing(true)}
+    >
       {editing ? editor : preview}
     </BlockShell>
   )
@@ -87,30 +124,12 @@ function DropZone({ onDrop, label }) {
   )
 }
 
-const SECTION_LABELS = {
-  intuition: 'Intuition', math: 'Math', rigor: 'Rigor',
-  examples: 'Examples', challenges: 'Challenges', checkpoints: 'Checkpoints', quiz: 'Quiz',
-  cells: 'Cells', walkthroughs: 'Walkthroughs',
-  semantics: 'Semantics', spiral: 'Spiral', assessment: 'Assessment',
-  misconceptions: 'Misconceptions', transferPrompts: 'Transfer Prompts',
-  debugging: 'Debugging', mastery: 'Mastery',
-}
-
-const SECTION_ICONS = {
-  intuition: '🧠', math: '📐', rigor: '∴',
-  examples: '✏️', challenges: '🎯', checkpoints: '✅', quiz: '🧪',
-  cells: '⚗️', walkthroughs: '🚶',
-  semantics: '🔣', spiral: '🌀', assessment: '📋',
-  misconceptions: '⚠️', transferPrompts: '🚀',
-  debugging: '🐛', mastery: '🎓',
-}
-
 function SectionBlock({ sec, dispatch, index, total, courseId }) {
   const common = {
     sec, dispatch, index, total, courseId,
-    onMoveUp: () => dispatch({ type: 'MOVE_UP', id: sec._id }),
+    onMoveUp:   () => dispatch({ type: 'MOVE_UP',   id: sec._id }),
     onMoveDown: () => dispatch({ type: 'MOVE_DOWN', id: sec._id }),
-    onRemove: () => {
+    onRemove:   () => {
       if (window.confirm(`Remove ${SECTION_LABELS[sec.type] ?? sec.type} section?`)) {
         dispatch({ type: 'REMOVE_SECTION', id: sec._id })
       }
@@ -118,52 +137,36 @@ function SectionBlock({ sec, dispatch, index, total, courseId }) {
   }
 
   switch (sec.type) {
-    case 'intuition':
-      return <ProseCalloutBlock {...common} label="Intuition" icon="🧠" sectionId={sec._id} />
-    case 'rigor':
-      return <ProseCalloutBlock {...common} label="Rigor" icon="∴" sectionId={sec._id} />
-    case 'math':
-      return <MathBlock {...common} sectionId={sec._id} />
-    case 'examples':
-      return <ExamplesBlock {...common} />
-    case 'challenges':
-      return <ChallengesBlock {...common} />
-    case 'checkpoints':
-      return <CheckpointsBlock {...common} />
-    case 'quiz':
-      return <QuizBlock {...common} />
-    case 'python':
-      return <PythonBlock {...common} />
-    case 'cells':
-      return <CellsBlock {...common} />
-    case 'walkthroughs':
-      return <WalkthroughsBlock {...common} />
-    case 'semantics':
-      return <SemanticsBlock {...common} />
-    case 'spiral':
-      return <SpiralBlock {...common} />
-    case 'assessment':
-      return <AssessmentBlock {...common} />
-    case 'misconceptions':
-      return <MisconceptionsBlock {...common} />
-    case 'transferPrompts':
-      return <TransferPromptsBlock {...common} />
-    case 'debugging':
-      return <DebuggingBlock {...common} />
-    case 'mastery':
-      return <MasteryBlock {...common} />
-    default:
-      return <GenericSectionBlock {...common} />
+    case 'intuition':     return <ProseCalloutBlock {...common} label="Intuition" icon="🧠" sectionId={sec._id} />
+    case 'rigor':         return <ProseCalloutBlock {...common} label="Rigor"     icon="∴"  sectionId={sec._id} />
+    case 'math':          return <MathBlock         {...common} sectionId={sec._id} />
+    case 'examples':      return <ExamplesBlock     {...common} />
+    case 'challenges':    return <ChallengesBlock   {...common} />
+    case 'checkpoints':   return <CheckpointsBlock  {...common} />
+    case 'quiz':          return <QuizBlock         {...common} />
+    case 'python':        return <PythonBlock       {...common} />
+    case 'cells':         return <CellsBlock        {...common} />
+    case 'walkthroughs':  return <WalkthroughsBlock {...common} />
+    case 'semantics':     return <SemanticsBlock    {...common} />
+    case 'spiral':        return <SpiralBlock       {...common} />
+    case 'assessment':    return <AssessmentBlock   {...common} />
+    case 'misconceptions':  return <MisconceptionsBlock  {...common} />
+    case 'transferPrompts': return <TransferPromptsBlock {...common} />
+    case 'debugging':     return <DebuggingBlock    {...common} />
+    case 'mastery':       return <MasteryBlock      {...common} />
+    default:              return <GenericSectionBlock {...common} />
   }
 }
 
-// Show fields from _raw that the builder doesn't handle — confirms nothing will be dropped
 function PassthroughPanel({ raw }) {
   const [expanded, setExpanded] = useState(false)
   if (!raw) return null
 
-  const passKeys = Object.keys(raw).filter(k => !HANDLED_SECTION_KEYS.has(k) && !HANDLED_META_KEYS.has(k) && !['hook', 'id', 'slug', 'chapter', 'order', 'title', 'subtitle', 'tags', 'coreConcept', 'prerequisites', 'timeToComplete', 'aliases', 'nextLesson'].includes(k))
-
+  const passKeys = Object.keys(raw).filter(k =>
+    !HANDLED_SECTION_KEYS.has(k) && !HANDLED_META_KEYS.has(k) &&
+    !['hook', 'id', 'slug', 'chapter', 'order', 'title', 'subtitle', 'tags', 'coreConcept',
+      'prerequisites', 'timeToComplete', 'aliases', 'nextLesson'].includes(k)
+  )
   if (!passKeys.length) return null
 
   return (
@@ -197,27 +200,31 @@ function PassthroughPanel({ raw }) {
   )
 }
 
-export default function BuilderCanvas({ state, dispatch }) {
+export default function BuilderCanvas({ state, dispatch, selectedId, onSelect }) {
   const { meta, hook, mentalModel, sections, _raw } = state
-  // Diagrams live at src/courses/<courseId>/diagrams/, one folder per course —
-  // derive courseId from the chapter id (e.g. 'linear-algebra-1' -> 'linear-algebra')
-  // the same way lessonSerializer.js's getFilePath() does, so SVG blocks resolve
-  // to the right course's diagrams folder instead of always assuming geometry.
   const courseId = (state._chapterId || meta.chapter || 'geometry').replace(/-\d+$/, '')
 
+  // Scroll selected block into view within canvas scroll container
+  useEffect(() => {
+    if (!selectedId) return
+    const el = document.querySelector(`[data-block-id="${selectedId}"]`)
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }, [selectedId])
+
   return (
-    <div className="flex-1 min-w-0 space-y-3">
-      {/* Rigid: identity */}
-      <IdentityBlock meta={meta} dispatch={dispatch} />
+    <div className="space-y-3">
+      <BlockWrapper id="__identity" color="indigo" selected={selectedId === '__identity'} onSelect={onSelect}>
+        <IdentityBlock meta={meta} dispatch={dispatch} />
+      </BlockWrapper>
 
-      {/* Rigid: hook */}
-      <HookBlock hook={hook} dispatch={dispatch} courseId={courseId} />
+      <BlockWrapper id="__hook" color="violet" selected={selectedId === '__hook'} onSelect={onSelect}>
+        <HookBlock hook={hook} dispatch={dispatch} courseId={courseId} />
+      </BlockWrapper>
 
-      {/* Rigid: mental model — optional, only shows meaningfully once it has content,
-          but always present so it's easy to add even when a lesson didn't have one */}
-      <MentalModelBlock mentalModel={mentalModel} dispatch={dispatch} />
+      <BlockWrapper id="__mentalmodel" color="purple" selected={selectedId === '__mentalmodel'} onSelect={onSelect}>
+        <MentalModelBlock mentalModel={mentalModel} dispatch={dispatch} />
+      </BlockWrapper>
 
-      {/* Drop zone before first flexible section */}
       {sections.length === 0 ? (
         <DropZone
           label="Drag a section here to start"
@@ -231,7 +238,14 @@ export default function BuilderCanvas({ state, dispatch }) {
           />
           {sections.map((sec, i) => (
             <div key={sec._id}>
-              <SectionBlock sec={sec} dispatch={dispatch} index={i} total={sections.length} courseId={courseId} />
+              <BlockWrapper
+                id={sec._id}
+                color={SECTION_COLORS[sec.type] ?? 'slate'}
+                selected={selectedId === sec._id}
+                onSelect={onSelect}
+              >
+                <SectionBlock sec={sec} dispatch={dispatch} index={i} total={sections.length} courseId={courseId} />
+              </BlockWrapper>
               <DropZone
                 label="+"
                 onDrop={type => dispatch({ type: 'ADD_SECTION', blockType: type, insertAt: i + 1 })}
@@ -241,7 +255,6 @@ export default function BuilderCanvas({ state, dispatch }) {
         </>
       )}
 
-      {/* Fields from the original lesson that are preserved but not editable in the builder */}
       <PassthroughPanel raw={_raw} />
     </div>
   )

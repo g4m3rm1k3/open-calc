@@ -2,7 +2,7 @@ import { PALETTE_BLOCKS } from './builderUtils.js'
 
 export default function ComponentPalette({ onAdd, presentTypes }) {
   return (
-    <aside className="w-64 shrink-0 flex flex-col gap-2 sticky top-0 self-start">
+    <aside className="flex flex-col gap-2 p-4">
       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">
         Add Section
       </p>
