@@ -872,6 +872,28 @@ export default function MarkdownHub() {
   const [workspaceSnap, setWorkspaceSnap] = useState({ code: '', language: '', filename: '', fileList: [], getTerminalOutput: () => '' })
   const isDark = useIsDark()
   const [sidebarTab, setSidebarTab] = useState('docs') // 'docs' | 'toc'
+  const [docSearch, setDocSearch] = useState('')
+
+  // Flat list of all doc paths for search — derived once from the glob keys
+  const allDocPaths = useMemo(() => Object.keys(DOCS_MODULES), [])
+
+  const searchResults = useMemo(() => {
+    const q = docSearch.trim().toLowerCase()
+    if (q.length < 2) return []
+    return allDocPaths
+      .filter((p) => {
+        const rel = p.slice(PREFIX.length).toLowerCase()
+        return q.split(/\s+/).every((word) => rel.includes(word))
+      })
+      .slice(0, 40)
+      .map((p) => {
+        const rel = p.slice(PREFIX.length)
+        const parts = rel.split('/')
+        const fileName = parts[parts.length - 1]
+        const folder = parts.slice(0, -1).join(' / ')
+        return { path: p, fileName: displayName(fileName), folder: displayName(folder) }
+      })
+  }, [docSearch, allDocPaths])
   const contentScrollRef = useRef(null)
   const headings = useMemo(() => {
     if (!content) return []
@@ -1457,8 +1479,39 @@ export default function MarkdownHub() {
         <DocsCtx.Provider value={docsCtxValue}>
         <div className={`flex flex-1 min-h-0 overflow-hidden w-full relative ${codeAlongOpen ? 'min-w-0' : ''}`}>
           <div className={`${docsNavOpen ? 'hidden sm:flex' : 'hidden'} ${codeAlongOpen ? 'w-[240px]' : 'w-[300px]'} ${ui.bg1} border-r ${ui.border} flex-col shrink-0 overflow-hidden h-full`}>
-            {/* Sidebar tab switcher — only in tutorials mode when doc has headings */}
-            {tab === 'tutorials' && headings.length > 0 && (
+
+            {/* ── Docs search bar ── */}
+            {tab === 'tutorials' && (
+              <div className={`shrink-0 px-2 py-2 border-b ${ui.border}`}>
+                <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md border ${ui.border} ${ui.bg1} transition-colors focus-within:ring-1`}
+                  style={{ '--tw-ring-color': accentColor }}
+                >
+                  <svg className="w-3 h-3 shrink-0 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <input
+                    type="text"
+                    value={docSearch}
+                    onChange={(e) => setDocSearch(e.target.value)}
+                    placeholder="Search docs…"
+                    className={`flex-1 bg-transparent text-[12px] outline-none placeholder-slate-400 dark:placeholder-slate-600 ${ui.txt1}`}
+                  />
+                  {docSearch && (
+                    <button
+                      onClick={() => setDocSearch('')}
+                      className="opacity-40 hover:opacity-70 transition-opacity"
+                    >
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Sidebar tab switcher — only in tutorials mode when doc has headings and not searching */}
+            {tab === 'tutorials' && headings.length > 0 && !docSearch && (
               <div className={`flex shrink-0 border-b ${ui.border}`}>
                 <button
                   onClick={() => setSidebarTab('docs')}
@@ -1477,6 +1530,38 @@ export default function MarkdownHub() {
               </div>
             )}
 
+            {/* ── Search results ── */}
+            {tab === 'tutorials' && docSearch.trim().length >= 2 && (
+              <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+                {searchResults.length === 0 ? (
+                  <p className={`px-3 py-4 text-[11px] text-center ${ui.txt2}`}>No results for "{docSearch.trim()}"</p>
+                ) : (
+                  <>
+                    <p className={`px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-widest ${ui.txt2}`}>
+                      {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                    </p>
+                    {searchResults.map((r) => (
+                      <div
+                        key={r.path}
+                        onClick={() => { selectTutorial(r.path); setDocSearch('') }}
+                        className={`flex flex-col gap-0.5 px-3 py-2 cursor-pointer border-l-2 transition-colors ${
+                          activeFile === r.path
+                            ? `${ui.txt1} bg-slate-100 dark:bg-slate-800/60`
+                            : `border-transparent ${ui.txt2} hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:${ui.txt1}`
+                        }`}
+                        style={activeFile === r.path ? { borderLeftColor: accentColor } : {}}
+                      >
+                        <span className="text-[12px] font-medium truncate" style={activeFile === r.path ? { color: accentColor } : {}}>{r.fileName}</span>
+                        {r.folder && <span className={`text-[10px] truncate ${ui.txt2}`}>{r.folder}</span>}
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* ── Normal tree (hidden while searching) ── */}
+            {!(tab === 'tutorials' && docSearch.trim().length >= 2) && (
             <div className="flex-1 overflow-y-auto py-3 custom-scrollbar min-h-0">
               {tab === 'tutorials' && (sidebarTab === 'docs' || !headings.length) && (
                 tree.length === 0
@@ -1497,7 +1582,7 @@ export default function MarkdownHub() {
                     ))
               )}
 
-              {tab === 'tutorials' && sidebarTab === 'toc' && headings.length > 0 && (
+              {tab === 'tutorials' && !docSearch && sidebarTab === 'toc' && headings.length > 0 && (
                 <div className="py-1">
                   {headings.map((h, i) => (
                     <button
@@ -1560,6 +1645,7 @@ export default function MarkdownHub() {
                 </>
               )}
             </div>
+            )}
 
             {tab === 'editor' && (
               <div className={`shrink-0 p-3 border-t ${ui.border} ${ui.bg1}`}>
