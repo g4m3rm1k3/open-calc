@@ -220,7 +220,9 @@ export default function AppShell({ children }) {
     location.pathname.startsWith("/viz-builder") ||
     location.pathname.startsWith("/playground") ||
     location.pathname.startsWith("/lesson-builder");
-  const isScrollableFullPageRoute = location.pathname.startsWith("/calendar");
+  const isScrollableFullPageRoute = location.pathname.startsWith("/calendar") ||
+    location.pathname.startsWith("/rpg-workout") ||
+    location.pathname.startsWith("/brain");
   const isDesktopRoute = location.pathname === '/';
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
@@ -465,7 +467,7 @@ export default function AppShell({ children }) {
   return (
     <ChatProvider>
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className={`min-h-screen transition-colors duration-500 relative overflow-hidden ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
+        <div className={`min-h-screen transition-colors duration-500 relative overflow-x-hidden ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
           {isDesktopRoute && !isMobile && (
             <CodeMapBackground
               dark={dark}

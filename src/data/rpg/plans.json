@@ -1,0 +1,221 @@
+[
+  {
+    "id": "plan_berserker_ascent",
+    "name": "The Berserker's Ascent",
+    "type": "prebuilt",
+    "class": "barbarian",
+    "description": "An Upper/Lower powerbuilding split focused on raw strength and muscle mass.",
+    "difficulty": "intermediate",
+    "daysPerWeek": 4,
+    "workouts": [
+      {
+        "dayName": "Upper Heavy",
+        "exercises": [
+          { "id": "barbell_bench_press", "targetSets": 4, "targetReps": 5 },
+          { "id": "bw_pullups", "targetSets": 4, "targetReps": 8 },
+          { "id": "bw_pushups", "targetSets": 3, "targetReps": 15 }
+        ]
+      },
+      {
+        "dayName": "Lower Heavy",
+        "exercises": [
+          { "id": "barbell_squat", "targetSets": 4, "targetReps": 5 },
+          { "id": "iso_wall_sit", "targetSets": 3, "targetDurationMinutes": 1 },
+          { "id": "iso_plank", "targetSets": 3, "targetDurationMinutes": 1 }
+        ]
+      },
+      {
+        "dayName": "Upper Volume",
+        "exercises": [
+          { "id": "barbell_overhead_press", "targetSets": 4, "targetReps": 8 },
+          { "id": "barbell_bent_over_row", "targetSets": 4, "targetReps": 8 },
+          { "id": "db_bicep_curl", "targetSets": 3, "targetReps": 12 },
+          { "id": "db_tricep_extension", "targetSets": 3, "targetReps": 12 }
+        ]
+      },
+      {
+        "dayName": "Lower Volume",
+        "exercises": [
+          { "id": "barbell_romanian_deadlift", "targetSets": 4, "targetReps": 10 },
+          { "id": "machine_leg_press", "targetSets": 3, "targetReps": 12 },
+          { "id": "machine_leg_curl", "targetSets": 3, "targetReps": 12 },
+          { "id": "machine_calf_raise", "targetSets": 4, "targetReps": 20 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan_windrunner_path",
+    "name": "The Windrunner's Path",
+    "type": "prebuilt",
+    "class": "rogue",
+    "description": "A mix of long distance endurance running and high intensity sprint intervals.",
+    "difficulty": "intermediate",
+    "daysPerWeek": 4,
+    "workouts": [
+      {
+        "dayName": "Long Run",
+        "exercises": [
+          { "id": "cardio_running", "targetDistanceKm": 5 }
+        ]
+      },
+      {
+        "dayName": "Sprint Intervals",
+        "exercises": [
+          { "id": "cardio_sprinting", "targetDistanceKm": 1 },
+          { "id": "bw_box_jumps", "targetSets": 4, "targetReps": 10 }
+        ]
+      },
+      {
+        "dayName": "Active Recovery",
+        "exercises": [
+          { "id": "cardio_walking", "targetDistanceKm": 4 },
+          { "id": "mob_static_stretch", "targetDurationMinutes": 20 }
+        ]
+      },
+      {
+        "dayName": "Speed Work",
+        "exercises": [
+          { "id": "cardio_sprinting", "targetDistanceKm": 2 },
+          { "id": "bw_box_jumps", "targetSets": 5, "targetReps": 8 },
+          { "id": "iso_plank", "targetSets": 3, "targetDurationMinutes": 1 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan_monk_discipline",
+    "name": "The Monk's Discipline",
+    "type": "prebuilt",
+    "class": "monk",
+    "description": "Bodyweight mastery, isometric holds, and extreme flexibility.",
+    "difficulty": "beginner",
+    "daysPerWeek": 5,
+    "workouts": [
+      {
+        "dayName": "Calisthenics",
+        "exercises": [
+          { "id": "bw_pullups", "targetSets": 5, "targetReps": 10 },
+          { "id": "bw_pushups", "targetSets": 5, "targetReps": 20 },
+          { "id": "iso_plank", "targetSets": 3, "targetDurationMinutes": 2 }
+        ]
+      },
+      {
+        "dayName": "Mobility & Flow",
+        "exercises": [
+          { "id": "mob_yoga", "targetDurationMinutes": 30 },
+          { "id": "mob_static_stretch", "targetDurationMinutes": 15 }
+        ]
+      },
+      {
+        "dayName": "Advanced Skills",
+        "exercises": [
+          { "id": "bw_dips", "targetSets": 4, "targetReps": 12 },
+          { "id": "bw_chinups", "targetSets": 4, "targetReps": 10 },
+          { "id": "iso_hollow_body", "targetSets": 4, "targetDurationMinutes": 1 }
+        ]
+      },
+      {
+        "dayName": "Lower Body",
+        "exercises": [
+          { "id": "bw_pistol_squat", "targetSets": 3, "targetReps": 5 },
+          { "id": "bw_box_jumps", "targetSets": 4, "targetReps": 10 },
+          { "id": "iso_wall_sit", "targetSets": 3, "targetDurationMinutes": 2 }
+        ]
+      },
+      {
+        "dayName": "Recovery Yoga",
+        "exercises": [
+          { "id": "mob_foam_roll", "targetDurationMinutes": 10 },
+          { "id": "mob_yoga", "targetDurationMinutes": 40 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan_paladin_balance",
+    "name": "The Paladin Protocol",
+    "type": "prebuilt",
+    "class": "paladin",
+    "description": "Balanced strength and cardio — the complete athlete template.",
+    "difficulty": "intermediate",
+    "daysPerWeek": 4,
+    "workouts": [
+      {
+        "dayName": "Strength A",
+        "exercises": [
+          { "id": "barbell_squat", "targetSets": 3, "targetReps": 8 },
+          { "id": "barbell_bench_press", "targetSets": 3, "targetReps": 8 },
+          { "id": "barbell_bent_over_row", "targetSets": 3, "targetReps": 8 }
+        ]
+      },
+      {
+        "dayName": "Cardio & Core",
+        "exercises": [
+          { "id": "cardio_running", "targetDistanceKm": 4 },
+          { "id": "iso_plank", "targetSets": 3, "targetDurationMinutes": 1 },
+          { "id": "bw_crunches", "targetSets": 3, "targetReps": 20 }
+        ]
+      },
+      {
+        "dayName": "Strength B",
+        "exercises": [
+          { "id": "barbell_deadlift", "targetSets": 3, "targetReps": 6 },
+          { "id": "barbell_overhead_press", "targetSets": 3, "targetReps": 8 },
+          { "id": "bw_pullups", "targetSets": 3, "targetReps": 8 }
+        ]
+      },
+      {
+        "dayName": "Conditioning",
+        "exercises": [
+          { "id": "kb_swing", "targetSets": 5, "targetReps": 20 },
+          { "id": "bw_box_jumps", "targetSets": 4, "targetReps": 10 },
+          { "id": "cardio_rowing", "targetDistanceKm": 2 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "plan_ranger_trail",
+    "name": "The Ranger's Trail",
+    "type": "prebuilt",
+    "class": "ranger",
+    "description": "Endurance-focused. Build your aerobic engine for long-distance challenges.",
+    "difficulty": "beginner",
+    "daysPerWeek": 5,
+    "workouts": [
+      {
+        "dayName": "Zone 2 Run",
+        "exercises": [
+          { "id": "cardio_running", "targetDistanceKm": 6 }
+        ]
+      },
+      {
+        "dayName": "Cycling",
+        "exercises": [
+          { "id": "cardio_stationary_bike", "targetDistanceKm": 15 }
+        ]
+      },
+      {
+        "dayName": "Hike",
+        "exercises": [
+          { "id": "cardio_walking", "targetDistanceKm": 8 }
+        ]
+      },
+      {
+        "dayName": "Long Run",
+        "exercises": [
+          { "id": "cardio_running", "targetDistanceKm": 10 }
+        ]
+      },
+      {
+        "dayName": "Row & Recover",
+        "exercises": [
+          { "id": "cardio_rowing", "targetDistanceKm": 3 },
+          { "id": "mob_foam_roll", "targetDurationMinutes": 15 },
+          { "id": "mob_static_stretch", "targetDurationMinutes": 20 }
+        ]
+      }
+    ]
+  }
+]

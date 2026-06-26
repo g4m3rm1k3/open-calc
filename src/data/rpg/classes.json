@@ -1,0 +1,62 @@
+[
+  {
+    "id": "barbarian",
+    "name": "Barbarian (Tank)",
+    "desc": "Focuses on heavy lifting, strength training, and maximum power output.",
+    "icon": "shield",
+    "color": "from-orange-500 to-red-600",
+    "shadow": "shadow-[0_0_20px_rgba(249,115,22,0.4)]",
+    "statBonuses": { "STR": 2 },
+    "lore": "Masters of raw power. When others rest, Barbarians add another plate."
+  },
+  {
+    "id": "rogue",
+    "name": "Rogue (Speed)",
+    "desc": "Focuses on running, sprinting, and high-intensity interval training (HIIT).",
+    "icon": "wind",
+    "color": "from-emerald-400 to-teal-600",
+    "shadow": "shadow-[0_0_20px_rgba(52,211,153,0.4)]",
+    "statBonuses": { "AGI": 2 },
+    "lore": "Fleet-footed and relentless. The open road is their training ground."
+  },
+  {
+    "id": "monk",
+    "name": "Monk (Agility)",
+    "desc": "Focuses on bodyweight exercises, calisthenics, yoga, and flexibility.",
+    "icon": "hand",
+    "color": "from-fuchsia-500 to-purple-600",
+    "shadow": "shadow-[0_0_20px_rgba(217,70,239,0.4)]",
+    "statBonuses": { "DEX": 2 },
+    "lore": "The body is the weapon. Discipline forged through movement and stillness."
+  },
+  {
+    "id": "paladin",
+    "name": "Paladin (Balanced)",
+    "desc": "A balanced protocol mixing strength, cardio, and endurance.",
+    "icon": "sword",
+    "color": "from-cyan-400 to-blue-600",
+    "shadow": "shadow-[0_0_20px_rgba(34,211,238,0.4)]",
+    "statBonuses": { "END": 1, "STR": 1 },
+    "lore": "Neither purely powerful nor purely fast — the Paladin masters all domains."
+  },
+  {
+    "id": "ranger",
+    "name": "Ranger (Endurance)",
+    "desc": "Long-distance running, cycling, and sustained outdoor challenges.",
+    "icon": "map-pin",
+    "color": "from-lime-400 to-green-600",
+    "shadow": "shadow-[0_0_20px_rgba(132,204,22,0.4)]",
+    "statBonuses": { "END": 2 },
+    "lore": "Hours of relentless movement through any terrain. Distance is their domain."
+  },
+  {
+    "id": "wizard",
+    "name": "Wizard (Precision)",
+    "desc": "Technical lifting, Olympic weightlifting, and sport-specific movement patterns.",
+    "icon": "zap",
+    "color": "from-violet-400 to-indigo-600",
+    "shadow": "shadow-[0_0_20px_rgba(139,92,246,0.4)]",
+    "statBonuses": { "DEX": 1, "AGI": 1 },
+    "lore": "Form is everything. Mastery comes from the relentless pursuit of perfect technique."
+  }
+]

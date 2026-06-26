@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Compass as CompassIcon, Sparkles } from 'lucide-react'
-import { useLocation } from 'react-router-dom'
+import { Compass as CompassIcon, Sparkles, Dumbbell, X } from 'lucide-react'
+import { useLocation, Link } from 'react-router-dom'
 import { useCompass } from './useCompass'
 import PlanIntake from './components/PlanIntake'
 import IntakeQuestions from './components/IntakeQuestions'
@@ -14,6 +14,49 @@ import MontyPanel from './components/MontyPanel'
 import GoalMap from './components/GoalMap'
 import { isComplicated, type ActionDraft, type IntakeAnswers } from './playbooks'
 import { computeDailyWin } from './montyStatus'
+
+const FITNESS_KEYWORDS = [
+  'get in shape', 'get fit', 'lose weight', 'weight loss', 'fat loss', 'gain muscle',
+  'build muscle', 'bulk', 'cut', 'shred', 'workout', 'work out', 'exercise', 'fitness',
+  'gym', 'training', 'train', 'run', 'running', 'cardio', 'strength', 'weightlifting',
+  'bench press', 'squat', 'deadlift', 'abs', 'push-up', 'pull-up', 'body composition',
+  'healthy body', 'lose fat', 'get stronger', 'build strength', 'be fit',
+]
+
+function isFitnessGoal(title: string) {
+  const lower = title.toLowerCase()
+  return FITNESS_KEYWORDS.some(kw => lower.includes(kw))
+}
+
+function FitnessBridgeCard({ goal, onDismiss }: { goal: string; onDismiss: () => void }) {
+  return (
+    <div className="bg-gradient-to-br from-emerald-950/60 to-cyan-950/60 border border-emerald-800/60 rounded-2xl p-4 flex gap-3 items-start shadow-lg">
+      <div className="w-9 h-9 shrink-0 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-400">
+        <Dumbbell size={18} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-black text-emerald-300 mb-0.5">Sounds like a fitness goal!</p>
+        <p className="text-xs text-slate-400 leading-relaxed">
+          The RPG Workout tracker can plan your training sessions, track progress, and earn XP as you hit your goals.
+        </p>
+        <div className="flex items-center gap-2 mt-3">
+          <Link
+            to="/rpg-workout"
+            className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-black rounded-lg transition-colors"
+          >
+            ⚔ Open RPG Workout
+          </Link>
+          <button type="button" onClick={onDismiss} className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+            Keep plan here
+          </button>
+        </div>
+      </div>
+      <button type="button" aria-label="Dismiss" onClick={onDismiss} className="text-slate-600 hover:text-slate-400 transition-colors shrink-0">
+        <X size={14} />
+      </button>
+    </div>
+  )
+}
 
 import atomicHabits from './tutorials/atomic-habits.js'
 import deepWork from './tutorials/deep-work.js'
@@ -44,6 +87,7 @@ export default function CompassPage() {
   const [convertingNoteId, setConvertingNoteId] = useState<string | null>(null)
   
   const [montyOpen, setMontyOpen] = useState(false)
+  const [fitnessBridgeGoal, setFitnessBridgeGoal] = useState<string | null>(null)
 
   // Complicated (multi-action) goals get sized by two real answers instead
   // of always defaulting to the same canned numbers — see IntakeQuestions
@@ -51,6 +95,7 @@ export default function CompassPage() {
   // breakdown, since asking "hours/week" for "drink more water" is just
   // friction with nothing to size.
   const handleIntake = (title: string) => {
+    if (isFitnessGoal(title)) setFitnessBridgeGoal(title)
     if (isComplicated(title)) {
       setQuestionTitle(title)
     } else {
@@ -167,6 +212,10 @@ export default function CompassPage() {
             <PlanBreakdown title={draftTitle} initialDrafts={draftActions} onConfirm={handleConfirm} onCancel={handleCancelBreakdown} />
           ) : (
             <PlanIntake onSubmit={handleIntake} />
+          )}
+
+          {fitnessBridgeGoal && (
+            <FitnessBridgeCard goal={fitnessBridgeGoal} onDismiss={() => setFitnessBridgeGoal(null)} />
           )}
 
           {compass.plans.length === 0 && <p className="text-slate-500 text-sm">No plans yet — say what you want to accomplish above.</p>}

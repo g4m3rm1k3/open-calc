@@ -3,6 +3,7 @@ import { db } from '../../../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useAuth } from '../../../context/AuthContext';
 import { getExerciseDetails, EXERCISE_TYPES } from '../data/rpgExercises';
+import { checkAchievements } from '../data/rpgAchievements';
 
 const DEFAULT_RPG_STATE = {
   heroClass: null,
@@ -19,9 +20,28 @@ const DEFAULT_RPG_STATE = {
   abilities: [],
   activeQuests: [],
   completedQuests: [],
-  workoutLogs: [],
+  workoutLogs: [],    // individual exercise entries (kept for backward compat)
+  sessionLogs: [],    // grouped sessions: [{ id, date, planName, entries, totalXp, volume }]
   personalRecords: {},
+  achievements: [],   // [{ id, unlockedAt }]
+  streak: 0,
+  lastWorkoutDate: null,
+  weeklyTarget: 3,
+  bodyWeightLog: [],  // [{ date: YYYY-MM-DD, weight: number, unit: 'lbs'|'kg' }]
 };
+
+function todayISO() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function computeStreak(lastDate, currentStreak) {
+  if (!lastDate) return 1;
+  const today = todayISO();
+  if (lastDate === today) return currentStreak; // already logged today
+  const yesterday = new Date(Date.now() - 86_400_000).toISOString().split('T')[0];
+  if (lastDate === yesterday) return currentStreak + 1;
+  return 1; // gap — reset
+}
 
 function computeXpLevel(currentXp, addedXp, currentLevel, currentHp, currentMaxHp) {
   const newXp = currentXp + addedXp;
@@ -35,7 +55,7 @@ function computeXpLevel(currentXp, addedXp, currentLevel, currentHp, currentMaxH
 function updatePersonalRecords(existingPRs, entries) {
   const prs = { ...existingPRs };
   const beaten = [];
-  const today = new Date().toISOString().split('T')[0];
+  const today = todayISO();
 
   for (const { exerciseId, metrics } of entries) {
     const ex = getExerciseDetails(exerciseId);
@@ -72,6 +92,80 @@ function updatePersonalRecords(existingPRs, entries) {
   }
 
   return { prs, beaten };
+}
+
+function computeSessionVolume(entries) {
+  // tonnage = weight × sets × reps for weighted exercises; reps for BW; km for cardio
+  let tonnage = 0;
+  let totalReps = 0;
+  for (const { exerciseId, metrics } of entries) {
+    const ex = getExerciseDetails(exerciseId);
+    if (!ex || !metrics) continue;
+    const sets = parseInt(metrics.sets) || 1;
+    const reps = parseInt(metrics.reps) || 0;
+    const weight = parseFloat(metrics.weight) || 0;
+    if (ex.type === EXERCISE_TYPES.WEIGHT_REPS) tonnage += sets * reps * weight;
+    if (ex.type === EXERCISE_TYPES.BODYWEIGHT_REPS) totalReps += sets * reps;
+  }
+  return { tonnage, totalReps };
+}
+
+function saveWorkoutToCalendar(planName, entries, totalXp) {
+  try {
+    const today = todayISO();
+    const raw = localStorage.getItem('oc-calendar');
+    const store = raw ? JSON.parse(raw) : { events: [] };
+    if (!Array.isArray(store.events)) store.events = [];
+
+    // Avoid duplicate entries for same session (same minute)
+    const minute = new Date().toISOString().slice(0, 16);
+    const dup = store.events.find(e => e.id?.startsWith(`ev-rpg-${minute}`));
+    if (dup) return;
+
+    const exNames = entries
+      .map(e => getExerciseDetails(e.exerciseId)?.name || e.exerciseId)
+      .slice(0, 4)
+      .join(', ');
+
+    store.events.push({
+      id: `ev-rpg-${minute}-${Math.random().toString(36).slice(2, 6)}`,
+      title: `⚔ ${planName}`,
+      description: `${exNames}${entries.length > 4 ? ` +${entries.length - 4} more` : ''}\n+${totalXp} XP earned`,
+      start: today,
+      end: today,
+      allDay: true,
+      type: 'workout',
+      color: '#f97316',
+      notifications: [],
+      completed: true,
+    });
+
+    localStorage.setItem('oc-calendar', JSON.stringify(store));
+    // Notify CalendarPage if it's open
+    window.dispatchEvent(new StorageEvent('storage', { key: 'oc-calendar' }));
+  } catch { /* silent — calendar save is a bonus, not critical */ }
+}
+
+function autoVerifyQuests(activeQuests, entries) {
+  // Check if any active quests can be auto-completed based on what was just logged
+  const completable = [];
+  for (const quest of activeQuests) {
+    if (!quest.task) continue;
+    const task = quest.task.toLowerCase();
+    for (const { exerciseId } of entries) {
+      const ex = getExerciseDetails(exerciseId);
+      if (!ex) continue;
+      // Simple keyword matching on quest task text vs exercise name/muscles
+      const exWords = (ex.name + ' ' + (ex.muscles?.primary || []).join(' ')).toLowerCase();
+      const taskWords = task.split(/\s+/);
+      const matches = taskWords.filter(w => w.length > 3 && exWords.includes(w)).length;
+      if (matches >= 2 && !completable.includes(quest.id)) {
+        completable.push(quest.id);
+        break;
+      }
+    }
+  }
+  return completable;
 }
 
 export function useRPGData() {
@@ -120,7 +214,7 @@ export function useRPGData() {
     return () => { isMounted = false; };
   }, [currentUser]);
 
-  // HP drain for inactivity — applied once per session on load
+  // HP drain for inactivity
   useEffect(() => {
     if (loading || drainAppliedRef.current) return;
     drainAppliedRef.current = true;
@@ -129,7 +223,7 @@ export function useRPGData() {
     if (!lastLog?.date) return;
 
     const hoursSince = (Date.now() - new Date(lastLog.date).getTime()) / 3_600_000;
-    if (hoursSince < 48) return; // 2-day grace period
+    if (hoursSince < 48) return;
 
     const daysSince = Math.floor(hoursSince / 24);
     const drain = Math.min(daysSince * 10, rpgData.hp - Math.ceil(rpgData.maxHp * 0.1));
@@ -165,11 +259,14 @@ export function useRPGData() {
   };
 
   // entries: [{ exerciseId, metrics, calculatedXp, statGains }]
-  // Returns { leveledUp: boolean, newPrs: string[] }
-  const logDetailedWorkout = (entries) => {
-    if (!entries?.length) return { leveledUp: false, newPrs: [] };
+  // planName: string label for calendar event
+  const logDetailedWorkout = (entries, planName = 'Workout') => {
+    if (!entries?.length) return { leveledUp: false, newPrs: [], newAchievements: [] };
 
     const now = Date.now();
+    const today = todayISO();
+
+    // ── individual log entries (backward compat) ──
     const newEntries = entries.map((entry, i) => ({
       id: `${now}-${i}`,
       exerciseId: entry.exerciseId,
@@ -177,39 +274,96 @@ export function useRPGData() {
       xpEarned: entry.calculatedXp,
       date: new Date(now + i).toISOString(),
     }));
+    const newLogs = [...newEntries, ...rpgData.workoutLogs].slice(0, 200);
 
-    const newLogs = [...newEntries, ...rpgData.workoutLogs].slice(0, 100);
-
+    // ── session log ──
+    const { tonnage, totalReps } = computeSessionVolume(entries);
     const totalXp = entries.reduce((sum, e) => sum + (e.calculatedXp || 0), 0);
+    const session = {
+      id: `session-${now}`,
+      date: today,
+      planName,
+      entryCount: entries.length,
+      totalXp,
+      tonnage,
+      totalReps,
+      exerciseIds: entries.map(e => e.exerciseId),
+    };
+    const newSessionLogs = [session, ...(rpgData.sessionLogs || [])].slice(0, 100);
+
+    // ── XP + level ──
     const { newXp, newLevel, leveledUp, newMaxHp, newHp } = computeXpLevel(
       rpgData.xp, totalXp, rpgData.level, rpgData.hp, rpgData.maxHp
     );
 
+    // ── stats ──
     const newStats = { ...rpgData.stats };
     entries.forEach(({ statGains }) => {
-      if (statGains) {
-        Object.keys(statGains).forEach(stat => {
-          newStats[stat] = (newStats[stat] || 0) + statGains[stat];
-        });
-      }
+      if (statGains) Object.keys(statGains).forEach(stat => {
+        newStats[stat] = (newStats[stat] || 0) + statGains[stat];
+      });
     });
 
+    // ── personal records ──
     const { prs: newPRs, beaten: newPrs } = updatePersonalRecords(
       rpgData.personalRecords || {}, entries
     );
 
-    saveData({
+    // ── streak ──
+    const newStreak = computeStreak(rpgData.lastWorkoutDate, rpgData.streak);
+
+    // ── quest auto-verify ──
+    const autoCompleted = autoVerifyQuests(rpgData.activeQuests || [], entries);
+    let newActiveQuests = rpgData.activeQuests || [];
+    let newCompletedQuests = rpgData.completedQuests || [];
+    let goldGain = 0;
+    let xpFromQuests = 0;
+    if (autoCompleted.length) {
+      const justCompleted = newActiveQuests.filter(q => autoCompleted.includes(q.id));
+      justCompleted.forEach(q => {
+        xpFromQuests += q.rewardXP || 0;
+        goldGain += q.rewardGold || 0;
+      });
+      newActiveQuests = newActiveQuests.filter(q => !autoCompleted.includes(q.id));
+      newCompletedQuests = [
+        ...justCompleted.map(q => ({ ...q, completedAt: new Date().toISOString(), autoVerified: true })),
+        ...newCompletedQuests,
+      ].slice(0, 30);
+    }
+
+    // ── build new state ──
+    const preAchievementState = {
       ...rpgData,
       workoutLogs: newLogs,
-      xp: newXp,
+      sessionLogs: newSessionLogs,
+      xp: newXp + xpFromQuests,
       level: newLevel,
       hp: newHp,
       maxHp: newMaxHp,
       stats: newStats,
       personalRecords: newPRs,
-    });
+      streak: newStreak,
+      lastWorkoutDate: today,
+      gold: (rpgData.gold || 0) + goldGain,
+      activeQuests: newActiveQuests,
+      completedQuests: newCompletedQuests,
+    };
 
-    return { leveledUp, newPrs };
+    // ── achievements ──
+    const newlyEarned = checkAchievements(preAchievementState, newPrs.length);
+    const newAchievements = [...(rpgData.achievements || []), ...newlyEarned];
+    // Tonnage achievement checked separately
+    if (tonnage >= 1000 && !newAchievements.find(a => a.id === 'tonnage_1k')) {
+      newAchievements.push({ id: 'tonnage_1k', unlockedAt: new Date().toISOString() });
+    }
+
+    const finalState = { ...preAchievementState, achievements: newAchievements };
+    saveData(finalState);
+
+    // ── calendar save ──
+    saveWorkoutToCalendar(planName, entries, totalXp + xpFromQuests);
+
+    return { leveledUp, newPrs, newAchievements: newlyEarned, autoCompletedQuests: autoCompleted };
   };
 
   const setActivePlan = (planId) => saveData({ ...rpgData, activePlanId: planId });
@@ -245,9 +399,27 @@ export function useRPGData() {
     return leveledUp;
   };
 
+  const logBodyWeight = (weight, unit = 'lbs') => {
+    const today = todayISO();
+    const existing = (rpgData.bodyWeightLog || []).filter(e => e.date !== today);
+    saveData({
+      ...rpgData,
+      bodyWeightLog: [{ date: today, weight, unit }, ...existing].slice(0, 365),
+    });
+  };
+
+  const setWeeklyTarget = (target) => saveData({ ...rpgData, weeklyTarget: target });
+
+  // Count workouts in the last 7 calendar days
+  const workoutsThisWeek = (() => {
+    const cutoff = new Date(Date.now() - 7 * 86_400_000).toISOString();
+    return (rpgData.sessionLogs || []).filter(s => s.date >= cutoff.split('T')[0]).length;
+  })();
+
   return {
     rpgData,
     loading,
+    workoutsThisWeek,
     updateHeroClass,
     setOnboardingData,
     addXP,
@@ -256,5 +428,7 @@ export function useRPGData() {
     saveCustomPlan,
     acceptQuest,
     completeQuest,
+    logBodyWeight,
+    setWeeklyTarget,
   };
 }

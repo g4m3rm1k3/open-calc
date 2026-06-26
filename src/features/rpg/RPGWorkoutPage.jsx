@@ -6,7 +6,7 @@ export const meta = {
   jumpTo: '/rpg-workout',
 }
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRPGData } from './hooks/useRPGData';
 import { ClassSelector } from './components/ClassSelector';
 import { HeroPanel } from './components/HeroPanel';
@@ -19,18 +19,25 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { PREBUILT_PLANS } from './data/rpgPrebuiltPlans';
 import { getExerciseDetails } from './data/rpgExercises';
 import { WorkoutHistoryChart } from './components/WorkoutHistoryChart';
+import RPGContributeModal from './components/RPGContributeModal';
+import { AchievementsPanel } from './components/AchievementsPanel';
+import { BodyWeightTracker } from './components/BodyWeightTracker';
 
 export default function RPGWorkoutPage() {
-  const { 
-    rpgData, 
-    loading, 
-    setOnboardingData, 
-    addXP, 
-    logDetailedWorkout, 
+  const [showContribute, setShowContribute] = useState(false);
+  const {
+    rpgData,
+    loading,
+    workoutsThisWeek,
+    setOnboardingData,
+    addXP,
+    logDetailedWorkout,
     setActivePlan,
     saveCustomPlan,
-    acceptQuest, 
-    completeQuest 
+    acceptQuest,
+    completeQuest,
+    logBodyWeight,
+    setWeeklyTarget,
   } = useRPGData();
 
   if (loading) {
@@ -62,17 +69,25 @@ export default function RPGWorkoutPage() {
       <div className="max-w-6xl mx-auto space-y-6 relative z-10">
         
         {/* Header Section */}
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-cyan-400 drop-shadow-[0_0_10px_rgba(217,70,239,0.5)]">
-            Hero's Journey
-          </h1>
-          <p className="text-slate-400 font-medium">Train in reality. Level up in fantasy.</p>
+        <header className="mb-8 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-cyan-400 drop-shadow-[0_0_10px_rgba(217,70,239,0.5)]">
+              Hero's Journey
+            </h1>
+            <p className="text-slate-400 font-medium">Train in reality. Level up in fantasy.</p>
+          </div>
+          <button
+            onClick={() => setShowContribute(true)}
+            className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/80 border border-slate-600 hover:border-fuchsia-600 text-slate-300 hover:text-fuchsia-300 text-sm font-bold transition-all backdrop-blur-sm"
+          >
+            ⚔ Contribute
+          </button>
         </header>
 
         {/* Hero Stats & Radar Chart */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="lg:col-span-2">
-            <HeroPanel rpgData={rpgData} />
+            <HeroPanel rpgData={rpgData} workoutsThisWeek={workoutsThisWeek} />
           </div>
           <div className="bg-slate-900/80 border border-slate-700 rounded-2xl p-6 flex flex-col items-center justify-center backdrop-blur-xl">
             <h3 className="text-slate-400 font-bold mb-2 text-sm uppercase tracking-wider text-center">Stat Balance</h3>
@@ -92,6 +107,7 @@ export default function RPGWorkoutPage() {
               logDetailedWorkout={logDetailedWorkout}
               activePlan={activePlan}
               personalRecords={rpgData.personalRecords || {}}
+              sessionLogs={rpgData.sessionLogs || []}
             />
             
             {/* Logs Preview */}
@@ -127,17 +143,24 @@ export default function RPGWorkoutPage() {
             </div>
           </div>
 
-          {/* Right Column: Quests */}
-          <div className="h-full">
-            <QuestBoard 
-              rpgData={rpgData} 
-              acceptQuest={acceptQuest} 
-              completeQuest={completeQuest} 
+          {/* Right Column: Quests + Tracking */}
+          <div className="space-y-6">
+            <QuestBoard
+              rpgData={rpgData}
+              acceptQuest={acceptQuest}
+              completeQuest={completeQuest}
             />
+            <BodyWeightTracker
+              bodyWeightLog={rpgData.bodyWeightLog || []}
+              onLog={logBodyWeight}
+            />
+            <AchievementsPanel achievements={rpgData.achievements || []} />
           </div>
         </div>
 
       </div>
+
+      {showContribute && <RPGContributeModal onClose={() => setShowContribute(false)} />}
     </div>
   );
 }
