@@ -28,31 +28,19 @@ function isFitnessGoal(title: string) {
   return FITNESS_KEYWORDS.some(kw => lower.includes(kw))
 }
 
-function FitnessBridgeCard({ goal, onDismiss }: { goal: string; onDismiss: () => void }) {
+function FitnessBridgeCard({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <div className="bg-gradient-to-br from-emerald-950/60 to-cyan-950/60 border border-emerald-800/60 rounded-2xl p-4 flex gap-3 items-start shadow-lg">
-      <div className="w-9 h-9 shrink-0 rounded-xl bg-emerald-900/60 border border-emerald-700/50 flex items-center justify-center text-emerald-400">
-        <Dumbbell size={18} />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-black text-emerald-300 mb-0.5">Sounds like a fitness goal!</p>
-        <p className="text-xs text-slate-400 leading-relaxed">
-          The RPG Workout tracker can plan your training sessions, track progress, and earn XP as you hit your goals.
-        </p>
-        <div className="flex items-center gap-2 mt-3">
-          <Link
-            to="/rpg-workout"
-            className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-black rounded-lg transition-colors"
-          >
-            ⚔ Open RPG Workout
-          </Link>
-          <button type="button" onClick={onDismiss} className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-            Keep plan here
-          </button>
-        </div>
-      </div>
-      <button type="button" aria-label="Dismiss" onClick={onDismiss} className="text-slate-600 hover:text-slate-400 transition-colors shrink-0">
-        <X size={14} />
+    <div className="bg-slate-800/40 border border-slate-700/60 rounded-xl p-3 flex gap-2 items-start text-xs">
+      <Dumbbell size={13} className="text-emerald-500 shrink-0 mt-0.5" />
+      <p className="text-slate-400 leading-relaxed flex-1">
+        Your plan is above. Use{' '}
+        <Link to="/rpg-workout" className="text-emerald-400 hover:text-emerald-300 font-bold underline underline-offset-2">
+          RPG Workout
+        </Link>{' '}
+        as your logbook — check off each session there to track streaks and XP.
+      </p>
+      <button type="button" aria-label="Dismiss" onClick={onDismiss} className="text-slate-600 hover:text-slate-400 shrink-0">
+        <X size={12} />
       </button>
     </div>
   )
@@ -161,7 +149,7 @@ export default function CompassPage() {
       {/* Mobile tab bar */}
       <div className="flex md:hidden gap-1.5 mb-4 overflow-x-auto">
         {TABS.map((t) => (
-          <button key={t} onClick={() => setTab(t)}
+          <button type="button" key={t} onClick={() => setTab(t)}
             className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${tab === t ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20' : 'bg-white text-slate-500 border border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-transparent dark:text-slate-400 dark:hover:bg-slate-700'}`}>
             {t}
           </button>
@@ -255,7 +243,7 @@ export default function CompassPage() {
 
       {/* Monty — coach/mentor/assistant, click to open */}
       {!montyOpen && (
-        <button onClick={() => setMontyOpen(true)}
+        <button type="button" onClick={() => setMontyOpen(true)}
           className="fixed bottom-16 right-4 z-[1700] flex items-center gap-2 bg-sky-500 text-white font-semibold text-sm rounded-full pl-3 pr-4 py-2.5 shadow-lg shadow-sky-500/30 hover:bg-sky-400 hover:-translate-y-0.5 transition-all">
           <Sparkles size={16} /> Monty
         </button>

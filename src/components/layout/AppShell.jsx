@@ -220,9 +220,10 @@ export default function AppShell({ children }) {
     location.pathname.startsWith("/viz-builder") ||
     location.pathname.startsWith("/playground") ||
     location.pathname.startsWith("/lesson-builder");
-  const isScrollableFullPageRoute = location.pathname.startsWith("/calendar") ||
-    location.pathname.startsWith("/rpg-workout") ||
-    location.pathname.startsWith("/brain");
+  const isScrollableFullPageRoute = location.pathname.startsWith("/calendar");
+  const isFullWidthRoute = location.pathname.startsWith("/rpg-workout") ||
+    location.pathname.startsWith("/brain") ||
+    location.pathname.startsWith("/health");
   const isDesktopRoute = location.pathname === '/';
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
@@ -467,7 +468,7 @@ export default function AppShell({ children }) {
   return (
     <ChatProvider>
       <GrapherContext.Provider value={{ openGrapher }}>
-        <div className={`min-h-screen transition-colors duration-500 relative overflow-x-hidden ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
+        <div className={`min-h-screen transition-colors duration-500 relative ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
           {isDesktopRoute && !isMobile && (
             <CodeMapBackground
               dark={dark}
@@ -497,7 +498,7 @@ export default function AppShell({ children }) {
 
           {/* Main content */}
           <main
-            className={`transition-[padding] duration-500 ease-in-out ${isChemistryRoute || isFullPageToolRoute || isScrollableFullPageRoute ? "flex flex-col h-[calc(100vh-44px)] overflow-hidden" : isDesktopRoute && !isMobile ? "h-screen" : "min-h-screen pb-28 lg:pb-11"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-12`}
+            className={`transition-[padding] duration-500 ease-in-out ${isChemistryRoute || isFullPageToolRoute || isScrollableFullPageRoute ? "flex flex-col h-[calc(100vh-44px)] overflow-hidden" : isFullWidthRoute ? "h-screen overflow-y-auto" : isDesktopRoute && !isMobile ? "h-screen" : "min-h-screen pb-28 lg:pb-11"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-[52px]`}
             style={{
               paddingRight: chatOpen
                 ? (scratchSnap === "right" ? `${scratchSnapW}px` : "var(--chat-width, 380px)")
@@ -517,6 +518,8 @@ export default function AppShell({ children }) {
                     ? "flex-1 min-h-0 w-full flex flex-col overflow-hidden"
                     : isScrollableFullPageRoute
                       ? "flex-1 min-h-0 w-full overflow-y-auto"
+                      : isFullWidthRoute
+                      ? "w-full"
                       : isUniversalCalcRoute
                       ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"
                       : `max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-500`

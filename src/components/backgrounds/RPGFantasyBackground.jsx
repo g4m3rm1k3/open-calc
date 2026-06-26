@@ -350,7 +350,11 @@ export function RPGFantasyBackground() {
       className="fixed inset-0 z-0 pointer-events-none"
       style={{ background: 'radial-gradient(ellipse at 50% 30%, #0d0a2e 0%, #06040f 55%, #020209 100%)' }}
     >
-      <Canvas camera={{ position: [0, 0, 18], fov: 65 }}>
+      <Canvas
+        camera={{ position: [0, 0, 18], fov: 65 }}
+        style={{ pointerEvents: 'none' }}
+        events={undefined}
+      >
         <Scene />
       </Canvas>
 
