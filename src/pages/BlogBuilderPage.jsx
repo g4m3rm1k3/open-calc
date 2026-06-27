@@ -1,12 +1,12 @@
-import { useState, useRef, useCallback, lazy, Suspense, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useRef, useCallback, lazy, Suspense, useEffect, useMemo } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import BlogPost from '../components/blog/BlogPost.jsx'
 import MarkdownToolbar from '../components/markdown-toolbar/MarkdownToolbar.jsx'
 import { useGlobalTheme } from '../context/ThemeContext.jsx'
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react').then(m => ({ default: m.default })))
 
-// ── Existing posts (for Load menu) ────────────────────────────────────────────
+// ── Existing posts ────────────────────────────────────────────────────────────
 
 const POST_MODULES = import.meta.glob('../posts/**/*.md', { query: '?raw', import: 'default', eager: true })
 
@@ -26,7 +26,6 @@ function pathToFolderName(path) {
 }
 
 function globToRepoPath(path) {
-  // '../posts/foo/bar.md' → 'src/posts/foo/bar.md'
   return 'src/' + path.replace(/^\.\.\//, '')
 }
 
@@ -71,8 +70,6 @@ function extractTitle(markdown) {
 }
 
 // ── GitHub API ────────────────────────────────────────────────────────────────
-// targetPath: 'src/posts/foo/bar.md' — if the file already exists in main,
-// its SHA is fetched and included in the PUT so GitHub accepts the update.
 
 async function submitPR({ token, content, slug, title, targetPath }) {
   const base = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`
@@ -82,12 +79,10 @@ async function submitPR({ token, content, slug, title, targetPath }) {
     Accept: 'application/vnd.github+json',
   }
 
-  // 1. Get SHA of main branch tip
   const refRes = await fetch(`${base}/git/ref/heads/main`, { headers })
   if (!refRes.ok) { const e = await refRes.json(); throw new Error(e.message || `GitHub API ${refRes.status}`) }
   const { object: { sha: baseSha } } = await refRes.json()
 
-  // 2. Create branch — replace / in slug so it's a flat branch name
   const branch = `blog/${slug.replace(/\//g, '-')}`
   const branchRes = await fetch(`${base}/git/refs`, {
     method: 'POST', headers,
@@ -95,12 +90,10 @@ async function submitPR({ token, content, slug, title, targetPath }) {
   })
   if (!branchRes.ok) { const e = await branchRes.json(); throw new Error(e.message || `Branch: ${branchRes.status}`) }
 
-  // 3. Check if file already exists in main to get its SHA (required for updates)
   const encodedPath = targetPath.split('/').map(encodeURIComponent).join('/')
   const checkRes = await fetch(`${base}/contents/${encodedPath}`, { headers })
   const existingSha = checkRes.ok ? (await checkRes.json()).sha : null
 
-  // 4. Create or update the file
   const contentB64 = btoa(unescape(encodeURIComponent(content)))
   const fileBody = {
     message: existingSha ? `blog: update "${title}"` : `blog: add "${title}"`,
@@ -115,13 +108,11 @@ async function submitPR({ token, content, slug, title, targetPath }) {
   })
   if (!fileRes.ok) { const e = await fileRes.json(); throw new Error(e.message || `File: ${fileRes.status}`) }
 
-  // 5. Open PR
   const prRes = await fetch(`${base}/pulls`, {
     method: 'POST', headers,
     body: JSON.stringify({
       title: existingSha ? `Blog: update "${title}"` : `Blog: ${title}`,
-      head: branch,
-      base: 'main',
+      head: branch, base: 'main',
       body: existingSha
         ? `Updates blog post via the Blog Builder.\n\n**File:** \`${targetPath}\``
         : `New blog post submitted via the Blog Builder.\n\n**File:** \`${targetPath}\``,
@@ -131,67 +122,121 @@ async function submitPR({ token, content, slug, title, targetPath }) {
   return (await prRes.json()).html_url
 }
 
-// ── Load menu ─────────────────────────────────────────────────────────────────
+// ── Load modal ────────────────────────────────────────────────────────────────
 
-function LoadMenu({ onLoad, onClose }) {
-  const menuRef = useRef(null)
+function LoadModal({ onLoad, onClose }) {
+  const [query, setQuery] = useState('')
+  const searchRef = useRef(null)
 
   useEffect(() => {
-    function handleClick(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) onClose()
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
+    searchRef.current?.focus()
+    const handleKey = e => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
   }, [onClose])
 
-  const seriesMap = {}
-  const standalone = []
-  for (const post of ALL_POSTS) {
-    if (post.folderName) {
-      ;(seriesMap[post.folderName] ??= []).push(post)
-    } else {
-      standalone.push(post)
+  const { seriesMap, standalone } = useMemo(() => {
+    const q = query.toLowerCase().trim()
+    const source = q
+      ? ALL_POSTS.filter(p =>
+          p.title.toLowerCase().includes(q) ||
+          (p.folderName || '').toLowerCase().includes(q)
+        )
+      : ALL_POSTS
+    const seriesMap = {}
+    const standalone = []
+    for (const post of source) {
+      if (post.folderName) {
+        ;(seriesMap[post.folderName] ??= []).push(post)
+      } else {
+        standalone.push(post)
+      }
     }
-  }
-  for (const posts of Object.values(seriesMap)) {
-    posts.sort((a, b) => a.slug.localeCompare(b.slug))
-  }
+    for (const posts of Object.values(seriesMap)) {
+      posts.sort((a, b) => a.slug.localeCompare(b.slug))
+    }
+    return { seriesMap, standalone }
+  }, [query])
 
-  const rowClass = 'w-full text-left flex items-center gap-2 px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors truncate'
-  const headerClass = 'px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700/50'
+  const rowClass = 'w-full text-left flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors'
+  const sectionLabel = 'px-3 pt-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500'
+  const isEmpty = Object.keys(seriesMap).length === 0 && standalone.length === 0
 
   return (
     <div
-      ref={menuRef}
-      className="absolute right-0 top-full mt-1 w-72 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl z-50 overflow-hidden"
+      className="fixed inset-0 z-[800] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onMouseDown={e => e.target === e.currentTarget && onClose()}
     >
-      <div className="max-h-72 overflow-y-auto">
-        {Object.entries(seriesMap).map(([folder, posts]) => (
-          <div key={folder}>
-            <div className={headerClass}>📚 {folder}</div>
-            {posts.map((post, i) => (
-              <button key={post.slug} onClick={() => onLoad(post)} className={rowClass}>
-                <span className="shrink-0 text-slate-400 dark:text-slate-500 w-4 text-right">{i + 1}.</span>
-                <span className="truncate">{post.title}</span>
-              </button>
-            ))}
-          </div>
-        ))}
-        {standalone.length > 0 && (
-          <div>
-            {Object.keys(seriesMap).length > 0 && (
-              <div className={headerClass}>Standalone</div>
-            )}
-            {standalone.map(post => (
-              <button key={post.slug} onClick={() => onLoad(post)} className={rowClass}>
-                <span className="truncate">{post.title}</span>
-              </button>
-            ))}
-          </div>
-        )}
-        {ALL_POSTS.length === 0 && (
-          <p className="px-4 py-6 text-xs text-center text-slate-400">No posts found in src/posts/</p>
-        )}
+      <div className="w-full max-w-lg mx-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xl flex flex-col" style={{ maxHeight: '78vh' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-200 dark:border-slate-700 shrink-0">
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white">Load Post</h2>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg leading-none transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Search */}
+        <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700 shrink-0">
+          <input
+            ref={searchRef}
+            type="text"
+            placeholder="Search by title or series…"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-indigo-500/40"
+          />
+        </div>
+
+        {/* Scrollable list */}
+        <div className="overflow-y-auto flex-1 p-2">
+          {isEmpty && (
+            <p className="text-sm text-center text-slate-400 dark:text-slate-500 py-10">
+              {query ? `No posts matching "${query}"` : 'No posts found in src/posts/'}
+            </p>
+          )}
+
+          {/* Series groups */}
+          {Object.entries(seriesMap).map(([folder, posts]) => (
+            <div key={folder} className="mb-1">
+              <div className={sectionLabel}>📚 {folder}</div>
+              {posts.map((post, i) => (
+                <button key={post.slug} onClick={() => onLoad(post)} className={rowClass}>
+                  <span className="text-xs text-slate-400 dark:text-slate-500 w-5 text-right shrink-0">{i + 1}.</span>
+                  <span className="truncate">{post.title}</span>
+                  <span className="ml-auto text-[11px] text-slate-400 dark:text-slate-500 shrink-0 font-mono">.md</span>
+                </button>
+              ))}
+            </div>
+          ))}
+
+          {/* Standalone posts */}
+          {standalone.length > 0 && (
+            <div className="mb-1">
+              {Object.keys(seriesMap).length > 0 && (
+                <div className={sectionLabel}>Standalone</div>
+              )}
+              {standalone.map(post => (
+                <button key={post.slug} onClick={() => onLoad(post)} className={rowClass}>
+                  <span className="text-slate-400 dark:text-slate-500 shrink-0 text-xs">•</span>
+                  <span className="truncate">{post.title}</span>
+                  <span className="ml-auto text-[11px] text-slate-400 dark:text-slate-500 shrink-0 font-mono">.md</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer count */}
+        <div className="px-4 py-2.5 border-t border-slate-200 dark:border-slate-700 shrink-0">
+          <p className="text-[11px] text-slate-400 dark:text-slate-500">
+            {ALL_POSTS.length} post{ALL_POSTS.length !== 1 ? 's' : ''} in src/posts/
+            {query && ` · ${Object.values(seriesMap).flat().length + standalone.length} matching`}
+          </p>
+        </div>
       </div>
     </div>
   )
@@ -299,24 +344,33 @@ function PRModal({ slug, title, targetPath, content, onClose }) {
 export default function BlogBuilderPage() {
   const { isDarkGlobal } = useGlobalTheme()
   const navigate = useNavigate()
+  const location = useLocation()
   const editorRef = useRef(null)
   const fileInputRef = useRef(null)
 
   const [content, setContent] = useState(() => sessionStorage.getItem(STORAGE_KEY) || DEFAULT_CONTENT)
-  // sourcePost: { slug, repoPath } when editing an existing post, null for new/uploaded
   const [sourcePost, setSourcePost] = useState(null)
   const [showPRModal, setShowPRModal] = useState(false)
-  const [showLoadMenu, setShowLoadMenu] = useState(false)
+  const [showLoadModal, setShowLoadModal] = useState(false)
+
+  // If navigated here from "Edit Post" button, load that post immediately
+  useEffect(() => {
+    const editSlug = location.state?.editSlug
+    if (!editSlug) return
+    const post = ALL_POSTS.find(p => p.slug === editSlug)
+    if (post) {
+      setContent(post.raw)
+      setSourcePost({ slug: post.slug, repoPath: post.repoPath })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const monacoTheme = isDarkGlobal ? 'vs-dark' : 'vs'
 
-  // Effective slug and path — use sourcePost's slug when editing, otherwise derive from H1
   const derivedTitle = extractTitle(content) || 'Untitled'
   const derivedSlug = slugify(derivedTitle) || 'untitled'
   const effectiveSlug = sourcePost?.slug ?? derivedSlug
   const effectivePath = sourcePost?.repoPath ?? `src/posts/${derivedSlug}.md`
-  // Filename for download
-  const downloadName = (sourcePost?.repoPath?.split('/').pop()) ?? `${derivedSlug}.md`
+  const downloadName = sourcePost?.repoPath?.split('/').pop() ?? `${derivedSlug}.md`
 
   function handleChange(val) {
     const v = val ?? ''
@@ -326,7 +380,7 @@ export default function BlogBuilderPage() {
 
   function handleNew() {
     if (content.trim() !== DEFAULT_CONTENT.trim() &&
-      !window.confirm('Start a new post? Any unsaved edits will be lost.')) return
+      !window.confirm('Start a new post? Unsaved edits will be lost.')) return
     setContent(DEFAULT_CONTENT)
     setSourcePost(null)
     sessionStorage.setItem(STORAGE_KEY, DEFAULT_CONTENT)
@@ -335,7 +389,7 @@ export default function BlogBuilderPage() {
   function handleLoadPost(post) {
     setContent(post.raw)
     setSourcePost({ slug: post.slug, repoPath: post.repoPath })
-    setShowLoadMenu(false)
+    setShowLoadModal(false)
     sessionStorage.setItem(STORAGE_KEY, post.raw)
   }
 
@@ -382,12 +436,10 @@ export default function BlogBuilderPage() {
         </button>
         <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">Blog Builder</span>
 
-        {/* Current file path */}
-        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-green-700 dark:text-green-400 min-w-0 max-w-[260px] overflow-hidden">
+        <div className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-mono bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-green-700 dark:text-green-400 max-w-[240px] overflow-hidden">
           <span className="truncate">{effectivePath}</span>
         </div>
 
-        {/* Status badge */}
         {sourcePost ? (
           <span className="text-[11px] px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/50 shrink-0">
             Editing existing
@@ -396,70 +448,39 @@ export default function BlogBuilderPage() {
           <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">Draft auto-saved</span>
         )}
 
-        <div className="ml-auto flex items-center gap-1.5 flex-wrap">
-          {/* Source actions */}
-          <button
-            onClick={handleNew}
-            className="text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors hover:opacity-80 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
-          >
+        <div className="ml-auto flex items-center gap-1.5">
+          <button onClick={handleNew}
+            className="text-xs px-2.5 py-1.5 rounded-lg font-medium hover:opacity-80 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
             New
           </button>
 
-          {/* Load existing dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setShowLoadMenu(v => !v)}
-              className="text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors hover:opacity-80 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 flex items-center gap-1"
-            >
-              Load ▾
-            </button>
-            {showLoadMenu && (
-              <LoadMenu
-                onLoad={handleLoadPost}
-                onClose={() => setShowLoadMenu(false)}
-              />
-            )}
-          </div>
-
-          {/* Upload .md from disk */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors hover:opacity-80 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
-          >
-            ↑ Upload .md
+          <button onClick={() => setShowLoadModal(true)}
+            className="text-xs px-2.5 py-1.5 rounded-lg font-medium hover:opacity-80 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+            Load…
           </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".md,text/markdown"
-            className="hidden"
-            onChange={handleFileUpload}
-          />
+
+          <button onClick={() => fileInputRef.current?.click()}
+            className="text-xs px-2.5 py-1.5 rounded-lg font-medium hover:opacity-80 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
+            ↑ Upload
+          </button>
+          <input ref={fileInputRef} type="file" accept=".md,text/markdown" className="hidden" onChange={handleFileUpload} />
 
           <span className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
 
-          {/* Export actions */}
-          <button
-            onClick={handleDownload}
-            className="text-xs px-2.5 py-1.5 rounded-lg font-medium transition-colors hover:opacity-80 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200"
-          >
+          <button onClick={handleDownload}
+            className="text-xs px-2.5 py-1.5 rounded-lg font-medium hover:opacity-80 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
             ↓ Download
           </button>
-          <button
-            onClick={() => setShowPRModal(true)}
-            className="text-xs px-3.5 py-1.5 rounded-lg font-bold bg-[#238636] hover:opacity-90 transition-opacity text-white shrink-0"
-          >
+          <button onClick={() => setShowPRModal(true)}
+            className="text-xs px-3.5 py-1.5 rounded-lg font-bold bg-[#238636] hover:opacity-90 text-white shrink-0">
             Submit PR
           </button>
         </div>
       </div>
 
-      {/* Toolbar */}
       <MarkdownToolbar onInsert={insertBtn} />
 
-      {/* Split pane */}
       <div className="flex flex-1 min-h-0">
-        {/* Left: Monaco */}
         <div className="flex flex-col min-h-0 border-r border-slate-200 dark:border-slate-700" style={{ width: '50%' }}>
           <div className="px-3 py-1 text-xs shrink-0 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400">
             Markdown source
@@ -471,8 +492,7 @@ export default function BlogBuilderPage() {
                 language="markdown"
                 theme={monacoTheme}
                 options={{
-                  fontSize: 14,
-                  lineHeight: 22,
+                  fontSize: 14, lineHeight: 22,
                   minimap: { enabled: false },
                   wordWrap: 'on',
                   scrollBeyondLastLine: false,
@@ -487,7 +507,6 @@ export default function BlogBuilderPage() {
           </div>
         </div>
 
-        {/* Right: live preview */}
         <div className="flex flex-col min-h-0 flex-1 bg-white dark:bg-slate-950">
           <div className="px-3 py-1 text-xs shrink-0 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400">
             Preview — exactly as it appears on the blog
@@ -499,6 +518,10 @@ export default function BlogBuilderPage() {
           </div>
         </div>
       </div>
+
+      {showLoadModal && (
+        <LoadModal onLoad={handleLoadPost} onClose={() => setShowLoadModal(false)} />
+      )}
 
       {showPRModal && (
         <PRModal

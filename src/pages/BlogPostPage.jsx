@@ -132,12 +132,20 @@ export default function BlogPostPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 pb-24">
-      <button
-        onClick={() => navigate('/blog')}
-        className="mb-8 flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-      >
-        ← Blog
-      </button>
+      <div className="mb-8 flex items-center justify-between">
+        <button
+          onClick={() => navigate('/blog')}
+          className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+        >
+          ← Blog
+        </button>
+        <button
+          onClick={() => navigate('/blog/new', { state: { editSlug: slug } })}
+          className="text-xs px-3 py-1.5 rounded-lg font-medium transition-colors bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+        >
+          Edit Post
+        </button>
+      </div>
 
       <BlogPost key={slug} content={content} />
 
