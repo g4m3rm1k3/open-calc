@@ -1,7 +1,5 @@
 # Lesson 5: Functions — Organizing and Reusing Code in C++
 
-Welcome back!
-
 You’re doing great. By now you know variables, conditions, and loops.
 
 In **Lesson 5**, we’ll learn about **functions** — blocks of code that you can reuse whenever you want. Functions help keep your code clean, organized, and easier to maintain.

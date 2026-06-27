@@ -1,7 +1,5 @@
 # Getting Started with C++: The Ultimate Super Beginner’s Guide (No Experience Needed)
 
-Hello and welcome!
-
 If you’ve never written any code before in your life, this guide is written especially for you. We’re going to go **slow**, explain **everything**, and make sure you understand why things work the way they do. No rushing. No assuming you already know stuff.
 
 By the end of this guide, you’ll have written your first real C++ programs and feel confident to keep learning.

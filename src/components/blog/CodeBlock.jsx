@@ -58,6 +58,25 @@ const PRISM_LANG = {
 
 const PISTON_LANGS = new Set(['kotlin', 'powershell', 'ps1'])
 
+const STDIN_PATTERNS = {
+  python: /\binput\s*\(/, py: /\binput\s*\(/,
+  c: /\bscanf\s*\(|\bfgets\s*\(|\bgetchar\s*\(/,
+  cpp: /\bscanf\s*\(|\bcin\s*>>|\bstd::cin\b|\bgetline\s*\(/, 'c++': /\bscanf\s*\(|\bcin\s*>>|\bstd::cin\b|\bgetline\s*\(/,
+  java: /\bScanner\b|\bSystem\.in\b/,
+  rust: /\bstdin\(\)|\bread_line\b/,
+  go: /\bfmt\.Scan\b|\bbufio\.NewReader\b/,
+  ruby: /\bgets\b/,
+  kotlin: /\breadLine\s*\(\)/,
+  haskell: /\bgetLine\b|\bgetContents\b/,
+  bash: /\bread\s/, sh: /\bread\s/, shell: /\bread\s/,
+  javascript: /\bprompt\s*\(/, js: /\bprompt\s*\(/,
+}
+
+function needsStdin(lang, code) {
+  const re = STDIN_PATTERNS[lang]
+  return re ? re.test(code) : false
+}
+
 function CopyButton({ getText }) {
   const [copied, setCopied] = useState(false)
   async function handleCopy() {
@@ -112,6 +131,8 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
   const [output, setOutput] = useState(null)
   const [running, setRunning] = useState(false)
   const [isError, setIsError] = useState(false)
+  const [stdinValue, setStdinValue] = useState('')
+  const showStdin = isRunnable && needsStdin(lang, editorCode)
 
   const lineCount = editorCode.split('\n').length
   const editorHeight = Math.min(Math.max(lineCount * 20 + 24, 80), 560)
@@ -138,7 +159,7 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
     onCodeChange?.(cellIndex, lang, editorCode)
     try {
       const priorCode = getPriorContext ? getPriorContext(cellIndex, lang, editorCode) : ''
-      const result = await runCode(language, editorCode, priorCode)
+      const result = await runCode(language, editorCode, priorCode, stdinValue)
       const err = typeof result === 'string' && (result.startsWith('Error:') || result.startsWith('No runner'))
       setOutput(result || '(no output)')
       setIsError(err)
@@ -250,6 +271,34 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
           </div>
         )}
       </div>
+
+      {/* Stdin panel — shown when code contains input calls */}
+      {showStdin && (
+        <div className="border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-center justify-between px-3 py-1.5 bg-amber-50 dark:bg-amber-950/20">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">Stdin</span>
+              <span className="text-[10px] text-amber-500/70 dark:text-amber-600/70">one value per line</span>
+            </div>
+            {stdinValue && (
+              <button
+                onClick={() => setStdinValue('')}
+                className="text-[10px] text-amber-500 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <textarea
+            value={stdinValue}
+            onChange={e => setStdinValue(e.target.value)}
+            placeholder="Type program inputs here…"
+            rows={Math.min(Math.max(stdinValue.split('\n').length, 2), 6)}
+            spellCheck={false}
+            className="w-full px-4 py-2.5 text-[13px] font-mono leading-relaxed bg-amber-50/60 dark:bg-amber-950/10 text-slate-800 dark:text-slate-200 border-0 outline-none resize-none placeholder-amber-400/60 dark:placeholder-amber-700/60"
+          />
+        </div>
+      )}
 
       {/* Output panel */}
       {output !== null && (

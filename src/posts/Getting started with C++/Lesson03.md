@@ -1,7 +1,5 @@
 # Lesson 3: Making Decisions with if-else in C++
 
-Welcome back!
-
 In Lesson 1 we wrote our first program.  
 In Lesson 2 we learned about variables and storing information.
 

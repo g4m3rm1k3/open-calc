@@ -1,9 +1,5 @@
 # Lesson 4: Loops — Repeating Code in C++
 
-Welcome back!
-
-You’ve made it to Lesson 4. That’s awesome!
-
 So far you’ve learned:
 
 - Lesson 1: First program

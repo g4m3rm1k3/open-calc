@@ -2,11 +2,16 @@ import { getPyodide } from './pyodideRuntime.js'
 import { executeScript } from '../engines/openmat/openmatEngine.js'
 
 // ── Python ────────────────────────────────────────────────────────────────────
-export async function runPython(code) {
+export async function runPython(code, stdin = '') {
   const pyodide = await getPyodide()
   const lines = []
   pyodide.setStdout({ batched: (s) => lines.push(s) })
   pyodide.setStderr({ batched: (s) => lines.push('⚠ ' + s) })
+  if (stdin) {
+    const stdinLines = stdin.split('\n')
+    let idx = 0
+    pyodide.setStdin({ stdin: () => idx < stdinLines.length ? stdinLines[idx++] + '\n' : null })
+  }
   try {
     await pyodide.runPythonAsync(code)
   } catch (err) {
@@ -18,19 +23,23 @@ export async function runPython(code) {
 // ── JavaScript (in-browser) ───────────────────────────────────────────────────
 // priorCode: accumulated earlier cells run silently in the same Function scope
 // so their declarations (classes, vars, functions) are visible to `code`.
-export function runJS(code, priorCode = '') {
+export function runJS(code, priorCode = '', stdin = '') {
   const lines = []
   const capture = (...args) =>
     lines.push(args.map((a) => (typeof a === 'object' ? JSON.stringify(a, null, 2) : String(a))).join(' '))
   const silent = { log: () => {}, warn: () => {}, error: () => {}, info: () => {}, dir: () => {} }
   const active = { log: capture, warn: capture, error: capture, info: capture, dir: capture }
+  // Mock prompt() with pre-filled stdin lines so JS code using prompt() works
+  const stdinLines = stdin ? stdin.split('\n') : []
+  let stdinIdx = 0
+  const mockPrompt = () => stdinLines[stdinIdx++] ?? null
   try {
     if (priorCode) {
       // eslint-disable-next-line no-new-func
-      new Function('__silent', '__active', `let console=__silent;\n${priorCode}\nconsole=__active;\n${code}`)(silent, active)
+      new Function('__silent', '__active', 'prompt', `let console=__silent;\n${priorCode}\nconsole=__active;\n${code}`)(silent, active, mockPrompt)
     } else {
       // eslint-disable-next-line no-new-func
-      new Function('console', code)(active)
+      new Function('console', 'prompt', code)(active, mockPrompt)
     }
   } catch (e) {
     lines.push('Error: ' + e.message)
@@ -143,13 +152,15 @@ export const WANDBOX_COMPILER = {
   'c#':       'mono-6.12.0.199',
 }
 
-async function runWandbox(compiler, code) {
+async function runWandbox(compiler, code, stdin = '') {
   let res
+  const body = { code, compiler }
+  if (stdin) body.stdin = stdin
   try {
     res = await fetch('https://wandbox.org/api/compile.json', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, compiler }),
+      body: JSON.stringify(body),
     })
   } catch {
     throw new Error('Wandbox unreachable — check your connection')
@@ -186,15 +197,17 @@ const PISTON_LANG = {
   powershell: 'powershell', ps1: 'powershell',
 }
 
-async function runPiston(lang, wrappedCode) {
+async function runPiston(lang, wrappedCode, stdin = '') {
   const pistonLang = PISTON_LANG[lang]
   if (!pistonLang) throw new Error('No Piston runner for: ' + lang)
   let res
+  const body = { language: pistonLang, version: '*', files: [{ content: wrappedCode }] }
+  if (stdin) body.stdin = stdin
   try {
     res = await fetch('https://emkc.org/api/v2/piston/execute', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ language: pistonLang, version: '*', files: [{ content: wrappedCode }] }),
+      body: JSON.stringify(body),
     })
   } catch {
     throw new Error('Piston API unreachable')
@@ -209,29 +222,29 @@ async function runPiston(lang, wrappedCode) {
 }
 
 // ── Dispatch ──────────────────────────────────────────────────────────────────
-export async function runCode(language, code, priorCode = '') {
+export async function runCode(language, code, priorCode = '', stdin = '') {
   const lang = language.toLowerCase()
-  if (lang === 'python' || lang === 'py') return runPython(code)
-  if (lang === 'javascript' || lang === 'js') return runJS(code, priorCode)
+  if (lang === 'python' || lang === 'py') return runPython(code, stdin)
+  if (lang === 'javascript' || lang === 'js') return runJS(code, priorCode, stdin)
   if (lang === 'typescript' || lang === 'ts')
-    return runJS(stripTypeScript(code), priorCode ? stripTypeScript(priorCode) : '')
+    return runJS(stripTypeScript(code), priorCode ? stripTypeScript(priorCode) : '', stdin)
   if (lang === 'matlab' || lang === 'm') return runMatlab(code)
 
   const wrapped = autoWrap(lang, code)
 
   // Kotlin and PowerShell go straight to Piston (Wandbox doesn't support them)
   if (lang === 'kotlin' || lang === 'powershell' || lang === 'ps1')
-    return runPiston(lang, wrapped)
+    return runPiston(lang, wrapped, stdin)
 
   // Everything else: try Wandbox first, fall back to Piston on any failure
   const wandboxCompiler = WANDBOX_COMPILER[lang]
   if (wandboxCompiler) {
     try {
-      return await runWandbox(wandboxCompiler, wrapped)
+      return await runWandbox(wandboxCompiler, wrapped, stdin)
     } catch (wandboxErr) {
       if (!PISTON_LANG[lang]) throw wandboxErr
       try {
-        return await runPiston(lang, wrapped)
+        return await runPiston(lang, wrapped, stdin)
       } catch (pistonErr) {
         throw new Error(`Wandbox: ${wandboxErr.message} · Piston: ${pistonErr.message}`)
       }

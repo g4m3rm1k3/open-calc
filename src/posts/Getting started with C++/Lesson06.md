@@ -1,7 +1,5 @@
 # Lesson 6: Arrays — Working with Lists of Data in C++
 
-Welcome back!
-
 You’ve come a long way. You now know variables, conditions, loops, and functions.
 
 In **Lesson 6**, we’ll learn about **arrays** — a way to store multiple pieces of data of the same type in one place.

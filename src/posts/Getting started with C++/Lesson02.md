@@ -1,7 +1,5 @@
 # Lesson 2: Variables, Data Types, and Storing Information in C++
 
-Welcome back! �
-
 If you completed Lesson 1, you’ve already written your first program and understand the basic structure of C++. Great job!
 
 In this lesson, we’re going to slow down and really understand **variables** — one of the most important concepts in programming. We’ll go deep so you truly get it, even with zero prior experience.
