@@ -1,0 +1,81 @@
+<svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="230" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Taylor Polynomials Converging to sin(x)</text>
+
+  <!-- Axes -->
+  <line x1="40" y1="120" x2="360" y2="120" class="ax" stroke-width="1.5"/>
+  <line x1="40" y1="20"  x2="40"  y2="185" class="ax" stroke-width="1.5"/>
+  <polygon points="356,116 356,124 366,120" class="axf"/>
+  <polygon points="36,20 44,20 40,12" class="axf"/>
+  <text x="368" y="124" font-size="10" class="mu" font-style="italic">x</text>
+  <text x="28"  y="18"  font-size="10" class="mu" font-style="italic">y</text>
+
+  <!-- x-axis labels: -π at x≈40, 0 at x=200, π at x=360 -->
+  <text x="40"  y="133" font-size="9" class="mu" text-anchor="middle">−π</text>
+  <text x="200" y="133" font-size="9" class="mu" text-anchor="middle">0</text>
+  <text x="360" y="133" font-size="9" class="mu" text-anchor="middle">π</text>
+
+  <!-- 0 line -->
+  <line x1="38" y1="120" x2="45" y2="120" class="ax" stroke-width="1"/>
+  <text x="33"  y="124" font-size="9" class="mu" text-anchor="end">0</text>
+  <line x1="38" y1="40"  x2="45" y2="40"  class="ax" stroke-width="1"/>
+  <text x="33"  y="44"  font-size="9" class="mu" text-anchor="end">1</text>
+  <line x1="38" y1="200" x2="45" y2="200" class="ax" stroke-width="1"/>
+  <text x="33"  y="204" font-size="9" class="mu" text-anchor="end">−1</text>
+
+  <!-- T1(x) = x: line through (−π, −π) → (π, π) scaled -->
+  <!-- x ∈ [−π, π] maps to SVG x ∈ [40, 360], y: sin ∈ [−1,1] maps to SVG y ∈ [200, 40] (inverted) -->
+  <!-- T1: y = x, so at x=−π: T1=−π≈−3.14, SVG_y = 120 + 3.14*80 = 371 (clamp to 200) -->
+  <!-- Let's plot T1 from x=-1.5 to 1.5: T1(−1.5)=−1.5, T1(1.5)=1.5 -->
+  <!-- SVGx = 40 + (x+π)/(2π) * 320; SVGy = 120 − y*80 -->
+  <!-- x=−1.5: SVGx=40+(1.642/6.283)*320=123, SVGy=120+120=240(clip)→200 -->
+  <!-- x=1.5: SVGx=40+(4.642/6.283)*320=277, SVGy=120-120=0(clip)→20 -->
+  <line x1="80" y1="200" x2="320" y2="40" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3"/>
+
+  <!-- T3(x) = x - x³/6 -->
+  <!-- Key points computed: at x=±π/2 (SVGx=120,280): T3≈0.924, sin≈1 close -->
+  <!-- Approximate path for T3 -->
+  <path d="M 40,115 C 70,175 100,200 120,196 C 140,192 160,155 200,120 C 240,85 260,48 280,44 C 300,40 330,65 360,125"
+        fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,3"/>
+
+  <!-- sin(x) — true function -->
+  <path d="M 40,120 C 70,185 110,200 160,160 C 190,138 200,120 200,120 C 200,120 210,102 240,80 C 290,40 330,55 360,120"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- T5(x) very close to sin(x) in middle range -->
+  <path d="M 40,121 C 70,183 110,199 155,160 C 185,137 200,120 200,120 C 215,103 240,82 285,42 C 310,35 340,62 360,120"
+        fill="none" stroke="#10b981" stroke-width="1.8" stroke-dasharray="4,2"/>
+
+  <!-- Legend -->
+  <rect x="370" y="30" width="102" height="98" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="378" y1="50"  x2="405" y2="50"  stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="410" y="54"    font-size="9" fill="#64748b">T₁(x) = x</text>
+  <line x1="378" y1="68"  x2="405" y2="68"  stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="410" y="72"    font-size="9" fill="#d97706">T₃(x)</text>
+  <line x1="378" y1="86"  x2="405" y2="86"  stroke="#10b981" stroke-width="1.8" stroke-dasharray="4,2"/>
+  <text x="410" y="90"    font-size="9" fill="#059669">T₅(x)</text>
+  <line x1="378" y1="104" x2="405" y2="104" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="410" y="108"   font-size="9" fill="#6366f1">sin(x)</text>
+
+  <!-- Formula panel -->
+  <rect x="370" y="136" width="102" height="80" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="421" y="150" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">sin(x) = Σ</text>
+  <text x="421" y="163" font-size="8" fill="#6366f1" text-anchor="middle">(−1)ⁿ x²ⁿ⁺¹</text>
+  <line x1="385" y1="167" x2="463" y2="167" stroke="#6366f1" stroke-width="0.8"/>
+  <text x="421" y="178" font-size="8" fill="#6366f1" text-anchor="middle">(2n+1)!</text>
+  <text x="421" y="193" font-size="8" fill="#4338ca" text-anchor="middle">= x − x³/3! + x⁵/5! − ···</text>
+  <text x="421" y="207" font-size="7" class="mu"    text-anchor="middle">converges for all x</text>
+
+  <text x="195" y="220" font-size="8.5" class="mu" text-anchor="middle">More terms → polynomial matches sin(x) over a wider range</text>
+</svg>

@@ -1,0 +1,102 @@
+<svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="230" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Polar Coordinates — Cardioid r = 1 + cos(θ)</text>
+
+  <!-- LEFT: Polar grid with cardioid -->
+  <!-- Center at (130, 120), scale = 55 -->
+  <g transform="translate(130,120)">
+    <!-- Polar grid circles -->
+    <circle cx="0" cy="0" r="28"  fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+    <circle cx="0" cy="0" r="55"  fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+    <circle cx="0" cy="0" r="82"  fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+    <circle cx="0" cy="0" r="110" fill="none" stroke="#e2e8f0" stroke-width="0.8"/>
+    <!-- Grid radii -->
+    <line x1="-110" y1="0"   x2="110" y2="0"   stroke="#e2e8f0" stroke-width="0.8"/>
+    <line x1="0" y1="-110"   x2="0"   y2="110"  stroke="#e2e8f0" stroke-width="0.8"/>
+    <line x1="-78" y1="-78"  x2="78"  y2="78"   stroke="#e2e8f0" stroke-width="0.8"/>
+    <line x1="78"  y1="-78"  x2="-78" y2="78"   stroke="#e2e8f0" stroke-width="0.8"/>
+
+    <!-- Axes labels -->
+    <text x="112" y="4"  font-size="9" class="mu">0</text>
+    <text x="-5"  y="-112" font-size="9" class="mu" text-anchor="middle">π/2</text>
+    <text x="-126" y="4"  font-size="9" class="mu" text-anchor="end">π</text>
+    <text x="-5"  y="118"  font-size="9" class="mu" text-anchor="middle">3π/2</text>
+
+    <!-- Cardioid r = 1 + cos(θ), scale = 55 -->
+    <!-- Computed points: r(0)=2, r(π/6)=1.866, r(π/4)=1.707, r(π/3)=1.5, r(π/2)=1,
+         r(2π/3)=0.5, r(5π/6)=0.134, r(π)=0, r(3π/2)=1 -->
+    <path d="
+      M 110,0
+      C 104,-28 88,-55 77,-64
+      C 58,-83 28,-82 0,-55
+      C -14,-41 -22,-14 -22,0
+      C -22,14 -14,41 0,55
+      C 28,82 58,83 77,64
+      C 88,55 104,28 110,0 Z"
+      fill="#6366f1" fill-opacity="0.12" stroke="#6366f1" stroke-width="2"/>
+
+    <!-- Key point annotations -->
+    <circle cx="110" cy="0" r="3" fill="#6366f1"/>
+    <text x="114" y="-4" font-size="8" fill="#6366f1">θ=0, r=2</text>
+
+    <circle cx="0" cy="-55" r="3" fill="#6366f1"/>
+    <text x="6" y="-56" font-size="8" fill="#6366f1">θ=π/2, r=1</text>
+
+    <circle cx="-22" cy="0" r="3" fill="#6366f1"/>
+    <text x="-26" y="-4" font-size="8" fill="#6366f1" text-anchor="end">θ=π, r=0</text>
+
+    <!-- r arrow for one point -->
+    <line x1="0" y1="0" x2="77" y2="-64" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrf)"/>
+    <text x="30" y="-38" font-size="8" fill="#f59e0b">r = 1+cos(θ)</text>
+  </g>
+
+  <!-- Divider -->
+  <line x1="265" y1="28" x2="265" y2="215" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Comparison table -->
+  <text x="375" y="38"  font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Cartesian vs. Polar</text>
+
+  <rect x="272" y="48"  width="195" height="22" rx="3" fill="#eef2ff"/>
+  <text x="369" y="63"  font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Curve — Cartesian — Polar</text>
+
+  <text x="278" y="82"  font-size="8.5" fill="#0f172a">Circle r=a</text>
+  <text x="380" y="82"  font-size="8" fill="#6366f1">x²+y²=a²</text>
+  <text x="450" y="82"  font-size="8.5" fill="#10b981" text-anchor="end">r = a</text>
+
+  <text x="278" y="100" font-size="8.5" fill="#0f172a">Cardioid</text>
+  <text x="380" y="100" font-size="8"  fill="#6366f1">complex implicit</text>
+  <text x="450" y="100" font-size="8.5" fill="#10b981" text-anchor="end">r = 1+cos θ</text>
+
+  <text x="278" y="118" font-size="8.5" fill="#0f172a">Rose (4 petals)</text>
+  <text x="380" y="118" font-size="8"  fill="#6366f1">very complex</text>
+  <text x="450" y="118" font-size="8.5" fill="#10b981" text-anchor="end">r = cos 2θ</text>
+
+  <text x="278" y="136" font-size="8.5" fill="#0f172a">Spiral</text>
+  <text x="380" y="136" font-size="8"  fill="#6366f1">not a function!</text>
+  <text x="450" y="136" font-size="8.5" fill="#10b981" text-anchor="end">r = θ</text>
+
+  <!-- Conversion formulas -->
+  <rect x="272" y="148" width="195" height="54" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+  <text x="369" y="162" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">Conversion</text>
+  <text x="278" y="177" font-size="8.5" fill="#0f172a">x = r cos θ,   y = r sin θ</text>
+  <text x="278" y="190" font-size="8.5" fill="#0f172a">r = √(x²+y²),  tan θ = y/x</text>
+
+  <text x="369" y="212" font-size="8" class="mu" text-anchor="middle">Polar shines when distance from origin is key</text>
+
+  <defs>
+    <marker id="arrf" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+</svg>

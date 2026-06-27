@@ -1,0 +1,49 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <!-- Divider -->
+  <line x1="240" y1="10" x2="240" y2="210" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- LEFT: concave up (f'' > 0) -->
+  <!-- Parabola opening up: y = 0.02(x-100)^2 + 30 in SVG coords -->
+  <path d="M 30,180 Q 115,30 200,180" fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <text x="115" y="20" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">concave up</text>
+  <text x="115" y="34" font-size="10" fill="#10b981" text-anchor="middle">f ″ &gt; 0</text>
+  <!-- Smile label -->
+  <text x="115" y="185" font-size="9"  class="mu" text-anchor="middle">holds water ∪ (bowl)</text>
+  <!-- Tangent lines that rotate CCW (slopes increase) -->
+  <line x1="48"  y1="165" x2="80"  y2="192" stroke="#10b981" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+  <line x1="90"  y1="102" x2="130" y2="108" stroke="#10b981" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+  <line x1="150" y1="100" x2="190" y2="80"  stroke="#10b981" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+  <!-- Arrow showing slopes increasing -->
+  <text x="30"  y="150" font-size="8" fill="#10b981">slope↑</text>
+
+  <!-- RIGHT: concave down (f'' < 0) -->
+  <path d="M 270,50 Q 355,200 440,50" fill="none" stroke="#e11d48" stroke-width="2.5"/>
+  <text x="355" y="20" font-size="11" fill="#e11d48" text-anchor="middle" font-weight="700">concave down</text>
+  <text x="355" y="34" font-size="10" fill="#e11d48" text-anchor="middle">f ″ &lt; 0</text>
+  <text x="355" y="185" font-size="9"  class="mu" text-anchor="middle">sheds water ∩ (hill)</text>
+  <!-- Tangent lines that rotate CW (slopes decrease) -->
+  <line x1="278" y1="70"  x2="318" y2="46"  stroke="#e11d48" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+  <line x1="330" y1="125" x2="370" y2="120" stroke="#e11d48" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+  <line x1="392" y1="118" x2="432" y2="148" stroke="#e11d48" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>
+  <!-- Arrow showing slopes decreasing -->
+  <text x="428" y="130" font-size="8" fill="#e11d48">slope↓</text>
+
+  <!-- Bottom labels -->
+  <text x="115" y="200" font-size="8.5" fill="#10b981" text-anchor="middle">tangent lines rotate counter-clockwise</text>
+  <text x="355" y="200" font-size="8.5" fill="#e11d48" text-anchor="middle">tangent lines rotate clockwise</text>
+
+  <!-- Center label -->
+  <text x="240" y="210" font-size="8.5" class="mu" text-anchor="middle">inflection point: where f ″ changes sign (concavity switches)</text>
+</svg>

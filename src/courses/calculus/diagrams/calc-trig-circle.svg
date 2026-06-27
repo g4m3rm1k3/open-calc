@@ -1,0 +1,86 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Trig Derivatives — Unit Circle Explains the Pattern</text>
+
+  <!-- LEFT: Unit circle -->
+  <!-- Center: (115, 115), r = 80 -->
+  <g transform="translate(115,115)">
+    <!-- Axes -->
+    <line x1="-90" y1="0" x2="90" y2="0" class="ax" stroke-width="1.2"/>
+    <line x1="0" y1="-90" x2="0" y2="90" class="ax" stroke-width="1.2"/>
+    <!-- Unit circle -->
+    <circle cx="0" cy="0" r="80" fill="none" stroke="#94a3b8" stroke-width="1"/>
+    <!-- Angle at about 40° -->
+    <line x1="0" y1="0" x2="61" y2="-51" stroke="#6366f1" stroke-width="1.5"/>
+    <!-- Point on circle: (cos40°, sin40°) ≈ (0.766, 0.643) → SVG (61, -51) -->
+    <circle cx="61" cy="-51" r="4" fill="#6366f1"/>
+    <!-- cos: horizontal projection -->
+    <line x1="61" y1="0" x2="61" y2="-51" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3"/>
+    <!-- sin: vertical projection -->
+    <line x1="0" y1="-51" x2="61" y2="-51" stroke="#10b981" stroke-width="2" stroke-dasharray="4,3"/>
+    <!-- Labels -->
+    <text x="30" y="13" font-size="9" fill="#6366f1">cos θ</text>
+    <text x="64" y="-22" font-size="9" fill="#ef4444">sin θ</text>
+    <text x="46" y="-54" font-size="9" fill="#6366f1">(cos θ, sin θ)</text>
+    <!-- Angle arc -->
+    <path d="M 20,0 A 20,20 0 0,0 15,-12" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="22" y="-6" font-size="9" fill="#f59e0b">θ</text>
+    <!-- Axis labels -->
+    <text x="84" y="4" font-size="9" class="mu">1</text>
+    <text x="-14" y="-82" font-size="9" class="mu">1</text>
+    <text x="-96" y="4" font-size="9" class="mu">−1</text>
+  </g>
+
+  <!-- DIVIDER -->
+  <line x1="230" y1="28" x2="230" y2="210" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Derivative table and intuition -->
+  <text x="358" y="36" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">The Six Trig Derivatives</text>
+
+  <!-- Table rows -->
+  <!-- Row header -->
+  <rect x="238" y="44" width="100" height="20" rx="3" fill="#eef2ff"/>
+  <rect x="343" y="44" width="127" height="20" rx="3" fill="#ecfdf5"/>
+  <text x="288" y="58" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">f(x)</text>
+  <text x="406" y="58" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">f′(x)</text>
+
+  <!-- Rows -->
+  <text x="288" y="80"  font-size="11" fill="#6366f1" text-anchor="middle" font-weight="700">sin x</text>
+  <text x="406" y="80"  font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">cos x</text>
+  <text x="333" y="80"  font-size="14" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <text x="288" y="100" font-size="11" fill="#6366f1" text-anchor="middle" font-weight="700">cos x</text>
+  <text x="406" y="100" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">−sin x</text>
+  <text x="333" y="100" font-size="14" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <text x="288" y="120" font-size="11" fill="#6366f1" text-anchor="middle" font-weight="700">tan x</text>
+  <text x="406" y="120" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">sec² x</text>
+  <text x="333" y="120" font-size="14" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <text x="288" y="140" font-size="10" fill="#6366f1" text-anchor="middle" font-weight="700">csc x</text>
+  <text x="406" y="140" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">−csc x cot x</text>
+  <text x="333" y="140" font-size="14" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <text x="288" y="160" font-size="10" fill="#6366f1" text-anchor="middle" font-weight="700">sec x</text>
+  <text x="406" y="160" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">sec x tan x</text>
+  <text x="333" y="160" font-size="14" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <text x="288" y="180" font-size="10" fill="#6366f1" text-anchor="middle" font-weight="700">cot x</text>
+  <text x="406" y="180" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">−csc² x</text>
+  <text x="333" y="180" font-size="14" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <!-- Key insight -->
+  <rect x="238" y="188" width="232" height="22" rx="4" fill="#fef9c3"/>
+  <text x="354" y="203" font-size="8.5" fill="#d97706" text-anchor="middle">Co-functions pick up a minus sign: d/dx[cos] = −sin</text>
+</svg>

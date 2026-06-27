@@ -1,0 +1,89 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <!-- Title -->
+  <text x="240" y="20" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">One-Sided Limits — Approaching from Left vs. Right</text>
+
+  <!-- LEFT PANEL: agrees (two-sided limit exists) -->
+  <text x="120" y="38" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">Case 1: Limits Agree → Two-Sided Limit Exists</text>
+
+  <!-- axes -->
+  <line x1="28" y1="170" x2="215" y2="170" class="ax" stroke-width="1.5"/>
+  <line x1="28" y1="50"  x2="28"  y2="173" class="ax" stroke-width="1.5"/>
+
+  <!-- piecewise: left piece y=x+80 (x<120), right piece y=x+80-30 (x>120) both meeting near x=120 -->
+  <!-- left piece: linear from (28,158) to (113,73) -->
+  <line x1="28" y1="158" x2="113" y2="73" stroke="#10b981" stroke-width="2.5"/>
+  <!-- right piece: same slope continuation -->
+  <line x1="127" y1="73" x2="213" y2="73" stroke="#10b981" stroke-width="2.5"/>
+
+  <!-- open/filled dots at x=120 -->
+  <circle cx="120" cy="73" r="5" fill="none" stroke="#10b981" stroke-width="2"/>
+  <circle cx="120" cy="73" r="3" fill="#10b981"/>
+
+  <!-- vertical dashed line at x=a -->
+  <line x1="120" y1="60" x2="120" y2="175" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="120" y="185" font-size="10" fill="#6366f1" text-anchor="middle">a</text>
+
+  <!-- Left arrow -->
+  <line x1="90" y1="130" x2="110" y2="80" stroke="#ef4444" stroke-width="2" marker-end="url(#arrL)"/>
+  <text x="72" y="138" font-size="9" fill="#ef4444">lim⁻ = L</text>
+
+  <!-- Right arrow -->
+  <line x1="155" y1="60" x2="130" y2="70" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrR)"/>
+  <text x="150" y="57" font-size="9" fill="#3b82f6">lim⁺ = L</text>
+
+  <text x="120" y="200" font-size="8.5" fill="#059669" text-anchor="middle">Both agree → lim exists</text>
+
+  <!-- DIVIDER -->
+  <line x1="240" y1="30" x2="240" y2="210" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT PANEL: disagrees (jump discontinuity) -->
+  <text x="360" y="38" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="700">Case 2: Limits Disagree → No Two-Sided Limit</text>
+
+  <!-- axes right -->
+  <line x1="252" y1="170" x2="468" y2="170" class="ax" stroke-width="1.5"/>
+  <line x1="252" y1="50"  x2="252" y2="173" class="ax" stroke-width="1.5"/>
+
+  <!-- piecewise: left piece ends at y=120 (high), right piece starts at y=100 (low) -->
+  <line x1="252" y1="170" x2="337" y2="80" stroke="#ef4444" stroke-width="2.5"/>
+  <line x1="353" y1="130" x2="465" y2="80" stroke="#3b82f6" stroke-width="2.5"/>
+
+  <!-- open dots showing jump -->
+  <circle cx="345" cy="80"  r="5" fill="none" stroke="#ef4444" stroke-width="2"/>
+  <circle cx="345" cy="130" r="5" fill="none" stroke="#3b82f6" stroke-width="2"/>
+
+  <!-- vertical dashed line at x=a -->
+  <line x1="345" y1="50" x2="345" y2="175" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="345" y="185" font-size="10" fill="#6366f1" text-anchor="middle">a</text>
+
+  <!-- Left arrow approaching top -->
+  <line x1="308" y1="120" x2="336" y2="85" stroke="#ef4444" stroke-width="2" marker-end="url(#arrL2)"/>
+  <text x="268" y="122" font-size="9" fill="#ef4444">lim⁻ = L₁</text>
+
+  <!-- Right arrow approaching bottom -->
+  <line x1="380" y1="148" x2="354" y2="135" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrR2)"/>
+  <text x="380" y="165" font-size="9" fill="#3b82f6">lim⁺ = L₂</text>
+
+  <text x="360" y="200" font-size="8.5" fill="#dc2626" text-anchor="middle">L₁ ≠ L₂ → jump discontinuity</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrL"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#ef4444"/></marker>
+    <marker id="arrR"  markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#3b82f6"/></marker>
+    <marker id="arrL2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#ef4444"/></marker>
+    <marker id="arrR2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#3b82f6"/></marker>
+  </defs>
+
+  <text x="240" y="214" font-size="8.5" class="mu" text-anchor="middle">Two-sided limit exists iff lim⁻ = lim⁺ = L</text>
+</svg>

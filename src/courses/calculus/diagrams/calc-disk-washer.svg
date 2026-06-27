@@ -1,0 +1,107 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Volumes of Revolution — Disk, Washer, and Shell Methods</text>
+
+  <!-- LEFT: Disk method -->
+  <text x="80"  y="34" font-size="9" fill="#6366f1" text-anchor="middle" font-weight="700">Disk Method</text>
+  <text x="80"  y="46" font-size="8" class="mu"    text-anchor="middle">rotate y=f(x) around x-axis</text>
+
+  <!-- Axes -->
+  <line x1="20" y1="145" x2="155" y2="145" class="ax" stroke-width="1.2"/>
+  <line x1="20" y1="50"  x2="20"  y2="148" class="ax" stroke-width="1.2"/>
+
+  <!-- Curve (parabola-like) -->
+  <path d="M 20,145 Q 85,55 150,100" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Disk cross-section at x=85 -->
+  <ellipse cx="85" cy="105" rx="8" ry="40" fill="#6366f1" fill-opacity="0.2" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- radius arrow -->
+  <line x1="85" y1="145" x2="85" y2="65" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrRed)"/>
+  <text x="88" y="110" font-size="9" fill="#ef4444">R=f(x)</text>
+  <!-- Shaded region -->
+  <path d="M 20,145 Q 85,55 150,100 L 150,145 Z" fill="#6366f1" fill-opacity="0.08"/>
+  <!-- formula -->
+  <text x="80" y="170" font-size="9" fill="#4338ca" text-anchor="middle">V = ∫ π[f(x)]² dx</text>
+  <text x="80" y="183" font-size="8"  fill="#6366f1" text-anchor="middle">area of disk × dx</text>
+
+  <!-- DIVIDER 1 -->
+  <line x1="165" y1="28" x2="165" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- CENTER: Washer method -->
+  <text x="245" y="34" font-size="9" fill="#10b981" text-anchor="middle" font-weight="700">Washer Method</text>
+  <text x="245" y="46" font-size="8" class="mu"    text-anchor="middle">region between two curves</text>
+
+  <!-- Axes -->
+  <line x1="175" y1="145" x2="315" y2="145" class="ax" stroke-width="1.2"/>
+  <line x1="175" y1="50"  x2="175" y2="148" class="ax" stroke-width="1.2"/>
+
+  <!-- Outer curve (top) -->
+  <path d="M 175,145 Q 240,52 310,90" fill="none" stroke="#6366f1" stroke-width="2"/>
+  <!-- Inner curve (bottom boundary) -->
+  <path d="M 175,145 Q 240,110 310,130" fill="none" stroke="#10b981" stroke-width="2"/>
+
+  <!-- Region between -->
+  <path d="M 175,145 Q 240,52 310,90 L 310,130 Q 240,110 175,145 Z" fill="#10b981" fill-opacity="0.1"/>
+
+  <!-- Washer cross-section at x=245 -->
+  <!-- outer ellipse -->
+  <ellipse cx="245" cy="97" rx="8" ry="46" fill="none" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- inner ellipse -->
+  <ellipse cx="245" cy="122" rx="8" ry="23" fill="white" stroke="#10b981" stroke-width="1.5"/>
+  <!-- R and r arrows -->
+  <line x1="245" y1="145" x2="245" y2="55" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <line x1="245" y1="145" x2="245" y2="100" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="250" y="100" font-size="8" fill="#6366f1">R=f</text>
+  <text x="250" y="128" font-size="8" fill="#10b981">r=g</text>
+
+  <text x="245" y="170" font-size="9" fill="#4338ca" text-anchor="middle">V = ∫ π(R²−r²) dx</text>
+  <text x="245" y="183" font-size="8" fill="#10b981" text-anchor="middle">= π(f² − g²) integrated</text>
+
+  <!-- DIVIDER 2 -->
+  <line x1="325" y1="28" x2="325" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Shell method -->
+  <text x="405" y="34" font-size="9" fill="#f59e0b" text-anchor="middle" font-weight="700">Shell Method</text>
+  <text x="405" y="46" font-size="8" class="mu"    text-anchor="middle">rotate around y-axis</text>
+
+  <!-- Axes -->
+  <line x1="338" y1="145" x2="470" y2="145" class="ax" stroke-width="1.2"/>
+  <line x1="338" y1="50"  x2="338" y2="148" class="ax" stroke-width="1.2"/>
+
+  <!-- Curve -->
+  <path d="M 338,145 Q 385,60 445,80" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+  <path d="M 338,145 Q 385,60 445,80 L 445,145 Z" fill="#f59e0b" fill-opacity="0.1"/>
+
+  <!-- Shell at x=385, r=385-338=47, h=145-70=75 -->
+  <rect x="378" y="70" width="14" height="75" fill="#f59e0b" fill-opacity="0.3" stroke="#f59e0b" stroke-width="1.5"/>
+  <!-- radius arrow at base -->
+  <line x1="338" y1="150" x2="385" y2="150" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrAmb)"/>
+  <text x="358" y="163" font-size="8" fill="#f59e0b" text-anchor="middle">x = radius</text>
+  <!-- height arrow -->
+  <line x1="365" y1="75" x2="365" y2="140" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="362" y="110" font-size="8" fill="#f59e0b" text-anchor="end">h=f(x)</text>
+
+  <text x="405" y="170" font-size="9" fill="#4338ca" text-anchor="middle">V = ∫ 2πx·f(x) dx</text>
+  <text x="405" y="183" font-size="8" fill="#f59e0b" text-anchor="middle">circumference × height × dx</text>
+
+  <defs>
+    <marker id="arrRed" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#ef4444"/>
+    </marker>
+    <marker id="arrAmb" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+
+  <text x="240" y="210" font-size="8.5" class="mu" text-anchor="middle">Choose the method that avoids inverting the function; when in doubt, try both and pick the simpler integral</text>
+</svg>

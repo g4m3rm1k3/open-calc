@@ -1,0 +1,79 @@
+<svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="280" rx="12" class="bg"/>
+
+  <!-- Axes -->
+  <line x1="60" y1="230" x2="380" y2="230" class="ax" stroke-width="1.5"/>
+  <line x1="60" y1="20"  x2="60"  y2="235" class="ax" stroke-width="1.5"/>
+  <polygon points="380,226 380,234 390,230" class="axf"/>
+  <polygon points="56,20 64,20 60,12" class="axf"/>
+  <text x="393" y="234" font-size="12" class="mu" font-style="italic">x</text>
+  <text x="46"  y="16"  font-size="12" class="mu" font-style="italic">y</text>
+
+  <!-- Line f(x) = 2x+1, c=2, L=5 -->
+  <!-- SVG x: 60 + (xval/6)*320,  y: 230 - (yval/7)*200 -->
+  <!-- x=0 → SVG(60,230), x=6 → SVG(380,230), y=0→230, y=7→230-200=30 -->
+  <line x1="60" y1="202" x2="380" y2="116" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- c=2 → SVG x = 60+320/3 ≈ 167, L=5 → SVG y = 230-5/7*200 ≈ 87 -->
+  <!-- Point (c, L) -->
+  <circle cx="167" cy="87" r="5" fill="#6366f1"/>
+
+  <!-- epsilon band: L±ε, ε=0.8 → SVG Δy = 0.8/7*200 ≈ 23 -->
+  <rect x="60" y="64" width="320" height="46" fill="#6366f1" opacity="0.08"/>
+  <line x1="60" y1="64"  x2="380" y2="64"  stroke="#6366f1" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <line x1="60" y1="110" x2="380" y2="110" stroke="#6366f1" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="384" y="68"  font-size="10" fill="#6366f1">L + ε</text>
+  <text x="384" y="114" font-size="10" fill="#6366f1">L − ε</text>
+  <text x="38"  y="91"  font-size="11" fill="#6366f1" font-weight="700" text-anchor="end">L</text>
+
+  <!-- delta band: c±δ, δ=0.4 → SVG Δx = 0.4/6*320 ≈ 21 -->
+  <rect x="146" y="20" width="42" height="210" fill="#e11d48" opacity="0.07"/>
+  <line x1="146" y1="20" x2="146" y2="230" stroke="#e11d48" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <line x1="188" y1="20" x2="188" y2="230" stroke="#e11d48" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="141" y="242" font-size="10" fill="#e11d48" text-anchor="middle">c−δ</text>
+  <text x="167" y="242" font-size="10" fill="#e11d48" text-anchor="middle">c</text>
+  <text x="193" y="242" font-size="10" fill="#e11d48" text-anchor="middle">c+δ</text>
+
+  <!-- The "box" highlight at intersection -->
+  <rect x="146" y="64" width="42" height="46" fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="0"/>
+  <text x="108" y="57" font-size="9" fill="#10b981">ε-δ box</text>
+  <line x1="126" y1="58" x2="148" y2="68" stroke="#10b981" stroke-width="1" stroke-dasharray="2,2"/>
+
+  <!-- Labels -->
+  <text x="60" y="250" font-size="9" fill="#6366f1">← ε: output tolerance (how close f(x) must be to L)</text>
+  <text x="60" y="264" font-size="9" fill="#e11d48">← δ: input radius (how close x must be to c)</text>
+
+  <!-- Right panel: definition -->
+  <rect x="400" y="20" width="72" height="200" rx="6" fill="#fafafa" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="436" y="36"  font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">GAME</text>
+  <text x="406" y="52"  font-size="8" fill="#64748b">adversary</text>
+  <text x="406" y="64"  font-size="8" fill="#64748b">picks ε &gt; 0</text>
+  <line x1="436" y1="70" x2="436" y2="85" stroke="#94a3b8" stroke-width="1" marker-end="url(#arr-d)"/>
+  <text x="406" y="100" font-size="8" fill="#64748b">you find</text>
+  <text x="406" y="112" font-size="8" fill="#64748b">δ &gt; 0 s.t.</text>
+  <text x="406" y="130" font-size="8" fill="#64748b">|x−c| &lt; δ</text>
+  <text x="406" y="142" font-size="8" fill="#64748b">⟹|f(x)−L|</text>
+  <text x="406" y="154" font-size="8" fill="#64748b">  &lt; ε</text>
+  <line x1="436" y1="160" x2="436" y2="175" stroke="#94a3b8" stroke-width="1" marker-end="url(#arr-d)"/>
+  <text x="406" y="190" font-size="8" fill="#10b981" font-weight="700">if you can</text>
+  <text x="406" y="202" font-size="8" fill="#10b981" font-weight="700">always win:</text>
+  <text x="406" y="214" font-size="8" fill="#10b981" font-weight="700">limit = L ✓</text>
+
+  <defs>
+    <marker id="arr-d" markerWidth="6" markerHeight="6" refX="3" refY="6" orient="auto">
+      <path d="M0,0 L3,6 L6,0" fill="none" stroke="#94a3b8" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <text x="240" y="275" font-size="9" class="mu" text-anchor="middle">For every ε &gt; 0 there must exist δ &gt; 0: the box traps the function near L</text>
+</svg>

@@ -1,0 +1,66 @@
+<svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="260" rx="12" class="bg"/>
+
+  <!-- Axes -->
+  <line x1="40" y1="220" x2="460" y2="220" class="ax" stroke-width="1.5"/>
+  <line x1="40" y1="16"  x2="40"  y2="225" class="ax" stroke-width="1.5"/>
+  <polygon points="460,216 460,224 470,220" class="axf"/>
+  <polygon points="36,16 44,16 40,8" class="axf"/>
+  <text x="473" y="224" font-size="12" class="mu" font-style="italic">x</text>
+  <text x="26"  y="14"  font-size="12" class="mu" font-style="italic">y</text>
+
+  <!-- Cubic-like curve: goes up to local max, down to local min, then up -->
+  <!-- Approximate: SVG points for a smooth cubic -->
+  <path d="M 40,190 C 80,185 100,60 140,55 C 180,50 200,170 240,175 C 280,180 300,80 340,75 C 380,70 420,160 460,170"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Local max at ~(140, 55) -->
+  <circle cx="140" cy="55" r="6" fill="#e11d48"/>
+  <line x1="140" y1="55" x2="140" y2="220" stroke="#e11d48" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="140" y="36" font-size="10" fill="#e11d48" text-anchor="middle" font-weight="700">local max</text>
+  <text x="140" y="47" font-size="9"  fill="#e11d48" text-anchor="middle">f′ = 0</text>
+  <text x="140" y="234" font-size="9" fill="#e11d48" text-anchor="middle">x₁</text>
+
+  <!-- Local min at ~(240, 175) -->
+  <circle cx="240" cy="175" r="6" fill="#0284c7"/>
+  <line x1="240" y1="175" x2="240" y2="220" stroke="#0284c7" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="240" y="162" font-size="10" fill="#0284c7" text-anchor="middle" font-weight="700">local min</text>
+  <text x="240" y="152" font-size="9"  fill="#0284c7" text-anchor="middle">f′ = 0</text>
+  <text x="240" y="234" font-size="9"  fill="#0284c7" text-anchor="middle">x₂</text>
+
+  <!-- Global max at (340, 75) -->
+  <circle cx="340" cy="75" r="6" fill="#10b981"/>
+  <line x1="340" y1="75" x2="340" y2="220" stroke="#10b981" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="340" y="58" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">local max</text>
+  <text x="340" y="48" font-size="9"  fill="#10b981" text-anchor="middle">f′ = 0</text>
+  <text x="340" y="234" font-size="9"  fill="#10b981" text-anchor="middle">x₃</text>
+
+  <!-- Sign chart below x-axis -->
+  <text x="46"  y="250" font-size="9" fill="#64748b">f′:</text>
+  <text x="90"  y="250" font-size="10" fill="#10b981">+</text>
+  <text x="140" y="250" font-size="10" fill="#94a3b8">0</text>
+  <text x="188" y="250" font-size="10" fill="#e11d48">−</text>
+  <text x="240" y="250" font-size="10" fill="#94a3b8">0</text>
+  <text x="288" y="250" font-size="10" fill="#10b981">+</text>
+  <text x="340" y="250" font-size="10" fill="#94a3b8">0</text>
+  <text x="388" y="250" font-size="10" fill="#e11d48">−</text>
+  <text x="430" y="250" font-size="9"  fill="#64748b">→ x</text>
+
+  <!-- Legend -->
+  <circle cx="396" cy="22" r="5" fill="#e11d48"/>
+  <text x="406" y="26" font-size="9" fill="#e11d48">critical point (f′=0)</text>
+  <text x="396" y="42" font-size="9" fill="#10b981" text-anchor="middle">+</text>
+  <text x="406" y="42" font-size="9" fill="#10b981">f′&gt;0: increasing</text>
+  <text x="396" y="56" font-size="9" fill="#e11d48" text-anchor="middle">−</text>
+  <text x="406" y="56" font-size="9" fill="#e11d48">f′&lt;0: decreasing</text>
+</svg>

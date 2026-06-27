@@ -1,0 +1,66 @@
+<svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .mu  { fill: #64748b; }
+    .bx  { fill: #f8fafc; stroke-width: 1.5; rx: 8; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .mu  { fill: #64748b; }
+    .dark .bx  { fill: #1e293b; }
+  </style>
+  <rect width="480" height="180" rx="12" class="bg"/>
+
+  <defs>
+    <marker id="arr-sky" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#0284c7"/>
+    </marker>
+    <marker id="arr-rose" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#e11d48"/>
+    </marker>
+    <marker id="arr-grn" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#10b981"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="240" y="22" font-size="12" fill="#4338ca" text-anchor="middle" font-weight="700">Chain Rule: h(x) = f(g(x))</text>
+
+  <!-- Three boxes: x → g(x) → f(g(x)) -->
+  <!-- Box 1: input x -->
+  <rect x="20" y="55" width="90" height="60" rx="8" class="bg" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="65" y="82" font-size="14" fill="#64748b" text-anchor="middle" font-weight="700">x</text>
+  <text x="65" y="100" font-size="9" fill="#94a3b8" text-anchor="middle">input</text>
+
+  <!-- Arrow x → g box -->
+  <line x1="110" y1="85" x2="158" y2="85" stroke="#0284c7" stroke-width="2" marker-end="url(#arr-sky)"/>
+  <text x="134" y="78" font-size="9" fill="#0284c7" text-anchor="middle">apply g</text>
+
+  <!-- Box 2: g(x) -->
+  <rect x="160" y="55" width="110" height="60" rx="8" class="bg" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="215" y="78" font-size="13" fill="#0284c7" text-anchor="middle" font-weight="700">u = g(x)</text>
+  <text x="215" y="98" font-size="9" fill="#0284c7" text-anchor="middle">inner function</text>
+
+  <!-- Arrow g → f box -->
+  <line x1="270" y1="85" x2="318" y2="85" stroke="#e11d48" stroke-width="2" marker-end="url(#arr-rose)"/>
+  <text x="294" y="78" font-size="9" fill="#e11d48" text-anchor="middle">apply f</text>
+
+  <!-- Box 3: f(g(x)) -->
+  <rect x="320" y="55" width="140" height="60" rx="8" class="bg" stroke="#e11d48" stroke-width="1.5"/>
+  <text x="390" y="78" font-size="13" fill="#e11d48" text-anchor="middle" font-weight="700">f(g(x)) = y</text>
+  <text x="390" y="98" font-size="9" fill="#e11d48" text-anchor="middle">outer(inner) = output</text>
+
+  <!-- Bottom: derivative chain -->
+  <text x="240" y="140" font-size="10" fill="#10b981" text-anchor="middle">dy/dx  =  dy/du · du/dx  =  f′(g(x)) · g′(x)</text>
+
+  <!-- Brace / bracket lines below boxes -->
+  <line x1="160" y1="125" x2="160" y2="132" stroke="#0284c7" stroke-width="1.2"/>
+  <line x1="270" y1="125" x2="270" y2="132" stroke="#0284c7" stroke-width="1.2"/>
+  <line x1="160" y1="132" x2="270" y2="132" stroke="#0284c7" stroke-width="1.2"/>
+  <text x="215" y="145" font-size="8" fill="#0284c7" text-anchor="middle">g′(x) = du/dx</text>
+
+  <line x1="320" y1="125" x2="320" y2="132" stroke="#e11d48" stroke-width="1.2"/>
+  <line x1="460" y1="125" x2="460" y2="132" stroke="#e11d48" stroke-width="1.2"/>
+  <line x1="320" y1="132" x2="460" y2="132" stroke="#e11d48" stroke-width="1.2"/>
+  <text x="390" y="145" font-size="8" fill="#e11d48" text-anchor="middle">f′(g(x)) = dy/du</text>
+
+  <text x="240" y="172" font-size="8.5" class="mu" text-anchor="middle">Multiply: "outside prime of inside" × "inside prime"</text>
+</svg>

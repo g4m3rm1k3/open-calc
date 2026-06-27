@@ -1,0 +1,54 @@
+<svg viewBox="0 0 480 210" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="210" rx="12" class="bg"/>
+
+  <text x="240" y="20" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Power Rule — d/dx [xⁿ] = n·xⁿ⁻¹</text>
+  <text x="240" y="34" font-size="9" class="mu" text-anchor="middle">The exponent drops down as the coefficient; exponent decreases by 1</text>
+
+  <!-- Header row -->
+  <rect x="16" y="44" width="210" height="26" rx="4" fill="#eef2ff"/>
+  <rect x="240" y="44" width="230" height="26" rx="4" fill="#ecfdf5"/>
+  <text x="121" y="62" font-size="10" fill="#4338ca" text-anchor="middle" font-weight="700">f(x) — original function</text>
+  <text x="355" y="62" font-size="10" fill="#059669" text-anchor="middle" font-weight="700">f′(x) — derivative</text>
+
+  <!-- Example rows -->
+  <!-- Row 1 -->
+  <rect x="16" y="76" width="210" height="28" rx="3" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+  <rect x="240" y="76" width="230" height="28" rx="3" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="121" y="94" font-size="14" fill="#0284c7" text-anchor="middle" font-weight="700">x¹</text>
+  <text x="355" y="94" font-size="14" fill="#16a34a" text-anchor="middle" font-weight="700">1·x⁰ = 1</text>
+  <text x="228" y="94" font-size="18" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <!-- Row 2 -->
+  <rect x="16" y="108" width="210" height="28" rx="3" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+  <rect x="240" y="108" width="230" height="28" rx="3" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="121" y="126" font-size="14" fill="#0284c7" text-anchor="middle" font-weight="700">x²</text>
+  <text x="355" y="126" font-size="14" fill="#16a34a" text-anchor="middle" font-weight="700">2x¹ = 2x</text>
+  <text x="228" y="126" font-size="18" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <!-- Row 3 -->
+  <rect x="16" y="140" width="210" height="28" rx="3" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+  <rect x="240" y="140" width="230" height="28" rx="3" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="121" y="158" font-size="14" fill="#0284c7" text-anchor="middle" font-weight="700">x³</text>
+  <text x="355" y="158" font-size="14" fill="#16a34a" text-anchor="middle" font-weight="700">3x²</text>
+  <text x="228" y="158" font-size="18" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <!-- Row 4 -->
+  <rect x="16" y="172" width="210" height="28" rx="3" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1"/>
+  <rect x="240" y="172" width="230" height="28" rx="3" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="121" y="190" font-size="14" fill="#0284c7" text-anchor="middle" font-weight="700">xⁿ  (any real n)</text>
+  <text x="355" y="190" font-size="14" fill="#16a34a" text-anchor="middle" font-weight="700">n·xⁿ⁻¹</text>
+  <text x="228" y="190" font-size="18" fill="#94a3b8" text-anchor="middle">→</text>
+
+  <!-- annotation arrows for "bring down" and "subtract 1" -->
+  <defs>
+    <marker id="arr-g" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+    </marker>
+  </defs>
+</svg>

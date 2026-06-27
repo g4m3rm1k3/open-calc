@@ -1,0 +1,77 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <defs>
+    <marker id="arrV"  markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#6366f1"/></marker>
+    <marker id="arrU"  markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#10b981"/></marker>
+    <marker id="arrS"  markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#ef4444"/></marker>
+    <marker id="arrD"  markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#f59e0b"/></marker>
+  </defs>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Vectors — Magnitude, Direction, and Operations</text>
+
+  <!-- LEFT: Addition (parallelogram) -->
+  <text x="110" y="34" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Addition: u + v</text>
+
+  <!-- Axes left -->
+  <line x1="28" y1="170" x2="210" y2="170" class="ax" stroke-width="1.2"/>
+  <line x1="28" y1="40"  x2="28"  y2="173" class="ax" stroke-width="1.2"/>
+
+  <!-- u vector: (0,0) → (100, 0) i.e. SVG (28,170) → (128, 170) -->
+  <line x1="28" y1="170" x2="128" y2="170" stroke="#10b981" stroke-width="2.5" marker-end="url(#arrU)"/>
+  <text x="75" y="186" font-size="9" fill="#10b981" text-anchor="middle">u = ⟨3, 0⟩</text>
+
+  <!-- v vector: (0,0) → (60, -80) i.e. SVG (28,170) → (88, 90) -->
+  <line x1="28" y1="170" x2="88" y2="90" stroke="#6366f1" stroke-width="2.5" marker-end="url(#arrV)"/>
+  <text x="42" y="125" font-size="9" fill="#6366f1">v = ⟨2, 2⟩</text>
+
+  <!-- Parallelogram dashed -->
+  <line x1="128" y1="170" x2="188" y2="90" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="88"  y1="90"  x2="188" y2="90" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Resultant u+v -->
+  <line x1="28" y1="170" x2="188" y2="90" stroke="#ef4444" stroke-width="2.5" marker-end="url(#arrS)"/>
+  <text x="125" y="118" font-size="9" fill="#ef4444">u+v = ⟨5, 2⟩</text>
+
+  <!-- DIVIDER 1 -->
+  <line x1="220" y1="28" x2="220" y2="200" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- CENTER: Magnitude and unit vector -->
+  <text x="340" y="34" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Magnitude and Unit Vector</text>
+
+  <!-- Center axes -->
+  <line x1="230" y1="170" x2="460" y2="170" class="ax" stroke-width="1.2"/>
+  <line x1="230" y1="40"  x2="230" y2="173" class="ax" stroke-width="1.2"/>
+
+  <!-- v vector: (0,0) → (120, -80) SVG (230,170) → (350, 90) -->
+  <line x1="230" y1="170" x2="350" y2="90" stroke="#6366f1" stroke-width="2.5" marker-end="url(#arrV)"/>
+  <text x="276" y="108" font-size="9" fill="#6366f1">v = ⟨3, 2⟩</text>
+
+  <!-- Components dashed -->
+  <line x1="350" y1="170" x2="350" y2="90" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="230" y1="90"  x2="350" y2="90" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="353" y="133" font-size="9" fill="#6366f1">b = 2</text>
+  <text x="287" y="186" font-size="9" fill="#6366f1" text-anchor="middle">a = 3</text>
+
+  <!-- Magnitude annotation -->
+  <text x="270" y="55" font-size="9" fill="#4338ca">|v| = √(3²+2²) = √13 ≈ 3.61</text>
+
+  <!-- Unit vector (shorter arrow) -->
+  <line x1="230" y1="170" x2="263" y2="148" stroke="#f59e0b" stroke-width="2" marker-end="url(#arrD)"/>
+  <text x="274" y="140" font-size="8.5" fill="#f59e0b">v̂ = v/|v|</text>
+  <text x="274" y="152" font-size="8"   fill="#d97706">(unit vector)</text>
+
+  <!-- Dot product formula box -->
+  <rect x="230" y="190" width="230" height="20" rx="4" fill="#ecfdf5"/>
+  <text x="345" y="204" font-size="8.5" fill="#059669" text-anchor="middle">Dot product: u·v = |u||v|cos θ = a₁a₂ + b₁b₂</text>
+</svg>

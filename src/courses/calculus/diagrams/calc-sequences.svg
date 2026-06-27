@@ -1,0 +1,75 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Sequence Behavior: Convergent vs. Divergent</text>
+
+  <!-- ===== LEFT: Convergent ===== -->
+  <text x="110" y="35" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">Convergent: aₙ = 1/n → 0</text>
+  <line x1="18"  y1="130" x2="215" y2="130" class="ax" stroke-width="1.2"/>
+  <line x1="18"  y1="45"  x2="18"  y2="133" class="ax" stroke-width="1.2"/>
+
+  <!-- Limit line at y=130 (representing L=0) -->
+  <line x1="18" y1="130" x2="215" y2="130" stroke="#10b981" stroke-width="1" stroke-dasharray="5,4" opacity="0.5"/>
+  <text x="16"  y="129" font-size="8" fill="#10b981" text-anchor="end">L=0</text>
+
+  <!-- Dots converging to 0: aₙ = 1/n, scaled: n=1..8 -->
+  <!-- SVGx = 18 + n*24, SVGy = 130 - 80/n -->
+  <circle cx="42"  cy="50"  r="4" fill="#10b981"/>   <!-- n=1: 80/1=80 -->
+  <circle cx="66"  cy="90"  r="4" fill="#10b981"/>   <!-- n=2: 80/2=40 → y=90 -->
+  <circle cx="90"  cy="103" r="4" fill="#10b981"/>   <!-- n=3: 80/3≈27 → y=103 -->
+  <circle cx="114" cy="110" r="4" fill="#10b981"/>   <!-- n=4: 80/4=20 → y=110 -->
+  <circle cx="138" cy="114" r="4" fill="#10b981"/>   <!-- n=5: 80/5=16 → y=114 -->
+  <circle cx="162" cy="117" r="4" fill="#10b981"/>   <!-- n=6: 80/6≈13 → y=117 -->
+  <circle cx="186" cy="119" r="4" fill="#10b981"/>   <!-- n=7: 80/7≈11 → y=119 -->
+  <circle cx="210" cy="120" r="4" fill="#10b981"/>   <!-- n=8: 80/8=10 → y=120 -->
+
+  <text x="42"  y="148" font-size="8" fill="#10b981" text-anchor="middle">1</text>
+  <text x="210" y="148" font-size="8" fill="#10b981" text-anchor="middle">8</text>
+  <text x="110" y="160" font-size="8" fill="#10b981" text-anchor="middle">n</text>
+  <text x="110" y="178" font-size="8.5" fill="#059669" text-anchor="middle">terms converge to L</text>
+
+  <!-- DIVIDER -->
+  <line x1="236" y1="28" x2="236" y2="200" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- ===== RIGHT: Divergent (oscillating) ===== -->
+  <text x="360" y="35" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="700">Divergent: aₙ = (−1)ⁿ (oscillates)</text>
+  <line x1="248" y1="110" x2="468" y2="110" class="ax" stroke-width="1.2"/>
+  <line x1="248" y1="45"  x2="248" y2="113" class="ax" stroke-width="1.2"/>
+
+  <!-- +1 and -1 lines -->
+  <line x1="248" y1="65"  x2="468" y2="65"  stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+  <line x1="248" y1="155" x2="468" y2="155" stroke="#3b82f6" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+  <text x="244" y="65"  font-size="8" fill="#ef4444" text-anchor="end">+1</text>
+  <text x="244" y="158" font-size="8" fill="#3b82f6" text-anchor="end">−1</text>
+
+  <!-- Dots alternating: n=1 → -1 (blue), n=2 → +1 (red), ... -->
+  <!-- SVGx = 248 + n*27 -->
+  <circle cx="275" cy="155" r="4" fill="#3b82f6"/> <!-- n=1: -1 -->
+  <circle cx="302" cy="65"  r="4" fill="#ef4444"/> <!-- n=2: +1 -->
+  <circle cx="329" cy="155" r="4" fill="#3b82f6"/> <!-- n=3: -1 -->
+  <circle cx="356" cy="65"  r="4" fill="#ef4444"/> <!-- n=4: +1 -->
+  <circle cx="383" cy="155" r="4" fill="#3b82f6"/> <!-- n=5: -1 -->
+  <circle cx="410" cy="65"  r="4" fill="#ef4444"/> <!-- n=6: +1 -->
+  <circle cx="437" cy="155" r="4" fill="#3b82f6"/> <!-- n=7: -1 -->
+  <circle cx="464" cy="65"  r="4" fill="#ef4444"/> <!-- n=8: +1 -->
+
+  <!-- Connecting zigzag lines -->
+  <polyline points="275,155 302,65 329,155 356,65 383,155 410,65 437,155 464,65"
+            fill="none" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <text x="275" y="175" font-size="8" fill="#94a3b8" text-anchor="middle">1</text>
+  <text x="464" y="175" font-size="8" fill="#94a3b8" text-anchor="middle">8</text>
+  <text x="360" y="188" font-size="8.5" fill="#dc2626" text-anchor="middle">no single limit — diverges</text>
+
+  <text x="240" y="210" font-size="8.5" class="mu" text-anchor="middle">Convergence: terms settle within any window ε around L; oscillation prevents this</text>
+</svg>

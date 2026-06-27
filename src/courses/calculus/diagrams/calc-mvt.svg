@@ -1,0 +1,68 @@
+<svg viewBox="0 0 480 230" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="230" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Mean Value Theorem — Secant vs. Tangent</text>
+
+  <!-- Axes -->
+  <line x1="40" y1="190" x2="440" y2="190" class="ax" stroke-width="1.5"/>
+  <line x1="40" y1="20"  x2="40"  y2="195" class="ax" stroke-width="1.5"/>
+  <polygon points="436,186 436,194 446,190" class="axf"/>
+  <polygon points="36,20 44,20 40,12" class="axf"/>
+  <text x="448" y="194" font-size="10" class="mu" font-style="italic">x</text>
+  <text x="28"  y="16"  font-size="10" class="mu" font-style="italic">y</text>
+
+  <!-- Curve: smooth cubic-like from A to B -->
+  <path d="M 80,160 C 120,155 150,100 200,80 C 240,65 270,70 310,90 C 340,106 370,140 400,150"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Point A and B -->
+  <circle cx="80"  cy="160" r="5" fill="#6366f1"/>
+  <circle cx="400" cy="150" r="5" fill="#6366f1"/>
+  <text x="68"  y="158" font-size="9"  fill="#6366f1">A</text>
+  <text x="405" y="148" font-size="9"  fill="#6366f1">B</text>
+  <text x="68"  y="169" font-size="8"  fill="#6366f1">(a, f(a))</text>
+  <text x="398" y="157" font-size="8"  fill="#6366f1">(b, f(b))</text>
+
+  <!-- Secant line A→B -->
+  <line x1="60" y1="162" x2="430" y2="148" stroke="#ef4444" stroke-width="2"/>
+  <text x="435" y="146" font-size="9" fill="#ef4444">secant</text>
+  <text x="435" y="158" font-size="8" fill="#ef4444">slope = [f(b)−f(a)]/(b−a)</text>
+
+  <!-- a, b tick marks -->
+  <line x1="80"  y1="190" x2="80"  y2="197" class="ax" stroke-width="1"/>
+  <line x1="400" y1="190" x2="400" y2="197" class="ax" stroke-width="1"/>
+  <text x="80"  y="207" font-size="10" fill="#6366f1" text-anchor="middle">a</text>
+  <text x="400" y="207" font-size="10" fill="#6366f1" text-anchor="middle">b</text>
+
+  <!-- Point C (where tangent is parallel to secant) -->
+  <!-- Somewhere around x=200, y=80, tangent slope equals secant slope -->
+  <circle cx="200" cy="80" r="5" fill="#10b981"/>
+  <text x="192" y="72" font-size="9" fill="#10b981">c</text>
+
+  <!-- c tick mark -->
+  <line x1="200" y1="190" x2="200" y2="197" class="ax" stroke-width="1"/>
+  <text x="200" y="207" font-size="10" fill="#10b981" text-anchor="middle">c</text>
+
+  <!-- Dashed vertical from c to curve -->
+  <line x1="200" y1="80" x2="200" y2="190" stroke="#10b981" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- Tangent line at C (parallel to secant) — same slope, offset up -->
+  <!-- Secant slope ≈ (150-160)/(400-80) = -10/320 ≈ -0.03, nearly flat -->
+  <line x1="130" y1="82" x2="290" y2="77" stroke="#10b981" stroke-width="2.5"/>
+  <text x="295" y="75" font-size="9" fill="#10b981">tangent at c</text>
+  <text x="295" y="86" font-size="8" fill="#10b981">f′(c) = slope of secant</text>
+
+  <!-- MVT statement box -->
+  <rect x="46" y="214" width="390" height="13" rx="3" fill="#eef2ff"/>
+  <text x="241" y="224" font-size="8.5" fill="#4338ca" text-anchor="middle">MVT: ∃ c ∈ (a,b) such that f′(c) = [f(b) − f(a)] / (b − a)  — instantaneous rate = average rate</text>
+</svg>

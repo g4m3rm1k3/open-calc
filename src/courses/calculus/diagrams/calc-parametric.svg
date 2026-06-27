@@ -1,0 +1,75 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <defs>
+    <marker id="arrp" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#6366f1"/>
+    </marker>
+  </defs>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Parametric Equations — One Parameter, Two Coordinates</text>
+
+  <!-- LEFT: Parametric idea diagram -->
+  <text x="120" y="36" font-size="9" fill="#6366f1" text-anchor="middle" font-weight="700">x = cos(t),  y = sin(t)</text>
+
+  <!-- Axes left -->
+  <line x1="30" y1="125" x2="230" y2="125" class="ax" stroke-width="1.2"/>
+  <line x1="130" y1="35" x2="130" y2="190" class="ax" stroke-width="1.2"/>
+  <text x="232" y="129" font-size="9" class="mu">x</text>
+  <text x="120" y="34"  font-size="9" class="mu">y</text>
+
+  <!-- Unit circle -->
+  <circle cx="130" cy="125" r="70" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Direction arrows on circle (CCW) -->
+  <line x1="200" y1="118" x2="198" y2="108" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrp)"/>
+  <line x1="130" y1="55"  x2="140" y2="56"  stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrp)"/>
+
+  <!-- Key points -->
+  <circle cx="200" cy="125" r="4" fill="#10b981"/>
+  <text x="204" y="122" font-size="8" fill="#10b981">t=0: (1,0)</text>
+  <circle cx="130" cy="55"  r="4" fill="#10b981"/>
+  <text x="132" y="50"  font-size="8" fill="#10b981">t=π/2: (0,1)</text>
+  <circle cx="60"  cy="125" r="4" fill="#10b981"/>
+  <text x="18"  y="122" font-size="8" fill="#10b981">t=π: (−1,0)</text>
+  <circle cx="130" cy="195" r="4" fill="#10b981"/>
+  <!-- label too close to edge, skip -->
+
+  <!-- r labels -->
+  <line x1="130" y1="125" x2="168" y2="75" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="160" y="98" font-size="8" fill="#f59e0b">r=1</text>
+
+  <!-- DIVIDER -->
+  <line x1="248" y1="28" x2="248" y2="210" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Why parametric? -->
+  <text x="365" y="36" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Why Use Parametric?</text>
+
+  <!-- Fails vertical line test -->
+  <rect x="256" y="48" width="215" height="44" rx="5" fill="#fff1f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="363" y="63" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">y = f(x) fails for closed curves</text>
+  <text x="263" y="78" font-size="8" fill="#0f172a">A circle x²+y²=1 is TWO functions:</text>
+  <text x="263" y="90" font-size="8" fill="#6366f1">y = +√(1−x²) and y = −√(1−x²)</text>
+
+  <!-- Parametric advantage -->
+  <rect x="256" y="100" width="215" height="44" rx="5" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1"/>
+  <text x="363" y="116" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">Parametric: one clean expression</text>
+  <text x="263" y="130" font-size="8" fill="#0f172a">x = cos t,  y = sin t  describes the</text>
+  <text x="263" y="142" font-size="8" fill="#0f172a">entire circle — direction and speed too</text>
+
+  <!-- Slope formula -->
+  <rect x="256" y="152" width="215" height="44" rx="5" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="363" y="168" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Slope of parametric curve</text>
+  <text x="363" y="182" font-size="9"   fill="#6366f1" text-anchor="middle">dy/dx = (dy/dt) ÷ (dx/dt)</text>
+  <text x="363" y="194" font-size="8"   fill="#64748b" text-anchor="middle">chain rule: dy/dx = (dy/dt)·(dt/dx)</text>
+</svg>

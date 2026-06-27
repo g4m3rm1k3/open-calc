@@ -1,0 +1,68 @@
+<svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .tx  { fill: #0f172a; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+    .dark .tx  { fill: #e2e8f0; }
+  </style>
+  <rect width="480" height="260" rx="12" class="bg"/>
+
+  <!-- Axes -->
+  <line x1="46" y1="210" x2="440" y2="210" class="ax" stroke-width="1.5"/>
+  <line x1="46" y1="16"  x2="46"  y2="215" class="ax" stroke-width="1.5"/>
+  <polygon points="440,206 440,214 450,210" class="axf"/>
+  <polygon points="42,16 50,16 46,8" class="axf"/>
+  <text x="453" y="214" font-size="12" class="mu" font-style="italic">x</text>
+  <text x="32"  y="14"  font-size="12" class="mu" font-style="italic">y</text>
+
+  <!-- Parabola f(x) = 0.015(x-46)^2 + 20, scaled to SVG coords -->
+  <!-- Let t go 0..394 (SVG x from 46..440), f(t) = 0.8*(t/40)^2, y = 210 - f -->
+  <!-- Curve points (polyline approximation) -->
+  <polyline points="
+    46,210 66,206 86,199 106,188 126,175 146,158 166,138 186,115 206,90 226,62 246,32
+  " fill="none" stroke="#10b981" stroke-width="2.5"/>
+
+  <!-- Reference point P at (146, 158) — x=100 in data space -->
+  <circle cx="146" cy="158" r="5" fill="#6366f1"/>
+
+  <!-- Secant 1: wide (through P and Q1 at x=206,y=90) -->
+  <!-- slope = (90-158)/(206-146) = -68/60 ≈ -1.13, extended -->
+  <line x1="80" y1="234" x2="260" y2="28" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,3" opacity="0.9"/>
+  <circle cx="206" cy="90" r="4" fill="#f59e0b"/>
+  <text x="214" y="88" font-size="9" fill="#f59e0b">Q₁</text>
+
+  <!-- Secant 2: narrower (through P and Q2 at x=176,y=126) -->
+  <!-- slope = (126-158)/(176-146) = -32/30 ≈ -1.07, extended -->
+  <line x1="86" y1="222" x2="240" y2="64" stroke="#fb923c" stroke-width="2" stroke-dasharray="4,3" opacity="0.8"/>
+  <circle cx="176" cy="126" r="4" fill="#fb923c"/>
+  <text x="182" y="124" font-size="9" fill="#fb923c">Q₂</text>
+
+  <!-- Tangent at P (slope ≈ -0.9, extended) -->
+  <line x1="70" y1="213" x2="230" y2="69" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="68" y="225" font-size="9" fill="#6366f1" font-weight="700">tangent (h→0)</text>
+
+  <!-- P label -->
+  <text x="130" y="155" font-size="10" fill="#6366f1" font-weight="700" text-anchor="end">P</text>
+
+  <!-- h arrows -->
+  <line x1="146" y1="218" x2="206" y2="218" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="176" y="230" font-size="9" fill="#f59e0b" text-anchor="middle">h</text>
+  <line x1="146" y1="213" x2="146" y2="222" stroke="#f59e0b" stroke-width="1"/>
+  <line x1="206" y1="213" x2="206" y2="222" stroke="#f59e0b" stroke-width="1"/>
+
+  <!-- Difference quotient formula -->
+  <rect x="266" y="20" width="200" height="44" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="272" y="35"  font-size="10" fill="#4338ca">slope of secant:</text>
+  <text x="272" y="50"  font-size="11" fill="#6366f1" font-weight="700">  [f(x+h) − f(x)] / h</text>
+  <rect x="266" y="72" width="200" height="32" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+  <text x="272" y="85"  font-size="10" fill="#059669">slope of tangent (limit):</text>
+  <text x="272" y="98"  font-size="11" fill="#10b981" font-weight="700">  f′(x) = lim<tspan font-size="8" dy="3">h→0</tspan><tspan dy="-3"> [f(x+h)−f(x)]/h</tspan></text>
+
+  <text x="240" y="252" font-size="9" class="mu" text-anchor="middle">As h shrinks to zero, the secant becomes the tangent — that limit is the derivative</text>
+</svg>

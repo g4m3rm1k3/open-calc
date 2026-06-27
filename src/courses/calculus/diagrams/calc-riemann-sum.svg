@@ -1,0 +1,67 @@
+<svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="260" rx="12" class="bg"/>
+
+  <!-- Axes -->
+  <line x1="50" y1="210" x2="440" y2="210" class="ax" stroke-width="1.5"/>
+  <line x1="50" y1="20"  x2="50"  y2="215" class="ax" stroke-width="1.5"/>
+  <polygon points="440,206 440,214 450,210" class="axf"/>
+  <polygon points="46,20 54,20 50,12" class="axf"/>
+  <text x="453" y="214" font-size="12" class="mu" font-style="italic">x</text>
+  <text x="36"  y="18"  font-size="12" class="mu" font-style="italic">y</text>
+
+  <!-- f(x) curve: bell-like (sin-based), scaled -->
+  <!-- x: 50..440 (width 390), y: 20..210 (height 190), f goes 0..1 -->
+  <!-- f(t) = sin(π*t) for t in [0,1], scale t = (svgx-50)/390 -->
+  <path d="M 50,210 C 100,210 130,60 180,40 C 230,20 280,20 320,50 C 360,80 400,160 440,210"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Rectangles (left Riemann sum, 6 rects) -->
+  <!-- a=50, b=440, n=6, Δx=65 -->
+  <!-- rect 1: x=50..115, height = f(t=0) ≈ 0 → tiny -->
+  <rect x="50"  y="208" width="64" height="2"   fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="0.8"/>
+  <!-- rect 2: x=115..180, height = f at x=115, t=65/390≈0.167, sin(π*0.167)≈0.5 → h=95 -->
+  <rect x="115" y="115" width="64" height="95"  fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="0.8"/>
+  <!-- rect 3: x=180..245, height = f at x=180, t=130/390≈0.333, sin(π*0.333)≈0.866 → h=165 -->
+  <rect x="180" y="45"  width="64" height="165" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="0.8"/>
+  <!-- rect 4: x=245..310, height = f at x=245, t=195/390=0.5, sin(π*0.5)=1 → h=190 -->
+  <rect x="245" y="22"  width="64" height="188" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="0.8"/>
+  <!-- rect 5: x=310..375, height = f at x=310, t=260/390≈0.667, sin(π*0.667)≈0.866 → h=165 -->
+  <rect x="310" y="45"  width="64" height="165" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="0.8"/>
+  <!-- rect 6: x=375..440, height = f at x=375, t=325/390≈0.833, sin(π*0.833)≈0.5 → h=95 -->
+  <rect x="375" y="115" width="64" height="95"  fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="0.8"/>
+
+  <!-- Redraw curve on top -->
+  <path d="M 50,210 C 100,210 130,60 180,40 C 230,20 280,20 320,50 C 360,80 400,160 440,210"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- a and b markers -->
+  <text x="50"  y="226" font-size="11" fill="#6366f1" text-anchor="middle" font-weight="700">a</text>
+  <text x="440" y="226" font-size="11" fill="#6366f1" text-anchor="middle" font-weight="700">b</text>
+
+  <!-- Δx brace -->
+  <line x1="115" y1="216" x2="180" y2="216" stroke="#f59e0b" stroke-width="1.5"/>
+  <line x1="115" y1="212" x2="115" y2="220" stroke="#f59e0b" stroke-width="1.5"/>
+  <line x1="180" y1="212" x2="180" y2="220" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="148" y="230" font-size="9" fill="#f59e0b" text-anchor="middle">Δx</text>
+
+  <!-- Formula box -->
+  <rect x="52" y="22" width="240" height="36" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="58" y="34" font-size="9" fill="#4338ca">Riemann sum: Σ f(xᵢ)·Δx  ≈  area under curve</text>
+  <text x="58" y="50" font-size="9" fill="#6366f1">as n→∞ (Δx→0): Σ → ∫ₐᵇ f(x) dx  (exact area)</text>
+
+  <!-- n label -->
+  <text x="245" y="100" font-size="9" fill="#64748b" text-anchor="middle">n = 6 rectangles</text>
+  <text x="245" y="112" font-size="9" fill="#64748b" text-anchor="middle">(increase n → more accurate)</text>
+
+  <text x="245" y="250" font-size="9" class="mu" text-anchor="middle">Area of each rectangle: f(xᵢ) × Δx — sum them all to approximate the integral</text>
+</svg>

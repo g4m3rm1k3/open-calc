@@ -1,0 +1,73 @@
+<svg viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg    { fill: #f8fafc; }
+    .ax    { stroke: #94a3b8; }
+    .ax-f  { fill: #94a3b8; }
+    .mu    { fill: #64748b; }
+    .tx    { fill: #0f172a; }
+    .dark .bg    { fill: #0f172a; }
+    .dark .ax    { stroke: #475569; }
+    .dark .ax-f  { fill: #475569; }
+    .dark .mu    { fill: #64748b; }
+    .dark .tx    { fill: #e2e8f0; }
+  </style>
+  <rect width="480" height="260" rx="12" class="bg"/>
+
+  <!-- Axes -->
+  <line x1="50" y1="220" x2="450" y2="220" class="ax" stroke-width="1.5"/>
+  <line x1="50" y1="20"  x2="50"  y2="225" class="ax" stroke-width="1.5"/>
+  <polygon points="450,216 450,224 460,220" class="ax-f"/>
+  <polygon points="46,20 54,20 50,12" class="ax-f"/>
+  <text x="463" y="224" font-size="12" class="mu" font-style="italic">x</text>
+  <text x="36"  y="18"  font-size="12" class="mu" font-style="italic">y</text>
+
+  <!-- f(x) = x+2 line (drawn as two segments with gap at x=c) -->
+  <!-- Left segment: x from 50..240 (SVG), maps x-val 0..5, y = x+2 maps y 2..7 -->
+  <!-- Scale: x: 50+(val/8)*400, y: 220-(val/7)*180 -->
+  <!-- f(x) = x+2, c=3, hole at (240,150) -->
+  <!-- Left segment (x from 0 to 2.9) -->
+  <line x1="50" y1="168" x2="232" y2="94" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Right segment (x from 3.1 to 7) -->
+  <line x1="248" y1="86" x2="410" y2="14" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Open circle (hole) at c=3, L=5 -->
+  <circle cx="240" cy="90" r="6" fill="#f8fafc" stroke="#6366f1" stroke-width="2"/>
+  <circle cx="240" cy="90" r="6" fill="none" stroke="#6366f1" stroke-width="2" class="bg-circle"/>
+  <!-- background fill the hole -->
+  <circle cx="240" cy="90" r="4" class="bg"/>
+
+  <!-- Left approach arrow (red) -->
+  <line x1="160" y1="134" x2="228" y2="96" stroke="#e11d48" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arr-left)"/>
+  <!-- Right approach arrow (blue) -->
+  <line x1="320" y1="60" x2="252" y2="84" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="5,3" marker-end="url(#arr-right)"/>
+
+  <defs>
+    <marker id="arr-left" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#e11d48"/>
+    </marker>
+    <marker id="arr-right" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#0284c7"/>
+    </marker>
+  </defs>
+
+  <!-- x=c dashed vertical -->
+  <line x1="240" y1="90" x2="240" y2="220" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3"/>
+  <!-- y=L dashed horizontal -->
+  <line x1="50" y1="90" x2="240" y2="90" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- Labels -->
+  <text x="234" y="236" font-size="11" fill="#6366f1" text-anchor="middle" font-weight="700">c</text>
+  <text x="34"  y="94"  font-size="11" fill="#6366f1" text-anchor="end"    font-weight="700">L</text>
+  <text x="140" y="125" font-size="10" fill="#e11d48" text-anchor="end">x → c⁻</text>
+  <text x="340" y="52"  font-size="10" fill="#0284c7">x → c⁺</text>
+  <text x="270" y="80"  font-size="10" fill="#6366f1">hole (f(c) undef)</text>
+
+  <!-- Formula box -->
+  <rect x="52" y="24" width="190" height="34" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="56" y="36" font-size="9" fill="#4338ca">lim</text>
+  <text x="70" y="45" font-size="8" fill="#4338ca">x → c</text>
+  <text x="94" y="36" font-size="11" fill="#4338ca">f(x) = L</text>
+  <text x="56" y="54" font-size="8.5" fill="#6366f1">both sides agree → limit exists</text>
+
+  <text x="240" y="252" font-size="9" class="mu" text-anchor="middle">The limit L is the y-value both sides approach — even when f(c) is undefined</text>
+</svg>

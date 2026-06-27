@@ -1,0 +1,66 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <defs>
+    <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#0284c7"/>
+    </marker>
+    <marker id="arr-rose" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#e11d48"/>
+    </marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#059669"/>
+    </marker>
+  </defs>
+
+  <text x="240" y="20" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">U-Substitution — Chain Rule Reversed</text>
+
+  <!-- Step 1 box: original integral -->
+  <rect x="16" y="38" width="180" height="48" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="106" y="57" font-size="11" fill="#6366f1" text-anchor="middle" font-weight="700">∫ f(g(x))·g′(x) dx</text>
+  <text x="106" y="75" font-size="9"  fill="#4338ca" text-anchor="middle">original integral</text>
+
+  <!-- Arrow 1: substitute -->
+  <line x1="196" y1="62" x2="238" y2="62" stroke="#0284c7" stroke-width="2" marker-end="url(#arr-blue)"/>
+  <text x="217" y="56" font-size="8" fill="#0284c7" text-anchor="middle">u = g(x)</text>
+  <text x="217" y="72" font-size="8" fill="#0284c7" text-anchor="middle">du = g′(x)dx</text>
+
+  <!-- Step 2 box: in u -->
+  <rect x="242" y="38" width="130" height="48" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="307" y="57" font-size="11" fill="#10b981" text-anchor="middle" font-weight="700">∫ f(u) du</text>
+  <text x="307" y="75" font-size="9"  fill="#059669" text-anchor="middle">simpler integral</text>
+
+  <!-- Arrow 2: integrate -->
+  <line x1="372" y1="62" x2="414" y2="62" stroke="#059669" stroke-width="2" marker-end="url(#arr-green)"/>
+  <text x="393" y="56" font-size="8" fill="#059669" text-anchor="middle">integrate</text>
+  <text x="393" y="72" font-size="8" fill="#059669" text-anchor="middle">in u</text>
+
+  <!-- Step 3 box: F(u) -->
+  <rect x="418" y="38" width="50" height="48" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="443" y="57" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="700">F(u)+C</text>
+  <text x="443" y="73" font-size="8"  fill="#d97706" text-anchor="middle">antideriv</text>
+
+  <!-- Back-substitute arrow curving back -->
+  <path d="M 443,90 C 443,115 350,130 280,130 C 200,130 106,118 106,105" fill="none" stroke="#e11d48" stroke-width="2" marker-end="url(#arr-rose)" stroke-dasharray="5,3"/>
+  <text x="275" y="145" font-size="9" fill="#e11d48" text-anchor="middle">back-substitute: replace u with g(x)</text>
+
+  <!-- Final result -->
+  <rect x="16" y="152" width="180" height="38" rx="8" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="106" y="169" font-size="11" fill="#a855f7" text-anchor="middle" font-weight="700">F(g(x)) + C</text>
+  <text x="106" y="183" font-size="8"  fill="#9333ea" text-anchor="middle">final answer (in x)</text>
+
+  <!-- 4-step guide -->
+  <rect x="242" y="105" width="230" height="100" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="357" y="120" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">4-Step Method</text>
+  <text x="252" y="134" font-size="8.5" fill="#0f172a">1. Choose u = g(x)  (inner function)</text>
+  <text x="252" y="148" font-size="8.5" fill="#0f172a">2. Compute du = g′(x) dx</text>
+  <text x="252" y="162" font-size="8.5" fill="#0f172a">3. Rewrite ∫ entirely in u and du</text>
+  <text x="252" y="176" font-size="8.5" fill="#0f172a">4. Integrate → back-substitute u = g(x)</text>
+  <text x="252" y="196" font-size="8" fill="#64748b">For definite integrals: also update the limits!</text>
+</svg>

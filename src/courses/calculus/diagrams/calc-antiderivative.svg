@@ -1,0 +1,65 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <defs>
+    <marker id="arr-sky" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#0284c7"/>
+    </marker>
+    <marker id="arr-rose" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#e11d48"/>
+    </marker>
+  </defs>
+
+  <text x="240" y="22" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Differentiation ↔ Antidifferentiation (Inverse Operations)</text>
+
+  <!-- Three stacked examples -->
+  <!-- Example 1 -->
+  <rect x="20" y="38" width="180" height="36" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+  <text x="110" y="52" font-size="12" fill="#10b981" text-anchor="middle" font-weight="700">F(x) = x³</text>
+  <text x="110" y="68" font-size="9" fill="#059669" text-anchor="middle">antiderivative / accumulator</text>
+
+  <line x1="204" y1="56" x2="252" y2="56" stroke="#0284c7" stroke-width="2" marker-end="url(#arr-sky)"/>
+  <text x="228" y="50" font-size="9" fill="#0284c7" text-anchor="middle">d/dx</text>
+  <line x1="252" y1="62" x2="204" y2="62" stroke="#e11d48" stroke-width="2" marker-end="url(#arr-rose)"/>
+  <text x="228" y="76" font-size="9" fill="#e11d48" text-anchor="middle">∫ dx</text>
+
+  <rect x="256" y="38" width="200" height="36" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.2"/>
+  <text x="356" y="52" font-size="12" fill="#6366f1" text-anchor="middle" font-weight="700">f(x) = 3x²</text>
+  <text x="356" y="68" font-size="9" fill="#4338ca" text-anchor="middle">derivative / rate function</text>
+
+  <!-- Example 2 -->
+  <rect x="20" y="92" width="180" height="36" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+  <text x="110" y="106" font-size="12" fill="#10b981" text-anchor="middle" font-weight="700">F(x) = sin x</text>
+  <text x="110" y="122" font-size="9" fill="#059669" text-anchor="middle">antiderivative</text>
+
+  <line x1="204" y1="110" x2="252" y2="110" stroke="#0284c7" stroke-width="2" marker-end="url(#arr-sky)"/>
+  <text x="228" y="104" font-size="9" fill="#0284c7" text-anchor="middle">d/dx</text>
+  <line x1="252" y1="116" x2="204" y2="116" stroke="#e11d48" stroke-width="2" marker-end="url(#arr-rose)"/>
+  <text x="228" y="130" font-size="9" fill="#e11d48" text-anchor="middle">∫ dx</text>
+
+  <rect x="256" y="92" width="200" height="36" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.2"/>
+  <text x="356" y="106" font-size="12" fill="#6366f1" text-anchor="middle" font-weight="700">f(x) = cos x</text>
+  <text x="356" y="122" font-size="9" fill="#4338ca" text-anchor="middle">derivative</text>
+
+  <!-- Example 3 -->
+  <rect x="20" y="146" width="180" height="36" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+  <text x="110" y="160" font-size="12" fill="#10b981" text-anchor="middle" font-weight="700">F(x) = eˣ</text>
+  <text x="110" y="176" font-size="9" fill="#059669" text-anchor="middle">antiderivative</text>
+
+  <line x1="204" y1="164" x2="252" y2="164" stroke="#0284c7" stroke-width="2" marker-end="url(#arr-sky)"/>
+  <text x="228" y="158" font-size="9" fill="#0284c7" text-anchor="middle">d/dx</text>
+  <line x1="252" y1="170" x2="204" y2="170" stroke="#e11d48" stroke-width="2" marker-end="url(#arr-rose)"/>
+  <text x="228" y="184" font-size="9" fill="#e11d48" text-anchor="middle">∫ dx</text>
+
+  <rect x="256" y="146" width="200" height="36" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.2"/>
+  <text x="356" y="160" font-size="12" fill="#6366f1" text-anchor="middle" font-weight="700">f(x) = eˣ</text>
+  <text x="356" y="176" font-size="9" fill="#4338ca" text-anchor="middle">(its own derivative!)</text>
+
+  <text x="240" y="196" font-size="8.5" class="mu" text-anchor="middle">+C: the constant of integration — any vertical shift gives the same derivative</text>
+</svg>

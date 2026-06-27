@@ -1,0 +1,59 @@
+<svg viewBox="0 0 480 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .mu  { fill: #64748b; }
+    .tx  { fill: #0f172a; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .mu  { fill: #64748b; }
+    .dark .tx  { fill: #e2e8f0; }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <text x="240" y="22" font-size="12" fill="#4338ca" text-anchor="middle" font-weight="700">Derivative Notation — All Mean the Same Thing</text>
+
+  <!-- Four notation boxes -->
+  <!-- Box 1 -->
+  <rect x="16" y="35" width="105" height="80" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="68" y="62" font-size="18" fill="#6366f1" text-anchor="middle" font-weight="700">f′(x)</text>
+  <text x="68" y="80" font-size="9" fill="#4338ca" text-anchor="middle">Lagrange notation</text>
+  <text x="68" y="93" font-size="8" class="mu" text-anchor="middle">"f prime of x"</text>
+  <text x="68" y="107" font-size="8" class="mu" text-anchor="middle">reads naturally</text>
+
+  <!-- Box 2 -->
+  <rect x="131" y="35" width="105" height="80" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="183" y="62" font-size="18" fill="#10b981" text-anchor="middle" font-weight="700">dy/dx</text>
+  <text x="183" y="80" font-size="9" fill="#059669" text-anchor="middle">Leibniz notation</text>
+  <text x="183" y="93" font-size="8" class="mu" text-anchor="middle">"dee y dee x"</text>
+  <text x="183" y="107" font-size="8" class="mu" text-anchor="middle">chain rule friendly</text>
+
+  <!-- Box 3 -->
+  <rect x="246" y="35" width="105" height="80" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="298" y="60" font-size="15" fill="#f59e0b" text-anchor="middle" font-weight="700">d/dx f(x)</text>
+  <text x="298" y="78" font-size="9" fill="#d97706" text-anchor="middle">operator notation</text>
+  <text x="298" y="91" font-size="8" class="mu" text-anchor="middle">"d over dx of f"</text>
+  <text x="298" y="107" font-size="8" class="mu" text-anchor="middle">emphasizes operation</text>
+
+  <!-- Box 4 -->
+  <rect x="361" y="35" width="105" height="80" rx="8" fill="#fdf2f8" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="413" y="62" font-size="18" fill="#a855f7" text-anchor="middle" font-weight="700">ẋ(t)</text>
+  <text x="413" y="80" font-size="9" fill="#9333ea" text-anchor="middle">Newton notation</text>
+  <text x="413" y="93" font-size="8" class="mu" text-anchor="middle">"x-dot of t"</text>
+  <text x="413" y="107" font-size="8" class="mu" text-anchor="middle">physics (time deriv)</text>
+
+  <!-- All equal signs -->
+  <text x="120" y="80" font-size="20" fill="#94a3b8" text-anchor="middle">=</text>
+  <text x="235" y="80" font-size="20" fill="#94a3b8" text-anchor="middle">=</text>
+  <text x="350" y="80" font-size="20" fill="#94a3b8" text-anchor="middle">=</text>
+
+  <!-- Second derivative row -->
+  <text x="240" y="140" font-size="10" fill="#64748b" text-anchor="middle" font-weight="700">Second Derivative (rate of change of the rate)</text>
+  <text x="78"  y="160" font-size="13" fill="#6366f1" text-anchor="middle" font-weight="700">f ″(x)</text>
+  <text x="183" y="160" font-size="13" fill="#10b981" text-anchor="middle" font-weight="700">d²y/dx²</text>
+  <text x="298" y="160" font-size="12" fill="#f59e0b" text-anchor="middle" font-weight="700">d²/dx² f</text>
+  <text x="413" y="160" font-size="13" fill="#a855f7" text-anchor="middle" font-weight="700">ẍ(t)</text>
+  <text x="120" y="162" font-size="16" fill="#94a3b8" text-anchor="middle">=</text>
+  <text x="235" y="162" font-size="16" fill="#94a3b8" text-anchor="middle">=</text>
+  <text x="350" y="162" font-size="16" fill="#94a3b8" text-anchor="middle">=</text>
+
+  <text x="240" y="192" font-size="8.5" class="mu" text-anchor="middle">Leibniz (dy/dx) is preferred in physics and integration; Lagrange (f′) is common in pure math</text>
+</svg>
