@@ -242,17 +242,32 @@ export function WorkoutLogger({ logDetailedWorkout, activePlan, personalRecords 
             )}
             {/* Day switcher */}
             {activePlan.workouts?.length > 1 && (
-              <div className="flex gap-1 bg-slate-950 p-1 rounded-lg">
-                {activePlan.workouts.map((day, idx) => (
-                  <button key={idx} onClick={() => setActiveDayIdx(idx)}
-                    className={`px-3 py-1 rounded text-xs font-bold transition-colors ${
-                      activeDayIdx === idx ? 'bg-emerald-600 text-white' : 'text-slate-500 hover:text-slate-300'
-                    }`}
-                  >
-                    {day.dayName || `Day ${idx + 1}`}
-                  </button>
-                ))}
-              </div>
+              <>
+                {/* Mobile: native select dropdown */}
+                <select
+                  className="sm:hidden bg-slate-950 border border-slate-800 text-slate-200 text-xs font-bold rounded-lg px-2 py-1.5 focus:outline-none focus:border-emerald-600"
+                  value={activeDayIdx}
+                  onChange={e => setActiveDayIdx(Number(e.target.value))}
+                >
+                  {activePlan.workouts.map((day, idx) => (
+                    <option key={idx} value={idx}>
+                      {day.dayName || `Day ${idx + 1}`}
+                    </option>
+                  ))}
+                </select>
+                {/* Desktop: pill buttons */}
+                <div className="hidden sm:flex gap-1 bg-slate-950 p-1 rounded-lg">
+                  {activePlan.workouts.map((day, idx) => (
+                    <button key={idx} onClick={() => setActiveDayIdx(idx)}
+                      className={`px-3 py-1 rounded text-xs font-bold transition-colors ${
+                        activeDayIdx === idx ? 'bg-emerald-600 text-white' : 'text-slate-500 hover:text-slate-300'
+                      }`}
+                    >
+                      {day.dayName || `Day ${idx + 1}`}
+                    </button>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
