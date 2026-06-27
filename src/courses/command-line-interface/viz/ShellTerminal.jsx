@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import { useThemeColors } from "../../../hooks/useThemeColors";
 
-// ── Colors ────────────────────────────────────────────────────────────────────
+// ── ANSI text colors (terminal output coloring — fixed, like a real terminal's
+// color scheme; not meant to vary with the studio theme) ──────────────────────
 const C = {
   green: "#73c991",
   yellow: "#e2c08d",
@@ -1819,6 +1821,7 @@ export default function ShellTerminal({ params = {} }) {
     liveFiles,
   } = params;
 
+  const T = useThemeColors();
   const [fsMap, setFsMap] = useState(() => initFs(initialFiles));
   const [cwd, setCwd] = useState(initialCwd);
   const [env, setEnv] = useState({
@@ -1975,17 +1978,18 @@ export default function ShellTerminal({ params = {} }) {
 
   return (
     <div
-      className="flex flex-col h-full min-h-[400px] max-h-[640px] rounded-lg overflow-hidden border border-gray-700"
+      className="flex flex-col h-full min-h-[400px] max-h-[640px] rounded-lg overflow-hidden"
       style={{
-        background: "#0d1117",
+        background: T.bg,
+        border: `1px solid ${T.border}`,
         fontFamily: "'Fira Code', 'Cascadia Code', Consolas, monospace",
       }}
       onClick={() => inputRef.current?.focus()}
     >
       {/* Title bar */}
       <div
-        className="flex items-center justify-between px-4 py-2 border-b border-gray-700 flex-shrink-0"
-        style={{ background: "#161b22" }}
+        className="flex items-center justify-between px-4 py-2 flex-shrink-0"
+        style={{ background: T.surface2, borderBottom: `1px solid ${T.border}` }}
       >
         <div className="flex items-center gap-1.5">
           <div
@@ -2000,13 +2004,13 @@ export default function ShellTerminal({ params = {} }) {
             className="w-3 h-3 rounded-full"
             style={{ background: "#27c93f" }}
           />
-          <span className="text-xs ml-2" style={{ color: C.gray }}>
+          <span className="text-xs ml-2" style={{ color: T.muted }}>
             zsh — {promptLabel}@{hostname}
           </span>
         </div>
         <span
           className="text-[10px] px-2 py-0.5 rounded-full font-mono"
-          style={{ background: "#1f2937", color: C.green }}
+          style={{ background: T.surface, color: C.green }}
         >
           {cwd.replace("/home/user", "~")}
         </span>
@@ -2040,8 +2044,8 @@ export default function ShellTerminal({ params = {} }) {
 
       {/* Status bar */}
       <div
-        className="flex items-center gap-4 px-4 py-1 border-t border-gray-700 flex-shrink-0 text-[10px]"
-        style={{ background: "#161b22", color: C.dim }}
+        className="flex items-center gap-4 px-4 py-1 flex-shrink-0 text-[10px]"
+        style={{ background: T.surface2, borderTop: `1px solid ${T.border}`, color: T.hint }}
       >
         <span>↑↓ history</span>
         <span>Ctrl+L clear</span>

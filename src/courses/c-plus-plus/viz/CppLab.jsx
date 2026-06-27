@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import ShellTerminal from "../../command-line-interface/viz/ShellTerminal.jsx";
+import { useThemeColors } from "../../../hooks/useThemeColors";
 
 /**
  * CppLab — Split-pane C++ development environment.
@@ -45,6 +46,7 @@ export default function CppLab({ params = {} }) {
     [initialFiles, mainPath, mainFile],
   );
 
+  const C = useThemeColors();
   const [code, setCode] = useState(defaultCode);
   const [savedCode, setSavedCode] = useState(defaultCode);
   const [isDirty, setIsDirty] = useState(false);
@@ -127,7 +129,7 @@ export default function CppLab({ params = {} }) {
         height: "100%",
         minHeight: 420,
         gap: 8,
-        background: "#0d1117",
+        background: C.bg,
         padding: 4,
         borderRadius: 8,
         overflow: "hidden",
@@ -142,7 +144,7 @@ export default function CppLab({ params = {} }) {
           flexDirection: "column",
           borderRadius: 8,
           overflow: "hidden",
-          border: "1px solid #30363d",
+          border: `1px solid ${C.border}`,
         }}
       >
         {/* Header bar */}
@@ -152,8 +154,8 @@ export default function CppLab({ params = {} }) {
             alignItems: "center",
             justifyContent: "space-between",
             padding: "6px 12px",
-            background: "#161b22",
-            borderBottom: "1px solid #30363d",
+            background: C.surface2,
+            borderBottom: `1px solid ${C.border}`,
             flexShrink: 0,
           }}
         >
@@ -187,13 +189,13 @@ export default function CppLab({ params = {} }) {
               style={{
                 fontFamily: "monospace",
                 fontSize: 12,
-                color: "#8b949e",
+                color: C.muted,
                 marginLeft: 8,
               }}
             >
               {mainFile}
               {isDirty && (
-                <span style={{ color: "#f0883e", marginLeft: 6 }}>●</span>
+                <span style={{ color: C.orange, marginLeft: 6 }}>●</span>
               )}
             </span>
           </div>
@@ -209,9 +211,9 @@ export default function CppLab({ params = {} }) {
               fontFamily: "monospace",
               cursor: isDirty ? "pointer" : "default",
               transition: "all 0.15s",
-              background: isDirty ? "#1f6feb" : "#21262d",
-              borderColor: isDirty ? "#1f6feb" : "#30363d",
-              color: isDirty ? "#ffffff" : "#6e7681",
+              background: isDirty ? C.blue : C.surface,
+              borderColor: isDirty ? C.blue : C.border,
+              color: isDirty ? "#ffffff" : C.hint,
             }}
           >
             {isDirty ? "Save ⌘S" : "✓ Saved"}
@@ -224,11 +226,11 @@ export default function CppLab({ params = {} }) {
             flex: 1,
             display: "flex",
             overflow: "hidden",
-            background: "#0d1117",
+            background: C.bg,
           }}
         >
           {/* Line numbers */}
-          <LineNumbers code={code} />
+          <LineNumbers code={code} C={C} />
 
           {/* Textarea */}
           <textarea
@@ -243,7 +245,7 @@ export default function CppLab({ params = {} }) {
             style={{
               flex: 1,
               background: "transparent",
-              color: "#e6edf3",
+              color: C.text,
               fontFamily:
                 "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Courier New', monospace",
               fontSize: 13,
@@ -264,10 +266,10 @@ export default function CppLab({ params = {} }) {
         <div
           style={{
             padding: "3px 12px",
-            background: "#161b22",
-            borderTop: "1px solid #30363d",
+            background: C.surface2,
+            borderTop: `1px solid ${C.border}`,
             fontSize: 10,
-            color: "#6e7681",
+            color: C.hint,
             fontFamily: "monospace",
             display: "flex",
             gap: 16,
@@ -291,15 +293,15 @@ export default function CppLab({ params = {} }) {
 }
 
 // ── Line numbers sidebar ───────────────────────────────────────────────────────
-function LineNumbers({ code }) {
+function LineNumbers({ code, C }) {
   const lines = code.split("\n");
   return (
     <div
       aria-hidden="true"
       style={{
         padding: "12px 8px 12px 12px",
-        background: "#0d1117",
-        color: "#484f58",
+        background: C.bg,
+        color: C.hint,
         fontFamily:
           "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Courier New', monospace",
         fontSize: 13,
@@ -308,7 +310,7 @@ function LineNumbers({ code }) {
         userSelect: "none",
         flexShrink: 0,
         minWidth: 36,
-        borderRight: "1px solid #21262d",
+        borderRight: `1px solid ${C.border}`,
         overflowY: "hidden",
         whiteSpace: "pre",
       }}
