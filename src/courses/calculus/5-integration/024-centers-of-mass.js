@@ -1,3 +1,4 @@
+import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 export default {
   id: 'ch4-centroid',
   slug: 'centers-of-mass',
@@ -20,7 +21,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'For a system of point masses m₁, m₂, ... at positions x₁, x₂, ..., the center of mass is x̄ = (Σmᵢxᵢ)/(Σmᵢ) — the weighted average of positions, with mass as weight. The quantity Mᵧ = Σmᵢxᵢ is called the moment about the y-axis (moment = mass × distance to axis). The center of mass is x̄ = Mᵧ/m (moment divided by total mass). This is the balance point: if you placed the masses on a seesaw, x̄ is where you put the fulcrum.',
 
       'For a continuous thin plate (lamina) with density ρ(x,y), the discrete sum ΣmᵢxΙ becomes an integral. For a lamina bounded by f(x) ≥ g(x) on [a,b] with constant density ρ = 1 (a "uniform" lamina), the total mass is m = ∫ₐᵇ[f(x)−g(x)]dx (which equals the area A). The moment about the y-axis is Mᵧ = ∫ₐᵇ x[f(x)−g(x)]dx, giving x̄ = Mᵧ/m. This is the x-coordinate of the centroid.',
@@ -32,6 +36,9 @@ export default {
       'Pappus\'s Theorem is a 4th-century gem: if a plane region with area A is rotated around an external axis, the volume of the solid is V = 2π·d̄·A, where d̄ is the distance from the centroid to the axis. Equivalently, V = (area) × (path traced by centroid) = A × (2πd̄). The derivation uses the shell method — V = 2π∫ₐᵇ x[f(x)−g(x)]dx = 2π·Mᵧ = 2π·x̄·m = 2π·x̄·A (for constant density). Pappus replaces an integral over a 3D solid with just the centroid of a 2D region — a massive simplification for symmetric shapes.',
 
       'The classic application of Pappus is the torus (donut). Rotate a disk of radius r whose center is at distance R from the axis (R > r). The centroid of the disk is at its center, distance R from the axis. Area of disk = πr². Volume by Pappus: V = 2π·R·(πr²) = 2π²Rr². No setup of 3D integrals needed — one application of the centroid formula does everything. This is why centroids matter beyond pure geometry.',
+        ],
+      },
+      { type: 'image', src: riemannSumUrl, alt: 'Region sliced into strips to compute centroid coordinates', caption: 'Center of mass balances the moments: x̄ = (1/A) ∫x f(x) dx, ȳ = (1/A) ∫½[f(x)]² dx.' },
     ],
     callouts: [
       {

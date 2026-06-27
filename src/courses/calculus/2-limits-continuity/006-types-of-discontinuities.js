@@ -1,3 +1,4 @@
+import continuityUrl from '../diagrams/calc-continuity.svg?url';
 export default {
   id: "ch1-discontinuities",
   slug: "types-of-discontinuities",
@@ -37,7 +38,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "Continuity means the graph has no breaks — you can draw it without lifting your pencil. A discontinuity is any break, gap, or bad behavior in the graph. But not all breaks are equal. Mathematicians classify discontinuities into four types based on what the limits are doing.",
 
       '**Type 1: Removable Discontinuity (a "hole").** The two-sided limit exists — approaching from the left and right gives the same value — but either $f(c)$ is undefined, or $f(c)$ equals something different from the limit. The graph looks like a normal curve with a single point missing or relocated. Example: $f(x) = (x^2 - 4)/(x - 2)$. At $x = 2$: division by zero. But $\\lim_{x \\to 2} f(x) = 4$. The limit exists! If we just define $f(2) = 4$, the function becomes continuous. The discontinuity was "removable" — a hole we can fill.',
@@ -51,6 +55,9 @@ export default {
       "**The classification matters for calculus.** Integration: removable discontinuities do not affect integrals (a single point has zero area). Jump discontinuities create a change in the integral's value at that point. Infinite discontinuities may create improper integrals that diverge. Differentiation: none of these discontinuous functions are differentiable at the point of discontinuity — differentiability implies continuity.",
 
       '**Historical note.** Bernhard Riemann (1826–1866) gave the first systematic analysis of discontinuities. He showed that a function with only finitely many jump discontinuities is still integrable in his sense (the Riemann integral). This was revolutionary — before Riemann, most mathematicians thought discontinuous functions were "pathological." Today we know that many important functions (step functions, square waves, probability distributions) are naturally discontinuous.',
+        ],
+      },
+      { type: 'image', src: continuityUrl, alt: 'Three panels showing removable, jump, and infinite discontinuities', caption: 'Each discontinuity type has a different cause and a different repair strategy.' },
     ],
     callouts: [
       {

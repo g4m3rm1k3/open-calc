@@ -1,3 +1,4 @@
+import antiderivativeUrl from '../diagrams/calc-antiderivative.svg?url';
 // FILE: src/content/chapter-4/04-indefinite-integrals.js
 export default {
   id: 'ch4-004',
@@ -46,7 +47,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'A **derivative** answers one question: **"How fast is this changing?"** Given a function $f(x)$, the derivative $f\'(x)$ is the instantaneous rate of change — the slope of the tangent line at every point. For example, $\\frac{d}{dx}[x^3] = 3x^2$ means $x^3$ is growing at rate $3x^2$ at every point $x$.',
       'An **antiderivative** reverses that question: **"What function was changing at this rate?"** Given a known rate $f(x)$, you want the original function $F(x)$ such that $F\'(x) = f(x)$. Ask: *what function has derivative $3x^2$?* Answer: $x^3$ (since $\\frac{d}{dx}[x^3] = 3x^2$). That makes $x^3$ an antiderivative of $3x^2$.',
       '$$F\'(x) = f(x)$$',
@@ -87,6 +91,9 @@ export default {
       'The integration table is finite and exact for elementary functions, but many seemingly simple functions have no elementary antiderivative. The function eˣ² has no antiderivative expressible in terms of polynomials, trig functions, exponentials, and logarithms — despite being smooth and rapidly computable numerically. The same is true for sin(x)/x, √(1−x⁴), and many others. This is not a temporary gap in our knowledge — it was proved rigorously by Liouville in 1835 using what is now called "differential Galois theory." For functions without elementary antiderivatives, Riemann sums or Taylor series must be used. FTC Part 1 still applies: d/dx[∫₀ˣ eᵗ² dt] = eˣ² even though the antiderivative has no closed form.',
       'The complete **pattern-recognition guide** for choosing an antiderivative technique: see $x^n$ → power rule. See $1/x$ → $\\ln|x|$. See $e^x$, $\\sin x$, $\\cos x$ → use the table directly. See a polynomial → split term by term. See a **composition** $f(g(x))$ (a function inside a function, like $(2x+3)^5$ or $\\sin(x^2)$) → that is the chain rule in reverse, which is **u-substitution** (Lesson 6). See a **product** like $x \\cdot e^x$ or $x \\cdot \\ln x$ → that is the product rule in reverse, which is **integration by parts** (Lesson 7). See a **rational function** → factor the denominator and use **partial fractions** (Lesson 10). Recognizing the pattern correctly is the real skill; the algebra that follows is mechanical.',
       '▶ **Pattern recognition drill:** for each integral below, name the technique you would use — *do not integrate yet*. **(1)** $\\int x^{10}\\,dx$. **(2)** $\\int \\frac{1}{x}\\,dx$. **(3)** $\\int (5x^2 + \\cos x)\\,dx$. **(4)** $\\int (3x-1)^8\\,dx$. **(5)** $\\int x \\ln x\\,dx$. **(6)** $\\int \\frac{x}{x^2 + 1}\\,dx$.',
+        ],
+      },
+      { type: 'image', src: antiderivativeUrl, alt: 'Antiderivative pairs showing the family of curves differing by a constant C', caption: 'An indefinite integral produces a family of antiderivatives — all differing by a constant C.' },
     ],
     callouts: [
       {

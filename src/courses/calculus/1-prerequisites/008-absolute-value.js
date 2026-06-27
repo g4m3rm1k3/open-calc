@@ -1,3 +1,4 @@
+import numberLineUrl from '../diagrams/calc-number-line.svg?url';
 export default {
   id: 'ch0-absolute-value',
   slug: 'absolute-value',
@@ -20,7 +21,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Absolute value answers one question: **How far is this number from zero?**',
 
       '|5| = 5 because 5 is five units to the right of zero. |−5| = 5 because −5 is five units to the left of zero. Both are the same distance away.',
@@ -39,6 +43,9 @@ export default {
       'What about |x − a| > r? This is the complement: x is **not** close to a. Instead of one interval in the middle, you get two rays on the outside: x < a − r OR x > a + r.',
 
       'Multiplying by a negative number inside an absolute value is weird at first. But remember: |−x| means "the distance from −x to zero," which is the same as "the distance from x to zero." So |−x| = |x|. More generally, |−5x| = |5| · |−x| = 5|x|. The negative sign gets stripped away by the absolute value, leaving only magnitudes to multiply.',
+        ],
+      },
+      { type: 'image', src: numberLineUrl, alt: 'Number line showing absolute value as distance from zero', caption: '|x| is the distance from x to 0; |x − a| is the distance from x to the point a.' },
     ],
     callouts: [
       {

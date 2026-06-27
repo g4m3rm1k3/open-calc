@@ -1,3 +1,4 @@
+import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
 export default {
   id: "ch1-limit-laws",
   slug: "limit-laws",
@@ -27,7 +28,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**You already know the limit laws intuitively.** Suppose your friend tells you the temperature in Room A is approaching 20°C and the temperature in Room B is approaching 30°C. Without thinking, you know the average of the two temperatures is approaching 25°C. You just used the Sum Law for limits. The Limit Laws are not new ideas — they are the precise mathematical justification for arithmetic that already feels obvious.',
 
       'Here is the key insight: if two functions are each "settling down" to their own limits, then any arithmetic combination of those functions settles down to the same arithmetic combination of those limits. Addition distributes through limits. Multiplication distributes through limits. The only exceptions are when you might be dividing by zero or taking an even root of a negative number — situations that would be problematic in ordinary arithmetic too.',
@@ -39,6 +43,9 @@ export default {
       '**The Squeeze Theorem is a completely different kind of tool.** Sometimes a function is so wild that you cannot factor or simplify it. The classic example is f(x) = x·sin(1/x) near x = 0. As x approaches 0, sin(1/x) oscillates infinitely many times back and forth between −1 and +1 — it has no limit of its own. You cannot factor it. You cannot simplify it. But here is the key observation: |sin(anything)| ≤ 1 always. So −|x| ≤ x·sin(1/x) ≤ |x| for all x ≠ 0. Both −|x| and |x| approach 0. The function is sandwiched (squeezed) between two things that both go to 0, so it must go to 0 too. No algebra involved — just the logical consequence of being trapped.',
 
       '**The fundamental trig limits, sin(x)/x → 1 and (1−cos x)/x → 0 as x→0, are the most important applications of the Squeeze Theorem in Calculus 1.** They cannot be obtained by algebra. They require the Squeeze Theorem plus a geometric argument about areas on the unit circle. And they come back in every single derivative of a trig function. If you ever see $\\frac{\\sin(5x)}{x}$, the trick is to force the pattern: multiply and divide by 5 to get $5 \\cdot \\frac{\\sin(5x)}{5x}$, and now the piece in brackets approaches 1 as x goes to 0. So the answer is 5.',
+        ],
+      },
+      { type: 'image', src: limitApproachUrl, alt: 'Convergent curve showing limit laws apply when both limits exist', caption: 'Limit laws let you break complex expressions into simpler pieces you can evaluate separately.' },
     ],
     callouts: [
       {

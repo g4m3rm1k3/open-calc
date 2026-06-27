@@ -1,3 +1,4 @@
+import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 export default {
   id: 'ch0-trig-identities',
   slug: 'trig-identities',
@@ -50,6 +51,7 @@ export default {
                     'By the Pythagorean theorem: cos²θ + sin²θ = 1².',
         caption: 'Drag the angle around the unit circle and watch cos²θ + sin²θ stay locked at 1 — the identity is geometric.',
       },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle proving sin²θ + cos²θ = 1 from the Pythagorean theorem', caption: 'Every trig identity follows from the unit-circle definitions; the Pythagorean identity is just the distance formula.' },
     ],
   },
 

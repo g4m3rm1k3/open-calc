@@ -1,3 +1,4 @@
+import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 export default {
   id: 'ch1-006',
   slug: 'rate-of-change',
@@ -15,7 +16,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** Chapter 1 has been entirely about limits — what functions approach near a point, how to prove those claims rigorously, how to handle trig and infinity. This lesson is the chapter\'s pivot. It takes everything you know about limits and aims it at a specific, concrete question: how fast is a function changing at a single instant? The answer to that question is the derivative — and this lesson builds exactly the machinery to define it.',
 
       'Start with something familiar: slope. The slope of a straight line is the same everywhere — rise over run, $\\Delta y / \\Delta x$. For a curve, slope changes at every point, so "the slope of the curve" only makes sense at a specific point. The first step toward that idea is the simpler question: what is the average rate of change over an interval?',
@@ -27,6 +31,9 @@ export default {
       'Visually, here is what happens as $h$ shrinks. The secant line connects two points on the curve. As you slide the second point toward the first (letting $h \\to 0$), the secant line rotates. In the limit, it settles into a unique position: the tangent line at that point. The slope of that tangent line is the derivative — the instantaneous rate of change. The derivative IS the difference quotient when $h$ reaches zero.',
 
       '**Where this is heading:** The next lesson is function modeling — applying these ideas to build equations from real situations. Then Chapter 2 takes the limit definition of the derivative and derives every differentiation rule from it. The difference quotient you work with in this lesson is the formula Chapter 2 starts from. Every power rule, product rule, and chain rule derivation is a limit of this formula applied to a specific type of function.',
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Secant lines converging to the tangent line as h approaches 0', caption: 'Average rate of change is the slope of a secant; instantaneous rate is the limit as the interval shrinks.' },
     ],
     callouts: [
       {

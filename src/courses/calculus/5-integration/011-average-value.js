@@ -1,3 +1,4 @@
+import mvtUrl from '../diagrams/calc-mvt.svg?url';
 export default {
   id: 'ch4-average-value',
   slug: 'average-value',
@@ -63,6 +64,7 @@ export default {
                 'In other words: the function actually ATTAINS its average value at some point in [a, b].',
         },
       },
+      { type: 'image', src: mvtUrl, alt: 'Curve with the average-value horizontal line and equal-area demonstration', caption: 'Average value = (1/(b−a)) ∫f dx — the constant function with the same area over [a, b].' },
     ],
   },
 

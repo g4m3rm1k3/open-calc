@@ -15,7 +15,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "The Mean Value Theorem proved that instantaneous and average rates must agree somewhere. Now we flip the idea into a practical tool: if we know f(a) and f'(a), we can approximate f(x) for x near a. This is linear approximation — the tangent line used as a calculator. NASA used linear approximation to compute trajectories in the 1960s. Your calculator uses it internally for sin, cos, exp, and ln. Engineers use it constantly for 'small signal analysis.' The idea sounds simple, but it is one of the most used tools in applied mathematics.",
       'Start with the central geometric fact: if you zoom into a differentiable function f at a point x = a, the curve eventually becomes indistinguishable from a straight line — the tangent line. This is not just a visual trick; it is the precise meaning of differentiability. A function is differentiable at a if and only if it "looks linear" at infinitely high magnification at a. The tangent line L(x) = f(a) + f\'(a)(x - a) is the unique line that matches both the function value and the slope of f at the point (a, f(a)). Because the curve and the tangent line agree in both value and direction at x = a, they stay close to each other for x near a.',
       'Think of it as replacing f with its tangent line locally. The linearization (also called the linear approximation) of f at x = a is L(x) = f(a) + f\'(a)(x - a). When you use L(x) as a surrogate for f(x) near a, you are making an approximation error f(x) - L(x). By Taylor\'s theorem, this error is approximately f\'\'(a)(x-a)²/2 — it grows like the square of the distance from a. This means the error is O((x-a)²): if you halve the distance from a, you quarter the error. For x very close to a, the linear approximation is astonishingly accurate.',
@@ -23,6 +26,9 @@ export default {
       'Error analysis is built into the linear approximation framework through differentials. If y = f(x), the differential dy is defined as dy = f\'(x)·dx. Here dx represents a small change in x (not necessarily infinitesimal — just small), and dy is the corresponding change in y along the TANGENT LINE. This is different from Δy, the actual change in f: Δy = f(x + dx) - f(x). The linear approximation says Δy ≈ dy, with error Δy - dy = f\'\'(a)(dx)²/2 + higher-order terms. Engineers use dy to estimate how errors in measurements propagate to errors in computed quantities.',
       'The differential formalism provides a powerful tool for sensitivity analysis. If you measure a physical quantity x with absolute error ±δx, the resulting error in f(x) is approximately |f\'(x)|·δx. The relative error in f(x) is approximately |f\'(x)/f(x)|·δx = |(d/dx)[ln f(x)]|·δx. For the volume of a sphere, V = (4/3)πr³, the relative error is 3·(δr/r) — a 1% error in radius measurement produces about a 3% error in calculated volume. This factor of 3 comes directly from the power in the formula, and the linear approximation makes it quantitative.',
       'The linearizations of the standard functions at x = 0 are the most important special cases. Near x = 0: sin(x) ≈ x (since sin(0) = 0 and cos(0) = 1). cos(x) ≈ 1 (since cos(0) = 1 and -sin(0) = 0). e^x ≈ 1 + x (since e^0 = 1 and e^0 = 1). ln(1+x) ≈ x (since ln(1) = 0 and 1/(1+0) = 1). (1+x)^n ≈ 1 + nx (by the binomial theorem / chain rule). These approximations are valid for |x| << 1 and appear constantly in physics, engineering, and probability. The simple pendulum formula T = 2π√(L/g) relies on sin(θ) ≈ θ — the small-angle approximation.',
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Curve with tangent line used as a local linear approximation', caption: 'Near x=a, a differentiable function looks like its tangent line: L(x) = f(a) + f′(a)(x − a).' },
     ],
     callouts: [
       {
@@ -194,6 +200,7 @@ fig.show()`,
               hint: 'f = math.exp, df = math.exp, a = 0. Then f(a)=1, f\'(a)=1, so L(x) = 1 + x. Use fig.plot() twice — once for f and once for L.',
               code: `from opencalc import Figure
 import math
+import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 
 # ── Fill in the blanks ────────────────────────────────────────
 f   = math.exp

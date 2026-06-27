@@ -52,7 +52,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "**What is a root of an equation?** An equation like $x^2 - 2 = 0$ has a **root** when there is a number that makes the left side exactly zero. The root of this particular equation is $x = \\sqrt{2} \\approx 1.414213562$.",
       "Some equations are easy to solve by algebra. Many equations — especially ones involving $\\sin$, $\\ln$, $e$, or mixtures of these — have **no** nice algebraic answer. Newton's Method is a trick to find a super-accurate number that is extremely close to the true root, as close as you want.",
       "One important thing to understand upfront: Newton's Method does **not** give you an exact fraction like $3/2$. It gives you a decimal that gets closer and closer to the true root with each step. After enough steps the decimal is so accurate that it is indistinguishable from the true answer for any practical purpose.",
@@ -101,6 +104,9 @@ export default {
       "Many of the most important equations in science and engineering involve mixtures of polynomial, trigonometric, exponential, and logarithmic terms — what mathematicians call **transcendental equations**. These cannot be solved by algebra alone. The equation $\\sin x = 0.5$ happens to have an exact algebraic answer ($x = \\pi/6$), but $x + \\ln x = 2$ or $x = \\cos x$ have no algebraic answer whatsoever. For such equations, Newton's Method is not just a convenience — it is the practical path to a numerical answer. The equation $x = \\cos x$ has a unique positive solution called the **Dottie number** ($\\approx 0.7390851332$), named because repeatedly pressing the cosine button on a calculator in radian mode always converges to this fixed point. There is no fraction, no radical, no combination of $\\pi$ and $e$ that equals it. Yet Newton's Method ($f(x) = x - \\cos x$, $f'(x) = 1 + \\sin x$) finds it in five iterations from $x_0 = 0.7$.",
       "Three practical rules for using Newton's Method successfully: (1) **Graph first** — plot $y = f(x)$ to estimate where the root is, so your starting guess $x_0$ is already close. (2) **Check signs** — if $f(a)$ and $f(b)$ have opposite signs, there is a root between $a$ and $b$; bisection brackets it, then Newton's Method rapidly refines it. (3) **Watch for trouble** — if $|f(x_n)|$ is not shrinking, or the iterates start jumping wildly, your starting point is too far from the root or you have hit a region where $f'$ is near zero. In practice, Newton's Method is run with a convergence test: stop when $|x_{n+1} - x_n| < \\varepsilon$ for some small tolerance $\\varepsilon$ (like $10^{-10}$). Five to ten iterations is almost always enough once you are in the right neighborhood.",
       "**▶ Apply the sign-check rule:** Before moving to worked examples, find root brackets for $f(x) = x^3 - 4x + 1$. Evaluate $f$ at $x = -3, -2, -1, 0, 1, 2$. Where do sign changes occur? Record those three intervals — they will be the starting points for the three Newton sequences. *(Values: $f(-3) = -14$, $f(-2) = 1$, $f(-1) = 4$, $f(0) = 1$, $f(1) = -2$, $f(2) = 1$. Sign changes in $(-3,-2)$, $(0,1)$, and $(1,2)$ pin down all three roots in 60 seconds.)*",
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Curve with tangent line intersecting x-axis to approximate a root', caption: 'Newton\'s method uses the tangent line at each guess to produce the next — converging to a root.' },
     ],
     callouts: [
       {
@@ -270,6 +276,7 @@ print(f"{steps:>4}  {x:>20.15f}  {f(x):>14.2e}  {abs(x-true_root):>14.2e}")`,
               ],
               code: `from opencalc import Figure
 import math
+import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 
 f  = lambda x: x**2 - 2
 df = lambda x: 2*x

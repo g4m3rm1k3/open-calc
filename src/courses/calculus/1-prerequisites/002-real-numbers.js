@@ -1,3 +1,4 @@
+import numberLineUrl from '../diagrams/calc-number-line.svg?url';
 export default {
   id: 'ch0-real-numbers',
   slug: 'real-numbers',
@@ -22,7 +23,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Imagine a perfectly straight ruler stretching infinitely in both directions. Every single point on that ruler corresponds to exactly one real number, and every real number corresponds to exactly one point. No gaps, no overlaps. This is the **real number line**, and it is the stage on which all of calculus plays out.',
 
       'The real numbers are built up in layers — like Russian nesting dolls, each family of numbers fitting inside the next.',
@@ -38,6 +42,9 @@ export default {
       '**Real numbers ℝ = ℚ ∪ irrationals** — everything. The real line has no "holes." This is the key property that separates ℝ from ℚ and makes calculus possible: every infinite decimal that seems like it "should" converge to something actually does converge to a real number.',
 
       'Why does this matter for calculus? Because limits, derivatives, and integrals all depend on the idea of numbers getting arbitrarily close together. If the number line had holes (like ℚ does), limits might "fall through" those holes and fail to exist. The completeness of ℝ is what prevents this.',
+        ],
+      },
+      { type: 'image', src: numberLineUrl, alt: 'The real number line showing subsets and interval notation', caption: 'Every real number has a unique position; subsets nest as ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ.' },
     ],
     callouts: [
       {

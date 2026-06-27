@@ -1,3 +1,4 @@
+import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 export default {
   id: 'ch5-precalc-review',
   slug: 'algebra-geometry-master-review',
@@ -16,10 +17,16 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'You can think of this lesson as a command center. When a limit looks stuck, you choose an algebra move: factor, conjugate, common denominator, or special identity. When a related-rates question looks messy, you choose a geometry move: similar triangles, angle sum, or radius-arc relation.',
       'A practical workflow from the algebra page is: diagnose the obstruction first. If direct substitution gives 0/0, do not panic and do not attempt random manipulations. Classify the expression shape and apply the matching move. This keeps your work deliberate, not luck-based.',
       'A practical workflow from the geometry page is: write the invariant relationship before differentiating. If two triangles stay similar through time, lock the ratio first. If a rotating radius sweeps an arc, write s = r theta in radians first. Differentiation should happen after structure is fixed.',
+        ],
+      },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle connecting algebra and geometry before calculus', caption: 'The unit circle is the final boss of prerequisites — master it and calculus notation becomes readable immediately.' },
     ],
     callouts: [
       {

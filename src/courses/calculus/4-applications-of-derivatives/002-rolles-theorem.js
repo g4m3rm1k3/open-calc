@@ -1,3 +1,4 @@
+import mvtUrl from '../diagrams/calc-mvt.svg?url';
 // FILE: src/content/chapter-3/02a-rolles-theorem.js
 export default {
   id: "ch3-025",
@@ -24,7 +25,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "You have spent all of Chapter 2 building the derivative — limit definitions, power rule, chain rule, implicit differentiation. But so far, derivatives have been about computing. Chapter 3 is about what derivatives TELL you. We start with the simplest possible question: if a function starts and ends at the same height, what must be true between those endpoints? The answer — Rolle's Theorem — looks almost obvious when you draw a picture, but its proof requires everything you learned about continuity and differentiability in Chapters 1 and 2.",
 
       "**Prerequisites you need (review them now if shaky).** (1) *Continuity on a closed interval*: $f$ is continuous on $[a,b]$ if it has no breaks, jumps, or holes. (2) *Differentiability on an open interval*: the derivative $f'(x) = \\lim_{h \\to 0} \\frac{f(x+h)-f(x)}{h}$ exists at every interior point — no corners, cusps, or vertical tangents. (3) *Extreme Value Theorem (EVT)*: if $f$ is continuous on $[a,b]$, it attains both a global maximum $M$ and global minimum $m$ on $[a,b]$. This is the key engine inside the proof. (4) *Fermat's Interior Extremum Theorem*: if $f$ has a local max or min at an interior point $c$ and $f'(c)$ exists, then $f'(c) = 0$. Quick sketch of why: at a local max, the difference quotient is $\\leq 0$ from the right and $\\geq 0$ from the left, so the limit (the derivative) must be exactly 0. (5) *Secant slope* (the average rate of change): $\\frac{f(b)-f(a)}{b-a}$.",
@@ -42,6 +46,9 @@ export default {
       "**Connection to the Mean Value Theorem.** Rolle's Theorem is actually a special case of the MVT. The MVT says: for any continuous, differentiable function on $[a, b]$, there exists $c$ with $f'(c) = \\frac{f(b) - f(a)}{b - a}$. When $f(a) = f(b)$, the right-hand side is zero, and the MVT reduces exactly to Rolle's Theorem. Historically, however, Rolle's Theorem came first, and the MVT is proved using Rolle's Theorem — the logical order is the reverse of the historical order.",
 
       "**Root-counting application.** One of the most elegant uses of Rolle's Theorem is proving bounds on the number of roots a function can have. If a polynomial $p(x)$ of degree $n$ had $n + 1$ roots, then between each consecutive pair Rolle's would give a root of $p'(x)$, producing $n$ roots of $p'$. But $p'$ has degree $n-1$ and can have at most $n-1$ roots — contradiction. Therefore $p(x)$ has at most $n$ roots.",
+        ],
+      },
+      { type: 'image', src: mvtUrl, alt: 'Curve from A to B at the same height with a horizontal tangent at c', caption: 'Rolle\'s theorem: if f(a) = f(b), the function must have a horizontal tangent somewhere between a and b.' },
     ],
     callouts: [
       {

@@ -1,3 +1,4 @@
+import powerRuleUrl from '../diagrams/calc-power-rule.svg?url';
 // FILE: src/content/chapter-2/01-differentiation-rules.js
 export default {
   id: 'ch2-001',
@@ -15,7 +16,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** In the last lesson you built the derivative from first principles using the limit definition. You proved that the derivative of x² is 2x by expanding (x+h)² and simplifying. You now *understand* what a derivative is. This lesson asks the next question: do you really need to go back to limits every time? The answer is no — and here is why.',
 
       '**The payoff of Act 1:** Every rule in this lesson is a theorem proved from the limit definition you just learned. Once proved, it can be applied instantly to any function in its domain. Engineers, physicists, and economists differentiate hundreds of functions per day. The shortcut rules make that possible without going back to scratch every time.',
@@ -33,6 +37,9 @@ export default {
       'It is worth pausing to appreciate what these rules actually are. Each one is a theorem — a mathematical fact with a proof. The power rule was proved by expanding (x+h)^n with the Binomial Theorem, cancelling, dividing by h, and taking the limit. The product rule was proved using an "add-zero" trick inside the difference quotient. The quotient rule follows from the product rule applied to f(x) times (1/g(x)). Crucially, each proof was done once and only once. From now on you can apply these rules to any differentiable function in their domain without returning to limits. This is how mathematics works: hard work done once at the foundation level earns you effortless tools forever after. Every time you write d/dx[x^7] = 7x^6 in a two-second step, you are cashing in a proof that someone (Newton, Leibniz, their successors) worked hard to establish.',
 
       'The second derivative deserves special attention because it is not just a curiosity — it carries independent geometric meaning. If f\'(x) tells you the slope of f at x, then f\'\'(x) tells you how that slope is changing. Geometrically, f\'\'(x) > 0 means the slope is increasing as you move right, which means the curve is bending upward (concave up, like the inside of a bowl). f\'\'(x) < 0 means the slope is decreasing, so the curve bends downward (concave down, like the outside of a bowl). A point where f\'\'(x) changes sign is called an inflection point — the curve switches from concave up to concave down or vice versa. Physically, if f(t) is position, then f\'(t) is velocity and f\'\'(t) is acceleration. Acceleration is the rate of change of the rate of change — exactly what the second derivative captures. This triple relationship (position, velocity, acceleration) will come up in physics, differential equations, and optimization for the rest of your STEM career.',
+        ],
+      },
+      { type: 'image', src: powerRuleUrl, alt: 'Power rule table showing xⁿ → nxⁿ⁻¹ for key exponents', caption: 'Differentiation rules turn the limit definition into one-line calculations.' },
     ],
     callouts: [
       {

@@ -1,0 +1,112 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <defs>
+    <marker id="arrExp" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#6366f1"/>
+    </marker>
+    <marker id="arrLog" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#10b981"/>
+    </marker>
+  </defs>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Exponential and Logarithm — Inverse Functions</text>
+
+  <!-- LEFT: Graph showing eˣ and ln(x) as reflections over y=x -->
+  <!-- Coordinate frame: origin at (115, 165), scale = 45px per unit -->
+  <line x1="25"  y1="165" x2="225" y2="165" class="ax" stroke-width="1.2"/>
+  <line x1="25"  y1="40"  x2="25"  y2="168" class="ax" stroke-width="1.2"/>
+  <polygon points="223,161 231,165 223,169" class="axf"/>
+  <polygon points="21,42 25,34 29,42" class="axf"/>
+  <text x="234" y="169" font-size="9" class="mu">x</text>
+  <text x="18"  y="32"  font-size="9" class="mu">y</text>
+
+  <!-- Tick marks: x=1 at 115+45=160, y=1 at 165-45=120 -->
+  <line x1="160" y1="162" x2="160" y2="168" class="ax" stroke-width="1"/>
+  <text x="160" y="178" font-size="8" class="mu" text-anchor="middle">1</text>
+  <line x1="22" y1="120" x2="28" y2="120" class="ax" stroke-width="1"/>
+  <text x="18" y="124" font-size="8" class="mu" text-anchor="end">1</text>
+
+  <!-- y=x (dashed, reflection line) -->
+  <line x1="25" y1="165" x2="220" y2="40" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5,4" opacity="0.6"/>
+  <text x="190" y="58" font-size="8" class="mu" transform="rotate(-52,190,58)">y = x</text>
+
+  <!-- eˣ curve: passes through (0,1)=(115,120), (1,e)≈(160,84), (-1,1/e)≈(70,147) -->
+  <!-- At x=-2 (x_svg=25): y=e^-2≈0.135 → y_svg=165-6=159 -->
+  <!-- At x=0: y_svg=120 -->
+  <!-- At x=1: y_svg=165-45*2.718=165-122=43 -->
+  <path d="M 25,159 C 45,152 75,143 115,120 C 135,109 150,90 162,44"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <circle cx="115" cy="120" r="4" fill="#6366f1"/>
+  <text x="118" y="118" font-size="8" fill="#6366f1">(0,1)</text>
+  <text x="162"  y="38" font-size="9" fill="#6366f1">eˣ</text>
+
+  <!-- ln(x) curve: passes through (1,0)=(160,165), (e,1)=(115+45*2.718,...)=(241,..nope OOB) -->
+  <!-- Let me recalculate: origin at (115,165), scale=45. ln curve: (1,0)→(160,165), (2,0.69)→(205,134), (e,1)→(237,120) -->
+  <!-- Actually restrict x_svg from 70..220 → x from 25/45... let me just set pts -->
+  <!-- ln(x): at x=0.1, y=-2.3; at x=0.5, y=-0.693; at x=1, y=0; at x=2, y=0.693; at x=3, y=1.1 -->
+  <!-- SVG: x_svg = 115 + x*45, y_svg = 165 - y*45 -->
+  <!-- x=0.3(SVG=129), y=-1.2(SVG=219 — below frame) -->
+  <!-- x=0.5(SVG=138), y=-0.693(SVG=196 — below frame) -->
+  <!-- x=0.7(SVG=147), y=-0.357(SVG=181) -->
+  <!-- x=1.0(SVG=160), y=0   (SVG=165) -->
+  <!-- x=2.0(SVG=205), y=0.693(SVG=134) -->
+  <!-- x=3.0(SVG=250), y=1.1 (SVG=115) → out of range (max=225) -->
+  <!-- Keep within x_svg 115..220 → x=0.0..2.3 -->
+  <path d="M 116,210 C 125,198 138,183 160,165 C 178,151 197,138 218,128"
+        fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <circle cx="160" cy="165" r="4" fill="#10b981"/>
+  <text x="164" y="178" font-size="8" fill="#10b981">(1,0)</text>
+  <text x="219" y="126" font-size="9" fill="#10b981">ln x</text>
+
+  <!-- Reflection arrows showing inverse relationship -->
+  <line x1="115" y1="120" x2="120" y2="165" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrLog)" stroke-dasharray="3,2"/>
+  <text x="103" y="146" font-size="7.5" fill="#f59e0b">inverse</text>
+
+  <!-- DIVIDER -->
+  <line x1="238" y1="28" x2="238" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Key facts table -->
+  <text x="360" y="34" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Key Properties</text>
+
+  <!-- eˣ column -->
+  <rect x="246" y="42" width="108" height="20" rx="3" fill="#eef2ff"/>
+  <text x="300" y="56" font-size="9" fill="#6366f1" text-anchor="middle" font-weight="700">eˣ (Exponential)</text>
+
+  <text x="250" y="76" font-size="8.5" fill="#6366f1">e⁰ = 1</text>
+  <text x="250" y="92" font-size="8.5" fill="#6366f1">e¹ = e ≈ 2.718</text>
+  <text x="250" y="108" font-size="8.5" fill="#6366f1">eˣ · eʸ = eˣ⁺ʸ</text>
+  <text x="250" y="124" font-size="8.5" fill="#6366f1">(eˣ)ʸ = eˣʸ</text>
+  <text x="250" y="140" font-size="8.5" fill="#6366f1">domain: all ℝ</text>
+  <text x="250" y="156" font-size="8.5" fill="#6366f1">range: (0, ∞)</text>
+  <text x="250" y="172" font-size="8.5" fill="#6366f1">d/dx [eˣ] = eˣ</text>
+
+  <!-- Divider between columns -->
+  <line x1="360" y1="42" x2="360" y2="185" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- ln(x) column -->
+  <rect x="362" y="42" width="108" height="20" rx="3" fill="#ecfdf5"/>
+  <text x="416" y="56" font-size="9" fill="#10b981" text-anchor="middle" font-weight="700">ln x (Natural Log)</text>
+
+  <text x="366" y="76" font-size="8.5" fill="#10b981">ln(1) = 0</text>
+  <text x="366" y="92" font-size="8.5" fill="#10b981">ln(e) = 1</text>
+  <text x="366" y="108" font-size="8.5" fill="#10b981">ln(xy) = ln x + ln y</text>
+  <text x="366" y="124" font-size="8.5" fill="#10b981">ln(xⁿ) = n · ln x</text>
+  <text x="366" y="140" font-size="8.5" fill="#10b981">domain: (0, ∞)</text>
+  <text x="366" y="156" font-size="8.5" fill="#10b981">range: all ℝ</text>
+  <text x="366" y="172" font-size="8.5" fill="#10b981">d/dx [ln x] = 1/x</text>
+
+  <!-- Bottom note -->
+  <rect x="246" y="190" width="224" height="18" rx="4" fill="#fef9c3"/>
+  <text x="358" y="203" font-size="8.5" fill="#d97706" text-anchor="middle">e^(ln x) = x and ln(eˣ) = x — they undo each other</text>
+</svg>

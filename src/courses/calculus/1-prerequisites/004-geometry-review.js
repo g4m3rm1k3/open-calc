@@ -1,3 +1,4 @@
+import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 export default {
   id: "ch0-geometry-review",
   slug: "geometry-review",
@@ -204,6 +205,7 @@ export default {
         caption:
           "Visual proof that the area of a triangle is half base times height.",
       },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle connecting geometry and trigonometry', caption: 'The unit circle is where coordinate geometry and trigonometry meet — both essential for calculus.' },
     ],
   },
 

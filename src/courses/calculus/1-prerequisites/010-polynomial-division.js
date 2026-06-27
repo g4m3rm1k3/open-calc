@@ -1,3 +1,4 @@
+import powerRuleUrl from '../diagrams/calc-power-rule.svg?url';
 export default {
   id: 'ch0-polynomial-division',
   slug: 'polynomial-division',
@@ -16,7 +17,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'You already know how to do long division with numbers. Dividing 157 by 12: 12 goes into 15 once (remainder 3), bring down the 7, 12 goes into 37 three times (remainder 1). So 157 = 12 × 13 + 1. The same idea works for polynomials — just replace digits with terms.',
 
       '**Polynomial long division** divides a polynomial $p(x)$ by a divisor $d(x)$ to produce a quotient $q(x)$ and remainder $r(x)$: $p(x) = d(x) \\cdot q(x) + r(x)$, where the degree of $r$ is less than the degree of $d$. This is the **Division Algorithm** for polynomials.',
@@ -30,6 +34,9 @@ export default {
       'The **Factor Theorem** is the Remainder Theorem\'s immediate corollary: $(x - c)$ is a factor of $p(x)$ if and only if $p(c) = 0$. In other words, $c$ is a root of $p(x)$ precisely when $(x-c)$ divides $p(x)$ evenly (zero remainder).',
 
       'The **Rational Root Theorem** helps you find candidates for rational roots. If $p(x) = a_n x^n + \\cdots + a_0$ has a rational root $\\frac{p}{q}$ in lowest terms, then $p$ divides $a_0$ (the constant term) and $q$ divides $a_n$ (the leading coefficient). This gives you a finite list of candidates to test using synthetic division.',
+        ],
+      },
+      { type: 'image', src: powerRuleUrl, alt: 'Polynomial structure table for division and factoring', caption: 'Polynomial long division mirrors integer division: divide, multiply, subtract, bring down.' },
     ],
     callouts: [
       {

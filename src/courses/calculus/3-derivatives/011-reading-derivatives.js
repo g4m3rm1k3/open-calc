@@ -1,3 +1,4 @@
+import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
 export default {
   id: "ch2-reading-derivatives",
   slug: "reading-derivatives",
@@ -43,7 +44,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story — and what this lesson completes:** Over the past nine lessons you have built the entire toolkit of differential calculus: limit definition, shortcut rules, chain rule, special function families (trig, exp/log, inverse), and implicit differentiation. That is the "how to compute" side. This final lesson teaches the other side: **how to read**. Given any graph, you should be able to extract everything the derivative reveals — without computing anything.',
 
       '**Why this matters as a capstone:** A physicist looking at a position-vs-time graph reads velocity and acceleration directly. An economist looking at a profit graph reads marginal profit. An engineer looking at a stress-strain curve reads stiffness. All of them are reading derivatives. This lesson builds that same visual fluency.',
@@ -90,6 +94,9 @@ export default {
       "**First derivative test vs. second derivative test:** At a critical point where f'(c)=0, you can determine whether it is a local max or min in two ways. (1) First derivative test: check the sign of f' just before and after c. If f' changes from positive to negative, f goes from increasing to decreasing, so c is a local max. If f' changes from negative to positive, f goes from decreasing to increasing, so c is a local min. If f' does not change sign, c is neither (a horizontal inflection). (2) Second derivative test: if f''(c)>0, the curve is concave up at c, which means the critical point is a local min (bowl shape). If f''(c)<0, the curve is concave down at c, which means the critical point is a local max (cap shape). If f''(c)=0, the test is inconclusive — the curve could be a max, min, or inflection, and you must fall back on the first derivative test. The second derivative test is faster when f'' is easy to compute, but it fails in the inconclusive case, so knowing both tests is essential.",
 
       "**Reading derivatives on standard exams — given a graph of f', what can you say about f?** This is a classic AP Calculus and college exam question type. The rules are: (1) When f'>0, f is increasing. (2) When f'<0, f is decreasing. (3) When f' changes sign from positive to negative at x=c, f has a local maximum at c. (4) When f' changes sign from negative to positive at x=c, f has a local minimum at c. (5) When f' is increasing on an interval, f is concave up there (because f''=(f')'>0). (6) When f' is decreasing on an interval, f is concave down there (because f''=(f')'<0). (7) Where f' has a local maximum or local minimum, f has an inflection point — the concavity of f changes at that x-value. Internalizing these seven rules lets you reconstruct the qualitative shape of f from any graph of f' alone.",
+        ],
+      },
+      { type: 'image', src: curveExtremaUrl, alt: 'Curve with local max/min and f-prime sign chart', caption: 'Where f′ > 0 the function rises, where f′ < 0 it falls, and f′ = 0 marks potential turning points.' },
     ],
     callouts: [
       {

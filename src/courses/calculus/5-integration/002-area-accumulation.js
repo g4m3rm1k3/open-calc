@@ -1,3 +1,4 @@
+import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 // FILE: src/content/chapter-4/00-area-accumulation.js
 export default {
   id: "ch4-000",
@@ -27,13 +28,19 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "The simplest accumulation problem is constant rate: if water flows at a steady 5 litres per minute for 3 minutes, the total is 5 × 3 = 15 litres. On a graph of rate r versus time t, the rate is a horizontal line at r = 5. The total accumulated quantity is the area of the rectangle under that line: width 3 (time interval) times height 5 (rate) equals 15. This geometric observation — area under the rate curve equals total accumulated quantity — is the seed of integration.",
       "Now suppose the rate is not constant but changes linearly: r(t) = 3t m/s (a car accelerating from rest). In the first 4 seconds, the rate rises from 0 to 12 m/s. The velocity-time graph is a straight line through the origin. The region under the graph from t = 0 to t = 4 is a right triangle with base 4 and height 12. Its area is ½ × 4 × 12 = 24. The car travels 24 metres. This is not a coincidence — it is the same logic. Distance is area under the velocity curve, because each thin vertical strip of the graph has width dt (a tiny time interval) and height v(t) (speed at that instant), contributing v(t) dt metres to the total.",
       "For curved rate functions, the triangle and rectangle formulas no longer apply directly. But the underlying logic is unchanged. Slice the time axis into many small intervals. In each tiny interval [tᵢ, tᵢ₊₁] of width Δt, the rate barely changes — it is approximately r(tᵢ). The amount accumulated in that slice is approximately r(tᵢ) · Δt, the area of a thin rectangle. Sum all these rectangles, and you have an approximation to the total. The more slices you use, the finer the approximation and the closer you get to the true total. In the limit as the slice width approaches zero, the sum of rectangles becomes the area under the curve exactly.",
       'This limit of sums is the definite integral, written ∫ₐᵇ f(x) dx. The elongated S symbol (∫) stands for "sum" — Leibniz chose it to emphasize that the integral is a limiting summation. The symbol dx represents the infinitesimal width of each slice. The limits a and b mark the start and end of the interval. The entire expression means: "sum up f(x) · dx for every x from a to b." This is the most compact and powerful notation ever invented for an accumulation process.',
       "The connection between area and accumulation has a directional aspect: signed area. If a velocity is negative (moving backward), the contribution to displacement is negative. If a rate function dips below the t-axis, the integral subtracts that portion. The definite integral computes net accumulation — positive contributions minus negative contributions. For total accumulation (ignoring direction), you integrate the absolute value |f(x)|. This signed vs. unsigned distinction is important in applications: displacement (net change in position) uses the signed integral, while total distance traveled uses the integral of |v(t)|.",
       "The historical roots of integration go back to Archimedes, who computed the area of a parabolic segment around 250 BC by exhausting it with triangles — a method strikingly close to modern Riemann sums. Cavalieri in the 1630s summed infinitesimal slices to compute volumes. But the real leap came from Newton and Leibniz in the 1660s–1680s: they independently discovered that the process of accumulation is the inverse of the process of differentiation. This Fundamental Theorem of Calculus — which we develop in Lesson 3 — transforms integration from a geometric puzzle into an algebraic calculation.",
+        ],
+      },
+      { type: 'image', src: riemannSumUrl, alt: 'Bell curve with rectangles approximating the area underneath', caption: 'Area under a curve is the limit of rectangle sums as the rectangles become infinitely thin.' },
     ],
     callouts: [
       {

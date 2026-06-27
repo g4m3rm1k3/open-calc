@@ -1,3 +1,4 @@
+import numberLineUrl from '../diagrams/calc-number-line.svg?url';
 export default {
   id: 'ch0-sets-and-logic',
   slug: 'sets-and-logic',
@@ -18,7 +19,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'A **set** is simply a collection of objects, called **elements** or **members**. We write $a \\in S$ to mean "a is an element of S" and $a \\notin S$ to mean "a is not in S." That is the entire definition — sets are containers, and things are either in them or not.',
 
       'You can describe a set in two ways. **Roster notation** lists the elements explicitly: $\\{2, 4, 6, 8\\}$. **Set-builder notation** describes a rule: $\\{x \\in \\mathbb{Z} : x \\text{ is even and } 0 < x < 10\\}$. The colon (or vertical bar |) reads as "such that." Both describe the same set.',
@@ -32,6 +36,9 @@ export default {
       'The two **quantifiers** are the heart of formal mathematics. The **universal quantifier** $\\forall$ means "for all" or "for every." The **existential quantifier** $\\exists$ means "there exists" or "there is at least one." The statement $\\forall x \\in \\mathbb{R},\\; x^2 \\geq 0$ says "every real number squared is non-negative." The statement $\\exists x \\in \\mathbb{R} : x^2 = 2$ says "there is some real number whose square is 2."',
 
       'Negating quantified statements follows a beautiful pattern: the negation of "for all" is "there exists one that does not," and the negation of "there exists" is "for all, it is not." Symbolically: $\\neg(\\forall x, P(x)) \\equiv \\exists x, \\neg P(x)$ and $\\neg(\\exists x, P(x)) \\equiv \\forall x, \\neg P(x)$. This is crucial for understanding epsilon-delta proofs, where you often need to negate a limit definition.',
+        ],
+      },
+      { type: 'image', src: numberLineUrl, alt: 'Number line showing open and closed intervals as sets', caption: 'Interval notation and set-builder notation describe the same collection of numbers two different ways.' },
     ],
     callouts: [
       {

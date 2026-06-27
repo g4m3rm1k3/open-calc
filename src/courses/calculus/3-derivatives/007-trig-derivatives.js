@@ -1,3 +1,4 @@
+import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 // FILE: src/content/chapter-2/03-trig-derivatives.js
 export default {
   id: "ch2-003",
@@ -38,7 +39,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** You now have a complete differentiation toolkit: power, product, quotient, and chain rules. That toolkit applies to any function — but we have only tested it on polynomials. This lesson and the next two apply the same toolkit to the three fundamental families of functions that appear throughout science and engineering: trigonometric functions (this lesson), exponential and logarithmic functions (next lesson), and inverse functions (the lesson after).',
 
       '**The central question of this lesson:** The sine function oscillates smoothly. At some angles it is rising fast, at others it is flat, and at others it is falling. Can we find a formula for that rate of change at every angle? The answer turns out to be startlingly clean: the rate of change of sin(θ) is cos(θ). The cosine curve IS the derivative of the sine curve. This lesson shows why — geometrically, analytically, and through the unit circle.',
@@ -57,6 +61,9 @@ export default {
       '**The 90-degree phase shift pattern — a cycle of four:** Each derivative of a trig function is a quarter-period (90-degree) shift of the wave. Starting from sin(x): its derivative is cos(x), which is sin(x) shifted left by π/2. The derivative of cos(x) is −sin(x), another 90-degree shift. The derivative of −sin(x) is −cos(x), and the derivative of −cos(x) returns to sin(x). So the cycle is sin → cos → −sin → −cos → sin, repeating every four derivatives. This means: to find the 47th derivative of sin(x), compute 47 mod 4 = 3, so the 47th derivative is −cos(x). This four-step cycle is unique to trigonometric functions and reflects the geometric fact that rotating the unit-circle velocity vector by 90 degrees four times returns to the original direction.',
 
       '**Chain rule with trig — the most important application:** Once you have d/dx[sin(x)] = cos(x) and d/dx[cos(x)] = −sin(x), the chain rule extends these to any composite argument. The pattern is: d/dx[sin(g(x))] = cos(g(x))·g\'(x) and d/dx[cos(g(x))] = −sin(g(x))·g\'(x). The outer derivative uses the trig formula as usual, but the result must be multiplied by the derivative of the inner function g\'(x). Example 1: d/dx[sin(3x)] = cos(3x)·3 = 3cos(3x). Example 2: d/dx[cos(x²)] = −sin(x²)·2x = −2x·sin(x²). Forgetting the inner derivative is the chain-trap in trig form — the same mistake isolated in the previous lesson now appears in trig context.',
+        ],
+      },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle with trig derivative table', caption: 'Trig derivatives repeat in a cycle of four; co-functions pick up a minus sign.' },
     ],
     callouts: [
       {

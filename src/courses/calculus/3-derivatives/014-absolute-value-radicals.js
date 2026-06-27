@@ -1,3 +1,4 @@
+import continuityUrl from '../diagrams/calc-continuity.svg?url';
 export default {
   id: 'ch2-009',
   slug: 'absolute-value-radicals',
@@ -15,12 +16,18 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Appendix Tool Lesson — Algebra Review:** This lesson is a prerequisite reference, not part of the ten-lesson derivative arc. Return here if you encounter absolute value equations or radical expressions inside a calculus problem and need to brush up on the algebra mechanics. These skills are assumed in calculus but often feel rusty — this lesson is the refresher.',
 
       'The absolute value $|a|$ equals $a$ when $a \\geq 0$ and $-a$ when $a < 0$. It is the distance from $a$ to zero on the number line. The equation $|f(x)| = k$ means $f(x) = k$ or $f(x) = -k$ — two cases, always. If $k < 0$, there is no solution because absolute value is never negative.',
       'When both sides have absolute value, $|f(x)| = |g(x)|$, the two cases are $f(x) = g(x)$ or $f(x) = -g(x)$. Solve each separately, check both answers. Extraneous solutions do not appear for absolute value equations (unlike radical equations) — but always verify anyway.',
       'Simplifying radical expressions with variables requires knowing the domain. $\\sqrt{x^2} = |x|$, not $x$ — because for negative $x$, $\\sqrt{x^2} = \\sqrt{(-3)^2} = \\sqrt{9} = 3 = |-3|$, not $-3$. This matters: $\\sqrt{(x-2)^2} = |x-2|$, which equals $x-2$ only when $x \\geq 2$ and $2-x$ when $x < 2$.',
+        ],
+      },
+      { type: 'image', src: continuityUrl, alt: 'Function with a corner showing non-differentiability', caption: 'Absolute value and radicals create corners and cusps where the derivative does not exist.' },
     ],
     callouts: [
       {

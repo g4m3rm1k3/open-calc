@@ -15,7 +15,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'The Integral Test bridges series and integrals. If $f(x)$ is positive, continuous, and decreasing for $x \\ge 1$, and $a_n = f(n)$, then $\\sum_{n=1}^{\\infty} a_n$ and $\\int_1^{\\infty} f(x)\\,dx$ either both converge or both diverge. The idea: the sum $\\sum a_n$ is trapped between the left and right Riemann sums of $\\int f(x)\\,dx$. Since $f$ is decreasing, $\\int_1^{N+1} f(x)\\,dx \\le \\sum_{n=1}^{N} f(n) \\le f(1) + \\int_1^{N} f(x)\\,dx$. So the sum and integral have the same convergence behavior.',
       'The p-series test is the most important consequence of the integral test. $\\sum_{n=1}^{\\infty} 1/n^p$ converges if $p > 1$ and diverges if $p \\le 1$. Proof via integral test: $\\int_1^{\\infty} x^{-p}\\,dx = \\frac{x^{1-p}}{1-p}\\Big|_1^{\\infty}$. For $p > 1$, the exponent $1-p < 0$, so $x^{1-p} \\to 0$; integral converges. For $p < 1$, $x^{1-p} \\to \\infty$; integral diverges. For $p = 1$: harmonic series, diverges. The p-series is the yardstick against which all other series are measured.',
       'The Comparison Test (Direct Comparison): if $0 \\le a_n \\le b_n$ for all $n$, then (a) if $\\sum b_n$ converges, so does $\\sum a_n$, and (b) if $\\sum a_n$ diverges, so does $\\sum b_n$. Think of it as: a series smaller than a convergent series must converge; a series larger than a divergent series must diverge. The challenge is finding the right comparison series — usually a geometric series or p-series.',
@@ -24,6 +27,9 @@ export default {
       'Absolute vs. conditional convergence: $\\sum a_n$ converges absolutely if $\\sum |a_n|$ converges. If $\\sum a_n$ converges but $\\sum |a_n|$ diverges, the convergence is conditional. Key fact: absolute convergence implies convergence (since $|S_M - S_N| \\le \\sum_{n=N+1}^{M}|a_n|$), but not conversely. Absolutely convergent series can be rearranged freely; conditionally convergent series cannot (Riemann rearrangement theorem).',
       'The Ratio Test: let $L = \\lim_{n\\to\\infty} |a_{n+1}/a_n|$. If $L < 1$, the series converges absolutely. If $L > 1$ (or $L = \\infty$), it diverges. If $L = 1$, the test is inconclusive. The ratio test is ideal for series involving factorials, exponentials, or products. It detects "geometric-like" behavior: when the ratio of successive terms approaches a constant $r < 1$, the series behaves like a geometric series. Example: $\\sum n!/n^n$ — ratio $= (n/(n+1))^n \\cdot 1/(n+1) \\to e^{-1}/\\infty = 0 < 1$, converges.',
       'The Root Test: let $L = \\lim_{n\\to\\infty} |a_n|^{1/n}$. If $L < 1$, converges absolutely. If $L > 1$, diverges. If $L = 1$, inconclusive. The root test is stronger than the ratio test in theory (whenever ratio test gives an answer, root test gives the same; root test can sometimes decide when ratio test cannot). In practice, use the root test when $a_n$ has the form $(\\text{something})^n$. Example: $\\sum (n/(2n+1))^n$ — root $= n/(2n+1) \\to 1/2 < 1$, converges.',
+        ],
+      },
+      { type: 'image', src: sequencesUrl, alt: 'Convergent and divergent sequence plots illustrating convergence tests', caption: 'Convergence tests (ratio, root, integral, comparison) determine whether a series sums to something finite.' },
     ],
     callouts: [
       {
@@ -167,6 +173,7 @@ print("  p=2 > 1 => use p-series test => CONVERGES")`,
               ],
               code: `from opencalc import Figure
 import math
+import sequencesUrl from '../diagrams/calc-sequences.svg?url';
 
 # Alternating harmonic series: Σ (-1)^(n+1) / n = ln(2)
 true = math.log(2)

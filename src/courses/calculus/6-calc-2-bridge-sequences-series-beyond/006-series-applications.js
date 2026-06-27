@@ -1,3 +1,4 @@
+import taylorUrl from '../diagrams/calc-taylor.svg?url';
 export default {
   id: 'ch5-series-applications',
   slug: 'series-applications',
@@ -17,7 +18,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'A series is useful in the real world only when you can stop after finitely many terms and still trust the answer. That is why error bounds are the central skill, not optional detail.',
       'For alternating series satisfying AST conditions, the first omitted term bounds the error. This is a gift: fast, reliable, and easy to compute by hand.',
       'For Taylor approximations, the Lagrange remainder gives a worst-case bound based on an upper bound for the next derivative. This is more general and works even when no alternation exists.',
@@ -25,6 +29,9 @@ export default {
       'In exams, students often compute a polynomial correctly but cannot justify accuracy. In applied settings, that missing justification is the difference between a useful result and an unverifiable guess.',
       'A powerful bridge to life applications: local linearization and low-order Taylor models explain why complex systems are often controlled around operating points. Engineers and scientists rarely use full exact models in real-time control loops.',
       'Fourier-series truncation is the sibling idea in frequency space: keep the dominant low-frequency coefficients and drop high-frequency terms to compress or denoise. JPEG and MP3 are practical versions of "finite series with controlled error".',
+        ],
+      },
+      { type: 'image', src: taylorUrl, alt: 'Taylor series approximation used to evaluate a difficult integral', caption: 'Taylor series let you integrate and differentiate functions that have no elementary antiderivative.' },
     ],
     callouts: [
       {

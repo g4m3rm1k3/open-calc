@@ -1,3 +1,4 @@
+import continuityUrl from '../diagrams/calc-continuity.svg?url';
 export default {
   id: 'limits-and-continuity',
   slug: 'limits-and-continuity',
@@ -15,7 +16,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** Chapter 1 began with a deceptively simple question — what does a function approach near a point it may never actually reach? From that one question, an entire toolkit grew: limit laws for combining limits, continuity for classifying function behavior, epsilon-delta for making "approaches" rigorous, the Squeeze Theorem for limits that resist direct calculation, and limits at infinity for end behavior. This lesson is the synthesis. Its job is to show how those tools connect to each other, not just how to use each one in isolation.',
 
       'Start with the core idea. A limit lim(x→a) f(x) = L is a prediction, not an evaluation. It asks: if x gets arbitrarily close to a (from either side, but without equaling a), what value does f(x) get close to? The answer L is determined entirely by the behavior of f *around* a — what happens exactly *at* a is irrelevant. This is what makes limits powerful: they work even when the function has a hole, a jump, or is simply undefined at the target point.',
@@ -31,6 +35,9 @@ export default {
       'Limits at infinity shift the question from "what does f approach near x = a?" to "what does f settle into as x grows without bound?" For rational functions the answer comes from comparing polynomial degrees: equal degrees give the ratio of leading coefficients, a heavier denominator gives 0, and a heavier numerator gives growth without bound (or a slant asymptote via long division). The growth hierarchy ln(x) ≪ xᵃ ≪ bˣ tells you which type of function dominates in mixed cases.',
 
       '**Where this is heading:** This is the last lesson of Chapter 1. The next lesson — Rate of Change — is actually the first bridge into Chapter 2. It takes the limit idea and asks: what happens to the slope of a secant line as the two points collapse toward one? The answer to that question is the derivative. Everything you have learned about limits in this chapter is exactly the machinery Chapter 2 needs.',
+        ],
+      },
+      { type: 'image', src: continuityUrl, alt: 'Three discontinuity types connecting limits to continuity conditions', caption: 'Continuity at a point requires three things: f(a) defined, limit exists, and they are equal.' },
     ],
     callouts: [
       {

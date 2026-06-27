@@ -1,3 +1,4 @@
+import expLogUrl from '../diagrams/calc-exp-log.svg?url';
 // FILE: src/content/chapter-2/04-exp-log-derivatives.js
 export default {
   id: "ch2-004",
@@ -51,7 +52,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "**Where you are in the story:** You have derivatives for polynomials (power rule), products and quotients, compositions (chain rule), and all six trig functions. There is one more fundamental family to master: exponential and logarithmic functions. These are the functions of growth and decay — they appear everywhere quantities change proportionally to their current size.",
 
       "**The big question of this lesson:** Is there a base b such that b^x equals its own derivative? If such a base existed, it would mean the function's slope at every point equals its own height — a remarkable self-referential property. This lesson shows that the answer is yes, the base is e ≈ 2.718, and this is not a coincidence but the *defining property* that makes exponential calculus so clean.",
@@ -314,6 +318,9 @@ export default {
       "You now have it from the ground up.",
 
       "**Where this is heading:** Notice that we derived the derivative of $\\ln(x)$ by using the fact that it is the inverse of $e^x$. That same inverse-function reasoning generalizes: the next lesson turns that argument into a theorem that works for any inverse function — and uses it to derive the derivatives of $\\arcsin$, $\\arccos$, and $\\arctan$.",
+        ],
+      },
+      { type: 'image', src: expLogUrl, alt: 'Exponential and log curves with derivative annotations', caption: 'd/dx[eˣ] = eˣ is unique: it is its own derivative. d/dx[ln x] = 1/x follows from the inverse relationship.' },
     ],
     callouts: [
       {

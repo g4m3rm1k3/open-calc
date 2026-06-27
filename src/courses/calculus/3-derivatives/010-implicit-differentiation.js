@@ -1,3 +1,4 @@
+import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 // FILE: src/content/chapter-2/05-implicit-differentiation.js
 export default {
   id: 'ch2-005',
@@ -29,7 +30,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** You have a complete differentiation toolkit and you have applied it to every fundamental function type. But there is one situation we have avoided: what if you cannot write y as an explicit function of x? The equation x² + y² = 25 defines a circle. You can split it into y = √(25−x²) and y = −√(25−x²), but neither piece covers the whole circle. What if you need the slope at a point where the two pieces meet? Implicit differentiation is the answer.',
 
       '**The key idea — and it is just the chain rule:** Treat y as an unknown function of x. When you differentiate any expression involving y with respect to x, you apply the chain rule — differentiate with respect to y first, then multiply by dy/dx. That is it. The method produces an equation you then solve for dy/dx. No new rules; just the chain rule used deliberately.',
@@ -48,6 +52,9 @@ export default {
       '**Finding d\u00b2y/dx\u00b2 implicitly:** To find the second derivative, differentiate dy/dx once more with respect to x, treating dy/dx as a function of x (and using the chain rule and quotient rule as needed), then substitute the known expression for dy/dx wherever it appears. For the circle x\u00b2+y\u00b2=r\u00b2: the first derivative is dy/dx = \u2212x/y. Differentiating again: d\u00b2y/dx\u00b2 = \u2212(y\u00b71 \u2212 x\u00b7dy/dx)/y\u00b2 = \u2212(y \u2212 x(\u2212x/y))/y\u00b2 = \u2212(y + x\u00b2/y)/y\u00b2 = \u2212(y\u00b2+x\u00b2)/y\u00b3 = \u2212r\u00b2/y\u00b3 (using x\u00b2+y\u00b2=r\u00b2). The second derivative is negative in the upper semicircle (y>0), confirming that the circle is concave down there, as expected geometrically.',
 
       '**The big picture — constraint sensitivity:** The formula dy/dx = \u2212F_x/F_y (where F(x,y)=0 is the defining equation) is more than a calculation trick. It expresses the rate at which y must change to keep the constraint satisfied as x changes. In economics this is a marginal rate of substitution; in thermodynamics it is a thermodynamic slope along a level curve; in constrained optimization it appears in the Lagrange multiplier condition. The slope of a level curve of F is exactly \u2212F_x/F_y, and that quantity appears everywhere in multivariable calculus, optimization, and applied mathematics. Implicit differentiation is not just a technique for circles and ellipses \u2014 it is the foundational formula connecting partial derivatives to constrained rates of change.',
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Curve showing tangent line found via implicit differentiation', caption: 'Implicit differentiation applies when y cannot be isolated — differentiate both sides and solve for dy/dx.' },
     ],
     callouts: [
       {

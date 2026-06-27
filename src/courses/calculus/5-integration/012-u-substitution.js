@@ -1,3 +1,4 @@
+import uSubUrl from '../diagrams/calc-u-sub.svg?url';
 // FILE: src/content/chapter-4/06-u-substitution.js
 export default {
   id: 'ch4-006',
@@ -21,7 +22,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Recall the chain rule for derivatives: if F(u) is an antiderivative of f(u), then d/dx [F(g(x))] = f(g(x)) · g\'(x). Rearranging: ∫ f(g(x)) · g\'(x) dx = F(g(x)) + C. This is u-substitution in one equation.',
 
       'The substitution u = g(x) transforms the integral. Here is the key mechanic: if u = g(x), then du/dx = g\'(x), which we write as du = g\'(x) dx. This lets us replace the original integral:',
@@ -37,6 +41,9 @@ export default {
       'For **definite integrals**, you have two options: (1) change the limits with u to avoid back-substituting, or (2) integrate in u, back-substitute, then evaluate. Changing limits is cleaner for exam work.',
 
       'A critical subtlety: u-substitution requires the ENTIRE integrand (except du) to transform cleanly. If there is a leftover factor that does not simplify, the substitution is the wrong choice. Sometimes you need to solve for x in terms of u to replace leftovers — this is common when u = ax + b (linear substitutions always work).',
+        ],
+      },
+      { type: 'image', src: uSubUrl, alt: '4-step pipeline: original integral → u-variable → antiderivative → back-substitute', caption: 'u-substitution reverses the chain rule: recognize the inner function and replace it with u.' },
     ],
     callouts: [
       {

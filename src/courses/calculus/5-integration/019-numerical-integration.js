@@ -15,7 +15,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Numerical integration goes back to the original idea of Riemann sums: approximate the area under a curve by summing the areas of simple shapes. The question is not WHETHER we can approximate (we always can), but HOW ACCURATELY and HOW EFFICIENTLY. Different methods use different shapes — rectangles, trapezoids, parabolic arcs — and achieve different levels of accuracy for the same number of function evaluations.',
       'The midpoint rule uses rectangles whose height is the function value at the midpoint of each subinterval. If you divide $[a,b]$ into $n$ equal subintervals of width $h = (b-a)/n$, the midpoint rule gives $M_n = h\\sum_{i=1}^{n} f(\\bar{x}_i)$, where $\\bar{x}_i = a + (i-1/2)h$ is the midpoint of the $i$-th subinterval. Geometrically, each rectangle touches the curve at the center, which tends to balance overestimates and underestimates.',
       'The trapezoidal rule replaces each rectangle with a trapezoid: connect the function values at the left and right endpoints with a straight line. The area of each trapezoid is $h \\cdot [f(x_i) + f(x_{i+1})]/2$. Summing: $T_n = h[f(x_0)/2 + f(x_1) + f(x_2) + \\cdots + f(x_{n-1}) + f(x_n)/2]$. The first and last function values get half weight; all interior points get full weight. The trapezoidal rule is exact for linear functions.',
@@ -23,6 +26,9 @@ export default {
       'The error bounds reveal why Simpson\'s rule is so powerful. Midpoint rule: $|E_M| \\leq (b-a)^3/(24n^2) \\cdot \\max|f\'\'|$. Trapezoidal rule: $|E_T| \\leq (b-a)^3/(12n^2) \\cdot \\max|f\'\'|$. Both have errors that shrink like $1/n^2$ — doubling $n$ cuts the error by a factor of 4. Simpson\'s rule: $|E_S| \\leq (b-a)^5/(180n^4) \\cdot \\max|f^{(4)}|$. The error shrinks like $1/n^4$ — doubling $n$ cuts the error by a factor of 16! Simpson\'s rule with just $n = 10$ often gives 8+ digits of accuracy.',
       'An important relationship: Simpson\'s rule is a weighted average of the midpoint and trapezoidal rules: $S_{2n} = (2M_n + T_n)/3$. This means you can compute $M_n$ and $T_n$ and combine them to get $S_{2n}$ for free, effectively tripling your accuracy without additional function evaluations.',
       'When do you NEED numerical methods? (1) The integrand has no elementary antiderivative: $e^{-x^2}$, $\\sin(x)/x$, $\\sqrt{1+x^4}$. (2) The function is given by data (measured temperatures, experimental readings) rather than a formula — you cannot find an antiderivative of a table. (3) The antiderivative exists but is too complicated to evaluate reliably (some partial fraction or trig sub results). In all these cases, numerical integration gives the answer directly.',
+        ],
+      },
+      { type: 'image', src: riemannSumUrl, alt: 'Riemann rectangles with midpoint rule and trapezoids compared', caption: 'When antiderivatives are unavailable, numerical methods (midpoint, trapezoid, Simpson) approximate the integral.' },
     ],
     callouts: [
       {
@@ -160,6 +166,7 @@ for n in [4, 8, 16, 32, 64]:
               ],
               code: `from opencalc import Figure
 import math
+import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 
 def midpoint(f,a,b,n):
     h=(b-a)/n; return h*sum(f(a+(i+.5)*h) for i in range(n))

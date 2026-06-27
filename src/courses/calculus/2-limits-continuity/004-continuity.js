@@ -1,3 +1,4 @@
+import continuityUrl from '../diagrams/calc-continuity.svg?url';
 export default {
   id: "ch1-continuity",
   slug: "continuity",
@@ -27,7 +28,10 @@ export default {
     previewVisualizationId: "ContinuityViz",
   },
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**You have been computing limits for two lessons now. Here is the payoff.** A limit tells you what $f(x)$ is *heading toward* as $x$ approaches $c$. But every time you evaluated a limit, you checked: is the denominator zero? Can I substitute directly? The reason some functions let you substitute and others don\'t is **continuity**. Continuous functions are the "well-behaved" ones where the limit and the value agree. Everything else is a special case.',
 
       '**The pencil test.** Imagine drawing the graph of a function without lifting your pencil. If you can do it over an interval, the function is continuous there. The moment you have to lift your pencil — to jump to a new height, or skip over a hole, or avoid a vertical spike — you have a discontinuity. This physical test captures the essential idea, even if it is not quite rigorous enough for proofs.',
@@ -43,6 +47,9 @@ export default {
       '**Continuity on an interval.** A function is continuous on an open interval $(a, b)$ if it is continuous at every single point in that interval. For a closed interval $[a, b]$, we also require one-sided continuity at the endpoints: the right-hand limit equals $f(a)$ at $a$, and the left-hand limit equals $f(b)$ at $b$. Polynomials, trig functions, exponentials, and logarithms (on their domains) are all continuous everywhere they are defined. These are your "safe" functions for direct substitution.',
 
       '**Why does any of this matter?** Because continuity is the hypothesis of every major theorem in Calculus 1: the Intermediate Value Theorem, the Extreme Value Theorem, the Mean Value Theorem, and the Fundamental Theorem of Calculus. The reason those theorems work is that continuous functions do not have hidden jumps or holes that could cause the conclusion to fail.',
+        ],
+      },
+      { type: 'image', src: continuityUrl, alt: 'Three discontinuity types: removable hole, jump, and infinite', caption: 'Continuity means no surprises: the function arrives exactly where it was headed.' },
     ],
     callouts: [
       {

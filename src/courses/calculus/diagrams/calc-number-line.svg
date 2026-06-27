@@ -1,0 +1,83 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">The Real Number Line — Subsets, Intervals, and Absolute Value</text>
+
+  <!-- Number line -->
+  <line x1="24" y1="70" x2="456" y2="70" class="ax" stroke-width="1.5"/>
+  <polygon points="454,66 462,70 454,74" class="axf"/>
+
+  <!-- Tick marks and labels -->
+  <line x1="108" y1="64" x2="108" y2="76" class="ax" stroke-width="1.2"/>
+  <line x1="168" y1="64" x2="168" y2="76" class="ax" stroke-width="1.2"/>
+  <line x1="228" y1="64" x2="228" y2="76" class="ax" stroke-width="1.2"/>
+  <line x1="288" y1="64" x2="288" y2="76" class="ax" stroke-width="1.2"/>
+  <line x1="348" y1="64" x2="348" y2="76" class="ax" stroke-width="1.2"/>
+  <line x1="408" y1="64" x2="408" y2="76" class="ax" stroke-width="1.2"/>
+  <text x="108" y="88" font-size="10" class="mu" text-anchor="middle">−2</text>
+  <text x="168" y="88" font-size="10" class="mu" text-anchor="middle">−1</text>
+  <text x="228" y="88" font-size="10" class="mu" text-anchor="middle">0</text>
+  <text x="288" y="88" font-size="10" class="mu" text-anchor="middle">1</text>
+  <text x="348" y="88" font-size="10" class="mu" text-anchor="middle">2</text>
+  <text x="408" y="88" font-size="10" class="mu" text-anchor="middle">3</text>
+
+  <!-- π marker -->
+  <line x1="316" y1="62" x2="316" y2="78" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="316" y="56" font-size="9" fill="#6366f1" text-anchor="middle">π≈3.14</text>
+
+  <!-- √2 marker -->
+  <line x1="312" y1="62" x2="312" y2="78" stroke="#6366f1" stroke-width="0"/>
+  <line x1="303" y1="62" x2="303" y2="78" stroke="#10b981" stroke-width="1.5"/>
+  <text x="303" y="56" font-size="9" fill="#10b981" text-anchor="middle">√2≈1.41</text>
+
+  <!-- Number subsets -->
+  <text x="240" y="105" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ  (each set contains the one before it)</text>
+
+  <!-- Rows of subset examples -->
+  <rect x="16"  y="112" width="100" height="18" rx="4" fill="#ecfdf5"/>
+  <text x="66"  y="125" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">ℕ Naturals</text>
+  <rect x="122" y="112" width="100" height="18" rx="4" fill="#eef2ff"/>
+  <text x="172" y="125" font-size="8.5" fill="#6366f1" text-anchor="middle" font-weight="700">ℤ Integers</text>
+  <rect x="228" y="112" width="100" height="18" rx="4" fill="#fef9c3"/>
+  <text x="278" y="125" font-size="8.5" fill="#d97706" text-anchor="middle" font-weight="700">ℚ Rationals</text>
+  <rect x="334" y="112" width="130" height="18" rx="4" fill="#fff1f2"/>
+  <text x="399" y="125" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">ℝ \ ℚ Irrationals</text>
+
+  <text x="66"  y="142" font-size="9" fill="#059669" text-anchor="middle">1, 2, 3, 4, …</text>
+  <text x="172" y="142" font-size="9" fill="#6366f1" text-anchor="middle">…−2,−1,0,1,2…</text>
+  <text x="278" y="142" font-size="9" fill="#d97706" text-anchor="middle">1/2, 3/4, −5/3</text>
+  <text x="399" y="142" font-size="9" fill="#dc2626" text-anchor="middle">√2, π, e</text>
+
+  <!-- Interval notation row -->
+  <text x="240" y="163" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Interval Notation</text>
+
+  <!-- Open interval (a,b) -->
+  <line x1="30" y1="178" x2="130" y2="178" stroke="#6366f1" stroke-width="2"/>
+  <circle cx="30"  cy="178" r="4" fill="white" stroke="#6366f1" stroke-width="2"/>
+  <circle cx="130" cy="178" r="4" fill="white" stroke="#6366f1" stroke-width="2"/>
+  <text x="80" y="172" font-size="8" fill="#6366f1" text-anchor="middle">(a, b)</text>
+  <text x="80" y="193" font-size="8" fill="#6366f1" text-anchor="middle">open — excludes endpoints</text>
+
+  <!-- Closed interval [a,b] -->
+  <line x1="158" y1="178" x2="258" y2="178" stroke="#059669" stroke-width="2"/>
+  <circle cx="158" cy="178" r="4" fill="#059669" stroke="#059669" stroke-width="2"/>
+  <circle cx="258" cy="178" r="4" fill="#059669" stroke="#059669" stroke-width="2"/>
+  <text x="208" y="172" font-size="8" fill="#059669" text-anchor="middle">[a, b]</text>
+  <text x="208" y="193" font-size="8" fill="#059669" text-anchor="middle">closed — includes endpoints</text>
+
+  <!-- Absolute value -->
+  <rect x="284" y="164" width="180" height="46" rx="5" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="374" y="178" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Absolute Value: |x| = distance from 0</text>
+  <text x="374" y="192" font-size="9" fill="#6366f1" text-anchor="middle">|x| = x if x ≥ 0,  −x if x &lt; 0</text>
+  <text x="374" y="204" font-size="8" class="mu"    text-anchor="middle">|−3| = 3,  |7| = 7,  |x − a| = dist(x, a)</text>
+</svg>

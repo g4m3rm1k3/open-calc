@@ -1,3 +1,4 @@
+import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
 export default {
   id: 'ch1-limits-intro',
   slug: 'introduction',
@@ -37,7 +38,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**You have already met the seed of the limit.** In Chapter 0, you learned that the slope of a line is \u0394y / \u0394x — the ratio of rise to run. That slope is the rate of change averaged over the full run. Now ask: what if the run shrinks? What if \u0394x keeps getting smaller and smaller, never quite reaching zero? The number you are approaching is the limit. This is not a brand new idea — it is the slope idea taken to its extreme.',
 
       'Imagine walking toward a wall, cutting the remaining distance in half each step. You get closer and closer — 1 m, 0.5 m, 0.25 m, 0.125 m — but you never quite touch it. A **limit** describes the value a function approaches as its input gets close to some target value. The key insight: the function does not need to be defined *at* the target — only *near* it.',
@@ -54,6 +58,9 @@ export default {
       '**The limit is about the journey, not the destination.** Whether f(2) is undefined, or defined but equal to something else — the limit doesn\'t care. It only asks: what value does f(x) approach as x gets close to 2?',
 
       'There is also the possibility of **one-sided limits**: the function might approach a different value from the left than from the right. If that happens, the two-sided limit does not exist (DNE). Think of a cliff edge: approaching from land gives height H, approaching from sea gives height 0. The "height" limit at the cliff edge DNE.',
+        ],
+      },
+      { type: 'image', src: limitApproachUrl, alt: 'Curve with left and right approach arrows converging on L at x=c', caption: 'A limit describes where a function is heading, not where it arrives — the value at x=c is irrelevant.' },
     ],
     callouts: [
       {

@@ -1,3 +1,4 @@
+import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
 // FILE: src/content/chapter-2/02-chain-rule.js
 export default {
   id: 'ch2-002',
@@ -16,7 +17,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** You have all the basic differentiation rules — power, product, and quotient. Those rules handle functions that are *combined* (added, multiplied, divided). But what about functions that are *nested* — one function applied inside another? sin(x²) is not a product; it is sine *applied to* x². The rules from the last lesson cannot reach inside that parenthesis. This lesson closes that gap.',
 
       '**Why this matters:** The chain rule is the single most-used rule in all of applied calculus. It appears every time you differentiate any non-trivial function. In machine learning, every gradient computed through a deep neural network is chain rule applied millions of times (backpropagation). In physics, any coordinate transform or changing variable requires it. In the rest of this chapter alone, you will use it in every single subsequent lesson.',
@@ -34,6 +38,9 @@ export default {
       'The chain rule extends to triple and longer compositions. For y = f(g(h(x))), the derivative is f\'(g(h(x))) \u00b7 g\'(h(x)) \u00b7 h\'(x). Differentiate the outermost layer first, then the next, and so on, each time multiplying by the derivative of the layer below. This is like peeling an onion, one layer at a time.',
 
       '**Where this is heading:** The chain rule is now yours. But knowing a rule and applying it without error are two different things. The very next lesson deliberately shows you the most common mistake students make the first week after learning the chain rule — forgetting to fully differentiate the inner piece inside a product rule. Seeing the mistake made explicitly (and numerically confirmed wrong) is the fastest way to make sure you never make it.',
+        ],
+      },
+      { type: 'image', src: chainRuleUrl, alt: 'Composition pipeline x → g(x) → f(g(x)) with derivative labels', caption: 'The chain rule multiplies the derivative of the outer function by the derivative of the inner function.' },
     ],
     callouts: [
       {

@@ -1,3 +1,4 @@
+import epsilonDeltaUrl from '../diagrams/calc-epsilon-delta.svg?url';
 export default {
   id: "ch1-epsilon-delta",
   slug: "epsilon-delta",
@@ -28,7 +29,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "Imagine you're playing a game against a skeptic. You claim that lim(x→3) (2x+1) = 7. The skeptic doesn't believe you. So you agree on rules:",
 
       '**Round 1**: The skeptic says "I bet f(x) isn\'t always within 0.5 of 7." You respond: "Keep x within 0.25 of 3, and I guarantee |f(x) − 7| < 0.5." You\'re right: if |x−3| < 0.25, then |2x+1−7| = 2|x−3| < 2(0.25) = 0.5. ✓',
@@ -42,6 +46,9 @@ export default {
       "For this linear function, the winning strategy is simple: set δ = ε/2. For other functions, finding δ is harder — that's where the algebra comes in. But the game is always the same.",
 
       'The beautiful thing about this definition: it never mentions infinity, it never mentions "approaching," and it never mentions motion or time. It replaces all of those fuzzy ideas with a single, airtight logical statement about numbers. This is what mathematician Morris Kline called "the arithmetization of analysis" — rebuilding all of calculus on nothing more than the properties of real numbers.',
+        ],
+      },
+      { type: 'image', src: epsilonDeltaUrl, alt: 'ε-δ box showing the formal definition of a limit', caption: 'The ε-δ definition turns the intuitive idea of "approaching" into a precise, checkable condition.' },
     ],
     callouts: [
       {

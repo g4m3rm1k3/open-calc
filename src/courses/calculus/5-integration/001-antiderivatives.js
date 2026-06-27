@@ -1,3 +1,4 @@
+import antiderivativeUrl from '../diagrams/calc-antiderivative.svg?url';
 // FILE: src/content/chapter-4/00-antiderivatives.js
 export default {
   id: "ch4-000a",
@@ -73,7 +74,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "**Where this lesson sits in the story.** You built differentiation from the limit definition, learned the power rule, product rule, chain rule, and implicit differentiation — a complete forward machine that takes functions to their derivatives. Now we ask: can we run the machine backward? Given the output (the derivative), can we recover the input (the original function)? This question — called *antidifferentiation* — is the first topic of integration. But right away we need to address something your book is careful about that many courses blur over: *antiderivatives and definite integrals are not the same thing*. They are connected by a deep theorem (the Fundamental Theorem of Calculus, Lesson 4), but the connection is not obvious and was not obvious historically. This lesson is about antiderivatives. Definite integrals come in Lessons 1–3.",
 
       "**The definition.** A function $F$ is called an *antiderivative* of $f$ on an interval $I$ if $F'(x) = f(x)$ for every $x \\in I$. That's the entire definition. It is purely algebraic: given $f$, find $F$ whose derivative is $f$. No area. No rectangles. No limits of sums. Just the question: what function differentiates to this?",
@@ -93,6 +97,9 @@ export default {
       "**Linearity.** Because differentiation is linear — $\\dfrac{d}{dx}[cF + G] = cF' + G'$ — antidifferentiation is linear too: if $F$ is an antiderivative of $f$ and $G$ is an antiderivative of $g$, then $cF + G$ is an antiderivative of $cf + g$. In practice: to antidifferentiate a sum, antidifferentiate term by term; to antidifferentiate a constant multiple, factor the constant out. One $+C$ at the end covers all the individual constants.",
 
       "**Initial value problems.** The general antiderivative $F(x) + C$ describes a whole family. An *initial value problem* (IVP) adds one constraint — typically $F(x_0) = y_0$ — that pins down $C$. Procedure: (1) find the general antiderivative $F(x) + C$; (2) substitute $x_0$ and $y_0$: $y_0 = F(x_0) + C$, so $C = y_0 - F(x_0)$; (3) write the particular solution. Example: antiderivative of $f(x) = 2x$ is $F(x) = x^2 + C$; given $F(3) = 10$: $10 = 9 + C$, so $C = 1$, particular solution $F(x) = x^2 + 1$.",
+        ],
+      },
+      { type: 'image', src: antiderivativeUrl, alt: 'Pairs of functions and antiderivatives with bidirectional arrows', caption: 'An antiderivative F satisfies F′(x) = f(x) — differentiation and antidifferentiation are inverse operations.' },
     ],
     callouts: [
       {

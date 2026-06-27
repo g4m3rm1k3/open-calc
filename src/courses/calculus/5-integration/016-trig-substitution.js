@@ -1,3 +1,4 @@
+import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 // FILE: src/content/chapter-4/09-trig-substitution.js
 export default {
   id: 'ch4-009',
@@ -16,7 +17,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'The idea behind trig substitution is beautifully geometric. Consider $\\sqrt{a^2 - x^2}$. This expression describes the height of a semicircle of radius $a$ at horizontal position $x$. On the unit circle, $\\cos^2\\theta + \\sin^2\\theta = 1$, which means $\\cos\\theta = \\sqrt{1 - \\sin^2\\theta}$. If we set $x = a\\sin\\theta$, then $\\sqrt{a^2 - x^2} = \\sqrt{a^2 - a^2\\sin^2\\theta} = a\\cos\\theta$. The radical is gone — replaced by a trig function.',
       'There are three cases, one for each Pythagorean identity. For $\\sqrt{a^2 - x^2}$: use $x = a\\sin\\theta$ (from $1 - \\sin^2\\theta = \\cos^2\\theta$). For $\\sqrt{a^2 + x^2}$: use $x = a\\tan\\theta$ (from $1 + \\tan^2\\theta = \\sec^2\\theta$). For $\\sqrt{x^2 - a^2}$: use $x = a\\sec\\theta$ (from $\\sec^2\\theta - 1 = \\tan^2\\theta$). Each substitution transforms a radical into a simple trig function.',
       'The reference triangle is your best friend for converting back to $x$. After integrating in $\\theta$, you need to express the answer in terms of $x$. Draw a right triangle where the sides are determined by the substitution. For $x = a\\sin\\theta$: opposite side $= x$, hypotenuse $= a$, so adjacent side $= \\sqrt{a^2-x^2}$. Read off any trig function of $\\theta$ directly from the triangle: $\\cos\\theta = \\sqrt{a^2-x^2}/a$, $\\tan\\theta = x/\\sqrt{a^2-x^2}$, etc.',
@@ -24,6 +28,9 @@ export default {
       'Sometimes you need to complete the square before applying trig substitution. For $\\int dx/\\sqrt{x^2 + 6x + 13}$: complete the square to get $x^2 + 6x + 13 = (x+3)^2 + 4$. Now let $u = x + 3$, and the integral becomes $\\int du/\\sqrt{u^2+4}$, which is a standard tan substitution with $u = 2\\tan\\theta$.',
       'A common error is forgetting the domain restrictions on $\\theta$. For $x = a\\sin\\theta$, we restrict $\\theta \\in [-\\pi/2, \\pi/2]$ so that $\\cos\\theta \\geq 0$ and $\\sqrt{a^2-x^2} = a\\cos\\theta$ (not $-a\\cos\\theta$). For $x = a\\tan\\theta$, restrict $\\theta \\in (-\\pi/2, \\pi/2)$ so that $\\sec\\theta > 0$. For $x = a\\sec\\theta$, restrict to $\\theta \\in [0, \\pi/2) \\cup [\\pi, 3\\pi/2)$ depending on the sign of $x$.',
       'For definite integrals, you can either convert the limits to $\\theta$-values (often cleaner) or integrate in $\\theta$, convert back to $x$ using the reference triangle, and evaluate at the original $x$-limits. Converting limits: if $x$ goes from $0$ to $a$ and $x = a\\sin\\theta$, then $\\theta$ goes from $0$ to $\\pi/2$.',
+        ],
+      },
+      { type: 'image', src: trigCircleUrl, alt: 'Right triangle showing trig substitution variable relationships', caption: 'Trig substitution converts radicals like √(a²−x²) into trig expressions that integrate cleanly.' },
     ],
     callouts: [
       {

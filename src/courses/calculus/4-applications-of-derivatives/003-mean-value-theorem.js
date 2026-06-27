@@ -1,3 +1,4 @@
+import mvtUrl from '../diagrams/calc-mvt.svg?url';
 // FILE: src/content/chapter-3/02-mean-value-theorem.js
 export default {
   id: 'ch3-002',
@@ -15,7 +16,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "Rolle's Theorem proved that equal endpoints force a horizontal tangent. But what about unequal endpoints? The Mean Value Theorem answers this: between any two points on a differentiable curve, there is always some point where the instantaneous rate of change equals the average rate of change over the whole interval. This sounds dry, but it is the engine behind almost every theorem in Chapter 3. Increasing functions, decreasing functions, the first derivative test, L'Hôpital's Rule — all of these rest on the MVT. Newton called it the cornerstone of calculus.",
       'The geometric picture makes the MVT obvious once you see it. Draw any smooth curve from point A = (a, f(a)) to point B = (b, f(b)). The secant line from A to B has slope m = (f(b) - f(a))/(b - a) — the average rate of change over the interval. Now imagine a horizontal line sliding up from below, parallel to the secant. At some point, this sliding line first touches the curve — at a tangent point. At that tangent point c, the tangent line is parallel to the secant, meaning f\'(c) = m. That is the entire content of the Mean Value Theorem: somewhere between a and b, the instantaneous slope equals the average slope.',
       "Rolle's Theorem is the special case where f(a) = f(b) — the starting and ending values are equal. In this case, the secant is horizontal (slope 0), and the tangent must also be horizontal somewhere. Geometrically: if you start and end at the same height, the graph must have a horizontal tangent somewhere in between. A ball thrown upward eventually falls — it must stop (instantaneous velocity = 0) at the peak. A pendulum swinging back to its starting position must momentarily stop at the peak. Rolle's Theorem captures this intuition precisely.",
@@ -23,6 +27,9 @@ export default {
       'The most important consequence of the MVT is the characterization of constant functions. If f\'(x) = 0 for all x in (a,b), then the MVT applied to any two points x₁ < x₂ in (a,b) gives: f(x₂) - f(x₁) = f\'(c)(x₂ - x₁) = 0·(x₂ - x₁) = 0. So f(x₂) = f(x₁) for all pairs — f is constant. This theorem, which feels obvious, is actually non-trivial to prove without the MVT. It is the first theorem about antiderivatives: if F and G are both antiderivatives of f (F\' = G\' = f), then (F - G)\' = 0, so F - G is constant, so F = G + C for some constant C. This is why every antiderivative has "+ C".',
       'The MVT also proves that positive derivative implies increasing function. If f\'(x) > 0 for all x in (a,b), then for any x₁ < x₂ in (a,b), the MVT gives f(x₂) - f(x₁) = f\'(c)(x₂ - x₁) > 0 (since f\'(c) > 0 and x₂ - x₁ > 0). So f(x₂) > f(x₁): f is increasing. Similarly, f\'(x) < 0 everywhere means f is decreasing. This result, which seems geometrically obvious, is proved rigorously only through the MVT.',
       "History: the Mean Value Theorem was proved by Joseph-Louis Lagrange in 1797 in his landmark book Théorie des fonctions analytiques, where he attempted to put calculus on a rigorous footing without infinitesimals. Lagrange called it the théorème des accroissements finis (theorem of finite increments). Rolle's Theorem was proved 100 years earlier, in 1691, by Michel Rolle — interestingly, as part of an argument AGAINST calculus. Rolle believed that infinitesimals were logically incoherent, and he published his theorem to demonstrate a paradox in the new calculus. The irony is that the theorem named after him is now used to prove the foundations of the subject he opposed.",
+        ],
+      },
+      { type: 'image', src: mvtUrl, alt: 'Curve with secant line and parallel tangent at interior point c', caption: 'MVT: at some interior point the instantaneous rate matches the average rate over the whole interval.' },
     ],
     callouts: [
       {

@@ -1,3 +1,4 @@
+import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 // FILE: src/content/chapter-2/00-tangent-problem.js
 export default {
   id: "ch2-000",
@@ -73,7 +74,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "**Let's place you exactly where you are in the course.** In Chapter 0, you learned that the slope of a line between two points is \u0394y/\u0394x. In Chapter 1, you learned that a limit is what a function approaches as its input gets close to a value. Both of those ideas were preparation for this exact moment. The derivative IS the limit of the slope formula. That’s it. The difference quotient [f(x+h) - f(x)] / h is \u0394y/\u0394x with \u0394x = h. The derivative is what that ratio approaches as h \u2192 0. You already know both halves — this lesson puts them together.",
 
       "Start with something we already understand: average rate of change. If you drive 120 miles in 2 hours, your average speed is 60 mph. If a population grows from 1,000 to 1,500 individuals over 5 years, the average growth rate is 100 individuals per year. In each case, we compute (change in output) divided by (change in input). This is the slope of the line connecting two points on the graph — called a secant line.",
@@ -91,6 +95,9 @@ export default {
       "There is a profound and one-directional relationship between differentiability and continuity: differentiability always implies continuity, but continuity does NOT always imply differentiability. The proof that differentiability implies continuity is short: write f(x) - f(a) = [f(x) - f(a)] / (x - a) times (x - a). As x approaches a, the first factor approaches f'(a) (a finite number, since f is differentiable), and the second factor approaches 0. Their product approaches f'(a) times 0 = 0, so f(x) approaches f(a), which is exactly the definition of continuity. The converse fails because continuity only requires that the function has no jumps or holes — it says nothing about whether the graph has a well-defined direction (slope) at each point. The absolute value function |x| is the standard counterexample: perfectly continuous on all of R, but non-differentiable at x = 0 because of the corner.",
 
       "A practical checklist for differentiability: before computing a derivative, ask three questions. (1) Is the function continuous at the point? If not, it cannot be differentiable. (2) Is there a corner, cusp, or vertical tangent? If so, the derivative does not exist there. (3) Is the function defined by cases (piecewise)? At the boundary between pieces, you must check that the one-sided derivatives match. Only if all three checks pass can you proceed to compute the derivative using the limit definition or the shortcut rules.",
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Secant lines converging to the tangent line as h → 0', caption: 'The tangent line slope is the limit of secant slopes — the birth of the derivative.' },
     ],
     callouts: [
       {

@@ -1,3 +1,4 @@
+import taylorUrl from '../diagrams/calc-taylor.svg?url';
 // FILE: src/content/chapter-5/03-power-series.js
 export default {
   id: 'ch5-003',
@@ -15,7 +16,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'A power series centered at $c$ is an expression $\\sum_{n=0}^{\\infty} a_n(x-c)^n = a_0 + a_1(x-c) + a_2(x-c)^2 + \\cdots$. It is an "infinite polynomial" whose convergence depends on $x$. At $x = c$, every power series converges (all terms vanish except $a_0$). The question is: for which other $x$ does it converge?',
       'The remarkable fact is that every power series has a radius of convergence $R \\ge 0$ (possibly $\\infty$) such that the series converges absolutely for $|x - c| < R$ and diverges for $|x - c| > R$. The convergence region is a symmetric interval centered at $c$. At the endpoints $x = c \\pm R$, anything can happen — the series may converge or diverge at each endpoint independently. So the interval of convergence is one of $(c-R, c+R)$, $[c-R, c+R)$, $(c-R, c+R]$, or $[c-R, c+R]$.',
       'Finding $R$ is usually done with the Ratio Test applied to the power series. For $\\sum a_n(x-c)^n$: $\\left|\\frac{a_{n+1}(x-c)^{n+1}}{a_n(x-c)^n}\\right| = \\left|\\frac{a_{n+1}}{a_n}\\right||x-c| \\to L|x-c|$ where $L = \\lim|a_{n+1}/a_n|$. The series converges when $L|x-c| < 1$, i.e., $|x-c| < 1/L = R$. So $R = \\lim|a_n/a_{n+1}|$ (or $R = 1/\\limsup|a_n|^{1/n}$ via the Root Test).',
@@ -23,6 +27,9 @@ export default {
       'The most powerful property of power series is term-by-term differentiation and integration. If $f(x) = \\sum_{n=0}^{\\infty} a_n(x-c)^n$ for $|x-c| < R$, then: $f\'(x) = \\sum_{n=1}^{\\infty} na_n(x-c)^{n-1}$ and $\\int f(x)\\,dx = C + \\sum_{n=0}^{\\infty} \\frac{a_n}{n+1}(x-c)^{n+1}$, both with the same radius of convergence $R$. This is incredibly useful: you can generate new power series from known ones by calculus operations.',
       'Building a power series library from $1/(1-x) = \\sum_{n=0}^{\\infty} x^n$: (1) Replace $x$ by $-x$: $1/(1+x) = \\sum(-1)^n x^n$. (2) Integrate: $\\ln(1+x) = \\sum_{n=0}^{\\infty}(-1)^n x^{n+1}/(n+1) = x - x^2/2 + x^3/3 - \\cdots$. (3) Replace $x$ by $x^2$ in $1/(1+x)$: $1/(1+x^2) = \\sum(-1)^n x^{2n}$. (4) Integrate: $\\arctan(x) = \\sum_{n=0}^{\\infty}(-1)^n x^{2n+1}/(2n+1)$. Set $x = 1$: $\\pi/4 = 1 - 1/3 + 1/5 - 1/7 + \\cdots$ (Leibniz formula for $\\pi$).',
       'Representing functions as power series means expressing $f(x)$ in the form $\\sum a_n x^n$. Not every function has a power series representation (it must be infinitely differentiable and its Taylor series must converge to it). But for those that do, the representation is unique: $a_n = f^{(n)}(c)/n!$. This uniqueness is extremely useful for finding coefficients — you can use any valid method (substitution, differentiation, integration, algebraic manipulation) and the result is guaranteed to be the Taylor series.',
+        ],
+      },
+      { type: 'image', src: taylorUrl, alt: 'Taylor polynomials of increasing degree converging to a function', caption: 'A power series Σ aₙ(x−c)ⁿ converges inside its radius of convergence and represents a function there.' },
     ],
     callouts: [
       {

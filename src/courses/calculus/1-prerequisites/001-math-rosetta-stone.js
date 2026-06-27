@@ -1,3 +1,4 @@
+import derivativeNotationsUrl from '../diagrams/calc-derivative-notations.svg?url';
 export default {
   id: "ch0-rosetta",
 
@@ -35,12 +36,18 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "The single biggest source of confusion in calculus is not calculus — it is algebra. Specifically, it is the algebra steps that textbooks skip because 'students should already know this.' The goal of this lesson is to rebuild every skipped step from scratch, using a side-by-side proof: the left column uses a specific number (like 3 or 10), and the right column uses a letter (like x or a). Both columns do the exact same arithmetic. The number column is always checkable on a calculator. Once you trust the number column, the letter column stops looking like a trick.",
       "The 'Algebra Tax' is the name we give to the mandatory manipulation steps that appear before you can do any calculus. Before you can take a derivative of \\frac{x^2-9}{x-3}, you must pay the algebra tax: factor the numerator, cancel, simplify. Before you can evaluate \\lim_{h\\to 0} \\frac{\\sqrt{x+h}-\\sqrt{x}}{h}, you must pay the conjugate tax. These taxes are not calculus — they are arithmetic dressed in variables. This lesson catalogs every tax you will ever pay, with a receipt showing exactly what rule justifies each step.",
       "Order matters in mathematics for one reason: different operations undo each other at different speeds. Multiplication undoes addition faster than addition undoes itself. Exponents pack multiplication the way multiplication packs addition. Understanding why PEMDAS is ordered the way it is — not just that it is ordered that way — lets you read any expression and instantly see the order in which it wants to be simplified. This is the difference between a student who memorizes the rule and a student who sees the structure.",
       "Every algebraic identity is a shortcut for arithmetic you could always do the long way. (a+b)² = a²+2ab+b² is not a definition — it is the result of multiplying (a+b)(a+b) using the distributive property twice. The difference of squares a²-b² = (a-b)(a+b) is not a formula to memorize — it is what you get when you expand (a-b)(a+b) and watch the middle terms cancel. If you forget any identity, you can always re-derive it in 30 seconds by going back to the distributive property. That is the point: one rule (distributive property) generates all the others.",
       "The cancellation trap is the most common algebra error in calculus. Students cancel \\frac{6}{3} = 2 (correct: a factor of 3 cancels), then apply the same thinking to \\frac{x+6}{3} = x+2 (wrong: you cannot cancel a term, only a factor). The rule is: cancellation requires the thing you are canceling to be multiplied across the entire numerator and the entire denominator. A factor cancels; a term does not. Learning to tell factors from terms — instantly, by inspection — eliminates this entire class of error.",
+        ],
+      },
+      { type: 'image', src: derivativeNotationsUrl, alt: 'Four equivalent notations for the derivative', caption: 'Lagrange f\'(x), Leibniz dy/dx, operator D, and Newton dot notation all describe the same thing.' },
     ],
     callouts: [
       {

@@ -1,3 +1,4 @@
+import concavityUrl from '../diagrams/calc-concavity.svg?url';
 export default {
   id: 'ch2-higher-order-derivatives',
   slug: 'higher-order-derivatives',
@@ -53,6 +54,7 @@ export default {
           'When a(t) < 0, velocity is decreasing (slowing down or speeding up in negative direction).',
         caption: 'Watch all three graphs simultaneously. Positive acceleration means the velocity curve is rising, which means the position curve is concave up.',
       },
+      { type: 'image', src: concavityUrl, alt: 'Two panels: concave up (f″ > 0) and concave down (f″ < 0)', caption: 'The second derivative measures the rate of change of the slope — it governs concavity.' },
     ],
   },
 

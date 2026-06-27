@@ -1,3 +1,4 @@
+import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
 export default {
   id: 'ch0-completing-the-square',
   slug: 'completing-the-square',
@@ -18,7 +19,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Here is the core idea: any quadratic expression $x^2 + bx + c$ can be rewritten as $(x + h)^2 + k$ for the right values of $h$ and $k$. Why would you want to do this? Because a **perfect square** $(x+h)^2$ is always $\\geq 0$, which immediately tells you the minimum value of the expression is $k$, achieved when $x = -h$.',
 
       'The technique is called "completing the square" because you are literally completing a partial square. Think of $x^2 + 6x$ geometrically: you have a square of side $x$ (area $x^2$) and a rectangle of dimensions $x \\times 6$ (area $6x$). Split the rectangle into two pieces of $x \\times 3$ and attach them to two sides of the square. You almost have a bigger square of side $(x+3)$, but there is a $3 \\times 3$ corner piece missing. Add it: $x^2 + 6x + 9 = (x+3)^2$.',
@@ -30,6 +34,9 @@ export default {
       'This technique derives the **quadratic formula**. Start with $ax^2 + bx + c = 0$. Divide by $a$: $x^2 + \\frac{b}{a}x = -\\frac{c}{a}$. Complete the square: $\\left(x + \\frac{b}{2a}\\right)^2 = \\frac{b^2 - 4ac}{4a^2}$. Take square roots: $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$. You do not need to memorize the quadratic formula if you can complete the square — you can derive it in 30 seconds.',
 
       'In calculus, completing the square transforms integrals involving quadratics into standard forms that can be evaluated using inverse trig functions or trig substitution. For example, $\\int \\frac{dx}{x^2 + 6x + 13}$ becomes $\\int \\frac{dx}{(x+3)^2 + 4}$, which is a standard arctangent integral.',
+        ],
+      },
+      { type: 'image', src: curveExtremaUrl, alt: 'Parabola with vertex labeled, showing the effect of completing the square', caption: 'Completing the square converts ax² + bx + c to a(x − h)² + k, revealing the vertex (h, k).' },
     ],
     callouts: [
       {

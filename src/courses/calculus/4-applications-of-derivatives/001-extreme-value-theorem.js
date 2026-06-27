@@ -1,3 +1,4 @@
+import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
 export default {
   id: 'ch3-extreme-value-theorem',
   slug: 'extreme-value-theorem',
@@ -62,6 +63,7 @@ export default {
           'The value at each candidate is computed and the largest/smallest is highlighted.',
         caption: 'Adjust the function and interval. All candidates (endpoints + critical points) are marked. The absolute max and min are colored red and blue.',
       },
+      { type: 'image', src: curveExtremaUrl, alt: 'Cubic curve with local max and min labeled', caption: 'On a closed interval, a continuous function always attains an absolute max and an absolute min.' },
     ],
   },
 

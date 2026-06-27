@@ -1,0 +1,91 @@
+<svg viewBox="0 0 480 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="220" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Conic Sections — Slices Through a Double Cone</text>
+
+  <!-- PANEL 1: Parabola -->
+  <text x="80" y="34" font-size="9" fill="#6366f1" text-anchor="middle" font-weight="700">Parabola</text>
+  <text x="80" y="46" font-size="8" class="mu" text-anchor="middle">y = ax²  (a ≠ 0)</text>
+
+  <line x1="20"  y1="155" x2="152" y2="155" class="ax" stroke-width="1.2"/>
+  <line x1="86"  y1="48"  x2="86"  y2="158" class="ax" stroke-width="1.2"/>
+
+  <!-- Parabola y = (1/60)(x−86)² + 60; vertex at (86,60) -->
+  <path d="M 22,155 Q 54,52 86,57 Q 118,52 150,155"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <circle cx="86" cy="57" r="4" fill="#6366f1"/>
+  <text x="92" y="56" font-size="8" fill="#6366f1">vertex</text>
+
+  <!-- Axis of symmetry -->
+  <line x1="86" y1="55" x2="86" y2="155" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+
+  <text x="80" y="174" font-size="9" fill="#6366f1" text-anchor="middle">y = x², opens up</text>
+  <text x="80" y="186" font-size="8" class="mu" text-anchor="middle">vertex, axis of symmetry</text>
+
+  <!-- DIVIDER 1 -->
+  <line x1="162" y1="28" x2="162" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- PANEL 2: Ellipse -->
+  <text x="245" y="34" font-size="9" fill="#10b981" text-anchor="middle" font-weight="700">Ellipse</text>
+  <text x="245" y="46" font-size="8" class="mu" text-anchor="middle">x²/a² + y²/b² = 1</text>
+
+  <line x1="172" y1="115" x2="318" y2="115" class="ax" stroke-width="1.2"/>
+  <line x1="245" y1="50"  x2="245" y2="118" class="ax" stroke-width="1.2"/>
+
+  <!-- Ellipse: center (245,95), rx=65, ry=42 -->
+  <ellipse cx="245" cy="95" rx="65" ry="42" fill="none" stroke="#10b981" stroke-width="2.5"/>
+
+  <!-- semi-axes labels -->
+  <line x1="245" y1="95" x2="310" y2="95" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <line x1="245" y1="95" x2="245" y2="53" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="278" y="91" font-size="9" fill="#10b981">a</text>
+  <text x="249" y="72" font-size="9" fill="#10b981">b</text>
+
+  <!-- Foci -->
+  <circle cx="195" cy="95" r="3" fill="#059669"/>
+  <circle cx="295" cy="95" r="3" fill="#059669"/>
+  <text x="195" y="110" font-size="8" fill="#059669" text-anchor="middle">F₁</text>
+  <text x="295" y="110" font-size="8" fill="#059669" text-anchor="middle">F₂</text>
+
+  <text x="245" y="162" font-size="9" fill="#10b981" text-anchor="middle">sum of distances to foci = const</text>
+  <text x="245" y="175" font-size="8" class="mu" text-anchor="middle">circle is special case (a = b)</text>
+
+  <!-- DIVIDER 2 -->
+  <line x1="325" y1="28" x2="325" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- PANEL 3: Hyperbola -->
+  <text x="405" y="34" font-size="9" fill="#ef4444" text-anchor="middle" font-weight="700">Hyperbola</text>
+  <text x="405" y="46" font-size="8" class="mu" text-anchor="middle">x²/a² − y²/b² = 1</text>
+
+  <line x1="333" y1="110" x2="472" y2="110" class="ax" stroke-width="1.2"/>
+  <line x1="403" y1="48"  x2="403" y2="155" class="ax" stroke-width="1.2"/>
+
+  <!-- Right branch -->
+  <path d="M 440,50 C 428,70 422,90 422,110 C 422,130 428,148 440,168"
+        fill="none" stroke="#ef4444" stroke-width="2.5"/>
+  <!-- Left branch -->
+  <path d="M 366,50 C 378,70 384,90 384,110 C 384,130 378,148 366,168"
+        fill="none" stroke="#ef4444" stroke-width="2.5"/>
+
+  <!-- Asymptotes -->
+  <line x1="335" y1="55" x2="470" y2="165" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+  <line x1="335" y1="165" x2="470" y2="55" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3" opacity="0.5"/>
+  <text x="460" y="62" font-size="8" fill="#ef4444">y = ±(b/a)x</text>
+
+  <!-- Vertices -->
+  <circle cx="422" cy="110" r="3" fill="#ef4444"/>
+  <circle cx="384" cy="110" r="3" fill="#ef4444"/>
+
+  <text x="403" y="186" font-size="9" fill="#ef4444" text-anchor="middle">difference of distances = const</text>
+  <text x="403" y="198" font-size="8" class="mu" text-anchor="middle">two branches, asymptotes guide shape</text>
+</svg>

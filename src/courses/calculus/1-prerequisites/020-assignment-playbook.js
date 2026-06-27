@@ -1,3 +1,4 @@
+import derivativeNotationsUrl from '../diagrams/calc-derivative-notations.svg?url';
 export default {
   id: 'ch0-assignment-playbook',
   slug: 'assignment-playbook',
@@ -30,11 +31,17 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Think of every problem as a translation task: words and diagrams -> function model -> operation (differentiate or integrate) -> interpretation with units.',
       'The fastest way to improve is to classify problem type first. If you skip this and start computing immediately, you often perform a correct technique on the wrong object.',
       'A strong default workflow is: identify target quantity, name variables, write governing equation, choose operation, then solve and unit-check.',
       'For graph-reading questions, derivatives are slope information and integrals are signed area accumulation. If the prompt emphasizes turning points, monotonicity, concavity, velocity/acceleration, or marginal change, you are in derivative territory. If it emphasizes net amount, total accumulation, average value, or area/work, you are in integral territory.',
+        ],
+      },
+      { type: 'image', src: derivativeNotationsUrl, alt: 'Four derivative notations as a notation reference guide', caption: 'Recognizing every notation variant lets you read any textbook, course, or formula sheet without translation.' },
     ],
     callouts: [
       {

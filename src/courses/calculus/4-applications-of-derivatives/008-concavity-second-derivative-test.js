@@ -1,3 +1,4 @@
+import concavityUrl from '../diagrams/calc-concavity.svg?url';
 export default {
   id: 'ch3-concavity-second-derivative-test',
   slug: 'concavity-second-derivative-test',
@@ -47,6 +48,7 @@ export default {
           body: 'A point $(c, f(c))$ is an **inflection point** if:\n1. $f$ is continuous at $c$, AND\n2. The concavity CHANGES at $c$ (from ∪ to ∩, or from ∩ to ∪)\n\nA necessary condition: $f\'\'(c) = 0$ or $f\'\'(c)$ does not exist.\nBut this is NOT sufficient — $f\'\'(c) = 0$ alone does not guarantee an inflection point.\nYou must verify that the concavity actually changes.',
         },
       },
+      { type: 'image', src: concavityUrl, alt: 'Two panels: concave up (f″ > 0) and concave down (f″ < 0)', caption: 'f″ > 0 means the slope is increasing (cup up); f″ < 0 means the slope is decreasing (cup down).' },
     ],
   },
 

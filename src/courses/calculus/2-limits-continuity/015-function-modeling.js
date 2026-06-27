@@ -1,3 +1,4 @@
+import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
 export default {
   id: 'ch1-007',
   slug: 'function-modeling',
@@ -15,12 +16,18 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** The previous lesson showed how the limit machinery you built through Chapter 1 leads directly to the derivative — the instantaneous rate of change. Now you use that same functional thinking for a different purpose: building the function itself before any calculus happens. This is the chapter\'s capstone skill. Every optimization problem in calculus begins here, with a model.',
       'Modeling has a four-step process every time. First, identify the quantity you want to express as a function — the output. Second, identify the variable(s) it depends on — the inputs. Third, use constraints to reduce to one variable. Fourth, state the domain explicitly, because the function only makes physical sense on a restricted interval. Think of it like building a machine: you decide what the machine produces (output), what knobs it has (inputs), what the physical limits are (constraints), and what range the knobs can actually turn (domain).',
       'Constraints are the bridge between multiple variables. If a rectangle has perimeter 400 m, then $2l + 2w = 400$, so $w = 200 - l$. Now area $A = lw = l(200-l)$ depends on only one variable. The constraint eliminated $w$. This reduction step is where most students get stuck — the algebra is straightforward once you see what to substitute.',
       'The domain is not optional. Area $A = l(200-l)$ is a parabola defined for all real $l$, but the problem only makes sense for $l \\in (0, 200)$ — both dimensions must be positive. Always ask: what values of the input are physically meaningful? That is your domain. A function without a domain is a blueprint with no instructions for which size screws to use.',
       '**Where this is heading:** Chapter 2 opens with derivatives. Every optimization problem you will encounter — minimizing cost, maximizing area, finding the most efficient shape — uses exactly the four-step process from this lesson, followed by differentiation. This lesson is the setup; Chapter 2 is the payoff.',
+        ],
+      },
+      { type: 'image', src: limitApproachUrl, alt: 'Curve showing limit behavior for a modeled function', caption: 'Mathematical models use limits to describe continuous change from discrete data points.' },
     ],
     callouts: [
       {

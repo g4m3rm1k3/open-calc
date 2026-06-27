@@ -1,3 +1,4 @@
+import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
 export default {
   id: 'ch1-infinite-limits-vertical-asymptotes',
   slug: 'infinite-limits-vertical-asymptotes',
@@ -63,6 +64,7 @@ export default {
                 '"Limits at infinity" are covered separately in lesson 05. Do not confuse them.',
         },
       },
+      { type: 'image', src: limitsInfinityUrl, alt: 'Three cases for limits at infinity based on polynomial degree comparison', caption: 'Vertical asymptotes occur where the denominator is zero and the numerator is not.' },
     ],
   },
 

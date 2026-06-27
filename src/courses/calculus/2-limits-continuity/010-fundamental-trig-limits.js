@@ -1,3 +1,4 @@
+import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 export default {
   id: "ch1-fundamental-trig-limits",
   slug: "fundamental-trig-limits",
@@ -27,7 +28,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "These two limits are not random facts to memorize. They are the translation layer between geometry and analysis.",
 
       "First pillar: lim(x->0) sin(x)/x = 1. This says that for very small angles x (in radians), sin(x) and x are nearly identical. " +
@@ -43,6 +47,9 @@ export default {
 
       "Most exam problems are not the base limits themselves. They are pattern variations like sin(7x)/(3x), (1-cos(5x))/x, (tan x - sin x)/x^3, or compositions. " +
         "Mastering pattern conversion is what makes trig week feel easy.",
+        ],
+      },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing sin(θ)/θ approaching 1 as θ approaches 0', caption: 'The limit lim(θ→0) sin(θ)/θ = 1 is proved geometrically from the unit circle and is the foundation of all trig derivatives.' },
     ],
     callouts: [
       {

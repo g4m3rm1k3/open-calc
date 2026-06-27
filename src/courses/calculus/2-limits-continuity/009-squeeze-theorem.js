@@ -1,3 +1,4 @@
+import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
 export default {
   id: 'ch1-squeeze-theorem',
   slug: 'squeeze-theorem',
@@ -20,7 +21,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Picture a hot dog inside a bun. As you carry the bun to your mouth, the hot dog comes along for the ride — it has no choice. It doesn\'t matter if the hot dog is wiggling, spinning, or vibrating inside the bun. If the top and bottom of the bun both arrive at the same destination, the hot dog arrives there too.',
 
       'Mathematically: suppose g(x) ≤ f(x) ≤ h(x) for all x near c (except possibly at c itself). If both g(x) → L and h(x) → L as x → c, then f(x) → L as well. The function f is "squeezed" between g and h.',
@@ -30,6 +34,9 @@ export default {
       '**The standard pattern**: if q(x) is bounded (|q(x)| ≤ M for some constant M) and p(x) → 0, then p(x)·q(x) → 0. This is because −M·|p(x)| ≤ p(x)·q(x) ≤ M·|p(x)|, and both bounds → 0. This handles cases like x·sin(1/x), x²·cos(1/x), and √x·sin(1/x).',
 
       'Harold Jacobs likened this to a child walking between two parents who both turn into a doorway: the child enters the doorway too, no matter how much they zigzag. The key insight is that the child\'s freedom shrinks to zero — the two boundaries converge to the same point, leaving no room for anything else.',
+        ],
+      },
+      { type: 'image', src: limitApproachUrl, alt: 'Three curves converging to the same limit, illustrating the squeeze', caption: 'If g(x) ≤ f(x) ≤ h(x) and g and h share the same limit L, then f is squeezed to L.' },
     ],
     callouts: [
       {

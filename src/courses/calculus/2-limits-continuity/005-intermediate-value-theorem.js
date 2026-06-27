@@ -1,3 +1,4 @@
+import continuityUrl from '../diagrams/calc-continuity.svg?url';
 export default {
   id: 'ch1-ivt',
   slug: 'intermediate-value-theorem',
@@ -25,7 +26,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**The core idea is about continuous motion.** If you are walking along a path and you end up higher than where you started, you must have passed through every height in between. You cannot jump. You cannot teleport. You must go through every intermediate value.',
 
       'Mathematically: if $f$ is continuous on $[a, b]$, and $f(a) = 2$ and $f(b) = 7$, then $f$ must take every value between 2 and 7 somewhere in $(a, b)$. Want to know if $f$ ever equals 5? Yes — guaranteed. Does $f$ equal 3.14159? Yes. Does $f$ equal 6.9999? Yes. Every single value between 2 and 7 is hit at least once.',
@@ -39,6 +43,9 @@ export default {
       '**The IVT is secretly a theorem about connected sets.** In topology, the IVT says that the continuous image of a connected set is connected. The interval $[a, b]$ is connected (it has no gaps), so its image under $f$ must also be connected (no gaps), which means the image must contain every value between $f(a)$ and $f(b)$. This "big picture" view explains why the theorem is true at a deep level.',
 
       '**Real-world applications are everywhere.** In economics: if supply exceeds demand at price $p_1$ and is less than demand at price $p_2$, there must be an equilibrium price between them. In engineering: if a beam deflects upward at one end and downward at another under a load, it has a neutral point in between. In medicine: if body temperature was 98.6°F at 8am and 103°F at noon, it passed through every temperature in between — so doctors can say "the fever first reached 101°F sometime between 8am and noon."',
+        ],
+      },
+      { type: 'image', src: continuityUrl, alt: 'Continuous curve connecting two points, proving a middle value is hit', caption: 'A continuous function on [a,b] hits every value between f(a) and f(b) — it cannot jump over them.' },
     ],
     callouts: [
       {

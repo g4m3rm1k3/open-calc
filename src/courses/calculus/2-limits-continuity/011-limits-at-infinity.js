@@ -1,3 +1,4 @@
+import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
 export default {
   id: 'ch1-limits-at-infinity',
   slug: 'limits-at-infinity',
@@ -15,7 +16,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** You have spent this chapter studying limits near a finite point — what does f(x) do as x approaches some number a? The Fundamental Trig Limits lesson pushed that machinery to its limits (literally) by squeezing tricky expressions into known patterns. Now the chapter turns in a different direction: instead of asking what happens as x approaches a finite value, we ask what happens as x grows without bound. This is the other half of the limit story.',
 
       'The key mental shift is this: a limit at infinity is NOT about plugging in x = ∞. Infinity is not a number, and you cannot substitute it. Instead, lim(x→∞) f(x) = L is a statement about a trend — it says that f(x) gets and stays arbitrarily close to L once x is large enough. The graph of f might wiggle, dip, and spike at small values of x while still having a completely predictable long-run destination.',
@@ -31,6 +35,9 @@ export default {
       'The growth-rate hierarchy is a fact worth memorizing once and using forever: for large x, logarithms grow slowest, then powers of x (like x², x^10), then exponentials (like eˣ, 2ˣ). In race notation: ln(x) ≪ xᵃ ≪ bˣ for any a > 0 and b > 1. This means lim(x→∞) ln(x)/x = 0 (polynomial wins over log), and lim(x→∞) x¹⁰⁰/eˣ = 0 (exponential wins over any polynomial, even x to the hundredth power). These facts come up constantly in later chapters.',
 
       '**Where this is heading:** Limits at infinity give you horizontal and slant asymptotes — two of the five key features used in curve sketching in Chapter 3. In Chapter 3 you will also meet L\'Hôpital\'s Rule, which handles ∞/∞ and 0/0 indeterminate forms that the degree-comparison technique cannot reach. Everything in this lesson is prerequisite for that tool.',
+        ],
+      },
+      { type: 'image', src: limitsInfinityUrl, alt: 'Three cases for rational function limits at infinity based on degree comparison', caption: 'Compare numerator vs. denominator degree: smaller wins (→0), equal (→ratio), larger (→∞).' },
     ],
     callouts: [
       {

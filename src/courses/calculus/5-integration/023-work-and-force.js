@@ -1,3 +1,4 @@
+import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 export default {
   id: 'ch4-work',
   slug: 'work-and-force',
@@ -20,7 +21,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'In basic physics, Work = Force × Distance, but only when force is constant and motion is in one direction. When the force F(x) varies with position x, the work over a small displacement dx is dW = F(x) dx. Summing up all these tiny work contributions gives W = ∫ₐᵇ F(x) dx. This is the fundamental work integral — force is the integrand, and we integrate over displacement.',
 
       'Springs are the most common variable-force application. Hooke\'s Law says the restoring force of a spring is F = kx, where x is the displacement from natural length and k is the spring constant (in N/m). To stretch a spring from x=0 to x=d, the work is W = ∫₀ᵈ kx dx = (1/2)kd². The quadratic result (not linear) reflects that the force itself grows with displacement — you must do more work per additional millimeter the further you stretch.',
@@ -32,6 +36,9 @@ export default {
       'Hydrostatic force (pressure force) on a submerged surface: water pressure at depth d is P = ρgd (force per unit area). For a vertical dam gate with width w(y) at depth d = (H−y) (where H is the water surface height and y is measured from the bottom), the force on a thin strip at height y is dF = P·dA = ρg(H−y)·w(y)·dy. Total force = ∫₀ᴴ ρg(H−y)·w(y) dy. This is structurally identical to the pumping integral — the same "distance to the top" factor (H−y) appears.',
 
       'The unifying insight across all these applications: integration is the tool whenever something accumulates with a varying rate. Work accumulates at rate F(x) per unit displacement. Hydrostatic force accumulates at rate P(y)·w(y) per unit height. The integral "sums up" infinitely many infinitesimal contributions, each involving a different value of the varying quantity. This is the same conceptual move as area, volume, and all other applications of the integral.',
+        ],
+      },
+      { type: 'image', src: riemannSumUrl, alt: 'Variable force summed over distance slices to compute total work', caption: 'Work = ∫F(x) dx — a Riemann sum of force × tiny displacement, exact in the limit.' },
     ],
     callouts: [
       {

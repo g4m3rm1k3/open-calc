@@ -1,3 +1,4 @@
+import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
 export default {
   id: 'ch0-integrated-review',
   slug: 'integrated-review',
@@ -23,13 +24,19 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'This review is intentionally visual first. Before formulas, ask three questions: what quantity is changing, what constrains it, and what graph best encodes the constraint.',
       'Prealgebra gives constraint language: intervals, inequalities, and absolute value as distance. If a dimension target is 20 ± 0.1 mm, |x - 20| <= 0.1 is not symbolic decoration; it is a geometric tube around acceptable values.',
       'Precalc gives shape language: lines for constant rates, parabolas for constant acceleration models, exponentials for proportional growth, and trig functions for periodic behavior. Matching scenario to shape is the core modeling step.',
       'A strong workflow is: visualize -> model -> compute -> interpret units. The interpretation step is where many learners skip and lose intuition. Every result must answer: what does this number mean physically or financially?',
       'In a textbook-style sequence, this chapter should end with fluent model recognition and algebraic solving. Calculus enters later as a refinement of these same ideas, not as a replacement for them.',
       'This chapter acts as a bridge: you are not re-memorizing isolated formulas; you are building a reusable map from real systems to mathematical structures.'
+        ],
+      },
+      { type: 'image', src: limitApproachUrl, alt: 'Curve with left and right approach arrows converging — the core limit picture', caption: 'Calculus rests on limits; the prerequisites ensure every tool needed to evaluate them is in place.' },
     ],
     callouts: [
       {

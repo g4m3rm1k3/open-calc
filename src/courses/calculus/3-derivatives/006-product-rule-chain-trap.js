@@ -1,3 +1,4 @@
+import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
 export default {
   id: 'ch2-004b',
   slug: 'product-rule-chain-trap',
@@ -31,7 +32,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** You just learned both the product rule and the chain rule. They are separate tools, each correct on its own. This lesson exists for one reason only: to show you what happens when you combine them carelessly — and to give you a workflow that prevents the mistake permanently. The trap is not about forgetting a formula; it is about the order in which you complete steps.',
 
       '**The trap, stated precisely:** When you apply the product rule h\'(x) = u\'v + uv\' to a function h(x) = u(x)·v(x), every term is a multiplication of already-completed derivatives. If v(x) is itself a composite function — meaning v(x) = f(g(x)) for some inner function g — then v\'(x) REQUIRES the chain rule: v\'(x) = f\'(g(x))·g\'(x). Stopping at just the outer derivative f\'(g(x)) and skipping the multiplication by g\'(x) is the trap. The algebra looks plausible, the answer has the right shape, but it is numerically wrong at every single point.',
@@ -47,6 +51,9 @@ export default {
       '**Second worked example — h(x) = e^(2x) · (x³ − 1)²:** Step 1 — choose u = e^(2x) and v = (x³ − 1)². Step 2 — compute u\' fully: u = e^(2x) is a composition with outer e^(·) and inner 2x, so u\' = e^(2x)·2 = 2e^(2x). Step 3 — compute v\' fully: v = (x³ − 1)² is a composition with outer (·)² and inner (x³ − 1), so v\' = 2(x³ − 1)·3x² = 6x²(x³ − 1). Step 4 — assemble: h\'(x) = [2e^(2x)]·(x³ − 1)² + e^(2x)·[6x²(x³ − 1)]. Factor out the common e^(2x)(x³ − 1) to simplify: h\'(x) = e^(2x)(x³ − 1)[2(x³ − 1) + 6x²] = e^(2x)(x³ − 1)(2x³ + 6x² − 2). Both u\' and v\' required chain rule, and both were completed before assembly.',
 
       '**Pattern recognition — how to know when v\' needs chain rule:** Ask one question about v before you differentiate it: "Is the thing I am differentiating a simple power xⁿ, or does it contain a sub-expression inside?" If v is simply xⁿ, power rule alone suffices. If v is ANYTHING composed with something other than x — like sin(3x), e^(2x), (x³−1)², ln(x²+1), arctan(5x) — then the chain rule is mandatory. The tell-tale sign is: do I see a function applied to something that is not just plain x? If yes, chain rule is required for v\'.',
+        ],
+      },
+      { type: 'image', src: chainRuleUrl, alt: 'Function composition pipeline highlighting where the chain rule applies', caption: 'The chain trap: (f·g)′ ≠ f′·g′ — the product rule is needed, not the chain rule.' },
     ],
     callouts: [
       {

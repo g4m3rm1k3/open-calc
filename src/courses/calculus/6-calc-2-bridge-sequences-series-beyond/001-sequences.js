@@ -1,3 +1,4 @@
+import sequencesUrl from '../diagrams/calc-sequences.svg?url';
 // FILE: src/content/chapter-5/00-sequences.js
 export default {
   id: 'ch5-sequences',
@@ -15,7 +16,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       `**What is a sequence?** A sequence is an ordered, infinite list of real numbers: $a_1, a_2, a_3, \\ldots$ We write it $\\{a_n\\}$ or $\\{a_n\\}_{n=1}^{\\infty}$. Each $a_n$ is called a **term**. Three key points: (1) order matters — $1, 2, 3, \\ldots$ and $3, 1, 2, \\ldots$ are different sequences; (2) repetition is allowed — $1, 1, 1, \\ldots$ is a valid sequence; (3) a sequence is just a function $a:\\mathbb{N}\\to\\mathbb{R}$, so $a_n = a(n)$. That last point is powerful: it lets us reuse every limit tool from Calc 1 on sequences.`,
 
       `**What does "convergence" mean — intuitively?** A sequence converges to $L$ if the terms get closer and closer to $L$ and *stay* close. Picture a thermometer reading a cooling object: each reading is closer to room temperature than the last, and once the readings are within half a degree of room temperature they never leave that window again. The window can be made as narrow as you like — that "any window, however narrow" idea is exactly the formal definition. A sequence that does NOT settle at any single value is said to **diverge**.`,
@@ -29,6 +33,9 @@ export default {
       `**Monotone Convergence Theorem — existence without a formula.** Sometimes you can prove a sequence converges without ever finding the limit. The theorem says: if a sequence is (a) monotone (always going in one direction) and (b) bounded (never escaping a finite interval), then it must converge. The intuition: a sequence moving in one direction inside a bounded box has no choice but to converge to the wall it's approaching. This is the existence theorem behind recursive sequences — you prove convergence first, then *set* $L = f(L)$ and solve.`,
 
       `**Recursive sequences — finding the limit.** Many real sequences are defined by a rule $a_{n+1} = f(a_n)$. To find the limit: step 1, prove the sequence converges (Monotone Convergence Theorem — show it's monotone and bounded). Step 2, take limits on both sides of the recursion: since $a_{n+1} \\to L$ and $a_n \\to L$, the rule becomes $L = f(L)$. Step 3, solve for $L$. Warning: step 2 is only valid *after* step 1. If you skip the proof of convergence, you might "solve" for a limit that doesn't exist.`,
+        ],
+      },
+      { type: 'image', src: sequencesUrl, alt: 'Convergent (1/n → 0) and divergent (−1)ⁿ sequences plotted', caption: 'A sequence converges if its terms approach a finite limit L; otherwise it diverges.' },
     ],
     callouts: [
       {

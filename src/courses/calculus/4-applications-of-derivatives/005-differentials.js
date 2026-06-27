@@ -1,3 +1,4 @@
+import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 // FILE: src/content/chapter-3/07-differentials.js
 export default {
   id: 'ch3-070',
@@ -15,7 +16,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "Linear approximation says Δy ≈ f'(a)Δx for small changes. Differentials are that same idea given formal mathematical names: we write dx for the independent change (an infinitesimal nudge in x) and dy = f'(x)dx for the dependent change (how y responds along the tangent line). The notation is not just cosmetic — it is the same Leibniz notation you have used for derivatives since Chapter 2. In fact, dy/dx being a 'fraction of differentials' that you can cancel is why the chain rule and substitution rule work the way they do. This lesson makes that informal intuition precise.",
       "You already know linear approximation: $f(x + \\Delta x) \\approx f(x) + f'(x) \\cdot \\Delta x$ when $\\Delta x$ is small. Differentials repackage this idea with a subtle but important shift in emphasis. Instead of approximating the value of $f$ at a nearby point, we approximate the change in $f$. The actual change is $\\Delta y = f(x + \\Delta x) - f(x)$. The approximate change is $dy = f'(x)\\,dx$, where $dx = \\Delta x$ is the change in $x$. The approximation says $\\Delta y \\approx dy$ when $dx$ is small.",
       "What are $dx$ and $dy$ as standalone objects? Think of $dx$ as an independent variable — it represents an arbitrary (small) increment in $x$. Given $dx$, the differential $dy = f'(x)\\,dx$ is defined to be the change along the tangent line, not the change along the curve. The actual change $\\Delta y$ follows the curve; the differential $dy$ follows the tangent. For small $dx$, the tangent and the curve are nearly identical, so $\\Delta y \\approx dy$.",
@@ -24,6 +28,9 @@ export default {
       "Relative error is often more meaningful than absolute error. If you measure a length as 100 m $\\pm$ 1 m, the relative error is $1/100 = 1\\%$. If you measure it as 10 m $\\pm$ 1 m, the relative error is $1/10 = 10\\%$ — much worse, even though the absolute error is the same. The relative error in $y$ is $\\frac{dy}{y} = \\frac{f'(x)}{f(x)}\\,dx$. For $y = x^n$, this gives $\\frac{dy}{y} = n\\frac{dx}{x}$: the relative error in $x^n$ is $n$ times the relative error in $x$. A 1\\% error in the radius of a sphere produces a 3\\% error in its volume ($V \\propto r^3$).",
       "Differentials also connect derivatives to integrals conceptually. The equation $dy = f'(x)\\,dx$ says that the total change in $y$ is the accumulation of tiny changes $f'(x)\\,dx$. Summing these infinitesimal changes from $a$ to $b$ gives $\\int_a^b f'(x)\\,dx = f(b) - f(a)$ — the Fundamental Theorem of Calculus. The integral literally sums up the differentials. This is why the notation $\\int f(x)\\,dx$ includes the $dx$: you are summing products $f(x) \\cdot dx$ over the interval.",
       "In multiple dimensions, the story generalizes beautifully. If $f$ depends on several variables, $df = \\frac{\\partial f}{\\partial x}dx + \\frac{\\partial f}{\\partial y}dy + \\cdots$. This is the total differential, and it captures how errors in multiple measurements combine. Each partial derivative is an error amplification factor for its respective variable. This is the foundation of uncertainty propagation in experimental science.",
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Tangent line showing dy vs. Δy for a small change dx', caption: 'Differentials dy = f′(x) dx approximate the actual change Δy — useful for error estimation.' },
     ],
     callouts: [
       {

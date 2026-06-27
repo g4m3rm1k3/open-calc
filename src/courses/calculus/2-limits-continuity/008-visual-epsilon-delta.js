@@ -1,3 +1,4 @@
+import epsilonDeltaUrl from '../diagrams/calc-epsilon-delta.svg?url';
 export default {
   id: 'ch1-visual-epsilon-delta',
   slug: 'visual-epsilon-delta',
@@ -17,7 +18,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**The Core Idea**  ' +
       'An ε–δ limit proof says: "For every y-tolerance (ε), there exists an x-tolerance (δ) such that if the input is within δ of point a, the output is guaranteed within ε of limit L."  ' +
       'Graphically, this translates to: draw a horizontal y-tolerance band, find where the curve exits it, and measure the x-distance back to point a.',
@@ -41,6 +45,9 @@ export default {
       '**Behavior Near the Limit Point**  ' +
       'The procedure reveals a profound fact: close enough to a, the function stays within the band. ' +
       'The exact function form (linear, curved, wiggly) determines how close you need to be, but the method is universal.',
+        ],
+      },
+      { type: 'image', src: epsilonDeltaUrl, alt: 'ε-δ adversary game showing input band vs. output band', caption: 'Think of ε-δ as a game: the adversary picks ε, you must find δ that keeps outputs within ε of L.' },
     ],
     callouts: [
       {

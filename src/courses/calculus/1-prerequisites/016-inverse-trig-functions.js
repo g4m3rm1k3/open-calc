@@ -1,3 +1,4 @@
+import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 export default {
   id: 'ch0-inverse-trig-functions',
   slug: 'inverse-trig-functions',
@@ -72,6 +73,7 @@ export default {
           'arctan(x) has two horizontal asymptotes: y = −π/2 as x → −∞, and y = π/2 as x → +∞.',
         ],
       },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing angle and its trig values for inverse functions', caption: 'Inverse trig functions answer "what angle gives this ratio?" — reading the unit circle backwards.' },
     ],
   },
 

@@ -1,3 +1,4 @@
+import polarUrl from '../diagrams/calc-polar.svg?url';
 // FILE: src/content/chapter-6/01-polar-coordinates.js
 export default {
   id: 'ch6-polar',
@@ -16,7 +17,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Cartesian coordinates describe a point by how far right (x) and how far up (y) it is from the origin. Polar coordinates describe the same point by how far away (r) and at what angle (theta) it is from the origin. Both systems label every point in the plane; neither is "better" in general. But some curves have simple equations in one system and horrific equations in the other. A circle centered at the origin is x^2 + y^2 = a^2 in Cartesian — manageable. In polar it is simply r = a — one symbol. A spiral is nightmarish in Cartesian but trivially r = theta in polar.',
       'The conversion formulas are immediate from trigonometry. If a point is at distance r from the origin at angle theta from the positive x-axis, then its Cartesian coordinates are x = r*cos(theta) and y = r*sin(theta). Going the other way: r = sqrt(x^2 + y^2) and tan(theta) = y/x (with appropriate quadrant adjustments). These are not new — they are the same relationships you used in trigonometry class. The new idea is using (r, theta) as the primary coordinates.',
       'A polar equation r = f(theta) describes a curve by specifying how far from the origin the point is at each angle. To plot it, think of a searchlight beam sweeping counterclockwise: at each angle theta, the curve reaches out to distance f(theta). When f(theta) < 0, the point is plotted in the opposite direction — through the origin and out the other side. This sign convention takes some practice but is essential for understanding curves like rose curves where r alternates sign.',
@@ -24,6 +28,9 @@ export default {
       'Rose curves r = cos(n*theta) produce stunning petal patterns. When n is odd, the curve has n petals. When n is even, it has 2n petals. Each petal is traced as theta sweeps through an interval of width pi/n. The petals are equally spaced around the origin, and their tips lie on the circle r = 1. These curves appear in vibration patterns of circular membranes (like drumheads) and in the radiation patterns of phased array antennas.',
       'Limacons r = a + b*cos(theta) generalize the cardioid. When a = b, you get a cardioid. When a > b, the curve is a dimpled or convex limacon (no inner loop). When a < b, the curve has an inner loop — the curve crosses through the origin twice, creating a loop inside the outer boundary. The ratio a/b controls the shape continuously from a circle (a >> b) through a cardioid (a = b) to a looped limacon (a < b).',
       'Symmetry tests simplify graphing. If replacing theta with -theta leaves the equation unchanged, the curve is symmetric about the polar axis (x-axis). If replacing theta with pi - theta leaves it unchanged, the curve is symmetric about the line theta = pi/2 (y-axis). If replacing r with -r leaves it unchanged, the curve is symmetric about the origin. These tests can halve or quarter the work of plotting a polar curve.',
+        ],
+      },
+      { type: 'image', src: polarUrl, alt: 'Cardioid r=1+cos(θ) on a polar grid with Cartesian comparison', caption: 'Polar coordinates (r, θ) locate points by distance and angle, making circular curves simple.' },
     ],
     callouts: [
       {

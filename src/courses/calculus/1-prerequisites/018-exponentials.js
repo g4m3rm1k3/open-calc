@@ -1,3 +1,4 @@
+import expLogUrl from '../diagrams/calc-exp-log.svg?url';
 export default {
   id: 'ch0-exponentials',
   slug: 'exponentials',
@@ -18,7 +19,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'You already understand exponential growth — you just might not know it yet. If someone offered you a choice between $1,000,000 today or a penny that doubles every day for 30 days, which would you choose? The penny starts laughably small: 1¢, 2¢, 4¢, 8¢… After 10 days you have only $5.12. After 20 days, $5,242.88. But after 30 days? $5,368,709.12 — over five million dollars. That is the power of exponential growth: it starts slow and then explodes.',
       'Doubling repeatedly: 1 → 2 → 4 → 8 → 16 → … After n doublings you have 2ⁿ. This is exponential growth with base 2. The base determines how fast things grow. Base 3 would give you 1 → 3 → 9 → 27 → 81 (faster), while base 1.1 gives you 1 → 1.1 → 1.21 → 1.331 (slower but still exponential).',
       'Here is the key idea that makes exponential functions special: **the rate of growth is proportional to the current size**. A colony of 1,000 bacteria doubling means 1,000 new bacteria. A colony of 1,000,000 doubling means 1,000,000 new bacteria. The bigger it is, the faster it grows. This is fundamentally different from linear growth (adding the same amount each time) or quadratic growth (adding an increasing but predictable amount).',
@@ -27,6 +31,9 @@ export default {
       'The **natural logarithm** ln(x) = log_e(x) is the inverse of e^x. If you want to "undo" e^x, apply ln. If you want to "undo" ln(x), apply e^x. These two functions are perfect mirrors: ln(e^x) = x and e^(ln x) = x.',
       'Logarithms turn multiplication into addition, division into subtraction, and powers into multiplication. This made them the primary tool for computation before calculators — and they still appear everywhere in calculus, physics, information theory, and music (decibels and pitch intervals are logarithmic).',
       'Exponential **decay** is just growth with a negative exponent: e^(-x) shrinks as x increases. Radioactive half-lives, cooling objects, and drug concentration in the bloodstream all follow exponential decay. If something has a half-life of T hours, after t hours you have (1/2)^(t/T) of the original — which is the same as e^(-t·ln2/T).',
+        ],
+      },
+      { type: 'image', src: expLogUrl, alt: 'Exponential and logarithm curves as inverse functions', caption: 'Exponential growth is constant percentage change; the natural log reverses it.' },
     ],
     callouts: [
       {

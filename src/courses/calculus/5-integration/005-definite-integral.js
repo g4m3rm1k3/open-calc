@@ -1,3 +1,4 @@
+import ftcUrl from '../diagrams/calc-ftc.svg?url';
 // FILE: src/content/chapter-4/02-definite-integral.js
 export default {
   id: "ch4-002",
@@ -28,13 +29,19 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'The definite integral ∫ₐᵇ f(x) dx is a single real number. It measures signed area: regions where f > 0 contribute positively, regions where f < 0 contribute negatively. The "signed" aspect is essential for physics — velocity can be negative (motion in the opposite direction), and the signed area gives displacement (net change in position), not total distance. Keeping track of signs is not a complication; it is the feature that makes the integral physically meaningful.',
       'Linearity is the most useful property in practice. ∫ₐᵇ [c·f(x) + g(x)] dx = c·∫ₐᵇ f(x) dx + ∫ₐᵇ g(x) dx. This means you can split a complicated integral into simpler pieces. To compute ∫₀² (3x² + 5√x) dx, you can compute ∫₀² 3x² dx and ∫₀² 5√x dx separately and add. Any polynomial, any sum of trigonometric functions, any linear combination of integrable functions can be integrated piece by piece. Linearity is the reason integration is "not that hard" for elementary functions.',
       "The interval additivity property ∫ₐᶜ f = ∫ₐᵇ f + ∫ᵦᶜ f allows you to break the domain of integration anywhere. To compute ∫₋₂⁵ f, split at x = 0: ∫₋₂⁰ f + ∫₀⁵ f. This is powerful when f behaves differently on different sub-intervals (for example, if f has a corner at 0, or changes sign at 0). For |f(x)| dx (total area), split at every zero of f and negate the negative pieces: ∫|f| = ∫₍positive regions₎ f − ∫₍negative regions₎ f.",
       "Symmetry is the most elegant shortcut for computing integrals. For an ODD function — one satisfying f(−x) = −f(x) — the graph is symmetric about the origin. The area above the x-axis on [0, b] is exactly canceled by the equal-and-opposite area below the x-axis on [−b, 0]. Therefore ∫₋ₐᵃ f(x) dx = 0 for any odd function integrated over a symmetric interval. For an EVEN function — f(−x) = f(x), symmetric about the y-axis — the areas on [−a, 0] and [0, a] are equal, so ∫₋ₐᵃ f(x) dx = 2∫₀ᵃ f(x) dx. These shortcuts save enormous computational effort.",
       'The average value of f on [a, b] is defined as f_avg = (1/(b−a)) ∫ₐᵇ f(x) dx. This is the continuous analog of the arithmetic mean (average) of a list of numbers: instead of summing n values and dividing by n, we integrate the function and divide by the interval length. Geometrically, f_avg is the height of the rectangle with base [a, b] that has exactly the same area as the region under f. The rectangle is the "flattened-out" version of f.',
       "The Mean Value Theorem for Integrals guarantees that f_avg is actually attained by f somewhere in (a, b), not just an abstract average. If f is continuous, then there exists at least one point c ∈ (a, b) where f(c) = f_avg. This is deeply intuitive: the continuous function must pass through its average. For f(x) = x² on [0, 3], f_avg = (1/3)∫₀³ x² dx = (1/3)(9) = 3. The equation f(c) = 3 gives c² = 3, so c = √3 ≈ 1.73. The function x² takes the value 3 at x = √3, which is inside (0, 3), exactly as the theorem predicts.",
+        ],
+      },
+      { type: 'image', src: ftcUrl, alt: 'FTC diagram showing area accumulation A(x) and evaluation F(b) − F(a)', caption: 'The definite integral is a limit of Riemann sums and represents the signed area under f on [a, b].' },
     ],
     callouts: [
       {

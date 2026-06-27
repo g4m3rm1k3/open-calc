@@ -1,3 +1,4 @@
+import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 // FILE: src/content/chapter-4/00c-summation-notation.js
 export default {
   id: "ch4-000c",
@@ -58,7 +59,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "**What sigma notation is.** The symbol $\\Sigma$ (capital Greek sigma) means 'sum.' A sigma expression has four parts: the symbol $\\Sigma$, a lower bound written below it, an upper bound written above it, and a formula to the right — called the summand. The expression $\\displaystyle\\sum_{i=1}^{n} a_i$ means: substitute $i = 1$ into $a_i$, then $i = 2$, then $i = 3$, all the way up to $i = n$, and add all the results. The letter $i$ is the **index of summation** — it is a dummy variable that exists only inside the sum and disappears when evaluated.",
 
       "**Reading it out loud.** $\\displaystyle\\sum_{i=1}^{5} i^2$ is read: 'the sum from $i$ equals one to five of $i$ squared.' Expanding: $1^2 + 2^2 + 3^2 + 4^2 + 5^2 = 1 + 4 + 9 + 16 + 25 = 55$. The index $i$ starts at the bottom number, increases by 1 each step, and stops when it hits the top number. If the bottom number equals the top number, there is exactly one term. If the bottom number exceeds the top, the convention is an empty sum equal to 0.",
@@ -74,6 +78,9 @@ export default {
       "**Telescoping sums.** When consecutive terms cancel, a sum collapses dramatically. If $a_i = b_{i+1} - b_i$ for some sequence $b$, then:\n$$\\sum_{i=1}^{n} a_i = \\sum_{i=1}^{n}(b_{i+1} - b_i) = b_{n+1} - b_1$$\nThis is because every intermediate term appears once as $+b_k$ and once as $-b_k$, leaving only the first and last:\n$$(b_2 - b_1) + (b_3 - b_2) + (b_4 - b_3) + \\cdots + (b_{n+1} - b_n) = b_{n+1} - b_1$$\nThe $\\sum_{i=1}^n i^2$ identity can be proved by telescoping a cleverly chosen sequence.",
 
       "**Connection to Riemann sums.** The right-endpoint Riemann sum for $\\int_a^b f(x)\\,dx$ with $n$ equal subdivisions is:\n$$R_n = \\sum_{i=1}^{n} f\\!\\left(a + i\\,\\frac{b-a}{n}\\right) \\cdot \\frac{b-a}{n}$$\nEvery symbol here means something: the $\\sum$ tells us to add $n$ terms; $a + i\\cdot\\frac{b-a}{n}$ is the right endpoint of the $i$-th rectangle; $\\frac{b-a}{n}$ is the width $\\Delta x$; $f(\\cdot)$ is the height. To compute $\\lim_{n\\to\\infty} R_n$ exactly for polynomial $f$, you expand using linearity, apply the closed-form identities, then take the limit — and you get the exact integral without any guesswork.",
+        ],
+      },
+      { type: 'image', src: riemannSumUrl, alt: 'Riemann sum diagram with Σ notation labeled', caption: 'Summation notation Σ compactly expresses the sum of many rectangle areas.' },
     ],
     callouts: [
       {

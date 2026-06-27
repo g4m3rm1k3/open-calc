@@ -1,3 +1,4 @@
+import conicSectionsUrl from '../diagrams/calc-conic-sections.svg?url';
 export default {
   id: 'ch0-conic-sections',
   slug: 'conic-sections',
@@ -16,12 +17,18 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Conic sections are what you get by slicing a cone with a plane: circle, ellipse, parabola, or hyperbola.',
       'Each family has two views: an algebraic quadratic equation and a geometric distance rule. Both matter.',
       'Circle: fixed distance from one center. Ellipse: fixed sum of distances to two foci. Hyperbola: fixed absolute difference of distances to two foci. Parabola: equal distance to focus and directrix.',
       'Completing the square is the decoder that turns expanded equations into standard forms where centers, vertices, and axes are visible.',
       'This is not isolated algebra. Conic structure appears in optimization constraints, implicit differentiation, and substitution patterns in integration.',
+        ],
+      },
+      { type: 'image', src: conicSectionsUrl, alt: 'The three conic sections: parabola, ellipse, and hyperbola', caption: 'Each conic is a cross-section of a double cone, defined by its distance relationship to foci.' },
     ],
     callouts: [
       {

@@ -1,3 +1,4 @@
+import numberLineUrl from '../diagrams/calc-number-line.svg?url';
 export default {
   id: 'ch0-inequalities',
   slug: 'inequalities',
@@ -31,6 +32,7 @@ export default {
       { type: 'viz', id: 'VideoEmbed', title: 'Rational Inequalities', props: { url: "" } },
       { type: 'prose', paragraphs: ['**Absolute value inequalities** connect to distance on the number line. $|x - a| < r$ means "x is within distance r of a," which gives the interval $(a-r, a+r)$. $|x - a| > r$ means "x is more than distance r from a," giving two rays: $(-\\infty, a-r) \\cup (a+r, \\infty)$. Master this geometric interpretation and absolute value inequalities become intuitive.'] },
       { type: 'callout', callout: { type: 'tip', title: 'Open vs. Closed at Critical Points', body: 'For strict inequalities (< or >), critical points are excluded (open circles). For non-strict (≤ or ≥), zeros of the numerator are included (filled circles), but zeros of the denominator are ALWAYS excluded.' } },
+      { type: 'image', src: numberLineUrl, alt: 'Number line showing open and closed intervals for inequality solutions', caption: 'Inequalities give ranges, not points; interval notation and number-line graphs show the same solution set.' },
     ],
   },
 

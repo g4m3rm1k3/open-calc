@@ -1,3 +1,4 @@
+import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 export default {
   id: 'ch2-002b',
   slug: 'derivatives-of-inverse-functions',
@@ -29,7 +30,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where you are in the story:** In the last lesson, you saw an inverse-function argument in action: the derivative of ln(x) was found by treating ln as the inverse of e^x, differentiating both sides of e^y = x, and solving. That approach was not a trick — it was a general theorem in disguise. This lesson makes that theorem explicit, proves it geometrically, and then applies it to derive all six inverse trig derivatives.',
 
       '**The central insight:** If f maps x to y, then f⁻¹ maps y back to x. On a graph, f⁻¹ is the reflection of f across the line y = x. Reflection swaps the x and y axes — which means it swaps "rise" and "run" in every slope calculation. So the slope of f⁻¹ at y is the *reciprocal* of the slope of f at x. That is the whole theorem. The rest is applying it carefully.',
@@ -48,6 +52,9 @@ export default {
       '**A practical note: why arcsin and arctan matter for integration:** Knowing the derivatives d/dx[arcsin(x)] = 1/√(1−x²) and d/dx[arctan(x)] = 1/(1+x²) is not just an endpoint — it is a starting point for Chapter 4. Integration reverses differentiation: since d/dx[arctan(x)] = 1/(1+x²), the antiderivative of 1/(1+x²) is arctan(x)+C. Similarly, since d/dx[arcsin(x)] = 1/√(1−x²), the antiderivative of 1/√(1−x²) is arcsin(x)+C. These two integral formulas — ∫1/(1+x²)dx = arctan(x)+C and ∫1/√(1−x²)dx = arcsin(x)+C — appear constantly in calculus applications. Students who memorize the derivative formulas from this chapter recognize these integral patterns immediately in Chapter 4, while students who do not have to re-derive them each time.',
 
       '**Where this is heading:** You have now differentiated polynomials, trig, exponential/log, and inverse functions — a complete toolkit for every fundamental function type. The next lesson takes one final step: what if y is not even written explicitly as a function of x? That is implicit differentiation, and it is simply the chain rule applied to both sides of any equation.',
+        ],
+      },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing inverse trig function domains and ranges', caption: 'The derivative of an inverse function flips the x and y roles: (f⁻¹)′(y) = 1 / f′(f⁻¹(y)).' },
     ],
     callouts: [
       {

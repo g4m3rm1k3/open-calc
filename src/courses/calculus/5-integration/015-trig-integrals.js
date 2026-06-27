@@ -1,3 +1,4 @@
+import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 // FILE: src/content/chapter-4/08-trig-integrals.js
 export default {
   id: 'ch4-008',
@@ -16,7 +17,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'The fundamental challenge with trig integrals is that powers of trig functions are not in the basic antiderivative table. You know $\\int \\sin x\\,dx = -\\cos x$ and $\\int \\cos x\\,dx = \\sin x$, but $\\int \\sin^2 x\\,dx$ is not directly available. The strategy is always the same: use trigonometric identities to convert the integrand into a form you CAN integrate.',
       'For products $\\sin^m x \\cos^n x$, the strategy depends on whether $m$ or $n$ is odd. If one exponent is odd, peel off one factor and use the Pythagorean identity to convert the rest. For example, $\\int \\sin^3 x \\cos^2 x\\,dx$: peel off one $\\sin x$ to get $\\sin^2 x \\cos^2 x \\cdot \\sin x\\,dx$, replace $\\sin^2 x = 1 - \\cos^2 x$, and substitute $u = \\cos x$. The integral becomes a polynomial in $u$.',
       'If BOTH exponents are even, peeling off one factor does not help (it leaves an odd power that cannot be converted using $\\sin^2 + \\cos^2 = 1$ cleanly). Instead, use the half-angle identities: $\\sin^2 x = (1 - \\cos 2x)/2$ and $\\cos^2 x = (1 + \\cos 2x)/2$. These reduce the powers by converting $\\sin^2$ and $\\cos^2$ into first-degree trig functions of $2x$. You may need to apply half-angle identities multiple times for higher even powers.',
@@ -24,6 +28,9 @@ export default {
       'For $\\int \\sec^n x\\,dx$ with even $n$, save a $\\sec^2 x$ factor and convert the rest using $\\sec^2 x = 1 + \\tan^2 x$, then substitute $u = \\tan x$. For odd powers of secant, integration by parts is needed — and $\\int \\sec^3 x\\,dx$ is a famously tricky integral that combines by-parts with the identity $\\sec^2 x = 1 + \\tan^2 x$.',
       'Here is the complete decision flowchart for $\\int \\sin^m x \\cos^n x\\,dx$: (1) If $n$ is odd: save one $\\cos x$, write the rest as $(1-\\sin^2 x)^{(n-1)/2}$, substitute $u = \\sin x$. (2) If $m$ is odd: save one $\\sin x$, write the rest as $(1-\\cos^2 x)^{(m-1)/2}$, substitute $u = \\cos x$. (3) If both are even: use half-angle identities to reduce powers. For $\\int \\tan^m x \\sec^n x\\,dx$: (1) If $n$ is even: save $\\sec^2 x$, convert remaining $\\sec$ to $\\tan$ via $\\sec^2 = 1 + \\tan^2$, substitute $u = \\tan x$. (2) If $m$ is odd: save $\\sec x \\tan x$, convert remaining $\\tan$ to $\\sec$ via $\\tan^2 = \\sec^2 - 1$, substitute $u = \\sec x$.',
       'The Wallis formulas give closed-form results for $\\int_0^{\\pi/2} \\sin^n x\\,dx$ and $\\int_0^{\\pi/2} \\cos^n x\\,dx$. By the reduction formula, $\\int_0^{\\pi/2} \\sin^n x\\,dx = \\frac{n-1}{n}\\cdot\\frac{n-3}{n-2}\\cdots$ The product ends at $\\frac{1}{2}\\cdot\\frac{\\pi}{2}$ if $n$ is even, or at $1$ if $n$ is odd. These formulas are used in physics (computing moments of inertia of spheres) and lead to the beautiful Wallis product for $\\pi$: $\\pi/2 = (2/1)(2/3)(4/3)(4/5)(6/5)(6/7)\\cdots$',
+        ],
+      },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle with trig identities used in trig integrals', caption: 'Trig integrals exploit Pythagorean identities to reduce powers and create substitutable pieces.' },
     ],
     callouts: [
       {

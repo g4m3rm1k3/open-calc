@@ -1,3 +1,4 @@
+import powerRuleUrl from '../diagrams/calc-power-rule.svg?url';
 export default {
   id: 'ch0-partial-fractions-intro',
   slug: 'partial-fractions-intro',
@@ -18,7 +19,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'You already know how to add fractions: $\\frac{1}{x} - \\frac{1}{x+1} = \\frac{(x+1) - x}{x(x+1)} = \\frac{1}{x(x+1)}$. Partial fraction decomposition is the **reverse** of this process. Given the single fraction $\\frac{1}{x(x+1)}$, we want to find that it equals $\\frac{1}{x} - \\frac{1}{x+1}$.',
 
       'Why bother? Because the simple pieces are easy to work with. In calculus, $\\int \\frac{1}{x(x+1)}\\,dx$ looks hard, but $\\int \\frac{1}{x}\\,dx - \\int \\frac{1}{x+1}\\,dx = \\ln|x| - \\ln|x+1| + C$ is straightforward. Partial fractions decompose the hard problem into easy pieces.',
@@ -30,6 +34,9 @@ export default {
       '**Irreducible quadratic factors** (quadratics with no real roots, like $x^2 + 1$) get a linear numerator: $\\frac{Ax + B}{x^2 + 1}$. A constant numerator is not enough because the quadratic factor is degree 2. If the quadratic is repeated, like $(x^2 + 1)^2$, you need: $\\frac{Ax + B}{x^2 + 1} + \\frac{Cx + D}{(x^2 + 1)^2}$.',
 
       'Before decomposing, always check: is the fraction **proper** (degree of numerator < degree of denominator)? If not, perform polynomial long division first to get a polynomial plus a proper fraction. Then decompose the proper fraction.',
+        ],
+      },
+      { type: 'image', src: powerRuleUrl, alt: 'Algebraic decomposition showing partial fraction structure', caption: 'Partial fractions reverse the process of combining fractions over a common denominator.' },
     ],
     callouts: [
       {

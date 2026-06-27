@@ -1,3 +1,4 @@
+import diskWasherUrl from '../diagrams/calc-disk-washer.svg?url';
 export default {
   id: 'ch4-vol-disk',
   slug: 'volumes-disk-washer',
@@ -20,7 +21,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Picture the curve y = f(x) over [a, b]. Grab one end and spin the entire curve 360° around the x-axis. The result is a 3D solid — like a vase or a football. Now imagine slicing that solid with a knife perpendicular to the x-axis at some position x. The slice is a perfect circle (a disk) whose radius equals the height of the original curve: r = f(x). The area of that thin circular slice is πr² = π[f(x)]².',
 
       'To find the total volume, stack infinitely many such slices. A slice of thickness dx has volume dV = π[f(x)]² dx. Summing (integrating) over all x from a to b gives the Disk Method: V = π∫ₐᵇ [f(x)]² dx. The logic mirrors every other integral setup: identify the tiny piece, write its contribution, then integrate.',
@@ -32,6 +36,9 @@ export default {
       'Rotating around a line other than a coordinate axis is common in applications — for example, revolving around y = −1 or around x = 3. The key is that the disk radius is the distance from the curve to the axis of rotation. If rotating y = f(x) around y = k, the radius at x is |f(x) − k|. Always sketch the problem: identify which side of the axis the region lies on, then write the radius as (larger) − (smaller) to keep it positive.',
 
       'Cross-section visualization is the bridge between the 2D curve and the 3D solid. At every x, there is a circle of radius f(x). The 3D solid is the union of all these circles. Moving x across [a, b] sweeps out the entire object. This "known cross-section" viewpoint generalizes far beyond circles — squares, triangles, or any shape can be the cross-section, giving more exotic solids (explored in advanced calculus).',
+        ],
+      },
+      { type: 'image', src: diskWasherUrl, alt: 'Disk and washer cross-sections for volumes of revolution', caption: 'Disk method: V = ∫π[f(x)]² dx. Washer method subtracts the inner radius squared.' },
     ],
     callouts: [
       {

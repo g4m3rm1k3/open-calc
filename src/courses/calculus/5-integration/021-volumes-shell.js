@@ -1,3 +1,4 @@
+import diskWasherUrl from '../diagrams/calc-disk-washer.svg?url';
 export default {
   id: 'ch4-vol-shell',
   slug: 'volumes-shell',
@@ -19,7 +20,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'The disk method slices a solid perpendicular to the rotation axis, producing circular cross-sections. The shell method slices parallel to the rotation axis, producing thin cylindrical shells. Imagine peeling an onion: each layer is a thin cylindrical shell. The total volume of the onion is the sum of all shell volumes. This is the shell method — a completely different decomposition of the same 3D solid.',
 
       'A cylindrical shell has radius r, height h, and wall thickness Δr. Its volume is (outer cylinder) − (inner cylinder) = π(r+Δr)²h − πr²h = π[2rΔr + (Δr)²]h ≈ 2πr·h·Δr for small Δr. Think of unrolling the thin shell into a flat rectangular slab: dimensions are 2πr (circumference) × h (height) × Δr (thickness). Volume = circumference × height × thickness.',
@@ -31,6 +35,9 @@ export default {
       'When rotating around the x-axis using shells, the roles reverse: shells are at height y with radius y (distance from x-axis), height = x-extent of the curve at that y = g(y), and thickness dy. Volume = 2π∫ y·g(y) dy. So shells work in whichever variable is perpendicular to the axis — which is usually the natural function variable.',
 
       'Disk vs. shell decision guide: (1) Is the function given as y=f(x)? If rotating around the x-axis, use disks (integrate in x). If rotating around the y-axis, use shells (integrate in x — no inversion needed). (2) Is the function given as x=g(y)? If rotating around the y-axis, use disks (integrate in y). If rotating around the x-axis, use shells (integrate in y). Both methods always give the same answer; the choice is which integral is easier.',
+        ],
+      },
+      { type: 'image', src: diskWasherUrl, alt: 'Shell method showing cylindrical shells stacked to form the volume', caption: 'Shell method: V = ∫2πx·f(x) dx — sum of thin cylindrical shells rotating around the y-axis.' },
     ],
     callouts: [
       {

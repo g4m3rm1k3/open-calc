@@ -1,3 +1,4 @@
+import vectorsUrl from '../diagrams/calc-vectors.svg?url';
 // FILE: src/content/chapter-6/02-vectors.js
 export default {
   id: 'ch6-vectors',
@@ -22,7 +23,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'A vector is an arrow with two attributes: **magnitude** (its length) and **direction** (which way it points). Two vectors are equal if and only if they have the same magnitude and direction — position does not matter. You can slide a vector anywhere in space and it is still the "same" vector.',
 
       'In coordinates: a 2D vector **v** = ⟨a, b⟩ means "go a units in the x-direction and b units in the y-direction." The magnitude (length) is |**v**| = √(a²+b²) — just the Pythagorean theorem. The direction is the angle θ = arctan(b/a). In 3D: **v** = ⟨a, b, c⟩, |**v**| = √(a²+b²+c²).',
@@ -34,6 +38,9 @@ export default {
       'The **dot product** **u** · **v** = |**u**||**v**|cos(θ) = a₁a₂ + b₁b₂ (+ c₁c₂ in 3D) is a SCALAR. It measures the \"amount of **u** in the direction of **v**\". When **u** ⊥ **v**, cos(θ) = 0 so **u** · **v** = 0. This is the algebraic test for perpendicularity. The dot product also gives the projection of **u** onto **v**: proj_v(**u**) = ((**u**·**v**)/|**v**|²) **v**.',
 
       'The **cross product** **u** × **v** exists in 3D and gives a VECTOR perpendicular to both **u** and **v**, with magnitude |**u**||**v**|sin(θ) (equal to the area of the parallelogram spanned by **u** and **v**). Right-hand rule: curl fingers from **u** toward **v** — thumb points in the direction of **u** × **v**. In components: if **u** = ⟨u₁,u₂,u₃⟩ and **v** = ⟨v₁,v₂,v₃⟩, then **u** × **v** = ⟨u₂v₃−u₃v₂, u₃v₁−u₁v₃, u₁v₂−u₂v₁⟩ (expand a 3×3 determinant).',
+        ],
+      },
+      { type: 'image', src: vectorsUrl, alt: 'Vector addition parallelogram and magnitude/unit-vector diagram', caption: 'Vectors encode both magnitude and direction; addition, scaling, and dot products are the core operations.' },
     ],
     callouts: [
       {

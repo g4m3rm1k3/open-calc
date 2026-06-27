@@ -1,3 +1,4 @@
+import taylorUrl from '../diagrams/calc-taylor.svg?url';
 export default {
   id: 'ch0-01f',
   slug: 'binomial-theorem',
@@ -32,6 +33,7 @@ export default {
         caption: 'Drag the slider to build larger polynomials. Pay extremely close attention to the second block of the output. The coefficient is ALWAYS exactly the power $n$.',
       },
       { type: 'viz', id: 'VideoEmbed', title: 'Binomial Theorem Introduction', props: { url: "" } },
+      { type: 'image', src: taylorUrl, alt: 'Taylor polynomial approximations showing polynomial expansion pattern', caption: 'The binomial theorem is a special case of polynomial expansion — a preview of Taylor series.' },
     ],
   },
 

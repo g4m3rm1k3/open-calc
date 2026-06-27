@@ -1,3 +1,4 @@
+import continuityUrl from '../diagrams/calc-continuity.svg?url';
 export default {
   id: 'ch2-differentiability-vs-continuity',
   slug: 'differentiability-vs-continuity',
@@ -14,7 +15,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       '**What differentiability means geometrically:** A function is differentiable at a point if the graph looks like a straight line when you zoom in close enough. This is the "local linearity" interpretation. Every differentiable function, no matter how curved it is globally, becomes indistinguishable from its tangent line at a microscopic scale.',
 
       '**What can go wrong.** There are exactly three ways a continuous function can fail to be differentiable at a point, and each has a distinctive shape:',
@@ -26,6 +30,9 @@ export default {
       '**3. A vertical tangent.** Both one-sided slopes blow up to the same infinity (both +∞ or both −∞). The tangent line exists in the limit but is vertical — a vertical line is not the graph of a function, so it cannot be a well-defined derivative. Classic example: f(x) = x^(1/3) at x = 0.',
 
       '**The hierarchy of smoothness.** These two properties are not symmetric — one is strictly stronger than the other. Every differentiable function is automatically continuous, but not every continuous function is differentiable. The proof is short and elegant, and we give it in the Rigor section below.',
+        ],
+      },
+      { type: 'image', src: continuityUrl, alt: 'Discontinuity types showing where differentiability also fails', caption: 'Differentiability implies continuity, but not the reverse — a corner is continuous but not differentiable.' },
     ],
     callouts: [
       {

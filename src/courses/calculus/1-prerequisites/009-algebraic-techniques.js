@@ -1,3 +1,4 @@
+import powerRuleUrl from '../diagrams/calc-power-rule.svg?url';
 export default {
   id: "ch0-algebraic-techniques",
   slug: "algebraic-techniques",
@@ -120,6 +121,7 @@ export default {
           body: "Polynomial form? Factor. Has √ or ∛? Conjugate or special identity. Has 1/(x+h) form? Common denominator. Quadratic expression hidden? Complete the square.",
         },
       },
+      { type: 'image', src: powerRuleUrl, alt: 'Power rule table showing xⁿ → nxⁿ⁻¹ for key exponents', caption: 'Recognizing polynomial structure is the first step — the power rule does the rest.' },
     ],
   },
 

@@ -1,3 +1,4 @@
+import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
 export default {
   id: 'ch3-first-derivative-test',
   slug: 'first-derivative-test',
@@ -56,6 +57,7 @@ export default {
           'When f\' switches from + to −, f has a local maximum. When from − to +, a local minimum.',
         caption: 'Drag the critical points to rearrange the sign chart. Watch how the function shape updates to match.',
       },
+      { type: 'image', src: curveExtremaUrl, alt: 'Curve with local max and min and f-prime sign chart below', caption: 'The first derivative test: f′ changes from + to − at a local max, − to + at a local min.' },
     ],
   },
 

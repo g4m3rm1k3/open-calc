@@ -1,3 +1,4 @@
+import oneSidedUrl from '../diagrams/calc-one-sided.svg?url';
 export default {
   id: 'ch1-one-sided-limits',
   slug: 'one-sided-limits',
@@ -65,6 +66,7 @@ export default {
                 'The two-sided limit exists if and only if both one-sided limits exist AND are equal to each other.',
         },
       },
+      { type: 'image', src: oneSidedUrl, alt: 'Two panels: limits agree (two-sided limit exists) vs. jump discontinuity', caption: 'The two-sided limit exists only when the left-hand and right-hand limits both exist and are equal.' },
     ],
   },
 

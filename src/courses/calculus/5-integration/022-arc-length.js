@@ -1,3 +1,4 @@
+import mvtUrl from '../diagrams/calc-mvt.svg?url';
 export default {
   id: 'ch4-arc-length',
   slug: 'arc-length',
@@ -20,7 +21,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'The idea behind arc length is the same strategy that has worked throughout calculus: approximate with straight-line segments, then pass to a limit. Break the curve y = f(x) into tiny pieces. Over a small horizontal step Δx, the curve rises or falls by approximately Δy ≈ f\'(x)·Δx. The true length of this tiny piece is the hypotenuse of a right triangle with legs Δx and Δy — by the Pythagorean theorem, Δs = √((Δx)² + (Δy)²).',
 
       'Factor out Δx: Δs = √(1 + (Δy/Δx)²)·Δx ≈ √(1 + [f\'(x)]²)·Δx. Summing these tiny lengths and taking the limit gives the arc length formula: L = ∫ₐᵇ √(1 + [f\'(x)]²) dx. The key quantity ds = √(1+[f\'(x)]²)dx is the arc length element — an infinitesimal piece of the curve treated as straight.',
@@ -32,6 +36,9 @@ export default {
       'Parametric arc length is needed when the curve is given as (x(t), y(t)) rather than y=f(x). An infinitesimal step in t produces changes dx = x\'(t)dt and dy = y\'(t)dt, so ds = √((x\'(t))²+(y\'(t))²)dt. Arc length: L = ∫ₐᵇ √((x\'(t))²+(y\'(t))²) dt. This formula handles curves that loop back on themselves, vertical tangents, and other situations where y=f(x) would fail.',
 
       'A common misconception: arc length L is NOT simply ∫f(x)dx. The integral ∫f(x)dx gives area; ∫ds = ∫√(1+(f\'(x))²)dx gives length. The distinction is crucial — arc length always involves a square root with a derivative inside, making it typically harder to integrate than area problems. Most arc length integrals do not have elementary antiderivatives; those that do are carefully constructed examples (like the ones in this lesson).',
+        ],
+      },
+      { type: 'image', src: mvtUrl, alt: 'Curve segment with arc-length approximation using the MVT', caption: 'Arc length = ∫√(1 + [f′(x)]²) dx, derived by summing infinitely many tiny hypotenuses.' },
     ],
     callouts: [
       {

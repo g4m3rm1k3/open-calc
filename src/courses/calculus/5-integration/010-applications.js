@@ -1,3 +1,4 @@
+import ftcUrl from '../diagrams/calc-ftc.svg?url';
 // FILE: src/content/chapter-4/05-applications.js
 export default {
   id: 'ch4-005',
@@ -15,13 +16,19 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'The Net Change Theorem is FTC Part 2 stated in physical language: ∫ₐᵇ F\'(x) dx = F(b) − F(a). In words: the integral of a rate of change over an interval equals the net change in the quantity. Integrate velocity to get displacement. Integrate acceleration to get change in velocity. Integrate marginal cost to get total cost increase. Integrate population growth rate to get population change. The net change theorem unifies all these under one principle: ∫(rate) = net change.',
       'Area between two curves extends the basic area idea. If f(x) ≥ g(x) on [a, b], the area between them is ∫ₐᵇ [f(x) − g(x)] dx. This formula has a transparent geometric meaning: at each x, the "height" of the region is f(x) − g(x) (the gap between the curves), and integrating these heights over [a, b] gives the total area. The formula is always "upper curve minus lower curve" — never worry about whether either function is above or below the x-axis. Even if both f and g are negative, f − g is positive when f ≥ g, and the formula is correct.',
       'Finding the limits of integration for area between curves requires finding where the curves intersect. At an intersection, f(x) = g(x). Solve this equation to find the x-coordinates where the curves cross. Between adjacent intersections, one curve is consistently above the other — but the labeling may switch. Always check which curve is on top in each subinterval (evaluate at a test point). If the curves cross within your intended interval, split the integral at each crossing and negate the piece where the intended "upper" function is actually below.',
       'Average value is conceptually elegant: f_avg = (1/(b−a)) ∫ₐᵇ f(x) dx. For a temperature function T(t) = 70 + 10sin(πt/12) over 24 hours, the average temperature is (1/24) ∫₀²⁴ T(t) dt. The sinusoidal part integrates to zero over a full period, leaving the average equal to the constant term: 70°F. This is the "DC component" in signal processing, and it represents the baseline around which the temperature oscillates.',
       'Work done by a variable force is W = ∫ₐᵇ F(x) dx, where F(x) is the force at position x and the object moves from x = a to x = b. When the force is constant, W = F × d (force times distance). When it varies, we sum F(x) dx over the path — a Riemann sum in the limit. Lifting an object against gravity: if the object weighs mg Newtons and is lifted from x = 0 to x = h, the work is ∫₀ʰ mg dx = mgh (same as the constant-force formula, since gravity is constant near the Earth\'s surface). Compressing a spring: by Hooke\'s law, F = kx, and work = ∫₀ˣ kx dx = kx²/2 (the energy stored in the spring).',
       'Consumer surplus in economics: the demand function D(x) gives the maximum price a consumer will pay for the x-th unit. If the market price is P*, consumers buying at or below quantity x* = D⁻¹(P*) receive "surplus" — they would have paid more than P* but only paid P*. The total consumer surplus is ∫₀^(x*) [D(x) − P*] dx: the area between the demand curve and the horizontal price line. Producer surplus is the analogous integral below the supply curve. Together, consumer + producer surplus = total economic surplus, a measure of the efficiency of a market — computed by integration.',
+        ],
+      },
+      { type: 'image', src: ftcUrl, alt: 'FTC area diagram showing net displacement as a signed area', caption: 'Definite integrals compute displacement, total change, and accumulated quantities in applied problems.' },
     ],
     callouts: [
       {

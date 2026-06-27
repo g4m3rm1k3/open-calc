@@ -25,7 +25,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       "You have the chain rule, implicit differentiation, and all the tools of Chapter 2. Related rates is their first application in the wild. The setup is always this: two quantities are geometrically linked (a fixed triangle, a fixed volume, a fixed distance), and you want to know how fast one changes when you know how fast the other changes. The chain rule does the work — you just need to know when to apply it. Every air traffic controller, every civil engineer tracking water levels, every physician modeling drug concentration is doing related rates in some form.",
       "The key insight behind all related rates problems is this: two quantities are linked by a geometric or physical relationship, and that relationship does not just constrain the values — it also constrains the rates of change. If the position of the base of a ladder is x(t) and the position of the top is y(t), the Pythagorean theorem says x² + y² = L² (where L is the fixed ladder length). This equation holds for every value of t, not just one particular instant. It is an identity in t, valid throughout the motion.",
       'Because x² + y² = L² holds for all t, we can differentiate both sides with respect to t. The right side is constant, so its derivative is 0. The left side requires the chain rule: d/dt[x²] = 2x·(dx/dt) and d/dt[y²] = 2y·(dy/dt). So we get 2x(dx/dt) + 2y(dy/dt) = 0. This single equation is the "rate equation" — it links dx/dt and dy/dt at every moment. Given one rate, you can solve for the other.',
@@ -33,6 +36,9 @@ export default {
       "Walk through the ladder problem conceptually to build intuition before any algebra. When the base is very close to the wall (x ≈ 0), the ladder is nearly vertical, and a small horizontal motion of the base produces almost no downward motion of the top. As the base slides further out, the geometry becomes more extreme: the top drops faster and faster. When the base is at 45° from the wall (x = y = L/√2), the top drops at exactly the same speed the base slides out. And as the base approaches L (the ladder is almost flat), the top plummets toward the floor at infinite speed — the constraint collapses to a degenerate triangle. The rate equation 2x(dx/dt) + 2y(dy/dt) = 0 captures all of this: dy/dt = -(x/y)·(dx/dt), and as y → 0 this ratio blows up.",
       "Radar tracking works by the same logic. An aircraft is at horizontal distance x(t) from the radar station and at altitude h (constant for simplicity). The slant range r = √(x² + h²). Differentiating: dr/dt = x/r · (dx/dt). So dr/dt — the rate the range changes — depends on the current angle of depression, not just the aircraft's ground speed dx/dt. A slow plane flying directly toward the radar may have a very fast dr/dt when it is nearly overhead; a fast plane flying perpendicular to the line of sight may have dr/dt = 0. Air traffic controllers account for exactly this effect.",
       "The five-step procedure for related rates is reliable in every situation. Step 1: Draw and label a diagram. Put variables (not numbers) on all the changing quantities. Step 2: Write the equation that relates those variables — this is the geometric or physical constraint. Step 3: Differentiate both sides with respect to t, applying the chain rule to every variable-dependent term. Step 4: Substitute in the known numerical values at the specific instant — both positions and rates. Step 5: Solve algebraically for the unknown rate. The crucial discipline is in Step 4: you must differentiate FIRST, then substitute. Substituting before differentiating destroys the rate information.",
+        ],
+      },
+      { type: 'image', src: chainRuleUrl, alt: 'Chain rule pipeline showing how rates of change are related through a shared variable', caption: 'Related rates apply the chain rule in time: if two quantities share a relationship, their rates are linked.' },
     ],
     callouts: [
       {
@@ -257,6 +263,7 @@ fig.show()`,
                 "Change `dV_dt` or `r_target` and re-run to see how the radius growth rate depends on size.",
               code: `from opencalc import Figure
 import math
+import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
 
 dV_dt    = 100.0   # cm³/s
 r_target = 5.0     # cm

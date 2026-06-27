@@ -1,3 +1,4 @@
+import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
 export default {
   id: 'ch0-functions',
   slug: 'functions',
@@ -49,6 +50,7 @@ export default {
         mathBridge: "Each function family has a characteristic shape determined by its formula: linear $f(x)=mx+b$ (straight lines), quadratic $f(x)=ax^2$ (parabolas), cubic $f(x)=ax^3$ (S-curves), exponential $f(x)=a^x$ (explosive growth), sine (smooth oscillation). Recognizing a function's family from its graph is the first step in understanding its calculus.",
         caption: 'Watch how the graph changes shape as you move between linear, quadratic, cubic, exponential, and sine. Each family has a distinct global personality.',
       },
+      { type: 'image', src: chainRuleUrl, alt: 'Function composition pipeline: x → g(x) → f(g(x))', caption: 'A function is a machine; composition chains machines — the output of one feeds the input of the next.' },
     ],
   },
 

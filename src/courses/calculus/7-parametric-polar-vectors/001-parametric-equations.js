@@ -1,3 +1,4 @@
+import parametricUrl from '../diagrams/calc-parametric.svg?url';
 // FILE: src/content/chapter-6/00-parametric-equations.js
 export default {
   id: 'ch6-parametric',
@@ -16,7 +17,10 @@ export default {
   },
 
   intuition: {
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       'Think of a parametric curve as a set of instructions for a moving point: at time t, go to x-coordinate f(t) and y-coordinate g(t). The parameter t is the clock. As t advances, the point traces out a curve in the xy-plane. The same curve can be traversed at different speeds, in different directions, or even retraced — all by changing how f(t) and g(t) depend on t. This is fundamentally different from y = f(x), which says nothing about when or how fast the curve is traversed.',
       'The simplest example is the unit circle. The equation x² + y² = 1 describes the shape but not the motion. The parametrization x = cos(t), y = sin(t) says the point starts at (1, 0) when t = 0 and sweeps counterclockwise at unit angular speed. A different parametrization, x = cos(2t), y = sin(2t), traces the same circle but twice as fast. And x = cos(-t), y = sin(-t) traces it clockwise. The shape is the same; the motion is different.',
       'Why not just use y = f(x)? Because many interesting curves fail the vertical line test. A circle, a figure-eight, a spiral that loops back over itself — none of these can be expressed as a single function of x. Parametric equations sidestep this entirely. Each coordinate is a separate function of the parameter, and there is no requirement that x(t) be one-to-one. The curve can cross itself, backtrack, or form any shape whatsoever.',
@@ -24,6 +28,9 @@ export default {
       'Lissajous figures arise when x and y are sinusoidal with different frequencies: x = A cos(at + d), y = B sin(bt). When the frequency ratio a/b is rational, the curve closes; when irrational, it fills a rectangle densely. These patterns appear on oscilloscopes when comparing two electrical signals, and they were historically used to calibrate tuning forks. The shape depends entirely on the ratio a/b and the phase shift d.',
       'To find the slope of a parametric curve, think about what dy/dx means physically. The point moves with horizontal velocity dx/dt and vertical velocity dy/dt. The slope is the ratio of vertical to horizontal velocity: dy/dx = (dy/dt) / (dx/dt). This is just the chain rule in disguise. The formula breaks down when dx/dt = 0 — at those moments the tangent line is vertical, which makes geometric sense: the point is moving straight up or down with no horizontal component.',
       'Eliminating the parameter means finding a direct relationship between x and y by removing t. For x = cos t, y = sin t, the identity cos²t + sin²t = 1 gives x² + y² = 1. For x = t², y = t³, you can write t = x^(1/2) and substitute: y = x^(3/2). Elimination recovers the shape but loses the motion information — direction, speed, and timing all disappear. Sometimes elimination is algebraically impossible or impractical, which is another reason to keep parametric form.',
+        ],
+      },
+      { type: 'image', src: parametricUrl, alt: 'Unit circle traced by x=cos(t), y=sin(t) with direction arrows', caption: 'Parametric equations describe a path with direction and speed — one parameter, two coordinates.' },
     ],
     callouts: [
       {
