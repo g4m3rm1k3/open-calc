@@ -7,15 +7,14 @@ import PinsNotesPopup from './PinsNotesPopup.jsx'
 import { useDesktop } from './DesktopProvider.jsx'
 import ReportBugButton from '../ui/ReportBugButton.jsx'
 
+// RPG Workout and Brain Training are tall, scrollable content pages — not
+// fixed-size games/labs — so they route to their own dedicated pages instead
+// of opening through the floating-window manager. FloatingWindow's content
+// area uses `overflow-hidden` with no scroll, which is correct for canvas
+// games but silently clips/cuts off anything taller than the window.
 const PINNED_APPS = [
-  {
-    id: 'rpg-workout', label: 'RPG Workout', emoji: '⚔️',
-    loader: () => import('../../features/rpg/RPGWorkoutPage.jsx').then(m => m.default),
-  },
-  {
-    id: 'brain', label: 'Brain Training', emoji: '🧠',
-    loader: () => import('../../features/brain/BrainPage.jsx').then(m => m.default),
-  },
+  { id: 'rpg-workout', label: 'RPG Workout', emoji: '⚔️', route: '/rpg-workout' },
+  { id: 'brain', label: 'Brain Training', emoji: '🧠', route: '/brain' },
 ]
 import { LayoutGrid, Command, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap, Compass } from 'lucide-react'
 
@@ -34,6 +33,7 @@ export default function Taskbar({ windows, onFocus }) {
   const toggleTutor = () => window.dispatchEvent(new CustomEvent('oc-toggle-tutor'))
 
   const openPinnedApp = async (app) => {
+    if (app.route) { navigate(app.route); return }
     const Component = await app.loader()
     openWindow({ id: app.id, label: app.label, emoji: app.emoji, Component, backTo: '/' })
   }
