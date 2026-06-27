@@ -11,49 +11,10 @@ import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 import { OPENCALC_LIB_SOURCE } from "./opencalcLibSource.js";
 import { useReportBug } from "../../hooks/useReportBug.js";
 
+import { useThemeColors, withAlpha } from '../../hooks/useThemeColors';
+import { useGlobalTheme } from '../../context/ThemeContext.jsx';
 // ── Colors hook (same as all viz components) ─────────────────────────────────
-function useColors() {
-  const isDark = () =>
-    typeof document !== "undefined" &&
-    document.documentElement.classList.contains("dark");
-  const [dark, setDark] = useState(isDark);
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()));
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => obs.disconnect();
-  }, []);
-  return {
-    dark,
-    bg: dark ? "#0f172a" : "#f8fafc",
-    surface: dark ? "#1e293b" : "#ffffff",
-    surface2: dark ? "#0f172a" : "#f1f5f9",
-    border: dark ? "#334155" : "#e2e8f0",
-    text: dark ? "#e2e8f0" : "#1e293b",
-    muted: dark ? "#94a3b8" : "#64748b",
-    hint: dark ? "#475569" : "#94a3b8",
-    blue: dark ? "#38bdf8" : "#0284c7",
-    blueBg: dark ? "rgba(56,189,248,0.12)" : "rgba(2,132,199,0.08)",
-    blueBd: dark ? "#38bdf8" : "#0284c7",
-    amber: dark ? "#fbbf24" : "#d97706",
-    amberBg: dark ? "rgba(251,191,36,0.12)" : "rgba(217,119,6,0.08)",
-    amberBd: dark ? "#fbbf24" : "#d97706",
-    green: dark ? "#4ade80" : "#16a34a",
-    greenBg: dark ? "rgba(74,222,128,0.12)" : "rgba(22,163,74,0.08)",
-    greenBd: dark ? "#4ade80" : "#16a34a",
-    red: dark ? "#f87171" : "#dc2626",
-    redBg: dark ? "rgba(248,113,113,0.12)" : "rgba(220,38,38,0.08)",
-    redBd: dark ? "#f87171" : "#dc2626",
-    teal: dark ? "#2dd4bf" : "#0d9488",
-    tealBg: dark ? "rgba(45,212,191,0.12)" : "rgba(13,148,136,0.08)",
-    tealBd: dark ? "#2dd4bf" : "#0d9488",
-    purple: dark ? "#a78bfa" : "#7c3aed",
-    purpleBg: dark ? "rgba(167,139,250,0.12)" : "rgba(124,58,237,0.08)",
-    purpleBd: dark ? "#a78bfa" : "#7c3aed",
-  };
-}
+
 
 // ── Detect opencalc figure JSON ───────────────────────────────────────────────
 function isFigureOutput(str) {
@@ -324,6 +285,7 @@ const CellComponent = React.memo(
   ({
     cell,
     C,
+    monacoTheme,
     onRun,
     onClear,
     onRemove,
@@ -352,19 +314,19 @@ const CellComponent = React.memo(
     return (
       <div
         style={{
-          background: `${C.surface}dd`,
-          border: `1.5px solid ${cell.status === "error" ? C.redBd : cell.status === "running" ? C.tealBd : isChallenge ? C.purpleBd : C.blueBd + "55"}`,
+          background: `${withAlpha(C.surface, "dd")}`,
+          border: `1.5px solid ${cell.status === "error" ? C.redBd : cell.status === "running" ? C.tealBd : isChallenge ? C.purpleBd : withAlpha(C.blueBd, "55")}`,
           borderRadius: 12,
           overflow: "hidden",
           transition: "border-color .2s, box-shadow .2s",
           boxShadow:
             cell.status === "error"
-              ? `0 6px 28px ${C.redBd}33, 0 2px 8px ${C.redBd}18`
+              ? `0 6px 28px ${withAlpha(C.redBd, "33")}, 0 2px 8px ${withAlpha(C.redBd, "18")}`
               : cell.status === "running"
-                ? `0 6px 28px ${C.tealBd}33, 0 2px 8px ${C.tealBd}18`
+                ? `0 6px 28px ${withAlpha(C.tealBd, "33")}, 0 2px 8px ${withAlpha(C.tealBd, "18")}`
                 : isChallenge
-                  ? `0 6px 28px ${C.purpleBd}28, 0 2px 8px ${C.purpleBd}14, 0 1px 3px #0004`
-                  : `0 6px 24px ${C.blueBd}18, 0 2px 6px #0003`,
+                  ? `0 6px 28px ${withAlpha(C.purpleBd, "28")}, 0 2px 8px ${withAlpha(C.purpleBd, "14")}, 0 1px 3px #0004`
+                  : `0 6px 24px ${withAlpha(C.blueBd, "18")}, 0 2px 6px #0003`,
         }}
       >
         {/* ── Challenge header ────────────────────────────────────────────── */}
@@ -479,7 +441,7 @@ const CellComponent = React.memo(
                   textTransform: "uppercase",
                   color: C.blue,
                   background: `linear-gradient(90deg, ${C.blueBg} 0%, ${C.surface2} 60%, ${C.surface} 100%)`,
-                  borderBottom: `1px solid ${C.blueBd}44`,
+                  borderBottom: `1px solid ${withAlpha(C.blueBd, "44")}`,
                   borderLeft: `3px solid ${C.blue}`,
                 }}
               >
@@ -790,7 +752,7 @@ const CellComponent = React.memo(
           height={editorHeight}
           beforeMount={setupOpenCalcMonaco}
           defaultLanguage="python"
-          theme={C.dark ? "open-calc-dark" : "open-calc-light"}
+          theme={monacoTheme || (C.dark ? "open-calc-dark" : "open-calc-light")}
           value={cell.code}
           onChange={(val) => onUpdate(cell.id, val || "")}
           options={{
@@ -899,7 +861,9 @@ function fixPythonBrokenStrings(src) {
 }
 
 export default function PythonNotebook({ params, onParamChange }) {
-  const C = useColors();
+  const C = useThemeColors();
+  const { themeStyles } = useGlobalTheme();
+  const monacoTheme = themeStyles?.monaco || (C.dark ? "open-calc-dark" : "open-calc-light");
   const [pyodide, setPyodide] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
@@ -1406,6 +1370,7 @@ fig.show()`}
             key={cell.id}
             cell={cell}
             C={C}
+            monacoTheme={monacoTheme}
             onRun={runCell}
             onClear={clearOutput}
             onRemove={removeCell}

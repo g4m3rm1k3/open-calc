@@ -116,7 +116,7 @@ export const STUDIO_THEMES = {
     uiDark: {
       bg0: 'bg-[#0d1117]',
       bg1: 'bg-[#161b22]',
-      bg2: 'bg-[#161b22]',
+      bg2: 'bg-[#21262d]',
       border: 'border-[#30363d]',
       txt1: 'text-[#c9d1d9]',
       txt2: 'text-[#8b949e]',
@@ -244,7 +244,7 @@ export const STUDIO_THEMES = {
     uiDark: {
       bg0: 'bg-[#2e3440]',
       bg1: 'bg-[#3b4252]',
-      bg2: 'bg-[#2e3440]',
+      bg2: 'bg-[#434c5e]',
       border: 'border-[#434c5e]',
       txt1: 'text-[#d8dee9]',
       txt2: 'text-[#4c566a]',
@@ -293,7 +293,7 @@ export const STUDIO_THEMES = {
     uiDark: {
       bg0: 'bg-[#272822]',
       bg1: 'bg-[#1e1f1c]',
-      bg2: 'bg-[#1e1f1c]',
+      bg2: 'bg-[#151612]',
       border: 'border-[#49483e]',
       txt1: 'text-[#f8f8f2]',
       txt2: 'text-[#75715e]',

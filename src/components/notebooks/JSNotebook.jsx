@@ -11,6 +11,9 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from 'remark-gfm';
 import PrismInlineCode from "./PrismInlineCode";
 
+import { makeNotebookTokens } from '../../utils/themeTokens';
+import { useGlobalTheme } from '../../context/ThemeContext.jsx';
+import { withAlpha } from '../../hooks/useThemeColors';
 // ── Theme hook ────────────────────────────────────────────────────────────────
 function useIsDark() {
   const isDark = () =>
@@ -28,13 +31,7 @@ function useIsDark() {
 // ── Colour tokens — computed per theme ───────────────────────────────────────
 function makeT(dark) {
   return {
-    bg:       dark ? "#0f172a"  : "#f8fafc",
-    panel:    dark ? "#1e293b"  : "#ffffff",
-    panel2:   dark ? "#0f172a"  : "#f1f5f9",
-    border:   dark ? "#334155"  : "#e2e8f0",
-    text:     dark ? "#e2e8f0"  : "#1e293b",
-    muted:    dark ? "#94a3b8"  : "#64748b",
-    accent:   dark ? "#38bdf8"  : "#0284c7",
+    ...makeNotebookTokens(dark),
     green:    dark ? "#34d399"  : "#16a34a",
     red:      dark ? "#f87171"  : "#dc2626",
     yellow:   dark ? "#fbbf24"  : "#d97706",
@@ -247,7 +244,7 @@ function ConsolePanel({ logs, T }) {
 }
 
 // ── Single notebook cell ──────────────────────────────────────────────────────
-function NotebookCell({ cell, cellIndex, T, dark }) {
+function NotebookCell({ cell, cellIndex, T, dark, monacoTheme }) {
   const iframeRef = useRef(null);
   const defaultTab = cell.html ? "html" : "js";
   const [activeTab, setActiveTab] = useState(defaultTab);
@@ -341,10 +338,10 @@ function NotebookCell({ cell, cellIndex, T, dark }) {
         <div style={{ padding: "16px 20px", borderBottom: `1px solid ${T.border}` }}>
           {cell.type === "challenge" && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <div style={{ width: 26, height: 26, borderRadius: "50%", background: T.yellow + "22", border: `1.5px solid ${T.yellow}`, color: T.yellow, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 26, height: 26, borderRadius: "50%", background: withAlpha(T.yellow, "22"), border: `1.5px solid ${T.yellow}`, color: T.yellow, fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {cellIndex + 1}
               </div>
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: T.yellow, background: T.yellow + "18", padding: "2px 8px", borderRadius: 10, border: `0.5px solid ${T.yellow}` }}>Challenge</span>
+              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: T.yellow, background: withAlpha(T.yellow, "18"), padding: "2px 8px", borderRadius: 10, border: `0.5px solid ${T.yellow}` }}>Challenge</span>
             </div>
           )}
           <InstructionText text={cell.instruction} T={T} />
@@ -417,7 +414,7 @@ function NotebookCell({ cell, cellIndex, T, dark }) {
           language={MONACO_LANG[activeTab]}
           value={editorValue}
           onChange={handleEditorChange}
-          theme={dark ? "open-calc-dark" : "open-calc-light"}
+          theme={monacoTheme || (dark ? "open-calc-dark" : "open-calc-light")}
           options={{
             fontSize: 13, lineHeight: 20,
             minimap: { enabled: false },
@@ -439,7 +436,7 @@ function NotebookCell({ cell, cellIndex, T, dark }) {
       {cell.type === "challenge" && (
         <div style={{
           minHeight: 44, padding: "10px 16px", borderTop: `1px solid ${T.border}`,
-          background: !hasRun || !challengeState ? "transparent" : (challengeState === "pass" ? T.green + "14" : T.red + "12"),
+          background: !hasRun || !challengeState ? "transparent" : (challengeState === "pass" ? withAlpha(T.green, "14") : withAlpha(T.red, "12")),
           color: challengeState === "pass" ? T.green : (challengeState === "fail" ? T.red : T.muted),
           fontSize: 13, fontWeight: 500,
         }}>
@@ -458,6 +455,8 @@ export default function JSNotebook({ lesson: lessonProp, params = {} }) {
   const { title, subtitle, cells = [] } = lesson || {};
   const dark = useIsDark();
   const T = makeT(dark);
+  const { themeStyles } = useGlobalTheme();
+  const monacoTheme = themeStyles?.monaco || (dark ? "open-calc-dark" : "open-calc-light");
 
   if (!lesson) return null;
 
@@ -473,7 +472,7 @@ export default function JSNotebook({ lesson: lessonProp, params = {} }) {
         </div>
       )}
       {cells.map((cell, i) => (
-        <NotebookCell key={`${title}-${i}`} cell={cell} cellIndex={i} T={T} dark={dark} />
+        <NotebookCell key={`${title}-${i}`} cell={cell} cellIndex={i} T={T} dark={dark} monacoTheme={monacoTheme} />
       ))}
     </div>
   );

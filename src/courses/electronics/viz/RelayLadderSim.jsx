@@ -16,7 +16,7 @@ function makeT(dark) {
     bg:      dark ? '#0a0f1e' : '#f8fafc',
     rung:    dark ? '#111827' : '#ffffff',
     border:  dark ? '#1e293b' : '#e2e8f0',
-    text:    dark ? '#e2e8f0' : '#1e293b',
+    text: dark ? "rgb(var(--tw-custom-slate-200))" : "rgb(var(--tw-custom-slate-800))",
     sub:     dark ? '#94a3b8' : '#64748b',
     dim:     dark ? '#475569' : '#94a3b8',
     wire:    dark ? '#334155' : '#e2e8f0',

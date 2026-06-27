@@ -1,31 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-function useColors() {
-  const isDark = () =>
-    typeof document !== 'undefined' &&
-    document.documentElement.classList.contains('dark');
-  const [dark, setDark] = useState(isDark);
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()));
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => obs.disconnect();
-  }, []);
-  return {
-    surface:  dark ? '#1e293b' : '#ffffff',
-    surface2: dark ? '#0f172a' : '#f1f5f9',
-    border:   dark ? '#334155' : '#e2e8f0',
-    border2:  dark ? '#334155' : '#e2e8f0',
-    border3:  dark ? '#1e293b' : '#f1f5f9',
-    text:     dark ? '#e2e8f0' : '#1e293b',
-    text2:    dark ? '#94a3b8' : '#64748b',
-    text3:    dark ? '#475569' : '#94a3b8',
-    green:    dark ? '#4ade80' : '#16a34a',
-    purple:   dark ? '#a78bfa' : '#7c3aed',
-    red:      dark ? '#f87171' : '#dc2626',
-    amber:    dark ? '#fbbf24' : '#d97706',
-  };
-}
 
+
+import { useThemeColors } from '../../../hooks/useThemeColors';
 function fr(n, d = 2) { return parseFloat(n.toFixed(d)); }
 
 // ── CNC Canvas ──────────────────────────────────────────────────────────────
@@ -828,7 +805,7 @@ const PAGES = [
 ];
 
 export default function LALinearAlgebraRealWorld({ params = {} }) {
-  const C = useColors();
+  const C = useThemeColors();
   const [page, setPage] = useState(params.page ?? 'cnc');
   const current = PAGES.find(p => p.id === page) ?? PAGES[0];
   const { Comp } = current;

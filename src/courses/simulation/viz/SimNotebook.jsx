@@ -8,52 +8,10 @@ import { setupOpenCalcMonaco } from '../../../utils/monacoThemes.js'
 import { buildSandbox } from '../../../utils/simSandbox.js'
 import MarkdownProse from '../../../components/math/MarkdownProse.jsx'
 
+import { useThemeColors, withAlpha } from '../../../hooks/useThemeColors';
+import { useGlobalTheme } from '../../../context/ThemeContext.jsx';
 // ── Theme hook ────────────────────────────────────────────────────────────────
-function useColors() {
-  const isDark = () =>
-    typeof document !== 'undefined' &&
-    document.documentElement.classList.contains('dark')
-  const [dark, setDark] = useState(isDark)
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
-  return {
-    dark,
-    bg:       dark ? '#0f172a' : '#f8fafc',
-    surface:  dark ? '#1e293b' : '#ffffff',
-    surface2: dark ? '#0f172a' : '#f1f5f9',
-    border:   dark ? '#334155' : '#e2e8f0',
-    text:     dark ? '#e2e8f0' : '#1e293b',
-    muted:    dark ? '#94a3b8' : '#64748b',
-    hint:     dark ? '#475569' : '#94a3b8',
-    // sky / 3D accent
-    sky:      dark ? '#38bdf8' : '#0284c7',
-    skyBg:    dark ? 'rgba(56,189,248,0.10)'  : 'rgba(2,132,199,0.07)',
-    skyBd:    dark ? '#38bdf8'  : '#0284c7',
-    // emerald / 2D accent
-    em:       dark ? '#34d399' : '#059669',
-    emBg:     dark ? 'rgba(52,211,153,0.10)'  : 'rgba(5,150,105,0.07)',
-    emBd:     dark ? '#34d399' : '#059669',
-    // amber / challenge accent
-    amber:    dark ? '#fbbf24' : '#d97706',
-    amberBg:  dark ? 'rgba(251,191,36,0.10)'  : 'rgba(217,119,6,0.07)',
-    amberBd:  dark ? '#fbbf24' : '#d97706',
-    // green / easy
-    green:    dark ? '#4ade80' : '#16a34a',
-    greenBg:  dark ? 'rgba(74,222,128,0.10)'  : 'rgba(22,163,74,0.07)',
-    greenBd:  dark ? '#4ade80' : '#16a34a',
-    // red / hard
-    red:      dark ? '#f87171' : '#dc2626',
-    redBg:    dark ? 'rgba(248,113,113,0.10)' : 'rgba(220,38,38,0.07)',
-    redBd:    dark ? '#f87171' : '#dc2626',
-    // violet / html accent
-    violet:   dark ? '#a78bfa' : '#7c3aed',
-    violetBg: dark ? 'rgba(167,139,250,0.10)' : 'rgba(124,58,237,0.07)',
-    violetBd: dark ? '#a78bfa' : '#7c3aed',
-  }
-}
+
 
 // ── Difficulty badge colors ───────────────────────────────────────────────────
 function diffStyle(difficulty, C) {
@@ -63,7 +21,7 @@ function diffStyle(difficulty, C) {
 }
 
 // ── Individual simulation cell ────────────────────────────────────────────────
-function SimCell({ cell, cellNumber, isChallenge, C }) {
+function SimCell({ cell, cellNumber, isChallenge, C, monacoTheme }) {
   const [code, setCode]         = useState(cell.code ?? '')
   const [ready, setReady]       = useState(false)
   const [codeOpen, setCodeOpen] = useState(!isChallenge)
@@ -124,7 +82,7 @@ function SimCell({ cell, cellNumber, isChallenge, C }) {
 
   return (
     <div style={{
-      background: `${C.surface}ee`,
+      background: `${withAlpha(C.surface, "ee")}`,
       border: `1.5px solid ${accentBd}55`,
       borderRadius: 12,
       overflow: 'hidden',
@@ -137,7 +95,7 @@ function SimCell({ cell, cellNumber, isChallenge, C }) {
         <div style={{
           padding: '12px 16px',
           background: `linear-gradient(135deg, ${C.amberBg} 0%, ${C.skyBg} 100%)`,
-          borderBottom: `1px solid ${C.amberBd}44`,
+          borderBottom: `1px solid ${withAlpha(C.amberBd, "44")}`,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: cell.prompt ? 8 : 0 }}>
             {/* Number badge */}
@@ -246,7 +204,7 @@ function SimCell({ cell, cellNumber, isChallenge, C }) {
             language="javascript"
             value={code}
             onChange={v => setCode(v ?? '')}
-            theme={C.dark ? 'open-calc-dark' : 'open-calc-light'}
+            theme={monacoTheme || (C.dark ? 'open-calc-dark' : 'open-calc-light')}
             beforeMount={setupOpenCalcMonaco}
             options={{
               fontSize: 12, lineHeight: 19,
@@ -359,7 +317,9 @@ function SimCell({ cell, cellNumber, isChallenge, C }) {
 // ── SimNotebook — renders a sequence of cells ─────────────────────────────────
 export default function SimNotebook({ initialCells: cellsProp, params = {} }) {
   const initialCells = cellsProp ?? params.initialCells ?? []
-  const C = useColors()
+  const C = useThemeColors()
+  const { themeStyles } = useGlobalTheme()
+  const monacoTheme = themeStyles?.monaco || (C.dark ? 'open-calc-dark' : 'open-calc-light')
 
   // Fingerprint derived from the first cell's code (prop, not state).
   // Stable within a lesson (user edits only change code STATE, never cell.code PROP).
@@ -387,6 +347,7 @@ export default function SimNotebook({ initialCells: cellsProp, params = {} }) {
               cellNumber={challengeCount}
               isChallenge
               C={C}
+              monacoTheme={monacoTheme}
             />
           )
         } else {
@@ -398,6 +359,7 @@ export default function SimNotebook({ initialCells: cellsProp, params = {} }) {
               cellNumber={regularCount}
               isChallenge={false}
               C={C}
+              monacoTheme={monacoTheme}
             />
           )
         }

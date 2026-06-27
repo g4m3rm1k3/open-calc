@@ -15,7 +15,7 @@ function getColors(dark) {
     trench:    dark ? "#1a1008" : "#7a5228",   // center divider groove
     railRed:   "#ef4444",
     railBlue:  "#3b82f6",
-    text:      dark ? "#e2e8f0" : "#1e293b",
+    text: dark ? "rgb(var(--tw-custom-slate-200))" : "rgb(var(--tw-custom-slate-800))",
     wire:      dark ? "#34d399" : "#059669",
     wireHi:    dark ? "#38bdf8" : "#0284c7",
     icBody:    dark ? "#1e293b" : "#334155",

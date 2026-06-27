@@ -6,49 +6,10 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import Editor from "@monaco-editor/react";
 import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";
 
+import { useThemeColors, withAlpha } from '../../../hooks/useThemeColors';
+import { useGlobalTheme } from '../../../context/ThemeContext.jsx';
 // ── Theme hook ────────────────────────────────────────────────────────────────
-function useColors() {
-  const isDark = () =>
-    typeof document !== "undefined" &&
-    document.documentElement.classList.contains("dark");
-  const [dark, setDark] = useState(isDark);
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()));
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => obs.disconnect();
-  }, []);
-  return {
-    dark,
-    bg: dark ? "#0f172a" : "#f8fafc",
-    surface: dark ? "#1e293b" : "#ffffff",
-    surface2: dark ? "#0f172a" : "#f1f5f9",
-    border: dark ? "#334155" : "#e2e8f0",
-    text: dark ? "#e2e8f0" : "#1e293b",
-    muted: dark ? "#94a3b8" : "#64748b",
-    hint: dark ? "#475569" : "#94a3b8",
-    blue: dark ? "#38bdf8" : "#0284c7",
-    blueBg: dark ? "rgba(56,189,248,0.12)" : "rgba(2,132,199,0.08)",
-    blueBd: dark ? "#38bdf8" : "#0284c7",
-    amber: dark ? "#fbbf24" : "#d97706",
-    amberBg: dark ? "rgba(251,191,36,0.12)" : "rgba(217,119,6,0.08)",
-    amberBd: dark ? "#fbbf24" : "#d97706",
-    green: dark ? "#4ade80" : "#16a34a",
-    greenBg: dark ? "rgba(74,222,128,0.12)" : "rgba(22,163,74,0.08)",
-    greenBd: dark ? "#4ade80" : "#16a34a",
-    red: dark ? "#f87171" : "#dc2626",
-    redBg: dark ? "rgba(248,113,113,0.12)" : "rgba(220,38,38,0.08)",
-    redBd: dark ? "#f87171" : "#dc2626",
-    teal: dark ? "#2dd4bf" : "#0d9488",
-    tealBg: dark ? "rgba(45,212,191,0.12)" : "rgba(13,148,136,0.08)",
-    tealBd: dark ? "#2dd4bf" : "#0d9488",
-    purple: dark ? "#a78bfa" : "#7c3aed",
-    purpleBg: dark ? "rgba(167,139,250,0.12)" : "rgba(124,58,237,0.08)",
-    purpleBd: dark ? "#a78bfa" : "#7c3aed",
-  };
-}
+
 
 // ── sql.js singleton loader ───────────────────────────────────────────────────
 const SQL_JS_CDN =
@@ -154,10 +115,10 @@ function ResultTable({ results, C }) {
                       key={rowi}
                       style={{
                         background:
-                          rowi % 2 === 0 ? "transparent" : `${C.surface}88`,
+                          rowi % 2 === 0 ? "transparent" : `${withAlpha(C.surface, "88")}`,
                         borderBottom:
                           rowi < result.values.length - 1
-                            ? `1px solid ${C.border}44`
+                            ? `1px solid ${withAlpha(C.border, "44")}`
                             : "none",
                       }}
                     >
@@ -191,7 +152,7 @@ function ResultTable({ results, C }) {
 
 // ── Cell component ────────────────────────────────────────────────────────────
 const SQLCell = React.memo(
-  ({ cell, C, onRun, onUpdate, isExecuting, isSetup }) => {
+  ({ cell, C, monacoTheme, onRun, onUpdate, isExecuting, isSetup }) => {
     const lineCount = (cell.sql || "").split("\n").length;
     const editorHeight = `${Math.min(360, Math.max(60, lineCount * 20 + 20))}px`;
 
@@ -203,20 +164,20 @@ const SQLCell = React.memo(
           : cell.status === "running"
             ? C.tealBd
             : isSetup
-              ? C.amberBd + "55"
-              : C.blueBd + "44";
+              ? withAlpha(C.amberBd, "55")
+              : withAlpha(C.blueBd, "44");
 
     const statusBg =
       cell.status === "error"
-        ? `0 4px 20px ${C.redBd}22`
+        ? `0 4px 20px ${withAlpha(C.redBd, "22")}`
         : cell.status === "done" && !isSetup
-          ? `0 4px 20px ${C.greenBd}18`
+          ? `0 4px 20px ${withAlpha(C.greenBd, "18")}`
           : "none";
 
     return (
       <div
         style={{
-          background: `${C.surface}ee`,
+          background: `${withAlpha(C.surface, "ee")}`,
           border: `1.5px solid ${statusColor}`,
           borderRadius: 10,
           overflow: "hidden",
@@ -234,7 +195,7 @@ const SQLCell = React.memo(
             background: isSetup
               ? `linear-gradient(90deg, ${C.amberBg} 0%, ${C.surface2} 100%)`
               : `linear-gradient(90deg, ${C.blueBg} 0%, ${C.surface2} 80%)`,
-            borderBottom: `1px solid ${C.border}44`,
+            borderBottom: `1px solid ${withAlpha(C.border, "44")}`,
           }}
         >
           {/* Type badge */}
@@ -321,7 +282,7 @@ const SQLCell = React.memo(
               readOnly: false,
             }}
             beforeMount={(monaco) => setupOpenCalcMonaco(monaco)}
-            theme={C.dark ? "opencalc-dark" : "opencalc-light"}
+            theme={monacoTheme || (C.dark ? "open-calc-dark" : "open-calc-light")}
           />
         </div>
 
@@ -329,10 +290,10 @@ const SQLCell = React.memo(
         {(cell.status === "done" || cell.status === "error") && (
           <div
             style={{
-              borderTop: `1px solid ${cell.status === "error" ? C.redBd + "44" : C.border + "44"}`,
+              borderTop: `1px solid ${cell.status === "error" ? withAlpha(C.redBd, "44") : withAlpha(C.border, "44")}`,
               padding: "10px 12px",
               background:
-                cell.status === "error" ? `${C.redBg}` : `${C.greenBg}44`,
+                cell.status === "error" ? `${C.redBg}` : `${withAlpha(C.greenBg, "44")}`,
             }}
           >
             {cell.status === "error" ? (
@@ -489,7 +450,9 @@ export default function SQLNotebook({
   initialCells: initialCellsProp = [],
 }) {
   const initialCells = params?.initialCells ?? initialCellsProp;
-  const C = useColors();
+  const C = useThemeColors();
+  const { themeStyles } = useGlobalTheme();
+  const monacoTheme = themeStyles?.monaco || (C.dark ? "open-calc-dark" : "open-calc-light");
   const dbRef = useRef(null);
   const SQLRef = useRef(null);
   const [dbReady, setDbReady] = useState(false);
@@ -778,6 +741,7 @@ export default function SQLNotebook({
               key={cell.id}
               cell={cell}
               C={C}
+              monacoTheme={monacoTheme}
               onRun={runCell}
               onUpdate={updateCell}
               isExecuting={executing === cell.id}

@@ -100,10 +100,10 @@ export default function CNCClosedLoopSim({ params = {} }) {
   const C = {
     bg:       dark ? '#0f172a' : '#ffffff',
     surface:  dark ? '#1e293b' : '#f8fafc',
-    border:   dark ? '#334155' : '#e2e8f0',
+    border: dark ? "rgb(var(--tw-custom-slate-700))" : "rgb(var(--tw-custom-slate-200))",
     text:     dark ? '#f1f5f9' : '#0f172a',
     muted:    dark ? '#94a3b8' : '#475569',
-    hint:     dark ? '#475569' : '#94a3b8',
+    hint: dark ? "rgb(var(--tw-custom-slate-500))" : "rgb(var(--tw-custom-slate-400))",
     tabActive:dark ? '#3730a3' : '#4338ca',
     tabBg:    dark ? '#1e293b' : '#f1f5f9',
     trackBg:  dark ? '#0f172a' : '#f1f5f9',

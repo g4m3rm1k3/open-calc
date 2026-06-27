@@ -11,52 +11,12 @@ import FigureRenderer from "./FigureRenderer";
 import { parseProse } from "../math/parseProse.jsx";
 import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 
+import { useThemeColors, withAlpha } from '../../hooks/useThemeColors';
+import { useGlobalTheme } from '../../context/ThemeContext.jsx';
 const math = create(all, { precision: 6 });
 
 // ── Colors (same hook as every other viz component) ──────────────────────────
-function useColors() {
-  const isDark = () =>
-    typeof document !== "undefined" &&
-    document.documentElement.classList.contains("dark");
-  const [dark, setDark] = useState(isDark);
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()));
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => obs.disconnect();
-  }, []);
-  return {
-    dark,
-    bg: dark ? "#0f172a" : "#f8fafc",
-    surface: dark ? "#1e293b" : "#ffffff",
-    surface2: dark ? "#0f172a" : "#f1f5f9",
-    border: dark ? "#334155" : "#e2e8f0",
-    text: dark ? "#e2e8f0" : "#1e293b",
-    muted: dark ? "#94a3b8" : "#64748b",
-    hint: dark ? "#475569" : "#94a3b8",
-    blue: dark ? "#38bdf8" : "#0284c7",
-    blueBg: dark ? "rgba(56,189,248,0.12)" : "rgba(2,132,199,0.08)",
-    blueBd: dark ? "#38bdf8" : "#0284c7",
-    amber: dark ? "#fbbf24" : "#d97706",
-    amberBg: dark ? "rgba(251,191,36,0.12)" : "rgba(217,119,6,0.08)",
-    amberBd: dark ? "#fbbf24" : "#d97706",
-    green: dark ? "#4ade80" : "#16a34a",
-    greenBg: dark ? "rgba(74,222,128,0.12)" : "rgba(22,163,74,0.08)",
-    greenBd: dark ? "#4ade80" : "#16a34a",
-    red: dark ? "#f87171" : "#dc2626",
-    redBg: dark ? "rgba(248,113,113,0.12)" : "rgba(220,38,38,0.08)",
-    redBd: dark ? "#f87171" : "#dc2626",
-    teal: dark ? "#2dd4bf" : "#0d9488",
-    tealBg: dark ? "rgba(45,212,191,0.12)" : "rgba(13,148,136,0.08)",
-    tealBd: dark ? "#2dd4bf" : "#0d9488",
-    purple: dark ? "#a78bfa" : "#7c3aed",
-    purpleBg: dark ? "rgba(167,139,250,0.12)" : "rgba(124,58,237,0.08)",
-    purpleBd: dark ? "#a78bfa" : "#7c3aed",
-    orange: dark ? "#fb923c" : "#ea580c",
-  };
-}
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // EXECUTION ENGINE
@@ -508,7 +468,7 @@ function diffStyle(diff, C) {
 // ─────────────────────────────────────────────────────────────────────────────
 // CELL COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
-const CellComponent = React.memo(function CellComponent({ cell, C, onRun, onClear, onRemove, onUpdate, isExecuting, isOnlyCell }) {
+const CellComponent = React.memo(function CellComponent({ cell, C, monacoTheme, onRun, onClear, onRemove, onUpdate, isExecuting, isOnlyCell }) {
   const [hintOpen, setHintOpen] = useState(false);
   const isChallenge = !!cell.challengeType;
   const ds = diffStyle(cell.difficulty, C);
@@ -517,10 +477,10 @@ const CellComponent = React.memo(function CellComponent({ cell, C, onRun, onClea
 
   return (
     <div style={{
-      background: `${C.surface}dd`,
-      border: `1.5px solid ${cell.status === "error" ? C.redBd : cell.status === "running" ? C.tealBd : isChallenge ? C.purpleBd : C.orange + "66"}`,
+      background: `${withAlpha(C.surface, "dd")}`,
+      border: `1.5px solid ${cell.status === "error" ? C.redBd : cell.status === "running" ? C.tealBd : isChallenge ? C.purpleBd : withAlpha(C.orange, "66")}`,
       borderRadius: 12, overflow: "hidden", transition: "border-color .2s",
-      boxShadow: isChallenge ? `0 6px 28px ${C.purpleBd}28, 0 2px 8px ${C.purpleBd}14` : `0 4px 18px ${C.orange}18, 0 2px 6px #0002`,
+      boxShadow: isChallenge ? `0 6px 28px ${withAlpha(C.purpleBd, "28")}, 0 2px 8px ${withAlpha(C.purpleBd, "14")}` : `0 4px 18px ${withAlpha(C.orange, "18")}, 0 2px 6px #0002`,
     }}>
       {/* Challenge header */}
       {isChallenge && (
@@ -541,7 +501,7 @@ const CellComponent = React.memo(function CellComponent({ cell, C, onRun, onClea
       {(cell.prose || (!isChallenge && cell.cellTitle)) && (
         <div style={{ borderBottom: `1px solid ${C.border}` }}>
           {!isChallenge && cell.cellTitle && (
-            <div style={{ padding: "7px 16px", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: C.orange, background: `linear-gradient(90deg, ${C.amberBg} 0%, ${C.surface2} 60%, ${C.surface} 100%)`, borderBottom: `1px solid ${C.amberBd}44`, borderLeft: `3px solid ${C.orange}` }}>
+            <div style={{ padding: "7px 16px", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: C.orange, background: `linear-gradient(90deg, ${C.amberBg} 0%, ${C.surface2} 60%, ${C.surface} 100%)`, borderBottom: `1px solid ${withAlpha(C.amberBd, "44")}`, borderLeft: `3px solid ${C.orange}` }}>
               {cell.cellTitle}
             </div>
           )}
@@ -577,7 +537,7 @@ const CellComponent = React.memo(function CellComponent({ cell, C, onRun, onClea
         height={editorHeight}
         beforeMount={setupOpenCalcMonaco}
         defaultLanguage="openmat"
-        theme={C.dark ? "openmat-dark" : "openmat-light"}
+        theme={monacoTheme || (C.dark ? "openmat-dark" : "openmat-light")}
         value={cell.code}
         onChange={val => onUpdate(cell.id, val || "")}
         options={{ minimap: { enabled: false }, scrollBeyondLastLine: false, fontSize: 13, lineNumbers: "on", padding: { top: 10, bottom: 10 }, automaticLayout: true, scrollbar: { vertical: "hidden", alwaysConsumeMouseWheel: false } }}
@@ -621,7 +581,9 @@ const CellComponent = React.memo(function CellComponent({ cell, C, onRun, onClea
 // MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 export default function OpenMatNotebook({ params }) {
-  const C = useColors();
+  const C = useThemeColors();
+  const { themeStyles } = useGlobalTheme();
+  const monacoTheme = themeStyles?.monaco || (C.dark ? "openmat-dark" : "openmat-light");
   const normalizeCells = (raw) =>
     (raw || STARTER_CELLS).map((c, i) =>
       c.id != null ? c : { ...c, id: `cell-${i + 1}`, output: c.output ?? '', status: c.status ?? 'idle', figureJson: c.figureJson ?? null }
@@ -701,7 +663,7 @@ export default function OpenMatNotebook({ params }) {
   }, [cells]);
 
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", background: C.bg, borderRadius: 14, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: `0 8px 32px ${C.orange}18` }}>
+    <div style={{ fontFamily: "system-ui, sans-serif", background: C.bg, borderRadius: 14, border: `1px solid ${C.border}`, overflow: "hidden", boxShadow: `0 8px 32px ${withAlpha(C.orange, "18")}` }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", background: `linear-gradient(90deg, ${C.surface2} 0%, ${C.surface} 100%)`, borderBottom: `1px solid ${C.border}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -728,6 +690,7 @@ export default function OpenMatNotebook({ params }) {
             key={cell.id}
             cell={cell}
             C={C}
+            monacoTheme={monacoTheme}
             onRun={runCell}
             onClear={clearCell}
             onRemove={removeCell}

@@ -6,6 +6,7 @@ import { useState, useEffect, useRef } from 'react'
 import { ELEMENTS, CATEGORY_COLORS, GRID_POSITIONS } from './chemistry_data'
 import AtomViewer from '../../courses/chemistry/viz/AtomViewer.jsx'
 
+import { useThemeColors } from '../../hooks/useThemeColors';
 // ── State at STP (298 K) ──────────────────────────────────────────────────────
 function stateAtSTP(el) {
   if (el.boil != null && el.boil <= 298) return 'gas'
@@ -35,24 +36,7 @@ function buildScale(trendKey) {
 }
 
 // ── Dark mode colors ──────────────────────────────────────────────────────────
-function useColors() {
-  const isDark = () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-  const [dark, setDark] = useState(isDark)
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
-  return {
-    bg:      dark ? '#0f172a' : '#f8fafc',
-    surface: dark ? '#1e293b' : '#ffffff',
-    surface2:dark ? '#0f172a' : '#f1f5f9',
-    border:  dark ? '#334155' : '#e2e8f0',
-    text:    dark ? '#e2e8f0' : '#1e293b',
-    muted:   dark ? '#94a3b8' : '#64748b',
-    hint:    dark ? '#475569' : '#94a3b8',
-  }
-}
+
 
 // ── Element tile — accepts tileW/tileH for dynamic sizing ─────────────────────
 function ElementCell({ el, isSelected, onClick, scale, tileW, tileH }) {
@@ -283,7 +267,7 @@ function TrendBar({ active, setActive, C }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function PeriodicTable({ params = {} }) {
-  const C = useColors()
+  const C = useThemeColors()
   const [selected,    setSelected]    = useState(null)
   const [search,      setSearch]      = useState('')
   const [filterCat,   setFilterCat]   = useState(null)

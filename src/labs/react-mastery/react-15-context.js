@@ -166,7 +166,7 @@ function ThemeProvider({ children }) {
     bg: dark ? '#1e293b' : '#f1f5f9',
     card: dark ? '#0f172a' : '#ffffff',
     text: dark ? '#f1f5f9' : '#1e293b',
-    muted: dark ? '#94a3b8' : '#64748b',
+    muted: dark ? "rgb(var(--tw-custom-slate-400))" : "rgb(var(--tw-custom-slate-500))",
     accent: '#38bdf8',
     toggle,
   }

@@ -1,40 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 
+import { useThemeColors } from '../../../hooks/useThemeColors';
 // ── colour tokens ────────────────────────────────────────────────────────────
-function useColors() {
-  const isDark = () =>
-    typeof document !== 'undefined' &&
-    document.documentElement.classList.contains('dark')
-  const [dark, setDark] = useState(isDark)
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
-  return {
-    bg:       dark ? '#0f172a' : '#f8fafc',
-    surface:  dark ? '#1e293b' : '#ffffff',
-    surface2: dark ? '#0f172a' : '#f1f5f9',
-    border:   dark ? '#334155' : '#e2e8f0',
-    text:     dark ? '#e2e8f0' : '#1e293b',
-    muted:    dark ? '#94a3b8' : '#64748b',
-    hint:     dark ? '#475569' : '#94a3b8',
-    blue:     dark ? '#38bdf8' : '#0284c7',
-    blueBg:   dark ? 'rgba(56,189,248,0.12)' : 'rgba(2,132,199,0.08)',
-    blueBd:   dark ? '#38bdf8' : '#0284c7',
-    amber:    dark ? '#fbbf24' : '#d97706',
-    amberBg:  dark ? 'rgba(251,191,36,0.12)' : 'rgba(217,119,6,0.08)',
-    amberBd:  dark ? '#fbbf24' : '#d97706',
-    green:    dark ? '#4ade80' : '#16a34a',
-    greenBg:  dark ? 'rgba(74,222,128,0.12)' : 'rgba(22,163,74,0.08)',
-    greenBd:  dark ? '#4ade80' : '#16a34a',
-    red:      dark ? '#f87171' : '#dc2626',
-    redBg:    dark ? 'rgba(248,113,113,0.12)' : 'rgba(220,38,38,0.08)',
-    redBd:    dark ? '#f87171' : '#dc2626',
-    purple:   dark ? '#a78bfa' : '#7c3aed',
-    purpleBg: dark ? 'rgba(167,139,250,0.12)' : 'rgba(124,58,237,0.08)',
-  }
-}
+
 
 // ── shared primitives ────────────────────────────────────────────────────────
 function Tag({ label, color, C }) {
@@ -285,7 +253,7 @@ const PAGE_COUNT = PAGES.length
 
 // ── main component ───────────────────────────────────────────────────────────
 export default function RationalExponentProof({ params = {} }) {
-  const C = useColors()
+  const C = useThemeColors()
   const containerRef = useRef(null)
   const [page, setPage] = useState(params.currentStep ?? 0)
 

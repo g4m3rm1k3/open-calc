@@ -68,6 +68,60 @@ function lerpColor(c1, c2, t) {
   ];
 }
 
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s;
+  const l = (max + min) / 2;
+  if (max === min) {
+    h = 0; s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      default: h = (r - g) / d + 4; break;
+    }
+    h *= 60;
+  }
+  return [h, s, l];
+}
+
+function hslToRgb(h, s, l) {
+  h = ((h % 360) + 360) % 360;
+  if (s === 0) { const v = Math.round(l * 255); return [v, v, v]; }
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let r1, g1, b1;
+  if (h < 60) [r1, g1, b1] = [c, x, 0];
+  else if (h < 120) [r1, g1, b1] = [x, c, 0];
+  else if (h < 180) [r1, g1, b1] = [0, c, x];
+  else if (h < 240) [r1, g1, b1] = [0, x, c];
+  else if (h < 300) [r1, g1, b1] = [x, 0, c];
+  else [r1, g1, b1] = [c, 0, x];
+  return [
+    Math.round((r1 + m) * 255),
+    Math.round((g1 + m) * 255),
+    Math.round((b1 + m) * 255),
+  ];
+}
+
+function rgbArrayToHex([r, g, b]) {
+  return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
+}
+
+// Rotates a hex color's hue by `degrees`, preserving its saturation/lightness.
+// Used to derive a second, genuinely distinct accent color from each theme's
+// single accentHex — no per-theme manual curation needed.
+export function rotateHue(hex, degrees) {
+  const rgb = hexToRgbArray(hex);
+  if (!rgb) return hex;
+  const [h, s, l] = rgbToHsl(...rgb);
+  return rgbArrayToHex(hslToRgb(h + degrees, s, l));
+}
+
 function generatePalette(baseHex) {
   if (!baseHex) return DEFAULT_PALETTE_RGB.brand;
   const base = hexToRgbArray(baseHex);
@@ -105,15 +159,27 @@ export function extractThemeColors(themeDef) {
   const border = hexToRgb(extractHex(ui.border) || extractHex(ui.btnBorder));
   const txt1 = hexToRgb(extractHex(ui.txt1));
   const txt2 = hexToRgb(extractHex(ui.txt2));
-  const primary = hexToRgb(themeDef.accentHex);
+
+  // bg0/bg1/bg2 are hand-authored per theme and aren't guaranteed to be in
+  // darkest-to-lightest order (e.g. Dracula's bg1 is darker than its bg0) —
+  // sort by actual luminance so 950 is always darker than 900, which is
+  // always darker than 800, regardless of which slot each came from.
+  const luminance = (rgb) => {
+    const [r, g, b] = rgb.split(' ').map(Number);
+    return 0.299 * r + 0.587 * g + 0.114 * b;
+  };
+  const sortedBgs = [bg0, bg1, bg2]
+    .filter(Boolean)
+    .sort((a, b) => luminance(a) - luminance(b));
+  const [darkest, middle, lightest] = sortedBgs;
 
   // Map to slate/sky scale. We only override the dark mode relevant colors.
   return {
     slate: {
       ...DEFAULT_PALETTE_RGB.slate, // fallback light mode colors remain default
-      950: bg0 || DEFAULT_PALETTE_RGB.slate[950],
-      900: bg1 || DEFAULT_PALETTE_RGB.slate[900],
-      800: bg2 || DEFAULT_PALETTE_RGB.slate[800],
+      950: darkest || DEFAULT_PALETTE_RGB.slate[950],
+      900: middle || DEFAULT_PALETTE_RGB.slate[900],
+      800: lightest || DEFAULT_PALETTE_RGB.slate[800],
       700: border || DEFAULT_PALETTE_RGB.slate[700],
       600: border || DEFAULT_PALETTE_RGB.slate[600],
       500: txt2 || DEFAULT_PALETTE_RGB.slate[500],
@@ -122,12 +188,11 @@ export function extractThemeColors(themeDef) {
       200: txt1 || DEFAULT_PALETTE_RGB.slate[200],
       100: txt1 || DEFAULT_PALETTE_RGB.slate[100],
     },
-    sky: {
-      ...DEFAULT_PALETTE_RGB.sky,
-      400: primary || DEFAULT_PALETTE_RGB.sky[400],
-      500: primary || DEFAULT_PALETTE_RGB.sky[500],
-      600: primary || DEFAULT_PALETTE_RGB.sky[600],
-    },
+    // "sky" is the theme's secondary accent — hue-rotated from the primary
+    // accentHex so every theme automatically gets a second, genuinely
+    // distinct accent (used for `teal` in useThemeColors so it's no longer
+    // identical to `blue`/brand). No per-theme manual curation needed.
+    sky: generatePalette(rotateHue(themeDef.accentHex, 130)),
     brand: generatePalette(themeDef.accentHex)
   };
 }

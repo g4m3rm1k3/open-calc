@@ -1,24 +1,7 @@
 import { useState, useEffect } from 'react'
 
-function useColors() {
-  const isDark = () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-  const [dark, setDark] = useState(isDark)
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
-  return {
-    bg:dark?'#0f172a':'#f8fafc',surface:dark?'#1e293b':'#ffffff',surface2:dark?'#0f172a':'#f1f5f9',
-    border:dark?'#334155':'#e2e8f0',text:dark?'#e2e8f0':'#1e293b',muted:dark?'#94a3b8':'#64748b',hint:dark?'#475569':'#94a3b8',
-    blue:dark?'#38bdf8':'#0284c7',blueBg:dark?'rgba(56,189,248,0.12)':'rgba(2,132,199,0.08)',blueBd:dark?'#38bdf8':'#0284c7',
-    amber:dark?'#fbbf24':'#d97706',amberBg:dark?'rgba(251,191,36,0.12)':'rgba(217,119,6,0.08)',amberBd:dark?'#fbbf24':'#d97706',
-    green:dark?'#4ade80':'#16a34a',greenBg:dark?'rgba(74,222,128,0.12)':'rgba(22,163,74,0.08)',greenBd:dark?'#4ade80':'#16a34a',
-    red:dark?'#f87171':'#dc2626',redBg:dark?'rgba(248,113,113,0.12)':'rgba(220,38,38,0.08)',redBd:dark?'#f87171':'#dc2626',
-    purple:dark?'#a78bfa':'#7c3aed',purpleBg:dark?'rgba(167,139,250,0.12)':'rgba(124,58,237,0.08)',purpleBd:dark?'#a78bfa':'#7c3aed',
-    teal:dark?'#2dd4bf':'#0d9488',tealBg:dark?'rgba(45,212,191,0.12)':'rgba(13,148,136,0.08)',tealBd:dark?'#2dd4bf':'#0d9488',
-  }
-}
+
+import { useThemeColors } from '../../../hooks/useThemeColors';
 const ui={
   Tag:({label,color,C})=>{const m={blue:[C.blueBg,C.blue],amber:[C.amberBg,C.amber],green:[C.greenBg,C.green],red:[C.redBg,C.red],purple:[C.purpleBg,C.purple],teal:[C.tealBg,C.teal]};const[bg,tc]=m[color]||m.blue;return<span style={{display:'inline-block',fontSize:11,padding:'2px 9px',borderRadius:6,background:bg,color:tc,fontWeight:500,marginBottom:10}}>{label}</span>},
   H:({children,C})=><h3 style={{fontSize:16,fontWeight:500,color:C.text,marginBottom:8,lineHeight:1.4}}>{children}</h3>,
@@ -184,7 +167,7 @@ function PageGrid({C}){
 const PAGES=[PageBoxModel,PageFlex,PageGrid]
 const PAGE_LABELS=['Box model','Flexbox','Grid']
 export default function WebLesson04_Layout({params={}}){
-  const C=useColors();const[page,setPage]=useState(params.currentStep??0)
+  const C=useThemeColors();const[page,setPage]=useState(params.currentStep??0)
   useEffect(()=>{if(params.currentStep!==undefined)setPage(Math.min(params.currentStep,PAGES.length-1))},[params.currentStep])
   const PageComponent=PAGES[Math.min(page,PAGES.length-1)]
   return<div style={{width:'100%',fontFamily:'sans-serif'}}>

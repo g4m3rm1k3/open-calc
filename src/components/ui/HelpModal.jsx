@@ -249,30 +249,13 @@ const TPL_VIZ = `// MyVizComponent.jsx
 // ================================================================
 
 import { useState, useEffect } from 'react'
-
-// ── COLORS HOOK (copy verbatim into every viz — do not modify) ──
-function useColors() {
-  const isDark = () =>
-    typeof document !== 'undefined' &&
-    document.documentElement.classList.contains('dark')
-  const [dark, setDark] = useState(isDark)
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
-  return {
-    bg: dark ? '#0f172a' : '#f8fafc', surface: dark ? '#1e293b' : '#ffffff',
-    border: dark ? '#334155' : '#e2e8f0', text: dark ? '#e2e8f0' : '#1e293b',
-    muted: dark ? '#94a3b8' : '#64748b',
-    blue: dark ? '#38bdf8' : '#0284c7', amber: dark ? '#fbbf24' : '#d97706',
-    green: dark ? '#4ade80' : '#16a34a',
-  }
-}
+import { useThemeColors } from '../../../hooks/useThemeColors'
+// ── COLORS HOOK: shared across every viz — import it, don't copy it. ──
+// (Adding a color? Edit src/hooks/useThemeColors.js once and every viz gets it.)
 
 // IMPORTANT: Function name must EXACTLY match filename and VizFrame.jsx key.
 export default function MyVizComponent({ params = {} }) {
-  const C = useColors()
+  const C = useThemeColors()
 
   return (
     <div style={{ fontFamily: 'var(--font-sans)', padding: '.5rem 0', maxWidth: 740 }}>
@@ -298,26 +281,9 @@ const TPL_CANVAS = `// MyCanvasViz.jsx
 // ================================================================
 
 import { useState, useEffect, useRef } from 'react'
-
-// ── COLORS HOOK (copy verbatim, do not modify) ───────────────────
-function useColors() {
-  const isDark = () =>
-    typeof document !== 'undefined' &&
-    document.documentElement.classList.contains('dark')
-  const [dark, setDark] = useState(isDark)
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
-  return {
-    bg: dark ? '#0f172a' : '#f8fafc', surface: dark ? '#1e293b' : '#ffffff',
-    border: dark ? '#334155' : '#e2e8f0', text: dark ? '#e2e8f0' : '#1e293b',
-    muted: dark ? '#94a3b8' : '#64748b',
-    blue: dark ? '#38bdf8' : '#0284c7', amber: dark ? '#fbbf24' : '#d97706',
-    green: dark ? '#4ade80' : '#16a34a', red: dark ? '#f87171' : '#dc2626',
-  }
-}
+import { useThemeColors } from '../../../hooks/useThemeColors'
+// ── COLORS HOOK: shared across every viz — import it, don't copy it. ──
+// (Adding a color? Edit src/hooks/useThemeColors.js once and every viz gets it.)
 
 function MyCanvas({ value, C }) {
   const canvasRef = useRef(null)  // PART A: named canvasRef (not ref or cvRef)
@@ -374,7 +340,7 @@ function MyCanvas({ value, C }) {
 }
 
 export default function MyCanvasViz({ params = {} }) {
-  const C = useColors()
+  const C = useThemeColors()
   const [value, setValue] = useState(5)
 
   return (
@@ -1840,22 +1806,15 @@ MyVizComponent: lazy(() => import('./react/MyVizComponent.jsx')),`}</CodeBlock>
 
       <H3>Required: the colors hook</H3>
       <Para>
-        Copy this verbatim into every viz component — never modify it. It makes
-        your component react to dark/light mode automatically.
+        Import this into every viz component — don't paste the implementation in.
+        It makes your component react to dark/light mode and the active studio
+        theme automatically, and a fix to the palette only has to happen once.
       </Para>
-      <CodeBlock>{`function useColors() {
-  const isDark = () =>
-    typeof document !== 'undefined' &&
-    document.documentElement.classList.contains('dark')
-  const [dark, setDark] = useState(isDark)
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()))
-    obs.observe(document.documentElement, {
-      attributes: true, attributeFilter: ['class'],
-    })
-    return () => obs.disconnect()
-  }, [])
-  return { bg: dark ? '#0f172a' : '#f8fafc', /* ... */ }
+      <CodeBlock>{`import { useThemeColors } from '../../../hooks/useThemeColors'
+
+export default function MyVizComponent() {
+  const C = useThemeColors()
+  // C.bg, C.surface, C.text, C.blue, C.teal, C.amber, C.green, C.red, C.purple, C.orange ...
 }`}</CodeBlock>
 
       <H3>Canvas: the 5 required parts</H3>

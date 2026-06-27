@@ -268,6 +268,30 @@ export function setupOpenCalcMonaco(monaco) {
   });
 
 
+  monaco.editor.defineTheme("catppuccin", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "6c7086", fontStyle: "italic" },
+      { token: "keyword", foreground: "cba6f7", fontStyle: "bold" },
+      { token: "string", foreground: "a6e3a1" },
+      { token: "number", foreground: "fab387" },
+      { token: "type", foreground: "89dceb" },
+      { token: "function", foreground: "89b4fa" },
+    ],
+    colors: {
+      "editor.background": "#1e1e2e",
+      "editor.foreground": "#cdd6f4",
+      "editorLineNumber.foreground": "#6c7086",
+      "editorLineNumber.activeForeground": "#cdd6f4",
+      "editorCursor.foreground": "#f5e0dc",
+      "editor.selectionBackground": "#313244",
+      "editor.lineHighlightBackground": "#313244aa",
+      "editorWidget.background": "#181825",
+      "editorWidget.border": "#45475a",
+    },
+  });
+
   monaco.editor.defineTheme("openmat-dark", {
 
     base: "vs-dark",

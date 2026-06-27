@@ -59,7 +59,7 @@
 
     /* Semantic color tokens */
     --color-surface: rgba(255, 255, 255, 0.72);
-    --color-page-bg: #f1f5f9;
+    --color-page-bg: rgb(var(--tw-custom-slate-50));
     --color-border: rgba(15, 23, 42, 0.08);
     --color-text-muted: #64748b;
     --shadow-premium:
@@ -76,7 +76,10 @@
 
   .dark {
     --color-surface: rgba(15, 23, 42, 0.72);
-    --color-page-bg: #020617;
+    /* Always a notch darker than slate-900 cards (e.g. CoursePage chapter
+       rows use dark:bg-slate-900) so the page backdrop never collapses into
+       the same flat shade as the content sitting on top of it. */
+    --color-page-bg: rgb(var(--tw-custom-slate-950));
     --color-border: rgba(255, 255, 255, 0.08);
     --color-text-muted: #94a3b8;
 
@@ -98,6 +101,18 @@
 
   body {
     @apply font-sans text-slate-800 dark:text-slate-200 antialiased bg-[var(--color-page-bg)];
+  }
+
+  /* ── Global dark-mode bg-white override ────────────────────────────────────
+     bg-white is used in ~300+ components. Rather than editing every file,
+     we remap it at the CSS level in dark mode so it picks up the theme's
+     background hue (slate-900 → driven by --tw-custom-slate-900 CSS var). */
+  .dark .bg-white {
+    background-color: rgb(var(--tw-custom-slate-900)) !important;
+  }
+  /* Keep text-white unaffected (it's an intentional contrast color) */
+  .dark .text-white {
+    color: #ffffff !important;
   }
 
 
@@ -130,7 +145,7 @@
   }
 
   .oc-premium-card-inner {
-    @apply rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300;
+    @apply rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 shadow-sm transition-all duration-300;
   }
 
   /* Interaction Utilities */
@@ -156,7 +171,7 @@
   }
 
   .oc-card-container {
-    @apply bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] p-6 sm:p-10 transition-all duration-300;
+    @apply bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] p-6 sm:p-10 transition-all duration-300;
     box-shadow: var(--shadow-premium);
   }
 
@@ -171,7 +186,7 @@
 
   /* Lesson builder form field */
   .field {
-    @apply w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 outline-none transition-colors;
+    @apply w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:border-brand-400 focus:ring-1 focus:ring-brand-400 outline-none transition-colors;
   }
 
   .field-label {
@@ -301,25 +316,26 @@
   }
 
   .oc-sidebar-item-active {
-    @apply bg-white dark:bg-slate-800/80 shadow-[0_8px_20px_-6px_rgba(79,70,229,0.2)] dark:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.6)]
-           border border-indigo-100/50 dark:border-white/10 font-black;
+    @apply bg-slate-50 dark:bg-slate-800/80 shadow-[0_8px_20px_-6px_rgba(79,70,229,0.2)] dark:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.6)]
+           border border-brand-100/50 dark:border-white/10 font-black;
     position: relative;
   }
   .oc-sidebar-item-active::before {
     content: '';
     position: absolute;
     left: 0; top: 25%; bottom: 25%; width: 3px;
-    @apply bg-gradient-to-b from-indigo-500 to-purple-500 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)];
+    @apply bg-gradient-to-b from-brand-500 to-purple-500 rounded-full;
+    box-shadow: 0 0 10px rgb(var(--tw-custom-brand-500) / 0.5);
   }
   .sidebar-chapter-active {
-    @apply text-indigo-700 dark:text-indigo-400 font-black relative bg-indigo-50/50 dark:bg-indigo-900/10;
+    @apply text-brand-700 dark:text-brand-400 font-black relative bg-brand-50/50 dark:bg-brand-900/10;
   }
   .sidebar-chapter-active::after {
     content: '';
-    @apply absolute left-0 top-0 bottom-0 w-1 bg-indigo-500/80;
+    @apply absolute left-0 top-0 bottom-0 w-1 bg-brand-500/80;
   }
   .tab-btn-active {
-    @apply border-brand-500 text-brand-600 dark:text-brand-400 bg-white dark:bg-slate-900;
+    @apply border-brand-500 text-brand-600 dark:text-brand-400 bg-slate-50 dark:bg-slate-900;
   }
   .tab-btn-inactive {
     @apply border-transparent text-slate-500 dark:text-slate-400
@@ -339,10 +355,10 @@
 /* KaTeX — given its own accent color (instead of inheriting the surrounding
    prose color) so formulas read as distinct notation, not blended-in text. */
 .katex {
-  color: #4341ca;
+  color: rgb(var(--tw-custom-brand-700));
 }
 .dark .katex {
-  color: #a5b8fc;
+  color: rgb(var(--tw-custom-brand-300));
 }
 
 /* Base sizing for math to match prose */

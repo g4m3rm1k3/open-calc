@@ -10,26 +10,9 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import AtomViewer from './AtomViewer.jsx'
 import { ELEMENTS, CATEGORY_COLORS } from './chemistry_data'
 
+import { useThemeColors } from '../../../hooks/useThemeColors';
 // ── Colour helpers ─────────────────────────────────────────────────────────────
-function useColors() {
-  const isDark = () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-  const [dark, setDark] = useState(isDark)
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
-  return {
-    bg:      dark ? '#0f172a' : '#f8fafc',
-    surface: dark ? '#1e293b' : '#ffffff',
-    surface2:dark ? '#0f172a' : '#f1f5f9',
-    border:  dark ? '#334155' : '#e2e8f0',
-    text:    dark ? '#e2e8f0' : '#1e293b',
-    muted:   dark ? '#94a3b8' : '#64748b',
-    hint:    dark ? '#475569' : '#94a3b8',
-    accent:  dark ? '#38bdf8' : '#0284c7',
-  }
-}
+
 
 // ── Section label ─────────────────────────────────────────────────────────────
 function SectionLabel({ text, C }) {
@@ -496,7 +479,7 @@ function ShellBuilder({ C }) {
 
 // ── Main export ───────────────────────────────────────────────────────────────
 export default function InsideTheAtom({ params }) {
-  const C = useColors()
+  const C = useThemeColors()
 
   const sections = [
     { id:'protons',   label:'Protons',        icon:'⚛', component: <ProtonExplorer C={C} /> },

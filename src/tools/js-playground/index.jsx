@@ -5,6 +5,7 @@ import { X, Plus, Trash2, Code2, Download } from "lucide-react";
 import FullPageIDE from "./FullPageIDE.jsx";
 import { zipSync, strToU8 } from "fflate";
 
+import { useThemeColors } from '../../hooks/useThemeColors';
 export const meta = {
   label: 'JS Playground',
   group: 'hidden',
@@ -68,36 +69,7 @@ ${cell.html || ""}
 }
 
 // ── Reactive colour tokens ────────────────────────────────────────────────────
-function useColors() {
-  const isDark = () =>
-    typeof document !== "undefined" &&
-    document.documentElement.classList.contains("dark");
-  const [dark, setDark] = useState(isDark);
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()));
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => obs.disconnect();
-  }, []);
-  return {
-    dark,
-    border: dark ? "#334155" : "#e2e8f0",
-    muted: dark ? "#64748b" : "#94a3b8",
-    accent: dark ? "#38bdf8" : "#0284c7",
-    green: dark ? "#34d399" : "#16a34a",
-    red: dark ? "#f87171" : "#dc2626",
-    yellow: dark ? "#fbbf24" : "#d97706",
-    editorBg: dark ? "#0c1222" : "#f8fafc",
-    previewBg: dark ? "#0a1016" : "#f1f5f9",
-    tabBarBg: dark ? "#0c1520" : "#f8fafc",
-    consoleBg: dark ? "#080e18" : "#f8fafc",
-    surface: dark ? "#0f172a" : "#ffffff",
-    card: dark ? "#1e293b" : "#f8fafc",
-    text: dark ? "#e2e8f0" : "#1e293b",
-  };
-}
+
 
 const TABS = ["html", "css", "js"];
 const TAB_LABEL = { html: "HTML", css: "CSS", js: "JavaScript" };
@@ -602,7 +574,7 @@ ${js}
 
 // ── Console panel ─────────────────────────────────────────────────────────────
 function ConsolePanel({ logs }) {
-  const T = useColors();
+  const T = useThemeColors();
   if (logs.length === 0) return null;
   const color = { log: T.text, error: T.red, warn: T.yellow };
   const icon = { log: "›", error: "✗", warn: "⚠" };
@@ -650,7 +622,7 @@ function ConsolePanel({ logs }) {
 
 // ── Template picker ───────────────────────────────────────────────────────────
 function TemplatePicker({ onInsert, onClose }) {
-  const T = useColors();
+  const T = useThemeColors();
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -725,7 +697,7 @@ function TemplatePicker({ onInsert, onClose }) {
 
 // ── Single cell ───────────────────────────────────────────────────────────────
 function PlaygroundCell({ cell, onChange, onDelete, canDelete }) {
-  const T = useColors();
+  const T = useThemeColors();
   const iframeRef = useRef(null);
   const iframeUidRef = useRef(null);
   const debounceRef = useRef(null);
@@ -946,7 +918,7 @@ const INITIAL_CELLS = [
 ];
 
 export default function GlobalJSPlayground({ isOpen, onClose }) {
-  const T = useColors();
+  const T = useThemeColors();
   const [cells, setCells] = useState(INITIAL_CELLS);
 
   const updateCell = (id, updated) =>

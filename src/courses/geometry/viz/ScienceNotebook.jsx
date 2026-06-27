@@ -18,6 +18,8 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import { setupOpenCalcMonaco } from '../../../utils/monacoThemes.js'
 
+import { makeNotebookTokens } from '../../../utils/themeTokens';
+import { useGlobalTheme } from '../../../context/ThemeContext.jsx';
 // ── Theme ──────────────────────────────────────────────────────────────────────
 function useIsDark() {
   const isDark = () =>
@@ -34,13 +36,7 @@ function useIsDark() {
 
 function makeT(dark) {
   return {
-    bg:       dark ? '#0f172a'  : '#f8fafc',
-    panel:    dark ? '#1e293b'  : '#ffffff',
-    panel2:   dark ? '#0f172a'  : '#f1f5f9',
-    border:   dark ? '#334155'  : '#e2e8f0',
-    text:     dark ? '#e2e8f0'  : '#1e293b',
-    muted:    dark ? '#94a3b8'  : '#64748b',
-    accent:   dark ? '#38bdf8'  : '#0284c7',
+    ...makeNotebookTokens(dark),
     green:    dark ? '#34d399'  : '#16a34a',
     greenBg:  dark ? '#052e16'  : '#d1fae5',
     greenBd:  dark ? '#10b981'  : '#10b981',
@@ -50,7 +46,7 @@ function makeT(dark) {
     yellow:   dark ? '#fbbf24'  : '#d97706',
     yellowBg: dark ? '#451a03'  : '#fef3c7',
     iframeBg: dark ? '#0f1923'  : '#ffffff',
-  }
+  };
 }
 
 function iframeThemeVars(dark) {
@@ -289,7 +285,7 @@ function MDText({ text, T }) {
 }
 
 // ── Visual cell (type:'js') — auto-runs, no editor shown ──────────────────────
-function VisualCell({ cell, cellIndex, T, dark, forceCodeOpen }) {
+function VisualCell({ cell, cellIndex, T, dark, monacoTheme, forceCodeOpen }) {
   const iframeRef  = useRef(null)
   const [height, setHeight]     = useState(cell.outputHeight || 160)
   const [showCode, setShowCode] = useState(false)
@@ -382,7 +378,7 @@ function VisualCell({ cell, cellIndex, T, dark, forceCodeOpen }) {
             beforeMount={setupOpenCalcMonaco}
             language={currentTab.lang}
             value={currentTab.code}
-            theme={dark ? 'open-calc-dark' : 'open-calc-light'}
+            theme={monacoTheme || (dark ? 'open-calc-dark' : 'open-calc-light')}
             options={{
               readOnly: true, fontSize: 12, lineHeight: 19,
               minimap: { enabled: false }, scrollBeyondLastLine: false,
@@ -414,7 +410,7 @@ function VisualCell({ cell, cellIndex, T, dark, forceCodeOpen }) {
 }
 
 // ── Challenge cell — options rendered as buttons in iframe ─────────────────────
-function ChallengeCell({ cell, cellIndex, T, dark, onPass }) {
+function ChallengeCell({ cell, cellIndex, T, dark, monacoTheme, onPass }) {
   const iframeRef  = useRef(null)
   const [state, setState] = useState(null) // null | 'pass' | 'fail'
 
@@ -547,7 +543,7 @@ function MarkdownCell({ cell, T }) {
 }
 
 // ── Coding cell — Monaco editor + Run + check() ───────────────────────────────
-function CodingCell({ cell, cellIndex, T, dark, onPass }) {
+function CodingCell({ cell, cellIndex, T, dark, monacoTheme, onPass }) {
   const iframeRef = useRef(null)
   const [code, setCode]         = useState(cell.startCode || '')
   const [logs, setLogs]         = useState([])
@@ -706,7 +702,7 @@ if(window.ResizeObserver){new ResizeObserver(r).observe(document.body)}else{wind
           language={cell.language || 'javascript'}
           value={showSolution ? (cell.solutionCode || code) : code}
           onChange={(val='') => { if (!showSolution) setCode(val) }}
-          theme={dark ? 'open-calc-dark' : 'open-calc-light'}
+          theme={monacoTheme || (dark ? 'open-calc-dark' : 'open-calc-light')}
           options={{ fontSize:13, lineHeight:20, minimap:{enabled:false}, scrollBeyondLastLine:false, wordWrap:'on', tabSize:2, readOnly:showSolution, renderLineHighlight:'none', overviewRulerLanes:0, folding:false, lineDecorationsWidth:6, lineNumbersMinChars:3, padding:{top:10,bottom:10} }}
         />
       </div>
@@ -735,7 +731,7 @@ if(window.ResizeObserver){new ResizeObserver(r).observe(document.body)}else{wind
 }
 
 // ── Walkthrough cell — numbered steps + read-only preview ─────────────────────
-function WalkthroughCell({ cell, cellIndex, T, dark }) {
+function WalkthroughCell({ cell, cellIndex, T, dark, monacoTheme }) {
   const [step, setStep] = useState(0)
   const iframeRef = useRef(null)
   const [height, setHeight] = useState(cell.outputHeight || 280)
@@ -822,7 +818,7 @@ function WalkthroughCell({ cell, cellIndex, T, dark }) {
             beforeMount={setupOpenCalcMonaco}
             language={cell.language || 'javascript'}
             value={currentStep.code}
-            theme={dark ? 'open-calc-dark' : 'open-calc-light'}
+            theme={monacoTheme || (dark ? 'open-calc-dark' : 'open-calc-light')}
             options={{ readOnly: true, fontSize: 12, lineHeight: 19, minimap: { enabled: false }, scrollBeyondLastLine: false, wordWrap: 'on', renderLineHighlight: 'none', overviewRulerLanes: 0, folding: false, lineDecorationsWidth: 6, lineNumbersMinChars: 3, padding: { top: 8, bottom: 8 }, domReadOnly: true }}
           />
         </div>
@@ -886,6 +882,8 @@ function ProgressBar({ cells, passedSet, T }) {
 export default function ScienceNotebook({ lesson: lessonProp, params = {} }) {
   const lesson = lessonProp ?? params?.lesson
   const dark   = useIsDark()
+  const { themeStyles } = useGlobalTheme()
+  const monacoTheme = themeStyles?.monaco || (dark ? 'open-calc-dark' : 'open-calc-light')
   const T      = makeT(dark)
   const [passedChallenges, setPassedChallenges] = useState(new Set())
   const [globalConsoleOpen, setGlobalConsoleOpen] = useState(false)
@@ -931,11 +929,11 @@ export default function ScienceNotebook({ lesson: lessonProp, params = {} }) {
       {/* Cells */}
       {cells.map((cell, i) => {
         if (cell.type === 'markdown')    return <MarkdownCell key={i} cell={cell} T={T} />
-        if (cell.type === 'challenge')   return <ChallengeCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} onPass={handlePass} />
-        if (cell.type === 'coding')      return <CodingCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} onPass={handlePass} />
-        if (cell.type === 'walkthrough') return <WalkthroughCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} />
+        if (cell.type === 'challenge')   return <ChallengeCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} monacoTheme={monacoTheme} onPass={handlePass} />
+        if (cell.type === 'coding')      return <CodingCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} monacoTheme={monacoTheme} onPass={handlePass} />
+        if (cell.type === 'walkthrough') return <WalkthroughCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} monacoTheme={monacoTheme} />
         // type:'js' and anything else = auto-run visual preview
-        return <VisualCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} forceCodeOpen={globalConsoleOpen} />
+        return <VisualCell key={i} cell={cell} cellIndex={i} T={T} dark={dark} monacoTheme={monacoTheme} forceCodeOpen={globalConsoleOpen} />
       })}
     </div>
   )

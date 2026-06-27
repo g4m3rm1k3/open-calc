@@ -40,14 +40,14 @@ const makeC = (dark) => ({
   panel:    dark ? '#111827'  : '#ffffff',
   border:   dark ? '#1e2d42'  : '#e2e8f0',
   border2:  dark ? '#273548'  : '#cbd5e1',
-  text:     dark ? '#e2e8f0'  : '#1e293b',
+  text: dark ? "rgb(var(--tw-custom-slate-200))" : "rgb(var(--tw-custom-slate-800))",
   muted:    dark ? '#64748b'  : '#94a3b8',
   hint:     dark ? '#334155'  : '#cbd5e1',
-  blue:     dark ? '#38bdf8'  : '#0284c7',
+  blue: dark ? "rgb(var(--tw-custom-brand-400))" : "rgb(var(--tw-custom-brand-600))",
   green:    dark ? '#4ade80'  : '#16a34a',
   amber:    dark ? '#fbbf24'  : '#d97706',
   red:      dark ? '#f87171'  : '#dc2626',
-  teal:     dark ? '#2dd4bf'  : '#0d9488',
+  teal: dark ? "rgb(var(--tw-custom-brand-400))" : "rgb(var(--tw-custom-brand-600))",
   purple:   dark ? '#c084fc'  : '#7c3aed',
   rapid:    dark ? '#fbbf24'  : '#d97706',
   feed:     dark ? '#38bdf8'  : '#2563eb',
@@ -677,7 +677,7 @@ function CellEditor({ cell, idx, isDark, C, running, ranUpto, onCodeChange, onLa
         value={cell.code}
         onChange={v => onCodeChange(cell.id, v ?? '')}
         beforeMount={setupOpenCalcMonaco}
-        theme={isDark ? 'opencalc-dark' : 'light'}
+        theme={isDark ? 'open-calc-dark' : 'open-calc-light'}
         options={{
           minimap: { enabled: false },
           fontSize: 12,

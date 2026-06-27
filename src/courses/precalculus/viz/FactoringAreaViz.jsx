@@ -27,10 +27,10 @@ export default function FactoringAreaViz({ params = {} }) {
   const getC = () => {
     const dark = document.documentElement.classList.contains('dark')
     return {
-      bg:     dark ? '#0f172a' : '#f8fafc',
+      bg: dark ? "rgb(var(--tw-custom-slate-900))" : "rgb(var(--tw-custom-slate-50))",
       panel:  dark ? '#1e293b' : '#ffffff',
-      border: dark ? '#334155' : '#e2e8f0',
-      text:   dark ? '#e2e8f0' : '#1e293b',
+      border: dark ? "rgb(var(--tw-custom-slate-700))" : "rgb(var(--tw-custom-slate-200))",
+      text: dark ? "rgb(var(--tw-custom-slate-200))" : "rgb(var(--tw-custom-slate-800))",
       muted:  dark ? '#64748b' : '#94a3b8',
       // tile colours — positive
       x2f:  dark ? '#1e3a5f' : '#dbeafe',  x2s:  dark ? '#3b82f6' : '#2563eb',

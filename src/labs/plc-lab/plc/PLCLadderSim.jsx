@@ -26,6 +26,7 @@
 
 import { useState, useEffect, useRef, useCallback, createContext, useContext } from 'react';
 
+import { makeCircuitTokens } from '../../../utils/themeTokens';
 function useDark() {
   const check = () => document.documentElement.classList.contains('dark');
   const [dark, setDark] = useState(check);
@@ -39,15 +40,7 @@ function useDark() {
 
 function makeT(dark) {
   return {
-    bg:     dark ? '#0a0f1e' : '#f8fafc',
-    panel:  dark ? '#111827' : '#ffffff',
-    card:   dark ? '#1e293b' : '#f1f5f9',
-    inset:  dark ? '#0f172a' : '#f8fafc',
-    border: dark ? '#1e293b' : '#e2e8f0',
-    fence:  dark ? '#334155' : '#d1d5db',
-    text:   dark ? '#e2e8f0' : '#1e293b',
-    sub:    dark ? '#94a3b8' : '#64748b',
-    dim:    dark ? '#475569' : '#94a3b8',
+    ...makeCircuitTokens(dark),
     muted:  dark ? '#64748b' : '#9ca3af',
     wireOff: dark ? '#334155' : '#cbd5e1',
   };

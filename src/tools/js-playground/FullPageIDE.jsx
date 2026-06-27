@@ -45,44 +45,10 @@ import {
   FolderOpen,
   Folder,
 } from "lucide-react";
+import { useThemeColors } from '../../hooks/useThemeColors';
 
 // ── Reactive colour tokens ────────────────────────────────────────────────────
-function useColors() {
-  const isDark = () =>
-    typeof document !== "undefined" &&
-    document.documentElement.classList.contains("dark");
-  const [dark, setDark] = useState(isDark);
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()));
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => obs.disconnect();
-  }, []);
-  return {
-    dark,
-    bg: dark ? "#0d1117" : "#ffffff",
-    surface: dark ? "#161b22" : "#f6f8fa",
-    surface2: dark ? "#21262d" : "#eaeef2",
-    border: dark ? "#30363d" : "#d0d7de",
-    text: dark ? "#e6edf3" : "#24292f",
-    muted: dark ? "#7d8590" : "#57606a",
-    accent: dark ? "#58a6ff" : "#0969da",
-    accentBg: dark ? "rgba(88,166,255,0.12)" : "rgba(9,105,218,0.08)",
-    green: dark ? "#3fb950" : "#1a7f37",
-    greenBg: dark ? "rgba(63,185,80,0.12)" : "rgba(26,127,55,0.08)",
-    orange: dark ? "#f0883e" : "#bc4c00",
-    orangeBg: dark ? "rgba(240,136,62,0.12)" : "rgba(188,76,0,0.08)",
-    red: dark ? "#f85149" : "#cf222e",
-    redBg: dark ? "rgba(248,81,73,0.12)" : "rgba(207,34,46,0.08)",
-    yellow: dark ? "#d29922" : "#9a6700",
-    purple: dark ? "#d2a8ff" : "#8250df",
-    tab: dark ? "#0d1117" : "#ffffff",
-    tabActive: dark ? "#161b22" : "#ffffff",
-    editorBg: dark ? "#0d1117" : "#ffffff",
-  };
-}
+
 
 // ── Build sandboxed iframe srcdoc – HTML mode ─────────────────────────────────
 function buildDoc(html, css, js) {
@@ -952,7 +918,7 @@ function CppPane({ output, running, stdin, onStdinChange, onRun, T }) {
 // Main Component
 // ─────────────────────────────────────────────────────────────────────────────
 export default function FullPageIDE({ cell, onChange, onClose, contained = false }) {
-  const T = useColors();
+  const T = useThemeColors();
 
   // ── File state ────────────────────────────────────────────────────────────
   const coreFiles = useMemo(

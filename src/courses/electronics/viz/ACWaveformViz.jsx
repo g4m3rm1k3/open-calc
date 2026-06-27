@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 
+import { makeCircuitTokens } from '../../../utils/themeTokens';
 const TWO_PI = Math.PI * 2;
 
 function useDark() {
@@ -15,12 +16,7 @@ function useDark() {
 
 function makeT(dark) {
   return {
-    bg:       dark ? '#0a0f1e' : '#f8fafc',
-    card:     dark ? '#1e293b' : '#f8fafc',
-    border:   dark ? '#1e293b' : '#e2e8f0',
-    text:     dark ? '#e2e8f0' : '#1e293b',
-    sub:      dark ? '#94a3b8' : '#64748b',
-    dim:      dark ? '#475569' : '#94a3b8',
+    ...makeCircuitTokens(dark),
     canvasBg: dark ? '#0f172a' : '#ffffff',
     gridLine: dark ? '#1e293b' : '#e5e7eb',
     zeroLine: dark ? '#334155' : '#d1d5db',

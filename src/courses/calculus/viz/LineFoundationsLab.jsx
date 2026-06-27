@@ -1,41 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { Plus, Info, Hash, Activity, Compass, Settings, Check, LayoutGrid } from 'lucide-react'
 
+import { useThemeColors } from '../../../hooks/useThemeColors';
 // ── CORE HOOKS ──────────────────────────────────────────────────────────────
 
-function useColors() {
-  const isDark = () => typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
-  const [dark, setDark] = useState(isDark)
-  useEffect(() => {
-    const obs = new MutationObserver(() => setDark(isDark()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => obs.disconnect()
-  }, [])
-  return {
-    bg: dark ? '#0f172a' : '#f8fafc',
-    surface: dark ? '#1e293b' : '#ffffff',
-    surface2: dark ? '#0f172a' : '#f1f5f9',
-    border: dark ? '#334155' : '#e2e8f0',
-    text: dark ? '#f1f5f9' : '#1e293b',
-    muted: dark ? '#94a3b8' : '#64748b',
-    hint: dark ? '#475569' : '#94a3b8',
-    blue: dark ? '#38bdf8' : '#0284c7',
-    blueBg: dark ? 'rgba(56,189,248,0.1)' : 'rgba(2,132,199,0.05)',
-    blueBd: dark ? '#38bdf8' : '#0284c7',
-    amber: dark ? '#fbbf24' : '#d97706',
-    amberBg: dark ? 'rgba(251,191,36,0.1)' : 'rgba(217,119,6,0.05)',
-    amberBd: dark ? '#fbbf24' : '#d97706',
-    green: dark ? '#4ade80' : '#16a34a',
-    greenBg: dark ? 'rgba(74,222,128,0.1)' : 'rgba(22,163,74,0.05)',
-    greenBd: dark ? '#4ade80' : '#16a34a',
-    red: dark ? '#f87171' : '#dc2626',
-    redBg: dark ? 'rgba(248,113,113,0.1)' : 'rgba(220,38,38,0.05)',
-    redBd: dark ? '#f87171' : '#dc2626',
-    purple: dark ? '#a78bfa' : '#7c3aed',
-    purpleBg: dark ? 'rgba(167,139,250,0.1)' : 'rgba(124,58,237,0.05)',
-    purpleBd: dark ? '#a78bfa' : '#7c3aed',
-  }
-}
+
 
 // ── UI COMPONENTS ────────────────────────────────────────────────────────────
 
@@ -70,7 +39,7 @@ const Callout = ({ title, children, color, icon: Icon, C }) => {
 // ── THE ENGINE ───────────────────────────────────────────────────────────────
 
 export default function LineFoundationsLab() {
-  const C = useColors()
+  const C = useThemeColors()
   const [mode, setMode] = useState('slope') // slope, forms, parallel, tangent, scenarios
   const [points, setPoints] = useState([{ x: 1, y: 2 }, { x: 5, y: 5 }])
   const [activePoint, setActivePoint] = useState(null)

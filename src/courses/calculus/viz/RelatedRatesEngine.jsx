@@ -127,10 +127,10 @@ function MachineTab({ ready, dark }) {
     const W = c.width, H = c.height;
 
     const col = {
-      bg:      dark ? "#0f172a" : "#f8fafc",
+      bg: dark ? "rgb(var(--tw-custom-slate-900))" : "rgb(var(--tw-custom-slate-50))",
       panel:   dark ? "#1e293b" : "#ffffff",
-      border:  dark ? "#334155" : "#e2e8f0",
-      text:    dark ? "#e2e8f0" : "#1e293b",
+      border: dark ? "rgb(var(--tw-custom-slate-700))" : "rgb(var(--tw-custom-slate-200))",
+      text: dark ? "rgb(var(--tw-custom-slate-200))" : "rgb(var(--tw-custom-slate-800))",
       muted:   dark ? "#64748b" : "#94a3b8",
       given:   dark ? "#38bdf8" : "#0284c7",   // blue — the given rate
       gear:    dark ? "#a78bfa" : "#7c3aed",   // purple — chain rule gear

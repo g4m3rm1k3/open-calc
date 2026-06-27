@@ -34,54 +34,11 @@ import { setupOpenCalcMonaco } from "../../utils/monacoThemes.js";
 import openMatGuide from "../../../docs/OpenMAT.md?raw";
 import { createExecutionEngine, executeScript, normalizeLine as normalizeOpenMatLine } from "../../engines/openmat/openmatEngine.js";
 
+import { useThemeColors } from '../../hooks/useThemeColors';
 const math = create(all);
 math.config({ matrix: "Array", number: "number" });
 
-function useColors() {
-  const isDark = () =>
-    typeof document !== "undefined" &&
-    document.documentElement.classList.contains("dark");
-  const [dark, setDark] = useState(isDark);
 
-  useEffect(() => {
-    const observer = new MutationObserver(() => setDark(isDark()));
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["class"],
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  return {
-    isDark: dark,
-    pageBg: dark ? "#07111e" : "#f4f7fb",
-    pageGlow: dark ? "rgba(33, 102, 255, 0.10)" : "rgba(33, 102, 255, 0.08)",
-    surface: dark ? "#0f172a" : "#ffffff",
-    surface2: dark ? "#132033" : "#edf4ff",
-    surface3: dark ? "#0b1424" : "#f8fbff",
-    border: dark ? "#2b3a55" : "#d5dfef",
-    text: dark ? "#e6eefb" : "#15253a",
-    muted: dark ? "#90a4c2" : "#607188",
-    hint: dark ? "#61738e" : "#8a99ae",
-    blue: dark ? "#63b8ff" : "#1769d1",
-    amber: dark ? "#f0b44c" : "#b36d05",
-    green: dark ? "#46d89f" : "#198754",
-    red: dark ? "#ff8b8b" : "#c03535",
-    purple: dark ? "#b89cff" : "#6f42c1",
-    teal: dark ? "#31d0c4" : "#0f8d85",
-    heroBg: dark
-      ? "linear-gradient(135deg, #091324 0%, #0a314e 52%, #0f5f64 100%)"
-      : "linear-gradient(135deg, #eef6ff 0%, #daeefe 48%, #ddfbf3 100%)",
-    heroBorder: dark ? "rgba(148, 184, 255, 0.18)" : "rgba(23, 105, 209, 0.16)",
-    heroText: dark ? "#ffffff" : "#10243e",
-    heroMuted: dark ? "#d8e5f5" : "#3d5878",
-    heroBadgeBg: dark ? "rgba(255,255,255,0.10)" : "rgba(23, 105, 209, 0.10)",
-    heroBadgeBorder: dark ? "rgba(255,255,255,0.18)" : "rgba(23, 105, 209, 0.18)",
-    heroBadgeText: dark ? "#d9f9ff" : "#1769d1",
-    heroPillBg: dark ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.66)",
-    heroPillText: dark ? "#e7f4ff" : "#244667",
-  };
-}
 
 const DEFAULT_CODE = `A = [1 2 3; 4 5 6; 7 8 10];
 b = [3; 3; 4];
@@ -5042,7 +4999,7 @@ function OpenMatPlotWindow({
 
 export default function OpenMatStudio() {
   const navigate = useNavigate();
-  const C = useColors();
+  const C = useThemeColors();
   const { openGrapher } = useGrapher();
   const [documents, setDocuments] = useLocalStorage("openmat-documents", getInitialOpenMatDocuments());
   const [activeDocumentId, setActiveDocumentId] = useLocalStorage(
