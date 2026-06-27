@@ -10,6 +10,8 @@
  * iframes don't break the mobile layout.
  */
 import { useRef, useState, useEffect, useCallback } from "react";
+import { Volume2, Square } from "lucide-react";
+import { useSpeech, cleanForSpeech } from "../../utils/useSpeech.js";
 import VizFrame from "../viz/VizFrame.jsx";
 import Callout from "../ui/Callout.jsx";
 import SVGImage from "./SVGImage.jsx";
@@ -34,21 +36,63 @@ const BULLET_RE = /^[•\-*]\s+/;
 const ORDERED_RE = /^\d+\.\s+/;
 
 function ProseParagraph({ text }) {
+  const { speak, stop } = useSpeech();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playingRef = useRef(false);
+
+  const handleRead = useCallback(async () => {
+    if (playingRef.current) {
+      stop();
+      playingRef.current = false;
+      setIsPlaying(false);
+      return;
+    }
+    stop();
+    playingRef.current = true;
+    setIsPlaying(true);
+    await speak(cleanForSpeech(text));
+    if (playingRef.current) {
+      playingRef.current = false;
+      setIsPlaying(false);
+    }
+  }, [speak, stop, text]);
+
   const match = text.match(HEADING_PREFIX);
   if (match) {
     const heading = match[1];
     const body = text.slice(match[0].length).trim();
     return (
-      <div className="mt-8 mb-4">
+      <div className="relative group mt-8 mb-4">
+        <ReadBtn isPlaying={isPlaying} onClick={handleRead} />
         <p className="text-[11px] font-black uppercase tracking-[0.14em] text-brand-600 dark:text-sky-400 mb-2">{heading}</p>
         {body && <MarkdownProse text={body} />}
       </div>
     );
   }
   return (
-    <div className="mb-6 last:mb-0">
+    <div className="relative group mb-6 last:mb-0">
+      <ReadBtn isPlaying={isPlaying} onClick={handleRead} />
       <MarkdownProse text={text} />
     </div>
+  );
+}
+
+function ReadBtn({ isPlaying, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      title={isPlaying ? 'Stop reading' : 'Read aloud'}
+      className={`absolute top-0 right-0 z-10 flex items-center gap-1 px-1.5 py-0.5 text-[11px] font-medium rounded border transition-all ${
+        isPlaying
+          ? 'opacity-100 text-cyan-600 border-cyan-300 bg-cyan-50 dark:text-cyan-300 dark:border-cyan-700/60 dark:bg-cyan-900/20'
+          : 'opacity-0 group-hover:opacity-100 text-slate-400 border-slate-200 bg-white/90 dark:bg-slate-800/90 dark:border-slate-700 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+      }`}
+    >
+      {isPlaying
+        ? <><Square className="w-2.5 h-2.5 fill-current" />&nbsp;Stop</>
+        : <><Volume2 className="w-2.5 h-2.5" />&nbsp;Read</>
+      }
+    </button>
   );
 }
 
