@@ -50,6 +50,7 @@ export default function BlogListPage() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
 
+
   const posts = useMemo(() => {
     if (!query.trim()) return ALL_POSTS
     const q = query.toLowerCase()
@@ -64,13 +65,21 @@ export default function BlogListPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
       {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
-          Blog
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400 text-lg">
-          Deep-dives on computer science, math, and programming — with runnable code.
-        </p>
+      <div className="mb-10 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
+            Blog
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-lg">
+            Deep-dives on computer science, math, and programming — with runnable code.
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/blog/new')}
+          className="shrink-0 mt-1 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors shadow-sm"
+        >
+          + New Post
+        </button>
       </div>
 
       {/* Search */}

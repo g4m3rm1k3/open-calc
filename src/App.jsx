@@ -63,6 +63,7 @@ const CalendarPage = lazy(() => import("./features/calendar/CalendarPage.tsx"));
 const CompassPage = lazy(() => import("./features/compass/CompassPage.tsx"));
 const BlogListPage = lazy(() => import("./pages/BlogListPage.jsx"));
 const BlogPostPage = lazy(() => import("./pages/BlogPostPage.jsx"));
+const BlogBuilderPage = lazy(() => import("./pages/BlogBuilderPage.jsx"));
 const NotificationToast = lazy(
   () => import("./features/calendar/NotificationToast.tsx"),
 );
@@ -179,6 +180,7 @@ export default function App() {
                             <Route path="calendar" element={<CalendarPage />} />
                             <Route path="compass" element={<CompassPage />} />
                             <Route path="blog" element={<BlogListPage />} />
+                            <Route path="blog/new" element={<BlogBuilderPage />} />
                             <Route path="blog/:slug" element={<BlogPostPage />} />
 
                             {/* Game auto-discovery */}

@@ -7,10 +7,13 @@ import rehypeKatex from 'rehype-katex'
 import 'katex/dist/katex.min.css'
 import Toolbar from '../../markdown-toolbar/MarkdownToolbar.jsx'
 import { CodeBlockPre, CodeBlockCode } from '../../math/CodeBlock.jsx'
+import { useGlobalTheme } from '../../../context/ThemeContext.jsx'
 
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function MarkdownCellEditor({ value, onChange, onClose, title = '📝 Markdown Editor' }) {
+  const { isDarkGlobal } = useGlobalTheme()
+  const monacoTheme = isDarkGlobal ? 'vs-dark' : 'vs'
   const editorRef = useRef(null)
   const [preview, setPreview] = useState(value ?? '')
 
@@ -31,28 +34,23 @@ export default function MarkdownCellEditor({ value, onChange, onClose, title = '
   }
 
   return (
-    <div className="fixed inset-0 z-[600] flex flex-col" style={{ background: '#0d1117' }}>
+    <div className="fixed inset-0 z-[600] flex flex-col bg-white dark:bg-slate-950">
       {/* Top bar */}
-      <div
-        className="flex items-center gap-3 px-4 py-2.5 shrink-0 border-b"
-        style={{ background: '#161b22', borderColor: '#30363d' }}
-      >
+      <div className="flex items-center gap-3 px-4 py-2.5 shrink-0 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
         <button
           onClick={onClose}
-          className="text-sm px-2 py-1 rounded hover:bg-white/10 transition-colors"
-          style={{ color: '#8b949e' }}
+          className="text-sm px-2 py-1 rounded transition-colors hover:opacity-70 text-slate-500 dark:text-slate-400"
         >
           ← Close
         </button>
-        <span className="text-sm font-semibold" style={{ color: '#e6edf3' }}>{title}</span>
-        <span className="text-xs" style={{ color: '#8b949e' }}>
+        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{title}</span>
+        <span className="text-xs text-slate-400 dark:text-slate-500">
           Live preview · KaTeX · GFM tables · Click toolbar buttons to insert at cursor
         </span>
         <div className="ml-auto">
           <button
             onClick={handleSave}
-            className="px-5 py-1.5 text-sm font-bold rounded-lg"
-            style={{ background: '#238636', color: '#ffffff' }}
+            className="px-5 py-1.5 text-sm font-bold rounded-lg bg-[#238636] text-white"
           >
             Save
           </button>
@@ -65,18 +63,15 @@ export default function MarkdownCellEditor({ value, onChange, onClose, title = '
       {/* Split: editor | preview */}
       <div className="flex flex-1 min-h-0">
         {/* Left: Monaco */}
-        <div className="flex flex-col min-h-0" style={{ width: '52%', borderRight: '1px solid #30363d' }}>
-          <div
-            className="px-3 py-1 text-xs shrink-0"
-            style={{ background: '#161b22', borderBottom: '1px solid #30363d', color: '#8b949e' }}
-          >
+        <div className="flex flex-col min-h-0 border-r border-slate-200 dark:border-slate-700" style={{ width: '52%' }}>
+          <div className="px-3 py-1 text-xs shrink-0 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400">
             Markdown source
           </div>
           <div className="flex-1 min-h-0">
             <Editor
               defaultValue={value ?? ''}
               language="markdown"
-              theme="vs-dark"
+              theme={monacoTheme}
               options={{
                 fontSize: 14,
                 lineHeight: 22,
@@ -93,53 +88,41 @@ export default function MarkdownCellEditor({ value, onChange, onClose, title = '
         </div>
 
         {/* Right: live preview */}
-        <div
-          className="flex flex-col min-h-0 flex-1 overflow-hidden"
-        >
-          <div
-            className="px-3 py-1 text-xs shrink-0"
-            style={{ background: '#161b22', borderBottom: '1px solid #30363d', color: '#8b949e' }}
-          >
+        <div className="flex flex-col min-h-0 flex-1 overflow-hidden">
+          <div className="px-3 py-1 text-xs shrink-0 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400">
             Rendered preview
           </div>
-          <div
-            className="flex-1 overflow-y-auto p-6"
-            style={{ background: '#0d1117', color: '#e6edf3' }}
-          >
+          <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeKatex]}
               components={{
-                h1: ({children}) => <h1 className="text-2xl font-bold mb-4 pb-2" style={{ borderBottom: '1px solid #30363d', color: '#e6edf3' }}>{children}</h1>,
-                h2: ({children}) => <h2 className="text-xl font-bold mt-6 mb-3" style={{ color: '#e6edf3' }}>{children}</h2>,
-                h3: ({children}) => <h3 className="text-lg font-bold mt-5 mb-2" style={{ color: '#c9d1d9' }}>{children}</h3>,
-                h4: ({children}) => <h4 className="text-base font-semibold mt-4 mb-2" style={{ color: '#c9d1d9' }}>{children}</h4>,
-                p: ({children}) => <p className="mb-4 leading-7" style={{ color: '#c9d1d9' }}>{children}</p>,
-                strong: ({children}) => <strong style={{ color: '#e6edf3', fontWeight: 700 }}>{children}</strong>,
-                em: ({children}) => <em style={{ color: '#c9d1d9' }}>{children}</em>,
-                // react-markdown v10 doesn't pass an `inline` boolean (that
-                // was removed years ago) — this used to check `inline`
-                // directly, which is always undefined now, so every code
-                // span (even single-backtick inline code) rendered as a
-                // full block. Checking className (only set on fenced
-                // blocks) is the correct v10 way to tell them apart, and
-                // also gets real Prism syntax highlighting for free.
+                h1: ({children}) => <h1 className="text-2xl font-bold mb-4 pb-2 border-b border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100">{children}</h1>,
+                h2: ({children}) => <h2 className="text-xl font-bold mt-6 mb-3 text-slate-900 dark:text-slate-100">{children}</h2>,
+                h3: ({children}) => <h3 className="text-lg font-bold mt-5 mb-2 text-slate-800 dark:text-slate-200">{children}</h3>,
+                h4: ({children}) => <h4 className="text-base font-semibold mt-4 mb-2 text-slate-700 dark:text-slate-300">{children}</h4>,
+                p: ({children}) => <p className="mb-4 leading-7 text-slate-600 dark:text-slate-300">{children}</p>,
+                strong: ({children}) => <strong className="font-bold text-slate-900 dark:text-white">{children}</strong>,
+                em: ({children}) => <em className="text-slate-600 dark:text-slate-300">{children}</em>,
                 pre: CodeBlockPre,
                 code: ({ className, children }) => (
-                  <CodeBlockCode className={className} inlineClassName="px-1.5 py-0.5 rounded text-sm font-mono bg-[#21262d] text-[#f97316] border border-[#30363d]">
+                  <CodeBlockCode
+                    className={className}
+                    inlineClassName="px-1.5 py-0.5 rounded text-sm font-mono bg-slate-100 dark:bg-slate-800 text-rose-600 dark:text-orange-400 border border-slate-200 dark:border-slate-700"
+                  >
                     {children}
                   </CodeBlockCode>
                 ),
-                blockquote: ({children}) => <blockquote className="pl-4 my-4 italic" style={{ borderLeft: '4px solid #388bfd', color: '#8b949e' }}>{children}</blockquote>,
-                ul: ({children}) => <ul className="list-disc pl-6 mb-4 space-y-1" style={{ color: '#c9d1d9' }}>{children}</ul>,
-                ol: ({children}) => <ol className="list-decimal pl-6 mb-4 space-y-1" style={{ color: '#c9d1d9' }}>{children}</ol>,
+                blockquote: ({children}) => <blockquote className="pl-4 my-4 italic border-l-4 border-indigo-400 text-slate-500 dark:text-slate-400">{children}</blockquote>,
+                ul: ({children}) => <ul className="list-disc pl-6 mb-4 space-y-1 text-slate-600 dark:text-slate-300">{children}</ul>,
+                ol: ({children}) => <ol className="list-decimal pl-6 mb-4 space-y-1 text-slate-600 dark:text-slate-300">{children}</ol>,
                 li: ({children}) => <li className="leading-6">{children}</li>,
                 table: ({children}) => <div className="overflow-x-auto mb-4"><table className="w-full text-sm border-collapse">{children}</table></div>,
-                thead: ({children}) => <thead style={{ background: '#161b22' }}>{children}</thead>,
-                th: ({children}) => <th className="px-3 py-2 text-left font-semibold" style={{ border: '1px solid #30363d', color: '#e6edf3' }}>{children}</th>,
-                td: ({children}) => <td className="px-3 py-2" style={{ border: '1px solid #30363d', color: '#c9d1d9' }}>{children}</td>,
-                hr: () => <hr className="my-6" style={{ borderColor: '#30363d' }} />,
-                a: ({href, children}) => <a href={href} style={{ color: '#388bfd' }} className="underline underline-offset-2">{children}</a>,
+                thead: ({children}) => <thead className="bg-slate-50 dark:bg-slate-900">{children}</thead>,
+                th: ({children}) => <th className="px-3 py-2 text-left font-semibold border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200">{children}</th>,
+                td: ({children}) => <td className="px-3 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">{children}</td>,
+                hr: () => <hr className="my-6 border-slate-200 dark:border-slate-700" />,
+                a: ({href, children}) => <a href={href} className="text-indigo-600 dark:text-indigo-400 underline underline-offset-2">{children}</a>,
               }}
             >
               {preview || '*Start typing to see preview…*'}

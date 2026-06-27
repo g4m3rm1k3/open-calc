@@ -205,15 +205,37 @@ export const GROUPS = [
 
 // ── Quick-insert wizards: ask what you want, build the syntax for you ─────────
 
+const CODE_LANGS = [
+  { value: 'javascript', label: 'JavaScript' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'python', label: 'Python' },
+  { value: 'java', label: 'Java' },
+  { value: 'cpp', label: 'C++' },
+  { value: 'c', label: 'C' },
+  { value: 'rust', label: 'Rust' },
+  { value: 'go', label: 'Go' },
+  { value: 'ruby', label: 'Ruby' },
+  { value: 'bash', label: 'Bash / Shell' },
+  { value: 'r', label: 'R' },
+  { value: 'julia', label: 'Julia' },
+  { value: 'lua', label: 'Lua' },
+  { value: 'haskell', label: 'Haskell' },
+  { value: 'scala', label: 'Scala' },
+  { value: 'kotlin', label: 'Kotlin' },
+  { value: 'swift', label: 'Swift' },
+  { value: 'csharp', label: 'C#' },
+  { value: 'php', label: 'PHP' },
+  { value: 'matlab', label: 'MATLAB' },
+  { value: 'sql', label: 'SQL' },
+  { value: '', label: 'Terminal output (no language)' },
+]
+
 function QuickAddPopover({ title, onClose, wide, children }) {
   return (
-    <div
-      className={`absolute z-10 top-full left-0 mt-1 rounded-lg shadow-xl p-3 space-y-2 ${wide ? 'w-auto max-w-[min(90vw,640px)]' : 'w-72'}`}
-      style={{ background: '#1c2128', border: '1px solid #30363d' }}
-    >
+    <div className={`absolute z-10 top-full left-0 mt-1 rounded-lg shadow-xl border p-3 space-y-2 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 ${wide ? 'w-auto max-w-[min(90vw,640px)]' : 'w-72'}`}>
       <div className="flex items-center justify-between">
-        <span className="text-xs font-bold" style={{ color: '#e6edf3' }}>{title}</span>
-        <button onClick={onClose} className="text-xs px-1 hover:text-white" style={{ color: '#8b949e' }}>✕</button>
+        <span className="text-xs font-bold text-slate-800 dark:text-slate-100">{title}</span>
+        <button onClick={onClose} className="text-xs px-1 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">✕</button>
       </div>
       {children}
     </div>
@@ -222,13 +244,12 @@ function QuickAddPopover({ title, onClose, wide, children }) {
 
 function NumField({ label, value, onChange, min = 1, max = 20 }) {
   return (
-    <label className="flex items-center justify-between gap-2 text-xs" style={{ color: '#8b949e' }}>
+    <label className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
       {label}
       <input
         type="number" min={min} max={max} value={value}
         onChange={e => onChange(Math.min(max, Math.max(min, Number(e.target.value) || min)))}
-        className="w-16 text-xs rounded px-1.5 py-0.5"
-        style={{ background: '#21262d', border: '1px solid #30363d', color: '#e6edf3' }}
+        className="w-16 text-xs rounded px-1.5 py-0.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200"
       />
     </label>
   )
@@ -248,17 +269,14 @@ function GridInput({ value, onChange, placeholder, isHeader, width = 80 }) {
       value={value}
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
-      style={{
-        width, background: isHeader ? '#2d2410' : '#21262d',
-        border: '1px solid #30363d', color: '#e6edf3',
-        borderRadius: 4, padding: '3px 6px', fontSize: 11,
-      }}
+      className={`text-[11px] rounded border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 ${isHeader ? 'bg-amber-50 dark:bg-amber-950/30' : 'bg-slate-50 dark:bg-slate-700'}`}
+      style={{ width, padding: '3px 6px' }}
     />
   )
 }
 
 function TableQuickAdd({ onInsert, onClose }) {
-  const [rows, setRows] = useState(3) // total rows, including the header row if any
+  const [rows, setRows] = useState(3)
   const [cols, setCols] = useState(3)
   const [header, setHeader] = useState(true)
   const [cells, setCells] = useState(() =>
@@ -287,12 +305,12 @@ function TableQuickAdd({ onInsert, onClose }) {
       <div className="flex items-center gap-3">
         <NumField label="Rows" value={rows} onChange={v => { setRows(v); resize(v, cols) }} min={1} max={12} />
         <NumField label="Columns" value={cols} onChange={v => { setCols(v); resize(rows, v) }} min={1} max={8} />
-        <label className="flex items-center gap-1.5 text-xs" style={{ color: '#8b949e' }}>
+        <label className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
           <input type="checkbox" checked={header} onChange={e => setHeader(e.target.checked)} />
           First row is a header
         </label>
       </div>
-      <p className="text-[10px]" style={{ color: '#6e7681' }}>Type the actual cell values below — they'll be inserted exactly as written.</p>
+      <p className="text-[10px] text-slate-400 dark:text-slate-500">Type the actual cell values below — they'll be inserted exactly as written.</p>
       <div className="overflow-x-auto">
         <table className="border-collapse"><tbody>
           {cells.map((row, r) => (
@@ -311,7 +329,7 @@ function TableQuickAdd({ onInsert, onClose }) {
           ))}
         </tbody></table>
       </div>
-      <button onClick={insert} className="w-full text-xs font-bold py-1.5 rounded" style={{ background: '#238636', color: '#fff' }}>Insert</button>
+      <button onClick={insert} className="w-full text-xs font-bold py-1.5 rounded bg-[#238636] text-white">Insert</button>
     </QuickAddPopover>
   )
 }
@@ -346,14 +364,14 @@ function MatrixQuickAdd({ onInsert, onClose }) {
       <div className="flex items-center gap-3">
         <NumField label="Rows" value={rows} onChange={v => { setRows(v); resize(v, cols) }} min={1} max={6} />
         <NumField label="Columns" value={cols} onChange={v => { setCols(v); resize(rows, v) }} min={1} max={6} />
-        <label className="flex items-center gap-1.5 text-xs" style={{ color: '#8b949e' }}>
+        <label className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
           Style
-          <select value={style} onChange={e => setStyle(e.target.value)} className="text-xs rounded px-1.5 py-1" style={{ background: '#21262d', border: '1px solid #30363d', color: '#e6edf3' }}>
+          <select value={style} onChange={e => setStyle(e.target.value)} className="text-xs rounded px-1.5 py-1 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200">
             {MATRIX_STYLES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
           </select>
         </label>
       </div>
-      <p className="text-[10px]" style={{ color: '#6e7681' }}>Type each entry — numbers, variables, or LaTeX like \frac&#123;1&#125;&#123;2&#125;. Blank cells become 0.</p>
+      <p className="text-[10px] text-slate-400 dark:text-slate-500">Type each entry — numbers, variables, or LaTeX like \frac&#123;1&#125;&#123;2&#125;. Blank cells become 0.</p>
       <div className="overflow-x-auto">
         <table className="border-collapse"><tbody>
           {cells.map((row, r) => (
@@ -367,7 +385,46 @@ function MatrixQuickAdd({ onInsert, onClose }) {
           ))}
         </tbody></table>
       </div>
-      <button onClick={insert} className="w-full text-xs font-bold py-1.5 rounded" style={{ background: '#238636', color: '#fff' }}>Insert</button>
+      <button onClick={insert} className="w-full text-xs font-bold py-1.5 rounded bg-[#238636] text-white">Insert</button>
+    </QuickAddPopover>
+  )
+}
+
+function CodeBlockQuickAdd({ onInsert, onClose }) {
+  const [lang, setLang] = useState('javascript')
+  const isOutput = lang === ''
+
+  const preview = isOutput
+    ? '```\noutput goes here\n```'
+    : `\`\`\`${lang}\n// your code here\n\`\`\``
+
+  const insert = () => {
+    const text = isOutput
+      ? '\n```\noutput goes here\n```\n'
+      : `\n\`\`\`${lang}\n// your code here\n\`\`\`\n`
+    onInsert({ plain: text })
+    onClose()
+  }
+
+  return (
+    <QuickAddPopover title="⌥ Insert code block" onClose={onClose} wide>
+      <label className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+        Language
+        <select
+          value={lang}
+          onChange={e => setLang(e.target.value)}
+          className="text-xs rounded px-1.5 py-1 flex-1 ml-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200"
+        >
+          {CODE_LANGS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+        </select>
+      </label>
+      <pre className="text-[11px] rounded p-2 leading-5 font-mono mt-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-green-700 dark:text-green-400">
+        {preview}
+      </pre>
+      <p className="text-[10px] text-slate-400 dark:text-slate-500">
+        {isOutput ? 'Rendered as a dark terminal block — no run button.' : 'A runnable code cell. Fill in your code after inserting.'}
+      </p>
+      <button onClick={insert} className="w-full text-xs font-bold py-1.5 rounded bg-[#238636] text-white">Insert</button>
     </QuickAddPopover>
   )
 }
@@ -379,46 +436,48 @@ function MatrixQuickAdd({ onInsert, onClose }) {
 
 export default function MarkdownToolbar({ onInsert }) {
   const [activeGroup, setActiveGroup] = useState(GROUPS[0].label)
-  const [openQuickAdd, setOpenQuickAdd] = useState(null) // 'table' | 'matrix' | null
+  const [openQuickAdd, setOpenQuickAdd] = useState(null) // 'table' | 'matrix' | 'code' | null
   const group = GROUPS.find(g => g.label === activeGroup) ?? GROUPS[0]
 
   return (
-    <div className="shrink-0 py-2 px-3 space-y-2" style={{ background: '#161b22', borderBottom: '1px solid #30363d' }}>
+    <div className="shrink-0 py-2 px-3 space-y-2 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
       {/* Quick-add wizards */}
       <div className="flex items-center gap-1.5 relative">
-        <span className="text-[9px] font-bold uppercase tracking-widest shrink-0 w-14 text-right pr-1.5" style={{ color: '#f0a050' }}>
+        <span className="text-[9px] font-bold uppercase tracking-widest shrink-0 w-14 text-right pr-1.5 text-amber-600 dark:text-amber-400">
           Quick add
         </span>
         <button
+          onClick={() => setOpenQuickAdd(o => o === 'code' ? null : 'code')}
+          className="px-2 py-0.5 text-xs rounded font-semibold bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-700/50 text-slate-700 dark:text-slate-200 hover:border-amber-400 dark:hover:border-amber-500 transition-colors"
+        >⌥ Code…</button>
+        {openQuickAdd === 'code' && <CodeBlockQuickAdd onInsert={onInsert} onClose={() => setOpenQuickAdd(null)} />}
+        <button
           onClick={() => setOpenQuickAdd(o => o === 'table' ? null : 'table')}
-          className="px-2 py-0.5 text-xs rounded font-semibold"
-          style={{ background: '#21262d', border: '1px solid #f0a05044', color: '#e6edf3' }}
+          className="px-2 py-0.5 text-xs rounded font-semibold bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-700/50 text-slate-700 dark:text-slate-200 hover:border-amber-400 dark:hover:border-amber-500 transition-colors"
         >▦ Table…</button>
         {openQuickAdd === 'table' && <TableQuickAdd onInsert={onInsert} onClose={() => setOpenQuickAdd(null)} />}
         <button
           onClick={() => setOpenQuickAdd(o => o === 'matrix' ? null : 'matrix')}
-          className="px-2 py-0.5 text-xs rounded font-semibold"
-          style={{ background: '#21262d', border: '1px solid #f0a05044', color: '#e6edf3' }}
+          className="px-2 py-0.5 text-xs rounded font-semibold bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-700/50 text-slate-700 dark:text-slate-200 hover:border-amber-400 dark:hover:border-amber-500 transition-colors"
         >⊞ Matrix…</button>
         {openQuickAdd === 'matrix' && <MatrixQuickAdd onInsert={onInsert} onClose={() => setOpenQuickAdd(null)} />}
       </div>
 
       {/* Category tabs */}
       <div className="flex items-center gap-1 flex-wrap">
-        {GROUPS.map(g => (
-          <button
-            key={g.label}
-            onClick={() => setActiveGroup(g.label)}
-            className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded transition-colors"
-            style={{
-              background: activeGroup === g.label ? `${g.color}33` : 'transparent',
-              border: `1px solid ${activeGroup === g.label ? g.color : '#30363d'}`,
-              color: activeGroup === g.label ? g.color : '#8b949e',
-            }}
-          >
-            {g.label}
-          </button>
-        ))}
+        {GROUPS.map(g => {
+          const isActive = activeGroup === g.label
+          return (
+            <button
+              key={g.label}
+              onClick={() => setActiveGroup(g.label)}
+              className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded transition-colors ${!isActive ? 'border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400' : ''}`}
+              style={isActive ? { background: `${g.color}33`, border: `1px solid ${g.color}`, color: g.color } : {}}
+            >
+              {g.label}
+            </button>
+          )
+        })}
       </div>
 
       {/* Active group's symbol buttons */}
@@ -428,11 +487,9 @@ export default function MarkdownToolbar({ onInsert }) {
             key={btn.label}
             title={btn.title}
             onClick={() => onInsert(btn)}
-            className="px-2 py-0.5 text-xs rounded transition-colors shrink-0 hover:brightness-125"
+            className="px-2 py-0.5 text-xs rounded transition-colors shrink-0 hover:brightness-110 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
             style={{
-              background: '#21262d',
               border: `1px solid ${group.color}44`,
-              color: '#e6edf3',
               fontFamily: btn.label.match(/[αβγδεζηθλμνξπρστφχψωΓΔΘΛΠΣΦΨΩ∑∏∫∬∮∇]/) ? 'serif' : 'monospace',
             }}
           >
