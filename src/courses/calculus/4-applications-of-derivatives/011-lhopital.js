@@ -35,13 +35,19 @@ export default {
       "In Chapter 1, you learned that some limits produce the indeterminate form 0/0 — and you handled them by factoring, conjugate multiplication, or trigonometric identities. But those were tricks for special cases. L'Hôpital's Rule is the general weapon: whenever both numerator and denominator approach 0 (or both approach ∞), you can replace the limit of the ratio with the limit of the ratio of derivatives. It sounds almost too simple to be true, but it works because near the limit point, both f(x) and g(x) look like their tangent lines — and the ratio of tangent lines is exactly f'(a)/g'(a).",
       "The basic idea is beautifully simple once you understand linear approximation. Suppose f(c) = 0 and g(c) = 0. Near x = c, both functions are well approximated by their linearizations: f(x) ≈ f'(c)(x-c) and g(x) ≈ g'(c)(x-c) (since f(c) = g(c) = 0, the constant terms vanish). Dividing: f(x)/g(x) ≈ f'(c)(x-c)/[g'(c)(x-c)] = f'(c)/g'(c). The (x-c) factors cancel! L'Hôpital's Rule is the formal version of this linear approximation argument. Near a zero of both numerator and denominator, both functions look like their derivatives times (x-c), and the (x-c) factors cancel in the ratio.",
       "The formal statement: if lim_{x→c} f(x) = 0 and lim_{x→c} g(x) = 0, and if lim_{x→c} f'(x)/g'(x) exists (or equals ±∞), and g'(x) ≠ 0 near c (except possibly at c itself), then lim_{x→c} f(x)/g(x) = lim_{x→c} f'(x)/g'(x). The same rule applies when f(x) → ±∞ and g(x) → ±∞ (the ∞/∞ form), and also for one-sided limits and limits as x → ±∞. The rule can be applied repeatedly: if f'/g' is still 0/0, apply it again. Each application simplifies the problem, typically by reducing the degree of the functions involved.",
+        ],
+      },
+      { type: 'image', src: lhopitalUrl, alt: 'Two curves both hitting zero at a — their ratio approaches the ratio of their slopes', caption: 'When f/g gives 0/0 or ∞/∞, differentiate numerator and denominator separately.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "The other five indeterminate forms (0·∞, ∞-∞, 1^∞, 0^0, ∞^0) all convert to 0/0 or ∞/∞ through algebraic manipulation. For 0·∞: write f(x)·g(x) = f(x)/(1/g(x)) = 0/0, or g(x)/(1/f(x)) = ∞/∞. Which form to use depends on which gives a simpler derivative. For the power forms 1^∞, 0^0, ∞^0: take logarithms. If L = lim f(x)^{g(x)}, then ln(L) = lim g(x)·ln(f(x)). This converts the power form to a 0·∞ limit in the exponent, which then converts to 0/0 or ∞/∞. After evaluating ln(L) = K, conclude L = e^K.",
       "The historical context is extraordinary. L'Hôpital's Rule appears in the 1696 book Analyse des infiniment petits pour l'intelligence des lignes courbes — the first textbook ever published on differential calculus, written by Guillaume de l'Hôpital, a French marquis and amateur mathematician. However, the rule was actually discovered by Johann Bernoulli, who was employed by l'Hôpital as a private tutor. L'Hôpital paid Bernoulli a retainer for the right to use his mathematical discoveries exclusively. The rule in the book was Bernoulli's. L'Hôpital died in 1704; Bernoulli only went public with his claim to the rule after l'Hôpital's death. Correspondence later found in the Bernoulli archive confirmed the story. L'Hôpital's Rule is one of mathematics' most famous cases of misattributed credit.",
       "Critical warning: L'Hôpital's Rule applies ONLY when the limit is genuinely indeterminate (0/0 or ∞/∞). It cannot be applied to a limit like lim_{x→1} (x²-1)/(x-1) if you have not first verified that both numerator and denominator approach 0 (they do — it's 0/0 form). More dangerously, some students apply L'Hôpital to non-indeterminate limits: lim_{x→1} (x+2)/(x-1) approaches 3/0 = ±∞, not 0/0. Applying L'Hôpital here gives lim 1/1 = 1, which is wrong. The correct answer is ±∞ (the limit does not exist). Always verify the indeterminate form FIRST.",
       "Another important limitation: L'Hôpital's Rule can fail even when it seems applicable. Consider lim_{x→∞} (x + sin(x))/x. This appears to be ∞/∞. The rule would give (1 + cos(x))/1, which has no limit as x → ∞ (since cos(x) oscillates). Yet the original limit clearly exists: (x + sin(x))/x = 1 + sin(x)/x → 1 + 0 = 1 (since |sin(x)/x| ≤ 1/x → 0). L'Hôpital's Rule says: IF the limit of f'/g' exists, THEN lim f/g equals it. It says nothing about what happens when f'/g' has no limit. The failure of L'Hôpital does not imply the original limit fails — you must use another method.",
         ],
       },
-      { type: 'image', src: limitsInfinityUrl, alt: 'Limit curves resolving 0/0 and ∞/∞ indeterminate forms', caption: 'L\'Hôpital\'s rule: when a limit gives 0/0 or ∞/∞, differentiate numerator and denominator separately.' },
+      { type: 'image', src: limitsInfinityUrl, alt: 'Degree comparison for ∞/∞ forms — L\'Hôpital generalizes this technique', caption: 'L\'Hôpital\'s rule applies to all 0/0 and ∞/∞ forms, not just rational functions.' },
     ],
     callouts: [
       {
@@ -191,6 +197,7 @@ print("  L'Hopital answer: e (ln L = lim x*ln(1+1/x) = 1 => L=e^1=e)")`,
               ],
               code: `from opencalc import Figure
 import math
+import lhopitalUrl from '../diagrams/calc-lhopital.svg?url';
 import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
 
 # The original limit DOES exist: (x+sin x)/x = 1 + sin(x)/x -> 1

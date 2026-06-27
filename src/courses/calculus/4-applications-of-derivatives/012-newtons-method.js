@@ -80,6 +80,12 @@ export default {
       "$$x_1 - x_0 = -\\frac{f(x_0)}{f'(x_0)}$$",
       "Step 3 — add $x_0$ to both sides:",
       "$$x_1 = x_0 - \\frac{f(x_0)}{f'(x_0)}$$",
+        ],
+      },
+      { type: 'image', src: newtonsMethodUrl, alt: 'Tangent line iterations converging to a root: x₀ → x₁ → x₂ → r', caption: 'xₙ₊₁ = xₙ − f(xₙ)/f′(xₙ): each step uses the tangent x-intercept as the next guess.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "That single formula **is** Newton's Method. You keep reusing it: replace $x_0$ with $x_1$ to get $x_2$, then replace $x_1$ with $x_2$ to get $x_3$, and so on. The general form is:",
       "$$x_{n+1} = x_n - \\frac{f(x_n)}{f'(x_n)}$$",
       "**▶ Try it now — one step by hand:** Let $f(x) = x^2 - 3$ with $x_0 = 2$. Compute $f(2)$ and $f'(2)$, then apply the formula. *(Answer: $f(2) = 4 - 3 = 1$, $f'(x) = 2x$ so $f'(2) = 4$. Therefore $x_1 = 2 - 1/4 = 1.75$. The true root is $\\sqrt{3} \\approx 1.7321$ — already within 0.018 after a single step that started 0.268 away.)*",
@@ -106,7 +112,7 @@ export default {
       "**▶ Apply the sign-check rule:** Before moving to worked examples, find root brackets for $f(x) = x^3 - 4x + 1$. Evaluate $f$ at $x = -3, -2, -1, 0, 1, 2$. Where do sign changes occur? Record those three intervals — they will be the starting points for the three Newton sequences. *(Values: $f(-3) = -14$, $f(-2) = 1$, $f(-1) = 4$, $f(0) = 1$, $f(1) = -2$, $f(2) = 1$. Sign changes in $(-3,-2)$, $(0,1)$, and $(1,2)$ pin down all three roots in 60 seconds.)*",
         ],
       },
-      { type: 'image', src: secantToTangentUrl, alt: 'Curve with tangent line intersecting x-axis to approximate a root', caption: 'Newton\'s method uses the tangent line at each guess to produce the next — converging to a root.' },
+      { type: 'image', src: secantToTangentUrl, alt: 'Tangent line as local linear approximation — the core tool Newton\'s method exploits', caption: 'Newton\'s method applies the tangent-line approximation repeatedly; convergence is quadratic.' },
     ],
     callouts: [
       {
@@ -276,6 +282,7 @@ print(f"{steps:>4}  {x:>20.15f}  {f(x):>14.2e}  {abs(x-true_root):>14.2e}")`,
               ],
               code: `from opencalc import Figure
 import math
+import newtonsMethodUrl from '../diagrams/calc-newtons-method.svg?url';
 import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 
 f  = lambda x: x**2 - 2

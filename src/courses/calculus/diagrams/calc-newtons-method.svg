@@ -1,0 +1,86 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <defs>
+    <marker id="nArr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Newton's Method — Tangent Lines Converge to a Root</text>
+
+  <!-- LEFT: Geometric iteration diagram -->
+  <!-- Axes: x from 60 to 260, x-axis at y=145 -->
+  <line x1="40"  y1="145" x2="272" y2="145" class="ax" stroke-width="1.2"/>
+  <line x1="40"  y1="36"  x2="40"  y2="148" class="ax" stroke-width="1.2"/>
+  <polygon points="270,141 278,145 270,149" class="axf"/>
+
+  <!-- The curve f(x) — parabola-like, root at x=r (around SVG x=100) -->
+  <!-- Let's say root at SVG x=100, curve comes from upper-right, crosses zero -->
+  <path d="M 44,130 C 60,108 80,80 100,145 C 115,190 130,110 200,44 C 220,30 255,28 272,30"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Root: f(r) = 0 at x=100 (approximately) -->
+  <circle cx="100" cy="145" r="5" fill="#059669"/>
+  <text x="100" y="160" font-size="9" fill="#059669" text-anchor="middle">root r</text>
+
+  <!-- x₀: first guess at SVG x=200 -->
+  <line x1="200" y1="142" x2="200" y2="148" class="ax" stroke-width="1"/>
+  <text x="200" y="162" font-size="9" class="mu" text-anchor="middle">x₀</text>
+  <circle cx="200" cy="44" r="4" fill="#ef4444"/>
+  <!-- f(x₀) point on curve -->
+  <!-- Tangent line at x₀: steep negative slope, crosses x-axis around x=155 -->
+  <line x1="155" y1="145" x2="230" y2="20" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <!-- x₁: tangent line crosses x-axis around x=155 -->
+  <line x1="155" y1="142" x2="155" y2="148" class="ax" stroke-width="1"/>
+  <text x="155" y="162" font-size="9" class="mu" text-anchor="middle">x₁</text>
+  <!-- Drop from x₁ to curve: f(x₁) is near root -->
+  <circle cx="155" cy="110" r="4" fill="#f59e0b"/>
+  <line x1="155" y1="145" x2="155" y2="110" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <!-- Second tangent at x₁, crossing near root -->
+  <line x1="110" y1="145" x2="175" y2="90" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <!-- x₂ -->
+  <line x1="118" y1="142" x2="118" y2="148" class="ax" stroke-width="1"/>
+  <text x="118" y="162" font-size="9" class="mu" text-anchor="middle">x₂</text>
+  <!-- Drop to curve -->
+  <circle cx="118" cy="140" r="4" fill="#10b981"/>
+
+  <!-- Convergence arrows along x-axis -->
+  <line x1="195" y1="170" x2="160" y2="170" stroke="#ef4444" stroke-width="2" marker-end="url(#nArr)"/>
+  <line x1="150" y1="170" x2="122" y2="170" stroke="#f59e0b" stroke-width="2" marker-end="url(#nArr)"/>
+
+  <!-- DIVIDER -->
+  <line x1="290" y1="28" x2="290" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Algorithm + formula -->
+  <text x="384" y="34" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">The Algorithm</text>
+
+  <rect x="298" y="44" width="174" height="42" rx="5" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+  <text x="385" y="62" font-size="9"  fill="#4338ca" text-anchor="middle">Start with guess x₀</text>
+  <text x="385" y="79" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">xₙ₊₁ = xₙ − f(xₙ)/f′(xₙ)</text>
+
+  <text x="385" y="104" font-size="8.5" class="mu" text-anchor="middle">Geometric meaning:</text>
+  <rect x="298" y="108" width="174" height="36" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="385" y="122" font-size="8.5" class="mu" text-anchor="middle">Draw tangent at (xₙ, f(xₙ)).</text>
+  <text x="385" y="136" font-size="8.5" class="mu" text-anchor="middle">Where it hits x-axis = xₙ₊₁</text>
+
+  <!-- Convergence note -->
+  <text x="385" y="158" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Convergence Rate</text>
+  <rect x="298" y="164" width="174" height="28" rx="4" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1"/>
+  <text x="385" y="178" font-size="8.5" fill="#059669" text-anchor="middle">Quadratic — doubles correct</text>
+  <text x="385" y="190" font-size="8.5" fill="#059669" text-anchor="middle">digits each step (very fast)</text>
+
+  <!-- Failure condition -->
+  <rect x="298" y="196" width="174" height="14" rx="3" fill="#fff1f2"/>
+  <text x="385" y="207" font-size="8" fill="#dc2626" text-anchor="middle">Fails if f′(xₙ) = 0 or x₀ is far off</text>
+</svg>

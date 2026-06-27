@@ -1,3 +1,4 @@
+import productRuleUrl from '../diagrams/calc-product-rule.svg?url';
 import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
 export default {
   id: 'ch2-004b',
@@ -43,6 +44,12 @@ export default {
       '**Worked wrong example — so you can recognize it:** Let h(x) = x² · sin(3x). Choose u = x² and v = sin(3x). The product rule gives h\'(x) = u\'v + uv\'. Now: u\' = 2x (correct). For v = sin(3x), the outer function is sin and the inner function is 3x. The WRONG move is to write v\' = cos(3x), keeping only the outer derivative of the sine. This gives the wrong answer: h\'(x) = 2x·sin(3x) + x²·cos(3x). This expression looks clean and reasonable. It is completely wrong.',
 
       '**Worked correct example — the same function done right:** h(x) = x² · sin(3x), u = x², v = sin(3x). Correctly: u\' = 2x. For v\' we must apply the chain rule to sin(3x): the outer derivative is cos(3x), and the inner derivative of 3x is 3. So v\' = cos(3x)·3 = 3cos(3x). Now assemble: h\'(x) = 2x·sin(3x) + x²·3cos(3x) = 2x·sin(3x) + 3x²cos(3x). The only difference is that factor of 3 in the second term — but it changes the numerical value at every point.',
+        ],
+      },
+      { type: 'image', src: productRuleUrl, alt: 'Rectangle area model proving (fg)′ = f′g + fg′ — two new strips', caption: 'Product rule for multiplication; chain rule for composition — choose based on structure.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       '**Numerical verification that the wrong answer is wrong:** Plug in x = 1. First evaluate the original function: h(1) = 1²·sin(3) ≈ 1·(0.1411) ≈ 0.1411. Now estimate h\'(1) numerically using a small step: compute (h(1.001) − h(1))/0.001. We have h(1.001) = (1.001)²·sin(3.003) ≈ (1.002001)·(0.1382) ≈ 0.1385. So (0.1385 − 0.1411)/0.001 ≈ −2.6. Now compare: the WRONG formula gives h\'(1) = 2(1)·sin(3) + (1)²·cos(3) ≈ 2(0.1411) + (−0.9900) ≈ 0.282 − 0.990 ≈ −0.708. The CORRECT formula gives h\'(1) = 2sin(3) + 3cos(3) ≈ 0.282 + 3(−0.990) ≈ 0.282 − 2.970 ≈ −2.688. The numerical estimate is approximately −2.6, which matches the correct answer (≈−2.69), not the wrong one (≈−0.71). The discrepancy is a factor of roughly 3.8 — not a rounding issue, a structural error.',
 
@@ -53,7 +60,7 @@ export default {
       '**Pattern recognition — how to know when v\' needs chain rule:** Ask one question about v before you differentiate it: "Is the thing I am differentiating a simple power xⁿ, or does it contain a sub-expression inside?" If v is simply xⁿ, power rule alone suffices. If v is ANYTHING composed with something other than x — like sin(3x), e^(2x), (x³−1)², ln(x²+1), arctan(5x) — then the chain rule is mandatory. The tell-tale sign is: do I see a function applied to something that is not just plain x? If yes, chain rule is required for v\'.',
         ],
       },
-      { type: 'image', src: chainRuleUrl, alt: 'Function composition pipeline highlighting where the chain rule applies', caption: 'The chain trap: (f·g)′ ≠ f′·g′ — the product rule is needed, not the chain rule.' },
+      { type: 'image', src: chainRuleUrl, alt: 'Composition pipeline: chain rule applies when g is nested inside f', caption: 'The chain trap: (f∘g)′ = f′(g)·g′, not (f·g)′ = f′·g′.' },
     ],
     callouts: [
       {

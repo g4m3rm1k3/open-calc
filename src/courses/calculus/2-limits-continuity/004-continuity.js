@@ -1,3 +1,4 @@
+import continuity3CondUrl from '../diagrams/calc-continuity-3cond.svg?url';
 import continuityUrl from '../diagrams/calc-continuity.svg?url';
 export default {
   id: "ch1-continuity",
@@ -39,6 +40,12 @@ export default {
       '**Three conditions, all required.** A function $f$ is continuous at a point $c$ if and only if ALL three of these hold simultaneously: (1) $f(c)$ exists — the function is actually defined there; (2) $\\lim_{x \\to c} f(x)$ exists — both sides approach the same value; (3) $\\lim_{x \\to c} f(x) = f(c)$ — the limit and the function value match. Miss any one of them and the function is discontinuous at $c$. Each condition catches a different failure mode.',
 
       '**Removable discontinuity (hole).** The limit exists but the function either is not defined at $c$, or is defined but at the wrong height. Example: $f(x) = (x^2-1)/(x-1)$ simplifies to $x+1$ for $x \\neq 1$, but is undefined at $x=1$. The limit as $x \\to 1$ is $2$. There is a hole at $(1, 2)$. We say this discontinuity is "removable" because we can patch it: just define $f(1) = 2$ and the function becomes continuous. The hole is an artifact of how the function was written, not a genuine break in the graph.',
+        ],
+      },
+      { type: 'image', src: continuity3CondUrl, alt: 'Three-condition checklist for continuity — all three must hold at once', caption: 'f is continuous at a when f(a) is defined, the limit exists, and they are equal.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       '**Jump discontinuity.** Both one-sided limits exist but they give different values, so the two-sided limit does not exist. The function literally jumps from one level to another. The floor function $\\lfloor x \\rfloor$ is the classic example: at every integer, the left-hand limit is one number and the right-hand limit is one higher. You cannot patch a jump by redefining one point — it is a genuine break.',
 
@@ -49,7 +56,7 @@ export default {
       '**Why does any of this matter?** Because continuity is the hypothesis of every major theorem in Calculus 1: the Intermediate Value Theorem, the Extreme Value Theorem, the Mean Value Theorem, and the Fundamental Theorem of Calculus. The reason those theorems work is that continuous functions do not have hidden jumps or holes that could cause the conclusion to fail.',
         ],
       },
-      { type: 'image', src: continuityUrl, alt: 'Three discontinuity types: removable hole, jump, and infinite', caption: 'Continuity means no surprises: the function arrives exactly where it was headed.' },
+      { type: 'image', src: continuityUrl, alt: 'Three discontinuity panels: removable, jump, and infinite — each fails differently', caption: 'Each discontinuity type reveals which of the three conditions broke down.' },
     ],
     callouts: [
       {

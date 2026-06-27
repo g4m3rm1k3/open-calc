@@ -1,3 +1,4 @@
+import workIntegralUrl from '../diagrams/calc-work-integral.svg?url';
 import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 export default {
   id: 'ch4-work',
@@ -30,6 +31,12 @@ export default {
       'Springs are the most common variable-force application. Hooke\'s Law says the restoring force of a spring is F = kx, where x is the displacement from natural length and k is the spring constant (in N/m). To stretch a spring from x=0 to x=d, the work is W = ∫₀ᵈ kx dx = (1/2)kd². The quadratic result (not linear) reflects that the force itself grows with displacement — you must do more work per additional millimeter the further you stretch.',
 
       'Pumping problems are the classic "different particles travel different distances" scenario. Set up a coordinate system with y measured from the bottom of the tank. A thin horizontal slice of water at height y and thickness dy has volume dV = A(y) dy (where A(y) is the cross-sectional area at height y). This slice weighs dW_weight = ρg·A(y)·dy (density × g × volume). To pump it to the top (height H), it must be lifted a distance (H − y). Work for this slice: dW = ρg(H−y)A(y) dy. Total: W = ∫₀ᴴ ρg(H−y)A(y) dy.',
+        ],
+      },
+      { type: 'image', src: workIntegralUrl, alt: 'Variable force F(x) curve — area under the curve equals total work done', caption: 'When force varies with position, W = ∫F(x)dx instead of W = F·d.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       'Chain and cable problems work similarly. A hanging chain of linear density δ (kg/m) and length L has its lower end at y=0 and upper end at y=L. When you lift the entire chain, each segment at height y must be lifted a distance (L−y) to reach the top. Work = ∫₀ᴸ δg(L−y) dy. If you lift the chain to wind it onto a drum, the "lift distance" for the segment at y is (L−y) regardless — the integral accounts for all the varying distances automatically.',
 
@@ -38,7 +45,7 @@ export default {
       'The unifying insight across all these applications: integration is the tool whenever something accumulates with a varying rate. Work accumulates at rate F(x) per unit displacement. Hydrostatic force accumulates at rate P(y)·w(y) per unit height. The integral "sums up" infinitely many infinitesimal contributions, each involving a different value of the varying quantity. This is the same conceptual move as area, volume, and all other applications of the integral.',
         ],
       },
-      { type: 'image', src: riemannSumUrl, alt: 'Variable force summed over distance slices to compute total work', caption: 'Work = ∫F(x) dx — a Riemann sum of force × tiny displacement, exact in the limit.' },
+      { type: 'image', src: riemannSumUrl, alt: 'Riemann sum: summing force × tiny displacement slices gives total work in the limit', caption: 'Work is a Riemann sum over force slices — the integral is its exact limit.' },
     ],
     callouts: [
       {

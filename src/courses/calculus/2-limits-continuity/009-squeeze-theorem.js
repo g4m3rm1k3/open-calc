@@ -1,4 +1,5 @@
-import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
+import squeezeUrl from '../diagrams/calc-squeeze.svg?url';
+import sinxOverXUrl from '../diagrams/calc-sinx-over-x.svg?url';
 export default {
   id: 'ch1-squeeze-theorem',
   slug: 'squeeze-theorem',
@@ -30,13 +31,19 @@ export default {
       'Mathematically: suppose g(x) ≤ f(x) ≤ h(x) for all x near c (except possibly at c itself). If both g(x) → L and h(x) → L as x → c, then f(x) → L as well. The function f is "squeezed" between g and h.',
 
       'The theorem is most powerful when f(x) is too complicated to evaluate directly. Perhaps it oscillates (like sin(1/x)), or has no closed-form simplification. But if you can find simpler functions g and h that bound f from below and above, and both converge to the same limit, you\'re done.',
+        ],
+      },
+      { type: 'image', src: squeezeUrl, alt: 'Three curves converging: g(x) ≤ f(x) ≤ h(x), all meeting at L', caption: 'If f is trapped between g and h, and both bounds share limit L, then f must reach L too.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       '**The standard pattern**: if q(x) is bounded (|q(x)| ≤ M for some constant M) and p(x) → 0, then p(x)·q(x) → 0. This is because −M·|p(x)| ≤ p(x)·q(x) ≤ M·|p(x)|, and both bounds → 0. This handles cases like x·sin(1/x), x²·cos(1/x), and √x·sin(1/x).',
 
       'Harold Jacobs likened this to a child walking between two parents who both turn into a doorway: the child enters the doorway too, no matter how much they zigzag. The key insight is that the child\'s freedom shrinks to zero — the two boundaries converge to the same point, leaving no room for anything else.',
         ],
       },
-      { type: 'image', src: limitApproachUrl, alt: 'Three curves converging to the same limit, illustrating the squeeze', caption: 'If g(x) ≤ f(x) ≤ h(x) and g and h share the same limit L, then f is squeezed to L.' },
+      { type: 'image', src: sinxOverXUrl, alt: 'Geometric proof: area squeeze on unit circle proves sin(θ)/θ → 1', caption: 'The squeeze theorem\'s most famous use: bounding sin(x)/x between 1 and cos(x).' },
     ],
     callouts: [
       {

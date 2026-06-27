@@ -1,4 +1,5 @@
 import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
+import limitConceptUrl from '../diagrams/calc-limit-concept.svg?url';
 export default {
   id: 'ch1-006',
   slug: 'rate-of-change',
@@ -25,6 +26,12 @@ export default {
       'Start with something familiar: slope. The slope of a straight line is the same everywhere — rise over run, $\\Delta y / \\Delta x$. For a curve, slope changes at every point, so "the slope of the curve" only makes sense at a specific point. The first step toward that idea is the simpler question: what is the average rate of change over an interval?',
 
       'The average rate of change of $f$ over $[a, b]$ is the slope of the secant line — the straight line connecting the two points $(a, f(a))$ and $(b, f(b))$ on the curve. The formula is just the slope formula: $\\frac{f(b)-f(a)}{b-a}$. It answers: how much did $f$ change, per unit of $x$, between $a$ and $b$? Notice this is a global measurement — it says nothing about what happened in the middle of the interval.',
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Secant lines converging to the tangent as the interval h → 0', caption: 'Average rate of change (secant slope) approaches instantaneous rate (tangent slope) as h → 0.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       'The difference quotient rewrites average rate of change with notation built for taking a limit. Instead of two endpoints $a$ and $b$, use $x$ and $x+h$, where $h$ is the gap between them. The average rate of change becomes $\\frac{f(x+h)-f(x)}{h}$. This is the same formula — just written to make $h \\to 0$ natural.',
 
@@ -33,7 +40,7 @@ export default {
       '**Where this is heading:** The next lesson is function modeling — applying these ideas to build equations from real situations. Then Chapter 2 takes the limit definition of the derivative and derives every differentiation rule from it. The difference quotient you work with in this lesson is the formula Chapter 2 starts from. Every power rule, product rule, and chain rule derivation is a limit of this formula applied to a specific type of function.',
         ],
       },
-      { type: 'image', src: secantToTangentUrl, alt: 'Secant lines converging to the tangent line as h approaches 0', caption: 'Average rate of change is the slope of a secant; instantaneous rate is the limit as the interval shrinks.' },
+      { type: 'image', src: limitConceptUrl, alt: 'Limit process: approaching from both sides as the interval shrinks to a point', caption: 'The instantaneous rate of change is a limit — the limit of average rates over shrinking intervals.' },
     ],
     callouts: [
       {

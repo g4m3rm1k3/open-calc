@@ -1,0 +1,83 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <defs>
+    <marker id="wArr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#6366f1"/>
+    </marker>
+  </defs>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Work = Force × Distance (When Force Varies, Integrate)</text>
+
+  <!-- LEFT: F(x) curve with area = total work -->
+  <!-- Axes: x=position, F=force -->
+  <line x1="32" y1="165" x2="240" y2="165" class="ax" stroke-width="1.2"/>
+  <line x1="32" y1="36"  x2="32"  y2="168" class="ax" stroke-width="1.2"/>
+  <polygon points="238,161 246,165 238,169" class="axf"/>
+  <text x="248" y="169" font-size="9" class="mu">x</text>
+  <text x="24"  y="34"  font-size="9" class="mu">F</text>
+
+  <!-- a and b marks -->
+  <line x1="52"  y1="162" x2="52"  y2="168" class="ax" stroke-width="1"/>
+  <line x1="210" y1="162" x2="210" y2="168" class="ax" stroke-width="1"/>
+  <text x="52"  y="180" font-size="9" class="mu" text-anchor="middle">a</text>
+  <text x="210" y="180" font-size="9" class="mu" text-anchor="middle">b</text>
+
+  <!-- Varying force curve F(x): like a spring force kx, rises then drops -->
+  <path d="M 52,165 C 70,145 90,110 115,80 C 140,53 170,48 200,65 L 210,70"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Shade area = work -->
+  <path d="M 52,165 C 70,145 90,110 115,80 C 140,53 170,48 200,65 L 210,70 L 210,165 Z"
+        fill="#6366f1" fill-opacity="0.12"/>
+
+  <!-- One strip: F(x₀)·Δx rectangle -->
+  <rect x="130" y="72" width="22" height="93" fill="#ef4444" fill-opacity="0.3" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="141" y="120" font-size="8.5" fill="#ef4444" text-anchor="middle" transform="rotate(-90,141,120)">F(xᵢ)·Δx</text>
+
+  <!-- Δx label -->
+  <line x1="130" y1="172" x2="152" y2="172" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="2,1"/>
+  <text x="141" y="183" font-size="8" fill="#ef4444" text-anchor="middle">Δx</text>
+
+  <!-- Force arrows: several vertical arrows at different x positions -->
+  <line x1="72"  y1="145" x2="72"  y2="165" stroke="#6366f1" stroke-width="2" marker-end="url(#wArr)"/>
+  <line x1="95"  y1="112" x2="95"  y2="165" stroke="#6366f1" stroke-width="2" marker-end="url(#wArr)"/>
+  <line x1="120" y1="82"  x2="120" y2="165" stroke="#6366f1" stroke-width="2" marker-end="url(#wArr)"/>
+  <line x1="175" y1="50"  x2="175" y2="165" stroke="#6366f1" stroke-width="2" marker-end="url(#wArr)"/>
+
+  <text x="130" y="200" font-size="8.5" fill="#4338ca" text-anchor="middle">Area under F(x) curve = total work done</text>
+
+  <!-- DIVIDER -->
+  <line x1="258" y1="28" x2="258" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Key formulas and examples -->
+  <text x="368" y="36" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Work Formulas</text>
+
+  <!-- Constant force -->
+  <rect x="266" y="44" width="206" height="28" rx="4" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="369" y="58" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Constant force: W = F · d</text>
+  <text x="369" y="70" font-size="8" class="mu" text-anchor="middle">(just multiplication)</text>
+
+  <!-- Variable force -->
+  <rect x="266" y="78" width="206" height="34" rx="4" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="369" y="93" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">Variable force:</text>
+  <text x="369" y="107" font-size="11" fill="#059669" text-anchor="middle" font-weight="700">W = ∫ₐᵇ F(x) dx</text>
+
+  <!-- Hooke's law example -->
+  <text x="369" y="129" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Example: Spring (Hooke's Law)</text>
+  <rect x="266" y="134" width="206" height="52" rx="5" fill="#fef9c3" stroke="#fde68a" stroke-width="1"/>
+  <text x="272" y="150" font-size="8.5" fill="#d97706">F(x) = kx  (force = spring constant × stretch)</text>
+  <text x="272" y="164" font-size="8.5" fill="#92400e">W = ∫₀ᵈ kx dx = ½kd²</text>
+  <text x="272" y="178" font-size="8" class="mu">Stretch a spring 0.1m with k=500 N/m:</text>
+  <text x="272" y="190" font-size="8" class="mu">W = ½(500)(0.01) = 2.5 joules</text>
+</svg>

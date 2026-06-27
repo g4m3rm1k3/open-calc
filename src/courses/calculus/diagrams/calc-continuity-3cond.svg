@@ -1,0 +1,72 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Continuity at a Point — All Three Conditions Must Hold</text>
+
+  <!-- Condition 1 -->
+  <rect x="12" y="28" width="144" height="90" rx="8" fill="#fff1f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="84" y="46" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="700">① f(a) is defined</text>
+  <!-- Mini graph: hole at a -->
+  <line x1="24" y1="95" x2="140" y2="95" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="24" y1="56" x2="24"  y2="98" stroke="#94a3b8" stroke-width="1"/>
+  <path d="M 28,90 Q 60,65 84,58 Q 100,54 110,58" fill="none" stroke="#dc2626" stroke-width="2"/>
+  <circle cx="84" cy="58" r="4" fill="white" stroke="#dc2626" stroke-width="2"/>
+  <text x="84" y="112" font-size="8" fill="#dc2626" text-anchor="middle">FAIL: hole at a</text>
+  <!-- x label -->
+  <line x1="84" y1="92" x2="84" y2="98" stroke="#94a3b8" stroke-width="1"/>
+  <text x="84" y="107" font-size="8" class="mu" text-anchor="middle">a</text>
+
+  <!-- Condition 2 -->
+  <rect x="168" y="28" width="144" height="90" rx="8" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="240" y="46" font-size="9" fill="#ea580c" text-anchor="middle" font-weight="700">② lim f(x) exists (x→a)</text>
+  <!-- Mini graph: jump discontinuity -->
+  <line x1="180" y1="95" x2="296" y2="95" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="180" y1="56" x2="180" y2="98" stroke="#94a3b8" stroke-width="1"/>
+  <path d="M 184,88 Q 210,82 237,75" fill="none" stroke="#ea580c" stroke-width="2"/>
+  <path d="M 243,58 Q 264,54 292,50" fill="none" stroke="#ea580c" stroke-width="2"/>
+  <circle cx="240" cy="75" r="4" fill="white" stroke="#ea580c" stroke-width="2"/>
+  <circle cx="240" cy="58" r="4" fill="#ea580c"/>
+  <!-- x label -->
+  <line x1="240" y1="92" x2="240" y2="98" stroke="#94a3b8" stroke-width="1"/>
+  <text x="240" y="107" font-size="8" class="mu" text-anchor="middle">a</text>
+  <text x="240" y="115" font-size="8" fill="#ea580c" text-anchor="middle">FAIL: lim⁻ ≠ lim⁺</text>
+
+  <!-- Condition 3 -->
+  <rect x="324" y="28" width="144" height="90" rx="8" fill="#fefce8" stroke="#fde68a" stroke-width="1.5"/>
+  <text x="396" y="46" font-size="9" fill="#ca8a04" text-anchor="middle" font-weight="700">③ lim f(x) = f(a)</text>
+  <!-- Mini graph: removable (value doesn't match limit) -->
+  <line x1="336" y1="95" x2="452" y2="95" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="336" y1="56" x2="336" y2="98" stroke="#94a3b8" stroke-width="1"/>
+  <path d="M 340,88 Q 368,78 396,70 Q 416,64 448,58" fill="none" stroke="#ca8a04" stroke-width="2"/>
+  <circle cx="396" cy="70" r="4" fill="white" stroke="#ca8a04" stroke-width="2"/>
+  <circle cx="396" cy="88" r="4" fill="#ca8a04"/>
+  <!-- x label -->
+  <line x1="396" y1="92" x2="396" y2="98" stroke="#94a3b8" stroke-width="1"/>
+  <text x="396" y="107" font-size="8" class="mu" text-anchor="middle">a</text>
+  <text x="396" y="115" font-size="8" fill="#ca8a04" text-anchor="middle">FAIL: f(a) ≠ limit</text>
+
+  <!-- All three satisfied = continuous -->
+  <rect x="12" y="128" width="456" height="74" rx="8" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="240" y="148" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">When ALL THREE hold: f is continuous at a</text>
+
+  <!-- Mini passing graph -->
+  <line x1="24" y1="190" x2="120" y2="190" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="24" y1="148" x2="24"  y2="193" stroke="#94a3b8" stroke-width="1"/>
+  <path d="M 28,186 Q 56,170 72,160 Q 88,150 116,142" fill="none" stroke="#059669" stroke-width="2.5"/>
+  <circle cx="72" cy="160" r="4" fill="#059669"/>
+  <line x1="72" y1="187" x2="72" y2="193" stroke="#94a3b8" stroke-width="1"/>
+  <text x="72" y="202" font-size="8" class="mu" text-anchor="middle">a</text>
+  <text x="72" y="210" font-size="8" fill="#059669" text-anchor="middle">✓ continuous</text>
+
+  <!-- Formal definition -->
+  <text x="200" y="160" font-size="9" fill="#059669" font-weight="700">Formal: f continuous at a iff:</text>
+  <text x="200" y="176" font-size="9" fill="#4338ca">lim f(x) = f(a)</text>
+  <text x="200" y="188" font-size="8" class="mu">x→a</text>
+  <text x="200" y="200" font-size="8" class="mu">(which implicitly requires all three conditions)</text>
+</svg>

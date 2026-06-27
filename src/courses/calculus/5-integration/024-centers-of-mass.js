@@ -1,3 +1,4 @@
+import centroidUrl from '../diagrams/calc-centroid.svg?url';
 import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 export default {
   id: 'ch4-centroid',
@@ -30,6 +31,12 @@ export default {
       'For a continuous thin plate (lamina) with density ρ(x,y), the discrete sum ΣmᵢxΙ becomes an integral. For a lamina bounded by f(x) ≥ g(x) on [a,b] with constant density ρ = 1 (a "uniform" lamina), the total mass is m = ∫ₐᵇ[f(x)−g(x)]dx (which equals the area A). The moment about the y-axis is Mᵧ = ∫ₐᵇ x[f(x)−g(x)]dx, giving x̄ = Mᵧ/m. This is the x-coordinate of the centroid.',
 
       'The moment about the x-axis is Mₓ = ∫ₐᵇ (1/2)[f(x)²−g(x)²]dx. The (1/2) factor comes from the centroid of each thin vertical strip being at its midpoint (f(x)+g(x))/2. The y-coordinate of the centroid is ȳ = Mₓ/m. Together, (x̄, ȳ) is the centroid — the balance point of the lamina.',
+        ],
+      },
+      { type: 'image', src: centroidUrl, alt: 'Region under a curve with centroid (x̄, ȳ) marked as the balance point', caption: 'x̄ = (1/A)∫x·f(x)dx and ȳ = (1/A)∫½[f(x)]²dx give the balance point.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       'Why the 1/2? Think of a thin vertical strip of height h = f(x)−g(x) at position x. The centroid of this strip is at its midpoint, which is at y = g(x) + h/2 = (f(x)+g(x))/2. The strip\'s mass contribution is h·dx = (f(x)−g(x))dx. Its moment about the x-axis is (mass)×(y-position of centroid) = (f(x)−g(x))dx × (f(x)+g(x))/2 = (1/2)(f²−g²)dx. That is where the (1/2)[f²−g²] comes from.',
 
@@ -38,7 +45,7 @@ export default {
       'The classic application of Pappus is the torus (donut). Rotate a disk of radius r whose center is at distance R from the axis (R > r). The centroid of the disk is at its center, distance R from the axis. Area of disk = πr². Volume by Pappus: V = 2π·R·(πr²) = 2π²Rr². No setup of 3D integrals needed — one application of the centroid formula does everything. This is why centroids matter beyond pure geometry.',
         ],
       },
-      { type: 'image', src: riemannSumUrl, alt: 'Region sliced into strips to compute centroid coordinates', caption: 'Center of mass balances the moments: x̄ = (1/A) ∫x f(x) dx, ȳ = (1/A) ∫½[f(x)]² dx.' },
+      { type: 'image', src: riemannSumUrl, alt: 'Vertical strips summing moment × area to find the centroid coordinates', caption: 'The centroid is the weighted average position — each strip contributes x·f(x)dx to the x-moment.' },
     ],
     callouts: [
       {

@@ -1,4 +1,5 @@
-import mvtUrl from '../diagrams/calc-mvt.svg?url';
+import mvtIntegralUrl from '../diagrams/calc-mvt-integral.svg?url';
+import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 export default {
   id: 'ch4-average-value',
   slug: 'average-value',
@@ -33,38 +34,8 @@ export default {
           'Average of samples ≈ (1/n) Σ f(xᵢ) = (1/(b−a)) Σ f(xᵢ)Δx → (1/(b−a)) ∫ₐᵇ f(x) dx as n → ∞.',
         ],
       },
-      {
-        type: 'callout',
-        callout: {
-          type: 'definition',
-          title: 'Average Value of a Function',
-          body: 'f_{avg} = \\frac{1}{b-a}\\int_a^b f(x)\\,dx',
-        },
-      },
-      {
-        type: 'prose',
-        paragraphs: [
-          'Geometrically: f_avg is the HEIGHT of the rectangle over [a, b] that has the SAME AREA as the region under f(x). ' +
-          'The integral gives area; dividing by (b − a) converts area to height.',
-        ],
-      },
-      {
-        type: 'viz',
-        id: '',
-        title: 'Average Value as Rectangle Height',
-        mathBridge: 'The shaded region under f(x) has the same area as the rectangle with height f_avg. Drag the interval endpoints to update the average.',
-        caption: 'The red horizontal line is f_avg. The rectangle has the same area as the curved region.',
-      },
-      {
-        type: 'callout',
-        callout: {
-          type: 'theorem',
-          title: 'Mean Value Theorem for Integrals',
-          body: 'If $f$ is continuous on $[a,b]$, then there exists $c \\in [a,b]$ such that $f(c) = f_{avg} = \\dfrac{1}{b-a}\\int_a^b f(x)\\,dx$.\n\n' +
-                'In other words: the function actually ATTAINS its average value at some point in [a, b].',
-        },
-      },
-      { type: 'image', src: mvtUrl, alt: 'Curve with the average-value horizontal line and equal-area demonstration', caption: 'Average value = (1/(b−a)) ∫f dx — the constant function with the same area over [a, b].' },
+      { type: 'image', src: mvtIntegralUrl, alt: 'Function curve with horizontal average-value line having equal area underneath', caption: 'f_avg = (1/(b−a))∫f dx is the height of the rectangle with the same area as f.' },
+      { type: 'image', src: riemannSumUrl, alt: 'Riemann sum interpretation: (1/n)Σf(xᵢ) converges to the average value', caption: 'Average value is the continuous analog of the arithmetic mean of infinitely many samples.' },
     ],
   },
 

@@ -1,4 +1,5 @@
-import mvtUrl from '../diagrams/calc-mvt.svg?url';
+import mvtIntegralUrl from '../diagrams/calc-mvt-integral.svg?url';
+import ftcUrl from '../diagrams/calc-ftc.svg?url';
 // FILE: src/content/chapter-4/03b-mvt-integrals.js
 export default {
   id: "ch4-003b",
@@ -34,12 +35,18 @@ export default {
         paragraphs: [
       "**The Equal-Area Rectangle:** When you integrate f over [a, b] you get a number A. Divide by (b − a) and you get the average value f_avg = A/(b − a). Geometrically, f_avg is the height of a rectangle with base (b − a) whose area equals the area under f. Draw it: if the curve dips below f_avg in some places and rises above it in others, the rectangle captures the same total signed area. The MVT for Integrals says the horizontal line at height f_avg must cross the curve at least once on (a, b) — the function actually attains its own average.",
       "**Why It Has to Work:** Because f is continuous on [a, b], the Extreme Value Theorem guarantees f attains some minimum m and some maximum M. The average f_avg is squeezed between them: m ≤ f_avg ≤ M. Now the Intermediate Value Theorem kicks in — since f is continuous and reaches both m and M, it must also reach every value between them, including f_avg. So some c ∈ (a, b) satisfies f(c) = f_avg. The proof is essentially just these two classical theorems applied in sequence.",
+        ],
+      },
+      { type: 'image', src: mvtIntegralUrl, alt: 'Equal-area rectangle: f_avg · (b−a) = ∫f dx — same area as the curve', caption: 'The MVT for integrals guarantees a point c where f(c) equals the average value of f.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**Connection to the Derivative MVT:** There is a cleaner derivation using tools we already have. Let F be an antiderivative of f. Apply the derivative MVT to F on [a, b]: F'(c) = (F(b) − F(a))/(b − a) for some c. Since F' = f and FTC Part 2 says F(b) − F(a) = ∫ₐᵇ f(x) dx, this becomes f(c) = (1/(b−a)) ∫ₐᵇ f(x) dx. That is the MVT for integrals. The two mean value theorems are the same result stated in different languages — the integral version is the derivative version translated through FTC.",
       "**Continuity Is Not Optional:** The theorem fails without it. Define f(x) = 0 for x ∈ [0, 0.5) and f(x) = 2 for x ∈ [0.5, 1]. The average is (1/1)∫₀¹ f dx = (0·0.5 + 2·0.5) = 1. But f never equals 1 anywhere — f jumps from 0 to 2, skipping the value 1 entirely. This is the IVT failing because of the jump discontinuity. Continuity is not a formality; it is the exact hypothesis that prevents the function from skipping over its own average.",
       "**Finding c in Practice:** Given a specific f on [a, b], the procedure is: (1) compute f_avg = (1/(b−a)) ∫ₐᵇ f(x) dx, (2) solve f(c) = f_avg for c, (3) check that the solution(s) lie in (a, b). The MVT guarantees at least one solution exists, but there may be multiple — a flat function f = k has infinitely many. The theorem is an existence result, not a formula for c.",
         ],
       },
-      { type: 'image', src: mvtUrl, alt: 'Curve with a horizontal secant at the average value, equal to a tangent', caption: 'The MVT for integrals: a continuous function equals its average value at some interior point.' },
+      { type: 'image', src: ftcUrl, alt: 'FTC: the integral gives total area; dividing by (b−a) gives the average height', caption: 'Average value = total integral ÷ interval length — a direct consequence of FTC Part 2.' },
     ],
     callouts: [
       {

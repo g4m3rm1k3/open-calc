@@ -1,4 +1,5 @@
 import continuityUrl from '../diagrams/calc-continuity.svg?url';
+import continuity3CondUrl from '../diagrams/calc-continuity-3cond.svg?url';
 export default {
   id: "ch1-discontinuities",
   slug: "types-of-discontinuities",
@@ -49,6 +50,12 @@ export default {
       '**Type 2: Jump Discontinuity.** The left-hand limit and right-hand limit both exist but are different. The graph "jumps" from one value to another. Example: $f(x) = 0$ for $x < 0$ and $f(x) = 1$ for $x \\geq 0$. As $x \\to 0^-$, $f(x) \\to 0$. As $x \\to 0^+$, $f(x) \\to 1$. These are different, so the two-sided limit DNE. You cannot remove this discontinuity — the function has fundamentally different behavior on the two sides. Think: a switch that goes from OFF (0) to ON (1) in zero time.',
 
       "**Type 3: Infinite Discontinuity (vertical asymptote).** At least one one-sided limit is $\\pm \\infty$. The graph shoots off to infinity. Example: $f(x) = 1/x$ at $x = 0$. As $x \\to 0^+$, $f(x) \\to +\\infty$. As $x \\to 0^-$, $f(x) \\to -\\infty$. Neither limit exists as a real number. Vertical asymptotes are infinite discontinuities. In physics: gravitational force $F = Gm_1 m_2/r^2$ has an infinite discontinuity at $r = 0$ — two objects cannot occupy the same point.",
+        ],
+      },
+      { type: 'image', src: continuityUrl, alt: 'Three panels: removable hole, jump, and infinite discontinuity', caption: 'Removable: limit exists but f(a) is wrong. Jump: one-sided limits differ. Infinite: limit is ±∞.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       '**Type 4: Oscillating Discontinuity (essential).** The function oscillates so wildly near the point that no limit exists, even $\\pm\\infty$. The classic example is $f(x) = \\sin(1/x)$ at $x = 0$. As $x \\to 0$, the argument $1/x \\to \\infty$ and $\\sin(1/x)$ oscillates infinitely many times between $-1$ and $+1$, never settling. No limit exists. This is the "worst" kind of discontinuity — no reasonable value can patch it.',
 
@@ -57,7 +64,7 @@ export default {
       '**Historical note.** Bernhard Riemann (1826–1866) gave the first systematic analysis of discontinuities. He showed that a function with only finitely many jump discontinuities is still integrable in his sense (the Riemann integral). This was revolutionary — before Riemann, most mathematicians thought discontinuous functions were "pathological." Today we know that many important functions (step functions, square waves, probability distributions) are naturally discontinuous.',
         ],
       },
-      { type: 'image', src: continuityUrl, alt: 'Three panels showing removable, jump, and infinite discontinuities', caption: 'Each discontinuity type has a different cause and a different repair strategy.' },
+      { type: 'image', src: continuity3CondUrl, alt: 'Three-condition checklist showing which condition each discontinuity type violates', caption: 'Classifying a discontinuity tells you which condition failed and whether it can be repaired.' },
     ],
     callouts: [
       {

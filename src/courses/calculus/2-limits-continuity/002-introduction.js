@@ -1,3 +1,4 @@
+import limitConceptUrl from '../diagrams/calc-limit-concept.svg?url';
 import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
 export default {
   id: 'ch1-limits-intro',
@@ -50,6 +51,12 @@ export default {
 
       '**From the left (x → 2⁻):**  x = 1.9 → f = 3.9,  x = 1.99 → f = 3.99,  x = 1.999 → f = 3.999',
       '**From the right (x → 2⁺):**  x = 2.1 → f = 4.1,  x = 2.01 → f = 4.01,  x = 2.001 → f = 4.001',
+        ],
+      },
+      { type: 'image', src: limitConceptUrl, alt: 'Curve with hole at c — limit L exists, but f(c) is missing or different', caption: 'A limit describes where f(x) is heading, not the value of f(c) itself.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       'From both sides, f(x) is approaching 4. We write: lim(x→2) (x²−4)/(x−2) = 4. The limit is 4, even though f(2) is undefined.',
 
@@ -60,7 +67,7 @@ export default {
       'There is also the possibility of **one-sided limits**: the function might approach a different value from the left than from the right. If that happens, the two-sided limit does not exist (DNE). Think of a cliff edge: approaching from land gives height H, approaching from sea gives height 0. The "height" limit at the cliff edge DNE.',
         ],
       },
-      { type: 'image', src: limitApproachUrl, alt: 'Curve with left and right approach arrows converging on L at x=c', caption: 'A limit describes where a function is heading, not where it arrives — the value at x=c is irrelevant.' },
+      { type: 'image', src: limitApproachUrl, alt: 'Left and right approach arrows converging to L from both sides', caption: 'Both sides must agree on the same target L for the two-sided limit to exist.' },
     ],
     callouts: [
       {

@@ -1,0 +1,88 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Differentiability Failures — Where f′ Cannot Exist</text>
+
+  <!-- PANEL 1: Corner (|x|) -->
+  <text x="80" y="34" font-size="9" fill="#ef4444" text-anchor="middle" font-weight="700">Corner: f(x) = |x|</text>
+
+  <line x1="16" y1="145" x2="158" y2="145" class="ax" stroke-width="1.2"/>
+  <line x1="87" y1="40"  x2="87"  y2="148" class="ax" stroke-width="1.2"/>
+
+  <!-- |x|: V shape, vertex at (87,145) -->
+  <path d="M 20,108 L 87,145 L 154,108" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+  <circle cx="87" cy="145" r="4" fill="#ef4444"/>
+
+  <!-- Two tangent arrows at corner - different slopes -->
+  <line x1="55" y1="127" x2="74" y2="140" stroke="#6366f1" stroke-width="2" stroke-dasharray="4,2"/>
+  <line x1="100" y1="140" x2="119" y2="127" stroke="#10b981" stroke-width="2" stroke-dasharray="4,2"/>
+  <text x="45"  y="122" font-size="8" fill="#6366f1">slope = −1</text>
+  <text x="108" y="122" font-size="8" fill="#10b981">slope = +1</text>
+
+  <text x="87" y="162" font-size="9" fill="#ef4444" text-anchor="middle">x = 0</text>
+  <text x="87" y="174" font-size="8" class="mu" text-anchor="middle">lim⁻ f'/h = −1  ≠  lim⁺ = +1</text>
+  <rect x="22" y="180" width="128" height="22" rx="4" fill="#fff1f2"/>
+  <text x="86" y="195" font-size="8.5" fill="#dc2626" text-anchor="middle">f′(0) does not exist</text>
+
+  <!-- DIVIDER 1 -->
+  <line x1="168" y1="28" x2="168" y2="210" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- PANEL 2: Cusp (x^(2/3)) -->
+  <text x="245" y="34" font-size="9" fill="#f59e0b" text-anchor="middle" font-weight="700">Cusp: f(x) = x^(2/3)</text>
+
+  <line x1="172" y1="145" x2="316" y2="145" class="ax" stroke-width="1.2"/>
+  <line x1="244" y1="40"  x2="244" y2="148" class="ax" stroke-width="1.2"/>
+
+  <!-- x^(2/3): cusp at origin — left branch: at x=-3: 2.08→ at x=-2: 1.59 → at x=-1: 1 → x=0: 0 -->
+  <!-- SVG scale: center (244,145), 40px per unit -->
+  <!-- Left: pts (-3,2.08)->( 124, 62), (-2,1.59)->(164,81), (-1,1)->(204,105), (0,0)->(244,145) -->
+  <path d="M 124,62 C 148,70 185,95 224,128 L 244,145"
+        fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+  <!-- Right: mirror shape (+3,2.08)->(364,62) but clipped to 316 -->
+  <!-- (+3,2.08)->(364,62) out of range, use (+2,1.59)->(324,81) out of range too -->
+  <!-- (+1,1)->(284,105), (+2,1.59)->(324,81)->clip at 316 -->
+  <path d="M 244,145 L 264,128 C 278,112 296,90 316,72"
+        fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+
+  <!-- Vertical tangent arrows at cusp -->
+  <line x1="244" y1="50" x2="244" y2="145" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.6"/>
+  <text x="249" y="80" font-size="8.5" fill="#f59e0b">vertical</text>
+  <text x="249" y="92" font-size="8.5" fill="#f59e0b">tangent</text>
+
+  <text x="244" y="162" font-size="9" fill="#f59e0b" text-anchor="middle">x = 0</text>
+  <text x="244" y="174" font-size="8" class="mu" text-anchor="middle">slope → ±∞  (unbounded)</text>
+  <rect x="180" y="180" width="128" height="22" rx="4" fill="#fef9c3"/>
+  <text x="244" y="195" font-size="8.5" fill="#ca8a04" text-anchor="middle">f′(0) does not exist</text>
+
+  <!-- DIVIDER 2 -->
+  <line x1="328" y1="28" x2="328" y2="210" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- PANEL 3: Rule + continuous ≠ differentiable -->
+  <text x="406" y="34" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">The Key Relationship</text>
+
+  <rect x="336" y="44" width="136" height="46" rx="5" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1"/>
+  <text x="404" y="60" font-size="8.5" fill="#059669" text-anchor="middle">Differentiable ⟹</text>
+  <text x="404" y="74" font-size="9"   fill="#059669" text-anchor="middle" font-weight="700">Continuous</text>
+  <text x="404" y="84" font-size="8"   class="mu"     text-anchor="middle">(always, no exceptions)</text>
+
+  <rect x="336" y="98" width="136" height="46" rx="5" fill="#fff1f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="404" y="114" font-size="8.5" fill="#dc2626" text-anchor="middle">Continuous does NOT</text>
+  <text x="404" y="126" font-size="9"   fill="#dc2626" text-anchor="middle" font-weight="700">⟹ Differentiable</text>
+  <text x="404" y="138" font-size="8"   class="mu"     text-anchor="middle">|x| is continuous at 0</text>
+
+  <!-- Failure modes list -->
+  <text x="342" y="162" font-size="8.5" fill="#4338ca" font-weight="700">f′ fails at:</text>
+  <text x="342" y="176" font-size="8.5" class="mu">• Corners (kink in graph)</text>
+  <text x="342" y="190" font-size="8.5" class="mu">• Cusps (vertical tangent)</text>
+  <text x="342" y="204" font-size="8.5" class="mu">• Discontinuities</text>
+</svg>

@@ -1,0 +1,75 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">L'Hôpital's Rule — Resolving Indeterminate Forms</text>
+
+  <!-- LEFT: Visualizing 0/0 as two curves both hitting zero -->
+  <text x="108" y="34" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Why it works: slopes at the crossing</text>
+
+  <line x1="20" y1="140" x2="210" y2="140" class="ax" stroke-width="1.2"/>
+  <line x1="20" y1="40"  x2="20"  y2="143" class="ax" stroke-width="1.2"/>
+  <polygon points="208,136 216,140 208,144" class="axf"/>
+
+  <!-- a on x-axis -->
+  <line x1="120" y1="137" x2="120" y2="143" class="ax" stroke-width="1"/>
+  <text x="120" y="155" font-size="9" class="mu" text-anchor="middle">a</text>
+
+  <!-- f(x): red, hits 0 at x=a -->
+  <!-- Goes from upper left to 0 at a, then continues -->
+  <path d="M 25,55 C 50,65 80,90 120,140 C 140,148 165,152 205,155"
+        fill="none" stroke="#ef4444" stroke-width="2.5"/>
+  <circle cx="120" cy="140" r="4" fill="#ef4444"/>
+  <text x="60" y="75" font-size="9" fill="#ef4444">f(x) → 0</text>
+
+  <!-- g(x): green, also hits 0 at x=a -->
+  <path d="M 25,90 C 50,100 80,115 120,140 C 148,157 175,160 205,162"
+        fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <circle cx="120" cy="140" r="4" fill="#10b981" opacity="0.7"/>
+  <text x="152" y="155" font-size="9" fill="#10b981">g(x) → 0</text>
+
+  <!-- Tangent slopes at a -->
+  <line x1="95" y1="106" x2="145" y2="174" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+  <line x1="95" y1="123" x2="145" y2="157" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.7"/>
+  <text x="148" y="178" font-size="8" fill="#ef4444">slope = f′(a)</text>
+  <text x="148" y="168" font-size="8" fill="#10b981">slope = g′(a)</text>
+
+  <!-- Annotation: ratio of slopes = limit -->
+  <rect x="22" y="170" width="185" height="36" rx="4" fill="#eef2ff"/>
+  <text x="114" y="184" font-size="9" fill="#4338ca" text-anchor="middle">f(x)/g(x) ≈ f′(a)·(x−a) / g′(a)·(x−a)</text>
+  <text x="114" y="198" font-size="9" fill="#4338ca" text-anchor="middle">= f′(a) / g′(a)</text>
+
+  <!-- DIVIDER -->
+  <line x1="224" y1="28" x2="224" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: The rule + indeterminate forms -->
+  <text x="352" y="34" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">L'Hôpital's Rule</text>
+
+  <rect x="232" y="44" width="240" height="42" rx="5" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+  <text x="352" y="60" font-size="9"  fill="#4338ca" text-anchor="middle">If lim f(x) = 0 and lim g(x) = 0,</text>
+  <text x="352" y="74" font-size="9"  fill="#4338ca" text-anchor="middle">or both → ±∞, then:</text>
+
+  <rect x="232" y="90" width="240" height="28" rx="5" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="352" y="109" font-size="12" fill="#059669" text-anchor="middle" font-weight="700">lim f/g = lim f′/g′</text>
+
+  <!-- Indeterminate forms -->
+  <text x="352" y="136" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Indeterminate Forms</text>
+  <rect x="232" y="142" width="240" height="62" rx="5" fill="#fef9c3" stroke="#fde68a" stroke-width="1"/>
+  <text x="240" y="158" font-size="8.5" fill="#d97706">Direct: 0/0  or  ∞/∞</text>
+  <text x="240" y="172" font-size="8.5" fill="#d97706">Rewrite then apply: 0·∞, ∞−∞</text>
+  <text x="240" y="186" font-size="8.5" fill="#d97706">Log trick: 0⁰, 1^∞, ∞⁰</text>
+  <text x="240" y="198" font-size="8" class="mu">→ take ln, apply rule, exponentiate back</text>
+
+  <!-- Warning -->
+  <rect x="232" y="208" width="240" height="0" rx="0"/>
+  <text x="352" y="212" font-size="8" fill="#dc2626" text-anchor="middle">⚠ Only when limit produces an indeterminate form</text>
+</svg>

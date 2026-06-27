@@ -1,3 +1,4 @@
+import verticalAsymptoteUrl from '../diagrams/calc-vertical-asymptote.svg?url';
 import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
 export default {
   id: 'ch1-infinite-limits-vertical-asymptotes',
@@ -32,39 +33,8 @@ export default {
           'but we write "= ∞" to give useful, specific information ABOUT why it fails to exist.',
         ],
       },
-      {
-        type: 'callout',
-        callout: {
-          type: 'intuition',
-          title: 'Four Behaviors at a Vertical Asymptote',
-          body: '1. Both sides → +∞\n' +
-                '2. Both sides → −∞\n' +
-                '3. Left → +∞, right → −∞ (or vice versa)\n' +
-                '4. Only one side has an asymptote (e.g., √x at x = 0)\n' +
-                'One-sided limits let us be specific about which case we are in.',
-        },
-      },
-      {
-        type: 'viz',
-        id: '',
-        title: 'Vertical Asymptote Explorer',
-        mathBridge:
-          'f(x) = 1/x has a vertical asymptote at x = 0. ' +
-          'lim(x→0⁺) 1/x = +∞ (positive from the right) and lim(x→0⁻) 1/x = −∞ (negative from the left).',
-        caption: 'Zoom in near x = 0. The function shoots off to ±∞ — there is no touching or crossing.',
-      },
-      {
-        type: 'callout',
-        callout: {
-          type: 'warning',
-          title: 'Vertical Asymptotes vs. Limits at Infinity',
-          body: 'These are two different concepts with similar-looking notation:\n' +
-                '• Infinite limit (vertical asymptote): lim(x→a) f(x) = ∞ — we fix the INPUT and see the OUTPUT blow up\n' +
-                '• Limit at infinity (horizontal asymptote): lim(x→∞) f(x) = L — we let the INPUT grow and watch the OUTPUT\n' +
-                '"Limits at infinity" are covered separately in lesson 05. Do not confuse them.',
-        },
-      },
-      { type: 'image', src: limitsInfinityUrl, alt: 'Three cases for limits at infinity based on polynomial degree comparison', caption: 'Vertical asymptotes occur where the denominator is zero and the numerator is not.' },
+      { type: 'image', src: verticalAsymptoteUrl, alt: 'Vertical asymptote panels: 1/x² (both → +∞) and 1/x (opposite signs)', caption: 'A vertical asymptote at x=a occurs when the denominator is zero and the numerator is not.' },
+      { type: 'image', src: limitsInfinityUrl, alt: 'Contrasting horizontal asymptotes (end behavior) with vertical blow-up', caption: 'Vertical asymptotes: limits near a finite point. Horizontal: limits as x → ±∞.' },
     ],
   },
 

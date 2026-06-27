@@ -1,3 +1,4 @@
+import cornerCuspUrl from '../diagrams/calc-corner-cusp.svg?url';
 import continuityUrl from '../diagrams/calc-continuity.svg?url';
 export default {
   id: 'ch2-differentiability-vs-continuity',
@@ -24,6 +25,12 @@ export default {
       '**What can go wrong.** There are exactly three ways a continuous function can fail to be differentiable at a point, and each has a distinctive shape:',
 
       '**1. A corner.** The function arrives with one slope from the left and departs with a different slope to the right. Both one-sided slopes exist and are finite — they just disagree. Classic example: f(x) = |x| at x = 0. Zoom in as far as you like; the corner stays. From the left, slope = −1. From the right, slope = +1. No tangent line captures both at once.',
+        ],
+      },
+      { type: 'image', src: cornerCuspUrl, alt: 'Corner (|x|) and cusp (x^(2/3)) where the derivative does not exist', caption: 'A function is differentiable at a iff the graph looks like a straight line when zoomed in.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       '**2. A cusp.** The two one-sided slopes blow up to opposite infinities: one goes to +∞ and the other to −∞. The graph spikes to a sharp point. Classic example: f(x) = x^(2/3) at x = 0. The curve comes in increasingly steeply from both sides, but the direction of steepness flips.',
 
@@ -32,7 +39,7 @@ export default {
       '**The hierarchy of smoothness.** These two properties are not symmetric — one is strictly stronger than the other. Every differentiable function is automatically continuous, but not every continuous function is differentiable. The proof is short and elegant, and we give it in the Rigor section below.',
         ],
       },
-      { type: 'image', src: continuityUrl, alt: 'Discontinuity types showing where differentiability also fails', caption: 'Differentiability implies continuity, but not the reverse — a corner is continuous but not differentiable.' },
+      { type: 'image', src: continuityUrl, alt: 'Discontinuity types — all discontinuities also prevent differentiability', caption: 'Differentiable ⟹ continuous, but continuous does not imply differentiable.' },
     ],
     callouts: [
       {

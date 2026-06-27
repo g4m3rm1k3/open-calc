@@ -1,3 +1,4 @@
+import limitLawsUrl from '../diagrams/calc-limit-laws.svg?url';
 import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
 export default {
   id: "ch1-limit-laws",
@@ -37,6 +38,12 @@ export default {
       'Here is the key insight: if two functions are each "settling down" to their own limits, then any arithmetic combination of those functions settles down to the same arithmetic combination of those limits. Addition distributes through limits. Multiplication distributes through limits. The only exceptions are when you might be dividing by zero or taking an even root of a negative number — situations that would be problematic in ordinary arithmetic too.',
 
       '**So what does this buy us?** It means we can break complicated limits into simpler pieces. To evaluate lim(x→2) (3x²−x+5), you do not need a table of values. You can write: limit of 3x² is 3·4 = 12, limit of x is 2, limit of 5 is 5, and then combine: 12 − 2 + 5 = 15. This is exactly what "direct substitution" means and why it works: the Limit Laws guarantee the pieces combine correctly.',
+        ],
+      },
+      { type: 'image', src: limitLawsUrl, alt: 'Table of limit laws: sum, difference, product, quotient, power, root', caption: 'Limit laws let you evaluate complex limits by breaking them into simple pieces.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       '**But there is a catch.** Direct substitution only works when the denominator is nonzero and the function is "nice" (continuous) at the point. What happens when it gives 0/0? The function (x²−4)/(x−2) seems to equal 0/0 at x = 2. But remember: a limit cares about the journey toward 2, not the value at 2. Factor the top: (x+2)(x−2)/(x−2). For any x≠2, you can cancel (x−2)/(x−2) = 1, leaving x+2. As x approaches 2, x+2 approaches 4. The limit is 4, even though the function has a hole there. This algebraic cancellation technique — factor and cancel before substituting — is the standard first move when you get 0/0.',
 
@@ -45,7 +52,7 @@ export default {
       '**The fundamental trig limits, sin(x)/x → 1 and (1−cos x)/x → 0 as x→0, are the most important applications of the Squeeze Theorem in Calculus 1.** They cannot be obtained by algebra. They require the Squeeze Theorem plus a geometric argument about areas on the unit circle. And they come back in every single derivative of a trig function. If you ever see $\\frac{\\sin(5x)}{x}$, the trick is to force the pattern: multiply and divide by 5 to get $5 \\cdot \\frac{\\sin(5x)}{5x}$, and now the piece in brackets approaches 1 as x goes to 0. So the answer is 5.',
         ],
       },
-      { type: 'image', src: limitApproachUrl, alt: 'Convergent curve showing limit laws apply when both limits exist', caption: 'Limit laws let you break complex expressions into simpler pieces you can evaluate separately.' },
+      { type: 'image', src: limitApproachUrl, alt: 'Curve approaching L, showing that laws apply when both limits are finite', caption: 'Direct substitution works for polynomials and rationals at points in their domain.' },
     ],
     callouts: [
       {

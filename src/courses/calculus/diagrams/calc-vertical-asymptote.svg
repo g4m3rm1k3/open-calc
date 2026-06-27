@@ -1,0 +1,81 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Vertical Asymptotes — Infinite Limits Near a Zero Denominator</text>
+
+  <!-- PANEL 1: Both sides → +∞ (1/x² near x=0) -->
+  <text x="80" y="34" font-size="9" fill="#6366f1" text-anchor="middle" font-weight="700">1/x² — both sides +∞</text>
+
+  <line x1="16" y1="165" x2="158" y2="165" class="ax" stroke-width="1.2"/>
+  <line x1="87" y1="38"  x2="87"  y2="168" class="ax" stroke-width="1.2"/>
+
+  <!-- Vertical asymptote at x=87 -->
+  <line x1="87" y1="40" x2="87" y2="165" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <!-- Right branch: 1/(x-87)^2, high then going to right -->
+  <path d="M 91,40  C 92,42 96,55 105,90 C 115,120 130,145 155,160"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Left branch: mirror -->
+  <path d="M 83,40 C 82,42 78,55 69,90 C 59,120 44,145 20,160"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <text x="87" y="183" font-size="9" fill="#ef4444" text-anchor="middle">x = 0</text>
+  <text x="87" y="195" font-size="8" class="mu" text-anchor="middle">lim→ +∞ from both sides</text>
+
+  <!-- DIVIDER 1 -->
+  <line x1="168" y1="28" x2="168" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- PANEL 2: Opposite signs (1/x near x=0) -->
+  <text x="245" y="34" font-size="9" fill="#10b981" text-anchor="middle" font-weight="700">1/x — opposite signs</text>
+
+  <line x1="172" y1="115" x2="316" y2="115" class="ax" stroke-width="1.2"/>
+  <line x1="244" y1="38"  x2="244" y2="205" class="ax" stroke-width="1.2"/>
+
+  <!-- Vertical asymptote at x=244 -->
+  <line x1="244" y1="40" x2="244" y2="205" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <!-- Right branch: 1/x → +∞ as x→0⁺ -->
+  <path d="M 248,40 C 249,43 252,57 258,78 C 266,100 278,110 312,113"
+        fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <!-- Left branch: 1/x → −∞ as x→0⁻ -->
+  <path d="M 240,205 C 239,200 236,185 230,165 C 222,140 210,120 176,116"
+        fill="none" stroke="#10b981" stroke-width="2.5"/>
+
+  <text x="244" y="183" font-size="9" fill="#ef4444" text-anchor="middle">x = 0</text>
+  <text x="190" y="106" font-size="8" fill="#10b981">−∞</text>
+  <text x="280" y="65"  font-size="8" fill="#10b981">+∞</text>
+  <text x="244" y="197" font-size="8" class="mu" text-anchor="middle">lim⁻ = −∞, lim⁺ = +∞</text>
+
+  <!-- DIVIDER 2 -->
+  <line x1="328" y1="28" x2="328" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- PANEL 3: How to find vertical asymptotes -->
+  <text x="406" y="38" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Finding Them</text>
+
+  <rect x="336" y="48" width="136" height="66" rx="5" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="404" y="64" font-size="8.5" fill="#4338ca" text-anchor="middle">For f(x) = p(x)/q(x):</text>
+  <text x="342" y="80" font-size="8.5" fill="#4338ca">① Set q(x) = 0, find x = a</text>
+  <text x="342" y="94" font-size="8.5" fill="#4338ca">② Check p(a) ≠ 0</text>
+  <text x="342" y="108" font-size="8.5" fill="#059669">  → vertical asymptote at x=a</text>
+
+  <!-- Note: if p(a)=0 too, might be removable -->
+  <rect x="336" y="120" width="136" height="42" rx="5" fill="#fef9c3" stroke="#fde68a" stroke-width="1"/>
+  <text x="404" y="134" font-size="8.5" fill="#d97706" text-anchor="middle">If p(a) = 0 too:</text>
+  <text x="342" y="148" font-size="8" fill="#92400e">Factor! May be a removable</text>
+  <text x="342" y="158" font-size="8" fill="#92400e">discontinuity, not VA.</text>
+
+  <!-- Key note -->
+  <rect x="336" y="168" width="136" height="28" rx="5" fill="#fff1f2"/>
+  <text x="404" y="183" font-size="8.5" fill="#dc2626" text-anchor="middle">Limit = ±∞ means</text>
+  <text x="404" y="196" font-size="8" fill="#dc2626" text-anchor="middle">the limit does not exist</text>
+</svg>

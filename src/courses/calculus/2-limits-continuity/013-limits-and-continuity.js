@@ -1,4 +1,5 @@
-import continuityUrl from '../diagrams/calc-continuity.svg?url';
+import continuity3CondUrl from '../diagrams/calc-continuity-3cond.svg?url';
+import oneSidedUrl from '../diagrams/calc-one-sided.svg?url';
 export default {
   id: 'limits-and-continuity',
   slug: 'limits-and-continuity',
@@ -27,6 +28,12 @@ export default {
       'There are four complementary ways to see this, and each one builds a different part of your intuition. The **visual perspective**: a graph of f(x) = (x²−1)/(x−1) has a hole at x = 1, but zoom into either side and the function is clearly approaching y = 2. The limit is 2 even though f(1) is undefined. The **numerical perspective**: plug in x = 0.9, 0.99, 0.999 from the left and x = 1.1, 1.01, 1.001 from the right. Both sequences converge to 2. The convergence from both sides is what makes it a two-sided limit. The **algebraic perspective**: factor x²−1 = (x−1)(x+1), cancel the (x−1) factor (valid since x ≠ 1 in a limit), and get x+1, which equals 2 at x = 1. The **conceptual perspective**: a limit is a *promise*. If you covered x = 1 and asked "based on the pattern, what should f(1) be?" — the limit answers that question. Continuity means the function keeps the promise.',
 
       'Continuity is limit equality at the point. A function f is continuous at x = a if all three conditions hold: (1) f(a) is defined, (2) lim(x→a) f(x) exists (both one-sided limits agree), and (3) those two values are equal. Fail any one condition and you have a discontinuity — removable (a hole), jump (the two sides disagree), or infinite (a vertical asymptote). The type of failure tells you exactly what went wrong.',
+        ],
+      },
+      { type: 'image', src: continuity3CondUrl, alt: 'Three-condition checklist showing how limits define continuity', caption: 'Continuity is defined using limits: f is continuous at a iff lim f(x) = f(a).' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       'One-sided limits are the tool for discontinuities. The left-hand limit lim(x→a⁻) f(x) asks only about x < a; the right-hand limit lim(x→a⁺) asks only about x > a. The two-sided limit exists if and only if both one-sided limits exist and are equal. Piecewise functions and absolute value expressions often require separate left and right analysis.',
 
@@ -37,7 +44,7 @@ export default {
       '**Where this is heading:** This is the last lesson of Chapter 1. The next lesson — Rate of Change — is actually the first bridge into Chapter 2. It takes the limit idea and asks: what happens to the slope of a secant line as the two points collapse toward one? The answer to that question is the derivative. Everything you have learned about limits in this chapter is exactly the machinery Chapter 2 needs.',
         ],
       },
-      { type: 'image', src: continuityUrl, alt: 'Three discontinuity types connecting limits to continuity conditions', caption: 'Continuity at a point requires three things: f(a) defined, limit exists, and they are equal.' },
+      { type: 'image', src: oneSidedUrl, alt: 'One-sided limits agreeing vs. disagreeing at a breakpoint', caption: 'The two-sided limit exists when lim⁻ = lim⁺; continuity adds that both equal f(a).' },
     ],
     callouts: [
       {

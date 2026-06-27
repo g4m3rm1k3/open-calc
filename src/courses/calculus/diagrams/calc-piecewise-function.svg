@@ -1,0 +1,81 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Piecewise Functions — Different Rules for Different Regions</text>
+
+  <!-- LEFT: Graph of a piecewise function -->
+  <!-- Axes: origin at (40, 155), scale = 40px per unit -->
+  <line x1="36"  y1="155" x2="240" y2="155" class="ax" stroke-width="1.2"/>
+  <line x1="36"  y1="36"  x2="36"  y2="158" class="ax" stroke-width="1.2"/>
+  <polygon points="238,151 246,155 238,159" class="axf"/>
+
+  <!-- Tick marks at x=1,2,3,4; y=1,2,3 -->
+  <line x1="76"  y1="152" x2="76"  y2="158" class="ax" stroke-width="1"/>
+  <line x1="116" y1="152" x2="116" y2="158" class="ax" stroke-width="1"/>
+  <line x1="156" y1="152" x2="156" y2="158" class="ax" stroke-width="1"/>
+  <line x1="196" y1="152" x2="196" y2="158" class="ax" stroke-width="1"/>
+  <text x="76"  y="168" font-size="8" class="mu" text-anchor="middle">1</text>
+  <text x="116" y="168" font-size="8" class="mu" text-anchor="middle">2</text>
+  <text x="156" y="168" font-size="8" class="mu" text-anchor="middle">3</text>
+  <text x="196" y="168" font-size="8" class="mu" text-anchor="middle">4</text>
+  <line x1="33" y1="115" x2="39" y2="115" class="ax" stroke-width="1"/>
+  <line x1="33" y1="75"  x2="39" y2="75"  class="ax" stroke-width="1"/>
+  <text x="26" y="119" font-size="8" class="mu" text-anchor="end">1</text>
+  <text x="26" y="79"  font-size="8" class="mu" text-anchor="end">2</text>
+
+  <!-- Piece 1: x < 2: f(x) = x+1 (line) from x=0 to x=2 -->
+  <!-- at x=0: y=1; at x=2: y=3. SVG: (36,115) to (116, 35) -->
+  <path d="M 36,115 L 116,35" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <circle cx="116" cy="35" r="4" fill="white" stroke="#6366f1" stroke-width="2"/> <!-- open at x=2 -->
+  <text x="50" y="90" font-size="8.5" fill="#6366f1">x + 1</text>
+
+  <!-- Piece 2: x = 2: f(2) = 1 (isolated point) -->
+  <circle cx="116" cy="115" r="4" fill="#ef4444"/>
+  <text x="120" y="113" font-size="8" fill="#ef4444">f(2)=1</text>
+
+  <!-- Piece 3: x > 2: f(x) = (x-2)² + 0.5 → at x=2: 0.5; at x=4: 4.5 (too high) -->
+  <!-- Let's do f(x) = -(x-4)² + 2: at x=2: -(−2)²+2=−2, too low -->
+  <!-- Instead: f(x) = 0.5(x-2)² at x=2: 0; at x=4: 2. SVG y = 155 - 40*f(x) -->
+  <!-- at x=2(116,155): y=155; at x=3(156,135): y=155-20=135; at x=4(196,75): y=155-80=75 -->
+  <path d="M 116,155 C 130,145 145,135 156,127 C 168,118 182,95 196,75"
+        fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <circle cx="116" cy="155" r="4" fill="white" stroke="#10b981" stroke-width="2"/> <!-- open at x=2+ -->
+  <text x="170" y="118" font-size="8.5" fill="#10b981">0.5(x−2)²</text>
+
+  <!-- Discontinuity annotation at x=2 -->
+  <line x1="116" y1="40" x2="116" y2="155" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,3" opacity="0.4"/>
+  <text x="116" y="185" font-size="8" fill="#ef4444" text-anchor="middle">x = 2</text>
+  <text x="116" y="197" font-size="8" fill="#ef4444" text-anchor="middle">jump disc.</text>
+
+  <!-- DIVIDER -->
+  <line x1="258" y1="28" x2="258" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Formula and limit check -->
+  <text x="368" y="36" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Limit Check at Breakpoints</text>
+
+  <!-- Formula box -->
+  <rect x="266" y="44" width="206" height="60" rx="5" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="369" y="60" font-size="8.5" fill="#4338ca" text-anchor="middle">f(x) = { x+1  if x &lt; 2</text>
+  <text x="369" y="76" font-size="8.5" fill="#ef4444" text-anchor="middle">         1     if x = 2</text>
+  <text x="369" y="92" font-size="8.5" fill="#10b981" text-anchor="middle">         0.5(x−2)²  if x &gt; 2</text>
+
+  <!-- Limit check table -->
+  <text x="369" y="118" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">At x = 2:</text>
+
+  <rect x="266" y="124" width="206" height="74" rx="5" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="272" y="140" font-size="8.5" fill="#6366f1">lim⁻ (x→2⁻): x+1 → 3</text>
+  <text x="272" y="156" font-size="8.5" fill="#10b981">lim⁺ (x→2⁺): 0.5(0)² → 0</text>
+  <text x="272" y="172" font-size="8.5" fill="#ef4444">f(2) = 1</text>
+  <rect x="266" y="180" width="206" height="16" rx="3" fill="#fff1f2"/>
+  <text x="369" y="192" font-size="8.5" fill="#dc2626" text-anchor="middle">3 ≠ 0 ≠ 1 → jump discontinuity</text>
+</svg>

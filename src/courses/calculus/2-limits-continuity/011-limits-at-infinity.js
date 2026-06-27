@@ -1,4 +1,5 @@
 import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
+import verticalAsymptoteUrl from '../diagrams/calc-vertical-asymptote.svg?url';
 export default {
   id: 'ch1-limits-at-infinity',
   slug: 'limits-at-infinity',
@@ -27,6 +28,12 @@ export default {
       'For rational functions, the intuition is a dominance race. Imagine the numerator and denominator as two competing runners. For large x, the highest-degree term in each one dominates everything else — the lower-degree terms become noise. So the race comes down to just the leading terms: if both runners have the same speed (same degree), they tie and the ratio of their leading coefficients is the result. If the denominator\'s runner is faster (higher degree), it pulls ahead and the ratio collapses to 0. If the numerator\'s runner is faster (higher degree), it pulls ahead and the function grows without bound.',
 
       'The standard technique is to divide every term by the highest power of x in the denominator. This turns things like 3x² into 3, and things like 2x into 2/x. Every term with any x in the denominator then vanishes as x → ∞ (because 1/xⁿ → 0 for n > 0). What survives is just the ratio of leading coefficients. This "divide by the dominant power" move is the workhorse of every rational limit at infinity.',
+        ],
+      },
+      { type: 'image', src: limitsInfinityUrl, alt: 'Three cases for rational limits at infinity: degree below, equal, or above denominator', caption: 'Compare degrees: n<d (→0), n=d (→leading ratio), n>d (→±∞).' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       'Horizontal asymptotes are what limits at infinity look like on a graph. If lim(x→∞) f(x) = L, the graph approaches the horizontal line y = L from below or above as you go far right. Crucially, the graph CAN cross a horizontal asymptote — asymptotes describe end behavior, not barriers. A function can oscillate across y = L many times at small x values and still approach L eventually.',
 
@@ -37,7 +44,7 @@ export default {
       '**Where this is heading:** Limits at infinity give you horizontal and slant asymptotes — two of the five key features used in curve sketching in Chapter 3. In Chapter 3 you will also meet L\'Hôpital\'s Rule, which handles ∞/∞ and 0/0 indeterminate forms that the degree-comparison technique cannot reach. Everything in this lesson is prerequisite for that tool.',
         ],
       },
-      { type: 'image', src: limitsInfinityUrl, alt: 'Three cases for rational function limits at infinity based on degree comparison', caption: 'Compare numerator vs. denominator degree: smaller wins (→0), equal (→ratio), larger (→∞).' },
+      { type: 'image', src: verticalAsymptoteUrl, alt: 'Horizontal asymptotes (limits at ∞) vs. vertical asymptotes (limits near a zero)', caption: 'Horizontal asymptotes describe end behavior; vertical asymptotes describe local blow-up.' },
     ],
     callouts: [
       {

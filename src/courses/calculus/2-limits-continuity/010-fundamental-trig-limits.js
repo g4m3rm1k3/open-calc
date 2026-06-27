@@ -1,3 +1,4 @@
+import sinxOverXUrl from '../diagrams/calc-sinx-over-x.svg?url';
 import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
 export default {
   id: "ch1-fundamental-trig-limits",
@@ -39,6 +40,12 @@ export default {
 
       "Second pillar: lim(x->0) (1-cos x)/x = 0. This says the quantity 1-cos(x) goes to 0 faster than x does. " +
         "So when divided by x, it still collapses to 0.",
+        ],
+      },
+      { type: 'image', src: sinxOverXUrl, alt: 'Unit circle area inequality proving sin(θ)/θ → 1 as θ → 0', caption: 'Three nested areas (triangle ≤ sector ≤ larger triangle) squeeze the limit to 1.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       "If you feel lost with these limits, the key is to stop treating them as algebra problems. They are geometry-plus-bounds problems:",
       "1. Build an inequality from unit-circle geometry.",
@@ -49,7 +56,7 @@ export default {
         "Mastering pattern conversion is what makes trig week feel easy.",
         ],
       },
-      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing sin(θ)/θ approaching 1 as θ approaches 0', caption: 'The limit lim(θ→0) sin(θ)/θ = 1 is proved geometrically from the unit circle and is the foundation of all trig derivatives.' },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing sin and cos definitions used in trig limit proofs', caption: 'For small θ, sin(θ) ≈ θ — this is visually obvious from the unit circle geometry.' },
     ],
     callouts: [
       {

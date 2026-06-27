@@ -1,0 +1,81 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Squeeze Theorem — Trapped Functions Must Share the Limit</text>
+
+  <!-- LEFT: Graph showing g ≤ f ≤ h converging -->
+  <!-- Axes: origin at (36, 165) -->
+  <line x1="32"  y1="165" x2="248" y2="165" class="ax" stroke-width="1.2"/>
+  <line x1="32"  y1="36"  x2="32"  y2="168" class="ax" stroke-width="1.2"/>
+  <polygon points="246,161 254,165 246,169" class="axf"/>
+
+  <!-- c and L marks -->
+  <line x1="164" y1="162" x2="164" y2="168" class="ax" stroke-width="1"/>
+  <text x="164" y="179" font-size="9" class="mu" text-anchor="middle">a</text>
+
+  <line x1="29" y1="96" x2="35" y2="96" class="ax" stroke-width="1"/>
+  <text x="20" y="100" font-size="9" class="mu" text-anchor="end">L</text>
+  <!-- L guide line -->
+  <line x1="32" y1="96" x2="164" y2="96" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+
+  <!-- h(x) — upper bound, purple, converges to L from above -->
+  <path d="M 36,60 C 60,58 90,68 120,80 C 140,88 155,94 164,96"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <path d="M 164,96 C 175,96 200,100 244,105"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="240" y="108" font-size="9" fill="#6366f1">h(x)</text>
+
+  <!-- g(x) — lower bound, green, converges to L from below -->
+  <path d="M 36,150 C 65,148 95,134 120,118 C 140,108 155,100 164,96"
+        fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <path d="M 164,96 C 175,96 200,92 244,88"
+        fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <text x="240" y="86" font-size="9" fill="#10b981">g(x)</text>
+
+  <!-- f(x) — squeezed in between, wiggles but converges to L -->
+  <path d="M 36,110 C 50,128 70,106 90,115 C 105,120 120,112 135,105 C 148,100 158,97 164,96"
+        fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,3"/>
+  <path d="M 164,96 C 172,96 185,97 200,97 C 220,97 235,96 244,96"
+        fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="80" y="128" font-size="9" fill="#ef4444" font-style="italic">f(x)</text>
+  <text x="70" y="140" font-size="8" fill="#ef4444">(wiggles between)</text>
+
+  <!-- Convergence dot at a -->
+  <circle cx="164" cy="96" r="5" fill="#f59e0b" stroke="white" stroke-width="1.5"/>
+  <text x="170" y="92" font-size="8.5" fill="#f59e0b">all → L</text>
+
+  <!-- Shaded sandwich region before a -->
+  <path d="M 36,60 C 60,58 90,68 120,80 C 140,88 155,94 164,96 C 155,100 140,108 120,118 C 95,134 65,148 36,150 Z"
+        fill="#6366f1" fill-opacity="0.06"/>
+
+  <!-- DIVIDER -->
+  <line x1="262" y1="28" x2="262" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Theorem statement and key example -->
+  <text x="370" y="38" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">The Theorem</text>
+
+  <rect x="270" y="44" width="202" height="64" rx="5" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="371" y="60" font-size="8.5" fill="#4338ca" text-anchor="middle">If  g(x) ≤ f(x) ≤ h(x)  near a,</text>
+  <text x="371" y="74" font-size="8.5" fill="#4338ca" text-anchor="middle">and  lim g(x) = lim h(x) = L,</text>
+  <text x="371" y="88" font-size="9"   fill="#059669" text-anchor="middle" font-weight="700">then lim f(x) = L</text>
+  <text x="371" y="101" font-size="8"  class="mu" text-anchor="middle">(even if f is unknown or wild)</text>
+
+  <!-- The classic example -->
+  <text x="371" y="124" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Classic Example</text>
+  <rect x="270" y="130" width="202" height="72" rx="5" fill="#fef9c3" stroke="#fde68a" stroke-width="1"/>
+  <text x="371" y="146" font-size="9" fill="#d97706" text-anchor="middle">lim x² sin(1/x) as x → 0</text>
+  <text x="275" y="162" font-size="8.5" fill="#92400e">sin(1/x) oscillates wildly, but:</text>
+  <text x="275" y="176" font-size="8.5" fill="#92400e">−x² ≤ x² sin(1/x) ≤ x²</text>
+  <text x="275" y="190" font-size="8.5" fill="#92400e">Both −x² and x² → 0, so limit = 0</text>
+  <text x="371" y="200" font-size="0" text-anchor="middle"/>
+</svg>

@@ -1,4 +1,5 @@
 import epsilonDeltaUrl from '../diagrams/calc-epsilon-delta.svg?url';
+import limitConceptUrl from '../diagrams/calc-limit-concept.svg?url';
 export default {
   id: "ch1-epsilon-delta",
   slug: "epsilon-delta",
@@ -40,6 +41,12 @@ export default {
       '**Round 2**: The skeptic tightens: "Within 0.01 of 7." You respond: "Keep x within 0.005 of 3." Check: 2(0.005) = 0.01. ✓',
 
       '**Round 3**: "Within 0.0001 of 7." You: "Within 0.00005 of 3." Check: 2(0.00005) = 0.0001. ✓',
+        ],
+      },
+      { type: 'image', src: epsilonDeltaUrl, alt: 'ε-δ box: horizontal input band δ must map inside vertical output band ε', caption: 'For every ε > 0 the adversary picks, you must produce a δ that keeps f within ε of L.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       "The skeptic can pick ANY positive number ε (the output tolerance), no matter how tiny. You must respond with a δ (the input tolerance) that guarantees every x within δ of 3 has f(x) within ε of 7. If you can ALWAYS win — for EVERY possible ε — then the limit is truly 7.",
 
@@ -48,7 +55,7 @@ export default {
       'The beautiful thing about this definition: it never mentions infinity, it never mentions "approaching," and it never mentions motion or time. It replaces all of those fuzzy ideas with a single, airtight logical statement about numbers. This is what mathematician Morris Kline called "the arithmetization of analysis" — rebuilding all of calculus on nothing more than the properties of real numbers.',
         ],
       },
-      { type: 'image', src: epsilonDeltaUrl, alt: 'ε-δ box showing the formal definition of a limit', caption: 'The ε-δ definition turns the intuitive idea of "approaching" into a precise, checkable condition.' },
+      { type: 'image', src: limitConceptUrl, alt: 'Curve with hole showing the informal limit that epsilon-delta formalizes', caption: 'ε-δ makes the intuitive idea of "approaching" into a precise, checkable condition.' },
     ],
     callouts: [
       {

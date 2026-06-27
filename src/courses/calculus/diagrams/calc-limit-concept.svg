@@ -1,0 +1,78 @@
+<svg viewBox="0 0 480 210" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="210" rx="12" class="bg"/>
+
+  <defs>
+    <marker id="aL" markerWidth="8" markerHeight="8" refX="2" refY="4" orient="auto"><path d="M8,0 L0,4 L8,8 Z" fill="#6366f1"/></marker>
+    <marker id="aR" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#10b981"/></marker>
+  </defs>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">What a Limit Actually Means</text>
+
+  <!-- Axes -->
+  <line x1="40"  y1="155" x2="300" y2="155" class="ax" stroke-width="1.2"/>
+  <line x1="40"  y1="40"  x2="40"  y2="158" class="ax" stroke-width="1.2"/>
+  <polygon points="298,151 306,155 298,159" class="axf"/>
+  <text x="308" y="159" font-size="9" class="mu">x</text>
+  <text x="32"  y="38"  font-size="9" class="mu">y</text>
+
+  <!-- Smooth curve on left of c -->
+  <path d="M 45,140 C 65,130 100,110 148,80" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Smooth curve on right of c -->
+  <path d="M 176,80 C 200,82 240,95 290,115" fill="none" stroke="#10b981" stroke-width="2.5"/>
+
+  <!-- Hole at c: x=162, y=80 -->
+  <circle cx="162" cy="80" r="5" fill="white" stroke="#64748b" stroke-width="2"/>
+  <!-- Actual value dot — f(c) defined elsewhere -->
+  <circle cx="162" cy="130" r="5" fill="#ef4444"/>
+
+  <!-- c on x-axis -->
+  <line x1="162" y1="152" x2="162" y2="158" class="ax" stroke-width="1.5"/>
+  <text x="162" y="170" font-size="10" class="mu" text-anchor="middle">c</text>
+
+  <!-- L on y-axis -->
+  <line x1="37" y1="80" x2="43" y2="80" class="ax" stroke-width="1.5"/>
+  <text x="28" y="84" font-size="10" class="mu">L</text>
+  <!-- L horizontal guide -->
+  <line x1="40" y1="80" x2="162" y2="80" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>
+
+  <!-- Approach arrows from left -->
+  <line x1="100" y1="110" x2="148" y2="84" stroke="#6366f1" stroke-width="2" marker-end="url(#aR)"/>
+  <text x="85" y="107" font-size="8.5" fill="#6366f1">x→c⁻</text>
+
+  <!-- Approach arrows from right -->
+  <line x1="220" y1="92" x2="178" y2="82" stroke="#10b981" stroke-width="2" marker-end="url(#aL)"/>
+  <text x="222" y="88" font-size="8.5" fill="#10b981">x→c⁺</text>
+
+  <!-- f(c) label -->
+  <text x="167" y="134" font-size="8.5" fill="#ef4444">f(c) ← actual value</text>
+
+  <!-- Key insight box (right side) -->
+  <rect x="316" y="36" width="156" height="130" rx="8" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="394" y="56" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">The Key Insight</text>
+
+  <rect x="326" y="64" width="136" height="28" rx="4" fill="#fff1f2"/>
+  <text x="394" y="78" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">What lim does NOT care:</text>
+  <text x="394" y="90" font-size="8" fill="#dc2626" text-anchor="middle">the value of f(c) — or even if</text>
+
+  <rect x="326" y="98" width="136" height="28" rx="4" fill="#ecfdf5"/>
+  <text x="394" y="112" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">What lim DOES care:</text>
+  <text x="394" y="124" font-size="8" fill="#059669" text-anchor="middle">where f(x) heads as x→c</text>
+
+  <rect x="326" y="132" width="136" height="26" rx="4" fill="#fef9c3"/>
+  <text x="394" y="146" font-size="8" fill="#d97706" text-anchor="middle">f(c) can be missing, wrong,</text>
+  <text x="394" y="158" font-size="8" fill="#d97706" text-anchor="middle">or equal to L — limit still works</text>
+
+  <!-- Bottom note -->
+  <text x="240" y="195" font-size="8.5" class="mu" text-anchor="middle">lim f(x) = L  means  f(x) → L as x → c from both sides; f(c) is irrelevant</text>
+  <text x="240" y="207" font-size="8.5" fill="#6366f1" text-anchor="middle">x→c</text>
+</svg>

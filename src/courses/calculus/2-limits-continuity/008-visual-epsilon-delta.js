@@ -1,4 +1,5 @@
 import epsilonDeltaUrl from '../diagrams/calc-epsilon-delta.svg?url';
+import limitConceptUrl from '../diagrams/calc-limit-concept.svg?url';
 export default {
   id: 'ch1-visual-epsilon-delta',
   slug: 'visual-epsilon-delta',
@@ -36,6 +37,12 @@ export default {
       '**Why Take the Smaller Distance?**  ' +
       'The δ we choose must work in all directions from a: if we use too large a δ on one side, the other side might escape the ε-band. ' +
       'By taking the minimum of the left and right distances, we guarantee both sides stay trapped.',
+        ],
+      },
+      { type: 'image', src: epsilonDeltaUrl, alt: 'ε-δ adversary game: opponent picks ε, you must respond with a valid δ', caption: 'Think of it as a game: any ε challenge can be met — that is what the limit guarantee means.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       '**Visual Reasoning Over Algebra**  ' +
       'This method is pure geometry: draw boxes, find crossing points, measure distances. ' +
@@ -47,7 +54,7 @@ export default {
       'The exact function form (linear, curved, wiggly) determines how close you need to be, but the method is universal.',
         ],
       },
-      { type: 'image', src: epsilonDeltaUrl, alt: 'ε-δ adversary game showing input band vs. output band', caption: 'Think of ε-δ as a game: the adversary picks ε, you must find δ that keeps outputs within ε of L.' },
+      { type: 'image', src: limitConceptUrl, alt: 'Informal limit picture that the ε-δ game captures precisely', caption: 'Every limit proof follows this game structure, even when the language is not used explicitly.' },
     ],
     callouts: [
       {

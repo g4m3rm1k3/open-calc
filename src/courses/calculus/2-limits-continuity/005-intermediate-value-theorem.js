@@ -1,3 +1,4 @@
+import ivtUrl from '../diagrams/calc-ivt.svg?url';
 import continuityUrl from '../diagrams/calc-continuity.svg?url';
 export default {
   id: 'ch1-ivt',
@@ -37,6 +38,12 @@ export default {
       '**The sign-change corollary is the workhorse.** If $f(a) < 0$ and $f(b) > 0$, then somewhere between $a$ and $b$ the function must cross zero. This is how we prove that equations have solutions: evaluate at two points with opposite signs, and the IVT guarantees a root between them. Example: $f(x) = x^3 - x - 1$. We have $f(1) = -1 < 0$ and $f(2) = 5 > 0$. Therefore there is a root between 1 and 2. Done. We haven\'t found it exactly, but we\'ve proved it exists.',
 
       '**The bisection method turns IVT into an algorithm.** Once you know a root lies between $a$ and $b$, evaluate at the midpoint $m = (a+b)/2$. If $f(m) = 0$, you\'re done. If $f(m)$ has the same sign as $f(a)$, the root is in $[m, b]$. If $f(m)$ has the same sign as $f(b)$, the root is in $[a, m]$. Repeat. Each step cuts the interval in half, so after $n$ steps you\'ve localized the root to within $(b-a)/2^n$ of its true location. This is the oldest root-finding algorithm in existence.',
+        ],
+      },
+      { type: 'image', src: ivtUrl, alt: 'Continuous curve crossing from f(a)<0 to f(b)>0, guaranteeing a root at c', caption: 'A continuous function cannot skip over values — it must hit every intermediate value.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       '**Why does continuity matter?** Remove it, and the theorem fails immediately. Consider $f(x) = -1$ for $x < 0$ and $f(x) = +1$ for $x \geq 0$. Then $f(-1) = -1$ and $f(1) = +1$, but $f$ never equals 0. The discontinuity at $x = 0$ is the escape hatch that lets the function "jump over" zero. Continuity is not just a technical condition — it is the precise mathematical formalization of "no teleporting."',
 
@@ -45,7 +52,7 @@ export default {
       '**Real-world applications are everywhere.** In economics: if supply exceeds demand at price $p_1$ and is less than demand at price $p_2$, there must be an equilibrium price between them. In engineering: if a beam deflects upward at one end and downward at another under a load, it has a neutral point in between. In medicine: if body temperature was 98.6°F at 8am and 103°F at noon, it passed through every temperature in between — so doctors can say "the fever first reached 101°F sometime between 8am and noon."',
         ],
       },
-      { type: 'image', src: continuityUrl, alt: 'Continuous curve connecting two points, proving a middle value is hit', caption: 'A continuous function on [a,b] hits every value between f(a) and f(b) — it cannot jump over them.' },
+      { type: 'image', src: continuityUrl, alt: 'Jump discontinuity showing how IVT fails without continuity', caption: 'The IVT requires continuity: a jump lets the function skip over intermediate values.' },
     ],
     callouts: [
       {

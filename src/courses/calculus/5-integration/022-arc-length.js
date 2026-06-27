@@ -1,3 +1,4 @@
+import arcLengthUrl from '../diagrams/calc-arc-length.svg?url';
 import mvtUrl from '../diagrams/calc-mvt.svg?url';
 export default {
   id: 'ch4-arc-length',
@@ -30,6 +31,12 @@ export default {
       'Factor out Δx: Δs = √(1 + (Δy/Δx)²)·Δx ≈ √(1 + [f\'(x)]²)·Δx. Summing these tiny lengths and taking the limit gives the arc length formula: L = ∫ₐᵇ √(1 + [f\'(x)]²) dx. The key quantity ds = √(1+[f\'(x)]²)dx is the arc length element — an infinitesimal piece of the curve treated as straight.',
 
       'The arc length element ds has a beautiful geometric meaning. Think of the curve as a wire. If you grab a tiny piece of length ds at position x, it points in the direction of the tangent. The horizontal component is dx, the vertical component is dy = f\'(x)dx, and the total length is ds = √(dx²+dy²). This is the infinitesimal Pythagorean theorem — the same theorem as in the finite case, just applied to infinitely small triangles.',
+        ],
+      },
+      { type: 'image', src: arcLengthUrl, alt: 'Polygonal chain of hypotenuses approximating a curve — each is √(Δx²+Δy²)', caption: 'L = ∫√(1+[f′(x)]²) dx arises from summing infinitely many tiny hypotenuses.' },
+      {
+        type: 'prose',
+        paragraphs: [
 
       'Surface area of revolution extends arc length into 3D. When you rotate the curve y=f(x) around the x-axis, a tiny arc element ds sweeps out a thin band (a frustum of a cone). The band has circumference 2πf(x) (the radius at that point) and width ds. Area of band = 2πf(x)·ds = 2πf(x)·√(1+[f\'(x)]²)dx. Integrating: S = 2π∫ₐᵇ f(x)√(1+[f\'(x)]²)dx.',
 
@@ -38,7 +45,7 @@ export default {
       'A common misconception: arc length L is NOT simply ∫f(x)dx. The integral ∫f(x)dx gives area; ∫ds = ∫√(1+(f\'(x))²)dx gives length. The distinction is crucial — arc length always involves a square root with a derivative inside, making it typically harder to integrate than area problems. Most arc length integrals do not have elementary antiderivatives; those that do are carefully constructed examples (like the ones in this lesson).',
         ],
       },
-      { type: 'image', src: mvtUrl, alt: 'Curve segment with arc-length approximation using the MVT', caption: 'Arc length = ∫√(1 + [f′(x)]²) dx, derived by summing infinitely many tiny hypotenuses.' },
+      { type: 'image', src: mvtUrl, alt: 'MVT guarantees a point where the slope equals the chord slope in each segment', caption: 'The MVT converts Δy to f′(c)Δx in each tiny segment, making the integral exact.' },
     ],
     callouts: [
       {

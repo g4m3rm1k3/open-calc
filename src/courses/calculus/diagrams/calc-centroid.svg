@@ -1,0 +1,77 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Center of Mass — The Balancing Point of a Region</text>
+
+  <!-- LEFT: Region with centroid shown -->
+  <!-- Axes -->
+  <line x1="30" y1="170" x2="248" y2="170" class="ax" stroke-width="1.2"/>
+  <line x1="30" y1="36"  x2="30"  y2="173" class="ax" stroke-width="1.2"/>
+  <polygon points="246,166 254,170 246,174" class="axf"/>
+
+  <!-- Bounds a (x=50) and b (x=220) -->
+  <line x1="50"  y1="167" x2="50"  y2="173" class="ax" stroke-width="1"/>
+  <line x1="220" y1="167" x2="220" y2="173" class="ax" stroke-width="1"/>
+  <text x="50"  y="183" font-size="9" class="mu" text-anchor="middle">a</text>
+  <text x="220" y="183" font-size="9" class="mu" text-anchor="middle">b</text>
+
+  <!-- Region under a curve (parabola-like) -->
+  <path d="M 50,170 L 50,100 C 80,65 120,45 160,55 C 185,62 205,85 220,110 L 220,170 Z"
+        fill="#6366f1" fill-opacity="0.15" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Curve outline separately -->
+  <path d="M 50,100 C 80,65 120,45 160,55 C 185,62 205,85 220,110"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Vertical strip at x=130 (SVG) for moment calculation -->
+  <rect x="128" y="49" width="12" height="121" fill="#ef4444" fill-opacity="0.25" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="134" y="105" font-size="8" fill="#ef4444" text-anchor="middle" transform="rotate(-90,134,105)">x · f(x) dx</text>
+
+  <!-- Centroid dot -->
+  <circle cx="136" cy="110" r="8" fill="#f59e0b" stroke="white" stroke-width="2"/>
+  <text x="148" y="108" font-size="9" fill="#f59e0b" font-weight="700">(x̄, ȳ)</text>
+  <text x="148" y="120" font-size="8.5" fill="#f59e0b">centroid</text>
+
+  <!-- Balance lines through centroid -->
+  <line x1="136" y1="36" x2="136" y2="170" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+  <line x1="30"  y1="110" x2="248" y2="110" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+
+  <!-- x-axis labels -->
+  <text x="30" y="194" font-size="8" class="mu" text-anchor="middle">0</text>
+
+  <!-- DIVIDER -->
+  <line x1="263" y1="28" x2="263" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Formulas -->
+  <text x="370" y="34" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Center of Mass Formulas</text>
+  <text x="370" y="48" font-size="8.5" class="mu" text-anchor="middle">(uniform density ρ, region under y = f(x))</text>
+
+  <!-- Area -->
+  <rect x="271" y="56" width="200" height="24" rx="4" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="371" y="73" font-size="9" fill="#4338ca" text-anchor="middle">A = ∫ₐᵇ f(x) dx</text>
+
+  <!-- x̄ -->
+  <rect x="271" y="86" width="200" height="36" rx="4" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="371" y="102" font-size="9"  fill="#6366f1" text-anchor="middle" font-weight="700">x̄ = 1/A ∫ₐᵇ x·f(x) dx</text>
+  <text x="371" y="116" font-size="8"  class="mu" text-anchor="middle">(moment about y-axis ÷ area)</text>
+
+  <!-- ȳ -->
+  <rect x="271" y="128" width="200" height="36" rx="4" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1"/>
+  <text x="371" y="144" font-size="9"  fill="#059669" text-anchor="middle" font-weight="700">ȳ = 1/A ∫ₐᵇ ½[f(x)]² dx</text>
+  <text x="371" y="158" font-size="8"  class="mu" text-anchor="middle">(moment about x-axis ÷ area)</text>
+
+  <!-- Physical meaning -->
+  <rect x="271" y="170" width="200" height="36" rx="5" fill="#fef9c3" stroke="#fde68a" stroke-width="1"/>
+  <text x="371" y="184" font-size="8.5" fill="#d97706" text-anchor="middle">The centroid is where a thin plate</text>
+  <text x="371" y="196" font-size="8.5" fill="#d97706" text-anchor="middle">of uniform density would balance</text>
+  <text x="371" y="208" font-size="8.5" fill="#d97706" text-anchor="middle">on a single point</text>
+</svg>

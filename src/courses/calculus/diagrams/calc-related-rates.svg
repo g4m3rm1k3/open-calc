@@ -1,0 +1,88 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+
+  <text x="240" y="18" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Related Rates — Linking Rates via a Geometric Constraint</text>
+
+  <!-- LEFT: Ladder sliding problem diagram -->
+  <text x="110" y="34" font-size="9" fill="#6366f1" text-anchor="middle" font-weight="700">Classic: Sliding Ladder</text>
+
+  <!-- Wall (vertical) -->
+  <line x1="40" y1="30" x2="40" y2="185" stroke="#94a3b8" stroke-width="3"/>
+  <!-- Ground (horizontal) -->
+  <line x1="40" y1="185" x2="220" y2="185" stroke="#94a3b8" stroke-width="3"/>
+
+  <!-- Ladder: from (40,75) to (175,185) -->
+  <line x1="40" y1="75" x2="175" y2="185" stroke="#6366f1" stroke-width="3"/>
+
+  <!-- y: height on wall (vertical dashed) -->
+  <line x1="40" y1="75" x2="40" y2="185" stroke="#10b981" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="26" y="133" font-size="10" fill="#10b981">y</text>
+  <!-- y rate arrow -->
+  <line x1="50" y1="75" x2="50" y2="95" stroke="#10b981" stroke-width="2" marker-end="url(#aDown)"/>
+  <text x="54" y="90" font-size="8.5" fill="#10b981">dy/dt &lt; 0</text>
+
+  <!-- x: base on ground (horizontal dashed) -->
+  <line x1="40" y1="190" x2="175" y2="190" stroke="#ef4444" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="107" y="204" font-size="10" fill="#ef4444" text-anchor="middle">x</text>
+  <!-- x rate arrow -->
+  <line x1="155" y1="180" x2="175" y2="180" stroke="#ef4444" stroke-width="2" marker-end="url(#aRight)"/>
+  <text x="130" y="175" font-size="8.5" fill="#ef4444">dx/dt &gt; 0</text>
+
+  <!-- Length label -->
+  <text x="96" y="120" font-size="9" fill="#6366f1" transform="rotate(38,96,120)">L = 10 m (fixed)</text>
+
+  <!-- Pythagorean constraint -->
+  <rect x="45" y="42" width="130" height="22" rx="4" fill="#eef2ff"/>
+  <text x="110" y="57" font-size="9" fill="#4338ca" text-anchor="middle">x² + y² = L² = 100</text>
+
+  <!-- Defs for arrows -->
+  <defs>
+    <marker id="aDown"  markerWidth="7" markerHeight="7" refX="3.5" refY="6" orient="auto"><path d="M0,0 L3.5,7 L7,0 Z" fill="#10b981"/></marker>
+    <marker id="aRight" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#ef4444"/></marker>
+  </defs>
+
+  <!-- DIVIDER -->
+  <line x1="232" y1="28" x2="232" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Strategy steps -->
+  <text x="356" y="34" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">5-Step Strategy</text>
+
+  <!-- Step 1 -->
+  <rect x="240" y="42" width="232" height="26" rx="4" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="246" y="55" font-size="8.5" fill="#6366f1" font-weight="700">① Draw and label</text>
+  <text x="246" y="66" font-size="8" class="mu">Name all quantities (x, y, θ …)</text>
+
+  <!-- Step 2 -->
+  <rect x="240" y="72" width="232" height="26" rx="4" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1"/>
+  <text x="246" y="85" font-size="8.5" fill="#059669" font-weight="700">② Write the geometric equation</text>
+  <text x="246" y="96" font-size="8" class="mu">e.g. x² + y² = L², V = πr²h</text>
+
+  <!-- Step 3 -->
+  <rect x="240" y="102" width="232" height="26" rx="4" fill="#fef9c3" stroke="#fde68a" stroke-width="1"/>
+  <text x="246" y="115" font-size="8.5" fill="#d97706" font-weight="700">③ Differentiate both sides w.r.t. t</text>
+  <text x="246" y="126" font-size="8" class="mu">2x(dx/dt) + 2y(dy/dt) = 0</text>
+
+  <!-- Step 4 -->
+  <rect x="240" y="132" width="232" height="26" rx="4" fill="#fff1f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="246" y="145" font-size="8.5" fill="#dc2626" font-weight="700">④ Plug in known values at instant</text>
+  <text x="246" y="156" font-size="8" class="mu">x=6, y=8, dx/dt=2 → solve dy/dt</text>
+
+  <!-- Step 5 -->
+  <rect x="240" y="162" width="232" height="26" rx="4" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="246" y="175" font-size="8.5" fill="#6366f1" font-weight="700">⑤ Solve for the unknown rate</text>
+  <text x="246" y="186" font-size="8" class="mu">dy/dt = −x/y · (dx/dt) = −1.5 m/s</text>
+
+  <!-- Note -->
+  <rect x="240" y="192" width="232" height="16" rx="3" fill="#f1f5f9"/>
+  <text x="356" y="204" font-size="8" class="mu" text-anchor="middle">Key: x, y are functions of t — differentiate accordingly</text>
+</svg>
