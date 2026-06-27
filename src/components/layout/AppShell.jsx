@@ -70,7 +70,7 @@ import MobileHomePage from "./MobileHomePage.jsx";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
 import WhatsNewModal from "../ui/WhatsNewModal.jsx";
 import { useGlobalTheme } from "../../context/ThemeContext.jsx";
-import { STUDIO_THEMES } from "../../utils/studioThemes.js";
+import ThemePicker from "../ui/ThemePicker.jsx";
 
 function MobileLocationBadge() {
   const { chapterId, lessonSlug } = useParams();
@@ -126,11 +126,10 @@ function NavSep({ className = "" }) {
   return <div className={`w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1.5 flex-shrink-0 rounded-full ${className}`} />
 }
 
-function TopBar({ dark, toggleDark }) {
+function TopBar() {
   const { openSearch } = useSearchContext();
   const location = useLocation();
   const isCompassActive = location.pathname.startsWith('/compass');
-  const { studioTheme, setStudioTheme } = useGlobalTheme();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] h-[52px] flex items-center px-4 gap-3 bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
@@ -182,24 +181,8 @@ function TopBar({ dark, toggleDark }) {
           <Search className="w-[18px] h-[18px]" />
         </button>
 
-        <select
-          value={studioTheme}
-          onChange={(e) => setStudioTheme(e.target.value)}
-          className="hidden lg:flex text-[11px] font-semibold rounded-md px-1.5 py-1 border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-600 dark:text-slate-400 cursor-pointer focus:outline-none hover:bg-slate-100 dark:hover:bg-slate-800"
-          title="Theme"
-        >
-          {Object.entries(STUDIO_THEMES).map(([id, t]) => (
-            <option key={id} value={id}>{t.name}</option>
-          ))}
-        </select>
+        <ThemePicker />
 
-        <button
-          onClick={toggleDark}
-          className="nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-          title="Toggle theme"
-        >
-          {dark ? <Sun className="w-[18px] h-[18px]" /> : <Moon className="w-[18px] h-[18px]" />}
-        </button>
         <div className="hidden lg:block">
           <FullscreenButton className="nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 [&>svg]:w-[18px] [&>svg]:h-[18px]" />
         </div>
@@ -309,16 +292,7 @@ export default function AppShell({ children }) {
   }, []);
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null);
   const { openSearch } = useSearchContext();
-
-  const [dark, setDark] = useState(() =>
-    document.documentElement.classList.contains("dark"),
-  );
-
-  const toggleDark = () => {
-    const isDark = document.documentElement.classList.toggle("dark");
-    localStorage.setItem("oc-theme", isDark ? "dark" : "light");
-    setDark(isDark);
-  };
+  const { isDarkGlobal: dark } = useGlobalTheme();
 
   // openGrapher — called by any lesson/component via GrapherContext
   const openGrapher = useCallback((config) => {
@@ -493,7 +467,7 @@ export default function AppShell({ children }) {
           {isDesktopRoute && !isMobile && selectedNode && (
             <NodePanel node={selectedNode} onClose={() => setSelectedNode(null)} />
           )}
-          <TopBar dark={dark} toggleDark={toggleDark} />
+          <TopBar />
 
           {/* Mobile tools backdrop */}
           {(graphOpen || graph3DOpen || graphJSXOpen || mobileToolsOpen) && (

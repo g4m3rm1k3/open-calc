@@ -10,9 +10,23 @@ const ThemeContext = createContext({
 });
 
 export function ThemeProvider({ children }) {
-  const [studioTheme, setStudioTheme] = useState(() => {
+  const [studioThemeState, setStudioThemeState] = useState(() => {
     return localStorage.getItem('studio_theme') || 'default';
   });
+
+  const setStudioTheme = (newTheme) => {
+    setStudioThemeState(newTheme);
+    localStorage.setItem('studio_theme', newTheme);
+    if (newTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('oc-theme', 'light');
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('oc-theme', 'dark');
+    }
+  };
+
+  const studioTheme = studioThemeState;
   
   const [isDarkGlobal, setIsDarkGlobal] = useState(() => {
     return document.documentElement.classList.contains('dark');
