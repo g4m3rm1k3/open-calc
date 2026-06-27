@@ -1,0 +1,67 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: #f8fafc; }
+    .ax  { stroke: #94a3b8; }
+    .axf { fill: #94a3b8; }
+    .mu  { fill: #64748b; }
+    .dark .bg  { fill: #0f172a; }
+    .dark .ax  { stroke: #475569; }
+    .dark .axf { fill: #475569; }
+    .dark .mu  { fill: #64748b; }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Implicit Differentiation — Treat y as a Function of x</text>
+
+  <!-- LEFT: circle x²+y²=25, tangent at (3,4) -->
+  <!-- Origin at SVG (120, 115), scale: 16px per unit, so radius 5 → 80px -->
+  <line x1="34"  y1="115" x2="218" y2="115" class="ax" stroke-width="1.2"/>
+  <line x1="120" y1="30"  x2="120" y2="195" class="ax" stroke-width="1.2"/>
+  <polygon points="216,111 224,115 216,119" class="axf"/>
+  <text x="226" y="119" font-size="9" class="mu">x</text>
+  <text x="110" y="28"  font-size="9" class="mu">y</text>
+
+  <!-- Circle of radius 5 (80px), centered at (120,115) -->
+  <circle cx="120" cy="115" r="80" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Point (3,4): SVG = (120+3*16, 115−4*16) = (168, 51) -->
+  <circle cx="168" cy="51" r="5" fill="#ef4444"/>
+  <text x="174" y="48" font-size="9" fill="#ef4444" font-weight="700">(3, 4)</text>
+
+  <!-- Tangent at (3,4): slope = dy/dx = −x/y = −3/4
+       Line through (168,51): y−51 = −(3/4)(x−168)  [SVG: y increases downward, dy/dx in math = −x/y but in SVG the y axis is flipped so slope in SVG = +3/4]
+       At x=200: y=51+(3/4)(200-168)=51+24=75
+       At x=100: y=51+(3/4)(100-168)=51-51=0 -->
+  <line x1="88" y1="0" x2="220" y2="98" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,4"/>
+  <text x="72" y="18" font-size="8.5" fill="#ef4444">slope = −x/y = −¾</text>
+
+  <!-- Axis labels -->
+  <text x="120" y="127" font-size="8" class="mu" text-anchor="middle">0</text>
+  <text x="200" y="127" font-size="8" class="mu" text-anchor="middle">5</text>
+  <text x="113" y="37"  font-size="8" class="mu" text-anchor="end">5</text>
+
+  <!-- DIVIDER -->
+  <line x1="240" y1="26" x2="240" y2="205" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- RIGHT: Step-by-step procedure -->
+  <text x="360" y="33" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Implicit Differentiation Procedure</text>
+
+  <rect x="248" y="40" width="224" height="24" rx="4" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1"/>
+  <text x="360" y="57" font-size="8.5" fill="#4338ca" text-anchor="middle">Example: x² + y² = 25</text>
+
+  <!-- Steps -->
+  <text x="250" y="79" font-size="8.5" fill="#059669" font-weight="700">Step 1  Differentiate both sides w.r.t. x</text>
+  <text x="252" y="93" font-size="8.5" class="mu">d/dx[x²] + d/dx[y²] = d/dx[25]</text>
+  <text x="252" y="107" font-size="8.5" class="mu">2x   +   2y · (dy/dx)   =   0</text>
+  <rect x="248" y="98" width="156" height="13" rx="2" fill="#fef9c3" fill-opacity="0.6"/>
+  <text x="408" y="107" font-size="8.5" fill="#d97706">← chain rule on y²</text>
+
+  <text x="250" y="123" font-size="8.5" fill="#059669" font-weight="700">Step 2  Solve for dy/dx</text>
+  <text x="252" y="137" font-size="8.5" class="mu">2y · dy/dx = −2x</text>
+  <rect x="248" y="143" width="224" height="20" rx="4" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+  <text x="360" y="158" font-size="11" fill="#059669" text-anchor="middle" font-weight="700">dy/dx = −x / y</text>
+
+  <text x="250" y="177" font-size="8.5" fill="#059669" font-weight="700">Step 3  Evaluate at the point</text>
+  <text x="252" y="191" font-size="8.5" class="mu">At (3, 4):  dy/dx = −3/4 = −0.75</text>
+  <rect x="248" y="198" width="224" height="14" rx="3" fill="#fef3c7" stroke="#fde68a"/>
+  <text x="360" y="209" font-size="8" fill="#92400e" text-anchor="middle">dy/dx involves both x and y — that's normal</text>
+</svg>

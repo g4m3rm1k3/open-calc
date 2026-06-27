@@ -1,0 +1,270 @@
+import { useState, useEffect, useRef, lazy, Suspense } from 'react'
+import { runCode, RUNNABLE_LANGS, WANDBOX_COMPILER } from '../../utils/codeRunner.js'
+import { useGlobalTheme } from '../../context/ThemeContext.jsx'
+import Prism from 'prismjs'
+import 'prismjs/themes/prism-tomorrow.css'
+import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-c'
+import 'prismjs/components/prism-cpp'
+import 'prismjs/components/prism-java'
+import 'prismjs/components/prism-rust'
+import 'prismjs/components/prism-go'
+import 'prismjs/components/prism-ruby'
+import 'prismjs/components/prism-lua'
+import 'prismjs/components/prism-r'
+import 'prismjs/components/prism-julia'
+import 'prismjs/components/prism-haskell'
+import 'prismjs/components/prism-kotlin'
+import 'prismjs/components/prism-scala'
+
+const MonacoEditor = lazy(() => import('@monaco-editor/react').then((m) => ({ default: m.default })))
+
+const LANG_LABEL = {
+  python: 'Python', py: 'Python',
+  javascript: 'JavaScript', js: 'JavaScript',
+  typescript: 'TypeScript', ts: 'TypeScript',
+  matlab: 'MATLAB', m: 'MATLAB',
+  cpp: 'C++', 'c++': 'C++', c: 'C',
+  java: 'Java', rust: 'Rust', go: 'Go', ruby: 'Ruby',
+  php: 'PHP', swift: 'Swift', r: 'R', julia: 'Julia',
+  lua: 'Lua', haskell: 'Haskell',
+  csharp: 'C#', 'c#': 'C#', scala: 'Scala', kotlin: 'Kotlin',
+  perl: 'Perl', bash: 'Bash', sh: 'Bash', shell: 'Bash',
+  powershell: 'PowerShell', ps1: 'PowerShell',
+}
+
+const MONACO_LANG = {
+  python: 'python', py: 'python',
+  javascript: 'javascript', js: 'javascript',
+  typescript: 'typescript', ts: 'typescript',
+  matlab: 'plaintext', m: 'plaintext',
+  cpp: 'cpp', 'c++': 'cpp', c: 'c',
+  java: 'java', rust: 'rust', go: 'go', ruby: 'ruby',
+  php: 'php', swift: 'swift', r: 'r', julia: 'julia',
+  lua: 'lua', haskell: 'haskell',
+  csharp: 'csharp', 'c#': 'csharp', scala: 'scala', kotlin: 'kotlin',
+  perl: 'perl', bash: 'shell', sh: 'shell', shell: 'shell',
+  powershell: 'powershell', ps1: 'powershell',
+}
+
+const PRISM_LANG = {
+  'c++': 'cpp', 'c#': 'csharp',
+  sh: 'bash', shell: 'bash',
+  m: 'plaintext', matlab: 'plaintext',
+}
+
+const PISTON_LANGS = new Set(['kotlin', 'powershell', 'ps1'])
+
+function CopyButton({ getText }) {
+  const [copied, setCopied] = useState(false)
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(getText())
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // clipboard API unavailable (e.g. non-https) — silently ignore
+    }
+  }
+  return (
+    <button
+      onClick={handleCopy}
+      title="Copy code"
+      className="text-[11px] text-slate-400 hover:text-slate-200 transition-colors px-2 py-0.5 rounded"
+    >
+      {copied ? '✓ Copied' : 'Copy'}
+    </button>
+  )
+}
+
+function HighlightedCode({ code, language }) {
+  const prismKey = PRISM_LANG[language] || language
+  const grammar = Prism.languages[prismKey]
+  const html = grammar
+    ? Prism.highlight(code, grammar, prismKey)
+    : code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  return (
+    <pre
+      className="m-0 p-4 text-[13px] leading-[1.6] overflow-x-auto font-mono bg-transparent"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
+}
+
+export default function CodeBlock({ language = '', code, cellIndex, getPriorContext, onCodeChange }) {
+  const { isDarkGlobal } = useGlobalTheme()
+  const trimmedCode = code.trimEnd()
+  const isTerminalOutput = !language
+  const lang = language.toLowerCase()
+  const isRunnable = RUNNABLE_LANGS.has(lang)
+  const isPiston = PISTON_LANGS.has(lang)
+  const isWandbox = lang in WANDBOX_COMPILER
+  const label = LANG_LABEL[lang] || language || 'output'
+  const monacoLang = MONACO_LANG[lang] || 'plaintext'
+  const monacoTheme = isDarkGlobal ? 'vs-dark' : 'vs'
+  const codeBg = isDarkGlobal ? 'bg-[#1e1e2e]' : 'bg-[#f8f8f2]'
+
+  const [editing, setEditing] = useState(false)
+  const [editorCode, setEditorCode] = useState(trimmedCode)
+  const [output, setOutput] = useState(null)
+  const [running, setRunning] = useState(false)
+  const [isError, setIsError] = useState(false)
+
+  const lineCount = editorCode.split('\n').length
+  const editorHeight = Math.min(Math.max(lineCount * 20 + 24, 80), 560)
+
+  const prevCode = useRef(trimmedCode)
+  useEffect(() => {
+    if (prevCode.current !== trimmedCode) {
+      prevCode.current = trimmedCode
+      setEditorCode(trimmedCode)
+      setOutput(null)
+    }
+  }, [trimmedCode])
+
+  function handleEditorChange(v) {
+    const updated = v ?? ''
+    setEditorCode(updated)
+    onCodeChange?.(cellIndex, lang, updated)
+  }
+
+  async function handleRun() {
+    setRunning(true)
+    setOutput(null)
+    setIsError(false)
+    onCodeChange?.(cellIndex, lang, editorCode)
+    try {
+      const priorCode = getPriorContext ? getPriorContext(cellIndex, lang, editorCode) : ''
+      const result = await runCode(language, editorCode, priorCode)
+      const err = typeof result === 'string' && (result.startsWith('Error:') || result.startsWith('No runner'))
+      setOutput(result || '(no output)')
+      setIsError(err)
+    } catch (e) {
+      setOutput('Error: ' + e.message)
+      setIsError(true)
+    } finally {
+      setRunning(false)
+    }
+  }
+
+  // Terminal / plain output block
+  if (isTerminalOutput) {
+    return (
+      <div className="my-3 rounded-xl overflow-hidden border border-zinc-700 dark:border-zinc-700 bg-zinc-900">
+        <div className="px-4 py-1.5 bg-zinc-800 flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
+          <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
+          <span className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+          <span className="ml-2 text-xs text-zinc-400 font-mono flex-1">output</span>
+          <CopyButton getText={() => trimmedCode} />
+        </div>
+        <pre className="m-0 px-4 py-3 text-[13px] leading-[1.6] font-mono text-emerald-300 overflow-x-auto whitespace-pre-wrap">
+          {trimmedCode}
+        </pre>
+      </div>
+    )
+  }
+
+  return (
+    <div className="my-4 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
+      {/* Header */}
+      <div className={`flex items-center justify-between px-4 py-2 ${isDarkGlobal ? 'bg-slate-900' : 'bg-slate-700'}`}>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{label}</span>
+          {isWandbox && isRunnable && (
+            <span className="text-[10px] text-slate-500 font-mono">via Wandbox</span>
+          )}
+          {!isWandbox && isPiston && isRunnable && (
+            <span className="text-[10px] text-slate-500 font-mono">via Piston</span>
+          )}
+          {(lang === 'matlab' || lang === 'm') && (
+            <span className="text-[10px] text-slate-500 font-mono">via OpenMAT</span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5">
+          <CopyButton getText={() => editing ? editorCode : trimmedCode} />
+          {editing && editorCode !== trimmedCode && (
+            <button
+              onClick={() => { setEditorCode(trimmedCode); setOutput(null); onCodeChange?.(cellIndex, lang, trimmedCode) }}
+              className="text-[11px] text-slate-400 hover:text-slate-200 transition-colors px-2 py-0.5 rounded"
+            >
+              Reset
+            </button>
+          )}
+          {isRunnable && !editing && (
+            <button
+              onClick={() => setEditing(true)}
+              className="text-[11px] text-indigo-300 hover:text-indigo-200 transition-colors px-2 py-0.5 rounded border border-indigo-500/40 hover:border-indigo-400/60"
+            >
+              Edit
+            </button>
+          )}
+          {isRunnable && (
+            <button
+              onClick={handleRun}
+              disabled={running}
+              className="flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {running ? (
+                <>
+                  <span className="inline-block w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Running…
+                </>
+              ) : (
+                <>▶ Run</>
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Code area */}
+      <div className={codeBg}>
+        {editing ? (
+          <Suspense fallback={<div className="px-4 py-3 text-slate-400 text-sm font-mono">Loading editor…</div>}>
+            <MonacoEditor
+              height={`${editorHeight}px`}
+              language={monacoLang}
+              value={editorCode}
+              onChange={handleEditorChange}
+              theme={monacoTheme}
+              options={{
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                fontSize: 13,
+                lineHeight: 20,
+                fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+                padding: { top: 12, bottom: 12 },
+                wordWrap: 'off',
+                folding: false,
+                renderLineHighlight: 'gutter',
+              }}
+            />
+          </Suspense>
+        ) : (
+          <div className={isDarkGlobal ? 'text-[#cdd6f4]' : 'text-slate-800'}>
+            <HighlightedCode code={trimmedCode} language={lang} />
+          </div>
+        )}
+      </div>
+
+      {/* Output panel */}
+      {output !== null && (
+        <div className={`border-t ${isError ? 'border-red-500/30 bg-red-950/40' : 'border-emerald-500/20 bg-zinc-950'}`}>
+          <div className="flex items-center justify-between px-3 py-1">
+            <span className={`text-[10px] font-semibold uppercase tracking-wider ${isError ? 'text-red-400' : 'text-emerald-500'}`}>
+              {isError ? 'Error' : 'Output'}
+            </span>
+            <CopyButton getText={() => output} />
+          </div>
+          <pre className={`m-0 px-4 pb-3 text-[13px] leading-[1.6] font-mono overflow-x-auto whitespace-pre-wrap ${isError ? 'text-red-300' : 'text-emerald-300'}`}>
+            {output}
+          </pre>
+        </div>
+      )}
+    </div>
+  )
+}

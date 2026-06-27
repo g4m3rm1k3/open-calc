@@ -152,6 +152,12 @@ function TopBar() {
 
       {/* CENTER — nav links */}
       <div className="flex-1 flex items-center gap-1">
+        <Link
+          to="/blog"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+        >
+          Blog
+        </Link>
       </div>
 
       {/* RIGHT — tools + utilities + clock */}
@@ -218,7 +224,8 @@ export default function AppShell({ children }) {
     location.pathname.startsWith("/viz-builder") ||
     location.pathname.startsWith("/playground") ||
     location.pathname.startsWith("/lesson-builder");
-  const isScrollableFullPageRoute = location.pathname.startsWith("/calendar");
+  const isScrollableFullPageRoute = location.pathname.startsWith("/calendar") ||
+    location.pathname.startsWith("/blog");
   const isFullWidthRoute = location.pathname.startsWith("/rpg-workout") ||
     location.pathname.startsWith("/brain") ||
     location.pathname.startsWith("/health");

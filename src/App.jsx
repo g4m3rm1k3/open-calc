@@ -61,6 +61,8 @@ const PlaygroundPage = lazy(() => import("./pages/PlaygroundPage.jsx"));
 const NotebookLabPage = lazy(() => import("./pages/NotebookLabPage.jsx"));
 const CalendarPage = lazy(() => import("./features/calendar/CalendarPage.tsx"));
 const CompassPage = lazy(() => import("./features/compass/CompassPage.tsx"));
+const BlogListPage = lazy(() => import("./pages/BlogListPage.jsx"));
+const BlogPostPage = lazy(() => import("./pages/BlogPostPage.jsx"));
 const NotificationToast = lazy(
   () => import("./features/calendar/NotificationToast.tsx"),
 );
@@ -176,6 +178,8 @@ export default function App() {
                             <Route path="brain" element={<BrainPage />} />
                             <Route path="calendar" element={<CalendarPage />} />
                             <Route path="compass" element={<CompassPage />} />
+                            <Route path="blog" element={<BlogListPage />} />
+                            <Route path="blog/:slug" element={<BlogPostPage />} />
 
                             {/* Game auto-discovery */}
                             <Route
