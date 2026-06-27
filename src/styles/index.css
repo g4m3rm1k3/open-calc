@@ -17,13 +17,38 @@
   :root {
     --sidebar-width: 280px;
     --topbar-height: 60px;
+    
+    /* Default Tailwind Slate */
+    --tw-custom-slate-50: 248 250 252;
+    --tw-custom-slate-100: 241 245 249;
+    --tw-custom-slate-200: 226 232 240;
+    --tw-custom-slate-300: 203 213 225;
+    --tw-custom-slate-400: 148 163 184;
+    --tw-custom-slate-500: 100 116 139;
+    --tw-custom-slate-600: 71 85 105;
+    --tw-custom-slate-700: 51 65 85;
+    --tw-custom-slate-800: 30 41 59;
+    --tw-custom-slate-900: 15 23 42;
+    --tw-custom-slate-950: 2 6 23;
+
+    /* Default Tailwind Sky */
+    --tw-custom-sky-50: 240 249 255;
+    --tw-custom-sky-100: 224 242 254;
+    --tw-custom-sky-200: 186 230 253;
+    --tw-custom-sky-300: 125 211 252;
+    --tw-custom-sky-400: 56 189 248;
+    --tw-custom-sky-500: 14 165 233;
+    --tw-custom-sky-600: 2 132 199;
+    --tw-custom-sky-700: 3 105 161;
+    --tw-custom-sky-800: 7 89 133;
+    --tw-custom-sky-900: 12 74 110;
+    --tw-custom-sky-950: 8 47 73;
+
     /* Semantic color tokens */
     --color-surface: rgba(255, 255, 255, 0.72);
     --color-page-bg: #f1f5f9;
     --color-border: rgba(15, 23, 42, 0.08);
     --color-text-muted: #64748b;
-
-    /* Premium Shadows */
     --shadow-premium:
       0 20px 50px -12px rgba(15, 23, 42, 0.08),
       0 4px 20px -2px rgba(15, 23, 42, 0.04);

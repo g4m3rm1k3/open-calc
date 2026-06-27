@@ -80,9 +80,12 @@ export const meta = {
     "React.lazy() + Suspense defers each page's bundle until the user navigates there. Only the code actually needed gets downloaded.",
 };
 
+import { ThemeProvider } from "./context/ThemeContext.jsx";
+
 export default function App() {
   return (
-    <AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
       <ProgressProvider>
         <SearchProvider>
           <PinsProvider>
@@ -394,5 +397,6 @@ export default function App() {
         </SearchProvider>
       </ProgressProvider>
     </AuthProvider>
+    </ThemeProvider>
   );
 }

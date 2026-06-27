@@ -38,6 +38,7 @@ import {
   runLuaInline, runRubyInline, runCInline, runBrainfuckInline,
 } from '../../utils/inlineRunner.js'
 import { getThemeStyles, STUDIO_THEMES } from '../../utils/studioThemes.js'
+import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import DocsCodeWorkspace from './DocsCodeWorkspace.jsx'
 import AdaPanel from './AdaPanel.jsx'
 
@@ -911,10 +912,9 @@ export default function MarkdownHub() {
     const el = contentScrollRef.current?.querySelector(`[id="${CSS.escape(id)}"]`)
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [])
-  const [studioTheme, setStudioTheme] = useState(() => localStorage.getItem('studio_theme') || 'default')
-  const themeStyles = useMemo(() => getThemeStyles(studioTheme, isDark), [studioTheme, isDark])
-  const ui = themeStyles.ui
-  const accentColor = STUDIO_THEMES[studioTheme]?.accentHex ?? '#0ea5e9'
+  const { studioTheme, setStudioTheme, themeStyles } = useGlobalTheme();
+  const ui = themeStyles.ui;
+  const accentColor = STUDIO_THEMES[studioTheme]?.accentHex ?? '#0ea5e9';
 
   const handleCodeChange = useCallback((snap) => { setWorkspaceSnap(snap) }, [])
 
@@ -1388,17 +1388,6 @@ export default function MarkdownHub() {
             <Sparkles className="w-3.5 h-3.5" /><span className="hidden sm:inline">Ask Ada</span>
           </button>
 
-          {/* Theme picker */}
-          <select
-            value={studioTheme}
-            onChange={(e) => { setStudioTheme(e.target.value); localStorage.setItem('studio_theme', e.target.value) }}
-            className={`text-xs font-semibold rounded-lg px-2 py-1.5 border ${ui.border} ${ui.bg1} ${ui.txt2} cursor-pointer focus:outline-none`}
-            title="Studio theme"
-          >
-            {Object.entries(STUDIO_THEMES).map(([id, t]) => (
-              <option key={id} value={id}>{t.name}</option>
-            ))}
-          </select>
 
           {/* Icon-only secondary actions */}
           <button onClick={refreshDocsIndex} className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`} title="Refresh docs index">
