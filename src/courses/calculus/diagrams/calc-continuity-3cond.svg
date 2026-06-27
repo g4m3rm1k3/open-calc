@@ -1,9 +1,9 @@
 <svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
   <style>
-    .bg  { fill: #f8fafc; }
-    .mu  { fill: #64748b; }
-    .dark .bg  { fill: #0f172a; }
-    .dark .mu  { fill: #64748b; }
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
   </style>
   <rect width="480" height="215" rx="12" class="bg"/>
 

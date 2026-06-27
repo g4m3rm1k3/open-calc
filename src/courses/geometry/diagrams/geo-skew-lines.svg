@@ -1,11 +1,11 @@
 <svg viewBox="0 0 380 240" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
   <style>
-    .svg-bg   { fill: #f8fafc; }
-    .svg-box  { stroke: #cbd5e1; fill: none; }
-    .svg-muted{ fill: #94a3b8; }
-    .dark .svg-bg   { fill: #0f172a; }
-    .dark .svg-box  { stroke: #334155; }
-    .dark .svg-muted{ fill: #64748b; }
+    .svg-bg   { fill: rgb(var(--tw-custom-slate-50)); }
+    .svg-box  { stroke: rgb(var(--tw-custom-slate-300)); fill: none; }
+    .svg-muted{ fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .svg-bg   { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .svg-box  { stroke: rgb(var(--tw-custom-slate-700)); }
+    .dark .svg-muted{ fill: rgb(var(--tw-custom-slate-500)); }
   </style>
   <rect width="380" height="240" rx="10" class="svg-bg"/>
   <defs>

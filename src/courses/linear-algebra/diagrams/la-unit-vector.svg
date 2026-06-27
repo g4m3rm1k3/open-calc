@@ -1,15 +1,15 @@
 <svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
   <style>
-    .svg-bg    { fill: #f8fafc; }
-    .svg-grid  { stroke: #e2e8f0; }
-    .svg-axis  { stroke: #94a3b8; }
-    .svg-axis-fill { fill: #94a3b8; }
-    .svg-muted { fill: #94a3b8; }
-    .dark .svg-bg    { fill: #0f172a; }
-    .dark .svg-grid  { stroke: #1e293b; }
-    .dark .svg-axis  { stroke: #475569; }
-    .dark .svg-axis-fill { fill: #475569; }
-    .dark .svg-muted { fill: #64748b; }
+    .svg-bg    { fill: rgb(var(--tw-custom-slate-50)); }
+    .svg-grid  { stroke: rgb(var(--tw-custom-slate-200)); }
+    .svg-axis  { stroke: rgb(var(--tw-custom-slate-400)); }
+    .svg-axis-fill { fill: rgb(var(--tw-custom-slate-400)); }
+    .svg-muted { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .svg-bg    { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .svg-grid  { stroke: rgb(var(--tw-custom-slate-800)); }
+    .dark .svg-axis  { stroke: rgb(var(--tw-custom-slate-600)); }
+    .dark .svg-axis-fill { fill: rgb(var(--tw-custom-slate-600)); }
+    .dark .svg-muted { fill: rgb(var(--tw-custom-slate-500)); }
   </style>
   <rect width="400" height="300" rx="12" class="svg-bg"/>
   <defs>

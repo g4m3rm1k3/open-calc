@@ -1,13 +1,13 @@
 <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 12px;">
   <style>
-    .svg-bg    { fill: #f8fafc; }
-    .svg-panel { fill: #ffffff; stroke: #e2e8f0; }
-    .svg-muted { fill: #94a3b8; }
-    .svg-text  { fill: #334155; }
-    .dark .svg-bg    { fill: #0f172a; }
-    .dark .svg-panel { fill: #1e293b; stroke: #334155; }
-    .dark .svg-muted { fill: #64748b; }
-    .dark .svg-text  { fill: #cbd5e1; }
+    .svg-bg    { fill: rgb(var(--tw-custom-slate-50)); }
+    .svg-panel { fill: #ffffff; stroke: rgb(var(--tw-custom-slate-200)); }
+    .svg-muted { fill: rgb(var(--tw-custom-slate-400)); }
+    .svg-text  { fill: rgb(var(--tw-custom-slate-700)); }
+    .dark .svg-bg    { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .svg-panel { fill: rgb(var(--tw-custom-slate-800)); stroke: rgb(var(--tw-custom-slate-700)); }
+    .dark .svg-muted { fill: rgb(var(--tw-custom-slate-500)); }
+    .dark .svg-text  { fill: rgb(var(--tw-custom-slate-300)); }
   </style>
   <rect width="520" height="220" rx="12" class="svg-bg"/>
   <defs>

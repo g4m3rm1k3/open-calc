@@ -1,15 +1,15 @@
 <svg viewBox="0 0 520 300" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
   <style>
-    .svg-bg    { fill: #f8fafc; }
+    .svg-bg    { fill: rgb(var(--tw-custom-slate-50)); }
     .svg-panel { fill: #ffffff; }
-    .svg-text  { fill: #1e293b; }
-    .svg-muted { fill: #64748b; }
-    .svg-border { stroke: #e2e8f0; fill: none; }
-    .dark .svg-bg    { fill: #0f172a; }
-    .dark .svg-panel { fill: #1e293b; }
-    .dark .svg-text  { fill: #e2e8f0; }
-    .dark .svg-muted { fill: #94a3b8; }
-    .dark .svg-border { stroke: #334155; }
+    .svg-text  { fill: rgb(var(--tw-custom-slate-800)); }
+    .svg-muted { fill: rgb(var(--tw-custom-slate-500)); }
+    .svg-border { stroke: rgb(var(--tw-custom-slate-200)); fill: none; }
+    .dark .svg-bg    { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .svg-panel { fill: rgb(var(--tw-custom-slate-800)); }
+    .dark .svg-text  { fill: rgb(var(--tw-custom-slate-200)); }
+    .dark .svg-muted { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .svg-border { stroke: rgb(var(--tw-custom-slate-700)); }
   </style>
 
   <!-- Background -->

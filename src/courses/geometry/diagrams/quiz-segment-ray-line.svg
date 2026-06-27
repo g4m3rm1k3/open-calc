@@ -1,15 +1,15 @@
 <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 8px;">
   <style>
-    .svg-bg    { fill: #f8fafc; }
+    .svg-bg    { fill: rgb(var(--tw-custom-slate-50)); }
     .svg-panel { fill: #ffffff; }
-    .svg-text  { fill: #1e293b; }
-    .svg-muted { fill: #64748b; }
-    .svg-div   { stroke: #e2e8f0; fill: none; }
-    .dark .svg-bg    { fill: #0f172a; }
-    .dark .svg-panel { fill: #1e293b; }
-    .dark .svg-text  { fill: #e2e8f0; }
-    .dark .svg-muted { fill: #94a3b8; }
-    .dark .svg-div   { stroke: #334155; }
+    .svg-text  { fill: rgb(var(--tw-custom-slate-800)); }
+    .svg-muted { fill: rgb(var(--tw-custom-slate-500)); }
+    .svg-div   { stroke: rgb(var(--tw-custom-slate-200)); fill: none; }
+    .dark .svg-bg    { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .svg-panel { fill: rgb(var(--tw-custom-slate-800)); }
+    .dark .svg-text  { fill: rgb(var(--tw-custom-slate-200)); }
+    .dark .svg-muted { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .svg-div   { stroke: rgb(var(--tw-custom-slate-700)); }
   </style>
   <rect width="340" height="160" rx="8" class="svg-bg"/>
   <text x="170" y="18" font-size="10" class="svg-muted" text-anchor="middle" font-weight="600">Which is a segment, which is a ray, which is a line?</text>

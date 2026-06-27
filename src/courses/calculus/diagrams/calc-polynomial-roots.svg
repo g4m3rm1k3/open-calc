@@ -1,13 +1,13 @@
 <svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
   <style>
-    .bg  { fill: #f8fafc; }
-    .ax  { stroke: #94a3b8; }
-    .axf { fill: #94a3b8; }
-    .mu  { fill: #64748b; }
-    .dark .bg  { fill: #0f172a; }
-    .dark .ax  { stroke: #475569; }
-    .dark .axf { fill: #475569; }
-    .dark .mu  { fill: #64748b; }
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .ax  { stroke: rgb(var(--tw-custom-slate-400)); }
+    .axf { fill: rgb(var(--tw-custom-slate-400)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .ax  { stroke: rgb(var(--tw-custom-slate-600)); }
+    .dark .axf { fill: rgb(var(--tw-custom-slate-600)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
   </style>
   <rect width="480" height="215" rx="12" class="bg"/>
   <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Roots, Factors, and Zeros — The Factor Theorem</text>

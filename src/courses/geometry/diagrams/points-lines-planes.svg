@@ -1,13 +1,13 @@
 <svg viewBox="0 0 560 380" xmlns="http://www.w3.org/2000/svg" font-family="ui-sans-serif, system-ui, sans-serif">
   <style>
-    .svg-bg   { fill: #f8fafc; }
-    .svg-sub  { fill: #64748b; }
-    .svg-muted{ fill: #94a3b8; }
-    .svg-div  { stroke: #e2e8f0; }
-    .dark .svg-bg   { fill: #1e293b; }
-    .dark .svg-sub  { fill: #94a3b8; }
-    .dark .svg-muted{ fill: #475569; }
-    .dark .svg-div  { stroke: #334155; }
+    .svg-bg   { fill: rgb(var(--tw-custom-slate-50)); }
+    .svg-sub  { fill: rgb(var(--tw-custom-slate-500)); }
+    .svg-muted{ fill: rgb(var(--tw-custom-slate-400)); }
+    .svg-div  { stroke: rgb(var(--tw-custom-slate-200)); }
+    .dark .svg-bg   { fill: rgb(var(--tw-custom-slate-800)); }
+    .dark .svg-sub  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .svg-muted{ fill: rgb(var(--tw-custom-slate-600)); }
+    .dark .svg-div  { stroke: rgb(var(--tw-custom-slate-700)); }
   </style>
 
   <defs>

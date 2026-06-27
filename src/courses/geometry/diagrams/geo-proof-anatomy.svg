@@ -1,13 +1,13 @@
 <svg viewBox="0 0 480 310" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
   <style>
-    .svg-bg    { fill: #f8fafc; }
+    .svg-bg    { fill: rgb(var(--tw-custom-slate-50)); }
     .svg-panel { fill: #ffffff; }
-    .svg-text  { fill: #1e293b; }
-    .svg-muted { fill: #64748b; }
-    .dark .svg-bg    { fill: #0f172a; }
-    .dark .svg-panel { fill: #1e293b; }
-    .dark .svg-text  { fill: #e2e8f0; }
-    .dark .svg-muted { fill: #94a3b8; }
+    .svg-text  { fill: rgb(var(--tw-custom-slate-800)); }
+    .svg-muted { fill: rgb(var(--tw-custom-slate-500)); }
+    .dark .svg-bg    { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .svg-panel { fill: rgb(var(--tw-custom-slate-800)); }
+    .dark .svg-text  { fill: rgb(var(--tw-custom-slate-200)); }
+    .dark .svg-muted { fill: rgb(var(--tw-custom-slate-400)); }
   </style>
 
   <rect width="480" height="310" rx="10" class="svg-bg"/>

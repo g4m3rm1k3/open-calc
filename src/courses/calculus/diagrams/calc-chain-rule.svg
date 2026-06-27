@@ -1,11 +1,11 @@
 <svg viewBox="0 0 480 180" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
   <style>
-    .bg  { fill: #f8fafc; }
-    .mu  { fill: #64748b; }
-    .bx  { fill: #f8fafc; stroke-width: 1.5; rx: 8; }
-    .dark .bg  { fill: #0f172a; }
-    .dark .mu  { fill: #64748b; }
-    .dark .bx  { fill: #1e293b; }
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .bx  { fill: rgb(var(--tw-custom-slate-50)); stroke-width: 1.5; rx: 8; }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .bx  { fill: rgb(var(--tw-custom-slate-800)); }
   </style>
   <rect width="480" height="180" rx="12" class="bg"/>
 
