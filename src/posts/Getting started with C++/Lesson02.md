@@ -1,4 +1,3 @@
-````markdown
 # Lesson 2: Variables, Data Types, and Storing Information in C++
 
 Welcome back! �
@@ -29,6 +28,7 @@ Here’s the basic pattern:
 ```cpp
 data_type variable_name = value;
 ```
+
 ````
 
 Let’s look at a full example:
@@ -196,13 +196,4 @@ int main() {
 You did great in Lesson 2!
 
 Variables are the foundation of almost everything in programming. The more comfortable you get with them, the easier everything else becomes.
-
-**Ready for Lesson 3?** Just say “lesson 3” and we’ll cover **if-else statements, conditions, and making decisions** in your programs.
-
-Keep practicing — you’re doing awesome! �
-
-**Happy Coding!**
-
-```
-
-```
+````

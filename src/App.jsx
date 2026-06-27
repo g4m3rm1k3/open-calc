@@ -181,7 +181,7 @@ export default function App() {
                             <Route path="compass" element={<CompassPage />} />
                             <Route path="blog" element={<BlogListPage />} />
                             <Route path="blog/new" element={<BlogBuilderPage />} />
-                            <Route path="blog/:slug" element={<BlogPostPage />} />
+                            <Route path="blog/*" element={<BlogPostPage />} />
 
                             {/* Game auto-discovery */}
                             <Route

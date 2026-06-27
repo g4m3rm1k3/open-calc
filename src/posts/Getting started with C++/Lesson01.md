@@ -319,10 +319,3 @@ int main() {
 You’ve made it to the end of this beginner’s guide!
 
 That’s a huge accomplishment. Programming is a skill that gets better with time and practice. Be patient with yourself.
-
-If you want the next guide (variables deep dive, loops, or your first game), just tell me what you’d like to learn next.
-
-You’ve got this! Keep going! �
-
-**Happy Coding!**  
-_Written for absolute beginners • June 2026_

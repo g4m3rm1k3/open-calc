@@ -1,26 +1,37 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-// Vite: load all .md files in src/posts/ as raw strings at build time
-const POST_MODULES = import.meta.glob('../posts/*.md', { query: '?raw', import: 'default', eager: true })
+const POST_MODULES = import.meta.glob('../posts/**/*.md', { query: '?raw', import: 'default', eager: true })
 
-function fileToSlug(path) {
+function pathToSlug(path) {
   return path
-    .replace(/^.*\//, '')      // strip directory
-    .replace(/\.md$/, '')      // strip extension
-    .replace(/\s+/g, '-')      // spaces → hyphens
-    .toLowerCase()
+    .replace(/^.*\/posts\//, '')
+    .replace(/\.md$/, '')
+    .split('/')
+    .map(s =>
+      s.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+    )
+    .join('/')
+}
+
+function pathToFolderName(path) {
+  const rel = path.replace(/^.*\/posts\//, '')
+  const parts = rel.split('/')
+  return parts.length > 1 ? parts.slice(0, -1).join('/') : null
 }
 
 function extractMeta(raw, path) {
-  const slug = fileToSlug(path)
+  const slug = pathToSlug(path)
+  const folderName = pathToFolderName(path)
   const lines = raw.split('\n')
 
-  // Title: first H1
-  const h1 = lines.find((l) => l.startsWith('# '))
-  const title = h1 ? h1.replace(/^# /, '').trim() : slug
+  const h1 = lines.find(l => l.startsWith('# '))
+  const title = h1 ? h1.replace(/^# /, '').trim() : slug.split('/').pop().replace(/-/g, ' ')
 
-  // Excerpt: first non-empty, non-heading paragraph (up to 220 chars)
   let excerpt = ''
   for (const line of lines) {
     const t = line.trim()
@@ -29,37 +40,59 @@ function extractMeta(raw, path) {
     break
   }
 
-  // Tags: scan for ## headings as rough topics
   const topics = lines
-    .filter((l) => l.startsWith('## '))
-    .map((l) => l.replace(/^## /, '').trim())
+    .filter(l => l.startsWith('## '))
+    .map(l => l.replace(/^## /, '').trim())
     .slice(0, 4)
 
-  // Estimate read time (200 wpm)
   const wordCount = raw.split(/\s+/).length
   const readMin = Math.max(1, Math.round(wordCount / 200))
 
-  return { slug, title, excerpt, topics, readMin }
+  return { slug, folderName, title, excerpt, topics, readMin }
 }
 
-const ALL_POSTS = Object.entries(POST_MODULES).map(([path, raw]) =>
-  extractMeta(raw, path)
-)
+const ALL_POSTS = Object.entries(POST_MODULES)
+  .map(([path, raw]) => extractMeta(raw, path))
+  .sort((a, b) => {
+    // Series posts sort by slug within each folder; standalone by title
+    if (a.folderName && b.folderName && a.folderName === b.folderName) {
+      return a.slug.localeCompare(b.slug)
+    }
+    return 0
+  })
 
 export default function BlogListPage() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
 
+  const { series, standalone, filtered } = useMemo(() => {
+    if (query.trim()) {
+      const q = query.toLowerCase()
+      const filtered = ALL_POSTS.filter(
+        p =>
+          p.title.toLowerCase().includes(q) ||
+          p.excerpt.toLowerCase().includes(q) ||
+          p.topics.some(t => t.toLowerCase().includes(q)) ||
+          (p.folderName || '').toLowerCase().includes(q)
+      )
+      return { series: null, standalone: null, filtered }
+    }
 
-  const posts = useMemo(() => {
-    if (!query.trim()) return ALL_POSTS
-    const q = query.toLowerCase()
-    return ALL_POSTS.filter(
-      (p) =>
-        p.title.toLowerCase().includes(q) ||
-        p.excerpt.toLowerCase().includes(q) ||
-        p.topics.some((t) => t.toLowerCase().includes(q))
-    )
+    const seriesMap = {}
+    const standalone = []
+    for (const post of ALL_POSTS) {
+      if (post.folderName) {
+        if (!seriesMap[post.folderName]) seriesMap[post.folderName] = []
+        seriesMap[post.folderName].push(post)
+      } else {
+        standalone.push(post)
+      }
+    }
+    // Sort each series' posts by slug
+    for (const posts of Object.values(seriesMap)) {
+      posts.sort((a, b) => a.slug.localeCompare(b.slug))
+    }
+    return { series: seriesMap, standalone, filtered: null }
   }, [query])
 
   return (
@@ -67,9 +100,7 @@ export default function BlogListPage() {
       {/* Header */}
       <div className="mb-10 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">
-            Blog
-          </h1>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-3 tracking-tight">Blog</h1>
           <p className="text-slate-500 dark:text-slate-400 text-lg">
             Deep-dives on computer science, math, and programming — with runnable code.
           </p>
@@ -88,66 +119,123 @@ export default function BlogListPage() {
           type="text"
           placeholder="Search posts…"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={e => setQuery(e.target.value)}
           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm"
         />
       </div>
 
-      {/* Post list */}
-      {posts.length === 0 ? (
-        <p className="text-slate-400 dark:text-slate-500 text-center py-16 text-sm">
-          No posts match "{query}"
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {posts.map((post) => (
-            <button
-              key={post.slug}
-              onClick={() => navigate(`/blog/${post.slug}`)}
-              className="w-full text-left group block rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-200 p-6"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug mb-2">
-                    {post.title}
-                  </h2>
-                  {post.excerpt && (
-                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-3">
-                      {post.excerpt}
-                    </p>
-                  )}
-                  {post.topics.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {post.topics.map((t) => (
-                        <span
-                          key={t}
-                          className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+      {/* Search results — flat list */}
+      {filtered !== null && (
+        filtered.length === 0 ? (
+          <p className="text-slate-400 dark:text-slate-500 text-center py-16 text-sm">
+            No posts match "{query}"
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {filtered.map(post => <PostCard key={post.slug} post={post} navigate={navigate} />)}
+          </div>
+        )
+      )}
+
+      {/* Grouped view */}
+      {filtered === null && (
+        <div className="space-y-8">
+          {/* Series groups */}
+          {Object.entries(series).map(([folderName, posts]) => (
+            <div key={folderName} className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+              <div className="px-5 py-3 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">📚</span>
+                  <span className="font-semibold text-slate-900 dark:text-white text-sm">{folderName}</span>
                 </div>
-                <div className="flex-shrink-0 text-right">
-                  <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">
-                    {post.readMin} min read
-                  </span>
-                </div>
+                <span className="text-xs text-slate-400 dark:text-slate-500">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
               </div>
-            </button>
+              <div>
+                {posts.map((post, i) => (
+                  <button
+                    key={post.slug}
+                    onClick={() => navigate(`/blog/${post.slug}`)}
+                    className="w-full text-left flex items-center gap-4 px-5 py-3.5 border-b last:border-b-0 border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group"
+                  >
+                    <span className="text-xs text-slate-400 dark:text-slate-500 w-5 text-right shrink-0">{i + 1}.</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                        {post.title}
+                      </p>
+                      {post.excerpt && (
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate">{post.excerpt}</p>
+                      )}
+                    </div>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">{post.readMin} min</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
+
+          {/* Standalone posts */}
+          {standalone.length > 0 && (
+            <div className="space-y-4">
+              {Object.keys(series).length > 0 && (
+                <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-1">Standalone Posts</h2>
+              )}
+              {standalone.map(post => <PostCard key={post.slug} post={post} navigate={navigate} />)}
+            </div>
+          )}
+
+          {ALL_POSTS.length === 0 && (
+            <p className="text-slate-400 dark:text-slate-500 text-center py-16 text-sm">No posts yet.</p>
+          )}
         </div>
       )}
 
       {/* Drop-in hint */}
       <div className="mt-12 p-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-center">
         <p className="text-sm text-slate-400 dark:text-slate-500">
-          Drop a <code className="text-slate-600 dark:text-slate-300 text-xs bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded">.md</code> file into{' '}
+          Drop a{' '}
+          <code className="text-slate-600 dark:text-slate-300 text-xs bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded">.md</code>{' '}
+          file into{' '}
           <code className="text-slate-600 dark:text-slate-300 text-xs bg-slate-100 dark:bg-slate-700 px-1 py-0.5 rounded">src/posts/</code>{' '}
-          and it appears here automatically.
+          or a subfolder for a series — it appears here automatically.
         </p>
       </div>
     </div>
+  )
+}
+
+function PostCard({ post, navigate }) {
+  return (
+    <button
+      onClick={() => navigate(`/blog/${post.slug}`)}
+      className="w-full text-left group block rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:border-indigo-300 dark:hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-200 p-6"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug mb-2">
+            {post.title}
+          </h2>
+          {post.excerpt && (
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-3">
+              {post.excerpt}
+            </p>
+          )}
+          {post.topics.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {post.topics.map(t => (
+                <span
+                  key={t}
+                  className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="shrink-0 text-right">
+          <span className="text-xs text-slate-400 dark:text-slate-500 whitespace-nowrap">{post.readMin} min read</span>
+        </div>
+      </div>
+    </button>
   )
 }
