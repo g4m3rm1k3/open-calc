@@ -513,7 +513,7 @@ export default function AppShell({ children }) {
                   : isChemistryRoute || isFullPageToolRoute
                     ? "flex-1 min-h-0 w-full flex flex-col overflow-hidden"
                     : isScrollableFullPageRoute
-                      ? "flex-1 min-h-0 w-full overflow-y-auto"
+                      ? "flex-1 min-h-0 w-full overflow-y-auto bg-white dark:bg-slate-950"
                       : isFullWidthRoute
                       ? "w-full"
                       : isUniversalCalcRoute

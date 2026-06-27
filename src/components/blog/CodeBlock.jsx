@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { runCode, RUNNABLE_LANGS, WANDBOX_COMPILER } from '../../utils/codeRunner.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import Prism from 'prismjs'
-import 'prismjs/themes/prism-tomorrow.css'
+import '../../styles/prism-blog.css'
 import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-javascript'
@@ -73,7 +73,7 @@ function CopyButton({ getText }) {
     <button
       onClick={handleCopy}
       title="Copy code"
-      className="text-[11px] text-slate-400 hover:text-slate-200 transition-colors px-2 py-0.5 rounded"
+      className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors px-2 py-0.5 rounded"
     >
       {copied ? '✓ Copied' : 'Copy'}
     </button>
@@ -105,7 +105,7 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
   const label = LANG_LABEL[lang] || language || 'output'
   const monacoLang = MONACO_LANG[lang] || 'plaintext'
   const monacoTheme = isDarkGlobal ? 'vs-dark' : 'vs'
-  const codeBg = isDarkGlobal ? 'bg-[#1e1e2e]' : 'bg-[#f8f8f2]'
+  const codeBg = isDarkGlobal ? 'bg-[#1e1e2e]' : 'bg-[#f6f8fa]'
 
   const [editing, setEditing] = useState(false)
   const [editorCode, setEditorCode] = useState(trimmedCode)
@@ -153,15 +153,15 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
   // Terminal / plain output block
   if (isTerminalOutput) {
     return (
-      <div className="my-3 rounded-xl overflow-hidden border border-zinc-700 dark:border-zinc-700 bg-zinc-900">
-        <div className="px-4 py-1.5 bg-zinc-800 flex items-center gap-2">
+      <div className={`my-3 rounded-xl overflow-hidden border ${isDarkGlobal ? 'border-zinc-700 bg-zinc-900' : 'border-slate-200 bg-white'}`}>
+        <div className={`px-4 py-1.5 flex items-center gap-2 ${isDarkGlobal ? 'bg-zinc-800' : 'bg-slate-100 border-b border-slate-200'}`}>
           <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
           <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
           <span className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-          <span className="ml-2 text-xs text-zinc-400 font-mono flex-1">output</span>
+          <span className={`ml-2 text-xs font-mono flex-1 ${isDarkGlobal ? 'text-zinc-400' : 'text-slate-500'}`}>output</span>
           <CopyButton getText={() => trimmedCode} />
         </div>
-        <pre className="m-0 px-4 py-3 text-[13px] leading-[1.6] font-mono text-emerald-300 overflow-x-auto whitespace-pre-wrap">
+        <pre className={`m-0 px-4 py-3 text-[13px] leading-[1.6] font-mono overflow-x-auto whitespace-pre-wrap ${isDarkGlobal ? 'text-emerald-300' : 'text-slate-700'}`}>
           {trimmedCode}
         </pre>
       </div>
@@ -171,17 +171,17 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
   return (
     <div className="my-4 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
       {/* Header */}
-      <div className={`flex items-center justify-between px-4 py-2 ${isDarkGlobal ? 'bg-slate-900' : 'bg-slate-700'}`}>
+      <div className={`flex items-center justify-between px-4 py-2 ${isDarkGlobal ? 'bg-slate-900' : 'bg-slate-100 border-b border-slate-200'}`}>
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{label}</span>
+          <span className={`text-[11px] font-semibold uppercase tracking-wider ${isDarkGlobal ? 'text-slate-400' : 'text-slate-500'}`}>{label}</span>
           {isWandbox && isRunnable && (
-            <span className="text-[10px] text-slate-500 font-mono">via Wandbox</span>
+            <span className={`text-[10px] font-mono ${isDarkGlobal ? 'text-slate-500' : 'text-slate-400'}`}>via Wandbox</span>
           )}
           {!isWandbox && isPiston && isRunnable && (
-            <span className="text-[10px] text-slate-500 font-mono">via Piston</span>
+            <span className={`text-[10px] font-mono ${isDarkGlobal ? 'text-slate-500' : 'text-slate-400'}`}>via Piston</span>
           )}
           {(lang === 'matlab' || lang === 'm') && (
-            <span className="text-[10px] text-slate-500 font-mono">via OpenMAT</span>
+            <span className={`text-[10px] font-mono ${isDarkGlobal ? 'text-slate-500' : 'text-slate-400'}`}>via OpenMAT</span>
           )}
         </div>
         <div className="flex items-center gap-1.5">
@@ -189,7 +189,7 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
           {editing && editorCode !== trimmedCode && (
             <button
               onClick={() => { setEditorCode(trimmedCode); setOutput(null); onCodeChange?.(cellIndex, lang, trimmedCode) }}
-              className="text-[11px] text-slate-400 hover:text-slate-200 transition-colors px-2 py-0.5 rounded"
+              className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors px-2 py-0.5 rounded"
             >
               Reset
             </button>
@@ -197,7 +197,7 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
           {isRunnable && !editing && (
             <button
               onClick={() => setEditing(true)}
-              className="text-[11px] text-indigo-300 hover:text-indigo-200 transition-colors px-2 py-0.5 rounded border border-indigo-500/40 hover:border-indigo-400/60"
+              className={`text-[11px] transition-colors px-2 py-0.5 rounded border ${isDarkGlobal ? 'text-indigo-300 hover:text-indigo-200 border-indigo-500/40 hover:border-indigo-400/60' : 'text-indigo-600 hover:text-indigo-700 border-indigo-300 hover:border-indigo-400'}`}
             >
               Edit
             </button>
@@ -245,7 +245,7 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
             />
           </Suspense>
         ) : (
-          <div className={isDarkGlobal ? 'text-[#cdd6f4]' : 'text-slate-800'}>
+          <div className={isDarkGlobal ? 'text-[#ccc]' : 'text-[#24292e]'}>
             <HighlightedCode code={trimmedCode} language={lang} />
           </div>
         )}
@@ -253,14 +253,14 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
 
       {/* Output panel */}
       {output !== null && (
-        <div className={`border-t ${isError ? 'border-red-500/30 bg-red-950/40' : 'border-emerald-500/20 bg-zinc-950'}`}>
+        <div className={`border-t ${isError ? isDarkGlobal ? 'border-red-500/30 bg-red-950/40' : 'border-red-200 bg-red-50' : isDarkGlobal ? 'border-emerald-500/20 bg-zinc-950' : 'border-emerald-200 bg-emerald-50/50'}`}>
           <div className="flex items-center justify-between px-3 py-1">
-            <span className={`text-[10px] font-semibold uppercase tracking-wider ${isError ? 'text-red-400' : 'text-emerald-500'}`}>
+            <span className={`text-[10px] font-semibold uppercase tracking-wider ${isError ? isDarkGlobal ? 'text-red-400' : 'text-red-600' : isDarkGlobal ? 'text-emerald-500' : 'text-emerald-700'}`}>
               {isError ? 'Error' : 'Output'}
             </span>
             <CopyButton getText={() => output} />
           </div>
-          <pre className={`m-0 px-4 pb-3 text-[13px] leading-[1.6] font-mono overflow-x-auto whitespace-pre-wrap ${isError ? 'text-red-300' : 'text-emerald-300'}`}>
+          <pre className={`m-0 px-4 pb-3 text-[13px] leading-[1.6] font-mono overflow-x-auto whitespace-pre-wrap ${isError ? isDarkGlobal ? 'text-red-300' : 'text-red-700' : isDarkGlobal ? 'text-emerald-300' : 'text-emerald-800'}`}>
             {output}
           </pre>
         </div>
