@@ -1388,6 +1388,17 @@ export default function MarkdownHub() {
             <Sparkles className="w-3.5 h-3.5" /><span className="hidden sm:inline">Ask Ada</span>
           </button>
 
+          {/* Theme picker */}
+          <select
+            value={studioTheme}
+            onChange={(e) => { setStudioTheme(e.target.value); localStorage.setItem('studio_theme', e.target.value) }}
+            className={`text-xs font-semibold rounded-lg px-2 py-1.5 border ${ui.border} ${ui.bg1} ${ui.txt2} cursor-pointer focus:outline-none`}
+            title="Studio theme"
+          >
+            {Object.entries(STUDIO_THEMES).map(([id, t]) => (
+              <option key={id} value={id}>{t.name}</option>
+            ))}
+          </select>
 
           {/* Icon-only secondary actions */}
           <button onClick={refreshDocsIndex} className={`p-1.5 rounded-md ${ui.txt2} ${ui.hoverBg} ${ui.hoverTx} transition-colors`} title="Refresh docs index">
