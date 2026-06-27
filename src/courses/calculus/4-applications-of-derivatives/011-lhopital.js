@@ -1,4 +1,6 @@
 // FILE: src/content/chapter-3/05-lhopital.js
+import lhopitalUrl from '../diagrams/calc-lhopital.svg?url';
+import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
 export default {
   id: "ch3-005",
   slug: "lhopital",
@@ -197,8 +199,6 @@ print("  L'Hopital answer: e (ln L = lim x*ln(1+1/x) = 1 => L=e^1=e)")`,
               ],
               code: `from opencalc import Figure
 import math
-import lhopitalUrl from '../diagrams/calc-lhopital.svg?url';
-import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
 
 # The original limit DOES exist: (x+sin x)/x = 1 + sin(x)/x -> 1
 print("Original limit: (x + sin x) / x")

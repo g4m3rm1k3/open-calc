@@ -1,4 +1,5 @@
 // FILE: src/content/chapter-4/11-improper-integrals.js
+import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
 export default {
   id: 'ch4-011',
   slug: 'improper-integrals',
@@ -145,7 +146,6 @@ else:
               ],
               code: `from opencalc import Figure
 import math
-import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
 
 def running_area(p, b_max=20, n=500):
     """Compute running area ∫₁^b for b in [1, b_max]."""

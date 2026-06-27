@@ -1,4 +1,6 @@
 // FILE: src/content/chapter-3/00-related-rates.js
+import relatedRatesUrl from '../diagrams/calc-related-rates.svg?url';
+import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
 export default {
   id: "ch3-000",
   slug: "related-rates",
@@ -269,8 +271,6 @@ fig.show()`,
                 "Change `dV_dt` or `r_target` and re-run to see how the radius growth rate depends on size.",
               code: `from opencalc import Figure
 import math
-import relatedRatesUrl from '../diagrams/calc-related-rates.svg?url';
-import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
 
 dV_dt    = 100.0   # cm³/s
 r_target = 5.0     # cm

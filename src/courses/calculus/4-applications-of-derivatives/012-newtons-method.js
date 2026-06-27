@@ -1,4 +1,6 @@
 // FILE: src/content/chapter-3/06-newtons-method.js
+import newtonsMethodUrl from '../diagrams/calc-newtons-method.svg?url';
+import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 export default {
   id: 'ch3-060',
   slug: 'newtons-method',
@@ -282,8 +284,6 @@ print(f"{steps:>4}  {x:>20.15f}  {f(x):>14.2e}  {abs(x-true_root):>14.2e}")`,
               ],
               code: `from opencalc import Figure
 import math
-import newtonsMethodUrl from '../diagrams/calc-newtons-method.svg?url';
-import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 
 f  = lambda x: x**2 - 2
 df = lambda x: 2*x

@@ -1,4 +1,5 @@
 // FILE: src/content/chapter-4/12-numerical-integration.js
+import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 export default {
   id: 'ch4-012',
   slug: 'numerical-integration',
@@ -166,7 +167,6 @@ for n in [4, 8, 16, 32, 64]:
               ],
               code: `from opencalc import Figure
 import math
-import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
 
 def midpoint(f,a,b,n):
     h=(b-a)/n; return h*sum(f(a+(i+.5)*h) for i in range(n))

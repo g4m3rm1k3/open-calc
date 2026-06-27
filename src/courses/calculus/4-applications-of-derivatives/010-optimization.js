@@ -1,4 +1,5 @@
 // FILE: src/content/chapter-3/04-optimization.js
+import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
 export default {
   id: "ch3-004",
   slug: "optimization",
@@ -253,7 +254,6 @@ fig.show()`,
               hint: "d(D\u00b2)/dx = 2x + 2(x\u00b2-3)(2x) = 2x(1 + 2x\u00b2 - 6) = 2x(2x\u00b2-5). Critical points: x=0 and x=\u00b1\u221a(5/2). Check which gives minimum.",
               code: `from opencalc import Figure
 import math
-import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
 
 D2 = lambda x: x**2 + (x**2 - 3)**2
 

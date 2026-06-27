@@ -1,4 +1,5 @@
 // FILE: src/content/chapter-4/04b-initial-value-problems.js
+import antiderivativeUrl from '../diagrams/calc-antiderivative.svg?url';
 export default {
   id: 'ch4-004b',
   slug: 'initial-value-problems',
@@ -808,7 +809,6 @@ for h in h_values:
         code:
 `import numpy as np
 import matplotlib.pyplot as plt
-import antiderivativeUrl from '../diagrams/calc-antiderivative.svg?url';
 from scipy.integrate import solve_ivp
 
 # Parameters

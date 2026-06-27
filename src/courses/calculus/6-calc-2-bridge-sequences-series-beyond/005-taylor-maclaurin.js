@@ -1,4 +1,5 @@
 // FILE: src/content/chapter-5/04-taylor-maclaurin.js
+import taylorUrl from '../diagrams/calc-taylor.svg?url';
 export default {
   id: 'ch5-004',
   slug: 'taylor-maclaurin',
@@ -203,7 +204,6 @@ print(f"  {e_sum}")
 print()
 print("Python's math.e (53-bit float):")
 import math
-import taylorUrl from '../diagrams/calc-taylor.svg?url';
 print(f"  {math.e}")
 print()
 print("How many terms needed to get 15 digits?")

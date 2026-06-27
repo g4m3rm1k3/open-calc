@@ -1,4 +1,5 @@
 // FILE: src/content/chapter-5/02-convergence-tests.js
+import sequencesUrl from '../diagrams/calc-sequences.svg?url';
 export default {
   id: 'ch5-002',
   slug: 'convergence-tests',
@@ -173,7 +174,6 @@ print("  p=2 > 1 => use p-series test => CONVERGES")`,
               ],
               code: `from opencalc import Figure
 import math
-import sequencesUrl from '../diagrams/calc-sequences.svg?url';
 
 # Alternating harmonic series: Σ (-1)^(n+1) / n = ln(2)
 true = math.log(2)

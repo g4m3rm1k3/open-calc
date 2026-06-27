@@ -1,4 +1,5 @@
 // FILE: src/content/chapter-3/01-linear-approximation.js
+import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 export default {
   id: 'ch3-001',
   slug: 'linear-approximation',
@@ -200,7 +201,6 @@ fig.show()`,
               hint: 'f = math.exp, df = math.exp, a = 0. Then f(a)=1, f\'(a)=1, so L(x) = 1 + x. Use fig.plot() twice — once for f and once for L.',
               code: `from opencalc import Figure
 import math
-import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 
 # ── Fill in the blanks ────────────────────────────────────────
 f   = math.exp
