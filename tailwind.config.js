@@ -9,17 +9,17 @@ export default {
     extend: {
       colors: {
         brand: {
-          50:  '#f0f4ff',
-          100: '#e0e9ff',
-          200: '#c7d7fe',
-          300: '#a5b8fc',
-          400: '#8193f8',
-          500: '#6470f1',
-          600: '#5054e4',
-          700: '#4341ca',
-          800: '#3837a3',
-          900: '#323481',
-          950: '#1e1f4c',
+          50: 'rgb(var(--tw-custom-brand-50) / <alpha-value>)',
+          100: 'rgb(var(--tw-custom-brand-100) / <alpha-value>)',
+          200: 'rgb(var(--tw-custom-brand-200) / <alpha-value>)',
+          300: 'rgb(var(--tw-custom-brand-300) / <alpha-value>)',
+          400: 'rgb(var(--tw-custom-brand-400) / <alpha-value>)',
+          500: 'rgb(var(--tw-custom-brand-500) / <alpha-value>)',
+          600: 'rgb(var(--tw-custom-brand-600) / <alpha-value>)',
+          700: 'rgb(var(--tw-custom-brand-700) / <alpha-value>)',
+          800: 'rgb(var(--tw-custom-brand-800) / <alpha-value>)',
+          900: 'rgb(var(--tw-custom-brand-900) / <alpha-value>)',
+          950: 'rgb(var(--tw-custom-brand-950) / <alpha-value>)',
         },
         slate: {
           50: 'rgb(var(--tw-custom-slate-50) / <alpha-value>)',

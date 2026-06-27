@@ -25,19 +25,68 @@ export const DEFAULT_PALETTE_RGB = {
     800: '7 89 133',
     900: '12 74 110',
     950: '8 47 73',
+  },
+  brand: {
+    50: '240 244 255',
+    100: '224 233 255',
+    200: '199 215 254',
+    300: '165 184 252',
+    400: '129 147 248',
+    500: '100 112 241',
+    600: '80 84 228',
+    700: '67 65 202',
+    800: '56 55 163',
+    900: '50 52 129',
+    950: '30 31 76',
   }
 };
 
-function hexToRgb(hex) {
+function hexToRgbArray(hex) {
   if (!hex) return null;
   hex = hex.replace(/^#/, '');
   if (hex.length === 3) {
     hex = hex.split('').map(c => c + c).join('');
   }
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
-  return `${r} ${g} ${b}`;
+  return [
+    parseInt(hex.substring(0, 2), 16),
+    parseInt(hex.substring(2, 4), 16),
+    parseInt(hex.substring(4, 6), 16)
+  ];
+}
+
+function hexToRgb(hex) {
+  const rgb = hexToRgbArray(hex);
+  if (!rgb) return null;
+  return rgb.join(' ');
+}
+
+function lerpColor(c1, c2, t) {
+  return [
+    Math.round(c1[0] + (c2[0] - c1[0]) * t),
+    Math.round(c1[1] + (c2[1] - c1[1]) * t),
+    Math.round(c1[2] + (c2[2] - c1[2]) * t)
+  ];
+}
+
+function generatePalette(baseHex) {
+  if (!baseHex) return DEFAULT_PALETTE_RGB.brand;
+  const base = hexToRgbArray(baseHex);
+  const white = [255, 255, 255];
+  const black = [0, 0, 0];
+  
+  return {
+    50: lerpColor(white, base, 0.1).join(' '),
+    100: lerpColor(white, base, 0.2).join(' '),
+    200: lerpColor(white, base, 0.4).join(' '),
+    300: lerpColor(white, base, 0.6).join(' '),
+    400: lerpColor(white, base, 0.8).join(' '),
+    500: base.join(' '),
+    600: lerpColor(base, black, 0.2).join(' '),
+    700: lerpColor(base, black, 0.4).join(' '),
+    800: lerpColor(base, black, 0.6).join(' '),
+    900: lerpColor(base, black, 0.8).join(' '),
+    950: lerpColor(base, black, 0.9).join(' ')
+  };
 }
 
 export function extractThemeColors(themeDef) {
@@ -78,7 +127,8 @@ export function extractThemeColors(themeDef) {
       400: primary || DEFAULT_PALETTE_RGB.sky[400],
       500: primary || DEFAULT_PALETTE_RGB.sky[500],
       600: primary || DEFAULT_PALETTE_RGB.sky[600],
-    }
+    },
+    brand: generatePalette(themeDef.accentHex)
   };
 }
 
@@ -92,6 +142,11 @@ export function generateThemeStyleString(colors, isDefault = false) {
   Object.keys(colors.sky).forEach(shade => {
     css += `  --tw-custom-sky-${shade}: ${colors.sky[shade]};\n`;
   });
+  if (colors.brand) {
+    Object.keys(colors.brand).forEach(shade => {
+      css += `  --tw-custom-brand-${shade}: ${colors.brand[shade]};\n`;
+    });
+  }
   css += '}\n';
   return css;
 }

@@ -66,7 +66,8 @@ export function ThemeProvider({ children }) {
       // Revert to defaults
       const customColors = {
         slate: DEFAULT_PALETTE_RGB.slate,
-        sky: DEFAULT_PALETTE_RGB.sky
+        sky: DEFAULT_PALETTE_RGB.sky,
+        brand: DEFAULT_PALETTE_RGB.brand
       };
       const cssString = generateThemeStyleString(customColors);
       

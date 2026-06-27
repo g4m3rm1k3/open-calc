@@ -44,6 +44,19 @@
     --tw-custom-sky-900: 12 74 110;
     --tw-custom-sky-950: 8 47 73;
 
+    /* Default Brand Colors */
+    --tw-custom-brand-50: 240 244 255;
+    --tw-custom-brand-100: 224 233 255;
+    --tw-custom-brand-200: 199 215 254;
+    --tw-custom-brand-300: 165 184 252;
+    --tw-custom-brand-400: 129 147 248;
+    --tw-custom-brand-500: 100 112 241;
+    --tw-custom-brand-600: 80 84 228;
+    --tw-custom-brand-700: 67 65 202;
+    --tw-custom-brand-800: 56 55 163;
+    --tw-custom-brand-900: 50 52 129;
+    --tw-custom-brand-950: 30 31 76;
+
     /* Semantic color tokens */
     --color-surface: rgba(255, 255, 255, 0.72);
     --color-page-bg: #f1f5f9;

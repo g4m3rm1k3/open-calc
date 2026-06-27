@@ -257,8 +257,8 @@ export default function StartMenu({ onClose }) {
       >
         {/* Ambient background glow */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[28px]">
-          <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-indigo-400/15 dark:bg-indigo-500/15 rounded-full blur-[80px] mix-blend-multiply dark:mix-blend-screen" />
-          <div className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-cyan-400/15 dark:bg-cyan-500/15 rounded-full blur-[80px] mix-blend-multiply dark:mix-blend-screen" />
+          <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] bg-brand-400/15 dark:bg-brand-500/15 rounded-full blur-[80px] mix-blend-multiply dark:mix-blend-screen" />
+          <div className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-sky-400/15 dark:bg-sky-500/15 rounded-full blur-[80px] mix-blend-multiply dark:mix-blend-screen" />
         </div>
 
         {/* Search */}
@@ -270,7 +270,7 @@ export default function StartMenu({ onClose }) {
               placeholder="Search labs, games, tools…"
               value={query}
               onChange={e => setQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 text-sm rounded-2xl bg-white/40 dark:bg-white/10 border border-white/40 dark:border-white/5 focus:bg-white/80 dark:focus:bg-white/20 focus:border-indigo-500/50 outline-none placeholder-slate-400 dark:placeholder-slate-300 text-slate-800 dark:text-white transition-all shadow-sm focus:shadow-md backdrop-blur-md"
+              className="w-full pl-10 pr-4 py-3 text-sm rounded-2xl bg-white/40 dark:bg-white/10 border border-white/40 dark:border-white/5 focus:bg-white/80 dark:focus:bg-white/20 focus:border-brand-500/50 outline-none placeholder-slate-400 dark:placeholder-slate-300 text-slate-800 dark:text-white transition-all shadow-sm focus:shadow-md backdrop-blur-md"
             />
             <svg className="absolute left-3.5 top-3.5 w-5 h-5 text-slate-400 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -289,14 +289,14 @@ export default function StartMenu({ onClose }) {
                   tab === s.id
                     ? s.id === 'favourites'
                       ? 'text-amber-700 dark:text-amber-200 bg-amber-50 dark:bg-amber-900/30'
-                      : 'text-indigo-700 dark:text-indigo-200 bg-indigo-50 dark:bg-indigo-900/30'
+                      : 'text-brand-700 dark:text-brand-200 bg-brand-50 dark:bg-brand-900/30'
                     : 'text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
                 {tab === s.id && (
                   <motion.div
                     layoutId="startMenuTab"
-                    className={`absolute inset-0 rounded-full z-0 ${s.id === 'favourites' ? 'bg-amber-100 dark:bg-amber-800/40' : 'bg-indigo-100 dark:bg-indigo-800/40'}`}
+                    className={`absolute inset-0 rounded-full z-0 ${s.id === 'favourites' ? 'bg-amber-100 dark:bg-amber-800/40' : 'bg-brand-100 dark:bg-brand-800/40'}`}
                   />
                 )}
                 <span className="relative z-10">{s.label}</span>
