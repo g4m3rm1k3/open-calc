@@ -297,7 +297,7 @@ function SectionDivider({ icon, label, color = "slate", noteId }) {
       id={noteId ? noteId.replace(/:/g, "-") : undefined}
       className={`group relative flex items-center gap-4 mb-8 p-1.5 pr-6 rounded-full border shadow-sm bg-gradient-to-r transition-all duration-300 hover:shadow-md ${themes[color]}`}
     >
-      <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-900 border border-inherit flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform">
+      <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 border border-inherit flex items-center justify-center text-xl shadow-inner group-hover:scale-110 transition-transform">
         {icon}
       </div>
       <span className="font-black text-[11px] uppercase tracking-[0.2em]">
@@ -319,9 +319,9 @@ function VizCard({
   return (
     <div
       id={noteId ? noteId.replace(/:/g, "-") : undefined}
-      className={`rounded-2xl overflow-hidden border ${borderColor} shadow-sm bg-white dark:bg-slate-900`}
+      className={`rounded-2xl overflow-hidden border ${borderColor} shadow-sm bg-slate-50 dark:bg-slate-900`}
     >
-      <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+      <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
         {viz.title ? (
           <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             {viz.title}
@@ -332,7 +332,7 @@ function VizCard({
         {noteId && <StickyNote noteId={noteId} />}
       </div>
       {viz.mathBridge && (
-        <div className="px-4 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200 [&_strong]:text-indigo-800 [&_strong]:dark:text-indigo-100">
+        <div className="px-4 py-3 bg-brand-50 dark:bg-brand-950/40 border-b border-brand-100 dark:border-brand-900/50 [&_p]:text-sm [&_p]:text-brand-900 [&_p]:dark:text-brand-200 [&_strong]:text-brand-800 [&_strong]:dark:text-brand-100">
           <MarkdownProse text={viz.mathBridge} />
         </div>
       )}
@@ -342,7 +342,7 @@ function VizCard({
         title={viz.title}
       />
       {viz.caption && (
-        <p className="text-xs text-slate-400 dark:text-slate-500 px-4 py-2.5 italic text-center leading-relaxed border-t border-slate-100 dark:border-slate-800">
+        <p className="text-xs text-slate-400 dark:text-slate-500 px-4 py-2.5 italic text-center leading-relaxed border-t border-slate-200 dark:border-slate-800">
           {parseProse(viz.caption)}
         </p>
       )}
@@ -431,9 +431,9 @@ function PerspectiveSync({ perspectives, bridge }) {
         {perspectives.map((p, i) => (
           <div
             key={i}
-            className="p-3 rounded-xl bg-white dark:bg-slate-800 border border-indigo-50 dark:border-indigo-800 shadow-sm"
+            className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-sky-100 dark:border-sky-800 shadow-sm"
           >
-            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-indigo-400 dark:text-indigo-500 mb-1">
+            <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-sky-500 dark:text-sky-400 mb-1">
               {p.type}
             </p>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
@@ -1044,7 +1044,7 @@ export default function MicroCycleLesson({ lesson }) {
                 <div className="px-5 py-4 space-y-3 bg-slate-50 dark:bg-slate-800/40 border-t border-slate-100 dark:border-slate-800">
                   {exp.physicsConnection && (
                     <div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 block mb-1">Physics connection</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400 block mb-1">Physics connection</span>
                       <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{exp.physicsConnection}</p>
                     </div>
                   )}
@@ -1056,7 +1056,7 @@ export default function MicroCycleLesson({ lesson }) {
                   )}
                   {exp.followUp && (
                     <div>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-violet-600 dark:text-violet-400 block mb-1">Try next</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400 block mb-1">Try next</span>
                       <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{exp.followUp}</p>
                     </div>
                   )}
@@ -1175,15 +1175,15 @@ export default function MicroCycleLesson({ lesson }) {
               <Link
                 key={tool.id}
                 to={tool.href}
-                className="group block rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all"
+                className="group block rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-5 shadow-sm hover:shadow-md hover:border-sky-300 dark:hover:border-sky-700 transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <span className="text-2xl">🧪</span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                  <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-900/40 text-sky-600 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                     Lab
                   </span>
                 </div>
-                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-1 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-1 leading-snug group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                   {tool.title}
                 </h3>
                 {tool.description && (
@@ -1191,7 +1191,7 @@ export default function MicroCycleLesson({ lesson }) {
                     {tool.description}
                   </p>
                 )}
-                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 group-hover:gap-2.5 transition-all">
+                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-sky-600 dark:text-sky-400 group-hover:gap-2.5 transition-all">
                   Launch Lab
                   <span className="transition-transform group-hover:translate-x-0.5">
                     →

@@ -233,7 +233,7 @@ function MobileVizCard({ viz, borderColor = "border-slate-200 dark:border-slate-
     return (
       <>
         {viz.mathBridge && (
-          <div className="px-4 py-3 mb-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200">
+          <div className="px-4 py-3 mb-2 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900/50 [&_p]:text-sm [&_p]:text-sky-900 [&_p]:dark:text-sky-200">
             <MarkdownProse text={viz.mathBridge} />
           </div>
         )}
@@ -248,7 +248,7 @@ function MobileVizCard({ viz, borderColor = "border-slate-200 dark:border-slate-
   }
 
   return (
-    <div className={`rounded-xl overflow-hidden border ${borderColor} bg-white dark:bg-slate-900`}>
+    <div className={`rounded-xl overflow-hidden border ${borderColor} bg-slate-50 dark:bg-slate-900`}>
       <button
         onClick={() => setExpanded((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700 transition-colors text-left"
@@ -263,7 +263,7 @@ function MobileVizCard({ viz, borderColor = "border-slate-200 dark:border-slate-
       {expanded && (
         <>
           {viz.mathBridge && (
-            <div className="px-0 py-3 bg-indigo-50 dark:bg-indigo-950/40 border-b border-indigo-100 dark:border-indigo-900/50 [&_p]:text-sm [&_p]:text-indigo-900 [&_p]:dark:text-indigo-200">
+            <div className="px-0 py-3 bg-sky-50 dark:bg-sky-950/40 border-b border-sky-100 dark:border-sky-900/50 [&_p]:text-sm [&_p]:text-sky-900 [&_p]:dark:text-sky-200">
               <MarkdownProse text={viz.mathBridge} />
             </div>
           )}

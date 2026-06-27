@@ -90,7 +90,7 @@ const PHONE_OK = new Set([
 
 function VizSkeleton() {
   return (
-    <div className="animate-pulse bg-slate-200 dark:bg-slate-700 rounded-lg h-64 flex items-center justify-center">
+    <div className="animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg h-64 flex items-center justify-center">
       <span className="text-slate-400 dark:text-slate-500 text-sm">
         Loading visualization…
       </span>
@@ -171,19 +171,19 @@ export default function VizFrame({ id, initialProps = {}, title }) {
     return createPortal(
       <div className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-sm flex flex-col">
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 bg-slate-900 border-b border-slate-700">
-          <h2 className="text-sm font-bold text-white truncate">
+        <div className="flex-shrink-0 flex items-center justify-between px-5 py-3 bg-slate-950 border-b border-slate-800">
+          <h2 className="text-sm font-bold text-slate-100 truncate">
             {title || "Interactive Visualizer"}
           </h2>
           <button
             onClick={() => setIsExpanded(false)}
-            className="ml-4 flex-shrink-0 px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold transition-colors"
+            className="ml-4 flex-shrink-0 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100 text-sm font-semibold transition-colors"
           >
             ✕ Close
           </button>
         </div>
         {/* Content — fills remaining height, scrolls if needed */}
-        <div className="flex-1 overflow-auto bg-white dark:bg-slate-950 p-4 sm:p-6">
+        <div className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-950 p-4 sm:p-6">
           <div className="w-full max-w-5xl mx-auto">{content}</div>
         </div>
       </div>,
@@ -220,14 +220,14 @@ export default function VizFrame({ id, initialProps = {}, title }) {
           <button
             onClick={togglePin}
             title={pinned ? "Unpin" : "Pin this visualization"}
-            className={`flex items-center gap-1 px-2 py-1 text-xs font-bold rounded shadow-md border transition-colors ${pinned ? "bg-amber-500 border-amber-400 text-white" : "bg-slate-800 border-slate-600 text-white hover:bg-amber-500 hover:border-amber-400"}`}
+            className={`flex items-center gap-1 px-2 py-1 text-xs font-bold rounded shadow-md border transition-colors ${pinned ? "bg-amber-500 border-amber-400 text-white" : "bg-slate-950 border-slate-700 text-slate-200 hover:bg-amber-500 hover:border-amber-400"}`}
           >
             📌
           </button>
           <button
             onClick={() => setIsExpanded(true)}
             title="Expand to Full Width"
-            className="bg-slate-800 text-white px-2 py-1 flex items-center gap-1 text-xs font-bold rounded shadow-md border border-slate-600 hover:bg-brand-500 hover:border-brand-400"
+            className="bg-slate-950 text-slate-200 px-2 py-1 flex items-center gap-1 text-xs font-bold rounded shadow-md border border-slate-700 hover:bg-brand-600 hover:border-brand-500 hover:text-white"
           >
             <span>⛶</span> Expand
           </button>
@@ -240,7 +240,7 @@ export default function VizFrame({ id, initialProps = {}, title }) {
   return (
     <div
       id={`viz-${id}`}
-      className="viz-frame relative group w-full max-w-full overflow-x-auto bg-white dark:bg-slate-900 rounded-xl"
+      className="viz-frame relative group w-full max-w-full overflow-x-auto bg-slate-50 dark:bg-slate-900 rounded-xl"
     >
       {/* ── Dev Mode Label — hidden until html.dev-mode is toggled via Shift+D ── */}
       <div className="dev-viz-label absolute top-0 left-0 z-[9999] items-center gap-1.5 px-2 py-1 rounded-br-lg rounded-tl-xl bg-amber-400 text-slate-900 pointer-events-none select-none">
@@ -259,14 +259,14 @@ export default function VizFrame({ id, initialProps = {}, title }) {
         <button
           onClick={togglePin}
           title={pinned ? "Unpin" : "Pin this visualization"}
-          className={`hidden lg:flex items-center gap-1 px-2 py-1 text-xs font-bold rounded shadow-md border transition-colors ${pinned ? "bg-amber-500 border-amber-400 text-white" : "bg-slate-800 border-slate-600 text-white hover:bg-amber-500 hover:border-amber-400"}`}
+          className={`hidden lg:flex items-center gap-1 px-2 py-1 text-xs font-bold rounded shadow-md border transition-colors ${pinned ? "bg-amber-500 border-amber-400 text-white" : "bg-slate-950 border-slate-700 text-slate-200 hover:bg-amber-500 hover:border-amber-400"}`}
         >
           📌
         </button>
         <button
           onClick={() => setIsExpanded(true)}
           title="Expand to Full Width"
-          className="bg-slate-800 text-white px-2 py-1 flex items-center gap-1 text-xs font-bold rounded shadow-md border border-slate-600 hover:bg-brand-500 hover:border-brand-400"
+          className="bg-slate-950 text-slate-200 px-2 py-1 flex items-center gap-1 text-xs font-bold rounded shadow-md border border-slate-700 hover:bg-brand-600 hover:border-brand-500 hover:text-white"
         >
           <span>⛶</span> Expand
         </button>
