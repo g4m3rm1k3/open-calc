@@ -1,0 +1,1484 @@
+{
+  "topics": [
+    {
+      "id": "scalars",
+      "title": "Scalars",
+      "category": "foundations",
+      "color": "#6366f1",
+      "summary": "A scalar is a single real number — magnitude with no direction.",
+      "intuition": "Temperature, mass, speed: a lone number. Contrast with a vector which also carries direction.",
+      "prereqs": [],
+      "steps": [
+        { "text": "A scalar c ∈ ℝ is just a real number." },
+        { "text": "Scalars can scale (stretch/shrink) vectors and matrices." }
+      ],
+      "code": {
+        "python": [
+          { "line": "c = 3.5", "note": "a plain Python float is a scalar" },
+          { "line": "import numpy as np", "note": "NumPy needed for vector ops" },
+          { "line": "v = np.array([1, 2, 3])", "note": "3-D column vector" },
+          { "line": "print(c * v)", "note": "scalar multiplication → [3.5, 7, 10.5]" }
+        ],
+        "matlab": [
+          { "line": "c = 3.5;", "note": "scalar — semicolon suppresses output" },
+          { "line": "v = [1; 2; 3];", "note": "3×1 column vector" },
+          { "line": "disp(c * v)", "note": "scalar multiplication" }
+        ]
+      },
+      "mistakes": ["Confusing scalar 0 with the zero vector"],
+      "example": "Temperature 98.6°F is a scalar; wind velocity (speed + direction) is a vector."
+    },
+    {
+      "id": "vectors",
+      "title": "Vectors",
+      "category": "foundations",
+      "color": "#6366f1",
+      "summary": "An ordered list of numbers representing magnitude and direction in n-dimensional space.",
+      "intuition": "An arrow in space: where it points and how long it is. Adding two vectors tip-to-tail gives a new vector.",
+      "prereqs": ["scalars"],
+      "steps": [
+        { "text": "A vector v ∈ ℝⁿ is an ordered n-tuple of real numbers.", "prereq": "scalars" },
+        { "text": "Vectors support addition (component-wise) and scalar multiplication." },
+        { "text": "The zero vector 0 is the additive identity." }
+      ],
+      "code": {
+        "python": [
+          { "line": "import numpy as np", "note": "NumPy is the standard for LA in Python" },
+          { "line": "v = np.array([3, -1, 2])", "note": "3-D vector as a 1-D NumPy array" },
+          { "line": "w = np.array([1, 4, -1])", "note": "another vector" },
+          { "line": "print(v + w)", "note": "vector addition: [4, 3, 1]" },
+          { "line": "print(2 * v)", "note": "scalar mult: [6, -2, 4]" },
+          { "line": "print(np.linalg.norm(v))", "note": "Euclidean length (magnitude)" }
+        ],
+        "matlab": [
+          { "line": "v = [3; -1; 2];", "note": "column vector (n×1)" },
+          { "line": "w = [1; 4; -1];", "note": "another column vector" },
+          { "line": "disp(v + w)", "note": "component-wise addition" },
+          { "line": "disp(2 * v)", "note": "scalar multiplication" },
+          { "line": "disp(norm(v))", "note": "Euclidean norm" }
+        ]
+      },
+      "mistakes": ["Row vs column vector confusion — always use column vectors (n×1) by convention"],
+      "example": "Velocity in 3-D space: v = [3, -1, 2] means 3 m/s east, 1 m/s south, 2 m/s up."
+    },
+    {
+      "id": "vector-operations",
+      "title": "Vector Operations",
+      "category": "foundations",
+      "color": "#6366f1",
+      "summary": "Addition, subtraction, scalar multiplication, and magnitude — the building blocks of all linear algebra.",
+      "intuition": "Vectors obey 8 axioms that define a vector space. Every operation we do on matrices ultimately reduces to vector operations.",
+      "prereqs": ["vectors"],
+      "steps": [
+        { "text": "Addition: (u + v)ᵢ = uᵢ + vᵢ", "prereq": "vectors" },
+        { "text": "Scalar multiplication: (cv)ᵢ = c·vᵢ" },
+        { "text": "Magnitude: ‖v‖ = √(v₁² + … + vₙ²)" },
+        { "text": "Unit vector: v̂ = v / ‖v‖" }
+      ],
+      "code": {
+        "python": [
+          { "line": "u = np.array([1, 2])", "note": "2-D vector" },
+          { "line": "v = np.array([3, -1])", "note": "another 2-D vector" },
+          { "line": "print(u - v)", "note": "subtraction: [-2, 3]" },
+          { "line": "mag = np.linalg.norm(v)", "note": "‖v‖" },
+          { "line": "unit = v / mag", "note": "unit vector pointing same direction as v" }
+        ],
+        "matlab": [
+          { "line": "u = [1; 2];", "note": "" },
+          { "line": "v = [3; -1];", "note": "" },
+          { "line": "disp(u - v)", "note": "subtraction" },
+          { "line": "mag = norm(v);", "note": "magnitude" },
+          { "line": "unit_v = v / mag;", "note": "unit vector" }
+        ]
+      },
+      "mistakes": ["Forgetting to normalize before using as a direction"],
+      "example": "Wind direction: normalize velocity vector to get a pure direction."
+    },
+    {
+      "id": "dot-product",
+      "title": "Dot Product",
+      "category": "foundations",
+      "color": "#6366f1",
+      "summary": "Dot product u·v = Σ uᵢvᵢ = ‖u‖‖v‖cos θ — measures how aligned two vectors are.",
+      "intuition": "If u·v = 0 the vectors are perpendicular. If positive they point the same general direction. This is the engine behind projections, angles, and orthogonality.",
+      "prereqs": ["vectors"],
+      "steps": [
+        { "text": "Algebraic definition: u·v = u₁v₁ + u₂v₂ + … + uₙvₙ", "prereq": "vectors" },
+        { "text": "Geometric definition: u·v = ‖u‖‖v‖cos θ" },
+        { "text": "Dot product is symmetric: u·v = v·u" },
+        { "text": "Orthogonality condition: u·v = 0 ⟺ u ⊥ v" }
+      ],
+      "code": {
+        "python": [
+          { "line": "u = np.array([1, 2, 3])", "note": "" },
+          { "line": "v = np.array([4, -2, 1])", "note": "" },
+          { "line": "print(np.dot(u, v))", "note": "dot product: 1*4 + 2*(-2) + 3*1 = 3" },
+          { "line": "cos_theta = np.dot(u,v) / (np.linalg.norm(u)*np.linalg.norm(v))", "note": "cosine of angle between u and v" },
+          { "line": "theta = np.arccos(cos_theta)", "note": "angle in radians" }
+        ],
+        "matlab": [
+          { "line": "u = [1; 2; 3];", "note": "" },
+          { "line": "v = [4; -2; 1];", "note": "" },
+          { "line": "d = dot(u, v);", "note": "dot product" },
+          { "line": "theta = acos(d / (norm(u)*norm(v)));", "note": "angle between vectors" }
+        ]
+      },
+      "mistakes": ["Using dot product on vectors of different dimensions"],
+      "example": "Work done by force F over displacement d: W = F·d"
+    },
+    {
+      "id": "cross-product",
+      "title": "Cross Product",
+      "category": "foundations",
+      "color": "#6366f1",
+      "summary": "Cross product u × v produces a vector perpendicular to both u and v (only in ℝ³).",
+      "intuition": "The magnitude ‖u × v‖ = ‖u‖‖v‖sin θ equals the area of the parallelogram spanned by u and v. Direction follows the right-hand rule.",
+      "prereqs": ["dot-product"],
+      "steps": [
+        { "text": "Only defined in ℝ³." },
+        { "text": "u × v = (u₂v₃−u₃v₂, u₃v₁−u₁v₃, u₁v₂−u₂v₁)" },
+        { "text": "Anti-commutative: u × v = −(v × u)" },
+        { "text": "‖u × v‖ = area of parallelogram spanned by u and v" }
+      ],
+      "code": {
+        "python": [
+          { "line": "u = np.array([1, 0, 0])", "note": "x-axis unit vector" },
+          { "line": "v = np.array([0, 1, 0])", "note": "y-axis unit vector" },
+          { "line": "print(np.cross(u, v))", "note": "[0, 0, 1] — the z-axis: right-hand rule" }
+        ],
+        "matlab": [
+          { "line": "u = [1; 0; 0];", "note": "" },
+          { "line": "v = [0; 1; 0];", "note": "" },
+          { "line": "disp(cross(u, v))", "note": "[0; 0; 1]" }
+        ]
+      },
+      "mistakes": ["Applying cross product to vectors in ℝ² or ℝⁿ for n≠3"],
+      "example": "Torque τ = r × F — the rotational effect of force F at position r."
+    },
+    {
+      "id": "matrices",
+      "title": "Matrices",
+      "category": "foundations",
+      "color": "#8b5cf6",
+      "summary": "A matrix is a rectangular array of numbers. An m×n matrix has m rows and n columns.",
+      "intuition": "Think of a matrix as a compact encoding of a linear transformation — it takes vectors in and gives vectors out.",
+      "prereqs": ["vectors"],
+      "steps": [
+        { "text": "An m×n matrix A has entries Aᵢⱼ (row i, column j).", "prereq": "vectors" },
+        { "text": "The columns of A are vectors in ℝᵐ; the rows are vectors in ℝⁿ." },
+        { "text": "Square matrix: m = n. Rectangular: m ≠ n." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1, 2, 3], [4, 5, 6]])", "note": "2×3 matrix" },
+          { "line": "print(A.shape)", "note": "(2, 3) — 2 rows, 3 cols" },
+          { "line": "print(A[0, :])", "note": "first row: [1, 2, 3]" },
+          { "line": "print(A[:, 1])", "note": "second column: [2, 5]" }
+        ],
+        "matlab": [
+          { "line": "A = [1 2 3; 4 5 6];", "note": "2×3 matrix — semicolon = new row" },
+          { "line": "size(A)", "note": "returns [2, 3]" },
+          { "line": "A(1, :)", "note": "first row (1-indexed)" },
+          { "line": "A(:, 2)", "note": "second column" }
+        ]
+      },
+      "mistakes": ["1-indexed in MATLAB vs 0-indexed in Python/NumPy"],
+      "example": "A 3×3 rotation matrix rotates every vector in ℝ³ by a fixed angle."
+    },
+    {
+      "id": "matrix-operations",
+      "title": "Matrix Operations",
+      "category": "foundations",
+      "color": "#8b5cf6",
+      "summary": "Addition, scalar multiplication, transpose, and matrix multiplication.",
+      "intuition": "Matrix multiplication AB means 'apply transformation B, then A'. Order matters — AB ≠ BA in general.",
+      "prereqs": ["matrices", "dot-product"],
+      "steps": [
+        { "text": "Addition: (A+B)ᵢⱼ = Aᵢⱼ + Bᵢⱼ — same dimensions required.", "prereq": "matrices" },
+        { "text": "Transpose: (Aᵀ)ᵢⱼ = Aⱼᵢ — rows become columns." },
+        { "text": "Matrix-vector product Av: the i-th entry is the dot product of row i with v.", "prereq": "dot-product" },
+        { "text": "Matrix multiplication AB: (AB)ᵢⱼ = row i of A · column j of B. A must be m×k, B must be k×n." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1,2],[3,4]])", "note": "2×2 matrix" },
+          { "line": "B = np.array([[5,6],[7,8]])", "note": "2×2 matrix" },
+          { "line": "print(A + B)", "note": "element-wise addition" },
+          { "line": "print(A.T)", "note": "transpose" },
+          { "line": "print(A @ B)", "note": "matrix multiplication — use @ not *" },
+          { "line": "print(A * B)", "note": "WARNING: this is element-wise, not matrix multiply" }
+        ],
+        "matlab": [
+          { "line": "A = [1 2; 3 4];", "note": "" },
+          { "line": "B = [5 6; 7 8];", "note": "" },
+          { "line": "disp(A + B)", "note": "addition" },
+          { "line": "disp(A')", "note": "transpose (apostrophe)" },
+          { "line": "disp(A * B)", "note": "matrix multiply — * is matrix multiply by default" },
+          { "line": "disp(A .* B)", "note": "element-wise multiply (dot-star)" }
+        ]
+      },
+      "mistakes": ["Using * in Python for matrix multiplication (it's element-wise); use @"],
+      "example": "Applying two transformations in sequence: rotate then scale = S·R applied to vector v."
+    },
+    {
+      "id": "determinant",
+      "title": "Determinant",
+      "category": "foundations",
+      "color": "#8b5cf6",
+      "summary": "det(A) is a scalar that measures volume scaling and tells you if A is invertible.",
+      "intuition": "The determinant is the signed area (2-D) or volume (3-D) of the parallelogram/parallelepiped formed by the column vectors. If det = 0, the columns are linearly dependent and the matrix is singular.",
+      "prereqs": ["matrix-operations"],
+      "steps": [
+        { "text": "2×2: det([[a,b],[c,d]]) = ad − bc", "prereq": "matrix-operations" },
+        { "text": "Larger matrices: cofactor expansion along any row or column." },
+        { "text": "det(AB) = det(A)·det(B)" },
+        { "text": "det(Aᵀ) = det(A)" },
+        { "text": "A is invertible ⟺ det(A) ≠ 0" }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[3,1],[2,4]])", "note": "2×2 matrix" },
+          { "line": "print(np.linalg.det(A))", "note": "det = 3*4 - 1*2 = 10" },
+          { "line": "B = np.array([[1,2,3],[4,5,6],[7,8,9]])", "note": "singular matrix" },
+          { "line": "print(np.linalg.det(B))", "note": "≈ 0 — columns are linearly dependent" }
+        ],
+        "matlab": [
+          { "line": "A = [3 1; 2 4];", "note": "" },
+          { "line": "disp(det(A))", "note": "= 10" },
+          { "line": "B = [1 2 3; 4 5 6; 7 8 9];", "note": "singular" },
+          { "line": "disp(det(B))", "note": "≈ 0" }
+        ]
+      },
+      "mistakes": ["det = 0 means NO inverse, not that something went wrong numerically"],
+      "example": "A 2×2 shear matrix has det = 1 — it preserves area but skews shapes."
+    },
+    {
+      "id": "linear-systems",
+      "title": "Systems of Linear Equations",
+      "category": "foundations",
+      "color": "#8b5cf6",
+      "summary": "A system Ax = b: find vectors x satisfying all equations simultaneously.",
+      "intuition": "Each equation is a hyperplane. The solution is where all hyperplanes intersect — could be a point, a line, a plane, or nothing.",
+      "prereqs": ["matrix-operations"],
+      "steps": [
+        { "text": "Write the system as an augmented matrix [A | b].", "prereq": "matrix-operations" },
+        { "text": "Apply row reduction to find solutions." },
+        { "text": "Three cases: unique solution, infinitely many, no solution." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[2.,1.],[-1.,3.]])", "note": "coefficient matrix" },
+          { "line": "b = np.array([5., 7.])", "note": "right-hand side" },
+          { "line": "x = np.linalg.solve(A, b)", "note": "solve Ax = b directly" },
+          { "line": "print(x)", "note": "solution vector" }
+        ],
+        "matlab": [
+          { "line": "A = [2 1; -1 3];", "note": "" },
+          { "line": "b = [5; 7];", "note": "" },
+          { "line": "x = A \\ b;", "note": "backslash = solve — most important MATLAB operator" },
+          { "line": "disp(x)", "note": "solution" }
+        ]
+      },
+      "mistakes": ["Using inv(A)*b instead of A\\b in MATLAB — slower and less numerically stable"],
+      "example": "3 unknown currents in a circuit → 3 equations → solve the 3×3 system."
+    },
+    {
+      "id": "rref",
+      "title": "Row Reduction & RREF",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "Reduced Row Echelon Form: a systematic algorithm to solve systems, find rank, null space, and inverses.",
+      "intuition": "Row operations don't change solutions — they just simplify the equations until the answer is obvious. RREF is the simplest possible form.",
+      "prereqs": ["linear-systems"],
+      "steps": [
+        { "text": "Three legal row operations: swap, scale, add multiple of one row to another.", "prereq": "linear-systems" },
+        { "text": "REF: each pivot is to the right of the one above; zeros below pivots." },
+        { "text": "RREF: additionally, each pivot = 1 and zeros ABOVE pivots too." },
+        { "text": "Pivot columns correspond to basic variables; free columns = free variables." }
+      ],
+      "code": {
+        "python": [
+          { "line": "from sympy import Matrix", "note": "SymPy for exact RREF (NumPy gives numerical)" },
+          { "line": "A = Matrix([[1,2,3],[4,5,6],[7,8,10]])", "note": "3×3 matrix" },
+          { "line": "rref_A, pivots = A.rref()", "note": "compute RREF and pivot positions" },
+          { "line": "print(rref_A)", "note": "RREF matrix" },
+          { "line": "print(pivots)", "note": "tuple of pivot column indices" }
+        ],
+        "matlab": [
+          { "line": "A = [1 2 3; 4 5 6; 7 8 10];", "note": "" },
+          { "line": "R = rref(A);", "note": "built-in RREF" },
+          { "line": "disp(R)", "note": "reduced row echelon form" }
+        ]
+      },
+      "mistakes": ["Forgetting to back-substitute: RREF gives you the answer directly, no extra step"],
+      "example": "Solving a 3-variable system: augment [A|b], row-reduce, read off x from RREF."
+    },
+    {
+      "id": "matrix-inverse",
+      "title": "Matrix Inverse",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "A⁻¹ is the unique matrix such that AA⁻¹ = A⁻¹A = I. Only square, full-rank matrices have inverses.",
+      "intuition": "The inverse undoes the transformation A. If A rotates 30°, A⁻¹ rotates −30°. If det(A) = 0, the transformation is irreversible (collapses a dimension).",
+      "prereqs": ["determinant", "rref"],
+      "steps": [
+        { "text": "A is invertible ⟺ det(A) ≠ 0 ⟺ A has full rank.", "prereq": "determinant" },
+        { "text": "Compute A⁻¹ via augmented form [A | I] → RREF → [I | A⁻¹].", "prereq": "rref" },
+        { "text": "2×2 shortcut: if A = [[a,b],[c,d]], A⁻¹ = (1/det) [[d,-b],[-c,a]]" },
+        { "text": "(AB)⁻¹ = B⁻¹A⁻¹" }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[3.,1.],[2.,4.]])", "note": "float dtype required" },
+          { "line": "A_inv = np.linalg.inv(A)", "note": "compute inverse" },
+          { "line": "print(A @ A_inv)", "note": "should be identity (up to float error)" }
+        ],
+        "matlab": [
+          { "line": "A = [3 1; 2 4];", "note": "" },
+          { "line": "A_inv = inv(A);", "note": "matrix inverse" },
+          { "line": "disp(A * A_inv)", "note": "≈ identity" }
+        ]
+      },
+      "mistakes": ["Never use inv(A)*b to solve Ax=b — always use A\\b or np.linalg.solve"],
+      "example": "Decoding a linear cipher: apply the inverse of the encoding matrix to get plain text."
+    },
+    {
+      "id": "rank-nullity",
+      "title": "Rank & Nullity",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "Rank = number of pivot columns = dimension of the column space. Rank + Nullity = n (number of columns).",
+      "intuition": "Rank tells you how many independent directions A can reach. Nullity tells you how many directions A collapses to zero. Together they always sum to n.",
+      "prereqs": ["rref"],
+      "steps": [
+        { "text": "Apply RREF to A. Count pivot columns → that's the rank.", "prereq": "rref" },
+        { "text": "Nullity = n − rank (the Rank-Nullity Theorem)." },
+        { "text": "rank(A) = rank(Aᵀ): row rank equals column rank." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1,2,3],[4,5,6],[7,8,9]])", "note": "rank-deficient matrix" },
+          { "line": "print(np.linalg.matrix_rank(A))", "note": "rank = 2 (rows are linearly dependent)" },
+          { "line": "n = A.shape[1]", "note": "number of columns" },
+          { "line": "nullity = n - np.linalg.matrix_rank(A)", "note": "nullity = 1" }
+        ],
+        "matlab": [
+          { "line": "A = [1 2 3; 4 5 6; 7 8 9];", "note": "" },
+          { "line": "r = rank(A);", "note": "= 2" },
+          { "line": "nullity = size(A,2) - r;", "note": "= 1" }
+        ]
+      },
+      "mistakes": ["Rank is a property of the matrix, not of individual rows or columns"],
+      "example": "A 4×6 matrix can have rank at most 4. If rank = 3, nullity = 3."
+    },
+    {
+      "id": "null-space",
+      "title": "Null Space (Kernel)",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "Null space of A = all vectors x such that Ax = 0. It's a subspace of ℝⁿ.",
+      "intuition": "The null space is what A 'kills' — directions that become zero. Its dimension (nullity) counts how many free variables you have in Ax = 0.",
+      "prereqs": ["rref", "rank-nullity"],
+      "steps": [
+        { "text": "Set up the homogeneous system Ax = 0 and row-reduce.", "prereq": "rref" },
+        { "text": "Free variables give parameters; express pivot variables in terms of free variables.", "prereq": "rank-nullity" },
+        { "text": "Write the general solution as a linear combination of basis vectors — that's the null space basis." }
+      ],
+      "code": {
+        "python": [
+          { "line": "from sympy import Matrix", "note": "" },
+          { "line": "A = Matrix([[1,2,3],[4,5,6],[7,8,9]])", "note": "rank 2 → nullity 1" },
+          { "line": "ns = A.nullspace()", "note": "list of basis vectors for null space" },
+          { "line": "print(ns)", "note": "one vector: [1, -2, 1] (scaled)" }
+        ],
+        "matlab": [
+          { "line": "A = [1 2 3; 4 5 6; 7 8 9];", "note": "" },
+          { "line": "N = null(A, 'r');", "note": "'r' gives rational basis vectors" },
+          { "line": "disp(N)", "note": "columns of N span the null space" }
+        ]
+      },
+      "mistakes": ["Null space is only for Ax=0; for Ax=b solutions, add a particular solution to the null space"],
+      "example": "The null space of a 3-D rotation matrix is just {0} — rotations are invertible."
+    },
+    {
+      "id": "column-space",
+      "title": "Column Space (Range)",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "Column space of A = span of the columns of A = all possible outputs Ax.",
+      "intuition": "The column space is every vector b that Ax = b can possibly reach. The system Ax = b is consistent iff b is in the column space.",
+      "prereqs": ["rref", "rank-nullity"],
+      "steps": [
+        { "text": "Row-reduce A. The pivot columns of the ORIGINAL A are a basis for col(A).", "prereq": "rref" },
+        { "text": "dim(col(A)) = rank(A).", "prereq": "rank-nullity" },
+        { "text": "Ax = b is solvable iff b ∈ col(A), i.e., rank([A|b]) = rank(A)." }
+      ],
+      "code": {
+        "python": [
+          { "line": "from sympy import Matrix", "note": "" },
+          { "line": "A = Matrix([[1,3,5],[2,4,6]])", "note": "2×3 matrix" },
+          { "line": "cs = A.columnspace()", "note": "list of basis vectors for column space" },
+          { "line": "print(cs)", "note": "two independent column vectors" }
+        ],
+        "matlab": [
+          { "line": "A = [1 3 5; 2 4 6];", "note": "" },
+          { "line": "C = orth(A);", "note": "orthonormal basis for column space" },
+          { "line": "disp(size(C, 2))", "note": "rank of A" }
+        ]
+      },
+      "mistakes": ["Use original A's pivot columns as the basis, not the RREF pivot columns"],
+      "example": "A camera projection matrix's column space is the set of all images that can be formed."
+    },
+    {
+      "id": "linear-independence",
+      "title": "Linear Independence",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "Vectors v₁,…,vₖ are linearly independent if c₁v₁+…+cₖvₖ=0 implies all cᵢ=0.",
+      "intuition": "No vector in the set is redundant — none can be written as a combination of the others. Dependence means there's overlap or redundancy.",
+      "prereqs": ["vectors", "null-space"],
+      "steps": [
+        { "text": "Form matrix A with the vectors as columns.", "prereq": "vectors" },
+        { "text": "Solve Ac = 0. If only c=0 works, the vectors are independent.", "prereq": "null-space" },
+        { "text": "Equivalently: rank(A) = k (number of vectors) iff independent." }
+      ],
+      "code": {
+        "python": [
+          { "line": "v1 = np.array([1,0,0])", "note": "" },
+          { "line": "v2 = np.array([0,1,0])", "note": "" },
+          { "line": "v3 = np.array([1,1,0])", "note": "v3 = v1 + v2: dependent!" },
+          { "line": "A = np.column_stack([v1, v2, v3])", "note": "columns are the vectors" },
+          { "line": "print(np.linalg.matrix_rank(A))", "note": "rank = 2 < 3: dependent" }
+        ],
+        "matlab": [
+          { "line": "A = [1 0 1; 0 1 1; 0 0 0];", "note": "columns are the vectors" },
+          { "line": "disp(rank(A))", "note": "2 < 3 → linearly dependent" }
+        ]
+      },
+      "mistakes": ["Don't confuse independence of vectors with invertibility of the matrix (only applies when square)"],
+      "example": "Standard basis vectors e₁, e₂, e₃ in ℝ³ are the canonical example of independence."
+    },
+    {
+      "id": "basis",
+      "title": "Basis & Coordinates",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "A basis is a linearly independent spanning set. Coordinates express any vector as a unique linear combination of basis vectors.",
+      "intuition": "A basis is a measuring system. Changing bases is like switching from miles to kilometers — same reality, different numbers.",
+      "prereqs": ["linear-independence", "column-space"],
+      "steps": [
+        { "text": "A basis B = {v₁,…,vₙ} for a subspace S satisfies: (1) independent, (2) spans S.", "prereq": "linear-independence" },
+        { "text": "Every subspace has infinitely many bases but they all have the same size (dimension)." },
+        { "text": "Coordinate vector [x]_B: solve Bc = x to get coordinates c." },
+        { "text": "Standard basis for ℝⁿ: {e₁,…,eₙ}" }
+      ],
+      "code": {
+        "python": [
+          { "line": "B = np.array([[1,1],[1,-1]], dtype=float)", "note": "a basis for ℝ²" },
+          { "line": "x = np.array([3., 1.])", "note": "vector to express in this basis" },
+          { "line": "coords = np.linalg.solve(B, x)", "note": "solve Bc = x" },
+          { "line": "print(coords)", "note": "coordinates of x in basis B" }
+        ],
+        "matlab": [
+          { "line": "B = [1 1; 1 -1];", "note": "basis vectors as columns" },
+          { "line": "x = [3; 1];", "note": "" },
+          { "line": "coords = B \\ x;", "note": "coordinate representation" },
+          { "line": "disp(coords)", "note": "" }
+        ]
+      },
+      "mistakes": ["A basis must be linearly independent AND span the space — both conditions required"],
+      "example": "Fourier basis: any periodic signal is a unique sum of sin/cos waves."
+    },
+    {
+      "id": "eigenvalues",
+      "title": "Eigenvalues",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "λ is an eigenvalue of A if det(A − λI) = 0. Eigenvalues are the roots of the characteristic polynomial.",
+      "intuition": "An eigenvalue is a scalar stretching factor. If Av = λv, then A doesn't rotate v — it just scales it by λ.",
+      "prereqs": ["determinant", "matrix-operations"],
+      "steps": [
+        { "text": "Form the characteristic polynomial p(λ) = det(A − λI).", "prereq": "determinant" },
+        { "text": "Solve p(λ) = 0. Each root is an eigenvalue.", "prereq": "matrix-operations" },
+        { "text": "Algebraic multiplicity: how many times λ appears as a root." },
+        { "text": "tr(A) = sum of eigenvalues; det(A) = product of eigenvalues." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[4.,2.],[1.,3.]])", "note": "2×2 matrix" },
+          { "line": "eigenvalues, eigenvectors = np.linalg.eig(A)", "note": "compute both at once" },
+          { "line": "print(eigenvalues)", "note": "λ₁ = 5, λ₂ = 2" },
+          { "line": "# Verify: det(A - lambda*I)", "note": "" },
+          { "line": "lam = eigenvalues[0]", "note": "" },
+          { "line": "print(np.linalg.det(A - lam*np.eye(2)))", "note": "should be ≈ 0" }
+        ],
+        "matlab": [
+          { "line": "[V, D] = eig(A);", "note": "D = diagonal matrix of eigenvalues, V = eigenvectors" },
+          { "line": "disp(diag(D))", "note": "eigenvalues as a column vector" }
+        ]
+      },
+      "mistakes": ["Complex eigenvalues are normal — they just mean rotation is involved"],
+      "example": "PageRank: the dominant eigenvalue/vector of the web link matrix determines page importance."
+    },
+    {
+      "id": "eigenvectors",
+      "title": "Eigenvectors",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "v is an eigenvector for eigenvalue λ if Av = λv and v ≠ 0. Find them by solving (A−λI)v = 0.",
+      "intuition": "Eigenvectors are the 'special directions' that A doesn't rotate — only stretches. They reveal the natural axes of the transformation.",
+      "prereqs": ["eigenvalues", "null-space"],
+      "steps": [
+        { "text": "For each eigenvalue λ, compute A − λI.", "prereq": "eigenvalues" },
+        { "text": "Find null space of (A−λI) — every non-zero vector in it is an eigenvector.", "prereq": "null-space" },
+        { "text": "The eigenspace for λ = null space of (A−λI) = span of the eigenvectors for λ." },
+        { "text": "Geometric multiplicity = dim of eigenspace ≤ algebraic multiplicity." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[4.,2.],[1.,3.]])", "note": "" },
+          { "line": "vals, vecs = np.linalg.eig(A)", "note": "vecs[:,i] is eigenvector for vals[i]" },
+          { "line": "print(vecs[:, 0])", "note": "eigenvector for λ=5" },
+          { "line": "# Verify: Av = λv", "note": "" },
+          { "line": "lam0, v0 = vals[0], vecs[:,0]", "note": "" },
+          { "line": "print(np.allclose(A @ v0, lam0 * v0))", "note": "True" }
+        ],
+        "matlab": [
+          { "line": "[V, D] = eig(A);", "note": "columns of V are eigenvectors" },
+          { "line": "v1 = V(:, 1);", "note": "first eigenvector" },
+          { "line": "lambda1 = D(1,1);", "note": "corresponding eigenvalue" },
+          { "line": "disp(norm(A*v1 - lambda1*v1))", "note": "should be ≈ 0" }
+        ]
+      },
+      "mistakes": ["Eigenvectors are only defined up to scalar multiples — there's no unique eigenvector for a given eigenvalue"],
+      "example": "PCA: eigenvectors of the covariance matrix are the principal components (variance directions)."
+    },
+    {
+      "id": "diagonalization",
+      "title": "Diagonalization",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "A = PDP⁻¹ where D is diagonal (eigenvalues) and P has eigenvectors as columns.",
+      "intuition": "Diagonalization finds a basis where A acts as pure scaling. In that basis, Aᵏ is trivial — just raise each eigenvalue to the k-th power.",
+      "prereqs": ["eigenvectors", "matrix-inverse", "basis"],
+      "steps": [
+        { "text": "Find all eigenvalues λ₁,…,λₙ.", "prereq": "eigenvectors" },
+        { "text": "Find corresponding eigenvectors v₁,…,vₙ. For A to be diagonalizable, you need n linearly independent eigenvectors." },
+        { "text": "Build P = [v₁|v₂|…|vₙ] and D = diag(λ₁,…,λₙ).", "prereq": "basis" },
+        { "text": "Then A = PDP⁻¹, so Aᵏ = PDᵏP⁻¹.", "prereq": "matrix-inverse" }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[4.,2.],[1.,3.]])", "note": "" },
+          { "line": "vals, P = np.linalg.eig(A)", "note": "vals=eigenvalues, P=eigenvector matrix" },
+          { "line": "D = np.diag(vals)", "note": "diagonal matrix of eigenvalues" },
+          { "line": "P_inv = np.linalg.inv(P)", "note": "inverse of eigenvector matrix" },
+          { "line": "print(np.allclose(P @ D @ P_inv, A))", "note": "True — verify PDP⁻¹ = A" },
+          { "line": "# Compute A^10 easily:", "note": "" },
+          { "line": "A10 = P @ np.diag(vals**10) @ P_inv", "note": "much faster than repeated multiplication" }
+        ],
+        "matlab": [
+          { "line": "[P, D] = eig(A);", "note": "P columns = eigenvectors, D = diagonal eigenvalues" },
+          { "line": "disp(P * D * inv(P))", "note": "should recover A" },
+          { "line": "A10 = P * diag(diag(D).^10) * inv(P);", "note": "A to the 10th power" }
+        ]
+      },
+      "mistakes": ["Not all matrices are diagonalizable — repeated eigenvalues with deficient eigenspaces cause failure"],
+      "example": "Fibonacci sequence: the 2×2 Fibonacci matrix diagonalizes to give the closed-form formula."
+    },
+    {
+      "id": "inner-product",
+      "title": "Inner Product",
+      "category": "orthogonality",
+      "color": "#10b981",
+      "summary": "A generalization of the dot product — any operation ⟨u,v⟩ satisfying linearity, symmetry, and positive-definiteness.",
+      "intuition": "An inner product gives geometry to a vector space: angles, lengths, and orthogonality. The dot product is the most common inner product in ℝⁿ.",
+      "prereqs": ["dot-product"],
+      "steps": [
+        { "text": "Standard inner product in ℝⁿ: ⟨u,v⟩ = uᵀv = Σ uᵢvᵢ", "prereq": "dot-product" },
+        { "text": "Positive-definiteness: ⟨v,v⟩ > 0 for v ≠ 0" },
+        { "text": "Induced norm: ‖v‖ = √⟨v,v⟩" },
+        { "text": "Cauchy-Schwarz: |⟨u,v⟩| ≤ ‖u‖·‖v‖" }
+      ],
+      "code": {
+        "python": [
+          { "line": "u = np.array([1., 2., 3.])", "note": "" },
+          { "line": "v = np.array([4., 5., 6.])", "note": "" },
+          { "line": "inner = np.inner(u, v)", "note": "= u.T @ v for real vectors" },
+          { "line": "print(inner)", "note": "32.0" }
+        ],
+        "matlab": [
+          { "line": "u = [1; 2; 3];", "note": "" },
+          { "line": "v = [4; 5; 6];", "note": "" },
+          { "line": "inner = u' * v;", "note": "transpose then multiply = inner product" }
+        ]
+      },
+      "mistakes": ["For complex vectors, inner product is conjugate-linear in the first argument: ⟨u,v⟩ = ū·v"],
+      "example": "Signal processing: ⟨f,g⟩ = ∫f(t)g(t)dt is the L² inner product for functions."
+    },
+    {
+      "id": "orthogonality",
+      "title": "Orthogonality",
+      "category": "orthogonality",
+      "color": "#10b981",
+      "summary": "Vectors u and v are orthogonal if ⟨u,v⟩ = 0. A set of mutually orthogonal unit vectors is orthonormal.",
+      "intuition": "Orthogonal = perpendicular in the generalized sense. Orthonormal bases are the easiest to work with — coordinates are just dot products.",
+      "prereqs": ["inner-product"],
+      "steps": [
+        { "text": "u ⊥ v iff ⟨u,v⟩ = 0", "prereq": "inner-product" },
+        { "text": "Orthonormal: mutually orthogonal AND each has unit length." },
+        { "text": "For an orthonormal set Q, coordinates are simple: cᵢ = ⟨x, qᵢ⟩" },
+        { "text": "Pythagoras in any inner product space: ‖u+v‖² = ‖u‖² + ‖v‖² when u ⊥ v" }
+      ],
+      "code": {
+        "python": [
+          { "line": "u = np.array([1., -1., 0.])", "note": "" },
+          { "line": "v = np.array([1., 1., -2.])", "note": "" },
+          { "line": "print(np.dot(u,v))", "note": "0.0 → orthogonal" },
+          { "line": "u_norm = u / np.linalg.norm(u)", "note": "normalize to unit length" },
+          { "line": "v_norm = v / np.linalg.norm(v)", "note": "" }
+        ],
+        "matlab": [
+          { "line": "u = [1; -1; 0];", "note": "" },
+          { "line": "v = [1; 1; -2];", "note": "" },
+          { "line": "disp(dot(u, v))", "note": "0 → orthogonal" }
+        ]
+      },
+      "mistakes": ["Orthogonal ≠ orthonormal; orthonormal also requires unit length"],
+      "example": "i, j, k (the standard basis) are orthonormal. They're perpendicular and each has length 1."
+    },
+    {
+      "id": "projection",
+      "title": "Projection",
+      "category": "orthogonality",
+      "color": "#10b981",
+      "summary": "The projection of b onto subspace W is the closest point in W to b. Defined as proj_W(b) = A(AᵀA)⁻¹Aᵀb.",
+      "intuition": "Drop a perpendicular from b to the subspace. Where it lands is the projection. The error vector (b − proj) is always perpendicular to the subspace.",
+      "prereqs": ["orthogonality", "matrix-inverse"],
+      "steps": [
+        { "text": "Project b onto a single vector a: proj_a(b) = (aᵀb / aᵀa) · a", "prereq": "orthogonality" },
+        { "text": "Project onto a subspace spanned by columns of A: proj = A(AᵀA)⁻¹Aᵀb", "prereq": "matrix-inverse" },
+        { "text": "Projection matrix P = A(AᵀA)⁻¹Aᵀ; it satisfies P² = P (idempotent) and Pᵀ = P." },
+        { "text": "If A has orthonormal columns Q, then P = QQᵀ (much simpler)." }
+      ],
+      "code": {
+        "python": [
+          { "line": "a = np.array([2., 1.])", "note": "vector to project onto" },
+          { "line": "b = np.array([3., 4.])", "note": "vector to project" },
+          { "line": "proj = (np.dot(a,b) / np.dot(a,a)) * a", "note": "projection of b onto line spanned by a" },
+          { "line": "error = b - proj", "note": "perpendicular component" },
+          { "line": "print(np.dot(a, error))", "note": "≈ 0 — error is perpendicular to a" }
+        ],
+        "matlab": [
+          { "line": "a = [2; 1];", "note": "" },
+          { "line": "b = [3; 4];", "note": "" },
+          { "line": "proj = (a'*b)/(a'*a) * a;", "note": "scalar formula" },
+          { "line": "P = a*a'/(a'*a);", "note": "projection matrix" },
+          { "line": "disp(P*b)", "note": "same result" }
+        ]
+      },
+      "mistakes": ["The projection is onto the subspace, not onto a vector — a vector spans a 1-D subspace"],
+      "example": "Least-squares fitting: project b onto the column space of A to find the best-fit solution."
+    },
+    {
+      "id": "gram-schmidt",
+      "title": "Gram-Schmidt Process",
+      "category": "orthogonality",
+      "color": "#10b981",
+      "summary": "Converts any linearly independent set into an orthonormal basis for the same subspace.",
+      "intuition": "Take each vector, subtract off its projections onto all previous orthonormal vectors, then normalize. What remains is a new vector orthogonal to all previous ones.",
+      "prereqs": ["projection", "orthogonality"],
+      "steps": [
+        { "text": "Start: q₁ = v₁/‖v₁‖", "prereq": "orthogonality" },
+        { "text": "For k≥2: e_k = v_k − Σᵢ₌₁ᵏ⁻¹ ⟨v_k, qᵢ⟩qᵢ (subtract projections)", "prereq": "projection" },
+        { "text": "Normalize: q_k = e_k / ‖e_k‖" },
+        { "text": "Result: {q₁,…,qₖ} is orthonormal with same span as {v₁,…,vₖ}." }
+      ],
+      "code": {
+        "python": [
+          { "line": "def gram_schmidt(V):", "note": "V: columns are input vectors" },
+          { "line": "    Q = np.zeros_like(V, dtype=float)", "note": "" },
+          { "line": "    for i in range(V.shape[1]):", "note": "" },
+          { "line": "        v = V[:, i].copy()", "note": "" },
+          { "line": "        for j in range(i):", "note": "subtract projections onto previous q's" },
+          { "line": "            v -= np.dot(Q[:,j], V[:,i]) * Q[:,j]", "note": "" },
+          { "line": "        Q[:, i] = v / np.linalg.norm(v)", "note": "normalize" },
+          { "line": "    return Q", "note": "" }
+        ],
+        "matlab": [
+          { "line": "[Q, R] = qr(A, 0);", "note": "QR decomposition gives orthonormal Q (= Gram-Schmidt output)" },
+          { "line": "disp(Q' * Q)", "note": "should be identity — Q is orthonormal" }
+        ]
+      },
+      "mistakes": ["Numerical Gram-Schmidt can lose orthogonality; use Modified Gram-Schmidt or QR in practice"],
+      "example": "Orthonormal polynomial basis: Legendre polynomials are Gram-Schmidt applied to {1, x, x², …}."
+    },
+    {
+      "id": "qr-decomposition",
+      "title": "QR Decomposition",
+      "category": "decompositions",
+      "color": "#3b82f6",
+      "summary": "A = QR where Q has orthonormal columns and R is upper triangular.",
+      "intuition": "QR is the numerically stable form of Gram-Schmidt. Q provides an orthonormal basis; R encodes how the original columns are expressed in that basis.",
+      "prereqs": ["gram-schmidt"],
+      "steps": [
+        { "text": "Q columns are the Gram-Schmidt orthonormal vectors.", "prereq": "gram-schmidt" },
+        { "text": "R is upper triangular: Rᵢⱼ = ⟨qᵢ, vⱼ⟩ for i≤j" },
+        { "text": "For square A: Aᵀb = Rᵀ(Qᵀb) — use QR to solve normal equations stably." },
+        { "text": "QR is used inside eigenvalue algorithms (QR iteration)." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1.,2.],[3.,4.],[5.,6.]])", "note": "3×2 matrix" },
+          { "line": "Q, R = np.linalg.qr(A)", "note": "full QR decomposition" },
+          { "line": "print(Q.shape, R.shape)", "note": "(3,3) and (3,2) for full; (3,2) and (2,2) for thin" },
+          { "line": "Q, R = np.linalg.qr(A, mode='reduced')", "note": "thin QR — usually what you want" },
+          { "line": "print(np.allclose(Q @ R, A))", "note": "True" }
+        ],
+        "matlab": [
+          { "line": "[Q, R] = qr(A);", "note": "full QR" },
+          { "line": "[Q, R] = qr(A, 0);", "note": "thin/economy QR" },
+          { "line": "disp(Q*R)", "note": "recovers A" }
+        ]
+      },
+      "mistakes": ["Full vs thin QR: thin QR (same column count) is usually what you need for least squares"],
+      "example": "Solving least squares Ax≈b: x = R⁻¹(Qᵀb) — more stable than normal equations."
+    },
+    {
+      "id": "lu-decomposition",
+      "title": "LU Decomposition",
+      "category": "decompositions",
+      "color": "#3b82f6",
+      "summary": "A = LU (or PA = LU) where L is lower triangular and U is upper triangular.",
+      "intuition": "LU is Gaussian elimination stored as a matrix. Once computed, you can solve Ax = b for many different b vectors cheaply by forward/back substitution.",
+      "prereqs": ["rref", "matrix-operations"],
+      "steps": [
+        { "text": "Gaussian elimination produces U (upper triangular); the multipliers fill L (lower triangular).", "prereq": "rref" },
+        { "text": "P is a permutation matrix for row pivoting — always needed in practice.", "prereq": "matrix-operations" },
+        { "text": "Solve Ly = Pb (forward substitution), then Ux = y (back substitution)." },
+        { "text": "Cost: O(n³) once, then O(n²) per new right-hand side." }
+      ],
+      "code": {
+        "python": [
+          { "line": "from scipy.linalg import lu", "note": "scipy has LU with pivoting" },
+          { "line": "A = np.array([[2.,1.,-1.],[-.5,.5,.5],[.5,-1.,-1.5]])", "note": "" },
+          { "line": "P, L, U = lu(A)", "note": "PA = LU" },
+          { "line": "print(np.allclose(P @ A, L @ U))", "note": "True" }
+        ],
+        "matlab": [
+          { "line": "[L, U, P] = lu(A);", "note": "PA = LU — note different argument order from scipy" },
+          { "line": "disp(P*A - L*U)", "note": "should be ≈ zero matrix" }
+        ]
+      },
+      "mistakes": ["Without partial pivoting (P), LU can fail even for invertible matrices"],
+      "example": "FEM solvers: factor the stiffness matrix once, then solve for hundreds of load vectors cheaply."
+    },
+    {
+      "id": "orthogonal-matrices",
+      "title": "Orthogonal Matrices",
+      "category": "orthogonality",
+      "color": "#10b981",
+      "summary": "A square matrix Q is orthogonal if QᵀQ = QQᵀ = I, i.e., Q⁻¹ = Qᵀ.",
+      "intuition": "Orthogonal matrices are rigid rotations/reflections — they preserve lengths and angles. The columns (and rows) form an orthonormal basis.",
+      "prereqs": ["orthogonality", "matrix-inverse"],
+      "steps": [
+        { "text": "Equivalent conditions: columns orthonormal, rows orthonormal, Qᵀ = Q⁻¹.", "prereq": "orthogonality" },
+        { "text": "|det(Q)| = 1: det = +1 for rotation, −1 for reflection.", "prereq": "matrix-inverse" },
+        { "text": "‖Qv‖ = ‖v‖ for all v — lengths preserved." },
+        { "text": "Eigenvalues of a real orthogonal matrix have absolute value 1." }
+      ],
+      "code": {
+        "python": [
+          { "line": "theta = np.pi/4", "note": "45 degree rotation" },
+          { "line": "Q = np.array([[np.cos(theta), -np.sin(theta)],", "note": "" },
+          { "line": "              [np.sin(theta),  np.cos(theta)]])", "note": "2D rotation matrix" },
+          { "line": "print(np.allclose(Q.T @ Q, np.eye(2)))", "note": "True — it's orthogonal" },
+          { "line": "print(np.linalg.det(Q))", "note": "≈ 1.0 — rotation (not reflection)" }
+        ],
+        "matlab": [
+          { "line": "theta = pi/4;", "note": "" },
+          { "line": "Q = [cos(theta) -sin(theta); sin(theta) cos(theta)];", "note": "" },
+          { "line": "disp(Q'*Q)", "note": "identity — Q is orthogonal" }
+        ]
+      },
+      "mistakes": ["Real orthogonal matrices are not the same as 'orthogonal vectors' — the term is overloaded"],
+      "example": "3-D rotation matrices (used in robotics and 3-D graphics) are all orthogonal."
+    },
+    {
+      "id": "symmetric-matrices",
+      "title": "Symmetric Matrices",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "A matrix S is symmetric if S = Sᵀ. Symmetric matrices always have real eigenvalues and orthogonal eigenvectors.",
+      "intuition": "Symmetric matrices are the most well-behaved — they always diagonalize with an orthonormal basis. Covariance matrices, Laplacians, and Hessians are all symmetric.",
+      "prereqs": ["matrix-operations", "eigenvalues"],
+      "steps": [
+        { "text": "S = Sᵀ iff Sᵢⱼ = Sⱼᵢ for all i,j.", "prereq": "matrix-operations" },
+        { "text": "Spectral Theorem: every symmetric matrix has real eigenvalues.", "prereq": "eigenvalues" },
+        { "text": "Eigenvectors for distinct eigenvalues are orthogonal." },
+        { "text": "S is always orthogonally diagonalizable: S = QΛQᵀ with Q orthogonal." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1.,2.],[2.,3.]])", "note": "symmetric: A=A.T" },
+          { "line": "print(np.allclose(A, A.T))", "note": "True" },
+          { "line": "vals, vecs = np.linalg.eigh(A)", "note": "eigh is for symmetric — more stable than eig" },
+          { "line": "print(vals)", "note": "real eigenvalues guaranteed" },
+          { "line": "print(np.allclose(vecs.T @ vecs, np.eye(2)))", "note": "orthonormal eigenvectors" }
+        ],
+        "matlab": [
+          { "line": "A = [1 2; 2 3];", "note": "symmetric" },
+          { "line": "[V, D] = eig(A);", "note": "for symmetric A, V is automatically orthogonal" },
+          { "line": "disp(V'*V)", "note": "≈ identity" }
+        ]
+      },
+      "mistakes": ["Use np.linalg.eigh (not eig) for symmetric matrices — it's more stable and guarantees real values"],
+      "example": "Covariance matrix of data is always symmetric positive semi-definite."
+    },
+    {
+      "id": "spectral-theorem",
+      "title": "Spectral Theorem",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "Every real symmetric matrix A can be written A = QΛQᵀ where Q is orthogonal and Λ is diagonal with real eigenvalues.",
+      "intuition": "The spectral theorem says symmetric matrices are 'pure stretching' in an orthonormal coordinate system — no rotation, no shearing. Just scaling along perpendicular axes.",
+      "prereqs": ["symmetric-matrices", "orthogonal-matrices", "diagonalization"],
+      "steps": [
+        { "text": "Find eigenvalues λ₁,…,λₙ of A (all real by symmetry).", "prereq": "symmetric-matrices" },
+        { "text": "Find corresponding eigenvectors; apply Gram-Schmidt within each eigenspace to get orthonormal eigenvectors." },
+        { "text": "Stack eigenvectors as columns of Q: Q is orthogonal.", "prereq": "orthogonal-matrices" },
+        { "text": "A = QΛQᵀ (note Qᵀ not Q⁻¹ — they're equal for orthogonal Q).", "prereq": "diagonalization" }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[5.,2.],[2.,2.]])", "note": "symmetric matrix" },
+          { "line": "vals, Q = np.linalg.eigh(A)", "note": "eigh guarantees orthogonal Q" },
+          { "line": "Lambda = np.diag(vals)", "note": "diagonal eigenvalue matrix" },
+          { "line": "A_reconstructed = Q @ Lambda @ Q.T", "note": "spectral decomposition" },
+          { "line": "print(np.allclose(A, A_reconstructed))", "note": "True" }
+        ],
+        "matlab": [
+          { "line": "A = [5 2; 2 2];", "note": "" },
+          { "line": "[Q, Lambda] = eig(A);", "note": "for symmetric A, Q is orthogonal" },
+          { "line": "disp(Q * Lambda * Q')", "note": "recovers A via spectral decomp" }
+        ]
+      },
+      "mistakes": ["The spectral theorem applies to REAL SYMMETRIC matrices; for complex, it's Hermitian matrices"],
+      "example": "PCA uses the spectral theorem on the covariance matrix to find uncorrelated directions of variance."
+    },
+    {
+      "id": "orthogonal-diagonalization",
+      "title": "Orthogonal Diagonalization",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "A symmetric matrix A is orthogonally diagonalizable: A = PDP⁻¹ = PDPᵀ where P is orthogonal.",
+      "intuition": "Ordinary diagonalization uses any eigenvector basis. Orthogonal diagonalization uses an ORTHONORMAL eigenvector basis — this is always possible for symmetric matrices and gives Pᵀ = P⁻¹.",
+      "prereqs": ["spectral-theorem", "gram-schmidt"],
+      "steps": [
+        { "text": "Find eigenvalues. For each, find the eigenspace (null space of A−λI).", "prereq": "spectral-theorem" },
+        { "text": "Within each eigenspace, apply Gram-Schmidt if the eigenspace has dimension > 1.", "prereq": "gram-schmidt" },
+        { "text": "Collect all orthonormal eigenvectors into P. Form D = diag(eigenvalues)." },
+        { "text": "Verify: PᵀP = I (orthogonal) and A = PDPᵀ." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[3.,1.,1.],[1.,3.,1.],[1.,1.,3.]])", "note": "symmetric 3×3" },
+          { "line": "vals, P = np.linalg.eigh(A)", "note": "eigh gives orthonormal P for symmetric A" },
+          { "line": "D = np.diag(vals)", "note": "" },
+          { "line": "print(np.allclose(P @ D @ P.T, A))", "note": "True — orthogonal diagonalization" },
+          { "line": "print(np.allclose(P.T @ P, np.eye(3)))", "note": "True — P is orthogonal" }
+        ],
+        "matlab": [
+          { "line": "A = [3 1 1; 1 3 1; 1 1 3];", "note": "" },
+          { "line": "[P, D] = eig(A);", "note": "for symmetric A, P is automatically orthogonal" },
+          { "line": "disp(P * D * P')", "note": "= A" },
+          { "line": "disp(P' * P)", "note": "≈ identity" }
+        ]
+      },
+      "mistakes": ["If an eigenvalue has multiplicity > 1, apply Gram-Schmidt to its eigenspace before assembling P"],
+      "example": "Stress analysis: principal stresses and axes from the (symmetric) stress tensor via orthogonal diagonalization."
+    },
+    {
+      "id": "svd",
+      "title": "Singular Value Decomposition (SVD)",
+      "category": "decompositions",
+      "color": "#3b82f6",
+      "summary": "Every matrix A = UΣVᵀ where U,V are orthogonal and Σ is diagonal with non-negative singular values.",
+      "intuition": "SVD is the most general decomposition — it works for ANY matrix (not just square or symmetric). It reveals the 'true geometry' of a linear transformation: rotate, scale along axes, rotate again.",
+      "prereqs": ["orthogonal-diagonalization", "orthogonal-matrices"],
+      "steps": [
+        { "text": "Singular values σᵢ = √(eigenvalues of AᵀA). Always real, non-negative.", "prereq": "orthogonal-diagonalization" },
+        { "text": "V: orthonormal eigenvectors of AᵀA (right singular vectors)." },
+        { "text": "U: orthonormal eigenvectors of AAᵀ (left singular vectors). Or compute uᵢ = Avᵢ/σᵢ.", "prereq": "orthogonal-matrices" },
+        { "text": "Rank = number of non-zero singular values. Condition number = σ_max/σ_min." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[3.,2.,2.],[2.,3.,-2.]])", "note": "2×3 matrix" },
+          { "line": "U, s, Vt = np.linalg.svd(A)", "note": "s = singular values (not a diagonal matrix)" },
+          { "line": "print(s)", "note": "singular values in decreasing order" },
+          { "line": "# Reconstruct A:", "note": "" },
+          { "line": "Sigma = np.zeros_like(A, dtype=float)", "note": "" },
+          { "line": "Sigma[:len(s), :len(s)] = np.diag(s)", "note": "" },
+          { "line": "print(np.allclose(U @ Sigma @ Vt, A))", "note": "True" }
+        ],
+        "matlab": [
+          { "line": "[U, S, V] = svd(A);", "note": "S is the diagonal Σ matrix (not just values)" },
+          { "line": "disp(U * S * V')", "note": "recovers A" },
+          { "line": "[U, S, V] = svd(A, 'econ');", "note": "economy SVD — fewer columns" }
+        ]
+      },
+      "mistakes": ["NumPy returns s as a vector; MATLAB returns S as a matrix — know which you have before using"],
+      "example": "Image compression: keep only the k largest singular values to get a rank-k approximation."
+    },
+    {
+      "id": "least-squares",
+      "title": "Least Squares",
+      "category": "applications",
+      "color": "#ef4444",
+      "summary": "When Ax=b has no solution, find x̂ minimizing ‖b−Ax‖². The solution satisfies the normal equations AᵀAx̂ = Aᵀb.",
+      "intuition": "Least squares finds the closest solution when exact solution doesn't exist — the projection of b onto the column space of A.",
+      "prereqs": ["projection", "qr-decomposition"],
+      "steps": [
+        { "text": "b is inconsistent: it's not in col(A). Project b onto col(A).", "prereq": "projection" },
+        { "text": "Normal equations: AᵀAx̂ = Aᵀb." },
+        { "text": "If A has full column rank, x̂ = (AᵀA)⁻¹Aᵀb (pseudoinverse)." },
+        { "text": "More stable: use QR decomposition to solve R x̂ = Qᵀb.", "prereq": "qr-decomposition" }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1.,1.],[1.,2.],[1.,3.]])", "note": "design matrix" },
+          { "line": "b = np.array([6.,5.,7.])", "note": "data / observations" },
+          { "line": "x_hat, _, _, _ = np.linalg.lstsq(A, b, rcond=None)", "note": "least squares solution" },
+          { "line": "print(x_hat)", "note": "best-fit line coefficients" }
+        ],
+        "matlab": [
+          { "line": "A = [1 1; 1 2; 1 3];", "note": "" },
+          { "line": "b = [6; 5; 7];", "note": "" },
+          { "line": "x_hat = A \\ b;", "note": "MATLAB \\ does least squares automatically when A is not square" }
+        ]
+      },
+      "mistakes": ["Normal equations (AᵀA)x = Aᵀb are mathematically correct but numerically unstable — prefer QR or lstsq"],
+      "example": "Linear regression: fit a line y = a + bx to data points using least squares."
+    },
+    {
+      "id": "pseudoinverse",
+      "title": "Moore-Penrose Pseudoinverse",
+      "category": "decompositions",
+      "color": "#3b82f6",
+      "summary": "A⁺ = VΣ⁺Uᵀ gives the best possible 'inverse' for any matrix — exact when A is invertible.",
+      "intuition": "The pseudoinverse solves Ax=b as well as possible: if it's consistent it gives the exact solution; if not, it gives the minimum-norm least-squares solution.",
+      "prereqs": ["svd", "least-squares"],
+      "steps": [
+        { "text": "From SVD A = UΣVᵀ, form Σ⁺ by inverting non-zero singular values.", "prereq": "svd" },
+        { "text": "A⁺ = VΣ⁺Uᵀ" },
+        { "text": "The least-squares solution x̂ = A⁺b.", "prereq": "least-squares" },
+        { "text": "If A is square and invertible: A⁺ = A⁻¹." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1.,2.],[3.,4.],[5.,6.]])", "note": "tall matrix (more rows than cols)" },
+          { "line": "A_plus = np.linalg.pinv(A)", "note": "Moore-Penrose pseudoinverse" },
+          { "line": "b = np.array([1., 2., 3.])", "note": "" },
+          { "line": "x_hat = A_plus @ b", "note": "min-norm least-squares solution" }
+        ],
+        "matlab": [
+          { "line": "A_plus = pinv(A);", "note": "pseudoinverse via SVD" },
+          { "line": "x_hat = A_plus * b;", "note": "best solution" }
+        ]
+      },
+      "mistakes": ["pinv is slow for large matrices — for least squares, use lstsq or QR instead"],
+      "example": "Robotics: pseudoinverse of the Jacobian maps desired end-effector motion to joint velocities."
+    },
+    {
+      "id": "linear-transformations",
+      "title": "Linear Transformations",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "A function T: ℝⁿ→ℝᵐ is linear if T(u+v)=T(u)+T(v) and T(cv)=cT(v).",
+      "intuition": "Linear transformations preserve the grid lines of vector space — lines stay straight, origin stays fixed. Every linear transformation has a matrix representation.",
+      "prereqs": ["matrix-operations", "basis"],
+      "steps": [
+        { "text": "Linearity conditions: additivity and homogeneity.", "prereq": "matrix-operations" },
+        { "text": "Matrix of T: columns are T(e₁), T(e₂), …, T(eₙ) — apply T to each basis vector.", "prereq": "basis" },
+        { "text": "Kernel = null space of A; Image = column space of A." },
+        { "text": "T is one-to-one iff kernel = {0}; onto iff image = ℝᵐ." }
+      ],
+      "code": {
+        "python": [
+          { "line": "# Rotation by 90 degrees in R^2", "note": "" },
+          { "line": "T = np.array([[0.,-1.],[1.,0.]])", "note": "rotate: T(e1)=[0,1], T(e2)=[-1,0]" },
+          { "line": "v = np.array([3., 1.])", "note": "" },
+          { "line": "print(T @ v)", "note": "[-1, 3] — rotated 90° counterclockwise" }
+        ],
+        "matlab": [
+          { "line": "T = [0 -1; 1 0];", "note": "90° rotation matrix" },
+          { "line": "v = [3; 1];", "note": "" },
+          { "line": "disp(T*v)", "note": "[-1; 3]" }
+        ]
+      },
+      "mistakes": ["Not every function from ℝⁿ to ℝᵐ is linear — check T(0) = 0 first"],
+      "example": "Differentiation of polynomials is a linear transformation between polynomial spaces."
+    },
+    {
+      "id": "change-of-basis",
+      "title": "Change of Basis",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "Convert coordinates between different bases using the change-of-basis matrix P.",
+      "intuition": "A vector doesn't change — only its coordinates change when you switch bases. The change-of-basis matrix converts between these coordinate representations.",
+      "prereqs": ["basis", "matrix-inverse"],
+      "steps": [
+        { "text": "If B = {b₁,…,bₙ} is a basis, build matrix P with bᵢ as columns.", "prereq": "basis" },
+        { "text": "Standard → B coordinates: [x]_B = P⁻¹x.", "prereq": "matrix-inverse" },
+        { "text": "B → standard coordinates: x = P[x]_B." },
+        { "text": "Matrix A in basis B: [A]_B = P⁻¹AP (similar matrices represent same transformation)." }
+      ],
+      "code": {
+        "python": [
+          { "line": "b1 = np.array([1.,1.])", "note": "basis vector 1" },
+          { "line": "b2 = np.array([1.,-1.])", "note": "basis vector 2" },
+          { "line": "P = np.column_stack([b1, b2])", "note": "change-of-basis matrix" },
+          { "line": "x = np.array([3., 1.])", "note": "vector in standard coords" },
+          { "line": "x_B = np.linalg.solve(P, x)", "note": "coordinates in B-basis" },
+          { "line": "print(P @ x_B)", "note": "back to standard: [3, 1]" }
+        ],
+        "matlab": [
+          { "line": "P = [b1, b2];", "note": "basis matrix" },
+          { "line": "x_B = P \\ x;", "note": "B-coordinates" },
+          { "line": "disp(P * x_B)", "note": "back to standard" }
+        ]
+      },
+      "mistakes": ["The change-of-basis matrix P goes from B-coordinates TO standard, not the other way"],
+      "example": "Eigenvector basis: in the eigenvector basis, a diagonalizable matrix acts as pure scaling."
+    },
+    {
+      "id": "positive-definite",
+      "title": "Positive Definite Matrices",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "A symmetric matrix S is positive definite if xᵀSx > 0 for all x ≠ 0, equivalently all eigenvalues > 0.",
+      "intuition": "Positive definite matrices are 'energy functions' — they always give a positive result when you plug in any non-zero vector. They have a unique Cholesky factorization and a unique minimum.",
+      "prereqs": ["symmetric-matrices", "eigenvalues"],
+      "steps": [
+        { "text": "Test 1: all eigenvalues > 0.", "prereq": "eigenvalues" },
+        { "text": "Test 2: all leading principal minors > 0 (Sylvester's criterion).", "prereq": "symmetric-matrices" },
+        { "text": "Test 3: S = AᵀA for some matrix A with independent columns." },
+        { "text": "Cholesky: if S is PD, then S = LLᵀ where L is lower triangular with positive diagonal." }
+      ],
+      "code": {
+        "python": [
+          { "line": "S = np.array([[4.,2.],[2.,3.]])", "note": "symmetric matrix" },
+          { "line": "vals = np.linalg.eigvalsh(S)", "note": "eigvalsh for symmetric — guaranteed real" },
+          { "line": "print(all(vals > 0))", "note": "True → positive definite" },
+          { "line": "L = np.linalg.cholesky(S)", "note": "Cholesky: S = L @ L.T" },
+          { "line": "print(np.allclose(L @ L.T, S))", "note": "True" }
+        ],
+        "matlab": [
+          { "line": "S = [4 2; 2 3];", "note": "" },
+          { "line": "try L = chol(S, 'lower'); disp('PD'); catch; disp('not PD'); end", "note": "chol fails iff not PD" }
+        ]
+      },
+      "mistakes": ["Semi-definite (xᵀSx ≥ 0) allows zero eigenvalues — not positive definite"],
+      "example": "Covariance matrices are always positive semi-definite (and positive definite if non-degenerate)."
+    },
+    {
+      "id": "cholesky",
+      "title": "Cholesky Decomposition",
+      "category": "decompositions",
+      "color": "#3b82f6",
+      "summary": "For symmetric positive definite S: S = LLᵀ where L is lower triangular with positive diagonal.",
+      "intuition": "Cholesky is the 'square root' of a positive definite matrix. Twice as fast as LU for symmetric matrices and guaranteed to be stable.",
+      "prereqs": ["positive-definite", "lu-decomposition"],
+      "steps": [
+        { "text": "Only works on symmetric positive definite matrices.", "prereq": "positive-definite" },
+        { "text": "Compute L column by column using the Cholesky algorithm." },
+        { "text": "Half the work of LU because symmetry is exploited.", "prereq": "lu-decomposition" },
+        { "text": "If cholesky fails (matrix not PD), you know the matrix is singular or indefinite." }
+      ],
+      "code": {
+        "python": [
+          { "line": "S = np.array([[25.,15.,-5.],[15.,18.,0.],[-5.,0.,11.]])", "note": "SPD matrix" },
+          { "line": "L = np.linalg.cholesky(S)", "note": "lower triangular factor" },
+          { "line": "print(np.allclose(L @ L.T, S))", "note": "True" },
+          { "line": "# Solve Sx = b via Cholesky:", "note": "" },
+          { "line": "b = np.array([10., 5., 3.])", "note": "" },
+          { "line": "y = np.linalg.solve(L, b)", "note": "forward sub: Ly = b" },
+          { "line": "x = np.linalg.solve(L.T, y)", "note": "back sub: Lᵀx = y" }
+        ],
+        "matlab": [
+          { "line": "L = chol(S, 'lower');", "note": "'lower' gives lower triangular L" },
+          { "line": "disp(L * L')", "note": "= S" }
+        ]
+      },
+      "mistakes": ["NumPy's cholesky returns lower triangular L where S = L @ L.T, not L.T @ L"],
+      "example": "Monte Carlo simulation: Cholesky of the covariance matrix generates correlated random samples."
+    },
+    {
+      "id": "vector-spaces",
+      "title": "Vector Spaces & Subspaces",
+      "category": "foundations",
+      "color": "#6366f1",
+      "summary": "A vector space satisfies 8 axioms. A subspace is a subset closed under addition and scalar multiplication.",
+      "intuition": "Any set where you can add elements and scale them — and the results stay in the set — is a vector space. Subspaces are 'smaller' vector spaces living inside larger ones.",
+      "prereqs": ["vectors"],
+      "steps": [
+        { "text": "Subspace test: (1) contains 0, (2) closed under addition, (3) closed under scalar mult.", "prereq": "vectors" },
+        { "text": "Key subspaces of A: null space, column space, row space, left null space." },
+        { "text": "Span of a set S = smallest subspace containing S." }
+      ],
+      "code": {
+        "python": [
+          { "line": "# Check if [1,2,3] is in the span of {[1,0,1], [0,1,1]}", "note": "" },
+          { "line": "A = np.array([[1.,0.],[0.,1.],[1.,1.]])", "note": "columns are the spanning set" },
+          { "line": "b = np.array([1., 2., 3.])", "note": "vector to test" },
+          { "line": "_, res, _, _ = np.linalg.lstsq(A, b, rcond=None)", "note": "residual" },
+          { "line": "print('in span:', np.allclose(res, 0))", "note": "False → not in span" }
+        ],
+        "matlab": [
+          { "line": "A = [1 0; 0 1; 1 1];", "note": "" },
+          { "line": "b = [1; 2; 3];", "note": "" },
+          { "line": "disp(rank([A, b]) == rank(A))", "note": "True iff b in col(A)" }
+        ]
+      },
+      "mistakes": ["A subspace must contain the zero vector — planes not through the origin are NOT subspaces"],
+      "example": "All 2×2 symmetric matrices form a 3-dimensional vector space (dimension = 3)."
+    },
+    {
+      "id": "four-subspaces",
+      "title": "The Four Fundamental Subspaces",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "Every m×n matrix A has four associated subspaces: col(A), null(A), row(A), left null(A).",
+      "intuition": "These four subspaces come in two orthogonal pairs. Understanding them reveals the complete geometry of a linear system.",
+      "prereqs": ["null-space", "column-space", "rank-nullity"],
+      "steps": [
+        { "text": "Column space col(A) ⊆ ℝᵐ, dim = r.", "prereq": "column-space" },
+        { "text": "Null space null(A) ⊆ ℝⁿ, dim = n−r.", "prereq": "null-space" },
+        { "text": "Row space row(A) = col(Aᵀ) ⊆ ℝⁿ, dim = r.", "prereq": "rank-nullity" },
+        { "text": "Left null space null(Aᵀ) ⊆ ℝᵐ, dim = m−r." },
+        { "text": "Orthogonality: col(A) ⊥ null(Aᵀ) and row(A) ⊥ null(A)." }
+      ],
+      "code": {
+        "python": [
+          { "line": "from sympy import Matrix", "note": "" },
+          { "line": "A = Matrix([[1,2,3],[4,5,6],[7,8,9]])", "note": "rank 2" },
+          { "line": "print('Col space:', A.columnspace())", "note": "2 basis vectors" },
+          { "line": "print('Null space:', A.nullspace())", "note": "1 basis vector" },
+          { "line": "print('Row space:', A.T.columnspace())", "note": "= col space of Aᵀ" },
+          { "line": "print('Left null:', A.T.nullspace())", "note": "1 basis vector" }
+        ],
+        "matlab": [
+          { "line": "A = [1 2 3; 4 5 6; 7 8 9];", "note": "rank 2" },
+          { "line": "disp(orth(A))", "note": "col space" },
+          { "line": "disp(null(A,'r'))", "note": "null space" },
+          { "line": "disp(orth(A'))", "note": "row space" },
+          { "line": "disp(null(A'))", "note": "left null space" }
+        ]
+      },
+      "mistakes": ["Row space and column space have the same dimension (rank), but live in different spaces"],
+      "example": "Network flows: null space = circulations, left null space = cuts. The four subspaces reveal flow structure."
+    },
+    {
+      "id": "markov-chains",
+      "title": "Markov Chains",
+      "category": "applications",
+      "color": "#ef4444",
+      "summary": "A Markov chain is a process where the state at step k+1 depends only on step k. The steady state is an eigenvector.",
+      "intuition": "Multiply the state vector by the transition matrix each step. Eventually it converges to the steady-state distribution — the eigenvector for eigenvalue 1.",
+      "prereqs": ["eigenvalues", "eigenvectors"],
+      "steps": [
+        { "text": "Transition matrix A: Aᵢⱼ = probability of going from state j to state i.", "prereq": "eigenvalues" },
+        { "text": "Columns sum to 1 (stochastic matrix); eigenvalue 1 always exists.", "prereq": "eigenvectors" },
+        { "text": "State at step k: xₖ = Aᵏx₀. As k→∞, xₖ → steady state." },
+        { "text": "Steady state: find null space of (A−I) — same as eigenvector for λ=1." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[0.9,0.2],[0.1,0.8]])", "note": "2-state Markov chain" },
+          { "line": "x0 = np.array([1.,0.])", "note": "start in state 1" },
+          { "line": "x100 = np.linalg.matrix_power(A,100) @ x0", "note": "after 100 steps" },
+          { "line": "print(x100)", "note": "≈ steady state" },
+          { "line": "vals, vecs = np.linalg.eig(A)", "note": "find steady state exactly" },
+          { "line": "ss = vecs[:, np.isclose(vals, 1)]", "note": "eigenvector for λ=1" }
+        ],
+        "matlab": [
+          { "line": "A = [0.9 0.2; 0.1 0.8];", "note": "" },
+          { "line": "x100 = mpower(A, 100) * [1; 0];", "note": "state after 100 steps" }
+        ]
+      },
+      "mistakes": ["Columns must sum to 1, not rows — this is the column stochastic convention"],
+      "example": "Google PageRank: web pages as states, hyperlinks as transitions, steady state = page importance."
+    },
+    {
+      "id": "quadratic-forms",
+      "title": "Quadratic Forms",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "A quadratic form Q(x) = xᵀAx for symmetric A. Its sign (positive/negative/indefinite) is determined by eigenvalues.",
+      "intuition": "A quadratic form is a multi-variable generalization of ax² — it's a 'bowl' in n-D space. Positive definite = bowl opening up, negative definite = bowl opening down, indefinite = saddle.",
+      "prereqs": ["positive-definite", "spectral-theorem"],
+      "steps": [
+        { "text": "Write Q(x) = xᵀAx where A is the associated symmetric matrix.", "prereq": "positive-definite" },
+        { "text": "Diagonalize A = QΛQᵀ, change variables y = Qᵀx.", "prereq": "spectral-theorem" },
+        { "text": "Q(x) = Σ λᵢyᵢ² (sum of squares — the 'principal axes form')." },
+        { "text": "Sign of Q depends on signs of eigenvalues." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1.,1.],[1.,2.]])", "note": "symmetric matrix" },
+          { "line": "def Q(x): return x @ A @ x", "note": "quadratic form Q(x) = xᵀAx" },
+          { "line": "print(Q(np.array([1.,0.])))", "note": "= 1 > 0" },
+          { "line": "print(Q(np.array([1.,-1.])))", "note": "= 1 - 2 + 2 = 1 > 0" },
+          { "line": "print(all(np.linalg.eigvalsh(A) > 0))", "note": "True → positive definite" }
+        ],
+        "matlab": [
+          { "line": "A = [1 1; 1 2];", "note": "" },
+          { "line": "x = [1; -1];", "note": "" },
+          { "line": "disp(x'*A*x)", "note": "quadratic form evaluated at x" }
+        ]
+      },
+      "mistakes": ["The matrix A of a quadratic form must be symmetric — if it's not, symmetrize it first: A = (A+Aᵀ)/2"],
+      "example": "Inertia tensor: Q(ω) = ωᵀIω is the rotational kinetic energy (quadratic form)."
+    },
+    {
+      "id": "diagonalization-test",
+      "title": "Diagonalizability Test",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "A matrix is diagonalizable iff it has n linearly independent eigenvectors iff geometric multiplicity = algebraic multiplicity for every eigenvalue.",
+      "intuition": "A repeated eigenvalue might cause problems if the eigenspace is 'too small' (defective). The test: enough independent eigenvectors?",
+      "prereqs": ["eigenvectors", "linear-independence"],
+      "steps": [
+        { "text": "Find all eigenvalues and their algebraic multiplicities (root multiplicities of char. poly.).", "prereq": "eigenvectors" },
+        { "text": "For each eigenvalue, find dim of null(A−λI) = geometric multiplicity.", "prereq": "linear-independence" },
+        { "text": "A is diagonalizable iff geom. mult. = alg. mult. for every eigenvalue." },
+        { "text": "Sufficient condition: n distinct eigenvalues guarantees diagonalizability." }
+      ],
+      "code": {
+        "python": [
+          { "line": "from sympy import Matrix", "note": "" },
+          { "line": "A = Matrix([[5,1],[0,5]])", "note": "repeated eigenvalue λ=5, NOT diagonalizable" },
+          { "line": "print(A.eigenvals())", "note": "{5: 2} — alg mult = 2" },
+          { "line": "print(A.eigenvects())", "note": "only 1 eigenvector — geom mult = 1 < 2: defective" },
+          { "line": "B = Matrix([[5,0],[0,5]])", "note": "also λ=5 repeated, but IS diagonalizable (it's 5I)" },
+          { "line": "print(B.eigenvects())", "note": "2 independent eigenvectors" }
+        ],
+        "matlab": [
+          { "line": "A = [5 1; 0 5];", "note": "defective — Jordan form, not diagonal" },
+          { "line": "[V, D] = eig(A);", "note": "MATLAB still returns something, but V is not well-conditioned" },
+          { "line": "disp(rank(V))", "note": "= 1 (only 1 independent eigenvector)" }
+        ]
+      },
+      "mistakes": ["All distinct eigenvalues → diagonalizable; repeated eigenvalues → CHECK geometric multiplicity"],
+      "example": "The identity matrix I has λ=1 with multiplicity n but IS diagonalizable (it already is diagonal)."
+    },
+    {
+      "id": "similarity",
+      "title": "Matrix Similarity",
+      "category": "spectral",
+      "color": "#f59e0b",
+      "summary": "A and B are similar if B = P⁻¹AP for some invertible P. Similar matrices represent the same linear transformation in different bases.",
+      "intuition": "Similarity is a change of basis. If you change the coordinates you use, the same transformation looks like a different matrix — but it IS the same transformation.",
+      "prereqs": ["change-of-basis", "diagonalization"],
+      "steps": [
+        { "text": "Similar matrices have the same eigenvalues, determinant, trace, and rank.", "prereq": "diagonalization" },
+        { "text": "B = P⁻¹AP means B is A in the P-basis.", "prereq": "change-of-basis" },
+        { "text": "Diagonalization is a special case: D = P⁻¹AP where D is diagonal." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[4.,2.],[1.,3.]])", "note": "" },
+          { "line": "P = np.array([[2.,1.],[1.,-1.]])", "note": "invertible change-of-basis matrix" },
+          { "line": "B = np.linalg.inv(P) @ A @ P", "note": "B is similar to A" },
+          { "line": "print(np.linalg.eigvals(A))", "note": "same eigenvalues as B" },
+          { "line": "print(np.linalg.eigvals(B))", "note": "same" }
+        ],
+        "matlab": [
+          { "line": "B = inv(P) * A * P;", "note": "similar matrix" },
+          { "line": "disp(eig(A))", "note": "same eigenvalues" },
+          { "line": "disp(eig(B))", "note": "same eigenvalues" }
+        ]
+      },
+      "mistakes": ["Similar matrices have the same eigenvalues but not the same eigenvectors"],
+      "example": "A rotation matrix and its diagonal form are similar — same rotation, described in different coordinate systems."
+    },
+    {
+      "id": "matrix-exponential",
+      "title": "Matrix Exponential",
+      "category": "applications",
+      "color": "#ef4444",
+      "summary": "eᴬ = Σ Aᵏ/k! solves differential equations ẋ = Ax: the solution is x(t) = eᴬᵗx₀.",
+      "intuition": "The matrix exponential is to ODEs what the scalar exponential is to scalar ODEs. Diagonalization makes it computable: eᴬ = PeᴰP⁻¹.",
+      "prereqs": ["diagonalization", "eigenvalues"],
+      "steps": [
+        { "text": "For diagonal D: eᴰ = diag(eᵈ¹, eᵈ², …)", "prereq": "eigenvalues" },
+        { "text": "For diagonalizable A = PDP⁻¹: eᴬ = PeᴰP⁻¹", "prereq": "diagonalization" },
+        { "text": "Solution to ẋ = Ax with x(0) = x₀: x(t) = eᴬᵗx₀" }
+      ],
+      "code": {
+        "python": [
+          { "line": "from scipy.linalg import expm", "note": "matrix exponential from scipy" },
+          { "line": "A = np.array([[0.,-1.],[1.,0.]])", "note": "skew-symmetric → rotation" },
+          { "line": "t = np.pi/2", "note": "90 degrees" },
+          { "line": "print(expm(A*t))", "note": "≈ rotation matrix by 90°" }
+        ],
+        "matlab": [
+          { "line": "A = [0 -1; 1 0];", "note": "" },
+          { "line": "disp(expm(A*pi/2))", "note": "matrix exponential at t=π/2" }
+        ]
+      },
+      "mistakes": ["expm(A) ≠ exp(A): exp gives element-wise exponential, expm gives the matrix exponential"],
+      "example": "Quantum mechanics: time evolution operator e^{-iHt/ℏ} is a matrix exponential."
+    },
+    {
+      "id": "span",
+      "title": "Span",
+      "category": "foundations",
+      "color": "#6366f1",
+      "summary": "The span of a set S is all possible linear combinations of vectors in S.",
+      "intuition": "Span is the 'reach' of a set of vectors. Two non-parallel vectors in ℝ³ span a plane; three non-coplanar vectors span all of ℝ³.",
+      "prereqs": ["vector-operations"],
+      "steps": [
+        { "text": "span(v₁,…,vₖ) = {c₁v₁+…+cₖvₖ : cᵢ ∈ ℝ}", "prereq": "vector-operations" },
+        { "text": "Span is always a subspace." },
+        { "text": "A set of vectors spans ℝⁿ iff their matrix has rank n." }
+      ],
+      "code": {
+        "python": [
+          { "line": "v1 = np.array([1.,0.,0.])", "note": "" },
+          { "line": "v2 = np.array([0.,1.,0.])", "note": "" },
+          { "line": "# Do v1, v2 span R^3?", "note": "" },
+          { "line": "A = np.column_stack([v1, v2])", "note": "2 columns in R^3" },
+          { "line": "print(np.linalg.matrix_rank(A))", "note": "= 2 ≠ 3: only spans a plane" }
+        ],
+        "matlab": [
+          { "line": "A = [v1, v2];", "note": "" },
+          { "line": "disp(rank(A))", "note": "= 2: spans R² plane in R³" }
+        ]
+      },
+      "mistakes": ["Adding a vector that's in the current span doesn't increase the span"],
+      "example": "The three RGB channels span the 3-D color space — any color is a combination of red, green, blue."
+    },
+    {
+      "id": "coordinates",
+      "title": "Coordinates & Dimension",
+      "category": "core",
+      "color": "#ec4899",
+      "summary": "Dimension of a subspace = size of any basis for it. Coordinates give unique representation in a chosen basis.",
+      "intuition": "Dimension counts degrees of freedom. ℝⁿ has dimension n. A plane through the origin has dimension 2, no matter what space it's embedded in.",
+      "prereqs": ["basis"],
+      "steps": [
+        { "text": "All bases for a subspace have the same number of vectors — that's the dimension.", "prereq": "basis" },
+        { "text": "Unique representation: given basis B and vector x, there is exactly one way to write x = c₁b₁+…+cₙbₙ." },
+        { "text": "Dimension formula: dim(col(A)) + dim(null(A)) = n (columns of A)" }
+      ],
+      "code": {
+        "python": [
+          { "line": "# Dimension of the column space:", "note": "" },
+          { "line": "A = np.random.randn(5, 3)", "note": "5×3 random matrix, likely full rank" },
+          { "line": "print(np.linalg.matrix_rank(A))", "note": "= 3 (full column rank)" },
+          { "line": "# Dimension of null space:", "note": "" },
+          { "line": "print(3 - np.linalg.matrix_rank(A))", "note": "= 0 (trivial null space)" }
+        ],
+        "matlab": [
+          { "line": "A = randn(5, 3);", "note": "" },
+          { "line": "disp(rank(A))", "note": "= 3" },
+          { "line": "disp(size(null(A), 2))", "note": "= 0" }
+        ]
+      },
+      "mistakes": ["Dimension is a property of the space, not of how it's described — different bases, same dimension"],
+      "example": "2-D images have a very high pixel dimension, but typically lie in a low-dimensional 'manifold'."
+    },
+    {
+      "id": "trace",
+      "title": "Trace",
+      "category": "foundations",
+      "color": "#8b5cf6",
+      "summary": "tr(A) = sum of diagonal entries = sum of eigenvalues.",
+      "intuition": "Trace is a simple but powerful invariant. It tells you the sum of eigenvalues without computing any of them.",
+      "prereqs": ["matrices", "eigenvalues"],
+      "steps": [
+        { "text": "tr(A) = A₁₁ + A₂₂ + … + Aₙₙ", "prereq": "matrices" },
+        { "text": "tr(A) = λ₁ + λ₂ + … + λₙ (sum of eigenvalues)", "prereq": "eigenvalues" },
+        { "text": "tr(AB) = tr(BA); tr(A+B) = tr(A)+tr(B)" }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1.,2.],[3.,4.]])", "note": "" },
+          { "line": "print(np.trace(A))", "note": "= 1 + 4 = 5" },
+          { "line": "print(sum(np.linalg.eigvals(A)))", "note": "also ≈ 5 (sum of eigenvalues)" }
+        ],
+        "matlab": [
+          { "line": "disp(trace(A))", "note": "= 5" },
+          { "line": "disp(sum(eig(A)))", "note": "= 5" }
+        ]
+      },
+      "mistakes": ["tr(AB) = tr(BA) but tr(ABC) ≠ tr(BAC) in general — only cyclic permutations are equal"],
+      "example": "In quantum mechanics, the trace of the density matrix = 1 (total probability = 1)."
+    },
+    {
+      "id": "norms",
+      "title": "Norms & Condition Number",
+      "category": "applications",
+      "color": "#ef4444",
+      "summary": "Matrix norms measure the 'size' of a matrix. The condition number κ = ‖A‖·‖A⁻¹‖ measures numerical sensitivity.",
+      "intuition": "A large condition number means the system is ill-conditioned — small changes in b lead to large changes in the solution x. SVD reveals the condition number directly.",
+      "prereqs": ["svd", "vector-operations"],
+      "steps": [
+        { "text": "Vector norms: ‖v‖₂ (Euclidean), ‖v‖₁ (sum of abs), ‖v‖_∞ (max abs)", "prereq": "vector-operations" },
+        { "text": "Induced 2-norm of A = σ_max (largest singular value)", "prereq": "svd" },
+        { "text": "Frobenius norm: ‖A‖_F = √(Σ Aᵢⱼ²) = √(Σ σᵢ²)" },
+        { "text": "Condition number: κ₂(A) = σ_max/σ_min. If κ >> 1, beware numerical errors." }
+      ],
+      "code": {
+        "python": [
+          { "line": "A = np.array([[1.,2.],[3.,4.]])", "note": "" },
+          { "line": "print(np.linalg.norm(A))", "note": "default = Frobenius norm" },
+          { "line": "print(np.linalg.norm(A, 2))", "note": "spectral (induced 2) norm = σ_max" },
+          { "line": "print(np.linalg.cond(A))", "note": "condition number" }
+        ],
+        "matlab": [
+          { "line": "disp(norm(A, 'fro'))", "note": "Frobenius norm" },
+          { "line": "disp(norm(A, 2))", "note": "spectral norm" },
+          { "line": "disp(cond(A))", "note": "condition number" }
+        ]
+      },
+      "mistakes": ["High condition number doesn't mean the matrix is singular — it just means small errors amplify greatly"],
+      "example": "Hilbert matrix: condition number grows exponentially with size — a classic ill-conditioned system."
+    },
+    {
+      "id": "pca",
+      "title": "Principal Component Analysis (PCA)",
+      "category": "applications",
+      "color": "#ef4444",
+      "summary": "PCA finds the directions of maximum variance in data using the spectral theorem on the covariance matrix.",
+      "intuition": "PCA rotates your coordinate system so the first axis points in the direction of greatest spread, the second in the next greatest (and perpendicular), etc. It's the spectral theorem applied to data.",
+      "prereqs": ["spectral-theorem", "svd", "least-squares"],
+      "steps": [
+        { "text": "Center the data: subtract the mean from each sample.", "prereq": "least-squares" },
+        { "text": "Compute the covariance matrix C = (1/n)XᵀX.", "prereq": "spectral-theorem" },
+        { "text": "Eigendecompose C = QΛQᵀ — columns of Q are principal components." },
+        { "text": "Equivalently: SVD of the data matrix X = UΣVᵀ; V contains principal components.", "prereq": "svd" }
+      ],
+      "code": {
+        "python": [
+          { "line": "from sklearn.preprocessing import StandardScaler", "note": "" },
+          { "line": "X = np.random.randn(100, 5)", "note": "100 samples, 5 features" },
+          { "line": "X -= X.mean(axis=0)", "note": "center the data" },
+          { "line": "C = X.T @ X / len(X)", "note": "covariance matrix" },
+          { "line": "vals, vecs = np.linalg.eigh(C)", "note": "eigendecompose covariance" },
+          { "line": "idx = np.argsort(vals)[::-1]", "note": "sort by descending eigenvalue" },
+          { "line": "components = vecs[:, idx]", "note": "principal components" }
+        ],
+        "matlab": [
+          { "line": "X = randn(100, 5);", "note": "" },
+          { "line": "X = X - mean(X);", "note": "center" },
+          { "line": "[coeff, score] = pca(X);", "note": "built-in PCA — coeff = principal components" }
+        ]
+      },
+      "mistakes": ["Always center data before PCA — without centering, the first PC just points at the mean"],
+      "example": "Face recognition: PCA on face images gives 'eigenfaces' — the main modes of facial variation."
+    }
+  ]
+}

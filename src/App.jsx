@@ -41,6 +41,9 @@ const EntryShell = lazy(() => import("./pages/EntryShell.jsx"));
 const LinearAlgebraReferencePage = lazy(
   () => import("./pages/LinearAlgebraReferencePage.jsx"),
 );
+const LAConceptExplorerPage = lazy(
+  () => import("./pages/LAConceptExplorerPage.jsx"),
+);
 const CSSMasteryPage = lazy(
   () => import("./labs/css-mastery/CSSMasteryPage.jsx"),
 );
@@ -139,6 +142,10 @@ export default function App() {
                             <Route
                               path="linear-algebra"
                               element={<LinearAlgebraReferencePage />}
+                            />
+                            <Route
+                              path="la-explorer"
+                              element={<LAConceptExplorerPage />}
                             />
                             <Route
                               path="universal-calc"

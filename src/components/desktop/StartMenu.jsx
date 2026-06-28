@@ -42,6 +42,7 @@ const GRID_TEXTURE = 'repeating-linear-gradient(0deg,transparent,transparent 11p
 const NAV_LINKS = [
   { id: 'reference',      label: 'Reference Library',          emoji: '📐', path: '/reference', color: 'slate' },
   { id: 'linear-algebra', label: 'Linear Algebra',             emoji: '∑',  path: '/linear-algebra', color: 'cyan' },
+  { id: 'la-explorer',    label: 'LA Concept Explorer',        emoji: '🔍', path: '/la-explorer', color: 'violet' },
   { id: 'studio',         label: 'Studio / Docs',              emoji: '✏️', path: '/studio', color: 'fuchsia' },
   { id: 'health',         label: 'Health Tracker',             emoji: '❤️', path: '/health', color: 'rose' },
   { id: 'compass',        label: 'Compass',                    emoji: '🧭', path: '/compass', color: 'sky' },
