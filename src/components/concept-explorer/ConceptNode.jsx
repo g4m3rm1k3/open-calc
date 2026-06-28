@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import CodeBlock from './CodeBlock.jsx';
+import Katex from './Katex.jsx';
 import {
   getUsedBy,
   flattenPrereqsTopDown,
@@ -89,8 +90,61 @@ export default function ConceptNode({ topic, topicMap, allTopics, onNavigate }) 
             </Section>
           )}
 
-          {/* Worked Example */}
-          {topic.example && (
+          {/* Worked Example — a real walkthrough (preferred) walks through an actual
+              problem step by step, naming exactly which technique produced each
+              intermediate result so you can jump there if you don't remember it.
+              Topics without one yet fall back to the older one-line summary. */}
+          {topic.walkthrough ? (
+            <Section label="Worked Example" color="text-amber-600 dark:text-amber-500/70">
+              <div className="rounded-xl border border-amber-200 dark:border-amber-700/30 bg-amber-50 dark:bg-amber-950/10 px-6 py-5 shadow-sm space-y-4">
+                <div className="text-slate-800 dark:text-slate-200 text-[15px] font-semibold leading-relaxed">
+                  {topic.walkthrough.problem}
+                </div>
+                {topic.walkthrough.problemLatex && (
+                  <div className="overflow-x-auto py-1">
+                    <Katex latex={topic.walkthrough.problemLatex} />
+                  </div>
+                )}
+                <ol className="space-y-4">
+                  {topic.walkthrough.steps.map((step, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="text-amber-600 dark:text-amber-500 text-[14px] font-bold mt-0.5 shrink-0">{i + 1}.</span>
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        {step.note && (
+                          <div className="text-slate-700 dark:text-slate-300 text-[14px] leading-relaxed italic">{step.note}</div>
+                        )}
+                        {step.latex ? (
+                          <div className="overflow-x-auto py-1">
+                            <Katex latex={step.latex} />
+                          </div>
+                        ) : step.text && (
+                          <div className="text-slate-700 dark:text-slate-300 text-[15px] leading-relaxed">{step.text}</div>
+                        )}
+                        {step.sourceTopic && topicMap[step.sourceTopic] && (
+                          <div className="flex items-center gap-1.5 text-[12px] text-amber-700 dark:text-amber-400/80">
+                            <span className="italic">from</span>
+                            <NavButton id={step.sourceTopic} topicMap={topicMap} onNavigate={onNavigate} c={c} />
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+                {(topic.walkthrough.answer || topic.walkthrough.answerLatex) && (
+                  <div className="rounded-lg border border-amber-300 dark:border-amber-600/40 bg-amber-100/60 dark:bg-amber-500/10 px-4 py-3 space-y-2">
+                    <span className="text-amber-700 dark:text-amber-400 text-[12px] font-bold uppercase tracking-wide">Answer</span>
+                    {topic.walkthrough.answerLatex ? (
+                      <div className="overflow-x-auto py-1">
+                        <Katex latex={topic.walkthrough.answerLatex} />
+                      </div>
+                    ) : (
+                      <div className="text-slate-800 dark:text-slate-200 text-[15px] font-mono">{topic.walkthrough.answer}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Section>
+          ) : topic.example && (
             <Section label="Worked Example" color="text-amber-600 dark:text-amber-500/70">
               <div className="rounded-xl border border-amber-200 dark:border-amber-700/30 bg-amber-50 dark:bg-amber-950/10 px-6 py-5 text-slate-800 dark:text-slate-300 text-[15px] leading-relaxed shadow-sm">
                 {topic.example}

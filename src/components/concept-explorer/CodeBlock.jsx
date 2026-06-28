@@ -1,8 +1,58 @@
-import { useState } from 'react';
+import { useState, useMemo, useRef } from 'react';
+import { runPythonInline, runOpenMATInline } from '../../utils/inlineRunner.js';
+
+function buildSource(items, commentToken) {
+  const body = items
+    .map(item => (item.note ? `${item.line}  ${commentToken} ${item.note}` : item.line))
+    .join('\n');
+  // These snippets were written as continuations of a tutorial (numpy already
+  // imported as `np` from an earlier lesson), so standalone runs need it back.
+  if (commentToken === '#' && /\bnp\./.test(body) && !/import numpy/.test(body)) {
+    return `import numpy as np\n\n${body}`;
+  }
+  return body;
+}
 
 export default function CodeBlock({ python = [], matlab = [] }) {
   const [lang, setLang] = useState('python');
-  const lines = lang === 'python' ? python : matlab;
+  const pythonSource = useMemo(() => buildSource(python, '#'), [python]);
+  const matlabSource = useMemo(() => buildSource(matlab, '%'), [matlab]);
+
+  const [pythonCode, setPythonCode] = useState(pythonSource);
+  const [matlabCode, setMatlabCode] = useState(matlabSource);
+  const code = lang === 'python' ? pythonCode : matlabCode;
+  const setCode = lang === 'python' ? setPythonCode : setMatlabCode;
+  const original = lang === 'python' ? pythonSource : matlabSource;
+
+  const [running, setRunning] = useState(false);
+  const [output, setOutput] = useState([]);
+  const runIdRef = useRef(0);
+
+  async function run() {
+    setRunning(true);
+    setOutput([]);
+    const runId = ++runIdRef.current;
+    const append = line => {
+      if (runIdRef.current !== runId) return;
+      setOutput(o => [...o, line]);
+    };
+
+    if (lang === 'python') {
+      append({ type: 'dim', text: '» Starting Python runtime (first run downloads Pyodide — may take a few seconds)…' });
+      const { error } = await runPythonInline(code, append);
+      if (error) append({ type: 'error', text: error });
+    } else {
+      const { output: out, error } = runOpenMATInline(code);
+      if (error) append({ type: 'error', text: error });
+      else append({ type: 'output', text: out });
+    }
+    if (runIdRef.current === runId) setRunning(false);
+  }
+
+  function reset() {
+    setCode(original);
+    setOutput([]);
+  }
 
   return (
     <div className="mt-3">
@@ -10,34 +60,67 @@ export default function CodeBlock({ python = [], matlab = [] }) {
         {['python', 'matlab'].map(l => (
           <button
             key={l}
-            onClick={() => setLang(l)}
+            onClick={() => { setLang(l); setOutput([]); }}
             className={`px-3 py-1 rounded text-xs font-mono font-semibold transition-colors ${
               lang === l
                 ? 'bg-indigo-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : 'bg-slate-200 dark:bg-gray-700 text-slate-700 dark:text-gray-300 hover:bg-slate-300 dark:hover:bg-gray-600'
             }`}
           >
             {l === 'python' ? 'Python / NumPy' : 'MATLAB'}
           </button>
         ))}
       </div>
-      <div className="rounded-lg overflow-hidden border border-gray-700 bg-gray-900">
-        {lines.map((item, i) => (
-          <div
-            key={i}
-            className={`grid text-xs font-mono ${item.note ? 'grid-cols-[1fr_auto]' : 'grid-cols-1'} gap-0`}
+
+      <div className="rounded-lg overflow-hidden border border-slate-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm">
+        <textarea
+          value={code}
+          onChange={e => setCode(e.target.value)}
+          spellCheck={false}
+          rows={Math.max(4, code.split('\n').length)}
+          className="w-full font-mono text-[13px] leading-6 px-4 py-3 bg-transparent text-slate-800 dark:text-emerald-300 outline-none resize-none"
+        />
+        <div className="flex items-center gap-2 px-3 py-2 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-850">
+          <button
+            onClick={run}
+            disabled={running}
+            className="px-3 py-1 rounded text-xs font-mono font-bold bg-emerald-600 hover:bg-emerald-500 disabled:bg-emerald-800 disabled:cursor-wait text-white transition-colors"
           >
-            <div className={`px-4 py-1 ${i % 2 === 0 ? 'bg-gray-900' : 'bg-gray-850'}`}>
-              <span className="text-gray-500 select-none mr-3">{String(i + 1).padStart(2, ' ')}</span>
-              <span className="text-emerald-300">{item.line}</span>
-            </div>
-            {item.note && (
-              <div className={`px-4 py-1 border-l border-gray-700 text-gray-400 italic max-w-xs text-right ${i % 2 === 0 ? 'bg-gray-900' : 'bg-gray-850'}`}>
-                {item.note}
-              </div>
+            {running ? '⏳ running…' : '▶ Run'}
+          </button>
+          {code !== original && (
+            <button
+              onClick={reset}
+              className="px-3 py-1 rounded text-xs font-mono text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-white transition-colors"
+            >
+              ↺ reset to example
+            </button>
+          )}
+          <span className="text-[11px] text-slate-400 dark:text-gray-500 ml-auto">
+            edit the code — try your own numbers
+          </span>
+        </div>
+
+        {output.length > 0 && (
+          <div className="border-t border-slate-200 dark:border-gray-700 bg-slate-900 dark:bg-black px-4 py-3 font-mono text-[13px] leading-6 max-h-72 overflow-y-auto">
+            {output.map((line, i) =>
+              line.type === 'image' ? (
+                <img key={i} src={`data:image/png;base64,${line.src}`} alt="plot output" className="my-2 rounded max-w-full" />
+              ) : (
+                <div
+                  key={i}
+                  className={
+                    line.type === 'error' ? 'text-red-400' :
+                    line.type === 'dim' ? 'text-gray-500 italic' :
+                    'text-emerald-300'
+                  }
+                >
+                  {line.text}
+                </div>
+              )
             )}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
