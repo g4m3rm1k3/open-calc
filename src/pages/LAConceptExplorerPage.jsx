@@ -32,24 +32,24 @@ export default function LAConceptExplorerPage({ onBack }) {
   }
 
   return (
-    <div className="flex h-screen bg-[#07070f] text-white overflow-hidden relative font-sans">
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-0"
-        style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,1) 39px,rgba(255,255,255,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,1) 39px,rgba(255,255,255,1) 40px)' }} />
+    <div className="fixed inset-0 flex bg-slate-50 dark:bg-[#07070f] text-slate-800 dark:text-white overflow-hidden font-sans">
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.03] z-0"
+        style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 39px,currentColor 39px,currentColor 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,currentColor 39px,currentColor 40px)' }} />
       
       {/* Sidebar */}
-      <aside className="w-80 shrink-0 bg-[#0e0e1a]/80 backdrop-blur-md border-r border-slate-800/60 flex flex-col z-10 relative shadow-2xl">
-        <div className="px-5 py-5 border-b border-slate-800/60 flex items-center gap-3 bg-gradient-to-br from-indigo-950/40 to-transparent">
+      <aside className="w-80 shrink-0 bg-white/80 dark:bg-[#0e0e1a]/80 backdrop-blur-md border-r border-slate-200 dark:border-slate-800/60 flex flex-col z-10 relative shadow-xl dark:shadow-2xl">
+        <div className="px-5 py-5 border-b border-slate-200 dark:border-slate-800/60 flex items-center gap-3 bg-gradient-to-br from-indigo-100/50 dark:from-indigo-950/40 to-transparent">
           {onBack && (
             <button
               onClick={onBack}
-              className="text-slate-400 hover:text-white transition-colors text-lg"
+              className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors text-lg"
             >
               ←
             </button>
           )}
           <div>
-            <h1 className="font-black text-white text-[15px] tracking-wide bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent drop-shadow-sm">Concept Explorer</h1>
-            <p className="text-[11px] text-slate-500 font-medium tracking-wide uppercase mt-0.5">Linear Algebra</p>
+            <h1 className="font-black text-[15px] tracking-wide bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 bg-clip-text text-transparent drop-shadow-sm">Concept Explorer</h1>
+            <p className="text-[11px] text-slate-500 dark:text-slate-500 font-bold tracking-wide uppercase mt-0.5">Linear Algebra</p>
           </div>
         </div>
         <div className="flex-1 overflow-hidden">
@@ -74,7 +74,7 @@ export default function LAConceptExplorerPage({ onBack }) {
             />
           ) : (
             <div className="flex h-[50vh] items-center justify-center">
-              <p className="text-slate-500 font-medium">Select a topic from the left to begin.</p>
+              <p className="text-slate-400 dark:text-slate-500 font-medium">Select a topic from the left to begin.</p>
             </div>
           )}
         </div>
