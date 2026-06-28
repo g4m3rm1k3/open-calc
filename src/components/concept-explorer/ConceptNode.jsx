@@ -69,15 +69,19 @@ export default function ConceptNode({ topic, topicMap, allTopics, onNavigate }) 
             <p className="text-slate-800 dark:text-slate-200 text-[15px] leading-relaxed">{topic.intuition}</p>
           </Section>
 
-          {/* Algorithm / Steps */}
+          {/* Algorithm / Steps — each step that leans on a prerequisite surfaces
+              it right there, at the point in the flow where it's actually used. */}
           {topic.steps.length > 0 && (
             <Section label="Algorithm" color={c.section}>
               <div className="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/60 px-6 py-5 shadow-inner">
                 <ol className="space-y-4">
                   {topic.steps.map((step, i) => (
-                    <li key={i} className="flex items-start gap-4">
+                    <li key={i} className="flex items-start gap-4 flex-wrap">
                       <span className={`text-[15px] font-bold mt-0.5 shrink-0 ${c.section}`}>{i + 1}.</span>
-                      <span className="text-slate-700 dark:text-slate-200 text-[15px] leading-relaxed">{step.text}</span>
+                      <span className="text-slate-700 dark:text-slate-200 text-[15px] leading-relaxed flex-1">{step.text}</span>
+                      {step.prereq && topicMap[step.prereq] && (
+                        <NavButton id={step.prereq} topicMap={topicMap} onNavigate={onNavigate} c={c} />
+                      )}
                     </li>
                   ))}
                 </ol>

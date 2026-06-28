@@ -223,7 +223,8 @@ export default function AppShell({ children }) {
   const isFullPageToolRoute = location.pathname.startsWith("/notebook-lab") ||
     location.pathname.startsWith("/viz-builder") ||
     location.pathname.startsWith("/playground") ||
-    location.pathname.startsWith("/lesson-builder");
+    location.pathname.startsWith("/lesson-builder") ||
+    location.pathname.startsWith("/la-explorer");
   const isScrollableFullPageRoute = location.pathname.startsWith("/calendar") ||
     location.pathname.startsWith("/blog");
   const isFullWidthRoute = location.pathname.startsWith("/rpg-workout") ||

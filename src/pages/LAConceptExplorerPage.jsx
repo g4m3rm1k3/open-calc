@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import graphData from '../data/concept-graph.json';
 import ConceptNode from '../components/concept-explorer/ConceptNode.jsx';
 import ConceptSearch from '../components/concept-explorer/ConceptSearch.jsx';
@@ -6,7 +7,8 @@ import ExecutionStack from '../components/concept-explorer/ExecutionStack.jsx';
 import DependencyTree from '../components/concept-explorer/DependencyTree.jsx';
 import { CATEGORY_STYLES } from '../components/concept-explorer/categoryStyles.js';
 
-export default function LAConceptExplorerPage({ onBack }) {
+export default function LAConceptExplorerPage() {
+  const navigate = useNavigate();
   const topics = graphData.topics;
 
   const topicMap = useMemo(() => {
@@ -37,21 +39,20 @@ export default function LAConceptExplorerPage({ onBack }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 overflow-hidden font-sans">
+    <div className="relative flex h-full w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 overflow-hidden font-sans">
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.03] z-0"
         style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 39px,currentColor 39px,currentColor 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,currentColor 39px,currentColor 40px)' }} />
-      
+
       {/* Left Sidebar */}
       <aside className="w-72 sm:w-80 shrink-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-r border-slate-200 dark:border-slate-800/60 flex flex-col z-10 relative shadow-xl dark:shadow-2xl transition-colors duration-500">
         <div className={`px-5 py-5 border-b border-slate-200 dark:border-slate-800/60 flex items-center gap-3 bg-gradient-to-br ${c.gradientBg} transition-colors duration-500`}>
-          {onBack && (
-            <button
-              onClick={onBack}
-              className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors text-lg"
-            >
-              ←
-            </button>
-          )}
+          <button
+            onClick={() => navigate('/')}
+            title="Close Concept Explorer"
+            className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors text-lg leading-none"
+          >
+            ✕
+          </button>
           <div>
             <h1 className="font-black text-[15px] tracking-wide bg-gradient-to-r from-slate-600 to-slate-900 dark:from-slate-200 dark:to-white bg-clip-text text-transparent drop-shadow-sm transition-colors duration-500">Concept Explorer</h1>
             <p className={`text-[11px] font-bold tracking-wide uppercase mt-0.5 transition-colors duration-500 ${c.text}`}>Linear Algebra</p>
