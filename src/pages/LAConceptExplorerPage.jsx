@@ -32,30 +32,38 @@ export default function LAConceptExplorerPage({ onBack }) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+    <div className="flex h-screen bg-[#07070f] text-white overflow-hidden relative font-sans">
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] z-0"
+        style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,1) 39px,rgba(255,255,255,1) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,1) 39px,rgba(255,255,255,1) 40px)' }} />
+      
       {/* Sidebar */}
-      <aside className="w-64 shrink-0 bg-gray-850 border-r border-gray-700 flex flex-col">
-        <div className="px-4 py-3 border-b border-gray-700 flex items-center gap-2">
+      <aside className="w-80 shrink-0 bg-[#0e0e1a]/80 backdrop-blur-md border-r border-slate-800/60 flex flex-col z-10 relative shadow-2xl">
+        <div className="px-5 py-5 border-b border-slate-800/60 flex items-center gap-3 bg-gradient-to-br from-indigo-950/40 to-transparent">
           {onBack && (
             <button
               onClick={onBack}
-              className="text-gray-400 hover:text-white text-sm"
+              className="text-slate-400 hover:text-white transition-colors text-lg"
             >
               ←
             </button>
           )}
-          <h1 className="font-bold text-white text-sm">LA Concept Explorer</h1>
+          <div>
+            <h1 className="font-black text-white text-[15px] tracking-wide bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent drop-shadow-sm">Concept Explorer</h1>
+            <p className="text-[11px] text-slate-500 font-medium tracking-wide uppercase mt-0.5">Linear Algebra</p>
+          </div>
         </div>
-        <ConceptSearch
-          topics={topics}
-          selected={current}
-          onSelect={handleSelectFromSidebar}
-        />
+        <div className="flex-1 overflow-hidden">
+          <ConceptSearch
+            topics={topics}
+            selected={current}
+            onSelect={handleSelectFromSidebar}
+          />
+        </div>
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-6 py-8">
+      <main className="flex-1 overflow-y-auto relative z-10 scroll-smooth">
+        <div className="max-w-4xl mx-auto px-8 py-10 pb-24">
           <ExecutionStack stack={stack} topicMap={topicMap} onJumpTo={handleJumpTo} />
           {current ? (
             <ConceptNode
@@ -65,7 +73,9 @@ export default function LAConceptExplorerPage({ onBack }) {
               onNavigate={handleNavigate}
             />
           ) : (
-            <p className="text-gray-400">Select a topic from the left to begin.</p>
+            <div className="flex h-[50vh] items-center justify-center">
+              <p className="text-slate-500 font-medium">Select a topic from the left to begin.</p>
+            </div>
           )}
         </div>
       </main>
