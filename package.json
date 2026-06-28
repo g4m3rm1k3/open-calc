@@ -64,6 +64,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.577.0",
     "mathjs": "^15.1.1",
+    "mathlive": "^0.110.0",
     "matter-js": "^0.20.0",
     "monaco-editor": "^0.55.1",
     "nostr-tools": "^2.23.3",

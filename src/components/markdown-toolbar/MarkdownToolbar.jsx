@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 // Shared markdown/LaTeX toolbar — used by the Lesson Builder's MarkdownCellEditor
 // (Monaco-backed) and Studio's MarkdownHub (plain-textarea-backed). Both pass an
@@ -429,6 +429,91 @@ function CodeBlockQuickAdd({ onInsert, onClose }) {
   )
 }
 
+// ── Visual math editor (MathLive) ────────────────────────────────────────────
+// Lazily registers the <math-field> web component the first time this popover
+// opens, so it doesn't bloat the initial bundle.
+
+let mathliveLoaded = false
+
+function MathEditorQuickAdd({ onInsert, onClose }) {
+  const mfRef = useRef(null)
+  const [display, setDisplay] = useState(false)
+  const [preview, setPreview] = useState('')
+  const [ready, setReady] = useState(mathliveLoaded)
+
+  useEffect(() => {
+    if (mathliveLoaded) { setReady(true); return }
+    import('mathlive').then(() => { mathliveLoaded = true; setReady(true) })
+  }, [])
+
+  // Attach native event listener after the web component is in the DOM
+  useEffect(() => {
+    if (!ready || !mfRef.current) return
+    const el = mfRef.current
+    const handler = () => setPreview(el.value ?? '')
+    el.addEventListener('input', handler)
+    return () => el.removeEventListener('input', handler)
+  }, [ready])
+
+  const getLatex = () => mfRef.current?.getValue?.() ?? mfRef.current?.value ?? ''
+
+  const insert = () => {
+    const latex = getLatex().trim()
+    if (!latex) { onClose(); return }
+    const wrapped = display ? `\n$$\n${latex}\n$$\n` : `$${latex}$`
+    onInsert({ plain: wrapped })
+    onClose()
+  }
+
+  return (
+    <QuickAddPopover title="∫≈ Visual math editor" onClose={onClose} wide>
+      <div className="flex items-center gap-3 mb-1">
+        <label className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 select-none cursor-pointer">
+          <input type="checkbox" checked={display} onChange={e => setDisplay(e.target.checked)} />
+          Display (block) — unchecked = inline
+        </label>
+      </div>
+
+      {!ready && (
+        <div className="flex items-center justify-center py-8 text-slate-400 dark:text-slate-500 text-sm">
+          Loading math editor…
+        </div>
+      )}
+
+      {ready && (
+        <>
+          {/* MathLive web component — styled to look like a proper input field */}
+          <div className="rounded border border-indigo-300 dark:border-indigo-600 bg-white dark:bg-slate-900 p-3 min-h-[56px] flex items-center text-lg">
+            <math-field
+              ref={mfRef}
+              style={{ width: '100%', minHeight: 40, outline: 'none', fontSize: 20 }}
+            />
+          </div>
+
+          {/* Raw LaTeX preview */}
+          {preview && (
+            <div className="text-[10px] font-mono text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-900 rounded px-2 py-1 border border-slate-200 dark:border-slate-700 break-all">
+              {display ? `$$${preview}$$` : `$${preview}$`}
+            </div>
+          )}
+
+          <p className="text-[10px] text-slate-400 dark:text-slate-500">
+            Type or click the virtual keyboard to build any expression. Click Insert to drop it into your lesson at the cursor.
+          </p>
+        </>
+      )}
+
+      <button
+        onClick={insert}
+        className="w-full text-xs font-bold py-1.5 rounded bg-[#238636] text-white disabled:opacity-40"
+        disabled={!ready}
+      >
+        Insert
+      </button>
+    </QuickAddPopover>
+  )
+}
+
 // ── Toolbar component ─────────────────────────────────────────────────────────
 // Symbol groups are shown one at a time behind tabs (instead of all ~150 buttons
 // stacked at once) so the panel stays scannable; table/matrix get a GUI wizard
@@ -436,16 +521,21 @@ function CodeBlockQuickAdd({ onInsert, onClose }) {
 
 export default function MarkdownToolbar({ onInsert }) {
   const [activeGroup, setActiveGroup] = useState(GROUPS[0].label)
-  const [openQuickAdd, setOpenQuickAdd] = useState(null) // 'table' | 'matrix' | 'code' | null
+  const [openQuickAdd, setOpenQuickAdd] = useState(null) // 'table' | 'matrix' | 'code' | 'math' | null
   const group = GROUPS.find(g => g.label === activeGroup) ?? GROUPS[0]
 
   return (
     <div className="shrink-0 py-2 px-3 space-y-2 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
       {/* Quick-add wizards */}
-      <div className="flex items-center gap-1.5 relative">
+      <div className="flex items-center gap-1.5 relative flex-wrap">
         <span className="text-[9px] font-bold uppercase tracking-widest shrink-0 w-14 text-right pr-1.5 text-amber-600 dark:text-amber-400">
           Quick add
         </span>
+        <button
+          onClick={() => setOpenQuickAdd(o => o === 'math' ? null : 'math')}
+          className="px-2 py-0.5 text-xs rounded font-semibold bg-white dark:bg-slate-800 border border-indigo-300 dark:border-indigo-600 text-indigo-700 dark:text-indigo-300 hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors"
+        >∫≈ Visual Math…</button>
+        {openQuickAdd === 'math' && <MathEditorQuickAdd onInsert={onInsert} onClose={() => setOpenQuickAdd(null)} />}
         <button
           onClick={() => setOpenQuickAdd(o => o === 'code' ? null : 'code')}
           className="px-2 py-0.5 text-xs rounded font-semibold bg-white dark:bg-slate-800 border border-amber-200 dark:border-amber-700/50 text-slate-700 dark:text-slate-200 hover:border-amber-400 dark:hover:border-amber-500 transition-colors"

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import Editor from '@monaco-editor/react'
 import { useContributorMode } from '../../../hooks/useContributorMode.js'
 import CreatePRModal from '../../contributor/CreatePRModal.jsx'
+import Toolbar from '../../markdown-toolbar/MarkdownToolbar.jsx'
 
 const SvgVisualEditor = lazy(() => import('./SvgVisualEditor.jsx'))
 
@@ -120,6 +121,14 @@ export default function SvgSourceEditor({ filePath, onClose }) {
   const editorRef = useRef(null)
   const containerRef = useRef(null)
   const dividerDrag = useRef(null)
+
+  const insertBtn = useCallback((btn) => {
+    const ed = editorRef.current
+    if (!ed) return
+    if (btn.plain != null) ed.trigger('keyboard', 'type', { text: btn.plain })
+    else if (btn.snippet) ed.trigger('keyboard', 'editor.action.insertSnippet', { snippet: btn.snippet })
+    ed.focus()
+  }, [])
 
   const onDividerDown = useCallback((e) => {
     e.preventDefault()
@@ -290,6 +299,7 @@ export default function SvgSourceEditor({ filePath, onClose }) {
                 </span>
               )}
             </div>
+            <Toolbar onInsert={insertBtn} />
             <div className="flex-1 min-h-0">
               <Editor
                 value={source}

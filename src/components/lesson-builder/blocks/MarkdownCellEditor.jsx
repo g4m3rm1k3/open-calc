@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import Editor from '@monaco-editor/react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -35,7 +36,7 @@ export default function MarkdownCellEditor({ value, onChange, onClose, title = '
     onClose()
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[600] flex flex-col bg-white dark:bg-slate-950">
       {/* Top bar */}
       <div className="flex items-center gap-3 px-4 py-2.5 shrink-0 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
@@ -132,6 +133,7 @@ export default function MarkdownCellEditor({ value, onChange, onClose, title = '
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

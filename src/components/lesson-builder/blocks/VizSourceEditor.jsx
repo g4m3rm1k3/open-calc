@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import Editor from '@monaco-editor/react'
 import { useContributorMode } from '../../../hooks/useContributorMode.js'
 import CreatePRModal from '../../contributor/CreatePRModal.jsx'
+import Toolbar from '../../markdown-toolbar/MarkdownToolbar.jsx'
 
 const API = '/api/dev-fs'
 const MOPTS = { fontSize: 13, minimap: { enabled: false }, wordWrap: 'on', scrollBeyondLastLine: false, automaticLayout: true }
@@ -69,6 +71,12 @@ function buildPreviewDoc(source, dark = isDarkNow()) {
   const cdnSetupLines = []       // JS lines to run inside the Babel block after CDN globals are set
 
   let processed = source
+    // Combined default + named: `import React, { useState, useEffect } from 'react'`
+    // Must come before the named-only pattern so the regex doesn't mis-match.
+    .replace(/import\s+\w+\s*,\s*\{([^}]+)\}\s*from\s*['"]react['"]/g, (_, names) => {
+      names.split(',').map(n => n.trim().split(/\s+as\s+/)[0].trim()).filter(Boolean).forEach(n => reactImports.add(n))
+      return ''
+    })
     // React named imports: `import { useState, useEffect } from 'react'`
     .replace(/import\s*\{([^}]+)\}\s*from\s*['"]react['"]/g, (_, names) => {
       names.split(',').map(n => n.trim().split(/\s+as\s+/)[0].trim()).filter(Boolean).forEach(n => reactImports.add(n))
@@ -136,6 +144,16 @@ ${cdnTags}
 body{margin:0;padding:10px;font-family:system-ui,sans-serif;font-size:14px;background:${dark ? '#0f172a' : '#f8fafc'};color:${dark ? '#e2e8f0' : '#1e293b'}}
 pre.error{color:#ef4444;background:#1f0707;padding:10px;border-radius:6px;font-size:12px;white-space:pre-wrap;margin:0}
 </style>
+<script>
+window.addEventListener('error', function(e) {
+  var r = document.getElementById('root');
+  if (r) r.innerHTML = '<pre class="error">Runtime error: ' + e.message + (e.filename ? '\\n' + e.filename.split('/').pop() + ':' + e.lineno : '') + '</pre>';
+});
+window.addEventListener('unhandledrejection', function(e) {
+  var r = document.getElementById('root');
+  if (r) r.innerHTML = '<pre class="error">Unhandled error: ' + (e.reason?.message || e.reason || 'unknown') + '</pre>';
+});
+<\/script>
 </head>
 <body>
 <div id="root"></div>
@@ -181,6 +199,7 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
   const [DiffEditorComp, setDiffEditorComp] = useState(null)
   const debounceRef = useRef(null)
   const sourceRef = useRef('')
+  const editorRef = useRef(null)
   const dir = `src/courses/${courseId}/viz`
 
   // Rebuild preview when app dark mode toggles
@@ -277,7 +296,15 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
 
   const noChanges = exists && source === originalSource
 
-  return (
+  const insertBtn = useCallback((btn) => {
+    const ed = editorRef.current
+    if (!ed) return
+    if (btn.plain != null) ed.trigger('keyboard', 'type', { text: btn.plain })
+    else if (btn.snippet) ed.trigger('keyboard', 'editor.action.insertSnippet', { snippet: btn.snippet })
+    ed.focus()
+  }, [])
+
+  return createPortal(
     <>
     {showPR && filePath && (
       <CreatePRModal
@@ -399,8 +426,9 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
             <div className="px-3 py-1 text-xs shrink-0" style={{ background: '#161b22', borderBottom: '1px solid #30363d', color: '#8b949e' }}>
               Component source — preview updates as you type · Save to persist
             </div>
+            <Toolbar onInsert={insertBtn} />
             <div className="flex-1 min-h-0">
-              <Editor value={source} onChange={handleSourceChange} language="javascript" theme="vs-dark" options={MOPTS} />
+              <Editor value={source} onChange={handleSourceChange} language="javascript" theme="vs-dark" options={MOPTS} onMount={ed => { editorRef.current = ed }} />
             </div>
           </div>
           <div className="flex flex-col min-h-0" style={{ width: '45%' }}>
@@ -418,6 +446,7 @@ export default function VizSourceEditor({ vizId, courseId = 'geometry', onClose 
         </div>
       )}
     </div>
-    </>
+    </>,
+    document.body
   )
 }
