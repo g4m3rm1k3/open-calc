@@ -51,13 +51,13 @@ const PROSE_COMPONENTS = {
   ),
   // Bold
   strong: ({ children }) => (
-    <strong className="font-bold text-slate-950 dark:text-slate-100">
+    <strong className="font-bold text-rose-700 dark:text-rose-400">
       {children}
     </strong>
   ),
   // Italic
   em: ({ children }) => (
-    <em className="italic text-slate-700 dark:text-slate-300">{children}</em>
+    <em className="italic text-teal-700 dark:text-teal-300">{children}</em>
   ),
   // Fenced code blocks get the shared pre wrapper + Prism highlighting;
   // inline code (single backtick) keeps its own pill styling.
@@ -72,13 +72,13 @@ const PROSE_COMPONENTS = {
   ),
   // Unordered list
   ul: ({ children }) => (
-    <ul className="list-disc pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
+    <ul className="list-disc pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch] marker:text-amber-600 dark:marker:text-amber-400 marker:font-bold">
       {children}
     </ul>
   ),
   // Ordered list
   ol: ({ children }) => (
-    <ol className="list-decimal pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch]">
+    <ol className="list-decimal pl-8 space-y-3 mb-6 text-[18px] sm:text-[20px] leading-[1.8] text-slate-800 dark:text-slate-300 font-serif tracking-[0.01em] max-w-[75ch] marker:text-amber-600 dark:marker:text-amber-400 marker:font-bold">
       {children}
     </ol>
   ),

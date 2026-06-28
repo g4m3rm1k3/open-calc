@@ -5,10 +5,11 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
+import katex from 'katex'
 import 'katex/dist/katex.min.css'
 import Editor from '@monaco-editor/react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
-import MarkdownToolbar, { stripSnippetSyntax } from '../markdown-toolbar/MarkdownToolbar.jsx'
+import MarkdownToolbar from '../markdown-toolbar/MarkdownToolbar.jsx'
 import {
   X,
   ChevronDown,
@@ -162,6 +163,9 @@ function getMdCss(md) {
 .md-body h3 { font-size: 1.15em; font-weight: 600; margin: 1.4em 0 0.4em; color: ${md.h3}; }
 .md-body h4 { font-size: 1em; font-weight: 600; margin: 1.2em 0 0.3em; color: ${md.h4}; }
 .md-body p { margin: 0 0 1em; }
+.md-body strong, .md-body b { color: ${md.strong}; font-weight: 700; }
+.md-body em, .md-body i { color: ${md.em}; }
+.md-body li::marker { color: ${md.listMarker}; font-weight: 700; }
 .md-body a { color: ${md.a}; text-decoration: underline; }
 .md-body code { background: ${md.codeBg}; border: 1px solid ${md.tdBorder}; border-radius: 4px; padding: 2px 6px; font-size: 0.85em; font-family: 'JetBrains Mono', monospace; color: ${md.codeText}; }
 .md-body pre { background: ${md.preBg}; border: 1px solid ${md.preBorder}; border-radius: 8px; padding: 16px 20px; overflow-x: auto; margin: 0 0 1.2em; }
@@ -176,6 +180,7 @@ function getMdCss(md) {
 .md-body hr { border: none; border-top: 1px solid ${md.hr}; margin: 1.5em 0; }
 .md-body img { max-width: 100%; border-radius: 8px; border: 1px solid ${md.imgBorder}; }
 .md-body .katex-display { overflow-x: auto; overflow-y: hidden; }
+.md-body .katex-display pre { display: inline-block; text-align: left; background: none; border: none; margin: 0; padding: 0; font-size: 0.9em; color: ${md.text}; }
 .md-code-block { margin: 0 0 1.2em; border-radius: 8px; overflow: hidden; border: 1px solid ${md.codeHeaderBorder}; }
 .md-code-header { display: flex; align-items: center; justify-content: space-between; padding: 5px 14px; background: ${md.codeHeaderBg}; border-bottom: 1px solid ${md.codeHeaderBorder}; }
 .md-code-lang { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: ${md.codeLangText}; font-family: 'JetBrains Mono', monospace; }
@@ -586,6 +591,38 @@ function MdLink({ href, children }) {
   )
 }
 
+// Fenced ```latex / ```math blocks are meant as display equations, not code
+// — render them through KaTeX directly so they get the same .katex-display
+// "math well" box as inline $$...$$, instead of showing as a code editor.
+const MATH_FENCE_LANGS = new Set(['latex', 'math', 'tex'])
+
+// Unlanguaged fences are mostly plain-text/ASCII diagrams, equation systems,
+// and terminal output (confirmed: 250+ existing docs rely on bare ``` for
+// exactly that) — not real code, and not necessarily valid LaTeX either,
+// so running them through KaTeX risks mangling them (e.g. unicode
+// subscripts/arrows in an ASCII equation system get parsed as math symbols
+// and garbled). Instead, give every bare fence the same boxed "math well"
+// visual treatment as a display equation, but render it verbatim as plain
+// text — no formatter touches the content, so it can't be misinterpreted.
+function MdPlainWell({ code }) {
+  return (
+    <div className="katex-display">
+      <pre>{code}</pre>
+    </div>
+  )
+}
+
+function MdMathBlock({ code }) {
+  const html = useMemo(() => {
+    try {
+      return katex.renderToString(code, { displayMode: true, throwOnError: false })
+    } catch (e) {
+      return `<span class="katex-error">${e.message}</span>`
+    }
+  }, [code])
+  return <div dangerouslySetInnerHTML={{ __html: html }} />
+}
+
 function MdImage({ src, alt, title }) {
   return (
     <img
@@ -616,9 +653,13 @@ const MD_COMPONENTS = {
       .map(n => n.value)
       .join('')
     const code = rawCode.replace(/\n$/, '')
-    if (match) return <MdCodeBlock language={match[1]} code={code} />
-    // Unlanguaged fenced block — bare <pre>, no <code> wrapper so inline-code CSS can't bleed in
-    return <pre>{code}</pre>
+    if (match) {
+      const lang = match[1]
+      if (MATH_FENCE_LANGS.has(lang)) return <MdMathBlock code={code} />
+      return <MdCodeBlock language={lang} code={code} />
+    }
+    // Unlanguaged fenced block — boxed plain text, see MdPlainWell above.
+    return <MdPlainWell code={code} />
   },
   code({ children }) {
     // Only inline code reaches here; block code is handled entirely by `pre` via node prop
@@ -741,6 +782,36 @@ function createLocalDoc() {
 
 // ── TTS reader helpers ────────────────────────────────────────────────────────
 
+// remark-math only recognizes $...$ / $$...$$. Content pasted from AI tools
+// (ChatGPT, Claude, etc.) commonly uses \( ... \) / \[ ... \] instead — and
+// worse, plain Markdown's backslash-escape rule silently drops the lone
+// backslash before remark-math ever sees it, leaving bare brackets. Rewrite
+// those delimiters to dollar form first, skipping inline code spans so code
+// samples containing literal brackets aren't touched.
+function convertTexDelimiters(text) {
+  return text
+    .split(/(`[^`\n]+`)/g)
+    .map((part) => part.startsWith('`') ? part : part
+      .replace(/\\\[([\s\S]*?)\\\]/g, (_, inner) => `$$${inner}$$`)
+      .replace(/\\\(([\s\S]*?)\\\)/g, (_, inner) => `$${inner}$`))
+    .join('')
+}
+
+// remark-math only treats $$...$$ as block/display math (the boxed "math
+// well" styling) when the delimiters sit alone on their own line. A whole
+// line that's just "$$<equation>$$" — common when content gets pasted or
+// authored compactly — parses as inline math instead and silently loses the
+// box. Promote any such line to a proper three-line block.
+function normalizeDisplayMath(text) {
+  return text
+    .split('\n')
+    .map((line) => {
+      const m = line.match(/^(\s*)\$\$(.+)\$\$(\s*)$/)
+      return m && m[2].trim() ? `${m[1]}$$\n${m[2].trim()}\n$$${m[3]}` : line
+    })
+    .join('\n')
+}
+
 function splitMarkdownSections(markdown) {
   const sections = []
   const fenceRe = /^```[^\n]*\n[\s\S]*?^```[ \t]*$/gm
@@ -817,7 +888,7 @@ function SectionedMarkdown({ content }) {
           rehypePlugins={[rehypeRaw, rehypeKatex]}
           components={MD_COMPONENTS}
         >
-          {section.content}
+          {normalizeDisplayMath(convertTexDelimiters(section.content))}
         </ReactMarkdown>
       </div>
     )
@@ -842,24 +913,19 @@ export default function MarkdownHub() {
   const [activeOverridePath, setActiveOverridePath] = useState(null)
   const [editorName, setEditorName] = useState('')
   const [editorContent, setEditorContent] = useState('')
-  const editorTextareaRef = useRef(null)
+  const editorInstanceRef = useRef(null)
 
-  // Toolbar insert for the plain <textarea> editor below — no real Monaco
-  // snippet/tabstop support here, so strip that syntax and just drop the
-  // placeholder text in at the cursor.
+  // Toolbar insert for the Monaco-backed editor below — real snippet/tabstop
+  // support, same mechanism as the Lesson Builder's MarkdownCellEditor.
   const insertIntoEditor = useCallback((btn) => {
-    const ta = editorTextareaRef.current
-    const text = btn.plain != null ? btn.plain : stripSnippetSyntax(btn.snippet)
-    if (!ta) {
-      setEditorContent(c => c + text)
-      return
+    const ed = editorInstanceRef.current
+    if (!ed) return
+    if (btn.plain != null) {
+      ed.trigger('keyboard', 'type', { text: btn.plain })
+    } else if (btn.snippet) {
+      ed.trigger('keyboard', 'editor.action.insertSnippet', { snippet: btn.snippet })
     }
-    const s = ta.selectionStart, e = ta.selectionEnd
-    setEditorContent(c => c.slice(0, s) + text + c.slice(e))
-    requestAnimationFrame(() => {
-      ta.focus()
-      ta.selectionStart = ta.selectionEnd = s + text.length
-    })
+    ed.focus()
   }, [])
   const [previewMode, setPreviewMode] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -1728,19 +1794,28 @@ export default function MarkdownHub() {
                   </span>
                 </div>
                 <MarkdownToolbar onInsert={insertIntoEditor} />
-                <textarea
-                  ref={editorTextareaRef}
-                  value={editorContent}
-                  onChange={(event) => setEditorContent(event.target.value)}
-                  spellCheck={false}
-                  className="flex-1 w-full p-6 sm:p-8 border-none outline-none resize-none font-mono text-[13px] leading-relaxed custom-scrollbar"
-                  style={{
-                    background: themeStyles.md.preBg,
-                    color: themeStyles.md.text,
-                    tabSize: 2,
-                  }}
-                  placeholder="# Begin your markdown here..."
-                />
+                <div className="flex-1 min-h-0">
+                  <Editor
+                    key={activeDocType === 'user' ? `user:${activeUserId}` : `override:${activeOverridePath}`}
+                    defaultValue={editorContent}
+                    language="markdown"
+                    theme={themeStyles.monaco || (themeStyles.isDark ? 'open-calc-dark' : 'open-calc-light')}
+                    beforeMount={setupOpenCalcMonaco}
+                    onChange={(value) => setEditorContent(value ?? '')}
+                    onMount={(editor) => { editorInstanceRef.current = editor }}
+                    options={{
+                      fontSize: 13,
+                      fontFamily: "'JetBrains Mono', Consolas, 'Courier New', monospace",
+                      lineHeight: 22,
+                      minimap: { enabled: false },
+                      wordWrap: 'on',
+                      scrollBeyondLastLine: false,
+                      automaticLayout: true,
+                      padding: { top: 20, bottom: 20 },
+                      lineNumbers: 'on',
+                    }}
+                  />
+                </div>
               </div>
             )}
           </div>
