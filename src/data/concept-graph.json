@@ -592,7 +592,7 @@
       ],
       "example": "Applying two transformations in sequence: rotate then scale = S·R applied to vector v.",
       "walkthrough": {
-        "problem": "For A = [[2,1],[1,3]] and B = [[1,0],[2,1]], compute A+B, A·B, and Aᵗ.",
+        "problem": "For A = [[2,1],[1,3]] and B = [[1,0],[2,1]], compute A+B, A·B, and Bᵗ.",
         "problemLatex": "A = \\begin{bmatrix} 2 & 1 \\\\ 1 & 3 \\end{bmatrix}, \\qquad B = \\begin{bmatrix} 1 & 0 \\\\ 2 & 1 \\end{bmatrix}",
         "steps": [
           {
@@ -606,11 +606,15 @@
             "sourceTopic": "dot-product"
           },
           {
-            "note": "Transpose swaps rows and columns.",
-            "latex": "A^{T} = \\begin{bmatrix} 2 & 1 \\\\ 1 & 3 \\end{bmatrix}"
+            "note": "Transpose swaps rows and columns: entry (i,j) moves to (j,i). A is symmetric so its transpose wouldn't visibly change — use B instead, which isn't symmetric, so the swap is actually visible.",
+            "latex": "B = \\begin{bmatrix} 1 & 0 \\\\ 2 & 1 \\end{bmatrix} \\qquad\\Longrightarrow\\qquad B^{T} = \\begin{bmatrix} 1 & 2 \\\\ 0 & 1 \\end{bmatrix}"
+          },
+          {
+            "note": "Check entry-by-entry: B's (2,1) entry was 2 — it moved to position (1,2) in Bᵗ. B's (1,2) entry was 0 — it moved to position (2,1).",
+            "latex": "B_{21}=2 \\;\\to\\; (B^{T})_{12}=2, \\qquad B_{12}=0 \\;\\to\\; (B^{T})_{21}=0"
           }
         ],
-        "answerLatex": "A+B = \\begin{bmatrix} 3 & 1 \\\\ 3 & 4 \\end{bmatrix}, \\qquad AB = \\begin{bmatrix} 4 & 1 \\\\ 7 & 3 \\end{bmatrix}, \\qquad A^{T} = \\begin{bmatrix} 2 & 1 \\\\ 1 & 3 \\end{bmatrix}"
+        "answerLatex": "A+B = \\begin{bmatrix} 3 & 1 \\\\ 3 & 4 \\end{bmatrix}, \\qquad AB = \\begin{bmatrix} 4 & 1 \\\\ 7 & 3 \\end{bmatrix}, \\qquad B^{T} = \\begin{bmatrix} 1 & 2 \\\\ 0 & 1 \\end{bmatrix}"
       }
     },
     {
@@ -1703,12 +1707,25 @@
             "latex": "D = \\begin{bmatrix} 0&0&0\\\\0&4&0\\\\0&0&2\\end{bmatrix}"
           },
           {
-            "note": "Each column satisfies Av_i = \\lambda_i v_i, so AP = PD. Multiply both sides by P⁻¹.",
-            "latex": "AP=PD \\;\\Longrightarrow\\; A = PDP^{-1}",
+            "note": "Each column satisfies Av_i = \\lambda_i v_i, so AP = PD. Multiply both sides by P⁻¹ — which means we actually need to compute it, not just write the symbol.",
+            "latex": "AP=PD \\;\\Longrightarrow\\; A = PDP^{-1}"
+          },
+          {
+            "note": "P has the same block structure as A: row/column 3 is just (0,0,1), so P⁻¹ comes from inverting the top-left 2×2 block B and leaving the trailing 1 alone. Start with det(B), exactly as in Determinant.",
+            "latex": "B = \\begin{bmatrix} -\\sqrt3 & 1 \\\\ 1 & \\sqrt3 \\end{bmatrix}, \\qquad \\det(B) = (-\\sqrt3)(\\sqrt3) - (1)(1) = -3-1 = -4",
+            "sourceTopic": "determinant"
+          },
+          {
+            "note": "Invert B with the same adjugate formula as Matrix Inverse: swap the diagonal, negate the off-diagonal, divide by det(B).",
+            "latex": "B^{-1} = \\frac{1}{-4}\\begin{bmatrix} \\sqrt3 & -1 \\\\ -1 & -\\sqrt3 \\end{bmatrix} = \\begin{bmatrix} -\\tfrac{\\sqrt3}{4} & \\tfrac14 \\\\ \\tfrac14 & \\tfrac{\\sqrt3}{4} \\end{bmatrix} \\;\\Longrightarrow\\; P^{-1} = \\begin{bmatrix} -\\tfrac{\\sqrt3}{4} & \\tfrac14 & 0 \\\\ \\tfrac14 & \\tfrac{\\sqrt3}{4} & 0 \\\\ 0 & 0 & 1 \\end{bmatrix}",
             "sourceTopic": "matrix-inverse"
+          },
+          {
+            "note": "Verify with one entry of PP⁻¹ — row 1 of P dotted with column 1 of P⁻¹ should give 1.",
+            "latex": "(PP^{-1})_{11} = (-\\sqrt3)\\!\\left(-\\tfrac{\\sqrt3}{4}\\right) + (1)\\!\\left(\\tfrac14\\right) + (0)(0) = \\tfrac34+\\tfrac14 = 1 \\;\\checkmark"
           }
         ],
-        "answerLatex": "A = PDP^{-1},\\qquad P=\\begin{bmatrix}-\\sqrt3&1&0\\\\1&\\sqrt3&0\\\\0&0&1\\end{bmatrix},\\quad D=\\operatorname{diag}(0,4,2)"
+        "answerLatex": "A = PDP^{-1},\\qquad P=\\begin{bmatrix}-\\sqrt3&1&0\\\\1&\\sqrt3&0\\\\0&0&1\\end{bmatrix},\\quad D=\\operatorname{diag}(0,4,2),\\quad P^{-1}=\\begin{bmatrix}-\\tfrac{\\sqrt3}{4}&\\tfrac14&0\\\\ \\tfrac14&\\tfrac{\\sqrt3}{4}&0\\\\ 0&0&1\\end{bmatrix}"
       }
     },
     {
@@ -2704,23 +2721,23 @@
         "problemLatex": "A=\\begin{bmatrix}1&1\\\\1&0\\\\0&1\\end{bmatrix}",
         "steps": [
           {
-            "note": "Form AᵗA and diagonalize it (symmetric, so orthogonally diagonalizable).",
+            "note": "Form AᵗA (a real matrix multiplication, transpose included) — it's symmetric, so it's orthogonally diagonalizable.",
             "latex": "A^{T}A=\\begin{bmatrix}1&1&0\\\\1&0&1\\end{bmatrix}\\begin{bmatrix}1&1\\\\1&0\\\\0&1\\end{bmatrix}=\\begin{bmatrix}2&1\\\\1&2\\end{bmatrix}",
-            "sourceTopic": "orthogonal-diagonalization"
+            "sourceTopic": "matrix-operations"
           },
           {
-            "note": "Eigenvalues of AᵗA solve det(AᵗA−λI)=0.",
+            "note": "Eigenvalues of AᵗA solve det(AᵗA−λI)=0 — the same characteristic-polynomial method as Eigenvalues.",
             "latex": "\\det\\begin{bmatrix}2-\\lambda&1\\\\1&2-\\lambda\\end{bmatrix}=(2-\\lambda)^2-1=0\\;\\Longrightarrow\\;\\lambda=1,\\ 3",
-            "sourceTopic": "orthogonal-diagonalization"
+            "sourceTopic": "eigenvalues"
           },
           {
             "note": "Singular values are the square roots of these eigenvalues.",
             "latex": "\\sigma_1=\\sqrt{3},\\qquad \\sigma_2=\\sqrt{1}=1"
           },
           {
-            "note": "Right singular vectors v₁, v₂: orthonormal eigenvectors of AᵗA, columns of V.",
+            "note": "Right singular vectors v₁, v₂: solve (AᵗA−λI)v=0 for each eigenvalue, exactly as in Eigenvectors, then normalize.",
             "latex": "A^{T}A\\,v_1=3v_1,\\ v_1=\\frac{1}{\\sqrt2}\\begin{bmatrix}1\\\\1\\end{bmatrix};\\qquad A^{T}A\\,v_2=1\\cdot v_2,\\ v_2=\\frac{1}{\\sqrt2}\\begin{bmatrix}1\\\\-1\\end{bmatrix}",
-            "sourceTopic": "orthogonal-matrices"
+            "sourceTopic": "eigenvectors"
           },
           {
             "note": "Left singular vectors u_i = A v_i / σ_i.",
@@ -2807,7 +2824,7 @@
           {
             "note": "Check b is not in col(A): rank(A) = 2 but rank([A|b]) = 3, so Ax=b has no exact solution.",
             "latex": "\\operatorname{rank}(A)=2,\\qquad \\operatorname{rank}\\big([A\\mid b]\\big)=3\\;\\Longrightarrow\\;b\\notin\\operatorname{col}(A)",
-            "sourceTopic": "projection"
+            "sourceTopic": "column-space"
           },
           {
             "note": "Method 1 — normal equations AᵗA x̂ = Aᵗb.",
@@ -2815,13 +2832,21 @@
             "sourceTopic": "projection"
           },
           {
-            "note": "Method 2 — use Q, R from qr-decomposition (same A): solve R x̂ = Qᵗb.",
-            "latex": "Q=\\begin{bmatrix}1/\\sqrt2&1/\\sqrt6\\\\1/\\sqrt2&-1/\\sqrt6\\\\0&2/\\sqrt6\\end{bmatrix},\\quad R=\\begin{bmatrix}\\sqrt2&1/\\sqrt2\\\\0&\\sqrt{1.5}\\end{bmatrix},\\quad Q^{T}b=\\begin{bmatrix}\\sqrt2\\\\ \\sqrt{1.5}\\cdot\\tfrac{2}{3}\\end{bmatrix}",
+            "note": "Method 2 — use Q, R from qr-decomposition (same A). First compute Qᵗb as two explicit dot products (rows of Qᵗ against b).",
+            "latex": "Q^{T}b=\\begin{bmatrix}\\tfrac{1}{\\sqrt2}(1)+\\tfrac{1}{\\sqrt2}(1)+0(1)\\\\[4pt] \\tfrac{1}{\\sqrt6}(1)-\\tfrac{1}{\\sqrt6}(1)+\\tfrac{2}{\\sqrt6}(1)\\end{bmatrix}=\\begin{bmatrix}\\sqrt2\\\\[2pt] \\tfrac{2}{\\sqrt6}\\end{bmatrix}",
             "sourceTopic": "qr-decomposition"
           },
           {
-            "note": "Back-substitute R x̂ = Qᵗb (R is upper triangular) — same answer as the normal equations.",
-            "latex": "R\\hat x=Q^{T}b\\;\\Longrightarrow\\;\\hat x=\\begin{bmatrix}2/3\\\\2/3\\end{bmatrix}",
+            "note": "Now back-substitute into R x̂ = Qᵗb (R is upper triangular, so solve bottom-up). Row 2 first: √1.5 x̂₂ = 2/√6, and √1.5 = √6/2.",
+            "latex": "R=\\begin{bmatrix}\\sqrt2&1/\\sqrt2\\\\0&\\sqrt{1.5}\\end{bmatrix}, \\qquad \\sqrt{1.5}\\,\\hat x_2 = \\tfrac{2}{\\sqrt6} \\;\\Longrightarrow\\; \\hat x_2 = \\frac{2/\\sqrt6}{\\sqrt6/2} = \\frac{4}{6} = \\frac23"
+          },
+          {
+            "note": "Row 1: √2 x̂₁ + (1/√2)x̂₂ = √2. Substitute x̂₂ = 2/3 and solve for x̂₁.",
+            "latex": "\\sqrt2\\,\\hat x_1 + \\frac{1}{\\sqrt2}\\cdot\\frac23 = \\sqrt2 \\;\\Longrightarrow\\; \\sqrt2\\,\\hat x_1 = \\sqrt2-\\frac{\\sqrt2}{3} = \\frac{2\\sqrt2}{3} \\;\\Longrightarrow\\; \\hat x_1 = \\frac23"
+          },
+          {
+            "note": "Both rows solved — Method 2 lands on exactly the same answer as the normal equations.",
+            "latex": "\\hat x=\\begin{bmatrix}2/3\\\\2/3\\end{bmatrix} \\quad \\text{(matches Method 1)}",
             "sourceTopic": "qr-decomposition"
           },
           {
@@ -3011,11 +3036,23 @@
             "latex": "T(v)+T(w) = \\begin{bmatrix} 4 \\\\ 2 \\end{bmatrix}+\\begin{bmatrix} 5 \\\\ -1 \\end{bmatrix} = \\begin{bmatrix} 9 \\\\ 1 \\end{bmatrix}"
           },
           {
-            "note": "The two sides match, confirming additivity.",
+            "note": "The two sides match, confirming additivity — but linearity needs BOTH additivity and scalar homogeneity. Check the second half: T(cv) = cT(v) for, say, c=3.",
             "latex": "T(v+w) = \\begin{bmatrix} 9 \\\\ 1 \\end{bmatrix} = T(v)+T(w)"
+          },
+          {
+            "note": "Scale v by c=3 first, then apply T.",
+            "latex": "cv = 3\\begin{bmatrix}1\\\\2\\end{bmatrix} = \\begin{bmatrix}3\\\\6\\end{bmatrix}, \\qquad T(cv) = M(cv) = \\begin{bmatrix} 2 & 1 \\\\ 0 & 1 \\end{bmatrix}\\begin{bmatrix} 3 \\\\ 6 \\end{bmatrix} = \\begin{bmatrix} 2(3)+1(6) \\\\ 0(3)+1(6) \\end{bmatrix} = \\begin{bmatrix} 12 \\\\ 6 \\end{bmatrix}"
+          },
+          {
+            "note": "Compare to c·T(v), scaling the already-computed T(v) by the same c=3.",
+            "latex": "c\\,T(v) = 3\\begin{bmatrix}4\\\\2\\end{bmatrix} = \\begin{bmatrix}12\\\\6\\end{bmatrix} = T(cv)"
+          },
+          {
+            "note": "Both additivity AND homogeneity hold, so T is genuinely linear — not just 'looks proportional'.",
+            "latex": "T(v+w)=T(v)+T(w) \\ \\text{ and } \\ T(cv)=cT(v) \\;\\Longrightarrow\\; T \\text{ is linear}"
           }
         ],
-        "answerLatex": "T(v) = \\begin{bmatrix} 4 \\\\ 2 \\end{bmatrix}, \\qquad T(v+w) = T(v)+T(w) = \\begin{bmatrix} 9 \\\\ 1 \\end{bmatrix} \\;\\checkmark"
+        "answerLatex": "T(v) = \\begin{bmatrix} 4 \\\\ 2 \\end{bmatrix}, \\qquad T(v+w) = T(v)+T(w), \\qquad T(cv) = cT(v) \\;\\checkmark"
       }
     },
     {
@@ -3904,8 +3941,9 @@
             "sourceTopic": "diagonalization"
           },
           {
-            "note": "This is exactly the similarity relation with S = P: D is A viewed in the eigenvector basis.",
-            "latex": "D = P^{-1}AP,\\qquad P=\\begin{bmatrix}-\\sqrt3&1&0\\\\1&\\sqrt3&0\\\\0&0&1\\end{bmatrix},\\qquad D=\\begin{bmatrix}0&0&0\\\\0&4&0\\\\0&0&2\\end{bmatrix}"
+            "note": "This is exactly the similarity relation with S = P: D is A viewed in the eigenvector basis. P⁻¹ was computed explicitly in Diagonalization — reuse it rather than leaving it symbolic.",
+            "latex": "D = P^{-1}AP,\\qquad P=\\begin{bmatrix}-\\sqrt3&1&0\\\\1&\\sqrt3&0\\\\0&0&1\\end{bmatrix},\\qquad P^{-1}=\\begin{bmatrix}-\\tfrac{\\sqrt3}{4}&\\tfrac14&0\\\\ \\tfrac14&\\tfrac{\\sqrt3}{4}&0\\\\ 0&0&1\\end{bmatrix},\\qquad D=\\begin{bmatrix}0&0&0\\\\0&4&0\\\\0&0&2\\end{bmatrix}",
+            "sourceTopic": "diagonalization"
           },
           {
             "note": "Similar matrices share eigenvalues, trace, and determinant — check trace as a quick sanity test.",
@@ -3988,8 +4026,9 @@
             "sourceTopic": "eigenvalues"
           },
           {
-            "note": "Assemble the full solution structure — P and P⁻¹ sandwich the exponentiated diagonal.",
-            "latex": "e^{At} = \\begin{bmatrix}-\\sqrt3&1&0\\\\1&\\sqrt3&0\\\\0&0&1\\end{bmatrix}\\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & e^{4t} & 0 \\\\ 0 & 0 & e^{2t} \\end{bmatrix}P^{-1}"
+            "note": "Assemble the full solution structure — P and P⁻¹ sandwich the exponentiated diagonal. P⁻¹ was computed explicitly in Diagonalization, not just left as a symbol.",
+            "latex": "e^{At} = \\begin{bmatrix}-\\sqrt3&1&0\\\\1&\\sqrt3&0\\\\0&0&1\\end{bmatrix}\\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & e^{4t} & 0 \\\\ 0 & 0 & e^{2t} \\end{bmatrix}\\begin{bmatrix}-\\tfrac{\\sqrt3}{4}&\\tfrac14&0\\\\ \\tfrac14&\\tfrac{\\sqrt3}{4}&0\\\\ 0&0&1\\end{bmatrix}",
+            "sourceTopic": "diagonalization"
           },
           {
             "note": "This solves ẋ = Ax: any solution is x(t) = e^{At}x_0, decaying/growing along each eigen-direction independently at rate λ.",
@@ -4425,23 +4464,31 @@
         "problemLatex": "X=\\{(5,3),\\ (3,5),\\ (-1,1),\\ (1,-1)\\}",
         "steps": [
           {
-            "note": "Compute the mean and center the data.",
-            "latex": "\\bar x=(2,2),\\qquad X_c=\\begin{bmatrix}3&1\\\\1&3\\\\-3&-1\\\\-1&-3\\end{bmatrix}"
+            "note": "Compute the mean: average each coordinate across all 4 points.",
+            "latex": "\\bar x = \\left(\\frac{5+3-1+1}{4},\\ \\frac{3+5+1-1}{4}\\right) = \\left(\\frac{8}{4},\\frac{8}{4}\\right) = (2,2)"
           },
           {
-            "note": "Form the covariance matrix C = (1/n) Xc^T Xc, where Xc is the centered data matrix.",
-            "latex": "C=\\frac14X_c^{T}X_c=\\frac14\\begin{bmatrix}20&12\\\\12&20\\end{bmatrix}=\\begin{bmatrix}5&3\\\\3&5\\end{bmatrix}",
-            "sourceTopic": "spectral-theorem"
+            "note": "Center the data by subtracting the mean from every point.",
+            "latex": "X_c=\\begin{bmatrix}5-2&3-2\\\\3-2&5-2\\\\-1-2&1-2\\\\1-2&-1-2\\end{bmatrix}=\\begin{bmatrix}3&1\\\\1&3\\\\-3&-1\\\\-1&-3\\end{bmatrix}"
           },
           {
-            "note": "Eigendecompose C (symmetric, so orthogonally diagonalizable).",
+            "note": "Form Xcᵗ Xc entry by entry — this is an ordinary matrix multiplication, same mechanics as Matrix Operations: entry (1,1) is the dot product of column 1 with itself, entry (1,2) is column 1 dotted with column 2.",
+            "latex": "(X_c^{T}X_c)_{11}=3^2+1^2+(-3)^2+(-1)^2=9+1+9+1=20,\\qquad (X_c^{T}X_c)_{12}=3(1)+1(3)+(-3)(-1)+(-1)(-3)=3+3+3+3=12",
+            "sourceTopic": "matrix-operations"
+          },
+          {
+            "note": "Assemble Xcᵗ Xc and divide by n=4 to get the covariance matrix C.",
+            "latex": "X_c^{T}X_c=\\begin{bmatrix}20&12\\\\12&20\\end{bmatrix} \\;\\Longrightarrow\\; C=\\frac14X_c^{T}X_c=\\begin{bmatrix}5&3\\\\3&5\\end{bmatrix}"
+          },
+          {
+            "note": "Eigendecompose C (symmetric, so orthogonally diagonalizable) — same characteristic-polynomial method as Eigenvalues.",
             "latex": "\\det\\begin{bmatrix}5-\\lambda&3\\\\3&5-\\lambda\\end{bmatrix}=(5-\\lambda)^2-9=0\\;\\Longrightarrow\\;\\lambda=8,\\ 2",
-            "sourceTopic": "spectral-theorem"
+            "sourceTopic": "eigenvalues"
           },
           {
-            "note": "Eigenvectors: λ=8 gives the direction of maximum variance (the first principal component); λ=2 is orthogonal to it.",
+            "note": "Eigenvectors: solve (C−λI)v=0 for each λ, exactly as in Eigenvectors. λ=8 gives the direction of maximum variance (the first principal component); λ=2 is orthogonal to it.",
             "latex": "\\lambda_1=8:\\ v_1=\\frac{1}{\\sqrt2}\\begin{bmatrix}1\\\\1\\end{bmatrix}\\quad(\\text{1st PC}),\\qquad \\lambda_2=2:\\ v_2=\\frac{1}{\\sqrt2}\\begin{bmatrix}-1\\\\1\\end{bmatrix}",
-            "sourceTopic": "svd"
+            "sourceTopic": "eigenvectors"
           },
           {
             "note": "Verified with numpy.linalg.eigh(C) — eigenvalues (2, 8) and matching eigenvectors to machine precision.",
