@@ -1,6 +1,11 @@
 import { useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import rehypeRaw from 'rehype-raw'
+import 'katex/dist/katex.min.css'
+import { preprocess } from '../math/latexPreprocess.js'
 import CodeBlock from './CodeBlock.jsx'
 
 const JS_FAMILY = new Set(['js', 'javascript', 'ts', 'typescript'])
@@ -69,7 +74,8 @@ export default function BlogPost({ content }) {
   return (
     <article className="prose-blog max-w-none">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeRaw, rehypeKatex]}
         components={{
           h1: ({ children }) => <Heading level={1}>{children}</Heading>,
           h2: ({ children }) => <Heading level={2}>{children}</Heading>,
@@ -220,7 +226,7 @@ export default function BlogPost({ content }) {
           },
         }}
       >
-        {content}
+        {preprocess(content)}
       </ReactMarkdown>
     </article>
   )

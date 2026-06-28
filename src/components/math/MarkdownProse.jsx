@@ -16,6 +16,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import rehypeRaw from "rehype-raw";
 import { preprocess } from "./latexPreprocess.js";
 import { CodeBlockPre, CodeBlockCode } from "./CodeBlock.jsx";
 
@@ -141,7 +142,7 @@ export default function MarkdownProse({ text, className = "" }) {
     <div className={className}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeKatex]}
+        rehypePlugins={[rehypeRaw, rehypeKatex]}
         components={PROSE_COMPONENTS}
       >
         {preprocess(text)}

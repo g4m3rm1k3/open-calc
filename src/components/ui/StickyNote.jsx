@@ -3,6 +3,9 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
+import rehypeRaw from 'rehype-raw'
+import 'katex/dist/katex.min.css'
+import { preprocess } from '../math/latexPreprocess.js'
 import DEFAULT_NOTES from './default-notes.json'
 
 // ─── Storage helpers ──────────────────────────────────────────────────────────
@@ -349,7 +352,7 @@ export default function StickyNote({ noteId }) {
                   {text.trim()
                     ? <ReactMarkdown
                         remarkPlugins={[remarkGfm, remarkMath]}
-                        rehypePlugins={[rehypeKatex]}
+                        rehypePlugins={[rehypeRaw, rehypeKatex]}
                         components={{
                           h1: ({children}) => <h1 style={{fontSize:'1.3em',fontWeight:700,margin:'0.4em 0'}}>{children}</h1>,
                           h2: ({children}) => <h2 style={{fontSize:'1.15em',fontWeight:700,margin:'0.4em 0'}}>{children}</h2>,
@@ -370,7 +373,7 @@ export default function StickyNote({ noteId }) {
                           blockquote: ({children}) => <blockquote style={{borderLeft:'3px solid rgba(100,116,139,0.4)',paddingLeft:'0.75em',margin:'0.3em 0',color:'rgba(30,41,59,0.7)',fontStyle:'italic'}}>{children}</blockquote>,
                           a: ({href, children}) => <a href={href} target="_blank" rel="noopener noreferrer" style={{color:'#2563eb',textDecoration:'underline'}}>{children}</a>,
                         }}
-                      >{text}</ReactMarkdown>
+                      >{preprocess(text)}</ReactMarkdown>
                     : <span style={{ color: mutedColor, fontStyle: 'italic' }}>Nothing here yet</span>
                   }
                 </div>

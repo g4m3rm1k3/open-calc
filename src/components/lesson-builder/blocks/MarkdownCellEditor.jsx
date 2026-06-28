@@ -4,9 +4,11 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
+import rehypeRaw from 'rehype-raw'
 import 'katex/dist/katex.min.css'
 import Toolbar from '../../markdown-toolbar/MarkdownToolbar.jsx'
 import { CodeBlockPre, CodeBlockCode } from '../../math/CodeBlock.jsx'
+import { preprocess } from '../../math/latexPreprocess.js'
 import { useGlobalTheme } from '../../../context/ThemeContext.jsx'
 
 // ── Main component ────────────────────────────────────────────────────────────
@@ -95,7 +97,7 @@ export default function MarkdownCellEditor({ value, onChange, onClose, title = '
           <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-200">
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath]}
-              rehypePlugins={[rehypeKatex]}
+              rehypePlugins={[rehypeRaw, rehypeKatex]}
               components={{
                 h1: ({children}) => <h1 className="text-2xl font-bold mb-4 pb-2 border-b border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100">{children}</h1>,
                 h2: ({children}) => <h2 className="text-xl font-bold mt-6 mb-3 text-slate-900 dark:text-slate-100">{children}</h2>,
@@ -125,7 +127,7 @@ export default function MarkdownCellEditor({ value, onChange, onClose, title = '
                 a: ({href, children}) => <a href={href} className="text-indigo-600 dark:text-indigo-400 underline underline-offset-2">{children}</a>,
               }}
             >
-              {preview || '*Start typing to see preview…*'}
+              {preview ? preprocess(preview) : '*Start typing to see preview…*'}
             </ReactMarkdown>
           </div>
         </div>

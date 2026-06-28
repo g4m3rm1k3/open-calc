@@ -140,7 +140,10 @@ export function wrapBareLatex(src) {
         continue
       }
     }
-    if (src.startsWith('\\(', i)) {
+    // src[i - 1] !== '\\' excludes LaTeX's "\\(" / "\\[6pt]" row-spacing
+    // idiom (a literal \\ line-break followed by an optional [..] arg) —
+    // see the matching note in preprocess() below for why this matters.
+    if (src.startsWith('\\(', i) && src[i - 1] !== '\\') {
       const close = src.indexOf('\\)', i + 2)
       if (close !== -1) {
         out += src.slice(i, close + 2)
@@ -148,7 +151,7 @@ export function wrapBareLatex(src) {
         continue
       }
     }
-    if (src.startsWith('\\[', i)) {
+    if (src.startsWith('\\[', i) && src[i - 1] !== '\\') {
       const close = src.indexOf('\\]', i + 2)
       if (close !== -1) {
         out += src.slice(i, close + 2)
@@ -184,12 +187,27 @@ export function preprocess(text) {
   const normalized = text.replace(/\\n(?![a-z])/g, '\n\n')
   return (
     wrapBareLatex(normalized)
-      // \[…\] → $$\n…\n$$ (block / display math)
-      .replace(/\\\[/g, '$$\n')
-      .replace(/\\\]/g, '\n$$')
+      // \[…\] → $$…$$ (block / display math). Matched as ONE pair (not two
+      // independent replaces) so whatever whitespace/newlines already
+      // surround \[ and \] are preserved as-is on both sides. This matters
+      // inside list items: \[ / \] indented to match the item's 2-space
+      // continuation (e.g. "  \[\n  A x = \\lambda x\n  \]") must produce
+      // an equally-indented closing "$$", or remark/micromark sees the
+      // unindented "$$" as falling outside the list item's container and
+      // starting a brand-new (now unclosed) math block — which then
+      // swallows everything up to the next "$$" it finds, however far away
+      // (confirmed: this is what broke Diagonalisation.md's eigenspace
+      // section — a 2-space-indented \[...\] inside a list item).
+      //
+      // (?<!\\) excludes LaTeX's own "\\[6pt]"/"\\[10pt]" row-spacing idiom
+      // (a literal \\ line-break followed by an optional-arg [..]) — without
+      // it, the second backslash + "[" reads as a display-math opener with
+      // no matching closer, which permanently shifts the open/close parity
+      // for every \[...\] in the rest of the document.
+      .replace(/(?<!\\)\\\[([\s\S]*?)(?<!\\)\\\]/g, (_, inner) => `$$${inner}$$`)
       // \(…\) → $…$ (inline math)
-      .replace(/\\\(/g, '$')
-      .replace(/\\\)/g, '$')
+      .replace(/(?<!\\)\\\(/g, '$')
+      .replace(/(?<!\\)\\\)/g, '$')
       // {{algebra:topicId|linkText}} → **linkText**  (preserves visible text)
       .replace(/\{\{algebra:[^|]+\|([^}]+)\}\}/g, '**$1**')
       // "Step N:" mid-sentence → new paragraph with bold label.
@@ -199,6 +217,15 @@ export function preprocess(text) {
       .replace(/[.—]\s+(\(\d+\))\s+/g, '.\n\n$1 ')
       // Sentence break after inline math: "$math$. Next sentence" → hard line break.
       .replace(/(\$[^$\n]+\$)\.\s+(?=\S)/g, '$1.  \n')
+      // A whole line that's just "$$<equation>$$" (e.g. from a \[...\] that
+      // was crammed inline with other text rather than on its own line)
+      // parses as INLINE math, not display/block — remark-math only treats
+      // $$ as block math when the delimiters sit alone on their own line.
+      // Promote it to a proper 3-line block so it still gets display
+      // rendering. A function replacer is used throughout — see the note
+      // above about "$$" being special inside a replacement *string*.
+      .replace(/^(\s*)\$\$(.+)\$\$(\s*)$/gm, (_, lead, inner, trail) =>
+        inner.trim() ? `${lead}$$\n${inner.trim()}\n$$${trail}` : `${lead}$$${inner}$$${trail}`)
   )
 }
 
