@@ -1,27 +1,9 @@
 import { useState } from 'react';
 import CodeBlock from './CodeBlock.jsx';
 import Katex from './Katex.jsx';
-import {
-  getUsedBy,
-  flattenPrereqsTopDown,
-  computeDifficulty,
-  computeEstimatedTime,
-} from './graphUtils.js';
+import NavButton from './NavButton.jsx';
+import { computeDifficulty, computeEstimatedTime } from './graphUtils.js';
 import { CATEGORY_STYLES } from './categoryStyles.js';
-
-function NavButton({ id, topicMap, onNavigate, c }) {
-  const topic = topicMap[id];
-  if (!topic) return null;
-  return (
-    <button
-      onClick={() => onNavigate(id)}
-      className={`inline-flex items-center gap-1.5 text-[13px] font-medium px-3 py-1.5 rounded-lg border transition-all shadow-sm ${c.btn}`}
-    >
-      <span className={c.icon}>▶</span>
-      {topic.title}
-    </button>
-  );
-}
 
 function Section({ label, color, children }) {
   return (
@@ -32,12 +14,10 @@ function Section({ label, color, children }) {
   )
 }
 
-export default function ConceptNode({ topic, topicMap, allTopics, onNavigate }) {
+export default function ConceptNode({ topic, topicMap, onNavigate }) {
   const [showCode, setShowCode] = useState(false);
 
   const c = CATEGORY_STYLES[topic.category] || CATEGORY_STYLES.foundations;
-  const prerequisites = flattenPrereqsTopDown(topic.id, topicMap);
-  const usedBy = getUsedBy(topic.id, allTopics);
   const difficulty = computeDifficulty(topic.id, topicMap);
   const estimatedTime = computeEstimatedTime(topic.id, topicMap);
 
@@ -168,71 +148,21 @@ export default function ConceptNode({ topic, topicMap, allTopics, onNavigate }) 
 
           <hr className="border-slate-200 dark:border-slate-800/60 my-10" />
 
-          {/* Stats row & Requirements */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">Learning Path</div>
-              <div className="flex gap-6 text-[13px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/60 rounded-xl px-5 py-4 shadow-inner">
-                <div>
-                  <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wide mb-1">Difficulty</div>
-                  <div className="text-slate-700 dark:text-slate-200 font-semibold">{difficulty}</div>
-                </div>
-                <div className="w-px bg-slate-200 dark:bg-slate-700/50"></div>
-                <div>
-                  <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wide mb-1">Estimated Time</div>
-                  <div className="text-slate-700 dark:text-slate-200 font-semibold">{estimatedTime}</div>
-                </div>
+          {/* Stats row — dependency info (Depends On / Unlocks / full Prerequisites
+              list) moved to the right sidebar's Links tab: it's already drawn in
+              the Tree tab too, and repeating it here was crowding the lesson. */}
+          <div className="mb-10">
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">Learning Path</div>
+            <div className="flex gap-6 text-[13px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/60 rounded-xl px-5 py-4 shadow-inner max-w-sm">
+              <div>
+                <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wide mb-1">Difficulty</div>
+                <div className="text-slate-700 dark:text-slate-200 font-semibold">{difficulty}</div>
               </div>
-            </div>
-
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">Prerequisites</div>
-              {prerequisites.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {prerequisites.map(id => (
-                    <button
-                      key={id}
-                      onClick={() => onNavigate(id)}
-                      className={`text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700/50 transition-all shadow-sm bg-white dark:bg-slate-900`}
-                    >
-                      <span className="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
-                      {topicMap[id]?.title ?? id}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-slate-400 dark:text-slate-500 text-[13px] italic font-medium px-2 py-1">No prerequisites.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Depends On / Used By */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">Depends On (Immediate)</div>
-              {topic.prereqs.length === 0 ? (
-                <p className="text-slate-400 dark:text-slate-500 text-[13px] italic font-medium px-2">
-                  Nothing — this is a foundational concept.
-                </p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {topic.prereqs.map(id => (
-                    <NavButton key={id} id={id} topicMap={topicMap} onNavigate={onNavigate} c={c} />
-                  ))}
-                </div>
-              )}
-            </div>
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-3">Unlocks</div>
-              {usedBy.length === 0 ? (
-                <p className="text-slate-400 dark:text-slate-500 text-[13px] italic font-medium px-2">Nothing yet — this is a terminal topic.</p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {usedBy.map(id => (
-                    <NavButton key={id} id={id} topicMap={topicMap} onNavigate={onNavigate} c={c} />
-                  ))}
-                </div>
-              )}
+              <div className="w-px bg-slate-200 dark:bg-slate-700/50"></div>
+              <div>
+                <div className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-wide mb-1">Estimated Time</div>
+                <div className="text-slate-700 dark:text-slate-200 font-semibold">{estimatedTime}</div>
+              </div>
             </div>
           </div>
 

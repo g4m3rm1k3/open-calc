@@ -5,6 +5,7 @@ import ConceptNode from '../components/concept-explorer/ConceptNode.jsx';
 import ConceptSearch from '../components/concept-explorer/ConceptSearch.jsx';
 import ExecutionStack from '../components/concept-explorer/ExecutionStack.jsx';
 import DependencyTree from '../components/concept-explorer/DependencyTree.jsx';
+import RelatedTopics from '../components/concept-explorer/RelatedTopics.jsx';
 import { CATEGORY_STYLES } from '../components/concept-explorer/categoryStyles.js';
 
 export default function LAConceptExplorerPage() {
@@ -73,7 +74,6 @@ export default function LAConceptExplorerPage() {
           <ConceptNode
             topic={current}
             topicMap={topicMap}
-            allTopics={topics}
             onNavigate={handleNavigate}
           />
         ) : (
@@ -96,24 +96,37 @@ export default function LAConceptExplorerPage() {
           >
             Path
           </button>
-          <button 
-            onClick={() => setRightTab('tree')} 
+          <button
+            onClick={() => setRightTab('tree')}
             className={`flex-1 py-3.5 text-[11px] font-black tracking-widest uppercase transition-all ${
-              rightTab === 'tree' 
+              rightTab === 'tree'
                 ? `${c.activeTab} border-b-2`
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 border-transparent border-b-2'
             }`}
           >
             Tree
           </button>
+          <button
+            onClick={() => setRightTab('links')}
+            className={`flex-1 py-3.5 text-[11px] font-black tracking-widest uppercase transition-all ${
+              rightTab === 'links'
+                ? `${c.activeTab} border-b-2`
+                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 border-transparent border-b-2'
+            }`}
+          >
+            Links
+          </button>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto p-6 scroll-smooth custom-scrollbar">
           {rightTab === 'stack' && (
             <ExecutionStack stack={stack} topicMap={topicMap} onJumpTo={handleJumpTo} currentCategoryStyle={c} />
           )}
           {rightTab === 'tree' && current && (
             <DependencyTree topicId={current.id} topicMap={topicMap} onNavigate={handleNavigate} currentCategoryStyle={c} />
+          )}
+          {rightTab === 'links' && current && (
+            <RelatedTopics topic={current} topicMap={topicMap} allTopics={topics} onNavigate={handleNavigate} c={c} />
           )}
         </div>
       </aside>
