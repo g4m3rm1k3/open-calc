@@ -1,32 +1,35 @@
 export default function ExecutionStack({ stack, topicMap, onJumpTo }) {
-  if (stack.length <= 1) return null;
+  if (stack.length === 0) return null;
 
   return (
-    <div className="mb-8 rounded-2xl border border-slate-200 dark:border-slate-700/50 bg-white/80 dark:bg-[#0e0e1a]/80 px-6 py-4 shadow-md dark:shadow-lg backdrop-blur-sm">
-      <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3">Execution Stack</div>
-      <div className="flex flex-wrap items-center gap-2 text-[13px] font-medium">
-        {stack.map((id, i) => {
-          const topic = topicMap[id];
-          const isLast = i === stack.length - 1;
-          return (
-            <div key={id + i} className="flex items-center gap-2">
-              {i > 0 && <span className="text-slate-300 dark:text-slate-600 font-normal">→</span>}
+    <div className="flex flex-col gap-3 font-mono text-[13px] transition-colors duration-500">
+      {stack.map((id, i) => {
+        const topic = topicMap[id];
+        const isLast = i === stack.length - 1;
+        return (
+          <div key={id + i} className="flex flex-col">
+            {i > 0 && <div className={`pl-[11px] py-1 text-[16px] font-bold transition-colors duration-500 ${isLast ? 'text-brand-600 dark:text-brand-400' : 'text-slate-300 dark:text-slate-600'}`}>↓</div>}
+            <div className="flex items-start gap-3 relative">
+              <div className={`mt-1 w-2 h-2 rounded-full shrink-0 transition-all duration-500 ${isLast ? 'bg-brand-500 shadow-[0_0_8px_rgba(var(--tw-custom-brand-500),0.6)]' : 'bg-slate-300 dark:bg-slate-600'}`} />
               {isLast ? (
-                <span className="text-indigo-700 dark:text-white px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/40 shadow-sm dark:shadow-[0_0_15px_rgba(99,102,241,0.15)]">
-                  {topic?.title ?? id}
-                </span>
+                <div className="flex flex-col font-sans">
+                  <span className={`font-bold leading-tight transition-colors duration-500 text-brand-600 dark:text-brand-400`}>
+                    {topic?.title ?? id}
+                  </span>
+                  <span className={`text-[10px] uppercase tracking-widest font-bold mt-1 transition-colors duration-500 text-brand-600 dark:text-brand-400`}>Current</span>
+                </div>
               ) : (
                 <button
                   onClick={() => onJumpTo(i)}
-                  className="text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 px-3 py-1.5 rounded-lg transition-all border border-transparent hover:border-indigo-100 dark:hover:border-indigo-500/20"
+                  className={`font-sans text-left font-medium leading-tight transition-colors duration-500 text-slate-600 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-400`}
                 >
                   {topic?.title ?? id}
                 </button>
               )}
             </div>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
