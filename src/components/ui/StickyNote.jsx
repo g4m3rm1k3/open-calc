@@ -5,6 +5,8 @@ import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import rehypeRaw from 'rehype-raw'
 import 'katex/dist/katex.min.css'
+import Editor from '@monaco-editor/react'
+import MarkdownToolbar from '../markdown-toolbar/MarkdownToolbar.jsx'
 import { preprocess } from '../math/latexPreprocess.js'
 import DEFAULT_NOTES from './default-notes.json'
 
@@ -73,6 +75,11 @@ const COLORS = [
   { id: 'orange', dot: '#fb923c', bg: '#ffedd5', bgDark: '#2c1500', border: '#fb923c' },
 ]
 
+// Bigger than the old 320×(auto) default — a real Monaco instance + toolbar
+// needs room to be usable, not just a couple of lines of plain text.
+const DEFAULT_W = 480
+const DEFAULT_H = 460
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function StickyNote({ noteId }) {
@@ -82,38 +89,24 @@ export default function StickyNote({ noteId }) {
   const [preview, setPreview] = useState(false)
   const [ruled, setRuled] = useState(false)
   const [fontIdx, setFontIdx] = useState(0)
-  const [size, setSize] = useState({ w: 320, h: null })
+  const [size, setSize] = useState({ w: DEFAULT_W, h: DEFAULT_H })
   const [pos, setPos] = useState(null)
   const btnRef = useRef(null)
   const cardRef = useRef(null)
+  const editorRef = useRef(null)
   // Always-current ref so scroll/resize closures see latest size
-  const sizeRef = useRef({ w: 320, h: null })
+  const sizeRef = useRef({ w: DEFAULT_W, h: DEFAULT_H })
   sizeRef.current = size
   // Prevents save from firing with stale state on the first render after open
   const loadedRef = useRef(false)
 
+  const isDark = useIsDark()
   const stored = getNote(noteId)
   const hasNote = !!stored?.text?.trim()
   const C = COLORS.find(c => c.id === color) ?? COLORS[0]
-  const cardBg = C.bg
-  const textColor = '#1e293b'
-  const mutedColor = '#64748b'
-
-  // Load from storage when opening
-  useEffect(() => {
-    if (open) {
-      loadedRef.current = false
-      const n = getNote(noteId)
-      setText(n?.text ?? '')
-      setColor(n?.color ?? 'yellow')
-      setRuled(n?.ruled ?? false)
-      setFontIdx(n?.fontIdx ?? 0)
-      setSize({ w: n?.w ?? 320, h: n?.h ?? null })
-      setPreview(!!(n?.text?.trim()))
-    } else {
-      loadedRef.current = false
-    }
-  }, [open, noteId])
+  const cardBg = isDark ? C.bgDark : C.bg
+  const textColor = isDark ? '#f1f5f9' : '#1e293b'
+  const mutedColor = isDark ? '#94a3b8' : '#64748b'
 
   // Auto-save when text or color changes while open
   useEffect(() => {
@@ -139,8 +132,24 @@ export default function StickyNote({ noteId }) {
     return { x, y }
   }
 
+  // Loading is done synchronously here (not in a useEffect keyed on `open`)
+  // so the very first render with open=true already has the correct text —
+  // Monaco's `defaultValue` only applies once, at mount, so a stale value
+  // from a later effect would never make it into the editor.
   const handleOpen = () => {
-    if (!open) setPos(computePos())
+    if (!open) {
+      loadedRef.current = false
+      const n = getNote(noteId)
+      setText(n?.text ?? '')
+      setColor(n?.color ?? 'yellow')
+      setRuled(n?.ruled ?? false)
+      setFontIdx(n?.fontIdx ?? 0)
+      setSize({ w: n?.w ?? DEFAULT_W, h: n?.h ?? DEFAULT_H })
+      setPreview(!!(n?.text?.trim()))
+      setPos(computePos())
+    } else {
+      loadedRef.current = false
+    }
     setOpen(o => !o)
   }
 
@@ -175,6 +184,14 @@ export default function StickyNote({ noteId }) {
       window.removeEventListener('resize', onResize)
     }
   }, [open])
+
+  const insertBtn = (btn) => {
+    const ed = editorRef.current
+    if (!ed) return
+    if (btn.plain != null) ed.trigger('keyboard', 'type', { text: btn.plain })
+    else if (btn.snippet) ed.trigger('keyboard', 'editor.action.insertSnippet', { snippet: btn.snippet })
+    ed.focus()
+  }
 
   const onDragStart = (e) => {
     e.preventDefault()
@@ -245,9 +262,9 @@ export default function StickyNote({ noteId }) {
           top: pos.y,
           left: pos.x,
           width: size.w,
-          height: size.h ?? 'auto',
-          minWidth: 220,
-          minHeight: 120,
+          height: size.h ?? DEFAULT_H,
+          minWidth: 360,
+          minHeight: 280,
           display: 'flex',
           flexDirection: 'column',
           resize: 'both',
@@ -281,7 +298,7 @@ export default function StickyNote({ noteId }) {
                   style={{
                     width: 13, height: 13, borderRadius: '50%',
                     background: c.dot,
-                    border: color === c.id ? '2px solid #1e293b' : '1.5px solid transparent',
+                    border: color === c.id ? `2px solid ${textColor}` : '1.5px solid transparent',
                     cursor: 'pointer', padding: 0,
                   }}
                 />
@@ -339,9 +356,9 @@ export default function StickyNote({ noteId }) {
           </div>
 
           {/* Content */}
-          <div style={{ flex: 1, padding: 10, overflow: 'auto', userSelect: 'text', minHeight: 0 }}>
-            {preview
-              ? (
+          {preview
+            ? (
+              <div style={{ flex: 1, padding: 10, overflow: 'auto', userSelect: 'text', minHeight: 0 }}>
                 <div style={{
                     fontSize: FONT_SIZES[fontIdx], lineHeight: 1.7, color: textColor, minHeight: 60, wordBreak: 'break-word',
                     ...(ruled ? {
@@ -370,34 +387,39 @@ export default function StickyNote({ noteId }) {
                           th: ({children}) => <th style={{border:'1px solid rgba(100,116,139,0.3)',padding:'4px 8px',background:'rgba(100,116,139,0.1)',textAlign:'left'}}>{children}</th>,
                           td: ({children}) => <td style={{border:'1px solid rgba(100,116,139,0.2)',padding:'4px 8px'}}>{children}</td>,
                           hr: () => <hr style={{border:'none',borderTop:'1px solid rgba(100,116,139,0.2)',margin:'0.5em 0'}} />,
-                          blockquote: ({children}) => <blockquote style={{borderLeft:'3px solid rgba(100,116,139,0.4)',paddingLeft:'0.75em',margin:'0.3em 0',color:'rgba(30,41,59,0.7)',fontStyle:'italic'}}>{children}</blockquote>,
-                          a: ({href, children}) => <a href={href} target="_blank" rel="noopener noreferrer" style={{color:'#2563eb',textDecoration:'underline'}}>{children}</a>,
+                          blockquote: ({children}) => <blockquote style={{borderLeft:'3px solid rgba(100,116,139,0.4)',paddingLeft:'0.75em',margin:'0.3em 0',color:mutedColor,fontStyle:'italic'}}>{children}</blockquote>,
+                          a: ({href, children}) => <a href={href} target="_blank" rel="noopener noreferrer" style={{color: isDark ? '#60a5fa' : '#2563eb',textDecoration:'underline'}}>{children}</a>,
                         }}
                       >{preprocess(text)}</ReactMarkdown>
                     : <span style={{ color: mutedColor, fontStyle: 'italic' }}>Nothing here yet</span>
                   }
                 </div>
-              )
-              : (
-                <textarea
-                  value={text}
-                  onChange={e => setText(e.target.value)}
-                  placeholder="Write a note… **bold**, $math$, etc."
-                  autoFocus
-                  style={{
-                    width: '100%', height: '100%', minHeight: 60, resize: 'none',
-                    background: ruled
-                      ? `repeating-linear-gradient(transparent, transparent calc(1.7em - 1px), rgba(100,116,139,0.14) calc(1.7em - 1px), rgba(100,116,139,0.14) 1.7em)`
-                      : 'transparent',
-                    backgroundSize: '100% 1.7em',
-                    border: 'none', outline: 'none',
-                    fontSize: FONT_SIZES[fontIdx], lineHeight: 1.7, color: textColor,
-                    fontFamily: 'inherit', padding: 0, boxSizing: 'border-box',
-                  }}
-                />
-              )
-            }
-          </div>
+              </div>
+            )
+            : (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' }}>
+                <MarkdownToolbar onInsert={insertBtn} />
+                <div style={{ flex: 1, minHeight: 0 }}>
+                  <Editor
+                    defaultValue={text}
+                    language="markdown"
+                    theme={isDark ? 'vs-dark' : 'vs'}
+                    onChange={(v) => setText(v ?? '')}
+                    onMount={(editor) => { editorRef.current = editor }}
+                    options={{
+                      fontSize: FONT_SIZES[fontIdx],
+                      lineHeight: Math.round(FONT_SIZES[fontIdx] * 1.7),
+                      minimap: { enabled: false },
+                      wordWrap: 'on',
+                      scrollBeyondLastLine: false,
+                      automaticLayout: true,
+                      padding: { top: 10, bottom: 10 },
+                    }}
+                  />
+                </div>
+              </div>
+            )
+          }
         </div>
       )}
     </span>
