@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import graphData from '../data/concept-graph.json';
 import ConceptNode from '../components/concept-explorer/ConceptNode.jsx';
@@ -7,6 +7,8 @@ import ExecutionStack from '../components/concept-explorer/ExecutionStack.jsx';
 import DependencyTree from '../components/concept-explorer/DependencyTree.jsx';
 import RelatedTopics from '../components/concept-explorer/RelatedTopics.jsx';
 import { CATEGORY_STYLES } from '../components/concept-explorer/categoryStyles.js';
+
+const STACK_STORAGE_KEY = 'la-explorer-stack';
 
 export default function LAConceptExplorerPage() {
   const navigate = useNavigate();
@@ -18,9 +20,22 @@ export default function LAConceptExplorerPage() {
     return map;
   }, [topics]);
 
-  const defaultRoot = topics.find(t => t.id === 'orthogonal-diagonalization') || topics[0];
-  const [stack, setStack] = useState(defaultRoot ? [defaultRoot.id] : []);
+  // Reopen wherever the student left off — there's no reason a reload should
+  // bounce them to an arbitrary fixed topic instead of where they actually were.
+  const [stack, setStack] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STACK_STORAGE_KEY));
+      if (Array.isArray(saved) && saved.length > 0 && saved.every(id => topicMap[id])) {
+        return saved;
+      }
+    } catch { /* ignore malformed/missing storage */ }
+    return topics[0] ? [topics[0].id] : [];
+  });
   const [rightTab, setRightTab] = useState('stack'); // 'stack' or 'tree'
+
+  useEffect(() => {
+    localStorage.setItem(STACK_STORAGE_KEY, JSON.stringify(stack));
+  }, [stack]);
 
   const currentId = stack[stack.length - 1];
   const current = topicMap[currentId];

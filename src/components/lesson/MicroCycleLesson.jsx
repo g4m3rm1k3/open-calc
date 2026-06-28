@@ -587,7 +587,7 @@ function IntuitionBlock({ data, lesson }) {
   if (!hasPrimary && !hasAlternate) return null;
 
   return (
-    <div className="mb-16">
+    <div className="mb-16" id={lesson?.id ? `${lesson.id}-intuition` : undefined}>
       <div className="mb-8 flex items-center gap-4">
         <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 font-serif">
           Conceptual Intuition

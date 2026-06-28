@@ -68,6 +68,19 @@
           }
         ],
         "answerLatex": "cv = \\begin{bmatrix} 6 \\\\ -3 \\\\ 9 \\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "A scalar is just a single real number — no direction, no shape, no components.",
+        "rules": [
+          {
+            "note": "Any single real number is a scalar — c is the general symbol used for it.",
+            "latex": "c \\in \\mathbb{R}"
+          },
+          {
+            "note": "The one thing a scalar does to a vector: multiply every component by the same number c.",
+            "latex": "c \\cdot v = \\begin{bmatrix} cv_1 \\\\ cv_2 \\\\ \\vdots \\\\ cv_n \\end{bmatrix}"
+          }
+        ]
       }
     },
     {
@@ -161,6 +174,19 @@
           }
         ],
         "answerLatex": "v+w = \\begin{bmatrix} 4 \\\\ 3 \\\\ 1 \\end{bmatrix}, \\qquad 2v = \\begin{bmatrix} 6 \\\\ -2 \\\\ 4 \\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "A vector in ℝⁿ is an ordered list of n real numbers — the general pattern every specific vector follows.",
+        "rules": [
+          {
+            "note": "n components, in a fixed order — v₁ is always first, vₙ always last.",
+            "latex": "v = \\begin{bmatrix} v_1 \\\\ v_2 \\\\ \\vdots \\\\ v_n \\end{bmatrix} \\in \\mathbb{R}^n"
+          },
+          {
+            "note": "Addition and scalar multiplication both act component-by-component, index i against index i — for any n, not just n=2 or 3.",
+            "latex": "v + w = \\begin{bmatrix} v_1+w_1 \\\\ \\vdots \\\\ v_n+w_n \\end{bmatrix}, \\qquad cv = \\begin{bmatrix} cv_1 \\\\ \\vdots \\\\ cv_n \\end{bmatrix}"
+          }
+        ]
       }
     },
     {
@@ -256,6 +282,23 @@
           }
         ],
         "answerLatex": "u - v = \\begin{bmatrix} -2 \\\\ 3 \\end{bmatrix}, \\qquad \\lVert v \\rVert = \\sqrt{10}, \\qquad \\hat v = \\frac{1}{\\sqrt{10}}\\begin{bmatrix} 3 \\\\ -1 \\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Every vector operation reduces to the same component-wise pattern, for any dimension n.",
+        "rules": [
+          {
+            "note": "Subtraction is addition of the negative — still entry i against entry i.",
+            "latex": "u - v = \\begin{bmatrix} u_1-v_1\\\\ \\vdots \\\\ u_n-v_n\\end{bmatrix}"
+          },
+          {
+            "note": "Magnitude is the Pythagorean theorem extended to n dimensions: square every component, add them, take the root.",
+            "latex": "\\lVert v \\rVert = \\sqrt{v_1^2+v_2^2+\\cdots+v_n^2}"
+          },
+          {
+            "note": "Dividing any nonzero vector by its own length always produces a unit vector — this works for every v.",
+            "latex": "\\hat v = \\frac{v}{\\lVert v \\rVert}, \\qquad \\lVert \\hat v \\rVert = 1"
+          }
+        ]
       }
     },
     {
@@ -333,14 +376,27 @@
         "problem": "Two vectors get reused through this whole chain: v₁ = (1, 1, 0) and v₂ = (1, 0, 1). Compute v₁·v₂ and v₁·v₁ — both feed straight into Projection below.",
         "steps": [
           {
-            "text": "v₁·v₂ = (1)(1) + (1)(0) + (0)(1) = 1 + 0 + 0.",
+            "latex": "v_1\\cdot v_2 = (1)(1) + (1)(0) + (0)(1) = 1+0+0",
             "sourceTopic": "vectors"
           },
           {
-            "text": "v₁·v₁ = (1)(1) + (1)(1) + (0)(0) = 1 + 1 + 0."
+            "latex": "v_1\\cdot v_1 = (1)(1) + (1)(1) + (0)(0) = 1+1+0"
           }
         ],
-        "answer": "v₁·v₂ = 1, v₁·v₁ = 2"
+        "answerLatex": "v_1\\cdot v_2 = 1, \\qquad v_1\\cdot v_1 = 2"
+      },
+      "canonical": {
+        "intro": "The dot product of two vectors in ℝⁿ is always this same sum, regardless of what u and v actually are.",
+        "rules": [
+          {
+            "note": "Multiply matching components, add them all — defined for any n, as long as u and v have the SAME n.",
+            "latex": "u\\cdot v = u_1v_1+u_2v_2+\\cdots+u_nv_n = \\sum_{i=1}^n u_iv_i"
+          },
+          {
+            "note": "The same number, viewed geometrically — holds for every pair of nonzero vectors, not a special case.",
+            "latex": "u\\cdot v = \\lVert u\\rVert\\,\\lVert v\\rVert\\cos\\theta"
+          }
+        ]
       }
     },
     {
@@ -424,6 +480,19 @@
           }
         ],
         "answerLatex": "u \\times v = \\begin{bmatrix} 0 \\\\ 0 \\\\ 1 \\end{bmatrix}, \\qquad \\lVert u \\times v \\rVert = 1"
+      },
+      "canonical": {
+        "intro": "The cross product has one fixed general formula, only defined in ℝ³.",
+        "rules": [
+          {
+            "note": "Each component skips its own index and cross-multiplies the other two, with a sign flip on the middle one — memorize this index pattern, not any one example’s numbers.",
+            "latex": "u\\times v = \\begin{bmatrix} u_2v_3-u_3v_2 \\\\ u_3v_1-u_1v_3 \\\\ u_1v_2-u_2v_1\\end{bmatrix}"
+          },
+          {
+            "note": "Always equals the area of the parallelogram spanned by u and v, for any u, v in ℝ³.",
+            "latex": "\\lVert u\\times v\\rVert = \\lVert u\\rVert\\lVert v\\rVert\\sin\\theta"
+          }
+        ]
       }
     },
     {
@@ -504,6 +573,15 @@
           }
         ],
         "answerLatex": "A_{11}=2,\\ A_{12}=1,\\ A_{21}=1,\\ A_{22}=3, \\qquad A \\text{ is } 2\\times 2"
+      },
+      "canonical": {
+        "intro": "A general m×n matrix is just a rectangular table of numbers, indexed by row and column.",
+        "rules": [
+          {
+            "note": "aᵢⱼ always means row i, column j — first index is the row, second is the column, no matter the matrix’s actual size.",
+            "latex": "A = \\begin{bmatrix} a_{11}&a_{12}&\\cdots&a_{1n}\\\\ a_{21}&a_{22}&\\cdots&a_{2n}\\\\ \\vdots&\\vdots&\\ddots&\\vdots\\\\ a_{m1}&a_{m2}&\\cdots&a_{mn}\\end{bmatrix} \\in \\mathbb{R}^{m\\times n}"
+          }
+        ]
       }
     },
     {
@@ -615,6 +693,27 @@
           }
         ],
         "answerLatex": "A+B = \\begin{bmatrix} 3 & 1 \\\\ 3 & 4 \\end{bmatrix}, \\qquad AB = \\begin{bmatrix} 4 & 1 \\\\ 7 & 3 \\end{bmatrix}, \\qquad B^{T} = \\begin{bmatrix} 1 & 2 \\\\ 0 & 1 \\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Two matrices can only be multiplied if the inner dimensions match — and the result’s shape is whatever’s left over (the outer dimensions).",
+        "rules": [
+          {
+            "note": "The number of columns of A must equal the number of rows of B (both n) — that’s the only requirement. The result takes A’s row count and B’s column count.",
+            "latex": "A_{m\\times n}\\ \\cdot\\ B_{n\\times p}\\ =\\ C_{m\\times p}"
+          },
+          {
+            "note": "Concretely: a 3×5 matrix times a 5×3 matrix gives a 3×3 result. The matching 5’s cancel out; the leftover 3 and 3 become the new shape — this works even though neither A nor B is square.",
+            "latex": "A_{3\\times 5}\\ \\cdot\\ B_{5\\times 3}\\ =\\ C_{3\\times 3}"
+          },
+          {
+            "note": "Entry (i,j) of the product is row i of A dotted with column j of B, summed over the shared inner dimension k. Every matrix multiplication, no matter the size, is this one rule.",
+            "latex": "C_{ij} = \\sum_{k=1}^{n} A_{ik}\\,B_{kj}"
+          },
+          {
+            "note": "Transpose swaps the row and column index of every entry. This is exactly why a symmetric matrix (where A_ij already equals A_ji) looks unchanged after transposing — there’s nothing left to swap.",
+            "latex": "(A^{T})_{ij} = A_{ji}"
+          }
+        ]
       }
     },
     {
@@ -702,6 +801,23 @@
           }
         ],
         "answerLatex": "\\det(A) = 5"
+      },
+      "canonical": {
+        "intro": "For ANY 2×2 matrix, the determinant is the same fixed formula — only the labels a, b, c, d change between problems, never the pattern.",
+        "rules": [
+          {
+            "note": "The four entries, in general position.",
+            "latex": "A = \\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}"
+          },
+          {
+            "note": "Multiply the main diagonal, subtract the product of the other diagonal. This is the entire rule for 2×2 — no exceptions, no special cases.",
+            "latex": "\\det(A) = ad - bc"
+          },
+          {
+            "note": "For a 3×3, expand along the first row with alternating +, −, + signs. Each term’s 2×2 \"minor\" is whatever is left after deleting that entry’s row and column.",
+            "latex": "A = \\begin{bmatrix} a&b&c\\\\ d&e&f\\\\ g&h&i\\end{bmatrix} \\quad\\Longrightarrow\\quad \\det(A) = a\\det\\begin{bmatrix}e&f\\\\h&i\\end{bmatrix} - b\\det\\begin{bmatrix}d&f\\\\g&i\\end{bmatrix} + c\\det\\begin{bmatrix}d&e\\\\g&h\\end{bmatrix}"
+          }
+        ]
       }
     },
     {
@@ -795,6 +911,19 @@
           }
         ],
         "answerLatex": "x = 1, \\qquad y = 3"
+      },
+      "canonical": {
+        "intro": "Any system of linear equations can be written in the single general form Ax=b — the size changes, the form never does.",
+        "rules": [
+          {
+            "note": "m equations in n unknowns, written as one matrix equation — A is m×n, x is n×1, b is m×1.",
+            "latex": "\\begin{cases} a_{11}x_1+\\cdots+a_{1n}x_n = b_1\\\\ \\vdots\\\\ a_{m1}x_1+\\cdots+a_{mn}x_n = b_m\\end{cases} \\quad\\Longleftrightarrow\\quad Ax = b"
+          },
+          {
+            "note": "A linear system’s solution set is always exactly one of these three — this is a hard rule, not a coincidence of small examples.",
+            "latex": "\\text{exactly one solution,}\\quad \\text{infinitely many,}\\quad \\text{or none}"
+          }
+        ]
       }
     },
     {
@@ -894,6 +1023,27 @@
           }
         ],
         "answerLatex": "\\operatorname{RREF}(A) = \\begin{bmatrix} 1 & 0 & 1 \\\\ 0 & 1 & 1 \\\\ 0 & 0 & 0 \\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Row reduction is only allowed to use three operations on the augmented matrix — anything else can change the solution set, which would make the answer wrong.",
+        "rules": [
+          {
+            "note": "Swap two rows — reordering equations doesn’t change what satisfies them.",
+            "latex": "R_i \\leftrightarrow R_j"
+          },
+          {
+            "note": "Scale a row by any nonzero constant c — multiplying both sides of a true equation by the same nonzero number keeps it true for the same solutions.",
+            "latex": "R_i \\to c\\,R_i, \\qquad c \\neq 0"
+          },
+          {
+            "note": "Add a multiple of one row to another — this is the one that actually eliminates a variable, and it’s valid for the same reason: adding a (scaled) true equation to another true equation changes nothing about the solution.",
+            "latex": "R_i \\to R_i + c\\,R_j"
+          },
+          {
+            "note": "Nothing else is legal. In particular: you never multiply two rows together, never add a bare constant to a row, and never scale a row by 0 (that would erase an equation instead of preserving it).",
+            "latex": "\\text{NOT allowed:}\\quad R_i\\cdot R_j, \\qquad R_i + k\\ (k\\ \\text{a lone number}), \\qquad R_i \\to 0\\cdot R_i"
+          }
+        ]
       }
     },
     {
@@ -985,6 +1135,23 @@
           }
         ],
         "answerLatex": "B^{-1} = \\begin{bmatrix} \\tfrac{3}{5} & -\\tfrac{1}{5} \\\\ -\\tfrac{1}{5} & \\tfrac{2}{5} \\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "A square matrix A has at most one inverse, and it must satisfy this equation exactly — for any n×n A.",
+        "rules": [
+          {
+            "note": "The defining equation — A⁻¹ undoes A in both multiplication orders.",
+            "latex": "AA^{-1}=A^{-1}A=I_n"
+          },
+          {
+            "note": "The adjugate formula and the existence test hold for ANY size n — det(A)=0 is the only thing that can break it.",
+            "latex": "A^{-1}=\\frac{1}{\\det(A)}\\operatorname{adj}(A), \\qquad \\text{exists} \\iff \\det(A)\\neq 0"
+          },
+          {
+            "note": "Inverting a product reverses the order — true for any invertible A, B of matching size.",
+            "latex": "(AB)^{-1}=B^{-1}A^{-1}"
+          }
+        ]
       }
     },
     {
@@ -1066,6 +1233,19 @@
           }
         ],
         "answerLatex": "\\operatorname{rank}(A) = 2,\\quad \\operatorname{nullity}(A) = 1,\\quad 2 + 1 = 3 = n \\checkmark"
+      },
+      "canonical": {
+        "intro": "For ANY m×n matrix A, these two numbers are forced to add up to n — a theorem, not a pattern that happens to hold in examples.",
+        "rules": [
+          {
+            "note": "n is the number of COLUMNS of A — m never enters this equation directly.",
+            "latex": "\\operatorname{rank}(A) + \\operatorname{nullity}(A) = n"
+          },
+          {
+            "note": "Both numbers come directly from counting columns in the row-reduced form — for any A.",
+            "latex": "\\operatorname{rank}(A) = \\#\\text{pivot columns in RREF}(A), \\qquad \\operatorname{nullity}(A) = \\#\\text{free columns}"
+          }
+        ]
       }
     },
     {
@@ -1153,6 +1333,19 @@
           }
         ],
         "answerLatex": "\\operatorname{Null}(A) = \\operatorname{Span}\\left\\{ \\begin{bmatrix} -1 \\\\ -1 \\\\ 1 \\end{bmatrix} \\right\\}, \\qquad \\dim\\operatorname{Null}(A) = 1"
+      },
+      "canonical": {
+        "intro": "The null space of any m×n matrix A is defined the same way regardless of size.",
+        "rules": [
+          {
+            "note": "Every solution to the homogeneous system — always a subspace of ℝⁿ (the domain), never ℝᵘ.",
+            "latex": "\\operatorname{Null}(A) = \\{\\,x\\in\\mathbb{R}^n \\mid Ax=0\\,\\}"
+          },
+          {
+            "note": "Directly from rank-nullity — true for any A.",
+            "latex": "\\dim\\operatorname{Null}(A) = n - \\operatorname{rank}(A)"
+          }
+        ]
       }
     },
     {
@@ -1237,6 +1430,19 @@
           }
         ],
         "answerLatex": "\\operatorname{Col}(A) = \\operatorname{Span}\\left\\{ \\begin{bmatrix} 1 \\\\ 2 \\\\ 1 \\end{bmatrix}, \\begin{bmatrix} 2 \\\\ 4 \\\\ 1 \\end{bmatrix} \\right\\}"
+      },
+      "canonical": {
+        "intro": "The column space of any m×n matrix is defined identically no matter what the matrix is.",
+        "rules": [
+          {
+            "note": "a₁,…,aₙ are the columns of A — Col(A) lives in ℝᵘ (the codomain), never ℝⁿ.",
+            "latex": "\\operatorname{Col}(A) = \\operatorname{Span}\\{a_1,a_2,\\ldots,a_n\\} \\subseteq \\mathbb{R}^m"
+          },
+          {
+            "note": "Always equal — this is literally the definition of rank in column-space terms.",
+            "latex": "\\dim\\operatorname{Col}(A) = \\operatorname{rank}(A)"
+          }
+        ]
       }
     },
     {
@@ -1325,6 +1531,19 @@
           }
         ],
         "answerLatex": "\\{a_1,a_2,a_3\\} \\text{ is linearly dependent } (a_3 = a_1+a_2); \\quad \\{a_1,a_2\\} \\text{ is linearly independent}"
+      },
+      "canonical": {
+        "intro": "A set of vectors is linearly independent based on ONE equation — this never changes regardless of how many vectors or what dimension.",
+        "rules": [
+          {
+            "note": "Independent means the ONLY way to combine them to zero is trivially — if any nonzero combination also works, they’re dependent.",
+            "latex": "c_1v_1+c_2v_2+\\cdots+c_kv_k = 0 \\quad\\Longrightarrow\\quad c_1=c_2=\\cdots=c_k=0"
+          },
+          {
+            "note": "Stack them as columns — independence is exactly full column rank, for any k vectors.",
+            "latex": "\\{v_1,\\ldots,v_k\\}\\ \\text{independent} \\iff \\operatorname{rank}\\begin{bmatrix}v_1&\\cdots&v_k\\end{bmatrix} = k"
+          }
+        ]
       }
     },
     {
@@ -1419,6 +1638,23 @@
           }
         ],
         "answerLatex": "\\mathcal{B} = \\left\\{ \\begin{bmatrix}1\\\\2\\\\1\\end{bmatrix}, \\begin{bmatrix}2\\\\4\\\\1\\end{bmatrix} \\right\\}, \\qquad \\dim\\operatorname{Col}(A) = 2"
+      },
+      "canonical": {
+        "intro": "A basis for a vector space V must satisfy BOTH conditions — dropping either one breaks the definition.",
+        "rules": [
+          {
+            "note": "Spans the space.",
+            "latex": "\\operatorname{Span}\\{v_1,\\ldots,v_k\\} = V"
+          },
+          {
+            "note": "And is linearly independent.",
+            "latex": "c_1v_1+\\cdots+c_kv_k=0 \\;\\Longrightarrow\\; \\text{all } c_i=0"
+          },
+          {
+            "note": "Every basis of the same space has the same number of vectors — that number IS the dimension, by definition.",
+            "latex": "\\dim V = k = \\#\\{\\text{vectors in any basis of } V\\}"
+          }
+        ]
       }
     },
     {
@@ -1513,6 +1749,19 @@
           }
         ],
         "answerLatex": "\\lambda(A) = \\{0,\\ 2,\\ 4\\}"
+      },
+      "canonical": {
+        "intro": "Eigenvalues of ANY square matrix A are defined by this one equation — only the size of A changes between examples.",
+        "rules": [
+          {
+            "note": "λ is an eigenvalue if SOME nonzero v exists satisfying this — v is the eigenvector, found afterward.",
+            "latex": "Av = \\lambda v, \\qquad v\\neq 0"
+          },
+          {
+            "note": "The characteristic equation — the ONLY way eigenvalues are found, for any n×n A.",
+            "latex": "\\det(A-\\lambda I) = 0"
+          }
+        ]
       }
     },
     {
@@ -1613,6 +1862,19 @@
           }
         ],
         "answerLatex": "E_0(A)=\\operatorname{Span}\\left\\{\\begin{bmatrix}-\\sqrt3\\\\1\\\\0\\end{bmatrix}\\right\\},\\quad E_4(A)=\\operatorname{Span}\\left\\{\\begin{bmatrix}1\\\\\\sqrt3\\\\0\\end{bmatrix}\\right\\},\\quad E_2(A)=\\operatorname{Span}\\left\\{\\begin{bmatrix}0\\\\0\\\\1\\end{bmatrix}\\right\\}"
+      },
+      "canonical": {
+        "intro": "For any eigenvalue λ of A, its eigenspace is defined and computed identically.",
+        "rules": [
+          {
+            "note": "Always a null-space computation — solve this homogeneous system for whichever λ you already found.",
+            "latex": "E_\\lambda(A) = \\operatorname{Null}(A-\\lambda I) = \\{x : (A-\\lambda I)x = 0\\}"
+          },
+          {
+            "note": "Holds for every eigenvalue of every square matrix — geometric multiplicity can never exceed algebraic multiplicity.",
+            "latex": "1 \\leq \\dim E_\\lambda(A) \\leq \\text{alg.mult}(\\lambda)"
+          }
+        ]
       }
     },
     {
@@ -1726,6 +1988,19 @@
           }
         ],
         "answerLatex": "A = PDP^{-1},\\qquad P=\\begin{bmatrix}-\\sqrt3&1&0\\\\1&\\sqrt3&0\\\\0&0&1\\end{bmatrix},\\quad D=\\operatorname{diag}(0,4,2),\\quad P^{-1}=\\begin{bmatrix}-\\tfrac{\\sqrt3}{4}&\\tfrac14&0\\\\ \\tfrac14&\\tfrac{\\sqrt3}{4}&0\\\\ 0&0&1\\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "A is diagonalizable exactly when this factorization exists — the same test and form for any n×n A.",
+        "rules": [
+          {
+            "note": "P’s columns are n linearly independent eigenvectors; D’s diagonal holds the matching eigenvalues, same order.",
+            "latex": "A = PDP^{-1}"
+          },
+          {
+            "note": "Three equivalent ways to say the same thing — any one confirms (or rules out) diagonalizability.",
+            "latex": "A\\ \\text{diagonalizable} \\iff n\\ \\text{independent eigenvectors} \\iff \\text{geo.mult}(\\lambda)=\\text{alg.mult}(\\lambda)\\ \\forall\\lambda"
+          }
+        ]
       }
     },
     {
@@ -1814,6 +2089,23 @@
           }
         ],
         "answerLatex": "\\langle v_1,v_2\\rangle = 1 = \\langle v_2,v_1\\rangle, \\qquad \\langle v_1,v_1\\rangle = 2 > 0"
+      },
+      "canonical": {
+        "intro": "An inner product on a vector space is ANY function ⟨·,·⟩ satisfying these three axioms — the dot product is just the most familiar example.",
+        "rules": [
+          {
+            "note": "Symmetry: order never matters.",
+            "latex": "\\langle u,v\\rangle = \\langle v,u\\rangle"
+          },
+          {
+            "note": "Linearity in the first argument, for any scalars a, b.",
+            "latex": "\\langle au+bv,w\\rangle = a\\langle u,w\\rangle + b\\langle v,w\\rangle"
+          },
+          {
+            "note": "Positive-definiteness — this is what lets ⟨v,v⟩ define a valid notion of length.",
+            "latex": "\\langle v,v\\rangle \\geq 0, \\quad \\text{with equality iff } v=0"
+          }
+        ]
       }
     },
     {
@@ -1887,14 +2179,29 @@
         "problem": "Are v₁ = (1, 1, 0) and v₂ = (1, 0, 1) orthogonal?",
         "steps": [
           {
-            "text": "Compute v₁·v₂ — already done in Dot Product: it equals 1.",
+            "note": "Compute v₁·v₂ — already done in Dot Product.",
+            "latex": "v_1\\cdot v_2 = 1",
             "sourceTopic": "dot-product"
           },
           {
-            "text": "Since v₁·v₂ = 1 ≠ 0, the vectors are NOT orthogonal. That gap is exactly what Gram-Schmidt below fixes."
+            "note": "Two vectors are orthogonal exactly when their dot product is zero. It isn’t here — that gap is exactly what Gram-Schmidt below fixes.",
+            "latex": "v_1\\cdot v_2 = 1 \\neq 0 \\;\\Longrightarrow\\; v_1 \\not\\perp v_2"
           }
         ],
-        "answer": "Not orthogonal (v₁·v₂ = 1 ≠ 0)"
+        "answerLatex": "v_1\\cdot v_2 = 1 \\neq 0 \\;\\Longrightarrow\\; \\text{not orthogonal}"
+      },
+      "canonical": {
+        "intro": "Two vectors are orthogonal based on a single test, for any inner product and any dimension.",
+        "rules": [
+          {
+            "note": "The ENTIRE definition — no exceptions for special vectors or dimensions.",
+            "latex": "u\\perp v \\iff \\langle u,v\\rangle = 0"
+          },
+          {
+            "note": "Every pair, not just consecutive ones — ALL cross pairs must vanish.",
+            "latex": "\\{v_1,\\ldots,v_k\\}\\ \\text{orthogonal} \\iff \\langle v_i,v_j\\rangle=0\\ \\ \\forall\\, i\\neq j"
+          }
+        ]
       }
     },
     {
@@ -1978,18 +2285,30 @@
         "problem": "Find the projection of v₂ = (1, 0, 1) onto v₁ = (1, 1, 0).",
         "steps": [
           {
-            "text": "proj_{v₁}(v₂) = (v₂·v₁ / v₁·v₁) v₁. From Dot Product: v₂·v₁ = 1 and v₁·v₁ = 2.",
+            "note": "The projection formula. From Dot Product: v₂·v₁ = 1 and v₁·v₁ = 2.",
+            "latex": "\\operatorname{proj}_{v_1}(v_2) = \\frac{v_2\\cdot v_1}{v_1\\cdot v_1}\\,v_1 = \\frac{1}{2}\\,v_1",
             "sourceTopic": "dot-product"
           },
           {
-            "text": "Scalar coefficient = 1/2."
-          },
-          {
-            "text": "Multiply the scalar by v₁: (1/2)(1, 1, 0) = (0.5, 0.5, 0).",
+            "note": "Multiply the scalar 1/2 into every component of v₁.",
+            "latex": "\\frac12\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix} = \\begin{bmatrix}0.5\\\\0.5\\\\0\\end{bmatrix}",
             "sourceTopic": "vector-operations"
           }
         ],
-        "answer": "proj = (0.5, 0.5, 0)"
+        "answerLatex": "\\operatorname{proj}_{v_1}(v_2) = \\begin{bmatrix}0.5\\\\0.5\\\\0\\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "The projection of any vector v onto any nonzero vector u follows this one formula.",
+        "rules": [
+          {
+            "note": "The scalar coefficient is always v’s component along u, divided by u’s own squared length — never changes shape.",
+            "latex": "\\operatorname{proj}_u(v) = \\frac{\\langle v,u\\rangle}{\\langle u,u\\rangle}\\,u"
+          },
+          {
+            "note": "What’s left over after subtracting the projection is always orthogonal to u — for any u, v.",
+            "latex": "v - \\operatorname{proj}_u(v) \\ \\perp\\ u"
+          }
+        ]
       }
     },
     {
@@ -2073,22 +2392,38 @@
         "problem": "Orthogonalize v₁ = (1, 1, 0) and v₂ = (1, 0, 1).",
         "steps": [
           {
-            "text": "u₁ = v₁ = (1, 1, 0)."
+            "latex": "u_1 = v_1 = \\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}"
           },
           {
-            "text": "u₂ = v₂ − proj_{u₁}(v₂) = (1, 0, 1) − (0.5, 0.5, 0) = (0.5, −0.5, 1). The projection was computed above.",
+            "note": "Subtract off the projection onto u₁ — computed in full in Projection above.",
+            "latex": "u_2 = v_2 - \\operatorname{proj}_{u_1}(v_2) = \\begin{bmatrix}1\\\\0\\\\1\\end{bmatrix} - \\begin{bmatrix}0.5\\\\0.5\\\\0\\end{bmatrix} = \\begin{bmatrix}0.5\\\\-0.5\\\\1\\end{bmatrix}",
             "sourceTopic": "projection"
           },
           {
-            "text": "Check: u₁·u₂ = (1)(0.5) + (1)(−0.5) + (0)(1) = 0. Orthogonal ✓",
+            "note": "Check orthogonality — exactly the dot-product test from Orthogonality.",
+            "latex": "u_1\\cdot u_2 = (1)(0.5)+(1)(-0.5)+(0)(1) = 0 \\;\\checkmark",
             "sourceTopic": "orthogonality"
           },
           {
-            "text": "Normalize: q₁ = u₁/‖u₁‖ = (1,1,0)/√2, q₂ = u₂/‖u₂‖ = (0.5,−0.5,1)/√1.5 = (1,−1,2)/√6.",
+            "note": "Normalize each orthogonal vector by dividing by its own length.",
+            "latex": "q_1 = \\frac{u_1}{\\lVert u_1\\rVert} = \\frac{1}{\\sqrt2}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}, \\qquad q_2 = \\frac{u_2}{\\lVert u_2\\rVert} = \\frac{1}{\\sqrt{1.5}}\\begin{bmatrix}0.5\\\\-0.5\\\\1\\end{bmatrix} = \\frac{1}{\\sqrt6}\\begin{bmatrix}1\\\\-1\\\\2\\end{bmatrix}",
             "sourceTopic": "vector-operations"
           }
         ],
-        "answer": "q₁ = (1/√2, 1/√2, 0),  q₂ = (1/√6, −1/√6, 2/√6)"
+        "answerLatex": "q_1 = \\frac{1}{\\sqrt2}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}, \\qquad q_2=\\frac{1}{\\sqrt6}\\begin{bmatrix}1\\\\-1\\\\2\\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "For ANY linearly independent set v₁,…,vₖ, Gram-Schmidt builds an orthogonal set by this same recursive rule.",
+        "rules": [
+          {
+            "note": "Subtract off the projection onto EVERY previously built orthogonal vector — not just the last one.",
+            "latex": "u_1 = v_1, \\qquad u_k = v_k - \\sum_{i=1}^{k-1}\\operatorname{proj}_{u_i}(v_k)\\quad (k\\geq 2)"
+          },
+          {
+            "note": "Normalizing each uₖ afterward turns \"orthogonal\" into \"orthonormal\" — same recipe regardless of k or dimension.",
+            "latex": "q_k = \\frac{u_k}{\\lVert u_k\\rVert}"
+          }
+        ]
       }
     },
     {
@@ -2160,23 +2495,41 @@
       "example": "Solving least squares Ax≈b: x = R⁻¹(Qᵀb) — more stable than normal equations.",
       "walkthrough": {
         "problem": "Find the QR factorization of A = [[1,1],[1,0],[0,1]] — a 3×2 matrix, not square — whose columns are v₁ = (1,1,0) and v₂ = (1,0,1).",
+        "problemLatex": "A = \\begin{bmatrix}1&1\\\\1&0\\\\0&1\\end{bmatrix}",
         "steps": [
           {
-            "text": "Run Gram-Schmidt on the columns of A to get q₁, q₂ — done in full above.",
+            "note": "Run Gram-Schmidt on the columns of A — done in full above.",
+            "latex": "q_1 = \\frac{1}{\\sqrt2}\\begin{bmatrix}1\\\\1\\\\0\\end{bmatrix}, \\qquad q_2=\\frac{1}{\\sqrt6}\\begin{bmatrix}1\\\\-1\\\\2\\end{bmatrix}",
             "sourceTopic": "gram-schmidt"
           },
           {
-            "text": "Q = [q₁ q₂], columns (1/√2, 1/√2, 0) and (1/√6, −1/√6, 2/√6)."
+            "note": "Assemble Q from the orthonormal columns.",
+            "latex": "Q = \\begin{bmatrix}q_1 & q_2\\end{bmatrix} = \\begin{bmatrix}1/\\sqrt2 & 1/\\sqrt6\\\\ 1/\\sqrt2 & -1/\\sqrt6\\\\ 0 & 2/\\sqrt6\\end{bmatrix}"
           },
           {
-            "text": "R is upper triangular by construction: r₁₁ = ‖u₁‖ = √2, r₁₂ = q₁·v₂ = 1/√2, r₂₂ = ‖u₂‖ = √1.5, and r₂₁ = 0 because q₂ ⊥ v₁.",
+            "note": "R is upper triangular by construction: r₁₁=‖u₁‖, r₁₂=q₁·v₂, r₂₂=‖u₂‖, and r₂₁=0 because q₂⊥v₁.",
+            "latex": "r_{11}=\\sqrt2,\\quad r_{12}=q_1\\cdot v_2=\\tfrac{1}{\\sqrt2},\\quad r_{22}=\\sqrt{1.5},\\quad r_{21}=0 \\;\\Longrightarrow\\; R=\\begin{bmatrix}\\sqrt2 & 1/\\sqrt2\\\\ 0 & \\sqrt{1.5}\\end{bmatrix}",
             "sourceTopic": "matrix-operations"
           },
           {
-            "text": "Verify: Q R = A."
+            "note": "Verify QR = A by multiplying back out.",
+            "latex": "QR = \\begin{bmatrix}1/\\sqrt2 & 1/\\sqrt6\\\\ 1/\\sqrt2 & -1/\\sqrt6\\\\ 0 & 2/\\sqrt6\\end{bmatrix}\\begin{bmatrix}\\sqrt2 & 1/\\sqrt2\\\\ 0 & \\sqrt{1.5}\\end{bmatrix} = \\begin{bmatrix}1&1\\\\1&0\\\\0&1\\end{bmatrix} = A \\;\\checkmark"
           }
         ],
-        "answer": "Q = [[1/√2, 1/√6], [1/√2, −1/√6], [0, 2/√6]],  R = [[√2, 1/√2], [0, √1.5]]"
+        "answerLatex": "Q = \\begin{bmatrix}1/\\sqrt2 & 1/\\sqrt6\\\\ 1/\\sqrt2 & -1/\\sqrt6\\\\ 0 & 2/\\sqrt6\\end{bmatrix}, \\qquad R = \\begin{bmatrix}\\sqrt2 & 1/\\sqrt2\\\\ 0 & \\sqrt{1.5}\\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Any matrix A with linearly independent columns factors this way, for any shape m×n (m≥n).",
+        "rules": [
+          {
+            "note": "Q’s columns are the Gram-Schmidt orthonormal vectors; R is upper triangular.",
+            "latex": "A = QR, \\qquad Q^TQ=I_n,\\qquad R\\ \\text{upper triangular}"
+          },
+          {
+            "note": "R is upper triangular BY CONSTRUCTION — qᵢ is built orthogonal to every column before aᵢ, forcing these entries to zero.",
+            "latex": "r_{ij} = \\langle q_i, a_j\\rangle\\ (i\\leq j), \\qquad r_{ij}=0\\ (i>j)"
+          }
+        ]
       }
     },
     {
@@ -2268,6 +2621,19 @@
           }
         ],
         "answerLatex": "L = \\begin{bmatrix} 1 & 0 \\\\ 2 & 1 \\end{bmatrix}, \\qquad U = \\begin{bmatrix} 2 & 1 \\\\ 0 & 1 \\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Whenever no row swaps are needed, A factors this way for any square matrix.",
+        "rules": [
+          {
+            "note": "L records every elimination multiplier; U is whatever’s left after eliminating below each pivot.",
+            "latex": "A = LU, \\qquad L\\ \\text{lower triangular (1's on diagonal)}, \\qquad U\\ \\text{upper triangular}"
+          },
+          {
+            "note": "Each entry of L below the diagonal is exactly the multiplier used to zero out that position during elimination.",
+            "latex": "\\ell_{ij} = \\frac{a_{ij}^{(\\text{current})}}{a_{jj}^{(\\text{pivot})}} \\quad (i>j)"
+          }
+        ]
       }
     },
     {
@@ -2359,6 +2725,19 @@
           }
         ],
         "answerLatex": "Q^{-1}=Q^{T}"
+      },
+      "canonical": {
+        "intro": "A matrix Q is orthogonal exactly when this holds — true for any size n, not just 2×2 or 3×3.",
+        "rules": [
+          {
+            "note": "Equivalent conditions — either alone proves Q is orthogonal.",
+            "latex": "Q^TQ = I \\quad\\Longleftrightarrow\\quad Q^{-1}=Q^{T}"
+          },
+          {
+            "note": "Orthogonal matrices never stretch or shrink vectors — only rotate/reflect. Holds for every x, not just eigenvectors.",
+            "latex": "\\lVert Qx\\rVert = \\lVert x\\rVert \\quad \\text{for every } x"
+          }
+        ]
       }
     },
     {
@@ -2449,6 +2828,19 @@
           }
         ],
         "answerLatex": "A = A^{T}\\ \\text{(symmetric)}"
+      },
+      "canonical": {
+        "intro": "A matrix is symmetric exactly when this index relation holds for every entry.",
+        "rules": [
+          {
+            "note": "Every entry equals its mirror across the diagonal — for ANY n×n matrix.",
+            "latex": "A = A^{T} \\quad\\Longleftrightarrow\\quad a_{ij}=a_{ji}\\ \\ \\forall\\, i,j"
+          },
+          {
+            "note": "Both consequences hold for every real symmetric matrix — this is the spectral theorem’s setup.",
+            "latex": "A\\ \\text{symmetric} \\;\\Longrightarrow\\; \\lambda(A)\\subset\\mathbb{R}, \\quad \\text{eigenvectors for distinct } \\lambda\\ \\text{are orthogonal}"
+          }
+        ]
       }
     },
     {
@@ -2547,6 +2939,19 @@
           }
         ],
         "answerLatex": "A = QDQ^{T}\\quad\\text{with}\\quad \\lambda(A)=\\{0,4,2\\}\\subset\\mathbb{R},\\ \\ Q^{T}Q=I"
+      },
+      "canonical": {
+        "intro": "Every real symmetric matrix, of any size n, satisfies this exact factorization — no exceptions, no special cases.",
+        "rules": [
+          {
+            "note": "Symmetry alone GUARANTEES this — you never need to check anything else first.",
+            "latex": "A = A^T \\quad\\Longrightarrow\\quad A = Q\\Lambda Q^{T}, \\qquad Q^TQ=I,\\ \\ \\Lambda\\ \\text{diagonal real}"
+          },
+          {
+            "note": "The columns of Q are an orthonormal eigenbasis — symmetric matrices are the only ones GUARANTEED to have one.",
+            "latex": "Q = \\begin{bmatrix}q_1&\\cdots&q_n\\end{bmatrix},\\quad Aq_i = \\lambda_i q_i,\\quad q_i\\cdot q_j = 0\\ (i\\neq j)"
+          }
+        ]
       }
     },
     {
@@ -2631,12 +3036,29 @@
             "sourceTopic": "orthogonal-matrices"
           },
           {
-            "note": "AQ = QD as before, but now Q⁻¹ = Qᵗ, so multiply both sides by Qᵗ instead of inverting.",
+            "note": "Compute QD first — multiplying by a diagonal matrix on the right just scales each column of Q by the matching diagonal entry of D (columns scaled by 0, 4, 2 respectively).",
+            "latex": "QD = \\begin{bmatrix}-\\tfrac{\\sqrt3}{2}&\\tfrac12&0\\\\ \\tfrac12&\\tfrac{\\sqrt3}{2}&0\\\\ 0&0&1\\end{bmatrix}\\begin{bmatrix}0&0&0\\\\0&4&0\\\\0&0&2\\end{bmatrix} = \\begin{bmatrix}0 & 4\\!\\cdot\\!\\tfrac12 & 0\\\\ 0 & 4\\!\\cdot\\!\\tfrac{\\sqrt3}{2} & 0\\\\ 0&0&2\\end{bmatrix} = \\begin{bmatrix}0&2&0\\\\0&2\\sqrt3&0\\\\0&0&2\\end{bmatrix}"
+          },
+          {
+            "note": "AQ = QD (same relation as Diagonalization), but now Q⁻¹ = Qᵗ, so right-multiply both sides by Qᵗ instead of inverting.",
             "latex": "AQ=QD \\;\\Longrightarrow\\; A=QDQ^{T}",
             "sourceTopic": "diagonalization"
+          },
+          {
+            "note": "Verify with two entries of QDQᵗ, computed as dot products (row of QD against the matching column of Qᵗ) — they should reproduce A's entries exactly.",
+            "latex": "(QDQ^{T})_{11} = (0)\\!\\left(\\!-\\tfrac{\\sqrt3}{2}\\right)+(2)\\!\\left(\\tfrac12\\right)+(0)(0) = 1 = A_{11}, \\qquad (QDQ^{T})_{12} = (0)\\!\\left(\\tfrac12\\right)+(2)\\!\\left(\\tfrac{\\sqrt3}{2}\\right)+(0)(0) = \\sqrt3 = A_{12}"
           }
         ],
-        "answerLatex": "A = QDQ^{T}"
+        "answerLatex": "A = QDQ^{T} \\quad\\text{(verified entrywise against the original }A\\text{)}"
+      },
+      "canonical": {
+        "intro": "For any symmetric A, this replaces the general A=PDP⁻¹ with a cheaper, more stable version.",
+        "rules": [
+          {
+            "note": "Because Q is orthogonal, Q⁻¹=Qᵗ — no matrix inversion is ever needed, for any symmetric A.",
+            "latex": "A = QDQ^{T} \\quad (\\text{vs. the general } A=PDP^{-1})"
+          }
+        ]
       }
     },
     {
@@ -2750,6 +3172,19 @@
           }
         ],
         "answerLatex": "\\sigma_1=\\sqrt3,\\quad \\sigma_2=1,\\qquad U=\\begin{bmatrix}\\tfrac{2}{\\sqrt6}&0\\\\\\tfrac{1}{\\sqrt6}&\\tfrac{1}{\\sqrt2}\\\\\\tfrac{1}{\\sqrt6}&-\\tfrac{1}{\\sqrt2}\\end{bmatrix},\\ V=\\begin{bmatrix}\\tfrac{1}{\\sqrt2}&\\tfrac{1}{\\sqrt2}\\\\\\tfrac{1}{\\sqrt2}&-\\tfrac{1}{\\sqrt2}\\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "EVERY matrix, of any shape m×n (no symmetry, not even square), has this factorization — SVD has no preconditions.",
+        "rules": [
+          {
+            "note": "U, V are square orthogonal matrices of different sizes (m and n); Σ is rectangular like A, singular values decreasing.",
+            "latex": "A = U\\Sigma V^{T}, \\qquad U^TU=I_m,\\ \\ V^TV=I_n,\\ \\ \\sigma_1\\geq\\sigma_2\\geq\\cdots\\geq 0"
+          },
+          {
+            "note": "Singular values always come from the eigenvalues of AᵗA (always symmetric, positive semi-definite, for ANY A) — this is what makes SVD universal.",
+            "latex": "\\sigma_i = \\sqrt{\\lambda_i(A^TA)}, \\qquad Av_i = \\sigma_i u_i"
+          }
+        ]
       }
     },
     {
@@ -2855,6 +3290,19 @@
           }
         ],
         "answerLatex": "\\hat x=\\begin{bmatrix}2/3\\\\2/3\\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Whenever Ax=b has no exact solution, this is the unique closest x — for any A, b combination.",
+        "rules": [
+          {
+            "note": "By definition, the x that makes the leftover error as small as possible — not necessarily zero.",
+            "latex": "\\hat x = \\arg\\min_x \\lVert Ax-b\\rVert^2"
+          },
+          {
+            "note": "The normal equations — always solvable when A has independent columns, regardless of whether b is in Col(A).",
+            "latex": "A^TA\\,\\hat x = A^Tb"
+          }
+        ]
       }
     },
     {
@@ -2947,6 +3395,19 @@
           }
         ],
         "answerLatex": "A^{+}=\\begin{bmatrix}1/3&2/3&-1/3\\\\1/3&-1/3&2/3\\end{bmatrix},\\qquad A^{+}b=\\begin{bmatrix}2/3\\\\2/3\\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Every matrix A, even non-square or rank-deficient ones, has exactly one Moore–Penrose pseudoinverse A⁺.",
+        "rules": [
+          {
+            "note": "Built from the SAME U, Σ, V as the SVD — flip every nonzero singular value, leave the zeros alone.",
+            "latex": "A^{+} = V\\Sigma^{+}U^{T}, \\qquad \\Sigma^{+}_{ii} = \\begin{cases}1/\\sigma_i & \\sigma_i\\neq 0\\\\ 0 & \\sigma_i=0\\end{cases}"
+          },
+          {
+            "note": "A⁺ generalizes the inverse to every matrix — square, rectangular, full-rank or not.",
+            "latex": "\\hat x = A^{+}b \\quad \\text{always exists, even when } A^{-1}\\ \\text{doesn't}"
+          }
+        ]
       }
     },
     {
@@ -3053,6 +3514,23 @@
           }
         ],
         "answerLatex": "T(v) = \\begin{bmatrix} 4 \\\\ 2 \\end{bmatrix}, \\qquad T(v+w) = T(v)+T(w), \\qquad T(cv) = cT(v) \\;\\checkmark"
+      },
+      "canonical": {
+        "intro": "A function T is a linear transformation only if it satisfies BOTH properties for every input — true for ANY T, not just matrix multiplication.",
+        "rules": [
+          {
+            "note": "Additivity, for all u, v.",
+            "latex": "T(u+v) = T(u)+T(v)"
+          },
+          {
+            "note": "Homogeneity, for all scalars c. Both must hold for ALL inputs — failing either disqualifies T as linear.",
+            "latex": "T(cv) = cT(v)"
+          },
+          {
+            "note": "Every linear transformation between finite-dimensional spaces can be written this way — A is built from T applied to the basis vectors.",
+            "latex": "T(x) = Ax \\quad \\text{for a unique matrix } A"
+          }
+        ]
       }
     },
     {
@@ -3156,6 +3634,19 @@
           }
         ],
         "answerLatex": "[v]_B = \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix}, \\qquad a=3,\\ b=1"
+      },
+      "canonical": {
+        "intro": "Converting coordinates between any two bases of the same space always uses this one matrix equation.",
+        "rules": [
+          {
+            "note": "P’s columns are the new basis vectors written in standard coordinates — for any basis B.",
+            "latex": "P = \\begin{bmatrix} b_1 & b_2 & \\cdots & b_n\\end{bmatrix}, \\qquad [v]_{\\text{std}} = P\\,[v]_B"
+          },
+          {
+            "note": "Going the other direction always requires inverting P — this is why P must be invertible.",
+            "latex": "[v]_B = P^{-1}[v]_{\\text{std}}"
+          }
+        ]
       }
     },
     {
@@ -3247,6 +3738,23 @@
           }
         ],
         "answerLatex": "\\lambda(S)=\\{1,3\\},\\ \\text{both}>0;\\qquad x^{T}Sx\\big|_{x=(1,1)} = 6 > 0"
+      },
+      "canonical": {
+        "intro": "A symmetric matrix is positive definite under any of these THREE equivalent conditions — checking one is enough.",
+        "rules": [
+          {
+            "note": "The defining condition — must hold for literally every nonzero x.",
+            "latex": "x^TAx > 0 \\quad \\text{for every } x\\neq 0"
+          },
+          {
+            "note": "Equivalent to the condition above — usually easier to actually check.",
+            "latex": "\\text{all eigenvalues } \\lambda_i > 0"
+          },
+          {
+            "note": "A third equivalent test (Sylvester’s criterion) — useful when eigenvalues are hard to compute by hand.",
+            "latex": "\\text{all leading principal minors of } A > 0"
+          }
+        ]
       }
     },
     {
@@ -3350,6 +3858,19 @@
           }
         ],
         "answerLatex": "L = \\begin{bmatrix} \\sqrt2 & 0 \\\\[2pt] \\dfrac{\\sqrt2}{2} & \\dfrac{\\sqrt6}{2} \\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Every symmetric positive-definite matrix, of any size, has a unique factorization of this exact form.",
+        "rules": [
+          {
+            "note": "Uniqueness comes from requiring a POSITIVE diagonal — without that restriction, L isn’t unique.",
+            "latex": "A = LL^{T}, \\qquad L\\ \\text{lower triangular with strictly positive diagonal}"
+          },
+          {
+            "note": "Applied column by column, these two formulas build L for ANY symmetric positive-definite matrix.",
+            "latex": "\\ell_{ii} = \\sqrt{a_{ii}-\\sum_{k<i}\\ell_{ik}^2}, \\qquad \\ell_{ji}=\\frac{1}{\\ell_{ii}}\\Big(a_{ji}-\\sum_{k<i}\\ell_{jk}\\ell_{ik}\\Big)\\ (j>i)"
+          }
+        ]
       }
     },
     {
@@ -3435,6 +3956,23 @@
           }
         ],
         "answerLatex": "v+w = \\begin{bmatrix} 4 \\\\ 3 \\\\ 1 \\end{bmatrix} \\in \\mathbb{R}^3, \\qquad 5v = \\begin{bmatrix} 15 \\\\ -5 \\\\ 10 \\end{bmatrix} \\in \\mathbb{R}^3"
+      },
+      "canonical": {
+        "intro": "A set V is a vector space only if it satisfies ALL of these rules for every u,v in V and every scalar c — not just some of them.",
+        "rules": [
+          {
+            "note": "Closure: combining vectors in the space (by these two operations) can never leave the space.",
+            "latex": "u+v \\in V, \\qquad cv \\in V \\quad \\text{for every } u,v\\in V,\\ c\\in\\mathbb{R}"
+          },
+          {
+            "note": "Addition is commutative and associative — true for every vector space, abstract or concrete.",
+            "latex": "u+v=v+u, \\qquad (u+v)+w=u+(v+w)"
+          },
+          {
+            "note": "A zero vector and additive inverses must exist inside V — without these, it isn’t a vector space at all.",
+            "latex": "\\exists\\, 0\\in V:\\ v+0=v, \\qquad \\exists\\,(-v)\\in V:\\ v+(-v)=0"
+          }
+        ]
       }
     },
     {
@@ -3557,6 +4095,19 @@
           }
         ],
         "answerLatex": "\\operatorname{Col}(A): \\dim 2 \\;\\;|\\;\\; \\operatorname{Null}(A): \\dim 1 \\;\\;|\\;\\; \\operatorname{Row}(A): \\dim 2 \\;\\;|\\;\\; \\operatorname{Null}(A^T): \\dim 1"
+      },
+      "canonical": {
+        "intro": "For ANY m×n matrix A with rank r, these four subspaces and their dimensions are completely fixed by m, n, and r.",
+        "rules": [
+          {
+            "note": "These two live in the codomain ℝᵘ and are orthogonal complements of each other.",
+            "latex": "\\operatorname{Col}(A)\\subseteq\\mathbb{R}^m,\\ \\dim=r \\qquad \\operatorname{Null}(A^T)\\subseteq\\mathbb{R}^m,\\ \\dim=m-r"
+          },
+          {
+            "note": "These two live in the domain ℝⁿ and are orthogonal complements of each other.",
+            "latex": "\\operatorname{Row}(A)\\subseteq\\mathbb{R}^n,\\ \\dim=r \\qquad \\operatorname{Null}(A)\\subseteq\\mathbb{R}^n,\\ \\dim=n-r"
+          }
+        ]
       }
     },
     {
@@ -3663,6 +4214,19 @@
           }
         ],
         "answerLatex": "\\pi=\\begin{bmatrix}4/7\\\\3/7\\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Any stochastic transition matrix (columns summing to 1) is guaranteed to have these properties, for every size n.",
+        "rules": [
+          {
+            "note": "Both conditions define \"stochastic\" — probabilities are non-negative and each column sums to 1.",
+            "latex": "P_{ij}\\geq 0, \\qquad \\sum_{i=1}^n P_{ij} = 1 \\quad \\text{for every column } j"
+          },
+          {
+            "note": "Every stochastic matrix has a steady-state eigenvector for λ=1 — guaranteed by the column-sum condition, not a coincidence.",
+            "latex": "P\\pi = \\pi, \\qquad \\lambda=1\\ \\text{is always an eigenvalue of any stochastic matrix}"
+          }
+        ]
       }
     },
     {
@@ -3758,6 +4322,19 @@
           }
         ],
         "answerLatex": "Q(x_1,x_2) = 2x_1^2+2x_1x_2+2x_2^2,\\qquad Q(1,1) = 6"
+      },
+      "canonical": {
+        "intro": "Every quadratic form in n variables comes from a unique symmetric matrix, by this formula.",
+        "rules": [
+          {
+            "note": "A is taken symmetric WLOG — the cross terms come from i≠j pairs.",
+            "latex": "Q(x) = x^TAx = \\sum_{i,j} a_{ij}x_ix_j, \\qquad A=A^T"
+          },
+          {
+            "note": "In the eigenbasis of A, every quadratic form becomes a pure sum of squares — no cross terms survive, for any A.",
+            "latex": "Q(x) = \\sum_i \\lambda_i y_i^2 \\quad (y = Q^Tx,\\ \\text{principal axes form})"
+          }
+        ]
       }
     },
     {
@@ -3858,6 +4435,15 @@
           }
         ],
         "answerLatex": "A\\ \\text{is diagonalizable: geo.mult}(\\lambda)=\\text{alg.mult}(\\lambda)=1\\ \\text{for }\\lambda\\in\\{0,4,2\\}"
+      },
+      "canonical": {
+        "intro": "This single multiplicity comparison decides diagonalizability for any square matrix — no other test is needed.",
+        "rules": [
+          {
+            "note": "Check EVERY eigenvalue — if even one fails, A is not diagonalizable, regardless of the others.",
+            "latex": "A\\ \\text{diagonalizable} \\iff \\text{geo.mult}(\\lambda) = \\text{alg.mult}(\\lambda) \\quad \\text{for every eigenvalue } \\lambda"
+          }
+        ]
       }
     },
     {
@@ -3951,6 +4537,19 @@
           }
         ],
         "answerLatex": "A \\sim D,\\qquad D = P^{-1}AP,\\qquad P=\\begin{bmatrix}-\\sqrt3&1&0\\\\1&\\sqrt3&0\\\\0&0&1\\end{bmatrix}"
+      },
+      "canonical": {
+        "intro": "Two n×n matrices are similar under this one test — and similar matrices always share these invariants, for any A, B.",
+        "rules": [
+          {
+            "note": "S represents a change of basis — A and B describe the SAME linear map, just in different coordinates.",
+            "latex": "B \\sim A \\iff B = S^{-1}AS \\quad \\text{for some invertible } S"
+          },
+          {
+            "note": "All three preserved under similarity, for any A, B, S — these are exactly the quantities independent of basis.",
+            "latex": "A\\sim B \\;\\Longrightarrow\\; \\det(A)=\\det(B), \\quad \\operatorname{tr}(A)=\\operatorname{tr}(B), \\quad \\lambda(A)=\\lambda(B)"
+          }
+        ]
       }
     },
     {
@@ -4036,6 +4635,19 @@
           }
         ],
         "answerLatex": "e^{At} = P\\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & e^{4t} & 0 \\\\ 0 & 0 & e^{2t} \\end{bmatrix}P^{-1}"
+      },
+      "canonical": {
+        "intro": "For ANY diagonalizable n×n matrix A, the matrix exponential always factors through D this way.",
+        "rules": [
+          {
+            "note": "The infinite series always converges; diagonalizability turns it into a closed-form computable matrix.",
+            "latex": "e^{At} = \\sum_{k=0}^{\\infty}\\frac{(At)^k}{k!}, \\qquad A=PDP^{-1} \\;\\Longrightarrow\\; e^{At}=P\\,e^{Dt}\\,P^{-1}"
+          },
+          {
+            "note": "Exponentiating a diagonal matrix just exponentiates each diagonal entry — true for any D, any n.",
+            "latex": "e^{Dt} = \\operatorname{diag}(e^{\\lambda_1 t},\\ldots,e^{\\lambda_n t})"
+          }
+        ]
       }
     },
     {
@@ -4121,6 +4733,19 @@
           }
         ],
         "answerLatex": "w = 3u_1 + 1u_2, \\qquad a=3,\\ b=1"
+      },
+      "canonical": {
+        "intro": "The span of any set of vectors is, by definition, exactly this set of combinations — for k vectors and any scalars.",
+        "rules": [
+          {
+            "note": "Every possible linear combination, with every possible choice of scalars — the whole definition, for any k vectors of any dimension.",
+            "latex": "\\operatorname{Span}\\{v_1,\\ldots,v_k\\} = \\{\\,c_1v_1+\\cdots+c_kv_k \\mid c_1,\\ldots,c_k\\in\\mathbb{R}\\,\\}"
+          },
+          {
+            "note": "Checking membership in a span is always solving this linear system for the c’s — that’s the only test there is.",
+            "latex": "w\\in\\operatorname{Span}\\{v_1,\\ldots,v_k\\} \\iff \\exists\\,c_1,\\ldots,c_k:\\ c_1v_1+\\cdots+c_kv_k=w"
+          }
+        ]
       }
     },
     {
@@ -4210,6 +4835,15 @@
           }
         ],
         "answerLatex": "[v]_B = \\begin{bmatrix} 3 \\\\ 1 \\end{bmatrix} \\quad\\text{relative to basis } B"
+      },
+      "canonical": {
+        "intro": "Coordinates relative to ANY basis B={b₁,…,bₙ} are defined the same way.",
+        "rules": [
+          {
+            "note": "Because B is a basis, this representation always exists and is always unique — that’s exactly what makes coordinates well-defined.",
+            "latex": "v = c_1b_1+c_2b_2+\\cdots+c_nb_n \\quad\\Longrightarrow\\quad [v]_B = \\begin{bmatrix}c_1\\\\c_2\\\\\\vdots\\\\c_n\\end{bmatrix}"
+          }
+        ]
       }
     },
     {
@@ -4290,6 +4924,19 @@
           }
         ],
         "answerLatex": "\\operatorname{tr}(A) = 6 = 0+4+2"
+      },
+      "canonical": {
+        "intro": "The trace of any n×n matrix is this one sum, regardless of what the matrix is.",
+        "rules": [
+          {
+            "note": "Only the diagonal entries — off-diagonal entries never contribute, no matter how large they are.",
+            "latex": "\\operatorname{tr}(A) = a_{11}+a_{22}+\\cdots+a_{nn} = \\sum_{i=1}^n a_{ii}"
+          },
+          {
+            "note": "Always equals the sum of the eigenvalues (with multiplicity) — true for every square A, even with complex eigenvalues.",
+            "latex": "\\operatorname{tr}(A) = \\sum_{i=1}^n \\lambda_i"
+          }
+        ]
       }
     },
     {
@@ -4378,6 +5025,19 @@
           }
         ],
         "answerLatex": "\\|A\\|_2=\\sqrt3,\\qquad \\|A\\|_F=2"
+      },
+      "canonical": {
+        "intro": "These vector and matrix norms are defined the same way for any dimension n or shape m×n.",
+        "rules": [
+          {
+            "note": "The p-norm family — p=2 is what \"length\" normally means, but p=1 and p=∞ are equally valid norms.",
+            "latex": "\\lVert v\\rVert_p = \\Big(\\sum_{i=1}^n |v_i|^p\\Big)^{1/p}"
+          },
+          {
+            "note": "The spectral norm is always the LARGEST singular value; Frobenius is the root of the SUM of squared singular values — for any matrix.",
+            "latex": "\\lVert A\\rVert_2 = \\sigma_{\\max}(A), \\qquad \\lVert A\\rVert_F = \\sqrt{\\sum_{i,j}a_{ij}^2} = \\sqrt{\\textstyle\\sum_i \\sigma_i^2}"
+          }
+        ]
       }
     },
     {
@@ -4496,6 +5156,19 @@
           }
         ],
         "answerLatex": "\\text{1st PC: }\\ v_1=\\frac{1}{\\sqrt2}\\begin{bmatrix}1\\\\1\\end{bmatrix}\\ (\\lambda_1=8),\\qquad \\text{2nd PC: }\\ v_2=\\frac{1}{\\sqrt2}\\begin{bmatrix}-1\\\\1\\end{bmatrix}\\ (\\lambda_2=2)"
+      },
+      "canonical": {
+        "intro": "For any centered data matrix, PCA always reduces to this one eigenvalue problem on the covariance matrix.",
+        "rules": [
+          {
+            "note": "The covariance matrix is always symmetric and positive semi-definite, for any dataset — why the spectral theorem always applies to it.",
+            "latex": "C = \\frac{1}{n}X_c^{T}X_c, \\qquad C=C^{T},\\ \\ \\text{eigenvalues of } C \\geq 0"
+          },
+          {
+            "note": "Order eigenvalues largest to smallest — the eigenvector for the LARGEST is always the direction of maximum variance, for any dataset.",
+            "latex": "Cv_i = \\lambda_i v_i, \\quad \\lambda_1\\geq\\lambda_2\\geq\\cdots\\geq 0 \\;\\Longrightarrow\\; v_1\\ \\text{is the 1st principal component}"
+          }
+        ]
       }
     }
   ]
