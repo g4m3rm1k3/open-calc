@@ -1,3 +1,7 @@
+import algebraBinomialSqUrl from '../diagrams/calc-algebra-binomial-sq.svg?url'
+import algebraIneqFlipUrl from '../diagrams/calc-algebra-ineq-flip.svg?url'
+import algebraFactoringUrl from '../diagrams/calc-algebra-factoring.svg?url'
+
 export default {
   id: 'algebra-tricky-parts',
   slug: 'algebra-tricky-parts',
@@ -19,6 +23,11 @@ export default {
   intuition: {
     summary: `Most algebra errors come from overapplying simple rules to situations where they don't hold.
       The fix is understanding WHEN each rule works and building a mental "alarm" for when you're in danger.`,
+    blocks: [
+      { type: "image", src: algebraBinomialSqUrl, alt: "(a+b)² area model showing four regions", caption: "Visual proof: (a+b)² = a² + 2ab + b². The 2ab term is always there — you can't skip it." },
+      { type: "image", src: algebraIneqFlipUrl, alt: "Inequality sign flip rules diagram", caption: "The sign flips only when you multiply or divide both sides by a negative number. Add/subtract is always safe." },
+      { type: "image", src: algebraFactoringUrl, alt: "Factoring decision tree", caption: "Factoring strategy: pull GCF first, then count terms to choose the right pattern (difference of squares, trinomial, etc.)." },
+    ],
     perspectives: [
       {
         style: 'mistake-focused',

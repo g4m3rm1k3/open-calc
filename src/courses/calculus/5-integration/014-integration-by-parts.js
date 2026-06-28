@@ -1,4 +1,6 @@
 import uSubUrl from '../diagrams/calc-u-sub.svg?url';
+import ibpFormulaUrl from '../diagrams/calc-ibp-formula.svg?url';
+import ibpLiateUrl from '../diagrams/calc-ibp-liate.svg?url';
 // FILE: src/content/chapter-4/07-integration-by-parts.js
 export default {
   id: 'ch4-007',
@@ -23,14 +25,26 @@ export default {
         paragraphs: [
       'The product rule says $(uv)\' = u\'v + uv\'$. Rearranging: $uv\' = (uv)\' - u\'v$. Integrate both sides: $\\int u\\,v\'\\,dx = uv - \\int u\'\\,v\\,dx$. That is the integration by parts formula. It trades the integral $\\int u\\,dv$ for a (hopefully simpler) integral $\\int v\\,du$. The art is choosing $u$ and $dv$ so that the new integral is easier than the original.',
       'Think of it as a strategic trade. You start with a product of two functions that you cannot integrate directly. You "differentiate one factor and integrate the other." If differentiating the first factor makes it simpler while integrating the second factor does not make it worse, you win: the new integral is easier. The classic example is $\\int x \\cdot e^x\\,dx$: differentiating $x$ gives 1 (simpler!), and integrating $e^x$ gives $e^x$ (no worse). So the new integral $\\int 1 \\cdot e^x\\,dx = e^x$ is trivial.',
+        ],
+      },
+      { type: 'image', src: uSubUrl, alt: 'Integration strategy pipeline showing parts vs. substitution choice', caption: 'Integration by parts reverses the product rule: ∫u dv = uv − ∫v du. Choose u to simplify on integration.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The LIATE rule gives a priority order for choosing $u$: Logarithmic, Inverse trig, Algebraic (polynomials), Trigonometric, Exponential. Choose $u$ as the function highest on the list; the remaining factor becomes $dv$. Why? Functions higher on the list simplify when differentiated (ln x → 1/x, arctan x → 1/(1+x²), x² → 2x → 2 → 0), while functions lower on the list do not get worse when integrated (e^x → e^x, sin x → −cos x).',
       'Sometimes you need to apply by-parts more than once. For $\\int x^2 \\sin x\\,dx$, one round reduces $x^2$ to $2x$; a second round reduces $2x$ to $2$; then the remaining integral is elementary. Each round peels off one power of $x$. The tabular method (also called the "tic-tac-toe" method) organizes repeated by-parts: list successive derivatives of $u$ in one column and successive antiderivatives of $dv$ in the other, alternating signs (+, −, +, −, …). Multiply diagonally and add.',
+        ],
+      },
+      { type: 'image', src: ibpFormulaUrl, alt: 'Tabular integration grid: u derivatives column alternates signs, dv antiderivatives column, diagonal products summed', caption: 'Tabular (tic-tac-toe) method: alternate signs down the u column, list antiderivatives for dv, multiply diagonally.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'A beautiful special case is the "cycling" trick. For $\\int e^x \\sin x\\,dx$, applying by-parts twice brings you back to an integral of the same form: $\\int e^x \\sin x\\,dx = -e^x \\cos x + e^x \\sin x - \\int e^x \\sin x\\,dx$. The original integral appears on both sides! Move it to the left: $2\\int e^x \\sin x\\,dx = e^x(\\sin x - \\cos x)$. Divide by 2. This is algebra, not magic — it works whenever the same integral recurs after two rounds of by-parts.',
       'Integration by parts also handles functions that seem to have no partner to multiply. For $\\int \\ln x\\,dx$, write it as $\\int 1 \\cdot \\ln x\\,dx$ with $u = \\ln x$ and $dv = dx$. Then $du = dx/x$ and $v = x$, giving $x \\ln x - \\int x \\cdot (1/x)\\,dx = x \\ln x - x + C$. The same trick works for $\\int \\arctan x\\,dx$ and $\\int \\arcsin x\\,dx$ — pair the inverse function with $dv = dx$.',
       'Reduction formulas use by-parts to express $\\int f_n(x)\\,dx$ in terms of $\\int f_{n-2}(x)\\,dx$ or $\\int f_{n-1}(x)\\,dx$. For example, $\\int \\sin^n x\\,dx$ can be reduced by writing $\\sin^n x = \\sin^{n-1}x \\cdot \\sin x$, integrating by parts, and using $\\sin^2 x = 1 - \\cos^2 x$. The result is a formula linking the $n$-th integral to the $(n-2)$-th. Applied repeatedly, this reduces any $\\int \\sin^n x\\,dx$ to either $\\int \\sin x\\,dx$ or $\\int dx$.',
         ],
       },
-      { type: 'image', src: uSubUrl, alt: 'Integration strategy pipeline showing parts vs. substitution choice', caption: 'Integration by parts reverses the product rule: ∫u dv = uv − ∫v du. Choose u to simplify on integration.' },
+      { type: 'image', src: ibpLiateUrl, alt: 'LIATE priority table: Log, Inverse trig, Algebraic, Trig, Exponential', caption: 'LIATE rule: choose u from the leftmost category — Logarithmic, Inverse trig, Algebraic, Trig, Exponential.' },
     ],
     callouts: [
       {

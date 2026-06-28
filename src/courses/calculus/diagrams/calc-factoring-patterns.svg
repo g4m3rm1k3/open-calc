@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Factoring Patterns — Algebra Quick Reference</text>
+  <!-- Header -->
+  <rect x="8" y="24" width="464" height="14" rx="0" fill="#6366f1"/>
+  <text x="240" y="35" font-size="8" fill="white" text-anchor="middle" font-weight="700">Pattern → Factored Form</text>
+  <!-- Rows -->
+  <rect x="8" y="38" width="464" height="22" rx="0" fill="#eef2ff"/>
+  <text x="140" y="53" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">GCF (always try first)</text>
+  <text x="354" y="53" font-size="9" fill="#374151" text-anchor="middle">6x² + 9x  =  3x(2x + 3)</text>
+  <rect x="8" y="60" width="464" height="22" rx="0" fill="#f8fafc"/>
+  <text x="140" y="75" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Difference of Squares</text>
+  <text x="354" y="75" font-size="9" fill="#374151" text-anchor="middle">a² − b²  =  (a+b)(a−b)</text>
+  <rect x="8" y="82" width="464" height="22" rx="0" fill="#eef2ff"/>
+  <text x="140" y="97" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Perfect Square (sum)</text>
+  <text x="354" y="97" font-size="9" fill="#374151" text-anchor="middle">a² + 2ab + b²  =  (a+b)²</text>
+  <rect x="8" y="104" width="464" height="22" rx="0" fill="#f8fafc"/>
+  <text x="140" y="119" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Perfect Square (diff)</text>
+  <text x="354" y="119" font-size="9" fill="#374151" text-anchor="middle">a² − 2ab + b²  =  (a−b)²</text>
+  <rect x="8" y="126" width="464" height="22" rx="0" fill="#eef2ff"/>
+  <text x="140" y="141" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Sum of Cubes</text>
+  <text x="354" y="141" font-size="9" fill="#374151" text-anchor="middle">a³ + b³  =  (a+b)(a²−ab+b²)</text>
+  <rect x="8" y="148" width="464" height="22" rx="0" fill="#f8fafc"/>
+  <text x="140" y="163" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Difference of Cubes</text>
+  <text x="354" y="163" font-size="9" fill="#374151" text-anchor="middle">a³ − b³  =  (a−b)(a²+ab+b²)</text>
+  <rect x="8" y="176" width="464" height="20" rx="0" fill="#dcfce7"/>
+  <text x="240" y="190" font-size="8" fill="#166534" text-anchor="middle">Calculus: factoring finds zeros of f(x) — same as roots that limits approach from each side</text>
+</svg>

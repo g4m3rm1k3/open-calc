@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Area &amp; Perimeter Formulas</text>
+  <!-- Rectangle -->
+  <rect x="8" y="24" width="140" height="80" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <rect x="18" y="40" width="100" height="54" fill="none" stroke="#4338ca" stroke-width="2"/>
+  <text x="68" y="60" font-size="8" fill="#1d4ed8" text-anchor="middle">l</text>
+  <text x="130" y="68" font-size="8" fill="#1d4ed8">w</text>
+  <text x="78" y="83" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">A = l · w</text>
+  <text x="78" y="96" font-size="8" fill="#374151" text-anchor="middle">P = 2l + 2w</text>
+  <text x="78" y="34" font-size="8" fill="#4338ca" text-anchor="middle" font-weight="700">Rectangle</text>
+  <!-- Triangle -->
+  <rect x="156" y="24" width="130" height="80" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <polygon points="221,35 176,90 266,90" fill="none" stroke="#166534" stroke-width="2"/>
+  <line x1="221" y1="35" x2="221" y2="90" stroke="#166534" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="235" y="66" font-size="8" fill="#374151">h</text>
+  <text x="221" y="100" font-size="8" fill="#374151" text-anchor="middle">b</text>
+  <text x="221" y="86" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">A = ½bh</text>
+  <text x="221" y="34" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">Triangle</text>
+  <!-- Circle -->
+  <rect x="294" y="24" width="130" height="80" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <circle cx="359" cy="66" r="28" fill="none" stroke="#d97706" stroke-width="2"/>
+  <line x1="359" y1="66" x2="387" y2="66" stroke="#d97706" stroke-width="1.5"/>
+  <text x="373" y="62" font-size="8" fill="#92400e">r</text>
+  <text x="359" y="100" font-size="8.5" fill="#d97706" text-anchor="middle" font-weight="700">A = πr²</text>
+  <text x="359" y="34" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">Circle: C = 2πr</text>
+  <!-- Trapezoid -->
+  <rect x="8" y="112" width="225" height="80" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5"/>
+  <polygon points="40,178 80,130 190,130 220,178" fill="none" stroke="#be185d" stroke-width="2"/>
+  <line x1="135" y1="130" x2="135" y2="178" stroke="#be185d" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="138" y="158" font-size="8" fill="#374151">h</text>
+  <text x="135" y="128" font-size="8" fill="#374151" text-anchor="middle">b₁</text>
+  <text x="130" y="192" font-size="8" fill="#374151" text-anchor="middle">b₂</text>
+  <text x="117" y="124" font-size="8.5" fill="#be185d" text-anchor="middle" font-weight="700">Trapezoid: A = ½h(b₁+b₂)</text>
+  <!-- Pythagorean theorem -->
+  <rect x="241" y="112" width="231" height="80" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <polygon points="260,185 260,135 320,185" fill="none" stroke="#7c3aed" stroke-width="2"/>
+  <rect x="260" y="175" width="10" height="10" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="248" y="162" font-size="8" fill="#7c3aed">a</text>
+  <text x="285" y="195" font-size="8" fill="#7c3aed">b</text>
+  <text x="293" y="156" font-size="8" fill="#7c3aed">c</text>
+  <text x="370" y="148" font-size="10" fill="#4338ca" text-anchor="middle" font-weight="700">a² + b² = c²</text>
+  <text x="370" y="166" font-size="8" fill="#374151" text-anchor="middle">Pythagorean Theorem</text>
+  <text x="370" y="182" font-size="8" fill="#374151" text-anchor="middle">Calculus uses this for arc length</text>
+</svg>

@@ -1,4 +1,6 @@
 import powerRuleUrl from '../diagrams/calc-power-rule.svg?url';
+import diffRulesSummaryUrl from '../diagrams/calc-diff-rules-summary.svg?url';
+import sumConstantRuleUrl from '../diagrams/calc-sum-constant-rule.svg?url';
 // FILE: src/content/chapter-2/01-differentiation-rules.js
 export default {
   id: 'ch2-001',
@@ -25,11 +27,23 @@ export default {
       '**The payoff of Act 1:** Every rule in this lesson is a theorem proved from the limit definition you just learned. Once proved, it can be applied instantly to any function in its domain. Engineers, physicists, and economists differentiate hundreds of functions per day. The shortcut rules make that possible without going back to scratch every time.',
 
       'Look at the pattern from the previous lesson: the derivative of x\u00b9 is 1, the derivative of x\u00b2 is 2x, the derivative of x\u00b3 is 3x\u00b2, and the derivative of x\u2074 is 4x\u00b3. In every case, the exponent "drops down" to become the coefficient, and the exponent decreases by one. This pattern is the power rule, and it holds for every real number exponent — not just positive integers.',
+        ],
+      },
+      { type: 'image', src: powerRuleUrl, alt: 'Power rule table showing xⁿ → nxⁿ⁻¹ for key exponents', caption: 'Differentiation rules turn the limit definition into one-line calculations.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Before diving into formulas, let us address a common misconception about the product rule. Students sometimes guess that the derivative of a product f(x)\u00b7g(x) should be f\'(x)\u00b7g\'(x) — just differentiate each factor. This guess is WRONG. A simple counterexample: take f(x) = x and g(x) = x. Then f(x)\u00b7g(x) = x\u00b2, whose derivative is 2x. But f\'(x)\u00b7g\'(x) = 1\u00b71 = 1. Since 2x \u2260 1 (except at x = 1/2), the naive guess fails. The actual product rule is more subtle.',
       'Why does the product rule have the form it does? Think of f(x)\u00b7g(x) as the area of a rectangle with side lengths f(x) and g(x). When x changes by a small amount h, both f and g change: f changes by approximately f\'(x)\u00b7h and g changes by approximately g\'(x)\u00b7h. The change in the area is the change in the rectangle. The new rectangle has area (f + \u0394f)(g + \u0394g) = fg + f\u00b7\u0394g + g\u00b7\u0394f + \u0394f\u00b7\u0394g. The total change in area is f\u00b7\u0394g + g\u00b7\u0394f + \u0394f\u00b7\u0394g. When we divide by h and let h\u21920, the \u0394f\u00b7\u0394g term (which is proportional to h\u00b2) becomes negligible, and we are left with f\u00b7g\'(x) + g\u00b7f\'(x). That is the product rule.',
       'The quotient rule can be remembered with the mnemonic: "low d-high minus high d-low, over low squared." Here "high" is the numerator and "low" is the denominator. So if h(x) = f(x)/g(x), then h\'(x) = [g(x)\u00b7f\'(x) - f(x)\u00b7g\'(x)] / [g(x)]\u00b2. The order matters: it is not symmetric like the product rule. Notice the minus sign in the numerator — this makes the quotient rule impossible to guess from the product rule without proof.',
       'Why does the quotient rule have a minus sign? Think of f/g: if the denominator g increases, the ratio f/g decreases. So an increase in g contributes negatively to the rate of change of the ratio. This negative contribution is captured by the minus sign in front of f(x)\u00b7g\'(x).',
       'The sum and difference rules say that differentiation is linear: you can differentiate term by term. This follows directly from the linearity of limits. The constant multiple rule follows similarly. These two rules together mean: to differentiate a polynomial, just differentiate each term independently.',
+        ],
+      },
+      { type: 'image', src: diffRulesSummaryUrl, alt: 'Quick reference table of all basic differentiation rules with examples', caption: 'The six basic rules: constant, power, constant multiple, sum/difference, product, quotient, chain.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Second and higher derivatives are just what you get by differentiating again. If f\'(x) is the derivative of f, then f\'\'(x) is the derivative of f\', called the second derivative. It measures the rate of change of the rate of change — geometrically, it measures concavity. The notation f\'\'(x) = d\u00b2y/dx\u00b2 (read "d two y d x squared") looks like a fraction raised to a power but is actually a separate operator applied twice.',
 
       '**Where this is heading:** Power, product, and quotient rules handle functions that are added, multiplied, or divided. But what about functions built by *nesting* — like sin(x²) or e^(3x) or √(x³+1)? The rules you just learned cannot reach inside those outer wrappers. The next lesson — the chain rule — is the key that unlocks every composed function in calculus.',
@@ -39,7 +53,7 @@ export default {
       'The second derivative deserves special attention because it is not just a curiosity — it carries independent geometric meaning. If f\'(x) tells you the slope of f at x, then f\'\'(x) tells you how that slope is changing. Geometrically, f\'\'(x) > 0 means the slope is increasing as you move right, which means the curve is bending upward (concave up, like the inside of a bowl). f\'\'(x) < 0 means the slope is decreasing, so the curve bends downward (concave down, like the outside of a bowl). A point where f\'\'(x) changes sign is called an inflection point — the curve switches from concave up to concave down or vice versa. Physically, if f(t) is position, then f\'(t) is velocity and f\'\'(t) is acceleration. Acceleration is the rate of change of the rate of change — exactly what the second derivative captures. This triple relationship (position, velocity, acceleration) will come up in physics, differential equations, and optimization for the rest of your STEM career.',
         ],
       },
-      { type: 'image', src: powerRuleUrl, alt: 'Power rule table showing xⁿ → nxⁿ⁻¹ for key exponents', caption: 'Differentiation rules turn the limit definition into one-line calculations.' },
+      { type: 'image', src: sumConstantRuleUrl, alt: 'Polynomial differentiation step-by-step using power rule term-by-term', caption: 'Apply power rule to each term independently — the derivative distributes over addition and subtraction.' },
     ],
     callouts: [
       {

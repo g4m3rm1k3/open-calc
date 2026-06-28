@@ -1,5 +1,6 @@
 import arcLengthUrl from '../diagrams/calc-arc-length.svg?url';
 import mvtUrl from '../diagrams/calc-mvt.svg?url';
+import arcLengthFormulaUrl from '../diagrams/calc-arc-length-formula.svg?url';
 export default {
   id: 'ch4-arc-length',
   slug: 'arc-length',
@@ -41,11 +42,16 @@ export default {
       'Surface area of revolution extends arc length into 3D. When you rotate the curve y=f(x) around the x-axis, a tiny arc element ds sweeps out a thin band (a frustum of a cone). The band has circumference 2πf(x) (the radius at that point) and width ds. Area of band = 2πf(x)·ds = 2πf(x)·√(1+[f\'(x)]²)dx. Integrating: S = 2π∫ₐᵇ f(x)√(1+[f\'(x)]²)dx.',
 
       'Parametric arc length is needed when the curve is given as (x(t), y(t)) rather than y=f(x). An infinitesimal step in t produces changes dx = x\'(t)dt and dy = y\'(t)dt, so ds = √((x\'(t))²+(y\'(t))²)dt. Arc length: L = ∫ₐᵇ √((x\'(t))²+(y\'(t))²) dt. This formula handles curves that loop back on themselves, vertical tangents, and other situations where y=f(x) would fail.',
-
-      'A common misconception: arc length L is NOT simply ∫f(x)dx. The integral ∫f(x)dx gives area; ∫ds = ∫√(1+(f\'(x))²)dx gives length. The distinction is crucial — arc length always involves a square root with a derivative inside, making it typically harder to integrate than area problems. Most arc length integrals do not have elementary antiderivatives; those that do are carefully constructed examples (like the ones in this lesson).',
         ],
       },
       { type: 'image', src: mvtUrl, alt: 'MVT guarantees a point where the slope equals the chord slope in each segment', caption: 'The MVT converts Δy to f′(c)Δx in each tiny segment, making the integral exact.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'A common misconception: arc length L is NOT simply ∫f(x)dx. The integral ∫f(x)dx gives area; ∫ds = ∫√(1+(f\'(x))²)dx gives length. The distinction is crucial — arc length always involves a square root with a derivative inside, making it typically harder to integrate than area problems. Most arc length integrals do not have elementary antiderivatives; those that do are carefully constructed examples (like the ones in this lesson).',
+        ],
+      },
+      { type: 'image', src: arcLengthFormulaUrl, alt: 'Arc length formula derivation table: function, derivative, resulting integral', caption: 'L = ∫√(1+[f′(x)]²) dx — choosing x or y as the variable depends on which makes 1+(derivative)² simpler.' },
     ],
     callouts: [
       {

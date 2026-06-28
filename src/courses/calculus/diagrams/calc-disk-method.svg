@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Disk Method — Volumes of Revolution</text>
+  <rect x="8" y="22" width="256" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Rotation axis -->
+  <line x1="28" y1="110" x2="256" y2="110" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6 3"/>
+  <text x="256" y="106" font-size="8" fill="#94a3b8">axis</text>
+  <!-- Curve above axis -->
+  <path d="M 45,110 Q 70,94 100,78 Q 130,62 155,52 Q 180,44 205,44 Q 222,44 236,48" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Disk at x=155 -->
+  <ellipse cx="155" cy="80" rx="6" ry="30" fill="#6366f1" opacity="0.15" stroke="#6366f1" stroke-width="1.5"/>
+  <ellipse cx="155" cy="80" rx="6" ry="30" fill="none" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- Disk at x=155, pointing down to axis -->
+  <line x1="155" y1="50" x2="155" y2="110" stroke="#ef4444" stroke-width="2"/>
+  <text x="160" y="82" font-size="8.5" fill="#ef4444">r = f(x)</text>
+  <!-- Thin disk width dx -->
+  <rect x="148" y="50" width="14" height="60" fill="#6366f1" opacity="0.3" stroke="#6366f1" stroke-width="1"/>
+  <text x="155" y="125" font-size="7.5" fill="#6366f1" text-anchor="middle">dx</text>
+  <!-- Volume strip annotation -->
+  <text x="155" y="145" font-size="8" fill="#4338ca" text-anchor="middle">dV = π[f(x)]²dx</text>
+  <!-- Right panel -->
+  <rect x="272" y="26" width="200" height="168" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="372" y="46" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Disk Method Formula</text>
+  <rect x="280" y="52" width="184" height="30" rx="4" fill="#dbeafe"/>
+  <text x="372" y="66" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">V = π ∫ₐᵇ [f(x)]² dx</text>
+  <text x="372" y="82" font-size="7.5" fill="#1e40af" text-anchor="middle">rotate around x-axis</text>
+  <text x="372" y="102" font-size="8" fill="#4338ca" text-anchor="middle">Each disk has:</text>
+  <text x="372" y="116" font-size="8" fill="#4338ca" text-anchor="middle">• radius = f(x)</text>
+  <text x="372" y="130" font-size="8" fill="#4338ca" text-anchor="middle">• area = π·r² = π[f(x)]²</text>
+  <text x="372" y="144" font-size="8" fill="#4338ca" text-anchor="middle">• thickness = dx</text>
+  <rect x="280" y="152" width="184" height="36" rx="4" fill="#dcfce7"/>
+  <text x="372" y="166" font-size="8" fill="#166534" text-anchor="middle">Example: f(x)=√x, [0,4]</text>
+  <text x="372" y="180" font-size="8" fill="#166534" text-anchor="middle">V = π∫₀⁴ x dx = 8π</text>
+</svg>

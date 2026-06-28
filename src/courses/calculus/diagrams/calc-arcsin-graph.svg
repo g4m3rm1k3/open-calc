@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Inverse Trig — arcsin, arccos, arctan Graphs</text>
+  <!-- arcsin panel -->
+  <rect x="8" y="24" width="142" height="170" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="79" y="40" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">arcsin(x) = sin⁻¹(x)</text>
+  <!-- Axes -->
+  <line x1="79" y1="30" x2="79" y2="188" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="14" y1="109" x2="144" y2="109" stroke="#94a3b8" stroke-width="1"/>
+  <!-- arcsin curve: S-shaped from (-1,-π/2) to (1,π/2) -->
+  <path d="M 22,155 C 35,140 55,120 79,109 C 103,98 122,78 136,63" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Endpoint dots -->
+  <circle cx="22" cy="155" r="4" fill="#6366f1"/>
+  <circle cx="136" cy="63" r="4" fill="#6366f1"/>
+  <text x="14" y="153" font-size="7" fill="#374151">(−1,−π/2)</text>
+  <text x="110" y="76" font-size="7" fill="#374151">(1,π/2)</text>
+  <text x="79" y="185" font-size="7" fill="#374151" text-anchor="middle">Domain: [−1,1] Range:[−π/2,π/2]</text>
+  <!-- arccos panel -->
+  <rect x="157" y="24" width="142" height="170" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="228" y="40" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">arccos(x) = cos⁻¹(x)</text>
+  <!-- Axes -->
+  <line x1="228" y1="30" x2="228" y2="188" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="163" y1="109" x2="293" y2="109" stroke="#94a3b8" stroke-width="1"/>
+  <!-- arccos: decreasing from (−1,π) to (1,0) -->
+  <path d="M 172,168 C 190,145 210,120 228,100 C 246,80 260,58 283,50" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+  <circle cx="172" cy="168" r="4" fill="#22c55e"/>
+  <circle cx="283" cy="50" r="4" fill="#22c55e"/>
+  <text x="163" y="165" font-size="7" fill="#374151">(−1,π)</text>
+  <text x="270" y="62" font-size="7" fill="#374151">(1,0)</text>
+  <text x="228" y="185" font-size="7" fill="#374151" text-anchor="middle">Domain: [−1,1]  Range: [0,π]</text>
+  <!-- arctan panel -->
+  <rect x="306" y="24" width="166" height="170" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="389" y="40" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">arctan(x) = tan⁻¹(x)</text>
+  <!-- Axes -->
+  <line x1="389" y1="30" x2="389" y2="188" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="312" y1="109" x2="466" y2="109" stroke="#94a3b8" stroke-width="1"/>
+  <!-- arctan: approaches ±π/2 asymptotes -->
+  <path d="M 312,165 C 340,155 360,130 389,109 C 418,88 438,63 466,53" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+  <!-- Asymptote lines -->
+  <line x1="312" y1="53" x2="466" y2="53" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="312" y1="165" x2="466" y2="165" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="470" y="57" font-size="7" fill="#ef4444">π/2</text>
+  <text x="468" y="168" font-size="7" fill="#ef4444">−π/2</text>
+  <text x="389" y="185" font-size="7" fill="#374151" text-anchor="middle">Domain: (−∞,∞)  Range: (−π/2,π/2)</text>
+</svg>

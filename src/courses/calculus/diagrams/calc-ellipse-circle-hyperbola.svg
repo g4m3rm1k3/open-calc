@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Conic Sections — Circle, Ellipse, Hyperbola</text>
+  <!-- Circle -->
+  <rect x="8" y="24" width="142" height="170" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="79" y="40" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Circle</text>
+  <circle cx="79" cy="100" r="48" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <line x1="79" y1="100" x2="127" y2="100" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="103" y="96" font-size="8" fill="#4338ca">r</text>
+  <text x="79" y="162" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">x²+y²=r²</text>
+  <text x="79" y="178" font-size="7.5" fill="#374151" text-anchor="middle">all sides equal</text>
+  <!-- Ellipse -->
+  <rect x="158" y="24" width="164" height="170" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="240" y="40" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Ellipse</text>
+  <ellipse cx="240" cy="100" rx="68" ry="40" fill="none" stroke="#22c55e" stroke-width="2.5"/>
+  <line x1="240" y1="100" x2="308" y2="100" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="274" y="96" font-size="8" fill="#166534">a</text>
+  <line x1="240" y1="100" x2="240" y2="60" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="244" y="82" font-size="8" fill="#166534">b</text>
+  <!-- Foci -->
+  <circle cx="200" cy="100" r="3" fill="#ef4444"/>
+  <circle cx="280" cy="100" r="3" fill="#ef4444"/>
+  <text x="240" y="157" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">x²/a² + y²/b² = 1</text>
+  <text x="240" y="172" font-size="7.5" fill="#374151" text-anchor="middle">a&gt;b; foci along major axis</text>
+  <text x="240" y="185" font-size="7.5" fill="#ef4444" text-anchor="middle">● foci</text>
+  <!-- Hyperbola -->
+  <rect x="330" y="24" width="142" height="170" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="401" y="40" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">Hyperbola</text>
+  <!-- Two hyperbola branches (simplified arcs) -->
+  <path d="M 345,155 Q 360,100 345,45" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+  <path d="M 457,155 Q 442,100 457,45" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+  <!-- Asymptotes -->
+  <line x1="338" y1="45" x2="464" y2="155" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="338" y1="155" x2="464" y2="45" stroke="#6366f1" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="401" y="157" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">x²/a²−y²/b²=1</text>
+  <text x="401" y="172" font-size="7.5" fill="#374151" text-anchor="middle">two branches; asymptotes</text>
+  <text x="401" y="185" font-size="7.5" fill="#6366f1" text-anchor="middle">y = ±(b/a)x</text>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Disk vs Washer — When to Use Each</text>
+  <!-- Disk panel -->
+  <rect x="8" y="24" width="228" height="170" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="122" y="44" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">DISK METHOD</text>
+  <text x="122" y="58" font-size="8" fill="#1e40af" text-anchor="middle">V = π ∫ [f(x)]² dx</text>
+  <text x="122" y="72" font-size="7.5" fill="#1e40af" text-anchor="middle">Use when region touches</text>
+  <text x="122" y="86" font-size="7.5" fill="#1e40af" text-anchor="middle">the rotation axis (no hole)</text>
+  <!-- Solid disk cross-section -->
+  <ellipse cx="122" cy="128" rx="18" ry="50" fill="#3b82f6" opacity="0.3" stroke="#3b82f6" stroke-width="2"/>
+  <text x="122" y="185" font-size="8" fill="#1d4ed8" text-anchor="middle">solid disk cross-section</text>
+
+  <!-- Washer panel -->
+  <rect x="244" y="24" width="228" height="170" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+  <text x="358" y="44" font-size="8.5" fill="#991b1b" text-anchor="middle" font-weight="700">WASHER METHOD</text>
+  <text x="358" y="58" font-size="8" fill="#991b1b" text-anchor="middle">V = π ∫ [R²−r²] dx</text>
+  <text x="358" y="72" font-size="7.5" fill="#991b1b" text-anchor="middle">Use when there is a gap</text>
+  <text x="358" y="86" font-size="7.5" fill="#991b1b" text-anchor="middle">between region and axis</text>
+  <!-- Washer cross-section -->
+  <ellipse cx="358" cy="128" rx="18" ry="50" fill="#ef4444" opacity="0.3" stroke="#ef4444" stroke-width="2"/>
+  <ellipse cx="358" cy="128" rx="10" ry="30" fill="white" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="358" y="185" font-size="8" fill="#991b1b" text-anchor="middle">washer (ring) cross-section</text>
+</svg>

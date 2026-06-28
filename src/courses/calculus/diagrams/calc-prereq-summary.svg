@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Prerequisite Checklist — Ready for Calculus?</text>
+  <!-- Header -->
+  <rect x="8" y="24" width="464" height="14" rx="0" fill="#6366f1"/>
+  <text x="240" y="35" font-size="8" fill="white" text-anchor="middle" font-weight="700">Topic — Can you do this without hesitation?</text>
+  <!-- Items -->
+  <rect x="8" y="38" width="464" height="18" rx="0" fill="#eef2ff"/>
+  <text x="24" y="51" font-size="8.5" fill="#166534">✓</text>
+  <text x="38" y="51" font-size="8.5" fill="#374151">Factor: x²−5x+6 = (x−2)(x−3); solve quadratics via formula</text>
+  <rect x="8" y="56" width="464" height="18" rx="0" fill="#f8fafc"/>
+  <text x="24" y="69" font-size="8.5" fill="#166534">✓</text>
+  <text x="38" y="69" font-size="8.5" fill="#374151">Simplify rational expressions; find LCD; polynomial long division</text>
+  <rect x="8" y="74" width="464" height="18" rx="0" fill="#eef2ff"/>
+  <text x="24" y="87" font-size="8.5" fill="#166534">✓</text>
+  <text x="38" y="87" font-size="8.5" fill="#374151">Evaluate sin 30°, cos 45°, tan 60° without a calculator</text>
+  <rect x="8" y="92" width="464" height="18" rx="0" fill="#f8fafc"/>
+  <text x="24" y="105" font-size="8.5" fill="#166534">✓</text>
+  <text x="38" y="105" font-size="8.5" fill="#374151">Recognize and sketch y=x², √x, |x|, eˣ, ln x, sin x</text>
+  <rect x="8" y="110" width="464" height="18" rx="0" fill="#eef2ff"/>
+  <text x="24" y="123" font-size="8.5" fill="#166634">✓</text>
+  <text x="38" y="123" font-size="8.5" fill="#374151">Composition: if f(x)=√x and g(x)=x²+1, find f(g(x))</text>
+  <rect x="8" y="128" width="464" height="18" rx="0" fill="#f8fafc"/>
+  <text x="24" y="141" font-size="8.5" fill="#166534">✓</text>
+  <text x="38" y="141" font-size="8.5" fill="#374151">Apply sin²θ + cos²θ = 1 to simplify expressions</text>
+  <rect x="8" y="146" width="464" height="18" rx="0" fill="#eef2ff"/>
+  <text x="24" y="159" font-size="8.5" fill="#166534">✓</text>
+  <text x="38" y="159" font-size="8.5" fill="#374151">Understand eˣ and ln x as inverses; ln(eˣ) = x, e^(ln x) = x</text>
+  <rect x="8" y="164" width="464" height="18" rx="0" fill="#f8fafc"/>
+  <text x="24" y="177" font-size="8.5" fill="#166534">✓</text>
+  <text x="38" y="177" font-size="8.5" fill="#374151">Slope of a line, distance formula, area of a circle/triangle</text>
+  <rect x="8" y="182" width="464" height="14" rx="0" fill="#dcfce7"/>
+  <text x="240" y="193" font-size="7.5" fill="#166534" text-anchor="middle">8/8 checks → you are ready. Missing any → revisit that chapter before continuing to limits.</text>
+</svg>

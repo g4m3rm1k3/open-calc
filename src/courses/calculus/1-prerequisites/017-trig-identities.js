@@ -1,4 +1,6 @@
 import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
+import pythagoreanIdentityUrl from '../diagrams/calc-pythagorean-identity.svg?url';
+import doubleAngleUrl from '../diagrams/calc-double-angle.svg?url';
 export default {
   id: 'ch0-trig-identities',
   slug: 'trig-identities',
@@ -32,6 +34,7 @@ export default {
           'The key skill isn\'t memorizing them blindly — it\'s knowing which form is useful for a given purpose.',
         ],
       },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle proving sin²θ + cos²θ = 1 from the Pythagorean theorem', caption: 'Every trig identity follows from the unit-circle definitions; the Pythagorean identity is just the distance formula.' },
       {
         type: 'callout',
         callout: {
@@ -51,7 +54,8 @@ export default {
                     'By the Pythagorean theorem: cos²θ + sin²θ = 1².',
         caption: 'Drag the angle around the unit circle and watch cos²θ + sin²θ stay locked at 1 — the identity is geometric.',
       },
-      { type: 'image', src: trigCircleUrl, alt: 'Unit circle proving sin²θ + cos²θ = 1 from the Pythagorean theorem', caption: 'Every trig identity follows from the unit-circle definitions; the Pythagorean identity is just the distance formula.' },
+      { type: 'image', src: pythagoreanIdentityUrl, alt: 'Unit circle diagram and the three Pythagorean identities divided by cos² and sin²', caption: 'Dividing sin²+cos²=1 by cos²θ gives tan²+1=sec²; dividing by sin²θ gives 1+cot²=csc² — three identities from one.' },
+      { type: 'image', src: doubleAngleUrl, alt: 'Double angle, half angle, and sum-difference formulas with a calculus integration example', caption: 'The power-reduction identities sin²θ=(1−cos2θ)/2 and cos²θ=(1+cos2θ)/2 are the key tool for integrating even powers of trig functions.' },
     ],
   },
 

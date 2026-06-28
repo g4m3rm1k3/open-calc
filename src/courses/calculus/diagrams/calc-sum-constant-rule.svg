@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Power Rule Applied — Step by Step</text>
+
+  <!-- Two worked examples side by side -->
+  <rect x="8" y="22" width="224" height="172" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="120" y="40" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">Example 1: Polynomial</text>
+
+  <text x="120" y="58" font-size="10" fill="#065f46" text-anchor="middle" font-weight="700">f(x) = 4x³ − 2x² + 7x − 5</text>
+
+  <line x1="18" y1="64" x2="222" y2="64" stroke="#a7f3d0" stroke-width="1"/>
+
+  <text x="20" y="82" font-size="8" fill="#166534">Apply power rule term-by-term:</text>
+  <text x="20" y="98" font-size="8.5" fill="#059669">4x³ → 4·3·x² = <tspan font-weight="700">12x²</tspan></text>
+  <text x="20" y="114" font-size="8.5" fill="#059669">−2x² → −2·2·x = <tspan font-weight="700">−4x</tspan></text>
+  <text x="20" y="130" font-size="8.5" fill="#059669">7x → 7·1·x⁰ = <tspan font-weight="700">7</tspan></text>
+  <text x="20" y="146" font-size="8.5" fill="#059669">−5 → <tspan font-weight="700">0</tspan>  (constant rule)</text>
+
+  <line x1="18" y1="154" x2="222" y2="154" stroke="#a7f3d0" stroke-width="1"/>
+  <rect x="18" y="158" width="202" height="28" rx="5" fill="#bbf7d0"/>
+  <text x="119" y="172" font-size="9" fill="#065f46" text-anchor="middle" font-weight="700">f ′(x) = 12x² − 4x + 7</text>
+  <text x="119" y="183" font-size="7.5" fill="#059669" text-anchor="middle">constant term vanishes</text>
+
+  <rect x="248" y="22" width="224" height="172" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="360" y="40" font-size="9" fill="#b45309" text-anchor="middle" font-weight="700">Example 2: Fractional Power</text>
+
+  <text x="360" y="58" font-size="10" fill="#92400e" text-anchor="middle" font-weight="700">g(x) = √x = x^(1/2)</text>
+
+  <line x1="258" y1="64" x2="462" y2="64" stroke="#fde68a" stroke-width="1"/>
+
+  <text x="260" y="82" font-size="8" fill="#92400e">Power rule works for ALL real n:</text>
+  <text x="260" y="98" font-size="8.5" fill="#b45309">n = 1/2, so n − 1 = −1/2</text>
+  <text x="260" y="114" font-size="8.5" fill="#b45309">g′(x) = (1/2) · x^(−1/2)</text>
+  <text x="260" y="130" font-size="8.5" fill="#b45309">       = 1 / (2√x)</text>
+
+  <line x1="258" y1="150" x2="462" y2="150" stroke="#fde68a" stroke-width="1"/>
+  <rect x="258" y="154" width="202" height="32" rx="5" fill="#fef3c7"/>
+  <text x="359" y="168" font-size="9" fill="#92400e" text-anchor="middle" font-weight="700">g′(x) = 1 / (2√x)</text>
+  <text x="359" y="180" font-size="7.5" fill="#b45309" text-anchor="middle">defined for x &gt; 0 only</text>
+</svg>

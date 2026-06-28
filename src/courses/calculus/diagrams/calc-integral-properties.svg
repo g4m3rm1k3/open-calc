@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Properties of Definite Integrals</text>
+  <rect x="8" y="24" width="464" height="170" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="16" y="32" width="448" height="16" rx="0" fill="#e2e8f0"/>
+  <text x="240" y="44" font-size="8" fill="#1e293b" text-anchor="middle" font-weight="700">Property</text>
+  <rect x="16" y="48" width="448" height="20" rx="0" fill="#dbeafe"/>
+  <text x="240" y="62" font-size="8" fill="#1d4ed8" text-anchor="middle">∫ₐᵃ f(x) dx = 0</text>
+  <text x="440" y="62" font-size="7" fill="#1e40af" text-anchor="end">zero width interval</text>
+  <rect x="16" y="68" width="448" height="20" rx="0" fill="#f8fafc"/>
+  <text x="240" y="82" font-size="8" fill="#374151" text-anchor="middle">∫ₐᵇ f(x) dx = −∫ᵇᵃ f(x) dx</text>
+  <text x="440" y="82" font-size="7" fill="#6b7280" text-anchor="end">swap limits, negate</text>
+  <rect x="16" y="88" width="448" height="20" rx="0" fill="#dbeafe"/>
+  <text x="240" y="102" font-size="8" fill="#1d4ed8" text-anchor="middle">∫ₐᵇ c·f dx = c·∫ₐᵇ f dx</text>
+  <text x="440" y="102" font-size="7" fill="#1e40af" text-anchor="end">constant factor rule</text>
+  <rect x="16" y="108" width="448" height="20" rx="0" fill="#f8fafc"/>
+  <text x="240" y="122" font-size="8" fill="#374151" text-anchor="middle">∫ₐᵇ [f±g] dx = ∫ₐᵇf dx ± ∫ₐᵇg dx</text>
+  <text x="440" y="122" font-size="7" fill="#6b7280" text-anchor="end">sum/difference rule</text>
+  <rect x="16" y="128" width="448" height="20" rx="0" fill="#dbeafe"/>
+  <text x="240" y="142" font-size="8" fill="#1d4ed8" text-anchor="middle">∫ₐᵇ f dx + ∫ᵦᶜ f dx = ∫ₐᶜ f dx</text>
+  <text x="440" y="142" font-size="7" fill="#1e40af" text-anchor="end">interval additivity</text>
+  <rect x="16" y="148" width="448" height="20" rx="0" fill="#f8fafc"/>
+  <text x="240" y="162" font-size="8" fill="#374151" text-anchor="middle">If f ≤ g on [a,b], then ∫ₐᵇ f dx ≤ ∫ₐᵇ g dx</text>
+  <text x="440" y="162" font-size="7" fill="#6b7280" text-anchor="end">comparison property</text>
+  <rect x="16" y="168" width="448" height="20" rx="4" fill="#dcfce7"/>
+  <text x="240" y="182" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">m(b−a) ≤ ∫ₐᵇ f dx ≤ M(b−a)  (m = min, M = max of f)</text>
+</svg>

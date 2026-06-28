@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Polar Arc Length</text>
+  <rect x="8" y="24" width="464" height="34" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="40" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">L = ∫ₐᵝ √[r² + (dr/dθ)²] dθ</text>
+  <text x="240" y="56" font-size="8" fill="#374151" text-anchor="middle">Derived from parametric formula: x=r cosθ, y=r sinθ, then dx/dθ and dy/dθ</text>
+  <!-- Left: derivation -->
+  <rect x="8" y="66" width="230" height="128" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="118" y="82" font-size="8" fill="#374151" text-anchor="middle" font-weight="700">From Parametric Formula:</text>
+  <text x="118" y="96" font-size="7.5" fill="#374151" text-anchor="middle">x = r cosθ,  y = r sinθ</text>
+  <text x="118" y="110" font-size="7.5" fill="#374151" text-anchor="middle">dx/dθ = r′cosθ − r sinθ</text>
+  <text x="118" y="124" font-size="7.5" fill="#374151" text-anchor="middle">dy/dθ = r′sinθ + r cosθ</text>
+  <text x="118" y="140" font-size="7.5" fill="#374151" text-anchor="middle">(dx/dθ)² + (dy/dθ)² = r² + (r′)²</text>
+  <rect x="16" y="148" width="212" height="22" rx="3" fill="#dbeafe"/>
+  <text x="118" y="163" font-size="8" fill="#1d4ed8" text-anchor="middle">∴ ds = √(r²+(dr/dθ)²) dθ</text>
+  <!-- Right panel: example -->
+  <rect x="246" y="66" width="226" height="128" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="359" y="84" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Example: r = a (circle)</text>
+  <text x="359" y="100" font-size="8" fill="#374151" text-anchor="middle">r = a (constant)  →  dr/dθ = 0</text>
+  <rect x="254" y="106" width="210" height="22" rx="3" fill="#dbeafe"/>
+  <text x="359" y="122" font-size="8" fill="#1d4ed8" text-anchor="middle">L = ∫₀^{2π} √(a²+0) dθ = 2πa ✓</text>
+  <text x="359" y="142" font-size="8" fill="#374151" text-anchor="middle">Example: r = eᶿ (logarithmic spiral)</text>
+  <text x="359" y="156" font-size="8" fill="#374151" text-anchor="middle">dr/dθ = eᶿ = r</text>
+  <rect x="254" y="162" width="210" height="26" rx="3" fill="#dcfce7"/>
+  <text x="359" y="174" font-size="8" fill="#166534" text-anchor="middle">L = ∫₀^T √(e²ᶿ+e²ᶿ) dθ = √2(eᵀ−1)</text>
+</svg>

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Trig Substitution — Decision Table</text>
+  <rect x="8" y="24" width="464" height="170" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <!-- Header row -->
+  <rect x="16" y="32" width="448" height="16" rx="0" fill="#e2e8f0"/>
+  <text x="90" y="43" font-size="8" fill="#1e293b" text-anchor="middle" font-weight="700">Integrand contains</text>
+  <text x="230" y="43" font-size="8" fill="#1e293b" text-anchor="middle" font-weight="700">Substitution</text>
+  <text x="370" y="43" font-size="8" fill="#1e293b" text-anchor="middle" font-weight="700">Identity used</text>
+  <!-- Row 1 -->
+  <rect x="16" y="48" width="448" height="28" rx="0" fill="#dbeafe"/>
+  <text x="90" y="66" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">√(a²−x²)</text>
+  <text x="230" y="60" font-size="8" fill="#1e40af" text-anchor="middle">x = a sin θ</text>
+  <text x="230" y="73" font-size="7.5" fill="#1e40af" text-anchor="middle">θ ∈ [−π/2, π/2]</text>
+  <text x="370" y="60" font-size="8" fill="#1e40af" text-anchor="middle">1 − sin²θ = cos²θ</text>
+  <text x="370" y="73" font-size="7.5" fill="#1e40af" text-anchor="middle">a²−x² = a²cos²θ</text>
+  <!-- Row 2 -->
+  <rect x="16" y="76" width="448" height="28" rx="0" fill="#f8fafc"/>
+  <text x="90" y="94" font-size="9" fill="#374151" text-anchor="middle" font-weight="700">√(a²+x²)</text>
+  <text x="230" y="88" font-size="8" fill="#374151" text-anchor="middle">x = a tan θ</text>
+  <text x="230" y="101" font-size="7.5" fill="#374151" text-anchor="middle">θ ∈ (−π/2, π/2)</text>
+  <text x="370" y="88" font-size="8" fill="#374151" text-anchor="middle">1 + tan²θ = sec²θ</text>
+  <text x="370" y="101" font-size="7.5" fill="#374151" text-anchor="middle">a²+x² = a²sec²θ</text>
+  <!-- Row 3 -->
+  <rect x="16" y="104" width="448" height="28" rx="0" fill="#dbeafe"/>
+  <text x="90" y="122" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">√(x²−a²)</text>
+  <text x="230" y="116" font-size="8" fill="#1e40af" text-anchor="middle">x = a sec θ</text>
+  <text x="230" y="129" font-size="7.5" fill="#1e40af" text-anchor="middle">θ ∈ [0, π/2) ∪ (π/2, π]</text>
+  <text x="370" y="116" font-size="8" fill="#1e40af" text-anchor="middle">sec²θ − 1 = tan²θ</text>
+  <text x="370" y="129" font-size="7.5" fill="#1e40af" text-anchor="middle">x²−a² = a²tan²θ</text>
+  <!-- Note -->
+  <rect x="16" y="136" width="448" height="52" rx="4" fill="#fef3c7"/>
+  <text x="240" y="152" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">After integrating in θ: always back-substitute to x!</text>
+  <text x="240" y="168" font-size="8" fill="#78350f" text-anchor="middle">Use the reference triangle to convert trig(θ) back to expressions in x.</text>
+  <text x="240" y="182" font-size="8" fill="#78350f" text-anchor="middle">Also convert the limits of integration if doing a definite integral.</text>
+</svg>

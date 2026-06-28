@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Types of Sequences</text>
+  <!-- Arithmetic -->
+  <rect x="8" y="24" width="148" height="170" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="82" y="40" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Arithmetic</text>
+  <text x="82" y="54" font-size="7.5" fill="#374151" text-anchor="middle">aₙ = a₁ + (n−1)d</text>
+  <circle cx="30" cy="80" r="5" fill="#6366f1"/><text x="30" y="100" font-size="7" fill="#6366f1" text-anchor="middle">2</text>
+  <circle cx="55" cy="72" r="5" fill="#6366f1"/><text x="55" y="92" font-size="7" fill="#6366f1" text-anchor="middle">5</text>
+  <circle cx="80" cy="64" r="5" fill="#6366f1"/><text x="80" y="84" font-size="7" fill="#6366f1" text-anchor="middle">8</text>
+  <circle cx="105" cy="56" r="5" fill="#6366f1"/><text x="105" y="76" font-size="7" fill="#6366f1" text-anchor="middle">11</text>
+  <circle cx="130" cy="48" r="5" fill="#6366f1"/><text x="130" y="68" font-size="7" fill="#6366f1" text-anchor="middle">14</text>
+  <text x="82" y="118" font-size="7.5" fill="#374151" text-anchor="middle">d = 3 (constant diff)</text>
+  <rect x="16" y="128" width="130" height="30" rx="4" fill="#dbeafe"/>
+  <text x="81" y="142" font-size="7.5" fill="#1d4ed8" text-anchor="middle">Always diverges</text>
+  <text x="81" y="156" font-size="7.5" fill="#1d4ed8" text-anchor="middle">(unless d = 0)</text>
+  <!-- Geometric -->
+  <rect x="164" y="24" width="148" height="170" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="238" y="40" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Geometric</text>
+  <text x="238" y="54" font-size="7.5" fill="#374151" text-anchor="middle">aₙ = a₁ · rⁿ⁻¹</text>
+  <circle cx="185" cy="98" r="5" fill="#22c55e"/>
+  <circle cx="210" cy="84" r="5" fill="#22c55e"/>
+  <circle cx="235" cy="72" r="5" fill="#22c55e"/>
+  <circle cx="260" cy="64" r="5" fill="#22c55e"/>
+  <circle cx="285" cy="60" r="5" fill="#22c55e"/>
+  <text x="238" y="118" font-size="7.5" fill="#374151" text-anchor="middle">r = ½ → converges</text>
+  <text x="238" y="130" font-size="7.5" fill="#374151" text-anchor="middle">r = 2 → diverges</text>
+  <rect x="172" y="140" width="130" height="30" rx="4" fill="#bbf7d0"/>
+  <text x="237" y="154" font-size="7.5" fill="#14532d" text-anchor="middle">Converges iff |r| &lt; 1</text>
+  <text x="237" y="168" font-size="7.5" fill="#14532d" text-anchor="middle">limit = 0</text>
+  <!-- Recursive -->
+  <rect x="320" y="24" width="152" height="170" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="396" y="40" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">Recursive</text>
+  <text x="396" y="54" font-size="7.5" fill="#374151" text-anchor="middle">aₙ = f(aₙ₋₁)</text>
+  <text x="396" y="72" font-size="8" fill="#92400e" text-anchor="middle">Fibonacci:</text>
+  <text x="396" y="85" font-size="7.5" fill="#374151" text-anchor="middle">aₙ = aₙ₋₁ + aₙ₋₂</text>
+  <text x="396" y="100" font-size="7.5" fill="#374151" text-anchor="middle">1, 1, 2, 3, 5, 8, 13...</text>
+  <text x="396" y="120" font-size="8" fill="#92400e" text-anchor="middle">Newton's method:</text>
+  <text x="396" y="133" font-size="7.5" fill="#374151" text-anchor="middle">xₙ₊₁ = xₙ−f(xₙ)/f′(xₙ)</text>
+  <rect x="328" y="148" width="136" height="40" rx="4" fill="#fde68a"/>
+  <text x="396" y="163" font-size="7.5" fill="#78350f" text-anchor="middle">Limit (if exists) satisfies</text>
+  <text x="396" y="177" font-size="7.5" fill="#78350f" text-anchor="middle">L = f(L)</text>
+</svg>

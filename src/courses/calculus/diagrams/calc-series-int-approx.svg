@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Series Applications — Integration</text>
+  <rect x="8" y="24" width="464" height="28" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="38" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">Integrate non-elementary functions by substituting their Maclaurin series</text>
+  <text x="240" y="50" font-size="8" fill="#374151" text-anchor="middle">Then integrate term-by-term — the result is a convergent numerical series</text>
+  <!-- Example 1: sin(x)/x -->
+  <rect x="8" y="60" width="228" height="134" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="122" y="76" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">∫₀¹ sin(x)/x dx  (no elementary form)</text>
+  <text x="122" y="92" font-size="8" fill="#374151" text-anchor="middle">sin(x)/x = 1 − x²/3! + x⁴/5! − …</text>
+  <rect x="16" y="98" width="212" height="22" rx="3" fill="#dcfce7"/>
+  <text x="122" y="113" font-size="8" fill="#166534" text-anchor="middle">∫₀¹ = 1 − 1/18 + 1/600 − …</text>
+  <rect x="16" y="126" width="212" height="22" rx="3" fill="#bbf7d0"/>
+  <text x="122" y="141" font-size="8" fill="#14532d" text-anchor="middle">≈ 0.9461  (alternating, error &lt; next term)</text>
+  <text x="122" y="164" font-size="8" fill="#374151" text-anchor="middle">Alternating series: |error| &lt; first</text>
+  <text x="122" y="178" font-size="8" fill="#374151" text-anchor="middle">omitted term</text>
+  <!-- Example 2: e^(-x²) -->
+  <rect x="244" y="60" width="228" height="134" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="358" y="76" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">∫₀¹ e^(−x²) dx  (Gaussian integral)</text>
+  <text x="358" y="92" font-size="8" fill="#374151" text-anchor="middle">e^(−x²) = 1 − x² + x⁴/2! − x⁶/3! + …</text>
+  <rect x="252" y="98" width="212" height="22" rx="3" fill="#dbeafe"/>
+  <text x="358" y="113" font-size="8" fill="#1d4ed8" text-anchor="middle">∫₀¹ = 1 − ⅓ + 1/10 − 1/42 + …</text>
+  <rect x="252" y="126" width="212" height="22" rx="3" fill="#c7d2fe"/>
+  <text x="358" y="141" font-size="8" fill="#3730a3" text-anchor="middle">≈ 0.7468  (used in probability/statistics)</text>
+  <text x="358" y="164" font-size="8" fill="#374151" text-anchor="middle">Related to the error function erf(x)</text>
+  <text x="358" y="178" font-size="8" fill="#374151" text-anchor="middle">used in normal distribution tables</text>
+</svg>

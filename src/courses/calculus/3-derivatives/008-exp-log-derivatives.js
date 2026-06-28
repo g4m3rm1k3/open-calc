@@ -1,4 +1,6 @@
 import expLogUrl from '../diagrams/calc-exp-log.svg?url';
+import expDerivUrl from '../diagrams/calc-exp-deriv.svg?url';
+import lnDerivUrl from '../diagrams/calc-ln-deriv.svg?url';
 // FILE: src/content/chapter-2/04-exp-log-derivatives.js
 export default {
   id: "ch2-004",
@@ -70,7 +72,12 @@ export default {
       "**Logarithmic differentiation — how to differentiate y = x^x:** Functions like y = x^x are neither a pure power (the exponent is not a constant) nor a pure exponential (the base is not a constant), so neither the power rule nor the standard exponential rule applies directly. The technique is to take the natural log of both sides: ln(y) = ln(x^x) = x·ln(x). Now differentiate both sides with respect to x. The left side gives (1/y)·(dy/dx) by the chain rule (since y is a function of x). The right side gives d/dx[x·ln(x)] = ln(x) + x·(1/x) = ln(x) + 1 by the product rule. Solving: dy/dx = y·(ln(x)+1) = x^x·(ln(x)+1). This technique works for any function where logarithms simplify the structure — it converts hard exponent problems into tractable algebra.",
 
       "**Chain rule with exponentials — the most important application:** The formula d/dx[e^x] = e^x extends immediately to composites via the chain rule: d/dx[e^(g(x))] = e^(g(x))·g'(x). The outer derivative of e^(·) is just e^(·) unchanged, and then we multiply by g'(x) as the chain rule demands. Example: d/dx[e^(3x²)] — here g(x) = 3x², so g'(x) = 6x. Therefore d/dx[e^(3x²)] = e^(3x²)·6x = 6x·e^(3x²). The same pattern extends to other bases: d/dx[a^(g(x))] = a^(g(x))·ln(a)·g'(x). Forgetting the inner derivative g'(x) is the chain-trap in exponential form.",
-
+        ],
+      },
+      { type: 'image', src: expLogUrl, alt: 'Exponential and log curves with derivative annotations', caption: 'd/dx[eˣ] = eˣ is unique: it is its own derivative. d/dx[ln x] = 1/x follows from the inverse relationship.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**The natural logarithm: complete theory from first principles** The natural logarithm, written $\\ln(x)$ (or sometimes $\\log(x)$ or $\\log_e(x)$), is the logarithm with base $e \\approx 2.718281828\\ldots$. Yes, the property $\\ln(a^b) = b \\ln a$ holds exactly for any $a > 0$ and any real number $b$. This is one of the core logarithm rules, derived rigorously from first principles below. The same rules apply to any base, but the natural log is special because it arises directly from the most fundamental operation in calculus: integration of $1/x$.",
 
       "**The natural logarithm: complete theory from first principles** The natural logarithm, written $\\ln(x)$ (or sometimes $\\log(x)$ or $\\log_e(x)$), is the logarithm with base $e \\approx 2.718281828\\ldots$.",
@@ -152,7 +159,12 @@ export default {
       "No other base gives this simple derivative.",
 
       'That is why it is \\"natural.\\"',
-
+        ],
+      },
+      { type: 'image', src: expDerivUrl, alt: 'eˣ is its own derivative shown graphically, plus d/dx[aˣ] = aˣ·ln(a) formula', caption: 'eˣ is the unique function equal to its own derivative. For other bases: d/dx[aˣ] = aˣ·ln(a).' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**Step 4: Prove that $\\ln(x)$ really is a logarithm**",
 
       "**The property to prove:** We must prove it satisfies $\\ln(xy) = \\ln x + \\ln y$.",
@@ -320,7 +332,7 @@ export default {
       "**Where this is heading:** Notice that we derived the derivative of $\\ln(x)$ by using the fact that it is the inverse of $e^x$. That same inverse-function reasoning generalizes: the next lesson turns that argument into a theorem that works for any inverse function — and uses it to derive the derivatives of $\\arcsin$, $\\arccos$, and $\\arctan$.",
         ],
       },
-      { type: 'image', src: expLogUrl, alt: 'Exponential and log curves with derivative annotations', caption: 'd/dx[eˣ] = eˣ is unique: it is its own derivative. d/dx[ln x] = 1/x follows from the inverse relationship.' },
+      { type: 'image', src: lnDerivUrl, alt: 'Graph of ln(x) with slope 1/x shown, plus chain rule version d/dx[ln g] = g′/g', caption: 'd/dx[ln x] = 1/x. With chain rule: d/dx[ln g(x)] = g′(x)/g(x). Log grows slowly; slope → 0 as x→∞.' },
     ],
     callouts: [
       {

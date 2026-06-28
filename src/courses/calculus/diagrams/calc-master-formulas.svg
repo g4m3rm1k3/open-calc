@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Master Formula Sheet — Prerequisites</text>
+  <!-- Two column layout -->
+  <rect x="8" y="24" width="228" height="170" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="122" y="40" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Algebra &amp; Functions</text>
+  <text x="18" y="57" font-size="8" fill="#374151">Quadratic: x = (−b ± √(b²−4ac)) / 2a</text>
+  <text x="18" y="72" font-size="8" fill="#374151">Vertex: x = −b/(2a) for ax²+bx+c</text>
+  <text x="18" y="87" font-size="8" fill="#374151">Exponent rules: aᵐaⁿ = aᵐ⁺ⁿ, (aᵐ)ⁿ = aᵐⁿ</text>
+  <text x="18" y="102" font-size="8" fill="#374151">Log: ln(xy)=lnx+lny, ln(xⁿ)=n·lnx</text>
+  <text x="18" y="117" font-size="8" fill="#374151">Difference of sq: a²−b²=(a+b)(a−b)</text>
+  <text x="18" y="132" font-size="8" fill="#374151">Binomial: (a+b)ⁿ = Σ C(n,k)aⁿ⁻ᵏbᵏ</text>
+  <text x="18" y="147" font-size="8" fill="#374151">Distance: √((Δx)²+(Δy)²)</text>
+  <text x="18" y="162" font-size="8" fill="#374151">Slope: m = Δy/Δx; line y−y₁=m(x−x₁)</text>
+  <text x="18" y="177" font-size="8" fill="#374151">Circle: (x−h)²+(y−k)²=r²</text>
+  <text x="18" y="188" font-size="7.5" fill="#6366f1">Complete the square to convert standard→vertex</text>
+  <rect x="244" y="24" width="228" height="170" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="358" y="40" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Trigonometry</text>
+  <text x="254" y="57" font-size="8" fill="#374151">sin²θ + cos²θ = 1</text>
+  <text x="254" y="72" font-size="8" fill="#374151">tan θ = sin θ/cos θ; sec θ = 1/cos θ</text>
+  <text x="254" y="87" font-size="8" fill="#374151">sin(2θ) = 2sinθcosθ</text>
+  <text x="254" y="102" font-size="8" fill="#374151">cos(2θ) = cos²θ−sin²θ = 1−2sin²θ</text>
+  <text x="254" y="117" font-size="8" fill="#374151">sin²θ = (1−cos2θ)/2 (power reduction)</text>
+  <text x="254" y="132" font-size="8" fill="#374151">cos²θ = (1+cos2θ)/2 (power reduction)</text>
+  <text x="254" y="147" font-size="8" fill="#374151">Special: sin30°=½, cos60°=½, tan45°=1</text>
+  <text x="254" y="162" font-size="8" fill="#374151">sin45°=cos45°=√2/2</text>
+  <text x="254" y="177" font-size="8" fill="#374151">sin60°=cos30°=√3/2</text>
+  <text x="254" y="188" font-size="7.5" fill="#22c55e">Memorize the unit circle — it appears everywhere in calc</text>
+</svg>

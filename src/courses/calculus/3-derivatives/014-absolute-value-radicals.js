@@ -1,5 +1,6 @@
 import cornerCuspUrl from '../diagrams/calc-corner-cusp.svg?url';
 import continuityUrl from '../diagrams/calc-continuity.svg?url';
+import radicalDerivUrl from '../diagrams/calc-radical-deriv.svg?url';
 export default {
   id: 'ch2-009',
   slug: 'absolute-value-radicals',
@@ -31,10 +32,16 @@ export default {
         type: 'prose',
         paragraphs: [
       'When both sides have absolute value, $|f(x)| = |g(x)|$, the two cases are $f(x) = g(x)$ or $f(x) = -g(x)$. Solve each separately, check both answers. Extraneous solutions do not appear for absolute value equations (unlike radical equations) — but always verify anyway.',
-      'Simplifying radical expressions with variables requires knowing the domain. $\\sqrt{x^2} = |x|$, not $x$ — because for negative $x$, $\\sqrt{x^2} = \\sqrt{(-3)^2} = \\sqrt{9} = 3 = |-3|$, not $-3$. This matters: $\\sqrt{(x-2)^2} = |x-2|$, which equals $x-2$ only when $x \\geq 2$ and $2-x$ when $x < 2$.',
         ],
       },
       { type: 'image', src: continuityUrl, alt: 'Continuous functions that fail differentiability at specific points', caption: 'Continuity is necessary but not sufficient for differentiability.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'Simplifying radical expressions with variables requires knowing the domain. $\\sqrt{x^2} = |x|$, not $x$ — because for negative $x$, $\\sqrt{x^2} = \\sqrt{(-3)^2} = \\sqrt{9} = 3 = |-3|$, not $-3$. This matters: $\\sqrt{(x-2)^2} = |x-2|$, which equals $x-2$ only when $x \\geq 2$ and $2-x$ when $x < 2$.',
+        ],
+      },
+      { type: 'image', src: radicalDerivUrl, alt: 'Derivatives of |x| (gives sgn(x)) and √x and ∛x via power rule, with chain rule extension', caption: 'd/dx|x| = x/|x|. d/dx[√x] = 1/(2√x). d/dx[√g] = g′/(2√g) via chain rule.' },
     ],
     callouts: [
       {

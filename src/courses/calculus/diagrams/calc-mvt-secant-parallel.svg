@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Mean Value Theorem — Tangent Parallel to Secant</text>
+  <rect x="8" y="22" width="464" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Axes -->
+  <line x1="30" y1="170" x2="460" y2="170" stroke="#64748b" stroke-width="1"/>
+  <line x1="30" y1="28" x2="30" y2="174" stroke="#64748b" stroke-width="1"/>
+  <!-- Curve -->
+  <path d="M 60,150 Q 90,130 130,100 Q 170,70 210,55 Q 250,43 290,48 Q 330,55 370,80 Q 400,100 430,140" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Endpoints a, b -->
+  <circle cx="60" cy="150" r="5" fill="#4338ca"/>
+  <circle cx="430" cy="140" r="5" fill="#4338ca"/>
+  <line x1="60" y1="165" x2="60" y2="175" stroke="#4338ca" stroke-width="1.5"/>
+  <line x1="430" y1="165" x2="430" y2="175" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="60" y="187" font-size="9" fill="#4338ca" text-anchor="middle">a</text>
+  <text x="430" y="187" font-size="9" fill="#4338ca" text-anchor="middle">b</text>
+  <!-- Secant line through (a,f(a)) and (b,f(b)) -->
+  <line x1="50" y1="153" x2="440" y2="137" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="248" y="180" font-size="8" fill="#64748b" text-anchor="middle">secant slope = [f(b)−f(a)] / (b−a)</text>
+  <!-- Point c on curve -->
+  <circle cx="250" cy="43" r="6" fill="#ef4444"/>
+  <line x1="250" y1="165" x2="250" y2="172" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="250" y="187" font-size="9" fill="#b91c1c" text-anchor="middle">c</text>
+  <!-- Tangent at c (parallel to secant) -->
+  <line x1="200" y1="45" x2="300" y2="41" stroke="#ef4444" stroke-width="2.5"/>
+  <!-- Parallel arrows -->
+  <text x="306" y="38" font-size="8" fill="#ef4444" font-weight="700">f ′(c)</text>
+  <!-- Parallel symbol indicator -->
+  <line x1="88" y1="129" x2="108" y2="128" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 0"/>
+  <text x="118" y="122" font-size="7.5" fill="#ef4444">parallel!</text>
+  <!-- MVT formula box -->
+  <rect x="310" y="60" width="148" height="60" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="384" y="80" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">MVT Formula</text>
+  <text x="384" y="97" font-size="8" fill="#4338ca" text-anchor="middle">f ′(c) = f(b) − f(a)</text>
+  <text x="384" y="112" font-size="8" fill="#4338ca" text-anchor="middle">          b − a</text>
+  <line x1="318" y1="104" x2="452" y2="104" stroke="#6366f1" stroke-width="0.8"/>
+</svg>

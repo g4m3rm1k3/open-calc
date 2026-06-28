@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Integration by Parts — Formula &amp; Derivation</text>
+  <!-- Formula box -->
+  <rect x="8" y="24" width="464" height="36" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <text x="240" y="46" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">∫ u dv = u·v − ∫ v du</text>
+  <!-- Derivation panel -->
+  <rect x="8" y="68" width="218" height="126" rx="6" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="117" y="86" font-size="8.5" fill="#1e293b" text-anchor="middle" font-weight="700">Derivation from Product Rule</text>
+  <text x="117" y="102" font-size="8" fill="#374151" text-anchor="middle">d/dx[u·v] = u·dv/dx + v·du/dx</text>
+  <text x="117" y="116" font-size="8" fill="#374151" text-anchor="middle">Integrate both sides:</text>
+  <text x="117" y="130" font-size="8" fill="#374151" text-anchor="middle">u·v = ∫ u dv + ∫ v du</text>
+  <text x="117" y="148" font-size="8" fill="#374151" text-anchor="middle">Rearrange:</text>
+  <rect x="16" y="152" width="202" height="36" rx="4" fill="#dbeafe"/>
+  <text x="117" y="168" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">∫ u dv = u·v − ∫ v du</text>
+  <text x="117" y="183" font-size="7.5" fill="#1e40af" text-anchor="middle">IBP = reversed product rule</text>
+  <!-- Example panel -->
+  <rect x="234" y="68" width="238" height="126" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="353" y="86" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">Example: ∫ x·eˣ dx</text>
+  <rect x="242" y="92" width="222" height="18" rx="3" fill="#fde68a"/>
+  <text x="353" y="105" font-size="8" fill="#92400e" text-anchor="middle">Choose: u = x,  dv = eˣ dx</text>
+  <rect x="242" y="114" width="222" height="18" rx="3" fill="#fde68a"/>
+  <text x="353" y="127" font-size="8" fill="#92400e" text-anchor="middle">Then: du = dx,  v = eˣ</text>
+  <rect x="242" y="136" width="222" height="18" rx="3" fill="#fde68a"/>
+  <text x="353" y="149" font-size="8" fill="#92400e" text-anchor="middle">∫ x·eˣ dx = x·eˣ − ∫ eˣ dx</text>
+  <rect x="242" y="158" width="222" height="30" rx="3" fill="#dcfce7"/>
+  <text x="353" y="172" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">= x·eˣ − eˣ + C = eˣ(x−1) + C</text>
+</svg>

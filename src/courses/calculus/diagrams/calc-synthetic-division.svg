@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Synthetic Division — Fast Polynomial Division by (x−c)</text>
+  <text x="240" y="36" font-size="8.5" fill="#374151" text-anchor="middle">(2x³ − 3x² + 4x − 5) ÷ (x − 2)  →  c = 2</text>
+  <!-- Synthetic layout -->
+  <rect x="8" y="44" width="350" height="110" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- c value -->
+  <text x="28" y="68" font-size="11" fill="#ef4444" font-weight="700">2 |</text>
+  <!-- Coefficients row -->
+  <text x="75" y="68" font-size="10" fill="#374151" text-anchor="middle">2</text>
+  <text x="135" y="68" font-size="10" fill="#374151" text-anchor="middle">−3</text>
+  <text x="195" y="68" font-size="10" fill="#374151" text-anchor="middle">4</text>
+  <text x="255" y="68" font-size="10" fill="#374151" text-anchor="middle">−5</text>
+  <line x1="55" y1="74" x2="280" y2="74" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- Bring down 2 -->
+  <text x="75" y="92" font-size="10" fill="#166534" text-anchor="middle">2</text>
+  <!-- 2*2=4 -->
+  <text x="135" y="84" font-size="9" fill="#6366f1" text-anchor="middle">4</text>
+  <text x="135" y="92" font-size="10" fill="#374151" text-anchor="middle">1</text>
+  <!-- 1*2=2 -->
+  <text x="195" y="84" font-size="9" fill="#6366f1" text-anchor="middle">2</text>
+  <text x="195" y="92" font-size="10" fill="#374151" text-anchor="middle">6</text>
+  <!-- 6*2=12 -->
+  <text x="255" y="84" font-size="9" fill="#6366f1" text-anchor="middle">12</text>
+  <text x="255" y="92" font-size="10" fill="#374151" text-anchor="middle">7</text>
+  <!-- Arrows indicating multiply -->
+  <text x="105" y="78" font-size="7" fill="#6366f1" text-anchor="middle">×2↓</text>
+  <text x="165" y="78" font-size="7" fill="#6366f1" text-anchor="middle">×2↓</text>
+  <text x="225" y="78" font-size="7" fill="#6366f1" text-anchor="middle">×2↓</text>
+  <!-- Labels bottom -->
+  <text x="75" y="112" font-size="7.5" fill="#166534" text-anchor="middle">2x²</text>
+  <text x="135" y="112" font-size="7.5" fill="#374151" text-anchor="middle">x</text>
+  <text x="195" y="112" font-size="7.5" fill="#374151" text-anchor="middle">const</text>
+  <text x="255" y="112" font-size="7.5" fill="#ef4444" text-anchor="middle">R</text>
+  <!-- Answer -->
+  <text x="168" y="144" font-size="9" fill="#4338ca" text-anchor="middle">Quotient: 2x² + x + 6  Remainder: 7</text>
+  <!-- Right panel -->
+  <rect x="366" y="44" width="106" height="110" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="419" y="63" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">Why Use It?</text>
+  <text x="419" y="79" font-size="7.5" fill="#374151" text-anchor="middle">Only works when</text>
+  <text x="419" y="91" font-size="7.5" fill="#374151" text-anchor="middle">divisor = (x − c)</text>
+  <text x="419" y="107" font-size="7.5" fill="#374151" text-anchor="middle">Much faster than</text>
+  <text x="419" y="119" font-size="7.5" fill="#374151" text-anchor="middle">long division</text>
+  <text x="419" y="135" font-size="7.5" fill="#374151" text-anchor="middle">Remainder = f(c)</text>
+  <text x="419" y="147" font-size="7.5" fill="#1d4ed8" text-anchor="middle">(Remainder Thm)</text>
+  <!-- Footer -->
+  <rect x="8" y="160" width="464" height="34" rx="4" fill="#fef3c7"/>
+  <text x="240" y="176" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">Remainder Theorem: f(c) = remainder when f(x) is divided by (x − c)</text>
+  <text x="240" y="190" font-size="8" fill="#374151" text-anchor="middle">If remainder = 0, then (x − c) is a factor and c is a root of f</text>
+</svg>

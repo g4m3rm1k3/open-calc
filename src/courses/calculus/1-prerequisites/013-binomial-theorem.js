@@ -1,4 +1,6 @@
 import taylorUrl from '../diagrams/calc-taylor.svg?url';
+import pascalsTriangleUrl from '../diagrams/calc-pascals-triangle.svg?url';
+import binomialExpansionUrl from '../diagrams/calc-binomial-expansion.svg?url';
 export default {
   id: 'ch0-01f',
   slug: 'binomial-theorem',
@@ -29,9 +31,11 @@ export default {
         body: "Look closely at the formula in the interactive below. If $n=4$, the terms are $x^4$, then $x^3h$, then $x^2h^2$, then $xh^3$, and finally $h^4$. The total power in each individual chunk always sums exactly to $n$.",
         type: 'tip'
       },
+      { type: 'image', src: pascalsTriangleUrl, alt: "Pascal's triangle rows 0-4 showing binomial coefficients with color-coded rows", caption: "Pascal's triangle gives the coefficients for (a+b)ⁿ row by row — each entry is the sum of the two entries above it." },
       { type: 'viz', id: 'PascalsTriangle', title: 'The Blueprint for Polynomials',
         caption: 'Drag the slider to build larger polynomials. Pay extremely close attention to the second block of the output. The coefficient is ALWAYS exactly the power $n$.',
       },
+      { type: 'image', src: binomialExpansionUrl, alt: 'Expanded forms for n=1 through 4 with calculus connection to derivative and Taylor series', caption: 'The binomial theorem connects to calculus twice: in the limit definition of the power rule, and in Taylor series for (1+x)ⁿ.' },
       { type: 'viz', id: 'VideoEmbed', title: 'Binomial Theorem Introduction', props: { url: "" } },
       { type: 'image', src: taylorUrl, alt: 'Taylor polynomial approximations showing polynomial expansion pattern', caption: 'The binomial theorem is a special case of polynomial expansion — a preview of Taylor series.' },
     ],

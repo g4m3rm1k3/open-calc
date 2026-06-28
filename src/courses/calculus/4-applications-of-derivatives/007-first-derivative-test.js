@@ -1,4 +1,6 @@
 import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
+import firstDerivTestUrl from '../diagrams/calc-first-deriv-test.svg?url';
+import criticalPointsUrl from '../diagrams/calc-critical-points.svg?url';
 export default {
   id: 'ch3-first-derivative-test',
   slug: 'first-derivative-test',
@@ -34,6 +36,7 @@ export default {
           '• f\'(x) = 0 at x = c — f has a CRITICAL POINT at c (tangent line is horizontal)',
         ],
       },
+      { type: 'image', src: curveExtremaUrl, alt: 'Curve with local max and min and f-prime sign chart below', caption: 'The first derivative test: f′ changes from + to − at a local max, − to + at a local min.' },
       {
         type: 'callout',
         callout: {
@@ -48,6 +51,7 @@ export default {
                 '5. + means increasing, − means decreasing',
         },
       },
+      { type: 'image', src: firstDerivTestUrl, alt: 'Side-by-side diagrams showing f\' sign change for local min and local max', caption: 'First Derivative Test: f′ negative then positive → local min; f′ positive then negative → local max.' },
       {
         type: 'viz',
         id: 'SignChartViz',
@@ -57,7 +61,7 @@ export default {
           'When f\' switches from + to −, f has a local maximum. When from − to +, a local minimum.',
         caption: 'Drag the critical points to rearrange the sign chart. Watch how the function shape updates to match.',
       },
-      { type: 'image', src: curveExtremaUrl, alt: 'Curve with local max and min and f-prime sign chart below', caption: 'The first derivative test: f′ changes from + to − at a local max, − to + at a local min.' },
+      { type: 'image', src: criticalPointsUrl, alt: 'Graph with critical points and table of types: f\' = 0, f\' DNE', caption: 'Critical points occur where f′=0 or f′ is undefined — not all are extrema; use the First Derivative Test to classify.' },
     ],
   },
 

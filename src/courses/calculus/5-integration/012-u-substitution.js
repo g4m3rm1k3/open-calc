@@ -1,4 +1,6 @@
 import uSubUrl from '../diagrams/calc-u-sub.svg?url';
+import uSubChainUrl from '../diagrams/calc-u-sub-chain.svg?url';
+import uSubBoundsUrl from '../diagrams/calc-u-sub-bounds.svg?url';
 // FILE: src/content/chapter-4/06-u-substitution.js
 export default {
   id: 'ch4-006',
@@ -27,7 +29,12 @@ export default {
         type: 'prose',
         paragraphs: [
       'Recall the chain rule for derivatives: if F(u) is an antiderivative of f(u), then d/dx [F(g(x))] = f(g(x)) · g\'(x). Rearranging: ∫ f(g(x)) · g\'(x) dx = F(g(x)) + C. This is u-substitution in one equation.',
-
+        ],
+      },
+      { type: 'image', src: uSubUrl, alt: '4-step pipeline: original integral → u-variable → antiderivative → back-substitute', caption: 'u-substitution reverses the chain rule: recognize the inner function and replace it with u.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The substitution u = g(x) transforms the integral. Here is the key mechanic: if u = g(x), then du/dx = g\'(x), which we write as du = g\'(x) dx. This lets us replace the original integral:',
       '∫ f(g(x)) · g\'(x) dx  →  ∫ f(u) du',
       'The new integral ∫ f(u) du is in a simpler variable. If we can antidifferentiate it (getting F(u) + C), we substitute back: F(g(x)) + C.',
@@ -37,13 +44,18 @@ export default {
       '• Exponential of a function: ∫ e^(3x) dx → let u = 3x',
       '• Trig of a function: ∫ cos(5x) dx → let u = 5x',
       '• Log or fraction: ∫ x/(x²+1) dx → let u = x²+1 (derivative 2x is present up to a constant)',
-
+        ],
+      },
+      { type: 'image', src: uSubChainUrl, alt: 'Chain rule diagram reversed: d/dx[F(g(x))] = f(g(x))·g\'(x) becomes the u-sub pattern', caption: 'u-substitution works when g\'(x) appears as a factor — recognize it as the "chain rule in reverse."' },
+      {
+        type: 'prose',
+        paragraphs: [
       'For **definite integrals**, you have two options: (1) change the limits with u to avoid back-substituting, or (2) integrate in u, back-substitute, then evaluate. Changing limits is cleaner for exam work.',
 
       'A critical subtlety: u-substitution requires the ENTIRE integrand (except du) to transform cleanly. If there is a leftover factor that does not simplify, the substitution is the wrong choice. Sometimes you need to solve for x in terms of u to replace leftovers — this is common when u = ax + b (linear substitutions always work).',
         ],
       },
-      { type: 'image', src: uSubUrl, alt: '4-step pipeline: original integral → u-variable → antiderivative → back-substitute', caption: 'u-substitution reverses the chain rule: recognize the inner function and replace it with u.' },
+      { type: 'image', src: uSubBoundsUrl, alt: 'Definite integral u-sub: two methods — change bounds vs back-substitute', caption: 'For definite integrals: either convert the bounds from x to u, or back-substitute to x before evaluating.' },
     ],
     callouts: [
       {

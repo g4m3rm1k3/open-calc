@@ -1,3 +1,7 @@
+import trigSohcahtoaUrl from '../diagrams/calc-trig-sohcahtoa.svg?url'
+import trigKeyAnglesUrl from '../diagrams/calc-trig-key-angles.svg?url'
+import trigWavesUrl from '../diagrams/calc-trig-waves.svg?url'
+
 export default {
   id: "ch0-trig",
   slug: "trig-review",
@@ -196,6 +200,9 @@ export default {
         caption:
           "Watch how two copies of the triangle tile a parallelogram, proving Area = ½ab sin C.",
       },
+      { type: "image", src: trigSohcahtoaUrl, alt: "SOH-CAH-TOA right triangle diagram", caption: "SOH-CAH-TOA: sin=opp/hyp, cos=adj/hyp, tan=opp/adj. These ratios are constant for any triangle with the same angle." },
+      { type: "image", src: trigKeyAnglesUrl, alt: "Table of key angle values for sin, cos, tan", caption: "The five key angles (0°, 30°, 45°, 60°, 90°) appear constantly in calculus. Notice sin and cos patterns are reversed." },
+      { type: "image", src: trigWavesUrl, alt: "Sine and cosine wave comparison for one period", caption: "Both waves have period 2π and amplitude 1. Cosine is sine shifted left by π/2: cos(x) = sin(x + π/2)." },
     ],
   },
 

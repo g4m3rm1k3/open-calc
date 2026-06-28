@@ -1,4 +1,6 @@
 import mvtUrl from '../diagrams/calc-mvt.svg?url';
+import rolleHorizontalUrl from '../diagrams/calc-rolle-horizontal.svg?url';
+import rolleConditionsUrl from '../diagrams/calc-rolle-conditions.svg?url';
 // FILE: src/content/chapter-3/02a-rolles-theorem.js
 export default {
   id: "ch3-025",
@@ -34,13 +36,23 @@ export default {
       "**Prerequisites you need (review them now if shaky).** (1) *Continuity on a closed interval*: $f$ is continuous on $[a,b]$ if it has no breaks, jumps, or holes. (2) *Differentiability on an open interval*: the derivative $f'(x) = \\lim_{h \\to 0} \\frac{f(x+h)-f(x)}{h}$ exists at every interior point — no corners, cusps, or vertical tangents. (3) *Extreme Value Theorem (EVT)*: if $f$ is continuous on $[a,b]$, it attains both a global maximum $M$ and global minimum $m$ on $[a,b]$. This is the key engine inside the proof. (4) *Fermat's Interior Extremum Theorem*: if $f$ has a local max or min at an interior point $c$ and $f'(c)$ exists, then $f'(c) = 0$. Quick sketch of why: at a local max, the difference quotient is $\\leq 0$ from the right and $\\geq 0$ from the left, so the limit (the derivative) must be exactly 0. (5) *Secant slope* (the average rate of change): $\\frac{f(b)-f(a)}{b-a}$.",
 
       "**The core idea, in plain language.** Rolle's Theorem makes a beautifully simple claim: if a function starts and ends at the same height on some interval, and if the function is smooth enough (continuous on the closed interval, differentiable on the open interval), then somewhere in between there must be a point where the tangent line is perfectly horizontal — the derivative is zero at that point.",
-
+        ],
+      },
+      { type: 'image', src: mvtUrl, alt: 'Curve from A to B at the same height with a horizontal tangent at c', caption: 'Rolle\'s theorem: if f(a) = f(b), the function must have a horizontal tangent somewhere between a and b.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Think about it graphically. You are drawing a curve that starts at $(a, f(a))$ and must end at $(b, f(b))$ where $f(a) = f(b)$. The curve must be unbroken and smooth. If the curve goes up at any point, it must eventually come back down to the same height at $b$ — meaning there is a peak somewhere with a horizontal tangent. If it goes down first, there must be a valley. If it stays perfectly flat, then $f'(c) = 0$ everywhere. No matter what, a horizontal tangent is unavoidable.",
 
       "**The ball-tossing example.** Let $f(t)$ be the height of a ball at time $t$. You throw it at time $a$ and catch it at time $b$ at the same height: $f(a) = f(b)$. The height function is continuous and differentiable. Therefore, there exists some time $c$ between $a$ and $b$ where $f'(c) = 0$ — the ball is momentarily stationary at its peak. You do not need to solve any equation to know this; Rolle's Theorem guarantees it purely from the boundary conditions.",
 
       "**Why every hypothesis is needed.** Continuity: if the function can jump, it could leap from $f(a)$ up to some value and then jump back down to $f(b)$ without ever having a horizontal tangent. Differentiability: the function $f(x) = |x|$ on $[-1, 1]$ has $f(-1) = f(1) = 1$ and is continuous, but its only candidate for a horizontal tangent is $x = 0$, where the function has a corner and is not differentiable — so Rolle's Theorem does not apply and indeed no $c$ with $f'(c) = 0$ exists. Equal endpoints: without $f(a) = f(b)$ the curve can slope straight through from one height to another, never flattening.",
-
+        ],
+      },
+      { type: 'image', src: rolleHorizontalUrl, alt: 'Curve with equal endpoint heights and a horizontal tangent marked at interior point c', caption: 'Rolle\'s Theorem guarantees a c where f′(c) = 0 — the horizontal tangent is mandatory between equal endpoints.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**Rolle's Theorem is an existence theorem.** It tells you that a point $c$ with $f'(c) = 0$ exists, but it does not tell you what $c$ is or how to find it. This is a common pattern in analysis — many of the deepest results guarantee existence without providing a formula. To actually locate $c$, you must solve $f'(x) = 0$ by other means (algebra, Newton's method, etc.).",
 
       "**Connection to the Mean Value Theorem.** Rolle's Theorem is actually a special case of the MVT. The MVT says: for any continuous, differentiable function on $[a, b]$, there exists $c$ with $f'(c) = \\frac{f(b) - f(a)}{b - a}$. When $f(a) = f(b)$, the right-hand side is zero, and the MVT reduces exactly to Rolle's Theorem. Historically, however, Rolle's Theorem came first, and the MVT is proved using Rolle's Theorem — the logical order is the reverse of the historical order.",
@@ -48,7 +60,7 @@ export default {
       "**Root-counting application.** One of the most elegant uses of Rolle's Theorem is proving bounds on the number of roots a function can have. If a polynomial $p(x)$ of degree $n$ had $n + 1$ roots, then between each consecutive pair Rolle's would give a root of $p'(x)$, producing $n$ roots of $p'$. But $p'$ has degree $n-1$ and can have at most $n-1$ roots — contradiction. Therefore $p(x)$ has at most $n$ roots.",
         ],
       },
-      { type: 'image', src: mvtUrl, alt: 'Curve from A to B at the same height with a horizontal tangent at c', caption: 'Rolle\'s theorem: if f(a) = f(b), the function must have a horizontal tangent somewhere between a and b.' },
+      { type: 'image', src: rolleConditionsUrl, alt: 'Three panels showing all three conditions of Rolle\'s Theorem must hold', caption: 'All three conditions are required: continuity on [a,b], differentiability on (a,b), and f(a) = f(b).' },
     ],
     callouts: [
       {

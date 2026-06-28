@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Sine and Cosine — One Period</text>
+
+  <!-- X-axis line -->
+  <line x1="30" y1="105" x2="460" y2="105" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Y-axis -->
+  <line x1="30" y1="22" x2="30" y2="186" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- X-axis labels (quarter periods) -->
+  <!-- Period = 400px, so quarter = 100px starting at x=30 -->
+  <text x="30"  y="120" font-size="8" class="mu" text-anchor="middle">0</text>
+  <text x="130" y="120" font-size="8" class="mu" text-anchor="middle">π/2</text>
+  <text x="230" y="120" font-size="8" class="mu" text-anchor="middle">π</text>
+  <text x="330" y="120" font-size="8" class="mu" text-anchor="middle">3π/2</text>
+  <text x="430" y="120" font-size="8" class="mu" text-anchor="middle">2π</text>
+
+  <!-- Tick marks on x-axis -->
+  <line x1="130" y1="101" x2="130" y2="109" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="230" y1="101" x2="230" y2="109" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="330" y1="101" x2="330" y2="109" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="430" y1="101" x2="430" y2="109" stroke="#94a3b8" stroke-width="1"/>
+
+  <!-- Y-axis labels: +1 at y=35, -1 at y=175 (amplitude=70) -->
+  <text x="24" y="38" font-size="8" class="mu" text-anchor="end">1</text>
+  <text x="24" y="108" font-size="8" class="mu" text-anchor="end">0</text>
+  <text x="22" y="178" font-size="8" class="mu" text-anchor="end">−1</text>
+  <line x1="26" y1="35" x2="34" y2="35" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="26" y1="175" x2="34" y2="175" stroke="#94a3b8" stroke-width="1"/>
+
+  <!-- sin(x) wave: starts at 0, peaks at π/2, zero at π, trough at 3π/2, back to 0 at 2π -->
+  <!-- Using cubic bezier approximation. Amplitude = 70 from y=105 baseline -->
+  <!-- sin: 0 at x=30, +70 at x=130, 0 at x=230, -70 at x=330, 0 at x=430 -->
+  <path d="M 30,105 C 52,105 108,35 130,35 C 152,35 208,105 230,105 C 252,105 308,175 330,175 C 352,175 408,105 430,105"
+        fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="140" y="30" font-size="9" fill="#6366f1" font-weight="700">y = sin(x)</text>
+  <circle cx="30" cy="105" r="3" fill="#6366f1"/>
+  <circle cx="130" cy="35" r="3" fill="#6366f1"/>
+  <circle cx="230" cy="105" r="3" fill="#6366f1"/>
+  <circle cx="330" cy="175" r="3" fill="#6366f1"/>
+
+  <!-- cos(x) wave: starts at +70 (peak), zero at π/2, -70 at π, zero at 3π/2, +70 at 2π -->
+  <path d="M 30,35 C 52,35 108,105 130,105 C 152,105 208,175 230,175 C 252,175 308,105 330,105 C 352,105 408,35 430,35"
+        fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="7,4"/>
+  <text x="330" y="30" font-size="9" fill="#b45309" font-weight="700">y = cos(x)</text>
+  <circle cx="30" cy="35" r="3" fill="#f59e0b"/>
+  <circle cx="130" cy="105" r="3" fill="#f59e0b"/>
+  <circle cx="230" cy="175" r="3" fill="#f59e0b"/>
+
+  <!-- Key features label -->
+  <!-- Period bracket -->
+  <line x1="30" y1="188" x2="430" y2="188" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="30" y1="184" x2="30" y2="192" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="430" y1="184" x2="430" y2="192" stroke="#94a3b8" stroke-width="1"/>
+  <text x="230" y="198" font-size="8" class="mu" text-anchor="middle" font-weight="700">Period = 2π</text>
+
+  <!-- Amplitude arrow on right -->
+  <line x1="446" y1="35" x2="446" y2="105" stroke="#10b981" stroke-width="1.5"/>
+  <line x1="442" y1="35" x2="450" y2="35" stroke="#10b981" stroke-width="1"/>
+  <line x1="442" y1="105" x2="450" y2="105" stroke="#10b981" stroke-width="1"/>
+  <text x="456" y="74" font-size="7.5" fill="#059669">amp</text>
+  <text x="456" y="82" font-size="7.5" fill="#059669">= 1</text>
+
+  <!-- Key difference note -->
+  <rect x="36" y="130" width="180" height="24" rx="4" fill="#fef9c3"/>
+  <text x="126" y="141" font-size="7.5" fill="#78350f" text-anchor="middle">cos is sin shifted left by π/2</text>
+  <text x="126" y="150" font-size="7.5" fill="#78350f" text-anchor="middle">cos(x) = sin(x + π/2)</text>
+</svg>

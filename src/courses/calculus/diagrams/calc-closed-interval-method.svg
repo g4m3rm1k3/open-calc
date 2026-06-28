@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Closed Interval Method — 3 Steps</text>
+  <!-- Step boxes -->
+  <rect x="10" y="26" width="140" height="164" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="80" y="46" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">STEP 1</text>
+  <text x="80" y="62" font-size="8.5" fill="#1d4ed8" text-anchor="middle">Find critical points</text>
+  <text x="80" y="76" font-size="8" fill="#1e40af" text-anchor="middle">where f ′(x) = 0</text>
+  <text x="80" y="90" font-size="8" fill="#1e40af" text-anchor="middle">or f ′(x) = DNE</text>
+  <text x="80" y="104" font-size="8" fill="#1e40af" text-anchor="middle">inside (a, b)</text>
+  <rect x="18" y="112" width="124" height="70" rx="5" fill="#bfdbfe"/>
+  <text x="80" y="128" font-size="8" fill="#1e3a8a" text-anchor="middle">Example: f(x)=x³−3x</text>
+  <text x="80" y="143" font-size="8" fill="#1e3a8a" text-anchor="middle">f ′=3x²−3=0</text>
+  <text x="80" y="157" font-size="8" fill="#1e3a8a" text-anchor="middle">→ x = ±1</text>
+  <text x="80" y="173" font-size="7.5" fill="#1e3a8a" text-anchor="middle">on [−2, 2]</text>
+
+  <rect x="170" y="26" width="140" height="164" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="240" y="46" font-size="9" fill="#166534" text-anchor="middle" font-weight="700">STEP 2</text>
+  <text x="240" y="62" font-size="8.5" fill="#166534" text-anchor="middle">Evaluate f at</text>
+  <text x="240" y="76" font-size="8" fill="#166534" text-anchor="middle">all critical points</text>
+  <text x="240" y="90" font-size="8" fill="#166534" text-anchor="middle">AND at endpoints</text>
+  <text x="240" y="104" font-size="8" fill="#166534" text-anchor="middle">x = a and x = b</text>
+  <rect x="178" y="112" width="124" height="70" rx="5" fill="#bbf7d0"/>
+  <text x="240" y="128" font-size="8" fill="#14532d" text-anchor="middle">f(−2) = −2, f(−1) = 2</text>
+  <text x="240" y="143" font-size="8" fill="#14532d" text-anchor="middle">f(1) = −2, f(2) = 2</text>
+  <text x="240" y="157" font-size="7.5" fill="#14532d" text-anchor="middle">← evaluate all 4 pts</text>
+  <text x="240" y="173" font-size="7" fill="#14532d" text-anchor="middle">(2 CPs + 2 endpoints)</text>
+
+  <rect x="330" y="26" width="142" height="164" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="401" y="46" font-size="9" fill="#92400e" text-anchor="middle" font-weight="700">STEP 3</text>
+  <text x="401" y="62" font-size="8.5" fill="#92400e" text-anchor="middle">Largest value =</text>
+  <text x="401" y="76" font-size="8" fill="#92400e" text-anchor="middle">absolute maximum</text>
+  <text x="401" y="90" font-size="8" fill="#92400e" text-anchor="middle">Smallest value =</text>
+  <text x="401" y="104" font-size="8" fill="#92400e" text-anchor="middle">absolute minimum</text>
+  <rect x="338" y="112" width="126" height="70" rx="5" fill="#fde68a"/>
+  <text x="401" y="128" font-size="8" fill="#78350f" text-anchor="middle">Values: −2, 2, −2, 2</text>
+  <text x="401" y="143" font-size="8" fill="#78350f" text-anchor="middle">Abs MAX = 2</text>
+  <text x="401" y="157" font-size="8" fill="#78350f" text-anchor="middle">(at x=−1 and x=2)</text>
+  <text x="401" y="171" font-size="8" fill="#78350f" text-anchor="middle">Abs MIN = −2</text>
+</svg>

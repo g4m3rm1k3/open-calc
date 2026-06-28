@@ -1,4 +1,6 @@
 import sequencesUrl from '../diagrams/calc-sequences.svg?url';
+import geometricSeriesUrl from '../diagrams/calc-geometric-series.svg?url';
+import telescopingSeriesUrl from '../diagrams/calc-telescoping-series.svg?url';
 // FILE: src/content/chapter-5/01-series-intro.js
 export default {
   id: 'ch5-001',
@@ -22,14 +24,26 @@ export default {
         paragraphs: [
       'An infinite series $\\sum_{n=1}^{\\infty} a_n = a_1 + a_2 + a_3 + \\cdots$ is defined via its partial sums. The $N$-th partial sum is $S_N = a_1 + a_2 + \\cdots + a_N = \\sum_{n=1}^{N} a_n$. We say the series converges to $S$ if $\\lim_{N\\to\\infty} S_N = S$, and we write $\\sum_{n=1}^{\\infty} a_n = S$. If the limit does not exist, the series diverges. So an infinite series is really a sequence — the sequence of partial sums — and all our sequence tools apply.',
       'The geometric series $\\sum_{n=0}^{\\infty} r^n = 1 + r + r^2 + \\cdots$ is the most important series in mathematics. Its partial sum is $S_N = \\frac{1 - r^{N+1}}{1 - r}$ (multiply both sides by $1-r$ and telescopes cancel). If $|r| < 1$, then $r^{N+1} \\to 0$, so $S = 1/(1-r)$. If $|r| \\ge 1$, the series diverges. More generally, $\\sum_{n=0}^{\\infty} ar^n = \\frac{a}{1-r}$ for $|r| < 1$. This formula appears in finance (annuities, bond pricing), probability (geometric distributions), and physics (repeated reflections, decay processes).',
+        ],
+      },
+      { type: 'image', src: sequencesUrl, alt: 'Partial-sum plot showing accumulation toward a series limit', caption: 'A series is the sum of a sequence — convergence means the running total approaches a finite value.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Zeno\'s paradox is resolved by the geometric series. The distances $1/2, 1/4, 1/8, \\ldots$ form the series $\\sum_{n=1}^{\\infty} (1/2)^n = 1/2 + 1/4 + 1/8 + \\cdots = \\frac{1/2}{1 - 1/2} = 1$. You do reach the wall. The infinitely many steps take infinitely many time intervals that also sum to a finite total. Zeno\'s error was assuming that infinitely many positive durations must sum to infinity — the geometric series shows this is false.',
       'A telescoping series is one where most terms cancel. Example: $\\sum_{n=1}^{\\infty} \\frac{1}{n(n+1)} = \\sum_{n=1}^{\\infty} \\left(\\frac{1}{n} - \\frac{1}{n+1}\\right)$. The partial sum is $S_N = (1 - 1/2) + (1/2 - 1/3) + \\cdots + (1/N - 1/(N+1)) = 1 - 1/(N+1)$. As $N \\to \\infty$, $S_N \\to 1$. The key is the partial fraction decomposition that reveals the telescoping structure.',
+        ],
+      },
+      { type: 'image', src: geometricSeriesUrl, alt: 'Unit square sliced into halving strips — geometric series 1+½+¼+… = 2', caption: 'Geometric series Σarⁿ = a/(1−r) when |r| < 1 — the unit-square slicing visualizes why the infinite sum is finite.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The harmonic series $\\sum_{n=1}^{\\infty} 1/n = 1 + 1/2 + 1/3 + 1/4 + \\cdots$ diverges, even though its terms go to zero. This is one of the most important facts in all of calculus. Proof (Oresme, ~1350): group terms: $1 + 1/2 + (1/3+1/4) + (1/5+1/6+1/7+1/8) + \\cdots > 1 + 1/2 + 1/2 + 1/2 + \\cdots = \\infty$. Each group of $2^k$ terms sums to more than $1/2$, so the partial sums grow without bound. The harmonic series diverges incredibly slowly — you need about $e^{23}$ terms (over 10 billion) to exceed a partial sum of $23$ — but diverge it does.',
       'The nth Term Test (Divergence Test) states: if $\\lim_{n\\to\\infty} a_n \\ne 0$ (or does not exist), then $\\sum a_n$ diverges. Contrapositive: if $\\sum a_n$ converges, then $a_n \\to 0$. WARNING: the converse is false! $a_n \\to 0$ does NOT imply $\\sum a_n$ converges. The harmonic series is the classic counterexample: $1/n \\to 0$ but $\\sum 1/n = \\infty$. The nth Term Test can only prove divergence, never convergence.',
       'Series vs. sequence: a sequence $\\{a_n\\}$ is a list of numbers; a series $\\sum a_n$ is the sum of a sequence. The sequence $\\{1/n\\}$ converges (to $0$), but the series $\\sum 1/n$ diverges (to $\\infty$). The sequence $\\{1/n^2\\}$ converges (to $0$) and the series $\\sum 1/n^2$ also converges (to $\\pi^2/6$ — proved by Euler in 1735). Whether a series converges depends on how fast the terms shrink, not merely whether they shrink.',
         ],
       },
-      { type: 'image', src: sequencesUrl, alt: 'Partial-sum plot showing accumulation toward a series limit', caption: 'A series is the sum of a sequence — convergence means the running total approaches a finite value.' },
+      { type: 'image', src: telescopingSeriesUrl, alt: 'Telescoping series cancellation pattern with partial fractions', caption: 'Telescoping series: write each term as bₙ−bₙ₊₁; all middle terms cancel, leaving just b₁ − lim bₙ.' },
     ],
     callouts: [
       {

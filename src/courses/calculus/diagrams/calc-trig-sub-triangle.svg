@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Trig Substitution — Reference Triangles</text>
+  <!-- Case 1: √(a²−x²) -->
+  <rect x="8" y="24" width="146" height="170" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="81" y="42" font-size="8" fill="#1d4ed8" text-anchor="middle" font-weight="700">√(a²−x²)</text>
+  <text x="81" y="56" font-size="7.5" fill="#1e40af" text-anchor="middle">x = a sin θ</text>
+  <!-- Right triangle -->
+  <polygon points="26,160 118,160 26,90" fill="none" stroke="#3b82f6" stroke-width="2"/>
+  <rect x="26" y="152" width="8" height="8" fill="none" stroke="#3b82f6" stroke-width="1.5"/>
+  <!-- Labels -->
+  <text x="72" y="175" font-size="8" fill="#1d4ed8" text-anchor="middle">a cos θ</text>
+  <text x="16" y="128" font-size="8" fill="#1d4ed8" text-anchor="end">x</text>
+  <text x="78" y="118" font-size="8" fill="#1d4ed8" text-anchor="middle">a</text>
+  <text x="107" y="158" font-size="8" fill="#1d4ed8">θ</text>
+  <!-- Result -->
+  <rect x="16" y="166" width="122" height="22" rx="3" fill="#bfdbfe"/>
+  <text x="77" y="180" font-size="8" fill="#1e3a8a" text-anchor="middle">dx = a cos θ dθ</text>
+
+  <!-- Case 2: √(a²+x²) -->
+  <rect x="166" y="24" width="148" height="170" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="240" y="42" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">√(a²+x²)</text>
+  <text x="240" y="56" font-size="7.5" fill="#15803d" text-anchor="middle">x = a tan θ</text>
+  <!-- Right triangle -->
+  <polygon points="180,160 272,160 272,90" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <rect x="264" y="152" width="8" height="8" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+  <!-- Labels -->
+  <text x="226" y="175" font-size="8" fill="#166534" text-anchor="middle">a</text>
+  <text x="278" y="128" font-size="8" fill="#166534">x</text>
+  <text x="223" y="118" font-size="8" fill="#166534" text-anchor="middle">√(a²+x²)</text>
+  <text x="192" y="158" font-size="8" fill="#166534">θ</text>
+  <!-- Result -->
+  <rect x="174" y="166" width="132" height="22" rx="3" fill="#bbf7d0"/>
+  <text x="240" y="180" font-size="8" fill="#14532d" text-anchor="middle">dx = a sec²θ dθ</text>
+
+  <!-- Case 3: √(x²−a²) -->
+  <rect x="326" y="24" width="146" height="170" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="399" y="42" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">√(x²−a²)</text>
+  <text x="399" y="56" font-size="7.5" fill="#78350f" text-anchor="middle">x = a sec θ</text>
+  <!-- Right triangle -->
+  <polygon points="340,160 432,160 432,90" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <rect x="424" y="152" width="8" height="8" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+  <!-- Labels -->
+  <text x="386" y="175" font-size="8" fill="#92400e" text-anchor="middle">a</text>
+  <text x="438" y="128" font-size="8" fill="#92400e">√(x²−a²)</text>
+  <text x="383" y="118" font-size="8" fill="#92400e" text-anchor="middle">x</text>
+  <text x="352" y="158" font-size="8" fill="#92400e">θ</text>
+  <!-- Result -->
+  <rect x="334" y="166" width="130" height="22" rx="3" fill="#fde68a"/>
+  <text x="399" y="180" font-size="8" fill="#78350f" text-anchor="middle">dx = a sec θ tan θ dθ</text>
+</svg>

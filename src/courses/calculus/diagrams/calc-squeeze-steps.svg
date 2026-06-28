@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Squeeze Theorem — The Sandwich Argument</text>
+
+  <!-- Graph area -->
+  <rect x="10" y="24" width="270" height="168" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Axes -->
+  <line x1="30" y1="180" x2="270" y2="180" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="150" y1="30" x2="150" y2="185" stroke="#64748b" stroke-width="1.5"/>
+  <text x="155" y="192" font-size="7.5" class="mu">c</text>
+
+  <!-- Upper bound h(x): opening upward -->
+  <path d="M 30,100 Q 90,80 150,62 Q 210,80 270,100" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+  <text x="40" y="92" font-size="8.5" fill="#ef4444" font-weight="700">h(x)</text>
+
+  <!-- f(x) — the squeezed function (wiggly but between) -->
+  <path d="M 30,100 Q 75,90 110,78 Q 130,70 150,62 Q 172,70 200,78 Q 228,85 270,100" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="192" y="78" font-size="8.5" fill="#6366f1" font-weight="700">f(x)</text>
+
+  <!-- Lower bound g(x): opening upward but lower -->
+  <path d="M 30,135 Q 90,110 150,62 Q 210,110 270,135" fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <text x="40" y="142" font-size="8.5" fill="#10b981" font-weight="700">g(x)</text>
+
+  <!-- Shaded sandwich region -->
+  <path d="M 30,100 Q 90,80 150,62 Q 210,80 270,100 Q 228,85 200,78 Q 172,70 150,62 Q 130,70 110,78 Q 75,90 30,100 Z" fill="#6366f1" opacity="0.08"/>
+  <path d="M 30,100 Q 75,90 110,78 Q 130,70 150,62 Q 172,70 200,78 Q 228,85 270,100 Q 210,110 150,62 Q 90,110 30,135 Z" fill="#10b981" opacity="0.08"/>
+
+  <!-- Common limit point at c -->
+  <circle cx="150" cy="62" r="5" fill="#4338ca"/>
+  <text x="158" y="58" font-size="8" fill="#4338ca" font-weight="700">L</text>
+  <text x="158" y="68" font-size="7.5" fill="#4338ca">all meet here!</text>
+
+  <!-- Right: Theorem statement -->
+  <rect x="288" y="24" width="184" height="168" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="380" y="42" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">Squeeze Theorem</text>
+  <line x1="296" y1="48" x2="464" y2="48" stroke="#a7f3d0" stroke-width="1"/>
+
+  <text x="296" y="64" font-size="8.5" fill="#166534">If near c:</text>
+  <text x="296" y="80" font-size="9" fill="#059669" font-weight="700">g(x) ≤ f(x) ≤ h(x)</text>
+
+  <text x="296" y="98" font-size="8.5" fill="#166534">and both bounds</text>
+  <text x="296" y="110" font-size="8.5" fill="#166534">converge to same L:</text>
+  <text x="296" y="126" font-size="9" fill="#059669" font-weight="700">lim g = lim h = L</text>
+
+  <line x1="296" y1="136" x2="464" y2="136" stroke="#a7f3d0" stroke-width="1"/>
+
+  <text x="296" y="152" font-size="8.5" fill="#166534">then necessarily:</text>
+  <rect x="296" y="158" width="160" height="24" rx="5" fill="#4338ca"/>
+  <text x="376" y="174" font-size="10" fill="white" text-anchor="middle" font-weight="700">lim f(x) = L</text>
+
+  <text x="380" y="192" font-size="7.5" class="mu" text-anchor="middle">classic use: sin(x)/x → 1</text>
+</svg>

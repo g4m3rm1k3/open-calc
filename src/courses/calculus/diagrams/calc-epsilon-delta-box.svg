@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">ε–δ Definition: The Box Visualization</text>
+
+  <!-- Main coordinate area -->
+  <rect x="10" y="22" width="280" height="170" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Axes -->
+  <line x1="50" y1="180" x2="280" y2="180" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="50" y1="30" x2="50" y2="180" stroke="#64748b" stroke-width="1.5"/>
+
+  <!-- Curve: smooth S-ish shape -->
+  <path d="M 60,170 Q 110,160 150,130 Q 180,108 200,90 Q 225,68 270,48" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Point c on x-axis and L on y-axis -->
+  <line x1="170" y1="180" x2="170" y2="30" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="50" y1="112" x2="280" y2="112" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="170" y="192" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">c</text>
+  <text x="40" y="115" font-size="8.5" fill="#4338ca" text-anchor="end" font-weight="700">L</text>
+
+  <!-- Point on curve at (c, L) ≈ (170, 112) -->
+  <circle cx="170" cy="112" r="4" fill="#4338ca"/>
+
+  <!-- δ bracket on x-axis -->
+  <rect x="138" y="174" width="64" height="10" rx="0" fill="#059669" opacity="0.2"/>
+  <line x1="138" y1="178" x2="202" y2="178" stroke="#059669" stroke-width="2"/>
+  <line x1="138" y1="174" x2="138" y2="182" stroke="#059669" stroke-width="1.5"/>
+  <line x1="202" y1="174" x2="202" y2="182" stroke="#059669" stroke-width="1.5"/>
+  <text x="170" y="194" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">← δ →</text>
+
+  <!-- ε bracket on y-axis -->
+  <rect x="44" y="82" width="10" height="60" rx="0" fill="#ef4444" opacity="0.2"/>
+  <line x1="48" y1="82" x2="48" y2="142" stroke="#ef4444" stroke-width="2"/>
+  <line x1="44" y1="82" x2="52" y2="82" stroke="#ef4444" stroke-width="1.5"/>
+  <line x1="44" y1="142" x2="52" y2="142" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="36" y="115" font-size="7.5" fill="#ef4444" text-anchor="middle">ε</text>
+
+  <!-- The ε-δ box -->
+  <rect x="138" y="82" width="64" height="60" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="175" y="118" font-size="8" fill="#b45309" text-anchor="middle">box</text>
+
+  <!-- Curve stays inside box in this region (visual) -->
+
+  <!-- Right: Definition and interpretation -->
+  <rect x="298" y="22" width="174" height="170" rx="8" fill="#1e1b4b"/>
+  <text x="385" y="40" font-size="9" fill="#a5b4fc" text-anchor="middle" font-weight="700">ε–δ Definition</text>
+  <line x1="306" y1="46" x2="464" y2="46" stroke="#4338ca" stroke-width="1"/>
+
+  <text x="308" y="62" font-size="8" fill="#e2e8f0">For every ε &gt; 0</text>
+  <text x="308" y="76" font-size="8" fill="#e2e8f0">there exists δ &gt; 0 such that:</text>
+  <text x="308" y="96" font-size="8.5" fill="#a5b4fc" font-weight="700">|x − c| &lt; δ</text>
+  <text x="308" y="110" font-size="8" fill="#e2e8f0">⟹  |f(x) − L| &lt; ε</text>
+
+  <line x1="306" y1="120" x2="464" y2="120" stroke="#4338ca" stroke-width="1"/>
+
+  <text x="308" y="136" font-size="8" fill="#94a3b8">In the box diagram:</text>
+  <text x="308" y="150" font-size="8" fill="#059669">← δ →  controls x-width</text>
+  <text x="308" y="164" font-size="8" fill="#ef4444">↕ ε ↕  controls y-height</text>
+  <text x="308" y="182" font-size="7.5" fill="#fbbf24">If curve stays in the box,</text>
+  <text x="308" y="190" font-size="7.5" fill="#fbbf24">the limit is proven!</text>
+</svg>

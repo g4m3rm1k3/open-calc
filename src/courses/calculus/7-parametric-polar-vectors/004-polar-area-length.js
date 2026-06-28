@@ -1,4 +1,6 @@
 import polarUrl from '../diagrams/calc-polar.svg?url';
+import polarSectorAreaUrl from '../diagrams/calc-polar-sector-area.svg?url';
+import polarArcLengthUrl from '../diagrams/calc-polar-arc-length.svg?url';
 export default {
   id: 'ch6-polar-area-length',
   slug: 'polar-area-length',
@@ -25,14 +27,26 @@ export default {
         paragraphs: [
       'In classical Cartesian integration, your fundamental geometric building block is a rectangle: height times width ($f(x) \\,dx$). In polar integration, your fundamental piece is a wedge-shaped sector: defined by a radius and an angle.',
       'A circular sector of radius $r$ spanned by a tiny angle $d\\theta$ has an area of exactly $\\frac{1}{2} r^2 \\,d\\theta$. As $d\\theta$ shrinks to an infinitesimal width, this discrete approximation becomes mathematically exact, birthing the polar area integral.',
+        ],
+      },
+      { type: 'image', src: polarUrl, alt: 'Polar curve with sector slices for area calculation', caption: 'Polar area = ½∫r² dθ, summing infinitely thin sector slices rather than rectangular strips.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Thus, for any boundary curve $r = f(\\theta)$, the total area enclosed between the rays $\\theta = \\alpha$ and $\\theta = \\beta$ is $A = \\frac{1}{2} \\int_\\alpha^\\beta [r(\\theta)]^2 \\,d\\theta$. Same Riemann-sum logic, entirely new geometric primitive.',
       'To find the area trapped between two polar curves, you evaluate the outer radius contribution minus the inner radius contribution at each angle. Because sector area scales quadratically, the differential area is $\\frac{1}{2} (r_{\\text{outer}}^2 - r_{\\text{inner}}^2) \\,d\\theta$.',
+        ],
+      },
+      { type: 'image', src: polarSectorAreaUrl, alt: 'Infinitesimal sector wedge dA = ½r²dθ with worked cardioid area example', caption: 'Polar area formula A = ½∫r² dθ — each infinitesimal wedge is a sector of a circle with angle dθ and radius r(θ).' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The arc length of a polar boundary follows directly from parametric motion. If we define $x(\\theta) = r\\cos\\theta$ and $y(\\theta) = r\\sin\\theta$, the classical speed integral $ds = \\sqrt{(dx/d\\theta)^2 + (dy/d\\theta)^2} \\,d\\theta$ simplifies beautifully via trigonometry into $\\sqrt{r^2 + (dr/d\\theta)^2} \\,d\\theta$.',
       'This polar length formula has an incredibly intuitive physical interpretation: the $r^2$ term captures the purely angular sweep (moving along a circle), while the $(dr/d\\theta)^2$ term captures the purely radial stretching. If you walk on a perfect circle, $dr/d\\theta = 0$, and length is just $r\\Delta\\theta$.',
       'In applied problems, integrating is usually trivial. The true difficulty lies in correctly selecting the $\\theta$-interval, predicting where curves self-intersect, and detecting when $r$ passes through the origin. Rough sketching and symmetry checks are absolutely mandatory.',
         ],
       },
-      { type: 'image', src: polarUrl, alt: 'Polar curve with sector slices for area calculation', caption: 'Polar area = ½∫r² dθ, summing infinitely thin sector slices rather than rectangular strips.' },
+      { type: 'image', src: polarArcLengthUrl, alt: 'L = ∫√(r²+(dr/dθ)²) dθ derived from parametric formula, verified for circle', caption: 'Polar arc length L = ∫√[r²+(dr/dθ)²] dθ — derived by treating the polar curve as x=r cosθ, y=r sinθ and applying the parametric formula.' },
     ],
     callouts: [
       {

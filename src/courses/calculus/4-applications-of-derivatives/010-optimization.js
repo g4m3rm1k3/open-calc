@@ -1,5 +1,7 @@
 // FILE: src/content/chapter-3/04-optimization.js
 import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
+import optimizationBoxUrl from '../diagrams/calc-optimization-box.svg?url';
+import optimizationStepsUrl from '../diagrams/calc-optimization-steps.svg?url';
 export default {
   id: "ch3-004",
   slug: "optimization",
@@ -35,14 +37,26 @@ export default {
       "Curve sketching told you the whole story of a function. Optimization asks a sharper question: what is the BEST value? Maximizing area with fixed fencing, minimizing cost with fixed constraints, finding the angle that maximizes a projectile's range — these are the problems that motivated Newton and Leibniz to invent calculus in the first place. The strategy is always the same: translate the problem into a single-variable function, find its derivative, set derivative equal to zero to find candidates, classify them as max or min, and check the endpoints if on a closed interval. Every applied calculus problem you will ever see follows this blueprint.",
       "All optimization problems share the same mathematical skeleton: identify the quantity you want to maximize or minimize (the objective function), identify the constraint that links your variables, use the constraint to reduce the objective to a single-variable function, then find the critical points of that reduced function and check which gives the global optimum. The geometry varies enormously — from rectangles to cylinders to light rays — but the procedure is always the same. Once you recognize this structure, optimization problems become systematic rather than mysterious.",
       "The Extreme Value Theorem (EVT) is the guarantee that global extrema exist on closed intervals. If f is continuous on [a,b], then f attains both a global maximum and a global minimum on [a,b]. This is a non-trivial theorem — it fails for open intervals (consider f(x) = x on (0,1), which approaches but never attains the values 0 and 1) and for discontinuous functions. The EVT relies on the completeness of the real numbers. For calculus problems, the EVT justifies the closed-interval method: evaluate f at all critical points in (a,b) and at both endpoints a, b; the largest value is the global max and the smallest is the global min.",
+        ],
+      },
+      { type: 'image', src: curveExtremaUrl, alt: 'Curve with absolute maximum on a closed interval', caption: 'Optimization finds the input that maximizes or minimizes an objective function on a given domain.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "For open intervals or unbounded domains (which are more common in word problems), you cannot use the endpoint evaluation directly. Instead, you rely on physical reasoning: if the problem guarantees a maximum or minimum exists (physically, there must be some optimal value), and you find only one critical point that is a local min, then it must be the global min. This \"one critical point\" argument is valid for many engineering and economic problems but requires justification. More rigorously: if f is continuous on (a,b), lim_{x→a⁺} f(x) = +∞ (or approaches a limit below the critical value), and lim_{x→b⁻} f(x) = +∞, and there is one critical point with f''> 0, then that critical point gives the global minimum.",
       "The fencing problem illustrates the full procedure. Let x and y be the sides of the rectangle. Constraint: perimeter = 2x + 2y = 100, so x + y = 50. Objective: area A = xy. Substitute y = 50 - x to get A(x) = x(50-x) = 50x - x². Domain: x ∈ (0, 50) (both dimensions must be positive). Derivative: A'(x) = 50 - 2x = 0 gives x = 25. A''(x) = -2 < 0 confirms local (and global) maximum. Optimal dimensions: x = y = 25 m (a square). Maximum area: 625 m². The square emerges from calculus, not from intuition.",
       "With one side against a river, you only need 2x + y = 100 (three sides). Objective: A = xy = x(100 - 2x). A'(x) = 100 - 4x = 0 gives x = 25 m. Then y = 50 m. Area = 1250 m² — twice the area of the four-sided enclosure! The river allows a different optimal shape: 25m × 50m (not a square), because the asymmetry of the constraint breaks the square's optimality.",
+        ],
+      },
+      { type: 'image', src: optimizationBoxUrl, alt: 'Classic box problem: square cut from corners to maximize volume', caption: 'Box problem: cut x×x squares from corners, fold up. V(x) = x(10−2x)(8−2x). Maximize by setting V′=0.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "The hardest part of an optimization problem is usually the setup: translating the word problem into an objective function and constraint. Experienced problem-solvers follow a disciplined procedure: (1) Draw a picture and label all quantities. (2) Identify the objective: what are you maximizing or minimizing? Write it as a formula. (3) Identify the constraint: what relationship must always hold? (4) Solve the constraint for one variable and substitute into the objective. (5) Differentiate and set equal to zero. (6) Verify it is a maximum or minimum (not a saddle point). (7) Answer the original question — report the optimal value AND the optimal input, with units.",
       "The AM-GM inequality (arithmetic mean ≥ geometric mean) provides a non-calculus proof that the square maximizes area for fixed perimeter. For positive x, y: (x+y)/2 ≥ √(xy), with equality iff x = y. So given x + y = 50, we have 50/2 ≥ √(xy), giving 625 ≥ xy, with equality iff x = y = 25. This is the fencing answer without calculus. But calculus generalizes: it solves non-symmetric, non-polynomial constraints where AM-GM cannot help.",
         ],
       },
-      { type: 'image', src: curveExtremaUrl, alt: 'Curve with absolute maximum on a closed interval', caption: 'Optimization finds the input that maximizes or minimizes an objective function on a given domain.' },
+      { type: 'image', src: optimizationStepsUrl, alt: 'Five-step optimization procedure: identify, variables, constrain, optimize, verify', caption: 'Optimization checklist: identify the objective, name variables, apply constraints, differentiate, verify with endpoint check.' },
     ],
     callouts: [
       {

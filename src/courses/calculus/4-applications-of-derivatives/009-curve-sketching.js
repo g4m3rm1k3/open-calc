@@ -1,4 +1,6 @@
 import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
+import sketchStepsUrl from '../diagrams/calc-sketch-steps.svg?url';
+import asymptoteSketchUrl from '../diagrams/calc-asymptote-sketch.svg?url';
 // FILE: src/content/chapter-3/03-curve-sketching.js
 export default {
   id: 'ch3-003',
@@ -22,14 +24,26 @@ export default {
         paragraphs: [
       "The Mean Value Theorem and its consequences have given us a rigorous foundation: f' > 0 means increasing, f' < 0 means decreasing, f'' > 0 means concave up, f'' < 0 means concave down. Curve sketching is the art of combining all of this information into a complete portrait of a function — without plotting hundreds of points. A professional sketch requires: domain, asymptotes, intercepts, sign chart for f' (increasing/decreasing and local extrema), sign chart for f'' (concavity and inflection points). When you can do this fluently, you understand what a function IS, not just what it computes.",
       'The complete qualitative picture of a function requires three layers of analysis. The first layer is f itself: domain (where is f defined?), x-intercepts (where does f = 0?), y-intercept (f(0)), symmetry (even/odd/neither), and asymptotes (what happens at the extremes?). The second layer is f\': where is f increasing (f\' > 0) and decreasing (f\' < 0)? Where does the function change direction (f\' = 0)? These changes of direction are local maxima and minima. The third layer is f\'\': where is the function concave up (bending upward, f\'\' > 0) and concave down (bending downward, f\'\' < 0)? Where does the concavity change (inflection points)? Together, these three layers give a complete picture.',
+        ],
+      },
+      { type: 'image', src: curveExtremaUrl, alt: 'Cubic curve with labeled extrema and sign charts for f′ and f″', caption: 'Curve sketching combines intercepts, extrema, concavity, and asymptotes into a complete picture.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Critical points are where f\'(x) = 0 or f\'(x) is undefined. They are candidates for local extrema — but only candidates. The key tool for deciding is the first derivative test: make a sign chart for f\' by dividing the number line at the critical points and testing f\' in each interval. If f\' changes from positive to negative at c, then f has a local maximum at c (it was rising, now falling). If f\' changes from negative to positive, local minimum (was falling, now rising). If f\' does not change sign, neither — c is likely a saddle point or inflection point. The sign chart is indispensable and should be your default tool.',
       'Concavity tells you the shape of the curve between critical points. If f\'\'(x) > 0, the function is concave up — the graph looks like a bowl opening upward, tangent lines are below the curve. If f\'\'(x) < 0, concave down — tangent lines are above the curve, like a frown or an upside-down bowl. An inflection point is a point where the concavity changes — where f\'\'(x) = 0 AND f\'\' changes sign. At an inflection point, the tangent line actually crosses the curve rather than staying on one side.',
       'The second derivative test offers a quicker (but less powerful) alternative to the sign chart for classifying critical points. At a critical point c where f\'(c) = 0: if f\'\'(c) > 0, then f has a local minimum at c (the function is concave up at c, like the bottom of a bowl). If f\'\'(c) < 0, local maximum. If f\'\'(c) = 0, the test is inconclusive — the critical point could be a local max, local min, or inflection point. When the second derivative test fails, you must fall back on the first derivative test (sign chart). The reason the second derivative test works is explained by the Taylor expansion: f(x) ≈ f(c) + f\'\'(c)(x-c)²/2 near a critical point c, so the sign of f\'\'(c) determines whether f is bowl-shaped or hill-shaped there.',
+        ],
+      },
+      { type: 'image', src: sketchStepsUrl, alt: 'Six-step grid showing the systematic curve sketching procedure', caption: 'Systematic curve sketching: domain → intercepts → asymptotes → f′ chart → f″ chart → sketch.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Asymptotes come in three varieties. Horizontal asymptotes: compute lim_{x→+∞} f(x) and lim_{x→-∞} f(x). If either limit is a finite number L, then y = L is a horizontal asymptote. Vertical asymptotes: look for x values where f(x) → ±∞ — typically where a denominator equals zero or where a logarithm argument reaches 0. Oblique asymptotes: if the degree of the numerator of a rational function is exactly one more than the degree of the denominator, perform polynomial long division to find the asymptote. Many functions (polynomials, for instance) have no asymptotes; the analysis of asymptotes is most important for rational functions, log functions, and exponentials.',
       'The complete procedure for curve sketching: (1) Find the domain. (2) Find intercepts (x and y). (3) Find and classify asymptotes. (4) Compute f\', find all critical points, make a sign chart for f\' → determine increasing/decreasing intervals and classify critical points. (5) Compute f\'\', find all potential inflection points, make a sign chart for f\'\' → determine concavity and inflection points. (6) Plot a few key points (intercepts, critical points, inflection points) and connect them with a smooth curve consistent with all the information gathered. The result is a qualitatively accurate sketch that reveals the function\'s complete behavior.',
         ],
       },
-      { type: 'image', src: curveExtremaUrl, alt: 'Cubic curve with labeled extrema and sign charts for f′ and f″', caption: 'Curve sketching combines intercepts, extrema, concavity, and asymptotes into a complete picture.' },
+      { type: 'image', src: asymptoteSketchUrl, alt: 'Curve with vertical and horizontal asymptotes showing both branches', caption: 'Asymptotes constrain the shape: curves approach but never cross them (usually) — essential for accurate sketches.' },
     ],
     callouts: [
       {

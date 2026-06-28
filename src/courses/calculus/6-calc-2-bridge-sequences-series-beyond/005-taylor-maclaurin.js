@@ -1,5 +1,7 @@
 // FILE: src/content/chapter-5/04-taylor-maclaurin.js
 import taylorUrl from '../diagrams/calc-taylor.svg?url';
+import maclaurinTableUrl from '../diagrams/calc-maclaurin-table.svg?url';
+import taylorErrorUrl from '../diagrams/calc-taylor-error.svg?url';
 export default {
   id: 'ch5-004',
   slug: 'taylor-maclaurin',
@@ -22,14 +24,26 @@ export default {
         paragraphs: [
       'The Taylor series of $f(x)$ centered at $x = c$ is $f(x) = \\sum_{n=0}^{\\infty} \\frac{f^{(n)}(c)}{n!}(x-c)^n = f(c) + f\'(c)(x-c) + \\frac{f\'\'(c)}{2!}(x-c)^2 + \\frac{f\'\'\'(c)}{3!}(x-c)^3 + \\cdots$. When $c = 0$, this is called the Maclaurin series: $f(x) = \\sum \\frac{f^{(n)}(0)}{n!}x^n$. The idea is simple: match the value, slope, concavity, and all higher derivatives of $f$ at $x = c$, producing the unique polynomial (of each degree) that agrees with $f$ to the highest possible order.',
       'The Taylor polynomial of degree $n$ is $T_n(x) = \\sum_{k=0}^{n}\\frac{f^{(k)}(c)}{k!}(x-c)^k$. It is the best polynomial approximation of degree $n$ near $x = c$ in the sense that $f(x) - T_n(x)$ vanishes to order $n$ at $c$: $\\lim_{x\\to c}\\frac{f(x)-T_n(x)}{(x-c)^n} = 0$. No other polynomial of degree $\\le n$ has this property.',
+        ],
+      },
+      { type: 'image', src: taylorUrl, alt: 'T₁, T₃, T₅ Taylor polynomials converging to sin(x)', caption: 'Taylor series use derivatives at a point to build a polynomial that matches the function to any precision.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Deriving the Maclaurin series for $e^x$: all derivatives of $e^x$ are $e^x$, so $f^{(n)}(0) = e^0 = 1$ for all $n$. Therefore $e^x = \\sum_{n=0}^{\\infty}x^n/n! = 1 + x + x^2/2! + x^3/3! + \\cdots$. This converges for all $x$ (ratio test: $|x|/(n+1) \\to 0$). Setting $x = 1$: $e = 1 + 1 + 1/2 + 1/6 + 1/24 + \\cdots \\approx 2.71828$.',
       'Deriving the Maclaurin series for $\\sin(x)$: the derivatives cycle: $\\sin, \\cos, -\\sin, -\\cos, \\sin, \\ldots$. At $x = 0$: $0, 1, 0, -1, 0, 1, 0, -1, \\ldots$. Only odd powers survive: $\\sin(x) = x - x^3/3! + x^5/5! - x^7/7! + \\cdots = \\sum_{n=0}^{\\infty}\\frac{(-1)^n x^{2n+1}}{(2n+1)!}$. Similarly, $\\cos(x) = 1 - x^2/2! + x^4/4! - \\cdots = \\sum_{n=0}^{\\infty}\\frac{(-1)^n x^{2n}}{(2n)!}$. Both converge for all $x$.',
+        ],
+      },
+      { type: 'image', src: maclaurinTableUrl, alt: 'Table of essential Maclaurin series: eˣ, sin x, cos x, 1/(1−x), ln(1+x), arctan x', caption: 'Memorize these six Maclaurin series — derive others by substitution, differentiation, or integration rather than computing from scratch.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The Lagrange remainder (error term) quantifies how good the $n$-th degree Taylor polynomial is. If $f$ has $n+1$ continuous derivatives on an interval containing $c$ and $x$, then $f(x) = T_n(x) + R_n(x)$ where $R_n(x) = \\frac{f^{(n+1)}(z)}{(n+1)!}(x-c)^{n+1}$ for some $z$ between $c$ and $x$. This looks exactly like the Mean Value Theorem applied to the Taylor context. The remainder tells you: the error is controlled by the $(n+1)$-st derivative and the $(n+1)$-st power of the distance from $c$.',
       'To prove a Taylor series converges to $f(x)$ (not just converges to something), you must show $R_n(x) \\to 0$ as $n \\to \\infty$. For $e^x$: $|R_n(x)| = \\frac{e^{|z|}}{(n+1)!}|x|^{n+1} \\le \\frac{e^{|x|}}{(n+1)!}|x|^{n+1} \\to 0$ since $n!$ grows faster than any exponential. For $\\sin(x)$ and $\\cos(x)$: $|f^{(n+1)}(z)| \\le 1$ always, so $|R_n| \\le |x|^{n+1}/(n+1)! \\to 0$. This proves the Taylor series equals the function everywhere.',
       'The key Maclaurin series to memorize: $e^x = \\sum x^n/n!$ (all $x$). $\\sin(x) = \\sum(-1)^n x^{2n+1}/(2n+1)!$ (all $x$). $\\cos(x) = \\sum(-1)^n x^{2n}/(2n)!$ (all $x$). $1/(1-x) = \\sum x^n$ ($|x|<1$). $\\ln(1+x) = \\sum(-1)^{n+1}x^n/n$ ($-1<x\\le 1$). $(1+x)^k = \\sum\\binom{k}{n}x^n$ ($|x|<1$, any real $k$) — the binomial series, where $\\binom{k}{n} = k(k-1)\\cdots(k-n+1)/n!$.',
         ],
       },
-      { type: 'image', src: taylorUrl, alt: 'T₁, T₃, T₅ Taylor polynomials converging to sin(x)', caption: 'Taylor series use derivatives at a point to build a polynomial that matches the function to any precision.' },
+      { type: 'image', src: taylorErrorUrl, alt: 'Taylor remainder bound |Rₙ(x)| ≤ M|x−a|ⁿ⁺¹/(n+1)! with worked example', caption: 'The remainder Rₙ = f − Tₙ satisfies |Rₙ(x)| ≤ M·|x−a|ⁿ⁺¹/(n+1)! — tells you exactly how accurate the approximation is.' },
     ],
     callouts: [
       {

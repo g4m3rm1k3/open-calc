@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">MVT Applications — Real World Examples</text>
+  <!-- Speed camera panel -->
+  <rect x="8" y="26" width="228" height="168" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="122" y="46" font-size="9" fill="#92400e" text-anchor="middle" font-weight="700">Speed Camera Example</text>
+  <text x="122" y="62" font-size="8" fill="#78350f" text-anchor="middle">Drive 100 km in 50 min</text>
+  <text x="122" y="78" font-size="8" fill="#78350f" text-anchor="middle">avg speed = 120 km/h</text>
+  <!-- Road diagram -->
+  <rect x="24" y="90" width="196" height="16" rx="3" fill="#94a3b8"/>
+  <rect x="50" y="93" width="20" height="10" rx="2" fill="#fbbf24"/>
+  <rect x="180" y="93" width="20" height="10" rx="2" fill="#fbbf24"/>
+  <text x="60" y="102" font-size="7" fill="#1f2937" text-anchor="middle">Start</text>
+  <text x="190" y="102" font-size="7" fill="#1f2937" text-anchor="middle">End</text>
+  <text x="122" y="130" font-size="8" fill="#b45309" text-anchor="middle">MVT → at some moment</text>
+  <text x="122" y="145" font-size="9" fill="#ef4444" text-anchor="middle" font-weight="700">v(t) = 120 km/h exactly</text>
+  <text x="122" y="162" font-size="7.5" fill="#78350f" text-anchor="middle">Speed limit: 110 km/h</text>
+  <text x="122" y="178" font-size="8" fill="#ef4444" text-anchor="middle" font-weight="700">→ Ticket guaranteed!</text>
+  <!-- Zero derivative panel -->
+  <rect x="244" y="26" width="228" height="168" rx="8" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="358" y="46" font-size="9" fill="#4c1d95" text-anchor="middle" font-weight="700">Zero Derivative Theorem</text>
+  <text x="358" y="62" font-size="8" fill="#5b21b6" text-anchor="middle">If f ′(x) = 0 for all x in (a,b)</text>
+  <text x="358" y="78" font-size="8" fill="#5b21b6" text-anchor="middle">→ f is constant on [a,b]</text>
+  <!-- Flat line diagram -->
+  <line x1="260" y1="140" x2="460" y2="140" stroke="#64748b" stroke-width="1"/>
+  <line x1="260" y1="90" x2="260" y2="144" stroke="#64748b" stroke-width="1"/>
+  <line x1="278" y1="110" x2="448" y2="110" stroke="#8b5cf6" stroke-width="3"/>
+  <circle cx="278" cy="110" r="4" fill="#8b5cf6"/>
+  <circle cx="448" cy="110" r="4" fill="#8b5cf6"/>
+  <text x="278" y="130" font-size="7.5" fill="#6d28d9">a</text>
+  <text x="446" y="130" font-size="7.5" fill="#6d28d9">b</text>
+  <text x="358" y="108" font-size="8" fill="#7c3aed" text-anchor="middle" dy="-4">f ′ = 0 everywhere</text>
+  <text x="358" y="170" font-size="8" fill="#5b21b6" text-anchor="middle">Proof uses MVT!</text>
+</svg>

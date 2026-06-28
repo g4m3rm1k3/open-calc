@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Angle Types &amp; Triangle Facts</text>
+  <!-- Acute angle -->
+  <rect x="8" y="24" width="108" height="100" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="62" y="40" font-size="8" fill="#4338ca" text-anchor="middle" font-weight="700">Acute  &lt; 90°</text>
+  <line x1="30" y1="105" x2="95" y2="105" stroke="#6366f1" stroke-width="2"/>
+  <line x1="30" y1="105" x2="70" y2="55" stroke="#6366f1" stroke-width="2"/>
+  <path d="M 50 105 A 20 20 0 0 1 42.5 88" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <text x="60" y="95" font-size="9" fill="#f59e0b">45°</text>
+  <!-- Right angle -->
+  <rect x="122" y="24" width="108" height="100" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="176" y="40" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">Right = 90°</text>
+  <line x1="144" y1="105" x2="210" y2="105" stroke="#22c55e" stroke-width="2"/>
+  <line x1="144" y1="105" x2="144" y2="55" stroke="#22c55e" stroke-width="2"/>
+  <rect x="144" y="95" width="10" height="10" fill="none" stroke="#22c55e" stroke-width="2"/>
+  <text x="176" y="90" font-size="9" fill="#166534" text-anchor="middle">90°</text>
+  <!-- Obtuse angle -->
+  <rect x="236" y="24" width="108" height="100" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="290" y="40" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">Obtuse &gt; 90°</text>
+  <line x1="258" y1="105" x2="325" y2="105" stroke="#f59e0b" stroke-width="2"/>
+  <line x1="258" y1="105" x2="290" y2="58" stroke="#f59e0b" stroke-width="2"/>
+  <path d="M 285 105 A 27 27 0 0 1 268 85" fill="none" stroke="#ef4444" stroke-width="2"/>
+  <text x="300" y="90" font-size="9" fill="#ef4444">120°</text>
+  <!-- Supplementary -->
+  <rect x="350" y="24" width="122" height="100" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5"/>
+  <text x="411" y="40" font-size="8" fill="#be185d" text-anchor="middle" font-weight="700">Supplementary</text>
+  <line x1="365" y1="80" x2="465" y2="80" stroke="#ec4899" stroke-width="2"/>
+  <line x1="415" y1="80" x2="415" y2="40" stroke="#7c3aed" stroke-width="2"/>
+  <text x="390" y="72" font-size="8" fill="#be185d" text-anchor="middle">α</text>
+  <text x="440" y="72" font-size="8" fill="#7c3aed" text-anchor="middle">β</text>
+  <text x="411" y="100" font-size="8" fill="#374151" text-anchor="middle">α + β = 180°</text>
+  <!-- Triangle angle sum -->
+  <rect x="8" y="130" width="464" height="64" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="240" y="148" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Triangle Angle Sum = 180°</text>
+  <polygon points="80,185 150,145 200,185" fill="none" stroke="#6366f1" stroke-width="2"/>
+  <text x="90" y="185" font-size="8" fill="#374151">α</text>
+  <text x="148" y="143" font-size="8" fill="#374151">β</text>
+  <text x="195" y="185" font-size="8" fill="#374151">γ</text>
+  <text x="260" y="165" font-size="9" fill="#374151" text-anchor="start">α + β + γ = 180°</text>
+  <text x="260" y="182" font-size="8.5" fill="#374151" text-anchor="start">Exterior angle = sum of two remote interiors</text>
+</svg>

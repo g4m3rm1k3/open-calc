@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Simpson's Rule — Better Numerical Integration</text>
+  <rect x="8" y="22" width="260" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="26" y1="165" x2="260" y2="165" stroke="#64748b" stroke-width="1"/>
+  <line x1="26" y1="28" x2="26" y2="169" stroke="#64748b" stroke-width="1"/>
+  <!-- Curve -->
+  <path d="M 40,155 Q 70,130 100,100 Q 130,72 160,55 Q 185,42 215,40 Q 235,40 250,44" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Simpson: pairs of parabolas (n=4, 2 parabolic panels) -->
+  <!-- Panel 1: parabola through x0, x1, x2 -->
+  <path d="M 40,165 L 40,155 Q 70,95 100,100 Q 130,105 150,62 L 150,165 Z" fill="#8b5cf6" opacity="0.2"/>
+  <path d="M 40,155 Q 70,95 100,76 Q 130,58 150,62" fill="none" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <!-- Panel 2: parabola through x2, x3, x4 -->
+  <path d="M 150,165 L 150,62 Q 180,28 210,42 Q 235,46 250,44 L 250,165 Z" fill="#8b5cf6" opacity="0.2"/>
+  <path d="M 150,62 Q 180,28 210,38 Q 235,44 250,44" fill="none" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <!-- Points -->
+  <circle cx="40" cy="155" r="3" fill="#8b5cf6"/>
+  <circle cx="100" cy="100" r="3" fill="#8b5cf6"/>
+  <circle cx="150" cy="62" r="3" fill="#8b5cf6"/>
+  <circle cx="205" cy="42" r="3" fill="#8b5cf6"/>
+  <circle cx="250" cy="44" r="3" fill="#8b5cf6"/>
+  <text x="40" y="178" font-size="7.5" fill="#7c3aed" text-anchor="middle">x₀</text>
+  <text x="100" y="178" font-size="7.5" fill="#7c3aed" text-anchor="middle">x₁</text>
+  <text x="150" y="178" font-size="7.5" fill="#7c3aed" text-anchor="middle">x₂</text>
+  <text x="205" y="178" font-size="7.5" fill="#7c3aed" text-anchor="middle">x₃</text>
+  <text x="250" y="178" font-size="7.5" fill="#7c3aed" text-anchor="middle">x₄</text>
+  <!-- Right panel -->
+  <rect x="276" y="26" width="196" height="168" rx="8" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="374" y="46" font-size="8.5" fill="#4c1d95" text-anchor="middle" font-weight="700">Simpson's Rule (n even)</text>
+  <rect x="284" y="52" width="180" height="42" rx="4" fill="#ddd6fe"/>
+  <text x="374" y="66" font-size="8" fill="#5b21b6" text-anchor="middle" font-weight="700">Sₙ = (h/3)[f(x₀)+4f(x₁)+</text>
+  <text x="374" y="80" font-size="8" fill="#5b21b6" text-anchor="middle" font-weight="700">2f(x₂)+4f(x₃)+…+f(xₙ)]</text>
+  <text x="374" y="93" font-size="7" fill="#6d28d9" text-anchor="middle">Pattern: 1,4,2,4,2,…,4,1</text>
+  <text x="374" y="112" font-size="8" fill="#4338ca" text-anchor="middle">Fits parabola to each pair</text>
+  <text x="374" y="126" font-size="8" fill="#4338ca" text-anchor="middle">of subintervals → more accurate</text>
+  <line x1="284" y1="136" x2="460" y2="136" stroke="#c4b5fd" stroke-width="1"/>
+  <text x="374" y="152" font-size="8" fill="#4c1d95" text-anchor="middle" font-weight="700">Error bound:</text>
+  <text x="374" y="166" font-size="8" fill="#4c1d95" text-anchor="middle">|Eₛ| ≤ K₄(b−a)⁵/(180n⁴)</text>
+  <text x="374" y="182" font-size="7.5" fill="#7c3aed" text-anchor="middle">Twice as many n → 16× smaller error!</text>
+</svg>

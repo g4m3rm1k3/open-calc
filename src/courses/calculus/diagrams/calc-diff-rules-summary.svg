@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Basic Differentiation Rules — Quick Reference</text>
+
+  <rect x="8" y="22" width="464" height="172" rx="8" fill="#1e1b4b"/>
+
+  <!-- 3-column grid of rules -->
+  <line x1="164" y1="22" x2="164" y2="194" stroke="#312e81" stroke-width="1"/>
+  <line x1="320" y1="22" x2="320" y2="194" stroke="#312e81" stroke-width="1"/>
+
+  <!-- Column headers -->
+  <text x="86" y="38" font-size="8.5" fill="#a5b4fc" text-anchor="middle" font-weight="700">Rule</text>
+  <text x="242" y="38" font-size="8.5" fill="#a5b4fc" text-anchor="middle" font-weight="700">Formula</text>
+  <text x="396" y="38" font-size="8.5" fill="#a5b4fc" text-anchor="middle" font-weight="700">Example</text>
+  <line x1="8" y1="42" x2="472" y2="42" stroke="#312e81" stroke-width="1"/>
+
+  <!-- Rows -->
+  <!-- Constant -->
+  <text x="86" y="57" font-size="8" fill="#94a3b8" text-anchor="middle">Constant</text>
+  <text x="242" y="57" font-size="9" fill="#4ade80" text-anchor="middle" font-weight="700">d/dx [c] = 0</text>
+  <text x="396" y="57" font-size="8.5" fill="#c7d2fe" text-anchor="middle">d/dx [7] = 0</text>
+  <line x1="8" y1="63" x2="472" y2="63" stroke="#312e81" stroke-width="0.5"/>
+
+  <!-- Power -->
+  <text x="86" y="79" font-size="8" fill="#94a3b8" text-anchor="middle">Power</text>
+  <text x="242" y="79" font-size="9" fill="#4ade80" text-anchor="middle" font-weight="700">d/dx [xⁿ] = n·xⁿ⁻¹</text>
+  <text x="396" y="79" font-size="8.5" fill="#c7d2fe" text-anchor="middle">d/dx [x³] = 3x²</text>
+  <line x1="8" y1="85" x2="472" y2="85" stroke="#312e81" stroke-width="0.5"/>
+
+  <!-- Constant Multiple -->
+  <text x="86" y="101" font-size="8" fill="#94a3b8" text-anchor="middle">Const. Multiple</text>
+  <text x="242" y="101" font-size="9" fill="#4ade80" text-anchor="middle" font-weight="700">d/dx [c·f] = c·f ′</text>
+  <text x="396" y="101" font-size="8.5" fill="#c7d2fe" text-anchor="middle">d/dx [5x⁴] = 20x³</text>
+  <line x1="8" y1="107" x2="472" y2="107" stroke="#312e81" stroke-width="0.5"/>
+
+  <!-- Sum/Diff -->
+  <text x="86" y="123" font-size="8" fill="#94a3b8" text-anchor="middle">Sum / Difference</text>
+  <text x="242" y="123" font-size="9" fill="#4ade80" text-anchor="middle" font-weight="700">d/dx [f ± g] = f ′ ± g′</text>
+  <text x="396" y="123" font-size="8.5" fill="#c7d2fe" text-anchor="middle">d/dx [x² + x] = 2x+1</text>
+  <line x1="8" y1="129" x2="472" y2="129" stroke="#312e81" stroke-width="0.5"/>
+
+  <!-- Product -->
+  <text x="86" y="145" font-size="8" fill="#94a3b8" text-anchor="middle">Product</text>
+  <text x="242" y="145" font-size="9" fill="#f59e0b" text-anchor="middle" font-weight="700">d/dx [f·g] = f ′g + fg′</text>
+  <text x="396" y="145" font-size="8" fill="#c7d2fe" text-anchor="middle">x·sin x → sin x + x cos x</text>
+  <line x1="8" y1="151" x2="472" y2="151" stroke="#312e81" stroke-width="0.5"/>
+
+  <!-- Quotient -->
+  <text x="86" y="167" font-size="8" fill="#94a3b8" text-anchor="middle">Quotient</text>
+  <text x="242" y="167" font-size="9" fill="#f59e0b" text-anchor="middle" font-weight="700">d/dx [f/g] = (f ′g − fg′)/g²</text>
+  <text x="396" y="167" font-size="8" fill="#c7d2fe" text-anchor="middle">sin x / x → (x cos x − sin x)/x²</text>
+  <line x1="8" y1="173" x2="472" y2="173" stroke="#312e81" stroke-width="0.5"/>
+
+  <!-- Chain -->
+  <text x="86" y="188" font-size="8" fill="#94a3b8" text-anchor="middle">Chain</text>
+  <text x="242" y="188" font-size="9" fill="#f87171" text-anchor="middle" font-weight="700">d/dx [f(g(x))] = f ′(g)·g′</text>
+  <text x="396" y="188" font-size="8" fill="#c7d2fe" text-anchor="middle">sin(x²) → cos(x²)·2x</text>
+</svg>

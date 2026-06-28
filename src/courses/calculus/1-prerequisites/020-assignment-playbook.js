@@ -1,4 +1,6 @@
 import derivativeNotationsUrl from '../diagrams/calc-derivative-notations.svg?url';
+import problemStrategyUrl from '../diagrams/calc-problem-strategy.svg?url';
+import commonMistakesUrl from '../diagrams/calc-common-mistakes.svg?url';
 export default {
   id: 'ch0-assignment-playbook',
   slug: 'assignment-playbook',
@@ -37,11 +39,23 @@ export default {
         paragraphs: [
       'Think of every problem as a translation task: words and diagrams -> function model -> operation (differentiate or integrate) -> interpretation with units.',
       'The fastest way to improve is to classify problem type first. If you skip this and start computing immediately, you often perform a correct technique on the wrong object.',
-      'A strong default workflow is: identify target quantity, name variables, write governing equation, choose operation, then solve and unit-check.',
-      'For graph-reading questions, derivatives are slope information and integrals are signed area accumulation. If the prompt emphasizes turning points, monotonicity, concavity, velocity/acceleration, or marginal change, you are in derivative territory. If it emphasizes net amount, total accumulation, average value, or area/work, you are in integral territory.',
         ],
       },
       { type: 'image', src: derivativeNotationsUrl, alt: 'Four derivative notations as a notation reference guide', caption: 'Recognizing every notation variant lets you read any textbook, course, or formula sheet without translation.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'A strong default workflow is: identify target quantity, name variables, write governing equation, choose operation, then solve and unit-check.',
+        ],
+      },
+      { type: 'image', src: problemStrategyUrl, alt: 'Four-step problem solving flow with algebra pre-processing moves and common problem types', caption: 'The four-step strategy: identify goal, strip calculus, pay the algebra tax, apply the rule — the algebra step is almost always the hardest part.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'For graph-reading questions, derivatives are slope information and integrals are signed area accumulation. If the prompt emphasizes turning points, monotonicity, concavity, velocity/acceleration, or marginal change, you are in derivative territory. If it emphasizes net amount, total accumulation, average value, or area/work, you are in integral territory.',
+        ],
+      },
+      { type: 'image', src: commonMistakesUrl, alt: 'Wrong vs correct comparison table for six common algebra errors', caption: 'These six mistakes appear on every calculus exam — knowing what not to write is half the battle.' },
     ],
     callouts: [
       {

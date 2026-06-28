@@ -1,5 +1,6 @@
 import continuity3CondUrl from '../diagrams/calc-continuity-3cond.svg?url';
 import oneSidedUrl from '../diagrams/calc-one-sided.svg?url';
+import limitContinuityConnectUrl from '../diagrams/calc-limit-continuity-connect.svg?url';
 export default {
   id: 'limits-and-continuity',
   slug: 'limits-and-continuity',
@@ -38,13 +39,18 @@ export default {
       'One-sided limits are the tool for discontinuities. The left-hand limit lim(x→a⁻) f(x) asks only about x < a; the right-hand limit lim(x→a⁺) asks only about x > a. The two-sided limit exists if and only if both one-sided limits exist and are equal. Piecewise functions and absolute value expressions often require separate left and right analysis.',
 
       'The Squeeze Theorem handles limits where neither substitution nor algebra works — typically when a bounded oscillating factor is multiplied by a vanishing factor. If g(x) ≤ f(x) ≤ h(x) near a, and lim g = lim h = L, then lim f = L. The proof of lim(x→0) sin(x)/x = 1 is the canonical example: squeeze sin(x)/x between cos(x) and 1, and the Squeeze Theorem does the rest.',
-
+        ],
+      },
+      { type: 'image', src: oneSidedUrl, alt: 'One-sided limits agreeing vs. disagreeing at a breakpoint', caption: 'The two-sided limit exists when lim⁻ = lim⁺; continuity adds that both equal f(a).' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Limits at infinity shift the question from "what does f approach near x = a?" to "what does f settle into as x grows without bound?" For rational functions the answer comes from comparing polynomial degrees: equal degrees give the ratio of leading coefficients, a heavier denominator gives 0, and a heavier numerator gives growth without bound (or a slant asymptote via long division). The growth hierarchy ln(x) ≪ xᵃ ≪ bˣ tells you which type of function dominates in mixed cases.',
 
       '**Where this is heading:** This is the last lesson of Chapter 1. The next lesson — Rate of Change — is actually the first bridge into Chapter 2. It takes the limit idea and asks: what happens to the slope of a secant line as the two points collapse toward one? The answer to that question is the derivative. Everything you have learned about limits in this chapter is exactly the machinery Chapter 2 needs.',
         ],
       },
-      { type: 'image', src: oneSidedUrl, alt: 'One-sided limits agreeing vs. disagreeing at a breakpoint', caption: 'The two-sided limit exists when lim⁻ = lim⁺; continuity adds that both equal f(a).' },
+      { type: 'image', src: limitContinuityConnectUrl, alt: 'Implication chain: limit exists + f(c) defined + they are equal → continuity', caption: 'Continuity requires three things: the limit must exist, f(c) must be defined, and they must agree.' },
     ],
     callouts: [
       {

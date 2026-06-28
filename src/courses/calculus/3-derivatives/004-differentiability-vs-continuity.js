@@ -1,5 +1,6 @@
 import cornerCuspUrl from '../diagrams/calc-corner-cusp.svg?url';
 import continuityUrl from '../diagrams/calc-continuity.svg?url';
+import diffFailsUrl from '../diagrams/calc-diff-fails.svg?url';
 export default {
   id: 'ch2-differentiability-vs-continuity',
   slug: 'differentiability-vs-continuity',
@@ -35,11 +36,16 @@ export default {
       '**2. A cusp.** The two one-sided slopes blow up to opposite infinities: one goes to +∞ and the other to −∞. The graph spikes to a sharp point. Classic example: f(x) = x^(2/3) at x = 0. The curve comes in increasingly steeply from both sides, but the direction of steepness flips.',
 
       '**3. A vertical tangent.** Both one-sided slopes blow up to the same infinity (both +∞ or both −∞). The tangent line exists in the limit but is vertical — a vertical line is not the graph of a function, so it cannot be a well-defined derivative. Classic example: f(x) = x^(1/3) at x = 0.',
-
-      '**The hierarchy of smoothness.** These two properties are not symmetric — one is strictly stronger than the other. Every differentiable function is automatically continuous, but not every continuous function is differentiable. The proof is short and elegant, and we give it in the Rigor section below.',
         ],
       },
       { type: 'image', src: continuityUrl, alt: 'Discontinuity types — all discontinuities also prevent differentiability', caption: 'Differentiable ⟹ continuous, but continuous does not imply differentiable.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      '**The hierarchy of smoothness.** These two properties are not symmetric — one is strictly stronger than the other. Every differentiable function is automatically continuous, but not every continuous function is differentiable. The proof is short and elegant, and we give it in the Rigor section below.',
+        ],
+      },
+      { type: 'image', src: diffFailsUrl, alt: 'Four cases where differentiability fails: corner, cusp, vertical tangent, discontinuity', caption: 'Differentiability requires a unique non-vertical tangent. Corners, cusps, vertical tangents, and jumps all prevent it.' },
     ],
     callouts: [
       {

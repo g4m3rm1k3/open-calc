@@ -1,4 +1,6 @@
 import concavityUrl from '../diagrams/calc-concavity.svg?url';
+import inflectionPointsUrl from '../diagrams/calc-inflection-points.svg?url';
+import secondDerivTestUrl from '../diagrams/calc-second-deriv-test.svg?url';
 export default {
   id: 'ch3-concavity-second-derivative-test',
   slug: 'concavity-second-derivative-test',
@@ -25,6 +27,7 @@ export default {
           '**Concave down (∩ shape)**: the slope is getting LESS positive (more negative). Think of a hill — as you move right, the sides tilt more steeply downward. Tangent lines are all ABOVE the curve.',
         ],
       },
+      { type: 'image', src: concavityUrl, alt: 'Two panels: concave up (f″ > 0) and concave down (f″ < 0)', caption: 'f″ > 0 means the slope is increasing (cup up); f″ < 0 means the slope is decreasing (cup down).' },
       {
         type: 'callout',
         callout: {
@@ -40,6 +43,7 @@ export default {
         mathBridge: 'Where f\'\' > 0, the curve bends upward. Where f\'\' < 0, it bends downward. The sign of f\'\' is a concavity map for f.',
         caption: 'Yellow = concave up (f\'\' > 0). Blue = concave down (f\'\' < 0). The boundary between regions is an inflection point.',
       },
+      { type: 'image', src: inflectionPointsUrl, alt: 'S-curve showing two inflection points where concavity switches', caption: 'Inflection points occur where f″ changes sign — the curve switches from ∪ to ∩ or vice versa.' },
       {
         type: 'callout',
         callout: {
@@ -48,7 +52,7 @@ export default {
           body: 'A point $(c, f(c))$ is an **inflection point** if:\n1. $f$ is continuous at $c$, AND\n2. The concavity CHANGES at $c$ (from ∪ to ∩, or from ∩ to ∪)\n\nA necessary condition: $f\'\'(c) = 0$ or $f\'\'(c)$ does not exist.\nBut this is NOT sufficient — $f\'\'(c) = 0$ alone does not guarantee an inflection point.\nYou must verify that the concavity actually changes.',
         },
       },
-      { type: 'image', src: concavityUrl, alt: 'Two panels: concave up (f″ > 0) and concave down (f″ < 0)', caption: 'f″ > 0 means the slope is increasing (cup up); f″ < 0 means the slope is decreasing (cup down).' },
+      { type: 'image', src: secondDerivTestUrl, alt: 'Three cases of second derivative test: f\'\'>0 min, f\'\'=0 inconclusive, f\'\'<0 max', caption: 'Second Derivative Test at a critical point: f″<0 → local max; f″>0 → local min; f″=0 → use First Derivative Test.' },
     ],
   },
 

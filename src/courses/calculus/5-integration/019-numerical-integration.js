@@ -1,5 +1,7 @@
 // FILE: src/content/chapter-4/12-numerical-integration.js
 import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
+import trapezoidRuleUrl from '../diagrams/calc-trapezoid-rule.svg?url';
+import simpsonsRuleUrl from '../diagrams/calc-simpsons-rule.svg?url';
 export default {
   id: 'ch4-012',
   slug: 'numerical-integration',
@@ -22,14 +24,26 @@ export default {
         paragraphs: [
       'Numerical integration goes back to the original idea of Riemann sums: approximate the area under a curve by summing the areas of simple shapes. The question is not WHETHER we can approximate (we always can), but HOW ACCURATELY and HOW EFFICIENTLY. Different methods use different shapes — rectangles, trapezoids, parabolic arcs — and achieve different levels of accuracy for the same number of function evaluations.',
       'The midpoint rule uses rectangles whose height is the function value at the midpoint of each subinterval. If you divide $[a,b]$ into $n$ equal subintervals of width $h = (b-a)/n$, the midpoint rule gives $M_n = h\\sum_{i=1}^{n} f(\\bar{x}_i)$, where $\\bar{x}_i = a + (i-1/2)h$ is the midpoint of the $i$-th subinterval. Geometrically, each rectangle touches the curve at the center, which tends to balance overestimates and underestimates.',
+        ],
+      },
+      { type: 'image', src: riemannSumUrl, alt: 'Riemann rectangles with midpoint rule and trapezoids compared', caption: 'When antiderivatives are unavailable, numerical methods (midpoint, trapezoid, Simpson) approximate the integral.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The trapezoidal rule replaces each rectangle with a trapezoid: connect the function values at the left and right endpoints with a straight line. The area of each trapezoid is $h \\cdot [f(x_i) + f(x_{i+1})]/2$. Summing: $T_n = h[f(x_0)/2 + f(x_1) + f(x_2) + \\cdots + f(x_{n-1}) + f(x_n)/2]$. The first and last function values get half weight; all interior points get full weight. The trapezoidal rule is exact for linear functions.',
       'Simpson\'s rule is the star of numerical integration. Instead of fitting a straight line through two points, it fits a parabola through three consecutive points. Over two subintervals $[x_{i-1}, x_{i+1}]$, the area under the parabola is $(h/3)[f(x_{i-1}) + 4f(x_i) + f(x_{i+1})]$. Summing over all pairs (requiring $n$ to be even): $S_n = (h/3)[f(x_0) + 4f(x_1) + 2f(x_2) + 4f(x_3) + \\cdots + 4f(x_{n-1}) + f(x_n)]$. The coefficients alternate: 1, 4, 2, 4, 2, ..., 4, 1.',
       'The error bounds reveal why Simpson\'s rule is so powerful. Midpoint rule: $|E_M| \\leq (b-a)^3/(24n^2) \\cdot \\max|f\'\'|$. Trapezoidal rule: $|E_T| \\leq (b-a)^3/(12n^2) \\cdot \\max|f\'\'|$. Both have errors that shrink like $1/n^2$ — doubling $n$ cuts the error by a factor of 4. Simpson\'s rule: $|E_S| \\leq (b-a)^5/(180n^4) \\cdot \\max|f^{(4)}|$. The error shrinks like $1/n^4$ — doubling $n$ cuts the error by a factor of 16! Simpson\'s rule with just $n = 10$ often gives 8+ digits of accuracy.',
+        ],
+      },
+      { type: 'image', src: trapezoidRuleUrl, alt: 'Trapezoidal rule diagram with error bound |ET| ≤ K(b−a)³/(12n²)', caption: 'Trapezoidal rule: connect function values with straight lines. Error is O(1/n²) — much better than left/right sums.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'An important relationship: Simpson\'s rule is a weighted average of the midpoint and trapezoidal rules: $S_{2n} = (2M_n + T_n)/3$. This means you can compute $M_n$ and $T_n$ and combine them to get $S_{2n}$ for free, effectively tripling your accuracy without additional function evaluations.',
       'When do you NEED numerical methods? (1) The integrand has no elementary antiderivative: $e^{-x^2}$, $\\sin(x)/x$, $\\sqrt{1+x^4}$. (2) The function is given by data (measured temperatures, experimental readings) rather than a formula — you cannot find an antiderivative of a table. (3) The antiderivative exists but is too complicated to evaluate reliably (some partial fraction or trig sub results). In all these cases, numerical integration gives the answer directly.',
         ],
       },
-      { type: 'image', src: riemannSumUrl, alt: 'Riemann rectangles with midpoint rule and trapezoids compared', caption: 'When antiderivatives are unavailable, numerical methods (midpoint, trapezoid, Simpson) approximate the integral.' },
+      { type: 'image', src: simpsonsRuleUrl, alt: "Simpson's rule 1,4,2,4,1 coefficients and error bound formula", caption: "Simpson's rule fits parabolas through triples of points — its error is O(1/n⁴), making it far more accurate than trapezoids." },
     ],
     callouts: [
       {

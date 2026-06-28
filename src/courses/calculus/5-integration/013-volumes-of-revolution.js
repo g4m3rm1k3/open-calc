@@ -1,4 +1,6 @@
 import diskWasherUrl from '../diagrams/calc-disk-washer.svg?url';
+import diskMethodUrl from '../diagrams/calc-disk-method.svg?url';
+import revolutionSolidUrl from '../diagrams/calc-revolution-solid.svg?url';
 // FILE: src/content/chapter-4/06b-volumes-of-revolution.js
 // Note: This lesson comes after u-substitution (06) in Chapter 4's applications arc
 export default {
@@ -27,17 +29,27 @@ export default {
         type: 'prose',
         paragraphs: [
       'Imagine spinning the region under y = f(x) on [a, b] around the x-axis. At each x-position, the spinning creates a circular cross-section (a disk) of radius r = f(x) and area πr² = π[f(x)]². The volume is the limit of the sum of thin disk volumes: ∑ π[f(x)]² Δx → ∫ₐᵇ π[f(x)]² dx. This is the **Disk Method**.',
-
+        ],
+      },
+      { type: 'image', src: diskMethodUrl, alt: 'V = π∫[f(x)]²dx with disk cross-section labeled radius and thickness', caption: 'Disk method: each cross-section is a circular disk with radius f(x) and thickness dx; summing gives V = π∫[f(x)]² dx.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'When the region is between two curves f(x) ≥ g(x) ≥ 0 and you rotate around the x-axis, each cross-section is a **washer** with outer radius R = f(x) and inner radius r = g(x). Area of washer = π(R² − r²). Volume = ∫ₐᵇ π[f(x)² − g(x)²] dx. This is the **Washer Method** — disk method with a hole.',
 
       'The **Shell Method** takes a different slice. Instead of slicing perpendicular to the axis of rotation (giving disks), we slice parallel to the axis (giving cylindrical shells). The volume of a cylindrical shell of radius r, height h, and thickness dr is approximately 2πr·h·dr. When rotating around the y-axis: V = ∫ₐᵇ 2πx·f(x) dx. The shell method is often simpler when the natural integration variable is perpendicular to the rotation axis (e.g., rotating around the y-axis but expressing the curve as y = f(x)).',
-
+        ],
+      },
+      { type: 'image', src: diskWasherUrl, alt: 'Washer cross-section with outer radius R = f(x) and inner radius r = g(x)', caption: 'Washer method: V = π∫[f(x)² − g(x)²] dx — subtract the inner disk from the outer when there is a hole.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Choosing disk vs. shell: if the axis of rotation is the x-axis, disk/washer slices in the x-direction and integrates in x (natural for y = f(x)). Shell slices in the x-direction and also integrates in x, but applies when rotating around the y-axis. A good rule: if you would need to invert the function x = f(y) to use disk method, try shells first.',
 
       'Rotation around other lines (y = k or x = h): shift the problem. If rotating y = f(x) around y = 2, the disk radius is |f(x) − 2| instead of f(x). If rotating around x = -1, the shell radius is (x + 1) instead of x. Always draw the problem to identify the correct radii.',
         ],
       },
-      { type: 'image', src: diskWasherUrl, alt: 'Three panels: disk method, washer method, and shell method', caption: 'Rotating a 2-D region generates a 3-D solid; the method depends on the axis of rotation.' },
+      { type: 'image', src: revolutionSolidUrl, alt: 'Perspective view of a 2D region being swept around the x-axis to form a solid', caption: 'Rotating a region around an axis generates a solid of revolution — the integral sums up infinitely thin disks or shells.' },
     ],
     callouts: [
       {

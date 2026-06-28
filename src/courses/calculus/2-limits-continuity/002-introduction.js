@@ -1,5 +1,6 @@
 import limitConceptUrl from '../diagrams/calc-limit-concept.svg?url';
 import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
+import limitIndeterminateUrl from '../diagrams/calc-limit-indeterminate.svg?url';
 export default {
   id: 'ch1-limits-intro',
   slug: 'introduction',
@@ -61,13 +62,18 @@ export default {
       'From both sides, f(x) is approaching 4. We write: lim(x→2) (x²−4)/(x−2) = 4. The limit is 4, even though f(2) is undefined.',
 
       'Why can we simplify (x²−4)/(x−2)? Because x²−4 = (x+2)(x−2), and for x ≠ 2 we can cancel: (x+2)(x−2)/(x−2) = x+2. At x = 2 this gives 4. The limit captured the "natural" value of this function at the hole.',
-
+        ],
+      },
+      { type: 'image', src: limitApproachUrl, alt: 'Left and right approach arrows converging to L from both sides', caption: 'Both sides must agree on the same target L for the two-sided limit to exist.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**The limit is about the journey, not the destination.** Whether f(2) is undefined, or defined but equal to something else — the limit doesn\'t care. It only asks: what value does f(x) approach as x gets close to 2?',
 
       'There is also the possibility of **one-sided limits**: the function might approach a different value from the left than from the right. If that happens, the two-sided limit does not exist (DNE). Think of a cliff edge: approaching from land gives height H, approaching from sea gives height 0. The "height" limit at the cliff edge DNE.',
         ],
       },
-      { type: 'image', src: limitApproachUrl, alt: 'Left and right approach arrows converging to L from both sides', caption: 'Both sides must agree on the same target L for the two-sided limit to exist.' },
+      { type: 'image', src: limitIndeterminateUrl, alt: '3-step resolution of the 0/0 indeterminate form: substitute, factor, cancel', caption: 'When substitution gives 0/0, factor and cancel the common factor — then substitute again.' },
     ],
     callouts: [
       {

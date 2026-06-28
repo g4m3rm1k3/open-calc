@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Shell vs Disk — Choosing the Right Method</text>
+  <rect x="8" y="24" width="228" height="170" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="122" y="44" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">USE SHELLS WHEN:</text>
+  <rect x="16" y="50" width="212" height="24" rx="3" fill="#bbf7d0"/>
+  <text x="122" y="66" font-size="8" fill="#14532d" text-anchor="middle">Rotating around y-axis</text>
+  <rect x="16" y="78" width="212" height="24" rx="3" fill="#bbf7d0"/>
+  <text x="122" y="94" font-size="8" fill="#14532d" text-anchor="middle">Region given as y=f(x)</text>
+  <rect x="16" y="106" width="212" height="24" rx="3" fill="#bbf7d0"/>
+  <text x="122" y="122" font-size="8" fill="#14532d" text-anchor="middle">Solving for x from y is hard</text>
+  <rect x="16" y="134" width="212" height="24" rx="3" fill="#bbf7d0"/>
+  <text x="122" y="150" font-size="8" fill="#14532d" text-anchor="middle">e.g. ∫ y=x²−x from 0 to 1</text>
+  <text x="122" y="172" font-size="8" fill="#166534" text-anchor="middle">V = 2π ∫₀¹ x(x²−x) dx</text>
+
+  <rect x="244" y="24" width="228" height="170" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="358" y="44" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">USE DISKS/WASHERS WHEN:</text>
+  <rect x="252" y="50" width="212" height="24" rx="3" fill="#bfdbfe"/>
+  <text x="358" y="66" font-size="8" fill="#1e3a8a" text-anchor="middle">Rotating around x-axis</text>
+  <rect x="252" y="78" width="212" height="24" rx="3" fill="#bfdbfe"/>
+  <text x="358" y="94" font-size="8" fill="#1e3a8a" text-anchor="middle">Region given as y=f(x)</text>
+  <rect x="252" y="106" width="212" height="24" rx="3" fill="#bfdbfe"/>
+  <text x="358" y="122" font-size="8" fill="#1e3a8a" text-anchor="middle">Simple to compute R and r</text>
+  <rect x="252" y="134" width="212" height="24" rx="3" fill="#bfdbfe"/>
+  <text x="358" y="150" font-size="8" fill="#1e3a8a" text-anchor="middle">e.g. ∫ y=√x from 0 to 4</text>
+  <text x="358" y="172" font-size="8" fill="#1d4ed8" text-anchor="middle">V = π ∫₀⁴ (√x)² dx = 8π</text>
+</svg>

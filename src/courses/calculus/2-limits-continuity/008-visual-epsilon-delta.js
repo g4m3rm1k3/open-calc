@@ -1,5 +1,6 @@
 import epsilonDeltaUrl from '../diagrams/calc-epsilon-delta.svg?url';
 import limitConceptUrl from '../diagrams/calc-limit-concept.svg?url';
+import epsilonDeltaProofUrl from '../diagrams/calc-epsilon-delta-proof.svg?url';
 export default {
   id: 'ch1-visual-epsilon-delta',
   slug: 'visual-epsilon-delta',
@@ -48,13 +49,18 @@ export default {
       'This method is pure geometry: draw boxes, find crossing points, measure distances. ' +
       'You can verify a limit without knowing the algebraic formula—just look at the graph. ' +
       'This is why graphical epsilon-delta is so useful for checking intuition and understanding what the definition actually says.',
-
+        ],
+      },
+      { type: 'image', src: limitConceptUrl, alt: 'Informal limit picture that the ε-δ game captures precisely', caption: 'Every limit proof follows this game structure, even when the language is not used explicitly.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**Behavior Near the Limit Point**  ' +
       'The procedure reveals a profound fact: close enough to a, the function stays within the band. ' +
       'The exact function form (linear, curved, wiggly) determines how close you need to be, but the method is universal.',
         ],
       },
-      { type: 'image', src: limitConceptUrl, alt: 'Informal limit picture that the ε-δ game captures precisely', caption: 'Every limit proof follows this game structure, even when the language is not used explicitly.' },
+      { type: 'image', src: epsilonDeltaProofUrl, alt: '5-step ε-δ proof template for a linear function showing scratchwork to formal proof', caption: 'ε-δ proofs follow a 5-step template: scratchwork first, then write the formal proof.' },
     ],
     callouts: [
       {

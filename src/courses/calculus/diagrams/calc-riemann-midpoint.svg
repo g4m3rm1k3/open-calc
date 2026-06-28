@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Midpoint Rule &amp; Convergence as n → ∞</text>
+  <!-- Midpoint panel -->
+  <rect x="8" y="24" width="228" height="170" rx="8" fill="#f8fafc" stroke="#22c55e" stroke-width="2"/>
+  <text x="122" y="42" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Midpoint Sum (Mₙ)</text>
+  <line x1="20" y1="162" x2="228" y2="162" stroke="#64748b" stroke-width="1"/>
+  <line x1="20" y1="42" x2="20" y2="166" stroke="#64748b" stroke-width="1"/>
+  <!-- Midpoint rectangles -->
+  <rect x="32" y="113" width="38" height="49" fill="#22c55e" opacity="0.3" stroke="#22c55e" stroke-width="1"/>
+  <rect x="70" y="93" width="38" height="69" fill="#22c55e" opacity="0.3" stroke="#22c55e" stroke-width="1"/>
+  <rect x="108" y="78" width="38" height="84" fill="#22c55e" opacity="0.3" stroke="#22c55e" stroke-width="1"/>
+  <rect x="146" y="67" width="38" height="95" fill="#22c55e" opacity="0.3" stroke="#22c55e" stroke-width="1"/>
+  <rect x="184" y="58" width="38" height="104" fill="#22c55e" opacity="0.3" stroke="#22c55e" stroke-width="1"/>
+  <!-- Curve -->
+  <path d="M 30,140 Q 55,115 80,95 Q 110,74 140,60 Q 165,50 195,44 Q 212,40 225,38" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Midpoint dots -->
+  <circle cx="51" cy="113" r="3" fill="#16a34a"/>
+  <circle cx="89" cy="93" r="3" fill="#16a34a"/>
+  <circle cx="127" cy="78" r="3" fill="#16a34a"/>
+  <circle cx="165" cy="67" r="3" fill="#16a34a"/>
+  <circle cx="203" cy="58" r="3" fill="#16a34a"/>
+  <text x="122" y="178" font-size="7.5" fill="#166534" text-anchor="middle">height = f(midpoint)</text>
+  <text x="122" y="188" font-size="7.5" fill="#166534" text-anchor="middle">most accurate single rule</text>
+
+  <!-- Convergence panel -->
+  <rect x="244" y="24" width="228" height="170" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="358" y="42" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">As n → ∞ (more strips)</text>
+  <!-- Many thin bars approximation -->
+  <line x1="256" y1="162" x2="464" y2="162" stroke="#64748b" stroke-width="1"/>
+  <line x1="256" y1="42" x2="256" y2="166" stroke="#64748b" stroke-width="1"/>
+  <!-- Many thin rectangles -->
+  <path d="M 268,162 L 268,130 L 270,130 L 270,162 Z" fill="#6366f1" opacity="0.5"/>
+  <path d="M 270,162 L 270,118 L 272,118 L 272,162 Z" fill="#6366f1" opacity="0.5"/>
+  <path d="M 272,162 L 272,109 L 274,109 L 274,162 Z" fill="#6366f1" opacity="0.5"/>
+  <path d="M 274,162 L 274,101 L 276,101 L 276,162 Z" fill="#6366f1" opacity="0.5"/>
+  <!-- Fill in with shaded area suggesting many -->
+  <path d="M 268,162 L 268,130 Q 290,98 330,70 Q 370,48 420,38 L 462,35 L 462,162 Z" fill="#6366f1" opacity="0.15"/>
+  <path d="M 268,130 Q 290,100 330,70 Q 370,46 420,38 L 462,35" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="358" y="110" font-size="8" fill="#4338ca" text-anchor="middle">thin strips → exact area</text>
+  <rect x="264" y="118" width="192" height="38" rx="4" fill="#dbeafe" opacity="0.9"/>
+  <text x="360" y="134" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">lim_{n→∞} Σ f(xᵢ*)Δx</text>
+  <text x="360" y="150" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">= ∫ₐᵇ f(x) dx</text>
+</svg>

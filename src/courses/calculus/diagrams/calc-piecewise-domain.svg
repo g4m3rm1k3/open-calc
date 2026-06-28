@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="15" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Piecewise Functions — Domain Partitioning</text>
+
+  <!-- LEFT: three-piece function -->
+  <rect x="8" y="20" width="230" height="174" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="123" y="38" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">How to Read a Piecewise Function</text>
+
+  <!-- Formula box -->
+  <rect x="18" y="42" width="210" height="62" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="123" y="58" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="600">f(x) =</text>
+  <text x="80" y="71" font-size="8.5" fill="#dc2626">x² − 1</text>
+  <text x="165" y="71" font-size="8" fill="#64748b">if x &lt; 0</text>
+  <text x="80" y="84" font-size="8.5" fill="#059669">3</text>
+  <text x="165" y="84" font-size="8" fill="#64748b">if x = 0</text>
+  <text x="80" y="97" font-size="8.5" fill="#f59e0b">2x + 1</text>
+  <text x="165" y="97" font-size="8" fill="#64748b">if x &gt; 0</text>
+
+  <!-- Number line showing domain split -->
+  <line x1="22" y1="128" x2="226" y2="128" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="124" y1="122" x2="124" y2="134" stroke="#64748b" stroke-width="2"/>
+  <text x="124" y="146" font-size="8" fill="#64748b" text-anchor="middle">x = 0</text>
+
+  <!-- Left region -->
+  <rect x="22" y="112" width="96" height="14" rx="3" fill="#fee2e2" opacity="0.8"/>
+  <text x="70" y="122" font-size="7.5" fill="#dc2626" text-anchor="middle" font-weight="600">x &lt; 0: use x²−1</text>
+
+  <!-- Right region -->
+  <rect x="128" y="112" width="96" height="14" rx="3" fill="#fef3c7" opacity="0.8"/>
+  <text x="178" y="122" font-size="7.5" fill="#b45309" text-anchor="middle" font-weight="600">x &gt; 0: use 2x+1</text>
+
+  <!-- Point at x=0 -->
+  <circle cx="124" cy="128" r="4" fill="#059669"/>
+  <text x="124" y="165" font-size="7.5" fill="#059669" text-anchor="middle">At x=0 exactly: f(0) = 3</text>
+
+  <rect x="18" y="172" width="210" height="16" rx="4" fill="#dbeafe"/>
+  <text x="123" y="183" font-size="8" fill="#1d4ed8" text-anchor="middle">Each piece applies on its specified domain</text>
+
+  <!-- RIGHT: graph of function -->
+  <rect x="246" y="20" width="226" height="174" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="359" y="38" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">The Graph Shows the Pieces</text>
+
+  <!-- Axes -->
+  <line x1="258" y1="128" x2="464" y2="128" stroke="#64748b" stroke-width="1"/>
+  <line x1="361" y1="30" x2="361" y2="188" stroke="#64748b" stroke-width="1"/>
+  <text x="362" y="28" font-size="7.5" fill="#64748b">y</text>
+  <text x="465" y="130" font-size="7.5" fill="#64748b">x</text>
+  <text x="354" y="130" font-size="7" fill="#64748b">0</text>
+
+  <!-- Left piece: x²-1 for x<0: parabola from (-3,8) to (0,-1) -->
+  <!-- Scale: x range -3 to 3 = 100px, so 1 unit = ~33px; y range -2 to 9 = 100px so 1 unit ~9px -->
+  <!-- Center at (361, 128). x: 258+33*(x+3), y: 128-9*(y+0) -->
+  <!-- At x=-3: y=8, screen (258, 56) -->
+  <!-- At x=-2: y=3, screen (291, 101) -->
+  <!-- At x=-1: y=0, screen (328, 128) -->
+  <!-- At x=0: y=-1, screen (361, 137) but open circle -->
+  <path d="M 264,56 Q 291,101 328,128 Q 344,133 360,137" fill="none" stroke="#dc2626" stroke-width="2"/>
+  <circle cx="361" cy="137" r="4" fill="white" stroke="#dc2626" stroke-width="2"/>
+
+  <!-- Right piece: 2x+1 for x>0: line -->
+  <!-- At x=0: y=1, screen (361, 119); at x=3: y=7, screen (461, 65) -->
+  <line x1="361" y1="119" x2="461" y2="65" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="361" cy="119" r="4" fill="white" stroke="#f59e0b" stroke-width="2"/>
+
+  <!-- Dot at (0, 3): screen (361, 101) -->
+  <circle cx="361" cy="101" r="4.5" fill="#059669"/>
+
+  <!-- Labels -->
+  <text x="280" y="90" font-size="7.5" fill="#dc2626">x² − 1</text>
+  <text x="415" y="78" font-size="7.5" fill="#b45309">2x + 1</text>
+  <text x="368" y="100" font-size="7.5" fill="#059669">f(0)=3</text>
+
+  <rect x="254" y="172" width="214" height="16" rx="4" fill="#dcfce7"/>
+  <text x="361" y="183" font-size="8" fill="#166534" text-anchor="middle">Open circles = excluded, closed = included</text>
+</svg>

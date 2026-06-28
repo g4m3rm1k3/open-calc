@@ -1,5 +1,6 @@
 import ivtUrl from '../diagrams/calc-ivt.svg?url';
 import continuityUrl from '../diagrams/calc-continuity.svg?url';
+import ivtRootsUrl from '../diagrams/calc-ivt-roots.svg?url';
 export default {
   id: 'ch1-ivt',
   slug: 'intermediate-value-theorem',
@@ -46,13 +47,18 @@ export default {
         paragraphs: [
 
       '**Why does continuity matter?** Remove it, and the theorem fails immediately. Consider $f(x) = -1$ for $x < 0$ and $f(x) = +1$ for $x \geq 0$. Then $f(-1) = -1$ and $f(1) = +1$, but $f$ never equals 0. The discontinuity at $x = 0$ is the escape hatch that lets the function "jump over" zero. Continuity is not just a technical condition — it is the precise mathematical formalization of "no teleporting."',
-
+        ],
+      },
+      { type: 'image', src: continuityUrl, alt: 'Jump discontinuity showing how IVT fails without continuity', caption: 'The IVT requires continuity: a jump lets the function skip over intermediate values.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**The IVT is secretly a theorem about connected sets.** In topology, the IVT says that the continuous image of a connected set is connected. The interval $[a, b]$ is connected (it has no gaps), so its image under $f$ must also be connected (no gaps), which means the image must contain every value between $f(a)$ and $f(b)$. This "big picture" view explains why the theorem is true at a deep level.',
 
       '**Real-world applications are everywhere.** In economics: if supply exceeds demand at price $p_1$ and is less than demand at price $p_2$, there must be an equilibrium price between them. In engineering: if a beam deflects upward at one end and downward at another under a load, it has a neutral point in between. In medicine: if body temperature was 98.6°F at 8am and 103°F at noon, it passed through every temperature in between — so doctors can say "the fever first reached 101°F sometime between 8am and noon."',
         ],
       },
-      { type: 'image', src: continuityUrl, alt: 'Jump discontinuity showing how IVT fails without continuity', caption: 'The IVT requires continuity: a jump lets the function skip over intermediate values.' },
+      { type: 'image', src: ivtRootsUrl, alt: 'IVT applied to guarantee at least one root between sign-change endpoints', caption: 'If f(a) < 0 and f(b) > 0 with f continuous, the IVT guarantees a root between a and b.' },
     ],
     callouts: [
       {

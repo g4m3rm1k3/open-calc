@@ -1,4 +1,6 @@
 import uSubUrl from '../diagrams/calc-u-sub.svg?url';
+import partialFractionsUrl from '../diagrams/calc-partial-fractions.svg?url';
+import pfDecompositionUrl from '../diagrams/calc-pf-decomposition.svg?url';
 // FILE: src/content/chapter-4/10-partial-fractions-integration.js
 export default {
   id: 'ch4-010',
@@ -23,14 +25,26 @@ export default {
         paragraphs: [
       'You already know how to add fractions: $1/(x-1) + 1/(x+2) = ((x+2)+(x-1))/((x-1)(x+2)) = (2x+1)/((x-1)(x+2))$. Partial fraction decomposition is this process in REVERSE. Given a complicated fraction like $(2x+1)/((x-1)(x+2))$, we break it back into $A/(x-1) + B/(x+2)$. Each simple fraction is easy to integrate: $\\int A/(x-1)\\,dx = A\\ln|x-1| + C$.',
       'The method works because rational functions (polynomial over polynomial) can always be decomposed into a polynomial part (if the degree of the numerator is $\\geq$ the degree of the denominator) plus a sum of "partial fractions" — terms of the form $A/(x-a)^k$ for real roots and $(Bx+C)/(x^2+bx+c)^k$ for irreducible quadratic factors. Each type has a known antiderivative.',
+        ],
+      },
+      { type: 'image', src: uSubUrl, alt: 'Integration pipeline showing partial fraction decomposition before integration', caption: 'Decompose a rational function into simple fractions, then integrate each term with known rules.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The first step is always: check degrees. If the numerator degree $\\geq$ denominator degree, perform polynomial long division first to get a polynomial plus a proper fraction (numerator degree $<$ denominator degree). Only proper fractions get decomposed. For example, $\\int (x^3+2)/(x^2-1)\\,dx$: divide to get $x + (x+2)/(x^2-1)$, then decompose the proper fraction.',
       'For distinct linear factors, the decomposition is straightforward. Factor the denominator completely: $Q(x) = (x-r_1)(x-r_2)\\cdots(x-r_n)$. Write $P(x)/Q(x) = A_1/(x-r_1) + A_2/(x-r_2) + \\cdots + A_n/(x-r_n)$. Find $A_1, A_2, \\ldots, A_n$ by multiplying both sides by $Q(x)$ and substituting the roots, or by comparing coefficients.',
+        ],
+      },
+      { type: 'image', src: partialFractionsUrl, alt: '4-step partial fraction decomposition with 1/(x²+x−2) worked example', caption: 'Four steps: factor the denominator, write the decomposition form, solve for constants, integrate each piece.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The Heaviside cover-up method is a fast shortcut for distinct linear factors. To find the coefficient $A_k$ of $1/(x-r_k)$: "cover up" the factor $(x-r_k)$ in the denominator and evaluate the rest at $x = r_k$. Formally, $A_k = P(r_k)/\\prod_{j \\neq k}(r_k - r_j)$. This avoids setting up a system of equations and is extremely efficient for denominators with 3 or more distinct factors.',
       'For repeated linear factors like $(x-r)^m$, you need $m$ terms: $A_1/(x-r) + A_2/(x-r)^2 + \\cdots + A_m/(x-r)^m$. The Heaviside method gives $A_m$ directly (plug in $x = r$), but the other coefficients require either comparing coefficients or differentiating the cover-up equation. Each term $A_k/(x-r)^k$ integrates as $A_k(x-r)^{1-k}/(1-k)$ for $k \\geq 2$, or $A_1 \\ln|x-r|$ for $k = 1$.',
       'For irreducible quadratic factors $(x^2+bx+c)$ (where $b^2-4c < 0$), the partial fraction has the form $(Bx+C)/(x^2+bx+c)$. To integrate: complete the square in the denominator, then split into two integrals — one giving a logarithm (via u-sub) and one giving an arctangent. For repeated quadratics $(x^2+bx+c)^k$, you need terms $(B_j x + C_j)/(x^2+bx+c)^j$ for $j = 1, 2, \\ldots, k$.',
         ],
       },
-      { type: 'image', src: uSubUrl, alt: 'Integration pipeline showing partial fraction decomposition before integration', caption: 'Decompose a rational function into simple fractions, then integrate each term with known rules.' },
+      { type: 'image', src: pfDecompositionUrl, alt: 'Table of partial fraction forms: distinct linear, repeated linear, irreducible quadratic', caption: 'Partial fraction form depends on the denominator: distinct roots get A/(x−r), repeated roots get A/(x−r)ⁿ, quadratics get (Ax+B)/(x²+bx+c).' },
     ],
     callouts: [
       {

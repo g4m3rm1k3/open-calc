@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Product Rule vs. Quotient Rule — Side by Side</text>
+
+  <!-- LEFT: Product Rule -->
+  <rect x="6" y="22" width="228" height="172" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="120" y="40" font-size="9.5" fill="#059669" text-anchor="middle" font-weight="700">PRODUCT RULE</text>
+
+  <rect x="16" y="46" width="208" height="22" rx="5" fill="#bbf7d0"/>
+  <text x="120" y="60" font-size="10" fill="#065f46" text-anchor="middle" font-weight="700">(fg)′ = f ′g + fg′</text>
+
+  <text x="16" y="80" font-size="8" fill="#166534" font-weight="700">Mnemonic: "left d-right + right d-left"</text>
+
+  <text x="16" y="98" font-size="8" fill="#166534">Example: h(x) = x² · sin(x)</text>
+  <text x="16" y="112" font-size="8" fill="#166534">  f = x²      → f ′ = 2x</text>
+  <text x="16" y="126" font-size="8" fill="#166534">  g = sin(x)  → g′ = cos(x)</text>
+
+  <line x1="16" y1="132" x2="224" y2="132" stroke="#a7f3d0" stroke-width="1"/>
+  <text x="16" y="148" font-size="8" fill="#166534">h′(x) = f ′g + fg′</text>
+  <text x="16" y="162" font-size="8.5" fill="#059669" font-weight="700">     = 2x sin(x) + x² cos(x)</text>
+
+  <rect x="16" y="170" width="208" height="18" rx="4" fill="#d1fae5"/>
+  <text x="120" y="182" font-size="7.5" fill="#065f46" text-anchor="middle">Both terms survive — neither cancels!</text>
+
+  <!-- RIGHT: Quotient Rule -->
+  <rect x="246" y="22" width="228" height="172" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="360" y="40" font-size="9.5" fill="#b45309" text-anchor="middle" font-weight="700">QUOTIENT RULE</text>
+
+  <rect x="256" y="46" width="208" height="22" rx="5" fill="#fde68a"/>
+  <text x="360" y="60" font-size="10" fill="#92400e" text-anchor="middle" font-weight="700">(f/g)′ = (f ′g − fg′) / g²</text>
+
+  <text x="256" y="80" font-size="8" fill="#92400e" font-weight="700">Mnemonic: "lo d-hi minus hi d-lo over lo²"</text>
+
+  <text x="256" y="98" font-size="8" fill="#92400e">Example: h(x) = sin(x) / x</text>
+  <text x="256" y="112" font-size="8" fill="#92400e">  f = sin(x)  → f ′ = cos(x)</text>
+  <text x="256" y="126" font-size="8" fill="#92400e">  g = x       → g′ = 1</text>
+
+  <line x1="256" y1="132" x2="464" y2="132" stroke="#fde68a" stroke-width="1"/>
+  <text x="256" y="148" font-size="8" fill="#92400e">h′(x) = (cos(x)·x − sin(x)·1) / x²</text>
+  <text x="256" y="162" font-size="8.5" fill="#b45309" font-weight="700">     = (x cos x − sin x) / x²</text>
+
+  <rect x="256" y="170" width="208" height="18" rx="4" fill="#fef3c7"/>
+  <text x="360" y="182" font-size="7.5" fill="#92400e" text-anchor="middle">Order matters: f ′g − fg′ not fg′ − f ′g</text>
+</svg>

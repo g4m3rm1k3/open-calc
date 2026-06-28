@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">SOH–CAH–TOA: Trig Ratios from a Right Triangle</text>
+
+  <!-- Right triangle: vertices at (40,170), (200,170), (200,60) -->
+  <!-- Bottom side: horizontal -->
+  <line x1="40" y1="170" x2="200" y2="170" stroke="#6366f1" stroke-width="2"/>
+  <!-- Right side: vertical -->
+  <line x1="200" y1="60" x2="200" y2="170" stroke="#10b981" stroke-width="2"/>
+  <!-- Hypotenuse -->
+  <line x1="40" y1="170" x2="200" y2="60" stroke="#f59e0b" stroke-width="2.5"/>
+
+  <!-- Right angle marker -->
+  <path d="M 200,170 L 188,170 L 188,158 L 200,158" fill="none" stroke="#6366f1" stroke-width="1.5"/>
+
+  <!-- Angle θ at bottom-left -->
+  <path d="M 72,170 A 32,32 0 0,0 51,150" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="74" y="163" font-size="12" fill="#ef4444" font-weight="700">θ</text>
+
+  <!-- Side labels -->
+  <text x="118" y="185" font-size="9" fill="#6366f1" text-anchor="middle" font-weight="700">adjacent (adj)</text>
+  <text x="214" y="120" font-size="9" fill="#10b981" font-weight="700">opposite</text>
+  <text x="215" y="130" font-size="9" fill="#10b981" font-weight="700">(opp)</text>
+  <text x="100" y="100" font-size="9" fill="#b45309" text-anchor="middle" font-weight="700">hypotenuse (hyp)</text>
+
+  <!-- Divider -->
+  <line x1="228" y1="30" x2="228" y2="192" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- SOH -->
+  <rect x="240" y="28" width="232" height="46" rx="7" fill="#fee2e2" stroke="#ef4444" stroke-width="1"/>
+  <text x="280" y="46" font-size="12" fill="#dc2626" font-weight="800">SOH</text>
+  <text x="338" y="42" font-size="9" fill="#991b1b">sin(θ) =</text>
+  <text x="390" y="42" font-size="10" fill="#dc2626" font-weight="700">opp / hyp</text>
+  <text x="356" y="56" font-size="7.5" class="mu">sine = opposite over hypotenuse</text>
+
+  <!-- CAH -->
+  <rect x="240" y="82" width="232" height="46" rx="7" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
+  <text x="280" y="100" font-size="12" fill="#1d4ed8" font-weight="800">CAH</text>
+  <text x="338" y="96" font-size="9" fill="#1e40af">cos(θ) =</text>
+  <text x="390" y="96" font-size="10" fill="#1d4ed8" font-weight="700">adj / hyp</text>
+  <text x="356" y="110" font-size="7.5" class="mu">cosine = adjacent over hypotenuse</text>
+
+  <!-- TOA -->
+  <rect x="240" y="136" width="232" height="46" rx="7" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+  <text x="280" y="154" font-size="12" fill="#059669" font-weight="800">TOA</text>
+  <text x="338" y="150" font-size="9" fill="#047857">tan(θ) =</text>
+  <text x="390" y="150" font-size="10" fill="#059669" font-weight="700">opp / adj</text>
+  <text x="356" y="164" font-size="7.5" class="mu">tangent = opposite over adjacent</text>
+
+  <!-- Memory hint at bottom left -->
+  <text x="40" y="192" font-size="7.5" fill="#64748b">"Some Old Hippy Caught Another Hippy Tripping On Acid"</text>
+</svg>

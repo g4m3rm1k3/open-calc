@@ -1,5 +1,7 @@
 // FILE: src/content/chapter-4/11-improper-integrals.js
 import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
+import improperInfiniteUrl from '../diagrams/calc-improper-infinite.svg?url';
+import improperDiscontinuousUrl from '../diagrams/calc-improper-discontinuous.svg?url';
 export default {
   id: 'ch4-011',
   slug: 'improper-integrals',
@@ -22,14 +24,26 @@ export default {
         paragraphs: [
       'An improper integral arises when the "standard" Riemann integral definition breaks down — either because the interval is infinite or because the integrand blows up somewhere on the interval. There are two types: Type 1 has an infinite limit of integration (like $\\int_1^\\infty 1/x^2\\,dx$), and Type 2 has a discontinuous integrand (like $\\int_0^1 1/\\sqrt{x}\\,dx$, where $1/\\sqrt{x} \\to \\infty$ as $x \\to 0^+$).',
       'The idea for handling both types is the same: replace the problematic part with a finite limit, compute the ordinary integral, and then take the limit. For Type 1: $\\int_1^\\infty f(x)\\,dx = \\lim_{b \\to \\infty} \\int_1^b f(x)\\,dx$. For Type 2 (discontinuity at $a$): $\\int_a^b f(x)\\,dx = \\lim_{\\epsilon \\to 0^+} \\int_{a+\\epsilon}^b f(x)\\,dx$. If the limit exists and is finite, the integral converges. If the limit is $\\pm\\infty$ or does not exist, the integral diverges.',
+        ],
+      },
+      { type: 'image', src: limitsInfinityUrl, alt: 'Curve approaching a horizontal asymptote, with area under infinite tail', caption: 'An improper integral replaces an infinite bound or discontinuity with a limit — it may converge or diverge.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The $p$-integral test is the most important convergence test: $\\int_1^\\infty 1/x^p\\,dx$ converges if and only if $p > 1$. At the boundary $p = 1$, we get $\\int_1^\\infty 1/x\\,dx = \\lim_{b \\to \\infty} \\ln b = \\infty$ — divergent. For $p > 1$: $\\int_1^\\infty x^{-p}\\,dx = [x^{1-p}/(1-p)]_1^\\infty = 0 - 1/(1-p) = 1/(p-1)$ — convergent. The cutoff is sharp: $1/x^{1.001}$ has finite total area, but $1/x^{0.999}$ does not.',
       'There is also a $p$-test near zero: $\\int_0^1 1/x^p\\,dx$ converges if and only if $p < 1$. This is the mirror image: near zero, $1/x^p$ blows up, but for $p < 1$ it does not blow up fast enough to make the area infinite. At $p = 1$, $\\int_0^1 1/x\\,dx = \\lim_{\\epsilon \\to 0^+}(-\\ln \\epsilon) = \\infty$. So $1/x$ is the "boundary function" for both types.',
+        ],
+      },
+      { type: 'image', src: improperInfiniteUrl, alt: '∫₁^∞ 1/x² convergence vs ∫₁^∞ 1/x divergence with p-series comparison', caption: 'Infinite upper bound: ∫₁^∞ 1/xᵖ converges if p>1 (p-series test) — the tail area shrinks fast enough.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The comparison test lets you determine convergence without computing the integral. If $0 \\leq f(x) \\leq g(x)$ for all $x$ large enough, then: if $\\int g$ converges, so does $\\int f$ (smaller function, smaller area). If $\\int f$ diverges, so does $\\int g$ (larger function, larger area). Typically you compare against a known $p$-integral. For example, $\\int_1^\\infty e^{-x}\\,dx$ converges because $e^{-x} \\leq 1/x^2$ for large $x$ (exponentials decay faster than any power).',
       'The limit comparison test is often easier: if $\\lim_{x \\to \\infty} f(x)/g(x) = L$ with $0 < L < \\infty$, then $\\int f$ and $\\int g$ either both converge or both diverge. This avoids proving an inequality; you just need the ratio to approach a positive constant. Compare $\\int_1^\\infty (3x+1)/(x^3+x^2)\\,dx$ with $\\int_1^\\infty 3/x^2\\,dx$: the ratio approaches 1, so both converge.',
       'Gabriel\'s Horn (Torricelli\'s trumpet) is a stunning paradox. Rotate $y = 1/x$ for $x \\geq 1$ around the $x$-axis. The volume is $\\pi\\int_1^\\infty 1/x^2\\,dx = \\pi$ — finite! But the surface area is $2\\pi\\int_1^\\infty (1/x)\\sqrt{1+1/x^4}\\,dx \\geq 2\\pi\\int_1^\\infty 1/x\\,dx = \\infty$. You can fill the horn with paint (finite volume), but you cannot paint its surface (infinite area). This is not a contradiction — it reflects the difference between $\\int 1/x^2$ (converges) and $\\int 1/x$ (diverges).',
         ],
       },
-      { type: 'image', src: limitsInfinityUrl, alt: 'Curve approaching a horizontal asymptote, with area under infinite tail', caption: 'An improper integral replaces an infinite bound or discontinuity with a limit — it may converge or diverge.' },
+      { type: 'image', src: improperDiscontinuousUrl, alt: '∫₀¹ 1/√x convergence via limit from the right as the lower bound approaches 0', caption: 'Discontinuity at a bound: replace it with a limit — ∫₀¹ x⁻¹/² dx = lim_{t→0⁺}∫ₜ¹ x⁻¹/² dx = 2.' },
     ],
     callouts: [
       {

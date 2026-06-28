@@ -220,23 +220,66 @@ const TAG_ATTRS = {
   image:     ['x','y','width','height','href','opacity'],
 }
 
+// ── Grid overlay — renders SVG-coordinate grid lines exactly over the SVG ─────
+function GridOverlay({ svgEl, style }) {
+  const vb = svgEl?.getAttribute('viewBox')
+  if (!vb) return null
+  const [vx, vy, vw, vh] = vb.split(/\s+/).map(Number)
+
+  const STEP = 20
+  const lines = []
+  for (let x = Math.ceil(vx / STEP) * STEP; x <= vx + vw; x += STEP) {
+    lines.push(
+      <line key={`v${x}`} x1={x} y1={vy} x2={x} y2={vy + vh}
+        stroke={x === 0 ? '#3b82f6' : '#30363d88'} strokeWidth={x % 100 === 0 ? 0.8 : 0.4} />,
+      <text key={`vl${x}`} x={x + 1} y={vy + 9} fontSize={6} fill="#484f58">{x}</text>
+    )
+  }
+  for (let y = Math.ceil(vy / STEP) * STEP; y <= vy + vh; y += STEP) {
+    lines.push(
+      <line key={`h${y}`} x1={vx} y1={y} x2={vx + vw} y2={y}
+        stroke={y === 0 ? '#3b82f6' : '#30363d88'} strokeWidth={y % 100 === 0 ? 0.8 : 0.4} />,
+      <text key={`hl${y}`} x={vx + 1} y={y - 1} fontSize={6} fill="#484f58">{y}</text>
+    )
+  }
+
+  return (
+    <svg
+      style={{ display: 'block', pointerEvents: 'none', ...style }}
+      viewBox={`${vx} ${vy} ${vw} ${vh}`}
+      preserveAspectRatio="none"
+    >
+      {lines}
+    </svg>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function SvgVisualEditor({ xml, dark, onChange }) {
+export default function SvgVisualEditor({ xml, dark, onChange, zoom = 1, onZoomChange }) {
   const docRef          = useRef(null)
   const svgContainerRef = useRef(null)
+  const svgWrapperRef   = useRef(null)
+  const canvasScrollRef = useRef(null)
   const svgElRef        = useRef(null)
   const moveableRef     = useRef(null)
   const historyStack    = useRef([])
+  const zoomRef         = useRef(zoom)
 
   const [selectedIdx, setSelectedIdx] = useState(null)
   const [showLayers, setShowLayers]   = useState(true)
+  const [showGrid, setShowGrid]       = useState(false)
+  const [coords, setCoords]           = useState(null)
+  const [svgPx, setSvgPx]            = useState({ w: 0, h: 0 })
 
   // docVersion bumps when the parsed doc changes → triggers SVG re-clone effect
   const [docVersion, setDocVersion]   = useState(0)
   // cloneReady bumps AFTER the SVG DOM is re-built → next render resolves
   // selectedRenderedEl from the fresh svgElRef, giving Moveable a live target
   const [, bumpCloneReady]            = useReducer(n => n + 1, 0)
+
+  // Keep zoomRef current without triggering re-clone
+  zoomRef.current = zoom
 
   // ── Parse incoming XML into docRef ────────────────────────────────────────
   useEffect(() => {
@@ -254,7 +297,10 @@ export default function SvgVisualEditor({ xml, dark, onChange }) {
 
     const clone = doc.documentElement.cloneNode(true)
     clone.removeAttribute('width'); clone.removeAttribute('height')
-    clone.style.cssText = 'width:100%;height:100%;display:block;overflow:visible'
+    const [,, vw, vh] = getViewBox(clone)
+    const pxW = Math.round(vw * zoomRef.current)
+    const pxH = Math.round(vh * zoomRef.current)
+    clone.style.cssText = `display:block;overflow:visible;width:${pxW}px;height:${pxH}px`
     if (dark) clone.classList.add('dark')
 
     // Tag every interactive element; add a wide transparent sibling for thin
@@ -279,10 +325,36 @@ export default function SvgVisualEditor({ xml, dark, onChange }) {
     container.innerHTML = ''
     container.appendChild(clone)
     svgElRef.current = clone
-    // Signal that the DOM is ready — the following render will resolve
-    // selectedRenderedEl from the new svgElRef
+    setSvgPx({ w: pxW, h: pxH })
     bumpCloneReady()
   }, [docVersion, dark])
+
+  // ── Update SVG pixel dimensions when zoom changes (no re-clone needed) ──
+  useEffect(() => {
+    const svgEl = svgElRef.current
+    if (!svgEl) return
+    const [,, vw, vh] = getViewBox(svgEl)
+    const w = Math.round(vw * zoom)
+    const h = Math.round(vh * zoom)
+    svgEl.style.width  = `${w}px`
+    svgEl.style.height = `${h}px`
+    setSvgPx({ w, h })
+    requestAnimationFrame(() => moveableRef.current?.updateRect())
+  }, [zoom])
+
+  // ── Ctrl/Cmd + scroll to zoom (non-passive so we can preventDefault) ────────
+  useEffect(() => {
+    const el = canvasScrollRef.current
+    if (!el) return
+    const onWheel = (e) => {
+      if (!e.ctrlKey && !e.metaKey) return
+      e.preventDefault()
+      const delta = e.deltaY < 0 ? 0.25 : -0.25
+      onZoomChange?.(z => Math.max(0.25, Math.min(5, +(z + delta).toFixed(2))))
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [onZoomChange])
 
   // ── Resolve selected element from the live rendered SVG ──────────────────
   // Computed every render so it always reflects the current svgElRef.
@@ -457,6 +529,12 @@ export default function SvgVisualEditor({ xml, dark, onChange }) {
           ))}
 
           <div className="ml-auto flex items-center gap-1 shrink-0">
+            <button onClick={() => setShowGrid(v => !v)}
+              className="px-2 py-0.5 text-[10px] font-bold rounded"
+              title="Toggle SVG coordinate grid (every 20 units)"
+              style={{ background: showGrid ? '#22863a' : '#21262d', color: showGrid ? '#fff' : '#8b949e', border: '1px solid #30363d' }}>
+              Grid
+            </button>
             <button onClick={() => setShowLayers(v => !v)}
               className="px-2 py-0.5 text-[10px] font-bold rounded"
               style={{ background: showLayers ? '#1f6feb' : '#21262d', color: showLayers ? '#fff' : '#8b949e', border: '1px solid #30363d' }}>
@@ -508,14 +586,55 @@ export default function SvgVisualEditor({ xml, dark, onChange }) {
           </div>
         )}
 
-        {/* SVG canvas */}
-        <div className="flex-1 min-w-0 relative overflow-hidden"
-          style={{ background: dark ? '#1e293b' : '#f1f5f9' }}>
-          <div ref={svgContainerRef} className="w-full h-full" onClick={handleSvgClick} />
-          {selectedRenderedEl && (
+        {/* SVG canvas — scroll container */}
+        <div
+          ref={canvasScrollRef}
+          className="flex-1 min-w-0 overflow-auto"
+          style={{ background: dark ? '#1e293b' : '#f1f5f9', position: 'relative' }}
+        >
+          {/* Inline-block wrapper — also the Moveable container so handles scroll with content */}
+          <div ref={svgWrapperRef} style={{ display: 'inline-block', minWidth: '100%', minHeight: '100%', position: 'relative', padding: 24 }}>
+            {/* SVG inject target */}
+            <div
+              ref={svgContainerRef}
+              onClick={handleSvgClick}
+              onMouseMove={(e) => {
+                const svgEl = svgElRef.current
+                if (!svgEl) return
+                try {
+                  const pt = clientToSvg(svgEl, e.clientX, e.clientY)
+                  setCoords({ x: Math.round(pt.x * 10) / 10, y: Math.round(pt.y * 10) / 10 })
+                } catch { /* ignore if SVG not yet mounted */ }
+              }}
+              onMouseLeave={() => setCoords(null)}
+            />
+            {/* Grid overlay — positioned exactly over the injected SVG */}
+            {showGrid && svgElRef.current && svgPx.w > 0 && (
+              <GridOverlay
+                svgEl={svgElRef.current}
+                style={{
+                  position: 'absolute',
+                  top: 24, left: 24,
+                  width: svgPx.w, height: svgPx.h,
+                  opacity: 0.8,
+                }}
+              />
+            )}
+          </div>
+
+          {coords && (
+            <div
+              className="sticky bottom-2 text-[10px] font-mono pointer-events-none select-none"
+              style={{ float: 'right', marginRight: 8, background: '#0d1117cc', color: '#58a6ff', padding: '2px 8px', borderRadius: 4, border: '1px solid #30363d' }}
+            >
+              x={coords.x}  y={coords.y}
+            </div>
+          )}
+          {selectedRenderedEl && svgWrapperRef.current && (
             <Moveable
               ref={moveableRef}
               target={selectedRenderedEl}
+              container={svgWrapperRef.current}
               draggable resizable rotatable
               throttleDrag={0} throttleResize={0} throttleRotate={1}
               onDrag={({ target, beforeTranslate: [dx, dy] }) => {

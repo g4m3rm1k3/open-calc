@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">The Three Types of Discontinuity</text>
+
+  <!-- PANEL 1: Removable (hole) -->
+  <rect x="10" y="24" width="142" height="168" rx="8" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="81" y="41" font-size="9" fill="#7e22ce" text-anchor="middle" font-weight="700">REMOVABLE</text>
+  <text x="81" y="53" font-size="7.5" class="mu" text-anchor="middle">(hole)</text>
+
+  <line x1="18" y1="155" x2="144" y2="155" stroke="#94a3b8" stroke-width="1"/>
+  <path d="M 20,145 Q 50,120 80,110 Q 110,100 140,80" fill="none" stroke="#a855f7" stroke-width="2.5"/>
+  <!-- Hole at x=80, y=110 -->
+  <circle cx="80" cy="110" r="5" fill="white" stroke="#a855f7" stroke-width="2"/>
+  <!-- Point elsewhere -->
+  <circle cx="80" cy="128" r="4" fill="#a855f7"/>
+
+  <text x="81" y="162" font-size="7.5" class="mu" text-anchor="middle">limit exists, but</text>
+  <text x="81" y="173" font-size="7.5" class="mu" text-anchor="middle">f(c) is wrong/missing</text>
+  <rect x="18" y="178" width="126" height="16" rx="4" fill="#f3e8ff"/>
+  <text x="81" y="189" font-size="7.5" fill="#7e22ce" text-anchor="middle" font-weight="700">can be "fixed" by redefining</text>
+
+  <!-- PANEL 2: Jump -->
+  <rect x="169" y="24" width="142" height="168" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="240" y="41" font-size="9" fill="#b45309" text-anchor="middle" font-weight="700">JUMP</text>
+  <text x="240" y="53" font-size="7.5" class="mu" text-anchor="middle">(one-sided limits differ)</text>
+
+  <line x1="177" y1="155" x2="303" y2="155" stroke="#94a3b8" stroke-width="1"/>
+  <!-- Left piece -->
+  <line x1="178" y1="142" x2="234" y2="118" stroke="#f59e0b" stroke-width="2.5"/>
+  <circle cx="234" cy="118" r="5" fill="white" stroke="#f59e0b" stroke-width="2"/>
+  <!-- Right piece (higher) -->
+  <line x1="246" y1="86" x2="298" y2="70" stroke="#f59e0b" stroke-width="2.5"/>
+  <circle cx="246" cy="86" r="4" fill="#f59e0b"/>
+  <!-- Jump arrow -->
+  <line x1="240" y1="118" x2="240" y2="86" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <text x="240" y="162" font-size="7.5" class="mu" text-anchor="middle">left lim ≠ right lim</text>
+  <text x="240" y="173" font-size="7.5" class="mu" text-anchor="middle">limit simply DNE</text>
+  <rect x="177" y="178" width="126" height="16" rx="4" fill="#fde68a"/>
+  <text x="240" y="189" font-size="7.5" fill="#78350f" text-anchor="middle" font-weight="700">cannot be fixed by redefining</text>
+
+  <!-- PANEL 3: Infinite -->
+  <rect x="328" y="24" width="142" height="168" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="399" y="41" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="700">INFINITE</text>
+  <text x="399" y="53" font-size="7.5" class="mu" text-anchor="middle">(vertical asymptote)</text>
+
+  <line x1="336" y1="155" x2="462" y2="155" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="399" y1="32" x2="399" y2="168" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <!-- Curve branches: 1/x shape -->
+  <path d="M 336,150 Q 370,148 385,140 Q 393,130 397,40" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+  <path d="M 462,158 Q 430,157 415,150 Q 405,140 401,40" fill="none" stroke="#ef4444" stroke-width="2.5"/>
+
+  <text x="399" y="162" font-size="7.5" class="mu" text-anchor="middle">f(x) → ±∞ as x → c</text>
+  <text x="399" y="173" font-size="7.5" class="mu" text-anchor="middle">function unbounded</text>
+  <rect x="336" y="178" width="126" height="16" rx="4" fill="#fca5a5"/>
+  <text x="399" y="189" font-size="7.5" fill="#7f1d1d" text-anchor="middle" font-weight="700">cannot be fixed; domain gap</text>
+</svg>

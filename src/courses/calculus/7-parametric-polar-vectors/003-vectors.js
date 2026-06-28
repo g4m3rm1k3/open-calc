@@ -1,4 +1,6 @@
 import vectorsUrl from '../diagrams/calc-vectors.svg?url';
+import dotProductUrl from '../diagrams/calc-dot-product.svg?url';
+import crossProductUrl from '../diagrams/calc-cross-product.svg?url';
 // FILE: src/content/chapter-6/02-vectors.js
 export default {
   id: 'ch6-vectors',
@@ -30,17 +32,27 @@ export default {
       'A vector is an arrow with two attributes: **magnitude** (its length) and **direction** (which way it points). Two vectors are equal if and only if they have the same magnitude and direction — position does not matter. You can slide a vector anywhere in space and it is still the "same" vector.',
 
       'In coordinates: a 2D vector **v** = ⟨a, b⟩ means "go a units in the x-direction and b units in the y-direction." The magnitude (length) is |**v**| = √(a²+b²) — just the Pythagorean theorem. The direction is the angle θ = arctan(b/a). In 3D: **v** = ⟨a, b, c⟩, |**v**| = √(a²+b²+c²).',
-
+        ],
+      },
+      { type: 'image', src: vectorsUrl, alt: 'Vector addition parallelogram and magnitude/unit-vector diagram', caption: 'Vectors encode both magnitude and direction; addition, scaling, and dot products are the core operations.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Vector **addition** is the famous parallelogram law. To add **u** and **v**: place **v** at the tip of **u**, and draw the arrow from the tail of **u** to the tip of **v**. In components: ⟨a,b⟩ + ⟨c,d⟩ = ⟨a+c, b+d⟩. Geometrically, this is how forces combine (resultant force), how displacements add, and how velocities compose.',
 
       'Scalar multiplication **kv** stretches (|k| > 1), shrinks (|k| < 1), or reverses (k < 0) a vector while keeping its direction. In components: k⟨a,b⟩ = ⟨ka, kb⟩. A **unit vector** has magnitude 1; the unit vector in the direction of **v** is **v̂** = **v**/|**v**|.',
-
+        ],
+      },
+      { type: 'image', src: dotProductUrl, alt: 'a·b = |a||b|cosθ with projection diagram and perpendicularity condition', caption: 'Dot product: a·b = Σaᵢbᵢ = |a||b|cosθ. Perpendicular vectors give a·b = 0; it computes projections and angles.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The **dot product** **u** · **v** = |**u**||**v**|cos(θ) = a₁a₂ + b₁b₂ (+ c₁c₂ in 3D) is a SCALAR. It measures the \"amount of **u** in the direction of **v**\". When **u** ⊥ **v**, cos(θ) = 0 so **u** · **v** = 0. This is the algebraic test for perpendicularity. The dot product also gives the projection of **u** onto **v**: proj_v(**u**) = ((**u**·**v**)/|**v**|²) **v**.',
 
       'The **cross product** **u** × **v** exists in 3D and gives a VECTOR perpendicular to both **u** and **v**, with magnitude |**u**||**v**|sin(θ) (equal to the area of the parallelogram spanned by **u** and **v**). Right-hand rule: curl fingers from **u** toward **v** — thumb points in the direction of **u** × **v**. In components: if **u** = ⟨u₁,u₂,u₃⟩ and **v** = ⟨v₁,v₂,v₃⟩, then **u** × **v** = ⟨u₂v₃−u₃v₂, u₃v₁−u₁v₃, u₁v₂−u₂v₁⟩ (expand a 3×3 determinant).',
         ],
       },
-      { type: 'image', src: vectorsUrl, alt: 'Vector addition parallelogram and magnitude/unit-vector diagram', caption: 'Vectors encode both magnitude and direction; addition, scaling, and dot products are the core operations.' },
+      { type: 'image', src: crossProductUrl, alt: 'a×b perpendicular to both a and b with parallelogram area |a×b|', caption: 'Cross product: a×b is perpendicular to both a and b with |a×b| = |a||b|sinθ — equals the area of the parallelogram spanned by the two vectors.' },
     ],
     callouts: [
       {

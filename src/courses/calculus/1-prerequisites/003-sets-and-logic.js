@@ -1,4 +1,6 @@
 import numberLineUrl from '../diagrams/calc-number-line.svg?url';
+import setsVennUrl from '../diagrams/calc-sets-venn.svg?url';
+import logicTableUrl from '../diagrams/calc-logic-table.svg?url';
 export default {
   id: 'ch0-sets-and-logic',
   slug: 'sets-and-logic',
@@ -28,9 +30,19 @@ export default {
       'You can describe a set in two ways. **Roster notation** lists the elements explicitly: $\\{2, 4, 6, 8\\}$. **Set-builder notation** describes a rule: $\\{x \\in \\mathbb{Z} : x \\text{ is even and } 0 < x < 10\\}$. The colon (or vertical bar |) reads as "such that." Both describe the same set.',
 
       'The **empty set** $\\emptyset = \\{\\}$ contains no elements. It is a valid set — think of it as an empty box. Every set contains $\\emptyset$ as a subset, which might feel strange, but it is true by a logical technicality we will see in the rigor tab.',
-
+        ],
+      },
+      { type: 'image', src: numberLineUrl, alt: 'Number line showing open and closed intervals as sets', caption: 'Interval notation and set-builder notation describe the same collection of numbers two different ways.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Now for combining sets. The **union** $A \\cup B$ is everything in A or B (or both) — think of it as "gathering together." The **intersection** $A \\cap B$ is everything in both A and B — think of it as "overlap." The **complement** $A^c$ (or $\\overline{A}$) is everything NOT in A (relative to some universal set). The **set difference** $A \\setminus B$ is everything in A that is not in B.',
-
+        ],
+      },
+      { type: 'image', src: setsVennUrl, alt: 'Three Venn diagram panels showing union, intersection, and set difference', caption: 'Union (A∪B) includes everything in either set; intersection (A∩B) keeps only shared elements; difference (A\\B) removes B from A.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Logic is the grammar of mathematics. The basic **connectives** are: AND ($\\wedge$), OR ($\\vee$), NOT ($\\neg$), IMPLIES ($\\Rightarrow$), and IF AND ONLY IF ($\\Leftrightarrow$). In math, OR is always **inclusive** — "A or B" means "A or B or both." This differs from everyday English where "or" often means "one or the other but not both."',
 
       'The two **quantifiers** are the heart of formal mathematics. The **universal quantifier** $\\forall$ means "for all" or "for every." The **existential quantifier** $\\exists$ means "there exists" or "there is at least one." The statement $\\forall x \\in \\mathbb{R},\\; x^2 \\geq 0$ says "every real number squared is non-negative." The statement $\\exists x \\in \\mathbb{R} : x^2 = 2$ says "there is some real number whose square is 2."',
@@ -38,7 +50,7 @@ export default {
       'Negating quantified statements follows a beautiful pattern: the negation of "for all" is "there exists one that does not," and the negation of "there exists" is "for all, it is not." Symbolically: $\\neg(\\forall x, P(x)) \\equiv \\exists x, \\neg P(x)$ and $\\neg(\\exists x, P(x)) \\equiv \\forall x, \\neg P(x)$. This is crucial for understanding epsilon-delta proofs, where you often need to negate a limit definition.',
         ],
       },
-      { type: 'image', src: numberLineUrl, alt: 'Number line showing open and closed intervals as sets', caption: 'Interval notation and set-builder notation describe the same collection of numbers two different ways.' },
+      { type: 'image', src: logicTableUrl, alt: 'Truth table for AND, OR, NOT, and implication with a calculus example contrapositive', caption: 'Logic connectives govern every "if-then" statement in calculus proofs; the contrapositive swaps and negates both sides while preserving truth.' },
     ],
     callouts: [
       {

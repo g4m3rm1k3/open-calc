@@ -1,4 +1,6 @@
 import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
+import arcsinGraphUrl from '../diagrams/calc-arcsin-graph.svg?url';
+import inverseTrigTableUrl from '../diagrams/calc-inverse-trig-table.svg?url';
 export default {
   id: 'ch0-inverse-trig-functions',
   slug: 'inverse-trig-functions',
@@ -33,6 +35,7 @@ export default {
           'That inverse is called **arcsin** or sin⁻¹.',
         ],
       },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing angle and its trig values for inverse functions', caption: 'Inverse trig functions answer "what angle gives this ratio?" — reading the unit circle backwards.' },
       {
         type: 'callout',
         callout: {
@@ -64,6 +67,7 @@ export default {
           'arctan has domain (−∞, ∞) and range (−π/2, π/2).',
         caption: 'Toggle between arcsin, arccos, and arctan. Notice how the restricted parent "unfolds" into the inverse.',
       },
+      { type: 'image', src: arcsinGraphUrl, alt: 'Three panels showing the graphs of arcsin, arccos, and arctan with domains and ranges', caption: 'Each inverse trig function is the original restricted to a one-to-one piece — arcsin on [−π/2, π/2], arccos on [0, π], arctan on (−π/2, π/2).' },
       {
         type: 'prose',
         paragraphs: [
@@ -73,7 +77,7 @@ export default {
           'arctan(x) has two horizontal asymptotes: y = −π/2 as x → −∞, and y = π/2 as x → +∞.',
         ],
       },
-      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing angle and its trig values for inverse functions', caption: 'Inverse trig functions answer "what angle gives this ratio?" — reading the unit circle backwards.' },
+      { type: 'image', src: inverseTrigTableUrl, alt: 'Table of all six inverse trig functions with domain, range, and derivative formula', caption: 'The derivatives of inverse trig functions appear constantly in integration — recognizing 1/√(1−x²) as d/dx[arcsin] is a key pattern.' },
     ],
   },
 

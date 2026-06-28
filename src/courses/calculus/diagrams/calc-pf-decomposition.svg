@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Partial Fraction Forms — All Cases</text>
+  <rect x="8" y="24" width="464" height="170" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="16" y="32" width="448" height="14" rx="0" fill="#e2e8f0"/>
+  <text x="150" y="43" font-size="7.5" fill="#1e293b" text-anchor="middle" font-weight="700">Factor Type</text>
+  <text x="370" y="43" font-size="7.5" fill="#1e293b" text-anchor="middle" font-weight="700">Partial Fraction Form</text>
+  <rect x="16" y="46" width="448" height="20" rx="0" fill="#dbeafe"/>
+  <text x="150" y="60" font-size="8" fill="#1d4ed8" text-anchor="middle">Distinct linear: (x−a)</text>
+  <text x="370" y="60" font-size="8" fill="#1d4ed8" text-anchor="middle">A/(x−a)</text>
+  <rect x="16" y="66" width="448" height="20" rx="0" fill="#f8fafc"/>
+  <text x="150" y="80" font-size="8" fill="#374151" text-anchor="middle">Repeated linear: (x−a)²</text>
+  <text x="370" y="80" font-size="8" fill="#374151" text-anchor="middle">A/(x−a) + B/(x−a)²</text>
+  <rect x="16" y="86" width="448" height="20" rx="0" fill="#dbeafe"/>
+  <text x="150" y="100" font-size="8" fill="#1d4ed8" text-anchor="middle">Irreducible quadratic: x²+bx+c</text>
+  <text x="370" y="100" font-size="8" fill="#1d4ed8" text-anchor="middle">(Ax+B)/(x²+bx+c)</text>
+  <rect x="16" y="106" width="448" height="20" rx="0" fill="#f8fafc"/>
+  <text x="150" y="120" font-size="8" fill="#374151" text-anchor="middle">Repeated quadratic: (x²+1)²</text>
+  <text x="370" y="120" font-size="8" fill="#374151" text-anchor="middle">(Ax+B)/(x²+1) + (Cx+D)/(x²+1)²</text>
+  <rect x="16" y="126" width="448" height="20" rx="0" fill="#dbeafe"/>
+  <text x="150" y="140" font-size="8" fill="#1d4ed8" text-anchor="middle">Triple linear: (x−a)³</text>
+  <text x="370" y="140" font-size="8" fill="#1d4ed8" text-anchor="middle">A/(x−a) + B/(x−a)² + C/(x−a)³</text>
+  <rect x="16" y="146" width="448" height="38" rx="4" fill="#fef3c7"/>
+  <text x="240" y="162" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">Prerequisite: degree of numerator must be LESS than degree of denominator.</text>
+  <text x="240" y="177" font-size="8" fill="#78350f" text-anchor="middle">If not: divide first (polynomial long division) to get proper fraction + polynomial.</text>
+</svg>

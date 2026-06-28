@@ -1,4 +1,6 @@
 import conicSectionsUrl from '../diagrams/calc-conic-sections.svg?url';
+import parabolaVertexUrl from '../diagrams/calc-parabola-vertex.svg?url';
+import ellipseCircleHyperbolaUrl from '../diagrams/calc-ellipse-circle-hyperbola.svg?url';
 export default {
   id: 'ch0-conic-sections',
   slug: 'conic-sections',
@@ -23,12 +25,24 @@ export default {
         paragraphs: [
       'Conic sections are what you get by slicing a cone with a plane: circle, ellipse, parabola, or hyperbola.',
       'Each family has two views: an algebraic quadratic equation and a geometric distance rule. Both matter.',
+        ],
+      },
+      { type: 'image', src: conicSectionsUrl, alt: 'The three conic sections: parabola, ellipse, and hyperbola', caption: 'Each conic is a cross-section of a double cone, defined by its distance relationship to foci.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Circle: fixed distance from one center. Ellipse: fixed sum of distances to two foci. Hyperbola: fixed absolute difference of distances to two foci. Parabola: equal distance to focus and directrix.',
+        ],
+      },
+      { type: 'image', src: ellipseCircleHyperbolaUrl, alt: 'Three panels showing circle, ellipse, and hyperbola with their standard equations', caption: 'Circles and ellipses are closed curves; hyperbolas open outward with asymptotes — each equation differs only in the sign between the squared terms.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Completing the square is the decoder that turns expanded equations into standard forms where centers, vertices, and axes are visible.',
       'This is not isolated algebra. Conic structure appears in optimization constraints, implicit differentiation, and substitution patterns in integration.',
         ],
       },
-      { type: 'image', src: conicSectionsUrl, alt: 'The three conic sections: parabola, ellipse, and hyperbola', caption: 'Each conic is a cross-section of a double cone, defined by its distance relationship to foci.' },
+      { type: 'image', src: parabolaVertexUrl, alt: 'Parabola graph with vertex labeled and a comparison of standard vs vertex form', caption: 'Vertex form y = a(x−h)² + k reads off the vertex directly; in calculus the vertex is the critical point where the derivative equals zero.' },
     ],
     callouts: [
       {

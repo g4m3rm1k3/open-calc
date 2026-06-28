@@ -1,4 +1,6 @@
 import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
+import implicitDiffUrl from '../diagrams/calc-implicit-diff.svg?url';
+import circleImplicitUrl from '../diagrams/calc-circle-implicit.svg?url';
 // FILE: src/content/chapter-2/05-implicit-differentiation.js
 export default {
   id: 'ch2-005',
@@ -40,11 +42,22 @@ export default {
 
       'The key insight of implicit differentiation is deceptively simple: y is a function of x. Even if we have not solved for y explicitly — even if solving for y is impossible — we can still treat y as if it is some function y(x). We just do not know which function it is. That is fine, because the chain rule tells us how to differentiate any expression involving y with respect to x, regardless of what y\'s explicit formula might be.',
       'The chain rule says: to differentiate a function of y with respect to x, differentiate with respect to y first, then multiply by dy/dx. This is because y is the inner function and x is the outer variable. So d/dx[y\u00b2] = 2y\u00b7(dy/dx), not just 2y. And d/dx[sin(y)] = cos(y)\u00b7(dy/dx). And d/dx[e^y] = e^y\u00b7(dy/dx). In each case, we treat y as a function of x and apply the chain rule.',
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Curve showing tangent line found via implicit differentiation', caption: 'Implicit differentiation applies when y cannot be isolated — differentiate both sides and solve for dy/dx.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The procedure is clean and algorithmic. Step 1: Write down the equation. Step 2: Differentiate both sides with respect to x, applying the chain rule to every y-expression. Step 3: Gather all terms containing dy/dx on one side of the equation. Step 4: Factor out dy/dx. Step 5: Divide to isolate dy/dx. The result expresses dy/dx in terms of both x and y — which is perfectly fine, since dy/dx is the slope of the curve at a specific point (x, y).',
       'Why does dy/dx involve both x and y? Because the slope of an implicit curve at a point depends on where you are on the curve, and to specify a location on a curve like a circle you need both coordinates. At the point (3, 4) on x\u00b2+y\u00b2=25, the slope is different from the slope at (4, 3), even though both x and y values are the same set of numbers.',
       'The tangent line to an implicit curve at a point (x\u2080, y\u2080) is found the same way as always: evaluate dy/dx at (x\u2080, y\u2080) to get the slope m, then use the point-slope formula y - y\u2080 = m(x - x\u2080). The only new subtlety is that dy/dx may involve both x and y, so we must substitute both coordinates to get a number.',
       'The normal line to a curve at a point is perpendicular to the tangent line. If the tangent has slope m, the normal has slope -1/m. Normal lines appear in optics (reflections) and in differential geometry (evolutes and involutes).',
-
+        ],
+      },
+      { type: 'image', src: implicitDiffUrl, alt: 'Implicit differentiation concept diagram', caption: 'When y is defined implicitly by F(x,y)=0, differentiate both sides with respect to x, treating y as a function of x, then solve for dy/dx.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**Where this is heading:** You now know how to differentiate anything — explicit or implicit. The final synthesis lesson (Lesson 10) asks a different kind of question: given the *graph* of a function, what can you read directly about its derivatives, without any computation? That visual literacy closes Chapter 2.',
 
       '**A hard implicit curve — the folium of Descartes:** The equation x\u00b3+y\u00b3=6xy is a genuinely hard implicit curve. Unlike the circle x\u00b2+y\u00b2=r\u00b2, you cannot split the folium into two explicit halves y = (something). There is no algebraic formula for y in terms of x. Yet implicit differentiation still delivers dy/dx = (2xy\u2212x\u00b2)/(y\u00b2\u22122xy) without any knowledge of what y explicitly is. The formula tells you the slope at any point (x,y) on the curve, even at points where the curve crosses itself (the origin, where the formula breaks down because both numerator and denominator vanish). This is the power of the method: the algebraic structure alone carries enough information to find the slope, without ever needing to solve for y.',
@@ -54,7 +67,7 @@ export default {
       '**The big picture — constraint sensitivity:** The formula dy/dx = \u2212F_x/F_y (where F(x,y)=0 is the defining equation) is more than a calculation trick. It expresses the rate at which y must change to keep the constraint satisfied as x changes. In economics this is a marginal rate of substitution; in thermodynamics it is a thermodynamic slope along a level curve; in constrained optimization it appears in the Lagrange multiplier condition. The slope of a level curve of F is exactly \u2212F_x/F_y, and that quantity appears everywhere in multivariable calculus, optimization, and applied mathematics. Implicit differentiation is not just a technique for circles and ellipses \u2014 it is the foundational formula connecting partial derivatives to constrained rates of change.',
         ],
       },
-      { type: 'image', src: secantToTangentUrl, alt: 'Curve showing tangent line found via implicit differentiation', caption: 'Implicit differentiation applies when y cannot be isolated — differentiate both sides and solve for dy/dx.' },
+      { type: 'image', src: circleImplicitUrl, alt: 'Implicit differentiation on x²+y²=25 showing step-by-step derivation of dy/dx = -x/y', caption: 'Apply d/dx to both sides, use chain rule on y terms (multiply by dy/dx), then isolate dy/dx.' },
     ],
     callouts: [
       {

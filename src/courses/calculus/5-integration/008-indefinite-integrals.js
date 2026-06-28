@@ -1,4 +1,6 @@
 import antiderivativeUrl from '../diagrams/calc-antiderivative.svg?url';
+import indefiniteRulesTableUrl from '../diagrams/calc-indefinite-rules-table.svg?url';
+import plusCFamilyUrl from '../diagrams/calc-plus-c-family.svg?url';
 // FILE: src/content/chapter-4/04-indefinite-integrals.js
 export default {
   id: 'ch4-004',
@@ -73,6 +75,12 @@ export default {
       '— Since $\\frac{d}{dx}[e^x] = e^x$, we have $\\int e^x\\,dx = e^x + C$.',
       'No new concept is needed — only the ability to read derivative rules backward.',
       '▶ **Pause and verify:** Before reading on, check two antiderivatives from memory. **(1)** Write $\\int e^x\\,dx$. **(2)** Write $\\int \\cos x\\,dx$. Then differentiate each answer and confirm it returns the original integrand. If it checks out — you used the core idea correctly.',
+        ],
+      },
+      { type: 'image', src: antiderivativeUrl, alt: 'Antiderivative pairs showing the family of curves differing by a constant C', caption: 'An indefinite integral produces a family of antiderivatives — all differing by a constant C.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'An antiderivative of f(x) is any function F(x) with F\'(x) = f(x). The process is differentiation run backwards. Since d/dx[x³] = 3x², the antiderivative of 3x² is x³. Since d/dx[sin(x)] = cos(x), the antiderivative of cos(x) is sin(x). Since d/dx[eˣ] = eˣ, the antiderivative of eˣ is eˣ. Every entry in the differentiation table can be read backwards to give an antiderivative rule.',
       'The critical new feature is the constant of integration, written +C. If F(x) is one antiderivative of f(x), then F(x)+5, F(x)−π, and F(x)+C for any constant C are also antiderivatives, because d/dx[F(x)+C] = F\'(x)+0 = f(x). Conversely, any two antiderivatives of the same function differ by a constant (proved using the MVT: if G\'=F\'=f, then (G−F)\'=0, so G−F=constant). The indefinite integral ∫f(x)dx denotes the entire family of antiderivatives: ∫f(x)dx = F(x)+C. Forgetting the +C is a mathematical error — the antiderivative is a family of functions, not a single function.',
       'The power rule for integration inverts the power rule for differentiation. Since d/dx[xⁿ⁺¹/(n+1)] = xⁿ (for n ≠ −1), we have ∫xⁿ dx = xⁿ⁺¹/(n+1) + C. The exception n = −1 is special: x⁻¹ = 1/x has antiderivative ln|x|, not x⁰/0 (which is undefined). The power rule covers polynomials, roots (fractional powers), and negative powers — a vast class of functions. Any polynomial ∫(aₙxⁿ + ··· + a₁x + a₀) dx is computed term by term.',
@@ -85,6 +93,12 @@ export default {
       '$$\\int \\frac{1}{x}\\,dx = \\ln|x| + C$$',
       'The logarithm appears here not by convention — it is the unique elementary function with this derivative. This is also why logarithms are so closely connected to areas under hyperbolas in the history of calculus.',
       '▶ **Try it now:** Using the "guess → check → fix" method, derive $\\int x^7\\,dx$ from scratch. Do not use the formula — start with the guess $x^8$, differentiate, identify the extra factor, divide to correct it, verify. Write every step.',
+        ],
+      },
+      { type: 'image', src: indefiniteRulesTableUrl, alt: 'Table of basic integration rules: power, exponential, trig, and log rules', caption: 'The core integration table — each rule is a derivative rule read in reverse.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The linearity of differentiation — d/dx[cf+g] = cf\'+g\' — runs backwards to give linearity of integration: ∫[cf(x)+g(x)]dx = c∫f(x)dx + ∫g(x)dx. This means integrals split across addition and constants factor out. To integrate a sum, integrate each term separately. To integrate a constant multiple, factor it out. Combined with the power rule, this handles any polynomial. The only restriction is that the split must happen BEFORE integrating — you cannot factor or split after integration without reintroducing constants.',
       '▶ **Apply linearity:** integrate $\\int(4x^3 - 6x + 2)\\,dx$. Write out three explicit steps: (1) split into three integrals, (2) factor out the constants, (3) apply the power rule to each. Verify your answer by differentiating.',
       'Initial value problems (IVPs) pin down the arbitrary constant C using an extra condition — typically a value of the function at a specific point. The procedure: integrate to find F(x) = G(x)+C (the general antiderivative), substitute the given condition F(x₀) = y₀ to find C, and write the specific solution F(x) = G(x) + (y₀ − G(x₀)). IVPs are ubiquitous in physics: "a ball is thrown upward at 20 m/s from a height of 5 m" gives both the initial velocity and initial position, which together determine the height function x(t) = 5 + 20t − 4.9t² completely.',
@@ -93,7 +107,7 @@ export default {
       '▶ **Pattern recognition drill:** for each integral below, name the technique you would use — *do not integrate yet*. **(1)** $\\int x^{10}\\,dx$. **(2)** $\\int \\frac{1}{x}\\,dx$. **(3)** $\\int (5x^2 + \\cos x)\\,dx$. **(4)** $\\int (3x-1)^8\\,dx$. **(5)** $\\int x \\ln x\\,dx$. **(6)** $\\int \\frac{x}{x^2 + 1}\\,dx$.',
         ],
       },
-      { type: 'image', src: antiderivativeUrl, alt: 'Antiderivative pairs showing the family of curves differing by a constant C', caption: 'An indefinite integral produces a family of antiderivatives — all differing by a constant C.' },
+      { type: 'image', src: plusCFamilyUrl, alt: 'Three parallel curves stacked vertically — same shape, different y-intercepts (+C)', caption: 'The +C is not optional: it represents an infinite family of functions that all have the same derivative.' },
     ],
     callouts: [
       {

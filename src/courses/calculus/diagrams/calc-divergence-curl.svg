@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Divergence and Curl (Preview)</text>
+  <!-- Divergence -->
+  <rect x="8" y="24" width="228" height="170" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="122" y="42" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Divergence</text>
+  <rect x="16" y="48" width="212" height="20" rx="3" fill="#dbeafe"/>
+  <text x="122" y="62" font-size="8" fill="#1d4ed8" text-anchor="middle">div F = ∂P/∂x + ∂Q/∂y + ∂R/∂z</text>
+  <text x="122" y="80" font-size="8" fill="#374151" text-anchor="middle">Measures net outflow from a point</text>
+  <!-- Arrows spreading out (positive div) -->
+  <circle cx="122" cy="120" r="4" fill="#6366f1"/>
+  <line x1="122" y1="120" x2="142" y2="104" stroke="#6366f1" stroke-width="2"/><polygon points="142,104 134,110 137,118" fill="#6366f1"/>
+  <line x1="122" y1="120" x2="145" y2="120" stroke="#6366f1" stroke-width="2"/><polygon points="145,120 135,115 135,125" fill="#6366f1"/>
+  <line x1="122" y1="120" x2="142" y2="136" stroke="#6366f1" stroke-width="2"/><polygon points="142,136 134,122 137,130" fill="#6366f1"/>
+  <line x1="122" y1="120" x2="102" y2="104" stroke="#6366f1" stroke-width="2"/><polygon points="102,104 110,110 107,118" fill="#6366f1"/>
+  <line x1="122" y1="120" x2="99" y2="120" stroke="#6366f1" stroke-width="2"/><polygon points="99,120 109,115 109,125" fill="#6366f1"/>
+  <line x1="122" y1="120" x2="102" y2="136" stroke="#6366f1" stroke-width="2"/><polygon points="102,136 110,122 107,130" fill="#6366f1"/>
+  <text x="122" y="158" font-size="7.5" fill="#374151" text-anchor="middle">div F &gt; 0: source</text>
+  <text x="122" y="170" font-size="7.5" fill="#374151" text-anchor="middle">div F &lt; 0: sink</text>
+  <text x="122" y="184" font-size="7.5" fill="#374151" text-anchor="middle">div F = 0: incompressible</text>
+  <!-- Curl -->
+  <rect x="244" y="24" width="228" height="170" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="358" y="42" font-size="9" fill="#166534" text-anchor="middle" font-weight="700">Curl</text>
+  <rect x="252" y="48" width="212" height="20" rx="3" fill="#bbf7d0"/>
+  <text x="358" y="62" font-size="8" fill="#14532d" text-anchor="middle">curl F = ∇ × F  (3D vector)</text>
+  <text x="358" y="80" font-size="8" fill="#374151" text-anchor="middle">Measures rotational tendency at a point</text>
+  <!-- Circular flow arrows -->
+  <circle cx="358" cy="120" r="4" fill="#22c55e"/>
+  <circle cx="358" cy="120" r="28" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <!-- Rotation arrows along circle -->
+  <line x1="358" y1="92" x2="368" y2="92" stroke="#22c55e" stroke-width="2"/><polygon points="368,92 360,88 360,96" fill="#22c55e"/>
+  <line x1="386" y1="120" x2="386" y2="130" stroke="#22c55e" stroke-width="2"/><polygon points="386,130 382,122 390,122" fill="#22c55e"/>
+  <line x1="358" y1="148" x2="348" y2="148" stroke="#22c55e" stroke-width="2"/><polygon points="348,148 356,144 356,152" fill="#22c55e"/>
+  <line x1="330" y1="120" x2="330" y2="110" stroke="#22c55e" stroke-width="2"/><polygon points="330,110 326,118 334,118" fill="#22c55e"/>
+  <text x="358" y="158" font-size="7.5" fill="#374151" text-anchor="middle">curl F ≠ 0: rotational field</text>
+  <text x="358" y="170" font-size="7.5" fill="#374151" text-anchor="middle">curl F = 0: conservative field</text>
+  <text x="358" y="184" font-size="7.5" fill="#374151" text-anchor="middle">(∮F·dr = 0 by Stokes' thm)</text>
+</svg>

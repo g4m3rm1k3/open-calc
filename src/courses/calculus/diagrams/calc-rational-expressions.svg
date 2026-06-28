@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Rational Expressions — Simplify, Multiply, Divide</text>
+  <!-- Simplify -->
+  <rect x="8" y="24" width="220" height="80" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="118" y="40" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">Simplify — Cancel Common Factors</text>
+  <text x="118" y="58" font-size="8.5" fill="#374151" text-anchor="middle">x²−4     (x+2)(x−2)</text>
+  <text x="118" y="72" font-size="8.5" fill="#374151" text-anchor="middle">─────  =  ──────────  =  x+2</text>
+  <text x="118" y="88" font-size="8.5" fill="#374151" text-anchor="middle">x−2            x−2</text>
+  <text x="118" y="100" font-size="7.5" fill="#ef4444" text-anchor="middle">Restriction: x ≠ 2</text>
+  <!-- Multiply -->
+  <rect x="236" y="24" width="236" height="80" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="354" y="40" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Multiply — Factor then Cancel</text>
+  <text x="354" y="58" font-size="8.5" fill="#374151" text-anchor="middle">a/b · c/d  =  ac/(bd)</text>
+  <text x="354" y="76" font-size="8" fill="#374151" text-anchor="middle">Factor ALL numerators and denominators</text>
+  <text x="354" y="92" font-size="8" fill="#374151" text-anchor="middle">first, then cancel across fraction bars</text>
+  <!-- Add/Subtract (LCD) -->
+  <rect x="8" y="112" width="220" height="80" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="118" y="128" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">Add/Subtract — Find LCD</text>
+  <text x="118" y="146" font-size="8" fill="#374151" text-anchor="middle">1/x + 1/(x+1)  →  LCD = x(x+1)</text>
+  <text x="118" y="162" font-size="8" fill="#374151" text-anchor="middle">= (x+1)/x(x+1) + x/x(x+1)</text>
+  <text x="118" y="178" font-size="9" fill="#92400e" text-anchor="middle" font-weight="700">= (2x+1)/x(x+1)</text>
+  <!-- Divide -->
+  <rect x="236" y="112" width="236" height="80" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="354" y="128" font-size="8.5" fill="#5b21b6" text-anchor="middle" font-weight="700">Divide — Flip the Second</text>
+  <text x="354" y="146" font-size="8.5" fill="#374151" text-anchor="middle">a/b ÷ c/d  =  a/b · d/c</text>
+  <text x="354" y="162" font-size="8" fill="#374151" text-anchor="middle">"Keep, Change, Flip"</text>
+  <text x="354" y="178" font-size="8" fill="#7c3aed" text-anchor="middle">Then factor and cancel as normal</text>
+</svg>

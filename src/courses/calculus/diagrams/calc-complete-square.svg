@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Completing the Square — Visual &amp; Algebraic</text>
+  <!-- Geometric intuition (left) -->
+  <rect x="8" y="24" width="200" height="170" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="108" y="40" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Geometric Intuition</text>
+  <!-- x² box -->
+  <rect x="24" y="48" width="80" height="80" fill="#6366f1" opacity="0.4" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="64" y="92" font-size="10" fill="#4338ca" text-anchor="middle">x²</text>
+  <text x="64" y="44" font-size="8" fill="#4338ca" text-anchor="middle">x</text>
+  <text x="14" y="90" font-size="8" fill="#4338ca">x</text>
+  <!-- Two bx/2 rectangles -->
+  <rect x="104" y="48" width="36" height="80" fill="#22c55e" opacity="0.4" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="122" y="92" font-size="8" fill="#166534" text-anchor="middle">bx/2</text>
+  <rect x="24" y="128" width="80" height="36" fill="#22c55e" opacity="0.4" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="64" y="150" font-size="8" fill="#166534" text-anchor="middle">bx/2</text>
+  <!-- Missing corner -->
+  <rect x="104" y="128" width="36" height="36" fill="#fef3c7" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,3"/>
+  <text x="122" y="150" font-size="8" fill="#92400e" text-anchor="middle">(b/2)²</text>
+  <text x="108" y="185" font-size="8" fill="#374151" text-anchor="middle">Add missing corner to complete!</text>
+  <!-- Algebraic steps (right) -->
+  <rect x="216" y="24" width="256" height="170" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="344" y="40" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Algorithm: x² + bx + c</text>
+  <rect x="224" y="48" width="240" height="22" rx="3" fill="#dbeafe"/>
+  <text x="344" y="63" font-size="8.5" fill="#1d4ed8" text-anchor="middle">Step 1: Take half of b → (b/2)</text>
+  <rect x="224" y="74" width="240" height="22" rx="3" fill="#dcfce7"/>
+  <text x="344" y="89" font-size="8.5" fill="#166534" text-anchor="middle">Step 2: Square it → (b/2)²</text>
+  <rect x="224" y="100" width="240" height="22" rx="3" fill="#fef3c7"/>
+  <text x="344" y="115" font-size="8.5" fill="#92400e" text-anchor="middle">Step 3: Add and subtract (b/2)²</text>
+  <rect x="224" y="126" width="240" height="22" rx="3" fill="#ede9fe"/>
+  <text x="344" y="141" font-size="8.5" fill="#5b21b6" text-anchor="middle">Result: (x + b/2)² + (c − (b/2)²)</text>
+  <rect x="224" y="154" width="240" height="34" rx="4" fill="#fce7f3"/>
+  <text x="344" y="168" font-size="8.5" fill="#be185d" text-anchor="middle" font-weight="700">Example: x²+6x+5</text>
+  <text x="344" y="182" font-size="8.5" fill="#374151" text-anchor="middle">= (x+3)² + 5−9 = (x+3)² − 4</text>
+</svg>

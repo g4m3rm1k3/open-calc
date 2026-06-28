@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Similar Triangles — The Scaling Law</text>
+
+  <!-- Small triangle: vertices (30,170), (130,170), (80,70) -->
+  <polygon points="30,170 130,170 80,70" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+
+  <!-- Label sides of small triangle -->
+  <!-- Bottom (a): 30→130 = 100px  -->
+  <text x="80" y="185" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">a = 5</text>
+  <!-- Left (b): 30,170→80,70 length = √(50²+100²)=√12500≈112 -->
+  <text x="42" y="120" font-size="9" fill="#1d4ed8" font-weight="700">b = 6</text>
+  <!-- Right (c): 130,170→80,70 -->
+  <text x="118" y="120" font-size="9" fill="#1d4ed8" font-weight="700">c = 7</text>
+
+  <!-- Angle marks (same angles) -->
+  <text x="36" y="168" font-size="11" fill="#ef4444">∠A</text>
+  <text x="115" y="168" font-size="11" fill="#ef4444">∠B</text>
+  <text x="75" y="82" font-size="11" fill="#ef4444">∠C</text>
+
+  <!-- Scale factor label -->
+  <rect x="148" y="95" width="56" height="30" rx="6" fill="#fde68a"/>
+  <text x="176" y="108" font-size="8" fill="#78350f" text-anchor="middle" font-weight="700">scale</text>
+  <text x="176" y="119" font-size="9" fill="#92400e" text-anchor="middle" font-weight="800">k = 1.6</text>
+  <defs>
+    <marker id="arr3" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+      <polygon points="0,0 8,3.5 0,7" fill="#92400e"/>
+    </marker>
+  </defs>
+  <line x1="204" y1="110" x2="222" y2="110" stroke="#92400e" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+  <!-- Large triangle: scaled by 1.6 from (230,170) to (390,170) -->
+  <!-- Base = 160, height = 160, left vertex at (310,10)... but that's off screen -->
+  <!-- Let me use scale 1.4: base=140, height=140 -->
+  <!-- vertices: (226,178), (366,178), (296,18) -->
+  <polygon points="226,178 366,178 296,50" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5"/>
+
+  <!-- Label sides of large triangle -->
+  <text x="296" y="194" font-size="9" fill="#15803d" text-anchor="middle" font-weight="700">a′ = 8</text>
+  <text x="233" y="116" font-size="9" fill="#15803d" font-weight="700">b′ = 9.6</text>
+  <text x="355" y="116" font-size="9" fill="#15803d" font-weight="700">c′ = 11.2</text>
+
+  <!-- Same angle marks -->
+  <text x="230" y="176" font-size="11" fill="#ef4444">∠A</text>
+  <text x="346" y="176" font-size="11" fill="#ef4444">∠B</text>
+  <text x="288" y="62" font-size="11" fill="#ef4444">∠C</text>
+
+  <!-- Same shape -->
+  <text x="296" y="34" font-size="9" fill="#15803d" text-anchor="middle" font-weight="700">same angles ↑</text>
+
+  <!-- Proportion equations on right -->
+  <rect x="380" y="40" width="92" height="110" rx="8" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="426" y="58" font-size="8.5" fill="#0369a1" text-anchor="middle" font-weight="700">Ratios Equal</text>
+  <line x1="384" y1="64" x2="468" y2="64" stroke="#bae6fd" stroke-width="1"/>
+  <text x="426" y="78" font-size="8.5" fill="#0284c7" text-anchor="middle">a/a′ = 5/8</text>
+  <text x="426" y="92" font-size="8.5" fill="#0284c7" text-anchor="middle">b/b′ = 6/9.6</text>
+  <text x="426" y="106" font-size="8.5" fill="#0284c7" text-anchor="middle">c/c′ = 7/11.2</text>
+  <line x1="384" y1="112" x2="468" y2="112" stroke="#bae6fd" stroke-width="1"/>
+  <text x="426" y="126" font-size="8.5" fill="#0369a1" text-anchor="middle" font-weight="700">all = 1/k</text>
+
+  <!-- Bottom formula -->
+  <rect x="10" y="170" width="210" height="26" rx="6" fill="#dbeafe"/>
+  <text x="115" y="182" font-size="8" fill="#1d4ed8" text-anchor="middle">Areas: if sides scale by k,</text>
+  <text x="115" y="193" font-size="9" fill="#1e40af" text-anchor="middle" font-weight="700">area scales by k²</text>
+</svg>

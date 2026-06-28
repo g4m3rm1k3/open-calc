@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Telescoping Series</text>
+  <rect x="8" y="24" width="464" height="30" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="44" font-size="8.5" fill="#1d4ed8" text-anchor="middle">Write each term as a difference bₙ − bₙ₊₁ — all middle terms cancel</text>
+  <!-- Cancellation diagram -->
+  <rect x="8" y="62" width="464" height="92" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="240" y="80" font-size="8" fill="#374151" text-anchor="middle">Σ 1/(n(n+1)) — partial fractions: 1/(n(n+1)) = 1/n − 1/(n+1)</text>
+  <text x="30" y="100" font-size="8.5" fill="#374151">Sₙ =</text>
+  <rect x="65" y="88" width="60" height="18" rx="3" fill="#bbf7d0"/>
+  <text x="95" y="101" font-size="8" fill="#166534" text-anchor="middle">(1 − ½)</text>
+  <rect x="133" y="88" width="60" height="18" rx="3" fill="#fde68a"/>
+  <text x="163" y="101" font-size="8" fill="#92400e" text-anchor="middle">+(½ − ⅓)</text>
+  <rect x="201" y="88" width="60" height="18" rx="3" fill="#bbf7d0"/>
+  <text x="231" y="101" font-size="8" fill="#166534" text-anchor="middle">+(⅓ − ¼)</text>
+  <text x="275" y="101" font-size="8.5" fill="#374151">+…</text>
+  <rect x="300" y="88" width="80" height="18" rx="3" fill="#fde68a"/>
+  <text x="340" y="101" font-size="8" fill="#92400e" text-anchor="middle">+(1/n − 1/(n+1))</text>
+  <!-- Arrow showing cancellation -->
+  <line x1="120" y1="110" x2="155" y2="110" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="2 2"/>
+  <line x1="188" y1="110" x2="223" y2="110" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="2 2"/>
+  <text x="200" y="128" font-size="8" fill="#6366f1" text-anchor="middle">⟨ all interior terms cancel ⟩</text>
+  <rect x="16" y="136" width="448" height="14" rx="3" fill="#dbeafe"/>
+  <text x="240" y="147" font-size="8" fill="#1d4ed8" text-anchor="middle">Sₙ = 1 − 1/(n+1) → 1 as n→∞   ∴ Σ 1/(n(n+1)) = 1</text>
+  <!-- General form -->
+  <rect x="8" y="162" width="464" height="32" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="240" y="178" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">Strategy: partial fractions first, then spot the telescoping pattern</text>
+  <text x="240" y="190" font-size="7.5" fill="#374151" text-anchor="middle">Σ(bₙ − bₙ₊₁) = b₁ − lim bₙ (if limit exists)</text>
+</svg>

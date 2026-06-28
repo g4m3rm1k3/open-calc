@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Vertex Form &amp; Calculus Applications</text>
+  <!-- Vertex form box -->
+  <rect x="8" y="24" width="464" height="38" rx="6" fill="#4338ca"/>
+  <text x="240" y="40" font-size="11" fill="white" text-anchor="middle" font-weight="700">y = a(x − h)² + k   ←→   vertex at (h, k)</text>
+  <text x="240" y="56" font-size="8.5" fill="#c7d2fe" text-anchor="middle">a &gt; 0: opens up (min at vertex)   |   a &lt; 0: opens down (max at vertex)</text>
+  <!-- Three panels -->
+  <rect x="8" y="68" width="146" height="124" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="81" y="84" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Reading the Vertex</text>
+  <text x="81" y="100" font-size="9" fill="#374151" text-anchor="middle">y = 3(x−2)² + 5</text>
+  <line x1="16" y1="106" x2="146" y2="106" stroke="#22c55e" stroke-width="1"/>
+  <text x="81" y="120" font-size="8" fill="#374151" text-anchor="middle">h = 2  (note: minus!)</text>
+  <text x="81" y="134" font-size="8" fill="#374151" text-anchor="middle">k = 5</text>
+  <text x="81" y="150" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Vertex = (2, 5)</text>
+  <text x="81" y="166" font-size="8" fill="#374151" text-anchor="middle">a=3 &gt; 0 → min</text>
+  <text x="81" y="180" font-size="8" fill="#374151" text-anchor="middle">opens upward</text>
+  <rect x="162" y="68" width="156" height="124" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="84" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">Converting Forms</text>
+  <text x="240" y="100" font-size="8" fill="#374151" text-anchor="middle">Standard → Vertex:</text>
+  <text x="240" y="114" font-size="8" fill="#374151" text-anchor="middle">complete the square</text>
+  <line x1="170" y1="120" x2="310" y2="120" stroke="#6366f1" stroke-width="1"/>
+  <text x="240" y="134" font-size="8" fill="#374151" text-anchor="middle">Vertex → Standard:</text>
+  <text x="240" y="150" font-size="8" fill="#374151" text-anchor="middle">expand (x−h)²</text>
+  <text x="240" y="166" font-size="8" fill="#374151" text-anchor="middle">= x²−2hx+h²</text>
+  <text x="240" y="182" font-size="8" fill="#374151" text-anchor="middle">then simplify</text>
+  <rect x="326" y="68" width="146" height="124" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="399" y="84" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">Calculus Link</text>
+  <text x="399" y="100" font-size="8" fill="#374151" text-anchor="middle">Vertex = critical point</text>
+  <text x="399" y="116" font-size="8" fill="#374151" text-anchor="middle">f'(x) = 2a(x−h)</text>
+  <text x="399" y="132" font-size="8" fill="#374151" text-anchor="middle">f'(h) = 0 ✓</text>
+  <line x1="334" y1="138" x2="464" y2="138" stroke="#f59e0b" stroke-width="1"/>
+  <text x="399" y="154" font-size="8" fill="#374151" text-anchor="middle">Completing the square</text>
+  <text x="399" y="168" font-size="8" fill="#374151" text-anchor="middle">appears in trig sub</text>
+  <text x="399" y="184" font-size="8" fill="#f59e0b" text-anchor="middle">∫dx/(x²+a²) = arctan…</text>
+</svg>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react'
+import { createPortal } from 'react-dom'
 import Editor from '@monaco-editor/react'
 import { useContributorMode } from '../../../hooks/useContributorMode.js'
 import CreatePRModal from '../../contributor/CreatePRModal.jsx'
@@ -20,7 +21,7 @@ const MOPTS = {
 // Renders the SVG source as actual browser SVG — same technique as
 // LiveSvgPreview, so font metrics and .dark CSS rules work identically
 // to how the diagram appears in the real lesson.
-function SvgPreview({ xml, dark, onElementClick }) {
+function SvgPreview({ xml, dark, onElementClick, zoom = 1 }) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -51,7 +52,6 @@ function SvgPreview({ xml, dark, onElementClick }) {
   const handleClick = (e) => {
     const target = e.target.closest('[data-svg-idx]') ?? e.target
     if (target.dataset.svgIdx == null) return
-    // Build a search hint from the element's key attributes
     const tag = target.tagName.toLowerCase()
     const attrs = ['x', 'y', 'cx', 'cy', 'x1', 'y1', 'x2', 'y2', 'r', 'fill', 'stroke', 'class', 'points']
       .filter(a => target.hasAttribute(a))
@@ -61,11 +61,19 @@ function SvgPreview({ xml, dark, onElementClick }) {
 
   return (
     <div
-      ref={ref}
-      onClick={handleClick}
-      className="w-full overflow-auto p-6"
-      style={{ minHeight: '100%', background: dark ? '#1e293b' : '#f1f5f9' }}
-    />
+      className="w-full h-full overflow-auto"
+      style={{ background: dark ? '#1e293b' : '#f1f5f9' }}
+    >
+      <div
+        ref={ref}
+        onClick={handleClick}
+        style={{
+          width: `${Math.max(1, zoom) * 100}%`,
+          minHeight: '100%',
+          padding: 24,
+        }}
+      />
+    </div>
   )
 }
 
@@ -106,8 +114,31 @@ export default function SvgSourceEditor({ filePath, onClose }) {
   const [loading, setLoading] = useState(true)
   const [clickHint, setClickHint] = useState(null)
   const [rightMode, setRightMode] = useState('visual')  // 'preview' | 'visual'
+  const [leftPct, setLeftPct] = useState(50)
+  const [zoom, setZoom] = useState(1)
   const debounceRef = useRef(null)
   const editorRef = useRef(null)
+  const containerRef = useRef(null)
+  const dividerDrag = useRef(null)
+
+  const onDividerDown = useCallback((e) => {
+    e.preventDefault()
+    dividerDrag.current = { startX: e.clientX, startPct: leftPct }
+    const onMove = (ev) => {
+      if (!dividerDrag.current || !containerRef.current) return
+      const dx = ev.clientX - dividerDrag.current.startX
+      const totalW = containerRef.current.offsetWidth
+      const newPct = Math.max(15, Math.min(85, dividerDrag.current.startPct + (dx / totalW) * 100))
+      setLeftPct(newPct)
+    }
+    const onUp = () => {
+      dividerDrag.current = null
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [leftPct])
 
   // Track app theme for Monaco (independently from preview dark toggle)
   useEffect(() => {
@@ -176,7 +207,7 @@ export default function SvgSourceEditor({ filePath, onClose }) {
     findAndReveal(editorRef, hint)
   }, [])
 
-  return (
+  return createPortal(
     <>
     {showPR && filePath && (
       <CreatePRModal
@@ -184,7 +215,7 @@ export default function SvgSourceEditor({ filePath, onClose }) {
         onClose={() => setShowPR(false)}
       />
     )}
-    <div className="fixed inset-0 z-[620] flex flex-col" style={{ background: '#0d1117' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', flexDirection: 'column', background: '#0d1117' }}>
       {/* Top bar */}
       <div
         className="flex items-center gap-3 px-4 py-2.5 shrink-0 border-b"
@@ -245,9 +276,9 @@ export default function SvgSourceEditor({ filePath, onClose }) {
           Loading…
         </div>
       ) : (
-        <div className="flex flex-1 min-h-0">
+        <div ref={containerRef} className="flex flex-1 min-h-0">
           {/* Left: Monaco editor */}
-          <div className="flex flex-col min-h-0" style={{ width: '52%', borderRight: '1px solid #30363d' }}>
+          <div className="flex flex-col min-h-0" style={{ width: `${leftPct}%` }}>
             <div
               className="px-3 py-1 text-xs shrink-0 flex items-center gap-2"
               style={{ background: '#161b22', borderBottom: '1px solid #30363d', color: '#8b949e' }}
@@ -271,8 +302,18 @@ export default function SvgSourceEditor({ filePath, onClose }) {
             </div>
           </div>
 
+          {/* Draggable divider */}
+          <div
+            onMouseDown={onDividerDown}
+            className="shrink-0 flex items-center justify-center cursor-col-resize group select-none"
+            style={{ width: 6, background: '#21262d', borderLeft: '1px solid #30363d', borderRight: '1px solid #30363d' }}
+            title="Drag to resize panels"
+          >
+            <div className="w-0.5 h-8 rounded-full group-hover:bg-blue-500 transition-colors" style={{ background: '#484f58' }} />
+          </div>
+
           {/* Right: visual editor or static preview */}
-          <div className="flex flex-col min-h-0 flex-1">
+          <div className="flex flex-col min-h-0 flex-1 min-w-0">
             <div
               className="px-2 py-1 shrink-0 flex items-center gap-1"
               style={{ background: '#161b22', borderBottom: '1px solid #30363d' }}
@@ -292,20 +333,43 @@ export default function SvgSourceEditor({ filePath, onClose }) {
               {rightMode === 'preview' && (
                 <span className="text-[10px] ml-1" style={{ color: '#484f58' }}>click element → jump in source</span>
               )}
+
+              {/* Zoom controls */}
+              <div className="ml-auto flex items-center gap-0.5">
+                <button
+                  onClick={() => setZoom(z => Math.max(0.25, +(z - 0.25).toFixed(2)))}
+                  className="w-6 h-5 flex items-center justify-center rounded text-sm font-bold hover:bg-white/10 transition-colors"
+                  style={{ color: '#8b949e', border: '1px solid #30363d' }}
+                  title="Zoom out"
+                >−</button>
+                <span
+                  className="text-[10px] font-mono px-1.5 cursor-pointer"
+                  style={{ color: '#58a6ff', minWidth: 36, textAlign: 'center' }}
+                  onClick={() => setZoom(1)}
+                  title="Reset zoom"
+                >{Math.round(zoom * 100)}%</span>
+                <button
+                  onClick={() => setZoom(z => Math.min(5, +(z + 0.25).toFixed(2)))}
+                  className="w-6 h-5 flex items-center justify-center rounded text-sm font-bold hover:bg-white/10 transition-colors"
+                  style={{ color: '#8b949e', border: '1px solid #30363d' }}
+                  title="Zoom in"
+                >+</button>
+              </div>
             </div>
-            <div className="flex-1 min-h-0 overflow-auto">
+            <div className="flex-1 min-h-0">
               {rightMode === 'visual' ? (
                 <Suspense fallback={<div className="flex-1 flex items-center justify-center text-xs" style={{ color: '#8b949e' }}>Loading editor…</div>}>
-                  <SvgVisualEditor xml={previewXml} dark={dark} onChange={handleVisualChange} />
+                  <SvgVisualEditor xml={previewXml} dark={dark} onChange={handleVisualChange} zoom={zoom} onZoomChange={setZoom} />
                 </Suspense>
               ) : (
-                <SvgPreview xml={previewXml} dark={dark} onElementClick={handleElementClick} />
+                <SvgPreview xml={previewXml} dark={dark} onElementClick={handleElementClick} zoom={zoom} />
               )}
             </div>
           </div>
         </div>
       )}
     </div>
-    </>
+    </>,
+    document.body
   )
 }

@@ -1,5 +1,6 @@
 import continuity3CondUrl from '../diagrams/calc-continuity-3cond.svg?url';
 import continuityUrl from '../diagrams/calc-continuity.svg?url';
+import continuityIntervalUrl from '../diagrams/calc-continuity-interval.svg?url';
 export default {
   id: "ch1-continuity",
   slug: "continuity",
@@ -50,13 +51,18 @@ export default {
       '**Jump discontinuity.** Both one-sided limits exist but they give different values, so the two-sided limit does not exist. The function literally jumps from one level to another. The floor function $\\lfloor x \\rfloor$ is the classic example: at every integer, the left-hand limit is one number and the right-hand limit is one higher. You cannot patch a jump by redefining one point — it is a genuine break.',
 
       '**Infinite discontinuity.** The function grows without bound (heads toward $\\pm \\infty$) as $x \\to c$. The example everyone knows: $f(x) = 1/x$ at $x = 0$. From the right, $1/x \\to +\\infty$; from the left, $1/x \\to -\\infty$. There is a vertical asymptote at $x = 0$. No limit exists, and no amount of redefining fixes it.',
-
+        ],
+      },
+      { type: 'image', src: continuityUrl, alt: 'Three discontinuity panels: removable, jump, and infinite — each fails differently', caption: 'Each discontinuity type reveals which of the three conditions broke down.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**Continuity on an interval.** A function is continuous on an open interval $(a, b)$ if it is continuous at every single point in that interval. For a closed interval $[a, b]$, we also require one-sided continuity at the endpoints: the right-hand limit equals $f(a)$ at $a$, and the left-hand limit equals $f(b)$ at $b$. Polynomials, trig functions, exponentials, and logarithms (on their domains) are all continuous everywhere they are defined. These are your "safe" functions for direct substitution.',
 
       '**Why does any of this matter?** Because continuity is the hypothesis of every major theorem in Calculus 1: the Intermediate Value Theorem, the Extreme Value Theorem, the Mean Value Theorem, and the Fundamental Theorem of Calculus. The reason those theorems work is that continuous functions do not have hidden jumps or holes that could cause the conclusion to fail.',
         ],
       },
-      { type: 'image', src: continuityUrl, alt: 'Three discontinuity panels: removable, jump, and infinite — each fails differently', caption: 'Each discontinuity type reveals which of the three conditions broke down.' },
+      { type: 'image', src: continuityIntervalUrl, alt: 'Three continuity conditions on an interval with failure examples', caption: 'A function is continuous on an interval when all three conditions hold at every interior point.' },
     ],
     callouts: [
       {

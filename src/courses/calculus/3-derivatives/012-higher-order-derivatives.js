@@ -1,4 +1,6 @@
 import concavityUrl from '../diagrams/calc-concavity.svg?url';
+import higherDerivTableUrl from '../diagrams/calc-higher-deriv-table.svg?url';
+import accelerationJerkUrl from '../diagrams/calc-acceleration-jerk.svg?url';
 export default {
   id: 'ch2-higher-order-derivatives',
   slug: 'higher-order-derivatives',
@@ -31,6 +33,7 @@ export default {
           'The second derivative is also the mathematical foundation of **concavity** — whether a curve bends upward or downward.',
         ],
       },
+      { type: 'image', src: concavityUrl, alt: 'Two panels: concave up (f″ > 0) and concave down (f″ < 0)', caption: 'The second derivative measures the rate of change of the slope — it governs concavity.' },
       {
         type: 'callout',
         callout: {
@@ -44,6 +47,7 @@ export default {
                 'Each level tells you something different about the motion.',
         },
       },
+      { type: 'image', src: higherDerivTableUrl, alt: 'Table of higher-order derivatives with Leibniz and prime notation, worked polynomial example', caption: 'nth derivative of xⁿ is n! (a constant). Leibniz writes dⁿy/dxⁿ, prime notation writes f⁽ⁿ⁾(x).' },
       {
         type: 'viz',
         id: 'HigherOrderDerivativesExplorer',
@@ -54,7 +58,7 @@ export default {
           'When a(t) < 0, velocity is decreasing (slowing down or speeding up in negative direction).',
         caption: 'Watch all three graphs simultaneously. Positive acceleration means the velocity curve is rising, which means the position curve is concave up.',
       },
-      { type: 'image', src: concavityUrl, alt: 'Two panels: concave up (f″ > 0) and concave down (f″ < 0)', caption: 'The second derivative measures the rate of change of the slope — it governs concavity.' },
+      { type: 'image', src: accelerationJerkUrl, alt: 'Position s(t) → velocity v=s′ → acceleration a=s″ chain with graphs', caption: 'Physics chain: differentiate position to get velocity, differentiate velocity to get acceleration.' },
     ],
   },
 

@@ -1,4 +1,6 @@
 import sequencesUrl from '../diagrams/calc-sequences.svg?url';
+import sequenceTypesUrl from '../diagrams/calc-sequence-types.svg?url';
+import monotoneBoundedUrl from '../diagrams/calc-monotone-bounded.svg?url';
 // FILE: src/content/chapter-5/00-sequences.js
 export default {
   id: 'ch5-sequences',
@@ -23,7 +25,12 @@ export default {
       `**What is a sequence?** A sequence is an ordered, infinite list of real numbers: $a_1, a_2, a_3, \\ldots$ We write it $\\{a_n\\}$ or $\\{a_n\\}_{n=1}^{\\infty}$. Each $a_n$ is called a **term**. Three key points: (1) order matters — $1, 2, 3, \\ldots$ and $3, 1, 2, \\ldots$ are different sequences; (2) repetition is allowed — $1, 1, 1, \\ldots$ is a valid sequence; (3) a sequence is just a function $a:\\mathbb{N}\\to\\mathbb{R}$, so $a_n = a(n)$. That last point is powerful: it lets us reuse every limit tool from Calc 1 on sequences.`,
 
       `**What does "convergence" mean — intuitively?** A sequence converges to $L$ if the terms get closer and closer to $L$ and *stay* close. Picture a thermometer reading a cooling object: each reading is closer to room temperature than the last, and once the readings are within half a degree of room temperature they never leave that window again. The window can be made as narrow as you like — that "any window, however narrow" idea is exactly the formal definition. A sequence that does NOT settle at any single value is said to **diverge**.`,
-
+        ],
+      },
+      { type: 'image', src: sequencesUrl, alt: 'Convergent (1/n → 0) and divergent (−1)ⁿ sequences plotted', caption: 'A sequence converges if its terms approach a finite limit L; otherwise it diverges.' },
+      {
+        type: 'prose',
+        paragraphs: [
       `**Three ways a sequence can diverge.** (1) *Blow up:* $a_n = n$ grows without bound — the terms fly off to $+\\infty$. (2) *Oscillate undamped:* $a_n = (-1)^n$ flips between $-1$ and $+1$ forever, never settling. (3) *Oscillate damped but to multiple values:* much rarer, but possible. The difference between (2) and convergence to $0$ is subtle: compare $(-1)^n$ (diverges) with $(-1)^n/n$ (converges to $0$). In the second case the oscillation gets smaller and smaller until it vanishes in the limit.`,
 
       `**The Squeeze Theorem — trapping a sequence.** If you can sandwich a sequence $b_n$ between two sequences $a_n \\le b_n \\le c_n$ that both converge to the same limit $L$, then $b_n$ must converge to $L$ too. Classic example: $\\sin(n)$ bounces between $-1$ and $1$ chaotically, so $-1/n \\le \\sin(n)/n \\le 1/n$. Both $\\pm 1/n \\to 0$, so $\\sin(n)/n \\to 0$ — even though $\\sin(n)$ itself never settles. The squeeze is your go-to tool whenever a sequence contains a function (sine, cosine, exponential) that you can bound.`,
@@ -31,11 +38,16 @@ export default {
       `**L'Hôpital via continuous extension.** A sequence is just a function sampled at integer inputs. If $a_n = f(n)$ for some continuous function $f(x)$, then $\\lim_{n\\to\\infty} a_n = \\lim_{x\\to\\infty} f(x)$. That second limit is a regular Calc 1 limit — you can use L'Hôpital, factoring, conjugates, everything. Example: $a_n = n/e^n$. Study $\\lim_{x\\to\\infty} x/e^x$. It's $\\infty/\\infty$, so L'Hôpital gives $\\lim 1/e^x = 0$. Done.`,
 
       `**Monotone Convergence Theorem — existence without a formula.** Sometimes you can prove a sequence converges without ever finding the limit. The theorem says: if a sequence is (a) monotone (always going in one direction) and (b) bounded (never escaping a finite interval), then it must converge. The intuition: a sequence moving in one direction inside a bounded box has no choice but to converge to the wall it's approaching. This is the existence theorem behind recursive sequences — you prove convergence first, then *set* $L = f(L)$ and solve.`,
-
+        ],
+      },
+      { type: 'image', src: sequenceTypesUrl, alt: 'Three panels: arithmetic (constant difference), geometric (constant ratio), recursive sequences', caption: 'Arithmetic sequences grow linearly and always diverge; geometric sequences converge iff |r| < 1; recursive sequences satisfy L = f(L) at their limit.' },
+      {
+        type: 'prose',
+        paragraphs: [
       `**Recursive sequences — finding the limit.** Many real sequences are defined by a rule $a_{n+1} = f(a_n)$. To find the limit: step 1, prove the sequence converges (Monotone Convergence Theorem — show it's monotone and bounded). Step 2, take limits on both sides of the recursion: since $a_{n+1} \\to L$ and $a_n \\to L$, the rule becomes $L = f(L)$. Step 3, solve for $L$. Warning: step 2 is only valid *after* step 1. If you skip the proof of convergence, you might "solve" for a limit that doesn't exist.`,
         ],
       },
-      { type: 'image', src: sequencesUrl, alt: 'Convergent (1/n → 0) and divergent (−1)ⁿ sequences plotted', caption: 'A sequence converges if its terms approach a finite limit L; otherwise it diverges.' },
+      { type: 'image', src: monotoneBoundedUrl, alt: 'Monotone Convergence Theorem: increasing bounded-above sequence approaching its limit', caption: 'Monotone Convergence Theorem: every sequence that is both monotone and bounded must converge — even if the limit cannot be found explicitly.' },
     ],
     callouts: [
       {

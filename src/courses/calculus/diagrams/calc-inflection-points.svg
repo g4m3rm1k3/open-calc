@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Inflection Points — Where Concavity Changes</text>
+  <rect x="8" y="22" width="464" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Main curve (S-curve) -->
+  <line x1="28" y1="168" x2="460" y2="168" stroke="#64748b" stroke-width="1"/>
+  <line x1="28" y1="28" x2="28" y2="172" stroke="#64748b" stroke-width="1"/>
+  <path d="M 50,155 Q 80,150 110,138 Q 140,125 160,105 Q 180,82 200,65 Q 220,50 240,45 Q 260,42 280,46 Q 300,52 320,65 Q 350,82 380,100 Q 410,118 440,130" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Concave up region (left) -->
+  <path d="M 50,155 Q 90,158 110,138" fill="none" stroke="#22c55e" stroke-width="4" opacity="0.4"/>
+  <text x="75" y="148" font-size="8" fill="#166534" text-anchor="middle">concave up</text>
+  <text x="75" y="159" font-size="7.5" fill="#166534" text-anchor="middle">f ′′ &gt; 0</text>
+  <!-- Concave down region (middle) -->
+  <path d="M 140,125 Q 190,60 290,46" fill="none" stroke="#ef4444" stroke-width="4" opacity="0.4"/>
+  <text x="210" y="35" font-size="8" fill="#991b1b" text-anchor="middle">concave down</text>
+  <text x="210" y="46" font-size="7.5" fill="#991b1b" text-anchor="middle">f ′′ &lt; 0</text>
+  <!-- Concave up region (right) -->
+  <path d="M 300,52 Q 370,78 440,130" fill="none" stroke="#22c55e" stroke-width="4" opacity="0.4"/>
+  <text x="390" y="98" font-size="8" fill="#166534" text-anchor="right">concave up</text>
+  <text x="390" y="109" font-size="7.5" fill="#166534" text-anchor="right">f ′′ &gt; 0</text>
+  <!-- Inflection point 1 -->
+  <circle cx="125" cy="118" r="7" fill="#f59e0b"/>
+  <text x="125" y="110" font-size="8" fill="#b45309" text-anchor="middle" font-weight="700">IP</text>
+  <line x1="125" y1="163" x2="125" y2="172" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="125" y="185" font-size="8" fill="#b45309" text-anchor="middle">x₁</text>
+  <!-- Inflection point 2 -->
+  <circle cx="298" cy="50" r="7" fill="#f59e0b"/>
+  <text x="298" y="42" font-size="8" fill="#b45309" text-anchor="middle" font-weight="700">IP</text>
+  <line x1="298" y1="163" x2="298" y2="172" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="298" y="185" font-size="8" fill="#b45309" text-anchor="middle">x₂</text>
+  <!-- Sign chart -->
+  <rect x="30" y="30" width="128" height="40" rx="5" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="94" y="45" font-size="7.5" fill="#4338ca" text-anchor="middle" font-weight="700">Inflection Point Rule:</text>
+  <text x="94" y="58" font-size="7.5" fill="#4338ca" text-anchor="middle">f ′′(c) = 0 and sign of f ′′</text>
+  <text x="94" y="70" font-size="7.5" fill="#4338ca" text-anchor="middle">changes at x = c</text>
+</svg>

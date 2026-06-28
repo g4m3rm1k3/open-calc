@@ -1,5 +1,6 @@
 import verticalAsymptoteUrl from '../diagrams/calc-vertical-asymptote.svg?url';
 import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
+import vertAsymSignUrl from '../diagrams/calc-vert-asym-sign.svg?url';
 export default {
   id: 'ch1-infinite-limits-vertical-asymptotes',
   slug: 'infinite-limits-vertical-asymptotes',
@@ -28,13 +29,26 @@ export default {
         paragraphs: [
           'When we write lim(x→a) f(x) = ∞, we mean: no matter how large a number M you choose, ' +
           'f(x) will eventually exceed M as x gets close to a. The function "grows without bound."',
+        ],
+      },
+      { type: 'image', src: verticalAsymptoteUrl, alt: 'Vertical asymptote panels: 1/x² (both → +∞) and 1/x (opposite signs)', caption: 'A vertical asymptote at x=a occurs when the denominator is zero and the numerator is not.' },
+      {
+        type: 'prose',
+        paragraphs: [
           'This is different from a regular limit (where the function approaches a finite value). ' +
           'Technically, a limit of ±∞ means the limit does NOT EXIST in the strict sense — ' +
           'but we write "= ∞" to give useful, specific information ABOUT why it fails to exist.',
         ],
       },
-      { type: 'image', src: verticalAsymptoteUrl, alt: 'Vertical asymptote panels: 1/x² (both → +∞) and 1/x (opposite signs)', caption: 'A vertical asymptote at x=a occurs when the denominator is zero and the numerator is not.' },
       { type: 'image', src: limitsInfinityUrl, alt: 'Contrasting horizontal asymptotes (end behavior) with vertical blow-up', caption: 'Vertical asymptotes: limits near a finite point. Horizontal: limits as x → ±∞.' },
+      {
+        type: 'prose',
+        paragraphs: [
+          'To determine whether a vertical asymptote goes to +∞ or −∞ from each side, use a sign chart. ' +
+          'Test one value in each interval defined by the asymptote — the sign of the numerator and denominator separately determines the sign of the quotient, and hence the direction of blow-up.',
+        ],
+      },
+      { type: 'image', src: vertAsymSignUrl, alt: 'Sign chart method for determining ±∞ direction of vertical asymptote limits', caption: 'Test a point on each side of the asymptote to determine whether the limit is +∞ or −∞.' },
     ],
   },
 

@@ -1,5 +1,6 @@
 import mvtIntegralUrl from '../diagrams/calc-mvt-integral.svg?url';
 import ftcUrl from '../diagrams/calc-ftc.svg?url';
+import mvtIntegralsUrl from '../diagrams/calc-mvt-integrals.svg?url';
 // FILE: src/content/chapter-4/03b-mvt-integrals.js
 export default {
   id: "ch4-003b",
@@ -43,10 +44,16 @@ export default {
         paragraphs: [
       "**Connection to the Derivative MVT:** There is a cleaner derivation using tools we already have. Let F be an antiderivative of f. Apply the derivative MVT to F on [a, b]: F'(c) = (F(b) − F(a))/(b − a) for some c. Since F' = f and FTC Part 2 says F(b) − F(a) = ∫ₐᵇ f(x) dx, this becomes f(c) = (1/(b−a)) ∫ₐᵇ f(x) dx. That is the MVT for integrals. The two mean value theorems are the same result stated in different languages — the integral version is the derivative version translated through FTC.",
       "**Continuity Is Not Optional:** The theorem fails without it. Define f(x) = 0 for x ∈ [0, 0.5) and f(x) = 2 for x ∈ [0.5, 1]. The average is (1/1)∫₀¹ f dx = (0·0.5 + 2·0.5) = 1. But f never equals 1 anywhere — f jumps from 0 to 2, skipping the value 1 entirely. This is the IVT failing because of the jump discontinuity. Continuity is not a formality; it is the exact hypothesis that prevents the function from skipping over its own average.",
-      "**Finding c in Practice:** Given a specific f on [a, b], the procedure is: (1) compute f_avg = (1/(b−a)) ∫ₐᵇ f(x) dx, (2) solve f(c) = f_avg for c, (3) check that the solution(s) lie in (a, b). The MVT guarantees at least one solution exists, but there may be multiple — a flat function f = k has infinitely many. The theorem is an existence result, not a formula for c.",
         ],
       },
       { type: 'image', src: ftcUrl, alt: 'FTC: the integral gives total area; dividing by (b−a) gives the average height', caption: 'Average value = total integral ÷ interval length — a direct consequence of FTC Part 2.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      "**Finding c in Practice:** Given a specific f on [a, b], the procedure is: (1) compute f_avg = (1/(b−a)) ∫ₐᵇ f(x) dx, (2) solve f(c) = f_avg for c, (3) check that the solution(s) lie in (a, b). The MVT guarantees at least one solution exists, but there may be multiple — a flat function f = k has infinitely many. The theorem is an existence result, not a formula for c.",
+        ],
+      },
+      { type: 'image', src: mvtIntegralsUrl, alt: 'MVT for integrals: average-value rectangle with the function curve crossing f_avg at point c', caption: 'The MVT for integrals guarantees a specific c where f(c) = f_avg — the function must hit its own average.' },
     ],
     callouts: [
       {

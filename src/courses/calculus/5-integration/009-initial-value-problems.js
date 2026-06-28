@@ -1,5 +1,7 @@
 // FILE: src/content/chapter-4/04b-initial-value-problems.js
 import antiderivativeUrl from '../diagrams/calc-antiderivative.svg?url';
+import ivpSolutionUrl from '../diagrams/calc-ivp-solution.svg?url';
+import slopeFieldUrl from '../diagrams/calc-slope-field.svg?url';
 export default {
   id: 'ch4-004b',
   slug: 'initial-value-problems',
@@ -62,17 +64,27 @@ export default {
       '**The most important conceptual shift in this lesson.** In algebra, you solve for a **number**. The equation $x^2 + 3 = 7$ has the solution $x = 2$. You found a point. In a differential equation, you solve for a **function**. The equation $\\frac{dy}{dx} = 2x$ has the solution $y = x^2 + C$. You found a curve — or rather, a whole family of curves. This is not a small difference. It changes what "solving" means, what "checking" means, and what the constant of integration means. Keep this distinction sharp throughout this lesson.',
 
       '**Why integration is the tool.** A differential equation like $\\frac{dy}{dx} = 2x$ is saying: "I know the slope of the function at every point. What is the function?" You are being given the derivative and asked for the original. That is exactly the definition of antidifferentiation — inverting the derivative. So you integrate both sides with respect to $x$: $\\int \\frac{dy}{dx}\\,dx = \\int 2x\\,dx$, which gives $y = x^2 + C$. The integration step is not a trick — it is the direct logical inversion of differentiation. You are un-doing the derivative.',
-
+        ],
+      },
+      { type: 'image', src: antiderivativeUrl, alt: 'Antiderivative family with one curve highlighted by the initial condition', caption: 'An initial condition pins down the specific antiderivative from the family by fixing C.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**The family of curves — what $+C$ really means geometrically.** The general solution $y = x^2 + C$ is not one curve; it is infinitely many. Every different value of $C$ shifts the parabola up or down. $C = 0$ gives $y = x^2$; $C = 5$ gives $y = x^2 + 5$; $C = -3$ gives $y = x^2 - 3$. All of these curves have the same slope at every $x$-value (they are all identical except for vertical position), so they all satisfy $y\' = 2x$ equally well. You cannot distinguish them from the derivative alone — the constant was lost when you differentiated.',
 
       '**What the initial condition does — picking the one curve.** An initial condition $y(0) = 5$ is a geometric instruction: "select the member of the family that passes through the point $(0, 5)$." Substitute: $5 = 0^2 + C$, so $C = 5$. The unique solution is $y = x^2 + 5$. Every other curve in the family is excluded. This is why IVPs have exactly one answer (when the right smoothness conditions hold): the initial condition is precisely the extra piece of information that determines $C$. Without it, there is no particular solution — only the family.',
-
+        ],
+      },
+      { type: 'image', src: ivpSolutionUrl, alt: 'Family of solution curves with one highlighted by the initial condition point', caption: 'An initial condition selects exactly one particular solution from the infinite family of antiderivatives.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**Exponentials and differential equations — why they are inseparable.** The exponential function $e^x$ has a remarkable property: $\\frac{d}{dx}[e^x] = e^x$. It is the only elementary function whose rate of change equals itself. This means: whenever a quantity\'s rate of change is proportional to itself — radioactive decay, population growth, drug clearance, compound interest — the solution involves $e^x$. The DE $\\frac{dy}{dx} = ky$ says "the function grows (or shrinks) at rate proportional to its current value." The solution is always $y = Ce^{kx}$. Exponentials are not a coincidence in these models; they are the inevitable consequence of "rate proportional to amount."',
 
       '**The slope field: seeing the DE without solving it.** A slope field is a grid of tiny arrows. At each point $(x, y)$, the arrow\'s slope is the value that $y\'$ takes there, as given by the DE. The slope field for $y\' = 2x$ has arrows sloping up on the right (slope = $2x > 0$ for $x > 0$), flat at $x = 0$, and sloping down on the left. Every solution curve must be tangent to the arrows it passes through — the arrows are the "instructions" and the solution is a curve that follows all of them simultaneously. The initial condition places your starting point; from there you follow the arrows. This is the geometric meaning of the IVP.',
         ],
       },
-      { type: 'image', src: antiderivativeUrl, alt: 'Antiderivative family with one curve highlighted by the initial condition', caption: 'An initial condition pins down the specific antiderivative from the family by fixing C.' },
+      { type: 'image', src: slopeFieldUrl, alt: 'Grid of slope dashes for dy/dx = x with several solution curves overlaid', caption: 'A slope field visualizes all solutions simultaneously — the initial condition selects one particular curve from the field.' },
     ],
     callouts: [
       {

@@ -1,4 +1,6 @@
 import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
+import algebraGeoConnectionsUrl from '../diagrams/calc-algebra-geo-connections.svg?url';
+import masterFormulasUrl from '../diagrams/calc-master-formulas.svg?url';
 export default {
   id: 'ch5-precalc-review',
   slug: 'algebra-geometry-master-review',
@@ -22,11 +24,23 @@ export default {
         type: 'prose',
         paragraphs: [
       'You can think of this lesson as a command center. When a limit looks stuck, you choose an algebra move: factor, conjugate, common denominator, or special identity. When a related-rates question looks messy, you choose a geometry move: similar triangles, angle sum, or radius-arc relation.',
-      'A practical workflow from the algebra page is: diagnose the obstruction first. If direct substitution gives 0/0, do not panic and do not attempt random manipulations. Classify the expression shape and apply the matching move. This keeps your work deliberate, not luck-based.',
-      'A practical workflow from the geometry page is: write the invariant relationship before differentiating. If two triangles stay similar through time, lock the ratio first. If a rotating radius sweeps an arc, write s = r theta in radians first. Differentiation should happen after structure is fixed.',
         ],
       },
       { type: 'image', src: trigCircleUrl, alt: 'Unit circle connecting algebra and geometry before calculus', caption: 'The unit circle is the final boss of prerequisites — master it and calculus notation becomes readable immediately.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'A practical workflow from the algebra page is: diagnose the obstruction first. If direct substitution gives 0/0, do not panic and do not attempt random manipulations. Classify the expression shape and apply the matching move. This keeps your work deliberate, not luck-based.',
+        ],
+      },
+      { type: 'image', src: algebraGeoConnectionsUrl, alt: 'Five panels showing how slope, distance, midpoint, area under a line, and circle equations all connect algebra to calculus', caption: 'Algebra and geometry are not separate subjects — slope is the derivative, distance is arc length, area under a line is an integral.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'A practical workflow from the geometry page is: write the invariant relationship before differentiating. If two triangles stay similar through time, lock the ratio first. If a rotating radius sweeps an arc, write s = r theta in radians first. Differentiation should happen after structure is fixed.',
+        ],
+      },
+      { type: 'image', src: masterFormulasUrl, alt: 'Two-column formula reference: left column algebra and functions, right column trigonometry', caption: 'This formula sheet covers everything in Chapter 1 — if any row looks unfamiliar, revisit that lesson before moving to limits.' },
     ],
     callouts: [
       {

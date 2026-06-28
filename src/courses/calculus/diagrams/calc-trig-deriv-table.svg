@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Trig Derivatives — Complete Table</text>
+
+  <rect x="8" y="22" width="464" height="172" rx="8" fill="#1e1b4b"/>
+
+  <!-- Two-column layout -->
+  <line x1="240" y1="22" x2="240" y2="194" stroke="#312e81" stroke-width="1.5"/>
+
+  <!-- Headers -->
+  <text x="124" y="38" font-size="9" fill="#a5b4fc" text-anchor="middle" font-weight="700">f(x)</text>
+  <text x="60" y="38" font-size="9" fill="#a5b4fc" text-anchor="middle" font-weight="700">→</text>
+  <text x="180" y="38" font-size="9" fill="#4ade80" text-anchor="middle" font-weight="700">f ′(x)</text>
+  <text x="360" y="38" font-size="9" fill="#a5b4fc" text-anchor="middle" font-weight="700">f(x)</text>
+  <text x="296" y="38" font-size="9" fill="#a5b4fc" text-anchor="middle" font-weight="700">→</text>
+  <text x="420" y="38" font-size="9" fill="#4ade80" text-anchor="middle" font-weight="700">f ′(x)</text>
+  <line x1="8" y1="42" x2="472" y2="42" stroke="#4338ca" stroke-width="1"/>
+
+  <!-- Row heights: 22px each, starting at y=52 -->
+  <!-- Left column -->
+  <text x="60" y="58" font-size="9" fill="#c7d2fe" text-anchor="middle">sin(x)</text>
+  <text x="180" y="58" font-size="9" fill="#4ade80" text-anchor="middle" font-weight="700">cos(x)</text>
+  <line x1="8" y1="63" x2="240" y2="63" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="60" y="80" font-size="9" fill="#c7d2fe" text-anchor="middle">cos(x)</text>
+  <text x="180" y="80" font-size="9" fill="#f87171" text-anchor="middle" font-weight="700">−sin(x)</text>
+  <line x1="8" y1="85" x2="240" y2="85" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="60" y="102" font-size="9" fill="#c7d2fe" text-anchor="middle">tan(x)</text>
+  <text x="180" y="102" font-size="9" fill="#4ade80" text-anchor="middle" font-weight="700">sec²(x)</text>
+  <line x1="8" y1="107" x2="240" y2="107" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="60" y="124" font-size="9" fill="#c7d2fe" text-anchor="middle">cot(x)</text>
+  <text x="180" y="124" font-size="9" fill="#f87171" text-anchor="middle" font-weight="700">−csc²(x)</text>
+  <line x1="8" y1="129" x2="240" y2="129" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="60" y="146" font-size="9" fill="#c7d2fe" text-anchor="middle">sec(x)</text>
+  <text x="180" y="146" font-size="9" fill="#4ade80" text-anchor="middle" font-weight="700">sec(x)tan(x)</text>
+  <line x1="8" y1="151" x2="240" y2="151" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="60" y="168" font-size="9" fill="#c7d2fe" text-anchor="middle">csc(x)</text>
+  <text x="180" y="168" font-size="9" fill="#f87171" text-anchor="middle" font-weight="700">−csc(x)cot(x)</text>
+  <line x1="8" y1="173" x2="240" y2="173" stroke="#312e81" stroke-width="0.5"/>
+
+  <!-- Right column: pattern notes -->
+  <text x="260" y="58" font-size="8" fill="#94a3b8">sin/cos pair: derive twice → negative</text>
+  <line x1="240" y1="63" x2="472" y2="63" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="260" y="80" font-size="8" fill="#94a3b8">d/dx[cos] = −sin (note the minus!)</text>
+  <line x1="240" y1="85" x2="472" y2="85" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="260" y="102" font-size="8" fill="#94a3b8">sec²x = 1 + tan²x (Pythagorean id.)</text>
+  <line x1="240" y1="107" x2="472" y2="107" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="260" y="124" font-size="8" fill="#94a3b8">co- functions pick up a minus sign</text>
+  <line x1="240" y1="129" x2="472" y2="129" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="260" y="146" font-size="8" fill="#94a3b8">sec·tan appear together always</text>
+  <line x1="240" y1="151" x2="472" y2="151" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="260" y="168" font-size="8" fill="#94a3b8">−csc·cot: mirror of sec·tan with minus</text>
+
+  <!-- Bottom note -->
+  <rect x="8" y="178" width="464" height="14" rx="3" fill="#312e81"/>
+  <text x="240" y="188" font-size="8" fill="#a5b4fc" text-anchor="middle">Memory trick: "co-" functions (cos, cot, csc) always get a MINUS in their derivatives</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Functions — Domain, Range, and Composition</text>
+  <!-- Function machine diagram -->
+  <text x="50" y="72" font-size="11" fill="#374151" text-anchor="middle">Input x</text>
+  <text x="50" y="88" font-size="9" fill="#94a3b8" text-anchor="middle">from domain</text>
+  <!-- Arrow -->
+  <line x1="85" y1="80" x2="145" y2="80" stroke="#6366f1" stroke-width="2"/>
+  <polygon points="145,75 155,80 145,85" fill="#6366f1"/>
+  <!-- Machine box -->
+  <rect x="155" y="58" width="170" height="44" rx="8" fill="#6366f1"/>
+  <text x="240" y="78" font-size="10" fill="white" text-anchor="middle" font-weight="700">f(x)</text>
+  <text x="240" y="94" font-size="8.5" fill="#c7d2fe" text-anchor="middle">function rule</text>
+  <!-- Arrow out -->
+  <line x1="325" y1="80" x2="385" y2="80" stroke="#22c55e" stroke-width="2"/>
+  <polygon points="385,75 395,80 385,85" fill="#22c55e"/>
+  <text x="430" y="72" font-size="11" fill="#374151" text-anchor="middle">Output</text>
+  <text x="430" y="88" font-size="11" fill="#22c55e" text-anchor="middle">f(x)</text>
+  <text x="430" y="102" font-size="9" fill="#94a3b8" text-anchor="middle">in range</text>
+  <!-- Domain / Range labels -->
+  <rect x="8" y="116" width="220" height="78" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="118" y="132" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Domain &amp; Range</text>
+  <text x="118" y="148" font-size="8" fill="#374151" text-anchor="middle">Domain: all valid inputs (x values)</text>
+  <text x="118" y="162" font-size="8" fill="#374151" text-anchor="middle">Range: all possible outputs (y values)</text>
+  <text x="118" y="178" font-size="8" fill="#374151" text-anchor="middle">f(x)=√x → domain [0,∞), range [0,∞)</text>
+  <!-- Composition -->
+  <rect x="236" y="116" width="236" height="78" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="354" y="132" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Composition (f ∘ g)(x) = f(g(x))</text>
+  <text x="354" y="148" font-size="8" fill="#374151" text-anchor="middle">Apply g first, then feed into f</text>
+  <text x="354" y="162" font-size="8" fill="#374151" text-anchor="middle">g(x)=x², f(x)=sin(x):</text>
+  <text x="354" y="178" font-size="8.5" fill="#22c55e" text-anchor="middle" font-weight="700">(f∘g)(x) = sin(x²)</text>
+</svg>

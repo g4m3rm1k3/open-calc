@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Polar ↔ Rectangular Conversion</text>
+  <!-- Left: diagram -->
+  <rect x="8" y="24" width="230" height="170" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="20" y1="120" x2="228" y2="120" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="80" y1="40" x2="80" y2="168" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="224" y="128" font-size="8" fill="#64748b">x</text>
+  <text x="84" y="44" font-size="8" fill="#64748b">y</text>
+  <!-- Point P -->
+  <circle cx="175" cy="68" r="5" fill="#6366f1"/>
+  <text x="183" y="66" font-size="8.5" fill="#6366f1">P(r, θ)</text>
+  <!-- r line -->
+  <line x1="80" y1="120" x2="175" y2="68" stroke="#6366f1" stroke-width="2"/>
+  <text x="120" y="100" font-size="8.5" fill="#6366f1">r</text>
+  <!-- x projection -->
+  <line x1="80" y1="120" x2="175" y2="120" stroke="#f59e0b" stroke-width="2"/>
+  <text x="128" y="134" font-size="8.5" fill="#f59e0b">x = r cos θ</text>
+  <!-- y projection -->
+  <line x1="175" y1="68" x2="175" y2="120" stroke="#22c55e" stroke-width="2"/>
+  <text x="188" y="96" font-size="8.5" fill="#22c55e">y = r sin θ</text>
+  <!-- theta arc -->
+  <path d="M 100,120 A 20,20 0 0,0 88,104" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="107" y="112" font-size="8.5" fill="#ef4444">θ</text>
+  <!-- Right: formulas -->
+  <rect x="246" y="24" width="226" height="170" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="359" y="44" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Conversion Formulas</text>
+  <rect x="254" y="50" width="210" height="40" rx="4" fill="#dbeafe"/>
+  <text x="359" y="66" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">Polar → Rectangular</text>
+  <text x="359" y="82" font-size="8" fill="#374151" text-anchor="middle">x = r cos θ  ,  y = r sin θ</text>
+  <rect x="254" y="96" width="210" height="40" rx="4" fill="#dcfce7"/>
+  <text x="359" y="112" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Rectangular → Polar</text>
+  <text x="359" y="128" font-size="8" fill="#374151" text-anchor="middle">r = √(x²+y²)  ,  θ = arctan(y/x)</text>
+  <rect x="254" y="142" width="210" height="46" rx="4" fill="#fef3c7"/>
+  <text x="359" y="156" font-size="8" fill="#92400e" text-anchor="middle">Example: r = 2 sin θ</text>
+  <text x="359" y="168" font-size="8" fill="#374151" text-anchor="middle">Multiply both sides by r:</text>
+  <text x="359" y="180" font-size="8" fill="#374151" text-anchor="middle">r² = 2r sinθ → x²+y² = 2y (circle)</text>
+</svg>

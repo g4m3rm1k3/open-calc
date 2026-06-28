@@ -1,5 +1,6 @@
 import mvtIntegralUrl from '../diagrams/calc-mvt-integral.svg?url';
 import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
+import averageValueUrl from '../diagrams/calc-average-value.svg?url';
 export default {
   id: 'ch4-average-value',
   slug: 'average-value',
@@ -30,12 +31,18 @@ export default {
           'The average of n numbers is (a₁ + a₂ + ... + aₙ) / n — sum them up and divide by how many there are. ' +
           'For a continuous function on [a, b], there are infinitely many values. ' +
           'How do we "sum" them all? With an integral.',
+        ],
+      },
+      { type: 'image', src: riemannSumUrl, alt: 'Riemann sum interpretation: (1/n)Σf(xᵢ) converges to the average value', caption: 'Average value is the continuous analog of the arithmetic mean of infinitely many samples.' },
+      {
+        type: 'prose',
+        paragraphs: [
           'Here\'s the key idea: approximate with n equally-spaced sample points xᵢ, each a distance Δx = (b−a)/n apart. ' +
           'Average of samples ≈ (1/n) Σ f(xᵢ) = (1/(b−a)) Σ f(xᵢ)Δx → (1/(b−a)) ∫ₐᵇ f(x) dx as n → ∞.',
         ],
       },
       { type: 'image', src: mvtIntegralUrl, alt: 'Function curve with horizontal average-value line having equal area underneath', caption: 'f_avg = (1/(b−a))∫f dx is the height of the rectangle with the same area as f.' },
-      { type: 'image', src: riemannSumUrl, alt: 'Riemann sum interpretation: (1/n)Σf(xᵢ) converges to the average value', caption: 'Average value is the continuous analog of the arithmetic mean of infinitely many samples.' },
+      { type: 'image', src: averageValueUrl, alt: 'f_avg rectangle with equal area to the curve, labeled formula 1/(b−a)∫ₐᵇf dx', caption: 'f_avg = (1/(b−a))∫ₐᵇ f dx — the constant height of a rectangle with the same area as f over [a, b].' },
     ],
   },
 

@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Limits at Infinity — Horizontal Asymptotes</text>
+
+  <!-- Main graph -->
+  <rect x="10" y="24" width="280" height="168" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- x axis -->
+  <line x1="150" y1="180" x2="280" y2="180" stroke="#64748b" stroke-width="1"/>
+  <line x1="10" y1="180" x2="142" y2="180" stroke="#64748b" stroke-width="1" stroke-dasharray="3,2"/>
+  <!-- y axis at center -->
+  <line x1="150" y1="30" x2="150" y2="186" stroke="#64748b" stroke-width="1.5"/>
+
+  <!-- Horizontal asymptote y=2 → SVG y = 180-80 = 100 -->
+  <line x1="18" y1="100" x2="282" y2="100" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <text x="12" y="96" font-size="8.5" fill="#ef4444" text-anchor="start">y = 2</text>
+
+  <!-- x-axis labels -->
+  <text x="150" y="192" font-size="8" class="mu" text-anchor="middle">0</text>
+  <text x="264" y="192" font-size="7.5" class="mu">+∞</text>
+  <text x="28" y="192" font-size="7.5" class="mu">−∞</text>
+
+  <!-- Curve: approaches y=2 from below as x→+∞, from above as x→-∞ -->
+  <!-- Right branch (x>0): starts at 180 (y=0 at x=0) and curves to 100 (y=2) -->
+  <path d="M 152,180 Q 172,130 200,112 Q 230,105 264,102" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Left branch (x<0): comes from y=2 from above -->
+  <path d="M 148,120 Q 126,105 95,101 Q 65,99 30,100" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Labels -->
+  <text x="216" y="125" font-size="7.5" fill="#6366f1">f(x) → 2</text>
+  <text x="216" y="134" font-size="7.5" fill="#6366f1">as x → +∞</text>
+  <text x="30" y="92" font-size="7.5" fill="#6366f1">f(x) → 2</text>
+  <text x="30" y="100" font-size="7" fill="#6366f1">as x → −∞</text>
+
+  <!-- Right: Rules for horizontal asymptotes of rational functions -->
+  <rect x="298" y="24" width="174" height="168" rx="8" fill="#1e1b4b"/>
+  <text x="385" y="42" font-size="8.5" fill="#a5b4fc" text-anchor="middle" font-weight="700">HA Rules (p/q rational)</text>
+  <line x1="306" y1="48" x2="464" y2="48" stroke="#4338ca" stroke-width="1"/>
+
+  <text x="308" y="65" font-size="8" fill="#a5b4fc" font-weight="700">deg(p) &lt; deg(q):</text>
+  <text x="308" y="78" font-size="9" fill="#4ade80" font-weight="700">HA: y = 0</text>
+  <text x="308" y="89" font-size="7.5" fill="#64748b">bottom wins → shrinks to 0</text>
+
+  <line x1="306" y1="95" x2="464" y2="95" stroke="#334155" stroke-width="1"/>
+
+  <text x="308" y="112" font-size="8" fill="#a5b4fc" font-weight="700">deg(p) = deg(q):</text>
+  <text x="308" y="125" font-size="9" fill="#4ade80" font-weight="700">HA: y = (lead coeff ratio)</text>
+  <text x="308" y="136" font-size="7.5" fill="#64748b">e.g. 3x²/5x² → y=3/5</text>
+
+  <line x1="306" y1="142" x2="464" y2="142" stroke="#334155" stroke-width="1"/>
+
+  <text x="308" y="159" font-size="8" fill="#a5b4fc" font-weight="700">deg(p) &gt; deg(q):</text>
+  <text x="308" y="172" font-size="9" fill="#f87171" font-weight="700">no HA (→ ±∞)</text>
+  <text x="308" y="185" font-size="7.5" fill="#64748b">top wins → blows up</text>
+</svg>

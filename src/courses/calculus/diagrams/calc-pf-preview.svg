@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Partial Fractions — Preview (Why We Need This)</text>
+  <!-- The problem -->
+  <rect x="8" y="24" width="464" height="38" rx="6" fill="#4338ca"/>
+  <text x="240" y="40" font-size="10" fill="white" text-anchor="middle" font-weight="700">Goal: Break a complex fraction into simpler pieces</text>
+  <text x="240" y="56" font-size="8.5" fill="#c7d2fe" text-anchor="middle">1/(x²−1)  =  ???  (can't integrate this directly)</text>
+  <!-- Arrow -->
+  <text x="240" y="76" font-size="14" fill="#6366f1" text-anchor="middle">↓ factor denominator ↓</text>
+  <!-- Decomposition -->
+  <rect x="8" y="84" width="464" height="48" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="102" font-size="10" fill="#374151" text-anchor="middle">1/(x²−1) = 1/((x+1)(x−1)) = A/(x+1) + B/(x−1)</text>
+  <text x="240" y="122" font-size="8.5" fill="#6366f1" text-anchor="middle">Solve: A = −½, B = ½  →  1/(x²−1) = −½/(x+1) + ½/(x−1)</text>
+  <!-- Integration result -->
+  <rect x="8" y="138" width="464" height="56" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="240" y="156" font-size="9" fill="#166534" text-anchor="middle" font-weight="700">Now each piece is trivially integrable!</text>
+  <text x="240" y="172" font-size="8.5" fill="#374151" text-anchor="middle">∫ 1/(x²−1) dx  =  −½ ln|x+1| + ½ ln|x−1| + C</text>
+  <text x="240" y="188" font-size="8.5" fill="#374151" text-anchor="middle">=  ½ ln|x−1| − ½ ln|x+1| + C  =  ½ ln|(x−1)/(x+1)| + C</text>
+</svg>

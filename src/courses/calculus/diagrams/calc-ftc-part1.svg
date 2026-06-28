@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">FTC Part 1 — Accumulation Function &amp; Its Derivative</text>
+  <rect x="8" y="22" width="270" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="28" y1="165" x2="270" y2="165" stroke="#64748b" stroke-width="1"/>
+  <line x1="28" y1="28" x2="28" y2="169" stroke="#64748b" stroke-width="1"/>
+  <!-- Shaded area from a to x -->
+  <path d="M 55,165 L 55,110 Q 80,84 110,66 Q 135,52 155,50 L 155,165 Z" fill="#6366f1" opacity="0.25"/>
+  <!-- Extended to x+h -->
+  <path d="M 155,165 L 155,50 Q 168,46 180,46 L 180,165 Z" fill="#ef4444" opacity="0.3"/>
+  <!-- Curve -->
+  <path d="M 35,145 Q 55,120 80,94 Q 110,68 140,53 Q 165,42 195,40 Q 220,38 260,40" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Labels -->
+  <text x="55" y="182" font-size="8.5" fill="#4338ca" text-anchor="middle">a</text>
+  <text x="155" y="182" font-size="8.5" fill="#6366f1" text-anchor="middle">x</text>
+  <text x="180" y="182" font-size="8.5" fill="#ef4444" text-anchor="middle">x+h</text>
+  <line x1="55" y1="160" x2="55" y2="169" stroke="#4338ca" stroke-width="1.5"/>
+  <line x1="155" y1="160" x2="155" y2="169" stroke="#6366f1" stroke-width="1.5"/>
+  <line x1="180" y1="160" x2="180" y2="169" stroke="#ef4444" stroke-width="1.5"/>
+  <!-- A(x) label -->
+  <text x="100" y="125" font-size="9" fill="#6366f1" text-anchor="middle">A(x)</text>
+  <!-- Thin strip -->
+  <text x="168" y="80" font-size="8.5" fill="#ef4444">≈f(x)·h</text>
+  <!-- Right panel -->
+  <rect x="286" y="26" width="186" height="168" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="379" y="46" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">FTC Part 1</text>
+  <rect x="294" y="52" width="170" height="28" rx="4" fill="#dbeafe"/>
+  <text x="379" y="66" font-size="8" fill="#1d4ed8" text-anchor="middle">A(x) = ∫ₐˣ f(t) dt</text>
+  <text x="379" y="80" font-size="7.5" fill="#1e40af" text-anchor="middle">(accumulation function)</text>
+  <rect x="294" y="86" width="170" height="28" rx="4" fill="#dcfce7"/>
+  <text x="379" y="100" font-size="9" fill="#166534" text-anchor="middle" font-weight="700">A′(x) = f(x)</text>
+  <text x="379" y="114" font-size="7.5" fill="#15803d" text-anchor="middle">(derivative of integral)</text>
+  <text x="379" y="136" font-size="8" fill="#4338ca" text-anchor="middle">Key idea: each extra</text>
+  <text x="379" y="150" font-size="8" fill="#4338ca" text-anchor="middle">thin strip A(x+h)−A(x)</text>
+  <text x="379" y="164" font-size="8" fill="#4338ca" text-anchor="middle">has height ≈ f(x)</text>
+  <text x="379" y="180" font-size="8" fill="#ef4444" text-anchor="middle">∴ d/dx[∫ₐˣ f(t) dt] = f(x)</text>
+</svg>

@@ -1,4 +1,6 @@
 import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
+import riemannLeftRightUrl from '../diagrams/calc-riemann-left-right.svg?url';
+import riemannMidpointUrl from '../diagrams/calc-riemann-midpoint.svg?url';
 // FILE: src/content/chapter-4/01-riemann-sums.js
 export default {
   id: 'ch4-001',
@@ -22,13 +24,25 @@ export default {
         paragraphs: [
       'The idea is transparent: divide the interval [a, b] into n equal subintervals, each of width Δx = (b−a)/n. On each subinterval, approximate the function by a horizontal line — its value at some representative point in the subinterval. The area of the resulting thin rectangle is f(representative point) × Δx. Sum all the rectangles. This is a Riemann sum.',
       'There are three natural choices for the sample point in each subinterval.\n\n**Left endpoint rule** — use the left end of each piece:\n$L_n = [f(x_0)+f(x_1)+\\cdots+f(x_{n-1})]\\cdot\\Delta x$\n\n**Right endpoint rule** — use the right end:\n$R_n = [f(x_1)+f(x_2)+\\cdots+f(x_n)]\\cdot\\Delta x$\n\n**Midpoint rule** — use the centre $\\bar x_i=(x_{i-1}+x_i)/2$:\n$M_n = [f(\\bar x_1)+f(\\bar x_2)+\\cdots+f(\\bar x_n)]\\cdot\\Delta x$\n\nFor an increasing function: the left sum underestimates (rectangles fall short of the curve) and the right sum overestimates (rectangles poke above it). The midpoint rule is typically the most accurate of the three for smooth functions.',
+        ],
+      },
+      { type: 'image', src: riemannSumUrl, alt: 'Left-endpoint Riemann rectangles approximating a curve', caption: 'Left, right, and midpoint Riemann sums all converge to the same definite integral as n → ∞.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'As n grows, all three methods converge to the same limit — provided f is integrable (which all continuous functions are). With n = 4 rectangles, L₄ and R₄ for ∫₀¹ x² dx are 0.21875 and 0.46875 respectively. The true answer is 1/3 ≈ 0.3333. With n = 100 rectangles, Rₙ ≈ 0.3383 — much closer. With n = 1000, Rₙ ≈ 0.3343. The error decreases proportionally to 1/n, so doubling n halves the error.',
       'The trapezoidal rule Tₙ = (Lₙ + Rₙ)/2 is the average of the left and right sums. Geometrically, it replaces rectangles with trapezoids — connecting f(xᵢ₋₁) and f(xᵢ) with a straight line across each subinterval. The trapezoid area on [xᵢ₋₁, xᵢ] is ½(f(xᵢ₋₁)+f(xᵢ))·Δx. For T₄ on ∫₀¹ x² dx: T₄ = (0.21875 + 0.46875)/2 = 0.34375. This is already much closer to 1/3 than either L₄ or R₄ alone, because the trapezoidal error is proportional to 1/n², not 1/n.',
+        ],
+      },
+      { type: 'image', src: riemannLeftRightUrl, alt: 'Side-by-side: left endpoint rectangles vs right endpoint rectangles under a curve', caption: 'Left sums underestimate increasing functions; right sums overestimate. As n→∞, both converge to the same limit.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'For a concrete calculation of $L_4$ on $\\int_0^1 x^2\\,dx$: the four subintervals are $[0,0.25]$, $[0.25,0.5]$, $[0.5,0.75]$, $[0.75,1]$. Left endpoints: $0, 0.25, 0.5, 0.75$. Function values: $0,\\; 0.0625,\\; 0.25,\\; 0.5625$. Sum $= 0.875$. Multiply by $\\Delta x = 0.25$: $L_4 = 0.21875$.\n\nFor $R_4$, right endpoints: $0.25, 0.5, 0.75, 1$. Function values: $0.0625,\\; 0.25,\\; 0.5625,\\; 1$. Sum $= 1.875$. Multiply by $0.25$: $R_4 = 0.46875$.\n\nAverage: $T_4 = (0.21875+0.46875)/2 = 0.34375$. The true area $1/3 \\approx 0.3333$ is sandwiched between $L_4$ and $R_4$, as expected for an increasing function.',
       'An important conceptual point: the definition of the definite integral does not require equal-width subintervals. The general Riemann sum allows arbitrary partitions a = x₀ < x₁ < ··· < xₙ = b and arbitrary representative points cᵢ ∈ [xᵢ₋₁, xᵢ]. The integral is defined as the limit of Riemann sums as the mesh size (width of the widest subinterval) approaches zero, provided this limit exists and is the same for all choices of partitions and representative points. For continuous functions — and even for bounded functions with only finitely many discontinuities — this limit always exists. This robustness is what makes the Riemann integral so useful in practice.',
         ],
       },
-      { type: 'image', src: riemannSumUrl, alt: 'Left-endpoint Riemann rectangles approximating a curve', caption: 'Left, right, and midpoint Riemann sums all converge to the same definite integral as n → ∞.' },
+      { type: 'image', src: riemannMidpointUrl, alt: 'Midpoint rule rectangles touching the curve at each subinterval center', caption: 'The midpoint rule typically outperforms left/right sums of the same n — its error is O(1/n²) rather than O(1/n).' },
     ],
     callouts: [
       {

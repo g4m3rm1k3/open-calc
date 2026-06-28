@@ -1,4 +1,6 @@
 import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
+import evtAbsoluteUrl from '../diagrams/calc-evt-absolute.svg?url';
+import closedIntervalMethodUrl from '../diagrams/calc-closed-interval-method.svg?url';
 export default {
   id: 'ch3-extreme-value-theorem',
   slug: 'extreme-value-theorem',
@@ -34,6 +36,7 @@ export default {
           'Both conditions — **closed** and **continuous** — are required.',
         ],
       },
+      { type: 'image', src: curveExtremaUrl, alt: 'Cubic curve with local max and min labeled', caption: 'On a closed interval, a continuous function always attains an absolute max and an absolute min.' },
       {
         type: 'callout',
         callout: {
@@ -63,7 +66,8 @@ export default {
           'The value at each candidate is computed and the largest/smallest is highlighted.',
         caption: 'Adjust the function and interval. All candidates (endpoints + critical points) are marked. The absolute max and min are colored red and blue.',
       },
-      { type: 'image', src: curveExtremaUrl, alt: 'Cubic curve with local max and min labeled', caption: 'On a closed interval, a continuous function always attains an absolute max and an absolute min.' },
+      { type: 'image', src: evtAbsoluteUrl, alt: 'Curve on closed interval with absolute max and local extrema labeled', caption: 'EVT guarantees an absolute max and min exist — but there may also be local extrema that are not the global ones.' },
+      { type: 'image', src: closedIntervalMethodUrl, alt: 'Three-step method for finding absolute extrema on a closed interval', caption: 'Closed Interval Method: find critical points inside, evaluate at critical points and both endpoints, compare values.' },
     ],
   },
 

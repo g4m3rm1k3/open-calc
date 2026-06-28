@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Basic Antiderivative Rules</text>
+  <rect x="8" y="24" width="230" height="170" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="123" y="42" font-size="8.5" fill="#1e293b" text-anchor="middle" font-weight="700">Power &amp; Trig Rules</text>
+  <!-- Rules table -->
+  <rect x="16" y="48" width="214" height="16" rx="0" fill="#dbeafe"/>
+  <text x="82" y="60" font-size="8" fill="#1d4ed8" text-anchor="middle">∫ xⁿ dx</text>
+  <text x="174" y="60" font-size="8" fill="#1d4ed8" text-anchor="middle">= xⁿ⁺¹/(n+1) + C</text>
+  <rect x="16" y="64" width="214" height="16" rx="0" fill="#f8fafc"/>
+  <text x="82" y="76" font-size="8" fill="#374151" text-anchor="middle">∫ 1/x dx</text>
+  <text x="174" y="76" font-size="8" fill="#374151" text-anchor="middle">= ln|x| + C</text>
+  <rect x="16" y="80" width="214" height="16" rx="0" fill="#dbeafe"/>
+  <text x="82" y="92" font-size="8" fill="#1d4ed8" text-anchor="middle">∫ eˣ dx</text>
+  <text x="174" y="92" font-size="8" fill="#1d4ed8" text-anchor="middle">= eˣ + C</text>
+  <rect x="16" y="96" width="214" height="16" rx="0" fill="#f8fafc"/>
+  <text x="82" y="108" font-size="8" fill="#374151" text-anchor="middle">∫ sin x dx</text>
+  <text x="174" y="108" font-size="8" fill="#374151" text-anchor="middle">= −cos x + C</text>
+  <rect x="16" y="112" width="214" height="16" rx="0" fill="#dbeafe"/>
+  <text x="82" y="124" font-size="8" fill="#1d4ed8" text-anchor="middle">∫ cos x dx</text>
+  <text x="174" y="124" font-size="8" fill="#1d4ed8" text-anchor="middle">= sin x + C</text>
+  <rect x="16" y="128" width="214" height="16" rx="0" fill="#f8fafc"/>
+  <text x="82" y="140" font-size="8" fill="#374151" text-anchor="middle">∫ sec²x dx</text>
+  <text x="174" y="140" font-size="8" fill="#374151" text-anchor="middle">= tan x + C</text>
+  <rect x="16" y="144" width="214" height="16" rx="0" fill="#dbeafe"/>
+  <text x="82" y="156" font-size="8" fill="#1d4ed8" text-anchor="middle">∫ 1/(1+x²) dx</text>
+  <text x="174" y="156" font-size="8" fill="#1d4ed8" text-anchor="middle">= arctan x + C</text>
+  <rect x="16" y="160" width="214" height="28" rx="4" fill="#dcfce7"/>
+  <text x="123" y="176" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">Power Rule: flip derivative!</text>
+  <text x="123" y="186" font-size="7.5" fill="#15803d" text-anchor="middle">Raise exponent by 1, divide by new exponent</text>
+  <!-- Right panel -->
+  <rect x="246" y="24" width="226" height="170" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="359" y="42" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Linear Properties</text>
+  <rect x="254" y="50" width="210" height="26" rx="4" fill="#dbeafe"/>
+  <text x="359" y="63" font-size="8" fill="#1d4ed8" text-anchor="middle">∫ k·f(x) dx = k·∫f(x) dx</text>
+  <text x="359" y="78" font-size="7.5" fill="#1e40af" text-anchor="middle">(constants factor out)</text>
+  <rect x="254" y="82" width="210" height="26" rx="4" fill="#dcfce7"/>
+  <text x="359" y="95" font-size="8" fill="#166534" text-anchor="middle">∫ [f±g] dx = ∫f dx ± ∫g dx</text>
+  <text x="359" y="109" font-size="7.5" fill="#15803d" text-anchor="middle">(sum/difference splits)</text>
+  <text x="359" y="130" font-size="8" fill="#4338ca" text-anchor="middle" font-weight="700">Example:</text>
+  <text x="359" y="146" font-size="8" fill="#4338ca" text-anchor="middle">∫(3x² + 5cos x) dx</text>
+  <text x="359" y="160" font-size="8" fill="#4338ca" text-anchor="middle">= 3·(x³/3) + 5·sin x + C</text>
+  <text x="359" y="176" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">= x³ + 5 sin x + C</text>
+</svg>

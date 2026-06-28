@@ -1,6 +1,7 @@
 // FILE: src/content/chapter-3/00-related-rates.js
 import relatedRatesUrl from '../diagrams/calc-related-rates.svg?url';
 import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
+import relatedRatesLadderUrl from '../diagrams/calc-related-rates-ladder.svg?url';
 export default {
   id: "ch3-000",
   slug: "related-rates",
@@ -42,11 +43,17 @@ export default {
         paragraphs: [
       "The chain rule is the engine driving every related rates calculation. Whenever you differentiate a function of a variable that itself depends on t, you must multiply by the derivative of that variable with respect to t. This is d/dt[f(x(t))] = f'(x)·(dx/dt). In the ladder problem, x is a function of t, so d/dt[x²] = 2x·(dx/dt) — you cannot just write 2x. The (dx/dt) factor is essential because x itself is changing in time.",
       "Walk through the ladder problem conceptually to build intuition before any algebra. When the base is very close to the wall (x ≈ 0), the ladder is nearly vertical, and a small horizontal motion of the base produces almost no downward motion of the top. As the base slides further out, the geometry becomes more extreme: the top drops faster and faster. When the base is at 45° from the wall (x = y = L/√2), the top drops at exactly the same speed the base slides out. And as the base approaches L (the ladder is almost flat), the top plummets toward the floor at infinite speed — the constraint collapses to a degenerate triangle. The rate equation 2x(dx/dt) + 2y(dy/dt) = 0 captures all of this: dy/dt = -(x/y)·(dx/dt), and as y → 0 this ratio blows up.",
+        ],
+      },
+      { type: 'image', src: chainRuleUrl, alt: 'Chain rule pipeline: rates chain through the shared geometric relationship', caption: 'Related rates is implicit differentiation with t as the implicit variable.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Radar tracking works by the same logic. An aircraft is at horizontal distance x(t) from the radar station and at altitude h (constant for simplicity). The slant range r = √(x² + h²). Differentiating: dr/dt = x/r · (dx/dt). So dr/dt — the rate the range changes — depends on the current angle of depression, not just the aircraft's ground speed dx/dt. A slow plane flying directly toward the radar may have a very fast dr/dt when it is nearly overhead; a fast plane flying perpendicular to the line of sight may have dr/dt = 0. Air traffic controllers account for exactly this effect.",
       "The five-step procedure for related rates is reliable in every situation. Step 1: Draw and label a diagram. Put variables (not numbers) on all the changing quantities. Step 2: Write the equation that relates those variables — this is the geometric or physical constraint. Step 3: Differentiate both sides with respect to t, applying the chain rule to every variable-dependent term. Step 4: Substitute in the known numerical values at the specific instant — both positions and rates. Step 5: Solve algebraically for the unknown rate. The crucial discipline is in Step 4: you must differentiate FIRST, then substitute. Substituting before differentiating destroys the rate information.",
         ],
       },
-      { type: 'image', src: chainRuleUrl, alt: 'Chain rule pipeline: rates chain through the shared geometric relationship', caption: 'Related rates is implicit differentiation with t as the implicit variable.' },
+      { type: 'image', src: relatedRatesLadderUrl, alt: 'Ladder problem diagram with x, y, L labeled and dx/dt solution steps', caption: 'Ladder: x²+y²=L². Differentiate w.r.t. t to link dx/dt and dy/dt — then substitute known values.' },
     ],
     callouts: [
       {

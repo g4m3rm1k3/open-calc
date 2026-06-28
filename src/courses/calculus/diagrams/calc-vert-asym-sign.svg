@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Vertical Asymptotes — Sign Determines ±∞</text>
+
+  <!-- LEFT: 1/(x-2) behavior -->
+  <rect x="10" y="24" width="220" height="168" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="120" y="42" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">f(x) = 1/(x − 2)</text>
+
+  <!-- Axes -->
+  <line x1="28" y1="116" x2="220" y2="116" stroke="#64748b" stroke-width="1"/>
+  <line x1="130" y1="32" x2="130" y2="184" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="134" y="36" font-size="8" fill="#ef4444">x=2</text>
+
+  <!-- Left branch: 1/(x-2) → -∞ as x→2⁻ -->
+  <path d="M 30,110 Q 60,112 90,113 Q 110,115 122,180" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Right branch: 1/(x-2) → +∞ as x→2⁺ -->
+  <path d="M 138,32 Q 148,75 158,100 Q 175,110 210,113" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Sign labels -->
+  <text x="76" y="140" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="700">negative</text>
+  <text x="76" y="152" font-size="9" fill="#dc2626" text-anchor="middle">→ −∞</text>
+  <text x="178" y="72" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">positive</text>
+  <text x="178" y="83" font-size="9" fill="#059669" text-anchor="middle">→ +∞</text>
+
+  <!-- Sign analysis at bottom -->
+  <rect x="18" y="162" width="204" height="22" rx="5" fill="#eef2ff"/>
+  <text x="120" y="175" font-size="8" fill="#4338ca" text-anchor="middle">x&lt;2: denom&lt;0 → f&lt;0;  x&gt;2: denom&gt;0 → f&gt;0</text>
+
+  <!-- RIGHT: Sign chart method -->
+  <rect x="242" y="24" width="228" height="168" rx="8" fill="#1e1b4b"/>
+  <text x="356" y="42" font-size="9" fill="#a5b4fc" text-anchor="middle" font-weight="700">Sign Chart for Vertical Asymptotes</text>
+  <line x1="250" y1="48" x2="462" y2="48" stroke="#4338ca" stroke-width="1"/>
+
+  <!-- Number line with VA marked -->
+  <line x1="262" y1="80" x2="450" y2="80" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="356" y1="74" x2="356" y2="86" stroke="#ef4444" stroke-width="2"/>
+  <text x="356" y="68" font-size="8" fill="#ef4444" text-anchor="middle">x = c</text>
+  <text x="262" y="94" font-size="7.5" fill="#a5b4fc">−∞</text>
+  <text x="445" y="94" font-size="7.5" fill="#a5b4fc">+∞</text>
+
+  <!-- Region labels -->
+  <text x="310" y="78" font-size="8" fill="#94a3b8" text-anchor="middle">left of c</text>
+  <text x="402" y="78" font-size="8" fill="#94a3b8" text-anchor="middle">right of c</text>
+
+  <text x="262" y="116" font-size="8" fill="#e2e8f0">Test a point left of c:</text>
+  <text x="262" y="130" font-size="8.5" fill="#a5b4fc">plug in x₀ &lt; c → check sign of f(x₀)</text>
+
+  <text x="262" y="148" font-size="8" fill="#e2e8f0">Test a point right of c:</text>
+  <text x="262" y="162" font-size="8.5" fill="#a5b4fc">plug in x₁ &gt; c → check sign of f(x₁)</text>
+
+  <rect x="250" y="170" width="204" height="18" rx="4" fill="#4338ca"/>
+  <text x="352" y="183" font-size="8.5" fill="white" text-anchor="middle">sign tells you +∞ or −∞ direction</text>
+</svg>

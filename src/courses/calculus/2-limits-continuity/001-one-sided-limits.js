@@ -1,4 +1,6 @@
 import oneSidedUrl from '../diagrams/calc-one-sided.svg?url';
+import oneSidedDneUrl from '../diagrams/calc-one-sided-dne.svg?url';
+import oneSidedComparisonUrl from '../diagrams/calc-one-sided-comparison.svg?url';
 export default {
   id: 'ch1-one-sided-limits',
   slug: 'one-sided-limits',
@@ -30,6 +32,7 @@ export default {
           'We need two new tools: the **left-hand limit** (approaching from values smaller than a) and the **right-hand limit** (approaching from values larger than a).',
         ],
       },
+      { type: 'image', src: oneSidedUrl, alt: 'Two panels: limits agree (two-sided limit exists) vs. jump discontinuity', caption: 'The two-sided limit exists only when the left-hand and right-hand limits both exist and are equal.' },
       {
         type: 'callout',
         callout: {
@@ -48,6 +51,7 @@ export default {
           'The "cliff" is the point a, and the two one-sided limits describe what you see from each direction.',
         ],
       },
+      { type: 'image', src: oneSidedComparisonUrl, alt: 'Side-by-side comparison of left-hand limit notation (x→a⁻) and right-hand limit notation (x→a⁺)', caption: 'The superscript − means approaching from below (x < a); superscript + means from above (x > a).' },
       {
         type: 'viz',
         id: '',
@@ -66,7 +70,7 @@ export default {
                 'The two-sided limit exists if and only if both one-sided limits exist AND are equal to each other.',
         },
       },
-      { type: 'image', src: oneSidedUrl, alt: 'Two panels: limits agree (two-sided limit exists) vs. jump discontinuity', caption: 'The two-sided limit exists only when the left-hand and right-hand limits both exist and are equal.' },
+      { type: 'image', src: oneSidedDneUrl, alt: 'Jump discontinuity and oscillation showing the two cases where a limit DNE', caption: 'A limit does not exist when left ≠ right (jump) or when one side oscillates without settling.' },
     ],
   },
 

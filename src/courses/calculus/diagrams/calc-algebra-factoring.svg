@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Factoring Decision Tree</text>
+
+  <!-- Step 1: GCF -->
+  <rect x="170" y="24" width="140" height="30" rx="7" fill="#4338ca"/>
+  <text x="240" y="43" font-size="9.5" fill="white" text-anchor="middle" font-weight="700">Step 1: Pull out GCF first</text>
+
+  <!-- Arrow down -->
+  <line x1="240" y1="54" x2="240" y2="68" stroke="#4338ca" stroke-width="2"/>
+  <polygon points="240,74 235,62 245,62" fill="#4338ca"/>
+
+  <!-- Step 2: Count terms -->
+  <rect x="150" y="74" width="180" height="26" rx="6" fill="#6366f1"/>
+  <text x="240" y="91" font-size="9" fill="white" text-anchor="middle" font-weight="700">Step 2: How many terms?</text>
+
+  <!-- Branch left: 2 terms -->
+  <line x1="150" y1="87" x2="80" y2="116" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="80" y="112" font-size="8" fill="#6366f1" text-anchor="middle">2 terms</text>
+
+  <!-- Branch right: 3 terms -->
+  <line x1="330" y1="87" x2="400" y2="116" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="400" y="112" font-size="8" fill="#6366f1" text-anchor="middle">3 terms</text>
+
+  <!-- 2-term box: difference of squares/cubes -->
+  <rect x="10" y="118" width="174" height="74" rx="7" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="97" y="135" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">Difference of Squares/Cubes</text>
+  <text x="97" y="150" font-size="9" fill="#166534" text-anchor="middle" font-weight="700">a²−b² = (a−b)(a+b)</text>
+  <text x="97" y="165" font-size="9" fill="#166534" text-anchor="middle" font-weight="700">a³−b³ = (a−b)(a²+ab+b²)</text>
+  <text x="97" y="180" font-size="9" fill="#166534" text-anchor="middle" font-weight="700">a³+b³ = (a+b)(a²−ab+b²)</text>
+
+  <!-- 3-term box: trinomial -->
+  <rect x="296" y="118" width="174" height="74" rx="7" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="383" y="135" font-size="8.5" fill="#b45309" text-anchor="middle" font-weight="700">Trinomial ax²+bx+c</text>
+  <text x="383" y="150" font-size="8.5" fill="#78350f" text-anchor="middle">Find p,q: p·q=ac, p+q=b</text>
+  <text x="383" y="164" font-size="8.5" fill="#78350f" text-anchor="middle">Split middle term, factor</text>
+  <text x="383" y="178" font-size="8.5" fill="#b45309" text-anchor="middle" font-weight="700">x²−5x+6 = (x−2)(x−3)</text>
+
+  <!-- Middle column: perfect squares reminder -->
+  <rect x="192" y="118" width="96" height="74" rx="7" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="240" y="134" font-size="7.5" fill="#7e22ce" text-anchor="middle" font-weight="700">Perfect Sq.</text>
+  <text x="240" y="148" font-size="8.5" fill="#7e22ce" text-anchor="middle">(a+b)²=</text>
+  <text x="240" y="160" font-size="8.5" fill="#7e22ce" text-anchor="middle">a²+2ab+b²</text>
+  <text x="240" y="174" font-size="8.5" fill="#7e22ce" text-anchor="middle">(a−b)²=</text>
+  <text x="240" y="186" font-size="8.5" fill="#7e22ce" text-anchor="middle">a²−2ab+b²</text>
+</svg>

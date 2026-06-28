@@ -1,3 +1,7 @@
+import geoPythagProofUrl from '../diagrams/calc-geo-pythag-proof.svg?url'
+import geoSimilarTriUrl from '../diagrams/calc-geo-similar-tri.svg?url'
+import geoCircleAreaUrl from '../diagrams/calc-geo-circle-area.svg?url'
+
 export default {
   id: 'geometry-visual-proofs',
   slug: 'geometry-visual-proofs',
@@ -20,6 +24,11 @@ export default {
   intuition: {
     summary: `Geometric truths can often be proven by rearranging shapes — cutting, rotating,
       and recombining areas. Seeing these manipulations makes the formulas unforgettable.`,
+    blocks: [
+      { type: "image", src: geoPythagProofUrl, alt: "Pythagorean theorem area rearrangement proof", caption: "Visual proof of a² + b² = c²: rearrange the same four triangles two ways inside an equal square — the remaining areas must be equal." },
+      { type: "image", src: geoSimilarTriUrl, alt: "Similar triangles with proportional sides labeled", caption: "Similar triangles have equal angles and proportional sides. If sides scale by k, area scales by k²." },
+      { type: "image", src: geoCircleAreaUrl, alt: "Circle unrolled into a rectangle to show area formula", caption: "A circle's area: slice into sectors, rearrange into a near-rectangle with width πr and height r. Area = πr × r = πr²." },
+    ],
     perspectives: [
       {
         style: 'visual-proof',

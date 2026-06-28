@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Compound Inequalities — AND vs OR</text>
+  <!-- AND panel -->
+  <rect x="8" y="24" width="228" height="170" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="122" y="42" font-size="9" fill="#166534" text-anchor="middle" font-weight="700">AND — Intersection</text>
+  <text x="122" y="58" font-size="9" fill="#374151" text-anchor="middle">−1 ≤ x &lt; 3   →   [−1, 3)</text>
+  <!-- Number line AND -->
+  <line x1="24" y1="85" x2="222" y2="85" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="24" y="98" font-size="8" fill="#374151" text-anchor="middle">−3</text>
+  <text x="75" y="98" font-size="8" fill="#374151" text-anchor="middle">−1</text>
+  <text x="155" y="98" font-size="8" fill="#374151" text-anchor="middle">3</text>
+  <text x="220" y="98" font-size="8" fill="#374151" text-anchor="middle">5</text>
+  <!-- Highlight region -->
+  <line x1="75" y1="85" x2="155" y2="85" stroke="#22c55e" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="75" cy="85" r="5" fill="#22c55e"/>
+  <circle cx="155" cy="85" r="5" fill="white" stroke="#22c55e" stroke-width="2.5"/>
+  <text x="122" y="115" font-size="8.5" fill="#166534" text-anchor="middle">Solution: between −1 and 3</text>
+  <text x="122" y="132" font-size="8" fill="#374151" text-anchor="middle">Both conditions must hold simultaneously</text>
+  <text x="122" y="148" font-size="8" fill="#374151" text-anchor="middle">Set notation: {x : −1 ≤ x &lt; 3}</text>
+  <rect x="16" y="156" width="212" height="32" rx="4" fill="#bbf7d0"/>
+  <text x="122" y="170" font-size="8" fill="#166534" text-anchor="middle">Calculus: continuous intervals where f(x) &gt; 0</text>
+  <text x="122" y="183" font-size="8" fill="#166534" text-anchor="middle">are always written as AND inequalities</text>
+  <!-- OR panel -->
+  <rect x="244" y="24" width="228" height="170" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="358" y="42" font-size="9" fill="#92400e" text-anchor="middle" font-weight="700">OR — Union</text>
+  <text x="358" y="58" font-size="9" fill="#374151" text-anchor="middle">x &lt; −1  OR  x ≥ 3   →   (−∞,−1)∪[3,∞)</text>
+  <!-- Number line OR -->
+  <line x1="258" y1="85" x2="458" y2="85" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="262" y="98" font-size="8" fill="#374151" text-anchor="middle">−3</text>
+  <text x="310" y="98" font-size="8" fill="#374151" text-anchor="middle">−1</text>
+  <text x="390" y="98" font-size="8" fill="#374151" text-anchor="middle">3</text>
+  <text x="454" y="98" font-size="8" fill="#374151" text-anchor="middle">5</text>
+  <!-- Left ray -->
+  <line x1="258" y1="85" x2="310" y2="85" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="310" cy="85" r="5" fill="white" stroke="#f59e0b" stroke-width="2.5"/>
+  <!-- Right ray -->
+  <line x1="390" y1="85" x2="458" y2="85" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="390" cy="85" r="5" fill="#f59e0b"/>
+  <text x="358" y="115" font-size="8.5" fill="#92400e" text-anchor="middle">Solution: outside [−1, 3)</text>
+  <text x="358" y="132" font-size="8" fill="#374151" text-anchor="middle">At least one condition must hold</text>
+  <text x="358" y="148" font-size="8" fill="#374151" text-anchor="middle">Set notation: (−∞,−1) ∪ [3, ∞)</text>
+  <rect x="252" y="156" width="212" height="32" rx="4" fill="#fde68a"/>
+  <text x="358" y="170" font-size="8" fill="#92400e" text-anchor="middle">Calculus: solution sets of rational inequalities</text>
+  <text x="358" y="183" font-size="8" fill="#92400e" text-anchor="middle">often require OR (union of disjoint intervals)</text>
+</svg>

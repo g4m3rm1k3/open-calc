@@ -1,5 +1,6 @@
 import centroidUrl from '../diagrams/calc-centroid.svg?url';
 import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
+import momentsUrl from '../diagrams/calc-moments.svg?url';
 export default {
   id: 'ch4-centroid',
   slug: 'centers-of-mass',
@@ -41,11 +42,16 @@ export default {
       'Why the 1/2? Think of a thin vertical strip of height h = f(x)−g(x) at position x. The centroid of this strip is at its midpoint, which is at y = g(x) + h/2 = (f(x)+g(x))/2. The strip\'s mass contribution is h·dx = (f(x)−g(x))dx. Its moment about the x-axis is (mass)×(y-position of centroid) = (f(x)−g(x))dx × (f(x)+g(x))/2 = (1/2)(f²−g²)dx. That is where the (1/2)[f²−g²] comes from.',
 
       'Pappus\'s Theorem is a 4th-century gem: if a plane region with area A is rotated around an external axis, the volume of the solid is V = 2π·d̄·A, where d̄ is the distance from the centroid to the axis. Equivalently, V = (area) × (path traced by centroid) = A × (2πd̄). The derivation uses the shell method — V = 2π∫ₐᵇ x[f(x)−g(x)]dx = 2π·Mᵧ = 2π·x̄·m = 2π·x̄·A (for constant density). Pappus replaces an integral over a 3D solid with just the centroid of a 2D region — a massive simplification for symmetric shapes.',
-
-      'The classic application of Pappus is the torus (donut). Rotate a disk of radius r whose center is at distance R from the axis (R > r). The centroid of the disk is at its center, distance R from the axis. Area of disk = πr². Volume by Pappus: V = 2π·R·(πr²) = 2π²Rr². No setup of 3D integrals needed — one application of the centroid formula does everything. This is why centroids matter beyond pure geometry.',
         ],
       },
       { type: 'image', src: riemannSumUrl, alt: 'Vertical strips summing moment × area to find the centroid coordinates', caption: 'The centroid is the weighted average position — each strip contributes x·f(x)dx to the x-moment.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'The classic application of Pappus is the torus (donut). Rotate a disk of radius r whose center is at distance R from the axis (R > r). The centroid of the disk is at its center, distance R from the axis. Area of disk = πr². Volume by Pappus: V = 2π·R·(πr²) = 2π²Rr². No setup of 3D integrals needed — one application of the centroid formula does everything. This is why centroids matter beyond pure geometry.',
+        ],
+      },
+      { type: 'image', src: momentsUrl, alt: 'Seesaw with masses at either end; continuous moment formulas Mₓ and Mᵧ', caption: 'Moments measure weighted distance from an axis — x̄ = Mᵧ/m and ȳ = Mₓ/m give the balance point of the region.' },
     ],
     callouts: [
       {

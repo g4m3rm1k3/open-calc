@@ -1,5 +1,7 @@
 // FILE: src/content/chapter-5/02-convergence-tests.js
 import sequencesUrl from '../diagrams/calc-sequences.svg?url';
+import ratioRootTestUrl from '../diagrams/calc-ratio-root-test.svg?url';
+import comparisonTestUrl from '../diagrams/calc-comparison-test.svg?url';
 export default {
   id: 'ch5-002',
   slug: 'convergence-tests',
@@ -22,15 +24,27 @@ export default {
         paragraphs: [
       'The Integral Test bridges series and integrals. If $f(x)$ is positive, continuous, and decreasing for $x \\ge 1$, and $a_n = f(n)$, then $\\sum_{n=1}^{\\infty} a_n$ and $\\int_1^{\\infty} f(x)\\,dx$ either both converge or both diverge. The idea: the sum $\\sum a_n$ is trapped between the left and right Riemann sums of $\\int f(x)\\,dx$. Since $f$ is decreasing, $\\int_1^{N+1} f(x)\\,dx \\le \\sum_{n=1}^{N} f(n) \\le f(1) + \\int_1^{N} f(x)\\,dx$. So the sum and integral have the same convergence behavior.',
       'The p-series test is the most important consequence of the integral test. $\\sum_{n=1}^{\\infty} 1/n^p$ converges if $p > 1$ and diverges if $p \\le 1$. Proof via integral test: $\\int_1^{\\infty} x^{-p}\\,dx = \\frac{x^{1-p}}{1-p}\\Big|_1^{\\infty}$. For $p > 1$, the exponent $1-p < 0$, so $x^{1-p} \\to 0$; integral converges. For $p < 1$, $x^{1-p} \\to \\infty$; integral diverges. For $p = 1$: harmonic series, diverges. The p-series is the yardstick against which all other series are measured.',
+        ],
+      },
+      { type: 'image', src: sequencesUrl, alt: 'Convergent and divergent sequence plots illustrating convergence tests', caption: 'Convergence tests (ratio, root, integral, comparison) determine whether a series sums to something finite.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The Comparison Test (Direct Comparison): if $0 \\le a_n \\le b_n$ for all $n$, then (a) if $\\sum b_n$ converges, so does $\\sum a_n$, and (b) if $\\sum a_n$ diverges, so does $\\sum b_n$. Think of it as: a series smaller than a convergent series must converge; a series larger than a divergent series must diverge. The challenge is finding the right comparison series — usually a geometric series or p-series.',
       'The Limit Comparison Test is often easier than direct comparison. If $a_n, b_n > 0$ and $\\lim_{n\\to\\infty} a_n/b_n = L$ where $0 < L < \\infty$, then $\\sum a_n$ and $\\sum b_n$ either both converge or both diverge. The idea: for large $n$, $a_n \\approx L \\cdot b_n$, so the series behave identically. Use this when direct inequalities are hard to establish but the asymptotic behavior is clear. Typical: compare $\\sum \\frac{n}{n^3+1}$ to $\\sum 1/n^2$ (limit of ratio is $1$, both converge).',
       'The Alternating Series Test (Leibniz Test): if $\\{b_n\\}$ is decreasing, $b_n > 0$, and $b_n \\to 0$, then $\\sum_{n=1}^{\\infty}(-1)^{n+1}b_n$ converges. The partial sums oscillate with decreasing amplitude, squeezing toward the limit. Moreover, the error after $N$ terms is at most $b_{N+1}$ — the alternating series estimation theorem. Example: $\\sum (-1)^{n+1}/n = \\ln 2$ (conditionally convergent — converges but $\\sum 1/n$ diverges).',
+        ],
+      },
+      { type: 'image', src: ratioRootTestUrl, alt: 'Ratio test L=lim|aₙ₊₁/aₙ| and root test L=lim|aₙ|^(1/n) decision table', caption: 'Ratio test: best for factorials and exponentials. Root test: best when aₙ = (f(n))ⁿ. Both: L<1 converges, L>1 diverges, L=1 inconclusive.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Absolute vs. conditional convergence: $\\sum a_n$ converges absolutely if $\\sum |a_n|$ converges. If $\\sum a_n$ converges but $\\sum |a_n|$ diverges, the convergence is conditional. Key fact: absolute convergence implies convergence (since $|S_M - S_N| \\le \\sum_{n=N+1}^{M}|a_n|$), but not conversely. Absolutely convergent series can be rearranged freely; conditionally convergent series cannot (Riemann rearrangement theorem).',
       'The Ratio Test: let $L = \\lim_{n\\to\\infty} |a_{n+1}/a_n|$. If $L < 1$, the series converges absolutely. If $L > 1$ (or $L = \\infty$), it diverges. If $L = 1$, the test is inconclusive. The ratio test is ideal for series involving factorials, exponentials, or products. It detects "geometric-like" behavior: when the ratio of successive terms approaches a constant $r < 1$, the series behaves like a geometric series. Example: $\\sum n!/n^n$ — ratio $= (n/(n+1))^n \\cdot 1/(n+1) \\to e^{-1}/\\infty = 0 < 1$, converges.',
       'The Root Test: let $L = \\lim_{n\\to\\infty} |a_n|^{1/n}$. If $L < 1$, converges absolutely. If $L > 1$, diverges. If $L = 1$, inconclusive. The root test is stronger than the ratio test in theory (whenever ratio test gives an answer, root test gives the same; root test can sometimes decide when ratio test cannot). In practice, use the root test when $a_n$ has the form $(\\text{something})^n$. Example: $\\sum (n/(2n+1))^n$ — root $= n/(2n+1) \\to 1/2 < 1$, converges.',
         ],
       },
-      { type: 'image', src: sequencesUrl, alt: 'Convergent and divergent sequence plots illustrating convergence tests', caption: 'Convergence tests (ratio, root, integral, comparison) determine whether a series sums to something finite.' },
+      { type: 'image', src: comparisonTestUrl, alt: 'Direct comparison: 0≤aₙ≤bₙ; limit comparison: lim(aₙ/bₙ)=L in (0,∞)', caption: 'Comparison tests: find a known series (p-series, geometric) to bound yours. If limits agree 0<L<∞, the series share convergence behavior.' },
     ],
     callouts: [
       {

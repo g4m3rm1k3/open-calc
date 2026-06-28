@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Newton's Method — Iteration Convergence</text>
+  <rect x="8" y="22" width="300" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Axes -->
+  <line x1="28" y1="168" x2="300" y2="168" stroke="#64748b" stroke-width="1"/>
+  <line x1="28" y1="28" x2="28" y2="172" stroke="#64748b" stroke-width="1"/>
+  <!-- Curve -->
+  <path d="M 38,160 Q 80,155 120,135 Q 150,118 175,90 Q 200,62 220,40 Q 235,26 260,22 Q 280,18 295,22" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Root (where curve crosses x-axis) -->
+  <circle cx="80" cy="168" r="5" fill="#059669"/>
+  <text x="80" y="186" font-size="8" fill="#059669" text-anchor="middle" font-weight="700">root r</text>
+  <!-- x0 -->
+  <line x1="220" y1="163" x2="220" y2="172" stroke="#ef4444" stroke-width="2"/>
+  <text x="220" y="185" font-size="8" fill="#ef4444" text-anchor="middle">x₀</text>
+  <!-- Tangent at x0 (slope from curve to x-axis) -->
+  <circle cx="220" cy="40" r="4" fill="#ef4444"/>
+  <line x1="100" y1="168" x2="250" y2="28" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <!-- x1 (where tangent hits x-axis) -->
+  <line x1="140" y1="163" x2="140" y2="172" stroke="#f59e0b" stroke-width="2"/>
+  <text x="140" y="185" font-size="8" fill="#b45309" text-anchor="middle">x₁</text>
+  <circle cx="140" cy="124" r="4" fill="#f59e0b"/>
+  <line x1="72" y1="168" x2="165" y2="112" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <!-- x2 -->
+  <line x1="96" y1="163" x2="96" y2="172" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="96" y="185" font-size="8" fill="#7c3aed" text-anchor="middle">x₂</text>
+  <!-- Convergence arrows -->
+  <text x="165" y="155" font-size="9" fill="#4338ca">→ converging to root!</text>
+
+  <!-- Formula panel -->
+  <rect x="314" y="22" width="158" height="172" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="393" y="42" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">The Formula</text>
+  <rect x="322" y="48" width="142" height="28" rx="4" fill="#dbeafe"/>
+  <text x="393" y="62" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">x_{n+1} = xₙ − f(xₙ)/f ′(xₙ)</text>
+  <text x="393" y="78" font-size="7" fill="#1e40af" text-anchor="middle">new guess = old − f / f ′</text>
+  <text x="393" y="98" font-size="8" fill="#4338ca" text-anchor="middle" font-weight="700">Convergence Rate:</text>
+  <text x="393" y="114" font-size="7.5" fill="#4338ca" text-anchor="middle">quadratic — correct digits</text>
+  <text x="393" y="128" font-size="7.5" fill="#4338ca" text-anchor="middle">roughly double each step</text>
+  <rect x="322" y="138" width="142" height="48" rx="4" fill="#fef3c7"/>
+  <text x="393" y="154" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">⚠ May Fail When:</text>
+  <text x="393" y="168" font-size="7.5" fill="#78350f" text-anchor="middle">• f ′(xₙ) ≈ 0 (flat tangent)</text>
+  <text x="393" y="181" font-size="7.5" fill="#78350f" text-anchor="middle">• Oscillation / cycles</text>
+</svg>

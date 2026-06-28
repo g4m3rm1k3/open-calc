@@ -1,4 +1,6 @@
 import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
+import inverseReflectUrl from '../diagrams/calc-inverse-reflect.svg?url';
+import arctanDerivUrl from '../diagrams/calc-arctan-deriv.svg?url';
 export default {
   id: 'ch2-002b',
   slug: 'derivatives-of-inverse-functions',
@@ -40,13 +42,24 @@ export default {
 
       'If y = f(x), then the inverse relation is x = f^(-1)(y). Intuitively, moving forward through f and then backward through f^(-1) cancels out.',
       'On a graph, f and f^(-1) are reflections across y = x. Reflection swaps x and y coordinates, so tangent rise/run becomes run/rise. That is why inverse slopes are reciprocals.',
+        ],
+      },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing inverse trig function domains and ranges', caption: 'The derivative of an inverse function flips the x and y roles: (f⁻¹)′(y) = 1 / f′(f⁻¹(y)).' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The most common mistake is evaluating at the wrong point. If f(a) = b, then the reciprocal slope relation is between f\'(a) and (f^(-1))\'(b), not at the same x-value.',
       'This general rule plus implicit differentiation gives the inverse trig derivatives cleanly, with domain restrictions built in.',
       'Think of a function as a machine. You put in $x$, it produces $y = f(x)$. An inverse function is a second machine that takes the output $y$ and hands back the original input $x$. We write it $f^{-1}(y) = x$, or equivalently $f^{-1}(f(x)) = x$ for every $x$ in the domain.',
       'Here is the single most important visual fact: the graph of $f^{-1}$ is the graph of $f$ reflected across the line $y = x$. Every point $(a, b)$ on $f$ becomes the point $(b, a)$ on $f^{-1}$. That reflection is not a trick — it is the geometric meaning of swapping input and output.',
       'But there is an immediate problem. If $f$ ever produces the same output from two different inputs — say $f(2) = 9$ and $f(-2) = 9$ — then the "undo" machine is confused: given output $9$, does it return $2$ or $-2$? It cannot do both and still be a function. This is why we need the function to be one-to-one: each output must come from exactly one input.',
       'The quick visual check is the horizontal line test. Draw any horizontal line across the graph of $f$. If any horizontal line hits the graph more than once, $f$ is not one-to-one and has no inverse on that full domain.',
-
+        ],
+      },
+      { type: 'image', src: inverseReflectUrl, alt: 'Graph showing f and f⁻¹ reflected over y=x, with derivative formula (f⁻¹)′(b) = 1/f′(a)', caption: 'Graphically: f and f⁻¹ are mirror images over y=x. Reflection swaps Δx and Δy, so the slope becomes 1/m.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**Deriving d/dx[arctan(x)] step by step:** This derivation uses the same implicit-differentiation move that produced d/dx[ln(x)], but now applied to the arctangent. Step 1: let y = arctan(x). By the definition of arctan, this means tan(y) = x, with y restricted to (−π/2, π/2). Step 2: differentiate both sides of tan(y) = x with respect to x. The right side gives 1. The left side requires the chain rule on tan(y) — its derivative is sec²(y)·(dy/dx). So: sec²(y)·(dy/dx) = 1. Step 3: solve for dy/dx: dy/dx = 1/sec²(y) = cos²(y). Step 4: convert cos²(y) back to an expression in x. Since tan(y) = x, draw a right triangle with opposite side x and adjacent side 1, giving hypotenuse √(1+x²). Then cos(y) = 1/√(1+x²), so cos²(y) = 1/(1+x²). Therefore d/dx[arctan(x)] = 1/(1+x²). This formula is valid for all real x, because arctan is defined and differentiable everywhere.',
 
       '**A practical note: why arcsin and arctan matter for integration:** Knowing the derivatives d/dx[arcsin(x)] = 1/√(1−x²) and d/dx[arctan(x)] = 1/(1+x²) is not just an endpoint — it is a starting point for Chapter 4. Integration reverses differentiation: since d/dx[arctan(x)] = 1/(1+x²), the antiderivative of 1/(1+x²) is arctan(x)+C. Similarly, since d/dx[arcsin(x)] = 1/√(1−x²), the antiderivative of 1/√(1−x²) is arcsin(x)+C. These two integral formulas — ∫1/(1+x²)dx = arctan(x)+C and ∫1/√(1−x²)dx = arcsin(x)+C — appear constantly in calculus applications. Students who memorize the derivative formulas from this chapter recognize these integral patterns immediately in Chapter 4, while students who do not have to re-derive them each time.',
@@ -54,7 +67,7 @@ export default {
       '**Where this is heading:** You have now differentiated polynomials, trig, exponential/log, and inverse functions — a complete toolkit for every fundamental function type. The next lesson takes one final step: what if y is not even written explicitly as a function of x? That is implicit differentiation, and it is simply the chain rule applied to both sides of any equation.',
         ],
       },
-      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing inverse trig function domains and ranges', caption: 'The derivative of an inverse function flips the x and y roles: (f⁻¹)′(y) = 1 / f′(f⁻¹(y)).' },
+      { type: 'image', src: arctanDerivUrl, alt: 'Table of inverse trig derivatives: arcsin, arccos, arctan with graphs', caption: 'The three key inverse trig derivatives: arcsin and arccos use √(1−x²), arctan uses 1+x².' },
     ],
     callouts: [
       {

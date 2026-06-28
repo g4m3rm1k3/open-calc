@@ -1,4 +1,6 @@
 import powerRuleUrl from '../diagrams/calc-power-rule.svg?url';
+import pfPreviewUrl from '../diagrams/calc-pf-preview.svg?url';
+import pfSimpleExampleUrl from '../diagrams/calc-pf-simple-example.svg?url';
 export default {
   id: 'ch0-partial-fractions-intro',
   slug: 'partial-fractions-intro',
@@ -26,17 +28,27 @@ export default {
       'You already know how to add fractions: $\\frac{1}{x} - \\frac{1}{x+1} = \\frac{(x+1) - x}{x(x+1)} = \\frac{1}{x(x+1)}$. Partial fraction decomposition is the **reverse** of this process. Given the single fraction $\\frac{1}{x(x+1)}$, we want to find that it equals $\\frac{1}{x} - \\frac{1}{x+1}$.',
 
       'Why bother? Because the simple pieces are easy to work with. In calculus, $\\int \\frac{1}{x(x+1)}\\,dx$ looks hard, but $\\int \\frac{1}{x}\\,dx - \\int \\frac{1}{x+1}\\,dx = \\ln|x| - \\ln|x+1| + C$ is straightforward. Partial fractions decompose the hard problem into easy pieces.',
-
+        ],
+      },
+      { type: 'image', src: powerRuleUrl, alt: 'Algebraic decomposition showing partial fraction structure', caption: 'Partial fractions reverse the process of combining fractions over a common denominator.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The method depends on the type of factors in the denominator. **Distinct linear factors** like $(x-1)(x+2)(x-3)$ are the simplest case: write $\\frac{A}{x-1} + \\frac{B}{x+2} + \\frac{C}{x-3}$, one constant per factor.',
 
       '**Repeated linear factors** like $(x-1)^3$ require a term for each power: $\\frac{A}{x-1} + \\frac{B}{(x-1)^2} + \\frac{C}{(x-1)^3}$. Think of it like this: omitting lower powers would leave gaps that cannot be filled.',
-
+        ],
+      },
+      { type: 'image', src: pfPreviewUrl, alt: 'Worked example decomposing 1/(x²-1) into two simple fractions then integrating', caption: 'The power of partial fractions: a fraction that looks unintegrable breaks into pieces each trivially handled by ln|x|.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**Irreducible quadratic factors** (quadratics with no real roots, like $x^2 + 1$) get a linear numerator: $\\frac{Ax + B}{x^2 + 1}$. A constant numerator is not enough because the quadratic factor is degree 2. If the quadratic is repeated, like $(x^2 + 1)^2$, you need: $\\frac{Ax + B}{x^2 + 1} + \\frac{Cx + D}{(x^2 + 1)^2}$.',
 
       'Before decomposing, always check: is the fraction **proper** (degree of numerator < degree of denominator)? If not, perform polynomial long division first to get a polynomial plus a proper fraction. Then decompose the proper fraction.',
         ],
       },
-      { type: 'image', src: powerRuleUrl, alt: 'Algebraic decomposition showing partial fraction structure', caption: 'Partial fractions reverse the process of combining fractions over a common denominator.' },
+      { type: 'image', src: pfSimpleExampleUrl, alt: 'Step-by-step partial fraction decomposition solving for A and B by plugging in zeros', caption: 'Plug in the zeros of each denominator factor to instantly isolate A and B — no system of equations needed.' },
     ],
     callouts: [
       {

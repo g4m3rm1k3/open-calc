@@ -236,6 +236,9 @@ function SectionContent({ data }) {
       {(data.callouts ?? []).map((c, i) => (
         <Callout key={i} {...c} />
       ))}
+      {(data.images ?? []).map((img, i) => (
+        <SVGImage key={`img-${i}`} src={img.src} alt={img.alt} caption={img.caption} />
+      ))}
     </div>
   );
 }

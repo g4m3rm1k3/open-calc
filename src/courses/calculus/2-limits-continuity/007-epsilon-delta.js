@@ -1,5 +1,6 @@
 import epsilonDeltaUrl from '../diagrams/calc-epsilon-delta.svg?url';
 import limitConceptUrl from '../diagrams/calc-limit-concept.svg?url';
+import epsilonDeltaBoxUrl from '../diagrams/calc-epsilon-delta-box.svg?url';
 export default {
   id: "ch1-epsilon-delta",
   slug: "epsilon-delta",
@@ -51,11 +52,16 @@ export default {
       "The skeptic can pick ANY positive number ε (the output tolerance), no matter how tiny. You must respond with a δ (the input tolerance) that guarantees every x within δ of 3 has f(x) within ε of 7. If you can ALWAYS win — for EVERY possible ε — then the limit is truly 7.",
 
       "For this linear function, the winning strategy is simple: set δ = ε/2. For other functions, finding δ is harder — that's where the algebra comes in. But the game is always the same.",
-
-      'The beautiful thing about this definition: it never mentions infinity, it never mentions "approaching," and it never mentions motion or time. It replaces all of those fuzzy ideas with a single, airtight logical statement about numbers. This is what mathematician Morris Kline called "the arithmetization of analysis" — rebuilding all of calculus on nothing more than the properties of real numbers.',
         ],
       },
       { type: 'image', src: limitConceptUrl, alt: 'Curve with hole showing the informal limit that epsilon-delta formalizes', caption: 'ε-δ makes the intuitive idea of "approaching" into a precise, checkable condition.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'The beautiful thing about this definition: it never mentions infinity, it never mentions "approaching," and it never mentions motion or time. It replaces all of those fuzzy ideas with a single, airtight logical statement about numbers. This is what mathematician Morris Kline called "the arithmetization of analysis" — rebuilding all of calculus on nothing more than the properties of real numbers.',
+        ],
+      },
+      { type: 'image', src: epsilonDeltaBoxUrl, alt: 'ε-δ box on a graph: vertical ε-band paired with horizontal δ-band', caption: 'For any ε-strip around L, you must find a δ-interval around a such that f maps into the strip.' },
     ],
     callouts: [
       {

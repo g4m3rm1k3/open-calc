@@ -1,4 +1,6 @@
 import numberLineUrl from '../diagrams/calc-number-line.svg?url';
+import absValueGraphUrl from '../diagrams/calc-abs-value-graph.svg?url';
+import absValueEquationUrl from '../diagrams/calc-abs-value-equation.svg?url';
 export default {
   id: 'ch0-absolute-value',
   slug: 'absolute-value',
@@ -32,20 +34,30 @@ export default {
       'More generally, |x − a| asks: **How far is x from the point a?** This is the key insight that unlocks the whole topic. Forget the formula for a moment and just think of the picture: mark the point a on the number line, measure the distance to x, and strip away any directional sign. That distance is |x − a|.',
 
       'This geometric view immediately explains why |x − a| < r is equivalent to "x is within a circle of radius r centered at a." In one dimension, that "circle" is an interval: all points between a − r and a + r.',
-
+        ],
+      },
+      { type: 'image', src: numberLineUrl, alt: 'Number line showing absolute value as distance from zero', caption: '|x| is the distance from x to 0; |x − a| is the distance from x to the point a.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Watch what happens:',
       '• |x| < 2 means x is within distance 2 of zero, so −2 < x < 2.',
       '• |x − 5| < 3 means x is within distance 3 of the point 5, so 2 < x < 8 (which is 5 − 3 < x < 5 + 3).',
       '• |x − (−1)| < 0.5 means x is within distance 0.5 of the point −1, so −1.5 < x < −0.5.',
 
       'This pattern works every time. Once you see it as a distance picture, the algebra is just bookkeeping.',
-
+        ],
+      },
+      { type: 'image', src: absValueGraphUrl, alt: 'V-shaped graph of y = |x| with corner at origin labeled as non-differentiable', caption: 'The absolute value graph has a sharp corner at x = 0 — it is continuous but not differentiable there, a key calculus distinction.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'What about |x − a| > r? This is the complement: x is **not** close to a. Instead of one interval in the middle, you get two rays on the outside: x < a − r OR x > a + r.',
 
       'Multiplying by a negative number inside an absolute value is weird at first. But remember: |−x| means "the distance from −x to zero," which is the same as "the distance from x to zero." So |−x| = |x|. More generally, |−5x| = |5| · |−x| = 5|x|. The negative sign gets stripped away by the absolute value, leaving only magnitudes to multiply.',
         ],
       },
-      { type: 'image', src: numberLineUrl, alt: 'Number line showing absolute value as distance from zero', caption: '|x| is the distance from x to 0; |x − a| is the distance from x to the point a.' },
+      { type: 'image', src: absValueEquationUrl, alt: 'Four panels showing how to solve absolute value equations and both inequality types', caption: '|A| = c splits into two equations; |A| < c gives one interval (AND); |A| > c gives two rays (OR) — the ε-δ definition of limits uses this exact form.' },
     ],
     callouts: [
       {

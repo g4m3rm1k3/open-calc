@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Resolving 0/0 — Factor, Don't Substitute</text>
+
+  <!-- Step 1: Naive substitution fails -->
+  <rect x="10" y="26" width="140" height="164" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="80" y="44" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="700">Step 1: Naive Try</text>
+  <text x="80" y="62" font-size="9" class="mu" text-anchor="middle">lim  x²−4</text>
+  <text x="80" y="72" font-size="7" fill="#6366f1" text-anchor="middle">x→2  x−2</text>
+  <text x="80" y="90" font-size="8.5" class="mu" text-anchor="middle">plug in x = 2:</text>
+  <text x="80" y="106" font-size="12" fill="#dc2626" text-anchor="middle" font-weight="700">2²−4  = 0</text>
+  <text x="80" y="120" font-size="12" fill="#dc2626" text-anchor="middle" font-weight="700">2−2      0</text>
+  <line x1="58" y1="113" x2="103" y2="113" stroke="#dc2626" stroke-width="1"/>
+  <text x="80" y="140" font-size="18" fill="#dc2626" text-anchor="middle" font-weight="800">✗</text>
+  <rect x="18" y="150" width="124" height="30" rx="5" fill="#fca5a5"/>
+  <text x="80" y="164" font-size="8.5" fill="#7f1d1d" text-anchor="middle" font-weight="700">0/0 is UNDEFINED</text>
+  <text x="80" y="176" font-size="7.5" fill="#7f1d1d" text-anchor="middle">but limit may still exist!</text>
+
+  <!-- Arrow -->
+  <text x="163" y="100" font-size="10" fill="#059669" text-anchor="middle">factor</text>
+  <defs>
+    <marker id="arr5" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0,0 7,3.5 0,7" fill="#059669"/></marker>
+  </defs>
+  <line x1="156" y1="108" x2="176" y2="108" stroke="#059669" stroke-width="2" marker-end="url(#arr5)"/>
+
+  <!-- Step 2: Factor -->
+  <rect x="180" y="26" width="140" height="164" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="250" y="44" font-size="9" fill="#b45309" text-anchor="middle" font-weight="700">Step 2: Factor</text>
+  <text x="250" y="62" font-size="9" class="mu" text-anchor="middle">x²−4 = (x+2)(x−2)</text>
+  <text x="250" y="80" font-size="9" class="mu" text-anchor="middle">so the fraction becomes:</text>
+  <text x="250" y="100" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="700">(x+2)(x−2)</text>
+  <text x="250" y="115" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="700">   (x−2)</text>
+  <line x1="208" y1="107" x2="292" y2="107" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="250" y="136" font-size="9" class="mu" text-anchor="middle">cancel (x−2), x ≠ 2:</text>
+  <text x="250" y="154" font-size="14" fill="#059669" text-anchor="middle" font-weight="800">= x + 2</text>
+  <text x="250" y="172" font-size="7.5" class="mu" text-anchor="middle">(valid for x near 2, not at 2)</text>
+  <text x="250" y="184" font-size="7.5" class="mu" text-anchor="middle">the hole is gone!</text>
+
+  <!-- Arrow 2 -->
+  <text x="333" y="100" font-size="10" fill="#059669" text-anchor="middle">now</text>
+  <text x="333" y="110" font-size="10" fill="#059669" text-anchor="middle">sub</text>
+  <defs>
+    <marker id="arr6" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0,0 7,3.5 0,7" fill="#059669"/></marker>
+  </defs>
+  <line x1="326" y1="118" x2="346" y2="118" stroke="#059669" stroke-width="2" marker-end="url(#arr6)"/>
+
+  <!-- Step 3: Answer -->
+  <rect x="350" y="26" width="120" height="164" rx="8" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+  <text x="410" y="44" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">Step 3: Answer</text>
+  <text x="410" y="70" font-size="9" class="mu" text-anchor="middle">lim (x + 2)</text>
+  <text x="410" y="82" font-size="7.5" fill="#6366f1" text-anchor="middle">x→2</text>
+  <text x="410" y="98" font-size="9" class="mu" text-anchor="middle">now sub x = 2</text>
+  <text x="410" y="116" font-size="9" class="mu" text-anchor="middle">safely:</text>
+  <text x="410" y="140" font-size="24" fill="#10b981" text-anchor="middle" font-weight="800">4</text>
+  <text x="410" y="158" font-size="18" fill="#10b981" text-anchor="middle" font-weight="800">✓</text>
+  <rect x="358" y="164" width="104" height="20" rx="5" fill="#a7f3d0"/>
+  <text x="410" y="178" font-size="8.5" fill="#065f46" text-anchor="middle" font-weight="700">limit = 4</text>
+</svg>

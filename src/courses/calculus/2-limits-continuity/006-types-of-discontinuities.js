@@ -1,5 +1,6 @@
 import continuityUrl from '../diagrams/calc-continuity.svg?url';
 import continuity3CondUrl from '../diagrams/calc-continuity-3cond.svg?url';
+import discontinuityTypesUrl from '../diagrams/calc-discontinuity-types.svg?url';
 export default {
   id: "ch1-discontinuities",
   slug: "types-of-discontinuities",
@@ -58,13 +59,18 @@ export default {
         paragraphs: [
 
       '**Type 4: Oscillating Discontinuity (essential).** The function oscillates so wildly near the point that no limit exists, even $\\pm\\infty$. The classic example is $f(x) = \\sin(1/x)$ at $x = 0$. As $x \\to 0$, the argument $1/x \\to \\infty$ and $\\sin(1/x)$ oscillates infinitely many times between $-1$ and $+1$, never settling. No limit exists. This is the "worst" kind of discontinuity — no reasonable value can patch it.',
-
+        ],
+      },
+      { type: 'image', src: continuity3CondUrl, alt: 'Three-condition checklist showing which condition each discontinuity type violates', caption: 'Classifying a discontinuity tells you which condition failed and whether it can be repaired.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**The classification matters for calculus.** Integration: removable discontinuities do not affect integrals (a single point has zero area). Jump discontinuities create a change in the integral's value at that point. Infinite discontinuities may create improper integrals that diverge. Differentiation: none of these discontinuous functions are differentiable at the point of discontinuity — differentiability implies continuity.",
 
       '**Historical note.** Bernhard Riemann (1826–1866) gave the first systematic analysis of discontinuities. He showed that a function with only finitely many jump discontinuities is still integrable in his sense (the Riemann integral). This was revolutionary — before Riemann, most mathematicians thought discontinuous functions were "pathological." Today we know that many important functions (step functions, square waves, probability distributions) are naturally discontinuous.',
         ],
       },
-      { type: 'image', src: continuity3CondUrl, alt: 'Three-condition checklist showing which condition each discontinuity type violates', caption: 'Classifying a discontinuity tells you which condition failed and whether it can be repaired.' },
+      { type: 'image', src: discontinuityTypesUrl, alt: 'Three-panel comparison of removable, jump, and infinite discontinuity types', caption: 'Removable: fix by redefining f(a). Jump: cannot fix. Infinite: the function blows up at a.' },
     ],
     callouts: [
       {

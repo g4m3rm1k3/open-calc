@@ -1,6 +1,7 @@
 // FILE: src/content/chapter-3/06-newtons-method.js
 import newtonsMethodUrl from '../diagrams/calc-newtons-method.svg?url';
 import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
+import newtonsIterationUrl from '../diagrams/calc-newtons-iteration.svg?url';
 export default {
   id: 'ch3-060',
   slug: 'newtons-method',
@@ -95,6 +96,12 @@ export default {
       "You have spent this chapter using derivatives to analyze functions — their shape, their extrema, their limits. Newton's Method closes the chapter with a different kind of application: using derivatives to SOLVE equations. The idea is elegant: if you cannot solve f(x) = 0 algebraically, linearize f near your current best guess, solve the linear equation, and use that solution as your next guess. Repeat. The method converges so fast that it roughly doubles the number of correct decimal digits at every step. This is the algorithm behind square-root computations, GPS positioning, and most of the numerical methods in science and engineering.",
       "The idea behind Newton's Method is disarmingly simple. You want to solve $f(x) = 0$, but the equation is too complicated for algebra. So you start with a guess $x_0$ that is reasonably close to the root. At the point $(x_0, f(x_0))$, you draw the tangent line to the curve $y = f(x)$. This tangent line is a good local approximation to the curve, and it is easy to find where a straight line crosses the $x$-axis. Call that crossing point $x_1$. Now repeat: draw the tangent line at $(x_1, f(x_1))$ and find where it hits the $x$-axis to get $x_2$. Keep going. Each new point $x_n$ is (usually) closer to the true root than the last.",
       "Why does this work? Near a root, a smooth function looks almost like a straight line — this is precisely what differentiability means. The tangent line captures that local linear behavior. When you follow the tangent line to the $x$-axis, you are essentially solving the linearized version of the equation $f(x) = 0$. Since linearization is a good approximation near the root, the solution of the linearized equation is close to the true root. And the closer you start, the better the linear approximation, which is why the method accelerates as it converges.",
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Tangent line as local linear approximation — the core tool Newton\'s method exploits', caption: 'Newton\'s method applies the tangent-line approximation repeatedly; convergence is quadratic.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Let us derive the formula. The tangent line to $y = f(x)$ at the point $(x_n, f(x_n))$ is:",
       "$$y - f(x_n) = f'(x_n)(x - x_n)$$",
       "Setting $y = 0$ to find the $x$-intercept gives $-f(x_n) = f'(x_n)(x_{n+1} - x_n)$. Solving for $x_{n+1}$:",
@@ -114,7 +121,7 @@ export default {
       "**▶ Apply the sign-check rule:** Before moving to worked examples, find root brackets for $f(x) = x^3 - 4x + 1$. Evaluate $f$ at $x = -3, -2, -1, 0, 1, 2$. Where do sign changes occur? Record those three intervals — they will be the starting points for the three Newton sequences. *(Values: $f(-3) = -14$, $f(-2) = 1$, $f(-1) = 4$, $f(0) = 1$, $f(1) = -2$, $f(2) = 1$. Sign changes in $(-3,-2)$, $(0,1)$, and $(1,2)$ pin down all three roots in 60 seconds.)*",
         ],
       },
-      { type: 'image', src: secantToTangentUrl, alt: 'Tangent line as local linear approximation — the core tool Newton\'s method exploits', caption: 'Newton\'s method applies the tangent-line approximation repeatedly; convergence is quadratic.' },
+      { type: 'image', src: newtonsIterationUrl, alt: 'Newton\'s method iterations x0, x1, x2 converging to root with formula', caption: 'Each iteration: x_{n+1} = xₙ − f(xₙ)/f′(xₙ). Correct digits roughly double each step — quadratic convergence.' },
     ],
     callouts: [
       {

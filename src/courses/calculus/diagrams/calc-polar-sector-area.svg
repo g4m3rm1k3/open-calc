@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Polar Area — Sector Slicing</text>
+  <rect x="8" y="24" width="464" height="34" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="40" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">A = ½ ∫ₐᵝ [r(θ)]² dθ</text>
+  <text x="240" y="56" font-size="8" fill="#374151" text-anchor="middle">Each infinitesimal wedge has area ≈ ½r²dθ (sector of circle, angle dθ)</text>
+  <!-- Left: sector diagram -->
+  <rect x="8" y="66" width="230" height="128" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Polar curve (cardioid-like) -->
+  <path d="M 100,120 C 115,95 145,82 165,88 C 185,94 200,108 200,120 C 200,132 185,148 165,154 C 145,160 115,148 100,120 Z" fill="#6366f1" opacity="0.15" stroke="#6366f1" stroke-width="2"/>
+  <!-- Pole (origin) -->
+  <circle cx="100" cy="120" r="3" fill="#374151"/>
+  <text x="92" y="130" font-size="7.5" fill="#374151">O</text>
+  <!-- Two radii bounding a sector slice -->
+  <line x1="100" y1="120" x2="170" y2="86" stroke="#22c55e" stroke-width="2"/>
+  <line x1="100" y1="120" x2="178" y2="93" stroke="#22c55e" stroke-width="2"/>
+  <!-- Sector fill -->
+  <path d="M 100,120 L 170,86 A 72,72 0 0,1 178,93 Z" fill="#22c55e" opacity="0.3"/>
+  <!-- dθ arc -->
+  <text x="140" y="108" font-size="8" fill="#22c55e" text-anchor="middle">dθ</text>
+  <!-- r label -->
+  <text x="128" y="98" font-size="8.5" fill="#6366f1">r(θ)</text>
+  <!-- Area formula for wedge -->
+  <text x="118" y="170" font-size="7.5" fill="#374151" text-anchor="middle">dA = ½r²dθ  →  integrate over [α,β]</text>
+  <!-- Right panel: example -->
+  <rect x="246" y="66" width="226" height="128" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="359" y="84" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Example: r = 2 cos θ</text>
+  <text x="359" y="100" font-size="8" fill="#374151" text-anchor="middle">(circle of radius 1, centered at (1,0))</text>
+  <rect x="254" y="106" width="210" height="22" rx="3" fill="#dbeafe"/>
+  <text x="359" y="122" font-size="8" fill="#1d4ed8" text-anchor="middle">A = ½∫_{−π/2}^{π/2} (2cosθ)² dθ</text>
+  <rect x="254" y="132" width="210" height="22" rx="3" fill="#dcfce7"/>
+  <text x="359" y="148" font-size="8" fill="#166534" text-anchor="middle">= 2∫₀^{π/2} cos²θ dθ = 2·π/4 = π/2</text>
+  <text x="359" y="172" font-size="8" fill="#374151" text-anchor="middle">Check: area of circle r=1 is π(1)² = π</text>
+  <text x="359" y="185" font-size="8" fill="#374151" text-anchor="middle">Half = π/2 ✓ (traced for θ∈[−π/2,π/2])</text>
+</svg>

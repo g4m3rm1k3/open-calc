@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#dc2626" text-anchor="middle" font-weight="700">When One-Sided Limits Disagree → Limit DNE</text>
+
+  <!-- LEFT PANEL: Jump discontinuity (step function) -->
+  <rect x="10" y="24" width="210" height="166" rx="8" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="115" y="42" font-size="9" fill="#dc2626" text-anchor="middle" font-weight="700">JUMP — limit DNE at x = 2</text>
+
+  <!-- Axes -->
+  <line x1="28" y1="160" x2="210" y2="160" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="120" y1="40" x2="120" y2="170" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="120" y="180" font-size="7.5" class="mu" text-anchor="middle">x = 2</text>
+
+  <!-- Step function: left side y=1, right side y=3 -->
+  <!-- Left: (28,128) to (120,128) — y=1 in math → SVG 128 -->
+  <line x1="28" y1="128" x2="116" y2="128" stroke="#6366f1" stroke-width="2.5"/>
+  <circle cx="116" cy="128" r="4" fill="white" stroke="#6366f1" stroke-width="2"/>
+  <text x="55" y="120" font-size="8" fill="#6366f1">y = 1</text>
+
+  <!-- Right: (124,88) to (205,88) — y=3 in math → SVG 88 -->
+  <line x1="124" y1="88" x2="205" y2="88" stroke="#ef4444" stroke-width="2.5"/>
+  <circle cx="124" cy="88" r="4" fill="#ef4444" stroke="#ef4444" stroke-width="2"/>
+  <text x="165" y="80" font-size="8" fill="#ef4444">y = 3</text>
+
+  <!-- Arrows from both sides approaching x=2 -->
+  <defs>
+    <marker id="arrL" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0,0 7,3.5 0,7" fill="#6366f1"/></marker>
+    <marker id="arrR" markerWidth="7" markerHeight="7" refX="1" refY="3.5" orient="auto"><polygon points="7,0 0,3.5 7,7" fill="#ef4444"/></marker>
+    <marker id="arrG" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0,0 7,3.5 0,7" fill="#059669"/></marker>
+  </defs>
+  <line x1="88" y1="145" x2="108" y2="145" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrL)"/>
+  <text x="64" y="142" font-size="7" fill="#6366f1">lim⁻ = 1</text>
+  <line x1="152" y1="108" x2="132" y2="108" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrR)"/>
+  <text x="154" y="105" font-size="7" fill="#ef4444">lim⁺ = 3</text>
+
+  <rect x="18" y="162" width="194" height="18" rx="4" fill="#fca5a5"/>
+  <text x="115" y="174" font-size="8.5" fill="#7f1d1d" text-anchor="middle" font-weight="700">1 ≠ 3  →  lim DNE at x=2</text>
+
+  <!-- RIGHT PANEL: Oscillating at limit (like sin(1/x)) -->
+  <rect x="260" y="24" width="210" height="166" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="365" y="42" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">OSCILLATION — limit DNE at x = 0</text>
+
+  <!-- x axis -->
+  <line x1="278" y1="120" x2="460" y2="120" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="340" y1="40" x2="340" y2="170" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="340" y="180" font-size="7.5" class="mu" text-anchor="middle">x = 0</text>
+
+  <!-- Approximation of sin(1/x): rapid oscillation near x=0 -->
+  <!-- Using a series of short up/down lines that get denser near x=0 -->
+  <!-- From right side (x>0): oscillates faster as x approaches 0 -->
+  <path d="M 458,120 C 440,70 430,170 415,120 C 405,70 398,170 385,120 C 376,70 370,170 360,120 C 355,70 349,170 344,120"
+        fill="none" stroke="#10b981" stroke-width="2"/>
+  <path d="M 278,120 C 296,70 306,170 321,120 C 331,70 338,170 343,120"
+        fill="none" stroke="#10b981" stroke-width="2"/>
+
+  <!-- Label -->
+  <text x="430" y="70" font-size="7.5" fill="#059669">f(x) = sin(1/x)</text>
+  <text x="365" y="148" font-size="7.5" class="mu" text-anchor="middle">oscillates between −1 and +1</text>
+  <text x="365" y="158" font-size="7.5" class="mu" text-anchor="middle">infinitely as x → 0</text>
+
+  <rect x="268" y="162" width="194" height="18" rx="4" fill="#a7f3d0"/>
+  <text x="365" y="174" font-size="8.5" fill="#065f46" text-anchor="middle" font-weight="700">never settles → limit DNE</text>
+</svg>

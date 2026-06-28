@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Parallel and Perpendicular Lines</text>
+
+  <!-- LEFT PANEL: Parallel -->
+  <rect x="10" y="24" width="218" height="168" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="119" y="42" font-size="10" fill="#4338ca" text-anchor="middle" font-weight="700">PARALLEL LINES</text>
+
+  <!-- Two parallel lines (same slope ~0.7) -->
+  <line x1="20" y1="150" x2="156" y2="72" stroke="#6366f1" stroke-width="2.5"/>
+  <line x1="74" y1="176" x2="220" y2="92" stroke="#818cf8" stroke-width="2.5"/>
+
+  <!-- Slope labels -->
+  <text x="38" y="112" font-size="8.5" fill="#4338ca">m₁ = 2/3</text>
+  <text x="140" y="148" font-size="8.5" fill="#6366f1">m₂ = 2/3</text>
+
+  <!-- Same slope indicator -->
+  <rect x="26" y="156" width="196" height="28" rx="5" fill="#c7d2fe"/>
+  <text x="124" y="169" font-size="9" fill="#3730a3" text-anchor="middle" font-weight="700">Rule: m₁ = m₂</text>
+  <text x="124" y="180" font-size="7.5" fill="#4338ca" text-anchor="middle">same slope → never intersect</text>
+
+  <!-- Perpendicular symbol on left (the right angle between the parallel line directions) -->
+
+  <!-- RIGHT PANEL: Perpendicular -->
+  <rect x="252" y="24" width="218" height="168" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="361" y="42" font-size="10" fill="#059669" text-anchor="middle" font-weight="700">PERPENDICULAR LINES</text>
+
+  <!-- Line 1 (slope ~1) -->
+  <line x1="262" y1="168" x2="460" y2="68" stroke="#10b981" stroke-width="2.5"/>
+  <!-- Line 2 (slope ~-1, perpendicular) -->
+  <line x1="262" y1="68" x2="460" y2="168" stroke="#f59e0b" stroke-width="2.5"/>
+
+  <!-- Intersection point -->
+  <circle cx="361" cy="118" r="4" fill="#ef4444"/>
+
+  <!-- Right angle marker -->
+  <path d="M 361,118 L 369,110 L 377,118" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="370" y="104" font-size="8" fill="#ef4444">90°</text>
+
+  <!-- Slope labels -->
+  <text x="268" y="108" font-size="8.5" fill="#059669">m₁ = 1</text>
+  <text x="268" y="140" font-size="8.5" fill="#b45309">m₂ = −1</text>
+
+  <!-- Rule box -->
+  <rect x="258" y="156" width="204" height="28" rx="5" fill="#a7f3d0"/>
+  <text x="360" y="168" font-size="9" fill="#065f46" text-anchor="middle" font-weight="700">Rule: m₂ = −1/m₁</text>
+  <text x="360" y="180" font-size="7.5" fill="#065f46" text-anchor="middle">check: m₁·m₂ = −1</text>
+</svg>

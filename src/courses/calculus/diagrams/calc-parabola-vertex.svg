@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Parabola — Vertex Form vs Standard Form</text>
+  <!-- Left: parabola graph -->
+  <rect x="8" y="24" width="220" height="170" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <!-- Axes -->
+  <line x1="118" y1="30" x2="118" y2="188" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="14" y1="140" x2="222" y2="140" stroke="#94a3b8" stroke-width="1.5"/>
+  <!-- Parabola y = (x-2)^2 - 1, shifted so vertex at (118+40, 140-30) = (158, 110) -->
+  <!-- Points: x from -3 to 7 in original coords, vertex at x=2 -->
+  <path d="M 18,188 Q 118,50 218,188" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Vertex dot -->
+  <circle cx="118" cy="110" r="5" fill="#ef4444"/>
+  <text x="130" y="108" font-size="8" fill="#ef4444" font-weight="700">Vertex (h,k)</text>
+  <!-- Axis of symmetry -->
+  <line x1="118" y1="30" x2="118" y2="188" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="122" y="42" font-size="8" fill="#ef4444">axis of symmetry</text>
+  <!-- Labels -->
+  <text x="118" y="22" font-size="8" fill="#4338ca" text-anchor="middle">opens up if a&gt;0, down if a&lt;0</text>
+  <text x="118" y="195" font-size="8" fill="#374151" text-anchor="middle">Roots where parabola crosses x-axis</text>
+  <!-- Right: Forms comparison -->
+  <rect x="236" y="24" width="236" height="170" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="354" y="42" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Two Useful Forms</text>
+  <rect x="244" y="50" width="220" height="56" rx="4" fill="#dbeafe"/>
+  <text x="354" y="66" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">Vertex Form</text>
+  <text x="354" y="82" font-size="10" fill="#1d4ed8" text-anchor="middle" font-weight="700">y = a(x − h)² + k</text>
+  <text x="354" y="97" font-size="8" fill="#374151" text-anchor="middle">Vertex is at (h, k) — read off directly</text>
+  <rect x="244" y="114" width="220" height="56" rx="4" fill="#dcfce7"/>
+  <text x="354" y="130" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Standard Form</text>
+  <text x="354" y="146" font-size="10" fill="#166534" text-anchor="middle" font-weight="700">y = ax² + bx + c</text>
+  <text x="354" y="161" font-size="8" fill="#374151" text-anchor="middle">Vertex x = −b/(2a); roots via quadratic formula</text>
+  <rect x="244" y="178" width="220" height="14" rx="3" fill="#fef3c7"/>
+  <text x="354" y="189" font-size="7.5" fill="#92400e" text-anchor="middle">In calc: vertex = local min/max (critical point of derivative)</text>
+</svg>

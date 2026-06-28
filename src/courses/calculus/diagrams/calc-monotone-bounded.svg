@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Monotone Convergence Theorem</text>
+  <rect x="8" y="24" width="464" height="46" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="240" y="42" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">If a sequence is BOTH monotone AND bounded → it MUST converge</text>
+  <text x="240" y="60" font-size="8" fill="#374151" text-anchor="middle">The limit exists (even if we can't find it) — it is "pinched" by the bound</text>
+  <!-- Increasing bounded above -->
+  <rect x="8" y="78" width="220" height="116" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="118" y="95" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">↑ Increasing, bounded above</text>
+  <line x1="20" y1="160" x2="218" y2="160" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="20" y1="102" x2="218" y2="102" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="215" y="100" font-size="7" fill="#ef4444" text-anchor="end">M</text>
+  <circle cx="35" cy="150" r="4" fill="#22c55e"/>
+  <circle cx="65" cy="138" r="4" fill="#22c55e"/>
+  <circle cx="95" cy="128" r="4" fill="#22c55e"/>
+  <circle cx="125" cy="120" r="4" fill="#22c55e"/>
+  <circle cx="155" cy="114" r="4" fill="#22c55e"/>
+  <circle cx="185" cy="110" r="4" fill="#22c55e"/>
+  <circle cx="210" cy="108" r="4" fill="#22c55e"/>
+  <text x="118" y="180" font-size="7.5" fill="#166534" text-anchor="middle">Converges to L ≤ M</text>
+  <!-- Decreasing bounded below -->
+  <rect x="252" y="78" width="220" height="116" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="362" y="95" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">↓ Decreasing, bounded below</text>
+  <line x1="264" y1="160" x2="462" y2="160" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="264" y1="148" x2="462" y2="148" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="459" y="146" font-size="7" fill="#ef4444" text-anchor="end">m</text>
+  <circle cx="279" cy="108" r="4" fill="#3b82f6"/>
+  <circle cx="309" cy="118" r="4" fill="#3b82f6"/>
+  <circle cx="339" cy="128" r="4" fill="#3b82f6"/>
+  <circle cx="369" cy="136" r="4" fill="#3b82f6"/>
+  <circle cx="399" cy="142" r="4" fill="#3b82f6"/>
+  <circle cx="429" cy="146" r="4" fill="#3b82f6"/>
+  <circle cx="454" cy="148" r="4" fill="#3b82f6"/>
+  <text x="362" y="180" font-size="7.5" fill="#1d4ed8" text-anchor="middle">Converges to L ≥ m</text>
+</svg>

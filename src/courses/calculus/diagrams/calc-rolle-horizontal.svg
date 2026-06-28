@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Rolle's Theorem — Horizontal Tangent Guaranteed</text>
+  <rect x="8" y="22" width="464" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Axes -->
+  <line x1="30" y1="170" x2="460" y2="170" stroke="#64748b" stroke-width="1"/>
+  <line x1="30" y1="28" x2="30" y2="174" stroke="#64748b" stroke-width="1"/>
+  <!-- Curve from a to b with f(a)=f(b) -->
+  <path d="M 70,130 Q 100,80 150,52 Q 200,28 250,35 Q 300,44 340,52 Q 380,68 420,130" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Endpoint a -->
+  <circle cx="70" cy="130" r="5" fill="#4338ca"/>
+  <line x1="70" y1="165" x2="70" y2="175" stroke="#4338ca" stroke-width="2"/>
+  <text x="70" y="186" font-size="9" fill="#4338ca" text-anchor="middle">a</text>
+  <!-- Endpoint b -->
+  <circle cx="420" cy="130" r="5" fill="#4338ca"/>
+  <line x1="420" y1="165" x2="420" y2="175" stroke="#4338ca" stroke-width="2"/>
+  <text x="420" y="186" font-size="9" fill="#4338ca" text-anchor="middle">b</text>
+  <!-- Equal height label -->
+  <line x1="70" y1="130" x2="420" y2="130" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="46" y="133" font-size="8" fill="#64748b">f(a)</text>
+  <text x="425" y="133" font-size="8" fill="#64748b">=f(b)</text>
+  <!-- Peak point c -->
+  <circle cx="250" cy="35" r="6" fill="#ef4444"/>
+  <line x1="250" y1="165" x2="250" y2="172" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="250" y="185" font-size="9" fill="#b91c1c" text-anchor="middle">c</text>
+  <!-- Horizontal tangent at c -->
+  <line x1="210" y1="35" x2="290" y2="35" stroke="#ef4444" stroke-width="2.5"/>
+  <text x="298" y="32" font-size="8.5" fill="#ef4444" font-weight="700">f ′(c) = 0</text>
+  <!-- Theorem box -->
+  <rect x="300" y="80" width="158" height="80" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="379" y="98" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Rolle's Theorem</text>
+  <text x="379" y="114" font-size="8" fill="#4338ca" text-anchor="middle">If f(a) = f(b) and f</text>
+  <text x="379" y="128" font-size="8" fill="#4338ca" text-anchor="middle">is continuous on [a,b],</text>
+  <text x="379" y="142" font-size="8" fill="#4338ca" text-anchor="middle">differentiable on (a,b),</text>
+  <text x="379" y="156" font-size="8" fill="#ef4444" text-anchor="middle">∃ c : f ′(c) = 0</text>
+</svg>

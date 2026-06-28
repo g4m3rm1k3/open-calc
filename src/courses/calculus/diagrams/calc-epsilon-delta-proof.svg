@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">ε–δ Proof Strategy — Template</text>
+
+  <!-- Proof as numbered steps -->
+  <rect x="10" y="24" width="460" height="168" rx="8" fill="#1e1b4b"/>
+
+  <text x="26" y="46" font-size="9" fill="#a5b4fc" font-weight="700">Goal: prove  lim (2x + 1) = 5  as x → 2</text>
+  <line x1="18" y1="52" x2="462" y2="52" stroke="#4338ca" stroke-width="1"/>
+
+  <!-- Step 1 -->
+  <rect x="18" y="58" width="18" height="18" rx="4" fill="#6366f1"/>
+  <text x="27" y="71" font-size="9" fill="white" text-anchor="middle" font-weight="700">1</text>
+  <text x="44" y="71" font-size="8.5" fill="#e2e8f0">Let ε &gt; 0 be given. (Adversary picks ε; you must find δ.)</text>
+
+  <!-- Step 2 -->
+  <rect x="18" y="82" width="18" height="18" rx="4" fill="#6366f1"/>
+  <text x="27" y="95" font-size="9" fill="white" text-anchor="middle" font-weight="700">2</text>
+  <text x="44" y="95" font-size="8.5" fill="#e2e8f0">Scratch work:  |f(x) − L| = |(2x+1) − 5| = |2x−4| = 2|x−2|</text>
+
+  <!-- Step 3 -->
+  <rect x="18" y="106" width="18" height="18" rx="4" fill="#059669"/>
+  <text x="27" y="119" font-size="9" fill="white" text-anchor="middle" font-weight="700">3</text>
+  <text x="44" y="119" font-size="8.5" fill="#4ade80">Choose  δ = ε/2.  (Work backwards: want 2|x−2| &lt; ε → |x−2| &lt; ε/2)</text>
+
+  <!-- Step 4 -->
+  <rect x="18" y="130" width="18" height="18" rx="4" fill="#f59e0b"/>
+  <text x="27" y="143" font-size="9" fill="white" text-anchor="middle" font-weight="700">4</text>
+  <text x="44" y="143" font-size="8.5" fill="#fde68a">Verify: if |x − 2| &lt; δ = ε/2, then |f(x)−5| = 2|x−2| &lt; 2·(ε/2) = ε  ✓</text>
+
+  <!-- Step 5 -->
+  <rect x="18" y="154" width="18" height="18" rx="4" fill="#a855f7"/>
+  <text x="27" y="167" font-size="9" fill="white" text-anchor="middle" font-weight="700">5</text>
+  <text x="44" y="167" font-size="8.5" fill="#e2e8f0">Conclude: for any ε &gt; 0, δ = ε/2 works. Therefore lim = 5. ∎</text>
+
+  <!-- Key insight box -->
+  <rect x="18" y="174" width="444" height="14" rx="4" fill="#1e40af"/>
+  <text x="240" y="184" font-size="7.5" fill="#bfdbfe" text-anchor="middle">Pattern: scratch work finds δ in terms of ε; formal proof runs the logic forward</text>
+</svg>

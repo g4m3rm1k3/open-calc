@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Differential Approximation — Worked Example</text>
+  <!-- Steps panel -->
+  <rect x="8" y="26" width="228" height="168" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="122" y="44" font-size="8.5" fill="#1e293b" text-anchor="middle" font-weight="700">Approximate √25.1 using dy</text>
+  <!-- Step 1 -->
+  <rect x="16" y="52" width="212" height="28" rx="4" fill="#dbeafe"/>
+  <text x="122" y="66" font-size="8" fill="#1d4ed8" text-anchor="middle">f(x) = √x → f ′(x) = 1/(2√x)</text>
+  <text x="122" y="79" font-size="7.5" fill="#1e40af" text-anchor="middle">a = 25, dx = 0.1</text>
+  <!-- Step 2 -->
+  <rect x="16" y="86" width="212" height="28" rx="4" fill="#dcfce7"/>
+  <text x="122" y="100" font-size="8" fill="#166534" text-anchor="middle">f(25) = 5</text>
+  <text x="122" y="113" font-size="7.5" fill="#15803d" text-anchor="middle">f ′(25) = 1/(2·5) = 1/10</text>
+  <!-- Step 3 -->
+  <rect x="16" y="120" width="212" height="28" rx="4" fill="#fef3c7"/>
+  <text x="122" y="134" font-size="8" fill="#92400e" text-anchor="middle">dy = f ′(25) · dx = (1/10)(0.1)</text>
+  <text x="122" y="147" font-size="8" fill="#92400e" text-anchor="middle">dy = 0.01</text>
+  <!-- Result -->
+  <rect x="16" y="154" width="212" height="32" rx="4" fill="#ede9fe"/>
+  <text x="122" y="168" font-size="8" fill="#5b21b6" text-anchor="middle">√25.1 ≈ f(25) + dy</text>
+  <text x="122" y="181" font-size="9" fill="#4c1d95" text-anchor="middle" font-weight="700">≈ 5 + 0.01 = 5.01</text>
+  <!-- Comparison panel -->
+  <rect x="244" y="26" width="228" height="168" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="358" y="44" font-size="8.5" fill="#1e293b" text-anchor="middle" font-weight="700">Relative Error Analysis</text>
+  <rect x="252" y="52" width="212" height="68" rx="5" fill="#f1f5f9"/>
+  <text x="358" y="70" font-size="8" fill="#374151" text-anchor="middle">Actual: √25.1 = 5.00999…</text>
+  <text x="358" y="87" font-size="8" fill="#374151" text-anchor="middle">Approx: 5.01</text>
+  <text x="358" y="104" font-size="7.5" fill="#6b7280" text-anchor="middle">|error| = 0.00001 — tiny!</text>
+  <text x="358" y="120" font-size="7.5" fill="#6b7280" text-anchor="middle">Relative error &lt; 0.001%</text>
+  <!-- Percentage error bar -->
+  <rect x="252" y="128" width="212" height="56" rx="5" fill="#ecfdf5"/>
+  <text x="358" y="146" font-size="8" fill="#065f46" text-anchor="middle" font-weight="700">Why it works:</text>
+  <text x="358" y="162" font-size="7.5" fill="#065f46" text-anchor="middle">dx = 0.1 is small, so</text>
+  <text x="358" y="177" font-size="7.5" fill="#065f46" text-anchor="middle">higher-order terms (dx)² ≈ 0</text>
+</svg>

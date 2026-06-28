@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Limit Laws — Break It Apart, Then Evaluate</text>
+
+  <!-- Laws reference on left -->
+  <rect x="10" y="24" width="200" height="168" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="110" y="42" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">The Laws (if both limits exist)</text>
+  <line x1="18" y1="48" x2="202" y2="48" stroke="#c7d2fe" stroke-width="1"/>
+
+  <text x="20" y="63" font-size="8.5" fill="#4338ca" font-weight="700">Sum:</text>
+  <text x="65" y="63" font-size="8.5" class="mu">lim[f+g] = lim f + lim g</text>
+  <text x="20" y="79" font-size="8.5" fill="#4338ca" font-weight="700">Diff:</text>
+  <text x="65" y="79" font-size="8.5" class="mu">lim[f−g] = lim f − lim g</text>
+  <text x="20" y="95" font-size="8.5" fill="#059669" font-weight="700">Prod:</text>
+  <text x="65" y="95" font-size="8.5" class="mu">lim[f·g] = lim f · lim g</text>
+  <text x="20" y="111" font-size="8.5" fill="#059669" font-weight="700">Quot:</text>
+  <text x="65" y="111" font-size="8.5" class="mu">lim[f/g] = lim f / lim g</text>
+  <text x="65" y="122" font-size="7" class="mu">(if lim g ≠ 0)</text>
+  <text x="20" y="137" font-size="8.5" fill="#b45309" font-weight="700">Power:</text>
+  <text x="70" y="137" font-size="8.5" class="mu">lim[fⁿ] = (lim f)ⁿ</text>
+  <text x="20" y="153" font-size="8.5" fill="#b45309" font-weight="700">Root:</text>
+  <text x="70" y="153" font-size="8.5" class="mu">lim[ⁿ√f] = ⁿ√(lim f)</text>
+  <text x="20" y="169" font-size="8.5" fill="#dc2626" font-weight="700">Const:</text>
+  <text x="70" y="169" font-size="8.5" class="mu">lim k = k,  lim x = c</text>
+  <text x="20" y="185" font-size="7.5" class="mu">(at x → c)</text>
+
+  <!-- Worked example on right -->
+  <rect x="218" y="24" width="252" height="168" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="344" y="42" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">Worked: lim (3x² + 2x − 1)  as x→2</text>
+  <line x1="226" y1="48" x2="462" y2="48" stroke="#a7f3d0" stroke-width="1"/>
+
+  <text x="230" y="63" font-size="8" fill="#166534">= lim(3x²) + lim(2x) − lim(1)</text>
+  <text x="462" y="63" font-size="7" fill="#059669" text-anchor="end">Sum law</text>
+
+  <text x="230" y="80" font-size="8" fill="#166534">= 3·lim(x²) + 2·lim(x) − 1</text>
+  <text x="462" y="80" font-size="7" fill="#059669" text-anchor="end">Const·f, const</text>
+
+  <text x="230" y="97" font-size="8" fill="#166534">= 3·(lim x)² + 2·lim(x) − 1</text>
+  <text x="462" y="97" font-size="7" fill="#059669" text-anchor="end">Power law</text>
+
+  <text x="230" y="114" font-size="8" fill="#166534">= 3·(2)² + 2·(2) − 1</text>
+  <text x="462" y="114" font-size="7" fill="#059669" text-anchor="end">lim x = c</text>
+
+  <text x="230" y="131" font-size="8" fill="#166534">= 3·4 + 4 − 1</text>
+  <text x="230" y="148" font-size="8" fill="#166534">= 12 + 4 − 1</text>
+
+  <rect x="226" y="155" width="228" height="28" rx="6" fill="#4338ca"/>
+  <text x="340" y="170" font-size="11" fill="white" text-anchor="middle" font-weight="700">= 15  ✓</text>
+  <text x="340" y="179" font-size="7.5" fill="#a5b4fc" text-anchor="middle">same as direct substitution (when no 0/0)</text>
+</svg>

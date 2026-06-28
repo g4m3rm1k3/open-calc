@@ -1,5 +1,6 @@
 import limitLawsUrl from '../diagrams/calc-limit-laws.svg?url';
 import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
+import limitLawsApplyUrl from '../diagrams/calc-limit-laws-apply.svg?url';
 export default {
   id: "ch1-limit-laws",
   slug: "limit-laws",
@@ -46,13 +47,18 @@ export default {
         paragraphs: [
 
       '**But there is a catch.** Direct substitution only works when the denominator is nonzero and the function is "nice" (continuous) at the point. What happens when it gives 0/0? The function (x²−4)/(x−2) seems to equal 0/0 at x = 2. But remember: a limit cares about the journey toward 2, not the value at 2. Factor the top: (x+2)(x−2)/(x−2). For any x≠2, you can cancel (x−2)/(x−2) = 1, leaving x+2. As x approaches 2, x+2 approaches 4. The limit is 4, even though the function has a hole there. This algebraic cancellation technique — factor and cancel before substituting — is the standard first move when you get 0/0.',
-
+        ],
+      },
+      { type: 'image', src: limitApproachUrl, alt: 'Curve approaching L, showing that laws apply when both limits are finite', caption: 'Direct substitution works for polynomials and rationals at points in their domain.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**The Squeeze Theorem is a completely different kind of tool.** Sometimes a function is so wild that you cannot factor or simplify it. The classic example is f(x) = x·sin(1/x) near x = 0. As x approaches 0, sin(1/x) oscillates infinitely many times back and forth between −1 and +1 — it has no limit of its own. You cannot factor it. You cannot simplify it. But here is the key observation: |sin(anything)| ≤ 1 always. So −|x| ≤ x·sin(1/x) ≤ |x| for all x ≠ 0. Both −|x| and |x| approach 0. The function is sandwiched (squeezed) between two things that both go to 0, so it must go to 0 too. No algebra involved — just the logical consequence of being trapped.',
 
       '**The fundamental trig limits, sin(x)/x → 1 and (1−cos x)/x → 0 as x→0, are the most important applications of the Squeeze Theorem in Calculus 1.** They cannot be obtained by algebra. They require the Squeeze Theorem plus a geometric argument about areas on the unit circle. And they come back in every single derivative of a trig function. If you ever see $\\frac{\\sin(5x)}{x}$, the trick is to force the pattern: multiply and divide by 5 to get $5 \\cdot \\frac{\\sin(5x)}{5x}$, and now the piece in brackets approaches 1 as x goes to 0. So the answer is 5.',
         ],
       },
-      { type: 'image', src: limitApproachUrl, alt: 'Curve approaching L, showing that laws apply when both limits are finite', caption: 'Direct substitution works for polynomials and rationals at points in their domain.' },
+      { type: 'image', src: limitLawsApplyUrl, alt: 'Limit laws reference table and a worked example decomposing a polynomial limit', caption: 'Apply limit laws step-by-step: break the limit into pieces, evaluate each, then combine.' },
     ],
     callouts: [
       {

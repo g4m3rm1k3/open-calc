@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">What f ′ Tells You About f</text>
+
+  <!-- Main graph -->
+  <rect x="8" y="22" width="290" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Axes -->
+  <line x1="20" y1="160" x2="290" y2="160" stroke="#64748b" stroke-width="1"/>
+  <line x1="20" y1="30" x2="20" y2="164" stroke="#64748b" stroke-width="1"/>
+
+  <!-- A curve with: decreasing → local min → increasing → local max → decreasing -->
+  <!-- Local min at x≈120, local max at x≈210 -->
+  <path d="M 20,60 Q 60,80 90,110 Q 110,130 120,140 Q 135,130 160,110 Q 185,88 210,80 Q 230,78 250,90 Q 270,108 288,128" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="14" y="56" font-size="8.5" fill="#6366f1" font-weight="700">f(x)</text>
+
+  <!-- Annotations -->
+  <circle cx="120" cy="140" r="4.5" fill="#059669"/>
+  <text x="105" y="156" font-size="7.5" fill="#059669" text-anchor="middle">local min</text>
+  <text x="105" y="166" font-size="7" fill="#94a3b8" text-anchor="middle">f ′=0, − → +</text>
+
+  <circle cx="210" cy="80" r="4.5" fill="#ef4444"/>
+  <text x="222" y="72" font-size="7.5" fill="#ef4444">local max</text>
+  <text x="222" y="82" font-size="7" fill="#94a3b8">f ′=0, + → −</text>
+
+  <!-- Slope indicators -->
+  <text x="60" y="52" font-size="8" fill="#dc2626" text-anchor="middle" font-style="italic">f ′ &lt; 0</text>
+  <text x="60" y="64" font-size="7.5" fill="#dc2626" text-anchor="middle">decreasing</text>
+  <text x="165" y="62" font-size="8" fill="#059669" text-anchor="middle" font-style="italic">f ′ &gt; 0</text>
+  <text x="165" y="72" font-size="7.5" fill="#059669" text-anchor="middle">increasing</text>
+  <text x="260" y="70" font-size="8" fill="#dc2626" text-anchor="middle" font-style="italic">f ′ &lt; 0</text>
+  <text x="260" y="80" font-size="7.5" fill="#dc2626" text-anchor="middle">decreasing</text>
+
+  <!-- RIGHT: summary rules -->
+  <rect x="306" y="22" width="166" height="172" rx="8" fill="#1e1b4b"/>
+  <text x="389" y="40" font-size="8.5" fill="#a5b4fc" text-anchor="middle" font-weight="700">f ′ → f Decoder</text>
+  <line x1="314" y1="44" x2="464" y2="44" stroke="#312e81" stroke-width="1"/>
+
+  <text x="314" y="60" font-size="8" fill="#4ade80" font-weight="700">f ′(x) &gt; 0:</text>
+  <text x="314" y="72" font-size="8" fill="#94a3b8">f is increasing ↑</text>
+  <line x1="314" y1="77" x2="464" y2="77" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="314" y="93" font-size="8" fill="#f87171" font-weight="700">f ′(x) &lt; 0:</text>
+  <text x="314" y="105" font-size="8" fill="#94a3b8">f is decreasing ↓</text>
+  <line x1="314" y1="110" x2="464" y2="110" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="314" y="126" font-size="8" fill="#fbbf24" font-weight="700">f ′(x) = 0:</text>
+  <text x="314" y="138" font-size="8" fill="#94a3b8">critical point</text>
+  <text x="314" y="150" font-size="7.5" fill="#94a3b8">(possible extremum)</text>
+  <line x1="314" y1="155" x2="464" y2="155" stroke="#312e81" stroke-width="0.5"/>
+
+  <text x="314" y="171" font-size="7.5" fill="#94a3b8">− to + sign change:</text>
+  <text x="314" y="183" font-size="7.5" fill="#4ade80" font-weight="700">LOCAL MIN</text>
+  <text x="370" y="183" font-size="7.5" fill="#94a3b8">  + to −:</text>
+  <text x="314" y="195" font-size="7.5" fill="#f87171" font-weight="700">LOCAL MAX</text>
+</svg>

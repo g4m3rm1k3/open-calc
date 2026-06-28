@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Solving Absolute Value Equations &amp; Inequalities</text>
+  <!-- Equations -->
+  <rect x="8" y="24" width="220" height="80" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="118" y="40" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">|ax + b| = c  (c &gt; 0)</text>
+  <text x="118" y="58" font-size="8.5" fill="#374151" text-anchor="middle">ax + b = c  OR  ax + b = −c</text>
+  <text x="118" y="74" font-size="8.5" fill="#374151" text-anchor="middle">→ Two solutions</text>
+  <text x="118" y="96" font-size="8" fill="#4338ca" text-anchor="middle">Example: |2x−1| = 5 → x = 3 or x = −2</text>
+  <!-- Less than -->
+  <rect x="236" y="24" width="236" height="80" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="354" y="40" font-size="9" fill="#166534" text-anchor="middle" font-weight="700">|ax + b| &lt; c  (AND)</text>
+  <text x="354" y="58" font-size="8.5" fill="#374151" text-anchor="middle">−c &lt; ax + b &lt; c</text>
+  <text x="354" y="74" font-size="8.5" fill="#374151" text-anchor="middle">→ One connected interval</text>
+  <text x="354" y="96" font-size="8" fill="#166534" text-anchor="middle">|x−3| &lt; 2 → 1 &lt; x &lt; 5 → (1, 5)</text>
+  <!-- Greater than -->
+  <rect x="8" y="112" width="220" height="80" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="118" y="128" font-size="9" fill="#92400e" text-anchor="middle" font-weight="700">|ax + b| &gt; c  (OR)</text>
+  <text x="118" y="146" font-size="8.5" fill="#374151" text-anchor="middle">ax + b &gt; c  OR  ax + b &lt; −c</text>
+  <text x="118" y="162" font-size="8.5" fill="#374151" text-anchor="middle">→ Two separate rays</text>
+  <text x="118" y="184" font-size="8" fill="#92400e" text-anchor="middle">|x−3| &gt; 2 → x&lt;1 or x&gt;5 → (−∞,1)∪(5,∞)</text>
+  <!-- Calculus connection -->
+  <rect x="236" y="112" width="236" height="80" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="354" y="130" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Calculus Connection</text>
+  <text x="354" y="148" font-size="8" fill="#374151" text-anchor="middle">|f(x) − L| &lt; ε  appears in</text>
+  <text x="354" y="164" font-size="8" fill="#374151" text-anchor="middle">the formal ε-δ definition of limits</text>
+  <text x="354" y="184" font-size="8.5" fill="#7c3aed" text-anchor="middle">"within ε of L" = centered interval</text>
+</svg>

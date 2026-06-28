@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Fourier Series Preview — Trig Representations</text>
+  <rect x="8" y="24" width="464" height="30" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="38" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">f(x) = a₀/2 + Σ[aₙ cos(nx) + bₙ sin(nx)]</text>
+  <text x="240" y="52" font-size="8" fill="#374151" text-anchor="middle">Unlike Taylor (one point), Fourier series represent periodic functions globally</text>
+  <!-- Diagram: square wave approximated by trig -->
+  <rect x="8" y="62" width="250" height="132" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="20" y1="130" x2="248" y2="130" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="20" y1="72" x2="20" y2="156" stroke="#94a3b8" stroke-width="1"/>
+  <!-- Square wave (target) -->
+  <polyline points="20,130 80,130 80,90 160,90 160,130 240,130" fill="none" stroke="#ef4444" stroke-width="2"/>
+  <!-- sin approximation -->
+  <path d="M 20,130 Q 35,100 50,90 Q 65,82 80,90 Q 110,100 130,90 Q 150,82 160,90 Q 185,100 200,90 Q 220,82 240,90" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <!-- Better approx -->
+  <path d="M 20,130 Q 40,105 60,90 Q 75,84 80,90 Q 95,100 105,90 Q 130,80 160,90 Q 190,105 200,90 Q 225,82 240,90" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="40" y="152" font-size="7" fill="#ef4444">target</text>
+  <text x="100" y="152" font-size="7" fill="#22c55e">1 term</text>
+  <text x="155" y="152" font-size="7" fill="#6366f1">3 terms</text>
+  <text x="134" y="165" font-size="7.5" fill="#374151" text-anchor="middle">More trig terms → closer to target</text>
+  <!-- Right: Key facts -->
+  <rect x="266" y="62" width="206" height="132" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="369" y="80" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Taylor vs Fourier</text>
+  <text x="369" y="96" font-size="8" fill="#374151" text-anchor="middle" font-weight="700">Taylor series:</text>
+  <text x="369" y="110" font-size="8" fill="#374151" text-anchor="middle">• Local (near one point a)</text>
+  <text x="369" y="122" font-size="8" fill="#374151" text-anchor="middle">• Uses polynomial terms xⁿ</text>
+  <text x="369" y="136" font-size="8" fill="#374151" text-anchor="middle" font-weight="700">Fourier series:</text>
+  <text x="369" y="150" font-size="8" fill="#374151" text-anchor="middle">• Global (all of −π to π)</text>
+  <text x="369" y="164" font-size="8" fill="#374151" text-anchor="middle">• Uses trig terms sin/cos</text>
+  <text x="369" y="180" font-size="7.5" fill="#6366f1" text-anchor="middle">Covered in depth in Calc 3 / DE</text>
+</svg>

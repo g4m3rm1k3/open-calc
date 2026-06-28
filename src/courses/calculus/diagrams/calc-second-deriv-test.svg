@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Second Derivative Test</text>
+  <!-- Case 1: f''<0 → local max -->
+  <rect x="8" y="26" width="148" height="168" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+  <text x="82" y="46" font-size="8.5" fill="#991b1b" text-anchor="middle" font-weight="700">f ′′(c) &lt; 0</text>
+  <text x="82" y="62" font-size="8" fill="#991b1b" text-anchor="middle">LOCAL MAXIMUM</text>
+  <text x="82" y="76" font-size="7.5" fill="#991b1b" text-anchor="middle">(concave down ∩)</text>
+  <line x1="20" y1="150" x2="144" y2="150" stroke="#64748b" stroke-width="1"/>
+  <path d="M 28,145 Q 50,120 82,100 Q 104,88 120,100 Q 132,110 144,140" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+  <circle cx="82" cy="100" r="6" fill="#dc2626"/>
+  <text x="82" y="93" font-size="7.5" fill="#dc2626" text-anchor="middle" font-weight="700">MAX</text>
+  <text x="82" y="168" font-size="7.5" fill="#991b1b" text-anchor="middle">smiling → sad face</text>
+  <text x="82" y="180" font-size="7.5" fill="#991b1b" text-anchor="middle">∩ concave down</text>
+
+  <!-- Case 2: f''=0 → inconclusive -->
+  <rect x="166" y="26" width="148" height="168" rx="8" fill="#f3f4f6" stroke="#9ca3af" stroke-width="2"/>
+  <text x="240" y="46" font-size="8.5" fill="#374151" text-anchor="middle" font-weight="700">f ′′(c) = 0</text>
+  <text x="240" y="62" font-size="8" fill="#374151" text-anchor="middle">INCONCLUSIVE</text>
+  <text x="240" y="76" font-size="7.5" fill="#374151" text-anchor="middle">Must use 1st Deriv Test</text>
+  <line x1="178" y1="150" x2="302" y2="150" stroke="#64748b" stroke-width="1"/>
+  <!-- Inflection point example -->
+  <path d="M 186,145 Q 210,140 240,115 Q 260,100 280,120 Q 292,132 302,148" fill="none" stroke="#6b7280" stroke-width="2.5"/>
+  <circle cx="240" cy="115" r="6" fill="#6b7280"/>
+  <text x="240" y="108" font-size="7" fill="#4b5563" text-anchor="middle">?</text>
+  <text x="240" y="168" font-size="7.5" fill="#374151" text-anchor="middle">Could be max, min,</text>
+  <text x="240" y="180" font-size="7.5" fill="#374151" text-anchor="middle">or inflection point</text>
+
+  <!-- Case 3: f''>0 → local min -->
+  <rect x="324" y="26" width="148" height="168" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="398" y="46" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">f ′′(c) &gt; 0</text>
+  <text x="398" y="62" font-size="8" fill="#166534" text-anchor="middle">LOCAL MINIMUM</text>
+  <text x="398" y="76" font-size="7.5" fill="#166534" text-anchor="middle">(concave up ∪)</text>
+  <line x1="336" y1="150" x2="460" y2="150" stroke="#64748b" stroke-width="1"/>
+  <path d="M 344,140 Q 360,125 398,105 Q 420,98 435,108 Q 448,120 460,142" fill="none" stroke="#16a34a" stroke-width="2.5"/>
+  <circle cx="398" cy="105" r="6" fill="#16a34a"/>
+  <text x="398" y="98" font-size="7.5" fill="#166534" text-anchor="middle" font-weight="700">MIN</text>
+  <text x="398" y="168" font-size="7.5" fill="#166534" text-anchor="middle">sad → smiling face</text>
+  <text x="398" y="180" font-size="7.5" fill="#166534" text-anchor="middle">∪ concave up</text>
+</svg>

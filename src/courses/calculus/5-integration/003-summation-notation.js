@@ -1,4 +1,6 @@
 import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
+import sigmaNotationUrl from '../diagrams/calc-sigma-notation.svg?url';
+import summationFormulasUrl from '../diagrams/calc-summation-formulas.svg?url';
 // FILE: src/content/chapter-4/00c-summation-notation.js
 export default {
   id: "ch4-000c",
@@ -70,17 +72,27 @@ export default {
       "**The index is a dummy variable.** $\\displaystyle\\sum_{i=1}^{n} i^2 = \\sum_{j=1}^{n} j^2 = \\sum_{k=1}^{n} k^2$. All three are identical — they all mean $1^2 + 2^2 + \\cdots + n^2$. The name of the index does not matter, only its range and the summand formula. This becomes important when you need to rename an index to combine two sums.",
 
       "**Linearity — the key property.** Sums obey the same linearity as derivatives and integrals. For constants $c$ and sequences $a_i$, $b_i$:\n\n- **Factor out a constant:** $\\displaystyle\\sum_{i=1}^n c \\cdot a_i = c \\sum_{i=1}^n a_i$\n- **Split over addition:** $\\displaystyle\\sum_{i=1}^n (a_i + b_i) = \\sum_{i=1}^n a_i + \\sum_{i=1}^n b_i$\n- **Split over subtraction:** $\\displaystyle\\sum_{i=1}^n (a_i - b_i) = \\sum_{i=1}^n a_i - \\sum_{i=1}^n b_i$\n\nThese let you break a complicated sum into simpler pieces that the closed-form identities can handle.",
-
+        ],
+      },
+      { type: 'image', src: riemannSumUrl, alt: 'Riemann sum diagram with Σ notation labeled', caption: 'Summation notation Σ compactly expresses the sum of many rectangle areas.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**The four closed-form identities.** When the summand is a simple power of $i$, the entire sum collapses to a formula in $n$. These four formulas are the engine of Riemann sum computation:\n\n$$\\sum_{i=1}^{n} 1 = n$$\n$$\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}$$\n$$\\sum_{i=1}^{n} i^2 = \\frac{n(n+1)(2n+1)}{6}$$\n$$\\sum_{i=1}^{n} i^3 = \\left[\\frac{n(n+1)}{2}\\right]^2$$\n\nMemorize the first two; the second two are worth recognizing. These are not arbitrary — they each have elegant proofs.",
 
       "**Proof of $\\sum_{i=1}^n i = n(n+1)/2$ — Gauss's method.** Write the sum twice — once forward, once backward:\n$$S = 1 + 2 + 3 + \\cdots + n$$\n$$S = n + (n-1) + (n-2) + \\cdots + 1$$\nAdd column by column: each pair adds to $n+1$, and there are $n$ pairs:\n$$2S = n(n+1) \\implies S = \\frac{n(n+1)}{2}$$\nLegend: Gauss reputedly discovered this in primary school when his teacher assigned the class to add 1 through 100 to keep them busy. Gauss finished in seconds: $100 \\times 101 / 2 = 5050$.",
-
+        ],
+      },
+      { type: 'image', src: sigmaNotationUrl, alt: 'Anatomy of sigma notation: index, lower bound, upper bound, and summand', caption: 'Σᵢ₌₁ⁿ f(i) reads: sum f(i) as i runs from 1 to n — index, range, and rule all in one symbol.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**Telescoping sums.** When consecutive terms cancel, a sum collapses dramatically. If $a_i = b_{i+1} - b_i$ for some sequence $b$, then:\n$$\\sum_{i=1}^{n} a_i = \\sum_{i=1}^{n}(b_{i+1} - b_i) = b_{n+1} - b_1$$\nThis is because every intermediate term appears once as $+b_k$ and once as $-b_k$, leaving only the first and last:\n$$(b_2 - b_1) + (b_3 - b_2) + (b_4 - b_3) + \\cdots + (b_{n+1} - b_n) = b_{n+1} - b_1$$\nThe $\\sum_{i=1}^n i^2$ identity can be proved by telescoping a cleverly chosen sequence.",
 
       "**Connection to Riemann sums.** The right-endpoint Riemann sum for $\\int_a^b f(x)\\,dx$ with $n$ equal subdivisions is:\n$$R_n = \\sum_{i=1}^{n} f\\!\\left(a + i\\,\\frac{b-a}{n}\\right) \\cdot \\frac{b-a}{n}$$\nEvery symbol here means something: the $\\sum$ tells us to add $n$ terms; $a + i\\cdot\\frac{b-a}{n}$ is the right endpoint of the $i$-th rectangle; $\\frac{b-a}{n}$ is the width $\\Delta x$; $f(\\cdot)$ is the height. To compute $\\lim_{n\\to\\infty} R_n$ exactly for polynomial $f$, you expand using linearity, apply the closed-form identities, then take the limit — and you get the exact integral without any guesswork.",
         ],
       },
-      { type: 'image', src: riemannSumUrl, alt: 'Riemann sum diagram with Σ notation labeled', caption: 'Summation notation Σ compactly expresses the sum of many rectangle areas.' },
+      { type: 'image', src: summationFormulasUrl, alt: 'Table of closed-form summation formulas: Σ1, Σi, Σi², Σi³', caption: 'Closed-form formulas for Σi, Σi², and Σi³ let us evaluate Riemann sums exactly before taking the limit n→∞.' },
     ],
     callouts: [
       {

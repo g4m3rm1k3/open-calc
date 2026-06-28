@@ -1,4 +1,6 @@
 import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
+import geoAnglesUrl from '../diagrams/calc-geo-angles.svg?url';
+import geoAreaFormulasUrl from '../diagrams/calc-geo-area-formulas.svg?url';
 export default {
   id: "ch0-geometry-review",
   slug: "geometry-review",
@@ -44,6 +46,7 @@ export default {
           "René Descartes had a revolutionary idea in the 1600s: put a grid on the plane. Assign every point a pair of numbers $(x, y)$. Suddenly, geometry becomes algebra. Shapes become equations. Proofs become calculations. This fusion of geometry and algebra — **coordinate geometry** (or analytic geometry) — is the language calculus is built on.",
         ],
       },
+      { type: 'image', src: geoAnglesUrl, alt: 'Four panels: acute, right, obtuse, and supplementary angles with triangle angle sum', caption: 'Angles classify as acute (< 90°), right (= 90°), or obtuse (> 90°); supplementary pairs sum to 180° — and so do interior triangle angles.' },
       {
         type: "prose",
         paragraphs: [
@@ -177,6 +180,7 @@ export default {
           "Triangles are everywhere in calculus — from computing areas under curves to understanding the geometry behind trigonometric functions. The area of a triangle is $A = \\frac{1}{2} \\cdot \\text{base} \\cdot \\text{height}$. **Similar triangles** have the same angles and proportional sides — they are scaled copies of each other, and their corresponding side ratios are equal.",
         ],
       },
+      { type: 'image', src: geoAreaFormulasUrl, alt: 'Area formulas for rectangle, triangle, circle, trapezoid, and Pythagorean theorem', caption: 'These five formulas appear throughout calculus — in surface area integrals, arc length, and optimization problems.' },
       {
         type: "viz",
         id: "VideoCarousel",

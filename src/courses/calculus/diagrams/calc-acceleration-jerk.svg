@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Position → Velocity → Acceleration (Physics Chain)</text>
+
+  <!-- Three columns: s, v, a -->
+  <rect x="6" y="22" width="148" height="172" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="80" y="40" font-size="9.5" fill="#059669" text-anchor="middle" font-weight="700">s(t) — Position</text>
+  <text x="80" y="58" font-size="9" fill="#065f46" text-anchor="middle">1st primitive</text>
+
+  <!-- Position curve -->
+  <line x1="16" y1="158" x2="144" y2="158" stroke="#64748b" stroke-width="1"/>
+  <line x1="16" y1="68" x2="16" y2="162" stroke="#64748b" stroke-width="1"/>
+  <path d="M 20,158 Q 50,130 70,100 Q 88,76 100,68 Q 112,64 125,70 Q 136,80 142,98" fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <text x="80" y="168" font-size="8" fill="#166534" text-anchor="middle">where object IS</text>
+  <text x="80" y="180" font-size="8" fill="#059669" text-anchor="middle" font-weight="700">s(t) = t³ − 3t + 1</text>
+
+  <!-- Arrow 1 -->
+  <rect x="156" y="88" width="60" height="24" rx="4" fill="#4338ca"/>
+  <text x="186" y="100" font-size="8" fill="white" text-anchor="middle">d/dt →</text>
+  <text x="186" y="110" font-size="7" fill="#a5b4fc" text-anchor="middle">take deriv</text>
+
+  <rect x="170" y="56" width="32" height="16" rx="3" fill="#312e81"/>
+  <text x="186" y="67" font-size="7" fill="#c7d2fe" text-anchor="middle">1st deriv</text>
+
+  <rect x="162" y="128" width="48" height="14" rx="3" fill="#1e1b4b"/>
+  <text x="186" y="138" font-size="7" fill="#94a3b8" text-anchor="middle">velocity</text>
+
+  <rect x="166" y="148" width="38" height="26" rx="3" fill="#0f172a"/>
+  <text x="185" y="161" font-size="7" fill="#4ade80" text-anchor="middle">v = s′</text>
+  <text x="185" y="171" font-size="6.5" fill="#64748b" text-anchor="middle">= 3t²−3</text>
+
+  <rect x="166" y="178" width="38" height="16" rx="3" fill="#0f172a"/>
+  <text x="185" y="189" font-size="6.5" fill="#f87171" text-anchor="middle">a = v′=s″</text>
+
+  <rect x="222" y="22" width="148" height="172" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="296" y="40" font-size="9.5" fill="#b45309" text-anchor="middle" font-weight="700">v(t) — Velocity</text>
+  <text x="296" y="58" font-size="9" fill="#92400e" text-anchor="middle">s′(t) = v(t)</text>
+
+  <!-- Velocity curve: parabola-like -->
+  <line x1="232" y1="130" x2="360" y2="130" stroke="#64748b" stroke-width="1"/>
+  <line x1="232" y1="68" x2="232" y2="134" stroke="#64748b" stroke-width="1"/>
+  <path d="M 234,68 Q 255,90 276,116 Q 286,128 296,130 Q 306,128 316,116 Q 336,90 358,68" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+  <circle cx="296" cy="130" r="3.5" fill="#f59e0b"/>
+  <text x="296" y="148" font-size="8" fill="#92400e" text-anchor="middle">v=0: object reverses</text>
+  <text x="296" y="162" font-size="8" fill="#b45309" text-anchor="middle" font-weight="700">v(t) = 3t² − 3</text>
+  <text x="296" y="176" font-size="8" fill="#92400e" text-anchor="middle">speed vs velocity:</text>
+  <text x="296" y="188" font-size="7.5" fill="#94a3b8" text-anchor="middle">speed = |v(t)|, direction matters</text>
+
+  <!-- Arrow 2 -->
+  <rect x="372" y="88" width="60" height="24" rx="4" fill="#4338ca"/>
+  <text x="402" y="100" font-size="8" fill="white" text-anchor="middle">d/dt →</text>
+  <text x="402" y="110" font-size="7" fill="#a5b4fc" text-anchor="middle">take deriv</text>
+
+  <rect x="436" y="22" width="38" height="172" rx="8" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="455" y="52" font-size="7.5" fill="#7c3aed" text-anchor="middle" transform="rotate(-90, 455, 108)">a(t) — Accel. = v′ = s″ = 6t</text>
+</svg>

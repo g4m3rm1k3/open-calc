@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Tangent Line vs Secant Line — Key Differences</text>
+
+  <!-- Comparison table -->
+  <rect x="10" y="22" width="460" height="172" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- Header row -->
+  <rect x="10" y="22" width="460" height="24" rx="8" fill="#4338ca"/>
+  <text x="150" y="38" font-size="9" fill="white" text-anchor="middle" font-weight="700">SECANT LINE</text>
+  <text x="355" y="38" font-size="9" fill="white" text-anchor="middle" font-weight="700">TANGENT LINE</text>
+  <line x1="240" y1="22" x2="240" y2="194" stroke="#6366f1" stroke-width="1.5"/>
+
+  <!-- Row 1 -->
+  <rect x="10" y="46" width="460" height="28" fill="#f0f9ff" opacity="0.6"/>
+  <text x="20" y="60" font-size="8" fill="#64748b" font-weight="700">Connects:</text>
+  <text x="150" y="60" font-size="8.5" fill="#1d4ed8" text-anchor="middle">TWO points on curve</text>
+  <text x="355" y="60" font-size="8.5" fill="#059669" text-anchor="middle">ONE point (just touches)</text>
+  <text x="20" y="72" font-size="7.5" fill="#94a3b8">(a, f(a)) and (a+h, f(a+h))</text>
+  <text x="150" y="72" font-size="7" fill="#94a3b8" text-anchor="middle">h ≠ 0</text>
+  <text x="355" y="72" font-size="7" fill="#94a3b8" text-anchor="middle">as h → 0</text>
+
+  <!-- Row 2 -->
+  <rect x="10" y="74" width="460" height="24" fill="white" opacity="0.6"/>
+  <text x="20" y="88" font-size="8" fill="#64748b" font-weight="700">Slope formula:</text>
+  <text x="150" y="88" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">[f(a+h) − f(a)] / h</text>
+  <text x="355" y="88" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">lim [f(a+h)−f(a)] / h</text>
+
+  <!-- Row 3 -->
+  <rect x="10" y="98" width="460" height="24" fill="#f0f9ff" opacity="0.6"/>
+  <text x="20" y="112" font-size="8" fill="#64748b" font-weight="700">Gives:</text>
+  <text x="150" y="112" font-size="8.5" fill="#1d4ed8" text-anchor="middle">Average rate over [a, a+h]</text>
+  <text x="355" y="112" font-size="8.5" fill="#059669" text-anchor="middle">Instantaneous rate at a</text>
+
+  <!-- Row 4 -->
+  <rect x="10" y="122" width="460" height="24" fill="white" opacity="0.6"/>
+  <text x="20" y="136" font-size="8" fill="#64748b" font-weight="700">This is called:</text>
+  <text x="150" y="136" font-size="8.5" fill="#1d4ed8" text-anchor="middle">Difference quotient</text>
+  <text x="355" y="136" font-size="8.5" fill="#059669" text-anchor="middle">The derivative f ′(a)</text>
+
+  <!-- Row 5: visual -->
+  <rect x="10" y="146" width="460" height="48" fill="#f8fafc"/>
+  <text x="20" y="162" font-size="8" fill="#64748b" font-weight="700">Visual:</text>
+
+  <!-- Secant mini: two points connected -->
+  <circle cx="90" cy="174" r="3" fill="#1d4ed8"/>
+  <circle cx="160" cy="152" r="3" fill="#1d4ed8"/>
+  <line x1="70" y1="180" x2="185" y2="144" stroke="#1d4ed8" stroke-width="1.5"/>
+  <path d="M 72,182 Q 100,172 130,162 Q 145,157 162,152" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="125" y="192" font-size="7.5" fill="#1d4ed8" text-anchor="middle">two points, finite h</text>
+
+  <!-- Tangent mini: one point just touching -->
+  <circle cx="310" cy="162" r="3.5" fill="#059669"/>
+  <line x1="250" y1="180" x2="380" y2="142" stroke="#059669" stroke-width="2"/>
+  <path d="M 252,182 Q 280,172 310,162 Q 340,152 372,142" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="315" y="192" font-size="7.5" fill="#059669" text-anchor="middle">one point, h = 0 (limit)</text>
+</svg>

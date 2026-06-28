@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Curve Sketching — Systematic Steps</text>
+  <!-- 6 step boxes in 3x2 grid -->
+  <rect x="8" y="24" width="148" height="80" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="82" y="42" font-size="8" fill="#1d4ed8" text-anchor="middle" font-weight="700">① Domain</text>
+  <text x="82" y="56" font-size="7.5" fill="#1e40af" text-anchor="middle">Find all valid x values</text>
+  <text x="82" y="70" font-size="7.5" fill="#1e40af" text-anchor="middle">Note excluded pts</text>
+  <text x="82" y="84" font-size="7.5" fill="#1e40af" text-anchor="middle">(div by 0, negatives)</text>
+
+  <rect x="166" y="24" width="148" height="80" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="240" y="42" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">② Intercepts</text>
+  <text x="240" y="56" font-size="7.5" fill="#15803d" text-anchor="middle">x-int: set f(x) = 0</text>
+  <text x="240" y="70" font-size="7.5" fill="#15803d" text-anchor="middle">y-int: set x = 0</text>
+  <text x="240" y="84" font-size="7.5" fill="#15803d" text-anchor="middle">→ f(0)</text>
+
+  <rect x="324" y="24" width="148" height="80" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="398" y="42" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">③ Asymptotes</text>
+  <text x="398" y="56" font-size="7.5" fill="#78350f" text-anchor="middle">Vertical: denom = 0</text>
+  <text x="398" y="70" font-size="7.5" fill="#78350f" text-anchor="middle">Horizontal: lim x→±∞</text>
+  <text x="398" y="84" font-size="7.5" fill="#78350f" text-anchor="middle">Oblique: long division</text>
+
+  <rect x="8" y="112" width="148" height="80" rx="6" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="82" y="130" font-size="8" fill="#4c1d95" text-anchor="middle" font-weight="700">④ f ′ Sign Chart</text>
+  <text x="82" y="144" font-size="7.5" fill="#5b21b6" text-anchor="middle">Find critical points</text>
+  <text x="82" y="158" font-size="7.5" fill="#5b21b6" text-anchor="middle">+ → increasing</text>
+  <text x="82" y="172" font-size="7.5" fill="#5b21b6" text-anchor="middle">− → decreasing</text>
+  <text x="82" y="186" font-size="7.5" fill="#5b21b6" text-anchor="middle">Local max / min</text>
+
+  <rect x="166" y="112" width="148" height="80" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5"/>
+  <text x="240" y="130" font-size="8" fill="#9d174d" text-anchor="middle" font-weight="700">⑤ f ′′ Sign Chart</text>
+  <text x="240" y="144" font-size="7.5" fill="#be185d" text-anchor="middle">Find inflection pts</text>
+  <text x="240" y="158" font-size="7.5" fill="#be185d" text-anchor="middle">+ → concave up ∪</text>
+  <text x="240" y="172" font-size="7.5" fill="#be185d" text-anchor="middle">− → concave down ∩</text>
+  <text x="240" y="186" font-size="7.5" fill="#be185d" text-anchor="middle">Mark inflection points</text>
+
+  <rect x="324" y="112" width="148" height="80" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="1.5"/>
+  <text x="398" y="130" font-size="8" fill="#1e293b" text-anchor="middle" font-weight="700">⑥ Sketch</text>
+  <text x="398" y="144" font-size="7.5" fill="#374151" text-anchor="middle">Plot all key points</text>
+  <text x="398" y="158" font-size="7.5" fill="#374151" text-anchor="middle">Connect smoothly</text>
+  <text x="398" y="172" font-size="7.5" fill="#374151" text-anchor="middle">Respect increasing/</text>
+  <text x="398" y="186" font-size="7.5" fill="#374151" text-anchor="middle">decreasing + concavity</text>
+</svg>

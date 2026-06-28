@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Trapezoid Rule — Numerical Integration</text>
+  <rect x="8" y="22" width="260" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="26" y1="165" x2="260" y2="165" stroke="#64748b" stroke-width="1"/>
+  <line x1="26" y1="28" x2="26" y2="169" stroke="#64748b" stroke-width="1"/>
+  <!-- 4 trapezoids under curve -->
+  <!-- Curve -->
+  <path d="M 40,155 Q 70,130 100,100 Q 130,72 160,55 Q 185,42 215,40 Q 235,40 250,44" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Trapezoid 1 -->
+  <polygon points="40,165 40,155 95,105 95,165" fill="#3b82f6" opacity="0.2" stroke="#3b82f6" stroke-width="1"/>
+  <!-- Trapezoid 2 -->
+  <polygon points="95,165 95,105 150,62 150,165" fill="#3b82f6" opacity="0.2" stroke="#3b82f6" stroke-width="1"/>
+  <!-- Trapezoid 3 -->
+  <polygon points="150,165 150,62 205,42 205,165" fill="#3b82f6" opacity="0.2" stroke="#3b82f6" stroke-width="1"/>
+  <!-- Trapezoid 4 -->
+  <polygon points="205,165 205,42 250,44 250,165" fill="#3b82f6" opacity="0.2" stroke="#3b82f6" stroke-width="1"/>
+  <!-- Slant tops -->
+  <line x1="40" y1="155" x2="95" y2="105" stroke="#3b82f6" stroke-width="1.5"/>
+  <line x1="95" y1="105" x2="150" y2="62" stroke="#3b82f6" stroke-width="1.5"/>
+  <line x1="150" y1="62" x2="205" y2="42" stroke="#3b82f6" stroke-width="1.5"/>
+  <line x1="205" y1="42" x2="250" y2="44" stroke="#3b82f6" stroke-width="1.5"/>
+  <!-- h label -->
+  <line x1="40" y1="180" x2="95" y2="180" stroke="#94a3b8" stroke-width="1"/>
+  <text x="68" y="192" font-size="7.5" fill="#64748b" text-anchor="middle">h=Δx</text>
+  <!-- Right panel -->
+  <rect x="276" y="26" width="196" height="168" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="374" y="46" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Trapezoid Rule</text>
+  <rect x="284" y="52" width="180" height="36" rx="4" fill="#dbeafe"/>
+  <text x="374" y="66" font-size="8" fill="#1d4ed8" text-anchor="middle" font-weight="700">Tₙ = (h/2)[f(x₀)+2f(x₁)+</text>
+  <text x="374" y="80" font-size="8" fill="#1d4ed8" text-anchor="middle" font-weight="700">…+2f(xₙ₋₁)+f(xₙ)]</text>
+  <text x="374" y="102" font-size="7.5" fill="#4338ca" text-anchor="middle">h = (b−a)/n = step size</text>
+  <text x="374" y="116" font-size="7.5" fill="#4338ca" text-anchor="middle">Endpoints count once</text>
+  <text x="374" y="130" font-size="7.5" fill="#4338ca" text-anchor="middle">Interior points count twice</text>
+  <line x1="284" y1="140" x2="460" y2="140" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="374" y="156" font-size="8" fill="#4338ca" text-anchor="middle" font-weight="700">Error bound:</text>
+  <text x="374" y="170" font-size="8" fill="#4338ca" text-anchor="middle">|Eₜ| ≤ K₂(b−a)³/(12n²)</text>
+  <text x="374" y="184" font-size="7.5" fill="#6366f1" text-anchor="middle">K₂ = max|f ′′| on [a,b]</text>
+</svg>

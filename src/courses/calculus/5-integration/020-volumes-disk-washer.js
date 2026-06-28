@@ -1,4 +1,6 @@
 import diskWasherUrl from '../diagrams/calc-disk-washer.svg?url';
+import washerMethodUrl from '../diagrams/calc-washer-method.svg?url';
+import diskWasherCompareUrl from '../diagrams/calc-disk-washer-compare.svg?url';
 export default {
   id: 'ch4-vol-disk',
   slug: 'volumes-disk-washer',
@@ -28,17 +30,27 @@ export default {
       'Picture the curve y = f(x) over [a, b]. Grab one end and spin the entire curve 360° around the x-axis. The result is a 3D solid — like a vase or a football. Now imagine slicing that solid with a knife perpendicular to the x-axis at some position x. The slice is a perfect circle (a disk) whose radius equals the height of the original curve: r = f(x). The area of that thin circular slice is πr² = π[f(x)]².',
 
       'To find the total volume, stack infinitely many such slices. A slice of thickness dx has volume dV = π[f(x)]² dx. Summing (integrating) over all x from a to b gives the Disk Method: V = π∫ₐᵇ [f(x)]² dx. The logic mirrors every other integral setup: identify the tiny piece, write its contribution, then integrate.',
-
+        ],
+      },
+      { type: 'image', src: diskWasherUrl, alt: 'Disk and washer cross-sections for volumes of revolution', caption: 'Disk method: V = ∫π[f(x)]² dx. Washer method subtracts the inner radius squared.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The Washer Method handles the case where you rotate the region between two curves f(x) ≥ g(x) ≥ 0 around the x-axis. Each cross-section is now a washer (an annulus) — a disk with a hole. The outer radius is R = f(x) and the inner radius is r = g(x). Area of a washer = π(R² − r²). Volume = π∫ₐᵇ [f(x)² − g(x)²] dx. Think of it as the disk from the outer curve minus the disk from the inner curve.',
 
       'Rotating around the y-axis instead? You can still use the disk/washer method, but you need to integrate in y and express x as a function of y. If y = f(x), solve for x = f⁻¹(y) = g(y), then V = π∫ [g(y)]² dy over the appropriate y-range. This is natural when the function is already given as x = h(y), but requires inverting when you have y = f(x).',
 
       'Rotating around a line other than a coordinate axis is common in applications — for example, revolving around y = −1 or around x = 3. The key is that the disk radius is the distance from the curve to the axis of rotation. If rotating y = f(x) around y = k, the radius at x is |f(x) − k|. Always sketch the problem: identify which side of the axis the region lies on, then write the radius as (larger) − (smaller) to keep it positive.',
-
+        ],
+      },
+      { type: 'image', src: washerMethodUrl, alt: 'V = π∫[R²−r²]dx with hollow washer cross-section showing outer R and inner r', caption: 'Washer method: V = π∫[R(x)²−r(x)²]dx — subtract the hole when the region does not touch the axis.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Cross-section visualization is the bridge between the 2D curve and the 3D solid. At every x, there is a circle of radius f(x). The 3D solid is the union of all these circles. Moving x across [a, b] sweeps out the entire object. This "known cross-section" viewpoint generalizes far beyond circles — squares, triangles, or any shape can be the cross-section, giving more exotic solids (explored in advanced calculus).',
         ],
       },
-      { type: 'image', src: diskWasherUrl, alt: 'Disk and washer cross-sections for volumes of revolution', caption: 'Disk method: V = ∫π[f(x)]² dx. Washer method subtracts the inner radius squared.' },
+      { type: 'image', src: diskWasherCompareUrl, alt: 'Solid disk cross-section vs ring/washer cross-section side by side', caption: 'If the region touches the axis of rotation → disk (no hole); if it does not → washer (ring with hole).' },
     ],
     callouts: [
       {

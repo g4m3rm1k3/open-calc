@@ -1,4 +1,6 @@
 import diskWasherUrl from '../diagrams/calc-disk-washer.svg?url';
+import shellMethodUrl from '../diagrams/calc-shell-method.svg?url';
+import shellDiagramUrl from '../diagrams/calc-shell-diagram.svg?url';
 export default {
   id: 'ch4-vol-shell',
   slug: 'volumes-shell',
@@ -27,17 +29,27 @@ export default {
       'The disk method slices a solid perpendicular to the rotation axis, producing circular cross-sections. The shell method slices parallel to the rotation axis, producing thin cylindrical shells. Imagine peeling an onion: each layer is a thin cylindrical shell. The total volume of the onion is the sum of all shell volumes. This is the shell method — a completely different decomposition of the same 3D solid.',
 
       'A cylindrical shell has radius r, height h, and wall thickness Δr. Its volume is (outer cylinder) − (inner cylinder) = π(r+Δr)²h − πr²h = π[2rΔr + (Δr)²]h ≈ 2πr·h·Δr for small Δr. Think of unrolling the thin shell into a flat rectangular slab: dimensions are 2πr (circumference) × h (height) × Δr (thickness). Volume = circumference × height × thickness.',
-
+        ],
+      },
+      { type: 'image', src: diskWasherUrl, alt: 'Shell method showing cylindrical shells stacked to form the volume', caption: 'Shell method: V = ∫2πx·f(x) dx — sum of thin cylindrical shells rotating around the y-axis.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'For rotating y = f(x) around the y-axis on [a, b]: at each x-position, the shell has radius x (distance from y-axis), height f(x) (height of the curve), and thickness dx. Shell volume = 2πx·f(x)·dx. Integrating: V = 2π∫ₐᵇ x·f(x) dx. The integrand is always: 2π × radius × height.',
 
       'The big advantage of shells: when rotating around the y-axis with a function given as y = f(x), shells integrate naturally in x — no need to invert f to get x = g(y). With disks, you would need to integrate in y and express everything in terms of y. For complicated functions (y = x⁵ − 3x³ + 2x, for instance), inverting is impossible analytically. Shells solve the problem directly.',
-
+        ],
+      },
+      { type: 'image', src: shellMethodUrl, alt: 'Cylindrical shell with labeled radius x, height f(x), circumference 2πx, and thickness dx', caption: 'Each shell has volume ≈ circumference × height × thickness = 2πx·f(x)·dx; integrating gives the total volume.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'When rotating around the x-axis using shells, the roles reverse: shells are at height y with radius y (distance from x-axis), height = x-extent of the curve at that y = g(y), and thickness dy. Volume = 2π∫ y·g(y) dy. So shells work in whichever variable is perpendicular to the axis — which is usually the natural function variable.',
 
       'Disk vs. shell decision guide: (1) Is the function given as y=f(x)? If rotating around the x-axis, use disks (integrate in x). If rotating around the y-axis, use shells (integrate in x — no inversion needed). (2) Is the function given as x=g(y)? If rotating around the y-axis, use disks (integrate in y). If rotating around the x-axis, use shells (integrate in y). Both methods always give the same answer; the choice is which integral is easier.',
         ],
       },
-      { type: 'image', src: diskWasherUrl, alt: 'Shell method showing cylindrical shells stacked to form the volume', caption: 'Shell method: V = ∫2πx·f(x) dx — sum of thin cylindrical shells rotating around the y-axis.' },
+      { type: 'image', src: shellDiagramUrl, alt: 'Decision guide: shells vs disk/washer — when to use each method', caption: 'Use shells when rotating around y-axis with a y=f(x) region; use disks/washers when rotating around x-axis.' },
     ],
     callouts: [
       {

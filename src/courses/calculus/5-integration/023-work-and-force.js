@@ -1,5 +1,6 @@
 import workIntegralUrl from '../diagrams/calc-work-integral.svg?url';
 import riemannSumUrl from '../diagrams/calc-riemann-sum.svg?url';
+import workSpringUrl from '../diagrams/calc-work-spring.svg?url';
 export default {
   id: 'ch4-work',
   slug: 'work-and-force',
@@ -41,11 +42,16 @@ export default {
       'Chain and cable problems work similarly. A hanging chain of linear density δ (kg/m) and length L has its lower end at y=0 and upper end at y=L. When you lift the entire chain, each segment at height y must be lifted a distance (L−y) to reach the top. Work = ∫₀ᴸ δg(L−y) dy. If you lift the chain to wind it onto a drum, the "lift distance" for the segment at y is (L−y) regardless — the integral accounts for all the varying distances automatically.',
 
       'Hydrostatic force (pressure force) on a submerged surface: water pressure at depth d is P = ρgd (force per unit area). For a vertical dam gate with width w(y) at depth d = (H−y) (where H is the water surface height and y is measured from the bottom), the force on a thin strip at height y is dF = P·dA = ρg(H−y)·w(y)·dy. Total force = ∫₀ᴴ ρg(H−y)·w(y) dy. This is structurally identical to the pumping integral — the same "distance to the top" factor (H−y) appears.',
-
-      'The unifying insight across all these applications: integration is the tool whenever something accumulates with a varying rate. Work accumulates at rate F(x) per unit displacement. Hydrostatic force accumulates at rate P(y)·w(y) per unit height. The integral "sums up" infinitely many infinitesimal contributions, each involving a different value of the varying quantity. This is the same conceptual move as area, volume, and all other applications of the integral.',
         ],
       },
       { type: 'image', src: riemannSumUrl, alt: 'Riemann sum: summing force × tiny displacement slices gives total work in the limit', caption: 'Work is a Riemann sum over force slices — the integral is its exact limit.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'The unifying insight across all these applications: integration is the tool whenever something accumulates with a varying rate. Work accumulates at rate F(x) per unit displacement. Hydrostatic force accumulates at rate P(y)·w(y) per unit height. The integral "sums up" infinitely many infinitesimal contributions, each involving a different value of the varying quantity. This is the same conceptual move as area, volume, and all other applications of the integral.',
+        ],
+      },
+      { type: 'image', src: workSpringUrl, alt: 'Spring stretched by x with F=kx force arrow, work W=kb²/2 formula', caption: "Hooke's Law: F = kx. Work to stretch a spring from 0 to b: W = ∫₀ᵇ kx dx = kb²/2." },
     ],
     callouts: [
       {

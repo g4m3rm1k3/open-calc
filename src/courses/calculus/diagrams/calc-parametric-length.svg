@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Arc Length — Parametric Curves</text>
+  <rect x="8" y="24" width="464" height="36" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="40" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">L = ∫ₐᵝ √[(dx/dt)² + (dy/dt)²] dt</text>
+  <text x="240" y="56" font-size="8" fill="#374151" text-anchor="middle">Each tiny step ds = √(dx² + dy²) = √[(ẋ)²+(ẏ)²] dt — sum them up</text>
+  <!-- Curve with chord segments -->
+  <rect x="8" y="68" width="250" height="126" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="20" y1="160" x2="248" y2="160" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="20" y1="80" x2="20" y2="164" stroke="#94a3b8" stroke-width="1"/>
+  <!-- Parametric curve (spiral-like) -->
+  <path d="M 40,150 C 70,130 80,110 100,100 C 120,90 150,88 175,92 C 200,96 215,108 220,124" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Small chord segments approximation -->
+  <line x1="40" y1="150" x2="70" y2="132" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="70" y1="132" x2="100" y2="100" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="100" y1="100" x2="130" y2="90" stroke="#22c55e" stroke-width="1.5"/>
+  <line x1="130" y1="90" x2="160" y2="90" stroke="#22c55e" stroke-width="1.5"/>
+  <!-- dx and dy labels on one segment -->
+  <line x1="100" y1="100" x2="130" y2="100" stroke="#f59e0b" stroke-width="1.5"/>
+  <line x1="130" y1="100" x2="130" y2="90" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="115" y="112" font-size="7.5" fill="#f59e0b" text-anchor="middle">dx</text>
+  <text x="140" y="96" font-size="7.5" fill="#ef4444">dy</text>
+  <text x="112" y="85" font-size="7.5" fill="#22c55e" text-anchor="middle">ds</text>
+  <text x="134" y="176" font-size="7.5" fill="#374151" text-anchor="middle">ds = √(dx²+dy²) → integrate as dt→0</text>
+  <!-- Example -->
+  <rect x="266" y="68" width="206" height="126" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="369" y="86" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Example: Circle</text>
+  <text x="369" y="102" font-size="8" fill="#374151" text-anchor="middle">x = r cos t, y = r sin t</text>
+  <text x="369" y="116" font-size="8" fill="#374151" text-anchor="middle">dx/dt = −r sin t, dy/dt = r cos t</text>
+  <rect x="274" y="122" width="190" height="22" rx="3" fill="#dbeafe"/>
+  <text x="369" y="134" font-size="8" fill="#1d4ed8" text-anchor="middle">√(r²sin²t + r²cos²t) = r</text>
+  <rect x="274" y="150" width="190" height="22" rx="3" fill="#dcfce7"/>
+  <text x="369" y="162" font-size="8" fill="#166534" text-anchor="middle">L = ∫₀^{2π} r dt = 2πr ✓</text>
+  <text x="369" y="184" font-size="7.5" fill="#374151" text-anchor="middle">Arc length formula recovers circumference</text>
+</svg>

@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Why A = πr² — Unrolling the Circle</text>
+
+  <!-- LEFT: Circle with pizza slices -->
+  <rect x="10" y="24" width="170" height="168" rx="8" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="95" y="40" font-size="8.5" fill="#0369a1" text-anchor="middle" font-weight="700">Circle (cut into slices)</text>
+
+  <!-- Circle approximation with visible slices (8 sectors) -->
+  <circle cx="95" cy="118" r="66" fill="#bae6fd" stroke="#0284c7" stroke-width="1"/>
+
+  <!-- 8 radii to simulate slices -->
+  <line x1="95" y1="118" x2="161" y2="118" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="95" y1="118" x2="142" y2="71" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="95" y1="118" x2="95" y2="52" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="95" y1="118" x2="48" y2="71" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="95" y1="118" x2="29" y2="118" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="95" y1="118" x2="48" y2="165" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="95" y1="118" x2="95" y2="184" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="95" y1="118" x2="142" y2="165" stroke="#0369a1" stroke-width="1.5"/>
+
+  <!-- Radius label -->
+  <text x="130" y="113" font-size="9" fill="#0369a1" font-weight="700">r</text>
+
+  <!-- Circumference hint -->
+  <text x="95" y="156" font-size="7.5" fill="#1e40af" text-anchor="middle">C = 2πr</text>
+
+  <!-- Arrow -->
+  <defs>
+    <marker id="arr4" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+      <polygon points="0,0 8,3.5 0,7" fill="#059669"/>
+    </marker>
+  </defs>
+  <text x="195" y="103" font-size="8.5" fill="#059669" text-anchor="middle">unroll</text>
+  <text x="195" y="113" font-size="8.5" fill="#059669" text-anchor="middle">slices →</text>
+  <line x1="188" y1="120" x2="208" y2="120" stroke="#059669" stroke-width="2" marker-end="url(#arr4)"/>
+
+  <!-- RIGHT: Approximate rectangle -->
+  <rect x="214" y="24" width="256" height="168" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="342" y="40" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">Rearranged into a rectangle</text>
+
+  <!-- Zigzag rectangle (interleaved slices form a near-rectangle) -->
+  <!-- Rectangle body: x=222 to 462, y=70 to 154, h=84 = r, w=230 ≈ πr -->
+  <rect x="228" y="70" width="224" height="80" rx="4" fill="#86efac"/>
+
+  <!-- Zigzag top edge to show "pizza slices" alternating -->
+  <polyline points="228,70 248,54 268,70 288,54 308,70 328,54 348,70 368,54 388,70 408,54 428,70 452,70"
+            fill="#a7f3d0" stroke="#059669" stroke-width="1.5"/>
+  <!-- Zigzag bottom edge -->
+  <polyline points="228,150 248,166 268,150 288,166 308,150 328,166 348,150 368,166 388,150 408,166 428,150 452,150"
+            fill="#a7f3d0" stroke="#059669" stroke-width="1.5"/>
+
+  <!-- Width label: πr (half circumference) -->
+  <line x1="228" y1="62" x2="452" y2="62" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="228" y1="58" x2="228" y2="66" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="452" y1="58" x2="452" y2="66" stroke="#0369a1" stroke-width="1.5"/>
+  <text x="340" y="57" font-size="9" fill="#0369a1" text-anchor="middle" font-weight="700">half of C = πr</text>
+
+  <!-- Height label: r -->
+  <line x1="460" y1="70" x2="460" y2="150" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="456" y1="70" x2="464" y2="70" stroke="#0369a1" stroke-width="1.5"/>
+  <line x1="456" y1="150" x2="464" y2="150" stroke="#0369a1" stroke-width="1.5"/>
+  <text x="472" y="114" font-size="9" fill="#0369a1" font-weight="700">r</text>
+
+  <!-- Area formula inside rectangle -->
+  <text x="340" y="112" font-size="11" fill="#166534" text-anchor="middle" font-weight="700">Area = πr × r</text>
+  <text x="340" y="128" font-size="13" fill="#15803d" text-anchor="middle" font-weight="800">= πr²</text>
+
+  <!-- More slices → more perfect -->
+  <rect x="214" y="154" width="256" height="34" rx="0" fill="none"/>
+  <text x="342" y="170" font-size="8" class="mu" text-anchor="middle">More slices → rectangle becomes more perfect</text>
+  <text x="342" y="182" font-size="8.5" fill="#059669" text-anchor="middle" font-weight="700">In the limit: A = πr² exactly</text>
+</svg>

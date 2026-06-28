@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Exponential Derivatives — eˣ and aˣ</text>
+
+  <!-- LEFT: eˣ is its own derivative -->
+  <rect x="8" y="22" width="228" height="172" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+  <text x="122" y="40" font-size="9.5" fill="#059669" text-anchor="middle" font-weight="700">The Special Property of eˣ</text>
+
+  <rect x="18" y="46" width="208" height="22" rx="5" fill="#bbf7d0"/>
+  <text x="122" y="61" font-size="11" fill="#065f46" text-anchor="middle" font-weight="700">d/dx [eˣ] = eˣ</text>
+
+  <text x="18" y="82" font-size="8" fill="#166534">eˣ is the ONLY function that is its own</text>
+  <text x="18" y="96" font-size="8" fill="#166534">derivative. This is what defines e ≈ 2.718.</text>
+
+  <!-- Graph: eˣ -->
+  <line x1="18" y1="168" x2="228" y2="168" stroke="#64748b" stroke-width="1"/>
+  <line x1="90" y1="108" x2="90" y2="172" stroke="#64748b" stroke-width="1"/>
+  <!-- eˣ curve from (-2, e^-2) to (2, e^2) -->
+  <!-- x range: 18→228, centered at 90. Scale: 50px/unit. y: 168 is x-axis, amplitude ~50 -->
+  <path d="M 18,166 Q 50,162 70,155 Q 80,148 90,138 Q 100,124 112,105" fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <!-- tangent at x=0 (90,138): slope = e^0 = 1 -->
+  <line x1="50" y1="178" x2="140" y2="98" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <circle cx="90" cy="138" r="4" fill="#10b981"/>
+  <text x="96" y="126" font-size="7.5" fill="#10b981" font-weight="700">y = eˣ</text>
+  <text x="96" y="136" font-size="7" fill="#94a3b8">slope = eˣ too!</text>
+
+  <rect x="18" y="152" width="208" height="12" rx="3" fill="#d1fae5"/>
+  <text x="122" y="161" font-size="7.5" fill="#065f46" text-anchor="middle">Tangent slope at (x, eˣ) = eˣ exactly</text>
+
+  <!-- RIGHT: aˣ formula -->
+  <rect x="244" y="22" width="228" height="172" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="358" y="40" font-size="9.5" fill="#b45309" text-anchor="middle" font-weight="700">General Base aˣ</text>
+
+  <rect x="254" y="46" width="208" height="22" rx="5" fill="#fde68a"/>
+  <text x="358" y="61" font-size="11" fill="#92400e" text-anchor="middle" font-weight="700">d/dx [aˣ] = aˣ · ln(a)</text>
+
+  <text x="254" y="82" font-size="8" fill="#92400e">Because aˣ = e^(x·ln a):</text>
+  <text x="254" y="96" font-size="8" fill="#92400e">  d/dx [e^(x·ln a)] = e^(x·ln a) · ln(a)</text>
+  <text x="254" y="110" font-size="8" fill="#92400e">                   = aˣ · ln(a)  ✓</text>
+
+  <line x1="254" y1="118" x2="462" y2="118" stroke="#fde68a" stroke-width="1"/>
+
+  <text x="254" y="134" font-size="8.5" fill="#92400e" font-weight="700">Examples:</text>
+  <text x="254" y="150" font-size="8.5" fill="#b45309">d/dx [2ˣ] = 2ˣ · ln(2)  ≈ 2ˣ · 0.693</text>
+  <text x="254" y="166" font-size="8.5" fill="#b45309">d/dx [10ˣ] = 10ˣ · ln(10) ≈ 10ˣ · 2.303</text>
+
+  <rect x="254" y="176" width="208" height="14" rx="4" fill="#fef3c7"/>
+  <text x="358" y="186" font-size="7.5" fill="#92400e" text-anchor="middle">When a = e: ln(e) = 1, so d/dx [eˣ] = eˣ ·1 = eˣ ✓</text>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Washer Method — Hollow Solid of Revolution</text>
+  <rect x="8" y="22" width="240" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="28" y1="107" x2="240" y2="107" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <!-- Outer curve -->
+  <path d="M 40,107 Q 65,80 95,62 Q 120,48 150,44 Q 175,42 195,46 Q 215,50 232,60" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Inner curve -->
+  <path d="M 40,107 Q 60,95 90,86 Q 115,80 140,79 Q 165,78 185,82 Q 205,88 232,100" fill="none" stroke="#ef4444" stroke-width="2"/>
+  <!-- Washer at x=130 -->
+  <ellipse cx="150" cy="107" rx="7" ry="35" fill="none" stroke="#6366f1" stroke-width="1.5"/>
+  <ellipse cx="150" cy="107" rx="7" ry="21" fill="white" stroke="#ef4444" stroke-width="1.5"/>
+  <!-- R and r labels -->
+  <line x1="150" y1="72" x2="150" y2="107" stroke="#6366f1" stroke-width="2"/>
+  <text x="158" y="92" font-size="8.5" fill="#6366f1">R</text>
+  <line x1="150" y1="86" x2="150" y2="107" stroke="#ef4444" stroke-width="2"/>
+  <text x="156" y="100" font-size="8.5" fill="#ef4444">r</text>
+  <text x="130" y="170" font-size="8" fill="#6366f1" text-anchor="middle">outer</text>
+  <text x="130" y="183" font-size="8" fill="#ef4444" text-anchor="middle">inner</text>
+  <!-- Right panel -->
+  <rect x="256" y="26" width="216" height="168" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="364" y="46" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Washer Method Formula</text>
+  <rect x="264" y="52" width="200" height="30" rx="4" fill="#dbeafe"/>
+  <text x="364" y="66" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">V = π ∫ₐᵇ [R(x)²−r(x)²] dx</text>
+  <text x="364" y="82" font-size="7.5" fill="#1e40af" text-anchor="middle">R = outer radius, r = inner radius</text>
+  <text x="364" y="102" font-size="8" fill="#4338ca" text-anchor="middle">Each washer:</text>
+  <text x="364" y="116" font-size="8" fill="#6366f1" text-anchor="middle">Area = π(R² − r²)</text>
+  <text x="364" y="130" font-size="7.5" fill="#4338ca" text-anchor="middle">= π(outer² − inner²)</text>
+  <rect x="264" y="140" width="200" height="46" rx="4" fill="#dcfce7"/>
+  <text x="364" y="156" font-size="8" fill="#166534" text-anchor="middle">Example: between y=√x and y=x</text>
+  <text x="364" y="170" font-size="8" fill="#166534" text-anchor="middle">V = π∫₀¹ [(√x)²−x²] dx</text>
+  <text x="364" y="184" font-size="8" fill="#166534" text-anchor="middle">= π∫₀¹ (x−x²) dx = π/6</text>
+</svg>

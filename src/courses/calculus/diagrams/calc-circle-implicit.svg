@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Implicit Differentiation on a Circle x² + y² = 25</text>
+
+  <!-- Circle graph -->
+  <rect x="8" y="22" width="230" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Axes -->
+  <line x1="18" y1="108" x2="228" y2="108" stroke="#64748b" stroke-width="1"/>
+  <line x1="123" y1="28" x2="123" y2="186" stroke="#64748b" stroke-width="1"/>
+
+  <!-- Circle: center (123,108), radius 68 -->
+  <circle cx="123" cy="108" r="68" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <text x="123" y="185" font-size="8" fill="#6366f1" text-anchor="middle">x² + y² = 25  (r=5 units)</text>
+
+  <!-- Point on circle: (3,4) → x=3, y=4 → SVG: (123+3*13.6, 108-4*13.6) = (164, 63) -->
+  <circle cx="164" cy="63" r="5" fill="#ef4444"/>
+  <text x="172" y="60" font-size="8" fill="#ef4444">(3, 4)</text>
+
+  <!-- Tangent line at (3,4): slope = -x/y = -3/4. Through (164,63) -->
+  <!-- y - 63 = -3/4 (x - 164) → SVG slope: rise/run=−3/4 → dy/dx in SVG coords (y flipped) = +3/4 -->
+  <line x1="100" y1="95" x2="228" y2="2" stroke="#ef4444" stroke-width="2"/>
+  <text x="215" y="14" font-size="8" fill="#ef4444">tangent: slope=−3/4</text>
+
+  <!-- Radius from center to point -->
+  <line x1="123" y1="108" x2="164" y2="63" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="126" y="90" font-size="7.5" fill="#94a3b8">radius</text>
+
+  <!-- RIGHT: the algebra -->
+  <rect x="246" y="22" width="226" height="172" rx="8" fill="#1e1b4b"/>
+  <text x="359" y="40" font-size="9" fill="#a5b4fc" text-anchor="middle" font-weight="700">Step-by-Step: d/dx both sides</text>
+  <line x1="254" y1="46" x2="464" y2="46" stroke="#312e81" stroke-width="1"/>
+
+  <text x="256" y="62" font-size="8" fill="#94a3b8">Given: x² + y² = 25</text>
+  <text x="256" y="78" font-size="8" fill="#94a3b8">Differentiate both sides w.r.t. x:</text>
+  <rect x="254" y="82" width="208" height="18" rx="4" fill="#312e81"/>
+  <text x="358" y="94" font-size="9" fill="#c7d2fe" text-anchor="middle">2x + 2y·(dy/dx) = 0</text>
+  <text x="256" y="108" font-size="7.5" fill="#64748b">  (chain rule on y²: 2y·dy/dx)</text>
+
+  <text x="256" y="126" font-size="8" fill="#94a3b8">Solve for dy/dx:</text>
+  <rect x="254" y="130" width="208" height="18" rx="4" fill="#4338ca"/>
+  <text x="358" y="142" font-size="10" fill="white" text-anchor="middle" font-weight="700">dy/dx = −x / y</text>
+
+  <line x1="254" y1="154" x2="464" y2="154" stroke="#312e81" stroke-width="1"/>
+  <text x="256" y="170" font-size="8" fill="#94a3b8">At point (3, 4):</text>
+  <text x="256" y="184" font-size="9" fill="#4ade80" font-weight="700">dy/dx = −3/4  ✓</text>
+  <text x="256" y="196" font-size="7.5" fill="#64748b">tangent line: y−4 = −3/4·(x−3)</text>
+</svg>

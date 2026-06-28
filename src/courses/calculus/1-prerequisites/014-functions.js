@@ -1,4 +1,6 @@
 import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
+import functionMachineUrl from '../diagrams/calc-function-machine.svg?url';
+import functionTypesUrl from '../diagrams/calc-function-types.svg?url';
 export default {
   id: 'ch0-functions',
   slug: 'functions',
@@ -27,6 +29,7 @@ export default {
         mathBridge: 'A function $f$ is a rule: for every input $x$ in the domain, it produces exactly one output $f(x)$. The machine enforces the one-output rule — if you could get two different outputs from the same input, it would fail the vertical line test and not be a function.',
         caption: 'Numbers go in, exactly one number comes out. Swap the rule to see how different functions behave.',
       },
+      { type: 'image', src: functionMachineUrl, alt: 'Input arrow through a function box to output arrow, with domain and range panels', caption: 'Domain is the set of valid inputs, range is the set of possible outputs — both constrained by the function rule.' },
       { type: 'viz', id: 'VideoCarousel', title: 'Functions and Their Graphs',
         props: { videos: [
           { url: "", title: 'Calc I 0.3 — Functions & Their Graphs' },
@@ -46,11 +49,12 @@ export default {
       { type: 'prose', paragraphs: ['We write **f : A → B** to say "f is a function from domain A to codomain B." We write **f(x) = [rule]** to specify the rule. The notation f(x) is read "f of x" — it means the output of the function f when given input x. It does NOT mean f times x.'] },
       { type: 'callout', callout: { type: 'misconception', title: 'f(a + b) ≠ f(a) + f(b) in general', body: "This property (called additivity) is only true for LINEAR functions. For example, (a+b)² ≠ a² + b², and sin(a+b) ≠ sin(a) + sin(b). Don't distribute functions like they're multiplication!" } },
       { type: 'prose', paragraphs: ['When no domain is stated, we use the **natural domain**: the largest set of real numbers for which the formula produces a well-defined real output. Three things can go wrong:', '1. **Division by zero**: exclude x values making the denominator zero.', '2. **Even roots of negatives**: the expression under √ (or ⁴√, ⁶√, etc.) must be ≥ 0.', '3. **Logarithm of a non-positive number**: log requires a strictly positive argument.'] },
+      { type: 'image', src: chainRuleUrl, alt: 'Function composition pipeline: x → g(x) → f(g(x))', caption: 'A function is a machine; composition chains machines — the output of one feeds the input of the next.' },
       { type: 'viz', id: 'GraphMorph', title: 'Function Families — Morphing',
         mathBridge: "Each function family has a characteristic shape determined by its formula: linear $f(x)=mx+b$ (straight lines), quadratic $f(x)=ax^2$ (parabolas), cubic $f(x)=ax^3$ (S-curves), exponential $f(x)=a^x$ (explosive growth), sine (smooth oscillation). Recognizing a function's family from its graph is the first step in understanding its calculus.",
         caption: 'Watch how the graph changes shape as you move between linear, quadratic, cubic, exponential, and sine. Each family has a distinct global personality.',
       },
-      { type: 'image', src: chainRuleUrl, alt: 'Function composition pipeline: x → g(x) → f(g(x))', caption: 'A function is a machine; composition chains machines — the output of one feeds the input of the next.' },
+      { type: 'image', src: functionTypesUrl, alt: 'Six mini-graphs of linear, quadratic, exponential, log, trig, and rational functions with key calculus properties', caption: 'Each function family has a characteristic shape and calculus behavior — recognizing the family tells you which rules apply.' },
     ],
   },
 

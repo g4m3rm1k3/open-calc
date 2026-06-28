@@ -1,4 +1,6 @@
 import powerRuleUrl from '../diagrams/calc-power-rule.svg?url';
+import factoringPatternsUrl from '../diagrams/calc-factoring-patterns.svg?url';
+import rationalExpressionsUrl from '../diagrams/calc-rational-expressions.svg?url';
 export default {
   id: "ch0-algebraic-techniques",
   slug: "algebraic-techniques",
@@ -58,6 +60,7 @@ export default {
           body: "If lim(x → a) f(x)/g(x) gives 0/0, then (x − a) divides both f(x) and g(x). Find the factorization and cancel (x − a). The limit is then lim(x → a) [remainder after cancelling].",
         },
       },
+      { type: 'image', src: powerRuleUrl, alt: 'Power rule table showing xⁿ → nxⁿ⁻¹ for key exponents', caption: 'Recognizing polynomial structure is the first step — the power rule does the rest.' },
       {
         type: "prose",
         paragraphs: [
@@ -72,6 +75,7 @@ export default {
           body: "x² − a² = (x − a)(x + a). x³ − a³ = (x − a)(x² + ax + a²). These appear constantly. Memorize difference of squares, sum/difference of cubes, and perfect square trinomials.",
         },
       },
+      { type: 'image', src: factoringPatternsUrl, alt: 'Table of six factoring patterns from GCF to sum of cubes with examples', caption: 'Always factor out the GCF first; then look for difference of squares, perfect squares, or cubes — these patterns appear in every limit and integral simplification.' },
       {
         type: "viz",
         id: "VideoEmbed",
@@ -121,7 +125,7 @@ export default {
           body: "Polynomial form? Factor. Has √ or ∛? Conjugate or special identity. Has 1/(x+h) form? Common denominator. Quadratic expression hidden? Complete the square.",
         },
       },
-      { type: 'image', src: powerRuleUrl, alt: 'Power rule table showing xⁿ → nxⁿ⁻¹ for key exponents', caption: 'Recognizing polynomial structure is the first step — the power rule does the rest.' },
+      { type: 'image', src: rationalExpressionsUrl, alt: 'Four panels showing how to simplify, multiply, add, and divide rational expressions', caption: 'Rational expressions follow fraction rules: cancel only factors, find LCD to add, flip to divide — mastering these eliminates the most common algebra errors in calculus.' },
     ],
   },
 

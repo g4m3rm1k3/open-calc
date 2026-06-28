@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">One-Sided Limit Notation — Comparison</text>
+
+  <!-- Divider -->
+  <line x1="240" y1="22" x2="240" y2="192" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- LEFT: left-hand limit -->
+  <rect x="8" y="24" width="224" height="168" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="120" y="42" font-size="9.5" fill="#4338ca" text-anchor="middle" font-weight="700">Left-Hand Limit</text>
+
+  <!-- Notation -->
+  <rect x="20" y="48" width="200" height="28" rx="5" fill="#c7d2fe"/>
+  <text x="120" y="65" font-size="14" fill="#3730a3" text-anchor="middle" font-weight="700">lim f(x) = L⁻</text>
+  <text x="120" y="76" font-size="7.5" fill="#4338ca" text-anchor="middle">x → a⁻</text>
+
+  <!-- Mini graph: approach from left -->
+  <line x1="28" y1="150" x2="220" y2="150" stroke="#64748b" stroke-width="1"/>
+  <line x1="124" y1="82" x2="124" y2="154" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="130" y="94" font-size="8" fill="#ef4444">a</text>
+
+  <!-- Left approach arrows and curve -->
+  <path d="M 38,142 Q 70,140 100,130 Q 112,125 120,120" fill="none" stroke="#6366f1" stroke-width="2"/>
+  <circle cx="124" cy="120" r="4" fill="none" stroke="#6366f1" stroke-width="2"/>
+
+  <!-- Arrow heads showing direction -->
+  <line x1="96" y1="132" x2="120" y2="120" stroke="#059669" stroke-width="2" marker-end="url(#arrowL)"/>
+
+  <defs>
+    <marker id="arrowL" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0,0 7,3.5 0,7" fill="#059669"/></marker>
+    <marker id="arrowR" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0,0 7,3.5 0,7" fill="#ef4444"/></marker>
+  </defs>
+
+  <text x="40" y="138" font-size="7.5" fill="#6366f1">x &lt; a</text>
+  <text x="40" y="128" font-size="7.5" fill="#059669">approaching →</text>
+
+  <rect x="18" y="158" width="204" height="30" rx="5" fill="#e0e7ff"/>
+  <text x="120" y="172" font-size="8" fill="#3730a3" text-anchor="middle" font-weight="700">x approaches a from BELOW</text>
+  <text x="120" y="184" font-size="7.5" fill="#4338ca" text-anchor="middle">(x stays strictly less than a)</text>
+
+  <!-- RIGHT: right-hand limit -->
+  <rect x="248" y="24" width="224" height="168" rx="8" fill="#fff7ed" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="360" y="42" font-size="9.5" fill="#b45309" text-anchor="middle" font-weight="700">Right-Hand Limit</text>
+
+  <!-- Notation -->
+  <rect x="260" y="48" width="200" height="28" rx="5" fill="#fed7aa"/>
+  <text x="360" y="65" font-size="14" fill="#92400e" text-anchor="middle" font-weight="700">lim f(x) = L⁺</text>
+  <text x="360" y="76" font-size="7.5" fill="#b45309" text-anchor="middle">x → a⁺</text>
+
+  <!-- Mini graph: approach from right -->
+  <line x1="268" y1="150" x2="460" y2="150" stroke="#64748b" stroke-width="1"/>
+  <line x1="364" y1="82" x2="364" y2="154" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <text x="370" y="94" font-size="8" fill="#ef4444">a</text>
+
+  <!-- Right approach arrows and curve -->
+  <path d="M 376,120 Q 390,118 420,112 Q 440,108 455,106" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  <circle cx="364" cy="120" r="4" fill="none" stroke="#f59e0b" stroke-width="2"/>
+
+  <!-- Arrow head showing direction -->
+  <line x1="388" y1="118" x2="366" y2="120" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowR)"/>
+
+  <text x="390" y="108" font-size="7.5" fill="#f59e0b">x &gt; a</text>
+  <text x="383" y="128" font-size="7.5" fill="#ef4444">← approaching</text>
+
+  <rect x="258" y="158" width="204" height="30" rx="5" fill="#ffedd5"/>
+  <text x="360" y="172" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">x approaches a from ABOVE</text>
+  <text x="360" y="184" font-size="7.5" fill="#b45309" text-anchor="middle">(x stays strictly greater than a)</text>
+</svg>

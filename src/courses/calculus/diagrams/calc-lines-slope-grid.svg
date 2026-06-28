@@ -1,0 +1,85 @@
+<svg viewBox="0 0 480 215" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .ax  { stroke: rgb(var(--tw-custom-slate-400)); }
+    .axf { fill: rgb(var(--tw-custom-slate-400)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .ax  { stroke: rgb(var(--tw-custom-slate-600)); }
+    .dark .axf { fill: rgb(var(--tw-custom-slate-600)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="215" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Slope = Δy/Δx — Rise Over Run</text>
+
+  <!-- LEFT PANEL: steep line -->
+  <!-- Axes origin at (40,140) -->
+  <line x1="30" y1="140" x2="160" y2="140" class="ax" stroke-width="1.2"/>
+  <line x1="40" y1="30"  x2="40"  y2="145" class="ax" stroke-width="1.2"/>
+  <polygon points="158,136 166,140 158,144" class="axf"/>
+
+  <!-- Line: slope = 2, through (40,140), so at x=100 → y=140−80=60 -->
+  <line x1="40" y1="140" x2="115" y2="10" stroke="#6366f1" stroke-width="2.5"/>
+
+  <!-- Rise and run annotations -->
+  <!-- Run: x from 55 to 95 (Δx=40 → 2 units), Rise: y from 140 to 60 (Δy=80 → 4 units) -->
+  <line x1="55" y1="140" x2="95" y2="140" stroke="#f59e0b" stroke-width="2"/>
+  <line x1="95" y1="140" x2="95" y2="60"  stroke="#ef4444" stroke-width="2"/>
+  <!-- arrowheads -->
+  <polygon points="90,140 100,140 95,136" fill="#f59e0b"/>
+  <polygon points="91,65  99,65  95,57"  fill="#ef4444"/>
+  <!-- labels -->
+  <text x="75"  y="154" font-size="9" fill="#d97706" text-anchor="middle">Δx = 2</text>
+  <text x="107" y="103" font-size="9" fill="#dc2626" text-anchor="middle">Δy = 4</text>
+
+  <!-- slope label -->
+  <rect x="32" y="32" width="100" height="22" rx="4" fill="#eef2ff" stroke="#6366f1" stroke-width="1"/>
+  <text x="82" y="47" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">m = Δy/Δx = 4/2 = 2</text>
+
+  <!-- MIDDLE PANEL: gentle slope -->
+  <!-- Axes origin at (190,140) -->
+  <line x1="180" y1="140" x2="310" y2="140" class="ax" stroke-width="1.2"/>
+  <line x1="190" y1="30"  x2="190" y2="145" class="ax" stroke-width="1.2"/>
+  <polygon points="308,136 316,140 308,144" class="axf"/>
+
+  <!-- Line: slope = 0.5, through (190,140) → at x=270 y=140-40=100 -->
+  <line x1="190" y1="140" x2="290" y2="90" stroke="#10b981" stroke-width="2.5"/>
+  <!-- Run: 210→270 (Δx=60→3), Rise: 140→110 (Δy=30→1.5) -->
+  <line x1="210" y1="125" x2="270" y2="125" stroke="#f59e0b" stroke-width="2"/>
+  <line x1="270" y1="125" x2="270" y2="95"  stroke="#ef4444" stroke-width="2"/>
+  <polygon points="265,125 275,125 270,121" fill="#f59e0b"/>
+  <polygon points="266,99  274,99  270,91"  fill="#ef4444"/>
+  <text x="240" y="139" font-size="9" fill="#d97706" text-anchor="middle">Δx = 3</text>
+  <text x="283" y="113" font-size="9" fill="#dc2626" text-anchor="middle">Δy=1.5</text>
+  <rect x="182" y="32" width="116" height="22" rx="4" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+  <text x="240" y="47" font-size="9" fill="#059669" text-anchor="middle" font-weight="700">m = Δy/Δx = 1.5/3 = 0.5</text>
+
+  <!-- RIGHT PANEL: negative slope -->
+  <!-- Axes origin at (340,100) -->
+  <line x1="328" y1="100" x2="465" y2="100" class="ax" stroke-width="1.2"/>
+  <line x1="340" y1="30"  x2="340" y2="145" class="ax" stroke-width="1.2"/>
+  <polygon points="463,96 471,100 463,104" class="axf"/>
+
+  <!-- Line: slope = −1.5, through (340,100) → at x=400 y=100+90=190 (clip at 145) -->
+  <!-- visible from (340,100) to (360,130) to (370,145) - stops at bottom -->
+  <line x1="335" y1="67" x2="435" y2="167" stroke="#f43f5e" stroke-width="2.5" clip-path="url(#rightClip)"/>
+  <defs>
+    <clipPath id="rightClip">
+      <rect x="328" y="28" width="150" height="150"/>
+    </clipPath>
+  </defs>
+  <!-- Run/Rise markers at visible portion -->
+  <line x1="355" y1="118" x2="395" y2="118" stroke="#f59e0b" stroke-width="2"/>
+  <line x1="395" y1="118" x2="395" y2="148" stroke="#ef4444" stroke-width="2"/>
+  <polygon points="390,118 400,118 395,114" fill="#f59e0b"/>
+  <polygon points="391,143 399,143 395,151" fill="#ef4444"/>
+  <text x="375" y="130" font-size="9" fill="#d97706" text-anchor="middle">Δx=2</text>
+  <text x="409" y="138" font-size="9" fill="#dc2626" text-anchor="middle">Δy=−3</text>
+  <rect x="332" y="32" width="126" height="22" rx="4" fill="#fff1f2" stroke="#f43f5e" stroke-width="1"/>
+  <text x="395" y="47" font-size="9" fill="#be123c" text-anchor="middle" font-weight="700">m = Δy/Δx = −3/2 = −1.5</text>
+
+  <!-- Bottom caption -->
+  <text x="240" y="207" font-size="9" class="mu" text-anchor="middle">The same ratio Δy/Δx applies between ANY two points on a line — it never changes. This constancy is what defines a line.</text>
+</svg>

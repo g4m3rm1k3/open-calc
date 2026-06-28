@@ -1,4 +1,6 @@
 import curveExtremaUrl from '../diagrams/calc-curve-extrema.svg?url';
+import signChartDerivUrl from '../diagrams/calc-sign-chart-deriv.svg?url';
+import firstDerivInfoUrl from '../diagrams/calc-first-deriv-info.svg?url';
 export default {
   id: "ch2-reading-derivatives",
   slug: "reading-derivatives",
@@ -65,7 +67,12 @@ export default {
         "At the bottom of a valley, the tangent line is also horizontal. " +
         "These are critical points where f'(x) = 0. Between them, the sign of f' tells you monotonicity: " +
         "if f' is positive on an interval, f is increasing there; if f' is negative, f is decreasing.",
-
+        ],
+      },
+      { type: 'image', src: curveExtremaUrl, alt: 'Curve with local max/min and f-prime sign chart', caption: 'Where f′ > 0 the function rises, where f′ < 0 it falls, and f′ = 0 marks potential turning points.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**The Second Derivative f''(x): The Curvature**  " +
         "f''(x) describes how the slope itself is changing. Is the curve bending upward or downward? " +
         "If f'' > 0, the curve is concave up (shaped like a bowl ∪). The slope is getting steeper (becoming more positive or less negative). " +
@@ -81,7 +88,12 @@ export default {
         "If f'(c) = 0 (critical point) and f''(c) > 0 (concave up at that point), then c is a local minimum. " +
         "If f'(c) = 0 and f''(c) < 0 (concave down), then c is a local maximum. " +
         "This is faster than tracking sign changes: one evaluation of f'' tells the story.",
-
+        ],
+      },
+      { type: 'image', src: signChartDerivUrl, alt: 'Sign chart of f′ with critical points and intervals showing ± signs and increasing/decreasing behavior', caption: 'Sign chart method: find critical points, test sign of f′ in each interval, read the increasing/decreasing behavior.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**The Third Derivative f'''(x): The Rate of Change of Concavity (Jerk)**  " +
         "In physics, f'''(x) is called jerk—how fast the acceleration is changing. " +
         "It is less commonly used but appears in engineering (cam design, ride comfort) and physics (smooth vs. jerky motion). " +
@@ -96,7 +108,7 @@ export default {
       "**Reading derivatives on standard exams — given a graph of f', what can you say about f?** This is a classic AP Calculus and college exam question type. The rules are: (1) When f'>0, f is increasing. (2) When f'<0, f is decreasing. (3) When f' changes sign from positive to negative at x=c, f has a local maximum at c. (4) When f' changes sign from negative to positive at x=c, f has a local minimum at c. (5) When f' is increasing on an interval, f is concave up there (because f''=(f')'>0). (6) When f' is decreasing on an interval, f is concave down there (because f''=(f')'<0). (7) Where f' has a local maximum or local minimum, f has an inflection point — the concavity of f changes at that x-value. Internalizing these seven rules lets you reconstruct the qualitative shape of f from any graph of f' alone.",
         ],
       },
-      { type: 'image', src: curveExtremaUrl, alt: 'Curve with local max/min and f-prime sign chart', caption: 'Where f′ > 0 the function rises, where f′ < 0 it falls, and f′ = 0 marks potential turning points.' },
+      { type: 'image', src: firstDerivInfoUrl, alt: 'Annotated curve showing what f′ > 0, f′ < 0, and f′ = 0 mean geometrically', caption: 'f′ > 0 → rising. f′ < 0 → falling. Sign change − to + → local min. Sign change + to − → local max.' },
     ],
     callouts: [
       {

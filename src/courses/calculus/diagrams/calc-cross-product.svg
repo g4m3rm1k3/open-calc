@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Cross Product (3D Only)</text>
+  <rect x="8" y="24" width="464" height="28" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="38" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">a × b = (a₂b₃−a₃b₂, a₃b₁−a₁b₃, a₁b₂−a₂b₁)</text>
+  <text x="240" y="50" font-size="8" fill="#374151" text-anchor="middle">|a × b| = |a||b| sin θ — area of parallelogram spanned by a and b</text>
+  <!-- Left: 3D diagram -->
+  <rect x="8" y="60" width="230" height="134" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Vector a (in-plane) -->
+  <line x1="80" y1="155" x2="165" y2="115" stroke="#6366f1" stroke-width="2.5"/>
+  <polygon points="165,115 157,122 170,124" fill="#6366f1"/>
+  <text x="172" y="116" font-size="9" fill="#6366f1" font-weight="700">a</text>
+  <!-- Vector b (in-plane, different dir) -->
+  <line x1="80" y1="155" x2="170" y2="145" stroke="#22c55e" stroke-width="2.5"/>
+  <polygon points="170,145 158,142 163,154" fill="#22c55e"/>
+  <text x="176" y="150" font-size="9" fill="#22c55e" font-weight="700">b</text>
+  <!-- Cross product a×b (out of plane) -->
+  <line x1="80" y1="155" x2="80" y2="80" stroke="#ef4444" stroke-width="2.5"/>
+  <polygon points="80,80 74,92 86,92" fill="#ef4444"/>
+  <text x="88" y="78" font-size="9" fill="#ef4444" font-weight="700">a×b</text>
+  <!-- Right angle mark -->
+  <rect x="84" y="145" width="8" height="8" fill="none" stroke="#ef4444" stroke-width="1"/>
+  <text x="134" y="174" font-size="7.5" fill="#374151" text-anchor="middle">a×b is perpendicular to both a and b</text>
+  <text x="134" y="186" font-size="7.5" fill="#374151" text-anchor="middle">Right-hand rule gives direction</text>
+  <!-- Right panel -->
+  <rect x="246" y="60" width="226" height="134" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="359" y="78" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Key Properties</text>
+  <rect x="254" y="84" width="210" height="18" rx="3" fill="#dbeafe"/>
+  <text x="359" y="97" font-size="8" fill="#1d4ed8" text-anchor="middle">a × b = −(b × a)  (anti-commutative)</text>
+  <rect x="254" y="106" width="210" height="18" rx="3" fill="#dcfce7"/>
+  <text x="359" y="119" font-size="8" fill="#166534" text-anchor="middle">a × a = 0  (parallel vectors give 0)</text>
+  <rect x="254" y="128" width="210" height="18" rx="3" fill="#fef3c7"/>
+  <text x="359" y="141" font-size="8" fill="#92400e" text-anchor="middle">|a × b| = area of parallelogram</text>
+  <rect x="254" y="150" width="210" height="40" rx="3" fill="#ede9fe"/>
+  <text x="359" y="163" font-size="8" fill="#5b21b6" text-anchor="middle">î × ĵ = k̂,  ĵ × k̂ = î,  k̂ × î = ĵ</text>
+  <text x="359" y="179" font-size="8" fill="#374151" text-anchor="middle">Torque, normal vector, volume of box</text>
+</svg>

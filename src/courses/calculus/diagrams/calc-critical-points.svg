@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Critical Points — Where f ′(x) = 0 or DNE</text>
+  <!-- Left panel: graph with critical points -->
+  <rect x="8" y="22" width="250" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="26" y1="168" x2="250" y2="168" stroke="#64748b" stroke-width="1"/>
+  <line x1="26" y1="28" x2="26" y2="172" stroke="#64748b" stroke-width="1"/>
+  <!-- Curve with local max, local min, and cusp -->
+  <path d="M 36,150 Q 60,130 85,95 Q 100,78 118,88 Q 140,100 155,140 Q 162,158 175,148 Q 190,136 208,120 Q 225,108 240,110" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Critical point 1: local max (f'=0) -->
+  <circle cx="85" cy="95" r="6" fill="#ef4444"/>
+  <line x1="65" y1="95" x2="105" y2="95" stroke="#ef4444" stroke-width="2"/>
+  <text x="85" y="85" font-size="7.5" fill="#ef4444" text-anchor="middle">f ′=0 (max)</text>
+  <!-- Critical point 2: local min (f'=0) -->
+  <circle cx="155" cy="140" r="6" fill="#22c55e"/>
+  <line x1="135" y1="140" x2="175" y2="140" stroke="#22c55e" stroke-width="2"/>
+  <text x="155" y="156" font-size="7.5" fill="#166534" text-anchor="middle">f ′=0 (min)</text>
+  <!-- Critical point 3: inflection-ish with horizontal tangent -->
+  <circle cx="208" cy="120" r="6" fill="#f59e0b"/>
+  <line x1="190" y1="120" x2="226" y2="120" stroke="#f59e0b" stroke-width="2"/>
+  <text x="208" y="112" font-size="7.5" fill="#b45309" text-anchor="middle">f ′=0 (neither)</text>
+  <!-- Right panel: types table -->
+  <rect x="266" y="22" width="206" height="172" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="369" y="40" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Types of Critical Points</text>
+  <!-- f'=0 row -->
+  <rect x="274" y="48" width="190" height="34" rx="4" fill="#fee2e2"/>
+  <text x="369" y="63" font-size="8" fill="#991b1b" text-anchor="middle" font-weight="700">f ′(c) = 0</text>
+  <text x="369" y="78" font-size="7.5" fill="#991b1b" text-anchor="middle">stationary point (tangent horizontal)</text>
+  <!-- f' DNE row -->
+  <rect x="274" y="88" width="190" height="34" rx="4" fill="#fef3c7"/>
+  <text x="369" y="103" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">f ′(c) = DNE</text>
+  <text x="369" y="118" font-size="7.5" fill="#92400e" text-anchor="middle">corner, cusp, or vertical tangent</text>
+  <!-- Note -->
+  <rect x="274" y="128" width="190" height="56" rx="4" fill="#dcfce7"/>
+  <text x="369" y="144" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">Not all CPs are extrema!</text>
+  <text x="369" y="160" font-size="7.5" fill="#15803d" text-anchor="middle">Use First Derivative Test</text>
+  <text x="369" y="175" font-size="7.5" fill="#15803d" text-anchor="middle">to classify each one</text>
+</svg>

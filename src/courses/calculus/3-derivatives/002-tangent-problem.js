@@ -1,4 +1,6 @@
 import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
+import tangentLineSlopeUrl from '../diagrams/calc-tangent-line-slope.svg?url';
+import tangentDefinitionUrl from '../diagrams/calc-tangent-definition.svg?url';
 // FILE: src/content/chapter-2/00-tangent-problem.js
 export default {
   id: "ch2-000",
@@ -83,9 +85,21 @@ export default {
       "Start with something we already understand: average rate of change. If you drive 120 miles in 2 hours, your average speed is 60 mph. If a population grows from 1,000 to 1,500 individuals over 5 years, the average growth rate is 100 individuals per year. In each case, we compute (change in output) divided by (change in input). This is the slope of the line connecting two points on the graph — called a secant line.",
       "Formally, the average rate of change of a function f over the interval from x = a to x = a + h is the slope of the secant line through the points (a, f(a)) and (a+h, f(a+h)). We write this as [f(a+h) - f(a)] / h. This expression has a name: the difference quotient. It is the single most important formula in differential calculus.",
       "Now ask: what happens as h gets smaller and smaller? The second point (a+h, f(a+h)) slides along the curve toward (a, f(a)). The secant line that once crossed the curve at two distinct points begins to rotate. In the limit, as h approaches 0, the secant line approaches a unique limiting position — the tangent line. The slope of that tangent line is the derivative.",
+        ],
+      },
+      { type: 'image', src: secantToTangentUrl, alt: 'Secant lines converging to the tangent line as h → 0', caption: 'The tangent line slope is the limit of secant slopes — the birth of the derivative.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Here is why we cannot simply plug in h = 0 directly. At h = 0, the difference quotient becomes [f(a) - f(a)] / 0 = 0/0, which is the indeterminate form from Chapter 1. This is not a number — it is a failure of division. But taking the LIMIT as h approaches 0 is something entirely different from evaluating AT h = 0. The limit asks: what value does the expression approach as h gets arbitrarily close to 0? That question has a perfectly well-defined, finite answer for most functions.",
       "Think about what the difference quotient measures geometrically. The numerator f(a+h) - f(a) is the vertical rise from one point to the other. The denominator h is the horizontal run. So the ratio is rise over run — the slope of the secant line. As h shrinks, the two points get closer and closer together, but the slope of the line between them settles into a limiting value. That limiting slope is the derivative.",
       "The derivative tells us two things simultaneously, and they are really the same thing: (1) it is the slope of the curve at the point x = a, meaning the slope of the tangent line to the graph there, and (2) it is the instantaneous rate of change of the function at x = a. If f(t) is position, the derivative is instantaneous velocity. If f(x) is a population, the derivative is the instantaneous growth rate. If f(x) is profit as a function of units sold, the derivative is marginal profit.",
+        ],
+      },
+      { type: 'image', src: tangentLineSlopeUrl, alt: 'Secant shrinking to tangent with the derivative formula f′(a) = lim[f(a+h)−f(a)]/h', caption: 'As h → 0, the secant slope becomes the tangent slope — this limit is the derivative f′(a).' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Mathematicians have invented several notations for the derivative, each with its own strengths. If y = f(x), then the derivative can be written as f'(x) (read \"f prime of x\", due to Lagrange), or as dy/dx (Leibniz notation, emphasizing the ratio of infinitesimal changes), or as d/dx[f(x)] (operator notation), or as Df(x) (operator notation due to Euler), or even as y\u0307 (Newton's dot notation, used in physics for time derivatives). All of these mean exactly the same thing: the limit of the difference quotient. Leibniz notation dy/dx is especially useful when doing related rates and chain rule problems, because it behaves somewhat like a fraction (though it is not exactly one). Lagrange notation f'(x) is compact and convenient for most algebraic work.",
 
       "**Where this is heading:** You now have the definition of the derivative and you can compute it for simple functions using the limit process. But computing (x+h)^100 - x^100 from scratch every time would be unbearable. The next lesson gives you the shortcut rules — proved from limits once, then used freely. After that, every derivative you compute will take seconds instead of pages.",
@@ -97,7 +111,7 @@ export default {
       "A practical checklist for differentiability: before computing a derivative, ask three questions. (1) Is the function continuous at the point? If not, it cannot be differentiable. (2) Is there a corner, cusp, or vertical tangent? If so, the derivative does not exist there. (3) Is the function defined by cases (piecewise)? At the boundary between pieces, you must check that the one-sided derivatives match. Only if all three checks pass can you proceed to compute the derivative using the limit definition or the shortcut rules.",
         ],
       },
-      { type: 'image', src: secantToTangentUrl, alt: 'Secant lines converging to the tangent line as h → 0', caption: 'The tangent line slope is the limit of secant slopes — the birth of the derivative.' },
+      { type: 'image', src: tangentDefinitionUrl, alt: 'Comparison table: secant connects two points (finite h), tangent touches one point (h → 0)', caption: 'Secant: two points, average rate. Tangent: one point, instantaneous rate. Same formula, different limit.' },
     ],
     callouts: [
       {

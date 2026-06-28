@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Pythagorean Theorem — Visual Proof</text>
+
+  <!-- LEFT PROOF: Big square (a+b)² with 4 triangles + c² center -->
+  <rect x="12" y="26" width="192" height="168" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="108" y="42" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Arrangement 1</text>
+
+  <!-- Big square outline: corners at (20,48), (196,48), (196,188), (20,188) -->
+  <!-- Side = 160px. a=100, b=60 -->
+  <!-- 4 right triangles placed in corners: -->
+  <!-- Triangle 1 (top-left): (20,48)→(120,48)→(20,148) leg a=100 horiz, b=100 vert... let me simplify -->
+  <!-- Using a=90, b=60, c=√(90²+60²)=√(8100+3600)=√11700≈108 -->
+  <!-- Big square side = a+b = 150 -->
+  <!-- Scale to fit: use side=136, a=88, b=48 -->
+
+  <!-- Big square -->
+  <rect x="28" y="48" width="136" height="136" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- 4 triangles (right triangles with legs a=88, b=48) -->
+  <!-- Top-left: (28,48)→(116,48)→(28,136) [base a horiz, height b vert] -->
+  <polygon points="28,48 116,48 28,136" fill="#93c5fd" opacity="0.7"/>
+  <!-- Top-right: (164,48)→(164,136)→(76,48) -->
+  <polygon points="76,48 164,48 164,136" fill="#93c5fd" opacity="0.7"/>
+  <!-- Bottom-right: (164,136)→(164,184)→(76,184) -->
+  <polygon points="76,184 164,136 164,184" fill="#93c5fd" opacity="0.7"/>
+  <!-- Bottom-left: (28,136)→(116,184)→(28,184) -->
+  <polygon points="28,136 116,184 28,184" fill="#93c5fd" opacity="0.7"/>
+
+  <!-- Center tilted square = c² -->
+  <polygon points="28,136 116,48 164,136 76,184" fill="#fbbf24" opacity="0.8"/>
+  <text x="96" y="120" font-size="18" fill="#78350f" text-anchor="middle" font-weight="800">c²</text>
+
+  <!-- Labels a and b -->
+  <text x="72" y="44" font-size="9" fill="#1d4ed8" text-anchor="middle">a</text>
+  <text x="22" y="96" font-size="9" fill="#1d4ed8">b</text>
+  <text x="108" y="118" font-size="8" fill="#92400e" text-anchor="middle">(hyp²)</text>
+
+  <!-- ARROW -->
+  <defs>
+    <marker id="arr2" markerWidth="8" markerHeight="7" refX="7" refY="3.5" orient="auto">
+      <polygon points="0,0 8,3.5 0,7" fill="#059669"/>
+    </marker>
+  </defs>
+  <text x="218" y="110" font-size="9" fill="#059669" text-anchor="middle">rearrange</text>
+  <text x="218" y="122" font-size="9" fill="#059669" text-anchor="middle">triangles</text>
+  <line x1="208" y1="130" x2="260" y2="130" stroke="#059669" stroke-width="2" marker-end="url(#arr2)"/>
+
+  <!-- RIGHT PROOF: Same 4 triangles, rearranged to show a²+b² -->
+  <rect x="268" y="26" width="200" height="168" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="368" y="42" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">Arrangement 2</text>
+
+  <!-- Same big square -->
+  <rect x="284" y="48" width="136" height="136" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+
+  <!-- Rearranged triangles: 2 in one corner pair, 2 in other -->
+  <!-- Two triangles form one rectangle in top-right: width b=48, height a=88 -->
+  <!-- Two triangles form another rectangle in bottom-left: width a=88, height b=48 -->
+  <!-- Top-left: triangle (284,48)→(372,48)→(284,136) -->
+  <polygon points="284,48 372,48 284,136" fill="#93c5fd" opacity="0.7"/>
+  <!-- Bottom-right: triangle (372,48)→(420,48)→(420,136) -->
+  <polygon points="372,48 420,48 420,136" fill="#93c5fd" opacity="0.7"/>
+  <!-- These two form: a square a²= (284→372)×(48→136) = 88×88 and rect b² -->
+
+  <!-- a² region -->
+  <rect x="284" y="48" width="88" height="88" fill="#86efac" opacity="0.8"/>
+  <text x="328" y="96" font-size="14" fill="#166534" text-anchor="middle" font-weight="800">a²</text>
+
+  <!-- b² region -->
+  <rect x="372" y="136" width="48" height="48" fill="#fca5a5" opacity="0.8"/>
+  <text x="396" y="164" font-size="12" fill="#991b1b" text-anchor="middle" font-weight="800">b²</text>
+
+  <!-- Two blue triangles in the remaining corners -->
+  <polygon points="372,48 420,48 372,136" fill="#93c5fd" opacity="0.7"/>
+  <polygon points="284,136 372,184 284,184" fill="#93c5fd" opacity="0.7"/>
+
+  <!-- Remaining area -->
+  <rect x="372" y="48" width="48" height="88" fill="#fde68a" opacity="0.7"/>
+  <rect x="284" y="136" width="88" height="48" fill="#fde68a" opacity="0.7"/>
+  <text x="396" y="96" font-size="9" fill="#92400e" text-anchor="middle">ab</text>
+  <text x="328" y="164" font-size="9" fill="#92400e" text-anchor="middle">ab</text>
+
+  <!-- Formula -->
+  <rect x="268" y="168" width="200" height="22" rx="5" fill="#4338ca"/>
+  <text x="368" y="183" font-size="10" fill="white" text-anchor="middle" font-weight="700">∴  a² + b² = c²</text>
+</svg>

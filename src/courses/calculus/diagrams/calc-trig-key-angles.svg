@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg  { fill: rgb(var(--tw-custom-slate-50)); }
+    .mu  { fill: rgb(var(--tw-custom-slate-500)); }
+    .tx  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .bg  { fill: rgb(var(--tw-custom-slate-900)); }
+    .dark .mu  { fill: rgb(var(--tw-custom-slate-400)); }
+    .dark .tx  { fill: rgb(var(--tw-custom-slate-200)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+
+  <text x="240" y="17" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Key Angle Values — Memorize These</text>
+
+  <!-- Table header -->
+  <rect x="10" y="24" width="460" height="26" rx="6" fill="#4338ca"/>
+  <text x="80"  y="41" font-size="10" fill="white" text-anchor="middle" font-weight="700">Angle</text>
+  <text x="175" y="41" font-size="10" fill="white" text-anchor="middle" font-weight="700">sin θ</text>
+  <text x="285" y="41" font-size="10" fill="white" text-anchor="middle" font-weight="700">cos θ</text>
+  <text x="415" y="41" font-size="10" fill="white" text-anchor="middle" font-weight="700">tan θ</text>
+
+  <!-- Row dividers (vertical) -->
+  <line x1="135" y1="24" x2="135" y2="196" stroke="#e2e8f0" stroke-width="1.5"/>
+  <line x1="235" y1="24" x2="235" y2="196" stroke="#e2e8f0" stroke-width="1.5"/>
+  <line x1="345" y1="24" x2="345" y2="196" stroke="#e2e8f0" stroke-width="1.5"/>
+
+  <!-- Row 1: 0° -->
+  <rect x="10" y="50" width="460" height="28" rx="0" fill="#f8fafc"/>
+  <text x="80"  y="68" font-size="9.5" class="tx" text-anchor="middle" font-weight="700">0°  (0 rad)</text>
+  <text x="175" y="68" font-size="10" fill="#6366f1" text-anchor="middle" font-weight="700">0</text>
+  <text x="285" y="68" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">1</text>
+  <text x="415" y="68" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="700">0</text>
+
+  <!-- Row 2: 30° -->
+  <rect x="10" y="78" width="460" height="28" rx="0" fill="#eef2ff"/>
+  <text x="80"  y="96" font-size="9.5" class="tx" text-anchor="middle" font-weight="700">30° (π/6)</text>
+  <text x="175" y="96" font-size="10" fill="#6366f1" text-anchor="middle" font-weight="700">1/2</text>
+  <text x="285" y="96" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">√3/2</text>
+  <text x="415" y="96" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="700">1/√3</text>
+
+  <!-- Row 3: 45° -->
+  <rect x="10" y="106" width="460" height="28" rx="0" fill="#f8fafc"/>
+  <text x="80"  y="124" font-size="9.5" class="tx" text-anchor="middle" font-weight="700">45° (π/4)</text>
+  <text x="175" y="124" font-size="10" fill="#6366f1" text-anchor="middle" font-weight="700">√2/2</text>
+  <text x="285" y="124" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">√2/2</text>
+  <text x="415" y="124" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="700">1</text>
+
+  <!-- Row 4: 60° -->
+  <rect x="10" y="134" width="460" height="28" rx="0" fill="#eef2ff"/>
+  <text x="80"  y="152" font-size="9.5" class="tx" text-anchor="middle" font-weight="700">60° (π/3)</text>
+  <text x="175" y="152" font-size="10" fill="#6366f1" text-anchor="middle" font-weight="700">√3/2</text>
+  <text x="285" y="152" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">1/2</text>
+  <text x="415" y="152" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="700">√3</text>
+
+  <!-- Row 5: 90° -->
+  <rect x="10" y="162" width="460" height="28" rx="0" fill="#f8fafc"/>
+  <text x="80"  y="180" font-size="9.5" class="tx" text-anchor="middle" font-weight="700">90° (π/2)</text>
+  <text x="175" y="180" font-size="10" fill="#6366f1" text-anchor="middle" font-weight="700">1</text>
+  <text x="285" y="180" font-size="10" fill="#10b981" text-anchor="middle" font-weight="700">0</text>
+  <text x="415" y="180" font-size="10" fill="#f59e0b" text-anchor="middle" font-weight="700">undef.</text>
+
+  <!-- Table border -->
+  <rect x="10" y="24" width="460" height="166" rx="6" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Memory trick -->
+  <text x="240" y="196" font-size="7.5" class="mu" text-anchor="middle">sin pattern: 0, ½, √2/2, √3/2, 1 — cos is reversed. tan = sin/cos.</text>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Trig Integrals — Strategy for Powers</text>
+  <!-- sin/cos powers -->
+  <rect x="8" y="24" width="228" height="170" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <text x="122" y="44" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">∫ sinⁿx cosᵐx dx</text>
+  <rect x="16" y="50" width="212" height="54" rx="4" fill="#dbeafe"/>
+  <text x="122" y="66" font-size="8" fill="#1d4ed8" text-anchor="middle" font-weight="700">Odd power of sin:</text>
+  <text x="122" y="80" font-size="7.5" fill="#1e40af" text-anchor="middle">Save one sin x, use sin²=1−cos²</text>
+  <text x="122" y="94" font-size="7.5" fill="#1e40af" text-anchor="middle">Let u = cos x</text>
+  <rect x="16" y="108" width="212" height="54" rx="4" fill="#dcfce7"/>
+  <text x="122" y="124" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">Odd power of cos:</text>
+  <text x="122" y="138" font-size="7.5" fill="#15803d" text-anchor="middle">Save one cos x, use cos²=1−sin²</text>
+  <text x="122" y="152" font-size="7.5" fill="#15803d" text-anchor="middle">Let u = sin x</text>
+  <rect x="16" y="166" width="212" height="24" rx="4" fill="#fef3c7"/>
+  <text x="122" y="182" font-size="7.5" fill="#92400e" text-anchor="middle">Both even: use half-angle identities</text>
+
+  <!-- Identities panel -->
+  <rect x="244" y="24" width="228" height="170" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="358" y="44" font-size="8.5" fill="#1e293b" text-anchor="middle" font-weight="700">Key Identities</text>
+  <rect x="252" y="50" width="212" height="20" rx="3" fill="#dbeafe"/>
+  <text x="358" y="64" font-size="8" fill="#1d4ed8" text-anchor="middle">sin²x + cos²x = 1</text>
+  <rect x="252" y="74" width="212" height="20" rx="3" fill="#f8fafc"/>
+  <text x="358" y="88" font-size="8" fill="#374151" text-anchor="middle">sin²x = (1 − cos 2x)/2</text>
+  <rect x="252" y="98" width="212" height="20" rx="3" fill="#dbeafe"/>
+  <text x="358" y="112" font-size="8" fill="#1d4ed8" text-anchor="middle">cos²x = (1 + cos 2x)/2</text>
+  <rect x="252" y="122" width="212" height="20" rx="3" fill="#f8fafc"/>
+  <text x="358" y="136" font-size="8" fill="#374151" text-anchor="middle">tan²x = sec²x − 1</text>
+  <rect x="252" y="146" width="212" height="20" rx="3" fill="#dbeafe"/>
+  <text x="358" y="160" font-size="8" fill="#1d4ed8" text-anchor="middle">cot²x = csc²x − 1</text>
+  <rect x="252" y="168" width="212" height="22" rx="3" fill="#ede9fe"/>
+  <text x="358" y="183" font-size="8" fill="#5b21b6" text-anchor="middle">∫ sec x dx = ln|sec x + tan x| + C</text>
+</svg>

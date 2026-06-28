@@ -1,4 +1,6 @@
 import powerRuleUrl from '../diagrams/calc-power-rule.svg?url';
+import longDivisionUrl from '../diagrams/calc-long-division.svg?url';
+import syntheticDivisionUrl from '../diagrams/calc-synthetic-division.svg?url';
 export default {
   id: 'ch0-polynomial-division',
   slug: 'polynomial-division',
@@ -26,9 +28,19 @@ export default {
       '**Polynomial long division** divides a polynomial $p(x)$ by a divisor $d(x)$ to produce a quotient $q(x)$ and remainder $r(x)$: $p(x) = d(x) \\cdot q(x) + r(x)$, where the degree of $r$ is less than the degree of $d$. This is the **Division Algorithm** for polynomials.',
 
       'The process: look at the leading term of the dividend, divide by the leading term of the divisor, write that as the next term of the quotient, multiply back, subtract, and repeat. It is exactly long division, just with variables instead of digits.',
-
+        ],
+      },
+      { type: 'image', src: powerRuleUrl, alt: 'Polynomial structure table for division and factoring', caption: 'Polynomial long division mirrors integer division: divide, multiply, subtract, bring down.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**Synthetic division** is a shortcut that works when the divisor is linear: $x - c$. Instead of writing out all the variables and powers, you only track the coefficients. It is faster, less error-prone, and reveals a beautiful connection: the remainder of dividing $p(x)$ by $x - c$ is exactly $p(c)$.',
-
+        ],
+      },
+      { type: 'image', src: longDivisionUrl, alt: 'Step-by-step polynomial long division of a cubic by a linear factor', caption: 'Long division produces a quotient plus a remainder over the divisor — the form needed before integrating rational functions.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'That connection is the **Remainder Theorem**: when you divide $p(x)$ by $(x - c)$, the remainder is $p(c)$. Think about it — if $p(x) = (x-c) \\cdot q(x) + r$, then plugging in $x = c$ gives $p(c) = 0 \\cdot q(c) + r = r$. The remainder is just the polynomial evaluated at $c$.',
 
       'The **Factor Theorem** is the Remainder Theorem\'s immediate corollary: $(x - c)$ is a factor of $p(x)$ if and only if $p(c) = 0$. In other words, $c$ is a root of $p(x)$ precisely when $(x-c)$ divides $p(x)$ evenly (zero remainder).',
@@ -36,7 +48,7 @@ export default {
       'The **Rational Root Theorem** helps you find candidates for rational roots. If $p(x) = a_n x^n + \\cdots + a_0$ has a rational root $\\frac{p}{q}$ in lowest terms, then $p$ divides $a_0$ (the constant term) and $q$ divides $a_n$ (the leading coefficient). This gives you a finite list of candidates to test using synthetic division.',
         ],
       },
-      { type: 'image', src: powerRuleUrl, alt: 'Polynomial structure table for division and factoring', caption: 'Polynomial long division mirrors integer division: divide, multiply, subtract, bring down.' },
+      { type: 'image', src: syntheticDivisionUrl, alt: 'Synthetic division grid showing coefficients, multiply-and-add steps, and remainder', caption: 'Synthetic division is long division compressed to arithmetic on coefficients — only valid when dividing by (x − c); the remainder equals f(c) by the Remainder Theorem.' },
     ],
     callouts: [
       {

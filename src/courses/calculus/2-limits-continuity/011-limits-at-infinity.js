@@ -1,5 +1,6 @@
 import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
 import verticalAsymptoteUrl from '../diagrams/calc-vertical-asymptote.svg?url';
+import horizAsymptoteUrl from '../diagrams/calc-horiz-asymptote.svg?url';
 export default {
   id: 'ch1-limits-at-infinity',
   slug: 'limits-at-infinity',
@@ -38,13 +39,18 @@ export default {
       'Horizontal asymptotes are what limits at infinity look like on a graph. If lim(x→∞) f(x) = L, the graph approaches the horizontal line y = L from below or above as you go far right. Crucially, the graph CAN cross a horizontal asymptote — asymptotes describe end behavior, not barriers. A function can oscillate across y = L many times at small x values and still approach L eventually.',
 
       'When the numerator degree exceeds the denominator degree by exactly 1, there is no horizontal asymptote — but there IS a slant (oblique) asymptote. Polynomial long division reveals it: divide to get f(x) = (linear part) + (remainder)/(denominator). As x → ∞ the remainder fraction vanishes, and the graph hugs the line given by the linear part.',
-
+        ],
+      },
+      { type: 'image', src: verticalAsymptoteUrl, alt: 'Horizontal asymptotes (limits at ∞) vs. vertical asymptotes (limits near a zero)', caption: 'Horizontal asymptotes describe end behavior; vertical asymptotes describe local blow-up.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The growth-rate hierarchy is a fact worth memorizing once and using forever: for large x, logarithms grow slowest, then powers of x (like x², x^10), then exponentials (like eˣ, 2ˣ). In race notation: ln(x) ≪ xᵃ ≪ bˣ for any a > 0 and b > 1. This means lim(x→∞) ln(x)/x = 0 (polynomial wins over log), and lim(x→∞) x¹⁰⁰/eˣ = 0 (exponential wins over any polynomial, even x to the hundredth power). These facts come up constantly in later chapters.',
 
       '**Where this is heading:** Limits at infinity give you horizontal and slant asymptotes — two of the five key features used in curve sketching in Chapter 3. In Chapter 3 you will also meet L\'Hôpital\'s Rule, which handles ∞/∞ and 0/0 indeterminate forms that the degree-comparison technique cannot reach. Everything in this lesson is prerequisite for that tool.',
         ],
       },
-      { type: 'image', src: verticalAsymptoteUrl, alt: 'Horizontal asymptotes (limits at ∞) vs. vertical asymptotes (limits near a zero)', caption: 'Horizontal asymptotes describe end behavior; vertical asymptotes describe local blow-up.' },
+      { type: 'image', src: horizAsymptoteUrl, alt: 'Rational function approaching a horizontal asymptote as x → ±∞, with degree comparison rules', caption: 'Three rules: deg(top) < deg(bottom) → y=0; equal degrees → ratio of leading coefficients; top wins → no HA.' },
     ],
     callouts: [
       {

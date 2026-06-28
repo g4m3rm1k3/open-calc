@@ -1,4 +1,6 @@
 import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
+import trigDerivTableUrl from '../diagrams/calc-trig-deriv-table.svg?url';
+import sinCosWaveDerivUrl from '../diagrams/calc-sin-cos-wave-deriv.svg?url';
 // FILE: src/content/chapter-2/03-trig-derivatives.js
 export default {
   id: "ch2-003",
@@ -53,17 +55,28 @@ export default {
       "At theta = pi: the point (-1, 0) is moving straight downward. The y-coordinate decreases at maximum rate. The slope is -1, and cos(pi) = -1.",
       "This pattern is a theorem, not a coincidence: d/dtheta[sin(theta)] = cos(theta).",
       "Geometric proof bridge: position is (cos(theta), sin(theta)) and velocity is perpendicular to radius, so velocity has direction (-sin(theta), cos(theta)). The y-component of velocity is cos(theta), and that y-component is exactly d/dtheta[sin(theta)].",
+        ],
+      },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle with trig derivative table', caption: 'Trig derivatives repeat in a cycle of four; co-functions pick up a minus sign.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Why the minus sign for cosine? As theta increases through the first quadrant, cosine tracks horizontal position moving left, so its rate of change is negative. That directional fact is d/dx[cos x] = -sin x.",
       "Expert intuition: each derivative is a 90-degree phase rotation of the trig wave. sin -> cos -> -sin -> -cos -> sin.",
 
       '**Where this is heading:** You now have derivatives for all six trig functions. The next lesson introduces the other great family: exponential and logarithmic functions. The highlight is e — the one base for which the exponential function literally equals its own derivative. That self-referential property is one of the most surprising facts in mathematics.',
-
+        ],
+      },
+      { type: 'image', src: trigDerivTableUrl, alt: 'Complete table of all six trig derivatives with memory patterns', caption: 'All six trig derivatives: co-functions (cos, cot, csc) always gain a minus sign.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**The 90-degree phase shift pattern — a cycle of four:** Each derivative of a trig function is a quarter-period (90-degree) shift of the wave. Starting from sin(x): its derivative is cos(x), which is sin(x) shifted left by π/2. The derivative of cos(x) is −sin(x), another 90-degree shift. The derivative of −sin(x) is −cos(x), and the derivative of −cos(x) returns to sin(x). So the cycle is sin → cos → −sin → −cos → sin, repeating every four derivatives. This means: to find the 47th derivative of sin(x), compute 47 mod 4 = 3, so the 47th derivative is −cos(x). This four-step cycle is unique to trigonometric functions and reflects the geometric fact that rotating the unit-circle velocity vector by 90 degrees four times returns to the original direction.',
 
       '**Chain rule with trig — the most important application:** Once you have d/dx[sin(x)] = cos(x) and d/dx[cos(x)] = −sin(x), the chain rule extends these to any composite argument. The pattern is: d/dx[sin(g(x))] = cos(g(x))·g\'(x) and d/dx[cos(g(x))] = −sin(g(x))·g\'(x). The outer derivative uses the trig formula as usual, but the result must be multiplied by the derivative of the inner function g\'(x). Example 1: d/dx[sin(3x)] = cos(3x)·3 = 3cos(3x). Example 2: d/dx[cos(x²)] = −sin(x²)·2x = −2x·sin(x²). Forgetting the inner derivative is the chain-trap in trig form — the same mistake isolated in the previous lesson now appears in trig context.',
         ],
       },
-      { type: 'image', src: trigCircleUrl, alt: 'Unit circle with trig derivative table', caption: 'Trig derivatives repeat in a cycle of four; co-functions pick up a minus sign.' },
+      { type: 'image', src: sinCosWaveDerivUrl, alt: 'Graph showing sin(x) and its derivative cos(x) with slope annotations at key points', caption: 'The derivative of sin is cos: where sin peaks, cos = 0; where sin rises, cos > 0.' },
     ],
     callouts: [
       {

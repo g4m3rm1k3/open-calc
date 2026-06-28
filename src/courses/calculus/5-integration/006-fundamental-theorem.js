@@ -1,4 +1,6 @@
 import ftcUrl from '../diagrams/calc-ftc.svg?url';
+import ftcPart1Url from '../diagrams/calc-ftc-part1.svg?url';
+import ftcPart2Url from '../diagrams/calc-ftc-part2.svg?url';
 // FILE: src/content/chapter-4/03-fundamental-theorem.js
 export default {
   id: "ch4-003",
@@ -34,13 +36,25 @@ export default {
         paragraphs: [
       "The Fundamental Theorem has two parts, and both parts are surprising. Part 1 says: if you define A(x) = ∫ₐˣ f(t) dt (the accumulated area from a to x), then A is differentiable and A'(x) = f(x). The derivative of the accumulated area is the original function. Differentiation undoes integration. Part 2 says: if F is any antiderivative of f (meaning F' = f), then ∫ₐᵇ f(x) dx = F(b) − F(a). To compute the area under f from a to b, find any antiderivative of f and subtract its values at the endpoints. Integration undoes differentiation (up to a constant).",
       "Part 1 can be understood physically. Imagine driving a car and tracking position A(x) at every moment. Your speedometer reads f(x) — the instantaneous rate of change of accumulated position. Part 1 says: if you know the accumulated position A(x), its derivative A'(x) is exactly your current speed f(x). The rate at which the \"area counter\" advances is equal to the height of the function at that exact moment. This is compelling: adding a thin strip of width dx and height f(x) to the accumulated area increases A by approximately f(x)·dx, so ΔA/Δx ≈ f(x), and in the limit A'(x) = f(x).",
+        ],
+      },
+      { type: 'image', src: ftcUrl, alt: 'Two panels: FTC Part 1 (A(x) accumulation) and Part 2 (F(b) − F(a))', caption: 'FTC Part 1 says the derivative of an area function is the original function. Part 2 gives the evaluation shortcut.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Part 2 follows from Part 1 by a beautiful algebraic argument. Suppose F is any antiderivative of f, so F' = f. We also know A'= f where A(x) = ∫ₐˣ f(t)dt. So A' = F' on [a, b], which means A − F is a function with zero derivative — and by the Mean Value Theorem, A(x) − F(x) = constant. Call it C. Evaluate at x = a: A(a) − F(a) = C. But A(a) = ∫ₐᵃ f = 0. So C = −F(a), giving A(x) = F(x) − F(a) for all x. At x = b: ∫ₐᵇ f(t)dt = A(b) = F(b) − F(a). This derivation is the logical core of FTC Part 2.",
       'The notation F(b) − F(a) is so common it has its own shorthand: [F(x)]ₐᵇ, read "F of x evaluated from a to b." The calculation ∫₀³ x² dx = [x³/3]₀³ = 27/3 − 0/3 = 9 is a typical application: find the antiderivative (x³/3), evaluate at the upper limit (3³/3 = 9), subtract the value at the lower limit (0³/3 = 0). Result: 9. What would have taken a pages-long Riemann sum calculation is now three lines of algebra.',
+        ],
+      },
+      { type: 'image', src: ftcPart1Url, alt: 'd/dx[∫ₐˣ f(t)dt] = f(x) with area-accumulation diagram', caption: 'FTC Part 1: differentiating an accumulation integral recovers the integrand — differentiation undoes integration.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Part 1 also has a chain rule version for when the upper limit of integration is a function of x rather than x itself. If g is differentiable, then d/dx[∫ₐ^(g(x)) f(t) dt] = f(g(x))·g'(x). This is FTC Part 1 composed with the chain rule: the outer derivative is f(g(x)) (the function evaluated at the upper limit), and g'(x) comes from the chain rule. For example, d/dx[∫₀^(x²) sin(t) dt] = sin(x²)·2x. This generalization appears constantly in differential equations and in the Leibniz integral rule.",
       "The historical importance of the FTC cannot be overstated. Before Newton and Leibniz, computing areas, volumes, and arc lengths required ad-hoc geometric arguments — brilliant but non-systematic. After the FTC, the problem of computing any definite integral was reduced to the problem of finding an antiderivative: a systematic algebraic task. The next century saw an explosion of mathematical physics, as Newton's laws of motion combined with the FTC to produce exact predictions for planetary orbits, projectile trajectories, wave propagation, and eventually Maxwell's equations of electromagnetism. Every model of physical reality that uses differential equations ultimately relies on the FTC.",
         ],
       },
-      { type: 'image', src: ftcUrl, alt: 'Two panels: FTC Part 1 (A(x) accumulation) and Part 2 (F(b) − F(a))', caption: 'FTC Part 1 says the derivative of an area function is the original function. Part 2 gives the evaluation shortcut.' },
+      { type: 'image', src: ftcPart2Url, alt: '∫ₐᵇ f(x)dx = F(b)−F(a) three-step evaluation process', caption: 'FTC Part 2: find any antiderivative F, then the definite integral is just F(b)−F(a) — no limit of sums needed.' },
     ],
     callouts: [
       {

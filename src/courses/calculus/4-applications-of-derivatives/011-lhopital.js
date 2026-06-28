@@ -1,6 +1,7 @@
 // FILE: src/content/chapter-3/05-lhopital.js
 import lhopitalUrl from '../diagrams/calc-lhopital.svg?url';
 import limitsInfinityUrl from '../diagrams/calc-limits-infinity.svg?url';
+import lhopitalTableUrl from '../diagrams/calc-lhopital-table.svg?url';
 export default {
   id: "ch3-005",
   slug: "lhopital",
@@ -45,11 +46,17 @@ export default {
         paragraphs: [
       "The other five indeterminate forms (0·∞, ∞-∞, 1^∞, 0^0, ∞^0) all convert to 0/0 or ∞/∞ through algebraic manipulation. For 0·∞: write f(x)·g(x) = f(x)/(1/g(x)) = 0/0, or g(x)/(1/f(x)) = ∞/∞. Which form to use depends on which gives a simpler derivative. For the power forms 1^∞, 0^0, ∞^0: take logarithms. If L = lim f(x)^{g(x)}, then ln(L) = lim g(x)·ln(f(x)). This converts the power form to a 0·∞ limit in the exponent, which then converts to 0/0 or ∞/∞. After evaluating ln(L) = K, conclude L = e^K.",
       "The historical context is extraordinary. L'Hôpital's Rule appears in the 1696 book Analyse des infiniment petits pour l'intelligence des lignes courbes — the first textbook ever published on differential calculus, written by Guillaume de l'Hôpital, a French marquis and amateur mathematician. However, the rule was actually discovered by Johann Bernoulli, who was employed by l'Hôpital as a private tutor. L'Hôpital paid Bernoulli a retainer for the right to use his mathematical discoveries exclusively. The rule in the book was Bernoulli's. L'Hôpital died in 1704; Bernoulli only went public with his claim to the rule after l'Hôpital's death. Correspondence later found in the Bernoulli archive confirmed the story. L'Hôpital's Rule is one of mathematics' most famous cases of misattributed credit.",
+        ],
+      },
+      { type: 'image', src: limitsInfinityUrl, alt: 'Degree comparison for ∞/∞ forms — L\'Hôpital generalizes this technique', caption: 'L\'Hôpital\'s rule applies to all 0/0 and ∞/∞ forms, not just rational functions.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Critical warning: L'Hôpital's Rule applies ONLY when the limit is genuinely indeterminate (0/0 or ∞/∞). It cannot be applied to a limit like lim_{x→1} (x²-1)/(x-1) if you have not first verified that both numerator and denominator approach 0 (they do — it's 0/0 form). More dangerously, some students apply L'Hôpital to non-indeterminate limits: lim_{x→1} (x+2)/(x-1) approaches 3/0 = ±∞, not 0/0. Applying L'Hôpital here gives lim 1/1 = 1, which is wrong. The correct answer is ±∞ (the limit does not exist). Always verify the indeterminate form FIRST.",
       "Another important limitation: L'Hôpital's Rule can fail even when it seems applicable. Consider lim_{x→∞} (x + sin(x))/x. This appears to be ∞/∞. The rule would give (1 + cos(x))/1, which has no limit as x → ∞ (since cos(x) oscillates). Yet the original limit clearly exists: (x + sin(x))/x = 1 + sin(x)/x → 1 + 0 = 1 (since |sin(x)/x| ≤ 1/x → 0). L'Hôpital's Rule says: IF the limit of f'/g' exists, THEN lim f/g equals it. It says nothing about what happens when f'/g' has no limit. The failure of L'Hôpital does not imply the original limit fails — you must use another method.",
         ],
       },
-      { type: 'image', src: limitsInfinityUrl, alt: 'Degree comparison for ∞/∞ forms — L\'Hôpital generalizes this technique', caption: 'L\'Hôpital\'s rule applies to all 0/0 and ∞/∞ forms, not just rational functions.' },
+      { type: 'image', src: lhopitalTableUrl, alt: 'L\'Hôpital\'s rule formula and table of all seven indeterminate forms with strategies', caption: 'Seven indeterminate forms: 0/0 and ∞/∞ apply directly; 0·∞, ∞−∞, 0⁰, 1^∞, ∞⁰ all require algebraic rewriting first.' },
     ],
     callouts: [
       {

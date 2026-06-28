@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Optimization — Problem Solving Steps</text>
+  <!-- 5 step boxes -->
+  <rect x="8" y="26" width="88" height="168" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="52" y="48" font-size="8" fill="#1d4ed8" text-anchor="middle" font-weight="700">① Identify</text>
+  <text x="52" y="62" font-size="7" fill="#1e40af" text-anchor="middle">What to</text>
+  <text x="52" y="74" font-size="7" fill="#1e40af" text-anchor="middle">maximize or</text>
+  <text x="52" y="86" font-size="7" fill="#1e40af" text-anchor="middle">minimize?</text>
+  <text x="52" y="110" font-size="7" fill="#3b82f6" text-anchor="middle">ex: Volume,</text>
+  <text x="52" y="122" font-size="7" fill="#3b82f6" text-anchor="middle">Area, Cost,</text>
+  <text x="52" y="134" font-size="7" fill="#3b82f6" text-anchor="middle">Profit, Time</text>
+
+  <rect x="104" y="26" width="88" height="168" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="148" y="48" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">② Variables</text>
+  <text x="148" y="62" font-size="7" fill="#15803d" text-anchor="middle">Name the</text>
+  <text x="148" y="74" font-size="7" fill="#15803d" text-anchor="middle">unknown(s)</text>
+  <text x="148" y="110" font-size="7" fill="#166534" text-anchor="middle">Write the</text>
+  <text x="148" y="122" font-size="7" fill="#166534" text-anchor="middle">objective</text>
+  <text x="148" y="134" font-size="7" fill="#166534" text-anchor="middle">function</text>
+
+  <rect x="200" y="26" width="88" height="168" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="244" y="48" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">③ Constrain</text>
+  <text x="244" y="62" font-size="7" fill="#78350f" text-anchor="middle">Write all</text>
+  <text x="244" y="74" font-size="7" fill="#78350f" text-anchor="middle">constraints</text>
+  <text x="244" y="86" font-size="7" fill="#78350f" text-anchor="middle">as equations</text>
+  <text x="244" y="110" font-size="7" fill="#b45309" text-anchor="middle">Substitute to</text>
+  <text x="244" y="122" font-size="7" fill="#b45309" text-anchor="middle">get function</text>
+  <text x="244" y="134" font-size="7" fill="#b45309" text-anchor="middle">of 1 variable</text>
+
+  <rect x="296" y="26" width="88" height="168" rx="6" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="340" y="48" font-size="8" fill="#4c1d95" text-anchor="middle" font-weight="700">④ Optimize</text>
+  <text x="340" y="62" font-size="7" fill="#5b21b6" text-anchor="middle">Take derivative</text>
+  <text x="340" y="74" font-size="7" fill="#5b21b6" text-anchor="middle">set = 0</text>
+  <text x="340" y="110" font-size="7" fill="#6d28d9" text-anchor="middle">Solve for</text>
+  <text x="340" y="122" font-size="7" fill="#6d28d9" text-anchor="middle">critical</text>
+  <text x="340" y="134" font-size="7" fill="#6d28d9" text-anchor="middle">points</text>
+
+  <rect x="392" y="26" width="80" height="168" rx="6" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5"/>
+  <text x="432" y="48" font-size="8" fill="#9d174d" text-anchor="middle" font-weight="700">⑤ Verify</text>
+  <text x="432" y="62" font-size="7" fill="#be185d" text-anchor="middle">Use 1st or</text>
+  <text x="432" y="74" font-size="7" fill="#be185d" text-anchor="middle">2nd deriv</text>
+  <text x="432" y="86" font-size="7" fill="#be185d" text-anchor="middle">test</text>
+  <text x="432" y="110" font-size="7" fill="#9d174d" text-anchor="middle">Check</text>
+  <text x="432" y="122" font-size="7" fill="#9d174d" text-anchor="middle">endpoints</text>
+  <text x="432" y="134" font-size="7" fill="#9d174d" text-anchor="middle">too!</text>
+</svg>

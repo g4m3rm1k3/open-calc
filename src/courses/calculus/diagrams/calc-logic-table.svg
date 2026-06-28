@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Logic Connectors — Truth Tables</text>
+  <!-- Header -->
+  <rect x="8" y="24" width="464" height="14" rx="0" fill="#6366f1"/>
+  <text x="50" y="35" font-size="7.5" fill="white" text-anchor="middle" font-weight="700">P</text>
+  <text x="90" y="35" font-size="7.5" fill="white" text-anchor="middle" font-weight="700">Q</text>
+  <text x="155" y="35" font-size="7.5" fill="white" text-anchor="middle" font-weight="700">P ∧ Q (AND)</text>
+  <text x="258" y="35" font-size="7.5" fill="white" text-anchor="middle" font-weight="700">P ∨ Q (OR)</text>
+  <text x="355" y="35" font-size="7.5" fill="white" text-anchor="middle" font-weight="700">¬P (NOT P)</text>
+  <text x="432" y="35" font-size="7.5" fill="white" text-anchor="middle" font-weight="700">P → Q</text>
+  <!-- Rows -->
+  <rect x="8" y="38" width="464" height="22" rx="0" fill="#eef2ff"/>
+  <text x="50" y="53" font-size="8.5" fill="#374151" text-anchor="middle">T</text>
+  <text x="90" y="53" font-size="8.5" fill="#374151" text-anchor="middle">T</text>
+  <text x="155" y="53" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">T</text>
+  <text x="258" y="53" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">T</text>
+  <text x="355" y="53" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">F</text>
+  <text x="432" y="53" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">T</text>
+  <rect x="8" y="60" width="464" height="22" rx="0" fill="#f8fafc"/>
+  <text x="50" y="75" font-size="8.5" fill="#374151" text-anchor="middle">T</text>
+  <text x="90" y="75" font-size="8.5" fill="#374151" text-anchor="middle">F</text>
+  <text x="155" y="75" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">F</text>
+  <text x="258" y="75" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">T</text>
+  <text x="355" y="75" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">F</text>
+  <text x="432" y="75" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">F</text>
+  <rect x="8" y="82" width="464" height="22" rx="0" fill="#eef2ff"/>
+  <text x="50" y="97" font-size="8.5" fill="#374151" text-anchor="middle">F</text>
+  <text x="90" y="97" font-size="8.5" fill="#374151" text-anchor="middle">T</text>
+  <text x="155" y="97" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">F</text>
+  <text x="258" y="97" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">T</text>
+  <text x="355" y="97" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">T</text>
+  <text x="432" y="97" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">T</text>
+  <rect x="8" y="104" width="464" height="22" rx="0" fill="#f8fafc"/>
+  <text x="50" y="119" font-size="8.5" fill="#374151" text-anchor="middle">F</text>
+  <text x="90" y="119" font-size="8.5" fill="#374151" text-anchor="middle">F</text>
+  <text x="155" y="119" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">F</text>
+  <text x="258" y="119" font-size="8.5" fill="#dc2626" text-anchor="middle" font-weight="700">F</text>
+  <text x="355" y="119" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">T</text>
+  <text x="432" y="119" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">T</text>
+  <!-- Calculus note -->
+  <rect x="8" y="132" width="464" height="62" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="150" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">Contrapositive: P→Q is equivalent to ¬Q→¬P</text>
+  <text x="240" y="166" font-size="8" fill="#374151" text-anchor="middle">Example: "f differentiable → f continuous"</text>
+  <text x="240" y="180" font-size="8" fill="#374151" text-anchor="middle">Contrapositive: "f not continuous → f not differentiable" (also TRUE)</text>
+</svg>

@@ -1,5 +1,6 @@
 import squeezeUrl from '../diagrams/calc-squeeze.svg?url';
 import sinxOverXUrl from '../diagrams/calc-sinx-over-x.svg?url';
+import squeezeStepsUrl from '../diagrams/calc-squeeze-steps.svg?url';
 export default {
   id: 'ch1-squeeze-theorem',
   slug: 'squeeze-theorem',
@@ -39,11 +40,16 @@ export default {
         paragraphs: [
 
       '**The standard pattern**: if q(x) is bounded (|q(x)| ≤ M for some constant M) and p(x) → 0, then p(x)·q(x) → 0. This is because −M·|p(x)| ≤ p(x)·q(x) ≤ M·|p(x)|, and both bounds → 0. This handles cases like x·sin(1/x), x²·cos(1/x), and √x·sin(1/x).',
-
-      'Harold Jacobs likened this to a child walking between two parents who both turn into a doorway: the child enters the doorway too, no matter how much they zigzag. The key insight is that the child\'s freedom shrinks to zero — the two boundaries converge to the same point, leaving no room for anything else.',
         ],
       },
       { type: 'image', src: sinxOverXUrl, alt: 'Geometric proof: area squeeze on unit circle proves sin(θ)/θ → 1', caption: 'The squeeze theorem\'s most famous use: bounding sin(x)/x between 1 and cos(x).' },
+      {
+        type: 'prose',
+        paragraphs: [
+      'Harold Jacobs likened this to a child walking between two parents who both turn into a doorway: the child enters the doorway too, no matter how much they zigzag. The key insight is that the child\'s freedom shrinks to zero — the two boundaries converge to the same point, leaving no room for anything else.',
+        ],
+      },
+      { type: 'image', src: squeezeStepsUrl, alt: 'Sandwich visualization with three steps: find bounds, check they share a limit, conclude', caption: 'Three steps: (1) find g and h bounding f, (2) compute their shared limit, (3) conclude f → same limit.' },
     ],
     callouts: [
       {

@@ -1,4 +1,6 @@
 import vectorsUrl from '../diagrams/calc-vectors.svg?url';
+import gradientFieldUrl from '../diagrams/calc-gradient-field.svg?url';
+import divergenceCurlUrl from '../diagrams/calc-divergence-curl.svg?url';
 export default {
   id: 'ch6-vector-preview',
   slug: 'vector-calculus-preview',
@@ -24,14 +26,26 @@ export default {
         paragraphs: [
       'A true vector-valued function packages independent scalar coordinate equations into one robust geometric object: $\\mathbf{r}(t) = \\langle x(t), y(t), z(t) \\rangle$. Instead of manually synchronizing three separate variables, you globally steer one moving point continuously sweeping through space.',
       'A component operation derivative logically outputs velocity: $\\mathbf{v}(t) = \\mathbf{r}\'(t)$. This is geometrically much more than a raw "rate" scalar; it is a full direction-and-speed vector arrow tangent to the physical curvature.',
+        ],
+      },
+      { type: 'image', src: vectorsUrl, alt: 'Vector field arrows and gradient direction illustration', caption: 'Vector calculus extends derivatives and integrals to vector-valued functions and multi-dimensional fields.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The second derivative correctly outputs dynamic acceleration: $\\mathbf{a}(t) = \\mathbf{r}\'\'(t)$. Physics conceptually insists acceleration explains mathematically how velocity forces change, which physically happens by altering speed scalar length, redirecting turning alignment, or blending both.',
       'Absolute speed is strictly defined as the strict magnitude of the velocity vector layout: $|\\mathbf{v}(t)|$. Consequently, you can speed steadily on a straight highway with zero real acceleration, or you can cruise continuously at constant speed navigating a sharp hairpin curve demanding high normal acceleration just to rotate the alignment direction.',
+        ],
+      },
+      { type: 'image', src: gradientFieldUrl, alt: 'Level curves of f=x²+y² with gradient arrows pointing toward the maximum', caption: 'The gradient ∇f points in the direction of steepest ascent and is always perpendicular to the level curves of f.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Arc length traces total integrated path traveled: continuously integrate absolute speed over the duration timeline. This strictly generalizes the classic 1D metric definition: Distance equals the integral of instantaneous Speed.',
       'A massive conceptual win: geometric reality and physical behavior seamlessly synchronize. Mathematically, a pure tangent vector describes raw localized direction; normal-like perpendicular vectors govern lateral turning; intrinsic metric curvature dictates mathematically how violently the driven path forcefully bends.',
       'In data science and Machine Learning, loss parameter trajectory descent paths and weighted network multidimensional optimization bounds are interpreted mathematically using the exact same vector-function gradient-descent flow lens.',
         ],
       },
-      { type: 'image', src: vectorsUrl, alt: 'Vector field arrows and gradient direction illustration', caption: 'Vector calculus extends derivatives and integrals to vector-valued functions and multi-dimensional fields.' },
+      { type: 'image', src: divergenceCurlUrl, alt: 'Divergence shows outflow (source/sink); curl shows rotation of a vector field', caption: 'Divergence measures outflow (source/sink behavior); curl measures rotation. Both are Calc 3 topics built on single-variable derivatives.' },
     ],
     callouts: [
       {

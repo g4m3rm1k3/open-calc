@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Moments — Weighted Balance</text>
+  <!-- Seesaw diagram -->
+  <rect x="8" y="24" width="220" height="170" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Pivot -->
+  <polygon points="114,160 100,180 128,180" fill="#94a3b8"/>
+  <!-- Seesaw bar -->
+  <rect x="30" y="150" width="172" height="10" rx="3" fill="#374151"/>
+  <!-- Left weight m₁ -->
+  <circle cx="50" cy="142" r="18" fill="#6366f1" opacity="0.7"/>
+  <text x="50" y="146" font-size="8.5" fill="white" text-anchor="middle" font-weight="700">m₁</text>
+  <!-- Right weight m₂ -->
+  <circle cx="168" cy="136" r="24" fill="#ef4444" opacity="0.7"/>
+  <text x="168" y="140" font-size="8.5" fill="white" text-anchor="middle" font-weight="700">m₂</text>
+  <!-- distances -->
+  <line x1="50" y1="174" x2="114" y2="174" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="82" y="186" font-size="8" fill="#6366f1" text-anchor="middle">d₁</text>
+  <line x1="114" y1="174" x2="168" y2="174" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="141" y="186" font-size="8" fill="#ef4444" text-anchor="middle">d₂</text>
+  <!-- Balance condition -->
+  <text x="114" y="42" font-size="9" fill="#1e293b" text-anchor="middle" font-weight="700">Balance if:</text>
+  <rect x="22" y="50" width="190" height="24" rx="4" fill="#dbeafe"/>
+  <text x="117" y="66" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">m₁d₁ = m₂d₂</text>
+  <text x="114" y="90" font-size="8" fill="#374151" text-anchor="middle">Moment = mass × distance</text>
+  <text x="114" y="104" font-size="8" fill="#374151" text-anchor="middle">from the pivot</text>
+  <!-- Right panel: integral moments -->
+  <rect x="236" y="24" width="236" height="170" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="354" y="44" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Continuous Distribution</text>
+  <rect x="244" y="50" width="220" height="28" rx="4" fill="#dbeafe"/>
+  <text x="354" y="62" font-size="8" fill="#1d4ed8" text-anchor="middle">Mₓ = ρ∫½[f(x)]² dx</text>
+  <text x="354" y="76" font-size="7.5" fill="#1e40af" text-anchor="middle">(moment about x-axis)</text>
+  <rect x="244" y="84" width="220" height="28" rx="4" fill="#dcfce7"/>
+  <text x="354" y="96" font-size="8" fill="#166534" text-anchor="middle">Mᵧ = ρ∫ x·f(x) dx</text>
+  <text x="354" y="110" font-size="7.5" fill="#15803d" text-anchor="middle">(moment about y-axis)</text>
+  <rect x="244" y="118" width="220" height="28" rx="4" fill="#fef3c7"/>
+  <text x="354" y="132" font-size="8" fill="#92400e" text-anchor="middle">x̄ = Mᵧ/m</text>
+  <text x="354" y="146" font-size="7.5" fill="#78350f" text-anchor="middle">ȳ = Mₓ/m  (m = ρA)</text>
+  <rect x="244" y="152" width="220" height="36" rx="4" fill="#ede9fe"/>
+  <text x="354" y="166" font-size="8" fill="#5b21b6" text-anchor="middle">Pappus's Theorem:</text>
+  <text x="354" y="180" font-size="8" fill="#5b21b6" text-anchor="middle">V = 2π ȳ · A  (rotation about x-axis)</text>
+</svg>

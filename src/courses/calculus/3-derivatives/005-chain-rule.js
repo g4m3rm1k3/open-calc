@@ -1,4 +1,6 @@
 import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
+import chainRuleDecomposeUrl from '../diagrams/calc-chain-rule-decompose.svg?url';
+import chainRuleTreeUrl from '../diagrams/calc-chain-rule-tree.svg?url';
 // FILE: src/content/chapter-2/02-chain-rule.js
 export default {
   id: 'ch2-002',
@@ -27,11 +29,23 @@ export default {
 
       'Sequencing map: first derivatives are built from limits, then power/product/quotient rules are proved, and only then does the chain rule appear. The chain rule is layered on those earlier results.',
       'Let\'s build intuition for composition before worrying about differentiation. The expression f(g(x)) means: first apply g to x, get an intermediate result, then apply f to that intermediate result. For example, if g(x) = x\u00b2 + 1 and f(u) = \u221au, then f(g(x)) = \u221a(x\u00b2+1). The function g acts "on the inside" and f acts "on the outside." To evaluate at x = 3: first g(3) = 10, then f(10) = \u221a10. This two-step process is composition.',
+        ],
+      },
+      { type: 'image', src: chainRuleUrl, alt: 'Composition pipeline x → g(x) → f(g(x)) with derivative labels', caption: 'The chain rule multiplies the derivative of the outer function by the derivative of the inner function.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'Now think about rates. If u = g(x) changes by a certain rate as x changes, and y = f(u) changes at a certain rate as u changes, then what is the rate of change of y with respect to x? The answer is found by multiplying the rates: if u increases 3 times as fast as x, and y increases 4 times as fast as u, then y increases 12 times as fast as x. Rates along a chain multiply.',
       'The gear analogy makes this precise. Suppose gear A meshes with gear B, and gear B meshes with gear C. If gear A turns 3 times for every revolution of gear B (dA/dB = 3), and gear B turns 2 times for every revolution of gear C (dB/dC = 2), then gear A turns 6 times for every revolution of gear C: dA/dC = (dA/dB)\u00b7(dB/dC) = 3\u00b72 = 6. The rates multiply along the chain. This is the chain rule in its essence.',
       'In Leibniz notation, the chain rule is dy/dx = (dy/du)\u00b7(du/dx). If you squint, it looks like the du terms "cancel" — and while this is not literally true (dy/du and du/dx are limits, not fractions), it serves as a perfect mnemonic and is essentially justified by the fact that in the limit, these ratio quantities do behave multiplicatively.',
       'There is a beautifully practical way to execute the chain rule called the "outside-inside" method. To differentiate f(g(x)): (1) Differentiate the outside function f, evaluated at the inside g(x), leaving the inside completely unchanged. (2) Multiply by the derivative of the inside g\'(x). In symbols: d/dx[f(g(x))] = f\'(g(x)) \u00b7 g\'(x). The key is to NOT differentiate the inside first — leave it intact and only differentiate the outer wrapper.',
       'Let\'s see this with a concrete example: d/dx[(3x\u00b2-1)\u2075]. The outside function is u\u2075 (raise to the fifth), and the inside is u = 3x\u00b2-1. Differentiate the outside: the derivative of u\u2075 is 5u\u2074, evaluated at u = 3x\u00b2-1, giving 5(3x\u00b2-1)\u2074. Multiply by the derivative of the inside: d/dx[3x\u00b2-1] = 6x. Final answer: 5(3x\u00b2-1)\u2074 \u00b7 6x = 30x(3x\u00b2-1)\u2074. This two-step process — differentiate outer (keep inner), multiply by derivative of inner — is all there is to the chain rule.',
+        ],
+      },
+      { type: 'image', src: chainRuleDecomposeUrl, alt: 'Chain rule decomposed into outer and inner functions with two worked examples', caption: 'Identify outer f and inner g, differentiate each, then multiply: d/dx[f(g(x))] = f′(g(x))·g′(x).' },
+      {
+        type: 'prose',
+        paragraphs: [
       'A note on identifying the outer and inner functions: look for the "last operation" that would be performed if you were evaluating the function at a specific number. For \u221a(x\u00b2+1), the last operation is taking a square root, so the outer function is u^(1/2) and the inner is x\u00b2+1. For sin(5x\u00b3), the last operation is taking the sine, so outer is sin(u) and inner is 5x\u00b3.',
       'Beginner survival skill: before differentiating, run a layer scan. For tan^3(4x), the outermost skin is (... )^3, the middle layer is tan(...), and the inner core is 4x. If you can label layers correctly, peeling becomes automatic.',
       'Pipeline view: composition is a relay race, not one giant jump. x flows through g to become u, then u flows through f to become y. If the first machine doubles speed and the second triples speed, output speed is six times faster. This is exactly dy/dx = (dy/du)(du/dx).',
@@ -40,7 +54,7 @@ export default {
       '**Where this is heading:** The chain rule is now yours. But knowing a rule and applying it without error are two different things. The very next lesson deliberately shows you the most common mistake students make the first week after learning the chain rule — forgetting to fully differentiate the inner piece inside a product rule. Seeing the mistake made explicitly (and numerically confirmed wrong) is the fastest way to make sure you never make it.',
         ],
       },
-      { type: 'image', src: chainRuleUrl, alt: 'Composition pipeline x → g(x) → f(g(x)) with derivative labels', caption: 'The chain rule multiplies the derivative of the outer function by the derivative of the inner function.' },
+      { type: 'image', src: chainRuleTreeUrl, alt: 'Composition tree showing the function chain and derivative computation step-by-step', caption: 'Trace the composition tree: outer derivative evaluated at the inner, times the inner derivative.' },
     ],
     callouts: [
       {

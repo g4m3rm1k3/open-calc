@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Improper Integrals — Infinite Limits</text>
+  <rect x="8" y="22" width="290" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="28" y1="165" x2="290" y2="165" stroke="#64748b" stroke-width="1"/>
+  <line x1="28" y1="28" x2="28" y2="169" stroke="#64748b" stroke-width="1"/>
+  <!-- Curve 1/x² from 1 to ∞, converges -->
+  <path d="M 50,38 Q 65,55 85,80 Q 105,100 130,122 Q 155,138 180,150 Q 210,158 250,162 Q 268,163 285,164" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Shaded area under 1/x² -->
+  <path d="M 50,165 L 50,38 Q 65,55 85,80 Q 105,100 130,122 Q 155,138 180,150 Q 210,158 250,162 Q 268,163 285,164 L 285,165 Z" fill="#6366f1" opacity="0.15"/>
+  <!-- label at x=1 -->
+  <line x1="50" y1="160" x2="50" y2="169" stroke="#4338ca" stroke-width="1.5"/>
+  <text x="50" y="182" font-size="8.5" fill="#4338ca" text-anchor="middle">1</text>
+  <text x="285" y="182" font-size="8.5" fill="#94a3b8" text-anchor="middle">∞</text>
+  <!-- f=1/x² label -->
+  <text x="60" y="48" font-size="8.5" fill="#6366f1">f(x)=1/x²</text>
+  <!-- Finite area label -->
+  <text x="165" y="140" font-size="8" fill="#4338ca" text-anchor="middle">area = 1</text>
+  <text x="165" y="153" font-size="8" fill="#059669" text-anchor="middle">CONVERGES ✓</text>
+  <!-- Right panel: definition and comparison -->
+  <rect x="306" y="26" width="166" height="168" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="389" y="46" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Definition</text>
+  <rect x="314" y="52" width="150" height="30" rx="4" fill="#dbeafe"/>
+  <text x="389" y="66" font-size="8" fill="#1d4ed8" text-anchor="middle">∫₁^∞ f(x) dx</text>
+  <text x="389" y="80" font-size="8" fill="#1d4ed8" text-anchor="middle">= lim_{t→∞} ∫₁ᵗ f(x) dx</text>
+  <text x="389" y="100" font-size="8" fill="#4338ca" text-anchor="middle">Converges if limit exists.</text>
+  <text x="389" y="114" font-size="8" fill="#4338ca" text-anchor="middle">Diverges otherwise.</text>
+  <line x1="314" y1="122" x2="462" y2="122" stroke="#cbd5e1" stroke-width="1"/>
+  <rect x="314" y="128" width="150" height="30" rx="4" fill="#dcfce7"/>
+  <text x="389" y="143" font-size="8" fill="#166534" text-anchor="middle">∫₁^∞ 1/xᵖ dx converges</text>
+  <text x="389" y="157" font-size="8" fill="#166534" text-anchor="middle">if and only if p &gt; 1</text>
+  <rect x="314" y="162" width="150" height="24" rx="4" fill="#fee2e2"/>
+  <text x="389" y="177" font-size="8" fill="#991b1b" text-anchor="middle">∫₁^∞ 1/x dx = ∞ DIVERGES</text>
+</svg>

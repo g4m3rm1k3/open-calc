@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Gradient — Direction of Steepest Ascent</text>
+  <rect x="8" y="24" width="464" height="30" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="38" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">∇f = (∂f/∂x, ∂f/∂y) — points in the direction of greatest increase</text>
+  <text x="240" y="52" font-size="8" fill="#374151" text-anchor="middle">Gradient is always perpendicular to level curves of f</text>
+  <!-- Left: level curves + gradient arrows -->
+  <rect x="8" y="62" width="235" height="132" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Level curves (concentric ellipses) -->
+  <ellipse cx="120" cy="128" rx="75" ry="50" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <ellipse cx="120" cy="128" rx="50" ry="34" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <ellipse cx="120" cy="128" rx="28" ry="18" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="120" cy="128" r="5" fill="#6366f1"/>
+  <text x="128" y="128" font-size="7.5" fill="#6366f1">max</text>
+  <!-- Gradient arrows (perpendicular to level curves, pointing inward) -->
+  <line x1="120" y1="78" x2="120" y2="110" stroke="#ef4444" stroke-width="2"/>
+  <polygon points="120,110 115,100 125,100" fill="#ef4444"/>
+  <line x1="75" y1="128" x2="92" y2="128" stroke="#ef4444" stroke-width="2"/>
+  <polygon points="92,128 82,123 82,133" fill="#ef4444"/>
+  <line x1="165" y1="128" x2="148" y2="128" stroke="#ef4444" stroke-width="2"/>
+  <polygon points="148,128 158,123 158,133" fill="#ef4444"/>
+  <line x1="90" y1="100" x2="105" y2="113" stroke="#ef4444" stroke-width="2"/>
+  <polygon points="105,113 96,107 102,118" fill="#ef4444"/>
+  <text x="25" y="80" font-size="7.5" fill="#94a3b8">level curves</text>
+  <text x="45" y="162" font-size="7.5" fill="#ef4444">∇f arrows</text>
+  <!-- Right panel -->
+  <rect x="251" y="62" width="221" height="132" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="361" y="80" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Directional Derivative</text>
+  <rect x="259" y="86" width="205" height="26" rx="3" fill="#dbeafe"/>
+  <text x="361" y="100" font-size="8" fill="#1d4ed8" text-anchor="middle">D_u f = ∇f · û  (rate in direction û)</text>
+  <text x="361" y="118" font-size="8" fill="#374151" text-anchor="middle">Maximum rate = |∇f| (along ∇f)</text>
+  <text x="361" y="130" font-size="8" fill="#374151" text-anchor="middle">Zero rate along level curves</text>
+  <rect x="259" y="138" width="205" height="52" rx="3" fill="#dcfce7"/>
+  <text x="361" y="152" font-size="8" fill="#166534" text-anchor="middle">Example: f = x²+y²</text>
+  <text x="361" y="164" font-size="8" fill="#374151" text-anchor="middle">∇f = (2x, 2y) — points radially outward</text>
+  <text x="361" y="178" font-size="8" fill="#374151" text-anchor="middle">|∇f| = 2r — steepness grows with r</text>
+</svg>

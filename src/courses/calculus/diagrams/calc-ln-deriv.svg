@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>
+    .bg { fill: rgb(var(--tw-custom-slate-50)); }
+    .dark .bg { fill: rgb(var(--tw-custom-slate-900)); }
+  </style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Logarithm Derivatives — ln(x) and logₐ(x)</text>
+
+  <!-- LEFT: ln(x) -->
+  <rect x="8" y="22" width="228" height="172" rx="8" fill="#f0f9ff" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="122" y="40" font-size="9.5" fill="#0284c7" text-anchor="middle" font-weight="700">Natural Log: ln(x)</text>
+
+  <rect x="18" y="46" width="208" height="22" rx="5" fill="#bae6fd"/>
+  <text x="122" y="61" font-size="11" fill="#0c4a6e" text-anchor="middle" font-weight="700">d/dx [ln x] = 1/x</text>
+
+  <!-- Graph of ln(x) -->
+  <line x1="18" y1="160" x2="228" y2="160" stroke="#64748b" stroke-width="1"/>
+  <line x1="60" y1="76" x2="60" y2="164" stroke="#64748b" stroke-width="1"/>
+  <!-- ln curve: starts near x=0 (very negative y), through (1,0), increases slowly -->
+  <!-- SVG: x-axis at y=160, x at 60=x_0. Scale: x: 55px/unit. At x=1: (115, 160). At x=2: (170, 115) -->
+  <path d="M 63,160 Q 90,152 115,140 Q 140,128 170,115 Q 200,104 222,96" fill="none" stroke="#0284c7" stroke-width="2.5"/>
+  <!-- Extend to x<1 going negative -->
+  <path d="M 63,160 Q 60,168 58,178" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-dasharray="3,2"/>
+  <circle cx="115" cy="140" r="4" fill="#0284c7"/>
+  <text x="120" y="138" font-size="7.5" fill="#0284c7">(1, 0)</text>
+  <!-- tangent at x=1: slope = 1/1 = 1 -->
+  <line x1="75" y1="180" x2="155" y2="100" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="96" y="118" font-size="7.5" fill="#b45309">slope=1/x=1 at x=1</text>
+
+  <text x="18" y="80" font-size="8" fill="#0c4a6e">Domain: x &gt; 0 only</text>
+  <rect x="18" y="84" width="208" height="11" rx="3" fill="#e0f2fe"/>
+  <text x="122" y="93" font-size="7.5" fill="#0c4a6e" text-anchor="middle">ln grows very slowly: slope 1/x → 0 as x→∞</text>
+
+  <!-- RIGHT: logₐ(x) -->
+  <rect x="244" y="22" width="228" height="172" rx="8" fill="#fdf4ff" stroke="#a855f7" stroke-width="1.5"/>
+  <text x="358" y="40" font-size="9.5" fill="#7c3aed" text-anchor="middle" font-weight="700">General Log: logₐ(x)</text>
+
+  <rect x="254" y="46" width="208" height="22" rx="5" fill="#e9d5ff"/>
+  <text x="358" y="61" font-size="10.5" fill="#4c1d95" text-anchor="middle" font-weight="700">d/dx [logₐ x] = 1/(x · ln a)</text>
+
+  <text x="254" y="82" font-size="8" fill="#6d28d9">Proof: logₐ x = ln x / ln a</text>
+  <text x="254" y="96" font-size="8" fill="#6d28d9">  d/dx [ln x / ln a] = (1/x) / ln a</text>
+  <text x="254" y="110" font-size="8" fill="#6d28d9">                   = 1 / (x · ln a) ✓</text>
+
+  <line x1="254" y1="118" x2="462" y2="118" stroke="#e9d5ff" stroke-width="1"/>
+
+  <text x="254" y="134" font-size="8.5" fill="#7c3aed" font-weight="700">Chain Rule version:</text>
+  <rect x="254" y="138" width="208" height="20" rx="4" fill="#f3e8ff"/>
+  <text x="358" y="151" font-size="9.5" fill="#4c1d95" text-anchor="middle" font-weight="700">d/dx [ln|g(x)|] = g′(x)/g(x)</text>
+
+  <text x="254" y="172" font-size="8" fill="#7c3aed">Example: d/dx [ln(x²+1)] = 2x/(x²+1)</text>
+
+  <rect x="254" y="178" width="208" height="12" rx="3" fill="#ede9fe"/>
+  <text x="358" y="187" font-size="7.5" fill="#4c1d95" text-anchor="middle">When a = e: ln(e) = 1, so = 1/x ✓</text>
+</svg>

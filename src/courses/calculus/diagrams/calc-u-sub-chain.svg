@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">U-Substitution — Reversing the Chain Rule</text>
+  <!-- Formula banner -->
+  <rect x="8" y="24" width="464" height="28" rx="6" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="42" font-size="9" fill="#4338ca" text-anchor="middle" font-weight="700">∫ f(g(x))·g′(x) dx = ∫ f(u) du  where  u = g(x),  du = g′(x) dx</text>
+  <!-- Step boxes -->
+  <rect x="8" y="60" width="100" height="132" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="58" y="78" font-size="8" fill="#1d4ed8" text-anchor="middle" font-weight="700">① Spot</text>
+  <text x="58" y="92" font-size="7.5" fill="#1e40af" text-anchor="middle">Identify inner</text>
+  <text x="58" y="106" font-size="7.5" fill="#1e40af" text-anchor="middle">function g(x)</text>
+  <text x="58" y="122" font-size="7.5" fill="#1e40af" text-anchor="middle">and check that</text>
+  <text x="58" y="136" font-size="7.5" fill="#1e40af" text-anchor="middle">g′(x) also</text>
+  <text x="58" y="150" font-size="7.5" fill="#1e40af" text-anchor="middle">appears in the</text>
+  <text x="58" y="164" font-size="7.5" fill="#1e40af" text-anchor="middle">integrand</text>
+
+  <rect x="116" y="60" width="100" height="132" rx="6" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="166" y="78" font-size="8" fill="#166534" text-anchor="middle" font-weight="700">② Set u</text>
+  <text x="166" y="92" font-size="7.5" fill="#15803d" text-anchor="middle">Let u = g(x)</text>
+  <text x="166" y="106" font-size="7.5" fill="#15803d" text-anchor="middle">Compute</text>
+  <text x="166" y="120" font-size="7.5" fill="#15803d" text-anchor="middle">du = g′(x) dx</text>
+  <text x="166" y="140" font-size="7.5" fill="#22c55e" text-anchor="middle">Example:</text>
+  <text x="166" y="154" font-size="7.5" fill="#22c55e" text-anchor="middle">∫ 2x·eˣ² dx</text>
+  <text x="166" y="168" font-size="7.5" fill="#22c55e" text-anchor="middle">u=x², du=2x dx</text>
+
+  <rect x="224" y="60" width="100" height="132" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="274" y="78" font-size="8" fill="#92400e" text-anchor="middle" font-weight="700">③ Substitute</text>
+  <text x="274" y="92" font-size="7.5" fill="#78350f" text-anchor="middle">Replace all x</text>
+  <text x="274" y="106" font-size="7.5" fill="#78350f" text-anchor="middle">with u</text>
+  <text x="274" y="124" font-size="7.5" fill="#b45309" text-anchor="middle">∫ 2x·eˣ² dx</text>
+  <text x="274" y="138" font-size="7.5" fill="#b45309" text-anchor="middle">= ∫ eᵘ du</text>
+  <text x="274" y="156" font-size="7" fill="#92400e" text-anchor="middle">(2x dx = du)</text>
+
+  <rect x="332" y="60" width="140" height="132" rx="6" fill="#ede9fe" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="402" y="78" font-size="8" fill="#4c1d95" text-anchor="middle" font-weight="700">④ Integrate &amp; Back-Sub</text>
+  <text x="402" y="94" font-size="7.5" fill="#5b21b6" text-anchor="middle">∫ eᵘ du = eᵘ + C</text>
+  <text x="402" y="110" font-size="7.5" fill="#5b21b6" text-anchor="middle">Sub back u = x²:</text>
+  <rect x="340" y="118" width="124" height="22" rx="4" fill="#dbeafe"/>
+  <text x="402" y="133" font-size="8.5" fill="#1d4ed8" text-anchor="middle" font-weight="700">= eˣ² + C  ✓</text>
+  <text x="402" y="154" font-size="7.5" fill="#7c3aed" text-anchor="middle">Verify: d/dx[eˣ²]</text>
+  <text x="402" y="168" font-size="7.5" fill="#7c3aed" text-anchor="middle">= 2x·eˣ²  ✓</text>
+</svg>

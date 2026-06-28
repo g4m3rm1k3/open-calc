@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Closed-Form Summation Formulas</text>
+  <rect x="8" y="24" width="464" height="170" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <!-- Header row -->
+  <rect x="16" y="32" width="448" height="16" rx="0" fill="#e2e8f0"/>
+  <text x="170" y="44" font-size="8" fill="#1e293b" text-anchor="middle" font-weight="700">Formula</text>
+  <text x="370" y="44" font-size="8" fill="#1e293b" text-anchor="middle" font-weight="700">Example (n=4)</text>
+  <!-- Row 1 -->
+  <rect x="16" y="48" width="448" height="24" rx="0" fill="#dbeafe"/>
+  <text x="60" y="62" font-size="8" fill="#1d4ed8">Σ1</text>
+  <text x="170" y="62" font-size="8" fill="#1d4ed8" text-anchor="middle">= n</text>
+  <text x="370" y="62" font-size="8" fill="#1d4ed8" text-anchor="middle">4×1 = 4</text>
+  <!-- Row 2 -->
+  <rect x="16" y="72" width="448" height="24" rx="0" fill="#f8fafc"/>
+  <text x="60" y="86" font-size="8" fill="#374151">Σi</text>
+  <text x="170" y="86" font-size="8" fill="#374151" text-anchor="middle">= n(n+1)/2</text>
+  <text x="370" y="86" font-size="8" fill="#374151" text-anchor="middle">4(5)/2 = 10</text>
+  <!-- Row 3 -->
+  <rect x="16" y="96" width="448" height="24" rx="0" fill="#dbeafe"/>
+  <text x="60" y="110" font-size="8" fill="#1d4ed8">Σi²</text>
+  <text x="170" y="110" font-size="8" fill="#1d4ed8" text-anchor="middle">= n(n+1)(2n+1)/6</text>
+  <text x="370" y="110" font-size="8" fill="#1d4ed8" text-anchor="middle">4(5)(9)/6 = 30</text>
+  <!-- Row 4 -->
+  <rect x="16" y="120" width="448" height="24" rx="0" fill="#f8fafc"/>
+  <text x="60" y="134" font-size="8" fill="#374151">Σi³</text>
+  <text x="170" y="134" font-size="8" fill="#374151" text-anchor="middle">= [n(n+1)/2]²</text>
+  <text x="370" y="134" font-size="8" fill="#374151" text-anchor="middle">[4(5)/2]² = 100</text>
+  <!-- Row 5 -->
+  <rect x="16" y="144" width="448" height="24" rx="0" fill="#dbeafe"/>
+  <text x="60" y="158" font-size="8" fill="#1d4ed8">Σc·aᵢ</text>
+  <text x="170" y="158" font-size="8" fill="#1d4ed8" text-anchor="middle">= c·Σaᵢ</text>
+  <text x="370" y="158" font-size="8" fill="#1d4ed8" text-anchor="middle">constants factor out</text>
+  <!-- Application note -->
+  <rect x="16" y="168" width="448" height="20" rx="4" fill="#ede9fe"/>
+  <text x="240" y="182" font-size="8" fill="#5b21b6" text-anchor="middle">Used in Riemann sum → definite integral derivations</text>
+</svg>

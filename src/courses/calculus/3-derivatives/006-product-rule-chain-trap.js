@@ -1,5 +1,6 @@
 import productRuleUrl from '../diagrams/calc-product-rule.svg?url';
 import chainRuleUrl from '../diagrams/calc-chain-rule.svg?url';
+import productQuotientRuleUrl from '../diagrams/calc-product-quotient-rule.svg?url';
 export default {
   id: 'ch2-004b',
   slug: 'product-rule-chain-trap',
@@ -54,13 +55,18 @@ export default {
       '**Numerical verification that the wrong answer is wrong:** Plug in x = 1. First evaluate the original function: h(1) = 1²·sin(3) ≈ 1·(0.1411) ≈ 0.1411. Now estimate h\'(1) numerically using a small step: compute (h(1.001) − h(1))/0.001. We have h(1.001) = (1.001)²·sin(3.003) ≈ (1.002001)·(0.1382) ≈ 0.1385. So (0.1385 − 0.1411)/0.001 ≈ −2.6. Now compare: the WRONG formula gives h\'(1) = 2(1)·sin(3) + (1)²·cos(3) ≈ 2(0.1411) + (−0.9900) ≈ 0.282 − 0.990 ≈ −0.708. The CORRECT formula gives h\'(1) = 2sin(3) + 3cos(3) ≈ 0.282 + 3(−0.990) ≈ 0.282 − 2.970 ≈ −2.688. The numerical estimate is approximately −2.6, which matches the correct answer (≈−2.69), not the wrong one (≈−0.71). The discrepancy is a factor of roughly 3.8 — not a rounding issue, a structural error.',
 
       '**The fix — the Assembly Rule:** Treat product-rule assembly as a shopping list with exactly four ingredients: u, v, u\', and full-v\'. You are not allowed to proceed to step 3 (assembly) until all four ingredients are completely finished. Step 1: identify u and v. Step 2: compute u\' fully — if u is a composition, use chain rule. Step 3: compute v\' fully — if v is a composition, use chain rule all the way through. Step 4: ONLY NOW, assemble h\' = u\'v + uv\'. This sequencing removes the trap structurally: there is no moment when partial v\' is in your hand and you are tempted to assemble.',
-
+        ],
+      },
+      { type: 'image', src: chainRuleUrl, alt: 'Composition pipeline: chain rule applies when g is nested inside f', caption: 'The chain trap: (f∘g)′ = f′(g)·g′, not (f·g)′ = f′·g′.' },
+      {
+        type: 'prose',
+        paragraphs: [
       '**Second worked example — h(x) = e^(2x) · (x³ − 1)²:** Step 1 — choose u = e^(2x) and v = (x³ − 1)². Step 2 — compute u\' fully: u = e^(2x) is a composition with outer e^(·) and inner 2x, so u\' = e^(2x)·2 = 2e^(2x). Step 3 — compute v\' fully: v = (x³ − 1)² is a composition with outer (·)² and inner (x³ − 1), so v\' = 2(x³ − 1)·3x² = 6x²(x³ − 1). Step 4 — assemble: h\'(x) = [2e^(2x)]·(x³ − 1)² + e^(2x)·[6x²(x³ − 1)]. Factor out the common e^(2x)(x³ − 1) to simplify: h\'(x) = e^(2x)(x³ − 1)[2(x³ − 1) + 6x²] = e^(2x)(x³ − 1)(2x³ + 6x² − 2). Both u\' and v\' required chain rule, and both were completed before assembly.',
 
       '**Pattern recognition — how to know when v\' needs chain rule:** Ask one question about v before you differentiate it: "Is the thing I am differentiating a simple power xⁿ, or does it contain a sub-expression inside?" If v is simply xⁿ, power rule alone suffices. If v is ANYTHING composed with something other than x — like sin(3x), e^(2x), (x³−1)², ln(x²+1), arctan(5x) — then the chain rule is mandatory. The tell-tale sign is: do I see a function applied to something that is not just plain x? If yes, chain rule is required for v\'.',
         ],
       },
-      { type: 'image', src: chainRuleUrl, alt: 'Composition pipeline: chain rule applies when g is nested inside f', caption: 'The chain trap: (f∘g)′ = f′(g)·g′, not (f·g)′ = f′·g′.' },
+      { type: 'image', src: productQuotientRuleUrl, alt: 'Product rule and quotient rule side by side with worked examples', caption: 'Product: (fg)′ = f′g + fg′. Quotient: (f/g)′ = (f′g − fg′)/g². Order matters in the quotient rule.' },
     ],
     callouts: [
       {

@@ -1,5 +1,6 @@
 import secantToTangentUrl from '../diagrams/calc-secant-to-tangent.svg?url';
 import limitConceptUrl from '../diagrams/calc-limit-concept.svg?url';
+import avgVsInstantUrl from '../diagrams/calc-avg-vs-instant.svg?url';
 export default {
   id: 'ch1-006',
   slug: 'rate-of-change',
@@ -36,11 +37,16 @@ export default {
       'The difference quotient rewrites average rate of change with notation built for taking a limit. Instead of two endpoints $a$ and $b$, use $x$ and $x+h$, where $h$ is the gap between them. The average rate of change becomes $\\frac{f(x+h)-f(x)}{h}$. This is the same formula — just written to make $h \\to 0$ natural.',
 
       'Visually, here is what happens as $h$ shrinks. The secant line connects two points on the curve. As you slide the second point toward the first (letting $h \\to 0$), the secant line rotates. In the limit, it settles into a unique position: the tangent line at that point. The slope of that tangent line is the derivative — the instantaneous rate of change. The derivative IS the difference quotient when $h$ reaches zero.',
-
-      '**Where this is heading:** The next lesson is function modeling — applying these ideas to build equations from real situations. Then Chapter 2 takes the limit definition of the derivative and derives every differentiation rule from it. The difference quotient you work with in this lesson is the formula Chapter 2 starts from. Every power rule, product rule, and chain rule derivation is a limit of this formula applied to a specific type of function.',
         ],
       },
       { type: 'image', src: limitConceptUrl, alt: 'Limit process: approaching from both sides as the interval shrinks to a point', caption: 'The instantaneous rate of change is a limit — the limit of average rates over shrinking intervals.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      '**Where this is heading:** The next lesson is function modeling — applying these ideas to build equations from real situations. Then Chapter 2 takes the limit definition of the derivative and derives every differentiation rule from it. The difference quotient you work with in this lesson is the formula Chapter 2 starts from. Every power rule, product rule, and chain rule derivation is a limit of this formula applied to a specific type of function.',
+        ],
+      },
+      { type: 'image', src: avgVsInstantUrl, alt: 'Side-by-side: secant slope (average rate) vs tangent slope (instantaneous rate)', caption: 'Average rate = secant slope over [a,b]. Instantaneous rate = tangent slope at c, found by letting h → 0.' },
     ],
     callouts: [
       {

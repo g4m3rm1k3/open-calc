@@ -1,3 +1,7 @@
+import derivSecantProcessUrl from '../diagrams/calc-deriv-secant-process.svg?url'
+import derivDiffQuotientUrl from '../diagrams/calc-deriv-diff-quotient.svg?url'
+import derivLocalLinearityUrl from '../diagrams/calc-deriv-local-linearity.svg?url'
+
 export default {
   id: 'derivatives-introduction',
   slug: 'derivatives-introduction',
@@ -70,7 +74,10 @@ export default {
       ]
     },
 
-    prose: [
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
       // ── I. The Paradox ──────────────────────────────────────────────────────
       '**The Problem: Speed at a Single Instant**',
       'Imagine a car trip. You drive 120 miles in 2 hours — your average speed is 60 mph. That calculation is easy: distance divided by time, a single fraction. But now think about your speedometer at exactly 2:17:43 PM. It says 72 mph. How? At a single instant, you travel no distance in no time. The formula gives 0/0 — an undefined quantity. Yet 72 mph is a completely meaningful, measurable, physical number. How can that be?',
@@ -80,7 +87,12 @@ export default {
       '**Step 1: Start with Average Rate of Change**',
       'Before solving the paradox, let\'s be precise about the simpler quantity: average rate of change. If f(t) gives your position at time t, the average velocity from t = a to t = b is: [f(b) - f(a)] / (b - a). This is Δy/Δx — the slope of the straight line connecting the two points (a, f(a)) and (b, f(b)) on the graph. That straight line is called a **secant line** (from the Latin "secare" — to cut; it cuts across the curve at two points).',
       'Everything starts here. The secant line slope is measurable, concrete, and computable. The question is: what happens to that slope as b gets closer and closer to a?',
-
+        ],
+      },
+      { type: 'image', src: derivSecantProcessUrl, alt: 'Secant line converging to tangent line', caption: 'As h → 0, the secant line through two points rotates and becomes the tangent line — the derivative.' },
+      {
+        type: 'prose',
+        paragraphs: [
       // ── III. The Limit Process ──────────────────────────────────────────────
       '**Step 2: Shrink the Interval Toward Zero**',
       'Watch what happens as we take smaller and smaller time intervals. Suppose f(t) = t² (think of a freely falling object where t is time and t² is proportional to distance fallen). At t = 2, let\'s compute the average velocity from t = 2 to t = 2 + h for shrinking values of h: h = 1 gives [f(3) - f(2)]/1 = [9 - 4]/1 = 5. h = 0.1 gives [f(2.1) - f(2)]/0.1 = [4.41 - 4]/0.1 = 4.1. h = 0.01 gives [f(2.01) - f(2)]/0.01 = [4.0401 - 4]/0.01 = 4.01. h = 0.001 gives 4.001. The numbers are converging — they approach 4 as h approaches 0.',
@@ -90,7 +102,12 @@ export default {
       '**The Geometry: Secant Lines Rotating into the Tangent Line**',
       'Geometrically, here is what is happening. Each secant line through (2, f(2)) and (2+h, f(2+h)) has slope [f(2+h) - f(2)]/h. As h shrinks, the second point slides along the curve toward (2, 4). The secant line rotates. In the limit, it becomes a line that touches the curve at exactly one point — it just brushes the curve — and has the same slope as the curve at that point. This is the **tangent line**. The derivative at a point is the slope of the tangent line at that point.',
       '**This is not abstract.** Zoom in on any smooth curve near a point with a microscope. Zoom in far enough and the curve stops looking curved — it looks like a straight line. That straight line is the tangent line. Its slope is the derivative. Mathematicians call this property **local linearity**: every differentiable function looks linear when you zoom in close enough.',
-
+        ],
+      },
+      { type: 'image', src: derivLocalLinearityUrl, alt: 'Three zoom levels showing a curve becoming linear', caption: 'Local linearity: zoom in far enough and any smooth curve looks like a straight line. The slope of that line is f′(x).' },
+      {
+        type: 'prose',
+        paragraphs: [
       // ── V. The Four Perspectives ────────────────────────────────────────────
       '**Four Ways to See the Same Thing**',
       'The derivative has four equivalent interpretations. Master all four, because different problems call for different lenses: (1) **Geometric**: the slope of the tangent line to the graph of f at the point (x, f(x)). (2) **Physical**: the instantaneous velocity — if f(t) is position, f\'(t) is how fast position is changing at time t. (3) **Algebraic**: the limit of the difference quotient [f(x+h) - f(x)] / h as h → 0. (4) **Computational**: the best linear approximation to f near x — meaning f(x+h) ≈ f(x) + f\'(x)·h for small h. All four describe the same object. The visualization below the Perspective Synchronization Block lets you switch between them.',
@@ -119,6 +136,9 @@ export default {
       // ── XI. How to Use the Visualizations ───────────────────────────────────
       '**How to Use the Visualizations Below**',
       'Work through the four interactive visualizations in order. First, LineFoundationsLab refreshes slope — run your mouse along the line and watch Δy/Δx stay constant. Second, CalculusFoundationsLab decodes the notation — every symbol in the derivative formula is mapped to a concrete meaning before you see the formula. Third, TangentLineViz shows the geometric derivative — drag the point along the curve and watch the tangent slope change. Fourth, DerivativeFromFirstPrinciplesViz is the key animation — drag h toward zero and watch the secant line rotate into the tangent line. That rotation IS the limit definition. Finally, PositionVelocityAcceleration shows the derivative chain in physics — three graphs live, connected by differentiation.',
+        ],
+      },
+      { type: 'image', src: derivDiffQuotientUrl, alt: 'Labeled difference quotient with rise and run', caption: 'The difference quotient [f(x+h)−f(x)]/h is the secant slope. The derivative is the limit of this as h → 0.' },
     ],
 
     perspectives: [
@@ -239,6 +259,7 @@ export default {
         reason: 'The difference quotient oscillates without settling to a limit (derivative exists here but demonstrates the general fragility)',
       },
     ],
+
   },
 
   math: {

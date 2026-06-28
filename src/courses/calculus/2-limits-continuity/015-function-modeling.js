@@ -1,5 +1,6 @@
 import piecewiseFunctionUrl from '../diagrams/calc-piecewise-function.svg?url';
 import limitApproachUrl from '../diagrams/calc-limit-approach.svg?url';
+import piecewiseDomainUrl from '../diagrams/calc-piecewise-domain.svg?url';
 export default {
   id: 'ch1-007',
   slug: 'function-modeling',
@@ -30,11 +31,17 @@ export default {
         type: 'prose',
         paragraphs: [
       'Constraints are the bridge between multiple variables. If a rectangle has perimeter 400 m, then $2l + 2w = 400$, so $w = 200 - l$. Now area $A = lw = l(200-l)$ depends on only one variable. The constraint eliminated $w$. This reduction step is where most students get stuck — the algebra is straightforward once you see what to substitute.',
+        ],
+      },
+      { type: 'image', src: limitApproachUrl, alt: 'Limit convergence in a model function near a transition', caption: 'At each breakpoint, verify that the left and right limits agree and match the function value.' },
+      {
+        type: 'prose',
+        paragraphs: [
       'The domain is not optional. Area $A = l(200-l)$ is a parabola defined for all real $l$, but the problem only makes sense for $l \\in (0, 200)$ — both dimensions must be positive. Always ask: what values of the input are physically meaningful? That is your domain. A function without a domain is a blueprint with no instructions for which size screws to use.',
       '**Where this is heading:** Chapter 2 opens with derivatives. Every optimization problem you will encounter — minimizing cost, maximizing area, finding the most efficient shape — uses exactly the four-step process from this lesson, followed by differentiation. This lesson is the setup; Chapter 2 is the payoff.',
         ],
       },
-      { type: 'image', src: limitApproachUrl, alt: 'Limit convergence in a model function near a transition', caption: 'At each breakpoint, verify that the left and right limits agree and match the function value.' },
+      { type: 'image', src: piecewiseDomainUrl, alt: 'Piecewise function domain partitioning with number line and graph showing open/closed endpoints', caption: 'Each piece applies only on its specified domain; open circles exclude endpoints, closed circles include them.' },
     ],
     callouts: [
       {

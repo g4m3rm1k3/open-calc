@@ -1,5 +1,6 @@
 import sinxOverXUrl from '../diagrams/calc-sinx-over-x.svg?url';
 import trigCircleUrl from '../diagrams/calc-trig-circle.svg?url';
+import trigLimitCircleUrl from '../diagrams/calc-trig-limit-circle.svg?url';
 export default {
   id: "ch1-fundamental-trig-limits",
   slug: "fundamental-trig-limits",
@@ -51,12 +52,17 @@ export default {
       "1. Build an inequality from unit-circle geometry.",
       "2. Apply the Squeeze Theorem.",
       "3. Reuse the result in limit patterns.",
-
+        ],
+      },
+      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing sin and cos definitions used in trig limit proofs', caption: 'For small θ, sin(θ) ≈ θ — this is visually obvious from the unit circle geometry.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "Most exam problems are not the base limits themselves. They are pattern variations like sin(7x)/(3x), (1-cos(5x))/x, (tan x - sin x)/x^3, or compositions. " +
         "Mastering pattern conversion is what makes trig week feel easy.",
         ],
       },
-      { type: 'image', src: trigCircleUrl, alt: 'Unit circle showing sin and cos definitions used in trig limit proofs', caption: 'For small θ, sin(θ) ≈ θ — this is visually obvious from the unit circle geometry.' },
+      { type: 'image', src: trigLimitCircleUrl, alt: 'Geometric proof of sin(θ)/θ → 1 via area inequality: triangle ≤ sector ≤ larger triangle', caption: 'The squeeze uses three nested areas to pin sin(θ)/θ between cos(θ) and 1, both → 1 as θ → 0.' },
     ],
     callouts: [
       {

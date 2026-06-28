@@ -1,4 +1,6 @@
 import numberLineUrl from '../diagrams/calc-number-line.svg?url';
+import realNumberTypesUrl from '../diagrams/calc-real-number-types.svg?url';
+import intervalNotationUrl from '../diagrams/calc-interval-notation.svg?url';
 export default {
   id: 'ch0-real-numbers',
   slug: 'real-numbers',
@@ -28,23 +30,28 @@ export default {
         type: 'prose',
         paragraphs: [
       'Imagine a perfectly straight ruler stretching infinitely in both directions. Every single point on that ruler corresponds to exactly one real number, and every real number corresponds to exactly one point. No gaps, no overlaps. This is the **real number line**, and it is the stage on which all of calculus plays out.',
-
       'The real numbers are built up in layers — like Russian nesting dolls, each family of numbers fitting inside the next.',
-
-      '**Natural numbers ℕ = {1, 2, 3, 4, …}** — the counting numbers. These are the numbers you used first as a child. Note: some books include 0, some don\'t. For calculus, it rarely matters.',
-
-      '**Integers ℤ = {…, −3, −2, −1, 0, 1, 2, 3, …}** — extend the naturals by including zero and negatives. The ℤ comes from the German word "Zahlen" meaning "numbers." You can add and subtract freely within ℤ.',
-
-      '**Rational numbers ℚ = {p/q : p, q ∈ ℤ, q ≠ 0}** — all fractions. These include 1/2, −3/7, 5 (which equals 5/1), and 0.333… (which equals 1/3). The key test: a decimal is rational if and only if it terminates (like 0.25 = 1/4) or eventually repeats in a cycle (like 0.142857142857… = 1/7). The ℚ comes from "quotient."',
-
-      '**Irrational numbers** — the rest. Numbers like √2, √3, π, e, and ∛5 whose decimal expansions never terminate and never settle into a repeating pattern. Between any two rational numbers there is an irrational, and between any two irrationals there is a rational — they interleave everywhere, infinitely densely.',
-
-      '**Real numbers ℝ = ℚ ∪ irrationals** — everything. The real line has no "holes." This is the key property that separates ℝ from ℚ and makes calculus possible: every infinite decimal that seems like it "should" converge to something actually does converge to a real number.',
-
-      'Why does this matter for calculus? Because limits, derivatives, and integrals all depend on the idea of numbers getting arbitrarily close together. If the number line had holes (like ℚ does), limits might "fall through" those holes and fail to exist. The completeness of ℝ is what prevents this.',
         ],
       },
       { type: 'image', src: numberLineUrl, alt: 'The real number line showing subsets and interval notation', caption: 'Every real number has a unique position; subsets nest as ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      '**Natural numbers ℕ = {1, 2, 3, 4, …}** — the counting numbers. These are the numbers you used first as a child. Note: some books include 0, some don\'t. For calculus, it rarely matters.',
+      '**Integers ℤ = {…, −3, −2, −1, 0, 1, 2, 3, …}** — extend the naturals by including zero and negatives. The ℤ comes from the German word "Zahlen" meaning "numbers." You can add and subtract freely within ℤ.',
+      '**Rational numbers ℚ = {p/q : p, q ∈ ℤ, q ≠ 0}** — all fractions. These include 1/2, −3/7, 5 (which equals 5/1), and 0.333… (which equals 1/3). The key test: a decimal is rational if and only if it terminates (like 0.25 = 1/4) or eventually repeats in a cycle (like 0.142857142857… = 1/7). The ℚ comes from "quotient."',
+        ],
+      },
+      { type: 'image', src: realNumberTypesUrl, alt: 'Nested ellipses showing natural numbers inside integers inside rationals inside reals', caption: 'The number system nests: every natural number is an integer, every integer is rational, and rationals plus irrationals fill the real line completely.' },
+      {
+        type: 'prose',
+        paragraphs: [
+      '**Irrational numbers** — the rest. Numbers like √2, √3, π, e, and ∛5 whose decimal expansions never terminate and never settle into a repeating pattern. Between any two rational numbers there is an irrational, and between any two irrationals there is a rational — they interleave everywhere, infinitely densely.',
+      '**Real numbers ℝ = ℚ ∪ irrationals** — everything. The real line has no "holes." This is the key property that separates ℝ from ℚ and makes calculus possible: every infinite decimal that seems like it "should" converge to something actually does converge to a real number.',
+      'Why does this matter for calculus? Because limits, derivatives, and integrals all depend on the idea of numbers getting arbitrarily close together. If the number line had holes (like ℚ does), limits might "fall through" those holes and fail to exist. The completeness of ℝ is what prevents this.',
+        ],
+      },
+      { type: 'image', src: intervalNotationUrl, alt: 'Table showing five interval types with number line diagrams and inequality equivalents', caption: 'Interval notation is shorthand for inequalities — brackets include endpoints, parentheses exclude them, and infinity always uses parentheses.' },
     ],
     callouts: [
       {

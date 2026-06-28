@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">U-Substitution with Definite Integrals — Changing Bounds</text>
+  <!-- Method A -->
+  <rect x="8" y="24" width="228" height="170" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+  <text x="122" y="44" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Method A: Change Bounds</text>
+  <text x="122" y="60" font-size="8" fill="#4338ca" text-anchor="middle">∫₀¹ 2x·eˣ² dx</text>
+  <rect x="16" y="66" width="212" height="20" rx="3" fill="#dbeafe"/>
+  <text x="122" y="80" font-size="7.5" fill="#1d4ed8" text-anchor="middle">u = x²,  du = 2x dx</text>
+  <rect x="16" y="90" width="212" height="20" rx="3" fill="#dcfce7"/>
+  <text x="122" y="104" font-size="7.5" fill="#166534" text-anchor="middle">When x=0: u=0. When x=1: u=1.</text>
+  <rect x="16" y="114" width="212" height="20" rx="3" fill="#fef3c7"/>
+  <text x="122" y="128" font-size="8" fill="#92400e" text-anchor="middle">∫₀¹ eᵘ du = [eᵘ]₀¹ = e − 1</text>
+  <rect x="16" y="138" width="212" height="48" rx="3" fill="#f8fafc"/>
+  <text x="122" y="154" font-size="8" fill="#059669" text-anchor="middle" font-weight="700">✓ No back-substitution needed</text>
+  <text x="122" y="168" font-size="7.5" fill="#64748b" text-anchor="middle">New bounds in terms of u</text>
+  <text x="122" y="180" font-size="7.5" fill="#64748b" text-anchor="middle">evaluate directly</text>
+
+  <!-- Method B -->
+  <rect x="244" y="24" width="228" height="170" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="358" y="44" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">Method B: Back-Substitute</text>
+  <text x="358" y="60" font-size="8" fill="#92400e" text-anchor="middle">∫₀¹ 2x·eˣ² dx</text>
+  <rect x="252" y="66" width="212" height="20" rx="3" fill="#fde68a"/>
+  <text x="358" y="80" font-size="7.5" fill="#92400e" text-anchor="middle">u = x²,  du = 2x dx</text>
+  <rect x="252" y="90" width="212" height="20" rx="3" fill="#fde68a"/>
+  <text x="358" y="104" font-size="7.5" fill="#92400e" text-anchor="middle">∫ eᵘ du = eᵘ + C = eˣ² + C</text>
+  <rect x="252" y="114" width="212" height="20" rx="3" fill="#fde68a"/>
+  <text x="358" y="128" font-size="8" fill="#78350f" text-anchor="middle">[eˣ²]₀¹ = e¹ − e⁰ = e − 1</text>
+  <rect x="252" y="138" width="212" height="48" rx="3" fill="#f8fafc"/>
+  <text x="358" y="154" font-size="8" fill="#b45309" text-anchor="middle" font-weight="700">Keep original x-bounds</text>
+  <text x="358" y="168" font-size="7.5" fill="#64748b" text-anchor="middle">Back-sub u→x first,</text>
+  <text x="358" y="180" font-size="7.5" fill="#64748b" text-anchor="middle">then use x-limits</text>
+</svg>

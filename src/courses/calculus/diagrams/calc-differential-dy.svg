@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Differentials — dy vs Δy</text>
+  <rect x="8" y="22" width="290" height="172" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Axes -->
+  <line x1="30" y1="168" x2="290" y2="168" stroke="#64748b" stroke-width="1"/>
+  <line x1="30" y1="28" x2="30" y2="172" stroke="#64748b" stroke-width="1"/>
+  <!-- Curve -->
+  <path d="M 45,160 Q 80,140 120,108 Q 155,78 185,54 Q 210,35 240,24 Q 255,18 280,14" fill="none" stroke="#6366f1" stroke-width="2.5"/>
+  <!-- Base point at x=120 -->
+  <circle cx="120" cy="108" r="5" fill="#059669"/>
+  <line x1="120" y1="163" x2="120" y2="172" stroke="#059669" stroke-width="1.5"/>
+  <text x="120" y="183" font-size="8.5" fill="#059669" text-anchor="middle">x</text>
+  <!-- Point at x+dx=185 -->
+  <circle cx="185" cy="54" r="5" fill="#6366f1"/>
+  <line x1="185" y1="163" x2="185" y2="172" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="185" y="183" font-size="8.5" fill="#6366f1" text-anchor="middle">x+dx</text>
+  <!-- Tangent line at x=120 -->
+  <line x1="60" y1="150" x2="220" y2="40" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="4 3"/>
+  <!-- dy = differential (on tangent line) -->
+  <line x1="185" y1="54" x2="185" y2="76" stroke="#ef4444" stroke-width="2.5"/>
+  <text x="192" y="68" font-size="8.5" fill="#ef4444" font-weight="700">dy</text>
+  <!-- Δy = actual change -->
+  <line x1="195" y1="54" x2="195" y2="108" stroke="#8b5cf6" stroke-width="2.5"/>
+  <text x="202" y="82" font-size="8.5" fill="#8b5cf6" font-weight="700">Δy</text>
+  <!-- dx arrow -->
+  <line x1="120" y1="155" x2="185" y2="155" stroke="#059669" stroke-width="2"/>
+  <text x="152" y="148" font-size="8" fill="#059669" text-anchor="middle">dx</text>
+  <!-- Key: tangent point on curve -->
+  <circle cx="185" cy="76" r="3" fill="#ef4444" opacity="0.6"/>
+  <!-- Formula panel -->
+  <rect x="305" y="26" width="167" height="168" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="388" y="46" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Differential Formulas</text>
+  <text x="388" y="66" font-size="8" fill="#ef4444" text-anchor="middle" font-weight="700">dy = f ′(x) · dx</text>
+  <text x="388" y="84" font-size="7.5" fill="#4338ca" text-anchor="middle">(along tangent line)</text>
+  <text x="388" y="104" font-size="8" fill="#8b5cf6" text-anchor="middle" font-weight="700">Δy = f(x+Δx) − f(x)</text>
+  <text x="388" y="122" font-size="7.5" fill="#4338ca" text-anchor="middle">(actual change)</text>
+  <line x1="315" y1="134" x2="462" y2="134" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="388" y="152" font-size="8" fill="#4338ca" text-anchor="middle">When dx is small:</text>
+  <text x="388" y="170" font-size="8" fill="#059669" text-anchor="middle" font-weight="700">dy ≈ Δy</text>
+  <text x="388" y="186" font-size="7.5" fill="#4338ca" text-anchor="middle">(differentials approximate)</text>
+</svg>

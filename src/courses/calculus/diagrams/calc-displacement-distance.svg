@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Displacement vs Total Distance</text>
+  <!-- Displacement panel -->
+  <rect x="8" y="24" width="228" height="170" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="122" y="44" font-size="8.5" fill="#166534" text-anchor="middle" font-weight="700">Displacement</text>
+  <text x="122" y="58" font-size="8" fill="#166534" text-anchor="middle">= ∫ₐᵇ v(t) dt</text>
+  <line x1="18" y1="128" x2="228" y2="128" stroke="#64748b" stroke-width="1"/>
+  <line x1="18" y1="68" x2="18" y2="132" stroke="#64748b" stroke-width="1"/>
+  <!-- v(t): positive then negative -->
+  <path d="M 28,128 Q 55,100 80,85 Q 100,75 115,78 Q 130,82 145,100 Q 158,115 172,128" fill="none" stroke="#16a34a" stroke-width="2.5"/>
+  <!-- Positive area -->
+  <path d="M 28,128 Q 55,100 80,85 Q 100,75 110,78 L 110,128 Z" fill="#22c55e" opacity="0.3"/>
+  <text x="68" y="115" font-size="8" fill="#166534">+A₁</text>
+  <!-- Negative area -->
+  <path d="M 110,128 Q 130,100 145,106 Q 158,112 172,128 Z" fill="#ef4444" opacity="0.3"/>
+  <text x="140" y="122" font-size="8" fill="#991b1b">−A₂</text>
+  <text x="122" y="150" font-size="8" fill="#166534" text-anchor="middle">Result = A₁ − A₂</text>
+  <text x="122" y="164" font-size="7.5" fill="#166534" text-anchor="middle">(can cancel out!)</text>
+  <text x="122" y="185" font-size="7.5" fill="#166534" text-anchor="middle">net position change</text>
+
+  <!-- Distance panel -->
+  <rect x="244" y="24" width="228" height="170" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="358" y="44" font-size="8.5" fill="#92400e" text-anchor="middle" font-weight="700">Total Distance</text>
+  <text x="358" y="58" font-size="8" fill="#92400e" text-anchor="middle">= ∫ₐᵇ |v(t)| dt</text>
+  <line x1="254" y1="128" x2="464" y2="128" stroke="#64748b" stroke-width="1"/>
+  <line x1="254" y1="68" x2="254" y2="132" stroke="#64748b" stroke-width="1"/>
+  <!-- |v(t)|: reflects negative part up -->
+  <path d="M 264,128 Q 291,100 316,85 Q 336,75 351,78 Q 366,82 381,100 Q 394,115 408,128" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <path d="M 264,128 Q 291,100 316,85 Q 336,75 351,78 Q 366,64 381,52 Q 392,42 408,36" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+  <!-- Both areas positive now -->
+  <path d="M 264,128 Q 291,100 316,85 Q 336,75 346,78 L 346,128 Z" fill="#f59e0b" opacity="0.3"/>
+  <text x="300" y="115" font-size="8" fill="#92400e">+A₁</text>
+  <path d="M 346,128 L 346,78 Q 366,64 381,52 Q 392,42 408,36 L 408,128 Z" fill="#f59e0b" opacity="0.3"/>
+  <text x="376" y="105" font-size="8" fill="#92400e">+A₂</text>
+  <text x="358" y="150" font-size="8" fill="#92400e" text-anchor="middle">Result = A₁ + A₂</text>
+  <text x="358" y="164" font-size="7.5" fill="#92400e" text-anchor="middle">(areas always add)</text>
+  <text x="358" y="185" font-size="7.5" fill="#92400e" text-anchor="middle">total path length traveled</text>
+</svg>

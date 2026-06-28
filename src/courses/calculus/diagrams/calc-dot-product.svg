@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 200" style="font-family: ui-monospace, monospace; border-radius: 12px;">
+  <style>.bg{fill:rgb(var(--tw-custom-slate-50))}.dark .bg{fill:rgb(var(--tw-custom-slate-900))}</style>
+  <rect width="480" height="200" rx="12" class="bg"/>
+  <text x="240" y="16" font-size="11" fill="#4338ca" text-anchor="middle" font-weight="700">Dot Product</text>
+  <rect x="8" y="24" width="464" height="30" rx="6" fill="#dbeafe" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="240" y="38" font-size="9" fill="#1d4ed8" text-anchor="middle" font-weight="700">a · b = a₁b₁ + a₂b₂ + a₃b₃ = |a||b| cos θ</text>
+  <text x="240" y="52" font-size="8" fill="#374151" text-anchor="middle">Component formula on left; geometric meaning on right</text>
+  <!-- Left: geometric diagram -->
+  <rect x="8" y="62" width="230" height="132" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <!-- Vector a -->
+  <line x1="80" y1="150" x2="185" y2="90" stroke="#6366f1" stroke-width="2.5"/>
+  <polygon points="185,90 178,98 191,100" fill="#6366f1"/>
+  <text x="196" y="90" font-size="9" fill="#6366f1" font-weight="700">a</text>
+  <!-- Vector b -->
+  <line x1="80" y1="150" x2="195" y2="130" stroke="#22c55e" stroke-width="2.5"/>
+  <polygon points="195,130 183,128 189,140" fill="#22c55e"/>
+  <text x="200" y="138" font-size="9" fill="#22c55e" font-weight="700">b</text>
+  <!-- theta arc -->
+  <path d="M 100,150 A 20,20 0 0,0 96,130" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="112" y="140" font-size="9" fill="#ef4444">θ</text>
+  <!-- Projection -->
+  <line x1="80" y1="150" x2="160" y2="150" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 2"/>
+  <text x="120" y="168" font-size="8" fill="#f59e0b" text-anchor="middle">|b|cosθ (projection)</text>
+  <!-- Right panel: uses -->
+  <rect x="246" y="62" width="226" height="132" rx="8" fill="#eef2ff" stroke="#6366f1" stroke-width="1.5"/>
+  <text x="359" y="80" font-size="8.5" fill="#4338ca" text-anchor="middle" font-weight="700">Uses of Dot Product</text>
+  <rect x="254" y="86" width="210" height="20" rx="3" fill="#dbeafe"/>
+  <text x="359" y="100" font-size="8" fill="#1d4ed8" text-anchor="middle">cos θ = (a·b) / (|a||b|) — angle between vectors</text>
+  <rect x="254" y="110" width="210" height="20" rx="3" fill="#dcfce7"/>
+  <text x="359" y="124" font-size="8" fill="#166534" text-anchor="middle">a·b = 0 ↔ a ⊥ b (perpendicular)</text>
+  <rect x="254" y="134" width="210" height="20" rx="3" fill="#fef3c7"/>
+  <text x="359" y="148" font-size="8" fill="#92400e" text-anchor="middle">proj_b a = (a·b/|b|²) b (projection)</text>
+  <rect x="254" y="158" width="210" height="30" rx="3" fill="#f8fafc"/>
+  <text x="359" y="170" font-size="8" fill="#374151" text-anchor="middle">W = F · d (work done by a force)</text>
+  <text x="359" y="184" font-size="8" fill="#374151" text-anchor="middle">a·a = |a|² (magnitude squared)</text>
+</svg>

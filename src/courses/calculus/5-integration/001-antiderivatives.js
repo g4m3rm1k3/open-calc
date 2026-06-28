@@ -1,4 +1,6 @@
 import antiderivativeUrl from '../diagrams/calc-antiderivative.svg?url';
+import antiderivativeFamilyUrl from '../diagrams/calc-antiderivative-family.svg?url';
+import antiderivativeRulesUrl from '../diagrams/calc-antiderivative-rules.svg?url';
 // FILE: src/content/chapter-4/00-antiderivatives.js
 export default {
   id: "ch4-000a",
@@ -83,13 +85,23 @@ export default {
       "**The definition.** A function $F$ is called an *antiderivative* of $f$ on an interval $I$ if $F'(x) = f(x)$ for every $x \\in I$. That's the entire definition. It is purely algebraic: given $f$, find $F$ whose derivative is $f$. No area. No rectangles. No limits of sums. Just the question: what function differentiates to this?",
 
       "**Simple examples.** Since $\\dfrac{d}{dx}[x^3] = 3x^2$, the function $F(x) = x^3$ is an antiderivative of $f(x) = 3x^2$. Since $\\dfrac{d}{dx}[\\sin x] = \\cos x$, we have $F(x) = \\sin x$ is an antiderivative of $f(x) = \\cos x$. Since $\\dfrac{d}{dx}[e^x] = e^x$, the function $F(x) = e^x$ is its own antiderivative. In each case, verification is instant: *differentiate the answer and check it equals the given function*. Differentiation is easy; it is the check that makes antidifferentiation rigorous.",
-
+        ],
+      },
+      { type: 'image', src: antiderivativeUrl, alt: 'Pairs of functions and antiderivatives with bidirectional arrows', caption: 'An antiderivative F satisfies F′(x) = f(x) — differentiation and antidifferentiation are inverse operations.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**The +C: infinitely many antiderivatives.** If $F(x) = x^3$ is one antiderivative of $3x^2$, then so is $x^3 + 5$, and $x^3 - 17$, and $x^3 + \\pi$. Differentiating destroys constant information permanently — $\\dfrac{d}{dx}[C] = 0$ regardless of $C$. So when you reverse the process, you cannot know which constant was originally there. Every one of $x^3 + C$, for any real constant $C$, is a valid antiderivative of $3x^2$.",
 
       "**These are ALL the antiderivatives — proved from the MVT.** Suppose $F'(x) = f(x)$ and $G'(x) = f(x)$ on an interval. Let $H = G - F$. Then $H'(x) = G'(x) - F'(x) = f(x) - f(x) = 0$ everywhere on the interval. The Mean Value Theorem corollary states: if $H'(x) = 0$ on an interval, then $H$ is constant on that interval. (Proof: pick any two points $a < b$; MVT gives $H(b) - H(a) = H'(c)(b-a) = 0$, so $H(b) = H(a)$.) Therefore $G(x) - F(x) = C$ for some constant $C$, meaning $G(x) = F(x) + C$. **Any two antiderivatives of the same function differ by a constant — that is the complete statement.** The general antiderivative of $f$ is written $F(x) + C$, where $F$ is any one particular antiderivative.",
 
       "**Geometric picture.** On a graph, the family $F(x) + C$ is the single curve $F(x)$ shifted vertically by $C$ — infinitely many parallel curves, one above the other, all with the same slope at every $x$-coordinate. At each point $x$, every member of the family has the same tangent slope $f(x)$. An initial condition — a single point $(x_0, y_0)$ that the solution must pass through — picks out exactly one member of the family, pinning down $C = y_0 - F(x_0)$.",
-
+        ],
+      },
+      { type: 'image', src: antiderivativeFamilyUrl, alt: 'Family of parallel curves — same shape, shifted vertically by constant C', caption: 'Every antiderivative of f differs from F only by a constant — the +C family of curves are parallel translates of each other.' },
+      {
+        type: 'prose',
+        paragraphs: [
       "**CRITICAL: antiderivatives and integrals are different objects.** An antiderivative of $f$ is a function $F$ satisfying $F' = f$. A definite integral $\\int_a^b f(x)\\,dx$ is a number defined as the limit of Riemann sums (the area under the curve). These are defined differently, computed differently, and produce different kinds of outputs (a function vs. a number). The Fundamental Theorem of Calculus (Lesson 4) will prove that $\\int_a^b f(x)\\,dx = F(b) - F(a)$ whenever $F' = f$ — a deep and non-obvious connection. Until you have that theorem, treat the two concepts as what they are: distinct. A textbook that defines 'integral' as 'antiderivative' is collapsing a theorem into a definition, which obscures the deep content of the FTC.",
 
       "**Building the antiderivative table.** Every differentiation rule, read right-to-left, gives an antiderivative rule. Since $\\dfrac{d}{dx}\\left[\\dfrac{x^{n+1}}{n+1}\\right] = x^n$ for $n \\neq -1$, we have: the antiderivative of $x^n$ is $\\dfrac{x^{n+1}}{n+1} + C$. Since $\\dfrac{d}{dx}[\\sin x] = \\cos x$ and $\\dfrac{d}{dx}[-\\cos x] = \\sin x$, we get antiderivatives for $\\cos x$ and $\\sin x$. The entire antiderivative table contains no new mathematics — only the derivative table read backwards. Every entry should be verified by differentiation before it is trusted.",
@@ -99,7 +111,7 @@ export default {
       "**Initial value problems.** The general antiderivative $F(x) + C$ describes a whole family. An *initial value problem* (IVP) adds one constraint — typically $F(x_0) = y_0$ — that pins down $C$. Procedure: (1) find the general antiderivative $F(x) + C$; (2) substitute $x_0$ and $y_0$: $y_0 = F(x_0) + C$, so $C = y_0 - F(x_0)$; (3) write the particular solution. Example: antiderivative of $f(x) = 2x$ is $F(x) = x^2 + C$; given $F(3) = 10$: $10 = 9 + C$, so $C = 1$, particular solution $F(x) = x^2 + 1$.",
         ],
       },
-      { type: 'image', src: antiderivativeUrl, alt: 'Pairs of functions and antiderivatives with bidirectional arrows', caption: 'An antiderivative F satisfies F′(x) = f(x) — differentiation and antidifferentiation are inverse operations.' },
+      { type: 'image', src: antiderivativeRulesUrl, alt: 'Table of power, trig, and exponential antiderivative rules with linearity', caption: 'Antiderivative rules mirror derivative rules in reverse: the power rule becomes ∫xⁿ dx = xⁿ⁺¹/(n+1)+C.' },
     ],
     callouts: [
       {

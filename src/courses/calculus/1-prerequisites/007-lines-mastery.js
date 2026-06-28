@@ -1,3 +1,8 @@
+import linesSlopeTypesUrl from '../diagrams/calc-lines-slope-types.svg?url'
+import linesThreeFormsUrl from '../diagrams/calc-lines-three-forms.svg?url'
+import linesParallelPerpUrl from '../diagrams/calc-lines-parallel-perp.svg?url'
+import linesSlopeGridUrl from '../diagrams/calc-lines-slope-grid.svg?url'
+
 export default {
   id: 'lines-mastery',
   slug: 'lines-mastery',
@@ -41,6 +46,13 @@ If you can master the construction of a line from any given data (points, slopes
         caption: 'Toggle between modes to see Parallel, Perpendicular, and Tangent lines. Drag points to observe real-time equation updates.',
         note: 'Graph is interactive, but the formulas and context above guide your understanding.'
       }
+    ],
+
+    images: [
+      { src: linesSlopeGridUrl, alt: 'Slope grid showing rise over run on a coordinate plane', caption: 'Slope = rise/run = Δy/Δx. Pick any two points on the line — the ratio is always the same. That constancy is what makes it a line.' },
+      { src: linesSlopeTypesUrl, alt: 'Four types of slope: positive, negative, zero, undefined', caption: 'Slope summarized: positive (rises), negative (falls), zero (flat), undefined (vertical).' },
+      { src: linesThreeFormsUrl, alt: 'Three equation forms of a line', caption: 'All three forms describe the same line. Point-slope y−y₁=m(x−x₁) is the calculus choice: you always know a point and a slope.' },
+      { src: linesParallelPerpUrl, alt: 'Parallel and perpendicular line slope rules', caption: 'Parallel lines share the same slope. Perpendicular lines have slopes that are negative reciprocals: m₁·m₂ = −1.' },
     ],
   },
 
