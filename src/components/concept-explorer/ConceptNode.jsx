@@ -1,5 +1,12 @@
 import { useState } from 'react';
 import CodeBlock from './CodeBlock.jsx';
+import DependencyTree from './DependencyTree.jsx';
+import {
+  getUsedBy,
+  flattenPrereqsTopDown,
+  computeDifficulty,
+  computeEstimatedTime,
+} from './graphUtils.js';
 
 const CATEGORY_COLORS = {
   foundations: '#6366f1',
@@ -10,107 +17,174 @@ const CATEGORY_COLORS = {
   applications: '#ef4444',
 };
 
-function PrereqPanel({ topicId, topicMap, depth }) {
-  const topic = topicMap[topicId];
+function NavButton({ id, topicMap, onNavigate }) {
+  const topic = topicMap[id];
   if (!topic) return null;
+  const color = CATEGORY_COLORS[topic.category] || '#6366f1';
   return (
-    <ConceptNode topic={topic} topicMap={topicMap} depth={depth} isEmbedded />
+    <button
+      onClick={() => onNavigate(id)}
+      className="inline-flex items-center gap-1.5 text-sm px-2.5 py-1 rounded border transition-colors hover:bg-gray-700"
+      style={{ borderColor: color, color }}
+    >
+      <span>▶</span>
+      {topic.title}
+    </button>
   );
 }
 
-export default function ConceptNode({ topic, topicMap, depth = 0, isEmbedded = false }) {
-  const [openPrereqs, setOpenPrereqs] = useState({});
+export default function ConceptNode({ topic, topicMap, allTopics, onNavigate }) {
   const [showCode, setShowCode] = useState(false);
+  const [showTree, setShowTree] = useState(false);
 
   const color = CATEGORY_COLORS[topic.category] || '#6366f1';
-  const borderStyle = isEmbedded ? { borderLeft: `4px solid ${color}` } : {};
-
-  function togglePrereq(prereqId) {
-    setOpenPrereqs(prev => ({ ...prev, [prereqId]: !prev[prereqId] }));
-  }
+  const prerequisites = flattenPrereqsTopDown(topic.id, topicMap);
+  const usedBy = getUsedBy(topic.id, allTopics);
+  const difficulty = computeDifficulty(topic.id, topicMap);
+  const estimatedTime = computeEstimatedTime(topic.id, topicMap);
 
   return (
-    <div
-      className={`rounded-lg bg-gray-800 ${isEmbedded ? 'my-3' : ''}`}
-      style={borderStyle}
-    >
-      <div className={`p-4 ${isEmbedded ? 'pl-5' : ''}`}>
+    <div className="rounded-lg bg-gray-800 border border-gray-700">
+      <div className="p-6">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-1">
+        <div className="flex items-center gap-3 mb-4">
           <span
             className="text-xs font-semibold px-2 py-0.5 rounded-full"
             style={{ backgroundColor: color + '30', color }}
           >
             {topic.category}
           </span>
-          <h3 className={`font-bold text-white ${depth === 0 ? 'text-xl' : 'text-base'}`}>
-            {topic.title}
-          </h3>
+          <h2 className="font-bold text-white text-2xl">{topic.title}</h2>
         </div>
 
-        {/* Summary */}
-        <p className="text-gray-300 text-sm mb-2">{topic.summary}</p>
+        {/* Goal */}
+        <div className="rounded border border-gray-700 bg-gray-900 px-4 py-3 mb-4 font-mono text-sm">
+          <div className="text-gray-500 text-xs uppercase tracking-wide mb-2">Goal</div>
+          <div className="text-gray-200">{topic.summary}</div>
+        </div>
 
         {/* Intuition */}
-        <p className="text-gray-400 text-sm italic mb-3">{topic.intuition}</p>
+        <p className="text-gray-400 text-sm italic mb-4">{topic.intuition}</p>
 
-        {/* Steps — each step that has a prereq gets an expandable */}
-        {topic.steps.length > 0 && (
-          <div className="space-y-2 mb-3">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">How it works</p>
-            {topic.steps.map((step, i) => (
-              <div key={i}>
-                <div className="flex items-start gap-2">
-                  <span className="text-gray-500 text-xs mt-0.5 shrink-0">{i + 1}.</span>
-                  <span className="text-gray-200 text-sm flex-1">{step.text}</span>
-                  {step.prereq && topicMap[step.prereq] && (
-                    <button
-                      onClick={() => togglePrereq(step.prereq + '_' + i)}
-                      className="shrink-0 text-xs px-2 py-0.5 rounded border transition-colors"
-                      style={{
-                        borderColor: CATEGORY_COLORS[topicMap[step.prereq].category] || '#6366f1',
-                        color: CATEGORY_COLORS[topicMap[step.prereq].category] || '#6366f1',
-                        backgroundColor: openPrereqs[step.prereq + '_' + i]
-                          ? (CATEGORY_COLORS[topicMap[step.prereq].category] || '#6366f1') + '20'
-                          : 'transparent',
-                      }}
-                    >
-                      {openPrereqs[step.prereq + '_' + i] ? '▲' : '▼'}{' '}
-                      {topicMap[step.prereq].title}
-                    </button>
-                  )}
-                </div>
+        {/* Stats row */}
+        <div className="flex gap-6 mb-5 text-sm">
+          <div>
+            <div className="text-gray-500 text-xs uppercase tracking-wide">Difficulty</div>
+            <div className="text-gray-200">{difficulty}</div>
+          </div>
+          <div>
+            <div className="text-gray-500 text-xs uppercase tracking-wide">Estimated Time</div>
+            <div className="text-gray-200">{estimatedTime}</div>
+          </div>
+        </div>
 
-                {/* Inline prereq expansion */}
-                {step.prereq && openPrereqs[step.prereq + '_' + i] && (
-                  <PrereqPanel
-                    topicId={step.prereq}
-                    topicMap={topicMap}
-                    depth={depth + 1}
-                  />
-                )}
-              </div>
-            ))}
+        {/* Prerequisites overview */}
+        {prerequisites.length > 0 && (
+          <div className="mb-5">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              Prerequisites
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {prerequisites.map(id => (
+                <button
+                  key={id}
+                  onClick={() => onNavigate(id)}
+                  className="text-sm text-gray-300 hover:text-white flex items-center gap-1.5"
+                >
+                  <span className="text-emerald-400">✓</span>
+                  {topicMap[id]?.title ?? id}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Example */}
+        {/* Algorithm */}
+        {topic.steps.length > 0 && (
+          <div className="mb-5">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              Algorithm
+            </div>
+            <ol className="space-y-1.5">
+              {topic.steps.map((step, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-gray-500 text-sm mt-0.5 shrink-0">{i + 1}.</span>
+                  <span className="text-gray-200 text-sm">{step.text}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {/* Worked Example */}
         {topic.example && (
-          <div className="bg-gray-700 rounded px-3 py-2 mb-3 text-sm">
-            <span className="text-yellow-400 font-semibold">Example: </span>
-            <span className="text-gray-200">{topic.example}</span>
+          <div className="rounded border-l-4 border-yellow-500 bg-gray-900 px-4 py-3 mb-5">
+            <div className="text-yellow-400 text-xs font-semibold uppercase tracking-wide mb-1">
+              Worked Example
+            </div>
+            <div className="text-gray-200 text-sm">{topic.example}</div>
           </div>
         )}
 
         {/* Common mistakes */}
         {topic.mistakes?.length > 0 && (
-          <div className="mb-3">
+          <div className="mb-5 space-y-1.5">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              Common Mistakes
+            </div>
             {topic.mistakes.map((m, i) => (
               <div key={i} className="flex items-start gap-2 text-sm">
                 <span className="text-red-400 shrink-0">⚠</span>
                 <span className="text-gray-300">{m}</span>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Depends On / Used By */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+          <div>
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              Depends On
+            </div>
+            {topic.prereqs.length === 0 ? (
+              <p className="text-gray-500 text-sm italic">
+                Nothing — this is a foundational concept.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {topic.prereqs.map(id => (
+                  <NavButton key={id} id={id} topicMap={topicMap} onNavigate={onNavigate} />
+                ))}
+              </div>
+            )}
+          </div>
+          <div>
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              Used By
+            </div>
+            {usedBy.length === 0 ? (
+              <p className="text-gray-500 text-sm italic">Nothing yet — this is a terminal topic.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {usedBy.map(id => (
+                  <NavButton key={id} id={id} topicMap={topicMap} onNavigate={onNavigate} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Dependency tree toggle */}
+        <button
+          onClick={() => setShowTree(v => !v)}
+          className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors font-mono mb-2 block"
+        >
+          {showTree ? '▲ hide full dependency tree' : '▼ view full dependency tree'}
+        </button>
+        {showTree && (
+          <div className="mb-5">
+            <DependencyTree topicId={topic.id} topicMap={topicMap} />
           </div>
         )}
 
