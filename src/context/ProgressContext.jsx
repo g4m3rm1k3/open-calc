@@ -5,7 +5,7 @@ export const meta = {
   conceptDetail: 'Context lets any component in the tree read or update progress without passing props through every layer. No drilling required — just call useProgress().',
 }
 
-import { createContext, useCallback, useEffect, useRef } from 'react'
+import { createContext, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage.js'
 import { useAuth } from './AuthContext.jsx'
 import { getLessonIdLookup } from '../courses/courseLoader.js'
@@ -195,13 +195,20 @@ export function ProgressProvider({ children }) {
     }
   }, [progress])
 
+  const value = useMemo(() => ({
+    progress, markCheckpoint, markVisited, setActiveTab, getLessonStatus, getLessonProgress,
+    getActiveTab, setReadingProgress, getReadingProgress,
+    setQuizScore, getQuizScore, setQuizStates, getQuizStates, ensureQuizTotal,
+    resetCourseProgress
+  }), [
+    progress, markCheckpoint, markVisited, setActiveTab, getLessonStatus, getLessonProgress,
+    getActiveTab, setReadingProgress, getReadingProgress,
+    setQuizScore, getQuizScore, setQuizStates, getQuizStates, ensureQuizTotal,
+    resetCourseProgress
+  ])
+
   return (
-    <ProgressContext.Provider value={{
-      progress, markCheckpoint, markVisited, setActiveTab, getLessonStatus, getLessonProgress,
-      getActiveTab, setReadingProgress, getReadingProgress,
-      setQuizScore, getQuizScore, setQuizStates, getQuizStates, ensureQuizTotal,
-      resetCourseProgress
-    }}>
+    <ProgressContext.Provider value={value}>
       {children}
     </ProgressContext.Provider>
   )

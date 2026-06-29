@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { VideoPlayerContext } from "./videoPlayerContext.js";
 import { selectVideosByKeywords } from "./videoSelector.js";
 import { ALL_LESSONS } from "../courses/index.js";
@@ -131,26 +131,30 @@ export function VideoPlayerProvider({ children }) {
     setCurrentVideo(null);
   }, [lessonId, customVideos]);
 
+  const value = useMemo(() => ({
+    isOpen,
+    isMinimized,
+    currentVideo,
+    lessonId,
+    searchQuery,
+    setSearchQuery,
+    customVideos,
+    openPlayer,
+    closePlayer,
+    toggleMinimize,
+    selectVideo,
+    setLessonId,
+    togglePin,
+    pinnedVideos,
+    addCustomVideo,
+  }), [
+    isOpen, isMinimized, currentVideo, lessonId, searchQuery, setSearchQuery,
+    customVideos, openPlayer, closePlayer, toggleMinimize, selectVideo,
+    setLessonId, togglePin, pinnedVideos, addCustomVideo,
+  ]);
+
   return (
-    <VideoPlayerContext.Provider
-      value={{
-        isOpen,
-        isMinimized,
-        currentVideo,
-        lessonId,
-        searchQuery,
-        setSearchQuery,
-        customVideos,
-        openPlayer,
-        closePlayer,
-        toggleMinimize,
-        selectVideo,
-        setLessonId,
-        togglePin,
-        pinnedVideos,
-        addCustomVideo,
-      }}
-    >
+    <VideoPlayerContext.Provider value={value}>
       {children}
     </VideoPlayerContext.Provider>
   );

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react'
 
 const PinsContext = createContext(null)
 
@@ -29,20 +29,23 @@ export function PinsProvider({ children }) {
     localStorage.setItem('oc-pins', JSON.stringify(pins))
   }, [pins])
 
-  function addPin(pin) {
+  const addPin = useCallback((pin) => {
     setPins(prev => prev.some(p => p.id === pin.id) ? prev : [pin, ...prev])
-  }
+  }, [])
 
-  function removePin(id) {
+  const removePin = useCallback((id) => {
     setPins(prev => prev.filter(p => p.id !== id))
-  }
+  }, [])
 
-  function isPinned(id) {
-    return pins.some(p => p.id === id)
-  }
+  const isPinned = useCallback((id) => pins.some(p => p.id === id), [pins])
+
+  const value = useMemo(
+    () => ({ pins, addPin, removePin, isPinned }),
+    [pins, addPin, removePin, isPinned]
+  )
 
   return (
-    <PinsContext.Provider value={{ pins, addPin, removePin, isPinned }}>
+    <PinsContext.Provider value={value}>
       {children}
     </PinsContext.Provider>
   )

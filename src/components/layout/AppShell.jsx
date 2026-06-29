@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import AuthButton from "../ui/AuthButton.jsx";
 import {
   Link,
@@ -8,11 +8,11 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { LESSON_MAP, CURRICULUM, COURSES } from "../../courses/index.js";
-import SearchModal from "../ui/SearchModal.jsx";
-import GlobalGrapher from "../../tools/grapher-2d/index.jsx";
-import GlobalGrapher3D from "../../tools/grapher-3d/index.jsx";
-import GlobalGrapherJSX from "../../tools/grapher-jsx/index.jsx";
-import ScratchPad from "../../tools/scratchpad/index.jsx";
+const SearchModal = lazy(() => import("../ui/SearchModal.jsx"));
+const GlobalGrapher = lazy(() => import("../../tools/grapher-2d/index.jsx"));
+const GlobalGrapher3D = lazy(() => import("../../tools/grapher-3d/index.jsx"));
+const GlobalGrapherJSX = lazy(() => import("../../tools/grapher-jsx/index.jsx"));
+const ScratchPad = lazy(() => import("../../tools/scratchpad/index.jsx"));
 import { TOOLS, toolsByGroup } from "../../tools/toolLoader.js";
 import { useSearchContext } from "../../context/SearchContext.jsx";
 import GrapherContext from "../../context/GrapherContext.jsx";
@@ -32,26 +32,26 @@ import {
   Moon,
   GraduationCap,
 } from "lucide-react";
-import MatrixReducer from "../../tools/matrix-reducer/index.jsx";
-import MathOS from "../../tools/math-os/MathOS.jsx";
-import TICalc from "../../tools/calculator/index.jsx";
-import SigmaCalc from "../../tools/sigma/index.jsx";
-import PolyCalc from "../../tools/polynomial/index.jsx";
-import LinearAlgebraCalc from "../../tools/linear-algebra/index.jsx";
-import HelpModal from "../ui/HelpModal.jsx";
+const MatrixReducer = lazy(() => import("../../tools/matrix-reducer/index.jsx"));
+const MathOS = lazy(() => import("../../tools/math-os/MathOS.jsx"));
+const TICalc = lazy(() => import("../../tools/calculator/index.jsx"));
+const SigmaCalc = lazy(() => import("../../tools/sigma/index.jsx"));
+const PolyCalc = lazy(() => import("../../tools/polynomial/index.jsx"));
+const LinearAlgebraCalc = lazy(() => import("../../tools/linear-algebra/index.jsx"));
+const HelpModal = lazy(() => import("../ui/HelpModal.jsx"));
 import ReportBugButton from "../ui/ReportBugButton.jsx";
 import MobileBottomNav from "./MobileBottomNav.jsx";
-import TerminalHub from "../../tools/terminal-hub/TerminalHub.jsx";
+const TerminalHub = lazy(() => import("../../tools/terminal-hub/TerminalHub.jsx"));
 import CompassQuickPanel from "../../features/compass/CompassQuickPanel.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
-import ChatPanel from "../tutor/ChatPanel.jsx";
+const ChatPanel = lazy(() => import("../tutor/ChatPanel.jsx"));
 import { motion, AnimatePresence } from "framer-motion";
-import PhysicsPoolLab from "../../games/pool/PhysicsPoolLab.jsx";
-import BasketballLab from "../../games/basketball/BasketballLab.jsx";
-import MiniGolfGame from "../../games/golf/MiniGolfGame.jsx";
-import FootballCalculus from "../../games/football/FootballCalculus.jsx";
-import ChemistryPage from "../../labs/chemistry/ChemistryPage.jsx";
-import PhysicsPage from "../../labs/physics/PhysicsPage.jsx";
+const PhysicsPoolLab = lazy(() => import("../../games/pool/PhysicsPoolLab.jsx"));
+const BasketballLab = lazy(() => import("../../games/basketball/BasketballLab.jsx"));
+const MiniGolfGame = lazy(() => import("../../games/golf/MiniGolfGame.jsx"));
+const FootballCalculus = lazy(() => import("../../games/football/FootballCalculus.jsx"));
+const ChemistryPage = lazy(() => import("../../labs/chemistry/ChemistryPage.jsx"));
+const PhysicsPage = lazy(() => import("../../labs/physics/PhysicsPage.jsx"));
 import CodeMapBackground from "../backgrounds/CodeMapBackground.jsx";
 import NodePanel from "../backgrounds/NodePanel.jsx";
 
@@ -62,13 +62,13 @@ export const meta = {
   conceptDetail: 'Separating shared chrome (nav, modals, overlays) from page content means pages stay focused. The shell can change structure without touching any page component.',
 }
 import AlphaMascot from "../ui/AlphaMascot.jsx";
-import GameRules from "../../games/GameRules.jsx";
+const GameRules = lazy(() => import("../../games/GameRules.jsx"));
 import FullscreenButton from "../desktop/FullscreenButton.jsx";
 import NavClock from "../desktop/NavClock.jsx";
-import TutorPanel from "../tutor/TutorPanel.jsx";
+const TutorPanel = lazy(() => import("../tutor/TutorPanel.jsx"));
 import MobileHomePage from "./MobileHomePage.jsx";
 import { useIsMobile } from "../../hooks/useIsMobile.js";
-import WhatsNewModal from "../ui/WhatsNewModal.jsx";
+const WhatsNewModal = lazy(() => import("../ui/WhatsNewModal.jsx"));
 import { useGlobalTheme } from "../../context/ThemeContext.jsx";
 import ThemePicker from "../ui/ThemePicker.jsx";
 
@@ -322,6 +322,8 @@ export default function AppShell({ children }) {
     else setGraphJSXOpen(true); // 'pro' default
   }, []);
 
+  const grapherContextValue = useMemo(() => ({ openGrapher }), [openGrapher]);
+
   useEffect(() => {
     const handler = () => setChatOpen(c => !c);
     window.addEventListener('oc-toggle-chat', handler);
@@ -353,24 +355,26 @@ export default function AppShell({ children }) {
   useEffect(() => {
     const handler = (e) => {
       const { tool } = e.detail ?? {};
-      if (tool === "math-os") setMathOsOpen(true);
-      else if (tool === "calculator") setCalcOpen(true);
-      else if (tool === "sigma") setSigmaOpen(true);
-      else if (tool === "polynomial") setPolyOpen(true);
-      else if (tool === "linear-algebra") setLaOpen(true);
+      if (tool === "math-os") setMathOsOpen(v => !v);
+      else if (tool === "calculator") setCalcOpen(v => !v);
+      else if (tool === "sigma") setSigmaOpen(v => !v);
+      else if (tool === "polynomial") setPolyOpen(v => !v);
+      else if (tool === "linear-algebra") setLaOpen(v => !v);
       else if (tool === "python" || tool === "terminal") {
-        setTerminalOpen(true);
-        if (tool === "python") {
-          window.dispatchEvent(new CustomEvent("oc-terminal-open-tab", { detail: { type: 'python' } }));
-        }
+        setTerminalOpen(v => {
+          if (!v && tool === "python") {
+            window.dispatchEvent(new CustomEvent("oc-terminal-open-tab", { detail: { type: 'python' } }));
+          }
+          return !v;
+        });
       }
-      else if (tool === "javascript") setTerminalOpen(true);
-      else if (tool === "scratchpad" && !isMobile) setScratchOpen(true);
-      else if (tool === "grapher") setGraphOpen(true);
-      else if (tool === "grapher-3d") setGraph3DOpen(true);
-      else if (tool === "jsxgraph") setGraphJSXOpen(true);
-      else if (tool === "matrix-reducer") setMatrixReducerOpen(true);
-      else if (tool === "compass-quick") setCompassQuickOpen(true);
+      else if (tool === "javascript") setTerminalOpen(v => !v);
+      else if (tool === "scratchpad" && !isMobile) setScratchOpen(v => !v);
+      else if (tool === "grapher") setGraphOpen(v => !v);
+      else if (tool === "grapher-3d") setGraph3DOpen(v => !v);
+      else if (tool === "jsxgraph") setGraphJSXOpen(v => !v);
+      else if (tool === "matrix-reducer") setMatrixReducerOpen(v => !v);
+      else if (tool === "compass-quick") setCompassQuickOpen(v => !v);
     };
     window.addEventListener("oc-open-tool", handler);
     return () => window.removeEventListener("oc-open-tool", handler);
@@ -400,77 +404,79 @@ export default function AppShell({ children }) {
     isLearnRoute
   ) {
     return (
-      <GrapherContext.Provider value={{ openGrapher }}>
+      <GrapherContext.Provider value={grapherContextValue}>
         <div
           className={`h-screen overflow-hidden ${isCadProRoute || isFiveAxisRoute || isCodeLensRoute || isLearnRoute ? "bg-[#08111f]" : "bg-white dark:bg-slate-950"}`}
         >
           <div className="h-[calc(100vh-44px)] w-full overflow-hidden">
             {children ?? <Outlet />}
           </div>
-          <SearchModal />
-          <GlobalGrapher
-            isOpen={graphOpen}
-            launchConfig={graphOpen ? grapherLaunchConfig : null}
-            onClose={() => {
-              setGraphOpen(false);
-              setGrapherLaunchConfig(null);
-            }}
-            onSwitchTo3D={() => {
-              setGraphOpen(false);
-              setGraph3DOpen(true);
-            }}
-            onSwitchToJSX={() => {
-              setGraphOpen(false);
-              setGraphJSXOpen(true);
-            }}
-          />
-          <GlobalGrapher3D
-            isOpen={graph3DOpen}
-            launchConfig={graph3DOpen ? grapherLaunchConfig : null}
-            onClose={() => {
-              setGraph3DOpen(false);
-              setGrapherLaunchConfig(null);
-            }}
-            onSwitchTo2D={() => {
-              setGraph3DOpen(false);
-              setGraphOpen(true);
-            }}
-            onSwitchToJSX={() => {
-              setGraph3DOpen(false);
-              setGraphJSXOpen(true);
-            }}
-          />
-          <GlobalGrapherJSX
-            isOpen={graphJSXOpen}
-            launchConfig={graphJSXOpen ? grapherLaunchConfig : null}
-            onClose={() => {
-              setGraphJSXOpen(false);
-              setGrapherLaunchConfig(null);
-            }}
-            onSwitchTo2D={() => {
-              setGraphJSXOpen(false);
-              setGraphOpen(true);
-            }}
-            onSwitchTo3D={() => {
-              setGraphJSXOpen(false);
-              setGraph3DOpen(true);
-            }}
-          />
-          {!isMobile && (
-            <ScratchPad
-              isOpen={scratchOpen}
-              openFile={scratchOpenFile}
-              onClose={() => { setScratchOpen(false); setScratchOpenFile(null); }}
-              onSnap={handleScratchSnap}
+          <Suspense fallback={null}>
+            <SearchModal />
+            <GlobalGrapher
+              isOpen={graphOpen}
+              launchConfig={graphOpen ? grapherLaunchConfig : null}
+              onClose={() => {
+                setGraphOpen(false);
+                setGrapherLaunchConfig(null);
+              }}
+              onSwitchTo3D={() => {
+                setGraphOpen(false);
+                setGraph3DOpen(true);
+              }}
+              onSwitchToJSX={() => {
+                setGraphOpen(false);
+                setGraphJSXOpen(true);
+              }}
             />
-          )}
-          {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
-          {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
-          <TerminalHub
-            isOpen={terminalOpen}
-            onClose={() => setTerminalOpen(false)}
-          />
-          <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} />
+            <GlobalGrapher3D
+              isOpen={graph3DOpen}
+              launchConfig={graph3DOpen ? grapherLaunchConfig : null}
+              onClose={() => {
+                setGraph3DOpen(false);
+                setGrapherLaunchConfig(null);
+              }}
+              onSwitchTo2D={() => {
+                setGraph3DOpen(false);
+                setGraphOpen(true);
+              }}
+              onSwitchToJSX={() => {
+                setGraph3DOpen(false);
+                setGraphJSXOpen(true);
+              }}
+            />
+            <GlobalGrapherJSX
+              isOpen={graphJSXOpen}
+              launchConfig={graphJSXOpen ? grapherLaunchConfig : null}
+              onClose={() => {
+                setGraphJSXOpen(false);
+                setGrapherLaunchConfig(null);
+              }}
+              onSwitchTo2D={() => {
+                setGraphJSXOpen(false);
+                setGraphOpen(true);
+              }}
+              onSwitchTo3D={() => {
+                setGraphJSXOpen(false);
+                setGraph3DOpen(true);
+              }}
+            />
+            {!isMobile && (
+              <ScratchPad
+                isOpen={scratchOpen}
+                openFile={scratchOpenFile}
+                onClose={() => { setScratchOpen(false); setScratchOpenFile(null); }}
+                onSnap={handleScratchSnap}
+              />
+            )}
+            {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
+            {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
+            <TerminalHub
+              isOpen={terminalOpen}
+              onClose={() => setTerminalOpen(false)}
+            />
+            <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} />
+          </Suspense>
         </div>
       </GrapherContext.Provider>
     );
@@ -478,7 +484,7 @@ export default function AppShell({ children }) {
 
   return (
     <ChatProvider>
-      <GrapherContext.Provider value={{ openGrapher }}>
+      <GrapherContext.Provider value={grapherContextValue}>
         <div className={`min-h-screen transition-colors duration-500 relative ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
           {isDesktopRoute && !isMobile && (
             <CodeMapBackground
@@ -736,133 +742,134 @@ export default function AppShell({ children }) {
             onToolsToggle={() => setMobileToolsOpen((o) => !o)}
           />
 
-          {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
-          {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
-          <WhatsNewModal />
-          <SearchModal />
-          <GlobalGrapher
-            isOpen={graphOpen}
-            launchConfig={graphOpen ? grapherLaunchConfig : null}
-            onClose={() => {
-              setGraphOpen(false);
-              setGrapherLaunchConfig(null);
-            }}
-            onSwitchTo3D={() => {
-              setGraphOpen(false);
-              setGraph3DOpen(true);
-            }}
-            onSwitchToJSX={() => {
-              setGraphOpen(false);
-              setGraphJSXOpen(true);
-            }}
-          />
-          <GlobalGrapher3D
-            isOpen={graph3DOpen}
-            launchConfig={graph3DOpen ? grapherLaunchConfig : null}
-            onClose={() => {
-              setGraph3DOpen(false);
-              setGrapherLaunchConfig(null);
-            }}
-            onSwitchTo2D={() => {
-              setGraph3DOpen(false);
-              setGraphOpen(true);
-            }}
-            onSwitchToJSX={() => {
-              setGraph3DOpen(false);
-              setGraphJSXOpen(true);
-            }}
-          />
-          <GlobalGrapherJSX
-            isOpen={graphJSXOpen}
-            launchConfig={graphJSXOpen ? grapherLaunchConfig : null}
-            onClose={() => {
-              setGraphJSXOpen(false);
-              setGrapherLaunchConfig(null);
-            }}
-            onSwitchTo2D={() => {
-              setGraphJSXOpen(false);
-              setGraphOpen(true);
-            }}
-            onSwitchTo3D={() => {
-              setGraphJSXOpen(false);
-              setGraph3DOpen(true);
-            }}
-          />
-          {!isMobile && (
-            <ScratchPad
-              isOpen={scratchOpen}
-              openFile={scratchOpenFile}
+          <Suspense fallback={null}>
+            {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
+            {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
+            <WhatsNewModal />
+            <SearchModal />
+            <GlobalGrapher
+              isOpen={graphOpen}
+              launchConfig={graphOpen ? grapherLaunchConfig : null}
               onClose={() => {
-                setScratchOpen(false);
-                setScratchSnap(null);
-                setScratchOpenFile(null);
+                setGraphOpen(false);
+                setGrapherLaunchConfig(null);
               }}
-              onSnap={handleScratchSnap}
+              onSwitchTo3D={() => {
+                setGraphOpen(false);
+                setGraph3DOpen(true);
+              }}
+              onSwitchToJSX={() => {
+                setGraphOpen(false);
+                setGraphJSXOpen(true);
+              }}
             />
-          )}
-          <TerminalHub
-            isOpen={terminalOpen}
-            onClose={() => setTerminalOpen(false)}
-          />
-          <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
-          <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} />
-          {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
-          {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
-          {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
-          {laOpen && (
-            <div className="fixed inset-0 z-[1999] flex items-start justify-center pt-16 pointer-events-none">
-              <div className="pointer-events-auto relative">
-                <button onClick={() => setLaOpen(false)} className="absolute top-2 right-2 z-10 text-slate-400 hover:text-white bg-slate-800 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
-                <LinearAlgebraCalc />
-              </div>
-            </div>
-          )}
-          {gameRulesOpen && (
-            <div style={{ position: "fixed", inset: 0, zIndex: 300 }}>
-              <GameRules onClose={() => setGameRulesOpen(false)} />
-            </div>
-          )}
-          {poolOpen && <PhysicsPoolLab onClose={() => setPoolOpen(false)} />}
-          {basketOpen && <BasketballLab onClose={() => setBasketOpen(false)} />}
-          {golfOpen && <MiniGolfGame onClose={() => setGolfOpen(false)} />}
-          <ChatPanel isOpen={chatOpen} onClose={() => setChatOpen(false)} />
-          <TutorPanel lesson={null} />
-
-
-          {footballOpen && (
-            <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950 overflow-auto">
-              <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800 shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">🏈</span>
-                  <span className="font-bold text-white text-sm">
-                    Football Calculus
-                  </span>
-                  <span className="text-xs text-slate-500 ml-2">
-                    Integration · Optimization · Related Rates
-                  </span>
+            <GlobalGrapher3D
+              isOpen={graph3DOpen}
+              launchConfig={graph3DOpen ? grapherLaunchConfig : null}
+              onClose={() => {
+                setGraph3DOpen(false);
+                setGrapherLaunchConfig(null);
+              }}
+              onSwitchTo2D={() => {
+                setGraph3DOpen(false);
+                setGraphOpen(true);
+              }}
+              onSwitchToJSX={() => {
+                setGraph3DOpen(false);
+                setGraphJSXOpen(true);
+              }}
+            />
+            <GlobalGrapherJSX
+              isOpen={graphJSXOpen}
+              launchConfig={graphJSXOpen ? grapherLaunchConfig : null}
+              onClose={() => {
+                setGraphJSXOpen(false);
+                setGrapherLaunchConfig(null);
+              }}
+              onSwitchTo2D={() => {
+                setGraphJSXOpen(false);
+                setGraphOpen(true);
+              }}
+              onSwitchTo3D={() => {
+                setGraphJSXOpen(false);
+                setGraph3DOpen(true);
+              }}
+            />
+            {!isMobile && (
+              <ScratchPad
+                isOpen={scratchOpen}
+                openFile={scratchOpenFile}
+                onClose={() => {
+                  setScratchOpen(false);
+                  setScratchSnap(null);
+                  setScratchOpenFile(null);
+                }}
+                onSnap={handleScratchSnap}
+              />
+            )}
+            <TerminalHub
+              isOpen={terminalOpen}
+              onClose={() => setTerminalOpen(false)}
+            />
+            <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
+            <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} />
+            {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
+            {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
+            {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
+            {laOpen && (
+              <div className="fixed inset-0 z-[1999] flex items-start justify-center pt-16 pointer-events-none">
+                <div className="pointer-events-auto relative">
+                  <button onClick={() => setLaOpen(false)} className="absolute top-2 right-2 z-10 text-slate-400 hover:text-white bg-slate-800 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
+                  <LinearAlgebraCalc />
                 </div>
-                <button
-                  onClick={() => setFootballOpen(false)}
-                  className="text-slate-400 hover:text-white p-1.5 rounded hover:bg-slate-800 transition-colors"
-                >
-                  ✕
-                </button>
               </div>
-              <div className="flex-1 p-4 overflow-auto">
-                <FootballCalculus />
+            )}
+            {gameRulesOpen && (
+              <div style={{ position: "fixed", inset: 0, zIndex: 300 }}>
+                <GameRules onClose={() => setGameRulesOpen(false)} />
               </div>
-            </div>
-          )}
-          {chemOpen && (
-            <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950">
-              <ChemistryPage onClose={() => setChemOpen(false)} />
-            </div>
-          )}
-          {physicsOpen && (
-            <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950">
-              <PhysicsPage onClose={() => setPhysicsOpen(false)} />
-            </div>
-          )}
+            )}
+            {poolOpen && <PhysicsPoolLab onClose={() => setPoolOpen(false)} />}
+            {basketOpen && <BasketballLab onClose={() => setBasketOpen(false)} />}
+            {golfOpen && <MiniGolfGame onClose={() => setGolfOpen(false)} />}
+            <ChatPanel isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+            <TutorPanel lesson={null} />
+
+            {footballOpen && (
+              <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950 overflow-auto">
+                <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">🏈</span>
+                    <span className="font-bold text-white text-sm">
+                      Football Calculus
+                    </span>
+                    <span className="text-xs text-slate-500 ml-2">
+                      Integration · Optimization · Related Rates
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setFootballOpen(false)}
+                    className="text-slate-400 hover:text-white p-1.5 rounded hover:bg-slate-800 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="flex-1 p-4 overflow-auto">
+                  <FootballCalculus />
+                </div>
+              </div>
+            )}
+            {chemOpen && (
+              <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950">
+                <ChemistryPage onClose={() => setChemOpen(false)} />
+              </div>
+            )}
+            {physicsOpen && (
+              <div className="fixed inset-0 z-[200] flex flex-col bg-slate-950">
+                <PhysicsPage onClose={() => setPhysicsOpen(false)} />
+              </div>
+            )}
+          </Suspense>
 
           <AlphaMascot />
         </div>

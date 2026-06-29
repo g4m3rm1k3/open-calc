@@ -5,7 +5,7 @@ export const meta = {
   conceptDetail: 'The SYNC_KEYS list controls exactly which localStorage keys get backed up. Add a key here and it automatically survives browser clears and works on every device.',
 }
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   onAuthStateChanged,
   GoogleAuthProvider,
@@ -230,30 +230,35 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  const signInWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider())
-  const signInWithEmail  = (email, password) => signInWithEmailAndPassword(auth, email, password)
-  const signUpWithEmail  = (email, password) => createUserWithEmailAndPassword(auth, email, password)
+  const signInWithGoogle = useCallback(() => signInWithPopup(auth, new GoogleAuthProvider()), [])
+  const signInWithEmail  = useCallback((email, password) => signInWithEmailAndPassword(auth, email, password), [])
+  const signUpWithEmail  = useCallback((email, password) => createUserWithEmailAndPassword(auth, email, password), [])
 
   // GitHub's OAuth access token is only returned on the popup result itself —
   // Firebase does not restore it on session refresh — so callers must request
   // it fresh right before they need it (e.g. right before opening a PR) and
   // hold it in memory only, never persist it alongside the synced app keys.
-  const signInWithGithubForContribution = async () => {
+  const signInWithGithubForContribution = useCallback(async () => {
     const provider = new GithubAuthProvider()
     provider.addScope('public_repo')
     const result = await signInWithPopup(auth, provider)
     const credential = GithubAuthProvider.credentialFromResult(result)
     return { user: result.user, token: credential?.accessToken ?? null }
-  }
+  }, [])
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     if (user && !IS_LOCAL_ENV) await pushToFirestore(user.uid).catch(() => {})
     await fbSignOut(auth)
     clearAllAppData()
-  }
+  }, [user])
+
+  const value = useMemo(
+    () => ({ user, syncing, signInWithGoogle, signInWithEmail, signUpWithEmail, signInWithGithubForContribution, signOut, pushNow }),
+    [user, syncing, signInWithGoogle, signInWithEmail, signUpWithEmail, signInWithGithubForContribution, signOut, pushNow]
+  )
 
   return (
-    <AuthContext.Provider value={{ user, syncing, signInWithGoogle, signInWithEmail, signUpWithEmail, signInWithGithubForContribution, signOut, pushNow }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )

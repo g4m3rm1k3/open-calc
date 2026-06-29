@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useCallback } from "react";
+import { createContext, useState, useContext, useCallback, useMemo } from "react";
 import { useSearch } from "../hooks/useSearch.js";
 
 const SearchContext = createContext({
@@ -20,10 +20,14 @@ export function SearchProvider({ children }) {
     searchState.setQuery("");
   }, [searchState]);
 
+  const { query, setQuery, results, isReady } = searchState;
+  const value = useMemo(
+    () => ({ query, setQuery, results, isReady, isOpen, openSearch, closeSearch }),
+    [query, setQuery, results, isReady, isOpen, openSearch, closeSearch]
+  );
+
   return (
-    <SearchContext.Provider
-      value={{ ...searchState, isOpen, openSearch, closeSearch }}
-    >
+    <SearchContext.Provider value={value}>
       {children}
     </SearchContext.Provider>
   );

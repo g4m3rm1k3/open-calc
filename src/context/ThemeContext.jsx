@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { STUDIO_THEMES } from '../utils/studioThemes';
 import { extractThemeColors, generateThemeStyleString, DEFAULT_PALETTE_RGB } from '../utils/themeEngine';
 
@@ -14,7 +14,7 @@ export function ThemeProvider({ children }) {
     return localStorage.getItem('studio_theme') || 'default';
   });
 
-  const setStudioTheme = (newTheme) => {
+  const setStudioTheme = useCallback((newTheme) => {
     setStudioThemeState(newTheme);
     localStorage.setItem('studio_theme', newTheme);
     if (newTheme === 'light') {
@@ -24,7 +24,7 @@ export function ThemeProvider({ children }) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('oc-theme', 'dark');
     }
-  };
+  }, []);
 
   const studioTheme = studioThemeState;
   
@@ -101,8 +101,13 @@ export function ThemeProvider({ children }) {
     }
   }, [studioTheme, isDarkGlobal]);
 
+  const value = useMemo(
+    () => ({ studioTheme, setStudioTheme, isDarkGlobal, themeStyles }),
+    [studioTheme, setStudioTheme, isDarkGlobal, themeStyles]
+  );
+
   return (
-    <ThemeContext.Provider value={{ studioTheme, setStudioTheme, isDarkGlobal, themeStyles }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );

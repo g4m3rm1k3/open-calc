@@ -376,34 +376,40 @@ export function ChatProvider({ children }) {
     setRoomKey(k => k + 1);
   }, []);
 
+  const value = useMemo(() => ({
+    username,
+    setUsername,
+    blockedPeers,
+    blockedUsers,
+    blockPeer,
+    unblockPeer,
+    globalMessages,
+    globalPeers,
+    currentLessonId,
+    currentLessonTitle,
+    activeLessons,
+    connected,
+    sendMessage,
+    sendLovelaceResponse,
+    unreadCount,
+    markAllRead,
+    globalHistoryLoaded,
+    isLovelaceHost: lovelaceHostId === "local",
+    lovelaceHostId,
+    pendingLovelaceQueries,
+    sendLovelaceQuery,
+    resolveLovelaceQuery,
+    reconnect,
+  }), [
+    username, setUsername, blockedPeers, blockedUsers, blockPeer, unblockPeer,
+    globalMessages, globalPeers, currentLessonId, currentLessonTitle, activeLessons,
+    connected, sendMessage, sendLovelaceResponse, unreadCount, markAllRead,
+    globalHistoryLoaded, lovelaceHostId, pendingLovelaceQueries, sendLovelaceQuery,
+    resolveLovelaceQuery, reconnect,
+  ]);
+
   return (
-    <ChatContext.Provider
-      value={{
-        username,
-        setUsername,
-        blockedPeers,
-        blockedUsers,
-        blockPeer,
-        unblockPeer,
-        globalMessages,
-        globalPeers,
-        currentLessonId,
-        currentLessonTitle,
-        activeLessons,
-        connected,
-        sendMessage,
-        sendLovelaceResponse,
-        unreadCount,
-        markAllRead,
-        globalHistoryLoaded,
-        isLovelaceHost: lovelaceHostId === "local",
-        lovelaceHostId,
-        pendingLovelaceQueries,
-        sendLovelaceQuery,
-        resolveLovelaceQuery,
-        reconnect,
-      }}
-    >
+    <ChatContext.Provider value={value}>
       {children}
     </ChatContext.Provider>
   );

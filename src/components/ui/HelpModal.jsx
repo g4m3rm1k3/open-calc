@@ -1641,6 +1641,15 @@ function SectionUseViz() {
         array.
       </Para>
 
+      <Note color="green">
+        <strong>No code editor?</strong> Open the <strong>Viz Builder</strong>{" "}
+        (🧩 in the top nav), configure a viz in the Build tab, click{" "}
+        <strong>Export →</strong>, then <strong>"Or insert directly into a
+        lesson"</strong>. Search for the target lesson, pick a section
+        (Intuition / Math / Rigor), and it drops straight into that lesson's
+        diff/save/PR flow — the same pipeline lessons already use.
+      </Note>
+
       <H3>How to add a viz</H3>
       <CodeBlock>{`intuition: {
   text: 'Your explanation...',
@@ -3115,14 +3124,12 @@ function SectionAbout() {
         </div>
         <div>
           <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
-            Open Source License — Non-Commercial
+            Open Source License — GPL-3.0
           </h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            This project is provided freely to advance mathematics education. It
-            is licensed strictly for <strong>non-commercial use</strong>. You
-            may not use this software, its content, or its visualizations for
-            any form of monetary gain, commercial hosting, or paid product
-            integration.
+            This project is licensed under <strong>GPL-3.0-or-later</strong> —
+            free to use, modify, and distribute. Derivative works must remain
+            open source; no proprietary fork is possible by design.
           </p>
         </div>
       </section>

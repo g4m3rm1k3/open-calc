@@ -100,7 +100,7 @@ export function TourProvider({ children }) {
     if (match) navigate(match.path)
   }, [navigate, endTour])
 
-  const value = {
+  const value = useMemo(() => ({
     active,
     step: steps[stepIndex],
     stepIndex,
@@ -109,7 +109,7 @@ export function TourProvider({ children }) {
     endTour,
     next,
     askQuestion,
-  }
+  }), [active, steps, stepIndex, startTour, endTour, next, askQuestion])
 
   return <TourContext.Provider value={value}>{children}</TourContext.Provider>
 }

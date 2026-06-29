@@ -11,7 +11,7 @@ import LESSON_TITLES from '../data/lessonTitles.json'
 import LESSON_IDS from '../data/lessonIds.json'
 
 let ALL_MODULES = {}
-try { ALL_MODULES = import.meta.glob('./**/*.js') } catch {}   // lazy — paths only at init
+try { ALL_MODULES = import.meta.glob('./*/*/*.js') } catch {}   // lazy — paths only at init
 
 // Raw source text, for tooling (Lesson Builder) that needs to recover things
 // the evaluated module loses — e.g. an image block's `src` is an imported
@@ -19,7 +19,7 @@ try { ALL_MODULES = import.meta.glob('./**/*.js') } catch {}   // lazy — paths
 // it's just the final resolved URL string with no trace of which import
 // produced it.
 let ALL_MODULES_RAW = {}
-try { ALL_MODULES_RAW = import.meta.glob('./**/*.js', { query: '?raw', import: 'default' }) } catch {}
+try { ALL_MODULES_RAW = import.meta.glob('./*/*/*.js', { query: '?raw', import: 'default' }) } catch {}
 
 let META_MODULES = {}
 try { META_MODULES = import.meta.glob('./*/meta.json', { eager: true }) } catch {}

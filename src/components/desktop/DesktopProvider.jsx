@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import FloatingWindow from './FloatingWindow.jsx'
 import Taskbar from './Taskbar.jsx'
 
@@ -60,7 +60,7 @@ export default function DesktopProvider({ children }) {
     localStorage.setItem('oc-desktop-style', value)
   }, [])
 
-  const value = {
+  const value = useMemo(() => ({
     windows,
     openWindow,
     closeWindow,
@@ -69,7 +69,7 @@ export default function DesktopProvider({ children }) {
     focusWindow,
     desktopStyle: style,
     setDesktopStyle: setStyle,
-  }
+  }), [windows, openWindow, closeWindow, minimizeWindow, toggleMaximize, focusWindow, style, setStyle])
 
   return (
     <DesktopContext.Provider value={value}>

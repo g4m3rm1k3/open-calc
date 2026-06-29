@@ -1,0 +1,1 @@
+export default { label: 'Linear Algebra Calculator', group: 'math', order: 40, glyph: '[A]', colorClass: 'text-sky-500 hover:bg-sky-50 dark:hover:bg-sky-900/30 font-black text-[10px]', eventTool: 'linear-algebra' }
