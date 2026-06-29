@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import CodeBlock from './CodeBlock.jsx';
 import Katex from './Katex.jsx';
 import NavButton from './NavButton.jsx';
@@ -16,10 +16,17 @@ function Section({ label, color, children }) {
 
 export default function ConceptNode({ topic, topicMap, onNavigate }) {
   const [showCode, setShowCode] = useState(false);
+  const scrollRef = useRef(null);
 
   const c = CATEGORY_STYLES[topic.category] || CATEGORY_STYLES.foundations;
   const difficulty = computeDifficulty(topic.id, topicMap);
   const estimatedTime = computeEstimatedTime(topic.id, topicMap);
+
+  // Opening a dependency swaps `topic` in place — without this the scrollable
+  // body keeps whatever scroll position the previous lesson was left at.
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [topic.id]);
 
   return (
     <div className={`flex flex-col h-full bg-slate-50 dark:bg-slate-950 transition-all duration-300`}>
@@ -43,7 +50,7 @@ export default function ConceptNode({ topic, topicMap, onNavigate }) {
       </div>
 
       {/* Scrollable Body */}
-      <div className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar">
         <div className="px-10 py-10 max-w-4xl mx-auto pb-32">
           {/* Intuition */}
           <Section label="In Plain English" color="text-slate-500 dark:text-slate-400">
@@ -63,6 +70,38 @@ export default function ConceptNode({ topic, topicMap, onNavigate }) {
                       {step.prereq && topicMap[step.prereq] && (
                         <NavButton id={step.prereq} topicMap={topicMap} onNavigate={onNavigate} c={c} />
                       )}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </Section>
+          )}
+
+          {/* Canonical Form — the general rule itself, in symbolic notation
+              (a, b, c, d / x_1, x_2 / m×n), stated BEFORE any numbers are
+              plugged in. This is what lets you tell "the rule" apart from
+              "this one example" once the Worked Example below starts
+              substituting real numbers. */}
+          {topic.canonical && (
+            <Section label="Canonical Form" color="text-sky-600 dark:text-sky-400/80">
+              <div className="rounded-xl border border-sky-200 dark:border-sky-700/30 bg-sky-50 dark:bg-sky-950/10 px-6 py-5 shadow-sm space-y-4">
+                {topic.canonical.intro && (
+                  <div className="text-slate-800 dark:text-slate-200 text-[15px] font-semibold leading-relaxed">
+                    {topic.canonical.intro}
+                  </div>
+                )}
+                <ol className="space-y-4">
+                  {topic.canonical.rules.map((rule, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="text-sky-600 dark:text-sky-400 text-[14px] font-bold mt-0.5 shrink-0">{i + 1}.</span>
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        {rule.note && (
+                          <div className="text-slate-700 dark:text-slate-300 text-[14px] leading-relaxed italic">{rule.note}</div>
+                        )}
+                        <div className="overflow-x-auto py-1">
+                          <Katex latex={rule.latex} />
+                        </div>
+                      </div>
                     </li>
                   ))}
                 </ol>

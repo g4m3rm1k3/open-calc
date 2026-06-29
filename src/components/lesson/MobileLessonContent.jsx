@@ -296,8 +296,12 @@ function CardHeader({ icon, kicker, label, noteId, right }) {
 }
 
 function MobileCard({ id, icon, kicker, label, noteId, children }) {
+  // Note anchors are derived from noteId so a click-to-scroll never silently breaks
+  // because a caller forgot to also pass a matching `id` — `id` only needs to be
+  // passed explicitly when this card has no note (e.g. tab-bar scroll-spy targets).
+  const anchorId = id ?? (noteId ? noteId.replace(/:/g, "-") : undefined);
   return (
-    <div id={id} className={`rounded-none border-x-0 bg-white dark:bg-slate-950 scroll-mt-24`}>
+    <div id={anchorId} className={`rounded-none border-x-0 bg-white dark:bg-slate-950 scroll-mt-24`}>
       <CardHeader icon={icon} kicker={kicker} label={label} noteId={noteId} />
       <div className="px-4 pb-8 pt-4">{children}</div>
     </div>
@@ -307,8 +311,9 @@ function MobileCard({ id, icon, kicker, label, noteId, children }) {
 function MobileCollapsible({ id, icon, kicker, label, defaultOpen = false, noteId, children }) {
   const [open, setOpen] = useState(defaultOpen);
   const toggle = <span className={`text-[10px] font-bold uppercase tracking-wide text-slate-400`}>{open ? "▲" : "▼"}</span>;
+  const anchorId = id ?? (noteId ? noteId.replace(/:/g, "-") : undefined);
   return (
-    <div id={id} className={`rounded-none border-x-0 bg-white dark:bg-slate-950 scroll-mt-24`}>
+    <div id={anchorId} className={`rounded-none border-x-0 bg-white dark:bg-slate-950 scroll-mt-24`}>
       <button
         onClick={() => setOpen((v) => !v)}
         className={`w-full text-left active:opacity-80 transition-opacity`}

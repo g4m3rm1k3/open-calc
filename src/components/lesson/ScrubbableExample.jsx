@@ -223,7 +223,10 @@ export default function ScrubbableExample({ example, number, lessonId }) {
   const cHint = cHintLevels[cHintLevel];
 
   return (
-    <div className="example-block oc-shell-card mx-0 sm:mx-4 lg:mx-0 mb-6 overflow-hidden rounded-none sm:rounded-[32px] border-x-0 sm:border-x">
+    <div
+      id={lessonId ? `${lessonId}-example-${example.id ?? number}` : undefined}
+      className="example-block oc-shell-card mx-0 sm:mx-4 lg:mx-0 mb-6 overflow-hidden rounded-none sm:rounded-[32px] border-x-0 sm:border-x"
+    >
       {/* Header */}
       <div className="oc-header-gradient px-4 py-4 sm:px-8 sm:py-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 sm:gap-4">
         <div className="flex items-center gap-3 min-w-0">
