@@ -193,6 +193,14 @@ function TopBar() {
           <FullscreenButton className="nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 [&>svg]:w-[18px] [&>svg]:h-[18px]" />
         </div>
 
+        <button
+          onClick={() => window.dispatchEvent(new CustomEvent('oc-toggle-help'))}
+          className="hidden lg:flex nav-tool-btn text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+          title="Contributor Docs"
+        >
+          <span className="text-[15px] font-black leading-none">?</span>
+        </button>
+
         <NavSep className="hidden lg:block" />
 
         <NavClock />
@@ -318,6 +326,12 @@ export default function AppShell({ children }) {
     const handler = () => setChatOpen(c => !c);
     window.addEventListener('oc-toggle-chat', handler);
     return () => window.removeEventListener('oc-toggle-chat', handler);
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setHelpOpen(true);
+    window.addEventListener('oc-toggle-help', handler);
+    return () => window.removeEventListener('oc-toggle-help', handler);
   }, []);
 
   useEffect(() => {
@@ -691,6 +705,20 @@ export default function AppShell({ children }) {
                       <span className="text-lg leading-none">🔨</span>
                     </div>
                     <span className="text-xs font-bold tracking-wide">Lesson Builder</span>
+                  </motion.button>
+
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setMobileToolsOpen(false);
+                      window.dispatchEvent(new CustomEvent('oc-toggle-help'));
+                    }}
+                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-500/20 shadow-sm"
+                  >
+                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-indigo-500/20 flex items-center justify-center shadow-sm">
+                      <span className="text-xl font-black leading-none">?</span>
+                    </div>
+                    <span className="text-xs font-bold tracking-wide">Contributor Docs</span>
                   </motion.button>
 
                   <ReportBugButton

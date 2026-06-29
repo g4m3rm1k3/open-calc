@@ -957,34 +957,86 @@ function HoverLessonPreview() {
 function SectionOverview() {
   return (
     <div>
-      <SectionHeading sub="No coding experience required to get started.">
-        How UpSkillOS works
+      <SectionHeading sub="Two paths to contribute — pick the one that fits.">
+        How to Contribute
       </SectionHeading>
       <Para>
-        UpSkillOS is an open-source interactive STEM learning platform. Every topic is a{" "}
-        <strong>lesson</strong>. Lessons are grouped into{" "}
-        <strong>chapters</strong>. You write lessons as simple text files — the
-        app reads them and renders them automatically.
+        UpSkillOS is an open-source interactive STEM learning platform. Every
+        topic is a <strong>lesson</strong>. Lessons are grouped into{" "}
+        <strong>chapters</strong>. There are two ways to write or improve a
+        lesson:
       </Para>
 
-      <div className="flex flex-wrap items-center gap-2 my-5 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-5">
+        <div className="p-5 rounded-2xl border-2 border-amber-400/50 bg-amber-50/60 dark:bg-amber-950/20">
+          <div className="text-2xl mb-2">🔨</div>
+          <div className="text-sm font-bold text-amber-800 dark:text-amber-300 mb-1">
+            Lesson Builder (in-app)
+          </div>
+          <div className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed mb-3">
+            A visual editor built into the app. Add cells, preview instantly, no
+            setup needed. Works right in your browser — nothing to install.
+          </div>
+          <a
+            href="/lesson-builder"
+            className="text-xs font-bold text-amber-700 dark:text-amber-300 hover:underline"
+          >
+            → Open Lesson Builder
+          </a>
+        </div>
+        <div className="p-5 rounded-2xl border-2 border-slate-300/50 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40">
+          <div className="text-2xl mb-2">💻</div>
+          <div className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+            Code Editor (Git)
+          </div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
+            Clone the repo, edit <Cb>.js</Cb> files directly, run{" "}
+            <Cb>npm run dev</Cb> to preview. Full control, supports all lesson
+            types including Science Notebook.
+          </div>
+          <a
+            href="https://github.com/g4m3rm1k3/upskillos"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-bold text-slate-600 dark:text-slate-400 hover:underline"
+          >
+            → GitHub Repo
+          </a>
+        </div>
+      </div>
+
+      <Note color="green">
+        <strong>New contributor?</strong> Start with the{" "}
+        <strong>Lesson Builder</strong> — head to{" "}
+        <strong>Your First Lesson</strong> in the sidebar for a step-by-step
+        walkthrough.
+      </Note>
+
+      <H3>How lessons become content</H3>
+      <div className="flex flex-wrap items-center gap-2 my-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
         {[
           {
-            icon: "📄",
-            label: "Write a .js file",
+            icon: "🔨",
+            label: "Build in Lesson Builder",
+            cls: "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40",
+          },
+          null,
+          {
+            icon: "📤",
+            label: "Export as .js file",
             cls: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40",
           },
           null,
           {
-            icon: "📁",
-            label: "Add to a chapter",
-            cls: "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/40",
+            icon: "🔀",
+            label: "Submit a PR",
+            cls: "text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40",
           },
           null,
           {
             icon: "🎓",
             label: "Students learn!",
-            cls: "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40",
+            cls: "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/40",
           },
         ].map((item, i) =>
           item === null ? (
@@ -1004,104 +1056,25 @@ function SectionOverview() {
         )}
       </div>
 
-      <H3>What does a lesson file look like?</H3>
-      <Para>
-        A lesson is a JavaScript file that exports one object with named fields.
-        You don't need to know JavaScript — just fill in the fields with text.
-        Think of it like a form with labeled boxes.
-      </Para>
-      <CodeBlock>{`export default {
-  id: 'ch1-derivatives',
-  title: 'What is a Derivative?',
-
-  hook: {
-    question: 'How fast is something changing right now?',
-    realWorldContext: 'GPS systems solve this thousands of times per second...',
-  },
-
-  intuition: {
-    text: 'Imagine zooming into a curve until it looks like a straight line...',
-  },
-
-  quiz: {
-    questions: [{ question: '...', answer: '...', hints: [] }],
-  },
-}`}</CodeBlock>
-
-      <H3>What you need to get started</H3>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
-        {[
-          {
-            icon: "💻",
-            title: "A text editor",
-            desc: "VS Code is free and works great. Any editor will work.",
-          },
-          {
-            icon: "📦",
-            title: "Node.js installed",
-            desc: 'Download from nodejs.org. Run "npm install" in the project folder once.',
-          },
-          {
-            icon: "🔥",
-            title: "npm run dev",
-            desc: "Starts the app locally so you can instantly see your changes.",
-          },
-        ].map((item) => (
-          <div
-            key={item.title}
-            className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
-          >
-            <div className="text-2xl mb-2">{item.icon}</div>
-            <div className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-1">
-              {item.title}
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              {item.desc}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <H3>The file structure</H3>
-      <Para>
-        All lesson files live in <Cb>src/content/</Cb>. Each chapter has its own
-        folder:
-      </Para>
-      <CodeBlock>{`src/content/
-  chapter-0/           ← Precalculus prerequisites
-    index.js           ← Chapter definition (title, lesson list)
-    00-real-numbers.js ← A lesson file
-    01-functions.js    ← Another lesson
-  python-1/
-    index.js
-    01-variables.js`}</CodeBlock>
-      <Note color="green">
-        <strong>Ready to write your first lesson?</strong> Head to{" "}
-        <strong>Your First Lesson</strong> in the sidebar — it walks you through
-        everything step by step.
-      </Note>
-
-      <div className="mt-4 flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
-        <svg
-          className="w-5 h-5 text-slate-500 shrink-0"
-          fill="currentColor"
-          viewBox="0 0 24 24"
+      <H3>Community</H3>
+      <div className="flex flex-wrap gap-3 mt-3">
+        <a
+          href="https://discord.gg/epd2kYBDVt"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 text-sm font-semibold hover:bg-sky-100 dark:hover:bg-sky-950/50 transition-colors"
         >
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
-        </svg>
-        <div className="flex-1 min-w-0">
-          <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-            Source code on GitHub
-          </div>
-          <a
-            href="https://github.com/g4m3rm1k3/upskillos"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-brand-600 dark:text-brand-400 hover:underline truncate block"
-          >
-            github.com/g4m3rm1k3/upskillos
-          </a>
-        </div>
+          🎮 Join Discord
+        </a>
+
+        <a
+          href="https://github.com/g4m3rm1k3/upskillos"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+        >
+          ⭐ GitHub
+        </a>
       </div>
     </div>
   );
@@ -1111,122 +1084,77 @@ function SectionOverview() {
 
 const FIRST_LESSON_STEPS = [
   {
-    title: "Download the starter template",
-    desc: "Click the button below to download a lesson file with every field pre-filled and commented. This is your starting point.",
-    note: "The file is heavily commented with instructions. Delete the comments as you go, or keep them as a reference.",
-    download: { filename: "math-lesson-template.js", content: TPL_MATH },
-  },
-  {
-    title: "Put the file in the right folder",
-    desc: "Move the downloaded file into the chapter folder it belongs to inside src/content/. For Chapter 1, put it in src/content/chapter-1/.",
-    code: `// Example:
-src/content/chapter-1/01-my-new-lesson.js
-
-// The filename doesn't matter to the app.
-// Convention: {order}-{topic}.js`,
-    note: "The folder name tells the app which chapter it's in — keep it matching.",
-  },
-  {
-    title: "Fill in the identity fields",
-    sub: "Lines 1–7 of the template",
-    desc: "These 4 fields are required. Without them the app cannot find or display your lesson. Replace every placeholder value.",
-    code: `  id: 'ch1-limits',        // unique, never reused
-  slug: 'limits',           // appears in the URL
-  chapter: 1,               // must match chapter.number
-  order: 3,                 // position in the chapter list
-  title: 'What is a Limit?',
-  subtitle: 'The foundation of all of calculus',
-  tags: ['limits', 'calculus'],`,
-    note: "The id must be unique across the ENTIRE app. If two lessons share the same id, progress data will mix and things will break.",
-  },
-  {
-    title: "Write a hook that creates curiosity",
-    sub: "The hook section",
-    desc: "The hook is the first thing a student sees. Its only job is to make them curious. Don't teach yet — just pose a question they'll want answered.",
-    code: `  hook: {
-    question: 'What happens when you divide by
-  something that keeps getting closer to zero —
-  but never actually reaches it?',
-    realWorldContext: 'GPS satellites solve thousands
-  of "approaching but never equal" problems every
-  second using limits.',
-  },`,
-    note: "If your hook doesn't make YOU curious, it won't make students curious. Rewrite it until it does.",
-  },
-  {
-    title: "Write the intuitive explanation",
-    sub: "intuition.text",
-    desc: "Your main lesson body. Explain the concept without formulas first. Write for a smart person who has never seen this topic.",
-    code: `  intuition: {
-    text: \`
-Imagine driving toward a wall. You get closer and
-closer — 10m, 1m, 1cm — but you never arrive.
-The wall is *there*, you're just always approaching.
-
-In math, a **limit** asks: what value does a function
-*approach* as input gets close to something?
-
-$\\lim_{x \\to 2} x^2 = 4$
-    \`,
-  },`,
-  },
-  {
-    title: "Add formal math (optional)",
-    sub: "The math section",
-    desc: "Now that students have intuition, introduce the formal definition and worked examples. Skip this for Python or web lessons.",
-    code: `  math: {
-    definition: \`The **limit** of $f(x)$ as $x \\to a$ is $L$:
-$\\lim_{x \\to a} f(x) = L$\`,
-    examples: [
-      {
-        problem: 'Evaluate $\\\\displaystyle\\\\lim_{x\\\\to 3}(x^2-1)$',
-        solution: 'Substitute: $(3)^2 - 1 = 8$.',
-      },
+    title: "Open the Lesson Builder",
+    desc: "Click the Start Menu (∂ logo, top-left) and choose 'Lesson Builder' — or navigate directly to /lesson-builder. No setup, no install.",
+    note: "The Lesson Builder works entirely in your browser. You can build and preview a complete lesson without touching any code.",
+    bullets: [
+      "Start Menu → Lesson Builder",
+      "Or navigate to /lesson-builder in the URL bar",
+      "The page opens with a blank lesson ready to fill in",
     ],
-  },`,
-    note: "Inline math uses $...$, display math uses $...$.",
+  },
+  {
+    title: "Set your lesson title and subtitle",
+    desc: "At the top of the builder, click the title field and type your lesson title. Add a subtitle — one sentence describing what the lesson teaches.",
+    note: "The title and subtitle are the first thing students see. Make the title a clear concept name, and the subtitle an active description: 'The instantaneous rate of change', not just 'Derivatives'.",
+  },
+  {
+    title: "Add a Markdown cell for your explanation",
+    desc: "Click '+ Add Cell' and choose Markdown. This is your main lesson body. Write the intuitive explanation here — prose, LaTeX math, and formatted text.",
+    code: `Write plain text and use:
+**bold**   *italic*   \`code\`
+
+Inline math:   $f'(x) = \\lim_{h \\to 0} \\frac{f(x+h)-f(x)}{h}$
+
+Display math:
+$$\\int_0^1 x^2 \\, dx = \\frac{1}{3}$$`,
+    note: "Not sure how to write a formula? Click the '∫≈ Visual Math…' button in the toolbar to open the visual equation editor — draw or type the formula and it inserts the LaTeX for you.",
+    noteColor: "green",
+  },
+  {
+    title: "Add a Quiz cell",
+    desc: "Click '+ Add Cell' → Quiz. Add 3–5 questions. Each question has an answer and optional hints (revealed one at a time). Getting ≥80% marks the lesson complete with a ★.",
+    code: `Question: What is the derivative of $f(x) = x^3$?
+Answer:   $3x^2$
+Hint 1:   Use the power rule.
+Hint 2:   Multiply the exponent by the coefficient, reduce exponent by 1.`,
+    note: "Write questions with a single definitive correct answer. Open-ended reflection questions belong in an Assessment cell (no score, students see model answer).",
     noteColor: "blue",
   },
   {
-    title: "Add a quiz",
-    sub: "The quiz section — ≥80% earns a ★",
-    desc: "The quiz is scored. Getting at least 80% marks the lesson complete. Write 3–5 questions with clear, single correct answers.",
-    code: `  quiz: {
-    questions: [
-      {
-        question: 'What does $\\\\lim_{x \\\\to 3}$ ask?',
-        answer: 'What value f(x) approaches as x gets close to 3.',
-        hints: [
-          'Think "approaching", not "arriving".',
-          'The limit is about the journey toward the value.',
-        ],
-      },
-    ],
-  },`,
+    title: "Add a Viz cell (optional)",
+    desc: "Click '+ Add Cell' → Viz to embed any registered interactive visualization. Type the visualization ID exactly as it appears in the registry.",
+    code: `Common IDs:
+SecantToTangent     RiemannSum
+UnitCircle          PythonNotebook
+JSNotebook          ParametricCurve3D`,
+    note: "The full list of available IDs is in the 'Using Vizs' section of this guide. IDs are case-sensitive.",
+    noteColor: "amber",
   },
   {
-    title: "Register the lesson in its chapter",
-    sub: "The chapter index.js file",
-    desc: "Add your lesson to the chapter's index.js file. Two lines: one import at the top, one entry in the lessons array.",
-    code: `// In src/content/chapter-1/index.js:
+    title: "Preview your lesson",
+    desc: "Click the eye icon (👁) or the 'Preview' button in the toolbar to see exactly how your lesson will look to students. The preview updates live as you edit.",
+    bullets: [
+      "LaTeX math renders correctly in preview",
+      "Quiz questions are interactive",
+      "Any embedded viz loads live",
+      "Scroll through to check the full layout",
+    ],
+  },
+  {
+    title: "Export and submit a PR",
+    desc: "Click 'Export' to download the lesson as a .js file. Then create a GitHub pull request to add it to the right chapter folder in the repository.",
+    code: `// Destination path pattern:
+src/courses/{subject}/{chapter-folder}/{order}-{topic}.js
 
-import myLesson from './03-limits.js'   // ← add import
-
-export default {
-  id: 'chapter-1',
-  number: 1,
-  title: 'Limits',
-  lessons: [
-    existingLesson1,
-    existingLesson2,
-    myLesson,          // ← add here
-  ],
-}`,
-    note: "Restart npm run dev after editing index.js. Navigate to /chapter/1/limits to see it live.",
+// Example:
+src/courses/calculus/2-derivatives/005-chain-rule.js`,
+    note: "Fork the repo first if you don't have write access. Ask in Discord if you're unsure which folder your lesson belongs in.",
     noteColor: "green",
     bullets: [
-      "The lesson now appears in the sidebar.",
-      "Any errors in your file appear in the browser console (press F12).",
+      "Open a PR on GitHub — maintainers review and merge",
+      "Your lesson appears in the app for all students",
+      "Join Discord to announce it to the community",
     ],
   },
 ];
@@ -1234,58 +1162,121 @@ export default {
 function SectionFirstLesson() {
   return (
     <div>
-      <SectionHeading sub="A complete walkthrough — from download to live lesson.">
+      <SectionHeading sub="From blank page to live lesson — using the Lesson Builder.">
         Your First Lesson
       </SectionHeading>
       <Para>
-        Follow these 8 steps. By the end you'll have a fully working lesson live
-        in the app. You don't need to know JavaScript — just fill in the fields.
+        Follow these steps. By the end you'll have a complete lesson built in
+        the app and ready to submit. No code required — just write content.
       </Para>
       <StepWizard steps={FIRST_LESSON_STEPS} />
     </div>
   );
 }
 
-// ─── SECTION: LESSON ANATOMY ─────────────────────────────────────────────────
+// ─── SECTION: CELL TYPES ─────────────────────────────────────────────────────
 
 function SectionAnatomy() {
   return (
     <div>
-      <SectionHeading sub="Hover any section to see the code and tips for filling it in.">
-        Lesson Anatomy
+      <SectionHeading sub="Every lesson is made of cells — pick the right type for each block of content.">
+        Cell Types
       </SectionHeading>
       <Para>
-        Every lesson uses the same structure. Sections you leave out are simply
-        not rendered — there will never be a blank box. Hover each section below
-        to explore.
+        The Lesson Builder composes lessons from cells. Each cell type renders
+        differently for students. Add cells in any order — the lesson renders
+        top-to-bottom.
       </Para>
-      <HoverLessonPreview />
 
-      <H3>Assessment vs. Quiz</H3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
-        <div className="p-4 rounded-xl bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-700">
-          <div className="text-xs font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-2">
-            assessment (teal)
+      <div className="space-y-4 my-4">
+        {[
+          {
+            icon: "📝",
+            label: "Markdown",
+            color: "border-blue-300/60 bg-blue-50/50 dark:bg-blue-950/20",
+            badge: "text-blue-600 dark:text-blue-400",
+            points: [
+              "Prose, headings, bold, italic, inline code",
+              "Inline math: $f(x)$    Display math: $$\\int$$",
+              "Use '∫≈ Visual Math…' toolbar button for WYSIWYG LaTeX",
+              "Renders markdown + KaTeX — no HTML needed",
+            ],
+          },
+          {
+            icon: "❓",
+            label: "Quiz (scored)",
+            color: "border-orange-300/60 bg-orange-50/50 dark:bg-orange-950/20",
+            badge: "text-orange-600 dark:text-orange-400",
+            points: [
+              "≥80% earns ★ completion — shown permanently in sidebar",
+              "Each question: answer + up to 3 hints (revealed one at a time)",
+              "Best for: clear right/wrong questions",
+              "Supports LaTeX in both question and answer",
+            ],
+          },
+          {
+            icon: "💭",
+            label: "Assessment (unscored)",
+            color: "border-teal-300/60 bg-teal-50/50 dark:bg-teal-950/20",
+            badge: "text-teal-600 dark:text-teal-400",
+            points: [
+              "No score — zero pressure, open-ended reflection",
+              "Students type an answer and then see the model answer",
+              "One hint per question (a single nudge, not an array)",
+              "Best for: 'explain in your own words' questions",
+            ],
+          },
+          {
+            icon: "📊",
+            label: "Viz",
+            color: "border-violet-300/60 bg-violet-50/50 dark:bg-violet-950/20",
+            badge: "text-violet-600 dark:text-violet-400",
+            points: [
+              "Embeds any registered interactive visualization by ID",
+              "ID must exactly match the VIZ_REGISTRY key (case-sensitive)",
+              "Pass props to configure the viz: { id: 'RiemannSum', props: { defaultN: 10 } }",
+              "Full list in the 'Using Vizs' section",
+            ],
+          },
+          {
+            icon: "💻",
+            label: "Code (Python / JS)",
+            color:
+              "border-emerald-300/60 bg-emerald-50/50 dark:bg-emerald-950/20",
+            badge: "text-emerald-600 dark:text-emerald-400",
+            points: [
+              "PythonNotebook: Pyodide, opencalc charts, Shift+Enter to run",
+              "JSNotebook: live HTML/CSS output, Monaco editor",
+              "Added via a Viz cell with id: 'PythonNotebook' or 'JSNotebook'",
+              "opencalc library available automatically in Python cells",
+            ],
+          },
+        ].map((c) => (
+          <div key={c.label} className={`rounded-xl border ${c.color} p-4`}>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg">{c.icon}</span>
+              <span className={`text-sm font-bold ${c.badge}`}>{c.label}</span>
+            </div>
+            <ul className="space-y-1">
+              {c.points.map((p, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400"
+                >
+                  <Check className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" />
+                  <span>{p}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="text-xs text-teal-800 dark:text-teal-300 space-y-1.5">
-            <li>• No score — zero pressure</li>
-            <li>• hint field is a single string</li>
-            <li>• Students see model answer after submitting</li>
-            <li>• Best for open-ended reflection</li>
-          </ul>
-        </div>
-        <div className="p-4 rounded-xl bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-700">
-          <div className="text-xs font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider mb-2">
-            quiz (orange)
-          </div>
-          <ul className="text-xs text-orange-800 dark:text-orange-300 space-y-1.5">
-            <li>• Scored — ≥80% earns ★ completion</li>
-            <li>• hints is an array (reveals one at a time)</li>
-            <li>• Result shown permanently in sidebar</li>
-            <li>• Best for clear right/wrong questions</li>
-          </ul>
-        </div>
+        ))}
       </div>
+
+      <Note color="blue">
+        <strong>LaTeX tip:</strong> Use the <strong>∫≈ Visual Math…</strong>{" "}
+        button in the Markdown cell toolbar to open a WYSIWYG equation editor.
+        Type or draw a formula, click Insert — the LaTeX is written for you.
+      </Note>
     </div>
   );
 }
@@ -1305,9 +1296,18 @@ function SectionTypes() {
     math: (
       <div>
         <Para>
-          The classic lesson type. All sections are available. Emphasis on
-          building intuition first, then formal definition, then practice.
+          The classic lesson type. Build it in the Lesson Builder: one or more
+          Markdown cells for explanation, a Viz cell for the interactive, and a
+          Quiz cell at the end. Emphasis on building intuition first, then
+          formal definition, then practice.
         </Para>
+        <H3>Recommended cell order</H3>
+        <CodeBlock>{`Markdown (hook question + real-world context)
+Markdown (intuitive explanation, no formulas yet)
+Viz      (interactive — SecantToTangent, RiemannSum, etc.)
+Markdown (formal definition with LaTeX)
+Assessment (open-ended reflection)
+Quiz     (scored — ≥80% earns ★)`}</CodeBlock>
         <H3>Inline algebra popovers</H3>
         <Para>
           In any prose string, use <Cb>{"{{"}</Cb>
@@ -1325,15 +1325,12 @@ function SectionTypes() {
           <Cb>solve-simple-quadratic</Cb>. Add new ones to{" "}
           <Cb>src/reference/algebraRegistry.js</Cb>.
         </Para>
-        <H3>Typical structure</H3>
-        <CodeBlock>{`hook → intuition (+ viz) → math definition
-  → examples → assessment → quiz`}</CodeBlock>
         <DownloadCard
           icon="📐"
-          title="Math Lesson Template"
+          title="Math Lesson Template (.js)"
           filename="math-lesson-template.js"
           template={TPL_MATH}
-          desc="All sections with commented instructions. For calculus, algebra, geometry, or any math topic."
+          desc="For contributors using a code editor. All sections with commented instructions."
         />
       </div>
     ),
@@ -1342,15 +1339,13 @@ function SectionTypes() {
         <Para>
           For lessons where students write and run Python code. An interactive
           Python notebook (powered by Pyodide — no installation needed) is
-          embedded directly in the lesson.
+          embedded as a Viz cell.
         </Para>
-        <H3>Adding the notebook</H3>
-        <CodeBlock>{`visualizations: [
-  { id: 'PythonNotebook', props: {} },
-],`}</CodeBlock>
+        <H3>In the Lesson Builder</H3>
         <Para>
-          That's it. The cell appears with syntax highlighting and Shift+Enter
-          to run. Students edit it live. output appears immediately.
+          Add a Viz cell and set the ID to <Cb>PythonNotebook</Cb>. That's it.
+          The cell appears with syntax highlighting and Shift+Enter to run.
+          Students edit it live — output appears immediately.
         </Para>
         <H3>opencalc library</H3>
         <Para>
@@ -1360,10 +1355,10 @@ function SectionTypes() {
         </Para>
         <DownloadCard
           icon="🐍"
-          title="Python Lesson Template"
+          title="Python Lesson Template (.js)"
           filename="python-lesson-template.js"
           template={TPL_PYTHON}
-          desc="Lesson with an embedded Python notebook cell."
+          desc="For contributors using a code editor. Lesson with an embedded Python notebook cell."
         />
       </div>
     ),
@@ -1371,31 +1366,29 @@ function SectionTypes() {
       <div>
         <Para>
           For lessons that walk through a mathematical proof step by step. Heavy
-          on <Cb>math.definition</Cb> and <Cb>rigor.text</Cb>. Often no scored
-          quiz — just an understanding check asking students to paraphrase the
-          result.
+          on prose (Markdown cells) — build intuition first, then present the
+          formal proof. Often no scored quiz — just an Assessment cell asking
+          students to paraphrase the result.
         </Para>
-        <H3>Typical structure</H3>
-        <CodeBlock>{`hook → intuition (why should this be true?) → math.definition
-  → rigor.text (step-by-step proof) → assessment`}</CodeBlock>
-        <H3>Writing the proof body</H3>
-        <CodeBlock>{`rigor: {
-  text: \`
-**Proof:**
+        <H3>Recommended cell order</H3>
+        <CodeBlock>{`Markdown (hook — why should this result be true?)
+Markdown (intuitive geometric argument, no symbols)
+Markdown (formal proof — use **Step 1:**, **Step 2:**)
+Assessment (explain the result in your own words)`}</CodeBlock>
+        <H3>Writing the proof body in Markdown</H3>
+        <CodeBlock>{`**Proof:**
 
-**Step 1:** Since triangle ABC is isoceles, $AB = AC$.
+**Step 1:** Since triangle ABC is isosceles, $AB = AC$.
 
 **Step 2:** By the Angle Bisector Theorem...
 
-**Therefore:** $\\\\angle B = \\\\angle C$. $\\\\square$
-  \`,
-},`}</CodeBlock>
+**Therefore:** $\\angle B = \\angle C$. $\\square$`}</CodeBlock>
         <DownloadCard
           icon="📝"
-          title="Proof Lesson Template"
+          title="Proof Lesson Template (.js)"
           filename="proof-lesson-template.js"
           template={TPL_PROOF}
-          desc="Step-by-step proof structure with intuition-first approach and formal justification."
+          desc="For contributors using a code editor."
         />
       </div>
     ),
@@ -1405,6 +1398,7 @@ function SectionTypes() {
           Used for chemistry and digital-fundamentals lessons. The entire lesson
           — prose, callouts, steps, and interactive viz — is packaged inside a{" "}
           <Cb>ScienceNotebook</Cb> component. This is <strong>Schema E</strong>.
+          Requires a code editor (not available in the Lesson Builder yet).
         </Para>
         <H3>File structure — two exports required</H3>
         <CodeBlock>{`// lesson1-0.js
@@ -1442,9 +1436,6 @@ export default function WhyChemistry({ params }) {
           <Cb>intuition.visualizations</Cb> only. Setting it in both causes a
           double-render.
         </Note>
-        <Note color="violet">
-          Full spec: CONTRIBUTING.md § 7 — ScienceNotebook Lesson Format
-        </Note>
       </div>
     ),
     web: (
@@ -1454,8 +1445,11 @@ export default function WhyChemistry({ params }) {
           <Cb>JSNotebook</Cb> — students see live output immediately as they
           type.
         </Para>
-        <H3>Adding the notebook</H3>
-        <CodeBlock>{`visualizations: [{ id: 'JSNotebook', props: {} }]`}</CodeBlock>
+        <H3>In the Lesson Builder</H3>
+        <Para>
+          Add a Viz cell and set the ID to <Cb>JSNotebook</Cb>. The Monaco
+          editor appears with live HTML/CSS/JS output in a panel beside it.
+        </Para>
         <H3>Python vs. JavaScript notebooks</H3>
         <div className="grid grid-cols-2 gap-3 mt-3 text-xs">
           <div className="p-3 rounded-lg bg-teal-50 dark:bg-teal-950/30 border border-teal-200 dark:border-teal-700 text-teal-800 dark:text-teal-300 space-y-1">
@@ -1476,13 +1470,14 @@ export default function WhyChemistry({ params }) {
   };
   return (
     <div>
-      <SectionHeading sub="All types share the same file structure — you just use different fields.">
+      <SectionHeading sub="Conventions for which cells to use based on subject matter.">
         Lesson Types
       </SectionHeading>
       <Para>
-        "Types" are conventions for which fields and components to use based on
-        subject. Each course uses one type consistently — check ARCHITECTURE.md
-        § 4 for the course→schema mapping before starting.
+        "Types" are conventions for cell order and content style based on
+        subject. The Lesson Builder supports all types except Science Notebook
+        (which requires a code editor). Check ARCHITECTURE.md § 4 for the
+        course→schema mapping before starting.
       </Para>
       <div className="flex flex-wrap gap-2 mb-6">
         {types.map((t) => (
@@ -1806,9 +1801,10 @@ MyVizComponent: lazy(() => import('./react/MyVizComponent.jsx')),`}</CodeBlock>
 
       <H3>Required: the colors hook</H3>
       <Para>
-        Import this into every viz component — don't paste the implementation in.
-        It makes your component react to dark/light mode and the active studio
-        theme automatically, and a fix to the palette only has to happen once.
+        Import this into every viz component — don't paste the implementation
+        in. It makes your component react to dark/light mode and the active
+        studio theme automatically, and a fix to the palette only has to happen
+        once.
       </Para>
       <CodeBlock>{`import { useThemeColors } from '../../../hooks/useThemeColors'
 
@@ -3087,8 +3083,12 @@ function SectionAbout() {
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">About UpSkillOS</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Project info, license, and how to contribute</p>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
+          About UpSkillOS
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Project info, license, and how to contribute
+        </p>
       </div>
 
       {/* Created by */}
@@ -3097,11 +3097,13 @@ function SectionAbout() {
           <Heart className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Created By</h3>
+          <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
+            Created By
+          </h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            UpSkillOS was created by <strong>Michael McLean</strong>, combining a passion for
-            rigorous mathematical pedagogy with interactive web technology. Built to be free
-            for students everywhere.
+            UpSkillOS was created by <strong>Michael McLean</strong>, combining
+            a passion for rigorous mathematical pedagogy with interactive web
+            technology. Built to be free for students everywhere.
           </p>
         </div>
       </section>
@@ -3112,13 +3114,41 @@ function SectionAbout() {
           <Shield className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Open Source License — Non-Commercial</h3>
+          <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
+            Open Source License — Non-Commercial
+          </h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-            This project is provided freely to advance mathematics education. It is licensed
-            strictly for <strong>non-commercial use</strong>. You may not use this software,
-            its content, or its visualizations for any form of monetary gain, commercial
-            hosting, or paid product integration.
+            This project is provided freely to advance mathematics education. It
+            is licensed strictly for <strong>non-commercial use</strong>. You
+            may not use this software, its content, or its visualizations for
+            any form of monetary gain, commercial hosting, or paid product
+            integration.
           </p>
+        </div>
+      </section>
+
+      {/* Community */}
+      <section className="p-5 rounded-2xl border border-sky-100 dark:border-sky-900/40 bg-sky-50/50 dark:bg-sky-950/20 space-y-3">
+        <h3 className="font-semibold text-slate-800 dark:text-slate-200">
+          Community
+        </h3>
+        <div className="flex flex-wrap gap-3">
+          <a
+            href="https://discord.gg/epd2kYBDVt"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 text-sm font-semibold hover:bg-sky-200 dark:hover:bg-sky-900/60 transition-colors"
+          >
+            🎮 Join Discord
+          </a>
+          <a
+            href="https://github.com/g4m3rm1k3/upskillos"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            <Github className="w-4 h-4" /> GitHub
+          </a>
         </div>
       </section>
 
@@ -3129,10 +3159,13 @@ function SectionAbout() {
         </div>
         <div className="space-y-3 w-full">
           <div>
-            <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">How to Contribute</h3>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
+              How to Contribute
+            </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Content is stored as plain JavaScript files — easy to contribute lessons, fix
-              errors, or add visualizations via pull request. No special build tools required.
+              Use the Lesson Builder to write lessons visually — no setup
+              required. For code-level contributions (vizualizations, features,
+              bug fixes), clone the repo and open a PR.
             </p>
           </div>
           <a
@@ -3150,12 +3183,17 @@ function SectionAbout() {
       {/* Dev mode tip */}
       <section className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
         <div className="flex items-center gap-1.5 shrink-0">
-          <kbd className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">Shift</kbd>
+          <kbd className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+            Shift
+          </kbd>
           <span className="text-slate-400 text-xs">+</span>
-          <kbd className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">D</kbd>
+          <kbd className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+            D
+          </kbd>
         </div>
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          Toggle <strong>Dev Mode</strong> — shows the component name on every visualization to help you find the right file to edit.
+          Toggle <strong>Dev Mode</strong> — shows the component name on every
+          visualization to help you find the right file to edit.
         </p>
       </section>
     </div>
@@ -3166,9 +3204,9 @@ const NAV = [
   {
     group: "Start Here",
     items: [
-      { id: "overview", label: "How It Works", Icon: BookOpen },
+      { id: "overview", label: "How to Contribute", Icon: BookOpen },
       { id: "first-lesson", label: "Your First Lesson", Icon: Play },
-      { id: "anatomy", label: "Lesson Anatomy", Icon: Eye },
+      { id: "anatomy", label: "Cell Types", Icon: Eye },
     ],
   },
   {
@@ -3256,10 +3294,10 @@ export default function HelpModal({ isOpen, onClose }) {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white leading-tight">
-                Contributor Docs
+                Contributor Guide
               </h1>
               <p className="text-[11px] text-white/70">
-                UpSkillOS · For all skill levels
+                Lesson Builder · Viz Builder · Code path
               </p>
             </div>
           </div>

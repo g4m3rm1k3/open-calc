@@ -184,9 +184,11 @@ export default function Taskbar({ windows, onFocus }) {
             whileTap={{ scale: 0.95 }}
             onClick={toggleChat}
             title="Study Chat"
-            className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:text-sky-600 dark:hover:text-sky-400 transition-colors focus:outline-none"
+            className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-md hover:shadow-lg hover:shadow-indigo-500/30 transition-all focus:outline-none group overflow-hidden"
           >
-            <MessageSquare className="w-5 h-5" />
+            <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <MessageSquare className="w-4 h-4 relative z-10" />
+            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 border-2 border-white dark:border-slate-950 animate-pulse shadow-sm" />
           </motion.button>
         </div>
       </div>
