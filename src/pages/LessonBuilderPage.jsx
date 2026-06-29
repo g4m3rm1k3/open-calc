@@ -122,6 +122,16 @@ export default function LessonBuilderPage() {
         </div>
       </header>
 
+      {state._format === 'unknown' && (
+        <div className="px-4 py-2 bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300 flex items-center gap-2">
+          <span>⚠</span>
+          <span>
+            This lesson's shape isn't one the builder recognizes (no <code>id</code>/<code>slug</code>, and it doesn't match the known legacy format either).
+            Edits may not round-trip safely — use <strong>Preview changes</strong> in the export panel before saving to confirm nothing unexpected changed.
+          </span>
+        </div>
+      )}
+
       {/* ── Three-column body — each column scrolls independently ── */}
       <div className="flex-1 flex gap-0 overflow-hidden">
 

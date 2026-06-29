@@ -1432,44 +1432,34 @@ export default function DroneLab({ onBack }) {
   const currentCode = code
 
   return (
-    <div style={{
-      height:'100vh', background:'rgba(3,8,15,0.96)',
-      fontFamily:"'JetBrains Mono',Consolas,monospace",
-      color:'#c8e8ff', display:'flex', flexDirection:'column',
-      overflow:'hidden', position:'relative',
-    }}>
+    <div className="h-full bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl text-slate-800 dark:text-slate-200 font-mono flex flex-col overflow-hidden relative shadow-2xl rounded-2xl border border-slate-200/50 dark:border-white/5">
 
       {/* ── Header ── */}
-      <div style={{
-        background:'#07101e', borderBottom:'1px solid #1a2e4a',
-        padding:'10px 20px', display:'flex', alignItems:'center', gap:14, flexShrink:0,
-      }}>
-        <button onClick={onBack} style={{
-          background:'none', border:'none', color:'#3a6080',
-          cursor:'pointer', fontSize:11, letterSpacing:'2px', fontFamily:'inherit', padding:0,
-        }}>← LABS</button>
-        <div style={{width:1, height:22, background:'#1a2e4a'}}/>
-        <div style={{
-          width:36, height:36, borderRadius:8, background:lesson.accent+'33',
-          display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, flexShrink:0,
-        }}>🚁</div>
+      <div className="bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-white/5 px-6 py-4 flex items-center gap-4 shrink-0 shadow-sm z-10 backdrop-blur-md transition-colors duration-500">
+        <button onClick={onBack} className="bg-transparent border-none text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white cursor-pointer text-[11px] tracking-widest font-sans font-bold px-0 transition-colors uppercase">
+          ← Labs
+        </button>
+        <div className="w-px h-6 bg-slate-200 dark:bg-slate-700/50"/>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[22px] shrink-0 shadow-inner" style={{ background: lesson.accent + '22' }}>
+          🚁
+        </div>
         <div>
-          <div style={{fontSize:15, fontWeight:700, color:'#e8f4ff', letterSpacing:0.3}}>Drone Lab</div>
-          <div style={{fontSize:9, color:'#3a5870', letterSpacing:1.2}}>
-            VECTORS · DOT PRODUCT · ROTATION MATRICES · PID CONTROL
+          <div className="text-[16px] font-black tracking-wide text-slate-800 dark:text-slate-100 font-sans">{lesson.unit}</div>
+          <div className="text-[10px] text-slate-500 dark:text-slate-400 tracking-[0.15em] uppercase font-bold mt-0.5">
+            Vectors · Dot Product · Matrices · Control
           </div>
         </div>
-        <div style={{marginLeft:'auto', display:'flex', gap:4, flexWrap:'wrap', alignItems:'center'}}>
+        <div className="ml-auto flex gap-1.5 flex-wrap items-center">
           {LESSONS.map((l,i)=>(
             <button key={l.id} onClick={()=>switchLesson(i)}
               title={`M${l.id}: ${l.title}`}
-              style={{
-                background:i===lessonIdx?l.accent+'22':'transparent',
-                border:`1px solid ${i===lessonIdx?l.accent:'#1a2e4a'}`,
-                borderRadius:4, padding:'2px 8px', fontSize:9, fontFamily:'inherit',
-                color:i===lessonIdx?l.accent:'#3a6080',
-                cursor:'pointer', transition:'all .15s', minWidth:0,
-              }}>
+              className={`rounded-md px-2.5 py-1 text-[10px] font-bold font-sans tracking-wide cursor-pointer transition-all ${
+                i === lessonIdx 
+                  ? 'shadow-sm' 
+                  : 'bg-transparent border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-700 dark:hover:text-slate-300 border'
+              }`}
+              style={i === lessonIdx ? { background: l.accent, color: '#fff', border: `1px solid ${l.accent}` } : {}}
+            >
               M{l.id}
             </button>
           ))}
@@ -1477,80 +1467,65 @@ export default function DroneLab({ onBack }) {
       </div>
 
       {/* ── Mission banner ── */}
-      <div style={{
-        background:'#07101e', borderBottom:`2px solid ${lesson.accent}33`,
-        padding:'8px 20px', display:'flex', alignItems:'center', gap:16, flexShrink:0,
-      }}>
-        <span style={{
-          fontSize:9, fontWeight:700, letterSpacing:1.2,
-          background:lesson.accent+'22', color:lesson.accent,
-          border:`1px solid ${lesson.accent}44`, borderRadius:3, padding:'2px 8px', flexShrink:0,
-        }}>{lesson.unit.toUpperCase()}</span>
-        <span style={{fontSize:13, fontWeight:700, color:'#e8f4ff'}}>{lesson.title}</span>
-        <span style={{fontSize:11, color:'#3a6080'}}>{lesson.subtitle}</span>
+      <div className="bg-slate-100/50 dark:bg-slate-900/40 border-b px-6 py-3 flex items-center gap-4 shrink-0 transition-colors duration-500 z-10" style={{ borderBottomColor: lesson.accent + '44' }}>
+        <span className="text-[10px] font-black tracking-widest px-2.5 py-1 rounded shadow-sm" style={{ background: lesson.accent, color: '#fff' }}>
+          MISSION {lesson.id}
+        </span>
+        <span className="text-[14px] font-bold text-slate-800 dark:text-slate-100 font-sans">{lesson.title}</span>
+        <span className="text-[12px] text-slate-500 dark:text-slate-400 font-medium font-sans">— {lesson.subtitle}</span>
         {allPass&&(
-          <span style={{
-            fontSize:11, color:'#44ff88', background:'rgba(68,255,136,0.1)',
-            border:'1px solid #44ff8844', borderRadius:4, padding:'2px 9px', marginLeft:'auto',
-          }}>✓ Mission complete!</span>
+          <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30 rounded-lg px-3 py-1 ml-auto shadow-sm tracking-wide flex items-center gap-1.5">
+            <span>✓</span> Mission Complete!
+          </span>
         )}
       </div>
 
       {/* ── Main body: canvas + editor ── */}
-      <div style={{display:'flex',flex:1,minHeight:0,overflow:'hidden'}}>
+      <div className="flex flex-1 min-h-0 overflow-hidden bg-white/40 dark:bg-transparent">
 
         {/* Canvas panel */}
-        <div style={{flex:'0 0 55%',display:'flex',flexDirection:'column',borderRight:'1px solid #1a3040'}}>
-          <div style={{
-            display:'flex',alignItems:'center',justifyContent:'space-between',
-            padding:'4px 12px',background:'#050d18',borderBottom:'1px solid #1a3040',flexShrink:0,
-          }}>
-            <div style={{fontSize:8,letterSpacing:3,color:'#2a5570'}}>FLIGHT SIMULATION</div>
-            <div style={{fontSize:9,color:'#2a5070',fontFamily:'monospace'}}>
+        <div className="flex-[0_0_55%] flex flex-col border-r border-slate-200 dark:border-slate-800/60 bg-white/60 dark:bg-slate-950/40">
+          <div className="flex items-center justify-between px-4 py-2 bg-slate-100/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800/60 shrink-0 backdrop-blur-md">
+            <div className="text-[9px] tracking-[0.2em] font-black text-slate-500 dark:text-slate-400 uppercase">Flight Simulation</div>
+            <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wide font-mono">
               {frames.length>0?`FRAME ${Math.min(playhead,frames.length-1)}/${frames.length-1}`:'AWAITING FLIGHT PROGRAM'}
             </div>
           </div>
-          <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',background:'#03080f',overflow:'hidden'}}>
-            <canvas ref={canvasRef} width={640} height={420} style={{display:'block',maxWidth:'100%',maxHeight:'100%'}}/>
+          <div className="flex-1 flex items-center justify-center bg-slate-50 dark:bg-[#03080f] overflow-hidden shadow-inner relative">
+             <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.03]"
+                style={{ backgroundImage: 'repeating-linear-gradient(45deg,currentColor,currentColor 1px,transparent 1px,transparent 10px)' }} />
+            <canvas ref={canvasRef} width={640} height={420} className="block max-w-full max-h-full rounded-lg shadow-sm border border-slate-200/50 dark:border-white/5 relative z-10"/>
           </div>
-          <div style={{
-            padding:'4px 12px',borderTop:'1px solid #1a3040',background:'#050d18',
-            display:'flex',gap:16,fontSize:8,color:'#1a4050',flexShrink:0,
-          }}>
-            <span style={{color:lesson.accent+'66'}}>● trail</span>
-            <span style={{color:'#4dd0ff66'}}>◎ waypoints</span>
-            <span style={{color:'#cc44ff66'}}>→ velocity</span>
-            <span style={{color:'#ffe04044'}}>— ideal path</span>
-            <div style={{flex:1}}/>
-            <span>mission {lesson.id}/10</span>
+          <div className="px-4 py-2 border-t border-slate-200 dark:border-slate-800/60 bg-slate-100/80 dark:bg-slate-900/80 flex gap-4 text-[9px] text-slate-500 dark:text-slate-400 shrink-0 font-bold tracking-widest uppercase">
+            <span style={{color:lesson.accent}}>● trail</span>
+            <span className="text-sky-500">◎ waypoints</span>
+            <span className="text-purple-500">→ velocity</span>
+            <span className="text-amber-500">— ideal path</span>
           </div>
 
           {/* Math viz */}
           {mathVizData && (
-            <div style={{
-              padding:'8px 12px',borderTop:`1px solid ${lesson.accent}22`,
-              background:'#04080f',flexShrink:0,
-            }}>
-              <div style={{fontSize:8,letterSpacing:2,color:lesson.accent,marginBottom:6}}>
+            <div className="px-5 py-4 border-t border-slate-200 dark:border-slate-800/60 bg-white dark:bg-slate-900/60 shrink-0 shadow-inner">
+              <div className="text-[9px] tracking-widest font-black uppercase mb-2" style={{color:lesson.accent}}>
                 {mathVizData.label||'LIVE MATH'}
               </div>
               {mathVizData.type==='vector'&&mathVizData.lines.map((ln,i)=>(
-                <div key={i} style={{display:'flex',gap:8,marginBottom:3,fontSize:11,fontFamily:'monospace'}}>
-                  <span style={{color:'#2a4870',minWidth:140}}>{ln.label}</span>
-                  <span style={{color:ln.color}}>{ln.value}</span>
+                <div key={i} className="flex gap-3 mb-1 text-[12px] font-mono font-medium">
+                  <span className="text-slate-500 dark:text-slate-400 min-w-[140px] uppercase tracking-wide text-[10px] mt-0.5">{ln.label}</span>
+                  <span style={{color:ln.color}} className="font-bold">{ln.value}</span>
                 </div>
               ))}
               {mathVizData.type==='matrix'&&(
                 <>
-                  <div style={{fontSize:10,color:'#7a9ab8',marginBottom:4}}>{mathVizData.note}</div>
-                  <div style={{fontFamily:'monospace',fontSize:11,color:'#c8e8ff',lineHeight:2}}>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-2 font-medium tracking-wide">{mathVizData.note}</div>
+                  <div className="font-mono text-[12px] text-slate-700 dark:text-slate-200 leading-relaxed font-bold">
                     {mathVizData.rows.map((row,i)=>(
-                      <div key={i} style={{display:'flex',gap:0}}>
-                        <span style={{color:'#4a6880',marginRight:4}}>⎢</span>
+                      <div key={i} className="flex">
+                        <span className="text-slate-300 dark:text-slate-600 mr-2">⎢</span>
                         {row.map((cell,j)=>(
-                          <span key={j} style={{minWidth:90,color:lesson.accent,textAlign:'right',paddingRight:12}}>{cell}</span>
+                          <span key={j} className="min-w-[90px] text-right pr-4" style={{color:lesson.accent}}>{cell}</span>
                         ))}
-                        <span style={{color:'#4a6880'}}>⎥</span>
+                        <span className="text-slate-300 dark:text-slate-600">⎥</span>
                       </div>
                     ))}
                   </div>
@@ -1561,44 +1536,37 @@ export default function DroneLab({ onBack }) {
         </div>
 
         {/* Right panel */}
-        <div style={{flex:1,display:'flex',flexDirection:'column',minWidth:0,overflow:'hidden'}}>
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-white/80 dark:bg-slate-950/80">
 
           {/* Tab bar */}
-          <div style={{
-            display:'flex',alignItems:'center',gap:0,
-            background:'#050d18',borderBottom:'1px solid #1a3040',flexShrink:0,
-          }}>
+          <div className="flex items-center bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/60 shrink-0 px-2">
             {[['editor','FLIGHT PROGRAM'],['theory','THEORY'],['console','CONSOLE']].map(([tab,label])=>(
-              <button key={tab} onClick={()=>setRightTab(tab)} style={{
-                background:rightTab===tab?'#0a1622':'transparent',
-                border:'none',borderBottom:rightTab===tab?`2px solid ${lesson.accent}`:'2px solid transparent',
-                color:rightTab===tab?lesson.accent:'#2a5070',
-                padding:'8px 14px',fontSize:9,fontFamily:'inherit',cursor:'pointer',letterSpacing:2,
-              }}>{label}</button>
+              <button key={tab} onClick={()=>setRightTab(tab)} className={`
+                border-none px-4 py-3 text-[10px] font-black uppercase tracking-[0.15em] cursor-pointer transition-all bg-transparent
+                ${rightTab===tab ? 'text-slate-800 dark:text-white border-b-2' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent'}
+              `} style={rightTab === tab ? { borderBottomColor: lesson.accent } : {}}>
+                {label}
+              </button>
             ))}
-            <div style={{flex:1}}/>
+            <div className="flex-1"/>
             {/* Language selector */}
-            <div style={{display:'flex',gap:4,paddingRight:10}}>
+            <div className="flex gap-1.5 pr-3">
               {['js','python','matlab'].map(l=>(
-                <button key={l} onClick={()=>setLang(l)} style={{
-                  background:lang===l?langColors[l]+'22':'transparent',
-                  border:`1px solid ${lang===l?langColors[l]+'88':'#1a3040'}`,
-                  color:lang===l?langColors[l]:'#2a5070',
-                  padding:'3px 8px',fontSize:9,borderRadius:3,fontFamily:'inherit',cursor:'pointer',
-                  transition:'all 0.15s',
-                }}>{l==='js'?'JS':l==='python'?'Python':'MATLAB'}</button>
+                <button key={l} onClick={()=>setLang(l)} className={`
+                  px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer transition-all border
+                  ${lang===l ? 'shadow-sm' : 'bg-transparent border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50'}
+                `} style={lang === l ? { background: langColors[l]+'22', borderColor: langColors[l]+'88', color: langColors[l] } : {}}>
+                  {l==='js'?'JS':l==='python'?'Python':'MATLAB'}
+                </button>
               ))}
             </div>
           </div>
 
           {/* Editor tab */}
           {rightTab==='editor'&&(
-            <div style={{flex:1,display:'flex',flexDirection:'column',minHeight:0}}>
-              <div style={{
-                display:'flex',alignItems:'center',gap:8,padding:'6px 12px',
-                background:'#0a1622',borderBottom:'1px solid #1a3040',flexShrink:0,
-              }}>
-                <div style={{fontSize:8,letterSpacing:2,color:'#2a5570',flex:1}}>
+            <div className="flex-1 flex flex-col min-h-0 bg-slate-50 dark:bg-[#07070f]">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-100 dark:bg-[#0a101a] border-b border-slate-200 dark:border-slate-800/60 shrink-0">
+                <div className="text-[10px] font-bold tracking-wide text-slate-500 dark:text-slate-400 flex-1 font-mono">
                   {lang==='js'?'drone.move(dx,dy) · drone.moveTo(x,y) · math.dot/normalize/matMul/project'
                    :lang==='python'?'drone.move(dx,dy) · drone.moveTo(x,y) · math.dot/normalize/mat_mul/project'
                    :'drone_move(dx,dy) · drone_move_to(x,y) · dot/norm/atan2'}
@@ -1608,10 +1576,9 @@ export default function DroneLab({ onBack }) {
                   const c=lang==='python'?lesson.pyStarter:lang==='matlab'?lesson.matStarter:lesson.starter
                   setCode(c)
                   setResults([]); setSyntaxErr(null); setRuntimeErr(null)
-                }} style={{
-                  background:'transparent',border:'1px solid #1a3040',color:'#3a6070',
-                  padding:'2px 8px',fontSize:9,cursor:'pointer',fontFamily:'inherit',borderRadius:3,
-                }}>↺ Reset</button>
+                }} className="bg-white dark:bg-transparent border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide cursor-pointer rounded-lg transition-colors shadow-sm">
+                  ↺ Reset
+                </button>
                 <button onClick={()=>{
                   const next=!showSolution
                   setShowSolution(next)
@@ -1620,25 +1587,26 @@ export default function DroneLab({ onBack }) {
                     const c=lang==='python'?lesson.pyStarter:lang==='matlab'?lesson.matStarter:lesson.starter
                     setCode(c)
                   }
-                }} style={{
-                  background:showSolution?'#0a2a10':'transparent',
-                  border:`1px solid ${showSolution?'#44ff88':'#1a3040'}`,
-                  color:showSolution?'#44ff88':'#3a6070',
-                  padding:'2px 8px',fontSize:9,cursor:'pointer',fontFamily:'inherit',borderRadius:3,
-                }}>Solution</button>
-                <button onClick={runCode} disabled={isRunning} style={{
-                  background:allPass?'#0a2a10':isRunning?'#0a1020':'#0a1628',
-                  border:`1px solid ${allPass?'#44ff88':lesson.accent}`,
-                  color:allPass?'#44ff88':lesson.accent,
-                  padding:'4px 18px',fontSize:11,cursor:isRunning?'wait':'pointer',
-                  letterSpacing:2,fontFamily:'inherit',borderRadius:3,
-                  opacity:isRunning?0.7:1,
+                }} className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide cursor-pointer rounded-lg transition-colors shadow-sm border ${
+                  showSolution 
+                    ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                    : 'bg-white dark:bg-transparent border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}>
+                  Solution
+                </button>
+                <button onClick={runCode} disabled={isRunning} className={`
+                  px-6 py-1.5 text-[11px] font-black uppercase tracking-widest cursor-pointer rounded-lg transition-all shadow-md
+                  ${isRunning ? 'opacity-70 cursor-wait' : 'hover:scale-[1.02] active:scale-[0.98]'}
+                `} style={{
+                  background: allPass ? '#10b981' : isRunning ? 'transparent' : lesson.accent,
+                  color: isRunning ? lesson.accent : '#fff',
+                  border: `2px solid ${allPass ? '#10b981' : lesson.accent}`
                 }}>
                   {isRunning?'▶ FLYING…':allPass?'✓ COMPLETE':'▶ RUN'}
                 </button>
               </div>
 
-              <div style={{ flex:1, minHeight:0, opacity:showSolution?0.75:1 }}>
+              <div className={`flex-1 min-h-0 ${showSolution ? 'opacity-75' : 'opacity-100'} transition-opacity`}>
                 <Editor
                   height="100%"
                   language={lang==='python'?'python':lang==='matlab'?'openmat':'javascript'}
@@ -1647,10 +1615,10 @@ export default function DroneLab({ onBack }) {
                   theme="open-calc-dark"
                   beforeMount={setupOpenCalcMonaco}
                   options={{
-                    fontSize:13,lineHeight:20,
+                    fontSize:13,lineHeight:22,
                     fontFamily:'"Fira Code","JetBrains Mono","SF Mono",monospace',
                     minimap:{enabled:false},scrollBeyondLastLine:false,
-                    padding:{top:12,bottom:12},tabSize:2,wordWrap:'on',
+                    padding:{top:16,bottom:16},tabSize:2,wordWrap:'on',
                     renderWhitespace:'none',overviewRulerLanes:0,
                     readOnly:showSolution,
                   }}
@@ -1659,31 +1627,28 @@ export default function DroneLab({ onBack }) {
 
               {/* Results panel */}
               {(syntaxErr||runtimeErr||results.length>0)&&(
-                <div style={{
-                  borderTop:'1px solid #1a3040',background:'#04080f',
-                  padding:'10px 14px',overflowY:'auto',maxHeight:180,flexShrink:0,
-                }}>
+                <div className="border-t border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-900/50 p-4 overflow-y-auto max-h-[220px] shrink-0 shadow-inner">
                   {syntaxErr&&(
-                    <div style={{marginBottom:8}}>
-                      <div style={{fontSize:8,color:'#ff4455',letterSpacing:2,marginBottom:4}}>SYNTAX ERROR</div>
-                      <div style={{fontFamily:'monospace',fontSize:11,color:'#ff6670',padding:'4px 8px',background:'#1a0508',border:'1px solid #ff445533'}}>{syntaxErr}</div>
+                    <div className="mb-3">
+                      <div className="text-[10px] text-rose-500 font-black tracking-widest uppercase mb-1.5">Syntax Error</div>
+                      <div className="font-mono text-[12px] text-rose-600 dark:text-rose-400 px-3 py-2 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/30 rounded-lg shadow-sm">{syntaxErr}</div>
                     </div>
                   )}
                   {runtimeErr&&(
-                    <div style={{marginBottom:8}}>
-                      <div style={{fontSize:8,color:'#ff8844',letterSpacing:2,marginBottom:4}}>WHAT WENT WRONG</div>
-                      <div style={{fontFamily:'monospace',fontSize:11,color:'#ff9955',padding:'4px 8px',background:'#1a0a04',border:'1px solid #ff884433',lineHeight:1.6}}>{runtimeErr}</div>
+                    <div className="mb-3">
+                      <div className="text-[10px] text-orange-500 font-black tracking-widest uppercase mb-1.5">What went wrong</div>
+                      <div className="font-mono text-[12px] text-orange-700 dark:text-orange-400 px-3 py-2 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 rounded-lg leading-relaxed shadow-sm">{runtimeErr}</div>
                     </div>
                   )}
                   {results.length>0&&(
                     <>
-                      <div style={{fontSize:8,color:'#2a5570',letterSpacing:2,marginBottom:6}}>MISSION OBJECTIVES</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-black tracking-widest uppercase mb-3 mt-2">Mission Objectives</div>
                       {results.map((r,i)=>(
-                        <div key={i} style={{display:'flex',alignItems:'flex-start',gap:8,marginBottom:6}}>
-                          <span style={{color:r.pass?'#44ff88':'#ff4455',fontSize:12,flexShrink:0}}>{r.pass?'✓':'✗'}</span>
+                        <div key={i} className="flex items-start gap-3 mb-2 bg-white dark:bg-slate-800/50 p-2.5 rounded-lg border border-slate-200 dark:border-white/5 shadow-sm">
+                          <span className={`text-[14px] shrink-0 font-bold ${r.pass?'text-emerald-500':'text-rose-500'}`}>{r.pass?'✓':'✗'}</span>
                           <div>
-                            <div style={{fontSize:11,color:r.pass?'#44ff88':'#ff6670',fontFamily:'monospace'}}>{r.label}</div>
-                            {!r.pass&&r.hint&&<div style={{fontSize:10,color:'#4a7060',marginTop:2,lineHeight:1.5}}>Hint: {r.hint}</div>}
+                            <div className={`text-[12px] font-mono font-bold ${r.pass?'text-emerald-600 dark:text-emerald-400':'text-rose-600 dark:text-rose-400'}`}>{r.label}</div>
+                            {!r.pass&&r.hint&&<div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed font-medium">Hint: {r.hint}</div>}
                           </div>
                         </div>
                       ))}
@@ -1696,35 +1661,39 @@ export default function DroneLab({ onBack }) {
 
           {/* Theory tab */}
           {rightTab==='theory'&&(
-            <div style={{flex:1,overflowY:'auto',padding:'16px 18px'}}>
-              <div style={{fontSize:14,color:lesson.accent,fontWeight:700,marginBottom:4}}>{lesson.title}</div>
-              <div style={{fontSize:11,color:'#4a7090',marginBottom:16}}>{lesson.subtitle}</div>
+            <div className="flex-1 overflow-y-auto p-8 scroll-smooth bg-white dark:bg-transparent">
+              <div className="text-[24px] font-black mb-1 font-sans" style={{color:lesson.accent}}>{lesson.title}</div>
+              <div className="text-[13px] text-slate-500 dark:text-slate-400 mb-8 font-medium font-sans">— {lesson.subtitle}</div>
               {lesson.book.map((b,i)=>(
-                <div key={i} style={{marginBottom:18}}>
-                  <div style={{fontSize:10,color:lesson.accent,letterSpacing:1,marginBottom:4,fontWeight:700}}>▸ {b.h}</div>
-                  <pre style={{
-                    margin:0,padding:'8px 12px',background:'#050d16',borderLeft:`2px solid ${lesson.accent}66`,
-                    fontSize:12,color:'#c8e8ff',lineHeight:1.9,whiteSpace:'pre',fontFamily:'inherit',
-                    overflowX:'auto',marginBottom:6,
-                  }}>{b.tex}</pre>
-                  {b.note&&<div style={{fontSize:11,color:'#4a7090',lineHeight:1.6,paddingLeft:4}}>{b.note}</div>}
+                <div key={i} className="mb-8">
+                  <div className="text-[11px] font-black tracking-widest uppercase mb-3 flex items-center gap-2" style={{color:lesson.accent}}>
+                    <span className="opacity-50">▸</span> {b.h}
+                  </div>
+                  <pre className="m-0 p-4 bg-slate-50 dark:bg-[#07090f] border border-slate-200 dark:border-white/5 rounded-xl text-[13px] text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre overflow-x-auto mb-3 shadow-inner font-medium"
+                    style={{ borderLeft: `3px solid ${lesson.accent}` }}>
+                    {b.tex}
+                  </pre>
+                  {b.note&&<div className="text-[13px] text-slate-600 dark:text-slate-400 leading-relaxed px-2 font-medium bg-slate-50/50 dark:bg-transparent p-2 rounded">{b.note}</div>}
                 </div>
               ))}
-              <div style={{marginTop:16,padding:'10px 12px',background:'#050d16',borderLeft:`2px solid ${lesson.accent}33`}}>
-                <div style={{fontSize:8,color:lesson.accent,letterSpacing:2,marginBottom:4}}>⬡ REAL DRONE APPLICATION</div>
-                <div style={{fontSize:11,color:'#4a8090',lineHeight:1.7}}>{lesson.realWorld}</div>
+              
+              <div className="mt-10 p-5 bg-slate-50 dark:bg-[#07090f] rounded-xl border border-slate-200 dark:border-white/5 shadow-sm relative overflow-hidden" style={{ borderTop: `3px solid ${lesson.accent}` }}>
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'repeating-linear-gradient(45deg,currentColor,currentColor 1px,transparent 1px,transparent 8px)' }} />
+                <div className="text-[10px] font-black tracking-widest uppercase mb-3 relative z-10" style={{color:lesson.accent}}>⬡ Real Drone Application</div>
+                <div className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium relative z-10">{lesson.realWorld}</div>
               </div>
+              
               {lesson.codeRef&&(
-                <div style={{marginTop:16}}>
-                  <div style={{fontSize:8,letterSpacing:2,color:'#44ff88',marginBottom:8}}>CODE REFERENCE</div>
+                <div className="mt-10 border-t border-slate-200 dark:border-slate-800/60 pt-8">
+                  <div className="text-[10px] tracking-widest font-black text-emerald-600 dark:text-emerald-400 mb-5 uppercase">Code Reference</div>
                   {lesson.codeRef.map((c,i)=>(
-                    <div key={i} style={{marginBottom:10}}>
-                      <div style={{fontSize:9,color:'#44ff88aa',marginBottom:3}}>▸ {c.l}</div>
-                      <pre style={{
-                        margin:0,padding:'6px 10px',background:'#050d16',border:'1px solid #0d2a1a',
-                        fontSize:11,color:'#c8e8ff',lineHeight:1.7,fontFamily:'inherit',
-                        whiteSpace:'pre',overflowX:'auto',
-                      }}>{c.c}</pre>
+                    <div key={i} className="mb-4">
+                      <div className="text-[11px] text-emerald-600 dark:text-emerald-500/80 mb-2 font-bold flex items-center gap-2">
+                        <span className="opacity-50">▸</span> {c.l}
+                      </div>
+                      <pre className="m-0 p-3 bg-slate-50 dark:bg-[#050c18] border border-slate-200 dark:border-[#0d2a1a] rounded-lg text-[12px] text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre overflow-x-auto shadow-inner font-medium">
+                        {c.c}
+                      </pre>
                     </div>
                   ))}
                 </div>
@@ -1734,24 +1703,16 @@ export default function DroneLab({ onBack }) {
 
           {/* Console tab */}
           {rightTab==='console'&&(
-            <div style={{flex:1,display:'flex',flexDirection:'column',minHeight:0}}>
-              <div style={{
-                display:'flex',alignItems:'center',justifyContent:'space-between',
-                padding:'6px 12px',background:'#0a1622',borderBottom:'1px solid #1a3040',flexShrink:0,
-              }}>
-                <span style={{fontSize:8,color:'#2a4870',letterSpacing:2}}>OUTPUT / CONSOLE</span>
-                <button onClick={()=>setConsoleLines([])} style={{
-                  background:'transparent',border:'1px solid #1a3040',color:'#3a6070',
-                  padding:'2px 8px',fontSize:9,cursor:'pointer',fontFamily:'inherit',borderRadius:3,
-                }}>Clear</button>
+            <div className="flex-1 flex flex-col min-h-0 bg-slate-50 dark:bg-[#07070f]">
+              <div className="flex items-center justify-between px-4 py-2 bg-slate-100 dark:bg-[#0a101a] border-b border-slate-200 dark:border-slate-800/60 shrink-0">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-black tracking-widest uppercase">Output / Console</span>
+                <button onClick={()=>setConsoleLines([])} className="bg-white dark:bg-transparent border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 px-3 py-1 text-[10px] font-bold uppercase tracking-wide cursor-pointer rounded-lg transition-colors shadow-sm">
+                  Clear
+                </button>
               </div>
-              <pre style={{
-                flex:1,margin:0,padding:'12px 16px',background:'#050c18',
-                color:'#7dd3fc',fontFamily:'inherit',fontSize:11,lineHeight:1.8,
-                overflowY:'auto',whiteSpace:'pre-wrap',minHeight:0,
-              }}>
+              <pre className="flex-1 m-0 p-5 bg-white dark:bg-[#03060a] text-slate-700 dark:text-sky-300 text-[12px] leading-relaxed overflow-y-auto whitespace-pre-wrap min-h-0 font-medium">
                 {consoleLines.length===0
-                  ? <span style={{color:'#1a3050'}}>{'// Output from print() / console.log() will appear here after ▶ RUN'}</span>
+                  ? <span className="text-slate-400 dark:text-slate-600 italic">{'// Output from print() / console.log() will appear here after ▶ RUN'}</span>
                   : consoleLines.join('\n')}
               </pre>
             </div>

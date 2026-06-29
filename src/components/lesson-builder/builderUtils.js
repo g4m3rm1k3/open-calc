@@ -145,12 +145,32 @@ export function blocksToState(blocks, imageImportQueue) {
       return { _id, type: 'image', importPath: recovered?.importPath ?? '', _importIdentifier: recovered?.identifier ?? '', alt: b.alt ?? '', caption: b.caption ?? '', _previewSrc: b.src ?? '' }
     }
     if (b.type === 'prose') {
+      // Some prose blocks store a single markdown string under `md` instead
+      // of `paragraphs` (an array) — reading only `paragraphs` silently
+      // discarded the entire block's text. Track which shape the original
+      // used so it round-trips back the same way.
+      if (b.paragraphs === undefined && typeof b.md === 'string') {
+        return { _id, type: 'prose', paragraphs: [b.md], _proseKey: 'md' }
+      }
       return { _id, type: 'prose', paragraphs: b.paragraphs ?? [] }
     }
     if (b.type === 'viz') {
-      return { _id, type: 'viz', vizId: b.id ?? '', title: b.title ?? '', caption: b.caption ?? '', mathBridge: b.mathBridge ?? '', props: b.props ?? {} }
+      // Viz config lives under `props` in most lessons but `initialProps` in
+      // others (the LA-style convention) — reading only `props` silently
+      // dropped every initialProps-shaped config (confirmed in 65 real
+      // lessons). Track which key the original used so it round-trips back
+      // under the same name instead of always normalizing to `props`.
+      const propsKey = b.props !== undefined ? 'props' : b.initialProps !== undefined ? 'initialProps' : 'props'
+      return { _id, type: 'viz', vizId: b.id ?? '', title: b.title ?? '', caption: b.caption ?? '', mathBridge: b.mathBridge ?? '', props: b[propsKey] ?? {}, _propsKey: propsKey }
     }
     if (b.type === 'callout') {
+      // Most callout blocks nest their content under `callout: {type, title,
+      // body}`, but some are flat — {type:'callout', kind, title, body}
+      // directly on the block. Reading only the nested shape silently
+      // discarded the entire callout (title AND body) for the flat ones.
+      if (b.callout === undefined && (b.kind !== undefined || b.title !== undefined || b.body !== undefined)) {
+        return { _id, type: 'callout', calloutType: b.kind ?? 'insight', title: b.title ?? '', body: b.body ?? '', _calloutFlat: true }
+      }
       return { _id, type: 'callout', calloutType: b.callout?.type ?? 'insight', title: b.callout?.title ?? '', body: b.callout?.body ?? '' }
     }
     // math / stepthrough / anything else the editor doesn't special-case —
@@ -170,6 +190,7 @@ export function stateToBlocks(blocks) {
       return { type: 'image', src: { __importRef: true, path: b.importPath, identifier: b._importIdentifier || '' }, alt: b.alt ?? '', caption: b.caption ?? '' }
     }
     if (b.type === 'prose') {
+      if (b._proseKey === 'md') return { type: 'prose', md: (b.paragraphs ?? []).join('\n\n') }
       return { type: 'prose', paragraphs: b.paragraphs ?? [] }
     }
     if (b.type === 'viz') {
@@ -177,10 +198,11 @@ export function stateToBlocks(blocks) {
       if (b.title)      v.title = b.title
       if (b.caption)    v.caption = b.caption
       if (b.mathBridge) v.mathBridge = b.mathBridge
-      if (b.props && Object.keys(b.props).length) v.props = b.props
+      if (b.props && Object.keys(b.props).length) v[b._propsKey ?? 'props'] = b.props
       return v
     }
     if (b.type === 'callout') {
+      if (b._calloutFlat) return { type: 'callout', kind: b.calloutType, title: b.title, body: b.body }
       return { type: 'callout', callout: { type: b.calloutType, title: b.title, body: b.body } }
     }
     return b._raw ?? b
@@ -252,19 +274,27 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
   }
 
   // Intuition / Rigor: blocks[] (new prose+image pattern) takes priority
-  // over the legacy prose[]/callouts[] shape when present.
+  // over the legacy prose[]/callouts[]/visualizations[] shape when present.
+  // Detect on ANY of those three sub-fields, not just .prose — a section
+  // that's purely visual (visualizations but no prose text) used to fail
+  // this check entirely, so the whole section (including its visualizations)
+  // got deleted as "removed by user" on every save, even with zero edits.
   if (lesson.intuition?.blocks?.length) {
     add('intuition', { blocks: blocksToState(lesson.intuition.blocks, imageImportQueue), callouts: lesson.intuition.callouts ?? [] })
-  } else if (lesson.intuition?.prose) {
+  } else if (lesson.intuition?.prose || lesson.intuition?.callouts?.length || lesson.intuition?.visualizations?.length) {
     add('intuition', { prose: lesson.intuition.prose ?? [], callouts: lesson.intuition.callouts ?? [], children: vizsToChildren(lesson.intuition.visualizations) })
   }
   if (lesson.math)      add('math',      { prose: lesson.math.prose ?? [], equations: lesson.math.equations ?? [], callouts: lesson.math.callouts ?? [], children: vizsToChildren(lesson.math.visualizations) })
   if (lesson.rigor?.blocks?.length) {
     add('rigor', { blocks: blocksToState(lesson.rigor.blocks, imageImportQueue), callouts: lesson.rigor.callouts ?? [] })
-  } else if (lesson.rigor?.prose) {
+  } else if (lesson.rigor?.prose || lesson.rigor?.callouts?.length || lesson.rigor?.visualizations?.length) {
     add('rigor', { prose: lesson.rigor.prose ?? [], callouts: lesson.rigor.callouts ?? [], children: vizsToChildren(lesson.rigor.visualizations) })
   }
-  if (lesson.examples?.length)    add('examples',    { items: lesson.examples.map(ex => ({ ...ex, steps: ex.steps ?? [] })) })
+  // Pass examples through verbatim — don't synthesize a steps:[] field for
+  // items that never had one. ExamplesBlock.jsx already reads `ex.steps ?? []`
+  // defensively wherever it renders, so this is safe; writing it unconditionally
+  // here previously added a spurious empty array to ~260 lessons.
+  if (lesson.examples?.length) add('examples', { items: lesson.examples })
   if (lesson.challenges?.length)  add('challenges',  { items: lesson.challenges })
   if (lesson.checkpoints?.length) add('checkpoints', { items: lesson.checkpoints })
   if (lesson.quiz?.length)        add('quiz',        { items: lesson.quiz })
@@ -284,16 +314,41 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
   // Semantic / pedagogical layers
   if (lesson.semantics)                      add('semantics',       { core: lesson.semantics.core ?? [], rulesOfThumb: lesson.semantics.rulesOfThumb ?? [] })
   if (lesson.spiral)                         add('spiral',          { recoveryPoints: lesson.spiral.recoveryPoints ?? [], futureLinks: lesson.spiral.futureLinks ?? [] })
-  if (lesson.assessment)                     add('assessment',      { items: lesson.assessment.questions ?? [] })
+  // assessment is usually {questions:[...]}, but some lessons store it as a
+  // bare array, or even a plain string (a single free-text prompt — e.g.
+  // src/courses/linear-algebra/10-advanced-theory/001-dual-spaces.js). Reading
+  // .questions off either of those silently produced items:[], discarding the
+  // real content. The builder only has UI for the {questions} shape, so for
+  // the other two, leave it out of `sections` entirely — _unrecognizedKeys
+  // below stops the serializer from deleting it as a result.
+  if (Array.isArray(lesson.assessment?.questions))
+    add('assessment', { items: lesson.assessment.questions })
   if (lesson.misconceptions?.length)         add('misconceptions',  { items: lesson.misconceptions })
   if (lesson.transferPrompts?.length)        add('transferPrompts', { items: lesson.transferPrompts })
   if (lesson.debugging?.length)              add('debugging',       { items: lesson.debugging })
   if (lesson.mastery)                        add('mastery',         {
-    targetLevel:               lesson.mastery.targetLevel ?? 1,
+    // Leave targetLevel undefined when absent rather than defaulting to 1 —
+    // MasteryBlock.jsx already renders/edits it safely either way (`?? 1` at
+    // display time), and defaulting here meant the serializer's `!= null`
+    // presence check could never see "this lesson never set a target level".
+    targetLevel:               lesson.mastery.targetLevel,
     solveIndependently:        lesson.mastery.solveIndependently ?? '',
     explainVerbally:           lesson.mastery.explainVerbally ?? '',
     detectIncorrectApplication: lesson.mastery.detectIncorrectApplication ?? '',
     transferToUnfamiliar:      lesson.mastery.transferToUnfamiliar ?? '',
+  })
+
+  // Safety net: any key the builder normally owns (HANDLED_SECTION_KEYS) that's
+  // actually present on the raw lesson but didn't get turned into a section
+  // above — because its value didn't match the shape that key's `if` check
+  // expects (e.g. assessment-as-a-string, or some future surprise) — gets
+  // listed here so the serializer below knows to leave it completely alone
+  // instead of deleting it as "removed by the user".
+  const _handledOrigKeys = new Set(sections.map(s => s._origKey ?? s.type))
+  const _unrecognizedKeys = [...HANDLED_SECTION_KEYS].filter(key => {
+    if (_handledOrigKeys.has(key)) return false
+    if (key === 'notebooks') return lesson.notebooks !== undefined
+    return lesson[key] !== undefined
   })
 
   // Detect old-format lessons: they have subject/sequential but no id/slug/chapter.
@@ -301,11 +356,19 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
   const _oldFormat = !lesson.id && !lesson.slug && !!(lesson.subject || lesson.sequential != null)
   const _varName = sourceText.match(/\bconst\s+([A-Z_][A-Z0-9_]*)\s*=\s*\{/)?.[1] ?? null
 
+  // Neither the recognized old format nor the standard one (has id or slug) —
+  // surfaced in the builder UI so edits to a genuinely unrecognized shape get a
+  // visible warning instead of silently being treated as "standard" and risking
+  // fields the new-format overlay doesn't know to preserve.
+  const _format = _oldFormat ? 'old-sequential' : (lesson.id || lesson.slug) ? 'standard' : 'unknown'
+
+  const derivedChapter = (chapterId ?? '').replace(/-\d+$/, '')
+
   return {
     meta: {
       id: lesson.id ?? '',
       slug: lesson.slug ?? lessonSlug ?? '',
-      chapter: lesson.chapter ?? (chapterId ?? '').replace(/-\d+$/, ''),
+      chapter: lesson.chapter ?? derivedChapter,
       order: lesson.order ?? 1,
       title: lesson.title ?? '',
       subtitle: lesson.subtitle ?? '',
@@ -323,6 +386,11 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
     // instant this lesson got saved. Treat the whole string as the question
     // instead, and flag it as legacy so the serializer can round-trip it back
     // to a plain string unless the user actually edits the hook.
+    //
+    // A third real shape (14 lessons in the corpus as of this writing, e.g.
+    // src/courses/geometry/3-geometry-3/005-midpoint-section.js): no `hook`
+    // field at all. Without `_hadHook`, buildLessonObject would inject a
+    // brand-new empty hook object on save even with zero edits.
     hook: typeof lesson.hook === 'string'
       ? { question: lesson.hook, realWorldContext: '', previewVisualizationId: '', _legacyString: true }
       : {
@@ -337,7 +405,18 @@ export function lessonToState(lesson, chapterId, lessonSlug, sourceText = '') {
     _chapterId: chapterId ?? '',
     _lessonSlug: lessonSlug ?? '',
     _oldFormat,
+    _format,
     _varName,
+    _hadHook: lesson.hook !== undefined,
+    _hadChapter: lesson.chapter !== undefined,
+    _derivedChapter: derivedChapter,
+    _unrecognizedKeys,
+    _hadPrerequisites: lesson.prerequisites !== undefined,
+    _hadCoreConcept: lesson.coreConcept !== undefined,
+    _hadTimeToComplete: lesson.timeToComplete !== undefined,
+    _hadOrder: lesson.order !== undefined,
+    _hadSubtitle: lesson.subtitle !== undefined,
+    _hadTags: lesson.tags !== undefined,
   }
 }
 
@@ -363,5 +442,19 @@ export function emptyState(_chapterId = '', _lessonSlug = '') {
     _raw: null,
     _chapterId,
     _lessonSlug,
+    _format: 'standard',
+    // A brand-new lesson has nothing to "preserve the absence of" — write the
+    // standard shape (hook + chapter present) rather than treating it like an
+    // existing lesson that never had these fields.
+    _hadHook: true,
+    _hadChapter: true,
+    _derivedChapter: _chapterId.replace(/-\d+$/, ''),
+    _unrecognizedKeys: [],
+    _hadPrerequisites: true,
+    _hadCoreConcept: true,
+    _hadTimeToComplete: true,
+    _hadOrder: true,
+    _hadSubtitle: true,
+    _hadTags: true,
   }
 }

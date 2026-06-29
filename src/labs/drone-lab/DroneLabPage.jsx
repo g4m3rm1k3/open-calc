@@ -10,7 +10,10 @@ function SkyBg() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     let W, H, particles, raf
-
+    
+    // We want the particles to be slightly adaptive to theme if possible, but they're drawn in canvas.
+    // Let's just make them somewhat neutral bright cyan/blue.
+    
     function resize() {
       W = canvas.width = window.innerWidth
       H = canvas.height = window.innerHeight
@@ -43,7 +46,10 @@ function SkyBg() {
         p.x += p.vx
         p.y += p.vy
         if (p.y < -4 || p.x < -4 || p.x > W + 4) Object.assign(p, makeParticle(), { y: H + 2 })
-        ctx.fillStyle = `hsla(${p.hue}, 80%, 65%, ${p.opacity})`
+        // Check if dark mode is active. (Rough heuristic from body background or just use a fixed color that works in both)
+        const isDark = document.documentElement.classList.contains('dark') || true;
+        const colorBase = isDark ? `hsla(${p.hue}, 80%, 65%, ${p.opacity})` : `hsla(${p.hue}, 90%, 40%, ${p.opacity * 1.5})`;
+        ctx.fillStyle = colorBase;
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
         ctx.fill()
@@ -63,7 +69,7 @@ function SkyBg() {
   return (
     <canvas
       ref={canvasRef}
-      style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}
+      className="fixed inset-0 z-0 pointer-events-none opacity-50 dark:opacity-100"
     />
   )
 }
@@ -77,17 +83,12 @@ export default function DroneLabPage() {
   }, [])
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      background: 'radial-gradient(ellipse at 30% 0%, #091825 0%, #07090f 60%, #080a14 100%)',
-      overflow: 'hidden',
-      zIndex: 50,
-      display: 'flex',
-      justifyContent: 'center',
-    }}>
+    <div className="fixed inset-0 z-50 flex justify-center bg-slate-50 dark:bg-[#07090f] overflow-hidden font-sans">
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_30%_0%,rgba(14,165,233,0.1)_0%,transparent_60%)] dark:bg-[radial-gradient(ellipse_at_30%_0%,#091825_0%,transparent_60%)] z-0" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] dark:opacity-[0.03] z-0"
+        style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 39px,currentColor 39px,currentColor 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,currentColor 39px,currentColor 40px)' }} />
       <SkyBg />
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1400px', height: '100%' }}>
+      <div className="relative z-10 w-full max-w-[1600px] h-full shadow-2xl">
         <DroneLab onBack={() => navigate('/labs')} />
       </div>
     </div>

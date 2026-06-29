@@ -1,5 +1,20 @@
 import { HANDLED_SECTION_KEYS, childrenToVizs, stateToBlocks } from './builderUtils.js'
 
+// Only write `key` onto `target` if the original sub-object already had it,
+// or the new value is actually non-empty. Without this, optional sub-fields
+// like math.equations / intuition.callouts / rigor.visualizations got an
+// empty [] written into them on every save of a lesson that never had that
+// field — harmless to behavior, but real diff noise on hundreds of lessons
+// (confirmed: math.equations alone affected 650 of ~980 real lessons).
+function overlayOptional(target, rawParent, key, value) {
+  const hadKey = !!rawParent && Object.prototype.hasOwnProperty.call(rawParent, key)
+  const isEmpty = Array.isArray(value)
+    ? value.length === 0
+    : (value && typeof value === 'object' ? Object.keys(value).length === 0 : !value)
+  if (hadKey || !isEmpty) target[key] = value
+  else delete target[key]
+}
+
 // Deterministic identifier for a diagram import, matching the hand-authored
 // convention (e.g. '../diagrams/la-drone-displacement.svg' -> 'laDroneDisplacementUrl').
 function pathToImportName(path) {
@@ -24,6 +39,20 @@ function collectImports(v, importsMap) {
   for (const val of Object.values(v)) collectImports(val, importsMap)
 }
 
+// Every hand-authored lesson file uses single-quoted strings. JSON.stringify
+// always produces double-quoted ones, which meant every saved lesson re-quoted
+// every single string field — turning a one-line edit into a diff that's
+// red/green on nearly every line, real change buried in pure punctuation
+// noise. Match the source convention instead: single quotes, falling back to
+// double quotes only when the string itself contains a single quote (same
+// rule Prettier uses), so nothing needs double-escaping.
+function quoteString(v) {
+  const json = JSON.stringify(v)
+  if (v.includes("'") && !v.includes('"')) return json
+  const inner = json.slice(1, -1).replace(/\\"/g, '"').replace(/'/g, "\\'")
+  return `'${inner}'`
+}
+
 function fmtValue(v, depth = 1, importsMap = new Map()) {
   const pad = '  '.repeat(depth)
   const innerPad = '  '.repeat(depth + 1)
@@ -32,13 +61,13 @@ function fmtValue(v, depth = 1, importsMap = new Map()) {
   if (typeof v === 'object' && v.__importRef) {
     return v.path ? (importsMap.get(v.path) ?? 'undefined /* missing diagram path */') : 'undefined /* no diagram path set */'
   }
-  if (typeof v === 'string') return JSON.stringify(v)
+  if (typeof v === 'string') return quoteString(v)
   if (typeof v === 'number' || typeof v === 'boolean') return String(v)
 
   if (Array.isArray(v)) {
     if (v.length === 0) return '[]'
     if (v.every(x => typeof x === 'string' || typeof x === 'number')) {
-      const inline = '[' + v.map(x => JSON.stringify(x)).join(', ') + ']'
+      const inline = '[' + v.map(x => (typeof x === 'string' ? quoteString(x) : String(x))).join(', ') + ']'
       if (inline.length < 72) return inline
     }
     const items = v.map(x => innerPad + fmtValue(x, depth + 1, importsMap))
@@ -62,7 +91,10 @@ function fmtValue(v, depth = 1, importsMap = new Map()) {
 // object (e.g. running it through checkLessonLatex before submitting a
 // contribution) don't have to re-parse the generated source string.
 export function buildLessonObject(state) {
-  const { meta, hook, mentalModel, sections, _raw, _oldFormat } = state
+  const {
+    meta, hook, mentalModel, sections, _raw, _oldFormat, _hadHook, _hadChapter, _derivedChapter,
+    _unrecognizedKeys, _hadPrerequisites, _hadCoreConcept, _hadTimeToComplete, _hadOrder, _hadSubtitle, _hadTags,
+  } = state
 
   // Start from raw if available, otherwise from an empty base
   const base = _raw ? { ..._raw } : {}
@@ -78,18 +110,45 @@ export function buildLessonObject(state) {
     // New-format lesson: overlay all meta fields
     base.id             = meta.id
     base.slug           = meta.slug
-    base.chapter        = meta.chapter
-    base.order          = Number(meta.order) || 1
+    // chapter: ~40 real lessons have no chapter field at all (it's derived
+    // from the folder path instead). Only write it back if the original had
+    // one, or the user actually typed something other than that derived
+    // default — otherwise saving an untouched lesson would silently add a
+    // field that was never there.
+    if (_hadChapter || meta.chapter !== _derivedChapter) base.chapter = meta.chapter
+    else delete base.chapter
+    // `|| 1` treats order:0 as "missing" and silently bumps it to 1 — a real
+    // bug (68 lessons use order:0 deliberately as the first item). Only fall
+    // back to 1 when the value genuinely isn't a usable number.
+    const orderNum = Number(meta.order)
+    const resolvedOrder = Number.isFinite(orderNum) ? orderNum : 1
+    if (_hadOrder || resolvedOrder !== 1) base.order = resolvedOrder
+    else delete base.order
     base.title          = meta.title
-    base.subtitle       = meta.subtitle
-    base.tags           = meta.tags ?? []
+    if (_hadSubtitle || meta.subtitle) base.subtitle = meta.subtitle
+    else delete base.subtitle
+    if (_hadTags || meta.tags?.length) base.tags = meta.tags ?? []
+    else delete base.tags
     if (meta.aliases)    base.aliases = meta.aliases
     else if (_raw?.aliases !== undefined) delete base.aliases
-    base.coreConcept    = meta.coreConcept
-    base.prerequisites  = meta.prerequisites ?? []
-    base.timeToComplete = Number(meta.timeToComplete) || 15
+    // coreConcept / prerequisites / timeToComplete: same "don't add a field
+    // that was never there" rule already applied to aliases/nextLesson above
+    // — roughly 800 of ~980 real lessons lack these three fields entirely, so
+    // writing them unconditionally meant nearly every untouched lesson would
+    // grow three new fields the instant someone opened and saved it.
+    if (_hadCoreConcept || meta.coreConcept) base.coreConcept = meta.coreConcept
+    else delete base.coreConcept
+    if (_hadPrerequisites || meta.prerequisites?.length) base.prerequisites = meta.prerequisites ?? []
+    else delete base.prerequisites
+    if (_hadTimeToComplete || Number(meta.timeToComplete) !== 15) base.timeToComplete = Number(meta.timeToComplete) || 15
+    else delete base.timeToComplete
+    // Some lessons use nextLesson: null deliberately (end of chapter, no
+    // auto-link) — that's a falsy but real, present value. Only delete the
+    // key when it genuinely never existed; otherwise round-trip the original
+    // value back untouched unless the user actually typed something new.
     if (meta.nextLesson) base.nextLesson = meta.nextLesson
-    else if (_raw?.nextLesson !== undefined) delete base.nextLesson
+    else if (_raw?.nextLesson !== undefined) base.nextLesson = _raw.nextLesson
+    else delete base.nextLesson
   }
 
   // Old-format lessons don't have hook/mentalModel — skip them entirely
@@ -105,12 +164,19 @@ export function buildLessonObject(state) {
   // lessonToState's _legacyString handling). If it's untouched, round-trip
   // it back exactly as the original string rather than promoting it to the
   // object shape just because the builder opened the lesson.
-  if (hook._legacyString && hook.question === _raw?.hook && !hook.realWorldContext && !hook.previewVisualizationId) {
+  //
+  // A third real shape (14 lessons): no hook field at all. If the lesson never
+  // had one and the user hasn't typed anything into the hook fields, don't
+  // inject a brand-new empty hook object just because the builder opened it.
+  const hookUntouched = !hook.question && !hook.realWorldContext && !hook.previewVisualizationId
+  if (!_hadHook && hookUntouched) {
+    delete base.hook
+  } else if (hook._legacyString && hook.question === _raw?.hook && !hook.realWorldContext && !hook.previewVisualizationId) {
     base.hook = _raw.hook
   } else {
     base.hook = {
       question: hook.question,
-      realWorldContext: hook.realWorldContext,
+      ...(hook.realWorldContext || (_raw?.hook && typeof _raw.hook === 'object' && 'realWorldContext' in _raw.hook) ? { realWorldContext: hook.realWorldContext } : {}),
       ...(hook.previewVisualizationId ? { previewVisualizationId: hook.previewVisualizationId } : {}),
     }
     // Preserve any extra hook fields from raw (visualizations, etc.) — only
@@ -137,6 +203,11 @@ export function buildLessonObject(state) {
   // Remove keys for section types the builder owns but that the user has removed
   for (const key of HANDLED_SECTION_KEYS) {
     if (presentOrigKeys.has(key)) continue
+    // The raw value is present but didn't match any recognized shape for this
+    // key (e.g. assessment as a plain string/array instead of {questions}) —
+    // leave it exactly as spread from _raw rather than deleting real content
+    // just because the builder doesn't know how to edit that particular shape.
+    if (_unrecognizedKeys?.includes(key)) continue
     if (key === 'notebooks') {
       // 'notebooks' is a nested object — only remove the python sub-key
       if (base.notebooks?.python) {
@@ -160,28 +231,23 @@ export function buildLessonObject(state) {
         // both are dropped so MicroCycleLesson.jsx doesn't have a stale prose[]
         // sitting unused alongside the real blocks[] content.
         const { prose: _prose, visualizations: _viz, ...rest } = _raw?.[sec.type] ?? {}
-        base[sec.type] = {
-          ...rest,
-          blocks: stateToBlocks(sec.blocks),
-          callouts: sec.callouts ?? [],
-        }
+        base[sec.type] = { ...rest, blocks: stateToBlocks(sec.blocks) }
+        overlayOptional(base[sec.type], rest, 'callouts', sec.callouts ?? [])
       } else {
-        base[sec.type] = {
-          ...(_raw?.[sec.type] ?? {}),
-          prose: sec.prose ?? [],
-          callouts: sec.callouts ?? [],
-          visualizations: childrenToVizs(sec.children),
-        }
+        const rawSec = _raw?.[sec.type] ?? {}
+        base[sec.type] = { ...rawSec }
+        overlayOptional(base[sec.type], rawSec, 'prose', sec.prose ?? [])
+        overlayOptional(base[sec.type], rawSec, 'callouts', sec.callouts ?? [])
+        overlayOptional(base[sec.type], rawSec, 'visualizations', childrenToVizs(sec.children))
         delete base[sec.type].blocks
       }
     } else if (sec.type === 'math') {
-      base.math = {
-        ...(_raw?.math ?? {}),
-        prose: sec.prose ?? [],
-        equations: sec.equations ?? [],
-        callouts: sec.callouts ?? [],
-        visualizations: childrenToVizs(sec.children),
-      }
+      const rawMath = _raw?.math ?? {}
+      base.math = { ...rawMath }
+      overlayOptional(base.math, rawMath, 'prose', sec.prose ?? [])
+      overlayOptional(base.math, rawMath, 'equations', sec.equations ?? [])
+      overlayOptional(base.math, rawMath, 'callouts', sec.callouts ?? [])
+      overlayOptional(base.math, rawMath, 'visualizations', childrenToVizs(sec.children))
     } else if (sec.type === 'examples') {
       base.examples = sec.items ?? []
     } else if (sec.type === 'challenges') {
@@ -212,11 +278,26 @@ export function buildLessonObject(state) {
     } else if (sec.type === 'debugging') {
       base.debugging = sec.items ?? []
     } else if (sec.type === 'semantics') {
-      base.semantics = { core: sec.core ?? [], rulesOfThumb: sec.rulesOfThumb ?? [] }
+      // Spread the original first — real lessons carry extra fields the
+      // builder's UI doesn't edit (symbols, etc.); without the spread, every
+      // field outside {core, rulesOfThumb} was silently destroyed on save
+      // (confirmed: .semantics.symbols missing in 20 real lessons).
+      const rawSemantics = _raw?.semantics ?? {}
+      base.semantics = { ...rawSemantics }
+      overlayOptional(base.semantics, rawSemantics, 'core', sec.core ?? [])
+      overlayOptional(base.semantics, rawSemantics, 'rulesOfThumb', sec.rulesOfThumb ?? [])
     } else if (sec.type === 'spiral') {
-      base.spiral = { recoveryPoints: sec.recoveryPoints ?? [], futureLinks: sec.futureLinks ?? [] }
+      const rawSpiral = _raw?.spiral ?? {}
+      base.spiral = { ...rawSpiral }
+      overlayOptional(base.spiral, rawSpiral, 'recoveryPoints', sec.recoveryPoints ?? [])
+      overlayOptional(base.spiral, rawSpiral, 'futureLinks', sec.futureLinks ?? [])
     } else if (sec.type === 'mastery') {
-      const m = {}
+      // Same fix as semantics above — real lessons use many more mastery
+      // fields than the builder's 5 known ones (nextSteps, checklistItems,
+      // commonStruggles, coreSkill, commonSticking, connections, ...); without
+      // spreading _raw.mastery first, all of those were dropped on every save
+      // (confirmed across 100+ lessons combined).
+      const m = { ...(_raw?.mastery ?? {}) }
       if (sec.targetLevel != null)            m.targetLevel = sec.targetLevel
       if (sec.solveIndependently)             m.solveIndependently = sec.solveIndependently
       if (sec.explainVerbally)                m.explainVerbally = sec.explainVerbally

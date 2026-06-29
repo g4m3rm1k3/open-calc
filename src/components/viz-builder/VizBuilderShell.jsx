@@ -6,6 +6,11 @@ import ConfigMode from './modes/ConfigMode.jsx'
 import CodeMode from './modes/CodeMode.jsx'
 import NodeGraphMode from './modes/NodeGraphMode.jsx'
 import VizPreview from './VizPreview.jsx'
+import LessonTargetPicker from './LessonTargetPicker.jsx'
+import { insertVizIntoLessonState } from './insertVizIntoLesson.js'
+import { loadLesson, loadLessonSource } from '../../courses/courseLoader.js'
+import { lessonToState } from '../lesson-builder/builderUtils.js'
+import LessonExportPanel from '../lesson-builder/ExportPanel.jsx'
 
 // ── Export panel ────────────────────────────────────────────────────────────
 function CopyButton({ text, label }) {
@@ -21,6 +26,10 @@ function CopyButton({ text, label }) {
 }
 
 function ExportPanel({ vizConfig, onClose }) {
+  const [mode, setMode] = useState('snippet') // snippet | pickLesson | loading | error
+  const [lessonState, setLessonState] = useState(null)
+  const [loadError, setLoadError] = useState('')
+
   const vizObj = `{
   id: '${vizConfig.vizId}',${vizConfig.title ? `\n  title: '${vizConfig.title}',` : ''}${vizConfig.caption ? `\n  caption: '${vizConfig.caption}',` : ''}
   props: ${JSON.stringify(vizConfig.props ?? {}, null, 4).replace(/^/gm, '  ').trim()},
@@ -30,6 +39,35 @@ function ExportPanel({ vizConfig, onClose }) {
     ${vizObj}
   ],
 },`
+
+  // A viz config only has meaning embedded inside a lesson file — there's no
+  // standalone viz file to write or PR on its own. So "contribute this viz"
+  // means: load the chosen lesson's real state, insert this viz into the
+  // chosen section, and hand the result to the exact same ExportPanel lessons
+  // already use (diff/save/PR) — no separate viz contribution pipeline to
+  // build or maintain.
+  async function handlePickLesson(lesson, sectionType) {
+    setMode('loading')
+    try {
+      const [parsed, sourceText] = await Promise.all([
+        loadLesson(lesson.chapterId, lesson.slug),
+        loadLessonSource(lesson.chapterId, lesson.slug),
+      ])
+      if (!parsed) throw new Error('Lesson failed to load')
+      const baseState = lessonToState(parsed, lesson.chapterId, lesson.slug, sourceText)
+      setLessonState(insertVizIntoLessonState(baseState, sectionType, vizConfig))
+    } catch (e) {
+      setLoadError(e.message ?? String(e))
+      setMode('error')
+    }
+  }
+
+  if (lessonState) {
+    // Reuse the lesson contribution pipeline wholesale — same diff preview,
+    // save-to-disk, and submit-as-PR flow lessons already have.
+    return <LessonExportPanel state={lessonState} onClose={onClose} />
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={onClose}>
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
@@ -39,20 +77,45 @@ function ExportPanel({ vizConfig, onClose }) {
           <button onClick={onClose} className="ml-auto text-slate-400 hover:text-slate-600">✕</button>
         </div>
         <div className="flex-1 overflow-y-auto p-6 space-y-5">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Viz object</span>
-              <CopyButton text={vizObj} label="Copy viz" />
+          {mode === 'snippet' && (
+            <>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Viz object</span>
+                  <CopyButton text={vizObj} label="Copy viz" />
+                </div>
+                <pre className="text-xs font-mono bg-slate-950 text-green-300 rounded-xl p-4 overflow-x-auto">{vizObj}</pre>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Full section snippet</span>
+                  <CopyButton text={sectionSnippet} label="Copy snippet" />
+                </div>
+                <pre className="text-xs font-mono bg-slate-950 text-slate-300 rounded-xl p-4 overflow-x-auto">{sectionSnippet}</pre>
+              </div>
+              <button
+                onClick={() => setMode('pickLesson')}
+                className="w-full px-4 py-3 text-sm font-bold rounded-xl bg-brand-600 hover:bg-brand-700 text-white transition-colors"
+              >
+                Or insert directly into a lesson →
+              </button>
+            </>
+          )}
+
+          {mode === 'pickLesson' && (
+            <LessonTargetPicker onCancel={() => setMode('snippet')} onConfirm={handlePickLesson} />
+          )}
+
+          {mode === 'loading' && (
+            <p className="text-sm text-slate-500 text-center py-8">Loading lesson…</p>
+          )}
+
+          {mode === 'error' && (
+            <div className="text-center py-8 space-y-3">
+              <p className="text-sm text-red-500">Couldn't load that lesson: {loadError}</p>
+              <button onClick={() => setMode('pickLesson')} className="text-xs font-bold text-brand-600 hover:underline">← Try another lesson</button>
             </div>
-            <pre className="text-xs font-mono bg-slate-950 text-green-300 rounded-xl p-4 overflow-x-auto">{vizObj}</pre>
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wide">Full section snippet</span>
-              <CopyButton text={sectionSnippet} label="Copy snippet" />
-            </div>
-            <pre className="text-xs font-mono bg-slate-950 text-slate-300 rounded-xl p-4 overflow-x-auto">{sectionSnippet}</pre>
-          </div>
+          )}
         </div>
       </div>
     </div>

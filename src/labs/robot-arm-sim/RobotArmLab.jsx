@@ -4178,45 +4178,42 @@ export default function RobotArmLab({ onBack }) {
   const playProgress = playback.frames>0 ? Math.round((playback.frame/playback.frames)*100) : 0;
 
   const runBtn = (
-    <button onClick={handleRun} disabled={pyLoading} style={{
-      marginLeft:"auto", background:pyLoading?"#1a2e4a":mission.color+"22",
-      border:`1px solid ${pyLoading?"#2a4060":mission.color+"55"}`, borderRadius:5,
-      color:pyLoading?"#3a6080":mission.color, padding:"4px 16px", fontSize:11,
-      cursor:pyLoading?"not-allowed":"pointer",
-      fontFamily:"inherit", fontWeight:700, letterSpacing:0.5, transition:"all .2s",
-    }}>{pyLoading ? "⏳ Loading Python…" : "▶ Run"}</button>
+    <button onClick={handleRun} disabled={pyLoading} className={`
+      ml-auto rounded-lg px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-md
+      ${pyLoading ? 'bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-500 cursor-not-allowed opacity-70' : 'hover:scale-[1.02] active:scale-[0.98]'}
+    `} style={!pyLoading ? {
+      background: mission.color,
+      color: '#fff',
+      border: `2px solid ${mission.color}`
+    } : {}}>
+      {pyLoading ? "⏳ Loading Python…" : "▶ Run"}
+    </button>
   );
 
   const consolePanel = (
-    <div style={{
-      flexShrink:0, background:"#07101e", padding:"8px 14px",
-      minHeight:68, maxHeight:140, overflowY:"auto",
-      borderTop:"1px solid #1a2e4a",
-    }}>
-      <div style={{fontSize:9,color:"#1e3050",letterSpacing:1,marginBottom:4}}>
-        CONSOLE  {pyLoading&&<span style={{color:"#00c2a8"}}>— loading Python runtime…</span>}
-        {!hasRun&&!pyLoading&&<span style={{color:"#162440"}}>— press ▶ Run</span>}
+    <div className="shrink-0 bg-slate-50 dark:bg-slate-900/50 p-4 min-h-[68px] max-h-[140px] overflow-y-auto border-t border-slate-200 dark:border-slate-800/60 shadow-inner">
+      <div className="text-[9px] text-slate-500 dark:text-slate-400 font-black tracking-widest uppercase mb-1">
+        CONSOLE {pyLoading && <span className="text-sky-500 ml-1">— loading Python runtime…</span>}
+        {!hasRun && !pyLoading && <span className="text-slate-400 dark:text-slate-500 ml-1">— press ▶ Run</span>}
       </div>
-      {codeError&&<div style={{color:"#f43f5e",fontSize:11,fontFamily:"monospace",marginBottom:4}}>✗ {codeError}</div>}
-      {consoleLines.map((line,i)=>(
-        <div key={i} style={{
-          fontSize:11,fontFamily:"monospace",lineHeight:1.7,
-          color:line.startsWith("→")?(line.includes("✓")?"#10b981":line.includes("✗")?"#f43f5e":"#818cf8"):"#7dd3fc",
-        }}>{line.startsWith("→")?line:`> ${line}`}</div>
+      {codeError && <div className="text-[11px] font-mono text-rose-500 mb-1">✗ {codeError}</div>}
+      {consoleLines.map((line, i) => (
+        <div key={i} className={`text-[11px] font-mono leading-relaxed ${
+          line.startsWith("→") 
+            ? (line.includes("✓") ? "text-emerald-600 dark:text-emerald-400" : line.includes("✗") ? "text-rose-600 dark:text-rose-400" : "text-sky-600 dark:text-sky-400") 
+            : "text-slate-600 dark:text-slate-300"
+        }`}>
+          {line.startsWith("→") ? line : `> ${line}`}
+        </div>
       ))}
-      {hasRun&&!codeError&&consoleLines.length===0&&(
-        <div style={{fontSize:11,color:"#1e3050",fontFamily:"monospace"}}>(add print(...) to see intermediate values)</div>
+      {hasRun && !codeError && consoleLines.length === 0 && (
+        <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">(add print(...) to see intermediate values)</div>
       )}
     </div>
   );
 
   return (
-    <div style={{
-      height:"100vh", background:"rgba(5,10,18,0.94)",
-      fontFamily:"'JetBrains Mono',Consolas,monospace",
-      color:"#c8d8f0", display:"flex", flexDirection:"column",
-      overflow:"hidden", position:"relative",
-    }}>
+    <div className="w-full h-full bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl text-slate-800 dark:text-slate-200 font-mono flex flex-col overflow-hidden relative shadow-2xl rounded-2xl border border-slate-200/50 dark:border-white/5">
       {showIntro && (
         <IntroModal onClose={()=>{
           localStorage.setItem("rfl-intro-seen","1");
@@ -4225,55 +4222,54 @@ export default function RobotArmLab({ onBack }) {
       )}
 
       {/* ── HEADER ── */}
-      <div style={{
-        background:"#07101e", borderBottom:"1px solid #1a2e4a",
-        padding:"10px 20px", display:"flex", alignItems:"center", gap:14, flexShrink:0,
-      }}>
+      <div className="bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-white/5 px-6 py-4 flex items-center gap-4 shrink-0 shadow-sm z-10 backdrop-blur-md transition-colors duration-500">
         {onBack && <>
-          <button onClick={onBack} style={{
-            background:"none",border:"none",color:"#3a6080",
-            cursor:"pointer",fontSize:11,letterSpacing:"2px",fontFamily:"inherit",padding:0,
-          }}>← LABS</button>
-          <div style={{width:1,height:22,background:"#1a2e4a"}}/>
+          <button onClick={onBack} className="bg-transparent border-none text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white cursor-pointer text-[11px] tracking-widest font-sans font-bold px-0 transition-colors uppercase">
+            ← Labs
+          </button>
+          <div className="w-px h-6 bg-slate-200 dark:bg-slate-700/50"/>
         </>}
-        <div style={{
-          width:36,height:36,borderRadius:8,background:mission.color,
-          display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0,
-        }}>🦾</div>
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[22px] shrink-0 shadow-inner" style={{ background: mission.color + '22' }}>
+          🦾
+        </div>
         <div>
-          <div style={{fontSize:15,fontWeight:700,color:"#e8f4ff",letterSpacing:0.3}}>Robot Arm Lab</div>
-          <div style={{fontSize:9,color:"#3a5870",letterSpacing:1.2}}>
+          <div className="text-[16px] font-black tracking-wide text-slate-800 dark:text-slate-100 font-sans">Robot Arm Lab</div>
+          <div className="text-[10px] text-slate-500 dark:text-slate-400 tracking-[0.15em] uppercase font-bold mt-0.5">
             4×4 HOMOGENEOUS TRANSFORMS · FORWARD & INVERSE KINEMATICS
           </div>
         </div>
-        <button onClick={()=>setShowIntro(true)} style={{
-          background:"none", border:"1px solid #1a3050", borderRadius:5,
-          color:"#2a5070", cursor:"pointer", fontSize:10,
-          fontFamily:"inherit", padding:"3px 10px", letterSpacing:0.5,
-        }}>? Help</button>
-        <button onClick={()=>setShowTutor(t=>!t)} style={{
-          background:showTutor?"rgba(0,194,168,0.12)":"none",
-          border:`1px solid ${showTutor?"#00c2a866":"#1a3050"}`,
-          borderRadius:5, color:showTutor?"#00c2a8":"#2a5070",
-          cursor:"pointer", fontSize:10,
-          fontFamily:"inherit", padding:"3px 10px", letterSpacing:0.5,
-        }}>🤖 Tutor</button>
-        <div style={{marginLeft:"auto",display:"flex",gap:4,flexWrap:"wrap",alignItems:"center"}}>
+        
+        <button onClick={()=>setShowIntro(true)} className="bg-transparent border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide cursor-pointer transition-colors shadow-sm ml-4">
+          ? Help
+        </button>
+        <button onClick={()=>setShowTutor(t=>!t)} className={`border rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide cursor-pointer transition-colors shadow-sm ${
+          showTutor 
+            ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+            : 'bg-transparent border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+        }`}>
+          🤖 Tutor
+        </button>
+
+        <div className="ml-auto flex gap-1.5 flex-wrap items-center">
           {MISSIONS.map((m,i)=>{
             const unlocked=isUnlocked(i), done=completed.includes(i);
             return (
               <button key={i} onClick={()=>unlocked&&setMIdx(i)}
                 title={!unlocked?`Complete Mission ${i-1} first`:`M${i}: ${m.title}`}
-                style={{
-                  background:i===mIdx?m.color+"22":done?m.color+"0e":"transparent",
-                  border:`1px solid ${i===mIdx?m.color:done?m.color+"44":"#1a2e4a"}`,
-                  borderRadius:4, padding:"2px 8px", fontSize:9, fontFamily:"inherit",
-                  color:i===mIdx?m.color:done?m.color+"99":unlocked?"#3a6080":"#1e3050",
-                  cursor:unlocked?"pointer":"not-allowed", opacity:unlocked?1:0.4,
-                  display:"flex",alignItems:"center",gap:3,transition:"all .15s",minWidth:0,
-                }}>
-                {done&&<span style={{fontSize:8}}>✓</span>}
-                {!unlocked&&<span style={{fontSize:8}}>🔒</span>}
+                className={`rounded-md px-2.5 py-1 text-[10px] font-bold font-sans tracking-wide transition-all flex items-center gap-1 border ${
+                  i === mIdx 
+                    ? 'shadow-sm' 
+                    : unlocked 
+                      ? 'bg-transparent border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-700 dark:hover:text-slate-300 cursor-pointer'
+                      : 'bg-transparent border-slate-200/50 dark:border-slate-800/50 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-50'
+                }`}
+                style={i === mIdx 
+                  ? { background: m.color, color: '#fff', border: `1px solid ${m.color}` } 
+                  : done && unlocked ? { borderColor: m.color + '44', color: m.color, background: m.color + '0e' } : {}
+                }
+              >
+                {done&&<span className="text-[8px]">✓</span>}
+                {!unlocked&&<span className="text-[8px]">🔒</span>}
                 M{i}
               </button>
             );
@@ -4282,90 +4278,68 @@ export default function RobotArmLab({ onBack }) {
       </div>
 
       {/* ── MISSION BANNER ── */}
-      <div style={{
-        background:"#07101e", borderBottom:`2px solid ${mission.color}33`,
-        padding:"8px 20px", display:"flex", alignItems:"center",
-        justifyContent:"space-between", gap:16, flexShrink:0,
-      }}>
-        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
-          <span style={{
-            fontSize:9,fontWeight:700,letterSpacing:1.2,
-            background:mission.color+"22",color:mission.color,
-            border:`1px solid ${mission.color}44`,borderRadius:3,padding:"2px 8px",
-          }}>{mission.badge.toUpperCase()}</span>
-          <span style={{fontSize:13,fontWeight:700,color:"#e8f4ff"}}>{mission.title}</span>
-          <span style={{fontSize:11,color:"#3a6080"}}>{mission.tagline}</span>
-          {won&&<span style={{
-            fontSize:11,color:"#10b981",background:"rgba(16,185,129,0.1)",
-            border:"1px solid #10b98144",borderRadius:4,padding:"2px 9px",
-          }}>✓ Mission complete!</span>}
+      <div className="bg-slate-100/50 dark:bg-slate-900/40 border-b px-6 py-3 flex items-center justify-between gap-4 shrink-0 transition-colors duration-500 z-10" style={{ borderBottomColor: mission.color + '44' }}>
+        <div className="flex items-center gap-4 flex-wrap">
+          <span className="text-[10px] font-black tracking-widest px-2.5 py-1 rounded shadow-sm" style={{ background: mission.color, color: '#fff' }}>
+            {mission.badge.toUpperCase()}
+          </span>
+          <span className="text-[14px] font-bold text-slate-800 dark:text-slate-100 font-sans">{mission.title}</span>
+          <span className="text-[12px] text-slate-500 dark:text-slate-400 font-medium font-sans">— {mission.tagline}</span>
+          {won&&<span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-300 dark:border-emerald-500/30 rounded-lg px-3 py-1 shadow-sm tracking-wide flex items-center gap-1.5 ml-2">
+            <span>✓</span> Mission Complete!
+          </span>}
         </div>
         {won&&mIdx<MISSIONS.length-1&&(
-          <button onClick={()=>setMIdx(mIdx+1)} style={{
-            background:MISSIONS[mIdx+1].color+"22",
-            border:`1px solid ${MISSIONS[mIdx+1].color}55`,
-            borderRadius:6,color:MISSIONS[mIdx+1].color,
-            padding:"6px 14px",fontSize:11,cursor:"pointer",fontFamily:"inherit",flexShrink:0,
-          }}>Next Mission →</button>
+          <button onClick={()=>setMIdx(mIdx+1)} className="rounded-lg px-4 py-1.5 text-[11px] font-black uppercase tracking-widest transition-all cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98] border"
+            style={{
+              background: MISSIONS[mIdx+1].color + '22',
+              borderColor: MISSIONS[mIdx+1].color + '55',
+              color: MISSIONS[mIdx+1].color
+            }}>
+            Next Mission →
+          </button>
         )}
       </div>
 
       {/* ── BODY ── */}
-      <div style={{display:"flex",flex:1,minHeight:0,overflow:"hidden"}}>
+      <div className="flex flex-1 min-h-0 overflow-hidden bg-white/40 dark:bg-transparent">
 
         {/* LEFT: 2D canvas (2D missions) or 3D canvas (3D missions / teach3d tab) */}
-        <div style={{
-          flex:"0 0 62%",display:"flex",flexDirection:"column",
-          borderRight:"1px solid #1a2e4a",minHeight:0,overflow:"hidden",
-        }}>
+        <div className="flex-[0_0_62%] flex flex-col border-r border-slate-200 dark:border-slate-800/60 min-h-0 overflow-hidden bg-white/60 dark:bg-slate-950/40">
+          
           {/* 2D canvas — shown for 2D missions, hidden in teach3d mode or 3D missions */}
-          <div style={{
-            flex:1,display:(is3D||rightTab==="teach3d")?"none":"flex",
-            flexDirection:"column",minHeight:0,overflow:"hidden",
-          }}>
-            <div style={{flex:1,position:"relative",minHeight:0,overflow:"hidden"}}>
-              <canvas ref={canvasRef} width={620} height={520}
-                style={{width:"100%",height:"100%",display:"block"}}
-              />
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ display: (is3D||rightTab==="teach3d") ? "none" : "flex" }}>
+            <div className="flex-1 relative min-h-0 overflow-hidden bg-slate-50 dark:bg-[#03080f] shadow-inner">
+              <canvas ref={canvasRef} width={620} height={520} className="w-full h-full block"/>
             </div>
             {/* Playback controls */}
-            <div style={{
-              background:"#07101e",borderTop:"1px solid #1a2e4a",
-              padding:"10px 16px",display:"flex",alignItems:"center",gap:10,flexShrink:0,
-            }}>
+            <div className="px-4 py-2 border-t border-slate-200 dark:border-slate-800/60 bg-slate-100/80 dark:bg-slate-900/80 flex items-center gap-3 shrink-0 backdrop-blur-md">
               <button onClick={()=>{ if(playback.active){stopPlayback();}else if(targetAngles){setPlayback({active:true,frame:0,frames:45,start:[...angles],end:targetAngles});}}}
                 disabled={!targetAngles}
-                style={{
-                  background:playback.active?mission.color+"33":"#0f1e33",
-                  border:`1px solid ${playback.active?mission.color+"88":"#1a3050"}`,
-                  borderRadius:5,color:playback.active?mission.color:"#4a7098",
-                  padding:"5px 14px",fontSize:10,cursor:targetAngles?"pointer":"not-allowed",
-                  fontFamily:"inherit",opacity:targetAngles?1:0.4,
-                }}>
+                className={`rounded-md px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-colors border shadow-sm ${
+                  !targetAngles ? 'opacity-40 cursor-not-allowed bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500' 
+                  : playback.active ? 'opacity-100 cursor-pointer text-white' 
+                  : 'opacity-100 cursor-pointer bg-white dark:bg-transparent border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`} style={playback.active && targetAngles ? { background: mission.color, borderColor: mission.color } : {}}>
                 {playback.active?"⏸ Pause":"▶ Replay"}
               </button>
               <button onClick={handleStep} disabled={!targetAngles||playback.active}
-                style={{
-                  background:"#0f1e33",border:"1px solid #1a3050",borderRadius:5,
-                  color:"#4a7098",padding:"5px 14px",fontSize:10,
-                  cursor:(targetAngles&&!playback.active)?"pointer":"not-allowed",
-                  fontFamily:"inherit",opacity:(targetAngles&&!playback.active)?1:0.4,
-                }}>⏭ Step</button>
-              <div style={{flex:1,height:3,background:"#1a2e4a",borderRadius:2,overflow:"hidden"}}>
-                {targetAngles&&<div style={{width:`${playProgress}%`,height:"100%",background:mission.color,transition:"width .1s"}}/>}
+                className={`rounded-md px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-colors border shadow-sm bg-white dark:bg-transparent border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 ${
+                  (!targetAngles||playback.active) ? 'opacity-40 cursor-not-allowed' : 'opacity-100 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}>
+                ⏭ Step
+              </button>
+              <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                {targetAngles&&<div className="h-full transition-all duration-100" style={{ width: `${playProgress}%`, background: mission.color }}/>}
               </div>
-              <button onClick={handleReset} style={{
-                background:"#0f1e33",border:"1px solid #1a3050",borderRadius:5,
-                color:"#3a5870",padding:"5px 14px",fontSize:10,cursor:"pointer",fontFamily:"inherit",
-              }}>↺ Reset</button>
+              <button onClick={handleReset} className="rounded-md px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-colors border shadow-sm bg-white dark:bg-transparent border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">
+                ↺ Reset
+              </button>
             </div>
           </div>
 
           {/* 3D canvas — shown for 3D missions OR teach3d tab */}
-          <div style={{
-            flex:1,display:(is3D||rightTab==="teach3d")?"flex":"none",
-            flexDirection:"column",minHeight:0,
-          }}>
+          <div className="flex-1 flex flex-col min-h-0 bg-slate-50 dark:bg-[#03080f] shadow-inner" style={{ display: (is3D||rightTab==="teach3d") ? "flex" : "none" }}>
             <Arm3DCanvas
               angles={is3D && rightTab!=="teach3d" ? angles : teachAngles}
               waypoints={rightTab==="teach3d" ? waypoints : []}
@@ -4378,11 +4352,9 @@ export default function RobotArmLab({ onBack }) {
         </div>
 
         {/* RIGHT: tabs */}
-        <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0,minHeight:0,overflow:"hidden"}}>
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden bg-white/80 dark:bg-slate-950/80">
           {/* Tab bar */}
-          <div style={{
-            display:"flex",background:"#07101e",borderBottom:"1px solid #1a2e4a",flexShrink:0,
-          }}>
+          <div className="flex items-center bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800/60 shrink-0 px-2 overflow-x-auto scrollbar-hide">
             {[
               ["python","Python"],
               ["matlab","MATLAB"],
@@ -4390,30 +4362,25 @@ export default function RobotArmLab({ onBack }) {
               ...(!is3D ? [["teach2d","2D Teach"]] : []),
               ["teach3d","3D Teach"],
             ].map(([id,label])=>(
-              <button key={id} onClick={()=>setRightTab(id)} style={{
-                background:rightTab===id?"#0c1828":"transparent",
-                border:"none",
-                borderBottom:rightTab===id?`2px solid ${id==="teach3d"||id==="teach2d"?"#00c2a8":mission.color}`:"2px solid transparent",
-                color:rightTab===id?id==="teach3d"||id==="teach2d"?"#00c2a8":"#e8f4ff":"#3a6080",
-                padding:"9px 16px",fontSize:11,cursor:"pointer",fontFamily:"inherit",letterSpacing:0.3,
-                transition:"color .15s",
-              }}>{label}</button>
+              <button key={id} onClick={()=>setRightTab(id)} className={`
+                border-none px-4 py-3 text-[10px] font-black uppercase tracking-[0.15em] cursor-pointer transition-all bg-transparent whitespace-nowrap
+                ${rightTab===id ? 'text-slate-800 dark:text-white border-b-2' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 border-b-2 border-transparent'}
+              `} style={rightTab === id ? { borderBottomColor: id==="teach3d"||id==="teach2d" ? "#10b981" : mission.color } : {}}>
+                {label}
+              </button>
             ))}
           </div>
 
           {/* PYTHON TAB */}
           {rightTab==="python" && (
-            <div style={{flex:1,display:"flex",flexDirection:"column",minHeight:0,overflow:"hidden"}}>
-              <div style={{
-                display:"flex",alignItems:"center",gap:8,padding:"6px 12px",
-                background:"#0a1622",borderBottom:"1px solid #1a2e4a",flexShrink:0,
-              }}>
-                <span style={{fontSize:9,color:"#2a4870",letterSpacing:1}}>
-                  set <span style={{color:"#7dd3fc"}}>joint_angles</span> = [...]  ·  Ctrl+Enter to run
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-slate-50 dark:bg-[#07070f]">
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-100 dark:bg-[#0a101a] border-b border-slate-200 dark:border-slate-800/60 shrink-0">
+                <span className="text-[10px] font-bold tracking-wide text-slate-500 dark:text-slate-400 flex-1 font-mono">
+                  set <span className="text-sky-500 font-black">joint_angles</span> = [...]  ·  Ctrl+Enter to run
                 </span>
                 {runBtn}
               </div>
-              <div style={{ flex:1, minHeight:0 }}>
+              <div className="flex-1 min-h-0">
                 <Editor
                   height="100%"
                   language="python"
@@ -4422,10 +4389,10 @@ export default function RobotArmLab({ onBack }) {
                   theme="open-calc-dark"
                   beforeMount={setupOpenCalcMonaco}
                   options={{
-                    fontSize:13,lineHeight:20,
+                    fontSize:13,lineHeight:22,
                     fontFamily:'"Fira Code","JetBrains Mono","SF Mono",monospace',
                     minimap:{enabled:false},scrollBeyondLastLine:false,
-                    padding:{top:12,bottom:12},tabSize:4,wordWrap:'on',
+                    padding:{top:16,bottom:16},tabSize:4,wordWrap:'on',
                     renderWhitespace:'none',overviewRulerLanes:0,
                   }}
                 />
@@ -4436,19 +4403,16 @@ export default function RobotArmLab({ onBack }) {
 
           {/* MATLAB TAB */}
           {rightTab==="matlab" && (
-            <div style={{flex:1,display:"flex",flexDirection:"column",minHeight:0,overflow:"hidden"}}>
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-slate-50 dark:bg-[#07070f]">
               {/* Editor header */}
-              <div style={{
-                display:"flex",alignItems:"center",gap:8,padding:"6px 12px",
-                background:"#0a1622",borderBottom:"1px solid #1a2e4a",flexShrink:0,
-              }}>
-                <span style={{fontSize:9,color:"#2a4870",letterSpacing:1}}>
-                  set <span style={{color:"#818cf8"}}>joint_angles</span> = [...]  ·  <span style={{color:"#2a4870"}}>% comments · ^ for power</span>
+              <div className="flex items-center gap-3 px-4 py-2.5 bg-slate-100 dark:bg-[#0a101a] border-b border-slate-200 dark:border-slate-800/60 shrink-0">
+                <span className="text-[10px] font-bold tracking-wide text-slate-500 dark:text-slate-400 flex-1 font-mono">
+                  set <span className="text-indigo-400 font-black">joint_angles</span> = [...]  ·  % comments · ^ for power
                 </span>
                 {runBtn}
               </div>
               {/* MATLAB code editor */}
-              <div style={{ flex:"0 0 42%", minHeight:0 }}>
+              <div className="flex-[0_0_42%] min-h-0 border-b border-slate-200 dark:border-slate-800/60">
                 <Editor
                   height="100%"
                   language="openmat"
@@ -4457,10 +4421,10 @@ export default function RobotArmLab({ onBack }) {
                   theme="open-calc-dark"
                   beforeMount={setupOpenCalcMonaco}
                   options={{
-                    fontSize:13,lineHeight:20,
+                    fontSize:13,lineHeight:22,
                     fontFamily:'"Fira Code","JetBrains Mono","SF Mono",monospace',
                     minimap:{enabled:false},scrollBeyondLastLine:false,
-                    padding:{top:12,bottom:12},tabSize:4,wordWrap:'on',
+                    padding:{top:16,bottom:16},tabSize:4,wordWrap:'on',
                     renderWhitespace:'none',overviewRulerLanes:0,
                   }}
                 />
@@ -4468,34 +4432,24 @@ export default function RobotArmLab({ onBack }) {
               {/* Console */}
               {consolePanel}
               {/* Matrix view header */}
-              <div style={{
-                display:"flex",alignItems:"center",gap:6,padding:"5px 12px",
-                background:"#0a1622",borderBottom:"1px solid #1a2e4a",flexShrink:0,flexWrap:"wrap",
-              }}>
-                <span style={{fontSize:9,color:"#2a4870",letterSpacing:1}}>MATRIX VIEW:</span>
-                <button onClick={()=>setMatStep(null)} style={{
-                  background:matStep===null?"#818cf822":"transparent",
-                  border:`1px solid ${matStep===null?"#818cf866":"#1a2e4a"}`,
-                  borderRadius:4,color:matStep===null?"#818cf8":"#3a6080",
-                  padding:"2px 9px",fontSize:10,cursor:"pointer",fontFamily:"inherit",
-                }}>All</button>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100/80 dark:bg-[#0a101a] border-y border-slate-200 dark:border-slate-800/60 shrink-0 flex-wrap">
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 mr-2">Matrix View:</span>
+                <button onClick={()=>setMatStep(null)} className={`
+                  px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer transition-all border
+                  ${matStep===null ? 'shadow-sm bg-indigo-50 dark:bg-indigo-900/20 border-indigo-300 dark:border-indigo-500/30 text-indigo-600 dark:text-indigo-400' : 'bg-transparent border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50'}
+                `}>All</button>
                 {(mission.lengths||[]).map((_,i)=>(
-                  <button key={i} onClick={()=>setMatStep(i+1)} style={{
-                    background:matStep===i+1?JCOLORS[i%JCOLORS.length]+"22":"transparent",
-                    border:`1px solid ${matStep===i+1?JCOLORS[i%JCOLORS.length]+"66":"#1a2e4a"}`,
-                    borderRadius:4,color:matStep===i+1?JCOLORS[i%JCOLORS.length]:"#3a6080",
-                    padding:"2px 9px",fontSize:10,cursor:"pointer",fontFamily:"inherit",
-                  }}>T_{Array.from({length:i+1},(_,k)=>k+1).join("..")}</button>
+                  <button key={i} onClick={()=>setMatStep(i+1)} className={`
+                    px-2.5 py-1 text-[10px] font-bold rounded cursor-pointer transition-all border
+                    ${matStep===i+1 ? 'shadow-sm' : 'bg-transparent border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800/50'}
+                  `} style={matStep===i+1 ? { background: JCOLORS[i%JCOLORS.length]+'22', borderColor: JCOLORS[i%JCOLORS.length]+'66', color: JCOLORS[i%JCOLORS.length] } : {}}>
+                    T_{Array.from({length:i+1},(_,k)=>k+1).join("..")}
+                  </button>
                 ))}
-                <span style={{fontSize:9,color:"#1e3050",marginLeft:"auto"}}>live · updates with ▶ Run</span>
+                <span className="text-[9px] text-slate-400 dark:text-slate-500 ml-auto italic">live · updates with ▶ Run</span>
               </div>
               {/* Live matrix display */}
-              <pre style={{
-                flex:1,margin:0,padding:"12px 16px",
-                background:"#050c18",color:"#7dd3fc",
-                fontFamily:"'JetBrains Mono',Consolas,monospace",
-                fontSize:10.5,lineHeight:1.8,overflowY:"auto",whiteSpace:"pre",minHeight:0,
-              }}>
+              <pre className="flex-1 m-0 p-4 bg-white dark:bg-[#03060a] text-slate-700 dark:text-sky-300 text-[11px] leading-relaxed overflow-y-auto whitespace-pre min-h-0 font-medium">
                 {matlabText}
               </pre>
             </div>
@@ -4503,53 +4457,43 @@ export default function RobotArmLab({ onBack }) {
 
           {/* THEORY TAB */}
           {rightTab==="theory" && (
-            <div style={{flex:1,display:"flex",flexDirection:"column",minHeight:0,overflow:"hidden"}}>
-              <div style={{
-                display:"flex",alignItems:"center",justifyContent:"space-between",
-                padding:"8px 14px",background:"#0a1622",borderBottom:"1px solid #1a2e4a",flexShrink:0,
-              }}>
-                <div style={{fontSize:9,color:"#2a4870",letterSpacing:1}}>THEORY</div>
-                <div style={{display:"flex",gap:5}}>
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-white dark:bg-transparent">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-slate-100 dark:bg-[#0a1622] border-b border-slate-200 dark:border-slate-800/60 shrink-0">
+                <div className="text-[10px] font-black tracking-[0.2em] uppercase text-slate-500 dark:text-slate-400">Theory</div>
+                <div className="flex gap-1.5">
                   {mission.tutorial.map((_,i)=>(
-                    <div key={i} onClick={()=>setTutPage(i)} style={{
-                      width:7,height:7,borderRadius:"50%",cursor:"pointer",
-                      background:i===tutPage?mission.color:"#1a2e4a",
-                      border:`1px solid ${i===tutPage?mission.color:"#2a4060"}`,
+                    <div key={i} onClick={()=>setTutPage(i)} className={`
+                      w-2 h-2 rounded-full cursor-pointer transition-colors border
+                    `} style={{
+                      background: i === tutPage ? mission.color : 'transparent',
+                      borderColor: i === tutPage ? mission.color : 'rgba(100,116,139,0.5)'
                     }}/>
                   ))}
                 </div>
               </div>
-              <div style={{flex:1,overflowY:"auto",padding:"16px 18px"}}>
-                <div style={{
-                  fontSize:12,color:mission.color,fontWeight:700,marginBottom:12,lineHeight:1.4,
-                }}>
+              <div className="flex-1 overflow-y-auto p-8 scroll-smooth">
+                <div className="text-[16px] font-black mb-4 leading-snug font-sans" style={{color:mission.color}}>
                   {mission.tutorial[tutPage].heading}
                 </div>
-                <pre style={{
-                  fontSize:11,color:"#7a9ab8",fontFamily:"inherit",
-                  lineHeight:1.9,whiteSpace:"pre-wrap",margin:0,
-                }}>
+                <pre className="text-[13px] text-slate-700 dark:text-slate-300 font-medium leading-relaxed whitespace-pre-wrap m-0 font-sans">
                   {mission.tutorial[tutPage].body}
                 </pre>
               </div>
-              <div style={{
-                padding:"10px 14px",borderTop:"1px solid #1a2e4a",
-                display:"flex",justifyContent:"space-between",flexShrink:0,
-              }}>
-                <button onClick={()=>setTutPage(p=>Math.max(0,p-1))} disabled={tutPage===0} style={{
-                  background:"transparent",border:"1px solid #1a2e4a",borderRadius:4,
-                  color:tutPage===0?"#1a2e4a":"#3a6080",
-                  padding:"5px 12px",fontSize:10,cursor:"pointer",fontFamily:"inherit",
-                }}>prev</button>
-                <span style={{fontSize:9,color:"#1a3050",alignSelf:"center"}}>
+              <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-800/60 flex justify-between items-center shrink-0 bg-slate-50 dark:bg-transparent">
+                <button onClick={()=>setTutPage(p=>Math.max(0,p-1))} disabled={tutPage===0} className={`
+                  bg-transparent border rounded-md px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-colors
+                  ${tutPage===0 ? 'border-slate-200 dark:border-slate-800 text-slate-400 cursor-not-allowed' : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer'}
+                `}>prev</button>
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
                   {tutPage+1} / {mission.tutorial.length}
                 </span>
                 <button onClick={()=>setTutPage(p=>Math.min(mission.tutorial.length-1,p+1))}
-                  disabled={tutPage===mission.tutorial.length-1} style={{
-                  background:"transparent",border:"1px solid #1a2e4a",borderRadius:4,
-                  color:tutPage===mission.tutorial.length-1?"#1a2e4a":mission.color,
-                  padding:"5px 12px",fontSize:10,cursor:"pointer",fontFamily:"inherit",
-                }}>next</button>
+                  disabled={tutPage===mission.tutorial.length-1} className={`
+                  bg-transparent border rounded-md px-3 py-1.5 text-[10px] font-bold uppercase tracking-wide transition-colors
+                  ${tutPage===mission.tutorial.length-1 ? 'border-slate-200 dark:border-slate-800 text-slate-400 cursor-not-allowed' : 'border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer shadow-sm'}
+                `} style={tutPage!==mission.tutorial.length-1 ? { color: mission.color, borderColor: mission.color + '66' } : {}}>
+                  next
+                </button>
               </div>
             </div>
           )}
