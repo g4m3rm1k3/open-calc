@@ -28,6 +28,19 @@ function isPastScheduledTime(time: string, now: Date): boolean {
   return now.getTime() > due.getTime()
 }
 
+function formatTime(time: string): string {
+  const [h, m] = time.split(':').map(Number)
+  if (Number.isNaN(h)) return time
+  const period = h >= 12 ? 'PM' : 'AM'
+  const hour = h % 12 || 12
+  return `${hour}:${String(m).padStart(2, '0')} ${period}`
+}
+
+function minutesPast(time: string, now: Date): number {
+  const [h, m] = time.split(':').map(Number)
+  return (now.getHours() - h) * 60 + (now.getMinutes() - m)
+}
+
 export function computeNudge(plans: Plan[], now: Date = new Date()): Nudge | null {
   const today = now.toISOString().split('T')[0]
   const activePlans = plans.filter((p) => p.status === 'active')
@@ -53,11 +66,15 @@ export function computeNudge(plans: Plan[], now: Date = new Date()): Nudge | nul
       if (!isActionDueToday(action, now)) continue
       if (action.log.some((l) => l.date === today)) continue
       if (!isPastScheduledTime(action.time, now)) continue
+      const late = minutesPast(action.time, now)
+      const message = late > 180
+        ? `You missed "${action.label}" today (was ${formatTime(action.time)}) — still want to do it?`
+        : `"${action.label}" was due at ${formatTime(action.time)} — did you get to it?`
       return {
         kind: 'overdue',
         planId: plan.id,
         actionId: action.id,
-        message: `It's past ${action.time} — have you done "${action.label}" yet?`,
+        message,
       }
     }
   }

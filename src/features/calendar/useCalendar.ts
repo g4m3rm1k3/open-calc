@@ -22,7 +22,7 @@ function uuid(): string {
 export function useCalendar() {
   const [store, setStore] = useLocalStorage<CalendarStore>('oc-calendar', EMPTY)
   const { pushNow } = (useAuth() ?? {}) as { pushNow?: () => void }
-  const { progress } = useProgress() as { progress: Record<string, { quiz?: { correct: number; total: number }; completedCheckpoints?: string[] }> }
+  const { progress } = useProgress() as unknown as { progress: Record<string, { quiz?: { correct: number; total: number }; completedCheckpoints?: string[] }> }
 
   // Schedule notifications for all future events whenever events change
   useEffect(() => {

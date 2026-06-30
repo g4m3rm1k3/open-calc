@@ -86,11 +86,19 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
     if (!n.pinNets) return;
 
     if (n.type === "POWER_SUPPLY") {
-      // Always inject directly into the power rails regardless of where the component is placed
-      const vcc = holeToNetIdx["rail_t1_0"];
-      const gnd = holeToNetIdx["rail_t2_0"];
-      if (vcc !== undefined && vcc !== gnd) { isFixed[vcc] = 1; fixedV[vcc] = 5.0; V[vcc] = 5.0; }
-      if (gnd !== undefined && vcc !== gnd) { isFixed[gnd] = 1; fixedV[gnd] = 0.0; V[gnd] = 0.0; }
+      let vcc, gnd;
+      if (n.pinNets && n.pinNets[0] !== undefined && n.pinNets[1] !== undefined) {
+        vcc = n.pinNets[0];
+        gnd = n.pinNets[1];
+      } else {
+        // Legacy fallback for breadboard rail placement
+        vcc = holeToNetIdx["rail_t1_0"];
+        gnd = holeToNetIdx["rail_t2_0"];
+      }
+      if (vcc !== undefined && gnd !== undefined && vcc !== gnd) {
+        isFixed[vcc] = 1; fixedV[vcc] = 5.0; V[vcc] = 5.0;
+        isFixed[gnd] = 1; fixedV[gnd] = 0.0; V[gnd] = 0.0;
+      }
     }
     
     if (n.type === "RESISTOR") {
@@ -219,8 +227,8 @@ export function solveAnalog(netlist, nodes, simState, dt = 1/60) {
       if (nOut === undefined) return;
       const inputs = inPins.map(p => pinNets[p] !== undefined ? V[pinNets[p]] > 2.5 : false);
       const isHigh = logicFn(...inputs);
-      const nVcc = pinNets[7];  // VCC = index 7 (top-row first pin)
-      const nGnd = pinNets[6];  // GND = index 6 (bottom-row last pin)
+      const nVcc = pinNets[13]; // VCC = index 13 (pin 14, top-row last pin on DIP14)
+      const nGnd = pinNets[6];  // GND = index 6 (pin 7, bottom-row last pin on DIP14)
       if (isHigh && nVcc !== undefined) {
         addConductance(nOut, nVcc, 1.0 / 50.0);
       } else if (!isHigh && nGnd !== undefined) {

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Sparkles, Send } from 'lucide-react'
 import { useCompassAI } from '../useCompassAI'
 
-export default function CompassCoachPanel({ storeContext }) {
+export default function CompassCoachPanel({ storeContext }: { storeContext: { systems: { title: string }[]; habits: { routine: string }[] } }) {
   const { ask, isThinking, isDownloading, downloadProgress } = useCompassAI()
   const [input, setInput] = useState('')
   const [chatLog, setChatLog] = useState([

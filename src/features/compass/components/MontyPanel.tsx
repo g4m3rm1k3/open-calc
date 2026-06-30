@@ -95,7 +95,7 @@ export default function MontyPanel({
 }: MontyPanelProps) {
   const { askWithContext, isThinking, isDownloading, downloadProgress } = useCompassAI()
   const { addEvent } = useCalendar()
-  const { progress } = useProgress() as { progress: Record<string, any> }
+  const { progress } = useProgress() as unknown as { progress: Record<string, any> }
   const location = useLocation()
 
   const [input, setInput] = useState('')

@@ -21,7 +21,7 @@ export default function MontyNudgeToast({
       </div>
       <div className="flex justify-end gap-2 mt-2">
         <button onClick={onSnooze} className="text-[11px] font-semibold text-slate-400 hover:text-slate-200 px-2 py-1">
-          Snooze 30m
+          Remind me in 30m
         </button>
         <button onClick={onDismiss} className="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 px-2 py-1">
           Got it

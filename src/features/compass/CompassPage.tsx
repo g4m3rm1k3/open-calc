@@ -211,7 +211,7 @@ export default function CompassPage() {
           )}
 
           {fitnessBridgeGoal && (
-            <FitnessBridgeCard goal={fitnessBridgeGoal} onDismiss={() => setFitnessBridgeGoal(null)} />
+            <FitnessBridgeCard onDismiss={() => setFitnessBridgeGoal(null)} />
           )}
 
           {compass.plans.length === 0 && <p className="text-slate-500 text-sm">No plans yet — say what you want to accomplish above.</p>}

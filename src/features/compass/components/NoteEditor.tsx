@@ -55,9 +55,8 @@ export default function NoteEditor({ notes, categories, onAdd, onUpdate, onDelet
       </button>
       {whyOpen && (
         <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/60 rounded-lg p-2 -mt-1">
-          <span className="text-slate-700 dark:text-slate-300 font-semibold">{gtd.name}</span>
-          <span className="text-slate-400 dark:text-slate-600"> · {gtd.source}</span>
-          <p className="mt-0.5">{gtd.why}</p>
+          <span className="text-slate-700 dark:text-slate-300 font-semibold">{gtd.title}</span>
+          <p className="mt-0.5">{gtd.description}</p>
         </div>
       )}
       <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-sm focus-within:ring-2 focus-within:ring-sky-500/20 transition-all">
