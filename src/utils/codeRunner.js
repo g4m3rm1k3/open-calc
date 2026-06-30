@@ -92,11 +92,15 @@ export function stripTypeScript(ts) {
     ts
       // Expand constructor parameter property shorthand BEFORE access modifiers are stripped.
       // `constructor(private foo: T) {}` → `constructor(foo: T) { this.foo = foo; }`
+      // Handles combined modifiers like `public readonly` by consuming ALL modifier
+      // keywords before the actual parameter name. Without this, `public readonly`
+      // would treat `readonly` as the parameter name, then a later pass would turn
+      // `this.readonly = ` into `this.= ` (syntax error).
       .replace(/\bconstructor\s*\(([^)]*)\)\s*\{/g, (match, paramStr) => {
         const assignments = []
         const cleaned = paramStr.replace(
-          /\b(private|public|protected|readonly)\s+(\w+)/g,
-          (_, _mod, name) => { assignments.push(`this.${name} = ${name};`); return name }
+          /\b(?:(?:private|public|protected|readonly)\s+)+(\w+)/g,
+          (_, name) => { assignments.push(`this.${name} = ${name};`); return name }
         )
         if (!assignments.length) return match
         return `constructor(${cleaned}) {\n    ${assignments.join('\n    ')}\n    `
