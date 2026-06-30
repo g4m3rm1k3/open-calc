@@ -285,7 +285,7 @@ function MobileVizCard({ viz, borderColor = "border-slate-200 dark:border-slate-
 
 function CardHeader({ icon, kicker, label, noteId, right }) {
   return (
-    <div className={`flex items-center gap-3 px-4 py-4 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950`}>
+    <div className={`flex items-center gap-3 px-4 py-4 border-b border-slate-100 dark:border-slate-800/50 bg-gradient-to-r from-brand-50 to-white dark:from-brand-900/20 dark:to-slate-950`}>
       <div className="flex-1 min-w-0 flex items-center gap-2">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 m-0">{label}</p>
       </div>
@@ -301,7 +301,7 @@ function MobileCard({ id, icon, kicker, label, noteId, children }) {
   // passed explicitly when this card has no note (e.g. tab-bar scroll-spy targets).
   const anchorId = id ?? (noteId ? noteId.replace(/:/g, "-") : undefined);
   return (
-    <div id={anchorId} className={`rounded-none border-x-0 bg-white dark:bg-slate-950 scroll-mt-24`}>
+    <div id={anchorId} className={`rounded-none border-y border-slate-100 dark:border-slate-800/50 bg-white dark:bg-slate-950 scroll-mt-24 my-2 shadow-sm`}>
       <CardHeader icon={icon} kicker={kicker} label={label} noteId={noteId} />
       <div className="px-4 pb-8 pt-4">{children}</div>
     </div>
@@ -313,7 +313,7 @@ function MobileCollapsible({ id, icon, kicker, label, defaultOpen = false, noteI
   const toggle = <span className={`text-[10px] font-bold uppercase tracking-wide text-slate-400`}>{open ? "▲" : "▼"}</span>;
   const anchorId = id ?? (noteId ? noteId.replace(/:/g, "-") : undefined);
   return (
-    <div id={anchorId} className={`rounded-none border-x-0 bg-white dark:bg-slate-950 scroll-mt-24`}>
+    <div id={anchorId} className={`rounded-none border-y border-slate-100 dark:border-slate-800/50 bg-white dark:bg-slate-950 scroll-mt-24 my-2 shadow-sm`}>
       <button
         onClick={() => setOpen((v) => !v)}
         className={`w-full text-left active:opacity-80 transition-opacity`}
@@ -358,7 +358,7 @@ function sectionExists(lesson, id) {
 
 function MobileTabBar({ tabs, activeTab, onTabClick }) {
   return (
-    <div className="sticky top-0 z-40 bg-[var(--color-page-bg)] border-b border-slate-200 dark:border-slate-800">
+    <div className="sticky top-0 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800/50 shadow-sm">
       <div className="flex">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;

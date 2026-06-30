@@ -37,29 +37,36 @@ export default function MobileHomePage() {
     .filter(Boolean);
 
   return (
-    <div className="px-4 pt-4 pb-8 max-w-screen-sm mx-auto">
-      <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1">
+    <div className="px-4 pt-8 pb-12 max-w-screen-sm mx-auto">
+      <h1 className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-sky-500 dark:from-brand-400 dark:to-sky-400 mb-2 drop-shadow-sm">
         Welcome back
       </h1>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+      <p className="text-base text-slate-600 dark:text-slate-300 font-medium mb-8">
         Pick up a course or jump back into a lesson.
       </p>
 
-      <section className="mb-6">
-        <div className="grid grid-cols-2 gap-3">
+      <section className="mb-10">
+        <div className="grid grid-cols-2 gap-4">
           {FEATURED.map((item) => {
             const inner = (
               <>
-                <span className="text-3xl leading-none mb-1">{item.icon}</span>
-                <span className="text-sm font-bold leading-tight">{item.label}</span>
-                <span className="text-xs opacity-70 leading-snug">{item.description}</span>
+                <span className="text-4xl leading-none mb-3 block drop-shadow-md">{item.icon}</span>
+                <span className="text-[15px] font-black tracking-tight leading-tight block mb-1">{item.label}</span>
+                <span className="text-[11px] font-semibold uppercase tracking-wider opacity-80 leading-snug block">{item.description}</span>
               </>
             );
+            // We can replace the static flat backgrounds with vibrant gradients
+            let gradientColor = "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900";
+            if (item.label.includes("RPG")) {
+              gradientColor = "bg-gradient-to-br from-emerald-400 to-teal-500 text-white shadow-emerald-500/30 border-emerald-400/50";
+            } else if (item.label.includes("TI Calculator")) {
+              gradientColor = "bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-violet-500/30 border-violet-400/50";
+            }
             return item.to ? (
               <Link
                 key={item.label}
                 to={item.to}
-                className={`flex flex-col gap-1 p-4 rounded-2xl border shadow-sm active:scale-[0.97] transition-transform ${item.color}`}
+                className={`flex flex-col p-5 rounded-3xl border shadow-lg active:scale-[0.97] transition-transform ${gradientColor}`}
               >
                 {inner}
               </Link>
@@ -67,7 +74,7 @@ export default function MobileHomePage() {
               <button
                 key={item.label}
                 onClick={() => window.dispatchEvent(new CustomEvent("oc-open-tool", { detail: { tool: item.event } }))}
-                className={`flex flex-col gap-1 p-4 rounded-2xl border shadow-sm active:scale-[0.97] transition-transform text-left ${item.color}`}
+                className={`flex flex-col p-5 rounded-3xl border shadow-lg active:scale-[0.97] transition-transform text-left ${gradientColor}`}
               >
                 {inner}
               </button>
@@ -77,43 +84,54 @@ export default function MobileHomePage() {
       </section>
 
       {inProgress.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
+        <section className="mb-12">
+          <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-brand-500 dark:text-brand-400 mb-4 flex items-center gap-2">
             Continue learning
+            <div className="flex-1 h-px bg-brand-100 dark:bg-brand-900/40" />
           </h2>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {inProgress.map(lesson => (
               <Link
                 key={lesson.slug}
                 to={`/chapter/${lesson.chapterNumber}/${lesson.slug}`}
-                className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm active:scale-[0.98] transition-transform"
+                className="group flex items-center justify-between gap-4 p-5 rounded-3xl bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/60 dark:border-slate-700/50 shadow-md active:scale-[0.98] hover:shadow-lg transition-all"
               >
-                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">
-                  {lesson.title}
-                </span>
-                <span className="text-brand-600 dark:text-brand-400 text-sm shrink-0">→</span>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">
+                    Chapter {lesson.chapterNumber}
+                  </span>
+                  <span className="text-base font-bold text-slate-800 dark:text-slate-100 truncate">
+                    {lesson.title}
+                  </span>
+                </div>
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 group-hover:bg-brand-500 group-hover:text-white transition-colors">
+                  <span className="font-bold text-lg leading-none translate-x-px">→</span>
+                </div>
               </Link>
             ))}
           </div>
         </section>
       )}
 
-      <section data-tour="courses-grid">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3">
-          Courses
+      <section data-tour="courses-grid" className="pb-12">
+        <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-sky-500 dark:text-sky-400 mb-4 flex items-center gap-2">
+          Explore Courses
+          <div className="flex-1 h-px bg-sky-100 dark:bg-sky-900/40" />
         </h2>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           {COURSES.map(course => (
             <Link
               key={course.key}
               to={course.path}
-              className="flex flex-col gap-2 p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm active:scale-[0.98] transition-transform"
+              className="group flex flex-col p-5 rounded-3xl bg-gradient-to-b from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 border border-slate-200/80 dark:border-slate-700 shadow-md active:scale-[0.98] hover:shadow-xl hover:-translate-y-1 transition-all"
             >
-              <span className="text-2xl leading-none">{course.icon}</span>
-              <span className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">
+              <div className="w-12 h-12 rounded-2xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                {course.icon}
+              </div>
+              <span className="text-[15px] font-black tracking-tight text-slate-800 dark:text-slate-100 leading-tight mb-2">
                 {course.label}
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 leading-snug line-clamp-2">
+              <span className="text-xs font-medium text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">
                 {course.description}
               </span>
             </Link>

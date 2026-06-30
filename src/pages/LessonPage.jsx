@@ -226,7 +226,7 @@ export default function LessonPage() {
       })()}
 
       <header className="sm:mx-0 sm:rounded-3xl mb-12 overflow-hidden shadow-2xl bg-white dark:bg-slate-900 border-y sm:border border-slate-200 dark:border-slate-800 relative">
-        <div className="oc-header-gradient px-3 py-10 sm:px-12 sm:py-14">
+        <div className="oc-header-gradient px-4 py-10 sm:px-12 sm:py-14 max-lg:bg-gradient-to-br max-lg:from-brand-100 max-lg:to-sky-50 max-lg:dark:from-brand-900/40 max-lg:dark:to-sky-900/20">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             {(() => {
               const chapter = CURRICULUM.find((entry) => String(entry.number) === chapterId)
@@ -254,7 +254,7 @@ export default function LessonPage() {
             })()}
           </div>
 
-          <h1 className="text-5xl font-black tracking-tight text-slate-950 dark:text-slate-200 sm:text-6xl lg:text-7xl !leading-[1.1]">
+          <h1 className="text-5xl font-black tracking-tight text-slate-950 dark:text-slate-200 sm:text-6xl lg:text-7xl !leading-[1.1] max-lg:bg-clip-text max-lg:text-transparent max-lg:bg-gradient-to-r max-lg:from-brand-600 max-lg:to-sky-500 max-lg:dark:from-brand-400 max-lg:dark:to-sky-300">
             {lesson.title}
           </h1>
           {lesson.subtitle && (
@@ -271,7 +271,7 @@ export default function LessonPage() {
       </header>
 
       {lesson.hook && (
-        <section className="mb-16">
+        <section className="mb-16 max-lg:px-4">
           <div className="flex items-center gap-3 mb-6">
             <span className="text-[11px] font-black uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400">
               Introduction
@@ -313,10 +313,10 @@ export default function LessonPage() {
        !lesson.cells?.length &&
        !lesson.intuition?.visualizations?.length &&
        !lesson.suppressWiki && (
-        <>
+        <div className="max-lg:px-4">
           <WikiIntro query={lesson.title} tags={lesson.tags} />
           <WikiDiagrams query={lesson.title} tags={lesson.tags} />
-        </>
+        </div>
       )}
 
       {lesson.tags?.length > 0 && (

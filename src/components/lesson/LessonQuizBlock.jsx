@@ -79,8 +79,8 @@ function QuizQuestion({ q: rawQ, index, state, onChange }) {
 
   return (
     <div className={`rounded-3xl border-2 ${borderColor} bg-white dark:bg-slate-900 p-6 transition-all duration-300 shadow-sm hover:shadow-premium`}>
-      <div className="flex items-start gap-3">
-        <span className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 ${
+      <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+        <span className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold sm:mt-0.5 ${
           submitted
             ? correct
               ? 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300'
