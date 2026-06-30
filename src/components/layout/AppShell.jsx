@@ -30,7 +30,8 @@ const PolyCalc = lazy(() => import("../../tools/polynomial/index.jsx"));
 const LinearAlgebraCalc = lazy(() => import("../../tools/linear-algebra/index.jsx"));
 const HelpModal = lazy(() => import("../ui/HelpModal.jsx"));
 const TerminalHub = lazy(() => import("../../tools/terminal-hub/TerminalHub.jsx"));
-import CompassQuickPanel from "../../features/compass/CompassQuickPanel.jsx";
+import CompassQuickPanel from "../../features/compass/CompassQuickPanel.tsx";
+import MontyAmbientNudge from "../../features/compass/components/MontyAmbientNudge.tsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
 const ChatPanel = lazy(() => import("../tutor/ChatPanel.jsx"));
 const PhysicsPoolLab = lazy(() => import("../../games/pool/PhysicsPoolLab.jsx"));
@@ -456,6 +457,7 @@ export default function AppShell({ children }) {
             )}
             {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
             {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
+            <MontyAmbientNudge />
             <TerminalHub
               isOpen={terminalOpen}
               onClose={() => setTerminalOpen(false)}
@@ -534,6 +536,7 @@ export default function AppShell({ children }) {
           <Suspense fallback={null}>
             {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
             {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
+            <MontyAmbientNudge />
             <WhatsNewModal />
             <SearchModal />
             <GlobalGrapher

@@ -2,9 +2,7 @@ import { useState } from 'react'
 import { Compass as CompassIcon, Sparkles, Dumbbell, X } from 'lucide-react'
 import { useLocation, Link } from 'react-router-dom'
 import { useCompass } from './useCompass'
-import PlanIntake from './components/PlanIntake'
-import IntakeQuestions from './components/IntakeQuestions'
-import PlanBreakdown from './components/PlanBreakdown'
+import PlanWalkthrough from './components/PlanWalkthrough'
 import PlanCard from './components/PlanCard'
 import NoteEditor from './components/NoteEditor'
 import TutorialCard from './components/TutorialCard'
@@ -14,6 +12,7 @@ import MontyPanel from './components/MontyPanel'
 import GoalMap from './components/GoalMap'
 import { isComplicated, type ActionDraft, type IntakeAnswers } from './playbooks'
 import { computeDailyWin } from './montyStatus'
+import type { Plan } from './types'
 
 const FITNESS_KEYWORDS = [
   'get in shape', 'get fit', 'lose weight', 'weight loss', 'fat loss', 'gain muscle',
@@ -73,6 +72,7 @@ export default function CompassPage() {
   const [draftTitle, setDraftTitle] = useState<string | null>(null)
   const [draftActions, setDraftActions] = useState<ActionDraft[]>([])
   const [convertingNoteId, setConvertingNoteId] = useState<string | null>(null)
+  const [confirmedPlan, setConfirmedPlan] = useState<Plan | null>(null)
   
   const [montyOpen, setMontyOpen] = useState(false)
   const [fitnessBridgeGoal, setFitnessBridgeGoal] = useState<string | null>(null)
@@ -83,6 +83,7 @@ export default function CompassPage() {
   // breakdown, since asking "hours/week" for "drink more water" is just
   // friction with nothing to size.
   const handleIntake = (title: string) => {
+    setConfirmedPlan(null)
     if (isFitnessGoal(title)) setFitnessBridgeGoal(title)
     if (isComplicated(title)) {
       setQuestionTitle(title)
@@ -107,13 +108,14 @@ export default function CompassPage() {
   }
 
   const handleConfirm = (title: string, drafts: ActionDraft[], reward?: string) => {
-    compass.confirmPlan(title, drafts, reward)
+    const plan = compass.confirmPlan(title, drafts, reward)
     if (convertingNoteId) {
       compass.updateNote(convertingNoteId, { status: 'clarified' })
       setConvertingNoteId(null)
     }
     setDraftTitle(null)
     setDraftActions([])
+    setConfirmedPlan(plan)
   }
 
   const handleCancelBreakdown = () => {
@@ -194,12 +196,18 @@ export default function CompassPage() {
           
           {(questionTitle || draftTitle) && montyOpen ? (
             <p className="text-slate-500 text-sm italic">Finishing this up in Monty's panel →</p>
-          ) : questionTitle ? (
-            <IntakeQuestions title={questionTitle} onContinue={handleAnswered} onCancel={handleCancelBreakdown} />
-          ) : draftTitle ? (
-            <PlanBreakdown title={draftTitle} initialDrafts={draftActions} onConfirm={handleConfirm} onCancel={handleCancelBreakdown} />
           ) : (
-            <PlanIntake onSubmit={handleIntake} />
+            <PlanWalkthrough
+              questionTitle={questionTitle}
+              draftTitle={draftTitle}
+              draftActions={draftActions}
+              confirmedPlan={confirmedPlan}
+              onIntake={handleIntake}
+              onAnswered={handleAnswered}
+              onConfirm={handleConfirm}
+              onCancel={handleCancelBreakdown}
+              onStartAnother={() => setConfirmedPlan(null)}
+            />
           )}
 
           {fitnessBridgeGoal && (

@@ -1,19 +1,20 @@
-// Quick-access overlay — capture a note or tick a habit without leaving
-// whatever lesson/tool you're in. Full system building/AI-coach workflows live on the
-// /compass page; this is the on-the-fly counterpart.
+// Quick-access overlay — capture a note or check today's status without
+// leaving whatever lesson/tool you're in. Full system building/AI-coach
+// workflows live on the /compass page; this is the on-the-fly counterpart.
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Compass, X, ExternalLink } from 'lucide-react'
 import { useCompass } from './useCompass'
+import { computeDailyWin } from './montyStatus'
 
-export default function CompassQuickPanel({ onClose }) {
+export default function CompassQuickPanel({ onClose }: { onClose?: () => void }) {
   const compass = useCompass()
   const navigate = useNavigate()
   const [draft, setDraft] = useState('')
 
   const capture = () => {
     if (!draft.trim()) return
-    compass.addNote(draft.trim())
+    compass.addNote({ content: draft.trim() })
     setDraft('')
   }
 
@@ -22,8 +23,11 @@ export default function CompassQuickPanel({ onClose }) {
     navigate('/compass')
   }
 
+  const win = computeDailyWin(compass.plans)
+  const activePlans = compass.plans.filter((p) => p.status === 'active')
+
   return (
-    <div className="fixed bottom-4 right-4 z-[150] w-80 max-h-[70vh] flex flex-col bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-[150] sm:w-80 max-h-[70vh] flex flex-col bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
       <div className="flex items-center justify-between px-3 py-2.5 border-b border-slate-800">
         <div className="flex items-center gap-2 text-slate-200 font-bold text-sm">
           <Compass size={15} className="text-emerald-400" /> Compass Quick
@@ -39,6 +43,12 @@ export default function CompassQuickPanel({ onClose }) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-3">
+        {win.dueToday > 0 && (
+          <div className={`rounded-xl p-2.5 text-xs font-bold ${win.won ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800/60 text-slate-300 border border-slate-700/60'}`}>
+            {win.won ? '🏆 ' : '🎯 '}{win.doneToday}/{win.dueToday} done today{win.won ? ' — you won the day' : ''}
+          </div>
+        )}
+
         <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-2.5">
           <textarea
             value={draft}
@@ -52,26 +62,20 @@ export default function CompassQuickPanel({ onClose }) {
           </button>
         </div>
 
-        {compass.systems.length > 0 && (
+        {activePlans.length > 0 ? (
           <div>
-            <p className="text-[10px] text-slate-500 uppercase tracking-wide mb-1.5">Active Systems</p>
+            <p className="text-[10px] text-slate-500 uppercase tracking-wide mb-1.5">Active Plans</p>
             <ul className="space-y-1">
-              {compass.systems.map((s) => (
-                <li key={s.id} className="text-xs text-slate-300 bg-slate-800/60 rounded-lg px-2 py-1.5">{s.title}</li>
+              {activePlans.map((p) => (
+                <li key={p.id} className="text-xs text-slate-300 bg-slate-800/60 rounded-lg px-2 py-1.5">{p.title}</li>
               ))}
             </ul>
           </div>
-        )}
-
-        {compass.habits.length > 0 && (
-          <div>
-            <p className="text-[10px] text-slate-500 uppercase tracking-wide mb-1.5">Daily Habits</p>
-            <ul className="space-y-1">
-              {compass.habits.map((h) => (
-                <li key={h.id} className="text-xs text-slate-300 bg-slate-800/60 rounded-lg px-2 py-1.5">{h.routine}</li>
-              ))}
-            </ul>
-          </div>
+        ) : (
+          <p className="text-xs text-slate-500">
+            No active plans yet —{' '}
+            <button onClick={goFull} className="text-emerald-400 hover:underline">open the full dashboard</button> to start one.
+          </p>
         )}
       </div>
     </div>

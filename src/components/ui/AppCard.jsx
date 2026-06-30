@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { GLASS_META } from '../../styles/courseColors.js'
-import { buildProgressKey } from '../../context/progressMigration.js'
+import { buildProgressKey } from '../../context/progressMigration.ts'
 
 const GRID_OVL = {
   backgroundImage: [

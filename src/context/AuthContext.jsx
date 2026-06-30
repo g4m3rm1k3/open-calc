@@ -17,7 +17,7 @@ import {
 } from 'firebase/auth'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
-import { mergeProgress, SYNC_MERGE_STRATEGIES } from './progressMigration.js'
+import { mergeProgress, SYNC_MERGE_STRATEGIES } from './progressMigration.ts'
 import { writeLocalStorageKey } from '../hooks/useLocalStorage.js'
 
 // ── Localhost guard ───────────────────────────────────────────────────────────

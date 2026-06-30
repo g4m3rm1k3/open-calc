@@ -232,6 +232,51 @@ const PLAYBOOKS: Playbook[] = [
         fallback: 'Do it for just 2 minutes.'
       }
     ]
+  },
+  // Catch-all — matches anything none of the above did (career goals like
+  // "become a software developer", "get a job as...", etc.). Without this,
+  // proposeBreakdown() used to silently degrade any unrecognized phrasing to
+  // a single one-off task with no real system — the opposite of what this
+  // app is for. Reuses the same domain-general structure as learn-a-subject
+  // (orientation -> recurring work session -> periodic review) since that's
+  // the right shape for "work toward something over time," not specific to
+  // any one keyword set. Must stay last in PLAYBOOKS — match always true.
+  {
+    id: 'general-goal',
+    complicated: true,
+    match: () => true,
+    generate: (title, answers) => {
+      const duration = sizeDuration(answers?.hoursPerWeek ?? 3, 5)
+      return [
+        {
+          label: `Orientation: define the first step for ${title}`,
+          cadence: 'once',
+          methodIds: ['systems-vs-goals'],
+          why: 'Before working toward this, you need to define the exact first step so you aren\'t overwhelmed by the whole goal.',
+          fallback: 'Just pick the smallest next concrete step.',
+          requiresNote: 'What is the first concrete step toward this?',
+          narrows: true
+        },
+        {
+          label: `Work session: ${title}`,
+          cadence: 'weekdays',
+          time: '19:00',
+          durationMinutes: duration,
+          methodIds: ['deep-work'],
+          why: 'Consistent, dedicated time is what actually moves a goal — without it, intentions don\'t become progress.',
+          fallback: 'Spend just 5 minutes on it today.'
+        },
+        {
+          label: `Weekly review: ${title}`,
+          cadence: 'weekly',
+          time: '10:00',
+          durationMinutes: 15,
+          why: 'A periodic check is the only way to tell real progress from a feeling either way.',
+          requiresNote: 'What moved this week? What\'s the next concrete step?',
+          fallback: 'Just answer: did I work on this at all this week?'
+        }
+      ]
+    }
   }
 ]
 
@@ -248,17 +293,7 @@ export function categorize(title: string): string | null {
 }
 
 export function proposeBreakdown(title: string, answers?: IntakeAnswers): ActionDraft[] {
-  const playbook = PLAYBOOKS.find(p => p.match(title))
-  if (playbook) {
-    return playbook.generate(title, answers)
-  }
-
-  // Fallback to one-off task if no heuristic matches
-  return [
-    {
-      label: title,
-      cadence: 'once',
-      why: 'A simple one-off task.',
-    }
-  ]
+  // PLAYBOOKS always has a match — general-goal is a catch-all at the end.
+  const playbook = PLAYBOOKS.find(p => p.match(title))!
+  return playbook.generate(title, answers)
 }

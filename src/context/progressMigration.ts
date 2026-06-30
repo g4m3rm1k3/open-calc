@@ -3,24 +3,43 @@
 // includes it). Falls back to the old route-derived shape only if `id` is
 // somehow missing — shouldn't happen (every real lesson file has one,
 // confirmed), but better than producing an unusable key.
-export function buildProgressKey(courseId, lesson) {
+
+export interface QuizState {
+  correct?: number
+  attempted?: number
+  total?: number
+  attemptedAt?: number
+}
+
+export interface LessonProgress {
+  completedCheckpoints?: string[]
+  readingProgress?: number
+  quiz?: QuizState
+  [key: string]: unknown
+}
+
+export type ProgressMap = Record<string, LessonProgress>
+
+export type IdLookup = Record<string, string>
+
+export function buildProgressKey(courseId: string, lesson?: { id?: string; slug?: string } | null): string {
   return lesson?.id ? `${courseId}::${lesson.id}` : `${courseId}/${lesson?.slug ?? ''}`
 }
 
 // Pure, side-effect-free progress merge/migration logic — shared by
 // AuthContext.jsx (sign-in conflict resolution) and ProgressContext.jsx
 // (one-time old-key migration), and unit-tested directly in
-// progressMigration.test.js without needing to import Firebase or mount a
+// progressMigration.test.ts without needing to import Firebase or mount a
 // React context.
 
 // Course progress is accumulative — checkpoints are never un-done. Union
 // both versions so no work is ever lost, regardless of which device/key was
 // newer. Operates on whole `{ [lessonKey]: {...} }` dictionaries.
-export function mergeProgress(local, remote) {
+export function mergeProgress(local: ProgressMap | null | undefined, remote: ProgressMap | null | undefined): ProgressMap | null {
   if (!local && !remote) return null
-  if (!local) return remote
-  if (!remote) return local
-  const merged = { ...remote }
+  if (!local) return remote ?? null
+  if (!remote) return local ?? null
+  const merged: ProgressMap = { ...remote }
   for (const [id, localLesson] of Object.entries(local)) {
     if (!merged[id]) {
       merged[id] = localLesson
@@ -54,10 +73,13 @@ export function mergeProgress(local, remote) {
 // merging into any existing new-format entry for the same lesson rather than
 // overwriting it. Entries it can't resolve (lesson genuinely gone, or
 // already-unrecognized key shapes) are left untouched — never dropped.
-export function migrateOldProgressKeys(progress, idLookup) {
+export function migrateOldProgressKeys(
+  progress: ProgressMap | null | undefined,
+  idLookup: IdLookup
+): { migrated: ProgressMap | null | undefined; changed: boolean } {
   if (!progress) return { migrated: progress, changed: false }
   let changed = false
-  let result = {}
+  let result: ProgressMap = {}
 
   // Carry forward everything already in the new format first.
   for (const [key, value] of Object.entries(progress)) {
@@ -77,7 +99,7 @@ export function migrateOldProgressKeys(progress, idLookup) {
     if (!id) { result[key] = value; continue } // can't resolve — leave the old entry alone, don't drop it
     const newKey = `${courseId}::${id}`
     changed = true
-    result = mergeProgress({ [newKey]: value }, result)
+    result = mergeProgress({ [newKey]: value }, result) ?? result
   }
 
   return { migrated: result, changed }
@@ -94,7 +116,7 @@ export function migrateOldProgressKeys(progress, idLookup) {
 
 // Array of plain values or ids (pinned videos, completed mission ids) —
 // union, order doesn't matter for this kind of data.
-export function mergeArrayUnion(local, remote) {
+export function mergeArrayUnion<T>(local: T[] | null | undefined, remote: T[] | null | undefined): T[] {
   if (!Array.isArray(local)) return remote ?? []
   if (!Array.isArray(remote)) return local ?? []
   return [...new Set([...remote, ...local])]
@@ -104,11 +126,15 @@ export function mergeArrayUnion(local, remote) {
 // confirmed `{id, title, subtitle, path}` in PinsContext.jsx). A plain Set
 // union doesn't dedupe these — two different object instances with the same
 // id are never === each other — so dedupe by id explicitly instead.
-export function mergeArrayUnionById(local, remote, idKey = 'id') {
+export function mergeArrayUnionById<T extends Record<string, unknown>>(
+  local: T[] | null | undefined,
+  remote: T[] | null | undefined,
+  idKey: string = 'id'
+): T[] {
   if (!Array.isArray(local)) return remote ?? []
   if (!Array.isArray(remote)) return local ?? []
-  const seen = new Set()
-  const merged = []
+  const seen = new Set<unknown>()
+  const merged: T[] = []
   for (const item of [...remote, ...local]) {
     const key = item?.[idKey]
     if (key != null && seen.has(key)) continue
@@ -122,14 +148,17 @@ export function mergeArrayUnionById(local, remote, idKey = 'id') {
 // events keyed by id, etc.) — union of keys; local's value wins for a key
 // present on both sides (this IS the device currently being synced from,
 // the more defensible default without real timestamps to compare).
-export function mergeKeyedObject(local, remote) {
+export function mergeKeyedObject(
+  local: Record<string, unknown> | unknown[] | null | undefined,
+  remote: Record<string, unknown> | unknown[] | null | undefined
+): Record<string, unknown> {
   // typeof [] === 'object' too — explicitly excluded, since spreading an
   // array as if it were a plain object would silently destroy its array-ness
   // (it'd become a {0: x, 1: y, ...}-shaped plain object instead). Safer to
   // just fall back to one side than risk corrupting a shape mismatch.
-  const isPlainObject = v => v && typeof v === 'object' && !Array.isArray(v)
-  if (!isPlainObject(local)) return remote ?? {}
-  if (!isPlainObject(remote)) return local ?? {}
+  const isPlainObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v)
+  if (!isPlainObject(local)) return isPlainObject(remote) ? remote : {}
+  if (!isPlainObject(remote)) return local
   return { ...remote, ...local }
 }
 
@@ -137,14 +166,22 @@ export function mergeKeyedObject(local, remote) {
 // regress (e.g. video-watch-percent — the existing player code already
 // refuses to downgrade progress on rewind, so a plain key-union "local
 // wins" merge would wrongly undo that the moment a behind-device synced).
-export function mergeMaxNumericObject(local, remote) {
+export function mergeMaxNumericObject(
+  local: Record<string, number> | null | undefined,
+  remote: Record<string, number> | null | undefined
+): Record<string, number> {
   if (!local || typeof local !== 'object') return remote ?? {}
   if (!remote || typeof remote !== 'object') return local ?? {}
-  const merged = { ...remote }
+  const merged: Record<string, number> = { ...remote }
   for (const [key, val] of Object.entries(local)) {
     merged[key] = Math.max(Number(val) || 0, Number(merged[key]) || 0)
   }
   return merged
+}
+
+interface CalendarData {
+  events?: Array<Record<string, unknown>>
+  [key: string]: unknown
 }
 
 // oc-calendar's real shape (confirmed in NavClock.jsx) is `{ events: [...],
@@ -152,11 +189,14 @@ export function mergeMaxNumericObject(local, remote) {
 // A plain mergeKeyedObject would let local's whole `events` array silently
 // shadow remote's. Union the events specifically (by id if present,
 // otherwise fall back to whichever side has more — never drops events).
-export function mergeCalendarData(local, remote) {
-  const isPlainObject = v => v && typeof v === 'object' && !Array.isArray(v)
+export function mergeCalendarData(
+  local: CalendarData | null | undefined,
+  remote: CalendarData | null | undefined
+): CalendarData {
+  const isPlainObject = (v: unknown): v is CalendarData => !!v && typeof v === 'object' && !Array.isArray(v)
   if (!isPlainObject(local)) return remote ?? {}
   if (!isPlainObject(remote)) return local ?? {}
-  const merged = { ...remote, ...local }
+  const merged: CalendarData = { ...remote, ...local }
   if (Array.isArray(local.events) || Array.isArray(remote.events)) {
     merged.events = mergeArrayUnionById(local.events ?? [], remote.events ?? [])
   }
@@ -167,21 +207,28 @@ export function mergeCalendarData(local, remote) {
 // libraries (`{ mill: {toolNum: {...}}, lathe: {toolNum: {...}} }`): merge
 // each top-level group's own keys, instead of one side's whole "mill" group
 // shadowing the other's entirely.
-export function mergeNestedKeyedObject(local, remote) {
+export function mergeNestedKeyedObject(
+  local: Record<string, Record<string, unknown>> | null | undefined,
+  remote: Record<string, Record<string, unknown>> | null | undefined
+): Record<string, Record<string, unknown>> {
   if (!local || typeof local !== 'object') return remote ?? {}
   if (!remote || typeof remote !== 'object') return local ?? {}
-  const merged = { ...remote }
+  const merged: Record<string, Record<string, unknown>> = { ...remote }
   for (const [group, localGroup] of Object.entries(local)) {
     merged[group] = mergeKeyedObject(localGroup, merged[group])
   }
   return merged
 }
 
+// Callers (AuthContext.jsx) are untyped JS, so `unknown` params here buy no
+// real safety — `any` matches the actual gradual-migration boundary.
+export type MergeStrategy = (local: any, remote: any) => unknown
+
 // Per-SYNC_KEY merge strategy, keyed by the same localStorage key names
 // AuthContext.jsx's SYNC_KEYS list uses. oc-progress is handled separately
 // (mergeProgress, lesson-keyed with checkpoint-union semantics) since it
 // needs different per-entry logic than a plain key/array union.
-export const SYNC_MERGE_STRATEGIES = {
+export const SYNC_MERGE_STRATEGIES: Record<string, MergeStrategy> = {
   'open-calc-pinned-videos': mergeArrayUnion,
   'open-calc-video-progress': mergeMaxNumericObject,
   'rfl-completed-v2': mergeArrayUnion,

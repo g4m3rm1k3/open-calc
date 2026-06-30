@@ -9,7 +9,7 @@ import { createContext, useCallback, useEffect, useMemo, useRef } from 'react'
 import { useLocalStorage } from '../hooks/useLocalStorage.js'
 import { useAuth } from './AuthContext.jsx'
 import { getLessonIdLookup } from '../courses/courseLoader.js'
-import { migrateOldProgressKeys } from './progressMigration.js'
+import { migrateOldProgressKeys } from './progressMigration.ts'
 
 const MIGRATION_FLAG = '_oc_progress_migrated_v1'
 

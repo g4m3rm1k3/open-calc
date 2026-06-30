@@ -23,6 +23,7 @@
     "desktop:build:mac": "cross-env ELECTRON_BUILD=1 node src/scripts/build-search-index.js && node scripts/build-lesson-ids.mjs && cross-env ELECTRON_BUILD=1 vite build && npm run desktop:sync-package && npm run desktop:prepare-build && node --max-old-space-size=4096 ./node_modules/electron-builder/cli.js --projectDir desktop/staging --mac dmg",
     "smoke": "node scripts/smoke-test.mjs",
     "check": "vite build",
+    "typecheck": "tsc --noEmit",
     "test": "vitest",
     "check-latex": "node scripts/check_latex.mjs",
     "check-latex:physics": "node scripts/check_latex.mjs physics",
@@ -102,6 +103,7 @@
     "postcss": "^8.4.45",
     "prisma": "^7.8.0",
     "tailwindcss": "^3.4.11",
+    "typescript": "^6.0.3",
     "vite": "^5.4.2",
     "vitest": "^4.1.8"
   },

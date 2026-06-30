@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { getAllCourses, getChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
-import { buildProgressKey } from '../context/progressMigration.js'
+import { buildProgressKey } from '../context/progressMigration.ts'
 import UniverseBackground from '../components/backgrounds/UniverseBackground.jsx'
 import AppCard from '../components/ui/AppCard.jsx'
 import { LABS } from '../labs/registry.js'

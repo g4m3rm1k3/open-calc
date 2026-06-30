@@ -173,7 +173,8 @@ export default function MontyPanel({
   const hasActivePlans = plans.some(p => p.status === 'active')
 
   return (
-    <div className="fixed bottom-4 right-4 z-[1700] w-[360px] h-[620px] max-h-[85vh] flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-[1700] bg-slate-900/40 backdrop-blur-sm flex sm:inset-auto sm:bottom-4 sm:right-4 sm:bg-transparent sm:backdrop-blur-none sm:block">
+    <div className="w-full h-full sm:w-[360px] sm:h-[620px] sm:max-h-[85vh] flex flex-col bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-700 sm:rounded-2xl shadow-2xl overflow-hidden">
       {/* Header */}
       <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 backdrop-blur flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
@@ -339,6 +340,7 @@ export default function MontyPanel({
           </div>
         </div>
       )}
+    </div>
     </div>
   )
 }
