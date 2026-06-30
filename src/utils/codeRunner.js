@@ -1,14 +1,44 @@
 import { getPyodide } from './pyodideRuntime.js'
 import { executeScript } from '../engines/openmat/openmatEngine.js'
 
+// Sentinel used to embed base64 PNG images in text output so CodeBlock can
+// split and render them as <img> tags without a separate channel.
+export const IMG_SENTINEL = '__OC_IMG__'
+export const IMG_SENTINEL_END = '__OC_IMG_END__'
+
+// Code injected before user code to set the non-interactive 'agg' backend.
+// Must run before any import of matplotlib.pyplot.
+const MATPLOTLIB_PREAMBLE = `
+import matplotlib as _oc_mpl_
+_oc_mpl_.use('agg')
+`
+
+// Code injected after user code to capture any open figures as base64 PNGs
+// and write them to stdout using the sentinel format.
+const MATPLOTLIB_CAPTURE = `
+try:
+    import matplotlib.pyplot as _oc_plt_
+    import io as _oc_io_
+    import base64 as _oc_b64_
+    for _oc_n_ in _oc_plt_.get_fignums():
+        _oc_f_ = _oc_plt_.figure(_oc_n_)
+        _oc_buf_ = _oc_io_.BytesIO()
+        _oc_f_.savefig(_oc_buf_, format='png', bbox_inches='tight', dpi=130)
+        _oc_buf_.seek(0)
+        print('${IMG_SENTINEL}' + _oc_b64_.b64encode(_oc_buf_.read()).decode() + '${IMG_SENTINEL_END}')
+    _oc_plt_.close('all')
+except Exception:
+    pass
+`
+
 // ── Python ────────────────────────────────────────────────────────────────────
 export async function runPython(code, stdin = '') {
   const pyodide = await getPyodide()
+  const usesMpl = /\bmatplotlib\b/.test(code)
 
   // Auto-load packages declared in import statements (numpy, pandas, etc.)
   await pyodide.loadPackagesFromImports(code).catch(() => {})
-  // matplotlib isn't caught by loadPackagesFromImports in all Pyodide versions
-  if (/\bmatplotlib\b/.test(code)) {
+  if (usesMpl) {
     await pyodide.loadPackage('matplotlib').catch(() => {})
   }
 
@@ -21,7 +51,8 @@ export async function runPython(code, stdin = '') {
     pyodide.setStdin({ stdin: () => idx < stdinLines.length ? stdinLines[idx++] + '\n' : null })
   }
   try {
-    await pyodide.runPythonAsync(code)
+    const wrapped = usesMpl ? MATPLOTLIB_PREAMBLE + code + MATPLOTLIB_CAPTURE : code
+    await pyodide.runPythonAsync(wrapped)
   } catch (err) {
     lines.push('Error: ' + err.message)
   }

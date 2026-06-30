@@ -216,7 +216,9 @@ export function preprocess(text) {
       // Matches a period/em-dash followed by a space then "(N)" at start of a new step.
       .replace(/[.—]\s+(\(\d+\))\s+/g, '.\n\n$1 ')
       // Sentence break after inline math: "$math$. Next sentence" → hard line break.
-      .replace(/(\$[^$\n]+\$)\.\s+(?=\S)/g, '$1.  \n')
+      // Only match horizontal whitespace (space/tab) — \s+ would also eat blank lines,
+      // collapsing paragraph→"---" into a setext h2 underline for the whole paragraph.
+      .replace(/(\$[^$\n]+\$)\.[ \t]+(?=\S)/g, '$1.  \n')
       // A whole line that's just "$$<equation>$$" (e.g. from a \[...\] that
       // was crammed inline with other text rather than on its own line)
       // parses as INLINE math, not display/block — remark-math only treats

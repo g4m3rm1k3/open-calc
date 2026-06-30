@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react'
-import { runCode, RUNNABLE_LANGS, WANDBOX_COMPILER } from '../../utils/codeRunner.js'
+import { runCode, RUNNABLE_LANGS, WANDBOX_COMPILER, IMG_SENTINEL, IMG_SENTINEL_END } from '../../utils/codeRunner.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 
@@ -129,6 +129,41 @@ function HighlightedCode({ code, language }) {
       className="m-0 p-4 text-[13px] leading-[1.6] overflow-x-auto font-mono bg-transparent"
       dangerouslySetInnerHTML={{ __html: html }}
     />
+  )
+}
+
+// Splits output on __OC_IMG__....__OC_IMG_END__ markers and renders
+// base64 PNG images inline alongside any text output.
+function OutputBody({ output, isError, isDarkGlobal }) {
+  const textClass = `m-0 px-4 pb-3 text-[13px] leading-[1.6] font-mono overflow-x-auto whitespace-pre-wrap ${
+    isError
+      ? isDarkGlobal ? 'text-red-300' : 'text-red-700'
+      : isDarkGlobal ? 'text-emerald-300' : 'text-emerald-800'
+  }`
+
+  const parts = output.split(new RegExp(`(${IMG_SENTINEL}[\\s\\S]*?${IMG_SENTINEL_END})`))
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (part.startsWith(IMG_SENTINEL) && part.endsWith(IMG_SENTINEL_END)) {
+          const b64 = part.slice(IMG_SENTINEL.length, part.length - IMG_SENTINEL_END.length).trim()
+          return (
+            <div key={i} className="px-4 pb-3">
+              <img
+                src={`data:image/png;base64,${b64}`}
+                alt="matplotlib figure"
+                className="max-w-full rounded-lg border border-slate-200 dark:border-slate-700"
+                style={{ display: 'block' }}
+              />
+            </div>
+          )
+        }
+        const text = part.trim()
+        if (!text) return null
+        return <pre key={i} className={textClass}>{text}</pre>
+      })}
+    </>
   )
 }
 
@@ -327,11 +362,9 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
             <span className={`text-[10px] font-semibold uppercase tracking-wider ${isError ? isDarkGlobal ? 'text-red-400' : 'text-red-600' : isDarkGlobal ? 'text-emerald-500' : 'text-emerald-700'}`}>
               {isError ? 'Error' : 'Output'}
             </span>
-            <CopyButton getText={() => output} />
+            <CopyButton getText={() => output.replace(new RegExp(`${IMG_SENTINEL}[\\s\\S]*?${IMG_SENTINEL_END}`, 'g'), '[image]')} />
           </div>
-          <pre className={`m-0 px-4 pb-3 text-[13px] leading-[1.6] font-mono overflow-x-auto whitespace-pre-wrap ${isError ? isDarkGlobal ? 'text-red-300' : 'text-red-700' : isDarkGlobal ? 'text-emerald-300' : 'text-emerald-800'}`}>
-            {output}
-          </pre>
+          <OutputBody output={output} isError={isError} isDarkGlobal={isDarkGlobal} />
         </div>
       )}
     </div>
