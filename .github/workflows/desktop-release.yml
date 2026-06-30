@@ -47,7 +47,12 @@ jobs:
         run: npm run ${{ matrix.script }}
         env:
           NODE_OPTIONS: --max-old-space-size=6144
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Prevent electron-builder from trying to publish via git
+          ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
+          # Skip Mac code signing — no Apple certificate in CI
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          CSC_LINK: ''
+          WIN_CSC_LINK: ''
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
