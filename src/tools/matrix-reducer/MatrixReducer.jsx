@@ -505,42 +505,39 @@ export default function MatrixReducer({ onBack } = {}) {
     return () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
   }, []);
 
-  const panelStyle = isMobile
-    ? { position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%,-50%)',
-        width: Math.min(PANEL_W, window.innerWidth - 16), maxHeight: '92dvh',
-        zIndex: 2000, borderRadius: 12, overflow: 'hidden',
-        border: '1px solid #2d3144', boxShadow: '0 24px 64px #000a' }
-    : { position: 'fixed', left: pos.x, top: pos.y, width: PANEL_W, maxHeight: '92dvh',
-        zIndex: 2000, borderRadius: 12, overflow: 'hidden',
-        border: '1px solid #2d3144', boxShadow: '0 24px 64px #000a' };
+  const dark = document.documentElement.classList.contains('dark')
+  const bg1 = 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl'
+  const bdr = 'border-slate-200/80 dark:border-slate-700/80'
 
   return (
     <>
       {isMobile && onBack && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 1999, background: 'rgba(0,0,0,0.5)' }}
-          onClick={onBack} />
+        <div className="fixed inset-0 z-[1999] bg-black/40 backdrop-blur-sm" onClick={onBack} />
       )}
-      <div style={{ ...panelStyle, display: 'flex', flexDirection: 'column', background: '#0f1117' }}>
+      <div
+        className={`fixed z-[2000] rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_50px_rgba(0,0,0,0.5)] border ${bdr} ${bg1} overflow-hidden ring-1 ring-white/10 flex flex-col`}
+        style={isMobile
+          ? { left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: Math.min(PANEL_W, window.innerWidth - 16), maxHeight: '92dvh' }
+          : { left: pos.x, top: pos.y, width: PANEL_W, maxHeight: '92dvh' }
+        }
+      >
         {/* Title bar */}
         <div
           onMouseDown={startDrag}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px',
-            background: '#1a1d27', borderBottom: '1px solid #2d3144', cursor: 'move', flexShrink: 0 }}
+          className={`flex items-center gap-2 px-3 py-2.5 bg-slate-50/50 dark:bg-slate-800/50 border-b ${bdr} cursor-move shrink-0 select-none`}
         >
-          <span style={{ color: '#4ade80', fontSize: 14, fontFamily: 'monospace', fontWeight: 700, userSelect: 'none' }}>⊞</span>
-          <span style={{ fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#94a3b8', fontFamily: 'monospace', flex: 1, userSelect: 'none' }}>
+          <span className="text-emerald-400 text-base font-bold font-mono">⊞</span>
+          <span className={`text-xs font-bold tracking-wide text-slate-800 dark:text-slate-100 flex-1 uppercase font-mono`}>
             Matrix Reducer
           </span>
           {onBack && (
             <button onClick={onBack}
-              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer',
-                fontSize: 16, lineHeight: 1, padding: '2px 4px', borderRadius: 4 }}
-              onMouseEnter={e => e.currentTarget.style.color = '#f87171'}
-              onMouseLeave={e => e.currentTarget.style.color = '#64748b'}
+              className={`ml-1 p-1 rounded-lg hover:bg-rose-500/10 dark:hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-colors text-base leading-none`}
+              title="Close"
             >×</button>
           )}
         </div>
-        <div style={{ ...S.root, flex: 1, minHeight: 0 }}>
+        <div style={{ ...S.root, flex: 1, minHeight: 0, background: 'transparent' }}>
       <div style={{ maxWidth: 800, margin: "0 auto" }}>
         <div style={S.header}>Matrix Workspace</div>
         <div style={S.subheader}>REF / RREF · Manual &amp; Solver</div>

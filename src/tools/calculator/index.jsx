@@ -552,16 +552,15 @@ export default function TICalc({ onClose }) {
   }
 
   // ─── Styling helpers ──────────────────────────────────────────────────────
-  const bg0   = dark ? 'bg-[#0d1117]' : 'bg-slate-100'
-  const bg1   = dark ? 'bg-[#161b22]' : 'bg-white'
-  const bg2   = dark ? 'bg-[#21262d]' : 'bg-slate-50'
-  const bdr   = dark ? 'border-slate-700' : 'border-slate-300'
-  const txt   = dark ? 'text-slate-100' : 'text-slate-900'
-  const muted = dark ? 'text-slate-400' : 'text-slate-500'
+  const bg0 = 'bg-slate-50/80 dark:bg-slate-800/80'
+  const bg1 = 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl'
+  const bg2 = 'bg-slate-50/50 dark:bg-slate-800/50'
+  const bdr = 'border-slate-200/80 dark:border-slate-700/80'
+  const txt = 'text-slate-800 dark:text-slate-100'
+  const muted = 'text-slate-500 dark:text-slate-400'
 
-  const inputCls = `w-full px-2 py-1.5 rounded-lg text-xs font-mono outline-none transition-colors
-    ${dark ? 'bg-[#0d1117] border border-slate-600 text-slate-200 focus:border-indigo-400 placeholder:text-slate-600'
-           : 'bg-white border border-slate-300 text-slate-800 focus:border-indigo-400 placeholder:text-slate-400'}`
+  const inputCls = `w-full px-2 py-1.5 rounded-lg text-xs font-mono outline-none transition-all
+    bg-white/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 placeholder:text-slate-400 dark:placeholder:text-slate-500`
 
   // Button factory
   const mkBtn = (label, variant, handler, extraCls = '') => {
@@ -647,7 +646,7 @@ export default function TICalc({ onClose }) {
     <div
       ref={calcRef}
       tabIndex={-1}
-      className={`fixed z-[2000] rounded-2xl shadow-2xl border ${bdr} ${bg1} overflow-hidden`}
+      className={`fixed z-[2000] rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_50px_rgba(0,0,0,0.5)] border ${bdr} ${bg1} overflow-hidden ring-1 ring-white/10`}
       style={isMobile
         ? { left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: Math.min(352, window.innerWidth - 16), maxHeight: '92dvh', overflowY: 'auto', outline: 'none' }
         : { left: pos.x, top: pos.y, width: 352, outline: 'none' }
@@ -655,7 +654,7 @@ export default function TICalc({ onClose }) {
     >
       {/* ── Title bar ──────────────────────────────────────────────────── */}
       <div
-        className={`flex items-center gap-2 px-3 py-2.5 ${bg0} cursor-move border-b ${bdr}`}
+        className={`flex items-center gap-2 px-3 py-2.5 bg-slate-50/50 dark:bg-slate-800/50 cursor-move border-b ${bdr}`}
         onMouseDown={startDrag}
       >
         <span className="text-indigo-400 text-base select-none">⊞</span>
@@ -670,7 +669,7 @@ export default function TICalc({ onClose }) {
         >
           toggle
         </button>
-        <button onClick={onClose} className={`ml-1 p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/40 ${muted} hover:text-rose-500 transition-colors`} title="Close">×</button>
+        <button onClick={onClose} className={`ml-1 p-1 rounded-lg hover:bg-rose-500/10 dark:hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-colors leading-none`} title="Close">×</button>
       </div>
 
       {/* ── Tab bar ────────────────────────────────────────────────────── */}

@@ -336,16 +336,14 @@ function PolyPanel({ dark }) {
     return () => clearTimeout(id)
   }, [rawExpr])
 
-  const bg0   = dark ? 'bg-[#0d1117]'  : 'bg-slate-100'
-  const bg1   = dark ? 'bg-[#161b22]'  : 'bg-white'
-  const bg2   = dark ? 'bg-[#21262d]'  : 'bg-slate-50'
-  const bdr   = dark ? 'border-slate-700' : 'border-slate-200'
-  const txt   = dark ? 'text-slate-100' : 'text-slate-900'
-  const muted = dark ? 'text-slate-400' : 'text-slate-500'
-  const inputCls = `w-full px-3 py-2 rounded-lg text-sm font-mono outline-none transition-colors border
-    ${dark
-      ? 'bg-[#0d1117] border-slate-600 text-slate-200 focus:border-violet-400 placeholder:text-slate-600'
-      : 'bg-white border-slate-300 text-slate-800 focus:border-violet-400 placeholder:text-slate-400'}`
+  const bg0  = 'bg-white/50 dark:bg-slate-900/50'
+  const bg1  = 'bg-transparent'
+  const bg2  = 'bg-slate-50 dark:bg-slate-800/50'
+  const bdr  = 'border-slate-200 dark:border-slate-700/50'
+  const txt  = 'text-slate-800 dark:text-slate-100'
+  const muted = 'text-slate-500 dark:text-slate-400'
+  const inputCls = `w-full px-3 py-2 rounded-lg text-sm font-mono outline-none transition-all border
+    bg-white/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 placeholder:text-slate-400 dark:placeholder:text-slate-500`
 
   const degree  = useMemo(() => detectDegree(debouncedExpr), [debouncedExpr])
   const roots   = useMemo(() => findRoots(debouncedExpr),    [debouncedExpr])
@@ -564,11 +562,11 @@ export default function PolyCalc({ onClose }) {
     return () => window.removeEventListener('keydown', handler)
   }, [onClose])
 
-  const bg0  = dark ? 'bg-[#0d1117]'    : 'bg-slate-100'
-  const bg1  = dark ? 'bg-[#161b22]'    : 'bg-white'
-  const bdr  = dark ? 'border-slate-700' : 'border-slate-300'
-  const txt  = dark ? 'text-slate-100'   : 'text-slate-900'
-  const muted = dark ? 'text-slate-400'  : 'text-slate-500'
+  const bg0 = 'bg-slate-50/80 dark:bg-slate-800/80'
+  const bg1 = 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl'
+  const bdr = 'border-slate-200/80 dark:border-slate-700/80'
+  const txt = 'text-slate-800 dark:text-slate-100'
+  const muted = 'text-slate-500 dark:text-slate-400'
 
   return (
     <>
@@ -576,7 +574,7 @@ export default function PolyCalc({ onClose }) {
         <div className="fixed inset-0 z-[1999] bg-black/40 backdrop-blur-sm" onClick={onClose} />
       )}
       <div
-        className={`fixed z-[2000] rounded-2xl shadow-2xl border ${bdr} ${bg1} overflow-hidden`}
+        className={`fixed z-[2000] rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_50px_rgba(0,0,0,0.5)] border ${bdr} ${bg1} overflow-hidden ring-1 ring-white/10`}
         style={isMobile
           ? {
               left: '50%', top: '50%',
@@ -589,7 +587,7 @@ export default function PolyCalc({ onClose }) {
       >
         {/* title bar */}
         <div
-          className={`flex items-center gap-2 px-3 py-2.5 ${bg0} border-b ${bdr} cursor-move select-none`}
+          className={`flex items-center gap-2 px-3 py-2.5 bg-slate-50/50 dark:bg-slate-800/50 border-b ${bdr} cursor-move select-none`}
           onMouseDown={startDrag}
         >
           <span className="text-violet-400 text-sm font-bold font-mono">P(x)</span>
@@ -597,7 +595,7 @@ export default function PolyCalc({ onClose }) {
           <span className={`text-[10px] ${muted}`}>drag to move</span>
           <button
             onClick={onClose}
-            className={`ml-1 p-1 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-900/40 ${muted} hover:text-rose-500 transition-colors text-base leading-none`}
+            className={`ml-1 p-1 rounded-lg hover:bg-rose-500/10 dark:hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-colors text-base leading-none`}
             title="Close (Esc)"
           >×</button>
         </div>

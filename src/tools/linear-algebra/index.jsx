@@ -967,9 +967,7 @@ function resizePreserve(grid, newRows, newCols) {
 
 // ─── MatrixGrid component ─────────────────────────────────────────────────────
 function MatrixGrid({ grid, setGrid, label, dark }) {
-  const bg = dark
-    ? 'bg-[#0d1117] border-slate-700 text-slate-200 focus:border-violet-400'
-    : 'bg-white border-slate-300 text-slate-800 focus:border-violet-500';
+  const inputCls = `w-14 h-9 text-center text-sm font-mono rounded-lg outline-none transition-all border bg-white/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20`;
   return (
     <div>
       <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{label}</p>
@@ -987,7 +985,7 @@ function MatrixGrid({ grid, setGrid, label, dark }) {
                         next[ri][ci] = e.target.value;
                         setGrid(next);
                       }}
-                      className={`w-12 h-9 text-center text-xs font-mono rounded-lg border outline-none transition-colors ${bg}`}
+                      className={inputCls}
                       placeholder="0"
                     />
                   </td>
@@ -1017,7 +1015,7 @@ function Transform2DView({ M, dark }) {
     return <><line x1={p0.x} y1={p0.y} x2={p1.x} y2={p1.y} stroke={stroke} strokeWidth="2.5" /><circle cx={p1.x} cy={p1.y} r="3.2" fill={stroke} /></>;
   };
   return (
-    <div className={`rounded-xl border ${dark ? 'border-slate-700 bg-[#0d1117]' : 'border-slate-200 bg-white'} p-2`}>
+    <div className={`rounded-xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-50/50 dark:bg-slate-800/50 p-2`}>
       <p className={`text-[10px] font-bold uppercase tracking-wider mb-1.5 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>2D Transform Visual</p>
       <svg width="100%" viewBox={`0 0 ${viewSize} ${viewSize}`}>
         {[...Array(9)].map((_, i) => {
@@ -1107,11 +1105,11 @@ function LAPanel({ dark }) {
     setSteps(null); setError('');
   }, [rowsB, colsB, rowsA]);
 
-  const bg0 = dark ? 'bg-[#0d1117]' : 'bg-slate-100';
-  const bg2 = dark ? 'bg-[#21262d]' : 'bg-slate-50';
-  const bdr = dark ? 'border-slate-700' : 'border-slate-200';
-  const txt = dark ? 'text-slate-100' : 'text-slate-800';
-  const muted = dark ? 'text-slate-400' : 'text-slate-500';
+  const bg0 = 'bg-slate-50/80 dark:bg-slate-800/80';
+  const bg2 = 'bg-slate-50/50 dark:bg-slate-800/50';
+  const bdr = 'border-slate-200/80 dark:border-slate-700/80';
+  const txt = 'text-slate-800 dark:text-slate-100';
+  const muted = 'text-slate-500 dark:text-slate-400';
 
   const handleSolve = () => {
     setError(''); setSteps(null);
@@ -1193,9 +1191,7 @@ function LAPanel({ dark }) {
                       className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border ${
                         opId === o.id
                           ? 'bg-violet-600 text-white border-violet-600 shadow-sm'
-                          : dark
-                            ? 'bg-[#21262d] border-slate-700 text-slate-300 hover:border-violet-500 hover:text-violet-400'
-                            : 'bg-white border-slate-200 text-slate-600 hover:border-violet-400 hover:text-violet-600'
+                          : 'bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/80 text-slate-600 dark:text-slate-300 hover:border-violet-400 hover:text-violet-500'
                       }`}
                     >{o.icon}</button>
                   );
@@ -1218,7 +1214,7 @@ function LAPanel({ dark }) {
             step={op.id === 'scalarmul' ? '0.1' : '1'}
             value={scalarN}
             onChange={e => setScalarN(op.id === 'scalarmul' ? parseFloat(e.target.value || '1') : parseInt(e.target.value || '0', 10))}
-            className={`w-28 h-9 text-center text-sm font-mono rounded-lg border outline-none transition-colors ${dark ? 'bg-[#0d1117] border-slate-700 text-slate-200 focus:border-violet-400' : 'bg-white border-slate-300 text-slate-800 focus:border-violet-500'}`}
+            className={`w-28 h-9 text-center text-sm font-mono rounded-lg border outline-none transition-all bg-white/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-700/50 text-slate-800 dark:text-slate-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/20`}
           />
         </div>
       )}
@@ -1316,6 +1312,88 @@ function LAPanel({ dark }) {
   );
 }
 
-export default function LinearAlgebraCalculator({ dark = true }) {
-  return <LAPanel dark={dark} />;
+export default function LinearAlgebraCalculator({ onClose }) {
+  const dark = document.documentElement.classList.contains('dark')
+  const isMobile = window.innerWidth < 640
+
+  const [pos, setPos] = useState(() => ({
+    x: Math.max(16, window.innerWidth  - 500),
+    y: Math.max(16, Math.round((window.innerHeight - 700) / 2)),
+  }))
+
+  const dragging   = useRef(false)
+  const dragOrigin = useRef({ mx: 0, my: 0, px: 0, py: 0 })
+
+  const startDrag = (e) => {
+    e.preventDefault()
+    dragging.current = true
+    dragOrigin.current = { mx: e.clientX, my: e.clientY, px: pos.x, py: pos.y }
+  }
+
+  useEffect(() => {
+    const move = (e) => {
+      if (!dragging.current) return
+      setPos({
+        x: Math.max(0, Math.min(window.innerWidth  - 400, dragOrigin.current.px + e.clientX - dragOrigin.current.mx)),
+        y: Math.max(0, Math.min(window.innerHeight - 80,  dragOrigin.current.py + e.clientY - dragOrigin.current.my)),
+      })
+    }
+    const up = () => { dragging.current = false }
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseup',   up)
+    return () => {
+      window.removeEventListener('mousemove', move)
+      window.removeEventListener('mouseup',   up)
+    }
+  }, [])
+
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape' && onClose) onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  const bg0 = 'bg-slate-50/80 dark:bg-slate-800/80'
+  const bg1 = 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl'
+  const bdr = 'border-slate-200/80 dark:border-slate-700/80'
+  const txt = 'text-slate-800 dark:text-slate-100'
+  const muted = 'text-slate-500 dark:text-slate-400'
+
+  return (
+    <>
+      {isMobile && (
+        <div className="fixed inset-0 z-[1999] bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      )}
+      <div
+        className={`fixed z-[2000] rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.2)] dark:shadow-[0_10px_50px_rgba(0,0,0,0.5)] border ${bdr} ${bg1} overflow-hidden ring-1 ring-white/10`}
+        style={isMobile
+          ? {
+              left: '50%', top: '50%',
+              transform: 'translate(-50%,-50%)',
+              width: Math.min(480, window.innerWidth - 16),
+              maxHeight: '92dvh', overflowY: 'auto',
+            }
+          : { left: pos.x, top: pos.y, width: 480 }
+        }
+      >
+        {/* title bar */}
+        <div
+          className={`flex items-center gap-2 px-3 py-2.5 bg-slate-50/50 dark:bg-slate-800/50 border-b ${bdr} cursor-move select-none`}
+          onMouseDown={startDrag}
+        >
+          <span className="text-violet-400 text-sm font-bold font-mono">[A]</span>
+          <span className={`text-xs font-bold tracking-wide ${txt} flex-1`}>Linear Algebra</span>
+          <span className={`text-[10px] ${muted}`}>drag to move</span>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className={`ml-1 p-1 rounded-lg hover:bg-rose-500/10 dark:hover:bg-rose-500/20 text-slate-400 hover:text-rose-500 transition-colors text-base leading-none`}
+              title="Close (Esc)"
+            >×</button>
+          )}
+        </div>
+        <LAPanel dark={dark} />
+      </div>
+    </>
+  )
 }

@@ -816,14 +816,7 @@ export default function AppShell({ children }) {
             {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
             {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
             {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
-            {laOpen && (
-              <div className="fixed inset-0 z-[1999] flex items-start justify-center pt-16 pointer-events-none">
-                <div className="pointer-events-auto relative">
-                  <button onClick={() => setLaOpen(false)} className="absolute top-2 right-2 z-10 text-slate-400 hover:text-white bg-slate-800 rounded-full w-6 h-6 flex items-center justify-center text-xs">✕</button>
-                  <LinearAlgebraCalc />
-                </div>
-              </div>
-            )}
+            {laOpen && <LinearAlgebraCalc onClose={() => setLaOpen(false)} />}
             {gameRulesOpen && (
               <div style={{ position: "fixed", inset: 0, zIndex: 300 }}>
                 <GameRules onClose={() => setGameRulesOpen(false)} />
