@@ -1,6 +1,25 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react'
 import { runCode, RUNNABLE_LANGS, WANDBOX_COMPILER } from '../../utils/codeRunner.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
+import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
+
+// Maps Monaco theme name → editor background hex, so the static (Prism) view
+// uses the same background as the edit-mode Monaco panel.
+const THEME_BG = {
+  'open-calc-dark':  '#07111e',
+  'open-calc-light': '#f3f9ff',
+  'github-light':    '#ffffff',
+  'github-dark':     '#0d1117',
+  'dracula':         '#282a36',
+  'nord-dark':       '#2e3440',
+  'monokai':         '#272822',
+  'tokyo-night':     '#1a1b26',
+  'one-dark':        '#282c34',
+  'solarized-dark':  '#002b36',
+  'catppuccin':      '#1e1e2e',
+  'openmat-dark':    '#081423',
+  'openmat-light':   '#eef7ff',
+}
 import Prism from 'prismjs'
 import '../../styles/prism-blog.css'
 import 'prismjs/components/prism-python'
@@ -114,7 +133,7 @@ function HighlightedCode({ code, language }) {
 }
 
 export default function CodeBlock({ language = '', code, cellIndex, getPriorContext, onCodeChange }) {
-  const { isDarkGlobal } = useGlobalTheme()
+  const { isDarkGlobal, themeStyles } = useGlobalTheme()
   const trimmedCode = code.trimEnd()
   const isTerminalOutput = !language
   const lang = language.toLowerCase()
@@ -123,8 +142,8 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
   const isWandbox = lang in WANDBOX_COMPILER
   const label = LANG_LABEL[lang] || language || 'output'
   const monacoLang = MONACO_LANG[lang] || 'plaintext'
-  const monacoTheme = isDarkGlobal ? 'vs-dark' : 'vs'
-  const codeBg = isDarkGlobal ? 'bg-[#1e1e2e]' : 'bg-[#f6f8fa]'
+  const monacoTheme = themeStyles?.monaco ?? (isDarkGlobal ? 'vs-dark' : 'vs')
+  const codeBgColor = THEME_BG[monacoTheme] ?? (isDarkGlobal ? '#1e1e2e' : '#f6f8fa')
 
   const [editing, setEditing] = useState(false)
   const [editorCode, setEditorCode] = useState(trimmedCode)
@@ -243,7 +262,7 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
       </div>
 
       {/* Code area */}
-      <div className={codeBg}>
+      <div style={{ backgroundColor: codeBgColor }}>
         {editing ? (
           <Suspense fallback={<div className="px-4 py-3 text-slate-400 text-sm font-mono">Loading editor…</div>}>
             <MonacoEditor
@@ -252,6 +271,7 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
               value={editorCode}
               onChange={handleEditorChange}
               theme={monacoTheme}
+              beforeMount={setupOpenCalcMonaco}
               options={{
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
@@ -266,7 +286,7 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
             />
           </Suspense>
         ) : (
-          <div className={isDarkGlobal ? 'text-[#ccc]' : 'text-[#24292e]'}>
+          <div style={{ color: isDarkGlobal ? '#ccc' : '#24292e' }}>
             <HighlightedCode code={trimmedCode} language={lang} />
           </div>
         )}

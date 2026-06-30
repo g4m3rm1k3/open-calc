@@ -4,6 +4,14 @@ import { executeScript } from '../engines/openmat/openmatEngine.js'
 // ── Python ────────────────────────────────────────────────────────────────────
 export async function runPython(code, stdin = '') {
   const pyodide = await getPyodide()
+
+  // Auto-load packages declared in import statements (numpy, pandas, etc.)
+  await pyodide.loadPackagesFromImports(code).catch(() => {})
+  // matplotlib isn't caught by loadPackagesFromImports in all Pyodide versions
+  if (/\bmatplotlib\b/.test(code)) {
+    await pyodide.loadPackage('matplotlib').catch(() => {})
+  }
+
   const lines = []
   pyodide.setStdout({ batched: (s) => lines.push(s) })
   pyodide.setStderr({ batched: (s) => lines.push('⚠ ' + s) })

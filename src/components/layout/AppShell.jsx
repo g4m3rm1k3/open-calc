@@ -17,20 +17,10 @@ import { TOOLS, toolsByGroup } from "../../tools/toolLoader.js";
 import { useSearchContext } from "../../context/SearchContext.jsx";
 import GrapherContext from "../../context/GrapherContext.jsx";
 import {
-  Activity,
-  Box,
-  Settings2,
-  PenLine,
-  Smartphone,
-  Layers,
   Search,
-  Menu,
-  Calculator,
-  Terminal,
   PlayCircle,
   Sun,
   Moon,
-  GraduationCap,
 } from "lucide-react";
 const MatrixReducer = lazy(() => import("../../tools/matrix-reducer/index.jsx"));
 const MathOS = lazy(() => import("../../tools/math-os/MathOS.jsx"));
@@ -39,13 +29,10 @@ const SigmaCalc = lazy(() => import("../../tools/sigma/index.jsx"));
 const PolyCalc = lazy(() => import("../../tools/polynomial/index.jsx"));
 const LinearAlgebraCalc = lazy(() => import("../../tools/linear-algebra/index.jsx"));
 const HelpModal = lazy(() => import("../ui/HelpModal.jsx"));
-import ReportBugButton from "../ui/ReportBugButton.jsx";
-import MobileBottomNav from "./MobileBottomNav.jsx";
 const TerminalHub = lazy(() => import("../../tools/terminal-hub/TerminalHub.jsx"));
 import CompassQuickPanel from "../../features/compass/CompassQuickPanel.jsx";
 import { ChatProvider } from "../../context/ChatContext.jsx";
 const ChatPanel = lazy(() => import("../tutor/ChatPanel.jsx"));
-import { motion, AnimatePresence } from "framer-motion";
 const PhysicsPoolLab = lazy(() => import("../../games/pool/PhysicsPoolLab.jsx"));
 const BasketballLab = lazy(() => import("../../games/basketball/BasketballLab.jsx"));
 const MiniGolfGame = lazy(() => import("../../games/golf/MiniGolfGame.jsx"));
@@ -154,7 +141,7 @@ function TopBar() {
       <div className="flex-1 flex items-center gap-1">
         <Link
           to="/blog"
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         >
           Blog
         </Link>
@@ -243,8 +230,6 @@ export default function AppShell({ children }) {
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
   const isMobile = useIsMobile();
   const isMobileHome = isDesktopRoute && isMobile;
-
-  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
 
   // Restore dev mode across page refreshes
   useEffect(() => {
@@ -498,7 +483,7 @@ export default function AppShell({ children }) {
           <TopBar />
 
           {/* Mobile tools backdrop */}
-          {(graphOpen || graph3DOpen || graphJSXOpen || mobileToolsOpen) && (
+          {(graphOpen || graph3DOpen || graphJSXOpen) && (
             <div
               className="fixed inset-0 z-[45] bg-black/30 backdrop-blur-sm lg:backdrop-blur-none lg:bg-transparent"
               onClick={() => {
@@ -515,7 +500,7 @@ export default function AppShell({ children }) {
 
           {/* Main content */}
           <main
-            className={`transition-[padding] duration-500 ease-in-out ${isChemistryRoute || isFullPageToolRoute || isScrollableFullPageRoute ? "flex flex-col h-[calc(100vh-44px)] overflow-hidden" : isFullWidthRoute ? "min-h-screen pb-28 lg:pb-11" : isDesktopRoute && !isMobile ? "h-screen" : "min-h-screen pb-28 lg:pb-11"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-[52px]`}
+            className={`transition-[padding] duration-500 ease-in-out ${isChemistryRoute || isFullPageToolRoute || isScrollableFullPageRoute ? "flex flex-col h-[calc(100vh-44px)] overflow-hidden" : isFullWidthRoute ? "min-h-screen pb-4 lg:pb-11" : isDesktopRoute && !isMobile ? "h-screen" : "min-h-screen pb-4 lg:pb-11"} ${isHealthRoute || isBrainRoute ? "bg-white dark:bg-slate-950" : ""} lg:pl-0 pt-[52px]`}
             style={{
               paddingRight: chatOpen
                 ? (scratchSnap === "right" ? `${scratchSnapW}px` : "var(--chat-width, 380px)")
@@ -545,202 +530,6 @@ export default function AppShell({ children }) {
               {isMobileHome ? <MobileHomePage /> : (children ?? <Outlet />)}
             </div>
           </main>
-
-          {/* Mobile Tools Menu Hub */}
-          <AnimatePresence>
-            {mobileToolsOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: "100%" }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: "100%" }}
-                transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="lg:hidden fixed bottom-[88px] left-4 right-4 z-[55] bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl rounded-[2rem] p-6 shadow-[0_10px_50px_rgba(0,0,0,0.25)] border border-white/50 dark:border-white/10 overflow-hidden"
-              >
-                {/* Decorative background glow */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[200%] h-32 bg-indigo-500/10 blur-[50px] pointer-events-none" />
-
-                <div className="flex items-center justify-between mb-6 relative z-10">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                      <Layers className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">Math Tools</h3>
-                      <p className="text-[11px] font-medium text-slate-500">Quick access to interactive apps</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setMobileToolsOpen(false)}
-                    className="p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 transition-colors"
-                  >
-                    <Smartphone className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 relative z-10 max-h-[50vh] overflow-y-auto pr-1 pb-2">
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      closeAllTools();
-                      setGraphOpen(true);
-                      setMobileToolsOpen(false);
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-500/20 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-indigo-500/20 flex items-center justify-center shadow-sm">
-                      <Activity className="w-5 h-5" />
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">2D Grapher</span>
-                  </motion.button>
-
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      closeAllTools();
-                      setGraph3DOpen(true);
-                      setMobileToolsOpen(false);
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-500/20 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-amber-500/20 flex items-center justify-center shadow-sm">
-                      <Box className="w-5 h-5" />
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">3D Plotter</span>
-                  </motion.button>
-
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      closeAllTools();
-                      setGraphJSXOpen(true);
-                      setMobileToolsOpen(false);
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-emerald-500/20 flex items-center justify-center shadow-sm">
-                      <Settings2 className="w-5 h-5" />
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">Pro Tools</span>
-                  </motion.button>
-
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      closeAllTools();
-                      setScratchOpen(true);
-                      setMobileToolsOpen(false);
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-500/20 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-rose-500/20 flex items-center justify-center shadow-sm">
-                      <PenLine className="w-5 h-5" />
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">Scratchpad</span>
-                  </motion.button>
-
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      closeAllTools();
-                      setMobileToolsOpen(false);
-                      setCalcOpen(true);
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 border border-violet-100 dark:border-violet-500/20 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-violet-500/20 flex items-center justify-center shadow-sm">
-                      <Calculator className="w-5 h-5" />
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">Calculator</span>
-                  </motion.button>
-
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      closeAllTools();
-                      setTerminalOpen(true);
-                      setMobileToolsOpen(false);
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-slate-700/50 flex items-center justify-center shadow-sm">
-                      <Terminal className="w-5 h-5" />
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">Terminal</span>
-                  </motion.button>
-
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      closeAllTools();
-                      window.dispatchEvent(new CustomEvent("oc-toggle-video"));
-                      setMobileToolsOpen(false);
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-sky-300 border border-sky-100 dark:border-sky-500/20 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-sky-500/20 flex items-center justify-center shadow-sm">
-                      <PlayCircle className="w-5 h-5" />
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">Video Player</span>
-                  </motion.button>
-
-                  <motion.button
-                    data-tour="stem-tutor-mobile"
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      window.dispatchEvent(new CustomEvent("oc-toggle-tutor"));
-                      setMobileToolsOpen(false);
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-emerald-500/20 flex items-center justify-center shadow-sm">
-                      <GraduationCap className="w-5 h-5" />
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">Delta (AI Tutor)</span>
-                  </motion.button>
-
-                  <motion.button
-                    data-tour="lesson-builder-mobile"
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      setMobileToolsOpen(false);
-                      navigate("/lesson-builder");
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-500/20 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-amber-500/20 flex items-center justify-center shadow-sm">
-                      <span className="text-lg leading-none">🔨</span>
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">Lesson Builder</span>
-                  </motion.button>
-
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      setMobileToolsOpen(false);
-                      window.dispatchEvent(new CustomEvent('oc-toggle-help'));
-                    }}
-                    className="flex flex-col items-start gap-3 p-4 rounded-3xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-500/20 shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-2xl bg-white/50 dark:bg-indigo-500/20 flex items-center justify-center shadow-sm">
-                      <span className="text-xl font-black leading-none">?</span>
-                    </div>
-                    <span className="text-xs font-bold tracking-wide">Contributor Docs</span>
-                  </motion.button>
-
-                  <ReportBugButton
-                    tile
-                    data-tour="report-bug-mobile"
-                    onOpen={() => setMobileToolsOpen(false)}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <MobileBottomNav
-            onSearchOpen={openSearch}
-            onToolsToggle={() => setMobileToolsOpen((o) => !o)}
-          />
 
           <Suspense fallback={null}>
             {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
