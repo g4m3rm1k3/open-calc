@@ -21,11 +21,11 @@ jobs:
         include:
           - os: macos-latest
             platform: mac
-            script: desktop:build:mac
+            eb_args: '--mac dmg'
             artifact: 'desktop/dist/*.dmg'
           - os: windows-latest
             platform: win
-            script: desktop:build:win
+            eb_args: '--win portable'
             artifact: 'desktop/dist/*.exe'
 
     runs-on: ${{ matrix.os }}
@@ -46,13 +46,32 @@ jobs:
       - name: Install dependencies
         run: npm install --prefer-offline
 
-      - name: Build (${{ matrix.platform }})
-        run: npm run ${{ matrix.script }}
+      - name: Build search index
+        run: node src/scripts/build-search-index.js
         env:
+          ELECTRON_BUILD: '1'
           NODE_OPTIONS: --max-old-space-size=6144
-          # Prevent electron-builder from trying to publish via git
+
+      - name: Build lesson IDs
+        run: node scripts/build-lesson-ids.mjs
+
+      - name: Build frontend (Vite)
+        run: node --max-old-space-size=6144 ./node_modules/vite/bin/vite.js build
+        env:
+          ELECTRON_BUILD: '1'
+          NODE_OPTIONS: --max-old-space-size=6144
+
+      - name: Sync desktop package.json
+        run: node scripts/sync-desktop-package.mjs
+
+      - name: Stage desktop app
+        run: node scripts/prepare-desktop-build.mjs
+
+      - name: Package (${{ matrix.platform }})
+        run: node --max-old-space-size=4096 ./node_modules/electron-builder/cli.js --projectDir desktop/staging --publish never ${{ matrix.eb_args }}
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
           ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: true
-          # Skip Mac code signing — no Apple certificate in CI
           CSC_IDENTITY_AUTO_DISCOVERY: false
           CSC_LINK: ''
           WIN_CSC_LINK: ''
