@@ -83,6 +83,20 @@ export default function MobileHomePage() {
         </div>
       </section>
 
+      <a
+        href="https://discord.gg/epd2kYBDVt"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 mb-10 px-5 py-4 rounded-3xl border border-sky-200/60 dark:border-sky-700/40 bg-sky-50/80 dark:bg-sky-900/20 active:scale-[0.98] transition-transform shadow-sm"
+      >
+        <span className="text-2xl leading-none">🎮</span>
+        <div className="min-w-0">
+          <p className="text-[13px] font-black text-sky-700 dark:text-sky-300 leading-tight">Join the Discord</p>
+          <p className="text-[11px] text-sky-600/70 dark:text-sky-400/70 font-medium mt-0.5">Ask questions · share your work · chat</p>
+        </div>
+        <span className="ml-auto text-sky-400 dark:text-sky-500 font-bold text-lg leading-none">→</span>
+      </a>
+
       {inProgress.length > 0 && (
         <section className="mb-12">
           <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-brand-500 dark:text-brand-400 mb-4 flex items-center gap-2">

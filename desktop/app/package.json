@@ -1,7 +1,7 @@
 {
   "name": "upskillos",
   "productName": "UpSkillOS",
-  "description": "Portable desktop shell for UpSkillOS",
+  "description": "An open-source interactive STEM learning platform — intuition first, rigor always",
   "license": "GPL-3.0-or-later",
   "type": "module",
   "main": "main.mjs",

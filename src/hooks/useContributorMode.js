@@ -1,16 +1,34 @@
 import { useState, useEffect } from 'react'
 
 export function useContributorMode() {
-  const [available, setAvailable] = useState(false)
+  const isElectron = typeof window !== 'undefined' && !!window.openCalcDesktop
+  const [devFsAvailable, setDevFsAvailable] = useState(false)
+  const [isCloned, setIsCloned] = useState(false)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/dev-fs/ping')
-      .then(r => (r.ok ? r.json() : Promise.reject()))
-      .then(d => { if (d?.ok) setAvailable(true) })
-      .catch(() => setAvailable(false))
-      .finally(() => setLoading(false))
-  }, [])
+    let cancelled = false
 
-  return { available, loading }
+    async function probe() {
+      try {
+        const [pingRes, statusRes] = await Promise.all([
+          fetch('/api/dev-fs/ping').then(r => r.ok ? r.json() : null).catch(() => null),
+          isElectron
+            ? window.openCalcDesktop.getContributorStatus()
+            : Promise.resolve(null),
+        ])
+
+        if (cancelled) return
+        setDevFsAvailable(!!pingRes?.ok)
+        setIsCloned(statusRes?.cloned ?? false)
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    probe()
+    return () => { cancelled = true }
+  }, [isElectron])
+
+  return { isElectron, isCloned, devFsAvailable, available: devFsAvailable, loading }
 }

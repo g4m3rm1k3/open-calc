@@ -36,7 +36,7 @@ export default function WhatsNewModal() {
           What's new
         </p>
         <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-3">{latest.title}</h2>
-        <ul className="space-y-2 mb-6">
+        <ul className="space-y-2 mb-4">
           {latest.items.map((item, i) => (
             <li key={i} className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed flex gap-2">
               <span className="text-brand-500 dark:text-brand-400 shrink-0">•</span>
@@ -44,6 +44,18 @@ export default function WhatsNewModal() {
             </li>
           ))}
         </ul>
+        {latest.discord && (
+          <a
+            href={latest.discord}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 mb-4 px-3 py-2.5 rounded-xl bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-700/40 text-sky-700 dark:text-sky-300 text-sm font-semibold hover:bg-sky-100 dark:hover:bg-sky-900/40 transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <span>🎮</span>
+            <span>Join the Discord community →</span>
+          </a>
+        )}
         <button
           onClick={dismiss}
           className="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold transition-colors"

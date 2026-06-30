@@ -1,0 +1,89 @@
+name: Desktop Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag (e.g. v0.2.0)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: mac
+            script: desktop:build:mac
+            artifact: 'desktop/dist/*.dmg'
+          - os: windows-latest
+            platform: win
+            script: desktop:build:win
+            artifact: 'desktop/dist/*.exe'
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install --prefer-offline
+
+      - name: Build (${{ matrix.platform }})
+        run: npm run ${{ matrix.script }}
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.platform }}
+          path: ${{ matrix.artifact }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name || inputs.tag }}
+          name: UpSkillOS ${{ github.ref_name || inputs.tag }}
+          draft: true
+          body: |
+            ## UpSkillOS ${{ github.ref_name || inputs.tag }}
+
+            ### Downloads
+            | Platform | File |
+            |---|---|
+            | Mac (Intel + Apple Silicon) | `.dmg` below |
+            | Windows 10/11 (64-bit) | `.exe` below — no install needed, just run it |
+
+            ### What's new
+            See the in-app "What's new" screen on first launch.
+          files: |
+            artifacts/desktop-mac/*.dmg
+            artifacts/desktop-win/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

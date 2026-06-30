@@ -1,8 +1,14 @@
 import { app, BrowserWindow, dialog, ipcMain, shell, protocol, net } from 'electron'
-import { promises as fs } from 'node:fs'
+import { promises as fs, createWriteStream } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { exec, spawn } from 'node:child_process'
+import { promisify } from 'node:util'
+
+const execAsync = promisify(exec)
+
+let backendProc = null
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isDev = !app.isPackaged
@@ -25,7 +31,7 @@ app.commandLine.appendSwitch('enable-gpu-rasterization')
 
 let mainWindow = null
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Serve the built dist/ through a custom scheme so file:// security
   // restrictions never apply, regardless of where the portable exe extracts.
   protocol.handle('opencalc', (request) => {
@@ -36,11 +42,19 @@ app.whenReady().then(() => {
     return net.fetch(`file:///${filePath.replace(/\\/g, '/')}`)
   })
 
+  // Auto-start backend so /api/dev-fs is available in packaged builds.
+  // In dev mode the Vite plugin handles these routes — skip spawning.
+  if (!isDev) spawnBackend()
+
   createWindow()
 })
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
+})
+
+app.on('before-quit', () => {
+  backendProc?.kill()
 })
 
 app.on('activate', () => {
@@ -90,6 +104,138 @@ ipcMain.handle('desktop:open-external', async (_event, url) => {
   await shell.openExternal(url)
   return { ok: true }
 })
+
+// ── Contributor mode ────────────────────────────────────────────────────────
+
+const GITHUB_ZIP_URL = 'https://codeload.github.com/g4m3rm1k3/upskillos/zip/refs/heads/main'
+const EXTRACTED_FOLDER = 'upskillos-main'
+
+function contribConfigPath() {
+  return path.join(app.getPath('userData'), 'contrib-config.json')
+}
+
+async function loadContribConfig() {
+  try {
+    return JSON.parse(await fs.readFile(contribConfigPath(), 'utf8'))
+  } catch {
+    return {}
+  }
+}
+
+async function saveContribConfig(data) {
+  await fs.writeFile(contribConfigPath(), JSON.stringify(data, null, 2), 'utf8')
+}
+
+ipcMain.handle('desktop:contributor-status', async () => {
+  const cfg = await loadContribConfig()
+  const repoPath = cfg.repoPath ?? null
+  let cloned = false
+  if (repoPath) {
+    try { await fs.access(path.join(repoPath, 'src')); cloned = true } catch {}
+  }
+  return { cloned, repoPath }
+})
+
+ipcMain.handle('desktop:clone-repo', async () => {
+  const userData = app.getPath('userData')
+  const zipPath  = path.join(userData, 'repo-download.zip')
+  const extractDir = path.join(userData, 'repo-extract')
+  const repoDir  = path.join(userData, 'repo')
+  const emit = (payload) => mainWindow?.webContents.send('desktop:clone-progress', payload)
+
+  try {
+    emit({ phase: 'downloading', percent: 0 })
+    const response = await fetch(GITHUB_ZIP_URL)
+    if (!response.ok) throw new Error(`Download failed: ${response.status}`)
+
+    const contentLength = parseInt(response.headers.get('content-length') || '0', 10)
+    const chunks = []
+    let received = 0
+    const reader = response.body.getReader()
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      chunks.push(Buffer.from(value))
+      received += value.length
+      if (contentLength > 0) {
+        emit({ phase: 'downloading', percent: Math.round((received / contentLength) * 80) })
+      }
+    }
+
+    await fs.writeFile(zipPath, Buffer.concat(chunks))
+    emit({ phase: 'extracting', percent: 85 })
+
+    await fs.rm(extractDir, { recursive: true, force: true })
+    await fs.mkdir(extractDir, { recursive: true })
+
+    if (process.platform === 'win32') {
+      await execAsync(`powershell -Command "Expand-Archive -Path '${zipPath}' -DestinationPath '${extractDir}' -Force"`)
+    } else {
+      await execAsync(`unzip -o "${zipPath}" -d "${extractDir}"`)
+    }
+
+    emit({ phase: 'extracting', percent: 95 })
+    await fs.rm(repoDir, { recursive: true, force: true })
+    await fs.rename(path.join(extractDir, EXTRACTED_FOLDER), repoDir)
+    await fs.rm(extractDir, { recursive: true, force: true })
+    await fs.rm(zipPath, { force: true })
+
+    const cfg = await loadContribConfig()
+    await saveContribConfig({ ...cfg, repoPath: repoDir, clonedAt: new Date().toISOString() })
+
+    if (!isDev) restartBackend()
+
+    emit({ phase: 'done', percent: 100 })
+    return { ok: true, repoPath: repoDir }
+  } catch (e) {
+    emit({ phase: 'error', error: String(e) })
+    return { ok: false, reason: String(e) }
+  }
+})
+
+ipcMain.handle('desktop:set-github-token', async (_event, token) => {
+  const cfg = await loadContribConfig()
+  await saveContribConfig({ ...cfg, githubToken: token })
+  return { ok: true }
+})
+
+ipcMain.handle('desktop:get-github-token', async () => {
+  const cfg = await loadContribConfig()
+  return { token: cfg.githubToken ?? '' }
+})
+
+// ── End contributor mode ────────────────────────────────────────────────────
+
+async function spawnBackend() {
+  const backendScript = app.isPackaged
+    ? path.join(process.resourcesPath, 'backend', 'server.mjs')
+    : path.join(__dirname, '..', '..', 'backend', 'server.mjs')
+
+  try {
+    await fs.access(backendScript)
+  } catch {
+    return // backend not bundled — skip (dev-fs won't be available in packaged build)
+  }
+
+  const cfg = await loadContribConfig()
+  const env = { ...process.env }
+  if (cfg.repoPath) env.OPEN_CALC_RUNTIME_ROOT = cfg.repoPath
+  if (cfg.githubToken) env.GITHUB_TOKEN = cfg.githubToken
+
+  backendProc = spawn(process.execPath, [backendScript], {
+    env,
+    stdio: 'ignore',
+    detached: false,
+  })
+
+  backendProc.on('error', () => {}) // silently absorb spawn errors
+}
+
+function restartBackend() {
+  backendProc?.kill()
+  backendProc = null
+  spawnBackend()
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
