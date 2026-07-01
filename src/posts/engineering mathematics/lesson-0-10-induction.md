@@ -157,12 +157,16 @@ $$1 + 2 + \cdots + k + (k+1) = \frac{(k+1)(k+2)}{2}$$
 
 Starting from the left side:
 
-$$1 + 2 + \cdots + k + (k+1)
-= \underbrace{\left(\frac{k(k+1)}{2}\right)}_{\text{by inductive hypothesis}} + (k+1)$$
+$$
+1 + 2 + \cdots + k + (k+1)
+= \underbrace{\left(\frac{k(k+1)}{2}\right)}_{\text{by inductive hypothesis}} + (k+1)
+$$
 
-$$= \frac{k(k+1)}{2} + \frac{2(k+1)}{2}
+$$
+= \frac{k(k+1)}{2} + \frac{2(k+1)}{2}
 = \frac{k(k+1) + 2(k+1)}{2}
-= \frac{(k+1)(k+2)}{2}$$
+= \frac{(k+1)(k+2)}{2}
+$$
 
 This is exactly the formula evaluated at $k+1$. ✓
 
@@ -275,11 +279,13 @@ for some $n \geq 0$ (inductive hypothesis).
 
 We must show $\displaystyle\sum_{k=0}^{n+1} 2^k = 2^{n+2} - 1$.
 
-$$\sum_{k=0}^{n+1} 2^k
+$$
+\sum_{k=0}^{n+1} 2^k
 = \underbrace{\sum_{k=0}^{n} 2^k}_{\text{inductive hypothesis}} + 2^{n+1}
 = \left(2^{n+1} - 1\right) + 2^{n+1}
 = 2 \cdot 2^{n+1} - 1
-= 2^{n+2} - 1 \checkmark$$
+= 2^{n+2} - 1 \checkmark
+$$
 
 By induction, the formula holds for all $n \geq 0$. $\blacksquare$
 
@@ -453,11 +459,13 @@ conditions hold, you were informally doing induction.
 
 **Key results proved:**
 
-$$\sum_{k=1}^{n} k = \frac{n(n+1)}{2}
+$$
+\sum_{k=1}^{n} k = \frac{n(n+1)}{2}
 \qquad
 \sum_{k=0}^{n} 2^k = 2^{n+1} - 1
 \qquad
-3 \mid n^3 - n \text{ for all } n \geq 0$$
+3 \mid n^3 - n \text{ for all } n \geq 0
+$$
 
 **Connection to recursion:** a recursive function's base case is the
 induction base case; its recursive call is the inductive step.
@@ -496,12 +504,16 @@ Factor out $(k+1)$ to get the formula at $k+1$.
 
 **Inductive step:** Assume $\sum_{k=1}^{n} k^2 = \frac{n(n+1)(2n+1)}{6}$.
 
-$$\sum_{k=1}^{n+1} k^2 = \frac{n(n+1)(2n+1)}{6} + (n+1)^2
-= \frac{n(n+1)(2n+1) + 6(n+1)^2}{6}$$
+$$
+\sum_{k=1}^{n+1} k^2 = \frac{n(n+1)(2n+1)}{6} + (n+1)^2
+= \frac{n(n+1)(2n+1) + 6(n+1)^2}{6}
+$$
 
-$$= \frac{(n+1)[n(2n+1) + 6(n+1)]}{6}
+$$
+= \frac{(n+1)[n(2n+1) + 6(n+1)]}{6}
 = \frac{(n+1)(2n^2+7n+6)}{6}
-= \frac{(n+1)(n+2)(2n+3)}{6}$$
+= \frac{(n+1)(n+2)(2n+3)}{6}
+$$
 
 This is the formula at $n+1$. $\square$
 
@@ -547,8 +559,10 @@ that sometimes the "right" proof is not induction. $\square$
 
 **3.** (Proof) Prove by induction that for all $n \geq 1$,
 
-$$\frac{1}{1 \cdot 2} + \frac{1}{2 \cdot 3} + \frac{1}{3 \cdot 4}
-+ \cdots + \frac{1}{n(n+1)} = \frac{n}{n+1}$$
+$$
+\frac{1}{1 \cdot 2} + \frac{1}{2 \cdot 3} + \frac{1}{3 \cdot 4}
++ \cdots + \frac{1}{n(n+1)} = \frac{n}{n+1}
+$$
 
 <details>
 <summary>Answer</summary>
@@ -557,9 +571,11 @@ $$\frac{1}{1 \cdot 2} + \frac{1}{2 \cdot 3} + \frac{1}{3 \cdot 4}
 
 **Inductive step:** Assume $\sum_{k=1}^{n} \frac{1}{k(k+1)} = \frac{n}{n+1}$.
 
-$$\sum_{k=1}^{n+1} \frac{1}{k(k+1)} = \frac{n}{n+1} + \frac{1}{(n+1)(n+2)}
+$$
+\sum_{k=1}^{n+1} \frac{1}{k(k+1)} = \frac{n}{n+1} + \frac{1}{(n+1)(n+2)}
 = \frac{n(n+2) + 1}{(n+1)(n+2)} = \frac{n^2+2n+1}{(n+1)(n+2)}
-= \frac{(n+1)^2}{(n+1)(n+2)} = \frac{n+1}{n+2}$$
+= \frac{(n+1)^2}{(n+1)(n+2)} = \frac{n+1}{n+2}
+$$
 
 This is the formula at $n+1$. $\square$
 
