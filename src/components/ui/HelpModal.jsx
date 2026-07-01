@@ -1,4 +1,4 @@
-﻿// HelpModal.jsx — Interactive contributor tutorial system
+// HelpModal.jsx — Interactive contributor tutorial system
 // A full in-app documentation site for contributors of all skill levels.
 import { useState, useEffect } from "react";
 import {
@@ -963,25 +963,40 @@ function SectionOverview() {
       <Para>
         UpSkillOS is an open-source interactive STEM learning platform. Every
         topic is a <strong>lesson</strong>. Lessons are grouped into{" "}
-        <strong>chapters</strong>. There are two ways to write or improve a
-        lesson:
+        <strong>chapters</strong>. There are three tools for building content:
       </Para>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 my-5">
         <div className="p-5 rounded-2xl border-2 border-amber-400/50 bg-amber-50/60 dark:bg-amber-950/20">
           <div className="text-2xl mb-2">🔨</div>
           <div className="text-sm font-bold text-amber-800 dark:text-amber-300 mb-1">
-            Lesson Builder (in-app)
+            Lesson Builder
           </div>
           <div className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed mb-3">
-            A visual editor built into the app. Add cells, preview instantly, no
-            setup needed. Works right in your browser — nothing to install.
+            Visual editor built into the app. Add cells, preview instantly, no
+            setup needed.
           </div>
           <a
             href="/lesson-builder"
             className="text-xs font-bold text-amber-700 dark:text-amber-300 hover:underline"
           >
             → Open Lesson Builder
+          </a>
+        </div>
+        <div className="p-5 rounded-2xl border-2 border-sky-400/50 bg-sky-50/60 dark:bg-sky-950/20">
+          <div className="text-2xl mb-2">🔭</div>
+          <div className="text-sm font-bold text-sky-800 dark:text-sky-300 mb-1">
+            Viz Builder
+          </div>
+          <div className="text-xs text-sky-700 dark:text-sky-400 leading-relaxed mb-3">
+            Build interactive visualizations and diagrams. Export directly into
+            any lesson.
+          </div>
+          <a
+            href="/viz-builder"
+            className="text-xs font-bold text-sky-700 dark:text-sky-300 hover:underline"
+          >
+            → Open Viz Builder
           </a>
         </div>
         <div className="p-5 rounded-2xl border-2 border-slate-300/50 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40">
@@ -991,8 +1006,7 @@ function SectionOverview() {
           </div>
           <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
             Clone the repo, edit <Cb>.js</Cb> files directly, run{" "}
-            <Cb>npm run dev</Cb> to preview. Full control, supports all lesson
-            types including Science Notebook.
+            <Cb>npm run dev</Cb> to preview. Full control, all lesson types.
           </div>
           <a
             href="https://github.com/g4m3rm1k3/upskillos"
@@ -1642,8 +1656,9 @@ function SectionUseViz() {
       </Para>
 
       <Note color="green">
-        <strong>No code editor?</strong> Open the <strong>Viz Builder</strong>{" "}
-        (🧩 in the top nav), configure a viz in the Build tab, click{" "}
+        <strong>No code editor?</strong> Open the{" "}
+        <a href="/viz-builder" className="font-bold underline">Viz Builder</a>{" "}
+        (🔭 in Labs), configure a viz in the Build tab, click{" "}
         <strong>Export →</strong>, then <strong>"Or insert directly into a
         lesson"</strong>. Search for the target lesson, pick a section
         (Intuition / Math / Rigor), and it drops straight into that lesson's
@@ -2212,69 +2227,99 @@ const AI_PROMPTS = [
     color: "blue",
     prompt: `You are generating a lesson for open-calc, an interactive math/STEM platform.
 
-The lesson is a JS file with one default export matching this EXACT schema (no extra fields):
+The lesson is a JS file with one default export. File goes in:
+  src/courses/{course-id}/{N}-{chapter-slug}/{NNN}-{lesson-slug}.js
+
+Example: src/courses/calculus/3-derivatives/006-product-rule.js
 
 export default {
-  id: 'ch1-derivatives',           // kebab-case, globally unique across all lessons
-  slug: 'ch1-what-is-a-derivative', // kebab-case, used in the URL
-  chapter: 'calc.1',               // MUST match the chapter object's number field exactly
-  order: 3,                        // integer position within chapter
-  title: 'What is a Derivative?',
+  id: 'product-rule',              // kebab-case, globally unique (no chapter prefix)
+  slug: 'product-rule',            // same as id — used in the URL
+  chapter: 3,                      // integer — the leading N in the chapter folder name
+  order: 6,                        // integer position within chapter (matches NNN prefix)
+  title: 'The Product Rule',
   subtitle: 'One-line plain-English description',
-  tags: ['calculus', 'derivatives'], // lowercase, hyphenated
+  tags: ['calculus', 'derivatives', 'product-rule'], // lowercase, hyphenated
 
   hook: {
-    question: 'How fast is something changing right now?',
+    question: 'How do you differentiate a product of two functions?',
     realWorldContext: 'One paragraph explaining real-world relevance.',
-    previewVisualizationId: 'SecantToTangent', // optional — leave out if none
+    previewVisualizationId: 'SecantToTangent', // optional — omit if none
+  },
+
+  mentalModel: ['Key takeaway 1.', 'Key takeaway 2.'],
+
+  // triggers: flash-card style recall cues (optional but recommended)
+  triggers: [
+    { prompt: 'Differentiate f(x)·g(x)', recall: "f'g + fg' — first times derivative of second plus second times derivative of first" },
+  ],
+
+  // spiral: links to prerequisite and follow-on lessons (optional but recommended)
+  spiral: {
+    recoveryPoints: [
+      { label: 'Derivative Definition (Lesson 1)', note: 'Review if the limit definition feels shaky.' },
+    ],
+    futureLinks: [
+      { label: 'Quotient Rule (Next Lesson)', note: 'The quotient rule is derived from the product rule.' },
+    ],
   },
 
   intuition: {
-    prose: ['Paragraph 1.', 'Paragraph 2.'], // plain English, no LaTeX
-    callouts: [
-      { type: 'important', title: 'Key idea', body: 'Explanation.' },
-      { type: 'tip',       title: 'Shortcut', body: 'Explanation.' },
-    ],
-    visualizations: [
-      { id: 'SecantToTangent', title: 'Display title', props: {} }
+    // semantics: symbol glossary — what every variable and notation means (optional)
+    semantics: {
+      core: [
+        { symbol: 'f(x)', meaning: 'first factor' },
+        { symbol: 'g(x)', meaning: 'second factor' },
+      ],
+      rulesOfThumb: [
+        "You can't just multiply the individual derivatives — try f=x², g=x² and verify.",
+      ],
+    },
+    // blocks: ordered content blocks — mix prose, images, and visualizations
+    blocks: [
+      {
+        type: 'prose',
+        paragraphs: [
+          'Paragraph 1 in plain English. No LaTeX here.',
+          'Paragraph 2.',
+        ],
+      },
+      // { type: 'image', src: importedSvgUrl, alt: 'Alt text', caption: 'Caption.' },
+      // { type: 'viz',   id: 'SecantToTangent', title: 'Display title', props: {} },
+      // { type: 'callout', calloutType: 'important', title: 'Key idea', body: 'Explanation.' },
     ],
   },
-
-  math: {
-    prose: ['Formal definition...'],
-    callouts: [],
-    visualizations: [],
-  },
-  rigor: { prose: [], callouts: [], visualizations: [] },
 
   examples: [
     {
-      title: 'Example: Power Rule',
-      problem: 'Find the derivative of f(x) = x^3.',
-      solution: 'Apply the power rule: bring down the exponent, reduce by 1.',
-      latex: 'f(x)=x^3 \\\\Rightarrow f\'(x)=3x^2',
+      title: 'Example: Power functions',
+      problem: 'Find the derivative of f(x) = x² · x³.',
+      solution: 'Apply the product rule: f\'g + fg\'.',
+      latex: 'f\'(x)=2x \\\\cdot x^3 + x^2 \\\\cdot 3x^2 = 5x^4',
     },
   ],
 
-  mentalModel: ['Key takeaway 1.', 'Key takeaway 2.'],
   checkpoints: ['read-intuition'],
   quiz: [
     {
       id: 'q1',
-      question: 'What does f\'(x) measure?',
-      options: ['Area under f', 'Instantaneous rate of change', 'Average value', 'Antiderivative'],
-      answer: 1, // 0-indexed correct answer
-      explanation: 'Because the derivative measures instantaneous rate of change.',
+      type: 'choice',
+      text: 'The product rule states that (fg)\\'(x) equals…',
+      options: ["f'g + fg'", "f'g'", "f'(x) · g'(x)", "(f+g)'"],
+      answer: 0, // 0-indexed correct answer
+      explanation: 'Because the derivative distributes across a product as f\'g + fg\'.',
     },
   ],
 };
 
 RULES:
-- All prose arrays contain plain English sentences — NO LaTeX, NO Markdown
-- LaTeX only goes in: latex fields, callout body strings (use \\\\frac not \\frac in those)
-- callout type must be one of: 'important', 'tip', 'warning'
-- Never add schema fields not listed above
+- id and slug are the same short kebab-case string — NO chapter prefix, no numbers
+- chapter is an integer matching the leading N in the chapter folder name
+- prose paragraphs are plain English — NO LaTeX, NO Markdown formatting
+- LaTeX goes in: latex fields and callout body strings (use \\\\frac, not \\frac)
+- calloutType must be one of: 'important', 'tip', 'warning'
 - Do not invent visualization IDs — only use ones explicitly provided to you
+- triggers and spiral are optional but strongly recommended for completeness
 - id must be unique across the entire codebase`,
   },
   {
@@ -2324,11 +2369,14 @@ const LESSON_MY_TOPIC = {
 
 PART 2 — Lesson metadata export:
 
+// File goes in: src/courses/{course-id}/{N}-{chapter-slug}/{NNN}-{lesson-slug}.js
+// Example: src/courses/tetris/1-build-tetris/002-tetris-describing-a-piece.js
+
 export default {
-  id: 'tetris-02-describing-a-piece',
-  slug: 'tetris-describing-a-piece',
-  chapter: 'tetris.1',
-  order: 2,
+  id: 'tetris-02-describing-a-piece',   // unique kebab-case id
+  slug: 'tetris-describing-a-piece',    // used in the URL
+  chapter: 1,                           // integer — leading N in the chapter folder name
+  order: 2,                             // integer position within chapter (matches NNN)
   title: 'Describing a Piece',
   subtitle: '...',
   tags: ['javascript', 'arrays'],
@@ -2494,46 +2542,47 @@ HARD RULES
     id: "new-course",
     label: "New Course",
     color: "green",
-    prompt: `You are adding a new course to open-calc. Complete all 5 steps exactly.
+    prompt: `You are adding a new course to open-calc. The course system auto-discovers content — NO manual registration in any index or courses file is needed.
 
-STEP 1 — Create src/content/[course-key]-1/lesson1.js
-Use the full Math Lesson schema. Set chapter: '[coursekey.1]' — must match STEP 2's number.
+DIRECTORY STRUCTURE
+src/courses/{course-id}/                    ← course root
+  meta.json                                 ← course metadata (required)
+  {N}-{chapter-slug}/                       ← one folder per chapter
+    {NNN}-{lesson-slug}.js                  ← one file per lesson
 
-STEP 2 — Create src/content/[course-key]-1/index.js
-import lesson1 from './lesson1.js'
-const COURSE_CH1 = {
-  title: 'Chapter Title',
-  number: '[coursekey.1]',   // ← lesson chapter fields must match this exactly
-  slug: 'coursekey-chapter-slug',
-  description: 'One paragraph.',
-  course: '[course-key]-1',  // must match STEP 3's key
-  lessons: [lesson1],
-};
-export default [COURSE_CH1];
+Example for a new "statistics" course, chapter 1 "Probability", lesson 1:
+  src/courses/statistics/meta.json
+  src/courses/statistics/1-probability/001-probability-intro.js
 
-STEP 3 — Add to src/content/courses.js (inside the COURSES array):
+STEP 1 — Create src/courses/{course-id}/meta.json
 {
-  key: '[course-key]-1',
-  label: 'Course Display Name',
-  path: '/course/[course-key]-1',
-  desc: 'Short tagline',
-  color: 'indigo',  // Tailwind color name
-},
+  "icon": "📊",
+  "description": "One sentence describing the course.",
+  "domain": "math"
+}
+domain options: "math" | "cs" | "science" | "engineering" | "creative" | "other"
 
-STEP 4 — Add to src/content/index.js:
-// At the top with other imports:
-import courseKey1 from './[course-key]-1/index.js'
-// In the const section:
-const COURSE_KEY_CURRICULUM = courseKey1.map(ch => ({ ...ch, course: '[course-key]-1' }))
-// In the CURRICULUM array:
-...COURSE_KEY_CURRICULUM,
+STEP 2 — Create the chapter folder and first lesson
+Folder: src/courses/{course-id}/1-{chapter-slug}/
+File:   src/courses/{course-id}/1-{chapter-slug}/001-{lesson-slug}.js
 
-STEP 5 — Register any new viz components in VizFrame.jsx if lessons use them.
+Use the Math Lesson schema for the lesson export. Key fields:
+  chapter: 1          // integer matching the leading N in the chapter folder name
+  order: 1            // integer matching the leading NNN in the filename
+  id: 'lesson-slug'   // kebab-case, no chapter prefix, globally unique
 
-VALIDATION: Run npm run build and check for:
-  ✔ "[N] lessons indexed" — number should increase
-  ✔ No "[open-calc validator]" warnings (chapter mismatch)
-  ✔ "built in Xs" with no errors`,
+STEP 3 — Add additional chapters and lessons as needed
+Each new N-{chapter-slug}/ folder is a new chapter.
+Each new NNN-{lesson-slug}.js inside it is a new lesson.
+courseLoader.js auto-discovers all of them via import.meta.glob.
+
+STEP 4 (only if lessons use new viz components) — Register in VizFrame.jsx
+Add the import and a case in the viz switch. Otherwise skip this step.
+
+VALIDATION: Run npm run dev and navigate to /courses to confirm the course appears.
+  ✔ Course card shows on the courses page
+  ✔ Chapter and lesson nav renders correctly
+  ✔ "npm run build" completes with no errors`,
   },
 ];
 
@@ -3286,73 +3335,88 @@ export default function HelpModal({ isOpen, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-[300] flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm"
+      className="fixed inset-0 z-[300] flex items-center justify-center p-2 sm:p-4 bg-slate-900/40 dark:bg-black/60 backdrop-blur-md transition-all duration-300 ease-out"
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-5xl h-[96vh] sm:h-[92vh] bg-white dark:bg-slate-950 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden"
+        className="relative w-full max-w-5xl h-[96vh] sm:h-[92vh] bg-white dark:bg-slate-900 rounded-2xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.3)] dark:shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Glow accent bar at the top */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-400 via-indigo-500 to-purple-500 z-50"></div>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-gradient-to-r from-brand-600 via-brand-500 to-indigo-500">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
-              <BookOpen className="w-4 h-4 text-white" />
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 shrink-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm z-40 relative">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
+              <BookOpen className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-sm font-bold text-white leading-tight">
+              <h1 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">
                 Contributor Guide
               </h1>
-              <p className="text-[11px] text-white/70">
-                Lesson Builder · Viz Builder · Code path
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mt-0.5">
+                Lesson Builder <span className="opacity-50 mx-1">•</span> Viz Builder <span className="opacity-50 mx-1">•</span> Code path
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/20 transition-colors"
+            className="p-2 rounded-full text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500/50"
             aria-label="Close docs"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex flex-1 min-h-0 overflow-hidden">
+        <div className="flex flex-1 min-h-0 overflow-hidden relative bg-slate-50/30 dark:bg-slate-950/30">
           {/* Left nav — desktop */}
-          <nav className="hidden sm:block w-52 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 overflow-y-auto py-3 px-2">
+          <nav className="hidden sm:block w-64 shrink-0 border-r border-slate-200/60 dark:border-white/5 bg-white/50 dark:bg-slate-900/50 overflow-y-auto py-5 px-3 z-30 sidebar-scroll">
             {NAV.map((group) => (
-              <div key={group.group} className="mb-4">
-                <p className="px-3 mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+              <div key={group.group} className="mb-6">
+                <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-2">
                   {group.group}
+                  <span className="flex-1 h-px bg-slate-200 dark:bg-slate-800"></span>
                 </p>
-                {group.items.map((item) => {
-                  const isActive = activeSection === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setActiveSection(item.id)}
-                      className={`flex items-center gap-2.5 w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors mb-0.5 ${
-                        isActive
-                          ? "bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 border border-brand-100 dark:border-brand-800"
-                          : "text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
-                      }`}
-                    >
-                      <item.Icon className="w-4 h-4 shrink-0" />
-                      <span>{item.label}</span>
-                    </button>
-                  );
-                })}
+                <div className="space-y-1">
+                  {group.items.map((item) => {
+                    const isActive = activeSection === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => setActiveSection(item.id)}
+                        className={`group flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          isActive
+                            ? "bg-gradient-to-r from-brand-50 to-indigo-50/50 dark:from-brand-500/10 dark:to-indigo-500/5 text-brand-700 dark:text-brand-300 shadow-sm border border-brand-200/50 dark:border-brand-700/30"
+                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
+                        }`}
+                      >
+                        <div className={`p-1.5 rounded-lg transition-colors ${isActive ? "bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400" : "bg-transparent text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"}`}>
+                          <item.Icon className="w-4 h-4 shrink-0" />
+                        </div>
+                        <span className="tracking-tight">{item.label}</span>
+                        {isActive && (
+                          <ChevronRight className="w-4 h-4 ml-auto text-brand-400 dark:text-brand-500 opacity-50" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             ))}
           </nav>
 
           {/* Mobile tabs */}
-          <div className="sm:hidden w-full shrink-0 flex gap-1.5 overflow-x-auto px-3 py-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 absolute top-[60px] left-0 z-10">
+          <div className="sm:hidden w-full shrink-0 flex gap-2 overflow-x-auto px-4 py-3 border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md absolute top-0 left-0 z-40 shadow-sm sidebar-scroll">
             {NAV.flatMap((g) => g.items).map((item) => (
               <button
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors shrink-0 ${activeSection === item.id ? "bg-brand-600 text-white" : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 border ${
+                  activeSection === item.id 
+                    ? "bg-gradient-to-r from-brand-500 to-indigo-600 text-white border-transparent shadow-md shadow-brand-500/20" 
+                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700"
+                }`}
               >
                 <item.Icon className="w-3.5 h-3.5" />
                 {item.label}
@@ -3361,8 +3425,10 @@ export default function HelpModal({ isOpen, onClose }) {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-6 sm:mt-0 mt-14">
-            <ActiveSection key={activeSection} />
+          <div className="flex-1 overflow-y-auto px-6 sm:px-10 py-8 sm:mt-0 mt-[68px] bg-transparent sidebar-scroll">
+            <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <ActiveSection key={activeSection} />
+            </div>
           </div>
         </div>
       </div>
