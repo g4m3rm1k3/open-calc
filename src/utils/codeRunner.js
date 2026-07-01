@@ -148,7 +148,7 @@ function wrapJava(code) {
 
 function wrapCSharp(code) {
   if (/\bclass\s+\w/.test(code) || /^using\s/m.test(code)) return code
-  return `using System;\nclass Program {\n    static void Main() {\n${code.replace(/^/gm, '        ')}\n    }\n}`
+  return `using System;\nclass Program {\n    static void Main(string[] args) {\n${code.replace(/^/gm, '        ')}\n    }\n}`
 }
 
 function wrapKotlin(code) {
