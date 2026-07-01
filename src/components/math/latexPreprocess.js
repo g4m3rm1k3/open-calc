@@ -184,7 +184,18 @@ export function preprocess(text) {
   // command (e.g. \nVdash). A prior (?![a-zA-Z]) version matched both cases and left
   // markers like "\nThe"/"\nSubstitute" as literal text, which wrapBareLatex() then
   // mistook for bare LaTeX commands and broke (see scripts/check_latex.mjs findings).
-  const normalized = text.replace(/\\n(?![a-z])/g, '\n\n')
+  //
+  // Code fences (```...```) are split out and reassembled so this replace never
+  // touches \n escape sequences inside Python/JS string literals in code blocks.
+  const CODE_FENCE = /^```[\s\S]*?^```/gm
+  const codeParts = []
+  const stripped = text.replace(CODE_FENCE, (match) => {
+    codeParts.push(match)
+    return `\x00CODE${codeParts.length - 1}\x00`
+  })
+  const normalized = stripped
+    .replace(/\\n(?![a-z])/g, '\n\n')
+    .replace(/\x00CODE(\d+)\x00/g, (_, i) => codeParts[Number(i)])
   return (
     wrapBareLatex(normalized)
       // \[…\] → $$…$$ (block / display math). Matched as ONE pair (not two
