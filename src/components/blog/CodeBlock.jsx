@@ -38,6 +38,13 @@ import 'prismjs/components/prism-julia'
 import 'prismjs/components/prism-haskell'
 import 'prismjs/components/prism-kotlin'
 import 'prismjs/components/prism-scala'
+import 'prismjs/components/prism-csharp'
+import 'prismjs/components/prism-markup'
+import 'prismjs/components/prism-markup-templating'
+import 'prismjs/components/prism-php'
+import 'prismjs/components/prism-swift'
+import 'prismjs/components/prism-powershell'
+import 'prismjs/components/prism-perl'
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react').then((m) => ({ default: m.default })))
 
@@ -124,11 +131,24 @@ function HighlightedCode({ code, language }) {
   const html = grammar
     ? Prism.highlight(code, grammar, prismKey)
     : code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const lineCount = code.split('\n').length
+  const gutterWidth = String(lineCount).length
+  const lineNums = Array.from({ length: lineCount }, (_, i) =>
+    String(i + 1).padStart(gutterWidth, ' ')
+  ).join('\n')
   return (
-    <pre
-      className="m-0 p-4 text-[13px] leading-[1.6] overflow-x-auto font-mono bg-transparent"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
+    <div className="flex overflow-hidden">
+      <pre
+        aria-hidden
+        className="m-0 py-4 pl-4 pr-3 text-[13px] leading-[1.6] font-mono select-none text-slate-500 dark:text-slate-600 border-r border-slate-600/25 flex-shrink-0 bg-transparent"
+      >
+        {lineNums}
+      </pre>
+      <pre
+        className="m-0 py-4 pl-4 pr-4 text-[13px] leading-[1.6] overflow-x-auto font-mono bg-transparent flex-1 min-w-0"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
   )
 }
 

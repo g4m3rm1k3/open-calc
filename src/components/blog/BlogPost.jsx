@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, createContext, useContext } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
@@ -9,6 +9,10 @@ import { preprocess } from '../math/latexPreprocess.js'
 import CodeBlock from './CodeBlock.jsx'
 
 const JS_FAMILY = new Set(['js', 'javascript', 'ts', 'typescript'])
+
+// react-markdown v9+ removed the `inline` prop from the code component.
+// Use context set by the `pre` handler to tell block code apart from inline.
+const InPreContext = createContext(false)
 
 // Extract top-level class and function names declared in a code block so we can
 // detect conflicts before merging prior cells into a notebook's running context.
@@ -111,10 +115,12 @@ export default function BlogPost({ content }) {
             return <em className="italic text-slate-700 dark:text-slate-300">{children}</em>
           },
 
-          code({ node, inline, className, children }) {
+          code({ className, children }) {
+            const isBlock = useContext(InPreContext)
             const lang = (className || '').replace('language-', '')
             const codeStr = String(children).replace(/\n$/, '')
-            if (inline) {
+
+            if (!isBlock) {
               return (
                 <code className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-rose-600 dark:text-rose-400 text-[0.85em] font-mono">
                   {codeStr}
@@ -124,7 +130,6 @@ export default function BlogPost({ content }) {
 
             const cellIndex = cellCounterRef.current++
 
-            // Seed the map with the original source on first encounter
             if (!cellCodesRef.current.has(cellIndex)) {
               cellCodesRef.current.set(cellIndex, { lang, code: codeStr })
             }
@@ -141,7 +146,7 @@ export default function BlogPost({ content }) {
           },
 
           pre({ children }) {
-            return <>{children}</>
+            return <InPreContext.Provider value={true}>{children}</InPreContext.Provider>
           },
 
           ul({ children }) {
