@@ -416,24 +416,96 @@ export function parseHtmlDocument(htmlString) {
     const doc = parser.parseFromString(htmlString, "text/html");
 
     const styleEls = Array.from(doc.querySelectorAll("style"));
-    const css = styleEls.map((s) => s.textContent).join("\n\n");
+    const rawCss = styleEls.map((s) => s.textContent).join("\n\n");
 
     const scriptEls = Array.from(doc.querySelectorAll("script"));
-    const javascript = scriptEls
-      .map((s) => s.textContent)
-      .filter(Boolean)
-      .join("\n\n");
+    const javascript = scriptEls.map((s) => s.textContent).filter(Boolean).join("\n\n");
 
+    // Apply CSS rules to DOM elements via selector matching so that
+    // htmlToElements picks them up as inline styles (it reads style="...").
+    // Returns body styles and any CSS that can't be inlined (pseudo-selectors,
+    // @media/@keyframes blocks).
+    const { bodyStylesFromCss, customCss } = applyImportedCssToDoc(doc, rawCss);
+
+    // Merge body CSS rules with any inline style="" on <body>
     const bodyStyleStr = doc.body?.getAttribute("style") || "";
-    const bodyStyles = parseStyleString(bodyStyleStr);
+    const bodyStyles = { ...bodyStylesFromCss, ...parseStyleString(bodyStyleStr) };
 
+    // DOM elements now have inline styles set — htmlToElements reads them directly
     const elements = htmlToElements(doc.body?.innerHTML || "", [], javascript) || [];
 
-    return { elements, bodyStyles, javascript, css };
+    return { elements, bodyStyles, javascript, css: customCss };
   } catch (err) {
     console.warn("parseHtmlDocument error:", err);
     return { elements: [], bodyStyles: {}, javascript: "", css: "" };
   }
+}
+
+// Apply class/id/tag CSS rules to a parsed DOM document by using element.matches().
+// @-rules and pseudo-selectors can't be inlined so they go to customCss.
+function applyImportedCssToDoc(doc, css) {
+  const bodyStylesFromCss = {};
+  const appliedRules = []; // { selector, styles }[]
+  const customChunks = [];
+
+  // Lift @-rules (media, keyframes, supports…) out unchanged — they have nested braces
+  let remaining = css.replace(/@[^{]+\{(?:[^{}]*|\{[^{}]*\})*\}/g, (m) => {
+    customChunks.push(m.trim());
+    return "";
+  });
+
+  // Parse flat   selector { declarations }   blocks
+  const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
+  let m;
+  while ((m = ruleRe.exec(remaining)) !== null) {
+    const selectorGroup = m[1].trim();
+    const declarations = m[2].trim();
+    if (!selectorGroup || !declarations) continue;
+    const styles = parseStyleString(declarations);
+    const selectors = selectorGroup.split(",").map((s) => s.trim()).filter(Boolean);
+
+    const simple = [];
+    const complex = [];
+    for (const sel of selectors) {
+      // body/html → extract as bodyStyles
+      if (/^html$|^body$/.test(sel)) {
+        Object.assign(bodyStylesFromCss, styles);
+      // pseudo-classes/elements and CSS combinators can't be inlined → customCss
+      } else if (/[:>+~]/.test(sel) || sel === "*" || sel.startsWith("*")) {
+        complex.push(sel);
+      } else {
+        simple.push(sel);
+      }
+    }
+
+    if (simple.length) simple.forEach((sel) => appliedRules.push({ selector: sel, styles }));
+    if (complex.length) customChunks.push(`${complex.join(", ")} {\n  ${declarations}\n}`);
+  }
+
+  // Walk the body DOM, test each element against collected rules, set inline styles
+  function applyToEl(el) {
+    const computed = {};
+    for (const rule of appliedRules) {
+      try {
+        if (el.matches(rule.selector)) Object.assign(computed, rule.styles);
+      } catch { /* invalid selector — skip */ }
+    }
+    if (Object.keys(computed).length) {
+      // Inline style="" in the original HTML takes precedence over class rules
+      const existing = parseStyleString(el.getAttribute("style") || "");
+      const merged = { ...computed, ...existing };
+      el.setAttribute(
+        "style",
+        Object.entries(merged)
+          .map(([k, v]) => `${k.replace(/([A-Z])/g, "-$1").toLowerCase()}: ${v}`)
+          .join("; "),
+      );
+    }
+    Array.from(el.children).forEach(applyToEl);
+  }
+  Array.from(doc.body?.children || []).forEach(applyToEl);
+
+  return { bodyStylesFromCss, customCss: customChunks.join("\n\n") };
 }
 
 export function parseStyleString(str) {
