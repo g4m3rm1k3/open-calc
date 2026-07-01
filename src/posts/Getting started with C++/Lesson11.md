@@ -1,181 +1,305 @@
-# Lesson 11: Dynamic Memory with new and delete in C++
+# Classes and Object-Oriented Programming: Why Bjarne Built C++
 
-You’ve reached **Lesson 11**. Great persistence!
+We have arrived at the reason C++ exists. In 1979, Bjarne Stroustrup was analyzing his Cambridge dissertation on distributed operating systems and discovered a fundamental problem: the simulation he was writing needed to model concurrent processes — each with its own state, behavior, and lifecycle. C didn't have a way to express this cleanly. You could fake it with structs and function pointers, but there was no *type* that bundled data and the operations on that data into a single cohesive unit.
 
-In this lesson, we’ll learn how to allocate and manage memory **dynamically** during program execution using `new` and `delete`.
+The language he'd studied at the Aarhus University, **Simula 67**, did. Simula — designed by Ole-Johan Dahl and Kristen Nygaard in Norway in 1967 — introduced the concept of the **class**: a user-defined type that combined data (called fields) and behavior (called methods). Stroustrup took Simula's class system and grafted it onto C. The result, after years of refinement, became C++.
 
----
+Object-oriented programming in C++ is not decoration. It's the language's original reason for being.
 
-## Why Dynamic Memory?
+## What a Class Is
 
-- You don’t know how much memory you need until the program is running
-- You can create arrays whose size is decided by the user
-- Better memory management for large programs
-
----
-
-## Basic new and delete
-
-```cpp
-#include <iostream>
-
-int main() {
-    // Allocate memory for one integer
-    int* ptr = new int;
-
-    *ptr = 42;
-
-    std::cout << "Value: " << *ptr << std::endl;
-    std::cout << "Address: " << ptr << std::endl;
-
-    // Free the memory
-    delete ptr;
-    ptr = nullptr;        // Good practice
-
-    return 0;
-}
-```
-
----
-
-## Dynamic Arrays
-
-```cpp
-#include <iostream>
-
-int main() {
-    int size;
-
-    std::cout << "How many numbers do you want to store? ";
-    std::cin >> size;
-
-    // Create dynamic array
-    int* numbers = new int[size];
-
-    // Fill the array
-    for (int i = 0; i < size; i++) {
-        std::cout << "Enter number " << (i + 1) << ": ";
-        std::cin >> numbers[i];
-    }
-
-    // Display
-    std::cout << "\nYou entered: ";
-    for (int i = 0; i < size; i++) {
-        std::cout << numbers[i] << " ";
-    }
-    std::cout << std::endl;
-
-    // Important: Free the memory
-    delete[] numbers;
-    numbers = nullptr;
-
-    return 0;
-}
-```
-
-**Note**: Use `delete[]` for arrays, `delete` for single values.
-
----
-
-## Dynamic Memory with Classes
+A class is a **user-defined type**. Just as `int` defines a type that stores integers and supports arithmetic operators, a class defines a type that stores custom data and supports custom operations. The data members are called **fields** or **member variables**. The operations are called **member functions** or **methods**.
 
 ```cpp
 #include <iostream>
 #include <string>
+#include <cmath>
 
-class Player {
-public:
-    std::string name;
-    int score;
+class Point {
+public:           // Public: accessible from outside the class
+    double x;
+    double y;
 
-    Player(std::string n, int s) : name(n), score(s) {
-        std::cout << "Player " << name << " created!" << std::endl;
+    // Constructor: called when an object is created
+    Point(double x, double y) : x(x), y(y) {}
+
+    // Member function: operates on this object
+    double distanceTo(const Point& other) const {
+        double dx = x - other.x;
+        double dy = y - other.y;
+        return std::sqrt(dx * dx + dy * dy);
     }
 
-    ~Player() {
-        std::cout << "Player " << name << " destroyed." << std::endl;
+    double magnitude() const {
+        return std::sqrt(x * x + y * y);
+    }
+
+    // Operator overloading: + creates a new point
+    Point operator+(const Point& other) const {
+        return Point(x + other.x, y + other.y);
+    }
+
+    void print() const {
+        std::cout << "(" << x << ", " << y << ")" << std::endl;
     }
 };
 
 int main() {
-    Player* p1 = new Player("Alice", 1500);
+    Point p1(3.0, 4.0);
+    Point p2(0.0, 0.0);
 
-    std::cout << p1->name << " has score: " << p1->score << std::endl;
+    p1.print();
+    std::cout << "Magnitude: " << p1.magnitude() << std::endl;  // 5.0 (3-4-5 triangle)
+    std::cout << "Distance to origin: " << p1.distanceTo(p2) << std::endl;
 
-    delete p1;      // Calls destructor
-    p1 = nullptr;
-
-    return 0;
+    Point p3 = p1 + p2;  // Uses operator+
+    p3.print();
 }
 ```
 
----
+The `const` at the end of member functions like `magnitude() const` is a promise: "this function does not modify the object." It's part of C++'s **const-correctness** system — a compile-time check that prevents accidentally modifying objects through const references.
 
-## Mini Project: Dynamic Student List
+## Encapsulation: Private by Default
+
+One of OOP's core principles is **encapsulation** — hiding implementation details behind a public interface. The class decides what the outside world can access:
 
 ```cpp
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
-class Student {
+class BankAccount {
+private:
+    std::string owner;
+    double balance;
+    int transactionCount;
+
 public:
-    std::string name;
-    double grade;
+    // Constructor: enforces valid initial state
+    BankAccount(const std::string& owner, double initialBalance)
+        : owner(owner), balance(0.0), transactionCount(0) {
+        if (initialBalance < 0) {
+            throw std::invalid_argument("Initial balance cannot be negative");
+        }
+        balance = initialBalance;
+    }
 
-    Student(std::string n, double g) : name(n), grade(g) {}
+    // Public interface — controlled access to private data
+    void deposit(double amount) {
+        if (amount <= 0) throw std::invalid_argument("Deposit must be positive");
+        balance += amount;
+        transactionCount++;
+    }
+
+    void withdraw(double amount) {
+        if (amount <= 0) throw std::invalid_argument("Withdrawal must be positive");
+        if (amount > balance) throw std::runtime_error("Insufficient funds");
+        balance -= amount;
+        transactionCount++;
+    }
+
+    // Getters — read-only access
+    double getBalance() const { return balance; }
+    int getTransactionCount() const { return transactionCount; }
+
+    void printStatement() const {
+        std::cout << "Account owner: " << owner << std::endl;
+        std::cout << "Balance: $" << balance << std::endl;
+        std::cout << "Transactions: " << transactionCount << std::endl;
+    }
 };
 
 int main() {
-    int count;
-    std::cout << "How many students? ";
-    std::cin >> count;
+    BankAccount account("Alice", 1000.0);
 
-    Student** students = new Student*[count];   // Array of pointers
+    account.deposit(500.0);
+    account.withdraw(200.0);
+    account.deposit(150.0);
 
-    for (int i = 0; i < count; i++) {
-        std::string name;
-        double grade;
+    account.printStatement();
 
-        std::cin.ignore();
-        std::cout << "Student " << (i+1) << " name: ";
-        std::getline(std::cin, name);
+    // This would not compile — balance is private:
+    // account.balance = 999999;  // error: 'balance' is private
 
-        std::cout << "Grade: ";
-        std::cin >> grade;
-
-        students[i] = new Student(name, grade);
+    try {
+        account.withdraw(5000.0);
+    } catch (const std::runtime_error& e) {
+        std::cout << "Error: " << e.what() << std::endl;
     }
-
-    std::cout << "\n=== Student List ===\n";
-    for (int i = 0; i < count; i++) {
-        std::cout << students[i]->name << ": " << students[i]->grade << std::endl;
-        delete students[i];           // Clean up each student
-    }
-
-    delete[] students;                // Clean up array
-
-    return 0;
 }
 ```
 
----
+The private members `balance` and `transactionCount` can only be modified through the public interface — `deposit` and `withdraw`. The class can enforce invariants (balance never negative) that external code couldn't accidentally violate.
 
-## Practice Exercises
+## Constructors and Destructors: RAII
 
-1. Write a program that creates a dynamic array, fills it with numbers 1 to n, and calculates the sum.
-2. Create a dynamic 2D array (matrix) and fill it with values.
-3. Build a simple inventory system using dynamic memory for items.
+The **constructor** is called automatically when an object is created. The **destructor** is called automatically when an object is destroyed — when it goes out of scope, or when `delete` is called on a heap-allocated object.
 
----
+This automatic pair forms the basis of **RAII** (Resource Acquisition Is Initialization) — C++'s most important idiom:
 
-## Memory Management Rules
+> Acquire resources in the constructor. Release them in the destructor. The compiler guarantees the destructor runs, even if an exception is thrown.
 
-1. Every `new` should have a matching `delete`
-2. Use `delete[]` for arrays
-3. Set pointers to `nullptr` after deleting
-4. Avoid memory leaks (forgetting to delete)
-5. Avoid dangling pointers (using memory after deleting)
+```cpp
+#include <iostream>
+#include <fstream>
+#include <stdexcept>
 
----
+class FileGuard {
+private:
+    std::ofstream file;
+    std::string filename;
 
-You now understand how C++ gives you direct control over memory — a key reason why it’s so powerful.
+public:
+    FileGuard(const std::string& path) : filename(path) {
+        file.open(path);
+        if (!file.is_open()) {
+            throw std::runtime_error("Cannot open: " + path);
+        }
+        std::cout << "Opened: " << path << std::endl;
+    }
+
+    // RAII: destructor closes the file automatically
+    ~FileGuard() {
+        if (file.is_open()) {
+            file.close();
+            std::cout << "Closed: " << filename << std::endl;
+        }
+    }
+
+    void write(const std::string& text) {
+        file << text << std::endl;
+    }
+};
+
+int main() {
+    {
+        FileGuard fg("/tmp/test.txt");
+        fg.write("Hello from RAII!");
+        fg.write("File will close automatically.");
+        // fg goes out of scope here — destructor called — file closed
+    }
+
+    // No explicit close() needed — the destructor handled it
+    std::cout << "Done — file was closed when fg went out of scope" << std::endl;
+}
+```
+
+RAII eliminates a whole class of resource leaks. In garbage-collected languages, you need explicit `close()`, `dispose()`, or `with` blocks. In C++, wrapping a resource in a class gives you automatic cleanup for free, and it's exception-safe — even if an exception is thrown inside the braces, the destructor still runs.
+
+## Operator Overloading: Making User Types Feel Native
+
+Bjarne added operator overloading to make user-defined types as expressive as built-in types. A `Matrix` class should be addable with `+`. A `Vector3D` class should be multiplicable by a scalar with `*`. A string class should concatenate with `+`.
+
+```cpp
+#include <iostream>
+
+class Vector2D {
+public:
+    double x, y;
+
+    Vector2D(double x = 0, double y = 0) : x(x), y(y) {}
+
+    Vector2D operator+(const Vector2D& other) const {
+        return Vector2D(x + other.x, y + other.y);
+    }
+
+    Vector2D operator*(double scalar) const {
+        return Vector2D(x * scalar, y * scalar);
+    }
+
+    double dot(const Vector2D& other) const {
+        return x * other.x + y * other.y;
+    }
+
+    bool operator==(const Vector2D& other) const {
+        return x == other.x && y == other.y;
+    }
+
+    // Stream output operator (friend: not a member, but needs private access)
+    friend std::ostream& operator<<(std::ostream& os, const Vector2D& v) {
+        return os << "(" << v.x << ", " << v.y << ")";
+    }
+};
+
+int main() {
+    Vector2D a(1.0, 2.0);
+    Vector2D b(3.0, 4.0);
+
+    Vector2D sum = a + b;
+    Vector2D scaled = a * 3.0;
+
+    std::cout << "a = " << a << std::endl;
+    std::cout << "b = " << b << std::endl;
+    std::cout << "a + b = " << sum << std::endl;
+    std::cout << "a * 3 = " << scaled << std::endl;
+    std::cout << "a · b = " << a.dot(b) << std::endl;
+}
+```
+
+The `operator<<` overload as a `friend` function is a common pattern for printing. `friend` gives a non-member function access to private members — necessary here because `operator<<` must take `ostream&` as its first argument (it can't be a member of `Vector2D`).
+
+## Inheritance: Building on Existing Types
+
+C++ allows classes to inherit from other classes, getting their data and behavior:
+
+```cpp
+#include <iostream>
+#include <string>
+#include <cmath>
+
+class Shape {
+protected:
+    std::string color;
+
+public:
+    Shape(const std::string& color) : color(color) {}
+
+    virtual double area() const = 0;     // Pure virtual — subclasses MUST implement
+    virtual double perimeter() const = 0;
+
+    virtual void describe() const {
+        std::cout << color << " shape with area " << area()
+                  << " and perimeter " << perimeter() << std::endl;
+    }
+
+    virtual ~Shape() {}  // Virtual destructor — essential for polymorphism
+};
+
+class Circle : public Shape {
+    double radius;
+public:
+    Circle(const std::string& color, double radius)
+        : Shape(color), radius(radius) {}
+
+    double area() const override { return M_PI * radius * radius; }
+    double perimeter() const override { return 2 * M_PI * radius; }
+};
+
+class Rectangle : public Shape {
+    double width, height;
+public:
+    Rectangle(const std::string& color, double w, double h)
+        : Shape(color), width(w), height(h) {}
+
+    double area() const override { return width * height; }
+    double perimeter() const override { return 2 * (width + height); }
+};
+
+int main() {
+    // Polymorphism: Shape* can point to any Shape subclass
+    Shape* shapes[] = {
+        new Circle("red", 5.0),
+        new Rectangle("blue", 4.0, 6.0),
+        new Circle("green", 3.0)
+    };
+
+    for (auto* shape : shapes) {
+        shape->describe();  // Calls the correct subclass method at runtime
+        delete shape;
+    }
+}
+```
+
+**Virtual functions** enable **runtime polymorphism**: the decision of which `area()` to call is made at runtime based on the actual type of the object, not the pointer type. This is how game engines render different types of entities, how GUI frameworks handle different widget types, and how parsers process different node types — one interface, many implementations.
+
+Classes in C++ are not a style choice. They're the fundamental mechanism for building large, maintainable programs — the reason the language was created, and the reason it endures.
