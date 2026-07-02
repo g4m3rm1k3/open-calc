@@ -9,8 +9,8 @@
     -apple-system,
     sans-serif;
   font-size: 13px;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--hl-bg);
+  color: var(--hl-text);
 }
 
 /* ── Toolbar ─────────────────────────────────────────────────────────────────── */
@@ -19,8 +19,8 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  background: #252526;
-  border-bottom: 1px solid #3c3c3c;
+  background: var(--hl-surface);
+  border-bottom: 1px solid var(--hl-border);
   flex-shrink: 0;
   flex-wrap: wrap;
   min-height: 42px;
@@ -28,10 +28,10 @@
 
 .backBtn {
   padding: 4px 10px;
-  border: 1px solid #4d4d4d;
+  border: 1px solid var(--hl-border);
   border-radius: 5px;
   background: transparent;
-  color: #9d9d9d;
+  color: var(--hl-muted);
   cursor: pointer;
   font-size: 12px;
   transition:
@@ -42,13 +42,13 @@
 }
 .backBtn:hover {
   background: rgba(255, 255, 255, 0.07);
-  color: #fff;
+  color: var(--hl-text);
 }
 
 .toolbarLogo {
   font-size: 13px;
   font-weight: 600;
-  color: #cba6f7;
+  color: var(--hl-accent2);
   margin-right: 4px;
   letter-spacing: -0.01em;
 }
@@ -56,22 +56,22 @@
 .toolbarSep {
   width: 1px;
   height: 20px;
-  background: #3c3c3c;
+  background: var(--hl-border);
   margin: 0 4px;
   flex-shrink: 0;
 }
 
 .toolbarLabel {
   font-size: 11px;
-  color: #777;
+  color: var(--hl-hint);
 }
 
 .elemBtn {
   padding: 3px 8px;
-  border: 1px dashed #555;
+  border: 1px dashed var(--hl-border);
   border-radius: 4px;
   background: transparent;
-  color: #9cdcfe;
+  color: var(--hl-keyword);
   cursor: pointer;
   font-size: 11px;
   font-family: "JetBrains Mono", Consolas, monospace;
@@ -81,18 +81,18 @@
     background 0.15s;
 }
 .elemBtn:hover {
-  border-color: #569cd6;
-  color: #fff;
-  background: rgba(86, 156, 214, 0.15);
+  border-color: var(--hl-accent);
+  color: var(--hl-text);
+  background: var(--hl-accent-bg);
   border-style: solid;
 }
 
 .tbBtn {
   padding: 4px 10px;
-  border: 1px solid #4d4d4d;
+  border: 1px solid var(--hl-border);
   border-radius: 5px;
   background: transparent;
-  color: #ccc;
+  color: var(--hl-muted);
   cursor: pointer;
   font-size: 12px;
   transition:
@@ -101,21 +101,21 @@
 }
 .tbBtn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  color: var(--hl-text);
 }
 .tbBtn:disabled {
   opacity: 0.35;
   cursor: not-allowed;
 }
 .tbBtnActive {
-  background: #0e639c;
+  background: var(--hl-accent-strong);
   color: #fff;
-  border-color: #0e639c;
+  border-color: var(--hl-accent-strong);
 }
 .tbBtnDanger:hover {
-  background: rgba(232, 75, 74, 0.2);
-  color: #f87171;
-  border-color: rgba(232, 75, 74, 0.5);
+  background: var(--hl-danger-bg);
+  color: var(--hl-danger);
+  border-color: var(--hl-danger);
 }
 .tbBtnPreview {
   background: #16a34a;
@@ -150,15 +150,15 @@
   padding: 5px 12px;
   font-size: 11px;
   font-weight: 500;
-  color: #9d9d9d;
-  background: #2d2d2d;
-  border-bottom: 1px solid #3c3c3c;
+  color: var(--hl-muted);
+  background: var(--hl-surface2);
+  border-bottom: 1px solid var(--hl-border);
   flex-shrink: 0;
   gap: 8px;
 }
 .panelHint {
   font-size: 10px;
-  color: #555;
+  color: var(--hl-hint);
   font-weight: 400;
 }
 
@@ -168,23 +168,23 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #fff;
+  background: var(--hl-canvas);
   min-width: 0;
-  border-left: 1px solid #3c3c3c;
-  border-right: 1px solid #3c3c3c;
+  border-left: 1px solid var(--hl-border);
+  border-right: 1px solid var(--hl-border);
 }
 
 .canvasDrop {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
-  background: #fafafa;
+  background: var(--hl-canvas);
 }
 
 .emptyHint {
   padding: 48px 24px;
   text-align: center;
-  color: #aaa;
+  color: var(--hl-muted);
   pointer-events: none;
 }
 .emptyIcon {
@@ -210,7 +210,7 @@
 }
 .dropZoneActive {
   height: 8px;
-  background: #569cd6;
+  background: var(--hl-accent);
   border-radius: 4px;
   box-shadow: 0 0 8px rgba(86, 156, 214, 0.6);
 }
@@ -236,10 +236,10 @@
 }
 
 .elSelected {
-  border-color: #2563eb !important;
+  border-color: var(--hl-accent) !important;
   box-shadow:
-    0 0 0 2px rgba(37, 99, 235, 0.3),
-    0 0 20px rgba(37, 99, 235, 0.15) !important;
+    0 0 0 2px rgba(86, 156, 214, 0.3),
+    0 0 20px rgba(86, 156, 214, 0.15) !important;
   position: relative;
   z-index: 100;
 }
@@ -250,10 +250,10 @@
 
 /* Green glow when hovering a container to drop inside */
 .elDropInside {
-  border-color: #22c55e !important;
+  border-color: var(--hl-positive) !important;
   box-shadow:
-    0 0 0 2px rgba(34, 197, 94, 0.2),
-    inset 0 0 12px rgba(34, 197, 94, 0.06) !important;
+    0 0 0 2px var(--hl-positive-bg),
+    inset 0 0 12px var(--hl-positive-bg) !important;
 }
 
 /* ── Tag badge at top of element ─────────────────────────────────────────────── */
@@ -268,8 +268,8 @@
   padding: 2px 7px;
   font-size: 9px;
   font-family: "JetBrains Mono", monospace;
-  color: #b0b0b0;
-  background: rgba(18, 18, 18, 0.92);
+  color: var(--hl-muted);
+  background: var(--hl-surface);
   border-radius: 4px;
   user-select: none;
   white-space: nowrap;
@@ -285,21 +285,21 @@
 
 /* Brighter tag on hover */
 .elWrap:hover .elTag {
-  color: #e8e8e8;
-  background: rgba(10, 10, 10, 0.96);
+  color: var(--hl-text);
+  background: var(--hl-bg);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Selected: solid blue badge, always on top */
+/* Selected: solid accent badge, always on top */
 .elSelected .elTag {
-  background: #2563eb;
+  background: var(--hl-accent);
   color: #ffffff;
   font-size: 11px;
   font-weight: 700;
   padding: 3px 10px;
   letter-spacing: 0.03em;
   border-radius: 5px;
-  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.55);
+  box-shadow: 0 3px 12px rgba(86, 156, 214, 0.55);
   z-index: 9999;
   pointer-events: auto;
   top: -24px;
@@ -321,7 +321,7 @@
   opacity: 1;
 }
 .elDelete:hover {
-  color: #fca5a5;
+  color: var(--hl-danger);
 }
 
 /* ── Inner element (the actual styled tag) ───────────────────────────────────── */
@@ -334,8 +334,8 @@
   padding: 8px;
   text-align: center;
   font-size: 10px;
-  color: #22c55e;
-  border: 1px dashed #22c55e;
+  color: var(--hl-positive);
+  border: 1px dashed var(--hl-positive);
   border-radius: 4px;
   margin: 4px;
   pointer-events: none;
@@ -344,7 +344,7 @@
 /* ── Mode pill (Elements / Components toggle) ────────────────────────────────── */
 .modePill {
   display: flex;
-  border: 1px solid #4d4d4d;
+  border: 1px solid var(--hl-border);
   border-radius: 6px;
   overflow: hidden;
   flex-shrink: 0;
@@ -354,7 +354,7 @@
   padding: 3px 10px;
   background: transparent;
   border: none;
-  color: #9d9d9d;
+  color: var(--hl-muted);
   font-size: 11px;
   font-weight: 500;
   cursor: pointer;
@@ -364,11 +364,11 @@
 
 .modeBtn:hover:not(.modeBtnActive) {
   background: rgba(255,255,255,0.06);
-  color: #ccc;
+  color: var(--hl-text);
 }
 
 .modeBtnActive {
-  background: #0e639c;
+  background: var(--hl-accent-strong);
   color: #fff;
 }
 
@@ -378,8 +378,8 @@
   flex-wrap: wrap;
   gap: 8px;
   padding: 10px 14px;
-  background: #2a2a2a;
-  border-bottom: 1px solid #3c3c3c;
+  background: var(--hl-surface2);
+  border-bottom: 1px solid var(--hl-border);
   flex-shrink: 0;
 }
 
@@ -389,8 +389,8 @@
   align-items: center;
   gap: 3px;
   padding: 8px 14px;
-  background: #333;
-  border: 1px solid #4d4d4d;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
   border-radius: 7px;
   cursor: pointer;
   transition: background 0.12s, border-color 0.12s;
@@ -398,8 +398,8 @@
 }
 
 .compCard:hover {
-  background: #3e3e3e;
-  border-color: #569cd6;
+  background: var(--hl-surface2);
+  border-color: var(--hl-accent);
 }
 
 .compIcon {
@@ -410,12 +410,12 @@
 .compName {
   font-size: 11px;
   font-weight: 600;
-  color: #d4d4d4;
+  color: var(--hl-text);
 }
 
 .compCat {
   font-size: 9px;
-  color: #777;
+  color: var(--hl-hint);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -425,16 +425,16 @@
   padding: 6px 4px 2px;
   font-size: 10px;
   font-weight: 700;
-  color: #56c4a0;
+  color: var(--hl-keyword);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  border-top: 1px solid #3c3c3c;
+  border-top: 1px solid var(--hl-border);
   margin-top: 4px;
 }
 
 /* ── Theme section in PropertiesPanel ─────────────────────────────────────────── */
 .themeSection {
-  border-bottom: 1px solid #3c3c3c;
+  border-bottom: 1px solid var(--hl-border);
   padding: 8px 0 10px;
 }
 
@@ -442,7 +442,7 @@
   padding: 5px 12px 6px;
   font-size: 10px;
   font-weight: 700;
-  color: #cba6f7;
+  color: var(--hl-accent2);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -453,7 +453,7 @@
 
 .themeGroupLabel {
   font-size: 9px;
-  color: #777;
+  color: var(--hl-hint);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 4px;
@@ -468,10 +468,10 @@
 
 .themeBtn {
   padding: 4px 10px;
-  background: #2a2a2a;
-  border: 1px solid #555;
+  background: var(--hl-surface2);
+  border: 1px solid var(--hl-border);
   border-radius: 5px;
-  color: #c9c9c9;
+  color: var(--hl-muted);
   font-size: 11px;
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s, color 0.1s;
@@ -479,15 +479,15 @@
 }
 
 .themeBtn:hover {
-  background: rgba(86,156,214,0.15);
-  border-color: #569cd6;
-  color: #fff;
+  background: var(--hl-accent-bg);
+  border-color: var(--hl-accent);
+  color: var(--hl-text);
 }
 
 .themeBtnApplied {
-  background: rgba(86,156,214,0.25);
-  border-color: #569cd6;
-  color: #569cd6;
+  background: var(--hl-accent-bg);
+  border-color: var(--hl-accent);
+  color: var(--hl-accent);
 }
 
 /* ── Gradient presets ────────────────────────────────────────────────────────── */
@@ -497,7 +497,7 @@
 
 .gradientLabel {
   font-size: 9px;
-  color: #666;
+  color: var(--hl-hint);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 5px;
@@ -565,13 +565,13 @@
 /* ── Divider ─────────────────────────────────────────────────────────────────── */
 .divider {
   width: 4px;
-  background: #3c3c3c;
+  background: var(--hl-border);
   cursor: col-resize;
   flex-shrink: 0;
   transition: background 0.15s;
 }
 .divider:hover {
-  background: #569cd6;
+  background: var(--hl-accent);
 }
 
 /* ── Code panel (Monaco) ─────────────────────────────────────────────────────── */
@@ -580,7 +580,7 @@
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
-  background: #1e1e1e;
+  background: var(--hl-bg);
 }
 .codeTabs {
   display: flex;
@@ -590,21 +590,21 @@
 }
 .codeTab {
   padding: 3px 8px;
-  border: 1px solid #3c3c3c;
+  border: 1px solid var(--hl-border);
   border-radius: 4px;
-  background: #1f1f1f;
-  color: #858585;
+  background: var(--hl-bg);
+  color: var(--hl-hint);
   cursor: pointer;
   font-size: 11px;
   line-height: 1.2;
 }
 .codeTab:hover {
-  color: #d4d4d4;
-  border-color: #555;
+  color: var(--hl-text);
+  border-color: var(--hl-border);
 }
 .codeTabActive {
-  background: #0e639c;
-  border-color: #0e639c;
+  background: var(--hl-accent-strong);
+  border-color: var(--hl-accent-strong);
   color: #fff;
 }
 .monacoWrap {
@@ -617,28 +617,28 @@
 .codeTreePanel {
   height: 100%;
   overflow-y: auto;
-  background: #1e1e1e;
+  background: var(--hl-bg);
   padding: 4px 0;
 }
 .codeTreePanel::-webkit-scrollbar { width: 6px; }
 .codeTreePanel::-webkit-scrollbar-track { background: transparent; }
-.codeTreePanel::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+.codeTreePanel::-webkit-scrollbar-thumb { background: var(--hl-border); border-radius: 3px; }
 
 /* ── Properties panel ────────────────────────────────────────────────────────── */
 .propsPanel {
   flex-shrink: 0;
-  border-left: 1px solid #3c3c3c;
-  background: #252526;
+  border-left: 1px solid var(--hl-border);
+  background: var(--hl-surface);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  color: #d4d4d4;
+  color: var(--hl-text);
 }
 
 .nestedBadge {
   font-size: 9px;
-  background: #0e639c;
-  color: #9cdcfe;
+  background: var(--hl-accent-strong);
+  color: var(--hl-keyword);
   padding: 1px 5px;
   border-radius: 3px;
   margin-left: auto;
@@ -648,7 +648,7 @@
 .propsEmpty {
   padding: 24px 12px;
   text-align: center;
-  color: #555;
+  color: var(--hl-hint);
   font-size: 12px;
   line-height: 1.6;
 }
@@ -665,12 +665,12 @@
   background: transparent;
 }
 .propsBody::-webkit-scrollbar-thumb {
-  background: #555;
+  background: var(--hl-border);
   border-radius: 3px;
 }
 
 .propSection {
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--hl-border);
 }
 
 .propSectionTitle {
@@ -683,7 +683,7 @@
   border: none;
   font-size: 10px;
   font-weight: 600;
-  color: #666;
+  color: var(--hl-hint);
   text-transform: uppercase;
   letter-spacing: 0.6px;
   cursor: pointer;
@@ -693,7 +693,7 @@
     background 0.1s;
 }
 .propSectionTitle:hover {
-  color: #ccc;
+  color: var(--hl-muted);
   background: rgba(255, 255, 255, 0.04);
 }
 
@@ -713,7 +713,7 @@
 .propLabel {
   width: 64px;
   font-size: 11px;
-  color: #9cdcfe;
+  color: var(--hl-keyword);
   text-align: right;
   flex-shrink: 0;
   white-space: nowrap;
@@ -725,40 +725,40 @@
 .propInput {
   flex: 1;
   padding: 3px 6px;
-  border: 1px solid #3c3c3c;
+  border: 1px solid var(--hl-border);
   border-radius: 4px;
   font-size: 11px;
-  background: #1e1e1e;
-  color: #ce9178;
+  background: var(--hl-bg);
+  color: var(--hl-string);
   outline: none;
   min-width: 0;
   font-family: "JetBrains Mono", monospace;
   transition: border-color 0.1s;
 }
 .propInput:focus {
-  border-color: #569cd6;
+  border-color: var(--hl-accent);
 }
 
 .propSelect {
   flex: 1;
   padding: 3px 4px;
-  border: 1px solid #3c3c3c;
+  border: 1px solid var(--hl-border);
   border-radius: 4px;
   font-size: 11px;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--hl-bg);
+  color: var(--hl-text);
   outline: none;
   min-width: 0;
   transition: border-color 0.1s;
 }
 .propSelect:focus {
-  border-color: #569cd6;
+  border-color: var(--hl-accent);
 }
 
 .propColor {
   width: 26px;
   height: 24px;
-  border: 1px solid #3c3c3c;
+  border: 1px solid var(--hl-border);
   border-radius: 4px;
   cursor: pointer;
   padding: 1px;
@@ -776,18 +776,18 @@
   display: grid;
   gap: 3px;
   padding: 6px;
-  border: 1px solid #3c3c3c;
+  border: 1px solid var(--hl-border);
   border-radius: 4px;
-  background: #1e1e1e;
+  background: var(--hl-bg);
 }
 .selectorBox span {
   font-size: 9px;
-  color: #777;
+  color: var(--hl-hint);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 .selectorBox code {
-  color: #9cdcfe;
+  color: var(--hl-keyword);
   font-size: 10px;
   line-height: 1.35;
   word-break: break-word;
@@ -801,37 +801,37 @@
 .jsToolBtn {
   min-width: 0;
   padding: 4px 5px;
-  border: 1px solid #3c3c3c;
+  border: 1px solid var(--hl-border);
   border-radius: 4px;
-  background: #1e1e1e;
-  color: #ce9178;
+  background: var(--hl-bg);
+  color: var(--hl-string);
   cursor: pointer;
   font-size: 10px;
 }
 .jsToolBtn:hover {
-  border-color: #ce9178;
-  background: rgba(206, 145, 120, 0.1);
+  border-color: var(--hl-string);
+  background: var(--hl-string-bg);
 }
 .jsLinked {
-  color: #4ade80;
+  color: var(--hl-positive);
   font-size: 10px;
   line-height: 1.4;
 }
 
 .multiSelectHint {
   font-size: 10px;
-  color: #4ade80;
+  color: var(--hl-positive);
   line-height: 1.5;
   padding: 8px 10px;
-  background: rgba(74, 222, 128, 0.08);
-  border: 1px solid rgba(74, 222, 128, 0.2);
+  background: var(--hl-positive-bg);
+  border: 1px solid var(--hl-positive-bg);
   border-radius: 6px;
   margin-bottom: 8px;
 }
 
 .jsPresetsLabel {
   font-size: 9px;
-  color: #777;
+  color: var(--hl-hint);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 2px;
@@ -849,21 +849,21 @@
   align-items: center;
   gap: 2px;
   padding: 6px 4px;
-  border: 1px solid #3c3c3c;
+  border: 1px solid var(--hl-border);
   border-radius: 5px;
-  background: #1e1e1e;
+  background: var(--hl-bg);
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s;
 }
 
 .jsPresetCard:hover {
-  border-color: #ce9178;
-  background: rgba(206, 145, 120, 0.08);
+  border-color: var(--hl-string);
+  background: var(--hl-string-bg);
 }
 
 .jsPresetCardActive {
-  border-color: #4ade80 !important;
-  background: rgba(74, 222, 128, 0.08) !important;
+  border-color: var(--hl-positive) !important;
+  background: var(--hl-positive-bg) !important;
 }
 
 .jsPresetIcon {
@@ -873,7 +873,7 @@
 
 .jsPresetLabel {
   font-size: 9px;
-  color: #ce9178;
+  color: var(--hl-string);
   text-align: center;
   line-height: 1.2;
   word-break: break-word;
@@ -929,8 +929,8 @@
 }
 .bmContent {
   flex: 1;
-  background: rgba(86, 156, 214, 0.18);
-  border: 1px solid rgba(86, 156, 214, 0.4);
+  background: var(--hl-accent-bg);
+  border: 1px solid var(--hl-accent);
   border-radius: 3px;
   padding: 6px 4px;
   text-align: center;
@@ -943,13 +943,13 @@
 .bmContentTag {
   font-size: 10px;
   font-family: "JetBrains Mono", monospace;
-  color: #9cdcfe;
+  color: var(--hl-keyword);
   font-weight: 600;
 }
 .bmDims {
   font-size: 9px;
   font-family: "JetBrains Mono", monospace;
-  color: #777;
+  color: var(--hl-hint);
 }
 
 /* ── Prop picker (preset dropdown per row) ───────────────────────────────────── */
@@ -962,9 +962,9 @@
   height: 22px;
   padding: 0;
   background: transparent;
-  border: 1px solid #3c3c3c;
+  border: 1px solid var(--hl-border);
   border-radius: 3px;
-  color: #666;
+  color: var(--hl-hint);
   cursor: pointer;
   font-size: 10px;
   line-height: 1;
@@ -976,16 +976,16 @@
     border-color 0.1s;
 }
 .pickerBtn:hover {
-  color: #cba6f7;
-  border-color: #cba6f7;
+  color: var(--hl-accent2);
+  border-color: var(--hl-accent2);
 }
 .pickerList {
   position: absolute;
   right: 0;
   top: calc(100% + 3px);
   z-index: 200;
-  background: #1e1e1e;
-  border: 1px solid #555;
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
   border-radius: 6px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   min-width: 160px;
@@ -1001,7 +1001,7 @@
   width: 4px;
 }
 .pickerList::-webkit-scrollbar-thumb {
-  background: #555;
+  background: var(--hl-border);
   border-radius: 2px;
 }
 .pickerItem {
@@ -1013,7 +1013,7 @@
   background: transparent;
   border: none;
   border-radius: 4px;
-  color: #ce9178;
+  color: var(--hl-string);
   font-size: 11px;
   font-family: "JetBrains Mono", monospace;
   text-align: left;
@@ -1026,12 +1026,12 @@
     color 0.1s;
 }
 .pickerItem:hover {
-  background: rgba(203, 166, 247, 0.12);
-  color: #cba6f7;
+  background: var(--hl-accent2-bg);
+  color: var(--hl-accent2);
 }
 .pickerItemActive {
-  background: rgba(14, 99, 156, 0.3) !important;
-  color: #9cdcfe !important;
+  background: var(--hl-accent-bg) !important;
+  color: var(--hl-keyword) !important;
 }
 .pickerSwatch {
   width: 12px;
@@ -1050,7 +1050,7 @@
 }
 .slibHint {
   font-size: 10px;
-  color: #555;
+  color: var(--hl-hint);
   line-height: 1.45;
 }
 .slibRow {
@@ -1058,8 +1058,8 @@
   gap: 5px;
 }
 .slibPreview {
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
   border-radius: 5px;
   padding: 6px 8px;
   max-height: 140px;
@@ -1072,7 +1072,7 @@
   width: 4px;
 }
 .slibPreview::-webkit-scrollbar-thumb {
-  background: #555;
+  background: var(--hl-border);
   border-radius: 2px;
 }
 .slibPreviewRow {
@@ -1083,18 +1083,18 @@
   line-height: 1.4;
 }
 .slibPreviewProp {
-  color: #9cdcfe;
+  color: var(--hl-keyword);
   flex-shrink: 0;
 }
 .slibPreviewVal {
-  color: #ce9178;
+  color: var(--hl-string);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .slibApplyBtn {
   padding: 6px 12px;
-  background: #0e639c;
+  background: var(--hl-accent-strong);
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -1105,22 +1105,22 @@
   align-self: flex-start;
 }
 .slibApplyBtn:hover:not(:disabled) {
-  background: #1177bb;
+  background: var(--hl-accent);
 }
 .slibApplyBtn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
 .slibApplyBtnDone {
-  background: #166534 !important;
+  background: var(--hl-positive-bg) !important;
 }
 
 /* ── Element Tree panel ──────────────────────────────────────────────────────── */
 .treePanel {
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid #3c3c3c;
-  background: #222;
+  border-bottom: 1px solid var(--hl-border);
+  background: var(--hl-surface2);
   flex-shrink: 0;
   max-height: 220px;
 }
@@ -1132,9 +1132,9 @@
   padding: 4px 12px;
   font-size: 10px;
   font-weight: 700;
-  color: #9d9d9d;
-  background: #2d2d2d;
-  border-bottom: 1px solid #3c3c3c;
+  color: var(--hl-muted);
+  background: var(--hl-surface2);
+  border-bottom: 1px solid var(--hl-border);
   flex-shrink: 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1142,7 +1142,7 @@
 
 .treePanelHint {
   font-size: 10px;
-  color: #555;
+  color: var(--hl-hint);
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
@@ -1155,7 +1155,7 @@
   padding: 3px 0;
 }
 .treeScroll::-webkit-scrollbar { width: 4px; }
-.treeScroll::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+.treeScroll::-webkit-scrollbar-thumb { background: var(--hl-border); border-radius: 2px; }
 
 .treeItem {
   display: flex;
@@ -1165,7 +1165,7 @@
   padding: 3px 8px 3px 8px;
   background: transparent;
   border: none;
-  color: #b0b0b0;
+  color: var(--hl-muted);
   font-size: 11px;
   text-align: left;
   cursor: pointer;
@@ -1175,31 +1175,31 @@
 }
 .treeItem:hover {
   background: rgba(255,255,255,0.05);
-  color: #e0e0e0;
+  color: var(--hl-text);
 }
 .treeItem:hover .treeDeleteBtn {
   opacity: 1;
 }
 
 .treeItemSelected {
-  background: rgba(37, 99, 235, 0.2) !important;
-  color: #9cdcfe !important;
+  background: var(--hl-accent-bg) !important;
+  color: var(--hl-keyword) !important;
 }
 .treeItemSelected .treeTag {
-  color: #9cdcfe;
+  color: var(--hl-keyword);
 }
 
 .treeItemMulti {
-  background: rgba(74, 222, 128, 0.12) !important;
-  color: #4ade80 !important;
+  background: var(--hl-positive-bg) !important;
+  color: var(--hl-positive) !important;
 }
 .treeItemMulti .treeTag {
-  color: #4ade80;
+  color: var(--hl-positive);
 }
 
 .treeMultiBadge {
   font-size: 9px;
-  color: #4ade80;
+  color: var(--hl-positive);
   flex-shrink: 0;
   margin-left: 2px;
 }
@@ -1207,20 +1207,20 @@
 .treeTag {
   font-family: "JetBrains Mono", monospace;
   font-size: 10px;
-  color: #569cd6;
+  color: var(--hl-accent);
   flex-shrink: 0;
 }
 
 .treeTagBody {
   font-family: "JetBrains Mono", monospace;
   font-size: 10px;
-  color: #cba6f7;
+  color: var(--hl-accent2);
   flex-shrink: 0;
 }
 
 .treeItemLabel {
   font-size: 10px;
-  color: #666;
+  color: var(--hl-hint);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1233,7 +1233,7 @@
   flex-shrink: 0;
   background: none;
   border: none;
-  color: #555;
+  color: var(--hl-hint);
   font-size: 13px;
   cursor: pointer;
   padding: 0 3px;
@@ -1243,8 +1243,8 @@
   border-radius: 3px;
 }
 .treeDeleteBtn:hover {
-  color: #f87171;
-  background: rgba(248, 113, 113, 0.1);
+  color: var(--hl-danger);
+  background: var(--hl-danger-bg);
 }
 
 /* ── Properties panel header & delete ───────────────────────────────────────── */
@@ -1260,17 +1260,17 @@
   flex-shrink: 0;
   padding: 2px 7px;
   background: transparent;
-  border: 1px solid #555;
+  border: 1px solid var(--hl-border);
   border-radius: 4px;
-  color: #888;
+  color: var(--hl-hint);
   font-size: 10px;
   cursor: pointer;
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
 .propDeleteBtn:hover {
-  background: rgba(248, 113, 113, 0.15);
-  border-color: rgba(248, 113, 113, 0.5);
-  color: #f87171;
+  background: var(--hl-danger-bg);
+  border-color: var(--hl-danger);
+  color: var(--hl-danger);
 }
 
 /* ── Media Queries section ───────────────────────────────────────────────────── */
@@ -1282,7 +1282,7 @@
 }
 .mqBuilderLabel {
   font-size: 9px;
-  color: #555;
+  color: var(--hl-hint);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 600;
@@ -1295,10 +1295,10 @@
 }
 .mqAddBtn {
   padding: 5px 10px;
-  background: #252526;
-  border: 1px solid #569cd6;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-accent);
   border-radius: 5px;
-  color: #569cd6;
+  color: var(--hl-accent);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -1309,8 +1309,8 @@
   margin-top: 2px;
 }
 .mqAddBtn:hover:not(:disabled) {
-  background: rgba(86, 156, 214, 0.15);
-  color: #9cdcfe;
+  background: var(--hl-accent-bg);
+  color: var(--hl-keyword);
 }
 .mqAddBtn:disabled {
   opacity: 0.3;
@@ -1321,15 +1321,15 @@
   flex-direction: column;
   gap: 3px;
   margin-top: 4px;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--hl-border);
   padding-top: 6px;
 }
 .mqRule {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
   border-radius: 4px;
   padding: 4px 6px;
 }
@@ -1343,18 +1343,18 @@
   min-width: 0;
 }
 .mqRuleBp {
-  color: #cba6f7;
+  color: var(--hl-accent2);
 }
 .mqRuleProp {
-  color: #9cdcfe;
+  color: var(--hl-keyword);
 }
 .mqRuleVal {
-  color: #ce9178;
+  color: var(--hl-string);
 }
 .mqRuleDel {
   background: none;
   border: none;
-  color: #555;
+  color: var(--hl-hint);
   cursor: pointer;
   font-size: 14px;
   line-height: 1;
@@ -1363,7 +1363,7 @@
   transition: color 0.1s;
 }
 .mqRuleDel:hover {
-  color: #f87171;
+  color: var(--hl-danger);
 }
 
 /* ── ConfirmDialog ──────────────────────────────────────────────────────────── */
@@ -1377,8 +1377,8 @@
   z-index: 9999;
 }
 .confirmBox {
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
   border-radius: 8px;
   padding: 20px 24px;
   min-width: 300px;
@@ -1389,7 +1389,7 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 .confirmMsg {
-  color: #d4d4d4;
+  color: var(--hl-text);
   font-size: 14px;
   line-height: 1.5;
   margin: 0;
@@ -1399,13 +1399,13 @@
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #888;
+  color: var(--hl-hint);
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
 }
 .confirmSkip input {
-  accent-color: #569cd6;
+  accent-color: var(--hl-accent);
   cursor: pointer;
 }
 .confirmBtns {
@@ -1414,9 +1414,9 @@
   gap: 8px;
 }
 .confirmCancel {
-  background: #2a2a2a;
-  border: 1px solid #3c3c3c;
-  color: #ccc;
+  background: var(--hl-surface2);
+  border: 1px solid var(--hl-border);
+  color: var(--hl-muted);
   border-radius: 5px;
   padding: 6px 16px;
   font-size: 13px;
@@ -1424,11 +1424,11 @@
   transition: background 0.15s;
 }
 .confirmCancel:hover {
-  background: #333;
+  background: var(--hl-surface);
 }
 .confirmOk {
-  background: #569cd6;
-  border: 1px solid #4a8cc4;
+  background: var(--hl-accent);
+  border: 1px solid var(--hl-accent);
   color: #fff;
   border-radius: 5px;
   padding: 6px 16px;
@@ -1438,7 +1438,7 @@
   transition: background 0.15s;
 }
 .confirmOk:hover {
-  background: #4a8cc4;
+  background: var(--hl-accent-strong);
 }
 
 /* ── Content prop row (textarea + expand) ───────────────────────────────────── */
@@ -1455,10 +1455,10 @@
 }
 .propTextarea {
   width: 100%;
-  background: #1a1a2e;
-  border: 1px solid #3c3c3c;
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
   border-radius: 4px;
-  color: #d4d4d4;
+  color: var(--hl-text);
   font-size: 12px;
   font-family: inherit;
   padding: 6px 8px;
@@ -1469,12 +1469,12 @@
 }
 .propTextarea:focus {
   outline: none;
-  border-color: #569cd6;
+  border-color: var(--hl-accent);
 }
 .propExpandBtn {
   background: none;
-  border: 1px solid #3c3c3c;
-  color: #888;
+  border: 1px solid var(--hl-border);
+  color: var(--hl-hint);
   font-size: 10px;
   border-radius: 3px;
   padding: 2px 6px;
@@ -1483,8 +1483,8 @@
   white-space: nowrap;
 }
 .propExpandBtn:hover {
-  color: #d4d4d4;
-  border-color: #569cd6;
+  color: var(--hl-text);
+  border-color: var(--hl-accent);
 }
 
 /* ── TextEditorModal ────────────────────────────────────────────────────────── */
@@ -1498,8 +1498,8 @@
   z-index: 9999;
 }
 .textEditorBox {
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
   border-radius: 8px;
   width: min(640px, 90vw);
   display: flex;
@@ -1512,15 +1512,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
-  border-bottom: 1px solid #2a2a2a;
-  background: #252526;
+  border-bottom: 1px solid var(--hl-border);
+  background: var(--hl-surface);
   font-size: 12px;
-  color: #888;
+  color: var(--hl-hint);
 }
 .textEditorClose {
   background: none;
   border: none;
-  color: #666;
+  color: var(--hl-hint);
   font-size: 14px;
   cursor: pointer;
   padding: 2px 4px;
@@ -1528,13 +1528,13 @@
   transition: color 0.15s;
 }
 .textEditorClose:hover {
-  color: #f87171;
+  color: var(--hl-danger);
 }
 .textEditorArea {
-  background: #1a1a2e;
+  background: var(--hl-bg);
   border: none;
-  border-bottom: 1px solid #2a2a2a;
-  color: #d4d4d4;
+  border-bottom: 1px solid var(--hl-border);
+  color: var(--hl-text);
   font-size: 14px;
   font-family: inherit;
   line-height: 1.6;
@@ -1551,14 +1551,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
-  background: #252526;
+  background: var(--hl-surface);
 }
 .textEditorHint {
   font-size: 11px;
-  color: #555;
+  color: var(--hl-hint);
 }
 .textEditorDone {
-  background: #569cd6;
+  background: var(--hl-accent);
   border: none;
   color: #fff;
   border-radius: 5px;
@@ -1569,7 +1569,7 @@
   transition: background 0.15s;
 }
 .textEditorDone:hover {
-  background: #4a8cc4;
+  background: var(--hl-accent-strong);
 }
 
 /* ── Libraries panel ────────────────────────────────────────────────────────── */
@@ -1578,13 +1578,13 @@
   flex-wrap: wrap;
   gap: 8px;
   padding: 10px 12px;
-  background: #1a1a2e;
-  border-bottom: 1px solid #2a2a3e;
+  background: var(--hl-surface2);
+  border-bottom: 1px solid var(--hl-border);
   flex-shrink: 0;
 }
 .libCard {
-  background: #252535;
-  border: 1px solid #3c3c5c;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
   border-radius: 8px;
   padding: 8px 12px;
   display: flex;
@@ -1596,36 +1596,36 @@
   min-width: 0;
 }
 .libCard:hover {
-  border-color: #569cd6;
-  background: #1a2535;
+  border-color: var(--hl-accent);
+  background: var(--hl-surface2);
 }
 .libCardActive {
-  border-color: #569cd6;
-  background: #0d1f30;
+  border-color: var(--hl-accent);
+  background: var(--hl-accent-bg);
 }
 .libIcon { font-size: 16px; flex-shrink: 0; }
 .libName {
-  color: #d4d4d4;
+  color: var(--hl-text);
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
 .libCat {
-  color: #555;
+  color: var(--hl-hint);
   font-size: 10px;
   white-space: nowrap;
 }
 .libDesc {
-  color: #666;
+  color: var(--hl-hint);
   font-size: 10px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .libBadge {
-  background: #2a2a3a;
-  border: 1px solid #3c3c5c;
-  color: #555;
+  background: var(--hl-surface2);
+  border: 1px solid var(--hl-border);
+  color: var(--hl-hint);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -1634,9 +1634,9 @@
   flex-shrink: 0;
 }
 .libBadgeOn {
-  background: #0d2a1a;
-  border-color: #16a34a;
-  color: #4ade80;
+  background: var(--hl-positive-bg);
+  border-color: var(--hl-positive);
+  color: var(--hl-positive);
 }
 
 /* ── Page tab strip (multi-page mode) ──────────────────────────────────────── */
@@ -1644,8 +1644,8 @@
   display: flex;
   align-items: stretch;
   gap: 2px;
-  background: #1a1a2e;
-  border-bottom: 1px solid #2a2a3e;
+  background: var(--hl-surface2);
+  border-bottom: 1px solid var(--hl-border);
   padding: 0 8px;
   flex-shrink: 0;
   min-height: 34px;
@@ -1657,7 +1657,7 @@
   gap: 6px;
   padding: 0 12px;
   font-size: 12px;
-  color: #888;
+  color: var(--hl-hint);
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s;
@@ -1665,11 +1665,11 @@
   flex-shrink: 0;
 }
 .pageTab:hover {
-  color: #d4d4d4;
+  color: var(--hl-text);
 }
 .pageTabActive {
-  color: #d4d4d4;
-  border-bottom-color: #569cd6;
+  color: var(--hl-text);
+  border-bottom-color: var(--hl-accent);
 }
 .pageTabName {
   max-width: 120px;
@@ -1677,9 +1677,9 @@
   text-overflow: ellipsis;
 }
 .pageTabInput {
-  background: #2a2a3e;
-  border: 1px solid #569cd6;
-  color: #d4d4d4;
+  background: var(--hl-surface2);
+  border: 1px solid var(--hl-accent);
+  color: var(--hl-text);
   font-size: 12px;
   border-radius: 3px;
   padding: 1px 6px;
@@ -1689,7 +1689,7 @@
 .pageTabDel {
   background: none;
   border: none;
-  color: #555;
+  color: var(--hl-hint);
   cursor: pointer;
   font-size: 11px;
   padding: 0 2px;
@@ -1698,12 +1698,12 @@
   flex-shrink: 0;
 }
 .pageTabDel:hover {
-  color: #f87171;
+  color: var(--hl-danger);
 }
 .pageTabAdd {
   background: none;
   border: none;
-  color: #569cd6;
+  color: var(--hl-accent);
   cursor: pointer;
   font-size: 11px;
   padding: 0 10px;
@@ -1713,7 +1713,7 @@
   flex-shrink: 0;
 }
 .pageTabAdd:hover {
-  color: #7cb9e8;
+  color: var(--hl-keyword);
 }
 
 /* ── Example Picker Modal ───────────────────────────────────────────────────── */
@@ -1727,8 +1727,8 @@
   z-index: 9999;
 }
 .exPickerBox {
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
   border-radius: 12px;
   width: min(680px, 92vw);
   overflow: hidden;
@@ -1739,16 +1739,16 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 20px;
-  border-bottom: 1px solid #2a2a2a;
-  background: #252526;
-  color: #d4d4d4;
+  border-bottom: 1px solid var(--hl-border);
+  background: var(--hl-surface);
+  color: var(--hl-text);
   font-size: 14px;
   font-weight: 600;
 }
 .exPickerClose {
   background: none;
   border: none;
-  color: #666;
+  color: var(--hl-hint);
   font-size: 16px;
   cursor: pointer;
   padding: 2px 4px;
@@ -1756,7 +1756,7 @@
   transition: color 0.15s;
 }
 .exPickerClose:hover {
-  color: #f87171;
+  color: var(--hl-danger);
 }
 .exPickerGrid {
   display: grid;
@@ -1765,8 +1765,8 @@
   padding: 20px;
 }
 .exPickerCard {
-  background: #252526;
-  border: 1px solid #3c3c3c;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
   border-radius: 10px;
   padding: 22px 16px;
   display: flex;
@@ -1778,20 +1778,20 @@
   text-align: center;
 }
 .exPickerCard:hover {
-  border-color: #569cd6;
-  background: #1a2535;
+  border-color: var(--hl-accent);
+  background: var(--hl-accent-bg);
 }
 .exPickerIcon {
   font-size: 30px;
   line-height: 1;
 }
 .exPickerName {
-  color: #d4d4d4;
+  color: var(--hl-text);
   font-size: 14px;
   font-weight: 600;
 }
 .exPickerDesc {
-  color: #666;
+  color: var(--hl-hint);
   font-size: 11px;
   line-height: 1.5;
 }
@@ -1814,7 +1814,7 @@
 /* ── Props panel resize divider ─────────────────────────────────────────────── */
 .propsDivider {
   width: 4px;
-  background: #1e1e1e;
+  background: var(--hl-bg);
   cursor: col-resize;
   flex-shrink: 0;
   transition: background 0.15s;
@@ -1822,5 +1822,5 @@
 }
 .propsDivider:hover,
 .propsDivider:active {
-  background: #569cd6;
+  background: var(--hl-accent);
 }

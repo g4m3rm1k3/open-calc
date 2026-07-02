@@ -1,6 +1,8 @@
 import { useRef, useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
 import styles from "./HtmlLab.module.css";
+import { useGlobalTheme } from "../../../context/ThemeContext.jsx";
+import { useThemeColors } from "../../../hooks/useThemeColors.js";
 
 const TABS = [
   { key: "html",       label: "HTML",       language: "html" },
@@ -205,6 +207,10 @@ export default function CodePanel({
   onToggleMultiSelect,
   onDeleteElement,
 }) {
+  const C = useThemeColors();
+  const { themeStyles } = useGlobalTheme();
+  const monacoTheme = themeStyles?.monaco || (C.isDark ? "vs-dark" : "vs");
+
   const debounceRef    = useRef(null);
   const editorRef      = useRef(null);
   const monacoRef      = useRef(null);
@@ -223,6 +229,11 @@ export default function CodePanel({
     if (!editor || isFocused.current) return;
     if (editor.getValue() !== activeSource) editor.setValue(activeSource);
   }, [activeSource]);
+
+  // Push theme changes into the live editor without remounting
+  useEffect(() => {
+    monacoRef.current?.editor.setTheme(monacoTheme);
+  }, [monacoTheme]);
 
   // ── Decoration: apply / clear whenever selection or tab changes ─────────────
   useEffect(() => {
@@ -333,7 +344,7 @@ export default function CodePanel({
           <Editor
             key={activeTab}
             defaultLanguage={activeLanguage}
-            theme="vs-dark"
+            theme={monacoTheme}
             options={{
               fontSize: 12,
               lineHeight: 19,

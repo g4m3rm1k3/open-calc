@@ -4,6 +4,7 @@ import { OrbitControls, Text, Line } from "@react-three/drei";
 import * as THREE from "three";
 import { X, Box, Layers, Settings2, Trash2, Plus, Info, Activity } from "lucide-react";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { useThemeColors } from "../../hooks/useThemeColors.js";
 
 // ── Color maps ────────────────────────────────────────────────────────────────
 const COLOR_MAPS = {
@@ -511,13 +512,35 @@ const Colorbar = ({ colorMap, range }) => {
 };
 
 // ── Main component ────────────────────────────────────────────────────────────
+function readCanvasBg(isDark) {
+  const varName = isDark ? '--tw-custom-slate-900' : '--tw-custom-slate-50';
+  const channels = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  if (!channels) return isDark ? '#0f172a' : '#f8fafc';
+  const parts = channels.split(' ').map(Number);
+  if (parts.length === 3 && parts.every(n => !isNaN(n))) return `rgb(${parts[0]}, ${parts[1]}, ${parts[2]})`;
+  return isDark ? '#0f172a' : '#f8fafc';
+}
+
 const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launchConfig, embedded = false }) => {
+  const C = useThemeColors();
+  const [canvasBg, setCanvasBg] = useState(() => readCanvasBg(
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  ));
+
+  useEffect(() => {
+    function update() { setCanvasBg(readCanvasBg(C.isDark)); }
+    update();
+    const el = document.getElementById('oc-dynamic-theme-styles');
+    if (!el) return;
+    const obs = new MutationObserver(update);
+    obs.observe(el, { characterData: true, childList: true, subtree: true });
+    return () => obs.disconnect();
+  }, [C.isDark]);
   const [functions, setFunctions] = useLocalStorage("openmat-grapher-3d-funcs", [
     { id: 1, latex: "sin(x) * cos(y)", color: "#6366f1", visible: true, plotType: "surf", wireframe: false, opacity: 0.9 },
   ]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [settings, setSettings] = useLocalStorage("openmat-grapher-3d-settings", {
-    isDark: typeof document !== "undefined" && document.documentElement.classList.contains("dark"),
     showGrid: true,
     range: 12,
     resolution: 64,
@@ -526,12 +549,6 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
     flatShading: true,
   });
   const lastSigRef = useRef("");
-
-  // Sync dark mode
-  useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    if (settings.isDark !== isDark) setSettings((s) => ({ ...s, isDark }));
-  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Apply launchConfig from engine
   useEffect(() => {
@@ -747,7 +764,7 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
         )}
 
         {/* ── Viewport ── */}
-        <div className="relative flex-1" style={{ background: settings.isDark ? "#0d1117" : "#f0f4f8" }}>
+        <div className="relative flex-1" style={{ background: canvasBg }}>
           {/* Hide/show sidebar */}
           <button onClick={() => setSidebarOpen((v) => !v)}
             className="absolute left-4 top-4 z-20 inline-flex items-center gap-2 rounded-2xl border bg-white/80 px-3 py-2 text-xs font-semibold text-slate-700 shadow-xl backdrop-blur-md hover:bg-white dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:bg-slate-900">
@@ -763,8 +780,8 @@ const OpenMatGrapher3D = ({ isOpen, onClose, onSwitchTo2D, onSwitchToJSX, launch
           )}
 
           <Canvas camera={{ position: [10, 8, 10], fov: 40 }}>
-            <color attach="background" args={[settings.isDark ? "#0d1117" : "#f0f4f8"]} />
-            <OpenMatScene functions={functions} settings={settings} />
+            <color attach="background" args={[canvasBg]} />
+            <OpenMatScene functions={functions} settings={{ ...settings, isDark: C.isDark }} />
           </Canvas>
 
           {/* Colorbar */}

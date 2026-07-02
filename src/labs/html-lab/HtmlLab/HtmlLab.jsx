@@ -20,8 +20,33 @@ import {
   parseHtmlDocument,
 } from "./htmlSync";
 import styles from "./HtmlLab.module.css";
+import { useThemeColors } from "../../../hooks/useThemeColors.js";
 
 export default function HtmlLab({ onBack }) {
+  const C = useThemeColors();
+  const hlVars = {
+    "--hl-bg":           C.bg,
+    "--hl-surface":      C.surface,
+    "--hl-surface2":     C.surface2,
+    "--hl-border":       C.border,
+    "--hl-text":         C.text,
+    "--hl-muted":        C.muted,
+    "--hl-hint":         C.hint,
+    "--hl-accent":       C.blue,
+    "--hl-accent-strong": C.blue,
+    "--hl-accent-bg":    C.blueBg,
+    "--hl-keyword":      C.teal,
+    "--hl-string":       C.amber,
+    "--hl-string-bg":    C.amberBg,
+    "--hl-accent2":      C.purple,
+    "--hl-accent2-bg":   C.purpleBg,
+    "--hl-positive":     C.green,
+    "--hl-positive-bg":  C.greenBg,
+    "--hl-danger":       C.red,
+    "--hl-danger-bg":    C.redBg,
+    "--hl-canvas":       C.isDark ? C.canvasSurface : "#fafafa",
+  };
+
   const [state, dispatch] = useReducer(labReducer, undefined, () => {
     const ex = (EXAMPLES.find(e => e.id === "showcase") ?? EXAMPLES[0]).generate();
     return { ...initialState, elements: ex.elements, bodyStyles: ex.bodyStyles, javascript: ex.javascript ?? "" };
@@ -239,7 +264,7 @@ export default function HtmlLab({ onBack }) {
   }, [state.elements, state.bodyStyles, state.customCss, state.javascript, state.cdnLinks]);
 
   return (
-    <div className={styles.app}>
+    <div className={styles.app} style={hlVars}>
       <input
         ref={fileInputRef}
         type="file"
