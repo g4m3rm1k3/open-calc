@@ -1,0 +1,38 @@
+{
+  "name": "@opencalc/openmat",
+  "version": "0.1.0",
+  "description": "MATLAB-compatible numeric computation engine for the web and Node.js",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "mathjs": ">=13.0.0"
+  },
+  "devDependencies": {
+    "mathjs": "^15.1.1",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  },
+  "keywords": ["matlab", "math", "numeric", "matrix", "openmat", "opencalc"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/g4m3rm1k3/open-calc"
+  }
+}
