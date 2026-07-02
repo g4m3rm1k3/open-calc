@@ -46,6 +46,7 @@ const NAV_LINKS = [
   { id: 'studio',         label: 'Studio / Docs',              emoji: '✏️', path: '/studio', color: 'fuchsia' },
   { id: 'health',         label: 'Health Tracker',             emoji: '❤️', path: '/health', color: 'rose' },
   { id: 'compass',        label: 'Compass',                    emoji: '🧭', path: '/compass', color: 'sky' },
+  { id: 'eng-math',       label: 'Engineering Mathematics',    emoji: '∫',  path: '/eng-math',        color: 'indigo' },
   { id: 'lesson-builder', label: 'Lesson Builder · Contribute',emoji: '🔨', path: '/lesson-builder', color: 'amber' },
   { id: 'about',          label: 'About',                      emoji: 'ℹ️', path: '/about', color: 'indigo' },
   { id: 'game-rules',     label: 'Game Reference',             emoji: '♠️', action: 'game-rules', color: 'violet' },
