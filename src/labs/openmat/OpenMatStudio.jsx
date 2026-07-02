@@ -35,6 +35,7 @@ import openMatGuide from "../../../docs/OpenMAT.md?raw";
 import { createExecutionEngine, executeScript, normalizeLine as normalizeOpenMatLine } from "../../engines/openmat/openmatEngine.js";
 
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { useGlobalTheme } from '../../context/ThemeContext.jsx';
 const math = create(all);
 math.config({ matrix: "Array", number: "number" });
 
@@ -5000,6 +5001,8 @@ function OpenMatPlotWindow({
 export default function OpenMatStudio() {
   const navigate = useNavigate();
   const C = useThemeColors();
+  const { themeStyles } = useGlobalTheme();
+  const monacoTheme = themeStyles?.monaco || (C.isDark ? "openmat-dark" : "openmat-light");
   const { openGrapher } = useGrapher();
   const [documents, setDocuments] = useLocalStorage("openmat-documents", getInitialOpenMatDocuments());
   const [activeDocumentId, setActiveDocumentId] = useLocalStorage(
@@ -5079,8 +5082,8 @@ export default function OpenMatStudio() {
 
   useEffect(() => {
     if (!monacoRef.current) return;
-    monacoRef.current.editor.setTheme(C.isDark ? "openmat-dark" : "openmat-light");
-  }, [C.isDark]);
+    monacoRef.current.editor.setTheme(monacoTheme);
+  }, [monacoTheme]);
 
   useEffect(() => {
     if (!documents.length) {
@@ -7556,7 +7559,7 @@ export default function OpenMatStudio() {
                   beforeMount={setupOpenCalcMonaco}
                   defaultLanguage="openmat"
                   language="openmat"
-                  theme={C.isDark ? "openmat-dark" : "openmat-light"}
+                  theme={monacoTheme}
                   value={code}
                   onChange={(value) => setCode(value || "")}
                   options={{
@@ -7570,7 +7573,7 @@ export default function OpenMatStudio() {
                   }}
                   onMount={(editor, monaco) => {
                     monacoRef.current = monaco;
-                    monaco.editor.setTheme(C.isDark ? "openmat-dark" : "openmat-light");
+                    monaco.editor.setTheme(monacoTheme);
                     editor.addCommand(1024 | 3, () => {
                       runCode();
                     });
@@ -9245,7 +9248,7 @@ export default function OpenMatStudio() {
               beforeMount={setupOpenCalcMonaco}
               defaultLanguage="openmat"
               language="openmat"
-              theme={C.isDark ? "openmat-dark" : "openmat-light"}
+              theme={monacoTheme}
               value={code}
               onChange={(value) => setCode(value || "")}
               options={{
@@ -9259,7 +9262,7 @@ export default function OpenMatStudio() {
               }}
               onMount={(editor, monaco) => {
                 monacoRef.current = monaco;
-                monaco.editor.setTheme(C.isDark ? "openmat-dark" : "openmat-light");
+                monaco.editor.setTheme(monacoTheme);
                 editor.addCommand(1024 | 3, () => {
                   runCode();
                 });

@@ -48,6 +48,18 @@ export function useThemeColors() {
 
   return {
     dark,
+    isDark: dark,  // alias used by Monaco editor in OpenMatStudio
+
+    // Canvas-safe hex colors — CSS variable strings are invalid in the 2D
+    // canvas context (ctx.fillStyle / ctx.strokeStyle can't resolve var(…)).
+    // Use these any time you draw into a <canvas>, not DOM elements.
+    canvasSurface: dark ? '#1e293b' : '#ffffff',
+    canvasText:    dark ? '#cbd5e1' : '#1e293b',
+    canvasMuted:   dark ? '#64748b' : '#475569',
+    canvasHint:    dark ? '#475569' : '#94a3b8',
+    canvasBorder:  dark ? '#334155' : '#e2e8f0',
+    canvasBlue:    dark ? '#60a5fa' : '#2563eb',
+
     // bg < surface2 < surface is a deliberate depth ladder (darkest backdrop ->
     // raised header bar -> raised card), so adjacent blocks stay visually
     // distinguishable. bg and surface2 used to both resolve to slate-900,

@@ -17,18 +17,37 @@ function getNiceTickStep(min, max, targetCount = 8) {
   return step
 }
 
-// ── Color token mapping ───────────────────────────────────────────────────────
-// Maps Python color names to actual CSS colors.
-// The 'C' object comes from the notebook's useColors() hook.
-function resolveColor(name, C) {
+// ── CSS variable resolution ────────────────────────────────────────────────────
+// The canvas 2D API cannot resolve "rgb(var(--tw-custom-slate-800))" — it
+// needs a concrete color. This helper reads the computed channel values and
+// builds a proper rgb() string. Called at draw-time so the figure always
+// reflects the active studio theme (not just dark/light mode).
+function resolveCSSColor(expr, fallback) {
+  if (!expr) return fallback
+  if (expr.startsWith('#') || (expr.startsWith('rgb') && !expr.includes('var('))) return expr
+  const m = expr.match(/var\((--[\w-]+)\)/)
+  if (!m) return fallback ?? expr
+  const channels = getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim()
+  return channels ? `rgb(${channels})` : (fallback ?? expr)
+}
+
+// ── Color token mapping ────────────────────────────────────────────────────────
+// Takes the draw-time resolved color set `cc` (built in draw() below).
+function resolveColor(name, cc) {
   const map = {
-    blue: C.blue, amber: C.amber, green: C.green, red: C.red,
-    purple: C.purple, teal: C.teal, gray: C.hint, muted: C.muted,
-    text: C.text, border: C.border, hint: C.hint,
+    blue:   cc.blue,
+    amber:  cc.amber,
+    green:  cc.green,
+    red:    cc.red,
+    purple: cc.purple,
+    teal:   cc.teal,
+    gray:   cc.hint,
+    muted:  cc.muted,
+    text:   cc.text,
+    border: cc.border,
+    hint:   cc.hint,
     white: '#ffffff', black: '#000000',
   }
-  // If it's a known token name, return the theme color.
-  // Otherwise treat it as a raw CSS color string.
   return map[name] || name
 }
 
@@ -50,6 +69,20 @@ export default function FigureRenderer({ figureJson, C }) {
     const draw = () => {
       const cv = canvasRef.current; if (!cv) return
 
+      // Resolve CSS variable strings to concrete colors at draw-time.
+      // This means the canvas updates whenever the studio theme changes its
+      // CSS custom properties — not just on dark/light toggle.
+      const cc = {
+        surface: resolveCSSColor(C.surface, C.canvasSurface),
+        text:    resolveCSSColor(C.text,    C.canvasText),
+        muted:   resolveCSSColor(C.muted,   C.canvasMuted),
+        hint:    resolveCSSColor(C.hint,    C.canvasHint),
+        border:  resolveCSSColor(C.border,  C.canvasBorder),
+        blue:    resolveCSSColor(C.blue,    C.canvasBlue),
+        // Categorical colors are already concrete hex — pass through
+        amber: C.amber, green: C.green, red: C.red, purple: C.purple, teal: C.teal,
+      }
+
       // Canvas sizing
       const canvasW = cv.offsetWidth || 600
       const canvasH = fig.square
@@ -62,7 +95,7 @@ export default function FigureRenderer({ figureJson, C }) {
       ctx.clearRect(0, 0, canvasW, canvasH)
 
       // Background
-      ctx.fillStyle = C.surface
+      ctx.fillStyle = cc.surface
       ctx.fillRect(0, 0, canvasW, canvasH)
 
       // Layout padding
@@ -99,7 +132,7 @@ export default function FigureRenderer({ figureJson, C }) {
 
       // Title
       if (fig.title) {
-        ctx.fillStyle = C.text
+        ctx.fillStyle = cc.text
         ctx.font = '500 14px sans-serif'
         ctx.textAlign = 'center'
         ctx.fillText(fig.title, canvasW / 2, 20)
@@ -120,7 +153,7 @@ export default function FigureRenderer({ figureJson, C }) {
 
           case 'grid': {
             const step = el.step || 1
-            ctx.strokeStyle = resolveColor(el.color || 'border', C)
+            ctx.strokeStyle = resolveColor(el.color || 'border', cc)
             ctx.lineWidth = 1
             // vertical lines
             for (let x = Math.ceil(xmin / step) * step; x <= xmax; x += step) {
@@ -134,7 +167,7 @@ export default function FigureRenderer({ figureJson, C }) {
           }
 
           case 'axes': {
-            ctx.strokeStyle = C.hint; ctx.lineWidth = 1.5
+            ctx.strokeStyle = cc.hint; ctx.lineWidth = 1.5
             // x-axis
             ctx.beginPath(); ctx.moveTo(pl, toY(0)); ctx.lineTo(pl + iw, toY(0)); ctx.stroke()
             // y-axis
@@ -142,7 +175,7 @@ export default function FigureRenderer({ figureJson, C }) {
             if (el.ticks !== false) {
               const xStep = getNiceTickStep(xmin, xmax, Math.max(4, Math.floor(iw / 90)))
               const yStep = getNiceTickStep(ymin, ymax, Math.max(4, Math.floor(ih / 44)))
-              ctx.fillStyle = C.hint; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
+              ctx.fillStyle = cc.hint; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
               for (let x = Math.ceil(xmin / xStep) * xStep; x <= xmax + xStep * 0.25; x += xStep) {
                 if (Math.abs(x) < 1e-9) continue
                 ctx.fillText(Number(x.toFixed(6)), toX(x), toY(0) + 14)
@@ -159,7 +192,7 @@ export default function FigureRenderer({ figureJson, C }) {
           case 'arrow': {
             const sx = toX(el.start[0]), sy = toY(el.start[1])
             const ex = toX(el.end[0]),   ey = toY(el.end[1])
-            const color = resolveColor(el.color || 'blue', C)
+            const color = resolveColor(el.color || 'blue', cc)
             const angle = Math.atan2(ey - sy, ex - sx)
             const hl = 10
 
@@ -184,7 +217,7 @@ export default function FigureRenderer({ figureJson, C }) {
           }
 
           case 'line': {
-            const color = resolveColor(el.color || 'muted', C)
+            const color = resolveColor(el.color || 'muted', cc)
             if (el.dashed) ctx.setLineDash([5, 4])
             ctx.strokeStyle = color; ctx.lineWidth = el.width || 1.5
             ctx.beginPath()
@@ -197,7 +230,7 @@ export default function FigureRenderer({ figureJson, C }) {
 
           case 'point': {
             const px = toX(el.pos[0]), py = toY(el.pos[1])
-            const color = resolveColor(el.color || 'amber', C)
+            const color = resolveColor(el.color || 'amber', cc)
             ctx.fillStyle = color
             ctx.beginPath(); ctx.arc(px, py, el.radius || 6, 0, Math.PI * 2); ctx.fill()
             if (el.label) {
@@ -208,7 +241,7 @@ export default function FigureRenderer({ figureJson, C }) {
           }
 
           case 'curve': {
-            const color = resolveColor(el.color || 'blue', C)
+            const color = resolveColor(el.color || 'blue', cc)
             const xs = el.xs, ys = el.ys
             // Filled region first (under the curve)
             if (el.fill) {
@@ -252,7 +285,7 @@ export default function FigureRenderer({ figureJson, C }) {
           }
 
           case 'scatter': {
-            const color = resolveColor(el.color || 'blue', C)
+            const color = resolveColor(el.color || 'blue', cc)
             ctx.fillStyle = color
             for (let i = 0; i < el.xs.length; i++) {
               const px = toX(el.xs[i]), py = toY(el.ys[i])
@@ -266,7 +299,7 @@ export default function FigureRenderer({ figureJson, C }) {
           }
 
           case 'region': {
-            const color = resolveColor(el.color || 'blue', C)
+            const color = resolveColor(el.color || 'blue', cc)
             ctx.beginPath()
             let started = false
             for (let i = 0; i < el.xs.length; i++) {
@@ -285,7 +318,7 @@ export default function FigureRenderer({ figureJson, C }) {
           }
 
           case 'text': {
-            const color = resolveColor(el.color || 'text', C)
+            const color = resolveColor(el.color || 'text', cc)
             ctx.fillStyle = color
             ctx.font = `${el.bold ? '500 ' : ''}${el.size || 13}px sans-serif`
             ctx.textAlign = el.align || 'center'
@@ -295,7 +328,7 @@ export default function FigureRenderer({ figureJson, C }) {
 
           case 'polygon': {
             if (!el.points || el.points.length < 2) break
-            const color = resolveColor(el.color || 'blue', C)
+            const color = resolveColor(el.color || 'blue', cc)
             ctx.beginPath()
             ctx.moveTo(toX(el.points[0][0]), toY(el.points[0][1]))
             for (let i = 1; i < el.points.length; i++)
@@ -318,12 +351,12 @@ export default function FigureRenderer({ figureJson, C }) {
             for (let i = -r; i <= r; i++) {
               // vertical lines of original grid
               const [x0,y0] = T(i, -r), [x1,y1] = T(i, r)
-              ctx.strokeStyle = i === 0 ? resolveColor(color_v || 'green', C) : resolveColor(color_v || 'green', C) + '55'
+              ctx.strokeStyle = i === 0 ? resolveColor(color_v || 'green', C) : resolveColor(color_v || 'green', cc) + '55'
               ctx.lineWidth = i === 0 ? 2 : 1
               ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.stroke()
               // horizontal lines
               const [x2,y2] = T(-r, i), [x3,y3] = T(r, i)
-              ctx.strokeStyle = i === 0 ? resolveColor(color_h || 'blue', C) : resolveColor(color_h || 'blue', C) + '55'
+              ctx.strokeStyle = i === 0 ? resolveColor(color_h || 'blue', C) : resolveColor(color_h || 'blue', cc) + '55'
               ctx.lineWidth = i === 0 ? 2 : 1
               ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x3,y3); ctx.stroke()
             }
@@ -332,7 +365,7 @@ export default function FigureRenderer({ figureJson, C }) {
           }
 
           case 'tangent': {
-            const color = resolveColor(el.color || 'amber', C)
+            const color = resolveColor(el.color || 'amber', cc)
             ctx.strokeStyle = color; ctx.lineWidth = el.width || 2
             ctx.beginPath()
             ctx.moveTo(toX(el.x1), toY(el.y0 + el.slope * (el.x1 - el.x0)))
@@ -349,7 +382,7 @@ export default function FigureRenderer({ figureJson, C }) {
           }
 
           case 'riemann': {
-            const color = resolveColor(el.color || 'blue', C)
+            const color = resolveColor(el.color || 'blue', cc)
             ctx.fillStyle = color; ctx.globalAlpha = el.alpha || 0.3
             for (const rect of el.rects) {
               const rx = toX(rect.x)
@@ -373,7 +406,7 @@ export default function FigureRenderer({ figureJson, C }) {
             const maxV = Math.max(...el.values.map(Math.abs))
             const barW = iw / (n * 1.4)
             const gap = iw / n
-            const barColor = resolveColor(el.color || 'blue', C)
+            const barColor = resolveColor(el.color || 'blue', cc)
             const baseY = pt + ih  // bottom of chart area
 
             el.values.forEach((v, i) => {
@@ -390,7 +423,7 @@ export default function FigureRenderer({ figureJson, C }) {
               ctx.fillStyle = barColor; ctx.font = '500 11px sans-serif'; ctx.textAlign = 'center'
               ctx.fillText(v.toFixed(1), bx + barW / 2, by - 4)
               // category label below
-              ctx.fillStyle = C.muted; ctx.font = '11px sans-serif'
+              ctx.fillStyle = cc.muted; ctx.font = '11px sans-serif'
               ctx.fillText(el.labels[i], bx + barW / 2, baseY + 14)
             })
             break
@@ -402,7 +435,7 @@ export default function FigureRenderer({ figureJson, C }) {
             const dataMin = el.xmin, dataMax = el.xmax
             const dataRange = dataMax - dataMin || 1
             const maxCount = Math.max(...counts, 1)
-            const histColor = resolveColor(el.color || 'blue', C)
+            const histColor = resolveColor(el.color || 'blue', cc)
             const baseY = pt + ih
             for (let i = 0; i < counts.length; i++) {
               const bx = pl + ((edges[i] - dataMin) / dataRange) * iw
@@ -412,11 +445,11 @@ export default function FigureRenderer({ figureJson, C }) {
               ctx.globalAlpha = el.alpha || 0.7
               ctx.fillRect(bx, baseY - bh, bw, bh)
               ctx.globalAlpha = 1
-              ctx.strokeStyle = C.surface; ctx.lineWidth = 1
+              ctx.strokeStyle = cc.surface; ctx.lineWidth = 1
               ctx.strokeRect(bx, baseY - bh, bw, bh)
             }
             // x-axis tick labels
-            ctx.fillStyle = C.muted; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
+            ctx.fillStyle = cc.muted; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
             const tickStep = counts.length > 15 ? 2 : 1
             for (let i = 0; i <= counts.length; i += tickStep) {
               const bx = pl + ((edges[i] - dataMin) / dataRange) * iw
@@ -430,7 +463,7 @@ export default function FigureRenderer({ figureJson, C }) {
             const { q1, median, q3, lower_whisker: lw2, upper_whisker: uw2, outliers: bpOutliers = [],
                     color: bpColorRaw, x: bpX2 = 0.5, xmax: bpXMax = 1, width: bpW2 = 0.35,
                     label: bpLabel, ymin: bpYMin, ymax: bpYMax } = el
-            const bpCol = resolveColor(bpColorRaw || 'blue', C)
+            const bpCol = resolveColor(bpColorRaw || 'blue', cc)
             const bpYRange = (bpYMax - bpYMin) || 1
             const toCanvasY2 = v => pt + ih - ((v - bpYMin) / bpYRange) * ih
             const cx3 = pl + (bpX2 / bpXMax) * iw
@@ -457,7 +490,7 @@ export default function FigureRenderer({ figureJson, C }) {
               ctx.beginPath(); ctx.arc(cx3, toCanvasY2(o), 3, 0, Math.PI * 2); ctx.fill()
             }
             if (bpLabel) {
-              ctx.fillStyle = C.muted; ctx.font = '11px sans-serif'; ctx.textAlign = 'center'
+              ctx.fillStyle = cc.muted; ctx.font = '11px sans-serif'; ctx.textAlign = 'center'
               ctx.fillText(bpLabel, cx3, pt + ih + 14)
             }
             break
@@ -468,16 +501,16 @@ export default function FigureRenderer({ figureJson, C }) {
             const pieTotalVal = el.values.reduce((a, b) => a + b, 0)
             const pieCx = pl + iw / 2, pieCy = pt + ih / 2
             const pieRadius = Math.min(iw, ih) * 0.42
-            const palette = [C.blue, C.amber, C.green, C.red, C.purple, C.teal]
+            const palette = [cc.blue, C.amber, C.green, C.red, C.purple, C.teal]
             let pieAngle = -Math.PI / 2
             el.values.forEach((v, i) => {
               const slice = (v / pieTotalVal) * Math.PI * 2
-              const pieColor = el.colors?.[i] ? resolveColor(el.colors[i], C) : palette[i % palette.length]
+              const pieColor = el.colors?.[i] ? resolveColor(el.colors[i], cc) : palette[i % palette.length]
               ctx.fillStyle = pieColor
               ctx.beginPath(); ctx.moveTo(pieCx, pieCy)
               ctx.arc(pieCx, pieCy, pieRadius, pieAngle, pieAngle + slice)
               ctx.closePath(); ctx.fill()
-              ctx.strokeStyle = C.surface; ctx.lineWidth = 2; ctx.stroke()
+              ctx.strokeStyle = cc.surface; ctx.lineWidth = 2; ctx.stroke()
               if (slice > 0.15) {
                 const midA = pieAngle + slice / 2
                 const pct = ((v / pieTotalVal) * 100).toFixed(1)
@@ -501,7 +534,7 @@ export default function FigureRenderer({ figureJson, C }) {
       ctx.restore()
 
       // Axis tick labels (drawn outside clip region)
-      ctx.fillStyle = C.muted; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
+      ctx.fillStyle = cc.muted; ctx.font = '10px sans-serif'; ctx.textAlign = 'center'
     }
 
     draw()
@@ -510,7 +543,16 @@ export default function FigureRenderer({ figureJson, C }) {
       roRef.current = new ResizeObserver(draw)
       if (canvasRef.current?.parentElement) roRef.current.observe(canvasRef.current.parentElement)
     }
-    return () => { if (roRef.current) { roRef.current.disconnect(); roRef.current = null } }
+
+    // Re-draw when the studio theme swaps CSS custom properties
+    const themeEl = document.getElementById('oc-dynamic-theme-styles')
+    const themeObs = new MutationObserver(draw)
+    if (themeEl) themeObs.observe(themeEl, { characterData: true, childList: true, subtree: true })
+
+    return () => {
+      if (roRef.current) { roRef.current.disconnect(); roRef.current = null }
+      themeObs.disconnect()
+    }
 
   }, [figureJson, C])
 

@@ -132,6 +132,11 @@ function devFsPlugin() {
 
 export default defineConfig({
   plugins: [react(), emitVersionJson(), devFsPlugin()],
+  resolve: {
+    alias: {
+      '@opencalc/openmat': path.resolve(process.cwd(), 'packages/openmat/src/index.ts'),
+    },
+  },
   base: process.env.VITE_BASE_URL ?? (process.env.ELECTRON_BUILD ? "./" : "/"),
   build: {
     outDir: "dist",

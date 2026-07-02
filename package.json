@@ -5,6 +5,7 @@
   "license": "GPL-3.0-or-later",
   "type": "module",
   "main": "desktop/app/main.mjs",
+  "workspaces": ["packages/*"],
   "scripts": {
     "dev": "node scripts/generate-graph.mjs && node src/scripts/build-search-index.js && node scripts/build-lesson-ids.mjs && vite",
     "build": "node scripts/generate-graph.mjs && node src/scripts/build-search-index.js && node scripts/build-lesson-ids.mjs && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
@@ -34,6 +35,7 @@
     "check-lessons": "node scripts/check-lesson-roundtrip.mjs"
   },
   "dependencies": {
+    "@opencalc/openmat": "*",
     "@babel/parser": "^7.29.2",
     "@fontsource/inter": "^5.1.1",
     "@fontsource/jetbrains-mono": "^5.1.1",
