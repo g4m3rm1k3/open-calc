@@ -23,7 +23,14 @@ function extractTitle(raw) {
 const ALL_POSTS = Object.entries(POST_MODULES)
   .map(([path, raw]) => ({ slug: pathToSlug(path), title: extractTitle(raw), raw }))
   .filter((p) => p.slug && !p.slug.startsWith('_'))
-  .sort((a, b) => a.slug.localeCompare(b.slug))
+  .sort((a, b) => {
+    // Extract the numeric lesson number from slug like "lesson-0-12-capstone" → 12
+    const num = (s) => {
+      const m = s.slug.match(/lesson-\d+-(\d+)/)
+      return m ? parseInt(m[1], 10) : 0
+    }
+    return num(a) - num(b)
+  })
 
 export default function EngMathPage() {
   const { slug } = useParams()
@@ -65,6 +72,7 @@ export default function EngMathPage() {
       title={post.title}
       slug={post.slug}
       seriesNav={seriesNav}
+      lessons={ALL_POSTS.map((p) => ({ slug: p.slug, title: p.title }))}
     />
   )
 }

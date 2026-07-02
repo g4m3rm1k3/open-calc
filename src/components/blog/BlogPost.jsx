@@ -79,7 +79,7 @@ export default function BlogPost({ content }) {
     <article className="prose-blog max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeRaw, rehypeKatex]}
+        rehypePlugins={[rehypeRaw, [rehypeKatex, { throwOnError: false, errorColor: '#ef4444' }]]}
         components={{
           h1: ({ children }) => <Heading level={1}>{children}</Heading>,
           h2: ({ children }) => <Heading level={2}>{children}</Heading>,

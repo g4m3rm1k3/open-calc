@@ -39,7 +39,8 @@ export default function EngMathLeft({ content, slug, onSceneChange, onQuizResult
         const containerRect = container.getBoundingClientRect()
         const cutoffY = containerRect.top + containerRect.height * 0.35
 
-        let current = null
+        // Default to the first waypoint so the lesson's opening scene shows immediately
+        let current = waypoints[0] ?? null
         for (const wp of waypoints) {
           const rect = wp.getBoundingClientRect()
           if (rect.top <= cutoffY) {
@@ -211,10 +212,10 @@ export default function EngMathLeft({ content, slug, onSceneChange, onQuizResult
 
   return (
     <div ref={scrollRef} className="h-full overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-8 py-10 pb-32">
+      <div className="px-6 py-8 pb-32">
         <ReactMarkdown
           remarkPlugins={[remarkGfm, remarkMath]}
-          rehypePlugins={[rehypeRaw, rehypeKatex]}
+          rehypePlugins={[rehypeRaw, [rehypeKatex, { throwOnError: false, errorColor: '#ef4444' }]]}
           components={components}
         >
           {preprocess(content)}

@@ -69,6 +69,7 @@ const BlogPostPage = lazy(() => import("./pages/BlogPostPage.jsx"));
 const BlogBuilderPage = lazy(() => import("./pages/BlogBuilderPage.jsx"));
 const SvgGalleryPage = lazy(() => import("./pages/SvgGalleryPage.jsx"));
 const EngMathPage = lazy(() => import("./pages/EngMathPage.jsx"));
+const SceneSandboxPage = lazy(() => import("./pages/SceneSandboxPage.jsx"));
 const NotificationToast = lazy(
   () => import("./features/calendar/NotificationToast.tsx"),
 );
@@ -194,6 +195,7 @@ export default function App() {
                             <Route path="svg-gallery" element={<SvgGalleryPage />} />
                             <Route path="eng-math" element={<EngMathPage />} />
                             <Route path="eng-math/:slug" element={<EngMathPage />} />
+                            <Route path="dev/scenes" element={<SceneSandboxPage />} />
 
                             {/* Game auto-discovery */}
                             <Route

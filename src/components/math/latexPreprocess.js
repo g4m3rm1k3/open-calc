@@ -239,6 +239,17 @@ export function preprocess(text) {
       // above about "$$" being special inside a replacement *string*.
       .replace(/^(\s*)\$\$(.+)\$\$(\s*)$/gm, (_, lead, inner, trail) =>
         inner.trim() ? `${lead}$$\n${inner.trim()}\n$$${trail}` : `${lead}$$${inner}$$${trail}`)
+      // Multi-line display math where $$ is on the same line as content, e.g.:
+      //   $$\exists x \in \mathbb{C} \text{ such that }
+      //   p(x) = a_n(x - z_1)\cdots(x - z_n)$$
+      // remark-math requires $$ to be alone on its own line (like a fenced
+      // code block) — content immediately after/before $$ prevents it from
+      // recognising the fence, so the delimiters leak into surrounding prose
+      // and the whole section renders as broken red text.
+      // Split opening $$ from its trailing content and closing $$ from its
+      // leading content so each fence sits on its own line.
+      .replace(/^(\s*)\$\$([^\s$\n])/gm, (_, lead, first) => `${lead}$$\n${first}`)
+      .replace(/([^$\n])\$\$(\s*)$/gm, (_, last, trail) => `${last}\n$$${trail}`)
   )
 }
 
