@@ -16,6 +16,15 @@ function el(id: string, tag: string, parentId: string | null, order: number, sty
   return { id, tag, parentId, order, content, attrs: { id: "", class: "" }, styles, mediaQueries: [] };
 }
 
+// Standalone copy of labReducer's private hexLum, for asserting on the actual
+// shade a color got remapped to without exporting an internal helper just for tests.
+function hexLumForTest(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
 describe("CONTAINER_TAGS — table structure renders in the canvas", () => {
   it("includes the table family so <thead>/<tr>/<th> aren't silently dropped", () => {
     for (const tag of ["table", "thead", "tbody", "tr", "th", "td"]) {
@@ -30,10 +39,12 @@ function stateWithColorMode(elements: LabElement[], colorMode: "light" | "dark")
 }
 
 describe("SET_COLOR_MODE — cascadeBodyTheme respects ancestor backgrounds", () => {
-  it("does not recolor text on a descendant sitting on a non-neutral ancestor background", () => {
+  it("does not recolor text on a descendant sitting on a non-neutral (genuine accent color) ancestor background", () => {
     const elements: LabElement[] = [
-      // A "hero" section with its own dark gradient background — unrelated to the page body.
-      el("section1", "section", null, 0, { background: "linear-gradient(#0f172a 0%, #1e293b 100%)" }),
+      // A "hero" section with its own deliberate violet brand gradient — a real
+      // accent choice (mid luminance, not near-black/near-white chrome), unrelated
+      // to the page body and something a global light/dark toggle should never touch.
+      el("section1", "section", null, 0, { background: "linear-gradient(#7c3aed 0%, #a78bfa 100%)" }),
       el("h1-1", "h1", "section1", 0, { color: "#f8fafc" }, "Heading"),
     ];
     const state = stateWithColorMode(elements, "dark");
@@ -41,8 +52,8 @@ describe("SET_COLOR_MODE — cascadeBodyTheme respects ancestor backgrounds", ()
 
     const h1 = next.elements.find((e) => e.id === "h1-1")!;
     // The heading's white text must survive — it's still sitting on the section's
-    // own dark gradient, which didn't change, so flipping it to dark text would
-    // make it unreadable against that unchanged dark backdrop.
+    // own violet gradient, which didn't change, so flipping it to dark text would
+    // make it unreadable against that unchanged backdrop.
     expect(h1.styles.color).toBe("#f8fafc");
   });
 
@@ -135,5 +146,51 @@ describe("inferBodyTheme", () => {
   it("detects centered from a maxWidth", () => {
     const theme = inferBodyTheme({ backgroundColor: "#f8fafc", maxWidth: "1024px" });
     expect(theme.centered).toBe(true);
+  });
+});
+
+describe("SET_COLOR_MODE — real incident: the startup demo never visibly changed", () => {
+  // The demo page (exampleProject.ts) builds every section from its own explicit
+  // #0f172a/#1e293b dark-navy styles instead of inheriting from body — nav
+  // backgroundColor is a plain #0f172a, the hero uses a
+  // linear-gradient(180deg, #0f172a 0%, #1e293b 100%), and CTA buttons use the
+  // genuine accent color #3b82f6. Before this fix, cascadeBodyTheme's
+  // saturation-based neutrality check refused to touch any of it — a gradient
+  // never even passed the entry check, and #0f172a's hue saturation (~0.64)
+  // read as "a deliberate color choice" even though it's just dark chrome.
+  const navEl = el("nav1", "nav", null, 0, { backgroundColor: "#0f172a" });
+  const heroEl = el("hero1", "section", null, 1, { background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)" });
+  const heroTitle = el("hero-title", "h1", "hero1", 0, { color: "#f8fafc" }, "Heading");
+  const ctaButton = el("cta1", "button", "hero1", 1, { backgroundColor: "#3b82f6", color: "#ffffff" }, "Get started");
+
+  function demoState(): LabState {
+    return stateWithColorMode([navEl, heroEl, heroTitle, ctaButton], "dark");
+  }
+
+  it("relights a plain-color nav background when switching to Light", () => {
+    const next = labReducer(demoState(), { type: "SET_COLOR_MODE", payload: "light" });
+    const nav = next.elements.find((e) => e.id === "nav1")!;
+    expect(hexLumForTest(nav.styles.backgroundColor)).toBeGreaterThan(0.85);
+  });
+
+  it("relights every stop of the hero's gradient background when switching to Light", () => {
+    const next = labReducer(demoState(), { type: "SET_COLOR_MODE", payload: "light" });
+    const hero = next.elements.find((e) => e.id === "hero1")!;
+    const stops = hero.styles.background.match(/#[0-9a-fA-F]{6}/g) ?? [];
+    expect(stops.length).toBeGreaterThan(0);
+    for (const stop of stops) expect(hexLumForTest(stop)).toBeGreaterThan(0.85);
+  });
+
+  it("recolors the hero heading's white text once its dark gradient backdrop is also relit", () => {
+    const next = labReducer(demoState(), { type: "SET_COLOR_MODE", payload: "light" });
+    const title = next.elements.find((e) => e.id === "hero-title")!;
+    expect(title.styles.color).not.toBe("#f8fafc");
+  });
+
+  it("leaves the genuine accent-colored CTA button untouched", () => {
+    const next = labReducer(demoState(), { type: "SET_COLOR_MODE", payload: "light" });
+    const button = next.elements.find((e) => e.id === "cta1")!;
+    expect(button.styles.backgroundColor).toBe("#3b82f6");
+    expect(button.styles.color).toBe("#ffffff");
   });
 });

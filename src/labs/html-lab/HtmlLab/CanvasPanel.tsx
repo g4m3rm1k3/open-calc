@@ -302,6 +302,15 @@ function renderTag(
   const extraProps = el.tag === "a"
     ? { onClick: (e: React.MouseEvent) => e.preventDefault() }
     : {};
+
+  // React specifically disallows setting a <textarea>'s initial text via
+  // children (warns and won't render it) — it has to be defaultValue/value.
+  if (el.tag === "textarea") {
+    return (
+      <Tag {...(domAttrs as React.HTMLAttributes<HTMLElement>)} style={tagStyle} defaultValue={el.content || ""} />
+    );
+  }
+
   return (
     <Tag {...(domAttrs as React.HTMLAttributes<HTMLElement>)} {...extraProps} style={tagStyle}>
       {el.content || ""}
@@ -322,11 +331,32 @@ function getSubtreeIds(elements: LabElement[], rootId: string | null): Set<strin
   return result;
 }
 
+// A handful of real HTML attribute names aren't valid JSX prop names (`for`
+// is a reserved word, `class` collides with the JS keyword) or use a
+// different case than their DOM property (`datetime` -> `dateTime`,
+// `colspan`/`rowspan` -> `colSpan`/`rowSpan`). LabElement.attrs always stores
+// the real HTML name (that's what gets serialized to exported HTML in
+// htmlSync.ts) — this is the one place it gets translated for React's canvas render.
+const REACT_PROP_NAME: Record<string, string> = {
+  class: "className",
+  for: "htmlFor",
+  datetime: "dateTime",
+  colspan: "colSpan",
+  rowspan: "rowSpan",
+  readonly: "readOnly",
+  maxlength: "maxLength",
+  tabindex: "tabIndex",
+};
+// Attributes React expects as an actual boolean, not the string "true"/"false"
+// LabElement.attrs stores everything as (TAG_ATTRS is Record<string,string>).
+const BOOLEAN_ATTRS = new Set(["controls", "checked", "disabled", "required", "readonly", "autoplay", "loop", "muted", "open", "selected"]);
+
 function attrsToReactProps(attrs: Record<string, string> = {}): Record<string, unknown> {
   const props: Record<string, unknown> = {};
   Object.entries(attrs).forEach(([key, value]) => {
     if (String(value || "").trim() === "") return;
-    props[key === "class" ? "className" : key] = value;
+    const propName = REACT_PROP_NAME[key] ?? key;
+    props[propName] = BOOLEAN_ATTRS.has(key) ? value === "true" : value;
   });
   return props;
 }

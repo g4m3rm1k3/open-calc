@@ -236,21 +236,65 @@ function hexSat(hex: string): number {
   return max === 0 ? 0 : (max - Math.min(r, g, b)) / max;
 }
 
+function extractHexColors(value: string): string[] {
+  return value.match(/#[0-9a-fA-F]{6}/g) ?? [];
+}
+
+// Real "page chrome" colors — light or dark — sit near the luminance extremes
+// (near-black, near-white); genuine accent/brand colors (a CTA blue, a badge
+// red) sit in the middle regardless of hue. Checking extremity instead of hue
+// saturation is what lets a dark-navy nav (high saturation, but near-black)
+// count as repaintable chrome while a mid-tone accent button stays protected.
+// 0.20 (not a rounder-looking 0.15) is deliberate: it's calibrated to include
+// #1e293b (lum 0.156 — Tailwind slate-800, used throughout this app's own
+// dark-chrome sections, e.g. exampleProject.ts's hero gradient) while still
+// excluding #334155 (lum 0.247, slate-700) and any real accent color like the
+// #3b82f6 buttons (lum 0.478) — verified against the actual palette in use,
+// not picked from a round number.
+function isNeutralLum(lum: number): boolean {
+  return lum < 0.20 || lum > 0.90;
+}
+
+// A background is "neutral" (safe to repaint) if every hex color found in it
+// is luminance-extreme — covers a plain `backgroundColor` (one color) and a
+// `background` gradient (several stops) with the same check. A background
+// with no hex color at all (rgba(), a CSS var, a named color) stays opaque/protected.
+function isNeutralBackground(bg?: string): boolean {
+  if (!bg) return true;
+  const hexColors = extractHexColors(bg);
+  return hexColors.length > 0 && hexColors.every((c) => isNeutralLum(hexLum(c)));
+}
+
+// Remaps every extreme-luminance hex stop in a background value (a plain color
+// or a multi-stop gradient) to the equivalent shade for the new mode, leaving
+// any stop that's already the right extreme (or isn't extreme at all) alone.
+function remapNeutralBackground(value: string, goingDark: boolean): { next: string; changed: boolean } {
+  let changed = false;
+  const next = value.replace(/#[0-9a-fA-F]{6}/g, (hex) => {
+    const lum = hexLum(hex);
+    if (goingDark && lum > 0.60) {
+      changed = true;
+      return lum > 0.95 ? "#1e293b" : lum > 0.85 ? "#0f172a" : "#334155";
+    }
+    if (!goingDark && lum < 0.35) {
+      changed = true;
+      return lum < 0.10 ? "#ffffff" : lum < 0.20 ? "#f8fafc" : "#f1f5f9";
+    }
+    return hex;
+  });
+  return { next, changed };
+}
+
 function cascadeBodyTheme(elements: LabElement[], newBodyStyles: Record<string, string>): LabElement[] {
   const rawBg = newBodyStyles.backgroundColor || newBodyStyles.background || "";
-  if (!rawBg.startsWith("#")) return elements;
+  const rawHexColors = extractHexColors(rawBg);
+  if (rawHexColors.length === 0) return elements;
 
-  const goingDark = hexLum(rawBg) < 0.35;
+  const goingDark = rawHexColors.reduce((sum, c) => sum + hexLum(c), 0) / rawHexColors.length < 0.35;
   const primaryText   = goingDark ? "#f8fafc" : "#0f172a";
   const secondaryText = goingDark ? "#94a3b8" : "#64748b";
 
   const byId = new Map(elements.map((e) => [e.id, e]));
-  // A background is "neutral" (safe to repaint / safe to assume text can be
-  // recolored against it) only when it's a plain low-saturation hex color.
-  // Anything else set at all — a gradient, rgba(), a CSS var, etc. via the
-  // `background` shorthand — is opaque to this heuristic, so treat it as non-neutral.
-  const isNeutralBg = (bg?: string): boolean =>
-    !bg || (bg.startsWith("#") && bg.length >= 7 && hexSat(bg) < 0.20);
   const ownBgValue = (el: LabElement): string | undefined => el.styles.backgroundColor || el.styles.background;
 
   // The background an element actually sits on: its own, if set, otherwise the
@@ -275,8 +319,8 @@ function cascadeBodyTheme(elements: LabElement[], newBodyStyles: Record<string, 
     // repaint. Only recolor its text if the background it actually sits on
     // (own, or inherited from an ancestor) is neutral too — otherwise text and
     // backdrop end up mismatched (e.g. dark text stranded on an unchanged navy card).
-    const ownBgIsNeutral = isNeutralBg(ownBgValue(el));
-    const sittingBgIsNeutral = isNeutralBg(effectiveBg(el));
+    const ownBgIsNeutral = isNeutralBackground(ownBgValue(el));
+    const sittingBgIsNeutral = isNeutralBackground(effectiveBg(el));
 
     if (sittingBgIsNeutral && s.color && s.color.startsWith("#") && s.color.length >= 7 && hexSat(s.color) < 0.25) {
       const lum = hexLum(s.color);
@@ -289,14 +333,14 @@ function cascadeBodyTheme(elements: LabElement[], newBodyStyles: Record<string, 
       }
     }
 
-    if (ownBgIsNeutral && s.backgroundColor) {
-      const lum = hexLum(s.backgroundColor);
-      if (goingDark && lum > 0.60) {
-        s.backgroundColor = lum > 0.95 ? "#1e293b" : lum > 0.85 ? "#0f172a" : "#334155";
-        changed = true;
-      } else if (!goingDark && lum < 0.35) {
-        s.backgroundColor = lum < 0.10 ? "#ffffff" : lum < 0.20 ? "#f8fafc" : "#f1f5f9";
-        changed = true;
+    if (ownBgIsNeutral) {
+      if (s.backgroundColor) {
+        const { next, changed: c } = remapNeutralBackground(s.backgroundColor, goingDark);
+        if (c) { s.backgroundColor = next; changed = true; }
+      }
+      if (s.background) {
+        const { next, changed: c } = remapNeutralBackground(s.background, goingDark);
+        if (c) { s.background = next; changed = true; }
       }
     }
 
