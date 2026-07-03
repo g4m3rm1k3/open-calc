@@ -1,17 +1,18 @@
+import type { LabElement, BodyStyles } from "./types";
+import type { CdnTag } from "./cdnLibraries";
+
 // ─── elements → editable source parts ─────────────────────────────────────────
-export function elementsToHtml(elements) {
+export function elementsToHtml(elements: LabElement[]): string {
   const VOID_TAGS = new Set(["img", "br", "hr", "input", "meta", "link"]);
 
-  function renderEl(el, depth = 1) {
+  function renderEl(el: LabElement, depth = 1): string {
     const indent = "  ".repeat(depth);
     const children = elements
       .filter((c) => c.parentId === el.id)
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     const attrs = `${renderAttrs(el.attrs)} data-lab-id="${escapeAttr(el.id)}"`;
 
-    if (VOID_TAGS.has(el.tag)) {
-      return `${indent}<${el.tag}${attrs} />`;
-    }
+    if (VOID_TAGS.has(el.tag)) return `${indent}<${el.tag}${attrs} />`;
     if (children.length > 0) {
       const childLines = children.map((c) => renderEl(c, depth + 1)).join("\n");
       const inner = el.content
@@ -59,9 +60,13 @@ input, button, textarea, select {
   font: inherit;
 }`;
 
-export function elementsToCss(elements, customCss = "", bodyStyles = {}) {
+export function elementsToCss(
+  elements: LabElement[],
+  customCss = "",
+  bodyStyles: BodyStyles = {},
+): string {
   const bodyRules = stylesToString(bodyStyles, "  ");
-  const blocks = [
+  const blocks: string[] = [
     CSS_RESET,
     ``,
     `body {\n${bodyRules || "  margin: 0;\n  padding: 16px;\n  font-family: sans-serif;"}\n}`,
@@ -72,33 +77,26 @@ export function elementsToCss(elements, customCss = "", bodyStyles = {}) {
     }),
   ];
 
-  // ── Media query blocks ──────────────────────────────────────────────────────
-  // Group all element media queries by breakpoint
-  const mqByBreakpoint = new Map();
+  const mqByBreakpoint = new Map<string, { id: string; prop: string; value: string }[]>();
   for (const el of elements) {
     for (const mq of el.mediaQueries || []) {
       const bp = mq.breakpoint;
       if (!mqByBreakpoint.has(bp)) mqByBreakpoint.set(bp, []);
-      mqByBreakpoint
-        .get(bp)
-        .push({ id: el.id, prop: mq.prop, value: mq.value });
+      mqByBreakpoint.get(bp)!.push({ id: el.id, prop: mq.prop, value: mq.value });
     }
   }
   if (mqByBreakpoint.size > 0) {
     blocks.push("");
     for (const [bp, rules] of mqByBreakpoint) {
-      const grouped = new Map();
+      const grouped = new Map<string, { prop: string; value: string }[]>();
       for (const r of rules) {
         if (!grouped.has(r.id)) grouped.set(r.id, []);
-        grouped.get(r.id).push({ prop: r.prop, value: r.value });
+        grouped.get(r.id)!.push({ prop: r.prop, value: r.value });
       }
       const inner = [...grouped.entries()]
         .map(([id, propRules]) => {
           const propLines = propRules
-            .map(
-              ({ prop, value }) =>
-                `    ${prop.replace(/([A-Z])/g, "-$1").toLowerCase()}: ${value};`,
-            )
+            .map(({ prop, value }) => `    ${prop.replace(/([A-Z])/g, "-$1").toLowerCase()}: ${value};`)
             .join("\n");
           return `  [data-lab-id="${id}"] {\n${propLines}\n  }`;
         })
@@ -108,32 +106,34 @@ export function elementsToCss(elements, customCss = "", bodyStyles = {}) {
   }
 
   const trimmedCustom = customCss.trim();
-  if (trimmedCustom) {
-    blocks.push("", "/* Custom CSS */", trimmedCustom);
-  }
+  if (trimmedCustom) blocks.push("", "/* Custom CSS */", trimmedCustom);
   return blocks.join("\n");
 }
 
 // ─── HTML string → elements ───────────────────────────────────────────────────
-export function htmlToElements(code, existingElements = [], javascript = "") {
+export function htmlToElements(
+  code: string,
+  existingElements: LabElement[] = [],
+  javascript = "",
+): LabElement[] | null {
   try {
     const parser = new DOMParser();
     const doc = parser.parseFromString(code, "text/html");
     const body = doc.body;
     const SKIP = new Set(["script", "style", "meta", "link"]);
-    const usedIds = new Set();
-    const existingById = new Map(existingElements.map((el) => [el.id, el]));
-    const existingByHtmlId = new Map(
+    const usedIds = new Set<string>();
+    const existingById = new Map<string, LabElement>(existingElements.map((el) => [el.id, el]));
+    const existingByHtmlId = new Map<string, LabElement>(
       existingElements
         .filter((el) => el.attrs?.id)
         .map((el) => [el.attrs.id, el]),
     );
-    const existingByPath = new Map();
+    const existingByPath = new Map<string, LabElement>();
     const jsRefs = extractJavascriptRefs(javascript);
 
-    function buildExistingPaths(parentId, prefix = "") {
+    function buildExistingPaths(parentId: string | null, prefix = ""): void {
       existingElements
-        .filter((el) => (el.parentId ?? null) === (parentId ?? null))
+        .filter((el) => (el.parentId ?? null) === parentId)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
         .forEach((el, index) => {
           const path = prefix ? `${prefix}.${index}` : `${index}`;
@@ -144,13 +144,13 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
     buildExistingPaths(null);
 
     let counter = Date.now();
-    function nextId() {
+    function nextId(): string {
       let id = "el" + counter++;
       while (existingById.has(id) || usedIds.has(id)) id = "el" + counter++;
       return id;
     }
 
-    function stableIdFor(node, path) {
+    function stableIdFor(node: Element, path: string): string {
       const explicitId = node.getAttribute("data-lab-id");
       if (explicitId && !usedIds.has(explicitId)) {
         usedIds.add(explicitId);
@@ -173,31 +173,30 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
       return id;
     }
 
-    function parseNode(node, parentId, order, path) {
+    function parseNode(node: Element, parentId: string | null, order: number, path: string): LabElement[] {
       const tag = node.tagName.toLowerCase();
       if (SKIP.has(tag)) return [];
 
       const styleStr = node.getAttribute("style") || "";
+      const labIdAttr = node.getAttribute("data-lab-id");
       const existing =
-        existingById.get(node.getAttribute("data-lab-id")) ||
+        (labIdAttr ? existingById.get(labIdAttr) : undefined) ??
         existingByPath.get(path);
       const inlineStyles = parseStyleString(styleStr);
       const styles = Object.keys(inlineStyles).length
         ? inlineStyles
         : { ...(existing?.styles || {}) };
-      const attrs = {
+      const attrs: Record<string, string> = {
         ...(existing?.attrs || {}),
         ...attrsFromNode(node),
       };
 
-      // Collect text content (only if no child elements)
       const childEls = Array.from(node.children).filter(
         (c) => !SKIP.has(c.tagName.toLowerCase()),
       );
-      const content =
-        childEls.length === 0 ? (node.textContent || "").trim() : "";
+      const content = childEls.length === 0 ? (node.textContent || "").trim() : "";
 
-      const el = {
+      const el: LabElement = {
         id: stableIdFor(node, path),
         tag,
         attrs,
@@ -208,7 +207,7 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
         mediaQueries: existing?.mediaQueries || [],
       };
 
-      const descendants = [];
+      const descendants: LabElement[] = [];
       childEls.forEach((child, i) => {
         descendants.push(...parseNode(child, el.id, i, `${path}.${i}`));
       });
@@ -221,10 +220,8 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
     );
     if (rootNodes.length === 0) return null;
 
-    const result = [];
-    rootNodes.forEach((node, i) =>
-      result.push(...parseNode(node, null, i, `${i}`)),
-    );
+    const result: LabElement[] = [];
+    rootNodes.forEach((node, i) => result.push(...parseNode(node, null, i, `${i}`)));
     return result;
   } catch (err) {
     console.warn("htmlToElements parse error:", err);
@@ -232,28 +229,24 @@ export function htmlToElements(code, existingElements = [], javascript = "") {
   }
 }
 
-export function extractJavascriptRefs(javascript = "") {
-  const labIds = new Set();
-  const htmlIds = new Set();
+export function extractJavascriptRefs(javascript = ""): { labIds: Set<string>; htmlIds: Set<string> } {
+  const labIds = new Set<string>();
+  const htmlIds = new Set<string>();
   const labIdPattern = /data-lab-id\s*=\s*(?:"([^"]+)"|'([^']+)')/g;
   const getElementPattern = /getElementById\(\s*(?:"([^"]+)"|'([^']+)')\s*\)/g;
-  const queryIdPattern =
-    /querySelector(?:All)?\(\s*(?:"#([^"]+)"|'#([^']+)')\s*\)/g;
+  const queryIdPattern = /querySelector(?:All)?\(\s*(?:"#([^"]+)"|'#([^']+)')\s*\)/g;
 
-  for (const match of javascript.matchAll(labIdPattern))
-    labIds.add(match[1] || match[2]);
-  for (const match of javascript.matchAll(getElementPattern))
-    htmlIds.add(match[1] || match[2]);
-  for (const match of javascript.matchAll(queryIdPattern))
-    htmlIds.add(match[1] || match[2]);
+  for (const match of javascript.matchAll(labIdPattern)) labIds.add(match[1] || match[2]);
+  for (const match of javascript.matchAll(getElementPattern)) htmlIds.add(match[1] || match[2]);
+  for (const match of javascript.matchAll(queryIdPattern)) htmlIds.add(match[1] || match[2]);
 
   return { labIds, htmlIds };
 }
 
-// ─── Shared element renderer (used by both export functions) ──────────────────
-function buildHtmlBody(elements) {
+// ─── Shared element renderer ──────────────────────────────────────────────────
+function buildHtmlBody(elements: LabElement[]): string {
   const VOID_TAGS = new Set(["img", "br", "hr", "input", "meta", "link"]);
-  function renderEl(el, depth = 1) {
+  function renderEl(el: LabElement, depth = 1): string {
     const indent = "  ".repeat(depth);
     const children = elements
       .filter(c => c.parentId === el.id)
@@ -280,18 +273,24 @@ function buildHtmlBody(elements) {
     .join("\n");
 }
 
-// ─── Export: generate a clean standalone HTML file ───────────────────────────
-export function generateExportHtml(elements, bodyStyles, customCss, javascript, cdnTags = []) {
+// ─── Export: standalone HTML ──────────────────────────────────────────────────
+export function generateExportHtml(
+  elements: LabElement[],
+  bodyStyles: BodyStyles,
+  customCss: string,
+  javascript: string,
+  cdnTags: CdnTag[] = [],
+): string {
   const htmlBody = buildHtmlBody(elements);
-  const css      = elementsToCss(elements, customCss, bodyStyles);
+  const css = elementsToCss(elements, customCss, bodyStyles);
 
   const cdnHeadTags = cdnTags.map(({ url, type }) =>
     type === "stylesheet"
       ? `  <link rel="stylesheet" href="${url}" />`
-      : `  <script src="${url}"></script>`
+      : `  <script src="${url}"></script>`,
   ).join("\n");
 
-  return [
+  const lines: (string | null)[] = [
     `<!DOCTYPE html>`,
     `<html lang="en">`,
     `<head>`,
@@ -310,19 +309,20 @@ export function generateExportHtml(elements, bodyStyles, customCss, javascript, 
     javascript?.trim() ? `<script>\n${javascript}\n</script>` : "",
     `</body>`,
     `</html>`,
-  ].filter(l => l !== null && l !== "").join("\n");
+  ];
+  return lines.filter((l): l is string => l !== null && l !== "").join("\n");
 }
 
-// ─── Export: generate HTML that links to separate styles.css / script.js ─────
-export function generateLinkedHtml(elements, cdnTags = []) {
+// ─── Export: linked to separate files ────────────────────────────────────────
+export function generateLinkedHtml(elements: LabElement[], cdnTags: CdnTag[] = []): string {
   const htmlBody = buildHtmlBody(elements);
   const cdnHeadTags = cdnTags.map(({ url, type }) =>
     type === "stylesheet"
       ? `  <link rel="stylesheet" href="${url}" />`
-      : `  <script src="${url}"></script>`
+      : `  <script src="${url}"></script>`,
   ).join("\n");
 
-  return [
+  const lines: (string | null)[] = [
     `<!DOCTYPE html>`,
     `<html lang="en">`,
     `<head>`,
@@ -339,31 +339,36 @@ export function generateLinkedHtml(elements, cdnTags = []) {
     `  <script src="script.js" defer></script>`,
     `</body>`,
     `</html>`,
-  ].filter(l => l !== null).join("\n");
+  ];
+  return lines.filter((l): l is string => l !== null).join("\n");
 }
 
-export function applyCssToElements(css, elements) {
-  const styleById = new Map();
-  let bodyStyles = null;
+export function applyCssToElements(
+  css: string,
+  elements: LabElement[],
+): { elements: LabElement[]; customCss: string; bodyStyles?: BodyStyles } {
+  const styleById = new Map<string, Record<string, string>>();
+  let bodyStyles: Record<string, string> | null = null;
 
   const managedBlock = /\[data-lab-id=(?:"([^"]+)"|'([^']+)')\]\s*\{([^}]*)\}/g;
   let customCss = css
     .replace(/\/\*\s*Custom CSS\s*\*\//gi, "")
-    .replace(managedBlock, (_, id1, id2, body) => {
+    .replace(managedBlock, (_, id1: string, id2: string, body: string) => {
       const id = id1 || id2;
       styleById.set(id, parseStyleString(body));
       return "";
     });
 
-  // Extract body block and parse its styles
-  customCss = customCss.replace(/body\s*\{([^}]*)\}/gi, (_, body) => {
-    bodyStyles = parseStyleString(body);
-    return "";
-  }).trim();
+  customCss = customCss
+    .replace(/body\s*\{([^}]*)\}/gi, (_, body: string) => {
+      bodyStyles = parseStyleString(body);
+      return "";
+    })
+    .trim();
 
   return {
     elements: elements.map((el) =>
-      styleById.has(el.id) ? { ...el, styles: styleById.get(el.id) } : el,
+      styleById.has(el.id) ? { ...el, styles: styleById.get(el.id)! } : el,
     ),
     customCss,
     ...(bodyStyles !== null ? { bodyStyles } : {}),
@@ -371,7 +376,7 @@ export function applyCssToElements(css, elements) {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-export function stylesToString(styles, linePrefix = "") {
+export function stylesToString(styles: Record<string, string>, linePrefix = ""): string {
   return Object.entries(styles)
     .map(([k, v]) => {
       const prop = k.replace(/([A-Z])/g, "-$1").toLowerCase();
@@ -380,17 +385,14 @@ export function stylesToString(styles, linePrefix = "") {
     .join("\n");
 }
 
-function renderAttrs(attrs = {}) {
+function renderAttrs(attrs: Record<string, string> = {}): string {
   return Object.entries(attrs)
-    .filter(
-      ([, value]) =>
-        value !== undefined && value !== null && String(value).trim() !== "",
-    )
+    .filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== "")
     .map(([key, value]) => ` ${key}="${escapeAttr(value)}"`)
     .join("");
 }
 
-function escapeAttr(value) {
+function escapeAttr(value: string): string {
   return String(value)
     .replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;")
@@ -398,8 +400,8 @@ function escapeAttr(value) {
     .replace(/>/g, "&gt;");
 }
 
-function attrsFromNode(node) {
-  const attrs = {};
+function attrsFromNode(node: Element): Record<string, string> {
+  const attrs: Record<string, string> = {};
   Array.from(node.attributes).forEach((attr) => {
     if (attr.name === "data-lab-id" || attr.name === "style") return;
     attrs[attr.name] = attr.value;
@@ -410,28 +412,27 @@ function attrsFromNode(node) {
 }
 
 // ─── Full HTML document → lab state ──────────────────────────────────────────
-export function parseHtmlDocument(htmlString) {
+export function parseHtmlDocument(htmlString: string): {
+  elements: LabElement[];
+  bodyStyles: BodyStyles;
+  javascript: string;
+  css: string;
+} {
   try {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
 
     const styleEls = Array.from(doc.querySelectorAll("style"));
-    const rawCss = styleEls.map((s) => s.textContent).join("\n\n");
+    const rawCss = styleEls.map((s) => s.textContent ?? "").join("\n\n");
 
     const scriptEls = Array.from(doc.querySelectorAll("script"));
     const javascript = scriptEls.map((s) => s.textContent).filter(Boolean).join("\n\n");
 
-    // Apply CSS rules to DOM elements via selector matching so that
-    // htmlToElements picks them up as inline styles (it reads style="...").
-    // Returns body styles and any CSS that can't be inlined (pseudo-selectors,
-    // @media/@keyframes blocks).
     const { bodyStylesFromCss, customCss } = applyImportedCssToDoc(doc, rawCss);
 
-    // Merge body CSS rules with any inline style="" on <body>
     const bodyStyleStr = doc.body?.getAttribute("style") || "";
-    const bodyStyles = { ...bodyStylesFromCss, ...parseStyleString(bodyStyleStr) };
+    const bodyStyles: BodyStyles = { ...bodyStylesFromCss, ...parseStyleString(bodyStyleStr) };
 
-    // DOM elements now have inline styles set — htmlToElements reads them directly
     const elements = htmlToElements(doc.body?.innerHTML || "", [], javascript) || [];
 
     return { elements, bodyStyles, javascript, css: customCss };
@@ -441,57 +442,75 @@ export function parseHtmlDocument(htmlString) {
   }
 }
 
-// Apply class/id/tag CSS rules to a parsed DOM document by using element.matches().
-// @-rules and pseudo-selectors can't be inlined so they go to customCss.
-function applyImportedCssToDoc(doc, css) {
-  const bodyStylesFromCss = {};
-  const appliedRules = []; // { selector, styles }[]
-  const customChunks = [];
+function applyImportedCssToDoc(
+  doc: Document,
+  css: string,
+): { bodyStylesFromCss: Record<string, string>; customCss: string } {
+  const bodyStylesFromCss: Record<string, string> = {};
+  const appliedRules: { selector: string; styles: Record<string, string> }[] = [];
+  const customChunks: string[] = [];
 
-  // Lift @-rules (media, keyframes, supports…) out unchanged — they have nested braces
   let remaining = css.replace(/@[^{]+\{(?:[^{}]*|\{[^{}]*\})*\}/g, (m) => {
     customChunks.push(m.trim());
     return "";
   });
 
-  // Parse flat   selector { declarations }   blocks
+  // A selector like "body.dark" or ".toast.show" — a tag/class immediately
+  // followed by one or more further classes with no combinator — is a
+  // toggleable "modifier" state (dark mode, a "show" state, a BEM modifier).
+  const isCompoundSelector = (sel: string): boolean => {
+    const classCount = (sel.match(/\.[\w-]+/g) || []).length;
+    return classCount >= 2 || (classCount >= 1 && /^[a-zA-Z]/.test(sel));
+  };
+  const classesOf = (sel: string): string[] => (sel.match(/\.[\w-]+/g) || []).map((c) => c.slice(1));
+
   const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
-  let m;
+  const parsedRules: { selectors: string[]; declarations: string; styles: Record<string, string> }[] = [];
+  // Any class referenced by a compound/stateful selector must never be baked into a
+  // one-time inline-style snapshot — not even via its own plain single-class rule —
+  // or the frozen inline value would permanently block whatever a classList.toggle()
+  // at runtime is trying to show/hide (inline styles beat stylesheet rules regardless
+  // of specificity). So every rule touching such a class is preserved as live CSS instead.
+  const stateClasses = new Set<string>();
+  let m: RegExpExecArray | null;
   while ((m = ruleRe.exec(remaining)) !== null) {
     const selectorGroup = m[1].trim();
     const declarations = m[2].trim();
     if (!selectorGroup || !declarations) continue;
     const styles = parseStyleString(declarations);
     const selectors = selectorGroup.split(",").map((s) => s.trim()).filter(Boolean);
-
-    const simple = [];
-    const complex = [];
+    parsedRules.push({ selectors, declarations, styles });
     for (const sel of selectors) {
-      // body/html → extract as bodyStyles
-      if (/^html$|^body$/.test(sel)) {
-        Object.assign(bodyStylesFromCss, styles);
-      // pseudo-classes/elements and CSS combinators can't be inlined → customCss
-      } else if (/[:>+~]/.test(sel) || sel === "*" || sel.startsWith("*")) {
+      if (isCompoundSelector(sel)) classesOf(sel).forEach((c) => stateClasses.add(c));
+    }
+  }
+
+  for (const rule of parsedRules) {
+    const simple: string[] = [];
+    const complex: string[] = [];
+    for (const sel of rule.selectors) {
+      const referencesStateClass = classesOf(sel).some((c) => stateClasses.has(c));
+      if (/^html$|^body$/.test(sel) && !referencesStateClass) {
+        Object.assign(bodyStylesFromCss, rule.styles);
+      } else if (/[:>+~]/.test(sel) || sel === "*" || sel.startsWith("*") || isCompoundSelector(sel) || referencesStateClass) {
         complex.push(sel);
       } else {
         simple.push(sel);
       }
     }
 
-    if (simple.length) simple.forEach((sel) => appliedRules.push({ selector: sel, styles }));
-    if (complex.length) customChunks.push(`${complex.join(", ")} {\n  ${declarations}\n}`);
+    if (simple.length) simple.forEach((sel) => appliedRules.push({ selector: sel, styles: rule.styles }));
+    if (complex.length) customChunks.push(`${complex.join(", ")} {\n  ${rule.declarations}\n}`);
   }
 
-  // Walk the body DOM, test each element against collected rules, set inline styles
-  function applyToEl(el) {
-    const computed = {};
+  function applyToEl(el: Element): void {
+    const computed: Record<string, string> = {};
     for (const rule of appliedRules) {
       try {
         if (el.matches(rule.selector)) Object.assign(computed, rule.styles);
       } catch { /* invalid selector — skip */ }
     }
     if (Object.keys(computed).length) {
-      // Inline style="" in the original HTML takes precedence over class rules
       const existing = parseStyleString(el.getAttribute("style") || "");
       const merged = { ...computed, ...existing };
       el.setAttribute(
@@ -503,13 +522,13 @@ function applyImportedCssToDoc(doc, css) {
     }
     Array.from(el.children).forEach(applyToEl);
   }
-  Array.from(doc.body?.children || []).forEach(applyToEl);
+  Array.from(doc.body?.children ?? []).forEach(applyToEl);
 
   return { bodyStylesFromCss, customCss: customChunks.join("\n\n") };
 }
 
-export function parseStyleString(str) {
-  const result = {};
+export function parseStyleString(str: string): Record<string, string> {
+  const result: Record<string, string> = {};
   if (!str) return result;
   str.split(";").forEach((part) => {
     const colonIdx = part.indexOf(":");
@@ -517,7 +536,7 @@ export function parseStyleString(str) {
     const key = part.slice(0, colonIdx).trim();
     const val = part.slice(colonIdx + 1).trim();
     if (!key || !val) return;
-    const camel = key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+    const camel = key.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
     result[camel] = val;
   });
   return result;

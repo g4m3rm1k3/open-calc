@@ -1,7 +1,16 @@
+import type { LabElement, SinglePageData } from "./types";
 import { JS_PRESETS } from "./jsPresets";
 
-// Build one example element
-function mk(id, tag, parentId, order, content, styles, cls, extraAttrs) {
+function mk(
+  id: string,
+  tag: string,
+  parentId: string | null,
+  order: number,
+  content: string,
+  styles: Record<string, string>,
+  cls?: string,
+  extraAttrs?: Record<string, string>,
+): LabElement {
   return {
     id, tag, parentId, order, content,
     attrs: { id: "", class: cls || "", ...(extraAttrs || {}) },
@@ -10,16 +19,20 @@ function mk(id, tag, parentId, order, content, styles, cls, extraAttrs) {
   };
 }
 
-// Clone a JS preset with fresh sequential IDs and optional root overrides
-function usePreset(presetId, newParentId, newOrder, rootStyleOverrides) {
+function usePreset(
+  presetId: string,
+  newParentId: string | null | undefined,
+  newOrder: number | undefined,
+  rootStyleOverrides?: Record<string, string>,
+): { elements: LabElement[]; code: string } {
   const preset = JS_PRESETS.find(p => p.id === presetId);
   if (!preset?.template) return { elements: [], code: "" };
 
   let counter = 0;
   const prefix = `${presetId.replace(/-/g, "_")}_`;
-  const idMap = {};
+  const idMap: Record<string, string> = {};
 
-  const cloned = JSON.parse(JSON.stringify(preset.template));
+  const cloned = JSON.parse(JSON.stringify(preset.template)) as LabElement[];
   cloned.forEach(el => {
     const fresh = prefix + counter++;
     idMap[el.id] = fresh;
@@ -39,11 +52,11 @@ function usePreset(presetId, newParentId, newOrder, rootStyleOverrides) {
   return { elements: cloned, code: preset.code };
 }
 
-export function generateExampleProject() {
-  const els  = [];
-  const code = [];
-  let   seq  = 1;
-  const id   = () => `ex${seq++}`;
+export function generateExampleProject(): SinglePageData {
+  const els: LabElement[] = [];
+  const code: string[] = [];
+  let seq = 1;
+  const id = () => `ex${seq++}`;
 
   // ── 1. Nav ────────────────────────────────────────────────────────────────────
   const navId = id();
@@ -57,7 +70,7 @@ export function generateExampleProject() {
     fontSize: "17px", fontWeight: "800", color: "#f8fafc",
     margin: "0", flexGrow: "1", display: "block",
   }));
-  [["Explore", 1], ["Components", 2], ["Docs", 3]].forEach(([text, order]) =>
+  ([ ["Explore", 1], ["Components", 2], ["Docs", 3] ] as [string, number][]).forEach(([text, order]) =>
     els.push(mk(id(), "a", navId, order, text, {
       display: "flex", alignItems: "center", height: "64px",
       padding: "0 14px", fontSize: "14px", fontWeight: "500",
@@ -88,7 +101,6 @@ export function generateExampleProject() {
       fontSize: "18px", color: "#94a3b8", marginBottom: "44px",
       lineHeight: "1.7", display: "block", maxWidth: "580px",
   }));
-  // Hero CTA → triggers the modal
   els.push(mk(id(), "button", heroId, 3, "See How It Works →", {
     padding: "16px 36px", backgroundColor: "#3b82f6", color: "#ffffff",
     border: "none", borderRadius: "10px", fontSize: "16px",
@@ -102,10 +114,10 @@ export function generateExampleProject() {
     padding: "48px 40px", backgroundColor: "#0f172a",
     width: "100%", boxSizing: "border-box",
   }));
-  const stats = [
-    ["🎨", "6 Presets",   "JavaScript components"],
-    ["📦", "14 Components","Drag-and-drop library"],
-    ["⚡", "Zero Build",  "Vanilla JS, no frameworks"],
+  const stats: [string, string, string][] = [
+    ["🎨", "6 Presets",    "JavaScript components"],
+    ["📦", "14 Components", "Drag-and-drop library"],
+    ["⚡", "Zero Build",   "Vanilla JS, no frameworks"],
   ];
   stats.forEach(([icon, val, label], i) => {
     const cardId = id();
@@ -115,16 +127,9 @@ export function generateExampleProject() {
       backgroundColor: "#1e293b", borderRadius: "16px",
       border: "1px solid #334155", minWidth: "180px",
     }));
-    els.push(mk(id(), "p", cardId, 0, icon, {
-      fontSize: "28px", margin: "0 0 8px", display: "block",
-    }));
-    els.push(mk(id(), "h2", cardId, 1, val, {
-      fontSize: "24px", fontWeight: "800", color: "#f8fafc",
-      margin: "0 0 4px", lineHeight: "1", display: "block",
-    }));
-    els.push(mk(id(), "p", cardId, 2, label, {
-      fontSize: "13px", color: "#64748b", margin: "0", display: "block",
-    }));
+    els.push(mk(id(), "p",  cardId, 0, icon, { fontSize: "28px", margin: "0 0 8px", display: "block" }));
+    els.push(mk(id(), "h2", cardId, 1, val,  { fontSize: "24px", fontWeight: "800", color: "#f8fafc", margin: "0 0 4px", lineHeight: "1", display: "block" }));
+    els.push(mk(id(), "p",  cardId, 2, label, { fontSize: "13px", color: "#64748b", margin: "0", display: "block" }));
   });
 
   // ── 4. Counter + Show/Hide row ────────────────────────────────────────────────
@@ -153,7 +158,6 @@ export function generateExampleProject() {
     width: "100%", boxSizing: "border-box",
     backgroundColor: "#1e293b", border: "1px solid #334155",
   });
-  // Fix counter number color for dark mode
   const numEl = counter.elements.find(e => e.attrs?.class?.includes("js-count"));
   if (numEl) numEl.styles.color = "#f8fafc";
   const lbl = counter.elements.find(e => e.content === "COUNT");
@@ -180,7 +184,7 @@ export function generateExampleProject() {
     display: "block", padding: "0 40px 64px",
     backgroundColor: "#0f172a", width: "100%", boxSizing: "border-box",
   }));
-  els.push(mk(id(), "p", tabsSec, 0, "📑 Tabs Component", {
+  els.push(mk(id(), "p",  tabsSec, 0, "📑 Tabs Component", {
     fontSize: "12px", fontWeight: "700", color: "#3b82f6",
     textTransform: "uppercase", letterSpacing: "0.1em",
     marginBottom: "8px", display: "block",
@@ -208,7 +212,7 @@ export function generateExampleProject() {
     display: "block", padding: "0 40px 64px",
     backgroundColor: "#0f172a", width: "100%", boxSizing: "border-box",
   }));
-  els.push(mk(id(), "p", toastSec, 0, "🔔 Toast Notification", {
+  els.push(mk(id(), "p",  toastSec, 0, "🔔 Toast Notification", {
     fontSize: "12px", fontWeight: "700", color: "#3b82f6",
     textTransform: "uppercase", letterSpacing: "0.1em",
     marginBottom: "8px", display: "block",
@@ -251,7 +255,7 @@ export function generateExampleProject() {
     fontWeight: "700", cursor: "pointer", display: "inline-block",
   }, "", { type: "button" }));
 
-  // ── 8. Modal overlay (root-level — must be outside page flow) ─────────────────
+  // ── 8. Modal overlay ──────────────────────────────────────────────────────────
   const overlayId = id();
   els.push(mk(overlayId, "div", null, 7, "", {
     display: "none", position: "fixed", top: "0", left: "0",
@@ -312,7 +316,7 @@ export function generateExampleProject() {
   els.push(mk(footerLinks, "div", footerId, 1, "", {
     display: "flex", gap: "24px", alignItems: "center",
   }));
-  [["Privacy", 0], ["Terms", 1], ["GitHub", 2]].forEach(([text, i]) =>
+  ([ ["Privacy", 0], ["Terms", 1], ["GitHub", 2] ] as [string, number][]).forEach(([text, i]) =>
     els.push(mk(id(), "a", footerLinks, i, text, {
       fontSize: "13px", color: "#64748b", textDecoration: "none", display: "inline",
     }, "", { href: "#" }))

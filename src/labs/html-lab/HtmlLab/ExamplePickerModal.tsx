@@ -1,7 +1,13 @@
 import styles from "./HtmlLab.module.css";
 import { EXAMPLES } from "./exampleGallery";
+import type { Example } from "./types";
 
-export default function ExamplePickerModal({ onSelect, onClose }) {
+interface Props {
+  onSelect: (ex: Example) => void;
+  onClose: () => void;
+}
+
+export default function ExamplePickerModal({ onSelect, onClose }: Props) {
   return (
     <div
       className={styles.exPickerOverlay}

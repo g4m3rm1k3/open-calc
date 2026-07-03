@@ -1,4 +1,20 @@
-export const CDN_LIBRARIES = [
+interface CdnLibrary {
+  id: string;
+  label: string;
+  icon: string;
+  description: string;
+  category: string;
+  type: "script" | "stylesheet";
+  url: string;
+  scriptOverride?: boolean;
+}
+
+export interface CdnTag {
+  url: string;
+  type: "script" | "stylesheet";
+}
+
+export const CDN_LIBRARIES: CdnLibrary[] = [
   {
     id: "threejs",
     label: "Three.js",
@@ -88,7 +104,7 @@ export const CDN_LIBRARIES = [
     category: "CSS",
     type: "stylesheet",
     url: "https://cdn.tailwindcss.com",
-    scriptOverride: true, // Tailwind CDN is a script, not a stylesheet
+    scriptOverride: true,
   },
   {
     id: "bootstrap-css",
@@ -110,13 +126,12 @@ export const CDN_LIBRARIES = [
   },
 ];
 
-export function resolveCdnTags(ids) {
+export function resolveCdnTags(ids: string[]): CdnTag[] {
   return ids
     .map((id) => CDN_LIBRARIES.find((l) => l.id === id))
-    .filter(Boolean)
+    .filter((lib): lib is CdnLibrary => lib !== undefined)
     .map((lib) => ({
       url: lib.url,
-      // Tailwind CDN is served as a script even though it's "CSS"
-      type: lib.scriptOverride ? "script" : lib.type,
+      type: (lib.scriptOverride ? "script" : lib.type) as "script" | "stylesheet",
     }));
 }

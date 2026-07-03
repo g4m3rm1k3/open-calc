@@ -1,18 +1,30 @@
 import { useRef, useState, useCallback } from "react";
 import styles from "./HtmlLab.module.css";
 import { CONTAINER_TAGS } from "./labReducer";
+import type { LabElement, BodyStyles } from "./types";
 
 const VOID_TAGS = new Set(["img", "br", "hr", "input"]);
 
-/**
- * CanvasPanel — document-flow HTML builder
- *
- * Mental model:
- *   • Elements flow in document order (no absolute positioning)
- *   • Dragging an element shows drop zones throughout the tree
- *   • Dropping INSIDE a container tag nests it as a child
- *   • Dropping BETWEEN elements reorders them
- */
+interface DropTarget {
+  parentId: string | null;
+  order: number;
+  type?: string;
+}
+
+interface Props {
+  elements: LabElement[];
+  selectedId: string | null;
+  showOverlay: boolean;
+  showLabels?: boolean;
+  bodyStyles?: BodyStyles;
+  onSelect: (id: string) => void;
+  onDeselect: () => void;
+  onDelete: (id: string) => void;
+  onNest: (childId: string, parentId: string, order: number) => void;
+  onMoveToRoot: (id: string, order: number) => void;
+  onReorder: (id: string, parentId: string | null, order: number) => void;
+}
+
 export default function CanvasPanel({
   elements,
   selectedId,
@@ -22,33 +34,29 @@ export default function CanvasPanel({
   onSelect,
   onDeselect,
   onDelete,
-  onNest,       // (childId, parentId, order)
-  onMoveToRoot, // (id, order)
-  onReorder,    // (id, parentId, order)
-}) {
-  // dropTarget: { parentId: string|null, order: number, type: "inside"|"before"|"after" }
-  const [dropTarget, setDropTarget] = useState(null);
-  const [draggingId, setDraggingId] = useState(null);
-  const canvasRef = useRef(null);
+  onNest,
+  onMoveToRoot,
+  onReorder,
+}: Props) {
+  const [dropTarget, setDropTarget] = useState<DropTarget | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
 
-  // IDs to show overlay on: selected element + its descendants (or all when body selected)
   const overlayIds = showOverlay ? getSubtreeIds(elements, selectedId) : null;
 
-  // ── Sort helper ──────────────────────────────────────────────────────────────
-  const childrenOf = useCallback((parentId) =>
+  const childrenOf = useCallback((parentId: string | null): LabElement[] =>
     elements
       .filter((e) => (e.parentId ?? null) === (parentId ?? null))
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
   [elements]);
 
-  const byId = {};
+  const byId: Record<string, LabElement> = {};
   for (const e of elements) byId[e.id] = e;
 
   // ── Drag start ───────────────────────────────────────────────────────────────
-  const handleDragStart = (e, el) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, el: LabElement): void => {
     e.stopPropagation();
-    // Use a ghost image
-    const ghost = e.currentTarget.cloneNode(true);
+    const ghost = e.currentTarget.cloneNode(true) as HTMLElement;
     ghost.style.opacity = "0.6";
     ghost.style.position = "fixed";
     ghost.style.top = "-9999px";
@@ -61,27 +69,28 @@ export default function CanvasPanel({
     setDraggingId(el.id);
   };
 
-  const handleDragEnd = () => {
+  const handleDragEnd = (): void => {
     setDraggingId(null);
     setDropTarget(null);
   };
 
-  // ── Drop zone enter/leave ────────────────────────────────────────────────────
-  const handleDropZoneEnter = (e, parentId, order) => {
+  // ── Drop zone enter ───────────────────────────────────────────────────────────
+  const handleDropZoneEnter = (e: React.DragEvent, parentId: string | null, order: number): void => {
     e.preventDefault();
     e.stopPropagation();
     setDropTarget({ parentId: parentId ?? null, order });
   };
 
-  const handleInsideEnter = (e, parentId) => {
+  const handleInsideEnter = (e: React.DragEvent, parentId: string): void => {
     e.preventDefault();
     e.stopPropagation();
     const children = childrenOf(parentId);
     setDropTarget({ parentId, order: children.length, type: "inside" });
   };
+  void handleInsideEnter; // used via renderTag
 
   // ── Drop ─────────────────────────────────────────────────────────────────────
-  const handleDrop = (e, parentId, order) => {
+  const handleDrop = (e: React.DragEvent, parentId: string | null, order: number): void => {
     e.preventDefault();
     e.stopPropagation();
     const childId = e.dataTransfer.getData("text/plain");
@@ -91,28 +100,19 @@ export default function CanvasPanel({
     if (!child) return;
 
     if (parentId === null) {
-      // Drop to root
       const sameParent = child.parentId === null;
-      if (sameParent) {
-        onReorder(childId, null, order);
-      } else {
-        onMoveToRoot(childId, order);
-      }
+      if (sameParent) { onReorder(childId, null, order); }
+      else            { onMoveToRoot(childId, order); }
     } else {
-      // Drop into a container
       const sameParent = child.parentId === parentId;
-      if (sameParent) {
-        onReorder(childId, parentId, order);
-      } else {
-        onNest(childId, parentId, order);
-      }
+      if (sameParent) { onReorder(childId, parentId, order); }
+      else            { onNest(childId, parentId, order); }
     }
     setDropTarget(null);
     setDraggingId(null);
   };
 
-  // ── Canvas-level drop (root, end) ────────────────────────────────────────────
-  const handleCanvasDrop = (e) => {
+  const handleCanvasDrop = (e: React.DragEvent): void => {
     e.preventDefault();
     const childId = e.dataTransfer.getData("text/plain");
     if (!childId) return;
@@ -122,8 +122,8 @@ export default function CanvasPanel({
     setDraggingId(null);
   };
 
-  // ── Render a between-sibling drop zone ───────────────────────────────────────
-  const renderDropZone = (parentId, order, key) => {
+  // ── Drop zone render ──────────────────────────────────────────────────────────
+  const renderDropZone = (parentId: string | null, order: number, key: string): React.ReactNode => {
     const isActive =
       dropTarget &&
       (dropTarget.parentId ?? null) === (parentId ?? null) &&
@@ -140,26 +140,22 @@ export default function CanvasPanel({
     );
   };
 
-  // ── Render one element ───────────────────────────────────────────────────────
-  const renderElement = (el) => {
-    const isSelected = el.id === selectedId;
-    const isDragging = el.id === draggingId;
-    const children = childrenOf(el.id);
-    const isContainer = CONTAINER_TAGS.has(el.tag);
-
-    // "Drop inside" highlight: user is hovering inside this container
-    const isInsideTarget =
-      isContainer &&
-      dropTarget?.parentId === el.id;
+  // ── Element render ────────────────────────────────────────────────────────────
+  const renderElement = (el: LabElement): React.ReactNode => {
+    const isSelected    = el.id === selectedId;
+    const isDragging    = el.id === draggingId;
+    const children      = childrenOf(el.id);
+    const isContainer   = CONTAINER_TAGS.has(el.tag);
+    const isInsideTarget = isContainer && dropTarget?.parentId === el.id;
 
     return (
       <div
         key={el.id}
         className={[
           styles.elWrap,
-          isSelected ? styles.elSelected : "",
-          isDragging ? styles.elDragging : "",
-          isInsideTarget ? styles.elDropInside : "",
+          isSelected    ? styles.elSelected    : "",
+          isDragging    ? styles.elDragging    : "",
+          isInsideTarget? styles.elDropInside  : "",
         ].join(" ")}
         style={{ display: el.styles.display || "block" }}
         draggable
@@ -179,7 +175,6 @@ export default function CanvasPanel({
           handleDrop(e, el.id, children.length);
         }}
       >
-        {/* tag badge — visible when labels on or element selected; fully hidden otherwise */}
         <div className={`${styles.elTag}${!showLabels && !isSelected ? ` ${styles.elTagHidden}` : ""}`}>
           &lt;{el.tag}&gt;
           {isSelected && (
@@ -191,10 +186,8 @@ export default function CanvasPanel({
           )}
         </div>
 
-        {/* render the actual element directly — no wrapper so display/flex propagates */}
         {renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget)}
 
-        {/* overlay badges — only on selected subtree (or all when body selected) */}
         {overlayIds?.has(el.id) && (
           <div className={styles.boxOverlay} aria-hidden="true">
             <div className={styles.boxOverlayMargin} />
@@ -221,12 +214,7 @@ export default function CanvasPanel({
       <div
         ref={canvasRef}
         className={styles.canvasDrop}
-        style={{
-          ...bodyStyles,
-          // Canvas must keep these regardless of body styles
-          flex: 1,
-          overflowY: "auto",
-        }}
+        style={{ ...bodyStyles, flex: 1, overflowY: "auto" }}
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleCanvasDrop}
         onClick={(e) => { if (e.target === e.currentTarget) onDeselect(); }}
@@ -238,7 +226,6 @@ export default function CanvasPanel({
           </div>
         )}
 
-        {/* root-level drop zones interleaved with elements */}
         {roots.length > 0 && renderDropZone(null, 0, "root-0")}
         {roots.map((el, i) => (
           <div key={el.id}>
@@ -251,14 +238,21 @@ export default function CanvasPanel({
   );
 }
 
-// ── Render the actual HTML tag with styling applied ──────────────────────────
-function renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget) {
-  const Tag = el.tag;
+// ── Render the actual HTML tag ────────────────────────────────────────────────
+function renderTag(
+  el: LabElement,
+  children: LabElement[],
+  renderElement: (el: LabElement) => React.ReactNode,
+  renderDropZone: (parentId: string | null, order: number, key: string) => React.ReactNode,
+  isContainer: boolean,
+  isInsideTarget: boolean,
+): React.ReactNode {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Tag = el.tag as any;
   const domAttrs = attrsToReactProps(el.attrs);
-  const tagStyle = {
-    ...el.styles,
+  const tagStyle: React.CSSProperties = {
+    ...(el.styles as React.CSSProperties),
     boxSizing: "border-box",
-    // Containers need visible min-height so you can drop into empty ones
     minHeight: isContainer && children.length === 0 ? "48px" : undefined,
   };
 
@@ -268,28 +262,26 @@ function renderTag(el, children, renderElement, renderDropZone, isContainer, isI
     return (
       <img
         {...domAttrs}
-        src={domAttrs.src || placeholder}
-        alt={domAttrs.alt || "Image"}
+        src={(domAttrs.src as string) || placeholder}
+        alt={(domAttrs.alt as string) || "Image"}
         style={{
           ...tagStyle,
           width: tagStyle.width || "120px",
           height: tagStyle.height || "80px",
-          objectFit: tagStyle.objectFit || "cover",
+          objectFit: (tagStyle.objectFit as React.CSSProperties["objectFit"]) || "cover",
         }}
       />
     );
   }
 
   if (VOID_TAGS.has(el.tag)) {
-    return <Tag {...domAttrs} style={tagStyle} />;
+    return <Tag {...(domAttrs as React.HTMLAttributes<HTMLElement>)} style={tagStyle} />;
   }
 
   if (isContainer) {
     return (
-      <Tag {...domAttrs} style={tagStyle}>
+      <Tag {...(domAttrs as React.HTMLAttributes<HTMLElement>)} style={tagStyle}>
         {el.content && <span>{el.content}</span>}
-
-        {/* interleave children with drop zones */}
         {children.length === 0 && isInsideTarget && (
           <div className={styles.emptyContainerHint}>drop here</div>
         )}
@@ -304,17 +296,22 @@ function renderTag(el, children, renderElement, renderDropZone, isContainer, isI
     );
   }
 
-  // Prevent anchor tags from navigating — the canvas handles clicks for selection
-  const extraProps = el.tag === "a" ? { onClick: (e) => e.preventDefault() } : {};
-  return <Tag {...domAttrs} {...extraProps} style={tagStyle}>{el.content || ""}</Tag>;
+  const extraProps = el.tag === "a"
+    ? { onClick: (e: React.MouseEvent) => e.preventDefault() }
+    : {};
+  return (
+    <Tag {...(domAttrs as React.HTMLAttributes<HTMLElement>)} {...extraProps} style={tagStyle}>
+      {el.content || ""}
+    </Tag>
+  );
 }
 
-function getSubtreeIds(elements, rootId) {
-  if (!rootId) return new Set(elements.map(e => e.id)); // body selected = show all
-  const result = new Set([rootId]);
+function getSubtreeIds(elements: LabElement[], rootId: string | null): Set<string> {
+  if (!rootId) return new Set(elements.map(e => e.id));
+  const result = new Set<string>([rootId]);
   const queue = [rootId];
   while (queue.length) {
-    const cur = queue.shift();
+    const cur = queue.shift()!;
     for (const e of elements) {
       if (e.parentId === cur) { result.add(e.id); queue.push(e.id); }
     }
@@ -322,8 +319,8 @@ function getSubtreeIds(elements, rootId) {
   return result;
 }
 
-function attrsToReactProps(attrs = {}) {
-  const props = {};
+function attrsToReactProps(attrs: Record<string, string> = {}): Record<string, unknown> {
+  const props: Record<string, unknown> = {};
   Object.entries(attrs).forEach(([key, value]) => {
     if (String(value || "").trim() === "") return;
     props[key === "class" ? "className" : key] = value;

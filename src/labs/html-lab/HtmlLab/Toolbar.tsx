@@ -6,7 +6,9 @@ const ELEMENTS = [
   { tag: "article", label: "article", title: "Article container" },
   { tag: "header",  label: "header",  title: "Header container" },
   { tag: "footer",  label: "footer",  title: "Footer container" },
+  { tag: "nav",     label: "nav",     title: "Navigation container" },
   { tag: "ul",      label: "ul",      title: "Unordered list" },
+  { tag: "ol",      label: "ol",      title: "Ordered list" },
   { tag: "li",      label: "li",      title: "List item" },
   { tag: "p",       label: "p",       title: "Paragraph" },
   { tag: "h1",      label: "H1",      title: "Heading 1" },
@@ -16,7 +18,40 @@ const ELEMENTS = [
   { tag: "span",    label: "span",    title: "Inline container" },
   { tag: "a",       label: "a",       title: "Anchor / link" },
   { tag: "img",     label: "img",     title: "Image placeholder" },
+  { tag: "hr",      label: "hr",      title: "Horizontal rule" },
+  { tag: "blockquote", label: "quote", title: "Blockquote" },
+  { tag: "pre",     label: "pre",     title: "Preformatted code block" },
+  { tag: "code",    label: "code",    title: "Inline code" },
+  { tag: "label",   label: "label",   title: "Form label" },
+  { tag: "video",   label: "video",   title: "Video player" },
+  { tag: "audio",   label: "audio",   title: "Audio player" },
 ];
+
+interface Props {
+  showOverlay: boolean;
+  showLabels: boolean;
+  showComponents: boolean;
+  showLibraries: boolean;
+  previewMode: boolean;
+  multiPageMode: boolean;
+  onAddElement: (tag: string) => void;
+  onToggleOverlay: () => void;
+  onToggleLabels: () => void;
+  onToggleComponents: () => void;
+  onToggleLibraries: () => void;
+  onTogglePreview: () => void;
+  onToggleMultiPage: () => void;
+  onImport: () => void;
+  onNew: () => void;
+  onUndo: () => void;
+  onClear: () => void;
+  onExport: () => void;
+  onExportSplit: () => void;
+  canUndo: boolean;
+  onBack?: () => void;
+  onApplyGlobalTheme?: (theme: string) => void;
+  onLoadExample: () => void;
+}
 
 export default function Toolbar({
   showOverlay,
@@ -42,7 +77,7 @@ export default function Toolbar({
   onBack,
   onApplyGlobalTheme,
   onLoadExample,
-}) {
+}: Props) {
   return (
     <div className={styles.toolbar}>
       {onBack && (
@@ -53,7 +88,6 @@ export default function Toolbar({
       <span className={styles.toolbarLogo}>HTML Lab</span>
       <div className={styles.toolbarSep} />
 
-      {/* Mode toggle */}
       <div className={styles.modePill}>
         <button
           className={`${styles.modeBtn} ${!showComponents && !showLibraries ? styles.modeBtnActive : ""}`}

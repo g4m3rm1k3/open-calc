@@ -179,6 +179,11 @@
   overflow-y: auto;
   padding: 16px;
   background: var(--hl-canvas);
+  /* Establishes a containing block for `position: fixed`/`absolute` in imported
+     HTML, so those elements are scoped to the canvas instead of escaping to
+     cover the whole app viewport. */
+  position: relative;
+  contain: layout paint;
 }
 
 .emptyHint {

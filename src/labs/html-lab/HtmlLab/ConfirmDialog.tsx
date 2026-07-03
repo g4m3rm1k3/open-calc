@@ -3,11 +3,18 @@ import styles from "./HtmlLab.module.css";
 
 const SKIP_PREFIX = "htmllab_skip_";
 
-export function shouldSkip(key) {
+export function shouldSkip(key: string): boolean {
   return localStorage.getItem(SKIP_PREFIX + key) === "true";
 }
 
-export default function ConfirmDialog({ storageKey, message, onConfirm, onCancel }) {
+interface Props {
+  storageKey: string;
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+export default function ConfirmDialog({ storageKey, message, onConfirm, onCancel }: Props) {
   const [dontShow, setDontShow] = useState(false);
 
   const handleOk = () => {

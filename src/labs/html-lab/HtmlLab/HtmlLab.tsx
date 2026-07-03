@@ -20,11 +20,31 @@ import {
   parseHtmlDocument,
 } from "./htmlSync";
 import styles from "./HtmlLab.module.css";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore — JS hooks file, no type declarations
 import { useThemeColors } from "../../../hooks/useThemeColors.js";
+import type { LabElement, LabPage } from "./types";
 
-export default function HtmlLab({ onBack }) {
-  const C = useThemeColors();
-  const hlVars = {
+interface HtmlLabProps {
+  onBack?: () => void;
+}
+
+interface ConfirmState {
+  storageKey: string;
+  message: string;
+  resolve: (value: boolean) => void;
+}
+
+interface FileRead {
+  name: string;
+  content: string;
+  ext: string;
+}
+
+export default function HtmlLab({ onBack }: HtmlLabProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const C: any = useThemeColors();
+  const hlVars: Record<string, string> = {
     "--hl-bg":           C.bg,
     "--hl-surface":      C.surface,
     "--hl-surface2":     C.surface2,
@@ -48,25 +68,26 @@ export default function HtmlLab({ onBack }) {
   };
 
   const [state, dispatch] = useReducer(labReducer, undefined, () => {
-    const ex = (EXAMPLES.find(e => e.id === "showcase") ?? EXAMPLES[0]).generate();
+    const exData = (EXAMPLES.find(e => e.id === "showcase") ?? EXAMPLES[0]).generate();
+    const ex = 'pages' in exData
+      ? { elements: exData.pages[0]?.elements ?? [], bodyStyles: exData.pages[0]?.bodyStyles ?? {}, javascript: exData.pages[0]?.javascript ?? "" }
+      : exData;
     return { ...initialState, elements: ex.elements, bodyStyles: ex.bodyStyles, javascript: ex.javascript ?? "" };
   });
-  const [codePanelWidth, setCodePanelWidth] = useState(360);
-  const [propsPanelWidth, setPropsPanelWidth] = useState(280);
-  const [showComponents, setShowComponents] = useState(false);
-  const [showLibraries, setShowLibraries] = useState(false);
-  const [multiSelectedIds, setMultiSelectedIds] = useState([]);
-  const [previewMode, setPreviewMode] = useState(false);
-  const [confirmDialog, setConfirmDialog] = useState(null);
-  const [showExamplePicker, setShowExamplePicker] = useState(false);
+  const [codePanelWidth, setCodePanelWidth]   = useState<number>(360);
+  const [propsPanelWidth, setPropsPanelWidth] = useState<number>(280);
+  const [showComponents, setShowComponents]   = useState<boolean>(false);
+  const [showLibraries, setShowLibraries]     = useState<boolean>(false);
+  const [multiSelectedIds, setMultiSelectedIds] = useState<string[]>([]);
+  const [previewMode, setPreviewMode]           = useState<boolean>(false);
+  const [confirmDialog, setConfirmDialog]       = useState<ConfirmState | null>(null);
+  const [showExamplePicker, setShowExamplePicker] = useState<boolean>(false);
 
-  // Detect which components match the selected element's direct children
   const matchedComponents = useMemo(() => {
     if (!state.selectedId) return [];
     return detectComponents(state.selectedId, state.elements);
   }, [state.selectedId, state.elements]);
 
-  // True when the body background is dark enough to warrant dark component defaults
   const bodyIsDark = useMemo(() => {
     const bg = state.bodyStyles.backgroundColor || "";
     if (bg.startsWith("#") && bg.length === 7) {
@@ -78,47 +99,51 @@ export default function HtmlLab({ onBack }) {
     const gradient = state.bodyStyles.background || "";
     return gradient.includes("0f172a") || gradient.includes("1e293b");
   }, [state.bodyStyles]);
-  // Synthesise a shared-value element for multi-select property editing
-  const multiElement = useMemo(() => {
+
+  const multiElement = useMemo((): LabElement | null => {
     if (multiSelectedIds.length < 2) return null;
-    const els = multiSelectedIds.map(id => state.elements.find(e => e.id === id)).filter(Boolean);
-    // Compute shared styles (properties where ALL found elements agree)
+    const els = multiSelectedIds
+      .map(id => state.elements.find(e => e.id === id))
+      .filter((e): e is LabElement => e !== undefined);
     const allProps = [...new Set(els.flatMap(e => Object.keys(e.styles || {})))];
-    const sharedStyles = {};
+    const sharedStyles: Record<string, string> = {};
     if (els.length > 0) {
       allProps.forEach(prop => {
         const vals = els.map(e => e.styles?.[prop]);
-        if (vals.every(v => v === vals[0] && v !== undefined)) sharedStyles[prop] = vals[0];
+        if (vals.every(v => v === vals[0] && v !== undefined)) sharedStyles[prop] = vals[0]!;
       });
     }
     return { id: "__multi__", tag: "div", styles: sharedStyles, attrs: {}, content: "", parentId: null, mediaQueries: [] };
   }, [multiSelectedIds, state.elements]);
 
-  const dividerDragging = useRef(false);
-  const dividerStartX = useRef(0);
-  const dividerStartW = useRef(0);
-  const fileInputRef = useRef(null);
+  const dividerDragging      = useRef<boolean>(false);
+  const dividerStartX        = useRef<number>(0);
+  const dividerStartW        = useRef<number>(0);
+  const fileInputRef         = useRef<HTMLInputElement | null>(null);
+  const propsDividerDragging = useRef<boolean>(false);
+  const propsDividerStartX   = useRef<number>(0);
+  const propsDividerStartW   = useRef<number>(0);
 
-  const propsDividerDragging = useRef(false);
-  const propsDividerStartX = useRef(0);
-  const propsDividerStartW = useRef(0);
-
-  const askConfirm = useCallback((storageKey, message) => {
+  const askConfirm = useCallback((storageKey: string, message: string): Promise<boolean> => {
     if (shouldSkip(storageKey)) return Promise.resolve(true);
-    return new Promise((resolve) => {
+    return new Promise<boolean>((resolve) => {
       setConfirmDialog({ storageKey, message, resolve });
     });
   }, []);
 
   const generatedCode = elementsToHtml(state.elements);
-  const generatedCss = elementsToCss(state.elements, state.customCss, state.bodyStyles);
+  const generatedCss  = elementsToCss(state.elements, state.customCss, state.bodyStyles);
 
-  const selectedElement = state.selectedId
-    ? state.elements.find((e) => e.id === state.selectedId) || null
-    : { id: "__body__", tag: "body", styles: state.bodyStyles, content: "", attrs: {}, mediaQueries: [] };
+  const selectedElement: LabElement = state.selectedId
+    ? state.elements.find((e) => e.id === state.selectedId) ?? {
+        id: "__body__", tag: "body", styles: state.bodyStyles, content: "",
+        attrs: {}, mediaQueries: [], parentId: null,
+      }
+    : { id: "__body__", tag: "body", styles: state.bodyStyles, content: "",
+        attrs: {}, mediaQueries: [], parentId: null };
 
   const handleCodeChange = useCallback(
-    (newCode) => {
+    (newCode: string): void => {
       const parsed = htmlToElements(newCode, state.elements, state.javascript);
       if (parsed) dispatch({ type: "SET_FROM_CODE", payload: parsed });
     },
@@ -126,26 +151,24 @@ export default function HtmlLab({ onBack }) {
   );
 
   const handleCssChange = useCallback(
-    (newCss) => {
+    (newCss: string): void => {
       const parsed = applyCssToElements(newCss, state.elements);
       dispatch({ type: "SET_FROM_CSS", payload: parsed });
     },
     [state.elements],
   );
 
-  const handleDividerMouseDown = (e) => {
+  const handleDividerMouseDown = (e: React.MouseEvent): void => {
     dividerDragging.current = true;
-    dividerStartX.current = e.clientX;
-    dividerStartW.current = codePanelWidth;
+    dividerStartX.current   = e.clientX;
+    dividerStartW.current   = codePanelWidth;
     e.preventDefault();
-    const onMouseMove = (e) => {
+    const onMouseMove = (ev: MouseEvent): void => {
       if (!dividerDragging.current) return;
-      const delta = e.clientX - dividerStartX.current;
-      setCodePanelWidth(
-        Math.max(200, Math.min(640, dividerStartW.current + delta)),
-      );
+      const delta = ev.clientX - dividerStartX.current;
+      setCodePanelWidth(Math.max(200, Math.min(640, dividerStartW.current + delta)));
     };
-    const onUp = () => {
+    const onUp = (): void => {
       dividerDragging.current = false;
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onUp);
@@ -154,17 +177,17 @@ export default function HtmlLab({ onBack }) {
     window.addEventListener("mouseup", onUp);
   };
 
-  const handlePropsDividerMouseDown = (e) => {
+  const handlePropsDividerMouseDown = (e: React.MouseEvent): void => {
     propsDividerDragging.current = true;
-    propsDividerStartX.current = e.clientX;
-    propsDividerStartW.current = propsPanelWidth;
+    propsDividerStartX.current   = e.clientX;
+    propsDividerStartW.current   = propsPanelWidth;
     e.preventDefault();
-    const onMouseMove = (e) => {
+    const onMouseMove = (ev: MouseEvent): void => {
       if (!propsDividerDragging.current) return;
-      const delta = propsDividerStartX.current - e.clientX;
+      const delta = propsDividerStartX.current - ev.clientX;
       setPropsPanelWidth(Math.max(200, Math.min(560, propsDividerStartW.current + delta)));
     };
-    const onUp = () => {
+    const onUp = (): void => {
       propsDividerDragging.current = false;
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onUp);
@@ -173,15 +196,15 @@ export default function HtmlLab({ onBack }) {
     window.addEventListener("mouseup", onUp);
   };
 
-  const handleFileImport = useCallback(async (e) => {
-    const files = Array.from(e.target.files);
+  const handleFileImport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const files = Array.from(e.target.files ?? []);
     e.target.value = "";
     if (!files.length) return;
 
-    const extOrder = { html: 0, css: 1, js: 2 };
+    const extOrder: Record<string, number> = { html: 0, css: 1, js: 2 };
     files.sort((a, b) => {
-      const ea = a.name.split(".").pop().toLowerCase();
-      const eb = b.name.split(".").pop().toLowerCase();
+      const ea = a.name.split(".").pop()?.toLowerCase() ?? "";
+      const eb = b.name.split(".").pop()?.toLowerCase() ?? "";
       return (extOrder[ea] ?? 9) - (extOrder[eb] ?? 9);
     });
 
@@ -194,24 +217,28 @@ export default function HtmlLab({ onBack }) {
       if (!ok) return;
     }
 
-    const reads = await Promise.all(files.map(f => new Promise(resolve => {
+    const reads = await Promise.all(files.map(f => new Promise<FileRead>(resolve => {
       const reader = new FileReader();
-      reader.onload = ev => resolve({ name: f.name, content: ev.target.result, ext: f.name.split(".").pop().toLowerCase() });
+      reader.onload = ev => resolve({
+        name: f.name,
+        content: ev.target?.result as string,
+        ext: f.name.split(".").pop()?.toLowerCase() ?? "",
+      });
       reader.readAsText(f);
     })));
 
     let elements = state.elements;
     let bodyStyles = { ...initialState.bodyStyles, ...state.bodyStyles };
     let javascript = state.javascript;
-    let customCss = state.customCss ?? "";
+    let customCss  = state.customCss ?? "";
 
     const htmlRead = reads.find(r => r.ext === "html");
     if (htmlRead) {
       const parsed = parseHtmlDocument(htmlRead.content);
-      elements = parsed.elements || [];
+      elements   = parsed.elements || [];
       bodyStyles = { ...initialState.bodyStyles, ...(parsed.bodyStyles || {}) };
       javascript = parsed.javascript || "";
-      customCss = parsed.css || "";
+      customCss  = parsed.css || "";
     }
 
     const cssRead = reads.find(r => r.ext === "css");
@@ -235,23 +262,23 @@ export default function HtmlLab({ onBack }) {
     }
   }, [askConfirm, state.elements, state.bodyStyles, state.javascript, state.customCss]);
 
-  const exportPage = useCallback((page) => {
+  const exportPage = useCallback((page: LabPage): void => {
     const cdnTags = resolveCdnTags(state.cdnLinks);
-    const html = generateExportHtml(page.elements, page.bodyStyles, page.customCss || "", page.javascript, cdnTags);
+    const html = generateExportHtml(page.elements, page.bodyStyles, page.customCss || "", page.javascript || "", cdnTags);
     const slug = page.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || "page";
     const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
     a.href = url; a.download = `${slug}.html`; a.click();
     URL.revokeObjectURL(url);
-  }, []);
+  }, [state.cdnLinks]);
 
-  const exportSplit = useCallback(() => {
+  const exportSplit = useCallback((): void => {
     const cdnTags = resolveCdnTags(state.cdnLinks);
     const html = generateLinkedHtml(state.elements, cdnTags);
     const css  = elementsToCss(state.elements, state.customCss, state.bodyStyles);
     const js   = state.javascript?.trim() || "";
-    function dl(content, filename, mime) {
+    function dl(content: string, filename: string, mime: string): void {
       const blob = new Blob([content], { type: mime });
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement("a");
@@ -259,12 +286,12 @@ export default function HtmlLab({ onBack }) {
       URL.revokeObjectURL(url);
     }
     dl(html, "index.html", "text/html");
-    setTimeout(() => dl(css,  "styles.css",  "text/css"),        150);
+    setTimeout(() => dl(css, "styles.css", "text/css"), 150);
     setTimeout(() => dl(js || "// script.js", "script.js", "text/javascript"), 300);
   }, [state.elements, state.bodyStyles, state.customCss, state.javascript, state.cdnLinks]);
 
   return (
-    <div className={styles.app} style={hlVars}>
+    <div className={styles.app} style={hlVars as React.CSSProperties}>
       <input
         ref={fileInputRef}
         type="file"
@@ -331,39 +358,32 @@ export default function HtmlLab({ onBack }) {
             );
             pages.forEach((page, i) => setTimeout(() => exportPage(page), i * 200));
           } else {
-            exportPage({ name: "index", elements: state.elements, bodyStyles: state.bodyStyles, customCss: state.customCss, javascript: state.javascript });
+            exportPage({ id: "", name: "index", elements: state.elements, bodyStyles: state.bodyStyles, customCss: state.customCss, javascript: state.javascript });
           }
         }}
         onExportSplit={exportSplit}
         canUndo={state.history.length > 0}
         onBack={onBack}
         onApplyGlobalTheme={(themeName) => {
-          // Find the corresponding body theme
-          const bodyTheme = BODY_THEMES.find(t => t.name.toLowerCase().includes(themeName.toLowerCase()) || t.id.toLowerCase().includes(themeName.toLowerCase()));
-          
-          const updates = [];
-          
-          // Check all potential component roots
+          const bodyTheme = BODY_THEMES.find(t =>
+            t.name.toLowerCase().includes(themeName.toLowerCase()) ||
+            t.id.toLowerCase().includes(themeName.toLowerCase())
+          );
+          const updates: ReturnType<typeof buildThemeUpdates> = [];
           for (const el of state.elements) {
             const matched = detectComponents(el.id, state.elements);
             if (matched.length > 0) {
               const comp = matched[0];
-              // Find the theme in this component that matches the themeName
-              const compTheme = comp.themeGroups.flatMap(g => g.themes).find(t => 
-                t.name.toLowerCase().includes(themeName.toLowerCase()) || t.id.toLowerCase().includes(themeName.toLowerCase())
+              const compTheme = comp.themeGroups.flatMap(g => g.themes).find(t =>
+                t.name.toLowerCase().includes(themeName.toLowerCase()) ||
+                t.id.toLowerCase().includes(themeName.toLowerCase())
               );
-              
               if (compTheme) {
-                const compUpdates = buildThemeUpdates(el.id, state.elements, compTheme);
-                updates.push(...compUpdates);
+                updates.push(...buildThemeUpdates(el.id, state.elements, compTheme));
               }
             }
           }
-          
-          dispatch({ 
-            type: "APPLY_GLOBAL_THEME", 
-            payload: { updates, bodyStyles: bodyTheme?.styles } 
-          });
+          dispatch({ type: "APPLY_GLOBAL_THEME", payload: { updates, bodyStyles: bodyTheme?.styles } });
         }}
         onLoadExample={() => setShowExamplePicker(true)}
       />
@@ -371,7 +391,7 @@ export default function HtmlLab({ onBack }) {
       {state.mode === "multi" && (
         <PageTabStrip
           pages={state.pages}
-          activePageId={state.activePageId}
+          activePageId={state.activePageId ?? ""}
           onSwitch={(id) => dispatch({ type: "SWITCH_PAGE", payload: id })}
           onAdd={() => dispatch({ type: "ADD_PAGE" })}
           onDelete={(id) => dispatch({ type: "DELETE_PAGE", payload: id })}
@@ -420,6 +440,7 @@ export default function HtmlLab({ onBack }) {
           ))}
         </div>
       )}
+
       {showLibraries && (
         <div className={styles.libPanel}>
           {CDN_LIBRARIES.map((lib) => {
@@ -444,7 +465,6 @@ export default function HtmlLab({ onBack }) {
         </div>
       )}
 
-      {/* Layout: [Code] | [Canvas] | [Properties] */}
       <div className={styles.main}>
         <CodePanel
           html={generatedCode}
@@ -456,9 +476,7 @@ export default function HtmlLab({ onBack }) {
           multiSelectedIds={multiSelectedIds}
           onHtmlChange={handleCodeChange}
           onCssChange={handleCssChange}
-          onJavascriptChange={(value) =>
-            dispatch({ type: "SET_JAVASCRIPT", payload: value })
-          }
+          onJavascriptChange={(value) => dispatch({ type: "SET_JAVASCRIPT", payload: value })}
           onSelectElement={(id) => {
             dispatch({ type: "SELECT", payload: id });
             setMultiSelectedIds([]);
@@ -521,7 +539,7 @@ export default function HtmlLab({ onBack }) {
               bodyThemes={!state.selectedId ? BODY_THEMES : null}
               onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
               onApplyComponentTheme={(theme) => {
-                const updates = buildThemeUpdates(state.selectedId, state.elements, theme);
+                const updates = buildThemeUpdates(state.selectedId ?? "", state.elements, theme);
                 dispatch({ type: "APPLY_COMPONENT_THEME", payload: { updates } });
               }}
               onApplyBodyTheme={(theme) =>
@@ -537,36 +555,24 @@ export default function HtmlLab({ onBack }) {
               onMultiStyleChange={(prop, value) =>
                 dispatch({ type: "UPDATE_MULTI_STYLE", payload: { ids: multiSelectedIds, prop, value } })
               }
-              onContentChange={(value) =>
-                dispatch({ type: "UPDATE_CONTENT", payload: value })
-              }
+              onContentChange={(value) => dispatch({ type: "UPDATE_CONTENT", payload: value })}
               onTagChange={(tag) => dispatch({ type: "UPDATE_TAG", payload: tag })}
               onAttrChange={(prop, value) =>
                 dispatch({ type: "UPDATE_ATTR", payload: { prop, value } })
               }
               javascript={state.javascript}
               onInsertJavascript={(snippet) =>
-                dispatch({
-                  type: "SET_JAVASCRIPT",
-                  payload: appendJavascriptSnippet(state.javascript, snippet),
-                })
+                dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, snippet) })
               }
               onInsertJsPreset={(template, code) => {
                 dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
-                dispatch({
-                  type: "SET_JAVASCRIPT",
-                  payload: appendJavascriptSnippet(state.javascript, code),
-                });
+                dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, code) });
               }}
               onApplyPreset={(presetStyles) =>
                 dispatch({ type: "APPLY_PRESET", payload: presetStyles })
               }
-              onAddMediaQuery={(mq) =>
-                dispatch({ type: "ADD_MEDIA_QUERY", payload: mq })
-              }
-              onRemoveMediaQuery={(index) =>
-                dispatch({ type: "REMOVE_MEDIA_QUERY", payload: index })
-              }
+              onAddMediaQuery={(mq) => dispatch({ type: "ADD_MEDIA_QUERY", payload: mq })}
+              onRemoveMediaQuery={(index) => dispatch({ type: "REMOVE_MEDIA_QUERY", payload: index })}
             />
           </>
         )}
@@ -575,28 +581,39 @@ export default function HtmlLab({ onBack }) {
   );
 }
 
-function appendJavascriptSnippet(current, snippet) {
+function appendJavascriptSnippet(current: string, snippet: string): string {
   const trimmed = current.trimEnd();
   if (trimmed.includes(snippet.trim())) return current;
   return `${trimmed}${trimmed ? "\n\n" : ""}${snippet}`;
 }
 
-function PageTabStrip({ pages, activePageId, onSwitch, onAdd, onDelete, onRename }) {
-  const [editingId, setEditingId] = useState(null);
-  const [draft, setDraft] = useState("");
-  const inputRef = useRef(null);
+// ── Page Tab Strip ────────────────────────────────────────────────────────────
+
+interface PageTabStripProps {
+  pages: LabPage[];
+  activePageId: string;
+  onSwitch: (id: string) => void;
+  onAdd: () => void;
+  onDelete: (id: string) => void;
+  onRename: (id: string, name: string) => void;
+}
+
+function PageTabStrip({ pages, activePageId, onSwitch, onAdd, onDelete, onRename }: PageTabStripProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft]         = useState<string>("");
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (editingId && inputRef.current) inputRef.current.select();
   }, [editingId]);
 
-  function startRename(page, e) {
+  function startRename(page: LabPage, e: React.MouseEvent): void {
     e.stopPropagation();
     setEditingId(page.id);
     setDraft(page.name);
   }
 
-  function commitRename() {
+  function commitRename(): void {
     if (editingId && draft.trim()) onRename(editingId, draft.trim());
     setEditingId(null);
   }

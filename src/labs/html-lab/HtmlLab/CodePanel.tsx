@@ -1,20 +1,32 @@
 import { useRef, useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
+import type { OnMount } from "@monaco-editor/react";
 import styles from "./HtmlLab.module.css";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore — JS context files, no type declarations
 import { useGlobalTheme } from "../../../context/ThemeContext.jsx";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore — JS hooks file, no type declarations
 import { useThemeColors } from "../../../hooks/useThemeColors.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore — JS utils file, no type declarations
+import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";
+import type { LabElement } from "./types";
+
+type MonacoEditor = Parameters<OnMount>[0];
+type MonacoApi    = Parameters<OnMount>[1];
 
 const TABS = [
   { key: "html",       label: "HTML",       language: "html" },
   { key: "css",        label: "CSS",        language: "css" },
   { key: "javascript", label: "JavaScript", language: "javascript" },
   { key: "tree",       label: "Tree",       language: null },
-];
+] as const;
 
-// Inject glow CSS into document head once — Monaco decorations are real DOM nodes
-// so a regular stylesheet reaches them.
+type TabKey = typeof TABS[number]["key"];
+
 let glowStyleInjected = false;
-function injectGlowStyle() {
+function injectGlowStyle(): void {
   if (glowStyleInjected) return;
   glowStyleInjected = true;
   const el = document.createElement("style");
@@ -32,9 +44,18 @@ function injectGlowStyle() {
   document.head.appendChild(el);
 }
 
-// ── Element Tree (renders in the Tree tab) ────────────────────────────────────
+// ── Element Tree ──────────────────────────────────────────────────────────────
 
-function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedIds, onToggleMultiSelect }) {
+interface TreeProps {
+  elements: LabElement[];
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+  onDelete: (id: string) => void;
+  multiSelectedIds: string[];
+  onToggleMultiSelect: (id: string) => void;
+}
+
+function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedIds, onToggleMultiSelect }: TreeProps) {
   return (
     <div className={styles.codeTreePanel}>
       <button
@@ -59,7 +80,12 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
   );
 }
 
-function TreeBranch({ elements, selectedId, onSelect, onDelete, parentId, depth, multiSelectedIds, onToggleMultiSelect }) {
+interface BranchProps extends TreeProps {
+  parentId: string | null;
+  depth: number;
+}
+
+function TreeBranch({ elements, selectedId, onSelect, onDelete, parentId, depth, multiSelectedIds, onToggleMultiSelect }: BranchProps) {
   const children = (elements || [])
     .filter(e => (e.parentId ?? null) === (parentId ?? null))
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -110,7 +136,9 @@ function TreeBranch({ elements, selectedId, onSelect, onDelete, parentId, depth,
 
 // ── Range finders ─────────────────────────────────────────────────────────────
 
-function findHtmlRanges(text, selectedId) {
+interface LineRange { start: number; end: number; }
+
+function findHtmlRanges(text: string, selectedId: string): LineRange[] {
   const lines = text.split("\n");
   const marker = `data-lab-id="${selectedId}"`;
 
@@ -120,12 +148,10 @@ function findHtmlRanges(text, selectedId) {
   }
   if (openLine === -1) return [];
 
-  // Self-closing tag — single line
   if (lines[openLine].trimEnd().endsWith("/>")) {
     return [{ start: openLine + 1, end: openLine + 1 }];
   }
 
-  // Extract the tag name so we can match its closing tag
   const tagMatch = lines[openLine].match(/<(\w[\w-]*)/);
   if (!tagMatch) return [{ start: openLine + 1, end: openLine + 1 }];
   const tagName = tagMatch[1];
@@ -133,26 +159,22 @@ function findHtmlRanges(text, selectedId) {
   const openRe  = new RegExp(`<${tagName}[\\s>/]`);
   const closeRe = new RegExp(`</${tagName}>`);
 
-  let depth   = 0;
+  let depth     = 0;
   let closeLine = openLine;
 
   for (let i = openLine; i < lines.length; i++) {
-    const line = lines[i];
-    // Count opens and closes on this line
+    const line  = lines[i];
     const opens  = (line.match(openRe)  || []).length;
     const closes = (line.match(closeRe) || []).length;
     depth += opens - closes;
-    if (depth <= 0 && i >= openLine) {
-      closeLine = i;
-      break;
-    }
+    if (depth <= 0 && i >= openLine) { closeLine = i; break; }
   }
 
   return [{ start: openLine + 1, end: closeLine + 1 }];
 }
 
-function findCssRanges(text, selectedId) {
-  const lines = text.split("\n");
+function findCssRanges(text: string, selectedId: string): LineRange[] {
+  const lines  = text.split("\n");
   const marker = `[data-lab-id="${selectedId}"]`;
 
   let startLine = -1;
@@ -162,7 +184,7 @@ function findCssRanges(text, selectedId) {
   if (startLine === -1) return [];
 
   let endLine = startLine;
-  let depth = 0;
+  let depth   = 0;
   for (let i = startLine; i < lines.length; i++) {
     const opens  = (lines[i].match(/\{/g) || []).length;
     const closes = (lines[i].match(/\}/g) || []).length;
@@ -174,15 +196,15 @@ function findCssRanges(text, selectedId) {
   return [{ start: startLine + 1, end: endLine + 1 }];
 }
 
-function findJsRanges(text, selectedId) {
+function findJsRanges(text: string, selectedId: string): LineRange[] {
   const lines = text.split("\n");
-  return lines.reduce((acc, line, i) => {
+  return lines.reduce<LineRange[]>((acc, line, i) => {
     if (line.includes(selectedId)) acc.push({ start: i + 1, end: i + 1 });
     return acc;
   }, []);
 }
 
-function findRanges(text, selectedId, tab) {
+function findRanges(text: string, selectedId: string, tab: string): LineRange[] {
   if (!text || !selectedId) return [];
   if (tab === "html")       return findHtmlRanges(text, selectedId);
   if (tab === "css")        return findCssRanges(text, selectedId);
@@ -191,6 +213,22 @@ function findRanges(text, selectedId, tab) {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
+
+interface CodePanelProps {
+  html: string;
+  css: string;
+  javascript: string;
+  width: string | number;
+  selectedId: string | null;
+  elements: LabElement[];
+  multiSelectedIds: string[];
+  onHtmlChange: (val: string) => void;
+  onCssChange: (val: string) => void;
+  onJavascriptChange: (val: string) => void;
+  onSelectElement: (id: string | null) => void;
+  onToggleMultiSelect: (id: string) => void;
+  onDeleteElement: (id: string) => void;
+}
 
 export default function CodePanel({
   html,
@@ -206,47 +244,45 @@ export default function CodePanel({
   onSelectElement,
   onToggleMultiSelect,
   onDeleteElement,
-}) {
-  const C = useThemeColors();
-  const { themeStyles } = useGlobalTheme();
-  const monacoTheme = themeStyles?.monaco || (C.isDark ? "vs-dark" : "vs");
+}: CodePanelProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const C: any = useThemeColors();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { themeStyles }: any = useGlobalTheme();
+  const monacoTheme: string = themeStyles?.monaco || (C.isDark ? "openmat-dark" : "openmat-light");
 
-  const debounceRef    = useRef(null);
-  const editorRef      = useRef(null);
-  const monacoRef      = useRef(null);
-  const decorationsRef = useRef([]);
+  const debounceRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editorRef      = useRef<MonacoEditor | null>(null);
+  const monacoRef      = useRef<MonacoApi | null>(null);
+  const decorationsRef = useRef<string[]>([]);
   const isFocused      = useRef(false);
-  const [activeTab, setActiveTab] = useState("html");
+  const [activeTab, setActiveTab] = useState<TabKey>("html");
 
-  const sources  = { html, css, javascript };
-  const handlers = { html: onHtmlChange, css: onCssChange, javascript: onJavascriptChange };
+  const sources: Record<string, string>                     = { html, css, javascript };
+  const handlers: Record<string, (val: string) => void>    = { html: onHtmlChange, css: onCssChange, javascript: onJavascriptChange };
   const activeSource   = sources[activeTab]   ?? "";
   const activeLanguage = TABS.find((t) => t.key === activeTab)?.language || "html";
 
-  // Push new content into Monaco when canvas changes (skip while user is typing)
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor || isFocused.current) return;
     if (editor.getValue() !== activeSource) editor.setValue(activeSource);
   }, [activeSource]);
 
-  // Push theme changes into the live editor without remounting
   useEffect(() => {
     monacoRef.current?.editor.setTheme(monacoTheme);
   }, [monacoTheme]);
 
-  // ── Decoration: apply / clear whenever selection or tab changes ─────────────
   useEffect(() => {
     applyDecorations();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId, activeTab]);
 
-  function applyDecorations() {
+  function applyDecorations(): void {
     const editor = editorRef.current;
     const monaco = monacoRef.current;
     if (!editor || !monaco) return;
 
-    // Clear existing
     decorationsRef.current = editor.deltaDecorations(decorationsRef.current, []);
 
     if (!selectedId) return;
@@ -269,12 +305,10 @@ export default function CodePanel({
     }));
 
     decorationsRef.current = editor.deltaDecorations([], newDecorations);
-
-    // Scroll to the first highlighted line, centred
     editor.revealLineInCenter(ranges[0].start, monaco.editor.ScrollType.Smooth);
   }
 
-  const handleMount = (editor, monaco) => {
+  const handleMount: OnMount = (editor, monaco) => {
     editorRef.current  = editor;
     monacoRef.current  = monaco;
     injectGlowStyle();
@@ -283,21 +317,18 @@ export default function CodePanel({
     editor.onDidFocusEditorText(() => { isFocused.current = true;  });
     editor.onDidBlurEditorText(()  => { isFocused.current = false; });
 
-    // Apply initial highlight if something is already selected
     setTimeout(applyDecorations, 0);
   };
 
-  const switchTab = (tab) => {
+  const switchTab = (tab: TabKey): void => {
     if (tab === activeTab) return;
-    clearTimeout(debounceRef.current);
-    // Save editor content only when leaving a code tab (not the tree tab)
+    if (debounceRef.current !== null) clearTimeout(debounceRef.current);
     if (activeTab !== "tree") {
       const editor = editorRef.current;
       if (editor) handlers[activeTab]?.(editor.getValue());
     }
     isFocused.current = false;
     setActiveTab(tab);
-    // Reload Monaco only when switching to a code tab
     if (tab !== "tree") {
       requestAnimationFrame(() => {
         const nextEditor = editorRef.current;
@@ -306,8 +337,8 @@ export default function CodePanel({
     }
   };
 
-  const handleChange = (val) => {
-    clearTimeout(debounceRef.current);
+  const handleChange = (val: string | undefined): void => {
+    if (debounceRef.current !== null) clearTimeout(debounceRef.current);
     const tab = activeTab;
     debounceRef.current = setTimeout(() => {
       handlers[tab]?.(val ?? "");
@@ -343,7 +374,7 @@ export default function CodePanel({
         ) : (
           <Editor
             key={activeTab}
-            defaultLanguage={activeLanguage}
+            defaultLanguage={activeLanguage ?? "html"}
             theme={monacoTheme}
             options={{
               fontSize: 12,
@@ -365,6 +396,7 @@ export default function CodePanel({
                 horizontalScrollbarSize: 6,
               },
             }}
+            beforeMount={setupOpenCalcMonaco}
             onMount={handleMount}
             onChange={handleChange}
           />

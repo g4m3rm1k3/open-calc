@@ -1,160 +1,66 @@
-// ─── Default styles per tag ──────────────────────────────────────────────────
-const TAG_DEFAULTS = {
-  div: {
-    padding: "24px",
-    margin: "0 0 16px 0",
-    border: "1px dashed #cbd5e1",
-    borderRadius: "8px",
-    minHeight: "60px",
-    display: "block",
-  },
-  p: {
-    fontSize: "16px",
-    color: "#475569",
-    lineHeight: "1.6",
-    margin: "0 0 16px 0",
-    display: "block",
-  },
-  h1: {
-    fontSize: "40px",
-    fontWeight: "700",
-    margin: "0 0 24px 0",
-    lineHeight: "1.2",
-    display: "block",
-  },
-  h2: {
-    fontSize: "32px",
-    fontWeight: "600",
-    margin: "0 0 16px 0",
-    lineHeight: "1.3",
-    display: "block",
-  },
-  h3: {
-    fontSize: "24px",
-    fontWeight: "600",
-    margin: "0 0 16px 0",
-    lineHeight: "1.4",
-    display: "block",
-  },
-  button: {
-    padding: "10px 20px",
-    backgroundColor: "#f1f5f9",
-    color: "#0f172a",
-    border: "1px solid #e2e8f0",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontWeight: "500",
-    cursor: "pointer",
-    display: "inline-block",
-    margin: "0 8px 0 0",
-  },
-  span: {
-    display: "inline",
-    color: "inherit",
-  },
-  img: {
-    width: "100%",
-    maxWidth: "400px",
-    height: "auto",
-    backgroundColor: "#f1f5f9",
-    borderRadius: "8px",
-    display: "block",
-    margin: "0 0 16px 0",
-  },
-  ul: {
-    padding: "0 0 0 24px",
-    margin: "0 0 16px 0",
-    display: "block",
-    color: "#475569",
-  },
-  li: {
-    fontSize: "16px",
-    lineHeight: "1.6",
-    display: "list-item",
-    margin: "0 0 8px 0",
-  },
-  a: {
-    color: "#3b82f6",
-    textDecoration: "underline",
-    display: "inline",
-    cursor: "pointer",
-  },
-  section: {
-    padding: "48px 24px",
-    margin: "0",
-    display: "block",
-    minHeight: "100px",
-    backgroundColor: "transparent",
-  },
-  article: {
-    padding: "32px",
-    margin: "0 0 24px 0",
-    backgroundColor: "#ffffff",
-    border: "1px solid #e2e8f0",
-    borderRadius: "12px",
-    display: "block",
-  },
-  header: {
-    padding: "24px",
-    margin: "0",
-    backgroundColor: "#ffffff",
-    borderBottom: "1px solid #e2e8f0",
-    display: "block",
-  },
-  footer: {
-    padding: "32px 24px",
-    margin: "0",
-    backgroundColor: "#f8fafc",
-    borderTop: "1px solid #e2e8f0",
-    display: "block",
-  },
+import type { Action, LabElement, LabPage, LabState } from "./types";
+
+// ─── Default styles per tag ───────────────────────────────────────────────────
+const TAG_DEFAULTS: Record<string, Record<string, string>> = {
+  div:     { padding: "24px", margin: "0 0 16px 0", border: "1px dashed #cbd5e1", borderRadius: "8px", minHeight: "60px", display: "block" },
+  p:       { fontSize: "16px", color: "#475569", lineHeight: "1.6", margin: "0 0 16px 0", display: "block" },
+  h1:      { fontSize: "40px", fontWeight: "700", margin: "0 0 24px 0", lineHeight: "1.2", display: "block" },
+  h2:      { fontSize: "32px", fontWeight: "600", margin: "0 0 16px 0", lineHeight: "1.3", display: "block" },
+  h3:      { fontSize: "24px", fontWeight: "600", margin: "0 0 16px 0", lineHeight: "1.4", display: "block" },
+  button:  { padding: "10px 20px", backgroundColor: "#f1f5f9", color: "#0f172a", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "14px", fontWeight: "500", cursor: "pointer", display: "inline-block", margin: "0 8px 0 0" },
+  span:    { display: "inline", color: "inherit" },
+  img:     { width: "100%", maxWidth: "400px", height: "auto", backgroundColor: "#f1f5f9", borderRadius: "8px", display: "block", margin: "0 0 16px 0" },
+  ul:      { padding: "0 0 0 24px", margin: "0 0 16px 0", display: "block", color: "#475569" },
+  li:      { fontSize: "16px", lineHeight: "1.6", display: "list-item", margin: "0 0 8px 0" },
+  a:       { color: "#3b82f6", textDecoration: "underline", display: "inline", cursor: "pointer" },
+  section: { padding: "48px 24px", margin: "0", display: "block", minHeight: "100px", backgroundColor: "transparent" },
+  article: { padding: "32px", margin: "0 0 24px 0", backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", display: "block" },
+  header:  { padding: "24px", margin: "0", backgroundColor: "#ffffff", borderBottom: "1px solid #e2e8f0", display: "block" },
+  footer:  { padding: "32px 24px", margin: "0", backgroundColor: "#f8fafc", borderTop: "1px solid #e2e8f0", display: "block" },
+  nav:     { padding: "16px 24px", margin: "0", display: "flex", alignItems: "center", gap: "16px", backgroundColor: "transparent" },
+  ol:      { padding: "0 0 0 24px", margin: "0 0 16px 0", display: "block", color: "#475569" },
+  hr:      { border: "none", borderTop: "1px solid #e2e8f0", margin: "16px 0" },
+  blockquote: { margin: "0 0 16px 0", padding: "8px 20px", borderLeft: "4px solid #cbd5e1", color: "#475569", fontStyle: "italic", display: "block" },
+  pre:     { margin: "0 0 16px 0", padding: "16px", backgroundColor: "#0f172a", color: "#f8fafc", borderRadius: "8px", fontFamily: "monospace", fontSize: "14px", overflow: "auto", display: "block" },
+  code:    { fontFamily: "monospace", fontSize: "14px", backgroundColor: "#f1f5f9", padding: "2px 6px", borderRadius: "4px", display: "inline" },
+  label:   { fontSize: "14px", fontWeight: "500", color: "#0f172a", display: "block", margin: "0 0 4px 0", cursor: "pointer" },
+  video:   { width: "100%", maxWidth: "480px", backgroundColor: "#0f172a", borderRadius: "8px", display: "block", margin: "0 0 16px 0" },
+  audio:   { width: "100%", maxWidth: "400px", display: "block", margin: "0 0 16px 0" },
 };
 
-const TAG_CONTENT = {
-  div: "",
-  p: "Paragraph text",
-  h1: "Heading 1",
-  h2: "Heading 2",
-  h3: "Heading 3",
-  button: "Click me",
-  span: "Span text",
-  img: "",
-  ul: "",
-  li: "List item",
-  a: "Link text",
-  section: "",
-  article: "",
-  header: "",
-  footer: "",
+const TAG_CONTENT: Record<string, string> = {
+  div: "", p: "Paragraph text", h1: "Heading 1", h2: "Heading 2", h3: "Heading 3",
+  button: "Click me", span: "Span text", img: "", ul: "", li: "List item",
+  a: "Link text", section: "", article: "", header: "", footer: "",
+  nav: "", ol: "", hr: "", blockquote: "The best way to predict the future is to invent it.",
+  pre: "console.log(\"Hello, world!\");", code: "code", label: "Label text",
+  video: "", audio: "",
 };
 
-const TAG_ATTRS = {
-  a: { href: "#", target: "" },
-  img: { src: "", alt: "Image" },
+const TAG_ATTRS: Record<string, Record<string, string>> = {
+  a:      { href: "#", target: "" },
+  img:    { src: "", alt: "Image" },
   button: { type: "button" },
+  video:  { controls: "true" },
+  audio:  { controls: "true" },
 };
 
-// Tags that can contain children
 export const CONTAINER_TAGS = new Set([
-  "div",
-  "section",
-  "article",
-  "header",
-  "footer",
-  "nav",
-  "ul",
-  "li",
-  "p",
-  "span",
+  "div", "section", "article", "header", "footer", "nav", "ul", "ol", "li", "p", "span",
+  // Table structure — without these, an imported <table>'s <thead>/<tr>/<th> children
+  // are silently dropped (they're not text content, and only container tags render children).
+  "table", "thead", "tbody", "tfoot", "tr", "th", "td",
+  "form", "fieldset", "figure", "figcaption", "dl", "dt", "dd",
+  "main", "aside", "blockquote", "details", "summary",
 ]);
 
 let _idCounter = 1;
-function genId() {
+function genId(): string {
   return "el" + _idCounter++;
 }
 
 // ─── Initial state ────────────────────────────────────────────────────────────
-export const initialState = {
+export const initialState: LabState = {
   elements: [],
   selectedId: null,
   showOverlay: false,
@@ -171,25 +77,23 @@ export const initialState = {
     margin: "0",
     padding: "0",
   },
-  // Multi-page
   mode: "single",
   pages: [],
   activePageId: null,
-  // CDN libraries
   cdnLinks: [],
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function cloneElements(elements) {
-  return JSON.parse(JSON.stringify(elements));
+function cloneElements(elements: LabElement[]): LabElement[] {
+  return JSON.parse(JSON.stringify(elements)) as LabElement[];
 }
 
-function withHistory(state) {
+function withHistory(state: LabState): LabState {
   const history = [...state.history, cloneElements(state.elements)];
   return { ...state, history: history.slice(-40) };
 }
 
-function saveActivePage(state) {
+function saveActivePage(state: LabState): LabPage[] {
   if (state.mode !== "multi" || !state.activePageId) return state.pages;
   return state.pages.map((p) =>
     p.id === state.activePageId
@@ -198,7 +102,7 @@ function saveActivePage(state) {
   );
 }
 
-function blankPage(name, index) {
+function blankPage(name: string, index: number): LabPage {
   return {
     id: "pg" + (Date.now() + index),
     name,
@@ -217,12 +121,11 @@ function blankPage(name, index) {
   };
 }
 
-// Get all descendant IDs of a given element
-function getDescendants(elements, id) {
-  const result = new Set();
+function getDescendants(elements: LabElement[], id: string): Set<string> {
+  const result = new Set<string>();
   const queue = [id];
   while (queue.length) {
-    const cur = queue.shift();
+    const cur = queue.shift()!;
     const children = elements.filter((e) => e.parentId === cur);
     for (const c of children) {
       result.add(c.id);
@@ -233,7 +136,7 @@ function getDescendants(elements, id) {
 }
 
 // ─── Dark/light cascade helpers ───────────────────────────────────────────────
-function hexLum(hex) {
+function hexLum(hex: string): number {
   if (!hex || !hex.startsWith("#") || hex.length < 7) return 0.5;
   const r = parseInt(hex.slice(1, 3), 16) / 255;
   const g = parseInt(hex.slice(3, 5), 16) / 255;
@@ -241,8 +144,7 @@ function hexLum(hex) {
   return 0.299 * r + 0.587 * g + 0.114 * b;
 }
 
-// Returns saturation (0–1) for a hex color — high saturation = brand/accent color, skip swapping
-function hexSat(hex) {
+function hexSat(hex: string): number {
   if (!hex || !hex.startsWith("#") || hex.length < 7) return 1;
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -251,23 +153,49 @@ function hexSat(hex) {
   return max === 0 ? 0 : (max - Math.min(r, g, b)) / max;
 }
 
-// Cascade body theme change to all child elements.
-// Uses luminance + saturation: only swaps neutral greys/near-whites/near-blacks.
-// Brand/accent colors (blues, greens, reds — high saturation) are left untouched.
-function cascadeBodyTheme(elements, newBodyStyles) {
+function cascadeBodyTheme(elements: LabElement[], newBodyStyles: Record<string, string>): LabElement[] {
   const rawBg = newBodyStyles.backgroundColor || newBodyStyles.background || "";
-  if (!rawBg.startsWith("#")) return elements; // gradient — skip
+  if (!rawBg.startsWith("#")) return elements;
 
   const goingDark = hexLum(rawBg) < 0.35;
-  const primaryText = goingDark ? "#f8fafc" : "#0f172a";
+  const primaryText   = goingDark ? "#f8fafc" : "#0f172a";
   const secondaryText = goingDark ? "#94a3b8" : "#64748b";
+
+  const byId = new Map(elements.map((e) => [e.id, e]));
+  // A background is "neutral" (safe to repaint / safe to assume text can be
+  // recolored against it) only when it's a plain low-saturation hex color.
+  // Anything else set at all — a gradient, rgba(), a CSS var, etc. via the
+  // `background` shorthand — is opaque to this heuristic, so treat it as non-neutral.
+  const isNeutralBg = (bg?: string): boolean =>
+    !bg || (bg.startsWith("#") && bg.length >= 7 && hexSat(bg) < 0.20);
+  const ownBgValue = (el: LabElement): string | undefined => el.styles.backgroundColor || el.styles.background;
+
+  // The background an element actually sits on: its own, if set, otherwise the
+  // nearest ancestor's explicit background, otherwise the body itself.
+  function effectiveBg(el: LabElement): string | undefined {
+    const own = ownBgValue(el);
+    if (own) return own;
+    let cur = el.parentId ? byId.get(el.parentId) : undefined;
+    while (cur) {
+      const curBg = ownBgValue(cur);
+      if (curBg) return curBg;
+      cur = cur.parentId ? byId.get(cur.parentId) : undefined;
+    }
+    return rawBg;
+  }
 
   return elements.map((el) => {
     const s = { ...el.styles };
     let changed = false;
 
-    // Swap text color if it's a neutral (low-sat) color on the wrong end of the luminance scale
-    if (s.color && s.color.startsWith("#") && s.color.length >= 7 && hexSat(s.color) < 0.25) {
+    // Only recolor an element's background if it's neutral enough to safely
+    // repaint. Only recolor its text if the background it actually sits on
+    // (own, or inherited from an ancestor) is neutral too — otherwise text and
+    // backdrop end up mismatched (e.g. dark text stranded on an unchanged navy card).
+    const ownBgIsNeutral = isNeutralBg(ownBgValue(el));
+    const sittingBgIsNeutral = isNeutralBg(effectiveBg(el));
+
+    if (sittingBgIsNeutral && s.color && s.color.startsWith("#") && s.color.length >= 7 && hexSat(s.color) < 0.25) {
       const lum = hexLum(s.color);
       if (goingDark && lum < 0.40) {
         s.color = lum < 0.20 ? primaryText : secondaryText;
@@ -278,8 +206,7 @@ function cascadeBodyTheme(elements, newBodyStyles) {
       }
     }
 
-    // Swap background color if neutral and on the wrong end
-    if (s.backgroundColor && s.backgroundColor.startsWith("#") && s.backgroundColor.length >= 7 && hexSat(s.backgroundColor) < 0.20) {
+    if (ownBgIsNeutral && s.backgroundColor) {
       const lum = hexLum(s.backgroundColor);
       if (goingDark && lum > 0.60) {
         s.backgroundColor = lum > 0.95 ? "#1e293b" : lum > 0.85 ? "#0f172a" : "#334155";
@@ -295,12 +222,11 @@ function cascadeBodyTheme(elements, newBodyStyles) {
 }
 
 // ─── Reducer ──────────────────────────────────────────────────────────────────
-export function labReducer(state, action) {
+export function labReducer(state: LabState, action: Action): LabState {
   switch (action.type) {
     case "LOAD_EXAMPLE": {
       const s = withHistory(state);
-      // Multi-page example
-      if (action.payload.pages) {
+      if ("pages" in action.payload) {
         const first = action.payload.pages[0];
         return {
           ...s,
@@ -315,7 +241,6 @@ export function labReducer(state, action) {
           selectedId: null,
         };
       }
-      // Single-page example
       return {
         ...s,
         elements: action.payload.elements,
@@ -342,14 +267,12 @@ export function labReducer(state, action) {
 
     case "APPLY_GLOBAL_THEME": {
       const s = withHistory(state);
-
       let newElements = [...s.elements];
       for (const update of action.payload.updates) {
         newElements = newElements.map(el =>
-          el.id === update.id ? { ...el, styles: { ...el.styles, ...update.styles } } : el
+          el.id === update.id ? { ...el, styles: { ...el.styles, ...update.styles } } : el,
         );
       }
-
       return {
         ...s,
         bodyStyles: action.payload.bodyStyles
@@ -362,15 +285,11 @@ export function labReducer(state, action) {
     case "ADD_ELEMENT": {
       const s = withHistory(state);
       const tag = action.payload;
-
-      // If a container element is selected, add inside it; otherwise add to root
       const selectedEl = s.selectedId ? s.elements.find(e => e.id === s.selectedId) : null;
       const parentId = (selectedEl && CONTAINER_TAGS.has(selectedEl.tag)) ? selectedEl.id : null;
-
       const siblings = s.elements.filter(e => (e.parentId ?? null) === parentId);
       const maxOrder = siblings.reduce((m, e) => Math.max(m, e.order ?? 0), -1);
-
-      const el = {
+      const el: LabElement = {
         id: genId(),
         tag,
         attrs: { id: "", class: "", ...(TAG_ATTRS[tag] || {}) },
@@ -385,14 +304,11 @@ export function labReducer(state, action) {
 
     case "DELETE_ELEMENT": {
       const s = withHistory(state);
-      const toDelete = new Set([
-        action.payload,
-        ...getDescendants(s.elements, action.payload),
-      ]);
+      const toDelete = new Set([action.payload, ...getDescendants(s.elements, action.payload)]);
       return {
         ...s,
         elements: s.elements.filter((e) => !toDelete.has(e.id)),
-        selectedId: toDelete.has(state.selectedId) ? null : state.selectedId,
+        selectedId: (state.selectedId !== null && toDelete.has(state.selectedId)) ? null : state.selectedId,
       };
     }
 
@@ -402,38 +318,32 @@ export function labReducer(state, action) {
     case "PUSH_HISTORY":
       return withHistory(state);
 
-    // Nest element inside a container, at a given position (order)
     case "NEST_ELEMENT": {
       const { childId, parentId, order } = action.payload;
       if (childId === parentId) return state;
       const descendants = getDescendants(state.elements, childId);
-      if (descendants.has(parentId)) return state; // would be circular
+      if (descendants.has(parentId)) return state;
       const parent = state.elements.find((e) => e.id === parentId);
       if (!parent || !CONTAINER_TAGS.has(parent.tag)) return state;
 
       const s = withHistory(state);
-      // Shift siblings to make room
       const siblings = s.elements
         .filter((e) => e.parentId === parentId && e.id !== childId)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       const targetOrder = order ?? siblings.length;
-      const reordered = siblings.map((e, i) => ({
-        ...e,
-        order: i >= targetOrder ? i + 1 : i,
-      }));
+      const reordered = siblings.map((e, i) => ({ ...e, order: i >= targetOrder ? i + 1 : i }));
 
       return {
         ...s,
         elements: s.elements.map((e) => {
           if (e.id === childId) return { ...e, parentId, order: targetOrder };
           const r = reordered.find((r) => r.id === e.id);
-          return r || e;
+          return r ?? e;
         }),
         selectedId: childId,
       };
     }
 
-    // Move element to root or different parent
     case "MOVE_TO_ROOT": {
       const { id, order } = action.payload;
       const s = withHistory(state);
@@ -441,21 +351,17 @@ export function labReducer(state, action) {
         .filter((e) => !e.parentId && e.id !== id)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       const targetOrder = order ?? rootEls.length;
-      const reordered = rootEls.map((e, i) => ({
-        ...e,
-        order: i >= targetOrder ? i + 1 : i,
-      }));
+      const reordered = rootEls.map((e, i) => ({ ...e, order: i >= targetOrder ? i + 1 : i }));
       return {
         ...s,
         elements: s.elements.map((e) => {
           if (e.id === id) return { ...e, parentId: null, order: targetOrder };
           const r = reordered.find((r) => r.id === e.id);
-          return r || e;
+          return r ?? e;
         }),
       };
     }
 
-    // Reorder within same parent
     case "REORDER_ELEMENT": {
       const { id, parentId, order } = action.payload;
       const s = withHistory(state);
@@ -463,17 +369,13 @@ export function labReducer(state, action) {
         .filter((e) => e.parentId === (parentId || null) && e.id !== id)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       const targetOrder = Math.max(0, Math.min(order, siblings.length));
-      const reordered = siblings.map((e, i) => ({
-        ...e,
-        order: i >= targetOrder ? i + 1 : i,
-      }));
+      const reordered = siblings.map((e, i) => ({ ...e, order: i >= targetOrder ? i + 1 : i }));
       return {
         ...s,
         elements: s.elements.map((e) => {
-          if (e.id === id)
-            return { ...e, parentId: parentId || null, order: targetOrder };
+          if (e.id === id) return { ...e, parentId: parentId || null, order: targetOrder };
           const r = reordered.find((r) => r.id === e.id);
-          return r || e;
+          return r ?? e;
         }),
       };
     }
@@ -483,12 +385,7 @@ export function labReducer(state, action) {
       return {
         ...state,
         elements: state.elements.map((e) =>
-          e.id === id
-            ? {
-                ...e,
-                styles: { ...e.styles, width: w + "px", height: h + "px" },
-              }
-            : e,
+          e.id === id ? { ...e, styles: { ...e.styles, width: w + "px", height: h + "px" } } : e,
         ),
       };
     }
@@ -523,17 +420,15 @@ export function labReducer(state, action) {
       };
     }
 
-    case "APPLY_PRESET": {
-      const presetStyles = action.payload;
+    case "APPLY_PRESET":
       return {
         ...state,
         elements: state.elements.map((e) =>
           e.id === state.selectedId
-            ? { ...e, styles: { ...e.styles, ...presetStyles } }
+            ? { ...e, styles: { ...e.styles, ...action.payload } }
             : e,
         ),
       };
-    }
 
     case "ADD_MEDIA_QUERY": {
       const { breakpoint, prop, value } = action.payload;
@@ -541,13 +436,7 @@ export function labReducer(state, action) {
         ...state,
         elements: state.elements.map((e) => {
           if (e.id !== state.selectedId) return e;
-          return {
-            ...e,
-            mediaQueries: [
-              ...(e.mediaQueries || []),
-              { breakpoint, prop, value },
-            ],
-          };
+          return { ...e, mediaQueries: [...(e.mediaQueries || []), { breakpoint, prop, value }] };
         }),
       };
     }
@@ -558,8 +447,7 @@ export function labReducer(state, action) {
         ...state,
         elements: state.elements.map((e) => {
           if (e.id !== state.selectedId) return e;
-          const mqs = (e.mediaQueries || []).filter((_, i) => i !== index);
-          return { ...e, mediaQueries: mqs };
+          return { ...e, mediaQueries: (e.mediaQueries || []).filter((_, i) => i !== index) };
         }),
       };
     }
@@ -598,14 +486,8 @@ export function labReducer(state, action) {
     case "SET_FROM_CODE": {
       const s = withHistory(state);
       const nextElements = action.payload;
-      const selectedStillExists = nextElements.some(
-        (el) => el.id === state.selectedId,
-      );
-      return {
-        ...s,
-        elements: nextElements,
-        selectedId: selectedStillExists ? state.selectedId : null,
-      };
+      const selectedStillExists = nextElements.some((el) => el.id === state.selectedId);
+      return { ...s, elements: nextElements, selectedId: selectedStillExists ? state.selectedId : null };
     }
 
     case "UPDATE_BODY_STYLE": {
@@ -627,16 +509,10 @@ export function labReducer(state, action) {
     }
 
     case "SET_JAVASCRIPT":
-      return {
-        ...state,
-        javascript: action.payload,
-      };
+      return { ...state, javascript: action.payload };
 
     case "SET_CUSTOM_CSS":
-      return {
-        ...state,
-        customCss: action.payload,
-      };
+      return { ...state, customCss: action.payload };
 
     case "TOGGLE_OVERLAY":
       return { ...state, showOverlay: !state.showOverlay };
@@ -644,44 +520,39 @@ export function labReducer(state, action) {
     case "TOGGLE_LABELS":
       return { ...state, showLabels: !state.showLabels };
 
-    // Insert a component template — remaps all template IDs to fresh ones.
-    // Payload: { template: el[], autoTheme?: themeObject } or bare el[] (legacy)
     case "INSERT_TEMPLATE": {
       const s = withHistory(state);
       const templateElements = Array.isArray(action.payload) ? action.payload : action.payload.template;
-      const autoTheme = Array.isArray(action.payload) ? null : action.payload.autoTheme;
+      const autoTheme = Array.isArray(action.payload) ? null : (action.payload.autoTheme ?? null);
 
-      // If a container is selected, insert inside it; otherwise insert at root
       const selectedEl = s.selectedId ? s.elements.find(e => e.id === s.selectedId) : null;
       const insertParentId = (selectedEl && CONTAINER_TAGS.has(selectedEl.tag)) ? selectedEl.id : null;
 
-      const idMap = new Map();
+      const idMap = new Map<string, string>();
       templateElements.forEach(el => idMap.set(el.id, genId()));
 
       const rootOffset = s.elements
         .filter(e => (e.parentId ?? null) === insertParentId)
         .reduce((m, e) => Math.max(m, e.order ?? 0), -1) + 1;
 
-      let newElements = templateElements.map(el => ({
+      let newElements: LabElement[] = templateElements.map(el => ({
         ...el,
-        id: idMap.get(el.id),
-        parentId: el.parentId ? idMap.get(el.parentId) : insertParentId,
-        order: el.parentId ? el.order : el.order + rootOffset,
+        id: idMap.get(el.id)!,
+        parentId: el.parentId ? (idMap.get(el.parentId) ?? insertParentId) : insertParentId,
+        order: el.parentId ? el.order : (el.order ?? 0) + rootOffset,
       }));
 
-      // Find the root element of this template (no template-parentId)
       const firstRoot = newElements.find(e => {
         const orig = templateElements.find(t => idMap.get(t.id) === e.id);
         return orig && !orig.parentId;
       });
 
-      // Auto-apply a theme to the inserted elements (e.g. dark theme on dark body)
       if (autoTheme && firstRoot) {
         const children = newElements
           .filter(e => e.parentId === firstRoot.id)
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-        const styleMap = new Map();
+        const styleMap = new Map<string, Record<string, string>>();
         if (autoTheme.parentStyles) styleMap.set(firstRoot.id, autoTheme.parentStyles);
         children.forEach((child, i) => {
           const indexStyles = autoTheme.childStylesByIndex?.[i];
@@ -703,7 +574,6 @@ export function labReducer(state, action) {
       };
     }
 
-    // Apply a component theme — merges styles onto matched elements
     case "APPLY_COMPONENT_THEME": {
       const { updates } = action.payload;
       return {
@@ -716,7 +586,6 @@ export function labReducer(state, action) {
       };
     }
 
-    // Apply a body theme — merges on top of existing and cascades colors to elements
     case "APPLY_BODY_THEME": {
       const s = withHistory(state);
       const newBodyStyles = { ...s.bodyStyles, ...action.payload };
@@ -725,7 +594,6 @@ export function labReducer(state, action) {
       return { ...s, bodyStyles: newBodyStyles, elements: newElements };
     }
 
-    // Hard-reset body styles back to defaults
     case "RESET_BODY_STYLES":
       return {
         ...state,
@@ -743,7 +611,7 @@ export function labReducer(state, action) {
     case "UNDO": {
       if (!state.history.length) return state;
       const history = [...state.history];
-      const elements = history.pop();
+      const elements = history.pop()!;
       return { ...state, elements, history, selectedId: null };
     }
 
@@ -752,19 +620,18 @@ export function labReducer(state, action) {
       return { ...s, elements: [], selectedId: null };
     }
 
-    // ── Multi-page ──────────────────────────────────────────────────────────────
     case "TOGGLE_MULTIPAGE": {
       if (state.mode === "single") {
-        const p1 = { id: "pg" + Date.now(), name: "Home", elements: state.elements, bodyStyles: state.bodyStyles, javascript: state.javascript, customCss: state.customCss };
+        const p1: LabPage = { id: "pg" + Date.now(), name: "Home", elements: state.elements, bodyStyles: state.bodyStyles, javascript: state.javascript, customCss: state.customCss };
         const p2 = blankPage("Page 2", 1);
         return { ...state, mode: "multi", pages: [p1, p2], activePageId: p1.id, history: [] };
       } else {
         const updatedPages = saveActivePage(state);
         const mergedElements = updatedPages.flatMap((p) => p.elements);
-        const mergedJs = updatedPages.map((p) => p.javascript).filter(Boolean).join("\n\n");
+        const mergedJs  = updatedPages.map((p) => p.javascript).filter(Boolean).join("\n\n");
         const mergedCss = updatedPages.map((p) => p.customCss).filter(Boolean).join("\n\n");
-        const first = updatedPages[0] || {};
-        return { ...state, mode: "single", pages: [], activePageId: null, elements: mergedElements, bodyStyles: first.bodyStyles || state.bodyStyles, javascript: mergedJs, customCss: mergedCss, selectedId: null, history: [] };
+        const first = updatedPages[0];
+        return { ...state, mode: "single", pages: [], activePageId: null, elements: mergedElements, bodyStyles: first?.bodyStyles ?? state.bodyStyles, javascript: mergedJs, customCss: mergedCss, selectedId: null, history: [] };
       }
     }
 
@@ -778,7 +645,7 @@ export function labReducer(state, action) {
 
     case "ADD_PAGE": {
       const updatedPages = saveActivePage(state);
-      const page = blankPage(action.payload || `Page ${updatedPages.length + 1}`, 0);
+      const page = blankPage(action.payload ?? `Page ${updatedPages.length + 1}`, 0);
       return { ...state, pages: [...updatedPages, page], activePageId: page.id, elements: page.elements, bodyStyles: page.bodyStyles, javascript: page.javascript, customCss: "", selectedId: null, history: [] };
     }
 
@@ -788,11 +655,11 @@ export function labReducer(state, action) {
       const idx = updatedPages.findIndex((p) => p.id === action.payload);
       const remaining = updatedPages.filter((p) => p.id !== action.payload);
       const needSwitch = action.payload === state.activePageId;
-      const newActive = needSwitch ? remaining[Math.max(0, idx - 1)] : null;
+      const newActive = needSwitch ? remaining[Math.max(0, idx - 1)] : undefined;
       return {
         ...state,
         pages: remaining,
-        ...(needSwitch ? {
+        ...(needSwitch && newActive ? {
           activePageId: newActive.id,
           elements: newActive.elements,
           bodyStyles: newActive.bodyStyles,
@@ -804,9 +671,13 @@ export function labReducer(state, action) {
       };
     }
 
-    case "RENAME_PAGE": {
-      return { ...state, pages: state.pages.map((p) => p.id === action.payload.id ? { ...p, name: action.payload.name } : p) };
-    }
+    case "RENAME_PAGE":
+      return {
+        ...state,
+        pages: state.pages.map((p) =>
+          p.id === action.payload.id ? { ...p, name: action.payload.name } : p,
+        ),
+      };
 
     default:
       return state;
