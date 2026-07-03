@@ -83,6 +83,14 @@ export default function EngMathReader({ content, title, slug, seriesNav, lessons
             </div>
           )}
 
+          {/* Scene Editor link */}
+          <button
+            onClick={() => navigate('/dev/scenes')}
+            className="text-xs px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            ✎ Scenes
+          </button>
+
           {/* Series navigation */}
           {seriesNav && (
             <div className="flex items-center gap-2">

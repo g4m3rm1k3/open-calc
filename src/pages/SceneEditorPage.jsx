@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import { SCENE_META } from '../components/eng-math/scenes/index.js'
-import { TUTORIALS } from '../data/canvasTutorials.js'
+import { SNIPPETS } from '../data/canvasSnippets.js'
+import { SERIES  } from '../data/canvasTutorialSeries.js'
 
 const API = '/api/dev-fs'
 const SCENES_DIR = 'src/components/eng-math/scenes'
@@ -589,18 +590,18 @@ function TutBlock({ block }) {
   }
 }
 
-function TutorialPanel({ onLoadCode }) {
+function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
   const [tutIdx, setTutIdx] = useState(0)
   const [stepIdx, setStepIdx] = useState(0)
 
-  const tutorial = TUTORIALS[tutIdx]
+  const tutorial = series[tutIdx]
   const step = tutorial.steps[stepIdx]
 
   return (
     <div className="flex flex-col" style={{ flex: 1, overflow: 'hidden', background: '#0d1117' }}>
       {/* Tutorial selector */}
       <div style={{ borderBottom: '1px solid #21262d', padding: '6px 10px', display: 'flex', gap: 6, flexShrink: 0 }}>
-        {TUTORIALS.map((t, i) => (
+        {series.map((t, i) => (
           <button
             key={t.id}
             onClick={() => { setTutIdx(i); setStepIdx(0) }}
@@ -665,17 +666,17 @@ function TutorialPanel({ onLoadCode }) {
             disabled={stepIdx === 0 && tutIdx === 0}
             onClick={() => {
               if (stepIdx > 0) { setStepIdx(s => s - 1) }
-              else if (tutIdx > 0) { setTutIdx(t => t - 1); setStepIdx(TUTORIALS[tutIdx - 1].steps.length - 1) }
+              else if (tutIdx > 0) { setTutIdx(t => t - 1); setStepIdx(series[tutIdx - 1].steps.length - 1) }
             }}
             style={{ fontSize: 10, padding: '4px 10px', borderRadius: 4, cursor: 'pointer', background: 'transparent', color: '#6e7681', border: '1px solid #30363d', opacity: (stepIdx === 0 && tutIdx === 0) ? 0.3 : 1 }}
           >
             ← Prev
           </button>
           <button
-            disabled={tutIdx === TUTORIALS.length - 1 && stepIdx === tutorial.steps.length - 1}
+            disabled={tutIdx === series.length - 1 && stepIdx === tutorial.steps.length - 1}
             onClick={() => {
               if (stepIdx < tutorial.steps.length - 1) { setStepIdx(s => s + 1) }
-              else if (tutIdx < TUTORIALS.length - 1) { setTutIdx(t => t + 1); setStepIdx(0) }
+              else if (tutIdx < series.length - 1) { setTutIdx(t => t + 1); setStepIdx(0) }
             }}
             style={{ fontSize: 10, padding: '4px 10px', borderRadius: 4, cursor: 'pointer', background: '#1f6feb22', color: '#58a6ff', border: '1px solid #1f6feb44' }}
           >
@@ -938,6 +939,7 @@ export default function SceneEditorPage() {
               { id: 'preview', label: 'Preview' },
               { id: 'properties', label: 'Properties' },
               { id: 'guide', label: 'Guide' },
+              { id: 'snippets', label: 'Snippets' },
               { id: 'tutorials', label: 'Tutorials' },
             ].map(tab => (
               <button
@@ -1008,8 +1010,21 @@ export default function SceneEditorPage() {
             />
           )}
 
+          {rightTab === 'snippets' && (
+            <TutorialPanel
+              onLoadCode={code => {
+                setSource(code)
+                editorRef.current?.setValue(code)
+                setPreviewDoc(buildPreviewDoc(code, isDark(), overlayGridRef.current))
+                setPreviewKey(k => k + 1)
+                setRightTab('preview')
+              }}
+            />
+          )}
+
           {rightTab === 'tutorials' && (
             <TutorialPanel
+              series={SERIES}
               onLoadCode={code => {
                 setSource(code)
                 editorRef.current?.setValue(code)
