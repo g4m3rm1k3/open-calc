@@ -5,6 +5,26 @@ import type { LabElement, BodyStyles } from "./types";
 
 const VOID_TAGS = new Set(["img", "br", "hr", "input"]);
 
+// Every element's real tag is wrapped in an administrative div (drag handle +
+// tag badge). Mirroring the element's own `display` onto that wrapper is only
+// correct for genuinely inline-flow values — it's what keeps e.g. inline <a>
+// tags sitting side by side instead of each forcing its own line. Mirroring a
+// shrink-to-fit *table* display instead breaks it: the wrapper becomes its
+// own zero-width-until-content table box with no width of its own, so a real
+// `<table style="width:100%">` inside it resolves 100% against that shrunk
+// wrapper and collapses to content width, stranded at the left — exactly the
+// "ignores the CSS, squished left in edit, fine in Preview" symptom. Same
+// trap for `display:none`: mirroring it would hide the wrapper (and its
+// select/drag handle) entirely, making a hidden element impossible to select
+// and un-hide in the editor. Blocklist-style allow only the inline values
+// that need it; everything else (block/flex/grid/table/table-*/none/unset)
+// falls back to a plain block wrapper — the real tag underneath still gets
+// its own actual `display` applied and lays out its own children normally.
+const INLINE_FLOW_DISPLAYS = new Set(["inline", "inline-block", "inline-flex", "inline-grid", "list-item"]);
+function wrapperDisplay(elDisplay: string | undefined): string {
+  return elDisplay && INLINE_FLOW_DISPLAYS.has(elDisplay) ? elDisplay : "block";
+}
+
 interface DropTarget {
   parentId: string | null;
   order: number;
@@ -157,7 +177,7 @@ export default function CanvasPanel({
           isDragging    ? styles.elDragging    : "",
           isInsideTarget? styles.elDropInside  : "",
         ].join(" ")}
-        style={{ display: el.styles.display || "block" }}
+        style={{ display: wrapperDisplay(el.styles.display) }}
         draggable
         onDragStart={(e) => handleDragStart(e, el)}
         onDragEnd={handleDragEnd}

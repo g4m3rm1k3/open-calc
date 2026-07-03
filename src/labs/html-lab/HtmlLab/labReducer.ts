@@ -240,6 +240,8 @@ function extractHexColors(value: string): string[] {
   return value.match(/#[0-9a-fA-F]{6}/g) ?? [];
 }
 
+const BORDER_SHORTHAND_PROPS = ["border", "borderTop", "borderRight", "borderBottom", "borderLeft", "outline", "boxShadow"] as const;
+
 // Real "page chrome" colors — light or dark — sit near the luminance extremes
 // (near-black, near-white); genuine accent/brand colors (a CTA blue, a badge
 // red) sit in the middle regardless of hue. Checking extremity instead of hue
@@ -341,6 +343,21 @@ function cascadeBodyTheme(elements: LabElement[], newBodyStyles: Record<string, 
       if (s.background) {
         const { next, changed: c } = remapNeutralBackground(s.background, goingDark);
         if (c) { s.background = next; changed = true; }
+      }
+    }
+
+    // Border/outline/shadow shorthands embed a color too (e.g. "2px solid
+    // #e2e8f0"), and it's independent of whatever the fill is doing — a plain
+    // table's whole color identity lives in borderBottom, with no
+    // backgroundColor at all, so without this it never budges on a mode
+    // toggle. Gated per-property on that property's own neutrality, not the
+    // element's background, since a neutral gray border can sit on a
+    // deliberately-unchanged accent fill.
+    for (const prop of BORDER_SHORTHAND_PROPS) {
+      const val = s[prop];
+      if (val && isNeutralBackground(val)) {
+        const { next, changed: c } = remapNeutralBackground(val, goingDark);
+        if (c) { s[prop] = next; changed = true; }
       }
     }
 

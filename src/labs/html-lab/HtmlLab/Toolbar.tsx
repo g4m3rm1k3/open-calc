@@ -50,7 +50,7 @@ export default function Toolbar({
       <div className={styles.toolbarSep} />
 
       <button
-        className={`${styles.tbBtn} ${previewMode ? styles.tbBtnPreview : ""}`}
+        className={`${styles.tbBtn} ${previewMode ? styles.tbBtnGoEdit : styles.tbBtnGoPreview}`}
         onClick={onTogglePreview}
         title={previewMode ? "Back to editor (Esc)" : "Preview with live JavaScript"}
       >
@@ -65,45 +65,14 @@ export default function Toolbar({
         {multiPageMode ? "⊟ Single page" : "⊞ Multi-page"}
       </button>
 
+      <div className={styles.toolbarSep} />
+
       <button
         className={styles.tbBtn}
         onClick={onImport}
         title="Import HTML, CSS, or JS files (select multiple to batch-import)"
       >
         ↑ Import
-      </button>
-
-      <button
-        className={`${styles.tbBtn} ${showLabels ? styles.tbBtnActive : ""}`}
-        onClick={onToggleLabels}
-        title="Show/hide element tag labels"
-      >
-        &lt;/&gt; Labels
-      </button>
-
-      <button
-        className={`${styles.tbBtn} ${showOverlay ? styles.tbBtnActive : ""}`}
-        onClick={onToggleOverlay}
-        title="Toggle box model overlay on selected element"
-      >
-        ⬜ Box model
-      </button>
-
-      <button
-        className={`${styles.tbBtn} ${styles.tbBtnDanger}`}
-        onClick={onNew}
-        title="Start a new blank project"
-      >
-        + New
-      </button>
-
-      <button
-        className={styles.tbBtn}
-        onClick={onUndo}
-        disabled={!canUndo}
-        title="Undo last action"
-      >
-        ↩ Undo
       </button>
 
       <button
@@ -123,6 +92,43 @@ export default function Toolbar({
         </button>
       )}
 
+      <div className={styles.toolbarSep} />
+
+      <button
+        className={`${styles.tbBtn} ${showLabels ? styles.tbBtnActive : ""}`}
+        onClick={onToggleLabels}
+        title="Show/hide element tag labels"
+      >
+        &lt;/&gt; Labels
+      </button>
+
+      <button
+        className={`${styles.tbBtn} ${showOverlay ? styles.tbBtnActive : ""}`}
+        onClick={onToggleOverlay}
+        title="Toggle box model overlay on selected element"
+      >
+        ⬜ Box model
+      </button>
+
+      <button
+        className={styles.tbBtn}
+        onClick={onUndo}
+        disabled={!canUndo}
+        title="Undo last action"
+      >
+        ↩ Undo
+      </button>
+
+      <div className={styles.toolbarSep} />
+
+      <button
+        className={`${styles.tbBtn} ${styles.tbBtnNew}`}
+        onClick={onNew}
+        title="Start a new blank project"
+      >
+        <span className={styles.newIcon}>+</span> New
+      </button>
+
       <button
         className={`${styles.tbBtn} ${styles.tbBtnDanger}`}
         onClick={onClear}
@@ -134,7 +140,7 @@ export default function Toolbar({
       <div className={styles.toolbarSep} />
 
       <button
-        className={styles.tbBtn}
+        className={`${styles.tbBtn} ${styles.tbBtnExample}`}
         onClick={onLoadExample}
         title="Load a full example project"
       >

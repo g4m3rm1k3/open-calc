@@ -194,3 +194,43 @@ describe("SET_COLOR_MODE — real incident: the startup demo never visibly chang
     expect(button.styles.color).toBe("#ffffff");
   });
 });
+
+describe("SET_COLOR_MODE — real incident: a plain table never changed with the page", () => {
+  // The Table structural scaffold (componentLibrary.ts) carries its entire
+  // color identity in `borderBottom` — no backgroundColor/color at all on
+  // <th>/<td> — so cascadeBodyTheme's old backgroundColor/background-only
+  // scan had nothing to touch: the header/row dividers stayed light-gray
+  // forever, even sitting on a page that had gone fully dark.
+  const th = el("th1", "th", null, 0, { borderBottom: "2px solid #e2e8f0" }, "Column 1");
+  const td = el("td1", "td", null, 1, { borderBottom: "1px solid #e2e8f0" }, "Row 1");
+
+  it("relights a neutral th border when switching to Dark", () => {
+    const state = stateWithColorMode([th, td], "light");
+    const next = labReducer(state, { type: "SET_COLOR_MODE", payload: "dark" });
+    const nextTh = next.elements.find((e) => e.id === "th1")!;
+    const stop = nextTh.styles.borderBottom.match(/#[0-9a-fA-F]{6}/)?.[0];
+    expect(stop).toBeDefined();
+    expect(hexLumForTest(stop!)).toBeLessThan(0.35);
+  });
+
+  it("relights a neutral td border when switching to Dark", () => {
+    const state = stateWithColorMode([th, td], "light");
+    const next = labReducer(state, { type: "SET_COLOR_MODE", payload: "dark" });
+    const nextTd = next.elements.find((e) => e.id === "td1")!;
+    const stop = nextTd.styles.borderBottom.match(/#[0-9a-fA-F]{6}/)?.[0];
+    expect(stop).toBeDefined();
+    expect(hexLumForTest(stop!)).toBeLessThan(0.35);
+  });
+
+  it("leaves a deliberately accent-colored border untouched", () => {
+    // Tag deliberately isn't <div>/<section>/etc — those also match the
+    // generic Container component, whose own Dark theme unconditionally
+    // overwrites `border` regardless of color, which would confound this
+    // test with a different code path than the one under test here.
+    const accentBordered = el("badge1", "span", null, 0, { border: "1px solid #3b82f6" });
+    const state = stateWithColorMode([accentBordered], "light");
+    const next = labReducer(state, { type: "SET_COLOR_MODE", payload: "dark" });
+    const badge = next.elements.find((e) => e.id === "badge1")!;
+    expect(badge.styles.border).toBe("1px solid #3b82f6");
+  });
+});

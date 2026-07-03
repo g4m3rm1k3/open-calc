@@ -14,6 +14,7 @@ import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";
 import { COMPONENTS } from "./componentLibrary";
 import { JS_PRESETS } from "./jsPresets";
 import { CDN_LIBRARIES } from "./cdnLibraries";
+import { CONTAINER_TAGS } from "./labReducer";
 import type { LabElement, ComponentTheme } from "./types";
 
 type MonacoEditor = Parameters<OnMount>[0];
@@ -307,6 +308,12 @@ function injectGlowStyle(): void {
 }
 
 // ── Element Tree ──────────────────────────────────────────────────────────────
+// Drag-and-drop here mirrors CanvasPanel's exactly (same drop-zone-between-
+// siblings + drop-on-container-to-nest pattern, same onReorder/onNest/
+// onMoveToRoot actions) so a subtree drags as a unit for the same reason it
+// does on the canvas: NEST_ELEMENT/REORDER_ELEMENT/MOVE_TO_ROOT only ever
+// reassign the dragged element's own parentId/order — descendants keep
+// pointing at it by id, so they come along for free.
 
 interface TreeProps {
   elements: LabElement[];
@@ -317,13 +324,76 @@ interface TreeProps {
   onToggleMultiSelect: (id: string) => void;
 }
 
-function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedIds, onToggleMultiSelect }: TreeProps) {
+interface ElementTreeProps extends TreeProps {
+  onReorder: (id: string, parentId: string | null, order: number) => void;
+  onNest: (childId: string, parentId: string, order: number) => void;
+  onMoveToRoot: (id: string, order: number) => void;
+}
+
+interface DropTargetInfo { parentId: string | null; order: number; inside?: boolean; }
+
+function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedIds, onToggleMultiSelect, onReorder, onNest, onMoveToRoot }: ElementTreeProps) {
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<DropTargetInfo | null>(null);
+
+  const byId: Record<string, LabElement> = {};
+  for (const e of elements) byId[e.id] = e;
+
+  const handleDragStartItem = (e: React.DragEvent, id: string): void => {
+    e.stopPropagation();
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", id);
+    setDraggingId(id);
+  };
+  const handleDragEndItem = (): void => {
+    setDraggingId(null);
+    setDropTarget(null);
+  };
+  const handleZoneEnter = (e: React.DragEvent, parentId: string | null, order: number): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDropTarget({ parentId, order });
+  };
+  const handleInsideEnter = (e: React.DragEvent, parentId: string, order: number): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDropTarget({ parentId, order, inside: true });
+  };
+  const handleDropItem = (e: React.DragEvent, parentId: string | null, order: number): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    const childId = e.dataTransfer.getData("text/plain");
+    const child = childId ? byId[childId] : undefined;
+    if (child) {
+      if (parentId === null) {
+        if (child.parentId === null) onReorder(childId, null, order);
+        else onMoveToRoot(childId, order);
+      } else {
+        if (child.parentId === parentId) onReorder(childId, parentId, order);
+        else onNest(childId, parentId, order);
+      }
+    }
+    setDropTarget(null);
+    setDraggingId(null);
+  };
+
+  const rootCount = elements.filter((e) => !e.parentId).length;
+  const bodyIsDropInside = !!dropTarget?.inside && dropTarget.parentId === null;
+  const handleBodyDragOver = (e: React.DragEvent): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDropTarget({ parentId: null, order: rootCount, inside: true });
+  };
+
   return (
     <div className={styles.codeTreePanel}>
       <button
-        className={`${styles.treeItem} ${!selectedId ? styles.treeItemSelected : ""}`}
+        className={`${styles.treeItem} ${!selectedId ? styles.treeItemSelected : ""} ${bodyIsDropInside ? styles.treeItemDropInside : ""}`}
         onClick={() => onSelect(null)}
-        title="<body> — page root"
+        title="<body> — page root — drop an element here to move it to the top level"
+        onDragOver={handleBodyDragOver}
+        onDragEnter={handleBodyDragOver}
+        onDrop={(e) => handleDropItem(e, null, rootCount)}
       >
         <span className={styles.treeTagBody}>&lt;body&gt;</span>
         <span className={styles.treeItemLabel}>page root</span>
@@ -337,6 +407,13 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
         depth={1}
         multiSelectedIds={multiSelectedIds}
         onToggleMultiSelect={onToggleMultiSelect}
+        draggingId={draggingId}
+        dropTarget={dropTarget}
+        onDragStartItem={handleDragStartItem}
+        onDragEndItem={handleDragEndItem}
+        onZoneEnter={handleZoneEnter}
+        onInsideEnter={handleInsideEnter}
+        onDropItem={handleDropItem}
       />
     </div>
   );
@@ -345,55 +422,110 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
 interface BranchProps extends TreeProps {
   parentId: string | null;
   depth: number;
+  draggingId: string | null;
+  dropTarget: DropTargetInfo | null;
+  onDragStartItem: (e: React.DragEvent, id: string) => void;
+  onDragEndItem: () => void;
+  onZoneEnter: (e: React.DragEvent, parentId: string | null, order: number) => void;
+  onInsideEnter: (e: React.DragEvent, parentId: string, order: number) => void;
+  onDropItem: (e: React.DragEvent, parentId: string | null, order: number) => void;
 }
 
-function TreeBranch({ elements, selectedId, onSelect, onDelete, parentId, depth, multiSelectedIds, onToggleMultiSelect }: BranchProps) {
+function TreeBranch({
+  elements, selectedId, onSelect, onDelete, parentId, depth, multiSelectedIds, onToggleMultiSelect,
+  draggingId, dropTarget, onDragStartItem, onDragEndItem, onZoneEnter, onInsideEnter, onDropItem,
+}: BranchProps) {
   const children = (elements || [])
     .filter(e => (e.parentId ?? null) === (parentId ?? null))
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-  return children.map(el => {
-    const isSelected = el.id === selectedId;
-    const isMulti = multiSelectedIds?.includes(el.id);
+  const dropZone = (order: number, key: string): React.ReactNode => {
+    const isActive = !!draggingId && !!dropTarget && !dropTarget.inside &&
+      (dropTarget.parentId ?? null) === (parentId ?? null) && dropTarget.order === order;
     return (
-      <div key={el.id}>
-        <button
-          className={`${styles.treeItem} ${isSelected ? styles.treeItemSelected : ""} ${isMulti ? styles.treeItemMulti : ""}`}
-          style={{ paddingLeft: `${depth * 14 + 8}px` }}
-          title={`<${el.tag}>${el.content ? ` "${el.content.slice(0, 30)}"` : ""} — Ctrl+click to multi-select`}
-          onClick={(e) => {
-            if ((e.ctrlKey || e.metaKey) && onToggleMultiSelect) {
-              e.preventDefault();
-              onToggleMultiSelect(el.id);
-            } else {
-              onSelect(el.id);
-            }
-          }}
-        >
-          <span className={styles.treeTag}>&lt;{el.tag}&gt;</span>
-          {el.content && (
-            <span className={styles.treeItemLabel}>{el.content.slice(0, 24)}</span>
-          )}
-          {isMulti && <span className={styles.treeMultiBadge}>✓</span>}
-          <button
-            className={styles.treeDeleteBtn}
-            onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
-            title="Delete"
-          >×</button>
-        </button>
-        <TreeBranch
-          elements={elements}
-          selectedId={selectedId}
-          onSelect={onSelect}
-          onDelete={onDelete}
-          parentId={el.id}
-          depth={depth + 1}
-          multiSelectedIds={multiSelectedIds}
-          onToggleMultiSelect={onToggleMultiSelect}
-        />
-      </div>
+      <div
+        key={key}
+        className={`${styles.dropZone} ${isActive ? styles.dropZoneActive : ""}`}
+        style={{ marginLeft: `${depth * 14 + 8}px` }}
+        onDragOver={(e) => onZoneEnter(e, parentId, order)}
+        onDragEnter={(e) => onZoneEnter(e, parentId, order)}
+        onDrop={(e) => onDropItem(e, parentId, order)}
+      />
     );
-  });
+  };
+
+  return (
+    <>
+      {children.length > 0 && dropZone(0, `${parentId ?? "root"}-dz-0`)}
+      {children.map((el, i) => {
+        const isSelected = el.id === selectedId;
+        const isMulti = multiSelectedIds?.includes(el.id);
+        const isDragging = el.id === draggingId;
+        const isContainer = CONTAINER_TAGS.has(el.tag);
+        const isDropInside = isContainer && !!dropTarget?.inside && dropTarget.parentId === el.id;
+        const ownChildCount = elements.filter((c) => c.parentId === el.id).length;
+
+        return (
+          <div key={el.id}>
+            <button
+              className={[
+                styles.treeItem,
+                isSelected ? styles.treeItemSelected : "",
+                isMulti ? styles.treeItemMulti : "",
+                isDragging ? styles.treeItemDragging : "",
+                isDropInside ? styles.treeItemDropInside : "",
+              ].join(" ")}
+              style={{ paddingLeft: `${depth * 14 + 8}px` }}
+              title={`<${el.tag}>${el.content ? ` "${el.content.slice(0, 30)}"` : ""} — Ctrl+click to multi-select, drag to move`}
+              draggable
+              onDragStart={(e) => onDragStartItem(e, el.id)}
+              onDragEnd={onDragEndItem}
+              onDragOver={(e) => { if (isContainer) onInsideEnter(e, el.id, ownChildCount); }}
+              onDragEnter={(e) => { if (isContainer) onInsideEnter(e, el.id, ownChildCount); }}
+              onDrop={(e) => { if (isContainer) onDropItem(e, el.id, ownChildCount); }}
+              onClick={(e) => {
+                if ((e.ctrlKey || e.metaKey) && onToggleMultiSelect) {
+                  e.preventDefault();
+                  onToggleMultiSelect(el.id);
+                } else {
+                  onSelect(el.id);
+                }
+              }}
+            >
+              <span className={styles.treeTag}>&lt;{el.tag}&gt;</span>
+              {el.content && (
+                <span className={styles.treeItemLabel}>{el.content.slice(0, 24)}</span>
+              )}
+              {isMulti && <span className={styles.treeMultiBadge}>✓</span>}
+              <button
+                className={styles.treeDeleteBtn}
+                onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
+                title="Delete"
+              >×</button>
+            </button>
+            <TreeBranch
+              elements={elements}
+              selectedId={selectedId}
+              onSelect={onSelect}
+              onDelete={onDelete}
+              parentId={el.id}
+              depth={depth + 1}
+              multiSelectedIds={multiSelectedIds}
+              onToggleMultiSelect={onToggleMultiSelect}
+              draggingId={draggingId}
+              dropTarget={dropTarget}
+              onDragStartItem={onDragStartItem}
+              onDragEndItem={onDragEndItem}
+              onZoneEnter={onZoneEnter}
+              onInsideEnter={onInsideEnter}
+              onDropItem={onDropItem}
+            />
+            {dropZone(i + 1, `${parentId ?? "root"}-dz-${i + 1}`)}
+          </div>
+        );
+      })}
+    </>
+  );
 }
 
 // ── Range finders ─────────────────────────────────────────────────────────────
@@ -497,6 +629,9 @@ interface CodePanelProps {
   onOpenTableBuilder: () => void;
   cdnLinks: string[];
   onToggleCdn: (id: string) => void;
+  onReorderElement: (id: string, parentId: string | null, order: number) => void;
+  onNestElement: (childId: string, parentId: string, order: number) => void;
+  onMoveElementToRoot: (id: string, order: number) => void;
 }
 
 export default function CodePanel({
@@ -520,6 +655,9 @@ export default function CodePanel({
   onOpenTableBuilder,
   cdnLinks,
   onToggleCdn,
+  onReorderElement,
+  onNestElement,
+  onMoveElementToRoot,
 }: CodePanelProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const C: any = useThemeColors();
@@ -646,6 +784,9 @@ export default function CodePanel({
             onDelete={onDeleteElement}
             multiSelectedIds={multiSelectedIds}
             onToggleMultiSelect={onToggleMultiSelect}
+            onReorder={onReorderElement}
+            onNest={onNestElement}
+            onMoveToRoot={onMoveElementToRoot}
           />
         ) : activeTab === "toolbox" ? (
           <ToolboxPicker

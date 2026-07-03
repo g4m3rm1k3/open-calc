@@ -8,7 +8,12 @@
 // foreground/background pair that's too close to read.
 
 import { describe, it, expect } from "vitest";
-import { COMPONENTS } from "./componentLibrary";
+import { COMPONENTS, detectComponents, buildThemeUpdates, cascadeComponentThemes } from "./componentLibrary";
+import type { LabElement } from "./types";
+
+function el(id: string, tag: string, parentId: string | null, order: number, styles: Record<string, string> = {}, content = ""): LabElement {
+  return { id, tag, parentId, order, content, attrs: { id: "", class: "" }, styles, mediaQueries: [] };
+}
 
 function relativeLuminance(hex: string): number {
   const toLinear = (c: number): number => {
@@ -71,4 +76,62 @@ describe("Component theme variants — text stays readable against its own backg
       }
     }
   }
+});
+
+describe("detectComponents — real incident: generic Container shadowed the specific Hero match", () => {
+  // A hero section (<section> containing button/h1/p) satisfies BOTH the
+  // generic Container matcher (any div/section/article/header/footer) and the
+  // specific Hero matcher (children are exactly button,h1,p). Container used
+  // to be declared first in COMPONENTS, so cascadeComponentThemes' `matched[0]`
+  // always picked Container's theme — which has no `background: "none"`
+  // override — leaving a hero's old gradient stuck underneath the new fill.
+  function heroElements(): LabElement[] {
+    return [
+      el("hero1", "section", null, 0, { background: "linear-gradient(180deg, #0f172a 0%, #1e293b 100%)" }),
+      el("h1-1", "h1", "hero1", 0, { color: "#f8fafc" }, "Heading"),
+      el("p-1", "p", "hero1", 1, { color: "#94a3b8" }, "Tagline"),
+      el("btn-1", "button", "hero1", 2, { backgroundColor: "#3b82f6", color: "#ffffff" }, "Get Started"),
+    ];
+  }
+
+  it("matches Hero before the generic Container for a hero-shaped section", () => {
+    const matched = detectComponents("hero1", heroElements());
+    expect(matched[0]?.id).toBe("hero");
+  });
+
+  it("cascadeComponentThemes clears the old gradient when switching to Glass", () => {
+    const updates = cascadeComponentThemes(heroElements(), "glass");
+    const heroUpdate = updates.find((u) => u.id === "hero1");
+    expect(heroUpdate?.styles.background).toBe("none");
+  });
+});
+
+describe("Table theme application reaches th/td through thead/tbody/tr wrappers", () => {
+  function tableElements(): LabElement[] {
+    return [
+      el("table1", "table", null, 0, {}),
+      el("thead1", "thead", "table1", 0, {}),
+      el("tr1",    "tr",    "thead1", 0, {}),
+      el("th1",    "th",    "tr1", 0, { borderBottom: "2px solid #e2e8f0" }, "Column 1"),
+      el("tbody1", "tbody", "table1", 1, {}),
+      el("tr2",    "tr",    "tbody1", 0, {}),
+      el("td1",    "td",    "tr2", 0, { borderBottom: "1px solid #e2e8f0" }, "Row 1"),
+    ];
+  }
+
+  it("matches the Table component when a <table> is selected", () => {
+    const matched = detectComponents("table1", tableElements());
+    expect(matched.some((c) => c.id === "table-structure")).toBe(true);
+  });
+
+  it("applies the Dark theme's th/td styles despite being two levels below <table>", () => {
+    const tableComp = COMPONENTS.find((c) => c.id === "table-structure")!;
+    const darkTheme = tableComp.themeGroups.flatMap((g) => g.themes).find((t) => t.id === "table-dark")!;
+    const updates = buildThemeUpdates("table1", tableElements(), darkTheme);
+
+    const thUpdate = updates.find((u) => u.id === "th1");
+    const tdUpdate = updates.find((u) => u.id === "td1");
+    expect(thUpdate?.styles.color).toBe("#f8fafc");
+    expect(tdUpdate?.styles.color).toBe("#cbd5e1");
+  });
 });

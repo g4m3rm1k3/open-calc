@@ -24,38 +24,6 @@ function sortedTags(children: LabElement[]): string {
 // ─── Component library ────────────────────────────────────────────────────────
 export const COMPONENTS: Component[] = [
 
-  // ── Container ────────────────────────────────────────────────────────────────
-  {
-    id: "container", name: "Container", category: "Layout", icon: "📦",
-    description: "Styled wrapper — add anything inside",
-    matches: (_children, parentTag) => ["div", "section", "article", "header", "footer"].includes(parentTag ?? ""),
-    themeGroups: [
-      { label: "Themes", themes: [
-        { id: "container-clean",       name: "Clean",       parentStyles: { backgroundColor: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)", borderRadius: "16px" } },
-        { id: "container-dark",        name: "Dark",        parentStyles: { backgroundColor: "#1e293b", border: "1px solid #334155", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", borderRadius: "16px" } },
-        { id: "container-glass",       name: "Glass",       parentStyles: { backgroundColor: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", backdropFilter: "blur(12px)", boxShadow: "0 8px 32px 0 rgba(0,0,0,0.1)", borderRadius: "16px" } },
-        { id: "container-transparent", name: "Transparent", parentStyles: { backgroundColor: "transparent", border: "none", boxShadow: "none", borderRadius: "0" } },
-      ] },
-      { label: "Layout", themes: [
-        { id: "container-layout-block",      name: "Block",       parentStyles: { display: "block" } },
-        { id: "container-layout-flex-row",   name: "Flex Row",    parentStyles: { display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "24px", alignItems: "flex-start" } },
-        { id: "container-layout-flex-col",   name: "Flex Column", parentStyles: { display: "flex", flexDirection: "column", gap: "24px", alignItems: "stretch" } },
-        { id: "container-layout-flex-center",name: "Flex Center", parentStyles: { display: "flex", flexDirection: "column", gap: "24px", alignItems: "center", justifyContent: "center" } },
-        { id: "container-layout-grid-2",     name: "Grid 2-col",  parentStyles: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" } },
-        { id: "container-layout-grid-3",     name: "Grid 3-col",  parentStyles: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" } },
-      ] },
-      { label: "Padding", themes: [
-        { id: "container-pad-none", name: "None",     parentStyles: { padding: "0" } },
-        { id: "container-pad-sm",   name: "Tight",    parentStyles: { padding: "16px" } },
-        { id: "container-pad-md",   name: "Normal",   parentStyles: { padding: "32px" } },
-        { id: "container-pad-lg",   name: "Spacious", parentStyles: { padding: "64px" } },
-      ] },
-    ],
-    template: [
-      el("t0", "div", null, 0, "", {}, { display: "block", width: "100%", boxSizing: "border-box", backgroundColor: "#ffffff", borderRadius: "16px", border: "1px solid #e2e8f0", padding: "32px", minHeight: "80px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }),
-    ],
-  },
-
   // ── Navbar ───────────────────────────────────────────────────────────────────
   {
     id: "nav", name: "Navbar", category: "Navigation", icon: "🧭",
@@ -288,8 +256,27 @@ export const COMPONENTS: Component[] = [
   {
     id: "table-structure", name: "Table", category: "Structure", icon: "▦",
     description: "Opens a builder to configure rows, columns, spans, and header",
-    matches: () => false,
-    themeGroups: [],
+    matches: (_children, parentTag) => parentTag === "table",
+    themeGroups: [
+      { label: "Themes", themes: [
+        { id: "table-clean",   name: "Clean",   parentStyles: { backgroundColor: "#ffffff" }, childStylesByTag: {
+          th: { backgroundColor: "#f8fafc", color: "#0f172a", borderBottom: "2px solid #e2e8f0" },
+          td: { color: "#334155", borderBottom: "1px solid #e2e8f0" },
+        } },
+        { id: "table-dark",    name: "Dark",    parentStyles: { backgroundColor: "#0f172a" }, childStylesByTag: {
+          th: { backgroundColor: "#1e293b", color: "#f8fafc", borderBottom: "2px solid #334155" },
+          td: { color: "#cbd5e1", borderBottom: "1px solid #334155" },
+        } },
+        { id: "table-glass",   name: "Glass",   parentStyles: { backgroundColor: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" }, childStylesByTag: {
+          th: { backgroundColor: "rgba(255,255,255,0.15)", color: "#ffffff", borderBottom: "2px solid rgba(255,255,255,0.3)" },
+          td: { color: "rgba(255,255,255,0.85)", borderBottom: "1px solid rgba(255,255,255,0.15)" },
+        } },
+        { id: "table-minimal", name: "Minimal", parentStyles: { backgroundColor: "transparent" }, childStylesByTag: {
+          th: { backgroundColor: "transparent", color: "#0f172a", borderBottom: "1px solid #0f172a", fontWeight: "700" },
+          td: { color: "#334155", borderBottom: "none" },
+        } },
+      ] },
+    ],
     template: [
       el("t0",  "table", null, 0, "", {}, { width: "100%", borderCollapse: "collapse", fontSize: "14px", margin: "0 0 16px 0", display: "table" }),
       el("t1",  "thead", "t0", 0, "", {}, {}),
@@ -399,6 +386,44 @@ export const COMPONENTS: Component[] = [
       el("t3", "button", "t0", 2, "Get Started", { type: "button" }, { display: "block", width: "100%", padding: "16px", backgroundColor: "#f1f5f9", color: "#0f172a", border: "none", borderRadius: "12px", fontSize: "16px", fontWeight: "600", cursor: "pointer", boxSizing: "border-box" }),
     ],
   },
+
+  // ── Container ────────────────────────────────────────────────────────────────
+  // Deliberately last: its `matches` only checks the selected element's own
+  // tag (div/section/article/header/footer), so it would otherwise shadow
+  // every more specific component above (Hero, Nav, Card, ...) whenever a
+  // matching instance of one of those *also* happens to be a <div>/<section>/
+  // etc. — detectComponents' consumers take the first match, so order here
+  // is what decides which theme actually applies.
+  {
+    id: "container", name: "Container", category: "Layout", icon: "📦",
+    description: "Styled wrapper — add anything inside",
+    matches: (_children, parentTag) => ["div", "section", "article", "header", "footer"].includes(parentTag ?? ""),
+    themeGroups: [
+      { label: "Themes", themes: [
+        { id: "container-clean",       name: "Clean",       parentStyles: { backgroundColor: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)", borderRadius: "16px" } },
+        { id: "container-dark",        name: "Dark",        parentStyles: { backgroundColor: "#1e293b", border: "1px solid #334155", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.3)", borderRadius: "16px" } },
+        { id: "container-glass",       name: "Glass",       parentStyles: { backgroundColor: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", backdropFilter: "blur(12px)", boxShadow: "0 8px 32px 0 rgba(0,0,0,0.1)", borderRadius: "16px" } },
+        { id: "container-transparent", name: "Transparent", parentStyles: { backgroundColor: "transparent", border: "none", boxShadow: "none", borderRadius: "0" } },
+      ] },
+      { label: "Layout", themes: [
+        { id: "container-layout-block",      name: "Block",       parentStyles: { display: "block" } },
+        { id: "container-layout-flex-row",   name: "Flex Row",    parentStyles: { display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "24px", alignItems: "flex-start" } },
+        { id: "container-layout-flex-col",   name: "Flex Column", parentStyles: { display: "flex", flexDirection: "column", gap: "24px", alignItems: "stretch" } },
+        { id: "container-layout-flex-center",name: "Flex Center", parentStyles: { display: "flex", flexDirection: "column", gap: "24px", alignItems: "center", justifyContent: "center" } },
+        { id: "container-layout-grid-2",     name: "Grid 2-col",  parentStyles: { display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "24px" } },
+        { id: "container-layout-grid-3",     name: "Grid 3-col",  parentStyles: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px" } },
+      ] },
+      { label: "Padding", themes: [
+        { id: "container-pad-none", name: "None",     parentStyles: { padding: "0" } },
+        { id: "container-pad-sm",   name: "Tight",    parentStyles: { padding: "16px" } },
+        { id: "container-pad-md",   name: "Normal",   parentStyles: { padding: "32px" } },
+        { id: "container-pad-lg",   name: "Spacious", parentStyles: { padding: "64px" } },
+      ] },
+    ],
+    template: [
+      el("t0", "div", null, 0, "", {}, { display: "block", width: "100%", boxSizing: "border-box", backgroundColor: "#ffffff", borderRadius: "16px", border: "1px solid #e2e8f0", padding: "32px", minHeight: "80px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)" }),
+    ],
+  },
 ];
 
 // ─── Detect matching components for a selected parent ─────────────────────────
@@ -413,6 +438,11 @@ export function detectComponents(parentId: string, elements: LabElement[]): Comp
   return COMPONENTS.filter(comp => {
     try { return comp.matches(children, parentTag); } catch { return false; }
   });
+}
+
+function collectDescendants(parentId: string, elements: LabElement[]): LabElement[] {
+  const direct = elements.filter(e => e.parentId === parentId);
+  return direct.flatMap(child => [child, ...collectDescendants(child.id, elements)]);
 }
 
 // ─── Build style updates for applying a theme ─────────────────────────────────
@@ -435,6 +465,21 @@ export function buildThemeUpdates(parentId: string, elements: LabElement[], them
       updates.push({ id: child.id, styles: merged });
     }
   });
+
+  // childStylesByTag also reaches deeper descendants, not just direct children
+  // — a Table's <th>/<td> sit two levels below <table>, inside <thead>/<tbody>/
+  // <tr> wrappers that carry no styling of their own. Direct children are
+  // already covered above, so only walk past them here.
+  if (theme.childStylesByTag) {
+    for (const child of children) {
+      for (const desc of collectDescendants(child.id, elements)) {
+        const tagStyles = theme.childStylesByTag[desc.tag];
+        if (tagStyles && Object.keys(tagStyles).length > 0) {
+          updates.push({ id: desc.id, styles: tagStyles });
+        }
+      }
+    }
+  }
 
   return updates;
 }

@@ -423,6 +423,15 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
           onOpenTableBuilder={() => setShowTableBuilder(true)}
           cdnLinks={state.cdnLinks}
           onToggleCdn={(id) => dispatch({ type: "TOGGLE_CDN", payload: id })}
+          onReorderElement={(id, parentId, order) =>
+            dispatch({ type: "REORDER_ELEMENT", payload: { id, parentId, order } })
+          }
+          onNestElement={(childId, parentId, order) =>
+            dispatch({ type: "NEST_ELEMENT", payload: { childId, parentId, order } })
+          }
+          onMoveElementToRoot={(id, order) =>
+            dispatch({ type: "MOVE_TO_ROOT", payload: { id, order } })
+          }
         />
 
         <div className={styles.divider} onMouseDown={handleDividerMouseDown} />

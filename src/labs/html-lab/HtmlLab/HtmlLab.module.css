@@ -27,22 +27,22 @@
 }
 
 .backBtn {
-  padding: 4px 10px;
+  padding: 5px 10px;
   border: 1px solid var(--hl-border);
-  border-radius: 5px;
-  background: transparent;
-  color: var(--hl-muted);
+  border-radius: 6px;
+  background: var(--hl-surface2);
+  color: var(--hl-text);
   cursor: pointer;
   font-size: 12px;
   transition:
-    background 0.1s,
-    color 0.1s;
+    background 0.12s,
+    border-color 0.12s;
   margin-right: 4px;
   flex-shrink: 0;
 }
 .backBtn:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--hl-text);
+  background: var(--hl-surface);
+  border-color: var(--hl-accent);
 }
 
 .toolbarLogo {
@@ -88,20 +88,31 @@
 }
 
 .tbBtn {
-  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
   border: 1px solid var(--hl-border);
-  border-radius: 5px;
-  background: transparent;
-  color: var(--hl-muted);
+  border-radius: 6px;
+  background: var(--hl-surface2);
+  color: var(--hl-text);
   cursor: pointer;
   font-size: 12px;
+  white-space: nowrap;
   transition:
-    background 0.1s,
-    color 0.1s;
+    background 0.12s,
+    border-color 0.12s,
+    box-shadow 0.12s,
+    transform 0.06s;
 }
 .tbBtn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--hl-text);
+  background: var(--hl-surface);
+  border-color: var(--hl-accent);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+.tbBtn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: none;
 }
 .tbBtn:disabled {
   opacity: 0.35;
@@ -111,21 +122,79 @@
   background: var(--hl-accent-strong);
   color: #fff;
   border-color: var(--hl-accent-strong);
+  box-shadow: 0 0 0 1px var(--hl-accent-strong);
 }
-.tbBtnDanger:hover {
+.tbBtnActive:hover:not(:disabled) {
+  background: var(--hl-accent-strong);
+  border-color: var(--hl-accent-strong);
+  filter: brightness(1.08);
+}
+.tbBtnDanger:hover:not(:disabled) {
   background: var(--hl-danger-bg);
   color: var(--hl-danger);
   border-color: var(--hl-danger);
 }
-.tbBtnPreview {
-  background: #16a34a;
+
+/* Preview ⇄ Edit — the primary mode toggle gets a persistent color identity
+   in both directions, instead of only the active side being highlighted. */
+.tbBtnGoPreview {
+  background: var(--hl-positive);
   color: #fff;
-  border-color: #16a34a;
+  border-color: var(--hl-positive);
   font-weight: 700;
 }
-.tbBtnPreview:hover {
-  background: #15803d;
-  border-color: #15803d;
+.tbBtnGoPreview:hover:not(:disabled) {
+  background: var(--hl-positive);
+  border-color: var(--hl-positive);
+  filter: brightness(1.1);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+.tbBtnGoEdit {
+  background: var(--hl-accent);
+  color: #fff;
+  border-color: var(--hl-accent);
+  font-weight: 700;
+}
+.tbBtnGoEdit:hover:not(:disabled) {
+  background: var(--hl-accent);
+  border-color: var(--hl-accent);
+  filter: brightness(1.1);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* New — outlined violet identity; the "+" pops on hover so starting fresh
+   reads as a distinct, inviting action rather than blending into the row. */
+.tbBtnNew {
+  color: var(--hl-accent2);
+  border-color: var(--hl-accent2);
+  background: var(--hl-accent2-bg);
+}
+.tbBtnNew:hover:not(:disabled) {
+  background: var(--hl-accent2);
+  color: #fff;
+  border-color: var(--hl-accent2);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+.tbBtnNew:hover:not(:disabled) .newIcon {
+  transform: rotate(90deg) scale(1.15);
+}
+.newIcon {
+  display: inline-block;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Load Example — amber "star" identity to match its emoji and its role as a
+   distinct, separated action at the end of the bar. */
+.tbBtnExample {
+  color: var(--hl-string);
+  border-color: var(--hl-string-bg);
+  background: var(--hl-string-bg);
+}
+.tbBtnExample:hover:not(:disabled) {
+  background: var(--hl-string);
+  color: #fff;
+  border-color: var(--hl-string);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* Preview iframe — fills the space where canvas + properties normally live */
@@ -1459,6 +1528,22 @@
 .treeDeleteBtn:hover {
   color: var(--hl-danger);
   background: var(--hl-danger-bg);
+}
+
+.treeItem[draggable="true"] {
+  cursor: grab;
+}
+.treeItem[draggable="true"]:active {
+  cursor: grabbing;
+}
+.treeItemDragging {
+  opacity: 0.4;
+}
+/* Green glow when dragging over a container row — matches CanvasPanel's
+   .elDropInside so "drop here to nest inside" reads the same in both views. */
+.treeItemDropInside {
+  background: var(--hl-positive-bg) !important;
+  box-shadow: inset 0 0 0 1.5px var(--hl-positive);
 }
 
 /* ── Properties panel header & delete ───────────────────────────────────────── */
