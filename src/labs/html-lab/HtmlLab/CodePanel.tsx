@@ -11,7 +11,10 @@ import { useThemeColors } from "../../../hooks/useThemeColors.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — JS utils file, no type declarations
 import { setupOpenCalcMonaco } from "../../../utils/monacoThemes.js";
-import type { LabElement } from "./types";
+import { COMPONENTS } from "./componentLibrary";
+import { JS_PRESETS } from "./jsPresets";
+import { CDN_LIBRARIES } from "./cdnLibraries";
+import type { LabElement, ComponentTheme } from "./types";
 
 type MonacoEditor = Parameters<OnMount>[0];
 type MonacoApi    = Parameters<OnMount>[1];
@@ -21,9 +24,241 @@ const TABS = [
   { key: "css",        label: "CSS",        language: "css" },
   { key: "javascript", label: "JavaScript", language: "javascript" },
   { key: "tree",       label: "Tree",       language: null },
+  { key: "toolbox",    label: "Toolbox",    language: null },
 ] as const;
 
 type TabKey = typeof TABS[number]["key"];
+
+// Tabs that don't hold Monaco source code — the editor stays unmounted for these.
+const NON_EDITOR_TABS = new Set<TabKey>(["tree", "toolbox"]);
+
+// ── Elements (raw tags, one-click add — grouped by category) ───────────────────
+
+interface ElementDef { tag: string; label: string; title: string; category: string; }
+
+const ELEMENTS: ElementDef[] = [
+  { tag: "div",     label: "div",     title: "Generic container",         category: "Layout" },
+  { tag: "section", label: "section", title: "Section container",         category: "Layout" },
+  { tag: "article", label: "article", title: "Article container",        category: "Layout" },
+  { tag: "header",  label: "header",  title: "Header container",         category: "Layout" },
+  { tag: "footer",  label: "footer",  title: "Footer container",         category: "Layout" },
+  { tag: "nav",     label: "nav",     title: "Navigation container",     category: "Layout" },
+  { tag: "ul",      label: "ul",      title: "Unordered list",           category: "Lists" },
+  { tag: "ol",      label: "ol",      title: "Ordered list",             category: "Lists" },
+  { tag: "li",      label: "li",      title: "List item",                category: "Lists" },
+  { tag: "p",       label: "p",       title: "Paragraph",                category: "Text" },
+  { tag: "h1",      label: "H1",      title: "Heading 1",                category: "Text" },
+  { tag: "h2",      label: "H2",      title: "Heading 2",                category: "Text" },
+  { tag: "h3",      label: "H3",      title: "Heading 3",                category: "Text" },
+  { tag: "span",    label: "span",    title: "Inline container",         category: "Text" },
+  { tag: "blockquote", label: "quote", title: "Blockquote",              category: "Text" },
+  { tag: "pre",     label: "pre",     title: "Preformatted code block",  category: "Text" },
+  { tag: "code",    label: "code",    title: "Inline code",              category: "Text" },
+  { tag: "label",   label: "label",   title: "Form label",               category: "Text" },
+  { tag: "button",  label: "button",  title: "Button",                   category: "Interactive" },
+  { tag: "a",       label: "a",       title: "Anchor / link",            category: "Interactive" },
+  { tag: "img",     label: "img",     title: "Image placeholder",        category: "Media" },
+  { tag: "hr",      label: "hr",      title: "Horizontal rule",          category: "Media" },
+  { tag: "video",   label: "video",   title: "Video player",             category: "Media" },
+  { tag: "audio",   label: "audio",   title: "Audio player",             category: "Media" },
+];
+
+function groupByCategory<T extends { category: string }>(items: T[]): [string, T[]][] {
+  const map = new Map<string, T[]>();
+  for (const item of items) {
+    if (!map.has(item.category)) map.set(item.category, []);
+    map.get(item.category)!.push(item);
+  }
+  return Array.from(map.entries());
+}
+
+// ── Collapsible section (VS Toolbox-style — nests: Toolbox tab > type region > category) ──
+
+interface CollapsibleSectionProps {
+  title: string;
+  count: number;
+  nested?: boolean;
+  children: React.ReactNode;
+}
+
+function CollapsibleSection({ title, count, nested, children }: CollapsibleSectionProps) {
+  const [open, setOpen] = useState(true);
+  return (
+    <div className={`${styles.collapseSection} ${nested ? styles.collapseSectionNested : ""}`}>
+      <button className={styles.collapseHeader} onClick={() => setOpen((o) => !o)} type="button">
+        <span>{open ? "▼" : "▶"} {title}</span>
+        <span className={styles.collapseCount}>{count}</span>
+      </button>
+      {open && <div className={styles.collapseBody}>{children}</div>}
+    </div>
+  );
+}
+
+// ── Elements region ────────────────────────────────────────────────────────────
+
+interface ElementsSectionProps {
+  onAddElement: (tag: string) => void;
+  onHover: (desc: string | null) => void;
+}
+
+function ElementsSection({ onAddElement, onHover }: ElementsSectionProps) {
+  return (
+    <CollapsibleSection title="Elements" count={ELEMENTS.length}>
+      {groupByCategory(ELEMENTS).map(([category, items]) => (
+        <CollapsibleSection key={category} title={category} count={items.length} nested>
+          <div className={styles.pickerGrid}>
+            {items.map((item) => (
+              <button
+                key={item.tag}
+                className={styles.compCard}
+                onClick={() => onAddElement(item.tag)}
+                onMouseEnter={() => onHover(item.title)}
+                onMouseLeave={() => onHover(null)}
+                onFocus={() => onHover(item.title)}
+                onBlur={() => onHover(null)}
+                type="button"
+              >
+                <span className={styles.compName}>{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </CollapsibleSection>
+      ))}
+    </CollapsibleSection>
+  );
+}
+
+// ── Components region ────────────────────────────────────────────────────────────
+
+interface ComponentsSectionProps {
+  bodyIsDark: boolean;
+  onInsertTemplate: (template: LabElement[], autoTheme: ComponentTheme | null) => void;
+  onInsertJsPreset: (template: LabElement[], code: string) => void;
+  onHover: (desc: string | null) => void;
+}
+
+function ComponentsSection({ bodyIsDark, onInsertTemplate, onInsertJsPreset, onHover }: ComponentsSectionProps) {
+  const jsPresets = JS_PRESETS.filter((p) => p.template);
+  const totalCount = COMPONENTS.length + jsPresets.length;
+
+  return (
+    <CollapsibleSection title="Components" count={totalCount}>
+      {groupByCategory(COMPONENTS).map(([category, items]) => (
+        <CollapsibleSection key={category} title={category} count={items.length} nested>
+          <div className={styles.pickerGrid}>
+            {items.map((comp) => (
+              <button
+                key={comp.id}
+                className={styles.compCard}
+                onClick={() => {
+                  const autoTheme = bodyIsDark
+                    ? comp.themeGroups.flatMap((g) => g.themes).find((t) =>
+                        t.name.toLowerCase() === "dark" || t.id.endsWith("-dark")
+                      ) ?? null
+                    : null;
+                  onInsertTemplate(comp.template, autoTheme);
+                }}
+                onMouseEnter={() => onHover(comp.description)}
+                onMouseLeave={() => onHover(null)}
+                onFocus={() => onHover(comp.description)}
+                onBlur={() => onHover(null)}
+                type="button"
+              >
+                <span className={styles.compIcon}>{comp.icon}</span>
+                <span className={styles.compName}>{comp.name}</span>
+              </button>
+            ))}
+          </div>
+        </CollapsibleSection>
+      ))}
+      <CollapsibleSection title="⚡ Interactive (JS)" count={jsPresets.length} nested>
+        <div className={styles.pickerGrid}>
+          {jsPresets.map((preset) => (
+            <button
+              key={preset.id}
+              className={styles.compCard}
+              onClick={() => onInsertJsPreset(preset.template, preset.code)}
+              onMouseEnter={() => onHover(preset.description)}
+              onMouseLeave={() => onHover(null)}
+              onFocus={() => onHover(preset.description)}
+              onBlur={() => onHover(null)}
+              type="button"
+            >
+              <span className={styles.compIcon}>{preset.icon}</span>
+              <span className={styles.compName}>{preset.label}</span>
+            </button>
+          ))}
+        </div>
+      </CollapsibleSection>
+    </CollapsibleSection>
+  );
+}
+
+// ── Libraries region ─────────────────────────────────────────────────────────────
+
+interface LibrariesSectionProps {
+  cdnLinks: string[];
+  onToggleCdn: (id: string) => void;
+}
+
+function LibrariesSection({ cdnLinks, onToggleCdn }: LibrariesSectionProps) {
+  return (
+    <CollapsibleSection title="Libraries" count={CDN_LIBRARIES.length}>
+      <div className={styles.pickerGrid}>
+        {CDN_LIBRARIES.map((lib) => {
+          const active = cdnLinks.includes(lib.id);
+          return (
+            <button
+              key={lib.id}
+              className={`${styles.libCard} ${active ? styles.libCardActive : ""}`}
+              onClick={() => onToggleCdn(lib.id)}
+              title={lib.url}
+              type="button"
+            >
+              <span className={styles.libIcon}>{lib.icon}</span>
+              <span className={styles.libName}>{lib.label}</span>
+              <span className={styles.libCat}>{lib.category}</span>
+              <span className={styles.libDesc}>{lib.description}</span>
+              <span className={`${styles.libBadge} ${active ? styles.libBadgeOn : ""}`}>
+                {active ? "ON" : "OFF"}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </CollapsibleSection>
+  );
+}
+
+// ── Toolbox tab — one panel, collapsible regions per type (like the VS XAML Toolbox) ──
+
+interface ToolboxPickerProps {
+  onAddElement: (tag: string) => void;
+  bodyIsDark: boolean;
+  onInsertTemplate: (template: LabElement[], autoTheme: ComponentTheme | null) => void;
+  onInsertJsPreset: (template: LabElement[], code: string) => void;
+  cdnLinks: string[];
+  onToggleCdn: (id: string) => void;
+}
+
+function ToolboxPicker({ onAddElement, bodyIsDark, onInsertTemplate, onInsertJsPreset, cdnLinks, onToggleCdn }: ToolboxPickerProps) {
+  const [hoverDesc, setHoverDesc] = useState<string | null>(null);
+  return (
+    <div className={styles.pickerPanel}>
+      <div className={styles.pickerScroll}>
+        <ElementsSection onAddElement={onAddElement} onHover={setHoverDesc} />
+        <ComponentsSection
+          bodyIsDark={bodyIsDark}
+          onInsertTemplate={onInsertTemplate}
+          onInsertJsPreset={onInsertJsPreset}
+          onHover={setHoverDesc}
+        />
+        <LibrariesSection cdnLinks={cdnLinks} onToggleCdn={onToggleCdn} />
+      </div>
+      <div className={styles.descStrip}>{hoverDesc || "Hover an item to see what it does."}</div>
+    </div>
+  );
+}
 
 let glowStyleInjected = false;
 function injectGlowStyle(): void {
@@ -228,6 +463,12 @@ interface CodePanelProps {
   onSelectElement: (id: string | null) => void;
   onToggleMultiSelect: (id: string) => void;
   onDeleteElement: (id: string) => void;
+  onAddElement: (tag: string) => void;
+  bodyIsDark: boolean;
+  onInsertTemplate: (template: LabElement[], autoTheme: ComponentTheme | null) => void;
+  onInsertJsPreset: (template: LabElement[], code: string) => void;
+  cdnLinks: string[];
+  onToggleCdn: (id: string) => void;
 }
 
 export default function CodePanel({
@@ -244,6 +485,12 @@ export default function CodePanel({
   onSelectElement,
   onToggleMultiSelect,
   onDeleteElement,
+  onAddElement,
+  bodyIsDark,
+  onInsertTemplate,
+  onInsertJsPreset,
+  cdnLinks,
+  onToggleCdn,
 }: CodePanelProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const C: any = useThemeColors();
@@ -323,13 +570,13 @@ export default function CodePanel({
   const switchTab = (tab: TabKey): void => {
     if (tab === activeTab) return;
     if (debounceRef.current !== null) clearTimeout(debounceRef.current);
-    if (activeTab !== "tree") {
+    if (!NON_EDITOR_TABS.has(activeTab)) {
       const editor = editorRef.current;
       if (editor) handlers[activeTab]?.(editor.getValue());
     }
     isFocused.current = false;
     setActiveTab(tab);
-    if (tab !== "tree") {
+    if (!NON_EDITOR_TABS.has(tab)) {
       requestAnimationFrame(() => {
         const nextEditor = editorRef.current;
         if (nextEditor) nextEditor.setValue(sources[tab] ?? "");
@@ -370,6 +617,15 @@ export default function CodePanel({
             onDelete={onDeleteElement}
             multiSelectedIds={multiSelectedIds}
             onToggleMultiSelect={onToggleMultiSelect}
+          />
+        ) : activeTab === "toolbox" ? (
+          <ToolboxPicker
+            onAddElement={onAddElement}
+            bodyIsDark={bodyIsDark}
+            onInsertTemplate={onInsertTemplate}
+            onInsertJsPreset={onInsertJsPreset}
+            cdnLinks={cdnLinks}
+            onToggleCdn={onToggleCdn}
           />
         ) : (
           <Editor

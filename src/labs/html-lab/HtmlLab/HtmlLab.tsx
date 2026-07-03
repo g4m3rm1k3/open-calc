@@ -7,9 +7,8 @@ import ConfirmDialog, { shouldSkip } from "./ConfirmDialog";
 import ExamplePickerModal from "./ExamplePickerModal";
 import { EXAMPLES } from "./exampleGallery";
 import { labReducer, initialState } from "./labReducer";
-import { COMPONENTS, BODY_THEMES, detectComponents, buildThemeUpdates } from "./componentLibrary";
-import { JS_PRESETS } from "./jsPresets";
-import { CDN_LIBRARIES, resolveCdnTags } from "./cdnLibraries";
+import { BODY_THEMES, detectComponents, buildThemeUpdates } from "./componentLibrary";
+import { resolveCdnTags } from "./cdnLibraries";
 import {
   applyCssToElements,
   elementsToCss,
@@ -76,8 +75,6 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
   });
   const [codePanelWidth, setCodePanelWidth]   = useState<number>(360);
   const [propsPanelWidth, setPropsPanelWidth] = useState<number>(280);
-  const [showComponents, setShowComponents]   = useState<boolean>(false);
-  const [showLibraries, setShowLibraries]     = useState<boolean>(false);
   const [multiSelectedIds, setMultiSelectedIds] = useState<string[]>([]);
   const [previewMode, setPreviewMode]           = useState<boolean>(false);
   const [confirmDialog, setConfirmDialog]       = useState<ConfirmState | null>(null);
@@ -324,15 +321,10 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
       <Toolbar
         showOverlay={state.showOverlay}
         showLabels={state.showLabels}
-        showComponents={showComponents}
         previewMode={previewMode}
         multiPageMode={state.mode === "multi"}
-        onAddElement={(tag) => dispatch({ type: "ADD_ELEMENT", payload: tag })}
         onToggleOverlay={() => dispatch({ type: "TOGGLE_OVERLAY" })}
         onToggleLabels={() => dispatch({ type: "TOGGLE_LABELS" })}
-        onToggleComponents={() => { setShowComponents(v => !v); setShowLibraries(false); }}
-        onToggleLibraries={() => { setShowLibraries(v => !v); setShowComponents(false); }}
-        showLibraries={showLibraries}
         onTogglePreview={() => setPreviewMode(v => !v)}
         onToggleMultiPage={() => dispatch({ type: "TOGGLE_MULTIPAGE" })}
         onImport={() => fileInputRef.current?.click()}
@@ -399,72 +391,6 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
         />
       )}
 
-      {showComponents && (
-        <div className={styles.compPanel}>
-          {COMPONENTS.map(comp => (
-            <button
-              key={comp.id}
-              className={styles.compCard}
-              onClick={() => {
-                const autoTheme = bodyIsDark
-                  ? comp.themeGroups.flatMap(g => g.themes).find(t =>
-                      t.name.toLowerCase() === "dark" || t.id.endsWith("-dark")
-                    ) ?? null
-                  : null;
-                dispatch({ type: "INSERT_TEMPLATE", payload: { template: comp.template, autoTheme } });
-                setShowComponents(false);
-              }}
-              title={comp.description}
-            >
-              <span className={styles.compIcon}>{comp.icon}</span>
-              <span className={styles.compName}>{comp.name}</span>
-              <span className={styles.compCat}>{comp.category}</span>
-            </button>
-          ))}
-          <div className={styles.compDivider}>⚡ Interactive (JS)</div>
-          {JS_PRESETS.filter(p => p.template).map(preset => (
-            <button
-              key={preset.id}
-              className={styles.compCard}
-              onClick={() => {
-                dispatch({ type: "INSERT_TEMPLATE", payload: { template: preset.template } });
-                dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, preset.code) });
-                setShowComponents(false);
-              }}
-              title={preset.description}
-            >
-              <span className={styles.compIcon}>{preset.icon}</span>
-              <span className={styles.compName}>{preset.label}</span>
-              <span className={styles.compCat}>JavaScript</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {showLibraries && (
-        <div className={styles.libPanel}>
-          {CDN_LIBRARIES.map((lib) => {
-            const active = state.cdnLinks.includes(lib.id);
-            return (
-              <button
-                key={lib.id}
-                className={`${styles.libCard} ${active ? styles.libCardActive : ""}`}
-                onClick={() => dispatch({ type: "TOGGLE_CDN", payload: lib.id })}
-                title={lib.url}
-              >
-                <span className={styles.libIcon}>{lib.icon}</span>
-                <span className={styles.libName}>{lib.label}</span>
-                <span className={styles.libCat}>{lib.category}</span>
-                <span className={styles.libDesc}>{lib.description}</span>
-                <span className={`${styles.libBadge} ${active ? styles.libBadgeOn : ""}`}>
-                  {active ? "ON" : "OFF"}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
       <div className={styles.main}>
         <CodePanel
           html={generatedCode}
@@ -489,6 +415,17 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
             })
           }
           onDeleteElement={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
+          onAddElement={(tag) => dispatch({ type: "ADD_ELEMENT", payload: tag })}
+          bodyIsDark={bodyIsDark}
+          onInsertTemplate={(template, autoTheme) =>
+            dispatch({ type: "INSERT_TEMPLATE", payload: { template, autoTheme } })
+          }
+          onInsertJsPreset={(template, code) => {
+            dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
+            dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, code) });
+          }}
+          cdnLinks={state.cdnLinks}
+          onToggleCdn={(id) => dispatch({ type: "TOGGLE_CDN", payload: id })}
         />
 
         <div className={styles.divider} onMouseDown={handleDividerMouseDown} />

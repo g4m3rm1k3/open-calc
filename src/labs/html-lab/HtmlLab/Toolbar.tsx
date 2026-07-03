@@ -1,44 +1,12 @@
 import styles from "./HtmlLab.module.css";
 
-const ELEMENTS = [
-  { tag: "div",     label: "div",     title: "Generic container" },
-  { tag: "section", label: "section", title: "Section container" },
-  { tag: "article", label: "article", title: "Article container" },
-  { tag: "header",  label: "header",  title: "Header container" },
-  { tag: "footer",  label: "footer",  title: "Footer container" },
-  { tag: "nav",     label: "nav",     title: "Navigation container" },
-  { tag: "ul",      label: "ul",      title: "Unordered list" },
-  { tag: "ol",      label: "ol",      title: "Ordered list" },
-  { tag: "li",      label: "li",      title: "List item" },
-  { tag: "p",       label: "p",       title: "Paragraph" },
-  { tag: "h1",      label: "H1",      title: "Heading 1" },
-  { tag: "h2",      label: "H2",      title: "Heading 2" },
-  { tag: "h3",      label: "H3",      title: "Heading 3" },
-  { tag: "button",  label: "button",  title: "Button" },
-  { tag: "span",    label: "span",    title: "Inline container" },
-  { tag: "a",       label: "a",       title: "Anchor / link" },
-  { tag: "img",     label: "img",     title: "Image placeholder" },
-  { tag: "hr",      label: "hr",      title: "Horizontal rule" },
-  { tag: "blockquote", label: "quote", title: "Blockquote" },
-  { tag: "pre",     label: "pre",     title: "Preformatted code block" },
-  { tag: "code",    label: "code",    title: "Inline code" },
-  { tag: "label",   label: "label",   title: "Form label" },
-  { tag: "video",   label: "video",   title: "Video player" },
-  { tag: "audio",   label: "audio",   title: "Audio player" },
-];
-
 interface Props {
   showOverlay: boolean;
   showLabels: boolean;
-  showComponents: boolean;
-  showLibraries: boolean;
   previewMode: boolean;
   multiPageMode: boolean;
-  onAddElement: (tag: string) => void;
   onToggleOverlay: () => void;
   onToggleLabels: () => void;
-  onToggleComponents: () => void;
-  onToggleLibraries: () => void;
   onTogglePreview: () => void;
   onToggleMultiPage: () => void;
   onImport: () => void;
@@ -56,15 +24,10 @@ interface Props {
 export default function Toolbar({
   showOverlay,
   showLabels,
-  showComponents,
-  showLibraries,
   previewMode,
   multiPageMode,
-  onAddElement,
   onToggleOverlay,
   onToggleLabels,
-  onToggleComponents,
-  onToggleLibraries,
   onTogglePreview,
   onToggleMultiPage,
   onImport,
@@ -86,46 +49,6 @@ export default function Toolbar({
         </button>
       )}
       <span className={styles.toolbarLogo}>HTML Lab</span>
-      <div className={styles.toolbarSep} />
-
-      <div className={styles.modePill}>
-        <button
-          className={`${styles.modeBtn} ${!showComponents && !showLibraries ? styles.modeBtnActive : ""}`}
-          onClick={() => (showComponents || showLibraries) && onToggleComponents()}
-        >
-          Elements
-        </button>
-        <button
-          className={`${styles.modeBtn} ${showComponents ? styles.modeBtnActive : ""}`}
-          onClick={() => !showComponents && onToggleComponents()}
-        >
-          Components
-        </button>
-        <button
-          className={`${styles.modeBtn} ${showLibraries ? styles.modeBtnActive : ""}`}
-          onClick={onToggleLibraries}
-        >
-          Libraries
-        </button>
-      </div>
-      <div className={styles.toolbarSep} />
-
-      {!showComponents && !showLibraries && (
-        <>
-          <span className={styles.toolbarLabel}>Add:</span>
-          {ELEMENTS.map(({ tag, label, title }) => (
-            <button
-              key={tag}
-              className={styles.elemBtn}
-              onClick={() => onAddElement(tag)}
-              title={title}
-            >
-              {label}
-            </button>
-          ))}
-        </>
-      )}
-
       <div className={styles.toolbarSep} />
 
       <button
