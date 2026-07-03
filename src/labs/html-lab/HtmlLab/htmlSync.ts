@@ -350,9 +350,18 @@ export function applyCssToElements(
   const styleById = new Map<string, Record<string, string>>();
   let bodyStyles: Record<string, string> | null = null;
 
+  // Matched by structure (comment + the 3 known selector groups), not by the
+  // exact property values inside — elementsToCss always re-emits this block
+  // verbatim, so failing to strip it here means every editor keystroke
+  // round-trips a fresh copy back into customCss, which then gets echoed
+  // back in by elementsToCss on top of *another* fresh copy: an unbounded
+  // duplicate pileup on every edit. Structural (not literal-text) matching
+  // also means it still strips — and self-heals — a copy someone hand-edited.
+  const resetBlock = /\/\*\s*Reset\s*\*\/\s*\*,\s*\*::before,\s*\*::after\s*\{[^}]*\}\s*img,\s*video,\s*svg\s*\{[^}]*\}\s*input,\s*button,\s*textarea,\s*select\s*\{[^}]*\}/gi;
   const managedBlock = /\[data-lab-id=(?:"([^"]+)"|'([^']+)')\]\s*\{([^}]*)\}/g;
   let customCss = css
     .replace(/\/\*\s*Custom CSS\s*\*\//gi, "")
+    .replace(resetBlock, "")
     .replace(managedBlock, (_, id1: string, id2: string, body: string) => {
       const id = id1 || id2;
       styleById.set(id, parseStyleString(body));
