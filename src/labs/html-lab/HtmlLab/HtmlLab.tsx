@@ -7,7 +7,7 @@ import ConfirmDialog, { shouldSkip } from "./ConfirmDialog";
 import ExamplePickerModal from "./ExamplePickerModal";
 import TableBuilderModal from "./TableBuilderModal";
 import { EXAMPLES } from "./exampleGallery";
-import { labReducer, initialState } from "./labReducer";
+import { labReducer, initialState, inferBodyTheme } from "./labReducer";
 import { detectComponents, buildThemeUpdates } from "./componentLibrary";
 import { resolveCdnTags } from "./cdnLibraries";
 import {
@@ -72,7 +72,13 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
     const ex = 'pages' in exData
       ? { elements: exData.pages[0]?.elements ?? [], bodyStyles: exData.pages[0]?.bodyStyles ?? {}, javascript: exData.pages[0]?.javascript ?? "" }
       : exData;
-    return { ...initialState, elements: ex.elements, bodyStyles: ex.bodyStyles, javascript: ex.javascript ?? "" };
+    return {
+      ...initialState,
+      elements: ex.elements,
+      bodyStyles: ex.bodyStyles,
+      bodyTheme: inferBodyTheme(ex.bodyStyles),
+      javascript: ex.javascript ?? "",
+    };
   });
   const [codePanelWidth, setCodePanelWidth]   = useState<number>(360);
   const [propsPanelWidth, setPropsPanelWidth] = useState<number>(280);

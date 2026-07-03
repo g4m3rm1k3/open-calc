@@ -9,7 +9,7 @@
 //     actually sitting on (an ancestor's gradient/solid background).
 
 import { describe, it, expect } from "vitest";
-import { labReducer, initialState, CONTAINER_TAGS, computeBodyStyles } from "./labReducer";
+import { labReducer, initialState, CONTAINER_TAGS, computeBodyStyles, inferBodyTheme } from "./labReducer";
 import type { LabElement, LabState, BodyThemeState } from "./types";
 
 function el(id: string, tag: string, parentId: string | null, order: number, styles: Record<string, string> = {}, content = ""): LabElement {
@@ -97,5 +97,43 @@ describe("TOGGLE_GLASS / TOGGLE_CENTERED — axes stay independent", () => {
     expect(state.bodyTheme).toEqual({ colorMode: "dark", glass: true, centered: true });
     expect(state.bodyStyles.maxWidth).toBe("1024px");
     expect(state.bodyStyles.background).toContain("#4c1d95");
+  });
+});
+
+describe("LOAD_EXAMPLE — bodyTheme stays in sync with whatever bodyStyles the example sets", () => {
+  // Real incident: examples (including the app's own startup example) set
+  // bodyStyles directly with their own hardcoded colors, entirely bypassing the
+  // bodyTheme axis system. Without inferBodyTheme, the Global Style panel kept
+  // showing "Light" as active — because bodyTheme was never touched — even
+  // though the loaded example's actual page was dark.
+  it("infers Dark from a loaded example's dark backgroundColor, not left at the default Light", () => {
+    const darkExampleStyles = { backgroundColor: "#0f172a", color: "#f8fafc" };
+    const next = labReducer(initialState, {
+      type: "LOAD_EXAMPLE",
+      payload: { elements: [], bodyStyles: darkExampleStyles, javascript: "" },
+    });
+    expect(next.bodyTheme.colorMode).toBe("dark");
+  });
+
+  it("infers Light from a loaded example's light backgroundColor", () => {
+    const lightExampleStyles = { backgroundColor: "#ffffff", color: "#0f172a" };
+    const next = labReducer(initialState, {
+      type: "LOAD_EXAMPLE",
+      payload: { elements: [], bodyStyles: lightExampleStyles, javascript: "" },
+    });
+    expect(next.bodyTheme.colorMode).toBe("light");
+  });
+});
+
+describe("inferBodyTheme", () => {
+  it("detects glass from a gradient background with no plain backgroundColor", () => {
+    const theme = inferBodyTheme({ background: "linear-gradient(135deg, #4c1d95 0%, #1e3a8a 100%)" });
+    expect(theme.glass).toBe(true);
+    expect(theme.colorMode).toBe("dark");
+  });
+
+  it("detects centered from a maxWidth", () => {
+    const theme = inferBodyTheme({ backgroundColor: "#f8fafc", maxWidth: "1024px" });
+    expect(theme.centered).toBe(true);
   });
 });

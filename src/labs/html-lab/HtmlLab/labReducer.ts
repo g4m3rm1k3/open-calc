@@ -134,6 +134,29 @@ export function computeBodyStyles(theme: BodyThemeState): Record<string, string>
   return styles;
 }
 
+// Best-effort reverse mapping, for whenever bodyStyles gets set directly by
+// something outside the axis system (loading an example, importing a page,
+// hand-editing the CSS tab) — without this, the Global Style panel keeps
+// showing whatever axis state it last had (e.g. "Light" highlighted) even
+// though the page that just loaded is actually dark, since none of those
+// code paths otherwise touch `bodyTheme` at all.
+export function inferBodyTheme(bodyStyles: Record<string, string>): BodyThemeState {
+  const bg = bodyStyles.backgroundColor || bodyStyles.background || "";
+  // A plain color is just itself; a gradient (or any string with multiple hex
+  // colors) is judged by the average luminance of every color in it, so this
+  // works for gradients this app never generated itself (e.g. a hand-authored
+  // import) just as well as for its own light-glass/dark-glass gradients.
+  const hexColors = bg.match(/#[0-9a-fA-F]{6}/g) ?? [];
+  const isDark = hexColors.length > 0
+    ? hexColors.reduce((sum, c) => sum + hexLum(c), 0) / hexColors.length < 0.5
+    : /0f172a|1e293b|1a1a1a|000000|020617/i.test(bg);
+  return {
+    colorMode: isDark ? "dark" : "light",
+    glass: Boolean(bodyStyles.background && !bodyStyles.backgroundColor),
+    centered: Boolean(bodyStyles.maxWidth),
+  };
+}
+
 // ─── Initial state ────────────────────────────────────────────────────────────
 export const initialState: LabState = {
   elements: [],
@@ -300,6 +323,7 @@ export function labReducer(state: LabState, action: Action): LabState {
           ...s,
           elements: first.elements,
           bodyStyles: first.bodyStyles,
+          bodyTheme: inferBodyTheme(first.bodyStyles),
           javascript: first.javascript ?? "",
           customCss: first.customCss ?? "",
           cdnLinks: action.payload.cdnLinks ?? s.cdnLinks,
@@ -313,6 +337,7 @@ export function labReducer(state: LabState, action: Action): LabState {
         ...s,
         elements: action.payload.elements,
         bodyStyles: action.payload.bodyStyles,
+        bodyTheme: inferBodyTheme(action.payload.bodyStyles),
         javascript: action.payload.javascript ?? "",
         customCss: action.payload.customCss ?? "",
         cdnLinks: action.payload.cdnLinks ?? s.cdnLinks,
@@ -568,11 +593,13 @@ export function labReducer(state: LabState, action: Action): LabState {
 
     case "SET_FROM_CSS": {
       const s = withHistory(state);
+      const bodyStyles = action.payload.bodyStyles ?? s.bodyStyles;
       return {
         ...s,
         elements: action.payload.elements,
         customCss: action.payload.customCss,
-        bodyStyles: action.payload.bodyStyles ?? s.bodyStyles,
+        bodyStyles,
+        bodyTheme: action.payload.bodyStyles ? inferBodyTheme(bodyStyles) : s.bodyTheme,
       };
     }
 
