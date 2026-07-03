@@ -7,12 +7,14 @@ import {
   CSS_PROPS_LIST,
 } from "./styleLibrary";
 import { JS_PRESETS } from "./jsPresets";
-import type { LabElement, MediaQuery, Component, ComponentTheme, BodyTheme } from "./types";
+import type { LabElement, MediaQuery, Component, ComponentTheme, BodyThemeState } from "./types";
 
 const TAGS = [
-  "div", "p", "h1", "h2", "h3", "h4", "button", "span", "a", "img",
+  "div", "p", "h1", "h2", "h3", "h4", "h5", "h6", "button", "span", "a", "img",
   "ul", "ol", "li", "section", "article", "header", "footer", "nav",
   "hr", "blockquote", "pre", "code", "label", "video", "audio",
+  "strong", "em", "b", "i", "u", "s", "small", "mark", "sub", "sup", "kbd", "time",
+  "address", "br", "textarea", "iframe", "canvas",
   "table", "thead", "tbody", "tr", "th", "td",
   "form", "input", "select", "option", "figure", "figcaption",
   "dl", "dt", "dd", "details", "summary",
@@ -73,6 +75,21 @@ const TAG_ATTR_ROWS: Record<string, SectionRow[]> = {
   ],
   details: [
     { label: "open", prop: "_open", attr: "open", type: "attr", placeholder: "true" },
+  ],
+  textarea: [
+    { label: "name",        prop: "_name",        attr: "name",        type: "attr", placeholder: "field-name" },
+    { label: "placeholder", prop: "_placeholder", attr: "placeholder", type: "attr", placeholder: "Enter value..." },
+    { label: "rows",        prop: "_rows",        attr: "rows",        type: "attr", placeholder: "4" },
+  ],
+  iframe: [
+    { label: "src", prop: "_src", attr: "src", type: "attr", placeholder: "https://..." },
+  ],
+  canvas: [
+    { label: "width",  prop: "_canvasWidth",  attr: "width",  type: "attr", placeholder: "480" },
+    { label: "height", prop: "_canvasHeight", attr: "height", type: "attr", placeholder: "240" },
+  ],
+  time: [
+    { label: "datetime", prop: "_datetime", attr: "datetime", type: "attr", placeholder: "2025-01-01" },
   ],
 };
 
@@ -215,9 +232,12 @@ interface PropsPanelProps {
   onAddMediaQuery: (mq: MediaQuery) => void;
   onRemoveMediaQuery: (index: number) => void;
   matchedComponents?: Component[];
-  bodyThemes?: BodyTheme[] | null;
+  bodyTheme?: BodyThemeState | null;
   onApplyComponentTheme?: (theme: ComponentTheme) => void;
-  onApplyBodyTheme?: (theme: BodyTheme) => void;
+  onSetColorMode?: (mode: "light" | "dark") => void;
+  onToggleGlass?: () => void;
+  onToggleCentered?: () => void;
+  onResetBodyTheme?: () => void;
   onDelete?: (id: string) => void;
   style?: React.CSSProperties;
 }
@@ -238,9 +258,12 @@ export default function PropertiesPanel({
   onAddMediaQuery,
   onRemoveMediaQuery,
   matchedComponents = [],
-  bodyThemes = null,
+  bodyTheme = null,
   onApplyComponentTheme,
-  onApplyBodyTheme,
+  onSetColorMode,
+  onToggleGlass,
+  onToggleCentered,
+  onResetBodyTheme,
   onDelete,
   style,
 }: PropsPanelProps) {
@@ -297,11 +320,13 @@ export default function PropertiesPanel({
         )}
       </div>
       <div className={styles.propsBody}>
-        {bodyThemes && (
-          <ThemeSection
-            title="Layout Themes"
-            groups={[{ label: null, themes: bodyThemes }]}
-            onApply={(theme) => onApplyBodyTheme?.(theme as BodyTheme)}
+        {bodyTheme && (
+          <GlobalStyleControls
+            bodyTheme={bodyTheme}
+            onSetColorMode={(mode) => onSetColorMode?.(mode)}
+            onToggleGlass={() => onToggleGlass?.()}
+            onToggleCentered={() => onToggleCentered?.()}
+            onReset={() => onResetBodyTheme?.()}
           />
         )}
 
@@ -948,7 +973,7 @@ function GradientPresets({ onChange }: GradientPresetsProps) {
 
 // ─── Theme Section ────────────────────────────────────────────────────────────
 
-type ThemeDisplayItem = BodyTheme | ComponentTheme;
+type ThemeDisplayItem = ComponentTheme;
 
 interface ThemeGroupDisplay {
   label: string | null;
@@ -982,6 +1007,65 @@ function ThemeSection({ title, groups, onApply }: ThemeSectionProps) {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+// ─── Global Style controls (Color Mode / Glass / Centered — independent axes) ──
+
+interface GlobalStyleControlsProps {
+  bodyTheme: BodyThemeState;
+  onSetColorMode: (mode: "light" | "dark") => void;
+  onToggleGlass: () => void;
+  onToggleCentered: () => void;
+  onReset: () => void;
+}
+
+function GlobalStyleControls({ bodyTheme, onSetColorMode, onToggleGlass, onToggleCentered, onReset }: GlobalStyleControlsProps) {
+  return (
+    <div className={styles.themeSection}>
+      <div className={styles.themeSectionTitle} style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        Global Style
+        <button className={styles.themeBtn} onClick={onReset} title="Reset color mode, glass, and centering to defaults">↺ Reset</button>
+      </div>
+
+      <div className={styles.themeGroup}>
+        <div className={styles.themeGroupLabel}>Color Mode</div>
+        <div className={styles.themeList}>
+          <button
+            className={`${styles.themeBtn} ${bodyTheme.colorMode === "light" ? styles.themeBtnApplied : ""}`}
+            onClick={() => onSetColorMode("light")}
+            title="Light background, dark text"
+          >Light</button>
+          <button
+            className={`${styles.themeBtn} ${bodyTheme.colorMode === "dark" ? styles.themeBtnApplied : ""}`}
+            onClick={() => onSetColorMode("dark")}
+            title="Dark background, light text"
+          >Dark</button>
+        </div>
+      </div>
+
+      <div className={styles.themeGroup}>
+        <div className={styles.themeGroupLabel}>Surface</div>
+        <div className={styles.themeList}>
+          <button
+            className={`${styles.themeBtn} ${bodyTheme.glass ? styles.themeBtnApplied : ""}`}
+            onClick={onToggleGlass}
+            title="Colorful gradient backdrop + translucent blurred cards — works in either color mode"
+          >Glassmorphism</button>
+        </div>
+      </div>
+
+      <div className={styles.themeGroup}>
+        <div className={styles.themeGroupLabel}>Layout</div>
+        <div className={styles.themeList}>
+          <button
+            className={`${styles.themeBtn} ${bodyTheme.centered ? styles.themeBtnApplied : ""}`}
+            onClick={onToggleCentered}
+            title="Constrain the page to a centered column — doesn't affect color"
+          >Centered Canvas</button>
+        </div>
+      </div>
     </div>
   );
 }

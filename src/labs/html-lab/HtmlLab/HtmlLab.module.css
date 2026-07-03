@@ -685,6 +685,148 @@
   min-height: 34px;
 }
 
+/* ── Table Builder modal ──────────────────────────────────────────────────────── */
+.tbControls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--hl-border);
+}
+.tbControlField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--hl-text);
+  font-weight: 600;
+}
+.tbControlField input[type="number"] {
+  width: 56px;
+  padding: 5px 8px;
+  border: 1px solid var(--hl-border);
+  border-radius: 6px;
+  background: var(--hl-surface);
+  color: var(--hl-text);
+  font-size: 13px;
+}
+.tbHeaderToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--hl-text);
+  font-weight: 600;
+  margin-left: auto;
+}
+.tbGridWrap {
+  padding: 20px;
+  overflow-x: auto;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+.tbGrid {
+  display: grid;
+  gap: 6px;
+}
+.tbCell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--hl-hint);
+}
+.tbCellHeader {
+  background: var(--hl-accent-bg);
+  border-color: var(--hl-accent);
+  color: var(--hl-accent-strong);
+  font-weight: 600;
+}
+.tbCellLabel {
+  pointer-events: none;
+}
+.tbCellInput {
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  color: inherit;
+  outline: none;
+  padding: 0;
+}
+.tbCellInput::placeholder {
+  color: inherit;
+  opacity: 0.7;
+}
+.tbExtendGroup {
+  position: absolute;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+.tbCell:hover .tbExtendGroup {
+  opacity: 1;
+}
+.tbExtendGroupRight {
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.tbExtendGroupDown {
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tbExtendBtn {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--hl-accent-strong);
+  border-radius: 50%;
+  background: var(--hl-accent-strong);
+  color: #fff;
+  font-size: 9px;
+  line-height: 1;
+  cursor: pointer;
+}
+.tbFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--hl-border);
+}
+.tbCancelBtn {
+  padding: 8px 16px;
+  border: 1px solid var(--hl-border);
+  border-radius: 8px;
+  background: var(--hl-surface);
+  color: var(--hl-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+.tbInsertBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--hl-accent-strong);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* Tree view inside the code panel (Tree tab) */
 .codeTreePanel {
   height: 100%;

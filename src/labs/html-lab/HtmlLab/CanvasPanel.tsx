@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback } from "react";
 import styles from "./HtmlLab.module.css";
-import { CONTAINER_TAGS } from "./labReducer";
+import { CONTAINER_TAGS, TABLE_ROLE_TAGS } from "./labReducer";
 import type { LabElement, BodyStyles } from "./types";
 
 const VOID_TAGS = new Set(["img", "br", "hr", "input"]);
@@ -287,7 +287,10 @@ function renderTag(
         )}
         {children.length > 0 && renderDropZone(el.id, 0, `${el.id}-dz-0`)}
         {children.map((child, i) => (
-          <div key={child.id}>
+          <div
+            key={child.id}
+            style={TABLE_ROLE_TAGS.has(child.tag) ? { display: child.styles.display } : undefined}
+          >
             {renderElement(child)}
             {renderDropZone(el.id, i + 1, `${el.id}-dz-${i + 1}`)}
           </div>

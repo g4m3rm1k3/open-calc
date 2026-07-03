@@ -1,4 +1,4 @@
-import type { LabElement, Component, ComponentTheme, BodyTheme, StyleUpdate } from "./types";
+import type { LabElement, Component, ComponentTheme, StyleUpdate } from "./types";
 
 function el(
   id: string,
@@ -20,17 +20,6 @@ function el(
 function sortedTags(children: LabElement[]): string {
   return [...children].map(c => c.tag).sort().join(",");
 }
-
-// ─── Body themes ─────────────────────────────────────────────────────────────
-export const BODY_THEMES: BodyTheme[] = [
-  { id: "body-reset",    name: "↺ Reset",           reset: true,  description: "Restore default body styles", styles: {} },
-  { id: "body-css-reset", name: "CSS Reset",         description: "margin: 0, padding: 0 — clean base", styles: { margin: "0", padding: "0", fontFamily: "system-ui, -apple-system, sans-serif", fontSize: "16px", lineHeight: "1.5", color: "#0f172a", backgroundColor: "#ffffff" } },
-  { id: "body-clean",    name: "Clean Light",        description: "Clean white page, sharp text", styles: { backgroundColor: "#ffffff", color: "#0f172a", fontFamily: "system-ui, -apple-system, sans-serif" } },
-  { id: "body-slate",    name: "Slate",              description: "Light slate page, perfect for white cards", styles: { backgroundColor: "#f8fafc", color: "#0f172a", fontFamily: "system-ui, -apple-system, sans-serif" } },
-  { id: "body-dark",     name: "Dark Mode",          description: "Dark slate background, light text", styles: { backgroundColor: "#0f172a", color: "#f8fafc", fontFamily: "system-ui, -apple-system, sans-serif" } },
-  { id: "body-glass",    name: "Glassmorphism",      description: "Mesh gradient background", styles: { background: "linear-gradient(135deg, #c084fc 0%, #3b82f6 100%)", color: "#ffffff", fontFamily: "system-ui, -apple-system, sans-serif" } },
-  { id: "body-centered", name: "Centered Canvas",   description: "Narrow centered column", styles: { display: "block", maxWidth: "1024px", margin: "0 auto", padding: "48px 24px" } },
-];
 
 // ─── Component library ────────────────────────────────────────────────────────
 export const COMPONENTS: Component[] = [
@@ -298,7 +287,7 @@ export const COMPONENTS: Component[] = [
   // ── Table (real <table>/<thead>/<tbody> structure) ────────────────────────────
   {
     id: "table-structure", name: "Table", category: "Structure", icon: "▦",
-    description: "Real <table> with header row and two data rows",
+    description: "Opens a builder to configure rows, columns, spans, and header",
     matches: () => false,
     themeGroups: [],
     template: [
@@ -447,5 +436,21 @@ export function buildThemeUpdates(parentId: string, elements: LabElement[], them
     }
   });
 
+  return updates;
+}
+
+// ─── Cascade a global color/surface mode to every matching component instance ──
+// Runs whenever Color Mode or Glass changes (labReducer.ts). Each component's
+// own theme variants are mutually exclusive (a card can't be both Dark and
+// Glass at once today), so this just picks the one variant matching `mode`.
+export function cascadeComponentThemes(elements: LabElement[], mode: "light" | "dark" | "glass"): StyleUpdate[] {
+  const suffix = mode === "light" ? "clean" : mode;
+  const updates: StyleUpdate[] = [];
+  for (const el of elements) {
+    const matched = detectComponents(el.id, elements);
+    if (matched.length === 0) continue;
+    const compTheme = matched[0].themeGroups.flatMap((g) => g.themes).find((t) => t.id.endsWith(`-${suffix}`));
+    if (compTheme) updates.push(...buildThemeUpdates(el.id, elements, compTheme));
+  }
   return updates;
 }

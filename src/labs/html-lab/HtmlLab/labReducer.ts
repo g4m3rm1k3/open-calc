@@ -1,4 +1,5 @@
-import type { Action, LabElement, LabPage, LabState } from "./types";
+import type { Action, BodyThemeState, LabElement, LabPage, LabState, StyleUpdate } from "./types";
+import { cascadeComponentThemes } from "./componentLibrary";
 
 // ─── Default styles per tag ───────────────────────────────────────────────────
 const TAG_DEFAULTS: Record<string, Record<string, string>> = {
@@ -26,6 +27,27 @@ const TAG_DEFAULTS: Record<string, Record<string, string>> = {
   label:   { fontSize: "14px", fontWeight: "500", color: "#0f172a", display: "block", margin: "0 0 4px 0", cursor: "pointer" },
   video:   { width: "100%", maxWidth: "480px", backgroundColor: "#0f172a", borderRadius: "8px", display: "block", margin: "0 0 16px 0" },
   audio:   { width: "100%", maxWidth: "400px", display: "block", margin: "0 0 16px 0" },
+  h4:      { fontSize: "20px", fontWeight: "600", margin: "0 0 12px 0", lineHeight: "1.4", display: "block" },
+  h5:      { fontSize: "17px", fontWeight: "600", margin: "0 0 12px 0", lineHeight: "1.4", display: "block" },
+  h6:      { fontSize: "15px", fontWeight: "600", margin: "0 0 12px 0", lineHeight: "1.4", display: "block" },
+  strong:  { fontWeight: "700", display: "inline", color: "inherit" },
+  em:      { fontStyle: "italic", display: "inline", color: "inherit" },
+  b:       { fontWeight: "700", display: "inline", color: "inherit" },
+  i:       { fontStyle: "italic", display: "inline", color: "inherit" },
+  u:       { textDecoration: "underline", display: "inline", color: "inherit" },
+  s:       { textDecoration: "line-through", display: "inline", color: "inherit" },
+  small:   { fontSize: "12px", display: "inline", color: "inherit" },
+  mark:    { backgroundColor: "#fef08a", padding: "0 2px", display: "inline", color: "#1a1a18" },
+  sub:     { verticalAlign: "sub", fontSize: "12px", display: "inline", color: "inherit" },
+  sup:     { verticalAlign: "super", fontSize: "12px", display: "inline", color: "inherit" },
+  kbd:     { fontFamily: "monospace", fontSize: "13px", backgroundColor: "#f1f5f9", border: "1px solid #cbd5e1", borderRadius: "4px", padding: "1px 6px", display: "inline" },
+  time:    { color: "#64748b", display: "inline" },
+  br:      {},
+  input:   { padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "15px", display: "block", width: "100%", maxWidth: "320px", boxSizing: "border-box", margin: "0 0 16px 0" },
+  textarea: { padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "15px", display: "block", width: "100%", maxWidth: "320px", minHeight: "80px", boxSizing: "border-box", margin: "0 0 16px 0", fontFamily: "inherit" },
+  address: { fontStyle: "normal", color: "#475569", display: "block", margin: "0 0 16px 0", lineHeight: "1.6" },
+  iframe:  { width: "100%", maxWidth: "480px", height: "270px", border: "none", borderRadius: "8px", display: "block", margin: "0 0 16px 0", backgroundColor: "#f1f5f9" },
+  canvas:  { width: "100%", maxWidth: "480px", height: "240px", backgroundColor: "#f1f5f9", borderRadius: "8px", display: "block", margin: "0 0 16px 0" },
 };
 
 const TAG_CONTENT: Record<string, string> = {
@@ -35,6 +57,11 @@ const TAG_CONTENT: Record<string, string> = {
   nav: "", ol: "", hr: "", blockquote: "The best way to predict the future is to invent it.",
   pre: "console.log(\"Hello, world!\");", code: "code", label: "Label text",
   video: "", audio: "",
+  h4: "Heading 4", h5: "Heading 5", h6: "Heading 6",
+  strong: "Bold text", em: "Italic text", b: "Bold text", i: "Italic text",
+  u: "Underlined text", s: "Strikethrough text", small: "Small print",
+  mark: "Highlighted text", sub: "sub", sup: "sup", kbd: "Ctrl+S", time: "2025-01-01",
+  br: "", input: "", textarea: "", address: "123 Main St, Anytown", iframe: "", canvas: "",
 };
 
 const TAG_ATTRS: Record<string, Record<string, string>> = {
@@ -43,6 +70,10 @@ const TAG_ATTRS: Record<string, Record<string, string>> = {
   button: { type: "button" },
   video:  { controls: "true" },
   audio:  { controls: "true" },
+  time:   { datetime: "2025-01-01" },
+  input:  { type: "text", placeholder: "Enter text..." },
+  iframe: { src: "" },
+  canvas: { width: "480", height: "240" },
 };
 
 export const CONTAINER_TAGS = new Set([
@@ -54,9 +85,53 @@ export const CONTAINER_TAGS = new Set([
   "main", "aside", "blockquote", "details", "summary",
 ]);
 
+// Tags whose CSS table role (table-row-group/table-row/table-cell) has to be
+// preserved on their canvas drag-handle wrapper div too, or the browser's table
+// layout algorithm sees a plain <div> where a row/cell belongs and the whole
+// table collapses into a single stacked column. See CanvasPanel's renderTag.
+export const TABLE_ROLE_TAGS = new Set(["thead", "tbody", "tfoot", "tr", "th", "td"]);
+
 let _idCounter = 1;
 function genId(): string {
   return "el" + _idCounter++;
+}
+
+// ─── Global style axes ──────────────────────────────────────────────────────────
+// Color mode, glass surface, and centered layout are independent — computed
+// fresh from these three flags every time, rather than merged from a flat list
+// of mutually-exclusive presets (which is how picking "Centered" used to throw
+// away whatever color mode was active).
+export const DEFAULT_BODY_THEME: BodyThemeState = { colorMode: "light", glass: false, centered: false };
+
+export function computeBodyStyles(theme: BodyThemeState): Record<string, string> {
+  const isDark = theme.colorMode === "dark";
+  const styles: Record<string, string> = {
+    fontFamily: "system-ui, -apple-system, sans-serif",
+    fontSize: "16px",
+    lineHeight: "1.5",
+    margin: "0",
+    padding: "0",
+    color: isDark ? "#f8fafc" : "#0f172a",
+  };
+
+  if (theme.glass) {
+    // Glass always needs something colorful underneath it to read as "glass" —
+    // the gradient itself shifts with color mode, same as the per-component
+    // -glass variants do for their own backgrounds.
+    styles.background = isDark
+      ? "linear-gradient(135deg, #4c1d95 0%, #1e3a8a 100%)"
+      : "linear-gradient(135deg, #ddd6fe 0%, #bfdbfe 100%)";
+  } else {
+    styles.backgroundColor = isDark ? "#0f172a" : "#f8fafc";
+  }
+
+  if (theme.centered) {
+    styles.maxWidth = "1024px";
+    styles.margin = "0 auto";
+    styles.padding = "48px 24px";
+  }
+
+  return styles;
 }
 
 // ─── Initial state ────────────────────────────────────────────────────────────
@@ -68,15 +143,8 @@ export const initialState: LabState = {
   customCss: "",
   javascript: "",
   history: [],
-  bodyStyles: {
-    fontFamily: "system-ui, -apple-system, sans-serif",
-    fontSize: "16px",
-    lineHeight: "1.5",
-    color: "#1a1a18",
-    backgroundColor: "#ffffff",
-    margin: "0",
-    padding: "0",
-  },
+  bodyTheme: DEFAULT_BODY_THEME,
+  bodyStyles: computeBodyStyles(DEFAULT_BODY_THEME),
   mode: "single",
   pages: [],
   activePageId: null,
@@ -107,15 +175,7 @@ function blankPage(name: string, index: number): LabPage {
     id: "pg" + (Date.now() + index),
     name,
     elements: [],
-    bodyStyles: {
-      fontFamily: "system-ui, -apple-system, sans-serif",
-      fontSize: "16px",
-      lineHeight: "1.5",
-      color: "#1a1a18",
-      backgroundColor: "#ffffff",
-      margin: "0",
-      padding: "0",
-    },
+    bodyStyles: computeBodyStyles(DEFAULT_BODY_THEME),
     javascript: "",
     customCss: "",
   };
@@ -219,6 +279,14 @@ function cascadeBodyTheme(elements: LabElement[], newBodyStyles: Record<string, 
 
     return changed ? { ...el, styles: s } : el;
   });
+}
+
+function applyStyleUpdates(elements: LabElement[], updates: StyleUpdate[]): LabElement[] {
+  let next = elements;
+  for (const update of updates) {
+    next = next.map((el) => (el.id === update.id ? { ...el, styles: { ...el.styles, ...update.styles } } : el));
+  }
+  return next;
 }
 
 // ─── Reducer ──────────────────────────────────────────────────────────────────
@@ -586,27 +654,34 @@ export function labReducer(state: LabState, action: Action): LabState {
       };
     }
 
-    case "APPLY_BODY_THEME": {
+    case "SET_COLOR_MODE": {
       const s = withHistory(state);
-      const newBodyStyles = { ...s.bodyStyles, ...action.payload };
-      const hasBgChange = "backgroundColor" in action.payload || "background" in action.payload;
-      const newElements = hasBgChange ? cascadeBodyTheme(s.elements, newBodyStyles) : s.elements;
-      return { ...s, bodyStyles: newBodyStyles, elements: newElements };
+      const bodyTheme: BodyThemeState = { ...s.bodyTheme, colorMode: action.payload };
+      const bodyStyles = computeBodyStyles(bodyTheme);
+      const elements = cascadeBodyTheme(s.elements, bodyStyles);
+      const mode = bodyTheme.glass ? "glass" : action.payload;
+      return { ...s, bodyTheme, bodyStyles, elements: applyStyleUpdates(elements, cascadeComponentThemes(elements, mode)) };
     }
 
-    case "RESET_BODY_STYLES":
-      return {
-        ...state,
-        bodyStyles: {
-          fontFamily: "system-ui, -apple-system, sans-serif",
-          fontSize: "16px",
-          lineHeight: "1.5",
-          color: "#1a1a18",
-          backgroundColor: "#ffffff",
-          margin: "0",
-          padding: "0",
-        },
-      };
+    case "TOGGLE_GLASS": {
+      const s = withHistory(state);
+      const bodyTheme: BodyThemeState = { ...s.bodyTheme, glass: !s.bodyTheme.glass };
+      const bodyStyles = computeBodyStyles(bodyTheme);
+      const elements = cascadeBodyTheme(s.elements, bodyStyles);
+      const mode = bodyTheme.glass ? "glass" : bodyTheme.colorMode;
+      return { ...s, bodyTheme, bodyStyles, elements: applyStyleUpdates(elements, cascadeComponentThemes(elements, mode)) };
+    }
+
+    case "TOGGLE_CENTERED": {
+      const s = withHistory(state);
+      const bodyTheme: BodyThemeState = { ...s.bodyTheme, centered: !s.bodyTheme.centered };
+      return { ...s, bodyTheme, bodyStyles: computeBodyStyles(bodyTheme) };
+    }
+
+    case "RESET_BODY_THEME": {
+      const s = withHistory(state);
+      return { ...s, bodyTheme: DEFAULT_BODY_THEME, bodyStyles: computeBodyStyles(DEFAULT_BODY_THEME) };
+    }
 
     case "UNDO": {
       if (!state.history.length) return state;

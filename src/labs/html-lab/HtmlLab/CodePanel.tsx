@@ -50,17 +50,38 @@ const ELEMENTS: ElementDef[] = [
   { tag: "h1",      label: "H1",      title: "Heading 1",                category: "Text" },
   { tag: "h2",      label: "H2",      title: "Heading 2",                category: "Text" },
   { tag: "h3",      label: "H3",      title: "Heading 3",                category: "Text" },
+  { tag: "h4",      label: "H4",      title: "Heading 4",                category: "Text" },
+  { tag: "h5",      label: "H5",      title: "Heading 5",                category: "Text" },
+  { tag: "h6",      label: "H6",      title: "Heading 6",                category: "Text" },
   { tag: "span",    label: "span",    title: "Inline container",         category: "Text" },
   { tag: "blockquote", label: "quote", title: "Blockquote",              category: "Text" },
   { tag: "pre",     label: "pre",     title: "Preformatted code block",  category: "Text" },
   { tag: "code",    label: "code",    title: "Inline code",              category: "Text" },
-  { tag: "label",   label: "label",   title: "Form label",               category: "Text" },
+  { tag: "address", label: "address", title: "Contact/address block",    category: "Text" },
+  { tag: "br",      label: "br",      title: "Line break",               category: "Text" },
+  { tag: "strong",  label: "strong",  title: "Bold / strong importance", category: "Inline text" },
+  { tag: "em",      label: "em",      title: "Italic / emphasis",        category: "Inline text" },
+  { tag: "b",       label: "b",       title: "Bold (no semantic weight)", category: "Inline text" },
+  { tag: "i",       label: "i",       title: "Italic (no semantic weight)", category: "Inline text" },
+  { tag: "u",       label: "u",       title: "Underline",                category: "Inline text" },
+  { tag: "s",       label: "s",       title: "Strikethrough",            category: "Inline text" },
+  { tag: "small",   label: "small",   title: "Small print",              category: "Inline text" },
+  { tag: "mark",    label: "mark",    title: "Highlighted text",         category: "Inline text" },
+  { tag: "sub",     label: "sub",     title: "Subscript",                category: "Inline text" },
+  { tag: "sup",     label: "sup",     title: "Superscript",              category: "Inline text" },
+  { tag: "kbd",     label: "kbd",     title: "Keyboard input",           category: "Inline text" },
+  { tag: "time",    label: "time",    title: "Date / time",              category: "Inline text" },
+  { tag: "label",   label: "label",   title: "Form label",               category: "Forms" },
+  { tag: "input",   label: "input",   title: "Text input field",         category: "Forms" },
+  { tag: "textarea", label: "textarea", title: "Multi-line text field",  category: "Forms" },
   { tag: "button",  label: "button",  title: "Button",                   category: "Interactive" },
   { tag: "a",       label: "a",       title: "Anchor / link",            category: "Interactive" },
   { tag: "img",     label: "img",     title: "Image placeholder",        category: "Media" },
   { tag: "hr",      label: "hr",      title: "Horizontal rule",          category: "Media" },
   { tag: "video",   label: "video",   title: "Video player",             category: "Media" },
   { tag: "audio",   label: "audio",   title: "Audio player",             category: "Media" },
+  { tag: "iframe",  label: "iframe",  title: "Embedded frame",           category: "Media" },
+  { tag: "canvas",  label: "canvas",  title: "Canvas (JS drawing surface)", category: "Media" },
 ];
 
 function groupByCategory<T extends { category: string }>(items: T[]): [string, T[]][] {
@@ -134,10 +155,11 @@ interface ComponentsSectionProps {
   bodyIsDark: boolean;
   onInsertTemplate: (template: LabElement[], autoTheme: ComponentTheme | null) => void;
   onInsertJsPreset: (template: LabElement[], code: string) => void;
+  onOpenTableBuilder: () => void;
   onHover: (desc: string | null) => void;
 }
 
-function ComponentsSection({ bodyIsDark, onInsertTemplate, onInsertJsPreset, onHover }: ComponentsSectionProps) {
+function ComponentsSection({ bodyIsDark, onInsertTemplate, onInsertJsPreset, onOpenTableBuilder, onHover }: ComponentsSectionProps) {
   const jsPresets = JS_PRESETS.filter((p) => p.template);
   const totalCount = COMPONENTS.length + jsPresets.length;
 
@@ -151,6 +173,9 @@ function ComponentsSection({ bodyIsDark, onInsertTemplate, onInsertJsPreset, onH
                 key={comp.id}
                 className={styles.compCard}
                 onClick={() => {
+                  // A table can't usefully start as one fixed scaffold — the modal
+                  // lets the user pick rows/columns/spans/header before insertion.
+                  if (comp.id === "table-structure") { onOpenTableBuilder(); return; }
                   const autoTheme = bodyIsDark
                     ? comp.themeGroups.flatMap((g) => g.themes).find((t) =>
                         t.name.toLowerCase() === "dark" || t.id.endsWith("-dark")
@@ -237,11 +262,12 @@ interface ToolboxPickerProps {
   bodyIsDark: boolean;
   onInsertTemplate: (template: LabElement[], autoTheme: ComponentTheme | null) => void;
   onInsertJsPreset: (template: LabElement[], code: string) => void;
+  onOpenTableBuilder: () => void;
   cdnLinks: string[];
   onToggleCdn: (id: string) => void;
 }
 
-function ToolboxPicker({ onAddElement, bodyIsDark, onInsertTemplate, onInsertJsPreset, cdnLinks, onToggleCdn }: ToolboxPickerProps) {
+function ToolboxPicker({ onAddElement, bodyIsDark, onInsertTemplate, onInsertJsPreset, onOpenTableBuilder, cdnLinks, onToggleCdn }: ToolboxPickerProps) {
   const [hoverDesc, setHoverDesc] = useState<string | null>(null);
   return (
     <div className={styles.pickerPanel}>
@@ -251,6 +277,7 @@ function ToolboxPicker({ onAddElement, bodyIsDark, onInsertTemplate, onInsertJsP
           bodyIsDark={bodyIsDark}
           onInsertTemplate={onInsertTemplate}
           onInsertJsPreset={onInsertJsPreset}
+          onOpenTableBuilder={onOpenTableBuilder}
           onHover={setHoverDesc}
         />
         <LibrariesSection cdnLinks={cdnLinks} onToggleCdn={onToggleCdn} />
@@ -467,6 +494,7 @@ interface CodePanelProps {
   bodyIsDark: boolean;
   onInsertTemplate: (template: LabElement[], autoTheme: ComponentTheme | null) => void;
   onInsertJsPreset: (template: LabElement[], code: string) => void;
+  onOpenTableBuilder: () => void;
   cdnLinks: string[];
   onToggleCdn: (id: string) => void;
 }
@@ -489,6 +517,7 @@ export default function CodePanel({
   bodyIsDark,
   onInsertTemplate,
   onInsertJsPreset,
+  onOpenTableBuilder,
   cdnLinks,
   onToggleCdn,
 }: CodePanelProps) {
@@ -624,6 +653,7 @@ export default function CodePanel({
             bodyIsDark={bodyIsDark}
             onInsertTemplate={onInsertTemplate}
             onInsertJsPreset={onInsertJsPreset}
+            onOpenTableBuilder={onOpenTableBuilder}
             cdnLinks={cdnLinks}
             onToggleCdn={onToggleCdn}
           />

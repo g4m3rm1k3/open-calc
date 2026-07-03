@@ -9,8 +9,8 @@
 //     actually sitting on (an ancestor's gradient/solid background).
 
 import { describe, it, expect } from "vitest";
-import { labReducer, initialState, CONTAINER_TAGS } from "./labReducer";
-import type { LabElement, LabState } from "./types";
+import { labReducer, initialState, CONTAINER_TAGS, computeBodyStyles } from "./labReducer";
+import type { LabElement, LabState, BodyThemeState } from "./types";
 
 function el(id: string, tag: string, parentId: string | null, order: number, styles: Record<string, string> = {}, content = ""): LabElement {
   return { id, tag, parentId, order, content, attrs: { id: "", class: "" }, styles, mediaQueries: [] };
@@ -24,19 +24,20 @@ describe("CONTAINER_TAGS — table structure renders in the canvas", () => {
   });
 });
 
-describe("APPLY_BODY_THEME — cascadeBodyTheme respects ancestor backgrounds", () => {
-  function stateWithHeroSection(): LabState {
+function stateWithColorMode(elements: LabElement[], colorMode: "light" | "dark"): LabState {
+  const bodyTheme: BodyThemeState = { ...initialState.bodyTheme, colorMode };
+  return { ...initialState, elements, bodyTheme, bodyStyles: computeBodyStyles(bodyTheme) };
+}
+
+describe("SET_COLOR_MODE — cascadeBodyTheme respects ancestor backgrounds", () => {
+  it("does not recolor text on a descendant sitting on a non-neutral ancestor background", () => {
     const elements: LabElement[] = [
       // A "hero" section with its own dark gradient background — unrelated to the page body.
       el("section1", "section", null, 0, { background: "linear-gradient(#0f172a 0%, #1e293b 100%)" }),
       el("h1-1", "h1", "section1", 0, { color: "#f8fafc" }, "Heading"),
     ];
-    return { ...initialState, elements, bodyStyles: { ...initialState.bodyStyles, backgroundColor: "#0f172a" } };
-  }
-
-  it("does not recolor text on a descendant sitting on a non-neutral ancestor background", () => {
-    const state = stateWithHeroSection();
-    const next = labReducer(state, { type: "APPLY_BODY_THEME", payload: { backgroundColor: "#f8fafc" } });
+    const state = stateWithColorMode(elements, "dark");
+    const next = labReducer(state, { type: "SET_COLOR_MODE", payload: "light" });
 
     const h1 = next.elements.find((e) => e.id === "h1-1")!;
     // The heading's white text must survive — it's still sitting on the section's
@@ -47,10 +48,54 @@ describe("APPLY_BODY_THEME — cascadeBodyTheme respects ancestor backgrounds", 
 
   it("still recolors text with no ancestor background, to follow the new body theme", () => {
     const elements: LabElement[] = [el("p1", "p", null, 0, { color: "#f8fafc" }, "Text")];
-    const state: LabState = { ...initialState, elements, bodyStyles: { ...initialState.bodyStyles, backgroundColor: "#0f172a" } };
-    const next = labReducer(state, { type: "APPLY_BODY_THEME", payload: { backgroundColor: "#f8fafc" } });
+    const state = stateWithColorMode(elements, "dark");
+    const next = labReducer(state, { type: "SET_COLOR_MODE", payload: "light" });
 
     const p = next.elements.find((e) => e.id === "p1")!;
     expect(p.styles.color).not.toBe("#f8fafc");
+  });
+});
+
+describe("computeBodyStyles — independent style axes", () => {
+  it("keeps the dark text color and picks the dark-toned gradient when Glass is on in Dark mode", () => {
+    const styles = computeBodyStyles({ colorMode: "dark", glass: true, centered: false });
+    expect(styles.color).toBe("#f8fafc");
+    expect(styles.background).toContain("#4c1d95");
+    expect(styles.backgroundColor).toBeUndefined();
+  });
+
+  it("picks the light-toned gradient when Glass is on in Light mode", () => {
+    const styles = computeBodyStyles({ colorMode: "light", glass: true, centered: false });
+    expect(styles.color).toBe("#0f172a");
+    expect(styles.background).toContain("#ddd6fe");
+  });
+
+  it("Centered never changes color or background", () => {
+    const withoutCentered = computeBodyStyles({ colorMode: "dark", glass: false, centered: false });
+    const withCentered = computeBodyStyles({ colorMode: "dark", glass: false, centered: true });
+    expect(withCentered.color).toBe(withoutCentered.color);
+    expect(withCentered.backgroundColor).toBe(withoutCentered.backgroundColor);
+    expect(withCentered.maxWidth).toBe("1024px");
+  });
+});
+
+describe("TOGGLE_GLASS / TOGGLE_CENTERED — axes stay independent", () => {
+  it("switching color mode while Glass is already on keeps Glass on", () => {
+    const state = labReducer(initialState, { type: "TOGGLE_GLASS" });
+    expect(state.bodyTheme.glass).toBe(true);
+
+    const next = labReducer(state, { type: "SET_COLOR_MODE", payload: "dark" });
+    expect(next.bodyTheme.glass).toBe(true);
+    expect(next.bodyStyles.background).toContain("#4c1d95"); // dark-mode glass gradient, not dropped
+  });
+
+  it("toggling Centered on top of Dark + Glass leaves both other axes untouched", () => {
+    let state = labReducer(initialState, { type: "SET_COLOR_MODE", payload: "dark" });
+    state = labReducer(state, { type: "TOGGLE_GLASS" });
+    state = labReducer(state, { type: "TOGGLE_CENTERED" });
+
+    expect(state.bodyTheme).toEqual({ colorMode: "dark", glass: true, centered: true });
+    expect(state.bodyStyles.maxWidth).toBe("1024px");
+    expect(state.bodyStyles.background).toContain("#4c1d95");
   });
 });

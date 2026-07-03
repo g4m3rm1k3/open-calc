@@ -17,7 +17,6 @@ interface Props {
   onExportSplit: () => void;
   canUndo: boolean;
   onBack?: () => void;
-  onApplyGlobalTheme?: (theme: string) => void;
   onLoadExample: () => void;
 }
 
@@ -38,7 +37,6 @@ export default function Toolbar({
   onExportSplit,
   canUndo,
   onBack,
-  onApplyGlobalTheme,
   onLoadExample,
 }: Props) {
   return (
@@ -134,23 +132,6 @@ export default function Toolbar({
       </button>
 
       <div className={styles.toolbarSep} />
-
-      <select
-        className={styles.tbSelect}
-        onChange={(e) => {
-          if (onApplyGlobalTheme && e.target.value) {
-            onApplyGlobalTheme(e.target.value);
-            e.target.value = "";
-          }
-        }}
-        defaultValue=""
-        title="Apply a theme to all compatible components"
-      >
-        <option value="" disabled>Global Theme</option>
-        <option value="Clean">Clean</option>
-        <option value="Dark">Dark</option>
-        <option value="Glass">Glass</option>
-      </select>
 
       <button
         className={styles.tbBtn}

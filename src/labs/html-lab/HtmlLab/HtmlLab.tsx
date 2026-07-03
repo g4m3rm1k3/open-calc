@@ -5,9 +5,10 @@ import CodePanel from "./CodePanel";
 import PropertiesPanel from "./PropertiesPanel";
 import ConfirmDialog, { shouldSkip } from "./ConfirmDialog";
 import ExamplePickerModal from "./ExamplePickerModal";
+import TableBuilderModal from "./TableBuilderModal";
 import { EXAMPLES } from "./exampleGallery";
 import { labReducer, initialState } from "./labReducer";
-import { BODY_THEMES, detectComponents, buildThemeUpdates } from "./componentLibrary";
+import { detectComponents, buildThemeUpdates } from "./componentLibrary";
 import { resolveCdnTags } from "./cdnLibraries";
 import {
   applyCssToElements,
@@ -79,6 +80,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
   const [previewMode, setPreviewMode]           = useState<boolean>(false);
   const [confirmDialog, setConfirmDialog]       = useState<ConfirmState | null>(null);
   const [showExamplePicker, setShowExamplePicker] = useState<boolean>(false);
+  const [showTableBuilder, setShowTableBuilder] = useState<boolean>(false);
 
   const matchedComponents = useMemo(() => {
     if (!state.selectedId) return [];
@@ -318,6 +320,15 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
           onClose={() => setShowExamplePicker(false)}
         />
       )}
+      {showTableBuilder && (
+        <TableBuilderModal
+          onInsert={(template) => {
+            dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
+            setShowTableBuilder(false);
+          }}
+          onClose={() => setShowTableBuilder(false)}
+        />
+      )}
       <Toolbar
         showOverlay={state.showOverlay}
         showLabels={state.showLabels}
@@ -356,27 +367,6 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
         onExportSplit={exportSplit}
         canUndo={state.history.length > 0}
         onBack={onBack}
-        onApplyGlobalTheme={(themeName) => {
-          const bodyTheme = BODY_THEMES.find(t =>
-            t.name.toLowerCase().includes(themeName.toLowerCase()) ||
-            t.id.toLowerCase().includes(themeName.toLowerCase())
-          );
-          const updates: ReturnType<typeof buildThemeUpdates> = [];
-          for (const el of state.elements) {
-            const matched = detectComponents(el.id, state.elements);
-            if (matched.length > 0) {
-              const comp = matched[0];
-              const compTheme = comp.themeGroups.flatMap(g => g.themes).find(t =>
-                t.name.toLowerCase().includes(themeName.toLowerCase()) ||
-                t.id.toLowerCase().includes(themeName.toLowerCase())
-              );
-              if (compTheme) {
-                updates.push(...buildThemeUpdates(el.id, state.elements, compTheme));
-              }
-            }
-          }
-          dispatch({ type: "APPLY_GLOBAL_THEME", payload: { updates, bodyStyles: bodyTheme?.styles } });
-        }}
         onLoadExample={() => setShowExamplePicker(true)}
       />
 
@@ -424,6 +414,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
             dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
             dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, code) });
           }}
+          onOpenTableBuilder={() => setShowTableBuilder(true)}
           cdnLinks={state.cdnLinks}
           onToggleCdn={(id) => dispatch({ type: "TOGGLE_CDN", payload: id })}
         />
@@ -473,17 +464,16 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
               multiSelectedIds={multiSelectedIds}
               multiElement={multiElement}
               matchedComponents={matchedComponents}
-              bodyThemes={!state.selectedId ? BODY_THEMES : null}
+              bodyTheme={!state.selectedId ? state.bodyTheme : null}
               onDelete={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
               onApplyComponentTheme={(theme) => {
                 const updates = buildThemeUpdates(state.selectedId ?? "", state.elements, theme);
                 dispatch({ type: "APPLY_COMPONENT_THEME", payload: { updates } });
               }}
-              onApplyBodyTheme={(theme) =>
-                theme.reset
-                  ? dispatch({ type: "RESET_BODY_STYLES" })
-                  : dispatch({ type: "APPLY_BODY_THEME", payload: theme.styles })
-              }
+              onSetColorMode={(mode) => dispatch({ type: "SET_COLOR_MODE", payload: mode })}
+              onToggleGlass={() => dispatch({ type: "TOGGLE_GLASS" })}
+              onToggleCentered={() => dispatch({ type: "TOGGLE_CENTERED" })}
+              onResetBodyTheme={() => dispatch({ type: "RESET_BODY_THEME" })}
               onChange={(prop, value) =>
                 state.selectedId
                   ? dispatch({ type: "UPDATE_STYLE", payload: { prop, value } })

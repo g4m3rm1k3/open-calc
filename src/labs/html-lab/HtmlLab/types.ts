@@ -8,6 +8,15 @@ export interface MediaQuery {
 
 export type BodyStyles = Record<string, string>;
 
+// The three independent global-style axes — see labReducer.ts's computeBodyStyles.
+// Composed together (never merged from a flat preset list), so toggling one
+// never clobbers the other two.
+export interface BodyThemeState {
+  colorMode: "light" | "dark";
+  glass: boolean;
+  centered: boolean;
+}
+
 export interface LabElement {
   id: string;
   tag: string;
@@ -37,6 +46,7 @@ export interface LabState {
   javascript: string;
   history: LabElement[][];
   bodyStyles: BodyStyles;
+  bodyTheme: BodyThemeState;
   mode: "single" | "multi";
   pages: LabPage[];
   activePageId: string | null;
@@ -77,13 +87,6 @@ export interface Component {
   template: LabElement[];
 }
 
-export interface BodyTheme {
-  id: string;
-  name: string;
-  description?: string;
-  reset?: true;
-  styles: Record<string, string>;
-}
 
 // ─── Example gallery types ────────────────────────────────────────────────────
 
@@ -143,8 +146,10 @@ export type Action =
   | { type: "TOGGLE_LABELS" }
   | { type: "INSERT_TEMPLATE"; payload: LabElement[] | { template: LabElement[]; autoTheme?: ComponentTheme | null } }
   | { type: "APPLY_COMPONENT_THEME"; payload: { updates: StyleUpdate[] } }
-  | { type: "APPLY_BODY_THEME"; payload: Record<string, string> }
-  | { type: "RESET_BODY_STYLES" }
+  | { type: "SET_COLOR_MODE"; payload: "light" | "dark" }
+  | { type: "TOGGLE_GLASS" }
+  | { type: "TOGGLE_CENTERED" }
+  | { type: "RESET_BODY_THEME" }
   | { type: "UNDO" }
   | { type: "CLEAR" }
   | { type: "TOGGLE_MULTIPAGE" }
