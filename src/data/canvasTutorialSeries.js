@@ -25,46 +25,43 @@ export const SERIES = [
           { type: 'p', text: 'We build the face before the hands, and the hands before the live time. At every step you can press ⌘S and see exactly what you have built. This is the agile principle applied to learning: always have something running you can look at. Never build invisible infrastructure first.' },
 
           { type: 'h3', text: 'The canvas shell' },
-          { type: 'code', text: `import { useEffect, useRef } from 'react'
+          { type: 'p', text: 'Click **Load Starter Code** below — the boilerplate is already wired up. Here is what each part does.' },
+          { type: 'code', text: `const canvasRef = useRef(null)
+useEffect(() => {
+  const canvas = canvasRef.current
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  let canvasWidth, canvasHeight, animationFrameId
+  // ...
+  return () => { cancelAnimationFrame(animationFrameId); resizeObserver.disconnect() }
+}, [])
+return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />` },
+          { type: 'walk', text: '`useRef` gives direct access to the DOM canvas element without triggering a re-render. `useEffect` with an empty dependency array (`[]`) runs exactly once after the component mounts — this is where we set up the drawing loop, which lives entirely outside React\'s render cycle. The cleanup function returned from `useEffect` runs when the component unmounts, cancelling the animation loop and disconnecting the resize observer so they do not leak memory.' },
+          { type: 'code', text: `function resize() {
+  const devicePixelRatio = window.devicePixelRatio || 1
+  const rect = canvas.parentElement.getBoundingClientRect()
+  canvasWidth  = rect.width
+  canvasHeight = rect.height
+  canvas.width  = canvasWidth  * devicePixelRatio
+  canvas.height = canvasHeight * devicePixelRatio
+  ctx.scale(devicePixelRatio, devicePixelRatio)
+}
+const resizeObserver = new ResizeObserver(resize)
+resizeObserver.observe(canvas.parentElement)
+resize()` },
+          { type: 'walk', text: '`devicePixelRatio` is 2 on Retina displays — it means one CSS pixel maps to 2 physical pixels. Setting `canvas.width = cssWidth * dpr` allocates the full pixel budget, and `ctx.scale(dpr, dpr)` makes all drawing coordinates match CSS pixels. Without this, everything looks blurry on high-resolution screens. `ResizeObserver` calls `resize()` whenever the parent div changes size, so the canvas always fills its container.' },
+          { type: 'code', text: `function draw() {
+  const isDarkMode = document.documentElement.classList.contains('dark')
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+  ctx.fillStyle = isDarkMode ? '#0f172a' : '#f8fafc'
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
-export default function ClockScene() {
-  const canvasRef = useRef(null)
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    let canvasWidth, canvasHeight, animationFrameId
+  // clock drawing goes here
 
-    function resize() {
-      const devicePixelRatio = window.devicePixelRatio || 1
-      const rect = canvas.parentElement.getBoundingClientRect()
-      canvasWidth  = rect.width
-      canvasHeight = rect.height
-      canvas.width  = canvasWidth  * devicePixelRatio
-      canvas.height = canvasHeight * devicePixelRatio
-      ctx.scale(devicePixelRatio, devicePixelRatio)
-    }
-
-    function draw() {
-      const isDarkMode = document.documentElement.classList.contains('dark')
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-      ctx.fillStyle = isDarkMode ? '#0f172a' : '#f8fafc'
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-
-      // clock drawing goes here
-
-      animationFrameId = requestAnimationFrame(draw)
-    }
-
-    const resizeObserver = new ResizeObserver(resize)
-    resizeObserver.observe(canvas.parentElement)
-    resize()
-    animationFrameId = requestAnimationFrame(draw)
-    return () => { cancelAnimationFrame(animationFrameId); resizeObserver.disconnect() }
-  }, [])
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-}` },
-          { type: 'walk', text: 'This is the standard scene shell you will use for every animated canvas scene. `useRef` gives us direct access to the DOM element. `useEffect` with an empty dependency array runs once after the component mounts — this is where we set up drawing that lives outside React\'s render cycle. The `resize` function handles both devicePixelRatio (Retina sharpness) and ResizeObserver (responsive layout). The cleanup function cancels both the animation loop and the observer so they do not leak memory when the component unmounts.' },
+  animationFrameId = requestAnimationFrame(draw)
+}
+animationFrameId = requestAnimationFrame(draw)` },
+          { type: 'walk', text: '`requestAnimationFrame(draw)` schedules `draw` to run before the browser\'s next paint — roughly 60 times per second. At the end of `draw` we call it again, creating the loop. Storing the return value in `animationFrameId` lets us cancel the loop on cleanup. `ctx.clearRect` wipes the canvas each frame; without it, every new frame is drawn on top of the previous one.' },
 
           { type: 'h3', text: 'Drawing the clock face' },
           { type: 'code', text: `const clockRadius = Math.min(canvasWidth, canvasHeight) * 0.40
@@ -1039,13 +1036,13 @@ function getCanvasCoordinates(mouseEvent) {
     x: mouseEvent.clientX - canvasRect.left,
     y: mouseEvent.clientY - canvasRect.top,
   }
-}
+}` },
+          { type: 'walk', text: '`isDrawing` is a plain `let` variable, not React state. Setting `isDrawing = true` in a state setter would trigger a re-render, unmounting and remounting the canvas and wiping the drawing. Mutable variables outside React state are the right choice for interaction flags that should not cause renders.\n\n`getCanvasCoordinates` converts from window coordinates (`mouseEvent.clientX`, `clientY` — measured from the viewport top-left) to canvas-relative coordinates. `canvas.getBoundingClientRect()` gives the canvas position; subtracting its left/top gives the point within the canvas.' },
 
-function handleMouseDown(mouseEvent) {
+          { type: 'code', text: `function handleMouseDown(mouseEvent) {
   isDrawing = true
   const { x, y } = getCanvasCoordinates(mouseEvent)
   lastDrawX = x; lastDrawY = y
-  // Draw a dot at the click position
   ctx.beginPath()
   ctx.arc(x, y, strokeWidth / 2, 0, Math.PI * 2)
   ctx.fillStyle = strokeColour
@@ -1058,15 +1055,14 @@ function handleMouseMove(mouseEvent) {
   ctx.beginPath()
   ctx.moveTo(lastDrawX, lastDrawY)
   ctx.lineTo(x, y)
-  ctx.strokeStyle = strokeColour
-  ctx.lineWidth   = strokeWidth
-  ctx.lineCap     = 'round'
-  ctx.lineJoin    = 'round'
+  ctx.strokeStyle = strokeColour; ctx.lineWidth = strokeWidth
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'
   ctx.stroke()
   lastDrawX = x; lastDrawY = y
-}
+}` },
+          { type: 'walk', text: '`handleMouseDown` sets `isDrawing`, records the starting position in `lastDrawX/Y`, and draws a dot at the click point. The dot is a filled circle with radius `strokeWidth / 2` — this prevents the stroke from starting with a gap at the first click.\n\n`handleMouseMove` draws a line from the previous position to the current one, then updates `lastDrawX/Y`. Chaining these segments produces a continuous stroke. `lineCap = \'round\'` rounds segment ends; `lineJoin = \'round\'` rounds corners — together they produce smooth, gapless strokes.' },
 
-function handleMouseUp()    { isDrawing = false }
+          { type: 'code', text: `function handleMouseUp()    { isDrawing = false }
 function handleMouseLeave() { isDrawing = false }
 
 canvas.addEventListener('mousedown',  handleMouseDown)
@@ -1074,6 +1070,7 @@ canvas.addEventListener('mousemove',  handleMouseMove)
 canvas.addEventListener('mouseup',    handleMouseUp)
 canvas.addEventListener('mouseleave', handleMouseLeave)
 
+// In the useEffect cleanup:
 return () => {
   canvas.removeEventListener('mousedown',  handleMouseDown)
   canvas.removeEventListener('mousemove',  handleMouseMove)
@@ -1081,7 +1078,7 @@ return () => {
   canvas.removeEventListener('mouseleave', handleMouseLeave)
   resizeObserver.disconnect()
 }` },
-          { type: 'walk', text: '`isDrawing` is a plain boolean variable, not React state. We do not want `isDrawing = true` to trigger a re-render — it would unmount and remount the canvas, wiping the drawing. This is one of the few cases where mutable variables outside React state are the correct choice.\n\n`getCanvasCoordinates` converts from window coordinates (`mouseEvent.clientX`, `clientY` — measured from the top-left of the browser window) to canvas coordinates (measured from the top-left of the canvas element). `canvas.getBoundingClientRect()` returns the canvas element\'s position in the window. Subtracting that gives the position within the canvas.\n\nEach `mousemove` draws a line from `(lastDrawX, lastDrawY)` to the current position. Updating `last` to `current` at the end of each handler chains the segments into a continuous stroke. `lineCap = \'round\'` rounds the endpoints of each segment; `lineJoin = \'round\'` rounds the corners where segments meet — together they produce smooth, gapless strokes.' },
+          { type: 'walk', text: '`mouseleave` fires when the cursor exits the canvas while the button is held. Without it, the user could press down, drag out of the canvas, release outside, and return — the canvas would still think the button is down and draw on re-entry. Setting `isDrawing = false` on leave fixes this.\n\nEvery listener added in `useEffect` must be removed in the cleanup function. Without removal, listeners accumulate on each re-mount, producing doubled or quadrupled strokes.' },
 
           { type: 'cs', text: '**State machine.** The drawing interaction is a two-state machine: IDLE (not drawing) and DRAWING (mouse held down). `mousedown` transitions IDLE → DRAWING. `mouseup` and `mouseleave` transition DRAWING → IDLE. In IDLE state, `mousemove` does nothing. In DRAWING state, `mousemove` draws. Explicitly naming the states and their transitions is clearer than a boolean — but a boolean encodes the same machine.' },
           { type: 'se', text: '**Always remove event listeners you add.** We add four event listeners in `useEffect`. The cleanup function must remove all four. If you add listeners and never remove them, they accumulate — every time the component mounts (including React StrictMode\'s double-mount), another set of listeners is attached. By the second mount you have two `mousemove` handlers firing simultaneously, both drawing, producing doubled strokes.' },
@@ -1211,6 +1208,7 @@ export default function PaintCanvas() {
           { type: 'h3', text: 'Why refs, not state, for tool settings' },
           { type: 'p', text: 'We need the event handlers inside `useEffect` to read the current brush colour. The problem: event handlers close over values at the time they are created — a stale closure. If we used `useState`, the handlers would always see the initial colour. The fix: store the current values in a `ref`. A ref object (`{ current: value }`) is mutable — the handlers read `colourRef.current` and always get the latest value, because we never replace the ref object itself, only its `.current` property.' },
 
+          { type: 'h3', text: 'Three refs — colour, size, erasing flag' },
           { type: 'code', text: `// At the top of the component (outside useEffect):
 const colourRef = useRef('#ffffff')
 const sizeRef   = useRef(4)
@@ -1218,49 +1216,39 @@ const isErasing = useRef(false)
 
 // Inside handleMouseDown and handleMouseMove, replace hardcoded values:
 const activeColour = isErasing.current ? '#0f172a' : colourRef.current
-const activeSize   = sizeRef.current
-
-// In JSX — the control bar:
-return (
-  <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-    <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ cursor: 'crosshair' }} />
-    <div style={{
-      position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)',
-      display: 'flex', gap: 8, alignItems: 'center',
-      background: '#1e293b', borderRadius: 8, padding: '6px 12px',
-      border: '1px solid #334155',
-    }}>
+const activeSize   = sizeRef.current` },
+          { type: 'walk', text: '`useRef` outside `useEffect` creates a ref that persists across renders. Mutating `colourRef.current` in an `onChange` handler does not trigger a re-render — the canvas stays mounted and the drawing is preserved. The event handlers inside `useEffect` always read the latest value because they hold a reference to the ref object, not a snapshot of the value inside it. This is the stale-closure fix.' },
+          { type: 'h3', text: 'The control bar JSX' },
+          { type: 'code', text: `return (
+  <div className="relative w-full h-full">
+    <canvas ref={canvasRef} className="absolute inset-0 w-full h-full cursor-crosshair" />
+    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 items-center
+                    bg-slate-800 rounded-lg px-3 py-1.5 border border-slate-700">
       <input type="color" defaultValue="#ffffff"
         onChange={e => { colourRef.current = e.target.value; isErasing.current = false }}
-        style={{ width: 28, height: 28, border: 'none', borderRadius: 4, cursor: 'pointer', background: 'none' }}
+        className="w-7 h-7 rounded cursor-pointer bg-transparent border-0"
       />
       <input type="range" min={2} max={40} defaultValue={4}
         onChange={e => { sizeRef.current = Number(e.target.value) }}
-        style={{ width: 80 }}
+        className="w-20"
       />
-      <button
-        onClick={() => { isErasing.current = !isErasing.current }}
-        style={{ fontSize: 11, padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
-          background: '#334155', color: '#e2e8f0', border: '1px solid #475569' }}
-      >
+      <button onClick={() => { isErasing.current = !isErasing.current }}
+        className="text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-200 border border-slate-600 cursor-pointer">
         ✦ Eraser
       </button>
-      <button
-        onClick={() => {
+      <button onClick={() => {
           const ctx = canvasRef.current?.getContext('2d')
           if (!ctx) return
           ctx.fillStyle = '#0f172a'
           ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height)
         }}
-        style={{ fontSize: 11, padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
-          background: '#334155', color: '#e2e8f0', border: '1px solid #475569' }}
-      >
+        className="text-[11px] px-2 py-0.5 rounded bg-slate-700 text-slate-200 border border-slate-600 cursor-pointer">
         ✕ Clear
       </button>
     </div>
   </div>
 )` },
-          { type: 'walk', text: '`useRef` outside `useEffect` creates a ref that persists across renders. `colourRef.current = e.target.value` inside the `onChange` handler mutates the ref without triggering a re-render — the canvas does not unmount and the drawing is preserved. Inside the event handlers, `colourRef.current` always reads the latest value because the ref object itself never changes (only its `.current` property does).\n\nThe eraser works by painting with the background colour (`#0f172a`). There is no "undo" concept in the canvas — the eraser literally paints over existing pixels with the background. `type="color"` and `type="range"` are native HTML input types — the browser provides the colour picker and slider UI, we just read the value from `onChange`.' },
+          { type: 'walk', text: '`type="color"` and `type="range"` are native HTML inputs — the browser provides the colour picker and drag slider. The `onChange` handlers write directly to refs (no state update, no re-render). The eraser paints with the background colour `#0f172a` — there is no undo stack, just overpainting. The clear button fills the whole buffer with the background.' },
 
           { type: 'cs', text: '**Stale closures and the ref solution.** When you write `canvas.addEventListener(\'mousemove\', handleMouseMove)`, `handleMouseMove` closes over the variables in scope at the time it is created. If those variables are captured by value (like a number), they never update. A ref is an object captured by reference — the event handler holds a reference to the ref object, not to the value inside it. The value inside can change without the handler being recreated.' },
           { type: 'se', text: '**Eraser as colour, not undo.** A true eraser would require storing the full drawing history (an undo stack). Our eraser paints with the background colour — simpler but destructive. When you "erase," you are actually drawing on top of the existing marks. This trade-off (simplicity vs correctness) is a real engineering decision. A production paint tool would implement an undo stack; a demo like this does not need one.' },
@@ -1455,54 +1443,53 @@ export default function PaintCanvas() {
           { type: 'build', text: 'Animate a single particle moving across the canvas using a position + velocity model. This is the foundation that every particle system, game physics engine, and physics simulation in the world is built on.' },
           { type: 'h3', text: 'Position and velocity — the core physics model' },
           { type: 'p', text: 'A particle has a **position** (where it is right now: x, y) and a **velocity** (how fast it is moving: vx, vy — pixels per frame). Each frame, we add the velocity to the position: `x += vx` and `y += vy`. That is the entire simulation model. Gravity is a velocity change: each frame we add a small downward amount to `vy`. This is Euler integration — the simplest numerical method for solving differential equations.' },
-          { type: 'code', text: `import { useEffect, useRef } from 'react'
+          { type: 'p', text: 'Load the starter code. It gives you the canvas shell. Add the particle object and `draw()` function below.' },
+          { type: 'h3', text: 'The canvas shell and particle object' },
+          { type: 'code', text: `const canvasRef = useRef(null)
+useEffect(() => {
+  const canvas = canvasRef.current
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  let canvasWidth, canvasHeight, animationFrameId
 
-export default function ParticleScene() {
-  const canvasRef = useRef(null)
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    let canvasWidth, canvasHeight, animationFrameId
+  function resize() {
+    const devicePixelRatio = window.devicePixelRatio || 1
+    const rect = canvas.parentElement.getBoundingClientRect()
+    canvasWidth  = rect.width; canvasHeight = rect.height
+    canvas.width = canvasWidth * devicePixelRatio; canvas.height = canvasHeight * devicePixelRatio
+    ctx.scale(devicePixelRatio, devicePixelRatio)
+  }
 
-    function resize() {
-      const devicePixelRatio = window.devicePixelRatio || 1
-      const rect = canvas.parentElement.getBoundingClientRect()
-      canvasWidth  = rect.width; canvasHeight = rect.height
-      canvas.width = canvasWidth * devicePixelRatio; canvas.height = canvasHeight * devicePixelRatio
-      ctx.scale(devicePixelRatio, devicePixelRatio)
-    }
+  const particle = { positionX: 100, positionY: 100, velocityX: 2.5, velocityY: 1.2 }
+  // ...
+}, [])` },
+          { type: 'walk', text: '`resize()` sets the canvas pixel buffer to the container size multiplied by `devicePixelRatio`, then scales the drawing context so 1 unit = 1 CSS pixel. The particle is a plain object with 4 fields — position and velocity. No class, no constructor. We mutate `positionX` directly every frame.' },
+          { type: 'h3', text: 'The draw loop — Euler integration' },
+          { type: 'code', text: `function draw() {
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.25)'
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
-    const particle = { positionX: 100, positionY: 100, velocityX: 2.5, velocityY: 1.2 }
+  particle.positionX += particle.velocityX
+  particle.positionY += particle.velocityY
 
-    function draw() {
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.25)'
-      ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+  if (particle.positionX < 0)            particle.positionX = canvasWidth
+  if (particle.positionX > canvasWidth)  particle.positionX = 0
+  if (particle.positionY < 0)            particle.positionY = canvasHeight
+  if (particle.positionY > canvasHeight) particle.positionY = 0
 
-      particle.positionX += particle.velocityX
-      particle.positionY += particle.velocityY
+  ctx.beginPath()
+  ctx.arc(particle.positionX, particle.positionY, 4, 0, Math.PI * 2)
+  ctx.fillStyle = '#6366f1'
+  ctx.fill()
 
-      if (particle.positionX < 0)            particle.positionX = canvasWidth
-      if (particle.positionX > canvasWidth)  particle.positionX = 0
-      if (particle.positionY < 0)            particle.positionY = canvasHeight
-      if (particle.positionY > canvasHeight) particle.positionY = 0
+  animationFrameId = requestAnimationFrame(draw)
+}
 
-      ctx.beginPath()
-      ctx.arc(particle.positionX, particle.positionY, 4, 0, Math.PI * 2)
-      ctx.fillStyle = '#6366f1'
-      ctx.fill()
-
-      animationFrameId = requestAnimationFrame(draw)
-    }
-
-    const resizeObserver = new ResizeObserver(resize)
-    resizeObserver.observe(canvas.parentElement)
-    resize(); animationFrameId = requestAnimationFrame(draw)
-    return () => { cancelAnimationFrame(animationFrameId); resizeObserver.disconnect() }
-  }, [])
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-}` },
-          { type: 'walk', text: 'The semi-transparent `fillRect` at the start of each frame fills the canvas with a near-black colour at 25% opacity instead of fully clearing it. After 4 frames, an old frame is nearly invisible. This produces motion trails. The trail length is controlled by the opacity: higher opacity = shorter trail.\n\nWrapping (`positionX > canvasWidth → positionX = 0`) teleports the particle to the other side, creating infinite-space feel.' },
+const resizeObserver = new ResizeObserver(resize)
+resizeObserver.observe(canvas.parentElement)
+resize(); animationFrameId = requestAnimationFrame(draw)
+return () => { cancelAnimationFrame(animationFrameId); resizeObserver.disconnect() }` },
+          { type: 'walk', text: 'The semi-transparent `fillRect` (25% opacity) does not fully clear the canvas — it dims the previous frame. After 4 frames the old dot is nearly invisible. This produces a motion trail. Higher opacity = shorter trail; `ctx.clearRect` = no trail at all.\n\n`position += velocity` each frame is the entire physics model. Wrapping (`positionX > canvasWidth → positionX = 0`) teleports the particle to the opposite side, giving an infinite-space feel.' },
           { type: 'cs', text: '**Euler integration.** `position += velocity` each frame is the discretised form of the continuous equation `dx/dt = v`. We approximate the smooth trajectory as a sequence of small straight-line steps. Euler integration is inaccurate for rapidly changing forces but perfectly adequate for game-style physics where visual plausibility matters more than exact accuracy.' },
           { type: 'se', text: '**Name fields for what they are.** `positionX` and `velocityX` rather than `x`, `vx`, `dx`. In a system with many particle fields, abbreviated names become confusing quickly. Descriptive names cost nothing and make `updateAndDrawParticle` readable on its own.' },
           { type: 'breaks', text: '**`ctx.clearRect` instead of semi-transparent fill → no trails.** `clearRect` wipes every pixel to transparent. The trail effect comes from the ghost of prior frames shining through the semi-transparent fill. Replace the fill with `clearRect` and you get a dot that moves with no history — just a point in space.' },
@@ -1612,6 +1599,7 @@ function createParticle() {
 const particles = Array.from({ length: PARTICLE_COUNT }, createParticle)` },
           { type: 'walk', text: '`Array.from({ length: N }, factory)` creates N elements by calling `factory` once per element — cleaner than a push loop. `(Math.random() - 0.5) * 3` gives a horizontal velocity from -1.5 to +1.5. `Math.random() * -2 - 0.5` gives an upward velocity from -0.5 to -2.5 so particles arc under gravity.\n\n`hue` stores a colour in degrees (220–280 = blue to purple). Used as `hsl(${hue}, 80%, 65%)` — one number drives the entire colour.' },
           { type: 'h3', text: 'Simulating gravity and floor respawn' },
+          { type: 'h3', text: 'Physics update — gravity, wrapping, floor respawn' },
           { type: 'code', text: `function updateAndDrawParticle(particle) {
   particle.velocityY += GRAVITY
   particle.positionX += particle.velocityX
@@ -1626,18 +1614,21 @@ const particles = Array.from({ length: PARTICLE_COUNT }, createParticle)` },
     particle.velocityY = Math.random() * -3 - 1
     particle.velocityX = (Math.random() - 0.5) * 3
   }
-
+  // drawing continues below...
+}` },
+          { type: 'walk', text: '`velocityY += GRAVITY` accumulates 0.12 px/frame² of downward acceleration. After 10 frames a particle falls 1.2 px/frame faster than it started. Side wrapping uses `± particle.radius` so particles exit fully before reappearing on the other side — no hard pop. Floor respawn resets position to just above the top and gives the particle a fresh upward velocity, keeping the scene alive indefinitely.' },
+          { type: 'h3', text: 'Drawing each particle and running the loop' },
+          { type: 'code', text: `  // Inside updateAndDrawParticle, after the physics:
   ctx.beginPath()
   ctx.arc(particle.positionX, particle.positionY, particle.radius, 0, Math.PI * 2)
   ctx.fillStyle = \`hsl(\${particle.hue}, 80%, 65%)\`
   ctx.fill()
-}
 
 // Inside draw():
 ctx.fillStyle = 'rgba(15, 23, 42, 0.18)'
 ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 particles.forEach(updateAndDrawParticle)` },
-          { type: 'walk', text: '`particle.velocityY += GRAVITY` is the gravity simulation. Each frame the downward velocity increases by 0.12 px/frame. After 10 frames a particle falls 1.2 px/frame faster than it started. When a particle exits through the floor it resets to the top with a fresh upward velocity — without this the screen empties completely.' },
+          { type: 'walk', text: '`hsl(hue, 80%, 65%)` drives colour from a single number — `hue` ranges 220–280 giving the blue-to-purple palette. Lower opacity on the background fill (`0.18`) gives longer trails than Step 1\'s `0.25`. `particles.forEach(updateAndDrawParticle)` calls the function once per particle — React\'s batch draw pattern: update all, draw all.' },
           { type: 'cs', text: '**The particle system pattern.** Every particle system uses: (1) create N particles with initial state, (2) each frame update every particle (position, velocity, lifetime), (3) draw each particle, (4) respawn dead particles. The logic lives in the update function; the draw function just reads state. Separating update from draw makes the system composable — add new forces without touching drawing code.' },
           { type: 'se', text: '**GRAVITY as a named constant.** `velocityY += 0.12` works but 0.12 is a magic number. `GRAVITY = 0.12` names it and gives it one place to change. Every scene that should feel heavier or lighter is a one-number edit. UPPER_CASE for module-level constants signals "do not mutate this" — a convention borrowed from C.' },
           { type: 'breaks', text: '**No respawn → all particles fall off screen in ~5 seconds.** At 60fps with GRAVITY=0.12, a particle starting at velocity 0 reaches 7 px/frame after 1 second and exits a 600px canvas after ~3 seconds. Without respawn the screen empties. Respawn is what keeps the scene alive.' },
@@ -2118,57 +2109,45 @@ export default function ParticleScene() {
           { type: 'build', text: 'Animate a single ball moving and bouncing off all four walls. This is the complete wall-collision algorithm. Get it right on one ball and adding a hundred more is just adding them to an array.' },
           { type: 'h3', text: 'Wall collision: detect and reflect' },
           { type: 'p', text: 'A ball bounces when it touches a wall. "Touching the left wall" means `positionX - radius <= 0`. The response: flip the horizontal velocity (`velocityX = -velocityX`). Velocity reflection — reversing the component perpendicular to the wall. We check `positionX - radius` so the collision is at the ball\'s surface, not its centre.' },
-          { type: 'code', text: `import { useEffect, useRef } from 'react'
-
-export default function BouncingBalls() {
-  const canvasRef = useRef(null)
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    let canvasWidth, canvasHeight, animationFrameId
-
-    function resize() {
-      const devicePixelRatio = window.devicePixelRatio || 1
-      const rect = canvas.parentElement.getBoundingClientRect()
-      canvasWidth  = rect.width; canvasHeight = rect.height
-      canvas.width = canvasWidth * devicePixelRatio; canvas.height = canvasHeight * devicePixelRatio
-      ctx.scale(devicePixelRatio, devicePixelRatio)
-    }
-
-    const ball = { positionX: 200, positionY: 150, velocityX: 4, velocityY: 3, radius: 20, colour: '#6366f1' }
-
-    function updateBall(ball) {
-      ball.positionX += ball.velocityX
-      ball.positionY += ball.velocityY
-
-      if (ball.positionX - ball.radius <= 0)            { ball.positionX = ball.radius;                ball.velocityX =  Math.abs(ball.velocityX) }
-      if (ball.positionX + ball.radius >= canvasWidth)  { ball.positionX = canvasWidth - ball.radius;  ball.velocityX = -Math.abs(ball.velocityX) }
-      if (ball.positionY - ball.radius <= 0)            { ball.positionY = ball.radius;                ball.velocityY =  Math.abs(ball.velocityY) }
-      if (ball.positionY + ball.radius >= canvasHeight) { ball.positionY = canvasHeight - ball.radius; ball.velocityY = -Math.abs(ball.velocityY) }
-    }
-
-    function drawBall(ball) {
-      ctx.beginPath()
-      ctx.arc(ball.positionX, ball.positionY, ball.radius, 0, Math.PI * 2)
-      ctx.fillStyle = ball.colour; ctx.fill()
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2; ctx.stroke()
-    }
-
-    function draw() {
-      ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-      updateBall(ball); drawBall(ball)
-      animationFrameId = requestAnimationFrame(draw)
-    }
-
-    const resizeObserver = new ResizeObserver(resize)
-    resizeObserver.observe(canvas.parentElement)
-    resize(); animationFrameId = requestAnimationFrame(draw)
-    return () => { cancelAnimationFrame(animationFrameId); resizeObserver.disconnect() }
-  }, [])
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+          { type: 'p', text: 'Load the starter code — it gives you the canvas shell with `resize()`. Add the ball object and the two functions below.' },
+          { type: 'h3', text: 'The ball object' },
+          { type: 'code', text: `const ball = {
+  positionX: 200, positionY: 150,
+  velocityX: 4,   velocityY: 3,
+  radius: 20,
+  colour: '#6366f1',
 }` },
-          { type: 'walk', text: 'Instead of `velocityX = -velocityX` we use `Math.abs(velocityX)` and negate it. `Math.abs(velocityX)` is always the speed without direction. Left wall needs the ball moving right: `+Math.abs`. Right wall moving left: `-Math.abs`. This is the safe form — if the ball somehow embeds in a wall across two frames, the absolute-value form always points velocity toward open space.' },
+          { type: 'walk', text: '`positionX/Y` is where the ball is drawn this frame. `velocityX/Y` is how many pixels it moves per frame. `radius` defines both the visual size and the collision surface. `colour` is a CSS hex string — changing it is a one-field edit.' },
+          { type: 'h3', text: 'updateBall — move and bounce' },
+          { type: 'code', text: `function updateBall(ball) {
+  ball.positionX += ball.velocityX
+  ball.positionY += ball.velocityY
+
+  if (ball.positionX - ball.radius <= 0)            { ball.positionX = ball.radius;                ball.velocityX =  Math.abs(ball.velocityX) }
+  if (ball.positionX + ball.radius >= canvasWidth)  { ball.positionX = canvasWidth - ball.radius;  ball.velocityX = -Math.abs(ball.velocityX) }
+  if (ball.positionY - ball.radius <= 0)            { ball.positionY = ball.radius;                ball.velocityY =  Math.abs(ball.velocityY) }
+  if (ball.positionY + ball.radius >= canvasHeight) { ball.positionY = canvasHeight - ball.radius; ball.velocityY = -Math.abs(ball.velocityY) }
+}` },
+          { type: 'walk', text: 'We use `Math.abs(velocityX)` rather than `-velocityX`. Left wall needs the ball moving right: `+Math.abs(velocityX)`. Right wall needs left: `-Math.abs(velocityX)`. This is the safe form — if the ball embeds in a wall across two frames, the next frame always corrects it rather than oscillating. The push-out (`positionX = radius`) moves the ball to exactly the wall surface.' },
+          { type: 'h3', text: 'drawBall and the animation loop' },
+          { type: 'code', text: `function drawBall(ball) {
+  ctx.beginPath()
+  ctx.arc(ball.positionX, ball.positionY, ball.radius, 0, Math.PI * 2)
+  ctx.fillStyle = ball.colour; ctx.fill()
+  ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2; ctx.stroke()
+}
+
+function draw() {
+  ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+  updateBall(ball); drawBall(ball)
+  animationFrameId = requestAnimationFrame(draw)
+}
+
+const resizeObserver = new ResizeObserver(resize)
+resizeObserver.observe(canvas.parentElement)
+resize(); animationFrameId = requestAnimationFrame(draw)
+return () => { cancelAnimationFrame(animationFrameId); resizeObserver.disconnect() }` },
+          { type: 'walk', text: '`draw()` always follows: clear → update → draw → schedule next frame. Separating `updateBall` and `drawBall` keeps physics and rendering independent. The `strokeStyle` at 20% white opacity adds a subtle highlight ring. `cancelAnimationFrame` in the cleanup stops the loop when the component unmounts.' },
           { type: 'cs', text: '**Velocity reflection.** Reflecting a velocity off a flat wall negates the component perpendicular to it. For a vertical wall: negate `velocityX`. For a horizontal wall: negate `velocityY`. For an angled wall: the general reflection formula uses the wall\'s surface normal — the same concept used in ray tracing and billiard physics.' },
           { type: 'se', text: '**Push-out before reflection.** After detecting collision, `ball.positionX = ball.radius` moves the ball to exactly touching the wall surface. Without this, a fast ball might penetrate several pixels in one frame and oscillate inside the wall — bouncing back and forth without ever escaping. Position correction (depenetration) is a critical step in all collision systems.' },
           { type: 'breaks', text: '**`velocityX = -velocityX` can tunnel through thin walls.** If the ball moves 10 px/frame and the wall is 2 px thick, the ball can jump through in a single frame — both sides checked, neither triggered. For fast small balls, test whether the path intersects the wall, not just its endpoint.' },
@@ -2276,6 +2255,7 @@ export default function BouncingBalls() {
           { type: 'build', text: 'Replace the single ball with an array of 8 balls and add ball-to-ball collision detection. Two circles collide when the distance between centres is less than the sum of their radii. The response swaps velocity components along the collision axis.' },
           { type: 'h3', text: 'Ball–ball collision detection and response' },
           { type: 'p', text: 'Two circles overlap when `sqrt((ax-bx)² + (ay-by)²) < ra + rb`. We compare squared distances to avoid `sqrt` in the check — faster when called 28 times per frame for 8 balls.' },
+          { type: 'h3', text: 'Replacing the single ball with an array' },
           { type: 'code', text: `const BALL_COLOURS = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#ef4444','#8b5cf6','#14b8a6']
 
 const balls = Array.from({ length: 8 }, (_, index) => ({
@@ -2285,45 +2265,42 @@ const balls = Array.from({ length: 8 }, (_, index) => ({
   velocityY: (Math.random() - 0.5) * 6,
   radius:    14 + Math.random() * 10,
   colour:    BALL_COLOURS[index],
-}))
-
-function resolveBallCollision(ballA, ballB) {
+}))` },
+          { type: 'walk', text: '`Array.from({ length: 8 }, factory)` calls the factory 8 times, giving each ball a unique index. Staggering starting positions (`80 + index * 60`) and alternating Y (`(index % 2) * 80`) avoids balls spawning inside each other. `Math.random() * 10` gives varied radii so they look like real objects.' },
+          { type: 'h3', text: 'resolveBallCollision — detect overlap and swap momentum' },
+          { type: 'code', text: `function resolveBallCollision(ballA, ballB) {
   const deltaX = ballB.positionX - ballA.positionX
   const deltaY = ballB.positionY - ballA.positionY
   const distanceSquared = deltaX * deltaX + deltaY * deltaY
   const minDistance = ballA.radius + ballB.radius
 
-  if (distanceSquared >= minDistance * minDistance) return   // no overlap
+  if (distanceSquared >= minDistance * minDistance) return  // no overlap
 
   const distance = Math.sqrt(distanceSquared)
   const normalX  = deltaX / distance
   const normalY  = deltaY / distance
 
-  // Project velocities onto collision normal
   const relativeVelocity = (ballA.velocityX - ballB.velocityX) * normalX
                           + (ballA.velocityY - ballB.velocityY) * normalY
 
   if (relativeVelocity <= 0) return  // already moving apart
 
-  // Apply elastic impulse (equal masses)
   ballA.velocityX -= relativeVelocity * normalX
   ballA.velocityY -= relativeVelocity * normalY
   ballB.velocityX += relativeVelocity * normalX
   ballB.velocityY += relativeVelocity * normalY
 
-  // Push apart to prevent overlap next frame
   const penetration = (minDistance - distance) * 0.5
-  ballA.positionX -= normalX * penetration
-  ballA.positionY -= normalY * penetration
-  ballB.positionX += normalX * penetration
-  ballB.positionY += normalY * penetration
-}
-
-// Inside draw(), after updating all balls:
+  ballA.positionX -= normalX * penetration; ballA.positionY -= normalY * penetration
+  ballB.positionX += normalX * penetration; ballB.positionY += normalY * penetration
+}` },
+          { type: 'walk', text: '`distanceSquared >= minDistance * minDistance` avoids `sqrt` in the common case (no collision). When circles overlap: compute the collision `normal` (unit vector from A to B). `relativeVelocity` is the dot product of the velocity difference with that normal — positive means approaching, negative means already separating. Subtract from A and add to B to transfer momentum. The final push-apart moves each ball half the penetration depth outward so they are not touching at the start of next frame.' },
+          { type: 'h3', text: 'Wiring collision into the draw loop' },
+          { type: 'code', text: `// Inside draw(), after balls.forEach(updateBall):
 for (let indexA = 0; indexA < balls.length; indexA++)
   for (let indexB = indexA + 1; indexB < balls.length; indexB++)
     resolveBallCollision(balls[indexA], balls[indexB])` },
-          { type: 'walk', text: '`relativeVelocity` is the dot product of the velocity difference with the collision normal — how fast the two balls approach each other along the axis between centres. Positive = approaching (collision). Zero or negative = already moving apart (skip). Subtracting from A and adding to B transfers momentum along the collision axis — elastic collision for equal masses.\n\n`indexB = indexA + 1` ensures each pair is checked once. 8 balls = 28 checks per frame.' },
+          { type: 'walk', text: '`indexB = indexA + 1` ensures each pair is checked exactly once — A vs B is the same collision as B vs A. For 8 balls that is 28 checks per frame. Update all balls first, then resolve all collisions, then draw — if you draw in the middle of collision resolution you get flicker.' },
           { type: 'cs', text: '**O(n²) collision detection.** For n balls we do n*(n-1)/2 checks. At 8 balls: 28. At 100 balls: 4950. At 1000 balls: 499,500 per frame. For large n, spatial partitioning (grid, quadtree, BVH) reduces this to O(n log n) by skipping pairs too far apart. Our demo is fine with O(n²) up to ~50 balls.' },
           { type: 'se', text: '**Early exit with squared distance.** Comparing `distanceSquared < minDistance * minDistance` avoids `Math.sqrt` in the common case (most pairs are not colliding). `sqrt` is expensive relative to multiplication. For 50 balls at 60fps = 73,500 checks/second — skipping `sqrt` on 99% of them is meaningful.' },
           { type: 'breaks', text: '**No depenetration → balls clump.** Without pushing the balls apart, they overlap next frame, collision fires again, and they get permanently stuck together. The push-apart (each ball moves half the penetration depth outward) ensures they are not touching at the start of the next frame.' },
@@ -2474,6 +2451,7 @@ export default function BouncingBalls() {
         title: 'Click to spawn new balls',
         content: [
           { type: 'build', text: 'Add a click listener so clicking the canvas spawns a new ball at the click position with a random velocity and colour. The array grows dynamically. This is the finished Bouncing Balls Sandbox.' },
+          { type: 'h3', text: 'The click handler' },
           { type: 'code', text: `const SPAWN_COLOURS = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#ef4444','#8b5cf6','#14b8a6','#f97316','#06b6d4']
 
 function handleCanvasClick(clickEvent) {
@@ -2486,21 +2464,23 @@ function handleCanvasClick(clickEvent) {
     radius:    12 + Math.random() * 14,
     colour:    SPAWN_COLOURS[Math.floor(Math.random() * SPAWN_COLOURS.length)],
   })
-}
-canvas.addEventListener('click', handleCanvasClick)
+}` },
+          { type: 'walk', text: '`canvas.getBoundingClientRect()` gives the canvas position in the viewport. `clientX - rect.left` converts the mouse position to canvas-relative coordinates. `balls.push(newBall)` adds to the live array — the `forEach` and `for` loops in `draw()` pick up the new entry immediately because they iterate over `balls.length`, which now includes it. No changes to the simulation code needed.' },
+          { type: 'h3', text: 'Register listener, update cleanup, add counter label' },
+          { type: 'code', text: `canvas.addEventListener('click', handleCanvasClick)
 
-// In cleanup:
+// Updated cleanup — remove every listener added in this effect:
 return () => {
   cancelAnimationFrame(animationFrameId)
   canvas.removeEventListener('click', handleCanvasClick)
   resizeObserver.disconnect()
 }
 
-// Inside draw(), after drawing balls — a live counter label:
+// Inside draw(), after drawing balls:
 ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'
 ctx.fillStyle = 'rgba(148, 163, 184, 0.5)'; ctx.font = '12px system-ui'
 ctx.fillText(\`Click to spawn · \${balls.length} balls\`, canvasWidth / 2, canvasHeight - 8)` },
-          { type: 'walk', text: '`canvas.getBoundingClientRect()` gives the canvas position in the viewport. `clientX - rect.left` converts to canvas-relative coordinates. `balls.push(newBall)` adds to the array — existing `forEach` and `for` loops in `draw()` pick up the new entry automatically because they iterate over `balls.length` which now includes it. No changes to the simulation code required.' },
+          { type: 'walk', text: 'Adding `removeEventListener` to cleanup is not optional. Every `useEffect` mount attaches a new `handleCanvasClick`. Without removal, remounts leave orphaned listeners — every click fires twice, spawning two balls. The counter label uses `ctx.fillText` with canvas text alignment set to centre-bottom so it sits at the bottom edge regardless of canvas size.' },
           { type: 'cs', text: '**Dynamic arrays and automatic loop coverage.** `Array.push` is O(1) amortised — JavaScript arrays resize automatically (doubling capacity). The simulation loops iterate over `balls.length` each frame, so newly pushed balls enter the simulation immediately. This is the open-closed principle: the system is open to extension (more balls) without modifying existing code.' },
           { type: 'se', text: '**One event, one concern.** `handleCanvasClick` reads the click position, constructs a ball, pushes it. It does not update, draw, or simulate. The simulation loop handles those on the next frame. Single responsibility makes the handler trivially testable and readable in isolation.' },
           { type: 'breaks', text: '**Not removing the click listener → leak.** Every `useEffect` mount attaches a new `handleCanvasClick`. If the component unmounts and remounts, the old listener stays on the old (removed) canvas — a memory leak. If it mounts again on the same canvas, you have two listeners and every click spawns two balls. Always return a cleanup that removes every listener added in the effect.' },

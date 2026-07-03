@@ -4,6 +4,9 @@ import Editor from '@monaco-editor/react'
 import { SCENE_META } from '../components/eng-math/scenes/index.js'
 import { SNIPPETS } from '../data/canvasSnippets.js'
 import { SERIES  } from '../data/canvasTutorialSeries.js'
+import Prism from 'prismjs'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/themes/prism-tomorrow.css'
 
 const API = '/api/dev-fs'
 const SCENES_DIR = 'src/components/eng-math/scenes'
@@ -520,69 +523,68 @@ function PropertiesPanel({ source, onSourceChange, editorRef }) {
 function tutInline(text) {
   return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**'))
-      return <strong key={i} style={{ color: '#c9d1d9' }}>{part.slice(2, -2)}</strong>
+      return <strong key={i} className="text-slate-200 font-semibold">{part.slice(2, -2)}</strong>
     if (part.startsWith('`') && part.endsWith('`'))
-      return <code key={i} style={{ background: '#21262d', color: '#79c0ff', padding: '1px 4px', borderRadius: 3, fontSize: 10 }}>{part.slice(1, -1)}</code>
+      return <code key={i} className="bg-slate-800 text-blue-400 px-1 py-px rounded text-[10px] font-mono">{part.slice(1, -1)}</code>
     return part
   })
 }
 
 function TutBlock({ block }) {
-  const S = { color: '#8b949e', fontSize: 11, lineHeight: 1.65 }
   switch (block.type) {
     case 'build':
       return (
-        <div style={{ borderLeft: '3px solid #3fb950', background: '#0d2117', borderRadius: '0 6px 6px 0', padding: '8px 12px', marginBottom: 10 }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#3fb950', marginBottom: 3 }}>WHAT YOU'LL BUILD</div>
-          <p style={S}>{tutInline(block.text)}</p>
+        <div className="border-l-[3px] border-green-500 bg-green-950/40 rounded-r-md px-3 py-2 mb-3">
+          <div className="text-[9px] font-bold tracking-widest text-green-400 mb-1">WHAT YOU'LL BUILD</div>
+          <p className="text-[11px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     case 'h3':
-      return <h3 style={{ fontSize: 11, fontWeight: 700, color: '#e6edf3', marginTop: 14, marginBottom: 4 }}>{block.text}</h3>
+      return <h3 className="text-[11px] font-bold text-slate-200 mt-4 mb-1">{block.text}</h3>
     case 'p':
-      return <p style={{ ...S, marginBottom: 8 }}>{tutInline(block.text)}</p>
+      return <p className="text-[11px] text-slate-400 leading-relaxed mb-2">{tutInline(block.text)}</p>
     case 'code': {
-      const lines = block.text.split('\n')
+      const html = Prism.highlight(block.text.trim(), Prism.languages.javascript, 'javascript')
       return (
-        <pre style={{ background: '#0d1117', border: '1px solid #30363d', borderRadius: 6, padding: '8px 10px', fontSize: 10, fontFamily: '"JetBrains Mono", monospace', color: '#c9d1d9', overflowX: 'auto', marginBottom: 8, lineHeight: 1.55 }}>
-          {lines.map((l, i) => <div key={i}>{l || ' '}</div>)}
+        <pre className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-[10.5px] font-mono overflow-x-auto mb-3 leading-relaxed">
+          <code className="language-js" dangerouslySetInnerHTML={{ __html: html }} />
         </pre>
       )
     }
     case 'walk':
       return (
-        <div style={{ borderLeft: '2px solid #30363d', paddingLeft: 10, marginBottom: 8 }}>
+        <div className="border-l-2 border-slate-700 pl-3 mb-3">
           {block.text.split('\n\n').map((para, i) => (
-            <p key={i} style={{ ...S, fontSize: 10, marginBottom: 4 }}>{tutInline(para)}</p>
+            <p key={i} className="text-[10.5px] text-slate-400 leading-relaxed mb-1">{tutInline(para)}</p>
           ))}
         </div>
       )
     case 'cs':
       return (
-        <div style={{ border: '1px solid #1f6feb66', background: '#0c1929', borderRadius: 6, padding: '8px 10px', marginBottom: 8 }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#58a6ff', marginBottom: 3 }}>CS CONCEPT</div>
-          <p style={{ ...S, fontSize: 10 }}>{tutInline(block.text)}</p>
+        <div className="border border-blue-900 bg-blue-950/40 rounded-lg px-3 py-2 mb-2">
+          <div className="text-[9px] font-bold tracking-widest text-blue-400 mb-1">CS CONCEPT</div>
+          <p className="text-[10.5px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     case 'se':
       return (
-        <div style={{ border: '1px solid #8b5cf644', background: '#130d1e', borderRadius: 6, padding: '8px 10px', marginBottom: 8 }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#a78bfa', marginBottom: 3 }}>SE PRINCIPLE</div>
-          <p style={{ ...S, fontSize: 10 }}>{tutInline(block.text)}</p>
+        <div className="border border-violet-900 bg-violet-950/40 rounded-lg px-3 py-2 mb-2">
+          <div className="text-[9px] font-bold tracking-widest text-violet-400 mb-1">SE PRINCIPLE</div>
+          <p className="text-[10.5px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     case 'breaks':
       return (
-        <div style={{ border: '1px solid #f8717144', background: '#1a0a0a', borderRadius: 6, padding: '8px 10px', marginBottom: 8 }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#f87171', marginBottom: 3 }}>WHAT BREAKS</div>
-          <p style={{ ...S, fontSize: 10 }}>{tutInline(block.text)}</p>
+        <div className="border border-red-900 bg-red-950/40 rounded-lg px-3 py-2 mb-2">
+          <div className="text-[9px] font-bold tracking-widest text-red-400 mb-1">WHAT BREAKS</div>
+          <p className="text-[10.5px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     case 'note':
       return (
-        <div style={{ border: '1px solid #d9770666', background: '#1a1200', borderRadius: 6, padding: '8px 10px', marginBottom: 8 }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#f59e0b', marginBottom: 3 }}>TRY IT</div>
-          <p style={{ ...S, fontSize: 10 }}>{tutInline(block.text)}</p>
+        <div className="border border-amber-800 bg-amber-950/40 rounded-lg px-3 py-2 mb-2">
+          <div className="text-[9px] font-bold tracking-widest text-amber-400 mb-1">TRY IT</div>
+          <p className="text-[10.5px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     default:
@@ -598,19 +600,18 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
   const step = tutorial.steps[stepIdx]
 
   return (
-    <div className="flex flex-col" style={{ flex: 1, overflow: 'hidden', background: '#0d1117' }}>
-      {/* Tutorial selector */}
-      <div style={{ borderBottom: '1px solid #21262d', padding: '6px 10px', display: 'flex', gap: 6, flexShrink: 0 }}>
+    <div className="flex flex-col flex-1 overflow-hidden bg-slate-950">
+      {/* Series selector */}
+      <div className="flex gap-1.5 px-2.5 py-1.5 border-b border-slate-800 shrink-0 flex-wrap">
         {series.map((t, i) => (
           <button
             key={t.id}
             onClick={() => { setTutIdx(i); setStepIdx(0) }}
-            style={{
-              fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4, cursor: 'pointer',
-              background: i === tutIdx ? '#1f6feb22' : 'transparent',
-              color: i === tutIdx ? '#58a6ff' : '#6e7681',
-              border: `1px solid ${i === tutIdx ? '#1f6feb44' : 'transparent'}`,
-            }}
+            className={`text-[10px] font-bold px-2 py-0.5 rounded cursor-pointer transition-colors ${
+              i === tutIdx
+                ? 'bg-blue-950 text-blue-400 border border-blue-800'
+                : 'text-slate-500 border border-transparent hover:text-slate-300'
+            }`}
           >
             {t.title}
           </button>
@@ -618,17 +619,14 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
       </div>
 
       {/* Step tabs */}
-      <div style={{ borderBottom: '1px solid #21262d', padding: '4px 8px', display: 'flex', gap: 4, flexShrink: 0, flexWrap: 'wrap' }}>
+      <div className="flex gap-1 px-2 py-1 border-b border-slate-800 shrink-0 flex-wrap">
         {tutorial.steps.map((s, i) => (
           <button
             key={s.id}
             onClick={() => setStepIdx(i)}
-            style={{
-              fontSize: 9, fontWeight: 600, padding: '2px 7px', borderRadius: 4, cursor: 'pointer',
-              background: i === stepIdx ? '#21262d' : 'transparent',
-              color: i === stepIdx ? '#e6edf3' : '#484f58',
-              border: '1px solid transparent',
-            }}
+            className={`text-[9px] font-semibold px-1.5 py-0.5 rounded cursor-pointer transition-colors ${
+              i === stepIdx ? 'bg-slate-800 text-slate-200' : 'text-slate-600 hover:text-slate-400'
+            }`}
           >
             {i + 1}. {s.title}
           </button>
@@ -636,39 +634,39 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px' }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#e6edf3', marginBottom: 2 }}>{step.title}</div>
-        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: '#58a6ff', marginBottom: 12 }}>
+      <div className="flex-1 overflow-y-auto px-3.5 py-3">
+        <div className="text-[13px] font-bold text-slate-100 mb-0.5">{step.title}</div>
+        <div className="text-[9px] font-bold tracking-widest text-blue-400 mb-3">
           {tutorial.title} · Step {stepIdx + 1} / {tutorial.steps.length}
         </div>
 
         {step.content.map((block, i) => <TutBlock key={i} block={block} />)}
 
         {/* Load starter / answer buttons */}
-        <div style={{ display: 'flex', gap: 8, marginTop: 16, paddingTop: 12, borderTop: '1px solid #21262d' }}>
+        <div className="flex gap-2 mt-4 pt-3 border-t border-slate-800">
           <button
             onClick={() => onLoadCode(step.starterCode)}
-            style={{ flex: 1, fontSize: 10, fontWeight: 600, padding: '6px 0', borderRadius: 5, cursor: 'pointer', background: '#21262d', color: '#c9d1d9', border: '1px solid #30363d' }}
+            className="flex-1 text-[10px] font-semibold py-1.5 rounded cursor-pointer bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition-colors"
           >
             Load Starter Code
           </button>
           <button
             onClick={() => onLoadCode(step.completeCode)}
-            style={{ flex: 1, fontSize: 10, fontWeight: 600, padding: '6px 0', borderRadius: 5, cursor: 'pointer', background: '#1a1200', color: '#f59e0b', border: '1px solid #d9770644' }}
+            className="flex-1 text-[10px] font-semibold py-1.5 rounded cursor-pointer bg-amber-950/50 text-amber-400 border border-amber-800/50 hover:bg-amber-950 transition-colors"
           >
             Show Answer
           </button>
         </div>
 
         {/* Prev / Next */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+        <div className="flex justify-between mt-2">
           <button
             disabled={stepIdx === 0 && tutIdx === 0}
             onClick={() => {
               if (stepIdx > 0) { setStepIdx(s => s - 1) }
               else if (tutIdx > 0) { setTutIdx(t => t - 1); setStepIdx(series[tutIdx - 1].steps.length - 1) }
             }}
-            style={{ fontSize: 10, padding: '4px 10px', borderRadius: 4, cursor: 'pointer', background: 'transparent', color: '#6e7681', border: '1px solid #30363d', opacity: (stepIdx === 0 && tutIdx === 0) ? 0.3 : 1 }}
+            className="text-[10px] px-2.5 py-1 rounded cursor-pointer text-slate-500 border border-slate-800 hover:text-slate-300 transition-colors disabled:opacity-30"
           >
             ← Prev
           </button>
@@ -678,7 +676,7 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
               if (stepIdx < tutorial.steps.length - 1) { setStepIdx(s => s + 1) }
               else if (tutIdx < series.length - 1) { setTutIdx(t => t + 1); setStepIdx(0) }
             }}
-            style={{ fontSize: 10, padding: '4px 10px', borderRadius: 4, cursor: 'pointer', background: '#1f6feb22', color: '#58a6ff', border: '1px solid #1f6feb44' }}
+            className="text-[10px] px-2.5 py-1 rounded cursor-pointer bg-blue-950/50 text-blue-400 border border-blue-800/50 hover:bg-blue-950 transition-colors"
           >
             Next →
           </button>
