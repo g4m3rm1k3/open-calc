@@ -4,6 +4,8 @@ import Editor from '@monaco-editor/react'
 import { SCENE_META } from '../components/eng-math/scenes/index.js'
 import { SNIPPETS } from '../data/canvasSnippets.js'
 import { SERIES  } from '../data/canvasTutorialSeries.js'
+import { useGlobalTheme } from '../context/ThemeContext.jsx'
+import { setupOpenCalcMonaco } from '../utils/monacoThemes.js'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-javascript'
 import 'prismjs/themes/prism-tomorrow.css'
@@ -436,12 +438,12 @@ function PropertiesPanel({ source, onSourceChange, editorRef }) {
 
   if (vars.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center px-6 gap-2" style={{ color: '#6e7681' }}>
+      <div className="flex flex-col items-center justify-center h-full text-center px-6 gap-2 text-slate-500">
         <div className="text-2xl opacity-30">⚙</div>
         <p className="text-xs leading-relaxed">
           No numeric constants detected.<br />
-          Declare variables as <code style={{ color: '#79c0ff' }}>const NAME = value</code><br />
-          or <code style={{ color: '#79c0ff' }}>const NAME = Math.min(expr, cap)</code><br />
+          Declare variables as <code className="text-blue-500 dark:text-blue-300">const NAME = value</code><br />
+          or <code className="text-blue-500 dark:text-blue-300">const NAME = Math.min(expr, cap)</code><br />
           and they'll appear here as editable inputs.
         </p>
       </div>
@@ -449,18 +451,20 @@ function PropertiesPanel({ source, onSourceChange, editorRef }) {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto" style={{ background: '#0d1117' }}>
+    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0d1117]">
       <div className="px-4 pt-3 pb-1">
-        <p className="text-xs mb-3" style={{ color: '#6e7681' }}>
-          Click any variable name to jump to it in the editor. Change values and hit <kbd style={{ background: '#21262d', color: '#8b949e', padding: '1px 5px', borderRadius: 3, fontSize: 10, border: '1px solid #30363d' }}>⌘S</kbd> to preview.
+        <p className="text-xs mb-3 text-slate-500">
+          Click any variable name to jump to it in the editor. Change values and hit{' '}
+          <kbd className="bg-slate-200 dark:bg-[#21262d] text-slate-600 dark:text-[#8b949e] px-1.5 py-px rounded text-[10px] border border-slate-300 dark:border-[#30363d]">⌘S</kbd>
+          {' '}to preview.
         </p>
       </div>
-      <table className="w-full text-xs" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
+      <table className="w-full text-xs border-collapse">
         <thead>
-          <tr style={{ borderBottom: '1px solid #21262d' }}>
-            <th className="px-4 py-1.5 text-left font-semibold" style={{ color: '#6e7681' }}>Variable</th>
-            <th className="px-2 py-1.5 text-left font-semibold" style={{ color: '#6e7681' }}>Formula</th>
-            <th className="px-4 py-1.5 text-right font-semibold" style={{ color: '#6e7681' }}>Value</th>
+          <tr className="border-b border-slate-200 dark:border-slate-800">
+            <th className="px-4 py-1.5 text-left font-semibold text-slate-500">Variable</th>
+            <th className="px-2 py-1.5 text-left font-semibold text-slate-500">Formula</th>
+            <th className="px-4 py-1.5 text-right font-semibold text-slate-500">Value</th>
           </tr>
         </thead>
         <tbody>
@@ -470,29 +474,27 @@ function PropertiesPanel({ source, onSourceChange, editorRef }) {
             return (
               <tr
                 key={`${v.name}-${v.line}`}
-                style={{ borderBottom: '1px solid #161b22' }}
-                className="hover:bg-white/[0.02] transition-colors"
+                className="border-b border-slate-100 dark:border-[#161b22] hover:bg-black/[0.03] dark:hover:bg-white/[0.02] transition-colors"
               >
                 <td className="px-4 py-2">
                   <button
                     onClick={() => jumpToLine(v.line)}
-                    className="text-left hover:underline"
+                    className="text-left hover:underline text-blue-500 dark:text-[#79c0ff] font-mono"
                     title={`Line ${v.line} — click to jump`}
-                    style={{ color: '#79c0ff', fontFamily: 'monospace' }}
                   >
                     {v.name}
                   </button>
                   {hint && (
-                    <div className="text-[10px] mt-0.5" style={{ color: '#484f58' }}>{hint}</div>
+                    <div className="text-[10px] mt-0.5 text-slate-400 dark:text-[#484f58]">{hint}</div>
                   )}
                 </td>
-                <td className="px-2 py-2" style={{ color: '#484f58', fontFamily: 'monospace', fontSize: 10 }}>
+                <td className="px-2 py-2 text-slate-400 dark:text-[#484f58] font-mono text-[10px]">
                   {v.type === 'minCap' ? (
                     <span title="proportional formula">
-                      Math.min(<span style={{ color: '#8b949e' }}>{v.expr}</span>, …)
+                      Math.min(<span className="text-slate-500 dark:text-[#8b949e]">{v.expr}</span>, …)
                     </span>
                   ) : (
-                    <span style={{ color: '#8b949e' }}>constant</span>
+                    <span className="text-slate-500 dark:text-[#8b949e]">constant</span>
                   )}
                 </td>
                 <td className="px-4 py-2 text-right">
@@ -501,13 +503,7 @@ function PropertiesPanel({ source, onSourceChange, editorRef }) {
                     value={localVal}
                     step={localVal < 10 ? 0.01 : localVal < 100 ? 1 : 10}
                     onChange={e => handleChange(v, e.target.value)}
-                    className="text-right rounded px-2 py-0.5 w-20 font-mono text-xs"
-                    style={{
-                      background: '#21262d',
-                      color: '#e6edf3',
-                      border: '1px solid #30363d',
-                      outline: 'none',
-                    }}
+                    className="text-right rounded px-2 py-0.5 w-20 font-mono text-xs bg-slate-200 dark:bg-[#21262d] text-slate-900 dark:text-[#e6edf3] border border-slate-300 dark:border-[#30363d] outline-none"
                   />
                 </td>
               </tr>
@@ -523,9 +519,9 @@ function PropertiesPanel({ source, onSourceChange, editorRef }) {
 function tutInline(text) {
   return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**'))
-      return <strong key={i} className="text-slate-200 font-semibold">{part.slice(2, -2)}</strong>
+      return <strong key={i} className="text-slate-700 dark:text-slate-200 font-semibold">{part.slice(2, -2)}</strong>
     if (part.startsWith('`') && part.endsWith('`'))
-      return <code key={i} className="bg-slate-800 text-blue-400 px-1 py-px rounded text-[10px] font-mono">{part.slice(1, -1)}</code>
+      return <code key={i} className="bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 px-1 py-px rounded text-[10px] font-mono">{part.slice(1, -1)}</code>
     return part
   })
 }
@@ -534,57 +530,57 @@ function TutBlock({ block }) {
   switch (block.type) {
     case 'build':
       return (
-        <div className="border-l-[3px] border-green-500 bg-green-950/40 rounded-r-md px-3 py-2 mb-3">
-          <div className="text-[9px] font-bold tracking-widest text-green-400 mb-1">WHAT YOU'LL BUILD</div>
-          <p className="text-[11px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
+        <div className="border-l-[3px] border-green-500 bg-green-50 dark:bg-green-950/40 rounded-r-md px-3 py-2 mb-3">
+          <div className="text-[9px] font-bold tracking-widest text-green-600 dark:text-green-400 mb-1">WHAT YOU'LL BUILD</div>
+          <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     case 'h3':
-      return <h3 className="text-[11px] font-bold text-slate-200 mt-4 mb-1">{block.text}</h3>
+      return <h3 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 mt-4 mb-1">{block.text}</h3>
     case 'p':
-      return <p className="text-[11px] text-slate-400 leading-relaxed mb-2">{tutInline(block.text)}</p>
+      return <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed mb-2">{tutInline(block.text)}</p>
     case 'code': {
       const html = Prism.highlight(block.text.trim(), Prism.languages.javascript, 'javascript')
       return (
-        <pre className="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-[10.5px] font-mono overflow-x-auto mb-3 leading-relaxed">
+        <pre className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-[10.5px] font-mono overflow-x-auto mb-3 leading-relaxed">
           <code className="language-js" dangerouslySetInnerHTML={{ __html: html }} />
         </pre>
       )
     }
     case 'walk':
       return (
-        <div className="border-l-2 border-slate-700 pl-3 mb-3">
+        <div className="border-l-2 border-slate-200 dark:border-slate-700 pl-3 mb-3">
           {block.text.split('\n\n').map((para, i) => (
-            <p key={i} className="text-[10.5px] text-slate-400 leading-relaxed mb-1">{tutInline(para)}</p>
+            <p key={i} className="text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed mb-1">{tutInline(para)}</p>
           ))}
         </div>
       )
     case 'cs':
       return (
-        <div className="border border-blue-900 bg-blue-950/40 rounded-lg px-3 py-2 mb-2">
-          <div className="text-[9px] font-bold tracking-widest text-blue-400 mb-1">CS CONCEPT</div>
-          <p className="text-[10.5px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
+        <div className="border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/40 rounded-lg px-3 py-2 mb-2">
+          <div className="text-[9px] font-bold tracking-widest text-blue-600 dark:text-blue-400 mb-1">CS CONCEPT</div>
+          <p className="text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     case 'se':
       return (
-        <div className="border border-violet-900 bg-violet-950/40 rounded-lg px-3 py-2 mb-2">
-          <div className="text-[9px] font-bold tracking-widest text-violet-400 mb-1">SE PRINCIPLE</div>
-          <p className="text-[10.5px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
+        <div className="border border-violet-200 dark:border-violet-900 bg-violet-50 dark:bg-violet-950/40 rounded-lg px-3 py-2 mb-2">
+          <div className="text-[9px] font-bold tracking-widest text-violet-600 dark:text-violet-400 mb-1">SE PRINCIPLE</div>
+          <p className="text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     case 'breaks':
       return (
-        <div className="border border-red-900 bg-red-950/40 rounded-lg px-3 py-2 mb-2">
-          <div className="text-[9px] font-bold tracking-widest text-red-400 mb-1">WHAT BREAKS</div>
-          <p className="text-[10.5px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
+        <div className="border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 rounded-lg px-3 py-2 mb-2">
+          <div className="text-[9px] font-bold tracking-widest text-red-600 dark:text-red-400 mb-1">WHAT BREAKS</div>
+          <p className="text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     case 'note':
       return (
-        <div className="border border-amber-800 bg-amber-950/40 rounded-lg px-3 py-2 mb-2">
-          <div className="text-[9px] font-bold tracking-widest text-amber-400 mb-1">TRY IT</div>
-          <p className="text-[10.5px] text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
+        <div className="border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 rounded-lg px-3 py-2 mb-2">
+          <div className="text-[9px] font-bold tracking-widest text-amber-600 dark:text-amber-400 mb-1">TRY IT</div>
+          <p className="text-[10.5px] text-slate-600 dark:text-slate-400 leading-relaxed">{tutInline(block.text)}</p>
         </div>
       )
     default:
@@ -600,17 +596,17 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
   const step = tutorial.steps[stepIdx]
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden bg-slate-950">
+    <div className="flex flex-col flex-1 overflow-hidden bg-white dark:bg-slate-950">
       {/* Series selector */}
-      <div className="flex gap-1.5 px-2.5 py-1.5 border-b border-slate-800 shrink-0 flex-wrap">
+      <div className="flex gap-1.5 px-2.5 py-1.5 border-b border-slate-200 dark:border-slate-800 shrink-0 flex-wrap">
         {series.map((t, i) => (
           <button
             key={t.id}
             onClick={() => { setTutIdx(i); setStepIdx(0) }}
             className={`text-[10px] font-bold px-2 py-0.5 rounded cursor-pointer transition-colors ${
               i === tutIdx
-                ? 'bg-blue-950 text-blue-400 border border-blue-800'
-                : 'text-slate-500 border border-transparent hover:text-slate-300'
+                ? 'bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800'
+                : 'text-slate-500 border border-transparent hover:text-slate-700 dark:hover:text-slate-300'
             }`}
           >
             {t.title}
@@ -619,13 +615,15 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
       </div>
 
       {/* Step tabs */}
-      <div className="flex gap-1 px-2 py-1 border-b border-slate-800 shrink-0 flex-wrap">
+      <div className="flex gap-1 px-2 py-1 border-b border-slate-200 dark:border-slate-800 shrink-0 flex-wrap">
         {tutorial.steps.map((s, i) => (
           <button
             key={s.id}
             onClick={() => setStepIdx(i)}
             className={`text-[9px] font-semibold px-1.5 py-0.5 rounded cursor-pointer transition-colors ${
-              i === stepIdx ? 'bg-slate-800 text-slate-200' : 'text-slate-600 hover:text-slate-400'
+              i === stepIdx
+                ? 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200'
+                : 'text-slate-400 dark:text-slate-600 hover:text-slate-600 dark:hover:text-slate-400'
             }`}
           >
             {i + 1}. {s.title}
@@ -635,24 +633,24 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-3.5 py-3">
-        <div className="text-[13px] font-bold text-slate-100 mb-0.5">{step.title}</div>
-        <div className="text-[9px] font-bold tracking-widest text-blue-400 mb-3">
+        <div className="text-[13px] font-bold text-slate-900 dark:text-slate-100 mb-0.5">{step.title}</div>
+        <div className="text-[9px] font-bold tracking-widest text-blue-600 dark:text-blue-400 mb-3">
           {tutorial.title} · Step {stepIdx + 1} / {tutorial.steps.length}
         </div>
 
         {step.content.map((block, i) => <TutBlock key={i} block={block} />)}
 
         {/* Load starter / answer buttons */}
-        <div className="flex gap-2 mt-4 pt-3 border-t border-slate-800">
+        <div className="flex gap-2 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
           <button
             onClick={() => onLoadCode(step.starterCode)}
-            className="flex-1 text-[10px] font-semibold py-1.5 rounded cursor-pointer bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition-colors"
+            className="flex-1 text-[10px] font-semibold py-1.5 rounded cursor-pointer bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
           >
             Load Starter Code
           </button>
           <button
             onClick={() => onLoadCode(step.completeCode)}
-            className="flex-1 text-[10px] font-semibold py-1.5 rounded cursor-pointer bg-amber-950/50 text-amber-400 border border-amber-800/50 hover:bg-amber-950 transition-colors"
+            className="flex-1 text-[10px] font-semibold py-1.5 rounded cursor-pointer bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50 hover:bg-amber-100 dark:hover:bg-amber-950 transition-colors"
           >
             Show Answer
           </button>
@@ -666,7 +664,7 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
               if (stepIdx > 0) { setStepIdx(s => s - 1) }
               else if (tutIdx > 0) { setTutIdx(t => t - 1); setStepIdx(series[tutIdx - 1].steps.length - 1) }
             }}
-            className="text-[10px] px-2.5 py-1 rounded cursor-pointer text-slate-500 border border-slate-800 hover:text-slate-300 transition-colors disabled:opacity-30"
+            className="text-[10px] px-2.5 py-1 rounded cursor-pointer text-slate-500 border border-slate-200 dark:border-slate-800 hover:text-slate-700 dark:hover:text-slate-300 transition-colors disabled:opacity-30"
           >
             ← Prev
           </button>
@@ -676,7 +674,7 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
               if (stepIdx < tutorial.steps.length - 1) { setStepIdx(s => s + 1) }
               else if (tutIdx < series.length - 1) { setTutIdx(t => t + 1); setStepIdx(0) }
             }}
-            className="text-[10px] px-2.5 py-1 rounded cursor-pointer bg-blue-950/50 text-blue-400 border border-blue-800/50 hover:bg-blue-950 transition-colors"
+            className="text-[10px] px-2.5 py-1 rounded cursor-pointer bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 hover:bg-blue-100 dark:hover:bg-blue-950 transition-colors"
           >
             Next →
           </button>
@@ -689,6 +687,7 @@ function TutorialPanel({ onLoadCode, series = SNIPPETS }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function SceneEditorPage() {
   const navigate = useNavigate()
+  const { themeStyles } = useGlobalTheme()
   const [sceneList, setSceneList] = useState([])
   const [listError, setListError] = useState(null)
   const [selectedId, setSelectedId] = useState('')
@@ -815,28 +814,26 @@ export default function SceneEditorPage() {
   const hasChanges = source !== savedSource
 
   return (
-    <div className="fixed inset-0 z-[120] flex flex-col" style={{ background: '#0d1117' }}>
+    <div className="fixed inset-0 z-[120] flex flex-col bg-slate-50 dark:bg-[#0d1117]">
       {/* Header */}
-      <div className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b" style={{ background: '#161b22', borderColor: '#30363d' }}>
+      <div className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b bg-white dark:bg-[#161b22] border-slate-200 dark:border-[#30363d]">
         <button
           onClick={() => navigate('/dev/scenes')}
-          className="text-sm px-2 py-1 rounded hover:bg-white/10 transition-colors shrink-0"
-          style={{ color: '#8b949e' }}
+          className="text-sm px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/10 transition-colors shrink-0 text-slate-500 dark:text-[#8b949e]"
         >
           ← Sandbox
         </button>
-        <span className="text-sm font-semibold" style={{ color: '#e6edf3' }}>Scene Editor</span>
-        <span style={{ color: '#30363d' }}>|</span>
+        <span className="text-sm font-semibold text-slate-900 dark:text-[#e6edf3]">Scene Editor</span>
+        <span className="text-slate-200 dark:text-[#30363d]">|</span>
 
         {/* Scene selector */}
         {listError ? (
-          <span className="text-xs" style={{ color: '#f87171' }}>{listError}</span>
+          <span className="text-xs text-red-500 dark:text-[#f87171]">{listError}</span>
         ) : (
           <select
             value={selectedId}
             onChange={e => { setSelectedId(e.target.value); setNewMode(false) }}
-            className="text-sm rounded px-2 py-1 font-mono"
-            style={{ background: '#21262d', color: '#e6edf3', border: '1px solid #30363d' }}
+            className="text-sm rounded px-2 py-1 font-mono bg-slate-100 dark:bg-[#21262d] text-slate-900 dark:text-[#e6edf3] border border-slate-200 dark:border-[#30363d]"
           >
             {sceneList.map(id => (
               <option key={id} value={id}>{id}</option>
@@ -853,21 +850,19 @@ export default function SceneEditorPage() {
               onChange={e => setNewName(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleCreateNew(); if (e.key === 'Escape') setNewMode(false) }}
               placeholder="e.g. Fourier Series"
-              className="text-sm rounded px-2 py-1 font-mono w-44"
-              style={{ background: '#21262d', color: '#e6edf3', border: '1px solid #388bfd', outline: 'none' }}
+              className="text-sm rounded px-2 py-1 font-mono w-44 bg-slate-100 dark:bg-[#21262d] text-slate-900 dark:text-[#e6edf3] border border-blue-400 dark:border-[#388bfd] outline-none"
             />
-            <button onClick={handleCreateNew} className="text-sm px-3 py-1 rounded font-semibold" style={{ background: '#238636', color: '#fff' }}>
+            <button onClick={handleCreateNew} className="text-sm px-3 py-1 rounded font-semibold bg-green-700 text-white">
               Create
             </button>
-            <button onClick={() => setNewMode(false)} className="text-sm px-2 py-1 rounded" style={{ color: '#8b949e', background: '#21262d', border: '1px solid #30363d' }}>
+            <button onClick={() => setNewMode(false)} className="text-sm px-2 py-1 rounded text-slate-600 dark:text-[#8b949e] bg-slate-100 dark:bg-[#21262d] border border-slate-200 dark:border-[#30363d]">
               Cancel
             </button>
           </div>
         ) : (
           <button
             onClick={() => setNewMode(true)}
-            className="text-sm px-3 py-1 rounded font-semibold"
-            style={{ background: '#21262d', color: '#58a6ff', border: '1px solid #30363d' }}
+            className="text-sm px-3 py-1 rounded font-semibold bg-slate-100 dark:bg-[#21262d] text-blue-600 dark:text-[#58a6ff] border border-slate-200 dark:border-[#30363d]"
           >
             + New Scene
           </button>
@@ -875,23 +870,22 @@ export default function SceneEditorPage() {
 
         <div className="ml-auto flex items-center gap-2">
           {saveMsg && (
-            <span className="text-xs" style={{ color: /error/i.test(saveMsg) ? '#f87171' : '#4ade80' }}>
+            <span className={`text-xs ${/error/i.test(saveMsg) ? 'text-red-500 dark:text-[#f87171]' : 'text-green-600 dark:text-[#4ade80]'}`}>
               {saveMsg}
             </span>
           )}
           {hasChanges && (
-            <span className="text-[10px] px-2 py-0.5 rounded" style={{ background: '#d2992222', color: '#d29922', border: '1px solid #d2992244' }}>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-amber-50 dark:bg-[#d2992222] text-amber-700 dark:text-[#d29922] border border-amber-200 dark:border-[#d2992244]">
               unsaved
             </span>
           )}
-          <span className="text-xs" style={{ color: '#484f58' }}>
+          <span className="text-xs text-slate-400 dark:text-[#484f58]">
             {selectedId && `${SCENES_DIR}/${selectedId}.jsx`}
           </span>
           <button
             onClick={handleRefreshPreview}
             title="Refresh preview without saving"
-            className="text-sm px-3 py-1.5 rounded font-semibold"
-            style={{ background: '#21262d', color: '#79c0ff', border: '1px solid #30363d' }}
+            className="text-sm px-3 py-1.5 rounded font-semibold bg-slate-100 dark:bg-[#21262d] text-blue-500 dark:text-[#79c0ff] border border-slate-200 dark:border-[#30363d]"
           >
             ↻ Preview
           </button>
@@ -899,30 +893,30 @@ export default function SceneEditorPage() {
             onClick={handleSave}
             disabled={!hasChanges || !selectedId}
             title="Save file and refresh preview (⌘S)"
-            className="text-sm px-4 py-1.5 rounded font-bold disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: '#238636', color: '#fff' }}
+            className="text-sm px-4 py-1.5 rounded font-bold disabled:opacity-40 disabled:cursor-not-allowed bg-green-700 text-white"
           >
-            Save  <span style={{ opacity: 0.65, fontSize: 10 }}>⌘S</span>
+            Save  <span className="opacity-65 text-[10px]">⌘S</span>
           </button>
         </div>
       </div>
 
       {/* Sub-header hint */}
-      <div className="shrink-0 px-4 py-1 text-xs" style={{ background: '#161b22', borderBottom: '1px solid #30363d', color: '#484f58' }}>
-        Canvas 2D · JSX · <strong style={{ color: '#6e7681' }}>⌘S</strong> to save + refresh preview ·
+      <div className="shrink-0 px-4 py-1 text-xs bg-white dark:bg-[#161b22] border-b border-slate-200 dark:border-[#30363d] text-slate-400 dark:text-[#484f58]">
+        Canvas 2D · JSX · <strong className="text-slate-500 dark:text-[#6e7681]">⌘S</strong> to save + refresh preview ·
         Properties tab shows editable variables — click a name to jump to its line
       </div>
 
       {/* Main area */}
       <div className="flex flex-1 min-h-0">
         {/* Monaco editor — 55% */}
-        <div className="flex flex-col min-h-0" style={{ width: '55%', borderRight: '1px solid #30363d' }}>
+        <div className="flex flex-col min-h-0 border-r border-slate-200 dark:border-[#30363d]" style={{ width: '55%' }}>
           <div className="flex-1 min-h-0">
             <Editor
               value={source}
               onChange={handleSourceChange}
               language="javascript"
-              theme="vs-dark"
+              theme={themeStyles.monaco}
+              beforeMount={setupOpenCalcMonaco}
               options={MOPTS}
               onMount={handleMonacoMount}
             />
@@ -932,7 +926,7 @@ export default function SceneEditorPage() {
         {/* Right panel — 45% */}
         <div className="flex flex-col min-h-0" style={{ width: '45%' }}>
           {/* Tabs */}
-          <div className="shrink-0 flex items-center border-b px-3 gap-1" style={{ background: '#161b22', borderColor: '#30363d', height: 33 }}>
+          <div className="shrink-0 flex items-center border-b px-3 gap-1 bg-white dark:bg-[#161b22] border-slate-200 dark:border-[#30363d]" style={{ height: 33 }}>
             {[
               { id: 'preview', label: 'Preview' },
               { id: 'properties', label: 'Properties' },
@@ -943,10 +937,11 @@ export default function SceneEditorPage() {
               <button
                 key={tab.id}
                 onClick={() => setRightTab(tab.id)}
-                className="text-xs px-3 py-1 rounded font-semibold transition-colors"
-                style={rightTab === tab.id
-                  ? { background: '#1f6feb22', color: '#58a6ff', border: '1px solid #1f6feb44' }
-                  : { color: '#6e7681', background: 'transparent', border: '1px solid transparent' }}
+                className={`text-xs px-3 py-1 rounded font-semibold transition-colors ${
+                  rightTab === tab.id
+                    ? 'bg-blue-50 dark:bg-[#1f6feb22] text-blue-600 dark:text-[#58a6ff] border border-blue-200 dark:border-[#1f6feb44]'
+                    : 'text-slate-500 dark:text-[#6e7681] bg-transparent border border-transparent'
+                }`}
               >
                 {tab.label}
               </button>
@@ -964,10 +959,11 @@ export default function SceneEditorPage() {
                   }
                 }}
                 title="Toggle coordinate grid overlay"
-                className="ml-auto text-xs px-2 py-1 rounded font-semibold transition-colors"
-                style={overlayGrid
-                  ? { background: '#1f6feb44', color: '#58a6ff', border: '1px solid #1f6feb66' }
-                  : { color: '#484f58', background: 'transparent', border: '1px solid #30363d' }}
+                className={`ml-auto text-xs px-2 py-1 rounded font-semibold transition-colors ${
+                  overlayGrid
+                    ? 'bg-blue-100 dark:bg-[#1f6feb44] text-blue-600 dark:text-[#58a6ff] border border-blue-300 dark:border-[#1f6feb66]'
+                    : 'text-slate-400 dark:text-[#484f58] bg-transparent border border-slate-200 dark:border-[#30363d]'
+                }`}
               >
                 ⊞ Grid
               </button>
@@ -986,8 +982,10 @@ export default function SceneEditorPage() {
                   sandbox="allow-scripts"
                 />
               ) : (
-                <div className="flex items-center justify-center h-full text-sm" style={{ color: '#6e7681' }}>
-                  Select a scene, then press <kbd className="mx-1 px-1.5 py-0.5 rounded text-xs" style={{ background: '#21262d', border: '1px solid #30363d', color: '#8b949e' }}>⌘S</kbd> to preview
+                <div className="flex items-center justify-center h-full text-sm text-slate-500">
+                  Select a scene, then press{' '}
+                  <kbd className="mx-1 px-1.5 py-0.5 rounded text-xs bg-slate-200 dark:bg-[#21262d] border border-slate-300 dark:border-[#30363d] text-slate-600 dark:text-[#8b949e]">⌘S</kbd>
+                  {' '}to preview
                 </div>
               )}
             </div>
@@ -1034,26 +1032,23 @@ export default function SceneEditorPage() {
           )}
 
           {rightTab === 'guide' && (
-            <div className="flex-1 overflow-y-auto" style={{ background: '#0d1117' }}>
+            <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0d1117]">
               <div className="p-4 space-y-5">
                 <div>
-                  <h2 className="text-sm font-bold mb-1" style={{ color: '#e6edf3' }}>Scene anatomy</h2>
-                  <p className="text-xs leading-relaxed" style={{ color: '#8b949e' }}>
+                  <h2 className="text-sm font-bold mb-1 text-slate-900 dark:text-[#e6edf3]">Scene anatomy</h2>
+                  <p className="text-xs leading-relaxed text-slate-500 dark:text-[#8b949e]">
                     Every scene is a React component that draws on a canvas using requestAnimationFrame.
-                    The canvas fills its parent via <code style={{ color: '#79c0ff' }}>absolute inset-0 w-full h-full</code>.
-                    Use the <strong style={{ color: '#c9d1d9' }}>Properties tab</strong> to adjust sizes without reading the math.
+                    The canvas fills its parent via <code className="text-blue-500 dark:text-[#79c0ff]">absolute inset-0 w-full h-full</code>.
+                    Use the <strong className="text-slate-700 dark:text-[#c9d1d9]">Properties tab</strong> to adjust sizes without reading the math.
                   </p>
                 </div>
                 {GUIDE_SECTIONS.map(s => (
                   <div key={s.title}>
-                    <div className="text-xs font-bold mb-1" style={{ color: '#58a6ff' }}>{s.title}</div>
-                    <pre
-                      className="text-xs leading-relaxed rounded p-3 overflow-x-auto mb-1"
-                      style={{ background: '#161b22', color: '#c9d1d9', fontFamily: '"JetBrains Mono", monospace' }}
-                    >
+                    <div className="text-xs font-bold mb-1 text-blue-600 dark:text-[#58a6ff]">{s.title}</div>
+                    <pre className="text-xs leading-relaxed rounded p-3 overflow-x-auto mb-1 bg-slate-100 dark:bg-[#161b22] text-slate-700 dark:text-[#c9d1d9] font-mono">
                       {s.code}
                     </pre>
-                    <p className="text-xs" style={{ color: '#8b949e' }}>{s.note}</p>
+                    <p className="text-xs text-slate-500 dark:text-[#8b949e]">{s.note}</p>
                   </div>
                 ))}
               </div>
