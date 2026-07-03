@@ -1,4 +1,5 @@
 import { Suspense, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { SCENE_REGISTRY, SCENE_META } from '../components/eng-math/scenes/index.js'
 
 const ALL_IDS = Object.keys(SCENE_REGISTRY)
@@ -36,6 +37,7 @@ function SceneCard({ id, fullscreen, onClick }) {
 }
 
 export default function SceneSandboxPage() {
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [focused, setFocused] = useState(null)
 
@@ -57,12 +59,20 @@ export default function SceneSandboxPage() {
               <div className="text-[10px] font-bold uppercase tracking-widest text-indigo-400 mb-0.5">{focused}</div>
               <div className="text-sm font-semibold text-white">{SCENE_META[focused]?.label}</div>
             </div>
-            <button
-              onClick={() => setFocused(null)}
-              className="text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
-            >
-              ✕ Close
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate(`/dev/scene-editor#${focused}`)}
+                className="text-indigo-400 hover:text-indigo-300 text-sm px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              >
+                ✎ Edit
+              </button>
+              <button
+                onClick={() => setFocused(null)}
+                className="text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+              >
+                ✕ Close
+              </button>
+            </div>
           </div>
           <div
             className="flex-1 relative"
@@ -93,13 +103,21 @@ export default function SceneSandboxPage() {
               {ALL_IDS.length} scenes — click any to view full screen
             </p>
           </div>
-          <input
-            type="search"
-            placeholder="Filter scenes…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="w-56 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/dev/scene-editor')}
+              className="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+            >
+              ✎ Scene Editor
+            </button>
+            <input
+              type="search"
+              placeholder="Filter scenes…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-56 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

@@ -70,6 +70,8 @@ const BlogBuilderPage = lazy(() => import("./pages/BlogBuilderPage.jsx"));
 const SvgGalleryPage = lazy(() => import("./pages/SvgGalleryPage.jsx"));
 const EngMathPage = lazy(() => import("./pages/EngMathPage.jsx"));
 const SceneSandboxPage = lazy(() => import("./pages/SceneSandboxPage.jsx"));
+const SceneEditorPage = lazy(() => import("./pages/SceneEditorPage.jsx"));
+const CanvasTutorialsPage = lazy(() => import("./pages/CanvasTutorialsPage.jsx"));
 const NotificationToast = lazy(
   () => import("./features/calendar/NotificationToast.tsx"),
 );
@@ -196,6 +198,10 @@ export default function App() {
                             <Route path="eng-math" element={<EngMathPage />} />
                             <Route path="eng-math/:slug" element={<EngMathPage />} />
                             <Route path="dev/scenes" element={<SceneSandboxPage />} />
+                            <Route path="dev/scene-editor" element={<SceneEditorPage />} />
+                            <Route path="dev/canvas-tutorials" element={<CanvasTutorialsPage />} />
+                            <Route path="dev/canvas-tutorials/:tutorialId" element={<CanvasTutorialsPage />} />
+                            <Route path="dev/canvas-tutorials/:tutorialId/:stepId" element={<CanvasTutorialsPage />} />
 
                             {/* Game auto-discovery */}
                             <Route

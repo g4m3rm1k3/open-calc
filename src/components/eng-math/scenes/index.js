@@ -86,6 +86,7 @@ export const SCENE_REGISTRY = {
   NotationScene:              lazy(() => import('./NotationScene.jsx')),
   // Lesson 0-12: Capstone
   BridgeScene:                lazy(() => import('./BridgeScene.jsx')),
+  YScene:                        lazy(() => import('./YScene.jsx')),
 }
 
 export const SCENE_META = {
@@ -162,4 +163,5 @@ export const SCENE_META = {
   ReadingProofScene:          { label: 'Reading a Proof',       desc: '√2 irrationality proof annotated step by step.' },
   NotationScene:              { label: 'Notation Reference',    desc: 'Scrolling flashcards: symbol, name, and example.' },
   BridgeScene:                { label: 'Bridge to Stage 1',     desc: 'Stage 0 foundations flowing into Stage 1 topics.' },
+  YScene:                        { label: 'Y', desc: 'Custom scene.' },
 }

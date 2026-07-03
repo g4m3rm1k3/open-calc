@@ -33,7 +33,7 @@ export default function AssociativeScene() {
       const prog = Math.min(1, (t % 2800) / 1800)
       const xVal = 3
 
-      const boxW = Math.min(w * 0.14, 54), boxH = Math.min(h * 0.12, 42)
+      const boxW = Math.min(w * 0.14, 500), boxH = Math.min(h * 0.12, 42)
       const gap = Math.min(w * 0.06, 24)
       const totalW = boxW * 3 + gap * 2
       const startX = cx - totalW / 2
