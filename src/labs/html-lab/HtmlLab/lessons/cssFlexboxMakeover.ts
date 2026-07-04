@@ -1,20 +1,20 @@
-import { computeSolvedStateAtStep } from "./lessonEngine";
+import { computeSolvedFoldAtStep } from "./lessonEngine";
 import { htmlBasics } from "./htmlBasics";
-import { el } from "./lessonHelpers";
+import { el, foldToPatch } from "./lessonHelpers";
 import type { Lesson } from "./lessonTypes";
 
 // Picks up exactly where "Semantic HTML Basics" left off — the finished
 // journal page (folding its challenge step as solved, same as any other
-// completed step) becomes this lesson's own starting content. This is what
-// "the same page, restyled" means in practice: no new engine machinery, the
-// CSS lesson just seeds its first step with another lesson's already-computed
-// end state instead of building its own page from scratch.
-const journalPage = computeSolvedStateAtStep(htmlBasics, htmlBasics.steps.length - 1);
+// completed step) becomes this lesson's own starting content. Comes AFTER
+// "Flexbox Fundamentals" in the catalog, so display:flex/justify-content/
+// align-items are assumed already learned — this lesson is deliberately
+// about APPLYING them to a real page, not re-teaching the vocabulary.
+const priorFold = computeSolvedFoldAtStep(htmlBasics, htmlBasics.steps.length - 1);
 
 export const cssFlexboxMakeover: Lesson = {
   id: "css-flexbox-makeover",
   title: "Flexbox Makeover",
-  description: "Take the journal page from Semantic HTML Basics and give it real layout with Flexbox.",
+  description: "Apply what Flexbox Fundamentals taught to a real page — the journal from Semantic HTML Basics.",
   topic: "css",
   unit: "Flexbox & Layout",
   steps: [
@@ -22,14 +22,14 @@ export const cssFlexboxMakeover: Lesson = {
       id: "recap-page",
       title: "Here's the page you built",
       instructions:
-        "This is the journal page from Semantic HTML Basics — solid structure, no layout yet. Every section just stacks top to bottom because that's what block elements do by default. Let's change that.",
-      patch: { elements: journalPage.elements },
+        "This is the journal page from Semantic HTML Basics — solid structure, no layout yet. Every section just stacks top to bottom, because that's what block elements do by default. Time to put Flexbox Fundamentals to use on a real page instead of a small isolated example.",
+      patch: foldToPatch(priorFold),
     },
     {
       id: "header-flex-row",
-      title: "Flexbox turns stacking into rows",
+      title: "Make the header a flex row",
       instructions:
-        "Setting `display: flex` on `<header>` changes how its children lay out — instead of each one taking the full width and stacking, they sit side by side in a row. Add a small badge next to the title to see it happen.",
+        "Same `display: flex` from Flexbox Fundamentals, applied here to `<header>` — its children stop stacking and line up in a row instead. A small badge has been added next to the title so there's a second item to actually see lining up.",
       patch: {
         elements: [
           el("header", "header", null, 0, "", {}, {
@@ -47,7 +47,7 @@ export const cssFlexboxMakeover: Lesson = {
       id: "nav-space-between",
       title: "One property, no new elements",
       instructions:
-        "The nav is already `display: flex` from the HTML lesson — it just never told its children how to share the extra space. `justify-content: space-between` pushes the first link to the left edge and the last to the right, with even gaps between whatever's in the middle.",
+        "The nav is already `display: flex` from the HTML lesson — it just never had `justify-content` set. Adding `justify-content: space-between` pushes the first link to the left edge and the last to the right, with even gaps between whatever's in the middle — the exact same property from Flexbox Fundamentals, just applied to real navigation links instead of practice badges.",
       patch: {
         elements: [
           el("nav", "nav", null, 1, "", {}, {
@@ -61,7 +61,7 @@ export const cssFlexboxMakeover: Lesson = {
       id: "challenge-footer-flex",
       title: "Your turn: lay out the footer",
       instructions:
-        "Make `<footer>` a flex row with `justify-content: space-between`, then add a second element inside it — a `<a>` link with the text \"Back to top\" — so the copyright line and the link sit at opposite ends.",
+        "Make `<footer>` a flex row with `justify-content: space-between`, then add a second element inside it — an `<a>` link with the text \"Back to top\" — so the copyright line and the link sit at opposite ends.",
       isChallenge: true,
       patch: {},
       hint: "Restyle the existing `<footer>` (don't recreate it) with `display: flex; justify-content: space-between;`, then add an `<a>` as its second child.",

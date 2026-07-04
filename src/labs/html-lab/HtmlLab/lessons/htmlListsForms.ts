@@ -2,21 +2,20 @@ import { el } from "./lessonHelpers";
 import type { Lesson } from "./lessonTypes";
 
 // Second HTML lesson — a fresh short page (a reading list), not chained to
-// html-basics. Proves the multi-element playback path on <ul>/<li> and a
-// real <form>, and gives the catalog a second entry in the same unit-group
-// pattern the CSS/JS lessons will keep following.
+// html-basics. <ul>, <ol>, <form>, and the label/input relationship each
+// get their own step instead of being introduced together.
 export const htmlListsForms: Lesson = {
   id: "html-lists-forms",
   title: "Lists & Forms",
-  description: "Build a reading list with a real <ul> and a form for adding to it.",
+  description: "ul, ol, li, form, and label — one idea at a time, on a reading list.",
   topic: "html",
   unit: "Lists & Forms",
   steps: [
     {
-      id: "intro-list",
-      title: "A list is a <ul>, not three <div>s",
+      id: "unordered-lists",
+      title: "<ul> is a list where order doesn't matter",
       instructions:
-        "Three items that belong together, in an order the reader should follow — that's a `<ul>` (or `<ol>` if the order itself matters, like steps in a recipe). Each item is its own `<li>`.",
+        "Three items that belong together — that's a list. `<ul>` (unordered list) is for a list where the order genuinely doesn't matter; rearranging the items wouldn't change their meaning. Each individual item inside it is its own `<li>` (list item).",
       patch: {
         elements: [
           el("h1", "h1", null, 0, "My Reading List", {}, { fontSize: "26px", margin: "0 0 16px", color: "#0f172a" }),
@@ -28,13 +27,32 @@ export const htmlListsForms: Lesson = {
       },
     },
     {
-      id: "add-form",
-      title: "Collecting input needs a <form>",
+      id: "ordered-lists",
+      title: "<ol> is a list where order DOES matter",
       instructions:
-        "Any time you're asking for input — even just one field — wrap it in a `<form>`. It's what makes the Enter key submit, what lets a `<label>` correctly point at its field, and what screen readers expect.",
+        "`<ol>` (ordered list) looks almost identical to `<ul>` — same `<li>` items inside — but it means something different: the sequence itself carries meaning. Steps in a recipe, or a ranked top-10, belong in `<ol>`, because swapping two items would actually change what the list is saying. This reading list doesn't have a meaningful order, which is exactly why it's a `<ul>` and not an `<ol>`.",
+      patch: {},
+    },
+    {
+      id: "what-is-a-form",
+      title: "<form> wraps anything collecting input",
+      instructions:
+        "Any time a page is asking for input — even just one field — that field belongs inside a `<form>`. Wrapping it is what makes pressing Enter submit the field, and it's what a screen reader expects when it encounters something meant to be filled in, rather than just read.",
       patch: {
         elements: [
           el("add-form", "form", null, 2, "", {}, { display: "flex", gap: "8px", marginTop: "20px" }),
+          el("add-input", "input", "add-form", 0, "", { id: "new-book", type: "text", placeholder: "Book title" }, { padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: "6px", flex: "1" }),
+          el("add-button", "button", "add-form", 1, "Add", { type: "submit" }, { padding: "8px 16px", background: "#0f172a", color: "#fff", border: "none", borderRadius: "6px" }),
+        ],
+      },
+    },
+    {
+      id: "label-input-relationship",
+      title: "<label> connects to an input by matching for/id",
+      instructions:
+        "A `<label>`'s `for` attribute and an `<input>`'s `id` attribute, when they match exactly, link the two together — clicking the label focuses that specific input, and a screen reader announces the label's text the moment the input receives focus. The label below is visually hidden (sighted users can see \"Book title\" in the placeholder instead), but it's still there in the markup, still doing its job for assistive tech.",
+      patch: {
+        elements: [
           el("add-label", "label", "add-form", 0, "New book", { for: "new-book" }, { position: "absolute", width: "1px", height: "1px", overflow: "hidden" }),
           el("add-input", "input", "add-form", 1, "", { id: "new-book", type: "text", placeholder: "Book title" }, { padding: "8px 10px", border: "1px solid #cbd5e1", borderRadius: "6px", flex: "1" }),
           el("add-button", "button", "add-form", 2, "Add", { type: "submit" }, { padding: "8px 16px", background: "#0f172a", color: "#fff", border: "none", borderRadius: "6px" }),

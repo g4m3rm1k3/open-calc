@@ -13,6 +13,13 @@ export const htmlBasics: Lesson = {
   unit: "Semantic Structure",
   steps: [
     {
+      id: "why-semantic-tags",
+      title: "A more specific tag beats a generic one",
+      instructions:
+        "`<div>` and `<span>`, from the last lesson, work for grouping things, but they don't say what a piece of content actually IS. HTML has more specific tags for common jobs — a page header, a navigation menu, the main content — and using them instead of a plain `<div>` means a screen reader or search engine understands the page's structure without any extra work. This lesson builds one real page using those tags, one at a time.",
+      patch: {},
+    },
+    {
       id: "intro-header",
       title: "Start with a header",
       instructions:

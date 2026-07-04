@@ -1,4 +1,4 @@
-import type { LabElement, LabState } from "../types";
+import type { LabElement, LabState, MediaQuery } from "../types";
 
 // A step's HTML/CSS/JS content, expressed as a *patch* against the running
 // state rather than a full snapshot — this is what makes lessons DRY (each
@@ -14,11 +14,31 @@ import type { LabElement, LabState } from "../types";
 // (labReducer.ts:604-616), not an arbitrary id, which would force every
 // style-only step through a SELECT-then-UPDATE_STYLE dance for no benefit
 // over just writing the target style straight into the patch.
+// A single named, independent piece of JavaScript — one handler, one
+// variable declaration, one function. `jsBlocks` are upserted by id exactly
+// like `elements` (re-supplying an existing id's `code` replaces just that
+// block; a new id is appended) and joined together to form the running
+// script. This is what lets a step add or change ONE handler without ever
+// having to hand-type the entire accumulated script as a single string —
+// the engine assembles the final script, the same way it already assembles
+// the page from independent elements instead of one hand-typed HTML blob.
+export interface JsBlock {
+  id: string;
+  code: string;
+}
+
 export interface LessonPatch {
   elements?: LabElement[];
   removeElementIds?: string[];
   bodyStyles?: Record<string, string>;
+  /** Prefer `jsBlocks` for anything with more than one handler/declaration —
+   *  this wholesale-replaces the whole script and is only worth reaching for
+   *  when a step's JS is a single, self-contained, one-off snippet. */
   javascript?: string;
+  jsBlocks?: JsBlock[];
+  /** Same idea as `jsBlocks`, for hand-written CSS rules (`customCss`) —
+   *  prefer this over `customCss` the moment there's more than one rule. */
+  cssBlocks?: JsBlock[];
   customCss?: string;
 }
 
@@ -83,4 +103,4 @@ export interface Lesson {
   steps: LessonStep[];
 }
 
-export type { LabElement, LabState };
+export type { LabElement, LabState, MediaQuery };

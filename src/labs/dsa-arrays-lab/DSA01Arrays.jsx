@@ -63,52 +63,55 @@ const ref_binarySearch = (arr, v)    => {
   return -1;
 };
 
-// ── STEP TRACERS ──────────────────────────────────────────────────────────
+// ── STEP TRACERS ─────────────────────────────────────────────────────────
+// codePattern: string Monaco will search for in the user's code to highlight
+// the line being executed at this step.
+
 const traceInsert = (arr, idx, val) => {
   const steps = [], a = [...arr];
-  steps.push({ state: [...a], highlight: null, note: `Start: insert ${val} at index ${idx}`, phase: "start" });
+  steps.push({ state: [...a], highlight: null, note: `Insert ${val} at index ${idx} — need to shift elements right`, phase: "start", codePattern: "function " });
   for (let i = a.length - 1; i >= idx; i--) {
     a[i + 1] = a[i];
-    steps.push({ state: [...a, 0].slice(0, a.length + 1), highlight: i, note: `Shift a[${i}] → a[${i+1}]`, phase: "shift" });
+    steps.push({ state: [...a, 0].slice(0, a.length + 1), highlight: i, note: `Shift a[${i}] → a[${i+1}]`, phase: "shift", codePattern: "i - 1" });
   }
   a[idx] = val;
-  steps.push({ state: [...a], highlight: idx, note: `Write ${val} at index ${idx}`, phase: "write" });
+  steps.push({ state: [...a], highlight: idx, note: `Write ${val} at index ${idx} ✓`, phase: "write", codePattern: "= val" });
   return steps;
 };
 
 const traceDelete = (arr, idx) => {
   const steps = [], a = [...arr];
-  steps.push({ state: [...a], highlight: idx, note: `Delete a[${idx}] = ${a[idx]}`, phase: "start" });
+  steps.push({ state: [...a], highlight: idx, note: `Delete a[${idx}] = ${a[idx]} — shift elements left to fill gap`, phase: "start", codePattern: "function " });
   for (let i = idx; i < a.length - 1; i++) {
     a[i] = a[i + 1];
-    steps.push({ state: [...a], highlight: i, note: `Shift a[${i+1}] → a[${i}]`, phase: "shift" });
+    steps.push({ state: [...a], highlight: i, note: `Shift a[${i+1}] → a[${i}]`, phase: "shift", codePattern: "i + 1" });
   }
   a.pop();
-  steps.push({ state: [...a], highlight: null, note: `Done. Length now ${a.length}`, phase: "done" });
+  steps.push({ state: [...a], highlight: null, note: `Done — length is now ${a.length}`, phase: "done", codePattern: "return" });
   return steps;
 };
 
 const traceBinarySearch = (arr, val) => {
   const steps = [];
   let lo = 0, hi = arr.length - 1;
-  steps.push({ kind:"array", state: [...arr], lo, hi, mid: null, note: `Search for ${val}. lo=${lo}, hi=${hi}`, found: -1 });
+  steps.push({ kind:"array", state: [...arr], lo, hi, mid: null, note: `lo=${lo}, hi=${hi} — begin search for ${val}`, found: -1, codePattern: "while" });
   while (lo <= hi) {
     const mid = lo + ((hi - lo) >> 1);
-    steps.push({ kind:"array", state: [...arr], lo, hi, mid, note: `mid=${mid}, a[mid]=${arr[mid]} — compare with ${val}`, found: -1 });
+    steps.push({ kind:"array", state: [...arr], lo, hi, mid, note: `mid = ${mid}  →  arr[${mid}] = ${arr[mid]}`, found: -1, codePattern: "mid" });
     if (arr[mid] === val) {
-      steps.push({ kind:"array", state: [...arr], lo, hi, mid, note: `✓ Found ${val} at index ${mid}!`, found: mid });
+      steps.push({ kind:"array", state: [...arr], lo, hi, mid, note: `arr[${mid}] === ${val} ✓ Found!`, found: mid, codePattern: "=== target" });
       break;
     }
     if (arr[mid] < val) {
       lo = mid + 1;
-      steps.push({ kind:"array", state: [...arr], lo, hi, mid: null, note: `${arr[mid]} < ${val} → search right half. lo=${lo}`, found: -1 });
+      steps.push({ kind:"array", state: [...arr], lo, hi, mid: null, note: `${arr[mid]} < ${val} → discard left half. lo = ${lo}`, found: -1, codePattern: "lo = mid" });
     } else {
       hi = mid - 1;
-      steps.push({ kind:"array", state: [...arr], lo, hi, mid: null, note: `${arr[mid]} > ${val} → search left half. hi=${hi}`, found: -1 });
+      steps.push({ kind:"array", state: [...arr], lo, hi, mid: null, note: `${arr[mid]} > ${val} → discard right half. hi = ${hi}`, found: -1, codePattern: "hi = mid" });
     }
   }
   if (steps[steps.length - 1].found === -1)
-    steps.push({ kind:"array", state: [...arr], lo, hi, mid: null, note: `Not found — lo > hi, search space exhausted.`, found: -2 });
+    steps.push({ kind:"array", state: [...arr], lo, hi, mid: null, note: `lo(${lo}) > hi(${hi}) — search space empty. Not found.`, found: -2, codePattern: "return -1" });
   return steps;
 };
 
@@ -139,11 +142,15 @@ const _inOrd = (n, r = []) => { if (!n) return r; _inOrd(n.left, r); r.push(n.va
 const traceListTraverse = (head, target) => {
   const steps = [];
   const nodes = listToArr(head);
-  steps.push({ kind:"list", nodes, highlight: -1, note: `Start at HEAD. Looking for ${target}.`, phase:"start" });
+  steps.push({ kind:"list", nodes, highlight: -1, note: `current = head  →  list is [${nodes.join(" → ")}]`, phase:"start", codePattern: "current =" });
   for (let i = 0; i < nodes.length; i++) {
     const found = nodes[i] === target;
-    steps.push({ kind:"list", nodes, highlight: i, note: `Check node[${i}] = ${nodes[i]}${found ? ` → ✓ Found!` : ` ≠ ${target}, move next`}`, phase: found ? "found" : "scan" });
-    if (found) break;
+    if (!found) {
+      steps.push({ kind:"list", nodes, highlight: i, note: `current.val = ${nodes[i]} ≠ ${target}  →  advance current = current.next`, phase:"scan", codePattern: "current = current.next" });
+    } else {
+      steps.push({ kind:"list", nodes, highlight: i, note: `current.val = ${nodes[i]} === ${target} ✓  Found!`, phase:"found", codePattern: "current.val" });
+      break;
+    }
   }
   return steps;
 };
@@ -151,45 +158,55 @@ const traceListTraverse = (head, target) => {
 const traceListInsertHead = (head, val) => {
   const steps = [];
   const nodes = listToArr(head);
-  steps.push({ kind:"list", nodes, highlight: -1, newNode: val, note: `Create new node(${val})`, phase:"create" });
-  steps.push({ kind:"list", nodes, highlight: 0, newNode: val, note: `new.next → HEAD (current first node)`, phase:"link" });
+  steps.push({ kind:"list", nodes, highlight: -1, newNode: val, note: `const newNode = { val: ${val}, next: null }  — allocate new node`, phase:"create", codePattern: "newNode =" });
+  steps.push({ kind:"list", nodes, highlight: 0, newNode: val, note: `newNode.next = head  — point new node at current first node`, phase:"link", codePattern: "newNode.next" });
   const newNodes = [val, ...nodes];
-  steps.push({ kind:"list", nodes: newNodes, highlight: 0, newNode: null, note: `new node IS the new HEAD ✓ — O(1), no traversal!`, phase:"done" });
+  steps.push({ kind:"list", nodes: newNodes, highlight: 0, newNode: null, note: `return newNode  — new node IS the head ✓  O(1) — no loop needed!`, phase:"done", codePattern: "return newNode" });
   return steps;
 };
 
 const traceListDelete = (head, val) => {
   const steps = [];
   const nodes = listToArr(head);
-  steps.push({ kind:"list", nodes, highlight: -1, note: `Delete first ${val} from list`, phase:"start" });
+  steps.push({ kind:"list", nodes, highlight: -1, note: `deleteFirst(list, ${val})  — scanning for target`, phase:"start", codePattern: "function " });
   if (nodes[0] === val) {
-    steps.push({ kind:"list", nodes, highlight: 0, note: `HEAD is ${val} — return HEAD.next`, phase:"scan" });
-    steps.push({ kind:"list", nodes: nodes.slice(1), highlight: -1, note: `Done. New HEAD is ${nodes[1] ?? "null"} ✓`, phase:"done" });
+    steps.push({ kind:"list", nodes, highlight: 0, note: `head.val === ${val}  — target is HEAD, return head.next`, phase:"scan", codePattern: "head.val === val" });
+    steps.push({ kind:"list", nodes: nodes.slice(1), highlight: -1, note: `Done. New HEAD is ${nodes[1] ?? "null"} ✓`, phase:"done", codePattern: "return head.next" });
     return steps;
   }
   for (let i = 0; i < nodes.length - 1; i++) {
-    steps.push({ kind:"list", nodes, highlight: i, note: `node[${i}].next.val = ${nodes[i+1]} — is it ${val}?`, phase:"scan" });
+    steps.push({ kind:"list", nodes, highlight: i, note: `current.next.val = ${nodes[i+1]}  — is it ${val}?`, phase:"scan", codePattern: "current.next.val === val" });
     if (nodes[i+1] === val) {
-      steps.push({ kind:"list", nodes, highlight: i, deletedIdx: i+1, note: `Yes! Bypass: node[${i}].next = node[${i+1}].next`, phase:"bypass" });
+      steps.push({ kind:"list", nodes, highlight: i, deletedIdx: i+1, note: `Yes! current.next = current.next.next  — bypass node(${val})`, phase:"bypass", codePattern: "current.next = current.next.next" });
       const newNodes = [...nodes.slice(0, i+1), ...nodes.slice(i+2)];
-      steps.push({ kind:"list", nodes: newNodes, highlight: -1, note: `Node ${val} removed ✓`, phase:"done" });
+      steps.push({ kind:"list", nodes: newNodes, highlight: -1, note: `Node ${val} removed ✓  return head`, phase:"done", codePattern: "return head" });
       return steps;
     }
+    steps.push({ kind:"list", nodes, highlight: i, note: `No. current = current.next  →  advance`, phase:"scan", codePattern: "current = current.next" });
   }
-  steps.push({ kind:"list", nodes, highlight: -1, note: `${val} not found in list.`, phase:"done" });
+  steps.push({ kind:"list", nodes, highlight: -1, note: `${val} not found — return head unchanged`, phase:"done", codePattern: "return head" });
   return steps;
 };
 
 const traceBSTSearch = (root, target) => {
   const steps = [];
   let node = root;
+  steps.push({ kind:"bst", tree: root, highlight: -1, found: false, note: `bstSearch(root, ${target})  — start at root`, codePattern: "function " });
   while (node) {
-    steps.push({ kind:"bst", tree: root, highlight: node.val, note: `Visit ${node.val} — is it ${target}?` });
-    if (node.val === target) { steps.push({ kind:"bst", tree: root, highlight: node.val, found: true, note: `✓ Found ${target}!` }); return steps; }
-    if (target < node.val) { steps.push({ kind:"bst", tree: root, highlight: node.val, note: `${target} < ${node.val} → go LEFT` }); node = node.left; }
-    else { steps.push({ kind:"bst", tree: root, highlight: node.val, note: `${target} > ${node.val} → go RIGHT` }); node = node.right; }
+    steps.push({ kind:"bst", tree: root, highlight: node.val, found: false, note: `node.val = ${node.val}  — is it ${target}?`, codePattern: "node.val === target" });
+    if (node.val === target) {
+      steps.push({ kind:"bst", tree: root, highlight: node.val, found: true, note: `node.val === ${target} ✓  return true`, codePattern: "return true" });
+      return steps;
+    }
+    if (target < node.val) {
+      steps.push({ kind:"bst", tree: root, highlight: node.val, found: false, note: `${target} < ${node.val}  → go LEFT (discard entire right subtree)`, codePattern: "node.left" });
+      node = node.left;
+    } else {
+      steps.push({ kind:"bst", tree: root, highlight: node.val, found: false, note: `${target} > ${node.val}  → go RIGHT (discard entire left subtree)`, codePattern: "node.right" });
+      node = node.right;
+    }
   }
-  steps.push({ kind:"bst", tree: root, highlight: -1, note: `Reached null — ${target} not in tree.` });
+  steps.push({ kind:"bst", tree: root, highlight: -1, found: false, note: `Reached null — ${target} not in tree. return false`, codePattern: "return false" });
   return steps;
 };
 
@@ -1638,6 +1655,61 @@ export default function DSA01Arrays({ onBack }) {
   const [showHint, setShowHint] = useState(false);
   const [traceSteps, setTraceSteps] = useState([]);
   const [traceIdx, setTraceIdx] = useState(0);
+
+  // Monaco editor refs — used for line highlighting during trace
+  const editorRef   = useRef(null);
+  const monacoRef   = useRef(null);
+  const decorRef    = useRef([]);   // active decoration IDs
+
+  // Inject CSS for the trace highlight once
+  useEffect(() => {
+    const id = "dsa-trace-line-css";
+    if (document.getElementById(id)) return;
+    const el = document.createElement("style");
+    el.id = id;
+    el.textContent = `
+      .trace-current-line {
+        background: rgba(79, 195, 247, 0.13) !important;
+        border-left: 3px solid #4fc3f7 !important;
+      }
+      .trace-current-line-error {
+        background: rgba(255, 77, 109, 0.13) !important;
+        border-left: 3px solid #ff4d6d !important;
+      }
+    `;
+    document.head.appendChild(el);
+    return () => el.remove();
+  }, []);
+
+  // Highlight the line in Monaco that matches the current trace step's codePattern
+  const cur = traceSteps[traceIdx];
+  useEffect(() => {
+    const editor = editorRef.current;
+    const monaco = monacoRef.current;
+    if (!editor || !monaco) return;
+    const model = editor.getModel();
+    if (!model) return;
+
+    // Always clear previous decorations first
+    decorRef.current = editor.deltaDecorations(decorRef.current, []);
+
+    const pattern = cur?.codePattern;
+    if (!pattern) return;
+
+    const matches = model.findMatches(pattern, false, false, false, null, true);
+    if (!matches.length) return;
+
+    const ln = matches[0].range.startLineNumber;
+    const isError = cur?.phase === "error";
+    decorRef.current = editor.deltaDecorations([], [{
+      range: new monaco.Range(ln, 1, ln, 999),
+      options: {
+        isWholeLine: true,
+        inlineClassName: isError ? "trace-current-line-error" : "trace-current-line",
+      },
+    }]);
+    editor.revealLineInCenter(ln, 0 /* Immediate */);
+  }, [cur]);
   const [completed, setCompleted] = useState(new Set());
   const [demoArr] = useState([12, 34, 56, 78, 90, 23, 45]);
   const [demoSorted] = useState([2, 5, 8, 12, 16, 23, 35, 42, 58, 72]);
@@ -1686,16 +1758,35 @@ export default function DSA01Arrays({ onBack }) {
     setTraceIdx(0);
   }, [LESSONS, lessonIdx, demoArr, demoSorted, demoIdx, demoVal, demoList, demoListVal, demoInsertVal, demoBST, demoBSTTarget]);
 
+  // Build a trace using the SAME inputs as the lesson's test suite so the
+  // trace matches exactly what just ran. Falls back to demo inputs when no
+  // test-specific trace is defined.
+  const buildTestTrace = useCallback((lessonId) => {
+    const steps = (() => {
+      switch (lessonId) {
+        case 1: return traceInsert([1, 2, 3, 4, 5], 2, 99);
+        case 2: return traceDelete([10, 20, 30, 40, 50], 2);
+        case 4: return traceBinarySearch([1, 3, 5, 7, 9, 11, 13, 15, 17, 19], 7);
+        case 5: return traceListTraverse(listFrom([1, 2, 3, 4, 5]), 3);
+        case 6: return traceListInsertHead(listFrom([2, 3, 4]), 1);
+        case 7: return traceListDelete(listFrom([1, 2, 3, 4, 5]), 3);
+        case 8: return traceBSTSearch(bstFromArr([10, 5, 15, 2, 7, 12, 20]), 7);
+        default: return null;
+      }
+    })();
+    if (steps) { setTraceSteps(steps); setTraceIdx(0); }
+    else buildTrace(); // fall back to demo trace
+  }, [buildTrace]);
+
   const handleRun = async () => {
     setRunning(true);
     setRunResult(null);
     if (lang === "js") {
       const res = runJS(lesson, jsCode);
       setRunResult(res);
-      if (res.testResult?.ok) {
-        setCompleted(c => new Set([...c, lessonIdx]));
-        buildTrace();
-      }
+      // Always show trace — even on failure. Mark complete only on pass.
+      if (res.testResult?.ok) setCompleted(c => new Set([...c, lessonIdx]));
+      if (lesson.hasTrace) buildTestTrace(lesson.id);
     } else {
       try {
         const { getPyodide } = await import("../../utils/pyodideRuntime.js").catch(() => ({ getPyodide: null }));
@@ -1707,7 +1798,8 @@ export default function DSA01Arrays({ onBack }) {
         const parsed = JSON.parse(typeof proxy === "string" ? proxy : proxy.toString());
         if (typeof proxy?.destroy === "function") proxy.destroy();
         setRunResult({ testResult: { ok: parsed.ok, checks: parsed.checks, result: parsed.result } });
-        if (parsed.ok) { setCompleted(c => new Set([...c, lessonIdx])); buildTrace(); }
+        if (parsed.ok) setCompleted(c => new Set([...c, lessonIdx]));
+        if (lesson.hasTrace) buildTestTrace(lesson.id);
       } catch (e) {
         setRunResult({ error: e.message || String(e) });
       }
@@ -1720,8 +1812,6 @@ export default function DSA01Arrays({ onBack }) {
     currentBlanks.forEach((b, i) => { code = code.replace(b, currentSols[i] || ""); });
     setCurrentCode(code);
   };
-
-  const cur = traceSteps[traceIdx];
 
   // ── UI helpers ───────────────────────────────────────────────────────────
   const btn = (style = {}) => ({
@@ -1929,8 +2019,15 @@ export default function DSA01Arrays({ onBack }) {
                 {/* Trace viewer */}
                 {traceSteps.length > 0 && (
                   <div style={{ marginTop: 16 }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                      <span style={label9}>Step {traceIdx + 1} of {traceSteps.length}</span>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                      <div>
+                        <span style={label9}>Step {traceIdx + 1} of {traceSteps.length}</span>
+                        {cur?.codePattern && (
+                          <span style={{ fontSize: 9, color: C.blue, fontFamily: mono, marginLeft: 8, opacity: 0.7 }}>
+                            ↑ highlighted in editor
+                          </span>
+                        )}
+                      </div>
                       <div style={{ display: "flex", gap: 3 }}>
                         {[["«", () => setTraceIdx(0)], ["‹", () => setTraceIdx(i => Math.max(0, i - 1))], ["›", () => setTraceIdx(i => Math.min(traceSteps.length - 1, i + 1))], ["»", () => setTraceIdx(traceSteps.length - 1)]].map(([lbl, fn], i) => (
                           <button key={i} onClick={fn} style={{ width: 26, height: 24, background: C.dim, border: `1px solid ${C.border2}`, borderRadius: 3, color: C.textDim, fontSize: 12, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: mono }}>{lbl}</button>
@@ -1989,10 +2086,11 @@ export default function DSA01Arrays({ onBack }) {
 
             {lesson.hasTrace && (
               <button
-                onClick={buildTrace}
+                onClick={() => buildTestTrace(lesson.id)}
                 style={{ height: 28, padding: "0 14px", borderRadius: 6, background: `linear-gradient(135deg, ${C.purple}, ${C.blue})`, border: "none", color: "#fff", fontSize: 11, fontWeight: 600, cursor: "pointer", fontFamily: sans, boxShadow: `0 0 10px ${C.purple}44` }}
+                title="Replay the algorithm trace — highlights matching lines in your code as each step runs"
               >
-                Step Through
+                ▶ Trace
               </button>
             )}
 
@@ -2039,7 +2137,8 @@ export default function DSA01Arrays({ onBack }) {
               language={lang === "python" ? "python" : "javascript"}
               value={currentCode}
               onChange={val => setCurrentCode(val || "")}
-              beforeMount={setupOpenCalcMonaco}
+              beforeMount={monaco => { monacoRef.current = monaco; setupOpenCalcMonaco(monaco); }}
+              onMount={editor => { editorRef.current = editor; }}
               theme={isDarkGlobal ? "open-calc-dark" : "open-calc-light"}
               options={{
                 fontSize: 14,

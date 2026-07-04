@@ -14,10 +14,10 @@ import {
   htmlToElements,
   generateExportHtml,
 } from "./htmlSync";
-import { applyPatch, computeStateAtStep, computeSolvedStateAtStep, validateStructure, validateBehavior } from "./lessons/lessonEngine";
-import { buildPlaybackFrames, frameRevealedIds, describeFrameTransition } from "./lessons/stepPlayer";
+import { computeStateAtStep, computeSolvedStateAtStep, computeSolvedFoldAtStep, validateStructure, validateBehavior, type Fold } from "./lessons/lessonEngine";
+import { buildPlaybackFrames, type PlaybackFrame } from "./lessons/stepPlayer";
 import { lessonProgressKey } from "./lessons/lessonHelpers";
-import type { Lesson, LessonPatch, LabState, ValidationResult } from "./lessons/lessonTypes";
+import type { Lesson, LessonPatch, ValidationResult } from "./lessons/lessonTypes";
 import styles from "./HtmlLab.module.css";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — JS hooks file, no type declarations
@@ -52,23 +52,22 @@ function appendJavascriptSnippet(current: string, snippet: string): string {
 const PLAYBACK_TICK_MS = 650;
 
 interface PlaybackState {
-  baseline: LabState;
-  frames: LabState[];
-  revealed: string[][];
-  captions: string[];
+  baseline: Fold;
+  frames: PlaybackFrame[];
   index: number;
   paused: boolean;
 }
 
-function makePlayback(baseline: LabState, patch: LessonPatch): PlaybackState {
-  const frames = buildPlaybackFrames(baseline, patch);
-  const revealed = frames.map((f, i) => frameRevealedIds(i === 0 ? baseline : frames[i - 1], f));
-  const captions = frames.map((f, i) => describeFrameTransition(i === 0 ? baseline : frames[i - 1], f));
-  return { baseline, frames, revealed, captions, index: 0, paused: false };
+function makePlayback(baseline: Fold, patch: LessonPatch): PlaybackState {
+  return { baseline, frames: buildPlaybackFrames(baseline, patch), index: 0, paused: false };
 }
 
-function stepBaseline(lesson: Lesson, stepIndex: number): LabState {
-  return stepIndex > 0 ? computeSolvedStateAtStep(lesson, stepIndex - 1) : { ...initialState };
+function emptyFold(): Fold {
+  return { state: { ...initialState }, blocks: new Map(), cssBlocks: new Map() };
+}
+
+function stepBaseline(lesson: Lesson, stepIndex: number): Fold {
+  return stepIndex > 0 ? computeSolvedFoldAtStep(lesson, stepIndex - 1) : emptyFold();
 }
 
 export default function HtmlLabLesson({ lesson, onBack }: Props) {
@@ -130,7 +129,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
 
   const [state, dispatch] = useReducer(labReducer, undefined, () => ({
     ...initialState,
-    ...(initialPlayback ? initialPlayback.frames[0] : computeStateAtStep(lesson, initialStepIndex)),
+    ...(initialPlayback ? initialPlayback.frames[0].state : computeStateAtStep(lesson, initialStepIndex)),
   }));
   const [playback, setPlayback] = useState<PlaybackState | null>(initialPlayback);
   const [previewMode, setPreviewMode] = useState<boolean>(false);
@@ -146,17 +145,18 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
   const step = lesson.steps[stepIndex];
   const isPlaying = playback !== null;
   const canAdvance = !isPlaying && (!step.isChallenge || checkResult?.passed === true);
-  const revealedIds = playback ? playback.revealed[playback.index] ?? [] : [];
-  const playbackCaption = playback ? playback.captions[playback.index] : undefined;
+  const revealedIds = playback ? playback.frames[playback.index]?.revealedIds ?? [] : [];
+  const playbackCaption = playback ? playback.frames[playback.index]?.caption : undefined;
   const focusTab = useMemo((): "html" | "css" | "javascript" | undefined => {
     // Between the tick that advances `index` past the last frame and the
     // effect that notices and clears playback, one render sees an
     // out-of-bounds index — bail out rather than indexing into `frames`.
     if (!playback || playback.index >= playback.frames.length) return undefined;
-    const prev = playback.index === 0 ? playback.baseline : playback.frames[playback.index - 1];
-    const cur = playback.frames[playback.index];
-    if (cur.javascript !== prev.javascript) return "javascript";
-    if (cur.customCss !== prev.customCss) return "css";
+    const prevJs = playback.index === 0 ? playback.baseline.state.javascript : playback.frames[playback.index - 1].state.javascript;
+    const prevCss = playback.index === 0 ? playback.baseline.state.customCss : playback.frames[playback.index - 1].state.customCss;
+    const cur = playback.frames[playback.index].state;
+    if (cur.javascript !== prevJs) return "javascript";
+    if (cur.customCss !== prevCss) return "css";
     return "html";
   }, [playback]);
 
@@ -193,7 +193,10 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
     setMultiSelectedIds([]);
 
     if (alreadySeen.includes(targetStep.id)) {
-      const next = applyPatch(baseline, targetStep.patch);
+      // Already completed before (including, for a challenge, already
+      // passed) — show it SOLVED, not the raw/blank scaffold `.patch` would
+      // give a challenge step arriving fresh.
+      const next = computeSolvedFoldAtStep(lesson, clamped).state;
       dispatch({ type: "LOAD_EXAMPLE", payload: { elements: next.elements, bodyStyles: next.bodyStyles, javascript: next.javascript, customCss: next.customCss } });
       setPlayback(null);
     } else {
@@ -232,7 +235,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
   const skipPlayback = useCallback((): void => {
     setPlayback((p) => {
       if (!p) return p;
-      const last = p.frames[p.frames.length - 1];
+      const last = p.frames[p.frames.length - 1].state;
       dispatch({ type: "LOAD_EXAMPLE", payload: { elements: last.elements, bodyStyles: last.bodyStyles, javascript: last.javascript, customCss: last.customCss } });
       return null;
     });
@@ -249,7 +252,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
   useEffect(() => {
     if (!playback) return;
     if (playback.index >= playback.frames.length) { setPlayback(null); return; }
-    const frame = playback.frames[playback.index];
+    const frame = playback.frames[playback.index].state;
     dispatch({ type: "LOAD_EXAMPLE", payload: { elements: frame.elements, bodyStyles: frame.bodyStyles, javascript: frame.javascript, customCss: frame.customCss } });
     if (playback.paused) return;
     const timer = setTimeout(() => {

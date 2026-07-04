@@ -30,50 +30,104 @@ export function applyPatch(state: LabState, patch: LessonPatch): LabState {
   };
 }
 
+// A running fold also carries the current *named* JS/CSS blocks (id -> code),
+// separately from `state.javascript`/`state.customCss` (which are just their
+// joined text) — upserting a block by id and re-joining is what lets a step
+// change ONE handler or rule without the lesson author ever hand-typing the
+// whole accumulated script/stylesheet as a single string. `LabState` itself
+// has no concept of blocks (the rest of the app — the reducer, the code
+// panel, the exporter — only ever deals in the plain joined strings), so
+// this bookkeeping lives here, in the lesson engine, and nowhere else.
+export interface Fold {
+  state: LabState;
+  blocks: Map<string, string>;
+  cssBlocks: Map<string, string>;
+}
+
+function upsertBlocks(blocks: Map<string, string>, entries: { id: string; code: string }[]): Map<string, string> {
+  const next = new Map(blocks);
+  for (const b of entries) next.set(b.id, b.code);
+  return next;
+}
+
+function foldPatch(fold: Fold, patch: LessonPatch): Fold {
+  const usesJsBlocks = !!patch.jsBlocks?.length;
+  const usesCssBlocks = !!patch.cssBlocks?.length;
+  let state = applyPatch(fold.state, {
+    ...patch,
+    javascript: usesJsBlocks ? undefined : patch.javascript,
+    customCss: usesCssBlocks ? undefined : patch.customCss,
+  });
+  const blocks = usesJsBlocks ? upsertBlocks(fold.blocks, patch.jsBlocks!) : fold.blocks;
+  const cssBlocks = usesCssBlocks ? upsertBlocks(fold.cssBlocks, patch.cssBlocks!) : fold.cssBlocks;
+  if (usesJsBlocks) state = { ...state, javascript: [...blocks.values()].join("\n\n") };
+  if (usesCssBlocks) state = { ...state, customCss: [...cssBlocks.values()].join("\n\n") };
+  return { state, blocks, cssBlocks };
+}
+
 // A challenge step's `.patch` is the blank/scaffold shown when the student
 // first arrives — but a LATER step that builds on top of it needs the
 // *solved* version, or the lesson would silently regress once you pass a
 // challenge and move on. `.solutionPatch` is what later steps fold in.
 //
-// Elements are MERGED, not replaced: a challenge's scaffold (e.g. a "Clear"
-// button added by `patch.elements` for the student to wire up) still needs
-// to exist in the solved state even though `solutionPatch` usually only
-// specifies the new `javascript` — solving a challenge means adding to what
-// was already on the page, not replacing it. Real incident: a later lesson
+// Elements and blocks are MERGED, not replaced: a challenge's scaffold
+// (e.g. a "Clear" button added by `patch.elements`, for the student to wire
+// up) still needs to exist in the solved state even though `solutionPatch`
+// usually only specifies the new code — solving a challenge means adding to
+// what was already there, not replacing it. Real incident: a later lesson
 // chaining off a solved challenge lost that challenge's own scaffold button
 // entirely, because solutionPatch never re-listed it and the lookup that
 // used to just prefer solutionPatch wholesale dropped it silently.
 function effectivePatch(step: LessonStep): LessonPatch {
   if (!step.isChallenge || !step.solutionPatch) return step.patch;
   const mergedElements = [...(step.patch.elements ?? []), ...(step.solutionPatch.elements ?? [])];
+  const mergedJsBlocks = [...(step.patch.jsBlocks ?? []), ...(step.solutionPatch.jsBlocks ?? [])];
+  const mergedCssBlocks = [...(step.patch.cssBlocks ?? []), ...(step.solutionPatch.cssBlocks ?? [])];
   return {
     ...step.solutionPatch,
     elements: mergedElements.length ? mergedElements : undefined,
+    jsBlocks: mergedJsBlocks.length ? mergedJsBlocks : undefined,
+    cssBlocks: mergedCssBlocks.length ? mergedCssBlocks : undefined,
   };
 }
 
 // ─── Cumulative step state ────────────────────────────────────────────────────
 
-/** The state the student should SEE on arriving at `stepIndex` — prior steps
- *  folded as solved, this step shown as its own raw (possibly blank) patch. */
-export function computeStateAtStep(lesson: Lesson, stepIndex: number): LabState {
+/** The fold (state + running JS block map) the student should SEE on
+ *  arriving at `stepIndex` — prior steps folded as solved, this step shown
+ *  as its own raw (possibly blank) patch. */
+export function computeFoldAtStep(lesson: Lesson, stepIndex: number): Fold {
   const upTo = Math.min(Math.max(stepIndex, 0), lesson.steps.length - 1);
-  let state: LabState = { ...initialState };
+  let fold: Fold = { state: { ...initialState }, blocks: new Map(), cssBlocks: new Map() };
   for (let i = 0; i < upTo; i++) {
-    state = applyPatch(state, effectivePatch(lesson.steps[i]));
+    fold = foldPatch(fold, effectivePatch(lesson.steps[i]));
   }
-  return applyPatch(state, lesson.steps[upTo].patch);
+  return foldPatch(fold, lesson.steps[upTo].patch);
 }
 
-/** The state as if `stepIndex` (inclusive) were solved — used for "Skip to
- *  solution" and as the foundation the next step is computed on top of. */
-export function computeSolvedStateAtStep(lesson: Lesson, stepIndex: number): LabState {
+/** The state the student should SEE on arriving at `stepIndex` — see
+ *  `computeFoldAtStep`. Most callers only need the state, not the block map. */
+export function computeStateAtStep(lesson: Lesson, stepIndex: number): LabState {
+  return computeFoldAtStep(lesson, stepIndex).state;
+}
+
+/** The fold as if `stepIndex` (inclusive) were solved — used for "Skip to
+ *  solution" and as the foundation the next step (or the next LESSON, when
+ *  chaining) is computed on top of. */
+export function computeSolvedFoldAtStep(lesson: Lesson, stepIndex: number): Fold {
   const upTo = Math.min(Math.max(stepIndex, 0), lesson.steps.length - 1);
-  let state: LabState = { ...initialState };
+  let fold: Fold = { state: { ...initialState }, blocks: new Map(), cssBlocks: new Map() };
   for (let i = 0; i <= upTo; i++) {
-    state = applyPatch(state, effectivePatch(lesson.steps[i]));
+    fold = foldPatch(fold, effectivePatch(lesson.steps[i]));
   }
-  return state;
+  return fold;
+}
+
+/** The state as if `stepIndex` (inclusive) were solved — see
+ *  `computeSolvedFoldAtStep`. Most callers only need the state, not the
+ *  block map (which matters only for a NEXT step/lesson's own playback). */
+export function computeSolvedStateAtStep(lesson: Lesson, stepIndex: number): LabState {
+  return computeSolvedFoldAtStep(lesson, stepIndex).state;
 }
 
 // ─── HTML/CSS structural validation ───────────────────────────────────────────

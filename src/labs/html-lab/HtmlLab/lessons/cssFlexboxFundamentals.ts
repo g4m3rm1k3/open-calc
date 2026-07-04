@@ -1,18 +1,20 @@
-import { computeSolvedStateAtStep } from "./lessonEngine";
+import { computeSolvedFoldAtStep } from "./lessonEngine";
 import { cssBoxModel } from "./cssBoxModel";
-import { el } from "./lessonHelpers";
+import { el, foldToPatch } from "./lessonHelpers";
 import type { Lesson } from "./lessonTypes";
 
 // Third CSS Foundations lesson — Flexbox from scratch, on three small
 // "skill badge" boxes added to the running profile page, BEFORE "Flexbox
 // Makeover" (which assumes flex-direction/justify-content/align-items are
-// already familiar and applies them to a full real page).
-const pageWithBoxModel = computeSolvedStateAtStep(cssBoxModel, cssBoxModel.steps.length - 1);
+// already familiar and applies them to a full real page). Main axis and
+// cross axis get their own step before justify-content/align-items lean on
+// that vocabulary.
+const priorFold = computeSolvedFoldAtStep(cssBoxModel, cssBoxModel.steps.length - 1);
 
 export const cssFlexboxFundamentals: Lesson = {
   id: "css-flexbox-fundamentals",
   title: "Flexbox Fundamentals",
-  description: "display: flex, justify-content, and align-items — layout basics on three small boxes before using them for real.",
+  description: "display: flex, the two axes, justify-content, and align-items — one idea at a time on three small boxes.",
   topic: "css",
   unit: "Flexbox & Layout",
   steps: [
@@ -20,7 +22,7 @@ export const cssFlexboxFundamentals: Lesson = {
       id: "recap-page",
       title: "Here's the page so far",
       instructions: "Adding a row of skill badges to the bottom of the profile page you've been building.",
-      patch: { elements: pageWithBoxModel.elements },
+      patch: foldToPatch(priorFold),
     },
     {
       id: "flex-row",
@@ -37,10 +39,17 @@ export const cssFlexboxFundamentals: Lesson = {
       },
     },
     {
-      id: "justify-content",
-      title: "justify-content spaces items along the row",
+      id: "main-axis-and-cross-axis",
+      title: "Flexbox thinks in two axes: main and cross",
       instructions:
-        "`justify-content` controls how extra space along the row (the *main axis*) gets distributed. `space-between` pushes the first item to the left edge, the last to the right edge, and spreads the rest evenly between them.",
+        "Once a container is `display: flex`, its layout is described using two directions: the MAIN axis is the direction items line up in — a row, left to right, by default — and the CROSS axis runs perpendicular to it — up and down, for a row. The next two steps each control spacing along one of these axes: one along the main axis, one along the cross axis.",
+      patch: {},
+    },
+    {
+      id: "justify-content",
+      title: "justify-content spaces items along the MAIN axis",
+      instructions:
+        "`justify-content` controls how extra leftover space along the main axis gets distributed between items. `space-between` pushes the first item all the way to the start of the row, the last item all the way to the end, and spreads the rest evenly in between.",
       patch: {
         elements: [
           el("badges", "div", null, 5, "", {}, { display: "flex", justifyContent: "space-between", gap: "10px", marginTop: "16px" }),
@@ -49,9 +58,9 @@ export const cssFlexboxFundamentals: Lesson = {
     },
     {
       id: "align-items",
-      title: "align-items lines items up the other way",
+      title: "align-items lines items up along the CROSS axis",
       instructions:
-        "The badges aren't all the same height — notice \"JavaScript\" has more padding, so it's taller. `align-items: center` controls the *cross axis* (up and down, when the main axis is a row) — it centers every item vertically no matter how tall it is, instead of stretching or top-aligning them.",
+        "The badges aren't all the same height — \"JavaScript\" has more padding, so it's taller than the other two. `align-items: center` controls the cross axis — up and down, since the main axis here is a row — and centers every item vertically no matter how tall it individually is, instead of the default, which stretches every item to match the tallest one.",
       patch: {
         elements: [
           el("badges", "div", null, 5, "", {}, { display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px", marginTop: "16px" }),
@@ -62,10 +71,10 @@ export const cssFlexboxFundamentals: Lesson = {
       id: "challenge-column-stack",
       title: "Your turn: stack them in a centered column",
       instructions:
-        "Add a new flex container with three items of your choice inside it. Make it a column instead of a row using `flex-direction: column`, and center every item horizontally with `align-items: center` (in a column, align-items controls the horizontal axis).",
+        "Add a new flex container with three items of your choice inside it. Make it a column instead of a row using `flex-direction: column`, then center every item with `align-items: center` — remember, `flex-direction: column` swaps which direction is \"main\" and which is \"cross,\" so `align-items` now centers left-to-right instead of top-to-bottom.",
       isChallenge: true,
       patch: {},
-      hint: "display: flex; flex-direction: column; align-items: center; — flex-direction: column flips which axis is \"main\" and which is \"cross\", so align-items now centers left-to-right instead of top-to-bottom.",
+      hint: "display: flex; flex-direction: column; align-items: center; — flex-direction: column flips which axis is main and which is cross, so align-items now centers left-to-right instead of top-to-bottom.",
       expected: [
         { tag: "h1" },
         { tag: "p" },

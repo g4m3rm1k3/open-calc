@@ -60,14 +60,24 @@ export const htmlTextSemantics: Lesson = {
       },
     },
     {
-      id: "add-blockquote",
-      title: "Quoting the source: <blockquote> and <cite>",
+      id: "blockquote",
+      title: "<blockquote> marks a pulled quotation",
       instructions:
-        "A pulled quote from the book itself belongs in `<blockquote>` — and if you name where it's from, that name goes in `<cite>`. Together they tell a reader (and a screen reader) exactly what's a quotation and what's your own writing.",
+        "A quote pulled directly from the book itself — not your own writing — belongs in `<blockquote>`. It tells a reader, and a screen reader, exactly where your commentary stops and someone else's original words begin.",
       patch: {
         elements: [
           el("quote", "blockquote", null, 4, "", {}, { margin: "20px 0", padding: "4px 0 4px 16px", borderLeft: "3px solid #cbd5e1", color: "#475569", fontStyle: "italic" }),
           el("quote-text", "p", "quote", 0, "Fear is the mind-killer.", {}, { margin: "0 0 4px" }),
+        ],
+      },
+    },
+    {
+      id: "cite",
+      title: "<cite> names the source of a quotation",
+      instructions:
+        "When a quote names where it came from, that name — the book title, the author, the speaker — goes in `<cite>`, usually right alongside the `<blockquote>` it belongs to. It's a small tag with one very specific job: marking \"this text is the name of the work or person being cited.\"",
+      patch: {
+        elements: [
           el("quote-cite", "cite", "quote", 1, "— Frank Herbert, Dune", {}, { fontStyle: "normal", fontSize: "13px", color: "#64748b" }),
         ],
       },

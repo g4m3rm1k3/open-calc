@@ -3,28 +3,36 @@ import type { Lesson } from "./lessonTypes";
 
 // Fourth HTML lesson — a small class-schedule page. Tables and images are
 // two of the most commonly misused areas of HTML (divs styled to look like
-// grids instead of real <table>s; images with no alt text at all), so this
-// is entirely about "use the real structural tag instead of faking it."
-// Two challenges again: extend the table mid-lesson, add a second figure at
-// the end.
+// grids instead of real <table>s; images with no alt text at all). "What is
+// a table," the header row, alt text, and <figure> each get their own step.
 const CELL = { padding: "8px 14px", borderBottom: "1px solid #e2e8f0", textAlign: "left" as const };
 
 export const htmlTablesMedia: Lesson = {
   id: "html-tables-media",
   title: "Tables for Real Data",
-  description: "Build a real class schedule with <table>, then add images the right way with <figure> and alt text.",
+  description: "table, thead/th, tbody/td, alt text, and figure — one idea at a time, on a class schedule.",
   topic: "html",
   unit: "Tables & Media",
   steps: [
     {
-      id: "intro-table",
-      title: "A grid of related data is a <table>",
+      id: "what-is-a-table",
+      title: "Rows and columns of related data is a <table>",
       instructions:
-        "Rows and columns that actually relate to each other — a schedule, a price list, a spreadsheet — belong in a real `<table>`, not a grid of styled `<div>`s. `<thead>` holds the header row, and each header cell is a `<th>`, not a `<td>`.",
+        "Rows and columns that actually relate to each other — a schedule, a price list, a spreadsheet — belong in a real `<table>`, not a grid of styled `<div>`s pretending to be one. A real table gives a screen reader the ability to announce which row and column a cell belongs to; a div grid never can.",
       patch: {
         elements: [
           el("title", "h1", null, 0, "Studio Class Schedule", {}, { fontSize: "26px", margin: "0 0 16px", color: "#0f172a" }),
           el("schedule", "table", null, 1, "", {}, { borderCollapse: "collapse", width: "100%", color: "#334155" }),
+        ],
+      },
+    },
+    {
+      id: "table-header-row",
+      title: "The header row: <thead> and <th>",
+      instructions:
+        "`<thead>` holds the header row — the one naming what each column IS, rather than any actual data. Cells inside it are `<th>` (table header), not `<td>` — a different tag specifically because a header cell means something different from a data cell, the same way `<h1>` means something different from `<p>`.",
+      patch: {
+        elements: [
           el("thead", "thead", "schedule", 0, "", {}, {}),
           el("head-row", "tr", "thead", 0, "", {}, {}),
           el("th-day", "th", "head-row", 0, "Day", {}, { ...CELL, borderBottom: "2px solid #0f172a", fontWeight: "700" }),
@@ -35,9 +43,9 @@ export const htmlTablesMedia: Lesson = {
     },
     {
       id: "add-tbody-rows",
-      title: "The data itself goes in <tbody>",
+      title: "The actual data: <tbody>, <tr>, and <td>",
       instructions:
-        "Every actual row of data lives inside `<tbody>` — a sibling of `<thead>`, not nested inside it. Each row is a `<tr>`, and this time the cells are `<td>` (table data), not `<th>`.",
+        "Every real row of data lives inside `<tbody>` — a sibling of `<thead>`, not nested inside it. Each row is a `<tr>` (table row), and each cell this time is `<td>` (table data) rather than `<th>`, since these cells hold actual values, not column names.",
       patch: {
         elements: [
           el("tbody", "tbody", "schedule", 1, "", {}, {}),
@@ -80,10 +88,21 @@ export const htmlTablesMedia: Lesson = {
       },
     },
     {
-      id: "add-figure",
-      title: "An image needs <figure>, <figcaption>, and real alt text",
+      id: "img-alt-text",
+      title: "An image's alt text is what a screen reader says instead",
       instructions:
-        "`<img>`'s `alt` attribute isn't optional decoration — it's what a screen reader says instead of the picture, so it should describe what's actually in the image. When an image has a caption, `<figure>` wraps both the `<img>` and a `<figcaption>` together as one unit.",
+        "`<img>`'s `alt` attribute isn't optional decoration — for someone who can't see the image, it's what gets read out loud INSTEAD of the picture. That means it should actually describe what's in the image, specifically, the same way you'd describe it to someone over the phone.",
+      patch: {
+        elements: [
+          el("fig1-img", "img", null, 2, "", { alt: "Sunlit studio room with wood floors and rolled-up mats along the wall", src: "" }, { width: "100%", borderRadius: "8px", background: "#e2e8f0", display: "block", aspectRatio: "16/9", marginTop: "24px" }),
+        ],
+      },
+    },
+    {
+      id: "figure-and-figcaption",
+      title: "<figure> groups an image with its caption",
+      instructions:
+        "When an image has a visible caption underneath it, `<figure>` wraps both the `<img>` and a `<figcaption>` together as one unit — telling a reader (and assistive tech) that the caption belongs to that specific image, not just to whatever happens to be nearby on the page.",
       patch: {
         elements: [
           el("fig1", "figure", null, 2, "", {}, { margin: "24px 0 0" }),

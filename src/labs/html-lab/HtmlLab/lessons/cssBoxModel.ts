@@ -1,19 +1,18 @@
-import { computeSolvedStateAtStep } from "./lessonEngine";
+import { computeSolvedFoldAtStep } from "./lessonEngine";
 import { cssFoundationsIntro } from "./cssFoundationsIntro";
-import { el } from "./lessonHelpers";
+import { el, foldToPatch } from "./lessonHelpers";
 import type { Lesson } from "./lessonTypes";
 
-// Second CSS Foundations lesson — continues the Alex Rivera profile page
-// from "What Is CSS?". Every element on a page is secretly a box; this
-// lesson makes that box visible, layer by layer: content, padding, border,
-// margin, then box-sizing (the one property that decides whether padding
-// and border grow the box or eat into it).
-const profilePage = computeSolvedStateAtStep(cssFoundationsIntro, cssFoundationsIntro.steps.length - 1);
+// Second CSS Foundations lesson — continues the Alex Rivera profile page.
+// Every element on a page is secretly a box with four layers; this teaches
+// each one on its own (padding, then border, then margin) instead of
+// naming all four in one sentence, then box-sizing.
+const priorFold = computeSolvedFoldAtStep(cssFoundationsIntro, cssFoundationsIntro.steps.length - 1);
 
 export const cssBoxModel: Lesson = {
   id: "css-box-model",
   title: "The Box Model",
-  description: "Content, padding, border, and margin — every element is a box, whether it looks like one or not.",
+  description: "Padding, border, margin, and box-sizing — one layer of the box at a time.",
   topic: "css",
   unit: "CSS Foundations",
   steps: [
@@ -21,13 +20,20 @@ export const cssBoxModel: Lesson = {
       id: "recap-page",
       title: "Here's the profile page so far",
       instructions: "The page from What Is CSS? — a name, a title, and an availability note.",
-      patch: { elements: profilePage.elements },
+      patch: foldToPatch(priorFold),
     },
     {
-      id: "content-and-padding",
-      title: "Content, then padding around it",
+      id: "what-is-the-box-model",
+      title: "Every element is secretly a box",
       instructions:
-        "Every box has four layers, from the inside out: content (the text or elements themselves), padding (space between the content and the edge), border (a line at the edge), and margin (space outside the edge, pushing other elements away). Here's a card with just padding added so far — notice how it pushes the border/background outward from the text, not the text inward.",
+        "Whether or not it looks like one, every single element on a page — a heading, a paragraph, a button — is a rectangular box under the hood. That box is built from layers: the content itself sits in the middle, and padding, border, and margin can each be added around it, one wrapped around the next. The next few steps add each of those layers one at a time, so it's clear what each one actually does.",
+      patch: {},
+    },
+    {
+      id: "padding",
+      title: "Padding is space INSIDE the box's edge",
+      instructions:
+        "Padding sits between the content and the edge of its own box — it pushes the border and background outward, away from the text, rather than pushing the text itself anywhere. Here's a card with padding added: notice the background color now extends well past the text, because the box grew to include that padding.",
       patch: {
         elements: [
           el("card", "div", null, 3, "", {}, { padding: "20px", backgroundColor: "#f8fafc", marginTop: "20px" }),
@@ -36,10 +42,21 @@ export const cssBoxModel: Lesson = {
       },
     },
     {
-      id: "border-and-margin",
-      title: "Border sits between padding and margin",
+      id: "border",
+      title: "Border draws a visible line at the box's edge",
       instructions:
-        "A `border` draws a visible line right where padding ends. `margin` is the space OUTSIDE that line — it doesn't affect the box's own background or border, it only pushes neighboring elements away. Watch the border appear, and the gap it creates above the note below.",
+        "`border` draws a visible line exactly where the padding ends and the box's edge is — it's the layer that makes a box actually look like a box. Watch it appear around the card, right at the outer edge of the padding added in the last step.",
+      patch: {
+        elements: [
+          el("card", "div", null, 3, "", {}, { padding: "20px", backgroundColor: "#f8fafc", marginTop: "20px", border: "2px solid #cbd5e1", borderRadius: "8px" }),
+        ],
+      },
+    },
+    {
+      id: "margin",
+      title: "Margin is space OUTSIDE the box, pushing others away",
+      instructions:
+        "Margin is the one layer that isn't really part of the box's own appearance at all — it doesn't affect that box's background or border, it only adds empty space beyond its edge, pushing NEIGHBORING elements further away. Watch the gap open up between the card and the note below it as margin gets added underneath.",
       patch: {
         elements: [
           el("card", "div", null, 3, "", {}, { padding: "20px", backgroundColor: "#f8fafc", marginTop: "20px", marginBottom: "20px", border: "2px solid #cbd5e1", borderRadius: "8px" }),
@@ -50,7 +67,7 @@ export const cssBoxModel: Lesson = {
       id: "box-sizing",
       title: "box-sizing decides what \"width\" actually means",
       instructions:
-        "By default, `width` only sets the CONTENT's width — padding and border get added on top, so a 300px-wide box with 20px of padding on each side actually takes up 340px. `box-sizing: border-box` changes the rule: padding and border now count AS PART OF the 300px, so the box never grows past the width you gave it. This card just switched to border-box with a fixed width — resize the padding later and it'll never overflow its column.",
+        "By default, `width` sets only the CONTENT's width — padding and border get added ON TOP of it, so a 300px-wide box with 20px of padding on each side actually takes up 340px total. `box-sizing: border-box` changes that rule: padding and border now count AS PART OF the 300px, so the box never grows past the width you gave it, no matter how much padding or border you add later. This card just switched to border-box with a fixed width.",
       patch: {
         elements: [
           el("card", "div", null, 3, "", {}, { padding: "20px", backgroundColor: "#f8fafc", marginTop: "20px", marginBottom: "20px", border: "2px solid #cbd5e1", borderRadius: "8px", width: "320px", boxSizing: "border-box" }),
