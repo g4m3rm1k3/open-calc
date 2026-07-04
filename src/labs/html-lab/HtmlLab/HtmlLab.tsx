@@ -410,6 +410,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
               return [...s];
             })
           }
+          onSelectRange={(ids) => setMultiSelectedIds(ids)}
           onDeleteElement={(id) => dispatch({ type: "DELETE_ELEMENT", payload: id })}
           onAddElement={(tag) => dispatch({ type: "ADD_ELEMENT", payload: tag })}
           bodyIsDark={bodyIsDark}

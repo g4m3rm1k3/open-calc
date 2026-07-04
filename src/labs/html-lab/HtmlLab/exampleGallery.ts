@@ -69,7 +69,7 @@ function generateMultiPageExample(): MultiPageData {
     }, "Available for hire"),
     el("home-h1", "h1", "home-hero", {
       fontSize: "54px", fontWeight: "800", margin: "0 0 16px", lineHeight: "1.1", letterSpacing: "-0.03em",
-    }, "Hi, I'm Alex Chen"),
+    }, "Hi, I'm Michael"),
     el("home-sub", "p", "home-hero", {
       color: "#94a3b8", fontSize: "20px", maxWidth: "520px", margin: "0 auto 36px", lineHeight: "1.6",
     }, "Full-stack developer crafting fast, accessible web experiences."),
@@ -105,7 +105,7 @@ function generateMultiPageExample(): MultiPageData {
     note(),
     el("ab-hero", "section", null, { padding: "64px 32px 48px", maxWidth: "720px", margin: "0 auto" }),
     el("ab-h1", "h1", "ab-hero", { fontSize: "40px", fontWeight: "800", margin: "0 0 20px", letterSpacing: "-0.03em" }, "About me"),
-    el("ab-p1", "p", "ab-hero", { color: "#94a3b8", fontSize: "17px", lineHeight: "1.75", margin: "0 0 16px" }, "I'm a full-stack developer based in Vancouver with a passion for building products that are fast, accessible, and a joy to use."),
+    el("ab-p1", "p", "ab-hero", { color: "#94a3b8", fontSize: "17px", lineHeight: "1.75", margin: "0 0 16px" }, "I'm a full-stack developer based in Boston with a passion for building products that are fast, accessible, and a joy to use."),
     el("ab-p2", "p", "ab-hero", { color: "#94a3b8", fontSize: "17px", lineHeight: "1.75", margin: "0 0 36px" }, "I specialize in React, Node.js, and TypeScript. When I'm not coding I'm hiking, reading, or experimenting with generative art."),
     el("ab-skills-title", "h2", "ab-hero", { fontSize: "18px", fontWeight: "700", color: "#f8fafc", margin: "0 0 16px" }, "Technologies"),
     el("ab-skills", "div", "ab-hero", { display: "flex", flexWrap: "wrap", gap: "8px" }),

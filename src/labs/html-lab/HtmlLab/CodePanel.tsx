@@ -325,6 +325,7 @@ interface TreeProps {
 }
 
 interface ElementTreeProps extends TreeProps {
+  onSelectRange: (ids: string[]) => void;
   onReorder: (id: string, parentId: string | null, order: number) => void;
   onNest: (childId: string, parentId: string, order: number) => void;
   onMoveToRoot: (id: string, order: number) => void;
@@ -332,12 +333,38 @@ interface ElementTreeProps extends TreeProps {
 
 interface DropTargetInfo { parentId: string | null; order: number; inside?: boolean; }
 
-function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedIds, onToggleMultiSelect, onReorder, onNest, onMoveToRoot }: ElementTreeProps) {
+// Depth-first pre-order walk matching exactly how TreeBranch renders rows top
+// to bottom (each element immediately followed by its own children before
+// the next sibling) — this is the order shift-click range selection needs to
+// walk to know what's "between" the anchor and the clicked row.
+function flattenTreeOrder(elements: LabElement[]): string[] {
+  const childrenByParent = new Map<string | null, LabElement[]>();
+  for (const el of elements) {
+    const key = el.parentId ?? null;
+    if (!childrenByParent.has(key)) childrenByParent.set(key, []);
+    childrenByParent.get(key)!.push(el);
+  }
+  for (const list of childrenByParent.values()) {
+    list.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }
+  const order: string[] = [];
+  function walk(parentId: string | null): void {
+    for (const el of childrenByParent.get(parentId) ?? []) {
+      order.push(el.id);
+      walk(el.id);
+    }
+  }
+  walk(null);
+  return order;
+}
+
+function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedIds, onToggleMultiSelect, onSelectRange, onReorder, onNest, onMoveToRoot }: ElementTreeProps) {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTargetInfo | null>(null);
 
   const byId: Record<string, LabElement> = {};
   for (const e of elements) byId[e.id] = e;
+  const flatOrder = flattenTreeOrder(elements);
 
   const handleDragStartItem = (e: React.DragEvent, id: string): void => {
     e.stopPropagation();
@@ -385,6 +412,19 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
     setDropTarget({ parentId: null, order: rootCount, inside: true });
   };
 
+  // Shift-click range select — the anchor is the current single selection
+  // (selectedId), same as a file explorer: shift-click extends/shrinks the
+  // range from that fixed point without moving it, so repeated shift-clicks
+  // adjust one contiguous range instead of compounding.
+  const handleSelectRange = (targetId: string): void => {
+    const anchor = selectedId ?? targetId;
+    const anchorIdx = flatOrder.indexOf(anchor);
+    const targetIdx = flatOrder.indexOf(targetId);
+    if (anchorIdx === -1 || targetIdx === -1) { onSelect(targetId); return; }
+    const [start, end] = anchorIdx <= targetIdx ? [anchorIdx, targetIdx] : [targetIdx, anchorIdx];
+    onSelectRange(flatOrder.slice(start, end + 1));
+  };
+
   return (
     <div className={styles.codeTreePanel}>
       <button
@@ -407,6 +447,7 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
         depth={1}
         multiSelectedIds={multiSelectedIds}
         onToggleMultiSelect={onToggleMultiSelect}
+        onSelectRange={handleSelectRange}
         draggingId={draggingId}
         dropTarget={dropTarget}
         onDragStartItem={handleDragStartItem}
@@ -424,6 +465,10 @@ interface BranchProps extends TreeProps {
   depth: number;
   draggingId: string | null;
   dropTarget: DropTargetInfo | null;
+  // Reports "this row was shift-clicked" up to ElementTree, which owns the
+  // flattened tree order and the anchor (selectedId) needed to resolve that
+  // into an actual range — TreeBranch itself has neither.
+  onSelectRange: (targetId: string) => void;
   onDragStartItem: (e: React.DragEvent, id: string) => void;
   onDragEndItem: () => void;
   onZoneEnter: (e: React.DragEvent, parentId: string | null, order: number) => void;
@@ -432,7 +477,7 @@ interface BranchProps extends TreeProps {
 }
 
 function TreeBranch({
-  elements, selectedId, onSelect, onDelete, parentId, depth, multiSelectedIds, onToggleMultiSelect,
+  elements, selectedId, onSelect, onDelete, parentId, depth, multiSelectedIds, onToggleMultiSelect, onSelectRange,
   draggingId, dropTarget, onDragStartItem, onDragEndItem, onZoneEnter, onInsideEnter, onDropItem,
 }: BranchProps) {
   const children = (elements || [])
@@ -476,7 +521,7 @@ function TreeBranch({
                 isDropInside ? styles.treeItemDropInside : "",
               ].join(" ")}
               style={{ paddingLeft: `${depth * 14 + 8}px` }}
-              title={`<${el.tag}>${el.content ? ` "${el.content.slice(0, 30)}"` : ""} — Ctrl+click to multi-select, drag to move`}
+              title={`<${el.tag}>${el.content ? ` "${el.content.slice(0, 30)}"` : ""} — Ctrl+click to multi-select, Shift+click to select a range, drag to move`}
               draggable
               onDragStart={(e) => onDragStartItem(e, el.id)}
               onDragEnd={onDragEndItem}
@@ -484,7 +529,10 @@ function TreeBranch({
               onDragEnter={(e) => { if (isContainer) onInsideEnter(e, el.id, ownChildCount); }}
               onDrop={(e) => { if (isContainer) onDropItem(e, el.id, ownChildCount); }}
               onClick={(e) => {
-                if ((e.ctrlKey || e.metaKey) && onToggleMultiSelect) {
+                if (e.shiftKey && onSelectRange) {
+                  e.preventDefault();
+                  onSelectRange(el.id);
+                } else if ((e.ctrlKey || e.metaKey) && onToggleMultiSelect) {
                   e.preventDefault();
                   onToggleMultiSelect(el.id);
                 } else {
@@ -512,6 +560,7 @@ function TreeBranch({
               depth={depth + 1}
               multiSelectedIds={multiSelectedIds}
               onToggleMultiSelect={onToggleMultiSelect}
+              onSelectRange={onSelectRange}
               draggingId={draggingId}
               dropTarget={dropTarget}
               onDragStartItem={onDragStartItem}
@@ -621,6 +670,7 @@ interface CodePanelProps {
   onJavascriptChange: (val: string) => void;
   onSelectElement: (id: string | null) => void;
   onToggleMultiSelect: (id: string) => void;
+  onSelectRange: (ids: string[]) => void;
   onDeleteElement: (id: string) => void;
   onAddElement: (tag: string) => void;
   bodyIsDark: boolean;
@@ -647,6 +697,7 @@ export default function CodePanel({
   onJavascriptChange,
   onSelectElement,
   onToggleMultiSelect,
+  onSelectRange,
   onDeleteElement,
   onAddElement,
   bodyIsDark,
@@ -784,6 +835,7 @@ export default function CodePanel({
             onDelete={onDeleteElement}
             multiSelectedIds={multiSelectedIds}
             onToggleMultiSelect={onToggleMultiSelect}
+            onSelectRange={onSelectRange}
             onReorder={onReorderElement}
             onNest={onNestElement}
             onMoveToRoot={onMoveElementToRoot}
