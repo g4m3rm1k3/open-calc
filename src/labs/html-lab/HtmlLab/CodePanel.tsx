@@ -759,6 +759,15 @@ interface CodePanelProps {
   selectedId: string | null;
   elements: LabElement[];
   multiSelectedIds: string[];
+  /** Lesson playback: switches to this tab while a step's build is revealing
+   *  content there (e.g. jump to "JavaScript" while a script types itself in). */
+  focusTab?: "html" | "css" | "javascript";
+  /** Lesson playback: forces Monaco's displayed text to match `html`/`css`/
+   *  `javascript` even if the editor still thinks it's focused — playback
+   *  never involves real typing, so there's no live edit to protect, and
+   *  without this an editor that's picked up focus for any reason would
+   *  silently keep showing a stale frame while state moves on underneath it. */
+  forceSync?: boolean;
   onHtmlChange: (val: string) => void;
   onCssChange: (val: string) => void;
   onJavascriptChange: (val: string) => void;
@@ -787,6 +796,8 @@ export default function CodePanel({
   selectedId,
   elements,
   multiSelectedIds,
+  focusTab,
+  forceSync,
   onHtmlChange,
   onCssChange,
   onJavascriptChange,
@@ -826,9 +837,10 @@ export default function CodePanel({
 
   useEffect(() => {
     const editor = editorRef.current;
-    if (!editor || isFocused.current) return;
+    if (!editor) return;
+    if (isFocused.current && !forceSync) return;
     if (editor.getValue() !== activeSource) editor.setValue(activeSource);
-  }, [activeSource]);
+  }, [activeSource, forceSync]);
 
   useEffect(() => {
     monacoRef.current?.editor.setTheme(monacoTheme);
@@ -838,6 +850,10 @@ export default function CodePanel({
     applyDecorations();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId, activeTab]);
+
+  useEffect(() => {
+    if (focusTab) setActiveTab(focusTab);
+  }, [focusTab]);
 
   function applyDecorations(): void {
     const editor = editorRef.current;

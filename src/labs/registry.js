@@ -30,6 +30,16 @@ export const LABS = [
     cover: { grad: 'from-orange-600 via-amber-700 to-yellow-950', mark: '</>', sub: 'Elements · Box Model · CSS' },
   },
   {
+    key: 'html-lessons',
+    label: 'HTML Lab Lessons',
+    emoji: '🎓',
+    color: 'emerald',
+    desc: 'Learn HTML, CSS, and JavaScript by building one real page across a guided step series — semantic tags first, then styling it, then bringing it to life with DOM manipulation. Try things freely in Edit mode; Preview always shows exactly where the lesson is.',
+    path: '/lab/html-lessons',
+    tags: ['HTML', 'CSS', 'JavaScript', 'Lessons', 'Interactive'],
+    cover: { grad: 'from-emerald-600 via-teal-700 to-cyan-950', mark: '🎓', sub: 'Guided · Step-by-step · Challenges' },
+  },
+  {
     key: 'css-mastery',
     label: 'CSS 0 to Mastery',
     emoji: '🎨',

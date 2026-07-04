@@ -64,6 +64,9 @@ interface Props {
   showOverlay: boolean;
   showLabels?: boolean;
   bodyStyles?: BodyStyles;
+  /** Element ids touched by the most recent lesson-playback frame — briefly
+   *  highlighted so a step's build reads as "this just appeared/changed". */
+  revealedIds?: string[];
   onSelect: (id: string) => void;
   onDeselect: () => void;
   onDelete: (id: string) => void;
@@ -78,6 +81,7 @@ export default function CanvasPanel({
   showOverlay,
   showLabels = true,
   bodyStyles = {},
+  revealedIds,
   onSelect,
   onDeselect,
   onDelete,
@@ -191,6 +195,7 @@ export default function CanvasPanel({
   const renderElement = (el: LabElement): React.ReactNode => {
     const isSelected    = el.id === selectedId;
     const isDragging    = el.id === draggingId;
+    const isRevealed    = revealedIds?.includes(el.id) ?? false;
     const children      = childrenOf(el.id);
     const isContainer   = CONTAINER_TAGS.has(el.tag);
     const isInsideTarget = isContainer && dropTarget?.parentId === el.id;
@@ -241,6 +246,7 @@ export default function CanvasPanel({
       isSelected    ? styles.elSelected    : "",
       isDragging    ? styles.elDragging    : "",
       isInsideTarget? styles.elDropInside  : "",
+      isRevealed    ? styles.justRevealed  : "",
     ].join(" ");
 
     if (TABLE_ROLE_TAGS.has(el.tag)) {

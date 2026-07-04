@@ -66,6 +66,196 @@
   color: var(--hl-hint);
 }
 
+/* ── Lesson mode ─────────────────────────────────────────────────────────────── */
+.lessonProgress {
+  font-size: 11px;
+  color: var(--hl-hint);
+  margin-right: 4px;
+}
+
+.lessonBanner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  background: var(--hl-surface2);
+  border-bottom: 1px solid var(--hl-border);
+  flex-shrink: 0;
+}
+.lessonBannerText {
+  flex: 1;
+  min-width: 0;
+}
+.lessonStepTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--hl-text);
+  margin-bottom: 4px;
+}
+.lessonInstructions {
+  font-size: 12px;
+  color: var(--hl-muted);
+  line-height: 1.6;
+  margin: 0;
+  max-width: 720px;
+}
+.lessonHint {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--hl-string-bg);
+  color: var(--hl-string);
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.lessonFeedbackPass,
+.lessonFeedbackFail {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.lessonFeedbackPass {
+  background: var(--hl-positive-bg);
+  color: var(--hl-positive);
+}
+.lessonFeedbackFail {
+  background: var(--hl-danger-bg);
+  color: var(--hl-danger);
+}
+.lessonFeedbackList {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-weight: 400;
+}
+.lessonActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ── Lesson catalog ──────────────────────────────────────────────────────────── */
+
+.catalogRoot {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px 48px;
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.catalogContinue {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  border-radius: 10px;
+  border: 1px solid var(--hl-accent);
+  background: var(--hl-accent-bg);
+  color: var(--hl-text);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.catalogTabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--hl-border);
+}
+
+.catalogTab {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  color: var(--hl-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.catalogTabActive {
+  color: var(--hl-accent);
+  border-bottom-color: var(--hl-accent);
+}
+
+.catalogUnit {
+  margin-bottom: 24px;
+}
+
+.catalogUnitTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--hl-muted);
+  margin-bottom: 8px;
+}
+
+.catalogLessonRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  text-align: left;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--hl-border);
+  background: var(--hl-surface);
+  cursor: pointer;
+}
+
+.catalogLessonRow:hover {
+  border-color: var(--hl-accent);
+}
+
+.catalogLessonTitle {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--hl-text);
+  margin-bottom: 3px;
+}
+
+.catalogLessonDesc {
+  font-size: 12px;
+  color: var(--hl-muted);
+}
+
+.catalogStatusPill {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.catalogStatusNew {
+  background: var(--hl-surface2);
+  color: var(--hl-muted);
+}
+
+.catalogStatusProgress {
+  background: var(--hl-hint);
+  color: var(--hl-text);
+}
+
+.catalogStatusComplete {
+  background: var(--hl-positive-bg);
+  color: var(--hl-positive);
+}
+
 .elemBtn {
   padding: 3px 8px;
   border: 1px dashed var(--hl-border);
@@ -328,6 +518,29 @@
   box-shadow:
     0 0 0 2px var(--hl-positive-bg),
     inset 0 0 12px var(--hl-positive-bg) !important;
+}
+
+/* Lesson playback: briefly flags whichever element the frame just
+   inserted/restyled, so watching a step build reads as "this is what
+   changed just now" rather than the page silently rewriting itself. */
+.justRevealed {
+  animation: lessonReveal 900ms ease-out;
+}
+@keyframes lessonReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 2px var(--hl-accent), 0 0 24px var(--hl-accent-bg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: 0 0 0 2px var(--hl-accent), 0 0 24px var(--hl-accent-bg);
+  }
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 transparent;
+  }
 }
 
 /* ── Tag badge at top of element ─────────────────────────────────────────────── */

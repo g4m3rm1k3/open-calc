@@ -1,0 +1,140 @@
+import styles from "./HtmlLab.module.css";
+import type { LessonStep, ValidationResult } from "./lessons/lessonTypes";
+
+interface Props {
+  lessonTitle: string;
+  stepIndex: number;
+  stepCount: number;
+  step: LessonStep;
+  previewMode: boolean;
+  onTogglePreview: () => void;
+  canAdvance: boolean;
+  checking: boolean;
+  checkResult: ValidationResult | null;
+  showHint: boolean;
+  onCheck: () => void;
+  onNext: () => void;
+  onShowHint: () => void;
+  onSkipToSolution: () => void;
+  onBack?: () => void;
+  isPlaying: boolean;
+  isPaused: boolean;
+  onPausePlayback: () => void;
+  onSkipPlayback: () => void;
+  onReplay: () => void;
+}
+
+export default function LessonToolbar({
+  lessonTitle,
+  stepIndex,
+  stepCount,
+  step,
+  previewMode,
+  onTogglePreview,
+  canAdvance,
+  checking,
+  checkResult,
+  showHint,
+  onCheck,
+  onNext,
+  onShowHint,
+  onSkipToSolution,
+  onBack,
+  isPlaying,
+  isPaused,
+  onPausePlayback,
+  onSkipPlayback,
+  onReplay,
+}: Props) {
+  const isLastStep = stepIndex === stepCount - 1;
+
+  return (
+    <>
+      <div className={styles.toolbar}>
+        {onBack && (
+          <button className={styles.backBtn} onClick={onBack} title="Back to Labs">
+            ← Labs
+          </button>
+        )}
+        <span className={styles.toolbarLogo}>{lessonTitle}</span>
+        {isPlaying ? (
+          <span className={styles.lessonProgress}>● Building…</span>
+        ) : (
+          <span className={styles.lessonProgress}>Step {stepIndex + 1} of {stepCount}</span>
+        )}
+        <div className={styles.toolbarSep} />
+
+        {isPlaying ? (
+          <>
+            <button className={styles.tbBtn} onClick={onPausePlayback}>
+              {isPaused ? "▶ Resume" : "⏸ Pause"}
+            </button>
+            <button className={styles.tbBtn} onClick={onSkipPlayback} title="Jump to the finished result">
+              ⏭ Skip
+            </button>
+          </>
+        ) : (
+          <button className={styles.tbBtn} onClick={onReplay} title="Watch this step get built again">
+            ↻ Replay build
+          </button>
+        )}
+
+        <button
+          className={`${styles.tbBtn} ${previewMode ? styles.tbBtnGoEdit : styles.tbBtnGoPreview}`}
+          onClick={onTogglePreview}
+          disabled={isPlaying}
+          title={previewMode ? "Back to editor" : "Preview with live JavaScript"}
+        >
+          {previewMode ? "✎ Edit" : "▶ Preview"}
+        </button>
+      </div>
+
+      <div className={styles.lessonBanner}>
+        <div className={styles.lessonBannerText}>
+          <div className={styles.lessonStepTitle}>{step.title}</div>
+          <p className={styles.lessonInstructions}>{step.instructions}</p>
+
+          {showHint && step.hint && (
+            <div className={styles.lessonHint}>💡 {step.hint}</div>
+          )}
+
+          {checkResult && (
+            <div className={checkResult.passed ? styles.lessonFeedbackPass : styles.lessonFeedbackFail}>
+              {checkResult.passed ? "✓ " : "✗ "}
+              {checkResult.passed ? "Correct!" : "Not quite:"}
+              {!checkResult.passed && (
+                <ul className={styles.lessonFeedbackList}>
+                  {checkResult.feedback.map((line, i) => <li key={i}>{line}</li>)}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className={styles.lessonActions}>
+          {step.isChallenge && !checkResult?.passed && (
+            <>
+              <button className={styles.tbBtn} onClick={onShowHint} disabled={isPlaying || !step.hint || showHint}>
+                💡 Hint
+              </button>
+              <button className={`${styles.tbBtn} ${styles.tbBtnDanger}`} onClick={onSkipToSolution} disabled={isPlaying}>
+                Skip to solution
+              </button>
+              <button className={`${styles.tbBtn} ${styles.tbBtnGoPreview}`} onClick={onCheck} disabled={isPlaying || checking}>
+                {checking ? "Checking…" : "Check"}
+              </button>
+            </>
+          )}
+          <button
+            className={`${styles.tbBtn} ${styles.tbBtnGoEdit}`}
+            onClick={onNext}
+            disabled={!canAdvance || isLastStep}
+            title={isLastStep ? "This is the last step" : undefined}
+          >
+            {isLastStep ? "Lesson complete" : "Next →"}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
