@@ -191,22 +191,25 @@ const traceListDelete = (head, val) => {
 const traceBSTSearch = (root, target) => {
   const steps = [];
   let node = root;
-  steps.push({ kind:"bst", tree: root, highlight: -1, found: false, note: `bstSearch(root, ${target})  — start at root`, codePattern: "function " });
+  const visited = [];   // nodes already passed through
+  steps.push({ kind:"bst", tree: root, highlight: -1, found: false, path: [], note: `bstSearch(root, ${target})  — start at root`, codePattern: "function " });
   while (node) {
-    steps.push({ kind:"bst", tree: root, highlight: node.val, found: false, note: `node.val = ${node.val}  — is it ${target}?`, codePattern: "node.val === target" });
+    steps.push({ kind:"bst", tree: root, highlight: node.val, found: false, path: [...visited], note: `node.val = ${node.val}  — is it ${target}?`, codePattern: "node.val === target" });
     if (node.val === target) {
-      steps.push({ kind:"bst", tree: root, highlight: node.val, found: true, note: `node.val === ${target} ✓  return true`, codePattern: "return true" });
+      steps.push({ kind:"bst", tree: root, highlight: node.val, found: true, path: [...visited, node.val], note: `node.val === ${target} ✓  return true`, codePattern: "return true" });
       return steps;
     }
     if (target < node.val) {
-      steps.push({ kind:"bst", tree: root, highlight: node.val, found: false, note: `${target} < ${node.val}  → go LEFT (discard entire right subtree)`, codePattern: "node.left" });
+      visited.push(node.val);
+      steps.push({ kind:"bst", tree: root, highlight: node.val, found: false, path: [...visited], note: `${target} < ${node.val}  → go LEFT (discard entire right subtree)`, codePattern: "node.left" });
       node = node.left;
     } else {
-      steps.push({ kind:"bst", tree: root, highlight: node.val, found: false, note: `${target} > ${node.val}  → go RIGHT (discard entire left subtree)`, codePattern: "node.right" });
+      visited.push(node.val);
+      steps.push({ kind:"bst", tree: root, highlight: node.val, found: false, path: [...visited], note: `${target} > ${node.val}  → go RIGHT (discard entire left subtree)`, codePattern: "node.right" });
       node = node.right;
     }
   }
-  steps.push({ kind:"bst", tree: root, highlight: -1, found: false, note: `Reached null — ${target} not in tree. return false`, codePattern: "return false" });
+  steps.push({ kind:"bst", tree: root, highlight: -1, found: false, path: [...visited], note: `Reached null — ${target} not in tree. return false`, codePattern: "return false" });
   return steps;
 };
 
@@ -434,43 +437,133 @@ function ListViz({ nodes, highlight, newNode, deletedIdx, note, C }) {
 }
 
 // ── BST VISUALIZER ────────────────────────────────────────────────────────
-function TreeNode({ node, highlight, found, C, depth = 0 }) {
-  if (!node) return <div style={{ width: 40, opacity: 0 }} />;
+function TreeNode({ node, highlight, found, path = [], C, depth = 0 }) {
+  if (!node) return <div style={{ width: 44, opacity: 0 }} />;
   const mono = "'JetBrains Mono','Fira Code',monospace";
-  const isHL = highlight === node.val;
+  const isHL    = highlight === node.val;
   const isFound = found && isHL;
+  const isVisited = path.includes(node.val) && !isHL;
+
+  let bg, border, color, shadow, badge;
+  if (isFound)   { bg = `${C.green}28`; border = C.green; color = C.green; shadow = `0 0 14px ${C.green}55`; badge = "✓"; }
+  else if (isHL) { bg = `${C.blue}28`;  border = C.blue;  color = C.blue;  shadow = `0 0 14px ${C.blue}55`; badge = "→"; }
+  else if (isVisited) { bg = `${C.muted}18`; border = C.muted; color = C.muted; shadow = "none"; badge = "✔"; }
+  else           { bg = C.dim; border = C.border2; color = C.text; shadow = "none"; badge = null; }
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0 }}>
-      <div style={{
-        width: 40, height: 40, borderRadius: "50%",
-        background: isFound ? `${C.green}30` : isHL ? `${C.blue}30` : C.dim,
-        border: `2px solid ${isFound ? C.green : isHL ? C.blue : C.border2}`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontFamily: mono, fontSize: 13, fontWeight: 700,
-        color: isFound ? C.green : isHL ? C.blue : C.text,
-        transition: "all .2s",
-        boxShadow: isFound ? `0 0 10px ${C.green}44` : isHL ? `0 0 10px ${C.blue}44` : "none",
-      }}>
-        {node.val}
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      {/* Node circle */}
+      <div style={{ position: "relative" }}>
+        <div style={{
+          width: 44, height: 44, borderRadius: "50%",
+          background: bg, border: `2px solid ${border}`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontFamily: mono, fontSize: 13, fontWeight: 700, color,
+          transition: "all .25s", boxShadow: shadow,
+          opacity: (!isHL && !isFound && !isVisited) ? 0.55 : 1,
+        }}>
+          {node.val}
+        </div>
+        {badge && (
+          <div style={{
+            position: "absolute", top: -6, right: -6,
+            width: 16, height: 16, borderRadius: "50%",
+            background: isFound ? C.green : isHL ? C.blue : C.muted,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 8, color: "#000", fontWeight: 900,
+          }}>
+            {badge}
+          </div>
+        )}
       </div>
+
+      {/* Children + connector lines */}
       {(node.left || node.right) && (
-        <div style={{ display: "flex", gap: Math.max(4, 32 - depth * 10), marginTop: 4 }}>
-          <TreeNode node={node.left}  highlight={highlight} found={found} C={C} depth={depth+1} />
-          <TreeNode node={node.right} highlight={highlight} found={found} C={C} depth={depth+1} />
+        <div style={{ display: "flex", gap: Math.max(6, 36 - depth * 10), marginTop: 6 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            {node.left && (
+              <div style={{ fontSize: 8, color: C.muted, fontFamily: mono, marginBottom: 1, opacity: 0.6 }}>L</div>
+            )}
+            <TreeNode node={node.left}  highlight={highlight} found={found} path={path} C={C} depth={depth+1} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+            {node.right && (
+              <div style={{ fontSize: 8, color: C.muted, fontFamily: mono, marginBottom: 1, opacity: 0.6 }}>R</div>
+            )}
+            <TreeNode node={node.right} highlight={highlight} found={found} path={path} C={C} depth={depth+1} />
+          </div>
         </div>
       )}
     </div>
   );
 }
-function TreeViz({ tree, highlight, found, note, C }) {
+
+function TreeViz({ tree, highlight, found, path = [], note, C }) {
   const mono = "'JetBrains Mono','Fira Code',monospace";
+
+  // Build human-readable breadcrumb from path
+  const crumbs = path.map((v, i) => {
+    const isLast = i === path.length - 1;
+    return (
+      <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+        <span style={{
+          fontSize: 10, fontFamily: mono, fontWeight: 700,
+          color: isLast ? C.blue : C.muted,
+          padding: "1px 6px", borderRadius: 3,
+          background: isLast ? `${C.blue}20` : "transparent",
+          border: `1px solid ${isLast ? C.blue : C.border}`,
+          textDecoration: isLast ? "none" : "line-through",
+          opacity: isLast ? 1 : 0.5,
+        }}>
+          {v}
+        </span>
+        {i < path.length - 1 && (
+          <span style={{ color: C.muted, fontSize: 10 }}>→</span>
+        )}
+      </span>
+    );
+  });
+
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "center", padding: "8px 0 12px" }}>
-        <TreeNode node={tree} highlight={highlight} found={found} C={C} />
+      {/* Decision breadcrumb trail */}
+      {path.length > 0 && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap",
+          marginBottom: 10, padding: "5px 8px",
+          background: C.dim, borderRadius: 4,
+          border: `1px solid ${C.border}`,
+          borderLeft: `3px solid ${found ? C.green : C.blue}`,
+        }}>
+          <span style={{ fontSize: 8, color: C.muted, fontFamily: mono, fontWeight: 700, marginRight: 4, textTransform: "uppercase", letterSpacing: "0.08em" }}>path</span>
+          {crumbs}
+          {highlight !== -1 && !found && (
+            <>
+              <span style={{ color: C.muted, fontSize: 10 }}>→</span>
+              <span style={{ fontSize: 10, fontFamily: mono, fontWeight: 700, color: C.blue, padding: "1px 6px", borderRadius: 3, background: `${C.blue}20`, border: `1px solid ${C.blue}` }}>
+                {highlight} ← checking
+              </span>
+            </>
+          )}
+          {found && (
+            <>
+              <span style={{ color: C.green, fontSize: 10 }}>→</span>
+              <span style={{ fontSize: 10, fontFamily: mono, fontWeight: 700, color: C.green, padding: "1px 6px", borderRadius: 3, background: `${C.green}20`, border: `1px solid ${C.green}` }}>
+                {highlight} ✓ FOUND
+              </span>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Tree render */}
+      <div style={{ display: "flex", justifyContent: "center", padding: "4px 0 8px" }}>
+        <TreeNode node={tree} highlight={highlight} found={found} path={path} C={C} />
       </div>
+
+      {/* Note strip */}
       {note && (
-        <div style={{ fontFamily: mono, fontSize: 11, color: C.textDim, lineHeight: 1.5, padding: "6px 10px", background: C.dim, borderRadius: 4, borderLeft: `2px solid ${C.border2}` }}>
+        <div style={{ fontFamily: mono, fontSize: 11, color: C.textDim, lineHeight: 1.5, padding: "6px 10px", background: C.dim, borderRadius: 4, borderLeft: `2px solid ${found ? C.green : C.blue}` }}>
           {note}
         </div>
       )}
@@ -1781,12 +1874,18 @@ export default function DSA01Arrays({ onBack }) {
   const handleRun = async () => {
     setRunning(true);
     setRunResult(null);
+
+    // Detect unfilled blanks still in the user's code
+    const codeToCheck = lang === "js" ? jsCode : pyCode;
+    const hasBlanks = lesson.blanks?.some(b => codeToCheck.includes(b)) ?? false;
+
     if (lang === "js") {
       const res = runJS(lesson, jsCode);
       setRunResult(res);
-      // Always show trace — even on failure. Mark complete only on pass.
       if (res.testResult?.ok) setCompleted(c => new Set([...c, lessonIdx]));
-      if (lesson.hasTrace) buildTestTrace(lesson.id);
+      // Only trace when code actually executed (no error) AND blanks are filled
+      if (lesson.hasTrace && !res.error && !hasBlanks) buildTestTrace(lesson.id);
+      else if (hasBlanks || res.error) setTraceSteps([]); // clear stale trace
     } else {
       try {
         const { getPyodide } = await import("../../utils/pyodideRuntime.js").catch(() => ({ getPyodide: null }));
@@ -1799,9 +1898,10 @@ export default function DSA01Arrays({ onBack }) {
         if (typeof proxy?.destroy === "function") proxy.destroy();
         setRunResult({ testResult: { ok: parsed.ok, checks: parsed.checks, result: parsed.result } });
         if (parsed.ok) setCompleted(c => new Set([...c, lessonIdx]));
-        if (lesson.hasTrace) buildTestTrace(lesson.id);
+        if (lesson.hasTrace && !hasBlanks) buildTestTrace(lesson.id);
       } catch (e) {
         setRunResult({ error: e.message || String(e) });
+        setTraceSteps([]); // clear stale trace on error
       }
     }
     setRunning(false);
@@ -2227,7 +2327,7 @@ export default function DSA01Arrays({ onBack }) {
                     <ListViz nodes={cur.nodes} highlight={cur.highlight} newNode={cur.newNode ?? null} deletedIdx={cur.deletedIdx ?? -1} note={cur.note} C={HX} />
                   )}
                   {cur.kind === "bst" && (
-                    <TreeViz tree={cur.tree} highlight={cur.highlight} found={!!cur.found} note={cur.note} C={HX} />
+                    <TreeViz tree={cur.tree} highlight={cur.highlight} found={!!cur.found} path={cur.path ?? []} note={cur.note} C={HX} />
                   )}
                   {(cur.kind === "array" || !cur.kind) && (
                     <MemoryViz arr={cur.state} highlight={cur.highlight} lo={cur.lo} hi={cur.hi} mid={cur.mid} found={cur.found} phase={cur.phase} label={cur.note} C={HX} />
