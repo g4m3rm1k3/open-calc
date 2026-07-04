@@ -433,6 +433,9 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
           onMoveElementToRoot={(id, order) =>
             dispatch({ type: "MOVE_TO_ROOT", payload: { id, order } })
           }
+          onDuplicateElement={(id, parentId, order) =>
+            dispatch({ type: "DUPLICATE_ELEMENT", payload: { id, parentId, order } })
+          }
         />
 
         <div className={styles.divider} onMouseDown={handleDividerMouseDown} />

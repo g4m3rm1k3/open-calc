@@ -128,6 +128,7 @@ export type Action =
   | { type: "NEST_ELEMENT"; payload: { childId: string; parentId: string; order?: number } }
   | { type: "MOVE_TO_ROOT"; payload: { id: string; order: number } }
   | { type: "REORDER_ELEMENT"; payload: { id: string; parentId: string | null; order: number } }
+  | { type: "DUPLICATE_ELEMENT"; payload: { id: string; parentId: string | null; order: number } }
   | { type: "RESIZE_ELEMENT"; payload: { id: string; w: number; h: number } }
   | { type: "UPDATE_STYLE"; payload: { prop: string; value: string } }
   | { type: "UPDATE_MULTI_STYLE"; payload: { ids: string[]; prop: string; value: string } }

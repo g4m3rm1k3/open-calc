@@ -329,6 +329,7 @@ interface ElementTreeProps extends TreeProps {
   onReorder: (id: string, parentId: string | null, order: number) => void;
   onNest: (childId: string, parentId: string, order: number) => void;
   onMoveToRoot: (id: string, order: number) => void;
+  onDuplicate: (id: string, parentId: string | null, order: number) => void;
 }
 
 interface DropTargetInfo { parentId: string | null; order: number; inside?: boolean; }
@@ -358,17 +359,37 @@ function flattenTreeOrder(elements: LabElement[]): string[] {
   return order;
 }
 
-function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedIds, onToggleMultiSelect, onSelectRange, onReorder, onNest, onMoveToRoot }: ElementTreeProps) {
+function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedIds, onToggleMultiSelect, onSelectRange, onReorder, onNest, onMoveToRoot, onDuplicate }: ElementTreeProps) {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dropTarget, setDropTarget] = useState<DropTargetInfo | null>(null);
+  // Purely a view concern — not part of undo history or export, so plain
+  // local state is enough. Keyed by element id, not depth, so collapsing one
+  // branch doesn't affect siblings at the same level.
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
 
   const byId: Record<string, LabElement> = {};
   for (const e of elements) byId[e.id] = e;
   const flatOrder = flattenTreeOrder(elements);
+  const parentIdsWithChildren = new Set(elements.filter((e) => e.parentId).map((e) => e.parentId!));
+
+  const toggleCollapse = (id: string): void => {
+    setCollapsedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const collapseAll = (): void => setCollapsedIds(new Set(parentIdsWithChildren));
+  const expandAll = (): void => setCollapsedIds(new Set());
 
   const handleDragStartItem = (e: React.DragEvent, id: string): void => {
     e.stopPropagation();
-    e.dataTransfer.effectAllowed = "move";
+    // Must allow both operations up front — declaring only "move" here means
+    // the browser can refuse to complete the drop at all once the user holds
+    // Ctrl (requesting "copy", which isn't in the allowed set), rather than
+    // just showing the wrong cursor. That's almost certainly why Ctrl+drag
+    // looked like it "did nothing": the drop event never fired.
+    e.dataTransfer.effectAllowed = "copyMove";
     e.dataTransfer.setData("text/plain", id);
     setDraggingId(id);
   };
@@ -376,14 +397,20 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
     setDraggingId(null);
     setDropTarget(null);
   };
+  // Ctrl/Alt held while dropping = duplicate instead of move — same
+  // convention as Explorer/Finder/Figma drag-and-drop. dropEffect gives the
+  // OS-native copy cursor (a "+" badge) as feedback while dragging.
+  const isCopyModifier = (e: React.DragEvent): boolean => e.ctrlKey || e.altKey;
   const handleZoneEnter = (e: React.DragEvent, parentId: string | null, order: number): void => {
     e.preventDefault();
     e.stopPropagation();
+    e.dataTransfer.dropEffect = isCopyModifier(e) ? "copy" : "move";
     setDropTarget({ parentId, order });
   };
   const handleInsideEnter = (e: React.DragEvent, parentId: string, order: number): void => {
     e.preventDefault();
     e.stopPropagation();
+    e.dataTransfer.dropEffect = isCopyModifier(e) ? "copy" : "move";
     setDropTarget({ parentId, order, inside: true });
   };
   const handleDropItem = (e: React.DragEvent, parentId: string | null, order: number): void => {
@@ -392,7 +419,9 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
     const childId = e.dataTransfer.getData("text/plain");
     const child = childId ? byId[childId] : undefined;
     if (child) {
-      if (parentId === null) {
+      if (isCopyModifier(e)) {
+        onDuplicate(childId, parentId, order);
+      } else if (parentId === null) {
         if (child.parentId === null) onReorder(childId, null, order);
         else onMoveToRoot(childId, order);
       } else {
@@ -409,6 +438,7 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
   const handleBodyDragOver = (e: React.DragEvent): void => {
     e.preventDefault();
     e.stopPropagation();
+    e.dataTransfer.dropEffect = isCopyModifier(e) ? "copy" : "move";
     setDropTarget({ parentId: null, order: rootCount, inside: true });
   };
 
@@ -427,6 +457,14 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
 
   return (
     <div className={styles.codeTreePanel}>
+      <div className={styles.treeToolbar}>
+        <button className={styles.treeToolbarBtn} onClick={collapseAll} title="Collapse all elements with children">
+          Collapse All
+        </button>
+        <button className={styles.treeToolbarBtn} onClick={expandAll} title="Expand every collapsed element">
+          Expand All
+        </button>
+      </div>
       <button
         className={`${styles.treeItem} ${!selectedId ? styles.treeItemSelected : ""} ${bodyIsDropInside ? styles.treeItemDropInside : ""}`}
         onClick={() => onSelect(null)}
@@ -448,6 +486,9 @@ function ElementTree({ elements, selectedId, onSelect, onDelete, multiSelectedId
         multiSelectedIds={multiSelectedIds}
         onToggleMultiSelect={onToggleMultiSelect}
         onSelectRange={handleSelectRange}
+        onDuplicate={onDuplicate}
+        collapsedIds={collapsedIds}
+        onToggleCollapse={toggleCollapse}
         draggingId={draggingId}
         dropTarget={dropTarget}
         onDragStartItem={handleDragStartItem}
@@ -469,6 +510,9 @@ interface BranchProps extends TreeProps {
   // flattened tree order and the anchor (selectedId) needed to resolve that
   // into an actual range — TreeBranch itself has neither.
   onSelectRange: (targetId: string) => void;
+  onDuplicate: (id: string, parentId: string | null, order: number) => void;
+  collapsedIds: Set<string>;
+  onToggleCollapse: (id: string) => void;
   onDragStartItem: (e: React.DragEvent, id: string) => void;
   onDragEndItem: () => void;
   onZoneEnter: (e: React.DragEvent, parentId: string | null, order: number) => void;
@@ -477,7 +521,8 @@ interface BranchProps extends TreeProps {
 }
 
 function TreeBranch({
-  elements, selectedId, onSelect, onDelete, parentId, depth, multiSelectedIds, onToggleMultiSelect, onSelectRange,
+  elements, selectedId, onSelect, onDelete, parentId, depth, multiSelectedIds, onToggleMultiSelect, onSelectRange, onDuplicate,
+  collapsedIds, onToggleCollapse,
   draggingId, dropTarget, onDragStartItem, onDragEndItem, onZoneEnter, onInsideEnter, onDropItem,
 }: BranchProps) {
   const children = (elements || [])
@@ -509,19 +554,26 @@ function TreeBranch({
         const isContainer = CONTAINER_TAGS.has(el.tag);
         const isDropInside = isContainer && !!dropTarget?.inside && dropTarget.parentId === el.id;
         const ownChildCount = elements.filter((c) => c.parentId === el.id).length;
+        const hasChildren = ownChildCount > 0;
+        const isCollapsed = collapsedIds.has(el.id);
+        // Depth cycles through a small palette so nested regions read as
+        // distinct bands at a glance — the same idea as bracket-pair
+        // colorization in a code editor, applied to tree indentation instead.
+        const depthClass = styles[`treeDepth${((depth - 1) % 5) + 1}`];
 
         return (
           <div key={el.id}>
             <button
               className={[
                 styles.treeItem,
+                depthClass,
                 isSelected ? styles.treeItemSelected : "",
                 isMulti ? styles.treeItemMulti : "",
                 isDragging ? styles.treeItemDragging : "",
                 isDropInside ? styles.treeItemDropInside : "",
               ].join(" ")}
               style={{ paddingLeft: `${depth * 14 + 8}px` }}
-              title={`<${el.tag}>${el.content ? ` "${el.content.slice(0, 30)}"` : ""} — Ctrl+click to multi-select, Shift+click to select a range, drag to move`}
+              title={`<${el.tag}>${el.content ? ` "${el.content.slice(0, 30)}"` : ""} — Ctrl+click to multi-select, Shift+click to select a range, drag to move (hold Ctrl/Alt while dragging to duplicate)`}
               draggable
               onDragStart={(e) => onDragStartItem(e, el.id)}
               onDragEnd={onDragEndItem}
@@ -540,35 +592,57 @@ function TreeBranch({
                 }
               }}
             >
+              {hasChildren ? (
+                <span
+                  className={styles.treeCollapseToggle}
+                  onClick={(e) => { e.stopPropagation(); onToggleCollapse(el.id); }}
+                  title={isCollapsed ? "Expand" : "Collapse"}
+                >{isCollapsed ? "▸" : "▾"}</span>
+              ) : (
+                <span className={styles.treeCollapseSpacer} />
+              )}
               <span className={styles.treeTag}>&lt;{el.tag}&gt;</span>
               {el.content && (
                 <span className={styles.treeItemLabel}>{el.content.slice(0, 24)}</span>
               )}
+              {hasChildren && isCollapsed && (
+                <span className={styles.treeChildCount}>{ownChildCount}</span>
+              )}
               {isMulti && <span className={styles.treeMultiBadge}>✓</span>}
+              <button
+                className={styles.treeDuplicateBtn}
+                onClick={(e) => { e.stopPropagation(); onDuplicate(el.id, el.parentId, (el.order ?? 0) + 1); }}
+                title="Duplicate — inserts a copy right after this element"
+              >⧉</button>
               <button
                 className={styles.treeDeleteBtn}
                 onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
                 title="Delete"
               >×</button>
             </button>
-            <TreeBranch
-              elements={elements}
-              selectedId={selectedId}
-              onSelect={onSelect}
-              onDelete={onDelete}
-              parentId={el.id}
-              depth={depth + 1}
-              multiSelectedIds={multiSelectedIds}
-              onToggleMultiSelect={onToggleMultiSelect}
-              onSelectRange={onSelectRange}
-              draggingId={draggingId}
-              dropTarget={dropTarget}
-              onDragStartItem={onDragStartItem}
-              onDragEndItem={onDragEndItem}
-              onZoneEnter={onZoneEnter}
-              onInsideEnter={onInsideEnter}
-              onDropItem={onDropItem}
-            />
+            {!isCollapsed && (
+              <TreeBranch
+                elements={elements}
+                selectedId={selectedId}
+                onSelect={onSelect}
+                onDelete={onDelete}
+                parentId={el.id}
+                depth={depth + 1}
+                multiSelectedIds={multiSelectedIds}
+                onToggleMultiSelect={onToggleMultiSelect}
+                onSelectRange={onSelectRange}
+                onDuplicate={onDuplicate}
+                collapsedIds={collapsedIds}
+                onToggleCollapse={onToggleCollapse}
+                draggingId={draggingId}
+                dropTarget={dropTarget}
+                onDragStartItem={onDragStartItem}
+                onDragEndItem={onDragEndItem}
+                onZoneEnter={onZoneEnter}
+                onInsideEnter={onInsideEnter}
+                onDropItem={onDropItem}
+              />
+            )}
             {dropZone(i + 1, `${parentId ?? "root"}-dz-${i + 1}`)}
           </div>
         );
@@ -682,6 +756,7 @@ interface CodePanelProps {
   onReorderElement: (id: string, parentId: string | null, order: number) => void;
   onNestElement: (childId: string, parentId: string, order: number) => void;
   onMoveElementToRoot: (id: string, order: number) => void;
+  onDuplicateElement: (id: string, parentId: string | null, order: number) => void;
 }
 
 export default function CodePanel({
@@ -709,6 +784,7 @@ export default function CodePanel({
   onReorderElement,
   onNestElement,
   onMoveElementToRoot,
+  onDuplicateElement,
 }: CodePanelProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const C: any = useThemeColors();
@@ -839,6 +915,7 @@ export default function CodePanel({
             onReorder={onReorderElement}
             onNest={onNestElement}
             onMoveToRoot={onMoveElementToRoot}
+            onDuplicate={onDuplicateElement}
           />
         ) : activeTab === "toolbox" ? (
           <ToolboxPicker

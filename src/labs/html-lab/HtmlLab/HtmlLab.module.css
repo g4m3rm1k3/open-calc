@@ -907,6 +907,75 @@
 .codeTreePanel::-webkit-scrollbar-track { background: transparent; }
 .codeTreePanel::-webkit-scrollbar-thumb { background: var(--hl-border); border-radius: 3px; }
 
+.treeToolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--hl-bg);
+  border-bottom: 1px solid var(--hl-border);
+  margin-bottom: 2px;
+}
+.treeToolbarBtn {
+  padding: 3px 8px;
+  border: 1px solid var(--hl-border);
+  border-radius: 4px;
+  background: var(--hl-surface2);
+  color: var(--hl-muted);
+  font-size: 10px;
+  cursor: pointer;
+}
+.treeToolbarBtn:hover {
+  background: var(--hl-surface);
+  color: var(--hl-text);
+  border-color: var(--hl-accent);
+}
+
+.treeCollapseToggle {
+  flex-shrink: 0;
+  width: 12px;
+  text-align: center;
+  color: var(--hl-hint);
+  font-size: 9px;
+  cursor: pointer;
+  user-select: none;
+}
+.treeCollapseToggle:hover {
+  color: var(--hl-text);
+}
+.treeCollapseSpacer {
+  flex-shrink: 0;
+  width: 12px;
+}
+.treeChildCount {
+  flex-shrink: 0;
+  font-size: 9px;
+  color: var(--hl-hint);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 0 5px;
+  margin-left: 2px;
+}
+
+/* Nesting depth reads as a distinct color band, cycling every 5 levels — the
+   same idea as bracket-pair colorization in a code editor, so it's obvious
+   at a glance which rows share a parent even when many sit between the drag
+   source and a target far below (the user's exact complaint: "hard to see
+   ... drag to the closing div"). Kept as a left border, not a full-row tint,
+   so it doesn't fight with the selected/multi-select/dragging backgrounds
+   that already use full-row color. */
+/* Compound with .treeItem (not just .treeDepthN alone) so this reliably wins
+   over .treeItem's own `border: none` reset regardless of which rule ends up
+   later in the compiled stylesheet — two joined classes beats one at equal
+   source order, without resorting to !important. */
+.treeItem.treeDepth1 { border-left: 2px solid rgba(96, 165, 250, 0.5); }
+.treeItem.treeDepth2 { border-left: 2px solid rgba(167, 139, 250, 0.5); }
+.treeItem.treeDepth3 { border-left: 2px solid rgba(45, 212, 191, 0.5); }
+.treeItem.treeDepth4 { border-left: 2px solid rgba(251, 191, 36, 0.5); }
+.treeItem.treeDepth5 { border-left: 2px solid rgba(248, 113, 113, 0.5); }
+
 /* ── Properties panel ────────────────────────────────────────────────────────── */
 .propsPanel {
   flex-shrink: 0;
@@ -1460,7 +1529,8 @@
   background: rgba(255,255,255,0.05);
   color: var(--hl-text);
 }
-.treeItem:hover .treeDeleteBtn {
+.treeItem:hover .treeDeleteBtn,
+.treeItem:hover .treeDuplicateBtn {
   opacity: 1;
 }
 
@@ -1511,8 +1581,26 @@
   min-width: 0;
 }
 
-.treeDeleteBtn {
+.treeDuplicateBtn {
   margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--hl-hint);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0 3px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.1s, color 0.1s;
+  border-radius: 3px;
+}
+.treeDuplicateBtn:hover {
+  color: var(--hl-accent);
+  background: var(--hl-accent-bg);
+}
+
+.treeDeleteBtn {
   flex-shrink: 0;
   background: none;
   border: none;

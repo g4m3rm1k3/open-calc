@@ -537,6 +537,60 @@ export function labReducer(state: LabState, action: Action): LabState {
       };
     }
 
+    case "DUPLICATE_ELEMENT": {
+      // Ctrl/Alt+drag in the Tree — clone the dragged subtree (fresh ids
+      // throughout, so the clone's own descendants still point at each
+      // other correctly) and insert the clone at the drop target, leaving
+      // the original untouched. Unlike NEST_ELEMENT/REORDER_ELEMENT there's
+      // no move-within-same-parent-vs-different-parent distinction to make:
+      // inserting a brand-new clone at (parentId, order) is the same
+      // operation either way.
+      const { id, parentId, order } = action.payload;
+      const source = state.elements.find((e) => e.id === id);
+      if (!source) return state;
+      if (parentId !== null) {
+        const parent = state.elements.find((e) => e.id === parentId);
+        if (!parent || !CONTAINER_TAGS.has(parent.tag)) return state;
+      }
+
+      const s = withHistory(state);
+      const subtreeIds = getDescendants(s.elements, id);
+      subtreeIds.add(id);
+      const subtree = s.elements.filter((e) => subtreeIds.has(e.id));
+
+      const idMap = new Map<string, string>();
+      subtree.forEach((el) => idMap.set(el.id, genId()));
+
+      const siblings = s.elements
+        .filter((e) => (e.parentId ?? null) === parentId)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      const targetOrder = Math.max(0, Math.min(order, siblings.length));
+      const shiftedSiblings = siblings.map((e, i) => ({ ...e, order: i >= targetOrder ? i + 1 : i }));
+
+      const clones: LabElement[] = subtree.map((el) => {
+        // A copied HTML `id` attribute would collide with the original the
+        // moment both render on the same page — getElementById, #id
+        // selectors, and label[for] would all now only ever find one of them.
+        const attrs = el.attrs?.id ? { ...el.attrs, id: "" } : el.attrs;
+        return {
+          ...el,
+          id: idMap.get(el.id)!,
+          attrs,
+          parentId: el.id === id ? parentId : (el.parentId ? (idMap.get(el.parentId) ?? el.parentId) : null),
+          order: el.id === id ? targetOrder : el.order,
+        };
+      });
+
+      return {
+        ...s,
+        elements: [
+          ...s.elements.map((e) => shiftedSiblings.find((r) => r.id === e.id) ?? e),
+          ...clones,
+        ],
+        selectedId: idMap.get(id)!,
+      };
+    }
+
     case "RESIZE_ELEMENT": {
       const { id, w, h } = action.payload;
       return {

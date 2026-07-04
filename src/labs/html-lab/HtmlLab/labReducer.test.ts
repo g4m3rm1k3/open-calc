@@ -234,3 +234,70 @@ describe("SET_COLOR_MODE — real incident: a plain table never changed with the
     expect(badge.styles.border).toBe("1px solid #3b82f6");
   });
 });
+
+describe("DUPLICATE_ELEMENT — Ctrl/Alt+drag in the Tree", () => {
+  it("clones a leaf element at the target position, leaving the original untouched", () => {
+    const state: LabState = { ...initialState, elements: [el("a", "p", null, 0, {}, "Hello")] };
+    const next = labReducer(state, { type: "DUPLICATE_ELEMENT", payload: { id: "a", parentId: null, order: 1 } });
+
+    expect(next.elements).toHaveLength(2);
+    const original = next.elements.find((e) => e.id === "a")!;
+    expect(original.content).toBe("Hello");
+    const clone = next.elements.find((e) => e.id !== "a")!;
+    expect(clone.content).toBe("Hello");
+    expect(clone.id).not.toBe("a");
+    expect(next.selectedId).toBe(clone.id);
+  });
+
+  it("clones an entire subtree, remapping descendant parentIds to the new clone ids", () => {
+    const state: LabState = {
+      ...initialState,
+      elements: [
+        el("card", "div", null, 0),
+        el("title", "h3", "card", 0, {}, "Title"),
+        el("body", "p", "card", 1, {}, "Body text"),
+      ],
+    };
+    const next = labReducer(state, { type: "DUPLICATE_ELEMENT", payload: { id: "card", parentId: null, order: 1 } });
+
+    expect(next.elements).toHaveLength(6);
+    const clonedCard = next.elements.find((e) => e.id !== "card" && e.tag === "div")!;
+    const clonedChildren = next.elements.filter((e) => e.parentId === clonedCard.id);
+    expect(clonedChildren.map((c) => c.content).sort()).toEqual(["Body text", "Title"]);
+    // originals still intact and still pointing at the original card
+    expect(next.elements.filter((e) => e.parentId === "card")).toHaveLength(2);
+  });
+
+  it("clears a copied HTML id attribute so the duplicate doesn't collide with the original", () => {
+    const source: LabElement = { id: "a", tag: "div", parentId: null, order: 0, content: "", attrs: { id: "left", class: "" }, styles: {}, mediaQueries: [] };
+    const state: LabState = { ...initialState, elements: [source] };
+    const next = labReducer(state, { type: "DUPLICATE_ELEMENT", payload: { id: "a", parentId: null, order: 1 } });
+
+    const clone = next.elements.find((e) => e.id !== "a")!;
+    expect(clone.attrs.id).toBe("");
+    // original keeps its id attribute
+    expect(next.elements.find((e) => e.id === "a")!.attrs.id).toBe("left");
+  });
+
+  it("does nothing when the drop target isn't a container tag", () => {
+    const state: LabState = {
+      ...initialState,
+      elements: [el("a", "p", null, 0, {}, "Hello"), el("b", "button", null, 1, {}, "World")],
+    };
+    const next = labReducer(state, { type: "DUPLICATE_ELEMENT", payload: { id: "a", parentId: "b", order: 0 } });
+    expect(next.elements).toHaveLength(2);
+  });
+
+  it("shifts existing siblings at the drop position instead of overwriting them", () => {
+    const state: LabState = {
+      ...initialState,
+      elements: [
+        el("a", "p", null, 0, {}, "First"),
+        el("b", "p", null, 1, {}, "Second"),
+      ],
+    };
+    const next = labReducer(state, { type: "DUPLICATE_ELEMENT", payload: { id: "a", parentId: null, order: 1 } });
+    const roots = next.elements.filter((e) => !e.parentId).sort((x, y) => (x.order ?? 0) - (y.order ?? 0));
+    expect(roots.map((e) => e.content)).toEqual(["First", "First", "Second"]);
+  });
+});
