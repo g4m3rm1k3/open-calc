@@ -184,18 +184,103 @@ export function generateSteps(source) {
   }
 }
 
-// ── Lesson enrichment ──────────────────────────────────────────────────────────
-// Runs each lesson step's code through the interpreter and attaches the most
-// relevant stackSnapshot so the variables panel populates in lesson mode.
+// ── TypeScript stripping ───────────────────────────────────────────────────────
+// Converts TypeScript-annotated code to plain JS for the interpreter.
+// Handles the subset of TS syntax used in the abstraction-viz lessons.
 
+export function stripTypeScript(code) {
+  let s = code
+
+  // interface blocks (single-level braces, multi-line)
+  s = s.replace(/^interface\s+\w+(?:<[^>]+>)?(?:\s+extends\s+[\w<>, .]+)?\s*\{[^}]*\}\n?/gm, '')
+
+  // single-line type aliases
+  s = s.replace(/^type\s+\w+(?:<[^>]+>)?\s*=.+$\n?/gm, '')
+
+  // 'implements' clauses
+  s = s.replace(/\s+implements\s+[\w<>, ]+(?=\s*[\n{])/g, '')
+
+  // generic type params on class/function declarations: <T>, <T, U>, <T extends Foo>
+  s = s.replace(/<(?:[A-Z]\w*(?:\s+extends\s+\w+(?:\.\w+)?)?,?\s*)+>(?=\s*[({,])/g, '')
+
+  // TypeScript access modifiers and keywords
+  s = s.replace(/\b(public|private|protected|readonly|abstract|override|declare)\s+/g, '')
+
+  // class body property declarations — one or more "name: Type" per line, separated by ";"
+  s = s.replace(/^(\s+)\w+\??:\s*\w+(?:\[\])?(?:\s*;\s*\w+\??:\s*\w+(?:\[\])?)*\s*(?:\/\/.*)?$/gm, '')
+
+  // TypeScript type name pattern — only strips types that look like TS (not JS literal values like 30).
+  // Matches: string, number, boolean, void, any, never, undefined, null, unknown, object,
+  //          or any PascalCase name (User, Animal, Shape) — never matches numeric or string literals.
+  const tsTypePat = '(?:string|number|boolean|void|any|never|undefined|null|unknown|object|[A-Z]\\w*)'
+  const tsTypeSeq = `${tsTypePat}(?:\\[\\])?(?:\\s*\\|\\s*${tsTypePat}(?:\\[\\])?)*`
+
+  // return type annotations: ): SomeType {  or  ): SomeType\n
+  s = s.replace(new RegExp(`\\)\\s*:\\s*${tsTypeSeq}(?=\\s*[\\n{])`, 'g'), ')')
+
+  // parameter type annotations: name: Type before , or )
+  s = s.replace(new RegExp(`(\\b\\w+)\\s*\\??:\\s*${tsTypeSeq}(?=\\s*[,)])`, 'g'), '$1')
+
+  // variable type annotations: const x: Type =
+  s = s.replace(new RegExp(`((?:const|let|var)\\s+\\w+)\\s*:\\s*${tsTypeSeq}(?=\\s*=)`, 'g'), '$1')
+
+  // 'as SomeType' casts
+  s = s.replace(/\s+as\s+\w+(?:\[\])?/g, '')
+
+  // generic type args in new expressions: new Box<number>() → new Box()
+  s = s.replace(/\bnew\s+(\w+)<[^>]+>/g, 'new $1')
+
+  // generic type args in function calls: foo<Number>() → foo()
+  s = s.replace(/(\b\w+)<[A-Z]\w*>(?=\s*\()/g, '$1')
+
+  s = s.replace(/\n{3,}/g, '\n\n')
+  return s.trim()
+}
+
+// ── Live step runner ───────────────────────────────────────────────────────────
+// Runs a single lesson step's code and returns { output, snapshot }.
+// Called live when the user navigates to a step — no pre-computation.
+
+export function runStep(step, lessonLang) {
+  const code = step.runCode ?? (lessonLang === 'ts' ? stripTypeScript(step.code) : step.code)
+  if (!code?.trim()) return { output: [], snapshot: [] }
+
+  const { events, output } = run(code)
+
+  const activeLines = new Set()
+  for (const h of step.active ?? []) {
+    for (let l = h.startLine; l <= h.endLine; l++) activeLines.add(l)
+  }
+
+  let best = null
+  for (const ev of events) {
+    if (ev.native) continue
+    if (ev.type !== EventType.FUNCTION_CALL && ev.type !== EventType.FUNCTION_RETURN) continue
+    const line = ev.sourceLocation?.line
+    if (line && activeLines.has(line)) { best = ev.stackSnapshot ?? []; break }
+  }
+  if (!best) {
+    for (let i = events.length - 1; i >= 0; i--) {
+      if (events[i].stackSnapshot?.length) { best = events[i].stackSnapshot; break }
+    }
+  }
+
+  return { output: output ?? [], snapshot: best ?? [] }
+}
+
+// ── Lesson enrichment (legacy — kept for reference) ───────────────────────────
 export function enrichLessonWithSnapshots(lesson) {
   return {
     ...lesson,
     steps: lesson.steps.map(step => {
       if (step.stackSnapshot?.length) return step  // already has data
 
-      const { events } = run(step.code)
-      if (!events.length) return { ...step, stackSnapshot: [] }
+      // Use runCode override for steps that need hand-written JS equivalents (e.g. complex TS patterns)
+      const sourceToRun = step.runCode ?? (lesson.lang === 'ts' ? stripTypeScript(step.code) : step.code)
+
+      const { events, output } = run(sourceToRun)
+      const outputSoFar = output ?? []
+      if (!events.length) return { ...step, stackSnapshot: [], outputSoFar }
 
       // Build a set of "active" line numbers from the highlights
       const activeLines = new Set()
@@ -219,7 +304,7 @@ export function enrichLessonWithSnapshots(lesson) {
         }
       }
 
-      return { ...step, stackSnapshot: best ?? [] }
+      return { ...step, stackSnapshot: best ?? [], outputSoFar }
     }),
   }
 }

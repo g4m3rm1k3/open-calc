@@ -358,25 +358,63 @@ class Interpreter {
     const superCls = node.superClass ? this._evalExpr(node.superClass, env) : null
     const protoRef = this.heap.allocate('prototype', {}, superCls?.__protoId ?? null)
 
+    // Instance methods close over a derived env that exposes __superClass,
+    // enabling super.method() calls from within any instance method.
+    const methodEnv = superCls ? env.extend('class-body') : env
+    if (superCls) methodEnv.define('__superClass', superCls, 'const')
+
     const methods = {}
+    const instanceFields = []  // PropertyDefinition entries (public or private)
+    const accessorMap   = {}   // key → { getter, setter }
+
     for (const member of node.body.body) {
+      // Class field declarations: `#x = 0` or `count = 0`
+      if (member.type === 'PropertyDefinition') {
+        const isPrivate = member.key.type === 'PrivateIdentifier'
+        const key = isPrivate
+          ? member.key.name
+          : (member.computed ? this._evalExpr(member.key, env) : (member.key.name ?? member.key.value))
+        const initVal = member.value ? this._evalExpr(member.value, env) : undefined
+        instanceFields.push({ name: key, private: isPrivate, init: initVal })
+        continue
+      }
+
       if (member.type !== 'MethodDefinition') continue
-      const key   = member.computed ? this._evalExpr(member.key, env) : member.key.name ?? member.key.value
-      const fn    = this._makeFunction(member.value, env, key)
+
+      const isPrivate = member.key.type === 'PrivateIdentifier'
+      const key = isPrivate
+        ? member.key.name
+        : (member.computed ? this._evalExpr(member.key, env) : (member.key.name ?? member.key.value))
+      const storageKey = isPrivate ? ('__priv_' + key) : key
+      const closureEnv = member.static ? env : methodEnv
+      const fn = this._makeFunction(member.value, closureEnv, key)
+
       if (member.static) {
         methods['static:' + key] = fn
+      } else if (member.kind === 'get') {
+        if (!accessorMap[key]) accessorMap[key] = { getter: null, setter: null }
+        accessorMap[key].getter = fn
+      } else if (member.kind === 'set') {
+        if (!accessorMap[key]) accessorMap[key] = { getter: null, setter: null }
+        accessorMap[key].setter = fn
       } else {
-        this.heap.set(protoRef, key, fn)
+        this.heap.set(protoRef, storageKey, fn)
       }
     }
 
+    // Store accessor descriptors on the prototype so _evalMember can intercept them
+    for (const [key, acc] of Object.entries(accessorMap)) {
+      this.heap.set(protoRef, key, { __kind: 'accessor', getter: acc.getter, setter: acc.setter })
+    }
+
     const cls = {
-      __kind:    'class',
-      name:      node.id?.name ?? '(anonymous)',
+      __kind:        'class',
+      name:          node.id?.name ?? '(anonymous)',
       protoRef,
       superCls,
-      __protoId: protoRef.objectId,
+      __protoId:     protoRef.objectId,
       staticMethods: methods,
+      instanceFields,
     }
     return cls
   }
@@ -408,6 +446,7 @@ class Interpreter {
       case 'SpreadElement':           return this._evalExpr(node.argument, env)
       case 'AssignmentPattern':       return this._evalExpr(node.right, env)
       case 'ChainExpression':         return this._evalChain(node, env)
+      case 'Super':                   return { __kind: 'super' }
       default:
         return undefined
     }
@@ -590,17 +629,49 @@ class Interpreter {
   // ── Member expressions ─────────────────────────────────────────────────────
 
   _evalMember(node, env) {
+    // super.prop — look up on parent class prototype, not on current instance
+    if (node.object.type === 'Super') {
+      const prop = node.computed
+        ? String(this._evalExpr(node.property, env))
+        : node.property.name
+      const superCls = (() => { try { return env.lookup('__superClass') } catch { return undefined } })()
+      if (!superCls) return undefined
+      const heapVal = this.heap.get(superCls.protoRef, prop)
+      if (heapVal?.__kind === 'accessor') {
+        if (!heapVal.getter) return undefined
+        const thisVal = (() => { try { return env.lookup('this') } catch { return undefined } })()
+        return this._apply(heapVal.getter, [], thisVal, node, env)
+      }
+      return heapVal
+    }
+
     const obj  = this._evalExpr(node.object, env)
     if (node.optional && (obj === null || obj === undefined)) return undefined
 
-    const prop = node.computed
-      ? String(this._evalExpr(node.property, env))
-      : node.property.name
+    const isPrivate = !node.computed && node.property.type === 'PrivateIdentifier'
+    const prop = isPrivate
+      ? ('__priv_' + node.property.name)
+      : node.computed
+        ? String(this._evalExpr(node.property, env))
+        : node.property.name
+
+    // Class objects: static method/property lookup
+    if (obj?.__kind === 'class') {
+      const staticFn = obj.staticMethods?.['static:' + (isPrivate ? node.property.name : prop)]
+      if (staticFn !== undefined) return staticFn
+      return undefined
+    }
 
     if (isRef(obj)) {
       const heapVal = this.heap.get(obj, prop)
-      // If not found on heap, check built-in array/object methods
-      if (heapVal !== undefined) return heapVal
+      if (heapVal !== undefined) {
+        // Invoke getter accessor transparently
+        if (heapVal?.__kind === 'accessor') {
+          if (!heapVal.getter) return undefined
+          return this._apply(heapVal.getter, [], obj, node, env)
+        }
+        return heapVal
+      }
       return this._primitiveGet(obj, prop)
     }
 
@@ -617,11 +688,20 @@ class Interpreter {
 
   _memberSet(node, value, env) {
     const obj  = this._evalExpr(node.object, env)
-    const prop = node.computed
-      ? String(this._evalExpr(node.property, env))
-      : node.property.name
+    const isPrivate = !node.computed && node.property.type === 'PrivateIdentifier'
+    const prop = isPrivate
+      ? ('__priv_' + node.property.name)
+      : node.computed
+        ? String(this._evalExpr(node.property, env))
+        : node.property.name
 
     if (isRef(obj)) {
+      const existing = this.heap.get(obj, prop)
+      // Call setter if the prototype has an accessor descriptor
+      if (existing?.__kind === 'accessor') {
+        if (!existing.setter) throw new TypeError(`Cannot set property '${prop}': no setter`)
+        return this._apply(existing.setter, [value], obj, node, env)
+      }
       const old = this.heap.get(obj, prop)
       this.heap.set(obj, prop, value)
       this._emit(EventType.OBJECT_MUTATE, node, env, {
@@ -695,13 +775,60 @@ class Interpreter {
 
     let fn, thisVal
 
+    // super() — call parent constructor body with the current this (in-place, no new object)
+    if (node.callee.type === 'Super') {
+      const currThis = (() => { try { return env.lookup('this') } catch { return undefined } })()
+      const superCls = (() => { try { return env.lookup('__superClass') ?? env.lookup('__super__') } catch { return undefined } })()
+      const args = this._evalArgs(node.arguments, env)
+      if (superCls) {
+        // Initialize parent instance fields first
+        if (superCls.instanceFields?.length) {
+          for (const field of superCls.instanceFields) {
+            const fkey = field.private ? ('__priv_' + field.name) : field.name
+            this.heap.set(currThis, fkey, field.init ?? undefined)
+          }
+        }
+        const ctorFn = this.heap.get(superCls.protoRef, 'constructor')
+        if (ctorFn?.__kind === 'function') {
+          const { node: fnNode, closure } = ctorFn
+          const fnEnv = closure.extend('function')
+          fnEnv.define('this', currThis, 'const')
+          if (superCls.superCls) fnEnv.define('__superClass', superCls.superCls, 'const')
+          this._bindParams(fnNode.params, args, fnEnv)
+          if (fnNode.body.type === 'BlockStatement') this._hoistDeclarations(fnNode.body.body, fnEnv)
+          this._evalBody(fnNode.body.body, fnEnv)
+        }
+      }
+      return undefined
+    }
+
     if (node.callee.type === 'MemberExpression') {
+      // super.method() — dispatch to parent prototype method with current this
+      if (node.callee.object.type === 'Super') {
+        const prop = node.callee.computed
+          ? String(this._evalExpr(node.callee.property, env))
+          : node.callee.property.name
+        const superCls = (() => { try { return env.lookup('__superClass') ?? env.lookup('__super__') } catch { return undefined } })()
+        thisVal = (() => { try { return env.lookup('this') } catch { return undefined } })()
+        fn = superCls ? this.heap.get(superCls.protoRef, prop) : undefined
+        const args = this._evalArgs(node.arguments, env)
+        return this._apply(fn, args, thisVal, node, env)
+      }
+
       thisVal = this._evalExpr(node.callee.object, env)
-      const prop = node.callee.computed
-        ? String(this._evalExpr(node.callee.property, env))
-        : node.callee.property.name
-      if (isRef(thisVal)) {
+      const calleeIsPrivate = !node.callee.computed && node.callee.property.type === 'PrivateIdentifier'
+      const prop = calleeIsPrivate
+        ? ('__priv_' + node.callee.property.name)
+        : node.callee.computed
+          ? String(this._evalExpr(node.callee.property, env))
+          : node.callee.property.name
+      if (thisVal?.__kind === 'class') {
+        // Static method call: Animal.create(...)
+        fn = thisVal.staticMethods?.['static:' + (calleeIsPrivate ? node.callee.property.name : prop)]
+      } else if (isRef(thisVal)) {
         fn = this.heap.get(thisVal, prop)
+        // Accessor in call position: invoke getter to get the function, then call it
+        if (fn?.__kind === 'accessor') fn = fn.getter ? this._apply(fn.getter, [], thisVal, node, env) : undefined
         if (fn === undefined) fn = this._primitiveGet(thisVal, prop)
       } else if (typeof thisVal === 'object' && thisVal !== null) {
         fn = thisVal[prop] ?? this._primitiveGet(thisVal, prop)
@@ -823,6 +950,14 @@ class Interpreter {
     this._emit(EventType.OBJECT_CREATE, callNode, callerEnv, {
       objectId: instance.objectId, objectType: cls.name,
     })
+
+    // Initialize class fields (public and private) before constructor runs
+    if (cls.instanceFields?.length) {
+      for (const field of cls.instanceFields) {
+        const key = field.private ? ('__priv_' + field.name) : field.name
+        this.heap.set(instance, key, field.init ?? undefined)
+      }
+    }
 
     // Find and call constructor
     const ctorFn = this.heap.get(cls.protoRef, 'constructor')
@@ -985,6 +1120,12 @@ class Interpreter {
       if (prop === 'charAt')   return { __kind: 'native', name: 'String.charAt',   fn: (t, [i]) => t.charAt(i) }
       if (prop === 'charCodeAt') return { __kind: 'native', name: 'String.charCodeAt', fn: (t, [i]) => t.charCodeAt(i) }
       if (!isNaN(prop))        return value[prop]
+      return undefined
+    }
+    if (typeof value === 'number') {
+      if (prop === 'toFixed')     return { __kind: 'native', name: 'Number.toFixed',     fn: (t, [d]) => t.toFixed(d ?? 0) }
+      if (prop === 'toPrecision') return { __kind: 'native', name: 'Number.toPrecision', fn: (t, [p]) => t.toPrecision(p) }
+      if (prop === 'toString')    return { __kind: 'native', name: 'Number.toString',    fn: (t, [r]) => t.toString(r) }
       return undefined
     }
     if (isRef(value)) {
@@ -1197,6 +1338,18 @@ class Interpreter {
 
     env.define('String', {
       __kind: 'native', name: 'String',
+      fn: (_, [val]) => {
+        if (val === null) return 'null'
+        if (val === undefined) return 'undefined'
+        if (isRef(val)) {
+          const toStr = self.heap.get(val, 'toString')
+          if (toStr?.__kind === 'function' || toStr?.__kind === 'native') {
+            return self._apply(toStr, [], val, null, new Environment(null))
+          }
+          return '[object Object]'
+        }
+        return String(val)
+      },
       fromCharCode: native('String.fromCharCode', (_, args) => String.fromCharCode(...args)),
     }, 'const')
 
@@ -1250,6 +1403,45 @@ class Interpreter {
     env.define('parseFloat', native('parseFloat', (_, [x]) => parseFloat(x)), 'const')
     env.define('isNaN',      native('isNaN',      (_, [x]) => isNaN(x)), 'const')
     env.define('isFinite',   native('isFinite',   (_, [x]) => isFinite(x)), 'const')
+
+    env.define('JSON', {
+      __kind: 'native', name: 'JSON',
+      stringify: native('JSON.stringify', (_, [val]) => {
+        function toJs(v) {
+          if (v === null || v === undefined || typeof v !== 'object') return v
+          if (isRef(v)) {
+            const obj = self.heap.objects.get(v.objectId)
+            if (!obj) return undefined
+            if (obj.type === 'Array') {
+              const len = self.heap.get(v, 'length') ?? 0
+              const arr = []
+              for (let i = 0; i < len; i++) arr.push(toJs(self.heap.get(v, String(i))))
+              return arr
+            }
+            const out = {}
+            for (const k of self.heap.ownKeys(v)) out[k] = toJs(self.heap.get(v, k))
+            return out
+          }
+          return v
+        }
+        return JSON.stringify(toJs(val))
+      }),
+      parse: native('JSON.parse', (_, [s]) => {
+        const parsed = JSON.parse(s)
+        function fromJs(v) {
+          if (v === null || typeof v !== 'object') return v
+          if (Array.isArray(v)) {
+            const ref = self.heap.allocate('Array', { length: v.length })
+            v.forEach((item, i) => self.heap.set(ref, String(i), fromJs(item)))
+            return ref
+          }
+          const ref = self.heap.allocate('Object', {})
+          Object.entries(v).forEach(([k, val]) => self.heap.set(ref, k, fromJs(val)))
+          return ref
+        }
+        return fromJs(parsed)
+      }),
+    }, 'const')
     env.define('String',     env.lookup('String'), 'const')
     env.define('typeof',     undefined, 'const')
 

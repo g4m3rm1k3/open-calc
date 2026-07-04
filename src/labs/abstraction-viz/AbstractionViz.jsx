@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import Editor from '@monaco-editor/react'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
-import { LESSONS } from './lessons.js'
-import { generateSteps, enrichLessonWithSnapshots } from './generateSteps.js'
+import { LESSONS } from './lessons/index.js'
+import { generateSteps, runStep } from './generateSteps.js'
 
 // ── Colours ────────────────────────────────────────────────────────────────────
 const HEX = {
@@ -141,6 +141,13 @@ function VarsPanel({ snapshot, hint }) {
   )
 }
 
+// ── Lesson groups for nav sidebar ─────────────────────────────────────────────
+const LESSON_GROUPS = LESSONS.reduce((acc, l, i) => {
+  if (!acc[l.tag]) acc[l.tag] = []
+  acc[l.tag].push({ lesson: l, idx: i })
+  return acc
+}, {})
+
 // ── Shared ─────────────────────────────────────────────────────────────────────
 const EMPTY_STEP = { title: '', code: '', explanation: '', active: [], connections: [], outputSoFar: [], stackSnapshot: [] }
 
@@ -154,36 +161,36 @@ export default function AbstractionViz({ onBack }) {
   const [speed,     setSpeed]     = useState(1)
   const [laneH,     setLaneH]     = useState(600)
 
-  const [mode,       setMode]       = useState('lessons')
-  const [userCode,   setUserCode]   = useState('')
-  const [userLesson, setUserLesson] = useState(null)
-  const [genError,   setGenError]   = useState(null)
-  const [enriched,   setEnriched]   = useState({})  // lessonId → enriched lesson
+  const [mode,         setMode]       = useState('lessons')
+  const [userCode,     setUserCode]   = useState('')
+  const [userLesson,   setUserLesson] = useState(null)
+  const [genError,     setGenError]   = useState(null)
+  const [navOpen,      setNavOpen]    = useState(true)
+  const [liveOutput,   setLiveOutput]   = useState([])
+  const [liveSnapshot, setLiveSnapshot] = useState([])
 
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
   const decorRef  = useRef(null)
   const laneRef   = useRef(null)
 
-  // Lazily enrich the current lesson with interpreter snapshots
-  useEffect(() => {
-    if (mode !== 'lessons') return
-    const raw = LESSONS[lessonIdx]
-    if (!raw || enriched[raw.id]) return
-    const result = enrichLessonWithSnapshots(raw)
-    setEnriched(prev => ({ ...prev, [raw.id]: result }))
-  }, [lessonIdx, mode]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const baseLesson = LESSONS[lessonIdx] ?? LESSONS[0]
-  const lesson     = (mode === 'user' && userLesson)
+  const lesson = (mode === 'user' && userLesson)
     ? userLesson
-    : (enriched[baseLesson.id] ?? baseLesson)
+    : (LESSONS[lessonIdx] ?? LESSONS[0])
   const safeStepIdx = Math.min(stepIdx, lesson.steps.length - 1)
   const step        = (mode === 'user' && !userLesson) ? EMPTY_STEP : (lesson.steps[safeStepIdx] ?? EMPTY_STEP)
   const totalLines  = step.code.split('\n').length
   const isFirst     = safeStepIdx === 0
   const isLast      = safeStepIdx === lesson.steps.length - 1
   const showInput   = mode === 'user' && !userLesson
+
+  // Run the current step's code live and capture output + variables
+  useEffect(() => {
+    if (mode !== 'lessons') return
+    const { output, snapshot } = runStep(step, lesson.lang)
+    setLiveOutput(output)
+    setLiveSnapshot(snapshot)
+  }, [lessonIdx, safeStepIdx, mode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync lane height
   useEffect(() => {
@@ -282,21 +289,10 @@ export default function AbstractionViz({ onBack }) {
         <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Abstraction Visualizer</span>
         <span className="text-slate-300 dark:text-slate-700">|</span>
 
-        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none min-w-0 flex-1">
+        <div className="flex items-center gap-1 min-w-0 flex-1">
           <button onClick={() => setMode('lessons')} className={tabCls(mode === 'lessons')}>Lessons</button>
           <button onClick={() => setMode('user')} className={tabCls(mode === 'user')}>Your Code</button>
 
-          {mode === 'lessons' && (
-            <>
-              <span className="text-slate-300 dark:text-slate-700 mx-0.5">|</span>
-              {LESSONS.map((l, i) => (
-                <button key={l.id} onClick={() => setLessonIdx(i)} className={tabCls(i === lessonIdx)}>
-                  <span className="opacity-50 mr-1 text-[9px]">{l.tag.split(' ')[0]}</span>
-                  {l.title}
-                </button>
-              ))}
-            </>
-          )}
           {mode === 'user' && userLesson && (
             <>
               <span className="text-slate-300 dark:text-slate-700 mx-0.5">|</span>
@@ -307,10 +303,54 @@ export default function AbstractionViz({ onBack }) {
             </>
           )}
         </div>
+
+        {mode === 'lessons' && (
+          <button onClick={() => setNavOpen(o => !o)}
+            title={navOpen ? 'Collapse lesson nav' : 'Open lesson nav'}
+            className="shrink-0 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors px-1.5 py-1 rounded">
+            {navOpen ? '◀' : '▶'}
+          </button>
+        )}
       </div>
 
-      {/* Three-panel body */}
+      {/* Body: sidebar + panels */}
       <div className="flex flex-1 min-h-0">
+
+        {/* Lesson nav sidebar */}
+        {mode === 'lessons' && (
+          navOpen ? (
+            <div className="shrink-0 flex flex-col min-h-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0d1117]"
+              style={{ width: 196 }}>
+              <div className="shrink-0 px-3 pt-3 pb-2 border-b border-slate-200 dark:border-slate-800">
+                <span className="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase">Lessons</span>
+              </div>
+              <div className="flex-1 overflow-y-auto py-2">
+                {Object.entries(LESSON_GROUPS).map(([tag, items]) => (
+                  <div key={tag} className="mb-3">
+                    <div className="px-3 py-1 text-[9px] font-bold tracking-widest text-indigo-400 dark:text-indigo-500 uppercase">
+                      {tag}
+                    </div>
+                    {items.map(({ lesson: l, idx: i }) => (
+                      <button key={l.id}
+                        onClick={() => { setLessonIdx(i); setStepIdx(0); setIsPlaying(false) }}
+                        className={`w-full text-left px-3 py-1.5 text-[11px] font-medium transition-colors rounded-none ${
+                          i === lessonIdx
+                            ? 'bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-l-2 border-indigo-500'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 border-l-2 border-transparent'
+                        }`}>
+                        {l.title}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="shrink-0 flex flex-col items-center pt-3 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0d1117]"
+              style={{ width: 28 }}>
+            </div>
+          )
+        )}
 
         {/* Panel 1 — Explanation */}
         <div className="flex flex-col min-h-0 border-r border-slate-200 dark:border-slate-800" style={{ width: '26%' }}>
@@ -353,7 +393,11 @@ export default function AbstractionViz({ onBack }) {
                 <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">{step.title}</h2>
               </div>
               <div className="flex-1 overflow-y-auto px-5 py-4 min-h-0">
-                <p className="text-[13px] leading-relaxed text-slate-600 dark:text-slate-400 mb-5">{step.explanation}</p>
+                <div className="mb-5 flex flex-col gap-3">
+                  {(Array.isArray(step.explanation) ? step.explanation : [step.explanation]).map((para, pi) => (
+                    <p key={pi} className="text-[13px] leading-relaxed text-slate-600 dark:text-slate-400">{para}</p>
+                  ))}
+                </div>
                 <div className="flex flex-col gap-2">
                   {step.active.map((h, i) => (
                     <div key={i} className="flex items-center gap-2.5">
@@ -372,7 +416,7 @@ export default function AbstractionViz({ onBack }) {
         <div className="flex flex-1 min-h-0">
           <div ref={laneRef} className="flex-1 min-h-0 relative">
             <Editor
-              language="javascript"
+              language={lesson.lang === 'ts' ? 'typescript' : 'javascript'}
               value={step.code}
               theme={themeStyles.monaco}
               beforeMount={setupOpenCalcMonaco}
@@ -396,7 +440,7 @@ export default function AbstractionViz({ onBack }) {
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto bg-white dark:bg-slate-950">
             <VarsPanel
-              snapshot={step.stackSnapshot}
+              snapshot={mode === 'user' ? (step.stackSnapshot ?? []) : liveSnapshot}
               hint={showInput ? 'Paste code and click Trace It →' : 'Step through to see variables'}
             />
           </div>
@@ -407,7 +451,7 @@ export default function AbstractionViz({ onBack }) {
       <div className="shrink-0 border-t border-slate-800 bg-slate-950 font-mono text-[11px] overflow-x-auto overflow-y-auto px-4 py-2 flex flex-col gap-0.5"
         style={{ minHeight: 36, maxHeight: 112 }}>
         <span className="text-slate-600 text-[10px] select-none">console</span>
-        {(step.outputSoFar ?? []).map((line, i) => (
+        {(mode === 'user' ? (step.outputSoFar ?? []) : liveOutput).map((line, i) => (
           <span key={i} className="whitespace-pre leading-snug text-emerald-400">{line}</span>
         ))}
       </div>
