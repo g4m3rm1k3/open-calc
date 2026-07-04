@@ -220,7 +220,8 @@ export default function AppShell({ children }) {
     location.pathname.startsWith("/viz-builder") ||
     location.pathname.startsWith("/playground") ||
     location.pathname.startsWith("/lesson-builder") ||
-    location.pathname.startsWith("/la-explorer");
+    location.pathname.startsWith("/la-explorer") ||
+    location.pathname.startsWith("/dev/abstractions");
   const isScrollableFullPageRoute = location.pathname.startsWith("/calendar") ||
     location.pathname.startsWith("/blog");
   const isFullWidthRoute = location.pathname.startsWith("/rpg-workout") ||

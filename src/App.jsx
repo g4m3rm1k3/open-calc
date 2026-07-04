@@ -72,6 +72,7 @@ const EngMathPage = lazy(() => import("./pages/EngMathPage.jsx"));
 const SceneSandboxPage = lazy(() => import("./pages/SceneSandboxPage.jsx"));
 const SceneEditorPage = lazy(() => import("./pages/SceneEditorPage.jsx"));
 const CanvasTutorialsPage = lazy(() => import("./pages/CanvasTutorialsPage.jsx"));
+const AbstractionViz = lazy(() => import("./components/abstraction-viz/AbstractionViz.jsx"));
 const NotificationToast = lazy(
   () => import("./features/calendar/NotificationToast.tsx"),
 );
@@ -202,6 +203,7 @@ export default function App() {
                             <Route path="dev/canvas-tutorials" element={<CanvasTutorialsPage />} />
                             <Route path="dev/canvas-tutorials/:tutorialId" element={<CanvasTutorialsPage />} />
                             <Route path="dev/canvas-tutorials/:tutorialId/:stepId" element={<CanvasTutorialsPage />} />
+                            <Route path="dev/abstractions" element={<AbstractionViz />} />
 
                             {/* Game auto-discovery */}
                             <Route
