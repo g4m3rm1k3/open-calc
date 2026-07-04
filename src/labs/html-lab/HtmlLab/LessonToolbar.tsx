@@ -1,6 +1,18 @@
 import styles from "./HtmlLab.module.css";
 import type { LessonStep, ValidationResult } from "./lessons/lessonTypes";
 
+// Lesson copy is written with backtick-quoted code terms (`<header>`,
+// `count % 2`) the same way a markdown doc would be — this renders those
+// spans as real inline code instead of showing the literal backtick
+// characters as plain text.
+function withInlineCode(text: string): React.ReactNode {
+  return text.split(/(`[^`]+`)/g).map((part, i) =>
+    part.startsWith("`") && part.endsWith("`") && part.length > 1
+      ? <code key={i} className={styles.inlineCode}>{part.slice(1, -1)}</code>
+      : part,
+  );
+}
+
 interface Props {
   lessonTitle: string;
   stepIndex: number;
@@ -101,14 +113,14 @@ export default function LessonToolbar({
 
       <div className={styles.lessonBanner}>
         <div className={styles.lessonBannerText}>
-          <div className={styles.lessonStepTitle}>{step.title}</div>
+          <div className={styles.lessonStepTitle}>📘 {step.title}</div>
           {isPlaying && playbackCaption && (
             <p className={styles.lessonPlaybackCaption}>● Right now: {playbackCaption}</p>
           )}
-          <p className={styles.lessonInstructions}>{step.instructions}</p>
+          <p className={styles.lessonInstructions}>{withInlineCode(step.instructions)}</p>
 
           {showHint && step.hint && (
-            <div className={styles.lessonHint}>💡 {step.hint}</div>
+            <div className={styles.lessonHint}>💡 {withInlineCode(step.hint)}</div>
           )}
 
           {checkResult && (

@@ -78,9 +78,10 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px 20px;
-  background: var(--hl-surface2);
+  padding: 16px 20px 16px 18px;
+  background: var(--hl-accent-bg);
   border-bottom: 1px solid var(--hl-border);
+  border-left: 4px solid var(--hl-accent);
   flex-shrink: 0;
 }
 .lessonBannerText {
@@ -88,17 +89,30 @@
   min-width: 0;
 }
 .lessonStepTitle {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   color: var(--hl-text);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 .lessonInstructions {
-  font-size: 12px;
-  color: var(--hl-muted);
-  line-height: 1.6;
+  font-size: 13.5px;
+  color: var(--hl-text);
+  line-height: 1.7;
   margin: 0;
   max-width: 720px;
+}
+.inlineCode {
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 0.92em;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+  color: var(--hl-accent-strong);
+  padding: 1px 5px;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 .lessonPlaybackCaption {
   font-size: 12px;
