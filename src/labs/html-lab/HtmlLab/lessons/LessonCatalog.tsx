@@ -6,6 +6,7 @@ import { useThemeColors } from "../../../../hooks/useThemeColors.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — JS hooks file, no type declarations
 import { useProgress } from "../../../../hooks/useProgress.js";
+import { lessonProgressKey } from "./lessonHelpers";
 import type { Lesson } from "./lessonTypes";
 
 interface Props {
@@ -21,10 +22,6 @@ const TOPIC_LABELS: Record<Lesson["topic"], string> = {
 };
 
 const TOPIC_ORDER: Lesson["topic"][] = ["html", "css", "js"];
-
-function progressKeyFor(lessonId: string): string {
-  return `html-lessons::${lessonId}`;
-}
 
 export default function LessonCatalog({ lessons, onSelect, onBack }: Props) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,7 +46,7 @@ export default function LessonCatalog({ lessons, onSelect, onBack }: Props) {
   const continueLesson = useMemo(() => {
     let best: { lesson: Lesson; at: number } | null = null;
     for (const lesson of lessons) {
-      const at: number = progress?.[progressKeyFor(lesson.id)]?.lastVisitedAt ?? 0;
+      const at: number = progress?.[lessonProgressKey(lesson.id)]?.lastVisitedAt ?? 0;
       if (at > 0 && (!best || at > best.at)) best = { lesson, at };
     }
     return best?.lesson ?? null;
@@ -98,7 +95,7 @@ export default function LessonCatalog({ lessons, onSelect, onBack }: Props) {
           <div key={group.unit} className={styles.catalogUnit}>
             <div className={styles.catalogUnitTitle}>{group.unit}</div>
             {group.lessons.map((lesson) => {
-              const status: string = getLessonStatus(progressKeyFor(lesson.id), lesson.steps.length);
+              const status: string = getLessonStatus(lessonProgressKey(lesson.id), lesson.steps.length);
               const pillClass =
                 status === "complete" ? styles.catalogStatusComplete :
                 status === "in-progress" ? styles.catalogStatusProgress :

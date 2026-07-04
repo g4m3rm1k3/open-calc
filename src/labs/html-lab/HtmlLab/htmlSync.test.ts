@@ -7,7 +7,7 @@
 // applyImportedCssToDoc). These guard against both regressing silently.
 
 import { describe, it, expect } from "vitest";
-import { parseHtmlDocument, elementsToCss, applyCssToElements } from "./htmlSync";
+import { parseHtmlDocument, elementsToCss, applyCssToElements, elementsToHtml, htmlToElements } from "./htmlSync";
 import type { LabElement } from "./types";
 
 describe("parseHtmlDocument — table structure", () => {
@@ -25,6 +25,29 @@ describe("parseHtmlDocument — table structure", () => {
 
     const thElements = elements.filter((e) => e.tag === "th");
     expect(thElements.map((e) => e.content)).toEqual(["Name", "Status"]);
+  });
+});
+
+describe("mixed content (leading text before a child element)", () => {
+  const els = (): LabElement[] => [
+    { id: "warning", tag: "p", parentId: null, order: 0, content: "Fair warning: ", attrs: { id: "", class: "" }, styles: {}, mediaQueries: [] },
+    { id: "warning-strong", tag: "strong", parentId: "warning", order: 0, content: "spoilers ahead.", attrs: { id: "", class: "" }, styles: {}, mediaQueries: [] },
+  ];
+
+  it("elementsToHtml renders the leading text before the child, not just the child", () => {
+    const html = elementsToHtml(els());
+    expect(html).toContain("Fair warning:");
+    expect(html).toContain("<strong");
+  });
+
+  it("htmlToElements round-trips the leading text instead of dropping it (real incident: lesson content lost its intro text on any edit that re-parsed the HTML tab)", () => {
+    // A bare fragment, not the full elementsToHtml() document — a <link
+    // rel="stylesheet"> in the parsed doc makes happy-dom attempt a real
+    // network fetch, which is irrelevant noise for what this test checks.
+    const fragment = `<p data-lab-id="warning">Fair warning: <strong data-lab-id="warning-strong">spoilers ahead.</strong></p>`;
+    const parsed = htmlToElements(fragment, els());
+    const warning = parsed?.find((e) => e.id === "warning");
+    expect(warning?.content).toBe("Fair warning:");
   });
 });
 

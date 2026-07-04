@@ -170,6 +170,20 @@ export function ProgressProvider({ children }) {
     pushNow?.()
   }, [setProgress, pushNow])
 
+  // Clears exactly one lesson's progress entry — unlike resetCourseProgress,
+  // a single lesson's checkpoints all live under one flat key
+  // ("<lab>::<lessonId>"), not a prefix shared by many keys, so a plain
+  // delete is correct here instead of a startsWith scan.
+  const resetLessonProgress = useCallback((lessonId) => {
+    setProgress((prev) => {
+      if (!(lessonId in prev)) return prev
+      const next = { ...prev }
+      delete next[lessonId]
+      return next
+    })
+    pushNow?.()
+  }, [setProgress, pushNow])
+
   // Quiz score is the canonical lesson progress metric.
   // Falls back to reading checkpoints for lessons that have no quiz.
   const getLessonProgress = useCallback((lessonId) => {
@@ -199,12 +213,12 @@ export function ProgressProvider({ children }) {
     progress, markCheckpoint, markVisited, setActiveTab, getLessonStatus, getLessonProgress,
     getActiveTab, setReadingProgress, getReadingProgress,
     setQuizScore, getQuizScore, setQuizStates, getQuizStates, ensureQuizTotal,
-    resetCourseProgress
+    resetCourseProgress, resetLessonProgress
   }), [
     progress, markCheckpoint, markVisited, setActiveTab, getLessonStatus, getLessonProgress,
     getActiveTab, setReadingProgress, getReadingProgress,
     setQuizScore, getQuizScore, setQuizStates, getQuizStates, ensureQuizTotal,
-    resetCourseProgress
+    resetCourseProgress, resetLessonProgress
   ])
 
   return (

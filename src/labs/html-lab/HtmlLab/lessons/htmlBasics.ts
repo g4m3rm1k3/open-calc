@@ -1,16 +1,5 @@
-import type { Lesson, LabElement } from "./lessonTypes";
-
-function el(
-  id: string,
-  tag: string,
-  parentId: string | null,
-  order: number,
-  content = "",
-  attrs: Record<string, string> = {},
-  styles: Record<string, string> = {},
-): LabElement {
-  return { id, tag, parentId, order, content, attrs: { id: "", class: "", ...attrs }, styles, mediaQueries: [] };
-}
+import { el } from "./lessonHelpers";
+import type { Lesson } from "./lessonTypes";
 
 // A first, deliberately small lesson: builds one page across 5 steps,
 // teaching semantic tags (header/nav/main/article/footer) instead of

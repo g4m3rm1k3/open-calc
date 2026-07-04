@@ -2,6 +2,7 @@ import { useState } from 'react'
 import HtmlLabLesson from '../html-lab/HtmlLab/HtmlLabLesson'
 import LessonCatalog from '../html-lab/HtmlLab/lessons/LessonCatalog'
 import { LESSONS } from '../html-lab/HtmlLab/lessons/catalog'
+import { lessonProgressKey } from '../html-lab/HtmlLab/lessons/lessonHelpers'
 import { useProgress } from '../../hooks/useProgress.js'
 
 export const meta = {
@@ -18,7 +19,7 @@ export default function HtmlLabLessonsEntry({ onBack }) {
   const { markVisited } = useProgress()
 
   const selectLesson = (lessonId) => {
-    markVisited(`html-lessons::${lessonId}`)
+    markVisited(lessonProgressKey(lessonId))
     setActiveLessonId(lessonId)
   }
 

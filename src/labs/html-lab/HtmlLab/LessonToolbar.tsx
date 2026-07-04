@@ -14,11 +14,14 @@ interface Props {
   showHint: boolean;
   onCheck: () => void;
   onNext: () => void;
+  onPrevious: () => void;
+  onRestart: () => void;
   onShowHint: () => void;
   onSkipToSolution: () => void;
   onBack?: () => void;
   isPlaying: boolean;
   isPaused: boolean;
+  playbackCaption?: string;
   onPausePlayback: () => void;
   onSkipPlayback: () => void;
   onReplay: () => void;
@@ -37,25 +40,32 @@ export default function LessonToolbar({
   showHint,
   onCheck,
   onNext,
+  onPrevious,
+  onRestart,
   onShowHint,
   onSkipToSolution,
   onBack,
   isPlaying,
   isPaused,
+  playbackCaption,
   onPausePlayback,
   onSkipPlayback,
   onReplay,
 }: Props) {
   const isLastStep = stepIndex === stepCount - 1;
+  const isFirstStep = stepIndex === 0;
 
   return (
     <>
       <div className={styles.toolbar}>
         {onBack && (
-          <button className={styles.backBtn} onClick={onBack} title="Back to Labs">
-            ← Labs
+          <button className={styles.backBtn} onClick={onBack} title="Back to the lesson list">
+            ← Lessons
           </button>
         )}
+        <button className={styles.tbBtn} onClick={onRestart} disabled={isPlaying} title="Start this lesson over from step 1">
+          ⟲ Restart
+        </button>
         <span className={styles.toolbarLogo}>{lessonTitle}</span>
         {isPlaying ? (
           <span className={styles.lessonProgress}>● Building…</span>
@@ -92,6 +102,9 @@ export default function LessonToolbar({
       <div className={styles.lessonBanner}>
         <div className={styles.lessonBannerText}>
           <div className={styles.lessonStepTitle}>{step.title}</div>
+          {isPlaying && playbackCaption && (
+            <p className={styles.lessonPlaybackCaption}>● Right now: {playbackCaption}</p>
+          )}
           <p className={styles.lessonInstructions}>{step.instructions}</p>
 
           {showHint && step.hint && (
@@ -125,6 +138,14 @@ export default function LessonToolbar({
               </button>
             </>
           )}
+          <button
+            className={styles.tbBtn}
+            onClick={onPrevious}
+            disabled={isPlaying || isFirstStep}
+            title={isFirstStep ? "This is the first step" : "Go back to the previous step"}
+          >
+            ← Previous
+          </button>
           <button
             className={`${styles.tbBtn} ${styles.tbBtnGoEdit}`}
             onClick={onNext}

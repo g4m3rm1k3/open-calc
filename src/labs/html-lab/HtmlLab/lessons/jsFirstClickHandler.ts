@@ -1,16 +1,5 @@
-import type { Lesson, LabElement } from "./lessonTypes";
-
-function el(
-  id: string,
-  tag: string,
-  parentId: string | null,
-  order: number,
-  content = "",
-  attrs: Record<string, string> = {},
-  styles: Record<string, string> = {},
-): LabElement {
-  return { id, tag, parentId, order, content, attrs: { id: "", class: "", ...attrs }, styles, mediaQueries: [] };
-}
+import { el } from "./lessonHelpers";
+import type { Lesson } from "./lessonTypes";
 
 // First JS/DOM lesson — a small standalone widget (not chained to the
 // HTML/CSS pages) so the whole lesson stays short. Exercises the

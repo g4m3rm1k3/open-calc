@@ -1,16 +1,5 @@
-import type { Lesson, LabElement } from "./lessonTypes";
-
-function el(
-  id: string,
-  tag: string,
-  parentId: string | null,
-  order: number,
-  content = "",
-  attrs: Record<string, string> = {},
-  styles: Record<string, string> = {},
-): LabElement {
-  return { id, tag, parentId, order, content, attrs: { id: "", class: "", ...attrs }, styles, mediaQueries: [] };
-}
+import { el } from "./lessonHelpers";
+import type { Lesson } from "./lessonTypes";
 
 // Second HTML lesson — a fresh short page (a reading list), not chained to
 // html-basics. Proves the multi-element playback path on <ul>/<li> and a

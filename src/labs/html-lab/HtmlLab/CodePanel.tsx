@@ -981,6 +981,7 @@ export default function CodePanel({
               padding: { top: 10, bottom: 10 },
               overviewRulerLanes: 0,
               hideCursorInOverviewRuler: true,
+              readOnly: forceSync,
               scrollbar: {
                 vertical: "auto",
                 horizontal: "auto",
@@ -990,7 +991,14 @@ export default function CodePanel({
             }}
             beforeMount={setupOpenCalcMonaco}
             onMount={handleMount}
-            onChange={handleChange}
+            // Disabled entirely during lesson playback (forceSync), not just
+            // debounced — Monaco's onChange fires for a programmatic
+            // setValue() exactly like a real keystroke, so leaving this wired
+            // up would round-trip every revealed frame straight back through
+            // the HTML/CSS parser and write it back into state as if the
+            // student had typed it, purely as a side effect of playback
+            // advancing the editor's displayed text.
+            onChange={forceSync ? undefined : handleChange}
           />
         )}
       </div>

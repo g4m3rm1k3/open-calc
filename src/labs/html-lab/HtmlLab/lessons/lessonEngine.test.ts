@@ -81,6 +81,35 @@ describe("computeStateAtStep — real incident shape: a later step must not regr
   });
 });
 
+describe("computeSolvedStateAtStep — real incident: a challenge's own scaffold element must survive folding", () => {
+  // A challenge whose scaffold (patch.elements) adds a button for the
+  // student to wire up, where solutionPatch only specifies the new
+  // javascript — the button itself must still be present once the step is
+  // treated as solved, or a later lesson chaining off this one (or "Skip to
+  // solution") loses the very element the solution's JS refers to.
+  const lesson: Lesson = {
+    id: "test-lesson-2",
+    title: "Test",
+    description: "",
+    topic: "js",
+    unit: "Test",
+    steps: [
+      {
+        id: "s1", title: "Challenge: wire up a button", instructions: "", isChallenge: true,
+        patch: { elements: [el("clearBtn", "button", null, 0, "Clear")] },
+        behavior: { interactions: [], assertions: [] },
+        solutionPatch: { javascript: "clearBtn.addEventListener('click', () => {});" },
+      },
+    ],
+  };
+
+  it("keeps the scaffold button in the solved state even though solutionPatch never re-lists it", () => {
+    const state = computeSolvedStateAtStep(lesson, 0);
+    expect(state.elements.map((e) => e.id)).toEqual(["clearBtn"]);
+    expect(state.javascript).toBe("clearBtn.addEventListener('click', () => {});");
+  });
+});
+
 describe("validateStructure", () => {
   it("passes when tags and required styles match", () => {
     const elements = [el("a", "nav", null, 0), el("b", "footer", null, 1, "", { color: "red" })];

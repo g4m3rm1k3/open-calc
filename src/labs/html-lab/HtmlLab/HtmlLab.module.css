@@ -100,6 +100,13 @@
   margin: 0;
   max-width: 720px;
 }
+.lessonPlaybackCaption {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--hl-accent);
+  margin: 0 0 6px;
+  font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+}
 .lessonHint {
   margin-top: 8px;
   padding: 8px 12px;

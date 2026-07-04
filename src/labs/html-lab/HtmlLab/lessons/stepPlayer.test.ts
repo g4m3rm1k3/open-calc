@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildPlaybackFrames, frameRevealedIds } from "./stepPlayer";
+import { buildPlaybackFrames, frameRevealedIds, describeFrameTransition } from "./stepPlayer";
 import { applyPatch } from "./lessonEngine";
 import { initialState } from "../labReducer";
 import type { LabElement } from "./lessonTypes";
@@ -68,6 +68,51 @@ describe("buildPlaybackFrames", () => {
     const frames = buildPlaybackFrames(prev, {});
     expect(frames.length).toBeGreaterThanOrEqual(1);
     expect(frames[frames.length - 1].elements).toEqual(prev.elements);
+  });
+
+  it("reveals JavaScript exactly one line at a time, not arbitrary character chunks", () => {
+    const prev = { ...initialState, javascript: "" };
+    const target = "function greet() {\n  alert('hi');\n}\ngreet();"; // 4 lines
+    const frames = buildPlaybackFrames(prev, { javascript: target });
+    expect(frames.map((f) => f.javascript.split("\n").length)).toEqual([1, 2, 3, 4]);
+    expect(frames[frames.length - 1].javascript).toBe(target);
+  });
+
+  it("a single changed line lands in one frame instead of being split into arbitrary character chunks", () => {
+    const prev = { ...initialState, javascript: "const a = 1;\nconst b = 2;" };
+    const target = "const a = 1;\nconst b = 3;"; // line 2 changed, line 1 identical
+    const frames = buildPlaybackFrames(prev, { javascript: target });
+    expect(frames).toEqual([{ ...prev, javascript: target }]);
+  });
+});
+
+describe("describeFrameTransition", () => {
+  it("describes a new top-level element", () => {
+    const prev = { ...initialState, elements: [] };
+    const frames = buildPlaybackFrames(prev, { elements: [el("nav", "nav", null, 0)] });
+    expect(describeFrameTransition(prev, frames[0])).toBe("Adding <nav>");
+  });
+
+  it("describes a new nested element, naming its parent", () => {
+    const prev = { ...initialState, elements: [el("nav", "nav", null, 0)] };
+    const frames = buildPlaybackFrames(prev, { elements: [el("link", "a", "nav", 0)] });
+    expect(describeFrameTransition(prev, frames[0])).toBe("Adding <a> inside <nav>");
+  });
+
+  it("describes a restyle of an existing element as an update, not an add", () => {
+    const prev = { ...initialState, elements: [el("nav", "nav", null, 0, "", { color: "blue" })] };
+    const frames = buildPlaybackFrames(prev, { elements: [el("nav", "nav", null, 0, "", { color: "red" })] });
+    expect(describeFrameTransition(prev, frames[0])).toBe("Updating <nav>'s styles");
+  });
+
+  it("describes a javascript text frame and a customCss text frame distinctly", () => {
+    const prevJs = { ...initialState, javascript: "" };
+    const jsFrames = buildPlaybackFrames(prevJs, { javascript: "doThing();" });
+    expect(describeFrameTransition(prevJs, jsFrames[0])).toBe("Typing the JavaScript");
+
+    const prevCss = { ...initialState, customCss: "" };
+    const cssFrames = buildPlaybackFrames(prevCss, { customCss: ".a { color: red; }" });
+    expect(describeFrameTransition(prevCss, cssFrames[0])).toBe("Writing the CSS");
   });
 });
 

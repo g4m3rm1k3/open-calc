@@ -194,7 +194,23 @@ export function htmlToElements(
       const childEls = Array.from(node.children).filter(
         (c) => !SKIP.has(c.tagName.toLowerCase()),
       );
-      const content = childEls.length === 0 ? (node.textContent || "").trim() : "";
+      // Mixed content (leading text before an inline child, e.g. <p>Fair
+      // warning: <strong>...</strong></p>) needs its own path — `textContent`
+      // on a node with children pulls in the children's text too, and
+      // elementsToHtml/generateExportHtml only ever render `content` BEFORE
+      // children, never interleaved with them, so only the text nodes up to
+      // the first child element round-trip correctly.
+      let content: string;
+      if (childEls.length === 0) {
+        content = (node.textContent || "").trim();
+      } else {
+        let leading = "";
+        for (const child of Array.from(node.childNodes)) {
+          if (child.nodeType !== Node.TEXT_NODE) break;
+          leading += child.textContent || "";
+        }
+        content = leading.trim();
+      }
 
       const el: LabElement = {
         id: stableIdFor(node, path),

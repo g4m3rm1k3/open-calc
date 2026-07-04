@@ -15,7 +15,8 @@ import {
   generateExportHtml,
 } from "./htmlSync";
 import { applyPatch, computeStateAtStep, computeSolvedStateAtStep, validateStructure, validateBehavior } from "./lessons/lessonEngine";
-import { buildPlaybackFrames, frameRevealedIds } from "./lessons/stepPlayer";
+import { buildPlaybackFrames, frameRevealedIds, describeFrameTransition } from "./lessons/stepPlayer";
+import { lessonProgressKey } from "./lessons/lessonHelpers";
 import type { Lesson, LessonPatch, LabState, ValidationResult } from "./lessons/lessonTypes";
 import styles from "./HtmlLab.module.css";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -44,15 +45,17 @@ function appendJavascriptSnippet(current: string, snippet: string): string {
 }
 
 // How long each revealed frame stays on screen before the next one plays —
-// same pace whether it's one new element or one more chunk of typed code, so
+// same pace whether it's one new element or one more line of typed code, so
 // the whole "watch it build" sequence stays predictable regardless of how a
-// step's patch happens to be shaped.
-const PLAYBACK_TICK_MS = 500;
+// step's patch happens to be shaped. Long enough to actually read the live
+// caption next to each change, short enough not to drag.
+const PLAYBACK_TICK_MS = 650;
 
 interface PlaybackState {
   baseline: LabState;
   frames: LabState[];
   revealed: string[][];
+  captions: string[];
   index: number;
   paused: boolean;
 }
@@ -60,7 +63,8 @@ interface PlaybackState {
 function makePlayback(baseline: LabState, patch: LessonPatch): PlaybackState {
   const frames = buildPlaybackFrames(baseline, patch);
   const revealed = frames.map((f, i) => frameRevealedIds(i === 0 ? baseline : frames[i - 1], f));
-  return { baseline, frames, revealed, index: 0, paused: false };
+  const captions = frames.map((f, i) => describeFrameTransition(i === 0 ? baseline : frames[i - 1], f));
+  return { baseline, frames, revealed, captions, index: 0, paused: false };
 }
 
 function stepBaseline(lesson: Lesson, stepIndex: number): LabState {
@@ -94,8 +98,8 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { progress, markCheckpoint }: any = useProgress();
-  const progressKey = `html-lessons::${lesson.id}`;
+  const { progress, markCheckpoint, resetLessonProgress }: any = useProgress();
+  const progressKey = lessonProgressKey(lesson.id);
 
   // Resume just past the furthest checkpoint reached in a prior visit —
   // computed once on mount, not reactive to later checkpoint updates (this
@@ -143,6 +147,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
   const isPlaying = playback !== null;
   const canAdvance = !isPlaying && (!step.isChallenge || checkResult?.passed === true);
   const revealedIds = playback ? playback.revealed[playback.index] ?? [] : [];
+  const playbackCaption = playback ? playback.captions[playback.index] : undefined;
   const focusTab = useMemo((): "html" | "css" | "javascript" | undefined => {
     // Between the tick that advances `index` past the last frame and the
     // effect that notices and clears playback, one render sees an
@@ -200,6 +205,25 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
     markCheckpoint(progressKey, step.id);
     goToStep(stepIndex + 1);
   }, [markCheckpoint, progressKey, step, stepIndex, goToStep]);
+
+  const handlePrevious = useCallback((): void => {
+    goToStep(stepIndex - 1);
+  }, [stepIndex, goToStep]);
+
+  // Clears every checkpoint for this lesson and forces step 1 to replay from
+  // scratch — deliberately bypasses goToStep's "already seen" check so
+  // confirming Restart is never a silent no-op jump straight to the end of
+  // step 1's build.
+  const handleRestart = useCallback(async (): Promise<void> => {
+    const ok = await askConfirm("restart_lesson", "Restart this lesson from step 1? Your progress on it will be cleared.");
+    if (!ok) return;
+    resetLessonProgress(progressKey);
+    setStepIndex(0);
+    setCheckResult(null);
+    setShowHint(false);
+    setMultiSelectedIds([]);
+    setPlayback(makePlayback(stepBaseline(lesson, 0), lesson.steps[0].patch));
+  }, [askConfirm, resetLessonProgress, progressKey, lesson]);
 
   const togglePausePlayback = useCallback((): void => {
     setPlayback((p) => (p ? { ...p, paused: !p.paused } : p));
@@ -379,6 +403,8 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
         showHint={showHint}
         onCheck={handleCheck}
         onNext={handleNext}
+        onPrevious={handlePrevious}
+        onRestart={handleRestart}
         onShowHint={() => setShowHint(true)}
         onSkipToSolution={async () => {
           const ok = await askConfirm("skip_to_solution", "Reveal the solution for this step? You can still look at how it's built.");
@@ -387,6 +413,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
         onBack={onBack}
         isPlaying={isPlaying}
         isPaused={playback?.paused ?? false}
+        playbackCaption={playbackCaption}
         onPausePlayback={togglePausePlayback}
         onSkipPlayback={skipPlayback}
         onReplay={replayCurrentStep}

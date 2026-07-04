@@ -1,28 +1,33 @@
 import { applyPatch } from "./lessonEngine";
 import type { LessonPatch, LabState } from "./lessonTypes";
 
-// A step's patch reveals in a fixed number of ticks regardless of how much
-// text it contains, so a one-line style tweak and a 40-line script both take
-// roughly the same amount of time to "type" — long code doesn't drag playback
-// out, short code doesn't flash by instantly.
-const TEXT_REVEAL_TICKS = 14;
+// A JS/CSS reveal happens one LINE per frame — that's what makes it read as
+// "typing it in" rather than a dump — capped at this many frames so a future
+// pathologically long script can't drag playback out forever (every lesson
+// today is well under the cap, so in practice it's always exactly one line
+// per frame; only past the cap do multiple lines start batching together).
+const MAX_TEXT_REVEAL_FRAMES = 16;
 
-function chunkTargets(prev: string, target: string, ticks: number): string[] {
+function chunkLines(prev: string, target: string, maxFrames: number): string[] {
   if (prev === target) return [];
-  // Only the appended/changed suffix is animated — if the student's prior
-  // code is a prefix of the new target (the common case: a step adds to
-  // existing JS), the shared prefix appears immediately and only the new
-  // part reveals gradually.
-  let shared = 0;
-  const max = Math.min(prev.length, target.length);
-  while (shared < max && prev[shared] === target[shared]) shared++;
-  const fixed = target.slice(0, shared);
-  const rest = target.slice(shared);
-  if (!rest) return [target];
-  const step = Math.max(1, Math.ceil(rest.length / ticks));
+  // Only the appended/changed lines are animated — if the student's prior
+  // code's lines are an exact prefix of the new target's lines (the common
+  // case: a step adds more JS below what's already there), those lines
+  // appear immediately and only the new ones reveal gradually. Comparing
+  // whole lines (not characters) means a fully-matching earlier line is
+  // never re-typed just because a later line changed.
+  const prevLines = prev === "" ? [] : prev.split("\n");
+  const targetLines = target.split("\n");
+  let sharedLines = 0;
+  const maxShared = Math.min(prevLines.length, targetLines.length);
+  while (sharedLines < maxShared && prevLines[sharedLines] === targetLines[sharedLines]) sharedLines++;
+  const fixedLines = targetLines.slice(0, sharedLines);
+  const restLines = targetLines.slice(sharedLines);
+  if (restLines.length === 0) return [target];
+  const batch = Math.max(1, Math.ceil(restLines.length / maxFrames));
   const out: string[] = [];
-  for (let i = step; i < rest.length; i += step) {
-    out.push(fixed + rest.slice(0, i));
+  for (let i = batch; i < restLines.length; i += batch) {
+    out.push([...fixedLines, ...restLines.slice(0, i)].join("\n"));
   }
   out.push(target);
   return out;
@@ -50,14 +55,14 @@ export function buildPlaybackFrames(prevState: LabState, patch: LessonPatch): La
   }
 
   if (patch.customCss !== undefined) {
-    for (const text of chunkTargets(state.customCss, patch.customCss, TEXT_REVEAL_TICKS)) {
+    for (const text of chunkLines(state.customCss, patch.customCss, MAX_TEXT_REVEAL_FRAMES)) {
       state = { ...state, customCss: text };
       frames.push(state);
     }
   }
 
   if (patch.javascript !== undefined) {
-    for (const text of chunkTargets(state.javascript, patch.javascript, TEXT_REVEAL_TICKS)) {
+    for (const text of chunkLines(state.javascript, patch.javascript, MAX_TEXT_REVEAL_FRAMES)) {
       state = { ...state, javascript: text };
       frames.push(state);
     }
@@ -88,4 +93,32 @@ export function frameRevealedIds(prevFrame: LabState, frame: LabState): string[]
     return !before || before !== e;
   });
   return changed.length ? changed.map((e) => e.id) : [...prevIds].filter((id) => !frame.elements.some((e) => e.id === id));
+}
+
+/**
+ * A short, human-readable caption for what changed between two consecutive
+ * playback frames — "Adding <nav>", "Typing the JavaScript", etc. Derived
+ * entirely from the frame diff (same identity-comparison `frameRevealedIds`
+ * already uses), so authoring a lesson never needs to write captions by hand.
+ */
+export function describeFrameTransition(prev: LabState, cur: LabState): string {
+  if (cur.elements !== prev.elements) {
+    const changed = cur.elements.filter((e) => {
+      const before = prev.elements.find((p) => p.id === e.id);
+      return !before || before !== e;
+    });
+    if (changed.length) {
+      const el = changed[0];
+      const isNew = !prev.elements.some((p) => p.id === el.id);
+      const parent = el.parentId ? cur.elements.find((e) => e.id === el.parentId) : null;
+      const where = parent ? ` inside <${parent.tag}>` : "";
+      return isNew ? `Adding <${el.tag}>${where}` : `Updating <${el.tag}>'s styles`;
+    }
+    const removed = prev.elements.find((p) => !cur.elements.some((e) => e.id === p.id));
+    if (removed) return `Removing <${removed.tag}>`;
+  }
+  if (cur.javascript !== prev.javascript) return "Typing the JavaScript";
+  if (cur.customCss !== prev.customCss) return "Writing the CSS";
+  if (cur.bodyStyles !== prev.bodyStyles) return "Adjusting the page's styles";
+  return "";
 }

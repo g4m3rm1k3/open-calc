@@ -34,8 +34,22 @@ export function applyPatch(state: LabState, patch: LessonPatch): LabState {
 // first arrives — but a LATER step that builds on top of it needs the
 // *solved* version, or the lesson would silently regress once you pass a
 // challenge and move on. `.solutionPatch` is what later steps fold in.
+//
+// Elements are MERGED, not replaced: a challenge's scaffold (e.g. a "Clear"
+// button added by `patch.elements` for the student to wire up) still needs
+// to exist in the solved state even though `solutionPatch` usually only
+// specifies the new `javascript` — solving a challenge means adding to what
+// was already on the page, not replacing it. Real incident: a later lesson
+// chaining off a solved challenge lost that challenge's own scaffold button
+// entirely, because solutionPatch never re-listed it and the lookup that
+// used to just prefer solutionPatch wholesale dropped it silently.
 function effectivePatch(step: LessonStep): LessonPatch {
-  return step.isChallenge ? (step.solutionPatch ?? step.patch) : step.patch;
+  if (!step.isChallenge || !step.solutionPatch) return step.patch;
+  const mergedElements = [...(step.patch.elements ?? []), ...(step.solutionPatch.elements ?? [])];
+  return {
+    ...step.solutionPatch,
+    elements: mergedElements.length ? mergedElements : undefined,
+  };
 }
 
 // ─── Cumulative step state ────────────────────────────────────────────────────
