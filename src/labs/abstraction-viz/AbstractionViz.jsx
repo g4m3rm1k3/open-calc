@@ -3,7 +3,7 @@ import Editor from '@monaco-editor/react'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { LESSONS } from './lessons.js'
-import { generateSteps } from './generateSteps.js'
+import { generateSteps, enrichLessonWithSnapshots } from './generateSteps.js'
 
 // ── Colours ────────────────────────────────────────────────────────────────────
 const HEX = {
@@ -80,20 +80,23 @@ function fmtVal(v) {
   if (v === null)      return 'null'
   if (v === undefined) return 'undefined'
   if (v === '<TDZ>')   return '<TDZ>'
+  if (typeof v === 'boolean') return String(v)
+  if (typeof v === 'number')  return String(v)
   if (typeof v === 'string') {
-    if (v.startsWith('[Function') || v.startsWith('[Class') || v.startsWith('[native')) return v
-    return `"${v}"`
+    // _snapshotValue already formatted these as display strings — show them verbatim
+    if (v.startsWith('[') || v.startsWith('{') || v === '') return v
+    return `"${v}"`   // actual string value
   }
-  if (typeof v === 'object' && '$ref' in v) return '{…}'
+  if (typeof v === 'object' && '$ref' in v) return '{…}'  // fallback, shouldn't occur after engine fix
   return String(v)
 }
 
-function VarsPanel({ snapshot, isDark }) {
+function VarsPanel({ snapshot, hint }) {
   if (!snapshot?.length) {
     return (
       <div className="h-full flex flex-col items-center justify-center gap-2 px-4 text-center">
         <span className="text-[11px] text-slate-500 dark:text-slate-600 leading-relaxed">
-          Trace your own code to see live variables here
+          {hint ?? 'No variables in scope'}
         </span>
       </div>
     )
@@ -155,13 +158,26 @@ export default function AbstractionViz({ onBack }) {
   const [userCode,   setUserCode]   = useState('')
   const [userLesson, setUserLesson] = useState(null)
   const [genError,   setGenError]   = useState(null)
+  const [enriched,   setEnriched]   = useState({})  // lessonId → enriched lesson
 
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
   const decorRef  = useRef(null)
   const laneRef   = useRef(null)
 
-  const lesson      = (mode === 'user' && userLesson) ? userLesson : (LESSONS[lessonIdx] ?? LESSONS[0])
+  // Lazily enrich the current lesson with interpreter snapshots
+  useEffect(() => {
+    if (mode !== 'lessons') return
+    const raw = LESSONS[lessonIdx]
+    if (!raw || enriched[raw.id]) return
+    const result = enrichLessonWithSnapshots(raw)
+    setEnriched(prev => ({ ...prev, [raw.id]: result }))
+  }, [lessonIdx, mode]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const baseLesson = LESSONS[lessonIdx] ?? LESSONS[0]
+  const lesson     = (mode === 'user' && userLesson)
+    ? userLesson
+    : (enriched[baseLesson.id] ?? baseLesson)
   const safeStepIdx = Math.min(stepIdx, lesson.steps.length - 1)
   const step        = (mode === 'user' && !userLesson) ? EMPTY_STEP : (lesson.steps[safeStepIdx] ?? EMPTY_STEP)
   const totalLines  = step.code.split('\n').length
@@ -379,7 +395,10 @@ export default function AbstractionViz({ onBack }) {
             <span className="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase">Variables</span>
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto bg-white dark:bg-slate-950">
-            <VarsPanel snapshot={step.stackSnapshot} isDark={isDark} />
+            <VarsPanel
+              snapshot={step.stackSnapshot}
+              hint={showInput ? 'Paste code and click Trace It →' : 'Step through to see variables'}
+            />
           </div>
         </div>
       </div>

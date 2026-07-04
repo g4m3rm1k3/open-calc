@@ -745,7 +745,7 @@ class Interpreter {
       })
       const result = fn.fn(thisVal, args, this)
       this._emit(EventType.FUNCTION_RETURN, callNode, callerEnv, {
-        functionName: name, returnValue: serializeValue(result),
+        functionName: name, returnValue: serializeValue(result), native: true,
       })
       return result
     }
@@ -1314,10 +1314,33 @@ class Interpreter {
     this.heap.set(ref, 'size', store.size)
   }
 
+  // Serialize a value for the variables panel — shows actual object contents.
+  _snapshotValue(v) {
+    if (v === null || v === undefined) return v
+    if (typeof v !== 'object') return v           // number | boolean | string as-is
+    if (v?.__kind === 'function') return `[Function: ${v.name ?? '(anonymous)'}]`
+    if (v?.__kind === 'class')    return `[Class: ${v.name}]`
+    if (v?.__kind === 'native')   return `[native: ${v.name}]`
+    if (v?.__kind === 'reference') return this._display(v)  // array/object → display string
+    return String(v)
+  }
+
+  // Like env.snapshot() but uses _snapshotValue so objects show their contents.
+  _snapshotLocals(env) {
+    if (!env) return {}
+    const out = {}
+    for (const [k, b] of env.bindings) {
+      out[k] = b.initialized ? this._snapshotValue(b.value) : '<TDZ>'
+    }
+    return out
+  }
+
   _display(v, depth = 0) {
     if (depth > 8) return '...'  // prevent infinite recursion on circular structures
     if (v === null)      return 'null'
     if (v === undefined) return 'undefined'
+    // Top-level strings are unquoted (console.log("hi") → hi); nested strings are quoted (like Node.js)
+    if (typeof v === 'string') return depth === 0 ? v : `'${v}'`
     if (typeof v !== 'object') return String(v)
     if (v?.__kind === 'function') return `[Function: ${v.name ?? 'anonymous'}]`
     if (v?.__kind === 'class')    return `[class ${v.name}]`
@@ -1364,19 +1387,19 @@ class Interpreter {
         while (e && e !== this.globalEnv) {
           for (const [k, b] of e.bindings) {
             if (!(k in locals)) {
-              locals[k] = b.initialized ? serializeValue(b.value) : '<TDZ>'
+              locals[k] = b.initialized ? this._snapshotValue(b.value) : '<TDZ>'
             }
           }
           if (e.name === 'function') break
           e = e.parent
         }
       } else {
-        locals = f.env?.snapshot() ?? {}
+        locals = this._snapshotLocals(f.env)
       }
       return { name: f.name, line: f.line ?? null, locals }
     })
 
-    const globalLocals = this.globalEnv?.snapshot() ?? {}
+    const globalLocals = this._snapshotLocals(this.globalEnv)
     const globalFrame  = { name: '__global__', line: null, locals: globalLocals }
 
     const stackSnapshot = [...functionFrames, globalFrame]
