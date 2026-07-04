@@ -1534,6 +1534,19 @@
   opacity: 1;
 }
 
+/* Closing-tag row — dimmer than a real element row (it isn't one), but
+   still a full-height, easy-to-hit drop target for "append as the last
+   child", and colored to match its opening row via the same depthClass. */
+.treeClosingTag {
+  opacity: 0.55;
+  font-style: italic;
+  cursor: default;
+}
+.treeClosingTag:hover {
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.04);
+}
+
 .treeItemSelected {
   background: var(--hl-accent-bg) !important;
   color: var(--hl-keyword) !important;

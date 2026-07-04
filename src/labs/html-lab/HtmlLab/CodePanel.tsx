@@ -643,6 +643,26 @@ function TreeBranch({
                 onDropItem={onDropItem}
               />
             )}
+            {isContainer && !isCollapsed && (
+              // A real closing-tag row — the same bracket-pair idea VS Code
+              // uses for matching braces, applied to nesting depth (same
+              // depthClass as the opening row above), and a big, obvious drop
+              // target for "append as the last child here" instead of only
+              // the thin dropzone bar or having to drop back on the opening
+              // row itself.
+              <div
+                className={[styles.treeItem, styles.treeClosingTag, depthClass, isDropInside ? styles.treeItemDropInside : ""].join(" ")}
+                style={{ paddingLeft: `${depth * 14 + 8}px` }}
+                title={`</${el.tag}> — drop here to add as the last child`}
+                onClick={() => onSelect(el.id)}
+                onDragOver={(e) => onInsideEnter(e, el.id, ownChildCount)}
+                onDragEnter={(e) => onInsideEnter(e, el.id, ownChildCount)}
+                onDrop={(e) => onDropItem(e, el.id, ownChildCount)}
+              >
+                <span className={styles.treeCollapseSpacer} />
+                <span className={styles.treeTag}>&lt;/{el.tag}&gt;</span>
+              </div>
+            )}
             {dropZone(i + 1, `${parentId ?? "root"}-dz-${i + 1}`)}
           </div>
         );
