@@ -59,6 +59,48 @@ describe("parseHtmlDocument — class-toggle interactivity survives import", () 
   });
 });
 
+describe("parseHtmlDocument — real incident: a page that rebuilds its own DOM via JS", () => {
+  // A "stress test" dashboard whose script wipes and regenerates a nav list
+  // on load: `nav.className = "navBtn"; left.appendChild(nav)`. `.navBtn` is
+  // a plain single-class selector with no compound rule anywhere referencing
+  // it, so the default "bake a simple selector into one-time per-element
+  // styles" behavior stripped it out of the live stylesheet entirely — every
+  // button the script (re)created after that had zero styling (no
+  // data-lab-id attribute exists on an element the script just created),
+  // rendering as native inline-block buttons wrapping 2-per-row instead of
+  // the intended full-width stacked list. `.hidden`, toggled via
+  // `classList.toggle("hidden")` and never appearing in a compound selector
+  // either, hit the identical gap.
+  const html = `<!DOCTYPE html><html><head><style>
+    .navBtn { display: block; width: 100%; margin: 4px 0; }
+    .hidden { display: none; }
+  </style></head><body>
+    <div id="left"></div>
+    <script>
+      const left = document.getElementById("left");
+      function render() {
+        const nav = document.createElement("button");
+        nav.className = "navBtn";
+        left.appendChild(nav);
+      }
+      function toggleGroup(g) {
+        document.querySelectorAll(".group-" + g).forEach(el => el.classList.toggle("hidden"));
+      }
+      render();
+    </script>
+  </body></html>`;
+
+  it("keeps a plain class assigned via el.className as live CSS, not baked per-element", () => {
+    const { css } = parseHtmlDocument(html);
+    expect(css).toContain(".navBtn");
+  });
+
+  it("keeps a plain class toggled via classList.toggle as live CSS, not baked per-element", () => {
+    const { css } = parseHtmlDocument(html);
+    expect(css).toContain(".hidden");
+  });
+});
+
 describe("elementsToCss / applyCssToElements — real incident: CSS tab editing snowballed the reset block", () => {
   // The CSS tab's onChange handler round-trips the FULL displayed text (reset
   // + body{} + per-element rules + "/* Custom CSS */" + customCss) back

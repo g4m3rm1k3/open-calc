@@ -437,7 +437,7 @@ export function parseHtmlDocument(htmlString: string): {
     const scriptEls = Array.from(doc.querySelectorAll("script"));
     const javascript = scriptEls.map((s) => s.textContent).filter(Boolean).join("\n\n");
 
-    const { bodyStylesFromCss, customCss } = applyImportedCssToDoc(doc, rawCss);
+    const { bodyStylesFromCss, customCss } = applyImportedCssToDoc(doc, rawCss, javascript);
 
     const bodyStyleStr = doc.body?.getAttribute("style") || "";
     const bodyStyles: BodyStyles = { ...bodyStylesFromCss, ...parseStyleString(bodyStyleStr) };
@@ -451,9 +451,39 @@ export function parseHtmlDocument(htmlString: string): {
   }
 }
 
+// Classes the imported page's own JS assigns dynamically — via
+// `el.className = "..."` / `el.classList.add/toggle/remove("...")` — need the
+// same protection as a compound-selector-referenced class (see stateClasses
+// below), for a second, distinct reason: some of these classes aren't
+// toggled on an existing element at all, they're stamped onto elements the
+// script *creates* at runtime (`document.createElement` + `className =`).
+// Real incident: a page whose JS rebuilds a nav list on load with
+// `nav.className = "navBtn"` — baking `.navBtn`'s styles into one-time
+// per-element `[data-lab-id]` rules (the default for a plain single-class
+// selector) meant every button the script (re)created after that had zero
+// styling, since a data-lab-id attribute only exists on elements that were
+// in the original static markup, not ones freshly created in the browser.
+// Keeping `.navBtn` as a live, real class rule — like the original page had
+// — means newly-created elements are styled correctly too, the same way a
+// real browser would render this page.
+function extractDynamicClassNames(javascript: string): Set<string> {
+  const names = new Set<string>();
+  const classNameAssignRe = /\.className\s*=\s*(["'`])((?:(?!\1).)*)\1/g;
+  const classListRe = /\.classList\.(?:add|toggle|remove)\(\s*(["'`])((?:(?!\1).)*)\1/g;
+  let cm: RegExpExecArray | null;
+  while ((cm = classNameAssignRe.exec(javascript)) !== null) {
+    cm[2].split(/\s+/).filter(Boolean).forEach((c) => names.add(c));
+  }
+  while ((cm = classListRe.exec(javascript)) !== null) {
+    names.add(cm[2]);
+  }
+  return names;
+}
+
 function applyImportedCssToDoc(
   doc: Document,
   css: string,
+  javascript = "",
 ): { bodyStylesFromCss: Record<string, string>; customCss: string } {
   const bodyStylesFromCss: Record<string, string> = {};
   const appliedRules: { selector: string; styles: Record<string, string> }[] = [];
@@ -480,7 +510,7 @@ function applyImportedCssToDoc(
   // or the frozen inline value would permanently block whatever a classList.toggle()
   // at runtime is trying to show/hide (inline styles beat stylesheet rules regardless
   // of specificity). So every rule touching such a class is preserved as live CSS instead.
-  const stateClasses = new Set<string>();
+  const stateClasses = extractDynamicClassNames(javascript);
   let m: RegExpExecArray | null;
   while ((m = ruleRe.exec(remaining)) !== null) {
     const selectorGroup = m[1].trim();

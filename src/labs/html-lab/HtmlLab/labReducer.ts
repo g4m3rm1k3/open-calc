@@ -85,10 +85,13 @@ export const CONTAINER_TAGS = new Set([
   "main", "aside", "blockquote", "details", "summary",
 ]);
 
-// Tags whose CSS table role (table-row-group/table-row/table-cell) has to be
-// preserved on their canvas drag-handle wrapper div too, or the browser's table
-// layout algorithm sees a plain <div> where a row/cell belongs and the whole
-// table collapses into a single stacked column. See CanvasPanel's renderTag.
+// Tags the canvas renders with no administrative wrapper div at all (see
+// CanvasPanel's renderElement/renderTag) — nesting a table-role display
+// (table-row/table-cell/...) wrapper around a real thead/tbody/tr/th/td
+// forces the browser to insert an anonymous mini-table at that level (a
+// table-cell can't directly contain another table-cell), which isolates that
+// cell's column width from its siblings entirely. The real tag carries the
+// interactive/selection behavior directly instead.
 export const TABLE_ROLE_TAGS = new Set(["thead", "tbody", "tfoot", "tr", "th", "td"]);
 
 let _idCounter = 1;

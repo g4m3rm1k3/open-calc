@@ -5,24 +5,51 @@ import type { LabElement, BodyStyles } from "./types";
 
 const VOID_TAGS = new Set(["img", "br", "hr", "input"]);
 
-// Every element's real tag is wrapped in an administrative div (drag handle +
-// tag badge). Mirroring the element's own `display` onto that wrapper is only
-// correct for genuinely inline-flow values — it's what keeps e.g. inline <a>
-// tags sitting side by side instead of each forcing its own line. Mirroring a
-// shrink-to-fit *table* display instead breaks it: the wrapper becomes its
-// own zero-width-until-content table box with no width of its own, so a real
-// `<table style="width:100%">` inside it resolves 100% against that shrunk
-// wrapper and collapses to content width, stranded at the left — exactly the
-// "ignores the CSS, squished left in edit, fine in Preview" symptom. Same
-// trap for `display:none`: mirroring it would hide the wrapper (and its
-// select/drag handle) entirely, making a hidden element impossible to select
-// and un-hide in the editor. Blocklist-style allow only the inline values
-// that need it; everything else (block/flex/grid/table/table-*/none/unset)
-// falls back to a plain block wrapper — the real tag underneath still gets
-// its own actual `display` applied and lays out its own children normally.
+// Every element's real tag is normally wrapped in an administrative div (drag
+// handle + tag badge). Mirroring the element's own `display` onto that
+// wrapper is only correct for genuinely inline-flow values — it's what keeps
+// e.g. inline <a> tags sitting side by side instead of each forcing its own
+// line. Blocklist-style allow only the inline values that need it; everything
+// else (block/flex/grid/none/unset) falls back to a plain block wrapper — the
+// real tag underneath still gets its own actual `display` applied and lays
+// out its own children normally.
+//
+// thead/tbody/tr/th/td skip this wrapper entirely (see renderElement) — no
+// mirrored `display` value fixes it, because the wrapper is a *second* box in
+// a chain that already includes the real table-role tag. Nesting one
+// table-cell-role box inside another (wrapper=table-cell containing real
+// td=table-cell) forces the browser to insert an anonymous mini-table at that
+// level (a table-cell can't directly contain another table-cell), which
+// isolates that cell's column width from its siblings entirely — exactly why
+// header cells and body cells ended up with completely different, content-
+// only widths instead of sharing one column grid.
 const INLINE_FLOW_DISPLAYS = new Set(["inline", "inline-block", "inline-flex", "inline-grid", "list-item"]);
 function wrapperDisplay(elDisplay: string | undefined): string {
   return elDisplay && INLINE_FLOW_DISPLAYS.has(elDisplay) ? elDisplay : "block";
+}
+
+// Grid/flex placement properties (grid-column, order, ...) only have any
+// effect on an element that's a *direct child* of its grid/flex container.
+// Once the wrapper div is that direct child instead of the real tag, setting
+// e.g. `grid-column: 1 / -1` on the real tag does nothing at all — the real
+// tag isn't a grid item, the wrapper is, and the wrapper never asked for that
+// placement. A real-world hit: a page laid out with `body { display: grid;
+// grid-template-columns: 220px 1fr 320px }` and `header { grid-column: 1 / -1
+// }` rendered its header squeezed into just the first column in the editor,
+// full-width in Preview. Mirroring these specific properties onto the
+// wrapper — not the whole style object, just placement — fixes it without
+// the anonymous-box problems that come from mirroring `display` itself.
+const GRID_FLEX_PLACEMENT_PROPS = [
+  "gridColumn", "gridColumnStart", "gridColumnEnd",
+  "gridRow", "gridRowStart", "gridRowEnd", "gridArea",
+  "justifySelf", "alignSelf", "order",
+] as const;
+function placementStyles(elStyles: Record<string, string>): React.CSSProperties {
+  const out: Record<string, string> = {};
+  for (const prop of GRID_FLEX_PLACEMENT_PROPS) {
+    if (elStyles[prop]) out[prop] = elStyles[prop];
+  }
+  return out;
 }
 
 interface DropTarget {
@@ -74,7 +101,7 @@ export default function CanvasPanel({
   for (const e of elements) byId[e.id] = e;
 
   // ── Drag start ───────────────────────────────────────────────────────────────
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, el: LabElement): void => {
+  const handleDragStart = (e: React.DragEvent, el: LabElement): void => {
     e.stopPropagation();
     const ghost = e.currentTarget.cloneNode(true) as HTMLElement;
     ghost.style.opacity = "0.6";
@@ -168,54 +195,73 @@ export default function CanvasPanel({
     const isContainer   = CONTAINER_TAGS.has(el.tag);
     const isInsideTarget = isContainer && dropTarget?.parentId === el.id;
 
+    const badge = (
+      <div className={`${styles.elTag}${!showLabels && !isSelected ? ` ${styles.elTagHidden}` : ""}`}>
+        &lt;{el.tag}&gt;
+        {isSelected && (
+          <button
+            className={styles.elDelete}
+            onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
+            title="Delete"
+          >×</button>
+        )}
+      </div>
+    );
+
+    const overlay = overlayIds?.has(el.id) && (
+      <div className={styles.boxOverlay} aria-hidden="true">
+        <div className={styles.boxOverlayMargin} />
+        <div className={styles.boxOverlayBorder} />
+        <div className={styles.boxOverlayPadding} />
+        <div className={styles.boxOverlayContent} />
+      </div>
+    );
+
+    const interactiveProps = {
+      draggable: true,
+      onDragStart: (e: React.DragEvent) => handleDragStart(e, el),
+      onDragEnd: handleDragEnd,
+      onClick: (e: React.MouseEvent) => { e.stopPropagation(); onSelect(el.id); },
+      onDragOver: (e: React.DragEvent) => {
+        if (!isContainer) return;
+        e.preventDefault();
+        e.stopPropagation();
+      },
+      onDrop: (e: React.DragEvent) => {
+        if (!isContainer) return;
+        const childId = e.dataTransfer.getData("text/plain");
+        if (!childId || childId === el.id) return;
+        e.stopPropagation();
+        handleDrop(e, el.id, children.length);
+      },
+    };
+
+    const selectionClassName = [
+      styles.elWrap,
+      isSelected    ? styles.elSelected    : "",
+      isDragging    ? styles.elDragging    : "",
+      isInsideTarget? styles.elDropInside  : "",
+    ].join(" ");
+
+    if (TABLE_ROLE_TAGS.has(el.tag)) {
+      // No wrapper div — see the note above wrapperDisplay for why nesting
+      // one here breaks shared column widths. The real tag carries the
+      // interactive props, selection styling, and badge directly instead.
+      return renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget, {
+        badge, overlay, interactiveProps, className: selectionClassName,
+      });
+    }
+
     return (
       <div
         key={el.id}
-        className={[
-          styles.elWrap,
-          isSelected    ? styles.elSelected    : "",
-          isDragging    ? styles.elDragging    : "",
-          isInsideTarget? styles.elDropInside  : "",
-        ].join(" ")}
-        style={{ display: wrapperDisplay(el.styles.display) }}
-        draggable
-        onDragStart={(e) => handleDragStart(e, el)}
-        onDragEnd={handleDragEnd}
-        onClick={(e) => { e.stopPropagation(); onSelect(el.id); }}
-        onDragOver={(e) => {
-          if (!isContainer) return;
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        onDrop={(e) => {
-          if (!isContainer) return;
-          const childId = e.dataTransfer.getData("text/plain");
-          if (!childId || childId === el.id) return;
-          e.stopPropagation();
-          handleDrop(e, el.id, children.length);
-        }}
+        className={selectionClassName}
+        style={{ display: wrapperDisplay(el.styles.display), ...placementStyles(el.styles) }}
+        {...interactiveProps}
       >
-        <div className={`${styles.elTag}${!showLabels && !isSelected ? ` ${styles.elTagHidden}` : ""}`}>
-          &lt;{el.tag}&gt;
-          {isSelected && (
-            <button
-              className={styles.elDelete}
-              onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
-              title="Delete"
-            >×</button>
-          )}
-        </div>
-
+        {badge}
         {renderTag(el, children, renderElement, renderDropZone, isContainer, isInsideTarget)}
-
-        {overlayIds?.has(el.id) && (
-          <div className={styles.boxOverlay} aria-hidden="true">
-            <div className={styles.boxOverlayMargin} />
-            <div className={styles.boxOverlayBorder} />
-            <div className={styles.boxOverlayPadding} />
-            <div className={styles.boxOverlayContent} />
-          </div>
-        )}
+        {overlay}
       </div>
     );
   };
@@ -248,7 +294,7 @@ export default function CanvasPanel({
 
         {roots.length > 0 && renderDropZone(null, 0, "root-0")}
         {roots.map((el, i) => (
-          <div key={el.id}>
+          <div key={el.id} style={placementStyles(el.styles)}>
             {renderElement(el)}
             {renderDropZone(null, i + 1, `root-${i + 1}`)}
           </div>
@@ -256,6 +302,20 @@ export default function CanvasPanel({
       </div>
     </div>
   );
+}
+
+interface TableRoleExtras {
+  badge: React.ReactNode;
+  overlay: React.ReactNode;
+  className: string;
+  interactiveProps: {
+    draggable: boolean;
+    onDragStart: (e: React.DragEvent) => void;
+    onDragEnd: () => void;
+    onClick: (e: React.MouseEvent) => void;
+    onDragOver: (e: React.DragEvent) => void;
+    onDrop: (e: React.DragEvent) => void;
+  };
 }
 
 // ── Render the actual HTML tag ────────────────────────────────────────────────
@@ -266,6 +326,7 @@ function renderTag(
   renderDropZone: (parentId: string | null, order: number, key: string) => React.ReactNode,
   isContainer: boolean,
   isInsideTarget: boolean,
+  tableRoleExtras?: TableRoleExtras,
 ): React.ReactNode {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Tag = el.tag as any;
@@ -299,22 +360,32 @@ function renderTag(
   }
 
   if (isContainer) {
+    const extraProps = tableRoleExtras
+      ? { className: tableRoleExtras.className, ...tableRoleExtras.interactiveProps }
+      : {};
     return (
-      <Tag {...(domAttrs as React.HTMLAttributes<HTMLElement>)} style={tagStyle}>
+      <Tag key={el.id} {...(domAttrs as React.HTMLAttributes<HTMLElement>)} style={tagStyle} {...extraProps}>
+        {tableRoleExtras?.badge}
         {el.content && <span>{el.content}</span>}
         {children.length === 0 && isInsideTarget && (
           <div className={styles.emptyContainerHint}>drop here</div>
         )}
         {children.length > 0 && renderDropZone(el.id, 0, `${el.id}-dz-0`)}
-        {children.map((child, i) => (
-          <div
-            key={child.id}
-            style={TABLE_ROLE_TAGS.has(child.tag) ? { display: child.styles.display } : undefined}
-          >
-            {renderElement(child)}
-            {renderDropZone(el.id, i + 1, `${el.id}-dz-${i + 1}`)}
-          </div>
-        ))}
+        {children.map((child, i) =>
+          // No administrative wrapper for table-role children either — same
+          // anonymous-mini-table collapse one level up. Row/cell reordering
+          // for tables goes through the Tree tab or the Table Builder modal
+          // instead of a canvas drop zone here.
+          TABLE_ROLE_TAGS.has(child.tag) ? (
+            renderElement(child)
+          ) : (
+            <div key={child.id} style={placementStyles(child.styles)}>
+              {renderElement(child)}
+              {renderDropZone(el.id, i + 1, `${el.id}-dz-${i + 1}`)}
+            </div>
+          ),
+        )}
+        {tableRoleExtras?.overlay}
       </Tag>
     );
   }
