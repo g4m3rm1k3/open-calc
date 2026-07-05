@@ -118,6 +118,13 @@ export const VIZ_CATALOG = {
   },
 
   // ── Chemistry ───────────────────────────────────────────────────────────────
+  WhyChemistry: {
+    title: 'Why Chemistry?',
+    category: 'chemistry',
+    description: 'A short orientation panel — why chemistry matters, plus quick links into the Chemistry Lab and the full course.',
+    concepts: ['Course orientation'],
+    whatYouLearn: 'What the Chemistry Lab and course cover, and where to start.',
+  },
   PeriodicTable: {
     title: 'Periodic Table',
     category: 'chemistry',

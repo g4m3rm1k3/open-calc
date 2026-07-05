@@ -1,18 +1,24 @@
-// MoleculeBuilder.jsx
+// MoleculeBuilder.tsx
 // Molecule builder + 3D viewer + reaction playground.
-// Three modes: Build (assemble molecules), View (3D molecular geometry), React (chemical reactions).
+// Three modes: Molecules (browse presets), Reactions (step through reactions), Build (assemble your own).
 
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import * as THREE from 'three'
-import { MOLECULES, REACTIONS, BOND_TYPES, ATOM_COLORS, CATEGORY_COLORS } from './chemistry_data'
+import {
+  MOLECULES, REACTIONS, BOND_TYPES, ATOM_COLORS, ELEMENTS,
+  type Molecule, type Reaction, type BondKind, type AtomPosition, type Bond,
+} from './chemistry_data'
+import { useThemeColors } from '../../hooks/useThemeColors.js'
 
+type ThemeColors = ReturnType<typeof useThemeColors>
 
-
-import { useThemeColors } from '../../hooks/useThemeColors';
 // ── 3D Molecule Viewer ────────────────────────────────────────────────────────
-function MoleculeViewer({ molecule, C }) {
-  const mountRef = useRef(null)
-  const animRef  = useRef(null)
+interface MoleculeViewerProps { molecule: Molecule | null; C: ThemeColors }
+
+function MoleculeViewer({ molecule }: MoleculeViewerProps) {
+  const mountRef = useRef<HTMLDivElement | null>(null)
+  const animRef  = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     if (!mountRef.current || !molecule) return
@@ -50,7 +56,7 @@ function MoleculeViewer({ molecule, C }) {
     const scale = 1.6
 
     // Draw atoms
-    molecule.atoms.forEach((atom, i) => {
+    molecule.atoms.forEach((atom) => {
       const color = ATOM_COLORS[atom.symbol] || ATOM_COLORS.default
       const radius = ((ATOM_COLORS[atom.symbol] ? 0.35 : 0.28)) + (atom.symbol === 'H' ? 0 : 0.1)
       const geo = new THREE.SphereGeometry(radius, 24, 24)
@@ -77,7 +83,7 @@ function MoleculeViewer({ molecule, C }) {
       const len   = dir.length()
       const mid   = start.clone().add(end).multiplyScalar(0.5)
 
-      const drawBondCylinder = (offset = 0, bondWidth = width) => {
+      const drawBondCylinder = (offset = 0, bondWidth: number = width) => {
         const geo = new THREE.CylinderGeometry(bondWidth, bondWidth, len, 12)
         const mat = new THREE.MeshPhongMaterial({ color, shininess: 60 })
         const cyl = new THREE.Mesh(geo, mat)
@@ -125,9 +131,9 @@ function MoleculeViewer({ molecule, C }) {
     let dragging = false, prevX = 0, prevY = 0
     let rotX = 0.3, rotY = 0.2
 
-    const onDown = e => { dragging = true; prevX = e.clientX; prevY = e.clientY }
+    const onDown = (e: MouseEvent) => { dragging = true; prevX = e.clientX; prevY = e.clientY }
     const onUp   = () => { dragging = false }
-    const onMove = e => {
+    const onMove = (e: MouseEvent) => {
       if (!dragging) return
       rotY += (e.clientX - prevX) * 0.012
       rotX += (e.clientY - prevY) * 0.012
@@ -135,7 +141,7 @@ function MoleculeViewer({ molecule, C }) {
     }
 
     // Touch support
-    const onTouch = e => {
+    const onTouch = (e: TouchEvent) => {
       if (e.touches.length === 1) {
         const t = e.touches[0]
         if (!dragging) { dragging = true; prevX = t.clientX; prevY = t.clientY; return }
@@ -163,7 +169,7 @@ function MoleculeViewer({ molecule, C }) {
     animate()
 
     return () => {
-      cancelAnimationFrame(animRef.current)
+      if (animRef.current != null) cancelAnimationFrame(animRef.current)
       renderer.domElement.removeEventListener('mousedown', onDown)
       renderer.domElement.removeEventListener('touchstart', onTouch)
       renderer.domElement.removeEventListener('touchmove', onTouch)
@@ -185,24 +191,26 @@ function MoleculeViewer({ molecule, C }) {
 }
 
 // ── Molecule Card ─────────────────────────────────────────────────────────────
-function MoleculeCard({ mol, isSelected, onClick }) {
-  const bondInfo = BOND_TYPES[mol.bondType] || BOND_TYPES.single
+interface MoleculeCardProps { mol: Molecule; isSelected: boolean; onClick: (mol: Molecule) => void; C: ThemeColors }
+
+function MoleculeCard({ mol, isSelected, onClick, C }: MoleculeCardProps) {
+  const bondInfo = BOND_TYPES[mol.bondType as BondKind] || BOND_TYPES.single
   return (
     <div
       onClick={() => onClick(mol)}
       style={{
         padding:'10px 14px', borderRadius:10, cursor:'pointer',
-        border:`1px solid ${isSelected ? '#38bdf8' : '#334155'}`,
-        background: isSelected ? 'rgba(56,189,248,0.1)' : 'transparent',
+        border:`1px solid ${isSelected ? C.blue : C.border}`,
+        background: isSelected ? C.blueBg : 'transparent',
         transition:'all .15s',
       }}
     >
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
         <div>
-          <span style={{ fontSize:16, fontWeight:700, color:'#e2e8f0', fontFamily:'monospace' }}>
+          <span style={{ fontSize:16, fontWeight:700, color:C.text, fontFamily:'monospace' }}>
             {mol.formula}
           </span>
-          <span style={{ fontSize:11, color:'#64748b', marginLeft:8 }}>{mol.name}</span>
+          <span style={{ fontSize:11, color:C.muted, marginLeft:8 }}>{mol.name}</span>
         </div>
         <span style={{
           fontSize:10, padding:'2px 7px', borderRadius:4,
@@ -212,22 +220,25 @@ function MoleculeCard({ mol, isSelected, onClick }) {
         </span>
       </div>
       <div style={{ display:'flex', gap:8, marginTop:6, flexWrap:'wrap' }}>
-        <span style={{ fontSize:10, color:'#475569' }}>{mol.molarMass} g/mol</span>
-        <span style={{ fontSize:10, color:'#475569' }}>·</span>
-        <span style={{ fontSize:10, color: mol.polarity === 'polar' ? '#38bdf8' : mol.polarity === 'ionic' ? '#fb923c' : '#94a3b8' }}>
+        <span style={{ fontSize:10, color:C.hint }}>{mol.molarMass} g/mol</span>
+        <span style={{ fontSize:10, color:C.hint }}>·</span>
+        <span style={{ fontSize:10, color: mol.polarity === 'polar' ? C.blue : mol.polarity === 'ionic' ? '#fb923c' : C.muted }}>
           {mol.polarity}
         </span>
-        <span style={{ fontSize:10, color:'#475569' }}>·</span>
-        <span style={{ fontSize:10, color:'#94a3b8' }}>{mol.state}</span>
+        <span style={{ fontSize:10, color:C.hint }}>·</span>
+        <span style={{ fontSize:10, color:C.muted }}>{mol.state}</span>
       </div>
     </div>
   )
 }
 
 // ── Molecule Info Panel ───────────────────────────────────────────────────────
-function MoleculeInfo({ mol, C }) {
+interface MoleculeInfoProps { mol: Molecule | null; C: ThemeColors }
+
+function MoleculeInfo({ mol, C }: MoleculeInfoProps) {
+  const navigate = useNavigate()
   if (!mol) return null
-  const bondInfo = BOND_TYPES[mol.bondType] || BOND_TYPES.single
+  const bondInfo = BOND_TYPES[mol.bondType as BondKind] || BOND_TYPES.single
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:0 }}>
@@ -259,14 +270,14 @@ function MoleculeInfo({ mol, C }) {
       <div style={{ padding:'0 18px 12px' }}>
         <div style={{ fontSize:11, color:C.hint, marginBottom:8, letterSpacing:'.08em', textTransform:'uppercase' }}>Properties</div>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'4px 12px' }}>
-          {[
+          {([
             ['Geometry',      mol.geometry],
             ['Polarity',      mol.polarity],
             ['Hybridization', mol.hybridization || '—'],
             ['Bond angle',    mol.bondAngle ? `${mol.bondAngle}°` : '—'],
             ['Molar mass',    `${mol.molarMass} g/mol`],
             ['State (25°C)',  mol.state],
-          ].map(([label, val]) => (
+          ] as [string, string][]).map(([label, val]) => (
             <div key={label} style={{ padding:'5px 0', borderBottom:`0.5px solid ${C.border}` }}>
               <div style={{ fontSize:10, color:C.hint }}>{label}</div>
               <div style={{ fontSize:12, color:C.text, fontFamily:'monospace' }}>{val}</div>
@@ -286,12 +297,20 @@ function MoleculeInfo({ mol, C }) {
         <div style={{ fontSize:11, color:C.blue, fontWeight:600, marginBottom:4 }}>⚡ Fun fact</div>
         <div style={{ fontSize:12, color:C.text, lineHeight:1.6 }}>{mol.funFact}</div>
       </div>
+
+      <div style={{ margin:'0 18px 18px' }}>
+        <button onClick={() => navigate('/course/chemistry')} style={{
+          fontSize:11.5, color:C.blue, background:'none', border:'none', cursor:'pointer', padding:0,
+        }}>Learn more about chemical bonding in the course →</button>
+      </div>
     </div>
   )
 }
 
 // ── Reaction Viewer ───────────────────────────────────────────────────────────
-function ReactionPanel({ reaction, C }) {
+interface ReactionPanelProps { reaction: Reaction | null; C: ThemeColors }
+
+function ReactionPanel({ reaction, C }: ReactionPanelProps) {
   const [step, setStep] = useState(0)  // 0=reactants, 1=transition, 2=products
   const STEPS = ['Reactants', 'Bond Changes', 'Products']
 
@@ -421,16 +440,205 @@ function ReactionPanel({ reaction, C }) {
   )
 }
 
-// ── Main Component ────────────────────────────────────────────────────────────
-export default function MoleculeBuilder({ params = {} }) {
-  const C = useThemeColors()
-  const [mode, setMode] = useState('molecules')   // 'molecules' | 'reactions'
-  const [selectedMol, setSelectedMol] = useState(MOLECULES[0])
-  const [selectedRxn, setSelectedRxn] = useState(null)
+// ── Build mode ────────────────────────────────────────────────────────────────
+// Typical valence (bond-order capacity) for a small palette of common elements —
+// used only as a hint, not strict validation.
+const VALENCE: Record<string, number> = {
+  H:1, C:4, N:3, O:2, F:1, Cl:1, Br:1, I:1, S:2, P:3, Na:1, Mg:2, Ca:2, Al:3, Si:4,
+}
+const PALETTE: { symbol: string; name: string }[] = [
+  { symbol:'H',  name:'Hydrogen' }, { symbol:'C', name:'Carbon' },
+  { symbol:'N',  name:'Nitrogen' }, { symbol:'O', name:'Oxygen' },
+  { symbol:'F',  name:'Fluorine' }, { symbol:'Cl', name:'Chlorine' },
+  { symbol:'Br', name:'Bromine' },  { symbol:'S', name:'Sulfur' },
+  { symbol:'P',  name:'Phosphorus' }, { symbol:'Na', name:'Sodium' },
+]
+const BOND_ORDER: Record<BondKind, number> = {
+  single:1, double:2, triple:3, ionic:1, aromatic:1.5, hydrogen:0, 'van-der-waals':0, metallic:1,
+}
+const ELEMENTS_BY_SYMBOL: Record<string, typeof ELEMENTS[number]> =
+  Object.fromEntries(ELEMENTS.map(el => [el.symbol, el]))
 
-  const TABS = [
+// Places each newly-added atom on an outward Fibonacci-sphere spiral so atoms
+// don't stack on top of each other — a simple placement scheme, not a real
+// geometry solver (see plan: "workable first version, not a CAD tool").
+function nextAtomPosition(i: number): [number, number, number] {
+  if (i === 0) return [0, 0, 0]
+  const phi   = Math.acos(1 - 2 * (i + 0.5) / (i + 1))
+  const theta = Math.PI * (1 + Math.sqrt(5)) * i
+  const r     = 1.15 * Math.cbrt(i)
+  return [r * Math.sin(phi) * Math.cos(theta), r * Math.sin(phi) * Math.sin(theta), r * Math.cos(phi)]
+}
+
+interface BuildModeProps { C: ThemeColors }
+
+function BuildMode({ C }: BuildModeProps) {
+  const [atoms, setAtoms] = useState<AtomPosition[]>([])
+  const [bonds, setBonds] = useState<Bond[]>([])
+  const [pendingFrom, setPendingFrom] = useState<number | null>(null)
+  const [pendingTo, setPendingTo] = useState<number | null>(null)
+
+  const addAtom = (symbol: string) => {
+    const [x, y, z] = nextAtomPosition(atoms.length)
+    setAtoms(prev => [...prev, { symbol, x, y, z }])
+  }
+
+  // First click picks the "from" atom, second click (on a different atom)
+  // picks "to" and reveals the bond-type buttons; clicking the same atom
+  // twice, or clicking a third atom once both are set, restarts the pick.
+  const pickAtom = (i: number) => {
+    if (pendingFrom === null) { setPendingFrom(i); setPendingTo(null); return }
+    if (pendingFrom === i) { setPendingFrom(null); setPendingTo(null); return }
+    if (pendingTo === null) { setPendingTo(i); return }
+    setPendingFrom(i); setPendingTo(null)
+  }
+
+  const addBond = (kind: BondKind) => {
+    if (pendingFrom === null || pendingTo === null) return
+    setBonds(prev => [...prev, [pendingFrom, pendingTo, kind]])
+    setPendingFrom(null); setPendingTo(null)
+  }
+
+  const clear = () => { setAtoms([]); setBonds([]); setPendingFrom(null); setPendingTo(null) }
+  const removeLast = () => {
+    const lastIdx = atoms.length - 1
+    setAtoms(prev => prev.slice(0, -1))
+    setBonds(prev => prev.filter(([f, t]) => f !== lastIdx && t !== lastIdx))
+    setPendingFrom(null); setPendingTo(null)
+  }
+
+  const bondCounts = atoms.map((_, i) =>
+    bonds.filter(([f, t]) => f === i || t === i).reduce((sum, [, , k]) => sum + (BOND_ORDER[k] ?? 1), 0)
+  )
+
+  const formula = (() => {
+    const counts: Record<string, number> = {}
+    atoms.forEach(a => { counts[a.symbol] = (counts[a.symbol] ?? 0) + 1 })
+    return Object.entries(counts).map(([s, n]) => n > 1 ? `${s}${n}` : s).join('') || '—'
+  })()
+
+  const molarMass = atoms.reduce((sum, a) => {
+    const el = ELEMENTS_BY_SYMBOL[a.symbol]
+    return sum + (el?.mass ?? 0)
+  }, 0)
+
+  const syntheticMolecule: Molecule | null = atoms.length > 0 ? {
+    id: 'custom-build', name: 'Custom molecule', formula,
+    elements: [...new Set(atoms.map(a => a.symbol))],
+    geometry: '—', polarity: 'nonpolar', molarMass: Math.round(molarMass * 100) / 100,
+    state: 'solid', description: 'Built in the lab — not a preset.',
+    bondType: 'single', bondAngle: null, hybridization: null,
+    atoms, bonds, funFact: '',
+  } : null
+
+  return (
+    <div style={{ display:'flex', flex:1, minHeight:0 }}>
+      {/* Palette + atom list */}
+      <div style={{ width:260, flexShrink:0, borderRight:`0.5px solid ${C.border}`, overflowY:'auto', padding:'12px 10px' }}>
+        <div style={{ fontSize:11, color:C.hint, marginBottom:8, textTransform:'uppercase', letterSpacing:'.08em' }}>Atom Palette — click to add</div>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:16 }}>
+          {PALETTE.map(p => (
+            <button key={p.symbol} onClick={() => addAtom(p.symbol)} title={p.name}
+              style={{ width:38, height:38, borderRadius:8, border:`1px solid ${C.border}`,
+                background:C.surface2, color:C.text, fontFamily:'monospace', fontWeight:700,
+                fontSize:13, cursor:'pointer' }}>
+              {p.symbol}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+          <span style={{ fontSize:11, color:C.hint, textTransform:'uppercase', letterSpacing:'.08em' }}>Atoms ({atoms.length})</span>
+          <div style={{ display:'flex', gap:6 }}>
+            <button onClick={removeLast} disabled={!atoms.length} style={{ fontSize:11, color:C.muted, background:'none', border:'none', cursor: atoms.length ? 'pointer' : 'default' }}>Undo</button>
+            <button onClick={clear} disabled={!atoms.length} style={{ fontSize:11, color:C.red, background:'none', border:'none', cursor: atoms.length ? 'pointer' : 'default' }}>Clear</button>
+          </div>
+        </div>
+
+        {atoms.length === 0 && (
+          <div style={{ fontSize:12, color:C.hint, lineHeight:1.6 }}>Click elements above to place atoms, then click two atoms to bond them.</div>
+        )}
+
+        <div style={{ display:'flex', flexDirection:'column', gap:4 }}>
+          {atoms.map((a, i) => {
+            const valence = VALENCE[a.symbol]
+            const overValence = valence != null && bondCounts[i] > valence
+            const picked = pendingFrom === i || pendingTo === i
+            return (
+              <div key={i} onClick={() => pickAtom(i)}
+                style={{ display:'flex', alignItems:'center', justifyContent:'space-between',
+                  padding:'6px 10px', borderRadius:6, cursor:'pointer',
+                  border:`1px solid ${picked ? C.blue : C.border}`,
+                  background: picked ? C.blueBg : 'transparent' }}>
+                <span style={{ fontSize:12, fontFamily:'monospace', color:C.text }}>{i}: {a.symbol}</span>
+                {valence != null && (
+                  <span style={{ fontSize:10, color: overValence ? C.red : C.hint }}>
+                    {bondCounts[i]}/{valence} bonds{overValence ? ' ⚠' : ''}
+                  </span>
+                )}
+              </div>
+            )
+          })}
+        </div>
+
+        {pendingFrom !== null && pendingTo === null && (
+          <div style={{ marginTop:12, fontSize:11, color:C.muted }}>
+            Atom {pendingFrom} ({atoms[pendingFrom].symbol}) selected — click a second atom to bond it to.
+          </div>
+        )}
+
+        {pendingFrom !== null && pendingTo !== null && (
+          <div style={{ marginTop:12, padding:'10px', borderRadius:8, background:C.surface2, border:`1px solid ${C.border}` }}>
+            <div style={{ fontSize:11, color:C.muted, marginBottom:8 }}>
+              Bond {pendingFrom} ({atoms[pendingFrom].symbol}) ↔ {pendingTo} ({atoms[pendingTo].symbol}):
+            </div>
+            <div style={{ display:'flex', gap:6 }}>
+              {(['single','double','triple'] as BondKind[]).map(kind => (
+                <button key={kind} onClick={() => addBond(kind)}
+                  style={{ flex:1, padding:'5px 8px', borderRadius:6, fontSize:11,
+                    border:`1px solid ${C.blue}`, background:C.blueBg, color:C.blue, cursor:'pointer' }}>
+                  {kind}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 3D preview */}
+      <div style={{ flex:1, overflowY:'auto', background:C.surface, padding:'16px 20px' }}>
+        <div style={{ fontSize:20, fontWeight:700, color:C.text, fontFamily:'monospace', marginBottom:4 }}>{formula}</div>
+        <div style={{ fontSize:12, color:C.muted, marginBottom:14 }}>
+          {atoms.length} atom{atoms.length === 1 ? '' : 's'} · {bonds.length} bond{bonds.length === 1 ? '' : 's'} · {molarMass.toFixed(2)} g/mol
+        </div>
+        {syntheticMolecule ? (
+          <MoleculeViewer molecule={syntheticMolecule} C={C} />
+        ) : (
+          <div style={{ height:360, borderRadius:12, border:`1px dashed ${C.border}`, display:'flex',
+            alignItems:'center', justifyContent:'center', color:C.hint, fontSize:13 }}>
+            Add atoms from the palette to start building
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
+type BuilderMode = 'molecules' | 'reactions' | 'build'
+
+interface MoleculeBuilderProps { params?: Record<string, unknown> }
+
+export default function MoleculeBuilder({}: MoleculeBuilderProps) {
+  const C = useThemeColors()
+  const [mode, setMode] = useState<BuilderMode>('molecules')
+  const [selectedMol, setSelectedMol] = useState<Molecule | null>(MOLECULES[0])
+  const [selectedRxn, setSelectedRxn] = useState<Reaction | null>(null)
+
+  const TABS: { key: BuilderMode; label: string }[] = [
     { key:'molecules', label:'🔬 Molecules' },
     { key:'reactions', label:'⚗️ Reactions' },
+    { key:'build',     label:'🧪 Build' },
   ]
 
   return (
@@ -454,37 +662,41 @@ export default function MoleculeBuilder({ params = {} }) {
         </div>
       </div>
 
-      <div style={{ display:'flex', flex:1 }}>
-        {/* List sidebar */}
-        <div style={{ width:260, flexShrink:0, borderRight:`0.5px solid ${C.border}`,
-          overflowY:'auto', padding:'12px 10px', display:'flex', flexDirection:'column', gap:4 }}>
-          {mode === 'molecules' && MOLECULES.map(mol => (
-            <MoleculeCard key={mol.id} mol={mol}
-              isSelected={selectedMol?.id === mol.id}
-              onClick={setSelectedMol} />
-          ))}
-          {mode === 'reactions' && REACTIONS.map(rxn => (
-            <div key={rxn.id}
-              onClick={() => setSelectedRxn(rxn)}
-              style={{ padding:'10px 14px', borderRadius:10, cursor:'pointer',
-                border:`1px solid ${selectedRxn?.id === rxn.id ? C.amber : C.border}`,
-                background: selectedRxn?.id === rxn.id ? C.amberBg : 'transparent',
-                transition:'all .15s' }}>
-              <div style={{ fontSize:13, fontWeight:500, color:C.text }}>{rxn.name}</div>
-              <div style={{ fontSize:11, color:C.muted, marginTop:3, fontFamily:'monospace' }}>{rxn.equation}</div>
-              <div style={{ fontSize:10, color: rxn.deltaH < 0 ? C.red : C.blue, marginTop:4 }}>
-                ΔH = {rxn.deltaH} kJ/mol
+      {mode === 'build' ? (
+        <BuildMode C={C} />
+      ) : (
+        <div style={{ display:'flex', flex:1 }}>
+          {/* List sidebar */}
+          <div style={{ width:260, flexShrink:0, borderRight:`0.5px solid ${C.border}`,
+            overflowY:'auto', padding:'12px 10px', display:'flex', flexDirection:'column', gap:4 }}>
+            {mode === 'molecules' && MOLECULES.map(mol => (
+              <MoleculeCard key={mol.id} mol={mol} C={C}
+                isSelected={selectedMol?.id === mol.id}
+                onClick={setSelectedMol} />
+            ))}
+            {mode === 'reactions' && REACTIONS.map(rxn => (
+              <div key={rxn.id}
+                onClick={() => setSelectedRxn(rxn)}
+                style={{ padding:'10px 14px', borderRadius:10, cursor:'pointer',
+                  border:`1px solid ${selectedRxn?.id === rxn.id ? C.amber : C.border}`,
+                  background: selectedRxn?.id === rxn.id ? C.amberBg : 'transparent',
+                  transition:'all .15s' }}>
+                <div style={{ fontSize:13, fontWeight:500, color:C.text }}>{rxn.name}</div>
+                <div style={{ fontSize:11, color:C.muted, marginTop:3, fontFamily:'monospace' }}>{rxn.equation}</div>
+                <div style={{ fontSize:10, color: rxn.deltaH < 0 ? C.red : C.blue, marginTop:4 }}>
+                  ΔH = {rxn.deltaH} kJ/mol
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Detail panel */}
-        <div style={{ flex:1, overflowY:'auto', background:C.surface }}>
-          {mode === 'molecules' && <MoleculeInfo mol={selectedMol} C={C} />}
-          {mode === 'reactions' && <ReactionPanel reaction={selectedRxn} C={C} />}
+          {/* Detail panel */}
+          <div style={{ flex:1, overflowY:'auto', background:C.surface }}>
+            {mode === 'molecules' && <MoleculeInfo mol={selectedMol} C={C} />}
+            {mode === 'reactions' && <ReactionPanel reaction={selectedRxn} C={C} />}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

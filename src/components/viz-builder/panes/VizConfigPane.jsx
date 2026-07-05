@@ -19,8 +19,9 @@ Object.assign(_VIZ_REGISTRY_LAZY, {
   CNCLab:               lazy(() => import('../../../labs/cnc-sim/cnc/CNCLab.jsx')),
   PLCLadderSim:         lazy(() => import('../../../labs/plc-lab/plc/PLCLadderSim.jsx')),
   LogicSim:             lazy(() => import('../../../labs/logic-sim/LogicSim.jsx')),
-  PeriodicTable:        lazy(() => import('../../../labs/chemistry/PeriodicTable.jsx')),
-  MoleculeBuilder:      lazy(() => import('../../../labs/chemistry/MoleculeBuilder.jsx')),
+  PeriodicTable:        lazy(() => import('../../../labs/chemistry/PeriodicTable.tsx')),
+  MoleculeBuilder:      lazy(() => import('../../../labs/chemistry/MoleculeBuilder.tsx')),
+  // WhyChemistry intentionally not registered here — see VizFrame.jsx for why.
   LinearInterpolationViz: lazy(() => import('../../../labs/cnc-sim/cnc/LinearInterpolationViz.jsx')),
   SVGDiagram:           lazy(() => import('../../../courses/calculus/viz/SVGDiagram.jsx')),
 })

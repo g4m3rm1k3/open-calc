@@ -1,4 +1,4 @@
-// AtomViewer.jsx
+// AtomViewer.tsx
 // Reusable 3D Bohr-model atom viewer.
 // Used by PeriodicTable and InsideTheAtom lesson.
 //
@@ -8,11 +8,29 @@
 
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import { CATEGORY_COLORS } from '../../../labs/chemistry/chemistry_data'
+import { CATEGORY_COLORS, type Element } from './chemistry_data'
 
-export default function AtomViewer({ element, height = 380 }) {
-  const mountRef = useRef(null)
-  const ctrlRef  = useRef(null)
+interface AtomViewerProps {
+  element: Element | null
+  height?: number
+}
+
+interface ViewerControls {
+  zoomIn: () => void
+  zoomOut: () => void
+  reset: () => void
+}
+
+interface ElectronObj {
+  mesh: THREE.Mesh
+  radius: number
+  phase: number
+  speed: number
+}
+
+export default function AtomViewer({ element, height = 380 }: AtomViewerProps) {
+  const mountRef = useRef<HTMLDivElement | null>(null)
+  const ctrlRef  = useRef<ViewerControls | null>(null)
 
   useEffect(() => {
     if (!mountRef.current || !element) return
@@ -59,10 +77,10 @@ export default function AtomViewer({ element, height = 380 }) {
 
     // Electron shells — each shell gets a Group with same rotation as its ring
     const shells       = element.shells || []
-    const electronObjs = []
+    const electronObjs: ElectronObj[] = []
     const SHELL_COLORS = [0x38bdf8, 0xa78bfa, 0x4ade80, 0xfbbf24, 0xf87171, 0xfb923c, 0xe879f9]
 
-    shells.forEach((count, si) => {
+    shells.forEach((count: number, si: number) => {
       const shellR = 1.4 + si * 1.0
       const tiltX  = Math.PI / 2 + si * 0.35
       const tiltY  = si * 0.5
@@ -92,15 +110,15 @@ export default function AtomViewer({ element, height = 380 }) {
     // Mouse drag + scroll zoom
     let isDragging = false, prev = { x:0, y:0 }
     let rotX = 0.3, rotY = 0.2
-    const onDown = e => { isDragging = true; prev = { x: e.clientX, y: e.clientY } }
+    const onDown = (e: MouseEvent) => { isDragging = true; prev = { x: e.clientX, y: e.clientY } }
     const onUp   = () => { isDragging = false }
-    const onMove = e => {
+    const onMove = (e: MouseEvent) => {
       if (!isDragging) return
       rotY += (e.clientX - prev.x) * 0.01
       rotX += (e.clientY - prev.y) * 0.01
       prev = { x: e.clientX, y: e.clientY }
     }
-    const onWheel = e => {
+    const onWheel = (e: WheelEvent) => {
       e.preventDefault()
       camera.position.z = Math.max(3, Math.min(22, camera.position.z + e.deltaY * 0.02))
     }
@@ -115,7 +133,7 @@ export default function AtomViewer({ element, height = 380 }) {
       reset:   () => { rotX = 0.3; rotY = 0.2; camera.position.z = 8 },
     }
 
-    let t = 0, animId
+    let t = 0, animId: number
     const animate = () => {
       animId = requestAnimationFrame(animate)
       t += 0.016

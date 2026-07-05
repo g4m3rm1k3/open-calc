@@ -21,8 +21,9 @@ const EXTRA_RAW = {
   OpenMatNotebook:      () => import('../../../components/notebooks/OpenMatNotebook.jsx?raw'),
   PLCLadderSim:         () => import('../../../labs/plc-lab/plc/PLCLadderSim.jsx?raw'),
   LogicSim:             () => import('../../../labs/logic-sim/LogicSim.jsx?raw'),
-  PeriodicTable:        () => import('../../../labs/chemistry/PeriodicTable.jsx?raw'),
-  MoleculeBuilder:      () => import('../../../labs/chemistry/MoleculeBuilder.jsx?raw'),
+  PeriodicTable:        () => import('../../../labs/chemistry/PeriodicTable.tsx?raw'),
+  MoleculeBuilder:      () => import('../../../labs/chemistry/MoleculeBuilder.tsx?raw'),
+  // WhyChemistry intentionally not registered here — see VizFrame.jsx for why.
   CNCLab:               () => import('../../../labs/cnc-sim/cnc/CNCLab.jsx?raw'),
   LinearInterpolationViz: () => import('../../../labs/cnc-sim/cnc/LinearInterpolationViz.jsx?raw'),
   MiniGolfGame:         () => import('../../../games/golf/MiniGolfGame.jsx?raw'),

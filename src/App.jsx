@@ -30,7 +30,7 @@ const OpenMatPage = lazy(() => import("./labs/openmat/OpenMatPage.jsx"));
 const CNCSimPage = lazy(() => import("./labs/cnc-sim/CNCSimPage.jsx"));
 const CoursePage = lazy(() => import("./pages/CoursePage.jsx"));
 const LogicSimPage = lazy(() => import("./labs/logic-sim/LogicSimPage.jsx"));
-const ChemistryPage = lazy(() => import("./labs/chemistry/ChemistryPage.jsx"));
+const ChemistryPage = lazy(() => import("./labs/chemistry/ChemistryPage.tsx"));
 const PhysicsPage = lazy(() => import("./labs/physics/PhysicsPage.jsx"));
 const CadProPage = lazy(() => import("./labs/cad-pro/CadProPage.jsx"));
 const MarkdownHub = lazy(() => import("./components/docs/MarkdownHub.jsx"));

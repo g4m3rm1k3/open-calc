@@ -7,8 +7,8 @@
 //   3. Electron shell builder — fill shells 1–18 electrons
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import AtomViewer from './AtomViewer.jsx'
-import { ELEMENTS, CATEGORY_COLORS } from './chemistry_data'
+import AtomViewer from '../../../labs/chemistry/AtomViewer'
+import { ELEMENTS, CATEGORY_COLORS } from '../../../labs/chemistry/chemistry_data'
 
 import { useThemeColors } from '../../../hooks/useThemeColors';
 // ── Colour helpers ─────────────────────────────────────────────────────────────

@@ -3,22 +3,35 @@
 // Tiles scale dynamically to fill available width via ResizeObserver.
 
 import { useState, useEffect, useRef } from 'react'
-import { ELEMENTS, CATEGORY_COLORS, GRID_POSITIONS } from './chemistry_data'
-import AtomViewer from '../../courses/chemistry/viz/AtomViewer.jsx'
+import { useNavigate } from 'react-router-dom'
+import { ELEMENTS, CATEGORY_COLORS, GRID_POSITIONS, type Element, type ElementCategory } from './chemistry_data'
+import AtomViewer from './AtomViewer'
+import { useThemeColors } from '../../hooks/useThemeColors.js'
 
-import { useThemeColors } from '../../hooks/useThemeColors';
+type ThemeColors = ReturnType<typeof useThemeColors>
+
+type StateAtSTP = 'solid' | 'liquid' | 'gas' | 'unknown'
+
 // ── State at STP (298 K) ──────────────────────────────────────────────────────
-function stateAtSTP(el) {
+function stateAtSTP(el: Element): StateAtSTP {
   if (el.boil != null && el.boil <= 298) return 'gas'
   if (el.melt != null && el.melt <= 298) return 'liquid'
   if (el.melt != null && el.melt > 298)  return 'solid'
   return 'unknown'
 }
-const STATE_DOT   = { solid:'#94a3b8', liquid:'#22d3ee', gas:'#fbbf24', unknown:'#374151' }
-const STATE_LABEL = { solid:'Solid',   liquid:'Liquid',  gas:'Gas',     unknown:'Unknown'  }
+const STATE_DOT: Record<StateAtSTP, string>   = { solid:'#94a3b8', liquid:'#22d3ee', gas:'#fbbf24', unknown:'#374151' }
+const STATE_LABEL: Record<StateAtSTP, string> = { solid:'Solid',   liquid:'Liquid',  gas:'Gas',     unknown:'Unknown'  }
 
 // ── Periodic trend definitions ────────────────────────────────────────────────
-const TRENDS = [
+interface Trend {
+  key: string
+  label: string
+  unit: string
+  color: string
+  get: (el: Element) => number | null
+}
+
+const TRENDS: Trend[] = [
   { key:'radius',  label:'Atomic Radius',     unit:'pm',    color:'#818cf8', get: el => el.radius  },
   { key:'eneg',    label:'Electronegativity', unit:'',      color:'#f59e0b', get: el => el.eneg    },
   { key:'density', label:'Density',           unit:'g/cm³', color:'#10b981', get: el => el.density ? Math.log10(el.density + 0.001) : null },
@@ -26,20 +39,33 @@ const TRENDS = [
   { key:'boil',    label:'Boiling Point',     unit:'K',     color:'#f97316', get: el => el.boil    },
 ]
 
-function buildScale(trendKey) {
+interface Scale extends Trend {
+  min: number
+  max: number
+  rgb: number[]
+  norm: (v: number | null) => number | null
+}
+
+function buildScale(trendKey: string): Scale | null {
   const t = TRENDS.find(x => x.key === trendKey)
   if (!t) return null
-  const vals = ELEMENTS.map(el => t.get(el)).filter(v => v != null)
+  const vals = ELEMENTS.map(el => t.get(el)).filter((v): v is number => v != null)
   const min = Math.min(...vals), max = Math.max(...vals)
   const rgb = [t.color.slice(1,3), t.color.slice(3,5), t.color.slice(5,7)].map(h => parseInt(h,16))
   return { ...t, min, max, rgb, norm: v => v != null ? (v - min) / (max - min) : null }
 }
 
-// ── Dark mode colors ──────────────────────────────────────────────────────────
-
-
 // ── Element tile — accepts tileW/tileH for dynamic sizing ─────────────────────
-function ElementCell({ el, isSelected, onClick, scale, tileW, tileH }) {
+interface ElementCellProps {
+  el: Element | null
+  isSelected: boolean
+  onClick: (el: Element) => void
+  scale: Scale | null
+  tileW: number
+  tileH: number
+}
+
+function ElementCell({ el, isSelected, onClick, scale, tileW, tileH }: ElementCellProps) {
   if (!el) return <div style={{ width:tileW, height:tileH, flexShrink:0 }} />
   const cat   = CATEGORY_COLORS[el.cat] || CATEGORY_COLORS.unknown
   const state = stateAtSTP(el)
@@ -78,21 +104,27 @@ function ElementCell({ el, isSelected, onClick, scale, tileW, tileH }) {
   )
 }
 
-function GhostTile({ label, sub, tileW, tileH }) {
+interface GhostTileProps { label: string; sub: string; tileW: number; tileH: number; C: ThemeColors }
+
+function GhostTile({ label, sub, tileW, tileH, C }: GhostTileProps) {
   return (
     <div style={{
-      width:tileW, height:tileH, borderRadius:4, border:'1px dashed #334155',
+      width:tileW, height:tileH, borderRadius:4, border:`1px dashed ${C.border}`,
       background:'rgba(99,102,241,0.07)', flexShrink:0,
       display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
     }}>
       <div style={{ fontSize: Math.max(7, Math.round(tileW*0.175)), color:'#6366f1', textAlign:'center', lineHeight:1.2 }}>{label}</div>
-      <div style={{ fontSize: Math.max(6, Math.round(tileW*0.15)),  color:'#475569', textAlign:'center' }}>{sub}</div>
+      <div style={{ fontSize: Math.max(6, Math.round(tileW*0.15)),  color:C.hint, textAlign:'center' }}>{sub}</div>
     </div>
   )
 }
 
 // ── Info panel ────────────────────────────────────────────────────────────────
-function InfoPanel({ element, C }) {
+interface InfoPanelProps { element: Element | null; C: ThemeColors }
+
+function InfoPanel({ element, C }: InfoPanelProps) {
+  const navigate = useNavigate()
+
   if (!element) return (
     <div style={{ padding:40, textAlign:'center', display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}>
       <div style={{ fontSize:48, opacity:0.2 }}>⚛</div>
@@ -102,8 +134,8 @@ function InfoPanel({ element, C }) {
   )
   const cat   = CATEGORY_COLORS[element.cat] || CATEGORY_COLORS.unknown
   const state = stateAtSTP(element)
-  const fmt   = v => v != null ? v : '—'
-  const rows  = [
+  const fmt   = (v: string | number | null): string | number => v != null ? v : '—'
+  const rows: [string, string | number][]  = [
     ['Atomic number',    element.n],
     ['Atomic mass',      `${element.mass} u`],
     ['State at 25 °C',  STATE_LABEL[state]],
@@ -164,13 +196,24 @@ function InfoPanel({ element, C }) {
         <div style={{ fontSize:10, color:cat.text, opacity:0.65, fontWeight:600, marginBottom:4 }}>⚡ Fun fact</div>
         <div style={{ fontSize:12, color:cat.text, lineHeight:1.65 }}>{element.fact}</div>
       </div>
+      <div style={{ margin:'0 18px 18px' }}>
+        <button onClick={() => navigate('/course/chemistry')} style={{
+          fontSize:11.5, color:C.blue, background:'none', border:'none', cursor:'pointer', padding:0,
+        }}>Learn more about atomic structure in the course →</button>
+      </div>
     </div>
   )
 }
 
 // ── Category legend (clickable, with clear) ───────────────────────────────────
-function Legend({ filterCat, setFilterCat, C }) {
-  const cats = [
+interface LegendProps {
+  filterCat: ElementCategory | null
+  setFilterCat: (cat: ElementCategory | null) => void
+  C: ThemeColors
+}
+
+function Legend({ filterCat, setFilterCat, C }: LegendProps) {
+  const cats: [ElementCategory, string][] = [
     ['alkali-metal','Alkali Metal'],        ['alkaline-earth','Alkaline Earth'],
     ['transition-metal','Transition Metal'],['post-transition','Post-Transition'],
     ['metalloid','Metalloid'],              ['nonmetal','Nonmetal'],
@@ -181,8 +224,8 @@ function Legend({ filterCat, setFilterCat, C }) {
     <div style={{ display:'flex', flexWrap:'wrap', gap:4, alignItems:'center' }}>
       {filterCat && (
         <button onClick={() => setFilterCat(null)} style={{
-          padding:'2px 8px', borderRadius:4, border:'1px solid #475569',
-          background:'transparent', color:'#94a3b8', fontSize:10, cursor:'pointer',
+          padding:'2px 8px', borderRadius:4, border:`1px solid ${C.border}`,
+          background:'transparent', color:C.muted, fontSize:10, cursor:'pointer',
         }}>× All</button>
       )}
       {cats.map(([key, label]) => {
@@ -206,8 +249,14 @@ function Legend({ filterCat, setFilterCat, C }) {
 }
 
 // ── State-at-STP filter chips with clear button ───────────────────────────────
-function StateFilters({ filterState, setFilterState, C }) {
-  const opts = [
+interface StateFiltersProps {
+  filterState: StateAtSTP | null
+  setFilterState: (state: StateAtSTP | null) => void
+  C: ThemeColors
+}
+
+function StateFilters({ filterState, setFilterState, C }: StateFiltersProps) {
+  const opts: { key: StateAtSTP; label: string; color: string }[] = [
     { key:'solid',  label:'Solids',  color:'#94a3b8' },
     { key:'liquid', label:'Liquids', color:'#22d3ee' },
     { key:'gas',    label:'Gases',   color:'#fbbf24' },
@@ -216,8 +265,8 @@ function StateFilters({ filterState, setFilterState, C }) {
     <div style={{ display:'flex', gap:5, alignItems:'center' }}>
       {filterState && (
         <button onClick={() => setFilterState(null)} style={{
-          padding:'4px 9px', borderRadius:6, border:'1px solid #475569',
-          background:'transparent', color:'#94a3b8', fontSize:11, cursor:'pointer',
+          padding:'4px 9px', borderRadius:6, border:`1px solid ${C.border}`,
+          background:'transparent', color:C.muted, fontSize:11, cursor:'pointer',
         }}>× All</button>
       )}
       {opts.map(({ key, label, color }) => {
@@ -240,14 +289,20 @@ function StateFilters({ filterState, setFilterState, C }) {
 }
 
 // ── Trend toggle bar ──────────────────────────────────────────────────────────
-function TrendBar({ active, setActive, C }) {
+interface TrendBarProps {
+  active: string | null
+  setActive: (key: string | null) => void
+  C: ThemeColors
+}
+
+function TrendBar({ active, setActive, C }: TrendBarProps) {
   return (
     <div style={{ display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
       <span style={{ fontSize:11, color:C.hint, whiteSpace:'nowrap' }}>Trend:</span>
       {active && (
         <button onClick={() => setActive(null)} style={{
-          padding:'4px 9px', borderRadius:6, border:'1px solid #475569',
-          background:'transparent', color:'#94a3b8', fontSize:11, cursor:'pointer',
+          padding:'4px 9px', borderRadius:6, border:`1px solid ${C.border}`,
+          background:'transparent', color:C.muted, fontSize:11, cursor:'pointer',
         }}>× Off</button>
       )}
       {TRENDS.map(t => {
@@ -266,16 +321,18 @@ function TrendBar({ active, setActive, C }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export default function PeriodicTable({ params = {} }) {
+interface PeriodicTableProps { params?: Record<string, unknown> }
+
+export default function PeriodicTable({ params = {} }: PeriodicTableProps) {
   const C = useThemeColors()
-  const [selected,    setSelected]    = useState(null)
+  const [selected,    setSelected]    = useState<Element | null>(null)
   const [search,      setSearch]      = useState('')
-  const [filterCat,   setFilterCat]   = useState(null)
-  const [filterState, setFilterState] = useState(null)
-  const [activeTrend, setActiveTrend] = useState(null)
+  const [filterCat,   setFilterCat]   = useState<ElementCategory | null>(null)
+  const [filterState, setFilterState] = useState<StateAtSTP | null>(null)
+  const [activeTrend, setActiveTrend] = useState<string | null>(null)
 
   // Dynamic tile sizing via ResizeObserver
-  const tableAreaRef = useRef(null)
+  const tableAreaRef = useRef<HTMLDivElement | null>(null)
   const [tileW, setTileW] = useState(40)
   const tileH = Math.round(tileW * 1.2)
 
@@ -296,13 +353,13 @@ export default function PeriodicTable({ params = {} }) {
   const scale = activeTrend ? buildScale(activeTrend) : null
 
   // Build 9-row × 18-col grid
-  const grid = Array.from({ length: 9 }, () => Array(18).fill(null))
+  const grid: (Element | null)[][] = Array.from({ length: 9 }, () => Array(18).fill(null))
   ELEMENTS.forEach(el => {
     const pos = GRID_POSITIONS[el.n]
     if (pos) grid[pos[0]-1][pos[1]-1] = el
   })
 
-  const matches = el => {
+  const matches = (el: Element | null) => {
     if (!el) return false
     if (filterCat   && el.cat !== filterCat) return false
     if (filterState && stateAtSTP(el) !== filterState) return false
@@ -365,8 +422,8 @@ export default function PeriodicTable({ params = {} }) {
               <div key={ri} style={{ display:'flex', gap, alignItems:'center' }}>
                 <div style={{ width:18, fontSize:9, color:C.hint, textAlign:'right', flexShrink:0 }}>{ri+1}</div>
                 {row.map((el, ci) => {
-                  if (!el && ri === 5 && ci === 2) return <GhostTile key={ci} label="57–71" sub="La–Lu" tileW={tileW} tileH={tileH} />
-                  if (!el && ri === 6 && ci === 2) return <GhostTile key={ci} label="89–103" sub="Ac–Lr" tileW={tileW} tileH={tileH} />
+                  if (!el && ri === 5 && ci === 2) return <GhostTile key={ci} label="57–71" sub="La–Lu" tileW={tileW} tileH={tileH} C={C} />
+                  if (!el && ri === 6 && ci === 2) return <GhostTile key={ci} label="89–103" sub="Ac–Lr" tileW={tileW} tileH={tileH} C={C} />
                   if (!el) return <div key={ci} style={{ width:tileW, height:tileH, flexShrink:0 }} />
                   return (
                     <div key={ci} style={{ opacity: matches(el) ? 1 : 0.13, transition:'opacity .18s' }}>
@@ -412,7 +469,7 @@ export default function PeriodicTable({ params = {} }) {
 
           {/* State dot legend */}
           <div style={{ marginTop:8, marginLeft:22, display:'flex', gap:10 }}>
-            {Object.entries(STATE_DOT).map(([k, col]) => (
+            {(Object.entries(STATE_DOT) as [StateAtSTP, string][]).map(([k, col]) => (
               <div key={k} style={{ display:'flex', alignItems:'center', gap:4 }}>
                 <div style={{ width:5, height:5, borderRadius:'50%', background:col }} />
                 <span style={{ fontSize:9, color:C.hint }}>{STATE_LABEL[k]}</span>

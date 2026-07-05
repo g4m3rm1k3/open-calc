@@ -1,9 +1,82 @@
-// chemistry_data.js
+// chemistry_data.ts
 // Complete element data + molecule library + reaction library
 // All data is self-contained — no network requests needed
+//
+// This is the single canonical copy — previously duplicated byte-for-byte at
+// src/courses/chemistry/viz/chemistry_data.jsx, which silently risked drifting
+// from this one. Both the lab (PeriodicTable/MoleculeBuilder) and the lesson
+// viz (InsideTheAtom) import from here now.
+
+export type ElementCategory =
+  | 'alkali-metal' | 'alkaline-earth' | 'transition-metal' | 'post-transition'
+  | 'metalloid' | 'nonmetal' | 'halogen' | 'noble-gas' | 'lanthanide' | 'actinide' | 'unknown'
+
+export interface CategoryColor { bg: string; border: string; text: string }
+
+export interface Element {
+  symbol: string
+  name: string
+  n: number
+  mass: number
+  cat: ElementCategory
+  period: number
+  group: number | null
+  config: string
+  eneg: number | null
+  radius: number | null
+  melt: number | null
+  boil: number | null
+  density: number | null
+  shells: number[]
+  discovered: string
+  year: number | null
+  uses: string
+  fact: string
+}
+
+export type BondKind =
+  | 'single' | 'double' | 'triple' | 'ionic' | 'aromatic'
+  | 'hydrogen' | 'van-der-waals' | 'metallic'
+
+export interface AtomPosition { symbol: string; x: number; y: number; z: number }
+export type Bond = [from: number, to: number, kind: BondKind]
+
+export interface Molecule {
+  id: string
+  name: string
+  formula: string
+  elements: string[]
+  geometry: string
+  polarity: 'polar' | 'nonpolar' | 'ionic'
+  molarMass: number
+  state: 'solid' | 'liquid' | 'gas'
+  description: string
+  bondType: string
+  bondAngle: number | null
+  hybridization: string | null
+  atoms: AtomPosition[]
+  bonds: Bond[]
+  funFact: string
+}
+
+export interface Reaction {
+  id: string
+  name: string
+  type: string
+  equation: string
+  reactants: string[]
+  products: string[]
+  deltaH: number
+  description: string
+  bondBreaking: string[]
+  bondForming: string[]
+  energyNote: string
+}
+
+export interface BondTypeInfo { label: string; color: string; width: number; description: string }
 
 // ── ELEMENT CATEGORIES ────────────────────────────────────────────────────────
-export const CATEGORY_COLORS = {
+export const CATEGORY_COLORS: Record<ElementCategory, CategoryColor> = {
   'alkali-metal':        { bg: '#7f1d1d', border: '#ef4444', text: '#fca5a5' },
   'alkaline-earth':      { bg: '#7c2d12', border: '#f97316', text: '#fdba74' },
   'transition-metal':    { bg: '#1e3a5f', border: '#3b82f6', text: '#93c5fd' },
@@ -22,7 +95,7 @@ export const CATEGORY_COLORS = {
 //         electronConfig, electronegativity, atomicRadius(pm), meltingPoint(K),
 //         boilingPoint(K), density(g/cm³), discoveredBy, discoveryYear,
 //         shells (electrons per shell), uses, funFact
-export const ELEMENTS = [
+export const ELEMENTS: Element[] = [
   { symbol:'H',  name:'Hydrogen',      n:1,   mass:1.008,    cat:'nonmetal',       period:1, group:1,
     config:'1s¹', eneg:2.20, radius:53,  melt:14,    boil:20,    density:0.0000899,
     shells:[1], discovered:'Cavendish', year:1766,
@@ -293,7 +366,7 @@ export const ELEMENTS = [
 // Each molecule has: id, name, formula, elements, bonds, geometry, polarity,
 // molar mass, state (at room temp), description, atoms (3D positions), bondType
 // Atom positions are in Angstroms relative to center of mass
-export const MOLECULES = [
+export const MOLECULES: Molecule[] = [
   {
     id: 'H2O', name: 'Water', formula: 'H₂O',
     elements: ['O','H','H'],
@@ -493,10 +566,181 @@ export const MOLECULES = [
     bonds: [[0,1,'single']],
     funFact: 'Can dissolve glass — the only common substance that etches silicon dioxide; stored in plastic containers',
   },
+  {
+    id: 'O3', name: 'Ozone', formula: 'O₃',
+    elements: ['O','O','O'],
+    geometry: 'bent', polarity: 'polar', molarMass: 47.997, state: 'gas',
+    description: 'Bent, resonance-stabilized molecule — the true structure is an average of two Lewis structures, each with one O=O double bond and one O-O single bond. The stratospheric ozone layer absorbs most of the Sun\'s UV-B radiation.',
+    bondType: 'covalent-polar',
+    bondAngle: 117,
+    hybridization: 'sp²',
+    atoms: [
+      { symbol:'O', x:0,     y:0.1,  z:0 },
+      { symbol:'O', x:1.14,  y:-0.55,z:0 },
+      { symbol:'O', x:-1.14, y:-0.55,z:0 },
+    ],
+    bonds: [[0,1,'double'],[0,2,'double']],
+    funFact: 'A single ozone molecule can absorb thousands of UV photons before breaking down — this is the entire reason life could move onto land',
+  },
+  {
+    id: 'H2O2', name: 'Hydrogen Peroxide', formula: 'H₂O₂',
+    elements: ['H','O','O','H'],
+    geometry: 'open-book', polarity: 'polar', molarMass: 34.015, state: 'liquid',
+    description: 'A non-planar "open book" shape — the two O-H bonds sit at roughly a 90° dihedral angle to each other around the central O-O bond, which is unusually weak and makes H₂O₂ a strong oxidizer.',
+    bondType: 'covalent-polar',
+    bondAngle: 94.8,
+    hybridization: 'sp³',
+    atoms: [
+      { symbol:'O', x:-0.73, y:0.05,  z:0    },
+      { symbol:'O', x:0.73,  y:0.05,  z:0    },
+      { symbol:'H', x:-0.88, y:-0.36, z:0.82 },
+      { symbol:'H', x:0.88,  y:-0.36, z:-0.82},
+    ],
+    bonds: [[0,1,'single'],[0,2,'single'],[1,3,'single']],
+    funFact: 'Used as a rocket propellant oxidizer and hair bleach; its weak O-O bond is exactly why it decomposes so readily into water and oxygen',
+  },
+  {
+    id: 'C2H6O', name: 'Ethanol', formula: 'C₂H₅OH',
+    elements: ['C','C','O','H','H','H','H','H','H'],
+    geometry: 'tetrahedral', polarity: 'polar', molarMass: 46.068, state: 'liquid',
+    description: 'A two-carbon chain ending in a hydroxyl (-OH) group. The polar -OH lets ethanol hydrogen-bond with water (fully miscible) while the nonpolar carbon chain also dissolves nonpolar substances — this dual nature is why it is such a versatile solvent.',
+    bondType: 'covalent-polar',
+    bondAngle: 109.5,
+    hybridization: 'sp³',
+    atoms: [
+      { symbol:'C', x:-1.2, y:0.3,  z:0    },
+      { symbol:'C', x:0.0,  y:-0.3, z:0    },
+      { symbol:'O', x:1.2,  y:0.3,  z:0    },
+      { symbol:'H', x:1.9,  y:-0.2, z:0    },
+      { symbol:'H', x:-1.2, y:1.0,  z:0.8  },
+      { symbol:'H', x:-1.2, y:1.0,  z:-0.8 },
+      { symbol:'H', x:-2.1, y:-0.3, z:0    },
+      { symbol:'H', x:0.0,  y:-1.0, z:0.8  },
+      { symbol:'H', x:0.0,  y:-1.0, z:-0.8 },
+    ],
+    bonds: [[0,1,'single'],[1,2,'single'],[2,3,'single'],[0,4,'single'],[0,5,'single'],[0,6,'single'],[1,7,'single'],[1,8,'single']],
+    funFact: 'The alcohol in beer, wine, and spirits — produced by yeast fermenting sugar, and one of the first chemicals humans learned to deliberately synthesize',
+  },
+  {
+    id: 'C2H4O2', name: 'Acetic Acid', formula: 'CH₃COOH',
+    elements: ['C','C','O','O','H','H','H','H'],
+    geometry: 'trigonal-planar', polarity: 'polar', molarMass: 60.052, state: 'liquid',
+    description: 'A carboxylic acid — a methyl group attached to a carbon that carries both a C=O (carbonyl) and a C-O-H (hydroxyl) group. The O-H hydrogen is acidic because the resulting negative charge is stabilized across both oxygens.',
+    bondType: 'covalent-polar',
+    bondAngle: 120,
+    hybridization: 'sp²',
+    atoms: [
+      { symbol:'C', x:-1.5, y:0.3,  z:0   },
+      { symbol:'C', x:0.0,  y:-0.2, z:0   },
+      { symbol:'O', x:0.3,  y:-1.5, z:0.3 },
+      { symbol:'O', x:1.1,  y:0.7,  z:0   },
+      { symbol:'H', x:2.0,  y:0.3,  z:0   },
+      { symbol:'H', x:-1.6, y:1.0,  z:0.9 },
+      { symbol:'H', x:-1.6, y:1.0,  z:-0.9},
+      { symbol:'H', x:-2.4, y:-0.3, z:0   },
+    ],
+    bonds: [[0,1,'single'],[1,2,'double'],[1,3,'single'],[3,4,'single'],[0,5,'single'],[0,6,'single'],[0,7,'single']],
+    funFact: 'Gives vinegar its sour taste and sharp smell — table vinegar is roughly 4-8% acetic acid dissolved in water',
+  },
+  {
+    id: 'CH4O', name: 'Methanol', formula: 'CH₃OH',
+    elements: ['C','O','H','H','H','H'],
+    geometry: 'tetrahedral', polarity: 'polar', molarMass: 32.042, state: 'liquid',
+    description: 'The simplest alcohol — a single carbon bonded to a hydroxyl group. Structurally almost identical to ethanol, but the shorter carbon chain and the way the body metabolizes it into toxic formaldehyde and formic acid make it dangerous to ingest.',
+    bondType: 'covalent-polar',
+    bondAngle: 109.5,
+    hybridization: 'sp³',
+    atoms: [
+      { symbol:'C', x:-0.7, y:0,    z:0   },
+      { symbol:'O', x:0.7,  y:0,    z:0   },
+      { symbol:'H', x:1.3,  y:0.8,  z:0   },
+      { symbol:'H', x:-1.1, y:0.9,  z:0.5 },
+      { symbol:'H', x:-1.1, y:0.9,  z:-0.5},
+      { symbol:'H', x:-1.1, y:-1.0, z:0   },
+    ],
+    bonds: [[0,1,'single'],[1,2,'single'],[0,3,'single'],[0,4,'single'],[0,5,'single']],
+    funFact: 'Sometimes called "wood alcohol"; unlike ethanol it is metabolized into formaldehyde and formic acid, which is why drinking it can cause blindness or death',
+  },
+  {
+    id: 'NaOH', name: 'Sodium Hydroxide', formula: 'NaOH',
+    elements: ['Na','O','H'],
+    geometry: 'linear', polarity: 'ionic', molarMass: 39.997, state: 'solid',
+    description: 'An ionic solid in the crystal (Na⁺ and OH⁻ ions), but the hydroxide ion itself is held together by a covalent O-H bond. Extremely soluble in water and highly caustic — it reacts with fats to make soap (saponification).',
+    bondType: 'ionic',
+    bondAngle: null,
+    hybridization: null,
+    atoms: [
+      { symbol:'Na', x:-1.3, y:0,   z:0 },
+      { symbol:'O',  x:0,    y:0,   z:0 },
+      { symbol:'H',  x:0.6,  y:0.8, z:0 },
+    ],
+    bonds: [[0,1,'ionic'],[1,2,'single']],
+    funFact: 'Known as lye or caustic soda — its industrial name reflects how aggressively it reacts with skin and fats',
+  },
+  {
+    id: 'CO', name: 'Carbon Monoxide', formula: 'CO',
+    elements: ['C','O'],
+    geometry: 'linear', polarity: 'polar', molarMass: 28.010, state: 'gas',
+    description: 'A triple bond between carbon and oxygen, including one dative (coordinate) bond where oxygen donates both electrons. Colorless, odorless, and dangerous — it binds to hemoglobin far more strongly than oxygen does.',
+    bondType: 'covalent-polar',
+    bondAngle: 180,
+    hybridization: 'sp',
+    atoms: [
+      { symbol:'C', x:-0.56, y:0, z:0 },
+      { symbol:'O', x:0.56,  y:0, z:0 },
+    ],
+    bonds: [[0,1,'triple']],
+    funFact: 'Binds to hemoglobin about 200 times more strongly than oxygen — which is why it is so dangerous despite having no smell or warning signs',
+  },
+  {
+    id: 'C6H12O6', name: 'Glucose', formula: 'C₆H₁₂O₆',
+    elements: ['C','C','C','C','C','C','O','O','O','O','O','O','H','H','H','H','H','H','H','H','H','H','H','H'],
+    geometry: 'chain', polarity: 'polar', molarMass: 180.156, state: 'solid',
+    description: 'Shown here in its open-chain (aldehyde) form — a six-carbon backbone with a C=O aldehyde at one end and a hydroxyl (-OH) group on every other carbon. In solution it mostly exists as a six-membered ring, but the open-chain form is easiest to see the atom-by-atom structure in.',
+    bondType: 'covalent-polar',
+    bondAngle: null,
+    hybridization: 'sp³',
+    atoms: [
+      { symbol:'C', x:-3.75, y:0.3,  z:0   },
+      { symbol:'C', x:-2.5,  y:-0.3, z:0   },
+      { symbol:'C', x:-1.25, y:0.3,  z:0   },
+      { symbol:'C', x:0,     y:-0.3, z:0   },
+      { symbol:'C', x:1.25,  y:0.3,  z:0   },
+      { symbol:'C', x:2.5,   y:-0.3, z:0   },
+      { symbol:'O', x:-3.75, y:1.5,  z:0   },
+      { symbol:'H', x:-4.7,  y:-0.2, z:0   },
+      { symbol:'O', x:-2.5,  y:0.9,  z:1.0 },
+      { symbol:'H', x:-2.5,  y:1.8,  z:1.0 },
+      { symbol:'H', x:-2.5,  y:-1.1, z:-0.8},
+      { symbol:'O', x:-1.25, y:-0.9, z:1.0 },
+      { symbol:'H', x:-1.25, y:-1.8, z:1.0 },
+      { symbol:'H', x:-1.25, y:1.1,  z:-0.8},
+      { symbol:'O', x:0,     y:0.9,  z:1.0 },
+      { symbol:'H', x:0,     y:1.8,  z:1.0 },
+      { symbol:'H', x:0,     y:-1.1, z:-0.8},
+      { symbol:'O', x:1.25,  y:-0.9, z:1.0 },
+      { symbol:'H', x:1.25,  y:-1.8, z:1.0 },
+      { symbol:'H', x:1.25,  y:1.1,  z:-0.8},
+      { symbol:'O', x:3.75,  y:0.3,  z:0   },
+      { symbol:'H', x:4.5,   y:1.0,  z:0   },
+      { symbol:'H', x:2.5,   y:-1.1, z:0.8 },
+      { symbol:'H', x:2.5,   y:-1.1, z:-0.8},
+    ],
+    bonds: [
+      [0,1,'single'],[1,2,'single'],[2,3,'single'],[3,4,'single'],[4,5,'single'],
+      [0,6,'double'],[0,7,'single'],
+      [1,8,'single'],[8,9,'single'],[1,10,'single'],
+      [2,11,'single'],[11,12,'single'],[2,13,'single'],
+      [3,14,'single'],[14,15,'single'],[3,16,'single'],
+      [4,17,'single'],[17,18,'single'],[4,19,'single'],
+      [5,20,'single'],[20,21,'single'],[5,22,'single'],[5,23,'single'],
+    ],
+    funFact: 'Your brain burns roughly 120g of glucose a day — about 20% of your body\'s total energy use, despite being only 2% of your body weight',
+  },
 ];
 
 // ── REACTION LIBRARY ─────────────────────────────────────────────────────────
-export const REACTIONS = [
+export const REACTIONS: Reaction[] = [
   {
     id: 'combustion-methane',
     name: 'Combustion of Methane',
@@ -541,7 +785,7 @@ export const REACTIONS = [
     name: 'Neutralization (HCl + NaOH)',
     type: 'acid-base',
     equation: 'HCl + NaOH → NaCl + H₂O',
-    reactants: ['HCl','NaOH-placeholder'],
+    reactants: ['HCl','NaOH'],
     products:  ['NaCl','H2O'],
     deltaH: -57.3,
     description: 'Classic acid-base neutralization. The H⁺ from the acid combines with OH⁻ from the base to form water. The net ionic equation is simply H⁺ + OH⁻ → H₂O.',
@@ -555,17 +799,56 @@ export const REACTIONS = [
     type: 'biochemical',
     equation: '6CO₂ + 6H₂O + light energy → C₆H₁₂O₆ + 6O₂',
     reactants: ['CO2','CO2','CO2','CO2','CO2','CO2','H2O','H2O','H2O','H2O','H2O','H2O'],
-    products:  ['C6H12O6-placeholder','O2','O2','O2','O2','O2','O2'],
+    products:  ['C6H12O6','O2','O2','O2','O2','O2','O2'],
     deltaH: +2803,
     description: 'The reaction that powers almost all life on Earth. Plants use light energy to convert CO₂ and water into glucose and oxygen. The reverse of cellular respiration.',
     bondBreaking: ['6 C=O bonds in CO₂', '12 O-H bonds in H₂O'],
     bondForming: ['C-C, C-H, C-O bonds in glucose', '6 O=O bonds in O₂'],
     energyNote: 'Endothermic — requires light energy input (2803 kJ absorbed per mole of glucose)',
   },
+  {
+    id: 'peroxide-decomposition',
+    name: 'Decomposition of Hydrogen Peroxide',
+    type: 'decomposition',
+    equation: '2H₂O₂ → 2H₂O + O₂',
+    reactants: ['H2O2','H2O2'],
+    products:  ['H2O','H2O','O2'],
+    deltaH: -196.4,
+    description: 'The classic "elephant toothpaste" reaction. Hydrogen peroxide is thermodynamically unstable and slowly decomposes into water and oxygen on its own — catalysts like catalase (in your blood) or manganese dioxide dramatically speed this up.',
+    bondBreaking: ['2 O-O single bonds in H₂O₂ (only ~146 kJ/mol each — unusually weak)'],
+    bondForming: ['1 O=O double bond in O₂', 'O-H bonds reorganized into 2H₂O'],
+    energyNote: 'Exothermic — the weak O-O bond is why H₂O₂ decomposes so readily, especially with a catalyst',
+  },
+  {
+    id: 'sodium-water',
+    name: 'Sodium + Water',
+    type: 'single-displacement',
+    equation: '2Na + 2H₂O → 2NaOH + H₂',
+    reactants: ['Na','H2O','H2O'],
+    products:  ['NaOH','NaOH','H2'],
+    deltaH: -368.4,
+    description: 'A textbook redox demonstration — and a genuinely dangerous one. Sodium metal gives up its outer electron to water, is oxidized (0 → +1), while hydrogen in water is reduced (+1 → 0) to form H₂ gas. The reaction is violently exothermic and can ignite the hydrogen produced.',
+    bondBreaking: ['Metallic bonding in solid Na', 'O-H bonds in H₂O (reorganized)'],
+    bondForming: ['Na-O ionic bonds in NaOH', 'H-H bond in H₂'],
+    energyNote: 'Strongly exothermic — reactive alkali metals like sodium react with water fast enough to be a genuine hazard',
+  },
+  {
+    id: 'esterification',
+    name: 'Esterification (Ethanol + Acetic Acid)',
+    type: 'esterification',
+    equation: 'CH₃COOH + C₂H₅OH ⇌ CH₃COOC₂H₅ + H₂O',
+    reactants: ['C2H4O2','C2H6O'],
+    products:  ['C4H8O2-ethyl-acetate','H2O'],
+    deltaH: +8.4,
+    description: 'A condensation reaction between a carboxylic acid and an alcohol, catalyzed by acid, that forms an ester and water. This is an equilibrium reaction — it can be pushed toward products by removing water as it forms. Esters are responsible for the characteristic smell of many fruits.',
+    bondBreaking: ['O-H bond in the carboxylic acid', 'C-O bond in the alcohol'],
+    bondForming: ['C-O ester linkage', 'O-H bond in water'],
+    energyNote: 'Roughly thermoneutral — this reaction is an equilibrium, not a one-way reaction like the others here',
+  },
 ];
 
 // ── BOND TYPE METADATA ────────────────────────────────────────────────────────
-export const BOND_TYPES = {
+export const BOND_TYPES: Record<BondKind, BondTypeInfo> = {
   'single':        { label: 'Single covalent',   color: '#94a3b8', width: 0.08, description: 'Shared electron pair. Rotatable. Bond energy ~350 kJ/mol for C-C.' },
   'double':        { label: 'Double covalent',   color: '#38bdf8', width: 0.14, description: 'Two shared pairs (σ + π bond). Restricted rotation. Shorter and stronger than single.' },
   'triple':        { label: 'Triple covalent',   color: '#a78bfa', width: 0.18, description: 'Three shared pairs (σ + 2π). No rotation. Very short, very strong (C≡C: 835 kJ/mol).' },
@@ -578,7 +861,7 @@ export const BOND_TYPES = {
 
 // ── ELEMENT GRID POSITIONS ────────────────────────────────────────────────────
 // Maps atomic number to [row, col] in the standard 18-column periodic table
-export const GRID_POSITIONS = {
+export const GRID_POSITIONS: Record<number, [number, number]> = {
   1:  [1,1],  2:  [1,18],
   3:  [2,1],  4:  [2,2],  5:  [2,13], 6:  [2,14], 7:  [2,15], 8:  [2,16], 9:  [2,17], 10: [2,18],
   11: [3,1],  12: [3,2],  13: [3,13], 14: [3,14], 15: [3,15], 16: [3,16], 17: [3,17], 18: [3,18],
@@ -588,10 +871,10 @@ export const GRID_POSITIONS = {
   37: [5,1],  38: [5,2],  39: [5,3],  40: [5,4],  41: [5,5],  42: [5,6],  43: [5,7],  44: [5,8],
   45: [5,9],  46: [5,10], 47: [5,11], 48: [5,12], 49: [5,13], 50: [5,14], 51: [5,15], 52: [5,16],
   53: [5,17], 54: [5,18],
-  55: [6,1],  56: [6,2],  57: [8,3],  72: [6,4],  73: [6,5],  74: [6,6],  75: [6,7],  76: [6,8],
+  55: [6,1],  56: [6,2],  72: [6,4],  73: [6,5],  74: [6,6],  75: [6,7],  76: [6,8],
   77: [6,9],  78: [6,10], 79: [6,11], 80: [6,12], 81: [6,13], 82: [6,14], 83: [6,15], 84: [6,16],
   85: [6,17], 86: [6,18],
-  87: [7,1],  88: [7,2],  89: [9,3],
+  87: [7,1],  88: [7,2],
   // Lanthanides row 8
   57: [8,3],  58: [8,4],  59: [8,5],  60: [8,6],  61: [8,7],  62: [8,8],  63: [8,9],  64: [8,10],
   65: [8,11], 66: [8,12], 67: [8,13], 68: [8,14], 69: [8,15], 70: [8,16], 71: [8,17],
@@ -601,7 +884,7 @@ export const GRID_POSITIONS = {
 };
 
 // ── ATOM COLORS (CPK coloring scheme) ─────────────────────────────────────────
-export const ATOM_COLORS = {
+export const ATOM_COLORS: Record<string, number> = {
   H:  0xffffff, He: 0xd9ffff, Li: 0xcc80ff, Be: 0xc2ff00, B:  0xffb5b5,
   C:  0x909090, N:  0x3050f8, O:  0xff0d0d, F:  0x90e050, Ne: 0xb3e3f5,
   Na: 0xab5cf2, Mg: 0x8aff00, Al: 0xbfa6a6, Si: 0xf0c8a0, P:  0xff8000,
@@ -611,7 +894,7 @@ export const ATOM_COLORS = {
 };
 
 // ── VAN DER WAALS RADII (pm) for 3D rendering ─────────────────────────────────
-export const VDW_RADII = {
+export const VDW_RADII: Record<string, number> = {
   H:70, He:140, Li:182, Be:153, B:192, C:170, N:155, O:152, F:147, Ne:154,
   Na:227, Mg:173, Al:184, Si:210, P:180, S:180, Cl:175, Ar:188, K:275, Ca:231,
   default: 200,

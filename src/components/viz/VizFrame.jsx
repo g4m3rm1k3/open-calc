@@ -70,8 +70,13 @@ Object.assign(VIZ_REGISTRY, {
   PLCHardwareViz:       lazy(() => import("../../labs/plc-lab/plc/PLCHardwareViz.jsx")),
   CardDiceLab:          lazy(() => import("../../labs/odds-lab/CardDiceLab.jsx")),
   LogicSim:             lazy(() => import("../../labs/logic-sim/LogicSim.jsx")),
-  PeriodicTable:        lazy(() => import("../../labs/chemistry/PeriodicTable.jsx")),
-  MoleculeBuilder:      lazy(() => import("../../labs/chemistry/MoleculeBuilder.jsx")),
+  PeriodicTable:        lazy(() => import("../../labs/chemistry/PeriodicTable.tsx")),
+  MoleculeBuilder:      lazy(() => import("../../labs/chemistry/MoleculeBuilder.tsx")),
+  // Note: WhyChemistry is NOT registered here — the lesson-embeddable version
+  // lives at courses/chemistry/viz/WhyChemistry.jsx and is picked up by the
+  // glob above. The lab's own intro tab (labs/chemistry/WhyChemistry.tsx) is
+  // only ever rendered directly by ChemistryPage.tsx, never through this
+  // id-based registry — registering it here would shadow the course version.
   SVGDiagram:           lazy(() => import("../../courses/calculus/viz/SVGDiagram.jsx")),
 });
 

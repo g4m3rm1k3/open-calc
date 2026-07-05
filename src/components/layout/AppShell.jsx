@@ -38,7 +38,7 @@ const PhysicsPoolLab = lazy(() => import("../../games/pool/PhysicsPoolLab.jsx"))
 const BasketballLab = lazy(() => import("../../games/basketball/BasketballLab.jsx"));
 const MiniGolfGame = lazy(() => import("../../games/golf/MiniGolfGame.jsx"));
 const FootballCalculus = lazy(() => import("../../games/football/FootballCalculus.jsx"));
-const ChemistryPage = lazy(() => import("../../labs/chemistry/ChemistryPage.jsx"));
+const ChemistryPage = lazy(() => import("../../labs/chemistry/ChemistryPage.tsx"));
 const PhysicsPage = lazy(() => import("../../labs/physics/PhysicsPage.jsx"));
 import CodeMapBackground from "../backgrounds/CodeMapBackground.jsx";
 import NodePanel from "../backgrounds/NodePanel.jsx";
