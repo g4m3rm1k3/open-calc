@@ -16,6 +16,9 @@ import { JS_PRESETS } from "./jsPresets";
 import { CDN_LIBRARIES } from "./cdnLibraries";
 import { CONTAINER_TAGS } from "./labReducer";
 import type { LabElement, ComponentTheme } from "./types";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore — JSX panel, no type declarations
+import LessonsPanel from "./LessonsPanel.jsx";
 
 type MonacoEditor = Parameters<OnMount>[0];
 type MonacoApi    = Parameters<OnMount>[1];
@@ -26,12 +29,13 @@ const TABS = [
   { key: "javascript", label: "JavaScript", language: "javascript" },
   { key: "tree",       label: "Tree",       language: null },
   { key: "toolbox",    label: "Toolbox",    language: null },
+  { key: "lessons",    label: "Lessons",    language: null },
 ] as const;
 
 type TabKey = typeof TABS[number]["key"];
 
 // Tabs that don't hold Monaco source code — the editor stays unmounted for these.
-const NON_EDITOR_TABS = new Set<TabKey>(["tree", "toolbox"]);
+const NON_EDITOR_TABS = new Set<TabKey>(["tree", "toolbox", "lessons"]);
 
 // ── Elements (raw tags, one-click add — grouped by category) ───────────────────
 
@@ -963,6 +967,8 @@ export default function CodePanel({
             cdnLinks={cdnLinks}
             onToggleCdn={onToggleCdn}
           />
+        ) : activeTab === "lessons" ? (
+          <LessonsPanel />
         ) : (
           <Editor
             key={activeTab}
