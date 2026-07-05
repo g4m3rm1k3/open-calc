@@ -1,91 +1,236 @@
-# Classes, Objects, and Records
+# Classes and Objects: Building Your Own Types
+
+So far you've used types that C# provides — `int`, `string`, `bool`. But the real power of C# is the ability to define **your own types** using **classes**. A class lets you bundle related data and behaviour together into a single, named thing.
 
 C# is fundamentally an object-oriented language — most code you write lives inside a **class**. But C# has evolved beyond classical OOP. C# 9 introduced **records**: immutable, value-semantics types defined in one line that replace the boilerplate-heavy classes that OOP traditionally demands for data. Understanding both the classical and modern approaches is essential to reading real C# codebases.
 
-## Defining a Class
+## What Is a Class?
 
-A class is a blueprint. An **object** (also called an **instance**) is created from that blueprint with `new`:
+Think of a class as a **blueprint** or a template. A blueprint for a house describes how many rooms it has, what colour it is, and what you can do in it. The actual house built from that blueprint is an **object** (also called an **instance**).
+
+You can build many houses from the same blueprint — they all follow the same structure, but each one has its own values.
+
+```csharp
+// This is the BLUEPRINT (class definition)
+class Dog
+{
+    // Data the blueprint describes (called fields or properties)
+    public string Name;
+    public string Breed;
+    public int Age;
+
+    // Behaviour the blueprint describes (called methods)
+    public void Bark()
+    {
+        Console.WriteLine($"{Name} says: Woof!");
+    }
+
+    public string GetDescription()
+    {
+        return $"{Name} is a {Age}-year-old {Breed}.";
+    }
+}
+
+// These are OBJECTS (instances) built from the blueprint using 'new'
+Dog rex   = new Dog();
+Dog buddy = new Dog();
+
+// Each object has its own copy of the data
+rex.Name  = "Rex";
+rex.Breed = "Labrador";
+rex.Age   = 3;
+
+buddy.Name  = "Buddy";
+buddy.Breed = "Poodle";
+buddy.Age   = 5;
+
+// They share the same behaviour (methods), but each uses its own data
+rex.Bark();                          // Rex says: Woof!
+buddy.Bark();                        // Buddy says: Woof!
+Console.WriteLine(rex.GetDescription());   // Rex is a 3-year-old Labrador.
+Console.WriteLine(buddy.GetDescription()); // Buddy is a 5-year-old Poodle.
+```
+
+`rex` and `buddy` are two completely separate objects — changing `rex.Name` does not affect `buddy.Name`.
+
+## Constructors: Setting Up an Object at Creation
+
+In the example above, you had to set `Name`, `Breed`, and `Age` separately after creating the Dog. A **constructor** is a special method that runs *at the moment you create an object*, so you can provide the data upfront:
+
+```csharp
+class Dog
+{
+    public string Name;
+    public string Breed;
+    public int Age;
+
+    // Constructor: has the same name as the class, no return type
+    // Parameters are the information you must provide when creating a Dog
+    public Dog(string name, string breed, int age)
+    {
+        // 'this' refers to the object being created
+        // We're taking the values passed in and storing them in the object
+        Name  = name;
+        Breed = breed;
+        Age   = age;
+    }
+
+    public void Bark()
+    {
+        Console.WriteLine($"{Name} says: Woof!");
+    }
+}
+
+// Now you MUST provide name, breed, and age when creating a Dog
+var rex   = new Dog("Rex",   "Labrador", 3);
+var buddy = new Dog("Buddy", "Poodle",   5);
+
+rex.Bark();     // Rex says: Woof!
+buddy.Bark();   // Buddy says: Woof!
+
+// new Dog();   // Compile error — the constructor requires 3 arguments
+```
+
+Constructors make sure an object always starts in a valid state. You can't forget to set the name — it's required by the constructor.
+
+## Properties: Controlled Access to Data
+
+In the examples above, `Name`, `Breed`, and `Age` are **fields** — raw variables directly on the object. Anyone can read or write them freely. **Properties** give you control over this:
+
+```csharp
+class BankAccount
+{
+    // The _balance field is PRIVATE — only code inside this class can touch it
+    // Convention: private fields start with an underscore
+    private decimal _balance;
+
+    // The Balance PROPERTY is PUBLIC — anyone can read it
+    // But there's no 'set' — nobody outside can write it directly
+    public decimal Balance
+    {
+        get { return _balance; }   // get: code that runs when someone reads Balance
+    }
+
+    // The AccountNumber can be read from outside but only set in the constructor
+    public string AccountNumber { get; private set; }
+
+    public BankAccount(string accountNumber)
+    {
+        AccountNumber = accountNumber;
+        _balance      = 0;
+    }
+
+    // To change _balance, you must go through these controlled methods
+    public void Deposit(decimal amount)
+    {
+        if (amount <= 0)
+        {
+            Console.WriteLine("Deposit amount must be positive.");
+            return;
+        }
+        _balance += amount;
+        Console.WriteLine($"Deposited {amount:C}. New balance: {_balance:C}");
+    }
+
+    public bool Withdraw(decimal amount)
+    {
+        if (amount > _balance)
+        {
+            Console.WriteLine("Insufficient funds.");
+            return false;   // false = failed
+        }
+        _balance -= amount;
+        Console.WriteLine($"Withdrew {amount:C}. New balance: {_balance:C}");
+        return true;   // true = success
+    }
+}
+
+var account = new BankAccount("ACC-001");
+account.Deposit(500m);     // Deposited £500.00. New balance: £500.00
+account.Withdraw(200m);    // Withdrew £200.00. New balance: £300.00
+account.Withdraw(400m);    // Insufficient funds.
+
+Console.WriteLine(account.Balance);        // 300
+// account._balance = 9999;  // Compile error: _balance is private
+// account.Balance  = 9999;  // Compile error: Balance has no public setter
+```
+
+This is **encapsulation** — one of the core ideas of object-oriented programming. The object protects its own data and only allows changes through controlled methods. The bank account can ensure the balance never goes negative by checking inside `Withdraw`.
+
+## Auto-Properties: The Shorthand
+
+Writing a private field and a property that just reads/writes it is so common that C# has a shortcut. An **auto-property** tells the compiler to create the private field automatically:
 
 ```csharp
 class Person
 {
-    // Fields: raw data storage (typically private)
-    private string _name;
-    private int _age;
+    // Auto-property: compiler creates the backing field for you
+    // { get; set; } means anyone can read and write it
+    public string Name  { get; set; }
 
-    // Constructor: called when you write new Person(...)
-    public Person(string name, int age)
+    // { get; private set; } means anyone can read, but only this class can write
+    public int Age { get; private set; }
+
+    // { get; } means read-only — can only be set in the constructor
+    public string Id { get; }
+
+    public Person(string id, string name, int age)
     {
-        _name = name;
-        _age  = age;
+        Id   = id;    // Can set read-only property in constructor
+        Name = name;
+        Age  = age;
     }
 
-    // Properties: controlled access to fields
-    public string Name
+    public void HaveBirthday()
     {
-        get => _name;
-        set => _name = value ?? throw new ArgumentNullException(nameof(value));
+        Age++;   // This class can write Age internally
+        Console.WriteLine($"Happy birthday {Name}! You are now {Age}.");
     }
-
-    public int Age
-    {
-        get => _age;
-        set
-        {
-            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
-            _age = value;
-        }
-    }
-
-    // Method
-    public string Greet() => $"Hi, I'm {_name}, age {_age}.";
-
-    // Override ToString — called automatically by Console.WriteLine, string interpolation, etc.
-    public override string ToString() => $"Person({_name}, {_age})";
 }
 
-var alice = new Person("Alice", 30);
-Console.WriteLine(alice.Greet());    // Hi, I'm Alice, age 30.
-Console.WriteLine(alice);            // Person(Alice, 30) — uses ToString()
-alice.Age = 31;                      // Property setter
-// alice.Age = -1;                   // Would throw ArgumentOutOfRangeException
+var person = new Person("P001", "Alice", 30);
+Console.WriteLine(person.Name);   // Alice
+Console.WriteLine(person.Age);    // 30
+
+person.Name = "Alicia";           // OK — Name has public set
+// person.Age = 25;               // Compile error — Age has private set
+person.HaveBirthday();            // Happy birthday Alicia! You are now 31.
 ```
 
-## Auto-Properties
+## Default Property Values
 
-Writing a backing field for every property is tedious when no special validation is needed. **Auto-properties** let the compiler generate the backing field for you:
+Properties can have default values, so you don't always need to set everything in the constructor:
 
 ```csharp
-class Product
+class ServerConfig
 {
-    // The compiler generates a private backing field automatically
-    public string Name    { get; set; }
-    public decimal Price  { get; set; }
-    public int Stock      { get; private set; }   // External code can read, not write
-
-    // Read-only auto-property — can only be set in constructor or with init
-    public Guid Id { get; } = Guid.NewGuid();
-
-    public Product(string name, decimal price, int stock)
-    {
-        Name  = name;
-        Price = price;
-        Stock = stock;
-    }
-
-    public void Restock(int units) => Stock += units;
+    public string Host    { get; set; } = "localhost";   // Default value
+    public int    Port    { get; set; } = 8080;
+    public bool   UseTls  { get; set; } = false;
+    public int    Timeout { get; set; } = 30;
 }
 
-var p = new Product("Widget", 9.99m, 100);
-Console.WriteLine(p.Id);        // A new Guid every time
-p.Restock(50);
-Console.WriteLine(p.Stock);     // 150
-// p.Stock = 0;                 // Compile error: private set
+// Using defaults — don't need to specify every property
+var config = new ServerConfig();
+Console.WriteLine($"{config.Host}:{config.Port}");   // localhost:8080
+
+// Override just what you need using an object initializer
+// (curly braces after 'new ServerConfig()' let you set properties)
+var productionConfig = new ServerConfig
+{
+    Host   = "api.example.com",
+    Port   = 443,
+    UseTls = true,
+    // Timeout stays 30 — the default
+};
+
+Console.WriteLine($"{productionConfig.Host}:{productionConfig.Port} TLS={productionConfig.UseTls}");
+// api.example.com:443 TLS=True
 ```
 
-## Constructors and Constructor Chaining
+## Multiple Constructors
 
-A class can have multiple constructors. Use `this(...)` to chain them — the chained constructor runs first:
+A class can have more than one constructor, each accepting different arguments. C# picks the right one based on what you pass to `new`:
 
 ```csharp
 class Rectangle
@@ -93,17 +238,18 @@ class Rectangle
     public double Width  { get; }
     public double Height { get; }
 
-    // Primary constructor
+    // Constructor 1: specify both dimensions
     public Rectangle(double width, double height)
     {
         Width  = width;
         Height = height;
     }
 
-    // Convenience constructor: a square
+    // Constructor 2: a square — same value for both
+    // ': this(side, side)' means "call Constructor 1 with side as both arguments"
     public Rectangle(double side) : this(side, side) { }
 
-    // Default: unit square
+    // Constructor 3: default 1×1 square
     public Rectangle() : this(1.0) { }
 
     public double Area      => Width * Height;
@@ -112,150 +258,130 @@ class Rectangle
     public override string ToString() => $"Rectangle({Width} × {Height})";
 }
 
-Console.WriteLine(new Rectangle(4, 3).Area);       // 12
-Console.WriteLine(new Rectangle(5).Area);           // 25 — square
-Console.WriteLine(new Rectangle().Perimeter);       // 4 — unit square
+Console.WriteLine(new Rectangle(4, 3).Area);       // 12  (4×3)
+Console.WriteLine(new Rectangle(5).Area);           // 25  (5×5 square)
+Console.WriteLine(new Rectangle().Perimeter);       // 4   (1×1 square)
 ```
 
-## Object Initializers
+## `static` Members: Belonging to the Class, Not an Object
 
-You can set properties at construction without writing a constructor for every combination, using **object initializers**:
+Everything you've seen so far belongs to an **instance** — you need to create an object to use it. A `static` member belongs to the **class itself** and is shared across all objects (or doesn't need an object at all):
 
 ```csharp
-class Config
+class Counter
 {
-    public string Host    { get; set; } = "localhost";
-    public int    Port    { get; set; } = 8080;
-    public bool   UseTls  { get; set; } = false;
-    public int    Timeout { get; set; } = 30;
+    // Static field: ONE copy shared by all Counter objects
+    private static int _totalCreated = 0;
+
+    // Instance field: each Counter object has its own
+    public int Value { get; private set; }
+
+    public Counter()
+    {
+        _totalCreated++;   // Every time a new Counter is created, increment the shared count
+        Value = 0;
+    }
+
+    public void Increment() => Value++;
+
+    // Static property: call as Counter.TotalCreated, no object needed
+    public static int TotalCreated => _totalCreated;
 }
 
-// Set only what you want to change — the rest use defaults
-var cfg = new Config
-{
-    Host   = "api.example.com",
-    Port   = 443,
-    UseTls = true,
-    // Timeout stays 30
-};
+var c1 = new Counter();
+var c2 = new Counter();
+var c3 = new Counter();
 
-Console.WriteLine($"{cfg.Host}:{cfg.Port} TLS={cfg.UseTls}");
+c1.Increment();
+c1.Increment();
+c2.Increment();
+
+Console.WriteLine($"c1.Value = {c1.Value}");          // 2
+Console.WriteLine($"c2.Value = {c2.Value}");          // 1
+Console.WriteLine($"Total counters: {Counter.TotalCreated}");  // 3 — shared!
 ```
 
-Object initializers work on any settable property. They're extremely common in C# for configuration, test data, and DTOs.
+You've already been using static members: `Console.WriteLine` is a static method on the `Console` class. `Math.Sqrt` is static on `Math`. These don't need you to create a `new Console()` first — you call them directly on the class.
 
-## `static` Members and the `static` Class
+## Access Modifiers: Who Can See What
 
-`static` members belong to the type, not to any instance. A `static` class can only contain `static` members and cannot be instantiated:
+Every field, property, and method in a class has an **access modifier** that controls who can use it:
 
-```csharp
-static class MathUtils
-{
-    public static double Clamp(double value, double min, double max)
-        => Math.Max(min, Math.Min(max, value));
+| Modifier | What can access it |
+|---|---|
+| `public` | Anyone, anywhere |
+| `private` | Only code inside this class |
+| `protected` | This class and classes that inherit from it |
+| `internal` | Anywhere within this project (assembly) |
 
-    public static double Lerp(double a, double b, double t)
-        => a + (b - a) * t;
-
-    // Constants are implicitly static
-    public const double GoldenRatio = 1.6180339887;
-}
-
-Console.WriteLine(MathUtils.Clamp(150, 0, 100));   // 100
-Console.WriteLine(MathUtils.Lerp(0, 100, 0.25));   // 25
-```
-
-## Inheritance
-
-A class can inherit from one base class, gaining its fields, properties, and methods. The derived class can extend or override the base:
+The most important rule: **start with private and only open things up when needed**. This keeps your objects in control of their own state.
 
 ```csharp
-class Animal
+class Player
 {
-    public string Name { get; }
+    private int _health = 100;      // Only Player code can touch this
+    private int _maxHealth = 100;
 
-    public Animal(string name)
+    public string Name { get; }     // Anyone can read the name
+
+    public int Health               // Anyone can read, nobody can write directly
+    {
+        get => _health;
+    }
+
+    public Player(string name)
     {
         Name = name;
     }
 
-    // virtual: derived classes may override this
-    public virtual string Speak() => "...";
-
-    public override string ToString() => $"{GetType().Name}({Name})";
-}
-
-class Dog : Animal
-{
-    public string Breed { get; }
-
-    public Dog(string name, string breed) : base(name)   // Call base constructor
+    public void TakeDamage(int amount)
     {
-        Breed = breed;
+        // Private validation logic — caller doesn't need to worry about this
+        _health = Math.Max(0, _health - amount);
+        Console.WriteLine($"{Name} took {amount} damage. Health: {_health}/{_maxHealth}");
     }
 
-    public override string Speak() => "Woof!";   // override — replaces base implementation
+    public void Heal(int amount)
+    {
+        _health = Math.Min(_maxHealth, _health + amount);
+        Console.WriteLine($"{Name} healed {amount}. Health: {_health}/{_maxHealth}");
+    }
+
+    public bool IsAlive => _health > 0;
 }
 
-class Cat : Animal
-{
-    public Cat(string name) : base(name) { }
-
-    public override string Speak() => "Meow.";
-}
-
-Animal[] animals = { new Dog("Rex", "Labrador"), new Cat("Whiskers"), new Dog("Buddy", "Poodle") };
-
-foreach (var animal in animals)
-    Console.WriteLine($"{animal.Name} says: {animal.Speak()}");
-// Rex says: Woof!
-// Whiskers says: Meow.
-// Buddy says: Woof!
+var player = new Player("Hero");
+player.TakeDamage(30);     // Hero took 30 damage. Health: 70/100
+player.TakeDamage(50);     // Hero took 50 damage. Health: 20/100
+player.Heal(40);           // Hero healed 40. Health: 60/100
+Console.WriteLine(player.IsAlive);  // True
+// player._health = 9999;  // Compile error: _health is private
 ```
 
-The array is typed as `Animal[]` but each element is actually a `Dog` or `Cat`. When `.Speak()` is called, C#'s **virtual dispatch** finds the correct overriding method at runtime. This is **polymorphism**.
+## `record`: A Shortcut for Simple Data Classes
 
-## `sealed`, `abstract`, and `base`
+Sometimes you just need a class to hold some data — no complex behaviour, no validation, just a container. Writing a full class with constructor, properties, and `ToString()` is repetitive. C# 9 introduced **records** for exactly this case:
 
 ```csharp
-// abstract: can't be instantiated — must be subclassed
-abstract class Shape
-{
-    public abstract double Area { get; }         // Must be implemented by subclass
-    public abstract double Perimeter { get; }
+// One line creates: constructor, read-only properties, ToString, equality comparison
+record Point(double X, double Y);
 
-    public virtual string Describe()             // Optional to override
-        => $"{GetType().Name}: area={Area:F2}, perimeter={Perimeter:F2}";
-}
+var p1 = new Point(3.0, 4.0);
+var p2 = new Point(3.0, 4.0);
+var p3 = new Point(1.0, 2.0);
 
-class Circle : Shape
-{
-    public double Radius { get; }
-    public Circle(double r) { Radius = r; }
+Console.WriteLine(p1);         // Point { X = 3, Y = 4 } — automatic ToString
+Console.WriteLine(p1 == p2);   // True  — records compare by value, not identity
+Console.WriteLine(p1 == p3);   // False
 
-    public override double Area      => Math.PI * Radius * Radius;
-    public override double Perimeter => 2 * Math.PI * Radius;
-}
-
-// sealed: no further inheritance allowed
-sealed class ImmutablePoint : Shape
-{
-    public double X { get; }
-    public double Y { get; }
-    public ImmutablePoint(double x, double y) { X = x; Y = y; }
-
-    public override double Area      => 0;
-    public override double Perimeter => 0;
-
-    public override string Describe()
-        => $"Point({X}, {Y})";   // Override optional virtual method
-}
-
-Shape s = new Circle(5);
-Console.WriteLine(s.Describe());   // Circle: area=78.54, perimeter=31.42
+// Records are immutable — you can't change X or Y after creation
+// But you can make a modified copy with 'with'
+var p4 = p1 with { Y = 99.0 };   // New Point, X stays 3, Y changes to 99
+Console.WriteLine(p4);            // Point { X = 3, Y = 99 }
+Console.WriteLine(p1);            // Point { X = 3, Y = 4 } — original unchanged
 ```
 
-## `record`: Immutable Value-Semantics Types
+Use a **record** when you're storing data (a product, a point, a user from an API response). Use a **class** when the object has behaviour, manages state, or has identity (a bank account, a game player, a service).
 
 Records are C# 9's answer to a common problem: data-carrying objects where equality should be based on values, not identity. With a regular class, two `Person` objects with the same name and age are not equal by default (reference equality). With a record, they are:
 
@@ -391,3 +517,4 @@ Console.WriteLine(account.Withdraw(200));   // True
 Console.WriteLine(account.Balance);         // 300
 // account._balance = 9999;                // Compile error: private
 ```
+
