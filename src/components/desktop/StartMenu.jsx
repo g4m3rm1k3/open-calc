@@ -8,16 +8,23 @@ import { getLabEntry } from '../../labs/labLoader.js'
 import { getGameEntry } from '../../games/gameLoader.js'
 import { useDesktop } from './DesktopProvider.jsx'
 import { usePins } from '../../context/PinsContext.jsx'
+import { usePinLauncher } from '../../hooks/usePinLauncher.js'
 import { GLASS_META } from '../../styles/courseColors.js'
 
 const SECTIONS = [
-  { id: 'all',        label: 'All' },
-  { id: 'favourites', label: '★ Favourites' },
-  { id: 'courses',    label: 'Courses' },
-  { id: 'labs',       label: 'Labs' },
-  { id: 'games',      label: 'Games' },
-  { id: 'nav',        label: 'Navigate' },
+  { id: 'all',         label: 'All' },
+  { id: 'favourites',  label: '★ Favourites' },
+  { id: 'courses',     label: 'Courses' },
+  { id: 'lessons',     label: 'Lessons' },
+  { id: 'labs',        label: 'Labs' },
+  { id: 'builders',    label: 'Builders' },
+  { id: 'visualizers', label: 'Visualizers' },
+  { id: 'games',       label: 'Games' },
+  { id: 'nav',         label: 'Navigate' },
 ]
+
+// Fixed, predictable order for subject subheadings within the Labs tab.
+const LAB_SUBJECTS = ['Math', 'Science', 'Engineering', 'CS Theory', 'Data Science', 'Web Dev', 'Creative']
 
 const GRID_OVL = {
   backgroundImage: [
@@ -74,6 +81,7 @@ export default function StartMenu({ onClose }) {
   const [contextMenu, setContextMenu] = useState(null) // { x, y, pin }
   const { openWindow } = useDesktop()
   const { pins, addPin, removePin, isPinned } = usePins()
+  const { openPin } = usePinLauncher()
   const navigate = useNavigate()
   const menuRef = useRef(null)
 
@@ -148,52 +156,29 @@ export default function StartMenu({ onClose }) {
 
   const handleOpenPin = async (pin) => {
     onClose()
-    if (pin.type === 'course' || pin.type === 'nav') {
-      if (pin.action === 'game-rules') { window.dispatchEvent(new CustomEvent('oc-game-rules')); return }
-      if (pin.path) navigate(pin.path)
-      return
-    }
-
-    if (pin.type === 'game') {
-      if (pin.gameKey) {
-        const entry = await getGameEntry(pin.gameKey)
-        if (entry?.component) {
-          openWindow({ id: pin.gameKey, label: pin.label, emoji: pin.emoji, Component: entry.component, backTo: '/' })
-        } else if (entry?.event) {
-          window.dispatchEvent(new CustomEvent('oc-open-game', { detail: { game: entry.event } }))
-        }
-      } else if (pin.event) {
-        window.dispatchEvent(new CustomEvent('oc-open-game', { detail: { game: pin.event } }))
-      }
-      return
-    }
-    if (pin.type === 'lab') {
-      if (pin.event) { window.dispatchEvent(new CustomEvent('oc-open-game', { detail: { game: pin.event } })); return }
-      if (pin.path?.startsWith('/web-learn/') || pin.path?.startsWith('/learn/')) { navigate(pin.path); return }
-      if (pin.labKey) {
-        const entry = await getLabEntry(pin.labKey)
-        if (entry?.component) {
-          openWindow({ id: pin.labKey, label: pin.label, emoji: pin.emoji, Component: entry.component, backTo: '/' })
-          return
-        }
-      }
-      if (pin.path) navigate(pin.path)
-    }
+    await openPin(pin)
   }
 
   // ---------- filters ----------
   const q = query.toLowerCase()
   const filteredCourses = COURSES.filter(c => !q || c.label.toLowerCase().includes(q))
-  const filteredLabs    = LABS.filter(l    => !q || l.label.toLowerCase().includes(q) || l.tags?.some(t => t.toLowerCase().includes(q)))
+  const filteredLabItems = LABS.filter(l => !q || l.label.toLowerCase().includes(q) || l.tags?.some(t => t.toLowerCase().includes(q)))
+  const filteredLabs        = filteredLabItems.filter(l => l.kind === 'lab')
+  const filteredLessons     = filteredLabItems.filter(l => l.kind === 'lesson')
+  const filteredBuilders    = filteredLabItems.filter(l => l.kind === 'builder')
+  const filteredVisualizers = filteredLabItems.filter(l => l.kind === 'visualizer')
   const filteredGames   = GAMES.filter(g   => !q || g.label.toLowerCase().includes(q) || g.tags?.some(t => t.toLowerCase().includes(q)))
   const filteredNav     = NAV_LINKS.filter(n => !q || n.label.toLowerCase().includes(q))
   const filteredPins    = pins.filter(p    => !q || p.label?.toLowerCase().includes(q))
 
-  const showFavourites = !q && (tab === 'all' || tab === 'favourites')
-  const showCourses    = tab === 'all' || tab === 'courses'
-  const showLabs       = tab === 'all' || tab === 'labs'
-  const showGames      = tab === 'all' || tab === 'games'
-  const showNav        = tab === 'all' || tab === 'nav'
+  const showFavourites  = !q && (tab === 'all' || tab === 'favourites')
+  const showCourses     = tab === 'all' || tab === 'courses'
+  const showLabs        = tab === 'all' || tab === 'labs'
+  const showLessons     = tab === 'all' || tab === 'lessons'
+  const showBuilders    = tab === 'all' || tab === 'builders'
+  const showVisualizers = tab === 'all' || tab === 'visualizers'
+  const showGames       = tab === 'all' || tab === 'games'
+  const showNav         = tab === 'all' || tab === 'nav'
 
   const sectionVariants = {
     hidden:  { opacity: 0, y: 10 },
@@ -361,12 +346,66 @@ export default function StartMenu({ onClose }) {
               </motion.section>
             )}
 
+            {/* ---- Lessons ---- */}
+            {showLessons && filteredLessons.length > 0 && (
+              <motion.section key="lessons-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+                <h3 className="text-[11px] font-black text-slate-600 dark:text-slate-200 uppercase tracking-widest mb-3 px-2">Lessons</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  {filteredLessons.map(lab => {
+                    const pin = toPin(lab, 'lab')
+                    return (
+                      <ItemBtn key={lab.key} pin={pin} onClick={() => handleOpenLab(lab)} />
+                    )
+                  })}
+                </div>
+              </motion.section>
+            )}
+
             {/* ---- Labs ---- */}
             {showLabs && filteredLabs.length > 0 && (
               <motion.section key="labs-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
                 <h3 className="text-[11px] font-black text-slate-600 dark:text-slate-200 uppercase tracking-widest mb-3 px-2">Labs</h3>
+                {LAB_SUBJECTS.map(subject => {
+                  const items = filteredLabs.filter(l => l.subject === subject)
+                  if (items.length === 0) return null
+                  return (
+                    <div key={subject} className="mb-4 last:mb-0">
+                      <h4 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-2">{subject}</h4>
+                      <div className="grid grid-cols-3 gap-2">
+                        {items.map(lab => {
+                          const pin = toPin(lab, 'lab')
+                          return (
+                            <ItemBtn key={lab.key} pin={pin} onClick={() => handleOpenLab(lab)} />
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
+              </motion.section>
+            )}
+
+            {/* ---- Builders ---- */}
+            {showBuilders && filteredBuilders.length > 0 && (
+              <motion.section key="builders-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+                <h3 className="text-[11px] font-black text-slate-600 dark:text-slate-200 uppercase tracking-widest mb-3 px-2">Builders</h3>
                 <div className="grid grid-cols-3 gap-2">
-                  {filteredLabs.map(lab => {
+                  {filteredBuilders.map(lab => {
+                    const pin = toPin(lab, 'lab')
+                    return (
+                      <ItemBtn key={lab.key} pin={pin} onClick={() => handleOpenLab(lab)} />
+                    )
+                  })}
+                </div>
+              </motion.section>
+            )}
+
+            {/* ---- Visualizers ---- */}
+            {showVisualizers && filteredVisualizers.length > 0 && (
+              <motion.section key="visualizers-section" variants={sectionVariants} initial="hidden" animate="visible" exit="hidden" layout>
+                <h3 className="text-[11px] font-black text-slate-600 dark:text-slate-200 uppercase tracking-widest mb-3 px-2">Visualizers</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  {filteredVisualizers.map(lab => {
                     const pin = toPin(lab, 'lab')
                     return (
                       <ItemBtn key={lab.key} pin={pin} onClick={() => handleOpenLab(lab)} />
@@ -408,7 +447,7 @@ export default function StartMenu({ onClose }) {
 
           </AnimatePresence>
 
-          {query && filteredCourses.length === 0 && filteredLabs.length === 0 && filteredGames.length === 0 && filteredNav.length === 0 && (
+          {query && filteredCourses.length === 0 && filteredLabs.length === 0 && filteredLessons.length === 0 && filteredBuilders.length === 0 && filteredVisualizers.length === 0 && filteredGames.length === 0 && filteredNav.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 opacity-50">
               <span className="text-4xl mb-3">🔍</span>
               <p className="text-center text-sm font-medium">No results for "{query}"</p>

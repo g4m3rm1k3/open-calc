@@ -42,6 +42,7 @@ const ChemistryPage = lazy(() => import("../../labs/chemistry/ChemistryPage.tsx"
 const PhysicsPage = lazy(() => import("../../labs/physics/PhysicsPage.jsx"));
 import CodeMapBackground from "../backgrounds/CodeMapBackground.jsx";
 import NodePanel from "../backgrounds/NodePanel.jsx";
+const HomePage = lazy(() => import("../../pages/HomePage.jsx"));
 
 export const meta = {
   title: 'App Shell',
@@ -232,6 +233,27 @@ export default function AppShell({ children }) {
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
   const isMobile = useIsMobile();
   const isMobileHome = isDesktopRoute && isMobile;
+
+  // Desktop background: 'home' (marketing home page, default) or 'graph' (codebase graph)
+  const [desktopMode, setDesktopModeState] = useState(() => localStorage.getItem("oc-desktop-mode") || "home");
+  const setDesktopMode = useCallback((mode) => {
+    setDesktopModeState(mode);
+    localStorage.setItem("oc-desktop-mode", mode);
+  }, []);
+  const [desktopCtxMenu, setDesktopCtxMenu] = useState(null); // { x, y }
+  useEffect(() => {
+    if (!desktopCtxMenu) return;
+    const onKey = (e) => { if (e.key === "Escape") setDesktopCtxMenu(null); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [desktopCtxMenu]);
+  // One-time nudge pointing at the right-click background switcher — dismissed
+  // for good either by clicking the "x" or by actually discovering the menu.
+  const [showDesktopHint, setShowDesktopHint] = useState(() => !localStorage.getItem("oc-desktop-hint-seen"));
+  const dismissDesktopHint = useCallback(() => {
+    setShowDesktopHint(false);
+    localStorage.setItem("oc-desktop-hint-seen", "1");
+  }, []);
 
   // Restore dev mode across page refreshes
   useEffect(() => {
@@ -474,14 +496,51 @@ export default function AppShell({ children }) {
     <ChatProvider>
       <GrapherContext.Provider value={grapherContextValue}>
         <div className={`min-h-screen transition-colors duration-500 relative ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
-          {isDesktopRoute && !isMobile && (
+          {isDesktopRoute && !isMobile && desktopMode === "graph" && (
             <CodeMapBackground
               dark={dark}
               onNodeClick={node => setSelectedNode(node)}
             />
           )}
-          {isDesktopRoute && !isMobile && selectedNode && (
+          {isDesktopRoute && !isMobile && desktopMode === "graph" && selectedNode && (
             <NodePanel node={selectedNode} onClose={() => setSelectedNode(null)} />
+          )}
+          {isDesktopRoute && !isMobile && desktopCtxMenu && (
+            <>
+              <div className="fixed inset-0 z-[1950]" onClick={() => setDesktopCtxMenu(null)} />
+              <div
+                className="fixed z-[1960] min-w-[180px] rounded-xl border border-white/10 bg-slate-900/95 backdrop-blur-md shadow-xl py-1.5 text-sm"
+                style={{ left: desktopCtxMenu.x, top: desktopCtxMenu.y }}
+              >
+                {[
+                  { mode: "graph", label: "🌐 Codebase Graph" },
+                  { mode: "home", label: "🏠 Home Page" },
+                ].map(opt => (
+                  <button
+                    key={opt.mode}
+                    onClick={() => { setDesktopMode(opt.mode); setDesktopCtxMenu(null); }}
+                    className={`w-full text-left px-3.5 py-1.5 flex items-center justify-between hover:bg-white/10 ${
+                      desktopMode === opt.mode ? "text-brand-300 font-semibold" : "text-slate-200"
+                    }`}
+                  >
+                    <span>{opt.label}</span>
+                    {desktopMode === opt.mode && <span className="text-xs">✓</span>}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+          {isDesktopRoute && !isMobile && showDesktopHint && !desktopCtxMenu && (
+            <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[1200] flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/90 backdrop-blur-md shadow-xl pl-4 pr-2 py-2 text-sm text-slate-200">
+              <span>💡 Right-click the desktop to change your background</span>
+              <button
+                onClick={dismissDesktopHint}
+                title="Dismiss"
+                className="w-5 h-5 flex items-center justify-center rounded-full text-slate-400 hover:text-white hover:bg-white/10 text-xs leading-none"
+              >
+                ✕
+              </button>
+            </div>
           )}
           <TopBar />
 
@@ -529,8 +588,17 @@ export default function AppShell({ children }) {
                       ? "max-w-[min(98vw,2800px)] mx-auto px-2 sm:px-3 lg:px-4 py-8"
                       : `max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-all duration-500`
               }
+              onContextMenu={isDesktopRoute && !isMobile ? (e) => {
+                e.preventDefault();
+                setDesktopCtxMenu({ x: e.clientX, y: e.clientY });
+                if (showDesktopHint) dismissDesktopHint();
+              } : undefined}
             >
-              {isMobileHome ? <MobileHomePage /> : (children ?? <Outlet />)}
+              {isMobileHome
+                ? <MobileHomePage />
+                : isDesktopRoute && !isMobile && desktopMode === "home"
+                  ? <Suspense fallback={null}><HomePage /></Suspense>
+                  : (children ?? <Outlet />)}
             </div>
           </main>
 

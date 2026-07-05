@@ -6,6 +6,43 @@ import UniverseBackground from '../components/backgrounds/UniverseBackground.jsx
 import AppCard from '../components/ui/AppCard.jsx'
 import { LABS } from '../labs/registry.js'
 import { GAMES } from '../games/registry.js'
+import { usePins } from '../context/PinsContext.jsx'
+import { usePinLauncher } from '../hooks/usePinLauncher.js'
+import { GLASS_META } from '../styles/courseColors.js'
+
+// ── Favourite pin card — pins are a slimmer shape than AppCard expects, so
+// render them with the same glass palette rather than forcing them through AppCard.
+function FavouriteCard({ pin, onOpen, onRemove }) {
+  const meta = GLASS_META[pin.color] ?? GLASS_META.slate
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onOpen}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onOpen(); }}
+      className={`group relative flex flex-col items-start gap-2 p-4 rounded-2xl text-left cursor-pointer transition-all hover:-translate-y-1 bg-gradient-to-br ${meta.header} border ${meta.border} text-white overflow-hidden`}
+    >
+      <button
+        onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        title="Remove from Favourites"
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-white/60 hover:text-white transition-all text-xs leading-none w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/20 z-10"
+      >
+        ✕
+      </button>
+      <span className="text-2xl leading-none">{pin.emoji}</span>
+      <span className="text-sm font-bold leading-tight drop-shadow-sm pr-4">{pin.label}</span>
+    </div>
+  )
+}
+
+// ── Labs registry split by kind ──────────────────────────────────────────────
+const LAB_SUBJECTS = ['Math', 'Science', 'Engineering', 'CS Theory', 'Data Science', 'Web Dev', 'Creative']
+const LABS_BY_KIND = {
+  lab:        LABS.filter(l => l.kind === 'lab'),
+  lesson:     LABS.filter(l => l.kind === 'lesson'),
+  builder:    LABS.filter(l => l.kind === 'builder'),
+  visualizer: LABS.filter(l => l.kind === 'visualizer'),
+}
 
 // ── Discipline pills ──────────────────────────────────────────────────────────
 const DISCIPLINES_ROW1 = [
@@ -76,6 +113,8 @@ function DomainSection({ domain, getLessonStatus }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const { getLessonStatus } = useProgress()
+  const { pins, removePin } = usePins()
+  const { openPin } = usePinLauncher()
   const totalLessons     = COURSE_ENTRIES.reduce((s, { chapters }) => s + chapters.reduce((n, ch) => n + ch.lessons.length, 0), 0)
   const completedLessons = COURSE_ENTRIES.reduce((s, { course, chapters }) =>
     s + chapters.reduce((n, ch) =>
@@ -145,6 +184,24 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── FAVOURITES ───────────────────────────────────────────────────── */}
+        {pins.length > 0 && (
+          <section className="px-4 pb-6">
+            <div className="flex items-center gap-3 mb-6 pb-3 border-b border-amber-500/30">
+              <span className="text-3xl leading-none">⭐</span>
+              <div>
+                <h3 className="text-lg font-bold text-amber-300">Favourites</h3>
+                <p className="text-slate-500 text-xs">Pinned from the Start Menu — right-click any item there to pin or unpin</p>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {pins.map(pin => (
+                <FavouriteCard key={pin.id} pin={pin} onOpen={() => openPin(pin)} onRemove={() => removePin(pin.id)} />
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* ── COURSES ──────────────────────────────────────────────────────── */}
         <section className="px-4 pb-6">
           <div className="mb-10 text-center">
@@ -161,17 +218,68 @@ export default function HomePage() {
           ))}
         </section>
 
+        {/* ── LESSONS ──────────────────────────────────────────────────────── */}
+        <section className="px-4 pb-6 mt-4">
+          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-emerald-500/30">
+            <span className="text-3xl leading-none">🎓</span>
+            <div>
+              <h3 className="text-lg font-bold text-emerald-300">Guided Lessons</h3>
+              <p className="text-slate-500 text-xs">Narrated, checkpointed walkthroughs — follow along step by step</p>
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {LABS_BY_KIND.lesson.map(item => <AppCard key={item.key} item={item} variant="lab" />)}
+          </div>
+        </section>
+
         {/* ── LABS ─────────────────────────────────────────────────────────── */}
         <section className="px-4 pb-6 mt-4">
           <div className="flex items-center gap-3 mb-6 pb-3 border-b border-cyan-500/30">
             <span className="text-3xl leading-none">🔬</span>
             <div>
               <h3 className="text-lg font-bold text-cyan-300">Interactive Labs</h3>
-              <p className="text-slate-500 text-xs">Full simulation environments — experiment, build, and explore</p>
+              <p className="text-slate-500 text-xs">Full simulation & computation environments — experiment and explore</p>
+            </div>
+          </div>
+          {LAB_SUBJECTS.map(subject => {
+            const items = LABS_BY_KIND.lab.filter(l => l.subject === subject)
+            if (items.length === 0) return null
+            return (
+              <div key={subject} className="mb-8 last:mb-0">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-3">{subject}</h4>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {items.map(item => <AppCard key={item.key} item={item} variant="lab" />)}
+                </div>
+              </div>
+            )
+          })}
+        </section>
+
+        {/* ── BUILDERS ─────────────────────────────────────────────────────── */}
+        <section className="px-4 pb-6 mt-4">
+          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-orange-500/30">
+            <span className="text-3xl leading-none">🏗️</span>
+            <div>
+              <h3 className="text-lg font-bold text-orange-300">Builders</h3>
+              <p className="text-slate-500 text-xs">Creative tools for making something real — drag, draw, and compose</p>
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {LABS.map(item => <AppCard key={item.key} item={item} variant="lab" />)}
+            {LABS_BY_KIND.builder.map(item => <AppCard key={item.key} item={item} variant="lab" />)}
+          </div>
+        </section>
+
+        {/* ── VISUALIZERS ──────────────────────────────────────────────────── */}
+        <section className="px-4 pb-6 mt-4">
+          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-violet-500/30">
+            <span className="text-3xl leading-none">🔍</span>
+            <div>
+              <h3 className="text-lg font-bold text-violet-300">Visualizers</h3>
+              <p className="text-slate-500 text-xs">Point these at code or a mechanism and watch it run, step by step</p>
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {LABS_BY_KIND.visualizer.map(item => <AppCard key={item.key} item={item} variant="lab" />)}
           </div>
         </section>
 
