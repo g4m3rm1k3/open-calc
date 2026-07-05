@@ -241,7 +241,11 @@ export function stripTypeScript(code) {
 // Runs a single lesson step's code and returns { output, snapshot }.
 // Called live when the user navigates to a step — no pre-computation.
 
+const stepCache = new WeakMap()
+
 export function runStep(step, lessonLang) {
+  if (stepCache.has(step)) return stepCache.get(step)
+
   const code = step.runCode ?? (lessonLang === 'ts' ? stripTypeScript(step.code) : step.code)
   if (!code?.trim()) return { output: [], snapshot: [] }
 
@@ -265,7 +269,9 @@ export function runStep(step, lessonLang) {
     }
   }
 
-  return { output: output ?? [], snapshot: best ?? [] }
+  const result = { output: output ?? [], snapshot: best ?? [] }
+  stepCache.set(step, result)
+  return result
 }
 
 // ── Lesson enrichment (legacy — kept for reference) ───────────────────────────
