@@ -5,6 +5,7 @@ export default {
   steps: [
     {
       title: 'Call stack — synchronous execution is LIFO',
+      semanticEvent: 'EnterScope',
       code:
 `function c() {
   console.log('C runs')
@@ -27,7 +28,7 @@ function a() {
 a()
 console.log('main done')`,
       explanation: [
-        'Execution: `a()` is pushed onto the call stack → prints `\'A runs\'` → calls `b()` → pushed onto stack → prints `\'B runs\'` → calls `c()` → pushed → prints `\'C runs\'` → returns `\'c-result\'` → popped → `b` continues, prints `\'B got: c-result\'` → returns `\'b-result\'` → popped → `a` continues, prints `\'A got: b-result\'` → returns → popped → main prints `\'main done\'`.',
+        'The call stack establishes the **LIFO execution order**: each function call pushes a frame; each return pops it. `a()` calls `b()`, which calls `c()`. The stack builds: a → b → c. Then `c` returns (popped), `b` resumes and returns (popped), `a` resumes and returns (popped). The output — `\'A runs\'`, `\'B runs\'`, `\'C runs\'`, `\'B got: c-result\'`, `\'A got: b-result\'`, `\'main done\'` — traces this LIFO unwind.',
         'CS — The call stack is a Stack (LIFO). Each function call pushes a stack frame containing: the function reference, local variables, the return address (where to resume after the function returns). When the function returns, its frame is popped. The stack frame is why recursion crashes with `Maximum call stack size exceeded` — deep recursion pushes thousands of frames before any pop.',
         'SE — The call stack is visible in browser DevTools: the "Call Stack" panel in the debugger shows exactly this structure. `Error.stack` in JavaScript captures the call stack at the moment the error was created — the stack trace in every Node.js error log is the contents of the call stack at throw time. V8\'s `--stack-trace-limit=100` controls how many frames are captured.',
         'Without this: without the call stack, there is no mechanism to resume a caller after a function returns. Every function would need to know its continuation explicitly (CPS — continuation-passing style). The call stack is the implicit mechanism that lets functions call other functions and return — it is the foundation on which all synchronous JavaScript runs.',
@@ -38,12 +39,13 @@ console.log('main done')`,
         { startLine: 19, endLine: 19, color: 'emerald', label: 'a() starts the chain — stack builds and unwinds' },
       ],
       connections: [
-        { fromLine: 8,  toLine: 1,  color: 'violet',  label: 'b calls c → c pushed onto stack' },
-        { fromLine: 15, toLine: 6,  color: 'indigo',  label: 'a calls b → b pushed onto stack' },
+        { fromLine: 8,  toLine: 1,  color: 'violet',  label: 'b calls c → c pushed onto stack', type: 'calls' },
+        { fromLine: 15, toLine: 6,  color: 'indigo',  label: 'a calls b → b pushed onto stack', type: 'calls' },
       ],
     },
     {
       title: 'Task queue — setTimeout deferred to later',
+      semanticEvent: 'EnqueueTask',
       code:
 `function c() {
   console.log('C runs')
@@ -72,7 +74,7 @@ console.log('step 2: synchronous')
 console.log('step 3: synchronous')
 console.log('(setTimeout callbacks run after all sync code — in the task queue)')`,
       explanation: [
-        'This step demonstrates the boundary between synchronous code and the task queue. All `console.log` calls on lines 22–26 are synchronous — they run in order on the call stack. `setTimeout(fn, 0)` (not shown here) would schedule `fn` in the task queue, which the event loop processes only after the call stack is empty. Output lines 22–26 print in order: sync always runs before deferred tasks.',
+        '`setTimeout(fn, 0)` establishes the **task queue deferral contract**: even with a 0ms delay, `fn` is placed in the task queue and runs only after the entire synchronous call stack empties. All `console.log` calls on lines 22–26 are synchronous — they run in order first. Deferred tasks always come after all synchronous code completes.',
         'CS — The event loop is a continuous loop: (1) run all synchronous code until the call stack is empty; (2) drain the microtask queue (Promises, queueMicrotask); (3) pick the next task from the task queue (setTimeout, setInterval, I/O callbacks, user events); (4) go to step 1. This is why `setTimeout(fn, 0)` fires after all synchronous code even with a 0ms delay — the call stack must be empty first.',
         'SE — The event loop is why Node.js is single-threaded but handles concurrent I/O. A database query does not block the call stack — Node.js\'s libuv library registers the I/O operation with the OS, releases the thread back to the event loop, and when the OS signals completion, the callback is placed in the task queue. The single thread handles thousands of concurrent I/O operations because it never blocks waiting — it delegates to the OS.',
         'Without this: without the event loop, JavaScript would need multi-threading for async operations — complex shared state, race conditions, mutexes. The event loop\'s single-threaded guarantee eliminates race conditions: no two JavaScript callbacks ever run simultaneously. The trade-off is that CPU-bound code blocks the loop — which is why Node.js uses worker threads for CPU-intensive work.',
@@ -85,6 +87,7 @@ console.log('(setTimeout callbacks run after all sync code — in the task queue
     },
     {
       title: 'Microtask queue — runs before the next task',
+      semanticEvent: 'EnqueueMicrotask',
       code:
 `function c() { console.log('C runs'); return 'c-result' }
 function b() { console.log('B runs'); var r = c(); console.log('B got: ' + r); return 'b-result' }
@@ -118,7 +121,7 @@ console.log('sync after promises: results so far = ' + results.length)
 results.push('sync-value')
 console.log('results: ' + results)`,
       explanation: [
-        '`Promise.resolve(\'micro-1\').then(fn)` schedules `fn` as a microtask. Microtasks are NOT run immediately — they wait until the current synchronous call stack is empty. Lines 13–15 register three microtasks. Line 17 runs synchronously — `results.length` is still `0` because the microtasks haven\'t run yet. Line 19 pushes `\'sync-value\'` synchronously. THEN, after the call stack empties, all three microtasks run and push `\'micro-1\'`, `\'micro-2\'`, `\'micro-3\'`. Final `results`: `[\'sync-value\', \'micro-1\', \'micro-2\', \'micro-3\']`.',
+        '`Promise.resolve().then(fn)` establishes the **microtask priority relationship**: `.then()` callbacks are queued but not run immediately — they wait until the current synchronous stack empties. Lines 13–15 register three microtasks; line 17 runs synchronously and sees `results.length === 0`. Only after the call stack empties do all three microtasks drain, pushing `\'micro-1\'`, `\'micro-2\'`, `\'micro-3\'` after `\'sync-value\'`.',
         'CS — The microtask queue (also called the "job queue") has higher priority than the task queue. After every task (or after synchronous code), ALL pending microtasks are drained before the next task begins. Promise `.then()` callbacks, `queueMicrotask()`, and `MutationObserver` callbacks are microtasks. `setTimeout`, `setInterval`, and I/O callbacks are tasks. Microtask → Microtask → Microtask → [task] → Microtask → Microtask → [task]...',
         'SE — This ordering is why `Promise.resolve().then(fn)` is a common trick for deferring code to after the current synchronous block without going all the way to a `setTimeout` (which is a task). Vue 3\'s scheduler uses `Promise.resolve().then(flushJobs)` to batch DOM updates — all reactive state changes in one tick trigger one flush of the microtask queue. React\'s `unstable_batchedUpdates` serves the same purpose.',
         'Without this: if microtasks ran immediately inline instead of being queued, `Promise.resolve(v).then(fn)` would execute `fn` synchronously — breaking async code that expects callbacks to run after the current frame. If microtasks ran as tasks, UI updates from Promises would be delayed one extra event loop tick, causing visible flicker. The microtask queue is the "runs soon but not now" tier.',
@@ -132,6 +135,7 @@ console.log('results: ' + results)`,
     },
     {
       title: 'Blocking the loop — what never to do',
+      semanticEvent: 'BeginLoop',
       code:
 `function c() { console.log('C runs'); return 'c-result' }
 function b() { console.log('B runs'); var r = c(); console.log('B got: ' + r); return 'b-result' }
@@ -176,7 +180,7 @@ runner()
 runner()
 console.log('chunked: other work can run between chunks')`,
       explanation: [
-        '`blockingWork(1000)` runs a loop of 1,000 iterations synchronously — the call stack is occupied for the entire duration. No other code runs until it finishes. Line 32 prints the sum `499500`. `chunkedWork` breaks the work into chunks of 100 — between chunks, the event loop could process other events. Lines 37–39 run three chunks. Line 40 prints the interleaving message.',
+        '`blockingWork(1000)` demonstrates the **event loop blocking cost**: the synchronous for-loop occupies the call stack for its entire duration — no other code, no I/O callbacks, no microtasks can run until it finishes. `chunkedWork` breaks the same computation into chunks of 100, allowing the event loop to process other events between each chunk.',
         'CS — Long-running synchronous code blocks the event loop completely. While the blocking loop runs, no user events, no I/O callbacks, no animation frames, and no Promise microtasks can run. This is the "blocking the thread" problem. The solution: break work into small chunks and yield control between chunks using `setTimeout(nextChunk, 0)` or `queueMicrotask(nextChunk)` in real environments.',
         'SE — Blocking the event loop is the critical mistake in Node.js server code. A 100ms CPU-bound operation on a server handling 1,000 requests/second effectively adds 100ms latency to 100 other requests. Node.js best practices: never block the event loop with synchronous CPU work; use `worker_threads` for CPU-intensive operations. The `--max-old-space-size` and `--stack-size` flags tune the runtime, but no flag fixes blocking code.',
         'Without this: without understanding event loop blocking, developers write `for (let i = 0; i < 1e9; i++)` in a request handler and wonder why the server stops responding to other requests. The event loop is non-blocking by design — but only if the code you run on it is also non-blocking. The developer\'s responsibility is to keep individual synchronous segments short.',
@@ -190,6 +194,7 @@ console.log('chunked: other work can run between chunks')`,
     },
     {
       title: 'The full picture — stack, microtask, task queue',
+      semanticEvent: 'EnqueueMicrotask',
       code:
 `function c() { console.log('C runs'); return 'c-result' }
 function b() { console.log('B runs'); var r = c(); console.log('B got: ' + r); return 'b-result' }
@@ -234,7 +239,7 @@ console.log(log)
 console.log('(microtasks will run after sync block ends)')
 console.log('final log will include microtasks after this point')`,
       explanation: [
-        'Execution order: line 13 (`\'1. sync-start\'`) runs synchronously. Lines 16–17 register two microtasks — not yet run. Line 19 (`\'2. sync-end\'`) runs synchronously. Line 21 pushes `\'(sync pushed after promises)\'` to `log`. After the synchronous call stack empties, the microtask queue drains: microtask-1 pushes `\'3. microtask-1\'`, microtask-2 pushes `\'4. microtask-2\'`. The `log` array at line 22 shows only the sync-pushed value — demonstrating that microtasks have not yet run.',
+        'The complete execution order establishes the **three-tier scheduling relationship**: synchronous code runs first (`\'1. sync-start\'`, `\'2. sync-end\'`); then microtasks drain (the two `.then()` callbacks push to `log`); then tasks would run. The `log` array at line 22 shows only the sync-pushed value — microtasks have not yet fired when sync code reads it.',
         'CS — The full event loop order: (1) run synchronous code on the call stack to completion; (2) drain microtask queue (all of it — new microtasks added during draining are also drained before moving on); (3) render frame (browser only); (4) dequeue one task from the task queue; (5) go to step 1. This is the HTML5 specification\'s "event loop processing model" — standardised across all browsers and Node.js.',
         'SE — Understanding this order is essential for debugging async bugs. A common mistake: `setState(newValue); console.log(state)` in React — `state` is still the old value because React batches state updates as microtasks. Another: `element.style.display = \'block\'; element.getBoundingClientRect()` — the layout calculation runs before the browser\'s render step, reading the old layout. The event loop order explains both.',
         'Without this: without the event loop mental model, async JavaScript is magic — callbacks appear "at random", Promises seem to run "immediately sometimes and later other times." The model makes the behaviour predictable: sync → microtasks → render → task → repeat. Once internalised, async ordering becomes deterministic reasoning.',

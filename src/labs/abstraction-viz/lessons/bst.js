@@ -5,6 +5,7 @@ export default {
   steps: [
     {
       title: 'Node — the building block',
+      semanticEvent: 'DefineClass',
       code:
 `class Node {
   constructor(value) {
@@ -19,7 +20,7 @@ console.log(root.value)
 console.log(root.left)
 console.log(root.right)`,
       explanation: [
-        'A `Node` holds a `value` and two child pointers: `left` and `right`, both starting as `null`. Line 10 prints `50`. Lines 11–12 print `null`. The single node is a complete tree of size 1 — the root with no children. Every BST is built by connecting Node instances through their `left` and `right` pointers.',
+        '`Node` establishes the **tree-building block**: a `value` and two child pointers (`left`, `right`) both starting as `null`. These two references encode the entire tree structure — every BST is built by linking Node instances through them. A single node with no children is already a complete tree of size 1.',
         'CS — A binary tree is a graph where each node has at most two children, called left and right. A Binary Search Tree (BST) adds the ordering invariant: every value in the left subtree is less than the node\'s value; every value in the right subtree is greater. This invariant makes search `O(log n)` on a balanced tree — halving the search space at each step.',
         'SE — Trees appear throughout software: the DOM is an `n`-ary tree (each node can have many children). A file system is a tree (directories contain files and subdirectories). JSON is a tree. TypeScript\'s Abstract Syntax Tree (AST) is a tree of `Node` objects. Webpack and Rollup traverse the import/export AST to build the dependency tree. BSTs specifically power database indexes and sorted sets.',
         'Without this: without the `left`/`right` pointers, a node has nowhere to attach children. The entire tree structure is encoded in these two references — `null` means "no child here." The BST works because every recursive operation makes one binary decision at each node: go left or go right.',
@@ -32,6 +33,7 @@ console.log(root.right)`,
     },
     {
       title: 'BST class and insert()',
+      semanticEvent: 'DefineClass',
       code:
 `class Node {
   constructor(value) {
@@ -73,7 +75,7 @@ console.log(bst.root.right.value)
 console.log(bst.root.left.left.value)
 console.log(bst.root.left.right.value)`,
       explanation: [
-        '`insert(value)` walks the tree: if `value < current.value`, go left; otherwise go right. When a `null` slot is found, place the new node there. After inserting 50, 30, 70, 20, 40: root is 50, root.left is 30, root.right is 70, root.left.left is 20, root.left.right is 40. Lines 35–39 print `50`, `30`, `70`, `20`, `40`. The BST invariant holds at every node.',
+        '`insert()` establishes the **BST ordering invariant**: at each node, values less than `current.value` go left, others go right — placing the new node in the first `null` slot found. After inserting 50, 30, 70, 20, 40: the left subtree holds 20 and 40 under 30, the right holds 70. Every search path will narrow to half the tree at each comparison.',
         'CS — Insert is `O(h)` where `h` is the tree height. For a balanced BST, `h = log₂(n)` — inserting into 1,000 nodes takes at most 10 comparisons. For a degenerate tree (inserting values in sorted order: 1, 2, 3, 4...), `h = n` — insert degrades to `O(n)`, identical to a linked list. Self-balancing BSTs (AVL tree, Red-Black tree) maintain `O(log n)` by rotating nodes on insert.',
         'SE — Database B-trees (B+ trees) generalise the BST for disk storage — each node holds many keys to maximise use of a disk block. MySQL\'s InnoDB and PostgreSQL use B+ trees for indexes. Redis\'s sorted sets use a skip list (probabilistic BST alternative). MongoDB\'s indexes use B-trees. Every `CREATE INDEX` creates a BST-family structure that makes `WHERE column = value` go from `O(n)` scan to `O(log n)` lookup.',
         'Without this: without the BST ordering invariant, finding a value in a tree requires visiting every node — `O(n)`. The invariant (left < node < right) is what makes binary search possible: at each node, you eliminate half the remaining tree. Maintaining the invariant on insert is the price that makes all subsequent searches fast.',
@@ -83,12 +85,13 @@ console.log(bst.root.left.right.value)`,
         { startLine: 33, endLine: 39, color: 'emerald', label: 'tree shape: 50 root, 30/70 children, 20/40 grandchildren' },
       ],
       connections: [
-        { fromLine: 22, toLine: 23, color: 'violet',  label: 'value < current → go left' },
-        { fromLine: 25, toLine: 26, color: 'indigo',  label: 'value >= current → go right' },
+        { fromLine: 22, toLine: 23, color: 'violet',  label: 'value < current → go left', type: 'reads' },
+        { fromLine: 25, toLine: 26, color: 'indigo',  label: 'value >= current → go right', type: 'reads' },
       ],
     },
     {
       title: 'search() — find a value',
+      semanticEvent: 'DefineFunction',
       code:
 `class Node {
   constructor(value) {
@@ -136,7 +139,7 @@ console.log(bst.search(40) !== null)
 console.log(bst.search(40).value)
 console.log(bst.search(99) === null)`,
       explanation: [
-        '`search(value)` starts at `root` and at each node compares `value` to `current.value`: if equal, return the node; if less, go left; if greater, go right. `search(40)` path: 50 (go left) → 30 (go right) → 40 (found). Line 43 prints `true` (node found). Line 44 prints `40`. `search(99)`: 50 → 70 → null (not found). Line 45 prints `true` (result is `null`).',
+        '`search()` establishes the **binary elimination contract**: at each node, if `value === current.value` return it; if less go left; if greater go right — each step halves the remaining candidates. `search(40)` takes exactly 3 comparisons (50 → 30 → 40 found); `search(99)` reaches `null` in 3 comparisons and returns `null` — not found.',
         'CS — Search visits at most `h` nodes — one per level of the tree. For a balanced tree of 1,000 nodes (`h ≈ 10`), search takes at most 10 comparisons. Compare to a linear array: finding 40 in `[20, 30, 40, 50, 70]` with `indexOf` requires scanning until the match — `O(n)` worst case. The BST\'s ordering invariant converts linear scan to binary search.',
         'SE — Database index lookup is BST search. `SELECT * FROM users WHERE id = 42` on a B-tree indexed column does exactly this walk: compare 42 to the root page\'s keys, decide which child page to follow, repeat. Without the index, the database scans all rows. The index makes it `O(log n)`. PostgreSQL\'s `EXPLAIN` output shows "Index Scan" vs. "Seq Scan" — BST search vs. linear scan.',
         'Without this: without the BST invariant, search requires checking every node — `O(n)`. The invariant is what makes the decision at each node unambiguous: go left or right, never both. If the invariant were violated (e.g., 60 stored in the left subtree of 50), search would follow the wrong path and report "not found" for a value that exists.',
@@ -145,10 +148,11 @@ console.log(bst.search(99) === null)`,
         { startLine: 25, endLine: 32, color: 'violet',  label: 'search — binary decision at each node, O(log n)' },
         { startLine: 43, endLine: 45, color: 'emerald', label: 'found 40, found 40.value, 99 not found → null' },
       ],
-      connections: [{ fromLine: 29, toLine: 29, color: 'violet', label: 'ternary: < current → left, else → right' }],
+      connections: [{ fromLine: 29, toLine: 29, color: 'violet', label: 'ternary: < current → left, else → right', type: 'reads' }],
     },
     {
       title: 'In-order traversal — values in sorted order',
+      semanticEvent: 'DefineFunction',
       code:
 `class Node {
   constructor(value) { this.value = value; this.left = null; this.right = null }
@@ -202,7 +206,7 @@ console.log(bst.search(40).value)
 console.log(bst.search(99) === null)
 console.log(bst.toArray())`,
       explanation: [
-        '`inOrder(node, result)` is a recursive depth-first traversal: visit left subtree → push current value → visit right subtree. For the BST with 50, 30, 70, 20, 40, 60, 80 inserted: left subtree of 50 is 20, 30, 40 (in order); current is 50; right subtree is 60, 70, 80. Line 53 prints `[20, 30, 40, 50, 60, 70, 80]` — sorted ascending. In-order traversal of a BST always produces sorted output.',
+        '`inOrder()` establishes the **sorted extraction relationship**: left subtree → push current value → right subtree maps directly to ascending order because the BST invariant guarantees all left values are smaller. Inserting 50, 30, 70, 20, 40, 60, 80 and calling `toArray()` produces `[20, 30, 40, 50, 60, 70, 80]` — the sort is implicit in the tree structure.',
         'CS — In-order traversal visits nodes in the sequence: left → root → right. This is a depth-first traversal. The three DFS traversal orders for a BST are: pre-order (root → left → right, useful for serialising a tree), in-order (left → root → right, produces sorted order), post-order (left → right → root, useful for deletion). Breadth-first traversal processes nodes level by level.',
         'SE — In-order traversal is used to: enumerate all keys in a sorted dictionary (B-tree database index range scan — `BETWEEN` query traverses the index in-order), merge two sorted arrays from BSTs in `O(n+m)`, and flatten a BST to a sorted array for binary search. Git\'s object model is a Merkle tree traversed in pre-order when computing diffs.',
         'Without this: without in-order traversal, extracting a sorted sequence from a BST requires extracting all values and sorting them — `O(n log n)`. In-order traversal exploits the BST invariant to produce sorted output in `O(n)` — the sorting is implicit in the tree structure. The traversal IS the sort.',
@@ -212,12 +216,13 @@ console.log(bst.toArray())`,
         { startLine: 48, endLine: 53, color: 'emerald', label: 'toArray → [20,30,40,50,60,70,80] sorted!' },
       ],
       connections: [
-        { fromLine: 34, toLine: 33, color: 'violet',  label: 'recurse left first' },
-        { fromLine: 36, toLine: 33, color: 'indigo',  label: 'then recurse right' },
+        { fromLine: 34, toLine: 33, color: 'violet',  label: 'recurse left first', type: 'calls' },
+        { fromLine: 36, toLine: 33, color: 'indigo',  label: 'then recurse right', type: 'calls' },
       ],
     },
     {
       title: 'min(), max() and height()',
+      semanticEvent: 'DefineFunction',
       code:
 `class Node {
   constructor(value) { this.value = value; this.left = null; this.right = null }
@@ -277,7 +282,7 @@ console.log(bst.min())
 console.log(bst.max())
 console.log(bst.height(bst.root))`,
       explanation: [
-        '`min()` walks leftward until `left === null` — the leftmost node is always the smallest. `max()` walks rightward — the rightmost node is always the largest. `height(node)` recursively computes the longest path to a leaf: `-1` for null, `1 + max(leftHeight, rightHeight)` for a node. Line 53 prints `[20,30,40,50,60,70,80]`. Line 54 prints `20`. Line 55 prints `80`. Line 56 prints `2` (the tree has 4 levels: root at 0, nodes at 1, leaves at 2 → height = 2).',
+        '`min()` and `max()` establish the **structural encoding relationship**: the leftmost node is always the minimum and the rightmost is always the maximum — a consequence of the BST invariant, not a stored value. `height()` recursively measures the longest root-to-leaf path. For the balanced 7-node tree, `min()` returns `20`, `max()` returns `80`, and `height()` returns `2`.',
         'CS — Min and max are `O(h)` — walk one direction to the bottom. Height is `O(n)` — must visit every node to find the deepest leaf. A perfectly balanced BST of 7 nodes (like ours: 50 at root, 30/70 as children, 20/40/60/80 as grandchildren) has height 2. Inserting 7 sorted values (1,2,3,4,5,6,7) would produce a degenerate tree of height 6 — a right-leaning chain.',
         'SE — `min()` and `max()` directly implement database `SELECT MIN()` and `SELECT MAX()` on indexed columns — follow the leftmost or rightmost B-tree path. Height is used by AVL and Red-Black tree rebalancing algorithms: if `|height(left) - height(right)| > 1`, the tree is unbalanced and rotation is needed. PostgreSQL and MySQL check balance factors during index maintenance.',
         'Without this: without following the ordering invariant, finding min would require visiting all `n` nodes. The BST stores the minimum at the bottom-left by construction — the invariant encodes the sort order structurally. Min and max "for free" are a direct payoff of maintaining the BST invariant on every insert.',

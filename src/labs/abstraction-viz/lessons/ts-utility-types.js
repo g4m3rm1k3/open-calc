@@ -6,6 +6,7 @@ export default {
   steps: [
     {
       title: 'Partial<T> — make all properties optional',
+      semanticEvent: 'InferType',
       code:
 `interface User {
   id:    number
@@ -34,7 +35,7 @@ console.log(updated.name)
 console.log(updated.email)
 console.log(updated.age)`,
       explanation: [
-        '`Partial<User>` transforms the `User` type so ALL properties become optional (`?`). The `patch` parameter can have zero, one, or all properties of `User`. `updateUser(1, { name: \'Bob\', age: 30 })` passes a partial with two fields — `email` and `id` are omitted. Line 14 prints `\'Bob\'`, line 15 prints `\'a@x.com\'` (unchanged from `current`), line 16 prints `30`.',
+        '`Partial<User>` establishes the **optional-all transformation**: every required property in `User` becomes `?`-optional in `Partial<User>`. The `patch` argument can contain any subset of `User` fields — `name` and `age` here; `email` and `id` omitted. The spread `{ ...current, ...patch, id }` applies only the provided fields, leaving the rest unchanged from `current`.',
         'CS — `Partial<T>` is a mapped type defined in TypeScript\'s standard library: `type Partial<T> = { [K in keyof T]?: T[K] }`. It iterates every key of `T` and adds `?` — making each optional. Mapped types are metaprogramming at the type level: they transform one type into another using type-level computation, analogous to `Array.map` at the value level.',
         'SE — `Partial<T>` is the standard type for PATCH-style API requests. REST APIs use PATCH to update a subset of resource fields — the request body is a `Partial<Resource>`. ORMs like Prisma and TypeORM use `Partial<Model>` for update operations. React\'s `setState` (class component) accepted `Partial<State>` — only the fields you pass are updated.',
         'Without this: without `Partial<T>`, you\'d need to define a separate interface for each update shape — `UserNamePatch`, `UserEmailPatch`, `UserAgePatch`. Adding a new field to `User` would require updating every patch type. `Partial<User>` derives automatically from `User` — add a field to the base type and all partial types update for free.',
@@ -48,6 +49,7 @@ console.log(updated.age)`,
     },
     {
       title: 'Required<T> and Readonly<T>',
+      semanticEvent: 'InferType',
       code:
 `interface User {
   id:    number
@@ -89,7 +91,7 @@ console.log(frozen.id)
 
 createServer({ host: 'localhost', port: 3000, timeout: 5000 })`,
       explanation: [
-        '`Required<Config>` is the inverse of `Partial` — it makes all optional properties required. `Config` has three optional fields; `Required<Config>` requires all three. `createServer` must receive all three. `Readonly<User>` marks all properties as read-only — attempting `frozen.name = \'Bob\'` would be a TypeScript compile error. Line 24 prints `\'Alice\'`. Line 25 prints `1`. Line 27 prints `\'localhost:3000\'` and `\'timeout: 5000\'`.',
+        '`Required<Config>` establishes the **mandatory-all transformation**: every optional `?` modifier is stripped — `Config`\'s three optional fields become three required fields. `Readonly<User>` simultaneously freezes every property — `frozen.name = \'Bob\'` would be a compile error. Both transformations derive from the source type; changing `Config` automatically updates `Required<Config>`.',
         'CS — `Required<T>` maps: `{ [K in keyof T]-?: T[K] }` — the `-?` removes the optional modifier. `Readonly<T>` maps: `{ readonly [K in keyof T]: T[K] }` — adds `readonly` to every property. These are modifier mapped types. TypeScript has four modifiers: `?` (optional), `-?` (required), `readonly`, `-readonly`. Mapped types can add or remove any combination.',
         'SE — `Readonly<T>` is used for configuration objects that should never be mutated after construction. Redux\'s state is typed `Readonly<State>` — reducers must return new objects, never mutate the existing state. React\'s `props` are `Readonly<Props>` — components should not mutate their own props. Immer\'s `Draft<T>` is the inverse: a mutable version of an otherwise `Readonly<T>` type.',
         'Without this: without `Readonly<T>`, a function receiving a User object could silently mutate the caller\'s data — `user.name = \'Modified\'` would change the original. The caller has no way to prevent it. `Readonly<T>` makes the mutation a compile-time error, enforcing the pure function contract at the type level.',
@@ -103,6 +105,7 @@ createServer({ host: 'localhost', port: 3000, timeout: 5000 })`,
     },
     {
       title: 'Pick<T, K> — select a subset of properties',
+      semanticEvent: 'InferType',
       code:
 `interface User {
   id:    number
@@ -143,7 +146,7 @@ var alice = { id: 1, name: 'Alice', email: 'a@x.com', age: 25 }
 showPreview(alice)
 showPublic(alice)`,
       explanation: [
-        '`Pick<User, \'id\' | \'name\'>` creates a type with ONLY `id` and `name` from `User`. `Pick<User, \'name\' | \'email\'>` creates a type with only `name` and `email`. `showPreview` receives `UserPreview` — accessing `u.age` inside would be a TypeScript error. `showPublic` can access `name` and `email` but not `id` or `age`. Line 24 prints `\'1: Alice\'`. Line 25 prints `\'Alice <a@x.com>\'`.',
+        '`Pick<User, \'id\' | \'name\'>` establishes the **property subsetting relationship**: only the listed keys survive into the new type. `showPreview` is typed to `UserPreview` — accessing `u.age` inside would be a compile error because `age` was not picked. `alice` (full `User`) satisfies both `UserPreview` and `UserPublic` through structural matching — extra fields are allowed.',
         'CS — `Pick<T, K>` is defined as `{ [P in K]: T[P] }` where `K extends keyof T`. It distributes over the union of key literals `K`, selecting only those properties from `T`. The complement is `Omit<T, K>`, which selects everything EXCEPT `K`. `Pick` and `Omit` are dual — `Pick<T, K>` = `Omit<T, Exclude<keyof T, K>>`.',
         'SE — `Pick` is used for view models and API response shaping. A `GET /users` endpoint returns `Pick<User, \'id\' | \'name\' | \'email\'>` — the `passwordHash` field is excluded by type. GraphQL\'s selection sets are essentially `Pick` at the query language level. tRPC procedures return `Pick<Model, \'field1\' | \'field2\'>` to prevent over-fetching. Prisma\'s `select: { name: true, email: true }` produces a `Pick` type in the result.',
         'Without this: without `Pick`, you\'d define `UserPreview` and `UserPublic` as separate interfaces, manually duplicating the property declarations from `User`. When `User` gains a new field, you manually decide if each view type should include it. `Pick` makes the view type a derivation — change `User`, and any `Pick` that should include the new field is updated by listing the key.',
@@ -157,6 +160,7 @@ showPublic(alice)`,
     },
     {
       title: 'Omit<T, K> — exclude specific properties',
+      semanticEvent: 'InferType',
       code:
 `interface User {
   id:         number
@@ -199,7 +203,7 @@ var newUser = registerUser({
 console.log(newUser.id > 0)
 displayUser(newUser)`,
       explanation: [
-        '`Omit<User, \'passwordHash\'>` creates `PublicUser` — all `User` fields EXCEPT `passwordHash`. `Omit<User, \'id\'>` creates `CreateUserDTO` — all fields except `id` (the server assigns the ID). `registerUser` receives data without an ID and returns a full `User` with a generated ID. Line 24 prints `true` (ID is positive). Line 25 prints `\'Carol (28) <c@x.com>\'`.',
+        '`Omit<User, \'passwordHash\'>` establishes the **property exclusion relationship**: all of `User`\'s fields survive except the listed ones. `PublicUser` omits `passwordHash` to prevent sensitive data exposure; `CreateUserDTO` omits `id` because the server generates it. A full `User` satisfies `PublicUser` structurally — the extra fields are present but callers of `displayUser` cannot access them through the type.',
         'CS — `Omit<T, K>` is defined as `Pick<T, Exclude<keyof T, K>>` — it uses `Exclude` (another utility type) to compute which keys to keep, then uses `Pick` to select them. `Exclude<Union, U>` removes members of `U` from `Union`: `Exclude<\'a\'|\'b\'|\'c\', \'a\'> = \'b\'|\'c\'`. These utility types are built from each other using conditional types and mapped types.',
         'SE — `Omit` is used for DTO (Data Transfer Object) shaping. A `CreateUserDTO` omits server-generated fields (`id`, `createdAt`, `updatedAt`). A `PublicUser` omits sensitive fields (`passwordHash`, `twoFactorSecret`). Prisma\'s `UserCreateInput` is `Omit<User, \'id\' | \'createdAt\'>`. Next.js API routes return `Omit<DbModel, \'internalField\'>` to prevent leaking internal data.',
         'Without this: without `Omit`, defining `CreateUserDTO` requires listing all `User` fields except `id` — 5 fields copied manually. Add `phone` to `User`, forget to add it to `CreateUserDTO`, and the DTO silently misses the new field until a runtime test catches it. `Omit` derives the type — add `phone` to `User` and `CreateUserDTO` automatically includes it.',
@@ -213,6 +217,7 @@ displayUser(newUser)`,
     },
     {
       title: 'Record<K, V> — typed dictionary',
+      semanticEvent: 'InferType',
       code:
 `interface User {
   id: number; name: string; email: string; age: number
@@ -266,7 +271,7 @@ var cache = {
 console.log(cache.u1.name)
 console.log(cache.u2.age)`,
       explanation: [
-        '`Record<Role, string[]>` creates a type where the keys are the `Role` union members (`\'admin\'` | `\'editor\'` | `\'viewer\'`) and each value is `string[]`. TypeScript verifies all three keys are present — omitting `\'viewer\'` would be a compile error. `Record<number, User>` creates a numeric-keyed dictionary of Users. Lines 18–20 print `true`, `false`, `true`. Lines 28–29 print `\'Alice\'`, `30`.',
+        '`Record<Role, string[]>` establishes the **keyed dictionary completeness contract**: the keys must be exactly the members of the `Role` union — omitting `\'viewer\'` is a compile error. Every value is typed `string[]`. `Record<number, User>` creates a numeric-keyed cache where each value is typed `User` — accessing a key not in the union fails at compile time, preventing typos from silently returning `undefined`.',
         'CS — `Record<K, V>` is defined as `{ [P in K]: V }` — a homogeneous mapped type where all values have the same type `V`. The key type `K` must be `string | number | symbol`. When `K` is a union literal type (`\'a\' | \'b\' | \'c\'`), TypeScript checks that ALL members of the union are present as keys — completeness checking for dictionaries, analogous to exhaustiveness checking for unions.',
         'SE — `Record` is used for lookup tables, caches, and dispatch maps. Express route registries: `Record<string, RequestHandler>`. React\'s `useReducer` switch dispatch: `Record<ActionType, ReducerFn>`. Redux\'s entity adapter stores: `Record<EntityId, Entity>`. Internationalization (i18n) dictionaries: `Record<Locale, Record<MessageKey, string>>`. Configuration maps: `Record<FeatureFlag, boolean>`.',
         'Without this: without `Record<Role, string[]>`, the type would be `{ [key: string]: string[] }` — which allows any string as a key, including typos (`\'adminn\'`). TypeScript would not catch a missing `viewer` key. `Record<Role, string[]>` constrains the keys to exactly the three role strings — completeness and spelling are both checked at compile time.',
@@ -280,6 +285,7 @@ console.log(cache.u2.age)`,
     },
     {
       title: 'ReturnType<T> and Parameters<T>',
+      semanticEvent: 'InferType',
       code:
 `interface User {
   id: number; name: string; email: string; age: number
@@ -327,7 +333,7 @@ console.log(u.name)
 console.log(u.age)
 console.log(u.email)`,
       explanation: [
-        '`ReturnType<typeof createUser>` extracts the return type of `createUser` — `User`. `Parameters<typeof createUser>` extracts the parameter types as a tuple — `[string, number]`. `wrappedCreate` uses both: `...args: CreateUserParams` means the wrapper accepts exactly the same arguments as `createUser`, and the return type is `CreateUserReturn` (also `User`). Line 28 prints `\'Diana\'`. Line 29 prints `32`. Line 30 prints `\'Diana@x.com\'`.',
+        '`ReturnType<typeof createUser>` establishes the **type extraction relationship**: it infers the return type (`User`) directly from the function without re-declaring it. `Parameters<typeof createUser>` extracts the argument tuple `[string, number]`. The wrapper\'s signature is derived entirely from the wrapped function — change `createUser`\'s signature once and the wrapper\'s types update automatically.',
         'CS — `ReturnType<T>` and `Parameters<T>` are conditional types using the `infer` keyword: `type ReturnType<T> = T extends (...args: any) => infer R ? R : never`. The `infer R` keyword tells TypeScript "extract the return type into `R`". This is type-level pattern matching — TypeScript destructures function types the same way destructuring destructures values.',
         'SE — These types are essential for wrapping third-party functions without re-declaring their types. A performance wrapper around `fetch`: `function trackedFetch(...args: Parameters<typeof fetch>): ReturnType<typeof fetch>`. The wrapper\'s type is always derived from the wrapped function — update the fetch signature and the wrapper updates automatically. Express `RequestHandler` type checking uses this pattern.',
         'Without this: without `ReturnType` and `Parameters`, wrapping `createUser` requires manually re-declaring: `function wrappedCreate(name: string, age: number): User`. When `createUser`\'s signature changes (add `email` parameter), you must update both `createUser` and `wrappedCreate` in sync. With `ReturnType`/`Parameters`, only `createUser`\'s signature changes — the wrapper derives everything automatically.',

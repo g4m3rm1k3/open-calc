@@ -6,6 +6,7 @@ export default {
   steps: [
     {
       title: 'T extends U ? X : Y — type-level if/else',
+      semanticEvent: 'InferType',
       code:
 `type IsString<T> = T extends string ? 'yes' : 'no'
 
@@ -30,7 +31,7 @@ console.log(typeLabel('hello'))
 console.log(typeLabel(42))
 console.log(typeLabel(true))`,
       explanation: [
-        '`type IsString<T> = T extends string ? \'yes\' : \'no\'` is a conditional type: if `T` extends (is assignable to) `string`, the type resolves to `\'yes\'`; otherwise `\'no\'`. `IsString<string>` = `\'yes\'`. `IsString<number>` = `\'no\'`. `IsString<\'hello\'>` = `\'yes\'` (literal strings extend `string`). `typeLabel(\'hello\')` returns a value typed as `\'yes\'`. Lines 12–14 print `\'yes\'`, `\'no\'`, `\'no\'`.',
+        '`type IsString<T> = T extends string ? \'yes\' : \'no\'` establishes the **type-level conditional relationship**: `T extends U ? X : Y` is a ternary at the type level — if `T` is assignable to `string`, the type resolves to `\'yes\'`; otherwise `\'no\'`. `IsString<\'hello\'>` resolves to `\'yes\'` because string literals extend `string`. The computation happens entirely at compile time with no runtime cost.',
         'CS — Conditional types are the type-level equivalent of a ternary expression. `T extends U` is a type subtype check: "is `T` assignable to `U`?" at compile time. Conditional types enable type-level programming — computing types from other types using logic. This is a form of dependent typing: the TYPE of a result depends on the TYPE of the input.',
         'SE — Conditional types are used heavily in TypeScript\'s standard library: `NonNullable<T>` is `T extends null | undefined ? never : T`. `Awaited<T>` (extract what a Promise resolves to) is a conditional type that recurses through nested Promises. Zod\'s type inference, React\'s `ComponentProps<T>`, and TypeScript\'s DOM types all use conditional types.',
         'Without this: without conditional types, you need function overloads to express "if the input is a string, return \'yes\'; otherwise return \'no\'." Overloads are verbose and finite — you list the cases manually. Conditional types compute the result type for ALL possible inputs at once, including generic inputs you haven\'t thought of yet.',
@@ -44,6 +45,7 @@ console.log(typeLabel(true))`,
     },
     {
       title: 'infer — extract a type from a generic',
+      semanticEvent: 'InferType',
       code:
 `type IsString<T> = T extends string ? 'yes' : 'no'
 
@@ -85,7 +87,7 @@ console.log(el2)
 console.log(typeof el1)
 console.log(typeof el2)`,
       explanation: [
-        '`infer R` in `T extends Promise<infer R> ? R : T` tells TypeScript: "if `T` matches `Promise<something>`, capture that something as `R` and return it." `UnwrapPromise<Promise<string>>` = `string`. `UnwrapPromise<Promise<number>>` = `number`. `UnwrapPromise<string>` = `string` (not a Promise — return `T` unchanged). `ElementType<string[]>` extracts `string`. Lines 24–27 print `1`, `\'a\'`, `\'number\'`, `\'string\'`.',
+        '`infer R` establishes the **type extraction by pattern matching relationship**: if `T` matches `Promise<something>`, TypeScript captures that something as `R` and returns it. `UnwrapPromise<Promise<string>>` → `R = string` → resolves to `string`. `UnwrapPromise<string>` → no match → returns `T` unchanged. `ElementType<string[]>` captures the element type `string` from the array pattern `(infer E)[]`.',
         'CS — `infer` is pattern matching at the type level. `T extends Promise<infer R>` is a type-level structural match: "does `T` look like `Promise<?>` — if so, what is `?`." This is the same concept as destructuring at the value level: `const { name } = user` extracts `name`; `infer R` extracts the generic parameter `R` from `Promise<R>`. TypeScript resolves `infer` only inside a conditional type.',
         'SE — `infer` powers TypeScript\'s `ReturnType<T>` (`T extends (...args: any) => infer R ? R : any`), `Parameters<T>`, `ConstructorParameters<T>`, and `InstanceType<T>`. Zod\'s `z.infer<typeof schema>` uses conditional types + `infer` to extract the TypeScript type from a Zod schema definition. React\'s `ComponentPropsWithRef<T>` uses `infer` to extract ref type from component type.',
         'Without this: without `infer`, you\'d need function overloads or manual type aliases to express "give me the type inside a Promise." `Promise<string>` resolves to `string`, but expressing that generically requires `infer`. Before TypeScript 2.8 (when `infer` was added), library authors had to define dozens of overloads for each possible wrapped type.',
@@ -99,6 +101,7 @@ console.log(typeof el2)`,
     },
     {
       title: 'Distributive conditional types',
+      semanticEvent: 'InferType',
       code:
 `type IsString<T> = T extends string ? 'yes' : 'no'
 type UnwrapPromise<T> = T extends Promise<infer R> ? R : T
@@ -140,7 +143,7 @@ console.log(processUnion(true))
 console.log(wrapInArray(5))
 console.log(wrapInArray('x'))`,
       explanation: [
-        '`ToArray<T>` is a distributive conditional type — when `T` is a union, TypeScript distributes the conditional over each member. `ToArray<string | number>` becomes `ToArray<string> | ToArray<number>` = `string[] | number[]`. This is NOT `(string | number)[]` — the union distributes to create separate array types. `ToArray<boolean>` = `boolean[]`. Lines 19–23 print `\'str: hello\'`, `\'num: 42\'`, `\'bool: true\'`, `[5]`, `[\'x\']`.',
+        '`ToArray<T>` establishes the **distributive union transformation relationship**: when `T` is a union, TypeScript applies the conditional to each member independently. `ToArray<string | number>` becomes `ToArray<string> | ToArray<number>` = `string[] | number[]` — separate array types per member, not a combined `(string | number)[]`. Distribution only fires when `T` appears "naked" in the condition.',
         'CS — Distribution happens when the type parameter is "naked" — appears directly as `T` (not wrapped in `Array<T>` or another generic). `T extends any ? T[] : never` is always true for any `T` — the key is the distribution. To prevent distribution, wrap `T` in a tuple: `[T] extends [any] ? T[] : never`. This is a subtle but important distinction in advanced TypeScript.',
         'SE — Distributive conditional types power `NonNullable<T>`: `T extends null | undefined ? never : T`. When `T` is `string | null | undefined`, distribution applies: `string extends null|undefined ? never : string = string; null extends null|undefined ? never : never; undefined extends null|undefined ? never : never`. Result: `string` — null and undefined are filtered out. This is the core mechanism behind non-null types.',
         'Without this: without distribution, `NonNullable<string | null>` would check if `string | null` extends `null | undefined` — which it doesn\'t — returning `string | null` unchanged. Distribution is what makes the type utility work per-member of the union. It\'s the key insight that makes conditional types compose correctly over union types.',
@@ -154,6 +157,7 @@ console.log(wrapInArray('x'))`,
     },
     {
       title: 'Exclude and Extract — filter union members',
+      semanticEvent: 'InferType',
       code:
 `type IsString<T> = T extends string ? 'yes' : 'no'
 type ToArray<T>  = T extends any ? T[] : never
@@ -191,7 +195,7 @@ console.log(handleLive('active'))
 console.log(handleEnd('suspended'))
 console.log(handleEnd('deleted'))`,
       explanation: [
-        '`Exclude<T, U>` removes union members that extend `U`. `Exclude<Status, \'deleted\' | \'suspended\'>` = `\'pending\' | \'active\'`. `Extract<T, U>` keeps only members that extend `U`. `Extract<Status, \'suspended\' | \'deleted\'>` = `\'suspended\' | \'deleted\'`. `handleLive` can only accept `\'pending\'` or `\'active\'` — passing `\'deleted\'` would be a TypeScript error. Lines 19–22 print the four status labels.',
+        '`Exclude<Status, \'deleted\' | \'suspended\'>` establishes the **type-level set difference relationship**: each union member that extends the second argument becomes `never` (which vanishes from unions) — leaving only `\'pending\' | \'active\'`. `Extract` is the dual: it keeps only members that match. `handleLive` accepting only `LiveStatus` means passing `\'deleted\'` is a compile error.',
         'CS — `Exclude` and `Extract` are the set-theoretic complement and intersection at the type level. `Exclude<A, B>` = A − B (set difference). `Extract<A, B>` = A ∩ B (set intersection). They work by distributing over union members and returning `never` or the member. `never` is absorbed in union types — `string | never` = `string` — so members excluded become invisible.',
         'SE — `Exclude` is used for: creating a type of "everything except error states," restricting event handler parameter types, and removing `null`/`undefined` from unions (which is what `NonNullable` does internally). TypeScript\'s own lib.es2015.ts uses `Exclude` to define types like `Exclude<keyof ReadonlyArray<T>, keyof Array<T>>`. Redux\'s `ActionCreatorWithoutPayload` uses `Exclude` to filter action types.',
         'Without this: without `Exclude`, you manually list the members you want to keep — `type LiveStatus = \'pending\' | \'active\'`. When a new live status is added to `Status` (`\'trial\'`), you must remember to add it to `LiveStatus` too. With `Exclude`, `LiveStatus` is always derived — add `\'trial\'` to `Status` and `LiveStatus` automatically includes it, `EndStatus` automatically excludes it.',
@@ -205,6 +209,7 @@ console.log(handleEnd('deleted'))`,
     },
     {
       title: 'DeepReadonly — recursive conditional type',
+      semanticEvent: 'InferType',
       code:
 `type IsString<T> = T extends string ? 'yes' : 'no'
 type Exclude<T, U> = T extends U ? never : T
@@ -254,7 +259,7 @@ console.log(state.items[0])
 console.log(state.count)
 console.log(state.items.length)`,
       explanation: [
-        '`DeepReadonly<T>` is a recursive conditional type: primitives return as-is; arrays become `ReadonlyArray<DeepReadonly<E>>`; objects become `{ readonly [K in keyof T]: DeepReadonly<T[K]> }`. Applied to `AppState`: `count: number` stays `number`; `user: { name: string }` becomes `{ readonly name: string }`; `items: string[]` becomes `ReadonlyArray<string>`. Attempting `state.user.name = \'Bob\'` would be a TypeScript error. Lines 28–31 print `\'Alice\'`, `\'a\'`, `42`, `3`.',
+        '`DeepReadonly<T>` establishes the **recursive type transformation relationship**: primitives return unchanged; arrays become `ReadonlyArray<DeepReadonly<E>>`; objects become `{ readonly [K in keyof T]: DeepReadonly<T[K]> }` — the type calls itself on every nested value. `state.user.name = \'Bob\'` would be a compile error because `user.name` is frozen at every nesting level, not just the top.',
         'CS — Recursive conditional types apply themselves to their own output — type-level recursion. TypeScript limits recursion depth to prevent infinite loops. `DeepReadonly` is the type-level equivalent of `Object.freeze()` applied recursively. The combination of `infer` (to extract array element types), mapped types (to iterate object keys), and conditional recursion produces a utility that works on arbitrarily nested structures.',
         'SE — `DeepReadonly` is used for Redux state types (state should never be mutated), configuration objects that are loaded once and read many times, and server-side props in Next.js (passed down immutably to components). Immer\'s `Draft<T>` is the inverse — it makes deeply readonly types mutable for the duration of `produce`. The two types are complementary in Redux + Immer codebases.',
         'Without this: without `DeepReadonly`, `Readonly<AppState>` makes the top-level object readonly — but `state.user.name = \'Bob\'` still compiles because `user` itself is mutable. You\'d need `Readonly<{ user: Readonly<{ name: string; email: string }> }>` — manually nested. `DeepReadonly` automates this for any level of nesting.',
@@ -263,7 +268,7 @@ console.log(state.items.length)`,
         { startLine: 7,  endLine: 11, color: 'violet',  label: 'DeepReadonly — recursive: primitive | array | object' },
         { startLine: 19, endLine: 31, color: 'emerald', label: 'Alice, a, 42, 3 — deeply readonly state reads fine' },
       ],
-      connections: [{ fromLine: 10, toLine: 7, color: 'violet', label: 'DeepReadonly recurses on E (array element type)' }],
+      connections: [{ fromLine: 10, toLine: 7, color: 'violet', label: 'DeepReadonly recurses on E (array element type)', type: 'resolves' }],
     },
   ],
 }

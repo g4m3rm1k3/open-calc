@@ -6,6 +6,7 @@ export default   {
     steps: [
       {
         title: 'The problem — no contract on object shape',
+        semanticEvent: 'DefineFunction',
         code:
 `// Without a type contract, any object is accepted — correct or not
 function describeUser(user) {
@@ -16,7 +17,7 @@ console.log(describeUser({ name: 'Alice', age: 25 }))  // → 'Alice is 25 years
 // describeUser({ firstName: 'Bob' })   // → 'undefined is undefined years old'
 // describeUser(42)                     // → 'undefined is undefined years old'`,
         explanation: [
-          'describeUser accepts any value. Passing { firstName: \'Bob\' } causes user.name to be undefined and user.age to be undefined — the function silently returns the wrong output. There is no error, no warning, and no indication that anything went wrong until the garbled string appears in production.',
+          '`describeUser` establishes the **missing contract problem**: without a type annotation, the function accepts any shape — correct or wrong — and silently produces garbage output instead of signalling the mistake. Passing `{ firstName: \'Bob\' }` gives `\'undefined is undefined years old\'` with no error. The contract gap between caller intent and function expectation is invisible until production.',
           'This is the runtime type safety problem: JavaScript checks nothing about the shape of values you pass to functions. You discover mistakes only when the wrong output appears (best case) or when the application crashes in production with a user watching (worst case).',
           'CS — TypeScript solves this with static type analysis: before the code runs, the TypeScript compiler analyses every function call and verifies that the argument matches the expected shape. Type violations become compile errors — caught in your editor, in CI, before any user sees the result. The types are erased in the compiled JavaScript; there is zero runtime overhead.',
           'SE — The cost of a runtime bug found in production is orders of magnitude higher than a compile-time error caught in the editor: investigation time, incident response, user impact, deployment. TypeScript interfaces shift the detection point from runtime to edit time. This is why virtually every large JavaScript project (Angular, VS Code, Slack) is written in TypeScript.',
@@ -29,6 +30,7 @@ console.log(describeUser({ name: 'Alice', age: 25 }))  // → 'Alice is 25 years
       },
       {
         title: 'interface — a named type contract',
+        semanticEvent: 'InferType',
         code:
 `interface User {
   name: string   // required: must be a string
@@ -48,7 +50,7 @@ console.log(describeUser({ name: 'Alice', age: 25 }))  // ✓ matches contract
 }
 console.log(describeUser({ name: 'Alice', age: 25 }))`,
         explanation: [
-          'interface User declares the exact shape required: any value passed where User is expected must have a string name and a number age. The annotation user: User on line 6 activates compile-time checking for every call to describeUser. Passing { firstName: \'Bob\' } is a type error caught before the code runs.',
+          '`interface User` establishes the **named shape → caller contract relationship**: every argument typed `User` must have exactly `name: string` and `age: number` — the compiler verifies this at every call site before the code runs. Passing `{ firstName: \'Bob\' }` is a compile error, not a silent runtime bug. Types are erased in the compiled output; the contract is purely compile-time.',
           'TypeScript checks the call site at compile time. It reads the argument\'s structure, compares it to User, finds that name is missing, and reports a clear error with the file name and line number. The compiled JavaScript has no User interface — types are completely erased. String output and runtime behaviour are identical to plain JavaScript.',
           'CS — An interface is a type expression, not a value. It exists only at compile time. In TypeScript\'s type system, interface User creates a named structural type: any object with at least name: string and age: number satisfies it, regardless of how it was created. This structural typing is different from Java/C# where you must explicitly implement an interface.',
           'SE — Interfaces are self-documenting contracts. Reading interface User tells you exactly what the function expects without reading the function body. IDEs use interfaces to provide autocomplete, hover documentation, and error highlighting as you type. Interface changes propagate as type errors through the entire codebase — refactoring becomes safe because the compiler finds every call site that breaks.',
@@ -62,6 +64,7 @@ console.log(describeUser({ name: 'Alice', age: 25 }))`,
       },
       {
         title: 'Optional property — ? marks what may be absent',
+        semanticEvent: 'NarrowType',
         code:
 `interface User {
   name:   string
@@ -89,7 +92,7 @@ const bob   = { name: 'Bob', age: 30, email: 'bob@example.com' }
 console.log(describeUser(alice))
 console.log(describeUser(bob))`,
         explanation: [
-          'email? declares an optional property. Callers may include it or omit it. Inside the function, TypeScript infers the type of user.email as string | undefined — a union type meaning "either a string or undefined". The compiler forces you to handle the undefined case before using the value.',
+          '`email?` establishes the **optional → union type narrowing relationship**: the `?` widens the property type to `string | undefined`, and the compiler forces every usage to handle both cases. The truthy check on `user.email` narrows the type to `string` inside the true branch — before that check, accessing `.length` would be a compile error, protecting against a runtime crash.',
           'Line 9 checks user.email with a ternary: if truthy (a non-empty string), append it. If falsy (undefined or empty string), append nothing. TypeScript will give an error if you write user.email.length without first checking — it knows email might be undefined and you would be calling .length on undefined, which is a runtime crash.',
           'CS — Union types (string | undefined) are TypeScript\'s way of modelling values that can be one of several types. The ? shorthand is syntactic sugar: email?: string is equivalent to email?: string | undefined. The compiler tracks the union through the code and narrows it at each conditional check — after the if(user.email) check, TypeScript knows email is string inside the true branch.',
           'SE — Optional properties model the real world accurately: a user account might or might not have an email address on file. Making it required would break registration flows; making it untyped would hide access bugs. Optional with forced handling is the correct middle ground. This pattern appears in virtually every API response type in TypeScript codebases.',
@@ -103,6 +106,7 @@ console.log(describeUser(bob))`,
       },
       {
         title: 'Interface extends interface — building type hierarchies',
+        semanticEvent: 'InferType',
         code:
 `interface User {
   name:   string
@@ -134,7 +138,7 @@ const admin = { name: 'Bob', age: 30, role: 'admin', permissions: ['read', 'writ
 console.log(describeUser(alice))
 console.log(describeUser(admin))`,
         explanation: [
-          'AdminUser extends User, inheriting its three fields and adding role and permissions. Any AdminUser value satisfies User — it has at least name, age, and email?. describeUser(admin) compiles because admin has all the fields User requires, plus extra ones TypeScript ignores.',
+          '`AdminUser extends User` establishes the **type hierarchy → structural superset relationship**: `AdminUser` inherits all of `User`\'s fields and adds more — making every `AdminUser` automatically a valid `User`. `describeUser(admin)` compiles because structural typing checks shape, not declaration: `admin` has everything `User` requires, and extra fields are allowed.',
           'This is structural typing: TypeScript checks the SHAPE, not the type name. admin was declared as AdminUser, not User — but it satisfies User because it has all of User\'s required fields. Extra fields (role, permissions) are allowed. This mirrors JavaScript\'s duck typing: "if it has the right properties, it works."',
           'CS — Structural typing is fundamentally different from nominal typing (Java, C#, Rust): in those languages, a type satisfies an interface only if it explicitly declares that it implements it. TypeScript\'s structural typing means any object with the right shape works — which is natural for JavaScript where object literals are ubiquitous.',
           'SE — Interface extension enables taxonomies: BaseUser → User → AdminUser → SuperAdminUser. Functions accepting User work with all subtypes. Functions accepting AdminUser require the extra fields. This hierarchy matches real-world access control models. Adding a new AdminUser field is caught everywhere the compiler can see — no hunting for usages.',
@@ -144,10 +148,11 @@ console.log(describeUser(admin))`,
           { startLine: 18, endLine: 18, color: 'pink', label: 'admin: AdminUser has all of User\'s required fields' },
           { startLine: 20, endLine: 20, color: 'emerald', label: 'structural match — AdminUser satisfies User, works as argument' },
         ],
-        connections: [{ fromLine: 7, toLine: 1, color: 'violet', label: 'extends — inherits contract' }],
+        connections: [{ fromLine: 7, toLine: 1, color: 'violet', label: 'extends — inherits contract', type: 'inherits' }],
       },
       {
         title: 'class implements interface — compiler verifies the promise',
+        semanticEvent: 'DefineClass',
         code:
 `interface User {
   name:   string
@@ -199,7 +204,7 @@ const record = new UserRecord('Carol', 22, 'carol@example.com')
 console.log(describeUser(record))
 console.log(record.greet())`,
         explanation: [
-          'implements User is a promise: "UserRecord guarantees it has all of User\'s required members." The compiler checks this promise at the class definition — if name were missing, TypeScript would error at line 12, not at every call site that passes a UserRecord as User. The error is at the source of the problem.',
+          '`implements User` establishes the **class → interface obligation relationship**: the compiler verifies at the class definition that every required member is present. If `name` were missing, the error appears at the class, not scattered across call sites. The obligation is declared once and enforced centrally — adding a new required field to `User` immediately surfaces as a compile error on `UserRecord`.',
           'Class property declarations (name: string, age: number) tell TypeScript what fields the class will have. They are type-level only — erased in compiled JavaScript. The constructor then assigns values to these fields. describeUser(record) compiles because UserRecord implements User and therefore satisfies the shape.',
           'CS — implements is a compile-time assertion. At runtime, there is no User interface — the JavaScript class has no knowledge of it. implements differs from extends: extends sets up a prototype chain (runtime mechanism); implements only checks types at compile time. A class can implements multiple interfaces but can only extends one class.',
           'SE — implements makes the relationship explicit and compiler-verified. If User gains a new required field (say, region: string), the class immediately gets a compile error at its declaration — not hidden somewhere at a call site. This is the value of being explicit: the mistake is found at the definition, not in a runtime exception reported by a user.',
@@ -209,10 +214,11 @@ console.log(record.greet())`,
           { startLine: 13, endLine: 15, color: 'indigo', label: 'must have all User\'s required fields — promise kept here' },
           { startLine: 30, endLine: 30, color: 'emerald', label: 'record satisfies User — compiler approved this call' },
         ],
-        connections: [{ fromLine: 12, toLine: 1, color: 'violet', label: 'must satisfy' }],
+        connections: [{ fromLine: 12, toLine: 1, color: 'violet', label: 'must satisfy', type: 'depends' }],
       },
       {
         title: 'Implementing multiple interfaces',
+        semanticEvent: 'DefineClass',
         code:
 `interface User {
   name:   string
@@ -272,7 +278,7 @@ console.log(describeUser(record))
 console.log(record.greet())
 record.print()`,
         explanation: [
-          'implements User, Printable makes two simultaneous promises: UserRecord has all User fields, AND it has a print() method. The compiler verifies both at the class definition. A function expecting User can receive a UserRecord. A function expecting Printable can also receive a UserRecord — the same object plays multiple roles.',
+          '`implements User, Printable` establishes the **multi-role obligation relationship**: one class simultaneously satisfies two independent contracts. The compiler verifies both at the definition. A function expecting `User` and a function expecting `Printable` can each accept a `UserRecord` — the same object plays different structural roles depending on the caller\'s required shape.',
           'The Printable interface defines a method signature: any class implementing Printable must provide print(): void. void means the method returns nothing (or undefined). The print() implementation on UserRecord logs to the console. A different class implementing Printable might print to a file, a PDF, or a network stream.',
           'CS — Multiple interface implementation models role composition without inheritance. UserRecord is both a User and Printable without inheriting from any class. This is the key advantage of interfaces over abstract classes: a class can only extend one parent, but it can implement any number of interfaces. Java, Go (implicitly), and TypeScript all support this.',
           'SE — Role-based design: UserRecord plays the User role in data functions and the Printable role in output functions. Callers depend only on the role they need. A function that serialises objects to CSV only needs Printable — it does not care about name or age. This decoupling is the Interface Segregation Principle (the I in SOLID).',
@@ -286,6 +292,7 @@ record.print()`,
       },
       {
         title: 'Structural typing — shape over name',
+        semanticEvent: 'InferType',
         code:
 `interface User {
   name:   string
@@ -351,7 +358,7 @@ record.print()
 const guest = { name: 'Guest', age: 16, joinedAt: '2024-01-01' }
 console.log(describeUser(guest))`,
         explanation: [
-          'guest is a plain object literal with no class and no implements keyword. TypeScript checks: does guest have name: string? Yes. age: number? Yes. email? — optional, so absence is fine. Extra properties (joinedAt) are permitted. guest satisfies User through structural matching alone, with no explicit declaration.',
+          '`guest` establishes the **structural match → implicit satisfaction relationship**: a plain object literal with no class and no `implements` keyword satisfies `User` because TypeScript checks shape, not declaration. `name: string` ✓, `age: number` ✓, `email?` absent (allowed), `joinedAt` extra (allowed). No wrapping, no retrofitting — if the shape fits, the type fits.',
           'Structural typing mirrors JavaScript\'s duck typing: if an object has the required properties, it works. TypeScript preserves this flexibility while adding compile-time checking. You do not need to retrofit implements onto every object in your codebase — any object with the right shape works.',
           'CS — Structural typing (also called duck typing at the type level) contrasts with nominal typing. In Go, an interface is satisfied implicitly by any type that has the required method set — this is structural. In Java, you must explicitly write implements Serializable — this is nominal. TypeScript chose structural because JavaScript object literals would otherwise be unusable as typed values.',
           'SE — This makes TypeScript integrate seamlessly with existing JavaScript. API responses (JSON parsed to plain objects), third-party library return values, and data from localStorage all work as typed values if they match the interface shape. You can write interfaces for external data shapes without wrapping everything in classes.',
@@ -365,6 +372,7 @@ console.log(describeUser(guest))`,
       },
       {
         title: 'readonly — immutable after construction',
+        semanticEvent: 'WriteProperty',
         code:
 `interface User {
   readonly name: string    // readonly in the interface — cannot be reassigned after creation
@@ -432,7 +440,7 @@ const guest = { name: 'Guest', age: 16, joinedAt: '2024-01-01' }
 console.log(describeUser(guest))
 record.age = 23`,
         explanation: [
-          'readonly on a property means it can be assigned only in the constructor. After the constructor returns, any assignment to that property is a TypeScript compile error. record.name = \'Eve\' on line 22 would be caught at compile time — the compiled JavaScript never runs that bad line.',
+          '`readonly name` establishes the **construction-only write contract**: the property can be assigned once in the constructor and is permanently frozen after that. `record.name = \'Eve\'` is a compile error — the bad assignment is caught before the code runs and never reaches the user. `age` remains mutable because identity fields (name) are different from state fields (age).',
           'readonly differs from const: const is for variable bindings (the variable cannot be rebound to a new value). readonly is for object properties (the property cannot be reassigned on an existing object). A readonly property can still hold a mutable object — record.name cannot be replaced, but if name were an array, its contents could still be pushed to.',
           'CS — Immutability is a correctness tool. A name that cannot change after construction is a contract: every consumer of this record can cache record.name knowing it will never become stale. This is the basis of many optimisations: React\'s PureComponent compares props by reference because props are immutable; if the reference is unchanged, no re-render is needed.',
           'SE — readonly at the interface level communicates intent to all consumers: this property is part of the identity, not a setting to be changed. Name changes are handled by creating a new UserRecord, not by mutating an existing one. This functional immutability pattern (create new, don\'t mutate) is central to Redux, immutable.js, and Elm\'s architecture.',

@@ -48,7 +48,10 @@
       "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/prototype-chain.js)",
       "Bash(git fetch *)",
       "Bash(git rebase *)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(node --input-type=module --eval ' *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3)"
     ]
   }
 }
