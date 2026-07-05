@@ -42,6 +42,11 @@ function describeUser(user: User): string {
 console.log(describeUser({ name: 'Alice', age: 25 }))  // ✓ matches contract
 // describeUser({ firstName: 'Bob' })      // ✗ compile error: 'name' is missing
 // describeUser({ name: 'Carol', age: '30' }) // ✗ compile error: age must be number`,
+        runCode:
+`function describeUser(user) {
+  return user.name + ' is ' + user.age + ' years old'
+}
+console.log(describeUser({ name: 'Alice', age: 25 }))`,
         explanation: [
           'interface User declares the exact shape required: any value passed where User is expected must have a string name and a number age. The annotation user: User on line 6 activates compile-time checking for every call to describeUser. Passing { firstName: \'Bob\' } is a type error caught before the code runs.',
           'TypeScript checks the call site at compile time. It reads the argument\'s structure, compares it to User, finds that name is missing, and reports a clear error with the file name and line number. The compiled JavaScript has no User interface — types are completely erased. String output and runtime behaviour are identical to plain JavaScript.',
@@ -74,6 +79,15 @@ const alice: User = { name: 'Alice', age: 25 }                          // ✓ e
 const bob:   User = { name: 'Bob', age: 30, email: 'bob@example.com' }  // ✓ email present
 console.log(describeUser(alice))  // → 'Alice is 25 years old'
 console.log(describeUser(bob))    // → 'Bob is 30 years old <bob@example.com>'`,
+        runCode:
+`function describeUser(user) {
+  const contactPart = user.email ? ' <' + user.email + '>' : ''
+  return user.name + ' is ' + user.age + ' years old' + contactPart
+}
+const alice = { name: 'Alice', age: 25 }
+const bob   = { name: 'Bob', age: 30, email: 'bob@example.com' }
+console.log(describeUser(alice))
+console.log(describeUser(bob))`,
         explanation: [
           'email? declares an optional property. Callers may include it or omit it. Inside the function, TypeScript infers the type of user.email as string | undefined — a union type meaning "either a string or undefined". The compiler forces you to handle the undefined case before using the value.',
           'Line 9 checks user.email with a ternary: if truthy (a non-empty string), append it. If falsy (undefined or empty string), append nothing. TypeScript will give an error if you write user.email.length without first checking — it knows email might be undefined and you would be calling .length on undefined, which is a runtime crash.',
@@ -110,6 +124,15 @@ const alice: User      = { name: 'Alice', age: 25 }
 const admin: AdminUser = { name: 'Bob', age: 30, role: 'admin', permissions: ['read', 'write'] }
 console.log(describeUser(alice))   // ✓ alice satisfies User
 console.log(describeUser(admin))   // ✓ admin satisfies User — structural typing`,
+        runCode:
+`function describeUser(user) {
+  const contactPart = user.email ? ' <' + user.email + '>' : ''
+  return user.name + ' is ' + user.age + ' years old' + contactPart
+}
+const alice = { name: 'Alice', age: 25 }
+const admin = { name: 'Bob', age: 30, role: 'admin', permissions: ['read', 'write'] }
+console.log(describeUser(alice))
+console.log(describeUser(admin))`,
         explanation: [
           'AdminUser extends User, inheriting its three fields and adding role and permissions. Any AdminUser value satisfies User — it has at least name, age, and email?. describeUser(admin) compiles because admin has all the fields User requires, plus extra ones TypeScript ignores.',
           'This is structural typing: TypeScript checks the SHAPE, not the type name. admin was declared as AdminUser, not User — but it satisfies User because it has all of User\'s required fields. Extra fields (role, permissions) are allowed. This mirrors JavaScript\'s duck typing: "if it has the right properties, it works."',
@@ -159,6 +182,22 @@ function describeUser(user: User): string {
 const record = new UserRecord('Carol', 22, 'carol@example.com')
 console.log(describeUser(record))   // ✓ UserRecord satisfies User
 console.log(record.greet())         // → 'Hello from Carol'`,
+        runCode:
+`function describeUser(user) {
+  const contactPart = user.email ? ' <' + user.email + '>' : ''
+  return user.name + ' is ' + user.age + ' years old' + contactPart
+}
+class UserRecord {
+  constructor(name, age, email) {
+    this.name  = name
+    this.age   = age
+    this.email = email
+  }
+  greet() { return 'Hello from ' + this.name }
+}
+const record = new UserRecord('Carol', 22, 'carol@example.com')
+console.log(describeUser(record))
+console.log(record.greet())`,
         explanation: [
           'implements User is a promise: "UserRecord guarantees it has all of User\'s required members." The compiler checks this promise at the class definition — if name were missing, TypeScript would error at line 12, not at every call site that passes a UserRecord as User. The error is at the source of the problem.',
           'Class property declarations (name: string, age: number) tell TypeScript what fields the class will have. They are type-level only — erased in compiled JavaScript. The constructor then assigns values to these fields. describeUser(record) compiles because UserRecord implements User and therefore satisfies the shape.',
@@ -214,6 +253,24 @@ const record = new UserRecord('Carol', 22, 'carol@example.com')
 console.log(describeUser(record))   // ✓ satisfies User
 console.log(record.greet())         // → 'Hello from Carol'
 record.print()                      // ✓ satisfies Printable`,
+        runCode:
+`function describeUser(user) {
+  const contactPart = user.email ? ' <' + user.email + '>' : ''
+  return user.name + ' is ' + user.age + ' years old' + contactPart
+}
+class UserRecord {
+  constructor(name, age, email) {
+    this.name  = name
+    this.age   = age
+    this.email = email
+  }
+  greet() { return 'Hello from ' + this.name }
+  print() { console.log(this.name + ' | age=' + this.age) }
+}
+const record = new UserRecord('Carol', 22, 'carol@example.com')
+console.log(describeUser(record))
+console.log(record.greet())
+record.print()`,
         explanation: [
           'implements User, Printable makes two simultaneous promises: UserRecord has all User fields, AND it has a print() method. The compiler verifies both at the class definition. A function expecting User can receive a UserRecord. A function expecting Printable can also receive a UserRecord — the same object plays multiple roles.',
           'The Printable interface defines a method signature: any class implementing Printable must provide print(): void. void means the method returns nothing (or undefined). The print() implementation on UserRecord logs to the console. A different class implementing Printable might print to a file, a PDF, or a network stream.',
@@ -273,6 +330,26 @@ record.print()
 // A plain object literal — no class, no 'implements':
 const guest = { name: 'Guest', age: 16, joinedAt: '2024-01-01' }
 console.log(describeUser(guest))    // ✓ plain object also satisfies User — structural match`,
+        runCode:
+`function describeUser(user) {
+  const contactPart = user.email ? ' <' + user.email + '>' : ''
+  return user.name + ' is ' + user.age + ' years old' + contactPart
+}
+class UserRecord {
+  constructor(name, age, email) {
+    this.name  = name
+    this.age   = age
+    this.email = email
+  }
+  greet() { return 'Hello from ' + this.name }
+  print() { console.log(this.name + ' | age=' + this.age) }
+}
+const record = new UserRecord('Carol', 22, 'carol@example.com')
+console.log(describeUser(record))
+console.log(record.greet())
+record.print()
+const guest = { name: 'Guest', age: 16, joinedAt: '2024-01-01' }
+console.log(describeUser(guest))`,
         explanation: [
           'guest is a plain object literal with no class and no implements keyword. TypeScript checks: does guest have name: string? Yes. age: number? Yes. email? — optional, so absence is fine. Extra properties (joinedAt) are permitted. guest satisfies User through structural matching alone, with no explicit declaration.',
           'Structural typing mirrors JavaScript\'s duck typing: if an object has the required properties, it works. TypeScript preserves this flexibility while adding compile-time checking. You do not need to retrofit implements onto every object in your codebase — any object with the right shape works.',
@@ -333,6 +410,27 @@ const guest = { name: 'Guest', age: 16, joinedAt: '2024-01-01' }
 console.log(describeUser(guest))
 // record.name = 'Eve'               // ✗ compile error: cannot assign to 'name' (readonly)
 record.age = 23                      // ✓ age is not readonly — can be updated`,
+        runCode:
+`function describeUser(user) {
+  const contactPart = user.email ? ' <' + user.email + '>' : ''
+  return user.name + ' is ' + user.age + ' years old' + contactPart
+}
+class UserRecord {
+  constructor(name, age, email) {
+    this.name  = name
+    this.age   = age
+    this.email = email
+  }
+  greet() { return 'Hello from ' + this.name }
+  print() { console.log(this.name + ' | age=' + this.age) }
+}
+const record = new UserRecord('Carol', 22, 'carol@example.com')
+console.log(describeUser(record))
+console.log(record.greet())
+record.print()
+const guest = { name: 'Guest', age: 16, joinedAt: '2024-01-01' }
+console.log(describeUser(guest))
+record.age = 23`,
         explanation: [
           'readonly on a property means it can be assigned only in the constructor. After the constructor returns, any assignment to that property is a TypeScript compile error. record.name = \'Eve\' on line 22 would be caught at compile time — the compiled JavaScript never runs that bad line.',
           'readonly differs from const: const is for variable bindings (the variable cannot be rebound to a new value). readonly is for object properties (the property cannot be reassigned on an existing object). A readonly property can still hold a mutable object — record.name cannot be replaced, but if name were an array, its contents could still be pushed to.',

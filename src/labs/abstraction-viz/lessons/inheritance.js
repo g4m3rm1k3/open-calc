@@ -89,9 +89,9 @@ class Dog extends Animal {
 
 const dog  = new Dog('Rex')
 const bird = new Animal('Bird', 'tweet')
-console.log(dog.speak())    // → 'Rex says: woof!'
-console.log(dog.tricks)     // → []
-console.log(dog.name)       // → 'Rex'  (set by Animal's constructor via super)`,
+console.log(dog.speak())   // → 'Rex says: woof!'
+console.log(dog.tricks)    // → []
+console.log(dog.name)      // → 'Rex'  (set by Animal's constructor via super)`,
         explanation: [
           'Dog now has its own constructor. super(name, \'woof\') calls Animal\'s constructor with this bound to the new Dog instance. It sets this.name and this.sound. super() MUST appear before any use of this in a subclass constructor — JavaScript throws "ReferenceError: Must call super constructor" if you access this before super().',
           'After super(), Dog adds its own property: this.tricks = []. The resulting dog instance has name (set by Animal), sound (set by Animal), and tricks (set by Dog). Callers only need to pass name — sound is always \'woof\' for all dogs, so Dog\'s constructor encapsulates that default.',
