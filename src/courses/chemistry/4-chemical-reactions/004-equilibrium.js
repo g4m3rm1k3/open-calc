@@ -67,12 +67,11 @@ For reactions involving gases, we sometimes use Kp (using partial pressures inst
       instruction: `### Equilibrium is dynamic: forward rate = reverse rate
 
 The simulation shows a reversible reaction reaching equilibrium. Blue particles (reactants) convert to red (products) and back. Watch the concentration bars on the right — they start far from equilibrium and settle to fixed values as the forward and reverse rates equalise. The rate graph at the bottom shows the rates converging.`,
-      html: `<canvas id="cv" width="700" height="360"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:360px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=360;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var K_EQ=2.5; // equilibrium constant [P]/[R]
@@ -281,12 +280,11 @@ The simulation shows N₂ + 3H₂ ⇌ 2NH₃ at equilibrium. Apply stresses usin
   <div style="display:flex;gap:8px;flex-wrap:wrap" id="stress-btns"></div>
   <div style="color:rgba(255,255,255,0.35);font-size:10px;font-family:monospace;margin-top:6px" id="stress-desc">System at equilibrium. Apply a stress.</div>
 </div>
-<canvas id="cv" width="700" height="280"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:280px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=280;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 // N2 + 3H2 <-> 2NH3
@@ -480,12 +478,11 @@ The interactive shows a number line where K is fixed. Drag the Q slider to diffe
     <span style="color:rgba(255,255,255,0.3);font-size:11px;font-family:monospace">K = 16 (fixed)</span>
   </div>
 </div>
-<canvas id="cv" width="700" height="240"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:240px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=240;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var QSl=document.getElementById('Q-sl');
 var QLbl=document.getElementById('Q-lbl');
@@ -617,12 +614,11 @@ This equilibrium system resists changes in blood pH. If H⁺ increases (acid add
       instruction: `### Haemoglobin: Le Chatelier's principle in your blood
 
 The simulation shows haemoglobin molecules at two locations — lungs (high O₂ pressure) and muscles (low O₂ pressure). Watch how the same equilibrium shifts in opposite directions depending on the local oxygen concentration, loading and unloading O₂ as haemoglobin circulates.`,
-      html: `<canvas id="cv" width="700" height="320"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:320px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=320;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 // Left = Lungs (high pO2), Right = Muscles (low pO2)

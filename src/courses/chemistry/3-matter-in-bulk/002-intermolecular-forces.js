@@ -54,12 +54,11 @@ A moment later, the electrons have moved, the dipoles have shifted, but new comp
       instruction: `### London dispersion: temporary dipoles in action
 
 The animation shows two nonpolar molecules. Watch the electron cloud (blue) shift to one side, creating a temporary dipole — and how this immediately induces a complementary dipole in the neighbour, creating a net attractive force between them. The force arrow appears when the dipoles are aligned.`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 function drawMolecule(cx,cy,r,electronOffset,label,induced){
@@ -185,12 +184,11 @@ This explains something that might otherwise seem like a strange coincidence: **
       instruction: `### Comparing intermolecular forces across molecules
 
 The chart below plots boiling points for a range of molecules, coloured by their dominant intermolecular force. Hover over any bar to see the molecule and its forces. Notice how hydrogen bonding lifts water and ammonia far above what their molecular masses would predict.`,
-      html: `<canvas id="cv" width="700" height="320"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center;cursor:default}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:320px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=320;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var molecules=[
   {name:'He',  bp:-269,mass:4,  force:'London',      color:'#94a3b8'},
@@ -323,12 +321,11 @@ The simulation below shows polar molecules orienting themselves in solution. The
   <button id="btn-dd" style="padding:6px 14px;border-radius:8px;border:1.5px solid #38bdf8;background:rgba(56,189,248,0.2);color:#38bdf8;font-family:monospace;font-size:12px;font-weight:700;cursor:pointer">Dipole-Dipole (HCl)</button>
   <button id="btn-hb" style="padding:6px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.4);font-family:monospace;font-size:12px;font-weight:700;cursor:pointer">Hydrogen Bonds (H₂O)</button>
 </div>
-<canvas id="cv" width="700" height="310"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:310px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=310;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 var mode='dd'; // 'dd' or 'hb'
 
@@ -571,12 +568,11 @@ A final note: all three forces are always evaluated together. A polar molecule h
       instruction: `### Identifying the dominant IMF: a decision flowchart
 
 Follow the flowchart for any molecule to identify its dominant intermolecular force. The path you take tells you both the force type and what to expect for boiling point.`,
-      html: `<canvas id="cv" width="700" height="340"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:340px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=340;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
 

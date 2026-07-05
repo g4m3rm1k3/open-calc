@@ -57,12 +57,11 @@ The distinction between heterogeneous and homogeneous mixtures depends on scale 
       instruction: `### Pure substance, heterogeneous mixture, solution — side by side
 
 The three panels show particle-level views. A pure substance has only one type of particle arranged uniformly. A heterogeneous mixture has regions of different composition. A solution has two types of particles completely intermixed at the molecular level — indistinguishable by region.`,
-      html: `<canvas id="cv" width="700" height="280"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:280px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=280;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var panelW=W/3;
@@ -207,12 +206,11 @@ But here's the critical insight: **many substances dissolve even when ΔH_soluti
       instruction: `### NaCl dissolving in water — step by step
 
 Watch water molecules orient around the crystal surface: oxygen atoms (red) point toward Na⁺ ions, hydrogen atoms point toward Cl⁻ ions. Ions are pulled out one by one and become surrounded by a hydration shell. The process is driven by the favourable ion-dipole interactions between the ions and polar water molecules.`,
-      html: `<canvas id="cv" width="700" height="340"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:340px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=340;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 // Crystal: 4x3 grid on left
@@ -428,12 +426,11 @@ Click each combination to see what happens at the molecular level. The simulatio
   <button id="btn-np" style="padding:7px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.4);font-family:monospace;font-size:11px;font-weight:700;cursor:pointer">🛢 Hexane + I₂ (nonpolar+nonpolar)</button>
   <button id="btn-ni" style="padding:7px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.4);font-family:monospace;font-size:11px;font-weight:700;cursor:pointer">🛢 Hexane + NaCl (nonpolar+ionic)</button>
 </div>
-<canvas id="cv" width="700" height="290"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:290px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=290;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 var mode='pw';
 
@@ -620,12 +617,11 @@ An **unsaturated solution** contains less solute than the maximum — more solut
       instruction: `### Solubility curves: how temperature affects dissolution
 
 The chart shows solubility curves for several common substances. Most solid solutes become more soluble as temperature rises. Gases (CO₂, O₂) become less soluble as temperature rises — explained by the kinetic energy argument.`,
-      html: `<canvas id="cv" width="700" height="310"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:310px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=310;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);

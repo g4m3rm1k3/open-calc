@@ -54,12 +54,11 @@ In other reactions — like photosynthesis, where plants use sunlight to convert
       instruction: `### H₂ + F₂ → 2 HF: bonds breaking and forming
 
 The animation shows the reaction at the molecular level. Watch the H–H and F–F bonds break, then see H–F bonds form. The bond energy values show that the energy released by forming two H–F bonds (2 × 569 kJ/mol) far exceeds the energy needed to break H–H (436 kJ/mol) and F–F (159 kJ/mol). Net: −574 kJ/mol released.`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 // Phases: 0-60 reactants, 60-120 bonds breaking, 120-180 atoms separate, 180-240 bonds forming, 240-300 products, loop
@@ -224,12 +223,11 @@ Now both sides have 4 H and 2 O. The numbers in front of molecules (coefficients
 
 The interactive below shows several reactions. Select one to see the atom count on each side. Green means balanced; red means unbalanced. Notice how adjusting coefficients in front of whole molecules (never subscripts inside them) brings both sides into balance.`,
       html: `<div style="padding:10px 14px 0;background:#0a0f1e;display:flex;gap:8px;flex-wrap:wrap" id="eq-btns"></div>
-<canvas id="cv" width="700" height="300"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var equations=[
   {
@@ -444,12 +442,11 @@ Recognising the reaction type is the first step toward predicting products, unde
       instruction: `### Five reaction type patterns
 
 Each panel shows the schematic pattern for one reaction type. The coloured circles represent different atom types; the bonds between them show which connections break and which form.`,
-      html: `<canvas id="cv" width="700" height="320"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:320px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=320;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var types=[
@@ -642,12 +639,11 @@ These are indicators, not proof — some physical changes can mimic them. But ob
       instruction: `### Five indicators of chemical reactions — animated
 
 Each panel shows one indicator at the particle level. Watch: colour change (electron structure changing), precipitate (insoluble product forming), gas production (new gaseous product), temperature change (energy released or absorbed), and light emission (excited electron relaxation).`,
-      html: `<canvas id="cv" width="700" height="280"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:280px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=280;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var panelW=W/5;

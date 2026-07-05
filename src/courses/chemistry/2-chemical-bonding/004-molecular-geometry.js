@@ -50,12 +50,11 @@ This is why water is bent, not linear: oxygen has 4 electron groups (2 bonds + 2
       instruction: `### Electron geometry from electron group count
 
 The canvas below shows how 2 through 6 electron groups arrange themselves in three-dimensional space. These are the base geometries — actual molecular shapes are derived from these by replacing some bonding groups with lone pairs.`,
-      html: `<canvas id="cv" width="700" height="340"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:340px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=340;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 ctx.fillStyle='#0a0f1e';
 ctx.fillRect(0,0,W,H);
@@ -190,13 +189,12 @@ All three have 4 electron groups. All three have tetrahedral **electron geometry
 Click any molecule to see its 3D shape, bond angles, electron groups, and lone pair positions. Notice how the same electron geometry (tetrahedral for the bottom row) gives different molecular shapes depending on the number of lone pairs.`,
       html: `<div style="padding:0">
   <div id="mol-tabs" style="display:flex;gap:8px;padding:14px 14px 0 14px;flex-wrap:wrap;background:#0a0f1e"></div>
-  <canvas id="cv" width="700" height="360"></canvas>
+  <canvas id="cv"></canvas>
 </div>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:360px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=360;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var molecules=[
@@ -479,12 +477,11 @@ With practice, this procedure becomes fast and automatic.`,
       instruction: `### Four key molecular shapes in 3D
 
 These four molecules represent the most important geometries you will encounter. The wireframe display shows the 3D structure rotating — pay attention to which bonds are in the plane of the screen, which come toward you, and which go away from you. Chemists use wedge-dash notation to show this on paper.`,
-      html: `<canvas id="cv" width="700" height="360"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:360px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=360;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 function project(x,y,z,cx,cy,scale,rotY,rotX){
@@ -670,12 +667,11 @@ This is why shape is not just an aesthetic detail — it determines polarity, po
       instruction: `### Dipole cancellation: CO₂ vs H₂O
 
 The arrows below represent bond dipoles (pointing toward the more electronegative atom). Watch what happens when you compare the linear geometry of CO₂ (dipoles cancel → nonpolar) with the bent geometry of H₂O (dipoles add → polar).`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 function drawArrow(x1,y1,x2,y2,color,width){

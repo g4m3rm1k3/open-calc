@@ -66,12 +66,11 @@ Use the slider to set a mass of a chosen compound. The display converts it to mo
     <input type="range" id="mass-slider" min="1" max="500" value="58" step="1" style="flex:1">
   </div>
 </div>
-<canvas id="cv" width="700" height="220"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:220px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=220;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var compounds=[
   {name:'NaCl', formula:'NaCl',  molarMass:58.44, color:'#f97316'},
@@ -253,12 +252,11 @@ Adjust mass and volume to calculate molarity, or set molarity and volume to find
     </div>
   </div>
 </div>
-<canvas id="cv" width="700" height="220"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:220px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=220;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var MOLAR_MASS=58.44; // NaCl
 
@@ -450,12 +448,11 @@ The animation shows a concentrated solution being diluted. The number of solute 
     <span style="color:rgba(255,255,255,0.3);font-size:11px;font-family:monospace">1× — 10×</span>
   </div>
 </div>
-<canvas id="cv" width="700" height="240"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:240px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=240;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var dilSlider=document.getElementById('dil-slider');
@@ -608,12 +605,11 @@ In this course, molarity (M) is the most important. But recognising the other un
       instruction: `### The same solution, four different concentration units
 
 A 1.00 M NaCl aqueous solution — expressed four ways. Each unit measures "concentration" but emphasises a different ratio. The visual shows how the same physical solution maps to each expression.`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
 

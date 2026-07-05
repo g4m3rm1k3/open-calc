@@ -32,12 +32,11 @@ This sharing strategy works particularly well between **nonmetals** — elements
       instruction: `### H₂ bond formation — watch the electrons merge
 
 Two hydrogen atoms approach each other. As they get close, their electron clouds overlap and the shared pair settles between the nuclei. The energy curve on the right shows the system reaching its lowest energy at the bond length (~74 pm).`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 function drawH2(){
@@ -157,12 +156,11 @@ Let's work through the most important examples: H₂, F₂, H₂O, O₂, N₂, a
 
 Select a molecule to see its Lewis structure, bond type, and explanation of how the electrons are arranged.`,
       html: `<div id="mol-tabs" style="display:flex;gap:8px;padding:14px 14px 0 14px;flex-wrap:wrap;background:#0a0f1e"></div>
-<canvas id="cv" width="700" height="340"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:340px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=340;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var molecules=[
   {name:'H\u2082',formula:'H\u2013H',bondOrder:1,bondType:'Single bond',color:'#facc15',
@@ -315,12 +313,11 @@ The pattern is clean: more bonds = shorter + stronger.`,
       instruction: `### C–C bond order comparison
 
 Three columns show the same two carbon atoms with single, double, and triple bonds. Notice how the bond length (pm) shrinks and the bond energy (kJ/mol) rises with each additional shared pair. The animated electrons show the increasing electron density.`,
-      html: `<canvas id="cv" width="700" height="320"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:320px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=320;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var bonds=[
@@ -414,12 +411,11 @@ This distinction matters enormously in practice:
       instruction: `### Sigma bond vs. pi bond geometry
 
 Left panel: the σ bond — head-on orbital overlap, electron density directly between the nuclei, allows free rotation. Right panel: the π bond — sideways overlap with electron density above and below the axis, restricts rotation and is more reactive.`,
-      html: `<canvas id="cv" width="700" height="340"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:340px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=340;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 function drawOrbital(cx,cy,rx,ry,angle,color,alpha){
@@ -548,12 +544,11 @@ Polarity is the bridge between ionic bonding (complete electron transfer) and no
       instruction: `### The bonding spectrum — from equal sharing to complete transfer
 
 Every bond falls somewhere on a continuous spectrum based on the electronegativity difference (ΔEN) between the two atoms. Six common molecules are plotted at their actual ΔEN values. The animated HF molecule at the bottom shows the asymmetric electron cloud.`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var examples=[

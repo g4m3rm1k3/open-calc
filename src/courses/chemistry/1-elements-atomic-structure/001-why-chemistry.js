@@ -39,7 +39,7 @@ The reason ice floats is completely explainable by how water molecules arrange t
     <button id="btnIce" class="tog active">Ice (solid)</button>
     <button id="btnWater" class="tog">Liquid water</button>
   </div>
-  <canvas id="cv" width="520" height="280"></canvas>
+  <canvas id="cv"></canvas>
   <div class="caption" id="cap">In ice, water molecules lock into a rigid hexagonal lattice with open space between them — making it less dense than liquid water.</div>
 </div>`,
       css: `body{margin:0;padding:14px;font-family:sans-serif}
@@ -47,9 +47,10 @@ The reason ice floats is completely explainable by how water molecules arrange t
 .controls-row{display:flex;gap:8px}
 .tog{padding:7px 16px;border-radius:8px;border:1px solid var(--color-border-secondary,#e2e8f0);background:transparent;color:var(--color-text-secondary,#64748b);cursor:pointer;font-size:12px;transition:all .2s}
 .tog.active{background:var(--color-background-info,#eff6ff);border-color:#93c5fd;color:var(--color-text-info,#1d4ed8);font-weight:500}
-canvas{border-radius:10px;display:block;width:100%}
+canvas{border-radius:10px;display:block;width:100%;max-width:520px;height:280px}
 .caption{font-size:12px;color:var(--color-text-secondary,#64748b);line-height:1.65}`,
-      startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+      startCode: `var cv=document.getElementById('cv'),ctx,LW=520,LH=280;
+(function(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var captions={
   ice:'In ice, water molecules lock into a rigid hexagonal lattice with open space between them — making it less dense than liquid water.',
   water:'In liquid water, molecules are more tightly packed and constantly moving. The same number of molecules occupies less space than in ice.'
@@ -62,21 +63,21 @@ function mol(x,y,a,oc){
   ctx.restore();
 }
 function drawIce(){
-  ctx.clearRect(0,0,cv.width,cv.height);
-  ctx.fillStyle='#f0f9ff';ctx.beginPath();ctx.roundRect(0,0,cv.width,130,8);ctx.fill();
-  ctx.fillStyle='#bfdbfe';ctx.beginPath();ctx.roundRect(0,132,cv.width,148,8);ctx.fill();
-  for(var r=0;r<4;r++)for(var c=0;c<7;c++){var x=50+c*66+(r%2)*33,y=18+r*30;if(x<cv.width-20)mol(x,y,0,'#7dd3fc');}
+  ctx.clearRect(0,0,LW,LH);
+  ctx.fillStyle='#f0f9ff';ctx.beginPath();ctx.roundRect(0,0,LW,130,8);ctx.fill();
+  ctx.fillStyle='#bfdbfe';ctx.beginPath();ctx.roundRect(0,132,LW,148,8);ctx.fill();
+  for(var r=0;r<4;r++)for(var c=0;c<7;c++){var x=50+c*66+(r%2)*33,y=18+r*30;if(x<LW-20)mol(x,y,0,'#7dd3fc');}
   ctx.fillStyle='#60a5fa';ctx.font='500 11px sans-serif';ctx.textAlign='left';
   ctx.fillText('Ice — open lattice (less dense)',12,120);
-  for(var r2=0;r2<5;r2++)for(var c2=0;c2<11;c2++){var x2=24+c2*44+(r2%2)*22,y2=150+r2*25;if(x2<cv.width-12)mol(x2,y2,Math.random()*.8-.4,'#3b82f6');}
+  for(var r2=0;r2<5;r2++)for(var c2=0;c2<11;c2++){var x2=24+c2*44+(r2%2)*22,y2=150+r2*25;if(x2<LW-12)mol(x2,y2,Math.random()*.8-.4,'#3b82f6');}
   ctx.fillStyle='#1d4ed8';ctx.fillText('Water — tighter packing (more dense)',12,268);
 }
 function drawWater(){
-  ctx.clearRect(0,0,cv.width,cv.height);
-  ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.roundRect(0,0,cv.width,cv.height,8);ctx.fill();
-  for(var i=0;i<72;i++)mol(24+Math.random()*(cv.width-48),18+Math.random()*(cv.height-36),Math.random()*Math.PI*2,'#2563eb');
+  ctx.clearRect(0,0,LW,LH);
+  ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.roundRect(0,0,LW,LH,8);ctx.fill();
+  for(var i=0;i<72;i++)mol(24+Math.random()*(LW-48),18+Math.random()*(LH-36),Math.random()*Math.PI*2,'#2563eb');
   ctx.fillStyle='#1e3a5f';ctx.font='500 11px sans-serif';ctx.textAlign='left';
-  ctx.fillText('Same molecules — more tightly packed, constantly moving',12,cv.height-10);
+  ctx.fillText('Same molecules — more tightly packed, constantly moving',12,LH-10);
 }
 var mode='ice';
 document.getElementById('btnIce').onclick=function(){mode='ice';this.className='tog active';document.getElementById('btnWater').className='tog';drawIce();document.getElementById('cap').textContent=captions.ice};
@@ -101,14 +102,14 @@ Every chemical reaction is fundamentally about the electrons on the outsides of 
   <div class="atom-card">
     <div class="aname">Carbon</div>
     <div class="asym">C</div>
-    <canvas id="c-cv" width="170" height="170"></canvas>
+    <canvas id="c-cv"></canvas>
     <div class="verdict burns">Burns readily</div>
     <div class="adetail">4 outer electrons — available to bond with oxygen</div>
   </div>
   <div class="atom-card">
     <div class="aname">Gold</div>
     <div class="asym">Au</div>
-    <canvas id="g-cv" width="170" height="170"></canvas>
+    <canvas id="g-cv"></canvas>
     <div class="verdict stable">Does not burn</div>
     <div class="adetail">Outer electrons in unusually stable configuration</div>
   </div>
@@ -119,14 +120,15 @@ Every chemical reaction is fundamentally about the electrons on the outsides of 
 .atom-card{border:1px solid var(--color-border-tertiary,#e2e8f0);border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--color-background-secondary,#f8fafc)}
 .aname{font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.08em}
 .asym{font-size:28px;font-weight:500;color:var(--color-text-primary);font-family:monospace}
-canvas{border-radius:8px;display:block}
+canvas{border-radius:8px;display:block;width:170px;height:170px}
 .verdict{font-size:12px;font-weight:500;padding:3px 10px;border-radius:6px}
 .burns{background:#fef3c7;color:#92400e}
 .stable{background:#d1fae5;color:#065f46}
 .adetail{font-size:11px;color:var(--color-text-secondary);text-align:center;line-height:1.5}
 .keyidea{background:var(--color-background-info,#eff6ff);border-left:3px solid var(--color-text-info,#3b82f6);padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;color:var(--color-text-info,#1d4ed8);line-height:1.6}`,
-      startCode: `function drawAtom(id,shells,nc,ec,lbl){
-  var cv=document.getElementById(id),ctx=cv.getContext('2d'),cx=85,cy=85;
+      startCode: `function fitCv(cv){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return ctx;}
+function drawAtom(id,shells,nc,ec,lbl){
+  var cv=document.getElementById(id),ctx=fitCv(cv),cx=85,cy=85;
   ctx.clearRect(0,0,170,170);
   ctx.beginPath();ctx.arc(cx,cy,14,0,Math.PI*2);ctx.fillStyle=nc;ctx.fill();
   ctx.fillStyle='white';ctx.font='500 11px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(lbl,cx,cy);
@@ -161,13 +163,13 @@ Chemists summarise this as: **"like dissolves like."** Polar dissolves polar. No
       html: `<div class="demos">
   <div class="demo">
     <div class="dlabel">Salt + water</div>
-    <canvas id="salt-cv" width="220" height="190"></canvas>
+    <canvas id="salt-cv"></canvas>
     <div class="verdict dissolves">Dissolves ✓</div>
     <div class="dreason">Charged ions attract polar water</div>
   </div>
   <div class="demo">
     <div class="dlabel">Oil + water</div>
-    <canvas id="oil-cv" width="220" height="190"></canvas>
+    <canvas id="oil-cv"></canvas>
     <div class="verdict separates">Separates ✗</div>
     <div class="dreason">Nonpolar oil and polar water repel</div>
   </div>
@@ -177,20 +179,21 @@ Chemists summarise this as: **"like dissolves like."** Polar dissolves polar. No
 .demos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
 .demo{border:1px solid var(--color-border-tertiary,#e2e8f0);border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:7px;background:var(--color-background-secondary,#f8fafc)}
 .dlabel{font-size:12px;font-weight:500;color:var(--color-text-primary)}
-canvas{border-radius:8px;display:block}
+canvas{border-radius:8px;display:block;width:220px;height:190px}
 .verdict{font-size:12px;font-weight:500;padding:3px 10px;border-radius:6px}
 .dissolves{background:#d1fae5;color:#065f46}
 .separates{background:#fee2e2;color:#991b1b}
 .dreason{font-size:11px;color:var(--color-text-secondary);text-align:center;line-height:1.5}
 .rule{background:var(--color-background-secondary,#f8fafc);border-left:3px solid var(--color-border-secondary,#94a3b8);padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;color:var(--color-text-primary);line-height:1.6;font-style:italic}`,
-      startCode: `function wm(ctx,x,y){ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle='#3b82f6';ctx.fill();ctx.beginPath();ctx.arc(x-7,y+6,3,0,Math.PI*2);ctx.fillStyle='#93c5fd';ctx.fill();ctx.beginPath();ctx.arc(x+7,y+6,3,0,Math.PI*2);ctx.fillStyle='#93c5fd';ctx.fill();}
-var s=document.getElementById('salt-cv'),sc=s.getContext('2d');
+      startCode: `function fitCv(cv){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;var ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return ctx;}
+function wm(ctx,x,y){ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fillStyle='#3b82f6';ctx.fill();ctx.beginPath();ctx.arc(x-7,y+6,3,0,Math.PI*2);ctx.fillStyle='#93c5fd';ctx.fill();ctx.beginPath();ctx.arc(x+7,y+6,3,0,Math.PI*2);ctx.fillStyle='#93c5fd';ctx.fill();}
+var s=document.getElementById('salt-cv'),sc=fitCv(s);
 sc.fillStyle='#dbeafe';sc.fillRect(0,0,220,190);
 for(var i=0;i<24;i++)wm(sc,14+(i%6)*34+(Math.floor(i/6)%2)*17,18+Math.floor(i/6)*46);
 var ions=[{x:58,y:38,c:'#f97316',s:'Na⁺'},{x:148,y:68,c:'#8b5cf6',s:'Cl⁻'},{x:88,y:118,c:'#f97316',s:'Na⁺'},{x:172,y:38,c:'#8b5cf6',s:'Cl⁻'},{x:38,y:158,c:'#f97316',s:'Na⁺'},{x:195,y:148,c:'#8b5cf6',s:'Cl⁻'}];
 ions.forEach(function(ion){sc.beginPath();sc.arc(ion.x,ion.y,9,0,Math.PI*2);sc.fillStyle=ion.c;sc.fill();sc.fillStyle='white';sc.font='8px monospace';sc.textAlign='center';sc.textBaseline='middle';sc.fillText(ion.s,ion.x,ion.y);});
 
-var o=document.getElementById('oil-cv'),oc=o.getContext('2d');
+var o=document.getElementById('oil-cv'),oc=fitCv(o);
 oc.fillStyle='#fef9c3';oc.fillRect(0,0,220,90);
 oc.fillStyle='#dbeafe';oc.fillRect(0,95,220,95);
 oc.strokeStyle='rgba(148,163,184,0.4)';oc.lineWidth=1.5;oc.beginPath();oc.moveTo(0,92);oc.lineTo(220,92);oc.stroke();

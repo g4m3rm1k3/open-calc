@@ -32,12 +32,11 @@ Opposite charges attract. Na⁺ and Cl⁻ are pulled toward each other with sign
       instruction: `### Electron transfer — watch it happen
 
 The animation below cycles through approach, electron transfer, and the resulting ionic attraction. Na gives away its outer electron; both atoms reach noble-gas configurations and become oppositely charged ions.`,
-      html: `<canvas id="cv" width="700" height="320"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:320px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=320;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var NAColor='#f97316',CLColor='#a78bfa',ELColor='#facc15',bgColor='#0a0f1e';
@@ -188,12 +187,11 @@ This architecture has dramatic consequences for the properties of ionic compound
       instruction: `### The NaCl crystal lattice — rotating 3D view
 
 Every Na⁺ is surrounded by exactly 6 Cl⁻ neighbours (above, below, left, right, front, back), and vice versa. This repeating pattern extends throughout the entire crystal.`,
-      html: `<canvas id="cv" width="700" height="360"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:360px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=360;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 function iso(x,y,z){
@@ -304,12 +302,11 @@ The crystal lattice structure directly explains the strange and fascinating prop
       instruction: `### Dissolution — ions leaving the lattice
 
 Watch as water molecules (polar O shown in blue, H in grey) pull individual ions out of the crystal and into solution. Free ions in solution carry electric current; locked ions in the solid cannot.`,
-      html: `<canvas id="cv" width="700" height="320"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:320px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=320;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var crystalIons=[];
@@ -437,11 +434,11 @@ These cutoffs are guidelines, not hard walls — the ionic/covalent distinction 
       instruction: `### Bond character vs. electronegativity difference
 
 The gradient bar below shows how bond type changes continuously with ΔEN. Common molecules are plotted at their actual values. H₂ sits at 0 (identical atoms, perfect sharing); LiF sits near 3.0 (essentially complete transfer).`,
-      html: `<canvas id="cv" width="700" height="280"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv'),ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:280px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=280;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
 
 ctx.fillStyle='rgba(255,255,255,0.8)';ctx.font='bold 14px monospace';ctx.textAlign='center';

@@ -58,12 +58,11 @@ The animation shows two reactions: HCl donating H⁺ to water (strong acid, comp
   <button id="btn-hcl" style="padding:6px 14px;border-radius:8px;border:1.5px solid #f87171;background:rgba(248,113,113,0.2);color:#f87171;font-family:monospace;font-size:12px;font-weight:700;cursor:pointer">HCl (strong acid)</button>
   <button id="btn-acetic" style="padding:6px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.4);font-family:monospace;font-size:12px;font-weight:700;cursor:pointer">CH₃COOH (weak acid)</button>
 </div>
-<canvas id="cv" width="700" height="300"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 var mode='hcl';
 
@@ -303,12 +302,11 @@ The scale is logarithmic: a change of 1 pH unit represents a 10-fold change in [
       instruction: `### The pH scale: from battery acid to drain cleaner
 
 The interactive shows the pH scale with real substances and their [H⁺] concentrations. Click any substance to see its pH, concentration, and context. Notice the logarithmic nature — each step is 10×.`,
-      html: `<canvas id="cv" width="700" height="320" style="cursor:pointer"></canvas>`,
+      html: `<canvas id="cv" style="cursor:pointer"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:320px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=320;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var substances=[
   {ph:0,  name:'Battery acid',     color:'#ef4444',desc:'H₂SO₄ 1M. Dissolves metals, destroys tissue on contact.'},
@@ -507,12 +505,11 @@ The chart shows pH as acid is added to two solutions — a buffer (acetic acid/a
   <input type="range" id="acid-sl" min="0" max="100" value="0" style="flex:1">
   <span style="color:rgba(255,255,255,0.3);font-size:11px;font-family:monospace">0 — 10 mmol HCl</span>
 </div>
-<canvas id="cv" width="700" height="260"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:260px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=260;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var acidSl=document.getElementById('acid-sl');
 var acidLbl=document.getElementById('acid-lbl');
@@ -693,12 +690,11 @@ Acid-base equilibria are so central to biology that every major physiological sy
       instruction: `### Acid-base titration curve: weak acid with strong base
 
 The chart shows the pH profile as 0.1 M NaOH is added to 25 mL of 0.1 M acetic acid. Identify the key points: the initial pH, the buffering region, the half-equivalence point (where pH = pKa), and the steep equivalence point jump. Hover over the curve to read values.`,
-      html: `<canvas id="cv" width="700" height="300" style="cursor:crosshair"></canvas>`,
+      html: `<canvas id="cv" style="cursor:crosshair"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var mouseX=-1,mouseY=-1;
 

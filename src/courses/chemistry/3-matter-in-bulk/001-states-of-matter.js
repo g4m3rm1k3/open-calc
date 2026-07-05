@@ -55,12 +55,11 @@ The curve below shows the distribution of molecular speeds at different temperat
     <span style="color:rgba(255,255,255,0.4);font-size:11px;font-family:monospace">100 K — 800 K</span>
   </div>
 </div>
-<canvas id="cv" width="700" height="280"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:280px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=280;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var slider=document.getElementById('temp-slider');
 var tempLabel=document.getElementById('temp-label');
 
@@ -221,12 +220,11 @@ The melting point of a solid is determined by the strength of whatever holds it 
       instruction: `### Molecular motion in solid, liquid, and gas
 
 All three panels show the same type of molecule at the same temperature. Watch the difference in arrangement and motion: solids vibrate in place, liquids flow past each other while staying in contact, gases move freely with large empty spaces between them.`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var panelW=W/3;
@@ -414,12 +412,11 @@ This dual nature gives liquids their characteristic properties:
       instruction: `### From solid to liquid to gas: temperature drives the transition
 
 The simulation below shows a substance heating up from a cold solid through melting and into a gas. Watch how molecular motion changes at each stage. The temperature bar shows where you are in the heating curve — including the flat regions at melting and boiling, where energy goes into breaking intermolecular forces rather than raising temperature.`,
-      html: `<canvas id="cv" width="700" height="360"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:360px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=360;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 // Particles
@@ -652,12 +649,11 @@ The phase diagram has three regions (solid, liquid, gas) separated by three curv
       instruction: `### Interactive phase diagram for water
 
 Click anywhere on the phase diagram to see what state water is in at that temperature and pressure. The triple point, critical point, and normal boiling and melting points are labelled. Notice the slightly negative slope of the solid-liquid boundary — unique to water among common substances.`,
-      html: `<canvas id="cv" width="700" height="340"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center;cursor:crosshair}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:340px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=340;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var chartX=70,chartY=20,chartW=W-100,chartH=H-70;
 // X: temperature -50°C to 400°C, Y: pressure 0.001 to 220 atm (log scale)

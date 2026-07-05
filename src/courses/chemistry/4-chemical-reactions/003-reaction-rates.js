@@ -79,12 +79,11 @@ The simulation shows molecules colliding. Adjust concentration (number of partic
     </div>
   </div>
 </div>
-<canvas id="cv" width="700" height="260"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:260px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=260;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 var concSl=document.getElementById('conc-sl');
@@ -299,12 +298,11 @@ To determine orders experimentally: run the reaction multiple times, changing on
       instruction: `### Rate law: how concentration order affects rate
 
 The chart shows how rate changes as concentration increases for zero, first, and second order reactions. Notice how the curves diverge dramatically — second order reactions accelerate far more with concentration than first order, which accelerates more than zero order.`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
 
@@ -446,12 +444,11 @@ Adjust temperature and activation energy to see how the rate constant k changes.
     </div>
   </div>
 </div>
-<canvas id="cv" width="700" height="260"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:260px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=260;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var TSl=document.getElementById('T-sl');
 var EaSl=document.getElementById('Ea-sl');
@@ -638,12 +635,11 @@ The reaction mechanism is a hypothesis — it must be consistent with the experi
       instruction: `### Rate-determining step: the bottleneck
 
 The animation shows a two-step reaction mechanism. Step 1 is slow (high activation energy); Step 2 is fast (low activation energy). The intermediate builds up while waiting for Step 2 to process it. The overall reaction rate is controlled entirely by Step 1 — the bottleneck.`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 // Pipeline model: particles flow through two steps

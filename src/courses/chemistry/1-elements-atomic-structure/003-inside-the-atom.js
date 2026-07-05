@@ -62,7 +62,7 @@ Notice also the **category colours**. Elements in the same colour group share ch
     </div>
   </div>
   <div class="canvas-row">
-    <canvas id="nucleus-cv" width="280" height="280"></canvas>
+    <canvas id="nucleus-cv"></canvas>
     <div class="facts-col">
       <div class="fact-label">About this element</div>
       <div class="fact-text" id="fact-text"></div>
@@ -86,7 +86,7 @@ Notice also the **category colours**. Elements in the same colour group share ch
 .el-name{font-size:13px;color:var(--color-text-secondary,#64748b)}
 .el-mass{font-size:11px;color:var(--color-text-secondary,#64748b);font-family:monospace;margin-top:2px}
 .canvas-row{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
-canvas{border-radius:12px;display:block;background:radial-gradient(ellipse at 40% 35%,#0d1f3e 0%,#050b18 100%)}
+canvas{border-radius:12px;display:block;width:280px;height:280px;background:radial-gradient(ellipse at 40% 35%,#0d1f3e 0%,#050b18 100%)}
 .facts-col{display:flex;flex-direction:column;gap:4px}
 .fact-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--color-text-secondary,#64748b)}
 .fact-text{font-size:13px;color:var(--color-text-primary,#1e293b);line-height:1.65}
@@ -132,7 +132,8 @@ for(var i=1;i<=36;i++){
   }
 }
 
-var cv=document.getElementById('nucleus-cv'),ctx=cv.getContext('2d');
+var cv=document.getElementById('nucleus-cv'),ctx;
+(function(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var slider=document.getElementById('pslider');
 
 function drawNucleus(n, color) {
@@ -247,7 +248,7 @@ Explore carbon's isotopes below. Toggle between them and watch stability change.
       html: `<div class="scene">
   <div class="iso-row" id="iso-buttons"></div>
   <div class="iso-main">
-    <canvas id="iso-cv" width="300" height="300"></canvas>
+    <canvas id="iso-cv"></canvas>
     <div class="iso-detail" id="iso-detail"></div>
   </div>
   <div class="iso-insight">
@@ -262,7 +263,7 @@ Explore carbon's isotopes below. Toggle between them and watch stability change.
 .iso-btn.active{border-color:#38bdf8;background:rgba(56,189,248,0.12);color:#0ea5e9}
 .iso-btn.radioactive.active{border-color:#f87171;background:rgba(248,113,113,0.12);color:#ef4444}
 .iso-main{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:center}
-canvas{border-radius:12px;display:block;background:radial-gradient(ellipse at 40% 35%,#0d1f3e 0%,#050b18 100%)}
+canvas{border-radius:12px;display:block;width:300px;height:300px;background:radial-gradient(ellipse at 40% 35%,#0d1f3e 0%,#050b18 100%)}
 .iso-detail{display:flex;flex-direction:column;gap:10px}
 .iso-name-big{font-size:22px;font-weight:600;font-family:monospace;color:var(--color-text-primary,#1e293b)}
 .iso-formula{font-size:14px;color:var(--color-text-secondary,#64748b);font-family:monospace}
@@ -285,7 +286,8 @@ canvas{border-radius:12px;display:block;background:radial-gradient(ellipse at 40
   {name:'Carbon-15',neutrons:9,stable:false,halflife:'2.4 seconds',abundance:'Artificial',note:'Too many neutrons. Decays by emitting an electron (beta decay), converting a neutron to a proton. Product: Nitrogen-15.'},
 ];
 
-var cv=document.getElementById('iso-cv'),ctx=cv.getContext('2d');
+var cv=document.getElementById('iso-cv'),ctx;
+(function(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var btns=document.getElementById('iso-buttons');
 var selected=2;
 
@@ -401,7 +403,7 @@ The dashed circles on the outer shell show empty slots — positions that could 
     <span class="sl-lab" id="el-id">H — Hydrogen</span>
   </div>
   <div class="main-row">
-    <canvas id="shell-cv" width="300" height="300"></canvas>
+    <canvas id="shell-cv"></canvas>
     <div class="info-col">
       <div class="info-section">
         <div class="info-label">Shell configuration</div>
@@ -430,7 +432,7 @@ The dashed circles on the outer shell show empty slots — positions that could 
 .sl-lab{font-size:13px;color:var(--color-text-primary,#1e293b);font-weight:500;white-space:nowrap}
 #ecount{font-size:18px;font-weight:700;color:#38bdf8;font-family:monospace}
 .main-row{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
-canvas{border-radius:12px;display:block;background:radial-gradient(ellipse at 50% 50%,#0d1f3e 0%,#050b18 100%)}
+canvas{border-radius:12px;display:block;width:300px;height:300px;background:radial-gradient(ellipse at 50% 50%,#0d1f3e 0%,#050b18 100%)}
 .info-col{display:flex;flex-direction:column;gap:12px}
 .info-section{display:flex;flex-direction:column;gap:4px}
 .info-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--color-text-secondary,#64748b)}
@@ -464,7 +466,8 @@ canvas{border-radius:12px;display:block;background:radial-gradient(ellipse at 50
   {e:18,sym:'Ar', name:'Argon',      shells:[2,8,8], val:8, tend:'Full outer shell. Completely stable. Noble gas. Note the pattern: every 8 electrons in the outer shell = inert element.'},
 ];
 
-var cv=document.getElementById('shell-cv'),ctx=cv.getContext('2d');
+var cv=document.getElementById('shell-cv'),ctx;
+(function(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var slider=document.getElementById('eslider');
 
 function drawShells(atom){

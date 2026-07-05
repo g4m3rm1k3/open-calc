@@ -49,12 +49,11 @@ This dipole is not subtle. Water has one of the largest dipole moments of any co
       instruction: `### The water molecule: geometry, lone pairs, and dipole
 
 The canvas shows a water molecule with its two lone pairs, bond angle, partial charges, and the resulting molecular dipole moment arrow. The lone pairs are shown as electron density clouds — they are real, spatially significant, and responsible for the bent shape.`,
-      html: `<canvas id="cv" width="700" height="320"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:320px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=320;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 function draw(){
@@ -204,12 +203,11 @@ It is this network — not any individual hydrogen bond — that gives water its
       instruction: `### Hydrogen bond network in liquid water
 
 Each water molecule (O in red, H in grey) can form up to 4 hydrogen bonds. The dashed lines show hydrogen bonds — shorter, weaker, and more directional than covalent bonds. The network is constantly breaking and reforming on a timescale of picoseconds, but at any instant nearly every possible hydrogen bond is occupied.`,
-      html: `<canvas id="cv" width="700" height="360"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:360px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=360;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 // Place water molecules in a loose network
@@ -385,12 +383,11 @@ The hydrogen bond network is responsible for a list of water properties that eac
       instruction: `### How unusual is water? Comparison with similar molecules
 
 The chart compares the boiling points of the Group 16 hydrides (H₂O, H₂S, H₂Se, H₂Te). The trend from H₂Te down to H₂S is smooth — a normal decrease with molecular size. Water is a dramatic outlier, sitting far above the extrapolated trend. This is the hydrogen bond effect, made visible.`,
-      html: `<canvas id="cv" width="700" height="320"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:320px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=320;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,W,H);
 
@@ -523,12 +520,11 @@ The density anomaly of water — a direct consequence of the geometry of hydroge
       instruction: `### Ice vs. liquid water: structure comparison
 
 The left panel shows the ordered hexagonal lattice of ice — each molecule locked into 4 hydrogen bonds, with large open spaces between the hexagonal rings. The right panel shows liquid water — hydrogen bonds present but dynamic, molecules more randomly arranged and closer together on average. The open structure of ice is why it is less dense.`,
-      html: `<canvas id="cv" width="700" height="330"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:330px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=330;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 // Ice: hexagonal lattice positions

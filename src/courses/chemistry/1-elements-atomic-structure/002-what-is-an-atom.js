@@ -37,7 +37,7 @@ The atom was not discovered by looking at one. It was discovered by taking the e
     <div class="ctrl"><span class="clabel">Hydrogen atoms: <span id="hn">4</span></span><input type="range" id="hs" min="1" max="10" value="4"></div>
     <div class="ctrl"><span class="clabel">Oxygen atoms: <span id="on">4</span></span><input type="range" id="os" min="1" max="10" value="4"></div>
   </div>
-  <canvas id="cv" width="520" height="210"></canvas>
+  <canvas id="cv"></canvas>
   <div class="results">
     <div class="rbox" id="wbox">Water molecules: <strong id="wn">0</strong></div>
     <div class="rbox lo" id="lbox">Leftover: <strong id="lt">—</strong></div>
@@ -50,15 +50,17 @@ The atom was not discovered by looking at one. It was discovered by taking the e
 .ctrl{display:flex;align-items:center;gap:8px}
 .clabel{font-size:12px;color:var(--color-text-primary);white-space:nowrap}
 input[type=range]{width:100px}
-canvas{border-radius:10px;display:block;width:100%}
+canvas{border-radius:10px;display:block;width:100%;max-width:520px;height:210px;margin:0 auto}
 .results{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .rbox{padding:9px 14px;border-radius:8px;border:1px solid var(--color-border-tertiary);font-size:13px;color:var(--color-text-primary);background:var(--color-background-secondary)}
 .lo{border-color:#fdba74;background:var(--color-background-secondary)}
 .insight{font-size:12px;color:var(--color-text-secondary);line-height:1.65;padding:8px 12px;border-left:2px solid var(--color-border-secondary);border-radius:0 6px 6px 0}`,
-      startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+      startCode: `var cv=document.getElementById('cv'),ctx,LW=520,LH=210;
+function fit(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);}
+fit();
 var hs=document.getElementById('hs'),os=document.getElementById('os');
 function draw(H,O){
-  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.clearRect(0,0,LW,LH);
   var water=Math.min(Math.floor(H/2),O);
   var usedH=water*2,usedO=water,leftH=H-usedH,leftO=O-usedO;
   document.getElementById('hn').textContent=H;document.getElementById('on').textContent=O;
@@ -72,12 +74,13 @@ function draw(H,O){
   ctx.fillStyle='#94a3b8';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('Hydrogen atoms',pad,50);
   for(var j=0;j<O;j++){var usedJ=j<usedO,ox=pad+j*30,oy=76;ctx.beginPath();ctx.arc(ox,oy,11,0,Math.PI*2);ctx.fillStyle=usedJ?'#f87171':'#cbd5e1';ctx.fill();ctx.fillStyle=usedJ?'#7f1d1d':'#64748b';ctx.font='500 8px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('O',ox,oy);}
   ctx.fillStyle='#94a3b8';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('Oxygen atoms',pad,100);
-  ctx.fillStyle='#94a3b8';ctx.font='18px sans-serif';ctx.textAlign='center';ctx.fillText('→',cv.width/2,118);
+  ctx.fillStyle='#94a3b8';ctx.font='18px sans-serif';ctx.textAlign='center';ctx.fillText('→',LW/2,118);
   for(var w=0;w<water;w++){var wx=pad+w*52,wy=152;ctx.beginPath();ctx.arc(wx+10,wy,11,0,Math.PI*2);ctx.fillStyle='#ef4444';ctx.fill();ctx.fillStyle='white';ctx.font='500 8px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('O',wx+10,wy);ctx.beginPath();ctx.arc(wx,wy+12,7,0,Math.PI*2);ctx.fillStyle='#60a5fa';ctx.fill();ctx.fillStyle='white';ctx.font='500 7px monospace';ctx.fillText('H',wx,wy+12);ctx.beginPath();ctx.arc(wx+20,wy+12,7,0,Math.PI*2);ctx.fillStyle='#60a5fa';ctx.fill();ctx.fillStyle='white';ctx.fillText('H',wx+20,wy+12);}
   if(water>0){ctx.fillStyle='#94a3b8';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('Water molecules (H\u2082O)',pad,198);}
 }
 hs.oninput=function(){draw(+hs.value,+os.value)};
 os.oninput=function(){draw(+hs.value,+os.value)};
+new ResizeObserver(function(){fit();draw(+hs.value,+os.value);}).observe(cv);
 draw(4,4);`,
       outputHeight: 440,
     },
@@ -92,7 +95,7 @@ We now know atoms are almost entirely **empty space**. The mass is concentrated 
 **Drag the slider** from "Nucleus" to "Full atom" to see the scale relationship. The numbers are accurate.`,
       html: `<div class="scene">
   <div class="slider-row"><span class="sl">Nucleus</span><input type="range" id="zs" min="0" max="100" value="0" style="flex:1"><span class="sl">Full atom</span></div>
-  <canvas id="cv" width="520" height="280"></canvas>
+  <canvas id="cv"></canvas>
   <div class="facts">
     <div class="fact"><div class="fn">99.9999%</div><div class="fd">of an atom's volume is empty space</div></div>
     <div class="fact"><div class="fn">99.97%</div><div class="fd">of the mass is in the nucleus</div></div>
@@ -104,16 +107,18 @@ We now know atoms are almost entirely **empty space**. The mass is concentrated 
 .scene{display:flex;flex-direction:column;gap:10px}
 .slider-row{display:flex;align-items:center;gap:10px}
 .sl{font-size:11px;color:var(--color-text-secondary);white-space:nowrap}
-canvas{border-radius:10px;display:block;width:100%}
+canvas{border-radius:10px;display:block;width:100%;max-width:520px;height:280px;margin:0 auto}
 .facts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .fact{border:1px solid var(--color-border-tertiary);border-radius:8px;padding:9px 12px;background:var(--color-background-secondary);text-align:center}
 .fn{font-size:15px;font-weight:500;color:var(--color-text-primary)}
 .fd{font-size:11px;color:var(--color-text-secondary);margin-top:3px;line-height:1.4}
 .analogy{background:var(--color-background-secondary);border-left:3px solid var(--color-border-secondary);padding:10px 14px;border-radius:0 8px 8px 0;font-size:13px;color:var(--color-text-primary);line-height:1.65;font-style:italic}`,
-      startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d'),zs=document.getElementById('zs');
+      startCode: `var cv=document.getElementById('cv'),ctx,LW=520,LH=280,zs=document.getElementById('zs');
+function fit(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);}
+fit();
 function draw(t){
-  ctx.clearRect(0,0,cv.width,cv.height);
-  var cx=cv.width/2,cy=cv.height/2;
+  ctx.clearRect(0,0,LW,LH);
+  var cx=LW/2,cy=LH/2;
   var cloudR=8+t*1.3;
   if(t>10){
     var a=Math.min((t-10)/40,0.65);
@@ -127,9 +132,11 @@ function draw(t){
   ctx.fillStyle='var(--color-text-primary,#1e293b)';ctx.font='500 12px sans-serif';ctx.textAlign='center';
   if(t<30){ctx.fillText('Nucleus',cx,cy+nr+18);ctx.font='11px sans-serif';ctx.fillStyle='var(--color-text-secondary,#64748b)';ctx.fillText('Almost all the mass. Incredibly dense.',cx,cy+nr+33);}
   if(t>50){var ly=cy-cloudR-12;if(ly<14)ly=cy+cloudR+18;ctx.fillStyle='#2563eb';ctx.font='500 12px sans-serif';ctx.fillText('Electron cloud',cx,ly);ctx.font='11px sans-serif';ctx.fillStyle='var(--color-text-secondary,#64748b)';ctx.fillText('Almost no mass. Almost all the volume.',cx,ly+16);}
-  if(t>5){ctx.fillStyle='#94a3b8';ctx.font='10px monospace';ctx.textAlign='right';ctx.fillText('atom / nucleus ratio: ~'+Math.round(t*900)+'x',cv.width-10,cv.height-8);}
+  if(t>5){ctx.fillStyle='#94a3b8';ctx.font='10px monospace';ctx.textAlign='right';ctx.fillText('atom / nucleus ratio: ~'+Math.round(t*900)+'x',LW-10,LH-8);}
 }
-zs.oninput=function(){draw(+zs.value)};draw(0);`,
+zs.oninput=function(){draw(+zs.value)};
+new ResizeObserver(function(){fit();draw(+zs.value);}).observe(cv);
+draw(0);`,
       outputHeight: 460,
     },
 
@@ -145,7 +152,7 @@ Einstein's insight: the pollen is being buffeted by individual water molecules. 
 The timeline below traces how the atom went from "useful idea" to "proven fact."`,
       html: `<div class="scene">
   <div class="slabel">Brownian motion — a pollen grain buffeted by invisible molecules</div>
-  <canvas id="cv" width="520" height="220" style="cursor:default"></canvas>
+  <canvas id="cv" style="cursor:default"></canvas>
   <button id="rst">Reset path</button>
   <div class="timeline">
     <div class="te"><div class="ty">1803</div><div class="tv">Dalton proposes atomic theory to explain fixed combination ratios</div></div>
@@ -158,27 +165,30 @@ The timeline below traces how the atom went from "useful idea" to "proven fact."
       css: `body{margin:0;padding:14px;font-family:sans-serif}
 .scene{display:flex;flex-direction:column;gap:10px}
 .slabel{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.08em}
-canvas{border-radius:10px;display:block;width:100%;background:var(--color-background-secondary)}
+canvas{border-radius:10px;display:block;width:100%;max-width:520px;height:220px;margin:0 auto;background:var(--color-background-secondary)}
 button{align-self:flex-start;padding:5px 14px;border-radius:7px;border:1px solid var(--color-border-secondary);background:transparent;color:var(--color-text-secondary);cursor:pointer;font-size:12px}
 .timeline{display:flex;flex-direction:column;gap:0}
 .te{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
 .te:last-child{border-bottom:none}
 .ty{font-size:12px;font-weight:500;color:var(--color-text-secondary);font-family:monospace}
 .tv{font-size:12px;color:var(--color-text-primary);line-height:1.55}`,
-      startCode: `var cv=document.getElementById('cv'),ctx=cv.getContext('2d');
-var cx=cv.width/2,cy=cv.height/2,px=cx,py=cy,path=[{x:cx,y:cy}],tid=null;
+      startCode: `var cv=document.getElementById('cv'),ctx,LW=520,LH=220;
+function fit(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);}
+fit();
+new ResizeObserver(fit).observe(cv);
+var cx=LW/2,cy=LH/2,px=cx,py=cy,path=[{x:cx,y:cy}],tid=null;
 function frame(){
-  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.clearRect(0,0,LW,LH);
   ctx.strokeStyle='rgba(148,163,184,0.1)';ctx.lineWidth=1;
-  for(var gx=0;gx<cv.width;gx+=28){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,cv.height);ctx.stroke();}
-  for(var gy=0;gy<cv.height;gy+=28){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(cv.width,gy);ctx.stroke();}
+  for(var gx=0;gx<LW;gx+=28){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,LH);ctx.stroke();}
+  for(var gy=0;gy<LH;gy+=28){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(LW,gy);ctx.stroke();}
   for(var m=0;m<10;m++){ctx.beginPath();ctx.arc(px+(Math.random()-.5)*70,py+(Math.random()-.5)*70,1.5,0,Math.PI*2);ctx.fillStyle='rgba(96,165,250,0.35)';ctx.fill();}
   if(path.length>1){ctx.beginPath();ctx.moveTo(path[0].x,path[0].y);for(var i=1;i<path.length;i++)ctx.lineTo(path[i].x,path[i].y);ctx.strokeStyle='rgba(251,146,60,0.5)';ctx.lineWidth=1.5;ctx.stroke();}
   ctx.beginPath();ctx.arc(px,py,9,0,Math.PI*2);ctx.fillStyle='#f59e0b';ctx.fill();ctx.strokeStyle='#d97706';ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle='#94a3b8';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('Pollen grain (visible)',px+14,py-4);
   ctx.fillStyle='#93c5fd';ctx.fillText('Water molecules (invisible, causing the jitter)',cx-100,cy+95);
-  px=Math.max(12,Math.min(cv.width-12,px+(Math.random()-.5)*16));
-  py=Math.max(12,Math.min(cv.height-12,py+(Math.random()-.5)*16));
+  px=Math.max(12,Math.min(LW-12,px+(Math.random()-.5)*16));
+  py=Math.max(12,Math.min(LH-12,py+(Math.random()-.5)*16));
   path.push({x:px,y:py});if(path.length>220)path.shift();
 }
 tid=setInterval(frame,75);

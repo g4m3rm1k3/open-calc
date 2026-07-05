@@ -106,10 +106,12 @@ try{(function(){
 ${escapedJs}
 })()}catch(e){console.error(e.message)}
 ;(function(){
-  function report(){window.parent.postMessage({type:'sn_resize',h:document.body.scrollHeight},'*')}
+  function report(){window.parent.postMessage({type:'sn_resize',h:Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)},'*')}
   report();
-  if(window.ResizeObserver){new ResizeObserver(report).observe(document.body)}
+  if(window.ResizeObserver){var ro=new ResizeObserver(report);ro.observe(document.body);ro.observe(document.documentElement)}
   else{window.addEventListener('load',report)}
+  window.addEventListener('load',report);
+  setTimeout(report,300);
 })();
 <\/script>
 </body>
@@ -163,10 +165,12 @@ try{(function(){
 ${escapedJs}
 })()}catch(e){console.error(e.message)}
 ;(function(){
-  function report(){window.parent.postMessage({type:'sn_resize',h:document.body.scrollHeight},'*')}
+  function report(){window.parent.postMessage({type:'sn_resize',h:Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)},'*')}
   report();
-  if(window.ResizeObserver){new ResizeObserver(report).observe(document.body)}
+  if(window.ResizeObserver){var ro=new ResizeObserver(report);ro.observe(document.body);ro.observe(document.documentElement)}
   else{window.addEventListener('load',report)}
+  window.addEventListener('load',report);
+  setTimeout(report,300);
 })();
 <\/script>
 </body>
@@ -247,10 +251,12 @@ try{(function(){
 ${escapedJs}
 })()}catch(e){}
 ;(function(){
-  function report(){window.parent.postMessage({type:'sn_resize',h:document.body.scrollHeight},'*')}
+  function report(){window.parent.postMessage({type:'sn_resize',h:Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)},'*')}
   report();
-  if(window.ResizeObserver){new ResizeObserver(report).observe(document.body)}
+  if(window.ResizeObserver){var ro=new ResizeObserver(report);ro.observe(document.body);ro.observe(document.documentElement)}
   else{window.addEventListener('load',report)}
+  window.addEventListener('load',report);
+  setTimeout(report,300);
 })();
 <\/script>
 </body>

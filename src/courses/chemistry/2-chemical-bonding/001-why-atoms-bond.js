@@ -44,7 +44,7 @@ When they interact, the sodium electron moves to chlorine's outer shell. Both at
 **The interactive below shows this energy landscape.** Drag the sodium atom toward the chlorine atom and watch the energy curve. The dip in the middle is the bond — the lowest energy point, where the system is most stable.`,
       html: `<div class="scene">
   <div class="top-label">Drag Na toward Cl to see the energy landscape</div>
-  <canvas id="bond-cv" width="540" height="280"></canvas>
+  <canvas id="bond-cv"></canvas>
   <div class="energy-display">
     <div class="e-item">
       <div class="e-label">Distance</div>
@@ -65,13 +65,14 @@ When they interact, the sodium electron moves to chlorine's outer shell. Both at
       css: `body{margin:0;padding:14px;font-family:sans-serif}
 .scene{display:flex;flex-direction:column;gap:10px}
 .top-label{font-size:12px;color:var(--color-text-secondary,#64748b);font-weight:500}
-canvas{border-radius:10px;display:block;width:100%}
+canvas{border-radius:10px;display:block;width:100%;max-width:540px;height:280px}
 .energy-display{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .e-item{border:1px solid var(--color-border-tertiary,#e2e8f0);border-radius:8px;padding:9px 12px;background:var(--color-background-secondary,#f8fafc)}
 .e-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--color-text-secondary,#64748b);margin-bottom:3px}
 .e-val{font-size:13px;font-weight:500;color:var(--color-text-primary,#1e293b);font-family:monospace}
 .slider-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--color-text-secondary,#64748b)}`,
-      startCode: `var cv=document.getElementById('bond-cv'),ctx=cv.getContext('2d');
+      startCode: `var cv=document.getElementById('bond-cv'),ctx,BONDW=540,BONDH=280;
+(function(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var slider=document.getElementById('dist-slider');
 
 function getEnergy(t){
@@ -82,8 +83,8 @@ function getEnergy(t){
 }
 
 function draw(t){
-  ctx.clearRect(0,0,cv.width,cv.height);
-  var W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,BONDW,BONDH);
+  var W=BONDW,H=BONDH;
 
   ctx.fillStyle='var(--color-background-secondary,#f8fafc)';
   ctx.beginPath();ctx.roundRect(0,0,W,H,8);ctx.fill();
@@ -207,7 +208,7 @@ The interactive below lets you combine pairs of atoms and see which bond type fo
     <div class="pair-buttons" id="pair-btns"></div>
   </div>
   <div class="bond-display">
-    <canvas id="bond-type-cv" width="400" height="220"></canvas>
+    <canvas id="bond-type-cv"></canvas>
     <div class="bond-info" id="bond-info"></div>
   </div>
   <div class="eneg-bar-wrap">
@@ -230,7 +231,7 @@ The interactive below lets you combine pairs of atoms and see which bond type fo
 .pair-btn{padding:6px 14px;border-radius:8px;border:1.5px solid var(--color-border-secondary,#e2e8f0);background:var(--color-background-secondary,#f8fafc);cursor:pointer;font-size:12px;font-family:monospace;font-weight:600;color:var(--color-text-primary,#1e293b);transition:all .15s}
 .pair-btn.active{border-color:#38bdf8;background:rgba(56,189,248,0.12);color:#0ea5e9}
 .bond-display{display:grid;grid-template-columns:400px 1fr;gap:14px;align-items:center}
-canvas{border-radius:10px;display:block;background:radial-gradient(ellipse at 50% 50%,#0a1535 0%,#050b18 100%)}
+canvas{border-radius:10px;display:block;width:400px;height:220px;background:radial-gradient(ellipse at 50% 50%,#0a1535 0%,#050b18 100%)}
 .bond-info{display:flex;flex-direction:column;gap:8px}
 .bi-type{font-size:18px;font-weight:600;color:var(--color-text-primary,#1e293b)}
 .bi-sub{font-size:12px;color:var(--color-text-secondary,#64748b)}
@@ -294,7 +295,8 @@ canvas{border-radius:10px;display:block;background:radial-gradient(ellipse at 50
   },
 ];
 
-var cv=document.getElementById('bond-type-cv'),ctx=cv.getContext('2d');
+var cv=document.getElementById('bond-type-cv'),ctx;
+(function(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var btns=document.getElementById('pair-btns');
 var selected=0;
 
@@ -427,16 +429,17 @@ The chart below shows bond dissociation energies for common bonds. A few things 
 - C-C bonds are moderately strong and can be strung together in chains — the foundation of organic chemistry`,
       html: `<div class="scene">
   <div class="chart-label">Bond dissociation energies (kJ/mol) — energy needed to break one mole of bonds</div>
-  <canvas id="bde-cv" width="520" height="340"></canvas>
+  <canvas id="bde-cv"></canvas>
   <div class="bde-note">Higher bars = stronger bonds = more energy required to break = more energy released when formed.</div>
 </div>`,
       css: `body{margin:0;padding:14px;font-family:sans-serif}
 .scene{display:flex;flex-direction:column;gap:10px}
 .chart-label{font-size:11px;font-weight:500;color:var(--color-text-secondary,#64748b);text-transform:uppercase;letter-spacing:.06em}
-canvas{border-radius:10px;display:block;width:100%}
+canvas{border-radius:10px;display:block;width:100%;max-width:520px;height:340px}
 .bde-note{font-size:12px;color:var(--color-text-secondary,#64748b);line-height:1.6;border-left:2px solid var(--color-border-secondary,#e2e8f0);padding-left:10px}`,
-      startCode: `var cv=document.getElementById('bde-cv'),ctx=cv.getContext('2d');
-var W=cv.width,H=cv.height;
+      startCode: `var cv=document.getElementById('bde-cv'),ctx;
+(function(){var dpr=window.devicePixelRatio||1,r=cv.getBoundingClientRect();cv.width=r.width*dpr;cv.height=r.height*dpr;ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
+var W=520,H=340;
 
 var bonds=[
   {label:'H\u2014H',  energy:436, color:'#a78bfa', type:'single'},

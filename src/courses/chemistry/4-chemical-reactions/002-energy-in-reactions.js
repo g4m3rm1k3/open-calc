@@ -58,12 +58,11 @@ Some examples:
       instruction: `### Energy diagrams: exothermic vs. endothermic
 
 The two diagrams show the energy profiles for an exothermic reaction (left) and an endothermic reaction (right). The y-axis is potential energy. Reactants start at a certain energy level; products end at a different level. The difference is ΔH. Both reactions must first climb an energy hill — the activation energy barrier — before descending to the products.`,
-      html: `<canvas id="cv" width="700" height="300"></canvas>`,
+      html: `<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;display:flex;justify-content:center}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 
 function drawEnergyDiagram(ox,oy,w,h,isExo,label){
@@ -256,12 +255,11 @@ The diagram shows the same reaction with and without a catalyst. Toggle the cata
   <button id="cat-btn" style="padding:7px 16px;border-radius:8px;border:1.5px solid #4ade80;background:rgba(74,222,128,0.15);color:#4ade80;font-family:monospace;font-size:12px;font-weight:700;cursor:pointer">Add Catalyst</button>
   <span id="cat-status" style="color:rgba(255,255,255,0.4);font-size:12px;font-family:monospace">No catalyst — high activation energy</span>
 </div>
-<canvas id="cv" width="700" height="300"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:300px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=300;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 var t=0;
 var catalystOn=false;
 var catTransition=0; // 0=no cat, 1=full cat
@@ -482,12 +480,11 @@ $\\Delta H°_{rxn} = \\sum \\Delta H°_f(\\text{products}) - \\sum \\Delta H°_f
 
 Select a reaction to see the bond-by-bond breakdown. The bars show energy in (red, bond breaking) and energy out (green, bond forming). The net is ΔH.`,
       html: `<div style="padding:10px 14px 0;background:#0a0f1e;display:flex;gap:8px;flex-wrap:wrap" id="rxn-btns"></div>
-<canvas id="cv" width="700" height="280"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:280px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=280;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var reactions=[
   {
@@ -658,12 +655,11 @@ Some reactions proceed in multiple steps. Each step has its own activation energ
   <input type="range" id="prog-slider" min="0" max="100" value="0" style="flex:1">
   <span id="prog-label" style="color:#facc15;font-family:monospace;font-size:12px;font-weight:700;white-space:nowrap;min-width:100px">Reactants</span>
 </div>
-<canvas id="cv" width="700" height="270"></canvas>`,
+<canvas id="cv"></canvas>`,
       css: `body{margin:0;background:#0a0f1e;font-family:monospace}
-canvas{display:block;width:100%;max-width:700px}`,
-      startCode: `var canvas=document.getElementById('cv');
-var ctx=canvas.getContext('2d');
-var W=canvas.width,H=canvas.height;
+canvas{display:block;width:100%;max-width:700px;height:270px}`,
+      startCode: `var canvas=document.getElementById('cv'),ctx,W=700,H=270;
+(function(){var dpr=window.devicePixelRatio||1,r=canvas.getBoundingClientRect();canvas.width=r.width*dpr;canvas.height=r.height*dpr;ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);})();
 
 var slider=document.getElementById('prog-slider');
 var progLabel=document.getElementById('prog-label');
