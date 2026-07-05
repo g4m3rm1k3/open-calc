@@ -1,292 +1,244 @@
-# Loops and Iteration: LINQ as a First-Class Citizen
+# Control Flow: Pattern Matching and the Modern Switch
 
-C#'s loop constructs are syntactically familiar: `for`, `while`, `do-while`, `foreach`. What makes C# iteration distinctive is **LINQ** (Language Integrated Query) — a set of language features and library methods introduced in C# 3.0 that bring SQL-like declarative queries directly into the language. LINQ isn't a bolt-on — the `foreach` loop, iterator methods, and expression trees are all designed to work together with it. Understanding iteration in C# means understanding where loops end and LINQ begins.
+C#'s control flow statements started as near-copies of Java and C — `if`, `while`, `for`, `switch` with familiar syntax. But the language has evolved them significantly. C# 7 began adding **pattern matching** to `switch`. C# 8 introduced **switch expressions**. C# 9 added **relational patterns** and **logical patterns**. By C# 10 and 11, C#'s pattern matching system had become one of the most expressive in any mainstream language.
 
-## The `for` Loop
+Understanding this evolution — from imperative branching to declarative pattern decomposition — is essential to reading modern C# code.
+
+## The `if` Statement
 
 ```csharp
-// Classic indexed loop
-for (int i = 0; i < 5; i++)
+int temperature = 22;
+
+if (temperature > 30)
 {
-    Console.Write(i + " ");
+    Console.WriteLine("Hot");
 }
-Console.WriteLine();
-
-// Summing
-int sum = 0;
-for (int i = 1; i <= 100; i++) sum += i;
-Console.WriteLine($"Sum 1-100: {sum}");  // 5050
-
-// Multiple variables
-for (int i = 0, j = 10; i < j; i++, j--)
+else if (temperature > 20)
 {
-    Console.Write($"({i},{j}) ");
+    Console.WriteLine("Comfortable");
 }
-Console.WriteLine();
-
-// Decrement
-for (int i = 10; i > 0; i--)
-    Console.Write(i + " ");
-Console.WriteLine();
-
-// Infinite loop with break
-int count = 0;
-for (;;)   // equivalent to while(true)
+else if (temperature > 10)
 {
-    count++;
-    if (count >= 5) break;
+    Console.WriteLine("Cool");
 }
-Console.WriteLine($"count = {count}");
+else
+{
+    Console.WriteLine("Cold");
+}
+
+// C# requires boolean condition — no implicit truthiness
+int n = 5;
+// if (n) { }   // Compile error
+if (n != 0) { Console.WriteLine("Non-zero"); }
+
+// One-liner (braceless) — style guides disagree; braces are safer
+if (n > 0) Console.WriteLine("Positive");
+
+// Null-safe condition
+string? s = null;
+if (s is not null && s.Length > 0)
+    Console.WriteLine("Non-empty");
 ```
 
-## The `foreach` Loop
+## The Classic `switch`
 
-`foreach` works on anything implementing `IEnumerable<T>` — arrays, lists, strings, files, database results, generators:
+C#'s classic `switch` has one important difference from Java: **fall-through is illegal** unless the case is empty. The compiler rejects a non-empty case that doesn't end with `break`, `return`, `throw`, or `goto case`:
 
 ```csharp
-// Over array
-int[] numbers = { 1, 2, 3, 4, 5 };
-foreach (int n in numbers)
-    Console.Write(n + " ");
-Console.WriteLine();
-
-// Over List
-var fruits = new List<string> { "apple", "banana", "cherry" };
-foreach (string fruit in fruits)
-    Console.WriteLine(fruit.ToUpper());
-
-// Over string (char by char)
-foreach (char c in "Hello")
-    Console.Write(c + "-");
-Console.WriteLine();
-
-// Over Dictionary
-var scores = new Dictionary<string, int>
+int day = 3;
+switch (day)
 {
-    ["Alice"]   = 95,
-    ["Bob"]     = 82,
-    ["Charlie"] = 91
+    case 1:
+        Console.WriteLine("Monday");
+        break;
+    case 2:
+        Console.WriteLine("Tuesday");
+        break;
+    case 3:
+        Console.WriteLine("Wednesday");
+        break;
+    case 6:
+    case 7:
+        Console.WriteLine("Weekend");  // Empty case fall-through: allowed
+        break;
+    default:
+        Console.WriteLine("Weekday");
+        break;
+}
+
+// switch on string
+string lang = "csharp";
+switch (lang)
+{
+    case "csharp":
+    case "cs":
+        Console.WriteLine("C# — .NET language");
+        break;
+    case "java":
+        Console.WriteLine("Java — JVM language");
+        break;
+    default:
+        Console.WriteLine("Unknown");
+        break;
+}
+```
+
+## Switch Expressions (C# 8+): Concise and Value-Producing
+
+Switch expressions use `=>` arms, eliminate `break`, and produce a value:
+
+```csharp
+int day = 3;
+string dayName = day switch
+{
+    1 => "Monday",
+    2 => "Tuesday",
+    3 => "Wednesday",
+    4 => "Thursday",
+    5 => "Friday",
+    6 => "Saturday",
+    7 => "Sunday",
+    _ => "Invalid"   // _ is the discard pattern (default)
 };
-foreach (var (name, score) in scores)   // Tuple deconstruction
-    Console.WriteLine($"  {name}: {score}");
+Console.WriteLine(dayName);
+
+// Switch expression with computation
+double score = 87.5;
+string grade = score switch
+{
+    >= 90 => "A",    // Relational pattern (C# 9)
+    >= 80 => "B",
+    >= 70 => "C",
+    >= 60 => "D",
+    _      => "F"
+};
+Console.WriteLine($"Grade: {grade}");
+
+// Inline in an expression
+Console.WriteLine($"Day type: {day switch { 1 or 2 or 3 or 4 or 5 => "Weekday", _ => "Weekend" }}");
 ```
 
-The tuple deconstruction `var (name, score) in scores` is C# 7's **deconstruction** syntax. `Dictionary<K,V>.GetEnumerator()` yields `KeyValuePair<K,V>`, and C# 7 lets you destructure it inline.
+## Pattern Matching: The Heart of Modern C# Branching
 
-## `while` and `do-while`
-
-```csharp
-// while: check first
-int value = 100;
-int steps = 0;
-while (value != 1)
-{
-    value = value % 2 == 0 ? value / 2 : 3 * value + 1;  // Collatz
-    steps++;
-}
-Console.WriteLine($"Collatz(100): {steps} steps");
-
-// do-while: execute first, check after
-int attempts = 0;
-do
-{
-    Console.WriteLine($"Attempt {++attempts}");
-} while (attempts < 3);
-
-// Newton-Raphson square root
-double target = 9.0;
-double guess = target;
-double prev;
-do
-{
-    prev = guess;
-    guess = (guess + target / guess) / 2.0;
-} while (Math.Abs(guess - prev) > 1e-12);
-Console.WriteLine($"sqrt(9) ≈ {guess}");
-```
-
-## `break`, `continue`, and `goto`
-
-Unlike Java, C# actually has `goto` — but it's limited to jumping to labels within the same method or to switch cases. It's rarely justified, but exists:
+Pattern matching lets you test both the type and the shape of a value simultaneously:
 
 ```csharp
-// break
-foreach (int n in new[] { 3, 7, -1, 9, 4 })
-{
-    if (n < 0) break;
-    Console.Write(n + " ");
-}
-Console.WriteLine();
+object[] items = { 42, "hello", 3.14, true, null, new int[] { 1, 2, 3 } };
 
-// continue
-for (int i = 0; i < 10; i++)
+foreach (object item in items)
 {
-    if (i % 2 == 0) continue;
-    Console.Write(i + " ");   // Only odd numbers
-}
-Console.WriteLine();
-
-// Breaking nested loops without flags — use a local function or goto
-static void FindInMatrix()
-{
-    int[,] matrix = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
-    int target = 5;
-    bool found = false;
-
-    for (int i = 0; i < 3 && !found; i++)
+    string description = item switch
     {
-        for (int j = 0; j < 3; j++)
-        {
-            if (matrix[i, j] == target)
-            {
-                Console.WriteLine($"Found {target} at [{i},{j}]");
-                found = true;
-                break;
-            }
-        }
-    }
+        int i when i > 100   => $"Large integer: {i}",
+        int i                => $"Integer: {i}",
+        string s when s.Length > 3 => $"Long string: \"{s}\"",
+        string s             => $"Short string: \"{s}\"",
+        double d             => $"Double: {d:F2}",
+        bool b               => $"Boolean: {b}",
+        null                 => "Null value",
+        int[] arr            => $"Array of {arr.Length} ints",
+        _                    => $"Other: {item}"
+    };
+    Console.WriteLine(description);
 }
-FindInMatrix();
 ```
 
-## Iterator Methods: `yield return`
+## Property Patterns (C# 8+)
 
-C#'s `yield return` creates **lazy sequences** — values are produced on demand, one at a time, without materializing the whole collection:
+Property patterns let you match on the values of properties:
 
 ```csharp
-// Generate an infinite Fibonacci sequence lazily
-static IEnumerable<long> Fibonacci()
+record Point(double X, double Y);
+record Circle(Point Center, double Radius);
+
+static string ClassifyShape(object shape) => shape switch
 {
-    long a = 0, b = 1;
-    while (true)
-    {
-        yield return a;
-        (a, b) = (b, a + b);   // Tuple swap
-    }
-}
+    Circle { Radius: 0 }                          => "Degenerate circle (point)",
+    Circle { Radius: var r } when r < 1           => $"Tiny circle, r={r:F2}",
+    Circle { Center: { X: 0, Y: 0 }, Radius: var r } => $"Origin circle, r={r:F2}",
+    Circle { Radius: var r }                      => $"Circle, r={r:F2}",
+    Point { X: 0, Y: 0 }                         => "Origin point",
+    Point { X: var x, Y: var y }                 => $"Point ({x}, {y})",
+    _                                             => "Unknown shape"
+};
 
-// Take only what you need — the generator stops when foreach stops
-foreach (long n in Fibonacci().Take(15))
-    Console.Write(n + " ");
-Console.WriteLine();
-
-// Primes via Sieve, lazily
-static IEnumerable<int> Primes(int max)
-{
-    var sieve = new bool[max + 1];
-    for (int i = 2; i <= max; i++)
-    {
-        if (!sieve[i])
-        {
-            yield return i;
-            for (int j = i * 2; j <= max; j += i)
-                sieve[j] = true;
-        }
-    }
-}
-
-Console.Write("Primes to 50: ");
-foreach (int p in Primes(50))
-    Console.Write(p + " ");
-Console.WriteLine();
+Console.WriteLine(ClassifyShape(new Circle(new Point(0, 0), 5)));
+Console.WriteLine(ClassifyShape(new Circle(new Point(3, 4), 0.5)));
+Console.WriteLine(ClassifyShape(new Point(0, 0)));
+Console.WriteLine(ClassifyShape(new Point(3, 4)));
 ```
 
-`yield return` produces an iterator that implements `IEnumerable<T>`. The method's execution is **suspended** at each `yield return` and resumed on the next `MoveNext()` call. This is cooperative multitasking within a single thread — the same mechanism that makes `async/await` work internally.
+## List Patterns (C# 11+)
 
-## LINQ: Declarative Iteration
-
-LINQ (Language Integrated Query) provides a rich set of extension methods on `IEnumerable<T>` — and a query syntax that looks like SQL:
+C# 11 added list patterns — match on the structure of arrays and sequences:
 
 ```csharp
-var numbers = Enumerable.Range(1, 20).ToList();
-
-// Method syntax (most common in modern code)
-var result = numbers
-    .Where(n => n % 2 == 0)       // Filter: even numbers
-    .Select(n => n * n)            // Transform: square them
-    .Where(n => n > 50)            // Filter again
-    .OrderByDescending(n => n)     // Sort
-    .Take(5);                      // First 5
-
-Console.WriteLine(string.Join(", ", result));
-
-// Query syntax (SQL-like alternative — same output)
-var result2 =
-    from n in numbers
-    where n % 2 == 0
-    let squared = n * n
-    where squared > 50
-    orderby squared descending
-    select squared;
-
-Console.WriteLine(string.Join(", ", result2.Take(5)));
-
-// Aggregation
-Console.WriteLine($"Sum: {numbers.Sum()}");
-Console.WriteLine($"Average: {numbers.Average()}");
-Console.WriteLine($"Max: {numbers.Max()}");
-Console.WriteLine($"Count even: {numbers.Count(n => n % 2 == 0)}");
-
-// Grouping
-var words = new[] { "apple", "banana", "cherry", "avocado", "blueberry", "apricot" };
-var byFirstLetter = words
-    .GroupBy(w => w[0])
-    .OrderBy(g => g.Key);
-
-foreach (var group in byFirstLetter)
+static string DescribeList(int[] data) => data switch
 {
-    Console.WriteLine($"  '{group.Key}': {string.Join(", ", group)}");
-}
+    []             => "Empty",
+    [var single]   => $"Single: {single}",
+    [var first, var last] => $"Two elements: {first} and {last}",
+    [1, 2, ..]    => "Starts with 1, 2",
+    [.., 99]      => "Ends with 99",
+    [var head, .. var rest] => $"Head={head}, rest has {rest.Length} items"
+};
+
+Console.WriteLine(DescribeList(Array.Empty<int>()));
+Console.WriteLine(DescribeList(new[] { 42 }));
+Console.WriteLine(DescribeList(new[] { 1, 2, 3, 4 }));
+Console.WriteLine(DescribeList(new[] { 5, 6, 7, 8, 99 }));
 ```
 
-## LINQ Is Lazy
-
-LINQ operations build a pipeline description — they don't execute until you iterate the result. This laziness means:
+## The Ternary Operator and Null Coalescing
 
 ```csharp
-// This query is built but not yet evaluated
-var query = Enumerable.Range(1, int.MaxValue)
-    .Where(n => n % 3 == 0)
-    .Select(n => n * n);
+int n = 15;
+string parity = n % 2 == 0 ? "even" : "odd";
+Console.WriteLine($"{n} is {parity}");
 
-// Execution happens here — stops after first 5 results
-// Without Take(5) this would run forever
-foreach (int n in query.Take(5))
-    Console.WriteLine(n);   // 9, 36, 81, 144, 225
+// Null coalescing: ?? and ??=
+string? name = null;
+string displayName = name ?? "Anonymous";
+Console.WriteLine(displayName);
 
-// Force immediate evaluation with ToList() or ToArray()
-var materialized = query.Take(10).ToList();
-Console.WriteLine($"Type: {materialized.GetType().Name}");
+name ??= "Default";   // Assign only if null
+Console.WriteLine(name);
+
+// Null-conditional: ?. chains
+string? text = null;
+int? len = text?.Trim()?.Length;
+Console.WriteLine(len ?? 0);   // 0 — no exception
+
+// Chaining all three
+string? input = null;
+Console.WriteLine(input?.ToUpper() ?? "EMPTY");
 ```
 
-The laziness is what makes LINQ over `IEnumerable<T>` efficient — you chain `Where`, `Select`, `Take` and each element is processed through the entire pipeline once, not in three separate passes. It's also why calling `Count()` on a LINQ query iterates the entire sequence — if you need to check both emptiness and count, call `ToList()` first.
-
-## `foreach` Under the Hood
-
-The C# compiler desugars `foreach` into a pattern-based expansion. Any type with a `GetEnumerator()` method returning an object with `MoveNext()` and `Current` works, even if it doesn't implement `IEnumerable<T>`. This is how `async foreach` (`await foreach`) works — `IAsyncEnumerable<T>` has `MoveNextAsync()` instead:
+## `is` Expressions and Type Testing
 
 ```csharp
-// Custom iterable struct (no heap allocation!)
-struct Range
-{
-    private readonly int start, end;
-    public Range(int start, int end) { this.start = start; this.end = end; }
+object obj = "Hello, C#!";
 
-    public Enumerator GetEnumerator() => new Enumerator(start, end);
+// Classic instanceof equivalent
+if (obj is string)
+    Console.WriteLine("It's a string");
 
-    public struct Enumerator
-    {
-        private int current;
-        private readonly int end;
-        public Enumerator(int start, int end) { current = start - 1; this.end = end; }
-        public bool MoveNext() => ++current <= end;
-        public int Current => current;
-    }
-}
+// Pattern variable (C# 7+)
+if (obj is string str)
+    Console.WriteLine($"String of length {str.Length}");
 
-foreach (int i in new Range(1, 5))
-    Console.Write(i + " ");
-Console.WriteLine();  // 1 2 3 4 5
+// Negation pattern (C# 9+)
+if (obj is not int)
+    Console.WriteLine("Not an integer");
+
+// Combined patterns (C# 9+)
+object value = 42;
+if (value is int i and > 0 and < 100)
+    Console.WriteLine($"{i} is a positive two-digit number");
+
+// 'or' pattern
+if (value is 0 or > 100)
+    Console.WriteLine("Zero or over 100");
 ```
 
-This struct-based enumerator allocates zero bytes on the heap — every `foreach` iteration is pure stack-based operation. This pattern is used extensively in high-performance .NET code.
+C#'s pattern matching has reached a sophistication level comparable to Haskell or Rust. The combination of `switch` expressions, property patterns, relational patterns, list patterns, and logical connectors (`and`, `or`, `not`) lets you express complex conditional logic as readable, exhaustive case analysis rather than tangled `if/else` chains. When combined with sealed class hierarchies (covered in the Inheritance lesson), the compiler can verify that your switch is exhaustive — every possible case handled.

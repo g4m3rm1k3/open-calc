@@ -1,336 +1,386 @@
-# Extension Methods and LINQ in Depth
+# Exception Handling: Dealing with Things That Go Wrong
 
-In Lesson 04 you saw LINQ used to filter and transform collections. Here we'll go deeper: how LINQ is actually built (using **extension methods**), how to write your own extension methods, and the full set of LINQ operations that courses commonly test.
+Every program you write will eventually encounter something unexpected: a file that doesn't exist, a number entered where text was expected, a network connection that dropped, or a division by zero. In C#, these runtime failures are called **exceptions**. Without any handling, an exception immediately crashes your program with an error message. Exception handling gives you a way to catch those failures, respond to them gracefully, and keep your program running — or at least fail in a controlled, informative way.
 
-## Extension Methods: Adding Methods to Types You Don't Own
+## What Is an Exception?
 
-Normally, to add a method to a type, you edit that type's source code. But what if you want to add a method to `string`, or `int`, or a .NET collection type? You can't edit those — they're part of the .NET framework. Extension methods let you **add** methods to any type without touching its source code.
-
-An extension method is a `static` method in a `static` class where the first parameter has the keyword `this` in front of it. That `this` tells C# "this method extends the type of this parameter":
+Think of an exception as an emergency signal. When something goes wrong at runtime, C# creates an exception **object** — an instance of a class that describes what went wrong — and **throws** it. If nothing catches it, the program stops.
 
 ```csharp
-// A static class to hold extension methods
-static class StringExtensions
+// This will crash with: DivideByZeroException
+int a = 10;
+int b = 0;
+int result = a / b;   // Exception thrown here
+Console.WriteLine(result);  // This line never runs
+```
+
+The crash message you'd see is something like:
+```
+Unhandled exception: System.DivideByZeroException: Attempted to divide by zero.
+```
+
+C# is telling you: the type of exception is `DivideByZeroException`, and the reason is "Attempted to divide by zero." Every exception has a type (which tells you *what* went wrong) and a message (which tells you *why*).
+
+## `try` and `catch`: The Basic Pattern
+
+A `try` block says "attempt this code." A `catch` block says "if an exception occurs, run this instead":
+
+```csharp
+try
 {
-    // 'this string s' means: this method extends the 'string' type
-    // 's' will be the string instance the method is called on
-    public static bool IsNullOrEmpty(this string? s)
+    // Code that might fail goes inside the try block
+    Console.Write("Enter a number: ");
+    string input = Console.ReadLine();
+
+    // int.Parse will throw FormatException if input is not a valid number
+    int number = int.Parse(input);
+
+    Console.WriteLine($"You entered: {number}");
+    Console.WriteLine($"Doubled: {number * 2}");
+}
+catch (FormatException ex)
+{
+    // This block runs ONLY if a FormatException was thrown
+    // 'ex' is the exception object — it contains details about what went wrong
+    Console.WriteLine("That wasn't a valid number.");
+    Console.WriteLine($"Details: {ex.Message}");
+}
+
+// Program continues here whether or not an exception occurred
+Console.WriteLine("Program still running.");
+```
+
+Walk through what happens:
+- If the user types `"42"`: `int.Parse("42")` succeeds, no exception, `catch` block is skipped, output shows the number
+- If the user types `"abc"`: `int.Parse("abc")` throws a `FormatException`, execution immediately jumps to the `catch` block, the doubled-number line never runs
+
+The `ex` variable gives you access to the exception object. Its most useful property is `ex.Message` — a human-readable description of what went wrong.
+
+## Catching Different Exception Types
+
+You can have multiple `catch` blocks, each handling a different kind of exception. C# tries them in order and runs the first one that matches:
+
+```csharp
+static void ProcessInput(string input, string[] data)
+{
+    try
     {
-        return s == null || s.Length == 0;
+        // Parse the input as an integer index
+        int index = int.Parse(input);
+
+        // Access the array at that index
+        string item = data[index];
+
+        Console.WriteLine($"Item at index {index}: {item}");
     }
-
-    // Multiple parameters: 'this' is always first, others are regular parameters
-    public static string Repeat(this string s, int times)
+    catch (FormatException)
     {
-        // string.Concat joins an enumerable of strings
-        return string.Concat(Enumerable.Repeat(s, times));
+        // Thrown by int.Parse when the string isn't a number
+        // Notice: no 'ex' variable needed if you don't use it
+        Console.WriteLine("Error: Please enter a whole number.");
     }
-
-    public static string TruncateAt(this string s, int maxLength)
+    catch (IndexOutOfRangeException)
     {
-        if (s.Length <= maxLength) return s;
-        return s[..maxLength] + "...";   // Range syntax: s[0..maxLength]
+        // Thrown when you access an array index that doesn't exist
+        // e.g., data has 3 items but you asked for index 5
+        Console.WriteLine($"Error: Index out of range. Array has {data.Length} items.");
     }
-
-    public static string ToTitleCase(this string s)
+    catch (Exception ex)
     {
-        if (string.IsNullOrEmpty(s)) return s;
-
-        // Split into words, capitalize first letter of each, rejoin
-        return string.Join(" ",
-            s.Split(' ')
-             .Select(word => word.Length > 0
-                 ? char.ToUpper(word[0]) + word[1..].ToLower()
-                 : word));
+        // This catches ANY exception not caught above
+        // 'Exception' is the base type of all exceptions
+        // Useful as a safety net, but try to be specific when possible
+        Console.WriteLine($"Unexpected error: {ex.Message}");
     }
 }
 
-// Now you can call these as if they were built-in string methods:
-string name = "hello world";
+string[] fruits = { "apple", "banana", "cherry" };
 
-Console.WriteLine(name.IsNullOrEmpty());            // False
-Console.WriteLine("ha".Repeat(3));                  // hahaha
-Console.WriteLine("This is a very long sentence".TruncateAt(10));  // This is a...
-Console.WriteLine("the quick brown fox".ToTitleCase());             // The Quick Brown Fox
-
-// Works with null too
-string? empty = null;
-Console.WriteLine(empty.IsNullOrEmpty());           // True (no NullReferenceException!)
+ProcessInput("1", fruits);    // Item at index 1: banana
+ProcessInput("abc", fruits);  // Error: Please enter a whole number.
+ProcessInput("99", fruits);   // Error: Index out of range. Array has 3 items.
 ```
 
-The key point: `name.TruncateAt(10)` looks exactly like a normal method call on `string`, but `string` itself has no `TruncateAt` method. The compiler translates it to `StringExtensions.TruncateAt(name, 10)`.
+**Order matters**: always put more specific exception types before less specific ones. If you put `catch (Exception)` first, it catches everything and the specific blocks below it are never reached.
 
-## How LINQ Uses Extension Methods
+## `finally`: Code That Always Runs
 
-Every LINQ method (`Where`, `Select`, `OrderBy`, etc.) is an extension method on `IEnumerable<T>`. That's why they work on any collection — arrays, lists, sets, query results — anything that implements `IEnumerable<T>`.
+Sometimes you need to run cleanup code whether or not an exception occurred — for example, closing a file or releasing a network connection. The `finally` block runs in **all cases**: normal completion, exception caught, and even if an exception is not caught:
 
 ```csharp
-// This is roughly what the built-in Where extension method looks like internally:
-static class EnumerableExtensions
+static void ReadFile(string path)
 {
-    public static IEnumerable<T> Where<T>(this IEnumerable<T> source, Func<T, bool> predicate)
+    // Declare outside try so it's accessible in finally
+    System.IO.StreamReader? reader = null;
+
+    try
     {
-        foreach (T item in source)
-        {
-            if (predicate(item))
-                yield return item;   // Return matching items one at a time (lazily)
-        }
+        Console.WriteLine($"Opening file: {path}");
+        reader = new System.IO.StreamReader(path);
+
+        string contents = reader.ReadToEnd();
+        Console.WriteLine($"File contents ({contents.Length} chars):");
+        Console.WriteLine(contents);
+    }
+    catch (System.IO.FileNotFoundException)
+    {
+        Console.WriteLine($"Error: File '{path}' does not exist.");
+    }
+    catch (System.IO.IOException ex)
+    {
+        Console.WriteLine($"Error reading file: {ex.Message}");
+    }
+    finally
+    {
+        // This ALWAYS runs — even if we return early, or an exception wasn't caught
+        // Close the reader if it was successfully opened
+        reader?.Close();
+        Console.WriteLine("Cleanup done: reader closed.");
     }
 }
 
-// When you write this:
-var evens = numbers.Where(n => n % 2 == 0);
-
-// The compiler sees:
-var evens = EnumerableExtensions.Where(numbers, n => n % 2 == 0);
+ReadFile("notes.txt");   // Works if file exists; shows error if not
 ```
 
-Understanding this demystifies LINQ entirely: every `.Where(...)`, `.Select(...)`, `.OrderBy(...)` is just a static method being called, passing your lambda as an argument.
+The `finally` block is your guarantee: no matter what path execution takes, this code runs. This prevents **resource leaks** — situations where files stay open or memory stays allocated because an exception skipped your cleanup code.
 
-## LINQ: Core Operations
+## The `using` Statement: Automatic Cleanup
 
-Let's build up from what you know with a realistic dataset:
+Because "open a resource, use it, always close it" is so common, C# has a shortcut. Any type that implements `IDisposable` (a standard interface meaning "I have a cleanup method") can be used with `using`:
 
 ```csharp
-record Student(string Name, int Age, string Major, double GPA);
-
-var students = new List<Student>
+// WITHOUT using — manual try/finally required
+static void ManualCleanup(string path)
 {
-    new("Alice",   22, "Computer Science", 3.8),
-    new("Bob",     20, "Mathematics",      3.2),
-    new("Carol",   23, "Computer Science", 3.9),
-    new("Dave",    21, "Physics",          2.9),
-    new("Eve",     22, "Mathematics",      3.6),
-    new("Frank",   24, "Physics",          3.1),
-    new("Grace",   20, "Computer Science", 3.7),
-};
-```
-
-### `Where` — Filtering
-
-`Where` keeps only elements that satisfy a condition (the predicate returns `true`):
-
-```csharp
-// Students with GPA above 3.5
-var highAchievers = students.Where(s => s.GPA > 3.5);
-
-foreach (var s in highAchievers)
-    Console.WriteLine($"{s.Name}: {s.GPA}");
-// Alice: 3.8
-// Carol: 3.9
-// Eve: 3.6
-// Grace: 3.7
-
-// Multiple conditions: use && and ||
-var youngCS = students.Where(s => s.Major == "Computer Science" && s.Age <= 22);
-```
-
-### `Select` — Transforming
-
-`Select` transforms each element into something else. The output collection has the same number of items as the input, but each item is transformed:
-
-```csharp
-// Get just the names
-IEnumerable<string> names = students.Select(s => s.Name);
-Console.WriteLine(string.Join(", ", names));
-// Alice, Bob, Carol, Dave, Eve, Frank, Grace
-
-// Create a new anonymous object with selected properties
-var summary = students.Select(s => new
-{
-    s.Name,
-    Grade = s.GPA >= 3.5 ? "A" : s.GPA >= 3.0 ? "B" : "C"
-});
-
-foreach (var item in summary)
-    Console.WriteLine($"{item.Name}: {item.Grade}");
-```
-
-### `OrderBy` and `OrderByDescending` — Sorting
-
-```csharp
-// Sort by GPA, lowest first
-var byGpa = students.OrderBy(s => s.GPA);
-
-// Sort by GPA, highest first
-var byGpaDesc = students.OrderByDescending(s => s.GPA);
-
-// Sort by major, then by GPA within each major
-var byMajorThenGpa = students
-    .OrderBy(s => s.Major)
-    .ThenByDescending(s => s.GPA);
-
-foreach (var s in byMajorThenGpa)
-    Console.WriteLine($"{s.Major,-20} {s.Name,-10} {s.GPA}");
-```
-
-### `GroupBy` — Grouping Elements
-
-`GroupBy` splits a sequence into groups based on a key. Each group has a `Key` property and contains all the elements that share that key:
-
-```csharp
-// Group students by their major
-var byMajor = students.GroupBy(s => s.Major);
-
-foreach (var group in byMajor)
-{
-    // group.Key is the major name ("Computer Science", "Mathematics", etc.)
-    Console.WriteLine($"\n{group.Key}:");
-
-    // group itself is an IEnumerable<Student> — all students in this major
-    foreach (var student in group)
-        Console.WriteLine($"  {student.Name} ({student.GPA})");
+    System.IO.StreamReader? reader = null;
+    try
+    {
+        reader = new System.IO.StreamReader(path);
+        Console.WriteLine(reader.ReadToEnd());
+    }
+    finally
+    {
+        reader?.Dispose();   // Dispose() is the standard cleanup method
+    }
 }
 
-// Calculate average GPA per major
-var avgGpaByMajor = students
-    .GroupBy(s => s.Major)
-    .Select(group => new
-    {
-        Major = group.Key,
-        AverageGPA = group.Average(s => s.GPA),
-        Count = group.Count()
-    })
-    .OrderByDescending(m => m.AverageGPA);
-
-foreach (var m in avgGpaByMajor)
-    Console.WriteLine($"{m.Major}: avg GPA = {m.AverageGPA:F2} ({m.Count} students)");
-```
-
-### `SelectMany` — Flattening Nested Collections
-
-`Select` produces one output per input. `SelectMany` is used when each input produces *multiple* outputs and you want them all flattened into one sequence:
-
-```csharp
-// Each student has a list of courses — we want all courses across all students
-record StudentWithCourses(string Name, List<string> Courses);
-
-var students2 = new List<StudentWithCourses>
+// WITH using — identical behavior, half the code
+// The 'using' block automatically calls Dispose() when it exits, no matter what
+static void AutoCleanup(string path)
 {
-    new("Alice", new() { "Algorithms", "Databases", "Networks" }),
-    new("Bob",   new() { "Calculus", "Statistics" }),
-    new("Carol", new() { "Algorithms", "Machine Learning", "Databases" }),
-};
+    using (var reader = new System.IO.StreamReader(path))
+    {
+        Console.WriteLine(reader.ReadToEnd());
+    }
+    // reader.Dispose() is called here automatically, even if an exception occurred
+}
 
-// Select would give: [["Algorithms","Databases","Networks"], ["Calculus","Statistics"], ...]
-// SelectMany flattens it: ["Algorithms", "Databases", "Networks", "Calculus", ...]
-IEnumerable<string> allCourses = students2.SelectMany(s => s.Courses);
-Console.WriteLine(string.Join(", ", allCourses));
-
-// Find unique courses (using Distinct to remove duplicates)
-var uniqueCourses = students2
-    .SelectMany(s => s.Courses)
-    .Distinct()
-    .OrderBy(c => c);
-
-Console.WriteLine(string.Join(", ", uniqueCourses));
-// Algorithms, Calculus, Databases, Machine Learning, Networks, Statistics
+// Modern C# (C# 8+) declaration-style using — disposes at end of enclosing scope
+static void ModernCleanup(string path)
+{
+    using var reader = new System.IO.StreamReader(path);
+    Console.WriteLine(reader.ReadToEnd());
+    // reader.Dispose() called when the method returns
+}
 ```
 
-### Aggregation: `Count`, `Sum`, `Average`, `Min`, `Max`
+Whenever you see a type that has `.Dispose()` or shows up in Visual Studio with a suggestion to wrap it in `using`, use the `using` statement. It's the idiomatic C# way to handle resources.
 
-These reduce a sequence to a single value:
+## `throw`: Signalling an Error Yourself
+
+You're not limited to catching exceptions — you can also **throw** them yourself when your code detects an invalid situation:
 
 ```csharp
-Console.WriteLine($"Total students: {students.Count()}");
-Console.WriteLine($"CS students: {students.Count(s => s.Major == "Computer Science")}");
-Console.WriteLine($"Average GPA: {students.Average(s => s.GPA):F2}");
-Console.WriteLine($"Highest GPA: {students.Max(s => s.GPA)}");
-Console.WriteLine($"Youngest: {students.Min(s => s.Age)}");
-Console.WriteLine($"GPA sum: {students.Sum(s => s.GPA):F1}");
+static double Divide(double numerator, double denominator)
+{
+    // Check for invalid input before doing the work
+    if (denominator == 0)
+    {
+        // throw creates and raises an exception right here
+        // Execution immediately leaves this method and goes to the nearest catch
+        throw new ArgumentException("Denominator cannot be zero.", nameof(denominator));
+    }
+
+    return numerator / denominator;
+}
+
+static void SetAge(int age)
+{
+    if (age < 0)
+        throw new ArgumentOutOfRangeException(nameof(age), "Age cannot be negative.");
+
+    if (age > 150)
+        throw new ArgumentOutOfRangeException(nameof(age), $"Age {age} is unrealistically large.");
+
+    Console.WriteLine($"Age set to {age}");
+}
+
+static string GetUserName(string? name)
+{
+    // ArgumentNullException is the conventional choice when a required value is null
+    if (name is null)
+        throw new ArgumentNullException(nameof(name), "Name is required.");
+
+    return name.Trim();
+}
+
+// Using these methods:
+try
+{
+    Console.WriteLine(Divide(10, 2));    // 5
+    SetAge(25);                          // Age set to 25
+    SetAge(-5);                          // Throws! Caught below.
+}
+catch (ArgumentOutOfRangeException ex)
+{
+    Console.WriteLine($"Invalid argument: {ex.Message}");
+}
 ```
 
-### `First`, `FirstOrDefault`, `Single`, `Any`, `All`
+The `nameof(denominator)` expression produces the string `"denominator"` — the name of the parameter. This is better than hardcoding `"denominator"` as a string because if you rename the parameter, `nameof` updates automatically and the compiler catches the change.
 
-These are for finding specific elements or checking conditions:
+## Re-throwing Exceptions
+
+Sometimes you catch an exception, do some partial handling (like logging), and then want to pass it on to the caller. Use `throw` without an argument to re-throw the **original** exception, preserving its full history:
 
 ```csharp
-// First — returns the first matching element; throws if none found
-Student first = students.First(s => s.GPA > 3.8);
-Console.WriteLine(first.Name);   // Carol
+static void LoadConfiguration(string path)
+{
+    try
+    {
+        string json = System.IO.File.ReadAllText(path);
+        Console.WriteLine($"Loaded config from {path}");
+        // ... process json ...
+    }
+    catch (System.IO.FileNotFoundException ex)
+    {
+        // Log the error (or do partial handling)
+        Console.WriteLine($"[LOG] Config file not found: {ex.Message}");
 
-// FirstOrDefault — returns null if none found (safe version)
-Student? found = students.FirstOrDefault(s => s.Major == "Biology");
-Console.WriteLine(found?.Name ?? "Not found");   // Not found
+        // Re-throw — the caller will also get the exception
+        // 'throw' alone preserves the original stack trace
+        // 'throw ex' would reset the stack trace (don't do that)
+        throw;
+    }
+}
 
-// Single — like First, but throws if MORE THAN ONE matches
-// Use when you expect exactly one result (e.g., find by unique ID)
-Student? alice = students.SingleOrDefault(s => s.Name == "Alice");
-
-// Any — does ANY element match?
-bool hasPhysicsStudents = students.Any(s => s.Major == "Physics");
-Console.WriteLine(hasPhysicsStudents);   // True
-
-bool hasDropouts = students.Any(s => s.GPA < 2.0);
-Console.WriteLine(hasDropouts);   // False
-
-// All — do ALL elements match?
-bool allAdults = students.All(s => s.Age >= 18);
-Console.WriteLine(allAdults);   // True
-
-bool allHighGPA = students.All(s => s.GPA > 3.5);
-Console.WriteLine(allHighGPA);  // False
+try
+{
+    LoadConfiguration("config.json");
+}
+catch (System.IO.FileNotFoundException)
+{
+    Console.WriteLine("Startup failed: missing configuration file.");
+    // In a real app you might exit, show an error dialog, etc.
+}
 ```
 
-### `Distinct`, `Take`, `Skip`
+## Creating Custom Exception Types
+
+The built-in exception types cover most cases, but sometimes you want a type that clearly communicates a domain-specific problem. Create a class that inherits from `Exception`:
 
 ```csharp
-var ages = students.Select(s => s.Age).Distinct().OrderBy(a => a);
-Console.WriteLine(string.Join(", ", ages));   // 20, 21, 22, 23, 24
+// Custom exception for our banking domain
+class InsufficientFundsException : Exception
+{
+    // Extra property specific to this exception
+    public decimal AttemptedAmount { get; }
+    public decimal AvailableBalance { get; }
 
-// Take the top 3 (by GPA)
-var top3 = students.OrderByDescending(s => s.GPA).Take(3);
+    // Pass the message up to the base Exception class
+    public InsufficientFundsException(decimal attempted, decimal available)
+        : base($"Cannot withdraw {attempted:C}. Available balance: {available:C}")
+    {
+        AttemptedAmount  = attempted;
+        AvailableBalance = available;
+    }
+}
 
-// Skip the first 2, take the next 3
-var page2 = students.OrderBy(s => s.Name).Skip(2).Take(3);
-// Useful for paging: Skip((pageNumber - 1) * pageSize).Take(pageSize)
+class BankAccount
+{
+    private decimal _balance;
+
+    public BankAccount(decimal initialBalance)
+    {
+        _balance = initialBalance;
+    }
+
+    public void Withdraw(decimal amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("Withdrawal amount must be positive.", nameof(amount));
+
+        if (amount > _balance)
+            throw new InsufficientFundsException(amount, _balance);
+
+        _balance -= amount;
+        Console.WriteLine($"Withdrew {amount:C}. New balance: {_balance:C}");
+    }
+}
+
+var account = new BankAccount(100m);
+
+try
+{
+    account.Withdraw(40m);    // Success
+    account.Withdraw(90m);    // Fails — insufficient funds
+}
+catch (InsufficientFundsException ex)
+{
+    Console.WriteLine($"Transaction declined: {ex.Message}");
+    Console.WriteLine($"You tried: {ex.AttemptedAmount:C}");
+    Console.WriteLine($"You have: {ex.AvailableBalance:C}");
+}
 ```
 
-## Chaining: Building a Pipeline
+## Common Built-In Exception Types
 
-LINQ's real power is chaining operations. Each method receives the output of the previous one. Build complex queries as readable pipelines:
+You'll encounter these regularly:
+
+| Exception Type | When it's thrown |
+|---|---|
+| `ArgumentNullException` | A required argument was `null` |
+| `ArgumentOutOfRangeException` | An argument's value was outside an acceptable range |
+| `ArgumentException` | An argument was invalid for some other reason |
+| `InvalidOperationException` | You called a method at the wrong time (e.g., reading a closed file) |
+| `FormatException` | A string couldn't be parsed (e.g., `int.Parse("abc")`) |
+| `OverflowException` | An arithmetic result was too large for its type |
+| `IndexOutOfRangeException` | An array index was negative or ≥ array length |
+| `NullReferenceException` | You tried to use `null` as if it were an object |
+| `DivideByZeroException` | Integer division by zero |
+| `NotImplementedException` | A method intentionally has no implementation yet |
+| `NotSupportedException` | An operation is not supported by this type |
+
+## When to Catch and When Not To
+
+A beginner's instinct is often to wrap everything in `try/catch`. Resist that. Here's a practical guide:
+
+**Catch exceptions when** you can do something useful with them — show the user a friendly message, retry the operation, use a fallback value, or log and continue.
+
+**Don't catch exceptions when** you have no useful response. Let them bubble up to a higher level that does know how to handle them. A function that reads a file shouldn't catch every possible error and swallow it silently — the caller needs to know something went wrong.
+
+**Never do this**: catching an exception and doing nothing (called "swallowing" it) hides bugs and makes programs very hard to debug:
 
 ```csharp
-// "Find the names of CS students aged 22 or younger,
-//  sorted by GPA descending, showing top 3"
-var result = students
-    .Where(s => s.Major == "Computer Science")    // Filter by major
-    .Where(s => s.Age <= 22)                       // And by age
-    .OrderByDescending(s => s.GPA)                 // Sort by GPA, best first
-    .Take(3)                                       // Only top 3
-    .Select(s => $"{s.Name} ({s.GPA})");           // Format as string
+// Bad — hides the error completely
+try
+{
+    DoSomething();
+}
+catch (Exception)
+{
+    // Empty: the error happened, nobody knows, program continues in broken state
+}
 
-foreach (string line in result)
-    Console.WriteLine(line);
-// Carol (3.9)
-// Alice (3.8)
-// Grace (3.7)
+// Good — at minimum, log it
+try
+{
+    DoSomething();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"[ERROR] {ex.Message}");
+    // Decide: can we recover? If not, re-throw.
+    throw;
+}
 ```
-
-Read it top to bottom: start with all students, filter to CS, filter to age ≤ 22, sort, take top 3, format. Each step receives the output of the step above. This is more readable than equivalent loops because the **intent** of each step is clear from its name.
-
-## `ToList()` and `ToArray()`: When to Materialize
-
-LINQ queries are **lazy** — they don't run until you iterate them. Each time you iterate the query, it runs again from scratch. If you need to:
-- Use the results more than once
-- Know the count before iterating
-- Avoid re-running an expensive query
-
-...then call `.ToList()` or `.ToArray()` to execute the query immediately and store the results:
-
-```csharp
-var query = students.Where(s => s.GPA > 3.5);
-
-// Without ToList: the Where runs once for each foreach
-foreach (var s in query) Console.WriteLine(s.Name);   // Runs the filter
-foreach (var s in query) Console.WriteLine(s.Age);    // Runs the filter AGAIN
-
-// With ToList: filter runs once, results stored in memory
-List<Student> results = students.Where(s => s.GPA > 3.5).ToList();
-
-Console.WriteLine(results.Count);                      // Instant — list already computed
-foreach (var s in results) Console.WriteLine(s.Name); // No re-evaluation
-foreach (var s in results) Console.WriteLine(s.Age);  // No re-evaluation
-```
-
-As a rule: if you'll use the results once, keep it as `IEnumerable<T>` (lazy). If you'll use them multiple times or need `.Count`, call `.ToList()`.

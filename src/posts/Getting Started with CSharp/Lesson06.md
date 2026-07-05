@@ -1,393 +1,292 @@
-# Classes, Objects, and Records
+# Loops and Iteration: LINQ as a First-Class Citizen
 
-C# is fundamentally an object-oriented language — most code you write lives inside a **class**. But C# has evolved beyond classical OOP. C# 9 introduced **records**: immutable, value-semantics types defined in one line that replace the boilerplate-heavy classes that OOP traditionally demands for data. Understanding both the classical and modern approaches is essential to reading real C# codebases.
+C#'s loop constructs are syntactically familiar: `for`, `while`, `do-while`, `foreach`. What makes C# iteration distinctive is **LINQ** (Language Integrated Query) — a set of language features and library methods introduced in C# 3.0 that bring SQL-like declarative queries directly into the language. LINQ isn't a bolt-on — the `foreach` loop, iterator methods, and expression trees are all designed to work together with it. Understanding iteration in C# means understanding where loops end and LINQ begins.
 
-## Defining a Class
-
-A class is a blueprint. An **object** (also called an **instance**) is created from that blueprint with `new`:
+## The `for` Loop
 
 ```csharp
-class Person
+// Classic indexed loop
+for (int i = 0; i < 5; i++)
 {
-    // Fields: raw data storage (typically private)
-    private string _name;
-    private int _age;
+    Console.Write(i + " ");
+}
+Console.WriteLine();
 
-    // Constructor: called when you write new Person(...)
-    public Person(string name, int age)
-    {
-        _name = name;
-        _age  = age;
-    }
+// Summing
+int sum = 0;
+for (int i = 1; i <= 100; i++) sum += i;
+Console.WriteLine($"Sum 1-100: {sum}");  // 5050
 
-    // Properties: controlled access to fields
-    public string Name
-    {
-        get => _name;
-        set => _name = value ?? throw new ArgumentNullException(nameof(value));
-    }
+// Multiple variables
+for (int i = 0, j = 10; i < j; i++, j--)
+{
+    Console.Write($"({i},{j}) ");
+}
+Console.WriteLine();
 
-    public int Age
+// Decrement
+for (int i = 10; i > 0; i--)
+    Console.Write(i + " ");
+Console.WriteLine();
+
+// Infinite loop with break
+int count = 0;
+for (;;)   // equivalent to while(true)
+{
+    count++;
+    if (count >= 5) break;
+}
+Console.WriteLine($"count = {count}");
+```
+
+## The `foreach` Loop
+
+`foreach` works on anything implementing `IEnumerable<T>` — arrays, lists, strings, files, database results, generators:
+
+```csharp
+// Over array
+int[] numbers = { 1, 2, 3, 4, 5 };
+foreach (int n in numbers)
+    Console.Write(n + " ");
+Console.WriteLine();
+
+// Over List
+var fruits = new List<string> { "apple", "banana", "cherry" };
+foreach (string fruit in fruits)
+    Console.WriteLine(fruit.ToUpper());
+
+// Over string (char by char)
+foreach (char c in "Hello")
+    Console.Write(c + "-");
+Console.WriteLine();
+
+// Over Dictionary
+var scores = new Dictionary<string, int>
+{
+    ["Alice"]   = 95,
+    ["Bob"]     = 82,
+    ["Charlie"] = 91
+};
+foreach (var (name, score) in scores)   // Tuple deconstruction
+    Console.WriteLine($"  {name}: {score}");
+```
+
+The tuple deconstruction `var (name, score) in scores` is C# 7's **deconstruction** syntax. `Dictionary<K,V>.GetEnumerator()` yields `KeyValuePair<K,V>`, and C# 7 lets you destructure it inline.
+
+## `while` and `do-while`
+
+```csharp
+// while: check first
+int value = 100;
+int steps = 0;
+while (value != 1)
+{
+    value = value % 2 == 0 ? value / 2 : 3 * value + 1;  // Collatz
+    steps++;
+}
+Console.WriteLine($"Collatz(100): {steps} steps");
+
+// do-while: execute first, check after
+int attempts = 0;
+do
+{
+    Console.WriteLine($"Attempt {++attempts}");
+} while (attempts < 3);
+
+// Newton-Raphson square root
+double target = 9.0;
+double guess = target;
+double prev;
+do
+{
+    prev = guess;
+    guess = (guess + target / guess) / 2.0;
+} while (Math.Abs(guess - prev) > 1e-12);
+Console.WriteLine($"sqrt(9) ≈ {guess}");
+```
+
+## `break`, `continue`, and `goto`
+
+Unlike Java, C# actually has `goto` — but it's limited to jumping to labels within the same method or to switch cases. It's rarely justified, but exists:
+
+```csharp
+// break
+foreach (int n in new[] { 3, 7, -1, 9, 4 })
+{
+    if (n < 0) break;
+    Console.Write(n + " ");
+}
+Console.WriteLine();
+
+// continue
+for (int i = 0; i < 10; i++)
+{
+    if (i % 2 == 0) continue;
+    Console.Write(i + " ");   // Only odd numbers
+}
+Console.WriteLine();
+
+// Breaking nested loops without flags — use a local function or goto
+static void FindInMatrix()
+{
+    int[,] matrix = { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } };
+    int target = 5;
+    bool found = false;
+
+    for (int i = 0; i < 3 && !found; i++)
     {
-        get => _age;
-        set
+        for (int j = 0; j < 3; j++)
         {
-            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
-            _age = value;
+            if (matrix[i, j] == target)
+            {
+                Console.WriteLine($"Found {target} at [{i},{j}]");
+                found = true;
+                break;
+            }
         }
     }
-
-    // Method
-    public string Greet() => $"Hi, I'm {_name}, age {_age}.";
-
-    // Override ToString — called automatically by Console.WriteLine, string interpolation, etc.
-    public override string ToString() => $"Person({_name}, {_age})";
 }
-
-var alice = new Person("Alice", 30);
-Console.WriteLine(alice.Greet());    // Hi, I'm Alice, age 30.
-Console.WriteLine(alice);            // Person(Alice, 30) — uses ToString()
-alice.Age = 31;                      // Property setter
-// alice.Age = -1;                   // Would throw ArgumentOutOfRangeException
+FindInMatrix();
 ```
 
-## Auto-Properties
+## Iterator Methods: `yield return`
 
-Writing a backing field for every property is tedious when no special validation is needed. **Auto-properties** let the compiler generate the backing field for you:
+C#'s `yield return` creates **lazy sequences** — values are produced on demand, one at a time, without materializing the whole collection:
 
 ```csharp
-class Product
+// Generate an infinite Fibonacci sequence lazily
+static IEnumerable<long> Fibonacci()
 {
-    // The compiler generates a private backing field automatically
-    public string Name    { get; set; }
-    public decimal Price  { get; set; }
-    public int Stock      { get; private set; }   // External code can read, not write
-
-    // Read-only auto-property — can only be set in constructor or with init
-    public Guid Id { get; } = Guid.NewGuid();
-
-    public Product(string name, decimal price, int stock)
+    long a = 0, b = 1;
+    while (true)
     {
-        Name  = name;
-        Price = price;
-        Stock = stock;
+        yield return a;
+        (a, b) = (b, a + b);   // Tuple swap
     }
-
-    public void Restock(int units) => Stock += units;
 }
 
-var p = new Product("Widget", 9.99m, 100);
-Console.WriteLine(p.Id);        // A new Guid every time
-p.Restock(50);
-Console.WriteLine(p.Stock);     // 150
-// p.Stock = 0;                 // Compile error: private set
-```
+// Take only what you need — the generator stops when foreach stops
+foreach (long n in Fibonacci().Take(15))
+    Console.Write(n + " ");
+Console.WriteLine();
 
-## Constructors and Constructor Chaining
-
-A class can have multiple constructors. Use `this(...)` to chain them — the chained constructor runs first:
-
-```csharp
-class Rectangle
+// Primes via Sieve, lazily
+static IEnumerable<int> Primes(int max)
 {
-    public double Width  { get; }
-    public double Height { get; }
-
-    // Primary constructor
-    public Rectangle(double width, double height)
+    var sieve = new bool[max + 1];
+    for (int i = 2; i <= max; i++)
     {
-        Width  = width;
-        Height = height;
+        if (!sieve[i])
+        {
+            yield return i;
+            for (int j = i * 2; j <= max; j += i)
+                sieve[j] = true;
+        }
     }
-
-    // Convenience constructor: a square
-    public Rectangle(double side) : this(side, side) { }
-
-    // Default: unit square
-    public Rectangle() : this(1.0) { }
-
-    public double Area      => Width * Height;
-    public double Perimeter => 2 * (Width + Height);
-
-    public override string ToString() => $"Rectangle({Width} × {Height})";
 }
 
-Console.WriteLine(new Rectangle(4, 3).Area);       // 12
-Console.WriteLine(new Rectangle(5).Area);           // 25 — square
-Console.WriteLine(new Rectangle().Perimeter);       // 4 — unit square
+Console.Write("Primes to 50: ");
+foreach (int p in Primes(50))
+    Console.Write(p + " ");
+Console.WriteLine();
 ```
 
-## Object Initializers
+`yield return` produces an iterator that implements `IEnumerable<T>`. The method's execution is **suspended** at each `yield return` and resumed on the next `MoveNext()` call. This is cooperative multitasking within a single thread — the same mechanism that makes `async/await` work internally.
 
-You can set properties at construction without writing a constructor for every combination, using **object initializers**:
+## LINQ: Declarative Iteration
+
+LINQ (Language Integrated Query) provides a rich set of extension methods on `IEnumerable<T>` — and a query syntax that looks like SQL:
 
 ```csharp
-class Config
+var numbers = Enumerable.Range(1, 20).ToList();
+
+// Method syntax (most common in modern code)
+var result = numbers
+    .Where(n => n % 2 == 0)       // Filter: even numbers
+    .Select(n => n * n)            // Transform: square them
+    .Where(n => n > 50)            // Filter again
+    .OrderByDescending(n => n)     // Sort
+    .Take(5);                      // First 5
+
+Console.WriteLine(string.Join(", ", result));
+
+// Query syntax (SQL-like alternative — same output)
+var result2 =
+    from n in numbers
+    where n % 2 == 0
+    let squared = n * n
+    where squared > 50
+    orderby squared descending
+    select squared;
+
+Console.WriteLine(string.Join(", ", result2.Take(5)));
+
+// Aggregation
+Console.WriteLine($"Sum: {numbers.Sum()}");
+Console.WriteLine($"Average: {numbers.Average()}");
+Console.WriteLine($"Max: {numbers.Max()}");
+Console.WriteLine($"Count even: {numbers.Count(n => n % 2 == 0)}");
+
+// Grouping
+var words = new[] { "apple", "banana", "cherry", "avocado", "blueberry", "apricot" };
+var byFirstLetter = words
+    .GroupBy(w => w[0])
+    .OrderBy(g => g.Key);
+
+foreach (var group in byFirstLetter)
 {
-    public string Host    { get; set; } = "localhost";
-    public int    Port    { get; set; } = 8080;
-    public bool   UseTls  { get; set; } = false;
-    public int    Timeout { get; set; } = 30;
+    Console.WriteLine($"  '{group.Key}': {string.Join(", ", group)}");
 }
-
-// Set only what you want to change — the rest use defaults
-var cfg = new Config
-{
-    Host   = "api.example.com",
-    Port   = 443,
-    UseTls = true,
-    // Timeout stays 30
-};
-
-Console.WriteLine($"{cfg.Host}:{cfg.Port} TLS={cfg.UseTls}");
 ```
 
-Object initializers work on any settable property. They're extremely common in C# for configuration, test data, and DTOs.
+## LINQ Is Lazy
 
-## `static` Members and the `static` Class
-
-`static` members belong to the type, not to any instance. A `static` class can only contain `static` members and cannot be instantiated:
+LINQ operations build a pipeline description — they don't execute until you iterate the result. This laziness means:
 
 ```csharp
-static class MathUtils
-{
-    public static double Clamp(double value, double min, double max)
-        => Math.Max(min, Math.Min(max, value));
+// This query is built but not yet evaluated
+var query = Enumerable.Range(1, int.MaxValue)
+    .Where(n => n % 3 == 0)
+    .Select(n => n * n);
 
-    public static double Lerp(double a, double b, double t)
-        => a + (b - a) * t;
+// Execution happens here — stops after first 5 results
+// Without Take(5) this would run forever
+foreach (int n in query.Take(5))
+    Console.WriteLine(n);   // 9, 36, 81, 144, 225
 
-    // Constants are implicitly static
-    public const double GoldenRatio = 1.6180339887;
-}
-
-Console.WriteLine(MathUtils.Clamp(150, 0, 100));   // 100
-Console.WriteLine(MathUtils.Lerp(0, 100, 0.25));   // 25
+// Force immediate evaluation with ToList() or ToArray()
+var materialized = query.Take(10).ToList();
+Console.WriteLine($"Type: {materialized.GetType().Name}");
 ```
 
-## Inheritance
+The laziness is what makes LINQ over `IEnumerable<T>` efficient — you chain `Where`, `Select`, `Take` and each element is processed through the entire pipeline once, not in three separate passes. It's also why calling `Count()` on a LINQ query iterates the entire sequence — if you need to check both emptiness and count, call `ToList()` first.
 
-A class can inherit from one base class, gaining its fields, properties, and methods. The derived class can extend or override the base:
+## `foreach` Under the Hood
+
+The C# compiler desugars `foreach` into a pattern-based expansion. Any type with a `GetEnumerator()` method returning an object with `MoveNext()` and `Current` works, even if it doesn't implement `IEnumerable<T>`. This is how `async foreach` (`await foreach`) works — `IAsyncEnumerable<T>` has `MoveNextAsync()` instead:
 
 ```csharp
-class Animal
+// Custom iterable struct (no heap allocation!)
+struct Range
 {
-    public string Name { get; }
+    private readonly int start, end;
+    public Range(int start, int end) { this.start = start; this.end = end; }
 
-    public Animal(string name)
+    public Enumerator GetEnumerator() => new Enumerator(start, end);
+
+    public struct Enumerator
     {
-        Name = name;
+        private int current;
+        private readonly int end;
+        public Enumerator(int start, int end) { current = start - 1; this.end = end; }
+        public bool MoveNext() => ++current <= end;
+        public int Current => current;
     }
-
-    // virtual: derived classes may override this
-    public virtual string Speak() => "...";
-
-    public override string ToString() => $"{GetType().Name}({Name})";
 }
 
-class Dog : Animal
-{
-    public string Breed { get; }
-
-    public Dog(string name, string breed) : base(name)   // Call base constructor
-    {
-        Breed = breed;
-    }
-
-    public override string Speak() => "Woof!";   // override — replaces base implementation
-}
-
-class Cat : Animal
-{
-    public Cat(string name) : base(name) { }
-
-    public override string Speak() => "Meow.";
-}
-
-Animal[] animals = { new Dog("Rex", "Labrador"), new Cat("Whiskers"), new Dog("Buddy", "Poodle") };
-
-foreach (var animal in animals)
-    Console.WriteLine($"{animal.Name} says: {animal.Speak()}");
-// Rex says: Woof!
-// Whiskers says: Meow.
-// Buddy says: Woof!
+foreach (int i in new Range(1, 5))
+    Console.Write(i + " ");
+Console.WriteLine();  // 1 2 3 4 5
 ```
 
-The array is typed as `Animal[]` but each element is actually a `Dog` or `Cat`. When `.Speak()` is called, C#'s **virtual dispatch** finds the correct overriding method at runtime. This is **polymorphism**.
-
-## `sealed`, `abstract`, and `base`
-
-```csharp
-// abstract: can't be instantiated — must be subclassed
-abstract class Shape
-{
-    public abstract double Area { get; }         // Must be implemented by subclass
-    public abstract double Perimeter { get; }
-
-    public virtual string Describe()             // Optional to override
-        => $"{GetType().Name}: area={Area:F2}, perimeter={Perimeter:F2}";
-}
-
-class Circle : Shape
-{
-    public double Radius { get; }
-    public Circle(double r) { Radius = r; }
-
-    public override double Area      => Math.PI * Radius * Radius;
-    public override double Perimeter => 2 * Math.PI * Radius;
-}
-
-// sealed: no further inheritance allowed
-sealed class ImmutablePoint : Shape
-{
-    public double X { get; }
-    public double Y { get; }
-    public ImmutablePoint(double x, double y) { X = x; Y = y; }
-
-    public override double Area      => 0;
-    public override double Perimeter => 0;
-
-    public override string Describe()
-        => $"Point({X}, {Y})";   // Override optional virtual method
-}
-
-Shape s = new Circle(5);
-Console.WriteLine(s.Describe());   // Circle: area=78.54, perimeter=31.42
-```
-
-## `record`: Immutable Value-Semantics Types
-
-Records are C# 9's answer to a common problem: data-carrying objects where equality should be based on values, not identity. With a regular class, two `Person` objects with the same name and age are not equal by default (reference equality). With a record, they are:
-
-```csharp
-// Positional record: one line creates constructor, properties, Equals, GetHashCode, ToString
-record Point(double X, double Y);
-
-var p1 = new Point(1.0, 2.0);
-var p2 = new Point(1.0, 2.0);
-var p3 = new Point(3.0, 4.0);
-
-Console.WriteLine(p1 == p2);   // True  — value equality
-Console.WriteLine(p1 == p3);   // False
-Console.WriteLine(p1);         // Point { X = 1, Y = 2 } — built-in ToString
-
-// Records are immutable by default — but you can "update" with 'with'
-var p4 = p1 with { Y = 99.0 };   // New record, X copied from p1
-Console.WriteLine(p4);            // Point { X = 1, Y = 99 }
-Console.WriteLine(p1);            // Point { X = 1, Y = 2 } — unchanged
-```
-
-The `with` expression is unique to records: it creates a copy with specified properties changed, leaving the original untouched. This is the **non-destructive mutation** pattern — extremely useful in functional-style code.
-
-## Records vs Classes: When to Use Which
-
-```csharp
-// Record — use for: data, DTOs, return values, immutable config, value-semantics
-record UserDto(int Id, string Name, string Email);
-
-// Class — use for: objects with identity, mutable state, services, controllers
-class UserService
-{
-    private readonly List<UserDto> _users = new();
-
-    public void AddUser(UserDto user) => _users.Add(user);
-    public UserDto? FindById(int id)  => _users.FirstOrDefault(u => u.Id == id);
-}
-
-var service = new UserService();
-service.AddUser(new UserDto(1, "Alice", "alice@example.com"));
-service.AddUser(new UserDto(2, "Bob",   "bob@example.com"));
-
-var found = service.FindById(1);
-Console.WriteLine(found);   // UserDto { Id = 1, Name = Alice, Email = alice@example.com }
-
-// Records can have methods too
-record Temperature(double Celsius)
-{
-    public double Fahrenheit => Celsius * 9.0 / 5.0 + 32;
-    public bool IsFreezing   => Celsius <= 0;
-    public override string ToString() => $"{Celsius}°C ({Fahrenheit:F1}°F)";
-}
-
-var t = new Temperature(100);
-Console.WriteLine(t);              // 100°C (212.0°F)
-Console.WriteLine(t.IsFreezing);   // False
-```
-
-## `record struct`: Value-Type Records
-
-C# 10 added `record struct` — the same value-semantics convenience but as a stack-allocated struct:
-
-```csharp
-record struct Rgb(byte R, byte G, byte B)
-{
-    public static readonly Rgb Red   = new(255, 0, 0);
-    public static readonly Rgb Green = new(0, 255, 0);
-    public static readonly Rgb Blue  = new(0, 0, 255);
-
-    public Rgb Mix(Rgb other) => new(
-        (byte)((R + other.R) / 2),
-        (byte)((G + other.G) / 2),
-        (byte)((B + other.B) / 2)
-    );
-}
-
-var purple = Rgb.Red.Mix(Rgb.Blue);
-Console.WriteLine(purple);   // Rgb { R = 127, G = 0, B = 127 }
-```
-
-Use `record struct` for small, frequently created data values where you want both value semantics and stack allocation.
-
-## Encapsulation and Access Modifiers
-
-C# has five access modifiers:
-
-| Modifier | Accessible from |
-|---|---|
-| `public` | Anywhere |
-| `private` | This class only |
-| `protected` | This class and derived classes |
-| `internal` | This assembly (project) only |
-| `protected internal` | This assembly OR derived classes |
-| `private protected` | This class and derived classes within this assembly |
-
-The default is `private` for class members, `internal` for top-level types. Prefer the most restrictive level that works — it makes code easier to reason about and refactor.
-
-```csharp
-class BankAccount
-{
-    private decimal _balance;               // Only this class
-    protected string OwnerId { get; }       // This class + subclasses
-    public string AccountNumber { get; }    // Everyone
-
-    internal void ReconcileWithBank() { }   // Only within this project
-
-    public BankAccount(string ownerId, string accountNumber)
-    {
-        OwnerId       = ownerId;
-        AccountNumber = accountNumber;
-        _balance      = 0;
-    }
-
-    public void Deposit(decimal amount)
-    {
-        if (amount <= 0) throw new ArgumentException("Amount must be positive");
-        _balance += amount;
-    }
-
-    public bool Withdraw(decimal amount)
-    {
-        if (amount > _balance) return false;
-        _balance -= amount;
-        return true;
-    }
-
-    public decimal Balance => _balance;
-}
-
-var account = new BankAccount("user-1", "ACC-001");
-account.Deposit(500);
-Console.WriteLine(account.Withdraw(200));   // True
-Console.WriteLine(account.Balance);         // 300
-// account._balance = 9999;                // Compile error: private
-```
+This struct-based enumerator allocates zero bytes on the heap — every `foreach` iteration is pure stack-based operation. This pattern is used extensively in high-performance .NET code.

@@ -1,311 +1,336 @@
-# Events: Reacting to Things That Happen
+# Extension Methods and LINQ in Depth
 
-A button click, a timer going off, a download finishing, a new message arriving — these are all **events**: things that happen at unpredictable times, to which your code needs to react. C#'s **event** system is the built-in way to handle this. It lets one part of your code say "tell me when this happens" and another part say "it just happened!"
+In Lesson 04 you saw LINQ used to filter and transform collections. Here we'll go deeper: how LINQ is actually built (using **extension methods**), how to write your own extension methods, and the full set of LINQ operations that courses commonly test.
 
-## The Problem Events Solve
+## Extension Methods: Adding Methods to Types You Don't Own
 
-Imagine a class that downloads data. It finishes at some unknown time in the future. How does it tell the rest of your program? You could check repeatedly ("is it done yet?"), but that's wasteful. Events let it instead **notify** any interested code the instant it completes.
+Normally, to add a method to a type, you edit that type's source code. But what if you want to add a method to `string`, or `int`, or a .NET collection type? You can't edit those — they're part of the .NET framework. Extension methods let you **add** methods to any type without touching its source code.
 
-This pattern — "notify me when something happens" — is called **publish/subscribe** or **observer**. The class that has the event is the **publisher**. Code that wants to know about it is a **subscriber**.
-
-## Delegates: The Foundation
-
-Before events, you need to understand **delegates** (covered in Lesson 05, revisited here for events). A delegate is a variable that holds a method — or several methods at once. Events are built on top of delegates.
+An extension method is a `static` method in a `static` class where the first parameter has the keyword `this` in front of it. That `this` tells C# "this method extends the type of this parameter":
 
 ```csharp
-// A delegate type: defines the signature of methods that can be stored
-// This one takes a string and returns nothing
-delegate void MessageHandler(string message);
-
-static void DisplayMessage(string msg)
+// A static class to hold extension methods
+static class StringExtensions
 {
-    Console.WriteLine($"Display: {msg}");
+    // 'this string s' means: this method extends the 'string' type
+    // 's' will be the string instance the method is called on
+    public static bool IsNullOrEmpty(this string? s)
+    {
+        return s == null || s.Length == 0;
+    }
+
+    // Multiple parameters: 'this' is always first, others are regular parameters
+    public static string Repeat(this string s, int times)
+    {
+        // string.Concat joins an enumerable of strings
+        return string.Concat(Enumerable.Repeat(s, times));
+    }
+
+    public static string TruncateAt(this string s, int maxLength)
+    {
+        if (s.Length <= maxLength) return s;
+        return s[..maxLength] + "...";   // Range syntax: s[0..maxLength]
+    }
+
+    public static string ToTitleCase(this string s)
+    {
+        if (string.IsNullOrEmpty(s)) return s;
+
+        // Split into words, capitalize first letter of each, rejoin
+        return string.Join(" ",
+            s.Split(' ')
+             .Select(word => word.Length > 0
+                 ? char.ToUpper(word[0]) + word[1..].ToLower()
+                 : word));
+    }
 }
 
-static void LogMessage(string msg)
-{
-    Console.WriteLine($"Log: {msg}");
-}
+// Now you can call these as if they were built-in string methods:
+string name = "hello world";
 
-// A delegate variable can hold one method
-MessageHandler handler = DisplayMessage;
-handler("Hello");   // Display: Hello
+Console.WriteLine(name.IsNullOrEmpty());            // False
+Console.WriteLine("ha".Repeat(3));                  // hahaha
+Console.WriteLine("This is a very long sentence".TruncateAt(10));  // This is a...
+Console.WriteLine("the quick brown fox".ToTitleCase());             // The Quick Brown Fox
 
-// Or multiple methods — using += to add more
-handler += LogMessage;
-handler("Hello");   // Runs BOTH methods:
-                    // Display: Hello
-                    // Log: Hello
-
-// Use -= to remove a method
-handler -= DisplayMessage;
-handler("Hello");   // Only LogMessage now:
-                    // Log: Hello
+// Works with null too
+string? empty = null;
+Console.WriteLine(empty.IsNullOrEmpty());           // True (no NullReferenceException!)
 ```
 
-The `+=` operator adds a method to the delegate's **invocation list** — all the methods it will call. `-=` removes one.
+The key point: `name.TruncateAt(10)` looks exactly like a normal method call on `string`, but `string` itself has no `TruncateAt` method. The compiler translates it to `StringExtensions.TruncateAt(name, 10)`.
 
-## Declaring and Using an Event
+## How LINQ Uses Extension Methods
 
-An `event` is a delegate variable with restrictions: outside code can only `+=` (subscribe) or `-=` (unsubscribe) — it cannot call the event directly or replace it. Only the class that owns the event can **raise** (invoke) it.
-
-Here's a complete example of a timer that raises an event every tick:
+Every LINQ method (`Where`, `Select`, `OrderBy`, etc.) is an extension method on `IEnumerable<T>`. That's why they work on any collection — arrays, lists, sets, query results — anything that implements `IEnumerable<T>`.
 
 ```csharp
-class SimpleTimer
+// This is roughly what the built-in Where extension method looks like internally:
+static class EnumerableExtensions
 {
-    // Step 1: Declare the event using a delegate type.
-    // 'event' keyword means: subscribers can += and -= but cannot invoke directly.
-    // Action<int> is a built-in delegate type: a method that takes an int, returns void.
-    public event Action<int>? Tick;
-
-    // This method raises (fires) the event
-    public void Start(int ticks, int intervalMs)
+    public static IEnumerable<T> Where<T>(this IEnumerable<T> source, Func<T, bool> predicate)
     {
-        for (int i = 1; i <= ticks; i++)
+        foreach (T item in source)
         {
-            // Wait before firing
-            System.Threading.Thread.Sleep(intervalMs);
-
-            // Raise the event: notify all subscribers.
-            // The ?. (null conditional) is needed because Tick is null if nobody subscribed.
-            // Without it, invoking a null event would crash.
-            Tick?.Invoke(i);
+            if (predicate(item))
+                yield return item;   // Return matching items one at a time (lazily)
         }
     }
 }
 
-class Program
-{
-    static void Main()
-    {
-        var timer = new SimpleTimer();
+// When you write this:
+var evens = numbers.Where(n => n % 2 == 0);
 
-        // Subscribe: "when Tick fires, run this lambda"
-        timer.Tick += tickNumber =>
-        {
-            Console.WriteLine($"Tick #{tickNumber}");
-        };
-
-        // Subscribe a second handler to the same event
-        timer.Tick += tickNumber =>
-        {
-            if (tickNumber % 2 == 0)
-                Console.WriteLine($"  (even tick!)");
-        };
-
-        // Start the timer — it fires Tick 5 times, 500ms apart
-        timer.Start(5, 500);
-    }
-}
+// The compiler sees:
+var evens = EnumerableExtensions.Where(numbers, n => n % 2 == 0);
 ```
 
-Output:
-```
-Tick #1
-Tick #2
-  (even tick!)
-Tick #3
-Tick #4
-  (even tick!)
-Tick #5
-```
+Understanding this demystifies LINQ entirely: every `.Where(...)`, `.Select(...)`, `.OrderBy(...)` is just a static method being called, passing your lambda as an argument.
 
-Both subscribers run each time the event fires. The timer class doesn't know or care how many subscribers there are or what they do — it just fires the event.
+## LINQ: Core Operations
 
-## `EventHandler<TEventArgs>`: The Standard Pattern
-
-The pattern above works, but .NET has a **standard convention** for events, used throughout the entire framework: events should use `EventHandler<TEventArgs>`. Following this convention means your events look consistent with every other .NET event.
-
-The convention:
-- The event delegate takes two parameters: `object sender` (who fired it) and a `TEventArgs` (the event data)
-- Create a class that inherits from `EventArgs` to hold the event's specific data
+Let's build up from what you know with a realistic dataset:
 
 ```csharp
-// Step 1: Create an EventArgs class to hold the event's data
-class TemperatureChangedEventArgs : EventArgs
+record Student(string Name, int Age, string Major, double GPA);
+
+var students = new List<Student>
 {
-    // EventArgs is a simple base class with no built-in data —
-    // we add whatever fields are relevant to our event
-    public double OldTemperature { get; }
-    public double NewTemperature { get; }
-    public DateTime TimeOfChange { get; }
-
-    public TemperatureChangedEventArgs(double oldTemp, double newTemp)
-    {
-        OldTemperature = oldTemp;
-        NewTemperature = newTemp;
-        TimeOfChange   = DateTime.Now;
-    }
-}
-
-// Step 2: The publisher class
-class Thermostat
-{
-    private double _temperature;
-
-    // Declare the event using the standard EventHandler<T> delegate type
-    // 'object? sender' will be 'this' — a reference to the Thermostat that fired
-    // 'TemperatureChangedEventArgs e' holds the event data
-    public event EventHandler<TemperatureChangedEventArgs>? TemperatureChanged;
-
-    public double Temperature
-    {
-        get => _temperature;
-        set
-        {
-            if (value == _temperature) return;   // No change — don't fire event
-
-            double old = _temperature;
-            _temperature = value;
-
-            // Raise the event — notify all subscribers
-            // Pass 'this' as sender so subscribers know which thermostat fired
-            TemperatureChanged?.Invoke(this, new TemperatureChangedEventArgs(old, value));
-        }
-    }
-}
-
-// Step 3: The subscriber — code that reacts to the event
-class HeatingSystem
-{
-    // This method has the right signature to subscribe to TemperatureChanged
-    // object sender = the Thermostat that fired
-    // TemperatureChangedEventArgs e = the temperature data
-    public void OnTemperatureChanged(object? sender, TemperatureChangedEventArgs e)
-    {
-        Console.WriteLine($"Temperature changed: {e.OldTemperature}°C → {e.NewTemperature}°C");
-
-        if (e.NewTemperature < 18)
-            Console.WriteLine("  ► Heating turned ON");
-        else if (e.NewTemperature > 24)
-            Console.WriteLine("  ► Cooling turned ON");
-        else
-            Console.WriteLine("  ► Temperature comfortable, nothing to do");
-    }
-}
-
-// Putting it all together
-var thermostat    = new Thermostat();
-var heatingSystem = new HeatingSystem();
-
-// Subscribe: when thermostat fires TemperatureChanged, call heatingSystem.OnTemperatureChanged
-thermostat.TemperatureChanged += heatingSystem.OnTemperatureChanged;
-
-// Also subscribe a lambda for logging
-thermostat.TemperatureChanged += (sender, e) =>
-{
-    Console.WriteLine($"  [LOG] Recorded at {e.TimeOfChange:HH:mm:ss}");
+    new("Alice",   22, "Computer Science", 3.8),
+    new("Bob",     20, "Mathematics",      3.2),
+    new("Carol",   23, "Computer Science", 3.9),
+    new("Dave",    21, "Physics",          2.9),
+    new("Eve",     22, "Mathematics",      3.6),
+    new("Frank",   24, "Physics",          3.1),
+    new("Grace",   20, "Computer Science", 3.7),
 };
-
-// Now change the temperature — this fires the event both times
-thermostat.Temperature = 15;
-Console.WriteLine();
-thermostat.Temperature = 22;
-Console.WriteLine();
-thermostat.Temperature = 28;
 ```
 
-## Unsubscribing: Avoiding Memory Leaks
+### `Where` — Filtering
 
-When you subscribe to an event with `+=`, the publisher holds a reference to your subscriber. If you forget to unsubscribe with `-=`, the subscriber object can't be garbage collected — this is an **event memory leak**, one of the most common bugs in C# applications.
+`Where` keeps only elements that satisfy a condition (the predicate returns `true`):
 
 ```csharp
-class DataLoader
-{
-    public event EventHandler<string>? DataLoaded;
+// Students with GPA above 3.5
+var highAchievers = students.Where(s => s.GPA > 3.5);
 
-    public void Load()
-    {
-        // Simulate loading
-        DataLoaded?.Invoke(this, "{ data: 42 }");
-    }
-}
+foreach (var s in highAchievers)
+    Console.WriteLine($"{s.Name}: {s.GPA}");
+// Alice: 3.8
+// Carol: 3.9
+// Eve: 3.6
+// Grace: 3.7
 
-class Dashboard
-{
-    private readonly DataLoader _loader;
-
-    public Dashboard(DataLoader loader)
-    {
-        _loader = loader;
-
-        // Subscribe
-        _loader.DataLoaded += OnDataLoaded;
-    }
-
-    private void OnDataLoaded(object? sender, string data)
-    {
-        Console.WriteLine($"Dashboard received: {data}");
-    }
-
-    // Call this when the Dashboard is closed / no longer needed
-    public void Dispose()
-    {
-        // Unsubscribe! Without this, _loader holds a reference to 'this'
-        // and prevents it from being garbage collected.
-        _loader.DataLoaded -= OnDataLoaded;
-        Console.WriteLine("Dashboard unsubscribed.");
-    }
-}
-
-var loader    = new DataLoader();
-var dashboard = new Dashboard(loader);
-
-loader.Load();       // Dashboard received: { data: 42 }
-
-dashboard.Dispose(); // Unsubscribe
-
-loader.Load();       // Dashboard no longer notified — handler was removed
+// Multiple conditions: use && and ||
+var youngCS = students.Where(s => s.Major == "Computer Science" && s.Age <= 22);
 ```
 
-## Events in Practice: A Simple Button
+### `Select` — Transforming
 
-Here's a pattern you'll see in UI frameworks (WinForms, WPF, MAUI, etc.):
+`Select` transforms each element into something else. The output collection has the same number of items as the input, but each item is transformed:
 
 ```csharp
-class Button
+// Get just the names
+IEnumerable<string> names = students.Select(s => s.Name);
+Console.WriteLine(string.Join(", ", names));
+// Alice, Bob, Carol, Dave, Eve, Frank, Grace
+
+// Create a new anonymous object with selected properties
+var summary = students.Select(s => new
 {
-    // The Click event — any code can subscribe to it
-    public event EventHandler? Click;
+    s.Name,
+    Grade = s.GPA >= 3.5 ? "A" : s.GPA >= 3.0 ? "B" : "C"
+});
 
-    // Called by the framework when the user physically clicks the button
-    protected virtual void OnClick()
-    {
-        // The 'protected virtual' convention lets subclasses override how the event fires
-        // EventArgs.Empty is used when there's no event data to pass
-        Click?.Invoke(this, EventArgs.Empty);
-    }
-
-    // Simulate a user click for demonstration
-    public void SimulateClick() => OnClick();
-}
-
-var saveButton = new Button();
-
-// Subscribe to the Click event
-saveButton.Click += (sender, e) =>
-{
-    Console.WriteLine("Save button clicked — saving data...");
-};
-
-saveButton.Click += (sender, e) =>
-{
-    Console.WriteLine("Save button clicked — updating status bar...");
-};
-
-saveButton.SimulateClick();
-// Save button clicked — saving data...
-// Save button clicked — updating status bar...
+foreach (var item in summary)
+    Console.WriteLine($"{item.Name}: {item.Grade}");
 ```
 
-This is almost exactly how real WinForms code looks. The framework calls `OnClick` when the user clicks; your code subscribes to `Click` and decides what to do.
+### `OrderBy` and `OrderByDescending` — Sorting
 
-## Summary: Key Rules for Events
+```csharp
+// Sort by GPA, lowest first
+var byGpa = students.OrderBy(s => s.GPA);
 
-1. **Declare with `event`** — prevents outside code from invoking or replacing the event
-2. **Use `?.Invoke`** when raising — prevents a crash if nobody has subscribed
-3. **Use `EventHandler<TEventArgs>`** — the standard .NET pattern for real-world code
-4. **Create an `EventArgs` subclass** to carry event data
-5. **Unsubscribe with `-=`** when the subscriber is no longer needed — prevents memory leaks
-6. **Name events in past tense** for things that happened (`DataLoaded`, `ButtonClicked`) or present tense for things about to happen (`Closing`, `Changing`)
+// Sort by GPA, highest first
+var byGpaDesc = students.OrderByDescending(s => s.GPA);
+
+// Sort by major, then by GPA within each major
+var byMajorThenGpa = students
+    .OrderBy(s => s.Major)
+    .ThenByDescending(s => s.GPA);
+
+foreach (var s in byMajorThenGpa)
+    Console.WriteLine($"{s.Major,-20} {s.Name,-10} {s.GPA}");
+```
+
+### `GroupBy` — Grouping Elements
+
+`GroupBy` splits a sequence into groups based on a key. Each group has a `Key` property and contains all the elements that share that key:
+
+```csharp
+// Group students by their major
+var byMajor = students.GroupBy(s => s.Major);
+
+foreach (var group in byMajor)
+{
+    // group.Key is the major name ("Computer Science", "Mathematics", etc.)
+    Console.WriteLine($"\n{group.Key}:");
+
+    // group itself is an IEnumerable<Student> — all students in this major
+    foreach (var student in group)
+        Console.WriteLine($"  {student.Name} ({student.GPA})");
+}
+
+// Calculate average GPA per major
+var avgGpaByMajor = students
+    .GroupBy(s => s.Major)
+    .Select(group => new
+    {
+        Major = group.Key,
+        AverageGPA = group.Average(s => s.GPA),
+        Count = group.Count()
+    })
+    .OrderByDescending(m => m.AverageGPA);
+
+foreach (var m in avgGpaByMajor)
+    Console.WriteLine($"{m.Major}: avg GPA = {m.AverageGPA:F2} ({m.Count} students)");
+```
+
+### `SelectMany` — Flattening Nested Collections
+
+`Select` produces one output per input. `SelectMany` is used when each input produces *multiple* outputs and you want them all flattened into one sequence:
+
+```csharp
+// Each student has a list of courses — we want all courses across all students
+record StudentWithCourses(string Name, List<string> Courses);
+
+var students2 = new List<StudentWithCourses>
+{
+    new("Alice", new() { "Algorithms", "Databases", "Networks" }),
+    new("Bob",   new() { "Calculus", "Statistics" }),
+    new("Carol", new() { "Algorithms", "Machine Learning", "Databases" }),
+};
+
+// Select would give: [["Algorithms","Databases","Networks"], ["Calculus","Statistics"], ...]
+// SelectMany flattens it: ["Algorithms", "Databases", "Networks", "Calculus", ...]
+IEnumerable<string> allCourses = students2.SelectMany(s => s.Courses);
+Console.WriteLine(string.Join(", ", allCourses));
+
+// Find unique courses (using Distinct to remove duplicates)
+var uniqueCourses = students2
+    .SelectMany(s => s.Courses)
+    .Distinct()
+    .OrderBy(c => c);
+
+Console.WriteLine(string.Join(", ", uniqueCourses));
+// Algorithms, Calculus, Databases, Machine Learning, Networks, Statistics
+```
+
+### Aggregation: `Count`, `Sum`, `Average`, `Min`, `Max`
+
+These reduce a sequence to a single value:
+
+```csharp
+Console.WriteLine($"Total students: {students.Count()}");
+Console.WriteLine($"CS students: {students.Count(s => s.Major == "Computer Science")}");
+Console.WriteLine($"Average GPA: {students.Average(s => s.GPA):F2}");
+Console.WriteLine($"Highest GPA: {students.Max(s => s.GPA)}");
+Console.WriteLine($"Youngest: {students.Min(s => s.Age)}");
+Console.WriteLine($"GPA sum: {students.Sum(s => s.GPA):F1}");
+```
+
+### `First`, `FirstOrDefault`, `Single`, `Any`, `All`
+
+These are for finding specific elements or checking conditions:
+
+```csharp
+// First — returns the first matching element; throws if none found
+Student first = students.First(s => s.GPA > 3.8);
+Console.WriteLine(first.Name);   // Carol
+
+// FirstOrDefault — returns null if none found (safe version)
+Student? found = students.FirstOrDefault(s => s.Major == "Biology");
+Console.WriteLine(found?.Name ?? "Not found");   // Not found
+
+// Single — like First, but throws if MORE THAN ONE matches
+// Use when you expect exactly one result (e.g., find by unique ID)
+Student? alice = students.SingleOrDefault(s => s.Name == "Alice");
+
+// Any — does ANY element match?
+bool hasPhysicsStudents = students.Any(s => s.Major == "Physics");
+Console.WriteLine(hasPhysicsStudents);   // True
+
+bool hasDropouts = students.Any(s => s.GPA < 2.0);
+Console.WriteLine(hasDropouts);   // False
+
+// All — do ALL elements match?
+bool allAdults = students.All(s => s.Age >= 18);
+Console.WriteLine(allAdults);   // True
+
+bool allHighGPA = students.All(s => s.GPA > 3.5);
+Console.WriteLine(allHighGPA);  // False
+```
+
+### `Distinct`, `Take`, `Skip`
+
+```csharp
+var ages = students.Select(s => s.Age).Distinct().OrderBy(a => a);
+Console.WriteLine(string.Join(", ", ages));   // 20, 21, 22, 23, 24
+
+// Take the top 3 (by GPA)
+var top3 = students.OrderByDescending(s => s.GPA).Take(3);
+
+// Skip the first 2, take the next 3
+var page2 = students.OrderBy(s => s.Name).Skip(2).Take(3);
+// Useful for paging: Skip((pageNumber - 1) * pageSize).Take(pageSize)
+```
+
+## Chaining: Building a Pipeline
+
+LINQ's real power is chaining operations. Each method receives the output of the previous one. Build complex queries as readable pipelines:
+
+```csharp
+// "Find the names of CS students aged 22 or younger,
+//  sorted by GPA descending, showing top 3"
+var result = students
+    .Where(s => s.Major == "Computer Science")    // Filter by major
+    .Where(s => s.Age <= 22)                       // And by age
+    .OrderByDescending(s => s.GPA)                 // Sort by GPA, best first
+    .Take(3)                                       // Only top 3
+    .Select(s => $"{s.Name} ({s.GPA})");           // Format as string
+
+foreach (string line in result)
+    Console.WriteLine(line);
+// Carol (3.9)
+// Alice (3.8)
+// Grace (3.7)
+```
+
+Read it top to bottom: start with all students, filter to CS, filter to age ≤ 22, sort, take top 3, format. Each step receives the output of the step above. This is more readable than equivalent loops because the **intent** of each step is clear from its name.
+
+## `ToList()` and `ToArray()`: When to Materialize
+
+LINQ queries are **lazy** — they don't run until you iterate them. Each time you iterate the query, it runs again from scratch. If you need to:
+- Use the results more than once
+- Know the count before iterating
+- Avoid re-running an expensive query
+
+...then call `.ToList()` or `.ToArray()` to execute the query immediately and store the results:
+
+```csharp
+var query = students.Where(s => s.GPA > 3.5);
+
+// Without ToList: the Where runs once for each foreach
+foreach (var s in query) Console.WriteLine(s.Name);   // Runs the filter
+foreach (var s in query) Console.WriteLine(s.Age);    // Runs the filter AGAIN
+
+// With ToList: filter runs once, results stored in memory
+List<Student> results = students.Where(s => s.GPA > 3.5).ToList();
+
+Console.WriteLine(results.Count);                      // Instant — list already computed
+foreach (var s in results) Console.WriteLine(s.Name); // No re-evaluation
+foreach (var s in results) Console.WriteLine(s.Age);  // No re-evaluation
+```
+
+As a rule: if you'll use the results once, keep it as `IEnumerable<T>` (lazy). If you'll use them multiple times or need `.Count`, call `.ToList()`.

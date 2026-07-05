@@ -1,398 +1,308 @@
-# File I/O and Working with Data
+# async and await: Writing Code That Waits Without Blocking
 
-Almost every real application reads or writes files: configuration files, logs, CSVs, JSON data, user documents. C# provides a rich set of tools for this under the `System.IO` namespace. We'll start with the simplest APIs and build up to handling larger files and structured data like JSON.
+Most programs do things that take time: reading a file from disk, fetching data from a website, querying a database. If you write that code the normal (synchronous) way, your entire program **freezes** while it waits for the result. The user sees a locked screen. The server stops handling other requests. Nothing else can happen.
 
-## Reading and Writing Files: The Simple API
+**Asynchronous programming** solves this. It lets your program say "start this operation and come back to me when it's done" — freeing it to do other things in the meantime. In C#, this is done with the keywords `async` and `await`.
 
-For small files that fit comfortably in memory, `System.IO.File` provides straightforward static methods:
+## The Problem: Blocking Code
 
-```csharp
-// You'll need this using directive at the top of your file
-// (In modern .NET with global usings, you may not even need it)
-using System.IO;
-
-// ── WRITING ─────────────────────────────────────────────────────────────────
-
-// Write a single string to a file.
-// If the file doesn't exist, it's created.
-// If it does exist, it's completely replaced (overwritten).
-File.WriteAllText("notes.txt", "Hello, file world!");
-
-// Write multiple lines at once
-// Each string in the array becomes one line
-string[] lines = { "Line one", "Line two", "Line three" };
-File.WriteAllLines("lines.txt", lines);
-
-// Append to an existing file (don't overwrite — add to the end)
-File.AppendAllText("notes.txt", "\nThis was added later.");
-
-// ── READING ─────────────────────────────────────────────────────────────────
-
-// Read the entire file as one big string
-string content = File.ReadAllText("notes.txt");
-Console.WriteLine(content);
-// Hello, file world!
-// This was added later.
-
-// Read all lines into an array of strings
-string[] readLines = File.ReadAllLines("lines.txt");
-foreach (string line in readLines)
-    Console.WriteLine($"  → {line}");
-// → Line one
-// → Line two
-// → Line three
-
-// Read all bytes (useful for images, PDFs, etc.)
-byte[] bytes = File.ReadAllBytes("notes.txt");
-Console.WriteLine($"File size: {bytes.Length} bytes");
-```
-
-These methods are perfect for small files and simple use cases. For anything larger or more complex, use streams.
-
-## File Paths: Working with the `Path` Class
-
-File paths look different on different operating systems (`C:\folder\file.txt` on Windows, `/home/user/file.txt` on Linux/Mac). The `Path` class gives you methods that handle paths correctly on any platform:
+Imagine a restaurant where there is only one waiter. A customer orders food. The waiter walks to the kitchen, stands there watching the food cook for 20 minutes, then brings it out. While waiting, they serve nobody else. That's **blocking** — the thread sits idle, doing nothing, while the work happens.
 
 ```csharp
-// DON'T do this — hardcoded separators break on other operating systems
-string bad = "data" + "\\" + "users" + "\\" + "alice.txt";
-
-// DO this — Path.Combine uses the correct separator for the current OS
-string good = Path.Combine("data", "users", "alice.txt");
-Console.WriteLine(good);   // data\users\alice.txt (on Windows)
-                            // data/users/alice.txt (on Linux/Mac)
-
-// Get parts of a path
-string fullPath = @"C:\projects\myapp\src\Program.cs";
-
-Console.WriteLine(Path.GetFileName(fullPath));           // Program.cs
-Console.WriteLine(Path.GetFileNameWithoutExtension(fullPath)); // Program
-Console.WriteLine(Path.GetExtension(fullPath));          // .cs
-Console.WriteLine(Path.GetDirectoryName(fullPath));      // C:\projects\myapp\src
-
-// Build an absolute path relative to where the program is running
-string relativePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.json");
-Console.WriteLine(relativePath);
-
-// Check if a file or directory exists before using it
-if (File.Exists("notes.txt"))
-    Console.WriteLine("File exists!");
-
-if (!Directory.Exists("output"))
-    Directory.CreateDirectory("output");   // Create the folder if it doesn't exist
-```
-
-Always use `Path.Combine` instead of string concatenation for file paths.
-
-## The `Directory` Class
-
-```csharp
-// Create a directory (and any missing parent directories)
-Directory.CreateDirectory(Path.Combine("output", "reports", "2024"));
-
-// List all files in a directory
-string[] files = Directory.GetFiles(".", "*.txt");   // "." = current directory
-foreach (string f in files)
-    Console.WriteLine(Path.GetFileName(f));
-
-// List all files recursively (including subfolders)
-string[] allCsFiles = Directory.GetFiles("src", "*.cs", SearchOption.AllDirectories);
-Console.WriteLine($"Found {allCsFiles.Length} C# files");
-
-// List subdirectories
-string[] folders = Directory.GetDirectories(".");
-foreach (string folder in folders)
-    Console.WriteLine(Path.GetFileName(folder));
-
-// Delete a file or directory
-File.Delete("temp.txt");
-Directory.Delete("old-output", recursive: true);   // recursive: delete contents too
-```
-
-## Streams: Reading Large Files Line by Line
-
-The simple `File.ReadAllText` loads the **entire file** into memory at once. For a 10 MB file, that's fine. For a 10 GB log file, it would crash your program by running out of memory. **Streams** solve this by reading a little at a time:
-
-```csharp
-// StreamReader reads text files line by line, loading only one line at a time into memory
-// 'using' ensures the file is properly closed when done (even if an exception occurs)
-using (var reader = new StreamReader("large-log.txt"))
+// Synchronous (blocking) — simulating slow work with Thread.Sleep
+static string FetchDataFromServer()
 {
-    int lineNumber = 0;
-    string? line;
-
-    // ReadLine() returns null when it reaches the end of the file
-    while ((line = reader.ReadLine()) != null)
-    {
-        lineNumber++;
-
-        // Process the line — in this case, only print lines containing "ERROR"
-        if (line.Contains("ERROR"))
-            Console.WriteLine($"Line {lineNumber}: {line}");
-    }
-
-    Console.WriteLine($"Processed {lineNumber} lines.");
-}
-// File is automatically closed here
-```
-
-### Writing with `StreamWriter`
-
-```csharp
-// StreamWriter writes text to a file
-// Second parameter: true = append to existing file, false (default) = overwrite
-using (var writer = new StreamWriter("output.txt", append: false))
-{
-    writer.WriteLine("First line");
-    writer.WriteLine("Second line");
-    writer.Write("No newline at end");
-
-    // For large amounts of data, WriteLine inside a loop works fine
-    for (int i = 1; i <= 1000; i++)
-    {
-        writer.WriteLine($"Record {i}: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-    }
-}
-// File is closed and flushed here — all data is written to disk
-```
-
-## Practical Example: Reading and Writing a CSV File
-
-CSV (Comma-Separated Values) is one of the most common data formats. Here's how to read and write it without a third-party library:
-
-```csharp
-record Product(string Name, string Category, decimal Price, int Stock);
-
-// ── WRITING A CSV ────────────────────────────────────────────────────────────
-
-static void WriteProductsCsv(string path, List<Product> products)
-{
-    using var writer = new StreamWriter(path);
-
-    // Write the header row
-    writer.WriteLine("Name,Category,Price,Stock");
-
-    // Write each product as a data row
-    foreach (var p in products)
-    {
-        // Wrap Name in quotes in case it contains commas
-        writer.WriteLine($"\"{p.Name}\",{p.Category},{p.Price},{p.Stock}");
-    }
-
-    Console.WriteLine($"Wrote {products.Count} products to {path}");
+    Console.WriteLine("Starting download...");
+    System.Threading.Thread.Sleep(3000);  // Pretend this takes 3 seconds
+    Console.WriteLine("Download complete.");
+    return "{ \"data\": 42 }";
 }
 
-// ── READING A CSV ────────────────────────────────────────────────────────────
+// The program stops here for 3 full seconds
+string data = FetchDataFromServer();
+Console.WriteLine($"Got: {data}");
+Console.WriteLine("This line had to wait 3 seconds to run.");
+```
 
-static List<Product> ReadProductsCsv(string path)
+During those 3 seconds, the thread that runs your program is completely blocked. In a desktop app, the UI freezes. In a web server, that thread can't handle any other requests.
+
+## The Solution: async and await
+
+The same restaurant, reimagined: the waiter takes the order, gives it to the kitchen, then goes to serve other tables. When the kitchen calls out "order up!", the waiter comes back and delivers it. The waiter's time is never wasted waiting.
+
+`async` and `await` work the same way. `await` says "start this work and let the thread go do something else. Resume here when it's done." No thread is blocked:
+
+```csharp
+// Task.Delay is the async version of Thread.Sleep
+// It waits without blocking the thread
+static async Task<string> FetchDataFromServerAsync()
 {
-    var products = new List<Product>();
+    Console.WriteLine("Starting download...");
 
-    using var reader = new StreamReader(path);
+    // await here: this method pauses and releases the thread.
+    // When 3 seconds pass, execution resumes from this exact point.
+    await Task.Delay(3000);
 
-    // Skip the header line
-    string? header = reader.ReadLine();
-
-    string? line;
-    int lineNum = 1;
-
-    while ((line = reader.ReadLine()) != null)
-    {
-        lineNum++;
-
-        // Skip empty lines
-        if (string.IsNullOrWhiteSpace(line)) continue;
-
-        // Split on commas — simple approach (doesn't handle quoted commas)
-        string[] parts = line.Split(',');
-
-        if (parts.Length != 4)
-        {
-            Console.WriteLine($"Warning: line {lineNum} has {parts.Length} fields, expected 4. Skipping.");
-            continue;
-        }
-
-        try
-        {
-            // Trim removes surrounding whitespace and quotes
-            string name     = parts[0].Trim().Trim('"');
-            string category = parts[1].Trim();
-            decimal price   = decimal.Parse(parts[2].Trim());
-            int stock       = int.Parse(parts[3].Trim());
-
-            products.Add(new Product(name, category, price, stock));
-        }
-        catch (FormatException ex)
-        {
-            Console.WriteLine($"Warning: could not parse line {lineNum}: {ex.Message}");
-        }
-    }
-
-    Console.WriteLine($"Read {products.Count} products from {path}");
-    return products;
+    Console.WriteLine("Download complete.");
+    return "{ \"data\": 42 }";
 }
 
-// ── USING THEM ────────────────────────────────────────────────────────────────
-
-var inventory = new List<Product>
+// To call an async method, you also use await
+// The method that does the awaiting must itself be marked async
+static async Task Main(string[] args)
 {
-    new("Widget",         "Hardware",   9.99m,  150),
-    new("Gadget Pro",     "Electronics", 79.99m, 42),
-    new("Blue Pen",       "Stationery", 1.49m,  800),
-    new("Notebook, A5",   "Stationery", 4.99m,  200),   // comma in name — needs quoting
+    string data = await FetchDataFromServerAsync();
+    Console.WriteLine($"Got: {data}");
+    Console.WriteLine("This line runs after the download finishes.");
+}
+```
+
+Two things changed:
+1. The method is marked `async` — this tells C# it's allowed to use `await` inside
+2. The return type changed from `string` to `Task<string>` — a `Task<T>` represents "a promise to deliver a `T` value in the future"
+
+## Understanding `Task`
+
+A **`Task`** is an object that represents an ongoing operation. It's like a receipt: you hand it to the cashier, get a receipt (Task), go sit down. When your name is called, you present the receipt and get your order (the result).
+
+```csharp
+// Task     = "this operation will complete, but returns nothing"
+// Task<T>  = "this operation will complete and return a value of type T"
+
+// These are the three possible return types for async methods:
+static async Task DoSomethingAsync()
+{
+    await Task.Delay(100);
+    // No return value — like a void method, but async
+}
+
+static async Task<int> GetNumberAsync()
+{
+    await Task.Delay(100);
+    return 42;   // Will be delivered as the Task's result
+}
+
+static async Task<string> GetNameAsync()
+{
+    await Task.Delay(100);
+    return "Alice";
+}
+
+// Calling them:
+await DoSomethingAsync();             // Wait for it to finish
+int number = await GetNumberAsync();  // Wait and get the int
+string name = await GetNameAsync();   // Wait and get the string
+```
+
+## A Realistic Example: Simulating an API Call
+
+In real code, you'd use `HttpClient` to fetch data from a web API. Here we'll simulate that to show the pattern:
+
+```csharp
+using System.Net.Http;
+
+static async Task<string> GetWeatherAsync(string city)
+{
+    // HttpClient is the standard way to make HTTP requests in C#
+    // 'using' ensures it's properly disposed when done
+    using var client = new HttpClient();
+
+    // GetStringAsync is an async method — it starts the HTTP request
+    // and 'await' suspends this method until the response arrives
+    // Your program can do other things while waiting for the server
+    string response = await client.GetStringAsync($"https://wttr.in/{city}?format=3");
+
+    return response;
+}
+
+// Calling it:
+static async Task Main(string[] args)
+{
+    Console.WriteLine("Fetching weather...");
+
+    // Both of these start at the same time — we're not waiting for
+    // London before we start fetching Paris
+    Task<string> londonTask = GetWeatherAsync("London");
+    Task<string> parisTask  = GetWeatherAsync("Paris");
+
+    // Now wait for both to finish
+    string london = await londonTask;
+    string paris  = await parisTask;
+
+    Console.WriteLine($"London: {london}");
+    Console.WriteLine($"Paris: {paris}");
+}
+```
+
+Notice: we started both tasks before awaiting either. This means both HTTP requests run concurrently — you don't wait for London to finish before Paris starts. This halves the total wait time.
+
+## Running Multiple Tasks at Once with `Task.WhenAll`
+
+`Task.WhenAll` is a cleaner way to run many tasks in parallel and wait for all of them:
+
+```csharp
+static async Task<int> SlowAddAsync(int a, int b)
+{
+    // Simulate a slow calculation (e.g., calling a remote service)
+    await Task.Delay(1000);
+    return a + b;
+}
+
+static async Task Main(string[] args)
+{
+    Console.WriteLine("Starting three calculations simultaneously...");
+
+    // Create all three tasks — they all start running right now
+    Task<int> task1 = SlowAddAsync(1, 2);
+    Task<int> task2 = SlowAddAsync(10, 20);
+    Task<int> task3 = SlowAddAsync(100, 200);
+
+    // Wait for ALL of them to finish — total wait is ~1 second, not ~3 seconds
+    int[] results = await Task.WhenAll(task1, task2, task3);
+
+    // results[0] = 3, results[1] = 30, results[2] = 300
+    foreach (int r in results)
+        Console.WriteLine(r);
+
+    Console.WriteLine("All done!");
+}
+```
+
+Without async, this would take 3 seconds (1 second × 3 sequential calls). With async + `Task.WhenAll`, it takes just 1 second because all three run at the same time.
+
+## Exception Handling in Async Code
+
+Exceptions in async methods work exactly the same way as in normal methods — you use `try/catch` in the same place. The exception is stored in the `Task` and re-thrown when you `await` it:
+
+```csharp
+static async Task<string> DownloadFileAsync(string url)
+{
+    using var client = new HttpClient();
+
+    // If the URL is invalid or the server is unreachable, an exception is thrown
+    string content = await client.GetStringAsync(url);
+    return content;
+}
+
+static async Task Main(string[] args)
+{
+    try
+    {
+        // If DownloadFileAsync throws, the exception appears right here at the await
+        string data = await DownloadFileAsync("https://invalid-site-that-does-not-exist.xyz");
+        Console.WriteLine(data);
+    }
+    catch (HttpRequestException ex)
+    {
+        // HttpRequestException covers network failures, timeouts, bad responses
+        Console.WriteLine($"Download failed: {ex.Message}");
+    }
+}
+```
+
+## async All the Way Down
+
+One rule you must follow: **if a method uses `await`, it must be marked `async`.** And if you want to `await` that method, the calling method must also be `async`. This is called "async all the way up":
+
+```csharp
+// Level 3: does the actual async work
+static async Task<byte[]> ReadFileBytesAsync(string path)
+{
+    return await System.IO.File.ReadAllBytesAsync(path);
+}
+
+// Level 2: calls the async method, must itself be async
+static async Task<string> ProcessFileAsync(string path)
+{
+    byte[] bytes = await ReadFileBytesAsync(path);     // await here
+    return System.Text.Encoding.UTF8.GetString(bytes);
+}
+
+// Level 1: calls level 2, must itself be async
+static async Task ShowFileAsync(string path)
+{
+    string content = await ProcessFileAsync(path);     // await here
+    Console.WriteLine(content);
+}
+
+// Entry point — in modern C# (9+), Main can be async
+static async Task Main(string[] args)
+{
+    await ShowFileAsync("readme.txt");                 // await here
+}
+```
+
+The `async` keyword propagates through your call stack. That's fine — it's how async is supposed to work.
+
+## `async void`: The One Exception (and Why to Avoid It)
+
+`async void` exists for one specific use: **event handlers**. Avoid it everywhere else. Unlike `Task`-returning async methods, you cannot `await` an `async void` method, and any exceptions it throws will crash your program in hard-to-debug ways:
+
+```csharp
+// Acceptable use of async void — event handlers require void return type
+button.Click += async (sender, e) =>
+{
+    string data = await FetchDataAsync();
+    DisplayData(data);
 };
 
-WriteProductsCsv("inventory.csv", inventory);
+// Never do this for regular methods — use Task instead
+async void BadMethod()   // BAD — exceptions can't be caught by callers
+{
+    await Task.Delay(100);
+    throw new Exception("This will crash the whole program!");
+}
 
-var loaded = ReadProductsCsv("inventory.csv");
-
-// Use LINQ to summarize
-var byCategory = loaded
-    .GroupBy(p => p.Category)
-    .Select(g => new { Category = g.Key, TotalValue = g.Sum(p => p.Price * p.Stock) })
-    .OrderByDescending(g => g.TotalValue);
-
-foreach (var cat in byCategory)
-    Console.WriteLine($"{cat.Category}: ${cat.TotalValue:F2}");
+async Task GoodMethod()  // GOOD — exceptions surface properly
+{
+    await Task.Delay(100);
+    throw new Exception("This can be caught with try/catch at the await site.");
+}
 ```
 
-## Working with JSON
+## `Task.Run`: Running CPU-Heavy Work Asynchronously
 
-JSON (JavaScript Object Notation) is the most common data format for web APIs and configuration files. .NET 5+ includes `System.Text.Json` — a fast, built-in JSON library. No extra packages needed.
+`await` by itself doesn't create a new thread — it just frees the current thread to do other things while waiting for I/O. But if you have **CPU-intensive** work (heavy calculations, image processing, large sorting), you should explicitly push it onto a background thread with `Task.Run`:
 
 ```csharp
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
-// ── YOUR DATA CLASS ──────────────────────────────────────────────────────────
-
-class WeatherForecast
+static int HeavyCalculation(int n)
 {
-    // JsonPropertyName lets you control what the JSON key is called
-    [JsonPropertyName("city")]
-    public string City { get; set; } = "";
-
-    [JsonPropertyName("temperature_c")]
-    public double TemperatureCelsius { get; set; }
-
-    // Computed property — serialized to JSON automatically
-    [JsonIgnore]   // JsonIgnore: don't include this in the JSON
-    public double TemperatureFahrenheit => TemperatureCelsius * 9 / 5 + 32;
-
-    [JsonPropertyName("description")]
-    public string Description { get; set; } = "";
+    // Simulates an expensive CPU computation — takes a long time
+    long sum = 0;
+    for (long i = 0; i < n * 1_000_000L; i++)
+        sum += i;
+    return (int)(sum % int.MaxValue);
 }
 
-// ── SERIALIZE: object → JSON string ──────────────────────────────────────────
-
-var forecast = new WeatherForecast
+static async Task Main(string[] args)
 {
-    City = "London",
-    TemperatureCelsius = 18.5,
-    Description = "Partly cloudy"
-};
+    Console.WriteLine("Starting heavy calculation in background...");
 
-// JsonSerializer.Serialize converts your object to a JSON string
-string json = JsonSerializer.Serialize(forecast);
-Console.WriteLine(json);
-// {"city":"London","temperature_c":18.5,"description":"Partly cloudy"}
+    // Task.Run puts HeavyCalculation on a thread pool thread
+    // So the current thread is free — UI stays responsive
+    int result = await Task.Run(() => HeavyCalculation(100));
 
-// WriteIndented: makes the JSON human-readable with line breaks and spaces
-var options = new JsonSerializerOptions { WriteIndented = true };
-string prettyJson = JsonSerializer.Serialize(forecast, options);
-Console.WriteLine(prettyJson);
-
-// ── SAVE TO FILE ──────────────────────────────────────────────────────────────
-
-File.WriteAllText("forecast.json", prettyJson);
-
-// ── DESERIALIZE: JSON string → object ────────────────────────────────────────
-
-string loadedJson = File.ReadAllText("forecast.json");
-
-// JsonSerializer.Deserialize converts JSON back into your object
-WeatherForecast? loaded = JsonSerializer.Deserialize<WeatherForecast>(loadedJson);
-Console.WriteLine($"Loaded: {loaded?.City}, {loaded?.TemperatureCelsius}°C");
-
-// ── WORKING WITH LISTS ────────────────────────────────────────────────────────
-
-var forecasts = new List<WeatherForecast>
-{
-    new() { City = "Paris",  TemperatureCelsius = 22, Description = "Sunny" },
-    new() { City = "Berlin", TemperatureCelsius = 15, Description = "Rainy" },
-    new() { City = "Rome",   TemperatureCelsius = 28, Description = "Hot" },
-};
-
-// Serialize a list — produces a JSON array
-string listJson = JsonSerializer.Serialize(forecasts, options);
-File.WriteAllText("forecasts.json", listJson);
-
-// Deserialize a list
-string listContent = File.ReadAllText("forecasts.json");
-List<WeatherForecast>? loadedList = JsonSerializer.Deserialize<List<WeatherForecast>>(listContent);
-Console.WriteLine($"Loaded {loadedList?.Count} forecasts");
+    Console.WriteLine($"Result: {result}");
+    Console.WriteLine("Main thread was never blocked.");
+}
 ```
 
-## Async File Operations
+**Rule of thumb**:
+- I/O operations (network, disk, database) — just `await` them directly, they're already async
+- CPU-heavy operations — wrap in `Task.Run` to offload to a background thread
 
-File I/O is a great candidate for async — disk operations can take time and we shouldn't block the thread while waiting. All the major file methods have async versions:
+## The Naming Convention
+
+By C# convention, async methods that return `Task` or `Task<T>` should have names ending in `Async`:
 
 ```csharp
-static async Task ProcessFilesAsync()
-{
-    // Async versions of the simple File methods
-    string content = await File.ReadAllTextAsync("notes.txt");
-    await File.WriteAllTextAsync("copy.txt", content);
+// ✅ Good naming
+Task<string> GetUserAsync(int id) { ... }
+Task SaveOrderAsync(Order order)  { ... }
+Task<bool> ValidateTokenAsync(string token) { ... }
 
-    string[] lines = await File.ReadAllLinesAsync("data.txt");
-
-    // For StreamReader, ReadLineAsync is available
-    using var reader = new StreamReader("large.txt");
-    string? line;
-    while ((line = await reader.ReadLineAsync()) != null)
-    {
-        // Process asynchronously
-    }
-
-    // JSON with async
-    using var stream = File.OpenRead("data.json");
-    var data = await JsonSerializer.DeserializeAsync<List<Product>>(stream);
-    Console.WriteLine($"Loaded {data?.Count} items");
-}
+// ❌ Missing the convention — confusing
+Task<string> GetUser(int id) { ... }
 ```
 
-In any application that does significant file work — a web API that reads configs, a tool that processes many files — use the async versions to keep your application responsive.
-
-## Common File Patterns Summary
-
-```csharp
-// Check before using
-if (File.Exists(path)) { /* read it */ }
-
-// Always use Path.Combine for paths
-string fullPath = Path.Combine(baseDir, "subfolder", "file.txt");
-
-// Always use 'using' with streams
-using var reader = new StreamReader(path);
-
-// Catch specific exceptions
-try
-{
-    string text = File.ReadAllText(path);
-}
-catch (FileNotFoundException)
-{
-    Console.WriteLine($"File not found: {path}");
-}
-catch (UnauthorizedAccessException)
-{
-    Console.WriteLine($"Permission denied: {path}");
-}
-catch (IOException ex)
-{
-    Console.WriteLine($"I/O error: {ex.Message}");
-}
-
-// Use async for any I/O in real applications
-string text2 = await File.ReadAllTextAsync(path);
-```
+This convention makes it obvious at a glance which methods are asynchronous, helping you remember to `await` them rather than calling them as regular methods.
