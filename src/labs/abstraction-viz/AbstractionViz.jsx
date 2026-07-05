@@ -31,6 +31,60 @@ function ensureCSS() {
   document.head.appendChild(el)
 }
 
+// ── Explanation paragraph ──────────────────────────────────────────────────────
+const PARA_LABELS = [
+  { re: /^(CS\s*[—–-]\s*)/, color: '#818cf8', bg: 'rgba(99,102,241,0.12)'  },  // indigo
+  { re: /^(SE\s*[—–-]\s*)/, color: '#34d399', bg: 'rgba(16,185,129,0.12)'  },  // emerald
+  { re: /^(Without this[:\s])/, color: '#fbbf24', bg: 'rgba(245,158,11,0.12)' }, // amber
+]
+
+function renderInlineCode(text) {
+  return text.split(/(`[^`\n]+`)/).map((seg, i) => {
+    if (seg.startsWith('`') && seg.endsWith('`')) {
+      return (
+        <code key={i} style={{
+          fontFamily: 'ui-monospace,SFMono-Regular,Menlo,monospace',
+          fontSize: '0.78em',
+          background: 'rgba(139,92,246,0.15)',
+          color: '#c4b5fd',
+          borderRadius: 3,
+          padding: '1px 4px',
+          letterSpacing: 0,
+        }}>{seg.slice(1, -1)}</code>
+      )
+    }
+    return seg
+  })
+}
+
+function ExplanationPara({ text }) {
+  for (const { re, color, bg } of PARA_LABELS) {
+    const m = text.match(re)
+    if (m) {
+      const prefix = m[1]
+      const body   = text.slice(prefix.length)
+      const label  = prefix.replace(/\s*[—–-]\s*$/, '').replace(/:\s*$/, '').trim()
+      return (
+        <p className="text-[13px] leading-relaxed text-slate-500 dark:text-slate-400">
+          <span style={{
+            display: 'inline-flex', alignItems: 'center',
+            background: bg, color, borderRadius: 4,
+            fontSize: '0.7em', fontWeight: 700, letterSpacing: '0.04em',
+            padding: '1px 6px', marginRight: 6, verticalAlign: 'middle',
+            textTransform: 'uppercase',
+          }}>{label}</span>
+          {renderInlineCode(body)}
+        </p>
+      )
+    }
+  }
+  return (
+    <p className="text-[13px] leading-relaxed text-slate-600 dark:text-slate-300">
+      {renderInlineCode(text)}
+    </p>
+  )
+}
+
 // ── Arrow lane ─────────────────────────────────────────────────────────────────
 const LANE_W  = 56
 const LINE_H  = 20
@@ -395,7 +449,7 @@ export default function AbstractionViz({ onBack }) {
               <div className="flex-1 overflow-y-auto px-5 py-4 min-h-0">
                 <div className="mb-5 flex flex-col gap-3">
                   {(Array.isArray(step.explanation) ? step.explanation : [step.explanation]).map((para, pi) => (
-                    <p key={pi} className="text-[13px] leading-relaxed text-slate-600 dark:text-slate-400">{para}</p>
+                    <ExplanationPara key={pi} text={para} />
                   ))}
                 </div>
                 <div className="flex flex-col gap-2">
