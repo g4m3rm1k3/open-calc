@@ -3,15 +3,28 @@
 // Three modes: Molecules (browse presets), Reactions (step through reactions), Build (assemble your own).
 
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import * as THREE from 'three'
 import {
-  MOLECULES, REACTIONS, BOND_TYPES, ATOM_COLORS, ELEMENTS,
+  MOLECULES, REACTIONS, BOND_TYPES, ATOM_COLORS, ELEMENTS, GLOSSARY,
   type Molecule, type Reaction, type BondKind, type AtomPosition, type Bond,
 } from './chemistry_data'
+import Term from './Term.tsx'
 import { useThemeColors } from '../../hooks/useThemeColors.js'
 
 type ThemeColors = ReturnType<typeof useThemeColors>
+
+// Maps a property row's display label to its glossary key where they differ.
+const LABEL_GLOSSARY_KEY: Record<string, string> = {
+  'Polarity':      'polarity (bond)',
+  'Hybridization': 'hybridization',
+  'Molar mass':    'molar mass',
+}
+
+function PropLabel({ label, C }: { label: string; C: ThemeColors }) {
+  const key = LABEL_GLOSSARY_KEY[label]
+  if (key && GLOSSARY[key]) return <Term word={key} C={C}>{label}</Term>
+  return <>{label}</>
+}
 
 // ── 3D Molecule Viewer ────────────────────────────────────────────────────────
 interface MoleculeViewerProps { molecule: Molecule | null; C: ThemeColors }
@@ -233,10 +246,9 @@ function MoleculeCard({ mol, isSelected, onClick, C }: MoleculeCardProps) {
 }
 
 // ── Molecule Info Panel ───────────────────────────────────────────────────────
-interface MoleculeInfoProps { mol: Molecule | null; C: ThemeColors }
+interface MoleculeInfoProps { mol: Molecule | null; C: ThemeColors; onGoToCourse: () => void }
 
-function MoleculeInfo({ mol, C }: MoleculeInfoProps) {
-  const navigate = useNavigate()
+function MoleculeInfo({ mol, C, onGoToCourse }: MoleculeInfoProps) {
   if (!mol) return null
   const bondInfo = BOND_TYPES[mol.bondType as BondKind] || BOND_TYPES.single
 
@@ -279,7 +291,7 @@ function MoleculeInfo({ mol, C }: MoleculeInfoProps) {
             ['State (25°C)',  mol.state],
           ] as [string, string][]).map(([label, val]) => (
             <div key={label} style={{ padding:'5px 0', borderBottom:`0.5px solid ${C.border}` }}>
-              <div style={{ fontSize:10, color:C.hint }}>{label}</div>
+              <div style={{ fontSize:10, color:C.hint }}><PropLabel label={label} C={C} /></div>
               <div style={{ fontSize:12, color:C.text, fontFamily:'monospace' }}>{val}</div>
             </div>
           ))}
@@ -299,7 +311,7 @@ function MoleculeInfo({ mol, C }: MoleculeInfoProps) {
       </div>
 
       <div style={{ margin:'0 18px 18px' }}>
-        <button onClick={() => navigate('/course/chemistry')} style={{
+        <button onClick={onGoToCourse} style={{
           fontSize:11.5, color:C.blue, background:'none', border:'none', cursor:'pointer', padding:0,
         }}>Learn more about chemical bonding in the course →</button>
       </div>
@@ -625,47 +637,21 @@ function BuildMode({ C }: BuildModeProps) {
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-type BuilderMode = 'molecules' | 'reactions' | 'build'
+export type BuilderMode = 'molecules' | 'reactions' | 'build'
 
-interface MoleculeBuilderProps { params?: Record<string, unknown> }
+interface MoleculeBuilderProps { mode: BuilderMode; onGoToCourse?: () => void }
 
-export default function MoleculeBuilder({}: MoleculeBuilderProps) {
+export default function MoleculeBuilder({ mode, onGoToCourse = () => {} }: MoleculeBuilderProps) {
   const C = useThemeColors()
-  const [mode, setMode] = useState<BuilderMode>('molecules')
   const [selectedMol, setSelectedMol] = useState<Molecule | null>(MOLECULES[0])
   const [selectedRxn, setSelectedRxn] = useState<Reaction | null>(null)
 
-  const TABS: { key: BuilderMode; label: string }[] = [
-    { key:'molecules', label:'🔬 Molecules' },
-    { key:'reactions', label:'⚗️ Reactions' },
-    { key:'build',     label:'🧪 Build' },
-  ]
-
   return (
-    <div style={{ width:'100%', fontFamily:'sans-serif', background:C.bg, display:'flex', flexDirection:'column', minHeight:'100vh' }}>
-      {/* Header */}
-      <div style={{ padding:'14px 20px', borderBottom:`0.5px solid ${C.border}`, display:'flex', alignItems:'center', gap:16 }}>
-        <div>
-          <div style={{ fontSize:17, fontWeight:600, color:C.text }}>Chemistry Explorer</div>
-          <div style={{ fontSize:12, color:C.muted }}>3D molecules, bonds, and reactions</div>
-        </div>
-        <div style={{ display:'flex', gap:6 }}>
-          {TABS.map(t => (
-            <button key={t.key} onClick={() => setMode(t.key)}
-              style={{ padding:'6px 14px', borderRadius:8, cursor:'pointer', fontSize:13,
-                border:`1px solid ${mode===t.key ? C.blue : C.border}`,
-                background: mode===t.key ? C.blueBg : 'transparent',
-                color: mode===t.key ? C.blue : C.muted, fontWeight: mode===t.key ? 600 : 400 }}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
+    <div style={{ width:'100%', height:'100%', fontFamily:'sans-serif', background:C.bg, display:'flex', flexDirection:'column', overflow:'hidden' }}>
       {mode === 'build' ? (
         <BuildMode C={C} />
       ) : (
-        <div style={{ display:'flex', flex:1 }}>
+        <div style={{ display:'flex', flex:1, minHeight:0 }}>
           {/* List sidebar */}
           <div style={{ width:260, flexShrink:0, borderRight:`0.5px solid ${C.border}`,
             overflowY:'auto', padding:'12px 10px', display:'flex', flexDirection:'column', gap:4 }}>
@@ -692,7 +678,7 @@ export default function MoleculeBuilder({}: MoleculeBuilderProps) {
 
           {/* Detail panel */}
           <div style={{ flex:1, overflowY:'auto', background:C.surface }}>
-            {mode === 'molecules' && <MoleculeInfo mol={selectedMol} C={C} />}
+            {mode === 'molecules' && <MoleculeInfo mol={selectedMol} C={C} onGoToCourse={onGoToCourse} />}
             {mode === 'reactions' && <ReactionPanel reaction={selectedRxn} C={C} />}
           </div>
         </div>

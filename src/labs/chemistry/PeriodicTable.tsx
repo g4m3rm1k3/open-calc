@@ -3,9 +3,9 @@
 // Tiles scale dynamically to fill available width via ResizeObserver.
 
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ELEMENTS, CATEGORY_COLORS, GRID_POSITIONS, type Element, type ElementCategory } from './chemistry_data'
+import { ELEMENTS, CATEGORY_COLORS, GRID_POSITIONS, GLOSSARY, type Element, type ElementCategory } from './chemistry_data'
 import AtomViewer from './AtomViewer'
+import Term from './Term.tsx'
 import { useThemeColors } from '../../hooks/useThemeColors.js'
 
 type ThemeColors = ReturnType<typeof useThemeColors>
@@ -119,93 +119,135 @@ function GhostTile({ label, sub, tileW, tileH, C }: GhostTileProps) {
   )
 }
 
-// ── Info panel ────────────────────────────────────────────────────────────────
-interface InfoPanelProps { element: Element | null; C: ThemeColors }
+// ── Element detail modal ──────────────────────────────────────────────────────
+const BLOCK_LABEL: Record<string, string> = { s:'s-block', p:'p-block', d:'d-block', f:'f-block' }
 
-function InfoPanel({ element, C }: InfoPanelProps) {
-  const navigate = useNavigate()
+// Maps a property row's display label to its glossary key where they don't
+// match exactly (e.g. plural vs singular).
+const LABEL_GLOSSARY_KEY: Record<string, string> = {
+  'Block':             'block (periodic table)',
+  'Oxidation states':  'oxidation state',
+  'Electronegativity': 'electronegativity',
+  'Ionization energy': 'ionization energy',
+  'Electron affinity': 'electron affinity',
+  'Atomic radius':     'atomic radius',
+}
 
-  if (!element) return (
-    <div style={{ padding:40, textAlign:'center', display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}>
-      <div style={{ fontSize:48, opacity:0.2 }}>⚛</div>
-      <div style={{ color:C.hint, fontSize:13 }}>Click any element to explore it</div>
-      <div style={{ color:C.hint, fontSize:11, opacity:0.6 }}>Drag to rotate · Scroll to zoom · Trend toggles above</div>
-    </div>
-  )
+function PropLabel({ label, C }: { label: string; C: ThemeColors }) {
+  const key = LABEL_GLOSSARY_KEY[label]
+  if (key && GLOSSARY[key]) return <Term word={key} C={C}>{label}</Term>
+  return <>{label}</>
+}
+
+interface ElementModalProps { element: Element; onClose: () => void; C: ThemeColors; onGoToCourse: () => void }
+
+function ElementModal({ element, onClose, C, onGoToCourse }: ElementModalProps) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
   const cat   = CATEGORY_COLORS[element.cat] || CATEGORY_COLORS.unknown
   const state = stateAtSTP(element)
   const fmt   = (v: string | number | null): string | number => v != null ? v : '—'
-  const rows: [string, string | number][]  = [
-    ['Atomic number',    element.n],
-    ['Atomic mass',      `${element.mass} u`],
-    ['State at 25 °C',  STATE_LABEL[state]],
-    ['Period / Group',  `${element.period} / ${element.group}`],
-    ['Electron config', element.config],
-    ['Shells',          `[${element.shells?.join(', ')}]`],
-    ['Electronegativity', fmt(element.eneg)],
-    ['Atomic radius',   element.radius  ? `${element.radius} pm` : '—'],
-    ['Melting point',   element.melt    ? `${element.melt} K  (${(element.melt-273.15).toFixed(1)} °C)` : '—'],
-    ['Boiling point',   element.boil    ? `${element.boil} K  (${(element.boil-273.15).toFixed(1)} °C)` : '—'],
-    ['Density',         element.density ? `${element.density} g/cm³` : '—'],
-    ['Discovered by',   fmt(element.discovered)],
-    ['Year',            fmt(element.year)],
+  const rows: [string, string | number][] = [
+    ['Atomic number',      element.n],
+    ['Atomic mass',        `${element.mass} u`],
+    ['State at 25 °C',     STATE_LABEL[state]],
+    ['Period / Group',     `${element.period} / ${element.group ?? '—'}`],
+    ['Block',              BLOCK_LABEL[element.block]],
+    ['Electron config',    element.config],
+    ['Shells',             `[${element.shells?.join(', ')}]`],
+    ['Electronegativity',  fmt(element.eneg)],
+    ['Ionization energy',  element.ionizationEnergy != null ? `${element.ionizationEnergy} kJ/mol` : '—'],
+    ['Electron affinity',  element.electronAffinity != null ? `${element.electronAffinity} kJ/mol` : '—'],
+    ['Oxidation states',   element.oxidationStates.length ? element.oxidationStates.map(s => s > 0 ? `+${s}` : `${s}`).join(', ') : '—'],
+    ['Atomic radius',      element.radius  ? `${element.radius} pm` : '—'],
+    ['Melting point',      element.melt    ? `${element.melt} K  (${(element.melt-273.15).toFixed(1)} °C)` : '—'],
+    ['Boiling point',      element.boil    ? `${element.boil} K  (${(element.boil-273.15).toFixed(1)} °C)` : '—'],
+    ['Density',            element.density ? `${element.density} g/cm³` : '—'],
+    ['Discovered by',      fmt(element.discovered)],
+    ['Year',               fmt(element.year)],
   ]
+
   return (
-    <div style={{ display:'flex', flexDirection:'column' }}>
-      <div style={{ background:cat.bg, borderBottom:`1px solid ${cat.border}`, padding:'14px 18px', display:'flex', alignItems:'center', gap:14 }}>
-        <div style={{ width:68, height:68, borderRadius:10, border:`2px solid ${cat.border}`, background:'rgba(0,0,0,0.28)',
-                      display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-          <div style={{ fontSize:10, color:cat.text, opacity:0.65 }}>{element.n}</div>
-          <div style={{ fontSize:28, fontWeight:700, color:cat.text, fontFamily:'monospace', lineHeight:1 }}>{element.symbol}</div>
-          <div style={{ fontSize:9,  color:cat.text, opacity:0.75 }}>{element.mass}</div>
-        </div>
-        <div style={{ minWidth:0 }}>
-          <div style={{ fontSize:18, fontWeight:600, color:cat.text }}>{element.name}</div>
-          <div style={{ fontSize:11, color:cat.text, opacity:0.7, marginTop:2 }}>
-            {element.cat.replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())}
-          </div>
-          <div style={{ fontSize:11, color:cat.text, opacity:0.7 }}>Period {element.period} · Group {element.group}</div>
-          <div style={{ display:'flex', alignItems:'center', gap:5, marginTop:5 }}>
-            <span style={{ width:7, height:7, borderRadius:'50%', background:STATE_DOT[state], display:'inline-block' }} />
-            <span style={{ fontSize:10, color:cat.text, opacity:0.8 }}>{STATE_LABEL[state]} at room temperature</span>
-          </div>
-        </div>
-      </div>
-      <div style={{ padding:'12px 14px', background:C.surface2 }}>
-        <div style={{ fontSize:10, color:C.hint, marginBottom:8, letterSpacing:'.08em', textTransform:'uppercase' }}>
-          Bohr Model — drag to rotate · scroll to zoom
-        </div>
-        <AtomViewer element={element} />
-      </div>
-      <div style={{ padding:'12px 18px' }}>
-        <div style={{ fontSize:10, color:C.hint, marginBottom:8, letterSpacing:'.08em', textTransform:'uppercase' }}>Properties</div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'3px 10px' }}>
-          {rows.map(([label, val]) => (
-            <div key={label} style={{ padding:'5px 0', borderBottom:`0.5px solid ${C.border}` }}>
-              <div style={{ fontSize:9,  color:C.hint }}>{label}</div>
-              <div style={{ fontSize:12, color:C.text, fontFamily:'monospace', wordBreak:'break-all' }}>{val}</div>
+    <div onClick={onClose} style={{
+      position:'fixed', inset:0, zIndex:250, background:'rgba(0,0,0,0.55)',
+      display:'flex', alignItems:'center', justifyContent:'center', padding:20,
+    }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        width:'100%', maxWidth:920, maxHeight:'88vh', overflowY:'auto',
+        borderRadius:16, background:C.surface, border:`1px solid ${C.border}`,
+        boxShadow:'0 24px 70px rgba(0,0,0,0.4)', display:'flex', flexWrap:'wrap',
+      }}>
+        {/* Left column — identity + Bohr model */}
+        <div style={{ flex:'1 1 360px', minWidth:320 }}>
+          <div style={{ background:cat.bg, padding:'18px 20px', display:'flex', alignItems:'center', gap:14 }}>
+            <div style={{ width:72, height:72, borderRadius:10, border:`2px solid ${cat.border}`, background:'rgba(0,0,0,0.28)',
+                          display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <div style={{ fontSize:10, color:cat.text, opacity:0.65 }}>{element.n}</div>
+              <div style={{ fontSize:30, fontWeight:700, color:cat.text, fontFamily:'monospace', lineHeight:1 }}>{element.symbol}</div>
+              <div style={{ fontSize:9,  color:cat.text, opacity:0.75 }}>{element.mass}</div>
             </div>
-          ))}
+            <div style={{ minWidth:0 }}>
+              <div style={{ fontSize:20, fontWeight:600, color:cat.text }}>{element.name}</div>
+              <div style={{ fontSize:11, color:cat.text, opacity:0.7, marginTop:2 }}>
+                {element.cat.replace(/-/g,' ').replace(/\b\w/g,l=>l.toUpperCase())} · {BLOCK_LABEL[element.block]}
+              </div>
+              <div style={{ fontSize:11, color:cat.text, opacity:0.7 }}>Period {element.period} · Group {element.group ?? '—'}</div>
+              <div style={{ display:'flex', alignItems:'center', gap:5, marginTop:5 }}>
+                <span style={{ width:7, height:7, borderRadius:'50%', background:STATE_DOT[state], display:'inline-block' }} />
+                <span style={{ fontSize:10, color:cat.text, opacity:0.8 }}>{STATE_LABEL[state]} at room temperature</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ padding:'14px 18px' }}>
+            <div style={{ fontSize:10, color:C.hint, marginBottom:8, letterSpacing:'.08em', textTransform:'uppercase' }}>
+              Bohr Model — drag to rotate · scroll to zoom
+            </div>
+            <AtomViewer element={element} height={300} />
+          </div>
+          <div style={{ padding:'0 18px 18px' }}>
+            <div style={{ fontSize:10, color:C.hint, marginBottom:5, letterSpacing:'.08em', textTransform:'uppercase' }}>Common Uses</div>
+            <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>{element.uses}</div>
+          </div>
         </div>
-      </div>
-      <div style={{ padding:'0 18px 12px' }}>
-        <div style={{ fontSize:10, color:C.hint, marginBottom:5, letterSpacing:'.08em', textTransform:'uppercase' }}>Common Uses</div>
-        <div style={{ fontSize:12, color:C.muted, lineHeight:1.7 }}>{element.uses}</div>
-      </div>
-      <div style={{ margin:'0 18px 18px', padding:'10px 14px', background:cat.bg, borderLeft:`3px solid ${cat.border}`, borderRadius:'0 8px 8px 0' }}>
-        <div style={{ fontSize:10, color:cat.text, opacity:0.65, fontWeight:600, marginBottom:4 }}>⚡ Fun fact</div>
-        <div style={{ fontSize:12, color:cat.text, lineHeight:1.65 }}>{element.fact}</div>
-      </div>
-      <div style={{ margin:'0 18px 18px' }}>
-        <button onClick={() => navigate('/course/chemistry')} style={{
-          fontSize:11.5, color:C.blue, background:'none', border:'none', cursor:'pointer', padding:0,
-        }}>Learn more about atomic structure in the course →</button>
+
+        {/* Right column — properties + fun fact + course link */}
+        <div style={{ flex:'1 1 360px', minWidth:320, borderLeft:`0.5px solid ${C.border}`, display:'flex', flexDirection:'column' }}>
+          <div style={{ display:'flex', justifyContent:'flex-end', padding:'10px 14px 0' }}>
+            <button onClick={onClose} style={{
+              border:'none', background:'none', cursor:'pointer', fontSize:18, color:C.muted, lineHeight:1,
+            }}>✕</button>
+          </div>
+          <div style={{ padding:'4px 18px 18px' }}>
+            <div style={{ fontSize:10, color:C.hint, marginBottom:8, letterSpacing:'.08em', textTransform:'uppercase' }}>Properties</div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'3px 10px' }}>
+              {rows.map(([label, val]) => (
+                <div key={label} style={{ padding:'5px 0', borderBottom:`0.5px solid ${C.border}` }}>
+                  <div style={{ fontSize:9,  color:C.hint }}><PropLabel label={label} C={C} /></div>
+                  <div style={{ fontSize:12, color:C.text, fontFamily:'monospace', wordBreak:'break-all' }}>{val}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ margin:'0 18px 16px', padding:'10px 14px', background:cat.bg, borderLeft:`3px solid ${cat.border}`, borderRadius:'0 8px 8px 0' }}>
+            <div style={{ fontSize:10, color:cat.text, opacity:0.65, fontWeight:600, marginBottom:4 }}>⚡ Fun fact</div>
+            <div style={{ fontSize:12, color:cat.text, lineHeight:1.65 }}>{element.fact}</div>
+          </div>
+          <div style={{ margin:'0 18px 18px' }}>
+            <button onClick={onGoToCourse} style={{
+              fontSize:11.5, color:C.blue, background:'none', border:'none', cursor:'pointer', padding:0,
+            }}>Learn more about atomic structure in the course →</button>
+          </div>
+        </div>
       </div>
     </div>
   )
 }
 
-// ── Category legend (clickable, with clear) ───────────────────────────────────
+// ── Category legend (clickable, with clear) — vertical, lives in the side nav ──
 interface LegendProps {
   filterCat: ElementCategory | null
   setFilterCat: (cat: ElementCategory | null) => void
@@ -221,26 +263,20 @@ function Legend({ filterCat, setFilterCat, C }: LegendProps) {
     ['lanthanide','Lanthanide'],            ['actinide','Actinide'],
   ]
   return (
-    <div style={{ display:'flex', flexWrap:'wrap', gap:4, alignItems:'center' }}>
-      {filterCat && (
-        <button onClick={() => setFilterCat(null)} style={{
-          padding:'2px 8px', borderRadius:4, border:`1px solid ${C.border}`,
-          background:'transparent', color:C.muted, fontSize:10, cursor:'pointer',
-        }}>× All</button>
-      )}
+    <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
       {cats.map(([key, label]) => {
         const c      = CATEGORY_COLORS[key]
         const active = filterCat === key
         return (
           <div key={key} onClick={() => setFilterCat(active ? null : key)}
             style={{
-              display:'flex', alignItems:'center', gap:4, cursor:'pointer',
-              padding:'2px 7px', borderRadius:4, transition:'all .13s',
+              display:'flex', alignItems:'center', gap:6, cursor:'pointer',
+              padding:'3px 7px', borderRadius:6, transition:'all .13s',
               background: active ? c.bg       : 'transparent',
               border:     active ? `1px solid ${c.border}` : '1px solid transparent',
             }}>
-            <div style={{ width:8, height:8, borderRadius:2, background:c.bg, border:`1px solid ${c.border}`, flexShrink:0 }} />
-            <span style={{ fontSize:10, color: active ? c.text : C.muted }}>{active ? `${label} ×` : label}</span>
+            <div style={{ width:9, height:9, borderRadius:2, background:c.bg, border:`1px solid ${c.border}`, flexShrink:0 }} />
+            <span style={{ fontSize:11, color: active ? c.text : C.muted }}>{active ? `${label} ×` : label}</span>
           </div>
         )
       })}
@@ -248,7 +284,7 @@ function Legend({ filterCat, setFilterCat, C }: LegendProps) {
   )
 }
 
-// ── State-at-STP filter chips with clear button ───────────────────────────────
+// ── State-at-STP filter chips ──────────────────────────────────────────────────
 interface StateFiltersProps {
   filterState: StateAtSTP | null
   setFilterState: (state: StateAtSTP | null) => void
@@ -262,24 +298,18 @@ function StateFilters({ filterState, setFilterState, C }: StateFiltersProps) {
     { key:'gas',    label:'Gases',   color:'#fbbf24' },
   ]
   return (
-    <div style={{ display:'flex', gap:5, alignItems:'center' }}>
-      {filterState && (
-        <button onClick={() => setFilterState(null)} style={{
-          padding:'4px 9px', borderRadius:6, border:`1px solid ${C.border}`,
-          background:'transparent', color:C.muted, fontSize:11, cursor:'pointer',
-        }}>× All</button>
-      )}
+    <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
       {opts.map(({ key, label, color }) => {
         const active = filterState === key
         return (
           <button key={key} onClick={() => setFilterState(active ? null : key)} style={{
-            padding:'4px 10px', borderRadius:6, cursor:'pointer', fontSize:11,
+            padding:'5px 10px', borderRadius:6, cursor:'pointer', fontSize:11.5, width:'100%',
             border:`1px solid ${active ? color : C.border}`,
             background: active ? `${color}22` : C.surface,
             color: active ? color : C.muted,
-            display:'flex', alignItems:'center', gap:5,
+            display:'flex', alignItems:'center', gap:6, textAlign:'left',
           }}>
-            <span style={{ width:6, height:6, borderRadius:'50%', background:color, display:'inline-block' }} />
+            <span style={{ width:6, height:6, borderRadius:'50%', background:color, display:'inline-block', flexShrink:0 }} />
             {active ? `${label} ×` : label}
           </button>
         )
@@ -288,7 +318,33 @@ function StateFilters({ filterState, setFilterState, C }: StateFiltersProps) {
   )
 }
 
-// ── Trend toggle bar ──────────────────────────────────────────────────────────
+// ── Browsable glossary — click a term to expand its definition in place ───────
+function GlossaryList({ C }: { C: ThemeColors }) {
+  const [open, setOpen] = useState<string | null>(null)
+  const terms = Object.keys(GLOSSARY).sort()
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
+      {terms.map(term => (
+        <div key={term}>
+          <div onClick={() => setOpen(o => o === term ? null : term)} style={{
+            cursor:'pointer', padding:'3px 4px', borderRadius:6,
+            fontSize:11, fontWeight:600, color: open === term ? C.blue : C.text,
+            textTransform:'capitalize',
+          }}>
+            {term}
+          </div>
+          {open === term && (
+            <div style={{ padding:'2px 4px 6px', fontSize:11, color:C.muted, lineHeight:1.55 }}>
+              {GLOSSARY[term]}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ── Trend toggle list ──────────────────────────────────────────────────────────
 interface TrendBarProps {
   active: string | null
   setActive: (key: string | null) => void
@@ -297,19 +353,12 @@ interface TrendBarProps {
 
 function TrendBar({ active, setActive, C }: TrendBarProps) {
   return (
-    <div style={{ display:'flex', alignItems:'center', gap:5, flexWrap:'wrap' }}>
-      <span style={{ fontSize:11, color:C.hint, whiteSpace:'nowrap' }}>Trend:</span>
-      {active && (
-        <button onClick={() => setActive(null)} style={{
-          padding:'4px 9px', borderRadius:6, border:`1px solid ${C.border}`,
-          background:'transparent', color:C.muted, fontSize:11, cursor:'pointer',
-        }}>× Off</button>
-      )}
+    <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
       {TRENDS.map(t => {
         const on = active === t.key
         return (
           <button key={t.key} onClick={() => setActive(on ? null : t.key)} style={{
-            padding:'4px 10px', borderRadius:6, cursor:'pointer', fontSize:11,
+            padding:'5px 10px', borderRadius:6, cursor:'pointer', fontSize:11.5, width:'100%', textAlign:'left',
             border:`1px solid ${on ? t.color : C.border}`,
             background: on ? `${t.color}22` : C.surface,
             color: on ? t.color : C.muted,
@@ -321,9 +370,9 @@ function TrendBar({ active, setActive, C }: TrendBarProps) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-interface PeriodicTableProps { params?: Record<string, unknown> }
+interface PeriodicTableProps { params?: Record<string, unknown>; onGoToCourse?: () => void }
 
-export default function PeriodicTable({ params = {} }: PeriodicTableProps) {
+export default function PeriodicTable({ onGoToCourse = () => {} }: PeriodicTableProps) {
   const C = useThemeColors()
   const [selected,    setSelected]    = useState<Element | null>(null)
   const [search,      setSearch]      = useState('')
@@ -379,35 +428,49 @@ export default function PeriodicTable({ params = {} }: PeriodicTableProps) {
   const gap = 2  // px gap between tiles
 
   return (
-    <div style={{ width:'100%', height:'100%', fontFamily:'sans-serif', background:C.bg, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+    <div style={{ width:'100%', height:'100%', fontFamily:'sans-serif', background:C.bg, display:'flex', overflow:'hidden' }}>
 
-      {/* Header */}
-      <div style={{ padding:'10px 14px', borderBottom:`0.5px solid ${C.border}`, display:'flex', flexDirection:'column', gap:8, flexShrink:0 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:12, flexWrap:'wrap' }}>
-          <div>
-            <div style={{ fontSize:16, fontWeight:600, color:C.text }}>Periodic Table</div>
-            <div style={{ fontSize:11, color:C.muted }}>118 elements — click to explore</div>
-          </div>
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by name, symbol, number, category, state, period, group…"
-            style={{ flex:1, minWidth:200, padding:'6px 12px', borderRadius:8,
-                     border:`1px solid ${C.border}`, background:C.surface, color:C.text, fontSize:12 }}
-          />
+      {/* Side nav — search, filters, trends, legend, glossary. Vertical so the
+          table itself keeps almost all the vertical space (it's a wide, tall grid). */}
+      <div style={{ width:220, flexShrink:0, borderRight:`0.5px solid ${C.border}`,
+        overflowY:'auto', padding:'14px 12px', display:'flex', flexDirection:'column', gap:16 }}>
+        <div>
+          <div style={{ fontSize:15, fontWeight:600, color:C.text }}>Periodic Table</div>
+          <div style={{ fontSize:10.5, color:C.muted }}>118 elements — click to explore</div>
         </div>
-        <div style={{ display:'flex', flexWrap:'wrap', gap:10, alignItems:'flex-start' }}>
+
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search elements…"
+          style={{ width:'100%', padding:'6px 10px', borderRadius:8,
+                   border:`1px solid ${C.border}`, background:C.surface, color:C.text, fontSize:12 }}
+        />
+
+        <div>
+          <div style={{ fontSize:10, color:C.hint, marginBottom:6, letterSpacing:'.08em', textTransform:'uppercase' }}>State at 25°C</div>
           <StateFilters filterState={filterState} setFilterState={setFilterState} C={C} />
+        </div>
+
+        <div>
+          <div style={{ fontSize:10, color:C.hint, marginBottom:6, letterSpacing:'.08em', textTransform:'uppercase' }}>Trend</div>
           <TrendBar active={activeTrend} setActive={setActiveTrend} C={C} />
         </div>
-        <Legend filterCat={filterCat} setFilterCat={setFilterCat} C={C} />
+
+        <div>
+          <div style={{ fontSize:10, color:C.hint, marginBottom:6, letterSpacing:'.08em', textTransform:'uppercase' }}>Category</div>
+          <Legend filterCat={filterCat} setFilterCat={setFilterCat} C={C} />
+        </div>
+
+        <div>
+          <div style={{ fontSize:10, color:C.hint, marginBottom:6, letterSpacing:'.08em', textTransform:'uppercase' }}>Glossary</div>
+          <GlossaryList C={C} />
+        </div>
       </div>
 
-      {/* Body */}
-      <div style={{ display:'flex', flex:1, minHeight:0 }}>
-
-        {/* Table area — flex:1 fills remaining space, ResizeObserver watches it */}
-        <div ref={tableAreaRef} style={{ flex:1, padding:'8px 12px', overflowX:'auto', overflowY:'auto' }}>
+      {/* Table area — centered so leftover width on wide screens doesn't look lopsided */}
+      <div ref={tableAreaRef} style={{ flex:1, minWidth:0, padding:'12px', overflowX:'auto', overflowY:'auto',
+        display:'flex', flexDirection:'column', alignItems:'center' }}>
 
           {/* Group numbers 1–18 */}
           <div style={{ display:'flex', gap, marginBottom:2, paddingLeft:22 }}>
@@ -478,14 +541,9 @@ export default function PeriodicTable({ params = {} }: PeriodicTableProps) {
           </div>
         </div>
 
-        {/* Info panel */}
-        <div style={{
-          width:400, flexShrink:0, borderLeft:`0.5px solid ${C.border}`,
-          background:C.surface, overflowY:'auto', height:'100%',
-        }}>
-          <InfoPanel element={selected} C={C} />
-        </div>
-      </div>
+      {selected && (
+        <ElementModal element={selected} onClose={() => setSelected(null)} C={C} onGoToCourse={onGoToCourse} />
+      )}
     </div>
   )
 }

@@ -74,9 +74,7 @@ Object.assign(VIZ_REGISTRY, {
   MoleculeBuilder:      lazy(() => import("../../labs/chemistry/MoleculeBuilder.tsx")),
   // Note: WhyChemistry is NOT registered here — the lesson-embeddable version
   // lives at courses/chemistry/viz/WhyChemistry.jsx and is picked up by the
-  // glob above. The lab's own intro tab (labs/chemistry/WhyChemistry.tsx) is
-  // only ever rendered directly by ChemistryPage.tsx, never through this
-  // id-based registry — registering it here would shadow the course version.
+  // glob above. Registering a second entry here would shadow it.
   SVGDiagram:           lazy(() => import("../../courses/calculus/viz/SVGDiagram.jsx")),
 });
 

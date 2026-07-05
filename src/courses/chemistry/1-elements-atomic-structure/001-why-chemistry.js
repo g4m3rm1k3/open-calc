@@ -325,7 +325,10 @@ export default {
       'Chemistry explains the visible world by describing what is happening at a scale too small to see.',
       'Every observable phenomenon is a consequence of specific atomic and molecular behaviour.',
     ],
-    callouts: [{ type: 'important', title: 'The core pattern', body: 'Visible phenomenon → invisible atomic explanation. This pattern repeats in every lesson.' }],
+    callouts: [
+      { type: 'important', title: 'The core pattern', body: 'Visible phenomenon → invisible atomic explanation. This pattern repeats in every lesson.' },
+      { type: 'tip', title: 'Hands-on: the Chemistry Lab', body: 'Alongside this course there is an interactive lab: a periodic table with all 118 elements and 3D atom models, a molecule builder with real molecules and reactions, a build mode to assemble your own molecules with live bonding feedback, and step-by-step chemistry calculators. Open it any time from the card below.' },
+    ],
     visualizations: [{ id: 'WhyChemistry', title: 'Why Chemistry?' }],
   },
   math: { prose: [], callouts: [], visualizations: [] },
