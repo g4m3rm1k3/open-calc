@@ -8,9 +8,11 @@ export const meta = {
 
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import CodeLens from './codelens/CodeLens.jsx'
+import CodeLens from './codelens/CodeLens'
 
-function peekHandoff() {
+interface CodelensHandoff { code?: string; lang?: string }
+
+function peekHandoff(): CodelensHandoff | null {
   try {
     const raw = localStorage.getItem('codelens-handoff')
     if (!raw) return null
@@ -20,7 +22,7 @@ function peekHandoff() {
   }
 }
 
-function peekLessonReturn() {
+function peekLessonReturn(): { path: string | null; label: string | null } {
   try {
     return {
       path:  sessionStorage.getItem('codelens_return_path')  || null,

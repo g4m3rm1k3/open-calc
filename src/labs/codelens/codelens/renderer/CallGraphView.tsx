@@ -3,43 +3,49 @@
  * Nodes = named functions/methods. Edges = "A calls B".
  * Active nodes are highlighted based on the current execution stack.
  */
+import type { CallGraph, CallGraphNode, TraceEvent } from '../types'
+import { useCodeLensTheme } from '../ThemeContext'
+import type { CodeLensUiPalette } from '../theme'
 
-const SVG_W    = 292
+// SVG_W was 292 (sized for a ~300px column); this view now mostly renders
+// inside the much larger CodeDetailModal, so a narrow virtual width was
+// still forcing computed node widths down to ~60 units and clipping longer
+// names (e.g. "constructor") even though there was plenty of real screen
+// space — the viewBox scales to fit its container either way, so widening it
+// only gives each node more room relative to its own text.
+const SVG_W    = 640
 const NODE_H   = 44
 const LAYER_H  = 84
 const PAD_TOP  = 14
 const PAD_SIDE = 8
-const NODE_GAP = 8
+const NODE_GAP = 12
 
-const KIND_COLOR = {
-  function:    '#7dd3fc',
-  arrow:       '#86efac',
-  method:      '#818cf8',
-  constructor: '#a78bfa',
+function kindColor(k: CallGraphNode['kind'], ui: CodeLensUiPalette): string {
+  const KIND_COLOR: Record<string, string> = {
+    function: ui.cyan, arrow: ui.green, method: ui.accent, constructor: ui.purple,
+  }
+  return KIND_COLOR[k] ?? ui.textDim
 }
-const kindColor = k => KIND_COLOR[k] ?? '#94a3b8'
 
-function complexityColor(c) {
+function complexityColor(c: string | undefined, ui: CodeLensUiPalette): string | null {
   if (!c || c === 'O(1)') return null
-  if (c === 'O(n)' || c.includes('recursive')) return '#fbbf24'
-  if (c.includes('log') || c === 'O(n²)') return '#f97316'
-  return '#f87171'
+  if (c === 'O(n)' || c.includes('recursive')) return ui.amber
+  if (c.includes('log') || c === 'O(n²)') return ui.pink
+  return ui.red
 }
 
-function trunc(str, maxLen) {
-  if (!str) return ''
-  return str.length > maxLen ? str.slice(0, maxLen - 1) + '…' : str
-}
+interface Position { x: number; y: number; w: number; cx: number }
+interface Layout { positions: Record<string, Position>; maxLayer: number; nameById: Record<string, string> }
 
 // ── Layout ─────────────────────────────────────────────────────────────────────
 // Assigns each node a layer (longest-path from root), then positions within layer.
 
-function computeLayout(nodes, edges) {
-  const nameById = {}
+function computeLayout(nodes: CallGraph['nodes'], edges: CallGraph['edges']): Layout {
+  const nameById: Record<string, string> = {}
   nodes.forEach(n => { nameById[n.id] = n.name })
 
-  const adj    = {}
-  const indeg  = {}
+  const adj: Record<string, string[]> = {}
+  const indeg: Record<string, number> = {}
   nodes.forEach(n => { adj[n.id] = []; indeg[n.id] = 0 })
 
   for (const e of edges) {
@@ -48,16 +54,16 @@ function computeLayout(nodes, edges) {
     indeg[e.to] = (indeg[e.to] ?? 0) + 1
   }
 
-  const layer = {}
+  const layer: Record<string, number> = {}
   nodes.forEach(n => { layer[n.id] = 0 })
 
   // BFS from zero-in-degree roots; assign longest-path layer
   let queue = nodes.filter(n => indeg[n.id] === 0).map(n => n.id)
   if (queue.length === 0) queue = nodes.map(n => n.id)  // all in a cycle
 
-  const visited = new Set()
+  const visited = new Set<string>()
   while (queue.length) {
-    const next = []
+    const next: string[] = []
     for (const id of queue) {
       if (visited.has(id)) continue
       visited.add(id)
@@ -71,7 +77,7 @@ function computeLayout(nodes, edges) {
   }
 
   // Group nodes by layer, sort within each by source line
-  const byLayer = {}
+  const byLayer: Record<string, CallGraphNode[]> = {}
   nodes.forEach(n => {
     const l = layer[n.id] ?? 0
     if (!byLayer[l]) byLayer[l] = []
@@ -81,7 +87,7 @@ function computeLayout(nodes, edges) {
 
   const maxLayer = Math.max(...nodes.map(n => layer[n.id] ?? 0), 0)
 
-  const positions = {}
+  const positions: Record<string, Position> = {}
   for (const [l, layerNodes] of Object.entries(byLayer)) {
     const count  = layerNodes.length
     const nodeW  = Math.min(200, Math.floor((SVG_W - 2 * PAD_SIDE - (count - 1) * NODE_GAP) / count))
@@ -98,10 +104,18 @@ function computeLayout(nodes, edges) {
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
-export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) {
+interface CallGraphViewProps {
+  callGraph: CallGraph | null | undefined
+  currentEvent: TraceEvent | null
+  onNodeClick?: (node: CallGraphNode) => void
+}
+
+export default function CallGraphView({ callGraph, currentEvent, onNodeClick }: CallGraphViewProps) {
+  const { theme: { ui } } = useCodeLensTheme()
+
   if (!callGraph?.nodes?.length) {
     return (
-      <div style={{ padding: '10px 0', fontSize: 12, color: '#475569' }}>
+      <div style={{ padding: '10px 0', fontSize: 12, color: ui.textFaint }}>
         No functions detected.
       </div>
     )
@@ -111,6 +125,9 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
   const activeNames = new Set((currentEvent?.stackSnapshot ?? []).map(f => f.name))
   const layout  = computeLayout(nodes, edges)
   const svgH    = PAD_TOP + (layout.maxLayer + 1) * LAYER_H + 4
+  const KIND_COLOR: Record<string, string> = {
+    function: ui.cyan, arrow: ui.green, method: ui.accent, constructor: ui.purple,
+  }
 
   return (
     <div style={{ overflow: 'auto', marginBottom: 10 }}>
@@ -122,10 +139,10 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
       >
         <defs>
           <marker id="cg-arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <polygon points="0,0 0,6 6,3" fill="#334155" />
+            <polygon points="0,0 0,6 6,3" fill={ui.borderStrong} />
           </marker>
           <marker id="cg-arr-a" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-            <polygon points="0,0 0,6 6,3" fill="#818cf8" />
+            <polygon points="0,0 0,6 6,3" fill={ui.accent} />
           </marker>
           {/* Per-node clip paths so text never escapes its card */}
           {nodes.map(node => {
@@ -153,7 +170,7 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
             <path key={i}
               d={`M${x1},${y1} C${x1},${mid} ${x2},${mid} ${x2},${y2}`}
               fill="none"
-              stroke={bothActive ? '#6366f1' : '#1e293b'}
+              stroke={bothActive ? ui.accentSolid : ui.border}
               strokeWidth={bothActive ? 1.5 : 1}
               markerEnd={bothActive ? 'url(#cg-arr-a)' : 'url(#cg-arr)'}
             />
@@ -167,8 +184,8 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
           const { x, y, w } = pos
           const isActive  = activeNames.has(node.name)
           const isRecurse = edges.some(e => e.recursive && e.from === node.id)
-          const color     = kindColor(node.kind)
-          const cxColor   = complexityColor(node.complexity)
+          const color     = kindColor(node.kind, ui)
+          const cxColor   = complexityColor(node.complexity, ui)
           const clipId    = `cg_clip_${node.id.replace(/[^a-zA-Z0-9]/g, '_')}`
           const clickable = !!onNodeClick
 
@@ -180,8 +197,8 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
             >
               {/* Hit area + card background */}
               <rect x={x} y={y} width={w} height={NODE_H} rx={6}
-                fill="#0d1526"
-                stroke={isActive ? '#fbbf24' : color + '44'}
+                fill={ui.panelBg2}
+                stroke={isActive ? ui.amber : color + '44'}
                 strokeWidth={isActive ? 1.5 : 1}
                 style={{ filter: isActive ? 'drop-shadow(0 0 6px rgba(251,191,36,.35))' : 'none' }}
               />
@@ -198,12 +215,12 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
               {/* Recursive indicator — outside clip path, right side */}
               {isRecurse && (
                 <text x={x + w - 5} y={y + 15}
-                  fill="#f59e0b" fontSize={12} textAnchor="end" fontFamily="monospace">↺</text>
+                  fill={ui.amber} fontSize={12} textAnchor="end" fontFamily="monospace">↺</text>
               )}
 
               {/* Function name — clipped */}
               <text x={x + 10} y={y + 17}
-                fill={isActive ? '#fbbf24' : color}
+                fill={isActive ? ui.amber : color}
                 fontSize={11} fontFamily="JetBrains Mono, monospace" fontWeight={700}
                 clipPath={`url(#${clipId})`}>
                 {node.name}
@@ -211,7 +228,7 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
 
               {/* Params — clipped */}
               <text x={x + 10} y={y + 33}
-                fill="#475569" fontSize={9} fontFamily="JetBrains Mono, monospace"
+                fill={ui.textFaint} fontSize={9} fontFamily="JetBrains Mono, monospace"
                 clipPath={`url(#${clipId})`}>
                 ({node.params.join(', ')})
               </text>
@@ -228,7 +245,7 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
               {/* Line number (bottom-right when no complexity) */}
               {!cxColor && node.line && (
                 <text x={x + w - 5} y={y + 33}
-                  fill="#334155" fontSize={8} fontFamily="JetBrains Mono, monospace"
+                  fill={ui.borderStrong} fontSize={8} fontFamily="JetBrains Mono, monospace"
                   textAnchor="end">
                   L{node.line}
                 </text>
@@ -237,7 +254,7 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
               {/* "click for detail" hint text */}
               {clickable && (
                 <text x={x + w / 2} y={y + NODE_H + 11}
-                  fill="#1e293b" fontSize={8} fontFamily="JetBrains Mono, monospace"
+                  fill={ui.border} fontSize={8} fontFamily="JetBrains Mono, monospace"
                   textAnchor="middle" className="cg-hint">
                   click for details
                 </text>
@@ -252,13 +269,13 @@ export default function CallGraphView({ callGraph, currentEvent, onNodeClick }) 
         {Object.entries(KIND_COLOR).map(([kind, color]) => (
           nodes.some(n => n.kind === kind) && (
             <span key={kind} style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 9,
-              color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+              color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace' }}>
               <span style={{ width: 3, height: 10, background: color, borderRadius: 2, display: 'inline-block' }} />
               {kind}
             </span>
           )
         ))}
-        <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace', marginLeft: 'auto' }}>
+        <span style={{ fontSize: 9, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace', marginLeft: 'auto' }}>
           click node for explanation
         </span>
       </div>

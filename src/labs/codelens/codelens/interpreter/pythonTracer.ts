@@ -4,6 +4,7 @@
  * event-stream format the JS interpreter emits. Returns { events, output, error }.
  */
 import { getPyodide } from '../../../../utils/pyodideRuntime.js'
+import type { ExecutionResult } from '../types'
 
 const CL = '###CL###'
 const MAX_EVENTS = 8000
@@ -134,14 +135,14 @@ finally:
 
 // ── Exported runner ───────────────────────────────────────────────────────────
 
-export async function runPython(source) {
+export async function runPython(source: string): Promise<ExecutionResult> {
   const pyodide = await getPyodide()
 
-  const events = []
-  const output = []
+  const events: ExecutionResult['events'] = []
+  const output: string[] = []
 
   pyodide.setStdout({
-    batched: (text) => {
+    batched: (text: string) => {
       for (const line of text.split('\n')) {
         if (!line) continue
         if (line.startsWith(CL)) {
@@ -154,7 +155,7 @@ export async function runPython(source) {
   })
 
   pyodide.setStderr({
-    batched: (text) => {
+    batched: (text: string) => {
       for (const line of text.split('\n')) {
         if (line.trim()) output.push(`[error] ${line}`)
       }
@@ -163,7 +164,7 @@ export async function runPython(source) {
 
   pyodide.globals.set('_user_code_', source)
 
-  let error = null
+  let error: ExecutionResult['error'] = null
   try {
     await pyodide.runPythonAsync(HARNESS)
   } catch (e) {

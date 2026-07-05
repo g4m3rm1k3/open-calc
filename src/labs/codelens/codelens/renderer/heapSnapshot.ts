@@ -1,10 +1,11 @@
 // Replay heap deltas up to a given step to reconstruct the full heap state.
 // Called on every step change — fast enough because each delta is a few ops.
+import type { TraceEvent, HeapSnapshot, HeapObjectEntry, HeapGraphData } from '../types'
 
-export function buildHeapSnapshot(events, stepIndex) {
-  const objects = new Map() // objectId -> { id, type, properties: Map, prototype }
-  const lastCreated = new Set()
-  const lastMutated = new Set()
+export function buildHeapSnapshot(events: TraceEvent[], stepIndex: number): HeapSnapshot {
+  const objects = new Map<number, HeapObjectEntry>()
+  const lastCreated = new Set<number>()
+  const lastMutated = new Set<number>()
 
   for (let i = 0; i <= stepIndex && i < events.length; i++) {
     const deltas = events[i].heapDelta ?? []
@@ -41,10 +42,10 @@ export function buildHeapSnapshot(events, stepIndex) {
 }
 
 // Extract nodes + directed edges from a heap snapshot for the D3 graph.
-export function snapshotToGraph(snapshot) {
-  const nodes = []
-  const links = []
-  const seen  = new Set()
+export function snapshotToGraph(snapshot: HeapSnapshot): HeapGraphData {
+  const nodes: HeapGraphData['nodes'] = []
+  const links: HeapGraphData['links'] = []
+  const seen  = new Set<string>()
 
   for (const obj of snapshot.objects.values()) {
     nodes.push({
@@ -71,12 +72,12 @@ export function snapshotToGraph(snapshot) {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function isRef(v) {
+function isRef(v: unknown): v is { $ref: number } {
   return v !== null && typeof v === 'object' && '$ref' in v
 }
 
-function visibleProps(obj) {
-  const out = []
+function visibleProps(obj: HeapObjectEntry): [string, string][] {
+  const out: [string, string][] = []
   for (const [k, v] of obj.properties) {
     if (isRef(v)) continue  // references shown as edges, not inline
     if (k === '__mapData__') continue
@@ -86,7 +87,7 @@ function visibleProps(obj) {
   return out
 }
 
-function formatVal(v) {
+function formatVal(v: unknown): string {
   if (v === null)      return 'null'
   if (v === undefined) return 'undef'
   if (typeof v === 'string') return v.length > 12 ? `"${v.slice(0, 12)}…"` : `"${v}"`

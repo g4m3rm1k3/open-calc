@@ -1,10 +1,11 @@
 /**
- * nativeTracer.js
+ * nativeTracer.ts
  * Connects to the CodeLens WebSocket bridge on the existing backend
  * (http://127.0.0.1:4318) and streams execution events for native languages.
  *
  * Returns { events, output, error } in the same shape as runPython / runInterpreter.
  */
+import type { ExecutionResult, TraceEvent, RuntimeError } from '../types'
 
 const BACKEND_WS = (() => {
   // In dev, Vite runs on :5173 and the backend on :4318.
@@ -13,22 +14,19 @@ const BACKEND_WS = (() => {
   return `ws://127.0.0.1:${backendPort}/api/codelens`
 })()
 
-/**
- * Run code via the native debug bridge.
- *
- * @param {string} source   Source code to trace
- * @param {'go'|'cpp'|'rust'} lang
- * @param {(event: object) => void} onEvent  Called for each CodeLens event as it arrives
- * @returns {Promise<{ events: object[], output: string[], error: object|null }>}
- */
-export function runNative(source, lang, onEvent) {
+/** Run code via the native debug bridge. `onEvent` is called for each CodeLens event as it arrives. */
+export function runNative(
+  source: string,
+  lang: 'go' | 'cpp' | 'rust',
+  onEvent?: (event: TraceEvent) => void,
+): Promise<ExecutionResult> {
   return new Promise((resolve) => {
-    let ws
-    const events = []
-    const output = []
+    let ws: WebSocket
+    const events: TraceEvent[] = []
+    const output: string[] = []
     let settled = false
 
-    function finish(error = null) {
+    function finish(error: RuntimeError | null = null) {
       if (settled) return
       settled = true
       try { ws?.close() } catch {}
@@ -41,7 +39,7 @@ export function runNative(source, lang, onEvent) {
       resolve({
         events: [],
         output: [],
-        error: { type: 'ConnectionError', message: `Cannot create WebSocket: ${e.message}` },
+        error: { type: 'ConnectionError', message: `Cannot create WebSocket: ${(e as Error).message}` },
       })
       return
     }
@@ -67,7 +65,7 @@ export function runNative(source, lang, onEvent) {
     })
 
     ws.addEventListener('message', (evt) => {
-      let msg
+      let msg: any
       try { msg = JSON.parse(evt.data) } catch { return }
 
       switch (msg.type) {
@@ -124,7 +122,7 @@ export function runNative(source, lang, onEvent) {
  * Check if the backend is reachable and which tools are installed.
  * Returns null if the backend is down.
  */
-export async function checkBackendTools() {
+export async function checkBackendTools(): Promise<unknown | null> {
   try {
     const res = await fetch('http://127.0.0.1:4318/api/codelens/tools', { signal: AbortSignal.timeout(2000) })
     if (!res.ok) return null

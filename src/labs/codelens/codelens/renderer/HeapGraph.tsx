@@ -5,22 +5,29 @@
  *   Linked-list     → horizontal card chain with arrows
  *   Everything else → scrollable card list with inline reference badges
  */
+import type { HeapSnapshot, HeapObjectEntry, HeapDelta } from '../types'
+import { useCodeLensTheme } from '../ThemeContext'
+import type { CodeLensUiPalette } from '../theme'
 
-const TYPE_COLOR = {
-  Object:     '#818cf8',
-  Array:      '#7dd3fc',
-  Node:       '#86efac',
-  LinkedList: '#a78bfa',
-  Map:        '#fbbf24',
-  Set:        '#f472b6',
-  prototype:  '#475569',
+function typeColor(t: string, ui: CodeLensUiPalette): string {
+  const TYPE_COLOR: Record<string, string> = {
+    Object: ui.accent, Array: ui.cyan, Node: ui.green, LinkedList: ui.purple,
+    Map: ui.amber, Set: ui.pink, prototype: ui.textFaint,
+  }
+  return TYPE_COLOR[t] ?? ui.textDim
 }
-const typeColor = t => TYPE_COLOR[t] ?? '#94a3b8'
 
 // ── Top-level dispatcher ───────────────────────────────────────────────────────
 
-export default function HeapGraph({ snapshot, heapDelta }) {
-  if (!snapshot || snapshot.objects.size === 0) return <EmptyState />
+interface HeapGraphProps {
+  snapshot: HeapSnapshot | null
+  heapDelta?: HeapDelta[]
+}
+
+export default function HeapGraph({ snapshot, heapDelta }: HeapGraphProps) {
+  const { theme: { ui } } = useCodeLensTheme()
+
+  if (!snapshot || snapshot.objects.size === 0) return <EmptyState ui={ui} />
 
   const objects = [...snapshot.objects.values()]
   const arrays  = objects.filter(o => o.type === 'Array')
@@ -30,21 +37,21 @@ export default function HeapGraph({ snapshot, heapDelta }) {
 
   // ── Check for SICP-style pair structures before falling into flat grid ─────
   // Check tree first (branching pairs), then chain (linear list).
-  const sicpTreeRoot  = arrays.length >= 3 ? detectSicpTree(arrays, snapshot) : null
-  const arraySiciChain = !sicpTreeRoot && arrays.length >= 2 ? detectSicpChain(arrays, snapshot) : null
+  const sicpTreeRoot  = arrays.length >= 3 ? detectSicpTree(arrays) : null
+  const arraySiciChain = !sicpTreeRoot && arrays.length >= 2 ? detectSicpChain(arrays) : null
 
   // ── SICP pair tree → tree diagram ─────────────────────────────────────────
-  if (sicpTreeRoot) {
+  if (sicpTreeRoot != null) {
     return (
       <div style={{ padding: '10px 12px', overflow: 'auto', height: '100%' }}>
-        <div style={{ marginBottom: 6, fontSize: 10, color: '#a78bfa',
+        <div style={{ marginBottom: 6, fontSize: 10, color: ui.purple,
           fontFamily: 'JetBrains Mono, monospace', letterSpacing: '.06em' }}>
           PAIR TREE — {arrays.length} node{arrays.length !== 1 ? 's' : ''}
         </div>
         <div style={{ display: 'inline-block' }}>
-          <PairTreeNode id={sicpTreeRoot} snapshot={snapshot} />
+          <PairTreeNode id={sicpTreeRoot} snapshot={snapshot} ui={ui} />
         </div>
-        <div style={{ marginTop: 10, fontSize: 10, color: '#475569',
+        <div style={{ marginTop: 10, fontSize: 10, color: ui.textFaint,
           fontFamily: 'JetBrains Mono, monospace' }}>
           Each box: [head | tail] — • = pointer to child node, / = null
         </div>
@@ -56,22 +63,21 @@ export default function HeapGraph({ snapshot, heapDelta }) {
   if (arraySiciChain) {
     const chainSet   = new Set(arraySiciChain)
     const standalone = arrays.filter(o => !chainSet.has(o.id))
-    const chainNodes = arraySiciChain.map(id => snapshot.objects.get(id)).filter(Boolean)
+    const chainNodes = arraySiciChain.map(id => snapshot.objects.get(id)).filter((o): o is HeapObjectEntry => !!o)
     return (
       <div style={{ padding: '10px 12px', overflow: 'auto', height: '100%' }}>
         {standalone.length > 0 && standalone.map(arr => (
-          <ArrayCells key={arr.id} obj={arr}
+          <ArrayCells key={arr.id} obj={arr} ui={ui}
             isNew={snapshot.lastCreated.has(arr.id)}
             mutated={mutatedProps[arr.id] ?? new Set()}
           />
         ))}
-        <div style={{ marginBottom: 6, fontSize: 10, color: '#86efac',
+        <div style={{ marginBottom: 6, fontSize: 10, color: ui.green,
           fontFamily: 'JetBrains Mono, monospace', letterSpacing: '.06em' }}>
           LIST CHAIN — {chainNodes.length} pair{chainNodes.length !== 1 ? 's' : ''}
         </div>
-        <PairChain nodes={chainNodes} snapshot={snapshot}
+        <PairChain nodes={chainNodes} ui={ui}
           lastCreated={snapshot.lastCreated} lastMutated={snapshot.lastMutated}
-          mutatedProps={mutatedProps}
         />
       </div>
     )
@@ -85,6 +91,7 @@ export default function HeapGraph({ snapshot, heapDelta }) {
           <ArrayCells
             key={arr.id}
             obj={arr}
+            ui={ui}
             isNew={snapshot.lastCreated.has(arr.id)}
             mutated={mutatedProps[arr.id] ?? new Set()}
           />
@@ -96,14 +103,14 @@ export default function HeapGraph({ snapshot, heapDelta }) {
   // ── Detect linked-list chain in non-array objects ──────────────────────────
   const chain = detectChain(others, snapshot)
   const chainSet = chain ? new Set(chain) : null
-  const containers = chain ? others.filter(o => !chainSet.has(o.id)) : []
-  const chainNodes = chain ? chain.map(id => snapshot.objects.get(id)).filter(Boolean) : []
+  const containers = chain ? others.filter(o => !chainSet!.has(o.id)) : []
+  const chainNodes = chain ? chain.map(id => snapshot.objects.get(id)).filter((o): o is HeapObjectEntry => !!o) : []
 
   return (
     <div style={{ padding: '10px 12px', overflow: 'auto', height: '100%' }}>
       {/* Flat arrays alongside objects */}
       {arrays.map(arr => (
-        <ArrayCells key={arr.id} obj={arr}
+        <ArrayCells key={arr.id} obj={arr} ui={ui}
           isNew={snapshot.lastCreated.has(arr.id)}
           mutated={mutatedProps[arr.id] ?? new Set()}
         />
@@ -111,7 +118,7 @@ export default function HeapGraph({ snapshot, heapDelta }) {
 
       {/* Container objects (e.g. LinkedList wrapper) */}
       {containers.map(obj => (
-        <ObjectCard key={obj.id} obj={obj} snapshot={snapshot}
+        <ObjectCard key={obj.id} obj={obj} snapshot={snapshot} ui={ui}
           isNew={snapshot.lastCreated.has(obj.id)}
           isMutated={snapshot.lastMutated.has(obj.id)}
           mutatedProps={mutatedProps[obj.id] ?? new Set()}
@@ -124,27 +131,27 @@ export default function HeapGraph({ snapshot, heapDelta }) {
           {containers.length > 0 && (
             <div style={{
               display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8,
-              fontSize: 10, color: '#475569', fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 10, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace',
             }}>
-              <div style={{ height: 1, width: 24, background: '#1e293b' }} />
+              <div style={{ height: 1, width: 24, background: ui.border }} />
               chain of {chainNodes.length} {chainNodes[0]?.type ?? 'nodes'}
-              <div style={{ flex: 1, height: 1, background: '#1e293b' }} />
+              <div style={{ flex: 1, height: 1, background: ui.border }} />
             </div>
           )}
           <div style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', paddingBottom: 6 }}>
-            {chainNodes.map((obj, i) => (
+            {chainNodes.map((obj) => (
               <div key={obj.id} style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                <ObjectCard obj={obj} snapshot={snapshot}
+                <ObjectCard obj={obj} snapshot={snapshot} ui={ui}
                   isNew={snapshot.lastCreated.has(obj.id)}
                   isMutated={snapshot.lastMutated.has(obj.id)}
                   mutatedProps={mutatedProps[obj.id] ?? new Set()}
                   compact
                 />
-                <ChainArrow />
+                <ChainArrow ui={ui} />
               </div>
             ))}
             <span style={{
-              fontSize: 12, color: '#475569', fontFamily: 'JetBrains Mono, monospace',
+              fontSize: 12, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace',
               padding: '0 8px', flexShrink: 0,
             }}>null</span>
           </div>
@@ -153,7 +160,7 @@ export default function HeapGraph({ snapshot, heapDelta }) {
 
       {/* Card list for non-chain objects */}
       {!chain && others.map(obj => (
-        <ObjectCard key={obj.id} obj={obj} snapshot={snapshot}
+        <ObjectCard key={obj.id} obj={obj} snapshot={snapshot} ui={ui}
           isNew={snapshot.lastCreated.has(obj.id)}
           isMutated={snapshot.lastMutated.has(obj.id)}
           mutatedProps={mutatedProps[obj.id] ?? new Set()}
@@ -165,9 +172,20 @@ export default function HeapGraph({ snapshot, heapDelta }) {
 
 // ── Object card (used for both list and chain) ─────────────────────────────────
 
-function ObjectCard({ obj, snapshot, isNew, isMutated, mutatedProps, compact }) {
-  const color = typeColor(obj.type)
-  const prims = [], refs = []
+interface ObjectCardProps {
+  obj: HeapObjectEntry
+  snapshot: HeapSnapshot
+  isNew: boolean
+  isMutated: boolean
+  mutatedProps: Set<string>
+  compact?: boolean
+  ui: CodeLensUiPalette
+}
+
+function ObjectCard({ obj, snapshot, isNew, isMutated, mutatedProps, compact, ui }: ObjectCardProps) {
+  const color = typeColor(obj.type, ui)
+  const prims: { key: string; val: unknown }[] = []
+  const refs: { key: string; label: string; id: number }[] = []
 
   for (const [k, v] of obj.properties) {
     if (obj.type === 'Array' && k === 'length') continue
@@ -179,14 +197,14 @@ function ObjectCard({ obj, snapshot, isNew, isMutated, mutatedProps, compact }) 
     }
   }
 
-  const borderColor = isNew ? '#22c55e' : isMutated ? '#f59e0b' : color + '44'
+  const borderColor = isNew ? ui.green : isMutated ? ui.amber : color + '44'
   const glow = (isNew || isMutated)
-    ? `0 0 12px ${isNew ? '#22c55e44' : '#f59e0b44'}`
+    ? `0 0 12px ${isNew ? ui.green + '44' : ui.amber + '44'}`
     : 'none'
 
   return (
     <div style={{
-      background: '#0d1526',
+      background: ui.panelBg2,
       border: `1px solid ${borderColor}`,
       borderRadius: 8,
       marginBottom: compact ? 0 : 8,
@@ -205,19 +223,19 @@ function ObjectCard({ obj, snapshot, isNew, isMutated, mutatedProps, compact }) 
         <span style={{ color, fontWeight: 700, fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>
           {obj.type}
         </span>
-        <span style={{ color: '#334155', fontSize: 9, fontFamily: 'JetBrains Mono, monospace' }}>
+        <span style={{ color: ui.borderStrong, fontSize: 9, fontFamily: 'JetBrains Mono, monospace' }}>
           #{obj.id}
         </span>
         {isNew && (
           <span style={{
             marginLeft: 'auto', fontSize: 9, padding: '1px 5px', borderRadius: 99,
-            background: '#14532d22', color: '#86efac', border: '1px solid #14532d44',
+            background: ui.greenDeep + '22', color: ui.green, border: `1px solid ${ui.greenDeep}44`,
           }}>new</span>
         )}
         {isMutated && !isNew && (
           <span style={{
             marginLeft: 'auto', fontSize: 9, padding: '1px 5px', borderRadius: 99,
-            background: '#78350f22', color: '#fcd34d', border: '1px solid #78350f44',
+            background: ui.amberDeep + '22', color: ui.amberSoft, border: `1px solid ${ui.amberDeep}44`,
           }}>changed</span>
         )}
       </div>
@@ -232,23 +250,23 @@ function ObjectCard({ obj, snapshot, isNew, isMutated, mutatedProps, compact }) 
                 display: 'flex', gap: 6, alignItems: 'baseline',
                 fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
                 marginBottom: 2,
-                background: highlighted ? '#78350f1a' : 'transparent',
+                background: highlighted ? ui.amberDeep + '1a' : 'transparent',
                 borderRadius: 3, padding: highlighted ? '1px 3px' : '1px 0',
               }}>
-                <span style={{ color: '#7dd3fc', flexShrink: 0 }}>{key}:</span>
-                <span style={{ color: valColor(val) }}>{fmtVal(val)}</span>
+                <span style={{ color: ui.cyan, flexShrink: 0 }}>{key}:</span>
+                <span style={{ color: valColor(val, ui) }}>{fmtVal(val)}</span>
               </div>
             )
           })}
-          {refs.map(({ key, label, id }) => (
+          {refs.map(({ key, label }) => (
             <div key={key} style={{
               display: 'flex', gap: 6, alignItems: 'center',
               fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
               marginBottom: 2,
             }}>
-              <span style={{ color: '#7dd3fc', flexShrink: 0 }}>{key}:</span>
+              <span style={{ color: ui.cyan, flexShrink: 0 }}>{key}:</span>
               <span style={{
-                color: '#818cf8', background: '#1e1b4b',
+                color: ui.accent, background: ui.accentBg,
                 padding: '1px 6px', borderRadius: 4, fontSize: 10,
               }}>→ {label}</span>
             </div>
@@ -259,19 +277,26 @@ function ObjectCard({ obj, snapshot, isNew, isMutated, mutatedProps, compact }) 
   )
 }
 
-function ChainArrow() {
+function ChainArrow({ ui }: { ui: CodeLensUiPalette }) {
   return (
     <svg width="28" height="24" style={{ flexShrink: 0, overflow: 'visible' }}>
-      <line x1="2" y1="12" x2="22" y2="12" stroke="#6366f1" strokeWidth="1.5" />
-      <polygon points="22,8 28,12 22,16" fill="#6366f1" />
+      <line x1="2" y1="12" x2="22" y2="12" stroke={ui.accentSolid} strokeWidth="1.5" />
+      <polygon points="22,8 28,12 22,16" fill={ui.accentSolid} />
     </svg>
   )
 }
 
 // ── Array cells (sort / array-heavy algorithms) ────────────────────────────────
 
-function ArrayCells({ obj, isNew, mutated }) {
-  const elems = []
+interface ArrayCellsProps {
+  obj: HeapObjectEntry
+  isNew: boolean
+  mutated: Set<string>
+  ui: CodeLensUiPalette
+}
+
+function ArrayCells({ obj, isNew, mutated, ui }: ArrayCellsProps) {
+  const elems: unknown[] = []
   for (const [k, v] of obj.properties) {
     const idx = parseInt(k, 10)
     if (!isNaN(idx)) elems[idx] = v
@@ -283,17 +308,17 @@ function ArrayCells({ obj, isNew, mutated }) {
   return (
     <div style={{ marginBottom: 16 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-        <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: '#7dd3fc', fontWeight: 700 }}>
+        <span style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: ui.cyan, fontWeight: 700 }}>
           Array #{obj.id}
         </span>
         <span style={{
           fontSize: 10, padding: '1px 6px', borderRadius: 99,
-          background: '#1e293b', color: '#475569', fontFamily: 'JetBrains Mono, monospace',
+          background: ui.border, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace',
         }}>{len} elements</span>
         {isNew && (
           <span style={{
             fontSize: 10, padding: '1px 6px', borderRadius: 99,
-            background: '#14532d22', color: '#86efac', border: '1px solid #14532d',
+            background: ui.greenDeep + '22', color: ui.green, border: `1px solid ${ui.greenDeep}`,
           }}>new</span>
         )}
       </div>
@@ -305,16 +330,16 @@ function ArrayCells({ obj, isNew, mutated }) {
               width: cellW, height: cellH,
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
               borderRadius: 5, cursor: 'default',
-              background: hit ? '#78350f33' : '#0f172a',
-              border: `1px solid ${hit ? '#f59e0b' : '#1e293b'}`,
-              boxShadow: hit ? '0 0 8px #f59e0b44' : 'none',
+              background: hit ? ui.amberDeep + '33' : ui.panelBg,
+              border: `1px solid ${hit ? ui.amber : ui.border}`,
+              boxShadow: hit ? `0 0 8px ${ui.amber}44` : 'none',
               transition: 'all 0.15s',
             }}>
               <span style={{
                 fontSize: cellW < 32 ? 11 : 13, fontFamily: 'JetBrains Mono, monospace',
-                fontWeight: 600, color: hit ? '#fcd34d' : '#86efac', lineHeight: 1,
+                fontWeight: 600, color: hit ? ui.amberSoft : ui.green, lineHeight: 1,
               }}>{v === undefined ? '·' : String(v)}</span>
-              <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: '#334155', marginTop: 2, lineHeight: 1 }}>
+              <span style={{ fontSize: 9, fontFamily: 'JetBrains Mono, monospace', color: ui.borderStrong, marginTop: 2, lineHeight: 1 }}>
                 {i}
               </span>
             </div>
@@ -327,24 +352,24 @@ function ArrayCells({ obj, isNew, mutated }) {
 
 // ── Empty state ────────────────────────────────────────────────────────────────
 
-function EmptyState() {
+function EmptyState({ ui }: { ui: CodeLensUiPalette }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       width: '100%', height: '100%', minHeight: 180, padding: 24, gap: 10, textAlign: 'center',
     }}>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.06em', color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.06em', color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace' }}>
         NO HEAP ALLOCATIONS
       </div>
-      <div style={{ fontSize: 12, color: '#475569', lineHeight: 1.7, maxWidth: 260 }}>
+      <div style={{ fontSize: 12, color: ui.textFaint, lineHeight: 1.7, maxWidth: 260 }}>
         This code works entirely with primitives — numbers, strings, booleans.
-        Primitives live on the <span style={{ color: '#818cf8' }}>call stack</span>, not the heap.
+        Primitives live on the <span style={{ color: ui.accent }}>call stack</span>, not the heap.
       </div>
       <div style={{
-        fontSize: 11, color: '#334155', padding: '6px 12px',
-        borderRadius: 6, background: '#0f172a', border: '1px solid #1e293b',
+        fontSize: 11, color: ui.borderStrong, padding: '6px 12px',
+        borderRadius: 6, background: ui.panelBg, border: `1px solid ${ui.border}`,
       }}>
-        → Switch to <span style={{ color: '#818cf8' }}>Scope</span> to see where variables live
+        → Switch to <span style={{ color: ui.accent }}>Scope</span> to see where variables live
       </div>
     </div>
   )
@@ -352,10 +377,10 @@ function EmptyState() {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-function isRef(v) { return v !== null && typeof v === 'object' && '$ref' in v }
+function isRef(v: unknown): v is { $ref: number } { return v !== null && typeof v === 'object' && '$ref' in v }
 
-function buildMutatedProps(heapDelta) {
-  const map = {}
+function buildMutatedProps(heapDelta: HeapDelta[] | undefined): Record<number, Set<string>> {
+  const map: Record<number, Set<string>> = {}
   for (const d of heapDelta ?? []) {
     if (d.op === 'mutate') {
       if (!map[d.objectId]) map[d.objectId] = new Set()
@@ -369,41 +394,48 @@ function buildMutatedProps(heapDelta) {
 // Renders nested pairs as a tree diagram when they branch (head or tail is also a pair).
 // Uses recursive divs with connecting lines.
 
-function PairTreeNode({ id, snapshot, depth = 0, visited = new Set() }) {
-  if (visited.has(id)) return <span style={{ color: '#f87171', fontSize: 10 }}>⟳</span>
+interface PairTreeNodeProps {
+  id: number
+  snapshot: HeapSnapshot
+  depth?: number
+  visited?: Set<number>
+  ui: CodeLensUiPalette
+}
+
+function PairTreeNode({ id, snapshot, depth = 0, visited = new Set(), ui }: PairTreeNodeProps) {
+  if (visited.has(id)) return <span style={{ color: ui.red, fontSize: 10 }}>⟳</span>
   visited = new Set([...visited, id])
 
   const obj = snapshot.objects.get(id)
   if (!obj) return null
 
-  const len  = parseInt(obj.properties.get('length') ?? 0, 10)
   const head = obj.properties.get('0')
   const tail = obj.properties.get('1')
 
-  const isHeadRef = head !== null && typeof head === 'object' && '$ref' in head && snapshot.objects.has(head.$ref)
-  const isTailRef = tail !== null && typeof tail === 'object' && '$ref' in tail && snapshot.objects.has(tail.$ref)
+  const isHeadRef = isRef(head) && snapshot.objects.has(head.$ref)
+  const isTailRef = isRef(tail) && snapshot.objects.has(tail.$ref)
   const isTailNull = tail === null
 
   const headStr = isHeadRef ? null
     : head === null ? 'nil' : typeof head === 'number' ? String(head)
     : typeof head === 'string' ? `"${head}"` : String(head)
 
-  const headColor = isHeadRef ? '#818cf8'
-    : typeof head === 'number' ? '#86efac' : '#fbbf24'
+  const headColor = isHeadRef ? ui.accent
+    : typeof head === 'number' ? ui.green : ui.amber
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
       {/* This node */}
       <div style={{
-        display: 'flex', border: '1px solid #818cf844', borderRadius: 6,
-        background: '#0d1526', overflow: 'hidden', fontSize: 11,
+        display: 'flex', border: `1px solid ${ui.accent}44`, borderRadius: 6,
+        background: ui.panelBg2, overflow: 'hidden', fontSize: 11,
         fontFamily: 'JetBrains Mono, monospace',
       }}>
-        <div style={{ padding: '4px 8px', borderRight: '1px solid #818cf844',
+        <div style={{ padding: '4px 8px', borderRight: `1px solid ${ui.accent}44`,
           color: headColor, minWidth: 28, textAlign: 'center' }}>
           {isHeadRef ? '•' : headStr}
         </div>
-        <div style={{ padding: '4px 8px', color: isTailNull ? '#475569' : '#818cf8',
+        <div style={{ padding: '4px 8px', color: isTailNull ? ui.textFaint : ui.accent,
           minWidth: 28, textAlign: 'center' }}>
           {isTailNull ? '/' : '•'}
         </div>
@@ -415,18 +447,18 @@ function PairTreeNode({ id, snapshot, depth = 0, visited = new Set() }) {
           {/* Connector line */}
           <div style={{
             position: 'absolute', top: 0, left: '50%', width: 1,
-            height: 14, background: '#818cf844', transform: 'translateX(-50%)',
+            height: 14, background: `${ui.accent}44`, transform: 'translateX(-50%)',
           }} />
           {isHeadRef && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 1, height: 14, background: '#818cf844' }} />
-              <PairTreeNode id={head.$ref} snapshot={snapshot} depth={depth + 1} visited={visited} />
+              <div style={{ width: 1, height: 14, background: `${ui.accent}44` }} />
+              <PairTreeNode id={(head as { $ref: number }).$ref} snapshot={snapshot} depth={depth + 1} visited={visited} ui={ui} />
             </div>
           )}
           {isTailRef && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 1, height: 14, background: '#818cf844' }} />
-              <PairTreeNode id={tail.$ref} snapshot={snapshot} depth={depth + 1} visited={visited} />
+              <div style={{ width: 1, height: 14, background: `${ui.accent}44` }} />
+              <PairTreeNode id={(tail as { $ref: number }).$ref} snapshot={snapshot} depth={depth + 1} visited={visited} ui={ui} />
             </div>
           )}
         </div>
@@ -437,19 +469,19 @@ function PairTreeNode({ id, snapshot, depth = 0, visited = new Set() }) {
 
 // Detect if arrays form a TREE structure (both head AND tail can point to arrays)
 // Returns the root node ID if a tree with branching is detected.
-function detectSicpTree(arrays, snapshot) {
+function detectSicpTree(arrays: HeapObjectEntry[]): number | null {
   if (arrays.length < 3) return null
 
   // Count how many times each array is referenced by another array
-  const refCounts = new Map()
+  const refCounts = new Map<number, number>()
   const pairIds   = new Set(arrays.map(a => a.id))
 
   for (const arr of arrays) {
-    const len = parseInt(arr.properties.get('length') ?? 0, 10)
+    const len = parseInt(String(arr.properties.get('length') ?? 0), 10)
     if (len !== 2) continue
     for (const prop of ['0', '1']) {
       const v = arr.properties.get(prop)
-      if (v !== null && typeof v === 'object' && '$ref' in v && pairIds.has(v.$ref)) {
+      if (isRef(v) && pairIds.has(v.$ref)) {
         refCounts.set(v.$ref, (refCounts.get(v.$ref) ?? 0) + 1)
       }
     }
@@ -460,8 +492,8 @@ function detectSicpTree(arrays, snapshot) {
   const hasBranching = arrays.some(arr => {
     const h = arr.properties.get('0')
     const t = arr.properties.get('1')
-    const hIsRef = h !== null && typeof h === 'object' && '$ref' in h && pairIds.has(h.$ref)
-    const tIsRef = t !== null && typeof t === 'object' && '$ref' in t && pairIds.has(t.$ref)
+    const hIsRef = isRef(h) && pairIds.has(h.$ref)
+    const tIsRef = isRef(t) && pairIds.has(t.$ref)
     return hIsRef && tIsRef
   })
   if (!hasBranching) return null
@@ -477,7 +509,14 @@ function detectSicpTree(arrays, snapshot) {
 // Renders list(1,2,3) = [1,[2,[3,null]]] as a horizontal pair chain.
 // Each node shows: [ head | tail→ ]
 
-function PairChain({ nodes, snapshot, lastCreated, lastMutated, mutatedProps }) {
+interface PairChainProps {
+  nodes: HeapObjectEntry[]
+  lastCreated: Set<number>
+  lastMutated: Set<number>
+  ui: CodeLensUiPalette
+}
+
+function PairChain({ nodes, lastCreated, lastMutated, ui }: PairChainProps) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', paddingBottom: 8, flexWrap: 'wrap', gap: '0 0' }}>
       {nodes.map((obj, i) => {
@@ -485,35 +524,35 @@ function PairChain({ nodes, snapshot, lastCreated, lastMutated, mutatedProps }) 
         const tailVal = obj.properties.get('1')
         const isNew     = lastCreated.has(obj.id)
         const isMutated = lastMutated.has(obj.id)
-        const borderColor = isNew ? '#22c55e' : isMutated ? '#f59e0b' : '#818cf844'
+        const borderColor = isNew ? ui.green : isMutated ? ui.amber : `${ui.accent}44`
 
         // Render the head value
         const headStr = headVal === null ? 'null'
           : headVal === undefined ? 'undef'
-          : typeof headVal === 'object' && headVal?.$ref !== undefined
+          : isRef(headVal)
             ? `#${headVal.$ref}`
             : String(headVal)
 
-        const headColor = headVal === null ? '#475569'
-          : typeof headVal === 'number' ? '#86efac'
-          : typeof headVal === 'string' ? '#fbbf24'
-          : typeof headVal === 'boolean' ? '#f472b6'
-          : '#818cf8'
+        const headColor = headVal === null ? ui.textFaint
+          : typeof headVal === 'number' ? ui.green
+          : typeof headVal === 'string' ? ui.amber
+          : typeof headVal === 'boolean' ? ui.pink
+          : ui.accent
 
         return (
           <div key={obj.id} style={{ display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>
             {/* Pair box: [ head | ↓ ] */}
             <div style={{
               display: 'flex', border: `1px solid ${borderColor}`, borderRadius: 6,
-              background: '#0d1526', overflow: 'hidden', flexShrink: 0,
-              boxShadow: isNew ? '0 0 8px #22c55e44' : isMutated ? '0 0 8px #f59e0b44' : 'none',
+              background: ui.panelBg2, overflow: 'hidden', flexShrink: 0,
+              boxShadow: isNew ? `0 0 8px ${ui.green}44` : isMutated ? `0 0 8px ${ui.amber}44` : 'none',
             }}>
               {/* Head cell */}
               <div style={{
                 padding: '6px 10px', borderRight: `1px solid ${borderColor}`,
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
               }}>
-                <span style={{ fontSize: 8, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+                <span style={{ fontSize: 8, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace' }}>
                   head
                 </span>
                 <span style={{
@@ -528,10 +567,10 @@ function PairChain({ nodes, snapshot, lastCreated, lastMutated, mutatedProps }) 
                 padding: '6px 8px', display: 'flex', flexDirection: 'column',
                 alignItems: 'center', gap: 2, minWidth: 36,
               }}>
-                <span style={{ fontSize: 8, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+                <span style={{ fontSize: 8, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace' }}>
                   tail
                 </span>
-                <span style={{ fontSize: 11, color: '#818cf8', fontFamily: 'JetBrains Mono, monospace' }}>
+                <span style={{ fontSize: 11, color: ui.accent, fontFamily: 'JetBrains Mono, monospace' }}>
                   {tailVal === null ? 'nil' : '→'}
                 </span>
               </div>
@@ -539,8 +578,8 @@ function PairChain({ nodes, snapshot, lastCreated, lastMutated, mutatedProps }) 
             {/* Arrow between pairs */}
             {i < nodes.length - 1 && (
               <svg width="24" height="44" style={{ flexShrink: 0, alignSelf: 'center' }}>
-                <line x1="2" y1="22" x2="18" y2="22" stroke="#818cf8" strokeWidth="1.5" />
-                <polygon points="18,18 24,22 18,26" fill="#818cf8" />
+                <line x1="2" y1="22" x2="18" y2="22" stroke={ui.accent} strokeWidth="1.5" />
+                <polygon points="18,18 24,22 18,26" fill={ui.accent} />
               </svg>
             )}
           </div>
@@ -549,7 +588,7 @@ function PairChain({ nodes, snapshot, lastCreated, lastMutated, mutatedProps }) 
       {/* Terminal null */}
       <div style={{
         display: 'flex', alignItems: 'center', paddingLeft: 8,
-        fontSize: 11, color: '#475569', fontFamily: 'JetBrains Mono, monospace',
+        fontSize: 11, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace',
         fontStyle: 'italic',
       }}>
         null
@@ -562,16 +601,13 @@ function PairChain({ nodes, snapshot, lastCreated, lastMutated, mutatedProps }) 
 // A SICP pair is [head, tail]. A list is a chain: [a,[b,[c,null]]].
 // We detect this by checking: each 2-element array whose index-1 is a $ref
 // to another 2-element array in the snapshot.
-function detectSicpChain(arrays, snapshot) {
+function detectSicpChain(arrays: HeapObjectEntry[]): number[] | null {
   // Only consider arrays with exactly 2 elements (pair structure)
-  const pairs = arrays.filter(o => {
-    const len = o.properties.get('length')
-    return len === 2
-  })
+  const pairs = arrays.filter(o => o.properties.get('length') === 2)
   if (pairs.length < 2) return null
 
   // Build a next-map: pairId → pairId via index 1
-  const nextMap = new Map()
+  const nextMap = new Map<number, number>()
   const pairIds = new Set(pairs.map(p => p.id))
   for (const p of pairs) {
     const tail = p.properties.get('1')
@@ -583,17 +619,17 @@ function detectSicpChain(arrays, snapshot) {
 
   // Find the head of the chain (not a target of any next pointer)
   const targets = new Set(nextMap.values())
-  let head = null
+  let head: number | null = null
   for (const [id] of nextMap) {
     if (!targets.has(id)) { head = id; break }
   }
-  if (!head) return null
+  if (head === null) return null
 
   // Walk the chain
-  const order = []
-  let cur = head
-  const seen = new Set()
-  while (cur && !seen.has(cur)) {
+  const order: number[] = []
+  let cur: number | null = head
+  const seen = new Set<number>()
+  while (cur !== null && !seen.has(cur)) {
     order.push(cur)
     seen.add(cur)
     cur = nextMap.get(cur) ?? null
@@ -603,15 +639,15 @@ function detectSicpChain(arrays, snapshot) {
   return order.length >= 2 ? order : null
 }
 
-function detectChain(objects, snapshot) {
+function detectChain(objects: HeapObjectEntry[], snapshot: HeapSnapshot): number[] | null {
   if (objects.length < 2) return null
 
   // Find pairs where one object has a property pointing to another of the same type
-  const nextMap = new Map() // fromId → toId
+  const nextMap = new Map<number, number>() // fromId → toId
   for (const obj of objects) {
     for (const [, v] of obj.properties) {
       if (isRef(v) && snapshot.objects.has(v.$ref)) {
-        const target = snapshot.objects.get(v.$ref)
+        const target = snapshot.objects.get(v.$ref)!
         if (target.type === obj.type) { nextMap.set(obj.id, v.$ref); break }
       }
     }
@@ -620,17 +656,17 @@ function detectChain(objects, snapshot) {
 
   // Find chain head: in nextMap but not a target of any nextMap entry
   const allTargets = new Set(nextMap.values())
-  let head = null
+  let head: number | null = null
   for (const [id] of nextMap) {
     if (!allTargets.has(id)) { head = id; break }
   }
-  if (!head) head = nextMap.keys().next().value
+  if (head === null) head = nextMap.keys().next().value ?? null
 
   // Walk the chain
-  const order = []
-  let cur = head
-  const seen = new Set()
-  while (cur && !seen.has(cur)) {
+  const order: number[] = []
+  let cur: number | null = head
+  const seen = new Set<number>()
+  while (cur !== null && !seen.has(cur)) {
     order.push(cur)
     seen.add(cur)
     cur = nextMap.get(cur) ?? null
@@ -639,15 +675,15 @@ function detectChain(objects, snapshot) {
   return order.length >= 2 ? order : null
 }
 
-function valColor(v) {
-  if (v === null || v === undefined) return '#475569'
-  if (typeof v === 'number') return '#86efac'
-  if (typeof v === 'string') return '#fbbf24'
-  if (typeof v === 'boolean') return '#f472b6'
-  return '#94a3b8'
+function valColor(v: unknown, ui: CodeLensUiPalette): string {
+  if (v === null || v === undefined) return ui.textFaint
+  if (typeof v === 'number') return ui.green
+  if (typeof v === 'string') return ui.amber
+  if (typeof v === 'boolean') return ui.pink
+  return ui.textDim
 }
 
-function fmtVal(v) {
+function fmtVal(v: unknown): string {
   if (v === null)      return 'null'
   if (v === undefined) return 'undefined'
   if (typeof v === 'string') return `"${v.length > 18 ? v.slice(0, 18) + '…' : v}"`

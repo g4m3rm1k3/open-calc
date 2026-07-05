@@ -1,29 +1,37 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef, type ReactNode, type CSSProperties } from 'react'
 import Editor, { useMonaco } from '@monaco-editor/react'
 import { buildProgramModel } from '../../../engines/js/parser/jsParser.js'
 import { run as runInterpreter } from '../../../engines/js/interpreter/interpreter.js'
-import { runPython } from './interpreter/pythonTracer.js'
-import { runNative } from './interpreter/nativeTracer.js'
+import { runPython } from './interpreter/pythonTracer'
+import { runNative } from './interpreter/nativeTracer'
 import { EXPLAIN, CONCEPT_GLOSSARY } from '../../../engines/js/eventStream.js'
-import { buildHeapSnapshot } from './renderer/heapSnapshot.js'
-import HeapGraph from './renderer/HeapGraph.jsx'
-import CallGraphView from './renderer/CallGraphView.jsx'
-import VariableWatch from './renderer/VariableWatch.jsx'
-import CallTreeView from './renderer/CallTreeView.jsx'
-import StackDepthMeter from './renderer/StackDepthMeter.jsx'
-import WatchWindow from './renderer/WatchWindow.jsx'
-import { SNIPPET_CATEGORIES } from './snippets.js'
+import { buildHeapSnapshot } from './renderer/heapSnapshot'
+import HeapGraph from './renderer/HeapGraph'
+import CallGraphView from './renderer/CallGraphView'
+import VariableWatch from './renderer/VariableWatch'
+import CallTreeView from './renderer/CallTreeView'
+import StackDepthMeter from './renderer/StackDepthMeter'
+import WatchWindow from './renderer/WatchWindow'
+import { SNIPPET_CATEGORIES } from './snippets'
 import { setupOpenCalcMonaco } from '../../../utils/monacoThemes.js'
+import { CodeLensThemeProvider, useCodeLensTheme } from './ThemeContext'
+import { CODELENS_THEMES } from './theme'
+import type { CodeLensUiPalette } from './theme'
+import type {
+  Lang, TraceEvent, StackFrame, ExecutionResult, HeapObjectEntry, HeapSnapshot,
+  CallGraph, CallGraphNode, AstNode, ProgramModel, TokenInfo, Snippet,
+} from './types'
 import {
   ChevronRight, ChevronDown, Code2, Boxes, Braces, ArrowLeft,
   Zap, Play, Pause, StepForward, StepBack, SkipForward, Terminal,
-  Palette, Info, Network, Layers, GitBranch, Maximize2, X, Eye,
+  Palette, Info, Network, Layers, GitBranch, X, Eye,
+  type LucideIcon,
 } from 'lucide-react'
 
 // ── TypeScript → JS type stripper ─────────────────────────────────────────────
 // Best-effort for educational code: removes type annotations so the JS
 // interpreter can run the logic. Not a full transpiler.
-function stripTypeScript(src) {
+function stripTypeScript(src: string): string {
   let s = src
 
   // interface Foo { ... } (handles nested braces via iteration)
@@ -33,9 +41,9 @@ function stripTypeScript(src) {
   s = s.replace(/(?:export\s+)?type\s+[\w<>, ]+\s*=\s*(?:\{[^}]*\}|[^\n;]+)[;\n]?/g, '')
 
   // enum Foo { A, B, C } → const Foo = { A: 0, B: 1, ... }
-  s = s.replace(/(?:export\s+)?enum\s+(\w+)\s*\{([^}]*)\}/g, (_, name, body) => {
-    const members = body.split(',').map(m => m.trim().split('=')[0].trim()).filter(Boolean)
-    return `const ${name} = {\n${members.map((m, i) => `  ${m}: ${i}`).join(',\n')}\n}`
+  s = s.replace(/(?:export\s+)?enum\s+(\w+)\s*\{([^}]*)\}/g, (_: string, name: string, body: string) => {
+    const members = body.split(',').map((m: string) => m.trim().split('=')[0].trim()).filter(Boolean)
+    return `const ${name} = {\n${members.map((m: string, i: number) => `  ${m}: ${i}`).join(',\n')}\n}`
   })
 
   // Access modifiers in class constructors/fields
@@ -64,7 +72,7 @@ function stripTypeScript(src) {
   return s
 }
 
-const SPEED_CONFIG = {
+const SPEED_CONFIG: Record<string, { interval: number; steps: number }> = {
   '0.5x': { interval: 1200, steps: 1 },
   '1x':   { interval: 600,  steps: 1 },
   '2x':   { interval: 250,  steps: 1 },
@@ -73,15 +81,9 @@ const SPEED_CONFIG = {
 }
 
 // ── Theme config ──────────────────────────────────────────────────────────────
-
-const THEMES = [
-  { id: 'monokai',        label: 'Monokai',      monaco: 'monokai' },
-  { id: 'open-calc-dark', label: 'UpSkillOS',    monaco: 'open-calc-dark' },
-  { id: 'dracula',        label: 'Dracula',      monaco: 'dracula' },
-  { id: 'nord-dark',      label: 'Nord',         monaco: 'nord-dark' },
-  { id: 'tokyo-night',    label: 'Tokyo Night',  monaco: 'tokyo-night' },
-  { id: 'one-dark',       label: 'One Dark',     monaco: 'one-dark' },
-]
+// The full CODELENS_THEMES list (theme.ts) now drives both the Monaco editor
+// theme AND every panel's UI palette via CodeLensThemeProvider/useCodeLensTheme
+// — previously `THEMES` only ever fed the editor's `theme` prop.
 
 const STARTER_TS = `interface Animal {
   name: string
@@ -211,25 +213,35 @@ console.log('Result:', result)
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function Panel({ title, icon: Icon, children, badge, style, accent = '#1e293b' }) {
+interface PanelProps {
+  title: string
+  icon?: LucideIcon
+  children: ReactNode
+  badge?: string | number
+  style?: CSSProperties
+  accent?: string
+}
+
+function Panel({ title, icon: Icon, children, badge, style, accent }: PanelProps) {
+  const { theme: { ui } } = useCodeLensTheme()
   return (
     <div style={{
-      background: '#0f172a', border: '1px solid #1e293b', borderRadius: 10,
+      background: ui.panelBg, border: `1px solid ${ui.border}`, borderRadius: 10,
       display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0,
-      borderTop: `2px solid ${accent}`,
+      borderTop: `2px solid ${accent ?? ui.border}`,
       ...style,
     }}>
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8,
-        padding: '7px 12px', borderBottom: '1px solid #1e293b',
-        background: '#0a0f1e', flexShrink: 0,
+        padding: '7px 12px', borderBottom: `1px solid ${ui.border}`,
+        background: ui.headerBg, flexShrink: 0,
       }}>
-        {Icon && <Icon size={13} color="#818cf8" />}
-        <span style={{ fontSize: 11, fontWeight: 600, color: '#e2e8f0', letterSpacing: '.02em' }}>{title}</span>
+        {Icon && <Icon size={13} color={ui.accent} />}
+        <span style={{ fontSize: 11, fontWeight: 600, color: ui.text, letterSpacing: '.02em' }}>{title}</span>
         {badge != null && (
           <span style={{
             marginLeft: 'auto', fontSize: 10,
-            background: '#1e293b', color: '#7dd3fc',
+            background: ui.border, color: ui.cyan,
             padding: '1px 6px', borderRadius: 99,
           }}>{badge}</span>
         )}
@@ -241,16 +253,25 @@ function Panel({ title, icon: Icon, children, badge, style, accent = '#1e293b' }
   )
 }
 
-function Btn({ onClick, disabled, title, children, active }) {
+interface BtnProps {
+  onClick: () => void
+  disabled?: boolean
+  title?: string
+  children: ReactNode
+  active?: boolean
+}
+
+function Btn({ onClick, disabled = false, title, children, active = false }: BtnProps) {
+  const { theme: { ui } } = useCodeLensTheme()
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       title={title}
       style={{
-        background: active ? '#312e81' : '#1e293b',
-        border: `1px solid ${active ? '#6366f1' : '#334155'}`,
-        color: disabled ? '#475569' : active ? '#a5b4fc' : '#cbd5e1',
+        background: active ? ui.accentBgSolid : ui.border,
+        border: `1px solid ${active ? ui.accentSolid : ui.borderStrong}`,
+        color: disabled ? ui.textFaint : active ? ui.accentBright : ui.textSoft,
         borderRadius: 6, padding: '4px 10px',
         cursor: disabled ? 'default' : 'pointer',
         fontSize: 12, fontWeight: 600,
@@ -263,7 +284,14 @@ function Btn({ onClick, disabled, title, children, active }) {
   )
 }
 
-function PrimaryRunBtn({ onClick, disabled, children }) {
+interface PrimaryRunBtnProps {
+  onClick: () => void
+  disabled?: boolean
+  children: ReactNode
+}
+
+function PrimaryRunBtn({ onClick, disabled = false, children }: PrimaryRunBtnProps) {
+  const { theme: { ui } } = useCodeLensTheme()
   const [hover, setHover] = useState(false)
   return (
     <button
@@ -273,9 +301,9 @@ function PrimaryRunBtn({ onClick, disabled, children }) {
       disabled={disabled}
       title="Run code (⌘↵)"
       style={{
-        background: disabled ? '#1e293b' : 'linear-gradient(135deg, #4f46e5, #9333ea)',
-        border: `1px solid ${disabled ? '#334155' : 'transparent'}`,
-        color: disabled ? '#475569' : '#ffffff',
+        background: disabled ? ui.border : 'linear-gradient(135deg, #4f46e5, #9333ea)',
+        border: `1px solid ${disabled ? ui.borderStrong : 'transparent'}`,
+        color: disabled ? ui.textFaint : '#ffffff',
         boxShadow: disabled ? 'none' : (hover ? '0 0 15px rgba(147, 51, 234, 0.6)' : '0 0 8px rgba(79, 70, 229, 0.4)'),
         borderRadius: 6, padding: '5px 14px',
         cursor: disabled ? 'default' : 'pointer',
@@ -291,13 +319,14 @@ function PrimaryRunBtn({ onClick, disabled, children }) {
   )
 }
 
-function ComplexityBadge({ complexity }) {
+function ComplexityBadge({ complexity }: { complexity?: string }) {
+  const { theme: { ui } } = useCodeLensTheme()
   const color =
-    complexity === 'O(1)'           ? '#86efac' :
-    complexity?.includes('log')     ? '#7dd3fc' :
-    complexity === 'O(n)'           ? '#fbbf24' :
-    complexity?.includes('recursive') ? '#fb923c' :
-    '#f87171'
+    complexity === 'O(1)'           ? ui.green :
+    complexity?.includes('log')     ? ui.cyan :
+    complexity === 'O(n)'           ? ui.amber :
+    complexity?.includes('recursive') ? ui.pink :
+    ui.red
   return (
     <span style={{
       fontSize: 10, padding: '1px 7px', borderRadius: 99,
@@ -306,27 +335,36 @@ function ComplexityBadge({ complexity }) {
     }}>{complexity}</span>
   )
 }
-
-const TOKEN_COLORS = {
-  keyword: '#818cf8', name: '#7dd3fc', num: '#86efac',
-  string: '#fbbf24', punctuation: '#94a3b8',
-}
-function tokenColor(type) {
+function tokenColor(type: string, ui: CodeLensUiPalette): string {
+  const TOKEN_COLORS: Record<string, string> = {
+    keyword: ui.accent, name: ui.cyan, num: ui.green,
+    string: ui.amber, punctuation: ui.textDim,
+  }
   for (const [k, v] of Object.entries(TOKEN_COLORS)) if (type.includes(k)) return v
-  return '#cbd5e1'
+  return ui.textSoft
 }
 
 // ── Concept badge with glossary popover ───────────────────────────────────────
 
-function ConceptBadge({ concept, style: extraStyle }) {
+interface ConceptEntry { tldr: string; detail: string; analogy?: string; sicp?: string }
+const CONCEPT_MAP = CONCEPT_GLOSSARY as Record<string, ConceptEntry>
+
+interface Explanation { summary: string; why?: string; concept?: string }
+const EXPLAIN_MAP = EXPLAIN as Record<string, ((event: TraceEvent) => Explanation) | undefined>
+function explainEvent(event: TraceEvent): Explanation {
+  return EXPLAIN_MAP[event.type]?.(event) ?? { summary: event.type, why: '', concept: '' }
+}
+
+function ConceptBadge({ concept, style: extraStyle }: { concept?: string; style?: CSSProperties }) {
+  const { theme: { ui } } = useCodeLensTheme()
   const [open, setOpen] = useState(false)
-  const ref = useRef(null)
-  const entry = CONCEPT_GLOSSARY[concept]
+  const ref = useRef<HTMLSpanElement>(null)
+  const entry = concept ? CONCEPT_MAP[concept] : undefined
 
   // Close when clicking outside
   useEffect(() => {
     if (!open) return
-    const handler = (e) => { if (!ref.current?.contains(e.target)) setOpen(false) }
+    const handler = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) setOpen(false) }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
@@ -340,8 +378,8 @@ function ConceptBadge({ concept, style: extraStyle }) {
         title={entry ? 'Click to learn more' : undefined}
         style={{
           fontSize: 10, padding: '2px 7px', borderRadius: 99,
-          background: '#1e1b4b', color: open ? '#a5b4fc' : '#6366f1',
-          border: `1px solid ${open ? '#6366f1' : '#6366f133'}`,
+          background: ui.accentBg, color: open ? ui.accentBright : ui.accentSolid,
+          border: `1px solid ${open ? ui.accentSolid : ui.accentSolid + '33'}`,
           fontFamily: 'JetBrains Mono, monospace',
           cursor: entry ? 'pointer' : 'default',
           userSelect: 'none',
@@ -359,8 +397,8 @@ function ConceptBadge({ concept, style: extraStyle }) {
           transform: 'translateX(-50%)',
           left: ref.current ? ref.current.getBoundingClientRect().left + ref.current.offsetWidth / 2 : 0,
           top: ref.current ? ref.current.getBoundingClientRect().bottom + 8 : 0,
-          background: '#0d1526',
-          border: '1px solid #6366f144',
+          background: ui.panelBg2,
+          border: `1px solid ${ui.accentSolid}44`,
           borderRadius: 12,
           padding: '14px 16px',
           maxWidth: 320,
@@ -370,30 +408,30 @@ function ConceptBadge({ concept, style: extraStyle }) {
           {/* Glow strip */}
           <div style={{
             position: 'absolute', top: 0, left: 0, right: 0, height: 2,
-            background: 'linear-gradient(90deg, #6366f1, #818cf8, transparent)',
+            background: `linear-gradient(90deg, ${ui.accentSolid}, ${ui.accent}, transparent)`,
             borderRadius: '12px 12px 0 0',
           }} />
 
-          <div style={{ fontSize: 10, color: '#6366f1', fontFamily: 'JetBrains Mono, monospace',
+          <div style={{ fontSize: 10, color: ui.accentSolid, fontFamily: 'JetBrains Mono, monospace',
             fontWeight: 700, letterSpacing: '.06em', marginBottom: 6 }}>
             {concept.toUpperCase()}
           </div>
 
           {/* TL;DR */}
-          <div style={{ fontSize: 12, fontWeight: 600, color: '#e2e8f0', lineHeight: 1.5, marginBottom: 8 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: ui.text, lineHeight: 1.5, marginBottom: 8 }}>
             {entry.tldr}
           </div>
 
           {/* Detail */}
-          <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.65, marginBottom: entry.analogy ? 8 : 0 }}>
+          <div style={{ fontSize: 11, color: ui.textMuted, lineHeight: 1.65, marginBottom: entry.analogy ? 8 : 0 }}>
             {entry.detail}
           </div>
 
           {/* Analogy */}
           {entry.analogy && (
             <div style={{
-              borderLeft: '2px solid #f59e0b', paddingLeft: 8,
-              fontSize: 11, color: '#78716c', lineHeight: 1.6, marginBottom: 6,
+              borderLeft: `2px solid ${ui.amber}`, paddingLeft: 8,
+              fontSize: 11, color: ui.textMuted, lineHeight: 1.6, marginBottom: 6,
               fontStyle: 'italic',
             }}>
               {entry.analogy}
@@ -402,7 +440,7 @@ function ConceptBadge({ concept, style: extraStyle }) {
 
           {/* SICP ref */}
           {entry.sicp && (
-            <div style={{ fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>
+            <div style={{ fontSize: 10, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace' }}>
               ↗ {entry.sicp}
             </div>
           )}
@@ -415,17 +453,17 @@ function ConceptBadge({ concept, style: extraStyle }) {
 // ── Narration bar ─────────────────────────────────────────────────────────────
 // Synthesises the current event into a plain-English tutor sentence.
 
-function buildNarration(event, prevEvent) {
+function buildNarration(event: TraceEvent | null, prevEvent: TraceEvent | null): string | null {
   if (!event) return null
   const t  = event.type
   const pt = prevEvent?.type
 
   if (t === 'function_call') {
     const argc = event.args?.length ?? 0
-    const argPart = argc === 0 ? '' : ` with ${event.args?.map(a => JSON.stringify(a)).join(', ')}`
+    const argPart = argc === 0 ? '' : ` with ${event.args?.map((a: unknown) => JSON.stringify(a)).join(', ')}`
     const wasReturn = pt === 'function_return'
     return wasReturn
-      ? `\`${prevEvent.functionName}\` just returned — now calling \`${event.functionName}\`${argPart}. A new stack frame is being pushed.`
+      ? `\`${prevEvent!.functionName}\` just returned — now calling \`${event.functionName}\`${argPart}. A new stack frame is being pushed.`
       : `Calling \`${event.functionName}\`${argPart}. The engine pushes a new frame onto the call stack — watch the stack depth increase.`
   }
 
@@ -475,89 +513,82 @@ function buildNarration(event, prevEvent) {
   return null
 }
 
-function NarrationBar({ event, prevEvent }) {
-  const text = buildNarration(event, prevEvent)
-
-  // Always render the bar so it occupies space at the bottom.
-  // When there is no text, show a dim placeholder so the layout is stable.
-  return (
-    <div style={{
-      padding: '8px 14px',
-      background: 'linear-gradient(90deg, #080c14, #060a12)',
-      borderTop: '1px solid #1e293b',
-      fontSize: 12, color: '#94a3b8', lineHeight: 1.6,
-      flexShrink: 0, minHeight: 36,
-      display: 'flex', alignItems: 'flex-start', gap: 8,
-    }}>
-      <span style={{
-        fontSize: 10, padding: '2px 6px', borderRadius: 4, flexShrink: 0,
-        background: text ? '#1e1b4b' : '#0f172a',
-        color: text ? '#818cf8' : '#334155',
-        fontFamily: 'JetBrains Mono, monospace', marginTop: 1,
-        transition: 'background 0.2s, color 0.2s',
-      }}>tutor</span>
-      <span style={{ flex: 1, color: text ? '#94a3b8' : '#334155',
-        transition: 'color 0.2s', fontStyle: text ? 'normal' : 'italic' }}>
-        {text
-          ? text.split(/(`[^`\n]+`)/g).map((part, i) =>
-              part.startsWith('`') && part.endsWith('`') ? (
-                <code key={i} style={{
-                  background: '#1e293b', color: '#7dd3fc',
-                  padding: '1px 5px', borderRadius: 3,
-                  fontSize: '0.9em', fontFamily: 'JetBrains Mono, monospace',
-                }}>{part.slice(1, -1)}</code>
-              ) : part
-            )
-          : 'Step through your code to see explanations here.'
-        }
-      </span>
-    </div>
-  )
-}
-
-
+// `buildNarration`'s plain-English sentence now renders inside ExplainHero
+// (see below) as a "In plain terms" line, instead of a separately-pinned
+// bottom bar — that used to be a second permanently-visible strip repeating
+// information the Explain panel already showed, adding to the "too much
+// shown at once" problem.
 
 // ── AST viewer ────────────────────────────────────────────────────────────────
 
-function ASTNode({ node, depth = 0, startOpen = false, interactive = false }) {
+// A tiny glossary mapping common node types to plain English for the hover tooltip
+const NODE_GLOSSARY: Record<string, string> = {
+  Identifier: "A named reference (variable, property, or function name).",
+  CallExpression: "A function being invoked.",
+  BinaryExpression: "Two values combined with an operator (like + or ===).",
+  Literal: "A hardcoded value (string, number, boolean).",
+  BlockStatement: "A block of code wrapped in { } braces.",
+  FunctionDeclaration: "Defining a new named function.",
+  VariableDeclaration: "Declaring one or more variables using let, const, or var.",
+  ExpressionStatement: "A statement consisting of a single expression (like a function call on its own line).",
+  ReturnStatement: "Exiting a function and returning a value to the caller.",
+  IfStatement: "Conditional branch control flow.",
+  MemberExpression: "Accessing a property on an object (like console.log)."
+}
+
+// Category-color the AST tree by node kind instead of one flat gray tone, so
+// nesting reads as structure (declarations vs control-flow vs expressions vs
+// literals) rather than a wall of identically-styled text.
+const DECLARATION_NODES = new Set(['FunctionDeclaration', 'VariableDeclaration', 'VariableDeclarator', 'ClassDeclaration', 'ImportDeclaration', 'ExportNamedDeclaration', 'ExportDefaultDeclaration', 'MethodDefinition', 'PropertyDefinition', 'TSInterfaceDeclaration', 'TSTypeAliasDeclaration', 'TSEnumDeclaration'])
+const CONTROL_FLOW_NODES = new Set(['IfStatement', 'ForStatement', 'ForInStatement', 'ForOfStatement', 'WhileStatement', 'DoWhileStatement', 'SwitchStatement', 'SwitchCase', 'TryStatement', 'CatchClause', 'ConditionalExpression', 'BreakStatement', 'ContinueStatement', 'ReturnStatement', 'ThrowStatement'])
+const EXPRESSION_NODES = new Set(['CallExpression', 'BinaryExpression', 'LogicalExpression', 'UnaryExpression', 'UpdateExpression', 'AssignmentExpression', 'MemberExpression', 'NewExpression', 'ArrayExpression', 'ObjectExpression', 'ArrowFunctionExpression', 'FunctionExpression', 'SpreadElement', 'TemplateLiteral'])
+
+function astNodeColor(type: string, ui: CodeLensUiPalette): string {
+  if (DECLARATION_NODES.has(type))  return ui.accent
+  if (CONTROL_FLOW_NODES.has(type)) return ui.pink
+  if (EXPRESSION_NODES.has(type))   return ui.cyan
+  if (type === 'Literal')           return ui.amber
+  if (type === 'Identifier')        return ui.green
+  return ui.textDim
+}
+
+interface ASTNodeProps {
+  node: AstNode | null | undefined
+  depth?: number
+  startOpen?: boolean
+  interactive?: boolean
+}
+
+function ASTNode({ node, depth = 0, startOpen = false, interactive = false }: ASTNodeProps) {
+  const { theme: { ui } } = useCodeLensTheme()
   const [open, setOpen] = useState(startOpen || depth < 2)
   const [hover, setHover] = useState(false)
   if (!node || typeof node !== 'object') return null
-  
+
   const children = Object.entries(node).filter(([k, v]) => {
     if (['type','start','end','loc','sourceType'].includes(k)) return false
     if (Array.isArray(v)) return v.some(c => c && typeof c.type === 'string')
-    return v && typeof v.type === 'string'
-  })
-  
+    return v && typeof (v as { type?: unknown }).type === 'string'
+  }) as [string, AstNode | AstNode[]][]
+
   const label = [
     node.type,
     node.name ? ` ${node.name}` : '',
-    node.id?.name ? ` ${node.id.name}` : '',
+    (node.id as AstNode | undefined)?.name ? ` ${(node.id as AstNode).name}` : '',
     node.operator ? ` ${node.operator}` : '',
     node.kind ? ` (${node.kind})` : '',
     node.raw != null ? ` = ${node.raw}` : '',
   ].join('')
-  
+
   const hasChildren = children.length > 0
-  
-  // A tiny glossary mapping common node types to plain English for the hover tooltip
-  const NODE_GLOSSARY = {
-    Identifier: "A named reference (variable, property, or function name).",
-    CallExpression: "A function being invoked.",
-    BinaryExpression: "Two values combined with an operator (like + or ===).",
-    Literal: "A hardcoded value (string, number, boolean).",
-    BlockStatement: "A block of code wrapped in { } braces.",
-    FunctionDeclaration: "Defining a new named function.",
-    VariableDeclaration: "Declaring one or more variables using let, const, or var.",
-    ExpressionStatement: "A statement consisting of a single expression (like a function call on its own line).",
-    ReturnStatement: "Exiting a function and returning a value to the caller.",
-    IfStatement: "Conditional branch control flow.",
-    MemberExpression: "Accessing a property on an object (like console.log)."
-  }
+  const color = astNodeColor(node.type, ui)
 
   return (
-    <div style={{ marginLeft: depth * 14, fontFamily: 'JetBrains Mono, monospace', fontSize: interactive ? 12 : 11 }}>
+    <div style={{
+      marginLeft: depth * 14, paddingLeft: depth > 0 ? 8 : 0,
+      borderLeft: depth > 0 ? `1px solid ${ui.border}` : 'none',
+      fontFamily: 'JetBrains Mono, monospace', fontSize: interactive ? 12 : 11,
+    }}>
       <div
         onClick={() => hasChildren && setOpen(o => !o)}
         onMouseEnter={() => setHover(true)}
@@ -567,7 +598,7 @@ function ASTNode({ node, depth = 0, startOpen = false, interactive = false }) {
           cursor: hasChildren ? 'pointer' : 'default',
           padding: '2px 4px', borderRadius: 4,
           background: hover && interactive ? 'rgba(255,255,255,0.05)' : 'transparent',
-          color: depth === 0 ? '#818cf8' : depth === 1 ? '#7dd3fc' : depth === 2 ? '#86efac' : '#e2e8f0',
+          color,
           position: 'relative',
         }}
       >
@@ -578,23 +609,23 @@ function ASTNode({ node, depth = 0, startOpen = false, interactive = false }) {
         {hover && interactive && NODE_GLOSSARY[node.type] && (
           <div style={{
             position: 'absolute', left: '100%', top: '50%', transform: 'translate(10px, -50%)',
-            background: '#1e293b', border: '1px solid #334155', color: '#e2e8f0',
+            background: ui.border, border: `1px solid ${ui.borderStrong}`, color: ui.text,
             padding: '4px 8px', borderRadius: 4, fontSize: 10, whiteSpace: 'nowrap',
             zIndex: 10, pointerEvents: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
             display: 'flex', gap: 6, alignItems: 'center',
           }}>
-            <div style={{ width: 0, height: 0, borderTop: '4px solid transparent', borderBottom: '4px solid transparent', borderRight: '4px solid #1e293b', position: 'absolute', left: -4 }} />
-            <span style={{ color: '#818cf8', fontWeight: 600 }}>{node.type}</span>
-            <span style={{ color: '#94a3b8' }}>{NODE_GLOSSARY[node.type]}</span>
+            <div style={{ width: 0, height: 0, borderTop: '4px solid transparent', borderBottom: '4px solid transparent', borderRight: `4px solid ${ui.border}`, position: 'absolute', left: -4 }} />
+            <span style={{ color, fontWeight: 600 }}>{node.type}</span>
+            <span style={{ color: ui.textDim }}>{NODE_GLOSSARY[node.type]}</span>
           </div>
         )}
       </div>
 
       {open && hasChildren && children.map(([key, val]) => {
-        const items = Array.isArray(val) ? val.filter(c => c?.type) : [val]
+        const items = (Array.isArray(val) ? val.filter(c => c?.type) : [val]) as AstNode[]
         return (
           <div key={key}>
-            <div style={{ marginLeft: (depth+1)*14+13, fontSize: interactive ? 11 : 10, color: '#475569', padding: '2px 0' }}>{key}</div>
+            <div style={{ marginLeft: (depth+1)*14+13, fontSize: interactive ? 11 : 10, color: ui.textFaint, padding: '2px 0' }}>{key}</div>
             {items.map((child, i) => <ASTNode key={i} node={child} depth={depth + 2} startOpen={startOpen} interactive={interactive} />)}
           </div>
         )
@@ -605,23 +636,24 @@ function ASTNode({ node, depth = 0, startOpen = false, interactive = false }) {
 
 // ── Event explanation card ────────────────────────────────────────────────────
 
-function EventCard({ event, active }) {
-  const explain = EXPLAIN[event.type]?.(event) ?? { summary: event.type, why: '', concept: '' }
+function EventCard({ event, active }: { event: TraceEvent; active: boolean }) {
+  const { theme: { ui } } = useCodeLensTheme()
+  const explain = explainEvent(event)
   return (
     <div style={{
       padding: '7px 10px', borderRadius: 7, marginBottom: 4,
-      background: active ? '#1e1b4b' : '#0f172a',
-      border: `1px solid ${active ? '#4338ca' : '#1e293b'}`,
+      background: active ? ui.accentBg : ui.panelBg,
+      border: `1px solid ${active ? ui.accentDeep : ui.border}`,
       cursor: 'default',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: explain.why ? 4 : 0 }}>
         <span style={{
           fontSize: 10, padding: '1px 6px', borderRadius: 99,
-          background: '#1e293b', color: '#818cf8',
+          background: ui.border, color: ui.accent,
           fontFamily: 'JetBrains Mono, monospace', flexShrink: 0,
         }}>{event.type}</span>
         {event.sourceLocation?.line && (
-          <span style={{ fontSize: 10, color: '#475569' }}>L{event.sourceLocation.line}</span>
+          <span style={{ fontSize: 10, color: ui.textFaint }}>L{event.sourceLocation.line}</span>
         )}
         {explain.concept && (
           <span style={{ marginLeft: 'auto' }}>
@@ -629,11 +661,11 @@ function EventCard({ event, active }) {
           </span>
         )}
       </div>
-      <div style={{ fontSize: 12, color: '#e2e8f0', fontFamily: 'JetBrains Mono, monospace', marginBottom: explain.why ? 3 : 0 }}>
+      <div style={{ fontSize: 12, color: ui.text, fontFamily: 'JetBrains Mono, monospace', marginBottom: explain.why ? 3 : 0 }}>
         {explain.summary}
       </div>
       {explain.why && (
-        <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>
+        <div style={{ fontSize: 11, color: ui.textMuted, lineHeight: 1.5 }}>
           {explain.why}
         </div>
       )}
@@ -643,39 +675,40 @@ function EventCard({ event, active }) {
 
 // ── Stack frame display ───────────────────────────────────────────────────────
 
-function StackFrame({ frame, depth }) {
+function StackFrame({ frame, depth }: { frame: StackFrame; depth: number }) {
+  const { theme: { ui } } = useCodeLensTheme()
   const [open, setOpen] = useState(depth === 0)
   const locals = Object.entries(frame.locals ?? {})
   return (
     <div style={{
       marginBottom: 4, borderRadius: 6, overflow: 'hidden',
-      border: `1px solid ${depth === 0 ? '#4338ca' : '#1e293b'}`,
+      border: `1px solid ${depth === 0 ? ui.accentDeep : ui.border}`,
     }}>
       <div
         onClick={() => locals.length > 0 && setOpen(o => !o)}
         style={{
           display: 'flex', alignItems: 'center', gap: 6,
           padding: '5px 8px',
-          background: depth === 0 ? '#1e1b4b' : '#0f172a',
+          background: depth === 0 ? ui.accentBg : ui.panelBg,
           cursor: locals.length > 0 ? 'pointer' : 'default',
         }}
       >
         {locals.length > 0 ? (open ? <ChevronDown size={11} /> : <ChevronRight size={11} />) : <span style={{ width: 11 }} />}
-        <span style={{ fontSize: 12, color: '#a5b4fc', fontFamily: 'JetBrains Mono, monospace' }}>
+        <span style={{ fontSize: 12, color: ui.accentBright, fontFamily: 'JetBrains Mono, monospace' }}>
           {frame.name}
         </span>
-        {frame.line && <span style={{ fontSize: 10, color: '#475569' }}>L{frame.line}</span>}
-        {depth === 0 && <span style={{ marginLeft: 'auto', fontSize: 10, color: '#6366f1' }}>← current</span>}
+        {frame.line && <span style={{ fontSize: 10, color: ui.textFaint }}>L{frame.line}</span>}
+        {depth === 0 && <span style={{ marginLeft: 'auto', fontSize: 10, color: ui.accentSolid }}>← current</span>}
       </div>
       {open && locals.length > 0 && (
-        <div style={{ padding: '5px 8px', background: '#080c14' }}>
+        <div style={{ padding: '5px 8px', background: ui.bg }}>
           {locals.map(([name, value]) => (
             <div key={name} style={{
               display: 'flex', gap: 8, fontSize: 11,
               fontFamily: 'JetBrains Mono, monospace', marginBottom: 2,
             }}>
-              <span style={{ color: '#7dd3fc', minWidth: 80 }}>{name}</span>
-              <span style={{ color: '#86efac' }}>{JSON.stringify(value)}</span>
+              <span style={{ color: ui.cyan, minWidth: 80 }}>{name}</span>
+              <span style={{ color: ui.green }}>{JSON.stringify(value)}</span>
             </div>
           ))}
         </div>
@@ -686,8 +719,23 @@ function StackFrame({ frame, depth }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function CodeLens({ onBack, initialCode, initialLang, backLabel }) {
-  const [lang, setLang]             = useState(() => {
+type RunTab = 'events' | 'output' | 'explain'
+type DataTab = 'variables' | 'heap' | 'calltree' | 'scope'
+type CodeTab = 'structure' | 'tokens' | 'ast'
+
+interface FnModalState { node: CallGraphNode; callGraph: CallGraph | undefined }
+
+interface CodeLensProps {
+  onBack: () => void
+  initialCode?: string
+  initialLang?: string
+  backLabel?: string
+}
+
+function CodeLensInner({ onBack, initialCode, initialLang, backLabel }: CodeLensProps) {
+  const { themeId, setThemeId, theme: activeTheme } = useCodeLensTheme()
+  const ui = activeTheme.ui
+  const [lang, setLang]             = useState<Lang>(() => {
     if (initialLang === 'ts') return 'ts'
     if (initialLang === 'py') return 'py'
     if (initialLang === 'go') return 'go'
@@ -700,58 +748,74 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
     if (initialLang === 'go') return STARTER_GO
     return STARTER
   })
-  const [model, setModel]           = useState(null)
-  const [execution, setExecution]   = useState(null)
+  const [model, setModel]           = useState<ProgramModel | null>(null)
+  const [execution, setExecution]   = useState<ExecutionResult | null>(null)
   const [step, setStep]             = useState(0)
   const [running, setRunning]       = useState(false)
-  const [tab, setTab]               = useState('structure')
-  const [rightTab, setRightTab]     = useState('execution')
-  const [theme, setTheme]           = useState('open-calc-dark')
+  // Inspector nav: three always-visible columns (Run / Data / Code), each
+  // with its own remembered sub-tab — replaces the old rightMode/rightTab/tab
+  // tri-state, which crammed 5 tabs into one column and 6 more into another.
+  const [runTab, setRunTab]         = useState<RunTab>('explain')
+  const [dataTab, setDataTab]       = useState<DataTab>('variables')
+  const [codeModalTab, setCodeModalTab] = useState<CodeTab | null>(null)
   const [showThemes, setShowThemes] = useState(false)
-  const [rightMode, setRightMode]   = useState('explain')  // 'explain' | 'analyse'
   const [showWatch, setShowWatch]   = useState(false)
   const [playing, setPlaying]       = useState(false)
   const [playSpeed, setPlaySpeed]   = useState('1x')
-  const [fnModal, setFnModal]       = useState(null)
-  const [editorW, setEditorW]       = useState(null)  // null = auto flex-grow
-  const [breakpoints, setBreakpoints] = useState(() => new Set())
-  const eventListRef                = useRef(null)
-  const editorRef                   = useRef(null)
-  const decorRef                    = useRef([])
-  const bpDecorRef                  = useRef([])
-  const shadowDecorRef              = useRef([])
-  const editorColRef                = useRef(null)
+  const [fnModal, setFnModal]       = useState<FnModalState | null>(null)
+  const [editorW, setEditorW]       = useState<number | null>(null)  // null = auto flex-grow
+  const [breakpoints, setBreakpoints] = useState<Set<number>>(() => new Set())
+  const eventListRef                = useRef<HTMLDivElement>(null)
+  const editorRef                   = useRef<Parameters<NonNullable<Parameters<typeof Editor>[0]['onMount']>>[0] | null>(null)
+  const decorRef                    = useRef<string[]>([])
+  const bpDecorRef                  = useRef<string[]>([])
+  const shadowDecorRef              = useRef<string[]>([])
+  const editorColRef                = useRef<HTMLDivElement>(null)
+  // Tracks the source that produced `execution` — editing the code without
+  // re-running previously left the OLD run's current-line highlight/shadow
+  // decorations sitting on the NEW, unrelated text (looked broken/stuck, so
+  // users had to copy their edit out, force a reset, and paste it back in).
+  const lastRunSourceRef            = useRef<string | null>(null)
   const monaco                      = useMonaco()
 
   const totalSteps   = execution?.events?.length ?? 0
-  const currentEvent = execution?.events?.[step]      ?? null
-  const prevEvent    = execution?.events?.[step - 1]  ?? null
+  const currentEvent: TraceEvent | null = execution?.events?.[step]      ?? null
+  const prevEvent: TraceEvent | null    = execution?.events?.[step - 1]  ?? null
 
   // Parse live as we type (JS + TS; not Python)
-  useEffect(() => { if (lang !== 'py') setModel(buildProgramModel(source)) }, [])
+  useEffect(() => { if (lang !== 'py') setModel(buildProgramModel(source) as ProgramModel) }, [])
   useEffect(() => {
     if (lang === 'py') { setModel(null); return }
-    const id = setTimeout(() => setModel(buildProgramModel(source)), 400)
+    const id = setTimeout(() => setModel(buildProgramModel(source) as ProgramModel), 400)
     return () => clearTimeout(id)
   }, [source, lang])
 
-  // Source line highlighting — update Monaco decoration on every step
+  // Source line highlighting — update Monaco decoration on every step.
+  // Guarded on lastRunSourceRef: if the editor no longer matches the source
+  // that produced `execution`, the highlight/hint would land on unrelated
+  // freshly-edited text (see lastRunSourceRef's comment) — show nothing
+  // instead of a stale, misleading decoration.
   useEffect(() => {
     const ed = editorRef.current
     if (!ed || !monaco) return
-    const line = currentEvent?.sourceLocation?.line
+    const stale = source !== lastRunSourceRef.current
+    const line = stale ? undefined : currentEvent?.sourceLocation?.line
     if (!line) {
       decorRef.current = ed.deltaDecorations(decorRef.current, [])
       return
     }
-    const explain = EXPLAIN[currentEvent?.type]?.(currentEvent)
+    const explain = currentEvent ? explainEvent(currentEvent) : undefined
     const hintText = explain?.summary ? '   ⟵ ' + explain.summary.slice(0, 72) : ''
+    // The `after` widget anchors to the RANGE's end column, not to the end
+    // of the line's actual content — anchoring at column 1 (as this used to)
+    // rendered the hint before any code on the line, where it was invisible.
+    const endCol = ed.getModel()?.getLineMaxColumn(line) ?? 1
     decorRef.current = ed.deltaDecorations(decorRef.current, [{
-      range: new monaco.Range(line, 1, line, 1),
+      range: new monaco.Range(line, 1, line, endCol),
       options: {
         isWholeLine: true,
         className: 'cl-exec-line',
-        overviewRulerColor: '#6366f1',
+        overviewRuler: { color: '#6366f1', position: monaco.editor.OverviewRulerLane.Full },
         ...(hintText ? {
           after: {
             content: hintText,
@@ -788,34 +852,51 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           isWholeLine: true,
           className: 'cl-bp-line',
           glyphMarginClassName: 'cl-bp-glyph',
-          overviewRulerColor: '#ef4444cc',
-          overviewRulerLane: 4,
+          overviewRuler: { color: '#ef4444cc', position: monaco.editor.OverviewRulerLane.Right },
         }
       }))
     )
   }, [breakpoints, monaco])
 
-  // Code shadow — faint tint on previously-visited lines
+  // Code shadow — faint tint + a dim inline hint on previously-visited
+  // lines, each showing the last thing that happened there (up to the
+  // current step) so scrolling back through visited code still reads as an
+  // explanation trail, not just an unlabeled tint. Same staleness guard as
+  // the current-line highlight above.
   useEffect(() => {
     const ed = editorRef.current
-    if (!ed || !monaco || !execution) {
+    const stale = source !== lastRunSourceRef.current
+    if (!ed || !monaco || !execution || stale) {
       if (ed && monaco) shadowDecorRef.current = ed.deltaDecorations(shadowDecorRef.current, [])
       return
     }
-    const visited = new Set()
+    const lastEventPerLine = new Map<number, TraceEvent>()
     for (let i = 0; i <= step; i++) {
-      const ln = execution.events[i]?.sourceLocation?.line
-      if (ln) visited.add(ln)
+      const evt = execution.events[i]
+      const ln = evt?.sourceLocation?.line
+      if (ln) lastEventPerLine.set(ln, evt)
     }
     const currentLine = execution.events[step]?.sourceLocation?.line
-    if (currentLine) visited.delete(currentLine)
+    if (currentLine) lastEventPerLine.delete(currentLine)
+    const model = ed.getModel()
     shadowDecorRef.current = ed.deltaDecorations(shadowDecorRef.current,
-      [...visited].map(line => ({
-        range: new monaco.Range(line, 1, line, 1),
-        options: { isWholeLine: true, className: 'cl-shadow-line' }
-      }))
+      [...lastEventPerLine.entries()].map(([line, evt]) => {
+        const summary = explainEvent(evt).summary
+        const hintText = summary ? '   ⟵ ' + summary.slice(0, 60) : ''
+        const endCol = model?.getLineMaxColumn(line) ?? 1
+        return {
+          range: new monaco.Range(line, 1, line, endCol),
+          options: {
+            isWholeLine: true,
+            className: 'cl-shadow-line',
+            ...(hintText ? {
+              after: { content: hintText, inlineClassName: 'cl-inline-hint-dim' },
+            } : {}),
+          },
+        }
+      })
     )
-  }, [step, execution, monaco])
+  }, [step, execution, monaco, source])
 
   // Auto-scroll event list to current step
   useEffect(() => {
@@ -824,11 +905,11 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
     active?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }, [step])
 
-  const startEditorResize = useCallback((e) => {
+  const startEditorResize = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     const startX = e.clientX
     const startW = editorColRef.current?.getBoundingClientRect().width ?? 400
-    const onMove = (ev) => {
+    const onMove = (ev: MouseEvent) => {
       const w = Math.max(160, Math.min(startW + (ev.clientX - startX), window.innerWidth - 700))
       setEditorW(w)
     }
@@ -842,23 +923,23 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
 
   const handleRun = useCallback(async () => {
     setRunning(true)
+    lastRunSourceRef.current = source
     try {
-      let result
+      let result: ExecutionResult
       if (lang === 'py') {
         result = await runPython(source)
       } else if (lang === 'go') {
         result = await runNative(source, 'go')
       } else {
         const jsSource = lang === 'ts' ? stripTypeScript(source) : source
-        result = await new Promise((resolve) => {
-          setTimeout(() => resolve(runInterpreter(jsSource)), 0)
+        result = await new Promise<ExecutionResult>((resolve) => {
+          setTimeout(() => resolve(runInterpreter(jsSource) as ExecutionResult), 0)
         })
       }
       setExecution(result)
       setStep(0)
       setPlaying(false)
-      setRightTab('execution')
-      setRightMode('explain')
+      setRunTab('explain')
     } finally {
       setRunning(false)
     }
@@ -875,7 +956,18 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
     setStep(events.length - 1)
   }, [step, execution, breakpoints])
 
-  const TABS = (lang === 'py' || lang === 'go')
+  // ── Inspector nav: Run / Data / Code groups, each with its own tab strip ──
+  const RUN_TABS: { id: RunTab; label: string; icon: LucideIcon }[] = [
+    { id: 'explain', label: 'Explain', icon: Info },
+    { id: 'events',  label: 'Events',  icon: Play },
+    { id: 'output',  label: 'Output',  icon: Terminal },
+  ]
+  const DATA_TABS: { id: DataTab; label: string; icon: LucideIcon }[] = [
+    { id: 'variables', label: 'Variables', icon: Layers },
+    ...(lang === 'js' ? [{ id: 'heap' as const, label: 'Heap', icon: Network }] : []),
+    { id: 'calltree',  label: 'Tree',      icon: GitBranch },
+  ]
+  const CODE_TABS: { id: CodeTab; label: string; icon: LucideIcon }[] = (lang === 'py' || lang === 'go')
     ? [{ id: 'structure', label: 'Structure', icon: Boxes }]
     : [
         { id: 'structure', label: 'Structure', icon: Boxes },
@@ -883,23 +975,31 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         { id: 'ast',       label: 'AST',       icon: Braces },
       ]
 
-
   const heapSnapshot = (lang === 'js' && execution)
     ? buildHeapSnapshot(execution.events, step)
     : null
 
-  const RTABS = [
-    { id: 'execution', label: 'Events',    icon: Play },
-    { id: 'variables', label: 'Variables', icon: Layers },
-    { id: 'calltree',  label: 'Tree',      icon: GitBranch },
-    ...(lang === 'js' ? [{ id: 'heap', label: 'Heap', icon: Network }] : []),
-    { id: 'output',    label: 'Output',    icon: Terminal },
-  ]
+  // Variable/function names pulled from the parsed AST/model, offered as
+  // autocomplete suggestions in the floating Watch window instead of relying
+  // on the user to remember and retype exact names from the source.
+  const knownWatchNames = useMemo(() => {
+    if (!model) return []
+    const names = new Set<string>()
+    model.variables?.forEach(v => names.add(v.name))
+    model.callGraph?.nodes?.forEach(n => {
+      names.add(n.name)
+      n.params.forEach(p => names.add(p))
+    })
+    model.classes?.forEach(c => {
+      c.methods.forEach(m => names.add(m.name))
+    })
+    return [...names].sort()
+  }, [model])
 
   return (
     <div style={{
       display: 'flex', flexDirection: 'column', height: '100%',
-      background: '#080c14', color: '#e2e8f0',
+      background: ui.bg, color: ui.text,
     }}>
       <style>{`
         .cl-exec-line {
@@ -919,6 +1019,16 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         .cl-shadow-line {
           background: rgba(99,102,241,0.05) !important;
         }
+        .cl-inline-hint-dim {
+          color: #64748b !important;
+          opacity: 0.65 !important;
+          font-style: italic !important;
+          font-size: 11px !important;
+          font-family: JetBrains Mono, monospace !important;
+          letter-spacing: 0 !important;
+          user-select: none !important;
+          pointer-events: none !important;
+        }
         .cl-bp-line {
           background: rgba(239,68,68,0.08) !important;
         }
@@ -936,34 +1046,36 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
       {/* ── Header ── */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 10,
-        padding: '8px 14px', borderBottom: '1px solid #1e293b',
-        background: '#0a0f1e', flexShrink: 0,
+        padding: '8px 14px', borderBottom: `1px solid ${ui.border}`,
+        background: ui.headerBg, flexShrink: 0,
       }}>
         <button onClick={onBack} style={{
           background: 'none', border: 'none', cursor: 'pointer',
-          color: '#475569', display: 'flex', alignItems: 'center', gap: 5,
+          color: ui.textFaint, display: 'flex', alignItems: 'center', gap: 5,
           fontSize: 12, fontWeight: 500,
         }}>
           <ArrowLeft size={14} />
           {backLabel || 'UpSkillOS'}
         </button>
-        <Code2 size={17} color="#818cf8" />
+        <Code2 size={17} color={ui.accent} />
         <span style={{ fontWeight: 700, fontSize: 14 }}>CodeLens</span>
-        <span style={{ fontSize: 12, color: '#475569' }}>· Execution Visualizer</span>
+        <span style={{ fontSize: 12, color: ui.textFaint }}>· Execution Visualizer</span>
 
         {/* Language toggle */}
-        <div style={{ display: 'flex', gap: 2, background: '#0f172a',
-          borderRadius: 6, padding: 2, border: '1px solid #1e293b' }}>
-          {[
-            { id: 'js',  label: 'JS' },
-            { id: 'ts',  label: 'TS' },
-            { id: 'py',  label: 'Python' },
-            { id: 'go',  label: 'Go' },
-          ].map(l => (
+        <div style={{ display: 'flex', gap: 2, background: ui.panelBg,
+          borderRadius: 6, padding: 2, border: `1px solid ${ui.border}` }}>
+          {(
+            [
+              { id: 'js',  label: 'JS' },
+              { id: 'ts',  label: 'TS' },
+              { id: 'py',  label: 'Python' },
+              { id: 'go',  label: 'Go' },
+            ] as { id: Lang; label: string }[]
+          ).map(l => (
             <button key={l.id} onClick={() => {
               if (l.id === lang) return
               setLang(l.id)
-              const starters = { py: STARTER_PY, ts: STARTER_TS, go: STARTER_GO }
+              const starters: Record<string, string> = { py: STARTER_PY, ts: STARTER_TS, go: STARTER_GO }
               setSource(starters[l.id] ?? STARTER)
               setExecution(null)
               setStep(0)
@@ -972,8 +1084,8 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
             }} style={{
               padding: '3px 10px', borderRadius: 4, border: 'none', cursor: 'pointer',
               fontSize: 11, fontFamily: 'JetBrains Mono, monospace', fontWeight: 600,
-              background: lang === l.id ? '#312e81' : 'transparent',
-              color:      lang === l.id ? '#a5b4fc'  : '#475569',
+              background: lang === l.id ? ui.accentBgSolid : 'transparent',
+              color:      lang === l.id ? ui.accentBright  : ui.textFaint,
             }}>{l.label}</button>
           ))}
         </div>
@@ -982,9 +1094,9 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         <select
           style={{
             marginLeft: 12,
-            background: '#0f172a',
-            border: '1px solid #1e293b',
-            color: '#cbd5e1',
+            background: ui.panelBg,
+            border: `1px solid ${ui.border}`,
+            color: ui.textSoft,
             padding: '4px 8px',
             borderRadius: 6,
             fontSize: 11,
@@ -994,7 +1106,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           }}
           onChange={(e) => {
             if (!e.target.value) return
-            const [catIdx, itemIdx] = e.target.value.split('-')
+            const [catIdx, itemIdx] = e.target.value.split('-').map(Number)
             const snippet = SNIPPET_CATEGORIES[catIdx].items[itemIdx]
             setLang('js')
             setSource(snippet.code)
@@ -1006,9 +1118,9 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         >
           <option value="">📚 Load Example...</option>
           {SNIPPET_CATEGORIES.map((cat, i) => (
-            <optgroup key={i} label={cat.group} style={{ color: '#818cf8', fontStyle: 'italic', background: '#0a0f1e' }}>
+            <optgroup key={i} label={cat.group} style={{ color: ui.accent, fontStyle: 'italic', background: ui.headerBg }}>
               {cat.items.map((s, j) => (
-                <option key={j} value={`${i}-${j}`} style={{ color: '#cbd5e1', fontStyle: 'normal' }}>
+                <option key={j} value={`${i}-${j}`} style={{ color: ui.textSoft, fontStyle: 'normal' }}>
                   {s.name}
                 </option>
               ))}
@@ -1017,6 +1129,16 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         </select>
 
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Structure/Tokens/AST — buttons along the header, not a body
+              column: these are on-demand detail views, not something that
+              should permanently claim width from Run/Data's visualizations. */}
+          {CODE_TABS.map(({ id, label, icon: Icon }) => (
+            <Btn key={id} onClick={() => setCodeModalTab(id)} title={`View ${label}`}>
+              <Icon size={12} />
+              {label}
+            </Btn>
+          ))}
+
           {/* Watch window toggle */}
           <Btn
             onClick={() => setShowWatch(v => !v)}
@@ -1027,26 +1149,26 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
             Watch
           </Btn>
 
-          {/* Theme picker */}
+          {/* Theme picker — now recolors the whole UI, not just the editor */}
           <div style={{ position: 'relative' }}>
-            <Btn onClick={() => setShowThemes(v => !v)} active={showThemes} title="Editor theme">
+            <Btn onClick={() => setShowThemes(v => !v)} active={showThemes} title="Theme">
               <Palette size={12} />
-              {THEMES.find(t => t.id === theme)?.label ?? 'Theme'}
+              {activeTheme.label}
             </Btn>
             {showThemes && (
               <div style={{
                 position: 'absolute', top: '110%', right: 0, zIndex: 100,
-                background: '#0f172a', border: '1px solid #334155', borderRadius: 8,
+                background: ui.panelBg, border: `1px solid ${ui.borderStrong}`, borderRadius: 8,
                 padding: 4, minWidth: 140,
               }}>
-                {THEMES.map(t => (
+                {CODELENS_THEMES.map(t => (
                   <div
                     key={t.id}
-                    onClick={() => { setTheme(t.id); setShowThemes(false) }}
+                    onClick={() => { setThemeId(t.id); setShowThemes(false) }}
                     style={{
                       padding: '6px 10px', borderRadius: 5, cursor: 'pointer', fontSize: 12,
-                      background: theme === t.id ? '#1e293b' : 'transparent',
-                      color: theme === t.id ? '#a5b4fc' : '#cbd5e1',
+                      background: themeId === t.id ? ui.border : 'transparent',
+                      color: themeId === t.id ? ui.accentBright : ui.textSoft,
                     }}
                   >
                     {t.label}
@@ -1065,7 +1187,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
 
         {model?.error && (
           <span style={{
-            fontSize: 11, background: '#7f1d1d', color: '#fca5a5',
+            fontSize: 11, background: '#7f1d1d', color: ui.redSoft,
             padding: '2px 8px', borderRadius: 5,
           }}>
             L{model.error.line}: {model.error.message}
@@ -1077,8 +1199,8 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
       {execution && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 6,
-          padding: '5px 12px', borderBottom: '1px solid #1e293b',
-          background: '#080c14', flexShrink: 0, flexWrap: 'wrap',
+          padding: '5px 12px', borderBottom: `1px solid ${ui.border}`,
+          background: ui.bg, flexShrink: 0, flexWrap: 'wrap',
         }}>
           {/* Step controls */}
           <Btn onClick={() => { setPlaying(false); setStep(0) }} disabled={step === 0} title="Jump to start">
@@ -1097,7 +1219,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           {/* Continue to breakpoint */}
           {breakpoints.size > 0 && (
             <>
-              <div style={{ width: 1, height: 16, background: '#1e293b', margin: '0 2px' }} />
+              <div style={{ width: 1, height: 16, background: ui.border, margin: '0 2px' }} />
               <Btn
                 onClick={handleContinue}
                 disabled={!execution || step >= totalSteps - 1}
@@ -1109,7 +1231,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           )}
 
           {/* Play / pause */}
-          <div style={{ width: 1, height: 16, background: '#1e293b', margin: '0 2px' }} />
+          <div style={{ width: 1, height: 16, background: ui.border, margin: '0 2px' }} />
           <Btn
             onClick={() => setPlaying(p => !p)}
             disabled={step >= totalSteps - 1 && !playing}
@@ -1123,19 +1245,19 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           <input
             type="range" min={0} max={totalSteps - 1} value={step}
             onChange={e => { setPlaying(false); setStep(Number(e.target.value)) }}
-            style={{ flex: 1, minWidth: 80, accentColor: '#6366f1' }}
+            style={{ flex: 1, minWidth: 80, accentColor: ui.accentSolid }}
           />
-          <span style={{ fontSize: 10, color: '#475569', whiteSpace: 'nowrap', fontFamily: 'JetBrains Mono, monospace' }}>
+          <span style={{ fontSize: 10, color: ui.textFaint, whiteSpace: 'nowrap', fontFamily: 'JetBrains Mono, monospace' }}>
             {step + 1}/{totalSteps}
           </span>
 
           {/* Speed */}
-          <div style={{ display: 'flex', gap: 2, borderLeft: '1px solid #1e293b', paddingLeft: 6 }}>
+          <div style={{ display: 'flex', gap: 2, borderLeft: `1px solid ${ui.border}`, paddingLeft: 6 }}>
             {Object.keys(SPEED_CONFIG).map(sp => (
               <button key={sp} onClick={() => setPlaySpeed(sp)} style={{
-                background: playSpeed === sp ? '#312e81' : 'transparent',
-                border: `1px solid ${playSpeed === sp ? '#6366f1' : '#1e293b'}`,
-                color: playSpeed === sp ? '#a5b4fc' : '#475569',
+                background: playSpeed === sp ? ui.accentBgSolid : 'transparent',
+                border: `1px solid ${playSpeed === sp ? ui.accentSolid : ui.border}`,
+                color: playSpeed === sp ? ui.accentBright : ui.textFaint,
                 borderRadius: 4, padding: '2px 5px', cursor: 'pointer',
                 fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
               }}>{sp}</button>
@@ -1143,7 +1265,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           </div>
 
           {execution.error && (
-            <span style={{ fontSize: 10, color: '#f87171' }}>
+            <span style={{ fontSize: 10, color: ui.red }}>
               {execution.error.type}: {execution.error.message}
             </span>
           )}
@@ -1173,17 +1295,17 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
           }}
         >
           <div style={{
-            flex: 1, background: '#0f172a', border: '1px solid #1e293b',
+            flex: 1, background: ui.panelBg, border: `1px solid ${ui.border}`,
             borderRadius: 10, overflow: 'hidden', minHeight: 0,
           }}>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              padding: '7px 12px', borderBottom: '1px solid #1e293b',
-              background: '#0a0f1e',
+              padding: '7px 12px', borderBottom: `1px solid ${ui.border}`,
+              background: ui.headerBg,
             }}>
-              <Code2 size={13} color="#818cf8" />
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#e2e8f0' }}>Source</span>
-              <span style={{ fontSize: 10, color: '#475569', marginLeft: 'auto' }}>JavaScript</span>
+              <Code2 size={13} color={ui.accent} />
+              <span style={{ fontSize: 11, fontWeight: 600, color: ui.text }}>Source</span>
+              <span style={{ fontSize: 10, color: ui.textFaint, marginLeft: 'auto' }}>JavaScript</span>
             </div>
             <div style={{ height: 'calc(100% - 33px)' }}>
               <Editor
@@ -1191,7 +1313,7 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
                 language={lang === 'py' ? 'python' : lang === 'ts' ? 'typescript' : lang === 'go' ? 'go' : 'javascript'}
                 value={source}
                 onChange={v => setSource(v ?? '')}
-                theme={THEMES.find(t => t.id === theme)?.monaco ?? 'monokai'}
+                theme={activeTheme.monaco}
                 beforeMount={setupOpenCalcMonaco}
                 onMount={(ed, mo) => {
                   editorRef.current = ed
@@ -1239,34 +1361,83 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         >
           <div style={{
             width: 2, height: 36, borderRadius: 1,
-            background: '#1e293b', pointerEvents: 'none',
+            background: ui.border, pointerEvents: 'none',
           }} />
         </div>
 
-        {/* Middle: event stream */}
-        <div style={{ flex: editorW ? '1 1 320px' : '0 0 320px', minWidth: 280, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
+        {/* Inspector: three always-visible columns (Run / Data / Code),
+            each with its own small internal tab strip — replaces both the
+            old two-column design (which crammed 5 tabs into one column and
+            6 more into a second) AND a since-rejected single-column,
+            group-switcher design (which hid two of the three categories at
+            a time and left the freed-up width empty). Three narrower
+            columns keep every category visible without any one column
+            needing more than 3 tabs. */}
+
+        {/* ── Run column ── */}
+        <div style={{ flex: editorW ? '1 1 360px' : '0 0 360px', minWidth: 300, marginLeft: 10, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
           <div style={{
-            display: 'flex', gap: 4, background: '#0f172a',
-            borderRadius: 7, padding: 3, border: '1px solid #1e293b', flexShrink: 0,
+            display: 'flex', gap: 3, background: ui.panelBg,
+            borderRadius: 6, padding: 3, border: `1px solid ${ui.border}`, flexShrink: 0,
           }}>
-            {RTABS.map(({ id, label, icon: Icon }) => (
-              <button key={id} onClick={() => setRightTab(id)} style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                padding: '4px 0', borderRadius: 5, border: 'none', cursor: 'pointer',
-                fontSize: 11, fontWeight: 600,
-                background: rightTab === id ? '#1e293b' : 'transparent',
-                color: rightTab === id ? '#818cf8' : '#64748b',
+            {RUN_TABS.map(({ id, label, icon: Icon }) => (
+              <button key={id} onClick={() => setRunTab(id)} style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                padding: '4px 0', borderRadius: 4, border: 'none', cursor: 'pointer',
+                fontSize: 10, fontWeight: 600,
+                background: runTab === id ? ui.border : 'transparent',
+                color: runTab === id ? ui.accent : ui.textMuted,
               }}>
-                <Icon size={12} />{label}
+                <Icon size={11} />{label}
               </button>
             ))}
           </div>
 
-          <div style={{ flex: 1, minHeight: 0, overflow: (rightTab === 'heap' || rightTab === 'variables' || rightTab === 'scope' || rightTab === 'calltree') ? 'hidden' : 'auto' }} ref={eventListRef}>
-            {rightTab === 'execution' && (
+          <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }} ref={eventListRef}>
+            {runTab === 'explain' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {currentEvent
+                  ? <ExplainHero event={currentEvent} prevEvent={prevEvent} step={step} total={totalSteps} />
+                  : <IdleHero />
+                }
+                {(currentEvent?.heapDelta?.length ?? 0) > 0 && (
+                  <Panel title="Heap Changes" icon={Boxes} badge={currentEvent!.heapDelta!.length}>
+                    {currentEvent!.heapDelta!.map((d, i) => (
+                      <div key={i} style={{
+                        padding: '5px 8px', borderRadius: 6, marginBottom: 4,
+                        background: d.op === 'create' ? ui.greenDeep + '22' : ui.amberDeep + '22',
+                        border: `1px solid ${d.op === 'create' ? ui.greenDeep : ui.amberDeep}`,
+                        fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
+                      }}>
+                        <span style={{ color: d.op === 'create' ? ui.green : ui.amberSoft }}>
+                          {d.op === 'create' ? `+ ${d.objectType} #${d.objectId}` : `~ #${d.objectId}.${(d as { property?: string }).property}`}
+                        </span>
+                        {d.op === 'mutate' && (
+                          <span style={{ color: ui.textDim }}>
+                            {' '}{JSON.stringify((d as { oldValue?: unknown }).oldValue)} → {JSON.stringify((d as { newValue?: unknown }).newValue)}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </Panel>
+                )}
+                {currentEvent && (
+                  <Panel title="Call Stack" icon={Code2} badge={currentEvent.stackSnapshot?.length ?? 0}>
+                    {(currentEvent.stackSnapshot?.length ?? 0) > 0 ? (
+                      [...currentEvent.stackSnapshot!].reverse().map((frame, i) => (
+                        <StackFrame key={i} frame={frame} depth={currentEvent.stackSnapshot!.length - 1 - i} />
+                      ))
+                    ) : (
+                      <span style={{ color: ui.textFaint, fontSize: 12 }}>Global scope</span>
+                    )}
+                  </Panel>
+                )}
+              </div>
+            )}
+            {runTab === 'events' && (
               execution ? (
                 execution.events.length === 0
-                  ? <span style={{ color: '#475569', fontSize: 12 }}>No events.</span>
+                  ? <span style={{ color: ui.textFaint, fontSize: 12 }}>No events.</span>
                   : execution.events.map((evt, i) => (
                       <div
                         key={i}
@@ -1282,14 +1453,58 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
                   display: 'flex', flexDirection: 'column', alignItems: 'center',
                   justifyContent: 'center', height: '100%', gap: 10,
                 }}>
-                  <Play size={28} color="#4338ca" />
-                  <span style={{ fontSize: 13, color: '#64748b', textAlign: 'center' }}>
+                  <Play size={28} color={ui.accentDeep} />
+                  <span style={{ fontSize: 13, color: ui.textMuted, textAlign: 'center' }}>
                     Press Run to execute the code<br />and see the event stream here.
                   </span>
                 </div>
               )
             )}
-            {rightTab === 'variables' && (
+            {runTab === 'output' && (
+              (execution?.output?.length ?? 0) > 0 ? (
+                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>
+                  {execution!.output.map((line, i) => (
+                    <div key={i} style={{
+                      padding: '3px 8px', borderRadius: 4, marginBottom: 2,
+                      background: line.startsWith('[error]') ? '#7f1d1d22'
+                        : line.startsWith('[warn]') ? ui.amberDeep + '22' : ui.panelBg,
+                      color: line.startsWith('[error]') ? ui.redSoft
+                        : line.startsWith('[warn]') ? ui.amberSoft : ui.green,
+                    }}>
+                      {line}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span style={{ color: ui.textFaint, fontSize: 12 }}>
+                  {execution ? 'No output.' : 'Run code first.'}
+                </span>
+              )
+            )}
+          </div>
+        </div>
+
+        {/* ── Data column ── */}
+        <div style={{ flex: editorW ? '1 1 360px' : '0 0 360px', minWidth: 300, marginLeft: 10, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
+          <div style={{
+            display: 'flex', gap: 3, background: ui.panelBg,
+            borderRadius: 6, padding: 3, border: `1px solid ${ui.border}`, flexShrink: 0,
+          }}>
+            {DATA_TABS.map(({ id, label, icon: Icon }) => (
+              <button key={id} onClick={() => setDataTab(id)} style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+                padding: '4px 0', borderRadius: 4, border: 'none', cursor: 'pointer',
+                fontSize: 10, fontWeight: 600,
+                background: dataTab === id ? ui.border : 'transparent',
+                color: dataTab === id ? ui.accent : ui.textMuted,
+              }}>
+                <Icon size={11} />{label}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            {dataTab === 'variables' && (
               <VariableWatch
                 currentEvent={currentEvent}
                 prevEvent={prevEvent}
@@ -1298,16 +1513,16 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
                 events={execution?.events}
                 step={step}
                 onSeek={(s) => { setPlaying(false); setStep(s) }}
-                onShowEnvModel={() => setRightTab('scope')}
+                onShowEnvModel={() => setDataTab('scope')}
               />
             )}
-            {rightTab === 'scope' && (
+            {dataTab === 'scope' && (
               <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 <button
-                  onClick={() => setRightTab('variables')}
-                  style={{ background: 'none', border: 'none', borderBottom: '1px solid #1e293b',
+                  onClick={() => setDataTab('variables')}
+                  style={{ background: 'none', border: 'none', borderBottom: `1px solid ${ui.border}`,
                     cursor: 'pointer', padding: '6px 10px', textAlign: 'left',
-                    color: '#334155', fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
+                    color: ui.borderStrong, fontSize: 10, fontFamily: 'JetBrains Mono, monospace',
                     flexShrink: 0 }}
                 >
                   ← Back to Variables
@@ -1317,136 +1532,40 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
                 </div>
               </div>
             )}
-            {rightTab === 'calltree' && (
+            {dataTab === 'calltree' && (
               <CallTreeView
                 events={execution?.events ?? []}
                 step={step}
                 onSeek={(s) => { setPlaying(false); setStep(s) }}
               />
             )}
-            {rightTab === 'heap' && (
+            {dataTab === 'heap' && (
               <HeapPanel snapshot={heapSnapshot} heapDelta={currentEvent?.heapDelta} />
             )}
-            {rightTab === 'output' && (
-              execution?.output?.length > 0 ? (
-                <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>
-                  {execution.output.map((line, i) => (
-                    <div key={i} style={{
-                      padding: '3px 8px', borderRadius: 4, marginBottom: 2,
-                      background: line.startsWith('[error]') ? '#7f1d1d22'
-                        : line.startsWith('[warn]') ? '#78350f22' : '#0f172a',
-                      color: line.startsWith('[error]') ? '#fca5a5'
-                        : line.startsWith('[warn]') ? '#fcd34d' : '#86efac',
-                    }}>
-                      {line}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <span style={{ color: '#475569', fontSize: 12 }}>
-                  {execution ? 'No output.' : 'Run code first.'}
-                </span>
-              )
-            )}
           </div>
         </div>
 
-        {/* Right: Analyse / Explain toggle */}
-        <div style={{ width: 320, flexShrink: 0, marginLeft: 10, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
-          {/* Mode toggle */}
-          <div style={{
-            display: 'flex', gap: 4, background: '#0f172a',
-            borderRadius: 7, padding: 3, border: '1px solid #1e293b', flexShrink: 0,
-          }}>
-            {[
-              { id: 'analyse', label: 'Analyse', icon: Boxes },
-              { id: 'explain', label: 'Explain', icon: Info },
-            ].map(({ id, label, icon: Icon }) => (
-              <button key={id} onClick={() => setRightMode(id)} style={{
-                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                padding: '5px 0', borderRadius: 5, border: 'none', cursor: 'pointer',
-                fontSize: 11, fontWeight: 600,
-                background: rightMode === id ? '#1e293b' : 'transparent',
-                color: rightMode === id ? '#818cf8' : '#64748b',
-              }}>
-                <Icon size={12} />{label}
-              </button>
-            ))}
-          </div>
-
-          {/* Analyse mode: Structure / Tokens / AST */}
-          {rightMode === 'analyse' && (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6, minHeight: 0 }}>
-              <div style={{
-                display: 'flex', gap: 3, background: '#0f172a',
-                borderRadius: 6, padding: 3, border: '1px solid #1e293b', flexShrink: 0,
-              }}>
-                {TABS.map(({ id, label, icon: Icon }) => (
-                  <button key={id} onClick={() => setTab(id)} style={{
-                    flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                    padding: '3px 0', borderRadius: 4, border: 'none', cursor: 'pointer',
-                    fontSize: 10, fontWeight: 600,
-                    background: tab === id ? '#1e293b' : 'transparent',
-                    color: tab === id ? '#818cf8' : '#64748b',
-                  }}>
-                    <Icon size={11} />{label}
-                  </button>
-                ))}
-              </div>
-              <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
-                {tab === 'structure' && (lang === 'py'
-                  ? <PyStructureView source={source} execution={execution} />
-                  : <StructureView model={model} currentEvent={currentEvent} onNodeClick={node => setFnModal({ node, callGraph: model.callGraph })} />
-                )}
-                {tab === 'tokens'    && <TokensView model={model} source={source} />}
-                {tab === 'ast'       && <AstView model={model} />}
-              </div>
-            </div>
-          )}
-
-          {/* Explain mode: hero + heap changes + call stack */}
-          {rightMode === 'explain' && (
-            <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {currentEvent
-                ? <ExplainHero event={currentEvent} step={step} total={totalSteps} />
-                : <IdleHero />
-              }
-              {currentEvent?.heapDelta?.length > 0 && (
-                <Panel title="Heap Changes" icon={Boxes} badge={currentEvent.heapDelta.length}>
-                  {currentEvent.heapDelta.map((d, i) => (
-                    <div key={i} style={{
-                      padding: '5px 8px', borderRadius: 6, marginBottom: 4,
-                      background: d.op === 'create' ? '#14532d22' : '#78350f22',
-                      border: `1px solid ${d.op === 'create' ? '#14532d' : '#78350f'}`,
-                      fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
-                    }}>
-                      <span style={{ color: d.op === 'create' ? '#86efac' : '#fcd34d' }}>
-                        {d.op === 'create' ? `+ ${d.objectType} #${d.objectId}` : `~ #${d.objectId}.${d.property}`}
-                      </span>
-                      {d.op === 'mutate' && (
-                        <span style={{ color: '#94a3b8' }}>
-                          {' '}{JSON.stringify(d.oldValue)} → {JSON.stringify(d.newValue)}
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </Panel>
-              )}
-              {currentEvent && (
-                <Panel title="Call Stack" icon={Code2} badge={currentEvent.stackSnapshot?.length ?? 0}>
-                  {currentEvent.stackSnapshot?.length > 0 ? (
-                    [...currentEvent.stackSnapshot].reverse().map((frame, i) => (
-                      <StackFrame key={i} frame={frame} depth={currentEvent.stackSnapshot.length - 1 - i} />
-                    ))
-                  ) : (
-                    <span style={{ color: '#475569', fontSize: 12 }}>Global scope</span>
-                  )}
-                </Panel>
-              )}
-            </div>
-          )}
-        </div>
       </div>
+
+      {/* ── Code detail modal (Structure / Tokens / AST) ── */}
+      {/* Triggered from header buttons, not a body column — these are
+          on-demand full-size overlays (a call graph, a two-pane annotated-
+          source-plus-inspector split, a deep tree) that need real width and
+          shouldn't permanently take space away from Run/Data's charts. */}
+      {codeModalTab && (
+        <CodeDetailModal
+          title={CODE_TABS.find(t => t.id === codeModalTab)?.label ?? ''}
+          icon={CODE_TABS.find(t => t.id === codeModalTab)?.icon}
+          onClose={() => setCodeModalTab(null)}
+        >
+          {codeModalTab === 'structure' && (lang === 'py'
+            ? <PyStructureView source={source} execution={execution} />
+            : <StructureView model={model} currentEvent={currentEvent} onNodeClick={node => setFnModal({ node, callGraph: model?.callGraph })} />
+          )}
+          {codeModalTab === 'tokens' && <TokensView model={model} source={source} />}
+          {codeModalTab === 'ast'    && <AstView model={model} />}
+        </CodeDetailModal>
+      )}
 
       {/* ── Function detail modal ── */}
       {fnModal && (
@@ -1457,27 +1576,31 @@ export default function CodeLens({ onBack, initialCode, initialLang, backLabel }
         />
       )}
 
-      {/* ── Tutor narration bar — pinned at bottom ── */}
-      {execution && (
-        <NarrationBar event={currentEvent} prevEvent={prevEvent} />
-      )}
-
       {/* ── Floating watch window ── */}
       {showWatch && (
         <WatchWindow
           snapshot={heapSnapshot}
           currentEvent={currentEvent}
           onClose={() => setShowWatch(false)}
+          knownNames={knownWatchNames}
         />
       )}
     </div>
   )
 }
 
+export default function CodeLens(props: CodeLensProps) {
+  return (
+    <CodeLensThemeProvider>
+      <CodeLensInner {...props} />
+    </CodeLensThemeProvider>
+  )
+}
+
 // ── Inline code renderer ─────────────────────────────────────────────────────
 // Converts `backtick-wrapped` segments in explanation strings to styled <code>.
 
-function InlineText({ text }) {
+function InlineText({ text }: { text?: string }) {
   if (!text) return null
   const parts = String(text).split(/(`[^`\n]+`)/)
   return parts.map((part, i) =>
@@ -1493,34 +1616,28 @@ function InlineText({ text }) {
 
 // ── Explain hero ─────────────────────────────────────────────────────────────
 
-const EVENT_COLOR = {
-  CALL:        '#818cf8',
-  RETURN:      '#86efac',
-  DECLARE:     '#7dd3fc',
-  ASSIGN:      '#fbbf24',
-  BRANCH:      '#f472b6',
-  LOOP:        '#fb923c',
-  OBJECT_CREATE: '#a78bfa',
-  OBJECT_MUTATE: '#f59e0b',
-  THROW:       '#f87171',
-  CATCH:       '#34d399',
-  BUILTIN:     '#94a3b8',
-}
-function eventColor(type) {
-  for (const [k, v] of Object.entries(EVENT_COLOR)) {
-    if (type.startsWith(k)) return v
+function eventColor(type: string, ui: CodeLensUiPalette): string {
+  const EVENT_COLOR: Record<string, string> = {
+    CALL: ui.accent, RETURN: ui.green, DECLARE: ui.cyan, ASSIGN: ui.amber,
+    BRANCH: ui.pink, LOOP: ui.amberSoft, OBJECT_CREATE: ui.purple,
+    OBJECT_MUTATE: ui.amberDeep, THROW: ui.red, CATCH: ui.greenBright, BUILTIN: ui.textDim,
   }
-  return '#94a3b8'
+  for (const [k, v] of Object.entries(EVENT_COLOR)) {
+    if (type.toUpperCase().startsWith(k)) return v
+  }
+  return ui.textDim
 }
 
-function ExplainHero({ event, step, total }) {
-  const explain = EXPLAIN[event.type]?.(event) ?? { summary: event.type, why: '', concept: '' }
-  const color   = eventColor(event.type)
+function ExplainHero({ event, prevEvent, step, total }: { event: TraceEvent; prevEvent: TraceEvent | null; step: number; total: number }) {
+  const { theme: { ui } } = useCodeLensTheme()
+  const explain = explainEvent(event)
+  const color   = eventColor(event.type, ui)
   const loc     = event.sourceLocation
+  const narration = buildNarration(event, prevEvent)
 
   return (
     <div style={{
-      background: '#0a0f1e',
+      background: ui.headerBg,
       border: `1px solid ${color}33`,
       borderRadius: 12,
       padding: '16px 16px 14px',
@@ -1546,14 +1663,14 @@ function ExplainHero({ event, step, total }) {
         {loc && (
           <span style={{
             marginLeft: 'auto', fontSize: 10,
-            color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+            color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace',
           }}>L{loc.line}</span>
         )}
       </div>
 
       {/* Summary — the hero text */}
       <div style={{
-        fontSize: 14, fontWeight: 600, color: '#f1f5f9',
+        fontSize: 14, fontWeight: 600, color: ui.textBright,
         lineHeight: 1.5, marginBottom: explain.why ? 12 : 0,
       }}>
         <InlineText text={explain.summary} />
@@ -1562,10 +1679,28 @@ function ExplainHero({ event, step, total }) {
       {/* Why — the explanation */}
       {explain.why && (
         <div style={{
-          fontSize: 12, color: '#64748b', lineHeight: 1.7,
-          borderTop: '1px solid #1e293b', paddingTop: 10,
+          fontSize: 12, color: ui.textMuted, lineHeight: 1.7,
+          borderTop: `1px solid ${ui.border}`, paddingTop: 10,
         }}>
           <InlineText text={explain.why} />
+        </div>
+      )}
+
+      {/* In plain terms — folded in from the old standalone bottom narration
+          bar, which duplicated this same information as a second
+          permanently-visible strip. */}
+      {narration && (
+        <div style={{
+          marginTop: 10, display: 'flex', alignItems: 'flex-start', gap: 8,
+          fontSize: 12, color: ui.textMuted, lineHeight: 1.6,
+          borderTop: `1px solid ${ui.border}`, paddingTop: 10,
+        }}>
+          <span style={{
+            fontSize: 10, padding: '2px 6px', borderRadius: 4, flexShrink: 0,
+            background: ui.accentBg, color: ui.accent,
+            fontFamily: 'JetBrains Mono, monospace', marginTop: 1,
+          }}>plain terms</span>
+          <span style={{ flex: 1 }}><InlineText text={narration} /></span>
         </div>
       )}
 
@@ -1574,7 +1709,7 @@ function ExplainHero({ event, step, total }) {
         marginTop: 12, display: 'flex', alignItems: 'center', gap: 8,
       }}>
         <div style={{
-          flex: 1, height: 2, background: '#1e293b', borderRadius: 2, overflow: 'hidden',
+          flex: 1, height: 2, background: ui.border, borderRadius: 2, overflow: 'hidden',
         }}>
           <div style={{
             height: '100%', width: `${((step + 1) / total) * 100}%`,
@@ -1583,7 +1718,7 @@ function ExplainHero({ event, step, total }) {
           }} />
         </div>
         <span style={{
-          fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+          fontSize: 10, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace',
           whiteSpace: 'nowrap',
         }}>{step + 1} / {total}</span>
       </div>
@@ -1591,28 +1726,29 @@ function ExplainHero({ event, step, total }) {
   )
 }
 
-const IDLE_CARDS = [
+const IDLE_CARDS: { icon: string; colorKey: 'accent' | 'amber' | 'green'; title: string; desc: string }[] = [
   {
     icon: '📚',
-    color: '#818cf8',
+    colorKey: 'accent',
     title: 'Call Stack',
     desc: 'See every function call open and close in real time. Understand how recursion builds frames — and how they unwind.',
   },
   {
     icon: '🔍',
-    color: '#fbbf24',
+    colorKey: 'amber',
     title: 'Variable Watch',
     desc: 'Track how variables change as each line runs. Spot mutations, scope boundaries, and value flow instantly.',
   },
   {
     icon: '🧠',
-    color: '#86efac',
+    colorKey: 'green',
     title: 'Heap & Objects',
     desc: 'Watch objects get created and linked. Learn why two variables can point to the same object — and what that means.',
   },
 ]
 
 function IdleHero() {
+  const { theme: { ui } } = useCodeLensTheme()
   const [card, setCard] = useState(0)
 
   useEffect(() => {
@@ -1621,10 +1757,11 @@ function IdleHero() {
   }, [])
 
   const c = IDLE_CARDS[card]
+  const color = ui[c.colorKey]
 
   return (
     <div style={{
-      background: '#0a0f1e', border: `1px solid ${c.color}33`, borderRadius: 12,
+      background: ui.headerBg, border: `1px solid ${color}33`, borderRadius: 12,
       padding: '20px 16px', display: 'flex', flexDirection: 'column',
       alignItems: 'center', gap: 10, flexShrink: 0,
       transition: 'border-color 0.4s',
@@ -1633,7 +1770,7 @@ function IdleHero() {
       {/* Top glow accent */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: 2,
-        background: `linear-gradient(90deg, ${c.color}99, ${c.color}22)`,
+        background: `linear-gradient(90deg, ${color}99, ${color}22)`,
         borderRadius: '12px 12px 0 0',
         transition: 'background 0.4s',
       }} />
@@ -1641,7 +1778,7 @@ function IdleHero() {
       {/* Icon */}
       <div style={{
         width: 44, height: 44, borderRadius: '50%', fontSize: 22,
-        background: `${c.color}18`, border: `1px solid ${c.color}44`,
+        background: `${color}18`, border: `1px solid ${color}44`,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         {c.icon}
@@ -1649,10 +1786,10 @@ function IdleHero() {
 
       {/* Content */}
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: c.color, marginBottom: 5, transition: 'color 0.3s' }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color, marginBottom: 5, transition: 'color 0.3s' }}>
           {c.title}
         </div>
-        <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.65, maxWidth: 220 }}>
+        <div style={{ fontSize: 11, color: ui.textMuted, lineHeight: 1.65, maxWidth: 220 }}>
           {c.desc}
         </div>
       </div>
@@ -1665,7 +1802,7 @@ function IdleHero() {
             onClick={() => setCard(i)}
             style={{
               width: i === card ? 16 : 5, height: 5, borderRadius: 99,
-              background: i === card ? c.color : '#1e293b',
+              background: i === card ? color : ui.border,
               cursor: 'pointer', transition: 'all 0.25s',
             }}
           />
@@ -1673,8 +1810,8 @@ function IdleHero() {
       </div>
 
       {/* CTA */}
-      <div style={{ fontSize: 11, color: '#334155', marginTop: 2 }}>
-        Press <span style={{ color: '#818cf8', fontFamily: 'JetBrains Mono, monospace' }}>Run</span> to begin
+      <div style={{ fontSize: 11, color: ui.borderStrong, marginTop: 2 }}>
+        Press <span style={{ color: ui.accent, fontFamily: 'JetBrains Mono, monospace' }}>Run</span> to begin
       </div>
     </div>
   )
@@ -1683,23 +1820,29 @@ function IdleHero() {
 
 // ── Heap panel ────────────────────────────────────────────────────────────────
 
-function HeapPanel({ snapshot, heapDelta }) {
+function HeapPanel({ snapshot, heapDelta }: { snapshot: HeapSnapshot | null; heapDelta?: TraceEvent['heapDelta'] }) {
+  const { theme: { ui } } = useCodeLensTheme()
   const [open, setOpen] = useState(false)
+  const IC: CSSProperties = {
+    background: ui.border, color: ui.cyan,
+    padding: '1px 5px', borderRadius: 3,
+    fontSize: '0.9em', fontFamily: 'JetBrains Mono, monospace',
+  }
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Legend bar */}
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px',
-        borderBottom: '1px solid #1e293b', flexShrink: 0, flexWrap: 'wrap',
+        borderBottom: `1px solid ${ui.border}`, flexShrink: 0, flexWrap: 'wrap',
       }}>
-        <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
+        <span style={{ fontSize: 9, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace',
           letterSpacing: '.08em' }}>HEAP</span>
-        <HeapDot color="#22c55e" label="new object" />
-        <HeapDot color="#f59e0b" label="mutated" />
-        <HeapDot color="#818cf8" label="existing" />
+        <HeapDot color={ui.green} label="new object" />
+        <HeapDot color={ui.amberDeep} label="mutated" />
+        <HeapDot color={ui.accent} label="existing" />
         <button onClick={() => setOpen(v => !v)} style={{
           marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer',
-          color: open ? '#818cf8' : '#334155', fontSize: 10,
+          color: open ? ui.accent : ui.borderStrong, fontSize: 10,
           fontFamily: 'JetBrains Mono, monospace', padding: 0,
         }}>
           {open ? '▲ hide' : '? what is this'}
@@ -1709,20 +1852,20 @@ function HeapPanel({ snapshot, heapDelta }) {
       {/* Collapsible explanation */}
       {open && (
         <div style={{
-          padding: '12px 14px', background: '#080c14', borderBottom: '1px solid #1e293b',
-          fontSize: 12, color: '#64748b', lineHeight: 1.7, flexShrink: 0,
+          padding: '12px 14px', background: ui.bg, borderBottom: `1px solid ${ui.border}`,
+          fontSize: 12, color: ui.textMuted, lineHeight: 1.7, flexShrink: 0,
         }}>
-          <div style={{ fontWeight: 700, color: '#818cf8', marginBottom: 6 }}>The Heap — long-term memory</div>
+          <div style={{ fontWeight: 700, color: ui.accent, marginBottom: 6 }}>The Heap — long-term memory</div>
           When you write <code style={IC}>new Node()</code>, <code style={IC}>[]</code>, or <code style={IC}>{'{}'}</code>,
-          JavaScript allocates memory on the <em>heap</em> and gives your variable a <strong style={{ color: '#f1f5f9' }}>reference</strong> — an arrow pointing to that memory, not a copy of the value.
+          JavaScript allocates memory on the <em>heap</em> and gives your variable a <strong style={{ color: ui.textBright }}>reference</strong> — an arrow pointing to that memory, not a copy of the value.
           <br /><br />
-          Unlike the <strong style={{ color: '#f1f5f9' }}>call stack</strong> — which is destroyed when a function returns — heap objects
+          Unlike the <strong style={{ color: ui.textBright }}>call stack</strong> — which is destroyed when a function returns — heap objects
           persist until nothing holds a reference to them. At that point the garbage collector reclaims the memory.
           <br /><br />
           <strong>This is why mutation is powerful and dangerous.</strong> Multiple variables can hold references to the same object.
           Changing the object through any one of them changes it for all — there is only one copy.
           <br /><br />
-          <em style={{ color: '#475569' }}>SICP Chapter 3.3: "Modeling with Mutable Data" — the environment model depends on understanding this distinction.</em>
+          <em style={{ color: ui.textFaint }}>SICP Chapter 3.3: "Modeling with Mutable Data" — the environment model depends on understanding this distinction.</em>
         </div>
       )}
 
@@ -1733,16 +1876,11 @@ function HeapPanel({ snapshot, heapDelta }) {
   )
 }
 
-const IC = {
-  background: '#1e293b', color: '#7dd3fc',
-  padding: '1px 5px', borderRadius: 3,
-  fontSize: '0.9em', fontFamily: 'JetBrains Mono, monospace',
-}
-
-function HeapDot({ color, label }) {
+function HeapDot({ color, label }: { color: string; label: string }) {
+  const { theme: { ui } } = useCodeLensTheme()
   return (
     <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 9,
-      color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+      color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace' }}>
       <span style={{ width: 8, height: 8, borderRadius: 2, border: `2px solid ${color}`,
         display: 'inline-block', flexShrink: 0 }} />
       {label}
@@ -1752,26 +1890,28 @@ function HeapDot({ color, label }) {
 
 // ── Function detail modal ─────────────────────────────────────────────────────
 
-const KIND_COLOR_MAP = {
-  function:    '#7dd3fc',
-  arrow:       '#86efac',
-  method:      '#818cf8',
-  constructor: '#a78bfa',
+function kColor(k: CallGraphNode['kind'], ui: CodeLensUiPalette): string {
+  const KIND_COLOR_MAP: Record<string, string> = {
+    function: ui.cyan, arrow: ui.green, method: ui.accent, constructor: ui.purple,
+  }
+  return KIND_COLOR_MAP[k] ?? ui.textDim
 }
-const kColor = k => KIND_COLOR_MAP[k] ?? '#94a3b8'
 
-function FunctionModal({ node, callGraph, onClose }) {
+interface SicpNote { pattern?: string; body: string; practice?: string; sicp?: string | null }
+
+function FunctionModal({ node, callGraph, onClose }: { node: CallGraphNode; callGraph: CallGraph | undefined; onClose: () => void }) {
+  const { theme: { ui } } = useCodeLensTheme()
   const { nodes, edges } = callGraph ?? { nodes: [], edges: [] }
 
   const callsEdges   = edges.filter(e => e.from === node.id && !e.recursive)
   const calledByEdges = edges.filter(e => e.to === node.id && !e.recursive)
   const isRecursive  = edges.some(e => e.recursive && e.from === node.id)
 
-  const callsNames    = callsEdges.map(e => nodes.find(n => n.id === e.to)?.name).filter(Boolean)
-  const calledByNames = calledByEdges.map(e => nodes.find(n => n.id === e.from)?.name).filter(Boolean)
+  const callsNames    = callsEdges.map(e => nodes.find(n => n.id === e.to)?.name).filter((n): n is string => !!n)
+  const calledByNames = calledByEdges.map(e => nodes.find(n => n.id === e.from)?.name).filter((n): n is string => !!n)
   const isEntryPoint  = calledByNames.length === 0
   const isLeaf        = callsNames.length === 0 && !isRecursive
-  const color         = kColor(node.kind)
+  const color         = kColor(node.kind, ui)
 
   const sicp = getSICPNote(node, isRecursive, callsNames, isLeaf, calledByNames)
 
@@ -1782,7 +1922,7 @@ function FunctionModal({ node, callGraph, onClose }) {
       onClick={onClose}
     >
       <div
-        style={{ background: '#0d1526', border: '1px solid #1e293b', borderRadius: 14,
+        style={{ background: ui.panelBg2, border: `1px solid ${ui.border}`, borderRadius: 14,
           padding: '24px 26px', maxWidth: 500, width: '100%', maxHeight: '82vh',
           overflow: 'auto', boxShadow: '0 30px 70px rgba(0,0,0,.7)' }}
         onClick={e => e.stopPropagation()}
@@ -1798,14 +1938,14 @@ function FunctionModal({ node, callGraph, onClose }) {
               </span>
               {isRecursive && (
                 <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99,
-                  background: '#78350f22', color: '#f59e0b', border: '1px solid #78350f44',
+                  background: ui.amberDeep + '22', color: ui.amber, border: `1px solid ${ui.amberDeep}44`,
                   fontFamily: 'JetBrains Mono, monospace' }}>
                   ↺ recursive
                 </span>
               )}
               {isEntryPoint && (
                 <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 99,
-                  background: '#1e3a5f', color: '#7dd3fc', border: '1px solid #1e3a5f',
+                  background: ui.accentBg, color: ui.cyan, border: `1px solid ${ui.accentBg}`,
                   fontFamily: 'JetBrains Mono, monospace' }}>
                   entry point
                 </span>
@@ -1814,20 +1954,20 @@ function FunctionModal({ node, callGraph, onClose }) {
             <div style={{ fontSize: 19, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color }}>
               {node.name}
             </div>
-            <div style={{ fontSize: 12, color: '#64748b', fontFamily: 'JetBrains Mono, monospace', marginTop: 3 }}>
+            <div style={{ fontSize: 12, color: ui.textMuted, fontFamily: 'JetBrains Mono, monospace', marginTop: 3 }}>
               ({node.params.join(', ')})
-              {node.line && <span style={{ marginLeft: 10, color: '#334155' }}>line {node.line}</span>}
+              {node.line && <span style={{ marginLeft: 10, color: ui.borderStrong }}>line {node.line}</span>}
             </div>
           </div>
           <button onClick={onClose} style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#475569', fontSize: 22, lineHeight: 1, padding: 0,
+            color: ui.textFaint, fontSize: 22, lineHeight: 1, padding: 0,
           }}>×</button>
         </div>
 
         {/* ── What it does ── */}
         <ModalSection title="What this does">
-          <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
+          <p style={{ margin: 0, fontSize: 13, color: ui.textDim, lineHeight: 1.7 }}>
             <InlineText text={describeFn(node, callsNames, calledByNames, isRecursive, isLeaf, isEntryPoint)} />
           </p>
         </ModalSection>
@@ -1838,7 +1978,7 @@ function FunctionModal({ node, callGraph, onClose }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
               <ComplexityBadge complexity={node.complexity} />
             </div>
-            <p style={{ margin: 0, fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
+            <p style={{ margin: 0, fontSize: 13, color: ui.textDim, lineHeight: 1.7 }}>
               <InlineText text={explainComplexity(node.complexity)} />
             </p>
           </ModalSection>
@@ -1849,19 +1989,19 @@ function FunctionModal({ node, callGraph, onClose }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12,
             fontFamily: 'JetBrains Mono, monospace' }}>
             {callsNames.length > 0 && (
-              <RelRow icon="→" label="Calls" names={callsNames} color="#7dd3fc" />
+              <RelRow icon="→" label="Calls" names={callsNames} color={ui.cyan} />
             )}
             {calledByNames.length > 0 && (
-              <RelRow icon="←" label="Called by" names={calledByNames} color="#a78bfa" />
+              <RelRow icon="←" label="Called by" names={calledByNames} color={ui.purple} />
             )}
             {isRecursive && (
-              <RelRow icon="↺" label="Recursive" names={[node.name]} color="#f59e0b" />
+              <RelRow icon="↺" label="Recursive" names={[node.name]} color={ui.amber} />
             )}
             {isLeaf && (
-              <div style={{ color: '#475569' }}>Leaf function — calls nothing in this program.</div>
+              <div style={{ color: ui.textFaint }}>Leaf function — calls nothing in this program.</div>
             )}
             {isEntryPoint && !isRecursive && (
-              <div style={{ color: '#475569' }}>Not called by any other function — this is an entry point.</div>
+              <div style={{ color: ui.textFaint }}>Not called by any other function — this is an entry point.</div>
             )}
           </div>
         </ModalSection>
@@ -1873,28 +2013,28 @@ function FunctionModal({ node, callGraph, onClose }) {
               <span style={{
                 display: 'inline-block', marginBottom: 10,
                 fontSize: 10, padding: '2px 9px', borderRadius: 99,
-                background: '#1e293b', color: '#a5b4fc',
-                border: '1px solid #6366f155',
+                background: ui.border, color: ui.accentBright,
+                border: `1px solid ${ui.accentSolid}55`,
                 fontFamily: 'JetBrains Mono, monospace',
               }}>
                 {sicp.pattern}
               </span>
             )}
-            <p style={{ margin: '0 0 10px', fontSize: 13, color: '#94a3b8', lineHeight: 1.7 }}>
+            <p style={{ margin: '0 0 10px', fontSize: 13, color: ui.textDim, lineHeight: 1.7 }}>
               <InlineText text={sicp.body} />
             </p>
             {sicp.practice && (
               <div style={{
-                borderLeft: '2px solid #f59e0b', paddingLeft: 10,
-                fontSize: 12, color: '#78716c', lineHeight: 1.65, marginBottom: 10,
+                borderLeft: `2px solid ${ui.amber}`, paddingLeft: 10,
+                fontSize: 12, color: ui.textMuted, lineHeight: 1.65, marginBottom: 10,
               }}>
-                <span style={{ color: '#f59e0b', fontWeight: 700, fontFamily: 'JetBrains Mono, monospace',
+                <span style={{ color: ui.amber, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace',
                   fontSize: 10 }}>IN PRACTICE  </span>
                 <InlineText text={sicp.practice} />
               </div>
             )}
             {sicp.sicp && (
-              <div style={{ fontSize: 11, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>
+              <div style={{ fontSize: 11, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace' }}>
                 ↗ <InlineText text={sicp.sicp} />
               </div>
             )}
@@ -1905,10 +2045,52 @@ function FunctionModal({ node, callGraph, onClose }) {
   )
 }
 
-function ModalSection({ title, children }) {
+// ── Code detail modal — shared full-size overlay for Structure/Tokens/AST ──
+// so those views get real width to render call graphs / annotated source /
+// deep trees instead of squeezing into a permanent narrow column.
+
+function CodeDetailModal({ title, icon: Icon, onClose, children }: { title: string; icon?: LucideIcon; onClose: () => void; children: ReactNode }) {
+  const { theme: { ui } } = useCodeLensTheme()
+  return (
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 200,
+        background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40,
+      }}
+      onClick={onClose}
+    >
+      <div
+        style={{
+          background: ui.panelBg, border: `1px solid ${ui.border}`, borderRadius: 12,
+          width: '100%', maxWidth: 1100, height: '100%', display: 'flex', flexDirection: 'column',
+          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', overflow: 'hidden',
+        }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div style={{
+          padding: '12px 20px', borderBottom: `1px solid ${ui.border}`, background: ui.headerBg,
+          display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
+        }}>
+          {Icon && <Icon size={16} color={ui.accent} />}
+          <span style={{ fontWeight: 600, color: ui.text }}>{title}</span>
+          <button onClick={onClose} style={{
+            marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: ui.textMuted,
+          }}><X size={18} /></button>
+        </div>
+        <div style={{ flex: 1, overflow: 'auto', padding: 16, minHeight: 0 }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ModalSection({ title, children }: { title: string; children: ReactNode }) {
+  const { theme: { ui } } = useCodeLensTheme()
   return (
     <div style={{ marginBottom: 18 }}>
-      <div style={{ fontSize: 9, letterSpacing: '.1em', color: '#334155',
+      <div style={{ fontSize: 9, letterSpacing: '.1em', color: ui.borderStrong,
         fontFamily: 'JetBrains Mono, monospace', marginBottom: 8, textTransform: 'uppercase' }}>
         {title}
       </div>
@@ -1917,11 +2099,12 @@ function ModalSection({ title, children }) {
   )
 }
 
-function RelRow({ icon, label, names, color }) {
+function RelRow({ icon, label, names, color }: { icon: string; label: string; names: string[]; color: string }) {
+  const { theme: { ui } } = useCodeLensTheme()
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-      <span style={{ color: '#475569', minWidth: 16 }}>{icon}</span>
-      <span style={{ color: '#475569', minWidth: 60 }}>{label}</span>
+      <span style={{ color: ui.textFaint, minWidth: 16 }}>{icon}</span>
+      <span style={{ color: ui.textFaint, minWidth: 60 }}>{label}</span>
       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
         {names.map(n => (
           <span key={n} style={{ color, background: color + '18',
@@ -1934,7 +2117,14 @@ function RelRow({ icon, label, names, color }) {
   )
 }
 
-function describeFn(node, callsNames, calledByNames, isRecursive, isLeaf, isEntryPoint) {
+function describeFn(
+  node: CallGraphNode,
+  callsNames: string[],
+  calledByNames: string[],
+  isRecursive: boolean,
+  isLeaf: boolean,
+  isEntryPoint: boolean,
+): string {
   const name = node.name
   if (isRecursive) {
     const others = callsNames.filter(n => n !== name)
@@ -1953,8 +2143,8 @@ function describeFn(node, callsNames, calledByNames, isRecursive, isLeaf, isEntr
   return `\`${name}\` — a ${node.kind} function${node.params.length > 0 ? ` taking ${node.params.join(', ')}` : ' with no parameters'}.`
 }
 
-function explainComplexity(c) {
-  const map = {
+function explainComplexity(c: string): string {
+  const map: Record<string, string> = {
     'O(1)':           'Constant time — the same amount of work is done regardless of input size. This is the gold standard. Adding one more element changes nothing.',
     'O(n)':           'Linear time — work grows proportionally with n. Double the input, double the work. A single loop over n elements is typically O(n).',
     'O(n) recursive': 'Linear recursion — proportional to n but uses the call stack. Each recursive call adds a frame. For very large n this can cause a stack overflow. An iterative version with an explicit loop avoids this entirely.',
@@ -1964,7 +2154,13 @@ function explainComplexity(c) {
   return map[c] ?? `Work grows as ${c} with respect to input size.`
 }
 
-function getSICPNote(node, isRecursive, callsNames, isLeaf, calledByNames) {
+function getSICPNote(
+  node: CallGraphNode,
+  isRecursive: boolean,
+  callsNames: string[],
+  isLeaf: boolean,
+  calledByNames: string[],
+): SicpNote | null {
   const isEntryPoint = calledByNames.length === 0
   const name = node.name
   const nameLower = name.toLowerCase()
@@ -2052,14 +2248,19 @@ function getSICPNote(node, isRecursive, callsNames, isLeaf, calledByNames) {
 
 // ── Python structure view (regex-based, no Pyodide needed) ───────────────────
 
-function parsePyStructure(source) {
-  const lines   = source.split('\n')
-  const fns     = []
-  const classes = []
-  const vars    = []
+interface PyFn { name: string; params: string[]; line: number }
+interface PyClass { name: string; superclass: string | null; line: number; methods: PyFn[] }
+interface PyVar { name: string; initType: string | null; line: number }
+interface PyStructure { fns: PyFn[]; classes: PyClass[]; vars: PyVar[] }
 
-  let currentClass = null
-  let classBodyIndent = null
+function parsePyStructure(source: string): PyStructure {
+  const lines   = source.split('\n')
+  const fns: PyFn[]         = []
+  const classes: PyClass[]  = []
+  const vars: PyVar[]       = []
+
+  let currentClass: string | null = null
+  let classBodyIndent: number | null = null
 
   lines.forEach((raw, i) => {
     const line   = i + 1
@@ -2106,7 +2307,7 @@ function parsePyStructure(source) {
     const varM = t.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/)
     if (varM && indent === 0 && !t.startsWith('#')) {
       const initStr = varM[2].trim()
-      let initType = null
+      let initType: string | null = null
       if (initStr.startsWith('['))  initType = 'list'
       else if (initStr.startsWith('{')) initType = initStr.includes(':') ? 'dict' : 'set'
       else if (initStr.startsWith('('))  initType = 'tuple'
@@ -2121,7 +2322,8 @@ function parsePyStructure(source) {
   return { fns, classes, vars }
 }
 
-function PyStructureView({ source, execution }) {
+function PyStructureView({ source, execution }: { source: string; execution: ExecutionResult | null }) {
+  const { theme: { ui } } = useCodeLensTheme()
   const { fns, classes, vars } = parsePyStructure(source)
 
   // Build call set from execution events for live highlighting
@@ -2145,20 +2347,20 @@ function PyStructureView({ source, execution }) {
             return (
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', gap: 7,
-                padding: '4px 9px', background: '#0d1526',
-                borderRadius: 6, border: `1px solid ${wasCalled ? '#6366f155' : '#1e293b'}`,
+                padding: '4px 9px', background: ui.panelBg2,
+                borderRadius: 6, border: `1px solid ${wasCalled ? ui.accentSolid + '55' : ui.border}`,
               }}>
                 <span style={{ width: 3, height: 20, borderRadius: 2, flexShrink: 0,
-                  background: wasCalled ? '#818cf8' : '#334155' }} />
+                  background: wasCalled ? ui.accent : ui.borderStrong }} />
                 <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11,
-                  color: wasCalled ? '#818cf8' : '#7dd3fc', fontWeight: 700 }}>
+                  color: wasCalled ? ui.accent : ui.cyan, fontWeight: 700 }}>
                   {fn.name}
                 </span>
-                <span style={{ fontSize: 10, color: '#475569',
+                <span style={{ fontSize: 10, color: ui.textFaint,
                   fontFamily: 'JetBrains Mono, monospace' }}>
                   ({fn.params.join(', ')})
                 </span>
-                <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155',
+                <span style={{ marginLeft: 'auto', fontSize: 8, color: ui.borderStrong,
                   fontFamily: 'JetBrains Mono, monospace' }}>L{fn.line}</span>
               </div>
             )
@@ -2171,23 +2373,23 @@ function PyStructureView({ source, execution }) {
         <>
           <SectionLabel>CLASSES</SectionLabel>
           {classes.map((cls, i) => (
-            <div key={i} style={{ padding: '7px 9px', background: '#1e293b', borderRadius: 6 }}>
+            <div key={i} style={{ padding: '7px 9px', background: ui.border, borderRadius: 6 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: cls.methods.length ? 5 : 0 }}>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#818cf8' }}>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: ui.accent }}>
                   {cls.name}
                 </span>
                 {cls.superclass && (
-                  <span style={{ fontSize: 10, color: '#64748b' }}>({cls.superclass})</span>
+                  <span style={{ fontSize: 10, color: ui.textMuted }}>({cls.superclass})</span>
                 )}
-                <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155',
+                <span style={{ marginLeft: 'auto', fontSize: 8, color: ui.borderStrong,
                   fontFamily: 'JetBrains Mono, monospace' }}>L{cls.line}</span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                 {cls.methods.map((m, j) => (
                   <span key={j} style={{
                     fontSize: 10, padding: '1px 6px', borderRadius: 99,
-                    background: m.name === '__init__' ? '#312e81' : '#1e3a5f',
-                    color: m.name === '__init__' ? '#a5b4fc' : '#7dd3fc',
+                    background: m.name === '__init__' ? ui.accentBgSolid : ui.accentBg,
+                    color: m.name === '__init__' ? ui.accentBright : ui.cyan,
                     fontFamily: 'JetBrains Mono, monospace',
                   }}>{m.name}</span>
                 ))}
@@ -2205,18 +2407,18 @@ function PyStructureView({ source, execution }) {
             <div key={i} style={{
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '3px 8px', borderRadius: 5,
-              background: '#0d1526', border: '1px solid #1e293b',
+              background: ui.panelBg2, border: `1px solid ${ui.border}`,
             }}>
               <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3, flexShrink: 0,
-                background: '#86efac18', color: '#86efac', border: '1px solid #86efac33',
+                background: ui.green + '18', color: ui.green, border: `1px solid ${ui.green}33`,
                 fontFamily: 'JetBrains Mono, monospace' }}>var</span>
               <span style={{ flex: 1, fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
-                color: '#e2e8f0' }}>{v.name}</span>
+                color: ui.text }}>{v.name}</span>
               {v.initType && (
-                <span style={{ fontSize: 9, color: '#475569',
+                <span style={{ fontSize: 9, color: ui.textFaint,
                   fontFamily: 'JetBrains Mono, monospace' }}>{v.initType}</span>
               )}
-              <span style={{ fontSize: 8, color: '#334155',
+              <span style={{ fontSize: 8, color: ui.borderStrong,
                 fontFamily: 'JetBrains Mono, monospace' }}>L{v.line}</span>
             </div>
           ))}
@@ -2224,12 +2426,12 @@ function PyStructureView({ source, execution }) {
       )}
 
       {fns.length === 0 && classes.length === 0 && vars.length === 0 && (
-        <span style={{ color: '#475569', fontSize: 12 }}>No definitions detected.</span>
+        <span style={{ color: ui.textFaint, fontSize: 12 }}>No definitions detected.</span>
       )}
 
       {!hasRun && (fns.length > 0 || classes.length > 0) && (
-        <div style={{ fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace',
-          borderTop: '1px solid #1e293b', paddingTop: 6, marginTop: 2 }}>
+        <div style={{ fontSize: 10, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace',
+          borderTop: `1px solid ${ui.border}`, paddingTop: 6, marginTop: 2 }}>
           Run to see which functions are called (highlighted in indigo)
         </div>
       )}
@@ -2239,29 +2441,31 @@ function PyStructureView({ source, execution }) {
 
 // ── Static analysis views ─────────────────────────────────────────────────────
 
-const VAR_KIND_COLOR = { const: '#86efac', let: '#fbbf24', var: '#f472b6' }
-const INIT_TYPE_COLOR = {
-  number: '#86efac', string: '#fbbf24', boolean: '#f472b6',
-  array: '#7dd3fc', object: '#818cf8', function: '#a78bfa', expr: '#94a3b8',
-}
-function initColor(t) {
-  if (!t) return '#334155'
-  if (t.startsWith('new ')) return '#a78bfa'
-  if (t.endsWith('()'))     return '#7dd3fc'
-  return INIT_TYPE_COLOR[t] ?? '#475569'
+function initColor(t: string | null | undefined, ui: CodeLensUiPalette): string {
+  const INIT_TYPE_COLOR: Record<string, string> = {
+    number: ui.green, string: ui.amber, boolean: ui.pink,
+    array: ui.cyan, object: ui.accent, function: ui.purple, expr: ui.textDim,
+  }
+  if (!t) return ui.borderStrong
+  if (t.startsWith('new ')) return ui.purple
+  if (t.endsWith('()'))     return ui.cyan
+  return INIT_TYPE_COLOR[t] ?? ui.textFaint
 }
 
-function StructureView({ model, currentEvent, onNodeClick }) {
-  if (model?.error) return <span style={{ color: '#ef4444', fontSize: 12 }}>Parse error: {model.error.message}</span>
-  if (!model) return <span style={{ color: '#475569', fontSize: 12 }}>Parsing…</span>
+function StructureView({ model, currentEvent, onNodeClick }: { model: ProgramModel | null; currentEvent: TraceEvent | null; onNodeClick: (node: CallGraphNode) => void }) {
+  const { theme: { ui } } = useCodeLensTheme()
+  const VAR_KIND_COLOR: Record<string, string> = { const: ui.green, let: ui.amber, var: ui.pink }
 
-  const hasGraph      = model.callGraph?.nodes?.length > 0
-  const hasClasses    = model.classes?.length > 0
-  const hasVars       = model.variables?.length > 0
-  const hasImports    = model.imports?.length > 0
-  const hasInterfaces = model.interfaces?.length > 0
-  const hasTypes      = model.types?.length > 0
-  const hasEnums      = model.enums?.length > 0
+  if (model?.error) return <span style={{ color: ui.redSolid, fontSize: 12 }}>Parse error: {model.error.message}</span>
+  if (!model) return <span style={{ color: ui.textFaint, fontSize: 12 }}>Parsing…</span>
+
+  const hasGraph      = (model.callGraph?.nodes?.length ?? 0) > 0
+  const hasClasses    = (model.classes?.length ?? 0) > 0
+  const hasVars       = (model.variables?.length ?? 0) > 0
+  const hasImports    = (model.imports?.length ?? 0) > 0
+  const hasInterfaces = (model.interfaces?.length ?? 0) > 0
+  const hasTypes      = (model.types?.length ?? 0) > 0
+  const hasEnums      = (model.enums?.length ?? 0) > 0
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -2269,7 +2473,7 @@ function StructureView({ model, currentEvent, onNodeClick }) {
       {/* ── Call graph ── */}
       {hasGraph
         ? <CallGraphView callGraph={model.callGraph} currentEvent={currentEvent} onNodeClick={onNodeClick} />
-        : <span style={{ color: '#475569', fontSize: 12 }}>No functions detected.</span>
+        : <span style={{ color: ui.textFaint, fontSize: 12 }}>No functions detected.</span>
       }
 
       {/* ── Variables ── */}
@@ -2277,14 +2481,14 @@ function StructureView({ model, currentEvent, onNodeClick }) {
         <>
           <SectionLabel>VARIABLES</SectionLabel>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {model.variables.map((v, i) => {
-              const kindColor = VAR_KIND_COLOR[v.kind] ?? '#94a3b8'
-              const iColor    = initColor(v.initType)
+            {model.variables!.map((v, i) => {
+              const kindColor = VAR_KIND_COLOR[v.kind] ?? ui.textDim
+              const iColor    = initColor(v.initType, ui)
               return (
                 <div key={i} style={{
                   display: 'flex', alignItems: 'center', gap: 6,
-                  padding: '3px 8px', borderRadius: 5, background: '#0d1526',
-                  border: '1px solid #1e293b',
+                  padding: '3px 8px', borderRadius: 5, background: ui.panelBg2,
+                  border: `1px solid ${ui.border}`,
                 }}>
                   {/* kind badge */}
                   <span style={{
@@ -2297,7 +2501,7 @@ function StructureView({ model, currentEvent, onNodeClick }) {
                   {/* name */}
                   <span style={{
                     flex: 1, fontSize: 11, fontFamily: 'JetBrains Mono, monospace',
-                    color: '#e2e8f0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    color: ui.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>{v.name}</span>
 
                   {/* init type */}
@@ -2311,7 +2515,7 @@ function StructureView({ model, currentEvent, onNodeClick }) {
                   {/* line */}
                   {v.line && (
                     <span style={{
-                      fontSize: 8, color: '#334155', flexShrink: 0,
+                      fontSize: 8, color: ui.borderStrong, flexShrink: 0,
                       fontFamily: 'JetBrains Mono, monospace',
                     }}>L{v.line}</span>
                   )}
@@ -2326,19 +2530,19 @@ function StructureView({ model, currentEvent, onNodeClick }) {
       {hasClasses && (
         <>
           <SectionLabel>CLASSES</SectionLabel>
-          {model.classes.map((cls, i) => (
-            <div key={i} style={{ padding: '7px 9px', background: '#1e293b', borderRadius: 6 }}>
+          {model.classes!.map((cls, i) => (
+            <div key={i} style={{ padding: '7px 9px', background: ui.border, borderRadius: 6 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 }}>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#818cf8' }}>{cls.name}</span>
-                {cls.superclass && <span style={{ fontSize: 10, color: '#64748b' }}>extends {cls.superclass}</span>}
-                {cls.line && <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>L{cls.line}</span>}
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: ui.accent }}>{cls.name}</span>
+                {cls.superclass && <span style={{ fontSize: 10, color: ui.textMuted }}>extends {cls.superclass}</span>}
+                {cls.line && <span style={{ marginLeft: 'auto', fontSize: 8, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace' }}>L{cls.line}</span>}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                 {cls.methods.map((m, j) => (
                   <span key={j} style={{
                     fontSize: 10, padding: '1px 6px', borderRadius: 99,
-                    background: m.kind === 'constructor' ? '#312e81' : '#1e3a5f',
-                    color: m.kind === 'constructor' ? '#a5b4fc' : '#7dd3fc',
+                    background: m.kind === 'constructor' ? ui.accentBgSolid : ui.accentBg,
+                    color: m.kind === 'constructor' ? ui.accentBright : ui.cyan,
                     fontFamily: 'JetBrains Mono, monospace',
                   }}>{m.static ? 'static ' : ''}{m.name}</span>
                 ))}
@@ -2352,24 +2556,24 @@ function StructureView({ model, currentEvent, onNodeClick }) {
       {hasInterfaces && (
         <>
           <SectionLabel>INTERFACES</SectionLabel>
-          {model.interfaces.map((iface, i) => (
-            <div key={i} style={{ padding: '7px 9px', background: '#0d1526', borderRadius: 6, border: '1px solid #6366f133' }}>
+          {model.interfaces!.map((iface, i) => (
+            <div key={i} style={{ padding: '7px 9px', background: ui.panelBg2, borderRadius: 6, border: `1px solid ${ui.accentSolid}33` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: iface.members.length ? 5 : 0 }}>
                 <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3, flexShrink: 0,
-                  background: '#6366f118', color: '#818cf8', border: '1px solid #6366f133',
+                  background: ui.accentSolid + '18', color: ui.accent, border: `1px solid ${ui.accentSolid}33`,
                   fontFamily: 'JetBrains Mono, monospace' }}>interface</span>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#a5b4fc' }}>{iface.name}</span>
-                {iface.extends?.length > 0 && (
-                  <span style={{ fontSize: 10, color: '#475569' }}>extends {iface.extends.join(', ')}</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: ui.accentBright }}>{iface.name}</span>
+                {(iface.extends?.length ?? 0) > 0 && (
+                  <span style={{ fontSize: 10, color: ui.textFaint }}>extends {iface.extends!.join(', ')}</span>
                 )}
-                {iface.line && <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>L{iface.line}</span>}
+                {iface.line && <span style={{ marginLeft: 'auto', fontSize: 8, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace' }}>L{iface.line}</span>}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                 {iface.members.map((m, j) => (
                   <span key={j} style={{
                     fontSize: 10, padding: '1px 6px', borderRadius: 99,
-                    background: m.kind === 'method' ? '#1e3a5f' : '#1e293b',
-                    color: m.kind === 'method' ? '#7dd3fc' : '#94a3b8',
+                    background: m.kind === 'method' ? ui.accentBg : ui.border,
+                    color: m.kind === 'method' ? ui.cyan : ui.textDim,
                     fontFamily: 'JetBrains Mono, monospace',
                   }}>{m.name}{m.optional ? '?' : ''}{m.kind === 'method' ? '()' : ''}</span>
                 ))}
@@ -2384,18 +2588,18 @@ function StructureView({ model, currentEvent, onNodeClick }) {
         <>
           <SectionLabel>TYPES</SectionLabel>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {model.types.map((t, i) => (
+            {model.types!.map((t, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '3px 8px', borderRadius: 5,
-                background: '#0d1526', border: '1px solid #a78bfa33',
+                background: ui.panelBg2, border: `1px solid ${ui.purple}33`,
               }}>
                 <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3,
-                  background: '#a78bfa18', color: '#a78bfa', border: '1px solid #a78bfa33',
+                  background: ui.purple + '18', color: ui.purple, border: `1px solid ${ui.purple}33`,
                   fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>type</span>
-                <span style={{ flex: 1, fontSize: 11, fontFamily: 'JetBrains Mono, monospace', color: '#c4b5fd' }}>{t.name}</span>
-                {t.isUnion && <span style={{ fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>union</span>}
-                {t.line && <span style={{ fontSize: 8, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>L{t.line}</span>}
+                <span style={{ flex: 1, fontSize: 11, fontFamily: 'JetBrains Mono, monospace', color: ui.accentBright }}>{t.name}</span>
+                {t.isUnion && <span style={{ fontSize: 9, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace' }}>union</span>}
+                {t.line && <span style={{ fontSize: 8, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace' }}>L{t.line}</span>}
               </div>
             ))}
           </div>
@@ -2406,20 +2610,20 @@ function StructureView({ model, currentEvent, onNodeClick }) {
       {hasEnums && (
         <>
           <SectionLabel>ENUMS</SectionLabel>
-          {model.enums.map((e, i) => (
-            <div key={i} style={{ padding: '7px 9px', background: '#0d1526', borderRadius: 6, border: '1px solid #34d39933' }}>
+          {model.enums!.map((e, i) => (
+            <div key={i} style={{ padding: '7px 9px', background: ui.panelBg2, borderRadius: 6, border: `1px solid ${ui.greenBright}33` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: e.members.length ? 5 : 0 }}>
                 <span style={{ fontSize: 8, padding: '1px 5px', borderRadius: 3,
-                  background: '#34d39918', color: '#34d399', border: '1px solid #34d39933',
+                  background: ui.greenBright + '18', color: ui.greenBright, border: `1px solid ${ui.greenBright}33`,
                   fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>enum</span>
-                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#6ee7b7' }}>{e.name}</span>
-                {e.line && <span style={{ marginLeft: 'auto', fontSize: 8, color: '#334155', fontFamily: 'JetBrains Mono, monospace' }}>L{e.line}</span>}
+                <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: ui.greenBright }}>{e.name}</span>
+                {e.line && <span style={{ marginLeft: 'auto', fontSize: 8, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace' }}>L{e.line}</span>}
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                 {e.members.map((m, j) => (
                   <span key={j} style={{
                     fontSize: 10, padding: '1px 6px', borderRadius: 99,
-                    background: '#0f2920', color: '#34d399',
+                    background: ui.greenDeep, color: ui.greenBright,
                     fontFamily: 'JetBrains Mono, monospace',
                   }}>{m}</span>
                 ))}
@@ -2434,20 +2638,20 @@ function StructureView({ model, currentEvent, onNodeClick }) {
         <>
           <SectionLabel>IMPORTS</SectionLabel>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {model.imports.map((imp, i) => (
+            {model.imports!.map((imp, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '3px 8px', borderRadius: 5,
-                background: '#0d1526', border: '1px solid #1e293b',
+                background: ui.panelBg2, border: `1px solid ${ui.border}`,
               }}>
-                <span style={{ fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>
+                <span style={{ fontSize: 9, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>
                   from
                 </span>
-                <span style={{ flex: 1, fontSize: 10, color: '#fbbf24', fontFamily: 'JetBrains Mono, monospace',
+                <span style={{ flex: 1, fontSize: 10, color: ui.amber, fontFamily: 'JetBrains Mono, monospace',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {imp.source}
                 </span>
-                <span style={{ fontSize: 9, color: '#475569', fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>
+                <span style={{ fontSize: 9, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace', flexShrink: 0 }}>
                   {imp.specifiers.join(', ')}
                 </span>
               </div>
@@ -2460,89 +2664,94 @@ function StructureView({ model, currentEvent, onNodeClick }) {
   )
 }
 
-function SectionLabel({ children }) {
+function SectionLabel({ children }: { children: ReactNode }) {
+  const { theme: { ui } } = useCodeLensTheme()
   return (
     <div style={{
-      fontSize: 9, letterSpacing: '.08em', color: '#334155',
+      fontSize: 9, letterSpacing: '.08em', color: ui.borderStrong,
       fontFamily: 'JetBrains Mono, monospace',
-      paddingTop: 4, borderTop: '1px solid #1e293b',
+      paddingTop: 4, borderTop: `1px solid ${ui.border}`,
     }}>
       {children}
     </div>
   )
 }
 
-function TokensView({ model, source }) {
-  const [selected, setSelected] = useState(null)
+interface TokenGlossaryEntry { desc: string; bg: string }
+
+function TokensView({ model, source }: { model: ProgramModel | null; source: string }) {
+  const { theme: { ui } } = useCodeLensTheme()
+  const [selected, setSelected] = useState<TokenInfo | null>(null)
   const tokens = model?.files?.[0]?.tokens ?? []
-  
+
   // Lexer explanation mapping
-  const TOKEN_GLOSSARY = {
-    keyword: { desc: 'A reserved word built into the language (e.g., if, function, let).', bg: '#ec4899' },
-    name: { desc: 'An identifier chosen by the programmer for a variable, function, or property.', bg: '#60a5fa' },
-    number: { desc: 'A numeric literal value.', bg: '#f59e0b' },
-    string: { desc: 'A text literal value enclosed in quotes.', bg: '#22c55e' },
-    punctuation: { desc: 'Symbols that structure the code or represent operators (+, -, {, }, etc).', bg: '#94a3b8' },
+  const TOKEN_GLOSSARY: Record<string, TokenGlossaryEntry> = {
+    keyword: { desc: 'A reserved word built into the language (e.g., if, function, let).', bg: ui.pink },
+    name: { desc: 'An identifier chosen by the programmer for a variable, function, or property.', bg: ui.cyan },
+    number: { desc: 'A numeric literal value.', bg: ui.amber },
+    string: { desc: 'A text literal value enclosed in quotes.', bg: ui.green },
+    punctuation: { desc: 'Symbols that structure the code or represent operators (+, -, {, }, etc).', bg: ui.textDim },
   }
+  const selectedGlossary = selected ? TOKEN_GLOSSARY[selected.type] : undefined
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Educational intro */}
-      <div style={{ padding: '8px 10px', background: '#0a0f1e', borderBottom: '1px solid #1e293b' }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: '#818cf8', marginBottom: 4 }}>
+      <div style={{ padding: '8px 10px', background: ui.headerBg, borderBottom: `1px solid ${ui.border}` }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: ui.accent, marginBottom: 4 }}>
           Lexical Analysis (Tokenization)
         </div>
-        <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>
+        <div style={{ fontSize: 11, color: ui.textMuted, lineHeight: 1.5 }}>
           Before the computer can understand your code, the <strong>Lexer</strong> reads the raw text character-by-character and groups them into <strong>Tokens</strong> — the smallest meaningful words of a programming language.
         </div>
       </div>
 
       <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
         {/* Left: Annotated Source */}
-        <div style={{ flex: 1, overflow: 'auto', padding: 10, borderRight: '1px solid #1e293b' }}>
-          <div style={{ fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace', marginBottom: 8, letterSpacing: '.08em' }}>
+        <div style={{ flex: 1, overflow: 'auto', padding: 10, borderRight: `1px solid ${ui.border}` }}>
+          <div style={{ fontSize: 10, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace', marginBottom: 8, letterSpacing: '.08em' }}>
             ANNOTATED SOURCE
           </div>
           <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
             {source ? (
               <AnnotatedSource source={source} tokens={tokens} selected={selected} onSelect={setSelected} />
             ) : (
-              <span style={{ color: '#475569' }}>No source available.</span>
+              <span style={{ color: ui.textFaint }}>No source available.</span>
             )}
           </div>
         </div>
 
         {/* Right: Inspector */}
-        <div style={{ width: 180, background: '#0a0f1e', padding: 10, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ fontSize: 10, color: '#334155', fontFamily: 'JetBrains Mono, monospace', marginBottom: 12, letterSpacing: '.08em' }}>
+        <div style={{ width: 180, background: ui.headerBg, padding: 10, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ fontSize: 10, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace', marginBottom: 12, letterSpacing: '.08em' }}>
             INSPECTOR
           </div>
           {selected ? (
             <div>
               <div style={{
                 fontSize: 11, padding: '2px 6px', borderRadius: 4, display: 'inline-block',
-                background: `${TOKEN_GLOSSARY[selected.type]?.bg || '#94a3b8'}22`,
-                color: TOKEN_GLOSSARY[selected.type]?.bg || '#94a3b8',
-                border: `1px solid ${TOKEN_GLOSSARY[selected.type]?.bg || '#94a3b8'}44`,
+                background: `${selectedGlossary?.bg ?? ui.textDim}22`,
+                color: selectedGlossary?.bg ?? ui.textDim,
+                border: `1px solid ${selectedGlossary?.bg ?? ui.textDim}44`,
                 fontFamily: 'JetBrains Mono, monospace', marginBottom: 10,
               }}>
                 {selected.type}
               </div>
               <div style={{
-                fontSize: 14, color: '#e2e8f0', fontFamily: 'JetBrains Mono, monospace',
-                background: '#0f172a', padding: '6px 8px', borderRadius: 4, border: '1px solid #1e293b',
+                fontSize: 14, color: ui.text, fontFamily: 'JetBrains Mono, monospace',
+                background: ui.panelBg, padding: '6px 8px', borderRadius: 4, border: `1px solid ${ui.border}`,
                 marginBottom: 12, wordBreak: 'break-all'
               }}>
                 {selected.value ?? selected.type}
               </div>
-              <div style={{ fontSize: 11, color: '#64748b', lineHeight: 1.5 }}>
-                {TOKEN_GLOSSARY[selected.type]?.desc ?? 'A grammatical token.'}
+              <div style={{ fontSize: 11, color: ui.textMuted, lineHeight: 1.5 }}>
+                {selectedGlossary?.desc ?? 'A grammatical token.'}
                 <br /><br />
-                <span style={{ color: '#475569' }}>Offsets: {selected.start} – {selected.end}</span>
+                <span style={{ color: ui.textFaint }}>Offsets: {selected.start} – {selected.end}</span>
               </div>
             </div>
           ) : (
-            <div style={{ fontSize: 11, color: '#475569', fontStyle: 'italic', textAlign: 'center', marginTop: 20 }}>
+            <div style={{ fontSize: 11, color: ui.textFaint, fontStyle: 'italic', textAlign: 'center', marginTop: 20 }}>
               Click any highlighted token in the source code to inspect it.
             </div>
           )}
@@ -2552,10 +2761,16 @@ function TokensView({ model, source }) {
   )
 }
 
-function AnnotatedSource({ source, tokens, selected, onSelect }) {
+function AnnotatedSource({ source, tokens, selected, onSelect }: {
+  source: string
+  tokens: TokenInfo[]
+  selected: TokenInfo | null
+  onSelect: (tok: TokenInfo) => void
+}) {
+  const { theme: { ui } } = useCodeLensTheme()
   if (!tokens || tokens.length === 0) return source
 
-  const elements = []
+  const elements: ReactNode[] = []
   let lastPos = 0
 
   tokens.forEach((tok, i) => {
@@ -2565,7 +2780,7 @@ function AnnotatedSource({ source, tokens, selected, onSelect }) {
     }
     // Add token
     const isSel = selected === tok
-    const color = tokenColor(tok.type)
+    const color = tokenColor(tok.type, ui)
     elements.push(
       <span
         key={`tok-${i}`}
@@ -2594,87 +2809,47 @@ function AnnotatedSource({ source, tokens, selected, onSelect }) {
   return elements
 }
 
-function AstView({ model }) {
+function AstView({ model }: { model: ProgramModel | null }) {
+  // Rendered inside CodeDetailModal, which already provides a full-size
+  // overlay — no need for its own nested preview-then-modal escalation.
+  const { theme: { ui } } = useCodeLensTheme()
   const [openIntro, setOpenIntro] = useState(false)
-  const [modalOpen, setModalOpen] = useState(false)
   const ast = model?.files?.[0]?.ast
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, position: 'relative' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       {/* Collapsible intro */}
-      <div style={{ borderBottom: '1px solid #1e293b', paddingBottom: 6 }}>
+      <div style={{ borderBottom: `1px solid ${ui.border}`, paddingBottom: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '3px 0' }}>
-          <span style={{ fontSize: 9, color: '#334155', fontFamily: 'JetBrains Mono, monospace', letterSpacing: '.08em' }}>AST</span>
+          <span style={{ fontSize: 9, color: ui.borderStrong, fontFamily: 'JetBrains Mono, monospace', letterSpacing: '.08em' }}>AST</span>
           <button onClick={() => setOpenIntro(v => !v)} style={{
             marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer',
-            color: openIntro ? '#818cf8' : '#334155', fontSize: 10,
+            color: openIntro ? ui.accent : ui.borderStrong, fontSize: 10,
             fontFamily: 'JetBrains Mono, monospace', padding: 0,
           }}>
             {openIntro ? '▲ hide' : '? what is this'}
           </button>
         </div>
         {openIntro && (
-          <div style={{ padding: '10px 0', fontSize: 11, color: '#64748b', lineHeight: 1.7 }}>
-            <div style={{ fontWeight: 700, color: '#818cf8', marginBottom: 5 }}>
+          <div style={{ padding: '10px 0', fontSize: 11, color: ui.textMuted, lineHeight: 1.7 }}>
+            <div style={{ fontWeight: 700, color: ui.accent, marginBottom: 5 }}>
               Abstract Syntax Tree — how the computer reads your code
             </div>
-            The parser reads the token stream and converts it into a <strong style={{ color: '#f1f5f9' }}>tree of nodes</strong> — one node per grammatical unit (a function declaration, a variable, an expression).
+            The parser reads the token stream and converts it into a <strong style={{ color: ui.textBright }}>tree of nodes</strong> — one node per grammatical unit (a function declaration, a variable, an expression). Node color hints at its category:{' '}
+            <strong style={{ color: ui.accent }}>declarations</strong>,{' '}
+            <strong style={{ color: ui.pink }}>control flow</strong>,{' '}
+            <strong style={{ color: ui.cyan }}>expressions</strong>,{' '}
+            <strong style={{ color: ui.amber }}>literals</strong>, and{' '}
+            <strong style={{ color: ui.green }}>identifiers</strong>.
             <br /><br />
-            The interpreter then <strong style={{ color: '#f1f5f9' }}>walks this tree</strong>, executing what each node means. That walk produces the event stream you see in the Events tab.
+            The interpreter then <strong style={{ color: ui.textBright }}>walks this tree</strong>, executing what each node means. That walk produces the event stream you see in the Run tab.
           </div>
         )}
       </div>
 
-      <button
-        onClick={() => setModalOpen(true)}
-        style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          padding: '6px', background: '#1e293b', color: '#818cf8', borderRadius: 4,
-          border: '1px solid #334155', cursor: 'pointer', fontSize: 11, fontWeight: 600,
-        }}
-      >
-        <Maximize2 size={12} /> View Full AST
-      </button>
-
-      {/* Tree Preview */}
-      <div style={{ opacity: 0.6, pointerEvents: 'none', maxHeight: 300, overflow: 'hidden', maskImage: 'linear-gradient(to bottom, black 50%, transparent 100%)' }}>
-        {ast ? <ASTNode node={ast} depth={0} /> : <span style={{ color: '#475569', fontSize: 12 }}>No AST.</span>}
+      <div style={{ minWidth: 'max-content', paddingRight: 40 }}>
+        {ast ? <ASTNode node={ast} depth={0} startOpen interactive /> : <span style={{ color: ui.textFaint, fontSize: 12 }}>No AST.</span>}
       </div>
-
-      {/* Fullscreen Modal Overlay */}
-      {modalOpen && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 100,
-          background: 'rgba(2,6,23,0.85)', backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40,
-        }}>
-          <div style={{
-            background: '#0f172a', border: '1px solid #1e293b', borderRadius: 12,
-            width: '100%', maxWidth: 1000, height: '100%', display: 'flex', flexDirection: 'column',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', overflow: 'hidden'
-          }}>
-            <div style={{
-              padding: '12px 20px', borderBottom: '1px solid #1e293b', background: '#0a0f1e',
-              display: 'flex', alignItems: 'center', gap: 10
-            }}>
-              <Braces size={16} color="#818cf8" />
-              <span style={{ fontWeight: 600, color: '#e2e8f0' }}>Abstract Syntax Tree Explorer</span>
-              <button onClick={() => setModalOpen(false)} style={{
-                marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#64748b'
-              }}><X size={18} /></button>
-            </div>
-            
-            <div style={{ flex: 1, overflow: 'auto', padding: 20, background: '#080c14' }}>
-              <div style={{ 
-                minWidth: 'max-content', // Forces container to be wide enough for deep nesting
-                paddingRight: 40 
-              }}>
-                {ast && <ASTNode node={ast} depth={0} startOpen={true} interactive={true} />}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
@@ -2682,11 +2857,12 @@ function AstView({ model }) {
 
 // ── Scope chain view ──────────────────────────────────────────────────────────
 
-function ScopeChainView({ event }) {
+function ScopeChainView({ event }: { event: TraceEvent | null }) {
+  const { theme: { ui } } = useCodeLensTheme()
   if (!event) {
     return (
       <div style={{ padding: 12 }}>
-        <div style={{ fontSize: 12, color: '#475569' }}>Run code first.</div>
+        <div style={{ fontSize: 12, color: ui.textFaint }}>Run code first.</div>
       </div>
     )
   }
@@ -2702,37 +2878,37 @@ function ScopeChainView({ event }) {
       <div style={{
         display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10,
         padding: '6px 10px', borderRadius: 7,
-        background: '#0f172a', border: '1px solid #1e293b',
+        background: ui.panelBg, border: `1px solid ${ui.border}`,
       }}>
-        <Layers size={12} color="#818cf8" />
-        <span style={{ fontSize: 10, color: '#818cf8', fontWeight: 700, letterSpacing: '.04em' }}>
+        <Layers size={12} color={ui.accent} />
+        <span style={{ fontSize: 10, color: ui.accent, fontWeight: 700, letterSpacing: '.04em' }}>
           SCOPE CHAIN
         </span>
-        <span style={{ fontSize: 10, color: '#334155', marginLeft: 'auto' }}>
+        <span style={{ fontSize: 10, color: ui.borderStrong, marginLeft: 'auto' }}>
           {hasFrames ? `${ordered.length} frame${ordered.length > 1 ? 's' : ''}` : 'global only'}
         </span>
       </div>
 
       {/* Concept explanation */}
       <div style={{
-        fontSize: 11, color: '#475569', lineHeight: 1.6,
+        fontSize: 11, color: ui.textFaint, lineHeight: 1.6,
         padding: '0 2px', marginBottom: 12,
       }}>
-        Every time a function is called, JavaScript creates a new <span style={{ color: '#818cf8' }}>scope frame</span> to
+        Every time a function is called, JavaScript creates a new <span style={{ color: ui.accent }}>scope frame</span> to
         hold its variables. When the function returns, the frame is destroyed.
-        Inner frames can read variables from outer frames — that's how <span style={{ color: '#a78bfa' }}>closures</span> work.
+        Inner frames can read variables from outer frames — that's how <span style={{ color: ui.purple }}>closures</span> work.
       </div>
 
       {/* Stack frames as scope levels */}
       {ordered.map((frame, i) => (
-        <ScopeFrame key={i} frame={frame} isCurrent={i === 0} isGlobal={false} />
+        <ScopeFrame key={i} frame={frame} isCurrent={i === 0} />
       ))}
 
       {/* Global scope always at the bottom */}
       <div style={{ position: 'relative', marginTop: ordered.length > 0 ? 0 : 4 }}>
         {ordered.length > 0 && (
           <div style={{
-            width: 1, height: 12, background: '#1e293b',
+            width: 1, height: 12, background: ui.border,
             margin: '0 auto 0 19px',
           }} />
         )}
@@ -2742,7 +2918,8 @@ function ScopeChainView({ event }) {
   )
 }
 
-function ScopeFrame({ frame, isCurrent }) {
+function ScopeFrame({ frame, isCurrent }: { frame: StackFrame; isCurrent: boolean }) {
+  const { theme: { ui } } = useCodeLensTheme()
   const [open, setOpen] = useState(isCurrent)
   const locals = Object.entries(frame.locals ?? {})
 
@@ -2751,7 +2928,7 @@ function ScopeFrame({ frame, isCurrent }) {
       {/* Connector line */}
       <div style={{
         position: 'absolute', left: 19, top: 0, bottom: 0,
-        width: 1, background: isCurrent ? '#4338ca' : '#1e293b',
+        width: 1, background: isCurrent ? ui.accentDeep : ui.border,
         zIndex: 0,
       }} />
 
@@ -2762,37 +2939,37 @@ function ScopeFrame({ frame, isCurrent }) {
           style={{
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '6px 10px 6px 8px', borderRadius: 7,
-            background: isCurrent ? '#1e1b4b' : '#0f172a',
-            border: `1px solid ${isCurrent ? '#4338ca' : '#1e293b'}`,
+            background: isCurrent ? ui.accentBg : ui.panelBg,
+            border: `1px solid ${isCurrent ? ui.accentDeep : ui.border}`,
             cursor: locals.length > 0 ? 'pointer' : 'default',
             marginLeft: 0,
           }}
         >
           <div style={{
             width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-            background: isCurrent ? '#4338ca' : '#1e293b',
+            background: isCurrent ? ui.accentDeep : ui.border,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             {isCurrent
-              ? <span style={{ fontSize: 8, color: '#a5b4fc', fontWeight: 700 }}>NOW</span>
-              : <span style={{ fontSize: 9, color: '#475569' }}>fn</span>
+              ? <span style={{ fontSize: 8, color: ui.accentBright, fontWeight: 700 }}>NOW</span>
+              : <span style={{ fontSize: 9, color: ui.textFaint }}>fn</span>
             }
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
               fontSize: 12, fontWeight: 600, fontFamily: 'JetBrains Mono, monospace',
-              color: isCurrent ? '#a5b4fc' : '#7dd3fc',
+              color: isCurrent ? ui.accentBright : ui.cyan,
             }}>
               {frame.name ?? '(anonymous)'}
-              {isCurrent && <span style={{ fontSize: 10, color: '#6366f1', marginLeft: 6 }}>← running</span>}
+              {isCurrent && <span style={{ fontSize: 10, color: ui.accentSolid, marginLeft: 6 }}>← running</span>}
             </div>
-            <div style={{ fontSize: 10, color: '#334155' }}>
+            <div style={{ fontSize: 10, color: ui.borderStrong }}>
               {locals.length} variable{locals.length !== 1 ? 's' : ''}
               {frame.line ? ` · L${frame.line}` : ''}
             </div>
           </div>
           {locals.length > 0 && (
-            <span style={{ fontSize: 10, color: '#334155' }}>
+            <span style={{ fontSize: 10, color: ui.borderStrong }}>
               {open ? '▲' : '▼'}
             </span>
           )}
@@ -2803,7 +2980,7 @@ function ScopeFrame({ frame, isCurrent }) {
           <div style={{
             marginLeft: 30, marginTop: 2, marginBottom: 4,
             padding: '6px 8px', borderRadius: 6,
-            background: '#080c14', border: '1px solid #1e293b',
+            background: ui.bg, border: `1px solid ${ui.border}`,
           }}>
             {locals.map(([name, val]) => (
               <div key={name} style={{
@@ -2811,9 +2988,9 @@ function ScopeFrame({ frame, isCurrent }) {
                 fontFamily: 'JetBrains Mono, monospace',
                 padding: '2px 0', alignItems: 'baseline',
               }}>
-                <span style={{ color: '#7dd3fc', minWidth: 80, flexShrink: 0 }}>{name}</span>
-                <span style={{ color: '#334155', flexShrink: 0 }}>=</span>
-                <span style={{ color: valueColor(val), wordBreak: 'break-all' }}>
+                <span style={{ color: ui.cyan, minWidth: 80, flexShrink: 0 }}>{name}</span>
+                <span style={{ color: ui.borderStrong, flexShrink: 0 }}>=</span>
+                <span style={{ color: valueColor(val, ui), wordBreak: 'break-all' }}>
                   {formatValue(val)}
                 </span>
               </div>
@@ -2825,7 +3002,8 @@ function ScopeFrame({ frame, isCurrent }) {
   )
 }
 
-function GlobalScope({ event }) {
+function GlobalScope({ event }: { event: TraceEvent }) {
+  const { theme: { ui } } = useCodeLensTheme()
   const [open, setOpen] = useState(false)
   // Collect globals from the first (oldest) stack frame if available
   const frames  = event.stackSnapshot ?? []
@@ -2834,40 +3012,40 @@ function GlobalScope({ event }) {
   return (
     <div style={{
       padding: '6px 10px 6px 8px', borderRadius: 7,
-      background: '#080c14', border: '1px solid #1e293b',
+      background: ui.bg, border: `1px solid ${ui.border}`,
       cursor: globals.length > 0 ? 'pointer' : 'default',
     }} onClick={() => globals.length > 0 && setOpen(o => !o)}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{
           width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-          background: '#0f172a', border: '1px solid #334155',
+          background: ui.panelBg, border: `1px solid ${ui.borderStrong}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 8, color: '#475569', fontWeight: 700,
+          fontSize: 8, color: ui.textFaint, fontWeight: 700,
         }}>GBL</div>
         <div>
-          <div style={{ fontSize: 12, color: '#475569', fontFamily: 'JetBrains Mono, monospace' }}>
+          <div style={{ fontSize: 12, color: ui.textFaint, fontFamily: 'JetBrains Mono, monospace' }}>
             global scope
           </div>
-          <div style={{ fontSize: 10, color: '#334155' }}>
+          <div style={{ fontSize: 10, color: ui.borderStrong }}>
             top-level declarations · always visible
           </div>
         </div>
         {globals.length > 0 && (
-          <span style={{ fontSize: 10, color: '#334155', marginLeft: 'auto' }}>
+          <span style={{ fontSize: 10, color: ui.borderStrong, marginLeft: 'auto' }}>
             {open ? '▲' : '▼'}
           </span>
         )}
       </div>
       {open && globals.length > 0 && (
-        <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid #1e293b' }}>
+        <div style={{ marginTop: 6, paddingTop: 6, borderTop: `1px solid ${ui.border}` }}>
           {globals.map(([name, val]) => (
             <div key={name} style={{
               display: 'flex', gap: 8, fontSize: 11,
               fontFamily: 'JetBrains Mono, monospace', padding: '2px 0',
             }}>
-              <span style={{ color: '#64748b', minWidth: 80 }}>{name}</span>
-              <span style={{ color: '#334155' }}>=</span>
-              <span style={{ color: valueColor(val) }}>{formatValue(val)}</span>
+              <span style={{ color: ui.textMuted, minWidth: 80 }}>{name}</span>
+              <span style={{ color: ui.borderStrong }}>=</span>
+              <span style={{ color: valueColor(val, ui) }}>{formatValue(val)}</span>
             </div>
           ))}
         </div>
@@ -2876,22 +3054,22 @@ function GlobalScope({ event }) {
   )
 }
 
-function valueColor(v) {
-  if (v === null || v === undefined) return '#475569'
-  if (typeof v === 'number') return '#86efac'
-  if (typeof v === 'string') return '#fbbf24'
-  if (typeof v === 'boolean') return '#f472b6'
-  if (typeof v === 'object' && v?.__kind === 'reference') return '#818cf8'
-  if (typeof v === 'function' || (typeof v === 'object' && v?.type === 'function')) return '#a78bfa'
-  return '#94a3b8'
+function valueColor(v: unknown, ui: CodeLensUiPalette): string {
+  if (v === null || v === undefined) return ui.textFaint
+  if (typeof v === 'number') return ui.green
+  if (typeof v === 'string') return ui.amber
+  if (typeof v === 'boolean') return ui.pink
+  if (typeof v === 'object' && v !== null && (v as { __kind?: string }).__kind === 'reference') return ui.accent
+  if (typeof v === 'function' || (typeof v === 'object' && v !== null && (v as { type?: string }).type === 'function')) return ui.purple
+  return ui.textDim
 }
 
-function formatValue(v) {
+function formatValue(v: unknown): string {
   if (v === null)      return 'null'
   if (v === undefined) return 'undefined'
   if (typeof v === 'function') return '[Function]'
-  if (typeof v === 'object' && v?.__kind === 'reference') return `[Object #${v.objectId}]`
-  if (typeof v === 'object' && v?.type === 'function') return `[Function ${v.name ?? ''}]`
+  if (typeof v === 'object' && v !== null && (v as { __kind?: string }).__kind === 'reference') return `[Object #${(v as { objectId?: number }).objectId}]`
+  if (typeof v === 'object' && v !== null && (v as { type?: string }).type === 'function') return `[Function ${(v as { name?: string }).name ?? ''}]`
   if (typeof v === 'object') return JSON.stringify(v).slice(0, 30)
   if (typeof v === 'string') return `"${v.length > 20 ? v.slice(0, 20) + '…' : v}"`
   return String(v)

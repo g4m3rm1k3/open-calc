@@ -1,4 +1,6 @@
-export const SNIPPET_CATEGORIES = [
+import type { SnippetCategory } from './types'
+
+export const SNIPPET_CATEGORIES: SnippetCategory[] = [
   {
     group: 'Data Structures',
     items: [
@@ -93,6 +95,31 @@ function fib(n) {
 }
 
 fib(4)`
+      },
+      {
+        name: 'Fibonacci with Memoization',
+        code: `/*
+ * 1. THE CACHE STARTS EMPTY ON PURPOSE: recursion has to reach the base
+ *    case (n <= 1) before anything is computed, so the first several steps
+ *    legitimately show an empty cache in every frame — that's not a bug,
+ *    keep stepping forward.
+ * 2. WATCH THE HEAP: once the recursion starts returning, 'cache' fills in
+ *    as each result is memoized.
+ * 3. WATCH LINE 4: once a value is cached, later calls hit the
+ *    'if (n in cache)' shortcut instead of recursing again — that's the
+ *    whole point of memoizing.
+ * 4. WATCH THE CALL TREE: compare this to the plain recursion example —
+ *    repeated sub-problems get computed once and reused instead of
+ *    branching exponentially.
+ */
+function fib(n, cache = {}) {
+  if (n <= 1) return n
+  if (n in cache) return cache[n]
+  cache[n] = fib(n - 1, cache) + fib(n - 2, cache)
+  return cache[n]
+}
+
+fib(6)`
       }
     ]
   },
