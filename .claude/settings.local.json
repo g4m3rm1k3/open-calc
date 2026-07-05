@@ -27,7 +27,25 @@
       "Bash(grep -rn \"\\\\`\" src/content --include=\"*.js\")",
       "Bash(grep -l \"SVGDiagram\" \"c:/Users/g4m3r/Documents/testing tutorials/open-calc/src/content/physics-1/chapter-1/\"*.js)",
       "Skill(run)",
-      "Skill(run:*)"
+      "Skill(run:*)",
+      "Bash(cat)",
+      "Bash(node /private/tmp/test-interp.mjs)",
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/promise.js)",
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/proxy-reflect.js)",
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/generator.js)",
+      "Bash(node /private/tmp/claude-501/-Users-michaelmclean-Testing-open-calc/649642e7-b7c8-4362-a2c2-f90e64707988/scratchpad/test-interp.mjs)",
+      "Bash(node /private/tmp/claude-501/-Users-michaelmclean-Testing-open-calc/649642e7-b7c8-4362-a2c2-f90e64707988/scratchpad/debug.mjs)",
+      "Bash(node /private/tmp/claude-501/-Users-michaelmclean-Testing-open-calc/649642e7-b7c8-4362-a2c2-f90e64707988/scratchpad/debug2.mjs)",
+      "Bash(node /private/tmp/claude-501/-Users-michaelmclean-Testing-open-calc/649642e7-b7c8-4362-a2c2-f90e64707988/scratchpad/debug3.mjs)",
+      "Bash(node /private/tmp/claude-501/-Users-michaelmclean-Testing-open-calc/649642e7-b7c8-4362-a2c2-f90e64707988/scratchpad/debug4.mjs)",
+      "Bash(node /private/tmp/claude-501/-Users-michaelmclean-Testing-open-calc/649642e7-b7c8-4362-a2c2-f90e64707988/scratchpad/test8.mjs)",
+      "Bash(node /private/tmp/claude-501/-Users-michaelmclean-Testing-open-calc/649642e7-b7c8-4362-a2c2-f90e64707988/scratchpad/test10.mjs)",
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/builder.js 2)",
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/ts-utility-types.js 5)",
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/ts-utility-types.js 6)",
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/builder.js)",
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/iterator.js)",
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/prototype-chain.js)"
     ]
   }
 }

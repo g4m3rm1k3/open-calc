@@ -105,14 +105,10 @@ emitter.on('login', user => console.log(\`Welcome, \${user.name}!\`))`,
     if (!this.listeners[event]) { this.listeners[event] = [] }
     this.listeners[event].push(callback)
   }
-  emit(event, data) {
-    const fns = this.listeners[event] || []
-    fns.forEach(function(fn) { fn(data) })
-  }
 }
 const emitter = new EventEmitter()
 emitter.on('login', function(user) { console.log('Welcome, ' + user.name + '!') })
-emitter.emit('login', { name: 'Alice', id: 42 })`,
+console.log(Object.keys(emitter.listeners))`,
       },
       {
         title: 'Second subscriber — array grows',
@@ -152,15 +148,11 @@ emitter.on('login', user => console.log(\`Audit: \${user.id}\`))`,
     if (!this.listeners[event]) { this.listeners[event] = [] }
     this.listeners[event].push(callback)
   }
-  emit(event, data) {
-    const fns = this.listeners[event] || []
-    fns.forEach(function(fn) { fn(data) })
-  }
 }
 const emitter = new EventEmitter()
 emitter.on('login', function(user) { console.log('Welcome, ' + user.name + '!') })
 emitter.on('login', function(user) { console.log('Audit: ' + user.id) })
-emitter.emit('login', { name: 'Alice', id: 42 })`,
+console.log(emitter.listeners['login'].length)`,
       },
       {
         title: 'emit() — fire all subscribers',
