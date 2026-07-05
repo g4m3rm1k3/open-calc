@@ -45,7 +45,10 @@
       "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/ts-utility-types.js 6)",
       "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/builder.js)",
       "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/iterator.js)",
-      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/prototype-chain.js)"
+      "Bash(node scripts/run-lesson.mjs src/labs/abstraction-viz/lessons/prototype-chain.js)",
+      "Bash(git fetch *)",
+      "Bash(git rebase *)",
+      "Bash(git stash *)"
     ]
   }
 }
