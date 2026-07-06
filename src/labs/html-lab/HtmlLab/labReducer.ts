@@ -168,7 +168,7 @@ export function inferBodyTheme(bodyStyles: Record<string, string>): BodyThemeSta
 // every call site that historically read/wrote a single `javascript` string
 // (the lesson-patch engine, legacy example data), so old content keeps
 // working unchanged.
-function newJsFile(name = "script.js", code = ""): JsFile {
+export function newJsFile(name = "script.js", code = ""): JsFile {
   return { id: "js" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, code };
 }
 
@@ -193,14 +193,20 @@ export function buildJsBundle(jsFiles: JsFile[]): string {
 }
 
 // ─── Initial state ────────────────────────────────────────────────────────────
+// A fresh project starts with one real, empty file rather than none — typing
+// directly into the JavaScript tab with no file to hold it has nowhere to
+// persist to (the code just lives in Monaco's own buffer until the editor is
+// ever remounted, e.g. by switching tabs, and is silently lost).
+const INITIAL_JS_FILE = newJsFile();
+
 export const initialState: LabState = {
   elements: [],
   selectedId: null,
   showOverlay: false,
   showLabels: true,
   customCss: "",
-  jsFiles: [],
-  activeJsFileId: "",
+  jsFiles: [INITIAL_JS_FILE],
+  activeJsFileId: INITIAL_JS_FILE.id,
   history: [],
   bodyTheme: DEFAULT_BODY_THEME,
   bodyStyles: computeBodyStyles(DEFAULT_BODY_THEME),
@@ -235,7 +241,7 @@ function blankPage(name: string, index: number): LabPage {
     name,
     elements: [],
     bodyStyles: computeBodyStyles(DEFAULT_BODY_THEME),
-    jsFiles: [],
+    jsFiles: [newJsFile()],
     customCss: "",
   };
 }

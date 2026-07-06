@@ -37,6 +37,16 @@ type TabKey = typeof TABS[number]["key"];
 // Tabs that don't hold Monaco source code — the editor stays unmounted for these.
 const NON_EDITOR_TABS = new Set<TabKey>(["tree", "toolbox", "lessons"]);
 
+// The JavaScript tab holds several files that can each be a different real
+// language (.js, .jsx, .ts, .tsx) — Monaco's syntax highlighting/IntelliSense
+// should reflect the *active file's* actual extension, not a single language
+// hardcoded for the whole tab.
+function languageForJsFile(fileName: string): string {
+  const lower = fileName.toLowerCase();
+  if (lower.endsWith(".ts") || lower.endsWith(".tsx")) return "typescript";
+  return "javascript";
+}
+
 // ── Elements (raw tags, one-click add — grouped by category) ───────────────────
 
 interface ElementDef { tag: string; label: string; title: string; category: string; }
@@ -856,7 +866,9 @@ export default function CodePanel({
     javascript: (val) => { if (activeJsFile) onJsFileCodeChange(activeJsFile.id, val); },
   };
   const activeSource   = sources[activeTab]   ?? "";
-  const activeLanguage = TABS.find((t) => t.key === activeTab)?.language || "html";
+  const activeLanguage = activeTab === "javascript"
+    ? languageForJsFile(activeJsFile?.name ?? "script.js")
+    : TABS.find((t) => t.key === activeTab)?.language || "html";
 
   useEffect(() => {
     const editor = editorRef.current;
@@ -1064,11 +1076,13 @@ export default function CodePanel({
             cdnLinks={cdnLinks}
             onToggleCdn={onToggleCdn}
           />
-        ) : activeTab === "lessons" ? (
-          <LessonsPanel />
-        ) : (
+        ) : activeTab === "lessons" ? null : (
           <Editor
-            key={activeTab}
+            // Remount whenever the JavaScript tab's *effective language*
+            // changes (switching from a .js file to a .ts one, say) — Monaco's
+            // `defaultLanguage` is only applied once, at mount, so a language
+            // change needs a fresh instance to actually take effect.
+            key={activeTab === "javascript" ? `javascript-${activeLanguage}` : activeTab}
             defaultLanguage={activeLanguage ?? "html"}
             theme={monacoTheme}
             options={{
@@ -1104,6 +1118,13 @@ export default function CodePanel({
             onChange={forceSync ? undefined : handleChange}
           />
         )}
+        {/* Always mounted, just hidden — switching tabs away and back must not
+            reset which lesson the student was reading. Conditionally
+            rendering this like the other tabs would unmount it on every
+            switch and lose that position. */}
+        <div style={{ display: activeTab === "lessons" ? "block" : "none", height: "100%" }}>
+          <LessonsPanel />
+        </div>
       </div>
     </div>
   );

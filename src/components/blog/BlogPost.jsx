@@ -1,8 +1,9 @@
-import { useRef, useCallback, createContext, useContext } from 'react'
+import { useRef, useCallback, useMemo, createContext, useContext } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { PROSE_REMARK_PLUGINS, PROSE_REHYPE_PLUGINS, proseComponents, InlineCode } from '../markdown/proseComponents.jsx'
 import { preprocess } from '../math/latexPreprocess.js'
 import CodeBlock from './CodeBlock.jsx'
+import StaticCodeBlock from '../markdown/StaticCodeBlock.jsx'
 
 const JS_FAMILY = new Set(['js', 'javascript', 'ts', 'typescript'])
 
@@ -25,7 +26,7 @@ function getTopLevelDecls(code) {
   return names
 }
 
-export default function BlogPost({ content }) {
+export default function BlogPost({ content, interactive = true }) {
   // Per-post notebook state: tracks latest code for each code block by index
   const cellCodesRef = useRef(new Map())
   // Resets to 0 each render pass so cells always get the same index
@@ -57,44 +58,61 @@ export default function BlogPost({ content }) {
     return parts.join('\n\n').replace(/\b(const|let)\b(?=\s)/g, 'var')
   }, [])
 
+  // Both must keep a stable identity across renders. react-markdown uses
+  // `components.code`/`components.pre` as literal component types at each
+  // matching position in the tree — a *new* function reference every render
+  // (which is what a plain object literal in JSX produces) makes React treat
+  // it as a different component type and fully unmount + remount every code
+  // block, every time BlogPost re-renders for any reason, including ones
+  // that have nothing to do with this post's content. That is not just
+  // wasted work: it can tear a button's DOM node down between a click's
+  // mousedown and mouseup, so the click never registers as a click at all.
+  const renderCode = useCallback(function CodeRenderer({ className, children }) {
+    const isBlock = useContext(InPreContext)
+    const lang = (className || '').replace('language-', '')
+    const codeStr = String(children).replace(/\n$/, '')
+
+    if (!isBlock) {
+      return <InlineCode>{codeStr}</InlineCode>
+    }
+
+    if (!interactive) {
+      return <StaticCodeBlock language={lang} code={codeStr} />
+    }
+
+    const cellIndex = cellCounterRef.current++
+
+    if (!cellCodesRef.current.has(cellIndex)) {
+      cellCodesRef.current.set(cellIndex, { lang, code: codeStr })
+    }
+
+    return (
+      <CodeBlock
+        language={lang}
+        code={codeStr}
+        cellIndex={cellIndex}
+        getPriorContext={getPriorContext}
+        onCodeChange={handleCodeChange}
+      />
+    )
+  }, [interactive, getPriorContext, handleCodeChange])
+
+  const renderPre = useCallback(function PreRenderer({ children }) {
+    return <InPreContext.Provider value={true}>{children}</InPreContext.Provider>
+  }, [])
+
+  const components = useMemo(() => ({
+    ...proseComponents,
+    code: renderCode,
+    pre: renderPre,
+  }), [renderCode, renderPre])
+
   return (
     <article className="prose-blog max-w-none">
       <ReactMarkdown
         remarkPlugins={PROSE_REMARK_PLUGINS}
         rehypePlugins={PROSE_REHYPE_PLUGINS}
-        components={{
-          ...proseComponents,
-
-          code({ className, children }) {
-            const isBlock = useContext(InPreContext)
-            const lang = (className || '').replace('language-', '')
-            const codeStr = String(children).replace(/\n$/, '')
-
-            if (!isBlock) {
-              return <InlineCode>{codeStr}</InlineCode>
-            }
-
-            const cellIndex = cellCounterRef.current++
-
-            if (!cellCodesRef.current.has(cellIndex)) {
-              cellCodesRef.current.set(cellIndex, { lang, code: codeStr })
-            }
-
-            return (
-              <CodeBlock
-                language={lang}
-                code={codeStr}
-                cellIndex={cellIndex}
-                getPriorContext={getPriorContext}
-                onCodeChange={handleCodeChange}
-              />
-            )
-          },
-
-          pre({ children }) {
-            return <InPreContext.Provider value={true}>{children}</InPreContext.Provider>
-          },
-        }}
+        components={components}
       >
         {preprocess(content)}
       </ReactMarkdown>

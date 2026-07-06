@@ -8,7 +8,7 @@ import ExamplePickerModal from "./ExamplePickerModal";
 import TableBuilderModal from "./TableBuilderModal";
 import { EXAMPLES } from "./exampleGallery";
 import { STARTERS } from "./starterGallery";
-import { labReducer, initialState, inferBodyTheme, jsFilesFromLegacy, mainJsCode, buildJsBundle, withMainJsCode } from "./labReducer";
+import { labReducer, initialState, inferBodyTheme, jsFilesFromLegacy, mainJsCode, buildJsBundle, withMainJsCode, newJsFile } from "./labReducer";
 import { hasJsx, transpileBundle } from "./jsxTranspile";
 import { detectComponents, buildThemeUpdates } from "./componentLibrary";
 import { resolveCdnTags, reactCdnTags } from "./cdnLibraries";
@@ -223,7 +223,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
     e.target.value = "";
     if (!files.length) return;
 
-    const extOrder: Record<string, number> = { html: 0, css: 1, js: 2, jsx: 2 };
+    const extOrder: Record<string, number> = { html: 0, css: 1, js: 2, jsx: 2, ts: 2, tsx: 2 };
     files.sort((a, b) => {
       const ea = a.name.split(".").pop()?.toLowerCase() ?? "";
       const eb = b.name.split(".").pop()?.toLowerCase() ?? "";
@@ -271,10 +271,10 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
       if (applied.customCss) customCss = applied.customCss;
     }
 
-    // Every selected .js/.jsx file becomes its own entry — previously only
-    // the first of several selected JS files survived (`reads.find`), the
-    // rest were silently dropped.
-    const jsReads = reads.filter(r => r.ext === "js" || r.ext === "jsx");
+    // Every selected .js/.jsx/.ts/.tsx file becomes its own entry — previously
+    // only the first of several selected JS files survived (`reads.find`),
+    // the rest were silently dropped.
+    const jsReads = reads.filter(r => r.ext === "js" || r.ext === "jsx" || r.ext === "ts" || r.ext === "tsx");
     const newJsFiles: JsFile[] = jsReads.map(r => ({
       id: "js" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
       name: r.name,
@@ -293,7 +293,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
   const exportPage = useCallback((page: LabPage): void => {
     const cdnTags = [...resolveCdnTags(state.cdnLinks), ...(hasJsx(page.jsFiles) ? reactCdnTags() : [])];
     const bundle = transpileBundle(buildJsBundle(page.jsFiles), page.jsFiles);
-    if (bundle.error) { window.alert("Couldn't export — JSX error:\n\n" + bundle.error); return; }
+    if (bundle.error) { window.alert("Couldn't export — compile error:\n\n" + bundle.error); return; }
     const html = generateExportHtml(page.elements, page.bodyStyles, page.customCss || "", bundle.code, cdnTags);
     const slug = page.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || "page";
     const blob = new Blob([html], { type: "text/html" });
@@ -331,7 +331,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".html,.css,.js,.jsx"
+        accept=".html,.css,.js,.jsx,.ts,.tsx"
         multiple
         style={{ display: "none" }}
         onChange={handleFileImport}
@@ -396,7 +396,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
         onNew={async () => {
           const ok = await askConfirm("new_project", "Start a new blank project? This will clear everything.");
           if (ok) {
-            dispatch({ type: "LOAD_EXAMPLE", payload: { elements: [], bodyStyles: { ...initialState.bodyStyles }, jsFiles: [] } });
+            dispatch({ type: "LOAD_EXAMPLE", payload: { elements: [], bodyStyles: { ...initialState.bodyStyles }, jsFiles: [newJsFile()] } });
             setPreviewMode(false);
             setMultiSelectedIds([]);
           }
@@ -497,7 +497,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
         {previewMode ? (
           transpiledJs.error ? (
             <div className={styles.previewFrame} style={{ padding: 16, color: "#ef4444", fontFamily: "monospace", whiteSpace: "pre-wrap", overflow: "auto" }}>
-              JSX error — fix it in the JavaScript tab to see the preview:{"\n\n"}{transpiledJs.error}
+              Compile error — fix it in the JavaScript tab to see the preview:{"\n\n"}{transpiledJs.error}
             </div>
           ) : (
             <iframe

@@ -1,21 +1,80 @@
 import { useState, useEffect, useRef } from 'react'
 import BlogPost from '../../../components/blog/BlogPost.jsx'
-import { MARKDOWN_LESSONS } from './lessons/markdownLessonLoader.js'
+import { MARKDOWN_LESSONS, MARKDOWN_LESSON_SERIES } from './lessons/markdownLessonLoader.js'
 
 // Simple read-through reference panel — a learner reads the lesson here, then
 // does the actual typing in the real HTML/CSS/JS tabs (which already have the
 // live canvas preview). No separate live-preview/run behavior needed here,
-// just the same plain markdown rendering the blog uses.
+// just the same plain markdown rendering the blog uses, organized the same
+// way the blog organizes posts: standalone files, or a folder per series.
 
-function LessonList({ onSelect }) {
+function RootList({ series, standalone, onSelectSeries, onSelectStandalone }) {
   return (
     <div className="px-6 py-4">
       <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-3">Lessons</h2>
+
+      {series.length > 0 && (
+        <div className="space-y-2 mb-4">
+          {series.map((s) => (
+            <button
+              key={s.folder}
+              onClick={() => onSelectSeries(s.folder)}
+              className="w-full text-left flex items-center gap-3 px-3 py-3 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition-colors border border-slate-800/60"
+            >
+              <span className="flex-1">
+                <span className="block font-semibold text-slate-200">{s.title}</span>
+                <span className="block text-xs text-slate-500 mt-0.5">{s.lessons.length} lessons</span>
+              </span>
+              <span className="text-slate-600">→</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {standalone.length > 0 && (
+        <div className="space-y-1">
+          {standalone.map((lesson, i) => (
+            <button
+              key={lesson.slug}
+              onClick={() => onSelectStandalone(lesson.slug)}
+              className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition-colors"
+            >
+              <span className="text-xs text-slate-500 w-5 shrink-0 text-right">{i + 1}.</span>
+              <span className="flex-1 truncate">{lesson.title}</span>
+              <span className="text-slate-600">→</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SeriesList({ series, onSelectLesson, onSelectOverview, onBack }) {
+  return (
+    <div className="px-6 py-4">
+      <button
+        onClick={onBack}
+        className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-indigo-400 transition-colors mb-4"
+      >
+        ← All lessons
+      </button>
+      <h2 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-3">{series.title}</h2>
       <div className="space-y-1">
-        {MARKDOWN_LESSONS.map((lesson, i) => (
+        {series.overview && (
+          <button
+            onClick={onSelectOverview}
+            className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition-colors"
+          >
+            <span className="text-xs text-slate-500 w-5 shrink-0 text-right">·</span>
+            <span className="flex-1 truncate">Overview</span>
+            <span className="text-slate-600">→</span>
+          </button>
+        )}
+        {series.lessons.map((lesson, i) => (
           <button
             key={lesson.slug}
-            onClick={() => onSelect(lesson.slug)}
+            onClick={() => onSelectLesson(lesson.slug)}
             className="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-slate-300 hover:bg-slate-800/60 hover:text-white transition-colors"
           >
             <span className="text-xs text-slate-500 w-5 shrink-0 text-right">{i + 1}.</span>
@@ -35,17 +94,17 @@ function LessonView({ lesson, onBack, onNext }) {
         onClick={onBack}
         className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-indigo-400 transition-colors mb-4"
       >
-        ← All lessons
+        ← Back
       </button>
 
-      <BlogPost content={lesson.content} />
+      <BlogPost content={lesson.content} interactive={false} />
 
       <div className="mt-10 pt-6 border-t border-slate-700/50 flex items-center justify-between">
         <button
           onClick={onBack}
           className="text-sm text-slate-400 hover:text-indigo-400 transition-colors"
         >
-          ← All lessons
+          ← Back
         </button>
         {onNext && (
           <button
@@ -61,41 +120,78 @@ function LessonView({ lesson, onBack, onNext }) {
 }
 
 export default function LessonsPanel() {
-  const [activeSlug, setActiveSlug] = useState(null)
-  const activeIndex = MARKDOWN_LESSONS.findIndex((l) => l.slug === activeSlug)
-  const active = activeIndex >= 0 ? MARKDOWN_LESSONS[activeIndex] : null
-  const nextLesson = activeIndex >= 0 && activeIndex < MARKDOWN_LESSONS.length - 1
-    ? MARKDOWN_LESSONS[activeIndex + 1]
-    : null
+  // route: { view: 'root' } | { view: 'series', folder } | { view: 'lesson', slug, seriesFolder | null }
+  const [route, setRoute] = useState({ view: 'root' })
 
   const scrollRef = useRef(null)
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0
-  }, [activeSlug])
+  }, [route])
 
-  if (MARKDOWN_LESSONS.length === 0) {
+  if (MARKDOWN_LESSONS.length === 0 && MARKDOWN_LESSON_SERIES.length === 0) {
     return (
       <div className="p-6 text-sm text-slate-400">
         No lessons yet — drop a .md file into
         <code className="mx-1 px-1.5 py-0.5 rounded bg-slate-800 text-rose-400 font-mono text-xs">
           src/labs/html-lab/HtmlLab/lessons/markdown/
         </code>
-        and it'll show up here.
+        (or a subfolder, for a series) and it'll show up here.
+      </div>
+    )
+  }
+
+  if (route.view === 'series') {
+    const series = MARKDOWN_LESSON_SERIES.find((s) => s.folder === route.folder)
+    if (!series) {
+      setRoute({ view: 'root' })
+      return null
+    }
+    return (
+      <div ref={scrollRef} className="h-full overflow-y-auto">
+        <SeriesList
+          series={series}
+          onBack={() => setRoute({ view: 'root' })}
+          onSelectOverview={() => setRoute({ view: 'lesson', slug: series.overview.slug, seriesFolder: series.folder, isOverview: true })}
+          onSelectLesson={(slug) => setRoute({ view: 'lesson', slug, seriesFolder: series.folder })}
+        />
+      </div>
+    )
+  }
+
+  if (route.view === 'lesson') {
+    const series = route.seriesFolder ? MARKDOWN_LESSON_SERIES.find((s) => s.folder === route.seriesFolder) : null
+    const pool = series ? series.lessons : MARKDOWN_LESSONS
+    const lesson = route.isOverview ? series?.overview : pool.find((l) => l.slug === route.slug)
+
+    if (!lesson) {
+      setRoute({ view: 'root' })
+      return null
+    }
+
+    const index = route.isOverview ? -1 : pool.findIndex((l) => l.slug === route.slug)
+    const nextLesson = index >= 0 && index < pool.length - 1 ? pool[index + 1] : null
+
+    const backTarget = series ? { view: 'series', folder: series.folder } : { view: 'root' }
+
+    return (
+      <div ref={scrollRef} className="h-full overflow-y-auto">
+        <LessonView
+          lesson={lesson}
+          onBack={() => setRoute(backTarget)}
+          onNext={nextLesson ? () => setRoute({ view: 'lesson', slug: nextLesson.slug, seriesFolder: series?.folder ?? null }) : null}
+        />
       </div>
     )
   }
 
   return (
     <div ref={scrollRef} className="h-full overflow-y-auto">
-      {active ? (
-        <LessonView
-          lesson={active}
-          onBack={() => setActiveSlug(null)}
-          onNext={nextLesson ? () => setActiveSlug(nextLesson.slug) : null}
-        />
-      ) : (
-        <LessonList onSelect={setActiveSlug} />
-      )}
+      <RootList
+        series={MARKDOWN_LESSON_SERIES}
+        standalone={MARKDOWN_LESSONS}
+        onSelectSeries={(folder) => setRoute({ view: 'series', folder })}
+        onSelectStandalone={(slug) => setRoute({ view: 'lesson', slug, seriesFolder: null })}
+      />
     </div>
   )
 }

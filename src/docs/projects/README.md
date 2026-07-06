@@ -88,3 +88,59 @@ React for the UI, Python backend for geometry computation.
 
 Three.js for 3D rendering, React for the UI, Python backend for geometry computation.
 Every concept needed is taught in the lesson that needs it.
+
+---
+
+### 4. The Frontend Client — A Real UI for a Real API
+**Folder:** `frontend-client/` — [Full lesson plan](frontend-client/README.md)
+
+Build a complete frontend, in plain TypeScript/HTML/CSS with no framework, for
+Conduit — a live, publicly-hosted implementation of the RealWorld API spec (a real
+social blogging platform: articles, comments, favorites, JWT auth). No invented data:
+every lesson calls a real production-style backend the student does not control.
+
+Every capability — fetching, rendering, components, routing, forms, auth, search,
+pagination, a notification service, caching, and a production deployment — is added
+as its own vertical slice, motivated by a real, felt problem in the code that already
+exists, never introduced because "you'll need this eventually."
+
+**Software engineering taught:**
+Separation of concerns (data/presentation/orchestration), the component pattern
+discovered from first principles, service vs. component, the observer pattern,
+client-side vs. server-side validation, environment-based configuration.
+
+**Computer science taught:**
+The event loop and `Promise`/`async`/`await`, type narrowing and discriminated
+unions, debouncing, race conditions, memoization/caching with TTL-based invalidation,
+bundling and code splitting.
+
+**Web and networking taught:**
+REST, JSON, CORS, HTTP methods and status codes, JWTs, XSS, offset-based pagination,
+client-side routing and why it deploys cleanly to any static host.
+
+---
+
+### 5. React Studio — A Low-Code Application Builder
+**Folder:** `react-studio/` — [Full lesson plan](react-studio/README.md)
+
+Build a small, working version of Figma or Retool — drag widgets onto a canvas,
+select and resize them, edit properties in a panel, group them, undo mistakes, wire
+up click actions, save your work, and preview the result. The deliberate sibling to
+[The Frontend Client](frontend-client/README.md): that project teaches architecture
+in plain TypeScript so the reasons frameworks exist are felt first; this one teaches
+**React** itself, using a project where the UI is the entire product, not an
+interface bolted onto someone else's data.
+
+Every major React concept is introduced at the exact moment the feature already
+being built cannot proceed without it — state lifting appears because two sibling
+components must agree on the truth; `useReducer` appears because undo needs a
+structured history; Context appears because a button nested inside groups cannot
+reach app state any other way; a registry replaces scattered switch statements
+because adding a sixth widget type made the cost of not having one impossible to
+ignore.
+
+**React concepts taught:**
+JSX and the virtual DOM, components and props, `useState`, list rendering and keys,
+lifting state up, controlled components, discriminated unions in props, recursive
+components, `useReducer`, `useContext` and custom Context hooks, custom hooks,
+`React.memo` and `useCallback`, Portals, and a plugin-style registry architecture.
