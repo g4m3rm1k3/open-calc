@@ -1,4 +1,5 @@
 import { applyPatch, type Fold } from "./lessonEngine";
+import { withMainJsCode } from "../labReducer";
 import type { LessonPatch, LabState } from "./lessonTypes";
 
 /** One step of "watch it get built" playback. `caption` and `revealedIds`
@@ -48,7 +49,7 @@ export function buildPlaybackFrames(prevFold: Fold, patch: LessonPatch): Playbac
   for (const block of patch.jsBlocks ?? []) {
     jsBlocks = new Map(jsBlocks);
     jsBlocks.set(block.id, block.code);
-    state = { ...state, javascript: joinBlocks(jsBlocks) };
+    state = { ...state, jsFiles: withMainJsCode(state.jsFiles, joinBlocks(jsBlocks)) };
     frames.push({ state, revealedIds: [], caption: describeCode(block.code, "Typing") });
   }
 
@@ -62,7 +63,7 @@ export function buildPlaybackFrames(prevFold: Fold, patch: LessonPatch): Playbac
   // Legacy escape hatch for a single, self-contained snippet not worth
   // splitting into blocks — lands in one frame, no per-line animation.
   if (patch.javascript !== undefined && !patch.jsBlocks?.length) {
-    state = { ...state, javascript: patch.javascript };
+    state = { ...state, jsFiles: withMainJsCode(state.jsFiles, patch.javascript) };
     frames.push({ state, revealedIds: [], caption: "Typing the JavaScript" });
   }
   if (patch.customCss !== undefined && !patch.cssBlocks?.length) {

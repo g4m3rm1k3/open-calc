@@ -124,6 +124,27 @@ export const CDN_LIBRARIES: CdnLibrary[] = [
     type: "script",
     url: "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js",
   },
+  // Not shown in the manual CDN picker (auto-applied instead — see
+  // reactCdnTags()) whenever a project has a .jsx file, matching the
+  // installed react/react-dom major version this app itself uses.
+  {
+    id: "react",
+    label: "React",
+    icon: "⚛️",
+    description: "React UMD runtime (auto-added for .jsx files)",
+    category: "Framework",
+    type: "script",
+    url: "https://unpkg.com/react@18/umd/react.production.min.js",
+  },
+  {
+    id: "react-dom",
+    label: "ReactDOM",
+    icon: "⚛️",
+    description: "ReactDOM UMD runtime (auto-added for .jsx files)",
+    category: "Framework",
+    type: "script",
+    url: "https://unpkg.com/react-dom@18/umd/react-dom.production.min.js",
+  },
 ];
 
 export function resolveCdnTags(ids: string[]): CdnTag[] {
@@ -134,4 +155,9 @@ export function resolveCdnTags(ids: string[]): CdnTag[] {
       url: lib.url,
       type: (lib.scriptOverride ? "script" : lib.type) as "script" | "stylesheet",
     }));
+}
+
+// Auto-included (not user-toggled) whenever the project has any .jsx file.
+export function reactCdnTags(): CdnTag[] {
+  return resolveCdnTags(["react", "react-dom"]);
 }

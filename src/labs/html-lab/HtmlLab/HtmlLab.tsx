@@ -7,9 +7,10 @@ import ConfirmDialog, { shouldSkip } from "./ConfirmDialog";
 import ExamplePickerModal from "./ExamplePickerModal";
 import TableBuilderModal from "./TableBuilderModal";
 import { EXAMPLES } from "./exampleGallery";
-import { labReducer, initialState, inferBodyTheme } from "./labReducer";
+import { labReducer, initialState, inferBodyTheme, jsFilesFromLegacy, mainJsCode, buildJsBundle, withMainJsCode } from "./labReducer";
+import { hasJsx, transpileBundle } from "./jsxTranspile";
 import { detectComponents, buildThemeUpdates } from "./componentLibrary";
-import { resolveCdnTags } from "./cdnLibraries";
+import { resolveCdnTags, reactCdnTags } from "./cdnLibraries";
 import {
   applyCssToElements,
   elementsToCss,
@@ -23,7 +24,7 @@ import styles from "./HtmlLab.module.css";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — JS hooks file, no type declarations
 import { useThemeColors } from "../../../hooks/useThemeColors.js";
-import type { LabElement, LabPage } from "./types";
+import type { LabElement, LabPage, JsFile } from "./types";
 
 interface HtmlLabProps {
   onBack?: () => void;
@@ -70,14 +71,15 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
   const [state, dispatch] = useReducer(labReducer, undefined, () => {
     const exData = (EXAMPLES.find(e => e.id === "showcase") ?? EXAMPLES[0]).generate();
     const ex = 'pages' in exData
-      ? { elements: exData.pages[0]?.elements ?? [], bodyStyles: exData.pages[0]?.bodyStyles ?? {}, javascript: exData.pages[0]?.javascript ?? "" }
-      : exData;
+      ? { elements: exData.pages[0]?.elements ?? [], bodyStyles: exData.pages[0]?.bodyStyles ?? {}, jsFiles: exData.pages[0]?.jsFiles ?? [] }
+      : { elements: exData.elements, bodyStyles: exData.bodyStyles, jsFiles: jsFilesFromLegacy(exData.javascript, exData.jsFiles) };
     return {
       ...initialState,
       elements: ex.elements,
       bodyStyles: ex.bodyStyles,
       bodyTheme: inferBodyTheme(ex.bodyStyles),
-      javascript: ex.javascript ?? "",
+      jsFiles: ex.jsFiles,
+      activeJsFileId: ex.jsFiles[0]?.id ?? "",
     };
   });
   const [codePanelWidth, setCodePanelWidth]   = useState<number>(360);
@@ -92,6 +94,18 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
     if (!state.selectedId) return [];
     return detectComponents(state.selectedId, state.elements);
   }, [state.selectedId, state.elements]);
+
+  // Transpiled once per jsFiles change (not per render) — Babel only runs
+  // when any file is .jsx (see hasJsx inside transpileBundle), so plain-JS
+  // projects pay nothing here.
+  const transpiledJs = useMemo(
+    () => transpileBundle(buildJsBundle(state.jsFiles), state.jsFiles),
+    [state.jsFiles],
+  );
+  const previewCdnTags = useMemo(
+    () => [...resolveCdnTags(state.cdnLinks), ...(hasJsx(state.jsFiles) ? reactCdnTags() : [])],
+    [state.cdnLinks, state.jsFiles],
+  );
 
   const bodyIsDark = useMemo(() => {
     const bg = state.bodyStyles.backgroundColor || "";
@@ -149,10 +163,10 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
 
   const handleCodeChange = useCallback(
     (newCode: string): void => {
-      const parsed = htmlToElements(newCode, state.elements, state.javascript);
+      const parsed = htmlToElements(newCode, state.elements, mainJsCode(state.jsFiles));
       if (parsed) dispatch({ type: "SET_FROM_CODE", payload: parsed });
     },
-    [state.elements, state.javascript],
+    [state.elements, state.jsFiles],
   );
 
   const handleCssChange = useCallback(
@@ -206,7 +220,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
     e.target.value = "";
     if (!files.length) return;
 
-    const extOrder: Record<string, number> = { html: 0, css: 1, js: 2 };
+    const extOrder: Record<string, number> = { html: 0, css: 1, js: 2, jsx: 2 };
     files.sort((a, b) => {
       const ea = a.name.split(".").pop()?.toLowerCase() ?? "";
       const eb = b.name.split(".").pop()?.toLowerCase() ?? "";
@@ -234,7 +248,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
 
     let elements = state.elements;
     let bodyStyles = { ...initialState.bodyStyles, ...state.bodyStyles };
-    let javascript = state.javascript;
+    let jsFiles = state.jsFiles;
     let customCss  = state.customCss ?? "";
 
     const htmlRead = reads.find(r => r.ext === "html");
@@ -242,7 +256,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
       const parsed = parseHtmlDocument(htmlRead.content);
       elements   = parsed.elements || [];
       bodyStyles = { ...initialState.bodyStyles, ...(parsed.bodyStyles || {}) };
-      javascript = parsed.javascript || "";
+      jsFiles    = jsFilesFromLegacy(parsed.javascript || "");
       customCss  = parsed.css || "";
     }
 
@@ -254,22 +268,30 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
       if (applied.customCss) customCss = applied.customCss;
     }
 
-    const jsRead = reads.find(r => r.ext === "js");
-    if (jsRead) {
-      javascript = appendJavascriptSnippet(javascript, jsRead.content);
-    }
+    // Every selected .js/.jsx file becomes its own entry — previously only
+    // the first of several selected JS files survived (`reads.find`), the
+    // rest were silently dropped.
+    const jsReads = reads.filter(r => r.ext === "js" || r.ext === "jsx");
+    const newJsFiles: JsFile[] = jsReads.map(r => ({
+      id: "js" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: r.name,
+      code: r.content,
+    }));
+    if (newJsFiles.length > 0) jsFiles = [...jsFiles, ...newJsFiles];
 
     if (htmlRead) {
-      dispatch({ type: "LOAD_EXAMPLE", payload: { elements, bodyStyles, javascript, customCss } });
+      dispatch({ type: "LOAD_EXAMPLE", payload: { elements, bodyStyles, jsFiles, customCss } });
     } else {
       if (cssRead) dispatch({ type: "SET_FROM_CSS", payload: { elements, customCss, bodyStyles } });
-      if (jsRead && !cssRead) dispatch({ type: "SET_JAVASCRIPT", payload: javascript });
+      if (newJsFiles.length > 0 && !cssRead) dispatch({ type: "ADD_JS_FILES", payload: newJsFiles });
     }
-  }, [askConfirm, state.elements, state.bodyStyles, state.javascript, state.customCss]);
+  }, [askConfirm, state.elements, state.bodyStyles, state.jsFiles, state.customCss]);
 
   const exportPage = useCallback((page: LabPage): void => {
-    const cdnTags = resolveCdnTags(state.cdnLinks);
-    const html = generateExportHtml(page.elements, page.bodyStyles, page.customCss || "", page.javascript || "", cdnTags);
+    const cdnTags = [...resolveCdnTags(state.cdnLinks), ...(hasJsx(page.jsFiles) ? reactCdnTags() : [])];
+    const bundle = transpileBundle(buildJsBundle(page.jsFiles), page.jsFiles);
+    if (bundle.error) { window.alert("Couldn't export — JSX error:\n\n" + bundle.error); return; }
+    const html = generateExportHtml(page.elements, page.bodyStyles, page.customCss || "", bundle.code, cdnTags);
     const slug = page.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || "page";
     const blob = new Blob([html], { type: "text/html" });
     const url  = URL.createObjectURL(blob);
@@ -279,10 +301,10 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
   }, [state.cdnLinks]);
 
   const exportSplit = useCallback((): void => {
-    const cdnTags = resolveCdnTags(state.cdnLinks);
-    const html = generateLinkedHtml(state.elements, cdnTags);
+    const cdnTags = [...resolveCdnTags(state.cdnLinks), ...(hasJsx(state.jsFiles) ? reactCdnTags() : [])];
+    const jsNames = state.jsFiles.length > 0 ? state.jsFiles.map(f => f.name) : ["script.js"];
+    const html = generateLinkedHtml(state.elements, cdnTags, jsNames);
     const css  = elementsToCss(state.elements, state.customCss, state.bodyStyles);
-    const js   = state.javascript?.trim() || "";
     function dl(content: string, filename: string, mime: string): void {
       const blob = new Blob([content], { type: mime });
       const url  = URL.createObjectURL(blob);
@@ -292,15 +314,21 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
     }
     dl(html, "index.html", "text/html");
     setTimeout(() => dl(css, "styles.css", "text/css"), 150);
-    setTimeout(() => dl(js || "// script.js", "script.js", "text/javascript"), 300);
-  }, [state.elements, state.bodyStyles, state.customCss, state.javascript, state.cdnLinks]);
+    // Each file downloads as its own real source — not transpiled or merged,
+    // so a downloaded multi-file project stays editable exactly as authored.
+    if (state.jsFiles.length > 0) {
+      state.jsFiles.forEach((f, i) => setTimeout(() => dl(f.code, f.name, "text/javascript"), 300 + i * 150));
+    } else {
+      setTimeout(() => dl("// script.js", "script.js", "text/javascript"), 300);
+    }
+  }, [state.elements, state.bodyStyles, state.customCss, state.jsFiles, state.cdnLinks]);
 
   return (
     <div className={styles.app} style={hlVars as React.CSSProperties}>
       <input
         ref={fileInputRef}
         type="file"
-        accept=".html,.css,.js"
+        accept=".html,.css,.js,.jsx"
         multiple
         style={{ display: "none" }}
         onChange={handleFileImport}
@@ -348,7 +376,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
         onNew={async () => {
           const ok = await askConfirm("new_project", "Start a new blank project? This will clear everything.");
           if (ok) {
-            dispatch({ type: "LOAD_EXAMPLE", payload: { elements: [], bodyStyles: { ...initialState.bodyStyles }, javascript: "" } });
+            dispatch({ type: "LOAD_EXAMPLE", payload: { elements: [], bodyStyles: { ...initialState.bodyStyles }, jsFiles: [] } });
             setPreviewMode(false);
             setMultiSelectedIds([]);
           }
@@ -362,12 +390,12 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
           if (state.mode === "multi") {
             const pages = state.pages.map((p) =>
               p.id === state.activePageId
-                ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, javascript: state.javascript, customCss: state.customCss }
+                ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, jsFiles: state.jsFiles, customCss: state.customCss }
                 : p,
             );
             pages.forEach((page, i) => setTimeout(() => exportPage(page), i * 200));
           } else {
-            exportPage({ id: "", name: "index", elements: state.elements, bodyStyles: state.bodyStyles, customCss: state.customCss, javascript: state.javascript });
+            exportPage({ id: "", name: "index", elements: state.elements, bodyStyles: state.bodyStyles, customCss: state.customCss, jsFiles: state.jsFiles });
           }
         }}
         onExportSplit={exportSplit}
@@ -391,14 +419,19 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
         <CodePanel
           html={generatedCode}
           css={generatedCss}
-          javascript={state.javascript}
+          jsFiles={state.jsFiles}
+          activeJsFileId={state.activeJsFileId}
           width={codePanelWidth}
           selectedId={state.selectedId}
           elements={state.elements}
           multiSelectedIds={multiSelectedIds}
           onHtmlChange={handleCodeChange}
           onCssChange={handleCssChange}
-          onJavascriptChange={(value) => dispatch({ type: "SET_JAVASCRIPT", payload: value })}
+          onSetActiveJsFile={(id) => dispatch({ type: "SET_ACTIVE_JS_FILE", payload: id })}
+          onJsFileCodeChange={(id, code) => dispatch({ type: "UPDATE_JS_FILE_CODE", payload: { id, code } })}
+          onAddJsFile={(file) => dispatch({ type: "ADD_JS_FILES", payload: [file] })}
+          onRenameJsFile={(id, name) => dispatch({ type: "RENAME_JS_FILE", payload: { id, name } })}
+          onDeleteJsFile={(id) => dispatch({ type: "DELETE_JS_FILE", payload: id })}
           onSelectElement={(id) => {
             dispatch({ type: "SELECT", payload: id });
             setMultiSelectedIds([]);
@@ -419,7 +452,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
           }
           onInsertJsPreset={(template, code) => {
             dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
-            dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, code) });
+            dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), code) });
           }}
           onOpenTableBuilder={() => setShowTableBuilder(true)}
           cdnLinks={state.cdnLinks}
@@ -441,13 +474,19 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
         <div className={styles.divider} onMouseDown={handleDividerMouseDown} />
 
         {previewMode ? (
-          <iframe
-            key="preview-frame"
-            className={styles.previewFrame}
-            srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, state.javascript, resolveCdnTags(state.cdnLinks))}
-            title="Preview"
-            sandbox="allow-scripts"
-          />
+          transpiledJs.error ? (
+            <div className={styles.previewFrame} style={{ padding: 16, color: "#ef4444", fontFamily: "monospace", whiteSpace: "pre-wrap", overflow: "auto" }}>
+              JSX error — fix it in the JavaScript tab to see the preview:{"\n\n"}{transpiledJs.error}
+            </div>
+          ) : (
+            <iframe
+              key="preview-frame"
+              className={styles.previewFrame}
+              srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, transpiledJs.code, previewCdnTags)}
+              title="Preview"
+              sandbox="allow-scripts"
+            />
+          )
         ) : (
           <>
             <CanvasPanel
@@ -506,13 +545,13 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
               onAttrChange={(prop, value) =>
                 dispatch({ type: "UPDATE_ATTR", payload: { prop, value } })
               }
-              javascript={state.javascript}
+              javascript={mainJsCode(state.jsFiles)}
               onInsertJavascript={(snippet) =>
-                dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, snippet) })
+                dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), snippet) })
               }
               onInsertJsPreset={(template, code) => {
                 dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
-                dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, code) });
+                dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), code) });
               }}
               onApplyPreset={(presetStyles) =>
                 dispatch({ type: "APPLY_PRESET", payload: presetStyles })

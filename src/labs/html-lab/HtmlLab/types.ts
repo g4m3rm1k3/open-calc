@@ -28,12 +28,24 @@ export interface LabElement {
   mediaQueries: MediaQuery[];
 }
 
+// A single JS/JSX source file in the JavaScript tab. Kind (`js` vs `jsx`) is
+// derived from `name`'s extension rather than stored separately — one less
+// thing that could disagree with the filename. Files concatenate in array
+// order into one shared-scope script (see labReducer's `mainJsCode`/
+// `buildJsBundle`) — there's no real ES module resolution, so a component
+// defined in an earlier file is just available by name to a later one.
+export interface JsFile {
+  id: string;
+  name: string;
+  code: string;
+}
+
 export interface LabPage {
   id: string;
   name: string;
   elements: LabElement[];
   bodyStyles: BodyStyles;
-  javascript: string;
+  jsFiles: JsFile[];
   customCss: string;
 }
 
@@ -43,7 +55,8 @@ export interface LabState {
   showOverlay: boolean;
   showLabels: boolean;
   customCss: string;
-  javascript: string;
+  jsFiles: JsFile[];
+  activeJsFileId: string;
   history: LabElement[][];
   bodyStyles: BodyStyles;
   bodyTheme: BodyThemeState;
@@ -93,7 +106,9 @@ export interface Component {
 export interface SinglePageData {
   elements: LabElement[];
   bodyStyles: BodyStyles;
+  /** Legacy single-string form — normalized into a one-entry `jsFiles` on load. Prefer `jsFiles` for new examples. */
   javascript?: string;
+  jsFiles?: JsFile[];
   customCss?: string;
   cdnLinks?: string[];
 }
@@ -141,7 +156,15 @@ export type Action =
   | { type: "SET_FROM_CODE"; payload: LabElement[] }
   | { type: "UPDATE_BODY_STYLE"; payload: { prop: string; value: string } }
   | { type: "SET_FROM_CSS"; payload: { elements: LabElement[]; customCss: string; bodyStyles?: BodyStyles } }
-  | { type: "SET_JAVASCRIPT"; payload: string }
+  | { type: "SET_ACTIVE_JS_FILE"; payload: string }
+  | { type: "UPDATE_JS_FILE_CODE"; payload: { id: string; code: string } }
+  | { type: "ADD_JS_FILES"; payload: JsFile[] }
+  | { type: "RENAME_JS_FILE"; payload: { id: string; name: string } }
+  | { type: "DELETE_JS_FILE"; payload: string }
+  /** Appends to the main (first) JS file, creating it if none exists yet — for
+   *  toolbox actions (inserting a JS preset/snippet) that don't care which
+   *  file the code lands in, unlike direct editing of a specific open file. */
+  | { type: "APPEND_MAIN_JS"; payload: string }
   | { type: "SET_CUSTOM_CSS"; payload: string }
   | { type: "TOGGLE_OVERLAY" }
   | { type: "TOGGLE_LABELS" }

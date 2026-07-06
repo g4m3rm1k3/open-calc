@@ -1,4 +1,4 @@
-import type { LabElement, BodyStyles, MultiPageData, SinglePageData, ExampleData, Example } from "./types";
+import type { LabElement, BodyStyles, JsFile, MultiPageData, SinglePageData, ExampleData, Example } from "./types";
 import { generateExampleProject } from "./exampleProject";
 
 function el(
@@ -155,9 +155,9 @@ function generateMultiPageExample(): MultiPageData {
   ];
 
   const pages = [
-    { id: "pg-home",  name: "Home",  elements: homeEls,  bodyStyles: BODY, javascript: "", customCss: "" },
-    { id: "pg-about", name: "About", elements: aboutEls, bodyStyles: BODY, javascript: "", customCss: "" },
-    { id: "pg-work",  name: "Work",  elements: workEls,  bodyStyles: BODY, javascript: "", customCss: "" },
+    { id: "pg-home",  name: "Home",  elements: homeEls,  bodyStyles: BODY, jsFiles: [], customCss: "" },
+    { id: "pg-about", name: "About", elements: aboutEls, bodyStyles: BODY, jsFiles: [], customCss: "" },
+    { id: "pg-work",  name: "Work",  elements: workEls,  bodyStyles: BODY, jsFiles: [], customCss: "" },
   ];
 
   return { pages };
@@ -446,6 +446,366 @@ function generateThreeJsExample(): SinglePageData {
   return { elements, bodyStyles, javascript, cdnLinks: ["threejs"] };
 }
 
+// ── Tetris (React, multi-file JSX) ──────────────────────────────────────────
+// Deliberately split across 4 files by responsibility — this is the example
+// meant to demonstrate (and exercise) multi-file JSX in HTML Lab. Files
+// share one global scope (no `import`/`export` — see jsxTranspile.ts), so
+// load order in `jsFiles` below IS dependency order: constants, then the
+// pure rules that use them, then the component that uses the rules, then
+// the entry point that mounts the component.
+function generateTetrisExample(): SinglePageData {
+  const constantsJs = `// ── constants.jsx ────────────────────────────────────────────────────────
+// Pure data: board dimensions and the seven standard tetromino shapes. No
+// React, no logic — just the numbers everything else in this game agrees on.
+
+const BOARD_COLS = 10;
+const BOARD_ROWS = 20;
+const TICK_MS = 500; // base speed at level 1 — see board.jsx's speedForLevel()
+const LINES_PER_LEVEL = 10; // clear this many lines to advance a level
+
+// Each shape is defined in its "spawn" rotation as a 2D matrix of 0s/1s.
+// board.jsx's rotateMatrix() derives every other rotation from this one —
+// no need to hand-author 4 rotation states per piece.
+const TETROMINOES = {
+  I: { color: '#22d3ee', shape: [[1, 1, 1, 1]] },
+  O: { color: '#facc15', shape: [[1, 1], [1, 1]] },
+  T: { color: '#c084fc', shape: [[0, 1, 0], [1, 1, 1]] },
+  S: { color: '#4ade80', shape: [[0, 1, 1], [1, 1, 0]] },
+  Z: { color: '#f87171', shape: [[1, 1, 0], [0, 1, 1]] },
+  J: { color: '#60a5fa', shape: [[1, 0, 0], [1, 1, 1]] },
+  L: { color: '#fb923c', shape: [[0, 0, 1], [1, 1, 1]] },
+};
+const PIECE_KEYS = Object.keys(TETROMINOES);`;
+
+  const boardJs = `// ── board.jsx ────────────────────────────────────────────────────────────
+// Pure game rules: every function here operates only on plain arrays and
+// numbers, with no React and no rendering — Game.jsx is the only file that
+// touches component state. Keeping this pure means each rule is trivially
+// testable and readable on its own, with no hooks or DOM in the way.
+
+function createEmptyBoard() {
+  return Array.from({ length: BOARD_ROWS }, () => Array(BOARD_COLS).fill(null));
+}
+
+function randomPieceKey() {
+  return PIECE_KEYS[Math.floor(Math.random() * PIECE_KEYS.length)];
+}
+
+function spawnPiece(key) {
+  const def = TETROMINOES[key];
+  return {
+    key,
+    color: def.color,
+    shape: def.shape,
+    row: 0,
+    col: Math.floor((BOARD_COLS - def.shape[0].length) / 2),
+  };
+}
+
+// Rotates a shape matrix 90° clockwise: transpose, then reverse each row.
+// One general-purpose function instead of 4 hardcoded rotation states per piece.
+function rotateMatrix(shape) {
+  const rows = shape.length, cols = shape[0].length;
+  const rotated = Array.from({ length: cols }, () => Array(rows).fill(0));
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      rotated[c][rows - 1 - r] = shape[r][c];
+    }
+  }
+  return rotated;
+}
+
+// A position is only legal if every filled cell of the piece lands inside
+// the board's left/right/bottom walls and on top of an empty cell. Cells
+// above the visible board (row < 0) are allowed through — that's how a
+// piece is permitted to spawn partly off the top.
+function isValidPosition(board, shape, row, col) {
+  for (let r = 0; r < shape.length; r++) {
+    for (let c = 0; c < shape[r].length; c++) {
+      if (!shape[r][c]) continue;
+      const boardRow = row + r, boardCol = col + c;
+      if (boardCol < 0 || boardCol >= BOARD_COLS || boardRow >= BOARD_ROWS) return false;
+      if (boardRow >= 0 && board[boardRow][boardCol]) return false;
+    }
+  }
+  return true;
+}
+
+// Copies the piece's cells permanently into the board — called the moment a
+// piece can no longer move down.
+function mergePieceIntoBoard(board, piece) {
+  const next = board.map((row) => row.slice());
+  for (let r = 0; r < piece.shape.length; r++) {
+    for (let c = 0; c < piece.shape[r].length; c++) {
+      if (!piece.shape[r][c]) continue;
+      const boardRow = piece.row + r, boardCol = piece.col + c;
+      if (boardRow >= 0) next[boardRow][boardCol] = piece.color;
+    }
+  }
+  return next;
+}
+
+// Removes every fully-filled row and drops everything above down to fill
+// the gap, reporting how many rows were cleared (for scoring).
+function clearCompletedLines(board) {
+  const remaining = board.filter((row) => row.some((cell) => !cell));
+  const clearedCount = BOARD_ROWS - remaining.length;
+  const empties = Array.from({ length: clearedCount }, () => Array(BOARD_COLS).fill(null));
+  return { board: [...empties, ...remaining], clearedCount };
+}
+
+// Classic Tetris scoring — a 4-line "Tetris" is worth far more per line than
+// clearing one row at a time, which is what rewards playing well.
+function scoreForLines(count) {
+  return [0, 100, 300, 500, 800][count] || 0;
+}
+
+// Every level shaves time off the drop timer, floored so the game never
+// becomes literally unplayable at high levels.
+function speedForLevel(level) {
+  return Math.max(100, TICK_MS - (level - 1) * 40);
+}`;
+
+  const gameJsx = `// ── Game.jsx ─────────────────────────────────────────────────────────────
+// The only file that owns React state or touches the DOM's input events —
+// board.jsx supplies the pure rules, this file supplies the clock (the drop
+// timer), the player's keyboard input, and the rendering. Composing it this
+// way means the rules in board.jsx could power a totally different renderer
+// (canvas, terminal, ...) without changing a single line of game logic.
+
+// A small 4x4 preview of an upcoming piece, centered in its box. Purely
+// presentational — it re-reads TETROMINOES directly rather than taking a
+// pre-rendered board, since "what does piece X look like" is display
+// concern, not game-rules concern.
+function NextPiecePreview({ pieceKey }) {
+  const { shape, color } = TETROMINOES[pieceKey];
+  const boxSize = 4;
+  const rowOffset = Math.floor((boxSize - shape.length) / 2);
+  const colOffset = Math.floor((boxSize - shape[0].length) / 2);
+  const cells = [];
+  for (let r = 0; r < boxSize; r++) {
+    for (let c = 0; c < boxSize; c++) {
+      const shapeR = r - rowOffset;
+      const shapeC = c - colOffset;
+      const filled = shapeR >= 0 && shapeR < shape.length && shapeC >= 0 && shapeC < shape[0].length && shape[shapeR][shapeC];
+      cells.push(
+        <div key={\`\${r}-\${c}\`} style={{ width: '16px', height: '16px', background: filled ? color : 'transparent' }} />
+      );
+    }
+  }
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 16px)', gridTemplateRows: 'repeat(4, 16px)', gap: '1px' }}>
+      {cells}
+    </div>
+  );
+}
+
+function Game() {
+  const [board, setBoard] = React.useState(createEmptyBoard);
+  const [piece, setPiece] = React.useState(() => spawnPiece(randomPieceKey()));
+  const [nextKey, setNextKey] = React.useState(randomPieceKey);
+  const [score, setScore] = React.useState(0);
+  const [lines, setLines] = React.useState(0);
+  const [level, setLevel] = React.useState(1);
+  const [gameOver, setGameOver] = React.useState(false);
+
+  // Locks a piece into \`board\`, clears completed lines, scores them (worth
+  // more per line at higher levels), advances the level, and draws the next
+  // piece from the queue — ending the game if the new piece has nowhere
+  // legal to spawn. Shared by both the natural drop timer and a hard drop,
+  // so "what happens when a piece can no longer fall" only lives in one place.
+  const lockPiece = React.useCallback((current) => {
+    const merged = mergePieceIntoBoard(board, current);
+    const { board: cleared, clearedCount } = clearCompletedLines(merged);
+    setBoard(cleared);
+    if (clearedCount > 0) {
+      setScore((s) => s + scoreForLines(clearedCount) * level);
+      setLines((prevLines) => {
+        const total = prevLines + clearedCount;
+        setLevel(1 + Math.floor(total / LINES_PER_LEVEL));
+        return total;
+      });
+    }
+
+    const spawned = spawnPiece(nextKey);
+    setNextKey(randomPieceKey());
+    if (!isValidPosition(cleared, spawned.shape, spawned.row, spawned.col)) {
+      setGameOver(true);
+      return null;
+    }
+    return spawned;
+  }, [board, nextKey, level]);
+
+  // Moves the active piece down one row if legal, otherwise hands off to lockPiece.
+  const drop = React.useCallback(() => {
+    setPiece((prev) => {
+      if (!prev) return prev;
+      if (isValidPosition(board, prev.shape, prev.row + 1, prev.col)) {
+        return { ...prev, row: prev.row + 1 };
+      }
+      return lockPiece(prev);
+    });
+  }, [board, lockPiece]);
+
+  // Instantly moves the piece to its landing row and locks it — the
+  // impatient player's shortcut, triggered by Space.
+  const hardDrop = React.useCallback(() => {
+    setPiece((prev) => {
+      if (!prev) return prev;
+      let landingRow = prev.row;
+      while (isValidPosition(board, prev.shape, landingRow + 1, prev.col)) {
+        landingRow++;
+      }
+      return lockPiece({ ...prev, row: landingRow });
+    });
+  }, [board, lockPiece]);
+
+  // The drop timer — stops entirely once the game ends, and speeds up as
+  // \`level\` climbs (speedForLevel lives in board.jsx alongside the other rules).
+  React.useEffect(() => {
+    if (gameOver) return;
+    const id = setInterval(drop, speedForLevel(level));
+    return () => clearInterval(id);
+  }, [drop, gameOver, level]);
+
+  // Keyboard controls: left/right to move, up to rotate, down for a soft
+  // drop, space for an instant hard drop.
+  React.useEffect(() => {
+    if (gameOver) return;
+    function onKeyDown(e) {
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        hardDrop();
+        return;
+      }
+      setPiece((prev) => {
+        if (!prev) return prev;
+        if (e.key === 'ArrowLeft' && isValidPosition(board, prev.shape, prev.row, prev.col - 1)) {
+          return { ...prev, col: prev.col - 1 };
+        }
+        if (e.key === 'ArrowRight' && isValidPosition(board, prev.shape, prev.row, prev.col + 1)) {
+          return { ...prev, col: prev.col + 1 };
+        }
+        if (e.key === 'ArrowDown' && isValidPosition(board, prev.shape, prev.row + 1, prev.col)) {
+          return { ...prev, row: prev.row + 1 };
+        }
+        if (e.key === 'ArrowUp') {
+          const rotated = rotateMatrix(prev.shape);
+          if (isValidPosition(board, rotated, prev.row, prev.col)) {
+            return { ...prev, shape: rotated };
+          }
+        }
+        return prev;
+      });
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [board, gameOver, hardDrop]);
+
+  function restart() {
+    setBoard(createEmptyBoard());
+    setPiece(spawnPiece(randomPieceKey()));
+    setNextKey(randomPieceKey());
+    setScore(0);
+    setLines(0);
+    setLevel(1);
+    setGameOver(false);
+  }
+
+  // The falling piece is overlaid on the locked board purely for rendering —
+  // it never actually lives inside \`board\` until the moment it locks.
+  const displayBoard = board.map((row) => row.slice());
+  if (piece) {
+    for (let r = 0; r < piece.shape.length; r++) {
+      for (let c = 0; c < piece.shape[r].length; c++) {
+        if (!piece.shape[r][c]) continue;
+        const boardRow = piece.row + r, boardCol = piece.col + c;
+        if (boardRow >= 0 && boardRow < BOARD_ROWS) displayBoard[boardRow][boardCol] = piece.color;
+      }
+    }
+  }
+
+  const statBlock = (label, value) => (
+    <div>
+      <div style={{ fontSize: '11px', color: '#94a3b8', letterSpacing: '0.05em' }}>{label}</div>
+      <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{value}</div>
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px', padding: '32px', fontFamily: 'system-ui, sans-serif', color: '#f8fafc' }}>
+      <h1 style={{ margin: 0, fontSize: '26px' }}>Tetris</h1>
+      <div style={{ display: 'flex', gap: '28px', alignItems: 'flex-start' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: \`repeat(\${BOARD_COLS}, 24px)\`,
+          gridTemplateRows: \`repeat(\${BOARD_ROWS}, 24px)\`,
+          gap: '1px',
+          background: '#1e293b',
+          border: '2px solid #334155',
+        }}>
+          {displayBoard.map((row, r) =>
+            row.map((cell, c) => (
+              <div key={\`\${r}-\${c}\`} style={{ width: '24px', height: '24px', background: cell || '#0f172a' }} />
+            ))
+          )}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', minWidth: '90px' }}>
+          {statBlock('SCORE', score)}
+          {statBlock('LEVEL', level)}
+          {statBlock('LINES', lines)}
+          <div>
+            <div style={{ fontSize: '11px', color: '#94a3b8', letterSpacing: '0.05em', marginBottom: '6px' }}>NEXT</div>
+            <NextPiecePreview pieceKey={nextKey} />
+          </div>
+        </div>
+      </div>
+      {gameOver ? (
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ color: '#f87171', fontWeight: 'bold', fontSize: '17px', margin: '0 0 8px' }}>Game Over</p>
+          <button
+            onClick={restart}
+            style={{ padding: '8px 20px', borderRadius: '8px', background: '#3b82f6', color: 'white', border: 'none', cursor: 'pointer', fontSize: '14px' }}
+          >
+            Play Again
+          </button>
+        </div>
+      ) : (
+        <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>← → move · ↑ rotate · ↓ soft drop · space hard drop</p>
+      )}
+    </div>
+  );
+}`;
+
+  const appJsx = `// ── App.jsx ──────────────────────────────────────────────────────────────
+// The entry point — the only file that knows a DOM/browser is involved at
+// all. Everything above it (constants, board, Game) has no idea, which is
+// exactly what makes each of them easy to read and reason about on its own.
+
+ReactDOM.createRoot(document.getElementById('tetris-root')).render(<Game />);`;
+
+  const jsFiles: JsFile[] = [
+    { id: "tetris-constants", name: "constants.jsx", code: constantsJs },
+    { id: "tetris-board",     name: "board.jsx",     code: boardJs },
+    { id: "tetris-game",      name: "Game.jsx",       code: gameJsx },
+    { id: "tetris-app",       name: "App.jsx",        code: appJsx },
+  ];
+
+  const elements: LabElement[] = [
+    el("tetris-root", "div", null, {
+      display: "flex", minHeight: "100vh", alignItems: "center", justifyContent: "center",
+      textAlign: "center", fontFamily: "system-ui, sans-serif", fontSize: "16px", color: "#94a3b8",
+    }, "This canvas is static — press ▶ Preview above to run the React game.", { id: "tetris-root" }),
+  ];
+
+  const bodyStyles: BodyStyles = {
+    margin: "0", padding: "0", background: "#0f172a", color: "#f8fafc",
+    fontFamily: "system-ui, sans-serif", minHeight: "100vh",
+  };
+
+  return { elements, bodyStyles, jsFiles, customCss: "" };
+}
+
 // ── Gallery export ─────────────────────────────────────────────────────────────
 export const EXAMPLES: Example[] = [
   {
@@ -484,5 +844,13 @@ export const EXAMPLES: Example[] = [
     icon: "🪐",
     generate: generateThreeJsExample as () => ExampleData,
     requiresCdn: ["threejs"],
+  },
+  {
+    id: "tetris",
+    name: "Tetris (React)",
+    description: "A real Tetris game built with React across 4 files — constants, board logic, component, entry point",
+    icon: "🎮",
+    generate: generateTetrisExample as () => ExampleData,
+    badge: "React",
   },
 ];

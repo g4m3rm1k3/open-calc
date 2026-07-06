@@ -6,7 +6,7 @@
 
 import { describe, it, expect } from "vitest";
 import { applyPatch, computeStateAtStep, computeSolvedStateAtStep, validateStructure } from "./lessonEngine";
-import { initialState } from "../labReducer";
+import { initialState, mainJsCode, withMainJsCode } from "../labReducer";
 import type { Lesson, LabElement } from "./lessonTypes";
 
 function el(id: string, tag: string, parentId: string | null, order: number, content = "", styles: Record<string, string> = {}): LabElement {
@@ -34,9 +34,9 @@ describe("applyPatch", () => {
   });
 
   it("replaces javascript wholesale when present, leaves it alone when absent", () => {
-    const state = { ...initialState, javascript: "console.log(1)" };
-    expect(applyPatch(state, { javascript: "console.log(2)" }).javascript).toBe("console.log(2)");
-    expect(applyPatch(state, {}).javascript).toBe("console.log(1)");
+    const state = { ...initialState, jsFiles: withMainJsCode(initialState.jsFiles, "console.log(1)") };
+    expect(mainJsCode(applyPatch(state, { javascript: "console.log(2)" }).jsFiles)).toBe("console.log(2)");
+    expect(mainJsCode(applyPatch(state, {}).jsFiles)).toBe("console.log(1)");
   });
 
   it("merges bodyStyles instead of replacing the whole object", () => {
@@ -106,7 +106,7 @@ describe("computeSolvedStateAtStep — real incident: a challenge's own scaffold
   it("keeps the scaffold button in the solved state even though solutionPatch never re-lists it", () => {
     const state = computeSolvedStateAtStep(lesson, 0);
     expect(state.elements.map((e) => e.id)).toEqual(["clearBtn"]);
-    expect(state.javascript).toBe("clearBtn.addEventListener('click', () => {});");
+    expect(mainJsCode(state.jsFiles)).toBe("clearBtn.addEventListener('click', () => {});");
   });
 });
 

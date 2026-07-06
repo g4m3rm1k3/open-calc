@@ -5,7 +5,7 @@ import CodePanel from "./CodePanel";
 import PropertiesPanel from "./PropertiesPanel";
 import ConfirmDialog, { shouldSkip } from "./ConfirmDialog";
 import TableBuilderModal from "./TableBuilderModal";
-import { labReducer, initialState } from "./labReducer";
+import { labReducer, initialState, mainJsCode } from "./labReducer";
 import { detectComponents, buildThemeUpdates } from "./componentLibrary";
 import {
   applyCssToElements,
@@ -152,10 +152,10 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
     // effect that notices and clears playback, one render sees an
     // out-of-bounds index — bail out rather than indexing into `frames`.
     if (!playback || playback.index >= playback.frames.length) return undefined;
-    const prevJs = playback.index === 0 ? playback.baseline.state.javascript : playback.frames[playback.index - 1].state.javascript;
+    const prevJs = mainJsCode(playback.index === 0 ? playback.baseline.state.jsFiles : playback.frames[playback.index - 1].state.jsFiles);
     const prevCss = playback.index === 0 ? playback.baseline.state.customCss : playback.frames[playback.index - 1].state.customCss;
     const cur = playback.frames[playback.index].state;
-    if (cur.javascript !== prevJs) return "javascript";
+    if (mainJsCode(cur.jsFiles) !== prevJs) return "javascript";
     if (cur.customCss !== prevCss) return "css";
     return "html";
   }, [playback]);
@@ -197,7 +197,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
       // passed) — show it SOLVED, not the raw/blank scaffold `.patch` would
       // give a challenge step arriving fresh.
       const next = computeSolvedFoldAtStep(lesson, clamped).state;
-      dispatch({ type: "LOAD_EXAMPLE", payload: { elements: next.elements, bodyStyles: next.bodyStyles, javascript: next.javascript, customCss: next.customCss } });
+      dispatch({ type: "LOAD_EXAMPLE", payload: { elements: next.elements, bodyStyles: next.bodyStyles, jsFiles: next.jsFiles, customCss: next.customCss } });
       setPlayback(null);
     } else {
       setPlayback(makePlayback(baseline, targetStep.patch));
@@ -236,7 +236,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
     setPlayback((p) => {
       if (!p) return p;
       const last = p.frames[p.frames.length - 1].state;
-      dispatch({ type: "LOAD_EXAMPLE", payload: { elements: last.elements, bodyStyles: last.bodyStyles, javascript: last.javascript, customCss: last.customCss } });
+      dispatch({ type: "LOAD_EXAMPLE", payload: { elements: last.elements, bodyStyles: last.bodyStyles, jsFiles: last.jsFiles, customCss: last.customCss } });
       return null;
     });
   }, []);
@@ -253,7 +253,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
     if (!playback) return;
     if (playback.index >= playback.frames.length) { setPlayback(null); return; }
     const frame = playback.frames[playback.index].state;
-    dispatch({ type: "LOAD_EXAMPLE", payload: { elements: frame.elements, bodyStyles: frame.bodyStyles, javascript: frame.javascript, customCss: frame.customCss } });
+    dispatch({ type: "LOAD_EXAMPLE", payload: { elements: frame.elements, bodyStyles: frame.bodyStyles, jsFiles: frame.jsFiles, customCss: frame.customCss } });
     if (playback.paused) return;
     const timer = setTimeout(() => {
       setPlayback((p) => (p ? { ...p, index: p.index + 1 } : p));
@@ -266,7 +266,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
     setChecking(true);
     let result: ValidationResult;
     if (step.behavior) {
-      result = await validateBehavior(state.elements, state.bodyStyles, state.customCss, state.javascript, step.behavior);
+      result = await validateBehavior(state.elements, state.bodyStyles, state.customCss, mainJsCode(state.jsFiles), step.behavior);
     } else if (step.expected) {
       result = validateStructure(state.elements, step.expected);
     } else {
@@ -279,7 +279,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
 
   const handleSkipToSolution = useCallback((): void => {
     const solved = computeSolvedStateAtStep(lesson, stepIndex);
-    dispatch({ type: "LOAD_EXAMPLE", payload: { elements: solved.elements, bodyStyles: solved.bodyStyles, javascript: solved.javascript, customCss: solved.customCss } });
+    dispatch({ type: "LOAD_EXAMPLE", payload: { elements: solved.elements, bodyStyles: solved.bodyStyles, jsFiles: solved.jsFiles, customCss: solved.customCss } });
     markCheckpoint(progressKey, step.id);
     setCheckResult({ passed: true, feedback: ["Solution applied — take a look at how it's built, then continue."] });
   }, [lesson, stepIndex, step, progressKey, markCheckpoint]);
@@ -326,9 +326,9 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
         attrs: {}, mediaQueries: [], parentId: null };
 
   const handleCodeChange = useCallback((newCode: string): void => {
-    const parsed = htmlToElements(newCode, state.elements, state.javascript);
+    const parsed = htmlToElements(newCode, state.elements, mainJsCode(state.jsFiles));
     if (parsed) dispatch({ type: "SET_FROM_CODE", payload: parsed });
-  }, [state.elements, state.javascript]);
+  }, [state.elements, state.jsFiles]);
 
   const handleCssChange = useCallback((newCss: string): void => {
     const parsed = applyCssToElements(newCss, state.elements);
@@ -426,7 +426,8 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
         <CodePanel
           html={generatedCode}
           css={generatedCss}
-          javascript={state.javascript}
+          jsFiles={state.jsFiles}
+          activeJsFileId={state.activeJsFileId}
           width={codePanelWidth}
           selectedId={state.selectedId}
           elements={state.elements}
@@ -435,7 +436,11 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
           forceSync={isPlaying}
           onHtmlChange={handleCodeChange}
           onCssChange={handleCssChange}
-          onJavascriptChange={(value) => dispatch({ type: "SET_JAVASCRIPT", payload: value })}
+          onSetActiveJsFile={(id) => dispatch({ type: "SET_ACTIVE_JS_FILE", payload: id })}
+          onJsFileCodeChange={(id, code) => dispatch({ type: "UPDATE_JS_FILE_CODE", payload: { id, code } })}
+          onAddJsFile={(file) => dispatch({ type: "ADD_JS_FILES", payload: [file] })}
+          onRenameJsFile={(id, name) => dispatch({ type: "RENAME_JS_FILE", payload: { id, name } })}
+          onDeleteJsFile={(id) => dispatch({ type: "DELETE_JS_FILE", payload: id })}
           onSelectElement={(id) => {
             dispatch({ type: "SELECT", payload: id });
             setMultiSelectedIds([]);
@@ -456,7 +461,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
           }
           onInsertJsPreset={(template, code) => {
             dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
-            dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, code) });
+            dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), code) });
           }}
           onOpenTableBuilder={() => setShowTableBuilder(true)}
           cdnLinks={[]}
@@ -481,7 +486,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
           <iframe
             key="preview-frame"
             className={styles.previewFrame}
-            srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, state.javascript, [])}
+            srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, mainJsCode(state.jsFiles), [])}
             title="Preview"
             sandbox="allow-scripts"
           />
@@ -544,13 +549,13 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
               onAttrChange={(prop, value) =>
                 dispatch({ type: "UPDATE_ATTR", payload: { prop, value } })
               }
-              javascript={state.javascript}
+              javascript={mainJsCode(state.jsFiles)}
               onInsertJavascript={(snippet: string) =>
-                dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, snippet) })
+                dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), snippet) })
               }
               onInsertJsPreset={(template, code) => {
                 dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
-                dispatch({ type: "SET_JAVASCRIPT", payload: appendJavascriptSnippet(state.javascript, code) });
+                dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), code) });
               }}
               onApplyPreset={(presetStyles) =>
                 dispatch({ type: "APPLY_PRESET", payload: presetStyles })

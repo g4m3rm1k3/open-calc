@@ -28,11 +28,11 @@ export function lessonProgressKey(lessonId: string): string {
  * Turns a previous lesson's finished `Fold` into the patch a "recap" step
  * hands off with — carrying forward not just the elements but the actual
  * named JS/CSS blocks, not their already-joined text. Seeding only
- * `javascript: fold.state.javascript` would look identical on screen but
- * silently reset the block bookkeeping to empty, so the very next `jsBlocks`
- * addition in the new lesson would replace the whole script instead of
- * adding to it — every lesson that continues another lesson's page should
- * seed its first step with this instead of hand-picking fields.
+ * `jsFiles: fold.state.jsFiles` would look identical on screen but silently
+ * reset the block bookkeeping to empty, so the very next `jsBlocks` addition
+ * in the new lesson would replace the whole script instead of adding to it —
+ * every lesson that continues another lesson's page should seed its first
+ * step with this instead of hand-picking fields.
  */
 export function foldToPatch(fold: Fold): LessonPatch {
   return {

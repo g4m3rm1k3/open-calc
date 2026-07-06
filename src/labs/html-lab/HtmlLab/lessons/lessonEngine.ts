@@ -1,4 +1,4 @@
-import { initialState } from "../labReducer";
+import { initialState, withMainJsCode } from "../labReducer";
 import { generateExportHtml } from "../htmlSync";
 import type {
   Lesson, LessonStep, LessonPatch, LabElement, LabState,
@@ -25,19 +25,20 @@ export function applyPatch(state: LabState, patch: LessonPatch): LabState {
     ...state,
     elements,
     bodyStyles: patch.bodyStyles ? { ...state.bodyStyles, ...patch.bodyStyles } : state.bodyStyles,
-    javascript: patch.javascript !== undefined ? patch.javascript : state.javascript,
+    jsFiles: patch.javascript !== undefined ? withMainJsCode(state.jsFiles, patch.javascript) : state.jsFiles,
     customCss: patch.customCss !== undefined ? patch.customCss : state.customCss,
   };
 }
 
 // A running fold also carries the current *named* JS/CSS blocks (id -> code),
-// separately from `state.javascript`/`state.customCss` (which are just their
+// separately from `state.jsFiles[0]`/`state.customCss` (which just hold their
 // joined text) — upserting a block by id and re-joining is what lets a step
 // change ONE handler or rule without the lesson author ever hand-typing the
 // whole accumulated script/stylesheet as a single string. `LabState` itself
 // has no concept of blocks (the rest of the app — the reducer, the code
-// panel, the exporter — only ever deals in the plain joined strings), so
-// this bookkeeping lives here, in the lesson engine, and nowhere else.
+// panel, the exporter — only ever deals in the plain joined strings, treating
+// jsFiles[0] as "the main file"), so this bookkeeping lives here, in the
+// lesson engine, and nowhere else.
 export interface Fold {
   state: LabState;
   blocks: Map<string, string>;
@@ -60,7 +61,7 @@ function foldPatch(fold: Fold, patch: LessonPatch): Fold {
   });
   const blocks = usesJsBlocks ? upsertBlocks(fold.blocks, patch.jsBlocks!) : fold.blocks;
   const cssBlocks = usesCssBlocks ? upsertBlocks(fold.cssBlocks, patch.cssBlocks!) : fold.cssBlocks;
-  if (usesJsBlocks) state = { ...state, javascript: [...blocks.values()].join("\n\n") };
+  if (usesJsBlocks) state = { ...state, jsFiles: withMainJsCode(state.jsFiles, [...blocks.values()].join("\n\n")) };
   if (usesCssBlocks) state = { ...state, customCss: [...cssBlocks.values()].join("\n\n") };
   return { state, blocks, cssBlocks };
 }

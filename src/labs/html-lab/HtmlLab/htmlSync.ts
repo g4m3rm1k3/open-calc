@@ -330,13 +330,18 @@ export function generateExportHtml(
 }
 
 // ─── Export: linked to separate files ────────────────────────────────────────
-export function generateLinkedHtml(elements: LabElement[], cdnTags: CdnTag[] = []): string {
+// `jsFileNames` are written in order — one `<script>` per real file (each
+// downloads as itself, real editable source, not a merged/transpiled bundle;
+// see HtmlLab.tsx's exportSplit). Defaults to a single "script.js" for any
+// caller that hasn't been updated to pass real names.
+export function generateLinkedHtml(elements: LabElement[], cdnTags: CdnTag[] = [], jsFileNames: string[] = ["script.js"]): string {
   const htmlBody = buildHtmlBody(elements);
   const cdnHeadTags = cdnTags.map(({ url, type }) =>
     type === "stylesheet"
       ? `  <link rel="stylesheet" href="${url}" />`
       : `  <script src="${url}"></script>`,
   ).join("\n");
+  const jsTags = jsFileNames.map((name) => `  <script src="${name}" defer></script>`).join("\n");
 
   const lines: (string | null)[] = [
     `<!DOCTYPE html>`,
@@ -352,7 +357,7 @@ export function generateLinkedHtml(elements: LabElement[], cdnTags: CdnTag[] = [
     ``,
     htmlBody,
     ``,
-    `  <script src="script.js" defer></script>`,
+    jsTags || null,
     `</body>`,
     `</html>`,
   ];

@@ -15,7 +15,7 @@ import { COMPONENTS } from "./componentLibrary";
 import { JS_PRESETS } from "./jsPresets";
 import { CDN_LIBRARIES } from "./cdnLibraries";
 import { CONTAINER_TAGS } from "./labReducer";
-import type { LabElement, ComponentTheme } from "./types";
+import type { LabElement, ComponentTheme, JsFile } from "./types";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — JSX panel, no type declarations
 import LessonsPanel from "./LessonsPanel.jsx";
@@ -758,7 +758,8 @@ function findRanges(text: string, selectedId: string, tab: string): LineRange[] 
 interface CodePanelProps {
   html: string;
   css: string;
-  javascript: string;
+  jsFiles: JsFile[];
+  activeJsFileId: string;
   width: string | number;
   selectedId: string | null;
   elements: LabElement[];
@@ -767,14 +768,18 @@ interface CodePanelProps {
    *  content there (e.g. jump to "JavaScript" while a script types itself in). */
   focusTab?: "html" | "css" | "javascript";
   /** Lesson playback: forces Monaco's displayed text to match `html`/`css`/
-   *  `javascript` even if the editor still thinks it's focused — playback
+   *  the active JS file even if the editor still thinks it's focused — playback
    *  never involves real typing, so there's no live edit to protect, and
    *  without this an editor that's picked up focus for any reason would
    *  silently keep showing a stale frame while state moves on underneath it. */
   forceSync?: boolean;
   onHtmlChange: (val: string) => void;
   onCssChange: (val: string) => void;
-  onJavascriptChange: (val: string) => void;
+  onSetActiveJsFile: (id: string) => void;
+  onJsFileCodeChange: (id: string, code: string) => void;
+  onAddJsFile: (file: JsFile) => void;
+  onRenameJsFile: (id: string, name: string) => void;
+  onDeleteJsFile: (id: string) => void;
   onSelectElement: (id: string | null) => void;
   onToggleMultiSelect: (id: string) => void;
   onSelectRange: (ids: string[]) => void;
@@ -795,7 +800,8 @@ interface CodePanelProps {
 export default function CodePanel({
   html,
   css,
-  javascript,
+  jsFiles,
+  activeJsFileId,
   width,
   selectedId,
   elements,
@@ -804,7 +810,11 @@ export default function CodePanel({
   forceSync,
   onHtmlChange,
   onCssChange,
-  onJavascriptChange,
+  onSetActiveJsFile,
+  onJsFileCodeChange,
+  onAddJsFile,
+  onRenameJsFile,
+  onDeleteJsFile,
   onSelectElement,
   onToggleMultiSelect,
   onSelectRange,
@@ -833,9 +843,18 @@ export default function CodePanel({
   const decorationsRef = useRef<string[]>([]);
   const isFocused      = useRef(false);
   const [activeTab, setActiveTab] = useState<TabKey>("html");
+  const [renamingFileId, setRenamingFileId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState("");
+
+  const activeJsFile = jsFiles.find((f) => f.id === activeJsFileId) ?? jsFiles[0];
+  const javascript = activeJsFile?.code ?? "";
 
   const sources: Record<string, string>                     = { html, css, javascript };
-  const handlers: Record<string, (val: string) => void>    = { html: onHtmlChange, css: onCssChange, javascript: onJavascriptChange };
+  const handlers: Record<string, (val: string) => void>    = {
+    html: onHtmlChange,
+    css: onCssChange,
+    javascript: (val) => { if (activeJsFile) onJsFileCodeChange(activeJsFile.id, val); },
+  };
   const activeSource   = sources[activeTab]   ?? "";
   const activeLanguage = TABS.find((t) => t.key === activeTab)?.language || "html";
 
@@ -918,6 +937,21 @@ export default function CodePanel({
     }
   };
 
+  // Same flush-then-swap discipline as switchTab, one level down — for
+  // switching which JS file is open without leaving the "javascript" tab.
+  const switchJsFile = (id: string): void => {
+    if (id === activeJsFileId) return;
+    if (debounceRef.current !== null) clearTimeout(debounceRef.current);
+    const editor = editorRef.current;
+    if (editor && activeJsFile) onJsFileCodeChange(activeJsFile.id, editor.getValue());
+    isFocused.current = false;
+    onSetActiveJsFile(id);
+    const nextFile = jsFiles.find((f) => f.id === id);
+    requestAnimationFrame(() => {
+      if (editorRef.current) editorRef.current.setValue(nextFile?.code ?? "");
+    });
+  };
+
   const handleChange = (val: string | undefined): void => {
     if (debounceRef.current !== null) clearTimeout(debounceRef.current);
     const tab = activeTab;
@@ -942,6 +976,69 @@ export default function CodePanel({
           ))}
         </div>
       </div>
+      {activeTab === "javascript" && (
+        <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap", padding: "4px 6px", borderBottom: "1px solid var(--hl-border)" }}>
+          {jsFiles.map((f) => (
+            <div key={f.id} style={{ display: "flex", alignItems: "center" }}>
+              {renamingFileId === f.id ? (
+                <input
+                  autoFocus
+                  value={renameDraft}
+                  onChange={(e) => setRenameDraft(e.target.value)}
+                  onBlur={() => { onRenameJsFile(f.id, renameDraft.trim() || f.name); setRenamingFileId(null); }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+                    if (e.key === "Escape") setRenamingFileId(null);
+                  }}
+                  style={{ fontSize: 11, width: 90, padding: "2px 4px" }}
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => switchJsFile(f.id)}
+                  onDoubleClick={() => { setRenamingFileId(f.id); setRenameDraft(f.name); }}
+                  title="Click to select, double-click to rename"
+                  className={styles.codeTab}
+                  style={f.id === activeJsFileId ? undefined : { opacity: 0.65 }}
+                >
+                  {f.name}
+                </button>
+              )}
+              {jsFiles.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => onDeleteJsFile(f.id)}
+                  title={`Delete ${f.name}`}
+                  style={{ fontSize: 11, padding: "0 4px", opacity: 0.6, cursor: "pointer" }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => {
+              if (debounceRef.current !== null) clearTimeout(debounceRef.current);
+              const editor = editorRef.current;
+              if (editor && activeJsFile) onJsFileCodeChange(activeJsFile.id, editor.getValue());
+              isFocused.current = false;
+              const n = jsFiles.length + 1;
+              const file: JsFile = { id: "js" + Date.now().toString(36), name: `file${n}.js`, code: "" };
+              onAddJsFile(file);
+              setRenamingFileId(file.id);
+              setRenameDraft(file.name);
+              requestAnimationFrame(() => {
+                if (editorRef.current) editorRef.current.setValue("");
+              });
+            }}
+            title="Add a new .js or .jsx file — double-click any file's name to rename it"
+            style={{ fontSize: 12, padding: "2px 8px", cursor: "pointer" }}
+          >
+            + File
+          </button>
+        </div>
+      )}
       <div className={styles.monacoWrap}>
         {activeTab === "tree" ? (
           <ElementTree

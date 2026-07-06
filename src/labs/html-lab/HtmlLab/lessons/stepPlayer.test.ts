@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { buildPlaybackFrames } from "./stepPlayer";
 import { applyPatch, type Fold } from "./lessonEngine";
-import { initialState } from "../labReducer";
+import { initialState, mainJsCode, withMainJsCode } from "../labReducer";
 import type { LabElement } from "./lessonTypes";
 
 function el(id: string, tag: string, parentId: string | null, order: number, content = "", styles: Record<string, string> = {}): LabElement {
@@ -39,7 +39,7 @@ describe("buildPlaybackFrames — elements", () => {
     const last = frames[frames.length - 1].state;
     expect(last.elements).toEqual(expected.elements);
     expect(last.bodyStyles).toEqual(expected.bodyStyles);
-    expect(last.javascript).toBe("console.log('hi')");
+    expect(mainJsCode(last.jsFiles)).toBe("console.log('hi')");
   });
 
   it("restyling an existing element is captioned as an update, not an add, and reveals just that id", () => {
@@ -67,7 +67,7 @@ describe("buildPlaybackFrames — jsBlocks/cssBlocks", () => {
     // only ever lists the ONE block that changed, so only one frame appears
     // regardless of how much other code already exists.
     const priorFold: Fold = {
-      state: { ...initialState, javascript: "function first() {\n  doOneThing();\n}\n\nfunction second() {\n  doAnotherThing();\n}" },
+      state: { ...initialState, jsFiles: withMainJsCode(initialState.jsFiles, "function first() {\n  doOneThing();\n}\n\nfunction second() {\n  doAnotherThing();\n}") },
       blocks: new Map([
         ["first", "function first() {\n  doOneThing();\n}"],
         ["second", "function second() {\n  doAnotherThing();\n}"],
@@ -78,14 +78,14 @@ describe("buildPlaybackFrames — jsBlocks/cssBlocks", () => {
       jsBlocks: [{ id: "first", code: "function first() {\n  doOneThing();\n  doNewThing();\n}" }],
     });
     expect(frames).toHaveLength(1);
-    expect(frames[0].state.javascript).toContain("function second()"); // untouched block still present
-    expect(frames[0].state.javascript).toContain("doNewThing");
+    expect(mainJsCode(frames[0].state.jsFiles)).toContain("function second()"); // untouched block still present
+    expect(mainJsCode(frames[0].state.jsFiles)).toContain("doNewThing");
     expect(frames[0].caption).toBe("Typing: function first() {");
   });
 
   it("adding a new block joins it after existing blocks and reveals in one frame", () => {
     const priorFold: Fold = {
-      state: { ...initialState, javascript: "const a = 1;" },
+      state: { ...initialState, jsFiles: withMainJsCode(initialState.jsFiles, "const a = 1;") },
       blocks: new Map([["decl", "const a = 1;"]]),
       cssBlocks: new Map(),
     };
@@ -93,7 +93,7 @@ describe("buildPlaybackFrames — jsBlocks/cssBlocks", () => {
       jsBlocks: [{ id: "handler", code: "doThing();" }],
     });
     expect(frames).toHaveLength(1);
-    expect(frames[0].state.javascript).toBe("const a = 1;\n\ndoThing();");
+    expect(mainJsCode(frames[0].state.jsFiles)).toBe("const a = 1;\n\ndoThing();");
   });
 
   it("cssBlocks behave the same way as jsBlocks, independently", () => {
@@ -113,7 +113,7 @@ describe("buildPlaybackFrames — jsBlocks/cssBlocks", () => {
   it("legacy whole-script `javascript` patch (no jsBlocks) still lands in one frame", () => {
     const frames = buildPlaybackFrames(fold(), { javascript: "console.log('one-off');" });
     expect(frames).toHaveLength(1);
-    expect(frames[0].state.javascript).toBe("console.log('one-off');");
+    expect(mainJsCode(frames[0].state.jsFiles)).toBe("console.log('one-off');");
   });
 });
 

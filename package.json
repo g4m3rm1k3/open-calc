@@ -5,7 +5,9 @@
   "license": "GPL-3.0-or-later",
   "type": "module",
   "main": "desktop/app/main.mjs",
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "node scripts/generate-graph.mjs && node src/scripts/build-search-index.js && node scripts/build-lesson-ids.mjs && vite",
     "build": "node scripts/generate-graph.mjs && node src/scripts/build-search-index.js && node scripts/build-lesson-ids.mjs && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
@@ -36,8 +38,8 @@
     "check-lessons": "node scripts/check-lesson-roundtrip.mjs"
   },
   "dependencies": {
-    "@opencalc/openmat": "*",
     "@babel/parser": "^7.29.2",
+    "@babel/standalone": "^8.0.3",
     "@fontsource/inter": "^5.1.1",
     "@fontsource/jetbrains-mono": "^5.1.1",
     "@fullcalendar/core": "^6.1.21",
@@ -50,6 +52,7 @@
     "@huggingface/transformers": "^3.8.1",
     "@mlc-ai/web-llm": "^0.2.82",
     "@monaco-editor/react": "^4.7.0",
+    "@opencalc/openmat": "*",
     "@react-three/drei": "^9.120.4",
     "@react-three/fiber": "^8.17.10",
     "@trystero-p2p/nostr": "^0.23.1",
@@ -94,6 +97,7 @@
     "trystero": "^0.23.1"
   },
   "devDependencies": {
+    "@types/babel__standalone": "^7.1.9",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",

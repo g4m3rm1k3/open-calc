@@ -1,4 +1,4 @@
-import type { Action, BodyThemeState, LabElement, LabPage, LabState, StyleUpdate } from "./types";
+import type { Action, BodyThemeState, JsFile, LabElement, LabPage, LabState, StyleUpdate } from "./types";
 import { cascadeComponentThemes } from "./componentLibrary";
 
 // ─── Default styles per tag ───────────────────────────────────────────────────
@@ -160,6 +160,38 @@ export function inferBodyTheme(bodyStyles: Record<string, string>): BodyThemeSta
   };
 }
 
+// ─── JS files (multi-file JS/JSX support) ──────────────────────────────────────
+// Files concatenate in array order into one shared-scope script — there is no
+// real ES module resolution, so a component defined in an earlier file is
+// simply available by name to a later one (same model as the pre-existing
+// multi-page JS merge below). `jsFiles[0]` is treated as "the main file" by
+// every call site that historically read/wrote a single `javascript` string
+// (the lesson-patch engine, legacy example data), so old content keeps
+// working unchanged.
+function newJsFile(name = "script.js", code = ""): JsFile {
+  return { id: "js" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name, code };
+}
+
+export function mainJsCode(jsFiles: JsFile[]): string {
+  return jsFiles[0]?.code ?? "";
+}
+
+export function withMainJsCode(jsFiles: JsFile[], code: string): JsFile[] {
+  if (jsFiles.length === 0) return code ? [newJsFile("script.js", code)] : [];
+  return jsFiles.map((f, i) => (i === 0 ? { ...f, code } : f));
+}
+
+// Legacy single-string `javascript` input (old examples/lesson data) -> jsFiles.
+export function jsFilesFromLegacy(javascript?: string, jsFiles?: JsFile[]): JsFile[] {
+  if (jsFiles) return jsFiles;
+  if (javascript !== undefined) return javascript ? [newJsFile("script.js", javascript)] : [];
+  return [];
+}
+
+export function buildJsBundle(jsFiles: JsFile[]): string {
+  return jsFiles.map((f) => f.code).filter(Boolean).join("\n\n");
+}
+
 // ─── Initial state ────────────────────────────────────────────────────────────
 export const initialState: LabState = {
   elements: [],
@@ -167,7 +199,8 @@ export const initialState: LabState = {
   showOverlay: false,
   showLabels: true,
   customCss: "",
-  javascript: "",
+  jsFiles: [],
+  activeJsFileId: "",
   history: [],
   bodyTheme: DEFAULT_BODY_THEME,
   bodyStyles: computeBodyStyles(DEFAULT_BODY_THEME),
@@ -191,7 +224,7 @@ function saveActivePage(state: LabState): LabPage[] {
   if (state.mode !== "multi" || !state.activePageId) return state.pages;
   return state.pages.map((p) =>
     p.id === state.activePageId
-      ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, javascript: state.javascript, customCss: state.customCss }
+      ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, jsFiles: state.jsFiles, customCss: state.customCss }
       : p,
   );
 }
@@ -202,7 +235,7 @@ function blankPage(name: string, index: number): LabPage {
     name,
     elements: [],
     bodyStyles: computeBodyStyles(DEFAULT_BODY_THEME),
-    javascript: "",
+    jsFiles: [],
     customCss: "",
   };
 }
@@ -388,7 +421,8 @@ export function labReducer(state: LabState, action: Action): LabState {
           elements: first.elements,
           bodyStyles: first.bodyStyles,
           bodyTheme: inferBodyTheme(first.bodyStyles),
-          javascript: first.javascript ?? "",
+          jsFiles: first.jsFiles,
+          activeJsFileId: first.jsFiles[0]?.id ?? "",
           customCss: first.customCss ?? "",
           cdnLinks: action.payload.cdnLinks ?? s.cdnLinks,
           mode: "multi",
@@ -397,19 +431,23 @@ export function labReducer(state: LabState, action: Action): LabState {
           selectedId: null,
         };
       }
-      return {
-        ...s,
-        elements: action.payload.elements,
-        bodyStyles: action.payload.bodyStyles,
-        bodyTheme: inferBodyTheme(action.payload.bodyStyles),
-        javascript: action.payload.javascript ?? "",
-        customCss: action.payload.customCss ?? "",
-        cdnLinks: action.payload.cdnLinks ?? s.cdnLinks,
-        selectedId: null,
-        mode: "single",
-        pages: [],
-        activePageId: null,
-      };
+      {
+        const jsFiles = jsFilesFromLegacy(action.payload.javascript, action.payload.jsFiles);
+        return {
+          ...s,
+          elements: action.payload.elements,
+          bodyStyles: action.payload.bodyStyles,
+          bodyTheme: inferBodyTheme(action.payload.bodyStyles),
+          jsFiles,
+          activeJsFileId: jsFiles[0]?.id ?? "",
+          customCss: action.payload.customCss ?? "",
+          cdnLinks: action.payload.cdnLinks ?? s.cdnLinks,
+          selectedId: null,
+          mode: "single",
+          pages: [],
+          activePageId: null,
+        };
+      }
     }
 
     case "TOGGLE_CDN": {
@@ -721,8 +759,43 @@ export function labReducer(state: LabState, action: Action): LabState {
       };
     }
 
-    case "SET_JAVASCRIPT":
-      return { ...state, javascript: action.payload };
+    case "SET_ACTIVE_JS_FILE":
+      return { ...state, activeJsFileId: action.payload };
+
+    case "UPDATE_JS_FILE_CODE":
+      return {
+        ...state,
+        jsFiles: state.jsFiles.map((f) => (f.id === action.payload.id ? { ...f, code: action.payload.code } : f)),
+      };
+
+    case "ADD_JS_FILES": {
+      if (action.payload.length === 0) return state;
+      const jsFiles = [...state.jsFiles, ...action.payload];
+      return { ...state, jsFiles, activeJsFileId: action.payload[action.payload.length - 1].id };
+    }
+
+    case "RENAME_JS_FILE":
+      return {
+        ...state,
+        jsFiles: state.jsFiles.map((f) => (f.id === action.payload.id ? { ...f, name: action.payload.name } : f)),
+      };
+
+    case "DELETE_JS_FILE": {
+      const jsFiles = state.jsFiles.filter((f) => f.id !== action.payload);
+      const activeJsFileId = state.activeJsFileId === action.payload
+        ? (jsFiles[0]?.id ?? "")
+        : state.activeJsFileId;
+      return { ...state, jsFiles, activeJsFileId };
+    }
+
+    // `action.payload` is the already-merged code (callers compute the merge
+    // via `appendJavascriptSnippet`, since only they have both the existing
+    // code and the snippet in hand) — this just writes it to the main file,
+    // creating one if none exists yet.
+    case "APPEND_MAIN_JS": {
+      const jsFiles = withMainJsCode(state.jsFiles, action.payload);
+      return { ...state, jsFiles, activeJsFileId: state.activeJsFileId || jsFiles[0]?.id || "" };
+    }
 
     case "SET_CUSTOM_CSS":
       return { ...state, customCss: action.payload };
@@ -842,16 +915,16 @@ export function labReducer(state: LabState, action: Action): LabState {
 
     case "TOGGLE_MULTIPAGE": {
       if (state.mode === "single") {
-        const p1: LabPage = { id: "pg" + Date.now(), name: "Home", elements: state.elements, bodyStyles: state.bodyStyles, javascript: state.javascript, customCss: state.customCss };
+        const p1: LabPage = { id: "pg" + Date.now(), name: "Home", elements: state.elements, bodyStyles: state.bodyStyles, jsFiles: state.jsFiles, customCss: state.customCss };
         const p2 = blankPage("Page 2", 1);
         return { ...state, mode: "multi", pages: [p1, p2], activePageId: p1.id, history: [] };
       } else {
         const updatedPages = saveActivePage(state);
         const mergedElements = updatedPages.flatMap((p) => p.elements);
-        const mergedJs  = updatedPages.map((p) => p.javascript).filter(Boolean).join("\n\n");
+        const mergedJsFiles = updatedPages.flatMap((p) => p.jsFiles);
         const mergedCss = updatedPages.map((p) => p.customCss).filter(Boolean).join("\n\n");
         const first = updatedPages[0];
-        return { ...state, mode: "single", pages: [], activePageId: null, elements: mergedElements, bodyStyles: first?.bodyStyles ?? state.bodyStyles, javascript: mergedJs, customCss: mergedCss, selectedId: null, history: [] };
+        return { ...state, mode: "single", pages: [], activePageId: null, elements: mergedElements, bodyStyles: first?.bodyStyles ?? state.bodyStyles, jsFiles: mergedJsFiles, activeJsFileId: mergedJsFiles[0]?.id ?? "", customCss: mergedCss, selectedId: null, history: [] };
       }
     }
 
@@ -860,13 +933,13 @@ export function labReducer(state: LabState, action: Action): LabState {
       const updatedPages = saveActivePage(state);
       const next = updatedPages.find((p) => p.id === action.payload);
       if (!next) return state;
-      return { ...state, pages: updatedPages, activePageId: action.payload, elements: next.elements, bodyStyles: next.bodyStyles, javascript: next.javascript, customCss: next.customCss || "", selectedId: null, history: [] };
+      return { ...state, pages: updatedPages, activePageId: action.payload, elements: next.elements, bodyStyles: next.bodyStyles, jsFiles: next.jsFiles, activeJsFileId: next.jsFiles[0]?.id ?? "", customCss: next.customCss || "", selectedId: null, history: [] };
     }
 
     case "ADD_PAGE": {
       const updatedPages = saveActivePage(state);
       const page = blankPage(action.payload ?? `Page ${updatedPages.length + 1}`, 0);
-      return { ...state, pages: [...updatedPages, page], activePageId: page.id, elements: page.elements, bodyStyles: page.bodyStyles, javascript: page.javascript, customCss: "", selectedId: null, history: [] };
+      return { ...state, pages: [...updatedPages, page], activePageId: page.id, elements: page.elements, bodyStyles: page.bodyStyles, jsFiles: page.jsFiles, activeJsFileId: page.jsFiles[0]?.id ?? "", customCss: "", selectedId: null, history: [] };
     }
 
     case "DELETE_PAGE": {
@@ -883,7 +956,8 @@ export function labReducer(state: LabState, action: Action): LabState {
           activePageId: newActive.id,
           elements: newActive.elements,
           bodyStyles: newActive.bodyStyles,
-          javascript: newActive.javascript,
+          jsFiles: newActive.jsFiles,
+          activeJsFileId: newActive.jsFiles[0]?.id ?? "",
           customCss: newActive.customCss || "",
           selectedId: null,
           history: [],

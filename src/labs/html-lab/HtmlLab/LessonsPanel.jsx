@@ -1,14 +1,11 @@
-import { useState, useEffect, useRef, createContext, useContext } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { PROSE_REMARK_PLUGINS, PROSE_REHYPE_PLUGINS, proseComponents, InlineCode } from '../../../components/markdown/proseComponents.jsx'
-import { groupLiveCodeBlocks } from '../../../components/markdown/groupLiveCodeBlocks.js'
-import LiveCodeCell from '../../../components/markdown/LiveCodeCell.jsx'
-import CodeBlock from '../../../components/blog/CodeBlock.jsx'
+import { useState, useEffect, useRef } from 'react'
+import BlogPost from '../../../components/blog/BlogPost.jsx'
 import { MARKDOWN_LESSONS } from './lessons/markdownLessonLoader.js'
 
-// Same inline-vs-block trick BlogPost.jsx uses — react-markdown's `code`
-// component gets no way to tell the two apart on its own.
-const InPreContext = createContext(false)
+// Simple read-through reference panel — a learner reads the lesson here, then
+// does the actual typing in the real HTML/CSS/JS tabs (which already have the
+// live canvas preview). No separate live-preview/run behavior needed here,
+// just the same plain markdown rendering the blog uses.
 
 function LessonList({ onSelect }) {
   return (
@@ -41,36 +38,7 @@ function LessonView({ lesson, onBack, onNext }) {
         ← All lessons
       </button>
 
-      <article className="prose-blog max-w-none">
-        <ReactMarkdown
-          remarkPlugins={PROSE_REMARK_PLUGINS}
-          rehypePlugins={PROSE_REHYPE_PLUGINS}
-          components={{
-            ...proseComponents,
-
-            code({ className, children }) {
-              const isBlock = useContext(InPreContext)
-              const lang = (className || '').replace('language-', '')
-              const codeStr = String(children).replace(/\n$/, '')
-
-              if (!isBlock) return <InlineCode>{codeStr}</InlineCode>
-
-              if (lang === 'oc-live-group') {
-                const group = JSON.parse(codeStr)
-                return <LiveCodeCell html={group.html} css={group.css} js={group.js} />
-              }
-
-              return <CodeBlock language={lang} code={codeStr} cellIndex={0} />
-            },
-
-            pre({ children }) {
-              return <InPreContext.Provider value={true}>{children}</InPreContext.Provider>
-            },
-          }}
-        >
-          {groupLiveCodeBlocks(lesson.content)}
-        </ReactMarkdown>
-      </article>
+      <BlogPost content={lesson.content} />
 
       <div className="mt-10 pt-6 border-t border-slate-700/50 flex items-center justify-between">
         <button
