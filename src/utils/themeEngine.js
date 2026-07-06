@@ -197,21 +197,28 @@ export function extractThemeColors(themeDef) {
   };
 }
 
-export function generateThemeStyleString(colors, isDefault = false) {
+export function generateThemeStyleString(colors, forceLight = false) {
   if (!colors) return '';
-  const selector = isDefault ? ':root' : '.dark';
-  let css = `${selector} {\n`;
+  // Always write both selectors so switching themes never leaves residual vars
+  // from the other scope. The active scope gets the theme's vars; the inactive
+  // scope gets an explicit empty block that resets any previous values.
+  let vars = '';
   Object.keys(colors.slate).forEach(shade => {
-    css += `  --tw-custom-slate-${shade}: ${colors.slate[shade]};\n`;
+    vars += `  --tw-custom-slate-${shade}: ${colors.slate[shade]};\n`;
   });
   Object.keys(colors.sky).forEach(shade => {
-    css += `  --tw-custom-sky-${shade}: ${colors.sky[shade]};\n`;
+    vars += `  --tw-custom-sky-${shade}: ${colors.sky[shade]};\n`;
   });
   if (colors.brand) {
     Object.keys(colors.brand).forEach(shade => {
-      css += `  --tw-custom-brand-${shade}: ${colors.brand[shade]};\n`;
+      vars += `  --tw-custom-brand-${shade}: ${colors.brand[shade]};\n`;
     });
   }
-  css += '}\n';
-  return css;
+  if (forceLight) {
+    // Apply to :root so vars are active without a .dark class
+    return `:root {\n${vars}}\n.dark {}\n`;
+  } else {
+    // Apply to .dark; clear :root so vue-light vars don't bleed through
+    return `:root {}\n.dark {\n${vars}}\n`;
+  }
 }

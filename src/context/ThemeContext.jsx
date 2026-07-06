@@ -17,7 +17,8 @@ export function ThemeProvider({ children }) {
   const setStudioTheme = useCallback((newTheme) => {
     setStudioThemeState(newTheme);
     localStorage.setItem('studio_theme', newTheme);
-    if (newTheme === 'light') {
+    const themeDef = STUDIO_THEMES[newTheme];
+    if (newTheme === 'light' || themeDef?.forceLight) {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('oc-theme', 'light');
     } else {
@@ -53,7 +54,8 @@ export function ThemeProvider({ children }) {
     // Generate .dark scoped variables
     if (themeDef) {
       const customColors = extractThemeColors(themeDef);
-      const cssString = generateThemeStyleString(customColors);
+      // forceLight themes remove the 'dark' class, so CSS vars must target :root
+      const cssString = generateThemeStyleString(customColors, !!themeDef.forceLight);
       
       let styleEl = document.getElementById('oc-dynamic-theme-styles');
       if (!styleEl) {
