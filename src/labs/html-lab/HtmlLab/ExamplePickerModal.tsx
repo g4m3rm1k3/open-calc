@@ -1,13 +1,14 @@
 import styles from "./HtmlLab.module.css";
-import { EXAMPLES } from "./exampleGallery";
 import type { Example } from "./types";
 
 interface Props {
+  items: Example[];
+  title: string;
   onSelect: (ex: Example) => void;
   onClose: () => void;
 }
 
-export default function ExamplePickerModal({ onSelect, onClose }: Props) {
+export default function ExamplePickerModal({ items, title, onSelect, onClose }: Props) {
   return (
     <div
       className={styles.exPickerOverlay}
@@ -15,11 +16,11 @@ export default function ExamplePickerModal({ onSelect, onClose }: Props) {
     >
       <div className={styles.exPickerBox}>
         <div className={styles.exPickerHeader}>
-          <span>Choose an Example Project</span>
+          <span>{title}</span>
           <button className={styles.exPickerClose} onClick={onClose}>✕</button>
         </div>
         <div className={styles.exPickerGrid}>
-          {EXAMPLES.map((ex) => (
+          {items.map((ex) => (
             <button
               key={ex.id}
               className={styles.exPickerCard}

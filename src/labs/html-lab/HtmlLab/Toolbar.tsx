@@ -18,6 +18,7 @@ interface Props {
   canUndo: boolean;
   onBack?: () => void;
   onLoadExample: () => void;
+  onLoadStarter: () => void;
 }
 
 export default function Toolbar({
@@ -38,6 +39,7 @@ export default function Toolbar({
   canUndo,
   onBack,
   onLoadExample,
+  onLoadStarter,
 }: Props) {
   return (
     <div className={styles.toolbar}>
@@ -138,6 +140,14 @@ export default function Toolbar({
       </button>
 
       <div className={styles.toolbarSep} />
+
+      <button
+        className={`${styles.tbBtn} ${styles.tbBtnStarter}`}
+        onClick={onLoadStarter}
+        title="Load a bare-bones starter file for one tool or technique"
+      >
+        🧩 Starter Files
+      </button>
 
       <button
         className={`${styles.tbBtn} ${styles.tbBtnExample}`}

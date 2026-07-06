@@ -1,7 +1,7 @@
 import type { LabElement, BodyStyles, JsFile, MultiPageData, SinglePageData, ExampleData, Example } from "./types";
 import { generateExampleProject } from "./exampleProject";
 
-function el(
+export function el(
   id: string,
   tag: string,
   parentId: string | null,

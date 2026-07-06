@@ -488,7 +488,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
             className={styles.previewFrame}
             srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, mainJsCode(state.jsFiles), [])}
             title="Preview"
-            sandbox="allow-scripts"
+            sandbox="allow-scripts allow-forms"
           />
         ) : (
           <>

@@ -7,6 +7,7 @@ import ConfirmDialog, { shouldSkip } from "./ConfirmDialog";
 import ExamplePickerModal from "./ExamplePickerModal";
 import TableBuilderModal from "./TableBuilderModal";
 import { EXAMPLES } from "./exampleGallery";
+import { STARTERS } from "./starterGallery";
 import { labReducer, initialState, inferBodyTheme, jsFilesFromLegacy, mainJsCode, buildJsBundle, withMainJsCode } from "./labReducer";
 import { hasJsx, transpileBundle } from "./jsxTranspile";
 import { detectComponents, buildThemeUpdates } from "./componentLibrary";
@@ -57,6 +58,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
     "--hl-accent-strong": C.blue,
     "--hl-accent-bg":    C.blueBg,
     "--hl-keyword":      C.teal,
+    "--hl-keyword-bg":   C.tealBg,
     "--hl-string":       C.amber,
     "--hl-string-bg":    C.amberBg,
     "--hl-accent2":      C.purple,
@@ -88,6 +90,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
   const [previewMode, setPreviewMode]           = useState<boolean>(false);
   const [confirmDialog, setConfirmDialog]       = useState<ConfirmState | null>(null);
   const [showExamplePicker, setShowExamplePicker] = useState<boolean>(false);
+  const [showStarterPicker, setShowStarterPicker] = useState<boolean>(false);
   const [showTableBuilder, setShowTableBuilder] = useState<boolean>(false);
 
   const matchedComponents = useMemo(() => {
@@ -343,6 +346,8 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
       )}
       {showExamplePicker && (
         <ExamplePickerModal
+          items={EXAMPLES}
+          title="Choose an Example Project"
           onSelect={async (ex) => {
             setShowExamplePicker(false);
             const ok = await askConfirm("load_example", `Load "${ex.name}"? This will replace your current canvas.`);
@@ -352,6 +357,21 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
             }
           }}
           onClose={() => setShowExamplePicker(false)}
+        />
+      )}
+      {showStarterPicker && (
+        <ExamplePickerModal
+          items={STARTERS}
+          title="Choose a Starter File"
+          onSelect={async (ex) => {
+            setShowStarterPicker(false);
+            const ok = await askConfirm("load_starter", `Load "${ex.name}" starter? This will replace your current canvas.`);
+            if (ok) {
+              const data = ex.generate();
+              dispatch({ type: "LOAD_EXAMPLE", payload: data });
+            }
+          }}
+          onClose={() => setShowStarterPicker(false)}
         />
       )}
       {showTableBuilder && (
@@ -402,6 +422,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
         canUndo={state.history.length > 0}
         onBack={onBack}
         onLoadExample={() => setShowExamplePicker(true)}
+        onLoadStarter={() => setShowStarterPicker(true)}
       />
 
       {state.mode === "multi" && (
@@ -484,7 +505,12 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
               className={styles.previewFrame}
               srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, transpiledJs.code, previewCdnTags)}
               title="Preview"
-              sandbox="allow-scripts"
+              // allow-forms: without it, a <form>'s submit event never fires
+              // in a sandboxed iframe at all (not even to let preventDefault
+              // cancel it) — the browser blocks the submission algorithm
+              // before dispatching the event. Still no allow-same-origin/
+              // allow-top-navigation, so this can't escape the sandbox.
+              sandbox="allow-scripts allow-forms"
             />
           )
         ) : (
