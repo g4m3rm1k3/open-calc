@@ -401,4 +401,94 @@ export function setupOpenCalcMonaco(monaco) {
       ],
     },
   });
+
+  // Monaco's own TypeScript defaults never set `jsx` at all (confirmed
+  // live: getCompilerOptions() returns only { allowNonTsExtensions, target }
+  // before this runs). That was invisible as long as every JS/TS file in
+  // HTML Lab was an anonymous, path-less Monaco model — but the moment a
+  // file gets a real `.tsx` path (see CodePanel.tsx's per-file model fix),
+  // TypeScript correctly starts enforcing the flag it was always missing:
+  // "Cannot use JSX unless the '--jsx' flag is provided." `JsxEmit.React`
+  // matches this project's actual Babel transform (jsxTranspile.ts uses
+  // the React preset's classic runtime, not the newer automatic runtime).
+  monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+    ...monaco.languages.typescript.typescriptDefaults.getCompilerOptions(),
+    jsx: monaco.languages.typescript.JsxEmit.React,
+  });
+
+  // HTML Lab loads React/ReactDOM as global UMD scripts (see
+  // cdnLibraries.ts's reactCdnTags) — there's no `import React from 'react'`
+  // anywhere for Monaco to resolve. The real @types/react package (already
+  // a devDependency) is written for real `import` usage and pulls in a
+  // ~22,000-line `csstype` dependency; loading all of that into the
+  // in-browser TS worker is a real perf risk for a live-typing editor. This
+  // is a small, hand-written stand-in instead: real generics for the hooks
+  // this app's lessons actually use (confirmed live: a plain `React: any`
+  // stub breaks `React.useState<T>(...)` — "Untyped function calls may not
+  // accept type arguments" — since calling an `any`-typed function can't
+  // take explicit generics), everything else left as loosely-typed `any`.
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(
+    `
+    type SetStateAction<S> = S | ((prevState: S) => S);
+    type Dispatch<A> = (value: A) => void;
+    type EffectCallback = () => void | (() => void);
+    type DependencyList = readonly unknown[];
+
+    declare namespace React {
+      function useState<S>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>];
+      function useEffect(effect: EffectCallback, deps?: DependencyList): void;
+      function useMemo<T>(factory: () => T, deps: DependencyList): T;
+      function useCallback<T extends (...args: any[]) => any>(callback: T, deps: DependencyList): T;
+      function useRef<T>(initialValue: T): { current: T };
+      function useReducer<S, A>(reducer: (state: S, action: A) => S, initialState: S): [S, Dispatch<A>];
+      interface Context<T> {
+        Provider: (props: { value: T; children?: any }) => any;
+        Consumer: (props: { children: (value: T) => any }) => any;
+      }
+      function createContext<T>(defaultValue: T): Context<T>;
+      function useContext<T>(context: Context<T>): T;
+      function memo<T>(component: T): T;
+      function createElement(...args: any[]): any;
+      const Fragment: any;
+      class Component<P = {}, S = {}> {
+        props: P;
+        state: S;
+        constructor(props: P);
+        setState(state: Partial<S> | ((prevState: S, props: P) => Partial<S>)): void;
+        render(): any;
+      }
+    }
+
+    declare namespace ReactDOM {
+      interface Root {
+        render(children: any): void;
+        unmount(): void;
+      }
+      function createRoot(container: Element | DocumentFragment, options?: any): Root;
+    }
+
+    // Real @types/react makes "key" (and "ref") valid on *any* JSX element
+    // regardless of the component's own declared props, via this exact
+    // global interface. Without it (confirmed live), passing a totally
+    // idiomatic <Component key={...} /> fails: "Property 'key' does not
+    // exist on type '...Props'." — a real, standard React pattern (lesson
+    // 22 uses it to force a component to remount) flagged as an error.
+    declare namespace JSX {
+      interface IntrinsicAttributes {
+        key?: string | number | null;
+      }
+      // Real @types/react uses this exact interface to tell TypeScript
+      // that nested JSX content (<Foo>content</Foo>) should satisfy
+      // whichever prop is named "children" — without it (confirmed live),
+      // wrapping a component with a required "children" prop in JSX
+      // (lesson 27's <CalculatorErrorBoundary>...</CalculatorErrorBoundary>)
+      // fails: "Property 'children' is missing," because TypeScript has
+      // no rule connecting nested JSX to any prop at all.
+      interface ElementChildrenAttribute {
+        children: {};
+      }
+    }
+    `,
+    "file:///react-globals.d.ts",
+  );
 }

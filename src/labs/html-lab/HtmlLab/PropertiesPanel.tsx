@@ -797,6 +797,61 @@ function JavascriptTools({ element, allElements, javascript = "", onInsertJavasc
   // case, not a special one.
   const targetOptions = (allElements && allElements.length > 0 ? allElements : [element]).filter((el) => el.tag !== "body");
 
+  // "Grouped content" has no separate concept of its own in this project's
+  // data model — an element with two or more direct children already *is*
+  // a group, exactly the way a <ul> and its <li>s, or a <div> and its card
+  // children, already relate to each other via parentId. Reusing that
+  // existing relationship means this needs no new state at all: selecting
+  // any such container is what makes the option appear.
+  const directChildren = (allElements || []).filter((el) => el.parentId === element.id);
+
+  function addDragAndDropReordering(): void {
+    if (!varName || !selectorLiteral) return;
+    const code = [
+      "(() => {",
+      `  const container = document.querySelector(${selectorLiteral});`,
+      "  if (!container) return;",
+      "",
+      "  Array.from(container.children).forEach((child) => {",
+      "    child.draggable = true;",
+      "  });",
+      "",
+      "  let draggedElement = null;",
+      "",
+      "  container.addEventListener('dragstart', (event) => {",
+      "    draggedElement = event.target;",
+      "  });",
+      "",
+      "  container.addEventListener('dragover', (event) => {",
+      "    event.preventDefault();",
+      "  });",
+      "",
+      "  container.addEventListener('drop', (event) => {",
+      "    event.preventDefault();",
+      "    if (!draggedElement) return;",
+      "",
+      "    let target = event.target;",
+      "    while (target && target.parentElement !== container) {",
+      "      target = target.parentElement;",
+      "    }",
+      "    if (!target || target === draggedElement) return;",
+      "",
+      "    const children = Array.from(container.children);",
+      "    const draggedIndex = children.indexOf(draggedElement);",
+      "    const targetIndex = children.indexOf(target);",
+      "    if (draggedIndex < targetIndex) {",
+      "      target.after(draggedElement);",
+      "    } else {",
+      "      target.before(draggedElement);",
+      "    }",
+      "",
+      "    draggedElement = null;",
+      "  });",
+      "})();",
+    ].join("\n");
+    onInsertJavascript(code);
+  }
+
   const [eventType, setEventType] = useState(EVENT_TYPES[0].value);
   const [handlerName, setHandlerName] = useState(() => defaultHandlerName(EVENT_TYPES[0].value, varName || "element"));
   const [actionType, setActionType] = useState<HandlerActionType>("none");
@@ -985,6 +1040,23 @@ function JavascriptTools({ element, allElements, javascript = "", onInsertJavasc
               ? `Inserts a handler that toggles the class "${actionClassName.trim()}" on the target.`
               : "Type a class name above to toggle on the target element.")}
           </div>
+
+          {directChildren.length >= 2 && (
+            <>
+              <div className={styles.jsPresetsLabel} style={{ marginTop: 6 }}>Drag and Drop</div>
+              <div className={styles.jsLinked} style={{ color: "var(--hl-hint)" }}>
+                {directChildren.length} direct children found inside this element — enable dragging to reorder them.
+              </div>
+              <button
+                type="button"
+                className={styles.jsToolBtn}
+                style={{ width: "100%", marginTop: 4 }}
+                onClick={addDragAndDropReordering}
+              >
+                Enable Drag &amp; Drop Reordering
+              </button>
+            </>
+          )}
         </>
       )}
     </div>

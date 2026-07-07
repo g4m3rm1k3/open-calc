@@ -863,6 +863,8 @@ export default function CodePanel({
   const monacoRef      = useRef<MonacoApi | null>(null);
   const decorationsRef = useRef<string[]>([]);
   const isFocused      = useRef(false);
+  const extraLibsRef   = useRef<Map<string, { dispose: () => void }>>(new Map());
+  const jsModelKeysRef = useRef<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState<TabKey>("html");
   const [renamingFileId, setRenamingFileId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState("");
@@ -909,6 +911,73 @@ export default function CodePanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jsJumpToken]);
 
+  // A real, unique Monaco model path per JS/TS file — keyed by id (stable
+  // across a rename) *and* name (so a rename, which changes the file's
+  // extension, gets a genuinely different path and is re-classified by
+  // Monaco instead of keeping its old language). Without a real path here,
+  // the actively-edited file is an anonymous model with no extension at
+  // all, which — verified live — makes cross-file type lookups (below)
+  // corrupt that file's own JSX parsing. HTML and CSS stay on the old
+  // anonymous single-model behavior; they're single-file already.
+  function jsFilePath(file: JsFile): string {
+    return `file:///js/${file.id}/${file.name}`;
+  }
+
+  // HTML Lab's JS/TS files have no real import/export — every file
+  // concatenates into one shared runtime scope (see buildJsBundle). Monaco
+  // doesn't know that: each file is checked as an isolated model, so a
+  // component defined in Display.tsx and used from Calculator.tsx is
+  // flagged "Cannot find name 'Display'" even though the code is correct
+  // and runs fine. addExtraLib feeds every *other* file's source to the
+  // TypeScript language service as an ambient script (no import/export
+  // means TS treats it as contributing to the global scope, matching the
+  // real concatenated bundle) so cross-file references resolve for both
+  // diagnostics and autocomplete. typescriptDefaults only — also
+  // registering to javascriptDefaults (verified live) corrupts the active
+  // file's own JSX parsing.
+  function syncCrossFileLibs(monaco: MonacoApi): void {
+    const otherFileIds = new Set(jsFiles.filter((f) => f.id !== activeJsFile?.id).map((f) => f.id));
+    for (const [id, disposable] of extraLibsRef.current) {
+      if (!otherFileIds.has(id)) {
+        disposable.dispose();
+        extraLibsRef.current.delete(id);
+      }
+    }
+    for (const file of jsFiles) {
+      if (file.id === activeJsFile?.id) continue;
+      // Re-registering the same uri updates it in place; disposing the
+      // previous disposable first (verified live) leaves the TypeScript
+      // worker's extra-lib versioning inconsistent and corrupts parsing.
+      extraLibsRef.current.set(file.id, monaco.languages.typescript.typescriptDefaults.addExtraLib(file.code, jsFilePath(file)));
+    }
+  }
+
+  useEffect(() => {
+    const monaco = monacoRef.current;
+    if (!monaco) return;
+    syncCrossFileLibs(monaco);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jsFiles, activeJsFileId]);
+
+  // Dispose the real Monaco model behind a file once that exact id+name
+  // combination is gone — covers delete (the id disappears), rename (the
+  // old id+name pair disappears, replaced by a new one — see jsFilePath),
+  // and a fresh "+ New" project replacing jsFiles wholesale. Without this,
+  // renamed/deleted files' models pile up in Monaco's global registry for
+  // the rest of the session.
+  useEffect(() => {
+    const monaco = monacoRef.current;
+    if (!monaco) return;
+    const currentKeys = new Set(jsFiles.map((f) => jsFilePath(f)));
+    for (const oldKey of jsModelKeysRef.current) {
+      if (!currentKeys.has(oldKey)) {
+        monaco.editor.getModel(monaco.Uri.parse(oldKey))?.dispose();
+      }
+    }
+    jsModelKeysRef.current = currentKeys;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jsFiles]);
+
   function applyDecorations(): void {
     const editor = editorRef.current;
     const monaco = monacoRef.current;
@@ -948,6 +1017,7 @@ export default function CodePanel({
     editor.onDidFocusEditorText(() => { isFocused.current = true;  });
     editor.onDidBlurEditorText(()  => { isFocused.current = false; });
 
+    syncCrossFileLibs(monaco);
     setTimeout(applyDecorations, 0);
   };
 
@@ -1102,6 +1172,13 @@ export default function CodePanel({
             // `defaultLanguage` is only applied once, at mount, so a language
             // change needs a fresh instance to actually take effect.
             key={activeTab === "javascript" ? `javascript-${activeLanguage}` : activeTab}
+            // A real path, javascript-tab only, so each file gets its own
+            // genuinely-identified Monaco model (see jsFilePath above) —
+            // required for correct cross-file TypeScript/JSX behavior.
+            // HTML/CSS stay on the old anonymous single-model path; they
+            // aren't part of this problem and there's no reason to risk
+            // changing them.
+            path={activeTab === "javascript" && activeJsFile ? jsFilePath(activeJsFile) : undefined}
             defaultLanguage={activeLanguage ?? "html"}
             theme={monacoTheme}
             options={{
