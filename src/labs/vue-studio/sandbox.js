@@ -37,6 +37,7 @@ export const SANDBOX_HTML = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0;overflow-x:hidden}</style>
 <style id="__vue_styles__"></style>
 </head>
 <body>

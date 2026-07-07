@@ -51,7 +51,14 @@
       "Bash(git stash *)",
       "Bash(node --input-type=module --eval ' *)",
       "Bash(python3 -c ' *)",
-      "Bash(python3)"
+      "Bash(python3)",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(curl -s http://localhost:5174/lab/ts-lab)",
+      "Bash(curl -s http://localhost:5174/src/labs/ts-lab/TsLab.jsx)",
+      "Bash(curl -s \"http://localhost:5174/src/labs/ts-lab/lessons/index.js\")",
+      "Bash(curl -s http://localhost:5174/)",
+      "Bash(git pull *)"
     ]
   }
 }

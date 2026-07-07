@@ -8,7 +8,9 @@ import { SPACE_INVADERS } from './demos/space-invaders.js'
 
 const DEMOS = [SPACE_INVADERS]
 
-const LS_KEY = 'vue-studio-v1'
+// v2 intentionally busts any v1 cached state that got corrupted (demo files
+// accidentally saved to lesson slots). Students start with clean defaults.
+const LS_KEY = 'vue-studio-v2'
 
 function loadSavedFiles(milestoneId, fallback) {
   try {
@@ -21,63 +23,51 @@ function saveFiles(milestoneId, files) {
   try { localStorage.setItem(`${LS_KEY}:${milestoneId}`, JSON.stringify(files)) } catch {}
 }
 
-function loadCompletedIds() {
-  try { return new Set(JSON.parse(localStorage.getItem(`${LS_KEY}:completed`) ?? '[]')) } catch { return new Set() }
-}
-
-function markCompleted(milestoneId) {
+function getInitialMilestoneIdx() {
   try {
-    const ids = new Set(JSON.parse(localStorage.getItem(`${LS_KEY}:completed`) ?? '[]'))
-    ids.add(milestoneId)
-    localStorage.setItem(`${LS_KEY}:completed`, JSON.stringify([...ids]))
-  } catch {}
+    const n = parseInt(localStorage.getItem(`${LS_KEY}:milestone-idx`) ?? '0', 10)
+    return isNaN(n) ? 0 : Math.max(0, Math.min(MILESTONES.length - 1, n))
+  } catch { return 0 }
 }
 
 export default function VueStudio({ onBack }) {
   const { isDarkGlobal: isDark } = useGlobalTheme()
 
-  const [milestoneIdx, setMilestoneIdx] = useState(0)
+  // Persisted across sessions — user resumes the lesson they were on
+  const [milestoneIdx, setMilestoneIdx] = useState(getInitialMilestoneIdx)
   const milestone = MILESTONES[milestoneIdx]
 
   // Virtual file system: { 'src/App.vue': content, ... }
   const [files, setFiles] = useState(() => loadSavedFiles(milestone.id, milestone.files))
   const [activeFile, setActiveFile] = useState(() => Object.keys(milestone.files)[0] ?? '')
 
-  // Runtime panel state
+  // Runtime panel
   const [logs, setLogs] = useState([])
   const [componentTree, setComponentTree] = useState(null)
   const iframeRef = useRef(null)
 
-  // Concept checklist: which concepts the student has ticked
-  const [checkedConcepts, setCheckedConcepts] = useState({})
-  const [completedIds] = useState(loadCompletedIds)
-
-  // Divider widths (px)
+  // Divider widths
   const [lessonW, setLessonW] = useState(240)
-  const [runtimeW, setRuntimeW] = useState(380)
-  // When a demo is active, don't save its files over the milestone's saved state
+  const [runtimeW, setRuntimeW] = useState(560)
+
+  // When a demo is active its files must not overwrite the lesson's saved state
   const [demoActive, setDemoActive] = useState(false)
+  const [activeDemo, setActiveDemo] = useState(null)
 
-  // When milestone changes: load saved files or milestone defaults, reset logs
-  const goToMilestone = useCallback((idx) => {
-    const m = MILESTONES[idx]
-    if (!m) return
-    setDemoActive(false)          // leave demo mode before loading milestone files
-    setMilestoneIdx(idx)
-    const saved = loadSavedFiles(m.id, m.files)
-    setFiles(saved)
-    setActiveFile(Object.keys(m.files)[0] ?? '')
-    setLogs([])
-    setComponentTree(null)
-    setCheckedConcepts({})
-  }, [])
+  // If the active file was deleted, fall back to the first remaining file
+  useEffect(() => {
+    if (activeFile && !files[activeFile]) {
+      const first = Object.keys(files)[0]
+      if (first) setActiveFile(first)
+    }
+  }, [files, activeFile])
 
-  // Save files whenever they change — but NOT when a demo is loaded
+  // Persist file edits as the student types — skipped when a demo is running
   useEffect(() => {
     if (!demoActive) saveFiles(milestone.id, files)
   }, [files, milestone.id, demoActive])
 
-  // Handle messages from the iframe runtime
+  // Handle postMessage events from the iframe runtime
   useEffect(() => {
     const handler = ({ data }) => {
       if (!data?.type) return
@@ -93,7 +83,21 @@ export default function VueStudio({ onBack }) {
     return () => window.removeEventListener('message', handler)
   }, [])
 
-  // Trigger a Run — postMessage to iframe
+  // Navigate to a milestone: restore saved files or fall back to lesson defaults
+  const goToMilestone = useCallback((idx) => {
+    const m = MILESTONES[idx]
+    if (!m) return
+    try { localStorage.setItem(`${LS_KEY}:milestone-idx`, String(idx)) } catch {}
+    setDemoActive(false)
+    setActiveDemo(null)
+    setMilestoneIdx(idx)
+    const saved = loadSavedFiles(m.id, m.files)
+    setFiles(saved)
+    setActiveFile(Object.keys(m.files)[0] ?? '')
+    setLogs([])
+    setComponentTree(null)
+  }, [])
+
   const handleRun = useCallback(() => {
     setLogs([])
     setComponentTree(null)
@@ -104,9 +108,27 @@ export default function VueStudio({ onBack }) {
     setFiles(prev => ({ ...prev, [filename]: content }))
   }, [])
 
-  // Resizable divider handlers
-  // dir: 1 = drag right expands, -1 = drag right shrinks (RTL panel)
-  const startResize = useCallback((setter, getStart, min = 160, max = 600, dir = 1) => (e) => {
+  // Delete a file from the virtual filesystem (cannot delete the last file)
+  const deleteFile = useCallback((filename) => {
+    setFiles(prev => {
+      if (Object.keys(prev).length <= 1) return prev
+      const next = { ...prev }
+      delete next[filename]
+      return next
+    })
+  }, [])
+
+  // Reset all files to the lesson's original defaults (escape hatch for broken state)
+  const resetFiles = useCallback(() => {
+    const defaultFiles = milestone.files
+    setDemoActive(false)
+    setActiveDemo(null)
+    setFiles(defaultFiles)
+    setActiveFile(Object.keys(defaultFiles)[0] ?? '')
+    saveFiles(milestone.id, defaultFiles)
+  }, [milestone])
+
+  const startResize = useCallback((setter, getStart, min = 160, max = 700, dir = 1) => (e) => {
     const startX = e.clientX
     const startW = getStart()
     const overlay = document.createElement('div')
@@ -118,13 +140,22 @@ export default function VueStudio({ onBack }) {
     window.addEventListener('mouseup', onUp)
   }, [])
 
+  // Load a demo and auto-run it immediately — passes files directly so we don't
+  // wait for React state to settle before posting to the iframe
   const loadDemo = useCallback((demo) => {
-    setDemoActive(true)           // prevent demo files from being saved to milestone localStorage
+    setDemoActive(true)
+    setActiveDemo(demo)
     setFiles(demo.files)
     setActiveFile(Object.keys(demo.files)[0] ?? '')
     setLogs([])
     setComponentTree(null)
+    iframeRef.current?.contentWindow?.postMessage({ type: 'run', files: demo.files }, '*')
   }, [])
+
+  const clearDemo = useCallback(() => {
+    setActiveDemo(null)
+    goToMilestone(milestoneIdx)
+  }, [milestoneIdx, goToMilestone])
 
   const addFile = useCallback((filename) => {
     if (!filename || files[filename] !== undefined) return
@@ -143,47 +174,49 @@ export default function VueStudio({ onBack }) {
   return (
     <div style={{ display: 'flex', height: '100vh', background: bg, color: isDark ? '#f1f5f9' : '#0f172a', fontFamily: 'system-ui, sans-serif', overflow: 'hidden' }}>
 
-      {/* ── Four-panel body ──────────────────────────────────────────────── */}
+      {/* Lesson panel */}
+      <div style={{ width: lessonW, flexShrink: 0, borderRight: `1px solid ${border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <LessonPanel
+          milestoneIdx={milestoneIdx}
+          onSelectMilestone={goToMilestone}
+          onBack={onBack}
+          isDark={isDark}
+        />
+      </div>
 
-        {/* Lesson panel */}
-        <div style={{ width: lessonW, flexShrink: 0, borderRight: `1px solid ${border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <LessonPanel
-            milestoneIdx={milestoneIdx}
-            onSelectMilestone={goToMilestone}
-            onBack={onBack}
-            isDark={isDark}
-          />
-        </div>
+      <div onMouseDown={startResize(setLessonW, () => lessonW)} style={{ width: 4, cursor: 'col-resize', background: dividerColor, flexShrink: 0, opacity: 0.5 }} />
 
-        <div onMouseDown={startResize(setLessonW, () => lessonW)} style={{ width: 4, cursor: 'col-resize', background: dividerColor, flexShrink: 0, opacity: 0.5 }} />
+      {/* Code editor */}
+      <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <CodePanel
+          files={files}
+          activeFile={activeFile}
+          onActiveFileChange={setActiveFile}
+          onFileChange={updateFile}
+          onDeleteFile={deleteFile}
+          onNewFile={addFile}
+          onRun={handleRun}
+          onResetFiles={resetFiles}
+          demos={DEMOS}
+          onLoadDemo={loadDemo}
+          activeDemo={activeDemo}
+          onClearDemo={clearDemo}
+          isDark={isDark}
+        />
+      </div>
 
-        {/* Code editor */}
-        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <CodePanel
-            files={files}
-            activeFile={activeFile}
-            onActiveFileChange={setActiveFile}
-            onFileChange={updateFile}
-            onNewFile={addFile}
-            onRun={handleRun}
-            demos={DEMOS}
-            onLoadDemo={loadDemo}
-            isDark={isDark}
-          />
-        </div>
+      <div onMouseDown={startResize(setRuntimeW, () => runtimeW, 220, 700, -1)} style={{ width: 4, cursor: 'col-resize', background: dividerColor, flexShrink: 0, opacity: 0.5 }} />
 
-        <div onMouseDown={startResize(setRuntimeW, () => runtimeW, 220, 700, -1)} style={{ width: 4, cursor: 'col-resize', background: dividerColor, flexShrink: 0, opacity: 0.5 }} />
-
-        {/* Runtime panel */}
-        <div style={{ width: runtimeW, flexShrink: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <RuntimePanel
-            iframeRef={iframeRef}
-            logs={logs}
-            componentTree={componentTree}
-            onClearLogs={() => setLogs([])}
-            isDark={isDark}
-          />
-        </div>
+      {/* Runtime panel */}
+      <div style={{ width: runtimeW, flexShrink: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <RuntimePanel
+          iframeRef={iframeRef}
+          logs={logs}
+          componentTree={componentTree}
+          onClearLogs={() => setLogs([])}
+          isDark={isDark}
+        />
+      </div>
     </div>
   )
 }

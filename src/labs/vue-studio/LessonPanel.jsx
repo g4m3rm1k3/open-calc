@@ -20,6 +20,19 @@ const SERIES = [
   },
 ]
 
+const PANEL_LS_KEY = 'vue-studio-panel-v1'
+
+function loadPanelState() {
+  try { return JSON.parse(localStorage.getItem(PANEL_LS_KEY) ?? 'null') ?? {} } catch { return {} }
+}
+
+function savePanelState(patch) {
+  try {
+    const prev = loadPanelState()
+    localStorage.setItem(PANEL_LS_KEY, JSON.stringify({ ...prev, ...patch }))
+  } catch {}
+}
+
 // ── Series picker ────────────────────────────────────────────────────────────
 
 function SeriesList({ onSelect, onBack }) {
@@ -151,10 +164,12 @@ function LessonView({ lesson, lessons, lessonIndex, seriesLabel, onBackToList, o
 // ── Root panel ───────────────────────────────────────────────────────────────
 
 export default function LessonPanel({ milestoneIdx, onSelectMilestone, onBack }) {
-  // Three-level nav: 'series' → 'list' → 'content'
-  const [view, setView]           = useState('series')
-  const [seriesId, setSeriesId]   = useState(null)
-  const [lessonIdx, setLessonIdx] = useState(0)
+  // Restore navigation state from last session
+  const saved = loadPanelState()
+
+  const [view, setView]         = useState(saved.view     ?? 'series')
+  const [seriesId, setSeriesId] = useState(saved.seriesId ?? null)
+  const [lessonIdx, setLessonIdx] = useState(saved.lessonIdx ?? 0)
   const scrollRef = useRef(null)
 
   const activeSeries = SERIES.find(s => s.id === seriesId) ?? null
@@ -169,14 +184,30 @@ export default function LessonPanel({ milestoneIdx, onSelectMilestone, onBack })
     setSeriesId(id)
     setLessonIdx(0)
     setView('list')
+    savePanelState({ seriesId: id, lessonIdx: 0, view: 'list' })
   }
 
   function openLesson(idx) {
     setLessonIdx(idx)
     setView('content')
-    // Sync VueStudio milestone only for the intro series (drives the code panel)
+    savePanelState({ lessonIdx: idx, view: 'content', seriesId })
+    // Sync code panel for the intro series (each lesson has its own starter files)
     if (seriesId === 'intro') onSelectMilestone(idx)
   }
+
+  function backToList() {
+    setView('list')
+    savePanelState({ view: 'list', seriesId, lessonIdx })
+  }
+
+  function backToSeries() {
+    setView('series')
+    savePanelState({ view: 'series', seriesId, lessonIdx })
+  }
+
+  // For the intro series, the active-lesson highlight tracks milestoneIdx (the
+  // code panel's authoritative state) so they never fall out of sync.
+  const activeLessonHighlight = seriesId === 'intro' ? milestoneIdx : lessonIdx
 
   return (
     <div ref={scrollRef} className="h-full overflow-y-auto bg-[#0f1729] text-slate-100">
@@ -187,9 +218,9 @@ export default function LessonPanel({ milestoneIdx, onSelectMilestone, onBack })
       {view === 'list' && activeSeries && (
         <LessonList
           series={activeSeries}
-          activeLessonIdx={lessonIdx}
+          activeLessonIdx={activeLessonHighlight}
           onSelect={openLesson}
-          onBack={() => setView('series')}
+          onBack={backToSeries}
         />
       )}
 
@@ -199,7 +230,7 @@ export default function LessonPanel({ milestoneIdx, onSelectMilestone, onBack })
           lessons={activeSeries.lessons}
           lessonIndex={lessonIdx}
           seriesLabel={activeSeries.label}
-          onBackToList={() => setView('list')}
+          onBackToList={backToList}
           onSelectLesson={openLesson}
         />
       )}
