@@ -34,6 +34,7 @@ export default function TsLab({ onBack }) {
   const [code, setCode] = useState(() => loadCode(lesson.id, lesson.starter))
   const [entries, setEntries] = useState([])
   const [consoleH, setConsoleH] = useState(180)
+  const [checkResult, setCheckResult] = useState(null) // { pass, message } | null
 
   // Column widths — mission is fixed, code takes remaining, preview is resizable
   const [missionW, setMissionW] = useState(310)
@@ -82,8 +83,23 @@ export default function TsLab({ onBack }) {
 
   const handleRun = useCallback(() => {
     setEntries([])
+    setCheckResult(null)
     iframeRef.current?.contentWindow?.postMessage({ type: 'run', code }, '*')
   }, [code])
+
+  const handleCheck = useCallback(() => {
+    if (!lesson.verify) return
+    try {
+      const doc = iframeRef.current?.contentDocument
+      if (!doc || doc.body.children.length === 0) {
+        setCheckResult({ pass: false, message: 'Run your code first, then hit Check' })
+        return
+      }
+      setCheckResult(lesson.verify(doc))
+    } catch (e) {
+      setCheckResult({ pass: false, message: 'Could not check — run your code first' })
+    }
+  }, [lesson])
 
   const goToLesson = useCallback((idx) => {
     const l = LESSONS[idx]
@@ -176,6 +192,20 @@ export default function TsLab({ onBack }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 10, color: isDark ? '#475569' : '#94a3b8' }}>⌘↵</span>
+            {lesson.verify && (
+              <button
+                onClick={handleCheck}
+                style={{
+                  padding: '5px 14px', borderRadius: 6, fontSize: 12, fontWeight: 700,
+                  cursor: 'pointer', letterSpacing: '0.03em',
+                  border: `1px solid ${checkResult ? (checkResult.pass ? '#10b981' : '#f59e0b') : (isDark ? '#334155' : '#e2e8f0')}`,
+                  background: checkResult ? (checkResult.pass ? '#dcfce7' : '#fef3c7') : 'none',
+                  color: checkResult ? (checkResult.pass ? '#166534' : '#92400e') : (isDark ? '#64748b' : '#94a3b8'),
+                }}
+              >
+                {checkResult ? (checkResult.pass ? '✓ Passed' : '✗ Check') : '✓ Check'}
+              </button>
+            )}
             <button
               onClick={handleRun}
               style={{
@@ -188,6 +218,21 @@ export default function TsLab({ onBack }) {
             </button>
           </div>
         </div>
+
+        {/* Check result banner */}
+        {checkResult && (
+          <div style={{
+            padding: '8px 14px', fontSize: 12, flexShrink: 0, fontFamily: 'system-ui',
+            background: checkResult.pass ? (isDark ? 'rgba(16,185,129,0.1)' : '#dcfce7') : (isDark ? 'rgba(245,158,11,0.1)' : '#fef3c7'),
+            borderBottom: `1px solid ${checkResult.pass ? (isDark ? '#064e3b' : '#bbf7d0') : (isDark ? '#78350f' : '#fcd34d')}`,
+            color: checkResult.pass ? (isDark ? '#34d399' : '#166534') : (isDark ? '#fcd34d' : '#92400e'),
+            display: 'flex', alignItems: 'center', gap: 8,
+          }}>
+            <span style={{ fontWeight: 700 }}>{checkResult.pass ? '✓' : '→'}</span>
+            <span>{checkResult.message}</span>
+            <button onClick={() => setCheckResult(null)} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 14, padding: '0 2px', lineHeight: 1 }}>×</button>
+          </div>
+        )}
 
         {/* Monaco editor */}
         <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>

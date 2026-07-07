@@ -4,6 +4,17 @@ export default {
   phase: 2,
   phaseLabel: 'Phase 2 — Make it interactive',
   tags: ['state', 'render function', 'architecture'],
+
+  verify(doc) {
+    const hasNav = doc.querySelector('.nav, nav') !== null
+    if (!hasNav) return { pass: false, message: 'Add a <nav class="nav"> to the feed view — every view should share the same nav bar' }
+    const cards = doc.querySelectorAll('.card, [data-id]')
+    if (cards.length < 5) return { pass: false, message: `Only ${cards.length} post cards found — the feed should show at least 5 posts` }
+    const win = doc.defaultView
+    const hasState = win && (win.state !== undefined || doc.querySelector('[data-view]') !== null)
+    if (!hasState) return { pass: false, message: 'No state object or data-view attribute found — make sure your state is defined at the top level' }
+    return { pass: true, message: 'State pattern working — feed and detail views both render from state!' }
+  },
   starter: `// OpenSocial — Lesson 4
 // The pattern every UI framework is built on: state + render()
 
