@@ -166,3 +166,137 @@ describe("elementsToCss / applyCssToElements — real incident: CSS tab editing 
     expect(customCss).toContain(".my-rule");
   });
 });
+
+describe("applyCssToElements — real incident: pasted class/id/tag CSS never reached the Properties Panel", () => {
+  // User report: pasting a stylesheet with plain selectors like ".card { ... }"
+  // or "#header { ... }" into the CSS tab had no effect on the canvas, and the
+  // Properties Panel had nothing to show or let you change for it — the
+  // matching elements were plainly named div class="card" in the markup, but
+  // applyCssToElements only ever recognized its own [data-lab-id="..."] shape.
+  // A hand-typed simple selector needs the same "bake into this element's
+  // styles" treatment applyImportedCssToDoc already gives a freshly-imported
+  // HTML document — just matched against LabElement[] instead of a real DOM.
+  function elements(): LabElement[] {
+    return [
+      { id: "e1", tag: "div", parentId: null, order: 0, content: "", attrs: { id: "header", class: "card" }, styles: {}, mediaQueries: [] },
+      { id: "e2", tag: "p", parentId: "e1", order: 0, content: "hi", attrs: { id: "", class: "" }, styles: {}, mediaQueries: [] },
+    ];
+  }
+
+  it("bakes a plain .class selector's styles into the matching element", () => {
+    const { elements: updated } = applyCssToElements(".card { padding: 16px; }", elements());
+    expect(updated.find((e) => e.id === "e1")?.styles.padding).toBe("16px");
+  });
+
+  it("bakes a plain #id selector's styles into the matching element", () => {
+    const { elements: updated } = applyCssToElements("#header { border: 1px solid black; }", elements());
+    expect(updated.find((e) => e.id === "e1")?.styles.border).toBe("1px solid black");
+  });
+
+  it("bakes a bare tag selector's styles into every matching element", () => {
+    const { elements: updated } = applyCssToElements("p { margin: 0; }", elements());
+    expect(updated.find((e) => e.id === "e2")?.styles.margin).toBe("0");
+  });
+
+  it("leaves a compound selector (.card.featured) as live customCss, not baked", () => {
+    const { elements: updated, customCss } = applyCssToElements(".card.featured { color: red; }", elements());
+    expect(updated.find((e) => e.id === "e1")?.styles.color).toBeUndefined();
+    expect(customCss).toContain(".card.featured");
+  });
+
+  it("leaves a class referenced by this project's own JS (classList.toggle) as live customCss, not baked", () => {
+    const javascript = `document.querySelector(".card").classList.toggle("card");`;
+    const { elements: updated, customCss } = applyCssToElements(".card { padding: 16px; }", elements(), javascript);
+    expect(updated.find((e) => e.id === "e1")?.styles.padding).toBeUndefined();
+    expect(customCss).toContain(".card");
+  });
+
+  it("lets a [data-lab-id] block (a Properties Panel edit) win over a same-property class rule", () => {
+    const withClassRule = ".card { padding: 16px; }\n\n[data-lab-id=\"e1\"] {\n  padding: 32px;\n}";
+    const { elements: updated } = applyCssToElements(withClassRule, elements());
+    expect(updated.find((e) => e.id === "e1")?.styles.padding).toBe("32px");
+  });
+
+  it("survives a full edit round-trip without duplicating the baked rule as leftover text", () => {
+    const els = elements();
+    let customCss = ".card { padding: 16px; }";
+    let currentElements = els;
+    for (let i = 0; i < 5; i++) {
+      const generated = elementsToCss(currentElements, customCss, {});
+      const applied = applyCssToElements(generated, currentElements);
+      customCss = applied.customCss;
+      currentElements = applied.elements;
+    }
+    expect(customCss).not.toContain(".card");
+    expect(currentElements.find((e) => e.id === "e1")?.styles.padding).toBe("16px");
+  });
+
+  it("real incident: a .hidden class defined before any JS references it stays live, not baked, so a toggle added later still works", () => {
+    const els = [
+      { id: "panel", tag: "div", parentId: null, order: 0, content: "", attrs: { id: "panel", class: "hidden" }, styles: {}, mediaQueries: [] },
+    ];
+    // Written in the natural order: define the class first, wire up the
+    // toggle afterward — no javascript exists yet at this exact point.
+    const { elements: afterCssOnly, customCss } = applyCssToElements(".hidden { display: none; }", els, "");
+    expect(afterCssOnly.find((e) => e.id === "panel")?.styles.display).toBeUndefined();
+    expect(customCss).toContain(".hidden");
+
+    // Now the JS is added, and the CSS is reprocessed (as the real app does
+    // on every edit) — the class must still be live, not retroactively
+    // baked just because it's now also mentioned by the JS.
+    const javascript = `document.getElementById("btn").addEventListener("click", () => { document.getElementById("panel").classList.toggle("hidden"); });`;
+    const { elements: afterBoth } = applyCssToElements(".hidden { display: none; }", els, javascript);
+    expect(afterBoth.find((e) => e.id === "panel")?.styles.display).toBeUndefined();
+  });
+
+  it("still bakes a plain class rule that is not a visibility toggle (padding, color, etc.)", () => {
+    const els = [
+      { id: "e1", tag: "div", parentId: null, order: 0, content: "", attrs: { id: "", class: "card" }, styles: {}, mediaQueries: [] },
+    ];
+    const { elements: updated } = applyCssToElements(".card { padding: 16px; color: red; }", els);
+    expect(updated.find((e) => e.id === "e1")?.styles.padding).toBe("16px");
+    expect(updated.find((e) => e.id === "e1")?.styles.color).toBe("red");
+  });
+});
+
+describe("elementsToCss — real incident: a hand-typed :root block got silently relocated", () => {
+  // User report: typing a CSS variable block above the reset comment, the
+  // next render moved it below the reset and every generated rule instead —
+  // elementsToCss always rebuilt custom CSS at the very end, with no regard
+  // for where the user had actually placed it. Variables still resolve
+  // correctly wherever they end up (CSS doesn't require "declare before use"
+  // the way JS does) — this is about not surprising the user by moving code
+  // they placed on purpose, not a functional break.
+  function elements(): LabElement[] {
+    return [{ id: "e1", tag: "div", parentId: null, order: 0, content: "", attrs: { id: "", class: "" }, styles: {}, mediaQueries: [] }];
+  }
+
+  it("places a :root block before the reset, not after", () => {
+    const generated = elementsToCss(elements(), ":root {\n  --accent: #6366f1;\n}", {});
+    const rootIndex = generated.indexOf(":root");
+    const resetIndex = generated.indexOf("/* Reset */");
+    expect(rootIndex).toBeGreaterThanOrEqual(0);
+    expect(resetIndex).toBeGreaterThan(rootIndex);
+  });
+
+  it("keeps a non-:root custom rule at the end, acting as an override, unaffected by the hoist", () => {
+    const generated = elementsToCss(elements(), ":root {\n  --accent: #6366f1;\n}\n\n.my-rule { color: red; }", {});
+    const rootIndex = generated.indexOf(":root");
+    const customRuleIndex = generated.indexOf(".my-rule");
+    const lastElementRuleIndex = generated.lastIndexOf('[data-lab-id="e1"]');
+    expect(customRuleIndex).toBeGreaterThan(lastElementRuleIndex);
+    expect(rootIndex).toBeLessThan(customRuleIndex);
+  });
+
+  it("survives a full edit round-trip without duplicating or losing the :root block", () => {
+    const els = elements();
+    let customCss = ":root {\n  --accent: #6366f1;\n}";
+    for (let i = 0; i < 5; i++) {
+      const generated = elementsToCss(els, customCss, {});
+      customCss = applyCssToElements(generated, els).customCss;
+    }
+    const finalGenerated = elementsToCss(els, customCss, {});
+    expect(finalGenerated.match(/:root\s*\{/g)?.length ?? 0).toBe(1);
+    expect(finalGenerated).toContain("--accent");
+  });
+});

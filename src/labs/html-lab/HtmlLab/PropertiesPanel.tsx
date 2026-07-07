@@ -218,6 +218,12 @@ function MultiSelectPanel({ count, element, onChange, style }: MultiSelectPanelP
 
 interface PropsPanelProps {
   element: LabElement | null;
+  /** Every element in the project, selected or not — lets the Event
+   *  Handlers tool target an element other than the one currently selected
+   *  (e.g. a button's click handler showing/hiding a totally different
+   *  panel). Optional so call sites that never touch JavaScript tools don't
+   *  need to thread it through; defaults to just the selected element. */
+  allElements?: LabElement[];
   multiSelectedIds?: string[];
   multiElement?: LabElement | null;
   onMultiStyleChange?: (prop: string, value: string) => void;
@@ -244,6 +250,7 @@ interface PropsPanelProps {
 
 export default function PropertiesPanel({
   element,
+  allElements,
   multiSelectedIds,
   multiElement,
   onMultiStyleChange,
@@ -369,6 +376,7 @@ export default function PropertiesPanel({
                 ) : sec.special === "javascript" ? (
                   <JavascriptTools
                     element={element}
+                    allElements={allElements && allElements.length > 0 ? allElements : [element]}
                     javascript={javascript}
                     onInsertJavascript={onInsertJavascript}
                     onInsertJsPreset={onInsertJsPreset}
@@ -765,12 +773,15 @@ function MediaQueriesSection({ element, onAddMediaQuery, onRemoveMediaQuery }: M
 
 interface JavascriptToolsProps {
   element: LabElement;
+  allElements?: LabElement[];
   javascript?: string;
   onInsertJavascript: (code: string) => void;
   onInsertJsPreset?: (template: LabElement[], code: string) => void;
 }
 
-function JavascriptTools({ element, javascript = "", onInsertJavascript, onInsertJsPreset }: JavascriptToolsProps) {
+type HandlerActionType = "none" | "style" | "toggleClass";
+
+function JavascriptTools({ element, allElements, javascript = "", onInsertJavascript, onInsertJsPreset }: JavascriptToolsProps) {
   const [activePreset, setActivePreset] = useState<string | null>(null);
   const isBody = element.tag === "body";
 
@@ -779,6 +790,58 @@ function JavascriptTools({ element, javascript = "", onInsertJavascript, onInser
   const varName = isBody ? null : toVarName(element.attrs?.id || element.id);
   const hasSelector = selector ? javascript.includes(selector) : false;
   const styleObject = isBody ? null : stylesToJsObject(element.styles);
+
+  // Every element in the project is a candidate *target* for the action —
+  // deliberately independent of `element` (which is only ever the listener).
+  // Clicking a button and hiding some other panel entirely is the normal
+  // case, not a special one.
+  const targetOptions = (allElements && allElements.length > 0 ? allElements : [element]).filter((el) => el.tag !== "body");
+
+  const [eventType, setEventType] = useState(EVENT_TYPES[0].value);
+  const [handlerName, setHandlerName] = useState(() => defaultHandlerName(EVENT_TYPES[0].value, varName || "element"));
+  const [actionType, setActionType] = useState<HandlerActionType>("none");
+  const [targetElementId, setTargetElementId] = useState(element.id);
+  const [actionProperty, setActionProperty] = useState(CSS_PROPS_LIST[0]);
+  const [actionClassName, setActionClassName] = useState("");
+
+  // Selecting a different element on the canvas doesn't remount this
+  // component — without this, the target dropdown would keep quietly
+  // pointing at whichever element was selected the *first* time this panel
+  // opened, well after the student moved on to a different one.
+  useEffect(() => {
+    setTargetElementId(element.id);
+  }, [element.id]);
+  const [actionValue, setActionValue] = useState("");
+
+  function addEventHandler(): void {
+    if (!varName || !selectorLiteral) return;
+    const name = handlerName.trim() || defaultHandlerName(eventType, varName);
+
+    const targetIsSelf = targetElementId === element.id;
+    const targetElement = targetOptions.find((el) => el.id === targetElementId);
+    const targetSelectorLiteral = targetIsSelf ? selectorLiteral : (targetElement ? JSON.stringify(getElementSelector(targetElement)) : selectorLiteral);
+    const targetVarName = targetIsSelf ? varName : toVarName(targetElement?.attrs?.id || targetElement?.id || "target");
+
+    // Only declare a second `const` (and its own null-check) when the
+    // action actually reaches for a *different* element than the one
+    // listening — targeting "this element" keeps the body exactly as
+    // simple as it was before targeting existed at all.
+    const targetLookupLines = targetIsSelf
+      ? ""
+      : `    const ${targetVarName} = document.querySelector(${targetSelectorLiteral});\n    if (!${targetVarName}) return;\n\n`;
+
+    let actionLine: string;
+    if (actionType === "style" && actionValue.trim()) {
+      actionLine = `${targetVarName}.style.${actionProperty} = ${JSON.stringify(actionValue.trim())};`;
+    } else if (actionType === "toggleClass" && actionClassName.trim()) {
+      actionLine = `${targetVarName}.classList.toggle(${JSON.stringify(actionClassName.trim())});`;
+    } else {
+      actionLine = `// TODO: add your code here`;
+    }
+
+    const code = `(() => {\n  const ${varName} = document.querySelector(${selectorLiteral});\n  if (!${varName}) return;\n\n  function ${name}(event) {\n${targetLookupLines}    ${actionLine}\n  }\n\n  ${varName}.addEventListener(${JSON.stringify(eventType)}, ${name});\n})();`;
+    onInsertJavascript(code);
+  }
 
   const snippets = isBody ? [] : [
     { label: "Select", code: `const ${varName} = document.querySelector(${selectorLiteral});` },
@@ -828,10 +891,138 @@ function JavascriptTools({ element, javascript = "", onInsertJavascript, onInser
             ))}
           </div>
           {hasSelector && <div className={styles.jsLinked}>JavaScript references this element</div>}
+
+          <div className={styles.jsPresetsLabel} style={{ marginTop: 6 }}>Event Handlers</div>
+          <div className={styles.eventHandlerRow}>
+            <select
+              className={styles.eventHandlerSelect}
+              value={eventType}
+              onChange={(e) => {
+                const nextEvent = e.target.value;
+                setEventType(nextEvent);
+                setHandlerName(defaultHandlerName(nextEvent, varName || "element"));
+              }}
+            >
+              {EVENT_TYPES.map((et) => (
+                <option key={et.value} value={et.value}>{et.label}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              className={styles.eventHandlerInput}
+              value={handlerName}
+              onChange={(e) => setHandlerName(e.target.value)}
+              placeholder="handlerFunctionName"
+              spellCheck={false}
+            />
+          </div>
+          <div className={styles.eventHandlerRow}>
+            <select
+              className={styles.eventHandlerSelect}
+              value={targetElementId}
+              onChange={(e) => setTargetElementId(e.target.value)}
+            >
+              {targetOptions.map((el) => (
+                <option key={el.id} value={el.id}>
+                  {el.id === element.id ? `This element (${elementLabel(el)})` : elementLabel(el)}
+                </option>
+              ))}
+            </select>
+            <select
+              className={styles.eventHandlerSelect}
+              value={actionType}
+              onChange={(e) => setActionType(e.target.value as HandlerActionType)}
+            >
+              <option value="none">Write it myself</option>
+              <option value="style">Set a style property</option>
+              <option value="toggleClass">Toggle a class</option>
+            </select>
+          </div>
+          {actionType === "style" && (
+            <div className={styles.eventHandlerRow}>
+              <select
+                className={styles.eventHandlerSelect}
+                value={actionProperty}
+                onChange={(e) => setActionProperty(e.target.value)}
+              >
+                {CSS_PROPS_LIST.map((prop) => (
+                  <option key={prop} value={prop}>{prop}</option>
+                ))}
+              </select>
+              <input
+                type="text"
+                className={styles.eventHandlerInput}
+                value={actionValue}
+                onChange={(e) => setActionValue(e.target.value)}
+                placeholder="e.g. red"
+                spellCheck={false}
+              />
+            </div>
+          )}
+          {actionType === "toggleClass" && (
+            <div className={styles.eventHandlerRow}>
+              <input
+                type="text"
+                className={styles.eventHandlerInput}
+                value={actionClassName}
+                onChange={(e) => setActionClassName(e.target.value)}
+                placeholder="class-name-to-toggle"
+                spellCheck={false}
+              />
+            </div>
+          )}
+          <div className={styles.eventHandlerRow}>
+            <button type="button" className={styles.jsToolBtn} style={{ gridColumn: "1 / -1" }} onClick={addEventHandler}>
+              + Add
+            </button>
+          </div>
+          <div className={styles.jsLinked} style={{ color: "var(--hl-hint)" }}>
+            {actionType === "none" && "Inserts a named function wired up with addEventListener, with an empty body for you to fill in."}
+            {actionType === "style" && (actionValue.trim()
+              ? `Inserts a handler that sets the target's style.${actionProperty} to "${actionValue.trim()}".`
+              : "Pick a property and type a value above — the target is whichever element you chose, not necessarily this one.")}
+            {actionType === "toggleClass" && (actionClassName.trim()
+              ? `Inserts a handler that toggles the class "${actionClassName.trim()}" on the target.`
+              : "Type a class name above to toggle on the target element.")}
+          </div>
         </>
       )}
     </div>
   );
+}
+
+// ─── Event handler helpers ────────────────────────────────────────────────────
+
+const EVENT_TYPES: { value: string; label: string }[] = [
+  { value: "click", label: "Click" },
+  { value: "mouseenter", label: "Hover (enter)" },
+  { value: "mouseleave", label: "Hover (leave)" },
+  { value: "focus", label: "Focus" },
+  { value: "blur", label: "Blur" },
+  { value: "keydown", label: "Key Down" },
+  { value: "input", label: "Input" },
+  { value: "change", label: "Change" },
+  { value: "submit", label: "Submit" },
+];
+
+function defaultHandlerName(eventType: string, elementVarName: string): string {
+  const capitalizedEvent = eventType.charAt(0).toUpperCase() + eventType.slice(1);
+  const capitalizedElement = elementVarName.charAt(0).toUpperCase() + elementVarName.slice(1);
+  return `handle${capitalizedElement}${capitalizedEvent}`;
+}
+
+// A short, readable name for one entry in the target-element dropdown —
+// enough to tell elements apart at a glance without dumping a full selector
+// into a tiny <option>. Prefers id, falls back to class, then a snippet of
+// its own text content, then just the bare tag as a last resort.
+function elementLabel(el: LabElement): string {
+  const id = el.attrs?.id?.trim();
+  if (id) return `${el.tag}#${id}`;
+  const className = el.attrs?.class?.trim().split(/\s+/)[0];
+  if (className) return `${el.tag}.${className}`;
+  const text = el.content?.trim();
+  if (text) return `${el.tag} "${text.slice(0, 20)}${text.length > 20 ? "…" : ""}"`;
+  return el.tag;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

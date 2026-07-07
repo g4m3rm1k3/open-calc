@@ -1418,6 +1418,31 @@
   line-height: 1.4;
 }
 
+.eventHandlerRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.eventHandlerSelect,
+.eventHandlerInput {
+  min-width: 0;
+  padding: 4px 5px;
+  border: 1px solid var(--hl-border);
+  border-radius: 4px;
+  background: var(--hl-bg);
+  color: var(--hl-text);
+  font-size: 10px;
+}
+.eventHandlerInput {
+  font-family: "JetBrains Mono", monospace;
+}
+.eventHandlerSelect:focus,
+.eventHandlerInput:focus {
+  outline: none;
+  border-color: var(--hl-string);
+}
+
 .multiSelectHint {
   font-size: 10px;
   color: var(--hl-positive);

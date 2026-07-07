@@ -144,3 +144,43 @@ JSX and the virtual DOM, components and props, `useState`, list rendering and ke
 lifting state up, controlled components, discriminated unions in props, recursive
 components, `useReducer`, `useContext` and custom Context hooks, custom hooks,
 `React.memo` and `useCallback`, Portals, and a plugin-style registry architecture.
+
+---
+
+### 6. Video Notes — A Study Companion, Built in HTML Lab
+**Folder:** `video-notes/` — [Full lesson plan](video-notes/README.md)
+
+Build a real note-taking application for watching lecture and tutorial videos:
+paste a YouTube link, write notes timestamped to the exact moment in the video,
+tag and search and sort and reorder them, and carry the whole library out as a
+file and back in. The deliberate sibling to [The Frontend Client](frontend-client/README.md)
+and [React Studio](react-studio/README.md): those two teach TypeScript and React;
+this one teaches plain HTML, CSS, and JavaScript, built entirely inside this
+site's own **HTML Lab** — no framework, no terminal, no build step, nothing to
+install. Written for a learner who has never coded at all as much as one who
+already knows JavaScript and wants every gap filled in.
+
+Every capability arrives because the application genuinely needs it, not
+because a lesson invented a reason to use it: a plain `<iframe>` embed is used
+first, and is only replaced by the real YouTube IFrame Player API once
+"jump to the moment this note was written about" turns out to require it.
+By the final lesson, a growing pile of independent functions is reorganised
+into one class — motivated by repetition the student has already felt directly,
+not introduced as a rule to memorise.
+
+**Software engineering taught:**
+Separation of concerns, deriving views from one source of truth instead of
+duplicating state, encapsulation and refactoring toward a class, honest data
+migration, debouncing, the extract-protect-reinsert pattern for safely mixing
+generated and user content.
+
+**Computer science taught:**
+Closures, comparator functions and `Array.prototype.sort`, regular expressions
+and capture groups, event bubbling, array destructuring, a small tokenizer-style
+text-transform parser.
+
+**Web and browser APIs taught:**
+The YouTube IFrame Player API, `localStorage`, the HTML5 Drag and Drop API,
+`FileReader` and `Blob` downloads, loading third-party libraries from a CDN at
+runtime (KaTeX, optionally Monaco), and XSS — the first time this project
+renders user-typed text as real HTML instead of plain text.

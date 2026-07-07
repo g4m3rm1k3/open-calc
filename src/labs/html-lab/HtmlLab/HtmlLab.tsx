@@ -87,6 +87,11 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
   const [codePanelWidth, setCodePanelWidth]   = useState<number>(360);
   const [propsPanelWidth, setPropsPanelWidth] = useState<number>(280);
   const [multiSelectedIds, setMultiSelectedIds] = useState<string[]>([]);
+  // Stays undefined until the first real insert — CodePanel treats any
+  // defined value as "jump to JavaScript now," so starting at a real number
+  // like 0 would force that jump on the very first render too.
+  const [jsJumpToken, setJsJumpToken] = useState<number | undefined>(undefined);
+  const bumpJsJumpToken = (): void => setJsJumpToken((token) => (token ?? 0) + 1);
   const [previewMode, setPreviewMode]           = useState<boolean>(false);
   const [confirmDialog, setConfirmDialog]       = useState<ConfirmState | null>(null);
   const [showExamplePicker, setShowExamplePicker] = useState<boolean>(false);
@@ -174,10 +179,10 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
 
   const handleCssChange = useCallback(
     (newCss: string): void => {
-      const parsed = applyCssToElements(newCss, state.elements);
+      const parsed = applyCssToElements(newCss, state.elements, mainJsCode(state.jsFiles));
       dispatch({ type: "SET_FROM_CSS", payload: parsed });
     },
-    [state.elements],
+    [state.elements, state.jsFiles],
   );
 
   const handleDividerMouseDown = (e: React.MouseEvent): void => {
@@ -265,7 +270,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
 
     const cssRead = reads.find(r => r.ext === "css");
     if (cssRead) {
-      const applied = applyCssToElements(cssRead.content, elements);
+      const applied = applyCssToElements(cssRead.content, elements, mainJsCode(jsFiles));
       elements = applied.elements ?? elements;
       if (applied.bodyStyles) bodyStyles = { ...bodyStyles, ...applied.bodyStyles };
       if (applied.customCss) customCss = applied.customCss;
@@ -446,6 +451,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
           selectedId={state.selectedId}
           elements={state.elements}
           multiSelectedIds={multiSelectedIds}
+          jsJumpToken={jsJumpToken}
           onHtmlChange={handleCodeChange}
           onCssChange={handleCssChange}
           onSetActiveJsFile={(id) => dispatch({ type: "SET_ACTIVE_JS_FILE", payload: id })}
@@ -508,9 +514,31 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
               // allow-forms: without it, a <form>'s submit event never fires
               // in a sandboxed iframe at all (not even to let preventDefault
               // cancel it) — the browser blocks the submission algorithm
-              // before dispatching the event. Still no allow-same-origin/
-              // allow-top-navigation, so this can't escape the sandbox.
-              sandbox="allow-scripts allow-forms"
+              // before dispatching the event.
+              // allow-downloads: without it, a Blob + <a download> click runs
+              // with no error at all — the click handler fires, the object
+              // URL is created, .click() executes — but the browser silently
+              // drops the actual file save.
+              // allow-same-origin: without it, embedded third-party players
+              // (e.g. YouTube's iframe embed / IFrame Player API) fail to
+              // initialize at all — their own bootstrap script needs Cache
+              // Storage access, unavailable to a sandboxed srcDoc frame's
+              // opaque origin. Deliberate tradeoff, not an oversight: a
+              // srcDoc iframe with allow-same-origin inherits the embedding
+              // page's origin, so scripts run here (student-typed code
+              // included) can reach this real app's DOM/localStorage, not
+              // just the sandboxed preview — accepted because this is an
+              // open-source, no-secrets frontend with nothing sensitive for
+              // that code to reach. Still no allow-top-navigation, so a
+              // preview can't navigate the real page away.
+              // allow-modals: without it, alert()/confirm()/prompt() are
+              // silently ignored — "Ignored call to 'alert()'. The document
+              // is sandboxed..." in the console, no error thrown, the call
+              // just does nothing. This isn't an edge case: prompt() is a
+              // real, common way student code asks for input with zero
+              // extra UI to build (used throughout this app's own lesson
+              // content, e.g. Video Notes' "Add Note" flow).
+              sandbox="allow-scripts allow-forms allow-downloads allow-same-origin allow-modals"
             />
           )
         ) : (
@@ -545,6 +573,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
             <PropertiesPanel
               style={{ width: propsPanelWidth, flexShrink: 0 }}
               element={selectedElement}
+              allElements={state.elements}
               multiSelectedIds={multiSelectedIds}
               multiElement={multiElement}
               matchedComponents={matchedComponents}
@@ -572,12 +601,14 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
                 dispatch({ type: "UPDATE_ATTR", payload: { prop, value } })
               }
               javascript={mainJsCode(state.jsFiles)}
-              onInsertJavascript={(snippet) =>
-                dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), snippet) })
-              }
+              onInsertJavascript={(snippet) => {
+                dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), snippet) });
+                bumpJsJumpToken();
+              }}
               onInsertJsPreset={(template, code) => {
                 dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
                 dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), code) });
+                bumpJsJumpToken();
               }}
               onApplyPreset={(presetStyles) =>
                 dispatch({ type: "APPLY_PRESET", payload: presetStyles })

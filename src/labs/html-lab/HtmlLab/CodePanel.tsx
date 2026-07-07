@@ -777,6 +777,16 @@ interface CodePanelProps {
   /** Lesson playback: switches to this tab while a step's build is revealing
    *  content there (e.g. jump to "JavaScript" while a script types itself in). */
   focusTab?: "html" | "css" | "javascript";
+  /** Properties Panel: bump this (any new number) whenever a snippet/event
+   *  handler is inserted into the JS, so the student actually sees the code
+   *  that just got generated instead of it silently landing off-screen on
+   *  the JavaScript tab. Deliberately a separate signal from `focusTab` —
+   *  that one carries a specific tab value lesson playback jumps *between*;
+   *  this one only ever means "javascript, right now," and needs to fire
+   *  even if the target tab hasn't changed since the last time (an object
+   *  or plain value that happened to repeat wouldn't re-trigger the
+   *  effect — a counter always does, by construction). */
+  jsJumpToken?: number;
   /** Lesson playback: forces Monaco's displayed text to match `html`/`css`/
    *  the active JS file even if the editor still thinks it's focused — playback
    *  never involves real typing, so there's no live edit to protect, and
@@ -817,6 +827,7 @@ export default function CodePanel({
   elements,
   multiSelectedIds,
   focusTab,
+  jsJumpToken,
   forceSync,
   onHtmlChange,
   onCssChange,
@@ -889,6 +900,14 @@ export default function CodePanel({
   useEffect(() => {
     if (focusTab) setActiveTab(focusTab);
   }, [focusTab]);
+
+  useEffect(() => {
+    if (jsJumpToken !== undefined) setActiveTab("javascript");
+    // Only ever reacts to jsJumpToken changing, deliberately excluding
+    // anything else from the dependency array — this must fire once per
+    // insertion, not once per render for any other reason.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jsJumpToken]);
 
   function applyDecorations(): void {
     const editor = editorRef.current;

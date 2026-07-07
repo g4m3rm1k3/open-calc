@@ -1,0 +1,11 @@
+1. React profiler like react tools in the browser
+2. JavaScript event handlers on html in the properties panel
+i.e. hover, click, etc
+give them a name and it creates the default javaScript functions for it.
+and we can add more properties like to a group we can add drag and drop functionality
+
+#bugs, when I type CSS manually it doesn't correspond to the actual html, CSS should be parsed after the user previews and added
+or there can be a button to align
+Also when I added CSS variable before the reset the app moved them to the bottom. 
+CSS defaults should be populated then forgotten, if the user modifes them that is fine, only on new first time
+does the CSS reset and other defaults populate not at all times. 

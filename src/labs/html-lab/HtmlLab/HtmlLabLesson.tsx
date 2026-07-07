@@ -134,6 +134,9 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
   const [playback, setPlayback] = useState<PlaybackState | null>(initialPlayback);
   const [previewMode, setPreviewMode] = useState<boolean>(false);
   const [multiSelectedIds, setMultiSelectedIds] = useState<string[]>([]);
+  // See HtmlLab.tsx's identical field for why this starts undefined, not 0.
+  const [jsJumpToken, setJsJumpToken] = useState<number | undefined>(undefined);
+  const bumpJsJumpToken = (): void => setJsJumpToken((token) => (token ?? 0) + 1);
   const [codePanelWidth, setCodePanelWidth]   = useState<number>(360);
   const [propsPanelWidth, setPropsPanelWidth] = useState<number>(280);
   const [showTableBuilder, setShowTableBuilder] = useState<boolean>(false);
@@ -331,9 +334,9 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
   }, [state.elements, state.jsFiles]);
 
   const handleCssChange = useCallback((newCss: string): void => {
-    const parsed = applyCssToElements(newCss, state.elements);
+    const parsed = applyCssToElements(newCss, state.elements, mainJsCode(state.jsFiles));
     dispatch({ type: "SET_FROM_CSS", payload: parsed });
-  }, [state.elements]);
+  }, [state.elements, state.jsFiles]);
 
   const handleDividerMouseDown = (e: React.MouseEvent): void => {
     dividerDragging.current = true;
@@ -433,6 +436,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
           elements={state.elements}
           multiSelectedIds={multiSelectedIds}
           focusTab={focusTab}
+          jsJumpToken={jsJumpToken}
           forceSync={isPlaying}
           onHtmlChange={handleCodeChange}
           onCssChange={handleCssChange}
@@ -462,6 +466,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
           onInsertJsPreset={(template, code) => {
             dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
             dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), code) });
+            bumpJsJumpToken();
           }}
           onOpenTableBuilder={() => setShowTableBuilder(true)}
           cdnLinks={[]}
@@ -488,7 +493,12 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
             className={styles.previewFrame}
             srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, mainJsCode(state.jsFiles), [])}
             title="Preview"
-            sandbox="allow-scripts allow-forms"
+            // See HtmlLab.tsx's preview iframe for why allow-same-origin and
+            // allow-modals are included: third-party embeds (e.g. YouTube)
+            // need allow-same-origin to initialize at all, and alert()/
+            // confirm()/prompt() are silently ignored without allow-modals —
+            // both tradeoffs accepted project-wide.
+            sandbox="allow-scripts allow-forms allow-downloads allow-same-origin allow-modals"
           />
         ) : (
           <>
@@ -523,6 +533,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
             <PropertiesPanel
               style={{ width: propsPanelWidth, flexShrink: 0 }}
               element={selectedElement}
+              allElements={state.elements}
               multiSelectedIds={multiSelectedIds}
               multiElement={multiElement}
               matchedComponents={matchedComponents}
@@ -550,12 +561,14 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
                 dispatch({ type: "UPDATE_ATTR", payload: { prop, value } })
               }
               javascript={mainJsCode(state.jsFiles)}
-              onInsertJavascript={(snippet: string) =>
-                dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), snippet) })
-              }
+              onInsertJavascript={(snippet: string) => {
+                dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), snippet) });
+                bumpJsJumpToken();
+              }}
               onInsertJsPreset={(template, code) => {
                 dispatch({ type: "INSERT_TEMPLATE", payload: { template } });
                 dispatch({ type: "APPEND_MAIN_JS", payload: appendJavascriptSnippet(mainJsCode(state.jsFiles), code) });
+                bumpJsJumpToken();
               }}
               onApplyPreset={(presetStyles) =>
                 dispatch({ type: "APPLY_PRESET", payload: presetStyles })

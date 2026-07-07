@@ -60,13 +60,36 @@ input, button, textarea, select {
   font: inherit;
 }`;
 
+// Custom properties (CSS variables) are conventionally declared at the very
+// top of a stylesheet, before anything that might use them — the position a
+// user typing `:root { --accent: ... }` above the reset comment clearly
+// intended. elementsToCss otherwise always rebuilds custom CSS at the very
+// end (see below), which silently relocated a hand-typed :root block behind
+// the reset and every generated rule on the next round-trip. Variables still
+// resolve correctly wherever the block ends up (the CSS cascade doesn't
+// require "declare before use" the way JS does) — this is purely about not
+// surprising a user by moving code they placed on purpose, not a functional
+// fix. Only :root is hoisted; every other custom rule keeps acting as an
+// override, applied after the generated rules it may be overriding.
+function extractRootBlock(customCss: string): { rootBlock: string | null; rest: string } {
+  const rootBlockPattern = /:root\s*\{[^}]*\}/i;
+  const match = customCss.match(rootBlockPattern);
+  if (!match) return { rootBlock: null, rest: customCss };
+  return {
+    rootBlock: match[0],
+    rest: (customCss.slice(0, match.index) + customCss.slice((match.index ?? 0) + match[0].length)).trim(),
+  };
+}
+
 export function elementsToCss(
   elements: LabElement[],
   customCss = "",
   bodyStyles: BodyStyles = {},
 ): string {
   const bodyRules = stylesToString(bodyStyles, "  ");
+  const { rootBlock, rest: customCssWithoutRoot } = extractRootBlock(customCss.trim());
   const blocks: string[] = [
+    ...(rootBlock ? [rootBlock, ``] : []),
     CSS_RESET,
     ``,
     `body {\n${bodyRules || "  margin: 0;\n  padding: 16px;\n  font-family: sans-serif;"}\n}`,
@@ -105,7 +128,7 @@ export function elementsToCss(
     }
   }
 
-  const trimmedCustom = customCss.trim();
+  const trimmedCustom = customCssWithoutRoot.trim();
   if (trimmedCustom) blocks.push("", "/* Custom CSS */", trimmedCustom);
   return blocks.join("\n");
 }
@@ -367,6 +390,7 @@ export function generateLinkedHtml(elements: LabElement[], cdnTags: CdnTag[] = [
 export function applyCssToElements(
   css: string,
   elements: LabElement[],
+  javascript = "",
 ): { elements: LabElement[]; customCss: string; bodyStyles?: BodyStyles } {
   const styleById = new Map<string, Record<string, string>>();
   let bodyStyles: Record<string, string> | null = null;
@@ -388,6 +412,58 @@ export function applyCssToElements(
       styleById.set(id, parseStyleString(body));
       return "";
     });
+
+  // A hand-typed or pasted rule using a plain tag/.class/#id selector — e.g.
+  // ".card { padding: 16px; }" — previously stayed as opaque text forever:
+  // this function only ever recognized the [data-lab-id] shape its own
+  // elementsToCss emits, so such a rule never reached any element's `styles`,
+  // meaning the canvas never reflected it and the Properties Panel had
+  // nothing to show or let you change for it. This mirrors what
+  // applyImportedCssToDoc already does for a freshly-imported HTML document
+  // (matching a real, parsed DOM) — here against this app's own LabElement[]
+  // model instead, no DOM involved. Compound/stateful selectors (".toast.show",
+  // a class also toggled by this project's own JS) are deliberately left
+  // alone, for the identical reason the import path leaves them alone: baking
+  // a toggle-driven class's rule into a frozen inline style would permanently
+  // block that class from ever visually turning on or off again.
+  const stateClasses = extractDynamicClassNames(javascript);
+  const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
+  customCss = customCss.replace(ruleRe, (fullMatch, selectorGroup: string, declarations: string) => {
+    const trimmedSelectorGroup = selectorGroup.trim();
+    const trimmedDeclarations = declarations.trim();
+    if (!trimmedSelectorGroup || !trimmedDeclarations || /^body$/i.test(trimmedSelectorGroup)) return fullMatch;
+
+    const parsedStyles = parseStyleString(trimmedDeclarations);
+
+    const selectors = trimmedSelectorGroup.split(",").map((s) => s.trim()).filter(Boolean);
+    const isSimple = selectors.every((sel) => {
+      if (/[:>+~]/.test(sel) || sel === "*" || sel.startsWith("*") || isCompoundSelector(sel)) return false;
+      return !classesOf(sel).some((c) => stateClasses.has(c));
+    });
+    // A class currently unmentioned by any JS is still routinely the *plan*
+    // for one written moments later — "define what hidden looks like, then
+    // wire up a button to toggle it" is a completely normal order to build
+    // in, and stateClasses can only ever see JS that already exists. Baking
+    // a visibility-style property into a frozen per-element rule the first
+    // time would make that imminent toggle permanently inert (the class
+    // stops mattering once the property lives outside it entirely) — so a
+    // class-based rule that looks like a show/hide switch stays live CSS
+    // regardless, on the assumption that baking it was never really the
+    // point of writing a reusable class for it in the first place.
+    const isVisibilityToggle = isSimple && selectors.some((sel) => sel.startsWith(".")) && looksLikeVisibilityToggle(parsedStyles);
+    if (!isSimple || isVisibilityToggle) return fullMatch;
+
+    const matchedElements = elements.filter((el) => selectors.some((sel) => elementMatchesSimpleSelector(el, sel)));
+    if (matchedElements.length === 0) return fullMatch;
+
+    for (const el of matchedElements) {
+      // The exact [data-lab-id] block already extracted above reflects the
+      // most recent Properties Panel edit for this one element specifically —
+      // it wins over a same-named property from a broader class/tag rule.
+      styleById.set(el.id, { ...parsedStyles, ...(styleById.get(el.id) ?? {}) });
+    }
+    return "";
+  });
 
   customCss = customCss
     .replace(/body\s*\{([^}]*)\}/gi, (_, body: string) => {
@@ -487,6 +563,55 @@ export function parseHtmlDocument(htmlString: string): {
 // Keeping `.navBtn` as a live, real class rule — like the original page had
 // — means newly-created elements are styled correctly too, the same way a
 // real browser would render this page.
+// A selector like "body.dark" or ".toast.show" — a tag/class immediately
+// followed by one or more further classes with no combinator — is a
+// toggleable "modifier" state (dark mode, a "show" state, a BEM modifier).
+// Shared between applyImportedCssToDoc (matches against a real, parsed
+// Document) and applyCssToElements (matches against this app's own
+// LabElement[] model, no DOM involved) — both need to agree on exactly the
+// same "simple enough to bake into one element's styles" boundary.
+function isCompoundSelector(sel: string): boolean {
+  const classCount = (sel.match(/\.[\w-]+/g) || []).length;
+  return classCount >= 2 || (classCount >= 1 && /^[a-zA-Z]/.test(sel));
+}
+function classesOf(sel: string): string[] {
+  return (sel.match(/\.[\w-]+/g) || []).map((c) => c.slice(1));
+}
+
+// Matches a *simple* selector — a bare tag name, a single ".class", or a
+// single "#id" — against one LabElement, without needing a real DOM at all.
+// Anything more elaborate (compound, combinators, pseudo-classes, "*") is
+// already routed to customCss before this is ever called; it never has to
+// recognize those, only decide the three plain cases directly.
+function elementMatchesSimpleSelector(el: LabElement, selector: string): boolean {
+  const trimmed = selector.trim();
+  if (trimmed.startsWith(".")) {
+    return (el.attrs?.class || "").split(/\s+/).includes(trimmed.slice(1));
+  }
+  if (trimmed.startsWith("#")) {
+    return el.attrs?.id === trimmed.slice(1);
+  }
+  return el.tag.toLowerCase() === trimmed.toLowerCase();
+}
+
+// Real incident: writing ".hidden { display: none; }" and only afterward
+// adding a button whose click handler does classList.toggle("hidden") —
+// baked this class's rule into the element's own frozen [data-lab-id] style
+// the moment the CSS was typed, since nothing referencing "hidden" existed
+// in the JS yet. The toggle, added a moment later, still runs — the class
+// really does get added and removed — but display:none no longer depends
+// on the class at all once it lives in its own separate, unconditional
+// rule, so nothing visible ever changes again. A class-based rule that sets
+// one of these three properties to a value that would hide something is
+// exactly the shape a show/hide toggle takes; kept live rather than baked,
+// regardless of whether the JS side has been written yet.
+function looksLikeVisibilityToggle(styles: Record<string, string>): boolean {
+  const display = styles.display?.trim().toLowerCase();
+  const visibility = styles.visibility?.trim().toLowerCase();
+  const opacity = styles.opacity?.trim();
+  return display === "none" || visibility === "hidden" || opacity === "0";
+}
+
 function extractDynamicClassNames(javascript: string): Set<string> {
   const names = new Set<string>();
   const classNameAssignRe = /\.className\s*=\s*(["'`])((?:(?!\1).)*)\1/g;
@@ -514,15 +639,6 @@ function applyImportedCssToDoc(
     customChunks.push(m.trim());
     return "";
   });
-
-  // A selector like "body.dark" or ".toast.show" — a tag/class immediately
-  // followed by one or more further classes with no combinator — is a
-  // toggleable "modifier" state (dark mode, a "show" state, a BEM modifier).
-  const isCompoundSelector = (sel: string): boolean => {
-    const classCount = (sel.match(/\.[\w-]+/g) || []).length;
-    return classCount >= 2 || (classCount >= 1 && /^[a-zA-Z]/.test(sel));
-  };
-  const classesOf = (sel: string): string[] => (sel.match(/\.[\w-]+/g) || []).map((c) => c.slice(1));
 
   const ruleRe = /([^{}]+)\{([^{}]*)\}/g;
   const parsedRules: { selectors: string[]; declarations: string; styles: Record<string, string> }[] = [];
