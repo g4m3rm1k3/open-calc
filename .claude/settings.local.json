@@ -58,7 +58,9 @@
       "Bash(curl -s http://localhost:5174/src/labs/ts-lab/TsLab.jsx)",
       "Bash(curl -s \"http://localhost:5174/src/labs/ts-lab/lessons/index.js\")",
       "Bash(curl -s http://localhost:5174/)",
-      "Bash(git pull *)"
+      "Bash(git pull *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)"
     ]
   }
 }
