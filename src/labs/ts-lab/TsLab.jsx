@@ -26,7 +26,7 @@ function getInitialLessonIdx() {
 }
 
 export default function TsLab({ onBack }) {
-  const { isDarkGlobal: isDark } = useGlobalTheme()
+  const { isDarkGlobal: isDark, themeStyles } = useGlobalTheme()
 
   const [lessonIdx, setLessonIdx] = useState(getInitialLessonIdx)
   const lesson = LESSONS[lessonIdx]
@@ -43,9 +43,11 @@ export default function TsLab({ onBack }) {
   const iframeRef = useRef(null)
   const editorRef = useRef(null)
   const codeRef = useRef(code)
+  const isDarkRef = useRef(isDark)
 
-  // Keep codeRef in sync so sandbox-ready handler always has current code
+  // Keep refs in sync so the sandbox-ready handler always has current values
   useEffect(() => { codeRef.current = code }, [code])
+  useEffect(() => { isDarkRef.current = isDark }, [isDark])
 
   // Clear stale v1 keys once on mount
   useEffect(() => {
@@ -67,7 +69,8 @@ export default function TsLab({ onBack }) {
       if (!data?.type) return
       const ts = Date.now()
       if (data.type === 'sandbox-ready') {
-        // Auto-run the current code the moment the sandbox is initialized
+        // Sync theme before running so the initial render uses the right colours
+        iframeRef.current?.contentWindow?.postMessage({ type: 'theme', isDark: isDarkRef.current }, '*')
         iframeRef.current?.contentWindow?.postMessage({ type: 'run', code: codeRef.current }, '*')
       } else if (data.type === 'console') {
         setEntries(prev => [...prev, { source: 'console', level: data.level, args: data.args, ts }])
@@ -80,6 +83,11 @@ export default function TsLab({ onBack }) {
     window.addEventListener('message', handler)
     return () => window.removeEventListener('message', handler)
   }, [])
+
+  // Keep sandbox theme in sync with app theme
+  useEffect(() => {
+    iframeRef.current?.contentWindow?.postMessage({ type: 'theme', isDark }, '*')
+  }, [isDark])
 
   const handleRun = useCallback(() => {
     setEntries([])
@@ -239,7 +247,7 @@ export default function TsLab({ onBack }) {
           <Editor
             language="typescript"
             value={code}
-            theme={isDark ? 'vs-dark' : 'vs'}
+            theme={themeStyles.monaco}
             beforeMount={setupOpenCalcMonaco}
             onMount={(editor, monaco) => {
               editorRef.current = editor
