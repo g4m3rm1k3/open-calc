@@ -9,7 +9,7 @@ export default {
     const win = doc.defaultView
     if (!win) return { pass: false, message: 'Run the code first' }
     const hash = win.location.hash
-    const hasHashRouting = typeof (win as any).navigate === 'function'
+    const hasHashRouting = typeof win.navigate === 'function'
     if (!hasHashRouting) return { pass: false, message: 'No navigate() function found on window — make sure you expose it with window.navigate = navigate' }
     const cards = doc.querySelectorAll('[data-id], .card-clickable')
     if (cards.length < 3) return { pass: false, message: 'Need at least 3 clickable post cards in the feed' }

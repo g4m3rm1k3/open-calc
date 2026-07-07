@@ -17,6 +17,15 @@ export const SANDBOX_HTML = `<!DOCTYPE html>
     --shadow-md:0 4px 6px -1px rgba(0,0,0,0.1),0 2px 4px -1px rgba(0,0,0,0.06);
     --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.1),0 4px 6px -2px rgba(0,0,0,0.05);
   }
+  :root.dark{
+    --primary-light:#1e3a8a;
+    --bg:#0f172a;--surface:#1e293b;--surface2:#334155;
+    --border:#334155;--border-strong:#475569;
+    --text:#e2e8f0;--text-muted:#94a3b8;--text-subtle:#475569;
+    --shadow:0 1px 3px rgba(0,0,0,0.3),0 1px 2px rgba(0,0,0,0.2);
+    --shadow-md:0 4px 6px -1px rgba(0,0,0,0.4),0 2px 4px -1px rgba(0,0,0,0.3);
+    --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.5),0 4px 6px -2px rgba(0,0,0,0.3);
+  }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
   #app{min-height:100vh}
@@ -64,6 +73,8 @@ export const SANDBOX_HTML = `<!DOCTYPE html>
   .badge-green{background:#dcfce7;color:#166534}
   .badge-gray{background:var(--surface2);color:var(--text-muted)}
   .tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)}
+  :root.dark .badge-green{background:#14532d;color:#86efac}
+  :root.dark .badge-blue{background:#1e3a8a;color:#93c5fd}
 
   /* Avatar */
   .avatar{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-weight:700;color:#fff;flex-shrink:0}
@@ -89,6 +100,9 @@ export const SANDBOX_HTML = `<!DOCTYPE html>
   .alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
   .alert-success{background:#dcfce7;color:#166534;border:1px solid #bbf7d0}
   .alert-info{background:var(--primary-light);color:#1e40af;border:1px solid #bfdbfe}
+  :root.dark .alert-error{background:#450a0a;color:#fca5a5;border-color:#991b1b}
+  :root.dark .alert-success{background:#052e16;color:#86efac;border-color:#166534}
+  :root.dark .alert-info{background:#172554;color:#93c5fd;border-color:#1e40af}
 
   /* Utilities */
   .flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}
@@ -209,6 +223,7 @@ async function run(code) {
 
 window.addEventListener('message', ({ data }) => {
   if (data?.type === 'run') run(data.code).catch(e => _sendMsg({ type: 'error', message: String(e) }))
+  if (data?.type === 'theme') document.documentElement.classList.toggle('dark', !!data.isDark)
 })
 _sendMsg({ type: 'sandbox-ready' })
 </script>
