@@ -60,7 +60,9 @@
       "Bash(curl -s http://localhost:5174/)",
       "Bash(git pull *)",
       "Bash(git checkout *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)"
     ]
   }
 }

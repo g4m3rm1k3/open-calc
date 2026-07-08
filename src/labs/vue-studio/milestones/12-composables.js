@@ -9,6 +9,56 @@ export default {
     { id: 'cleanup',      label: 'onUnmounted — cleaning up timers, listeners, subscriptions' },
     { id: 'encap',        label: 'Encapsulation — hiding state, exposing only what callers need' },
   ],
+  starter: {
+    'src/composables/useCounter.ts':
+`import { ref } from 'vue'
+
+export function useCounter(initial = 0, step = 1) {
+  // Define reactive state and functions here
+}`,
+
+    'src/composables/useLocalStorage.ts':
+`import { ref, watch } from 'vue'
+
+export function useLocalStorage<T>(key: string, defaultValue: T) {
+  // Read from localStorage, return a synced ref
+}`,
+
+    'src/composables/useTimer.ts':
+`import { ref, onUnmounted } from 'vue'
+
+export function useTimer(intervalMs = 1000) {
+  // Implement a timer with start/stop/reset
+  // Don't forget onUnmounted cleanup!
+}`,
+
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.app { font-family: system-ui, sans-serif; max-width: 380px; margin: 40px auto; display: flex; flex-direction: column; gap: 16px; }
+.card { padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; }
+h3 { margin: 0 0 14px; font-size: 14px; font-weight: 700; color: #41b883; }
+.row { display: flex; align-items: center; gap: 10px; }
+.value { font-size: 24px; font-weight: 700; min-width: 48px; text-align: center; }
+button { padding: 8px 16px; background: #41b883; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; }
+button.ghost { background: #f1f5f9; color: #475569; }
+.input { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; box-sizing: border-box; margin-bottom: 10px; }
+.hint { font-size: 12px; color: #94a3b8; margin: 0 0 8px; }
+.timer { font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; color: #41b883; margin-bottom: 12px; }
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/composables/useCounter.ts':
 `import { ref } from 'vue'

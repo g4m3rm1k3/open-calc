@@ -9,6 +9,34 @@ export default {
     { id: 'key',   label: ':key — stable identity for list items' },
     { id: 'class', label: ':class — dynamic CSS classes' },
   ],
+  starter: {
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.app { font-family: system-ui, sans-serif; max-width: 380px; margin: 40px auto; }
+h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.filters { display: flex; gap: 6px; margin-bottom: 16px; }
+.filters button { padding: 4px 12px; border-radius: 16px; border: 1px solid #cbd5e1; background: none; cursor: pointer; font-size: 13px; text-transform: capitalize; }
+.filters button.active { background: #41b883; color: white; border-color: #41b883; }
+.empty { color: #94a3b8; font-style: italic; }
+ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+li { padding: 12px 16px; background: #f8fafc; border-radius: 8px; cursor: pointer; }
+li.done { opacity: 0.4; text-decoration: line-through; }
+.summary { margin-top: 16px; font-size: 13px; color: #64748b; }
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/App.vue':
 `<script setup lang="ts">

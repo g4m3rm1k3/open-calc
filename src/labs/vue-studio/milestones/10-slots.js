@@ -9,6 +9,56 @@ export default {
     { id: 'slotsFallback', label: 'Slot fallback — default content when parent provides none' },
     { id: 'scopedSlots', label: 'Scoped slots — passing data from child back to parent' },
   ],
+  starter: {
+    'src/components/Card.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.card { border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; font-family: system-ui, sans-serif; }
+.card.success { border-color: #41b883; }
+.card.warning { border-color: #f59e0b; }
+.card-header { padding: 12px 16px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; font-weight: 600; font-size: 14px; }
+.card.success .card-header { background: #f0fdf4; border-color: #86efac; color: #166534; }
+.card.warning .card-header { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+.card-body { padding: 16px; font-size: 14px; line-height: 1.6; }
+.card-footer { padding: 10px 16px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 13px; color: #64748b; }
+.empty { color: #94a3b8; font-style: italic; }
+</style>`,
+
+    'src/components/List.vue':
+`<script setup lang="ts" generic="T">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.item { padding: 10px 14px; background: #f8fafc; border-radius: 8px; }
+</style>`,
+
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.app { font-family: system-ui, sans-serif; max-width: 420px; margin: 40px auto; }
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/components/Card.vue':
 `<script setup lang="ts">

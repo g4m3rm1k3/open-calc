@@ -9,6 +9,43 @@ export default {
     { id: 'loadState',   label: 'loading / error / data — three-state async pattern' },
     { id: 'nullCheck',   label: 'v-if + v-else — guarding against null during load' },
   ],
+  starter: {
+    'src/composables/usePosts.ts':
+`import { ref, onMounted } from 'vue'
+
+export function usePosts() {
+  // Define your reactive state here
+
+  // Use onMounted to fetch data
+
+  // Return the reactive values
+}`,
+
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.app { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; }
+h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.state { color: #64748b; }
+.error { color: #ef4444; }
+ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.card { padding: 16px; background: #f8fafc; border-radius: 10px; }
+.card strong { display: block; font-size: 14px; font-weight: 600; text-transform: capitalize; margin-bottom: 6px; }
+.card p { font-size: 13px; color: #64748b; margin: 0; line-height: 1.5; }
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/composables/usePosts.ts':
 `import { ref, onMounted } from 'vue'

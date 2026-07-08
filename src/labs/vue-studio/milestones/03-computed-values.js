@@ -8,6 +8,30 @@ export default {
     { id: 'deps',        label: 'dependency tracking — Vue detects what you read' },
     { id: 'readOnly',    label: 'computed is read-only — never .value = something' },
   ],
+  starter: {
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.cart { font-family: system-ui, sans-serif; max-width: 340px; margin: 40px auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; }
+.row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+.stepper { display: flex; align-items: center; gap: 12px; }
+.stepper button { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #cbd5e1; background: none; cursor: pointer; font-size: 16px; }
+.badge { margin-top: 12px; padding: 6px 12px; background: #dcfce7; color: #166534; border-radius: 6px; font-size: 13px; }
+.total { margin-top: 16px; font-size: 18px; font-weight: 700; color: #41b883; text-align: right; }
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/App.vue':
 `<script setup lang="ts">

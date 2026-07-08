@@ -9,6 +9,58 @@ export default {
     { id: 'injectionKey', label: 'InjectionKey<T> — type-safe provide/inject' },
     { id: 'composable',  label: 'useTheme() — wrapping inject in a composable' },
   ],
+  starter: {
+    'src/composables/useTheme.ts':
+`import { provide, inject, ref } from 'vue'
+import type { InjectionKey, Ref } from 'vue'
+
+// Define your Theme interface and injection key here
+`,
+
+    'src/components/ThemeToggle.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.toggle { padding: 8px 16px; border-radius: 8px; border: 1px solid currentColor; background: transparent; cursor: pointer; font-size: 13px; }
+</style>`,
+
+    'src/components/ThemedCard.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.card { padding: 20px; border-radius: 12px; border: 1px solid; margin-bottom: 12px; transition: background 0.3s, color 0.3s; }
+h3 { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
+p { margin: 0; font-size: 13px; line-height: 1.6; }
+</style>`,
+
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.app { font-family: system-ui, sans-serif; padding: 24px; transition: background 0.3s; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+h2 { margin: 0; font-size: 20px; font-weight: 700; }
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/composables/useTheme.ts':
 `import { provide, inject, ref } from 'vue'

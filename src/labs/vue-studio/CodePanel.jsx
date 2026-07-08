@@ -17,19 +17,22 @@ function extToLang(filename) {
 
 export default function CodePanel({
   files, activeFile, onActiveFileChange, onFileChange,
-  onDeleteFile, onNewFile, onRun, onResetFiles,
+  onDeleteFile, onNewFile, onRun, onResetFiles, onLoadSolution,
   demos = [], onLoadDemo, activeDemo, onClearDemo, isDark,
+  reactiveHistory,
 }) {
   const { themeStyles } = useGlobalTheme()
-  const editorRef   = useRef(null)
-  const monacoRef   = useRef(null)
+  const editorRef        = useRef(null)
+  const monacoRef        = useRef(null)
   const hoverDisposables = useRef([])
+  const decorationsRef   = useRef(null) // IStandaloneCodeEditor decoration collection
   const [naming, setNaming] = useState(false)
   const [newName, setNewName] = useState('')
   const nameInputRef = useRef(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [hoveredTab, setHoveredTab] = useState(null)
   const [confirmReset, setConfirmReset] = useState(false)
+  const [confirmSolution, setConfirmSolution] = useState(false)
 
   const handleMount = useCallback((editor, monaco) => {
     editorRef.current  = editor
@@ -38,7 +41,55 @@ export default function CodePanel({
     hoverDisposables.current.forEach(d => d.dispose())
     hoverDisposables.current = registerVueHoverProviders(monaco)
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, onRun)
+    // Inject CSS for live value annotations
+    if (!document.getElementById('vue-studio-decorations-css')) {
+      const style = document.createElement('style')
+      style.id = 'vue-studio-decorations-css'
+      style.textContent = `.vue-ref-annotation { color: #64748b; font-style: italic; } .vue-ref-annotation-changed { color: #f59e0b; font-style: italic; font-weight: 600; }`
+      document.head.appendChild(style)
+    }
   }, [onRun])
+
+  // Live value annotations — update Monaco decorations when reactive history changes
+  useEffect(() => {
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+    if (!editor || !monaco || !reactiveHistory?.size) {
+      decorationsRef.current?.clear()
+      return
+    }
+    const source = files?.[activeFile] ?? ''
+    const lines  = source.split('\n')
+    const newDecos = []
+
+    lines.forEach((line, idx) => {
+      const lineNum = idx + 1
+      // Match `const name = ref(...)` and `const name = computed(...)`
+      for (const [, name] of line.matchAll(/const\s+(\w+)\s*=\s*(?:ref|computed)\s*\(/g)) {
+        const entry = reactiveHistory.get(name)
+        if (!entry) continue
+        const dv = typeof entry.value === 'object' ? JSON.stringify(entry.value) : String(entry.value)
+        const changed = entry.updateCount > 0 && String(entry.value) !== String(entry.prevValue)
+        const label = ` // ← ${dv}${entry.updateCount > 0 ? `  ↑${entry.updateCount}` : ''}`
+        newDecos.push({
+          range: new monaco.Range(lineNum, line.length + 1, lineNum, line.length + 1),
+          options: {
+            after: {
+              content: label,
+              inlineClassName: changed ? 'vue-ref-annotation-changed' : 'vue-ref-annotation',
+            },
+            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+          },
+        })
+      }
+    })
+
+    if (!decorationsRef.current) {
+      decorationsRef.current = editor.createDecorationsCollection(newDecos)
+    } else {
+      decorationsRef.current.set(newDecos)
+    }
+  }, [reactiveHistory, activeFile, files])
 
   useEffect(() => {
     if (!pickerOpen) return
@@ -47,13 +98,20 @@ export default function CodePanel({
     return () => window.removeEventListener('click', close)
   }, [pickerOpen])
 
-  // Cancel reset confirm if user clicks elsewhere
+  // Cancel confirm states if user clicks elsewhere / waits
   useEffect(() => {
     if (!confirmReset) return
     const cancel = () => setConfirmReset(false)
     const t = setTimeout(cancel, 4000)
     return () => clearTimeout(t)
   }, [confirmReset])
+
+  useEffect(() => {
+    if (!confirmSolution) return
+    const cancel = () => setConfirmSolution(false)
+    const t = setTimeout(cancel, 4000)
+    return () => clearTimeout(t)
+  }, [confirmSolution])
 
   const commitNewFile = useCallback(() => {
     const raw = newName.trim()
@@ -74,6 +132,12 @@ export default function CodePanel({
     setConfirmReset(false)
     onResetFiles()
   }, [confirmReset, onResetFiles])
+
+  const handleSolution = useCallback(() => {
+    if (!confirmSolution) { setConfirmSolution(true); return }
+    setConfirmSolution(false)
+    onLoadSolution?.()
+  }, [confirmSolution, onLoadSolution])
 
   const bg     = isDark ? '#0f172a' : '#ffffff'
   const border = isDark ? '#1e293b' : '#e2e8f0'
@@ -212,6 +276,7 @@ export default function CodePanel({
             ) : (
               <button
                 onMouseDown={(e) => { e.stopPropagation(); setPickerOpen(p => !p) }}
+                onClick={(e) => { e.stopPropagation() }}
                 title="Load example"
                 style={{ padding: '3px 8px', fontSize: 11, border: `1px solid ${border}`, borderRadius: 4, background: 'none', color: muted, cursor: 'pointer', whiteSpace: 'nowrap' }}
               >
@@ -284,7 +349,7 @@ export default function CodePanel({
           {/* Reset button — click once to arm, again to confirm */}
           <button
             onClick={handleReset}
-            title="Reset all files to lesson defaults"
+            title="Clear your code and start from scratch"
             style={{
               padding: '2px 8px', fontSize: 10, borderRadius: 4, cursor: 'pointer', flexShrink: 0,
               border: `1px solid ${confirmReset ? danger : border}`,
@@ -295,6 +360,22 @@ export default function CodePanel({
           >
             {confirmReset ? 'Confirm reset?' : '↺ Reset'}
           </button>
+          {/* Solution button — peek at the reference implementation */}
+          {onLoadSolution && (
+            <button
+              onClick={handleSolution}
+              title="Load the reference solution for this lesson"
+              style={{
+                padding: '2px 8px', fontSize: 10, borderRadius: 4, cursor: 'pointer', flexShrink: 0,
+                border: `1px solid ${confirmSolution ? '#f59e0b' : border}`,
+                background: confirmSolution ? (isDark ? '#1c1400' : '#fffbeb') : 'none',
+                color: confirmSolution ? '#f59e0b' : muted,
+                transition: 'all 0.15s',
+              }}
+            >
+              {confirmSolution ? 'Show solution?' : '◎ Solution'}
+            </button>
+          )}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
