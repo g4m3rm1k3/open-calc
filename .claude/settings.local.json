@@ -63,7 +63,8 @@
       "Bash(git add *)",
       "Bash(npx tsc *)",
       "Bash(npx eslint *)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(npx vite *)"
     ]
   }
 }
