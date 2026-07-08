@@ -16,6 +16,9 @@ import {
   simplifyExpr, expandExpr,
 } from './mathEngines.js'
 import { executeScript as openmatExec } from '../../engines/openmat/openmatEngine.js'
+import { useGlobalTheme } from '../../context/ThemeContext'
+import { useThemeColors } from '../../hooks/useThemeColors'
+import { setupOpenCalcMonaco } from '../../utils/monacoThemes'
 
 // ─── Monaco lazy load ─────────────────────────────────────────────────────────
 const MonacoEditor = lazy(() => import('@monaco-editor/react').then(m => ({ default: m.default })))
@@ -89,11 +92,11 @@ function MatrixInput({ matrix, onChange, label = 'A' }) {
   return (
     <div className="mb-4">
       <div className="flex items-center gap-2 mb-2 flex-wrap">
-        <span className="text-xs font-bold text-blue-300 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded">{label}</span>
+        <span className="text-xs font-bold text-brand-300 font-mono bg-brand-500/10 px-1.5 py-0.5 rounded">{label}</span>
         <span className="text-xs text-slate-400 font-mono">{rows}×{cols}</span>
         {[2,3,4,5].map(n => (
           <button key={n} onClick={() => resize(n, n)}
-            className={`text-[11px] px-2 py-0.5 rounded-md transition-all font-semibold ${rows===n&&cols===n?'bg-blue-500/20 text-blue-300 border border-blue-500/30':'bg-white/5 hover:bg-white/10 text-slate-400 border border-transparent'}`}>
+            className={`text-[11px] px-2 py-0.5 rounded-md transition-all font-semibold ${rows===n&&cols===n?'bg-brand-500/20 text-brand-300 border border-brand-500/30':'bg-white/5 hover:bg-white/10 text-slate-400 border border-transparent'}`}>
             {n}²
           </button>
         ))}
@@ -108,13 +111,13 @@ function MatrixInput({ matrix, onChange, label = 'A' }) {
         <button onClick={() => onChange(matrix.map(r => r.map(() => '0')))}
           className="text-[11px] font-semibold px-2 py-0.5 rounded hover:bg-red-500/10 hover:text-red-400 text-slate-500 ml-auto transition-colors">clear</button>
       </div>
-      <div className="inline-flex flex-col gap-1.5 p-3 bg-black/20 rounded-xl border border-white/5 shadow-inner">
+      <div className="inline-flex flex-col gap-1.5 p-3 bg-brand-500/5 dark:bg-black/20 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
         {matrix.map((row, r) => (
           <div key={r} className="flex gap-1.5">
             {row.map((cell, c) => (
               <input key={c} value={cell}
                 onChange={e => { const m = matrix.map(r2=>[...r2]); m[r][c]=e.target.value; onChange(m) }}
-                className="w-12 h-9 text-center text-sm bg-white/5 border border-white/10 rounded-lg text-white font-mono focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50 focus:bg-white/10 focus:outline-none transition-all shadow-inner" />
+                className="w-12 h-9 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:bg-white/10 focus:outline-none transition-all shadow-inner" />
             ))}
           </div>
         ))}
@@ -128,6 +131,7 @@ const GRAPH_COLORS = ['#60a5fa','#34d399','#f472b6','#fb923c']
 function CanvasGraph({ fns = [], xMin = -10, xMax = 10, yMin = -10, yMax = 10, width = 860, height = 320, highlightRoots = [] }) {
   const ref = useRef()
   const [trace, setTrace] = useState(null)
+  const C = useThemeColors()
 
   const toCanvasX = useCallback((x) => ((x - xMin) / (xMax - xMin)) * width, [xMin, xMax, width])
   const toCanvasY = useCallback((y) => height - ((y - yMin) / (yMax - yMin)) * height, [yMin, yMax, height])
@@ -138,19 +142,19 @@ function CanvasGraph({ fns = [], xMin = -10, xMax = 10, yMin = -10, yMax = 10, w
     const W = canvas.width, H = canvas.height
     const toX = x => ((x - xMin) / (xMax - xMin)) * W
     const toY = y => H - ((y - yMin) / (yMax - yMin)) * H
-    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, W, H)
+    ctx.fillStyle = C.canvasSurface; ctx.fillRect(0, 0, W, H)
     // Grid
-    ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1
+    ctx.strokeStyle = C.canvasBorder; ctx.lineWidth = 1
     const stepX = (xMax - xMin) / 10
     for (let x = Math.ceil(xMin/stepX)*stepX; x <= xMax + stepX*0.01; x += stepX) { ctx.beginPath(); ctx.moveTo(toX(x),0); ctx.lineTo(toX(x),H); ctx.stroke() }
     const stepY = (yMax - yMin) / 10
     for (let y = Math.ceil(yMin/stepY)*stepY; y <= yMax + stepY*0.01; y += stepY) { ctx.beginPath(); ctx.moveTo(0,toY(y)); ctx.lineTo(W,toY(y)); ctx.stroke() }
     // Axes
-    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1.5
+    ctx.strokeStyle = C.canvasMuted; ctx.lineWidth = 1.5
     ctx.beginPath(); ctx.moveTo(toX(0),0); ctx.lineTo(toX(0),H); ctx.stroke()
     ctx.beginPath(); ctx.moveTo(0,toY(0)); ctx.lineTo(W,toY(0)); ctx.stroke()
     // Axis tick labels
-    ctx.fillStyle = '#475569'; ctx.font = '10px monospace'; ctx.textAlign = 'center'
+    ctx.fillStyle = C.canvasMuted; ctx.font = '10px monospace'; ctx.textAlign = 'center'
     for (let x = Math.ceil(xMin/stepX)*stepX; x <= xMax + stepX*0.01; x += stepX) {
       if (Math.abs(x) > stepX*0.1) ctx.fillText(parseFloat(x.toPrecision(3)), toX(x), toY(0)+12)
     }
@@ -177,7 +181,7 @@ function CanvasGraph({ fns = [], xMin = -10, xMax = 10, yMin = -10, yMax = 10, w
     for (const r of highlightRoots) { ctx.beginPath(); ctx.arc(toX(r), toY(0), 5, 0, 2*Math.PI); ctx.fill() }
     // Trace crosshair
     if (trace) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1; ctx.setLineDash([4,4])
+      ctx.strokeStyle = C.canvasHint; ctx.lineWidth = 1; ctx.setLineDash([4,4])
       ctx.beginPath(); ctx.moveTo(trace.px, 0); ctx.lineTo(trace.px, H); ctx.stroke()
       if (trace.py !== null) { ctx.beginPath(); ctx.moveTo(0, trace.py); ctx.lineTo(W, trace.py); ctx.stroke() }
       ctx.setLineDash([])
@@ -187,7 +191,7 @@ function CanvasGraph({ fns = [], xMin = -10, xMax = 10, yMin = -10, yMax = 10, w
         ctx.beginPath(); ctx.arc(trace.px, py, 4, 0, 2*Math.PI); ctx.fill()
       })
     }
-  }, [fns, xMin, xMax, yMin, yMax, highlightRoots, trace, toCanvasX, toCanvasY, width, height])
+  }, [fns, xMin, xMax, yMin, yMax, highlightRoots, trace, toCanvasX, toCanvasY, width, height, C])
 
   const handleMove = useCallback((e) => {
     const canvas = ref.current; if (!canvas) return
@@ -425,6 +429,8 @@ function TriangleSVG({ a, b, c, A, B, C }) {
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function MathOS({ open, onClose }) {
+  const { themeStyles } = useGlobalTheme()
+  const ui = themeStyles.ui
   // drag
   const panelRef = useRef()
   const dragging = useRef(false)
@@ -1254,13 +1260,13 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
   return (
     <div
       ref={panelRef}
-      className="fixed z-[2000] flex flex-col rounded-[24px] border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden bg-slate-900/80 backdrop-blur-3xl"
-      style={{ left: pos.x, top: pos.y, width: 900, maxHeight: '92vh', color: '#e2e8f0', userSelect: dragging.current ? 'none' : 'auto' }}
+      className={`fixed z-[2000] flex flex-col rounded-[24px] border ${ui.border} overflow-hidden backdrop-blur-3xl ${ui.bg0} ${ui.txt1} shadow-[0_20px_60px_rgba(0,0,0,0.5)]`}
+      style={{ left: pos.x, top: pos.y, width: 900, maxHeight: '92vh', userSelect: dragging.current ? 'none' : 'auto' }}
     >
       {/* ── TITLE BAR ── */}
-      <div className="relative flex items-center gap-3 px-5 py-3 bg-white/5 border-b border-white/10 cursor-grab active:cursor-grabbing shrink-0" onMouseDown={onMouseDown}>
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-xl pointer-events-none" />
-        <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 font-black text-[15px] tracking-wide select-none">⬡ MathOS</span>
+      <div className={`relative flex items-center gap-3 px-5 py-3 border-b cursor-grab active:cursor-grabbing shrink-0 ${ui.bg1} ${ui.border}`} onMouseDown={onMouseDown}>
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-500/10 to-sky-500/10 blur-xl pointer-events-none" />
+        <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-sky-400 font-black text-[15px] tracking-wide select-none">⬡ MathOS</span>
         <span className="relative z-10 text-slate-400 font-medium text-xs select-none">Universal STEM Workspace</span>
         <div className="relative z-10 ml-auto flex items-center gap-2">
           <button onClick={() => setAngleMode(a => a === 'RAD' ? 'DEG' : 'RAD')}
@@ -1272,22 +1278,22 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
       </div>
 
       {/* ── VAR STRIP ── */}
-      <div className="flex gap-2 px-5 py-1.5 bg-black/20 border-b border-white/5 flex-wrap shrink-0 min-h-[32px] items-center">
+      <div className={`flex gap-2 px-5 py-1.5 border-b flex-wrap shrink-0 min-h-[32px] items-center ${ui.bg2} ${ui.border}`}>
         {Object.keys(vars).length === 0
           ? <span className="text-xs text-slate-500 font-mono">vars — type "x = 5" or use STO→ button to store values</span>
           : <>
               {Object.entries(vars).slice(0,20).map(([k,v]) => (
                 <button key={k} onClick={() => setInput(k)}
                   className="flex items-center gap-1.5 text-[11px] font-mono hover:bg-white/10 rounded-md px-2 py-0.5 transition-colors border border-transparent hover:border-white/10">
-                  <span className="text-blue-300 font-bold">{k}</span>
+                  <span className="text-brand-300 font-bold">{k}</span>
                   <span className="text-slate-600">=</span>
                   <span className="text-emerald-400">{typeof v === 'number' ? fmtNum(v) : String(v)}</span>
                 </button>
               ))}
               {Object.entries(matVars).slice(0,12).map(([k,mat]) => (
                 <button key={`m_${k}`} onClick={() => { setSection('matrix'); setMatA(mat.map(r=>r.map(String))) }}
-                  className="flex items-center gap-1 text-[11px] font-mono hover:bg-purple-500/10 rounded-md px-2 py-0.5 transition-colors border border-transparent hover:border-purple-500/20">
-                  <span className="text-purple-300 font-bold">{k}</span>
+                  className="flex items-center gap-1 text-[11px] font-mono hover:bg-sky-500/10 rounded-md px-2 py-0.5 transition-colors border border-transparent hover:border-sky-500/20">
+                  <span className="text-sky-300 font-bold">{k}</span>
                   <span className="text-slate-600 text-[10px]">[{mat.length}×{mat[0]?.length}]</span>
                 </button>
               ))}
@@ -1299,10 +1305,10 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
       </div>
 
       {/* ── SECTION TABS ── */}
-      <div className="flex gap-1 px-3 py-2 border-b border-white/5 shrink-0 overflow-x-auto bg-black/10">
+      <div className={`flex gap-1 px-3 py-2 border-b shrink-0 overflow-x-auto ${ui.bg1} ${ui.border}`}>
         {SECTIONS.map(s => (
           <button key={s.id} onClick={() => setSection(s.id)}
-            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${section===s.id?'bg-white/10 text-white shadow-sm':'text-slate-400 hover:text-slate-200 hover:bg-white/5'}`}>
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-all duration-200 ${section===s.id?'bg-brand-500/15 text-brand-300 shadow-sm':'text-slate-500 hover:text-slate-300 hover:bg-white/5'}`}>
             {s.label}
           </button>
         ))}
@@ -1322,9 +1328,9 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
                 placeholder='Type any STEM problem: "integrate x^2 from 0 to 1", "derivative of x^3 at x=2", "2^10", "STO→ A 42"...'
-                className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-[15px] font-mono text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all shadow-inner"
+                className={`flex-1 ${ui.bg2} border ${ui.border} rounded-xl px-4 py-3 text-[15px] font-mono ${ui.txt1} placeholder-slate-500 focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 focus:outline-none transition-all shadow-inner`}
               />
-              <button onClick={compute} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm shrink-0 shadow-[0_4px_15px_rgba(79,70,229,0.3)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all active:scale-95">Compute</button>
+              <button onClick={compute} className="px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white rounded-xl font-bold text-sm shrink-0 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">Compute</button>
             </div>
             {/* Quick-reference syntax chips */}
             <div className="flex flex-wrap gap-1 mb-4">
@@ -1339,7 +1345,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                 ['plot sin(x)','graph'],
               ].map(([ex]) => (
                 <button key={ex} onClick={() => setInput(ex)}
-                  className="text-xs px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/5 hover:border-blue-500/30 text-slate-400 hover:text-blue-300 font-mono transition-colors">
+                  className="text-xs px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-slate-200/40 dark:border-white/5 hover:border-brand-500/30 text-slate-400 hover:text-brand-300 font-mono transition-colors">
                   {ex}
                 </button>
               ))}
@@ -1348,18 +1354,18 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
             {result && (
               <>
                 {/* Numerical answer bar */}
-                <div className="flex items-center gap-4 bg-black/20 border border-white/5 rounded-xl px-5 py-3 mb-4 shadow-inner">
+                <div className="flex items-center gap-4 bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 rounded-xl px-5 py-3 mb-4 shadow-inner">
                   <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">Answer</span>
                   <span className="text-2xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 flex-1">{result.numerical}</span>
                   <button onClick={() => navigator.clipboard?.writeText(result.numerical)} className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-300 transition-colors px-2 py-1 rounded hover:bg-white/5">copy</button>
-                  <button onClick={() => { const name = prompt('Store as variable:'); if (name) { const v = {...vars,[name]:parseFloat(result.numerical)||result.numerical}; setVars(v) }}} className="text-[11px] font-semibold uppercase tracking-wider text-blue-400 hover:text-blue-300 transition-colors px-2 py-1 rounded hover:bg-white/5">STO→</button>
+                  <button onClick={() => { const name = prompt('Store as variable:'); if (name) { const v = {...vars,[name]:parseFloat(result.numerical)||result.numerical}; setVars(v) }}} className="text-[11px] font-semibold uppercase tracking-wider text-brand-400 hover:text-brand-300 transition-colors px-2 py-1 rounded hover:bg-white/5">STO→</button>
                 </div>
 
                 {/* Result tabs */}
-                <div className="flex gap-2 border-b border-white/5 mb-4 pb-1">
+                <div className="flex gap-2 border-b border-slate-200/40 dark:border-white/5 mb-4 pb-1">
                   {[['symbolic','∑ Steps'],['visual','◉ Visual'],['code','</> Code'],['explain','💡 Explain'],['connections','🔗 Connects']].map(([id,label])=>(
                     <button key={id} onClick={() => setTab(id)}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${tab===id?'bg-blue-500/10 text-blue-400 border border-blue-500/20':'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}`}>
+                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${tab===id?'bg-brand-500/10 text-brand-400 border border-brand-500/20':'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}`}>
                       {label}
                     </button>
                   ))}
@@ -1394,12 +1400,12 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                           <thead>
                             <tr className="border-b border-slate-700">
                               <th className="text-left px-3 py-1.5 text-slate-400">x</th>
-                              <th className="text-right px-3 py-1.5 text-blue-400">f(x)</th>
+                              <th className="text-right px-3 py-1.5 text-brand-400">f(x)</th>
                             </tr>
                           </thead>
                           <tbody>
                             {result.tableRows?.map(([x,y],i) => (
-                              <tr key={i} className={`border-b border-slate-800/60 ${i%2===0?'bg-slate-900/30':''}`}>
+                              <tr key={i} className={`border-b border-slate-800/60 ${i%2===0?'bg-brand-500/5 dark:bg-slate-900/30':''}`}>
                                 <td className="px-3 py-1 text-slate-400">{fmtNum(x,6)}</td>
                                 <td className="px-3 py-1 text-right text-green-400">{isFinite(y) ? fmtNum(y,6) : '—'}</td>
                               </tr>
@@ -1438,11 +1444,11 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                     <div className="flex gap-2 mb-3">
                       {[['eli5','ELI5'],['student','Student'],['college','College'],['advanced','Advanced']].map(([id,label])=>(
                         <button key={id} onClick={() => setExplainLevel(id)}
-                          className={`px-3 py-1 text-xs rounded ${explainLevel===id?'bg-blue-600 text-white':'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}>{label}</button>
+                          className={`px-3 py-1 text-xs rounded ${explainLevel===id?'bg-brand-600 text-white':'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}>{label}</button>
                       ))}
                     </div>
                     {explainText ? (
-                      <div className="bg-slate-800 rounded-lg p-4 text-sm text-slate-200 leading-relaxed">{explainText}</div>
+                      <div className="bg-brand-500/5 dark:bg-slate-800 rounded-lg p-4 text-sm text-slate-800 leading-relaxed">{explainText}</div>
                     ) : (
                       <div className="text-slate-500 text-sm p-4">No explanation available for this result type.</div>
                     )}
@@ -1477,14 +1483,14 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
           <div className="p-5">
 
             {/* ── Matrix Expression Evaluator ─────────────────────────────── */}
-            <div className="mb-5 bg-black/20 border border-purple-500/20 rounded-xl p-3 shadow-inner">
-              <div className="text-[11px] font-bold uppercase tracking-wider text-purple-400 mb-2">Matrix Expression  <span className="font-normal text-slate-500 normal-case tracking-normal">uses stored vars — e.g. inv(M)*A*M</span></div>
+            <div className="mb-5 bg-brand-500/5 dark:bg-black/20 border border-sky-500/20 rounded-xl p-3 shadow-inner">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-sky-400 mb-2">Matrix Expression  <span className="font-normal text-slate-500 normal-case tracking-normal">uses stored vars — e.g. inv(M)*A*M</span></div>
               <div className="flex gap-2">
                 <input value={matExpr} onChange={e => setMatExpr(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && computeMatExpr()}
                   placeholder="inv(M)*A*M  or  A^2  or  trace(A*B)"
-                  className="flex-1 text-sm bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-white font-mono focus:border-purple-400 focus:ring-1 focus:ring-purple-400/30 focus:outline-none transition-all" />
-                <button onClick={computeMatExpr} className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-bold transition-all active:scale-95 shadow">Eval</button>
+                  className="flex-1 text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-2 px-3 text-slate-800 font-mono focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 focus:outline-none transition-all" />
+                <button onClick={computeMatExpr} className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-sm font-bold transition-all active:scale-95 shadow">Eval</button>
               </div>
               {matExprResult && (
                 <div className="mt-2 text-sm font-mono">
@@ -1504,18 +1510,18 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
               )}
               {/* Stored matrix vars */}
               {Object.keys(matVars).length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-3 pt-2 border-t border-white/5">
+                <div className="flex flex-wrap gap-1.5 mt-3 pt-2 border-t border-slate-200/40 dark:border-white/5">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 self-center">Stored:</span>
                   {Object.entries(matVars).map(([name, mat]) => (
                     <div key={name} className="flex items-center gap-0.5">
                       <button onClick={() => setMatA(mat.map(r => r.map(String)))}
-                        className="text-[11px] font-mono px-2 py-0.5 rounded-l bg-purple-500/15 hover:bg-purple-500/30 text-purple-300 border border-purple-500/20 transition-colors">
+                        className="text-[11px] font-mono px-2 py-0.5 rounded-l bg-sky-500/15 hover:bg-sky-500/30 text-sky-300 border border-sky-500/20 transition-colors">
                         {name} <span className="text-slate-500">[{mat.length}×{mat[0]?.length}]</span>
                       </button>
                       {currentOp.needsB && (
                         <button onClick={() => setMatB(mat.map(r => r.map(String)))}
                           title="Load into B"
-                          className="text-[10px] font-mono px-1.5 py-0.5 rounded-r bg-white/5 hover:bg-white/15 text-slate-400 border border-white/10 border-l-0 transition-colors">→B</button>
+                          className="text-[10px] font-mono px-1.5 py-0.5 rounded-r bg-white/5 hover:bg-white/15 text-slate-400 border border-slate-200/60 dark:border-white/10 border-l-0 transition-colors">→B</button>
                       )}
                       <button onClick={() => { const v={...matVars}; delete v[name]; setMatVars(v) }}
                         className="text-[10px] px-1 py-0.5 rounded bg-transparent hover:text-red-400 text-slate-600 transition-colors ml-0.5">×</button>
@@ -1525,52 +1531,52 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
               )}
             </div>
 
-            <div className="flex flex-wrap gap-1.5 mb-5 p-2 bg-black/10 rounded-xl border border-white/5 shadow-inner">
+            <div className="flex flex-wrap gap-1.5 mb-5 p-2 bg-brand-500/5 dark:bg-black/10 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
               {OPERATIONS.map(op => (
                 <button key={op.id} onClick={() => setMatOp(op.id)}
-                  className={`px-3 py-1.5 text-xs rounded-lg transition-all font-medium ${matOp===op.id?'bg-blue-500 text-white shadow-md shadow-blue-500/20':'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200 border border-transparent hover:border-white/10'}`}>
+                  className={`px-3 py-1.5 text-xs rounded-lg transition-all font-medium ${matOp===op.id?'bg-brand-500 text-white shadow-md shadow-brand-500/20':'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200 border border-transparent hover:border-white/10'}`}>
                   {op.label}
                 </button>
               ))}
             </div>
 
             <div className="flex items-center gap-3 mb-1">
-              <span className="text-[11px] font-bold text-blue-300 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded">Matrix A</span>
+              <span className="text-[11px] font-bold text-brand-300 font-mono bg-brand-500/10 px-1.5 py-0.5 rounded">Matrix A</span>
               <button onClick={() => { const name = prompt('Store A as:')?.trim(); if (name) setMatVars({...matVars, [name]: parseMatrix(matA)}) }}
-                className="text-[11px] text-slate-400 hover:text-purple-300 font-semibold transition-colors px-2 py-0.5 rounded hover:bg-purple-500/10">+ Store A</button>
+                className="text-[11px] text-slate-400 hover:text-sky-300 font-semibold transition-colors px-2 py-0.5 rounded hover:bg-sky-500/10">+ Store A</button>
             </div>
             <MatrixInput matrix={matA} onChange={setMatA} label="A" />
             {currentOp.needsB && (
               <>
                 <div className="flex items-center gap-3 mb-1 mt-2">
-                  <span className="text-[11px] font-bold text-blue-300 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded">Matrix B</span>
+                  <span className="text-[11px] font-bold text-brand-300 font-mono bg-brand-500/10 px-1.5 py-0.5 rounded">Matrix B</span>
                   <button onClick={() => { const name = prompt('Store B as:')?.trim(); if (name) setMatVars({...matVars, [name]: parseMatrix(matB)}) }}
-                    className="text-[11px] text-slate-400 hover:text-purple-300 font-semibold transition-colors px-2 py-0.5 rounded hover:bg-purple-500/10">+ Store B</button>
+                    className="text-[11px] text-slate-400 hover:text-sky-300 font-semibold transition-colors px-2 py-0.5 rounded hover:bg-sky-500/10">+ Store B</button>
                 </div>
               </>
             )}
             {currentOp.needsB && <MatrixInput matrix={matB} onChange={setMatB} label="B" />}
             {currentOp.needsAug && (
               <div className="mb-4">
-                <div className="text-[11px] font-bold text-blue-300 font-mono bg-blue-500/10 px-1.5 py-0.5 rounded inline-block mb-2">Vector b</div>
+                <div className="text-[11px] font-bold text-brand-300 font-mono bg-brand-500/10 px-1.5 py-0.5 rounded inline-block mb-2">Vector b</div>
                 <MatrixInput matrix={matAugB} onChange={setMatAugB} label="b" />
               </div>
             )}
             {(matOp === 'power' || matOp === 'scalar') && (
-              <div className="mb-4 flex items-center gap-3 bg-black/20 p-3 rounded-xl border border-white/5 w-max shadow-inner">
-                <label className="text-[11px] font-bold text-blue-300 font-mono uppercase tracking-wider">{matOp === 'power' ? 'n (power)' : 'scalar c'}</label>
+              <div className="mb-4 flex items-center gap-3 bg-brand-500/5 dark:bg-black/20 p-3 rounded-xl border border-slate-200/40 dark:border-white/5 w-max shadow-inner">
+                <label className="text-[11px] font-bold text-brand-300 font-mono uppercase tracking-wider">{matOp === 'power' ? 'n (power)' : 'scalar c'}</label>
                 <input type="number" value={matN} onChange={e => setMatN(parseFloat(e.target.value))}
-                  className="w-20 text-center text-sm bg-white/5 border border-white/10 rounded-lg py-1.5 text-white focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50 focus:bg-white/10 focus:outline-none transition-all shadow-inner" />
+                  className="w-20 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:bg-white/10 focus:outline-none transition-all shadow-inner" />
               </div>
             )}
-            <button onClick={computeMatrix} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm mb-5 shadow-[0_4px_15px_rgba(79,70,229,0.3)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all active:scale-95">Compute Matrix</button>
+            <button onClick={computeMatrix} className="px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white rounded-xl font-bold text-sm mb-5 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">Compute Matrix</button>
 
             {result?.type === 'matrix' && (
               <>
-                <div className="flex gap-2 border-b border-white/5 mb-4 pb-1">
+                <div className="flex gap-2 border-b border-slate-200/40 dark:border-white/5 mb-4 pb-1">
                   {[['symbolic','∑ Steps'],['visual','◉ Visual'],['code','</> Code'],['explain','💡 Explain'],['connections','🔗 Connects']].map(([id,label])=>(
                     <button key={id} onClick={() => setTab(id)}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${tab===id?'bg-blue-500/10 text-blue-400 border border-blue-500/20':'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}`}>
+                      className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${tab===id?'bg-brand-500/10 text-brand-400 border border-brand-500/20':'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'}`}>
                       {label}
                     </button>
                   ))}
@@ -1610,9 +1616,9 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                 {tab === 'explain' && (
                   <div>
                     <div className="flex gap-2 mb-3">{[['eli5','ELI5'],['student','Student'],['college','College'],['advanced','Advanced']].map(([id,label])=>(
-                      <button key={id} onClick={()=>setExplainLevel(id)} className={`px-3 py-1 text-xs rounded ${explainLevel===id?'bg-blue-600 text-white':'bg-slate-700 text-slate-300'}`}>{label}</button>
+                      <button key={id} onClick={()=>setExplainLevel(id)} className={`px-3 py-1 text-xs rounded ${explainLevel===id?'bg-brand-600 text-white':'bg-slate-700 text-slate-300'}`}>{label}</button>
                     ))}</div>
-                    {explainText ? <div className="bg-slate-800 rounded-lg p-4 text-sm text-slate-200 leading-relaxed">{explainText}</div> : <div className="text-slate-500 text-sm p-4">No explanation available.</div>}
+                    {explainText ? <div className="bg-brand-500/5 dark:bg-slate-800 rounded-lg p-4 text-sm text-slate-800 leading-relaxed">{explainText}</div> : <div className="text-slate-500 text-sm p-4">No explanation available.</div>}
                   </div>
                 )}
                 {tab === 'connections' && result.connKey && CONNECTIONS[result.connKey] && (
@@ -1629,18 +1635,18 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
         {section === 'sigma' && (
           <div className="p-5">
             <div className="flex items-center gap-4 flex-wrap mb-5">
-              <div className="flex items-center gap-3 bg-black/20 p-4 rounded-xl border border-white/5 shadow-inner">
-                <span className="text-blue-400 text-2xl font-black">Σ</span>
+              <div className="flex items-center gap-3 bg-brand-500/5 dark:bg-black/20 p-4 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
+                <span className="text-brand-400 text-2xl font-black">Σ</span>
                 <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">i from</div>
-                  <input value={sigLo} onChange={e=>setSigLo(e.target.value)} className="w-16 text-center text-sm bg-white/5 border border-white/10 rounded-lg py-1.5 text-white font-mono focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50 focus:outline-none transition-all shadow-inner" /></div>
+                  <input value={sigLo} onChange={e=>setSigLo(e.target.value)} className="w-16 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>
                 <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">to (n or num)</div>
-                  <input value={sigHi} onChange={e=>setSigHi(e.target.value)} className="w-20 text-center text-sm bg-white/5 border border-white/10 rounded-lg py-1.5 text-white font-mono focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50 focus:outline-none transition-all shadow-inner" /></div>
+                  <input value={sigHi} onChange={e=>setSigHi(e.target.value)} className="w-20 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>
                 <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">f(i) =</div>
-                  <input value={sigExpr} onChange={e=>setSigExpr(e.target.value)} className="w-32 px-3 text-sm bg-white/5 border border-white/10 rounded-lg py-1.5 text-white font-mono focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50 focus:outline-none transition-all shadow-inner" /></div>
+                  <input value={sigExpr} onChange={e=>setSigExpr(e.target.value)} className="w-32 px-3 text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>
                 {sigHi === 'n' && <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">n =</div>
-                  <input type="number" value={sigN} onChange={e=>setSigN(parseInt(e.target.value)||10)} className="w-16 text-center text-sm bg-white/5 border border-white/10 rounded-lg py-1.5 text-white font-mono focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50 focus:outline-none transition-all shadow-inner" /></div>}
+                  <input type="number" value={sigN} onChange={e=>setSigN(parseInt(e.target.value)||10)} className="w-16 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>}
               </div>
-              <button onClick={computeSigma} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm shadow-[0_4px_15px_rgba(79,70,229,0.3)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all active:scale-95">Compute</button>
+              <button onClick={computeSigma} className="px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">Compute</button>
             </div>
             <div className="flex gap-2 flex-wrap mb-5">
               {[['1','n','1'],['i','n','i'],['i^2','n','i^2'],['i^3','n','i^3'],['2^i','10','2^i'],['1/i','20','1/i']].map(([e,h,l])=>(
@@ -1649,10 +1655,10 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
             </div>
             {result?.type === 'sigma' && (
               <>
-                <div className="bg-black/20 border border-white/5 rounded-xl px-5 py-4 mb-4 font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 text-2xl shadow-inner">Σ = {result.numerical}</div>
+                <div className="bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 rounded-xl px-5 py-4 mb-4 font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 text-2xl shadow-inner">Σ = {result.numerical}</div>
                 <div className="space-y-1 mb-5">{result.steps?.map((s,i)=><KatexStep key={i} label={s.label} latex={s.latex} />)}</div>
                 {result.terms?.length > 0 && (
-                  <div className="mb-5 bg-black/20 p-4 rounded-xl border border-white/5 shadow-inner">
+                  <div className="mb-5 bg-brand-500/5 dark:bg-black/20 p-4 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3">Bar chart of terms</div>
                     <svg width="100%" viewBox={`0 0 ${Math.min(result.terms.length*28+40,840)} 120`} className="rounded-lg">
                       {(() => {
@@ -1680,8 +1686,8 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
             <div className="flex gap-3 mb-4">
               <input value={polyExpr} onChange={e=>setPolyExpr(e.target.value)}
                 placeholder="e.g. x^2 - 5*x + 6, x^3 - 6x^2 + 11x - 6"
-                className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-[15px] font-mono text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all shadow-inner" />
-              <button onClick={computePoly} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm shrink-0 shadow-[0_4px_15px_rgba(79,70,229,0.3)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all active:scale-95">Solve</button>
+                className={`flex-1 ${ui.bg2} border ${ui.border} rounded-xl px-4 py-3 text-[15px] font-mono ${ui.txt1} placeholder-slate-500 focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 focus:outline-none transition-all shadow-inner`} />
+              <button onClick={computePoly} className="px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white rounded-xl font-bold text-sm shrink-0 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">Solve</button>
             </div>
             <div className="flex gap-2 flex-wrap mb-5">
               {['x^2 - 4','x^2 - 5*x + 6','x^3 - 6*x^2 + 11*x - 6','x^2 + 1','2*x^2 - 4*x - 6','x^4 - 5*x^2 + 4','x^3 - 2*x^2 - x + 2'].map(p=>(
@@ -1690,12 +1696,12 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
             </div>
             {result?.type === 'poly' && (
               <>
-                <div className="bg-black/20 border border-white/5 rounded-xl px-5 py-4 mb-4 font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 shadow-inner">
+                <div className="bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 rounded-xl px-5 py-4 mb-4 font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 shadow-inner">
                   Roots: {result.numerical}&nbsp;&nbsp;
                   {result.degree !== null && <span className="text-[11px] uppercase tracking-wider font-semibold text-slate-500 ml-3">degree {result.degree}</span>}
                 </div>
                 <div className="space-y-1 mb-5">{result.steps?.map((s,i)=><KatexStep key={i} label={s.label} latex={s.latex} />)}</div>
-                <div className="mb-5 bg-black/20 p-4 rounded-xl border border-white/5 shadow-inner">
+                <div className="mb-5 bg-brand-500/5 dark:bg-black/20 p-4 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
                   <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3">Graph — hover to trace</div>
                   <CanvasGraph
                     fns={[x => polyEvalAt(result.expr, x)]}
@@ -1717,13 +1723,13 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
             <div className="flex gap-3 mb-4">
               <input value={statsData} onChange={e=>setStatsData(e.target.value)}
                 placeholder="Enter numbers separated by commas: 1, 2, 3, 4, 5"
-                className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-[15px] font-mono text-white placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 focus:outline-none transition-all shadow-inner" />
-              <button onClick={computeStats} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm shrink-0 shadow-[0_4px_15px_rgba(79,70,229,0.3)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all active:scale-95">Analyze</button>
+                className={`flex-1 ${ui.bg2} border ${ui.border} rounded-xl px-4 py-3 text-[15px] font-mono ${ui.txt1} placeholder-slate-500 focus:border-brand-500 focus:ring-1 focus:ring-brand-500/50 focus:outline-none transition-all shadow-inner`} />
+              <button onClick={computeStats} className="px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white rounded-xl font-bold text-sm shrink-0 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">Analyze</button>
             </div>
             {result?.type === 'stats' && (
               <>
                 <div className="space-y-1 mb-5">{result.steps?.map((s,i)=><KatexStep key={i} label={s.label} latex={s.latex} />)}</div>
-                <div className="bg-black/20 p-4 rounded-xl border border-white/5 shadow-inner">
+                <div className="bg-brand-500/5 dark:bg-black/20 p-4 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
                   <svg width="100%" viewBox={`0 0 ${result.data.length*40+60} 140`}>
                     {(() => {
                       const max = Math.max(...result.data.map(Math.abs), 1)
@@ -1751,32 +1757,32 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
         {section === 'physics' && (
           <div className="p-5">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3">Select a formula</div>
-            <div className="flex flex-wrap gap-1.5 mb-5 p-2 bg-black/10 rounded-xl border border-white/5 shadow-inner">
+            <div className="flex flex-wrap gap-1.5 mb-5 p-2 bg-brand-500/5 dark:bg-black/10 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
               {PHYSICS_FORMULAS.map((f,i) => (
                 <button key={i} onClick={() => { setPhysFormula(f); setPhysVarsLocal(Object.fromEntries((f.vars||[]).map(v=>[v,'']))) }}
-                  className={`px-3 py-1.5 text-xs rounded-lg transition-all font-medium ${physFormula?.name===f.name?'bg-blue-500 text-white shadow-md shadow-blue-500/20':'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200 border border-transparent hover:border-white/10'}`}>
+                  className={`px-3 py-1.5 text-xs rounded-lg transition-all font-medium ${physFormula?.name===f.name?'bg-brand-500 text-white shadow-md shadow-brand-500/20':'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200 border border-transparent hover:border-white/10'}`}>
                   {f.name}
                 </button>
               ))}
             </div>
             {physFormula && (
               <div>
-                <div className="bg-black/20 border border-white/5 rounded-xl p-5 mb-5 shadow-inner">
+                <div className="bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 rounded-xl p-5 mb-5 shadow-inner">
                   <KatexStep label={physFormula.desc} latex={physFormula.latex} />
                 </div>
-                <div className="flex flex-wrap gap-4 mb-5 p-4 bg-black/20 border border-white/5 rounded-xl shadow-inner">
+                <div className="flex flex-wrap gap-4 mb-5 p-4 bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 rounded-xl shadow-inner">
                   {(physFormula.vars || []).map(v => (
                     <div key={v} className="flex items-center gap-3">
-                      <div className="text-xs font-bold text-blue-300 font-mono uppercase">{v} =</div>
+                      <div className="text-xs font-bold text-brand-300 font-mono uppercase">{v} =</div>
                       <input value={physVarsLocal[v]||''} onChange={e=>setPhysVarsLocal(p=>({...p,[v]:e.target.value}))}
-                        className="w-24 text-center text-sm bg-white/5 border border-white/10 rounded-lg py-1.5 text-white font-mono focus:border-blue-400 focus:ring-1 focus:ring-blue-400/50 focus:outline-none transition-all shadow-inner" />
+                        className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" />
                     </div>
                   ))}
                 </div>
-                <button onClick={computePhysics} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm shadow-[0_4px_15px_rgba(79,70,229,0.3)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all active:scale-95">Solve</button>
+                <button onClick={computePhysics} className="px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">Solve</button>
                 {result?.type === 'physics' && (
                   <div className="mt-5">
-                    <div className="bg-black/20 border border-white/5 rounded-xl px-5 py-4 mb-4 font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 text-2xl shadow-inner">{result.numerical}</div>
+                    <div className="bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 rounded-xl px-5 py-4 mb-4 font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 text-2xl shadow-inner">{result.numerical}</div>
                     <div className="space-y-1">{result.steps?.map((s,i)=><KatexStep key={i} label={s.label} latex={s.latex} />)}</div>
                   </div>
                 )}
@@ -1792,7 +1798,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
           <div className="p-5">
             {/* Formula picker */}
             <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3">Select formula</div>
-            <div className="flex flex-wrap gap-1.5 mb-5 p-2 bg-black/10 rounded-xl border border-white/5 shadow-inner">
+            <div className="flex flex-wrap gap-1.5 mb-5 p-2 bg-brand-500/5 dark:bg-black/10 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
               {MACHINIST_FORMULAS.map((f,i) => (
                 <button key={i} onClick={() => { setMachFormula(f); setMachVarsLocal(Object.fromEntries((f.vars||[]).map(v=>[v,'']))); setMachResult(null) }}
                   className={`px-3 py-1.5 text-xs rounded-lg transition-all font-medium ${machFormula?.name===f.name?'bg-orange-500 text-white shadow-md shadow-orange-500/20':'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200 border border-transparent hover:border-white/10'}`}>
@@ -1805,12 +1811,12 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
               <div className="flex gap-5 flex-wrap lg:flex-nowrap">
                 {/* Left: formula card + inputs + results + explanations */}
                 <div className="flex-1 min-w-0">
-                  <div className="bg-black/20 border border-white/5 rounded-xl p-5 mb-5 shadow-inner">
+                  <div className="bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 rounded-xl p-5 mb-5 shadow-inner">
                     <div className="text-sm font-bold text-orange-400 mb-2 uppercase tracking-wide">{machFormula.fullName}</div>
                     <div className="text-xs text-slate-400 mb-4">{machFormula.desc}</div>
                     <KatexStep label="" latex={machFormula.latex} />
                     {machFormula.units && (
-                      <div className="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-x-5 gap-y-1">
+                      <div className="mt-4 pt-3 border-t border-slate-200/40 dark:border-white/5 flex flex-wrap gap-x-5 gap-y-1">
                         {Object.entries(machFormula.units).map(([k,u]) => (
                           <div key={k} className="text-xs text-slate-500 font-mono"><span className="text-orange-200/50">{k}</span>: {u}</div>
                         ))}
@@ -1819,13 +1825,13 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                   </div>
 
                   {/* Variable inputs */}
-                  <div className="flex flex-wrap gap-4 mb-5 p-4 bg-black/20 border border-white/5 rounded-xl shadow-inner">
+                  <div className="flex flex-wrap gap-4 mb-5 p-4 bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 rounded-xl shadow-inner">
                     {(machFormula.vars || []).map(v => (
                       <div key={v} className="flex flex-col gap-1">
                         <div className="text-[11px] font-bold text-orange-300 font-mono uppercase pl-1">{v}</div>
                         <input value={machVarsLocal[v]||''} onChange={e=>setMachVarsLocal(p=>({...p,[v]:e.target.value}))}
                           placeholder="0"
-                          className="w-24 text-center text-sm bg-white/5 border border-white/10 rounded-lg py-2 text-white font-mono focus:border-orange-400 focus:ring-1 focus:ring-orange-400/50 focus:outline-none transition-all shadow-inner" />
+                          className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-2 text-slate-800 font-mono focus:border-orange-400 focus:ring-1 focus:ring-orange-400/50 focus:outline-none transition-all shadow-inner" />
                       </div>
                     ))}
                   </div>
@@ -1838,10 +1844,10 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                   {/* Result */}
                   {machResult && (
                     <div className="mb-5">
-                      <div className="bg-black/20 border border-white/5 rounded-xl px-5 py-4 mb-4 font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-400 text-2xl shadow-inner">{machResult.answer}</div>
+                      <div className="bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 rounded-xl px-5 py-4 mb-4 font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-400 text-2xl shadow-inner">{machResult.answer}</div>
                       {/* Bolt circle coordinate table */}
                       {machResult.coords && (
-                        <div className="overflow-x-auto mb-4 bg-black/20 rounded-xl border border-white/5 shadow-inner">
+                        <div className="overflow-x-auto mb-4 bg-brand-500/5 dark:bg-black/20 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
                           <table className="text-xs font-mono w-full border-collapse">
                             <thead>
                               <tr className="border-b border-white/10 bg-white/5">
@@ -1852,7 +1858,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                             </thead>
                             <tbody>
                               {machResult.coords.map(({k,x,y}) => (
-                                <tr key={k} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                <tr key={k} className="border-b border-slate-200/40 dark:border-white/5 hover:bg-white/5 transition-colors">
                                   <td className="px-4 py-2 text-slate-500 font-bold">{k+1}</td>
                                   <td className="px-4 py-2 text-right text-slate-300">{fmtNum(x, 5)}</td>
                                   <td className="px-4 py-2 text-right text-slate-300">{fmtNum(y, 5)}</td>
@@ -1868,11 +1874,11 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
 
                   {/* Explanations */}
                   {machFormula.explain && (
-                    <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/10">
+                    <div className="mt-4 p-4 bg-white/5 rounded-xl border border-slate-200/60 dark:border-white/10">
                       <div className="flex gap-2 mb-3">
                         {['eli5','student','college','advanced'].map(l => (
                           <button key={l} onClick={() => setExplainLevel(l)}
-                            className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-md transition-colors ${explainLevel===l?'bg-orange-500/20 text-orange-400 border border-orange-500/30':'bg-black/20 text-slate-400 hover:bg-white/10 border border-transparent'}`}>
+                            className={`text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-md transition-colors ${explainLevel===l?'bg-orange-500/20 text-orange-400 border border-orange-500/30':'bg-brand-500/5 dark:bg-black/20 text-slate-400 hover:bg-white/10 border border-transparent'}`}>
                             {l}
                           </button>
                         ))}
@@ -1882,20 +1888,20 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                   )}
 
                   {/* Reference links */}
-                  <div className="mt-6 pt-4 border-t border-white/5">
+                  <div className="mt-6 pt-4 border-t border-slate-200/40 dark:border-white/5">
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-3">Reference docs</div>
                     <div className="flex flex-wrap gap-2">
-                      <a href="#/reference" className="text-xs px-3 py-1.5 rounded-lg bg-black/20 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-slate-300 hover:text-blue-400 transition-all">📐 Math Reference</a>
-                      <a href="#/linear-algebra" className="text-xs px-3 py-1.5 rounded-lg bg-black/20 border border-white/10 hover:border-blue-500/50 hover:bg-blue-500/10 text-slate-300 hover:text-blue-400 transition-all">⊞ Linear Algebra</a>
-                      <a href="#/cnc-sim" className="text-xs px-3 py-1.5 rounded-lg bg-black/20 border border-white/10 hover:border-orange-500/50 hover:bg-orange-500/10 text-slate-300 hover:text-orange-400 transition-all">🔧 CNC Sim</a>
+                      <a href="#/reference" className="text-xs px-3 py-1.5 rounded-lg bg-brand-500/5 dark:bg-black/20 border border-slate-200/60 dark:border-white/10 hover:border-brand-500/50 hover:bg-brand-500/10 text-slate-300 hover:text-brand-400 transition-all">📐 Math Reference</a>
+                      <a href="#/linear-algebra" className="text-xs px-3 py-1.5 rounded-lg bg-brand-500/5 dark:bg-black/20 border border-slate-200/60 dark:border-white/10 hover:border-brand-500/50 hover:bg-brand-500/10 text-slate-300 hover:text-brand-400 transition-all">⊞ Linear Algebra</a>
+                      <a href="#/cnc-sim" className="text-xs px-3 py-1.5 rounded-lg bg-brand-500/5 dark:bg-black/20 border border-slate-200/60 dark:border-white/10 hover:border-orange-500/50 hover:bg-orange-500/10 text-slate-300 hover:text-orange-400 transition-all">🔧 CNC Sim</a>
                     </div>
                   </div>
                 </div>
 
                 {/* Right: SVG visualization */}
-                <div className="flex flex-col items-center gap-4 shrink-0 bg-black/20 p-5 rounded-xl border border-white/5 shadow-inner h-max">
+                <div className="flex flex-col items-center gap-4 shrink-0 bg-brand-500/5 dark:bg-black/20 p-5 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner h-max">
                   <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Diagram</div>
-                  <div className="bg-slate-900/50 p-2 rounded-lg border border-white/5">
+                  <div className="bg-brand-500/5 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-200/40 dark:border-white/5">
                     <MachinistViz viz={machFormula.viz} vars={machVarsLocal} />
                   </div>
                 </div>
@@ -1933,7 +1939,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
 
             <div className="flex gap-8 flex-wrap lg:flex-nowrap">
               {/* Inputs */}
-              <div className="flex-1 bg-black/20 p-5 rounded-xl border border-white/5 shadow-inner min-w-[300px]">
+              <div className="flex-1 bg-brand-500/5 dark:bg-black/20 p-5 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner min-w-[300px]">
                 <div className="flex gap-8 mb-6">
                   <div>
                     <div className="text-[11px] font-bold text-slate-500 mb-3 uppercase tracking-wider">Sides</div>
@@ -1943,7 +1949,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                           <span className="text-sm font-bold font-mono text-emerald-400 w-4">{k}</span>
                           <span className="text-slate-600">=</span>
                           <input value={triSides[k]} onChange={e=>setTriSides(p=>({...p,[k]:e.target.value}))}
-                            placeholder="?" className="w-24 text-center text-sm bg-white/5 border border-white/10 rounded-lg py-1.5 text-white font-mono focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/50 focus:outline-none transition-all shadow-inner" />
+                            placeholder="?" className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/50 focus:outline-none transition-all shadow-inner" />
                         </div>
                       ))}
                     </div>
@@ -1956,14 +1962,14 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                           <span className="text-sm font-bold font-mono text-amber-400 w-4">{k}</span>
                           <span className="text-slate-600">=</span>
                           <input value={triAngles[k]} onChange={e=>setTriAngles(p=>({...p,[k]:e.target.value}))}
-                            placeholder="?" className="w-24 text-center text-sm bg-white/5 border border-white/10 rounded-lg py-1.5 text-white font-mono focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 focus:outline-none transition-all shadow-inner" />
+                            placeholder="?" className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 focus:outline-none transition-all shadow-inner" />
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-3 pt-4 border-t border-white/5">
-                  <button onClick={computeTriangle} className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold text-sm shadow-[0_4px_15px_rgba(79,70,229,0.3)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.4)] hover:-translate-y-0.5 transition-all active:scale-95">Solve</button>
+                <div className="flex gap-3 pt-4 border-t border-slate-200/40 dark:border-white/5">
+                  <button onClick={computeTriangle} className="px-6 py-2.5 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">Solve</button>
                   <button onClick={() => { setTriSides({a:'',b:'',c:''}); setTriAngles({A:'',B:'',C:''}); setTriResult(null) }} className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl font-semibold text-sm transition-colors">Clear</button>
                 </div>
                 <div className="mt-4 text-[10px] text-slate-500 uppercase tracking-widest font-semibold space-y-1">
@@ -1974,14 +1980,14 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
 
               {/* SVG diagram */}
               {triResult && !triResult.error && (
-                <div className="flex flex-col items-center bg-black/20 p-5 rounded-xl border border-white/5 shadow-inner">
-                  <div className="bg-slate-900/50 p-4 rounded-xl border border-white/5 mb-4">
+                <div className="flex flex-col items-center bg-brand-500/5 dark:bg-black/20 p-5 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
+                  <div className="bg-brand-500/5 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200/40 dark:border-white/5 mb-4">
                     <TriangleSVG a={triResult.a} b={triResult.b} c={triResult.c}
                       A={triResult.A*Math.PI/180} B={triResult.B*Math.PI/180} C={triResult.C*Math.PI/180} />
                   </div>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-xs font-mono w-full">
                     {[['Area',triResult.area],['Perimeter',parseFloat((triResult.a+triResult.b+triResult.c).toFixed(6))],['Circumradius R',triResult.R],['Inradius r',triResult.r]].map(([k,v])=>(
-                      <div key={k} className="flex justify-between gap-4 border-b border-white/5 pb-1"><span className="text-slate-500">{k}</span><span className="text-emerald-400 font-bold">{v}</span></div>
+                      <div key={k} className="flex justify-between gap-4 border-b border-slate-200/40 dark:border-white/5 pb-1"><span className="text-slate-500">{k}</span><span className="text-emerald-400 font-bold">{v}</span></div>
                     ))}
                   </div>
                 </div>
@@ -2001,7 +2007,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
             )}
 
             {/* Reference laws */}
-            <div className="mt-8 pt-5 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mt-8 pt-5 border-t border-slate-200/40 dark:border-white/5 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 col-span-full mb-1">Reference Formulas</div>
               {[
                 ['Law of Sines','\\dfrac{a}{\\sin A} = \\dfrac{b}{\\sin B} = \\dfrac{c}{\\sin C}'],
@@ -2009,7 +2015,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                 ['Area','\\text{Area} = \\tfrac{1}{2}ab\\sin C = \\sqrt{s(s-a)(s-b)(s-c)}'],
                 ['Angles sum','A + B + C = 180^\\circ'],
               ].map(([lbl,lat]) => (
-                <div key={lbl} className="flex items-center gap-4 text-xs bg-white/5 p-3 rounded-xl border border-white/5">
+                <div key={lbl} className="flex items-center gap-4 text-xs bg-white/5 p-3 rounded-xl border border-slate-200/40 dark:border-white/5">
                   <span className="text-slate-400 w-28 shrink-0 font-medium">{lbl}</span>
                   <KatexInline expr={lat} />
                 </div>
@@ -2023,12 +2029,12 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
         ══════════════════════════════════════════════════════════════════════ */}
         {section === 'graph' && (
           <div className="p-5">
-            <div className="flex flex-wrap gap-4 mb-4 items-end bg-black/20 p-4 rounded-xl border border-white/5 shadow-inner">
+            <div className="flex flex-wrap gap-4 mb-4 items-end bg-brand-500/5 dark:bg-black/20 p-4 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
               {graphFns.map((fn,i) => (
                 <div key={i} className="flex flex-col gap-1">
                   <div className="text-[11px] font-bold uppercase font-mono tracking-wider" style={{color:['#60a5fa','#34d399','#f472b6','#fb923c'][i]}}>y{i+1} =</div>
                   <input value={fn} onChange={e=>{ const f=[...graphFns]; f[i]=e.target.value; setGraphFns(f) }}
-                    className="w-40 text-sm bg-white/5 border border-white/10 rounded-lg py-2 px-3 text-white font-mono focus:ring-1 focus:outline-none transition-all shadow-inner"
+                    className="w-40 text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-2 px-3 text-slate-800 font-mono focus:ring-1 focus:outline-none transition-all shadow-inner"
                     style={{ '--tw-ring-color': ['#60a5fa','#34d399','#f472b6','#fb923c'][i] }} />
                 </div>
               ))}
@@ -2037,12 +2043,12 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
               {[['xMin',graphXMin,setGraphXMin],['xMax',graphXMax,setGraphXMax],['yMin',graphYMin,setGraphYMin],['yMax',graphYMax,setGraphYMax]].map(([label,val,set])=>(
                 <div key={label} className="flex flex-col gap-1"><div className="text-[10px] font-bold uppercase tracking-wider">{label}</div>
                   <input type="number" value={val} onChange={e=>set(parseFloat(e.target.value)||0)}
-                    className="w-20 text-center text-sm bg-black/20 border border-white/10 rounded-lg py-1.5 text-white font-mono focus:border-blue-400 focus:outline-none shadow-inner transition-colors" />
+                    className="w-20 text-center text-sm bg-brand-500/5 dark:bg-black/20 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:outline-none shadow-inner transition-colors" />
                 </div>
               ))}
               <button onClick={()=>{setGraphXMin(-10);setGraphXMax(10);setGraphYMin(-10);setGraphYMax(10)}} className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 self-end font-medium transition-colors border border-transparent hover:border-white/10">reset bounds</button>
             </div>
-            <div className="bg-black/20 p-2 rounded-xl border border-white/5 shadow-inner">
+            <div className="bg-brand-500/5 dark:bg-black/20 p-2 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
               <CanvasGraph fns={builtGraphFns} xMin={graphXMin} xMax={graphXMax} yMin={graphYMin} yMax={graphYMax} width={860} height={380} />
             </div>
           </div>
@@ -2054,7 +2060,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
         {section === 'script' && (
           <div className="p-5">
             {/* Language selector */}
-            <div className="flex items-center gap-2 mb-4 p-2 bg-black/20 rounded-xl border border-white/5 shadow-inner">
+            <div className="flex items-center gap-2 mb-4 p-2 bg-brand-500/5 dark:bg-black/20 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
               {[['js','JavaScript','#f59e0b'],['python','Python (Pyodide)','#60a5fa'],['matlab','OpenMAT','#f97316']].map(([id,label,col])=>(
                 <button key={id} onClick={()=>{ setScriptLang(id); setScriptOutput(''); setMlOutput(''); setMlWorkspace([]) }}
                   className={`px-4 py-2 text-xs rounded-lg font-bold transition-all shadow-sm ${scriptLang===id?'text-white shadow-md':'bg-white/5 text-slate-400 hover:bg-white/10 border border-transparent'}`}
@@ -2074,9 +2080,9 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
               )}
               <div className="ml-auto flex items-center gap-3 pr-1">
                 {scriptLang !== 'matlab' && (
-                  <div className="flex items-center gap-2 bg-black/40 rounded-lg p-1 border border-white/5">
+                  <div className="flex items-center gap-2 bg-brand-500/5 dark:bg-black/40 rounded-lg p-1 border border-slate-200/40 dark:border-white/5">
                     <input value={scriptName} onChange={e=>setScriptName(e.target.value)} placeholder="name to save..."
-                      className="w-32 text-xs bg-transparent border-none rounded px-2 py-1 text-white font-mono focus:outline-none placeholder-slate-600" />
+                      className="w-32 text-xs bg-transparent border-none rounded px-2 py-1 text-slate-800 font-mono focus:outline-none placeholder-slate-600" />
                     <button onClick={() => { if (scriptName.trim()) setScripts2({...scripts,[scriptName.trim()]: scriptLang==='python' ? pyScript : script}) }}
                       className="px-3 py-1 bg-white/10 hover:bg-white/20 text-slate-200 rounded text-xs font-semibold transition-colors">Save</button>
                   </div>
@@ -2087,7 +2093,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                     else if (scriptLang === 'matlab') runMatlab()
                     else runScript()
                   }}
-                  className={`px-6 py-2 rounded-lg text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5 active:scale-95 ${scriptLang==='matlab'?'bg-gradient-to-r from-orange-600 to-red-600 hover:shadow-orange-500/30':scriptLang==='python'?'bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-blue-500/30':'bg-gradient-to-r from-emerald-600 to-teal-600 hover:shadow-emerald-500/30'}`}>
+                  className={`px-6 py-2 rounded-lg text-sm font-black text-white shadow-lg transition-all hover:-translate-y-0.5 active:scale-95 ${scriptLang==='matlab'?'bg-gradient-to-r from-orange-600 to-red-600 hover:shadow-orange-500/30':scriptLang==='python'?'bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-brand-500/30':'bg-gradient-to-r from-emerald-600 to-teal-600 hover:shadow-emerald-500/30'}`}>
                   {mlStatus === 'running' && scriptLang === 'matlab' ? '⏳ Running…' : '▶ Run'}
                 </button>
               </div>
@@ -2101,18 +2107,19 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                   <button key={name} onClick={()=>{
                     if (scriptLang==='python') setPyScript(scripts[name])
                     else setScript(scripts[name]); setScriptName(name)
-                  }} className="text-xs font-mono px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 text-slate-300 transition-colors">{name}</button>
+                  }} className="text-xs font-mono px-3 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-slate-200/40 dark:border-white/5 hover:border-white/20 text-slate-300 transition-colors">{name}</button>
                 ))}
               </div>
             )}
 
             {/* Editor */}
-            <div className="rounded-xl overflow-hidden border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-              <Suspense fallback={<div className="text-slate-400 text-sm p-4 bg-black/40">Loading editor...</div>}>
+            <div className="rounded-xl overflow-hidden border border-slate-200/60 dark:border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+              <Suspense fallback={<div className="text-slate-400 text-sm p-4 bg-brand-500/5 dark:bg-black/40">Loading editor...</div>}>
                 <MonacoEditor
                   height="280px"
                   language={scriptLang === 'python' ? 'python' : scriptLang === 'matlab' ? 'plaintext' : 'javascript'}
-                  theme="vs-dark"
+                  beforeMount={setupOpenCalcMonaco}
+                  theme={themeStyles.monaco}
                   value={scriptLang === 'python' ? pyScript : scriptLang === 'matlab' ? mlScript : script}
                   onChange={v => { if (scriptLang==='python') setPyScript(v||''); else if (scriptLang==='matlab') setMlScript(v||''); else setScript(v||'') }}
                   options={{ minimap:{enabled:false}, fontSize:13, wordWrap:'on', scrollBeyondLastLine:false, tabSize:2, padding:{top:10,bottom:10} }} />
@@ -2121,7 +2128,7 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
 
             {/* Output — JS / Python */}
             {scriptLang !== 'matlab' && (
-              <div className="mt-4 bg-[#0a0a0a] rounded-xl border border-white/10 p-4 font-mono text-sm min-h-[4rem] max-h-48 overflow-y-auto shadow-inner">
+              <div className="mt-4 bg-slate-950 rounded-xl border border-slate-200/60 dark:border-white/10 p-4 font-mono text-sm min-h-[4rem] max-h-48 overflow-y-auto shadow-inner">
                 {scriptOutput
                   ? <pre className="text-emerald-400 whitespace-pre-wrap">{scriptOutput}</pre>
                   : <span className="text-slate-600 select-none">Output appears here after ▶ Run...</span>}
@@ -2131,17 +2138,17 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
             {/* Output — OpenMAT */}
             {scriptLang === 'matlab' && (mlStatus !== 'idle') && (
               <div className="mt-4 space-y-3">
-                <div className="bg-[#0a0a0a] rounded-xl border border-white/10 p-4 font-mono text-sm min-h-[4rem] max-h-56 overflow-y-auto shadow-inner">
+                <div className="bg-slate-950 rounded-xl border border-slate-200/60 dark:border-white/10 p-4 font-mono text-sm min-h-[4rem] max-h-56 overflow-y-auto shadow-inner">
                   {mlOutput
                     ? <pre className={`whitespace-pre-wrap ${mlStatus==='error'?'text-red-400':'text-emerald-400'}`}>{mlOutput}</pre>
                     : <span className="text-slate-600">No output.</span>}
                 </div>
                 {mlWorkspace.length > 0 && (
-                  <div className="bg-black/20 rounded-xl border border-white/5 overflow-hidden shadow-inner">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-4 py-2 border-b border-white/5">Workspace</div>
+                  <div className="bg-brand-500/5 dark:bg-black/20 rounded-xl border border-slate-200/40 dark:border-white/5 overflow-hidden shadow-inner">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-4 py-2 border-b border-slate-200/40 dark:border-white/5">Workspace</div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs font-mono">
-                        <thead><tr className="text-slate-500 border-b border-white/5">
+                        <thead><tr className="text-slate-500 border-b border-slate-200/40 dark:border-white/5">
                           <th className="text-left px-4 py-1.5 font-semibold">Name</th>
                           <th className="text-left px-4 py-1.5 font-semibold">Size</th>
                           <th className="text-left px-4 py-1.5 font-semibold">Class</th>
@@ -2150,15 +2157,15 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
                         </tr></thead>
                         <tbody>
                           {mlWorkspace.map(w => (
-                            <tr key={w.name} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                              <td className="px-4 py-1.5 text-blue-300 font-bold">{w.name}</td>
+                            <tr key={w.name} className="border-b border-slate-200/40 dark:border-white/5 hover:bg-white/5 transition-colors">
+                              <td className="px-4 py-1.5 text-brand-300 font-bold">{w.name}</td>
                               <td className="px-4 py-1.5 text-slate-400">{w.size?.join('×')}</td>
                               <td className="px-4 py-1.5 text-slate-500">{w.className}</td>
                               <td className="px-4 py-1.5 text-emerald-400 max-w-[200px] truncate">{w.preview}</td>
                               <td className="px-2 py-1.5">
                                 {Array.isArray(w.value) && Array.isArray(w.value[0]) && (
                                   <button onClick={() => { setMatVars({...matVars, [w.name]: w.value}); setSection('matrix') }}
-                                    className="text-[10px] text-purple-400 hover:text-purple-300 font-semibold px-1.5 py-0.5 rounded hover:bg-purple-500/10 transition-colors">→ mat</button>
+                                    className="text-[10px] text-sky-400 hover:text-sky-300 font-semibold px-1.5 py-0.5 rounded hover:bg-sky-500/10 transition-colors">→ mat</button>
                                 )}
                               </td>
                             </tr>
@@ -2178,9 +2185,9 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
 
             {/* Matplotlib images */}
             {pyImages.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-4 p-4 bg-black/20 rounded-xl border border-white/5 shadow-inner">
+              <div className="mt-4 flex flex-wrap gap-4 p-4 bg-brand-500/5 dark:bg-black/20 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
                 {pyImages.map((src,i) => (
-                  <img key={i} src={src} alt={`Plot ${i+1}`} className="max-w-full rounded-lg border border-white/10 shadow-md" style={{maxHeight:320}} />
+                  <img key={i} src={src} alt={`Plot ${i+1}`} className="max-w-full rounded-lg border border-slate-200/60 dark:border-white/10 shadow-md" style={{maxHeight:320}} />
                 ))}
               </div>
             )}
@@ -2199,10 +2206,10 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {PHYSICS_FORMULAS.map(f => (
                   <button key={f.name} onClick={() => { setSection('physics'); setPhysFormula(f); setPhysVarsLocal(Object.fromEntries((f.vars||[]).map(v=>[v,'']))) }}
-                    className="text-left px-4 py-3 rounded-xl bg-black/20 border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all group">
-                    <div className="text-sm font-bold text-blue-400 group-hover:text-blue-300 transition-colors">{f.name}</div>
+                    className="text-left px-4 py-3 rounded-xl bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 hover:border-brand-500/50 hover:bg-brand-500/5 transition-all group">
+                    <div className="text-sm font-bold text-brand-400 group-hover:text-brand-300 transition-colors">{f.name}</div>
                     <div className="text-xs text-slate-400 font-mono mt-1">{f.desc}</div>
-                    <div className="text-xs text-slate-500 mt-2 overflow-hidden bg-black/20 p-2 rounded-lg">
+                    <div className="text-xs text-slate-500 mt-2 overflow-hidden bg-brand-500/5 dark:bg-black/20 p-2 rounded-lg">
                       <KatexInline expr={f.latex} />
                     </div>
                   </button>
@@ -2216,10 +2223,10 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {MACHINIST_FORMULAS.map(f => (
                   <button key={f.name} onClick={() => { setSection('machinist'); setMachFormula(f); setMachVarsLocal(Object.fromEntries((f.vars||[]).map(v=>[v,'']))); setMachResult(null) }}
-                    className="text-left px-4 py-3 rounded-xl bg-black/20 border border-white/5 hover:border-orange-500/50 hover:bg-orange-500/5 transition-all group">
+                    className="text-left px-4 py-3 rounded-xl bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 hover:border-orange-500/50 hover:bg-orange-500/5 transition-all group">
                     <div className="text-sm font-bold text-orange-400 group-hover:text-orange-300 transition-colors">{f.name}</div>
                     <div className="text-xs text-slate-400 mt-1">{f.desc}</div>
-                    <div className="text-xs text-slate-500 mt-2 overflow-hidden bg-black/20 p-2 rounded-lg">
+                    <div className="text-xs text-slate-500 mt-2 overflow-hidden bg-brand-500/5 dark:bg-black/20 p-2 rounded-lg">
                       <KatexInline expr={f.latex} />
                     </div>
                   </button>
@@ -2228,12 +2235,12 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
             </div>
             <div>
               <div className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-3 pl-1">Saved Formulas</div>
-              {Object.keys(formulas).length === 0 && <div className="text-slate-500 text-sm bg-black/20 p-4 rounded-xl border border-white/5">No saved formulas. In Compute, use "f1 = expr" to save.</div>}
+              {Object.keys(formulas).length === 0 && <div className="text-slate-500 text-sm bg-brand-500/5 dark:bg-black/20 p-4 rounded-xl border border-slate-200/40 dark:border-white/5">No saved formulas. In Compute, use "f1 = expr" to save.</div>}
               <div className="flex flex-wrap gap-2">
                 {Object.entries(formulas).map(([k,v]) => (
                   <button key={k} onClick={() => { setInput(v); setSection('compute') }}
-                    className="text-xs px-4 py-2 rounded-lg bg-black/20 border border-white/5 hover:border-blue-400/50 hover:bg-blue-500/5 text-slate-300 font-mono transition-all shadow-inner">
-                    <span className="font-bold text-blue-400 mr-2">{k}:</span>{v}
+                    className="text-xs px-4 py-2 rounded-lg bg-brand-500/5 dark:bg-black/20 border border-slate-200/40 dark:border-white/5 hover:border-brand-400/50 hover:bg-brand-500/5 text-slate-300 font-mono transition-all shadow-inner">
+                    <span className="font-bold text-brand-400 mr-2">{k}:</span>{v}
                   </button>
                 ))}
               </div>
@@ -2244,16 +2251,16 @@ window.parent.postMessage({type:'script-output',log:__log,err:__err},'*');
       </div>
 
       {/* ── STATUS BAR ── */}
-      <div className="flex items-center gap-4 px-5 py-2 bg-black/30 border-t border-white/5 shrink-0 backdrop-blur-md">
+      <div className={`flex items-center gap-4 px-5 py-2 border-t shrink-0 backdrop-blur-md ${ui.bg2} ${ui.border}`}>
         <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
           MathOS v1.0
         </span>
-        <span className="text-xs text-white/10">|</span>
-        <span className="text-[11px] font-medium text-slate-400"><span className="text-slate-300 font-mono">{Object.keys(vars).length}</span> vars</span>
-        <span className="text-xs text-white/10">|</span>
-        <span className="text-[11px] font-medium text-slate-400"><span className="text-slate-300 font-mono">{history.length}</span> history</span>
-        <span className="ml-auto text-[10px] font-semibold uppercase tracking-wider text-slate-500">↑↓ history • <kbd className="font-mono bg-white/5 px-1 rounded border border-white/10 mx-1">Enter</kbd> to compute</span>
+        <span className={`text-xs ${ui.txt2} opacity-30`}>|</span>
+        <span className="text-[11px] font-medium text-slate-400"><span className="text-slate-500 font-mono">{Object.keys(vars).length}</span> vars</span>
+        <span className={`text-xs ${ui.txt2} opacity-30`}>|</span>
+        <span className="text-[11px] font-medium text-slate-400"><span className="text-slate-500 font-mono">{history.length}</span> history</span>
+        <span className="ml-auto text-[10px] font-semibold uppercase tracking-wider text-slate-500">↑↓ history • <kbd className={`font-mono px-1 rounded mx-1 ${ui.bg2} border ${ui.border}`}>Enter</kbd> to compute</span>
       </div>
     </div>
   )

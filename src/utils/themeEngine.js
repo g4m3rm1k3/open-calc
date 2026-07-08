@@ -245,7 +245,17 @@ export function generateThemeStyleString(colors, forceLight = false) {
     // Apply to :root so vars are active without a .dark class
     return `:root {\n${vars}}\n.dark {}\n`;
   } else {
-    // Apply to .dark; clear :root so vue-light vars don't bleed through
-    return `:root {}\n.dark {\n${vars}}\n`;
+    // Slate stays .dark-scoped (values are dark-specific).
+    // Brand + sky go to :root too so they work in light mode.
+    let rootVars = '';
+    Object.keys(colors.sky).forEach(shade => {
+      rootVars += `  --tw-custom-sky-${shade}: ${colors.sky[shade]};\n`;
+    });
+    if (colors.brand) {
+      Object.keys(colors.brand).forEach(shade => {
+        rootVars += `  --tw-custom-brand-${shade}: ${colors.brand[shade]};\n`;
+      });
+    }
+    return `:root {\n${rootVars}}\n.dark {\n${vars}}\n`;
   }
 }
