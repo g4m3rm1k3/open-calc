@@ -95,6 +95,15 @@
     --math-text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
   }
 
+  ::selection {
+    background-color: rgb(var(--tw-custom-brand-500) / 0.25);
+    color: inherit;
+  }
+  .dark ::selection {
+    background-color: rgb(var(--tw-custom-brand-400) / 0.35);
+    color: inherit;
+  }
+
   html {
     scroll-behavior: smooth;
   }
@@ -150,7 +159,13 @@
 
   /* Interaction Utilities */
   .oc-btn-premium {
-    @apply transition-all duration-200 active:scale-[0.94] active:brightness-90 hover:brightness-105 hover:shadow-xl hover:-translate-y-0.5;
+    @apply transition-all duration-200 active:scale-[0.94] active:brightness-90 hover:-translate-y-0.5;
+  }
+  .oc-btn-premium:hover {
+    box-shadow: 0 8px 25px -5px rgb(var(--tw-custom-brand-500) / 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+  .dark .oc-btn-premium:hover {
+    box-shadow: 0 8px 25px -5px rgb(var(--tw-custom-brand-400) / 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .nav-tool-btn {
@@ -160,9 +175,15 @@
            bg-gradient-to-b from-white/60 to-transparent dark:from-white/10 dark:to-transparent
            shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.6)] 
            dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)]
-           hover:border-slate-300 dark:hover:border-slate-500 
-           hover:shadow-[0_3px_6px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,1)] 
            active:scale-[0.96] active:shadow-inner transition-all;
+  }
+  .nav-tool-btn:hover {
+    border-color: rgb(var(--tw-custom-brand-300));
+    box-shadow: 0 4px 12px -2px rgb(var(--tw-custom-brand-500) / 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+  .dark .nav-tool-btn:hover {
+    border-color: rgb(var(--tw-custom-brand-600));
+    box-shadow: 0 4px 12px -2px rgb(var(--tw-custom-brand-400) / 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   /* Plain CSS, not @apply with bracket arbitrary-values: complex multi-part
@@ -173,18 +194,29 @@
      what's selected. */
   .oc-header-gradient {
     background-image:
-      radial-gradient(circle at top left, rgb(var(--tw-custom-brand-500) / 0.12), transparent 32%),
-      linear-gradient(180deg, rgb(var(--tw-custom-slate-50) / 0.42), transparent);
+      radial-gradient(circle at top left, rgb(var(--tw-custom-brand-500) / 0.18), transparent 45%),
+      linear-gradient(180deg, rgb(var(--tw-custom-slate-50) / 0.8), transparent);
   }
   .dark .oc-header-gradient {
     background-image:
-      radial-gradient(circle at top left, rgb(var(--tw-custom-brand-400) / 0.14), transparent 32%),
-      linear-gradient(180deg, rgb(var(--tw-custom-slate-900) / 0.42), transparent);
+      radial-gradient(circle at top left, rgb(var(--tw-custom-brand-400) / 0.22), transparent 45%),
+      linear-gradient(180deg, rgb(var(--tw-custom-slate-900) / 0.8), transparent);
   }
 
   .oc-card-container {
     @apply bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] p-6 sm:p-10 transition-all duration-300;
-    box-shadow: var(--shadow-premium);
+    box-shadow: var(--shadow-premium), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+  .dark .oc-card-container {
+    box-shadow: var(--shadow-premium), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  .oc-card-container:hover {
+    box-shadow: 0 12px 40px -10px rgb(var(--tw-custom-brand-500) / 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    border-color: rgb(var(--tw-custom-brand-200));
+  }
+  .dark .oc-card-container:hover {
+    box-shadow: 0 12px 40px -10px rgb(var(--tw-custom-brand-400) / 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-color: rgb(var(--tw-custom-brand-800));
   }
 
   .oc-section-kicker {

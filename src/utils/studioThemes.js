@@ -566,7 +566,7 @@ export const STUDIO_THEMES = {
   },
   catppuccin: {
     name: 'Catppuccin',
-    accentHex: '#8aadf4',
+    accentHex: '#cba6f7', // Changed from blue to signature Mauve (Purple)
     monacoDark: 'catppuccin',
     dynamic: false,
     uiDark: {
@@ -579,17 +579,17 @@ export const STUDIO_THEMES = {
       hoverBg: 'hover:bg-[#363a4f]',
       hoverTx: 'hover:text-[#cad3f5]',
       btnBorder: 'border-[#494d64]',
-      primary: 'text-[#8aadf4]',
-      primaryBg: 'bg-[#8aadf4]/10',
+      primary: 'text-[#cba6f7]', // Mauve
+      primaryBg: 'bg-[#cba6f7]/10',
     },
     mdDark: {
       text: '#cad3f5',
       h1: '#ed8796',
-      h2: '#8aadf4',
-      h3: '#c6a0f6',
+      h2: '#cba6f7', // Mauve
+      h3: '#8aadf4', // Blue
       h4: '#eed49f',
       strong: '#a6da95',
-      em: '#f5bde6',
+      em: '#f5bde6', // Pink
       listMarker: '#f5a97f',
       a: '#8bd5ca',
       codeBg: '#1e2030',
@@ -613,7 +613,112 @@ export const STUDIO_THEMES = {
       codeBtnHoverBg: '#363a4f',
       codeBtnHoverText: '#cad3f5',
       resizeHandleBg: '#363a4f',
-      resizeHandleHover: '#8aadf4',
+      resizeHandleHover: '#cba6f7',
+    }
+  },
+  'catppuccin-latte': {
+    name: 'Catppuccin Latte',
+    accentHex: '#8839ef', // Mauve
+    monacoLight: 'catppuccin-latte',
+    forceLight: true,
+    dynamic: false,
+    uiDark: {
+      bg0: 'bg-[#eff1f5]',
+      bg1: 'bg-[#e6e9ef]',
+      bg2: 'bg-[#dce0e8]',
+      border: 'border-[#ccd0da]',
+      txt1: 'text-[#4c4f69]',
+      txt2: 'text-[#6c6f85]',
+      hoverBg: 'hover:bg-[#ccd0da]',
+      hoverTx: 'hover:text-[#4c4f69]',
+      btnBorder: 'border-[#bcc0cc]',
+      primary: 'text-[#8839ef]',
+      primaryBg: 'bg-[#8839ef]/10',
+    },
+    mdDark: {
+      text: '#4c4f69',
+      h1: '#d20f39', // Red
+      h2: '#8839ef', // Mauve
+      h3: '#1e66f5', // Blue
+      h4: '#df8e1d', // Yellow
+      strong: '#40a02b', // Green
+      em: '#ea76cb', // Pink
+      listMarker: '#fe640b', // Peach
+      a: '#209fb5', // Sapphire
+      codeBg: '#e6e9ef',
+      codeText: '#fe640b',
+      preBg: '#eff1f5',
+      preBorder: '#ccd0da',
+      quoteBorder: '#8839ef',
+      quoteBg: 'rgba(136, 57, 239, 0.05)',
+      quoteText: '#6c6f85',
+      thBg: '#e6e9ef',
+      tdBorder: '#ccd0da',
+      trEven: '#eff1f5',
+      hr: '#ccd0da',
+      imgBorder: '#ccd0da',
+      codeHeaderBg: '#e6e9ef',
+      codeHeaderBorder: '#ccd0da',
+      codeLangText: '#6c6f85',
+      codeBtnBg: '#eff1f5',
+      codeBtnBorder: '#ccd0da',
+      codeBtnText: '#4c4f69',
+      codeBtnHoverBg: '#ccd0da',
+      codeBtnHoverText: '#4c4f69',
+      resizeHandleBg: '#ccd0da',
+      resizeHandleHover: '#8839ef',
+    }
+  },
+  synthwave: {
+    name: "SynthWave '84",
+    accentHex: '#ff7edb', // Neon Pink
+    monacoDark: 'synthwave',
+    dynamic: false,
+    uiDark: {
+      bg0: 'bg-[#262335]',
+      bg1: 'bg-[#1e1c29]',
+      bg2: 'bg-[#16151e]',
+      border: 'border-[#3f3c4c]',
+      txt1: 'text-[#f8f8f2]',
+      txt2: 'text-[#848bbd]',
+      hoverBg: 'hover:bg-[#3f3c4c]',
+      hoverTx: 'hover:text-[#ff7edb]',
+      btnBorder: 'border-[#4e4b5d]',
+      primary: 'text-[#ff7edb]',
+      primaryBg: 'bg-[#ff7edb]/10',
+    },
+    mdDark: {
+      text: '#f8f8f2',
+      h1: '#ff7edb', // Neon Pink
+      h2: '#36f9f6', // Cyan
+      h3: '#f92aad', // Deep Pink
+      h4: '#fdfdfd',
+      strong: '#fe4450', // Neon Red
+      em: '#72f1b8', // Neon Green
+      listMarker: '#fede5d', // Neon Yellow
+      a: '#36f9f6', // Cyan
+      codeBg: '#1e1c29',
+      codeText: '#fede5d',
+      preBg: '#262335',
+      preBorder: '#3f3c4c',
+      quoteBorder: '#ff7edb',
+      quoteBg: 'rgba(255, 126, 219, 0.1)',
+      quoteText: '#848bbd',
+      thBg: '#1e1c29',
+      tdBorder: '#3f3c4c',
+      trEven: '#262335',
+      hr: '#3f3c4c',
+      imgBorder: '#3f3c4c',
+      codeHeaderBg: '#1e1c29',
+      codeHeaderBorder: '#3f3c4c',
+      codeLangText: '#848bbd',
+      codeBtnBg: '#262335',
+      codeBtnBorder: '#3f3c4c',
+      codeBtnText: '#f8f8f2',
+      codeBtnHoverBg: '#3f3c4c',
+      codeBtnHoverText: '#ff7edb',
+      resizeHandleBg: '#3f3c4c',
+      resizeHandleHover: '#36f9f6',
     }
   }
 };
