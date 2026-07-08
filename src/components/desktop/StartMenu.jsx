@@ -188,13 +188,6 @@ export default function StartMenu({ onClose }) {
   // Shared item button — used in every section
   const ItemBtn = ({ pin, onClick, children }) => {
     const meta = pin.color && GLASS_META[pin.color]
-    let overlay = null
-    if (meta) {
-      if (pin.type === 'course') overlay = { backgroundImage: GRID_TEXTURE, opacity: 0.15 }
-      else if (pin.type === 'lab') overlay = GRID_OVL
-      else if (pin.type === 'game') overlay = DOTS_OVL
-      else if (pin.type === 'nav') overlay = STRIPES_OVL
-    }
     
     return (
       <motion.button
@@ -204,25 +197,31 @@ export default function StartMenu({ onClose }) {
         onContextMenu={(e) => showCtxMenu(e, pin)}
         className={`relative flex flex-col items-start gap-2 p-3 rounded-2xl text-left transition-all group overflow-hidden ${
           meta
-            ? `bg-gradient-to-br ${meta.header} border ${meta.border} text-white`
+            ? `border ${meta.border} text-white`
             : 'bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-md'
         }`}
         style={meta ? { boxShadow: meta.glow.replace('32px', '16px').replace('0.50', '0.20') } : undefined}
       >
         {meta && (
-          <div className="absolute inset-0 bg-white/20 dark:bg-transparent pointer-events-none" />
-        )}
-        {meta && overlay && (
-          <div className="absolute inset-0 pointer-events-none" style={overlay} />
-        )}
-        {meta && (
-          <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none" />
+          <>
+            <div className={`absolute inset-0 bg-gradient-to-br ${meta.header} opacity-[0.85] dark:opacity-100`} />
+            <div className="absolute -top-8 -right-8 w-24 h-24 bg-white/30 blur-[24px] rounded-full pointer-events-none mix-blend-overlay" />
+            <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-black/20 blur-[24px] rounded-full pointer-events-none mix-blend-overlay" />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-50 pointer-events-none" />
+            
+            {/* Large faded background icon */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none select-none leading-none text-[80px] opacity-[0.12] -mr-4 drop-shadow-lg filter mix-blend-overlay">
+              {pin.emoji}
+            </div>
+            
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none" />
+          </>
         )}
         {isPinned(pin.id) && (
           <span className="absolute top-1.5 right-1.5 text-[10px] leading-none opacity-80 select-none z-10 drop-shadow-md">⭐</span>
         )}
-        <span className="text-2xl flex-shrink-0 relative z-10">{pin.emoji}</span>
-        <span className={`text-sm font-bold line-clamp-2 relative z-10 pr-2 ${
+        <span className="text-2xl flex-shrink-0 relative z-10 filter drop-shadow-md">{pin.emoji}</span>
+        <span className={`text-sm font-bold line-clamp-2 relative z-10 pr-2 tracking-tight ${
           meta ? 'text-white drop-shadow-sm' : 'text-slate-700 dark:text-slate-100'
         }`}>
           {pin.label}

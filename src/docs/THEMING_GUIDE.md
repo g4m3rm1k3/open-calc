@@ -34,7 +34,8 @@ React components use this hook to easily access semantic colors.
 
 Unlike the IDE, the Course/Chapter UI uses fixed semantic themes (like Indigo, Emerald, Rose) that are chosen per-course to give each curriculum a unique vibe.
 
-- These are defined via `courseColors.js` as objects containing pre-baked Tailwind gradient classes (e.g., `from-indigo-600 to-violet-700`). 
+- These are defined via `courseColors.js` as objects containing pre-baked Tailwind gradient classes (e.g., `from-indigo-600 via-purple-500 to-indigo-800`), glow box-shadow definitions, and text colors.
+- These themes power the premium glassmorphism aesthetics across the app (like `AppCard` and `StartMenu`). Components combine these gradients with overlay blend modes and blurred abstract orbs to create a sleek, frosted 3D look.
 - They do *not* go through the `themeEngine.js` dynamic extraction, as they are completely independent of the user's selected IDE preference.
 
 ## Golden Rules for Adding Components
