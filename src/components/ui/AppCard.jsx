@@ -78,13 +78,13 @@ function GameBody({ item }) {
   )
 }
 
-function CourseCard({ item, chapters, getLessonStatus, meta, ref }) {
+function CourseCard({ item, chapters, getLessonStatus, meta, innerRef }) {
   const total = chapters.reduce((s, ch) => s + ch.lessons.length, 0)
   const done  = chapters.reduce((s, ch) =>
     s + ch.lessons.filter(l => getLessonStatus(buildProgressKey(item.key, l), 1) === 'complete').length, 0)
   const pct = total > 0 ? done / total : 0
   return (
-    <div ref={ref} className="group flex flex-col overflow-hidden rounded-[24px] border border-white/60 dark:border-white/10 bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:-translate-y-2">
+    <div ref={innerRef} className="flex flex-col overflow-hidden rounded-[24px] border border-white/60 dark:border-white/10 bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.04)] group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:-translate-y-2">
       <div className={`relative bg-gradient-to-br ${meta.header} px-5 pt-5 pb-5 overflow-hidden`}>
         <div className="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.15] pointer-events-none" style={{ backgroundImage: meta.pattern }} />
@@ -103,9 +103,9 @@ function CourseCard({ item, chapters, getLessonStatus, meta, ref }) {
             <span>{chapters.length} {chapters.length === 1 ? 'chapter' : 'chapters'}{total > 0 && ` · ${total} lessons`}</span>
             {done > 0 && <span className={`font-bold ${meta.text}`}>{Math.round(pct * 100)}%</span>}
           </div>
-          <div className="h-1.5 rounded-full bg-slate-200 dark:bg-slate-700/60 overflow-hidden">
-            <div className={`h-full rounded-full bg-gradient-to-r ${meta.header} transition-all`}
-              style={{ width: pct > 0 ? `${Math.max(4, pct * 100)}%` : '0%' }} />
+          <div className="h-1.5 rounded-full bg-slate-200/80 dark:bg-slate-700/60 relative">
+            <div className={`absolute top-0 left-0 h-full rounded-full bg-gradient-to-r ${meta.header} transition-all duration-500`}
+              style={{ width: pct > 0 ? `${Math.max(4, pct * 100)}%` : '0%', boxShadow: pct > 0 ? meta.glow.replace('32px', '12px').replace('0.50', '0.8') : 'none' }} />
           </div>
         </div>
         <div className="flex justify-end mt-1">
@@ -125,13 +125,12 @@ export default function AppCard({ item, variant = 'course', chapters, getLessonS
   if (variant === 'course') {
     return (
       <Link
-        ref={ref}
         to={item.path}
-        className="block"
-        onMouseEnter={() => { if (ref.current) ref.current.style.boxShadow = meta.glow }}
-        onMouseLeave={() => { if (ref.current) ref.current.style.boxShadow = '' }}
+        className="group block"
+        onMouseEnter={() => { if (ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = meta.glow }}
+        onMouseLeave={() => { if (ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = '' }}
       >
-        <CourseCard item={item} chapters={chapters} getLessonStatus={getLessonStatus} meta={meta} />
+        <CourseCard innerRef={ref} item={item} chapters={chapters} getLessonStatus={getLessonStatus} meta={meta} />
       </Link>
     )
   }

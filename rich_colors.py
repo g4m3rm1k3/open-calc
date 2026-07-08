@@ -1,4 +1,4 @@
-export const GLASS_META = {
+content = """export const GLASS_META = {
   indigo:  { border:'border-indigo-500/30',  header:'from-indigo-600 via-purple-500 to-indigo-800', pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0H0v20h20V0zm-1 19H1V1h18v18z' fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`,   glow:'0 0 32px rgba(99,102,241,0.50)',  bar:'bg-indigo-400',  dim:'text-indigo-300',  text:'text-indigo-600 dark:text-indigo-400'  },
   blue:    { border:'border-blue-500/30',    header:'from-blue-600 via-indigo-500 to-blue-800', pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='2' fill='%23ffffff' fill-opacity='1'/%3E%3C/svg%3E")`,     glow:'0 0 32px rgba(59,130,246,0.50)',  bar:'bg-blue-400',    dim:'text-blue-300',    text:'text-blue-600 dark:text-blue-400'      },
   emerald: { border:'border-emerald-500/30', header:'from-emerald-500 via-teal-400 to-emerald-700', pattern: `url("data:image/svg+xml,%3Csvg width='10' height='10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-1 1l2-2M9 11l2-2M4 11L11 4' stroke='%23ffffff' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,    glow:'0 0 32px rgba(16,185,129,0.50)', bar:'bg-emerald-400', dim:'text-emerald-300', text:'text-emerald-600 dark:text-emerald-400' },
@@ -18,3 +18,8 @@ export const GLASS_META = {
   pink:    { border:'border-pink-500/30',    header:'from-pink-600 via-rose-400 to-pink-800', pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='2' fill='%23ffffff' fill-opacity='1'/%3E%3C/svg%3E")`,       glow:'0 0 32px rgba(236,72,153,0.50)', bar:'bg-pink-400',    dim:'text-pink-300',    text:'text-pink-600 dark:text-pink-400'      },
   yellow:  { border:'border-yellow-500/30',  header:'from-yellow-500 via-amber-400 to-yellow-700', pattern: `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0H0v20h20V0zm-1 19H1V1h18v18z' fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'/%3E%3C/svg%3E")`,    glow:'0 0 32px rgba(234,179,8,0.50)',  bar:'bg-yellow-400',  dim:'text-yellow-300',  text:'text-yellow-600 dark:text-yellow-400'  },
 }
+"""
+
+with open('src/styles/courseColors.js', 'w', encoding='utf-8') as f:
+    f.write(content)
+print("Updated courseColors.js with rich gradients.")

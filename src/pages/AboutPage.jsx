@@ -974,7 +974,7 @@ export default function AboutPage() {
         <section className="px-4 py-16 max-w-6xl mx-auto">
           <FadeSection>
             <div
-              className="relative rounded-3xl border border-indigo-500/20 bg-gradient-to-br from-indigo-950/50 via-slate-950/80 to-violet-950/50 backdrop-blur-sm p-10 sm:p-14 overflow-hidden"
+              className="group relative rounded-[32px] border border-indigo-500/30 dark:border-indigo-500/20 bg-indigo-50/80 dark:bg-indigo-950/20 backdrop-blur-xl p-10 sm:p-14 overflow-hidden transition-all duration-500 shadow-[0_8px_40px_rgba(99,102,241,0.1)] hover:shadow-[0_20px_60px_rgba(99,102,241,0.2)] dark:shadow-[0_8px_40px_rgba(99,102,241,0.05)] hover:-translate-y-1"
               style={{ boxShadow: "0 0 80px rgba(99,102,241,0.07)" }}
             >
               <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/8 rounded-full blur-[100px] pointer-events-none" />
