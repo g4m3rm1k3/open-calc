@@ -8,6 +8,27 @@ export default {
     { id: 'vOn',    label: 'v-on: — full event directive syntax' },
     { id: 'mutate', label: '.value++ — mutating reactive state' },
   ],
+  starter: {
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.app { font-family: system-ui, sans-serif; max-width: 400px; margin: 40px auto; text-align: center; }
+button { padding: 10px 24px; background: #41b883; color: white; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; }
+button:hover { background: #33a06f; }
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/App.vue':
 `<script setup lang="ts">

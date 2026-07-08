@@ -9,6 +9,39 @@ export default {
     { id: 'scoped',       label: '<style scoped> — CSS that cannot leak' },
     { id: 'reuse',        label: 'Component reuse — one file, use it anywhere' },
   ],
+  starter: {
+    'src/components/TodoItem.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+li { padding: 12px 16px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: opacity 0.2s; }
+li.done { opacity: 0.4; text-decoration: line-through; }
+</style>`,
+
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.app { font-family: system-ui, sans-serif; max-width: 380px; margin: 40px auto; }
+h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/components/TodoItem.vue':
 `<script setup lang="ts">

@@ -39,7 +39,11 @@ createApp(App).mount('#app')
 - `createApp(App)` — creates the Vue application; `App` is the root component every other component lives inside
 - `.mount('#app')` — finds `<div id="app">` in the HTML page and hands control to Vue
 
-**What is `import`?** A JavaScript module statement. `import { createApp } from 'vue'` means: find the npm package called `vue` and give me the named export called `createApp`. Curly braces = named import. Without curly braces = default import (like `import App from './App.vue'`).
+**What is `import`?** A JavaScript **module** statement. Every `.ts`, `.js`, and `.vue` file is a module — a self-contained unit of code that explicitly declares what it depends on and what it exports. `import { createApp } from 'vue'` means: from the module named `'vue'` (the Vue library, pre-loaded in Vue Studio's runtime), give me the named export called `createApp`.
+
+Curly braces `{ }` mean **named import** — you select a specific export by name. Without curly braces (`import App from './App.vue'`) is a **default import** — the module's one primary export, received under whatever name you choose.
+
+**CS concept — module system and dependency graph:** Before modules, every script file ran in a single shared global scope. A name like `createApp` defined in one file would silently overwrite a name with the same spelling in another. Modules solve this with explicit namespacing: each file has its own scope; only what is exported can be imported; only what is imported can be used. Your files and the Vue library together form a **dependency graph** — a directed acyclic graph where each node is a module and each directed edge is an `import` statement. Vue Studio resolves this graph when you click ▶ Run, compiling every `.vue` and `.ts` file and wiring the imports together before running the result.
 
 **CS concept — entry point:** Every program has exactly one place execution begins. In C it is `main()`. In a Vue app it is `main.ts`. Everything else is wired together from here.
 
@@ -49,11 +53,42 @@ createApp(App).mount('#app')
 
 ---
 
+### Step 1b — TypeScript and `<script setup>`
+
+Before looking at the root component, two constructs that appear in every lesson need explanation.
+
+**What is TypeScript?** TypeScript is JavaScript with a **type system** added. `lang="ts"` in `<script setup lang="ts">` tells Vue Studio's compiler to treat the script block as TypeScript rather than plain JavaScript. A type system lets you annotate what kind of value a variable holds — "this is always a number", "this is a string or null" — and the compiler checks those annotations before running the code. The payoff: bugs that would otherwise surface as cryptic runtime errors (`undefined is not a function`) are caught at write time, underlined in red before you click Run.
+
+**CS concept — type inference:** TypeScript does not require you to annotate everything. `const count = ref(0)` — TypeScript sees `0` is a number, infers that `ref(0)` creates a `Ref<number>`, and will reject `count.value = "hello"` automatically. The compiler traces type information forward through your code. The more it can infer, the fewer annotations you need to write.
+
+**What is `<script setup>`?** A compiler shorthand for Vue's Composition API. Without it, a component script looks like this:
+
+```typescript
+export default {
+  setup() {
+    const message = ref('Hello from Vue!')
+    return { message }  // must explicitly return everything the template needs
+  }
+}
+```
+
+With `<script setup>`, Vue's compiler generates that boilerplate for you. Everything declared at the top level of the block is automatically available in the template. No `export default`, no `return` statement. The same component becomes:
+
+```typescript
+<script setup lang="ts">
+const message = ref('Hello from Vue!')
+</script>
+```
+
+**SE principle — zero-boilerplate contracts:** `<script setup>` enforces an implicit contract: anything declared becomes part of the component's public template API. Vue's compiler generates the Composition API wrapper at build time. This is a common pattern in software: write the intention; let the toolchain generate the ceremony.
+
+---
+
 ### Step 2 — The root component
 
 **The problem:** We need a file that describes what the browser should display. A Vue component combines state (JavaScript data), template (HTML description), and style (CSS) in one place.
 
-**File:** `src/App.vue` — replace the entire file contents with:
+Here is what a complete root component looks like:
 
 ```html
 <script setup lang="ts">
@@ -108,7 +143,7 @@ src/App.vue
 
 Data flows one way: JavaScript state → template rendering. This one-way flow is the foundation every other Vue concept builds on.
 
-**In production:** Every Vue app created with `npm create vue@latest` has exactly these two files to start. `createApp` and `mount` appear in every Vue app in the world.
+**In the real world:** Every Vue app in production starts with `createApp(RootComponent).mount(selector)` — this is not Vue Studio syntax, it is how Vue works everywhere. In a real project a build tool (such as Vite) does what the ▶ Run button does here: it compiles TypeScript, processes your `.vue` files, resolves the module graph, and produces browser-ready JavaScript. Vue Studio does all of that on demand so you can focus on writing Vue code rather than configuring tooling.
 
 ---
 

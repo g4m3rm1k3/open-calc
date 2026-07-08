@@ -75,7 +75,7 @@ window.onunhandledrejection = e => {
 // ── Vue DevTools hook (must exist before Vue loads) ───────────────────────────
 const _devHook = {
   _apps: [],
-  _enabled: true,
+  enabled: true,
   emit(event, ...args) {
     if (event === 'app:init') {
       _devHook._apps.push(args[0])
@@ -83,11 +83,27 @@ const _devHook = {
       setTimeout(() => {
         try { parent.postMessage({ type: 'tree', tree: snapshotTree(args[0]._instance) }, '*') } catch(_) {}
       }, 50)
+    } else if (event === 'component:updated') {
+      try {
+        const tree = snapshotTree(args[0])
+        if (tree) parent.postMessage({ type: 'reactive-update', tree }, '*')
+      } catch(_) {}
     }
   },
   on() {}, off() {}, once() {},
 }
 window.__VUE_DEVTOOLS_GLOBAL_HOOK__ = _devHook
+
+// Forward user clicks to host — include element info for code-specific explanations
+document.addEventListener('click', (e) => {
+  const el = e.target
+  parent.postMessage({
+    type: 'user-click',
+    tag: el.tagName?.toLowerCase() ?? 'unknown',
+    text: (el.textContent ?? '').slice(0, 60).trim(),
+    id: el.id || null,
+  }, '*')
+}, true)
 
 function snapshotTree(instance) {
   if (!instance) return null
@@ -174,7 +190,16 @@ async function run(files) {
   // Reset error display and app mount point
   errBox.style.display = 'none'
   errBox.textContent = ''
-  document.getElementById('app').innerHTML = ''
+  // Unmount tracked Vue apps before replacing the DOM so Vue's scheduler
+  // doesn't try to patch elements that are about to be removed.
+  for (const app of _devHook._apps) { try { app.unmount() } catch(_) {} }
+  _devHook._apps = []
+  const oldApp = document.getElementById('app')
+  if (oldApp && oldApp.parentNode) {
+    const fresh = document.createElement('div')
+    fresh.id = 'app'
+    oldApp.parentNode.replaceChild(fresh, oldApp)
+  }
   document.getElementById('__vue_styles__').textContent = ''
 
   const [{ parse, compileScript, compileStyleAsync }, stripTS] = await Promise.all([getCompiler(), getStripTS()])
@@ -209,6 +234,8 @@ async function run(files) {
         return
       }
     }
+    // Empty SFC (no script block) — provide a minimal valid default export
+    if (!scriptCode) scriptCode = 'export default {}'
 
     const styleTexts = []
     for (const style of descriptor.styles) {

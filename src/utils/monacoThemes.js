@@ -550,4 +550,57 @@ export function setupOpenCalcMonaco(monaco) {
     `,
     "file:///react-globals.d.ts",
   );
+
+  // Vue Studio: without these stubs, src/main.ts (loaded as 'typescript') shows
+  // red squiggles on `import { createApp } from 'vue'` and `import App from './App.vue'`
+  // because Monaco's TS worker can't resolve those modules in-browser.
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(
+    `
+    declare module 'vue' {
+      export interface Ref<T = any> { value: T }
+      export interface ComputedRef<T = any> extends Ref<T> { readonly value: T }
+      export function ref<T>(value: T): Ref<T>
+      export function ref<T = any>(): Ref<T | undefined>
+      export function reactive<T extends object>(target: T): T
+      export function computed<T>(getter: () => T): ComputedRef<T>
+      export function watch(source: any, cb: any, opts?: any): () => void
+      export function watchEffect(effect: (onCleanup: (fn: () => void) => void) => void, opts?: any): () => void
+      export function onMounted(fn: () => void): void
+      export function onUnmounted(fn: () => void): void
+      export function onUpdated(fn: () => void): void
+      export function onBeforeMount(fn: () => void): void
+      export function onBeforeUpdate(fn: () => void): void
+      export function onBeforeUnmount(fn: () => void): void
+      export function nextTick(fn?: () => void): Promise<void>
+      export function defineProps<T extends Record<string, any>>(props?: any): T
+      export function defineEmits<T extends Record<string, any[]>>(emits: (keyof T)[]): (event: keyof T, ...args: any[]) => void
+      export function defineExpose(exposed: Record<string, any>): void
+      export function withDefaults<T, D>(props: T, defaults: D): T & D
+      export function provide(key: any, value: any): void
+      export function inject<T>(key: any, defaultValue?: T): T | undefined
+      export function toRef<T, K extends keyof T>(target: T, key: K): Ref<T[K]>
+      export function toRefs<T extends object>(target: T): { [K in keyof T]: Ref<T[K]> }
+      export function isRef(value: any): value is Ref
+      export function unref<T>(value: T | Ref<T>): T
+      export function shallowRef<T>(value: T): Ref<T>
+      export function shallowReactive<T extends object>(target: T): T
+      export function readonly<T>(target: T): Readonly<T>
+      export function useSlots(): Record<string, any>
+      export function useAttrs(): Record<string, any>
+      export function createApp(component: any, props?: Record<string, any>): {
+        mount(selector: string | Element): any
+        unmount(): void
+        use(plugin: any, ...opts: any[]): any
+        component(name: string, comp?: any): any
+        directive(name: string, dir?: any): any
+        provide(key: any, value: any): any
+      }
+    }
+    declare module '*.vue' {
+      const component: any
+      export default component
+    }
+    `,
+    "file:///vue-globals.d.ts",
+  );
 }

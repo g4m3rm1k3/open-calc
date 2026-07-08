@@ -9,6 +9,54 @@ export default {
     { id: 'prevent',  label: '@submit.prevent — preventing browser form reload' },
     { id: 'disabled', label: ':disabled — disabling a button from state' },
   ],
+  starter: {
+    'src/components/AddTodo.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.add-form { display: flex; gap: 8px; margin-bottom: 16px; }
+.input { flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; }
+.input:focus { border-color: #41b883; box-shadow: 0 0 0 3px rgba(65,184,131,0.15); }
+button { padding: 10px 18px; background: #41b883; color: white; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+</style>`,
+
+    'src/components/TodoItem.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+li { padding: 12px 16px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: opacity 0.2s; user-select: none; }
+li.done { opacity: 0.4; text-decoration: line-through; }
+</style>`,
+
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+.app { font-family: system-ui, sans-serif; max-width: 380px; margin: 40px auto; }
+h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/components/AddTodo.vue':
 `<script setup lang="ts">

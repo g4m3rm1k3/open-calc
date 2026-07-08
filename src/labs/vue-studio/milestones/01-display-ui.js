@@ -11,6 +11,28 @@ export default {
     { id: 'createApp',    label: 'createApp() — bootstrapping the application' },
     { id: 'mount',        label: '.mount() — connecting Vue to the HTML page' },
   ],
+  starter: {
+    'src/App.vue':
+`<script setup lang="ts">
+</script>
+
+<template>
+</template>
+
+<style scoped>
+h1 {
+  color: #41b883;
+  font-family: system-ui, sans-serif;
+}
+</style>`,
+
+    'src/main.ts':
+`import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')`,
+  },
+
   files: {
     'src/App.vue':
 `<script setup lang="ts">
