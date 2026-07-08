@@ -35,8 +35,24 @@ export interface HttpRequest {
   body: string;
 }
 
+// What the student's handleRequest actually receives — path with the
+// query string stripped off, plus query pre-parsed into a plain object.
+// Splitting the raw path this way is host-side work (see runRequest.ts),
+// the same way a real server's networking layer parses a raw URL before
+// framework code ever sees it.
+export interface ParsedHttpRequest extends HttpRequest {
+  query: Record<string, string>;
+  params?: Record<string, string>;
+}
+
 export interface HttpResponseResult {
   status: number;
   body: unknown;
   headers?: Record<string, string>;
+}
+
+export interface SavedRequest {
+  id: string;
+  name: string;
+  request: HttpRequest;
 }

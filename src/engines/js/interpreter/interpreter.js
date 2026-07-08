@@ -49,7 +49,17 @@ class Interpreter {
     this._installGlobals(globalEnv)
     if (extraGlobals) {
       for (const [name, fn] of Object.entries(extraGlobals)) {
-        globalEnv.define(name, { __kind: 'native', name, fn }, 'const')
+        // A plain function becomes a single callable native (e.g. __sendResponse).
+        // A plain object is installed as-is — a multi-method native namespace,
+        // the same shape _installGlobals already uses for console/JSON/Math —
+        // each of its own properties is expected to already be a
+        // { __kind: 'native', name, fn } value, resolved generically by
+        // _evalMember's "native module objects" fallback.
+        if (typeof fn === 'function') {
+          globalEnv.define(name, { __kind: 'native', name, fn }, 'const')
+        } else {
+          globalEnv.define(name, fn, 'const')
+        }
       }
     }
 
@@ -85,12 +95,87 @@ class Interpreter {
         const fn = this._makeFunction(stmt, env)
         env.define(stmt.id.name, fn, 'var')
       }
-      if (stmt.type === 'VariableDeclaration' && stmt.kind === 'var') {
-        for (const decl of stmt.declarations) {
-          const name = decl.id.name
-          env.functionScope().hoist(name)
+      // Real JS hoists every `var` declared anywhere in a function — even
+      // nested inside a for-loop's init, an if-block, a while body — to the
+      // top of that function's scope, not just ones written as top-level
+      // statements. Recurse into nested control-flow constructs to find all
+      // of them, so the very first assignment to e.g. `for (var i = 0; ...)`
+      // lands in THIS function's own scope. Without this, an un-hoisted
+      // `var i` falls through Environment.assign's "walk up to parent"
+      // fallback and gets created as an implicit global — meaning two
+      // unrelated functions that each write `for (var i = ...)` end up
+      // silently sharing one global `i`, corrupting each other's loop
+      // counters the moment one calls the other from inside its own loop.
+      this._hoistVarsInStatement(stmt, env)
+    }
+  }
+
+  // Walks into blocks/loops/if/switch/try nested inside a single statement,
+  // hoisting every `var` found — never descending into a nested function or
+  // arrow function body, since those get their own separate hoisting pass
+  // the moment they're actually called.
+  _hoistVarsInStatement(stmt, env) {
+    if (!stmt || typeof stmt !== 'object') return
+    switch (stmt.type) {
+      case 'VariableDeclaration':
+        if (stmt.kind === 'var') {
+          for (const decl of stmt.declarations) this._hoistPattern(decl.id, env)
         }
+        return
+      case 'BlockStatement':
+        for (const s of stmt.body) this._hoistVarsInStatement(s, env)
+        return
+      case 'ForStatement':
+        if (stmt.init) this._hoistVarsInStatement(stmt.init, env)
+        this._hoistVarsInStatement(stmt.body, env)
+        return
+      case 'ForInStatement':
+      case 'ForOfStatement':
+        if (stmt.left) this._hoistVarsInStatement(stmt.left, env)
+        this._hoistVarsInStatement(stmt.body, env)
+        return
+      case 'WhileStatement':
+      case 'DoWhileStatement':
+        this._hoistVarsInStatement(stmt.body, env)
+        return
+      case 'IfStatement':
+        this._hoistVarsInStatement(stmt.consequent, env)
+        if (stmt.alternate) this._hoistVarsInStatement(stmt.alternate, env)
+        return
+      case 'TryStatement':
+        this._hoistVarsInStatement(stmt.block, env)
+        if (stmt.handler?.body) this._hoistVarsInStatement(stmt.handler.body, env)
+        if (stmt.finalizer) this._hoistVarsInStatement(stmt.finalizer, env)
+        return
+      case 'SwitchStatement':
+        for (const c of stmt.cases) {
+          for (const s of c.consequent) this._hoistVarsInStatement(s, env)
+        }
+        return
+      case 'LabeledStatement':
+        this._hoistVarsInStatement(stmt.body, env)
+        return
+      default:
+        return // FunctionDeclaration, ExpressionStatement, etc. — nothing to recurse into
+    }
+  }
+
+  // Hoists every identifier bound by a (possibly destructuring) `var`
+  // pattern — `var i`, `var { a, b } = ...`, `var [x, ...rest] = ...`.
+  _hoistPattern(idNode, env) {
+    if (!idNode) return
+    if (idNode.type === 'Identifier') {
+      env.functionScope().hoist(idNode.name)
+    } else if (idNode.type === 'ObjectPattern') {
+      for (const prop of idNode.properties) {
+        this._hoistPattern(prop.type === 'RestElement' ? prop.argument : prop.value, env)
       }
+    } else if (idNode.type === 'ArrayPattern') {
+      for (const el of idNode.elements) {
+        if (el) this._hoistPattern(el.type === 'RestElement' ? el.argument : el, env)
+      }
+    } else if (idNode.type === 'AssignmentPattern') {
+      this._hoistPattern(idNode.left, env)
     }
   }
 
@@ -1332,6 +1417,12 @@ class Interpreter {
 
     env.define('Number', {
       __kind: 'native', name: 'Number',
+      fn: (_, [val]) => {
+        if (val === undefined) return NaN
+        if (val === null) return 0
+        if (isRef(val)) return NaN
+        return Number(val)
+      },
       isInteger:  native('Number.isInteger',  (_, [x]) => Number.isInteger(x)),
       isFinite:   native('Number.isFinite',   (_, [x]) => Number.isFinite(x)),
       isNaN:      native('Number.isNaN',      (_, [x]) => Number.isNaN(x)),

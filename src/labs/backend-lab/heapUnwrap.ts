@@ -12,6 +12,12 @@ export function heapUnwrap(value: any, heap: any, seen: Set<number> = new Set())
 
   if (value.__kind === "reference") {
     const objectId = value.objectId;
+    // Only the current ancestry chain counts as circular — the same object
+    // referenced twice from two unrelated places (e.g. two response fields
+    // both pointing at the same array) is completely valid, ordinary data,
+    // not a cycle. Removing objectId after its subtree finishes (backtracking)
+    // is what tells the two cases apart; a Set that only ever grows would
+    // wrongly flag the second, harmless case too.
     if (seen.has(objectId)) return "[Circular]";
     seen.add(objectId);
 
@@ -25,6 +31,7 @@ export function heapUnwrap(value: any, heap: any, seen: Set<number> = new Set())
       for (let i = 0; i < length; i++) {
         arr.push(heapUnwrap(heap.get(value, String(i)), heap, seen));
       }
+      seen.delete(objectId);
       return arr;
     }
 
@@ -32,6 +39,7 @@ export function heapUnwrap(value: any, heap: any, seen: Set<number> = new Set())
     for (const key of keys) {
       obj[key] = heapUnwrap(heap.get(value, key), heap, seen);
     }
+    seen.delete(objectId);
     return obj;
   }
 

@@ -17,6 +17,10 @@ interface LessonPanelProps {
   onToggleCollapsed: () => void;
   ui: UiTheme;
   accentHex: string;
+  onPrevLesson?: () => void;
+  onNextLesson?: () => void;
+  hasPrevLesson?: boolean;
+  hasNextLesson?: boolean;
 }
 
 // Same inline-vs-block distinction BlogPost.jsx uses: react-markdown v9+
@@ -44,6 +48,10 @@ export default function LessonPanel({
   onToggleCollapsed,
   ui,
   accentHex,
+  onPrevLesson,
+  onNextLesson,
+  hasPrevLesson,
+  hasNextLesson,
 }: LessonPanelProps) {
   const [checked, setChecked] = useState<boolean[]>(() => checklist.map(() => false));
 
@@ -58,7 +66,7 @@ export default function LessonPanel({
   }
 
   return (
-    <div className={`w-[380px] shrink-0 border-r ${ui.border} ${ui.bg1} flex flex-col overflow-hidden`}>
+    <div className={`w-full h-full border-r ${ui.border} ${ui.bg1} flex flex-col overflow-hidden`}>
       <div className={`flex items-center justify-between px-3.5 py-2.5 border-b ${ui.border} shrink-0`}>
         <strong className={`text-[13px] ${ui.txt1}`}>{title}</strong>
         <button onClick={onToggleCollapsed} title="Collapse" className={`bg-transparent border-none cursor-pointer text-sm ${ui.txt2}`}>
@@ -89,6 +97,30 @@ export default function LessonPanel({
             </label>
           ))}
         </div>
+
+        {(onPrevLesson || onNextLesson) && (
+          <div className={`flex justify-between gap-2 my-4 pt-3 border-t ${ui.border}`}>
+            <button
+              onClick={onPrevLesson}
+              disabled={!hasPrevLesson}
+              className={`px-3 py-1.5 rounded-md border ${ui.btnBorder} text-[13px] ${
+                hasPrevLesson ? `${ui.txt1} ${ui.hoverBg}` : `${ui.txt2} opacity-40 cursor-not-allowed`
+              }`}
+            >
+              ← Previous
+            </button>
+            <button
+              onClick={onNextLesson}
+              disabled={!hasNextLesson}
+              className={`px-3 py-1.5 rounded-md text-white text-[13px] font-semibold ${
+                hasNextLesson ? "" : "opacity-40 cursor-not-allowed"
+              }`}
+              style={{ background: accentHex }}
+            >
+              Next →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
