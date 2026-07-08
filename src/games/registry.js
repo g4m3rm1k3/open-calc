@@ -6,7 +6,7 @@ export const GAMES = [
     color: 'emerald',
     desc: "Group theory, permutations & non-commutativity through the world's most famous puzzle.",
     path: '/game/rubiks-cube',
-    tags: ['Group Theory', 'Linear Algebra'],
+    tags: ['Group Theory', 'Linear Algebra', 'Math', 'Puzzle'],
     cover: { grad: 'from-emerald-700 via-green-800 to-teal-900', mark: '3×3', sub: 'Group Theory' },
   },
   {
@@ -16,7 +16,7 @@ export const GAMES = [
     color: 'cyan',
     desc: 'Seven interactive lessons — vectors, transforms, determinants & eigenvectors.',
     path: '/game/matrix-game',
-    tags: ['Linear Algebra', 'Interactive'],
+    tags: ['Linear Algebra', 'Interactive', 'Math', 'Vectors', 'Matrices'],
     cover: { grad: 'from-cyan-700 via-sky-800 to-blue-900', mark: '[Ax]', sub: '7 Interactive Lessons' },
   },
   {
@@ -26,7 +26,7 @@ export const GAMES = [
     color: 'fuchsia',
     desc: 'Classic Tetris with six STEM lenses: matrix ops, 2×2 transforms, probability distributions.',
     path: '/game/stem-tetris',
-    tags: ['Math', 'CS'],
+    tags: ['Math', 'CS', 'Arcade', 'Probability', 'Matrices'],
     cover: { grad: 'from-fuchsia-700 via-purple-800 to-violet-900', mark: '████', sub: '6 STEM Lenses' },
   },
   {
@@ -56,7 +56,7 @@ export const GAMES = [
     color: 'violet',
     desc: 'Blast rocks through 10 waves — velocity, dot products, matrix transforms via gameplay.',
     path: '/game/asteroids-la',
-    tags: ['Linear Algebra', 'Arcade'],
+    tags: ['Linear Algebra', 'Arcade', 'Physics', 'Vectors', 'Space'],
     cover: { grad: 'from-violet-700 via-indigo-800 to-blue-900', mark: 'v→', sub: '10 Waves' },
   },
   {
@@ -66,7 +66,7 @@ export const GAMES = [
     color: 'cyan',
     desc: 'Full 3D mission campaign: use RREF, Cross Products, and Integrals to intercept targets.',
     path: '/game/vector-command',
-    tags: ['Linear Algebra', '3D', 'Calculus'],
+    tags: ['Linear Algebra', '3D', 'Calculus', 'Physics', 'Space', 'Geometry'],
     cover: { grad: 'from-cyan-700 via-blue-800 to-indigo-900', mark: 'R³', sub: '3D Missions' },
   },
   {
@@ -96,7 +96,7 @@ export const GAMES = [
     color: 'teal',
     desc: 'Build and explore in a physics-based voxel sandbox.',
     path: '/game/open-craft',
-    tags: ['Sandbox', 'Physics'],
+    tags: ['Sandbox', 'Physics', '3D', 'Voxel', 'Simulation'],
     cover: { grad: 'from-teal-700 via-cyan-800 to-blue-900', mark: '⬛⬛', sub: 'Physics Sandbox' },
   },
   {

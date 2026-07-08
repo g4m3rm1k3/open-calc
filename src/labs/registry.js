@@ -8,7 +8,7 @@ export const LABS = [
     subject: 'Web Dev',
     desc: 'Build a real backend from scratch — routes, middleware, services, and a database — one felt need at a time. Test your own endpoints with a built-in request client, no server or hosting required.',
     path: '/lab/backend-lab',
-    tags: ['Backend', 'HTTP', 'APIs', 'Interactive'],
+    tags: ['Backend', 'HTTP', 'APIs', 'Interactive', 'Nodejs', 'Databases', 'Server'],
     cover: { grad: 'from-emerald-600 via-teal-700 to-slate-950', mark: '{ }', sub: 'Routes · Middleware · Data' },
   },
   {
@@ -46,6 +46,18 @@ export const LABS = [
     path: '/lab/abstraction-viz',
     tags: ['Patterns', 'Functional', 'JavaScript', 'Interactive'],
     cover: { grad: 'from-indigo-600 via-violet-700 to-purple-950', mark: 'fn→fn', sub: 'Callbacks · HOF · Closures · DI' },
+  },
+  {
+    key: 'visual-code',
+    label: 'Visual Code Studio',
+    emoji: '🧩',
+    color: 'violet',
+    kind: 'builder',
+    subject: 'CS Theory',
+    desc: 'Build programs with block-based visual programming. Drag and drop logical blocks to generate real JavaScript, Python, or C++ code automatically. Live preview your creations instantly.',
+    path: '/lab/visual-code',
+    tags: ['CS', 'Logic', 'Visual', 'Blocks', 'Programming', 'Interactive', 'JavaScript', 'Python', 'C++'],
+    cover: { grad: 'from-violet-600 via-fuchsia-700 to-indigo-950', mark: '🧩', sub: 'Blocks · Code · Live' },
   },
   {
     key: 'music-lab',
@@ -92,7 +104,7 @@ export const LABS = [
     subject: 'Web Dev',
     desc: "Deep-dive into the browser's layout engine. Learn the Box Model, Centering, Flexbox, Grid, Stacking Contexts, and more through interactive multi-tab challenges.",
     path: '/web-learn/css-mastery',
-    tags: ['CSS', 'Web', 'Interactive'],
+    tags: ['CSS', 'Web', 'Interactive', 'Design', 'Frontend'],
     cover: { grad: 'from-fuchsia-600 via-pink-700 to-rose-950', mark: 'CSS', sub: 'Flex · Grid · Layout' },
   },
   {
@@ -104,7 +116,7 @@ export const LABS = [
     subject: 'Web Dev',
     desc: 'Build from raw React elements to advanced patterns — 27 narrated lessons covering JSX, components, hooks, state, context, reducers, memoization, and Suspense with live interactive sandboxes.',
     path: '/web-learn/react-mastery',
-    tags: ['React', 'Web', 'Interactive'],
+    tags: ['React', 'Web', 'Interactive', 'Frontend', 'JavaScript'],
     cover: { grad: 'from-cyan-500 via-blue-600 to-indigo-900', mark: 'React', sub: 'Components · Hooks · State' },
   },
   {
@@ -116,7 +128,7 @@ export const LABS = [
     subject: 'Science',
     desc: 'Build your own physics simulations from scratch — projectile motion, orbital mechanics, spring systems, particle effects, and more. Monaco editor + live 3D Three.js sandbox.',
     path: '/sim-lab',
-    tags: ['Physics', 'Three.js', 'Simulation'],
+    tags: ['Physics', 'Three.js', 'Simulation', '3D', 'Modeling', 'Mechanics', 'Gravity'],
     cover: { grad: 'from-sky-700 via-blue-800 to-indigo-950', mark: '∫dt', sub: 'Physics · Three.js · Code' },
   },
   {
@@ -128,7 +140,7 @@ export const LABS = [
     subject: 'Engineering',
     desc: 'Program a self-flying drone — 10 missions teaching displacement vectors, dot/cross products, rotation matrices, projections, Bézier paths, and PID control. JS, Python, and MATLAB.',
     path: '/drone-lab',
-    tags: ['Robotics', 'Python', 'MATLAB'],
+    tags: ['Robotics', 'Python', 'MATLAB', 'Control', 'PID', 'Navigation'],
     cover: { grad: 'from-sky-600 via-cyan-800 to-blue-950', mark: '🚁', sub: 'Vectors · Matrices · PID' },
   },
   {
@@ -140,7 +152,7 @@ export const LABS = [
     subject: 'Engineering',
     desc: 'Learn robot programming from zero — trig, FK, IK, 4×4 transforms, obstacle avoidance, Fanuc TP. 19 missions, 2D + 6-DOF 3D arm, real Python & MATLAB.',
     path: '/robot-arm-lab',
-    tags: ['Robotics', 'Python', 'MATLAB'],
+    tags: ['Robotics', 'Python', 'MATLAB', 'Kinematics', 'Automation', '3D', 'Arm'],
     cover: { grad: 'from-teal-700 via-cyan-800 to-blue-950', mark: '🦾', sub: 'FK · IK · Fanuc TP' },
   },
   {
@@ -152,7 +164,7 @@ export const LABS = [
     subject: 'Math',
     desc: 'Master linear algebra by coding it — row ops, Gaussian elimination, determinants, inverse, and Gram-Schmidt in JS, Python, and MATLAB.',
     path: '/matrix-lab',
-    tags: ['Math', 'Python', 'MATLAB'],
+    tags: ['Math', 'Python', 'MATLAB', 'Linear Algebra', 'Matrices', 'Vectors'],
     cover: { grad: 'from-violet-700 via-purple-800 to-indigo-950', mark: 'Ax=b', sub: 'Row Ops · RREF · QR' },
   },
   {
@@ -176,7 +188,7 @@ export const LABS = [
     subject: 'Engineering',
     desc: 'Simulate a coordinate measuring machine — probe circles, planes, and cylinders, watch the normal equation solve live, and read a real GD&T report with diameter deviation, circularity, flatness, and cylindricity.',
     path: '/cmm-lab',
-    tags: ['Engineering', 'Math', 'Metrology'],
+    tags: ['Engineering', 'Math', 'Metrology', '3D', 'Geometry'],
     cover: { grad: 'from-emerald-700 via-teal-800 to-cyan-950', mark: 'AᵀAx=Aᵀb', sub: 'Circle · Plane · Cylinder' },
   },
   {
@@ -200,7 +212,7 @@ export const LABS = [
     subject: 'Math',
     desc: 'See linear algebra live in a 3D world — manipulate a 3D object with translate/rotate/scale sliders and watch the 4×4 matrix update in real time. Covers vectors, dot product, determinant, RREF, eigenvalues, Cramer\'s rule, and subspaces.',
     path: '/matrix-3d-lab',
-    tags: ['Math', 'Three.js', 'Linear Algebra'],
+    tags: ['Math', 'Three.js', 'Linear Algebra', '3D', 'Geometry', 'Transforms'],
     cover: { grad: 'from-cyan-700 via-blue-800 to-indigo-950', mark: '4×4', sub: 'Transforms · Eigenvalues · 3D' },
   },
   {
@@ -224,7 +236,7 @@ export const LABS = [
     subject: 'Engineering',
     desc: 'Program and simulate CNC toolpaths with a live 3D backplot and fixture management.',
     path: '/cnc-sim',
-    tags: ['Engineering', 'CAD'],
+    tags: ['Engineering', 'CAD', 'CAM', 'Manufacturing', 'G-Code', '3D', 'Modeling'],
     cover: { grad: 'from-amber-700 via-orange-800 to-red-950', mark: 'G0', sub: 'CNC · CAM · Toolpaths' },
   },
   {
@@ -236,7 +248,7 @@ export const LABS = [
     subject: 'Engineering',
     desc: 'Hands-on PLC ladder logic simulator — 8 exercises from motor start/stop to full FSM state machines. Allen-Bradley naming: XIC, XIO, OTE, OTL, OTU, TON, CTU, comparison, math.',
     path: '/plc-lab',
-    tags: ['PLC', 'Industrial', 'Automation'],
+    tags: ['PLC', 'Industrial', 'Automation', 'Logic', 'Circuits'],
     cover: { grad: 'from-orange-700 via-amber-800 to-yellow-950', mark: '⊣⊢', sub: 'XIC · TON · CTU · FSM' },
   },
   {
@@ -248,7 +260,7 @@ export const LABS = [
     subject: 'Engineering',
     desc: 'Design and simulate digital logic circuits gate-by-gate with truth tables.',
     path: '/logic-sim',
-    tags: ['CS', 'Engineering'],
+    tags: ['CS', 'Engineering', 'Digital Logic', 'Circuits', 'Gates', 'CPU', 'Hardware'],
     cover: { grad: 'from-violet-800 via-purple-900 to-indigo-950', mark: '⊕∧∨', sub: 'Gates · Truth Tables' },
   },
   {
@@ -260,7 +272,7 @@ export const LABS = [
     event: 'chemistry',
     kind: 'lab',
     subject: 'Science',
-    tags: ['Chemistry', 'Lab'],
+    tags: ['Chemistry', 'Lab', 'Reactions', 'Molecules', 'Stoichiometry', 'Elements'],
     cover: { grad: 'from-cyan-700 via-teal-800 to-blue-950', mark: '⚗', sub: 'Reactions · Molecules' },
   },
   {
@@ -272,7 +284,7 @@ export const LABS = [
     event: 'physics',
     kind: 'lab',
     subject: 'Science',
-    tags: ['Physics', 'Simulation'],
+    tags: ['Physics', 'Simulation', 'Mechanics', 'Gravity', 'Forces', 'Kinematics'],
     cover: { grad: 'from-fuchsia-700 via-pink-800 to-rose-950', mark: 'F=ma', sub: 'Rigid Body Dynamics' },
   },
   {
@@ -284,7 +296,7 @@ export const LABS = [
     subject: 'Engineering',
     desc: 'Parametric 3D modelling with constraint-based design tools.',
     path: '/cad-pro',
-    tags: ['Engineering', 'Design'],
+    tags: ['Engineering', 'Design', 'CAD', '3D', 'Modeling', 'Geometry', 'Parametric'],
     cover: { grad: 'from-slate-600 via-slate-700 to-slate-900', mark: '⊡⊢', sub: 'Parametric Design' },
   },
   {
@@ -356,7 +368,7 @@ export const LABS = [
     subject: 'Data Science',
     desc: 'Create and run Python notebooks in the browser — write code, see output, download as .ipynb, upload from Jupyter, or import from GitHub.',
     path: '/notebook-lab',
-    tags: ['Python', 'Data Science', 'Interactive'],
+    tags: ['Python', 'Data Science', 'Interactive', 'Machine Learning', 'Jupyter', 'AI'],
     cover: { grad: 'from-indigo-700 via-violet-800 to-purple-950', mark: '📓', sub: 'Python · .ipynb · Jupyter' },
   },
   {
@@ -390,7 +402,7 @@ export const LABS = [
     subject: 'CS Theory',
     desc: 'Full hacker-workstation DSA lab: implement get, insert, delete, linear search, and binary search with live memory visualization and step tracer. JS + Python dual-language.',
     path: '/lab/dsa-arrays-lab',
-    tags: ['DSA', 'Memory', 'Python', 'Interactive'],
+    tags: ['DSA', 'Memory', 'Python', 'Interactive', 'Data Structures', 'Algorithms', 'C'],
     cover: { grad: 'from-cyan-700 via-slate-800 to-slate-950', mark: '[0]', sub: 'Memory · Pointers · O(n)' },
   },
   {

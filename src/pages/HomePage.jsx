@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getAllCourses, getChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
@@ -9,6 +10,47 @@ import { GAMES } from '../games/registry.js'
 import { usePins } from '../context/PinsContext.jsx'
 import { usePinLauncher } from '../hooks/usePinLauncher.js'
 import { GLASS_META } from '../styles/courseColors.js'
+import HomeTopicSearch from '../components/ui/HomeTopicSearch.jsx'
+
+function matchItem(item, query) {
+  if (!query) return true;
+  const q = query.toLowerCase().trim();
+  
+  const searchableText = [
+    item.label,
+    item.desc,
+    item.description,
+    item.subject,
+    item.domain,
+    item.key,
+    ...(item.tags || [])
+  ].filter(Boolean).join(' ').toLowerCase();
+
+  if (searchableText.includes(q)) return true;
+
+  // Extract keywords by removing conversational filler
+  const stopWords = [
+    'a', 'an', 'the', 'in', 'on', 'with', 'to', 'and', 'or', 'for', 'of', 'at', 'by', 'from',
+    'learn', 'master', 'build', 'explore', 'simulate', 'design', 'visualise', 'visualize', 'create', 'make', 'do',
+    'lesson', 'lessons', 'lab', 'labs', 'game', 'games', 'app', 'apps', 'course', 'courses', 
+    'topic', 'topics', 'how', 'what', 'why', 'who', 'where', 'when', 'is', 'are', 'am', 'be', 'been',
+    'i', 'you', 'he', 'she', 'it', 'we', 'they', 'my', 'your', 'his', 'her', 'our', 'their',
+    'want', 'need', 'like', 'would', 'could', 'should', 'can', 'will', 'show', 'me', 'find', 'search',
+    'about', 'some', 'any', 'all', 'this', 'that', 'these', 'those', 'there', 'here', 'so', 'if', 'then',
+    'teach', 'help', 'understand', 'work', 'scratch', 'from'
+  ];
+  
+  // Also keep terms that might be short but very specific
+  const terms = q.split(/[\s,]+/)
+    .filter(t => !stopWords.includes(t))
+    .filter(t => t.length > 2 || ['3d', 'js', 'ai', 'ui', 'ux', 'c', 'ml', 'vr', 'ar', 'g0', 'fk', 'ik', 'qr'].includes(t));
+  
+  if (terms.length > 0) {
+    return terms.some(term => searchableText.includes(term));
+  }
+  
+  return false;
+}
 
 // ── Favourite pin card — pins are a slimmer shape than AppCard expects, so
 // render them with the same glass palette rather than forcing them through AppCard.
@@ -88,9 +130,12 @@ const DOMAINS = DOMAIN_ORDER
   .filter(d => d.entries.length > 0)
 
 // ── Domain section ────────────────────────────────────────────────────────────
-function DomainSection({ domain, getLessonStatus }) {
+function DomainSection({ domain, getLessonStatus, query }) {
   const [iconColor, borderColor] = domain.headCol.split(' ')
-  const { entries } = domain
+  const entries = query 
+    ? domain.entries.filter(({ course }) => matchItem(course, query))
+    : domain.entries;
+    
   if (!entries?.length) return null
   return (
     <div className="mb-14">
@@ -115,6 +160,7 @@ export default function HomePage() {
   const { getLessonStatus } = useProgress()
   const { pins, removePin } = usePins()
   const { openPin } = usePinLauncher()
+  const [searchQuery, setSearchQuery] = useState('')
   const totalLessons     = COURSE_ENTRIES.reduce((s, { chapters }) => s + chapters.reduce((n, ch) => n + ch.lessons.length, 0), 0)
   const completedLessons = COURSE_ENTRIES.reduce((s, { course, chapters }) =>
     s + chapters.reduce((n, ch) =>
@@ -187,6 +233,16 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ── FILTER SECTION ───────────────────────────────────────────────── */}
+        <section className="px-4 pb-12 pt-4">
+          <div className="max-w-3xl mx-auto text-center mb-2">
+            <span className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 dark:border-indigo-500/30 dark:bg-indigo-900/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-300 backdrop-blur-sm">
+              <span className="text-base leading-none">🔍</span> Filter the Universe
+            </span>
+          </div>
+          <HomeTopicSearch onSearch={setSearchQuery} />
+        </section>
+
         {/* ── FAVOURITES ───────────────────────────────────────────────────── */}
         {pins.length > 0 && (
           <section className="px-4 pb-6">
@@ -217,7 +273,7 @@ export default function HomePage() {
             <p className="text-slate-600 dark:text-slate-400 text-base mt-2">Structured paths from first principles to mastery</p>
           </div>
           {DOMAINS.map(domain => (
-            <DomainSection key={domain.key} domain={domain} getLessonStatus={getLessonStatus} />
+            <DomainSection key={domain.key} domain={domain} getLessonStatus={getLessonStatus} query={searchQuery} />
           ))}
         </section>
 
@@ -231,7 +287,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {LABS_BY_KIND.lesson.map(item => <AppCard key={item.key} item={item} variant="lab" />)}
+            {LABS_BY_KIND.lesson.filter(item => matchItem(item, searchQuery)).map(item => <AppCard key={item.key} item={item} variant="lab" />)}
           </div>
         </section>
 
@@ -245,7 +301,7 @@ export default function HomePage() {
             </div>
           </div>
           {LAB_SUBJECTS.map(subject => {
-            const items = LABS_BY_KIND.lab.filter(l => l.subject === subject)
+            const items = LABS_BY_KIND.lab.filter(l => l.subject === subject && matchItem(l, searchQuery))
             if (items.length === 0) return null
             return (
               <div key={subject} className="mb-8 last:mb-0">
@@ -268,7 +324,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {LABS_BY_KIND.builder.map(item => <AppCard key={item.key} item={item} variant="lab" />)}
+            {LABS_BY_KIND.builder.filter(item => matchItem(item, searchQuery)).map(item => <AppCard key={item.key} item={item} variant="lab" />)}
           </div>
         </section>
 
@@ -282,7 +338,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {LABS_BY_KIND.visualizer.map(item => <AppCard key={item.key} item={item} variant="lab" />)}
+            {LABS_BY_KIND.visualizer.filter(item => matchItem(item, searchQuery)).map(item => <AppCard key={item.key} item={item} variant="lab" />)}
           </div>
         </section>
 
@@ -296,7 +352,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {GAMES.map(item => <AppCard key={item.key} item={item} variant="game" />)}
+            {GAMES.filter(item => matchItem(item, searchQuery)).map(item => <AppCard key={item.key} item={item} variant="game" />)}
           </div>
         </section>
 
