@@ -23,7 +23,7 @@ import {
   Moon,
 } from "lucide-react";
 const MatrixReducer = lazy(() => import("../../tools/matrix-reducer/index.jsx"));
-const MathOS = lazy(() => import("../../tools/math-os/MathOS.tsx"));
+const MathOS = lazy(() => import("../../tools/math-os/MathOSWorkspace.tsx"));
 const TICalc = lazy(() => import("../../tools/calculator/index.jsx"));
 const SigmaCalc = lazy(() => import("../../tools/sigma/index.jsx"));
 const PolyCalc = lazy(() => import("../../tools/polynomial/index.jsx"));

@@ -1,12 +1,9 @@
 import { lazy, Suspense } from 'react'
 import { useGlobalTheme } from '../../context/ThemeContext'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes'
-import { useDrag } from './hooks/useDrag'
 import { useMathOSState } from './hooks/useMathOSState'
-import TitleBar from './components/TitleBar'
 import VarStrip from './components/VarStrip'
 import SectionTabs from './components/SectionTabs'
-import StatusBar from './components/StatusBar'
 import KatexStep from './components/KatexStep'
 import KatexInline from './components/KatexInline'
 import CanvasGraph from './components/CanvasGraph'
@@ -105,14 +102,11 @@ function MachinistViz({ viz, vars }: { viz?: string; vars?: Record<string, strin
   )
 }
 
-// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-interface Props { open: boolean; onClose: () => void }
-
-export default function MathOS({ open, onClose }: Props) {
+// ─── CENTER CONTENT ───────────────────────────────────────────────────────────
+export default function MathOSCenter() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { themeStyles } = useGlobalTheme() as any
   const ui: Record<string, string> = themeStyles.ui
-  const { pos, dragging, onMouseDown } = useDrag({ x: Math.max(20, window.innerWidth - 960), y: 40 })
 
   const s = useMathOSState()
   const explainText = s.getExplain(s.explainLevel)
@@ -121,20 +115,8 @@ export default function MathOS({ open, onClose }: Props) {
   type Op = { id: string; label: string; needsB?: boolean; needsAug?: boolean; squareOnly?: boolean; vectorMode?: boolean }
   const currentOp: Partial<Op> = s.OPERATIONS.find((o: Op) => o.id === s.matOp) ?? {}
 
-  if (!open) return null
-
   return (
-    <div
-      className={`fixed z-[2000] flex flex-col rounded-[24px] border ${ui.border} overflow-hidden backdrop-blur-3xl ${ui.bg0} ${ui.txt1} shadow-[0_20px_60px_rgba(0,0,0,0.5)]`}
-      style={{ left: pos.x, top: pos.y, width: 900, maxHeight: '92vh', userSelect: dragging.current ? 'none' : 'auto' }}
-    >
-      <TitleBar
-        angleMode={s.angleMode}
-        onAngleModeToggle={() => s.setAngleMode(a => a === 'RAD' ? 'DEG' : 'RAD')}
-        onClose={onClose}
-        onMouseDown={onMouseDown}
-        ui={ui}
-      />
+    <div className="flex flex-col flex-1 min-h-0">
 
       <VarStrip
         vars={s.vars}
@@ -655,7 +637,6 @@ export default function MathOS({ open, onClose }: Props) {
 
       </div>
 
-      <StatusBar varCount={Object.keys(s.vars).length} historyCount={s.history.length} ui={ui} />
     </div>
   )
 }
