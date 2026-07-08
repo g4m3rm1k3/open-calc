@@ -6,10 +6,7 @@ import "./styles/proof.css";
 
 // Apply saved theme before first paint (avoids flash)
 const saved = localStorage.getItem("oc-theme");
-if (
-  saved === "dark" ||
-  (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches)
-) {
+if (saved === "dark" || !saved) {
   document.documentElement.classList.add("dark");
 }
 

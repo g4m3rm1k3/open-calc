@@ -20,7 +20,7 @@ function FavouriteCard({ pin, onOpen, onRemove }) {
       tabIndex={0}
       onClick={onOpen}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onOpen(); }}
-      className={`group relative flex flex-col items-start gap-2 p-4 rounded-2xl text-left cursor-pointer transition-all hover:-translate-y-1 bg-gradient-to-br ${meta.header} border ${meta.border} text-white overflow-hidden`}
+      className={`group relative flex flex-col items-start gap-2 p-4 rounded-2xl text-left cursor-pointer transition-all hover:-translate-y-1 bg-gradient-to-br ${meta.header} border ${meta.border} text-white shadow-md hover:shadow-lg dark:shadow-none overflow-hidden`}
     >
       <button
         onClick={(e) => { e.stopPropagation(); onRemove(); }}
@@ -46,30 +46,30 @@ const LABS_BY_KIND = {
 
 // ── Discipline pills ──────────────────────────────────────────────────────────
 const DISCIPLINES_ROW1 = [
-  { label:'Mathematics',  emoji:'∫',  col:'border-indigo-400/40 text-indigo-200 bg-indigo-900/30'   },
-  { label:'Physics',      emoji:'Φ',  col:'border-blue-400/40 text-blue-200 bg-blue-900/30'         },
-  { label:'Chemistry',    emoji:'⚗', col:'border-cyan-400/40 text-cyan-200 bg-cyan-900/30'         },
-  { label:'Biology',      emoji:'🧬', col:'border-emerald-400/40 text-emerald-200 bg-emerald-900/30'},
-  { label:'Robotics',     emoji:'🤖', col:'border-orange-400/40 text-orange-200 bg-orange-900/30'   },
-  { label:'Astronomy',    emoji:'🔭', col:'border-violet-400/40 text-violet-200 bg-violet-900/30'   },
+  { label:'Mathematics',  emoji:'∫',  col:'border-indigo-200 text-indigo-700 bg-indigo-50 dark:border-indigo-400/40 dark:text-indigo-200 dark:bg-indigo-900/30'   },
+  { label:'Physics',      emoji:'Φ',  col:'border-blue-200 text-blue-700 bg-blue-50 dark:border-blue-400/40 dark:text-blue-200 dark:bg-blue-900/30'         },
+  { label:'Chemistry',    emoji:'⚗', col:'border-cyan-200 text-cyan-700 bg-cyan-50 dark:border-cyan-400/40 dark:text-cyan-200 dark:bg-cyan-900/30'         },
+  { label:'Biology',      emoji:'🧬', col:'border-emerald-200 text-emerald-700 bg-emerald-50 dark:border-emerald-400/40 dark:text-emerald-200 dark:bg-emerald-900/30'},
+  { label:'Robotics',     emoji:'🤖', col:'border-orange-200 text-orange-700 bg-orange-50 dark:border-orange-400/40 dark:text-orange-200 dark:bg-orange-900/30'   },
+  { label:'Astronomy',    emoji:'🔭', col:'border-violet-200 text-violet-700 bg-violet-50 dark:border-violet-400/40 dark:text-violet-200 dark:bg-violet-900/30'   },
 ]
 const DISCIPLINES_ROW2 = [
-  { label:'Computer Science',       emoji:'⊕',  col:'border-purple-400/40 text-purple-200 bg-purple-900/30'   },
-  { label:'Data Science',           emoji:'Σ',  col:'border-sky-400/40 text-sky-200 bg-sky-900/30'            },
-  { label:'AI & Machine Learning',  emoji:'⟁',  col:'border-rose-400/40 text-rose-200 bg-rose-900/30'         },
-  { label:'Engineering',            emoji:'⚙', col:'border-amber-400/40 text-amber-200 bg-amber-900/30'      },
-  { label:'Linear Algebra',         emoji:'Ax', col:'border-teal-400/40 text-teal-200 bg-teal-900/30'         },
-  { label:'3D & Graphics',          emoji:'∇',  col:'border-fuchsia-400/40 text-fuchsia-200 bg-fuchsia-900/30'},
+  { label:'Computer Science',       emoji:'⊕',  col:'border-purple-200 text-purple-700 bg-purple-50 dark:border-purple-400/40 dark:text-purple-200 dark:bg-purple-900/30'   },
+  { label:'Data Science',           emoji:'Σ',  col:'border-sky-200 text-sky-700 bg-sky-50 dark:border-sky-400/40 dark:text-sky-200 dark:bg-sky-900/30'            },
+  { label:'AI & Machine Learning',  emoji:'⟁',  col:'border-rose-200 text-rose-700 bg-rose-50 dark:border-rose-400/40 dark:text-rose-200 dark:bg-rose-900/30'         },
+  { label:'Engineering',            emoji:'⚙', col:'border-amber-200 text-amber-700 bg-amber-50 dark:border-amber-400/40 dark:text-amber-200 dark:bg-amber-900/30'      },
+  { label:'Linear Algebra',         emoji:'Ax', col:'border-teal-200 text-teal-700 bg-teal-50 dark:border-teal-400/40 dark:text-teal-200 dark:bg-teal-900/30'         },
+  { label:'3D & Graphics',          emoji:'∇',  col:'border-fuchsia-200 text-fuchsia-700 bg-fuchsia-50 dark:border-fuchsia-400/40 dark:text-fuchsia-200 dark:bg-fuchsia-900/30'},
 ]
 
 // ── Domain visual config ──────────────────────────────────────────────────────
 const DOMAIN_META = {
-  math:        { label:'Mathematics',                    icon:'∑',  desc:'From pre-calculus through calculus, geometry, discrete math, linear algebra & statistics', headCol:'text-indigo-300 border-indigo-500/35' },
-  science:     { label:'Natural Sciences',               icon:'⚛',  desc:'Physics mechanics, waves, electricity · Chemistry elements, reactions & molecular structure', headCol:'text-cyan-300 border-cyan-500/35' },
-  cs:          { label:'Computer Science & Programming', icon:'⌨',  desc:'Python, JavaScript, web systems, algorithms, data structures & computational thinking', headCol:'text-emerald-300 border-emerald-500/35' },
-  engineering: { label:'Engineering & Hardware',         icon:'⚙',  desc:'Digital logic, CNC machining, G-code, C++ from zero to software engineer', headCol:'text-amber-300 border-amber-500/35' },
-  data:        { label:'Data, AI & Databases',           icon:'⟁',  desc:'NumPy, Pandas, ML foundations, LLMs, SQL, NoSQL & applied statistics', headCol:'text-violet-300 border-violet-500/35' },
-  creative:    { label:'Creative Technology',            icon:'∇',  desc:'3D graphics & WebGL, game dev, HTML Canvas, design systems, Git & command line', headCol:'text-rose-300 border-rose-500/35' },
+  math:        { label:'Mathematics',                    icon:'∑',  desc:'From pre-calculus through calculus, geometry, discrete math, linear algebra & statistics', headCol:'text-indigo-600 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/35' },
+  science:     { label:'Natural Sciences',               icon:'⚛',  desc:'Physics mechanics, waves, electricity · Chemistry elements, reactions & molecular structure', headCol:'text-cyan-600 dark:text-cyan-300 border-cyan-200 dark:border-cyan-500/35' },
+  cs:          { label:'Computer Science & Programming', icon:'⌨',  desc:'Python, JavaScript, web systems, algorithms, data structures & computational thinking', headCol:'text-emerald-600 dark:text-emerald-300 border-emerald-200 dark:border-emerald-500/35' },
+  engineering: { label:'Engineering & Hardware',         icon:'⚙',  desc:'Digital logic, CNC machining, G-code, C++ from zero to software engineer', headCol:'text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-500/35' },
+  data:        { label:'Data, AI & Databases',           icon:'⟁',  desc:'NumPy, Pandas, ML foundations, LLMs, SQL, NoSQL & applied statistics', headCol:'text-violet-600 dark:text-violet-300 border-violet-200 dark:border-violet-500/35' },
+  creative:    { label:'Creative Technology',            icon:'∇',  desc:'3D graphics & WebGL, game dev, HTML Canvas, design systems, Git & command line', headCol:'text-rose-600 dark:text-rose-300 border-rose-200 dark:border-rose-500/35' },
 }
 const DOMAIN_ORDER = ['math', 'science', 'cs', 'engineering', 'data', 'creative']
 
@@ -145,14 +145,14 @@ export default function HomePage() {
 
           <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black tracking-tight leading-none mb-5">
             <span
-              className="bg-gradient-to-r from-indigo-300 via-cyan-200 to-violet-300 bg-clip-text text-transparent"
+              className="bg-gradient-to-r from-indigo-500 via-cyan-400 to-violet-500 dark:from-indigo-300 dark:via-cyan-200 dark:to-violet-300 bg-clip-text text-transparent"
               style={{ filter:'drop-shadow(0 0 40px rgba(99,102,241,0.45))' }}
             >
               UpSkillOS
             </span>
           </h1>
 
-          <p className="text-slate-300 text-xl sm:text-2xl font-light max-w-3xl leading-relaxed mb-3">
+          <p className="text-slate-700 dark:text-slate-300 text-xl sm:text-2xl font-light max-w-3xl leading-relaxed mb-3">
             Master the universe of human knowledge.
           </p>
           <p className="text-slate-500 text-base sm:text-lg max-w-2xl leading-relaxed mb-10">
@@ -162,17 +162,17 @@ export default function HomePage() {
 
           <div className="flex flex-wrap justify-center gap-2 mb-8">
             {['Free Forever','Open Source','Runs in Browser','No Install Required','MIT License'].map(b => (
-              <span key={b} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-400 backdrop-blur-sm">{b}</span>
+              <span key={b} className="rounded-full border border-slate-200 bg-white/40 dark:border-white/10 dark:bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 backdrop-blur-md">{b}</span>
             ))}
           </div>
 
           {totalLessons > 0 && (
-            <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm px-5 py-2.5 text-sm mb-10">
-              <div className="h-2 w-36 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-gradient-to-r from-indigo-400 to-cyan-400 transition-all"
+            <div className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white/60 dark:border-white/10 dark:bg-white/5 backdrop-blur-md px-5 py-2.5 text-sm mb-10">
+              <div className="h-2 w-36 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
+                <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-cyan-500 dark:from-indigo-400 dark:to-cyan-400 transition-all"
                   style={{ width:`${(completedLessons / totalLessons) * 100}%` }} />
               </div>
-              <span className="text-slate-300 font-medium">
+              <span className="text-slate-700 dark:text-slate-300 font-medium">
                 {completedLessons} <span className="text-slate-500">/ {totalLessons} lessons</span>
               </span>
             </div>
@@ -187,10 +187,10 @@ export default function HomePage() {
         {/* ── FAVOURITES ───────────────────────────────────────────────────── */}
         {pins.length > 0 && (
           <section className="px-4 pb-6">
-            <div className="flex items-center gap-3 mb-6 pb-3 border-b border-amber-500/30">
+            <div className="flex items-center gap-3 mb-6 pb-3 border-b border-amber-200 dark:border-amber-500/30">
               <span className="text-3xl leading-none">⭐</span>
               <div>
-                <h3 className="text-lg font-bold text-amber-300">Favourites</h3>
+                <h3 className="text-lg font-bold text-amber-600 dark:text-amber-300">Favourites</h3>
                 <p className="text-slate-500 text-xs">Pinned from the Start Menu — right-click any item there to pin or unpin</p>
               </div>
             </div>
@@ -205,13 +205,13 @@ export default function HomePage() {
         {/* ── COURSES ──────────────────────────────────────────────────────── */}
         <section className="px-4 pb-6">
           <div className="mb-10 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-900/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-indigo-300 backdrop-blur-sm mb-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 dark:border-indigo-500/30 dark:bg-indigo-900/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-300 backdrop-blur-sm mb-4">
               <span>📚</span> Curriculum
             </div>
-            <h2 className="text-4xl font-black text-white tracking-tight">
+            <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               {ALL_COURSES.length}+ courses across every domain
             </h2>
-            <p className="text-slate-400 text-base mt-2">Structured paths from first principles to mastery</p>
+            <p className="text-slate-600 dark:text-slate-400 text-base mt-2">Structured paths from first principles to mastery</p>
           </div>
           {DOMAINS.map(domain => (
             <DomainSection key={domain.key} domain={domain} getLessonStatus={getLessonStatus} />
@@ -220,10 +220,10 @@ export default function HomePage() {
 
         {/* ── LESSONS ──────────────────────────────────────────────────────── */}
         <section className="px-4 pb-6 mt-4">
-          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-emerald-500/30">
+          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-emerald-200 dark:border-emerald-500/30">
             <span className="text-3xl leading-none">🎓</span>
             <div>
-              <h3 className="text-lg font-bold text-emerald-300">Guided Lessons</h3>
+              <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-300">Guided Lessons</h3>
               <p className="text-slate-500 text-xs">Narrated, checkpointed walkthroughs — follow along step by step</p>
             </div>
           </div>
@@ -234,10 +234,10 @@ export default function HomePage() {
 
         {/* ── LABS ─────────────────────────────────────────────────────────── */}
         <section className="px-4 pb-6 mt-4">
-          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-cyan-500/30">
+          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-cyan-200 dark:border-cyan-500/30">
             <span className="text-3xl leading-none">🔬</span>
             <div>
-              <h3 className="text-lg font-bold text-cyan-300">Interactive Labs</h3>
+              <h3 className="text-lg font-bold text-cyan-600 dark:text-cyan-300">Interactive Labs</h3>
               <p className="text-slate-500 text-xs">Full simulation & computation environments — experiment and explore</p>
             </div>
           </div>
@@ -257,10 +257,10 @@ export default function HomePage() {
 
         {/* ── BUILDERS ─────────────────────────────────────────────────────── */}
         <section className="px-4 pb-6 mt-4">
-          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-orange-500/30">
+          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-orange-200 dark:border-orange-500/30">
             <span className="text-3xl leading-none">🏗️</span>
             <div>
-              <h3 className="text-lg font-bold text-orange-300">Builders</h3>
+              <h3 className="text-lg font-bold text-orange-600 dark:text-orange-300">Builders</h3>
               <p className="text-slate-500 text-xs">Creative tools for making something real — drag, draw, and compose</p>
             </div>
           </div>
@@ -271,10 +271,10 @@ export default function HomePage() {
 
         {/* ── VISUALIZERS ──────────────────────────────────────────────────── */}
         <section className="px-4 pb-6 mt-4">
-          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-violet-500/30">
+          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-violet-200 dark:border-violet-500/30">
             <span className="text-3xl leading-none">🔍</span>
             <div>
-              <h3 className="text-lg font-bold text-violet-300">Visualizers</h3>
+              <h3 className="text-lg font-bold text-violet-600 dark:text-violet-300">Visualizers</h3>
               <p className="text-slate-500 text-xs">Point these at code or a mechanism and watch it run, step by step</p>
             </div>
           </div>
@@ -285,10 +285,10 @@ export default function HomePage() {
 
         {/* ── GAMES ────────────────────────────────────────────────────────── */}
         <section className="px-4 pt-6 pb-10 mt-4">
-          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-fuchsia-500/30">
+          <div className="flex items-center gap-3 mb-6 pb-3 border-b border-fuchsia-200 dark:border-fuchsia-500/30">
             <span className="text-3xl leading-none">🎮</span>
             <div>
-              <h3 className="text-lg font-bold text-fuchsia-300">STEM Games</h3>
+              <h3 className="text-lg font-bold text-fuchsia-600 dark:text-fuchsia-300">STEM Games</h3>
               <p className="text-slate-500 text-xs">Learn through play — real math and science behind every mechanic</p>
             </div>
           </div>
@@ -298,7 +298,7 @@ export default function HomePage() {
         </section>
 
         {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-        <footer className="border-t border-white/5 px-4 py-8 text-center text-xs text-slate-600 mt-4">
+        <footer className="border-t border-slate-200 dark:border-white/5 px-4 py-8 text-center text-xs text-slate-600 mt-4">
           <p>
             UpSkillOS is free, open source, and runs entirely in your browser.{' '}
             <Link to="/about" className="text-indigo-400 hover:text-indigo-300 hover:underline">Learn more</Link>

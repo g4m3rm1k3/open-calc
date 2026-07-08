@@ -575,11 +575,11 @@ export default function AboutPage() {
             </h1>
           </FadeSection>
           <FadeSection delay={140}>
-            <p className="text-slate-300 text-xl sm:text-2xl font-light max-w-2xl leading-relaxed mb-3">
+            <p className="text-slate-700 dark:text-slate-300 text-xl sm:text-2xl font-light max-w-2xl leading-relaxed mb-3">
               An open-source, browser-native learning platform for the full
               stack of human knowledge.
             </p>
-            <p className="text-slate-400 text-base sm:text-lg max-w-3xl leading-relaxed mb-10">
+            <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg max-w-3xl leading-relaxed mb-10">
               From Pre-Calculus to AI Engineering, from CNC Machining to Digital
               Logic, from CSS to C++ — 31 courses, 27 interactive labs, 15 STEM
               games, a built-in AI tutor, and an entire suite of tools. Runs
@@ -601,7 +601,7 @@ export default function AboutPage() {
               ].map((b) => (
                 <span
                   key={b}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-400 backdrop-blur-sm"
+                  className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-900/5 dark:bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-600 dark:text-slate-400 backdrop-blur-sm"
                 >
                   {b}
                 </span>
@@ -613,7 +613,7 @@ export default function AboutPage() {
               {STATS.map((s) => (
                 <div
                   key={s.label}
-                  className={`flex flex-col items-center gap-1 rounded-2xl border ${s.border} bg-white/4 backdrop-blur-sm px-4 py-5`}
+                  className={`flex flex-col items-center gap-1 rounded-2xl border ${s.border} bg-slate-900/5 dark:bg-white/4 backdrop-blur-sm px-4 py-5`}
                   style={{ boxShadow: `0 0 20px ${s.glow}` }}
                 >
                   <span className="text-2xl mb-1">{s.icon}</span>
@@ -622,7 +622,7 @@ export default function AboutPage() {
                   >
                     {s.value}
                   </span>
-                  <span className="text-xs text-slate-500 font-medium text-center">
+                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium text-center">
                     {s.label}
                   </span>
                 </div>
@@ -645,20 +645,20 @@ export default function AboutPage() {
                   <div className="text-xs font-bold uppercase tracking-widest text-rose-400 mb-1">
                     Created By
                   </div>
-                  <h2 className="text-2xl font-black text-white mb-3">
+                  <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-3">
                     Michael McLean
                   </h2>
-                  <p className="text-slate-300 text-base leading-relaxed mb-3">
+                  <p className="text-slate-700 dark:text-slate-300 text-base leading-relaxed mb-3">
                     UpSkillOS started as a small calculus visualizer and grew
                     into a full learning operating system — built by one person
                     with a conviction that{" "}
-                    <strong className="text-white">
+                    <strong className="text-slate-900 dark:text-white">
                       rigorous, free, world-class education
                     </strong>{" "}
                     should be accessible to everyone, everywhere, without a
                     paywall.
                   </p>
-                  <p className="text-slate-400 text-sm leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
                     Every lesson, lab, game, and tool has been designed from
                     first principles. The platform is non-commercial and
                     provided freely to advance education globally.
@@ -667,7 +667,7 @@ export default function AboutPage() {
                     href="https://github.com/g4m3rm1k3/open-calc"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-rose-300 hover:text-white transition-colors"
+                    className="inline-flex items-center gap-2 mt-4 text-sm font-semibold text-rose-300 hover:text-slate-900 dark:text-white transition-colors"
                   >
                     <span>⭐</span> github.com/g4m3rm1k3/open-calc
                   </a>
@@ -681,10 +681,10 @@ export default function AboutPage() {
         <section className="px-4 py-20 max-w-6xl mx-auto">
           <FadeSection className="text-center mb-12">
             <SectionBadge color="violet">🧠 Methodology</SectionBadge>
-            <h2 className="text-4xl font-black text-white tracking-tight">
+            <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               The 4-Stage Lesson Cycle
             </h2>
-            <p className="text-slate-400 text-base mt-3 max-w-xl mx-auto">
+            <p className="text-slate-600 dark:text-slate-400 text-base mt-3 max-w-xl mx-auto">
               Every lesson — from Pre-Calculus to AI Engineering — follows the
               same battle-tested structure. Intuition and rigor are not
               opposites. They reinforce each other.
@@ -693,7 +693,7 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {PHILOSOPHY.map((s, i) => (
               <FadeSection key={s.label} delay={i * 80}>
-                <div className="relative rounded-2xl border border-white/8 bg-slate-950/70 backdrop-blur-sm p-6 h-full flex flex-col gap-3 hover:border-white/15 hover:scale-[1.02] transition-all duration-300">
+                <div className="relative rounded-2xl border border-slate-200 dark:border-white/8 bg-white/70 dark:bg-slate-950/70 backdrop-blur-sm p-6 h-full flex flex-col gap-3 hover:border-slate-300 dark:border-white/15 hover:scale-[1.02] transition-all duration-300">
                   <div
                     className={`text-3xl font-black bg-gradient-to-r ${s.color} bg-clip-text text-transparent leading-none`}
                   >
@@ -705,11 +705,11 @@ export default function AboutPage() {
                     >
                       Step {s.step}
                     </div>
-                    <div className="text-base font-bold text-white">
+                    <div className="text-base font-bold text-slate-900 dark:text-white">
                       {s.label}
                     </div>
                   </div>
-                  <p className="text-sm text-slate-400 leading-relaxed flex-1">
+                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed flex-1">
                     {s.desc}
                   </p>
                 </div>
@@ -723,10 +723,10 @@ export default function AboutPage() {
           <div className="max-w-7xl mx-auto">
             <FadeSection className="text-center mb-12">
               <SectionBadge color="indigo">📚 31 Courses</SectionBadge>
-              <h2 className="text-4xl font-black text-white tracking-tight">
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                 Every Domain. First Principles.
               </h2>
-              <p className="text-slate-400 text-base mt-3 max-w-2xl mx-auto">
+              <p className="text-slate-600 dark:text-slate-400 text-base mt-3 max-w-2xl mx-auto">
                 Structured from zero — no prerequisites assumed. Each course
                 builds from motivation to intuition to proof, with interactive
                 code and visualizations throughout.
@@ -752,7 +752,7 @@ export default function AboutPage() {
                       {domain.courses.map((c) => (
                         <li
                           key={c}
-                          className="flex items-start gap-2 text-sm text-slate-400 leading-relaxed"
+                          className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed"
                         >
                           <span className="text-slate-600 shrink-0 mt-0.5">
                             ›
@@ -773,10 +773,10 @@ export default function AboutPage() {
           <div className="max-w-7xl mx-auto">
             <FadeSection className="text-center mb-12">
               <SectionBadge color="cyan">🔬 27 Interactive Labs</SectionBadge>
-              <h2 className="text-4xl font-black text-white tracking-tight">
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                 Hands-On Environments
               </h2>
-              <p className="text-slate-400 text-base mt-3 max-w-2xl mx-auto">
+              <p className="text-slate-600 dark:text-slate-400 text-base mt-3 max-w-2xl mx-auto">
                 Full simulation environments, visual debuggers, industrial
                 simulators, coding workstations — not just exercises, but real
                 tools you actually use.
@@ -785,13 +785,13 @@ export default function AboutPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {LABS_HIGHLIGHTS.map((lab, i) => (
                 <FadeSection key={lab.name} delay={Math.floor(i / 3) * 60}>
-                  <div className="flex items-start gap-4 rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm px-5 py-4 hover:border-cyan-500/30 hover:bg-cyan-900/8 transition-all duration-300 h-full group">
+                  <div className="flex items-start gap-4 rounded-2xl border border-slate-200 dark:border-white/8 bg-slate-900/5 dark:bg-white/4 backdrop-blur-sm px-5 py-4 hover:border-cyan-500/30 hover:bg-cyan-900/8 transition-all duration-300 h-full group">
                     <span className="text-2xl shrink-0 mt-0.5">{lab.icon}</span>
                     <div>
-                      <div className="text-sm font-bold text-white group-hover:text-cyan-200 transition-colors">
+                      <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-cyan-200 transition-colors">
                         {lab.name}
                       </div>
-                      <div className="text-xs text-slate-500 mt-1 leading-relaxed">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                         {lab.desc}
                       </div>
                     </div>
@@ -807,10 +807,10 @@ export default function AboutPage() {
           <div className="max-w-7xl mx-auto">
             <FadeSection className="text-center mb-12">
               <SectionBadge color="fuchsia">🎮 15 STEM Games</SectionBadge>
-              <h2 className="text-4xl font-black text-white tracking-tight">
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                 Learn Through Play
               </h2>
-              <p className="text-slate-400 text-base mt-3 max-w-2xl mx-auto">
+              <p className="text-slate-600 dark:text-slate-400 text-base mt-3 max-w-2xl mx-auto">
                 Real math and science behind every mechanic. Not educational
                 games — games that happen to teach, because the concepts are
                 built into the core loop.
@@ -819,12 +819,12 @@ export default function AboutPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               {GAMES_HIGHLIGHTS.map((game, i) => (
                 <FadeSection key={game.name} delay={Math.floor(i / 5) * 60}>
-                  <div className="flex flex-col gap-2 rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm px-4 py-4 hover:border-fuchsia-500/30 hover:bg-fuchsia-900/8 transition-all duration-300 h-full group">
+                  <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 dark:border-white/8 bg-slate-900/5 dark:bg-white/4 backdrop-blur-sm px-4 py-4 hover:border-fuchsia-500/30 hover:bg-fuchsia-900/8 transition-all duration-300 h-full group">
                     <span className="text-2xl">{game.icon}</span>
-                    <div className="text-sm font-bold text-white group-hover:text-fuchsia-200 transition-colors">
+                    <div className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-fuchsia-200 transition-colors">
                       {game.name}
                     </div>
-                    <div className="text-xs text-slate-500 leading-relaxed">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                       {game.desc}
                     </div>
                   </div>
@@ -839,10 +839,10 @@ export default function AboutPage() {
           <div className="max-w-7xl mx-auto">
             <FadeSection className="text-center mb-12">
               <SectionBadge color="violet">✨ Platform Features</SectionBadge>
-              <h2 className="text-4xl font-black text-white tracking-tight">
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                 More Than Lessons
               </h2>
-              <p className="text-slate-400 text-base mt-3 max-w-2xl mx-auto">
+              <p className="text-slate-600 dark:text-slate-400 text-base mt-3 max-w-2xl mx-auto">
                 UpSkillOS is a full learning operating system — with tools,
                 tracking, and features built around the learning process itself.
               </p>
@@ -859,10 +859,10 @@ export default function AboutPage() {
                     >
                       {f.icon}
                     </div>
-                    <div className="text-sm font-bold text-white">
+                    <div className="text-sm font-bold text-slate-900 dark:text-white">
                       {f.title}
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed flex-1">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed flex-1">
                       {f.desc}
                     </p>
                   </div>
@@ -876,10 +876,10 @@ export default function AboutPage() {
         <section className="px-4 py-20 max-w-6xl mx-auto">
           <FadeSection className="text-center mb-12">
             <SectionBadge color="amber">⚒️ Built-In Tools</SectionBadge>
-            <h2 className="text-4xl font-black text-white tracking-tight">
+            <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               The Toolbox
             </h2>
-            <p className="text-slate-400 text-base mt-3 max-w-xl mx-auto">
+            <p className="text-slate-600 dark:text-slate-400 text-base mt-3 max-w-xl mx-auto">
               Every tool is available from any page — no context switching. Open
               the grapher, calculator, or terminal without leaving your lesson.
             </p>
@@ -887,13 +887,13 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {TOOLS.map((t, i) => (
               <FadeSection key={t.name} delay={i * 40}>
-                <div className="rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm px-5 py-4 flex flex-col gap-2 hover:border-amber-500/30 hover:bg-amber-900/8 transition-all duration-300 group h-full">
+                <div className="rounded-2xl border border-slate-200 dark:border-white/8 bg-slate-900/5 dark:bg-white/4 backdrop-blur-sm px-5 py-4 flex flex-col gap-2 hover:border-amber-500/30 hover:bg-amber-900/8 transition-all duration-300 group h-full">
                   <span className="text-2xl">{t.icon}</span>
                   <div>
                     <code className="font-mono text-xs font-bold text-amber-300 group-hover:text-amber-200 transition-colors">
                       {t.name}
                     </code>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                       {t.desc}
                     </p>
                   </div>
@@ -914,10 +914,10 @@ export default function AboutPage() {
               <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-cyan-500/8 rounded-full blur-[80px] pointer-events-none" />
               <div className="relative z-10">
                 <div className="text-5xl mb-4">🐍</div>
-                <h2 className="text-3xl sm:text-4xl font-black text-white mb-4">
+                <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-4">
                   Python. In your browser. Right now.
                 </h2>
-                <p className="text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-2">
+                <p className="text-slate-700 dark:text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-2">
                   Powered by{" "}
                   <span className="text-emerald-300 font-semibold">
                     Pyodide
@@ -930,7 +930,7 @@ export default function AboutPage() {
                   visualization library — with a single click. No install. No
                   server. No signup.
                 </p>
-                <p className="text-slate-500 text-sm mt-2">
+                <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
                   JavaScript runs in an isolated sandbox. Python runs in
                   WebAssembly. Both have full consoles, error highlighting, and
                   output panels.
@@ -944,10 +944,10 @@ export default function AboutPage() {
         <section className="px-4 py-20 max-w-6xl mx-auto">
           <FadeSection className="text-center mb-12">
             <SectionBadge color="amber">⚡ Technology</SectionBadge>
-            <h2 className="text-4xl font-black text-white tracking-tight">
+            <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               Built on Modern Tech
             </h2>
-            <p className="text-slate-400 text-base mt-3 max-w-xl mx-auto">
+            <p className="text-slate-600 dark:text-slate-400 text-base mt-3 max-w-xl mx-auto">
               A pure static site — no backend, no server, no runtime costs.
               Deploy it anywhere for free.
             </p>
@@ -955,13 +955,13 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {STACK.map((s, i) => (
               <FadeSection key={s.name} delay={i * 40}>
-                <div className="rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm px-5 py-4 flex flex-col gap-2 hover:border-amber-500/25 hover:bg-amber-900/8 transition-all duration-300 group h-full">
+                <div className="rounded-2xl border border-slate-200 dark:border-white/8 bg-slate-900/5 dark:bg-white/4 backdrop-blur-sm px-5 py-4 flex flex-col gap-2 hover:border-amber-500/25 hover:bg-amber-900/8 transition-all duration-300 group h-full">
                   <span className="text-xl">{s.icon}</span>
                   <div>
                     <code className="font-mono text-xs font-bold text-amber-300 group-hover:text-amber-200 transition-colors">
                       {s.name}
                     </code>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                       {s.role}
                     </p>
                   </div>
@@ -983,19 +983,19 @@ export default function AboutPage() {
               <div className="relative z-10 grid sm:grid-cols-2 gap-10 items-center">
                 <div>
                   <div className="text-4xl mb-4">🌍</div>
-                  <h2 className="text-3xl font-black text-white mb-4">
+                  <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4">
                     Open Source. Non-Commercial.
                   </h2>
-                  <p className="text-slate-300 text-base leading-relaxed mb-4">
+                  <p className="text-slate-700 dark:text-slate-300 text-base leading-relaxed mb-4">
                     UpSkillOS is provided freely to advance education. It is{" "}
-                    <strong className="text-white">
+                    <strong className="text-slate-900 dark:text-white">
                       strictly non-commercial
                     </strong>{" "}
                     — you may not use this software, its content, or its
                     visualizations for monetary gain, commercial hosting, or
                     paid product integration.
                   </p>
-                  <p className="text-slate-400 text-sm leading-relaxed mb-4">
+                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
                     Content lives in plain JavaScript files, making it trivial
                     to contribute lessons, fix errors, or add visualizations via
                     pull request — no special tooling required.
@@ -1004,7 +1004,7 @@ export default function AboutPage() {
                     href="https://github.com/g4m3rm1k3/open-calc"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-300 hover:text-white transition-colors"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-300 hover:text-slate-900 dark:text-white transition-colors"
                   >
                     <span>⭐</span> github.com/g4m3rm1k3/open-calc
                   </a>
@@ -1034,14 +1034,14 @@ export default function AboutPage() {
                   ].map((item) => (
                     <div
                       key={item.title}
-                      className="flex items-start gap-3 rounded-xl border border-white/8 bg-white/4 px-4 py-3"
+                      className="flex items-start gap-3 rounded-xl border border-slate-200 dark:border-white/8 bg-slate-900/5 dark:bg-white/4 px-4 py-3"
                     >
                       <span className="text-xl shrink-0">{item.icon}</span>
                       <div>
-                        <div className="text-sm font-bold text-white">
+                        <div className="text-sm font-bold text-slate-900 dark:text-white">
                           {item.title}
                         </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                           {item.desc}
                         </div>
                       </div>
@@ -1057,7 +1057,7 @@ export default function AboutPage() {
         <section className="px-4 py-20 max-w-5xl mx-auto">
           <FadeSection className="text-center mb-12">
             <SectionBadge color="rose">🗺️ Roadmap</SectionBadge>
-            <h2 className="text-4xl font-black text-white tracking-tight">
+            <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
               What's Built. What's Next.
             </h2>
           </FadeSection>
@@ -1071,7 +1071,7 @@ export default function AboutPage() {
                   {ROADMAP_DONE.map((item, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2 text-sm text-slate-400 leading-relaxed"
+                      className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed"
                     >
                       <span className="text-emerald-500 shrink-0 mt-0.5">
                         ✓
@@ -1091,7 +1091,7 @@ export default function AboutPage() {
                   {ROADMAP_NEXT.map((item, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2 text-sm text-slate-400 leading-relaxed"
+                      className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed"
                     >
                       <span className="text-indigo-500 shrink-0 mt-0.5">›</span>
                       {item}
@@ -1108,19 +1108,19 @@ export default function AboutPage() {
           <div className="max-w-6xl mx-auto">
             <FadeSection className="text-center mb-14">
               <SectionBadge color="emerald">🌍 Community</SectionBadge>
-              <h2 className="text-5xl font-black text-white tracking-tight mb-4">
+              <h2 className="text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-4">
                 Built by the community.
                 <br />
                 <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">
                   For the community.
                 </span>
               </h2>
-              <p className="text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
+              <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto leading-relaxed">
                 UpSkillOS isn't a product built behind closed doors — it's an
                 open platform that grows with every person who contributes a
                 lesson, finds a bug, or adds a feature. Whether you're a
                 student, a self-taught developer, or an educator,{" "}
-                <strong className="text-white">
+                <strong className="text-slate-900 dark:text-white">
                   your contribution belongs here.
                 </strong>
               </p>
@@ -1221,16 +1221,16 @@ export default function AboutPage() {
                     >
                       How to contribute
                     </div>
-                    <h3 className="text-base font-bold text-white mb-3">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white mb-3">
                       {card.title}
                     </h3>
-                    <p className="text-sm text-slate-400 leading-relaxed flex-1 mb-4">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed flex-1 mb-4">
                       {card.desc}
                     </p>
                     {card.action.to ? (
                       <Link
                         to={card.action.to}
-                        className={`text-xs font-bold ${card.badge} hover:text-white transition-colors`}
+                        className={`text-xs font-bold ${card.badge} hover:text-slate-900 dark:text-white transition-colors`}
                       >
                         {card.action.label}
                       </Link>
@@ -1239,7 +1239,7 @@ export default function AboutPage() {
                         href={card.action.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`text-xs font-bold ${card.badge} hover:text-white transition-colors`}
+                        className={`text-xs font-bold ${card.badge} hover:text-slate-900 dark:text-white transition-colors`}
                       >
                         {card.action.label}
                       </a>
@@ -1262,10 +1262,10 @@ export default function AboutPage() {
                     <div className="text-xs font-bold uppercase tracking-widest text-amber-400 mb-2">
                       🔨 Built-In Authoring Tool
                     </div>
-                    <h3 className="text-3xl font-black text-white mb-3">
+                    <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-3">
                       Lesson Builder
                     </h3>
-                    <p className="text-slate-300 text-base leading-relaxed mb-4">
+                    <p className="text-slate-700 dark:text-slate-300 text-base leading-relaxed mb-4">
                       You don't need to clone the repo to write your first
                       lesson. The{" "}
                       <strong className="text-amber-300">Lesson Builder</strong>{" "}
@@ -1303,7 +1303,7 @@ export default function AboutPage() {
                       ].map((item) => (
                         <div
                           key={item.text}
-                          className="flex items-start gap-2 text-sm text-slate-400"
+                          className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400"
                         >
                           <span className="shrink-0">{item.icon}</span>
                           <span>{item.text}</span>
@@ -1319,7 +1319,7 @@ export default function AboutPage() {
                   </div>
                   <div className="hidden sm:flex flex-col items-center justify-center gap-2 text-center min-w-[140px]">
                     <div className="text-6xl">🔨</div>
-                    <div className="text-xs text-slate-500 font-medium">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                       No local setup needed
                     </div>
                   </div>
@@ -1329,14 +1329,14 @@ export default function AboutPage() {
 
             {/* GitHub banner */}
             <FadeSection delay={80}>
-              <div className="mt-6 relative rounded-2xl border border-white/10 bg-white/4 backdrop-blur-sm overflow-hidden">
+              <div className="mt-6 relative rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-900/5 dark:bg-white/4 backdrop-blur-sm overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/20 via-transparent to-emerald-900/20 pointer-events-none" />
                 <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4 px-8 py-6">
                   <div className="text-center sm:text-left">
-                    <div className="text-white font-bold text-lg">
+                    <div className="text-slate-900 dark:text-white font-bold text-lg">
                       github.com/g4m3rm1k3/upskillos
                     </div>
-                    <div className="text-slate-400 text-sm mt-0.5">
+                    <div className="text-slate-600 dark:text-slate-400 text-sm mt-0.5">
                       Issues · PRs · Discussions · Source code — everything is
                       open
                     </div>
@@ -1368,7 +1368,7 @@ export default function AboutPage() {
         {/* ── CTA ───────────────────────────────────────────────────────────── */}
         <section className="px-4 py-24 text-center">
           <FadeSection>
-            <p className="text-slate-500 text-sm mb-4">
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-4">
               Learn it. Build it. Teach it.
             </p>
             <h2
@@ -1377,13 +1377,13 @@ export default function AboutPage() {
             >
               Master the universe of human knowledge.
             </h2>
-            <p className="text-slate-500 text-base mb-10 max-w-lg mx-auto">
+            <p className="text-slate-500 dark:text-slate-400 text-base mb-10 max-w-lg mx-auto">
               Then come back and help someone else do the same.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Link
                 to="/"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all duration-200 hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white font-bold text-sm transition-all duration-200 hover:scale-105 hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]"
               >
                 ← Browse Curriculum
               </Link>
@@ -1397,7 +1397,7 @@ export default function AboutPage() {
                 href="https://github.com/g4m3rm1k3/upskillos"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-sm transition-all duration-200 backdrop-blur-sm"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-white/15 bg-slate-900/5 dark:bg-white/5 hover:bg-white/10 text-slate-700 dark:text-slate-300 font-semibold text-sm transition-all duration-200 backdrop-blur-sm"
               >
                 ⭐ GitHub
               </a>
@@ -1411,7 +1411,7 @@ export default function AboutPage() {
               </a>
               <Link
                 to="/reference"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/10 bg-white/3 hover:bg-white/8 text-slate-500 font-medium text-sm transition-all duration-200 backdrop-blur-sm"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white/3 hover:bg-white/8 text-slate-500 dark:text-slate-400 font-medium text-sm transition-all duration-200 backdrop-blur-sm"
               >
                 Formula Atlas
               </Link>
