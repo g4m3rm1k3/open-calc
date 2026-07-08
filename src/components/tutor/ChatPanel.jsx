@@ -587,7 +587,7 @@ export default function ChatPanel({ isOpen, onClose }) {
             exit={{ x: "100%", opacity: 0 }}
             transition={{ type: "spring", damping: 28, stiffness: 400 }}
             style={{ width }}
-            className="fixed right-0 top-12 bottom-11 z-[1500] flex flex-col bg-white/95 dark:bg-[#1c1c1e]/95 backdrop-blur-3xl border-l border-black/[0.08] dark:border-white/[0.1] shadow-[-10px_0_40px_rgba(0,0,0,0.08)] dark:shadow-[-20px_0_100px_rgba(0,0,0,0.4)]"
+            className="fixed right-0 top-12 bottom-11 z-[1500] flex flex-col bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl border-l border-black/[0.08] dark:border-white/[0.1] shadow-[-10px_0_40px_rgba(0,0,0,0.08)] dark:shadow-[-20px_0_100px_rgba(0,0,0,0.4)]"
           >
             {/* Resize handle */}
             <div

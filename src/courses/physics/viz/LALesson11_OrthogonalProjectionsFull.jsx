@@ -58,12 +58,12 @@ function VectorControl({ label, vector, onChange, color }) {
   };
   
   return (
-    <div className="p-4 rounded-lg bg-gray-100 dark:bg-gray-800">
+    <div className="p-4 rounded-lg bg-slate- dark:bg-slate-">
         <h4 className="font-bold mb-2" style={{color: color}}>{label}</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             {['x', 'y', 'z'].map(comp => (
                 <div key={comp}>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className="block text-sm font-medium text-slate- dark:text-slate-">
                         {comp.toUpperCase()}: {vector[comp].toFixed(2)}
                     </label>
                     <input
@@ -142,7 +142,7 @@ export default function OrthogonalProjection() {
       <h1 className="text-2xl font-bold mb-4">Interactive Lesson: Orthogonal Projections</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 h-96 md:h-[500px] border border-gray-300 dark:border-gray-700 rounded-lg">
+        <div className="md:col-span-2 h-96 md:h-[500px] border border-slate- dark:border-slate- rounded-lg">
           <Canvas camera={{ position: [5, 5, 5], fov: 35 }}>
             <ProjectionVisualization v={v} u={u} />
             <OrbitControls />
@@ -164,7 +164,7 @@ export default function OrthogonalProjection() {
                     className={`px-3 py-1.5 text-sm rounded-md ${
                     i === step
                         ? "bg-blue-600 text-white font-semibold"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+                        : "bg-slate- dark:bg-slate- text-slate- dark:text-slate- hover:bg-slate- dark:hover:bg-slate-"
                     }`}
                 >
                 {i+1}. {s.label}
@@ -172,13 +172,13 @@ export default function OrthogonalProjection() {
             ))}
         </div>
 
-        <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+        <div className="bg-slate- dark:bg-slate- p-4 rounded-lg">
           <h3 className="text-lg font-semibold mb-2">{steps[step].label}</h3>
-          <p className="text-gray-700 dark:text-gray-300 mb-4 prose">
+          <p className="text-slate- dark:text-slate- mb-4 prose">
             <Katex>{steps[step].explanation}</Katex>
           </p>
           {steps[step].formula && (
-            <div className="bg-white dark:bg-gray-900 p-4 rounded text-center">
+            <div className="bg-white dark:bg-slate- p-4 rounded text-center">
               <Katex block>{steps[step].formula}</Katex>
             </div>
           )}

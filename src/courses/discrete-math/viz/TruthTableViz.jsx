@@ -94,7 +94,7 @@ export default function TruthTableViz() {
           </div>
         </div>
 
-        <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+        <div className="text-sm text-slate- dark:text-slate- mb-4">
           <p>
             <strong>Syntax:</strong> Use AND, OR, NOT, IMPLIES (-&gt;), IFF
             (&lt;-&gt;), or symbols ∧ ∨ ¬ → ↔
@@ -106,18 +106,18 @@ export default function TruthTableViz() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
+        <table className="w-full border-collapse border border-slate-">
           <thead>
-            <tr className="bg-gray-100 dark:bg-slate-800">
+            <tr className="bg-slate- dark:bg-slate-800">
               {activeVars.map((varName) => (
                 <th
                   key={varName}
-                  className="border border-gray-300 px-4 py-2 text-center font-bold"
+                  className="border border-slate- px-4 py-2 text-center font-bold"
                 >
                   {varName}
                 </th>
               ))}
-              <th className="border border-gray-300 px-4 py-2 text-center font-bold">
+              <th className="border border-slate- px-4 py-2 text-center font-bold">
                 {expression || "Expression"}
               </th>
             </tr>
@@ -126,18 +126,18 @@ export default function TruthTableViz() {
             {tableData.map((row, index) => (
               <tr
                 key={index}
-                className={index % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-gray-50 dark:bg-slate-800"}
+                className={index % 2 === 0 ? "bg-white dark:bg-slate-900" : "bg-slate- dark:bg-slate-800"}
               >
                 {activeVars.map((varName) => (
                   <td
                     key={varName}
-                    className="border border-gray-300 px-4 py-2 text-center font-mono"
+                    className="border border-slate- px-4 py-2 text-center font-mono"
                   >
                     {row[varName] ? "T" : "F"}
                   </td>
                 ))}
                 <td
-                  className={`border border-gray-300 px-4 py-2 text-center font-mono font-bold ${
+                  className={`border border-slate- px-4 py-2 text-center font-mono font-bold ${
                     row.result === "T"
                       ? "text-green-600 dark:text-green-400"
                       : row.result === "F"
@@ -153,7 +153,7 @@ export default function TruthTableViz() {
         </table>
       </div>
 
-      <div className="mt-6 p-4 bg-gray-50 dark:bg-slate-800 rounded-lg">
+      <div className="mt-6 p-4 bg-slate- dark:bg-slate-800 rounded-lg">
         <h3 className="font-bold mb-2">Analysis:</h3>
         <div className="space-y-1">
           <p>
@@ -166,7 +166,7 @@ export default function TruthTableViz() {
             <strong>Tautology:</strong>{" "}
             <span
               className={
-                isTautology ? "text-green-600 dark:text-green-400 font-bold" : "text-gray-600 dark:text-gray-300"
+                isTautology ? "text-green-600 dark:text-green-400 font-bold" : "text-slate- dark:text-slate-"
               }
             >
               {isTautology ? "YES" : "NO"}
@@ -177,7 +177,7 @@ export default function TruthTableViz() {
             <strong>Contradiction:</strong>{" "}
             <span
               className={
-                isContradiction ? "text-red-600 dark:text-red-400 font-bold" : "text-gray-600 dark:text-gray-300"
+                isContradiction ? "text-red-600 dark:text-red-400 font-bold" : "text-slate- dark:text-slate-"
               }
             >
               {isContradiction ? "YES" : "NO"}
@@ -187,7 +187,7 @@ export default function TruthTableViz() {
         </div>
       </div>
 
-      <div className="mt-4 text-sm text-gray-600 dark:text-gray-300">
+      <div className="mt-4 text-sm text-slate- dark:text-slate-">
         <p>
           <strong>Interactive Tip:</strong> Try expressions like "P OR NOT P"
           (tautology), "P AND NOT P" (contradiction), or "(P → Q) ↔ (¬P ∨ Q)"

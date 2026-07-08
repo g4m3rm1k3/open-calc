@@ -48,7 +48,7 @@ export default function QuantifierExplorer() {
                 className={`p-3 border rounded-lg text-center transition-colors ${
                   selectedPredicate === index
                     ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
-                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
+                    : "bg-white dark:bg-slate-900 hover:bg-slate- dark:bg-slate-800 border-slate-"
                 }`}
               >
                 {pred.name}
@@ -75,7 +75,7 @@ export default function QuantifierExplorer() {
               </div>
             ))}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-300">
+          <div className="text-sm text-slate- dark:text-slate-">
             <p>
               <strong>Satisfy the property:</strong> {satisfying.join(" ")} (
               {satisfying.length} animals)
@@ -97,7 +97,7 @@ export default function QuantifierExplorer() {
             <div className="text-xl font-mono mb-2">
               ∀x ∈ Universe, {predicate.name.toLowerCase()}(x)
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">
+            <div className="text-sm text-slate- dark:text-slate-">
               "Every single animal has this property"
             </div>
           </div>
@@ -124,7 +124,7 @@ export default function QuantifierExplorer() {
             </div>
           </div>
 
-          <div className="text-xs text-gray-600 dark:text-gray-300">
+          <div className="text-xs text-slate- dark:text-slate-">
             <strong>Destruction:</strong> One counterexample destroys the entire
             universal claim. Finding a single animal that doesn't have fur
             proves "all animals have fur" is false.
@@ -139,7 +139,7 @@ export default function QuantifierExplorer() {
             <div className="text-xl font-mono mb-2">
               ∃x ∈ Universe, {predicate.name.toLowerCase()}(x)
             </div>
-            <div className="text-sm text-gray-600 dark:text-gray-300">
+            <div className="text-sm text-slate- dark:text-slate-">
               "At least one animal has this property"
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function QuantifierExplorer() {
             </div>
           </div>
 
-          <div className="text-xs text-gray-600 dark:text-gray-300">
+          <div className="text-xs text-slate- dark:text-slate-">
             <strong>Proof:</strong> Finding one example proves the existential
             claim. Finding a flying squirrel proves "some animals can fly" is
             true.
@@ -179,13 +179,13 @@ export default function QuantifierExplorer() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div className="bg-white dark:bg-slate-900 p-3 rounded border">
             <div className="font-mono mb-1">¬∀x P(x) ≡ ∃x ¬P(x)</div>
-            <div className="text-gray-600 dark:text-gray-300">
+            <div className="text-slate- dark:text-slate-">
               "Not all have P" means "Some don't have P"
             </div>
           </div>
           <div className="bg-white dark:bg-slate-900 p-3 rounded border">
             <div className="font-mono mb-1">¬∃x P(x) ≡ ∀x ¬P(x)</div>
-            <div className="text-gray-600 dark:text-gray-300">
+            <div className="text-slate- dark:text-slate-">
               "None have P" means "All don't have P"
             </div>
           </div>

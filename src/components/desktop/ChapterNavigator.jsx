@@ -36,7 +36,7 @@ export default function ChapterNavigator({ onClose }) {
   return (
     <div
       ref={ref}
-      className="fixed bottom-11 right-2 z-[1900] w-[300px] max-h-[72vh] flex flex-col rounded-2xl overflow-hidden shadow-2xl border border-black/10 dark:border-white/[0.1] bg-white/95 dark:bg-[#1c1c1e]/95 backdrop-blur-xl"
+      className="fixed bottom-11 right-2 z-[1900] w-[300px] max-h-[72vh] flex flex-col rounded-2xl overflow-hidden shadow-2xl border border-black/10 dark:border-white/[0.1] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl"
     >
       <div className="flex-shrink-0 px-4 py-3 border-b border-black/[0.08] dark:border-white/[0.07]">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-0.5">Course</p>

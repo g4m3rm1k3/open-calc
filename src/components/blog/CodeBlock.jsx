@@ -137,12 +137,12 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
   // Terminal / plain output block
   if (isTerminalOutput) {
     return (
-      <div className={`my-3 rounded-xl overflow-hidden border ${isDarkGlobal ? 'border-zinc-700 bg-zinc-900' : 'border-slate-200 bg-white'}`}>
-        <div className={`px-4 py-1.5 flex items-center gap-2 ${isDarkGlobal ? 'bg-zinc-800' : 'bg-slate-100 border-b border-slate-200'}`}>
+      <div className={`my-3 rounded-xl overflow-hidden border ${isDarkGlobal ? 'border-slate- bg-slate-' : 'border-slate-200 bg-white'}`}>
+        <div className={`px-4 py-1.5 flex items-center gap-2 ${isDarkGlobal ? 'bg-slate-' : 'bg-slate-100 border-b border-slate-200'}`}>
           <span className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
           <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
           <span className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
-          <span className={`ml-2 text-xs font-mono flex-1 ${isDarkGlobal ? 'text-zinc-400' : 'text-slate-500'}`}>output</span>
+          <span className={`ml-2 text-xs font-mono flex-1 ${isDarkGlobal ? 'text-slate-' : 'text-slate-500'}`}>output</span>
           <CopyButton getText={() => trimmedCode} />
         </div>
         <pre className={`m-0 px-4 py-3 text-[13px] leading-[1.6] font-mono overflow-x-auto whitespace-pre-wrap ${isDarkGlobal ? 'text-emerald-300' : 'text-slate-700'}`}>
@@ -266,7 +266,7 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
 
       {/* Output panel */}
       {output !== null && (
-        <div className={`border-t ${isError ? isDarkGlobal ? 'border-red-500/30 bg-red-950/40' : 'border-red-200 bg-red-50' : isDarkGlobal ? 'border-emerald-500/20 bg-zinc-950' : 'border-emerald-200 bg-emerald-50/50'}`}>
+        <div className={`border-t ${isError ? isDarkGlobal ? 'border-red-500/30 bg-red-950/40' : 'border-red-200 bg-red-50' : isDarkGlobal ? 'border-emerald-500/20 bg-slate-' : 'border-emerald-200 bg-emerald-50/50'}`}>
           <div className="flex items-center justify-between px-3 py-1">
             <span className={`text-[10px] font-semibold uppercase tracking-wider ${isError ? isDarkGlobal ? 'text-red-400' : 'text-red-600' : isDarkGlobal ? 'text-emerald-500' : 'text-emerald-700'}`}>
               {isError ? 'Error' : 'Output'}

@@ -310,7 +310,7 @@ export default function GitWorkspace({ params = {} }) {
 
   return (
     <div
-      className="flex h-full min-h-[520px] max-h-[680px] rounded-lg overflow-hidden border border-gray-700 text-sm"
+      className="flex h-full min-h-[520px] max-h-[680px] rounded-lg overflow-hidden border border-slate- text-sm"
       style={{
         background: "#1e1e1e",
         fontFamily: "'Fira Code', 'Cascadia Code', Consolas, monospace",
@@ -318,12 +318,12 @@ export default function GitWorkspace({ params = {} }) {
     >
       {/* ── LEFT: File Tree ── */}
       <div
-        className="w-44 flex-shrink-0 flex flex-col border-r border-gray-700"
+        className="w-44 flex-shrink-0 flex flex-col border-r border-slate-"
         style={{ background: "#252526" }}
       >
         {/* Repo header */}
-        <div className="px-3 py-2 border-b border-gray-700">
-          <div className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest truncate">
+        <div className="px-3 py-2 border-b border-slate-">
+          <div className="text-[9px] font-bold text-slate- dark:text-slate- uppercase tracking-widest truncate">
             {label}
           </div>
           <div className="flex items-center gap-1 mt-0.5">
@@ -361,7 +361,7 @@ export default function GitWorkspace({ params = {} }) {
             {showBranching && !showNewBranch && !isDetached && (
               <button
                 onClick={() => setShowNewBranch(true)}
-                className="text-[11px] text-gray-500 dark:text-gray-400 hover:text-gray-200 px-0.5 flex-shrink-0 leading-none"
+                className="text-[11px] text-slate- dark:text-slate- hover:text-slate- px-0.5 flex-shrink-0 leading-none"
                 title="New branch"
               >
                 +
@@ -383,7 +383,7 @@ export default function GitWorkspace({ params = {} }) {
                     setNewBranchName("");
                   }
                 }}
-                className="flex-1 text-[10px] bg-transparent border border-gray-600 rounded px-1 py-0.5 outline-none focus:border-blue-500 text-gray-200 min-w-0"
+                className="flex-1 text-[10px] bg-transparent border border-slate- rounded px-1 py-0.5 outline-none focus:border-blue-500 text-slate- min-w-0"
               />
               <button
                 onClick={() => {
@@ -399,7 +399,7 @@ export default function GitWorkspace({ params = {} }) {
         </div>
 
         {/* Explorer label */}
-        <div className="px-3 pt-2 pb-0.5 text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+        <div className="px-3 pt-2 pb-0.5 text-[9px] font-bold text-slate- dark:text-slate- uppercase tracking-widest">
           Explorer
         </div>
 
@@ -515,7 +515,7 @@ export default function GitWorkspace({ params = {} }) {
           <>
             {/* Tab bar */}
             <div
-              className="flex items-center border-b border-gray-700"
+              className="flex items-center border-b border-slate-"
               style={{ background: "#2d2d2d" }}
             >
               <div
@@ -573,7 +573,7 @@ export default function GitWorkspace({ params = {} }) {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm">
+          <div className="flex-1 flex items-center justify-center text-slate- dark:text-slate- text-sm">
             Select a file to edit
           </div>
         )}
@@ -581,26 +581,26 @@ export default function GitWorkspace({ params = {} }) {
 
       {/* ── RIGHT: Git Panel ── */}
       <div
-        className="w-60 flex-shrink-0 flex flex-col border-l border-gray-700"
+        className="w-60 flex-shrink-0 flex flex-col border-l border-slate-"
         style={{ background: "#252526" }}
       >
         {/* Panel title */}
-        <div className="px-3 py-2 border-b border-gray-700 flex items-center justify-between">
-          <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+        <div className="px-3 py-2 border-b border-slate- flex items-center justify-between">
+          <span className="text-[9px] font-bold text-slate- dark:text-slate- uppercase tracking-widest">
             Source Control
           </span>
-          <span className="text-[9px] text-gray-600 dark:text-gray-300">git</span>
+          <span className="text-[9px] text-slate- dark:text-slate-">git</span>
         </div>
 
         {/* Commit area */}
-        <div className="p-3 border-b border-gray-700">
+        <div className="p-3 border-b border-slate-">
           <input
             type="text"
             placeholder="Message (Enter to commit)"
             value={commitMsg}
             onChange={(e) => setCommitMsg(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleCommit()}
-            className="w-full bg-transparent border border-gray-600 rounded px-2 py-1 text-xs text-gray-200 outline-none focus:border-blue-500 placeholder-gray-600 mb-2"
+            className="w-full bg-transparent border border-slate- rounded px-2 py-1 text-xs text-slate- outline-none focus:border-blue-500 placeholder-slate- mb-2"
           />
           <button
             onClick={handleCommit}
@@ -623,7 +623,7 @@ export default function GitWorkspace({ params = {} }) {
         {showBranching &&
           Object.keys(git.branches).filter((n) => n !== git.head && !isDetached)
             .length > 0 && (
-            <div className="px-3 py-1.5 border-b border-gray-700 flex-shrink-0">
+            <div className="px-3 py-1.5 border-b border-slate- flex-shrink-0">
               {mergeError && (
                 <div className="text-[10px] text-red-400 mb-1">
                   {mergeError}
@@ -641,7 +641,7 @@ export default function GitWorkspace({ params = {} }) {
                         className="w-1.5 h-1.5 rounded-full flex-shrink-0"
                         style={{ background: "#d4a057" }}
                       />
-                      <span className="text-[10px] text-gray-300 truncate">
+                      <span className="text-[10px] text-slate- truncate">
                         {name}
                       </span>
                     </div>
@@ -665,13 +665,13 @@ export default function GitWorkspace({ params = {} }) {
           staged.length > 0 ||
           unsaved.size > 0) && (
           <div
-            className="px-3 py-2 border-b border-gray-700 flex-shrink-0 overflow-auto"
+            className="px-3 py-2 border-b border-slate- flex-shrink-0 overflow-auto"
             style={{ maxHeight: "9rem" }}
           >
             {/* Unsaved buffers */}
             {unsaved.size > 0 && (
               <>
-                <div className="text-[9px] text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">
+                <div className="text-[9px] text-slate- dark:text-slate- uppercase tracking-widest mb-1">
                   Unsaved
                 </div>
                 {Array.from(unsaved.keys()).map((f) => (
@@ -679,7 +679,7 @@ export default function GitWorkspace({ params = {} }) {
                     key={f}
                     className="flex items-center justify-between py-0.5"
                   >
-                    <span className="text-[11px] truncate text-gray-300">
+                    <span className="text-[11px] truncate text-slate-">
                       {f}
                     </span>
                     <div className="flex items-center gap-1 flex-shrink-0 ml-1">
@@ -705,7 +705,7 @@ export default function GitWorkspace({ params = {} }) {
               untracked.length > 0 ||
               recentlyDeletedUntracked.length > 0) && (
               <>
-                <div className="text-[9px] text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1 mt-1">
+                <div className="text-[9px] text-slate- dark:text-slate- uppercase tracking-widest mb-1 mt-1">
                   Changes
                 </div>
                 {[
@@ -796,7 +796,7 @@ export default function GitWorkspace({ params = {} }) {
             )}
             {staged.length > 0 && (
               <div className="mt-1">
-                <div className="text-[9px] text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">
+                <div className="text-[9px] text-slate- dark:text-slate- uppercase tracking-widest mb-1">
                   Staged
                 </div>
                 {staged.map((f) => (
@@ -822,7 +822,7 @@ export default function GitWorkspace({ params = {} }) {
 
         {/* Git Graph */}
         <div className="flex-1 overflow-auto">
-          <div className="px-3 pt-2 pb-1 text-[9px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
+          <div className="px-3 pt-2 pb-1 text-[9px] font-bold text-slate- dark:text-slate- uppercase tracking-widest">
             Git Graph
           </div>
           {isDetached && (
@@ -850,7 +850,7 @@ export default function GitWorkspace({ params = {} }) {
             </div>
           )}
           {fullHistory.length === 0 ? (
-            <div className="px-3 pb-2 text-[10px] text-gray-600 dark:text-gray-300">
+            <div className="px-3 pb-2 text-[10px] text-slate- dark:text-slate-">
               No commits yet.
             </div>
           ) : (
@@ -881,7 +881,7 @@ export default function GitWorkspace({ params = {} }) {
           >
             {!isDeleted(contextMenu.file) && (
               <button
-                className="w-full text-left px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-600/50 flex items-center gap-2"
+                className="w-full text-left px-3 py-1.5 text-xs text-slate- hover:bg-slate- flex items-center gap-2"
                 onClick={() => {
                   setRenaming(contextMenu.file);
                   setRenameValue(contextMenu.file);
@@ -1169,7 +1169,7 @@ function LineNumbers({ content }) {
   const lines = (content || "").split("\n").length;
   return (
     <div
-      className="py-3 pr-3 pl-2 text-right select-none leading-6 text-xs border-r border-gray-700 min-w-[2.5rem]"
+      className="py-3 pr-3 pl-2 text-right select-none leading-6 text-xs border-r border-slate- min-w-[2.5rem]"
       style={{ color: "#5a5a5a", background: "#1e1e1e" }}
     >
       {Array.from({ length: lines }, (_, i) => (

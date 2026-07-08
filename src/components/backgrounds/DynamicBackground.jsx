@@ -526,7 +526,7 @@ export default function DynamicBackground({ mode, config }) {
   }
 
   return (
-    <div data-bg className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-slate-100 dark:bg-[#020617]">
+    <div data-bg className="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-slate-100 dark:bg-slate-900">
       <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
         {isDark ? (
           <NightSystem config={config} />

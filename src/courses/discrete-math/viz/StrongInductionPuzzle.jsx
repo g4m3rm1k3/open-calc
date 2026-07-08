@@ -122,7 +122,7 @@ export default function StrongInductionPuzzle() {
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedProblem === index
                     ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
-                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
+                    : "bg-white dark:bg-slate-900 hover:bg-slate- dark:bg-slate-800 border-slate-"
                 }`}
               >
                 <div className="font-semibold mb-1">{prob.title}</div>
@@ -151,7 +151,7 @@ export default function StrongInductionPuzzle() {
               max={problem.solution.length - 1}
               value={currentStep}
               onChange={(e) => setCurrentStep(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-slate- dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
             />
           </div>
 
@@ -174,7 +174,7 @@ export default function StrongInductionPuzzle() {
               <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
                 {currentSolution?.amount}¢
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">
+              <div className="text-sm text-slate- dark:text-slate-">
                 Can you make this amount?
               </div>
             </div>
@@ -191,7 +191,7 @@ export default function StrongInductionPuzzle() {
                     </div>
                   ))}
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
+                <p className="text-sm text-slate- dark:text-slate-">
                   {currentSolution.explanation}
                 </p>
               </div>
@@ -218,7 +218,7 @@ export default function StrongInductionPuzzle() {
 
         <div>
           <h3 className="text-xl font-bold mb-4">Available Amounts</h3>
-          <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg max-h-64 overflow-y-auto">
+          <div className="bg-slate- dark:bg-slate-800 p-4 rounded-lg max-h-64 overflow-y-auto">
             <div className="grid grid-cols-5 gap-2">
               {Array.from({ length: problem.target + 1 }, (_, i) => i).map(
                 (amount) => {
@@ -236,7 +236,7 @@ export default function StrongInductionPuzzle() {
                           ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
                           : available
                             ? "bg-green-200 dark:bg-green-800/50 border-green-400 dark:border-green-600/50 text-green-800 dark:text-green-300"
-                            : "bg-gray-200 dark:bg-slate-700 border-gray-300 text-gray-500 dark:text-gray-400"
+                            : "bg-slate- dark:bg-slate-700 border-slate- text-slate- dark:text-slate-"
                       }`}
                     >
                       {amount}
@@ -245,14 +245,14 @@ export default function StrongInductionPuzzle() {
                 },
               )}
             </div>
-            <div className="mt-4 text-xs text-gray-600 dark:text-gray-300">
+            <div className="mt-4 text-xs text-slate- dark:text-slate-">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-green-200 dark:bg-green-800/50 border border-green-400 dark:border-green-600/50 rounded"></div>
                   <span>Available</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-gray-200 dark:bg-slate-700 border border-gray-300 rounded"></div>
+                  <div className="w-3 h-3 bg-slate- dark:bg-slate-700 border border-slate- rounded"></div>
                   <span>Not yet proven</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -274,7 +274,7 @@ export default function StrongInductionPuzzle() {
             <div className="text-4xl mb-2">➡️</div>
             <div className="font-mono text-lg">P(k) → P(k+1)</div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-slate- dark:text-slate-">
             Assumes only the immediate previous case. Good for simple patterns
             like "each number is one more than the previous."
           </p>
@@ -290,7 +290,7 @@ export default function StrongInductionPuzzle() {
               [P(1) ∧ ... ∧ P(k)] → P(k+1)
             </div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-slate- dark:text-slate-">
             Assumes ALL previous cases. Powerful for complex dependencies where
             you might need to combine multiple earlier results.
           </p>

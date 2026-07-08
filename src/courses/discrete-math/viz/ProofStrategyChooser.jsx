@@ -116,7 +116,7 @@ export default function ProofStrategyChooser() {
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedClaim === index
                     ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
-                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
+                    : "bg-white dark:bg-slate-900 hover:bg-slate- dark:bg-slate-800 border-slate-"
                 }`}
               >
                 <div className="font-semibold mb-1">{claim.type}</div>
@@ -142,7 +142,7 @@ export default function ProofStrategyChooser() {
             <strong>Recommended strategies:</strong>{" "}
             {claimType.strategies.map((s) => STRATEGIES[s].name).join(", ")}
           </p>
-          <div className="text-sm text-gray-600 dark:text-gray-300">
+          <div className="text-sm text-slate- dark:text-slate-">
             <strong>Examples:</strong>
             <ul className="list-disc list-inside mt-1">
               {claimType.examples.map((ex, i) => (
@@ -164,7 +164,7 @@ export default function ProofStrategyChooser() {
                 className={`w-full p-4 border-2 rounded-lg text-left transition-all ${
                   selectedStrategy === key
                     ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
-                    : "border-gray-300 bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800"
+                    : "border-slate- bg-white dark:bg-slate-900 hover:bg-slate- dark:bg-slate-800"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -173,7 +173,7 @@ export default function ProofStrategyChooser() {
                     className={`px-2 py-1 rounded text-xs ${
                       claimType.strategies.includes(key)
                         ? "bg-green-200 dark:bg-green-800/50 text-green-800 dark:text-green-300"
-                        : "bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300"
+                        : "bg-slate- dark:bg-slate-700 text-slate- dark:text-slate-"
                     }`}
                   >
                     {claimType.strategies.includes(key)
@@ -181,10 +181,10 @@ export default function ProofStrategyChooser() {
                       : "Alternative"}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                <p className="text-sm text-slate- dark:text-slate- mb-2">
                   {strat.description}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Use when: {strat.when}</p>
+                <p className="text-xs text-slate- dark:text-slate-">Use when: {strat.when}</p>
               </button>
             ))}
           </div>
@@ -212,12 +212,12 @@ export default function ProofStrategyChooser() {
               </span>
             </div>
             <p className="text-sm mb-3">{strategy.description}</p>
-            <p className="text-xs text-gray-600 dark:text-gray-300">
+            <p className="text-xs text-slate- dark:text-slate-">
               <strong>When to use:</strong> {strategy.when}
             </p>
           </div>
 
-          <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
+          <div className="bg-slate- dark:bg-slate-800 p-4 rounded-lg">
             <h4 className="font-bold mb-2">Example: {strategy.example}</h4>
             <div className="space-y-1">
               {strategy.steps.map((step, index) => (
@@ -267,7 +267,7 @@ export default function ProofStrategyChooser() {
             </span>
           </div>
         </div>
-        <p className="mt-3 text-xs text-gray-600 dark:text-gray-300">
+        <p className="mt-3 text-xs text-slate- dark:text-slate-">
           <strong>Pro Tip:</strong> Most proofs are direct proofs. Don't
           overcomplicate — start with the obvious approach!
         </p>

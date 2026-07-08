@@ -40,9 +40,9 @@ const VennDiagram = ({ law, highlighted }) => {
           />
 
           {/* Labels for regions */}
-          <text x="55" y="45" className="text-xs fill-gray-600">P∧Q</text>
-          <text x="145" y="45" className="text-xs fill-gray-600">P∧Q</text>
-          <text x="100" y="110" className="text-xs fill-gray-600">¬(P∧Q)</text>
+          <text x="55" y="45" className="text-xs fill-slate-">P∧Q</text>
+          <text x="145" y="45" className="text-xs fill-slate-">P∧Q</text>
+          <text x="100" y="110" className="text-xs fill-slate-">¬(P∧Q)</text>
         </svg>
       </div>
 
@@ -50,7 +50,7 @@ const VennDiagram = ({ law, highlighted }) => {
         <div className="text-lg font-mono mb-2">
           {isDeMorgan1 ? '¬(P ∧ Q)' : '¬(P ∨ Q)'}
         </div>
-        <div className="text-sm text-gray-600 dark:text-gray-300">
+        <div className="text-sm text-slate- dark:text-slate-">
           {isDeMorgan1 ? 'NOT (P AND Q)' : 'NOT (P OR Q)'}
         </div>
       </div>
@@ -92,7 +92,7 @@ export default function DeMorganViz() {
             className={`px-6 py-3 rounded-lg font-bold transition-colors ${
               selectedLaw === 'demorgan1'
                 ? 'bg-blue-50 dark:bg-blue-900/300 text-white'
-                : 'bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200'
+                : 'bg-slate- dark:bg-slate-700 hover:bg-slate- text-slate- dark:text-slate-'
             }`}
           >
             First Law: ¬(P ∧ Q) ≡ ¬P ∨ ¬Q
@@ -102,28 +102,28 @@ export default function DeMorganViz() {
             className={`px-6 py-3 rounded-lg font-bold transition-colors ${
               selectedLaw === 'demorgan2'
                 ? 'bg-green-50 dark:bg-green-900/300 text-white'
-                : 'bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 text-gray-700 dark:text-gray-200'
+                : 'bg-slate- dark:bg-slate-700 hover:bg-slate- text-slate- dark:text-slate-'
             }`}
           >
             Second Law: ¬(P ∨ Q) ≡ ¬P ∧ ¬Q
           </button>
         </div>
 
-        <div className="bg-gray-50 dark:bg-slate-800 p-6 rounded-lg mb-6">
+        <div className="bg-slate- dark:bg-slate-800 p-6 rounded-lg mb-6">
           <h3 className="text-xl font-bold mb-4 text-center">{currentLaw.name}</h3>
           <div className="flex items-center justify-center space-x-8 mb-4">
             <div className="text-center">
               <div className="text-2xl font-mono mb-2">{currentLaw.left}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Left side</div>
+              <div className="text-sm text-slate- dark:text-slate-">Left side</div>
             </div>
             <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">≡</div>
             <div className="text-center">
               <div className="text-2xl font-mono mb-2">{currentLaw.right}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">Right side</div>
+              <div className="text-sm text-slate- dark:text-slate-">Right side</div>
             </div>
           </div>
-          <p className="text-center text-gray-700 dark:text-gray-200 mb-4">{currentLaw.description}</p>
-          <div className="bg-gray-100 dark:bg-slate-800 p-3 rounded font-mono text-sm text-center">
+          <p className="text-center text-slate- dark:text-slate- mb-4">{currentLaw.description}</p>
+          <div className="bg-slate- dark:bg-slate-800 p-3 rounded font-mono text-sm text-center">
             {currentLaw.code}
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function DeMorganViz() {
         <div className="text-center">
           <h3 className="text-lg font-bold mb-4">Visual Proof with Venn Diagrams</h3>
           <VennDiagram law={selectedLaw} highlighted={highlighted} />
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-4">
+          <p className="text-sm text-slate- dark:text-slate- mt-4">
             The shaded region represents the area that satisfies the expression.
             Both expressions shade exactly the same region, proving they're equivalent.
           </p>
@@ -142,14 +142,14 @@ export default function DeMorganViz() {
         <div className="space-y-4">
           <h3 className="text-lg font-bold">Interactive Truth Table</h3>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300">
+            <table className="w-full border-collapse border border-slate-">
               <thead>
-                <tr className="bg-gray-100 dark:bg-slate-800">
-                  <th className="border border-gray-300 px-3 py-2">P</th>
-                  <th className="border border-gray-300 px-3 py-2">Q</th>
-                  <th className="border border-gray-300 px-3 py-2">{currentLaw.left}</th>
-                  <th className="border border-gray-300 px-3 py-2">{currentLaw.right}</th>
-                  <th className="border border-gray-300 px-3 py-2">Equal?</th>
+                <tr className="bg-slate- dark:bg-slate-800">
+                  <th className="border border-slate- px-3 py-2">P</th>
+                  <th className="border border-slate- px-3 py-2">Q</th>
+                  <th className="border border-slate- px-3 py-2">{currentLaw.left}</th>
+                  <th className="border border-slate- px-3 py-2">{currentLaw.right}</th>
+                  <th className="border border-slate- px-3 py-2">Equal?</th>
                 </tr>
               </thead>
               <tbody>
@@ -159,19 +159,19 @@ export default function DeMorganViz() {
                     const rightResult = selectedLaw === 'demorgan1' ? (!p || !q) : (!p && !q);
                     return (
                       <tr key={`${p}-${q}`} className="text-center">
-                        <td className="border border-gray-300 px-3 py-2 font-mono">
+                        <td className="border border-slate- px-3 py-2 font-mono">
                           {p ? 'T' : 'F'}
                         </td>
-                        <td className="border border-gray-300 px-3 py-2 font-mono">
+                        <td className="border border-slate- px-3 py-2 font-mono">
                           {q ? 'T' : 'F'}
                         </td>
-                        <td className="border border-gray-300 px-3 py-2 font-mono font-bold">
+                        <td className="border border-slate- px-3 py-2 font-mono font-bold">
                           {leftResult ? 'T' : 'F'}
                         </td>
-                        <td className="border border-gray-300 px-3 py-2 font-mono font-bold">
+                        <td className="border border-slate- px-3 py-2 font-mono font-bold">
                           {rightResult ? 'T' : 'F'}
                         </td>
-                        <td className="border border-gray-300 px-3 py-2">
+                        <td className="border border-slate- px-3 py-2">
                           <span className={leftResult === rightResult ? 'text-green-600 dark:text-green-400 font-bold' : 'text-red-600 dark:text-red-400 font-bold'}>
                             {leftResult === rightResult ? '✓' : '✗'}
                           </span>
@@ -183,7 +183,7 @@ export default function DeMorganViz() {
               </tbody>
             </table>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-slate- dark:text-slate-">
             The truth table shows that both expressions have identical values for all possible inputs,
             proving they are logically equivalent.
           </p>

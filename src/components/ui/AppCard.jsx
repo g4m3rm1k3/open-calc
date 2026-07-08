@@ -97,13 +97,13 @@ function CourseCard({ item, chapters, getLessonStatus, meta, ref }) {
       <div className="flex-1 flex flex-col bg-[#e8e2d5] dark:bg-[#0d0d18] px-4 pt-4 pb-4"
         style={{ boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.09)' }}
       >
-        <p className="text-sm text-stone-600 dark:text-slate-400 leading-snug flex-1 mb-3">{item.description}</p>
+        <p className="text-sm text-slate- dark:text-slate-400 leading-snug flex-1 mb-3">{item.description}</p>
         <div className="mb-2">
-          <div className="flex justify-between items-center text-[10px] text-stone-400 dark:text-slate-500 mb-1.5">
+          <div className="flex justify-between items-center text-[10px] text-slate- dark:text-slate-500 mb-1.5">
             <span>{chapters.length} {chapters.length === 1 ? 'chapter' : 'chapters'}{total > 0 && ` · ${total} lessons`}</span>
             {done > 0 && <span className={`font-bold ${meta.text}`}>{Math.round(pct * 100)}%</span>}
           </div>
-          <div className="h-1.5 rounded-full bg-stone-300/60 dark:bg-slate-700/60 overflow-hidden">
+          <div className="h-1.5 rounded-full bg-slate- dark:bg-slate-700/60 overflow-hidden">
             <div className={`h-full rounded-full bg-gradient-to-r ${meta.header} transition-all`}
               style={{ width: pct > 0 ? `${Math.max(4, pct * 100)}%` : '0%' }} />
           </div>

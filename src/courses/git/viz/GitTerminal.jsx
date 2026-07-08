@@ -831,7 +831,7 @@ export default function GitTerminal({ params = {} }) {
 
   return (
     <div
-      className="flex flex-col h-full min-h-[400px] max-h-[640px] rounded-lg overflow-hidden border border-gray-700"
+      className="flex flex-col h-full min-h-[400px] max-h-[640px] rounded-lg overflow-hidden border border-slate-"
       style={{
         background: "#0d1117",
         fontFamily: "'Fira Code', 'Cascadia Code', Consolas, monospace",
@@ -840,7 +840,7 @@ export default function GitTerminal({ params = {} }) {
     >
       {/* Title bar */}
       <div
-        className="flex items-center justify-between px-4 py-2 border-b border-gray-700 flex-shrink-0"
+        className="flex items-center justify-between px-4 py-2 border-b border-slate- flex-shrink-0"
         style={{ background: "#161b22" }}
       >
         <div className="flex items-center gap-2">
@@ -909,7 +909,7 @@ export default function GitTerminal({ params = {} }) {
 
       {/* Status bar */}
       <div
-        className="flex items-center gap-4 px-4 py-1 border-t border-gray-700 flex-shrink-0 text-[10px]"
+        className="flex items-center gap-4 px-4 py-1 border-t border-slate- flex-shrink-0 text-[10px]"
         style={{ background: "#161b22", color: COLOR.dim }}
       >
         <span>↑↓ history</span>

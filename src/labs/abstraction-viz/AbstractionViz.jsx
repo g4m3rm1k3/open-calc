@@ -504,7 +504,7 @@ export default function AbstractionViz({ onBack }) {
     <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-slate-950">
 
       {/* Header */}
-      <div className="shrink-0 flex items-center gap-3 px-5 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#161b22]">
+      <div className="shrink-0 flex items-center gap-3 px-5 py-2.5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
         {onBack && (
           <>
             <button onClick={onBack} className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors">← Back</button>
@@ -544,7 +544,7 @@ export default function AbstractionViz({ onBack }) {
         {/* Lesson nav sidebar */}
         {mode === 'lessons' && (
           navOpen ? (
-            <div className="shrink-0 flex flex-col min-h-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0d1117]"
+            <div className="shrink-0 flex flex-col min-h-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
               style={{ width: 196 }}>
               <div className="shrink-0 px-3 pt-3 pb-2 border-b border-slate-200 dark:border-slate-800">
                 <span className="text-[9px] font-bold tracking-widest text-slate-400 dark:text-slate-600 uppercase">Lessons</span>
@@ -571,7 +571,7 @@ export default function AbstractionViz({ onBack }) {
               </div>
             </div>
           ) : (
-            <div className="shrink-0 flex flex-col items-center pt-3 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0d1117]"
+            <div className="shrink-0 flex flex-col items-center pt-3 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
               style={{ width: 28 }}>
             </div>
           )
@@ -721,7 +721,7 @@ export default function AbstractionViz({ onBack }) {
             </div>
           </div>
         ) : (
-          <div className="shrink-0 flex flex-col items-center pt-3 border-l border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#0d1117]"
+          <div className="shrink-0 flex flex-col items-center pt-3 border-l border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900"
             style={{ width: 28 }}>
             <button onClick={() => setVarsOpen(true)} title="Expand variables"
               className="text-slate-400 dark:text-slate-600 hover:text-slate-700 dark:hover:text-slate-300 text-xs">◀</button>
@@ -783,7 +783,7 @@ export default function AbstractionViz({ onBack }) {
 
       {/* Controls */}
       <div className={`shrink-0 flex items-center gap-3 px-5 py-2.5 border-t ${
-        isDark ? 'bg-[#161b22] border-slate-800' : 'bg-slate-50 border-slate-200'
+        isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'
       }`}>
         <button onClick={goPrev} disabled={isFirst || showInput}
           className="text-xs px-3 py-1.5 rounded font-semibold disabled:opacity-30 transition-colors bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700">

@@ -552,13 +552,13 @@ function applyBrand(brandName) {
   root.style.setProperty('--p-brand-border', \`hsl(\${h},70%,22%)\`);
 
   // Fixed neutral primitives (don't change with brand)
-  root.style.setProperty('--p-neutral-950', 'hsl(222,47%,7%)');
-  root.style.setProperty('--p-neutral-900', 'hsl(222,39%,12%)');
-  root.style.setProperty('--p-neutral-800', 'hsl(222,35%,17%)');
-  root.style.setProperty('--p-neutral-700', 'hsl(217,32%,22%)');
-  root.style.setProperty('--p-neutral-200', 'hsl(210,40%,96%)');
-  root.style.setProperty('--p-neutral-400', 'hsl(215,25%,65%)');
-  root.style.setProperty('--p-neutral-500', 'hsl(217,20%,45%)');
+  root.style.setProperty('--p-slate-', 'hsl(222,47%,7%)');
+  root.style.setProperty('--p-slate-', 'hsl(222,39%,12%)');
+  root.style.setProperty('--p-slate-', 'hsl(222,35%,17%)');
+  root.style.setProperty('--p-slate-', 'hsl(217,32%,22%)');
+  root.style.setProperty('--p-slate-', 'hsl(210,40%,96%)');
+  root.style.setProperty('--p-slate-', 'hsl(215,25%,65%)');
+  root.style.setProperty('--p-slate-', 'hsl(217,20%,45%)');
 
   // ── STEP 2: DEFINE LAYER 2 — SEMANTIC TOKENS ────────────────────────────────
   // Naming: --s-[role] (no colour names allowed in the name)
@@ -586,8 +586,8 @@ function applyBrand(brandName) {
   const tokens = [
     ['--p-brand-500  (L1 primitive)', \`hsl(\${h},\${s}%,47%)\`],
     ['--s-interactive (L2 semantic)', 'var(--p-brand-500)'],
-    ['--s-surface     (L2 semantic)', 'var(--p-neutral-900)'],
-    ['--s-text-1      (L2 semantic)', 'var(--p-neutral-200)'],
+    ['--s-surface     (L2 semantic)', 'var(--p-slate-)'],
+    ['--s-text-1      (L2 semantic)', 'var(--p-slate-)'],
   ];
   display.innerHTML = tokens.map(([k,v]) =>
     \`<div>\${k}: <span style="color:#f1f5f9">\${v}</span></div>\`
@@ -643,29 +643,29 @@ function applyBrand(b) {
   root.style.setProperty('--p-brand-600',    \`hsl(\${h},\${s}%,38%)\`);
   root.style.setProperty('--p-brand-subtle', \`hsl(\${h},80%,14%)\`);
   root.style.setProperty('--p-brand-border', \`hsl(\${h},70%,22%)\`);
-  root.style.setProperty('--p-neutral-950',  'hsl(222,47%,7%)');
-  root.style.setProperty('--p-neutral-900',  'hsl(222,39%,12%)');
-  root.style.setProperty('--p-neutral-800',  'hsl(222,35%,17%)');
-  root.style.setProperty('--p-neutral-700',  'hsl(217,32%,22%)');
-  root.style.setProperty('--p-neutral-200',  'hsl(210,40%,96%)');
-  root.style.setProperty('--p-neutral-400',  'hsl(215,25%,65%)');
-  root.style.setProperty('--p-neutral-500',  'hsl(217,20%,45%)');
+  root.style.setProperty('--p-slate-',  'hsl(222,47%,7%)');
+  root.style.setProperty('--p-slate-',  'hsl(222,39%,12%)');
+  root.style.setProperty('--p-slate-',  'hsl(222,35%,17%)');
+  root.style.setProperty('--p-slate-',  'hsl(217,32%,22%)');
+  root.style.setProperty('--p-slate-',  'hsl(210,40%,96%)');
+  root.style.setProperty('--p-slate-',  'hsl(215,25%,65%)');
+  root.style.setProperty('--p-slate-',  'hsl(217,20%,45%)');
   root.style.setProperty('--s-interactive',        'var(--p-brand-500)');
   root.style.setProperty('--s-interactive-subtle', 'var(--p-brand-subtle)');
   root.style.setProperty('--s-interactive-border', 'var(--p-brand-border)');
   root.style.setProperty('--s-on-interactive',     '#ffffff');
-  root.style.setProperty('--s-bg',      'var(--p-neutral-950)');
-  root.style.setProperty('--s-surface', 'var(--p-neutral-900)');
-  root.style.setProperty('--s-border',  'var(--p-neutral-700)');
-  root.style.setProperty('--s-text-1',  'var(--p-neutral-200)');
-  root.style.setProperty('--s-text-2',  'var(--p-neutral-400)');
-  root.style.setProperty('--s-text-3',  'var(--p-neutral-500)');
+  root.style.setProperty('--s-bg',      'var(--p-slate-)');
+  root.style.setProperty('--s-surface', 'var(--p-slate-)');
+  root.style.setProperty('--s-border',  'var(--p-slate-)');
+  root.style.setProperty('--s-text-1',  'var(--p-slate-)');
+  root.style.setProperty('--s-text-2',  'var(--p-slate-)');
+  root.style.setProperty('--s-text-3',  'var(--p-slate-)');
   const display = document.getElementById('p1-token-list');
   display.innerHTML = [
     ['--p-brand-500  (L1)', \`hsl(\${h},\${s}%,47%)\`],
     ['--s-interactive (L2)', 'var(--p-brand-500)'],
-    ['--s-surface     (L2)', 'var(--p-neutral-900)'],
-    ['--s-text-1      (L2)', 'var(--p-neutral-200)'],
+    ['--s-surface     (L2)', 'var(--p-slate-)'],
+    ['--s-text-1      (L2)', 'var(--p-slate-)'],
   ].map(([k,v]) => \`<div>\${k}: <span style="color:#f1f5f9">\${v}</span></div>\`).join('');
   ['blue','teal','purple'].forEach(x => {
     document.getElementById('p1-brand-'+x).className='p1-rb-btn'+(x===b?' active':'');

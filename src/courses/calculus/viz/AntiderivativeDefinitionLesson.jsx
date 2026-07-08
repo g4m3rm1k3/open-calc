@@ -4,10 +4,10 @@ export default function AntiderivativeDefinitionLesson({ params }) {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+        <h2 className="text-3xl font-bold text-slate- dark:text-slate- mb-4">
           What is an Antiderivative?
         </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400">
+        <p className="text-lg text-slate- dark:text-slate-">
           Understanding the fundamental relationship between functions and their
           rates of change
         </p>
@@ -67,7 +67,7 @@ export default function AntiderivativeDefinitionLesson({ params }) {
               </h4>
               <p className="font-mono dark:text-white">f(x) = 2x</p>
               <p className="font-mono dark:text-white">F(x) = x²</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Check: F'(x) = 2x ✓</p>
+              <p className="text-sm text-slate- dark:text-slate- mt-2">Check: F'(x) = 2x ✓</p>
             </div>
 
             <div className="bg-white dark:bg-slate-800 p-4 rounded">
@@ -76,7 +76,7 @@ export default function AntiderivativeDefinitionLesson({ params }) {
               </h4>
               <p className="font-mono dark:text-white">f(x) = cos(x)</p>
               <p className="font-mono dark:text-white">F(x) = sin(x)</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              <p className="text-sm text-slate- dark:text-slate- mt-2">
                 Check: F'(x) = cos(x) ✓
               </p>
             </div>
@@ -131,7 +131,7 @@ export default function AntiderivativeDefinitionLesson({ params }) {
             <p className="text-center mt-2 dark:text-purple-100">
               <strong>Question:</strong> Where was the car 2 hours ago?
             </p>
-            <p className="text-center mt-2 text-sm text-gray-600 dark:text-purple-300">
+            <p className="text-center mt-2 text-sm text-slate- dark:text-purple-300">
               The antiderivative gives infinitely many possible answers
               (depending on where it started)
             </p>

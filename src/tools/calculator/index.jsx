@@ -980,7 +980,7 @@ export default function TICalc({ onClose }) {
                   ? <tr><td colSpan={2} className={`${muted} text-center py-6 text-[10px]`}>Enter a function above</td></tr>
                   : tableRows.map((row, i) => (
                     <tr key={i} className={dark
-                      ? (i % 2 === 0 ? 'bg-[#161b22]' : 'bg-[#0d1117]')
+                      ? (i % 2 === 0 ? 'bg-slate-900' : 'bg-slate-900')
                       : (i % 2 === 0 ? 'bg-white' : 'bg-slate-50')}>
                       <td className={`${muted} py-1.5 px-3`}>{row.x}</td>
                       <td className={`py-1.5 px-3 text-right font-bold ${

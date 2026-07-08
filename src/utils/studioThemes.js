@@ -566,7 +566,7 @@ export const STUDIO_THEMES = {
   },
   catppuccin: {
     name: 'Catppuccin',
-    accentHex: '#cba6f7', // Changed from blue to signature Mauve (Purple)
+    accentHex: '#cba6f7', // Mauve
     monacoDark: 'catppuccin',
     dynamic: false,
     uiDark: {

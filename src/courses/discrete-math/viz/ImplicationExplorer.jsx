@@ -124,7 +124,7 @@ export default function ImplicationExplorer() {
                 className={`p-3 border rounded-lg text-left transition-colors ${
                   selectedScenario === index
                     ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
-                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
+                    : "bg-white dark:bg-slate-900 hover:bg-slate- dark:bg-slate-800 border-slate-"
                 }`}
               >
                 <div className="font-semibold">{s.expression}</div>
@@ -143,7 +143,7 @@ export default function ImplicationExplorer() {
             <strong>If</strong> {scenario.premise.toLowerCase()},{" "}
             <strong>then</strong> {scenario.conclusion.toLowerCase()}.
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-slate- dark:text-slate-">
             This promise is only broken when the premise is met but the
             conclusion fails.
           </p>
@@ -175,7 +175,7 @@ export default function ImplicationExplorer() {
                 >
                   {caseData.valid ? "VALID" : "INVALID"}
                 </span>
-                <span className="text-sm text-gray-500 dark:text-gray-400">Case {index + 1}</span>
+                <span className="text-sm text-slate- dark:text-slate-">Case {index + 1}</span>
               </div>
               <p className="text-sm">{caseData.description}</p>
               <div className="mt-2 text-xs">
@@ -227,7 +227,7 @@ export default function ImplicationExplorer() {
                 : "BROKEN (Invalid implication)"}
             </span>
           </p>
-          <p className="text-sm text-gray-700 dark:text-gray-200">
+          <p className="text-sm text-slate- dark:text-slate-">
             {selectedCaseData.valid
               ? "The implication holds because either the premise wasn't met (so the promise wasn't invoked) or both premise and conclusion are true."
               : "The implication fails because the premise is true but the conclusion is false — the promise was made and broken."}

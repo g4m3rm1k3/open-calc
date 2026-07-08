@@ -4,10 +4,10 @@ export default function ConstantDifferenceTheoremLesson({ params }) {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+        <h2 className="text-3xl font-bold text-slate- dark:text-slate- mb-4">
           Why Antiderivatives Differ by Constants
         </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-400">
+        <p className="text-lg text-slate- dark:text-slate-">
           The mathematical proof that explains why +C is necessary
         </p>
       </div>
@@ -27,20 +27,20 @@ export default function ConstantDifferenceTheoremLesson({ params }) {
             <h4 className="font-semibold mb-2 dark:text-red-200">Example: f(x) = 2x</h4>
             <p className="dark:text-slate-300">What function has derivative 2x?</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3">
-              <div className="bg-gray-100 dark:bg-slate-700 p-2 rounded text-center">
+              <div className="bg-slate- dark:bg-slate-700 p-2 rounded text-center">
                 <p className="font-mono dark:text-red-100">F₁(x) = x²</p>
                 <p className="text-sm dark:text-slate-400">F₁'(x) = 2x ✓</p>
               </div>
-              <div className="bg-gray-100 dark:bg-slate-700 p-2 rounded text-center">
+              <div className="bg-slate- dark:bg-slate-700 p-2 rounded text-center">
                 <p className="font-mono dark:text-red-100">F₂(x) = x² + 5</p>
                 <p className="text-sm dark:text-slate-400">F₂'(x) = 2x ✓</p>
               </div>
-              <div className="bg-gray-100 dark:bg-slate-700 p-2 rounded text-center">
+              <div className="bg-slate- dark:bg-slate-700 p-2 rounded text-center">
                 <p className="font-mono dark:text-red-100">F₃(x) = x² - 3</p>
                 <p className="text-sm dark:text-slate-400">F₃'(x) = 2x ✓</p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 dark:text-slate-400 mt-2">
+            <p className="text-sm text-slate- dark:text-slate-400 mt-2">
               All three functions have the same derivative!
             </p>
           </div>
@@ -151,7 +151,7 @@ export default function ConstantDifferenceTheoremLesson({ params }) {
           <div className="bg-white dark:bg-slate-800 p-4 rounded border-l-4 border-purple-500">
             <h4 className="font-semibold mb-2 dark:text-purple-200">Example:</h4>
             <p className="font-mono text-center text-lg dark:text-purple-100">∫ 2x dx = x² + C</p>
-            <p className="text-sm text-center mt-2 text-gray-600 dark:text-slate-400">
+            <p className="text-sm text-center mt-2 text-slate- dark:text-slate-400">
               This represents the entire family of functions whose derivative is
               2x
             </p>

@@ -64,7 +64,7 @@ export default function CodeBlock({ python = [], matlab = [] }) {
             className={`px-3 py-1 rounded text-xs font-mono font-semibold transition-colors ${
               lang === l
                 ? 'bg-indigo-600 text-white'
-                : 'bg-slate-200 dark:bg-gray-700 text-slate-700 dark:text-gray-300 hover:bg-slate-300 dark:hover:bg-gray-600'
+                : 'bg-slate-200 dark:bg-slate- text-slate-700 dark:text-slate- hover:bg-slate-300 dark:hover:bg-slate-'
             }`}
           >
             {l === 'python' ? 'Python / NumPy' : 'MATLAB'}
@@ -72,7 +72,7 @@ export default function CodeBlock({ python = [], matlab = [] }) {
         ))}
       </div>
 
-      <div className="rounded-lg overflow-hidden border border-slate-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm">
+      <div className="rounded-lg overflow-hidden border border-slate-300 dark:border-slate- bg-white dark:bg-slate- shadow-sm">
         <textarea
           value={code}
           onChange={e => setCode(e.target.value)}
@@ -80,7 +80,7 @@ export default function CodeBlock({ python = [], matlab = [] }) {
           rows={Math.max(4, code.split('\n').length)}
           className="w-full font-mono text-[13px] leading-6 px-4 py-3 bg-transparent text-slate-800 dark:text-emerald-300 outline-none resize-none"
         />
-        <div className="flex items-center gap-2 px-3 py-2 border-t border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-850">
+        <div className="flex items-center gap-2 px-3 py-2 border-t border-slate-200 dark:border-slate- bg-slate-50 dark:bg-slate-">
           <button
             onClick={run}
             disabled={running}
@@ -91,18 +91,18 @@ export default function CodeBlock({ python = [], matlab = [] }) {
           {code !== original && (
             <button
               onClick={reset}
-              className="px-3 py-1 rounded text-xs font-mono text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-white transition-colors"
+              className="px-3 py-1 rounded text-xs font-mono text-slate-500 dark:text-slate- hover:text-slate-800 dark:hover:text-white transition-colors"
             >
               ↺ reset to example
             </button>
           )}
-          <span className="text-[11px] text-slate-400 dark:text-gray-500 ml-auto">
+          <span className="text-[11px] text-slate-400 dark:text-slate- ml-auto">
             edit the code — try your own numbers
           </span>
         </div>
 
         {output.length > 0 && (
-          <div className="border-t border-slate-200 dark:border-gray-700 bg-slate-900 dark:bg-black px-4 py-3 font-mono text-[13px] leading-6 max-h-72 overflow-y-auto">
+          <div className="border-t border-slate-200 dark:border-slate- bg-slate-900 dark:bg-black px-4 py-3 font-mono text-[13px] leading-6 max-h-72 overflow-y-auto">
             {output.map((line, i) =>
               line.type === 'image' ? (
                 <img key={i} src={`data:image/png;base64,${line.src}`} alt="plot output" className="my-2 rounded max-w-full" />
@@ -111,7 +111,7 @@ export default function CodeBlock({ python = [], matlab = [] }) {
                   key={i}
                   className={
                     line.type === 'error' ? 'text-red-400' :
-                    line.type === 'dim' ? 'text-gray-500 italic' :
+                    line.type === 'dim' ? 'text-slate- italic' :
                     'text-emerald-300'
                   }
                 >

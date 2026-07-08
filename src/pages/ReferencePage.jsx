@@ -85,7 +85,7 @@ function FormulaCard({ entry, onOpenProof }) {
         {/* Note + proof CTA */}
         <div className="mt-3 min-h-[28px] flex flex-col justify-end">
           {entry.note && (
-            <div className="text-[11px] text-stone-500 dark:text-slate-500 font-medium italic line-clamp-2 leading-relaxed">
+            <div className="text-[11px] text-slate- dark:text-slate-500 font-medium italic line-clamp-2 leading-relaxed">
               {entry.note}
             </div>
           )}

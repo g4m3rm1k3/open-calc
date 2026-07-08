@@ -451,7 +451,7 @@ function PropertiesPanel({ source, onSourceChange, editorRef }) {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0d1117]">
+    <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900">
       <div className="px-4 pt-3 pb-1">
         <p className="text-xs mb-3 text-slate-500">
           Click any variable name to jump to it in the editor. Change values and hit{' '}
@@ -814,9 +814,9 @@ export default function SceneEditorPage() {
   const hasChanges = source !== savedSource
 
   return (
-    <div className="fixed inset-0 z-[120] flex flex-col bg-slate-50 dark:bg-[#0d1117]">
+    <div className="fixed inset-0 z-[120] flex flex-col bg-slate-50 dark:bg-slate-900">
       {/* Header */}
-      <div className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b bg-white dark:bg-[#161b22] border-slate-200 dark:border-[#30363d]">
+      <div className="shrink-0 flex items-center gap-3 px-4 py-2.5 border-b bg-white dark:bg-slate-900 border-slate-200 dark:border-[#30363d]">
         <button
           onClick={() => navigate('/dev/scenes')}
           className="text-sm px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/10 transition-colors shrink-0 text-slate-500 dark:text-[#8b949e]"
@@ -901,7 +901,7 @@ export default function SceneEditorPage() {
       </div>
 
       {/* Sub-header hint */}
-      <div className="shrink-0 px-4 py-1 text-xs bg-white dark:bg-[#161b22] border-b border-slate-200 dark:border-[#30363d] text-slate-400 dark:text-[#484f58]">
+      <div className="shrink-0 px-4 py-1 text-xs bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-[#30363d] text-slate-400 dark:text-[#484f58]">
         Canvas 2D · JSX · <strong className="text-slate-500 dark:text-[#6e7681]">⌘S</strong> to save + refresh preview ·
         Properties tab shows editable variables — click a name to jump to its line
       </div>
@@ -926,7 +926,7 @@ export default function SceneEditorPage() {
         {/* Right panel — 45% */}
         <div className="flex flex-col min-h-0" style={{ width: '45%' }}>
           {/* Tabs */}
-          <div className="shrink-0 flex items-center border-b px-3 gap-1 bg-white dark:bg-[#161b22] border-slate-200 dark:border-[#30363d]" style={{ height: 33 }}>
+          <div className="shrink-0 flex items-center border-b px-3 gap-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-[#30363d]" style={{ height: 33 }}>
             {[
               { id: 'preview', label: 'Preview' },
               { id: 'properties', label: 'Properties' },
@@ -1032,7 +1032,7 @@ export default function SceneEditorPage() {
           )}
 
           {rightTab === 'guide' && (
-            <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-[#0d1117]">
+            <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900">
               <div className="p-4 space-y-5">
                 <div>
                   <h2 className="text-sm font-bold mb-1 text-slate-900 dark:text-[#e6edf3]">Scene anatomy</h2>
@@ -1045,7 +1045,7 @@ export default function SceneEditorPage() {
                 {GUIDE_SECTIONS.map(s => (
                   <div key={s.title}>
                     <div className="text-xs font-bold mb-1 text-blue-600 dark:text-[#58a6ff]">{s.title}</div>
-                    <pre className="text-xs leading-relaxed rounded p-3 overflow-x-auto mb-1 bg-slate-100 dark:bg-[#161b22] text-slate-700 dark:text-[#c9d1d9] font-mono">
+                    <pre className="text-xs leading-relaxed rounded p-3 overflow-x-auto mb-1 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-[#c9d1d9] font-mono">
                       {s.code}
                     </pre>
                     <p className="text-xs text-slate-500 dark:text-[#8b949e]">{s.note}</p>

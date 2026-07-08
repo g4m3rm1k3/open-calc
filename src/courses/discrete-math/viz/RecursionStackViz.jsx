@@ -167,7 +167,7 @@ export default function RecursionStackViz() {
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedFunction === key
                     ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
-                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
+                    : "bg-white dark:bg-slate-900 hover:bg-slate- dark:bg-slate-800 border-slate-"
                 }`}
               >
                 <div className="font-semibold mb-1">{f.name}</div>
@@ -199,7 +199,7 @@ export default function RecursionStackViz() {
               max={selectedFunction === "fibonacci" ? "8" : "6"}
               value={inputValue}
               onChange={(e) => setInputValue(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-slate- dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
               disabled={isAnimating}
             />
           </div>
@@ -208,13 +208,13 @@ export default function RecursionStackViz() {
             <button
               onClick={simulateRecursion}
               disabled={isAnimating}
-              className="px-6 py-3 bg-green-50 dark:bg-green-900/300 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-400 transition-colors font-bold"
+              className="px-6 py-3 bg-green-50 dark:bg-green-900/300 text-white rounded-lg hover:bg-green-600 disabled:bg-slate- transition-colors font-bold"
             >
               {isAnimating ? "Running..." : "Simulate Recursion"}
             </button>
             <button
               onClick={reset}
-              className="px-6 py-3 bg-gray-50 dark:bg-slate-8000 text-white rounded-lg hover:bg-gray-600 transition-colors font-bold"
+              className="px-6 py-3 bg-slate- dark:bg-slate-8000 text-white rounded-lg hover:bg-slate- transition-colors font-bold"
             >
               Reset
             </button>
@@ -226,10 +226,10 @@ export default function RecursionStackViz() {
         <h3 className="text-xl font-bold mb-4 text-center">
           Call Stack Visualization
         </h3>
-        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg min-h-96">
+        <div className="bg-slate- dark:bg-slate-800 p-4 rounded-lg min-h-96">
           <div className="space-y-2">
             {callStack.length === 0 ? (
-              <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+              <div className="text-center text-slate- dark:text-slate- py-8">
                 Click "Simulate Recursion" to see the call stack in action
               </div>
             ) : (
@@ -249,7 +249,7 @@ export default function RecursionStackViz() {
                   <div className="flex items-center justify-between">
                     <div className="font-mono text-sm">
                       <span className="font-bold">{call.function}</span>
-                      <span className="text-gray-600 dark:text-gray-300">
+                      <span className="text-slate- dark:text-slate-">
                         ({call.args.join(", ")})
                       </span>
                     </div>
@@ -263,7 +263,7 @@ export default function RecursionStackViz() {
                       )}
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="text-xs text-slate- dark:text-slate- mt-1">
                     Depth: {call.depth} | Step: {index + 1}
                   </div>
                 </div>
@@ -293,7 +293,7 @@ export default function RecursionStackViz() {
             <div className="text-4xl mb-2">📚</div>
             <div className="font-mono text-lg">LIFO Structure</div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-slate- dark:text-slate-">
             Each function call creates a new "frame" on the stack. When a
             function returns, its frame is popped off. The stack grows downward
             as recursion deepens.
@@ -308,7 +308,7 @@ export default function RecursionStackViz() {
             <div className="text-4xl mb-2">🎯</div>
             <div className="font-mono text-lg">n ≤ 1 → 1</div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-slate- dark:text-slate-">
             The base case stops the recursion. Without it, the stack would grow
             forever until it causes a stack overflow error. Every recursive
             function needs a base case.

@@ -84,7 +84,7 @@ export default function LogicConnectiveBuilder() {
                 False
               </label>
             </div>
-            <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            <div className="mt-2 text-sm text-slate- dark:text-slate-">
               Current value:{" "}
               <span
                 className={`font-bold ${p ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
@@ -116,7 +116,7 @@ export default function LogicConnectiveBuilder() {
                 False
               </label>
             </div>
-            <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            <div className="mt-2 text-sm text-slate- dark:text-slate-">
               Current value:{" "}
               <span
                 className={`font-bold ${q ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
@@ -137,7 +137,7 @@ export default function LogicConnectiveBuilder() {
                 className={`p-3 border rounded-lg text-center transition-colors ${
                   selectedConnective === symbol
                     ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
-                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
+                    : "bg-white dark:bg-slate-900 hover:bg-slate- dark:bg-slate-800 border-slate-"
                 }`}
               >
                 <div className="text-2xl font-bold mb-1">{symbol}</div>
@@ -145,7 +145,7 @@ export default function LogicConnectiveBuilder() {
               </button>
             ))}
           </div>
-          <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+          <div className="mt-2 text-sm text-slate- dark:text-slate-">
             <strong>
               {connective.name} ({connective.symbol}):
             </strong>{" "}
@@ -158,7 +158,7 @@ export default function LogicConnectiveBuilder() {
         <h3 className="text-xl font-bold mb-4">Expression Results</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {expressions.map((item, index) => (
-            <div key={index} className="border rounded-lg p-4 bg-gray-50 dark:bg-slate-800">
+            <div key={index} className="border rounded-lg p-4 bg-slate- dark:bg-slate-800">
               <div className="font-mono text-lg mb-2">
                 {item.expr
                   .replace("∧", " ∧ ")

@@ -153,7 +153,7 @@ export default function RecursionTreeViz() {
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedExample === index
                     ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
-                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
+                    : "bg-white dark:bg-slate-900 hover:bg-slate- dark:bg-slate-800 border-slate-"
                 }`}
               >
                 <div className="font-semibold mb-1">{ex.name}</div>
@@ -178,7 +178,7 @@ export default function RecursionTreeViz() {
               max="6"
               value={maxDepth}
               onChange={(e) => setMaxDepth(parseInt(e.target.value))}
-              className="w-full h-2 bg-gray-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
+              className="w-full h-2 bg-slate- dark:bg-slate-700 rounded-lg appearance-none cursor-pointer"
             />
           </div>
           <div className="flex gap-4">
@@ -194,12 +194,12 @@ export default function RecursionTreeViz() {
 
       <div className="mb-6">
         <h3 className="text-xl font-bold mb-4 text-center">Recursion Tree</h3>
-        <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg">
+        <div className="bg-slate- dark:bg-slate-800 p-4 rounded-lg">
           <svg width="800" height="500" className="w-full border rounded">
             {renderTree(tree)}
           </svg>
         </div>
-        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 text-center">
+        <p className="text-sm text-slate- dark:text-slate- mt-2 text-center">
           Each node represents a function call. Lines show which calls depend on
           which subcalls.
         </p>
@@ -234,7 +234,7 @@ export default function RecursionTreeViz() {
             <div className="text-4xl mb-2">🎯</div>
             <div className="font-mono text-lg">F(0) = 0, F(1) = 1</div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-slate- dark:text-slate-">
             The recursion must stop somewhere. Base cases provide the "ground
             truth" that everything else builds upon. Without them, recursion
             goes forever.
@@ -249,7 +249,7 @@ export default function RecursionTreeViz() {
             <div className="text-4xl mb-2">🔄</div>
             <div className="font-mono text-lg">F(n) = F(n-1) + F(n-2)</div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm text-slate- dark:text-slate-">
             Express the problem in terms of smaller instances of itself. Each
             call breaks down the problem until it hits the base case, then
             builds back up.
@@ -281,7 +281,7 @@ export default function RecursionTreeViz() {
             </ul>
           </div>
         </div>
-        <p className="mt-3 text-xs text-gray-600 dark:text-gray-300">
+        <p className="mt-3 text-xs text-slate- dark:text-slate-">
           <strong>Key Insight:</strong> Every recursive function can be
           rewritten iteratively, and vice versa. The choice depends on which is
           more natural for the problem and which performs better.

@@ -89,7 +89,7 @@ export default function InductionFailureViz() {
                 className={`p-4 border rounded-lg text-left transition-colors ${
                   selectedScenario === index
                     ? "bg-blue-50 dark:bg-blue-900/300 text-white border-blue-500"
-                    : "bg-white dark:bg-slate-900 hover:bg-gray-50 dark:bg-slate-800 border-gray-300"
+                    : "bg-white dark:bg-slate-900 hover:bg-slate- dark:bg-slate-800 border-slate-"
                 }`}
               >
                 <div className="font-semibold mb-1">{scenario.name}</div>
