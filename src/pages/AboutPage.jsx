@@ -635,8 +635,7 @@ export default function AboutPage() {
         <section className="px-4 py-12 max-w-4xl mx-auto">
           <FadeSection>
             <div
-              className="relative rounded-3xl border border-rose-500/20 bg-gradient-to-br from-rose-950/50 via-slate-950/80 to-indigo-950/50 backdrop-blur-sm p-8 sm:p-12 overflow-hidden"
-              style={{ boxShadow: "0 0 60px rgba(244,63,94,0.06)" }}
+              className="relative rounded-3xl border border-rose-200 dark:border-rose-500/20 bg-gradient-to-br from-rose-50 via-white to-indigo-50 dark:from-rose-950/50 dark:via-slate-950/80 dark:to-indigo-950/50 backdrop-blur-sm p-8 sm:p-12 overflow-hidden shadow-xl shadow-rose-500/5 dark:shadow-[0_0_60px_rgba(244,63,94,0.06)]"
             >
               <div className="absolute top-0 right-0 w-72 h-72 bg-rose-500/8 rounded-full blur-[80px] pointer-events-none" />
               <div className="relative z-10 grid sm:grid-cols-[auto_1fr] gap-6 items-start">

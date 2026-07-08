@@ -84,7 +84,7 @@ function CourseCard({ item, chapters, getLessonStatus, meta, ref }) {
     s + ch.lessons.filter(l => getLessonStatus(buildProgressKey(item.key, l), 1) === 'complete').length, 0)
   const pct = total > 0 ? done / total : 0
   return (
-    <div ref={ref} className="group flex flex-col overflow-hidden rounded-2xl transition-all duration-300 shadow-md hover:shadow-lg dark:shadow-[0_4px_20px_rgba(0,0,0,0.3),0_1px_4px_rgba(0,0,0,0.2)] hover:-translate-y-2">
+    <div ref={ref} className="group flex flex-col overflow-hidden rounded-[24px] border border-white/60 dark:border-white/10 bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:-translate-y-2">
       <div className={`relative bg-gradient-to-br ${meta.header} px-5 pt-5 pb-5 overflow-hidden`}>
         <div className="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.055] pointer-events-none" style={{ backgroundImage: GRID_TEXTURE }} />
@@ -139,7 +139,7 @@ export default function AppCard({ item, variant = 'course', chapters, getLessonS
   const inner = (
     <div
       ref={ref}
-      className="group rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#060a14] overflow-hidden transition-all duration-300 hover:border-slate-300 dark:hover:border-white/20 hover:scale-[1.025] hover:-translate-y-0.5 shadow-sm hover:shadow-md dark:shadow-none"
+      className="group rounded-2xl border border-white/60 dark:border-white/10 bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-xl overflow-hidden transition-all duration-500 hover:border-white dark:hover:border-white/20 hover:scale-[1.025] hover:-translate-y-1 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.06)] dark:shadow-none"
       onMouseEnter={() => { if (ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = meta.glow }}
       onMouseLeave={() => { if (ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = '' }}
     >
