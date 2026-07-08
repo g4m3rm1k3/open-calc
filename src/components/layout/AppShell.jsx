@@ -126,11 +126,32 @@ function TopBar() {
       {/* LEFT — logo + app name + auth */}
       <div className="flex items-center gap-3 flex-shrink-0">
         <Link to="/" className="flex items-center gap-2 group select-none" aria-label="Home">
-          <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 shadow-sm group-hover:shadow-brand-500/25 group-hover:scale-105 transition-all duration-300">
-            <span className="text-white font-black text-xl leading-none tracking-tight">
-              ∂
-            </span>
-          </div>
+          <svg
+            viewBox="0 0 256 256"
+            className="w-8 h-8 rounded-[7px] shadow-sm group-hover:shadow-brand-500/25 group-hover:scale-105 transition-all duration-300"
+          >
+            <defs>
+              <linearGradient id="logoBgGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" className="text-brand-500" stopColor="currentColor" />
+                <stop offset="100%" className="text-indigo-600" stopColor="currentColor" />
+              </linearGradient>
+              <linearGradient id="logoCaretGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" className="text-white" stopColor="currentColor" />
+                <stop offset="100%" className="text-slate-200" stopColor="currentColor" />
+              </linearGradient>
+            </defs>
+            <rect width="256" height="256" rx="56" fill="url(#logoBgGrad)" />
+            <g transform="matrix(4.8069 0 0 3.7957 126.0017 180)">
+              <text
+                fontFamily="'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif"
+                fontSize="75"
+                fontWeight="900"
+                fill="url(#logoCaretGrad)"
+              >
+                <tspan x="-24.7559" y="23.5605">^</tspan>
+              </text>
+            </g>
+          </svg>
           <span className="text-[15px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 hidden sm:block tracking-tight">
             UpSkillOS
           </span>

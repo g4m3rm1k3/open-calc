@@ -1099,7 +1099,7 @@ function SectionOverview() {
 const FIRST_LESSON_STEPS = [
   {
     title: "Open the Lesson Builder",
-    desc: "Click the Start Menu (∂ logo, top-left) and choose 'Lesson Builder' — or navigate directly to /lesson-builder. No setup, no install.",
+    desc: "Click the Start Menu (^ logo, top-left) and choose 'Lesson Builder' — or navigate directly to /lesson-builder. No setup, no install.",
     note: "The Lesson Builder works entirely in your browser. You can build and preview a complete lesson without touching any code.",
     bullets: [
       "Start Menu → Lesson Builder",
