@@ -174,12 +174,12 @@
   .oc-header-gradient {
     background-image:
       radial-gradient(circle at top left, rgb(var(--tw-custom-brand-500) / 0.12), transparent 32%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent);
+      linear-gradient(180deg, rgb(var(--tw-custom-slate-50) / 0.42), transparent);
   }
   .dark .oc-header-gradient {
     background-image:
       radial-gradient(circle at top left, rgb(var(--tw-custom-brand-400) / 0.14), transparent 32%),
-      linear-gradient(180deg, rgba(15, 23, 42, 0.42), transparent);
+      linear-gradient(180deg, rgb(var(--tw-custom-slate-900) / 0.42), transparent);
   }
 
   .oc-card-container {

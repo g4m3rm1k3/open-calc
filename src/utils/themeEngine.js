@@ -153,41 +153,68 @@ export function extractThemeColors(themeDef) {
     return match ? match[0] : null;
   };
 
-  const bg0 = hexToRgb(extractHex(ui.bg0));
-  const bg1 = hexToRgb(extractHex(ui.bg1));
-  const bg2 = hexToRgb(extractHex(ui.bg2));
-  const border = hexToRgb(extractHex(ui.border) || extractHex(ui.btnBorder));
-  const txt1 = hexToRgb(extractHex(ui.txt1));
-  const txt2 = hexToRgb(extractHex(ui.txt2));
+  const strToArr = (str) => str ? str.split(' ').map(Number) : null;
+  
+  const bg0Arr = hexToRgbArray(extractHex(ui.bg0));
+  const bg1Arr = hexToRgbArray(extractHex(ui.bg1));
+  const bg2Arr = hexToRgbArray(extractHex(ui.bg2));
+  const borderArr = hexToRgbArray(extractHex(ui.border) || extractHex(ui.btnBorder));
+  const txt2Arr = hexToRgbArray(extractHex(ui.txt2));
+  const txt1Arr = hexToRgbArray(extractHex(ui.txt1));
 
-  // bg0/bg1/bg2 are hand-authored per theme and aren't guaranteed to be in
-  // darkest-to-lightest order (e.g. Dracula's bg1 is darker than its bg0) —
-  // sort by actual luminance so 950 is always darker than 900, which is
-  // always darker than 800, regardless of which slot each came from.
-  const luminance = (rgb) => {
-    const [r, g, b] = rgb.split(' ').map(Number);
-    return 0.299 * r + 0.587 * g + 0.114 * b;
-  };
-  const sortedBgs = [bg0, bg1, bg2]
+  const luminance = (arr) => 0.299 * arr[0] + 0.587 * arr[1] + 0.114 * arr[2];
+  
+  const sortedBgs = [bg0Arr, bg1Arr, bg2Arr]
     .filter(Boolean)
     .sort((a, b) => luminance(a) - luminance(b));
-  const [darkest, middle, lightest] = sortedBgs;
+    
+  const darkest = sortedBgs[0] || strToArr(DEFAULT_PALETTE_RGB.slate[950]);
+  const middle = sortedBgs[1] || strToArr(DEFAULT_PALETTE_RGB.slate[900]);
+  const lightest = sortedBgs[2] || strToArr(DEFAULT_PALETTE_RGB.slate[800]);
+  
+  const b = borderArr || strToArr(DEFAULT_PALETTE_RGB.slate[700]);
+  const t2 = txt2Arr || strToArr(DEFAULT_PALETTE_RGB.slate[500]);
+  const t1 = txt1Arr || strToArr(DEFAULT_PALETTE_RGB.slate[200]);
+  const white = [255, 255, 255];
 
-  // Map to slate/sky scale. We only override the dark mode relevant colors.
-  return {
-    slate: {
+  const isLight = themeDef.forceLight;
+
+  let slateScale;
+  if (isLight) {
+    slateScale = {
+      ...DEFAULT_PALETTE_RGB.slate,
+      50: lightest.join(' '),
+      100: middle.join(' '),
+      200: darkest.join(' '),
+      300: b.join(' '),
+      400: lerpColor(b, t2, 0.5).join(' '),
+      500: t2.join(' '),
+      600: lerpColor(t2, t1, 0.5).join(' '),
+      700: lerpColor(t2, t1, 0.8).join(' '),
+      800: t1.join(' '),
+      900: lerpColor(t1, [0, 0, 0], 0.5).join(' '),
+      950: lerpColor(t1, [0, 0, 0], 0.8).join(' '),
+    };
+  } else {
+    slateScale = {
       ...DEFAULT_PALETTE_RGB.slate, // fallback light mode colors remain default
-      950: darkest || DEFAULT_PALETTE_RGB.slate[950],
-      900: middle || DEFAULT_PALETTE_RGB.slate[900],
-      800: lightest || DEFAULT_PALETTE_RGB.slate[800],
-      700: border || DEFAULT_PALETTE_RGB.slate[700],
-      600: border || DEFAULT_PALETTE_RGB.slate[600],
-      500: txt2 || DEFAULT_PALETTE_RGB.slate[500],
-      400: txt2 || DEFAULT_PALETTE_RGB.slate[400],
-      300: txt1 || DEFAULT_PALETTE_RGB.slate[300],
-      200: txt1 || DEFAULT_PALETTE_RGB.slate[200],
-      100: txt1 || DEFAULT_PALETTE_RGB.slate[100],
-    },
+      950: darkest.join(' '),
+      900: middle.join(' '),
+      800: lightest.join(' '),
+      700: b.join(' '),
+      600: lerpColor(b, t2, 0.5).join(' '), // Halfway between border and muted text
+      500: t2.join(' '),
+      400: lerpColor(t2, t1, 0.5).join(' '), // Halfway between muted and normal text
+      300: lerpColor(t2, t1, 0.8).join(' '),
+      200: t1.join(' '),
+      100: lerpColor(t1, white, 0.5).join(' '),
+      50:  lerpColor(t1, white, 0.8).join(' '),
+    };
+  }
+
+  // Map to slate/sky scale.
+  return {
+    slate: slateScale,
     // "sky" is the theme's secondary accent — hue-rotated from the primary
     // accentHex so every theme automatically gets a second, genuinely
     // distinct accent (used for `teal` in useThemeColors so it's no longer
