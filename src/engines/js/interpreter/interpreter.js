@@ -14,7 +14,7 @@ class ThrowSignal   { constructor(v) { this.value = v } }
 
 // ── Public entry point ────────────────────────────────────────────────────────
 
-export function run(source) {
+export function run(source, options = {}) {
   let ast
   try {
     ast = acorn.parse(source, { ecmaVersion: 2022, sourceType: 'module', locations: true })
@@ -23,7 +23,7 @@ export function run(source) {
   }
 
   const interp = new Interpreter(source, ast)
-  return interp.execute()
+  return interp.execute(options.extraGlobals ?? null)
 }
 
 // ── Interpreter ───────────────────────────────────────────────────────────────
@@ -43,10 +43,15 @@ class Interpreter {
 
   // ── Execution entry ────────────────────────────────────────────────────────
 
-  execute() {
+  execute(extraGlobals = null) {
     const globalEnv = new Environment(null, 'global')
     this.globalEnv = globalEnv
     this._installGlobals(globalEnv)
+    if (extraGlobals) {
+      for (const [name, fn] of Object.entries(extraGlobals)) {
+        globalEnv.define(name, { __kind: 'native', name, fn }, 'const')
+      }
+    }
 
     this._emit(EventType.PROGRAM_START, null, globalEnv, {
       source: this.source,

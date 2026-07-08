@@ -147,6 +147,65 @@ export function setupOpenCalcMonaco(monaco) {
     },
   });
 
+  // Vue's own emerald palette — reuses the exact hex tones already defined
+  // for its markdown theme (studioThemes.js's vue-dark/vue-light mdDark
+  // blocks: preBg/preBorder/text/h1-h3), so the editor doesn't introduce a
+  // fourth, uncoordinated shade of green. Previously vue/vue-dark/vue-light
+  // all pointed at the generic open-calc-dark/light themes, which is why
+  // the editor never visibly changed under the Vue theme unlike GitHub,
+  // Dracula, or Monokai, each of which has always had its own definition.
+  monaco.editor.defineTheme("open-calc-vue-dark", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "4d7c66", fontStyle: "italic" },
+      { token: "keyword", foreground: "34d399", fontStyle: "bold" },
+      { token: "string", foreground: "fbbf24" },
+      { token: "number", foreground: "6ee7b7" },
+      { token: "delimiter", foreground: "6b9080" },
+    ],
+    colors: {
+      "editor.background": "#081410",
+      "editor.foreground": "#a7f3d0",
+      "editorLineNumber.foreground": "#3f6852",
+      "editorLineNumber.activeForeground": "#6ee7b7",
+      "editorCursor.foreground": "#41b883",
+      "editor.selectionBackground": "#134e2d",
+      "editor.inactiveSelectionBackground": "#0c2317",
+      "editor.lineHighlightBackground": "#0c231766",
+      "editorIndentGuide.background1": "#134e2d",
+      "editorIndentGuide.activeBackground1": "#1a6b3d",
+      "editorWidget.background": "#0c1f17",
+      "editorWidget.border": "#134e2d",
+    },
+  });
+
+  monaco.editor.defineTheme("open-calc-vue-light", {
+    base: "vs",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "6b8f7c", fontStyle: "italic" },
+      { token: "keyword", foreground: "047857", fontStyle: "bold" },
+      { token: "string", foreground: "b45309" },
+      { token: "number", foreground: "059669" },
+      { token: "delimiter", foreground: "4b7a64" },
+    ],
+    colors: {
+      "editor.background": "#f0fdf4",
+      "editor.foreground": "#1e3a2f",
+      "editorLineNumber.foreground": "#7ba690",
+      "editorLineNumber.activeForeground": "#047857",
+      "editorCursor.foreground": "#41b883",
+      "editor.selectionBackground": "#bbf7d0",
+      "editor.inactiveSelectionBackground": "#ecfdf5",
+      "editor.lineHighlightBackground": "#ecfdf5",
+      "editorIndentGuide.background1": "#d1fae5",
+      "editorIndentGuide.activeBackground1": "#6ee7b7",
+      "editorWidget.background": "#ffffff",
+      "editorWidget.border": "#bbf7d0",
+    },
+  });
+
   monaco.editor.defineTheme("nord-dark", {
     base: "vs-dark",
     inherit: true,

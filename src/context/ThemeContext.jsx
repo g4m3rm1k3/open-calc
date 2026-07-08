@@ -94,11 +94,19 @@ export function ThemeProvider({ children }) {
         isDark: isDarkGlobal
       };
     } else {
+      // forceLight themes (e.g. vue-light) store their light-mode classes
+      // under the same uiDark/mdDark keys non-dynamic themes conventionally
+      // use (there's only ever one variant for a non-dynamic theme), so the
+      // fallback here is intentional, not a typo — only monaco has a real
+      // separate monacoLight to prefer. Previously this branch always read
+      // monacoDark/isDark:true unconditionally, which silently broke
+      // vue-light specifically: monacoDark didn't exist on it at all.
+      const isDark = !t.forceLight;
       return {
         ui: t.uiDark,
         md: t.mdDark,
-        monaco: t.monacoDark,
-        isDark: true
+        monaco: (isDark ? t.monacoDark : t.monacoLight) ?? t.monacoDark ?? t.monacoLight,
+        isDark
       };
     }
   }, [studioTheme, isDarkGlobal]);
