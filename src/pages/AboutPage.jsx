@@ -1250,10 +1250,9 @@ export default function AboutPage() {
 
             {/* Lesson Builder Spotlight */}
             <FadeSection>
-              <div
-                className="relative rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-950/40 via-slate-950/80 to-orange-950/40 backdrop-blur-sm p-10 sm:p-12 overflow-hidden"
-                style={{ boxShadow: "0 0 60px rgba(245,158,11,0.07)" }}
-              >
+                <div
+                  className="group relative rounded-[32px] border border-amber-500/30 dark:border-amber-500/20 bg-amber-50/80 dark:bg-amber-950/20 backdrop-blur-xl p-10 sm:p-12 overflow-hidden transition-all duration-500 shadow-[0_8px_40px_rgba(245,158,11,0.1)] hover:shadow-[0_20px_60px_rgba(245,158,11,0.2)] dark:shadow-[0_8px_40px_rgba(245,158,11,0.05)] hover:-translate-y-1"
+                >
                 <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/8 rounded-full blur-[80px] pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-72 h-72 bg-orange-500/6 rounded-full blur-[80px] pointer-events-none" />
                 <div className="relative z-10 grid sm:grid-cols-[1fr_auto] gap-8 items-center">
@@ -1328,8 +1327,8 @@ export default function AboutPage() {
 
             {/* GitHub banner */}
             <FadeSection delay={80}>
-              <div className="mt-6 relative rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-900/5 dark:bg-white/4 backdrop-blur-sm overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/20 via-transparent to-emerald-900/20 pointer-events-none" />
+              <div className="group mt-6 relative rounded-[24px] border border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-[#0b0f19]/80 backdrop-blur-2xl overflow-hidden transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:-translate-y-1">
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/20 via-transparent to-emerald-900/20 pointer-events-none opacity-0 dark:opacity-100" />
                 <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4 px-8 py-6">
                   <div className="text-center sm:text-left">
                     <div className="text-slate-900 dark:text-white font-bold text-lg">
@@ -1345,7 +1344,7 @@ export default function AboutPage() {
                       href="https://github.com/g4m3rm1k3/upskillos"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-slate-900 font-bold text-sm hover:bg-slate-100 transition-all duration-200 hover:scale-105"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-sm hover:bg-slate-800 dark:hover:bg-slate-100 transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg"
                     >
                       <span>⭐</span> GitHub
                     </a>
@@ -1353,7 +1352,7 @@ export default function AboutPage() {
                       href="https://discord.gg/epd2kYBDVt"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500/20 text-sky-200 font-bold text-sm border border-sky-500/30 hover:bg-sky-500/30 transition-all duration-200 hover:scale-105"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-300 font-bold text-sm border border-sky-200 dark:border-sky-500/30 hover:bg-sky-100 dark:hover:bg-sky-500/30 transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
                     >
                       🎮 Discord
                     </a>

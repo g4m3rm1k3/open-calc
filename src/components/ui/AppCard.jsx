@@ -16,7 +16,7 @@ const DOTS_OVL = {
   backgroundSize: '13px 13px',
 }
 
-const GRID_TEXTURE = 'repeating-linear-gradient(0deg,transparent,transparent 11px,rgba(255,255,255,0.8) 11px,rgba(255,255,255,0.8) 12px),repeating-linear-gradient(90deg,transparent,transparent 11px,rgba(255,255,255,0.8) 11px,rgba(255,255,255,0.8) 12px)'
+
 
 const TAG = 'text-[10px] font-medium px-2 py-0.5 rounded-full bg-white/5 border border-white/[0.08] text-slate-500'
 
@@ -87,7 +87,7 @@ function CourseCard({ item, chapters, getLessonStatus, meta, ref }) {
     <div ref={ref} className="group flex flex-col overflow-hidden rounded-[24px] border border-white/60 dark:border-white/10 bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:-translate-y-2">
       <div className={`relative bg-gradient-to-br ${meta.header} px-5 pt-5 pb-5 overflow-hidden`}>
         <div className="absolute inset-0 bg-gradient-to-b from-white/12 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 opacity-[0.055] pointer-events-none" style={{ backgroundImage: GRID_TEXTURE }} />
+        <div className="absolute inset-0 opacity-[0.15] pointer-events-none" style={{ backgroundImage: meta.pattern }} />
         <div className="relative">
           <div className="text-3xl font-black text-white/65 mb-2 font-mono leading-none tracking-tight">{item.icon}</div>
           <div className="font-bold text-[17px] text-white leading-tight drop-shadow">{item.label}</div>
