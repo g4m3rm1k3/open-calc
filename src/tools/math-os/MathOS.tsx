@@ -218,7 +218,7 @@ export default function MathOS({ open, onClose }: Props) {
                 {s.tab === 'explain' && (
                   <div>
                     <div className="flex gap-2 mb-3">{[['eli5','ELI5'],['student','Student'],['college','College'],['advanced','Advanced']].map(([id,label])=><button key={id} onClick={()=>s.setExplainLevel(id as typeof s.explainLevel)} className={`px-3 py-1 text-xs rounded ${s.explainLevel===id?'bg-brand-600 text-white':'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}>{label}</button>)}</div>
-                    {explainText ? <div className="bg-brand-500/5 dark:bg-slate-800 rounded-lg p-4 text-sm text-slate-800 leading-relaxed">{explainText}</div> : <div className="text-slate-500 text-sm p-4">No explanation available for this result type.</div>}
+                    {explainText ? <div className="bg-brand-500/5 dark:bg-slate-800 rounded-lg p-4 text-sm text-slate-800 dark:text-slate-100 leading-relaxed">{explainText}</div> : <div className="text-slate-500 text-sm p-4">No explanation available for this result type.</div>}
                   </div>
                 )}
                 {s.tab === 'connections' && <div>{connData ? <div><div className="text-xs text-slate-400 mb-2">This concept connects to:</div><div className="flex flex-wrap gap-2">{connData.map((c: string)=><span key={c} className="px-3 py-1 rounded-full bg-slate-700 text-slate-200 text-xs border border-slate-600">{c}</span>)}</div></div> : <div className="text-slate-500 text-sm p-4">No connections mapped for this result.</div>}</div>}
@@ -234,7 +234,7 @@ export default function MathOS({ open, onClose }: Props) {
               <div className="text-[11px] font-bold uppercase tracking-wider text-sky-400 mb-2">Matrix Expression <span className="font-normal text-slate-500 normal-case tracking-normal">uses stored vars — e.g. inv(M)*A*M</span></div>
               <div className="flex gap-2">
                 <input value={s.matExpr} onChange={e=>s.setMatExpr(e.target.value)} onKeyDown={e=>e.key==='Enter'&&s.computeMatExpr()} placeholder="inv(M)*A*M  or  A^2  or  trace(A*B)"
-                  className="flex-1 text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-2 px-3 text-slate-800 font-mono focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 focus:outline-none transition-all" />
+                  className="flex-1 text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-2 px-3 text-slate-800 dark:text-slate-100 font-mono focus:border-sky-400 focus:ring-1 focus:ring-sky-400/30 focus:outline-none transition-all" />
                 <button onClick={s.computeMatExpr} className="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-sm font-bold transition-all active:scale-95 shadow">Eval</button>
               </div>
               {s.matExprResult && (
@@ -278,7 +278,7 @@ export default function MathOS({ open, onClose }: Props) {
             {(s.matOp === 'power' || s.matOp === 'scalar') && (
               <div className="mb-4 flex items-center gap-3 bg-brand-500/5 dark:bg-black/20 p-3 rounded-xl border border-slate-200/40 dark:border-white/5 w-max shadow-inner">
                 <label className="text-[11px] font-bold text-brand-300 font-mono uppercase tracking-wider">{s.matOp === 'power' ? 'n (power)' : 'scalar c'}</label>
-                <input type="number" value={s.matN} onChange={e=>s.setMatN(parseFloat(e.target.value))} className="w-20 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:bg-white/10 focus:outline-none transition-all shadow-inner" />
+                <input type="number" value={s.matN} onChange={e=>s.setMatN(parseFloat(e.target.value))} className="w-20 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 dark:text-slate-100 focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:bg-white/10 focus:outline-none transition-all shadow-inner" />
               </div>
             )}
             <button onClick={s.computeMatrix} className="px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white rounded-xl font-bold text-sm mb-5 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">Compute Matrix</button>
@@ -303,7 +303,7 @@ export default function MathOS({ open, onClose }: Props) {
                   return <div className="text-slate-500 text-sm p-4 text-center">Visual available for 2D Transform. For other ops, see symbolic steps above.</div>
                 })()}
                 {s.tab === 'code' && s.result.code && <div className="space-y-3 font-mono text-xs">{[['JavaScript','js'],['Python','py'],['MATLAB','ml']].map(([lang,key])=><div key={key}><div className="text-slate-400 mb-1 font-sans">{lang}</div><pre className="bg-slate-900 border border-slate-700 rounded-lg p-3 whitespace-pre-wrap text-slate-200 overflow-x-auto">{(s.result!.code as any)?.[key]||'// Not available'}</pre></div>)}</div>}
-                {s.tab === 'explain' && (<div><div className="flex gap-2 mb-3">{[['eli5','ELI5'],['student','Student'],['college','College'],['advanced','Advanced']].map(([id,label])=><button key={id} onClick={()=>s.setExplainLevel(id as typeof s.explainLevel)} className={`px-3 py-1 text-xs rounded ${s.explainLevel===id?'bg-brand-600 text-white':'bg-slate-700 text-slate-300'}`}>{label}</button>)}</div>{explainText?<div className="bg-brand-500/5 dark:bg-slate-800 rounded-lg p-4 text-sm text-slate-800 leading-relaxed">{explainText}</div>:<div className="text-slate-500 text-sm p-4">No explanation available.</div>}</div>)}
+                {s.tab === 'explain' && (<div><div className="flex gap-2 mb-3">{[['eli5','ELI5'],['student','Student'],['college','College'],['advanced','Advanced']].map(([id,label])=><button key={id} onClick={()=>s.setExplainLevel(id as typeof s.explainLevel)} className={`px-3 py-1 text-xs rounded ${s.explainLevel===id?'bg-brand-600 text-white':'bg-slate-700 text-slate-300'}`}>{label}</button>)}</div>{explainText?<div className="bg-brand-500/5 dark:bg-slate-800 rounded-lg p-4 text-sm text-slate-800 dark:text-slate-100 leading-relaxed">{explainText}</div>:<div className="text-slate-500 text-sm p-4">No explanation available.</div>}</div>)}
                 {s.tab === 'connections' && s.result.connKey && (CONNECTIONS as any)[s.result.connKey] && <div className="flex flex-wrap gap-2 pt-2">{(CONNECTIONS as any)[s.result.connKey].map((c: string)=><span key={c} className="px-3 py-1 rounded-full bg-slate-700 text-slate-200 text-xs border border-slate-600">{c}</span>)}</div>}
               </>
             )}
@@ -316,10 +316,10 @@ export default function MathOS({ open, onClose }: Props) {
             <div className="flex items-center gap-4 flex-wrap mb-5">
               <div className="flex items-center gap-3 bg-brand-500/5 dark:bg-black/20 p-4 rounded-xl border border-slate-200/40 dark:border-white/5 shadow-inner">
                 <span className="text-brand-400 text-2xl font-black">Σ</span>
-                <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">i from</div><input value={s.sigLo} onChange={e=>s.setSigLo(e.target.value)} className="w-16 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>
-                <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">to (n or num)</div><input value={s.sigHi} onChange={e=>s.setSigHi(e.target.value)} className="w-20 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>
-                <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">f(i) =</div><input value={s.sigExpr} onChange={e=>s.setSigExpr(e.target.value)} className="w-32 px-3 text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>
-                {s.sigHi === 'n' && <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">n =</div><input type="number" value={s.sigN} onChange={e=>s.setSigN(parseInt(e.target.value)||10)} className="w-16 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>}
+                <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">i from</div><input value={s.sigLo} onChange={e=>s.setSigLo(e.target.value)} className="w-16 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 dark:text-slate-100 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>
+                <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">to (n or num)</div><input value={s.sigHi} onChange={e=>s.setSigHi(e.target.value)} className="w-20 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 dark:text-slate-100 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>
+                <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">f(i) =</div><input value={s.sigExpr} onChange={e=>s.setSigExpr(e.target.value)} className="w-32 px-3 text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 dark:text-slate-100 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>
+                {s.sigHi === 'n' && <div><div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">n =</div><input type="number" value={s.sigN} onChange={e=>s.setSigN(parseInt(e.target.value)||10)} className="w-16 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 dark:text-slate-100 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" /></div>}
               </div>
               <button onClick={s.computeSigma} className="px-6 py-3 bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-500 hover:to-brand-600 text-white rounded-xl font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95">Compute</button>
             </div>
@@ -402,7 +402,7 @@ export default function MathOS({ open, onClose }: Props) {
                   {(s.physFormula.vars || []).map((v: string) => (
                     <div key={v} className="flex items-center gap-3">
                       <div className="text-xs font-bold text-brand-300 font-mono uppercase">{v} =</div>
-                      <input value={s.physVarsLocal[v]||''} onChange={e=>s.setPhysVarsLocal((p: Record<string,string>)=>({...p,[v]:e.target.value}))} className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" />
+                      <input value={s.physVarsLocal[v]||''} onChange={e=>s.setPhysVarsLocal((p: Record<string,string>)=>({...p,[v]:e.target.value}))} className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 dark:text-slate-100 font-mono focus:border-brand-400 focus:ring-1 focus:ring-brand-400/50 focus:outline-none transition-all shadow-inner" />
                     </div>
                   ))}
                 </div>
@@ -438,7 +438,7 @@ export default function MathOS({ open, onClose }: Props) {
                     {(s.machFormula.vars || []).map((v: string) => (
                       <div key={v} className="flex flex-col gap-1">
                         <div className="text-[11px] font-bold text-orange-300 font-mono uppercase pl-1">{v}</div>
-                        <input value={s.machVarsLocal[v]||''} onChange={e=>s.setMachVarsLocal((p: Record<string,string>)=>({...p,[v]:e.target.value}))} placeholder="0" className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-2 text-slate-800 font-mono focus:border-orange-400 focus:ring-1 focus:ring-orange-400/50 focus:outline-none transition-all shadow-inner" />
+                        <input value={s.machVarsLocal[v]||''} onChange={e=>s.setMachVarsLocal((p: Record<string,string>)=>({...p,[v]:e.target.value}))} placeholder="0" className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-2 text-slate-800 dark:text-slate-100 font-mono focus:border-orange-400 focus:ring-1 focus:ring-orange-400/50 focus:outline-none transition-all shadow-inner" />
                       </div>
                     ))}
                   </div>
@@ -492,11 +492,11 @@ export default function MathOS({ open, onClose }: Props) {
                 <div className="flex gap-8 mb-6">
                   <div>
                     <div className="text-[11px] font-bold text-slate-500 mb-3 uppercase tracking-wider">Sides</div>
-                    <div className="flex flex-col gap-3">{['a','b','c'].map(k=><div key={k} className="flex items-center gap-3"><span className="text-sm font-bold font-mono text-emerald-400 w-4">{k}</span><span className="text-slate-600">=</span><input value={(s.triSides as Record<string,string>)[k]} onChange={e=>s.setTriSides((p: typeof s.triSides)=>({...p,[k]:e.target.value}))} placeholder="?" className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/50 focus:outline-none transition-all shadow-inner" /></div>)}</div>
+                    <div className="flex flex-col gap-3">{['a','b','c'].map(k=><div key={k} className="flex items-center gap-3"><span className="text-sm font-bold font-mono text-emerald-400 w-4">{k}</span><span className="text-slate-600">=</span><input value={(s.triSides as Record<string,string>)[k]} onChange={e=>s.setTriSides((p: typeof s.triSides)=>({...p,[k]:e.target.value}))} placeholder="?" className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 dark:text-slate-100 font-mono focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/50 focus:outline-none transition-all shadow-inner" /></div>)}</div>
                   </div>
                   <div>
                     <div className="text-[11px] font-bold text-slate-500 mb-3 uppercase tracking-wider">Angles ({s.angleMode})</div>
-                    <div className="flex flex-col gap-3">{['A','B','C'].map(k=><div key={k} className="flex items-center gap-3"><span className="text-sm font-bold font-mono text-amber-400 w-4">{k}</span><span className="text-slate-600">=</span><input value={(s.triAngles as Record<string,string>)[k]} onChange={e=>s.setTriAngles((p: typeof s.triAngles)=>({...p,[k]:e.target.value}))} placeholder="?" className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 focus:outline-none transition-all shadow-inner" /></div>)}</div>
+                    <div className="flex flex-col gap-3">{['A','B','C'].map(k=><div key={k} className="flex items-center gap-3"><span className="text-sm font-bold font-mono text-amber-400 w-4">{k}</span><span className="text-slate-600">=</span><input value={(s.triAngles as Record<string,string>)[k]} onChange={e=>s.setTriAngles((p: typeof s.triAngles)=>({...p,[k]:e.target.value}))} placeholder="?" className="w-24 text-center text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 dark:text-slate-100 font-mono focus:border-amber-400 focus:ring-1 focus:ring-amber-400/50 focus:outline-none transition-all shadow-inner" /></div>)}</div>
                   </div>
                 </div>
                 <div className="flex gap-3 pt-4 border-t border-slate-200/40 dark:border-white/5">
@@ -529,13 +529,13 @@ export default function MathOS({ open, onClose }: Props) {
               {s.graphFns.map((fn: string, i: number) => (
                 <div key={i} className="flex flex-col gap-1">
                   <div className="text-[11px] font-bold uppercase font-mono tracking-wider" style={{color:['#60a5fa','#34d399','#f472b6','#fb923c'][i]}}>y{i+1} =</div>
-                  <input value={fn} onChange={e=>{ const f=[...s.graphFns]; f[i]=e.target.value; s.setGraphFns(f) }} className="w-40 text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-2 px-3 text-slate-800 font-mono focus:ring-1 focus:outline-none transition-all shadow-inner" />
+                  <input value={fn} onChange={e=>{ const f=[...s.graphFns]; f[i]=e.target.value; s.setGraphFns(f) }} className="w-40 text-sm bg-white/5 border border-slate-200/60 dark:border-white/10 rounded-lg py-2 px-3 text-slate-800 dark:text-slate-100 font-mono focus:ring-1 focus:outline-none transition-all shadow-inner" />
                 </div>
               ))}
             </div>
             <div className="flex flex-wrap gap-4 mb-5 items-end text-xs text-slate-400">
               {([['xMin',s.graphXMin,s.setGraphXMin],['xMax',s.graphXMax,s.setGraphXMax],['yMin',s.graphYMin,s.setGraphYMin],['yMax',s.graphYMax,s.setGraphYMax]] as const).map(([label,val,set]) => (
-                <div key={label} className="flex flex-col gap-1"><div className="text-[10px] font-bold uppercase tracking-wider">{label}</div><input type="number" value={val} onChange={e=>set(parseFloat(e.target.value)||0)} className="w-20 text-center text-sm bg-brand-500/5 dark:bg-black/20 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 font-mono focus:border-brand-400 focus:outline-none shadow-inner transition-colors" /></div>
+                <div key={label} className="flex flex-col gap-1"><div className="text-[10px] font-bold uppercase tracking-wider">{label}</div><input type="number" value={val} onChange={e=>set(parseFloat(e.target.value)||0)} className="w-20 text-center text-sm bg-brand-500/5 dark:bg-black/20 border border-slate-200/60 dark:border-white/10 rounded-lg py-1.5 text-slate-800 dark:text-slate-100 font-mono focus:border-brand-400 focus:outline-none shadow-inner transition-colors" /></div>
               ))}
               <button onClick={()=>{ s.setGraphXMin(-10); s.setGraphXMax(10); s.setGraphYMin(-10); s.setGraphYMax(10) }} className="px-3 py-1.5 text-xs bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 self-end font-medium transition-colors border border-transparent hover:border-white/10">reset bounds</button>
             </div>
@@ -561,7 +561,7 @@ export default function MathOS({ open, onClose }: Props) {
               <div className="ml-auto flex items-center gap-3 pr-1">
                 {s.scriptLang !== 'matlab' && (
                   <div className="flex items-center gap-2 bg-brand-500/5 dark:bg-black/40 rounded-lg p-1 border border-slate-200/40 dark:border-white/5">
-                    <input value={s.scriptName} onChange={e=>s.setScriptName(e.target.value)} placeholder="name to save..." className="w-32 text-xs bg-transparent border-none rounded px-2 py-1 text-slate-800 font-mono focus:outline-none placeholder-slate-600" />
+                    <input value={s.scriptName} onChange={e=>s.setScriptName(e.target.value)} placeholder="name to save..." className="w-32 text-xs bg-transparent border-none rounded px-2 py-1 text-slate-800 dark:text-slate-100 font-mono focus:outline-none placeholder-slate-600" />
                     <button onClick={()=>{ if(s.scriptName.trim()) s.setScripts({...s.scripts,[s.scriptName.trim()]: s.scriptLang==='python'?s.pyScript:s.script}) }} className="px-3 py-1 bg-white/10 hover:bg-white/20 text-slate-200 rounded text-xs font-semibold transition-colors">Save</button>
                   </div>
                 )}
