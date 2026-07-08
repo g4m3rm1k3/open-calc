@@ -26,7 +26,7 @@ function getTopLevelDecls(code) {
   return names
 }
 
-export default function BlogPost({ content, interactive = true }) {
+export default function BlogPost({ content, interactive = true, onLinkClick }) {
   // Per-post notebook state: tracks latest code for each code block by index
   const cellCodesRef = useRef(new Map())
   // Resets to 0 each render pass so cells always get the same index
@@ -101,11 +101,33 @@ export default function BlogPost({ content, interactive = true }) {
     return <InPreContext.Provider value={true}>{children}</InPreContext.Provider>
   }, [])
 
+  // Only overrides the default `a` (a live, target=_blank external link) when
+  // a caller actually supplies onLinkClick — e.g. LessonsPanel, which needs
+  // to intercept a lesson's internal cross-references and resolve them
+  // in-app instead of letting the browser navigate. Real blog posts (no
+  // onLinkClick passed) keep proseComponents' ordinary external-link anchor.
+  const renderLink = useCallback(function LinkRenderer({ href, children }) {
+    return (
+      <a
+        href={href}
+        target={/^https?:\/\//i.test(href || '') ? '_blank' : undefined}
+        rel="noopener noreferrer"
+        onClick={(event) => {
+          if (onLinkClick?.(href)) event.preventDefault()
+        }}
+        className="text-indigo-600 dark:text-indigo-400 underline underline-offset-2 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"
+      >
+        {children}
+      </a>
+    )
+  }, [onLinkClick])
+
   const components = useMemo(() => ({
     ...proseComponents,
     code: renderCode,
     pre: renderPre,
-  }), [renderCode, renderPre])
+    ...(onLinkClick ? { a: renderLink } : {}),
+  }), [renderCode, renderPre, renderLink, onLinkClick])
 
   return (
     <article className="prose-blog max-w-none">

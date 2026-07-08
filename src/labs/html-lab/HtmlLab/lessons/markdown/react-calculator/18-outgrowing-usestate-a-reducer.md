@@ -76,6 +76,24 @@ production app, though not needed here) the ability to log, replay, or
 even undo a sequence of actions, since each one is just data that can be
 stored, not a function call that already happened and is gone.
 
+**CS lens — a reducer is a finite state machine, generalized.** Lesson 10
+named the eager operator model a **state machine** — a system with a fixed
+set of states and rules for moving between them — and found it too small
+a machine to represent this calculator correctly. `calculatorReducer` is
+also a state machine, but a much larger, more capable one: its "states"
+are every possible `CalculatorState` value (effectively unlimited, since
+`expression` can be any string), and its "transitions" are exactly the
+branches of the `switch` — one named, explicit rule per `CalculatorAction`
+variant, for how one state becomes the next. A **finite** state machine
+technically requires a *fixed*, countable set of states, which
+`CalculatorState` doesn't quite satisfy (an unbounded string field makes
+the state space infinite) — worth being precise about even while using
+the same mental model: `calculatorReducer` is a state machine in the
+general sense (states, actions, deterministic transitions between them),
+looser than the strict finite-state-machine definition lesson 28's
+`route` (a small, genuinely fixed set: `"basic"`, `"scientific"`,
+`"settings"`) satisfies exactly.
+
 ---
 
 ## Step 3 — Write the Reducer
@@ -134,6 +152,35 @@ function calculatorReducer(state: CalculatorState, action: CalculatorAction): Ca
 }
 ```
 
+**CS lens — the word "reducer" is not a React invention; it's the same
+shape as `Array.prototype.reduce`.** `[1, 2, 3].reduce((accumulator, item)
+=> accumulator + item, 0)` calls its function once per array element,
+each time combining the *running total so far* with *one new item* to
+produce the *next* running total. `calculatorReducer(state, action)` is
+the identical shape: `state` is the running total (the calculator's
+current condition), `action` is the one new item (what just happened),
+and the return value is the next running total. `useReducer` is, in a
+real sense, "run `.reduce()` over the entire sequence of actions a user
+ever dispatches, one at a time, keeping only the latest running total
+visible" — the name was chosen deliberately to point at this exact
+parallel, not coined fresh for React.
+
+**Connect to the real world — this state/action/reducer/dispatch
+vocabulary predates `useReducer` itself.** This entire shape — actions as
+plain data objects with a `type` field, a pure reducer function computing
+new state from old state plus an action, a `dispatch` function as the only
+way to trigger a change — is the core design of **Redux**, a
+state-management library that predates React's own `useReducer` hook by
+several years and popularized this exact pattern across the whole
+JavaScript ecosystem (the broader idea is called **Flux architecture**).
+React eventually added `useReducer` as a built-in hook specifically
+because this pattern proved useful often enough, for state local to one
+component, that reaching for an external library felt like overkill just
+to get it. Recognizing this vocabulary — action, reducer, dispatch — means
+recognizing Redux code (or any Flux-inspired state management) on sight,
+in any React codebase that uses it, as the same idea this lesson just
+built from scratch.
+
 **Walkthrough — a reducer's exact shape: `(state, action) => newState`.**
 `calculatorReducer` takes the calculator's *current* state and one action,
 and returns a *brand new* state object describing what it should become —
@@ -183,6 +230,23 @@ name: string; angleMode: AngleMode }` — so everything the reducer needs is
 sitting right there in its own two arguments, and the component doing the
 `dispatch` (which already has `angleMode` in scope) is the one responsible
 for including it.
+
+**The general law, stated once, so every future case is obvious instead of
+memorized one at a time.**
+
+> **A reducer is a mathematical function: `(oldState, action) → newState`.
+> Nothing else is allowed in.**
+
+No reading the clock (`Date.now()`, `new Date()`). No random numbers
+(`Math.random()`). No reading or writing `localStorage`. No touching the
+DOM. No network requests. No reading a file. No reading or writing any
+variable declared outside the reducer function itself. Every one of those
+is a way for the *same* `(oldState, action)` pair to produce a *different*
+`newState` on two separate calls — the exact property a pure function must
+never have. `angleMode` read from outside would have broken this law the
+same way `Date.now()` would have, for identical reasons — this project
+will reference this exact law again, by name, every time a reducer
+threatens to reach outside its own two arguments.
 
 ---
 
@@ -291,6 +355,9 @@ object instead of one variable.
 - [ ] You can explain why `scientificMode` and `angleMode` were left as `useState`
 - [ ] You can explain what would go wrong if a reducer branch mutated `state` instead of returning a new object
 - [ ] You can explain why `angleMode` had to travel inside the `"function"` action instead of the reducer just reading it directly
+- [ ] You can state, from memory, the general law a reducer must never break, and list at least four kinds of outside access it forbids
+- [ ] You can explain why "reducer" is the same shape as `Array.prototype.reduce`
+- [ ] You can name Redux and explain how this project's action/reducer/dispatch vocabulary maps onto it
 
 ---
 

@@ -56,15 +56,34 @@ Click **▶ Preview**. The same ten buttons appear, in the same order —
 identical output to lesson 03, from four lines of new code instead of ten
 repeated ones.
 
-**Walkthrough — `digitLabels`, a plain array.** `["7", "8", "9", ...]` is
-an **array literal**: an ordered list of values, here ten strings, stored
-in one variable. Nothing about it is React-specific — this is the same
-kind of value the TypeScript Spreadsheet project stored cell ranges in.
-Placing it *outside* the `Keypad` function (at the top level of the file,
-running once when the file loads) rather than *inside* it matters: if it
-were declared inside `Keypad`, a brand-new array would be created every
-single time `Keypad` re-renders, for no reason — the list of digits never
-changes, so it only needs to be built once.
+**Walkthrough — `digitLabels`, a plain array, and precisely what that
+means.** `["7", "8", "9", ...]` is an **array literal**: an **array** —
+an **ordered**, **indexed** collection of values, meaning each value has a
+fixed position (`digitLabels[0]` is `"7"`, `digitLabels[1]` is `"8"`, and
+so on), retrievable by that position, and the collection's length can
+change over time (an array is not fixed-size, unlike some lower-level
+languages' arrays). Nothing about any of this is React-specific — this is
+the same kind of value the TypeScript Spreadsheet project stored cell
+ranges in, and the same data structure every language with arrays at all
+provides. Placing it *outside* the `Keypad` function (at the top level of
+the file, running once when the file loads) rather than *inside* it
+matters: if it were declared inside `Keypad`, a brand-new array would be
+created every single time `Keypad` re-renders, for no reason — the list of
+digits never changes, so it only needs to be built once.
+
+**A precise, important fact about arrays worth stating now, used constantly
+from here on: they are reference types.** Assigning an array to a second
+variable, `const copy = digitLabels;`, does **not** create a second,
+independent array — `copy` and `digitLabels` both point to the exact same
+underlying array in memory; changing one through either name changes what
+both see. This is called being a **reference type**, in contrast to a
+**value type** like a `number` or `string`, where `const b = a;` genuinely
+copies the value, and changing `b` afterward has no effect on `a` at all.
+This exact distinction is why lesson 06's array and object updates always
+build a *new* array or object (`[...array, item]`) rather than modifying
+one in place — modifying a reference type in place changes it for every
+name pointing at it, which is almost never what's actually wanted when
+that array is React state.
 
 **Walkthrough — `.map()`, your first array method in this project.**
 `digitLabels.map((label) => (...))` is a built-in JavaScript array method.
@@ -75,6 +94,29 @@ string (`label`, e.g. `"7"`) and returns one JSX element,
 `<Button key="7" label="7" />`. The result of the whole `.map()` call is
 an array of ten JSX elements — and React knows how to render an array of
 elements exactly the way it renders one, placing each in order.
+
+**SE lens — this is the actual beginning of "data-driven UI," a phrase
+worth being able to back up with a real example now.** Before this
+lesson, `Keypad`'s ten buttons existed because ten lines of JSX said so —
+the *code itself* was the only description of what buttons existed. After
+this lesson, the buttons exist because `digitLabels` says so — the code
+(`.map()`) is now a fixed, generic instruction ("render one `Button` per
+entry"), and the actual content lives entirely in a plain array. This is
+the concrete, checkable meaning behind "data-driven": changing what's on
+screen becomes a matter of changing *data*, not rewriting *markup* — which
+is precisely why lesson 15's second row of scientific buttons and lesson
+28's `Tabs` component (driven by a `routes` array, not hardcoded tab
+names) both reuse this exact shape without it needing to be reinvented.
+
+**CS lens — visiting every element of a collection, once each, in order,
+is called traversal.** `.map()` is one specific, common shape of
+**traversal**: visit every item, transform it, keep the result. Not every
+traversal transforms — some just look (searching for one matching item),
+some just act (printing each one) — but the "visit each element exactly
+once" shape underneath is the same one, and it's worth recognizing by name
+every time it appears, because it appears constantly: lesson 22's
+`.filter()`, lesson 24's `.reduce()`, and ordinary `for` loops are all
+traversals too, differing only in what they do with each element visited.
 
 `(label) => ( ... )` is an **arrow function** — shorthand for `function
 (label) { return ( ... ); }`. The parentheses around the JSX
@@ -116,6 +158,23 @@ falls back to matching purely by position (item 0, item 1, item 2...) —
 which silently breaks the moment items are inserted, removed, or reordered
 anywhere but the very end, because "item 3" no longer refers to the same
 logical thing it did before.
+
+**How the diffing algorithm actually uses `key`, at a level worth
+knowing.** When `Keypad` re-renders, React has two lists of `<Button />`
+elements to compare: the one from last render, and the new one from this
+render. Without keys, React compares them position by position — element 0
+against element 0, element 1 against element 1 — which is correct only if
+nothing has been added, removed, or reordered. With keys, React instead
+builds a lookup from key to element for *both* lists, and matches entries
+by key first: an element whose key existed in both the old and new list is
+recognized as "the same logical thing, possibly with different props now"
+and is *updated* in place rather than destroyed and rebuilt; a key present
+only in the new list is a genuinely new element to *create*; a key present
+only in the old list is one to *remove*. This key-based matching is
+**identity** — reconciliation's whole job is answering "is this the same
+thing as before, or a different thing that merely looks similar?", and
+`key` is the one piece of information your code provides to answer it
+correctly instead of by position-guessing.
 
 Right now, this list never changes — the keys aren't yet load-bearing for
 correctness, only for silencing the warning. **Forward connection:**
@@ -180,6 +239,8 @@ to never depend on position.
 - [ ] ▶ Preview shows the same ten buttons, in the same order, as lesson 03
 - [ ] You can explain what `.map()` returns, and that it does not modify the original array
 - [ ] You can explain what problem the `key` prop solves, and why index-as-key is risky
+- [ ] You can explain what makes an array a "reference type," using `const copy = digitLabels` as the example
+- [ ] You can describe, in your own words, how React's diffing algorithm uses keys to match old elements to new ones
 
 ---
 

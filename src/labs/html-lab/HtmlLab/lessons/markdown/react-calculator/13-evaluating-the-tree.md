@@ -42,8 +42,13 @@ anything for the current node — a `binary` node's value is only knowable
 once both of its children have their own values, and *those* might
 themselves be `binary` nodes needing the same treatment first. This is
 **tree recursion**: the function's structure directly mirrors the
-recursive structure of the data it's processing. `2+3×4`'s tree evaluates
-correctly not because of any special-case logic, but because
+recursive structure of the data it's processing. Lesson 12 defined a
+recursive function's two required parts; here, `{ kind: "number" }` is the
+**base case** — a leaf node lesson 02's tree vocabulary already named,
+answered directly with no further recursive call — and `{ kind: "binary" }`
+is the **recursive case**, always calling `evaluateNode` on smaller
+pieces (its own children) until it bottoms out at leaves. `2+3×4`'s tree
+evaluates correctly not because of any special-case logic, but because
 `evaluateNode` is called on the `×` subtree (`3×4 → 12`) as an ordinary
 step in evaluating the outer `+` node (`2+12 → 14`) — the nesting the
 parser built is exactly what makes the correct order happen automatically.
@@ -57,6 +62,23 @@ about *how this calculator behaves*, not a fact about division itself.
 specific, human-readable message, instead of letting `12 / 0` silently
 become JavaScript's own `Infinity` and continue on as if nothing went
 wrong — the exact gap named honestly back in lesson 09.
+
+**CS lens — the call stack, and why deep recursion has a real limit.**
+Every time `evaluateNode` calls itself, the calling environment — which
+node it's on, whether it's waiting on the left or right child — is pushed
+onto the **call stack**, a real, finite region of memory tracking every
+function call currently in progress, waiting to resume once the call it
+made returns. `2+3×4`'s tree is only three levels deep, so this is
+invisible in practice — but an expression with thousands of nested
+parentheses would push thousands of stack frames before the first base
+case is ever reached, and every real language's call stack has a genuine
+size limit. Exceeding it throws a real, specific error — `RangeError:
+Maximum call stack size exceeded` in JavaScript — a **stack overflow**, a
+real failure mode of recursive code, not a defect unique to this project.
+This project's expressions are short enough by construction that this
+limit is never a practical concern, but it's worth knowing by name, since
+it's the honest cost every recursive solution (this evaluator, the parser,
+even `.reduce()` implemented recursively) implicitly carries.
 
 **CS lens — reusing the dispatch table.** `OPERATORS[node.operator]` is the
 same lookup used in `handleOperator` since lesson 08 — a tree node's
@@ -120,6 +142,37 @@ is a **type guard** — a runtime check that also narrows the type for
 TypeScript afterward — confirming this specific caught value really is an
 `Error` object (which every `throw` in this project's own code actually
 is) before trusting it has a `.message` property at all.
+
+**SE lens — domain errors versus programmer errors, the real distinction
+behind this design.** "Division by zero" is a **domain error** — a failure
+that's a completely normal, expected part of the problem this program
+solves; any calculator will eventually be asked to divide by zero, and the
+right response is a clear, handled message, never a crash. A **programmer
+error** — calling a function with the wrong number of arguments, accessing
+a property on `undefined` due to an actual coding mistake — represents a
+genuine bug that should be fixed in the code, not gracefully handled at
+runtime. `CalculatorResult` exists specifically for the first category:
+`evaluate` returns `{ kind: "error", ... }` for the kinds of failure a
+correct calculator must expect and handle every day, while an actual
+programmer error elsewhere in this project's own code (say, `OPERATORS[node.operator]`
+being called with a key that was never registered, from lesson 09's
+typo scenario) is still allowed to throw and crash loudly — because that
+represents the code itself being wrong, not the user's input being
+invalid, and a loud crash during development is far more useful than a
+quietly swallowed bug.
+
+**Connect to the real world — this pattern has a name in nearly every
+modern language, and this project just built its own version.** Rust's
+standard library has `Result<T, E>`, an enum with exactly the same two
+shapes as `CalculatorResult` — `Ok(value)` or `Err(error)` — used
+pervasively throughout the entire language specifically so that every
+function whose caller might need to handle failure says so directly in
+its own return type. Haskell's `Either` is the same idea under a different
+name. TypeScript has no built-in equivalent, which is exactly why this
+project (and the TypeScript Spreadsheet series before it) had to define
+`CalculatorResult` by hand — the pattern is powerful enough that
+languages without it in the standard library tend to have it reinvented,
+by convention, in nearly every serious codebase written in them.
 
 **SE lens — why not make `tokenize` and `parsePrimary` return
 `CalculatorResult` too, instead of throwing?** That's a completely
@@ -185,6 +238,9 @@ last resort as a first line of defense).
 - [ ] `evaluate("5÷0")` returns a real error, not `Infinity`
 - [ ] You can explain why `try`/`catch` only appears inside `evaluate`, nowhere else
 - [ ] You can explain what `error instanceof Error` checks and why it's needed
+- [ ] You can explain the difference between a domain error and a programmer error, using this lesson's design as the example
+- [ ] You can name at least one real language whose standard library has a built-in equivalent of `CalculatorResult`
+- [ ] You can explain what a stack overflow is and why this project's expressions are safely short of it
 
 ---
 

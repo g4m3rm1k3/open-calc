@@ -31,6 +31,21 @@ buttons. `"Keypad rendered"` prints once for **every single press** — not
 just the button you clicked, the entire `Keypad` component, all fourteen
 of its buttons, every time.
 
+**CS lens — naming what's actually happening: reconciliation, revisited.**
+Lesson 04 first named **reconciliation** — React's process of comparing a
+new render's output to the previous one to decide what the real DOM
+actually needs to change. What this step reveals is a detail reconciliation
+doesn't fix on its own: reconciliation decides *what to change in the DOM*,
+but by default, every child component still **re-renders** — its function
+body runs again, computing a fresh description of its UI — regardless of
+whether reconciliation will find any actual difference once that
+description is compared. Re-rendering `Keypad` fourteen times over,
+producing an identical result each time, is wasted *computation*, even
+though reconciliation itself correctly ensures the real DOM buttons are
+never actually touched. `React.memo` targets the wasted computation
+specifically — skipping the re-render itself, not just the DOM update
+reconciliation would have skipped anyway.
+
 **Walkthrough — why this happens, mechanically.** React's default
 behavior, with no optimization applied anywhere, is: when a component
 re-renders, **every child it renders re-renders too**, regardless of
@@ -134,6 +149,19 @@ Since `dispatch` never changes, `handleDigit` and the rest are computed
 once, ever, and reused for every subsequent render — which is exactly the
 stable reference `React.memo(Keypad)` needed to finally do its job.
 
+**SE lens — `React.memo` is the same trade-off `useMemo` named in lesson
+25, applied to components instead of values.** `React.memo` doesn't make
+`Keypad` free — it replaces "re-render and produce output" with "compare
+every prop for shallow equality," a real cost of its own, just usually
+much smaller. Wrapping every component in the entire project in
+`React.memo` by default, the way wrapping every value in `useMemo` would
+be premature optimization, carries the identical risk: components that
+re-render cheaply and rarely (`Display`, showing one string) pay a real
+comparison cost on every render for a savings that was never actually
+needed. `Keypad` earned the wrap here because Step 1 *measured* a real,
+repeated, wasted cost across fourteen buttons — the same measure-first
+discipline, not a rule to apply reflexively everywhere.
+
 **CS lens — memoizing the boundary, not every leaf.** It would be
 possible to wrap every individual `Button` in `React.memo` instead of
 `Keypad`. It wouldn't work as cleanly: each `Button` would still receive a
@@ -144,6 +172,22 @@ that owns the decision "should any of my fourteen children even be asked
 to reconsider what they render" — solves the problem for the entire
 subtree underneath it in one place, rather than needing the same fix
 repeated fourteen times.
+
+**Connect to the real world — this is what "profiling" means, and why
+it's a real professional practice, not guesswork.** This entire lesson
+followed a real, disciplined process: *observe* a problem (the
+`console.log` count), *form a hypothesis* about the cause (unstable
+function props defeating `React.memo`), *test the fix*, and *confirm* with
+the same measurement used to find the problem in the first place. This
+process — measuring actual behavior before and after a change, rather than
+guessing at what "feels" faster — is called **profiling**, and React
+DevTools (a real browser extension, separate from the ordinary DevTools
+this project has used since lesson 01) provides a dedicated Profiler tab
+that visualizes exactly this: which components rendered, how often, and
+why, for a real running React application. The `console.log` technique
+this lesson used is a legitimate, real, low-tech version of the identical
+practice — useful specifically because it requires no additional tooling
+to try immediately, on any component, right now.
 
 ---
 
@@ -176,6 +220,8 @@ actual cause.
 - [ ] You can explain why `React.memo` alone didn't fix the re-render problem
 - [ ] You can explain why `[dispatch]` as a `useCallback` dependency means "never recreate this function"
 - [ ] You can explain why memoizing `Keypad` fixes all fourteen buttons at once, rather than needing to memoize each individually
+- [ ] You can explain the difference between reconciliation (skipping DOM changes) and `React.memo` (skipping the re-render itself)
+- [ ] You can explain why `React.memo` isn't applied to every component in this project by default
 
 ---
 

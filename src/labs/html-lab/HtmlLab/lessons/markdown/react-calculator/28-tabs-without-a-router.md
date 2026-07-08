@@ -41,6 +41,38 @@ function useHashRoute(defaultRoute: string): [string, (route: string) => void] {
 }
 ```
 
+**Walkthrough — the return type, `[string, (route: string) => void]`, a
+tuple, and why it deliberately copies `useState`'s own shape.** A
+**tuple** is a fixed-length array where each *position* has its own,
+specific meaning — position 0 is always the current route, position 1 is
+always the function that changes it — as opposed to an ordinary array,
+where every element is understood to hold the same kind of thing. This is
+not an accident of convenience: `useHashRoute` is written to return
+`[route, setRoute]` on purpose, in that order, specifically so calling it
+*feels* exactly like calling `React.useState`, which has returned
+`[value, setValue]` since lesson 05. TypeScript's array destructuring
+doesn't care about names — `const [route, setRoute] = useHashRoute(...)`
+works because of *position*, not because either side wrote the word
+`route` — the caller is free to name them anything (`const [view, goTo] =
+useHashRoute(...)` would work identically). This is the same reason
+`useState`'s own convention exists: a tuple lets the caller pick meaningful
+names for each render, which a fixed-name object return (`{ value, setValue
+}`) would not allow without renaming during destructuring every time.
+
+**Walkthrough — `useHashRoute` is a custom hook, and what makes that
+official rather than just "a function that happens to use hooks."** A
+function only counts as a real React hook — subject to the Rules of Hooks
+first mentioned back when `useState` was introduced, and eligible to call
+other hooks (`useState`, `useEffect`) inside itself — if its name starts
+with `use`. This isn't cosmetic: React's own tooling (the linter that
+enforces the Rules of Hooks) and React itself both use the `use` prefix to
+recognize which functions are allowed to call hooks internally and which
+call sites must therefore also follow the same rules (always called at the
+top level of a component or another hook, never inside a condition or
+loop). `useHashRoute` earns the name honestly — it calls `useState` and
+`useEffect` inside itself, and packages both up behind one clean function
+any component can call.
+
 **Walkthrough — `window.location.hash`, a browser API used for the first
 time.** Every URL can carry a **hash fragment** — the part after a `#`,
 like `#scientific`. Uniquely among the parts of a URL, changing the hash
@@ -77,6 +109,41 @@ all of that, a router is fundamentally this: read the current URL, decide
 what to render based on it, and update the URL when navigation happens.
 Nothing about that core idea is more mysterious in a full library than it
 is here.
+
+**Connect to the real world — the other way routers keep state in the URL,
+and why this project uses the older one.** `HashRouter`, used by this
+entire platform, is one of two real strategies real routers use.
+`BrowserRouter` (`react-router-dom`'s other option) uses the actual URL
+path (`/lab/html-lab`, no `#`) together with a different browser API,
+`history.pushState`, and listens for a different event, `popstate`, rather
+than `hashchange` — from a user's perspective the address bar looks
+cleaner, without a `#`. The trade-off is real: a path-based URL only works
+correctly if the *server* is configured to respond to every possible path
+by serving the same single-page app (otherwise reloading `/lab/html-lab`
+directly, or sharing that link, hits a real server 404, since no such file
+or route exists there) — a hash fragment, by contrast, is never even sent
+to the server at all, so a plain static file server handles it correctly
+with zero configuration. `useHashRoute` picked the hash strategy for the
+identical reason this whole platform did: no server-side routing
+configuration required.
+
+**CS lens — three homes for state now exist in this project, and choosing
+between them is a real, named design decision.** `expression`
+(`useReducer`, since lesson 18) lives in **component state** — private to
+one running instance of `Calculator`, gone the moment it unmounts.
+`formulas` (`useState` plus `useEffect`, lesson 23) lives in **persisted
+storage** — `localStorage`, outliving the page itself, but invisible to
+the URL and therefore not shareable as a link. `route`, as of this lesson,
+lives in **URL state** — visible in the address bar, bookmarkable, and
+restorable by the browser's own back/forward buttons, but gone the instant
+the page is closed, exactly like component state. None of these three is
+strictly "better" — each is the right home for a specific kind of value,
+and the actual engineering skill this project has been building toward is
+recognizing, for any new piece of state, which of the three it actually
+belongs in: something private and disposable belongs in component state;
+something a user would be upset to lose belongs in persisted storage;
+something a user would want to share, bookmark, or navigate back to
+belongs in the URL.
 
 ---
 
@@ -119,6 +186,22 @@ renders whatever list of `{ key, label }` pairs it's given, highlighting
 whichever one matches `activeRoute`. This is composition again, the same
 instinct from lesson 02: `Tabs` is reusable for any set of named views,
 because it was never written to know about calculators specifically.
+
+**PL lens — `onNavigate`, and the naming convention this project has
+followed silently since `onDigit` in lesson 04.** Every callback prop this
+project has ever defined — `onDigit`, `onOperator`, `onEquals`,
+`onSignChange`, and now `onNavigate` — is named starting with **`on`**,
+describing an *event from the child's point of view* ("a navigation
+happened"), never what the parent actually does in response. The function
+actually passed in from the parent, by contrast, is conventionally named
+starting with **`handle`** — `handleDigit`, `handleOperator` (lesson 26)
+— describing the parent's own reaction. This isn't enforced by TypeScript
+or React at all; it's a naming convention, a shared habit professional
+React codebases follow so that, at a glance, `onX` always means "a prop
+this component calls outward" and `handleX` always means "a function this
+component defined to handle something." `Tabs` itself never needs to know
+what clicking a tab actually *does* — only that `onNavigate` is a function
+it should call, with the clicked route's key, whenever a tab is clicked.
 
 ---
 
@@ -198,6 +281,9 @@ actual cause.
 - [ ] Manually editing the hash and pressing Enter also switches the active tab
 - [ ] You can explain what a `useEffect` cleanup function does and why this hook needed one
 - [ ] You can explain, in your own words, what a router fundamentally does
+- [ ] You can explain why `useHashRoute` returns a tuple instead of an object, and how that mirrors `useState`
+- [ ] You can explain the three homes state can live in this project (component, storage, URL) and how to choose between them
+- [ ] You can explain the `on`-prefix versus `handle`-prefix naming convention for event props versus their implementations
 
 ---
 

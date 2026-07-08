@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import Prism from 'prismjs'
 import '../../styles/prism-blog.css'
+import 'prismjs/components/prism-markup'
+import 'prismjs/components/prism-markup-templating'
 import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-jsx'
+import 'prismjs/components/prism-tsx'
 import 'prismjs/components/prism-bash'
 import 'prismjs/components/prism-c'
 import 'prismjs/components/prism-cpp'
@@ -18,8 +22,6 @@ import 'prismjs/components/prism-haskell'
 import 'prismjs/components/prism-kotlin'
 import 'prismjs/components/prism-scala'
 import 'prismjs/components/prism-csharp'
-import 'prismjs/components/prism-markup'
-import 'prismjs/components/prism-markup-templating'
 import 'prismjs/components/prism-php'
 import 'prismjs/components/prism-swift'
 import 'prismjs/components/prism-powershell'
@@ -93,12 +95,46 @@ export function CopyButton({ getText }) {
   )
 }
 
+// Prism tokenizes `{`, `(`, `[` as flat "punctuation" tokens with no idea of
+// nesting depth. This walks Prism's already-escaped HTML output, treating
+// any `<...>` run as an opaque tag (safe — Prism escapes literal `<`/`>` in
+// code as `&lt;`/`&gt;`, so a raw `<` in the string is always one of Prism's
+// own tags, never source text) and wraps each bracket character found in a
+// real text run with a depth-indexed span, cycling through RAINBOW_DEPTH
+// colors defined in prism-blog.css. Depth is shared across all three
+// bracket kinds, matching how editors' rainbow-bracket features read visual
+// nesting (JSX/TSX mixes `{}`/`()`/`[]` constantly within one nested shape).
+const RAINBOW_DEPTH = 6
+const OPEN_BRACKETS = new Set(['{', '(', '['])
+const CLOSE_BRACKETS = new Set(['}', ')', ']'])
+
+export function rainbowifyBrackets(html) {
+  let depth = 0
+  return html.replace(/(<[^>]+>)|([^<]+)/g, (_match, tag, text) => {
+    if (tag) return tag
+    let out = ''
+    for (const ch of text) {
+      if (OPEN_BRACKETS.has(ch)) {
+        out += `<span class="rainbow-bracket-${depth % RAINBOW_DEPTH}">${ch}</span>`
+        depth += 1
+      } else if (CLOSE_BRACKETS.has(ch)) {
+        depth = Math.max(0, depth - 1)
+        out += `<span class="rainbow-bracket-${depth % RAINBOW_DEPTH}">${ch}</span>`
+      } else {
+        out += ch
+      }
+    }
+    return out
+  })
+}
+
 export function HighlightedCode({ code, language }) {
   const prismKey = PRISM_LANG[language] || language
   const grammar = Prism.languages[prismKey]
-  const html = grammar
+  const highlighted = grammar
     ? Prism.highlight(code, grammar, prismKey)
     : code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const html = rainbowifyBrackets(highlighted)
   const lineCount = code.split('\n').length
   const gutterWidth = String(lineCount).length
   const lineNums = Array.from({ length: lineCount }, (_, i) =>

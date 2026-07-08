@@ -93,3 +93,24 @@
 .dark .token.symbol { color: #f8c555; }
 
 .dark .token.inserted { color: #7ec699; }
+
+/* ── Rainbow brackets ────────────────────────────────────────────────────────
+   Depth-cycled colors for {}/()/[] — applied by rainbowifyBrackets() in
+   codeDisplay.jsx as an extra span layered inside Prism's own punctuation
+   token, so it overrides the flat .token.punctuation color above (a more
+   specific/later-applied color on the same element always wins, regardless
+   of the ancestor token's color). Six depths cycle for code nested deeper
+   than that, matching how editor rainbow-bracket extensions behave. */
+.rainbow-bracket-0 { color: #b58900; }
+.rainbow-bracket-1 { color: #d33682; }
+.rainbow-bracket-2 { color: #268bd2; }
+.rainbow-bracket-3 { color: #2aa198; }
+.rainbow-bracket-4 { color: #cb4b16; }
+.rainbow-bracket-5 { color: #6c71c4; }
+
+.dark .rainbow-bracket-0 { color: #ffd700; }
+.dark .rainbow-bracket-1 { color: #da70d6; }
+.dark .rainbow-bracket-2 { color: #87cefa; }
+.dark .rainbow-bracket-3 { color: #98fb98; }
+.dark .rainbow-bracket-4 { color: #ff8c69; }
+.dark .rainbow-bracket-5 { color: #dda0dd; }

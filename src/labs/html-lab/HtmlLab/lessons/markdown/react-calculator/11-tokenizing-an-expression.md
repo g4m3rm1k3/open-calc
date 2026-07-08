@@ -89,11 +89,48 @@ function tokenize(source: string): Token[] {
 }
 ```
 
-**Walkthrough — the main loop.** `position` tracks which character of
-`source` is being examined right now, starting at `0` and advancing until
-every character has been consumed. This is **lexing** — scanning input one
-piece at a time, left to right, exactly the same technique the TypeScript
-Spreadsheet project's own `Token` scanner used for spreadsheet formulas.
+**Walkthrough — the main loop, and what "algorithm" means, precisely.**
+`position` tracks which character of `source` is being examined right
+now, starting at `0` and advancing until every character has been
+consumed. This whole function is an **algorithm** — a finite, precise,
+step-by-step procedure for solving one specific problem, guaranteed to
+finish — and it's worth being able to name its shape: `tokenize` looks at
+`source` exactly once, left to right, never revisiting a character once
+`position` has moved past it. An algorithm that examines each of `n` input
+items a constant number of times is said to run in **O(n) time** ("order
+n," or "linear time") — its cost grows directly in proportion to the
+input's length, not faster. This won't matter for a calculator expression
+a person can type (a handful of characters), but naming it now means
+lesson 25's discussion of a genuinely *slow* algorithm has real vocabulary
+to contrast against. This scanning technique itself is called **lexing**
+— scanning input one piece at a time, left to right — exactly the same
+technique the TypeScript Spreadsheet project's own `Token` scanner used
+for spreadsheet formulas.
+
+**CS lens — how `character >= "0" && character <= "9"` actually works.**
+JavaScript compares strings character by character using each character's
+underlying numeric **code point** — every character a computer can
+display is really stored as a number (`"0"` is code point 48, `"9"` is
+57, following the ASCII standard almost every text encoding still
+preserves for these characters). `">="` and `"<="` on single-character
+strings compare those numbers directly, which is exactly why this range
+check correctly matches every digit character and nothing else — it isn't
+comparing digits mathematically, it's comparing them as the specific,
+consecutive block of code points ASCII happens to assign the ten digit
+characters.
+
+**CS lens — "maximal munch," the formal name for what the digit-scanning
+loop does.** Consuming the *longest possible* match at each position
+before producing a single token — reading all of `"42"` as one number
+instead of stopping after `"4"` — is a real, named strategy in compiler
+theory called **maximal munch** (or "longest match"). It's the standard
+rule real-world lexers follow specifically to avoid the exact ambiguity
+named in "What Breaks Without This" below: without it, there would be no
+principled way to know whether to stop consuming digits after one
+character or several. Naming the strategy is what turns "obviously you
+keep reading digits" into a rule that generalizes — the identical
+principle is what lets a real language's lexer correctly read `variable1`
+as one identifier token instead of `variable` followed by `1`.
 
 **Walkthrough — the digit-scanning inner loop.** A single digit character
 isn't a complete number by itself — `"42"` needs both `"4"` and `"2"`
@@ -190,6 +227,8 @@ two digits in a row).
 - [ ] `tokenize` correctly turns `"2+3×4"` into five tokens: number, plus, number, multiply, number
 - [ ] Multi-digit numbers produce one token, not one per digit
 - [ ] You can explain what lexing is and why it's a separate step from parsing
+- [ ] You can explain why `"0" <= character <= "9"` works, in terms of character code points
+- [ ] You can explain what "maximal munch" means and why the digit loop needs it
 
 ---
 

@@ -172,6 +172,48 @@ Already demonstrated, live: `sin(30)` (meant as 30 degrees) returns the
 sine of 30 radians instead — a wrong answer for the single most common
 way anyone would actually try to use this feature.
 
+**SE lens — the deeper lesson: a plain `number` doesn't encode meaning; a
+well-designed type does.** `sin(value: number)` accepted a `number` and
+told TypeScript nothing about what that number was supposed to *mean* —
+degrees, radians, dollars, milliseconds, all look identical to the type
+checker, all are just `number`. This is a real, general limitation worth
+naming: **domain modeling** is the practice of choosing types that encode
+the actual meaning of the values a program handles, not just their raw
+shape. A stricter version of this project could define `type Degrees =
+number` and `type Radians = number` as distinct types and require an
+explicit conversion function between them — TypeScript's structural typing
+(lesson 03) would still treat both as plain numbers underneath, but naming
+them differently in code is itself a real, if imperfect, defense: it
+forces a reader (and a careful function signature) to say *which* unit is
+expected, rather than leaving it to be assumed and occasionally guessed
+wrong, exactly the way this project's own `sin` did until this lesson
+caught it.
+
+**PL lens — a real, named technique for going further than a type alias:
+branded types.** `type Degrees = number` is only a label — TypeScript's
+structural typing (lesson 03) means a plain `number` is still accepted
+anywhere a `Degrees` is expected, since they're structurally identical.
+Real TypeScript codebases that need the type checker to actually *enforce*
+the distinction use a pattern called a **branded type**: `type Degrees =
+number & { readonly __brand: "Degrees" }`, adding a property that no
+ordinary number actually has, so that only a value deliberately constructed
+(and explicitly cast) as a `Degrees` type-checks where one is required — a
+plain `30` no longer satisfies it by accident. This project doesn't adopt
+that pattern (it's real extra ceremony for a project this size), but
+knowing it exists matters: it's the actual production-grade answer to "how
+do I stop a degree value and a radian value from ever being silently
+interchangeable," rather than just a naming convention a reader has to
+remember to respect.
+
+**Walkthrough — the actual conversion formula, previewed ahead of lesson
+17's fix.** Degrees and radians relate by one exact formula: `radians =
+degrees × (π / 180)`. `Math.PI`, another built-in constant on the same
+`Math` object `Math.sin` came from, holds JavaScript's most precise
+available approximation of π. `30 × (Math.PI / 180)` correctly produces
+`≈0.524` radians — the value `Math.sin` needed all along, and precisely
+what lesson 17's fix computes before ever calling `sin`, once there's a
+real place in the calculator's state to know which unit was intended.
+
 ---
 
 ## Definition of Done
@@ -181,6 +223,8 @@ way anyone would actually try to use this feature.
 - [ ] You can explain what a radian is and why it differs from a degree
 - [ ] You can explain why this bug has the same underlying shape as lesson 10's
 - [ ] You can explain, in your own words, what went wrong with the Mars Climate Orbiter and why it's the same category of bug
+- [ ] You can explain what a branded type is and why a plain type alias doesn't stop degree/radian mixups
+- [ ] You can state the degrees-to-radians formula from memory
 
 ---
 

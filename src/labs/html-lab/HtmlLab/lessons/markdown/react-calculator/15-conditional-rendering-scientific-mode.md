@@ -18,6 +18,21 @@ percent, and sign-change.
 
 ## Step 1 — A Boolean Piece of State
 
+**Booleans, from first principles, since this project hasn't needed one
+until now.** Every value used as state so far has been a `string` or a
+`number`. `scientificMode` introduces a **boolean** — a value that is
+always exactly one of two things, `true` or `false`, nothing in between
+and nothing else. Booleans come from **Boolean algebra**, a branch of
+mathematics dealing entirely in true/false values and the operations that
+combine them: **AND** (both sides must be true), **OR** (at least one side
+must be true), and **NOT** (flips true to false and false to true).
+JavaScript spells these `&&`, `||`, and `!`. `!scientificMode` is `NOT
+scientificMode` — read literally, "the opposite of whatever
+`scientificMode` currently is": if `scientificMode` is `true`,
+`!scientificMode` is `false`, and vice versa. This one piece of math
+underlies every `if`, every conditional render, and every toggle this
+entire project builds from here on.
+
 In `Calculator.tsx`, add one more state variable alongside `expression` and
 `result`:
 
@@ -35,6 +50,23 @@ initial value alone doesn't tell the whole story, like `null` needing to
 be widened to `string | null`.
 
 ---
+
+**PL lens — naming a boolean, and why `scientificMode` doesn't follow the
+usual convention.** A very common, widely-followed naming convention for
+booleans prefixes them with `is`, `has`, `can`, or `should` —
+`isLoading`, `hasError`, `canSubmit` — specifically so that reading the
+name alone, with no type annotation visible, tells you it's a yes/no flag
+rather than a string or number. `scientificMode` deliberately doesn't
+follow it, for a specific, honest reason: this project already uses
+`AngleMode`/`Theme` (lesson 29) as the name for a *non-boolean* mode
+setting with more than two states — naming this flag `isScientificMode`
+would read fine on its own, but `scientificMode` was chosen instead to
+keep it visually paired with those other "mode" settings while it's still
+just a boolean here. This is a real, judgment-call-level naming decision,
+worth noticing precisely because reasonable engineers could make it either
+way — the `is`/`has`/`can` convention is a strong default, not an
+absolute rule, and knowing why a particular case might deviate from it is
+part of using the convention well rather than mechanically.
 
 ## Step 2 — Render (or Don't) Based on the Flag
 
@@ -100,6 +132,35 @@ must be *something* regardless of which mode is active, not "something, or
 nothing." `&&` is the right tool when the false case should render
 nothing; a ternary is the right tool when both cases need a real, different
 result.
+
+**Expressions versus statements, named explicitly, because this whole
+technique depends on the difference.** An **expression** is any piece of
+code that evaluates to a value — `2 + 2`, `scientificMode`, `scientificMode
+&& <ScientificPad />` are all expressions; each one *is* a value once
+evaluated. A **statement** is an instruction that performs an action but
+doesn't itself produce a value to be used elsewhere — `if
+(scientificMode) { ... }` is a statement; it cannot be dropped inside `{ }`
+in JSX, because JSX's curly braces only accept something that evaluates to
+a value. This is the precise, technical reason `if` cannot be used
+directly inside JSX, and `&&`/ternary can: `&&` and `?:` are **operators**
+— symbols that combine expressions into a new, larger expression — while
+`if` is statement syntax. `&&`'s own **evaluation rule** — check the left
+side first; if it's falsy, stop and return it; otherwise evaluate and
+return the right side — is called **short-circuit evaluation**, and it's
+also why `&&`'s right side is never even evaluated when the left side is
+falsy: not "evaluated but ignored," genuinely never run at all.
+
+**Truthy, falsy, and coercion — the rule `&&` actually follows.**
+JavaScript will convert, or **coerce**, any value to a boolean when a
+boolean is needed for a decision, using a fixed rule: exactly six values —
+`false`, `0`, `""` (empty string), `null`, `undefined`, and `NaN` — coerce
+to `false`, called **falsy**. Every other value in the entire language,
+including `"0"` (a non-empty string), every non-empty array, and every
+object, coerces to `true`, called **truthy**. `&&`'s "is the left side
+falsy" check is exactly this coercion rule, applied silently, which is why
+memorizing that specific list of six falsy values matters — anything not
+on it behaves as `true` in a condition, even values that might look
+"empty" or "zero-ish" at a glance.
 
 **CS lens — this is why "conditional rendering" doesn't need new syntax.**
 A React component's job is to return a description of what the UI should
@@ -197,6 +258,10 @@ appear. The fix is to force a real boolean first — `{someCount > 0 &&
 - [ ] You can explain when a ternary is the better choice over `&&`
 - [ ] You can explain the difference between unmounting a component and hiding it with CSS
 - [ ] You can explain the classic `{count && <X />}` bug and how to avoid it
+- [ ] You can name AND, OR, and NOT, and give their JavaScript symbols
+- [ ] You can explain why `if` cannot be used directly inside JSX curly braces, but `&&` and `?:` can
+- [ ] You can list the six falsy values from memory
+- [ ] You can explain the `is`/`has`/`can` boolean naming convention and why `scientificMode` deviates from it
 
 ---
 

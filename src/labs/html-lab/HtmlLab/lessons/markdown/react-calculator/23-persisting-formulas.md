@@ -40,6 +40,20 @@ through the global `localStorage` object, the same way `document` and
 `Math` are globals the browser provides rather than the language itself
 defining them.
 
+**CS lens — a key-value store, the same general data shape as
+`OPERATORS` and `Record`, at the browser level instead of the language
+level.** `localStorage` is, structurally, a **key-value store** — data
+addressed by a unique string key, with no relationships or ordering
+between entries — the exact same shape lesson 09's `OPERATORS` dispatch
+table used inside a single running program. The difference is scope and
+lifetime: `OPERATORS` lives in one function's memory, for one page load;
+`localStorage` is a key-value store the *browser itself* maintains, per
+website, surviving far longer. Recognizing the same underlying shape
+(string keys, arbitrary values, lookup by key) reused at a different layer
+of the system — language-level object, browser-level storage, and later,
+a real database — is a large part of what makes unfamiliar tools faster
+to learn: the shape is often not new, only the scope it operates at.
+
 **Its real shape and real limits.** `localStorage.setItem(key, value)`
 stores one string under one string key; `localStorage.getItem(key)`
 retrieves it, returning `null` if that key was never set.
@@ -80,16 +94,35 @@ wrapper (`React.useState(loadFormulasFromStorage())` instead of
 would happen on **every single render** of `Calculator`, even though only
 the very first result is ever actually used.
 
-**Walkthrough — `JSON.parse`, the inverse of `JSON.stringify`.**
-`JSON.stringify` (used since lesson 10's debug panel) converts a
-JavaScript value into a JSON-formatted string. `JSON.parse` does the
-reverse: given a JSON string, it reconstructs the JavaScript value it
-represents — here, turning the stored text back into a real array of
-`SavedFormula` objects. `try`/`catch` around it guards against genuinely
-malformed stored text (someone editing `localStorage` by hand through
-DevTools, or a future version of this project changing what shape it
-expects to find there) — falling back to an empty array rather than
-crashing the whole calculator on load.
+**Walkthrough — `JSON.parse`, the inverse of `JSON.stringify`, and the
+formal names for both directions.** `JSON.stringify` (used since lesson
+10's debug panel) converts a JavaScript value into a JSON-formatted
+string — this direction, turning an in-memory value into a storable or
+transmittable form, is called **serialization**. `JSON.parse` does the
+reverse — turning stored or transmitted text back into a real, live
+JavaScript value — called **deserialization**. Every time this project
+saves anything outside its own running memory (here, `localStorage`; in a
+real production app, often a network request to a server) it must
+serialize first; every time it reads that same data back, it must
+deserialize before using it as real objects again. `try`/`catch` around
+`JSON.parse` guards against genuinely malformed stored text (someone
+editing `localStorage` by hand through DevTools, or a future version of
+this project changing what shape it expects to find there) — falling back
+to an empty array rather than crashing the whole calculator on load.
+
+**SE lens — persistence versus ephemeral state, named precisely.** Every
+piece of state this project built before this lesson — `expression`,
+`memory`, `scientificMode` — is **ephemeral**: it exists only in the
+browser's memory, for as long as the page happens to stay loaded, and
+vanishes completely the instant that page unloads, with no trace left
+anywhere. `formulas`, from this lesson on, is **persistent**: written to
+storage that outlives the page itself, recoverable the next time this
+project runs, even after the browser fully closes. Choosing which state
+deserves persistence and which doesn't is a real design decision, not an
+automatic one — this project's own `expression` deliberately stays
+ephemeral (a mid-typed calculation surviving a reload would be strange
+and confusing), while `formulas` deliberately doesn't (losing a saved
+formula on every reload would defeat the entire point of saving it).
 
 ---
 
@@ -174,6 +207,7 @@ crashing the entire application before a single button ever appears.
 - [ ] You can explain what `localStorage` is and that it's a browser API, not part of React
 - [ ] You can explain the three dependency-array shapes for `useEffect` and what each means
 - [ ] You can explain why formulas are loaded inside `useState`'s initializer function rather than a second `useEffect`
+- [ ] You can explain what a key-value store is and name another example of one at a different layer of this project
 
 ---
 

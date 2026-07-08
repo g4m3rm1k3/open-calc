@@ -80,3 +80,53 @@ export const MARKDOWN_LESSON_SERIES = Array.from(seriesByFolder.entries())
     }
   })
   .sort((a, b) => a.folder.localeCompare(b.folder))
+
+// Lesson prose cross-links each other with plain relative markdown links —
+// `[README](README.md)`, `[Video Notes](../video-notes/README.md)` — written
+// as if these files sat on a real filesystem the reader could browse. They
+// don't: this is a client-rendered SPA with no route or server endpoint for
+// an arbitrary "react-calculator/README.md" path, so letting the browser
+// navigate to `href` directly either 404s or (for the handful of links that
+// happen to collide with a real top-level file, e.g. "README.md") loads the
+// wrong document entirely. Resolve these against the already-loaded lesson
+// slugs instead, the same way a bundler resolves a relative import.
+function resolveRelativeSlug(currentSlug, href) {
+  if (!href || !href.endsWith('.md')) return null
+  if (/^[a-z][a-z0-9+.-]*:/i.test(href)) return null // real scheme (https:, mailto:, ...)
+  const currentDir = currentSlug.includes('/') ? currentSlug.split('/').slice(0, -1) : []
+  const parts = currentDir.concat(href.replace(/\.md$/, '').split('/'))
+  const resolved = []
+  for (const part of parts) {
+    if (part === '' || part === '.') continue
+    if (part === '..') resolved.pop()
+    else resolved.push(part)
+  }
+  return resolved.join('/')
+}
+
+// Finds which standalone lesson or series lesson/overview a resolved slug
+// points to, in the same shape LessonsPanel's `route` state already uses.
+export function findLessonEntryBySlug(slug) {
+  const standalone = MARKDOWN_LESSONS.find((l) => l.slug === slug)
+  if (standalone) return { seriesFolder: null, slug: standalone.slug, isOverview: false }
+  for (const series of MARKDOWN_LESSON_SERIES) {
+    if (series.overview && series.overview.slug === slug) {
+      return { seriesFolder: series.folder, slug: series.overview.slug, isOverview: true }
+    }
+    const lesson = series.lessons.find((l) => l.slug === slug)
+    if (lesson) return { seriesFolder: series.folder, slug: lesson.slug, isOverview: false }
+  }
+  return null
+}
+
+// Combines both steps: a markdown link's raw `href`, as written in a lesson
+// at `currentSlug`, resolved all the way to a navigable lesson-route target
+// — or `null` if it isn't an internal `.md` cross-reference, or doesn't
+// resolve to any lesson this app actually has loaded (e.g. a link to a real
+// source file like `src/docs/LESSON_CONTRACT.md`, which isn't a lesson at
+// all and has nowhere in this app to be shown).
+export function resolveLessonLink(currentSlug, href) {
+  const slug = resolveRelativeSlug(currentSlug, href)
+  if (slug === null) return null
+  return findLessonEntryBySlug(slug)
+}

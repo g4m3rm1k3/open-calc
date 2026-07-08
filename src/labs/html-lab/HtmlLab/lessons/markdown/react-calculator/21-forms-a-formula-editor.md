@@ -106,6 +106,45 @@ as empty too. After a successful save, `setName("")` and
 "submit and add another" form, confirmed the moment you see the fields go
 blank after clicking Save.
 
+**Walkthrough — `React.FormEvent`, a generic event type.** `handleSubmit`'s
+parameter, `event: React.FormEvent`, is itself a generic type (lesson 08
+named generics precisely) describing the object React hands every form-
+submission handler: which real DOM element the event happened on, methods
+like `preventDefault()`, and — for more specific event types this project
+hasn't needed yet, like `React.ChangeEvent<HTMLInputElement>` for
+`onChange` above — exactly which properties are available depends on
+*which* kind of event occurred, encoded directly in the type. This is the
+same idea `KeypadProps`' `onDigit: (digit: string) => void` used in lesson
+06 (a function's type says exactly what it needs and returns), applied to
+the specific shape of data a browser event carries.
+
+**Connect to the real world — "two-way data binding," a term from other
+frameworks, and why React deliberately doesn't work that way.** Frameworks
+like Angular and Vue offer **two-way data binding** as a built-in feature:
+bind an input directly to a variable, and the framework automatically
+keeps both in sync in both directions — the variable updates the input,
+and the input updates the variable, without the developer writing an
+explicit handler for either direction. React deliberately chose not to
+offer this: `value={name}` and `onChange={(event) => setName(...)}` are
+two separate, explicit steps, precisely so the *exact* path data takes is
+always visible in the code, never implicit framework magic. This is a real
+design philosophy difference, not an oversight — the cost is a little more
+boilerplate per input; the benefit is that reading `FormulaEditor`'s code
+alone tells you, completely, everything that happens when a keystroke
+occurs, with nothing happening invisibly on the framework's behalf.
+
+**CS lens — a controlled form is a tiny, real state machine.** Lesson 18
+defined a state machine as a fixed set of states with rules for moving
+between them. This form has two meaningful states — "empty, ready for
+input" and "has content, ready to submit" — and the transitions between
+them are exactly `onChange` (moves toward "has content") and a successful
+submit (moves back to "empty"). Recognizing a controlled form this way is
+what makes `FormulaEditor`'s behavior predictable: at every instant, its
+displayed values are a pure function of its own `name`/`expression`
+state — never anything the DOM is independently remembering on its own —
+the identical `(state) → UI` shape lesson 01 defined for every component
+in this project, applied here specifically to form fields.
+
 ---
 
 ## Step 2 — Store Saved Formulas and Render Them
@@ -216,6 +255,7 @@ later, faster than it's visible.
 - [ ] Saving with an empty name or expression is correctly ignored
 - [ ] You can explain what a controlled input is and how its value prop and onChange work together
 - [ ] You can explain the XSS threat this project avoids, and specifically how JSX's `{ }` avoids it
+- [ ] You can explain what two-way data binding is and why React requires an explicit `onChange` instead
 
 ---
 

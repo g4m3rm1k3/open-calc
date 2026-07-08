@@ -113,6 +113,20 @@ Update `useReducer`'s initial state to include `memory: 0`:
 const [state, dispatch] = React.useReducer(calculatorReducer, { expression: "", result: null, memory: 0 });
 ```
 
+**SE lens — the `CalculatorAction` union just grew from eight variants to
+thirteen, and that growth is itself worth watching.** Every new feature
+this project adds means one more line in `CalculatorAction`'s discriminated
+union and one more `case` in `calculatorReducer`'s `switch`. This is
+completely healthy at thirteen variants — but lesson 30's capstone names
+honestly what happens if this keeps growing unchecked: a single `switch`
+statement handling dozens of unrelated concerns eventually becomes its own
+maintenance burden, and real, larger applications split one big reducer
+into several smaller ones once it reaches that point. Nothing about this
+lesson's five new branches crosses that line — they're small, and they all
+genuinely relate to one concern, memory — but it's worth noticing the
+union growing, one lesson at a time, as the concrete thing lesson 30 will
+eventually ask you to step back and evaluate.
+
 **Walkthrough.** Every memory action follows the same "evaluate, then
 transform" shape percent and sign-change established in lesson 14 —
 `memoryStore` and `memoryAdd`/`memorySubtract` all call `evaluate` on
@@ -133,6 +147,22 @@ unchanged in concept for decades: one slot, five operations, entirely
 separate from the "current calculation" being built up elsewhere.
 `state.memory` *is* an accumulator, implemented as a plain TypeScript
 number instead of a physical register.
+
+**CS lens — an invariant, named, and this project's first real one.** An
+**invariant** is a condition that must always hold true, at every point a
+program could be observed, no matter what sequence of actions led there.
+This project has an invariant, unstated until now: **the display always
+shows exactly what `state.expression` (or `state.result`) currently
+holds — never something stale, never something from a different
+calculation.** Every reducer branch was written to preserve this: none of
+them ever update `expression` without the corresponding render happening
+immediately after, and `memory`'s complete independence from `expression`
+is deliberate specifically so memory operations can never accidentally
+violate it. Naming an invariant explicitly is useful beyond description —
+it's a concrete question to ask before adding any future feature: "could
+this ever leave the display showing something other than the true current
+state?" If the answer is yes, the invariant is broken, and that's a real
+bug, whether or not it happens to be visible in whatever case was tested.
 
 ---
 

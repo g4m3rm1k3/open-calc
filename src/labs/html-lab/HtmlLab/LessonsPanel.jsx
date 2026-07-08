@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import BlogPost from '../../../components/blog/BlogPost.jsx'
-import { MARKDOWN_LESSONS, MARKDOWN_LESSON_SERIES } from './lessons/markdownLessonLoader.js'
+import { MARKDOWN_LESSONS, MARKDOWN_LESSON_SERIES, resolveLessonLink } from './lessons/markdownLessonLoader.js'
 
 // Simple read-through reference panel — a learner reads the lesson here, then
 // does the actual typing in the real HTML/CSS/JS tabs (which already have the
@@ -87,7 +87,7 @@ function SeriesList({ series, onSelectLesson, onSelectOverview, onBack }) {
   )
 }
 
-function LessonView({ lesson, onBack, onNext }) {
+function LessonView({ lesson, onBack, onNext, onLinkClick }) {
   return (
     <div className="px-6 py-4">
       <button
@@ -97,7 +97,7 @@ function LessonView({ lesson, onBack, onNext }) {
         ← Back
       </button>
 
-      <BlogPost content={lesson.content} interactive={false} />
+      <BlogPost content={lesson.content} interactive={false} onLinkClick={onLinkClick} />
 
       <div className="mt-10 pt-6 border-t border-slate-700/50 flex items-center justify-between">
         <button
@@ -179,6 +179,19 @@ export default function LessonsPanel() {
           lesson={lesson}
           onBack={() => setRoute(backTarget)}
           onNext={nextLesson ? () => setRoute({ view: 'lesson', slug: nextLesson.slug, seriesFolder: series?.folder ?? null }) : null}
+          onLinkClick={(href) => {
+            const target = resolveLessonLink(lesson.slug, href)
+            if (target) {
+              setRoute({ view: 'lesson', slug: target.slug, seriesFolder: target.seriesFolder, isOverview: target.isOverview })
+            }
+            // A ".md"-style relative link is always an internal cross-reference
+            // in this lesson system, resolvable or not — either way there's no
+            // real page for the browser to navigate to, so always suppress the
+            // default anchor behavior even when resolution fails (e.g. a link
+            // to a real source file like LESSON_CONTRACT.md, which isn't a
+            // lesson and has nowhere in this app to be shown).
+            return href?.endsWith('.md') ?? false
+          }}
         />
       </div>
     )

@@ -33,14 +33,31 @@ const OPERATORS: Readonly<Record<string, (a: number, b: number) => number>> = {
 };
 ```
 
-**Walkthrough — `add`, deliberately trivial.** This function is almost
-insultingly simple — that's the point. Its entire job is being *correct*
-and being *only* about addition. It doesn't know what a "display" is. It
-doesn't know it's being called from a button. It takes two numbers and
-returns their sum, exactly the way `columnLetter()` in the TypeScript
-Spreadsheet project took a number and returned a letter — a **pure
-function**: given the same inputs, it always returns the same output, and
-it doesn't read or change anything outside itself.
+**Walkthrough — `add`, deliberately trivial, and precisely what "pure"
+means.** This function is almost insultingly simple — that's the point.
+Its entire job is being *correct* and being *only* about addition. It
+doesn't know what a "display" is. It doesn't know it's being called from a
+button. It takes two numbers and returns their sum, exactly the way
+`columnLetter()` in the TypeScript Spreadsheet project took a number and
+returned a letter — a **pure function**, a term with two precise parts,
+worth having both of:
+
+1. **Deterministic** — called with the same arguments, it always returns
+   the same result, forever, no matter when or how many times it's
+   called. `add(2, 3)` is `5` today, tomorrow, and a million calls from
+   now, every time.
+2. **No side effects** — it doesn't read or change anything outside
+   itself: no global variables, no `localStorage`, no DOM, no console
+   output, nothing. Its only connection to the rest of the program is its
+   arguments in and its return value out.
+
+Both together give a pure function a property called **referential
+transparency**: a call to it, like `add(2, 3)`, could be replaced
+anywhere in the program by its result, `5`, with no change in what the
+program does. This is precisely why `add` needing no test, no mock, and no
+setup to reason about — its entire behavior is visible in its own three
+lines — and it's the same property lesson 18's reducer law protects at a
+larger scale.
 
 **Walkthrough — `OPERATORS`, a dispatch table.** `Record<string, (a: number,
 b: number) => number>` describes a plain object where every key is a
@@ -134,6 +151,20 @@ function Calculator() {
 }
 ```
 
+**Walkthrough — `useState<number | null>`, a generic function, and a
+union type, both named explicitly.** `useState` is written to work with
+*any* type of state — a `string` in lesson 05, a `boolean` later, a
+`number | null` here — without being rewritten for each one. A function
+written once but usable with different types, chosen per call via `<...>`,
+is called a **generic function**; `<number | null>` is the **type
+argument** telling this specific call which type to specialize for.
+`number | null` itself is a **union type**: a value that is *either* a
+`number` *or* specifically the value `null`, never anything else — the
+same "one of several possibilities" idea behind every discriminated union
+this project's `engine.ts` will use, minus the shared tag field, since here
+there are only two genuinely distinguishable shapes (`null`, or a real
+number) and JavaScript's own `=== null` check is enough to tell them apart.
+
 **Walkthrough — four pieces of state, and what each one remembers.**
 `display` is what's on screen — unchanged from lesson 07. `previousValue`
 is the number that was on screen the moment an operator was last pressed —
@@ -159,6 +190,35 @@ chaining forward, before the new operator is recorded. This chaining
 behavior is exactly what produces the bug lesson 10 exposes on purpose;
 it's kept here, honestly, rather than hidden, because seeing it fail is
 how the next few lessons earn their reason to exist.
+
+**CS lens — `NaN`, precisely, since `Number(display)` can produce it.**
+`NaN` ("Not a Number") is JavaScript's specified result for a numeric
+operation with no sensible numeric answer — `Number("abc")` is one way to
+get it; `0 / 0` (a different one, covered in lesson 09) is another. `NaN`
+has one famously strange property, worth knowing before it causes real
+confusion: **`NaN !== NaN`** — comparing it to itself with `===` returns
+`false`, the only value in JavaScript for which this is true. This is why
+checking for it requires a dedicated function, `Number.isNaN(value)`,
+rather than `value === NaN` (which would silently always be `false`, even
+when `value` genuinely is `NaN`). This project's own `display` can never
+actually reach `Number()` as anything but a valid numeric string as built
+so far, so `NaN` isn't a live bug yet — but it's the same honest, no-crash
+open question lesson 13's `CalculatorResult` closes for good once real,
+possibly-malformed expressions exist.
+
+**SE lens — four separate `useState` calls, and the coordination cost
+starting to show.** `display`, `previousValue`, `pendingOperator`, and
+`startFresh` are four independent pieces of state, each with its own
+setter, and `handleOperator`/`handleEquals`/`handleClear` each have to
+update several of them together, by hand, in the right order, every time.
+Nothing enforces that these four values stay logically consistent with
+each other — it's entirely up to careful, manual discipline in every
+handler. This works today because there are only four handlers and four
+pieces of state to keep in sync. **Forward connection:** lesson 18 names
+this exact strain formally and introduces `useReducer`, which bundles
+related state into one object updated by one function — worth remembering
+this feeling once you get there, since it's the actual motivation, not an
+arbitrary tool switch.
 
 **Walkthrough — `handleEquals`.** Nearly identical to the chaining branch
 of `handleOperator`, but afterward it fully resets `pendingOperator` and
@@ -238,6 +298,8 @@ possible because the dispatch table already exists.
 - [ ] `2 + 3 =` correctly shows `5`
 - [ ] You can explain what a pure function is, using `add` as the example
 - [ ] You can explain what `startFresh` prevents, concretely
+- [ ] You can explain why `value === NaN` never works and what to use instead
+- [ ] You can explain the coordination cost of four separate `useState` calls, in your own words
 
 ---
 

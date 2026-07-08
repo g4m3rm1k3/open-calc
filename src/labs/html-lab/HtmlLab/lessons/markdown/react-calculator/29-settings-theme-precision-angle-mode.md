@@ -21,7 +21,23 @@ Lesson 28 — a Settings tab that exists but shows only a placeholder.
 `AngleModeContext` was the right size when angle mode was the only shared
 setting this project had. Settings now needs three: theme, precision, and
 angle mode. Consolidate them into one broader context — a real, honest
-refactor, not new functionality:
+refactor, not new functionality.
+
+**SE lens — what "refactor" formally means, stated precisely because this
+lesson's very first sentence uses the word.** A **refactor** is a change to
+a codebase's internal structure that does not change its external, observable
+behavior — the calculator computes the same results, shows the same screen,
+before and after this step. This is what separates a refactor from a
+feature (which *does* change behavior) and from a rewrite (which throws
+away the existing structure rather than reshaping it). The reason
+refactors are worth naming explicitly, rather than treating them as just
+"more coding," is that they carry a different kind of risk: a broken
+feature is usually caught immediately, because something new stops
+working; a broken refactor can silently change behavior in a way nobody
+notices until much later, precisely because nothing about *what* the app
+does was supposed to change. This is also the entire subject of lesson 30,
+the capstone — this lesson is a preview of that same discipline, applied
+once, early, out of real necessity rather than as an exercise.
 
 ```tsx
 type AngleMode = "degrees" | "radians";
@@ -45,6 +61,22 @@ const SettingsContext = React.createContext<SettingsContextValue>({
   toggleAngleMode: () => {},
 });
 ```
+
+**Walkthrough — the object passed to `createContext`, and what it's
+actually for.** `React.createContext<SettingsContextValue>({ theme:
+"light", ... })`'s argument is the **default value** — what
+`React.useContext(SettingsContext)` would return if a component called it
+with *no* `SettingsContext.Provider` anywhere above it in the tree at all.
+It is not the value the app actually runs with; `Calculator` always
+renders a real `Provider`, so this default is never actually reached
+during normal use. It matters for two honest reasons: it gives every field
+a real, correctly-typed placeholder (so `theme`, `precision`, and the rest
+have sensible values even in, say, an isolated test that renders
+`SettingsPanel` alone, without wrapping it in a `Provider`), and it's what
+lets `SettingsContextValue`'s type be written without every field needing
+to be `| undefined` to account for "what if there's no provider yet" — a
+real, common source of extra optional-checking noise in codebases whose
+contexts are created with `createContext<T>(undefined)` instead.
 
 Update `Calculator` to own all three pieces of state and provide them
 together, replacing the old `AngleModeContext.Provider`:
@@ -134,6 +166,56 @@ to Scientific; the `DEG`/`RAD` label there reflects the change too, and
 clicking it there updates Settings back. Neither component was given the
 other's information through props — both simply read and write the same
 `SettingsContext`.
+
+**Walkthrough — the precision slider is a controlled input, the same
+pattern lesson 21 built for the Formula Editor's text fields, applied to a
+new HTML input type.** `<input type="range">` renders as a draggable
+slider rather than a text box, but the controlled-component contract from
+lesson 21 is identical: React, not the DOM, owns the truth. `value={precision}`
+forces the slider's visual position to always match `precision` exactly;
+`onChange` fires on every drag movement, and `setPrecision(Number(event.target.value))`
+is the only thing that actually moves the slider, by feeding a new value
+back in as `value`. A slider left uncontrolled (no `value` prop, no
+`onChange`) would still drag freely — but React would have no idea what
+position it was in, unable to display that number anywhere else on the
+page, exactly the "the DOM's memory and React's memory disagree" problem
+lesson 21 named directly.
+
+**Walkthrough — `event.target.value`, and why it's always a string, even
+here.** Every HTML form input's `value`, read through its DOM event, is a
+**string** — this is true of `<input type="range">` exactly as much as
+it's true of `<input type="text">`, even though a range slider's value is
+conceptually always numeric. `Number(event.target.value)` performs the
+same explicit string-to-number conversion this project has used since its
+very first digit button — the DOM never hands back a genuine JavaScript
+number from a form control, regardless of that control's declared `type`.
+
+**Walkthrough — `min`, `max`, and why a UI constraint is not the same
+thing as a validated one.** `min="0"` and `max="10"` keep the slider's
+*handle* from being dragged outside that range — a real constraint, but
+one enforced entirely by the browser's own rendering of the control, not
+by any check this project's own code performs. `setPrecision` would happily
+accept `-5` or `500` if called directly (from, say, a future keyboard
+shortcut or a bug elsewhere) — the slider's `min`/`max` narrows what a
+*mouse dragging this specific element* can produce, which is a real but
+partial guarantee, not a substitute for validating the value itself if it
+could ever arrive from anywhere else.
+
+**PL lens — `"light" | "dark"` and `"degrees" | "radians"`, string literal
+union types, doing real work here.** `Theme` and `AngleMode` are each a
+**union of string literals** — not the general type `string`, but a type
+that only permits these exact, named values. `setPrecision(Number(...))`
+by contrast accepts any `number` at all, unconstrained — the deliberate
+difference is that `theme` and `angleMode` each only ever have a small,
+fixed, known set of valid states, so TypeScript is asked to enforce that
+directly: writing `setTheme("blue")` anywhere in this project is a
+compile-time error, not a runtime surprise, because `"blue"` was never one
+of the two literals the type permits. `precision`, meaningfully, could be
+any whole number from 0 to 10 (or beyond), so a plain `number` is the
+honest type for it — the lesson worth keeping is that a union of literals
+is the right tool specifically when a value's whole set of legal states is
+small and known in advance, the same category `CalculatorAction`'s
+`type` field and `Token`'s `kind` field have belonged to since lessons 12 and 18.
 
 ---
 
@@ -254,6 +336,10 @@ unacceptable, answer for a calculator meant for humans to actually read.
 - [ ] `0.1 + 0.2` is confirmed to show the raw floating-point artifact before rounding is applied
 - [ ] You can explain, in your own words, why `0.1 + 0.2 !== 0.3` in almost every programming language
 - [ ] You can explain why this project rounds only for display, not for the underlying computation
+- [ ] You can explain what a refactor is and how it differs from a feature or a rewrite
+- [ ] You can explain what `createContext`'s default value argument is actually for, and why it's never reached in this app
+- [ ] You can explain why the precision slider is a controlled input, in the same sense as lesson 21's text fields
+- [ ] You can explain why `Theme` and `AngleMode` are string literal unions while `precision` is a plain `number`
 
 ---
 

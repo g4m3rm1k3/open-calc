@@ -35,6 +35,22 @@ also need to read and change it. Passing it down as an ordinary prop
 through every layer between wherever it lives and wherever it's needed,
 forever, as this project grows, is exactly the problem **Context** solves.
 
+**The name for the problem being avoided: prop drilling.** If `angleMode`
+stayed an ordinary prop, and `ScientificPad` were ever nested three or
+four components deep instead of being a direct child of `Calculator`,
+every single intermediate component — components that don't use
+`angleMode` themselves at all — would still need to accept it as a prop
+purely to forward it one level further down. This is called **prop
+drilling**: threading a value through every layer of a tree it merely
+passes through, bloating every intermediate component's props with data
+it never actually uses itself. It's not that prop drilling is *broken* —
+this project's own `onDigit`/`onOperator` props are threaded through
+exactly one layer (`Calculator` → `Keypad` → `Button`) and that's
+perfectly reasonable. Prop drilling becomes a real problem specifically
+when the number of layers grows and most of them have nothing to do with
+the value passing through — precisely the situation Context exists to
+avoid.
+
 ---
 
 ## Step 2 — Create the Context
@@ -165,6 +181,25 @@ containing the current `angleMode` and the `toggleAngleMode` function;
 whenever `angleMode` changes, `Calculator` re-renders, a new value object
 is created, and every component consuming this context re-renders too.
 
+**Honest limitation, worth naming now even though this project doesn't fix
+it until lesson 25/26's tools exist.** `value={{ angleMode,
+toggleAngleMode }}` creates a **brand-new object literal on every single
+render of `Calculator`** — not just the renders where `angleMode` actually
+changes, every one, including a plain digit press that has nothing to do
+with angle mode at all. Context's own rule for deciding whether consumers
+need to re-render is a reference comparison on the *whole* `value` — since
+this object is new every time, by reference, **every component reading
+`AngleModeContext` re-renders on every keystroke**, whether or not
+anything it actually cares about changed. This is a real, well-known
+Context gotcha in production React code, not a mistake unique to this
+lesson — and it's exactly the kind of unnecessary re-render lesson 25's
+`useMemo` and lesson 26's `React.memo` exist to catch and fix. The honest
+fix here would be wrapping the value in `React.useMemo(() => ({
+angleMode, toggleAngleMode }), [angleMode, toggleAngleMode])` — worth
+trying once you've completed lesson 25, as a real, concrete way to apply
+memoization to something other than the manufactured example that lesson
+uses.
+
 ---
 
 ## Step 4 — Consume It From `ScientificPad`
@@ -263,6 +298,7 @@ actually type.
 - [ ] You can explain why a plain global variable couldn't replace Context here
 - [ ] You can explain what a Context `Provider` does and who can read from it
 - [ ] You've opened `src/context/ThemeContext.jsx` in this app and can point to its `createContext` call and `.Provider`
+- [ ] You can explain why every consumer of `AngleModeContext` currently re-renders on every keystroke, and how `useMemo` would fix it
 
 ---
 

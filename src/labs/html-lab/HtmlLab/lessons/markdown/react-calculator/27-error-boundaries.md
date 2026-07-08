@@ -131,14 +131,27 @@ a clear message appears: "Something went wrong: Expected a number or
 and the form comes back, reset and usable.
 
 **Walkthrough — why this is the one place in this project that needs a
-class.** Every other component in this project has been a function.
-`getDerivedStateFromError` and its sibling `componentDidCatch` — the two
-lifecycle methods that let a component catch an error thrown by any
-component *below* it in the tree — have no function-component or hook
-equivalent in React as of this project's version. This is a real, current
-gap in React's hook API, not a stylistic choice: error boundaries are
-built with classes because that's the only mechanism React currently
-provides for this specific job.
+class, and the one honest exception to lesson 02's rule.** Every other
+component in this project has been a function, and lesson 02 stated
+precisely: using a component is a function call, never `new`.
+`CalculatorErrorBoundary` is the genuine exception — a **class**, the
+traditional object-oriented blueprint for creating objects, and React
+really does call `new CalculatorErrorBoundary(props)` internally to create
+one, exactly once, the first time it mounts. `constructor(props)` is the
+special method a class runs automatically the moment `new` creates an
+instance from it — its job here is entirely to set up
+`this.state`, the object's own initial data. `this` inside a class refers
+to *the specific instance currently running* — necessary because, unlike
+a function component (where `useState` handles remembering values across
+calls invisibly), a class instance holds its own state directly, as a
+real property on itself, and must be told explicitly, via `this.state =
+...`, what that starting data is. `getDerivedStateFromError` and its
+sibling `componentDidCatch` — the two lifecycle methods that let a
+component catch an error thrown by any component *below* it in the tree —
+have no function-component or hook equivalent in React as of this
+project's version. This is a real, current gap in React's hook API, not a
+stylistic choice: error boundaries are built with classes because that's
+the only mechanism React currently provides for this specific job.
 
 **Walkthrough — `static getDerivedStateFromError(error)`.** A `static`
 method belongs to the class itself, not to any one instance — called by

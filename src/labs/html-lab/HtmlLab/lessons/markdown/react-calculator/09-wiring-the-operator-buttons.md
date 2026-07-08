@@ -44,6 +44,31 @@ calculator shows, not the `*` and `/` a programming language uses for the
 same operations. Nothing requires them to match; `OPERATORS` just needs
 its keys to be whatever strings will actually arrive from button clicks.
 
+**Walkthrough — `Readonly<Record<string, (a: number, b: number) => number>>`,
+read from the outside in.** `Record<K, V>` is a TypeScript **utility
+type** — a generic, built into TypeScript itself, not written by this
+project — meaning "an object type whose keys are all of type `K` and whose
+values are all of type `V`." `Record<string, (a: number, b: number) =>
+number>` says: any string key is allowed, and every value must be a
+function taking two numbers and returning one. `Readonly<T>` is a second
+utility type, wrapping the first, marking every property of whatever it
+wraps as unassignable after creation — `OPERATORS["+"] = subtract`
+anywhere else in this file becomes a compile-time error, TypeScript's way
+of enforcing that this lookup table is fixed once written, never quietly
+reassigned somewhere unexpected.
+
+**CS lens — functions as first-class values, the deeper idea `OPERATORS`
+depends on.** In JavaScript and TypeScript, a function is a real value —
+it can be stored in a variable, held as a property of an object (exactly
+what `OPERATORS` does with `add`, `subtract`, `multiply`, and `divide`),
+passed as an argument, or returned from another function. Languages with
+this property are said to treat functions as **first-class citizens** —
+not a special, restricted kind of thing, but a value like any number or
+string. `OPERATORS` only works at all because `add` isn't just "a thing
+that can be called" — it's a value that can be *stored*, looked up by key,
+and called later, exactly the way `42` or `"hello"` could be stored and
+retrieved from the same kind of object.
+
 **What isn't handled yet, on purpose.** `divide(5, 0)` doesn't throw an
 error — JavaScript's own division returns `Infinity`, silently. Try it
 once you've wired the `÷` button below: `5 ÷ 0 =` shows `Infinity` on
@@ -52,6 +77,19 @@ calculator should ever display to a person. This project leaves that gap
 open, honestly, until lesson 13 — turning failures like this into a real,
 handled `Result` is that lesson's entire subject, and handling it here
 first would mean doing the same work twice.
+
+**CS lens — `Infinity`, a real, specified numeric value, not an error
+state JavaScript invented informally.** IEEE 754 (the same floating-point
+standard lesson 29 covers in depth for `0.1 + 0.2`) defines `Infinity` and
+`-Infinity` as genuine, valid numeric values a computation can legitimately
+produce — along with a third special value, `NaN` ("Not a Number"), for
+operations with no defined numeric result at all (`0 / 0` produces `NaN`,
+not `Infinity` — division by zero has one specified answer only when the
+numerator is nonzero). `typeof Infinity` is `"number"`, confirming
+JavaScript treats it as a real member of the number type, not a special
+error case bolted on separately — which is exactly why `divide(5, 0)`
+doesn't throw: dividing by zero isn't invalid *to the language*, only to
+what a calculator should ever actually show a human being.
 
 ---
 
@@ -172,6 +210,9 @@ this easy to spot by eye before it ever becomes a runtime error.
 - [ ] You can trace a single button click through every function it passes through, in order
 - [ ] You've confirmed, live, that `5 ÷ 0` shows `Infinity` rather than a real error
 - [ ] You can explain why a typo'd dispatch-table key fails with a confusing error pointing at the wrong line
+- [ ] You can explain what `Record` and `Readonly` each do as TypeScript utility types
+- [ ] You can explain what it means for functions to be first-class values, using `OPERATORS` as the example
+- [ ] You can explain why `divide(5, 0)` returns `Infinity` instead of throwing
 
 ---
 

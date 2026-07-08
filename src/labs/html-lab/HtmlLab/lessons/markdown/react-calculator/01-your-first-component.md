@@ -24,6 +24,56 @@ used starting in this lesson exactly as that project used them.
 
 ---
 
+## Step 0 — What React Actually Is, and What Problem It Solves
+
+Before touching HTML Lab at all: **React is a library** — a collection of
+pre-written functions and tools someone else built, that your own code
+calls into to get work done, as opposed to a **framework**, which calls
+*your* code according to rules it defines (React sits closer to the
+library end of that spectrum than something like Angular, though the line
+is genuinely blurry in practice). Calling React "a library for building
+user interfaces" means precisely this: React does not know anything about
+calculators, forms, or buttons. It knows how to take a description of what
+a screen should look like and make the real screen match it, efficiently,
+repeatedly, as that description changes over time. Every other word in
+this lesson is about how you hand React that description.
+
+**The problem this actually solves, concretely, stated once.** Before
+libraries like React existed, updating a webpage in response to something
+happening — a click, a timer, new data arriving — meant writing code that
+manually found the exact DOM nodes that needed to change and mutated them:
+`document.getElementById('total').textContent = newTotal`, one line per
+thing that could change, scattered across a program whose different parts
+all keep separate, private track of "what does the screen currently show,
+and what should it show now." That bookkeeping — keeping a mental model of
+current DOM state in sync with real DOM state, by hand, forever, as a
+program grows — is where an enormous fraction of real historical DOM bugs
+came from: something changed the underlying data but the specific line of
+code that should have updated a specific span of text was missing, or ran
+twice, or ran in the wrong order relative to something else. React's whole
+reason to exist is removing that bookkeeping: you never manually find and
+mutate a specific DOM node again, anywhere in this entire project, starting
+with this very lesson. You describe what the whole screen should look
+like, given the current data, and React finds the differences itself,
+every single time, correctly, without you tracking anything by hand.
+
+**The DOM, defined precisely, since everything above depends on it.** The
+**DOM** — **Document Object Model** — is the browser's own in-memory,
+tree-shaped representation of a webpage: every HTML element becomes a
+**node** in this tree the instant the browser parses the page, and that
+tree is what's actually drawn on screen, not the original HTML text itself.
+`document` (as in `document.getElementById`) is JavaScript's name for the
+root object of this tree, provided automatically by the browser to any
+script running on the page — not part of the JavaScript language itself,
+a **browser API**: a capability the *browser* provides, distinct from
+things the language provides on its own (like `Math` or `Array`).
+`document.getElementById(id)` searches this tree for the one node whose
+`id` attribute matches, returning it if found or `null` if nothing
+matches — this exact method, and this exact `HTMLElement | null` return
+shape, is what Step 4's `requireElement` wraps.
+
+---
+
 ## Step 1 — Start a Blank Project and Add a Container
 
 **The problem:** A brand-new HTML Lab project has no dedicated place for
@@ -82,18 +132,75 @@ signal in the TypeScript Spreadsheet project:
 **SE lens — what happens the instant a `.tsx` file exists, that you did
 not do yourself.** The moment any file in this project ends in `.jsx` or
 `.tsx`, HTML Lab automatically adds two `<script>` tags to whatever ▶
-Preview generates, loading React and ReactDOM from a CDN (a server that
-just hosts the finished, pre-built library file — no installation, no
-`npm`, because this sandbox has no terminal to run `npm` in at all). This
-is the same idea `npm install react` accomplishes in a real project —
-making the `React` and `ReactDOM` names available to your code — just
-solved a different way, because this environment doesn't have the tooling
-a real project would use to bundle a downloaded package into your code.
-Nothing about the *code you write* is any different either way.
+Preview generates, loading React and ReactDOM from a **CDN** — a Content
+Delivery Network, a large set of servers, spread across many physical
+locations worldwide, that do nothing but host and serve popular, unchanging
+files (finished, pre-built library code, in this case) as fast as possible
+to whoever requests them, from whichever server happens to be physically
+closest to that request. Adding `<script src="https://unpkg.com/react@18/umd/react.production.min.js">`
+to a page tells the browser: fetch this exact file, over the network, and
+run it, before running anything else on the page — that one file, once it
+runs, is what defines the global `React` name this project's code then
+calls into. `unpkg.com` specifically is a real, widely-used CDN that
+serves the exact contents of published `npm` packages, letting a page load
+one without installing anything.
+
+This is the same idea `npm install react` accomplishes in a real project
+— making the `React` and `ReactDOM` names available to your code — solved
+a different way here because this sandbox has no terminal to run `npm`
+in at all. `npm` (the Node Package Manager) is the tool a real project
+uses to download a **package** — a named, versioned bundle of someone
+else's code, published so other projects can depend on it — onto your own
+machine, permanently, as a file inside a folder named `node_modules`; a
+build tool then reads that downloaded code directly off disk and bundles
+it into your project's own final output. A CDN script tag instead fetches
+the same code fresh, over the network, every time the page loads, into the
+browser's memory only — nothing is ever saved to a disk anywhere in this
+project. Both approaches produce the identical end state: `React` and
+`ReactDOM`, available as names your own code can call. Nothing about the
+*code you write* is any different either way.
 
 ---
 
-## Step 3 — Write and Mount Your First Component
+## Step 3 — What a Function Actually Is, Before Writing One
+
+**This project assumes nothing carried over from any other course.** Every
+piece of code in this lesson is a **function**, so before writing one:
+
+```typescript
+function double(input: number): number {
+  return input * 2;
+}
+```
+
+A function is a named, reusable block of code. `function` is the keyword
+that begins a **function declaration**. `double` is its name. `(input:
+number)` is its **parameter list** — here, one parameter named `input`,
+required to be a `number`. `: number` after the closing parenthesis is its
+**return type** — a promise that calling this function always produces a
+number back. The body, between `{` and `}`, runs only when the function is
+**called** — written as the function's name followed by parentheses
+containing real values, `double(5)` — at which point `input` becomes `5`
+for the duration of that one call, and `return input * 2;` hands `10` back
+to whatever called it. Nothing inside a function's body runs until it is
+called; writing `function double(...) { ... }` alone does not multiply
+anything by two, it only defines what *would* happen if the function were
+called.
+
+**Declarative versus imperative, named explicitly.** `renderGrid()` in the
+TypeScript Spreadsheet project (or any ordinary DOM-manipulating code) is
+**imperative**: a list of literal steps to perform, in order — "create
+this element, set this property, insert it here." Every line of code in
+this project from here on will instead be **declarative**: describing
+*what the result should look like*, and leaving the actual step-by-step
+work of making the real page match that description to something else —
+here, React. These are the formal names for a distinction every later
+lesson in this project depends on; keep them, because they'll be used by
+name repeatedly.
+
+---
+
+## Step 4 — Write and Mount Your First Component
 
 **The problem:** `App.tsx` exists, but it's still the old file's leftover
 content (or empty) — nothing describes what should go inside `#app` yet.
@@ -171,6 +278,33 @@ define real classes — lesson 27 of this project uses one). This is the
 first of several small naming differences between JSX and HTML you'll meet;
 each is called out the first time it matters.
 
+**Why JSX needs a compiler at all, stated precisely.** `<div>` is not legal
+JavaScript syntax on its own — outside of a `.jsx`/`.tsx` file, typing it
+where an expression is expected is a syntax error. JSX is a **language
+extension**: extra syntax layered on top of JavaScript, understood by a
+specific tool (Babel, here) but not by JavaScript engines themselves,
+meaning it must always be **transpiled** — converted into plain,
+already-legal JavaScript — before it can actually run anywhere, in any
+browser. This is different from TypeScript's type annotations, which are
+simply *deleted* before running (as this project's README already
+explained); JSX is *transformed into different, real code*
+(`React.createElement(...)` calls) that does the equivalent job. Babel
+performs both transformations, back to back, on every `.tsx` file this
+project has: erase the types, then convert the JSX — by the time the
+result reaches ▶ Preview's iframe, it is 100% plain, ordinary JavaScript,
+with no trace of either TypeScript or JSX syntax left in it at all.
+
+**What `React.createElement` accepts beyond one child, briefly.** `App`'s
+version only nests one level deep — one `<div>` containing one `<p>`. A
+tag with several children, `<div><p>First</p><p>Second</p></div>`,
+compiles to `React.createElement('div', null, React.createElement('p',
+null, 'First'), React.createElement('p', null, 'Second'))` — every
+additional child is simply one more argument after the props object,
+matching `createElement`'s own `(type, props, ...children)` signature
+exactly, `...children` meaning "any number of remaining arguments,
+collected together" (the same rest-parameter idea, from the opposite
+direction, as the spread syntax lesson 06 uses to expand a value out).
+
 **CS lens — a component is a function that returns a description, not a
 DOM element.** `App()` never once calls `document.createElement`. Calling
 `App()` does not put anything on the page by itself — it returns a
@@ -187,19 +321,70 @@ they represent it in opposite ways. Every lesson from here on is, in one
 sense, an exploration of what declarative UI buys you that imperative UI
 does not.
 
-**Walkthrough — mounting.** `document.getElementById('app')` (wrapped in
-`requireElement`) finds the one real DOM node this project committed to in
-Step 1. `ReactDOM.createRoot(container)` creates what React 18 calls a
-**root** — a connection point between one real DOM node and a React
-component tree, capable of running React's newer concurrent rendering
-features. (An older API, `ReactDOM.render(<App />, container)`, did the
-same basic job in React 17 and earlier without a separate root object —
-you may see it in older tutorials; `createRoot` is what every current
-React project uses.) `.render(<App />)` then hands that root your
-top-level component, and React takes it from there: calling `App()`,
+**The single idea every lesson after this one is quietly built on.** Say
+it once, explicitly, so it never has to stay implicit again:
+
+> **A React component is a function that takes state and props as input,
+> and returns a description of the UI as output.**
+
+`App()` takes nothing (yet — lesson 03 gives a component its first real
+input, `props`) and returns one fixed description. Every future lesson
+changes exactly one side of this: lesson 03 adds real input (`props`).
+Lesson 05 adds a second kind of input a component can keep for itself
+between calls (`state`). Every lesson after that is still, underneath
+whatever it adds, this same shape: `(state, props) → UI description`.
+When a later lesson says a component "re-renders," what's actually
+happening is mechanical and simple: **the function is called again**,
+with whatever the current state and props are *now*, and it returns a
+new description — not a modified old one, a brand new one, exactly the
+way calling `double(5)` again doesn't modify the `10` from before, it
+just returns a fresh answer. Holding onto this one sentence is what makes
+every later lesson's behavior predictable instead of magical.
+
+**Walkthrough — mounting, one operation at a time before it's compressed
+onto one line.** `ReactDOM.createRoot(container).render(<App />);` is
+really two separate operations, chained together. Written apart first:
+
+```typescript
+const root = ReactDOM.createRoot(container);
+root.render(<App />);
+```
+
+`document.getElementById('app')` (wrapped in `requireElement`) finds the
+one real DOM node this project committed to in Step 1, and that result is
+what's stored in `container`. `ReactDOM.createRoot(container)` creates
+what React 18 calls a **root** — a connection point between one real DOM
+node and a React component tree, capable of running React's newer
+concurrent rendering features — and stores that connection point in a new
+variable, `root`. (An older API, `ReactDOM.render(<App />, container)`,
+did the same basic job in React 17 and earlier without a separate root
+object — you may see it in older tutorials; `createRoot` is what every
+current React project uses.) `root.render(<App />)` then hands that root
+your top-level component, and React takes it from there: calling `App()`,
 walking the object tree it returns, and creating the real DOM nodes needed
 to match it — the exact translation from "description" to "actual page"
-the CS lens above named.
+the CS lens above named. Collapsed back onto one line — `ReactDOM.
+createRoot(container).render(<App />);`, this project's actual convention
+— nothing about *what happens* changes; only the intermediate `root`
+variable disappears, because nothing else in this project ever needs to
+refer back to it by name. This chaining shape — calling a method directly
+on what a previous method call returned, with no named variable in
+between — is called **method chaining**, and it's worth recognizing on
+sight: it's doing exactly what the two-line version does, just without
+naming the thing in the middle.
+
+**A first, brief look at browser DevTools, since "press F12" appears for
+the first time below.** Every modern browser ships with a built-in set of
+developer tools — usually opened with the F12 key, or by right-clicking
+the page and choosing "Inspect." The **Console** panel specifically shows
+messages your code prints (via `console.log`, not used yet, but common
+from here on) and any errors JavaScript encountered while running — the
+single most important tool for finding out *why* something isn't working,
+used constantly starting in this lesson's own "What Breaks Without This"
+section below. Other panels exist (Elements, for inspecting the live DOM
+tree; Network, for watching requests like the CDN script fetches above;
+Sources, for setting breakpoints — lesson 06 uses this idea) but Console
+is the one this project reaches for first and most often.
 
 ---
 
@@ -235,6 +420,34 @@ TypeScript's checking of the `id: string` parameter and everything else.
 With plain `.js`, ▶ Preview fails outright: the JSX syntax `<div
 className="calculator">` is not valid JavaScript, and nothing renders.
 
+**Forgetting to return anything from `App` at all** (a bare `function App()
+{ }`, no `return` statement): JavaScript functions with no explicit
+`return` return `undefined` automatically — not an error by itself, but
+React, asked to render `undefined` as a component's output, throws a real
+error at runtime: `Nothing was returned from render`. This is a genuinely
+common typo (forgetting `return` after adding a blank line, or a stray
+closing brace before it), worth recognizing by its exact message the first
+time it's seen rather than being surprised by it later.
+
+**Misspelling `ReactDOM` as `ReactDom` or `reactDOM`** anywhere in the
+mounting line: JavaScript identifiers are case-sensitive — `ReactDOM` and
+`ReactDom` are two completely different names as far as the language is
+concerned. Since neither typo matches the actual global name the CDN
+script defined, the result is `ReferenceError: ReactDom is not defined` —
+a real crash, and the browser Console (this lesson's own new terminology)
+is exactly where that error message would appear, naming the line it
+happened on.
+
+**Connect to the real world.** Every production React application in
+existence — from small personal projects to applications run by companies
+serving hundreds of millions of users — starts with this exact same shape:
+one container element, one call to `createRoot`, one call to `.render()`.
+What differs at scale is everything *inside* `App` — more components, more
+state, more logic — never this foundational wiring. Opening the browser
+DevTools on almost any real website built with React and searching its
+loaded scripts for `createRoot` will find this same call, doing the same
+job, for a real product instead of a teaching example.
+
 ---
 
 ## Definition of Done
@@ -244,6 +457,12 @@ className="calculator">` is not valid JavaScript, and nothing renders.
 - [ ] You can explain, without looking back, what `React.createElement` call your JSX compiles into
 - [ ] You can explain the difference between `.js`, `.ts`, `.jsx`, and `.tsx` in this environment
 - [ ] You can explain what "declarative" means, using `App()` versus `renderGrid()` as the contrast
+- [ ] You can explain what the DOM is and what `document` represents
+- [ ] You can explain what a CDN is and what problem it solves, versus `npm install`
+- [ ] You can explain why JSX needs a compiler, and what "transpiled" means
+- [ ] You can open the browser Console and explain what it's for
+- [ ] You can state, from memory, the one-sentence definition of a React component as a function from state and props to a UI description
+- [ ] You can explain what a function's parameter list and return type are, using `double` or `requireElement` as the example
 
 ---
 

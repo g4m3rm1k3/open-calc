@@ -103,6 +103,35 @@ none of them need to know anything about precedence anymore. That
 knowledge lives entirely inside `evaluate`, called exactly once, only when
 the user actually asks for an answer.
 
+**CS lens — this is lazy evaluation, named precisely.** The old, eager
+design computed a result the instant enough information existed to
+produce *some* answer, whether or not that answer was actually needed yet
+— this is **eager evaluation**. The new design does the opposite: it
+delays all computation for as long as possible, doing nothing but
+accumulating text until the answer is genuinely requested — this is
+**lazy evaluation**. `&&`'s short-circuiting (lesson 15) is lazy in the
+same sense — it doesn't evaluate its right side until it knows the left
+side didn't already answer the question. Both are the same trade: do less
+work up front, in exchange for doing the right work, once, only when it's
+actually needed.
+
+**CS/SE lens — `displayValue` is derived state, not stored state, and the
+distinction is worth naming precisely.** `displayValue` is computed fresh,
+every render, directly from `result` and `expression` — it is never itself
+passed to `useState`. This is **derived state**: a value calculated from
+other state, rather than state in its own right. The alternative — a third
+`useState` call holding `displayValue` directly, updated by hand alongside
+`expression` and `result` — would create exactly the risk lesson 07 named
+formally: two (or here, three) pieces of state that are supposed to always
+agree, with nothing but careful, manual discipline keeping them in sync.
+Deriving `displayValue` on the spot instead makes it *impossible* for it to
+disagree with `expression`/`result` — there's no separate copy to drift,
+only a calculation that runs fresh every time. The general rule this
+follows: if a value can be *computed* from state you already have, prefer
+computing it over storing a redundant copy — a real, common judgment call
+in React code, and the correct default whenever the computation itself is
+cheap (as it is here — a single ternary).
+
 **Walkthrough — `result: string | null`, kept separate from
 `expression`.** `expression` is what the user is currently building.
 `result` is what `=` most recently computed — kept as a *second*, separate
@@ -215,6 +244,8 @@ expects pressing `=` on a blank calculator to do.
 - [ ] A division by zero shows a real message, not `Infinity` or a crash
 - [ ] `engine.ts` was not modified in this lesson
 - [ ] You can explain why `handlePercent` and `handleSignChange` didn't need any new parsing logic
+- [ ] You can explain what derived state is and why `displayValue` isn't its own `useState` call
+- [ ] You can explain the difference between eager and lazy evaluation, using this lesson's redesign as the example
 
 ---
 

@@ -50,6 +50,48 @@ computation actually depends on.
 
 ---
 
+**CS lens — the grammar this project promised in lesson 10, written down
+formally, before any code.** A **grammar** can be written independent of
+any programming language, in a standard notation (a simplified form of
+**BNF**, Backus-Naur Form, the classic notation for describing a
+language's structure). This project's entire grammar, in that notation:
+
+```
+Expression     ::= Addition
+Addition       ::= Multiplication (("+" | "-") Multiplication)*
+Multiplication ::= Unary (("×" | "÷") Unary)*
+Unary          ::= "-" Unary | Primary
+Primary        ::= number | "(" Expression ")"
+```
+
+Read literally: an `Addition` is one `Multiplication`, followed by zero or
+more `("+" or "-") Multiplication` pairs (`*` means "zero or more,"
+exactly the way it does in a regular expression); a `Primary` is either a
+raw number or a parenthesized `Expression`. Every function below is a
+direct, mechanical translation of exactly one of these five lines into
+TypeScript — this is not a coincidence or a stylistic choice: recursive
+descent parsing *is*, by definition, the technique of translating a
+grammar written this way into one function per rule, calling each other in
+the same shape the grammar itself describes.
+
+**CS lens — why the grammar is written this way and not more directly,
+avoiding a classic trap: left recursion.** A tempting, more "obvious" way
+to write `Addition` might be `Addition ::= Addition "+" Multiplication |
+Multiplication` — directly mirroring "an addition is an addition, plus
+one more multiplication." This is called **left recursion** (the rule
+refers to itself as the very first thing it checks), and translated
+directly into a recursive descent function, it would call itself
+immediately, before consuming any input at all — `parseAddition` calling
+`parseAddition` calling `parseAddition`, forever, with `position` never
+advancing, until the call stack overflows. This project's actual grammar
+— `Multiplication (("+" | "-") Multiplication)*` — says the same thing
+without left recursion, using a `while` loop instead of self-reference to
+express "one or more, repeated": `parseAddition`'s `while` loop *is* the
+`*` in the grammar, executed iteratively rather than recursively,
+specifically to sidestep this trap. Recognizing left recursion by sight,
+and rewriting a grammar rule to use repetition instead, is a real,
+transferable skill anyone hand-writing a recursive descent parser needs.
+
 ## Step 2 — A Shared Parser State
 
 ```typescript
@@ -162,6 +204,22 @@ If no `+` or `-` is next, `break` exits the loop and returns whatever
 `left` has become. `parseMultiplication` is structured identically, one
 level down, calling `parseUnary` instead of `parseMultiplication`.
 
+**CS lens — recursion, defined precisely, since this is where it first
+genuinely matters.** A function is **recursive** when it calls itself,
+directly or indirectly, as part of doing its own job. Every recursive
+function needs two parts to ever finish instead of calling itself forever:
+a **base case** — a condition simple enough to answer directly, with no
+further recursive call (`parsePrimary` returning a plain `number` node,
+with no further parsing needed, is `parseUnary`'s eventual base case) —
+and a **recursive case** — where the function calls itself on a smaller or
+simpler version of the same problem, trusting that smaller call to
+correctly solve its own piece (`parseUnary` calling `parseUnary` again on
+"whatever comes after this minus sign," trusting that call to fully
+resolve it). Every parsing function in this lesson is recursive in exactly
+this sense; the "which function calls which" structure from the CS lens
+above is what determines both *when* each one recurses and what its base
+case actually is.
+
 **Walkthrough — `parseUnary`, and why negation gets its own level.**
 `token !== undefined && token.kind === "minus"` checks: is there a token
 left at all, and is it a minus sign appearing where a *number* was
@@ -258,6 +316,8 @@ idea how to handle (it only understands numbers and parentheses), throwing
 - [ ] `parseExpression` on `"2+3×4"`'s tokens produces a tree with multiplication nested inside addition, confirmed in the console
 - [ ] You can explain why recursive descent doesn't need a precedence lookup table
 - [ ] You can explain what makes `ExpressionNode` a recursive type
+- [ ] You can write this project's grammar in BNF-style notation from memory
+- [ ] You can explain what left recursion is and why this grammar avoids it with a `while` loop instead
 
 ---
 

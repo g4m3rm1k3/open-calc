@@ -15,6 +15,31 @@ many others exist.
 Lesson 21 — `FormulaEditor`, a controlled form, and `formulas: SavedFormula[]`
 in `Calculator`, appended to on save.
 
+**CRUD, spelled out, since this lesson builds three-quarters of it.**
+**CRUD** is an acronym for the four operations almost any real data-backed
+feature needs: **C**reate (lesson 21 already built this — saving a new
+formula), **R**ead (already built too — rendering the list), **U**pdate
+(this lesson's editing), and **D**elete (this lesson's deleting). Naming
+it now is useful beyond vocabulary: recognizing "this feature needs CRUD"
+early tells you, immediately, that all four operations need designing
+together, consistently, rather than discovering partway through that
+Update was never actually planned for.
+
+**`SavedFormula`, a record, and why it needs an `id` at all.** `{ id,
+name, expression }` is a **record**: a fixed set of named fields describing
+one real, meaningful thing this project's domain actually has — a saved
+formula — as opposed to `digitLabels`, an array of interchangeable,
+identical-in-kind strings. Structuring domain data this way, as records
+with named fields rather than loose, separately-tracked variables, is
+called **domain modeling** — deliberately shaping your types to mirror the
+real things your program manages. The `id` field specifically exists to
+answer one question precisely: **identity** — "is this the *same* formula
+as before, or merely one that currently looks the same?" Two formulas
+could easily share a `name` (nothing stops two people naming a formula
+"Area") or even a `name` *and* `expression` — `id`, generated fresh at
+creation and never reused, is what lets this project always tell them
+apart, no matter how similar their visible content becomes.
+
 ---
 
 ## Step 1 — Track Which Formula Is Being Edited
@@ -176,6 +201,33 @@ deletion, expressed as "keep everything that isn't this," rather than
 formula]` for adding, back in lesson 21: never mutate the existing array,
 always produce a new one.
 
+**CS lens — `handleDeleteFormula` is idempotent, a real property worth
+naming precisely.** An operation is **idempotent** when doing it more than
+once has the exact same effect as doing it exactly once. Calling
+`handleDeleteFormula("17203...")` a second time, after the formula with
+that id is already gone, does nothing new: `.filter()` simply keeps every
+formula that isn't a match, and if none match, the "new" array is just an
+identical copy of the old one. Contrast this with `handleSaveFormula`'s
+create branch — calling it twice with the same name and expression
+genuinely creates *two* separate formulas, since each call generates a
+fresh `id` — creation is **not** idempotent here, by design. Recognizing
+which operations in a system are idempotent matters beyond trivia: it's
+exactly the property that makes an operation safe to retry blindly (a
+double-click, a network request resent after a timeout) without worrying
+about corrupting anything — a real, common concern in production code that
+this lesson's delete button happens to satisfy for free.
+
+**Connect to the real world — this project deliberately skips a
+confirmation dialog before deleting, worth naming as a real, honest scope
+cut.** `handleDeleteFormula` runs immediately on click, with no "Are you
+sure?" step in between — a real, common UX pattern for destructive actions
+that this project chooses not to build here, to keep the lesson focused on
+CRUD mechanics rather than dialog UI. HTML Lab itself, the tool this
+lesson is being completed inside, uses exactly this kind of confirmation
+step for its own destructive actions (resetting a project) via a real
+`ConfirmDialog` component — worth opening as a reference if this project
+ever gets extended to add the same safeguard here.
+
 **CS lens — this is why `key` had to be a real, stable id, and not the
 array index, all along.** Lesson 04 flagged index-as-key as risky the
 moment a list could reorder or change length — this is that moment,
@@ -221,6 +273,7 @@ from the very first list this project ever rendered.
 - [ ] Deleting a formula removes only that one, correctly, regardless of its position
 - [ ] You can explain why changing `key` forces a component to fully remount
 - [ ] You can explain the difference between how `.map()` updates one item and how `.filter()` removes one
+- [ ] You can explain what idempotent means and why delete is idempotent here but create is not
 
 ---
 

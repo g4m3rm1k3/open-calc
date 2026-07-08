@@ -113,6 +113,15 @@ doesn't let components reach into each other's state directly, now
 applied to hiding a hook's own internal implementation from whatever calls
 it.
 
+`UseMemoryResult` is, in exactly the sense lesson 03 named for
+`ButtonProps`, `useMemory`'s **API** — the complete, deliberate surface it
+exposes. `setMemory` is not part of that API; it is `useMemory`'s
+**private** implementation detail, in the same sense a class's private
+fields are private in traditional object-oriented code, even though
+nothing about a plain function literally enforces the word "private" here
+— the enforcement is structural: `setMemory` simply never leaves the
+function it was created inside.
+
 ---
 
 ## Step 3 — Remove Memory From the Reducer, Use the Hook Instead

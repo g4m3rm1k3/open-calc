@@ -17,14 +17,41 @@ receive it through props.
 
 ---
 
-## Step 1 — Naming What Lesson 06 Already Did
+## Step 1 — What "Owns" a Piece of State Actually Means
+
+Lesson 06 kept saying `Calculator` "owns" `value`. That word has been
+doing real work without ever being defined. Define it now, precisely,
+because every lesson from here on depends on it:
+
+> **A piece of state always has exactly one owner: the component that
+> calls `useState` (or, later, `useReducer`) for it.** The owner is
+> responsible for creating the state, updating it, deciding which
+> descendants are allowed to read it, and passing it down as props to
+> whichever of them need it. Every other component is either a
+> **consumer** — it receives the value through props and reads it — or an
+> **actor** — it receives a function through props and calls it to
+> request a change, without ever touching the state directly itself.
+
+`Calculator` is `value`'s owner. `Display` is a consumer — it only ever
+reads `value`, through the prop lesson 06 gave it. `Keypad` is an actor —
+it never sees `value` at all, only `onDigit`, a function it calls to
+*request* a change, leaving the actual updating entirely to the owner.
+Neither `Display` nor `Keypad` could become the owner instead without
+losing the ability to coordinate with the other — which is exactly the
+motivation for lifting state up, arrived at now with the vocabulary to
+state it precisely instead of just doing it.
+
+## Step 2 — Naming What Lesson 06 Already Did
 
 **Lifting state up** is the name for moving a piece of state from the
 component that first seemed to need it, up to the closest shared ancestor
-of every component that actually needs it. `Display` looked like the
-natural home for the display value, right up until `Keypad` also needed to
-change it — at which point the *only* component that can coordinate both
-of them is their common parent, `Calculator`.
+of every component that actually needs it — in the tree vocabulary lesson
+02 established, the closest node that has both candidates as descendants.
+`Display` looked like the natural home for the display value, right up
+until `Keypad` also needed to change it — at which point the *only*
+component that can coordinate both of them, and therefore the only
+component that can correctly be the owner, is their common ancestor,
+`Calculator`.
 
 **SE lens — why React doesn't let components reach sideways.** It would
 be technically possible to design a UI framework where any component could
@@ -47,9 +74,24 @@ in the whole project responsible for how digits affect the display — one
 file to read, one function to trust, no matter how large this project
 eventually gets.
 
+**CS/SE lens — dependencies only ever point one way: downward.** In this
+project's component tree, information — props — only ever flows from a
+node to its children, never sideways to a sibling and never upward to a
+parent. This is called **dependency direction**, and React enforces it as
+a hard rule: a component can depend on (receive data from) its ancestors,
+never its siblings, and never its descendants. `Keypad` cannot depend on
+`Display` because they're siblings — neither is an ancestor of the other.
+The *only* node both can depend on is their shared ancestor, `Calculator`
+— which is precisely, mechanically, why lifting state to the closest
+shared ancestor isn't just *a* solution, it's the *only* location in the
+whole tree that both `Display` and `Keypad` are structurally allowed to
+depend on at all. Every "where should this state live" question in this
+project from here on has the identical answer-shape: find the lowest node
+in the tree that is an ancestor of everything that needs it.
+
 ---
 
-## Step 2 — What Breaks Without Lifting: A Live Demonstration
+## Step 3 — What Breaks Without Lifting: A Live Demonstration
 
 **The problem:** to see why lifting state is the *only* correct option
 here — not just *a* nice option — it helps to see the broken alternative
@@ -90,7 +132,7 @@ longer one truth — there are two, and nothing keeps them equal.
 
 ---
 
-## Step 3 — Add a Real Clear Button
+## Step 4 — Add a Real Clear Button
 
 With state already correctly lifted, adding a second feature that needs to
 affect the display is now small. In `Calculator.tsx`, add a `handleClear`
@@ -153,6 +195,19 @@ already matches the exact shape needed, passing it directly is correct and
 simpler — recognizing *when* a wrapper is needed, versus when it would
 just be unnecessary extra code, is worth noticing explicitly here.
 
+**Forward connection — this two-level pass-through is not yet "prop
+drilling," but it's the shape that becomes a real problem later.** Right
+now, `onDigit` and `onClear` travel exactly one level — `Calculator` to
+`Keypad` — a completely normal, healthy use of props. Lesson 17 names
+**prop drilling** precisely: passing a prop down through one or more
+*intermediate* components that don't use it themselves, purely so a
+distant descendant can eventually receive it. This project doesn't hit
+that problem yet because `Keypad` is both the recipient and the user of
+`onDigit`/`onClear` — but as this tree grows deeper (a settings value
+needed by a component three levels down, say), the exact same lifting
+instinct this lesson just named formally starts to strain, which is the
+honest motivation lesson 17's `Context` actually solves.
+
 **SE lens — this is why the pattern is worth having a name.** `handleClear`
 took three lines, in the one file that already owns the state it needs to
 change. No new state was introduced anywhere. No component needed to be
@@ -188,9 +243,11 @@ silently, with no error anywhere to point at the cause.
 
 - [ ] A working `C` button clears the display back to `"0"`
 - [ ] `Display` still has zero state of its own — only a `value` prop
+- [ ] You can state, from memory, the formal definition of what it means for a component to "own" a piece of state
 - [ ] You can explain what "lifting state up" means and why React requires it here
-- [ ] You can explain what a "single source of truth" is, using Step 2's broken demo as the concrete example
+- [ ] You can explain what a "single source of truth" is, using Step 3's broken demo as the concrete example
 - [ ] You can explain why `onClear` is passed directly but `onDigit` needs a wrapping arrow function
+- [ ] You can say, for `Display` and `Keypad` each, whether they're a consumer or an actor with respect to `value`
 
 ---
 

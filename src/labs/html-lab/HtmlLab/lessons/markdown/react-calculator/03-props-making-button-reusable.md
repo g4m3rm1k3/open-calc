@@ -36,6 +36,18 @@ identical change made to it sixteen separate times.
 
 ---
 
+**SE lens — naming the principle this whole lesson exists to serve: DRY.**
+**DRY** — Don't Repeat Yourself — is one of the oldest, most widely known
+named principles in software engineering: the same piece of logic or
+knowledge should exist in exactly one place in a codebase, not copy-pasted
+wherever it's needed. Sixteen hand-written `<button>` elements would violate
+it sixteen times over — one real bug or one real design change would need
+finding and fixing in sixteen separate places, with every copy a fresh
+chance to fix ten of them correctly and miss the eleventh. `Button`,
+`ButtonProps`, and props themselves are this project's first real tool for
+actually satisfying DRY for UI — not a coincidence; it's the entire reason
+components and props exist as a concept at all.
+
 ## Step 2 — Create `Button.tsx` With a Prop
 
 In the **JavaScript** tab, click **+ New** and create `Button.tsx`:
@@ -58,6 +70,21 @@ component in this project that accepts configuration will define an
 interface named `<ComponentName>Props` for it — a consistent naming
 pattern, not a rule React itself enforces, that makes every component's
 file instantly tell you what it needs just by reading its top few lines.
+
+**CS/SE lens — an interface is a contract, and TypeScript checks it
+structurally.** `ButtonProps` is a **contract**: a promise that anything
+claiming to be a `ButtonProps` has a `label` field that's a string, and a
+promise, symmetrically, that `Button` will never try to read anything
+else off the object it's given. Critically, TypeScript checks this
+**structurally**, not by name — it never asks "was this object literally
+declared as a `ButtonProps`?" It only asks "does this object have a
+`label: string` field?" Any object with that shape satisfies the
+contract, regardless of what it's called or where it came from. This
+matters concretely later: lesson 06's `ButtonProps` grows an `onClick:
+() => void` field, and any function with that exact shape — takes nothing,
+returns nothing — satisfies it, whether it was written specifically for
+`Button` or not. **Structural typing** is the name for this: type
+compatibility based on shape, not on declared identity.
 
 **Walkthrough — `{ label }: ButtonProps`, your first destructured
 parameter.** Every component function receives exactly **one** argument:
@@ -99,6 +126,59 @@ attributes you add later can be written in any order), and adding a second
 prop later never requires updating every existing call site's argument
 order — only the interface, and only the call sites that actually need the
 new prop.
+
+**SE lens — props are a component's public API, and `ButtonProps` is its
+documentation.** An **API** (Application Programming Interface) is
+whatever surface one piece of code exposes for other code to use, without
+exposing how it works internally. `ButtonProps` — `{ label: string }` — is
+`Button`'s entire public API: the complete list of everything any other
+part of this project is allowed to configure about it. Reading
+`ButtonProps` alone, without opening `Button`'s function body at all, is
+enough to know exactly how to use it correctly. This is precisely why the
+convention from Step 2 (one named interface per component, listed first
+in the file) matters beyond consistency — it makes every component's API
+readable at a glance, the same way a library's documentation would.
+
+**Props are read-only, always — a rule stated once because it never
+changes.** `Button` receives `label` and only ever reads it — nowhere in
+this entire project does any component reassign one of its own props
+(`label = "something else"` inside `Button` would be both a TypeScript
+error and a violation of a rule React enforces at every level). Data
+flows in exactly one direction: a **parent** passes props **down** to a
+**child**; a child can never reach back up and hand a new value to its own
+props. This is called **one-way data flow**, and it's the reason every
+piece of state this project ever builds has to live in a specific,
+identifiable owner (lesson 07 makes this precise) rather than being
+writable from wherever it's convenient — the direction data is allowed to
+flow is fixed, by design, from this lesson forward.
+
+**PL lens — required versus optional props, previewed for later use.**
+`label: string` is a **required** field — every `ButtonProps` object must
+have one, and TypeScript rejects any call site that doesn't provide it (see
+"What Breaks Without This," below). TypeScript also allows **optional**
+fields, marked with a `?` — `label?: string` would mean "a `label` may or
+may not be present," and any code reading it would need to handle the
+`undefined` case explicitly (typically by giving it a **default value**,
+the same idea lesson 21's `initialName = ""` function parameter uses:
+"use this value if nothing was actually passed"). `Button` doesn't need
+this yet — a button with no label at all wouldn't make sense here, which
+is exactly why `label` staying required, not optional, is the *correct*
+modeling choice for this specific component, not just the simpler one.
+
+**Type inference, named precisely, since Monaco has been doing it
+silently since lesson 01.** TypeScript doesn't require a type annotation
+on every single value — `const doubled = double(5);` never needed
+`: number` written anywhere, because TypeScript can work out, mechanically,
+that `double` returns a `number`, and therefore `doubled` must be a
+`number` too, without being told. This mechanical process — deducing a
+value's type from context, rather than requiring it spelled out — is
+called **type inference**. `ButtonProps` still needs its fields' types
+written explicitly (`label: string`) because there's no existing value for
+TypeScript to infer *from* — a type declaration is the starting definition,
+not a deduction. Inference is why `React.useState(false)` (lesson 15)
+needs no explicit `<boolean>`, while `React.useState<string | null>(null)`
+does — inference can only work when the initial value alone fully
+determines the intended type.
 
 ---
 
@@ -191,6 +271,11 @@ lesson 06.
 - [ ] ▶ Preview shows all ten buttons with correct labels
 - [ ] You can explain what destructuring a parameter does, and why it's written that way here
 - [ ] You can explain why `label` is typed as `string`, not `number`
+- [ ] You can explain what "structural typing" means and why it matters for how props get checked
+- [ ] You can explain what "one-way data flow" means and why a child can't write back to its own props
+- [ ] You can explain what type inference is, and give an example from this lesson where TypeScript infers a type versus one where it can't
+- [ ] You can state the DRY principle and explain how `Button` satisfies it
+- [ ] You can explain the difference between a required and an optional prop, and why `label` should stay required
 
 ---
 

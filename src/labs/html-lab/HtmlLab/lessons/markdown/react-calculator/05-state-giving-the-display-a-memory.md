@@ -72,6 +72,33 @@ calls to a component function, tied to that specific place in the
 component tree, and — critically — changing it is what tells React "call
 this component again, something it depends on is different now."
 
+**Object lifetime, named explicitly, since state is the first thing in
+this project that has one.** Every value in a program has a **lifetime**
+— the span of time between when it's created and when it's destroyed and
+its memory reclaimed. A local variable's lifetime is exactly one function
+call: born when the call starts, gone when it returns. `Display`'s state
+has a *longer* lifetime: it's created once, the first time `Display`
+**mounts** (appears in the tree for the first time), and it survives every
+subsequent re-render, until `Display` **unmounts** (is removed from the
+tree entirely — lesson 15 is where this first genuinely happens, when
+`ScientificPad` toggles off). This mount → survives many re-renders →
+unmount span is a component instance's lifetime, and it's precisely why
+state can "remember" anything at all: it's tied to that lifetime, not to
+any single call of the component function.
+
+**A precise refinement worth having, on exactly what "the function is
+called again" means.** Lesson 01 said re-rendering means calling the
+component function again — true, but one detail matters here: React
+doesn't confuse *this* `Display`'s state with some *other* `Display`'s
+state, even though both would be running the identical function
+`Display()`. React tracks state per **position in the tree**, not per
+function — if this project ever rendered two `<Display />` elements side
+by side, each would get its own, completely independent `useState("0")`
+call and its own independent value, despite both running the exact same
+code. "Which `Display`" is determined by where it sits in the component
+tree lesson 02 introduced, not by anything written inside the function
+itself.
+
 ---
 
 ## Step 2 — `useState`
@@ -129,6 +156,44 @@ returns the value React has been remembering, which is now the freshly
 updated one. The `"0"` argument only ever matters on a component's very
 first render, ever, for as long as that component stays on the page.
 
+**Walkthrough — `value + "1")` never modifies `value` itself; strings
+cannot be modified at all.** A **string** in JavaScript is **immutable** —
+once created, its contents can never change; `value + "1"` doesn't alter
+the string `value` currently points to, it computes and returns a brand
+new string, which `setValue` then stores as the new state. This is worth
+noticing early, because it's the *easy* case: strings, numbers, and
+booleans are all immutable by nature, so there's no way to accidentally
+"mutate them in place" even if you tried. Lesson 18 revisits this exact
+concern for arrays and objects, which genuinely *can* be mutated in place
+(`.push()`, direct property assignment) — a real danger strings and
+numbers simply don't have, which is part of why the mistake doesn't show
+up until this project starts holding more complex state.
+
+**A crucial, commonly-confused point about timing: `setValue` does not
+change `value` immediately, inside the handler that called it.** Calling
+`setValue(value + "1")` does not reach back and update the `value` variable
+currently in scope — that specific `value` was created by *this* render's
+call to `useState`, and like every `const`, it never changes for the rest
+of this render. What `setValue` actually does is tell React "the next
+time you render this component, start `useState` off from this new value
+instead." If the click handler read `value` again on the very next line,
+immediately after calling `setValue`, it would still see the *old* value —
+the update only becomes visible the *next* time `Display` runs, as a
+brand-new call with a brand-new `value` from a fresh `useState`. This is
+why every setter call in this entire project is written to depend only on
+values already known at the moment it's called, never assuming a state
+setter has taken effect by the very next line of the same function.
+
+**CS lens — `() => setValue(value + "1")` is a closure.** The arrow
+function passed to `onClick` refers to `value` and `setValue` — two names
+it never received as its own parameters, reaching out instead to variables
+that exist in the surrounding `Display` function. A function that
+"remembers" and can still use variables from the scope it was defined in,
+even when it's called later, from somewhere else entirely (here, by
+React's own event system, whenever a click actually happens) is called a
+**closure**. Every event handler in this project, from here on, is a
+closure — this is the mechanism, not a special case.
+
 **SE lens — why state lives inside the component that owns it, for now.**
 `Display` owns its own display value, entirely by itself — nothing outside
 `Display` can see or change it. This is deliberate and temporary: it makes
@@ -176,6 +241,11 @@ render-avoidance on purpose.
 - [ ] Clicking the display visibly grows the number
 - [ ] You can explain why a plain `let` variable can't hold state across renders
 - [ ] You can explain exactly what the two values `useState` returns represent
+- [ ] You can explain what a closure is, using this lesson's `onClick` as the example
+- [ ] You can explain what "lifetime" means for a value, contrasting a local variable's lifetime with state's
+- [ ] You can explain why two `<Display />` elements on the same page would not share state, even though both run identical code
+- [ ] You can explain why strings are immutable and how that relates to `value + "1"`
+- [ ] You can explain why reading `value` on the line right after calling `setValue` still shows the old value
 
 ---
 
