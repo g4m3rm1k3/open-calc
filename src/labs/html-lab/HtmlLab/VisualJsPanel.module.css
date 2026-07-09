@@ -224,6 +224,9 @@
   margin-top: 5px;
   border-top: 1px solid var(--hl-border, #e2e8f0);
   padding-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .childSlot {
@@ -252,35 +255,44 @@
 }
 .addChildBtn:hover { border-color: #6366f1; color: #6366f1; }
 
-/* ── Field Input ── */
+/* ── Property rows (horizontal label + control, matching PropertiesPanel style) ── */
 
-.field {
+.propRow {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 5px;
+  align-items: center;
+  gap: 6px;
+  min-height: 22px;
 }
 
-.fieldLabel {
+.propLabel {
+  width: 70px;
   font-size: 10px;
   font-weight: 600;
   color: var(--hl-muted, #64748b);
+  text-align: right;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.fieldControl {
+.propInput {
+  flex: 1;
+  min-width: 0;
   font-size: 11px;
-  padding: 3px 6px;
+  padding: 2px 5px;
   border: 1px solid var(--hl-border, #e2e8f0);
   border-radius: 4px;
   background: transparent;
   color: inherit;
   font-family: inherit;
-  width: 100%;
   box-sizing: border-box;
 }
-.fieldControl:focus { outline: none; border-color: #6366f1; }
+.propInput:focus { outline: none; border-color: #6366f1; }
 
 .fieldCode {
+  flex: 1;
+  min-width: 0;
   font-size: 11px;
   padding: 3px 6px;
   border: 1px solid var(--hl-border, #e2e8f0);
@@ -288,9 +300,8 @@
   background: transparent;
   color: inherit;
   font-family: monospace;
-  width: 100%;
   box-sizing: border-box;
-  min-height: 60px;
+  min-height: 52px;
   resize: vertical;
 }
 .fieldCode:focus { outline: none; border-color: #6366f1; }

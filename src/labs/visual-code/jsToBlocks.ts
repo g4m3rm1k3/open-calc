@@ -87,11 +87,33 @@ function splitStatements(code: string): string[] {
   return result
 }
 
+// Detect (function() { ... })() IIFEs and return the body, or null if not an IIFE.
+function tryUnwrapIife(s: string): string | null {
+  if (!/^\(\s*(?:async\s+)?function\s*[\w$]*\s*\(/.test(s)) return null
+  const firstBrace = s.indexOf('{')
+  if (firstBrace === -1) return null
+  const lastBrace = matchBrace(s, firstBrace)
+  // After the closing } there must be a ) to close the wrapping ( — confirming it's an IIFE call.
+  if (s.slice(lastBrace + 1).trimStart()[0] !== ')') return null
+  return s.slice(firstBrace + 1, lastBrace)
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export function parseJsToBlocks(code: string): Block[] {
   if (!code?.trim()) return []
-  return splitStatements(code).map(parseStmt).filter((b): b is Block => b !== null)
+  const blocks: Block[] = []
+  for (const stmt of splitStatements(code)) {
+    const iife = tryUnwrapIife(stmt)
+    if (iife !== null) {
+      // Unwrap: parse the IIFE body as if it were top-level statements
+      blocks.push(...parseJsToBlocks(iife))
+    } else {
+      const b = parseStmt(stmt)
+      if (b) blocks.push(b)
+    }
+  }
+  return blocks
 }
 
 // ── Statement matcher ─────────────────────────────────────────────────────────

@@ -1239,6 +1239,7 @@ export default function CodePanel({
             <VisualJsPanel
               elements={elements}
               html={html}
+              css={css}
               activeJsCode={javascript}
               tabVisitCount={visualTabCount}
               onCodeChange={handleVisualCodeChange}
