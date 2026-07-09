@@ -2,71 +2,151 @@
 
 ## What you will build
 
-Three composables — `useCounter`, `useLocalStorage`, and `useFetch` — and an app that uses all three. Each composable encapsulates a reusable behaviour; your component imports and uses them like lego bricks.
+Three composables — `useCounter`, `useLocalStorage`, and `useFetch` — and an app that uses all three. Each composable encapsulates reusable reactive behavior. Your component imports and calls them like building blocks.
 
 ```
-useCounter    →  count, doubled, increment, decrement, reset
-useLocalStorage → value (persisted across page refreshes)
-useFetch      →  data, loading, error
+useCounter      →  count, doubled, increment, decrement, reset
+useLocalStorage →  value (persisted across page refreshes, typed)
+useFetch        →  data, loading, error  (the Lesson 08 pattern, extracted)
 ```
 
 ---
 
-## Connects backward
+## What you need to know first
 
-Every lesson in this series introduced a piece of Vue's composition API: `ref` (01), events (02), `computed` (03), `watch` (09), `onMounted` (08), `provide`/`inject` (11). A composable is just a function that uses these pieces together. `usePosts()` appeared in Lesson 08. This lesson formalizes the pattern.
+Every lesson in this series introduced a piece of Vue's Composition API: `ref` (01), events (02), `computed` (03), `watch` (09), `onMounted` (08), `provide`/`inject` (11). A composable is a function that uses these pieces to implement a reusable behavior. This lesson starts by showing the problem a composable solves — duplication of reactive logic — before extracting the solution.
 
 ---
 
-## The lesson
+## Step 1 — Logic without composables, and where duplication appears
 
-### Step 1 — `useCounter.ts`
+Build two counters in `App.vue`. Without composables, you write the entire counter logic twice:
 
-**The problem:** A counter with increment/decrement/reset logic appears in multiple places in a real app. If it lives directly in each component, any bug fix or change must be applied everywhere. Extract it once and import it anywhere.
+```html
+<script setup lang="ts">
+import { ref, computed } from 'vue'
 
-**File:** Create `src/composables/useCounter.ts` (use the `+` button) — paste the entire file contents:
+// Counter 1: page views
+const pageCount    = ref(0)
+const pageDoubled  = computed(() => pageCount.value * 2)
+function incPage()   { pageCount.value++ }
+function decPage()   { if (pageCount.value > 0) pageCount.value-- }
+function resetPage() { pageCount.value = 0 }
+
+// Counter 2: score
+const scoreCount   = ref(0)
+const scoreDoubled = computed(() => scoreCount.value * 2)
+function incScore()   { scoreCount.value++ }
+function decScore()   { if (scoreCount.value > 0) scoreCount.value-- }
+function resetScore() { scoreCount.value = 0 }
+</script>
+
+<template>
+  <div>
+    <h3>Pages: {{ pageCount }} (doubled: {{ pageDoubled }})</h3>
+    <button @click="decPage">−</button>
+    <button @click="resetPage">Reset</button>
+    <button @click="incPage">+</button>
+
+    <h3>Score: {{ scoreCount }} (doubled: {{ scoreDoubled }})</h3>
+    <button @click="decScore">−</button>
+    <button @click="resetScore">Reset</button>
+    <button @click="incScore">+</button>
+  </div>
+</template>
+```
+
+Twelve lines of logic, six for each counter, identical in structure. Now a bug: `decrement` should allow going below zero (scores can be negative). Fix `decPage` and `decScore`. A new requirement: "doubled" should be "tripled." Update `pageDoubled` and `scoreDoubled`. Add a third counter. Add a fourth. Each addition multiplies the edit surface.
+
+**CS lens — generalization.** Lesson 03 showed `computed` generalizing from "manually recalculate total in every function" to "declare what total is." Lesson 05 showed components generalizing from "copy the `<li>` template" to "define it once." A composable applies the same generalization to reactive *logic*: declare the behavior once as a function; call it from anywhere. The same pattern — one rule covering every case — applies at every level of abstraction.
+
+**SE lens — duplication as a maintenance obligation.** Each copy of the counter logic is a contract: "this copy must remain synchronized with every other copy, forever." Every change, fix, and extension must be applied to all copies. As copies multiply, the probability that at least one is out of sync after any change approaches 1. The maintenance cost scales with the number of copies. A composable brings the copy count to 1.
+
+---
+
+## Step 2 — `useCounter.ts`: extracting reactive logic
+
+Create `src/composables/useCounter.ts`:
 
 ```typescript
 import { ref, computed } from 'vue'
 
 export function useCounter(initialValue = 0) {
-  const count = ref(initialValue)
+  const count   = ref(initialValue)
   const doubled = computed(() => count.value * 2)
 
   function increment() { count.value++ }
   function decrement() { count.value-- }
-  function reset() { count.value = initialValue }
+  function reset()     { count.value = initialValue }
 
   return { count, doubled, increment, decrement, reset }
 }
 ```
 
-**Walkthrough:**
-- `export function useCounter(initialValue = 0)` — a plain TypeScript function; the naming convention `use` + noun signals "this function uses Vue's reactivity APIs — call it inside a component"
-- `const count = ref(initialValue)` — creates a reactive ref; each call to `useCounter()` creates its own independent ref
-- `const doubled = computed(...)` — derived state; re-computes whenever `count` changes
-- `return { count, doubled, increment, decrement, reset }` — the public API of this composable; callers destructure what they need
+Replace `App.vue`'s script:
 
-**CS concept — closure:** The returned functions `increment`, `decrement`, and `reset` all close over `count`. When a component calls `useCounter()`, it gets back functions that already have a reference to *this call's* `count` ref. The closure is what makes each use of `useCounter()` independent — two components using `useCounter()` get two separate `count` refs.
+```typescript
+import { useCounter } from './composables/useCounter.ts'
 
-**SE principle — cohesion:** All the pieces of counter logic live together: the state, the derived values, the functions. `ref`, `computed`, and the functions are cohesive — they have the same reason to change. High cohesion makes code easier to find, understand, and modify.
+const {
+  count: pageCount, doubled: pageDoubled,
+  increment: incPage, decrement: decPage, reset: resetPage
+} = useCounter(0)
 
-**What breaks if you call `useCounter()` at the module level (outside a component):** `computed()` called outside a component setup context still works (it creates a reactive value). But `onMounted` and lifecycle hooks would throw. Convention: composables that use lifecycle hooks must be called during component setup. `useCounter` is safe anywhere; composables that call `onMounted` are not.
+const {
+  count: scoreCount, doubled: scoreDoubled,
+  increment: incScore
+} = useCounter(0)
+```
+
+Twelve lines become two. Fix a bug in `useCounter` once — both counters benefit instantly.
+
+**Walkthrough — a composable is a function.** `useCounter` is a plain TypeScript function. Nothing about it is specific to Vue *yet* — until you notice that its body calls `ref` and `computed`, which are Vue composition API functions. A composable is precisely this: **a function that uses Vue composition API functions**. That is the complete definition.
+
+**Walkthrough — closure and independence:**
+
+```typescript
+export function useCounter(initialValue = 0) {
+  const count = ref(initialValue)   // created in this call's scope
+
+  function increment() { count.value++ }  // closes over this call's count
+  function decrement() { count.value-- }
+  function reset()     { count.value = initialValue }
+
+  return { count, doubled, increment, decrement, reset }
+}
+```
+
+Each call to `useCounter()` creates a **new scope** with a **new `ref`**. `increment`, `decrement`, and `reset` **close over** the `count` ref created in their enclosing scope — the call that created them. This is JavaScript closure: the inner functions carry a reference to the specific `count` from their creation context, and that reference is fixed for the lifetime of the returned object.
+
+Two calls to `useCounter()` produce two independent `count` refs. Incrementing `pageCount` does not affect `scoreCount` — they close over different refs. The closure is what makes each composable call independent.
+
+**Walkthrough — destructuring with rename:**
+
+```typescript
+const { count: pageCount, increment: incPage } = useCounter()
+```
+
+`{ count: pageCount }` means: destructure the property `count` from the returned object, and bind it to the local name `pageCount`. This is standard JavaScript destructuring rename syntax — not Vue-specific. It allows using the same composable twice in the same component without name collisions: `count` from both calls would collide; `pageCount` and `scoreCount` do not.
+
+**CS concept — closure, precisely.** A **closure** is a function that retains access to variables from its lexical scope even after that scope has exited. `increment` is created inside the `useCounter` function call. The call returns — the stack frame exits — but `increment` still refers to `count` from that frame. JavaScript keeps the frame's variables alive as long as any function references them. Two calls to `useCounter()` create two frames, each with its own `count`, producing two independent closures. This is the mechanism that makes composables stateful and isolated per call.
+
+**SE principle — cohesion.** All the pieces of counter logic live together in `useCounter.ts`: the state, the derivation, the mutations. They have the same reason to change — they are all about "counter." **High cohesion** means a file or module contains things that belong together. **Low cohesion** means a file mixes unrelated concerns. The scattered counter logic in Step 1 was low cohesion: counter behavior was mixed with two different counters' declarations, in the same file as the template. `useCounter.ts` is high cohesion: everything inside is specifically about counter behavior.
 
 ---
 
-### Step 2 — `useLocalStorage.ts`
+## Step 3 — `useLocalStorage.ts`: extracting the Lesson 09 pattern
 
-**The problem:** Any reactive value that should persist across page refreshes needs to be saved to `localStorage` on change and read from `localStorage` on mount. This is the exact watcher pattern from Lesson 09 — make it reusable for any type.
+The save-to-localStorage pattern from Lesson 09 is identical for any serialisable type:
 
-**File:** Create `src/composables/useLocalStorage.ts` — paste the entire file contents:
+Create `src/composables/useLocalStorage.ts`:
 
 ```typescript
 import { ref, watch } from 'vue'
 
 export function useLocalStorage<T>(key: string, defaultValue: T) {
   const stored = localStorage.getItem(key)
-  const value = ref<T>(stored !== null ? JSON.parse(stored) : defaultValue)
+  const value  = ref<T>(stored !== null ? JSON.parse(stored) : defaultValue)
 
   watch(value, (newVal) => {
     localStorage.setItem(key, JSON.stringify(newVal))
@@ -76,42 +156,65 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
 }
 ```
 
-**Walkthrough:**
-- `<T>` — a TypeScript generic parameter; the caller decides the type: `useLocalStorage<string>(...)`, `useLocalStorage<number>(...)`, `useLocalStorage<string[]>(...)`
-- `localStorage.getItem(key)` — runs synchronously during setup; reads the saved value immediately
-- `stored !== null ? JSON.parse(stored) : defaultValue` — `getItem` returns `null` when the key is absent; `JSON.parse` converts the stored string back to the original type
-- `watch(value, ..., { deep: true })` — `{ deep: true }` is needed because `value` might be an object or array; without it, mutations to nested properties would not trigger the watcher
-- `JSON.stringify(newVal)` — serialises the value to a string for storage; this handles numbers, booleans, arrays, and objects
+Use it:
 
-**What is `<T>` in `useLocalStorage<T>(key: string, defaultValue: T)`?** A generic type parameter. `T` is a placeholder the caller fills in. When you call `useLocalStorage<string>('name', 'Anonymous')`, TypeScript replaces `T` with `string` throughout the function. The return type becomes `Ref<string>`. This is TypeScript generics — the same mechanism as `Array<string>` or `Promise<number>`.
+```typescript
+const notes     = useLocalStorage<string>('notes', '')
+const savedCount = useLocalStorage<number>('count', 0)
+const settings  = useLocalStorage<{ dark: boolean; size: number }>('settings', { dark: false, size: 14 })
+```
 
-**CS concept — generic programming:** `useLocalStorage<T>` works for any type `T` that can be JSON-serialized. You write the logic once; TypeScript enforces correctness for each specific type at each call site. Without generics you would need `useStringLocalStorage`, `useNumberLocalStorage`, etc. — one function per type.
+The read-parse-watch-save pattern from Lesson 09 — which was 5 lines — now applies to any JSON-serialisable type with one line.
 
-**SE principle — DRY (Don't Repeat Yourself):** The localStorage read-parse-watch pattern is identical whether you are storing a name, a preference, or a list. Extracting it into a composable means the implementation lives in one place. Bug in `JSON.parse`? Fix it once. New storage requirement (encryption, compression)? Add it once.
+**Walkthrough — `<T>` generics:**
+
+```typescript
+export function useLocalStorage<T>(key: string, defaultValue: T)
+```
+
+`<T>` is a **generic type parameter** — a placeholder for a type that the caller fills in. When you write `useLocalStorage<string>('key', '')`, TypeScript substitutes `string` everywhere `T` appears: `defaultValue` is `string`, and the return value is `Ref<string>`. A separate call with `<number>` gets `Ref<number>`. The same function body serves all types; the type system guarantees correctness at each call site.
+
+Without generics you would need: `useStringLocalStorage`, `useNumberLocalStorage`, `useBooleanLocalStorage` — or a version that returns `Ref<unknown>` and loses all type safety. Generics allow you to write an algorithm once and let the type system specialize it for each use.
+
+**Walkthrough — `{ deep: true }`:**
+
+```typescript
+watch(value, (newVal) => {
+  localStorage.setItem(key, JSON.stringify(newVal))
+}, { deep: true })
+```
+
+Without `{ deep: true }`, the watcher fires only when `value.value` is *replaced* — a new object or array assigned to `.value`. Mutating a property inside the object (`settings.value.dark = true`) does not replace the ref's value — it mutates a property inside it — and a shallow watcher would miss this. `{ deep: true }` traverses the value recursively and fires whenever any nested property changes.
+
+**Walkthrough — `JSON.parse` and `JSON.stringify`:**
+
+`localStorage` only stores strings. Complex values must be serialised. `JSON.stringify` converts any JSON-compatible value to a string; `JSON.parse` converts it back. Values that are not JSON-compatible (functions, `undefined`, circular references, `Date` objects) lose information through serialisation — `JSON.parse(JSON.stringify(new Date()))` produces a string, not a Date. For simple data (strings, numbers, booleans, plain objects, arrays), this is transparent.
+
+**CS concept — generic programming.** `useLocalStorage<T>` works for any type `T` that can be JSON-serialised. Writing the algorithm once and parameterizing it over types is **generic programming** — the same principle behind `Array<T>`, `Promise<T>`, `Ref<T>`. The alternative to generics is either code duplication (one function per type) or loss of type safety (all values typed as `any`). Generics allow you to write "this algorithm works the same way for any type in this category" — *and* have the type system verify it at every call site.
 
 ---
 
-### Step 3 — `useFetch.ts`
+## Step 4 — `useFetch.ts`: extracting the Lesson 08 pattern
 
-**The problem:** The three-state fetch pattern from Lesson 08 (loading/error/data) is the same in every component that fetches. Extract it as a generic composable.
+The three-state fetch pattern from Lesson 08 is identical for any URL and any response type:
 
-**File:** Create `src/composables/useFetch.ts` — paste the entire file contents:
+Create `src/composables/useFetch.ts`:
 
 ```typescript
 import { ref, onMounted } from 'vue'
 
 export function useFetch<T>(url: string) {
-  const data = ref<T | null>(null)
+  const data    = ref<T | null>(null)
   const loading = ref(true)
-  const error = ref<string | null>(null)
+  const error   = ref<string | null>(null)
 
   onMounted(async () => {
     try {
       const res = await fetch(url)
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      data.value = await res.json()
+      data.value = await res.json() as T
     } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Unknown error'
+      error.value = e instanceof Error ? e.message : 'Fetch failed'
     } finally {
       loading.value = false
     }
@@ -121,144 +224,89 @@ export function useFetch<T>(url: string) {
 }
 ```
 
-**Walkthrough:**
-- `useFetch<T>(url: string)` — `T` is the type of the response data; callers specify it: `useFetch<Post[]>('...')`
-- `ref<T | null>(null)` — `null` until the fetch completes; `T` after success
-- `onMounted(async () => {...})` — fetches after the component is in the DOM (same as Lesson 08; now it's reusable)
-- `e instanceof Error ? e.message : 'Unknown error'` — safe error handling regardless of what was thrown
+Use it:
 
----
-
-### Step 4 — `App.vue` using all three composables
-
-**File:** `src/App.vue` — replace the entire `<script setup>` section with:
-
-```typescript
-import { useCounter } from './composables/useCounter'
-import { useLocalStorage } from './composables/useLocalStorage'
-import { useFetch } from './composables/useFetch'
+```html
+<script setup lang="ts">
+import { useFetch } from './composables/useFetch.ts'
 
 interface Post { id: number; title: string }
 
-const { count, doubled, increment, decrement, reset } = useCounter(10)
-const name = useLocalStorage<string>('user-name', 'Anonymous')
 const { data: posts, loading, error } = useFetch<Post[]>(
-  'https://jsonplaceholder.typicode.com/posts?_limit=3'
+  'https://jsonplaceholder.typicode.com/posts?_limit=5'
 )
-```
+</script>
 
-**File:** `src/App.vue` — replace the `<template>` section with:
-
-```html
 <template>
-  <div class="app">
-
-    <section>
-      <h3>Counter</h3>
-      <p>Count: {{ count }} · Doubled: {{ doubled }}</p>
-      <div class="controls">
-        <button @click="decrement">−</button>
-        <button @click="reset">Reset</button>
-        <button @click="increment">+</button>
-      </div>
-    </section>
-
-    <section>
-      <h3>Persisted name</h3>
-      <input v-model="name" placeholder="Your name" />
-      <p>Hello, {{ name }}! (try refreshing — it persists)</p>
-    </section>
-
-    <section>
-      <h3>Posts</h3>
-      <div v-if="loading">Loading...</div>
-      <div v-else-if="error">Error: {{ error }}</div>
-      <ul v-else>
-        <li v-for="post in posts" :key="post.id">{{ post.title }}</li>
-      </ul>
-    </section>
-
-  </div>
+  <p v-if="loading">Loading…</p>
+  <p v-else-if="error">{{ error }}</p>
+  <ul v-else>
+    <li v-for="post in posts" :key="post.id">{{ post.title }}</li>
+  </ul>
 </template>
 ```
 
-**File:** `src/App.vue` — replace the `<style>` section with:
+The 15-line `onMounted`/`try`/`catch`/`finally` pattern from Lesson 08 is now one line.
 
-```html
-<style scoped>
-.app { font-family: system-ui, sans-serif; max-width: 480px; margin: 40px auto; display: flex; flex-direction: column; gap: 24px; }
-section { padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; }
-h3 { font-size: 14px; font-weight: 700; margin: 0 0 12px; color: #41b883; }
-.controls { display: flex; gap: 8px; }
-.controls button { padding: 6px 16px; border: 1px solid #cbd5e1; border-radius: 6px; background: none; cursor: pointer; font-size: 14px; }
-input { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; width: 100%; box-sizing: border-box; margin-bottom: 8px; }
-ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
-li { font-size: 13px; color: #475569; }
-p { font-size: 13px; color: #64748b; margin: 8px 0 0; }
-</style>
-```
+**Walkthrough — `onMounted` inside a composable:**
 
-**Walkthrough — the call site:**
-- `const { count, doubled, ... } = useCounter(10)` — starts at 10; `count` and `doubled` are reactive; functions are plain functions
-- `const name = useLocalStorage<string>('user-name', 'Anonymous')` — `name` is a `Ref<string>`; `v-model="name"` works directly on it
-- `const { data: posts, loading, error } = useFetch<Post[]>(...)` — `data` renamed to `posts` at destructure; `posts` is `Ref<Post[] | null>`
+When `useFetch` is called during a component's setup, Vue knows which component is currently initializing. `onMounted` called inside `useFetch` registers the lifecycle hook on *that component* — the one whose setup is currently running. Vue maintains a reference to the "current instance" during setup; lifecycle hooks and `inject`/`provide` all use this reference. The composable does not need to know which component is using it.
 
-**CS concept — composition:** The power of composables is that they compose. `useLocalStorage` uses `ref` and `watch`. `useFetch` uses `ref` and `onMounted`. You can build composables that use other composables:
+**Walkthrough — `as T` type assertion:**
 
 ```typescript
-export function usePersistedCounter(key: string) {
-  const stored = useLocalStorage<number>(key, 0)  // uses another composable
-  const doubled = computed(() => stored.value * 2)
-  function increment() { stored.value++ }
-  return { count: stored, doubled, increment }
+data.value = await res.json() as T
+```
+
+`res.json()` returns `Promise<any>` — TypeScript knows a JSON response was parsed, but not its shape. `as T` is a **type assertion**: you are telling TypeScript "trust me, this value is of type T." The runtime does not check this — if the API returns a different shape than T, TypeScript will not catch it. For production code, use a validation library (Zod, Valibot) to verify the shape at runtime.
+
+**CS concept — abstraction boundaries.** Each composable defines a boundary: the **public API** (what is returned) is stable; the **implementation** (how state is managed, how the fetch is performed) is internal. Callers depend on the public API. If `useFetch` later adds caching, retry logic, or request deduplication — callers see no change. The abstraction boundary insulates callers from implementation details.
+
+**CS concept — composing composables.** Composables can call other composables:
+
+```typescript
+export function useSearchablePosts(query: Ref<string>) {
+  const { data: allPosts, loading, error } = useFetch<Post[]>('/api/posts')
+  const filtered = computed(() =>
+    allPosts.value?.filter(p => p.title.includes(query.value)) ?? []
+  )
+  return { posts: filtered, loading, error }
 }
 ```
 
-This is the same composability model as Unix pipes or React hooks.
+`useSearchablePosts` builds on `useFetch` and `computed`. This layering — composables that call composables — is how complex behaviors are built from simple ones. Each layer adds one responsibility; no layer knows about layers above it.
 
-**SE principle — reuse without inheritance:** Vue 2 used mixins for shared logic. Mixins had three problems: name collisions, unclear source of origin, implicit dependencies. Composables have none of these — destructuring makes the origin explicit, and there are no shared namespaces. Every imported value has a visible name at the call site.
-
----
-
-## Three rules of composables
-
-1. **Call during setup:** Composables that use lifecycle hooks (`onMounted`, `watch`) must be called synchronously during `<script setup>`. Not inside a callback, not after an `await`.
-
-2. **Can call other composables:** `usePersistedCounter` can call `useLocalStorage`. Composition applies.
-
-3. **Return reactive values:** The calling component destructures refs and functions and uses them directly in templates. The ref itself (not `.value`) is returned so Vue's template auto-unwrapping works.
+**SE principle — DRY, paid in full.** Each behavior has one definition. `useFetch` is defined once; every component that fetches uses it. A bug in the error-catching logic: fixed once, fixed everywhere. A new requirement to add a timeout: added once, applies everywhere. The number of places a change must be applied drops from N (one per component) to 1.
 
 ---
 
-## Series complete
+## The `use` naming convention
 
-You have built a full Vue 3 foundation:
+A function that uses Vue Composition API internals (`ref`, `computed`, `watch`, `onMounted`, `provide`, `inject`) is called a **composable** and named with a `use` prefix by convention. This signals: "this function has Vue reactive internals; it must be called during component setup (inside `<script setup>` or a `setup()` function)."
 
-| Lesson | Concept |
-|--------|---------|
-| 01 | `ref`, `{{ }}`, SFC structure |
-| 02 | `@click`, event handlers |
-| 03 | `computed()`, declarative derivation |
-| 04 | `v-if`, `v-for`, `:key` |
-| 05 | `defineProps`, component import |
-| 06 | `defineEmits`, data down / events up |
-| 07 | `v-model`, form handling |
-| 08 | `onMounted`, `fetch`, three-state async |
-| 09 | `watch`, `watchEffect`, side effects |
-| 10 | `<slot>`, named slots, `$slots` |
-| 11 | `provide`, `inject`, `InjectionKey` |
-| 12 | Composables: encapsulate and reuse |
+A function without `use` is a plain utility — safe to call anywhere, no Vue internals:
 
-Every concept in this series appears in production Vue 3 applications daily. The spreadsheet series ahead applies them all to one ambitious, real-world project.
+```typescript
+// Composable — must be called in setup:
+const { count, increment } = useCounter()
+
+// Plain utility — can be called anywhere:
+const formatted = formatCurrency(price.value)
+```
+
+The `use` prefix is a social contract. Vue does not enforce it. Breaking it — calling a composable outside setup — produces the error: `inject() can only be used inside setup() or functional components.`
 
 ---
 
 ## Definition of done
 
-Click **▶ Run** and verify:
+Build a page that uses all three composables. Click **▶ Run** and verify:
 
-- [ ] Counter increments, decrements, resets from 10
-- [ ] Name persists through page refresh (check the storage in browser DevTools)
-- [ ] Posts load from the API
-- [ ] You can explain the three rules of composables
-- [ ] Build `useDebounce<T>(source: Ref<T>, delayMs: number): Ref<T>` — a composable that returns a ref whose value updates only after the source has been stable for `delayMs` milliseconds
+- [ ] Two counters increment/decrement independently — changing one does not affect the other
+- [ ] A textarea backed by `useLocalStorage` persists its content after page refresh
+- [ ] Posts from `useFetch` load with a loading state, then display correctly
+- [ ] You can explain why two calls to `useCounter()` produce independent counters (closure)
+- [ ] You can explain what `<T>` in `useFetch<T>()` does and why `as T` is a runtime risk
+- [ ] You can explain why `onMounted` inside a composable registers on the calling component
+- [ ] You can explain the `use` naming convention and what it signals to readers
+- [ ] Write a `useDebounce(value: Ref<string>, delay: number)` composable that returns a ref that only updates when the input has been stable for `delay` milliseconds

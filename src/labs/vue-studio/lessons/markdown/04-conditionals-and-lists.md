@@ -2,35 +2,72 @@
 
 ## What you will build
 
-A filterable todo list: renders each item from a reactive array, shows an empty state when nothing matches, and lets you filter between All / Active / Done.
+A filterable todo list: renders each item from a reactive array, toggles items done, shows an empty state when nothing matches, and filters between All / Active / Done. You can also add new items.
 
 ```
+[ Add new todo _________ ] [ Add ]
+
 [all] [active] [done]
 
-• Learn Vue components
-• Build something real   ✓ (strikethrough)
-• Ship it
+● Learn Vue components
+● Build something real   ✓ (strikethrough)
+● Ship it
 
 2 remaining
 ```
 
 ---
 
-## Connects backward
+## What you need to know first
 
-Lessons 01–03 built up reactive state and event handling. This lesson adds the two directives that render different markup depending on what that state contains: `v-if` for conditional branches and `v-for` for lists.
+Lessons 01–03 built reactive state (`ref`), event handling (`@click`), and derived state (`computed`). Every example rendered a *fixed* number of elements — one heading, one counter, three rows. Real applications render a *variable* number of elements based on what the data contains. This lesson adds the directives that make that possible.
 
 ---
 
-## The lesson
+## Step 1 — Rendering a list without `v-for`, and where it collapses
 
-### Step 1 — Reactive array and computed filter
+Before using `v-for`, try the approach you already know. Replace `src/App.vue`:
 
-**The problem:** We have a list of todos in reactive state. Displaying only the items that match the current filter is derived data — a job for `computed()`.
+```html
+<script setup lang="ts">
+import { ref } from 'vue'
 
-**File:** `src/App.vue` — replace the entire `<script setup>` section with:
+const todos = ref([
+  { id: 1, text: 'Learn Vue components', done: false },
+  { id: 2, text: 'Build something real', done: false },
+  { id: 3, text: 'Ship it', done: false },
+])
+</script>
+
+<template>
+  <ul>
+    <li>{{ todos[0].text }}</li>
+    <li>{{ todos[1].text }}</li>
+    <li>{{ todos[2].text }}</li>
+  </ul>
+</template>
+```
+
+Click **▶ Run**. All three items render. Now add a fourth item in the script:
 
 ```typescript
+todos.value.push({ id: 4, text: 'Learn composables', done: false })
+```
+
+The array has four items. The template has three `<li>` tags. The fourth item is invisible. Now run: the push itself re-renders the template — but the template has no `<li>` for index 3. Nothing shows.
+
+To display the fourth item you would add a fourth `<li>`. A fifth requires a fifth. This approach requires knowing the length of the array at the moment you write the template — which is never true with real data. User input, API responses, filter results — all have unknown lengths.
+
+**SE lens — hardcoding data structure into markup.** Each `<li todos[N].text>` bets that item N exists at render time. It couples the template to the current data length. A template that must be edited every time the data changes is not a *view* of the data — it is a *copy*. Copies drift; views stay current. The fix is to describe how to render *one* item and let Vue apply that description to every item — which is `v-for`.
+
+---
+
+## Step 2 — `v-for` and `:key`: rendering from data
+
+Replace the entire `src/App.vue`:
+
+```html
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 
 interface Todo {
@@ -45,6 +82,8 @@ const todos = ref<Todo[]>([
   { id: 3, text: 'Ship it', done: false },
 ])
 const filter = ref<'all' | 'active' | 'done'>('all')
+const newText = ref('')
+let nextId = 4
 
 const filtered = computed(() => {
   if (filter.value === 'active') return todos.value.filter(t => !t.done)
@@ -52,39 +91,29 @@ const filtered = computed(() => {
   return todos.value
 })
 
+const remaining = computed(() => todos.value.filter(t => !t.done).length)
+
 function toggle(id: number) {
   const todo = todos.value.find(t => t.id === id)
   if (todo) todo.done = !todo.done
 }
-```
 
-**Walkthrough:**
-- `interface Todo` — a TypeScript interface describing each item's shape; `ref<Todo[]>([])` tells TypeScript the array holds `Todo` objects
-- `ref<'all' | 'active' | 'done'>('all')` — a string ref with a union type; TypeScript will reject any other string assigned to `filter.value`
-- `computed(() => {...})` — re-runs whenever `filter` or `todos` changes; returns the matching subset
-- `todos.value.filter(t => !t.done)` — `Array.prototype.filter` returns a new array containing only items where the callback returns `true`
-- `toggle(id)` — finds the item by id and flips its `done` property; because `todos` is a reactive ref, Vue detects the mutation and re-renders
+function addTodo() {
+  const trimmed = newText.value.trim()
+  if (!trimmed) return
+  todos.value.push({ id: nextId++, text: trimmed, done: false })
+  newText.value = ''
+}
+</script>
 
-**What is `ref<Todo[]>([])` doing?** The `<Todo[]>` is a TypeScript generic parameter that overrides type inference. Without it, TypeScript would infer `Ref<never[]>` from the empty array, which refuses to hold `Todo` items. Explicit generics are how you tell TypeScript what a ref is *intended to hold*.
-
-**CS concept — data model separation:** The array is the model. The filter is a control. The `filtered` computed is a view projection. The template renders the projection. Separating *what data exists* from *what subset is shown* is fundamental data modelling.
-
-**SE principle — immutability at the edges:** `filter()` returns a new array — it does not modify `todos`. This is important: computed values should never mutate their dependencies. If `filtered` mutated `todos`, reading `filtered` would change `todos`, which would trigger `filtered` to re-run, infinitely.
-
-**What breaks if `filtered` mutates `todos`:** Replace `return todos.value.filter(...)` with `todos.value = todos.value.filter(...)`. Now activating the "done" filter *deletes* the active todos from the list permanently. Never mutate source state inside a computed getter.
-
----
-
-### Step 2 — Template: `v-if`/`v-else` for empty state
-
-**The problem:** When no todos match the filter, the list is empty. We should show a helpful message instead of a blank area.
-
-**File:** `src/App.vue` — replace the entire `<template>` section with:
-
-```html
 <template>
   <div class="app">
     <h2>Todo List</h2>
+
+    <form class="add-row" @submit.prevent="addTodo">
+      <input v-model="newText" placeholder="Add new todo…" class="input" />
+      <button type="submit" :disabled="!newText.trim()">Add</button>
+    </form>
 
     <div class="filters">
       <button
@@ -92,14 +121,10 @@ function toggle(id: number) {
         :key="f"
         :class="{ active: filter === f }"
         @click="filter = f"
-      >
-        {{ f }}
-      </button>
+      >{{ f }}</button>
     </div>
 
-    <p v-if="filtered.length === 0" class="empty">
-      Nothing here yet.
-    </p>
+    <p v-if="filtered.length === 0" class="empty">Nothing here yet.</p>
 
     <ul v-else>
       <li
@@ -108,70 +133,170 @@ function toggle(id: number) {
         :class="{ done: todo.done }"
         @click="toggle(todo.id)"
       >
+        <span class="check">{{ todo.done ? '✓' : '○' }}</span>
         {{ todo.text }}
       </li>
     </ul>
 
-    <div class="summary">
-      {{ todos.filter(t => !t.done).length }} remaining
-    </div>
+    <div class="summary">{{ remaining }} remaining</div>
   </div>
 </template>
-```
 
-**Walkthrough of each directive:**
-
-`v-if` / `v-else`:
-```html
-<p v-if="filtered.length === 0">Nothing here yet.</p>
-<ul v-else>...</ul>
-```
-`v-if="expression"` renders the element only when the expression is truthy. `v-else` (immediately following) renders when it is not. Vue **removes the element from the DOM entirely** when the condition is false — not `display: none`, but full removal. A `v-else` must immediately follow a `v-if` or `v-else-if` element with no other elements in between.
-
-`v-for` for lists:
-```html
-<li v-for="todo in filtered" :key="todo.id">
-```
-`v-for="item in array"` renders the element once per item. `item` is scoped to that element and its children. `:key` is required (see next point).
-
-`:key` — stable identity for list items:
-```html
-:key="todo.id"
-```
-Vue uses the key to match DOM nodes to array items across renders. Without a key, Vue guesses by position — if you filter or reorder, it reassigns DOM nodes to the wrong data. With a stable, unique key (always an `id`, never the array index), Vue patches only the items that actually changed.
-
-`:class` with an object:
-```html
-:class="{ done: todo.done }"
-```
-An object value applies each key as a CSS class when the value is truthy. The `done` class is added when `todo.done === true`, removed when false. This is cleaner than `todo.done ? 'done' : ''`.
-
-**CS concept — virtual DOM diffing:** When `todos` changes, Vue does not re-render the entire list. It compares the new virtual DOM tree to the previous one (diffing). Keys let the differ identify which `<li>` nodes moved, which were added, which were removed. Without keys the differ assumes everything at a given position is the same element — wrong after filtering.
-
-**SE principle — declarative rendering over imperative DOM manipulation:** Notice there is no `document.createElement`, no `list.innerHTML = ''`, no manually building HTML strings. You declare the desired structure; Vue figures out the minimum DOM operations.
-
-**What breaks without `:key`:** Remove `:key="todo.id"`. Mark two todos as done then switch to the "active" filter. You may see the wrong items with strikethrough, or items losing their done state when the filter changes. Vue is reusing the wrong DOM nodes.
-
----
-
-### Step 3 — Style
-
-**File:** `src/App.vue` — replace the `<style>` section with:
-
-```html
 <style scoped>
-.app { font-family: system-ui, sans-serif; max-width: 380px; margin: 40px auto; }
+.app { font-family: system-ui, sans-serif; max-width: 420px; margin: 40px auto; }
 h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.add-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+.add-row button { padding: 8px 16px; background: #41b883; color: white; border: none; border-radius: 6px; cursor: pointer; }
+.add-row button:disabled { opacity: 0.4; }
 .filters { display: flex; gap: 6px; margin-bottom: 16px; }
 .filters button { padding: 4px 12px; border-radius: 16px; border: 1px solid #cbd5e1; background: none; cursor: pointer; font-size: 13px; text-transform: capitalize; }
 .filters button.active { background: #41b883; color: white; border-color: #41b883; }
 .empty { color: #94a3b8; font-style: italic; }
 ul { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-li { padding: 12px 16px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: opacity 0.2s; }
-li.done { opacity: 0.4; text-decoration: line-through; }
+li { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #f8fafc; border-radius: 8px; cursor: pointer; transition: opacity 0.2s; user-select: none; }
+li.done { opacity: 0.45; text-decoration: line-through; }
+.check { font-size: 16px; color: #41b883; min-width: 16px; }
 .summary { margin-top: 16px; font-size: 13px; color: #64748b; }
 </style>
 ```
+
+**Walkthrough — `v-for`:**
+
+```html
+<li v-for="todo in filtered" :key="todo.id">
+```
+
+`v-for="item in array"` renders the element once for each item in `array`. The element and all its children have access to `item` (a scoped alias for the current iteration's object). Vue renders as many `<li>` elements as there are items in `filtered`. When `filtered` changes — because `filter` or `todos` changed — Vue re-renders the list automatically.
+
+`v-for` can also iterate over an array of strings, numbers, or objects:
+
+```html
+<button v-for="f in ['all', 'active', 'done']" :key="f">{{ f }}</button>
+```
+
+This is the filter buttons row — three buttons rendered from a literal array. The items are strings; `:key="f"` uses the string itself as the key.
+
+You can also access the index:
+
+```html
+<li v-for="(todo, index) in filtered" :key="todo.id">
+  {{ index + 1 }}. {{ todo.text }}
+</li>
+```
+
+**Walkthrough — `:key` and why it matters deeply:**
+
+```html
+:key="todo.id"
+```
+
+Vue uses the `key` to match DOM nodes to array items across renders. Without a key, Vue guesses by position — the DOM node at index 0 is assumed to be "whatever is now at index 0." This breaks when items reorder or filter:
+
+**Example without key:** todos array is `[A, B, C]`. Filter to "active" — only `[A, C]` remain. Vue sees: the list now has 2 items. The DOM node at position 0 is reused for A (same), DOM node at position 1 is reused for C (was B). DOM node at position 2 is removed. If B or C had any per-element DOM state (focused, checked, animating), that state stays on the wrong node.
+
+**Example with key:** Vue knows the identity of each item. When filtering to `[A, C]`, Vue knows "B is gone; C moved from index 1 to index 0; A stayed at index 0." It removes B's DOM node and moves C's, or patches the difference. Correct state, minimal operations.
+
+**Why the array index is a bad key:** If `todos` is `[A, B, C]` and you remove B, the new array is `[A, C]`. The index-keyed DOM node at position 1 was B's; it becomes C's. Vue patches B's text to C's text and removes the last node — but any state attached to the node (animation class, checkbox state, input text) belongs to B, and it survives on what is now C's node. Use real object IDs as keys, never positions.
+
+**Walkthrough — `v-if` / `v-else-if` / `v-else`:**
+
+```html
+<p v-if="filtered.length === 0" class="empty">Nothing here yet.</p>
+<ul v-else>...</ul>
+```
+
+`v-if` **removes the element from the DOM** when false — not `display: none`, but actual DOM removal and re-insertion. This has two implications:
+
+1. An element with `v-if="false"` is not in the DOM at all — it has zero event listeners, zero rendered children, zero memory footprint.
+2. When `v-if` toggles to `true`, Vue mounts the element from scratch — lifecycle hooks fire, child components initialize.
+
+`v-else` immediately follows a `v-if` (or `v-else-if`) and renders when all preceding conditions are false. Vue will warn if `v-else` is not immediately adjacent to `v-if`.
+
+Multiple branches:
+
+```html
+<div v-if="status === 'loading'">Loading…</div>
+<div v-else-if="status === 'error'">Error: {{ error }}</div>
+<div v-else>{{ data }}</div>
+```
+
+Only one branch exists in the DOM at any time.
+
+**Walkthrough — `:class` with an object:**
+
+```html
+:class="{ done: todo.done }"
+```
+
+Passing an object to `:class` adds each key as a CSS class when the corresponding value is truthy. `{ done: todo.done }` adds the `done` class when `todo.done === true` and removes it when false. This is equivalent to:
+
+```html
+:class="todo.done ? 'done' : ''"
+```
+
+But `:class="{ ... }"` scales cleanly to multiple conditional classes:
+
+```html
+:class="{ done: todo.done, urgent: todo.priority === 'high', new: todo.isNew }"
+```
+
+Three conditions, three classes, no string concatenation. You can also mix static and dynamic classes:
+
+```html
+<li class="item" :class="{ done: todo.done }">
+```
+
+Vue merges them: the element gets `class="item done"` when done, `class="item"` when not.
+
+**Walkthrough — the `filtered` computed:**
+
+```typescript
+const filtered = computed(() => {
+  if (filter.value === 'active') return todos.value.filter(t => !t.done)
+  if (filter.value === 'done')   return todos.value.filter(t => t.done)
+  return todos.value
+})
+```
+
+`Array.prototype.filter` returns a *new array*. It does not modify `todos.value`. The `filtered` computed re-runs whenever `filter` or `todos` changes. It is read-only — never assign into `filtered.value`. (The template uses it with `v-for`, which reads from it but never writes back to it.)
+
+**Walkthrough — `toggle(id)`:**
+
+```typescript
+function toggle(id: number) {
+  const todo = todos.value.find(t => t.id === id)
+  if (todo) todo.done = !todo.done
+}
+```
+
+`todos.value` is a reactive array. When you mutate a property of an object inside that array (`todo.done = !todo.done`), Vue detects the change and re-runs every computed and template that reads from `todos`. The `filtered` computed re-evaluates; if the filter is "active", a newly-done item disappears from the list. This is automatic — no manual refresh.
+
+**Walkthrough — `addTodo()` and `v-model` preview:**
+
+```typescript
+function addTodo() {
+  const trimmed = newText.value.trim()
+  if (!trimmed) return
+  todos.value.push({ id: nextId++, text: trimmed, done: false })
+  newText.value = ''
+}
+```
+
+`todos.value.push(...)` mutates the reactive array. Vue's Proxy intercepts array mutations (push, pop, splice, etc.) and triggers re-renders. `newText.value = ''` clears the input after submission. `v-model="newText"` on the input is Lesson 07's topic — it keeps the input field and the ref in sync. For now, know that it works.
+
+`nextId` is a plain number — not a ref, not reactive. It does not need to be reactive because nothing in the template displays it. It is only used to generate unique IDs.
+
+**CS concept — virtual DOM diffing with keys.** When `todos` changes, Vue produces a new virtual DOM tree (a JavaScript object representation of the desired DOM) and compares it to the previous virtual DOM tree. This comparison — the **diff** — determines the minimum set of real DOM operations needed to update the page. Keys are how the differ identifies which virtual node corresponds to which real DOM node:
+
+- Without keys: position-based comparison. Node at index 0 in the new tree is matched to the real node at index 0.
+- With keys: identity-based comparison. Node with key `3` in the new tree is matched to the real node with key `3`, wherever it moved.
+
+Identity-based comparison minimizes DOM operations: it can reorder without destroying/recreating, skip unchanged items entirely, and correctly destroy only what actually left.
+
+**CS concept — immutability at the projection boundary.** `todos` is the canonical state. `filtered` is a *projection* — a derived read-only view. The view must not modify its source. If a computed getter could mutate `todos`, reading the computed value would have a side effect. Functions with side effects cannot be memoized safely — Vue might skip a call and miss the side effect. Always treat computed values as read-only windows into the reactive data.
+
+**SE principle — declarative rendering over imperative DOM manipulation.** No `document.createElement`. No `list.innerHTML = ''`. No building HTML strings. The template declares the desired shape of the DOM in terms of the data; Vue produces it. Imperative DOM manipulation requires you to correctly sequence every step — fail to clear the old items before adding new ones and you get duplicates. Declarative rendering is specified once in terms of the desired result; Vue's diffing algorithm handles the rest correctly by construction.
 
 ---
 
@@ -179,18 +304,18 @@ li.done { opacity: 0.4; text-decoration: line-through; }
 
 | `v-if` | `v-show` |
 |--------|----------|
-| Removes element from DOM | Adds `display: none` — element stays in DOM |
-| Destroyed and recreated | Always mounted, just hidden |
-| Right for: expensive components that may never be needed | Right for: elements that toggle frequently |
-| Right for: conditional that is false on first render | Right for: always initialized, sometimes hidden |
+| Removes element from DOM when false | Adds `display: none`; element stays in DOM |
+| Component lifecycle runs on toggle | Component lifecycle runs once |
+| Has real cost each time it toggles | Toggle is cheap (just CSS property) |
+| Right for: content rarely toggled or false on first render | Right for: content toggled frequently |
 
-The discount badge in Lesson 03 used `v-if` — correct, because the element is genuinely absent in the base case. A dropdown menu you show/hide on every click is a better fit for `v-show`.
+A "no results" message that appears only when a filter has zero matches: `v-if`. A dropdown that opens and closes on every click: `v-show`. A loading spinner that disappears once: `v-if`.
 
 ---
 
 ## Connects forward
 
-Lesson 05 extracts `<TodoItem>` into its own component and passes data down via `defineProps`. The `v-for` + `:key` pattern you learned here is used everywhere components are rendered in a list.
+Lesson 05 extracts the `<li>` template into `TodoItem.vue`. The `v-for` + `:key` loop stays in `App.vue` — only the element rendered inside the loop changes from `<li>` to `<TodoItem>`.
 
 ---
 
@@ -198,8 +323,11 @@ Lesson 05 extracts `<TodoItem>` into its own component and passes data down via 
 
 Click **▶ Run** and verify:
 
-- [ ] Clicking a todo marks it done (strikethrough + fade)
-- [ ] Filter buttons show correct subsets; empty state shows when nothing matches
-- [ ] "N remaining" updates when you mark items done
-- [ ] You can explain the difference between `v-if` and `v-show`
-- [ ] You can explain why `:key` is required on `v-for` and why the array index is a bad key
+- [ ] Adding a new todo appends it to the list; the input clears
+- [ ] Clicking a todo marks it done (strikethrough + fade); clicking again un-marks it
+- [ ] Each filter button shows the correct subset; empty state appears when nothing matches
+- [ ] "N remaining" counts only active todos and updates when items are toggled
+- [ ] You can explain why `:key="todo.id"` is required and why `:key="index"` is a bad substitute
+- [ ] You can explain the difference between `v-if` (removes from DOM) and `v-show` (hides with CSS)
+- [ ] You can explain why `filtered` must never mutate `todos.value`
+- [ ] Add a "Clear done" button that removes all completed todos from the array

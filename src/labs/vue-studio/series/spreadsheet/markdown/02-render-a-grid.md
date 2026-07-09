@@ -1,275 +1,412 @@
-# Render a Grid
+# Vue Spreadsheet — Lesson 02 — Selecting a Cell
 
 ## What you will build
 
-A 3×3 grid of cells driven by reactive data. The data — a 2D array of numbers — lives in `App.vue`. The grid decomposes into three components: `Grid`, `Row`, and `Cell` (from lesson 1).
+Click any cell and it highlights with a blue outline. Click a different one and the highlight moves — never two cells at once, never zero once you have clicked at least one. The selection is the first real state this spreadsheet tracks: one piece of reactive data whose change automatically updates the one cell that was deselected and the one that is now selected.
 
 ```
-┌──────┬──────┬──────┐
-│   5  │  10  │  15  │
-├──────┼──────┼──────┤
-│  20  │  25  │  30  │
-├──────┼──────┼──────┤
-│  35  │  40  │  45  │
-└──────┴──────┴──────┘
+    A     B     C     D     E     F
+1 |     |▓▓▓▓▓|     |     |     |     |   ← B1 selected
+2 |     |     |     |     |     |     |
 ```
-
-Change the data — the grid updates. Adding a fourth row to `gridData` causes a fourth row to appear without touching the template.
 
 ---
 
 ## What you need to know first
 
-Lesson 1 built `Cell.vue`, `App.vue`, and `main.ts`. `Cell.vue` is unchanged this lesson — we build above it.
-
-We introduce `ref` (reactive state), `v-for` (rendering arrays), and `:key` (efficient list updates). All three are explained at the moment they appear.
+Lesson 01 left a 6×10 grid with sixty individually addressable cells, each with a `cell-A1`-style `id`. `columnLetter()`, `cellId()`, `columns`, `rows` — all of that carries forward unchanged.
 
 ---
 
-## The lesson
+## Step 1 — A type that can be "nothing"
 
-### The problem
+**The problem:** Before any cell has been clicked, there is no coordinate to point at. Forcing one to exist anyway means inventing a fake "default" selection — a lie about what the user has actually done.
 
-One cell is not a spreadsheet. A spreadsheet is a grid — rows of cells. The naive approach: copy `<Cell />` nine times in `App.vue`. This works for exactly nine cells but breaks the moment the grid grows. When lesson 7 adds rows dynamically, hand-written markup cannot respond.
+Add to `<script setup>`, below the imports:
 
-The rule: if the number of something is determined by data, render it with `v-for`. The grid must be driven by data.
-
----
-
-### Step 1 — The data model
-
-**The problem:** We need to store the grid's values somewhere the template can react to. A plain JavaScript array will not work — Vue does not know when plain arrays change. We need a reactive container.
-
-```ts
-// In App.vue <script setup>
+```typescript
 import { ref } from 'vue'
 
-const gridData = ref([
-  [5,  10, 15],
-  [20, 25, 30],
-  [35, 40, 45],
-])
+const selectedCoordinate = ref<Coordinate | null>(null)
 ```
 
-**Walkthrough:** `import { ref } from 'vue'` extracts `ref` from the `vue` package. `ref([...])` wraps the 2D array in a reactive container and returns a `Ref<number[][]>` object with one important property: `.value`. Reading `gridData.value` in script returns the array. Setting `gridData.value = newArray` tells Vue the data changed and triggers a re-render of everything that reads it. In templates, Vue automatically unwraps refs — you write `gridData`, not `gridData.value`.
+**Walkthrough — `Coordinate | null`:**
 
-**What is `import { ref } from 'vue'`?**
+`|` is TypeScript's **union operator**. `Coordinate | null` means "a `Coordinate` object, *or* the special value `null`, and nothing else." `selectedCoordinate.value` can legally hold `{ col: 2, row: 3 }` or `null`. Both are valid states.
 
-- The `vue` package is Vue 3's entire framework — reactivity system, component engine, template compiler, public API. Its single responsibility: provide the tools to build reactive user interfaces.
-- `ref` is one specific named export — the function that creates a reactive container for a single value.
-- We import `ref` specifically (not `reactive`) because `ref` works with any type including arrays and primitives. `reactive()` only wraps plain objects and cannot wrap primitive values like strings or numbers.
+This is not a workaround. It is the honest, complete description of every state this variable can be in. Starting it as `null` means the moment the page loads — before any click — is represented truthfully.
 
-**What `ref()` does:** Accepts an initial value of any type. Returns a `Ref<T>` object — a reactive box. Reading `.value` in any reactive context (template, `computed`, `watch`) registers a dependency. Setting `.value` notifies all registered dependents and schedules a re-render. This is Vue's core reactivity primitive.
-
-**What breaks without `ref`:** A plain `const gridData = [[5,10,15],...]` works for the initial render — Vue reads the array during the first paint. But when lesson 3 edits a cell by mutating `gridData[0][0]`, Vue has no idea the value changed. The screen stays frozen at the original values. No error is thrown — the bug is silent, which makes it harder to find than a crash.
-
-**CS concept — the Observer pattern:** `ref` implements Observer. The `Ref` object is the observable (or "subject"). Every template or computed that reads `.value` subscribes. When `.value` is set, the Ref notifies subscribers and Vue schedules a re-render. Vue's reactivity uses JavaScript Proxies internally — every property access on a reactive object is intercepted. This is the same pattern used by MobX, Svelte stores, and Kotlin's `StateFlow`.
-
-**SE principle — single source of truth:** `gridData` is the one authoritative record of what the grid contains. Templates read from it; future lessons write to it. There is no second copy. When two views of the same data can diverge, bugs become inevitable. One source of truth prevents divergence by design.
-
----
-
-### Step 2 — The Row component
-
-**The problem:** The grid renders rows of cells. We could render all cells directly in `Grid.vue`, but that mixes two concerns: "how rows are laid out vertically" and "how cells are laid out horizontally within a row." We separate them.
+Run this throwaway to see TypeScript enforcing the union:
 
 ```vue
-<!-- src/components/Row.vue -->
 <script setup lang="ts">
-import Cell from './Cell.vue'
+interface Coordinate { readonly col: number; readonly row: number }
+import { ref } from 'vue'
 
-defineProps<{
-  cells: (number | string)[]
-}>()
-</script>
+const sel = ref<Coordinate | null>(null)
 
-<template>
-  <div class="row">
-    <Cell
-      v-for="(cellValue, columnIndex) in cells"
-      :key="columnIndex"
-      :value="cellValue"
-    />
-  </div>
-</template>
+// These are all legal:
+sel.value = { col: 2, row: 3 }    // a real coordinate
+sel.value = null                   // no selection
 
-<style scoped>
-.row {
-  display: flex;
+// TypeScript catches these:
+// sel.value = { col: 'A', row: 1 }  // col must be number
+// sel.value = { col: 2 }            // missing row
+// sel.value = 0                     // not Coordinate or null
+
+// Type narrowing — required before reading .col:
+if (sel.value !== null) {
+  console.log(sel.value.col)   // ok — TypeScript knows it is a Coordinate here
 }
-</style>
+// console.log(sel.value.col)   // error outside the if — might be null
+</script>
+<template><p>{{ sel }}</p></template>
 ```
 
-**Walkthrough:**
+The last commented line is the key: outside the `if`, `sel.value` might be `null`, and TypeScript refuses to let you call `.col` on something that might be `null`. Inside the `if`, TypeScript has *narrowed* the type — it knows `sel.value !== null` has been proven true at that point, so `.col` is safe.
 
-- `import Cell from './Cell.vue'` — `Cell.vue` from lesson 1. `./Cell.vue` resolves relative to `Row.vue`'s location inside `src/components/`. Vite compiled `Cell.vue` on startup; this import reuses the cached result.
-- `defineProps<{ cells: (number | string)[] }>()` — one prop: `cells`, an array of cell values. `Row` does not know how many cells the array contains — that is determined by `Grid`'s caller.
-- `v-for="(cellValue, columnIndex) in cells"` — Vue renders one `<Cell />` for each item in `cells`. On each iteration `cellValue` holds the current item and `columnIndex` holds its 0-based position.
-- `:key="columnIndex"` — provides a stable identity for each rendered element (explained below).
-- `:value="cellValue"` — passes the current value to `Cell` as a prop (the prop we defined in lesson 1).
+**Type narrowing, stated precisely:**
 
-**What is `import Cell from './Cell.vue'`?**
+TypeScript tracks what a check *proves* about a type. After `if (sel.value !== null)`, inside that block, TypeScript knows `sel.value` is `Coordinate` — not `Coordinate | null`. The union collapses to just the non-null branch. This is type narrowing: a conditional check reduces what a type can be in the code that follows it.
 
-- `Cell.vue` is responsible for rendering exactly one spreadsheet cell — the boundary drawn in lesson 1.
-- Default import (no curly braces) because SFCs export their component object as the default export.
-- We do not import `Cell` into `Grid.vue` — `Grid` does not know what a cell looks like internally. Dependencies flow one level at a time.
-
-**The prop type `(number | string)[]`:** An array where every element is either a number or a string. The parentheses around `number | string` are required — without them, `number | string[]` would mean "either a number, or an array of strings," which is a completely different type.
-
-**What is `v-for`?** A Vue directive that repeats an element once for each item in an iterable. The syntax `v-for="(item, index) in array"` makes `item` (the value) and `index` (the position, 0-based) available inside the element. Vue renders one copy of the element and all its children for each iteration. The `in` keyword separates the iteration variable from the source.
-
-**What is `:key`?** When Vue re-renders a `v-for` list after data changes, it must decide which DOM elements correspond to which data items. Without `:key`, Vue re-renders the entire list even if only one item changed — it cannot tell which old DOM node maps to which new data item. With `:key`, Vue tracks each element by its key, updates only the changed elements, and preserves internal state (like an active input) for unchanged ones. We use `columnIndex` for now. In later lessons we will use a stable cell ID — column indices shift when columns are inserted.
-
-**`display: flex`:** Makes `.row` a flex container. Flex containers arrange children along a row axis by default. Without it, `<Cell />` elements (rendered as `<div>`) would stack vertically (block layout). The result would be nine cells in a single column, not a 3-across row.
-
-**What breaks without `:key`:** Static data — nothing visible. Dynamic data (lesson 3 onwards) — Vue cannot efficiently update individual cells. When `gridData.value[0][0]` changes, Vue re-renders the entire row instead of the one cell, causing a flash. If cells carry internal component state (lesson 3's editing state), unkeyed re-renders can corrupt that state by swapping the wrong element.
-
-**CS concept — decomposition:** `Row` does not know how many rows exist. `Cell` does not know it is in a row. Each component solves the smallest possible problem. This is the same principle that keeps functions short and testable: divide the problem, conquer each piece independently.
-
-**SE principle — single responsibility:** `Row.vue` has one job: render one horizontal row of cells. It does not manage the grid or know its own row index. One reason to change: if cells within a row need a row header added, that change lives entirely in `Row.vue`.
+TypeScript does this automatically based on the shape of your `if` check. You do not ask for it. It happens because TypeScript tracks the logical implications of conditions.
 
 ---
 
-### Step 3 — The Grid component
+## Step 2 — Make coordinates immutable
 
-**The problem:** Something must render the rows. `Row` renders cells within a row; `Grid` renders rows within the grid — the same decomposition principle, one level up.
+**The problem:** Nothing prevents a future line from writing `selectedCoordinate.value.col = 99` — quietly mutating an existing coordinate instead of replacing it with a new one.
+
+Update the `Coordinate` interface in `<script setup>`:
+
+```typescript
+interface Coordinate {
+  readonly col: number
+  readonly row: number
+}
+```
+
+**Walkthrough — `readonly`:**
+
+`readonly` on a property means it can be set once — when the object literal is first created — and never after. `readonly` does not prevent replacing `selectedCoordinate.value` with a new object entirely; it prevents *editing* the fields of the object already stored there.
+
+To feel this distinction:
 
 ```vue
-<!-- src/components/Grid.vue -->
 <script setup lang="ts">
-import Row from './Row.vue'
-
-defineProps<{
-  rows: (number | string)[][]
-}>()
-</script>
-
-<template>
-  <div class="grid">
-    <Row
-      v-for="(rowCells, rowIndex) in rows"
-      :key="rowIndex"
-      :cells="rowCells"
-    />
-  </div>
-</template>
-
-<style scoped>
-.grid {
-  display: inline-flex;
-  flex-direction: column;
-  border-top: 1px solid #cbd5e1;
-  border-left: 1px solid #cbd5e1;
+interface Coordinate {
+  readonly col: number
+  readonly row: number
 }
-</style>
+import { ref } from 'vue'
+
+const sel = ref<Coordinate | null>(null)
+sel.value = { col: 2, row: 3 }    // ok — replacing the whole value
+
+// TypeScript catches this:
+// sel.value.col = 5               // Cannot assign to 'col' because it is read-only
+
+// To "change" col, replace the whole object:
+if (sel.value) {
+  sel.value = { col: 5, row: sel.value.row }   // ok — new object
+}
+</script>
+<template><p>{{ sel }}</p></template>
 ```
 
-**Walkthrough:**
+This is the pattern this project will always use: when a coordinate changes, create a new one. Never mutate the existing one. `readonly` turns that convention into a compiler-enforced rule.
 
-- `defineProps<{ rows: (number | string)[][] }>()` — accepts `rows`, a 2D array. `[][]` means "array of arrays."
-- `v-for="(rowCells, rowIndex) in rows"` — iterates the outer array. Each `rowCells` is an inner array of cell values; it is passed to `<Row :cells="rowCells" />`.
-- The border strategy: `Grid` has `border-top` and `border-left`. Each `Cell` already has a full 1px border. The combination creates clean grid lines: cells' bottom and right borders form the internal grid lines; `Grid`'s top and left borders close the top-left corner without doubling any border.
+**Why replace instead of mutate?**
 
-**What is `import Row from './Row.vue'`?**
-
-- `Row.vue` is responsible for rendering one horizontal row of cells.
-- Default import — same pattern as `Cell` in lesson 1.
-- `Grid` does not import `Cell`. `Grid` knows about `Row`; `Row` knows about `Cell`. Each layer imports only the layer directly below it. This is loose coupling — `Grid` can be replaced without affecting `Cell`.
-
-**The type `(number | string)[][]`:** A 2D array. The outer `[]` is the grid (array of rows). The inner `[]` is each row (array of cell values). TypeScript rejects passing a 1D array or an array of objects — it enforces the matrix shape at compile time.
-
-**`flex-direction: column`:** Flex containers default to `row` direction (children side by side). `column` stacks children vertically, so each `<Row />` appears below the previous one.
-
-**What breaks without `flex-direction: column`:** All `Row` elements appear side by side horizontally. The 3×3 grid renders as three wide horizontal strips stacked left-to-right rather than top-to-bottom — a very confused layout with no visible fix because it looks like a CSS problem rather than an architecture problem.
-
-**What breaks without the border strategy:** Remove `border-top: 1px solid` and `border-left: 1px solid` from `.grid`. The top and left edges of the first row and first column are unbounded — the grid looks open on two sides. It is a cosmetic bug but one that appears in every lesson until it is fixed.
-
-**CS concept — hierarchical composition:** App → Grid → Row → Cell. Each layer has its own job and is ignorant of layers above it. This pattern appears in operating systems (process → thread → instruction), in HTML (document → section → element), and in every major UI framework. Hierarchical composition is the universal technique for managing UI complexity.
-
-**SE principle — dependency direction:** `Grid` imports `Row`; `Row` imports `Cell`; `Cell` imports nothing. Dependencies flow downward only. `Cell` has no knowledge of `Row` or `Grid` — it can be tested in isolation, reused in any other context, and replaced without touching `Grid`.
+A new object has one clear moment of transition. Vue's reactivity detects any write to `selectedCoordinate.value` and schedules a re-render. Mutating a field inside the object could be missed by shallow watching, or produce confusing intermediate states. Replacement is simpler to reason about and integrates cleanly with Vue's reactive model.
 
 ---
 
-### Step 4 — Wire it together in App.vue
+## Step 3 — Selection state and click handling
 
-**The problem:** `App.vue` owns the data and must connect it to `Grid`. `Grid` does not own data — it displays data given to it via props.
+**The problem:** Clicking a cell does nothing. `selectedCoordinate` exists but nothing updates it, and nothing in the template responds to it.
+
+Add to `<script setup>`:
+
+```typescript
+function selectCell(coordinate: Coordinate): void {
+  selectedCoordinate.value = coordinate
+}
+
+function isCellSelected(col: number, row: number): boolean {
+  const sel = selectedCoordinate.value
+  if (sel === null) return false          // type narrowing
+  return sel.col === col && sel.row === row
+}
+```
+
+`selectCell` is the entire update logic: assign the new coordinate. One line. In the HTML Lab version of this project, `selectCell` had to find the previous cell's DOM element, remove a CSS class from it, update the variable, find the new cell's DOM element, and add the class to it. In Vue, you update state. Vue updates the DOM.
+
+`isCellSelected` is pure: given a column and row, return whether that cell is currently selected. The `if (sel === null) return false` line is type narrowing — after that guard, `sel` is known to be `Coordinate`, so `sel.col` is safe.
+
+Now update the `<td>` in the template:
+
+```html
+<td
+  v-for="col in columns"
+  :key="col"
+  :id="'cell-' + cellId({ col, row })"
+  :class="['cell', { 'cell-selected': isCellSelected(col, row) }]"
+  @click="selectCell({ col, row })"
+></td>
+```
+
+Add to `<style>`:
+
+```css
+.cell-selected {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+  background-color: #eff6ff;
+}
+```
+
+Here is the complete file:
 
 ```vue
-<!-- src/App.vue -->
 <script setup lang="ts">
 import { ref } from 'vue'
-import Grid from './components/Grid.vue'
 
-const gridData = ref([
-  [5,  10, 15],
-  [20, 25, 30],
-  [35, 40, 45],
-])
+const COLUMN_COUNT = 6
+const ROW_COUNT = 10
+
+interface Coordinate {
+  readonly col: number
+  readonly row: number
+}
+
+type CellId = string
+
+function columnLetter(col: number): string {
+  return String.fromCharCode(65 + col)
+}
+
+function cellId(coordinate: Coordinate): CellId {
+  return `${columnLetter(coordinate.col)}${coordinate.row + 1}`
+}
+
+const columns = Array.from({ length: COLUMN_COUNT }, (_, col) => col)
+const rows    = Array.from({ length: ROW_COUNT },    (_, row) => row)
+
+const selectedCoordinate = ref<Coordinate | null>(null)
+
+function selectCell(coordinate: Coordinate): void {
+  selectedCoordinate.value = coordinate
+}
+
+function isCellSelected(col: number, row: number): boolean {
+  const sel = selectedCoordinate.value
+  if (sel === null) return false
+  return sel.col === col && sel.row === row
+}
 </script>
 
 <template>
-  <div class="spreadsheet">
-    <Grid :rows="gridData" />
-  </div>
+  <table class="spreadsheet">
+    <thead>
+      <tr>
+        <th></th>
+        <th v-for="col in columns" :key="col">{{ columnLetter(col) }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="row in rows" :key="row">
+        <th>{{ row + 1 }}</th>
+        <td
+          v-for="col in columns"
+          :key="col"
+          :id="'cell-' + cellId({ col, row })"
+          :class="['cell', { 'cell-selected': isCellSelected(col, row) }]"
+          @click="selectCell({ col, row })"
+        ></td>
+      </tr>
+    </tbody>
+  </table>
 </template>
 
-<style scoped>
-.spreadsheet {
-  padding: 24px;
-  font-family: system-ui, sans-serif;
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, sans-serif; padding: 1rem; }
+.spreadsheet { border-collapse: collapse; }
+.spreadsheet th,
+.spreadsheet td {
+  border: 1px solid #cbd5e1;
+  min-width: 90px;
+  height: 28px;
+  text-align: left;
+  padding: 0 6px;
+  font-size: 0.875rem;
+  cursor: default;
+}
+.spreadsheet thead th,
+.spreadsheet tbody th {
+  background: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  text-align: center;
+}
+.cell-selected {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+  background-color: #eff6ff;
 }
 </style>
 ```
 
-**Walkthrough:** `App.vue` no longer imports `Cell` directly — it imports `Grid` and passes the full 2D array. In the template, `:rows="gridData"` passes the reactive array. Vue auto-unwraps the `Ref` — `Grid` receives the raw array, not the Ref wrapper. `Grid` passes each inner array to `Row` as `cells`. `Row` passes each value to `Cell`. `App.vue` knows nothing about cells or rows internally — only about `Grid`.
-
-**Verify reactivity:** Add a fourth row to `gridData`:
-
-```ts
-const gridData = ref([
-  [5,  10, 15],
-  [20, 25, 30],
-  [35, 40, 45],
-  [50, 55, 60],  // add this
-])
-```
-
-Save. Vite hot-reloads. A fourth row appears. Remove it. The 3×3 grid returns. The template did not change — the grid responds to data.
-
-**What breaks without `ref`:** As established in step 1, plain array → silent render freeze in lesson 3. Adding `ref` now costs nothing and prevents a subtle bug later.
-
-**CS concept — data-driven rendering:** The grid is a pure function of `gridData`. Same data → same UI. Different data → different UI. This is the core idea of reactive frameworks. The mental model shifts from "imperatively update the DOM when data changes" to "declaratively describe what the UI looks like given the current data; the framework handles the DOM."
-
-**SE principle — props down, events up:** Data flows downward via props: `App → Grid → Row → Cell`. User actions (lesson 3) flow upward via emits: `Cell → Row → Grid → App`. This one-way data flow is a deliberate constraint. When data can flow freely in both directions, tracing where a value was changed becomes guesswork. Enforced one-way flow makes data changes traceable to a single source.
+Click ▶ Run. Click any cell — it highlights. Click another — the highlight moves. Before any click, no cell is highlighted.
 
 ---
 
-## Connect the pieces
+## Walkthrough — what Vue does when `selectCell` runs
 
-`Cell.vue` from lesson 1 is unchanged. We built `Row.vue` and `Grid.vue` above it — new layers in the component tree. `gridData` in `App.vue` is the single source of truth for what the grid contains.
+Follow the chain when you click cell B1 (`col=1, row=0`):
 
-In lesson 3, user input writes to `gridData`. Because `gridData` is a `ref`, every component that reads it re-renders automatically. The architecture built here — reactive data at the root, display-only components below — is what makes lessons 3 through 12 work without rewriting anything from lessons 1 or 2.
+1. Browser fires a `click` event on that `<td>`
+2. Vue calls `selectCell({ col: 1, row: 0 })`
+3. `selectCell` writes `selectedCoordinate.value = { col: 1, row: 0 }`
+4. Vue detects the write — `selectedCoordinate` is a `ref`, so `.value` writes are tracked
+5. Vue marks every expression that *read* `selectedCoordinate.value` as dirty
+6. Before the next paint, Vue re-evaluates all dirty expressions
+7. `isCellSelected(col, row)` is re-evaluated for all sixty cells
+8. For cell at `col=1, row=0`: `isCellSelected(1, 0)` returns `true` → `cell-selected` is added
+9. For the previously selected cell: `isCellSelected` returns `false` → `cell-selected` is removed
+10. Only two cells' DOM attributes changed — the other fifty-eight are untouched
 
-**In production:** This component hierarchy (a data-owning "container" component with display-only "presentational" children) is standard Vue architecture used at every company building Vue applications. React's documentation calls it "container/presentational components" — the same pattern, different syntax.
+This is the full reactive loop for one click. The DOM update in steps 8–9 requires no code on your part. It follows from the `:class` binding reading a reactive value.
+
+---
+
+## Walkthrough — `:class` with an array and an object
+
+```html
+:class="['cell', { 'cell-selected': isCellSelected(col, row) }]"
+```
+
+Vue's `:class` accepts several formats. Knowing all three lets you choose the right one:
+
+```html
+<!-- String: always applied -->
+:class="'cell'"
+
+<!-- Object: applied when truthy -->
+:class="{ 'cell-selected': isCellSelected(col, row) }"
+
+<!-- Array: combine both -->
+:class="['cell', { 'cell-selected': isCellSelected(col, row) }]"
+```
+
+`'cell'` in the array means every `<td>` always has the class `cell`. The object conditionally adds `cell-selected`. You could also write:
+
+```html
+<td class="cell" :class="{ 'cell-selected': isCellSelected(col, row) }">
+```
+
+Both are correct. Vue merges static `class` and dynamic `:class` — they do not overwrite each other.
+
+---
+
+## The closure-in-loop problem (and why Vue avoids it)
+
+The HTML Lab builds the same grid imperatively with `addEventListener`. Try this throwaway to see the classic bug:
+
+```vue
+<script setup lang="ts">
+import { onMounted } from 'vue'
+
+onMounted(() => {
+  const container = document.getElementById('container')!
+
+  // var is function-scoped — all listeners share the same variable
+  for (var i = 0; i < 5; i++) {
+    const btn = document.createElement('button')
+    btn.textContent = `Button ${i}`
+    btn.addEventListener('click', () => console.log('clicked:', i))
+    container.appendChild(btn)
+  }
+  // By the time any button is clicked, i is 5 — every button logs 5
+})
+</script>
+<template><div id="container" style="display:flex;gap:8px"></div></template>
+```
+
+Click ▶ Run. Click any button: the console always prints `clicked: 5`. Never 0, 1, 2, 3, or 4.
+
+`var` is **function-scoped**: all five iterations share the exact same `i` variable. By the time any click fires — after the loop ends — `i` is `5`. Every listener closes over the same `i` and reads its current value at click time.
+
+Now change `var i` to `let i`:
+
+```vue
+for (let i = 0; i < 5; i++) {
+```
+
+Click ▶ Run again. Each button logs its correct number. `let` is **block-scoped**: each iteration creates a fresh, independent `i` binding. The listener created in iteration 2 closes over iteration 2's own `i`. Later iterations cannot affect it.
+
+**This bug cannot happen in Vue's `v-for`:**
+
+```html
+<button v-for="col in columns" @click="selectCell({ col, row })">
+```
+
+`v-for` always creates a new, scoped binding per iteration — the equivalent of `let`, never `var`. The closure bug is structurally impossible in a Vue template. Every `@click` handler captures the correct `col` for that cell.
 
 ---
 
 ## What breaks without this
 
-**If you skip `ref` and use a plain array:** The grid renders correctly on first load. Lesson 3's editing code mutates `cells[row][col].raw = newValue`. Vue detects no change. The cell shows the old value. There is no error message — which is the hardest kind of bug because the code appears correct and the only symptom is "the screen didn't update."
+**Removing `if (sel === null) return false` from `isCellSelected`:**
+
+```typescript
+function isCellSelected(col: number, row: number): boolean {
+  const sel = selectedCoordinate.value
+  return sel.col === col && sel.row === row   // TypeScript error
+}
+```
+
+TypeScript underlines `sel.col`: *Object is possibly 'null'*. Before any click, `selectedCoordinate.value` is `null`, and `null.col` would be a runtime TypeError. The guard is not optional — it is what makes `sel.col` safe on the next line.
+
+**Starting with `ref<Coordinate>({ col: 0, row: 0 })` instead of `ref<Coordinate | null>(null)`:**
+
+Cell A1 appears selected before any click. The application lies about its state from the first render. Any UI that reacts to the selection — an info bar, a formula editor — would show A1's data immediately, as if the user had interacted. The `| null` initial value is the honest representation: nothing is selected yet.
+
+**Writing `selectedCoordinate.value.col = newCol` instead of replacing:**
+
+TypeScript: *Cannot assign to 'col' because it is a read-only property.* `readonly` catches this. The fix is always to create a new object: `selectedCoordinate.value = { col: newCol, row: selectedCoordinate.value.row }`.
+
+---
+
+## Connect the pieces
+
+```
+App.vue
+  <script setup>
+    selectedCoordinate  ref<Coordinate | null>(null)
+                        — the one new state this lesson adds
+    selectCell()        — replaces .value; Vue handles the DOM update
+    isCellSelected()    — pure; returns boolean; type narrowing guards null
+  <template>
+    @click              — triggers selectCell; passes current { col, row }
+    :class              — derives 'cell-selected' from isCellSelected()
+```
 
 ---
 
 ## Definition of done
 
-- [ ] The browser shows a 3×3 grid with visible borders
-- [ ] The grid displays 5, 10, 15, 20, 25, 30, 35, 40, 45
-- [ ] Adding a fourth row to `gridData` causes a fourth row to appear without touching the template
-- [ ] Removing the added row restores the 3×3 grid immediately
-- [ ] No console errors
-- [ ] **Git commit:**
+Click ▶ Run and verify:
 
-```
-git add src/
-git commit -m "Add Grid and Row components — grid renders from reactive data (App → Grid → Row → Cell)"
-```
+- [ ] Clicking any cell highlights it with a visible blue outline
+- [ ] Clicking a second cell moves the highlight; the first cell deselects
+- [ ] Before any click, no cell is highlighted
+- [ ] You can explain what `Coordinate | null` means and why `null` is the correct initial value
+- [ ] You can explain what `readonly` prevents and write the TypeScript error it produces
+- [ ] You can explain type narrowing using `isCellSelected`'s `if (sel === null)` check as the example
+- [ ] You can run the `var`-in-a-loop throwaway, reproduce the bug, and explain why `let` fixes it
+
+---
+
+*Next: Lesson 03 — Editing a Cell. Double-click a selected cell and an input appears. Type a value, press Enter, and it sticks — the first data this spreadsheet actually owns.*

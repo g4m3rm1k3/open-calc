@@ -8,93 +8,143 @@ A page that shows a message sourced from reactive JavaScript state — not hardc
 Browser: Hello from Vue!
 ```
 
-After this lesson: change the string in JavaScript, click Run, the browser updates. No `document.getElementById`. No manual DOM manipulation.
+After this lesson: change the string in JavaScript, click Run — the browser updates automatically. No `document.getElementById`. No `element.textContent = ...`. No synchronisation code of any kind.
 
 ---
 
 ## What you need to know first
 
-This is lesson 1. No prior Vue knowledge is needed. The only prerequisites are JavaScript variables and a rough understanding that the browser turns HTML into a visual page.
+This is lesson 1. No prior Vue knowledge required. The only prerequisites are JavaScript variables and a rough understanding that the browser turns HTML into a visual page. This lesson explains everything else from the ground up: what a `.vue` file is, what TypeScript adds, what `<script setup>` means, how `ref()` works, and how the application bootstraps.
 
 ---
 
-## The lesson
+## What a `.vue` file is
 
-### Step 1 — The entry point
+A `.vue` file is a **Single File Component** (SFC). It is not valid JavaScript or HTML on its own — it is a format Vue's compiler understands. The compiler reads the file, separates its three sections, processes them, and outputs a JavaScript module that the browser can run.
 
-**The problem:** The browser needs a JavaScript file to execute first. That file creates the Vue application and connects it to the HTML page.
+An SFC has three sections, each optional:
 
-**File:** `src/main.ts` (already open in the editor — this file is complete, you do not need to change it)
+```html
+<script setup lang="ts">
+  // JavaScript (or TypeScript) logic for this component
+</script>
 
-```typescript
-import { createApp } from 'vue'
-import App from './App.vue'
+<template>
+  <!-- The HTML-like markup this component renders -->
+</template>
 
-createApp(App).mount('#app')
+<style scoped>
+  /* CSS that applies only to this component's elements */
+</style>
 ```
 
-**Walkthrough, line by line:**
-- `import { createApp } from 'vue'` — loads the `createApp` function from the Vue package
-- `import App from './App.vue'` — loads your root component
-- `createApp(App)` — creates the Vue application; `App` is the root component every other component lives inside
-- `.mount('#app')` — finds `<div id="app">` in the HTML page and hands control to Vue
-
-**What is `import`?** A JavaScript **module** statement. Every `.ts`, `.js`, and `.vue` file is a module — a self-contained unit of code that explicitly declares what it depends on and what it exports. `import { createApp } from 'vue'` means: from the module named `'vue'` (the Vue library, pre-loaded in Vue Studio's runtime), give me the named export called `createApp`.
-
-Curly braces `{ }` mean **named import** — you select a specific export by name. Without curly braces (`import App from './App.vue'`) is a **default import** — the module's one primary export, received under whatever name you choose.
-
-**CS concept — module system and dependency graph:** Before modules, every script file ran in a single shared global scope. A name like `createApp` defined in one file would silently overwrite a name with the same spelling in another. Modules solve this with explicit namespacing: each file has its own scope; only what is exported can be imported; only what is imported can be used. Your files and the Vue library together form a **dependency graph** — a directed acyclic graph where each node is a module and each directed edge is an `import` statement. Vue Studio resolves this graph when you click ▶ Run, compiling every `.vue` and `.ts` file and wiring the imports together before running the result.
-
-**CS concept — entry point:** Every program has exactly one place execution begins. In C it is `main()`. In a Vue app it is `main.ts`. Everything else is wired together from here.
-
-**SE principle — separation of concerns:** `main.ts` has one job: bootstrap the application. `App.vue` has one job: define the root component's UI. Different reasons to change → different files.
-
-**What breaks without `.mount('#app')`:** The application is created but never connected to the HTML. The page stays blank. No error — Vue just waits for something to mount into.
+When you click **▶ Run** in Vue Studio, the studio compiles your `.vue` files, resolves module imports, and feeds the output to the browser. This is exactly what Vite (Vue's official build tool) does in production.
 
 ---
 
-### Step 1b — TypeScript and `<script setup>`
+## What TypeScript adds
 
-Before looking at the root component, two constructs that appear in every lesson need explanation.
+`lang="ts"` on the script tag tells the compiler to treat the code as TypeScript. TypeScript is JavaScript with a type system: a layer that checks your code for type-level errors before it runs.
 
-**What is TypeScript?** TypeScript is JavaScript with a **type system** added. `lang="ts"` in `<script setup lang="ts">` tells Vue Studio's compiler to treat the script block as TypeScript rather than plain JavaScript. A type system lets you annotate what kind of value a variable holds — "this is always a number", "this is a string or null" — and the compiler checks those annotations before running the code. The payoff: bugs that would otherwise surface as cryptic runtime errors (`undefined is not a function`) are caught at write time, underlined in red before you click Run.
+```typescript
+let count = 0
+count = "hello"   // TypeScript error: Type 'string' is not assignable to type 'number'
+```
 
-**CS concept — type inference:** TypeScript does not require you to annotate everything. `const count = ref(0)` — TypeScript sees `0` is a number, infers that `ref(0)` creates a `Ref<number>`, and will reject `count.value = "hello"` automatically. The compiler traces type information forward through your code. The more it can infer, the fewer annotations you need to write.
+Without TypeScript, `count = "hello"` is valid JavaScript — the error only surfaces at runtime when something tries to multiply `count` by a number and gets `NaN`. TypeScript surfaces it immediately, at the line where you wrote it.
 
-**What is `<script setup>`?** A compiler shorthand for Vue's Composition API. Without it, a component script looks like this:
+**What TypeScript does NOT do:** it does not change how the code runs. TypeScript compiles to plain JavaScript. At runtime, the browser runs JavaScript — there are no type annotations left. TypeScript is entirely a write-time tool: it makes bugs visible before execution, not during.
+
+**Type inference:** TypeScript does not always need you to write the type. It infers it:
+
+```typescript
+const name = 'Alice'           // inferred: string
+const count = 0                // inferred: number
+const message = ref('hello')   // inferred: Ref<string>
+```
+
+Inference means you write types only when TypeScript cannot figure them out on its own — which is less often than you think.
+
+---
+
+## What `<script setup>` is
+
+`<script setup>` is a compiler shorthand for Vue's **Composition API**. Without it, you would write:
 
 ```typescript
 export default {
   setup() {
-    const message = ref('Hello from Vue!')
-    return { message }  // must explicitly return everything the template needs
+    const message = ref('Hello')
+    // must explicitly return everything the template uses:
+    return { message }
   }
 }
 ```
 
-With `<script setup>`, Vue's compiler generates that boilerplate for you. Everything declared at the top level of the block is automatically available in the template. No `export default`, no `return` statement. The same component becomes:
+With `<script setup>`:
 
 ```typescript
-<script setup lang="ts">
-const message = ref('Hello from Vue!')
-</script>
+// Just declare it — it's automatically available in the template
+const message = ref('Hello')
 ```
 
-**SE principle — zero-boilerplate contracts:** `<script setup>` enforces an implicit contract: anything declared becomes part of the component's public template API. Vue's compiler generates the Composition API wrapper at build time. This is a common pattern in software: write the intention; let the toolchain generate the ceremony.
+The compiler generates the `setup()` function, the return statement, and the exports automatically. Everything you declare at the top level of `<script setup>` is automatically available in `<template>`. This is not magic — it is a well-specified compile step. But the result is significantly less boilerplate.
 
 ---
 
-### Step 2 — The root component
+## Step 1 — The manual approach, and why it breaks under you
 
-**The problem:** We need a file that describes what the browser should display. A Vue component combines state (JavaScript data), template (HTML description), and style (CSS) in one place.
+Before writing a single line of Vue, see what the problem looks like without it. Open `src/App.vue` and replace the template with a hardcoded string:
 
-Here is what a complete root component looks like:
+```html
+<template>
+  <h1>Hello from Vue!</h1>
+</template>
+```
+
+Click **▶ Run**. The browser shows the heading. Now change the string to something else and click Run again — it updates. This technically works, as long as the content never needs to change based on data.
+
+Now try sourcing the message from a JavaScript variable:
+
+```html
+<script setup lang="ts">
+let message = 'Hello from Vue!'
+
+setTimeout(() => {
+  message = 'Updated after 1 second!'
+}, 1000)
+</script>
+
+<template>
+  <h1>{{ message }}</h1>
+</template>
+```
+
+Click **▶ Run**. The heading shows "Hello from Vue!" — good. Wait one second. The heading does not change.
+
+Open the Console tab in the RuntimePanel. Add `console.log(message)` inside the timeout callback. Run again. After one second: the console shows the new string. The variable changed. The browser's DOM has no idea.
+
+**This is the core problem:** JavaScript variables and browser DOM text nodes are in two separate systems. Changing one does not automatically notify the other. Before reactive frameworks, every developer solved this manually — call `element.textContent = newValue` every time the underlying data changed. In a small app, that is manageable. In a real app with dozens of pieces of state and hundreds of DOM nodes, it becomes a maintenance nightmare where one missed update means the UI shows stale data.
+
+**CS lens — the synchronisation problem, precisely.** JavaScript runs in a single-threaded environment with an event loop. Variables live in the JavaScript heap. DOM nodes live in the browser's rendering engine (often a separate process). These are different data stores. When you write `message = 'Updated'`, the JavaScript engine updates a slot in memory. There is no mechanism by which this assignment signals anything to the DOM renderer — they do not share memory. Frameworks solve this by inserting themselves between your code and the DOM: instead of assigning to a plain variable, you call a method on a reactive container, and the container notifies the framework, which updates the DOM.
+
+**SE lens — a structural bug class, not a bug.** The hardcoded approach and the plain-variable approach share the same weakness: the displayed value and the source value are two different things that can diverge. Discipline does not fix structural problems. The fix is removing the possibility of divergence — making it so that the display *always* reflects the current value of the source, automatically. That is what `ref()` provides.
+
+---
+
+## Step 2 — `ref()`: a variable Vue can watch
+
+Replace the entire `src/App.vue`:
 
 ```html
 <script setup lang="ts">
 import { ref } from 'vue'
 
 const message = ref('Hello from Vue!')
+
+setTimeout(() => {
+  message.value = 'Updated after 1 second!'
+}, 1000)
 </script>
 
 <template>
@@ -109,23 +159,64 @@ h1 {
 </style>
 ```
 
+Click **▶ Run**. Wait one second. The heading updates automatically.
+
+**Walkthrough, line by line:**
+
+`import { ref } from 'vue'` — a named import from the `'vue'` module. `{ ref }` means: from this module, give me the export named `ref`. The curly braces are the named-import syntax. A module can export many named things; you pick exactly what you need. `'vue'` is the Vue library — Vue Studio pre-loads it.
+
+`const message = ref('Hello from Vue!')` — creates a **reactive container** holding the string. `ref()` takes any value and wraps it in an object whose `.value` property is tracked by Vue. Writing `ref('Hello from Vue!')` creates an object like `{ value: 'Hello from Vue!' }` — but with invisible instrumentation: every read and write of `.value` is intercepted.
+
+`message.value = 'Updated after 1 second!'` — writes through the container. The assignment triggers Vue's internal notification system, which schedules a re-render of every template that read from this ref.
+
+`{{ message }}` — a template expression. Vue evaluates the expression and inserts the result as text. In templates, Vue **auto-unwraps** refs: `{{ message }}` is equivalent to `{{ message.value }}`. This auto-unwrapping only applies in templates — in `<script setup>`, you always need `.value`.
+
+**What `ref()` actually is:** `ref(x)` creates a JavaScript `Proxy` — a wrapper object that intercepts property access. When code reads `message.value`, the Proxy getter records: "whoever is currently rendering depends on this ref." When code writes `message.value = newValue`, the Proxy setter fires and tells Vue's scheduler: "queue a re-render for everything that depends on me." The scheduler runs on the next microtask — after the current synchronous code finishes.
+
+**Why `.value` in scripts but not in templates?** In `<script setup>`, you work directly with the ref object. The ref is the object; `.value` is the data inside it. In templates, Vue automatically calls `.value` for you — this is part of the template compiler's work. It reduces template noise: you write `{{ message }}` instead of `{{ message.value }}` everywhere. The trade-off: switching between `<script setup>` (`.value` required) and `<template>` (`.value` not needed) can be confusing at first. It becomes automatic with practice.
+
+**CS concept — the observer pattern.** `ref()` implements the **observer pattern**: one object (the ref) notifies registered observers (templates, computed values, watchers) when its value changes. The ref is the **subject** or **publisher**. Each template that reads from it is a **subscriber**. Vue manages subscriptions automatically: when a component renders and reads a ref, Vue registers that component as a subscriber. When the ref changes, Vue notifies all subscribers. When a component unmounts, Vue removes its subscriptions. You never register or deregister manually.
+
+**CS concept — reactivity as a directed graph.** When `{{ message }}` renders, Vue records a directed edge: "this template node depends on this ref node." When `message.value` is written, Vue traverses outward from that ref node and schedules re-renders for everything connected. As the application grows with more refs and more templates, this forms a dependency graph — Vue's reactivity system is a live, automatically-maintained DAG (directed acyclic graph).
+
+**SE principle — declarative over imperative.** The template says *what* to show: "show the value of `message` here." It does not say *when* to update or *how* to reach into the DOM. The when and how are Vue's responsibility. Declarative code is shorter, harder to get wrong, and easier to reason about — there is no sequence of imperative update calls to order correctly, and no risk of forgetting one.
+
+**What breaks if you use `let message = 'Hello'` without `ref`:** Vue cannot observe plain variables. There is no Proxy, no interception, no notification. The template renders the initial string value but never re-renders when `message` changes. No error, no warning — the UI silently shows stale data. This is the bug from Step 1.
+
+**What breaks if you forget `import { ref } from 'vue'`:** `ref` is `undefined` at runtime. Calling `undefined('Hello')` throws: `TypeError: ref is not a function`. Vue Studio's TypeScript support will also flag this at write time: "Cannot find name 'ref'."
+
+---
+
+## Step 3 — The entry point: `main.ts`
+
+Open `src/main.ts`. This file is complete; you do not need to change it. Understand it.
+
+```typescript
+import { createApp } from 'vue'
+import App from './App.vue'
+
+createApp(App).mount('#app')
+```
+
 **Walkthrough:**
-- `<script setup lang="ts">` — the script block for this component; `lang="ts"` means TypeScript; `setup` means Composition API
-- `import { ref } from 'vue'` — loads the `ref` function from Vue
-- `const message = ref('Hello from Vue!')` — creates a reactive container holding the string
-- `<template>` — the HTML structure this component renders
-- `{{ message }}` — a mustache expression: Vue evaluates this and inserts its string value as text
-- `<style scoped>` — CSS that only applies to elements in this component's template
 
-**What is `ref()`?** `ref()` creates a **reactive container** around a value. Vue watches this container. When the value inside changes, Vue automatically updates every template that reads from it. To read or write the value in JavaScript, use `.value`: `message.value = 'New text'`. In the template, Vue unwraps it automatically — write `{{ message }}`, not `{{ message.value }}`.
+`import { createApp } from 'vue'` — loads `createApp`, the function that creates a Vue application instance. Named import, same syntax as `{ ref }`.
 
-**What is `{{ message }}`?** Double curly braces are Vue's **interpolation** syntax. They evaluate a JavaScript expression and render the result as text. They work anywhere inside a `<template>`. They escape HTML characters (so user-supplied content cannot inject HTML tags — this is safe by default).
+`import App from './App.vue'` — loads your root component. This is a **default import** — no curly braces. A module's default export is received under whatever name you choose; `App` is the conventional name for the root component. `'./App.vue'` means "relative to this file's location." The Vue compiler has already processed `App.vue` into a JavaScript module by the time this import runs.
 
-**CS concept — reactive programming:** A reactive system tracks dependencies automatically. When the template reads `message`, Vue records "this template depends on `message`." When `message.value` changes, Vue re-renders only the parts that depend on it. The CS term for a value that notifies observers when it changes is an **observable**. Vue's reactivity is built on JavaScript Proxies.
+`createApp(App)` — creates the Vue application instance. `App` is the root component — the starting point of the component tree. Every component in the application is ultimately a descendant of `App`.
 
-**SE principle — declarative rendering:** You describe the desired output in terms of data (`{{ message }}`), not the steps to produce it. The alternative — imperative rendering — requires manually calling `element.textContent = value` every time data changes. Declarative rendering is more reliable because Vue handles the synchronisation.
+`.mount('#app')` — finds `<div id="app">` in the HTML page and hands control of that element to Vue. Every re-render Vue performs replaces the contents of this div. The application is now running.
 
-**What breaks without `ref()`:** Change `const message = ref('Hello from Vue!')` to `const message = 'Hello from Vue!'`. The page still shows the message — but if anything later changes `message`, the template does not update. Without `ref()`, Vue cannot track the value, so it cannot re-render when it changes.
+**CS concept — module system and the dependency graph.** Before JavaScript modules, every script file shared one global scope. A `function format()` in one file silently overwrote another file's `format()`. Modules solve this: each file has its own scope; only what is explicitly `export`ed can be `import`ed by others. Your `.vue` and `.ts` files form a **module dependency graph** — a directed acyclic graph where nodes are files and edges are `import` statements. Vue Studio traverses this graph starting from `main.ts` when you click ▶ Run.
+
+**CS concept — entry point.** Every program has exactly one execution starting point. In C it is `main()`. In a browser JavaScript app it is the first `<script>` that runs. In a Vue application it is `main.ts`. Everything else — components, composables, utilities — is wired together through imports originating here.
+
+**SE principle — separation of concerns.** `main.ts` has one job: bootstrap the application (create + mount). `App.vue` has one job: define the root component. They have different reasons to change: modifying the startup process (add plugins, configure global state) touches `main.ts`; modifying the root layout touches `App.vue`. Keeping them in separate files means either can change without touching the other.
+
+**What breaks without `.mount('#app')`:** `createApp(App)` creates the Vue instance but never connects it to the HTML. The browser shows the raw `<div id="app">` — empty. No error — Vue waits for something to mount into that never comes. The application exists in memory but is invisible.
+
+**What breaks if `#app` does not exist in the HTML:** `.mount('#app')` finds no element and warns: `[Vue warn]: Failed to mount app: mount target selector "#app" returned null.` The application does not render. Vue Studio's sandbox HTML already contains `<div id="app">` — you do not need to add it.
 
 ---
 
@@ -133,17 +224,19 @@ h1 {
 
 ```
 src/main.ts
-  createApp(App)       ← Vue runtime created, App.vue is the root
-  .mount('#app')       ← connected to <div id="app"> in the HTML
+  createApp(App)     ← Vue runtime created; App.vue is the root
+  .mount('#app')     ← connected to <div id="app"> in the sandbox HTML
 
 src/App.vue
-  ref('Hello…')        ← reactive container Vue watches
-  {{ message }}        ← reads the container; re-renders when it changes
+  ref('Hello…')      ← reactive container Vue watches
+  {{ message }}      ← reads the container; re-renders when it changes
 ```
 
 Data flows one way: JavaScript state → template rendering. This one-way flow is the foundation every other Vue concept builds on.
 
-**In the real world:** Every Vue app in production starts with `createApp(RootComponent).mount(selector)` — this is not Vue Studio syntax, it is how Vue works everywhere. In a real project a build tool (such as Vite) does what the ▶ Run button does here: it compiles TypeScript, processes your `.vue` files, resolves the module graph, and produces browser-ready JavaScript. Vue Studio does all of that on demand so you can focus on writing Vue code rather than configuring tooling.
+The full render path: `message.value` changes → Proxy setter fires → Vue scheduler queues re-render → on next microtask, Vue re-runs the template function → virtual DOM diff → Vue patches only the text node inside `<h1>`. The text node updates without touching any surrounding element.
+
+**In the real world:** `createApp(RootComponent).mount(selector)` is not Vue Studio syntax — it is how every Vue application bootstraps, in development or production. Vite (Vue's official build tool) does what the ▶ Run button does here: compiles TypeScript, processes `.vue` files, resolves the module graph, and produces browser-ready JavaScript bundles. Vue Studio runs this on demand so you focus on Vue code, not tooling configuration.
 
 ---
 
@@ -152,6 +245,9 @@ Data flows one way: JavaScript state → template rendering. This one-way flow i
 Click **▶ Run** and verify:
 
 - [ ] The browser shows `Hello from Vue!`
-- [ ] Change `'Hello from Vue!'` to any other string, click Run — the browser shows the new text
-- [ ] You can explain what `ref()` does and why `{{ }}` shows its value without `.value`
-- [ ] You can explain why `main.ts` and `App.vue` are separate files
+- [ ] After one second it automatically changes to `Updated after 1 second!`
+- [ ] Remove the `setTimeout` — change `ref('Hello from Vue!')` to any other string, click Run — the browser shows the new text
+- [ ] You can explain why the plain `let message` version never updated
+- [ ] You can explain what `ref()` does and why `.value` is required in `<script setup>` but not in `<template>`
+- [ ] You can explain what `mount('#app')` connects Vue to and what happens without it
+- [ ] You can explain the difference between a named import (`{ ref }`) and a default import (`App from './App.vue'`)

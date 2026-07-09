@@ -1,260 +1,336 @@
-# Named Ranges
+# Vue Spreadsheet — Lesson 08 — Evaluating the Tree
 
 ## What you will build
 
-A named range manager. Select a range of cells, give it a name like `PRICES`, and reference it in a formula as `=SUM(PRICES)`. The formula engine resolves the name to the range before evaluating.
+Type `=10+5*2` into a cell, press Enter, and it displays `20` — not the raw formula text, not `30`. The AST lesson 07 built already has the correct shape; this lesson walks it and produces a real number. This is also the moment `displayCell` must split into two functions: what you see while *looking* at a cell, and what you see while *editing* it.
 
 ```
-Named range: PRICES = A1:A3  (cells with values 5, 10, 15)
-
-Formula:  =SUM(PRICES)
-Result:   30
+    A         B         C
+1 | 10     | 5      | =A1+B1*2  |   ← shows 20
 ```
 
 ---
 
 ## What you need to know first
 
-In lesson 4 we built formula evaluation with basic cell references (`A1`, `B2`). This lesson adds two new capabilities: range notation (`A1:B3`) and named ranges (`PRICES`). Both extend the formula evaluator without modifying its core — the open/closed principle.
+Lesson 07 left `parse(tokens)` returning a `ParseResult` — either a real `ExpressionNode` tree or a clear error. `Number`, `UnaryExpression`, and `BinaryExpression` are the only three node kinds so far.
 
 ---
 
-## The lesson
+## Step 1 — Walk the tree
 
-### The problem
+**The problem:** Nothing yet turns an `ExpressionNode` into a number.
 
-Formulas like `=A1+A2+A3+A4+A5` are hard to write and impossible to read. Naming a range (`PRICES = A1:A5`) makes formulas readable (`=SUM(PRICES)`) and maintainable (change the range in one place). This is the same reason we name variables in code instead of using raw memory addresses.
+Add to `<script setup>`:
 
----
-
-### Step 1 — The range type
-
-**The problem:** We need a data structure to represent a rectangular block of cells — a start coordinate and an end coordinate — and a way to parse range notation like `"A1:C3"`.
-
-```ts
-// src/types/namedRange.ts
-import type { CellData } from './cell'
-
-export interface CellRange {
-  startRow: number
-  startCol: number
-  endRow: number
-  endCol: number
-}
-
-export interface NamedRange {
-  name: string      // e.g., 'PRICES'
-  range: CellRange
-  sheetId: string   // which sheet this range belongs to
-}
-
-export function parseRange(rangeStr: string): CellRange {
-  const [startAddress, endAddress] = rangeStr.split(':')
-  const start = parseCellAddress(startAddress)
-  const end = parseCellAddress(endAddress)
-  return {
-    startRow: Math.min(start.rowIndex, end.rowIndex),
-    startCol: Math.min(start.colIndex, end.colIndex),
-    endRow:   Math.max(start.rowIndex, end.rowIndex),
-    endCol:   Math.max(start.colIndex, end.colIndex),
+```typescript
+function applyOperator(operator: '+' | '-' | '*' | '/', left: number, right: number): number {
+  switch (operator) {
+    case '+': return left + right
+    case '-': return left - right
+    case '*': return left * right
+    case '/': return left / right
+    default:  return assertNever(operator)
   }
 }
 
-export function resolveCellRange(range: CellRange, cells: CellData[][]): (number | string)[] {
-  const values: (number | string)[] = []
-  for (let row = range.startRow; row <= range.endRow; row++) {
-    for (let col = range.startCol; col <= range.endCol; col++) {
-      values.push(cells[row]?.[col]?.raw ?? 0)
+function evaluate(node: ExpressionNode): number {
+  switch (node.kind) {
+    case 'Number':
+      return node.value
+
+    case 'UnaryExpression':
+      return -evaluate(node.operand)
+
+    case 'BinaryExpression': {
+      const left  = evaluate(node.left)
+      const right = evaluate(node.right)
+      return applyOperator(node.operator, left, right)
+    }
+
+    default:
+      return assertNever(node)
+  }
+}
+```
+
+**Before reading the walkthrough, run this throwaway to see `evaluate` working on a tree you build by hand:**
+
+```vue
+<script setup lang="ts">
+interface NumberNode { kind: 'Number'; value: number }
+interface UnaryExpressionNode { kind: 'UnaryExpression'; operator: '-'; operand: ExpressionNode }
+interface BinaryExpressionNode { kind: 'BinaryExpression'; operator: '+' | '-' | '*' | '/'; left: ExpressionNode; right: ExpressionNode }
+type ExpressionNode = NumberNode | UnaryExpressionNode | BinaryExpressionNode
+
+function applyOperator(op: '+' | '-' | '*' | '/', l: number, r: number): number {
+  switch (op) {
+    case '+': return l + r
+    case '-': return l - r
+    case '*': return l * r
+    case '/': return l / r
+  }
+}
+
+function evaluate(node: ExpressionNode): number {
+  switch (node.kind) {
+    case 'Number': return node.value
+    case 'UnaryExpression': return -evaluate(node.operand)
+    case 'BinaryExpression': {
+      return applyOperator(node.operator, evaluate(node.left), evaluate(node.right))
     }
   }
-  return values
+}
+
+// The tree for 10+5*2: * is nested inside +
+const tree: ExpressionNode = {
+  kind: 'BinaryExpression',
+  operator: '+',
+  left: { kind: 'Number', value: 10 },
+  right: {
+    kind: 'BinaryExpression',
+    operator: '*',
+    left:  { kind: 'Number', value: 5 },
+    right: { kind: 'Number', value: 2 },
+  }
+}
+
+// What does evaluate do?
+// evaluate(+) → evaluate(10) + evaluate(5*2)
+//             → 10 + evaluate(*)
+//             → 10 + (evaluate(5) * evaluate(2))
+//             → 10 + (5 * 2)
+//             → 10 + 10
+//             → 20
+
+const result = evaluate(tree)  // 20
+</script>
+<template>
+  <p>Result: {{ result }}</p>
+  <p>Tree: <pre>{{ JSON.stringify(tree, null, 2) }}</pre></p>
+</template>
+```
+
+Click ▶ Run. The result is 20. Build a few more trees by hand and evaluate them to get a feel for how the recursive calls flow.
+
+**Walkthrough — recursion doing the work:**
+
+`evaluate` calls itself twice in the `'BinaryExpression'` case — once for `node.left`, once for `node.right` — *before* computing the node's own result. For `10+5*2`'s tree, evaluating the outer `+` node requires first evaluating its right child, the `5*2` node. The `5*2` node evaluates both its children (both plain `Number` nodes), applies `*`, and returns `10`. The outer `+` then computes `10 + 10 = 20`.
+
+No part of `evaluate` needs to know how deep the tree is. The same handful of lines correctly evaluates a tree one level deep or twenty levels deep. This is the core property of recursive algorithms over recursive structures: the code's structure mirrors the data's structure.
+
+**Walkthrough — `{ }` braces around the `'BinaryExpression'` case:**
+
+```typescript
+case 'BinaryExpression': {
+  const left  = evaluate(node.left)
+  const right = evaluate(node.right)
+  return applyOperator(node.operator, left, right)
 }
 ```
 
-**Walkthrough:** `parseRange('A1:C3')` splits the string on `:` to produce `['A1', 'C3']`. It parses each address (using `parseCellAddress` from lesson 4) and normalises with `Math.min`/`Math.max` so the range is always stored top-left to bottom-right regardless of which direction the user selected.
+The `{ }` braces give this case its own block scope. Without them, all cases in a `switch` share one scope. If two cases both declared `const left`, you would get "Cannot redeclare block-scoped variable 'left'". The braces isolate each case's local variables.
 
-`resolveCellRange` iterates the rectangular region with two nested `for` loops — outer over rows, inner over columns — collecting each cell's raw value into a flat array. For a 3×1 range `A1:A3`, the result is `[5, 10, 15]`. That flat array is what formula functions (`SUM`, `AVERAGE`) receive.
+Run this throwaway to see the error:
 
-**What is `String.prototype.split(separator)`?** Returns an array of substrings by splitting the string at every occurrence of `separator`. `'A1:C3'.split(':')` → `['A1', 'C3']`. `'a,b,c'.split(',')` → `['a', 'b', 'c']`. `split` is the inverse of `Array.prototype.join`.
+```vue
+<script setup lang="ts">
+function demo(x: number): string {
+  switch (x) {
+    case 1:
+      const result = 'one'    // declared here
+      return result
+    case 2:
+      // const result = 'two' // would error: already declared above in same switch scope
+      return 'two'
+    default:
+      return 'other'
+  }
+}
+</script>
+<template><p>{{ demo(1) }}</p></template>
+```
 
-**Destructuring assignment — `const [startAddress, endAddress] = rangeStr.split(':')`:** `[a, b] = array` assigns `array[0]` to `a` and `array[1]` to `b`. This is JavaScript array destructuring — a shorthand for `const startAddress = parts[0]; const endAddress = parts[1]`.
+Try uncommenting the redeclaration. Then add `{ }` braces around each case and try again. The braces fix it.
 
-**What is `Math.min(a, b)` and `Math.max(a, b)`?** Built-in JavaScript functions. `Math.min(3, 1)` returns `1` (the smaller). `Math.max(3, 1)` returns `3` (the larger). We use them to normalise the range: if the user selected from C3 to A1 (right-to-left, bottom-to-top), the start address has a larger index than the end. `Math.min` and `Math.max` ensure `startRow ≤ endRow` and `startCol ≤ endCol` regardless of selection direction.
+**Walkthrough — `applyOperator` as a separate function:**
 
-**The `for...of` loop pattern here is two nested `for` (classic) loops:** `for (let row = start; row <= end; row++)` iterates from `start` to `end` inclusive, incrementing by 1 each step. Classic `for` loops are preferable over `for...of` when you need the current index explicitly and control start/end bounds. `let` declares `row` as a block-scoped variable — its scope is limited to the `for` loop block.
+`assertNever` is used twice in this lesson: once for `ExpressionNode`'s three node kinds (inside `evaluate`), once for the four operator strings (inside `applyOperator`). Splitting them apart means each `switch` handles exactly one concern: which kind of node this is, or what this operator means. Two exhaustiveness checks, over two different unions, each clearly scoped.
 
-**CS concept — bounding box as a data structure:** A `CellRange` is a two-dimensional bounding box (min row/col, max row/col). The same structure appears in image processing (selection rectangles), CSS layout (element bounds), collision detection (axis-aligned bounding boxes), and geographic information systems (bounding boxes for map regions).
-
-**What breaks if you do not normalise with `Math.min/max`:** A user who selects from C3 to A1 produces `{ startRow: 2, endRow: 0 }`. The loop `for (let row = 2; row <= 0; row++)` has `2 <= 0` which is false immediately — the loop never runs. `resolveCellRange` returns an empty array. `=SUM(PRICES)` returns 0. No error — just silently wrong.
+**Honest scope note:** `left / right` when `right` is `0` does not throw in JavaScript. It returns `Infinity`, `-Infinity`, or `NaN` (for `0/0`) — all technically valid numbers. Whether the spreadsheet should display `Infinity` or a clear error message is a real design question that belongs to a future "error handling" lesson, once there are enough failure modes to answer it properly.
 
 ---
 
-### Step 2 — The formula function registry
+## Step 2 — Split `displayCell` into two functions
 
-**The problem:** Named ranges enable range-based formula functions like `SUM` and `AVERAGE`. We need a registry that maps function names to implementations.
+**The problem:** `displayCell` currently answers two different questions at once: what a cell looks like when you are *viewing* it, and what text appears in the input when you are *editing* it. For numbers and text, those have always been the same answer. For formulas, they cannot be: viewing should show the computed result (`20`), but editing should show the formula (`=10+5*2`). Opening a formula cell for editing and seeing `20` would silently destroy the formula the moment you committed it.
 
-```ts
-// src/utils/formulaFunctions.ts
+Add `editableText` to `<script setup>`:
 
-export const FORMULA_FUNCTIONS: Record<string, (values: number[]) => number> = {
-  SUM:     (values) => values.reduce((total, value) => total + value, 0),
-  AVERAGE: (values) => values.reduce((total, value) => total + value, 0) / values.length,
-  MAX:     (values) => Math.max(...values),
-  MIN:     (values) => Math.min(...values),
-  COUNT:   (values) => values.filter(value => !isNaN(value)).length,
+```typescript
+function editableText(cell: Cell | undefined): string {
+  if (!cell) return ''
+  switch (cell.kind) {
+    case 'number':  return cell.value.toString()
+    case 'text':    return cell.value
+    case 'formula': return '=' + cell.expr
+    default:        return assertNever(cell)
+  }
 }
 ```
 
-**Walkthrough:** `FORMULA_FUNCTIONS` is a plain JavaScript object mapping function names (strings) to function implementations. `FORMULA_FUNCTIONS['SUM']` returns the `SUM` function. `FORMULA_FUNCTIONS['AVERAGE']` returns the average function. A formula like `=SUM(PRICES)` looks up `'SUM'` in this table and calls the result.
+Update `displayCell`:
 
-**What is `Record<string, (values: number[]) => number>`?** `Record<K, V>` is a TypeScript utility type for an object where every key has type `K` and every value has type `V`. `Record<string, (values: number[]) => number>` means: every key is a string, every value is a function that accepts `number[]` and returns `number`. TypeScript rejects `FORMULA_FUNCTIONS['SUM'] = 42` (not a function) and `FORMULA_FUNCTIONS['SUM'] = (v) => 'hello'` (wrong return type).
-
-**What is `Array.prototype.reduce(callback, initialValue)`?** Reduces an array to a single value by applying `callback(accumulator, currentValue)` to each element. The accumulator starts as `initialValue`. `[5, 10, 15].reduce((total, v) => total + v, 0)` runs: total=0 + 5 = 5, then 5 + 10 = 15, then 15 + 15 = 30. Result: `30`. `reduce` is the general aggregation operation — `SUM`, `AVERAGE`, `MAX`, and `MIN` are all special cases of reduce.
-
-**What is `Math.max(...values)`?** `Math.max` does not accept an array — it accepts individual arguments: `Math.max(5, 10, 15)` → `15`. The spread operator `...values` expands `[5, 10, 15]` into individual arguments, making `Math.max(...[5, 10, 15])` equivalent to `Math.max(5, 10, 15)`. This works for reasonable array sizes; for very large arrays (tens of thousands of elements), `reduce` is safer (spread can overflow the call stack).
-
-**What is `Array.prototype.filter(predicate)`?** Returns a new array containing only the elements for which `predicate(element)` is `true`. `[1, NaN, 3].filter(value => !isNaN(value))` → `[1, 3]`. `filter` does not mutate the original array; it creates a new one. `COUNT` counts only numeric values — filtering out `NaN` handles empty cells (which contribute `0` raw values, converted to `NaN` by `Number('')`).
-
-**CS concept — dispatch table:** `FORMULA_FUNCTIONS` is a dispatch table — a data structure that maps identifiers to functions. JavaScript lookups in an object are O(1) (hash map access). The alternative — a long `if/else if` chain — is O(n) and must be modified every time a function is added. The dispatch table is the standard pattern for extensible command systems.
-
-**SE principle — open/closed:** Adding `MEDIAN`, `STDEV`, or `PERCENTILE` adds one entry to `FORMULA_FUNCTIONS`. No existing code changes. The formula evaluator, the formula parser, and all existing formulas continue to work unchanged. This is the open/closed principle: open for extension (add entries), closed for modification (don't touch the evaluator).
-
-**What breaks if `FORMULA_FUNCTIONS` is not `const`:** Nothing functional — but convention signals intent. `const` communicates "this object is defined once and not reassigned." Without `const`, future code might do `FORMULA_FUNCTIONS = {}` (replacing the whole table) instead of `FORMULA_FUNCTIONS['NEWFN'] = ...` (adding to it). The lesson 12 plugin system will add functions dynamically — but by creating a merged object, not by mutating this one.
-
----
-
-### Step 3 — The useNamedRanges composable
-
-**The problem:** We need to store named ranges and provide functions to define, look up, and remove them.
-
-```ts
-// src/composables/useNamedRanges.ts
-import { ref, computed } from 'vue'
-import type { Ref } from 'vue'
-import type { NamedRange, CellRange } from '../types/namedRange'
-
-export function useNamedRanges(activeSheetId: Ref<string>) {
-  const namedRanges = ref<NamedRange[]>([])
-
-  function defineRange(name: string, range: CellRange) {
-    const upperName = name.toUpperCase()
-    const existingIndex = namedRanges.value.findIndex(
-      r => r.name === upperName && r.sheetId === activeSheetId.value
-    )
-    const entry: NamedRange = { name: upperName, range, sheetId: activeSheetId.value }
-    if (existingIndex >= 0) {
-      namedRanges.value[existingIndex] = entry  // update
-    } else {
-      namedRanges.value.push(entry)             // insert
+```typescript
+function displayCell(cell: Cell | undefined): string {
+  if (!cell) return ''
+  switch (cell.kind) {
+    case 'number':  return cell.value.toString()
+    case 'text':    return cell.value
+    case 'formula': {
+      const parseResult = parse(tokenize(cell.expr))
+      if (parseResult.success === false) return '#ERROR'
+      return evaluate(parseResult.ast).toString()
     }
+    default: return assertNever(cell)
   }
-
-  function removeRange(name: string) {
-    namedRanges.value = namedRanges.value.filter(
-      r => !(r.name === name.toUpperCase() && r.sheetId === activeSheetId.value)
-    )
-  }
-
-  function findRange(name: string): NamedRange | undefined {
-    return namedRanges.value.find(
-      r => r.name === name.toUpperCase() && r.sheetId === activeSheetId.value
-    )
-  }
-
-  const activeSheetRanges = computed(() =>
-    namedRanges.value.filter(r => r.sheetId === activeSheetId.value)
-  )
-
-  return { namedRanges, activeSheetRanges, defineRange, removeRange, findRange }
 }
 ```
 
-**Walkthrough:** `namedRanges` holds all named ranges across all sheets. Each has a `sheetId` so ranges are scoped to their sheet. `defineRange` normalises the name to uppercase (so `PRICES` and `prices` are the same), then either updates the existing entry or inserts a new one. `removeRange` creates a new array excluding the named range. `activeSheetRanges` is a computed that filters to only the current sheet's ranges — used by the UI to list defined names.
+Update the template's `<input>` to use `editableText` instead of `displayCell` for its `:value`:
 
-**What is `Array.prototype.findIndex(predicate)`?** Like `find`, but returns the **index** of the first matching element instead of the element itself. Returns `-1` if no match is found. `[{name:'PRICES'},{name:'TAX'}].findIndex(r => r.name === 'TAX')` → `1`. We use `findIndex` (not `find`) because we need the position to do an in-place update: `array[index] = newValue`.
-
-**What is `String.prototype.toUpperCase()`?** Returns a new string with all characters converted to uppercase. `'prices'.toUpperCase()` → `'PRICES'`. Non-alphabetic characters are unchanged. We normalise to uppercase so users can type `sum(prices)` and have it match `PRICES`.
-
-**Upsert pattern:** "Update if exists, insert if not." Common in databases. `findIndex` checks if the name exists. If `existingIndex >= 0`, replace at that position. If `-1`, push a new entry. Without the upsert, defining `PRICES` twice would create two entries, and the formula evaluator would find the first one (possibly the old one) instead of the most recent.
-
-**Why `namedRanges.value = namedRanges.value.filter(...)` instead of `splice`?** `filter` creates a new array. Replacing the ref's value with the new array triggers Vue's reactivity: any computed or template reading `namedRanges.value` re-evaluates. Mutation via `splice` would also work (`namedRanges.value.splice(index, 1)`), but replacing the array is more explicit and easier to reason about.
-
-**What breaks if names are not normalised to uppercase:** `=SUM(PRICES)` works after defining `PRICES`. `=SUM(prices)` fails with `#NAME?` — the lookup is case-sensitive by default. Excel and Google Sheets are case-insensitive for named ranges. Users type in all caps or all lowercase; normalising to uppercase means all formats match.
-
----
-
-### Step 4 — Update the formula evaluator
-
-**The problem:** The evaluator from lesson 4 handles cell references (`A1`). We now need it to handle function calls on ranges (`SUM(A1:C3)`) and named ranges (`SUM(PRICES)`).
-
-```ts
-function evaluateFormula(
-  formula: string,
-  cells: CellData[][],
-  findRange: (name: string) => NamedRange | undefined
-): number | string {
-  let expression = formula.slice(1)
-
-  // Pre-processing step: resolve function calls before cell reference substitution
-  expression = expression.replace(
-    /([A-Z]+)\(([A-Z_][A-Z0-9_]*|[A-Z]+\d+:[A-Z]+\d+)\)/g,
-    (_, funcName, argument) => {
-      const fn = FORMULA_FUNCTIONS[funcName]
-      if (!fn) return '#NAME?'
-
-      const rawValues = argument.includes(':')
-        ? resolveCellRange(parseRange(argument), cells)        // range: A1:C3
-        : resolveCellRange(findRange(argument)!.range, cells)  // named: PRICES
-
-      const numbers = rawValues.map(v => Number(v) || 0)
-      return String(fn(numbers))
-    }
-  )
-
-  // Then: lesson 4's cell reference substitution and arithmetic evaluation
-  // ...
-}
+```html
+<input
+  class="cell-input"
+  :value="editableText(cells[cellId({ col, row })])"
+  @keydown.enter.stop="commitEdit({ col, row }, ($event.target as HTMLInputElement).value)"
+  @blur="commitEdit({ col, row }, ($event.target as HTMLInputElement).value)"
+  :ref="(el) => { if (el) (el as HTMLInputElement).focus() }"
+/>
 ```
 
-**Walkthrough:** Before the lesson 4 cell reference step, we add a new replacement pass. The regex `/([A-Z]+)\(([A-Z_][A-Z0-9_]*|[A-Z]+\d+:[A-Z]+\d+)\)/g` matches patterns like `SUM(PRICES)` or `AVERAGE(A1:B3)`. For each match, the first capture group (`funcName`) is the function name; the second (`argument`) is either a named range identifier or a range address. We resolve the argument to values, apply the function, and substitute the numeric result.
+The display branch stays as `{{ displayCell(cells[cellId({ col, row })]) }}` — unchanged.
 
-After this step, the expression contains only numbers and arithmetic operators — which the existing lesson 4 evaluator handles unchanged.
+Click ▶ Run. Type `=10+5*2` into a cell and press Enter: it shows `20`. Double-click it to edit: the input shows `=10+5*2`, not `20`. Commit without changes: still shows `20`.
 
-**`argument.includes(':')`:** `String.prototype.includes(substring)` returns `true` if the string contains `substring`. `'A1:C3'.includes(':')` → `true`. `'PRICES'.includes(':')` → `false`. We use this to distinguish range notation (`A1:C3`) from a named range identifier (`PRICES`).
+**This is the moment lesson 04 predicted:**
 
-**SE principle — open/closed in action:** We extended `evaluateFormula` with a pre-processing step without modifying the lesson 4 cell reference step. The existing logic runs after the new logic, completely unchanged. New capability added; existing capability unmodified.
+When `displayCell` was written for numbers and text, its walkthrough said: "That will not stay true once formulas exist in lesson 05." Two lessons later, that prediction arrived. The split was deferred until it was actually needed — not anticipated with a `forEditing` parameter added speculatively.
 
-**What breaks if the function name check `if (!fn)` is missing:** `=TYPO(A1:B1)` looks up `FORMULA_FUNCTIONS['TYPO']` which is `undefined`. Calling `undefined(numbers)` throws `TypeError: undefined is not a function`. The error propagates up, crashes `evaluateFormula`, and the whole grid fails to render. `#NAME?` is the user-visible signal that the function does not exist — not a crashed spreadsheet.
+**Why two small functions instead of one with a flag:**
+
+```typescript
+// Possible but worse:
+function displayCell(cell, { forEditing = false } = {}) { ... }
+```
+
+Every call site must remember which flag means what. A future reader must track two branches inside one function. Two clearly named functions — `editableText` answers "what should the edit input show?", `displayCell` answers "what should the viewer see?" — state their purposes explicitly. The overlap in their first three cases is fine. Small, clearly named functions that share three lines are more readable than one function with a boolean parameter that silently changes its semantics.
 
 ---
 
-## Connect the pieces
+## Step 3 — Expand the debug panel to show the result
 
-Named ranges sit between the formula evaluator and the grid data. They are a vocabulary layer — they give human-readable names to regions of cells, making formulas readable and resilient to layout changes.
+Update `debugInfo` in `<script setup>` to include the evaluated result:
 
-**CS concept — symbol table:** A symbol table maps identifiers (names) to locations or values. When JavaScript resolves a variable `x`, it looks it up in the scope chain — a symbol table. When our evaluator resolves `PRICES`, it looks it up in the named range registry — a domain-specific symbol table. You have built a small domain-specific language with its own name resolution mechanism.
+```typescript
+interface DebugInfo {
+  tokens: Token[]
+  parseResult: ParseResult
+  result: number | null
+}
 
-**In production:** Excel's Name Manager, Google Sheets' Named Ranges, and SQL's views are all instances of this same pattern. Formula engineers at these companies maintain exactly this architecture: a name registry, a lookup function, and a formula evaluator that pre-resolves names before arithmetic evaluation.
+const debugInfo = computed<DebugInfo | null>(() => {
+  const sel = selectedCoordinate.value
+  if (sel === null) return null
+  const cell = cells.value[cellId(sel)]
+  if (!cell || cell.kind !== 'formula') return null
+  try {
+    const tokens = tokenize(cell.expr)
+    const parseResult = parse(tokens)
+    const result = parseResult.success === true ? evaluate(parseResult.ast) : null
+    return { tokens, parseResult, result }
+  } catch {
+    return null
+  }
+})
+```
+
+Update the template debug panel to show all three:
+
+```html
+<div class="debug-panel" v-if="debugInfo !== null">
+  <h3>Tokens</h3>
+  <pre>{{ JSON.stringify(debugInfo.tokens, null, 2) }}</pre>
+
+  <h3>AST</h3>
+  <template v-if="debugInfo.parseResult.success === true">
+    <pre>{{ JSON.stringify(debugInfo.parseResult.ast, null, 2) }}</pre>
+  </template>
+  <template v-else>
+    <pre class="error">Parse error: {{ debugInfo.parseResult.error.message }}</pre>
+  </template>
+
+  <h3>Result</h3>
+  <pre v-if="debugInfo.result !== null">{{ debugInfo.result }}</pre>
+  <pre v-else class="error">(parse failed — no result)</pre>
+</div>
+<div class="debug-panel debug-empty" v-else>
+  <p>(select a formula cell to see the full pipeline)</p>
+</div>
+```
+
+Click ▶ Run. Select a formula cell — the panel shows the entire pipeline: tokens, AST, and the final computed number.
 
 ---
 
 ## What breaks without this
 
-**If you always pass the cell reference through `new Function` evaluation:** `=SUM(PRICES)` gets to `new Function('return (SUM(PRICES))')()`. `SUM` is not a JavaScript function — this throws `ReferenceError: SUM is not defined`. The pre-processing step that replaces `SUM(PRICES)` with its numeric result (e.g., `30`) before passing to `new Function` is what makes formula functions safe.
+**Reverting the input `:value` to `displayCell` instead of `editableText`:**
+
+Type `=10+5*2`, confirm it shows `20`. Double-click to edit — the input shows `20`. Press Enter without changing anything. `commitEdit` calls `parseRawInput('20')` — the number `20` is stored, permanently destroying the formula. The cell now holds the literal number `20`, not a live formula. `editableText` exists specifically to prevent this.
+
+**Removing `{ }` from the `'BinaryExpression'` case in `evaluate`, then adding another case that also declares `const left`:**
+
+TypeScript: "Cannot redeclare block-scoped variable 'left'." The braces are required for multiple cases with their own local declarations.
+
+**Removing `assertNever` from `applyOperator`:**
+
+Add a fifth operator string to `'+' | '-' | '*' | '/'` — say, `'%'`. The switch has no `'%'` case and no `assertNever`. TypeScript says nothing. At runtime, `applyOperator('%', 10, 3)` falls through the switch returning `undefined`, which becomes `NaN` when used as a number. With `assertNever`, adding `'%'` to the union immediately forces you to add a `case '%': return left % right` or the code refuses to compile.
+
+---
+
+## Connect the pieces
+
+```
+App.vue
+  <script setup>
+    applyOperator()    — pure; operator + two numbers → number;
+                         assertNever for exhaustiveness
+    evaluate()         — pure; ExpressionNode → number; recursive;
+                         BinaryExpression case needs { } for scope
+    editableText()     — what the edit input shows (formula text preserved)
+    displayCell()      — what the viewer sees (formula → computed result)
+    debugInfo          — computed; now includes result; still zero calls
+  <template>
+    :value="editableText(...)"   — edit input uses editableText
+    {{ displayCell(...) }}       — display text uses displayCell
+```
 
 ---
 
 ## Definition of done
 
-- [ ] Define named range `PRICES` covering `A1:A3` with values 5, 10, 15
-- [ ] `=SUM(PRICES)` in a cell shows `30`
-- [ ] `=AVERAGE(PRICES)` shows `10`; `=MAX(PRICES)` shows `15`
-- [ ] Changing A1 to 100 updates the formula cell automatically
-- [ ] The NameManager lists the defined range and has a working Remove button
-- [ ] Range notation without naming also works: `=SUM(A1:A3)` → `30`
-- [ ] **Git commit:**
+Click ▶ Run and verify:
 
-```
-git add src/
-git commit -m "Add named ranges and formula functions — human-readable labels, SUM/AVERAGE/MAX/MIN/COUNT"
-```
+- [ ] `=10+5*2` displays `20` in the cell
+- [ ] `=(10+5)*2` displays `30` (parentheses override precedence)
+- [ ] Double-clicking a formula cell shows the original formula text, not its result
+- [ ] The debug panel shows tokens, AST, and result for a selected formula cell
+- [ ] A formula with division by zero shows `Infinity` or `NaN` (not an error yet)
+- [ ] You can explain why `{ }` braces are needed in the `'BinaryExpression'` switch case
+- [ ] You can explain why `editableText` and `displayCell` had to become two separate functions at this exact lesson
+- [ ] You can explain what `5/0` evaluates to and why that is not yet the final answer this project gives
+
+---
+
+*Next: Lesson 09 — Cell References. `=A1+B1` finally reads two other cells' values. The parser's `Primary` rule grows a second case, the evaluator grows to match it, and `cells` becomes part of what `evaluate` reads — the first time the evaluator is not pure.*

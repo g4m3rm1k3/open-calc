@@ -2,29 +2,77 @@
 
 ## What you will build
 
-An `AddTodo` component with a text input. As the user types, a ref updates. When the form is submitted, the new todo is added to the list and the input clears.
+An `AddTodo` component with a text input. As the user types, a ref updates. When the form is submitted, the new todo is added to the list and the input clears. Additionally: a select filter that uses `v-model`, and a checkbox that demonstrates how `v-model` adapts to different input types.
 
 ```
-[ What needs doing? ________________ ] [ Add ]
+[ What needs doing? _________ ] [ Add ]
 ```
 
-After this: every form input in every Vue app you write will use this pattern.
+After this: every form input in every Vue app you write uses this pattern.
 
 ---
 
-## Connects backward
+## What you need to know first
 
-Lesson 06 showed the `emit` half of component communication. This lesson introduces `v-model` — which is shorthand for a specific prop + emit pair. After this lesson the `v-model` contract (Lesson 06 mechanics + a naming convention) will be fully transparent to you.
+Lesson 06 completed the "data down, events up" pattern: props carry data into a component; emits carry events out. This lesson shows a very specific props + emit pair — syncing a text input with a ref — that is common enough to deserve its own shorthand. The lesson starts by wiring the input manually so the shorthand becomes obvious, not magical.
 
 ---
 
-## The lesson
+## Step 1 — Wiring an input by hand, and the boilerplate it produces
 
-### Step 1 — Create `AddTodo.vue`
+Create `src/components/AddTodo.vue`. Paste the manual, fully-explicit approach:
 
-**The problem:** A form input needs to do two things simultaneously: display the current value and update a ref when the user types. Doing this manually requires `:value` (display) and `@input` (update). `v-model` is shorthand for both.
+```html
+<script setup lang="ts">
+import { ref } from 'vue'
 
-**File:** Create `src/components/AddTodo.vue` (use the `+` button) — paste the entire file contents:
+const emit = defineEmits<{
+  add: [text: string]
+}>()
+
+const inputText = ref('')
+</script>
+
+<template>
+  <form @submit.prevent="emit('add', inputText)">
+    <input
+      :value="inputText"
+      @input="inputText = ($event.target as HTMLInputElement).value"
+      placeholder="What needs doing?"
+    />
+    <button type="submit" :disabled="!inputText.trim()">Add</button>
+  </form>
+</template>
+```
+
+**Walkthrough — what these two bindings do:**
+
+`:value="inputText"` — a one-way binding from ref to DOM. The input element's displayed text is always `inputText.value`. Without this, the input is **uncontrolled**: the browser owns the text; Vue has no say in what is displayed. If `inputText.value` is set to `''` programmatically (to clear after submit), an uncontrolled input would not clear.
+
+`@input="inputText = ($event.target as HTMLInputElement).value"` — a one-way binding from DOM to ref. Every time the user types a character, the browser fires an `input` event. The event's `target` is the `<input>` element; its `.value` property is the current text. This assignment copies the text into the ref.
+
+Together these two bindings form a **synchronisation loop**:
+
+```
+User types
+  → @input fires
+  → inputText.value = current text
+  → Vue re-renders
+  → :value updates the DOM input to match
+  → (cycle continues)
+```
+
+Both bindings must be present. Without `:value`, Vue doesn't control what the input shows — programmatic clears fail. Without `@input`, typing doesn't update the ref — submitting sends the initial empty string.
+
+**The type cast `($event.target as HTMLInputElement)`:** TypeScript knows `event.target` can be any `EventTarget` — an element, a document, a window. It does not know it is specifically an `HTMLInputElement` with a `.value` property. The cast narrows the type so TypeScript allows `.value`. At runtime this does nothing — JavaScript has no type information.
+
+**SE lens — the synchronisation boilerplate problem.** Two lines of code for one conceptually simple thing: "this input and this ref stay in sync." In a form with ten inputs, that is twenty lines of identical structure. The structure is always the same — `:value="ref"` + `@input="ref = $event.target.value"` — but the ref name changes. This is precisely the kind of mechanical repetition that a named abstraction should eliminate.
+
+---
+
+## Step 2 — `v-model`: the shorthand for the synchronisation loop
+
+Replace the entire `src/components/AddTodo.vue`:
 
 ```html
 <script setup lang="ts">
@@ -51,9 +99,7 @@ function submit() {
       placeholder="What needs doing?"
       class="input"
     />
-    <button type="submit" :disabled="!inputText.trim()">
-      Add
-    </button>
+    <button type="submit" :disabled="!inputText.trim()">Add</button>
   </form>
 </template>
 
@@ -66,125 +112,128 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 ```
 
-**Walkthrough — `v-model`:**
+`v-model="inputText"` replaces both `:value` and `@input`. The two-line boilerplate collapses to one directive.
+
+**What `v-model` expands to — exactly:**
 
 ```html
+<!-- This: -->
 <input v-model="inputText" />
-```
 
-`v-model` is syntactic sugar. This expands to:
-
-```html
+<!-- Is exactly: -->
 <input
   :value="inputText"
   @input="inputText = ($event.target as HTMLInputElement).value"
 />
 ```
 
-`:value="inputText"` — the input displays the ref's current value.
-`@input="..."` — every keystroke updates the ref.
-Together they create a loop: type → ref updates → input shows new value.
+This is pure syntactic sugar. There is no new mechanism — `v-model` is a named abbreviation for a pattern you just wrote manually. Understanding what it expands to means you will never be confused by its behavior.
 
-**CS concept — two-way data binding:** Classic MVC separated model (data) from view (display). A two-way binding synchronises them automatically in both directions. User input updates the model; model changes update the view. Vue's reactivity system makes this zero-cost: only the input element re-renders when `inputText` changes.
-
-**SE principle — derived state at the boundary:** The Add button's disabled state is derived from `inputText.trim()` — it is computed inline as `:disabled="!inputText.trim()"`. We do not store a separate `isDisabled` ref. Storing derived booleans in refs creates synchronisation problems; expressing them as computed expressions keeps a single source of truth.
-
-**What breaks if you use `:value` + `@input` manually but forget one:**
-- Only `:value="inputText"`: input displays the value but the ref never updates when you type → the button is always enabled, nothing ever submits correctly
-- Only `@input="..."`: the ref updates but the input's displayed value is not controlled → the input shows what the browser tracks, not what Vue tracks, causing desync after a reset
-
----
-
-**Walkthrough — form submission:**
+**Walkthrough — `@submit.prevent`:**
 
 ```html
 <form @submit.prevent="submit">
 ```
 
-`@submit.prevent` is two things chained: `@submit` listens for the form's `submit` event; `.prevent` calls `event.preventDefault()` before running `submit`. Without `.prevent`, clicking the button or pressing Enter causes the browser to navigate to a new URL (the old HTML form behavior). In a Vue SPA, the page must never reload on form submit.
+Without `.prevent`, pressing Enter or clicking the Add button causes the browser to navigate to a new URL (HTML's default `<form>` behavior, unchanged since 1993). In a Vue SPA, that navigation destroys all Vue state and reloads the page. The todo is never added — `submit()` begins to run but the page reload interrupts it before `emit('add', ...)` completes. `.prevent` calls `event.preventDefault()` before `submit()` runs, stopping the navigation.
+
+**Walkthrough — the submit function and order of operations:**
 
 ```typescript
 function submit() {
   const trimmed = inputText.value.trim()
-  if (!trimmed) return
-  emit('add', trimmed)
-  inputText.value = ''   // clear after emit
+  if (!trimmed) return        // guard: don't add whitespace-only todos
+  emit('add', trimmed)        // send the text upward
+  inputText.value = ''        // clear the input AFTER emitting
 }
 ```
 
-Order matters: emit the value *before* clearing, otherwise the parent receives an empty string.
+Order matters. `emit('add', trimmed)` captures the trimmed text and sends it up. *Then* `inputText.value = ''` clears the ref. If you cleared first, `trimmed` already holds the correct text (it was captured before the clear) — but it communicates intent more clearly to emit before clearing. The `trimmed` constant protects you if you accidentally swap the order.
 
-**What breaks if you remove `.prevent`:** Remove `.prevent` from `@submit.prevent`. Submit the form. The page reloads. All Vue state is destroyed and re-initialized. The todo was never added because the emit never fired — the reload happened first.
+**Walkthrough — `:disabled="!inputText.trim()"`:**
+
+The Add button is disabled when the input is empty or whitespace-only. `!inputText.trim()` is a derived boolean: `inputText.trim()` returns `''` when the input is blank, and `''` is falsy, so `!''` is `true`, which disables the button. Vue re-evaluates this on every keystroke (because `inputText` is reactive and the template reads it here).
+
+Note: this could be a `computed` value (`const isDisabled = computed(() => !inputText.value.trim())`). For a single instance, the inline expression is fine. Use `computed` when the same derivation is needed in multiple places.
 
 ---
 
-### Step 2 — Update `App.vue`
+## Step 3 — `v-model` adapts to input type
 
-**The problem:** `App.vue` needs to import `AddTodo`, render it, and handle the `@add` event by pushing a new item to the todos array.
+`v-model` expands differently based on the HTML element and `type` attribute. The same directive; different machinery under the hood.
 
-**File:** `src/App.vue` — replace the entire `<script setup>` section with:
-
-```typescript
-import { ref } from 'vue'
-import TodoItem from './components/TodoItem.vue'
-import AddTodo from './components/AddTodo.vue'
-
-const todos = ref([
-  { id: 1, text: 'Learn Vue components', done: false },
-  { id: 2, text: 'Build something real', done: false },
-])
-
-let nextId = 3
-
-function addTodo(text: string) {
-  todos.value.push({ id: nextId++, text, done: false })
-}
-
-function toggle(id: number) {
-  const todo = todos.value.find(t => t.id === id)
-  if (todo) todo.done = !todo.done
-}
-```
-
-**File:** `src/App.vue` — replace the `<template>` section with:
+**Text inputs and textarea:**
 
 ```html
-<template>
-  <div class="app">
-    <h2>Todos</h2>
-    <AddTodo @add="addTodo" />
-    <ul>
-      <TodoItem
-        v-for="todo in todos"
-        :key="todo.id"
-        :id="todo.id"
-        :text="todo.text"
-        :done="todo.done"
-        @toggle="toggle"
-      />
-    </ul>
-  </div>
-</template>
+<input v-model="name" />
+<textarea v-model="bio" />
+<!-- Both expand to: :value + @input -->
 ```
 
-**File:** `src/App.vue` — the `<style>` section is unchanged from Lesson 06.
+**Checkboxes — single boolean:**
 
-**Walkthrough:**
-- `import AddTodo from './components/AddTodo.vue'` — import the new component
-- `let nextId = 3` — a non-reactive counter; it does not need to be reactive because we never display it in the template; plain `let` is fine for internal counters
-- `addTodo(text: string)` — the handler for `@add`; `todos.value.push(...)` mutates the array in place; Vue detects this and re-renders the list
-- `<AddTodo @add="addTodo" />` — renders the form and connects the `add` event to `addTodo`
+```html
+<input type="checkbox" v-model="isDone" />
+<!-- Expands to: :checked="isDone" + @change="isDone = $event.target.checked" -->
+```
 
-**CS concept — functional component boundary:** `AddTodo` is a pure input component. It owns `inputText` locally. It never holds a reference to the todos array. The text flows out through `emit('add', text)` as a plain string. The parent decides what to do with that string. This is the same functional boundary principle as pure functions — no hidden state, no side effects on shared data.
+`isDone` must be a `ref(false)` (boolean). When checked, `isDone.value` becomes `true`; when unchecked, `false`.
+
+**Checkboxes — array for multiple selection:**
+
+```html
+<input type="checkbox" v-model="selectedIds" value="1" />
+<input type="checkbox" v-model="selectedIds" value="2" />
+<input type="checkbox" v-model="selectedIds" value="3" />
+```
+
+When `selectedIds` is `ref<string[]>([])`, checking box "2" adds `"2"` to the array; unchecking removes it. Vue manages array membership automatically.
+
+**Radio buttons:**
+
+```html
+<input type="radio" v-model="priority" value="low" />
+<input type="radio" v-model="priority" value="medium" />
+<input type="radio" v-model="priority" value="high" />
+<!-- priority.value becomes 'low', 'medium', or 'high' based on selection -->
+```
+
+**Select:**
+
+```html
+<select v-model="filter">
+  <option value="all">All</option>
+  <option value="active">Active</option>
+  <option value="done">Done</option>
+</select>
+<!-- Expands to: :value + @change -->
+```
+
+`filter.value` matches whichever `option value` is selected.
+
+**`v-model` modifiers:**
+
+```html
+<!-- .trim: strips leading/trailing whitespace from the value -->
+<input v-model.trim="name" />
+
+<!-- .number: converts the string to a number (inputs always give strings) -->
+<input type="number" v-model.number="quantity" />
+
+<!-- .lazy: syncs on @change instead of @input (fires on blur, not keystroke) -->
+<input v-model.lazy="expensive" />
+```
+
+`.number` is especially important. `<input type="number">` in HTML still gives you a *string* from `event.target.value` — `"42"`, not `42`. Without `.number`, a calculation like `price.value * quantity.value` where `quantity` is `"3"` (string) would return `NaN`. `.number` automatically converts the string to a number.
 
 ---
 
-## `v-model` on components
+## Step 4 — `v-model` on components: connecting Lesson 06
 
-`v-model` on a native `<input>` uses `value`/`input`. On a component it uses a different convention:
+`v-model` on a native HTML element uses `:value`/`@input`. On a *component*, it uses a naming convention from the props+emit system:
 
 ```html
-<!-- Parent -->
+<!-- Parent: -->
 <MyInput v-model="searchText" />
 
 <!-- Expands to: -->
@@ -193,27 +242,72 @@ function toggle(id: number) {
   @update:modelValue="searchText = $event"
 />
 
-<!-- Inside MyInput.vue -->
+<!-- Inside MyInput.vue: -->
 defineProps<{ modelValue: string }>()
 defineEmits<{ 'update:modelValue': [value: string] }>()
 ```
 
-This is the pattern every Vue UI library uses (Vuetify, PrimeVue, Headless UI). When you see `v-model` on a component, you now know exactly what props and emits it requires.
+The convention: the prop is named `modelValue`; the emit is named `'update:modelValue'`. This is not magic — it is a pair of names Vue chose as the standard for two-way binding on components.
+
+Every Vue UI library (Vuetify, PrimeVue, Naive UI) uses this convention for its input components. When you see `<DatePicker v-model="selectedDate" />`, you know the component accepts a `modelValue` prop and emits `'update:modelValue'`. You know how to implement `<MyDatePicker v-model="..." />` yourself, because Lesson 06 gave you `defineProps` and `defineEmits`, and this lesson gave you the naming convention.
+
+**Multiple v-model on one component:**
+
+```html
+<UserForm v-model:firstName="first" v-model:lastName="last" />
+
+<!-- Expands to: -->
+<UserForm
+  :firstName="first"
+  @update:firstName="first = $event"
+  :lastName="last"
+  @update:lastName="last = $event"
+/>
+```
+
+The `v-model:propName` form lets a single component have multiple independently bound values.
+
+---
+
+## Update `App.vue` to use `<AddTodo>`
+
+```typescript
+import AddTodo from './components/AddTodo.vue'
+
+function addTodo(text: string) {
+  todos.value.push({ id: nextId++, text, done: false })
+}
+```
+
+```html
+<AddTodo @add="addTodo" />
+```
+
+`@add="addTodo"` — `AddTodo` emits `'add'` with the text; `App.vue` catches it and pushes to the array.
+
+**CS concept — two-way data binding.** The manual Step 1 approach — `:value` read, `@input` write — is a **data binding**: a live synchronisation between a JavaScript value and a DOM control. **Two-way** binding synchronises both directions: the control always shows the current value; user input always propagates to the value. This eliminates the class of bugs where UI and data diverge (the DOM shows the old value, or the data has a stale string). Vue's reactive system makes two-way binding efficient: only the bound input element re-renders when the ref changes, not the entire form.
+
+**CS concept — controlled vs uncontrolled inputs.** A **controlled** input is one where a JavaScript value is the source of truth — `:value="ref"` ensures the input always shows what the ref contains. An **uncontrolled** input is one where the browser owns the value internally; JavaScript can read it but not push values in. Programmatic clears (`inputText.value = ''`) only work on controlled inputs. Pre-filling from saved data only works on controlled inputs. Vue's `v-model` creates controlled inputs. Use controlled inputs for any form that has state beyond what the user just typed.
+
+**SE principle — single source of truth for form state.** `inputText` is the single source of truth for what the user typed. The DOM input is a view of `inputText.value`. The button's disabled state is derived from `inputText.value`. The submit handler reads `inputText.value`. There is no `inputElement.value` anywhere — the browser's internal DOM state is not consulted directly. This ensures that programmatic changes (clearing, pre-filling) are always reflected correctly in the UI.
 
 ---
 
 ## Connects forward
 
-Lesson 08 introduces `onMounted` for loading data. The three-state async pattern (loading/error/data) is the fetch equivalent of the submit pattern here: user initiates → component signals → parent responds.
+Lesson 08 introduces `onMounted` for loading data from an API. Forms (submission) and fetches (data loading) share a common pattern: an async operation puts the component in a loading state, then transitions to a success or error state. The state machine model from Lesson 08 applies to both.
 
 ---
 
 ## Definition of done
 
-Click **▶ Run** and verify:
+`App.vue` should now include `<AddTodo @add="addTodo" />` above the filters. Verify:
 
-- [ ] Typing and clicking Add appends a new todo
+- [ ] Typing in the input and clicking Add (or pressing Enter) appends a new todo to the list
 - [ ] The input clears after submission
-- [ ] The Add button is disabled when the input is empty
-- [ ] You can explain what `v-model` expands to and why `.prevent` is on `@submit`
-- [ ] Add `@keyup.escape="inputText = ''"` to the input — pressing Escape clears it
+- [ ] The Add button is disabled when the input is empty or whitespace-only
+- [ ] You can write out what `v-model="inputText"` expands to from memory (two attributes)
+- [ ] You can explain why `.prevent` is on `@submit` and what happens without it
+- [ ] You can explain the difference between a controlled and uncontrolled input
+- [ ] You can explain what `v-model.number` does and why it matters for numeric inputs
+- [ ] Add `@keyup.escape="inputText = ''"` to the input — pressing Escape should clear it without submitting

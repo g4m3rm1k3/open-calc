@@ -8,68 +8,89 @@ A shopping cart summary where total price and discount status update automatical
 Unit price: $29.99
 Quantity:   [−] 3 [+]
             ✅ 10% bulk discount applied
+Subtotal:   $89.97
+Discount:   −$8.99
 Total:      $80.97
 ```
 
-Change quantity → total updates. You never write the update code yourself. That is what `computed()` does.
+Change quantity → total, discount, and subtotal update. You never write the update logic yourself.
 
 ---
 
-## Connects backward
+## What you need to know first
 
-Lesson 02 showed functions that imperatively update one ref at a time. This lesson shows the declarative alternative: describe what a value *is* in terms of other values, and Vue keeps it in sync automatically.
+Lesson 02 showed that writing to `count.value` triggers a re-render — Vue re-runs the template with the new value. This lesson introduces a different question: what if a value is *derived from* another value? You could store `total` in its own ref and update it manually every time `price` or `quantity` changes. The lesson starts there — and shows exactly why that approach fails structurally before computed values exist to prevent it.
 
 ---
 
-## The lesson
+## Step 1 — The manual update trap
 
-### Step 1 — Source state and computed derivations
+Try deriving the total by hand. Replace `src/App.vue`:
 
-**The problem:** Price and quantity are independent facts the user controls. Subtotal, discount eligibility, and total are not independent — they follow from price and quantity. Storing them in plain refs means you must update them manually everywhere price or quantity changes. Miss one spot and you have a bug.
+```html
+<script setup lang="ts">
+import { ref } from 'vue'
 
-**File:** `src/App.vue` — replace the entire `<script setup>` section with:
+const price    = ref(29.99)
+const quantity = ref(1)
+const total    = ref(price.value * quantity.value)   // snapshot at line-run time
 
-```typescript
+function increase() {
+  quantity.value++
+  total.value = price.value * quantity.value   // must remember to update
+}
+
+function decrease() {
+  if (quantity.value > 1) {
+    quantity.value--
+    total.value = price.value * quantity.value  // must remember here too
+  }
+}
+</script>
+
+<template>
+  <div>
+    <p>Price: ${{ price.toFixed(2) }}</p>
+    <p>Quantity: {{ quantity }}</p>
+    <button @click="decrease">−</button>
+    <button @click="increase">+</button>
+    <p>Total: ${{ total.toFixed(2) }}</p>
+  </div>
+</template>
+```
+
+Click **▶ Run**. It works.
+
+Now add a coupon code feature that halves the price. You must add a `total.value = ...` update inside the coupon handler. Add a "buy 5 get 1 free" promotion? Another update. Add a "group override price" that an admin can set? Another update. Add a shipping cost? Every function that changes *any* of the inputs must now also update `total` — and any other derived value that depends on those inputs.
+
+**The structural weakness here:** every function that mutates `price` or `quantity` becomes responsible for also maintaining `total`. This is not just extra code — it is a *contract* that every future author must know about and honor. Forget it once and the displayed total silently shows a wrong number. The more derived values you add, the more every mutation function must know about — and the more places a change can be missed.
+
+**SE lens — the synchronisation obligation, exactly.** The code above creates an implicit *maintenance obligation*: "whenever a function changes `price` or `quantity`, it must also recalculate `total`." This obligation is nowhere documented, nowhere enforced by the language, and nowhere enforced by tests. It is a convention that breaks silently when violated. The number of synchronisation sites grows with the product of (number of mutations) × (number of derived values). In a real cart with a dozen derived values and a dozen mutation functions, that is over a hundred places where a missed update causes a bug.
+
+**CS lens — derived values vs independent values.** `price` and `quantity` are *independent facts* — the user sets them; they exist on their own terms. `total` is a *dependent fact* — it follows mathematically from the other two. Storing both kinds in the same container type (`ref`) hides this distinction. Treating a derived truth as if it were a source truth — giving it its own independent ref — means you have to *enforce* the derivation relationship everywhere, manually. The fix is a container that *knows* it is derived and enforces the relationship automatically.
+
+---
+
+## Step 2 — `computed()`: declare what a value *is*, not when to update it
+
+Replace the entire `src/App.vue`:
+
+```html
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 
-const price = ref(29.99)
+const price    = ref(29.99)
 const quantity = ref(1)
 
-const subtotal = computed(() => price.value * quantity.value)
-const hasDiscount = computed(() => quantity.value >= 3)
-const total = computed(() =>
-  hasDiscount.value ? subtotal.value * 0.9 : subtotal.value
-)
+const subtotal     = computed(() => price.value * quantity.value)
+const hasDiscount  = computed(() => quantity.value >= 3)
+const discountAmt  = computed(() => hasDiscount.value ? subtotal.value * 0.1 : 0)
+const total        = computed(() => subtotal.value - discountAmt.value)
 
 function increase() { quantity.value++ }
 function decrease() { if (quantity.value > 1) quantity.value-- }
-```
+</script>
 
-**Walkthrough:**
-- `import { ref, computed } from 'vue'` — `computed` is a new import alongside `ref`
-- `const price = ref(29.99)` and `const quantity = ref(1)` — source state; these are the values the user controls
-- `const subtotal = computed(() => price.value * quantity.value)` — a reactive derived value; the function runs once now and again whenever `price` or `quantity` changes
-- `const hasDiscount = computed(() => quantity.value >= 3)` — `boolean` derived from `quantity`; evaluates to `true` when 3 or more items
-- `const total = computed(() => hasDiscount.value ? subtotal.value * 0.9 : subtotal.value)` — depends on two other computed values; Vue tracks the whole chain
-- `increase()` / `decrease()` — mutate the source state only; all derived values update automatically
-
-**What is `computed()`?** It takes a getter function and returns a reactive object whose `.value` is the getter's result. Vue tracks every reactive value read *inside* the getter. When any of them change, Vue re-runs the getter and updates `computed.value`. The return value is read-only — you never assign to it.
-
-**CS concept — memoization:** `computed()` caches its result. If `price` and `quantity` have not changed since the last read, Vue returns the cached result without re-running the function. This matters when computation is expensive. A plain function called in the template runs on *every render*. `computed()` runs only when its dependencies change.
-
-**SE principle — single source of truth:** `price` and `quantity` are the sources of truth. `subtotal`, `hasDiscount`, and `total` are derived truths. If you stored `total` in a `ref` and updated it manually, you would have two sources of truth that can drift apart. `computed()` eliminates that class of bug.
-
-**What breaks if you replace `computed` with `ref`:** Change `const subtotal = computed(...)` to `const subtotal = ref(price.value * quantity.value)`. Now `subtotal` is a snapshot of the initial values — it never updates again. Click `+` to change quantity: the quantity display updates but the subtotal stays frozen at the initial price. Every function that changes `price` or `quantity` would need to manually recalculate `subtotal`, `hasDiscount`, and `total`. This is the maintenance nightmare `computed()` prevents.
-
----
-
-### Step 2 — Template
-
-**The problem:** We need to display all five values and wire the `+` / `−` buttons.
-
-**File:** `src/App.vue` — replace the entire `<template>` and `<style>` sections with:
-
-```html
 <template>
   <div class="cart">
     <h2>Shopping Cart</h2>
@@ -81,69 +102,129 @@ function decrease() { if (quantity.value > 1) quantity.value-- }
 
     <div class="row">
       <span>Quantity</span>
-      <div class="stepper">
+      <div class="qty">
         <button @click="decrease">−</button>
         <span>{{ quantity }}</span>
         <button @click="increase">+</button>
       </div>
     </div>
 
-    <div v-if="hasDiscount" class="badge">
-      10% bulk discount applied (3+)
+    <div v-if="hasDiscount" class="discount">✅ 10% bulk discount applied</div>
+
+    <div class="row">
+      <span>Subtotal</span>
+      <span>${{ subtotal.toFixed(2) }}</span>
     </div>
 
-    <div class="total">
-      Total: ${{ total.toFixed(2) }}
+    <div v-if="hasDiscount" class="row discount-row">
+      <span>Discount</span>
+      <span>−${{ discountAmt.toFixed(2) }}</span>
+    </div>
+
+    <div class="row total">
+      <span>Total</span>
+      <span>${{ total.toFixed(2) }}</span>
     </div>
   </div>
 </template>
 
 <style scoped>
-.cart {
-  font-family: system-ui, sans-serif;
-  max-width: 340px;
-  margin: 40px auto;
-  padding: 24px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-}
-.row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
-.stepper { display: flex; align-items: center; gap: 12px; }
-.stepper button { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #cbd5e1; background: none; cursor: pointer; font-size: 16px; }
-.badge { margin-top: 12px; padding: 6px 12px; background: #dcfce7; color: #166534; border-radius: 6px; font-size: 13px; }
-.total { margin-top: 16px; font-size: 18px; font-weight: 700; color: #41b883; text-align: right; }
+.cart { font-family: system-ui, sans-serif; max-width: 360px; margin: 40px auto; }
+h2 { font-size: 20px; margin-bottom: 20px; }
+.row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
+.row.total { font-weight: 700; font-size: 18px; border-bottom: none; margin-top: 8px; }
+.row.discount-row span:last-child { color: #16a34a; }
+.qty { display: flex; align-items: center; gap: 12px; }
+.qty button { width: 28px; height: 28px; border: 1px solid #cbd5e1; border-radius: 6px; background: none; cursor: pointer; font-size: 16px; }
+.discount { color: #16a34a; font-size: 13px; padding: 8px 0; }
 </style>
 ```
 
-**Walkthrough:**
-- `{{ price.toFixed(2) }}` — `price` is a `Ref<number>`; Vue auto-unwraps it in the template, so `.toFixed(2)` is called on the number directly
-- `v-if="hasDiscount"` — the badge only renders when the computed boolean is `true`; this is preview for Lesson 04
-- `{{ total.toFixed(2) }}` — reads the computed value; Vue auto-unwraps it just like a ref
+Click **▶ Run**. Increment quantity to 3 — the discount badge appears, the discount row shows, and the total drops by 10%, all instantly and with zero manual update calls.
 
-**What is `v-if`?** A Vue directive that conditionally renders an element. When the expression is `false`, the element is removed from the DOM entirely — not hidden with CSS. Full coverage in Lesson 04.
+**Walkthrough — `computed(getter)`:**
 
-**CS concept — declarative vs imperative:** The template *declares* what to show based on current state. Nowhere do you write "update the total div's text content." You describe the desired output; Vue figures out the minimal DOM updates needed.
+```typescript
+const subtotal = computed(() => price.value * quantity.value)
+```
 
-**SE principle — open for extension, closed for modification:** Adding a new derived value (say, `tax = computed(() => total.value * 0.08)`) requires no changes to existing code — not to `increase()`, not to `decrease()`, not to the template's existing bindings. Each derived fact is independently declared.
+`computed()` takes a getter function and returns a **ComputedRef<T>** — a reactive, read-only container. Vue tracks every reactive value read inside the getter (any `ref.value`, any other `computed.value`) and records them as dependencies. When any dependency changes, Vue marks this computed as **stale** and re-runs the getter on the next read.
+
+`const subtotal = computed(...)` — the result is assigned to `const`, not `let`. This is intentional: you cannot and should not reassign the computed ref itself. Its value is always the getter's latest result.
+
+**Walkthrough — chained computed values:**
+
+```typescript
+const subtotal    = computed(() => price.value * quantity.value)
+const hasDiscount = computed(() => quantity.value >= 3)
+const discountAmt = computed(() => hasDiscount.value ? subtotal.value * 0.1 : 0)
+const total       = computed(() => subtotal.value - discountAmt.value)
+```
+
+`total` depends on `discountAmt`; `discountAmt` depends on `hasDiscount` and `subtotal`; both depend on `quantity`. Change `quantity.value` and Vue propagates the change through the chain in the correct topological order: `subtotal` → `hasDiscount` → `discountAmt` → `total`. You do not specify the order — Vue derives it from the dependency graph automatically.
+
+**`increase()` and `decrease()` — one line each.** Neither function mentions `total`, `subtotal`, `hasDiscount`, or `discountAmt`. They only mutate the sources. Derived values update themselves. Adding a new derived value (say, `shippingCost`, `taxAmount`) requires zero changes to the mutation functions.
+
+**CS concept — memoization.** `computed()` caches its result. Between two reads of `subtotal`, if `price` and `quantity` have not changed, Vue returns the cached value without re-running the getter. This matters for performance: a template expression called during every render re-runs on every render triggered by *any* state change, even changes to completely unrelated refs. A computed getter only runs when its specific dependencies change.
+
+Concrete example: suppose your app has `const name = ref('Alice')` and you show both `{{ name }}` and `{{ total }}` in the template. Typing in a name input that updates `name.value` triggers a re-render. Without memoization, `total` would recompute from scratch during that render even though `price` and `quantity` did not change. With `computed`, Vue skips the recomputation — the cached result is still valid.
+
+**CS concept — dependency graph, formalized.** Vue's reactivity system maintains a directed graph at runtime:
+
+```
+quantity ──► subtotal ──► total
+         ──► hasDiscount ──► discountAmt ──► total
+price    ──► subtotal
+```
+
+Each node is a reactive value. Each directed edge means "this value depends on that value." When `quantity.value` changes, Vue traverses all outgoing edges from `quantity` and marks dependents as stale. Stale computed values recompute on next read (lazy evaluation). The result of each recomputation may itself propagate to further dependents. This is a **pull-based reactive graph** — values are pulled when needed, not pushed on every change.
+
+**CS concept — purity requirement.** A `computed` getter must be a **pure function** — given the same inputs (reactive dependency values), it must return the same output, with no side effects. Vue may call the getter multiple times during a single render, during SSR, or while checking for changes. If the getter has side effects (writing to `localStorage`, mutating another ref, sending a network request), those side effects may run at unexpected times and frequencies. Computed getters are for reading and transforming reactive data; side effects belong in `watch()` (Lesson 09).
+
+**SE principle — single source of truth.** `price` and `quantity` are the sources of truth: two independent refs that the user controls. `subtotal`, `hasDiscount`, `discountAmt`, and `total` are derived truths — they follow from the sources. The rule: store each fact exactly once. A derived fact stored in its own ref is a second copy that must be kept synchronized with the first, forever. Every new mutation function that touches the source must also update the derived copy. `computed()` makes the derivation relationship structural — it cannot be forgotten.
+
+**What breaks if you replace `computed` with `ref` for `total`:** `const total = ref(price.value * quantity.value)` — this takes a snapshot of the values at the moment the line runs, not a live derivation. Click `+` ten times. Quantity shows correctly. Total stays frozen at $29.99. The line ran once, produced a number, and that number does not update. Every function that changes `price` or `quantity` now needs a manual `total.value = ...` update — the Step 1 trap, reintroduced.
+
+**What breaks if you try to assign to a computed ref:** `subtotal.value = 100`. Vue throws: `[Vue warn]: Write operation failed: computed value is readonly.` Derived facts cannot be overwritten — they can only be recalculated from their sources. If you need to write to it, the value is not derived — it is an independent source, and should be a ref.
 
 ---
 
-## When to use `computed` vs `ref`
+## `computed` vs plain template expression
 
-| Situation | Tool |
-|-----------|------|
-| User controls the value directly | `ref` |
-| Value derives from other reactive state | `computed` |
-| You set it with `.value =` | `ref` |
-| You only read it | `computed` |
+```html
+<!-- Option A: plain expression — evaluates on every render -->
+<p>Total: ${{ (price * quantity).toFixed(2) }}</p>
 
-If you catch yourself writing `totalRef.value = priceRef.value * qty.value` in every handler — you want `computed`.
+<!-- Option B: computed ref — cached, evaluates only when deps change -->
+<p>Total: ${{ total.toFixed(2) }}</p>
+```
+
+For a multiplication this is invisible. For a computation that sorts or filters a 10,000-item list, Option A re-runs on every render triggered by *any* state change — even a button click that has nothing to do with the list. Option B runs only when the list or the sort order changes. Use `computed` for any derivation that is non-trivial or that you use in multiple places.
+
+---
+
+## The computed setter (advanced)
+
+`computed()` accepts an object with `get` and `set` functions instead of a single getter:
+
+```typescript
+const fullName = computed({
+  get: () => `${firstName.value} ${lastName.value}`,
+  set: (value: string) => {
+    const [first, last] = value.split(' ')
+    firstName.value = first
+    lastName.value = last ?? ''
+  }
+})
+```
+
+Now `fullName.value = 'Alice Smith'` splits and updates both source refs. This is useful when a parent needs to write through a computed that the child exposes via `v-model`. Use it sparingly — most computed values should be read-only derivations.
 
 ---
 
 ## Connects forward
 
-Lesson 04 uses `computed()` to build a filtered list. `v-if="hasDiscount"` previewed here is explained fully there. The concept of reactive derivation chains (computed depending on computed) appears in the spreadsheet series.
+Lesson 04's `v-if` and `v-for` use computed values extensively — `filtered` is a computed array derived from the todos and the active filter. Lesson 09 (`watch()`) complements computed: `computed` derives a value; `watch` runs side effects when a value changes.
 
 ---
 
@@ -151,7 +232,10 @@ Lesson 04 uses `computed()` to build a filtered list. `v-if="hasDiscount"` previ
 
 Click **▶ Run** and verify:
 
-- [ ] Total updates automatically when you click `+` or `−`
-- [ ] The discount badge appears at 3 items and disappears below 3
-- [ ] You can explain why `computed()` is cached and why that matters over a plain function
-- [ ] Add `const formattedTotal = computed(() => '$' + total.value.toFixed(2))` and display it instead
+- [ ] Incrementing to 3 items shows the discount badge; total and discount row reflect the 10% reduction
+- [ ] Decrementing back below 3 removes the discount and restores full price
+- [ ] You can explain why `total` as a `ref` freezes at the initial value
+- [ ] You can explain what `computed()` caches and when it re-runs its getter
+- [ ] You can explain why a computed getter must be a pure function
+- [ ] You can explain the topological order Vue uses to re-evaluate chained computeds
+- [ ] Add `const taxAmount = computed(() => total.value * 0.08)` and display the tax as a separate line
