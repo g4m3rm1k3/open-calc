@@ -3,45 +3,49 @@ import {
   BLOCK_GROUPS, BLOCK_LIBRARY, blockDefinition, canContainChildren, childOptionsFor, summarizeBlock, createBlock
 } from '../../visual-code/blocks.ts'
 import {
-  normalizeProject, cloneProject, insertBlock, removeBlock, moveBlock, updateBlock, transpileProject
+  normalizeProject, insertBlock, removeBlock, moveBlock, updateBlock, transpileProject
 } from '../../visual-code/transpiler.ts'
 import { parseJsToBlocks } from '../../visual-code/jsToBlocks.ts'
 import type { Block, BlockType, FieldSpec, Project } from '../../visual-code/types.ts'
-import type { LabElement } from './types'
+import type { LabElement, JsFile } from './types'
 import styles from './VisualJsPanel.module.css'
-
-const JS_PROJECT: Project = normalizeProject({
-  schemaVersion: 2,
-  id: 'visual-js',
-  name: 'Visual JS',
-  target: 'javascript',
-  files: [{ id: 'file_main', name: 'main.js', blocks: [] }],
-  activeFileId: 'file_main',
-  html: '',
-})
 
 interface Props {
   elements: LabElement[]
   html: string
   css?: string
-  activeJsCode?: string
+  jsFiles: JsFile[]
+  activeJsFileId: string
   tabVisitCount?: number
-  onCodeChange: (code: string) => void
+  onCodeChange: (fileId: string, code: string) => void
 }
 
-export default function VisualJsPanel({ elements, html, css = '', activeJsCode, tabVisitCount, onCodeChange }: Props) {
-  const [project, setProject] = useState<Project>(() => normalizeProject(cloneProject(JS_PROJECT)))
+export default function VisualJsPanel({ elements, html, css = '', jsFiles, activeJsFileId, tabVisitCount, onCodeChange }: Props) {
+  // One block-project file per HTML Lab JS file (same ids), so switching
+  // which .js file is active — even without leaving this tab — shows that
+  // file's own blocks instead of one shared canvas for the whole JS tab.
+  const [project, setProject] = useState<Project>(() => normalizeProject({
+    schemaVersion: 2,
+    id: 'visual-js',
+    name: 'Visual JS',
+    target: 'javascript',
+    files: jsFiles.map(f => ({ id: f.id, name: f.name, blocks: [] })),
+    activeFileId: activeJsFileId,
+    html: '',
+  }))
   const [query, setQuery] = useState('')
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null)
   const [importFlash, setImportFlash] = useState(false)
-  const lastImportedCodeRef = useRef<string | null>(null)
+  // Per file: the JS text last imported into (or generated for) it, so each
+  // file independently knows whether its code has changed since it was last
+  // in sync with its blocks.
+  const lastImportedCodeRef = useRef<Map<string, string>>(new Map())
   const importingRef = useRef(false)
-  const blocksRef = useRef<Block[]>([])
 
   const file = project.files.find(f => f.id === project.activeFileId) ?? project.files[0]
   const blocks = file?.blocks ?? []
-  blocksRef.current = blocks
   const generated = useMemo(() => transpileProject(project, project.activeFileId), [project])
+  const activeJsCode = jsFiles.find(f => f.id === activeJsFileId)?.code ?? ''
 
   // Hints from canvas elements AND from raw HTML (covers elements typed in the HTML editor)
   const domHints = useMemo(() => {
@@ -79,10 +83,13 @@ export default function VisualJsPanel({ elements, html, css = '', activeJsCode, 
     // Guard 2: never write empty code. The project starts with no blocks and
     // generated.code = "" on mount — writing that would wipe the active JS file.
     if (!generated.code) return
-    onCodeChangeRef.current(generated.code)
-    // Track the outgoing code so we don't re-import it on the next tab visit
-    // (block edits → transpiler → same code as activeJsCode → no re-import needed)
-    lastImportedCodeRef.current = generated.code
+    const fileId = project.activeFileId
+    onCodeChangeRef.current(fileId, generated.code)
+    // Track the outgoing code so the jsFiles-driven sync effect below sees
+    // this file as already in sync and doesn't parse the code we just
+    // generated back into blocks (which would be a lossy round-trip and
+    // could visibly mutate what the user just built).
+    lastImportedCodeRef.current.set(fileId, generated.code)
   }, [generated])
 
   function commit(updater: (bs: Block[]) => Block[]) {
@@ -111,43 +118,59 @@ export default function VisualJsPanel({ elements, html, css = '', activeJsCode, 
     commit(bs => updateBlock(bs, blockId, b => ({ ...b, fields: { ...b.fields, [name]: value } })))
   }
 
-  const importFromJs = useCallback((code: string) => {
+  const importFromJs = useCallback((code: string, fileId: string) => {
     const imported = parseJsToBlocks(code)
     if (!imported.length) return
     // Flag the generated effect to skip onCodeChange for this render cycle.
     // The original code is already stored in lastImportedCodeRef so the next
-    // tab visit can correctly detect whether the JS changed externally.
+    // sync can correctly detect whether the JS changed externally.
     importingRef.current = true
-    lastImportedCodeRef.current = code
-    commit(() => imported)
+    lastImportedCodeRef.current.set(fileId, code)
+    setProject(p => normalizeProject({
+      ...p,
+      files: p.files.map(f => f.id === fileId ? { ...f, blocks: imported } : f),
+    }))
     setSelectedBlockId(null)
     setImportFlash(true)
     setTimeout(() => setImportFlash(false), 1200)
   }, [])
 
-  // Each time the user switches to this tab, sync blocks with the current JS file.
-  // - If JS was cleared → clear the canvas.
-  // - If JS changed since we last synced it (external edit or new example) → re-import.
-  // - If code hasn't changed (only block edits happened) → do nothing.
+  // Keeps project.files structurally in sync with HTML Lab's own jsFiles
+  // (add/rename/drop — a file removed from jsFiles is simply not in the
+  // next mapped list), and re-imports whichever file is now active if its
+  // code has changed since it was last synced. Runs whenever a new file is
+  // added, the active file is switched (even without leaving this tab), or
+  // this tab is first visited — not just on tab-visit like before.
   useEffect(() => {
     if (!tabVisitCount) return
-    const code = activeJsCode?.trim() ?? ''
-    if (!code) {
-      // JS was cleared — wipe the canvas so it doesn't show stale blocks
-      if (blocksRef.current.length > 0) {
-        commit(() => [])
-        setSelectedBlockId(null)
-        lastImportedCodeRef.current = null
-      }
+
+    setProject(p => {
+      const files = jsFiles.map(jf => {
+        const existing = p.files.find(pf => pf.id === jf.id)
+        return existing && existing.name === jf.name ? existing : { id: jf.id, name: jf.name, blocks: existing?.blocks ?? [] }
+      })
+      const sameFiles = files.length === p.files.length && files.every((f, i) => f === p.files[i])
+      if (sameFiles && p.activeFileId === activeJsFileId) return p
+      return normalizeProject({ ...p, files, activeFileId: activeJsFileId })
+    })
+
+    const activeCode = (jsFiles.find(jf => jf.id === activeJsFileId)?.code ?? '').trim()
+    const lastCode = (lastImportedCodeRef.current.get(activeJsFileId) ?? '').trim()
+    if (activeCode === lastCode) return
+
+    if (!activeCode) {
+      // JS was cleared — wipe this file's canvas so it doesn't show stale blocks
+      lastImportedCodeRef.current.delete(activeJsFileId)
+      setProject(p => normalizeProject({
+        ...p,
+        files: p.files.map(f => f.id === activeJsFileId ? { ...f, blocks: [] } : f),
+      }))
+      setSelectedBlockId(null)
       return
     }
-    // Only re-import when JS differs from what was last synced
-    // (block edits keep lastImportedCodeRef in sync via the generated-code effect above)
-    if (code.trim() !== (lastImportedCodeRef.current ?? '').trim()) {
-      importFromJs(code)
-    }
+    importFromJs(activeCode, activeJsFileId)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabVisitCount])
+  }, [tabVisitCount, activeJsFileId, jsFiles])
 
   const visibleInPalette = BLOCK_LIBRARY.filter(b => {
     if (b.tsOnly) return false
@@ -197,12 +220,12 @@ export default function VisualJsPanel({ elements, html, css = '', activeJsCode, 
         <div className={styles.program}>
           <div className={styles.programHeader}>
             Program
-            {activeJsCode?.trim() && (
+            {activeJsCode.trim() && (
               <button
                 type="button"
                 className={`${styles.importBtn} ${importFlash ? styles.importBtnFlash : ''}`}
                 title="Convert the JavaScript file to visual blocks (replaces current blocks)"
-                onClick={() => importFromJs(activeJsCode)}
+                onClick={() => importFromJs(activeJsCode, activeJsFileId)}
               >
                 ← Import from JS
               </button>

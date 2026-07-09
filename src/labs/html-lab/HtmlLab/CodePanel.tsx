@@ -877,11 +877,14 @@ export default function CodePanel({
   const [visualTabCount, setVisualTabCount] = useState(0);
   // Ref-based stable callback — identity never changes so VCS's onCodeChange
   // effect won't loop when HtmlLab re-renders after syncing generated code.
-  const visualCodeSyncRef = useRef<{ activeJsFile: typeof activeJsFile; onJsFileCodeChange: typeof onJsFileCodeChange } | null>(null);
-  useEffect(() => { visualCodeSyncRef.current = { activeJsFile, onJsFileCodeChange }; });
-  const handleVisualCodeChange = useCallback((code: string) => {
-    const ctx = visualCodeSyncRef.current;
-    if (ctx?.activeJsFile) ctx.onJsFileCodeChange(ctx.activeJsFile.id, code);
+  // Takes the fileId directly from VisualJsPanel now (it tracks blocks per
+  // file), instead of guessing "whichever file is active" — the two can
+  // briefly disagree during a file switch, and writing to the wrong file's
+  // code would silently corrupt it.
+  const visualCodeSyncRef = useRef<{ onJsFileCodeChange: typeof onJsFileCodeChange } | null>(null);
+  useEffect(() => { visualCodeSyncRef.current = { onJsFileCodeChange }; });
+  const handleVisualCodeChange = useCallback((fileId: string, code: string) => {
+    visualCodeSyncRef.current?.onJsFileCodeChange(fileId, code);
   }, []);
 
   const activeJsFile = jsFiles.find((f) => f.id === activeJsFileId) ?? jsFiles[0];
@@ -913,6 +916,18 @@ export default function CodePanel({
     applyDecorations();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId, activeTab]);
+
+  // Monaco unmounts entirely on tabs that don't hold source code (tree,
+  // toolbox, lessons, visual — see NON_EDITOR_TABS), but nothing ever
+  // cleared editorRef.current when that happened. Every "if (editor)" guard
+  // elsewhere in this file then saw a stale, disposed editor instance and
+  // trusted its (frozen, outdated) getValue() — confirmed real bug:
+  // switching JS files while on the Visual JS tab flushed the last thing
+  // Monaco displayed before it unmounted into whichever file was actually
+  // active, silently clobbering that file's real code.
+  useEffect(() => {
+    if (NON_EDITOR_TABS.has(activeTab)) editorRef.current = null;
+  }, [activeTab]);
 
   useEffect(() => {
     if (focusTab) setActiveTab(focusTab);
@@ -1094,7 +1109,7 @@ export default function CodePanel({
           ))}
         </div>
       </div>
-      {activeTab === "javascript" && (
+      {(activeTab === "javascript" || activeTab === "visual") && (
         <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap", padding: "4px 6px", borderBottom: "1px solid var(--hl-border)" }}>
           {jsFiles.map((f) => (
             <div key={f.id} style={{ display: "flex", alignItems: "center" }}>
@@ -1240,7 +1255,8 @@ export default function CodePanel({
               elements={elements}
               html={html}
               css={css}
-              activeJsCode={javascript}
+              jsFiles={jsFiles}
+              activeJsFileId={activeJsFileId}
               tabVisitCount={visualTabCount}
               onCodeChange={handleVisualCodeChange}
             />
