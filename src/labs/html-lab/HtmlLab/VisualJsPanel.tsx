@@ -220,6 +220,15 @@ export default function VisualJsPanel({ elements, html, css = '', jsFiles, activ
             />
           </div>
           <div className={styles.paletteScroll}>
+            {query && visibleInPalette.length === 0 && (
+              <div className={styles.emptyState}>
+                No blocks match "{query}". Try a different word, or look for
+                a block whose Target field can point at the element you want
+                — most element-related actions (Event Listener, HTML Text,
+                Add/Remove/Toggle Class, Set Style) work that way instead of
+                a separate "find element" block.
+              </div>
+            )}
             {BLOCK_GROUPS.map(group => {
               const groupBlocks = visibleInPalette.filter(b => b.category === group.id)
               if (!groupBlocks.length) return null

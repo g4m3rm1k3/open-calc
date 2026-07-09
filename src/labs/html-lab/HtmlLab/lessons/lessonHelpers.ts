@@ -40,5 +40,7 @@ export function foldToPatch(fold: Fold): LessonPatch {
     bodyStyles: fold.state.bodyStyles,
     jsBlocks: [...fold.blocks].map(([id, code]) => ({ id, code })),
     cssBlocks: [...fold.cssBlocks].map(([id, code]) => ({ id, code })),
+    pageTitle: fold.state.pageTitle,
+    faviconUrl: fold.state.faviconUrl,
   };
 }

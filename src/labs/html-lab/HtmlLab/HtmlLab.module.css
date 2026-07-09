@@ -69,6 +69,46 @@
   color: var(--hl-hint);
 }
 
+/* ── Page settings popover (title/favicon) ───────────────────────────────────── */
+.pageSettingsWrap {
+  position: relative;
+  display: inline-flex;
+}
+.pageSettingsPanel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 260px;
+  padding: 12px;
+  background: var(--hl-surface);
+  border: 1px solid var(--hl-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+.pageSettingsLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--hl-hint);
+}
+.pageSettingsInput {
+  padding: 6px 8px;
+  border: 1px solid var(--hl-border);
+  border-radius: 6px;
+  background: var(--hl-bg);
+  color: var(--hl-text);
+  font-size: 12px;
+}
+.pageSettingsInput:focus {
+  outline: none;
+  border-color: var(--hl-accent);
+}
+
 /* ── Lesson mode ─────────────────────────────────────────────────────────────── */
 .lessonProgress {
   font-size: 11px;

@@ -1,4 +1,5 @@
 import styles from "./HtmlLab.module.css";
+import PageSettingsControl from "./PageSettingsControl";
 import type { LessonStep, ValidationResult } from "./lessons/lessonTypes";
 
 // Lesson copy is written with backtick-quoted code terms (`<header>`,
@@ -37,6 +38,9 @@ interface Props {
   onPausePlayback: () => void;
   onSkipPlayback: () => void;
   onReplay: () => void;
+  pageTitle: string;
+  faviconUrl: string;
+  onChangePageMeta: (next: { pageTitle?: string; faviconUrl?: string }) => void;
 }
 
 export default function LessonToolbar({
@@ -63,6 +67,9 @@ export default function LessonToolbar({
   onPausePlayback,
   onSkipPlayback,
   onReplay,
+  pageTitle,
+  faviconUrl,
+  onChangePageMeta,
 }: Props) {
   const isLastStep = stepIndex === stepCount - 1;
   const isFirstStep = stepIndex === 0;
@@ -109,6 +116,8 @@ export default function LessonToolbar({
         >
           {previewMode ? "✎ Edit" : "▶ Preview"}
         </button>
+
+        <PageSettingsControl pageTitle={pageTitle} faviconUrl={faviconUrl} onChange={onChangePageMeta} />
       </div>
 
       <div className={styles.lessonBanner}>

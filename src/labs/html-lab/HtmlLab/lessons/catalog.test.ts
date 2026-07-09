@@ -6,7 +6,7 @@
 
 import { describe, it, expect } from "vitest";
 import { LESSONS } from "./catalog";
-import { computeSolvedStateAtStep, validateStructure } from "./lessonEngine";
+import { computeSolvedStateAtStep, validateStructure, validatePageMeta } from "./lessonEngine";
 
 describe("catalog", () => {
   it("has no duplicate lesson ids", () => {
@@ -21,10 +21,10 @@ describe("catalog", () => {
         expect(new Set(ids).size).toBe(ids.length);
       });
 
-      it("every challenge step defines either a structural or behavioral check", () => {
+      it("every challenge step defines a structural, behavioral, or page-meta check", () => {
         for (const step of lesson.steps) {
           if (!step.isChallenge) continue;
-          expect(step.expected || step.behavior).toBeTruthy();
+          expect(step.expected || step.behavior || step.expectedPageTitle !== undefined || step.expectedFaviconUrl !== undefined).toBeTruthy();
         }
       });
 
@@ -33,6 +33,16 @@ describe("catalog", () => {
         it(`step "${step.id}"'s own solutionPatch satisfies its expected structural check`, () => {
           const solved = computeSolvedStateAtStep(lesson, i);
           const result = validateStructure(solved.elements, step.expected!);
+          expect(result.feedback).toEqual([]);
+          expect(result.passed).toBe(true);
+        });
+      });
+
+      lesson.steps.forEach((step, i) => {
+        if (!step.isChallenge || (step.expectedPageTitle === undefined && step.expectedFaviconUrl === undefined)) return;
+        it(`step "${step.id}"'s own solutionPatch satisfies its expected page-meta check`, () => {
+          const solved = computeSolvedStateAtStep(lesson, i);
+          const result = validatePageMeta(solved, step);
           expect(result.feedback).toEqual([]);
           expect(result.passed).toBe(true);
         });

@@ -40,6 +40,8 @@ export interface LessonPatch {
    *  prefer this over `customCss` the moment there's more than one rule. */
   cssBlocks?: JsBlock[];
   customCss?: string;
+  pageTitle?: string;
+  faviconUrl?: string;
 }
 
 export interface ValidationResult {
@@ -49,11 +51,14 @@ export interface ValidationResult {
 
 // Structural expectation for an HTML/CSS challenge — checked against the
 // student's actual `state.elements` by tag and a *subset* of style
-// properties (not full equality; unrelated properties the student didn't
-// touch shouldn't fail the check).
+// properties/attributes (not full equality; unrelated properties/attrs the
+// student didn't touch shouldn't fail the check). `attrs` is what a
+// challenge checking e.g. `aria-label`, `aria-hidden`, or `required` uses —
+// those live on `attrs`, not `styles`.
 export interface ExpectedNode {
   tag: string;
   styles?: Record<string, string>;
+  attrs?: Record<string, string>;
   children?: ExpectedNode[];
 }
 
@@ -75,6 +80,11 @@ export interface Assertion {
 export interface BehaviorScript {
   interactions: InteractionStep[];
   assertions: Assertion[];
+  /** Optional pause between running interactions and checking assertions —
+   *  only needed when an interaction kicks off async work (e.g. a real
+   *  `fetch()`) that has to resolve before the resulting DOM state exists to
+   *  assert on. Omitted (or 0), behavior is identical to before this existed. */
+  settleMs?: number;
 }
 
 export interface LessonStep {
@@ -90,6 +100,11 @@ export interface LessonStep {
   expected?: ExpectedNode[];
   /** JS behavioral check. Runs against the live state's exported HTML/JS. */
   behavior?: BehaviorScript;
+  /** Page-settings check — a page-level field, not an element, so it's
+   *  compared directly against `state.pageTitle`/`faviconUrl` rather than
+   *  going through `expected`/`behavior`. */
+  expectedPageTitle?: string;
+  expectedFaviconUrl?: string;
 }
 
 export interface Lesson {

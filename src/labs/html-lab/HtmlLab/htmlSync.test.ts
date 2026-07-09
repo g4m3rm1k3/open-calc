@@ -7,8 +7,39 @@
 // applyImportedCssToDoc). These guard against both regressing silently.
 
 import { describe, it, expect } from "vitest";
-import { parseHtmlDocument, elementsToCss, applyCssToElements, elementsToHtml, htmlToElements } from "./htmlSync";
+import { parseHtmlDocument, elementsToCss, applyCssToElements, elementsToHtml, htmlToElements, generateExportHtml, generateLinkedHtml } from "./htmlSync";
 import type { LabElement } from "./types";
+
+describe("generateExportHtml / generateLinkedHtml — page title & favicon", () => {
+  it("defaults to the historical hardcoded title and no favicon when omitted", () => {
+    const html = generateExportHtml([], {}, "", "");
+    expect(html).toContain("<title>My Page</title>");
+    expect(html).not.toContain('rel="icon"');
+  });
+
+  it("emits a custom title and favicon link when provided", () => {
+    const html = generateExportHtml([], {}, "", "", [], "My Cool Site", "https://example.com/favicon.ico");
+    expect(html).toContain("<title>My Cool Site</title>");
+    expect(html).toContain('<link rel="icon" href="https://example.com/favicon.ico" />');
+  });
+
+  it("falls back to the default title for an empty string, same as omitted", () => {
+    const html = generateExportHtml([], {}, "", "", [], "");
+    expect(html).toContain("<title>My Page</title>");
+  });
+
+  it("generateLinkedHtml also defaults to the historical title/no favicon", () => {
+    const html = generateLinkedHtml([]);
+    expect(html).toContain("<title>My Page</title>");
+    expect(html).not.toContain('rel="icon"');
+  });
+
+  it("generateLinkedHtml emits a custom title and favicon too", () => {
+    const html = generateLinkedHtml([], [], ["script.js"], "Linked Page", "icon.png");
+    expect(html).toContain("<title>Linked Page</title>");
+    expect(html).toContain('<link rel="icon" href="icon.png" />');
+  });
+});
 
 describe("parseHtmlDocument — table structure", () => {
   it("preserves <thead>/<tr>/<th> children instead of dropping them", () => {

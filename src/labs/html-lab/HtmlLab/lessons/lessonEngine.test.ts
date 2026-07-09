@@ -5,12 +5,12 @@
 // section), not here.
 
 import { describe, it, expect } from "vitest";
-import { applyPatch, computeStateAtStep, computeSolvedStateAtStep, validateStructure } from "./lessonEngine";
+import { applyPatch, computeStateAtStep, computeSolvedStateAtStep, validateStructure, validatePageMeta } from "./lessonEngine";
 import { initialState, mainJsCode, withMainJsCode } from "../labReducer";
 import type { Lesson, LabElement } from "./lessonTypes";
 
-function el(id: string, tag: string, parentId: string | null, order: number, content = "", styles: Record<string, string> = {}): LabElement {
-  return { id, tag, parentId, order, content, attrs: { id: "", class: "" }, styles, mediaQueries: [] };
+function el(id: string, tag: string, parentId: string | null, order: number, content = "", styles: Record<string, string> = {}, attrs: Record<string, string> = {}): LabElement {
+  return { id, tag, parentId, order, content, attrs: { id: "", class: "", ...attrs }, styles, mediaQueries: [] };
 }
 
 describe("applyPatch", () => {
@@ -43,6 +43,46 @@ describe("applyPatch", () => {
     const state = { ...initialState, bodyStyles: { color: "black", margin: "0" } };
     const next = applyPatch(state, { bodyStyles: { color: "white" } });
     expect(next.bodyStyles).toEqual({ color: "white", margin: "0" });
+  });
+
+  it("carries pageTitle/faviconUrl forward when a patch doesn't set them, applies them when it does", () => {
+    const state = { ...initialState, pageTitle: "Existing Title", faviconUrl: "existing.ico" };
+    expect(applyPatch(state, {}).pageTitle).toBe("Existing Title");
+    expect(applyPatch(state, {}).faviconUrl).toBe("existing.ico");
+    const next = applyPatch(state, { pageTitle: "New Title", faviconUrl: "new.ico" });
+    expect(next.pageTitle).toBe("New Title");
+    expect(next.faviconUrl).toBe("new.ico");
+  });
+});
+
+describe("validatePageMeta", () => {
+  it("passes when the page title matches what's expected", () => {
+    const result = validatePageMeta({ pageTitle: "My Cool Site", faviconUrl: "" }, { expectedPageTitle: "My Cool Site" });
+    expect(result.passed).toBe(true);
+  });
+
+  it("fails with a specific message when the page title doesn't match", () => {
+    const result = validatePageMeta({ pageTitle: "Wrong Title", faviconUrl: "" }, { expectedPageTitle: "My Cool Site" });
+    expect(result.passed).toBe(false);
+    expect(result.feedback[0]).toContain("My Cool Site");
+    expect(result.feedback[0]).toContain("Wrong Title");
+  });
+
+  it("passes when the favicon URL matches what's expected", () => {
+    const result = validatePageMeta({ pageTitle: "", faviconUrl: "icon.ico" }, { expectedFaviconUrl: "icon.ico" });
+    expect(result.passed).toBe(true);
+  });
+
+  it("fails when the favicon URL is unset but expected", () => {
+    const result = validatePageMeta({ pageTitle: "", faviconUrl: "" }, { expectedFaviconUrl: "icon.ico" });
+    expect(result.passed).toBe(false);
+    expect(result.feedback[0]).toContain("(not set)");
+  });
+
+  it("ignores a field the step doesn't check", () => {
+    const result = validatePageMeta({ pageTitle: "Anything", faviconUrl: "" }, { expectedFaviconUrl: "icon.ico" });
+    expect(result.passed).toBe(false);
+    expect(result.feedback).toHaveLength(1); // only the favicon complaint, not pageTitle
   });
 });
 
@@ -145,5 +185,19 @@ describe("validateStructure", () => {
     const elements = [el("a", "footer", null, 0, "", { color: "red", padding: "40px" })];
     const result = validateStructure(elements, [{ tag: "footer", styles: { color: "red" } }]);
     expect(result.passed).toBe(true);
+  });
+
+  it("passes when a required attribute matches", () => {
+    const elements = [el("a", "button", null, 0, "", {}, { "aria-label": "Close" })];
+    const result = validateStructure(elements, [{ tag: "button", attrs: { "aria-label": "Close" } }]);
+    expect(result.passed).toBe(true);
+  });
+
+  it("fails with a specific message when a required attribute is missing or wrong", () => {
+    const elements = [el("a", "button", null, 0)];
+    const result = validateStructure(elements, [{ tag: "button", attrs: { "aria-label": "Close" } }]);
+    expect(result.passed).toBe(false);
+    expect(result.feedback[0]).toContain("aria-label");
+    expect(result.feedback[0]).toContain("(not set)");
   });
 });

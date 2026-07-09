@@ -1,10 +1,14 @@
 import styles from "./HtmlLab.module.css";
+import PageSettingsControl from "./PageSettingsControl";
 
 interface Props {
   showOverlay: boolean;
   showLabels: boolean;
   previewMode: boolean;
   multiPageMode: boolean;
+  pageTitle: string;
+  faviconUrl: string;
+  onChangePageMeta: (next: { pageTitle?: string; faviconUrl?: string }) => void;
   onToggleOverlay: () => void;
   onToggleLabels: () => void;
   onTogglePreview: () => void;
@@ -26,6 +30,9 @@ export default function Toolbar({
   showLabels,
   previewMode,
   multiPageMode,
+  pageTitle,
+  faviconUrl,
+  onChangePageMeta,
   onToggleOverlay,
   onToggleLabels,
   onTogglePreview,
@@ -120,6 +127,10 @@ export default function Toolbar({
       >
         ↩ Undo
       </button>
+
+      <div className={styles.toolbarSep} />
+
+      <PageSettingsControl pageTitle={pageTitle} faviconUrl={faviconUrl} onChange={onChangePageMeta} />
 
       <div className={styles.toolbarSep} />
 

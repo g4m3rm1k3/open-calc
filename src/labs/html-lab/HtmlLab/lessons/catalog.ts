@@ -16,6 +16,11 @@ import { jsArraysObjects } from "./jsArraysObjects";
 import { jsDomElements } from "./jsDomElements";
 import { jsFormsValidation } from "./jsFormsValidation";
 import { jsFirstClickHandler } from "./jsFirstClickHandler";
+import { htmlFormsDeepDive } from "./htmlFormsDeepDive";
+import { htmlAccessibilityBasics } from "./htmlAccessibilityBasics";
+import { cssTransitionsAnimations } from "./cssTransitionsAnimations";
+import { htmlDocumentHeadMeta } from "./htmlDocumentHeadMeta";
+import { jsFetchApisBasics } from "./jsFetchApisBasics";
 import type { Lesson } from "./lessonTypes";
 
 // The full lesson catalog — flat list, grouped by `topic`/`unit` for display
@@ -60,20 +65,20 @@ import type { Lesson } from "./lessonTypes";
 // ROADMAP (zero → DOM mastery — built so far vs. planned):
 //   HTML: [x] Foundations (tags/elements, div/span/attributes)
 //         [x] Semantic Structure, Lists & Forms, Text & Inline Semantics, Tables & Media
-//         [ ] Forms Deep Dive (select/textarea/checkboxes/fieldset/validation)
-//         [ ] Accessibility Basics (aria, focus order, landmarks review)
-//         [ ] Document Head & Meta (title/meta/viewport/favicon)
+//         [x] Forms Deep Dive (select/textarea/checkboxes/fieldset/validation)
+//         [x] Accessibility Basics (aria, focus order, landmarks review)
+//         [x] Document Head & Meta (title/meta/viewport/favicon)
 //   CSS:  [x] Foundations (what CSS is, rules, class selectors, box model)
 //         [x] Flexbox & Layout (fundamentals, then applying it to a real page)
 //         [x] CSS Grid (grid-template-columns, fr units, gap)
 //         [x] Responsive Design (mobile-first, media queries)
-//         [ ] Transitions & Animations
+//         [x] Transitions & Animations
 //   JS:   [x] Foundations (let/const, functions, addEventListener, if/else,
 //             comparisons, for loops, arrays, objects)
 //         [x] The DOM (querySelector/createElement/appendChild/remove,
 //             then real form input + validation)
 //         [x] Events & the DOM (a standalone second click-handler lesson)
-//         [ ] Fetch & APIs Basics
+//         [x] Fetch & APIs Basics
 export const LESSONS: Lesson[] = [
   htmlFoundationsTags,
   htmlFoundationsDivSpan,
@@ -93,4 +98,9 @@ export const LESSONS: Lesson[] = [
   jsDomElements,
   jsFormsValidation,
   jsFirstClickHandler,
+  htmlFormsDeepDive,
+  htmlAccessibilityBasics,
+  cssTransitionsAnimations,
+  htmlDocumentHeadMeta,
+  jsFetchApisBasics,
 ];

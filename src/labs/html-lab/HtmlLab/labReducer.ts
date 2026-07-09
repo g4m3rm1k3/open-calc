@@ -81,7 +81,9 @@ export const CONTAINER_TAGS = new Set([
   // Table structure — without these, an imported <table>'s <thead>/<tr>/<th> children
   // are silently dropped (they're not text content, and only container tags render children).
   "table", "thead", "tbody", "tfoot", "tr", "th", "td",
-  "form", "fieldset", "figure", "figcaption", "dl", "dt", "dd",
+  // "select" holds <option> children the same way — without it, options exist
+  // in state.elements but never render on the canvas at all.
+  "form", "fieldset", "select", "figure", "figcaption", "dl", "dt", "dd",
   "main", "aside", "blockquote", "details", "summary",
 ]);
 
@@ -214,6 +216,8 @@ export const initialState: LabState = {
   pages: [],
   activePageId: null,
   cdnLinks: [],
+  pageTitle: "",
+  faviconUrl: "",
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -230,7 +234,7 @@ function saveActivePage(state: LabState): LabPage[] {
   if (state.mode !== "multi" || !state.activePageId) return state.pages;
   return state.pages.map((p) =>
     p.id === state.activePageId
-      ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, jsFiles: state.jsFiles, customCss: state.customCss }
+      ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, jsFiles: state.jsFiles, customCss: state.customCss, pageTitle: state.pageTitle, faviconUrl: state.faviconUrl }
       : p,
   );
 }
@@ -243,6 +247,8 @@ function blankPage(name: string, index: number): LabPage {
     bodyStyles: computeBodyStyles(DEFAULT_BODY_THEME),
     jsFiles: [newJsFile()],
     customCss: "",
+    pageTitle: "",
+    faviconUrl: "",
   };
 }
 
@@ -431,6 +437,8 @@ export function labReducer(state: LabState, action: Action): LabState {
           activeJsFileId: first.jsFiles[0]?.id ?? "",
           customCss: first.customCss ?? "",
           cdnLinks: action.payload.cdnLinks ?? s.cdnLinks,
+          pageTitle: first.pageTitle ?? "",
+          faviconUrl: first.faviconUrl ?? "",
           mode: "multi",
           pages: action.payload.pages,
           activePageId: first.id,
@@ -448,6 +456,8 @@ export function labReducer(state: LabState, action: Action): LabState {
           activeJsFileId: jsFiles[0]?.id ?? "",
           customCss: action.payload.customCss ?? "",
           cdnLinks: action.payload.cdnLinks ?? s.cdnLinks,
+          pageTitle: action.payload.pageTitle ?? s.pageTitle,
+          faviconUrl: action.payload.faviconUrl ?? s.faviconUrl,
           selectedId: null,
           mode: "single",
           pages: [],
@@ -921,7 +931,7 @@ export function labReducer(state: LabState, action: Action): LabState {
 
     case "TOGGLE_MULTIPAGE": {
       if (state.mode === "single") {
-        const p1: LabPage = { id: "pg" + Date.now(), name: "Home", elements: state.elements, bodyStyles: state.bodyStyles, jsFiles: state.jsFiles, customCss: state.customCss };
+        const p1: LabPage = { id: "pg" + Date.now(), name: "Home", elements: state.elements, bodyStyles: state.bodyStyles, jsFiles: state.jsFiles, customCss: state.customCss, pageTitle: state.pageTitle, faviconUrl: state.faviconUrl };
         const p2 = blankPage("Page 2", 1);
         return { ...state, mode: "multi", pages: [p1, p2], activePageId: p1.id, history: [] };
       } else {
@@ -930,7 +940,7 @@ export function labReducer(state: LabState, action: Action): LabState {
         const mergedJsFiles = updatedPages.flatMap((p) => p.jsFiles);
         const mergedCss = updatedPages.map((p) => p.customCss).filter(Boolean).join("\n\n");
         const first = updatedPages[0];
-        return { ...state, mode: "single", pages: [], activePageId: null, elements: mergedElements, bodyStyles: first?.bodyStyles ?? state.bodyStyles, jsFiles: mergedJsFiles, activeJsFileId: mergedJsFiles[0]?.id ?? "", customCss: mergedCss, selectedId: null, history: [] };
+        return { ...state, mode: "single", pages: [], activePageId: null, elements: mergedElements, bodyStyles: first?.bodyStyles ?? state.bodyStyles, jsFiles: mergedJsFiles, activeJsFileId: mergedJsFiles[0]?.id ?? "", customCss: mergedCss, pageTitle: first?.pageTitle ?? state.pageTitle, faviconUrl: first?.faviconUrl ?? state.faviconUrl, selectedId: null, history: [] };
       }
     }
 
@@ -939,13 +949,13 @@ export function labReducer(state: LabState, action: Action): LabState {
       const updatedPages = saveActivePage(state);
       const next = updatedPages.find((p) => p.id === action.payload);
       if (!next) return state;
-      return { ...state, pages: updatedPages, activePageId: action.payload, elements: next.elements, bodyStyles: next.bodyStyles, jsFiles: next.jsFiles, activeJsFileId: next.jsFiles[0]?.id ?? "", customCss: next.customCss || "", selectedId: null, history: [] };
+      return { ...state, pages: updatedPages, activePageId: action.payload, elements: next.elements, bodyStyles: next.bodyStyles, jsFiles: next.jsFiles, activeJsFileId: next.jsFiles[0]?.id ?? "", customCss: next.customCss || "", pageTitle: next.pageTitle ?? "", faviconUrl: next.faviconUrl ?? "", selectedId: null, history: [] };
     }
 
     case "ADD_PAGE": {
       const updatedPages = saveActivePage(state);
       const page = blankPage(action.payload ?? `Page ${updatedPages.length + 1}`, 0);
-      return { ...state, pages: [...updatedPages, page], activePageId: page.id, elements: page.elements, bodyStyles: page.bodyStyles, jsFiles: page.jsFiles, activeJsFileId: page.jsFiles[0]?.id ?? "", customCss: "", selectedId: null, history: [] };
+      return { ...state, pages: [...updatedPages, page], activePageId: page.id, elements: page.elements, bodyStyles: page.bodyStyles, jsFiles: page.jsFiles, activeJsFileId: page.jsFiles[0]?.id ?? "", customCss: "", pageTitle: "", faviconUrl: "", selectedId: null, history: [] };
     }
 
     case "DELETE_PAGE": {
@@ -965,11 +975,20 @@ export function labReducer(state: LabState, action: Action): LabState {
           jsFiles: newActive.jsFiles,
           activeJsFileId: newActive.jsFiles[0]?.id ?? "",
           customCss: newActive.customCss || "",
+          pageTitle: newActive.pageTitle ?? "",
+          faviconUrl: newActive.faviconUrl ?? "",
           selectedId: null,
           history: [],
         } : {}),
       };
     }
+
+    case "SET_PAGE_META":
+      return {
+        ...state,
+        pageTitle: action.payload.pageTitle ?? state.pageTitle,
+        faviconUrl: action.payload.faviconUrl ?? state.faviconUrl,
+      };
 
     case "RENAME_PAGE":
       return {

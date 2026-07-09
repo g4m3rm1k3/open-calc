@@ -47,6 +47,10 @@ export interface LabPage {
   bodyStyles: BodyStyles;
   jsFiles: JsFile[];
   customCss: string;
+  /** Empty string means "use the exporter's hardcoded default" (`<title>My Page</title>`,
+   *  no favicon link) — every page created before these fields existed behaves identically. */
+  pageTitle?: string;
+  faviconUrl?: string;
 }
 
 export interface LabState {
@@ -64,6 +68,9 @@ export interface LabState {
   pages: LabPage[];
   activePageId: string | null;
   cdnLinks: string[];
+  /** See `LabPage.pageTitle`/`faviconUrl` — same "empty means default" convention. */
+  pageTitle: string;
+  faviconUrl: string;
 }
 
 // ─── Style update helper ──────────────────────────────────────────────────────
@@ -111,6 +118,8 @@ export interface SinglePageData {
   jsFiles?: JsFile[];
   customCss?: string;
   cdnLinks?: string[];
+  pageTitle?: string;
+  faviconUrl?: string;
 }
 
 export interface MultiPageData {
@@ -135,6 +144,7 @@ export interface Example {
 export type Action =
   | { type: "LOAD_EXAMPLE"; payload: ExampleData }
   | { type: "TOGGLE_CDN"; payload: string }
+  | { type: "SET_PAGE_META"; payload: { pageTitle?: string; faviconUrl?: string } }
   | { type: "APPLY_GLOBAL_THEME"; payload: { updates: StyleUpdate[]; bodyStyles?: Record<string, string> } }
   | { type: "ADD_ELEMENT"; payload: string }
   | { type: "DELETE_ELEMENT"; payload: string }

@@ -319,6 +319,8 @@ export function generateExportHtml(
   customCss: string,
   javascript: string,
   cdnTags: CdnTag[] = [],
+  pageTitle = "My Page",
+  faviconUrl = "",
 ): string {
   const htmlBody = buildHtmlBody(elements);
   const css = elementsToCss(elements, customCss, bodyStyles);
@@ -335,7 +337,8 @@ export function generateExportHtml(
     `<head>`,
     `  <meta charset="UTF-8" />`,
     `  <meta name="viewport" content="width=device-width, initial-scale=1.0" />`,
-    `  <title>My Page</title>`,
+    `  <title>${pageTitle || "My Page"}</title>`,
+    faviconUrl ? `  <link rel="icon" href="${faviconUrl}" />` : null,
     cdnHeadTags || null,
     `  <style>`,
     css.split("\n").map(l => `    ${l}`).join("\n"),
@@ -357,7 +360,7 @@ export function generateExportHtml(
 // downloads as itself, real editable source, not a merged/transpiled bundle;
 // see HtmlLab.tsx's exportSplit). Defaults to a single "script.js" for any
 // caller that hasn't been updated to pass real names.
-export function generateLinkedHtml(elements: LabElement[], cdnTags: CdnTag[] = [], jsFileNames: string[] = ["script.js"]): string {
+export function generateLinkedHtml(elements: LabElement[], cdnTags: CdnTag[] = [], jsFileNames: string[] = ["script.js"], pageTitle = "My Page", faviconUrl = ""): string {
   const htmlBody = buildHtmlBody(elements);
   const cdnHeadTags = cdnTags.map(({ url, type }) =>
     type === "stylesheet"
@@ -372,7 +375,8 @@ export function generateLinkedHtml(elements: LabElement[], cdnTags: CdnTag[] = [
     `<head>`,
     `  <meta charset="UTF-8" />`,
     `  <meta name="viewport" content="width=device-width, initial-scale=1.0" />`,
-    `  <title>My Page</title>`,
+    `  <title>${pageTitle || "My Page"}</title>`,
+    faviconUrl ? `  <link rel="icon" href="${faviconUrl}" />` : null,
     cdnHeadTags || null,
     `  <link rel="stylesheet" href="styles.css" />`,
     `</head>`,

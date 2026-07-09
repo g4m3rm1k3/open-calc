@@ -14,7 +14,7 @@ import {
   htmlToElements,
   generateExportHtml,
 } from "./htmlSync";
-import { computeStateAtStep, computeSolvedStateAtStep, computeSolvedFoldAtStep, validateStructure, validateBehavior, type Fold } from "./lessons/lessonEngine";
+import { computeStateAtStep, computeSolvedStateAtStep, computeSolvedFoldAtStep, validateStructure, validateBehavior, validatePageMeta, type Fold } from "./lessons/lessonEngine";
 import { buildPlaybackFrames, type PlaybackFrame } from "./lessons/stepPlayer";
 import { lessonProgressKey } from "./lessons/lessonHelpers";
 import type { Lesson, LessonPatch, ValidationResult } from "./lessons/lessonTypes";
@@ -200,7 +200,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
       // passed) — show it SOLVED, not the raw/blank scaffold `.patch` would
       // give a challenge step arriving fresh.
       const next = computeSolvedFoldAtStep(lesson, clamped).state;
-      dispatch({ type: "LOAD_EXAMPLE", payload: { elements: next.elements, bodyStyles: next.bodyStyles, jsFiles: next.jsFiles, customCss: next.customCss } });
+      dispatch({ type: "LOAD_EXAMPLE", payload: { elements: next.elements, bodyStyles: next.bodyStyles, jsFiles: next.jsFiles, customCss: next.customCss, pageTitle: next.pageTitle, faviconUrl: next.faviconUrl } });
       setPlayback(null);
     } else {
       setPlayback(makePlayback(baseline, targetStep.patch));
@@ -239,7 +239,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
     setPlayback((p) => {
       if (!p) return p;
       const last = p.frames[p.frames.length - 1].state;
-      dispatch({ type: "LOAD_EXAMPLE", payload: { elements: last.elements, bodyStyles: last.bodyStyles, jsFiles: last.jsFiles, customCss: last.customCss } });
+      dispatch({ type: "LOAD_EXAMPLE", payload: { elements: last.elements, bodyStyles: last.bodyStyles, jsFiles: last.jsFiles, customCss: last.customCss, pageTitle: last.pageTitle, faviconUrl: last.faviconUrl } });
       return null;
     });
   }, []);
@@ -256,7 +256,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
     if (!playback) return;
     if (playback.index >= playback.frames.length) { setPlayback(null); return; }
     const frame = playback.frames[playback.index].state;
-    dispatch({ type: "LOAD_EXAMPLE", payload: { elements: frame.elements, bodyStyles: frame.bodyStyles, jsFiles: frame.jsFiles, customCss: frame.customCss } });
+    dispatch({ type: "LOAD_EXAMPLE", payload: { elements: frame.elements, bodyStyles: frame.bodyStyles, jsFiles: frame.jsFiles, customCss: frame.customCss, pageTitle: frame.pageTitle, faviconUrl: frame.faviconUrl } });
     if (playback.paused) return;
     const timer = setTimeout(() => {
       setPlayback((p) => (p ? { ...p, index: p.index + 1 } : p));
@@ -272,6 +272,8 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
       result = await validateBehavior(state.elements, state.bodyStyles, state.customCss, mainJsCode(state.jsFiles), step.behavior);
     } else if (step.expected) {
       result = validateStructure(state.elements, step.expected);
+    } else if (step.expectedPageTitle !== undefined || step.expectedFaviconUrl !== undefined) {
+      result = validatePageMeta(state, step);
     } else {
       result = { passed: true, feedback: [] };
     }
@@ -282,7 +284,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
 
   const handleSkipToSolution = useCallback((): void => {
     const solved = computeSolvedStateAtStep(lesson, stepIndex);
-    dispatch({ type: "LOAD_EXAMPLE", payload: { elements: solved.elements, bodyStyles: solved.bodyStyles, jsFiles: solved.jsFiles, customCss: solved.customCss } });
+    dispatch({ type: "LOAD_EXAMPLE", payload: { elements: solved.elements, bodyStyles: solved.bodyStyles, jsFiles: solved.jsFiles, customCss: solved.customCss, pageTitle: solved.pageTitle, faviconUrl: solved.faviconUrl } });
     markCheckpoint(progressKey, step.id);
     setCheckResult({ passed: true, feedback: ["Solution applied — take a look at how it's built, then continue."] });
   }, [lesson, stepIndex, step, progressKey, markCheckpoint]);
@@ -423,6 +425,9 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
         onPausePlayback={togglePausePlayback}
         onSkipPlayback={skipPlayback}
         onReplay={replayCurrentStep}
+        pageTitle={state.pageTitle}
+        faviconUrl={state.faviconUrl}
+        onChangePageMeta={(next) => dispatch({ type: "SET_PAGE_META", payload: next })}
       />
 
       <div className={styles.main}>
@@ -491,7 +496,7 @@ export default function HtmlLabLesson({ lesson, onBack }: Props) {
           <iframe
             key="preview-frame"
             className={styles.previewFrame}
-            srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, mainJsCode(state.jsFiles), [])}
+            srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, mainJsCode(state.jsFiles), [], state.pageTitle, state.faviconUrl)}
             title="Preview"
             // See HtmlLab.tsx's preview iframe for why allow-same-origin and
             // allow-modals are included: third-party embeds (e.g. YouTube)

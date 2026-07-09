@@ -27,6 +27,8 @@ export function applyPatch(state: LabState, patch: LessonPatch): LabState {
     bodyStyles: patch.bodyStyles ? { ...state.bodyStyles, ...patch.bodyStyles } : state.bodyStyles,
     jsFiles: patch.javascript !== undefined ? withMainJsCode(state.jsFiles, patch.javascript) : state.jsFiles,
     customCss: patch.customCss !== undefined ? patch.customCss : state.customCss,
+    pageTitle: patch.pageTitle !== undefined ? patch.pageTitle : state.pageTitle,
+    faviconUrl: patch.faviconUrl !== undefined ? patch.faviconUrl : state.faviconUrl,
   };
 }
 
@@ -132,9 +134,28 @@ export function computeSolvedStateAtStep(lesson: Lesson, stepIndex: number): Lab
 }
 
 // ─── HTML/CSS structural validation ───────────────────────────────────────────
-// Checked by tag + a *subset* of style properties, not deep equality —
-// properties the lesson doesn't care about shouldn't fail the check, and two
-// students can reasonably add extra attributes/content beyond what's asked.
+// Checked by tag + a *subset* of style properties/attributes, not deep
+// equality — properties/attrs the lesson doesn't care about shouldn't fail
+// the check, and two students can reasonably add extra attributes/content
+// beyond what's asked.
+
+// ─── Page-settings validation ──────────────────────────────────────────────────
+// pageTitle/faviconUrl are page-level state, not elements — checked directly
+// against the running state rather than through `validateStructure`.
+
+export function validatePageMeta(
+  state: { pageTitle: string; faviconUrl: string },
+  step: { expectedPageTitle?: string; expectedFaviconUrl?: string },
+): ValidationResult {
+  const feedback: string[] = [];
+  if (step.expectedPageTitle !== undefined && state.pageTitle.trim() !== step.expectedPageTitle.trim()) {
+    feedback.push(`Expected the page title to be "${step.expectedPageTitle}", found "${state.pageTitle || "(not set)"}".`);
+  }
+  if (step.expectedFaviconUrl !== undefined && state.faviconUrl.trim() !== step.expectedFaviconUrl.trim()) {
+    feedback.push(`Expected the favicon URL to be "${step.expectedFaviconUrl}", found "${state.faviconUrl || "(not set)"}".`);
+  }
+  return { passed: feedback.length === 0, feedback };
+}
 
 export function validateStructure(elements: LabElement[], expected: ExpectedNode[]): ValidationResult {
   const feedback: string[] = [];
@@ -164,6 +185,12 @@ function compareLevel(
       const actualValue = act.styles[prop];
       if (actualValue !== value) {
         feedback.push(`<${act.tag}> at ${at}: expected ${prop} to be "${value}", found "${actualValue ?? "(not set)"}".`);
+      }
+    }
+    for (const [attr, value] of Object.entries(exp.attrs ?? {})) {
+      const actualValue = act.attrs[attr];
+      if (actualValue !== value) {
+        feedback.push(`<${act.tag}> at ${at}: expected attribute "${attr}" to be "${value}", found "${actualValue ?? "(not set)"}".`);
       }
     }
     if (exp.children) {
@@ -226,6 +253,10 @@ export async function validateBehavior(
         (el as HTMLInputElement).value = step.value ?? "";
         el.dispatchEvent(new Event(step.action, { bubbles: true }));
       }
+    }
+
+    if (script.settleMs) {
+      await new Promise<void>((resolve) => setTimeout(resolve, script.settleMs));
     }
 
     for (const a of script.assertions) {

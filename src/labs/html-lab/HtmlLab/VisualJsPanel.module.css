@@ -327,12 +327,20 @@
   /* text is naturally centered and wrapped */
 }
 
-/* ── Property rows (horizontal label + control, matching PropertiesPanel style) ── */
+/* ── Property rows (label stacked above its control) ──────────────────────────
+   Used to be a fixed 70px label column beside the control, copied from
+   PropertiesPanel's CSS-property rows ("color", "width" — always short).
+   This panel's actual labels ("Type annotation", "Function / method",
+   "Argument 1") are real phrases, not single words, and 70px truncated
+   nearly all of them into unreadable fragments ("Type annota…") — a real
+   problem in a tool meant to teach what each field means. Stacking gives
+   both the label and the control the full row width instead. */
 
 .propRow {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
   min-height: 26px;
   margin-bottom: 8px;
 }
@@ -341,15 +349,10 @@
 }
 
 .propLabel {
-  width: 70px;
   font-size: 10px;
   font-weight: 600;
   color: var(--hl-muted, #64748b);
-  text-align: right;
-  flex-shrink: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: left;
 }
 
 .propInput {

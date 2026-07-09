@@ -299,7 +299,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
     const cdnTags = [...resolveCdnTags(state.cdnLinks), ...(hasJsx(page.jsFiles) ? reactCdnTags() : [])];
     const bundle = transpileBundle(buildJsBundle(page.jsFiles), page.jsFiles);
     if (bundle.error) { window.alert("Couldn't export — compile error:\n\n" + bundle.error); return; }
-    const html = generateExportHtml(page.elements, page.bodyStyles, page.customCss || "", bundle.code, cdnTags);
+    const html = generateExportHtml(page.elements, page.bodyStyles, page.customCss || "", bundle.code, cdnTags, page.pageTitle || "My Page", page.faviconUrl || "");
     const slug = page.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") || "page";
     const blob = new Blob([html], { type: "text/html" });
     const url  = URL.createObjectURL(blob);
@@ -311,7 +311,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
   const exportSplit = useCallback((): void => {
     const cdnTags = [...resolveCdnTags(state.cdnLinks), ...(hasJsx(state.jsFiles) ? reactCdnTags() : [])];
     const jsNames = state.jsFiles.length > 0 ? state.jsFiles.map(f => f.name) : ["script.js"];
-    const html = generateLinkedHtml(state.elements, cdnTags, jsNames);
+    const html = generateLinkedHtml(state.elements, cdnTags, jsNames, state.pageTitle || "My Page", state.faviconUrl || "");
     const css  = elementsToCss(state.elements, state.customCss, state.bodyStyles);
     function dl(content: string, filename: string, mime: string): void {
       const blob = new Blob([content], { type: mime });
@@ -393,6 +393,9 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
         showLabels={state.showLabels}
         previewMode={previewMode}
         multiPageMode={state.mode === "multi"}
+        pageTitle={state.pageTitle}
+        faviconUrl={state.faviconUrl}
+        onChangePageMeta={(next) => dispatch({ type: "SET_PAGE_META", payload: next })}
         onToggleOverlay={() => dispatch({ type: "TOGGLE_OVERLAY" })}
         onToggleLabels={() => dispatch({ type: "TOGGLE_LABELS" })}
         onTogglePreview={() => setPreviewMode(v => !v)}
@@ -415,12 +418,12 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
           if (state.mode === "multi") {
             const pages = state.pages.map((p) =>
               p.id === state.activePageId
-                ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, jsFiles: state.jsFiles, customCss: state.customCss }
+                ? { ...p, elements: state.elements, bodyStyles: state.bodyStyles, jsFiles: state.jsFiles, customCss: state.customCss, pageTitle: state.pageTitle, faviconUrl: state.faviconUrl }
                 : p,
             );
             pages.forEach((page, i) => setTimeout(() => exportPage(page), i * 200));
           } else {
-            exportPage({ id: "", name: "index", elements: state.elements, bodyStyles: state.bodyStyles, customCss: state.customCss, jsFiles: state.jsFiles });
+            exportPage({ id: "", name: "index", elements: state.elements, bodyStyles: state.bodyStyles, customCss: state.customCss, jsFiles: state.jsFiles, pageTitle: state.pageTitle, faviconUrl: state.faviconUrl });
           }
         }}
         onExportSplit={exportSplit}
@@ -509,7 +512,7 @@ export default function HtmlLab({ onBack }: HtmlLabProps) {
             <iframe
               key="preview-frame"
               className={styles.previewFrame}
-              srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, transpiledJs.code, previewCdnTags)}
+              srcDoc={generateExportHtml(state.elements, state.bodyStyles, state.customCss, transpiledJs.code, previewCdnTags, state.pageTitle, state.faviconUrl)}
               title="Preview"
               // allow-forms: without it, a <form>'s submit event never fires
               // in a sandboxed iframe at all (not even to let preventDefault
