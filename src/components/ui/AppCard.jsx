@@ -5,45 +5,46 @@ import { buildProgressKey } from '../../context/progressMigration.ts'
 
 const TAG = 'text-[10px] font-bold tracking-wide uppercase px-2.5 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400'
 
-function PremiumHeaderBackground({ grad }) {
+function PremiumHeaderBackground({ meta }) {
   return (
     <>
-      <div className={`absolute inset-0 bg-gradient-to-br ${grad} opacity-[0.85] dark:opacity-100`} />
-      <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/30 blur-[30px] rounded-full pointer-events-none mix-blend-overlay" />
-      <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-black/20 blur-[30px] rounded-full pointer-events-none mix-blend-overlay" />
-      <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent opacity-50 pointer-events-none" />
+      <div className={`absolute inset-0 opacity-[0.15] dark:opacity-[0.25] bg-gradient-to-br ${meta.header} mix-blend-multiply dark:mix-blend-screen pointer-events-none group-hover:opacity-[0.25] dark:group-hover:opacity-[0.35] transition-opacity duration-300`} />
+      <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent dark:from-white/10 opacity-50 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transform -translate-x-full group-hover:translate-x-full transition-all duration-700 pointer-events-none" />
     </>
   )
 }
 
 function LabHeader({ item }) {
-  const { grad, mark, sub } = item.cover
+  const { mark, sub } = item.cover
+  const meta = GLASS_META[item.color] ?? GLASS_META.slate
   return (
-    <div className="relative overflow-hidden">
-      <PremiumHeaderBackground grad={grad} />
-      <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none select-none leading-none font-black text-white/[0.07] text-[64px] tracking-tighter">{mark}</div>
+    <div className={`relative overflow-hidden border-b-2 ${meta.border}`}>
+      <PremiumHeaderBackground meta={meta} />
+      <div className={`absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none select-none leading-none font-black text-[64px] tracking-tighter opacity-[0.06] dark:opacity-[0.12] ${meta.text}`}>{mark}</div>
       <div className="relative flex items-center gap-4 px-5 py-5 z-10">
-        <span className="text-[2.5rem] leading-none filter drop-shadow-md">{item.emoji}</span>
+        <span className="text-[2.5rem] leading-none filter drop-shadow-sm transition-transform duration-300 group-hover:scale-110">{item.emoji}</span>
         <div>
-          <h4 className="font-extrabold text-white text-[17px] leading-tight drop-shadow-sm tracking-tight">{item.label}</h4>
-          <span className="text-white/70 text-[12px] font-mono font-medium">{sub}</span>
+          <h4 className={`font-extrabold text-[17px] leading-tight drop-shadow-sm tracking-tight ${meta.text}`}>{item.label}</h4>
+          <span className="text-slate-500 dark:text-slate-400 text-[12px] font-mono font-medium">{sub}</span>
         </div>
-        <span className="ml-auto text-white/50 text-xs font-bold uppercase shrink-0 group-hover:text-white group-hover:translate-x-0.5 transition-all">Launch →</span>
+        <span className={`ml-auto text-xs font-bold uppercase shrink-0 transition-all ${meta.text}`}>Launch →</span>
       </div>
     </div>
   )
 }
 
 function GameHeader({ item }) {
-  const { grad, mark, sub } = item.cover
+  const { mark, sub } = item.cover
+  const meta = GLASS_META[item.color] ?? GLASS_META.slate
   return (
-    <div className="relative overflow-hidden">
-      <PremiumHeaderBackground grad={grad} />
-      <div className="absolute bottom-0 right-2 pointer-events-none select-none leading-none font-black text-white/[0.09] text-[56px] tracking-tight">{mark}</div>
+    <div className={`relative overflow-hidden border-b-2 ${meta.border}`}>
+      <PremiumHeaderBackground meta={meta} />
+      <div className={`absolute bottom-0 right-2 pointer-events-none select-none leading-none font-black text-[56px] tracking-tight opacity-[0.06] dark:opacity-[0.12] ${meta.text}`}>{mark}</div>
       <div className="relative px-5 pt-6 pb-5 z-10">
-        <div className="text-[2.5rem] leading-none mb-3 filter drop-shadow-md">{item.emoji}</div>
-        <h4 className="font-extrabold text-white text-[17px] leading-tight drop-shadow-sm tracking-tight">{item.label}</h4>
-        <span className="text-white/70 text-[12px] font-medium">{sub}</span>
+        <div className="text-[2.5rem] leading-none mb-3 filter drop-shadow-sm transition-transform duration-300 group-hover:scale-110">{item.emoji}</div>
+        <h4 className={`font-extrabold text-[17px] leading-tight drop-shadow-sm tracking-tight ${meta.text}`}>{item.label}</h4>
+        <span className="text-slate-500 dark:text-slate-400 text-[12px] font-medium">{sub}</span>
       </div>
     </div>
   )
@@ -84,17 +85,17 @@ function CourseCard({ item, chapters, getLessonStatus, meta, innerRef }) {
     <div ref={innerRef} className="flex flex-col h-full overflow-hidden rounded-[24px] border border-slate-200/60 dark:border-white/10 bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.04)] group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:-translate-y-2">
       
       {/* Sleek Header */}
-      <div className="relative px-5 pt-6 pb-6 overflow-hidden">
-        <PremiumHeaderBackground grad={meta.header} />
+      <div className={`relative px-5 pt-6 pb-6 overflow-hidden border-b-2 ${meta.border}`}>
+        <PremiumHeaderBackground meta={meta} />
         
         {/* Large faded background icon */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none select-none leading-none text-[100px] opacity-[0.12] -mr-4 drop-shadow-lg filter mix-blend-overlay">
+        <div className={`absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none select-none leading-none text-[100px] opacity-[0.06] dark:opacity-[0.12] -mr-4 drop-shadow-sm filter mix-blend-overlay ${meta.text}`}>
           {item.icon}
         </div>
 
         <div className="relative z-10">
-          <div className="text-4xl mb-3 font-mono leading-none tracking-tight filter drop-shadow-md">{item.icon}</div>
-          <div className="font-extrabold text-[19px] text-white leading-tight tracking-tight drop-shadow-sm">{item.label}</div>
+          <div className="text-4xl mb-3 font-mono leading-none tracking-tight filter drop-shadow-sm transition-transform duration-300 group-hover:scale-110">{item.icon}</div>
+          <div className={`font-extrabold text-[19px] leading-tight tracking-tight drop-shadow-sm ${meta.text}`}>{item.label}</div>
         </div>
       </div>
       

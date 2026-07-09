@@ -62,17 +62,32 @@ function FavouriteCard({ pin, onOpen, onRemove }) {
       tabIndex={0}
       onClick={onOpen}
       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onOpen(); }}
-      className={`group relative flex flex-col items-start gap-2 p-4 rounded-2xl text-left cursor-pointer transition-all hover:-translate-y-1 bg-gradient-to-br ${meta.header} border ${meta.border} text-white shadow-md hover:shadow-lg dark:shadow-none overflow-hidden`}
+      className={`group relative flex flex-col items-start gap-2 p-4 rounded-2xl text-left cursor-pointer transition-all bg-white/60 dark:bg-slate-800/40 hover:bg-white/90 dark:hover:bg-slate-700/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 shadow-sm hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:-translate-y-1 overflow-hidden ${meta ? 'border-b-2 ' + meta.border : ''}`}
     >
+      {/* Subtle color tint */}
+      <div className={`absolute inset-0 opacity-[0.15] dark:opacity-[0.25] bg-gradient-to-br ${meta.header} mix-blend-multiply dark:mix-blend-screen pointer-events-none group-hover:opacity-[0.25] dark:group-hover:opacity-[0.35] transition-opacity duration-300`} />
+      
+      {/* Highlight glare */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent dark:from-white/10 opacity-50 pointer-events-none" />
+      
+      {/* Animated hover gradient */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transform -translate-x-full group-hover:translate-x-full transition-all duration-700 pointer-events-none" />
+
+      {/* Large faded background icon */}
+      <div className={`absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none select-none leading-none text-[80px] opacity-[0.06] dark:opacity-[0.12] -mr-4 drop-shadow-sm`}>
+        {pin.emoji}
+      </div>
+
       <button
         onClick={(e) => { e.stopPropagation(); onRemove(); }}
         title="Remove from Favourites"
-        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-white/60 hover:text-white transition-all text-xs leading-none w-5 h-5 flex items-center justify-center rounded-full hover:bg-white/20 z-10"
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-all text-xs leading-none w-5 h-5 flex items-center justify-center rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 z-20"
       >
         ✕
       </button>
-      <span className="text-2xl leading-none">{pin.emoji}</span>
-      <span className="text-sm font-bold leading-tight drop-shadow-sm pr-4">{pin.label}</span>
+      
+      <span className="text-2xl leading-none relative z-10 drop-shadow-sm transition-transform duration-300 group-hover:scale-110">{pin.emoji}</span>
+      <span className={`text-sm font-bold leading-tight drop-shadow-sm pr-4 relative z-10 ${meta ? meta.text : 'text-slate-700 dark:text-slate-100'}`}>{pin.label}</span>
     </div>
   )
 }
