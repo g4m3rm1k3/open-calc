@@ -877,3 +877,5 @@ plt.show = _patched_show
     iframeRef, runScript, runPython, runMatlab,
   }
 }
+
+export type MathOSState = ReturnType<typeof useMathOSState>

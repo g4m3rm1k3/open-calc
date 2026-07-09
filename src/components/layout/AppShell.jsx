@@ -299,6 +299,7 @@ export default function AppShell({ children }) {
   const [matrixReducerOpen, setMatrixReducerOpen] = useState(false);
   const [compassQuickOpen, setCompassQuickOpen] = useState(false);
   const [mathOsOpen, setMathOsOpen] = useState(false);
+  const [mathOsConfig, setMathOsConfig] = useState(null);
   const [calcOpen, setCalcOpen] = useState(false);
   const [sigmaOpen, setSigmaOpen] = useState(false);
   const [polyOpen, setPolyOpen] = useState(false);
@@ -318,6 +319,13 @@ export default function AppShell({ children }) {
     document.body.dataset.chatOpen = chatOpen ? '1' : '0';
     return () => { delete document.body.dataset.chatOpen; };
   }, [chatOpen]);
+  useEffect(() => {
+    window.__openMathOS = (config) => {
+      setMathOsConfig(config || null);
+      setMathOsOpen(true);
+    };
+    return () => { delete window.__openMathOS; };
+  }, []);
   const closeAllTools = useCallback(() => {
     setGraphOpen(false);
     setGraph3DOpen(false);
@@ -506,7 +514,7 @@ export default function AppShell({ children }) {
               isOpen={terminalOpen}
               onClose={() => setTerminalOpen(false)}
             />
-            <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} />
+            <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} lessonConfig={mathOsConfig} />
           </Suspense>
         </div>
       </GrapherContext.Provider>
@@ -694,7 +702,7 @@ export default function AppShell({ children }) {
               onClose={() => setTerminalOpen(false)}
             />
             <HelpModal isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
-            <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} />
+            <MathOS open={mathOsOpen} onClose={() => setMathOsOpen(false)} lessonConfig={mathOsConfig} />
             {calcOpen && <TICalc onClose={() => setCalcOpen(false)} />}
             {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
             {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}

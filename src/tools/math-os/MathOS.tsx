@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { useGlobalTheme } from '../../context/ThemeContext'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes'
-import { useMathOSState } from './hooks/useMathOSState'
+import type { MathOSState } from './hooks/useMathOSState'
 import VarStrip from './components/VarStrip'
 import SectionTabs from './components/SectionTabs'
 import KatexStep from './components/KatexStep'
@@ -103,12 +103,10 @@ function MachinistViz({ viz, vars }: { viz?: string; vars?: Record<string, strin
 }
 
 // ─── CENTER CONTENT ───────────────────────────────────────────────────────────
-export default function MathOSCenter() {
+export default function MathOSCenter({ s }: { s: MathOSState }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { themeStyles } = useGlobalTheme() as any
   const ui: Record<string, string> = themeStyles.ui
-
-  const s = useMathOSState()
   const explainText = s.getExplain(s.explainLevel)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const connData = s.result?.connKey ? (CONNECTIONS as any)[s.result.connKey] : null
