@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useCncTheme } from "./theme/useCncTheme.js";
 
 function useIsDark() {
   const isDark = () => document.documentElement.classList.contains('dark')
@@ -97,28 +98,29 @@ export default function CNCClosedLoopSim({ params = {} }) {
   const stpRaf = useRef(null)
   const stpState = useRef({ cmd: 0, actual: 0, lost: 0, done: false })
 
+  const _C = useCncTheme();
   const C = {
-    bg:       dark ? '#0f172a' : '#ffffff',
-    surface:  dark ? '#1e293b' : '#f8fafc',
-    border: dark ? "rgb(var(--tw-custom-slate-700))" : "rgb(var(--tw-custom-slate-200))",
-    text:     dark ? '#f1f5f9' : '#0f172a',
-    muted:    dark ? '#94a3b8' : '#475569',
-    hint: dark ? "rgb(var(--tw-custom-slate-500))" : "rgb(var(--tw-custom-slate-400))",
-    tabActive:dark ? '#3730a3' : '#4338ca',
-    tabBg:    dark ? '#1e293b' : '#f1f5f9',
-    trackBg:  dark ? '#0f172a' : '#f1f5f9',
-    rail:     dark ? '#334155' : '#cbd5e1',
-    commanded:dark ? '#818cf8' : '#6366f1',
-    actual:   dark ? '#38bdf8' : '#0284c7',
-    actualStep:dark ? '#fb923c' : '#ea580c',
-    logBg:    dark ? '#020617' : '#f8fafc',
-    chipBg:   dark ? '#1e293b' : '#f1f5f9',
-    ok:       dark ? '#4ade80' : '#16a34a',
-    warn:     dark ? '#fbbf24' : '#d97706',
-    alarm:    dark ? '#f87171' : '#dc2626',
-    btnBlue:  dark ? '#1d4ed8' : '#2563eb',
-    btnGray:  dark ? '#334155' : '#e2e8f0',
-  }
+    bg: _C.vpBg,
+    surface: _C.p1,
+    border: _C.bd,
+    text: _C.txt,
+    muted: _C.txt2,
+    hint: _C.txt3,
+    tabActive: _C.purple,
+    tabBg: _C.bg,
+    trackBg: _C.vpBg,
+    rail: _C.bd2,
+    commanded: _C.purple,
+    actual: _C.blue,
+    actualStep: _C.amber,
+    logBg: _C.bg,
+    chipBg: _C.p2,
+    ok: _C.green,
+    warn: _C.amber,
+    alarm: _C.red,
+    btnBlue: _C.blue,
+    btnGray: _C.bd2,
+  };
 
   const addSrvLog = (text, type) => setSrvLogs(l => [...l, { text, type }])
   const addStpLog = (text, type) => setStpLogs(l => [...l, { text, type }])

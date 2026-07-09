@@ -179,6 +179,44 @@ export function mergeMaxNumericObject(
   return merged
 }
 
+interface BackendLabFile {
+  id: string
+  [key: string]: unknown
+}
+interface BackendLabSavedRequest {
+  id: string
+  [key: string]: unknown
+}
+interface BackendLabData {
+  files?: BackendLabFile[]
+  savedRequests?: BackendLabSavedRequest[]
+  activeLessonId?: string
+  [key: string]: unknown
+}
+
+// Backend Lab's persisted work (student's own code files + saved API
+// requests) — both arrays are keyed by `id`, so union-by-id is the right
+// merge (same reasoning as mergeArrayUnionById above: two different object
+// instances with the same id are never === each other, a plain Set union
+// wouldn't dedupe them). activeLessonId has no real merge — local wins if
+// present, matching mergeKeyedObject's "device being synced from wins on
+// conflict" default.
+export function mergeBackendLabData(
+  local: BackendLabData | null | undefined,
+  remote: BackendLabData | null | undefined
+): BackendLabData {
+  const isPlainObject = (v: unknown): v is BackendLabData => !!v && typeof v === 'object' && !Array.isArray(v)
+  if (!isPlainObject(local)) return isPlainObject(remote) ? remote : {}
+  if (!isPlainObject(remote)) return local
+  return {
+    ...remote,
+    ...local,
+    files: mergeArrayUnionById(local.files ?? [], remote.files ?? []),
+    savedRequests: mergeArrayUnionById(local.savedRequests ?? [], remote.savedRequests ?? []),
+    activeLessonId: local.activeLessonId ?? remote.activeLessonId,
+  }
+}
+
 interface CalendarData {
   events?: Array<Record<string, unknown>>
   [key: string]: unknown
@@ -239,4 +277,5 @@ export const SYNC_MERGE_STRATEGIES: Record<string, MergeStrategy> = {
   'oc-health-v1': mergeKeyedObject,
   'oc-rpg-data': mergeKeyedObject,
   'oc-compass': mergeKeyedObject,
+  'oc-backend-lab': mergeBackendLabData,
 }

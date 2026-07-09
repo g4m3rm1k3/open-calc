@@ -39,9 +39,36 @@ export type BackendLabAction =
   | { type: "DELETE_SAVED_REQUEST"; id: string }
   | { type: "NEW_REQUEST" }
   | { type: "SET_LESSON_WIDTH"; width: number }
-  | { type: "SET_POSTMAN_WIDTH"; width: number };
+  | { type: "SET_POSTMAN_WIDTH"; width: number }
+  | { type: "LOAD_PERSISTED_DATA"; data: PersistedBackendLabData };
 
 const DEFAULT_REQUEST: HttpRequest = { method: "GET", path: "/users", headers: {}, body: "" };
+
+// The only part of Backend Lab's state worth surviving a refresh or
+// following a signed-in user to another device — a student's own code and
+// saved API requests. Everything else (which panel tab is open, panel
+// widths, the in-progress request draft, the last response) is session UI
+// state, not real work, and stays in-memory only, the same "keep the sync
+// list small" discipline AuthContext.jsx's own SYNC_KEYS already documents.
+export const BACKEND_LAB_STORAGE_KEY = "oc-backend-lab";
+
+export interface PersistedBackendLabData {
+  files: BackendFile[];
+  savedRequests: SavedRequest[];
+  activeLessonId: string;
+}
+
+function readPersistedData(): PersistedBackendLabData | null {
+  try {
+    const raw = window.localStorage.getItem(BACKEND_LAB_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.files) || parsed.files.length === 0) return null;
+    return parsed as PersistedBackendLabData;
+  } catch {
+    return null;
+  }
+}
 
 // Header rows are edited as a list (so two blank/duplicate keys mid-edit
 // don't collide), then collapsed into the plain Record<string,string>
@@ -61,6 +88,23 @@ function headersToRows(headers: Record<string, string>): HeaderRow[] {
 }
 
 export function createInitialState(): BackendLabState {
+  const persisted = readPersistedData();
+  if (persisted) {
+    return {
+      files: persisted.files,
+      activeFileId: persisted.files[0].id,
+      request: { ...DEFAULT_REQUEST },
+      headerRows: [],
+      lastOutcome: null,
+      postmanTab: "response",
+      lessonCollapsed: false,
+      activeLessonId: LESSONS.some((l) => l.id === persisted.activeLessonId) ? persisted.activeLessonId : LESSONS[0].id,
+      savedRequests: persisted.savedRequests,
+      editingSavedRequestId: null,
+      lessonWidth: 380,
+      postmanWidth: 420,
+    };
+  }
   const fileId = "file-1";
   return {
     files: [{ id: fileId, name: "server.js", code: "" }],
@@ -207,6 +251,23 @@ export function backendLabReducer(
 
     case "SET_POSTMAN_WIDTH":
       return { ...state, postmanWidth: action.width };
+
+    // Fires when AuthContext.jsx's Firestore sync writes a freshly-merged
+    // oc-backend-lab value to localStorage after this component already
+    // mounted (e.g. sign-in completing async, or another tab's edit
+    // arriving) — the same "external write" case useLocalStorage.js
+    // handles for plain useState-based state, adapted here for a reducer.
+    case "LOAD_PERSISTED_DATA": {
+      if (action.data.files.length === 0) return state;
+      return {
+        ...state,
+        files: action.data.files,
+        activeFileId: action.data.files.some((f) => f.id === state.activeFileId)
+          ? state.activeFileId
+          : action.data.files[0].id,
+        savedRequests: action.data.savedRequests,
+      };
+    }
 
     default:
       return state;

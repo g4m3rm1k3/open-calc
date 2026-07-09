@@ -8,6 +8,7 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { ColladaLoader } from "three/examples/jsm/loaders/ColladaLoader.js";
 import { PLYLoader } from "three/examples/jsm/loaders/PLYLoader.js";
+import { useCncTheme } from "./theme/useCncTheme.js";
 
 export default function CNCBackplot({
   pathPoints = [],
@@ -74,16 +75,17 @@ export default function CNCBackplot({
     facePickModeRef.current = facePickMode;
   }, [facePickMode]);
 
+  const C = useCncTheme();
   // Colors based on theme
   const colors = {
-    bg: isDark ? 0x0f172a : 0xf1f5f9,
-    grid: isDark ? 0x334155 : 0x94a3b8,
-    gridAlt: isDark ? 0x1e293b : 0xcbd5e1,
-    rapid: isDark ? 0xfacc15 : 0xd97706, // G00
-    feed: isDark ? 0x38bdf8 : 0x2563eb, // G01/02/03
-    stockFill: isDark ? 0x3b82f6 : 0x2563eb,
-    stockEdge: isDark ? 0x93c5fd : 0x1d4ed8,
-    channels: [0x63b8ff, 0x46d89f, 0xf0b44c, 0xb89cff],
+    bg: C.vpBg,
+    grid: C.axBd,
+    gridAlt: C.bd2,
+    rapid: C.rapid, // G00
+    feed: C.feed, // G01/02/03
+    stockFill: C.stockFront,
+    stockEdge: C.stockBd,
+    channels: [C.blue, C.green, C.amber, C.purple],
   };
 
   // ── Bootstrap Three.js (once) ─────────────────────────────────────────────
@@ -332,7 +334,7 @@ export default function CNCBackplot({
     const scene = sceneRef.current;
     const currentGrid = gridRef.current;
     if (renderer) renderer.setClearColor(colors.bg);
-    if (scene?.fog) scene.fog.color.setHex(colors.bg);
+    if (scene?.fog) scene.fog.color.set(colors.bg);
     if (scene && currentGrid) {
       scene.remove(currentGrid);
       currentGrid.geometry?.dispose?.();

@@ -14,6 +14,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { useCncTheme } from "./theme/useCncTheme.js";
 
 // ─── Axis definitions ─────────────────────────────────────────────────────────
 // curlPath(t, r) → [x, y, z]  —  right-hand rule orbit, t ∈ [0, 2π]
@@ -498,15 +499,12 @@ export default function CNCAxesExplorer({
   }, [isDark])
 
   // ── Theme colors ───────────────────────────────────────────────────────────
-  const C = useMemo(() => isDark ? {
-    bg: '#0f172a', surface: '#1e293b', border: '#334155',
-    text: '#f1f5f9', muted: '#94a3b8', hint: '#475569',
-    panel: 'rgba(15,23,42,0.94)', panelBorder: '#334155',
-  } : {
-    bg: '#f1f5f9', surface: '#ffffff', border: '#e2e8f0',
-    text: '#0f172a', muted: '#64748b', hint: '#94a3b8',
-    panel: 'rgba(255,255,255,0.97)', panelBorder: '#cbd5e1',
-  }, [isDark])
+  const _C = useCncTheme();
+  const C = useMemo(() => ({
+    bg: _C.vpBg, surface: _C.p1, border: _C.bd,
+    text: _C.txt, muted: _C.txt2, hint: _C.txt3,
+    panel: _C.bg, panelBorder: _C.bd2,
+  }), [_C])
 
   const sel = selectedAxis ? AXES[selectedAxis] : null
 

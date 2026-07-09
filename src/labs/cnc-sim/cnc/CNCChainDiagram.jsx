@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useCncTheme } from "./theme/useCncTheme.js";
 
 function useIsDark() {
   const isDark = () => document.documentElement.classList.contains('dark')
@@ -112,17 +113,18 @@ export default function CNCChainDiagram({ params = {} }) {
     return () => ro.disconnect()
   }, [])
 
+  const _C = useCncTheme();
   const C = {
-    bg:      dark ? '#0f172a' : '#ffffff',
-    surface: dark ? '#1e293b' : '#f8fafc',
-    border: dark ? "rgb(var(--tw-custom-slate-700))" : "rgb(var(--tw-custom-slate-200))",
-    text:    dark ? '#f1f5f9' : '#0f172a',
-    muted:   dark ? '#94a3b8' : '#475569',
-    hint: dark ? "rgb(var(--tw-custom-slate-500))" : "rgb(var(--tw-custom-slate-400))",
-    warn:    dark ? '#fca5a5' : '#b91c1c',
-    warnBg:  dark ? '#450a0a' : '#fef2f2',
-    arrowColor: dark ? '#475569' : '#94a3b8',
-  }
+    bg: _C.vpBg,
+    surface: _C.p1,
+    border: _C.bd,
+    text: _C.txt,
+    muted: _C.txt2,
+    hint: _C.txt3,
+    warn: _C.red,
+    warnBg: _C.redBg,
+    arrowColor: _C.bd2,
+  };
 
   const detail = active ? DETAILS[active] : null
 

@@ -12,6 +12,7 @@
  */
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { CNCInterpreter } from '../../../scripts/cnc/CNCInterpreter.js'
+import { useCncTheme } from "./theme/useCncTheme.js";
 
 // ─── Minimal line-level G-code colorizer ─────────────────────────────────────
 function lineColor(line, C) {
@@ -62,23 +63,16 @@ export default function CNCMacroLab({
     return () => obs.disconnect()
   }, [])
 
-  const C = useMemo(() => isDark ? {
-    bg:      '#0f172a', surface: '#1e293b', border:  '#334155',
-    text:    '#f1f5f9', muted:   '#64748b', hint:    '#475569',
-    green:   '#4ade80', amber:   '#fbbf24', red:     '#f87171',
-    blue:    '#38bdf8', teal:    '#2dd4bf', purple:  '#c084fc',
-    rapid:   '#fbbf24', feed:    '#38bdf8',
-    curLine: '#1e3a8a',
-    execRapid: '#92400e', execFeed: '#1e3a5f',
-  } : {
-    bg:      '#f8fafc', surface: '#ffffff', border:  '#e2e8f0',
-    text:    '#0f172a', muted:   '#94a3b8', hint:    '#94a3b8',
-    green:   '#16a34a', amber:   '#d97706', red:     '#dc2626',
-    blue:    '#2563eb', teal:    '#0d9488', purple:  '#7c3aed',
-    rapid:   '#d97706', feed:    '#2563eb',
-    curLine: '#dbeafe',
-    execRapid: '#fde68a', execFeed: '#bfdbfe',
-  }, [isDark])
+  const _C = useCncTheme();
+  const C = useMemo(() => ({
+    bg: _C.vpBg, surface: _C.p1, border: _C.bd,
+    text: _C.txt, muted: _C.txt2, hint: _C.txt3,
+    green: _C.green, amber: _C.amber, red: _C.red,
+    blue: _C.blue, teal: _C.teal, purple: _C.purple,
+    rapid: _C.rapid, feed: _C.feed,
+    curLine: _C.blueBg,
+    execRapid: _C.amberBg, execFeed: _C.greenBg,
+  }), [_C]);
 
   // ── Core state ─────────────────────────────────────────────────────────────
   const [code, setCode]           = useState(initialCode)

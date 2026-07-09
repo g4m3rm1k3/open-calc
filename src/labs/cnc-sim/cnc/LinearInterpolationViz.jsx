@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useCncTheme } from "./theme/useCncTheme.js";
 
 function useIsDark() {
   const isDark = () => document.documentElement.classList.contains('dark')
@@ -19,27 +20,28 @@ export default function LinearInterpolationViz({ params = {} }) {
   const dark = useIsDark()
   const [tab, setTab] = useState(0)
 
+  const _C = useCncTheme();
   const C = {
-    bg:       dark ? '#0f172a' : '#ffffff',
-    surface:  dark ? '#1e293b' : '#f8fafc',
-    border: dark ? "rgb(var(--tw-custom-slate-700))" : "rgb(var(--tw-custom-slate-200))",
-    text:     dark ? '#f1f5f9' : '#0f172a',
-    muted:    dark ? '#94a3b8' : '#475569',
-    hint: dark ? "rgb(var(--tw-custom-slate-500))" : "rgb(var(--tw-custom-slate-400))",
-    rapid:    dark ? '#fbbf24' : '#d97706',
-    rapidBg:  dark ? '#78350f' : '#fef3c7',
-    feed:     dark ? '#38bdf8' : '#0284c7',
-    feedBg:   dark ? '#0c4a6e' : '#e0f2fe',
-    green:    dark ? '#4ade80' : '#16a34a',
-    red:      dark ? '#f87171' : '#dc2626',
-    grid:     dark ? '#1e293b' : '#f1f5f9',
-    axis:     dark ? '#334155' : '#cbd5e1',
-    btnBlue:  dark ? '#1d4ed8' : '#2563eb',
-    btnGray:  dark ? '#334155' : '#e2e8f0',
-    modal:    dark ? '#a78bfa' : '#7c3aed',
-    modalBg:  dark ? '#2e1065' : '#ede9fe',
-    lookahead:dark ? '#34d399' : '#059669',
-  }
+    bg: _C.vpBg,
+    surface: _C.p1,
+    border: _C.bd,
+    text: _C.txt,
+    muted: _C.txt2,
+    hint: _C.txt3,
+    rapid: _C.rapid,
+    rapidBg: _C.amberBg,
+    feed: _C.feed,
+    feedBg: _C.blueBg,
+    green: _C.green,
+    red: _C.red,
+    grid: _C.axGrid,
+    axis: _C.bd2,
+    btnBlue: _C.blue,
+    btnGray: _C.bd2,
+    modal: _C.purple,
+    modalBg: _C.blueBg,
+    lookahead: _C.green,
+  };
 
   return (
     <div style={{ background: C.bg, borderRadius: 12, padding: '16px 20px', border: `1px solid ${C.border}`, fontFamily: 'system-ui, sans-serif' }}>

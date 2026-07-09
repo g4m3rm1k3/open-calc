@@ -1,10 +1,11 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { useCncTheme } from "./theme/useCncTheme.js";
 
-const CSS = `
+const getCSS = (_C) => `
 .error-viz-wrap {
-  --amber: #ffb800; --blue: #38b6ff; --red: #ff4545;
+  --amber: ; --blue: ; --red: ;
   background: #080c0f; color: #e8f4f8; font-family: 'DM Sans', sans-serif;
   overflow: hidden; display: flex; flex-direction: column; height: 100%;
 }
@@ -92,6 +93,7 @@ const CSS = `
 `;
 
 export default function ErrorAccumulationViz({ height = 680 }) {
+  const _C = useCncTheme();
   const containerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -300,7 +302,7 @@ export default function ErrorAccumulationViz({ height = 680 }) {
 
   return (
     <div ref={containerRef} className="error-viz-wrap" style={{ height: `${height}px` }}>
-      <style>{CSS}</style>
+      <style>{getCSS(_C)}</style>
 
       <div className="topbar">
         <div className="logo">G90 vs G91 — Error Accumulation</div>

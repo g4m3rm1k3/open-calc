@@ -49,6 +49,25 @@ user needs a name" hasn't changed even slightly. The business rule and
 the storage mechanism are currently forced to change together, for
 reasons that have nothing to do with each other.
 
+**CS lens — coupling, named precisely, not just described.** Two pieces
+of code are **coupled** when a change to one is likely to force a
+change to the other. Right now `usersService` is tightly coupled to
+`db`'s exact shape — `usersService` "knows" `db`, the same way a
+function that reads a global variable "knows" about that variable.
+**High coupling** between a business rule and a storage detail is
+exactly what makes "swap the storage" turn into "rewrite the business
+logic" — the actual, concrete cost this lesson exists to remove.
+
+**SE lens — why SQL specifically should never live inside a service.**
+Imagine `usersService.create` contained raw SQL directly: it would now
+know three unrelated things at once — the business rule (a name is
+required), the table's exact name, and the SQL dialect a specific
+database happens to use. A later switch from one database engine to
+another (SQLite to Postgres, say, or to a document store) would force a
+rewrite of business logic that never actually changed — the exact
+failure mode a repository exists to prevent, stated concretely rather
+than left implicit.
+
 ---
 
 ## Step 2 — Extract a Repository
@@ -81,6 +100,29 @@ add Update and Delete to this exact repository, using this exact same
 naming convention — a real, industry-standard vocabulary, not this
 project's own invention.
 
+**CS lens — abstraction, the actual mechanism the repository pattern is
+built from.** `usersRepository.findAll`/`.insert` are an **abstraction**:
+a simplified, general-purpose surface standing in front of a real,
+specific, more complicated thing underneath. The caller only ever
+thinks in terms of "give me users" / "store this user" — never in terms
+of arrays, SQL tables, files, or a network call to some other service,
+even though one of those is always the real answer underneath. This is
+the same abstraction idea lesson 2 named for the router (a lookup
+instead of a chain of specific checks) and lesson 6 named again for
+controllers (a resource instead of six individual functions) —
+reappearing here at the storage boundary.
+
+**CS lens — an interface, restated from lesson 1, now describing an
+object's shape instead of a function's.** Lesson 1 named an interface as
+an agreed shape both sides commit to. `usersRepository`'s interface is
+exactly two names — `findAll(filters)`, `insert(name)` — nothing about
+what argument types mean beyond that, nothing about how either method
+is implemented. Anything satisfying that same two-method shape can be
+used wherever a repository is expected. JavaScript never checks this for
+you the way some languages formally check an `interface` keyword — the
+contract here is a real, load-bearing agreement, just not one the
+language itself enforces.
+
 ---
 
 ## Step 3 — The Service Talks Only to the Repository
@@ -111,17 +153,52 @@ job now, exclusively. The business rule and the storage mechanism can now
 change completely independently: swapping `db` for real SQL only touches
 `usersRepository`; adding a new validation rule only touches `usersService`.
 
+**CS lens — cohesion, coupling's opposite-facing companion.** Coupling
+(Step 1) asks how much two *different* things depend on each other.
+**Cohesion** asks the opposite-facing question: how focused is *one*
+thing's job? Before this lesson, `usersService` mixed validation and
+storage logic — low cohesion, two unrelated jobs in one object. After
+this lesson, `usersService` only validates, and `usersRepository` only
+stores — each one is now highly cohesive. The actual engineering goal
+this whole lesson series keeps aiming at is both at once: **high
+cohesion, low coupling** — each piece focused and self-contained,
+depending on its neighbors as little as possible.
+
 **SE lens — the real payoff: a fake repository, swapped in for testing,
 with zero changes to `usersService`.** Because `usersService` only ever
 calls `usersRepository.findAll`/`.insert` — never `db` directly — a test
 could hand it a *completely fake* repository instead: a plain object
-with the same two method names, backed by nothing but a local array,
-with no `db` bridge involved at all. `usersService`'s validation logic
-could be tested in complete isolation this way, without touching real
-storage — this only works because `usersService` depends on a *shape*
-(two method names), not on `db` specifically. This exact idea — swapping
-which real object gets used, as long as it has the right shape — is
-what the next lesson, dependency injection, builds a real mechanism for.
+with the same two method names, backed by nothing but a local array (a
+tiny **in-memory** store, built just for the test, sometimes called a
+**test double** or a **fixture**), with no `db` bridge involved at all.
+`usersService`'s validation logic could be tested in complete isolation
+this way, without touching real storage — this only works because
+`usersService` depends on a *shape* (two method names), not on `db`
+specifically.
+
+**CS lens — polymorphism, the real name for "swap the object, keep the
+shape."** The real `usersRepository` and a fake, array-backed one are
+two completely different objects, built two completely different ways —
+yet anywhere a repository is expected, either one works identically,
+because both satisfy the same two-method shape. Treating genuinely
+different objects identically, because they share a common shape
+(interface), is called **polymorphism** — not the class-inheritance kind
+some languages require, but the more general version JavaScript's
+structural typing gives you for free, already named informally back in
+lesson 1 as a "structural contract."
+
+**SE lens — dependency direction, and the principle it's a real
+instance of.** `usersService` depends on the *repository shape*, not on
+`db` and not on any one specific repository object — the dependency
+points at an abstraction, not at a concrete detail. This is a real,
+named idea in software design, the **Dependency Inversion Principle**:
+higher-level policy (the business rule "a name is required") shouldn't
+depend directly on low-level detail (which specific database is being
+used) — both should depend on a shared abstraction in between. This
+project isn't building the full, formal version of that principle yet —
+the next lesson, dependency injection, is what actually lets you swap
+which real object gets used, as long as it has the right shape — but
+the shape of the idea is already sitting here, one lesson early.
 
 **Connect to the real world.** The repository pattern is a real, named,
 extremely common architecture: Spring Data's `Repository` interfaces,
@@ -145,6 +222,28 @@ Repository   (storage-agnostic: findAll, insert)
    |
 db           (today: an array. Lesson 13: real SQL.)
 ```
+
+**CS lens — a named stack, not just this project's own invention.**
+Controller → Service → Repository is a specific case of a much more
+general, widely-used layering: a **presentation layer** (HTTP in, HTTP
+out), a **business layer** (rules), and a **data access layer** (storage).
+Real, larger backend systems often add more layers still — a distinct
+"entity" or "model" layer describing what a row of data actually looks
+like, for instance — but this three-layer shape, controller/service/
+repository, is already the same real stack under a different name.
+
+**SE lens — an honest caveat: this is not automatically the right
+choice for every project.** A repository is a genuine, valuable pattern
+— and also genuinely unnecessary overhead for a project small enough
+that storage will never change and never needs faking for a test. This
+project builds one because it's about to swap storage for real (lesson
+13) and because testability was worth demonstrating concretely — real
+reasons, not assumed ones. A five-route project that will only ever use
+one database, forever, might reasonably skip this layer entirely and
+let its service talk to storage directly. Adding structure has a real
+cost (more files, more indirection to trace through); it's worth
+adopting for a reason, not by default, on every project, regardless of
+size.
 
 ---
 
@@ -174,6 +273,11 @@ exact coupling this lesson just removed.
 - [ ] You can explain what a repository is and what specific concern it isolates
 - [ ] You can explain what CRUD stands for and name which repository method corresponds to each letter so far
 - [ ] You can explain why a fake, array-backed repository could replace `usersRepository` in a test without changing `usersService` at all
+- [ ] You can explain the difference between coupling and cohesion, using this lesson's before-and-after as the concrete case
+- [ ] You can explain what an abstraction is, using `usersRepository`'s two methods as the example
+- [ ] You can explain why the real and fake repositories are an example of polymorphism
+- [ ] You can explain, in your own words, what the Dependency Inversion Principle means
+- [ ] You can explain when a repository layer is genuinely worth adding, and when it's unnecessary overhead
 
 ---
 

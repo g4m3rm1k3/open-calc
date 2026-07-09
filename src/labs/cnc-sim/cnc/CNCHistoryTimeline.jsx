@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useCncTheme } from "./theme/useCncTheme.js";
 
 function useIsDark() {
   const isDark = () => document.documentElement.classList.contains('dark')
@@ -89,17 +90,18 @@ export default function CNCHistoryTimeline({ params = {} }) {
   const dark = useIsDark()
   const [openIdx, setOpenIdx] = useState(0)
 
+  const _C = useCncTheme();
   const C = {
-    bg:      dark ? '#0f172a' : '#ffffff',
-    surface: dark ? '#1e293b' : '#f8fafc',
-    border: dark ? "rgb(var(--tw-custom-slate-700))" : "rgb(var(--tw-custom-slate-200))",
-    text:    dark ? '#f1f5f9' : '#0f172a',
-    muted:   dark ? '#94a3b8' : '#475569',
-    hint: dark ? "rgb(var(--tw-custom-slate-500))" : "rgb(var(--tw-custom-slate-400))",
-    accent:  dark ? '#818cf8' : '#534AB7',
-    dotIdle: dark ? '#334155' : '#e2e8f0',
-    line:    dark ? '#1e293b' : '#e2e8f0',
-  }
+    bg: _C.vpBg,
+    surface: _C.p1,
+    border: _C.bd,
+    text: _C.txt,
+    muted: _C.txt2,
+    hint: _C.txt3,
+    accent: _C.purple,
+    dotIdle: _C.bd2,
+    line: _C.bd,
+  };
 
   return (
     <div style={{ background: C.bg, borderRadius: 12, padding: '16px 20px', border: `1px solid ${C.border}`, fontFamily: 'system-ui, sans-serif' }}>

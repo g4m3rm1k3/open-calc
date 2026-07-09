@@ -19,6 +19,7 @@ import { useState, useEffect, useRef, useCallback, useMemo, useId } from 'react'
 import Editor from '@monaco-editor/react'
 import { CNCInterpreter } from '../../../scripts/cnc/CNCInterpreter.js'
 import { setupOpenCalcMonaco } from '../../../utils/monacoThemes.js'
+import { useCncTheme } from "./theme/useCncTheme.js";
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
 function useIsDark() {
@@ -34,30 +35,6 @@ function useIsDark() {
   return dark
 }
 
-const makeC = (dark) => ({
-  bg:       dark ? '#060b14'  : '#f8fafc',
-  surface:  dark ? '#0f172a'  : '#ffffff',
-  panel:    dark ? '#111827'  : '#ffffff',
-  border:   dark ? '#1e2d42'  : '#e2e8f0',
-  border2:  dark ? '#273548'  : '#cbd5e1',
-  text: dark ? "rgb(var(--tw-custom-slate-200))" : "rgb(var(--tw-custom-slate-800))",
-  muted:    dark ? '#64748b'  : '#94a3b8',
-  hint:     dark ? '#334155'  : '#cbd5e1',
-  blue: dark ? "rgb(var(--tw-custom-brand-400))" : "rgb(var(--tw-custom-brand-600))",
-  green:    dark ? '#4ade80'  : '#16a34a',
-  amber:    dark ? '#fbbf24'  : '#d97706',
-  red:      dark ? '#f87171'  : '#dc2626',
-  teal: dark ? "rgb(var(--tw-custom-brand-400))" : "rgb(var(--tw-custom-brand-600))",
-  purple:   dark ? '#c084fc'  : '#7c3aed',
-  rapid:    dark ? '#fbbf24'  : '#d97706',
-  feed:     dark ? '#38bdf8'  : '#2563eb',
-  arc:      dark ? '#a78bfa'  : '#7c3aed',
-  traceBg:  dark ? '#04080f'  : '#f1f5f9',
-  editorBg: dark ? '#0c1222'  : '#f8fafc',
-  cellBar:  dark ? '#0f1c2e'  : '#eff6ff',
-  runBtn:   dark ? '#0ea5e9'  : '#0284c7',
-  addBtn:   dark ? '#334155'  : '#e2e8f0',
-})
 
 // ── Known system variable descriptions ───────────────────────────────────────
 const SYS_VAR_DESC = {
@@ -389,7 +366,31 @@ export default function GcodeNotebook({
   const dialect = params.dialect ?? dialectProp
   const height = params.height ?? heightProp
   const isDark = useIsDark()
-  const C = useMemo(() => makeC(isDark), [isDark])
+  const _C = useCncTheme();
+  const C = useMemo(() => ({
+    bg: _C.vpBg,
+    surface: _C.p1,
+    panel: _C.p1,
+    border: _C.bd,
+    border2: _C.bd2,
+    text: _C.txt,
+    muted: _C.txt2,
+    hint: _C.txt3,
+    blue: _C.blue,
+    green: _C.green,
+    amber: _C.amber,
+    red: _C.red,
+    teal: _C.teal,
+    purple: _C.purple,
+    rapid: _C.rapid,
+    feed: _C.feed,
+    arc: _C.arc,
+    traceBg: _C.bg,
+    editorBg: _C.bg,
+    cellBar: _C.p2,
+    runBtn: _C.blue,
+    addBtn: _C.bd2,
+  }), [_C]);
 
   const seed = useMemo(() => {
     const raw = initialCells ?? DEFAULT_CELLS

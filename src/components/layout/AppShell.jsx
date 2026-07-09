@@ -40,8 +40,11 @@ const MiniGolfGame = lazy(() => import("../../games/golf/MiniGolfGame.jsx"));
 const FootballCalculus = lazy(() => import("../../games/football/FootballCalculus.jsx"));
 const ChemistryPage = lazy(() => import("../../labs/chemistry/ChemistryPage.tsx"));
 const PhysicsPage = lazy(() => import("../../labs/physics/PhysicsPage.jsx"));
-import CodeMapBackground from "../backgrounds/CodeMapBackground.jsx";
-import NodePanel from "../backgrounds/NodePanel.jsx";
+// Lazy: pulls in the 250KB+ codebaseGraph.js data file and does adjacency-list
+// computation at module load — only needed when a user opts into graph view
+// (default desktopMode is "home"), so it must not be in every page's bundle.
+const CodeMapBackground = lazy(() => import("../backgrounds/CodeMapBackground.jsx"));
+const NodePanel = lazy(() => import("../backgrounds/NodePanel.jsx"));
 const HomePage = lazy(() => import("../../pages/HomePage.jsx"));
 
 export const meta = {
@@ -526,13 +529,17 @@ export default function AppShell({ children }) {
       <GrapherContext.Provider value={grapherContextValue}>
         <div className={`min-h-screen transition-colors duration-500 relative ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
           {isDesktopRoute && !isMobile && desktopMode === "graph" && (
-            <CodeMapBackground
-              dark={dark}
-              onNodeClick={node => setSelectedNode(node)}
-            />
+            <Suspense fallback={null}>
+              <CodeMapBackground
+                dark={dark}
+                onNodeClick={node => setSelectedNode(node)}
+              />
+            </Suspense>
           )}
           {isDesktopRoute && !isMobile && desktopMode === "graph" && selectedNode && (
-            <NodePanel node={selectedNode} onClose={() => setSelectedNode(null)} />
+            <Suspense fallback={null}>
+              <NodePanel node={selectedNode} onClose={() => setSelectedNode(null)} />
+            </Suspense>
           )}
           {isDesktopRoute && !isMobile && desktopCtxMenu && (
             <>

@@ -1,8 +1,9 @@
-import { useCallback, useReducer, useRef } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import { useGlobalTheme } from "../../context/ThemeContext.jsx";
 import { useThemeColors } from "../../hooks/useThemeColors";
+import { EXTERNAL_WRITE_EVENT } from "../../hooks/useLocalStorage.js";
 import { STUDIO_THEMES } from "../../utils/studioThemes";
-import { backendLabReducer, createInitialState } from "./backendLabReducer";
+import { backendLabReducer, createInitialState, BACKEND_LAB_STORAGE_KEY } from "./backendLabReducer";
 import { runRequest } from "./runRequest";
 import type { HttpRequest } from "./types";
 import LessonPanel from "./LessonPanel";
@@ -58,6 +59,51 @@ export default function BackendLab({ onBack }: BackendLabProps) {
   const postmanWidthRef = useRef(state.postmanWidth);
   lessonWidthRef.current = state.lessonWidth;
   postmanWidthRef.current = state.postmanWidth;
+
+  // Persist a student's code and saved requests — the only part of this
+  // lab's state worth surviving a refresh — every time either changes.
+  // AuthContext.jsx's SYNC_KEYS list (oc-backend-lab) then carries this to
+  // Firestore for any signed-in user, the same mechanism every other synced
+  // feature in this app already uses; nothing Backend Lab-specific needed
+  // on the sync side, only on getting the right key into the right shape.
+  // Writes directly via localStorage.setItem, NOT writeLocalStorageKey —
+  // that helper also dispatches the external-write event below, which
+  // would make this component re-load its own just-written data on every
+  // change (new array references every time, since LOAD_PERSISTED_DATA
+  // always parses fresh objects), thrashing forever.
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        BACKEND_LAB_STORAGE_KEY,
+        JSON.stringify({ files: state.files, savedRequests: state.savedRequests, activeLessonId: state.activeLessonId })
+      );
+    } catch {
+      // localStorage unavailable/full — the student's session still works, just unsaved
+    }
+  }, [state.files, state.savedRequests, state.activeLessonId]);
+
+  // Picks up a Firestore-merged value written to localStorage after this
+  // component already mounted (sign-in resolving async, or another tab's
+  // edit) — the same external-write case useLocalStorage.js handles
+  // internally for plain useState-based state, adapted here for a reducer.
+  useEffect(() => {
+    const onExternalWrite = (e: Event) => {
+      const detail = (e as CustomEvent<{ key: string }>).detail;
+      if (detail?.key !== BACKEND_LAB_STORAGE_KEY) return;
+      try {
+        const raw = window.localStorage.getItem(BACKEND_LAB_STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (Array.isArray(data?.files) && data.files.length > 0) {
+          dispatch({ type: "LOAD_PERSISTED_DATA", data });
+        }
+      } catch {
+        // ignore malformed data — keep whatever's already in state
+      }
+    };
+    window.addEventListener(EXTERNAL_WRITE_EVENT, onExternalWrite);
+    return () => window.removeEventListener(EXTERNAL_WRITE_EVENT, onExternalWrite);
+  }, []);
 
   const handleSelectFile = useCallback((id: string) => dispatch({ type: "SET_ACTIVE_FILE", id }), []);
   const handleAddFile = useCallback(() => {

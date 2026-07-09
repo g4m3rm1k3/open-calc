@@ -15,6 +15,7 @@ import {
   mergeMaxNumericObject,
   mergeNestedKeyedObject,
   mergeCalendarData,
+  mergeBackendLabData,
 } from './progressMigration.ts'
 
 describe('migrateOldProgressKeys', () => {

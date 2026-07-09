@@ -9,7 +9,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 // the merged data — confirmed real bug: two genuinely signed-in devices
 // showing different progress because neither tab ever re-read post-sync
 // data without a full page reload.
-const EXTERNAL_WRITE_EVENT = 'oc-localstorage-external-write'
+export const EXTERNAL_WRITE_EVENT = 'oc-localstorage-external-write'
 
 export function writeLocalStorageKey(key, value) {
   try {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useCncTheme } from "./theme/useCncTheme.js";
 
 function useIsDark() {
   const isDark = () => document.documentElement.classList.contains('dark')
@@ -91,15 +92,16 @@ export default function CNCMachineTypes({ params = {} }) {
   const dark = useIsDark()
   const [activeId, setActiveId] = useState(null)
 
+  const _C = useCncTheme();
   const C = {
-    bg:      dark ? '#0f172a' : '#ffffff',
-    surface: dark ? '#1e293b' : '#f8fafc',
-    border: dark ? "rgb(var(--tw-custom-slate-700))" : "rgb(var(--tw-custom-slate-200))",
-    text:    dark ? '#f1f5f9' : '#0f172a',
-    muted:   dark ? '#94a3b8' : '#475569',
-    hint: dark ? "rgb(var(--tw-custom-slate-500))" : "rgb(var(--tw-custom-slate-400))",
-    specBg:  dark ? '#0f172a' : '#ffffff',
-  }
+    bg: _C.vpBg,
+    surface: _C.p1,
+    border: _C.bd,
+    text: _C.txt,
+    muted: _C.txt2,
+    hint: _C.txt3,
+    specBg: _C.bg,
+  };
 
   const active = activeId ? MACHINES.find(m => m.id === activeId) : null
 

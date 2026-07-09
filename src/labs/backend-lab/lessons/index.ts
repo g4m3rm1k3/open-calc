@@ -232,6 +232,11 @@ export const LESSONS: LessonMeta[] = [
       "You can explain what a repository is and what specific concern it isolates",
       "You can explain what CRUD stands for and name which repository method corresponds to each letter so far",
       "You can explain why a fake, array-backed repository could replace usersRepository in a test without changing usersService at all",
+      "You can explain the difference between coupling and cohesion, using this lesson's before-and-after as the concrete case",
+      "You can explain what an abstraction is, using usersRepository's two methods as the example",
+      "You can explain why the real and fake repositories are an example of polymorphism",
+      "You can explain, in your own words, what the Dependency Inversion Principle means",
+      "You can explain when a repository layer is genuinely worth adding, and when it's unnecessary overhead",
     ],
   },
   {

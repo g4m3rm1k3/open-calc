@@ -47,6 +47,7 @@ const SYNC_KEYS = [
   'oc_formulas',              // saved formulas in Math OS
   'cnc_tool_libraries_v1',    // CNC mill/lathe tool definitions
   'rfl-completed-v2',         // robot-arm-lab mission completions
+  'oc-backend-lab',           // Backend Lab: student's code files + saved API requests
 ]
 
 // Timestamp we write to localStorage after every successful Firestore restore,
