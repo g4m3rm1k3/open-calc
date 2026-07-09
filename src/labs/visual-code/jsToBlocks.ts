@@ -171,20 +171,23 @@ function parseStmt(raw: string): Block | null {
   }
 
   // ── setStyle ─────────────────────────────────────────────────────────────
-  // (document.querySelector('sel') as HTMLElement).style.prop = value
-  // or varName.style.prop = value
+  // (document.querySelector('sel') as HTMLElement).style.prop = 'value'
+  // or varName.style.prop = 'value'
+  // Only matches when the right-hand side is a genuine, fully-quoted string
+  // literal — setStyle's own value field always gets JSON.stringify'd back
+  // out on render (see transpiler.ts), so anything that ISN'T a plain
+  // literal (e.g. `hidden ? '' : 'none'`) must NOT be captured here, or it
+  // round-trips as a broken quoted string instead of the real expression.
+  // Falls through to the generic assign matcher below instead, which
+  // renders its value raw, unquoted.
   if (s.includes('.style.')) {
-    const styleM = s.match(/document\.querySelector\(['"`]([^'"`]+)['"`]\)(?:\s*as\s*\w+)?.*?\.style\.(\w+)\s*=\s*([\s\S]+)/)
+    const styleM = s.match(/document\.querySelector\(['"`]([^'"`]+)['"`]\)(?:\s*as\s*\w+)?.*?\.style\.(\w+)\s*=\s*(['"`])((?:(?!\3).)*)\3$/)
     if (styleM) {
-      const rawVal = styleM[3].trim()
-      const val = rawVal.replace(/^['"`](.*)['"`]$/, '$1')
-      return mkBlock('setStyle', { targetKind: 'selector', selector: styleM[1], property: styleM[2], value: val })
+      return mkBlock('setStyle', { targetKind: 'selector', selector: styleM[1], property: styleM[2], value: styleM[4] })
     }
-    const styleVarM = s.match(/^([A-Za-z_$][\w$]*)\.style\.(\w+)\s*=\s*([\s\S]+)/)
+    const styleVarM = s.match(/^([A-Za-z_$][\w$]*)\.style\.(\w+)\s*=\s*(['"`])((?:(?!\3).)*)\3$/)
     if (styleVarM) {
-      const rawVal = styleVarM[3].trim()
-      const val = rawVal.replace(/^['"`](.*)['"`]$/, '$1')
-      return mkBlock('setStyle', { targetKind: 'variable', variableName: styleVarM[1], property: styleVarM[2], value: val })
+      return mkBlock('setStyle', { targetKind: 'variable', variableName: styleVarM[1], property: styleVarM[2], value: styleVarM[4] })
     }
   }
 

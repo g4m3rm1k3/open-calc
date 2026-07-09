@@ -8,6 +8,7 @@ import {
 import { parseJsToBlocks } from '../../visual-code/jsToBlocks.ts'
 import type { Block, BlockType, FieldSpec, Project } from '../../visual-code/types.ts'
 import type { LabElement, JsFile } from './types'
+import { EXPRESSION_GROUPS, EXPRESSION_LIBRARY, type ExpressionParam } from './jsExpressionLibrary.ts'
 import styles from './VisualJsPanel.module.css'
 
 interface Props {
@@ -439,6 +440,11 @@ function FieldInput({ field, block, onChange, onChangeMulti, domHints, classHint
   if (field.name === 'value' && block.type === 'setStyle') {
     return <CssValueField value={value} property={block.fields?.property ?? ''} onChange={v => onChange(field.name, v)} />
   }
+  // Any general-purpose JS expression field — offers the curated pattern
+  // library, but the raw text stays a normal, always-editable input either way.
+  if (['value', 'expression', 'condition'].includes(field.name) || (field.name === 'text' && block.type === 'htmlText')) {
+    return <ExpressionField label={field.label} value={value} domHints={domHints} variableHints={variableHints} onChange={v => onChange(field.name, v)} />
+  }
 
   return (
     <label className={styles.propRow}>
@@ -530,6 +536,124 @@ function TargetField({ block, domHints, variableHints, onChange }: {
         />
       )}
     </div>
+  )
+}
+
+// ── Expression Field ──────────────────────────────────────────────────────────
+// Same idea as the CSS property/value dropdowns below, for JS instead of CSS:
+// a curated, grouped library of common expressions (find an element, fetch
+// JSON, round a number, uppercase text...) that fills in the real field —
+// which stays a normal, always-editable text input either way. Picking a
+// pattern with parameters (e.g. "Fetch JSON from a URL" needs a URL) shows
+// small inputs for just those parameters and live-composes the final
+// expression as you fill them in.
+
+function ExpressionField({ label, value, domHints, variableHints, onChange }: {
+  label: string
+  value: string
+  domHints: string[]
+  variableHints: string[]
+  onChange: (v: string) => void
+}) {
+  const [templateId, setTemplateId] = useState<string | null>(null)
+  const [paramValues, setParamValues] = useState<Record<string, string>>({})
+  const template = templateId ? EXPRESSION_LIBRARY.find(t => t.id === templateId) ?? null : null
+
+  const handleSelectTemplate = (id: string) => {
+    if (id === '__manual__') { setTemplateId(null); return }
+    const t = EXPRESSION_LIBRARY.find(x => x.id === id)
+    if (!t) return
+    const initial: Record<string, string> = {}
+    for (const param of t.params) initial[param.name] = param.default ?? ''
+    setTemplateId(id)
+    setParamValues(initial)
+    onChange(t.build(initial))
+  }
+
+  const handleParamChange = (name: string, v: string) => {
+    const next = { ...paramValues, [name]: v }
+    setParamValues(next)
+    if (template) onChange(template.build(next))
+  }
+
+  return (
+    <>
+      <label className={styles.propRow}>
+        <span className={styles.propLabel}>Pattern</span>
+        <select
+          className={styles.propInput}
+          aria-label="Expression pattern"
+          value={templateId ?? '__manual__'}
+          onChange={e => handleSelectTemplate(e.target.value)}
+        >
+          <option value="__manual__">✏ type manually</option>
+          {EXPRESSION_GROUPS.map(group => {
+            const items = EXPRESSION_LIBRARY.filter(t => t.group === group.id)
+            if (!items.length) return null
+            return (
+              <optgroup key={group.id} label={group.label}>
+                {items.map(t => <option key={t.id} value={t.id} title={t.description}>{t.label}</option>)}
+              </optgroup>
+            )
+          })}
+        </select>
+      </label>
+      {template?.params.map(param => (
+        <ExpressionParamInput
+          key={param.name}
+          param={param}
+          value={paramValues[param.name] ?? ''}
+          domHints={domHints}
+          variableHints={variableHints}
+          onChange={v => handleParamChange(param.name, v)}
+        />
+      ))}
+      <label className={styles.propRow}>
+        <span className={styles.propLabel}>{label}</span>
+        <input className={styles.propInput} value={value} onChange={e => onChange(e.target.value)} />
+      </label>
+    </>
+  )
+}
+
+function ExpressionParamInput({ param, value, domHints, variableHints, onChange }: {
+  param: ExpressionParam
+  value: string
+  domHints: string[]
+  variableHints: string[]
+  onChange: (v: string) => void
+}) {
+  const hints = param.kind === 'selector' ? domHints : param.kind === 'variable' ? variableHints : []
+  const known = hints.includes(value)
+  const [custom, setCustom] = useState(hints.length > 0 ? (!known && value !== '') : true)
+
+  if (hints.length === 0) {
+    return (
+      <label className={styles.propRow}>
+        <span className={styles.propLabel}>{param.label}</span>
+        <input className={styles.propInput} value={value} onChange={e => onChange(e.target.value)} placeholder={param.placeholder} />
+      </label>
+    )
+  }
+
+  const handleSelect = (v: string) => {
+    if (v === '__custom__') { setCustom(true); return }
+    setCustom(false)
+    onChange(v)
+  }
+
+  return (
+    <label className={styles.propRow}>
+      <span className={styles.propLabel}>{param.label}</span>
+      <select className={styles.propInput} value={custom ? '__custom__' : (value || '__empty__')} onChange={e => handleSelect(e.target.value)}>
+        <option value="__empty__" disabled>— pick —</option>
+        {hints.map(h => <option key={h} value={h}>{h}</option>)}
+        <option value="__custom__">✏ type manually…</option>
+      </select>
+      {custom && (
+        <input className={styles.propInput} value={value} onChange={e => onChange(e.target.value)} placeholder={param.placeholder} autoFocus />
+      )}
+    </label>
   )
 }
 
