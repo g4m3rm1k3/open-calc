@@ -1,4 +1,4 @@
-import VisualCodeStudio from "./VisualCodeStudio";
+import VisualCodeStudio from "./VisualCodeStudio.tsx";
 
 export const meta = {
   label: 'Visual Code Studio',

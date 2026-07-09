@@ -65,7 +65,8 @@
       "Bash(npx eslint *)",
       "Bash(node -e ' *)",
       "Bash(npx vite *)",
-      "Bash(curl -s http://localhost:5174)"
+      "Bash(curl -s http://localhost:5174)",
+      "Bash(node --input-type=module)"
     ]
   }
 }

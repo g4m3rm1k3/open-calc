@@ -5,20 +5,20 @@
   --muted: rgb(var(--tw-custom-slate-500));
   --text: rgb(var(--tw-custom-slate-900));
   --page-bg: rgb(var(--tw-custom-slate-100));
-  
+
   --accent: rgb(var(--tw-custom-brand-500));
   --accent-gradient: linear-gradient(135deg, rgb(var(--tw-custom-brand-400)), rgb(var(--tw-custom-brand-600)));
   --accent-gradient-hover: linear-gradient(135deg, rgb(var(--tw-custom-brand-500)), rgb(var(--tw-custom-brand-700)));
   --accent-shadow: rgba(var(--tw-custom-brand-500) / 0.3);
-  
+
   --code-bg: rgb(var(--tw-custom-slate-100));
   --code-border: rgb(var(--tw-custom-slate-300));
   --code-text: rgb(var(--tw-custom-slate-800));
   --empty-border: rgba(var(--tw-custom-slate-400) / 0.4);
-  
+
   min-height: 100vh;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto auto 1fr;
   
   /* The dynamic theme page background */
   background: var(--page-bg);
@@ -273,14 +273,22 @@
   letter-spacing: 0.5px;
 }
 
+/* ── Block category color tokens (set via data-category attribute) ── */
+[data-category="oop"]    { --block-color: #6366f1; }
+[data-category="state"]  { --block-color: #06b6d4; }
+[data-category="flow"]   { --block-color: #f59e0b; }
+[data-category="output"] { --block-color: #10b981; }
+[data-category="html"]   { --block-color: #f97316; }
+[data-category="types"]  { --block-color: #8b5cf6; }
+
 .paletteBlock,
 .stackBlock {
   border: 1px solid var(--border);
-  border-left: 8px solid var(--block-color);
+  border-left: 8px solid var(--block-color, #475569);
   border-radius: 10px;
   padding: 12px 14px;
   /* Mix the block's specific color with the dynamic slate page background */
-  background: color-mix(in srgb, var(--block-color) 15%, var(--page-bg));
+  background: color-mix(in srgb, var(--block-color, #475569) 15%, var(--page-bg));
   color: var(--text);
   text-align: left;
   box-shadow: 0 2px 10px rgba(0,0,0,0.04);
@@ -296,10 +304,10 @@
 }
 
 .paletteBlock:hover {
-  background: color-mix(in srgb, var(--block-color) 25%, var(--page-bg));
+  background: color-mix(in srgb, var(--block-color, #475569) 25%, var(--page-bg));
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-  border-color: color-mix(in srgb, var(--block-color) 40%, var(--border));
+  border-color: var(--block-color, #475569);
 }
 
 .blockName {
@@ -547,6 +555,120 @@
 
 .hiddenInput {
   display: none;
+}
+
+/* ── File tabs ── */
+.fileTabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 90%, rgba(128,128,128,0.05));
+  overflow-x: auto;
+  min-height: 38px;
+}
+
+.fileTab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  min-height: 36px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.fileTab:hover:not(.fileTabActive) {
+  background: color-mix(in srgb, var(--surface) 80%, rgba(128,128,128,0.05));
+  color: var(--text);
+}
+
+.fileTabActive {
+  background: var(--page-bg);
+  border-color: var(--border);
+  color: var(--text);
+  position: relative;
+}
+
+.fileTabActive::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-gradient);
+}
+
+.fileTabClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.fileTabClose:hover {
+  background: color-mix(in srgb, #ef4444 20%, transparent);
+  color: #ef4444;
+}
+
+.fileTabAdd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  margin-left: 4px;
+  transition: all 0.15s;
+}
+
+.fileTabAdd:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.fileNameInput {
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  min-width: 80px;
+  padding: 1px 4px;
+  outline: none;
+}
+
+/* ── Inline field editor (shown inside selected block) ── */
+.inlineEditor {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  margin-top: 4px;
+  background: color-mix(in srgb, var(--page-bg) 80%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
 
 @supports not (background: color-mix(in srgb, white, black)) {
