@@ -48,6 +48,7 @@ const SYNC_KEYS = [
   'cnc_tool_libraries_v1',    // CNC mill/lathe tool definitions
   'rfl-completed-v2',         // robot-arm-lab mission completions
   'oc-backend-lab',           // Backend Lab: student's code files + saved API requests
+  'oc-learning-time',         // Monty: total foreground learning time
 ]
 
 // Timestamp we write to localStorage after every successful Firestore restore,

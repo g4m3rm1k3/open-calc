@@ -10,6 +10,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage.js'
 import { useAuth } from './AuthContext.jsx'
 import { getLessonIdLookup } from '../courses/courseLoader.js'
 import { migrateOldProgressKeys } from './progressMigration.ts'
+import { celebrate } from '../features/compass/montyNudge.ts'
 
 const MIGRATION_FLAG = '_oc_progress_migrated_v1'
 
@@ -42,18 +43,32 @@ export function ProgressProvider({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Mirrors `progress` without being a dependency of markCheckpoint itself —
+  // reading it via ref (instead of adding `progress` to the callback's deps)
+  // keeps markCheckpoint referentially stable across unrelated progress
+  // changes elsewhere in the app, which several effects key off of.
+  const progressRef = useRef(progress)
+  useEffect(() => { progressRef.current = progress }, [progress])
+
   const markCheckpoint = useCallback((lessonId, checkpoint) => {
+    const existing = progressRef.current[lessonId]?.completedCheckpoints ?? []
+    const isNew = !existing.includes(checkpoint)
     setProgress((prev) => {
-      const existing = prev[lessonId]?.completedCheckpoints ?? []
-      if (existing.includes(checkpoint)) return prev
+      const existingPrev = prev[lessonId]?.completedCheckpoints ?? []
+      if (existingPrev.includes(checkpoint)) return prev
       return {
         ...prev,
         [lessonId]: {
           ...prev[lessonId],
-          completedCheckpoints: [...existing, checkpoint],
+          completedCheckpoints: [...existingPrev, checkpoint],
         },
       }
     })
+    // Monty's "nice work" nudge — only for genuinely new completions, not
+    // a no-op re-mark of something already done.
+    if (isNew) {
+      celebrate(checkpoint === 'quiz-passed' ? 'Quiz passed — nice work! 🎉' : 'Checkpoint complete — nice work! 🎉')
+    }
     // Immediately persist to Firestore so progress is never lost on a crash
     pushNow?.()
   }, [setProgress, pushNow])

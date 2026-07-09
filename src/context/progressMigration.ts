@@ -179,6 +179,27 @@ export function mergeMaxNumericObject(
   return merged
 }
 
+interface LearningTimeData {
+  totalMs?: number
+  [key: string]: unknown
+}
+
+// totalMs only ever grows locally (see useLearningTime.ts's setInterval
+// accumulator), so — same "never regress" philosophy as
+// mergeMaxNumericObject above — the correct merge is the max of the two.
+// This under-counts true total time if someone studies on two devices at
+// once (neither side's accumulation is ever summed with the other's), but
+// it can never lose time either device already recorded, which matters
+// more for a personal stat than exact precision.
+export function mergeLearningTime(
+  local: LearningTimeData | null | undefined,
+  remote: LearningTimeData | null | undefined
+): LearningTimeData {
+  const localMs = Number(local?.totalMs) || 0
+  const remoteMs = Number(remote?.totalMs) || 0
+  return { totalMs: Math.max(localMs, remoteMs) }
+}
+
 interface BackendLabFile {
   id: string
   [key: string]: unknown
@@ -278,4 +299,5 @@ export const SYNC_MERGE_STRATEGIES: Record<string, MergeStrategy> = {
   'oc-rpg-data': mergeKeyedObject,
   'oc-compass': mergeKeyedObject,
   'oc-backend-lab': mergeBackendLabData,
+  'oc-learning-time': mergeLearningTime,
 }

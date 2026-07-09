@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Plan } from './types'
-import { computeNudge, type Nudge } from './montyNudge'
+import { computeNudge, CELEBRATE_EVENT, type Nudge } from './montyNudge'
 
 const POLL_INTERVAL_MS = 5 * 60 * 1000
 const SNOOZE_MS = 30 * 60 * 1000
@@ -48,6 +48,19 @@ export function useMontyNudge(plans: Plan[]) {
     const id = setInterval(check, POLL_INTERVAL_MS)
     return () => clearInterval(id)
   }, [snoozedUntil, dismissed]) // no `plans` — uses ref to avoid firing on every render
+
+  // Real-time completion celebrations bypass the poll/dismissed/snooze
+  // machinery entirely — each one is a fresh, one-off "this just happened"
+  // event, not a re-surfaced reminder about standing state.
+  useEffect(() => {
+    const onCelebrate = (e: Event) => {
+      const message = (e as CustomEvent<{ message: string }>).detail?.message
+      if (!message) return
+      setNudge({ kind: 'celebration', planId: `celebration-${Date.now()}`, message })
+    }
+    window.addEventListener(CELEBRATE_EVENT, onCelebrate)
+    return () => window.removeEventListener(CELEBRATE_EVENT, onCelebrate)
+  }, [])
 
   const dismiss = () => {
     if (!nudge) return

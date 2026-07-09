@@ -53,7 +53,6 @@ export const meta = {
   concept: 'Layout Composition',
   conceptDetail: 'Separating shared chrome (nav, modals, overlays) from page content means pages stay focused. The shell can change structure without touching any page component.',
 }
-import AlphaMascot from "../ui/AlphaMascot.jsx";
 const GameRules = lazy(() => import("../../games/GameRules.jsx"));
 import FullscreenButton from "../desktop/FullscreenButton.jsx";
 import NavClock from "../desktop/NavClock.jsx";
@@ -761,7 +760,6 @@ export default function AppShell({ children }) {
             )}
           </Suspense>
 
-          <AlphaMascot />
         </div>
       </GrapherContext.Provider>
     </ChatProvider>

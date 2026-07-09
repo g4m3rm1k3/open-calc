@@ -5,7 +5,9 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Compass, X, ExternalLink } from 'lucide-react'
 import { useCompass } from './useCompass'
-import { computeDailyWin } from './montyStatus'
+import { computeDailyWin, computeXp, xpToLevel } from './montyStatus'
+import { useLearningTime, formatLearningTime } from './useLearningTime'
+import { useProgress } from '../../hooks/useProgress.js'
 
 export default function CompassQuickPanel({ onClose }: { onClose?: () => void }) {
   const compass = useCompass()
@@ -25,6 +27,9 @@ export default function CompassQuickPanel({ onClose }: { onClose?: () => void })
 
   const win = computeDailyWin(compass.plans)
   const activePlans = compass.plans.filter((p) => p.status === 'active')
+  const { progress } = useProgress() as unknown as { progress: Record<string, { quiz?: { correct: number }; completedCheckpoints?: string[] }> }
+  const { level, xpInLevel } = xpToLevel(computeXp(progress))
+  const learningMs = useLearningTime()
 
   return (
     <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 z-[150] sm:w-80 max-h-[70vh] flex flex-col bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
@@ -40,6 +45,13 @@ export default function CompassQuickPanel({ onClose }: { onClose?: () => void })
             <X size={15} />
           </button>
         </div>
+      </div>
+
+      <div className="flex items-center gap-2.5 px-3 py-1.5 text-[11px] font-semibold text-slate-400 border-b border-slate-800">
+        <span className="text-sky-400">Lv {level}</span>
+        <span>{xpInLevel}/100 XP</span>
+        <span className="text-slate-700">·</span>
+        <span>{formatLearningTime(learningMs)}</span>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3 space-y-3">

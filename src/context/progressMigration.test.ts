@@ -16,6 +16,7 @@ import {
   mergeNestedKeyedObject,
   mergeCalendarData,
   mergeBackendLabData,
+  mergeLearningTime,
 } from './progressMigration.ts'
 
 describe('migrateOldProgressKeys', () => {
@@ -166,5 +167,13 @@ describe('generic sync-key merge strategies', () => {
     const merged = mergeCalendarData(local, remote)
     expect(merged.events!.map(e => e.id).sort()).toEqual(['e1', 'e2'])
     expect(merged.notify).toBe(true) // local wins on the plain config field
+  })
+
+  it('mergeLearningTime takes the max instead of summing, so it can never lose time but also never double-counts', () => {
+    expect(mergeLearningTime({ totalMs: 1000 }, { totalMs: 4000 }).totalMs).toBe(4000)
+    expect(mergeLearningTime({ totalMs: 9000 }, { totalMs: 2000 }).totalMs).toBe(9000)
+    expect(mergeLearningTime(null, { totalMs: 500 }).totalMs).toBe(500)
+    expect(mergeLearningTime({ totalMs: 500 }, undefined).totalMs).toBe(500)
+    expect(mergeLearningTime(null, null).totalMs).toBe(0)
   })
 })

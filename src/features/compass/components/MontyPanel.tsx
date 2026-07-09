@@ -11,7 +11,8 @@ import PlanIntake from './PlanIntake'
 import IntakeQuestions from './IntakeQuestions'
 import PlanBreakdown from './PlanBreakdown'
 import GoalMap from './GoalMap'
-import { computeDailyWin } from '../montyStatus'
+import { computeDailyWin, computeXp, xpToLevel } from '../montyStatus'
+import { useLearningTime, formatLearningTime } from '../useLearningTime'
 
 interface MontyPanelProps {
   plans: Plan[]
@@ -104,6 +105,9 @@ export default function MontyPanel({
   const [activeTab, setActiveTab] = useState<'chat' | 'map'>('chat')
 
   const win = computeDailyWin(plans)
+  const xp = computeXp(progress)
+  const { level, xpInLevel } = xpToLevel(xp)
+  const learningMs = useLearningTime()
 
   const buildContext = (): AppContext => ({
     currentPage: location.pathname,
@@ -189,6 +193,14 @@ export default function MontyPanel({
         <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700 transition-colors">
           <X size={16} />
         </button>
+      </div>
+
+      {/* Stats bar — XP/level from quiz + checkpoint progress, learning time from foreground app time */}
+      <div className="px-4 py-2 flex items-center gap-3 text-[11px] font-semibold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 shrink-0">
+        <span className="text-sky-600 dark:text-sky-400">Lv {level}</span>
+        <span>{xpInLevel}/100 XP</span>
+        <span className="text-slate-300 dark:text-slate-700">·</span>
+        <span>{formatLearningTime(learningMs)} learning time</span>
       </div>
 
       {/* Daily Win Bar */}

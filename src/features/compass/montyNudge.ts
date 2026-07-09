@@ -5,13 +5,24 @@
 import type { Plan, PlanAction } from './types'
 import { isActionDueToday } from './montyStatus'
 
-export type NudgeKind = 'blocked-streak' | 'overdue' | 'daily-summary'
+export type NudgeKind = 'blocked-streak' | 'overdue' | 'daily-summary' | 'celebration'
 
 export interface Nudge {
   kind: NudgeKind
   planId: string
   actionId?: string
   message: string
+}
+
+// Fired the moment a lesson checkpoint/quiz completes (see markCheckpoint in
+// ProgressContext.jsx) — decoupled the same way notifications.ts's
+// 'oc-notification' event decouples the scheduler from its UI. useMontyNudge
+// listens and surfaces it immediately, instead of waiting on the 5-minute
+// poll that drives the plan-based nudges above.
+export const CELEBRATE_EVENT = 'oc-monty-celebrate'
+
+export function celebrate(message: string) {
+  window.dispatchEvent(new CustomEvent(CELEBRATE_EVENT, { detail: { message } }))
 }
 
 function hasBlockedStreak(action: PlanAction, minStreak = 2): boolean {

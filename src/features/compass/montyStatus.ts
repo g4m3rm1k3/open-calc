@@ -1,5 +1,21 @@
 import type { Plan, PlanAction } from './types'
 
+type LessonProgress = { quiz?: { correct: number }; completedCheckpoints?: string[] }
+
+// Same formula the old desktop mascot used for its XP bar — kept here so
+// Monty (the Compass chat) can report the same numbers now that it owns
+// this job instead.
+export function computeXp(progress: Record<string, LessonProgress>): number {
+  return Object.values(progress).reduce(
+    (sum, p) => sum + (p.quiz?.correct ?? 0) * 5 + (p.completedCheckpoints?.length ?? 0) * 2,
+    0
+  )
+}
+
+export function xpToLevel(xp: number): { level: number; xpInLevel: number } {
+  return { level: Math.floor(xp / 100) + 1, xpInLevel: xp % 100 }
+}
+
 // Simple approximation for daily/weekdays — shared by computeDailyWin here
 // and montyNudge.ts so both agree on what "due today" means.
 export function isActionDueToday(action: PlanAction, now: Date = new Date()): boolean {
