@@ -125,15 +125,21 @@ function parseStmt(raw: string): Block | null {
 
   // ── Event listener ───────────────────────────────────────────────────────
   // document.querySelector('sel')?.addEventListener('evt', (event) => { ... });
+  // or, just as commonly, a variable captured earlier:
+  // varName?.addEventListener('evt', (event) => { ... });
   if (s.includes('addEventListener')) {
     const selM = s.match(/document\.querySelector\(['"`]([^'"`]+)['"`]\)/)
+    const varM = !selM ? s.match(/^([A-Za-z_$][\w$]*)\??\.addEventListener\(/) : null
     const evtM = s.match(/\.addEventListener\(['"`]([^'"`]+)['"`]/)
     const addIdx = s.indexOf('addEventListener')
     const braceOpen = addIdx !== -1 ? s.indexOf('{', addIdx) : -1
-    if (selM && evtM && braceOpen !== -1) {
+    if ((selM || varM) && evtM && braceOpen !== -1) {
       const braceClose = matchBrace(s, braceOpen)
       const children = parseJsToBlocks(s.slice(braceOpen + 1, braceClose))
-      return mkBlock('event', { selector: selM[1], event: evtM[1] }, children)
+      const target = selM
+        ? { targetKind: 'selector', selector: selM[1], variableName: '' }
+        : { targetKind: 'variable', variableName: varM![1], selector: '' }
+      return mkBlock('event', { ...target, event: evtM[1] }, children)
     }
   }
 
@@ -154,40 +160,62 @@ function parseStmt(raw: string): Block | null {
   }
 
   // ── classList ────────────────────────────────────────────────────────────
+  const CLASS_MAP = { add: 'addClass', remove: 'removeClass', toggle: 'toggleClass' } as const
   const clsM = s.match(/document\.querySelector\(['"`]([^'"`]+)['"`]\)\??\.classList\.(add|remove|toggle)\(['"`]([^'"`]+)['"`]\)/)
   if (clsM) {
-    const map = { add: 'addClass', remove: 'removeClass', toggle: 'toggleClass' } as const
-    return mkBlock(map[clsM[2] as keyof typeof map], { selector: clsM[1], className: clsM[3] })
+    return mkBlock(CLASS_MAP[clsM[2] as keyof typeof CLASS_MAP], { targetKind: 'selector', selector: clsM[1], className: clsM[3] })
+  }
+  const clsVarM = s.match(/^([A-Za-z_$][\w$]*)\??\.classList\.(add|remove|toggle)\(['"`]([^'"`]+)['"`]\)/)
+  if (clsVarM) {
+    return mkBlock(CLASS_MAP[clsVarM[2] as keyof typeof CLASS_MAP], { targetKind: 'variable', variableName: clsVarM[1], className: clsVarM[3] })
   }
 
   // ── setStyle ─────────────────────────────────────────────────────────────
   // (document.querySelector('sel') as HTMLElement).style.prop = value
+  // or varName.style.prop = value
   if (s.includes('.style.')) {
     const styleM = s.match(/document\.querySelector\(['"`]([^'"`]+)['"`]\)(?:\s*as\s*\w+)?.*?\.style\.(\w+)\s*=\s*([\s\S]+)/)
     if (styleM) {
       const rawVal = styleM[3].trim()
       const val = rawVal.replace(/^['"`](.*)['"`]$/, '$1')
-      return mkBlock('setStyle', { selector: styleM[1], property: styleM[2], value: val })
+      return mkBlock('setStyle', { targetKind: 'selector', selector: styleM[1], property: styleM[2], value: val })
+    }
+    const styleVarM = s.match(/^([A-Za-z_$][\w$]*)\.style\.(\w+)\s*=\s*([\s\S]+)/)
+    if (styleVarM) {
+      const rawVal = styleVarM[3].trim()
+      const val = rawVal.replace(/^['"`](.*)['"`]$/, '$1')
+      return mkBlock('setStyle', { targetKind: 'variable', variableName: styleVarM[1], property: styleVarM[2], value: val })
     }
   }
 
   // ── htmlText ─────────────────────────────────────────────────────────────
   // document.querySelector('sel').textContent = String(val)
+  // or varName.textContent = String(val)
   if (s.includes('textContent') || s.includes('innerText')) {
     const txtM = s.match(/document\.querySelector\(['"`]([^'"`]+)['"`]\)\??\.(?:textContent|innerText)\s*=\s*([\s\S]+)/)
     if (txtM) {
       let text = txtM[2].trim()
       const wrap = text.match(/^String\((.+)\)$/)
       if (wrap) text = wrap[1]
-      return mkBlock('htmlText', { selector: txtM[1], text })
+      return mkBlock('htmlText', { targetKind: 'selector', selector: txtM[1], text })
+    }
+    const txtVarM = s.match(/^([A-Za-z_$][\w$]*)\??\.(?:textContent|innerText)\s*=\s*([\s\S]+)/)
+    if (txtVarM) {
+      let text = txtVarM[2].trim()
+      const wrap = text.match(/^String\((.+)\)$/)
+      if (wrap) text = wrap[1]
+      return mkBlock('htmlText', { targetKind: 'variable', variableName: txtVarM[1], text })
     }
   }
 
   // ── readValue ────────────────────────────────────────────────────────────
   // const name = (document.querySelector('sel') as HTMLInputElement).value
+  // or const name = varName.value
   if (s.includes('.value') && /^(?:const|let|var)/.test(s)) {
     const readM = s.match(/^(?:const|let|var)\s+(\w+)\s*=\s*\(?document\.querySelector\(['"`]([^'"`]+)['"`]\)(?:\s*as\s*\w+)?\)?\.value/)
-    if (readM) return mkBlock('readValue', { name: readM[1], selector: readM[2] })
+    if (readM) return mkBlock('readValue', { name: readM[1], targetKind: 'selector', selector: readM[2] })
+    const readVarM = s.match(/^(?:const|let|var)\s+(\w+)\s*=\s*([A-Za-z_$][\w$]*)\.value/)
+    if (readVarM) return mkBlock('readValue', { name: readVarM[1], targetKind: 'variable', variableName: readVarM[2] })
   }
 
   // ── Variable declaration ─────────────────────────────────────────────────

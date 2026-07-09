@@ -274,34 +274,41 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
   }),
 
   // ── HTML ─────────────────────────────────────────────────────────────────
+  // All seven of these share the same "target" concept — which element this
+  // block acts on — and every one can point at either a raw CSS selector or
+  // an already-declared variable (e.g. `const btn = document.querySelector(...)`
+  // earlier in the file). targetKind/variableName aren't listed in `fields`
+  // because the palette renders them as one combined dropdown (TargetField
+  // in VisualJsPanel.tsx), not three separate raw inputs — but they're real,
+  // explicit data on the block, not inferred from the selector string.
   def('event', 'Event Listener', 'html', 'Run code when the user interacts with an element.', {
-    defaults: { selector: '#scoreButton', event: 'click' },
+    defaults: { targetKind: 'selector', selector: '#scoreButton', variableName: '', event: 'click' },
     childTypes: ['variable', 'assign', 'call', 'log', 'if', 'loop', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle'],
-    fields: [f('selector', 'CSS selector'), f('event', 'Event type')],
+    fields: [f('selector', 'Target (element or variable)'), f('event', 'Event type')],
   }),
   def('htmlText', 'HTML Text', 'html', 'Write a value into an element the user can see.', {
-    defaults: { selector: '#message', text: 'player.label' },
-    fields: [f('selector', 'CSS selector'), f('text', 'Text expression')],
+    defaults: { targetKind: 'selector', selector: '#message', variableName: '', text: 'player.label' },
+    fields: [f('selector', 'Target (element or variable)'), f('text', 'Text expression')],
   }),
   def('readValue', 'Read Value', 'html', 'Read what a user typed into an input field.', {
-    defaults: { name: 'userInput', selector: '' },
-    fields: [f('name', 'Store in variable'), f('selector', 'Input element')],
+    defaults: { name: 'userInput', targetKind: 'selector', selector: '', variableName: '' },
+    fields: [f('name', 'Store in variable'), f('selector', 'Target (element or variable)')],
   }),
   def('addClass', 'Add Class', 'html', 'Add a CSS class to an element to change how it looks.', {
-    defaults: { selector: '', className: 'active' },
-    fields: [f('selector', 'Element'), f('className', 'Class to add')],
+    defaults: { targetKind: 'selector', selector: '', variableName: '', className: 'active' },
+    fields: [f('selector', 'Target (element or variable)'), f('className', 'Class to add')],
   }),
   def('removeClass', 'Remove Class', 'html', 'Remove a CSS class from an element.', {
-    defaults: { selector: '', className: 'active' },
-    fields: [f('selector', 'Element'), f('className', 'Class to remove')],
+    defaults: { targetKind: 'selector', selector: '', variableName: '', className: 'active' },
+    fields: [f('selector', 'Target (element or variable)'), f('className', 'Class to remove')],
   }),
   def('toggleClass', 'Toggle Class', 'html', 'Add a class if absent, remove it if present.', {
-    defaults: { selector: '', className: 'active' },
-    fields: [f('selector', 'Element'), f('className', 'Class to toggle')],
+    defaults: { targetKind: 'selector', selector: '', variableName: '', className: 'active' },
+    fields: [f('selector', 'Target (element or variable)'), f('className', 'Class to toggle')],
   }),
   def('setStyle', 'Set Style', 'html', 'Set a CSS style property directly on an element.', {
-    defaults: { selector: '', property: 'display', value: 'none' },
-    fields: [f('selector', 'Element'), f('property', 'CSS property'), f('value', 'Value')],
+    defaults: { targetKind: 'selector', selector: '', variableName: '', property: 'display', value: 'none' },
+    fields: [f('selector', 'Target (element or variable)'), f('property', 'CSS property'), f('value', 'Value')],
   }),
 ]
 
@@ -333,6 +340,11 @@ export function createBlock(type: BlockType): Block {
   }
 }
 
+// The same element-or-variable target every DOM-facing block below points at.
+function targetSummary(f: Record<string, string>): string {
+  return f.targetKind === 'variable' ? (f.variableName || '?') : (f.selector || '?')
+}
+
 export function summarizeBlock(block: Block): string {
   const f = block.fields ?? {}
   switch (block.type) {
@@ -356,13 +368,13 @@ export function summarizeBlock(block: Block): string {
     case 'if':           return `if (${f.condition || 'true'})`
     case 'loop':         return `repeat ${f.count || '0'} as ${f.iterator || 'i'}`
     case 'log':          return `console.log(${f.expression || ''})`
-    case 'event':        return `${f.selector || '#app'} on ${f.event || 'click'}`
-    case 'htmlText':     return `${f.selector || '#app'} ← ${f.text || ''}`
-    case 'readValue':    return `${f.name || 'val'} = ${f.selector || '?'}.value`
-    case 'addClass':     return `${f.selector || '?'}.classList.add('${f.className || ''}')`
-    case 'removeClass':  return `${f.selector || '?'}.classList.remove('${f.className || ''}')`
-    case 'toggleClass':  return `${f.selector || '?'}.classList.toggle('${f.className || ''}')`
-    case 'setStyle':     return `${f.selector || '?'}.style.${f.property || 'display'} = '${f.value || ''}'`
+    case 'event':        return `${targetSummary(f)} on ${f.event || 'click'}`
+    case 'htmlText':     return `${targetSummary(f)} ← ${f.text || ''}`
+    case 'readValue':    return `${f.name || 'val'} = ${targetSummary(f)}.value`
+    case 'addClass':     return `${targetSummary(f)}.classList.add('${f.className || ''}')`
+    case 'removeClass':  return `${targetSummary(f)}.classList.remove('${f.className || ''}')`
+    case 'toggleClass':  return `${targetSummary(f)}.classList.toggle('${f.className || ''}')`
+    case 'setStyle':     return `${targetSummary(f)}.style.${f.property || 'display'} = '${f.value || ''}'`
     default:             return Object.values(f).filter(Boolean).join(' ')
   }
 }

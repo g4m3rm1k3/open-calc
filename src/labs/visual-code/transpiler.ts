@@ -202,24 +202,31 @@ function renderBlock(item: Block, depth: number, diags: Diagnostic[], lang: 'jav
     }
     case 'event': {
       const body = renderChildren(item, depth + 1, diags, lang)
-      return `${pad}document.querySelector(${JSON.stringify(f.selector || '#app')})?.addEventListener(${JSON.stringify(f.event || 'click')}, (event) => {\n${body || `${INDENT.repeat(depth + 1)}// Add event handler blocks here.`}\n${pad}});`
+      const target = targetExpr(f, diags, item, '#app')
+      return `${pad}${target}?.addEventListener(${JSON.stringify(f.event || 'click')}, (event) => {\n${body || `${INDENT.repeat(depth + 1)}// Add event handler blocks here.`}\n${pad}});`
     }
     case 'htmlText':
-      return `${pad}document.querySelector(${JSON.stringify(f.selector || '#app')}).textContent = String(${val(f.text, '""')});`
+      return `${pad}${targetExpr(f, diags, item, '#app')}.textContent = String(${val(f.text, '""')});`
     case 'readValue': {
-      const cast = lang === 'typescript' ? ' as HTMLInputElement' : ''
-      return `${pad}const ${safeId(f.name, 'inputVal', diags, item)} = (document.querySelector(${JSON.stringify(f.selector || '#input')})${cast}).value;`
+      const isVar = f.targetKind === 'variable'
+      const cast = !isVar && lang === 'typescript' ? ' as HTMLInputElement' : ''
+      const target = targetExpr(f, diags, item, '#input')
+      const wrapped = isVar ? target : `(${target}${cast})`
+      return `${pad}const ${safeId(f.name, 'inputVal', diags, item)} = ${wrapped}.value;`
     }
     case 'addClass':
-      return `${pad}document.querySelector(${JSON.stringify(f.selector || '#app')})?.classList.add(${JSON.stringify(f.className || '')});`
+      return `${pad}${targetExpr(f, diags, item, '#app')}?.classList.add(${JSON.stringify(f.className || '')});`
     case 'removeClass':
-      return `${pad}document.querySelector(${JSON.stringify(f.selector || '#app')})?.classList.remove(${JSON.stringify(f.className || '')});`
+      return `${pad}${targetExpr(f, diags, item, '#app')}?.classList.remove(${JSON.stringify(f.className || '')});`
     case 'toggleClass':
-      return `${pad}document.querySelector(${JSON.stringify(f.selector || '#app')})?.classList.toggle(${JSON.stringify(f.className || '')});`
+      return `${pad}${targetExpr(f, diags, item, '#app')}?.classList.toggle(${JSON.stringify(f.className || '')});`
     case 'setStyle': {
       const prop = (f.property || 'display').replace(/-([a-z])/g, (_: string, c: string) => c.toUpperCase())
-      const cast = lang === 'typescript' ? ' as HTMLElement' : ''
-      return `${pad}(document.querySelector(${JSON.stringify(f.selector || '#app')})${cast}).style.${prop} = ${JSON.stringify(f.value || '')};`
+      const isVar = f.targetKind === 'variable'
+      const cast = !isVar && lang === 'typescript' ? ' as HTMLElement' : ''
+      const target = targetExpr(f, diags, item, '#app')
+      const wrapped = isVar ? target : `(${target}${cast})`
+      return `${pad}${wrapped}.style.${prop} = ${JSON.stringify(f.value || '')};`
     }
 
     // TypeScript-only blocks
@@ -314,6 +321,17 @@ function renderChildren(
     .map(child => renderer(child, depth, diags, lang))
     .filter(Boolean)
     .join('\n')
+}
+
+// Resolves the shared "target" concept every DOM-facing block (event,
+// htmlText, readValue, addClass/removeClass/toggleClass, setStyle) points
+// at — either a fresh `document.querySelector(sel)` lookup, or a bare
+// reference to a variable the student already captured earlier in the file
+// (e.g. `const btn = document.querySelector('#btn')` then later reusing
+// `btn`). Explicit via targetKind, not inferred from the selector string.
+function targetExpr(f: Record<string, string>, diags: Diagnostic[], item: Block, fallbackSelector: string): string {
+  if (f.targetKind === 'variable') return safeId(f.variableName, 'el', diags, item)
+  return `document.querySelector(${JSON.stringify(f.selector || fallbackSelector)})`
 }
 
 function safeId(value: string | undefined, fallback: string, diags: Diagnostic[], item: Block): string {

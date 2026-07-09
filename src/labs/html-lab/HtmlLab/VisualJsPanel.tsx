@@ -70,6 +70,24 @@ export default function VisualJsPanel({ elements, html, css = '', jsFiles, activ
     return [...names]
   }, [domHints, css])
 
+  // Variable names declared anywhere in this file's own blocks (Variable /
+  // Read Value) — offered as an explicit alternative to a raw CSS selector
+  // wherever a block needs a target element, e.g. an event listener attached
+  // to `btn` after `const btn = document.querySelector('#btn')` earlier.
+  // Not real scope analysis — just "names declared somewhere in this file,"
+  // same approximation domHints/classHints already make.
+  const variableHints = useMemo(() => {
+    const names: string[] = []
+    const walk = (bs: Block[]) => {
+      for (const b of bs) {
+        if ((b.type === 'variable' || b.type === 'readValue') && b.fields?.name) names.push(b.fields.name)
+        walk(b.children ?? [])
+      }
+    }
+    walk(blocks)
+    return [...new Set(names)]
+  }, [blocks])
+
   const onCodeChangeRef = useRef(onCodeChange)
   useEffect(() => { onCodeChangeRef.current = onCodeChange })
   useEffect(() => {
@@ -116,6 +134,14 @@ export default function VisualJsPanel({ elements, html, css = '', jsFiles, activ
 
   function updateField(blockId: string, name: string, value: string) {
     commit(bs => updateBlock(bs, blockId, b => ({ ...b, fields: { ...b.fields, [name]: value } })))
+  }
+
+  // For controls that set several fields atomically — e.g. picking a target
+  // from the combined element/variable dropdown sets targetKind + selector +
+  // variableName together, so the block is never left in a state where the
+  // kind and the value it's paired with disagree.
+  function updateFields(blockId: string, patch: Record<string, string>) {
+    commit(bs => updateBlock(bs, blockId, b => ({ ...b, fields: { ...b.fields, ...patch } })))
   }
 
   const importFromJs = useCallback((code: string, fileId: string) => {
@@ -245,8 +271,10 @@ export default function VisualJsPanel({ elements, html, css = '', jsFiles, activ
                   onMove={(id, dir) => commit(bs => moveBlock(bs, id, dir))}
                   onAddChild={addBlock}
                   onUpdateField={updateField}
+                  onUpdateFields={updateFields}
                   domHints={domHints}
                   classHints={classHints}
+                  variableHints={variableHints}
                 />
               ))
             )}
@@ -268,12 +296,14 @@ interface BlockRowProps {
   onMove: (id: string, dir: 'up' | 'down') => void
   onAddChild: (type: BlockType, parentId: string) => void
   onUpdateField: (blockId: string, name: string, value: string) => void
+  onUpdateFields: (blockId: string, patch: Record<string, string>) => void
   domHints: string[]
   classHints: string[]
+  variableHints: string[]
   depth?: number
 }
 
-function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChild, onUpdateField, domHints, classHints, depth = 0 }: BlockRowProps) {
+function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChild, onUpdateField, onUpdateFields, domHints, classHints, variableHints, depth = 0 }: BlockRowProps) {
   const def = blockDefinition(block.type)
   const childOptions = childOptionsFor(block.type)
   const isSelected = selectedBlockId === block.id
@@ -302,8 +332,10 @@ function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChi
                 field={field}
                 block={block}
                 onChange={(name, value) => onUpdateField(block.id, name, value)}
+                onChangeMulti={(patch) => onUpdateFields(block.id, patch)}
                 domHints={domHints}
                 classHints={classHints}
+                variableHints={variableHints}
               />
             ))}
           </div>
@@ -324,8 +356,10 @@ function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChi
               onMove={onMove}
               onAddChild={onAddChild}
               onUpdateField={onUpdateField}
+              onUpdateFields={onUpdateFields}
               domHints={domHints}
               classHints={classHints}
+              variableHints={variableHints}
               depth={depth + 1}
             />
           ))}
@@ -379,17 +413,19 @@ const CSS_PROP_VALUES: Record<string, string[]> = {
 
 // ── Field Input ───────────────────────────────────────────────────────────────
 
-function FieldInput({ field, block, onChange, domHints, classHints }: {
+function FieldInput({ field, block, onChange, onChangeMulti, domHints, classHints, variableHints }: {
   field: FieldSpec
   block: Block
   onChange: (name: string, value: string) => void
+  onChangeMulti: (patch: Record<string, string>) => void
   domHints: string[]
   classHints: string[]
+  variableHints: string[]
 }) {
   const value = block.fields?.[field.name] ?? ''
 
   if (field.name === 'selector') {
-    return <SelectorField value={value} domHints={domHints} onChange={v => onChange(field.name, v)} />
+    return <TargetField block={block} domHints={domHints} variableHints={variableHints} onChange={onChangeMulti} />
   }
   if (field.name === 'event') {
     return <EventTypeField value={value} onChange={v => onChange(field.name, v)} />
@@ -420,43 +456,75 @@ function FieldInput({ field, block, onChange, domHints, classHints }: {
   )
 }
 
-// ── Selector Field ────────────────────────────────────────────────────────────
+// ── Target Field ──────────────────────────────────────────────────────────────
+// One combined dropdown for the "which element does this act on" question
+// every DOM-facing block asks. Explicit, not inferred: picking from "By ID" /
+// "By class" / "By tag" sets targetKind: 'selector'; picking from "Variables"
+// sets targetKind: 'variable' — the block always knows which kind of target
+// it has, it's never guessed from the string's shape.
 
-function SelectorField({ value, domHints, onChange }: { value: string; domHints: string[]; onChange: (v: string) => void }) {
+function TargetField({ block, domHints, variableHints, onChange }: {
+  block: Block
+  domHints: string[]
+  variableHints: string[]
+  onChange: (patch: Record<string, string>) => void
+}) {
+  const targetKind = block.fields?.targetKind === 'variable' ? 'variable' : 'selector'
+  const selector = block.fields?.selector ?? ''
+  const variableName = block.fields?.variableName ?? ''
+  const currentValue = targetKind === 'variable' ? variableName : selector
+  const knownValue = targetKind === 'variable' ? variableHints.includes(currentValue) : domHints.includes(currentValue)
+  const [custom, setCustom] = useState(targetKind === 'selector' && currentValue !== '' && !knownValue)
+
   const ids     = domHints.filter(h => h.startsWith('#'))
   const classes = domHints.filter(h => h.startsWith('.'))
   const tags    = domHints.filter(h => !h.startsWith('#') && !h.startsWith('.'))
-  const inList  = domHints.includes(value)
-  const [custom, setCustom] = useState(!inList && value !== '')
+  const hasOptions = ids.length > 0 || classes.length > 0 || tags.length > 0 || variableHints.length > 0
 
   const handleSelect = (v: string) => {
     if (v === '__custom__') { setCustom(true); return }
-    setCustom(false); onChange(v)
+    setCustom(false)
+    if (v.startsWith('__var__:')) {
+      onChange({ targetKind: 'variable', variableName: v.slice('__var__:'.length), selector: '' })
+    } else {
+      onChange({ targetKind: 'selector', selector: v, variableName: '' })
+    }
   }
+
+  const selectValue = custom
+    ? '__custom__'
+    : targetKind === 'variable'
+      ? (variableName ? `__var__:${variableName}` : '__empty__')
+      : (selector || '__empty__')
 
   return (
     <div className={styles.propRow}>
-      <span className={styles.propLabel}>Element</span>
-      {domHints.length > 0 && (
+      <span className={styles.propLabel}>Target</span>
+      {hasOptions && (
         <select
           className={styles.propInput}
-          aria-label="Target element"
-          value={custom ? '__custom__' : (value || '__empty__')}
+          aria-label="Target element or variable"
+          value={selectValue}
           onChange={e => handleSelect(e.target.value)}
         >
-          <option value="__empty__" disabled>— pick an element —</option>
+          <option value="__empty__" disabled>— pick an element or variable —</option>
           {ids.length > 0 && <optgroup label="By ID">{ids.map(h => <option key={h} value={h}>{h}</option>)}</optgroup>}
           {classes.length > 0 && <optgroup label="By class">{classes.map(h => <option key={h} value={h}>{h}</option>)}</optgroup>}
           {tags.length > 0 && <optgroup label="By tag">{tags.map(h => <option key={h} value={h}>{h}</option>)}</optgroup>}
+          {variableHints.length > 0 && (
+            <optgroup label="Variables">
+              {variableHints.map(v => <option key={v} value={`__var__:${v}`}>{v}</option>)}
+            </optgroup>
+          )}
           <option value="__custom__">✏ type manually…</option>
         </select>
       )}
-      {(custom || domHints.length === 0) && (
+      {(custom || !hasOptions) && (
         <input
           className={styles.propInput}
           aria-label="CSS selector"
-          value={value}
-          onChange={e => onChange(e.target.value)}
+          value={selector}
+          onChange={e => onChange({ targetKind: 'selector', selector: e.target.value, variableName: '' })}
           placeholder="#id or .class or tag"
           autoFocus
         />
