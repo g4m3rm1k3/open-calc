@@ -12,7 +12,7 @@ export type BlockType =
   // Output
   | 'log'
   // HTML
-  | 'event' | 'htmlText'
+  | 'event' | 'htmlText' | 'readValue' | 'addClass' | 'removeClass' | 'toggleClass' | 'setStyle'
   // TypeScript-only
   | 'interface' | 'interfaceField' | 'typeAlias' | 'enum' | 'enumMember'
 

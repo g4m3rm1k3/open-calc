@@ -20,6 +20,7 @@ import { EMPTY_PROJECT, EXAMPLES } from './examples.ts'
 import { buildRunnableHtml } from './runJavaScript.ts'
 import { BlockPalette, ProgramPanel, OutputPanel } from './VisualCodePanels.tsx'
 import ConceptPanel from './ConceptPanel.tsx'
+import { parseJsToBlocks } from './jsToBlocks.ts'
 import styles from './VisualCodeStudio.module.css'
 import type { Block, BlockType, Project, ProjectFile } from './types'
 
@@ -47,7 +48,8 @@ interface Props {
 type RightTab = 'concept' | 'code' | 'run' | 'preview' | 'data'
 
 export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onProjectChange, onCodeChange, onBack }: Props) {
-  const { openWindow } = useDesktop()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { openWindow } = useDesktop() as any
   const [project, setProject] = useState<Project>(() => normalizeProject(cloneProject(initialProject)))
   const [query, setQuery] = useState('')
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null)
@@ -56,7 +58,10 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
   const [saveState, setSaveState] = useState<'idle' | 'dirty' | 'saved'>('idle')
   const [editingFileName, setEditingFileName] = useState<string | null>(null)
   const [showExamples, setShowExamples] = useState(false)
+  const [showJsImport, setShowJsImport] = useState(false)
+  const [jsImportCode, setJsImportCode] = useState('')
   const importRef = useRef<HTMLInputElement>(null)
+  const jsFileRef = useRef<HTMLInputElement>(null)
   const previewRef = useRef<HTMLIFrameElement>(null)
 
   const file = activeFile(project)
@@ -162,6 +167,28 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
     setShowExamples(false)
   }
 
+  function applyJsImport(code: string) {
+    const imported = parseJsToBlocks(code)
+    if (!imported.length) return
+    commitBlocks(() => imported)
+    setSelectedBlockId(null)
+  }
+
+  function confirmJsImport() {
+    applyJsImport(jsImportCode)
+    setJsImportCode('')
+    setShowJsImport(false)
+  }
+
+  function importJsFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => applyJsImport(String(reader.result ?? ''))
+    reader.readAsText(file)
+  }
+
   function importProject(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     e.target.value = ''
@@ -192,6 +219,7 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
   return (
     <section className={styles.studio}>
       <input ref={importRef} type="file" accept=".json,.vcproject.json" className={styles.hiddenInput} onChange={importProject} />
+      <input ref={jsFileRef} type="file" accept=".js,.ts,.jsx,.tsx" className={styles.hiddenInput} onChange={importJsFile} />
 
       {/* ── Single-row topbar ── */}
       <header className={styles.topbar}>
@@ -277,6 +305,12 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
               <div className={styles.moreMenu} onMouseLeave={() => setShowMore(false)}>
                 <button type="button" className={styles.moreItem} onClick={() => { importRef.current?.click(); setShowMore(false) }}>
                   <FolderOpen size={14} /> Import project
+                </button>
+                <button type="button" className={styles.moreItem} onClick={() => { jsFileRef.current?.click(); setShowMore(false) }}>
+                  <FileCode size={14} /> Upload .js file → blocks
+                </button>
+                <button type="button" className={styles.moreItem} onClick={() => { setShowJsImport(true); setShowMore(false) }}>
+                  <FileCode size={14} /> Paste JS → blocks
                 </button>
                 <button type="button" className={styles.moreItem} onClick={() => { clearProject(); setShowMore(false) }}>
                   <Trash2 size={14} /> Clear project
@@ -390,6 +424,7 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
                 previewRef={previewRef}
                 onRun={runProject}
                 onOpenCodeLens={openInCodeLens}
+                onMakeBlocks={applyJsImport}
                 onFieldChange={updateField}
                 onHtmlChange={html => commit(p => ({ ...p, html }))}
                 previewHtml={previewHtml}
@@ -398,6 +433,38 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
           </div>
         </aside>
       </div>
+
+      {/* ── Paste JS → blocks modal ── */}
+      {showJsImport && (
+        <div className={styles.jsImportOverlay} onClick={() => setShowJsImport(false)}>
+          <div className={styles.jsImportModal} onClick={e => e.stopPropagation()}>
+            <h3 className={styles.jsImportTitle}>Paste JavaScript → convert to blocks</h3>
+            <p className={styles.jsImportHint}>
+              Paste any JavaScript below. Recognised patterns (functions, events, variables, DOM calls…) become editable blocks. Unrecognised lines become expression blocks.
+            </p>
+            <textarea
+              className={styles.jsImportTextarea}
+              value={jsImportCode}
+              onChange={e => setJsImportCode(e.target.value)}
+              placeholder="// paste your JavaScript here…"
+              autoFocus
+              spellCheck={false}
+            />
+            <div className={styles.jsImportActions}>
+              <button type="button" className={styles.jsImportCancel} onClick={() => setShowJsImport(false)}>Cancel</button>
+              <button
+                type="button"
+                className={styles.jsImportConfirm}
+                disabled={!jsImportCode.trim()}
+                onClick={confirmJsImport}
+              >
+                Convert to blocks
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </section>
   )
 }

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import Editor from "@monaco-editor/react";
 import type { OnMount } from "@monaco-editor/react";
 import styles from "./HtmlLab.module.css";
@@ -19,6 +19,7 @@ import type { LabElement, ComponentTheme, JsFile } from "./types";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore — JSX panel, no type declarations
 import LessonsPanel from "./LessonsPanel.jsx";
+import VisualJsPanel from "./VisualJsPanel";
 
 type MonacoEditor = Parameters<OnMount>[0];
 type MonacoApi    = Parameters<OnMount>[1];
@@ -30,12 +31,13 @@ const TABS = [
   { key: "tree",       label: "Tree",       language: null },
   { key: "toolbox",    label: "Toolbox",    language: null },
   { key: "lessons",    label: "Lessons",    language: null },
+  { key: "visual",     label: "Visual JS",  language: null },
 ] as const;
 
 type TabKey = typeof TABS[number]["key"];
 
 // Tabs that don't hold Monaco source code — the editor stays unmounted for these.
-const NON_EDITOR_TABS = new Set<TabKey>(["tree", "toolbox", "lessons"]);
+const NON_EDITOR_TABS = new Set<TabKey>(["tree", "toolbox", "lessons", "visual"]);
 
 // The JavaScript tab holds several files that can each be a different real
 // language (.js, .jsx, .ts, .tsx) — Monaco's syntax highlighting/IntelliSense
@@ -868,6 +870,19 @@ export default function CodePanel({
   const [activeTab, setActiveTab] = useState<TabKey>("html");
   const [renamingFileId, setRenamingFileId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState("");
+  // Mount Visual JS panel on first visit, keep mounted after (preserves block state)
+  const [visualMounted, setVisualMounted] = useState(false);
+  // Increments every time the user switches to the Visual JS tab — VisualJsPanel
+  // watches this to know when to auto-import the active JS file.
+  const [visualTabCount, setVisualTabCount] = useState(0);
+  // Ref-based stable callback — identity never changes so VCS's onCodeChange
+  // effect won't loop when HtmlLab re-renders after syncing generated code.
+  const visualCodeSyncRef = useRef<{ activeJsFile: typeof activeJsFile; onJsFileCodeChange: typeof onJsFileCodeChange } | null>(null);
+  useEffect(() => { visualCodeSyncRef.current = { activeJsFile, onJsFileCodeChange }; });
+  const handleVisualCodeChange = useCallback((code: string) => {
+    const ctx = visualCodeSyncRef.current;
+    if (ctx?.activeJsFile) ctx.onJsFileCodeChange(ctx.activeJsFile.id, code);
+  }, []);
 
   const activeJsFile = jsFiles.find((f) => f.id === activeJsFileId) ?? jsFiles[0];
   const javascript = activeJsFile?.code ?? "";
@@ -1023,6 +1038,8 @@ export default function CodePanel({
 
   const switchTab = (tab: TabKey): void => {
     if (tab === activeTab) return;
+    if (tab === "visual" && !visualMounted) setVisualMounted(true);
+    if (tab === "visual") setVisualTabCount(c => c + 1);
     if (debounceRef.current !== null) clearTimeout(debounceRef.current);
     if (!NON_EDITOR_TABS.has(activeTab)) {
       const editor = editorRef.current;
@@ -1165,7 +1182,7 @@ export default function CodePanel({
             cdnLinks={cdnLinks}
             onToggleCdn={onToggleCdn}
           />
-        ) : activeTab === "lessons" ? null : (
+        ) : activeTab === "lessons" || activeTab === "visual" ? null : (
           <Editor
             // Remount whenever the JavaScript tab's *effective language*
             // changes (switching from a .js file to a .ts one, say) — Monaco's
@@ -1213,6 +1230,20 @@ export default function CodePanel({
             // advancing the editor's displayed text.
             onChange={forceSync ? undefined : handleChange}
           />
+        )}
+        {/* Always mounted once visited — same pattern as LessonsPanel so block
+            state survives tab switches. Not rendered at all until first visit
+            so the heavy VCS bundle is never loaded for users who skip this tab. */}
+        {visualMounted && (
+          <div style={{ display: activeTab === "visual" ? "flex" : "none", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+            <VisualJsPanel
+              elements={elements}
+              html={html}
+              activeJsCode={javascript}
+              tabVisitCount={visualTabCount}
+              onCodeChange={handleVisualCodeChange}
+            />
+          </div>
         )}
         {/* Always mounted, just hidden — switching tabs away and back must not
             reset which lesson the student was reading. Conditionally

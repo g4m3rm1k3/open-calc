@@ -493,6 +493,7 @@
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.1px;
+  color: var(--block-color, var(--text));
 }
 
 .blockDescription {
@@ -509,7 +510,7 @@
   border-left: 5px solid var(--block-color, #475569);
   border-radius: 10px;
   padding: 10px 13px;
-  background: var(--page-bg);
+  background: color-mix(in srgb, var(--block-color, #475569) 5%, var(--page-bg));
   color: var(--text);
   display: grid;
   gap: 6px;
@@ -528,6 +529,7 @@
 
 .stackBlockActive {
   border-color: var(--accent);
+  border-left-color: var(--block-color, var(--accent));
   box-shadow: 0 0 0 2px var(--accent-shadow), 0 4px 16px rgba(0,0,0,0.06);
 }
 
@@ -557,7 +559,8 @@
   display: block;
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--block-color, var(--muted));
+  opacity: 0.75;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -678,6 +681,12 @@
   transition: all 0.15s;
 }
 .codeLensBtn:hover { background: var(--page-bg); border-color: var(--accent); }
+
+.codeHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
 /* ── Run view ── */
 .runHeader {
@@ -1017,3 +1026,90 @@
     width: 100%;
   }
 }
+
+/* ── Paste JS → blocks modal ─────────────────────────────────────────────── */
+
+.jsImportOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.jsImportModal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px 24px 18px;
+  width: min(520px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.jsImportTitle {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text);
+}
+
+.jsImportHint {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.jsImportTextarea {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  resize: vertical;
+  min-height: 220px;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+.jsImportTextarea:focus { border-color: var(--accent); }
+
+.jsImportActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.jsImportCancel {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+}
+.jsImportCancel:hover { border-color: var(--accent); color: var(--text); }
+
+.jsImportConfirm {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.jsImportConfirm:disabled { opacity: 0.4; cursor: default; }
+.jsImportConfirm:not(:disabled):hover { opacity: 0.88; }
