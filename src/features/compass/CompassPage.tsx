@@ -1,31 +1,15 @@
 import { useState } from 'react'
-import { Compass as CompassIcon, Sparkles, Dumbbell, X } from 'lucide-react'
-import { useLocation, Link } from 'react-router-dom'
-import { useCompass } from './useCompass'
+import { Compass as CompassIcon, Dumbbell, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { useMontyContext } from './MontyContext'
 import PlanWalkthrough from './components/PlanWalkthrough'
 import PlanCard from './components/PlanCard'
 import NoteEditor from './components/NoteEditor'
 import TutorialCard from './components/TutorialCard'
 import PomodoroTimer from './components/PomodoroTimer'
 import FlashcardReview from './components/FlashcardReview'
-import MontyPanel from './components/MontyPanel'
 import GoalMap from './components/GoalMap'
-import { isComplicated, type ActionDraft, type IntakeAnswers } from './playbooks'
 import { computeDailyWin } from './montyStatus'
-import type { Plan } from './types'
-
-const FITNESS_KEYWORDS = [
-  'get in shape', 'get fit', 'lose weight', 'weight loss', 'fat loss', 'gain muscle',
-  'build muscle', 'bulk', 'cut', 'shred', 'workout', 'work out', 'exercise', 'fitness',
-  'gym', 'training', 'train', 'run', 'running', 'cardio', 'strength', 'weightlifting',
-  'bench press', 'squat', 'deadlift', 'abs', 'push-up', 'pull-up', 'body composition',
-  'healthy body', 'lose fat', 'get stronger', 'build strength', 'be fit',
-]
-
-function isFitnessGoal(title: string) {
-  const lower = title.toLowerCase()
-  return FITNESS_KEYWORDS.some(kw => lower.includes(kw))
-}
 
 function FitnessBridgeCard({ onDismiss }: { onDismiss: () => void }) {
   return (
@@ -65,64 +49,13 @@ const TABS = ['Plans', 'Notes', 'Cards', 'Focus', 'Learn'] as const
 type Tab = typeof TABS[number]
 
 export default function CompassPage() {
-  const compass = useCompass()
+  const {
+    compass, montyOpen,
+    questionTitle, draftTitle, draftActions, confirmedPlan, fitnessBridgeGoal,
+    setConfirmedPlan, setFitnessBridgeGoal,
+    handleIntake, handleAnswered, handleClarifyToPlan, handleConfirm, handleCancelBreakdown,
+  } = useMontyContext()
   const [tab, setTab] = useState<Tab>('Plans')
-
-  const [questionTitle, setQuestionTitle] = useState<string | null>(null)
-  const [draftTitle, setDraftTitle] = useState<string | null>(null)
-  const [draftActions, setDraftActions] = useState<ActionDraft[]>([])
-  const [convertingNoteId, setConvertingNoteId] = useState<string | null>(null)
-  const [confirmedPlan, setConfirmedPlan] = useState<Plan | null>(null)
-  
-  const [montyOpen, setMontyOpen] = useState(false)
-  const [fitnessBridgeGoal, setFitnessBridgeGoal] = useState<string | null>(null)
-
-  // Complicated (multi-action) goals get sized by two real answers instead
-  // of always defaulting to the same canned numbers — see IntakeQuestions
-  // and isComplicated() in playbooks.ts. Simple ones skip straight to the
-  // breakdown, since asking "hours/week" for "drink more water" is just
-  // friction with nothing to size.
-  const handleIntake = (title: string) => {
-    setConfirmedPlan(null)
-    if (isFitnessGoal(title)) setFitnessBridgeGoal(title)
-    if (isComplicated(title)) {
-      setQuestionTitle(title)
-    } else {
-      setDraftTitle(title)
-      setDraftActions(compass.proposePlan(title))
-    }
-  }
-
-  const handleAnswered = (answers: IntakeAnswers) => {
-    if (!questionTitle) return
-    setDraftTitle(questionTitle)
-    setDraftActions(compass.proposePlan(questionTitle, answers))
-    setQuestionTitle(null)
-  }
-
-  // A note's "→ Plan" clarify action reuses the exact same intake/breakdown
-  // flow as typing into PlanIntake directly — it's not a separate path.
-  const handleClarifyToPlan = (noteId: string, content: string) => {
-    setConvertingNoteId(noteId)
-    handleIntake(content)
-  }
-
-  const handleConfirm = (title: string, drafts: ActionDraft[], reward?: string) => {
-    const plan = compass.confirmPlan(title, drafts, reward)
-    if (convertingNoteId) {
-      compass.updateNote(convertingNoteId, { status: 'clarified' })
-      setConvertingNoteId(null)
-    }
-    setDraftTitle(null)
-    setDraftActions([])
-    setConfirmedPlan(plan)
-  }
-
-  const handleCancelBreakdown = () => {
-    setConvertingNoteId(null)
-    setQuestionTitle(null)
-    setDraftTitle(null)
-  }
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 via-slate-50 to-slate-100 dark:from-sky-950/20 dark:via-slate-950 dark:to-slate-950 text-slate-900 dark:text-slate-200 p-4 md:p-8 pb-32 md:pb-8 transition-colors duration-300">
@@ -249,30 +182,6 @@ export default function CompassPage() {
         </div>
       </div>
 
-      {/* Monty — coach/mentor/assistant, click to open */}
-      {!montyOpen && (
-        <button type="button" onClick={() => setMontyOpen(true)}
-          className="fixed bottom-16 right-4 z-[1700] flex items-center gap-2 bg-sky-500 text-white font-semibold text-sm rounded-full pl-3 pr-4 py-2.5 shadow-lg shadow-sky-500/30 hover:bg-sky-400 hover:-translate-y-0.5 transition-all">
-          <Sparkles size={16} /> Monty
-        </button>
-      )}
-
-      {montyOpen && (
-        <MontyPanel
-          plans={compass.plans}
-          notes={compass.notes}
-          flashcards={compass.flashcards}
-          dueFlashcards={compass.dueFlashcards}
-          onClose={() => setMontyOpen(false)}
-          questionTitle={questionTitle}
-          draftTitle={draftTitle}
-          draftActions={draftActions}
-          onIntake={handleIntake}
-          onAnswered={handleAnswered}
-          onConfirm={handleConfirm}
-          onCancelBreakdown={handleCancelBreakdown}
-        />
-      )}
     </div>
   )
 }

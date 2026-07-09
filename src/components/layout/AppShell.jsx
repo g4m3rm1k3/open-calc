@@ -32,6 +32,10 @@ const HelpModal = lazy(() => import("../ui/HelpModal.jsx"));
 const TerminalHub = lazy(() => import("../../tools/terminal-hub/TerminalHub.jsx"));
 import CompassQuickPanel from "../../features/compass/CompassQuickPanel.tsx";
 import MontyAmbientNudge from "../../features/compass/components/MontyAmbientNudge.tsx";
+import { useMontyContext } from "../../features/compass/MontyContext.tsx";
+// Lazy: pulls in @mlc-ai/web-llm (a local LLM runtime) via useCompassAI —
+// must not be in every page's bundle just because the taskbar button exists.
+const MontyPanel = lazy(() => import("../../features/compass/components/MontyPanel.tsx"));
 import { ChatProvider } from "../../context/ChatContext.jsx";
 const ChatPanel = lazy(() => import("../tutor/ChatPanel.jsx"));
 const PhysicsPoolLab = lazy(() => import("../../games/pool/PhysicsPoolLab.jsx"));
@@ -300,6 +304,7 @@ export default function AppShell({ children }) {
   const [footballOpen, setFootballOpen] = useState(false);
   const [matrixReducerOpen, setMatrixReducerOpen] = useState(false);
   const [compassQuickOpen, setCompassQuickOpen] = useState(false);
+  const monty = useMontyContext();
   const [mathOsOpen, setMathOsOpen] = useState(false);
   const [mathOsConfig, setMathOsConfig] = useState(null);
   const [calcOpen, setCalcOpen] = useState(false);
@@ -512,6 +517,22 @@ export default function AppShell({ children }) {
             {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
             {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
             <MontyAmbientNudge />
+            {monty.montyOpen && (
+              <MontyPanel
+                plans={monty.compass.plans}
+                notes={monty.compass.notes}
+                flashcards={monty.compass.flashcards}
+                dueFlashcards={monty.compass.dueFlashcards}
+                onClose={monty.closeMonty}
+                questionTitle={monty.questionTitle}
+                draftTitle={monty.draftTitle}
+                draftActions={monty.draftActions}
+                onIntake={monty.handleIntake}
+                onAnswered={monty.handleAnswered}
+                onConfirm={monty.handleConfirm}
+                onCancelBreakdown={monty.handleCancelBreakdown}
+              />
+            )}
             <TerminalHub
               isOpen={terminalOpen}
               onClose={() => setTerminalOpen(false)}
@@ -641,6 +662,22 @@ export default function AppShell({ children }) {
             {matrixReducerOpen && <MatrixReducer onBack={() => setMatrixReducerOpen(false)} />}
             {compassQuickOpen && <CompassQuickPanel onClose={() => setCompassQuickOpen(false)} />}
             <MontyAmbientNudge />
+            {monty.montyOpen && (
+              <MontyPanel
+                plans={monty.compass.plans}
+                notes={monty.compass.notes}
+                flashcards={monty.compass.flashcards}
+                dueFlashcards={monty.compass.dueFlashcards}
+                onClose={monty.closeMonty}
+                questionTitle={monty.questionTitle}
+                draftTitle={monty.draftTitle}
+                draftActions={monty.draftActions}
+                onIntake={monty.handleIntake}
+                onAnswered={monty.handleAnswered}
+                onConfirm={monty.handleConfirm}
+                onCancelBreakdown={monty.handleCancelBreakdown}
+              />
+            )}
             <WhatsNewModal />
             <SearchModal />
             <GlobalGrapher

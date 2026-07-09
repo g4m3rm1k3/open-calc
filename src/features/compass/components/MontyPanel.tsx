@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { Sparkles, X, Send, Check, Calendar, Target } from 'lucide-react'
+import { Zap, X, Send, Check, Calendar, Target, Compass, LayoutGrid, Dumbbell, Brain } from 'lucide-react'
 import { useCompassAI, type AgentAction } from '../useCompassAI'
 import { useCalendar } from '../../calendar/useCalendar'
 import { useProgress } from '../../../hooks/useProgress'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import type { Plan, Note, Flashcard } from '../types'
 import type { ActionDraft, IntakeAnswers } from '../playbooks'
 import type { AppContext } from '../buildAgentContext'
@@ -98,6 +98,7 @@ export default function MontyPanel({
   const { addEvent } = useCalendar()
   const { progress } = useProgress() as unknown as { progress: Record<string, any> }
   const location = useLocation()
+  const navigate = useNavigate()
 
   const [input, setInput] = useState('')
   const [chatLog, setChatLog] = useState<ChatMessage[]>([])
@@ -176,17 +177,25 @@ export default function MontyPanel({
 
   const hasActivePlans = plans.some(p => p.status === 'active')
 
+  const goTo = (path: string) => {
+    onClose()
+    navigate(path)
+  }
+
   return (
     <div className="fixed inset-0 z-[1700] bg-slate-900/40 backdrop-blur-sm flex sm:inset-auto sm:bottom-4 sm:right-4 sm:bg-transparent sm:backdrop-blur-none sm:block">
     <div className="w-full h-full sm:w-[360px] sm:h-[620px] sm:max-h-[85vh] flex flex-col bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-700 sm:rounded-2xl shadow-2xl overflow-hidden">
-      {/* Header */}
+      {/* Header — electric theme; glow strength tracks how full the level meter is */}
       <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 backdrop-blur flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-sky-500/20 flex items-center justify-center">
-            <Sparkles className="text-sky-400" size={14} />
+          <div
+            className="w-7 h-7 rounded-lg bg-cyan-500/20 flex items-center justify-center"
+            style={{ filter: `drop-shadow(0 0 ${3 + (xpInLevel / 100) * 8}px rgba(0,212,255,${0.35 + (xpInLevel / 100) * 0.5}))` }}
+          >
+            <Zap className="text-cyan-400" size={14} fill="currentColor" />
           </div>
           <div>
-            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-none">Compass</h3>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-sm leading-none">Monty</h3>
             <p className="text-[10px] text-slate-500 mt-0.5">Your achievement operating system</p>
           </div>
         </div>
@@ -197,10 +206,28 @@ export default function MontyPanel({
 
       {/* Stats bar — XP/level from quiz + checkpoint progress, learning time from foreground app time */}
       <div className="px-4 py-2 flex items-center gap-3 text-[11px] font-semibold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 shrink-0">
-        <span className="text-sky-600 dark:text-sky-400">Lv {level}</span>
+        <span className="text-cyan-600 dark:text-cyan-400">Lv {level}</span>
         <span>{xpInLevel}/100 XP</span>
         <span className="text-slate-300 dark:text-slate-700">·</span>
         <span>{formatLearningTime(learningMs)} learning time</span>
+      </div>
+
+      {/* Quick links — Monty is now the one way in to these destinations */}
+      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-slate-200 dark:border-slate-800 shrink-0 overflow-x-auto">
+        {[
+          { label: 'Compass', icon: Compass, path: '/compass' },
+          { label: 'Courses', icon: LayoutGrid, path: '/' },
+          { label: 'RPG Workout', icon: Dumbbell, path: '/rpg-workout' },
+          { label: 'Brain', icon: Brain, path: '/brain' },
+        ].map(({ label, icon: Icon, path }) => (
+          <button
+            key={path}
+            onClick={() => goTo(path)}
+            className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-cyan-100 dark:hover:bg-cyan-900/30 hover:text-cyan-700 dark:hover:text-cyan-300 rounded-full px-2.5 py-1 whitespace-nowrap transition-colors"
+          >
+            <Icon size={11} /> {label}
+          </button>
+        ))}
       </div>
 
       {/* Daily Win Bar */}

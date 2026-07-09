@@ -13,6 +13,7 @@ import { getGameEntry } from "./games/gameLoader.js";
 import DesktopProvider from "./components/desktop/DesktopProvider.jsx";
 import RootErrorBoundary from "./components/layout/RootErrorBoundary.jsx";
 import { TourProvider } from "./context/TourContext.jsx";
+import { MontyProvider } from "./features/compass/MontyContext.tsx";
 import TourSpotlight from "./components/ui/TourSpotlight.jsx";
 import TourAutoStart from "./components/ui/TourAutoStart.jsx";
 
@@ -109,6 +110,7 @@ export default function App() {
                 }}
               >
                 <TourProvider>
+                  <MontyProvider>
                   <DesktopProvider>
                     <FloatingVideoPlayer />
                     <Suspense fallback={null}>
@@ -418,6 +420,7 @@ export default function App() {
                       </AppShell>
                     </RootErrorBoundary>
                   </DesktopProvider>
+                  </MontyProvider>
                 </TourProvider>
               </HashRouter>
             </VideoPlayerProvider>

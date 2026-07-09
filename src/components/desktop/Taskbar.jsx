@@ -6,6 +6,9 @@ import ChapterNavigator from './ChapterNavigator.jsx'
 import PinsNotesPopup from './PinsNotesPopup.jsx'
 import { useDesktop } from './DesktopProvider.jsx'
 import ReportBugButton from '../ui/ReportBugButton.jsx'
+import { useMontyContext } from '../../features/compass/MontyContext.tsx'
+import { useProgress } from '../../hooks/useProgress.js'
+import { computeXp, xpToLevel } from '../../features/compass/montyStatus.ts'
 
 // RPG Workout and Brain Training are tall, scrollable content pages — not
 // fixed-size games/labs — so they route to their own dedicated pages instead
@@ -16,7 +19,7 @@ const PINNED_APPS = [
   { id: 'rpg-workout', label: 'RPG Workout', emoji: '⚔️', route: '/rpg-workout' },
   { id: 'brain', label: 'Brain Training', emoji: '🧠', route: '/brain' },
 ]
-import { LayoutGrid, Command, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap, Compass } from 'lucide-react'
+import { LayoutGrid, Command, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap, Zap } from 'lucide-react'
 
 export default function Taskbar({ windows, onFocus }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -25,7 +28,10 @@ export default function Taskbar({ windows, onFocus }) {
   const location = useLocation()
   const navigate = useNavigate()
   const { openWindow } = useDesktop()
-  const isCompassActive = location.pathname.startsWith('/compass')
+  const monty = useMontyContext()
+  const { progress } = useProgress()
+  const { level, xpInLevel } = xpToLevel(computeXp(progress))
+  const montyFillCircumference = 2 * Math.PI * 15.5
 
   const isLessonRoute = /^\/chapter\/[^/]+\/.+/.test(location.pathname)
 
@@ -152,16 +158,33 @@ export default function Taskbar({ windows, onFocus }) {
 
           <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1 flex-shrink-0 rounded-full" />
 
+          {/* Monty — opens the chat/goal panel; also the only way in to Compass now.
+              The ring around the icon fills as xpInLevel climbs toward the next
+              level, and the glow gets stronger with it — "the meter getting full." */}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/compass')}
-            title="Compass"
-            className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none ${
-              isCompassActive ? 'bg-sky-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 hover:text-sky-600 dark:hover:text-sky-400'
+            onClick={monty.openMonty}
+            title={`Monty — Lv ${level}, ${xpInLevel}/100 XP`}
+            className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none ${
+              monty.montyOpen ? 'bg-cyan-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-500 dark:hover:text-cyan-400'
             }`}
+            style={{
+              filter: `drop-shadow(0 0 ${3 + (xpInLevel / 100) * 9}px rgba(0,212,255,${0.25 + (xpInLevel / 100) * 0.55}))`,
+            }}
           >
-            <Compass className="w-5 h-5" />
+            <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.5" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="2" />
+              <circle
+                cx="18" cy="18" r="15.5" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round"
+                strokeDasharray={`${(xpInLevel / 100) * montyFillCircumference} ${montyFillCircumference}`}
+                style={{ transition: 'stroke-dasharray 0.5s ease' }}
+              />
+            </svg>
+            <Zap className="w-5 h-5 relative z-10" fill={monty.montyOpen ? 'currentColor' : 'none'} />
+            <span className="absolute -bottom-1 -right-1 text-[8px] font-black leading-none bg-cyan-500 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center border border-white dark:border-slate-950">
+              {level}
+            </span>
           </motion.button>
 
           <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1 flex-shrink-0 rounded-full" />
