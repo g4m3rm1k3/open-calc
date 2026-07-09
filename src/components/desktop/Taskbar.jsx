@@ -31,7 +31,7 @@ export default function Taskbar({ windows, onFocus }) {
   const monty = useMontyContext()
   const { progress } = useProgress()
   const { level, xpInLevel } = xpToLevel(computeXp(progress))
-  const montyFillCircumference = 2 * Math.PI * 15.5
+
 
   const isLessonRoute = /^\/chapter\/[^/]+\/.+/.test(location.pathname)
 
@@ -162,27 +162,38 @@ export default function Taskbar({ windows, onFocus }) {
               The ring around the icon fills as xpInLevel climbs toward the next
               level, and the glow gets stronger with it — "the meter getting full." */}
           <motion.button
-            whileHover={{ scale: 1.1 }}
+            whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
             onClick={monty.openMonty}
             title={`Monty — Lv ${level}, ${xpInLevel}/100 XP`}
-            className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none ${
-              monty.montyOpen ? 'bg-cyan-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 hover:text-cyan-500 dark:hover:text-cyan-400'
+            className={`relative flex items-center justify-center w-10 h-10 rounded-2xl transition-all duration-300 focus:outline-none overflow-hidden group ${
+              monty.montyOpen
+                ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/40 ring-2 ring-cyan-400 ring-offset-2 dark:ring-offset-slate-950'
+                : 'bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 hover:text-cyan-500 dark:hover:text-cyan-400 shadow hover:shadow-cyan-500/20'
             }`}
             style={{
-              filter: `drop-shadow(0 0 ${3 + (xpInLevel / 100) * 9}px rgba(0,212,255,${0.25 + (xpInLevel / 100) * 0.55}))`,
+              filter: `drop-shadow(0 0 ${4 + (xpInLevel / 100) * 12}px rgba(6,182,212,${0.3 + (xpInLevel / 100) * 0.6}))`,
             }}
           >
-            <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15.5" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="2" />
+            {/* Glass glare effect inside button */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 40 40">
+              <defs>
+                <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#22d3ee" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+              </defs>
+              <circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" strokeOpacity={monty.montyOpen ? "0.2" : "0.1"} strokeWidth="2.5" />
               <circle
-                cx="18" cy="18" r="15.5" fill="none" stroke="#00D4FF" strokeWidth="2" strokeLinecap="round"
-                strokeDasharray={`${(xpInLevel / 100) * montyFillCircumference} ${montyFillCircumference}`}
-                style={{ transition: 'stroke-dasharray 0.5s ease' }}
+                cx="20" cy="20" r="17.5" fill="none" stroke="url(#cyanGlow)" strokeWidth="2.5" strokeLinecap="round"
+                strokeDasharray={`${(xpInLevel / 100) * (2 * Math.PI * 17.5)} ${2 * Math.PI * 17.5}`}
+                style={{ transition: 'stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }}
               />
             </svg>
-            <Zap className="w-5 h-5 relative z-10" fill={monty.montyOpen ? 'currentColor' : 'none'} />
-            <span className="absolute -bottom-1 -right-1 text-[8px] font-black leading-none bg-cyan-500 text-white rounded-full w-3.5 h-3.5 flex items-center justify-center border border-white dark:border-slate-950">
+            <Zap className={`w-5 h-5 relative z-10 ${monty.montyOpen ? 'drop-shadow-md' : 'group-hover:drop-shadow-sm'}`} fill={monty.montyOpen ? 'currentColor' : 'none'} />
+            <span className="absolute -bottom-1 -right-1 text-[9px] font-black leading-none bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full w-4 h-4 flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-sm z-20">
               {level}
             </span>
           </motion.button>

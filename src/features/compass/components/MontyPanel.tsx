@@ -57,7 +57,7 @@ function ActionConfirmCard({
     <Check size={13} />
 
   return (
-    <div className="flex items-center justify-between gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-emerald-500/20 rounded-xl px-3 py-2.5 text-xs shadow-sm">
+    <div className="flex items-center justify-between gap-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border border-slate-200/80 dark:border-cyan-500/30 rounded-xl px-3 py-2.5 text-xs shadow-md hover:shadow-cyan-500/10 transition-all duration-300">
       <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
         <span className="text-emerald-600 dark:text-emerald-400">{icon}</span>
         <span>{label}</span>
@@ -65,7 +65,7 @@ function ActionConfirmCard({
       <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={onConfirm}
-          className="bg-emerald-500 hover:bg-emerald-400 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm shadow-emerald-500/20 transition-all"
+          className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 dark:from-emerald-600 dark:to-teal-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-md shadow-emerald-500/20 hover:scale-105 transition-all"
         >
           Do it
         </button>
@@ -183,11 +183,12 @@ export default function MontyPanel({
   }
 
   return (
-    <div className="fixed inset-0 z-[1700] bg-slate-900/40 backdrop-blur-sm flex sm:inset-auto sm:bottom-4 sm:right-4 sm:bg-transparent sm:backdrop-blur-none sm:block">
-    <div className="w-full h-full sm:w-[360px] sm:h-[620px] sm:max-h-[85vh] flex flex-col bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-700 sm:rounded-2xl shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-[1700] bg-slate-900/40 backdrop-blur-sm flex sm:inset-auto sm:bottom-[72px] sm:right-4 sm:bg-transparent sm:backdrop-blur-none sm:block">
+    <div className="w-full h-full sm:w-[360px] sm:h-[620px] sm:max-h-[85vh] flex flex-col bg-white/90 dark:bg-slate-900/80 backdrop-blur-2xl sm:border border-white/40 dark:border-cyan-500/30 sm:rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_32px_rgba(6,182,212,0.15)] overflow-hidden transition-all duration-500">
       {/* Header — electric theme; glow strength tracks how full the level meter is */}
-      <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-800/60 backdrop-blur flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2">
+      <div className="p-4 border-b border-slate-200/50 dark:border-slate-700/50 bg-gradient-to-r from-slate-50/80 to-cyan-50/50 dark:from-slate-800/60 dark:to-cyan-900/20 backdrop-blur-xl flex items-center justify-between shrink-0 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/40 dark:via-cyan-400/30 to-transparent" />
+        <div className="flex items-center gap-2 relative z-10">
           <div
             className="w-7 h-7 rounded-lg bg-cyan-500/20 flex items-center justify-center"
             style={{ filter: `drop-shadow(0 0 ${3 + (xpInLevel / 100) * 8}px rgba(0,212,255,${0.35 + (xpInLevel / 100) * 0.5}))` }}
@@ -205,7 +206,7 @@ export default function MontyPanel({
       </div>
 
       {/* Stats bar — XP/level from quiz + checkpoint progress, learning time from foreground app time */}
-      <div className="px-4 py-2 flex items-center gap-3 text-[11px] font-semibold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 shrink-0">
+      <div className="px-4 py-2 flex items-center gap-3 text-[11px] font-semibold text-slate-500 dark:text-cyan-100/70 border-b border-slate-200/50 dark:border-cyan-900/30 bg-white/40 dark:bg-slate-900/40 shrink-0 shadow-inner">
         <span className="text-cyan-600 dark:text-cyan-400">Lv {level}</span>
         <span>{xpInLevel}/100 XP</span>
         <span className="text-slate-300 dark:text-slate-700">·</span>
@@ -213,7 +214,7 @@ export default function MontyPanel({
       </div>
 
       {/* Quick links — Monty is now the one way in to these destinations */}
-      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-slate-200 dark:border-slate-800 shrink-0 overflow-x-auto">
+      <div className="flex items-center gap-1.5 px-3 py-2.5 border-b border-slate-200/50 dark:border-cyan-900/30 bg-slate-50/30 dark:bg-slate-800/30 shrink-0 overflow-x-auto scrollbar-hide">
         {[
           { label: 'Compass', icon: Compass, path: '/compass' },
           { label: 'Courses', icon: LayoutGrid, path: '/' },
@@ -223,7 +224,7 @@ export default function MontyPanel({
           <button
             key={path}
             onClick={() => goTo(path)}
-            className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-cyan-100 dark:hover:bg-cyan-900/30 hover:text-cyan-700 dark:hover:text-cyan-300 rounded-full px-2.5 py-1 whitespace-nowrap transition-colors"
+            className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-600 dark:text-cyan-100/80 bg-white/60 dark:bg-slate-800/60 hover:bg-white dark:hover:bg-cyan-900/50 hover:text-cyan-700 dark:hover:text-cyan-300 border border-slate-200/50 dark:border-cyan-500/20 shadow-sm hover:shadow-cyan-500/20 hover:scale-[1.03] active:scale-95 rounded-full px-3 py-1.5 whitespace-nowrap transition-all"
           >
             <Icon size={11} /> {label}
           </button>
@@ -282,9 +283,10 @@ export default function MontyPanel({
           {/* Empty state */}
           {chatLog.length === 0 && !questionTitle && !draftTitle && (
             <div className="space-y-3">
-              <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-4 text-sm text-slate-700 dark:text-slate-300 shadow-sm">
-                <p className="font-semibold text-slate-900 dark:text-slate-100 mb-1">What do you want to accomplish?</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">I'll build you a plan, schedule it, and hold you to it.</p>
+              <div className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-800/80 dark:to-slate-900/80 border border-slate-200/80 dark:border-cyan-500/20 rounded-2xl p-4 shadow-sm relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/0 via-cyan-400/5 to-cyan-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <p className="font-bold text-slate-900 dark:text-white mb-1 relative z-10">What do you want to accomplish?</p>
+                <p className="text-xs text-slate-500 dark:text-cyan-100/60 relative z-10">I'll build you a plan, schedule it, and hold you to it.</p>
               </div>
               <PlanIntake onSubmit={onIntake} />
               <div className="grid grid-cols-2 gap-2">
@@ -292,7 +294,7 @@ export default function MontyPanel({
                   <button
                     key={q}
                     onClick={() => { setInput(q); }}
-                    className="text-left text-xs text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl px-3 py-2.5 hover:border-sky-500/40 hover:shadow-sm transition-all hover:-translate-y-0.5"
+                    className="text-left text-xs font-medium text-slate-600 dark:text-cyan-100/70 bg-white/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-cyan-500/20 rounded-xl px-3 py-2.5 hover:border-cyan-400/50 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/30 hover:text-cyan-700 dark:hover:text-cyan-300 hover:shadow-md hover:shadow-cyan-500/10 transition-all hover:-translate-y-0.5"
                   >
                     {q}
                   </button>
@@ -304,11 +306,11 @@ export default function MontyPanel({
           {/* Chat messages */}
           {chatLog.map((msg, msgIdx) => (
             <div key={msgIdx} className="space-y-2">
-              <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in slide-in-from-bottom-2 fade-in duration-300`}>
                 <div className={`px-3 py-2.5 rounded-xl max-w-[88%] text-sm leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-sky-500 text-white shadow-sm shadow-sky-500/20'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 shadow-sm'
+                    ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-md shadow-cyan-500/20 rounded-br-sm'
+                    : 'bg-white/80 dark:bg-slate-800/80 backdrop-blur-md text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-cyan-500/20 border-l-2 dark:border-l-cyan-400 shadow-sm rounded-bl-sm'
                 }`}>
                   {msg.content || (msg.actions?.length ? '↓ Suggested actions:' : '(no response)')}
                 </div>
@@ -343,11 +345,11 @@ export default function MontyPanel({
 
           {isThinking && (
             <div className="flex justify-start">
-              <div className="bg-slate-800 border border-slate-700/60 rounded-xl px-3 py-2.5 text-sm text-slate-400 italic flex items-center gap-2">
+              <div className="bg-slate-800/80 backdrop-blur-md border border-cyan-500/20 rounded-xl px-3 py-2.5 text-sm text-cyan-200/80 italic flex items-center gap-2 shadow-sm rounded-bl-sm animate-pulse">
                 <span className="inline-flex gap-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                 </span>
                 Compass is thinking…
               </div>
@@ -358,11 +360,11 @@ export default function MontyPanel({
 
       {/* Input */}
       {activeTab === 'chat' && (
-        <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shrink-0">
+        <div className="p-4 border-t border-slate-200/50 dark:border-cyan-900/30 bg-white/60 dark:bg-slate-900/60 backdrop-blur-xl shrink-0">
           <div className="relative">
             <input
               type="text"
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-2.5 pl-4 pr-11 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 transition-all"
+              className="w-full bg-white/80 dark:bg-slate-950/50 border border-slate-300/80 dark:border-cyan-500/30 rounded-2xl py-3 pl-4 pr-11 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-cyan-700/50 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 shadow-inner transition-all duration-300"
               placeholder="Goal or question — e.g. 'master linear algebra'"
               value={input}
               onChange={e => setInput(e.target.value)}
@@ -372,7 +374,7 @@ export default function MontyPanel({
             <button
               onClick={handleSend}
               disabled={isThinking || !input.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-sky-500 hover:text-sky-600 dark:text-sky-400 dark:hover:text-sky-300 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-lg disabled:opacity-40 transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-cyan-500 hover:text-cyan-400 dark:text-cyan-400 dark:hover:text-cyan-300 hover:bg-cyan-50 dark:hover:bg-cyan-900/30 rounded-lg disabled:opacity-40 transition-colors"
             >
               <Send size={15} />
             </button>
