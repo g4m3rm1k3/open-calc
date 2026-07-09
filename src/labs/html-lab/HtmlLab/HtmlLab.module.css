@@ -13,17 +13,20 @@
   color: var(--hl-text);
 }
 
-/* ── Toolbar ─────────────────────────────────────────────────────────────────── */
 .toolbar {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  background: var(--hl-surface);
+  padding: 8px 14px;
+  background: color-mix(in srgb, var(--hl-surface) 90%, transparent);
+  backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--hl-border);
   flex-shrink: 0;
   flex-wrap: wrap;
-  min-height: 42px;
+  min-height: 46px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+  position: relative;
+  z-index: 10;
 }
 
 .backBtn {
@@ -319,7 +322,8 @@
 .tbBtn:hover:not(:disabled) {
   background: var(--hl-surface);
   border-color: var(--hl-accent);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
 }
 .tbBtn:active:not(:disabled) {
   transform: translateY(1px);
@@ -685,7 +689,7 @@
 }
 
 .modeBtn:hover:not(.modeBtnActive) {
-  background: rgba(255,255,255,0.06);
+  background: rgba(120, 130, 140, 0.15);
   color: var(--hl-text);
 }
 
@@ -709,19 +713,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
-  padding: 8px 14px;
+  gap: 4px;
+  padding: 10px 14px;
   background: var(--hl-surface);
   border: 1px solid var(--hl-border);
-  border-radius: 7px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.12s, border-color 0.12s;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 72px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
 }
 
 .compCard:hover {
   background: var(--hl-surface2);
   border-color: var(--hl-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .compIcon {

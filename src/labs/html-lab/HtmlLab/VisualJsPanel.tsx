@@ -346,7 +346,7 @@ function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChi
         )}
       </div>
       {canContainChildren(block.type) && (
-        <div className={styles.childSlot}>
+        <div className={`${styles.childSlot} ${styles[`depth-${depth % 6}`] || ''}`}>
           {(block.children ?? []).map(child => (
             <BlockRow
               key={child.id}
@@ -443,7 +443,7 @@ function FieldInput({ field, block, onChange, onChangeMulti, domHints, classHint
   // Any general-purpose JS expression field — offers the curated pattern
   // library, but the raw text stays a normal, always-editable input either way.
   if (['value', 'expression', 'condition'].includes(field.name) || (field.name === 'text' && block.type === 'htmlText')) {
-    return <ExpressionField label={field.label} value={value} domHints={domHints} variableHints={variableHints} onChange={v => onChange(field.name, v)} />
+    return <ExpressionField label={field.label} value={value} domHints={domHints} variableHints={variableHints} onChange={v => onChange(field.name, v)} depth={1} />
   }
 
   return (
@@ -558,6 +558,7 @@ function ExpressionField({ label, value, domHints, variableHints, onChange, nest
   // a && b) rather than the top-level field on the block itself — just
   // controls a visual indent so nesting depth reads clearly.
   nested?: boolean
+  depth?: number
 }) {
   // Runs once, at mount, against whatever this field already holds — e.g.
   // code that was just parsed in from the JS file. Lazy useState initializers
@@ -615,6 +616,7 @@ function ExpressionField({ label, value, domHints, variableHints, onChange, nest
           domHints={domHints}
           variableHints={variableHints}
           onChange={v => handleParamChange(param.name, v)}
+          depth={(depth || 0) + 1}
         />
       ))}
       <label className={styles.propRow}>
@@ -624,15 +626,16 @@ function ExpressionField({ label, value, domHints, variableHints, onChange, nest
     </>
   )
 
-  return nested ? <div className={styles.childSlot}>{body}</div> : body
+  return nested ? <div className={`${styles.childSlot} ${styles[`depth-${(depth || 0) % 6}`] || ''}`}>{body}</div> : body
 }
 
-function ExpressionParamInput({ param, value, domHints, variableHints, onChange }: {
+function ExpressionParamInput({ param, value, domHints, variableHints, onChange, depth = 0 }: {
   param: ExpressionParam
   value: string
   domHints: string[]
   variableHints: string[]
   onChange: (v: string) => void
+  depth?: number
 }) {
   // Recursive case: a param that's itself a full sub-expression gets its
   // own nested pattern-picker, not a plain text box — this is what lets
@@ -647,6 +650,7 @@ function ExpressionParamInput({ param, value, domHints, variableHints, onChange 
         variableHints={variableHints}
         onChange={onChange}
         nested
+        depth={depth}
       />
     )
   }

@@ -152,17 +152,25 @@
 
 .blockRow {
   border: 1px solid var(--hl-border, #e2e8f0);
-  border-radius: 5px;
-  margin-bottom: 4px;
-  padding: 5px 6px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  padding: 8px 10px;
   cursor: pointer;
-  background: transparent;
+  background: var(--hl-surface, #ffffff);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: all 0.15s ease;
 }
-.blockRow:hover { background: var(--hl-hover, rgba(99,102,241,0.04)); }
+.blockRow:hover { 
+  background: var(--hl-surface2, rgba(99,102,241,0.04)); 
+  border-color: var(--hl-accent, #6366f1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
 
 .blockRowActive {
-  border-color: #6366f1;
-  background: rgba(99, 102, 241, 0.05);
+  border-color: var(--hl-accent, #6366f1);
+  background: var(--hl-accent-bg, rgba(99, 102, 241, 0.08));
+  box-shadow: 0 0 0 1px var(--hl-accent, #6366f1);
 }
 
 .blockTopLine {
@@ -230,12 +238,23 @@
 }
 
 .childSlot {
-  border-left: 2px solid var(--hl-border, #e2e8f0);
-  margin-left: 6px;
-  padding-left: 6px;
-  margin-bottom: 2px;
-  margin-top: 2px;
+  border-left: 2px solid var(--bracket-color, var(--hl-border, #e2e8f0));
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+  margin-left: 8px;
+  padding-left: 10px;
+  margin-bottom: 6px;
+  margin-top: 6px;
+  transition: border-color 0.2s ease;
 }
+
+/* Depth-based Bracket Colors matching common IDE syntax themes */
+.depth-0 { --bracket-color: #e5c07b; } /* Yellow/Gold */
+.depth-1 { --bracket-color: #c678dd; } /* Purple */
+.depth-2 { --bracket-color: #61afef; } /* Blue */
+.depth-3 { --bracket-color: #d19a66; } /* Orange */
+.depth-4 { --bracket-color: #98c379; } /* Green */
+.depth-5 { --bracket-color: #e06c75; } /* Red */
 
 .childActions {
   display: flex;
