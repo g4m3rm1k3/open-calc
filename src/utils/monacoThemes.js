@@ -35,7 +35,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "delimiter", foreground: "9fb5d1" },
     ],
     colors: {
-      "editor.background": "#07111e",
+      "editor.background": "#00000000",
       "editor.foreground": "#b7d7ff",
       "editorLineNumber.foreground": "#4f6b91",
       "editorLineNumber.activeForeground": "#8dbdff",
@@ -61,7 +61,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "delimiter", foreground: "607188" },
     ],
     colors: {
-      "editor.background": "#f3f9ff",
+      "editor.background": "#00000000",
       "editor.foreground": "#16314f",
       "editorLineNumber.foreground": "#8aa0bc",
       "editorLineNumber.activeForeground": "#1769d1",
@@ -87,7 +87,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "type", foreground: "953800" },
     ],
     colors: {
-      "editor.background": "#ffffff",
+      "editor.background": "#00000000",
       "editor.foreground": "#24292f",
       "editorLineNumber.foreground": "#8c959f",
       "editorLineNumber.activeForeground": "#24292f",
@@ -110,7 +110,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "type", foreground: "ffa657" },
     ],
     colors: {
-      "editor.background": "#0d1117",
+      "editor.background": "#00000000",
       "editor.foreground": "#c9d1d9",
       "editorLineNumber.foreground": "#6e7681",
       "editorLineNumber.activeForeground": "#c9d1d9",
@@ -135,7 +135,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "variable", foreground: "f8f8f2" },
     ],
     colors: {
-      "editor.background": "#282a36",
+      "editor.background": "#00000000",
       "editor.foreground": "#f8f8f2",
       "editorLineNumber.foreground": "#6272a4",
       "editorLineNumber.activeForeground": "#f8f8f2",
@@ -165,7 +165,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "delimiter", foreground: "6b9080" },
     ],
     colors: {
-      "editor.background": "#081410",
+      "editor.background": "#00000000",
       "editor.foreground": "#a7f3d0",
       "editorLineNumber.foreground": "#3f6852",
       "editorLineNumber.activeForeground": "#6ee7b7",
@@ -191,7 +191,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "delimiter", foreground: "4b7a64" },
     ],
     colors: {
-      "editor.background": "#f0fdf4",
+      "editor.background": "#00000000",
       "editor.foreground": "#1e3a2f",
       "editorLineNumber.foreground": "#7ba690",
       "editorLineNumber.activeForeground": "#047857",
@@ -218,7 +218,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "function", foreground: "88c0d0" },
     ],
     colors: {
-      "editor.background": "#2e3440",
+      "editor.background": "#00000000",
       "editor.foreground": "#d8dee9",
       "editorLineNumber.foreground": "#4c566a",
       "editorLineNumber.activeForeground": "#d8dee9",
@@ -242,7 +242,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "function", foreground: "a6e22e" },
     ],
     colors: {
-      "editor.background": "#272822",
+      "editor.background": "#00000000",
       "editor.foreground": "#f8f8f2",
       "editorLineNumber.foreground": "#75715e",
       "editorLineNumber.activeForeground": "#f8f8f2",
@@ -266,7 +266,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "function", foreground: "7aa2f7" },
     ],
     colors: {
-      "editor.background": "#1a1b26",
+      "editor.background": "#00000000",
       "editor.foreground": "#a9b1d6",
       "editorLineNumber.foreground": "#3b4261",
       "editorLineNumber.activeForeground": "#737aa2",
@@ -290,7 +290,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "function", foreground: "61afef" },
     ],
     colors: {
-      "editor.background": "#282c34",
+      "editor.background": "#00000000",
       "editor.foreground": "#abb2bf",
       "editorLineNumber.foreground": "#4b5263",
       "editorLineNumber.activeForeground": "#abb2bf",
@@ -314,7 +314,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "function", foreground: "b58900" },
     ],
     colors: {
-      "editor.background": "#002b36",
+      "editor.background": "#00000000",
       "editor.foreground": "#839496",
       "editorLineNumber.foreground": "#586e75",
       "editorLineNumber.activeForeground": "#839496",
@@ -341,7 +341,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "type", foreground: "f9e2af" },
     ],
     colors: {
-      "editor.background": "#1e1e2e",
+      "editor.background": "#00000000",
       "editor.foreground": "#cdd6f4",
       "editorLineNumber.foreground": "#585b70",
       "editorLineNumber.activeForeground": "#cba6f7",
@@ -370,7 +370,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "type", foreground: "df8e1d" },
     ],
     colors: {
-      "editor.background": "#eff1f5",
+      "editor.background": "#00000000",
       "editor.foreground": "#4c4f69",
       "editorLineNumber.foreground": "#acb0be",
       "editorLineNumber.activeForeground": "#8839ef",
@@ -399,7 +399,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "type", foreground: "fe4450" },
     ],
     colors: {
-      "editor.background": "#262335",
+      "editor.background": "#00000000",
       "editor.foreground": "#f8f8f2",
       "editorLineNumber.foreground": "#4e4b5d",
       "editorLineNumber.activeForeground": "#ff7edb",
@@ -431,7 +431,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "delimiter", foreground: "8fb7e6" },
     ],
     colors: {
-      "editor.background": "#081423",
+      "editor.background": "#00000000",
       "editor.foreground": "#cfe7ff",
       "editorLineNumber.foreground": "#4f6b91",
       "editorLineNumber.activeForeground": "#8dbdff",
@@ -461,7 +461,7 @@ export function setupOpenCalcMonaco(monaco) {
       { token: "delimiter", foreground: "607188" },
     ],
     colors: {
-      "editor.background": "#eef7ff",
+      "editor.background": "#00000000",
       "editor.foreground": "#16314f",
       "editorLineNumber.foreground": "#8aa0bc",
       "editorLineNumber.activeForeground": "#1769d1",
@@ -472,6 +472,54 @@ export function setupOpenCalcMonaco(monaco) {
       "editorIndentGuide.activeBackground1": "#a8c7ef",
       "editorWidget.background": "#ffffff",
       "editorWidget.border": "#c9d9ee",
+    },
+  });
+
+  monaco.editor.defineTheme("paper-textbook", {
+    base: "vs",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "7086a0" },
+      { token: "keyword", foreground: "1769d1", fontStyle: "bold" },
+      { token: "string", foreground: "0f8d85" },
+      { token: "number", foreground: "b36d05" },
+      { token: "delimiter", foreground: "607188" },
+    ],
+    colors: {
+      "editor.background": "#00000000",
+      "editor.foreground": "#2b2b29",
+      "editorLineNumber.foreground": "#8c959f",
+      "editorLineNumber.activeForeground": "#2b2b29",
+      "editorCursor.foreground": "#1769d1",
+      "editor.selectionBackground": "#00000015",
+      "editor.inactiveSelectionBackground": "#0000000a",
+      "editor.lineHighlightBackground": "#00000008",
+      "editorWidget.background": "#ffffff",
+      "editorWidget.border": "#d0d7de",
+    },
+  });
+
+  monaco.editor.defineTheme("sepia-textbook", {
+    base: "vs-dark",
+    inherit: true,
+    rules: [
+      { token: "comment", foreground: "6e86a6" },
+      { token: "keyword", foreground: "74c0fc", fontStyle: "bold" },
+      { token: "string", foreground: "8ce99a" },
+      { token: "number", foreground: "ffd166" },
+      { token: "delimiter", foreground: "9fb5d1" },
+    ],
+    colors: {
+      "editor.background": "#00000000",
+      "editor.foreground": "#e6e6df",
+      "editorLineNumber.foreground": "#6e7681",
+      "editorLineNumber.activeForeground": "#c9d1d9",
+      "editorCursor.foreground": "#74c0fc",
+      "editor.selectionBackground": "#ffffff20",
+      "editor.inactiveSelectionBackground": "#ffffff10",
+      "editor.lineHighlightBackground": "#ffffff0a",
+      "editorWidget.background": "#161b22",
+      "editorWidget.border": "#30363d",
     },
   });
 

@@ -156,11 +156,53 @@ const PALETTES: Record<string, CodeLensUiPalette> = {
   },
 }
 
+function extractHex(str: string): string | null {
+  if (!str) return null;
+  const match = str.match(/#([0-9a-fA-F]{3,8})/);
+  return match ? match[0] : null;
+}
+
+function generateDynamicPalette(def: any): CodeLensUiPalette {
+  const base = PALETTES.default;
+  const sourceUI = def.uiDark || def.uiLight || {};
+  
+  const bg = extractHex(sourceUI.bg0) ?? base.bg;
+  const headerBg = extractHex(sourceUI.bg1) ?? base.headerBg;
+  const panelBg = extractHex(sourceUI.bg1) ?? base.panelBg;
+  const panelBg2 = extractHex(sourceUI.bg2) ?? base.panelBg2;
+  const border = extractHex(sourceUI.border) ?? base.border;
+  const text = extractHex(sourceUI.txt1) ?? base.text;
+  const textFaint = extractHex(sourceUI.txt2) ?? base.textFaint;
+  const accent = def.accentHex ?? base.accent;
+
+  return {
+    ...base,
+    bg,
+    headerBg,
+    panelBg,
+    panelBg2,
+    border,
+    borderStrong: extractHex(sourceUI.btnBorder) ?? border,
+    textFaint,
+    textMuted: textFaint,
+    textDim: textFaint,
+    text,
+    textBright: text,
+    textSoft: text,
+    accent,
+    accentBright: accent,
+    accentSolid: accent,
+    accentDeep: accent,
+    accentBg: `${accent}20`,
+    accentBgSolid: `${accent}40`,
+  };
+}
+
 export const CODELENS_THEMES: CodeLensTheme[] = Object.entries(STUDIO_THEMES).map(([id, def]: [string, any]) => ({
   id,
   label: def.name,
   monaco: def.monacoDark ?? def.monacoLight,
-  ui: PALETTES[id] ?? PALETTES.default,
+  ui: PALETTES[id] ?? generateDynamicPalette(def),
 }))
 
 export const DEFAULT_CODELENS_THEME_ID = 'default'

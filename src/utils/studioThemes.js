@@ -1021,7 +1021,7 @@ export const STUDIO_THEMES = {
   paperTextbook: {
     name: 'Paper Textbook',
     accentHex: '#475569', // Slate-600 (Ink)
-    monacoLight: 'open-calc-light',
+    monacoLight: 'paper-textbook',
     forceLight: true,
     dynamic: false,
     uiDark: {
@@ -1074,7 +1074,7 @@ export const STUDIO_THEMES = {
   sepiaTextbook: {
     name: 'Sepia Textbook',
     accentHex: '#f97316', // Orange-500
-    monacoDark: 'open-calc-dark',
+    monacoDark: 'sepia-textbook',
     dynamic: false,
     uiDark: {
       bg0: 'bg-[#2a2723]',
