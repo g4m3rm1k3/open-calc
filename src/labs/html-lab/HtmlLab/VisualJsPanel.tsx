@@ -311,7 +311,7 @@ function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChi
   const isSelected = selectedBlockId === block.id
 
   return (
-    <div style={{ marginLeft: depth * 10 }}>
+    <div className={styles.blockRowWrapper}>
       <div
         className={`${styles.blockRow} ${isSelected ? styles.blockRowActive : ''}`}
         onClick={e => { e.stopPropagation(); onSelect(block.id) }}
@@ -366,16 +366,25 @@ function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChi
             />
           ))}
           <div className={styles.childActions}>
-            {childOptions.map(opt => (
-              <button
-                key={opt.type}
-                type="button"
-                className={styles.addChildBtn}
-                onClick={e => { e.stopPropagation(); onAddChild(opt.type as BlockType, block.id) }}
-              >
-                + {opt.label}
-              </button>
-            ))}
+            {childOptions.map(opt => {
+              const color = CATEGORY_COLORS[opt.category] || '#94a3b8';
+              return (
+                <button
+                  key={opt.type}
+                  type="button"
+                  className={styles.addChildBtn}
+                  style={{ 
+                    '--block-color': color,
+                    '--block-bg': color + '1a',
+                    '--block-border': color + '4d'
+                  } as React.CSSProperties}
+                  onClick={e => { e.stopPropagation(); onAddChild(opt.type as BlockType, block.id) }}
+                >
+                  <span className={styles.addChildIcon}>+</span>
+                  <span className={styles.addChildLabel}>{opt.label}</span>
+                </button>
+              )
+            })}
           </div>
         </div>
       )}
@@ -549,7 +558,7 @@ function TargetField({ block, domHints, variableHints, onChange }: {
 // small inputs for just those parameters and live-composes the final
 // expression as you fill them in.
 
-function ExpressionField({ label, value, domHints, variableHints, onChange, nested }: {
+function ExpressionField({ label, value, domHints, variableHints, onChange, nested, depth }: {
   label: string
   value: string
   domHints: string[]

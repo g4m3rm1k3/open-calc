@@ -252,10 +252,10 @@
   border-left: 2px solid var(--bracket-color, var(--hl-border, #e2e8f0));
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
-  margin-left: 8px;
-  padding-left: 10px;
-  margin-bottom: 6px;
-  margin-top: 6px;
+  margin-left: 4px;
+  padding-left: 6px;
+  margin-bottom: 4px;
+  margin-top: 4px;
   transition: border-color 0.2s ease;
 }
 
@@ -272,7 +272,10 @@
   flex-wrap: wrap;
   gap: 6px;
   margin-top: 6px;
-  padding-bottom: 4px;
+  padding: 6px;
+  border: 1px dashed color-mix(in srgb, var(--bracket-color) 40%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--bracket-color) 5%, transparent);
 }
 
 .addChildBtn {
@@ -281,10 +284,10 @@
   align-items: center;
   justify-content: center;
   font-size: 10px;
-  padding: 6px 4px;
-  border: 1px solid color-mix(in srgb, var(--block-color) 40%, transparent);
+  padding: 4px 4px;
+  border: 1px solid var(--block-border);
   border-radius: 6px;
-  background: color-mix(in srgb, var(--block-color) 12%, transparent);
+  background: var(--block-bg);
   cursor: pointer;
   color: var(--block-color);
   font-weight: 600;
