@@ -70,9 +70,31 @@ export const EXPRESSION_LIBRARY: ExpressionTemplate[] = [
   // ── Network / JSON ───────────────────────────────────────────────────────
   {
     id: 'fetchJson', group: 'network', label: 'Fetch JSON from a URL',
-    description: 'fetch(url).then(response => response.json())',
+    description: 'fetch(url).then(response => response.json()) — just the promise, e.g. to return or assign it',
     params: [p('url', 'URL', 'text', 'https://api.example.com')],
     build: v => `fetch(${JSON.stringify(v.url || '')}).then(response => response.json())`,
+  },
+  {
+    id: 'fetchJsonHandle', group: 'network', label: 'Fetch JSON, then use it',
+    description: 'fetch(url).then(r => r.json()).then(data => { ... }) — the whole chain, explicit: fill in what happens with the data, and (optionally) what happens if it fails',
+    params: [
+      p('url', 'URL', 'text', 'https://api.example.com'),
+      p('body', 'What to do with the data (data is available)', 'text', 'console.log(data)'),
+      p('errorBody', 'What to do if it fails (optional)', 'text', ''),
+    ],
+    build: v => {
+      const url = JSON.stringify(v.url || '')
+      const body = v.body?.trim() || 'console.log(data)'
+      const base = `fetch(${url}).then(response => response.json()).then(data => { ${body} })`
+      const errorBody = v.errorBody?.trim()
+      return errorBody ? `${base}.catch(error => { ${errorBody} })` : base
+    },
+  },
+  {
+    id: 'fetchText', group: 'network', label: 'Fetch plain text from a URL',
+    description: 'fetch(url).then(response => response.text())',
+    params: [p('url', 'URL', 'text', 'https://api.example.com')],
+    build: v => `fetch(${JSON.stringify(v.url || '')}).then(response => response.text())`,
   },
   {
     id: 'jsonStringify', group: 'network', label: 'Turn a value into JSON text',

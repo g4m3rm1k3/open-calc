@@ -290,6 +290,24 @@
 }
 .propInput:focus { outline: none; border-color: #6366f1; }
 
+/* Native <select> popups render as an OS-level layer, not a normal styled
+   DOM node — background:transparent on the closed control (fine for text
+   inputs, which stay untouched) falls back to a plain white system popup
+   the moment it's opened. Giving <option>/<optgroup> a real, theme-matched
+   background + color directly is the standard cross-browser fix; Chrome
+   and Firefox both honor it even though nothing else about the popup is
+   stylable. Scoped to selects only, so plain inputs/textareas keep
+   blending transparently into the panel as before. */
+select.propInput {
+  background: var(--hl-surface, #1e293b);
+  color: var(--hl-text, inherit);
+}
+select.propInput option,
+select.propInput optgroup {
+  background: var(--hl-surface, #1e293b);
+  color: var(--hl-text, inherit);
+}
+
 .fieldCode {
   flex: 1;
   min-width: 0;
