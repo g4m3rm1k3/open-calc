@@ -1017,6 +1017,111 @@ export const STUDIO_THEMES = {
       resizeHandleBg: '#002636',
       resizeHandleHover: '#06b6d4',
     }
+  },
+  paperTextbook: {
+    name: 'Paper Textbook',
+    accentHex: '#475569', // Slate-600 (Ink)
+    monacoLight: 'open-calc-light',
+    forceLight: true,
+    dynamic: false,
+    uiDark: {
+      bg0: 'bg-[#f9f9f6]', // Soft off-white paper
+      bg1: 'bg-[#f0f0eb]', // Slightly darker for panels
+      bg2: 'bg-[#e6e6df]', // Even darker for hovers
+      border: 'border-[#d4d4cd]',
+      txt1: 'text-[#2b2b29]', // Soft ink black
+      txt2: 'text-[#52524e]', // Muted pencil gray
+      hoverBg: 'hover:bg-[#f0f0eb]',
+      hoverTx: 'hover:text-[#2b2b29]',
+      btnBorder: 'border-[#d4d4cd]',
+      primary: 'text-[#475569]',
+      primaryBg: 'bg-[#475569]/10',
+    },
+    mdDark: {
+      text: '#2b2b29',
+      h1: '#1a1a18',
+      h2: '#334155', // Slate-700
+      h3: '#475569', // Slate-600
+      h4: '#334155',
+      strong: '#1a1a18',
+      em: '#334155',
+      listMarker: '#475569',
+      a: '#334155',
+      codeBg: '#f0f0eb',
+      codeText: '#475569',
+      preBg: '#f9f9f6',
+      preBorder: '#d4d4cd',
+      quoteBorder: '#475569',
+      quoteBg: 'rgba(71, 85, 105, 0.05)',
+      quoteText: '#52524e',
+      thBg: '#f0f0eb',
+      tdBorder: '#d4d4cd',
+      trEven: '#f9f9f6',
+      hr: '#d4d4cd',
+      imgBorder: '#d4d4cd',
+      codeHeaderBg: '#f0f0eb',
+      codeHeaderBorder: '#d4d4cd',
+      codeLangText: '#52524e',
+      codeBtnBg: '#f9f9f6',
+      codeBtnBorder: '#d4d4cd',
+      codeBtnText: '#2b2b29',
+      codeBtnHoverBg: '#d4d4cd',
+      codeBtnHoverText: '#2b2b29',
+      resizeHandleBg: '#d4d4cd',
+      resizeHandleHover: '#475569',
+    }
+  },
+  sepiaTextbook: {
+    name: 'Sepia Textbook',
+    accentHex: '#f97316', // Orange-500
+    monacoDark: 'open-calc-dark',
+    dynamic: false,
+    uiDark: {
+      bg0: 'bg-[#2a2723]',
+      bg1: 'bg-[#36322d]',
+      bg2: 'bg-[#45403a]/50',
+      border: 'border-[#5c554d]',
+      txt1: 'text-[#e3dfd7]',
+      txt2: 'text-[#a8a195]',
+      hoverBg: 'hover:bg-[#5c554d]/50',
+      hoverTx: 'hover:text-[#e3dfd7]',
+      btnBorder: 'border-[#736c62]',
+      primary: 'text-[#fb923c]', // Orange-400
+      primaryBg: 'bg-[#fb923c]/10',
+    },
+    mdDark: {
+      text: '#e3dfd7',
+      h1: '#e3dfd7',
+      h2: '#fb923c', // Orange-400
+      h3: '#fdba74', // Orange-300
+      h4: '#fb923c',
+      strong: '#fdba74',
+      em: '#fb923c',
+      listMarker: '#fdba74',
+      a: '#fb923c',
+      codeBg: '#36322d',
+      codeText: '#fdba74',
+      preBg: '#2a2723',
+      preBorder: '#5c554d',
+      quoteBorder: '#fb923c',
+      quoteBg: 'rgba(251, 146, 60, 0.1)',
+      quoteText: '#a8a195',
+      thBg: '#36322d',
+      tdBorder: '#5c554d',
+      trEven: '#2a2723',
+      hr: '#5c554d',
+      imgBorder: '#5c554d',
+      codeHeaderBg: '#2a2723',
+      codeHeaderBorder: '#5c554d',
+      codeLangText: '#a8a195',
+      codeBtnBg: '#36322d',
+      codeBtnBorder: '#5c554d',
+      codeBtnText: '#e3dfd7',
+      codeBtnHoverBg: '#5c554d',
+      codeBtnHoverText: '#e3dfd7',
+      resizeHandleBg: '#36322d',
+      resizeHandleHover: '#fb923c',
+    }
   }
 };
 
