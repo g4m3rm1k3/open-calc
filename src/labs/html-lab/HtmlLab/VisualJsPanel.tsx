@@ -231,6 +231,7 @@ export default function VisualJsPanel({ elements, html, css = '', jsFiles, activ
                       key={item.type}
                       type="button"
                       className={styles.paletteBtn}
+                      style={{ '--block-color': CATEGORY_COLORS[item.category] || 'var(--hl-text)' } as React.CSSProperties}
                       onClick={() => addBlock(item.type as BlockType)}
                       title={item.description}
                     >
