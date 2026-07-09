@@ -6,8 +6,16 @@
 // they're a dropdown pick instead of memorized syntax. Anything not covered
 // still falls back to typing it by hand — every field this powers stays a
 // normal, always-editable text input.
+//
+// Params of kind 'expression' are genuinely recursive: VisualJsPanel renders
+// them as another full nested pattern-picker, not a plain text box — so
+// "call a method with an argument that's itself a comparison that's itself
+// a property lookup" can be built (or, via detectTemplate below, decomposed
+// back out of already-written code) one explicit piece at a time, instead
+// of bottoming out at "type the rest by hand" the moment there's more than
+// one operator in play.
 
-export type ExpressionParamKind = 'selector' | 'variable' | 'text'
+export type ExpressionParamKind = 'selector' | 'variable' | 'expression' | 'text'
 
 export interface ExpressionParam {
   name: string
@@ -28,6 +36,8 @@ export interface ExpressionTemplate {
 
 export const EXPRESSION_GROUPS: { id: string; label: string }[] = [
   { id: 'dom', label: 'Find on the page' },
+  { id: 'calls', label: 'Calls & properties' },
+  { id: 'logic', label: 'Logic (and / or / not)' },
   { id: 'network', label: 'Network / JSON' },
   { id: 'text', label: 'Text' },
   { id: 'array', label: 'Lists' },
@@ -65,6 +75,61 @@ export const EXPRESSION_LIBRARY: ExpressionTemplate[] = [
     description: 'element.closest(selector)',
     params: [p('value', 'Element', 'variable'), p('selector', 'Ancestor', 'selector')],
     build: v => `${v.value || 'element'}.closest(${JSON.stringify(v.selector || '')})`,
+  },
+
+  // ── Calls & properties ──────────────────────────────────────────────────
+  // The general-purpose building blocks: "call this with these arguments"
+  // and "get this property off that." Every argument is itself a nested
+  // expression picker, so e.g. btn.addEventListener('click', load) breaks
+  // down into: call → fn: btn.addEventListener, arg1: a text literal,
+  // arg2: a bare identifier — instead of one opaque string.
+  {
+    id: 'callFn', group: 'calls', label: 'Call a function or method',
+    description: "name(arg1, arg2, arg3) — e.g. btn.addEventListener. Leave argument boxes blank if not needed.",
+    params: [
+      p('fn', 'Function / method (e.g. btn.addEventListener)', 'text'),
+      p('arg1', 'Argument 1 (optional)', 'expression'),
+      p('arg2', 'Argument 2 (optional)', 'expression'),
+      p('arg3', 'Argument 3 (optional)', 'expression'),
+    ],
+    build: v => {
+      const args = [v.arg1, v.arg2, v.arg3].map(a => (a ?? '').trim()).filter(Boolean)
+      return `${v.fn || 'fn'}(${args.join(', ')})`
+    },
+  },
+  {
+    id: 'getProperty', group: 'calls', label: 'Get a property',
+    description: 'object.property',
+    params: [p('object', 'Object', 'expression'), p('property', 'Property name', 'text')],
+    build: v => `${v.object || 'object'}.${v.property || 'property'}`,
+  },
+
+  // ── Logic (boolean combinators) ─────────────────────────────────────────
+  // These read as sentences on purpose — a learner should never have to
+  // wonder what && does at a given point; the label says it.
+  {
+    id: 'logicAnd', group: 'logic', label: 'Both must be true (AND)',
+    description: 'a && b',
+    params: [p('a', 'First', 'expression'), p('b', 'Second', 'expression')],
+    build: v => `${v.a || 'a'} && ${v.b || 'b'}`,
+  },
+  {
+    id: 'logicOr', group: 'logic', label: 'Either can be true (OR)',
+    description: 'a || b',
+    params: [p('a', 'First', 'expression'), p('b', 'Second', 'expression')],
+    build: v => `${v.a || 'a'} || ${v.b || 'b'}`,
+  },
+  {
+    id: 'logicNot', group: 'logic', label: 'Is not true (NOT)',
+    description: '!value',
+    params: [p('value', 'Value', 'expression')],
+    build: v => `!${v.value || 'value'}`,
+  },
+  {
+    id: 'guardThen', group: 'logic', label: 'Only if it exists, then...',
+    description: "value && action — a common safety check: don't run action unless value is real (not null/undefined). Same as AND, worded for this specific, very common use.",
+    params: [p('check', 'Only if this exists', 'expression'), p('then', 'Then do this', 'expression')],
+    build: v => `${v.check || 'value'} && ${v.then || 'action'}`,
   },
 
   // ── Network / JSON ───────────────────────────────────────────────────────
@@ -279,43 +344,97 @@ export const EXPRESSION_LIBRARY: ExpressionTemplate[] = [
   {
     id: 'cmpEquals', group: 'compare', label: 'Are equal',
     description: 'a === b',
-    params: [p('a', 'First', 'variable'), p('b', 'Second', 'text')],
+    params: [p('a', 'First', 'expression'), p('b', 'Second', 'expression')],
     build: v => `${v.a || 'a'} === ${v.b || 'b'}`,
   },
   {
     id: 'cmpNotEquals', group: 'compare', label: 'Are not equal',
     description: 'a !== b',
-    params: [p('a', 'First', 'variable'), p('b', 'Second', 'text')],
+    params: [p('a', 'First', 'expression'), p('b', 'Second', 'expression')],
     build: v => `${v.a || 'a'} !== ${v.b || 'b'}`,
   },
   {
     id: 'cmpGreater', group: 'compare', label: 'Greater than',
     description: 'a > b',
-    params: [p('a', 'First', 'variable'), p('b', 'Second', 'text')],
+    params: [p('a', 'First', 'expression'), p('b', 'Second', 'expression')],
     build: v => `${v.a || 'a'} > ${v.b || 'b'}`,
   },
   {
     id: 'cmpLess', group: 'compare', label: 'Less than',
     description: 'a < b',
-    params: [p('a', 'First', 'variable'), p('b', 'Second', 'text')],
+    params: [p('a', 'First', 'expression'), p('b', 'Second', 'expression')],
     build: v => `${v.a || 'a'} < ${v.b || 'b'}`,
   },
-  {
-    id: 'cmpAnd', group: 'compare', label: 'Both are true',
-    description: 'a && b',
-    params: [p('a', 'First', 'variable'), p('b', 'Second', 'variable')],
-    build: v => `${v.a || 'a'} && ${v.b || 'b'}`,
-  },
-  {
-    id: 'cmpOr', group: 'compare', label: 'Either is true',
-    description: 'a || b',
-    params: [p('a', 'First', 'variable'), p('b', 'Second', 'variable')],
-    build: v => `${v.a || 'a'} || ${v.b || 'b'}`,
-  },
-  {
-    id: 'cmpNot', group: 'compare', label: 'Is not true',
-    description: '!value',
-    params: [p('value', 'Value', 'variable')],
-    build: v => `!${v.value || 'value'}`,
-  },
 ]
+
+// ── Reverse detection ─────────────────────────────────────────────────────
+// Run once, at mount, against whatever text a field already holds (e.g. code
+// just parsed in from the JS file) — so already-written a && b / a || b /
+// !a / name(args) shows up pre-decomposed into real, explicit blocks instead
+// of always defaulting to "type manually" just because it wasn't built
+// through this UI in the first place. Deliberately narrow: these are the
+// few shapes with syntax simple and unambiguous enough to detect reliably
+// without a real JS parser. Anything else still falls back to manual entry,
+// same as always.
+
+function findTopLevel(s: string, op: string): number {
+  let depth = 0
+  let inStr = false
+  let strCh = ''
+  for (let i = 0; i <= s.length - op.length; i++) {
+    const ch = s[i]
+    if (inStr) { if (ch === strCh && s[i - 1] !== '\\') inStr = false; continue }
+    if (ch === '"' || ch === "'" || ch === '`') { inStr = true; strCh = ch; continue }
+    if ('([{'.includes(ch)) depth++
+    else if (')]}'.includes(ch)) depth--
+    if (depth === 0 && s.slice(i, i + op.length) === op) return i
+  }
+  return -1
+}
+
+function splitArgs(s: string): string[] {
+  const args: string[] = []
+  let depth = 0, inStr = false, strCh = '', start = 0
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i]
+    if (inStr) { if (ch === strCh && s[i - 1] !== '\\') inStr = false; continue }
+    if (ch === '"' || ch === "'" || ch === '`') { inStr = true; strCh = ch; continue }
+    if ('([{'.includes(ch)) depth++
+    else if (')]}'.includes(ch)) depth--
+    if (depth === 0 && ch === ',') { args.push(s.slice(start, i).trim()); start = i + 1 }
+  }
+  const last = s.slice(start).trim()
+  if (last) args.push(last)
+  return args
+}
+
+export interface DetectedTemplate {
+  id: string
+  params: Record<string, string>
+}
+
+export function detectTemplate(value: string): DetectedTemplate | null {
+  const v = value.trim()
+  if (!v) return null
+
+  const andAt = findTopLevel(v, '&&')
+  if (andAt !== -1) return { id: 'logicAnd', params: { a: v.slice(0, andAt).trim(), b: v.slice(andAt + 2).trim() } }
+
+  const orAt = findTopLevel(v, '||')
+  if (orAt !== -1) return { id: 'logicOr', params: { a: v.slice(0, orAt).trim(), b: v.slice(orAt + 2).trim() } }
+
+  if (v.startsWith('!') && v[1] !== '=') return { id: 'logicNot', params: { value: v.slice(1).trim() } }
+
+  // name(args) or a.b.c(args) — the whole string, not just a piece of it
+  const callM = v.match(/^([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*)\((.*)\)$/)
+  if (callM) {
+    const args = splitArgs(callM[2])
+    if (args.length <= 3) {
+      const params: Record<string, string> = { fn: callM[1] }
+      args.forEach((a, i) => { params[`arg${i + 1}`] = a })
+      return { id: 'callFn', params }
+    }
+  }
+
+  return null
+}

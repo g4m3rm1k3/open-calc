@@ -8,7 +8,7 @@ import {
 import { parseJsToBlocks } from '../../visual-code/jsToBlocks.ts'
 import type { Block, BlockType, FieldSpec, Project } from '../../visual-code/types.ts'
 import type { LabElement, JsFile } from './types'
-import { EXPRESSION_GROUPS, EXPRESSION_LIBRARY, type ExpressionParam } from './jsExpressionLibrary.ts'
+import { EXPRESSION_GROUPS, EXPRESSION_LIBRARY, detectTemplate, type ExpressionParam } from './jsExpressionLibrary.ts'
 import styles from './VisualJsPanel.module.css'
 
 interface Props {
@@ -548,15 +548,24 @@ function TargetField({ block, domHints, variableHints, onChange }: {
 // small inputs for just those parameters and live-composes the final
 // expression as you fill them in.
 
-function ExpressionField({ label, value, domHints, variableHints, onChange }: {
+function ExpressionField({ label, value, domHints, variableHints, onChange, nested }: {
   label: string
   value: string
   domHints: string[]
   variableHints: string[]
   onChange: (v: string) => void
+  // True when this is a param of an *outer* expression (e.g. the "a" in
+  // a && b) rather than the top-level field on the block itself — just
+  // controls a visual indent so nesting depth reads clearly.
+  nested?: boolean
 }) {
-  const [templateId, setTemplateId] = useState<string | null>(null)
-  const [paramValues, setParamValues] = useState<Record<string, string>>({})
+  // Runs once, at mount, against whatever this field already holds — e.g.
+  // code that was just parsed in from the JS file. Lazy useState initializers
+  // only ever run on the very first render, which is exactly the "only when
+  // this is genuinely a fresh value, never fight the user mid-edit" timing
+  // this needs (a fresh import always mounts a fresh block/field anyway).
+  const [templateId, setTemplateId] = useState<string | null>(() => detectTemplate(value)?.id ?? null)
+  const [paramValues, setParamValues] = useState<Record<string, string>>(() => detectTemplate(value)?.params ?? {})
   const template = templateId ? EXPRESSION_LIBRARY.find(t => t.id === templateId) ?? null : null
 
   const handleSelectTemplate = (id: string) => {
@@ -576,7 +585,7 @@ function ExpressionField({ label, value, domHints, variableHints, onChange }: {
     if (template) onChange(template.build(next))
   }
 
-  return (
+  const body = (
     <>
       <label className={styles.propRow}>
         <span className={styles.propLabel}>Pattern</span>
@@ -614,6 +623,8 @@ function ExpressionField({ label, value, domHints, variableHints, onChange }: {
       </label>
     </>
   )
+
+  return nested ? <div className={styles.childSlot}>{body}</div> : body
 }
 
 function ExpressionParamInput({ param, value, domHints, variableHints, onChange }: {
@@ -623,6 +634,23 @@ function ExpressionParamInput({ param, value, domHints, variableHints, onChange 
   variableHints: string[]
   onChange: (v: string) => void
 }) {
+  // Recursive case: a param that's itself a full sub-expression gets its
+  // own nested pattern-picker, not a plain text box — this is what lets
+  // "call a method whose argument is a comparison" build (or decompose)
+  // one explicit piece at a time instead of bottoming out at raw text.
+  if (param.kind === 'expression') {
+    return (
+      <ExpressionField
+        label={param.label}
+        value={value}
+        domHints={domHints}
+        variableHints={variableHints}
+        onChange={onChange}
+        nested
+      />
+    )
+  }
+
   const hints = param.kind === 'selector' ? domHints : param.kind === 'variable' ? variableHints : []
   const known = hints.includes(value)
   const [custom, setCustom] = useState(hints.length > 0 ? (!known && value !== '') : true)
