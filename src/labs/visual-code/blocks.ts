@@ -201,7 +201,7 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
   def('function', 'Function', 'oop', 'A reusable block of code outside any class.', {
     defaults: { name: 'makePlayer', params: 'name: string', returnType: '', async: 'false' },
     fields: [f('name', 'Name'), f('params', 'Parameters'), f('returnType', 'Return type'), f('async', 'Async', 'select', ['false', 'true'])],
-    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'loop', 'return', 'htmlText'],
+    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'loop', 'return', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle'],
   }),
   def('call', 'Call', 'oop', 'Execute a function or method.', {
     defaults: { expression: 'player.greet()' },
@@ -258,12 +258,12 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
   // ── Flow ─────────────────────────────────────────────────────────────────
   def('if', 'If', 'flow', 'Run code only when a condition is true.', {
     defaults: { condition: 'player.score > 5', body: '' },
-    childTypes: ['variable', 'assign', 'call', 'log', 'loop', 'return', 'htmlText'],
+    childTypes: ['variable', 'assign', 'call', 'log', 'loop', 'return', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle'],
     fields: [f('condition', 'Condition'), f('body', 'Raw body (fallback)', 'code')],
   }),
   def('loop', 'Repeat', 'flow', 'Run code a set number of times.', {
     defaults: { count: '3', iterator: 'i', body: '' },
-    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'return', 'htmlText'],
+    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'return', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle'],
     fields: [f('count', 'Count'), f('iterator', 'Iterator name'), f('body', 'Raw body (fallback)', 'code')],
   }),
 
@@ -276,12 +276,32 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
   // ── HTML ─────────────────────────────────────────────────────────────────
   def('event', 'Event Listener', 'html', 'Run code when the user interacts with an element.', {
     defaults: { selector: '#scoreButton', event: 'click' },
-    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'loop', 'htmlText'],
+    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'loop', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle'],
     fields: [f('selector', 'CSS selector'), f('event', 'Event type')],
   }),
   def('htmlText', 'HTML Text', 'html', 'Write a value into an element the user can see.', {
     defaults: { selector: '#message', text: 'player.label' },
     fields: [f('selector', 'CSS selector'), f('text', 'Text expression')],
+  }),
+  def('readValue', 'Read Value', 'html', 'Read what a user typed into an input field.', {
+    defaults: { name: 'userInput', selector: '' },
+    fields: [f('name', 'Store in variable'), f('selector', 'Input element')],
+  }),
+  def('addClass', 'Add Class', 'html', 'Add a CSS class to an element to change how it looks.', {
+    defaults: { selector: '', className: 'active' },
+    fields: [f('selector', 'Element'), f('className', 'Class to add')],
+  }),
+  def('removeClass', 'Remove Class', 'html', 'Remove a CSS class from an element.', {
+    defaults: { selector: '', className: 'active' },
+    fields: [f('selector', 'Element'), f('className', 'Class to remove')],
+  }),
+  def('toggleClass', 'Toggle Class', 'html', 'Add a class if absent, remove it if present.', {
+    defaults: { selector: '', className: 'active' },
+    fields: [f('selector', 'Element'), f('className', 'Class to toggle')],
+  }),
+  def('setStyle', 'Set Style', 'html', 'Set a CSS style property directly on an element.', {
+    defaults: { selector: '', property: 'display', value: 'none' },
+    fields: [f('selector', 'Element'), f('property', 'CSS property'), f('value', 'Value')],
   }),
 ]
 
@@ -338,6 +358,11 @@ export function summarizeBlock(block: Block): string {
     case 'log':          return `console.log(${f.expression || ''})`
     case 'event':        return `${f.selector || '#app'} on ${f.event || 'click'}`
     case 'htmlText':     return `${f.selector || '#app'} ← ${f.text || ''}`
+    case 'readValue':    return `${f.name || 'val'} = ${f.selector || '?'}.value`
+    case 'addClass':     return `${f.selector || '?'}.classList.add('${f.className || ''}')`
+    case 'removeClass':  return `${f.selector || '?'}.classList.remove('${f.className || ''}')`
+    case 'toggleClass':  return `${f.selector || '?'}.classList.toggle('${f.className || ''}')`
+    case 'setStyle':     return `${f.selector || '?'}.style.${f.property || 'display'} = '${f.value || ''}'`
     default:             return Object.values(f).filter(Boolean).join(' ')
   }
 }

@@ -137,12 +137,13 @@ interface OutputPanelProps {
   previewRef: RefObject<HTMLIFrameElement>
   onRun: () => void
   onOpenCodeLens: () => void
+  onMakeBlocks: (code: string) => void
   onFieldChange: (name: string, value: string) => void
   onHtmlChange: (html: string) => void
   previewHtml: string
 }
 
-export function OutputPanel({ activeTab, generated, project, messages, previewRef, onRun, onOpenCodeLens, onHtmlChange, previewHtml }: OutputPanelProps) {
+export function OutputPanel({ activeTab, generated, project, messages, previewRef, onRun, onOpenCodeLens, onMakeBlocks, onHtmlChange, previewHtml }: OutputPanelProps) {
   const openInCodeLens = onOpenCodeLens
 
   return (
@@ -154,9 +155,14 @@ export function OutputPanel({ activeTab, generated, project, messages, previewRe
           ))}
           <div className={styles.codeHeader}>
             <span className={styles.codeLabel}>{project.target === 'typescript' ? 'TypeScript' : 'JavaScript'} · {generated.code.split('\n').length} lines</span>
-            <button type="button" className={styles.codeLensBtn} onClick={openInCodeLens} title="Open in CodeLens to visualize execution">
-              <ExternalLink size={12} /> Open in CodeLens
-            </button>
+            <div className={styles.codeHeaderActions}>
+              <button type="button" className={styles.codeLensBtn} onClick={() => onMakeBlocks(generated.code)} title="Convert this code back into visual blocks">
+                ← Make blocks
+              </button>
+              <button type="button" className={styles.codeLensBtn} onClick={openInCodeLens} title="Open in CodeLens to visualize execution">
+                <ExternalLink size={12} /> Open in CodeLens
+              </button>
+            </div>
           </div>
           <pre className={styles.code}>{generated.code || '// Add blocks to generate code'}</pre>
         </div>
@@ -165,7 +171,6 @@ export function OutputPanel({ activeTab, generated, project, messages, previewRe
       {activeTab === 'run' && (
         <div className={styles.editor}>
           <div className={styles.runHeader}>
-            <button type="button" className={`${styles.button} ${styles.primaryButton}`} onClick={onRun}>▶ Run</button>
             <button type="button" className={styles.codeLensBtn} onClick={openInCodeLens} title="Visualize in CodeLens">
               <ExternalLink size={12} /> Visualize in CodeLens
             </button>

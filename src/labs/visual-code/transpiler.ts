@@ -206,6 +206,21 @@ function renderBlock(item: Block, depth: number, diags: Diagnostic[], lang: 'jav
     }
     case 'htmlText':
       return `${pad}document.querySelector(${JSON.stringify(f.selector || '#app')}).textContent = String(${val(f.text, '""')});`
+    case 'readValue': {
+      const cast = lang === 'typescript' ? ' as HTMLInputElement' : ''
+      return `${pad}const ${safeId(f.name, 'inputVal', diags, item)} = (document.querySelector(${JSON.stringify(f.selector || '#input')})${cast}).value;`
+    }
+    case 'addClass':
+      return `${pad}document.querySelector(${JSON.stringify(f.selector || '#app')})?.classList.add(${JSON.stringify(f.className || '')});`
+    case 'removeClass':
+      return `${pad}document.querySelector(${JSON.stringify(f.selector || '#app')})?.classList.remove(${JSON.stringify(f.className || '')});`
+    case 'toggleClass':
+      return `${pad}document.querySelector(${JSON.stringify(f.selector || '#app')})?.classList.toggle(${JSON.stringify(f.className || '')});`
+    case 'setStyle': {
+      const prop = (f.property || 'display').replace(/-([a-z])/g, (_: string, c: string) => c.toUpperCase())
+      const cast = lang === 'typescript' ? ' as HTMLElement' : ''
+      return `${pad}(document.querySelector(${JSON.stringify(f.selector || '#app')})${cast}).style.${prop} = ${JSON.stringify(f.value || '')};`
+    }
 
     // TypeScript-only blocks
     case 'interface': {
