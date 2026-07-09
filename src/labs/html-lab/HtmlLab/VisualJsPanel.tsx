@@ -636,7 +636,7 @@ function ExpressionField({ label, value, domHints, variableHints, onChange, nest
     </>
   )
 
-  return nested ? <div className={`${styles.childSlot} ${styles[`depth-${(depth || 0) % 6}`] || ''}`}>{body}</div> : body
+  return nested ? <div className={`${styles.nestedExprSlot} ${styles[`depth-${(depth || 0) % 6}`] || ''}`}>{body}</div> : <>{body}</>
 }
 
 function ExpressionParamInput({ param, value, domHints, variableHints, onChange, depth = 0 }: {

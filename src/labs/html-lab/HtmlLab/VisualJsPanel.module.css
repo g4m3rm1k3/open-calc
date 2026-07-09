@@ -259,6 +259,18 @@
   transition: border-color 0.2s ease;
 }
 
+.nestedExprSlot {
+  border-left: 2px solid var(--bracket-color, var(--hl-border, #e2e8f0));
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--bracket-color) 4%, transparent);
+  margin-left: 4px;
+  padding: 8px 8px 4px 0px;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+  box-shadow: inset 1px 0 0 rgba(255,255,255,0.05);
+}
+
 /* Depth-based Bracket Colors matching common IDE syntax themes */
 .depth-0 { --bracket-color: #e5c07b; } /* Yellow/Gold */
 .depth-1 { --bracket-color: #c678dd; } /* Purple */
@@ -320,8 +332,12 @@
 .propRow {
   display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 22px;
+  gap: 8px;
+  min-height: 26px;
+  margin-bottom: 8px;
+}
+.propRow:last-child {
+  margin-bottom: 0;
 }
 
 .propLabel {
@@ -340,15 +356,21 @@
   flex: 1;
   min-width: 0;
   font-size: 11px;
-  padding: 2px 5px;
+  padding: 4px 8px;
   border: 1px solid var(--hl-border, #e2e8f0);
-  border-radius: 4px;
-  background: transparent;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--hl-text) 3%, transparent);
   color: inherit;
   font-family: inherit;
   box-sizing: border-box;
+  transition: all 0.15s ease;
 }
-.propInput:focus { outline: none; border-color: #6366f1; }
+.propInput:focus { 
+  outline: none; 
+  border-color: #6366f1; 
+  background: transparent;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.15);
+}
 
 /* Native <select> popups render as an OS-level layer, not a normal styled
    DOM node — background:transparent on the closed control (fine for text
