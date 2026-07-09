@@ -52,6 +52,9 @@ function stripTypeScript(src: string): string {
   // implements clause
   s = s.replace(/\s+implements\s+[\w, .]+(?=\s*\{)/g, '')
 
+  // export keyword — remove from value declarations (script/eval context, no module system)
+  s = s.replace(/\bexport\s+(?=class\b|function\b|const\b|let\b|var\b|async\b)/g, '')
+
   // Generic type parameters on functions/classes: <T>, <T extends X>, <K, V>
   s = s.replace(/<[A-Z][A-Za-z0-9_$,\s extends=|&\[\]]*>/g, '')
 

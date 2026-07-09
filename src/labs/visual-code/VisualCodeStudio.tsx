@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, Copy, Download, FileCode, FilePlus, FolderOpen, MoreHorizontal, Play, RotateCcw, Save, X } from 'lucide-react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { useDesktop } from '../../components/desktop/DesktopProvider.jsx'
+import { ArrowLeft, BookOpen, Copy, Download, FileCode, FilePlus, FolderOpen, MoreHorizontal, Play, RotateCcw, Save, Trash2, X } from 'lucide-react'
 import { createBlock } from './blocks.ts'
 import {
-  DEFAULT_PROJECT,
   TARGETS,
   activeFile,
   cloneProject,
@@ -16,11 +16,26 @@ import {
   transpileProject,
   updateBlock,
 } from './transpiler.ts'
+import { EMPTY_PROJECT, EXAMPLES } from './examples.ts'
 import { buildRunnableHtml } from './runJavaScript.ts'
 import { BlockPalette, ProgramPanel, OutputPanel } from './VisualCodePanels.tsx'
 import ConceptPanel from './ConceptPanel.tsx'
 import styles from './VisualCodeStudio.module.css'
 import type { Block, BlockType, Project, ProjectFile } from './types'
+
+const CodeLensLazy = lazy(() => import('../codelens/codelens/CodeLens.tsx'))
+
+function CodeLensWindow({ onBack }: { onBack?: () => void }) {
+  const [handoff] = useState<{ code?: string; lang?: string } | null>(() => {
+    try { return JSON.parse(localStorage.getItem('codelens-handoff') || 'null') } catch { return null }
+  })
+  useEffect(() => { localStorage.removeItem('codelens-handoff') }, [])
+  return (
+    <Suspense fallback={<div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: 14 }}>Loading CodeLens…</div>}>
+      <CodeLensLazy onBack={onBack ?? (() => {})} initialCode={handoff?.code} initialLang={handoff?.lang} backLabel="Visual Code Studio" />
+    </Suspense>
+  )
+}
 
 interface Props {
   initialProject?: Project
@@ -31,14 +46,16 @@ interface Props {
 
 type RightTab = 'concept' | 'code' | 'run' | 'preview' | 'data'
 
-export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onProjectChange, onCodeChange, onBack }: Props) {
+export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onProjectChange, onCodeChange, onBack }: Props) {
+  const { openWindow } = useDesktop()
   const [project, setProject] = useState<Project>(() => normalizeProject(cloneProject(initialProject)))
   const [query, setQuery] = useState('')
-  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(project.files[0]?.blocks[0]?.id ?? null)
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null)
   const [rightTab, setRightTab] = useState<RightTab>('concept')
   const [messages, setMessages] = useState<{ type: string; value: string }[]>([])
   const [saveState, setSaveState] = useState<'idle' | 'dirty' | 'saved'>('idle')
   const [editingFileName, setEditingFileName] = useState<string | null>(null)
+  const [showExamples, setShowExamples] = useState(false)
   const importRef = useRef<HTMLInputElement>(null)
   const previewRef = useRef<HTMLIFrameElement>(null)
 
@@ -121,6 +138,30 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
     if (previewRef.current) previewRef.current.srcdoc = previewHtml
   }
 
+  function openInCodeLens() {
+    const lang = project.target === 'typescript' ? 'ts' : 'js'
+    try {
+      localStorage.setItem('codelens-handoff', JSON.stringify({ code: generated.code, lang }))
+    } catch {}
+    openWindow({ id: 'codelens', label: 'CodeLens', emoji: '🔍', Component: CodeLensWindow })
+  }
+
+  function loadExample(id: string) {
+    const ex = EXAMPLES.find(e => e.id === id)
+    if (!ex) return
+    setProject(normalizeProject(cloneProject(ex.project)))
+    setSelectedBlockId(null)
+    setSaveState('idle')
+    setShowExamples(false)
+  }
+
+  function clearProject() {
+    setProject(normalizeProject(cloneProject(EMPTY_PROJECT)))
+    setSelectedBlockId(null)
+    setSaveState('idle')
+    setShowExamples(false)
+  }
+
   function importProject(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     e.target.value = ''
@@ -130,7 +171,7 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
       try {
         const next = parseProject(String(reader.result ?? ''))
         setProject(next)
-        setSelectedBlockId(next.files[0]?.blocks[0]?.id ?? null)
+        setSelectedBlockId(null)
         setSaveState('idle')
       } catch (err) {
         window.alert(`Could not import: ${(err as Error).message}`)
@@ -185,6 +226,36 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
           <span className={styles.saveState} aria-live="polite">
             {saveState === 'dirty' ? '● Unsaved' : saveState === 'saved' ? '✓ Saved' : ''}
           </span>
+
+          {/* Examples picker */}
+          <div className={styles.moreWrap}>
+            <button
+              type="button"
+              className={`${styles.actionBtn} ${showExamples ? styles.actionBtnActive : ''}`}
+              onClick={() => { setShowExamples(v => !v); setShowMore(false) }}
+            >
+              <BookOpen size={14} /> Examples
+            </button>
+            {showExamples && (
+              <div className={`${styles.moreMenu} ${styles.examplesMenu}`} onMouseLeave={() => setShowExamples(false)}>
+                <div className={styles.examplesHeader}>Load an example project</div>
+                {EXAMPLES.map(ex => (
+                  <button key={ex.id} type="button" className={styles.exampleItem} onClick={() => loadExample(ex.id)}>
+                    <span className={styles.exampleEmoji}>{ex.emoji}</span>
+                    <span className={styles.exampleInfo}>
+                      <span className={styles.exampleName}>{ex.name}</span>
+                      <span className={styles.exampleDesc}>{ex.description}</span>
+                    </span>
+                  </button>
+                ))}
+                <div className={styles.menuDivider} />
+                <button type="button" className={styles.moreItem} onClick={clearProject}>
+                  <Trash2 size={13} /> Clear everything
+                </button>
+              </div>
+            )}
+          </div>
+
           <button type="button" className={`${styles.actionBtn} ${styles.primaryButton}`} onClick={runProject}>
             <Play size={14} /> Run
           </button>
@@ -199,7 +270,7 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
           </button>
           {/* More menu */}
           <div className={styles.moreWrap}>
-            <button type="button" className={styles.actionBtn} onClick={() => setShowMore(v => !v)} title="More options">
+            <button type="button" className={styles.actionBtn} onClick={() => { setShowMore(v => !v); setShowExamples(false) }} title="More options">
               <MoreHorizontal size={14} />
             </button>
             {showMore && (
@@ -207,8 +278,8 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
                 <button type="button" className={styles.moreItem} onClick={() => { importRef.current?.click(); setShowMore(false) }}>
                   <FolderOpen size={14} /> Import project
                 </button>
-                <button type="button" className={styles.moreItem} onClick={() => { setProject(normalizeProject(cloneProject(DEFAULT_PROJECT))); setSelectedBlockId(null); setShowMore(false) }}>
-                  <RotateCcw size={14} /> Reset to default
+                <button type="button" className={styles.moreItem} onClick={() => { clearProject(); setShowMore(false) }}>
+                  <Trash2 size={14} /> Clear project
                 </button>
               </div>
             )}
@@ -318,6 +389,7 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
                 messages={messages}
                 previewRef={previewRef}
                 onRun={runProject}
+                onOpenCodeLens={openInCodeLens}
                 onFieldChange={updateField}
                 onHtmlChange={html => commit(p => ({ ...p, html }))}
                 previewHtml={previewHtml}

@@ -186,6 +186,75 @@
 }
 .moreItem:hover { background: var(--page-bg); }
 
+.actionBtnActive {
+  background: var(--page-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.examplesMenu {
+  min-width: 320px;
+  right: 0;
+  left: auto;
+}
+
+.examplesHeader {
+  padding: 10px 14px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+
+.exampleItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+.exampleItem:hover { background: var(--page-bg); }
+
+.exampleEmoji {
+  font-size: 22px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.exampleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.exampleName {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.exampleDesc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.menuDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
 .saveState {
   font-size: 11px;
   font-weight: 600;
@@ -270,8 +339,8 @@
   min-height: 0;
   border-right: 1px solid var(--border);
   background: var(--surface);
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   display: grid;
   grid-template-rows: auto 1fr;
 }
@@ -776,7 +845,7 @@
   border-radius: 8px;
   padding: 10px 14px;
   background: color-mix(in srgb, #ef4444 10%, var(--surface));
-  border: 1px solid color-mix(in srgb, #ef4444 20%, transparent);
+  border: 1px solid rgba(239, 68, 68, 0.25);
   color: #ef4444;
   font-size: 13px;
   font-weight: 600;

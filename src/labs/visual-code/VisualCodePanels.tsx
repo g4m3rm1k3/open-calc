@@ -136,20 +136,14 @@ interface OutputPanelProps {
   messages: { type: string; value: string }[]
   previewRef: RefObject<HTMLIFrameElement>
   onRun: () => void
+  onOpenCodeLens: () => void
   onFieldChange: (name: string, value: string) => void
   onHtmlChange: (html: string) => void
   previewHtml: string
 }
 
-export function OutputPanel({ activeTab, generated, project, messages, previewRef, onRun, onFieldChange, onHtmlChange, previewHtml }: OutputPanelProps) {
-  function openInCodeLens() {
-    try {
-      localStorage.setItem('codelens-handoff', JSON.stringify({ code: generated.code, lang: project.target === 'typescript' ? 'typescript' : 'javascript' }))
-      sessionStorage.setItem('codelens_return_path', '#/lab/visual-code')
-      sessionStorage.setItem('codelens_return_label', 'Visual Code Studio')
-    } catch {}
-    window.location.hash = '/codelens'
-  }
+export function OutputPanel({ activeTab, generated, project, messages, previewRef, onRun, onOpenCodeLens, onHtmlChange, previewHtml }: OutputPanelProps) {
+  const openInCodeLens = onOpenCodeLens
 
   return (
     <>
