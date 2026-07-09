@@ -99,18 +99,18 @@ export default function ChapterPage() {
               >
                 <Link
                   to={`/chapter/${chapter.number}/${lesson.slug}`}
-                  className={`group flex items-center justify-between p-5 md:p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/60 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xl transition-all duration-300 relative overflow-hidden block`}
+                  className={`group flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-5 md:p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/60 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xl transition-all duration-300 relative overflow-hidden block`}
                 >
                   {/* Subtle hover background block using the safelisted color */}
                   <div className={`absolute inset-y-0 right-0 w-1/2 bg-gradient-to-l from-current opacity-0 group-hover:opacity-[0.03] dark:group-hover:opacity-[0.05] transition-opacity duration-300 pointer-events-none ${theme.text}`} />
 
-                  <div className="flex items-start gap-5 md:gap-6 relative z-10 flex-1">
+                  <div className="flex items-start gap-5 md:gap-6 relative z-10 flex-1 w-full sm:w-auto">
                     <div className={`flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800 ${theme.text} font-bold font-mono text-xl group-hover:scale-110 transition-transform duration-300 shadow-sm border border-slate-100 dark:border-slate-700/50`}>
                       {i + 1}
                     </div>
                     
                     <div className="flex-1 min-w-0 pr-4 mt-0.5">
-                      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1.5 group-hover:text-slate-800 dark:group-hover:text-white transition-colors truncate">{lesson.title}</h2>
+                      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1.5 group-hover:text-slate-800 dark:group-hover:text-white transition-colors whitespace-normal break-words">{lesson.title}</h2>
                       <p className="text-slate-500 dark:text-slate-400 mb-4 line-clamp-2 text-sm leading-relaxed">{lesson.subtitle}</p>
                       
                       {lesson.tags && lesson.tags.length > 0 && (
@@ -123,19 +123,8 @@ export default function ChapterPage() {
                     </div>
                   </div>
 
-                  <div className="flex-shrink-0 relative z-10 ml-4 hidden sm:block">
+                  <div className="flex-shrink-0 relative z-10 ml-0 sm:ml-4 w-full sm:w-auto">
                     <LessonProgressBadge 
-                      status={status} 
-                      percent={percent} 
-                      correct={correct} 
-                      total={total}
-                      courseColorMeta={theme}
-                    />
-                  </div>
-                  
-                  {/* Mobile Badge Container */}
-                  <div className="absolute top-5 right-5 sm:hidden scale-[0.8] origin-top-right">
-                     <LessonProgressBadge 
                       status={status} 
                       percent={percent} 
                       correct={correct} 
