@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowLeft, Copy, Download, FileCode, FilePlus, FolderOpen, Play, RotateCcw, Save, Trash2, X } from 'lucide-react'
+import { ArrowLeft, Copy, Download, FileCode, FilePlus, FolderOpen, MoreHorizontal, Play, RotateCcw, Save, X } from 'lucide-react'
 import { createBlock } from './blocks.ts'
 import {
   DEFAULT_PROJECT,
@@ -146,64 +146,77 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
 
   const ext = TARGETS[project.target]?.fileExtension ?? 'ts'
 
+  const [showMore, setShowMore] = useState(false)
+
   return (
     <section className={styles.studio}>
       <input ref={importRef} type="file" accept=".json,.vcproject.json" className={styles.hiddenInput} onChange={importProject} />
 
-      {/* ── Topbar ── */}
+      {/* ── Single-row topbar ── */}
       <header className={styles.topbar}>
         <div className={styles.titleGroup}>
           {onBack && (
-            <button className={styles.button} onClick={onBack} aria-label="Back">
+            <button type="button" className={styles.backBtn} onClick={onBack} aria-label="Back">
               <ArrowLeft size={16} />
             </button>
           )}
-          <div>
-            <input
-              className={styles.projectName}
-              value={project.name}
-              aria-label="Project name"
-              onChange={e => commit(p => ({ ...p, name: e.target.value }))}
-            />
-            <p className={styles.subtitle}>
-              {project.files.length} file{project.files.length !== 1 ? 's' : ''} · {project.target === 'typescript' ? 'TypeScript' : 'JavaScript'}
-            </p>
+          <input
+            className={styles.projectName}
+            value={project.name}
+            aria-label="Project name"
+            onChange={e => commit(p => ({ ...p, name: e.target.value }))}
+          />
+          {/* Language pill toggle */}
+          <div className={styles.langToggle} role="group" aria-label="Target language">
+            {targetList.map(t => (
+              <button
+                key={t.id}
+                type="button"
+                className={`${styles.langPill} ${project.target === t.id ? styles.langActive : ''}`}
+                onClick={() => commit(p => ({ ...p, target: t.id as Project['target'] }))}
+              >
+                {t.id === 'typescript' ? 'TS' : 'JS'}
+              </button>
+            ))}
           </div>
         </div>
+
         <div className={styles.topActions}>
-          <select
-            className={styles.select}
-            value={project.target}
-            onChange={e => commit(p => ({ ...p, target: e.target.value as Project['target'] }))}
-            aria-label="Target language"
-          >
-            {targetList.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
-          </select>
-          <button className={`${styles.button} ${styles.primaryButton}`} onClick={runProject}>
-            <Play size={15} /> Run
-          </button>
-          <button className={styles.button} onClick={() => navigator.clipboard?.writeText(generated.code)}>
-            <Copy size={15} /> Copy
-          </button>
-          <button className={styles.button} onClick={() => download(generated.code, `${slug(project.name)}.${ext}`, 'text/plain')}>
-            <Download size={15} /> Code
-          </button>
-          <button className={styles.button} onClick={() => importRef.current?.click()}>
-            <FolderOpen size={15} /> Import
-          </button>
-          <button className={styles.button} onClick={exportProject}>
-            <Save size={15} /> Save
-          </button>
-          <button className={styles.button} onClick={() => { setProject(normalizeProject(cloneProject(DEFAULT_PROJECT))); setSelectedBlockId(null) }}>
-            <RotateCcw size={15} /> Reset
-          </button>
-          <span className={styles.saveState}>
-            {saveState === 'dirty' ? 'Unsaved' : saveState === 'saved' ? 'Saved' : 'Ready'}
+          <span className={styles.saveState} aria-live="polite">
+            {saveState === 'dirty' ? '● Unsaved' : saveState === 'saved' ? '✓ Saved' : ''}
           </span>
+          <button type="button" className={`${styles.actionBtn} ${styles.primaryButton}`} onClick={runProject}>
+            <Play size={14} /> Run
+          </button>
+          <button type="button" className={styles.actionBtn} onClick={() => navigator.clipboard?.writeText(generated.code)} title="Copy generated code">
+            <Copy size={14} />
+          </button>
+          <button type="button" className={styles.actionBtn} onClick={() => download(generated.code, `${slug(project.name)}.${ext}`, 'text/plain')} title="Download code">
+            <Download size={14} />
+          </button>
+          <button type="button" className={styles.actionBtn} onClick={exportProject} title="Save project">
+            <Save size={14} />
+          </button>
+          {/* More menu */}
+          <div className={styles.moreWrap}>
+            <button type="button" className={styles.actionBtn} onClick={() => setShowMore(v => !v)} title="More options">
+              <MoreHorizontal size={14} />
+            </button>
+            {showMore && (
+              <div className={styles.moreMenu} onMouseLeave={() => setShowMore(false)}>
+                <button type="button" className={styles.moreItem} onClick={() => { importRef.current?.click(); setShowMore(false) }}>
+                  <FolderOpen size={14} /> Import project
+                </button>
+                <button type="button" className={styles.moreItem} onClick={() => { setProject(normalizeProject(cloneProject(DEFAULT_PROJECT))); setSelectedBlockId(null); setShowMore(false) }}>
+                  <RotateCcw size={14} /> Reset to default
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
-      {/* ── File tabs ── */}
+      {/* ── File tabs + new file button ── */}
       <div className={styles.fileTabs}>
         {project.files.map(f => (
           <div
@@ -211,7 +224,7 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
             className={`${styles.fileTab} ${f.id === project.activeFileId ? styles.fileTabActive : ''}`}
             onClick={() => switchFile(f.id)}
           >
-            <FileCode size={12} />
+            <FileCode size={11} />
             {editingFileName === f.id ? (
               <input
                 className={styles.fileNameInput}
@@ -226,6 +239,7 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
             )}
             {project.files.length > 1 && (
               <button
+                type="button"
                 className={styles.fileTabClose}
                 onClick={e => { e.stopPropagation(); deleteFile(f.id) }}
                 aria-label={`Delete ${f.name}`}
@@ -235,8 +249,8 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
             )}
           </div>
         ))}
-        <button className={styles.fileTabAdd} onClick={addFile} aria-label="Add file">
-          <FilePlus size={14} />
+        <button type="button" className={styles.fileTabAdd} onClick={addFile} aria-label="Add file">
+          <FilePlus size={13} />
         </button>
       </div>
 
@@ -267,25 +281,23 @@ export default function VisualCodeStudio({ initialProject = DEFAULT_PROJECT, onP
           />
         </main>
 
-        {/* Right: Concept / Code / Run / Preview / Data */}
+        {/* Right: Learn / Code / Run / Preview */}
         <aside className={styles.panel}>
           <div className={styles.panelHeader}>
             <div className={styles.tabs}>
-              {([
-                ['concept', 'Concept'],
-                ['code', 'Code'],
-                ['run', 'Run'],
-                ['preview', 'Preview'],
-                ['data', 'Data'],
-              ] as [RightTab, string][]).map(([id, label]) => (
-                <button
-                  key={id}
-                  className={`${styles.tab} ${rightTab === id ? styles.tabActive : ''}`}
-                  onClick={() => setRightTab(id)}
-                >
-                  {label}
-                </button>
-              ))}
+              {(['learn', 'code', 'run', 'preview'] as const).map(id => {
+                const active = id === 'learn' ? rightTab === 'concept' : rightTab === id
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    className={`${styles.tab} ${active ? styles.tabActive : ''}`}
+                    onClick={() => setRightTab(id === 'learn' ? 'concept' : id as RightTab)}
+                  >
+                    {id === 'learn' ? '✦ Learn' : id === 'code' ? 'Code' : id === 'run' ? 'Run' : 'Preview'}
+                  </button>
+                )
+              })}
             </div>
           </div>
           <div className={styles.scroll}>

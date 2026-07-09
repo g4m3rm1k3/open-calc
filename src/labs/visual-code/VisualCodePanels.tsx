@@ -1,5 +1,5 @@
 import { RefObject } from 'react'
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react'
+import { ArrowDown, ArrowUp, ExternalLink, Plus, Trash2 } from 'lucide-react'
 import { BLOCK_GROUPS, BLOCK_LIBRARY, blockDefinition, canContainChildren, childOptionsFor, summarizeBlock } from './blocks.ts'
 import { serializeProject } from './transpiler.ts'
 import styles from './VisualCodeStudio.module.css'
@@ -27,12 +27,13 @@ export function BlockPalette({ query, onQueryChange, onAddBlock, targetId }: Blo
       <div className={styles.panelHeader}>
         <div className={styles.panelHeaderLine}>
           <h2 className={styles.panelTitle}>Blocks</h2>
+          <span className={styles.blockCount}>{filtered.length}</span>
         </div>
         <input
           className={styles.input}
           value={query}
           onChange={e => onQueryChange(e.target.value)}
-          placeholder="Search class, getter, event…"
+          placeholder="Search blocks…"
         />
       </div>
       <div className={styles.scroll}>
@@ -41,20 +42,29 @@ export function BlockPalette({ query, onQueryChange, onAddBlock, targetId }: Blo
           if (!groupBlocks.length) return null
           return (
             <section className={styles.paletteGroup} key={group.id}>
-              <h3 className={styles.groupTitle}>{group.label}</h3>
+              <h3 className={styles.groupTitle} data-category={group.id}>{group.label}</h3>
               <div className={styles.blockList}>
-                {groupBlocks.map(item => (
-                  <button
-                    key={item.type}
-                    type="button"
-                    className={styles.paletteBlock}
-                    data-category={item.category}
-                    onClick={() => onAddBlock(item.type as BlockType)}
-                  >
-                    <span className={styles.blockName}>{item.label}</span>
-                    <span className={styles.blockDescription}>{item.description}</span>
-                  </button>
-                ))}
+                {groupBlocks.map(item => {
+                  const def = blockDefinition(item.type)
+                  return (
+                    <button
+                      key={item.type}
+                      type="button"
+                      className={styles.paletteBlock}
+                      data-category={item.category}
+                      onClick={() => onAddBlock(item.type as BlockType)}
+                    >
+                      <div className={styles.paletteBlockMain}>
+                        <span className={styles.blockName}>{item.label}</span>
+                        {item.tsOnly && <span className={styles.tsBadge}>TS</span>}
+                      </div>
+                      <span className={styles.blockDescription}>{item.description}</span>
+                      {def?.concept?.summary && (
+                        <span className={styles.blockConcept}>{def.concept.summary}</span>
+                      )}
+                    </button>
+                  )
+                })}
               </div>
             </section>
           )
@@ -77,14 +87,14 @@ interface ProgramPanelProps {
   project: Project
 }
 
-export function ProgramPanel({ blocks, selectedBlockId, onSelect, onAddBlock, onDeleteBlock, onMoveBlock, onUpdateField, project }: ProgramPanelProps) {
+export function ProgramPanel({ blocks, selectedBlockId, onSelect, onAddBlock, onDeleteBlock, onMoveBlock, onUpdateField }: ProgramPanelProps) {
   return (
     <>
       <div className={styles.panelHeader}>
         <div className={styles.panelHeaderLine}>
           <h2 className={styles.panelTitle}>Program</h2>
           <button type="button" className={styles.button} onClick={() => onAddBlock('class')}>
-            <Plus size={16} /> Class
+            <Plus size={14} /> Class
           </button>
         </div>
       </div>
@@ -105,7 +115,10 @@ export function ProgramPanel({ blocks, selectedBlockId, onSelect, onAddBlock, on
             ))}
           </div>
         ) : (
-          <div className={styles.empty}>Add blocks from the palette to build a program.</div>
+          <div className={styles.emptyProgram}>
+            <strong>Your program is empty</strong>
+            <span>Click any block in the palette to add it here, then select it to learn how it works.</span>
+          </div>
         )}
       </div>
     </>
@@ -128,7 +141,16 @@ interface OutputPanelProps {
   previewHtml: string
 }
 
-export function OutputPanel({ activeTab, generated, selectedBlock, project, messages, previewRef, onRun, onFieldChange, onHtmlChange, previewHtml }: OutputPanelProps) {
+export function OutputPanel({ activeTab, generated, project, messages, previewRef, onRun, onFieldChange, onHtmlChange, previewHtml }: OutputPanelProps) {
+  function openInCodeLens() {
+    try {
+      localStorage.setItem('codelens-handoff', JSON.stringify({ code: generated.code, lang: project.target === 'typescript' ? 'typescript' : 'javascript' }))
+      sessionStorage.setItem('codelens_return_path', '#/lab/visual-code')
+      sessionStorage.setItem('codelens_return_label', 'Visual Code Studio')
+    } catch {}
+    window.location.hash = '/codelens'
+  }
+
   return (
     <>
       {activeTab === 'code' && (
@@ -136,19 +158,34 @@ export function OutputPanel({ activeTab, generated, selectedBlock, project, mess
           {generated.diagnostics.map((item, i) => (
             <div className={styles.diagnostic} key={`${item.message}-${i}`}>{item.message}</div>
           ))}
-          <pre className={styles.code}>{generated.code}</pre>
+          <div className={styles.codeHeader}>
+            <span className={styles.codeLabel}>{project.target === 'typescript' ? 'TypeScript' : 'JavaScript'} · {generated.code.split('\n').length} lines</span>
+            <button type="button" className={styles.codeLensBtn} onClick={openInCodeLens} title="Open in CodeLens to visualize execution">
+              <ExternalLink size={12} /> Open in CodeLens
+            </button>
+          </div>
+          <pre className={styles.code}>{generated.code || '// Add blocks to generate code'}</pre>
         </div>
       )}
 
       {activeTab === 'run' && (
         <div className={styles.editor}>
-          <button type="button" className={`${styles.button} ${styles.primaryButton}`} onClick={onRun}>Run code</button>
+          <div className={styles.runHeader}>
+            <button type="button" className={`${styles.button} ${styles.primaryButton}`} onClick={onRun}>▶ Run</button>
+            <button type="button" className={styles.codeLensBtn} onClick={openInCodeLens} title="Visualize in CodeLens">
+              <ExternalLink size={12} /> Visualize in CodeLens
+            </button>
+          </div>
           <div className={styles.output}>
-            {messages.length ? messages.map((msg, i) => (
-              <p key={`${msg.type}-${i}`} className={`${styles.outputLine} ${msg.type === 'error' ? styles.error : ''}`}>
-                [{msg.type}] {msg.value}
-              </p>
-            )) : <p className={styles.outputLine}>Run the project to see console output.</p>}
+            {messages.length ? (
+              <>
+                {messages.map((msg, i) => (
+                  <p key={`${msg.type}-${i}`} className={`${styles.outputLine} ${msg.type === 'error' ? styles.error : msg.type === 'warn' ? styles.warn : ''}`}>
+                    <span className={styles.outputType}>{msg.type}</span> {msg.value}
+                  </p>
+                ))}
+              </>
+            ) : <p className={styles.outputPlaceholder}>Click Run to execute your program and see output here.</p>}
           </div>
           <iframe ref={previewRef} className={styles.preview} title="Run output" sandbox="allow-scripts" />
         </div>
@@ -192,31 +229,40 @@ function BlockNode({ block, selectedBlockId, onSelect, onAddBlock, onDeleteBlock
     <article
       className={`${styles.stackBlock} ${isSelected ? styles.stackBlockActive : ''}`}
       data-category={block.category}
-      onClick={() => onSelect(block.id)}
+      onClick={e => { e.stopPropagation(); onSelect(block.id) }}
     >
       <div className={styles.blockTopline}>
-        <span className={styles.blockName}>{def?.label ?? block.type}</span>
+        <div className={styles.blockTopLeft}>
+          <span className={styles.blockCategoryDot} data-category={block.category} />
+          <span className={styles.blockName}>{def?.label ?? block.type}</span>
+        </div>
         <div className={styles.blockActions}>
           <button type="button" className={styles.iconButton} title="Move up" onClick={e => { e.stopPropagation(); onMoveBlock(block.id, 'up') }}>
-            <ArrowUp size={14} />
+            <ArrowUp size={13} />
           </button>
           <button type="button" className={styles.iconButton} title="Move down" onClick={e => { e.stopPropagation(); onMoveBlock(block.id, 'down') }}>
-            <ArrowDown size={14} />
+            <ArrowDown size={13} />
           </button>
           <button type="button" className={styles.iconButton} title="Delete" onClick={e => { e.stopPropagation(); onDeleteBlock(block.id) }}>
-            <Trash2 size={14} />
+            <Trash2 size={13} />
           </button>
         </div>
       </div>
 
-      <span className={styles.blockDescription}>{summarizeBlock(block)}</span>
+      <code className={styles.blockSummary}>{summarizeBlock(block)}</code>
 
       {/* Inline field editor when selected */}
       {isSelected && def?.fields?.length ? (
         <div className={styles.inlineEditor} onClick={e => e.stopPropagation()}>
+          <div className={styles.inlineEditorLabel}>Edit</div>
           {def.fields.map(field => <FieldInput key={field.name} field={field} block={block} onChange={onUpdateField} />)}
         </div>
       ) : null}
+
+      {/* Concept hint strip shown when not selected */}
+      {!isSelected && def?.concept?.summary && (
+        <span className={styles.blockConceptHint}>{def.concept.summary}</span>
+      )}
 
       {canContainChildren(block.type) && (
         <div className={styles.childSlot}>
@@ -240,7 +286,7 @@ function BlockNode({ block, selectedBlockId, onSelect, onAddBlock, onDeleteBlock
                 className={styles.button}
                 onClick={e => { e.stopPropagation(); onAddBlock(option.type as BlockType, block.id) }}
               >
-                <Plus size={16} /> {option.label}
+                <Plus size={13} /> {option.label}
               </button>
             ))}
           </div>

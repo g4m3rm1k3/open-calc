@@ -41,148 +41,222 @@
   --empty-border: rgba(var(--tw-custom-slate-600) / 0.4);
 }
 
+/* ── Topbar: single row ── */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 12px 20px;
+  gap: 12px;
+  padding: 0 16px;
+  height: 48px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   z-index: 10;
 }
 
 .titleGroup {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 10px;
+  min-width: 0;
 }
 
-.title {
-  margin: 0;
-  font-size: 20px;
-  line-height: 1.2;
-  font-weight: 800;
-  /* Brand-aligned dynamic gradient */
-  background: linear-gradient(to right, rgb(var(--tw-custom-brand-400)), rgb(var(--tw-custom-brand-600)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-  margin: 0;
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
   color: var(--muted);
-  font-size: 13px;
-  font-weight: 500;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.backBtn:hover { color: var(--text); border-color: var(--muted); }
+
+.projectName {
+  width: 160px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+.projectName:hover { border-color: var(--border); background: var(--page-bg); }
+.projectName:focus { outline: none; border-color: var(--accent); background: var(--page-bg); box-shadow: 0 0 0 2px var(--accent-shadow); }
+
+/* ── Language toggle pill ── */
+.langToggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--page-bg);
 }
 
+.langPill {
+  padding: 4px 12px;
+  min-height: 30px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.4px;
+}
+.langPill:hover:not(.langActive) { color: var(--text); }
+.langActive {
+  background: var(--accent-gradient);
+  color: white;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+/* ── Top action buttons ── */
 .topActions {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  min-height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.actionBtn:hover { background: var(--page-bg); border-color: var(--muted); }
+.actionBtn:active { transform: scale(0.97); }
+
+/* ── More dropdown ── */
+.moreWrap {
+  position: relative;
+}
+.moreMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  overflow: hidden;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.moreItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+.moreItem:hover { background: var(--page-bg); }
+
+.saveState {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 56px;
+  text-align: right;
+  letter-spacing: 0.3px;
+}
+
+/* ── Shared input/select/textarea (used in inline fields) ── */
 .select,
-.projectName,
 .input,
 .textarea {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--page-bg) 95%, transparent);
+  background: var(--page-bg);
   color: var(--text);
   font: inherit;
-  transition: all 0.2s ease;
+  transition: all 0.15s;
 }
-
-.select:hover,
-.projectName:hover,
-.input:hover,
-.textarea:hover {
-  border-color: color-mix(in srgb, var(--border) 50%, var(--muted));
-  background: color-mix(in srgb, var(--page-bg) 85%, transparent);
-}
-
-.select:focus,
-.projectName:focus,
-.input:focus,
-.textarea:focus {
+.select:focus, .input:focus, .textarea:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 2px var(--accent-shadow);
 }
-
-.select option {
-  background: var(--page-bg);
-  color: var(--text);
-}
-
-.select,
-.projectName,
-.input {
-  min-height: 36px;
-  padding: 0 12px;
-}
-
-.projectName {
-  width: 180px;
-  font-weight: 700;
-}
-
+.select option { background: var(--page-bg); color: var(--text); }
+.select, .input { min-height: 32px; padding: 0 10px; font-size: 13px; }
 .textarea {
   min-height: 82px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   resize: vertical;
   font-family: "JetBrains Mono", ui-monospace, monospace;
   font-size: 13px;
   line-height: 1.45;
 }
 
+/* ── Generic .button still used inside program/palette panels ── */
 .button {
   border: 1px solid var(--border);
-  border-radius: 8px;
-  min-height: 36px;
-  padding: 0 14px;
+  border-radius: 7px;
+  min-height: 30px;
+  padding: 0 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  gap: 6px;
+  background: var(--page-bg);
   color: var(--text);
   cursor: pointer;
-  font-weight: 650;
-  transition: all 0.2s ease;
-  font-size: 13px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.15s;
 }
-
-.button:hover {
-  border-color: color-mix(in srgb, var(--border) 50%, var(--muted));
-  background: color-mix(in srgb, var(--surface) 60%, transparent);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-}
-
-.button:active {
-  transform: translateY(0);
-}
+.button:hover { border-color: var(--muted); background: var(--surface); }
+.button:active { transform: scale(0.97); }
 
 .primaryButton {
   background: var(--accent-gradient);
   border-color: transparent;
   color: white;
-  box-shadow: 0 4px 15px var(--accent-shadow);
+  font-weight: 700;
+  font-size: 13px;
+  min-height: 32px;
+  padding: 0 16px;
+  box-shadow: 0 2px 10px var(--accent-shadow);
 }
-
 .primaryButton:hover {
   background: var(--accent-gradient-hover);
   border-color: transparent;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--accent-shadow);
+  box-shadow: 0 4px 16px var(--accent-shadow);
 }
 
 .main {
@@ -264,13 +338,13 @@
 }
 
 .groupTitle {
-  margin: 0 0 4px 4px;
-  font-size: 12px;
-  font-weight: 700;
+  margin: 0 0 6px 0;
+  font-size: 10px;
+  font-weight: 800;
   line-height: 1;
-  color: var(--muted);
+  color: var(--block-color, var(--muted));
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 /* ── Block category color tokens (set via data-category attribute) ── */
@@ -281,122 +355,285 @@
 [data-category="html"]   { --block-color: #f97316; }
 [data-category="types"]  { --block-color: #8b5cf6; }
 
-.paletteBlock,
-.stackBlock {
+/* ── Palette blocks ── */
+.paletteBlock {
+  display: block;
+  width: 100%;
   border: 1px solid var(--border);
-  border-left: 8px solid var(--block-color, #475569);
-  border-radius: 10px;
-  padding: 12px 14px;
-  /* Mix the block's specific color with the dynamic slate page background */
-  background: color-mix(in srgb, var(--block-color, #475569) 15%, var(--page-bg));
+  border-left: 5px solid var(--block-color, #475569);
+  border-radius: 9px;
+  padding: 9px 12px;
+  background: var(--page-bg);
   color: var(--text);
   text-align: left;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
 }
-
-.paletteBlock {
-  cursor: grab;
-}
-
-.paletteBlock:active {
-  cursor: grabbing;
-}
-
 .paletteBlock:hover {
-  background: color-mix(in srgb, var(--block-color, #475569) 25%, var(--page-bg));
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+  background: color-mix(in srgb, var(--block-color, #475569) 10%, var(--page-bg));
   border-color: var(--block-color, #475569);
+  transform: translateX(2px);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+}
+.paletteBlock:hover .blockConcept { max-height: 60px; opacity: 1; margin-top: 6px; }
+
+.paletteBlockMain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blockCount {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--page-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1px 8px;
+}
+
+.tsBadge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #8b5cf6;
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.25);
+  border-radius: 4px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+
+.blockConcept {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease, opacity 0.2s ease, margin-top 0.2s ease;
+  font-style: italic;
 }
 
 .blockName {
   display: block;
-  font-weight: 800;
-  font-size: 14px;
-  letter-spacing: 0.2px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1px;
 }
 
 .blockDescription {
   display: block;
   color: var(--muted);
-  font-size: 12px;
-  margin-top: 4px;
-  line-height: 1.4;
+  font-size: 11px;
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+/* ── Stack blocks (program panel) ── */
+.stackBlock {
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--block-color, #475569);
+  border-radius: 10px;
+  padding: 10px 13px;
+  background: var(--page-bg);
+  color: var(--text);
+  display: grid;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
 }
 
 .workspace {
-  background: color-mix(in srgb, var(--page-bg) 95%, rgba(128,128,128,0.05));
-  box-shadow: inset 0 0 40px rgba(0,0,0,0.02);
+  background: var(--page-bg);
 }
 
 .stack {
   display: grid;
-  gap: 12px;
-}
-
-.stackBlock {
-  display: grid;
   gap: 10px;
-  cursor: pointer;
 }
 
 .stackBlockActive {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-  box-shadow: 0 0 15px var(--accent-shadow);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-shadow), 0 4px 16px rgba(0,0,0,0.06);
 }
 
 .blockTopline {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
+}
+
+.blockTopLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.blockCategoryDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--block-color, #475569);
+  flex-shrink: 0;
+}
+
+.blockSummary {
+  display: block;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.blockConceptHint {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  padding-top: 2px;
+  font-style: italic;
+  opacity: 0.7;
 }
 
 .blockActions {
   display: flex;
-  gap: 6px;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
 }
+.stackBlock:hover .blockActions,
+.stackBlockActive .blockActions { opacity: 1; }
 
 .iconButton {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--surface) 60%, rgba(128,128,128,0.05));
-  color: var(--text);
+  border-radius: 6px;
+  background: var(--page-bg);
+  color: var(--muted);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-.iconButton:hover {
-  background: color-mix(in srgb, var(--surface) 40%, rgba(128,128,128,0.15));
-  transform: scale(1.05);
-}
+.iconButton:hover { color: var(--text); border-color: var(--muted); background: var(--surface); }
 
 .childSlot {
   display: grid;
-  gap: 10px;
-  padding: 10px 0 0 16px;
-  border-left: 2px dashed color-mix(in srgb, var(--block-color) 40%, var(--border));
-  margin-left: 4px;
+  gap: 8px;
+  padding: 8px 0 0 14px;
+  border-left: 2px dashed var(--border);
+  margin-left: 2px;
 }
 
 .childActions {
   display: flex;
   flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.emptyProgram {
+  border: 2px dashed var(--empty-border);
+  border-radius: 12px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  margin-top: 4px;
+  color: var(--muted);
+  text-align: center;
+  padding: 24px;
+  font-size: 13px;
+}
+.emptyProgram strong { color: var(--text); font-size: 14px; }
+
+/* ── Inline field editor ── */
+.inlineEditor {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 2px;
+}
+.inlineEditorLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
 }
 
 .editor {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
+
+/* ── Code view ── */
+.codeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.codeLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.codeLensBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.codeLensBtn:hover { background: var(--page-bg); border-color: var(--accent); }
+
+/* ── Run view ── */
+.runHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.outputType {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  min-width: 34px;
+}
+.outputPlaceholder {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+.warn { color: #f59e0b; }
 
 .field {
   display: grid;
@@ -543,14 +780,6 @@
   color: #ef4444;
   font-size: 13px;
   font-weight: 600;
-}
-
-.saveState {
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 600;
-  min-width: 64px;
-  text-align: right;
 }
 
 .hiddenInput {
