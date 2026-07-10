@@ -19,6 +19,7 @@ import {
 import { EMPTY_PROJECT, EXAMPLES } from './examples.ts'
 import { buildRunnableHtml } from './runJavaScript.ts'
 import { BlockPalette, ProgramPanel, OutputPanel } from './VisualCodePanels.tsx'
+import { computeDomHints, computeClassHints, computeVariableHints } from './BlockEditor.tsx'
 import ConceptPanel from './ConceptPanel.tsx'
 import { parseJsToBlocks } from './jsToBlocks.ts'
 import styles from './VisualCodeStudio.module.css'
@@ -69,6 +70,14 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
   const previewHtml = useMemo(() => buildRunnableHtml({ html: project.html, code: generated.code }), [project.html, generated.code])
   const selectedBlock = useMemo(() => findBlock(file?.blocks ?? [], selectedBlockId), [file, selectedBlockId])
   const targetList = Object.values(TARGETS)
+
+  // Hints for the shared block-editor's field pickers (Target/ClassName/List
+  // dropdowns) — this project has no separate `elements` array or CSS string
+  // the way HTML Lab does, just `project.html` and the block tree, so these
+  // get a correct, smaller subset (see BlockEditor.tsx's own doc comment).
+  const domHints = useMemo(() => computeDomHints([], project.html), [project.html])
+  const classHints = useMemo(() => computeClassHints(domHints, ''), [domHints])
+  const variableHints = useMemo(() => computeVariableHints(file?.blocks ?? []), [file])
 
   useEffect(() => { onProjectChange?.(project) }, [project, onProjectChange])
   useEffect(() => { onCodeChange?.(generated.code, generated) }, [generated, onCodeChange])
@@ -132,9 +141,16 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
     if (selectedBlockId === id) setSelectedBlockId(null)
   }
 
-  function updateField(name: string, value: string) {
-    if (!selectedBlock) return
-    commitBlocks(blocks => updateBlock(blocks, selectedBlock.id, b => ({ ...b, fields: { ...b.fields, [name]: value } })))
+  function updateField(blockId: string, name: string, value: string) {
+    commitBlocks(blocks => updateBlock(blocks, blockId, b => ({ ...b, fields: { ...b.fields, [name]: value } })))
+  }
+
+  // For controls that set several fields atomically — e.g. picking a target
+  // from the combined element/variable dropdown sets targetKind + selector +
+  // variableName together, so the block is never left in a state where the
+  // kind and the value it's paired with disagree.
+  function updateFields(blockId: string, patch: Record<string, string>) {
+    commitBlocks(blocks => updateBlock(blocks, blockId, b => ({ ...b, fields: { ...b.fields, ...patch } })))
   }
 
   function runProject() {
@@ -382,6 +398,10 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
             onDeleteBlock={deleteBlock}
             onMoveBlock={(id, dir) => commitBlocks(blocks => moveBlock(blocks, id, dir))}
             onUpdateField={updateField}
+            onUpdateFields={updateFields}
+            domHints={domHints}
+            classHints={classHints}
+            variableHints={variableHints}
             project={project}
           />
         </main>

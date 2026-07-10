@@ -1,9 +1,55 @@
 import { RefObject } from 'react'
-import { ArrowDown, ArrowUp, ExternalLink, Plus, Trash2 } from 'lucide-react'
-import { BLOCK_GROUPS, BLOCK_LIBRARY, blockDefinition, canContainChildren, childOptionsFor, summarizeBlock } from './blocks.ts'
+import { ExternalLink, Plus } from 'lucide-react'
 import { serializeProject } from './transpiler.ts'
+import {
+  BlockPalette as SharedBlockPalette, BlockProgram as SharedBlockProgram, filterPaletteBlocks,
+  type BlockEditorClassNames,
+} from './BlockEditor.tsx'
 import styles from './VisualCodeStudio.module.css'
-import type { Block, BlockType, FieldSpec, GeneratedOutput, Project } from './types.ts'
+import type { Block, BlockType, GeneratedOutput, Project } from './types.ts'
+
+// Maps Visual Code Studio's own CSS classes onto the shared block-editor
+// widget's generic slots — see BlockEditor.tsx's own comment for why this is
+// a per-host classNames bundle rather than a shared stylesheet (this app and
+// HTML Lab's Visual JS use genuinely different, independent theming systems:
+// this one themes via Tailwind custom properties directly in CSS, HTML Lab's
+// via a JS hook injecting `--hl-*` variables — reconciling them would mean
+// merging two different dark-mode mechanisms, out of scope here).
+const BLOCK_EDITOR_CLASSNAMES: BlockEditorClassNames = {
+  paletteSearchWrap: undefined,
+  searchInput: styles.input,
+  paletteScroll: styles.scroll,
+  emptyState: styles.emptyProgram,
+  paletteGroup: styles.paletteGroup,
+  groupLabel: styles.groupTitle,
+  paletteBtn: styles.paletteBlock,
+  programHeader: undefined,
+  importBtn: styles.button,
+  importBtnFlash: undefined,
+  programScroll: styles.scroll,
+  blockRowWrapper: undefined,
+  blockRow: styles.stackBlock,
+  blockRowActive: styles.stackBlockActive,
+  blockTopLine: styles.blockTopline,
+  blockDot: styles.blockCategoryDot,
+  blockName: styles.blockName,
+  blockActions: styles.blockActions,
+  iconBtn: styles.iconButton,
+  blockSummary: styles.blockSummary,
+  fieldEditor: styles.inlineEditor,
+  conceptHint: styles.blockConceptHint,
+  childSlot: styles.childSlot,
+  depthClass: () => '', // no depth-based rainbow bracket colors in this app's design language
+  childActions: styles.childActions,
+  addChildBtn: styles.button,
+  addChildIcon: undefined,
+  addChildLabel: undefined,
+  propRow: styles.field,
+  propLabel: undefined, // styled via `.field span`, not its own class
+  propInput: styles.input,
+  fieldCode: styles.textarea,
+  nestedExprSlot: styles.nestedExprSlot,
+}
 
 // ── Block Palette ─────────────────────────────────────────────────────────────
 
@@ -16,61 +62,23 @@ interface BlockPaletteProps {
 
 export function BlockPalette({ query, onQueryChange, onAddBlock, targetId }: BlockPaletteProps) {
   const isTs = targetId === 'typescript'
-  const filtered = BLOCK_LIBRARY.filter(item => {
-    if (item.tsOnly && !isTs) return false
-    if (item.childOnly) return false
-    const text = `${item.label} ${item.category} ${item.description}`.toLowerCase()
-    return text.includes(query.toLowerCase())
-  })
+  const count = filterPaletteBlocks(query, isTs).length
 
   return (
     <>
       <div className={styles.panelHeader}>
         <div className={styles.panelHeaderLine}>
           <h2 className={styles.panelTitle}>Blocks</h2>
-          <span className={styles.blockCount}>{filtered.length}</span>
+          <span className={styles.blockCount}>{count}</span>
         </div>
-        <input
-          className={styles.input}
-          value={query}
-          onChange={e => onQueryChange(e.target.value)}
-          placeholder="Search blocks…"
-        />
       </div>
-      <div className={styles.scroll}>
-        {BLOCK_GROUPS.map(group => {
-          const groupBlocks = filtered.filter(item => item.category === group.id)
-          if (!groupBlocks.length) return null
-          return (
-            <section className={styles.paletteGroup} key={group.id}>
-              <h3 className={styles.groupTitle} data-category={group.id}>{group.label}</h3>
-              <div className={styles.blockList}>
-                {groupBlocks.map(item => {
-                  const def = blockDefinition(item.type)
-                  return (
-                    <button
-                      key={item.type}
-                      type="button"
-                      className={styles.paletteBlock}
-                      data-category={item.category}
-                      onClick={() => onAddBlock(item.type as BlockType)}
-                    >
-                      <div className={styles.paletteBlockMain}>
-                        <span className={styles.blockName}>{item.label}</span>
-                        {item.tsOnly && <span className={styles.tsBadge}>TS</span>}
-                      </div>
-                      <span className={styles.blockDescription}>{item.description}</span>
-                      {def?.concept?.summary && (
-                        <span className={styles.blockConcept}>{def.concept.summary}</span>
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
-            </section>
-          )
-        })}
-      </div>
+      <SharedBlockPalette
+        query={query}
+        onQueryChange={onQueryChange}
+        onAddBlock={onAddBlock}
+        allowTsOnly={isTs}
+        classNames={BLOCK_EDITOR_CLASSNAMES}
+      />
     </>
   )
 }
@@ -84,11 +92,18 @@ interface ProgramPanelProps {
   onAddBlock: (type: BlockType, parentId?: string | null) => void
   onDeleteBlock: (id: string) => void
   onMoveBlock: (id: string, dir: 'up' | 'down') => void
-  onUpdateField: (name: string, value: string) => void
+  onUpdateField: (blockId: string, name: string, value: string) => void
+  onUpdateFields: (blockId: string, patch: Record<string, string>) => void
+  domHints: string[]
+  classHints: string[]
+  variableHints: string[]
   project: Project
 }
 
-export function ProgramPanel({ blocks, selectedBlockId, onSelect, onAddBlock, onDeleteBlock, onMoveBlock, onUpdateField }: ProgramPanelProps) {
+export function ProgramPanel({
+  blocks, selectedBlockId, onSelect, onAddBlock, onDeleteBlock, onMoveBlock, onUpdateField, onUpdateFields,
+  domHints, classHints, variableHints,
+}: ProgramPanelProps) {
   return (
     <>
       <div className={styles.panelHeader}>
@@ -99,29 +114,26 @@ export function ProgramPanel({ blocks, selectedBlockId, onSelect, onAddBlock, on
           </button>
         </div>
       </div>
-      <div className={styles.scroll}>
-        {blocks.length ? (
-          <div className={styles.stack}>
-            {blocks.map(item => (
-              <BlockNode
-                key={item.id}
-                block={item}
-                selectedBlockId={selectedBlockId}
-                onSelect={onSelect}
-                onAddBlock={onAddBlock}
-                onDeleteBlock={onDeleteBlock}
-                onMoveBlock={onMoveBlock}
-                onUpdateField={onUpdateField}
-              />
-            ))}
-          </div>
-        ) : (
+      <SharedBlockProgram
+        blocks={blocks}
+        selectedBlockId={selectedBlockId}
+        onSelect={onSelect}
+        onDelete={onDeleteBlock}
+        onMove={onMoveBlock}
+        onAddChild={(type, parentId) => onAddBlock(type, parentId)}
+        onUpdateField={onUpdateField}
+        onUpdateFields={onUpdateFields}
+        domHints={domHints}
+        classHints={classHints}
+        variableHints={variableHints}
+        classNames={BLOCK_EDITOR_CLASSNAMES}
+        emptyMessage={
           <div className={styles.emptyProgram}>
             <strong>Your program is empty</strong>
             <span>Click any block in the palette to add it here, then select it to learn how it works.</span>
           </div>
-        )}
-      </div>
+        }
+      />
     </>
   )
 }
@@ -139,7 +151,7 @@ interface OutputPanelProps {
   onRun: () => void
   onOpenCodeLens: () => void
   onMakeBlocks: (code: string) => void
-  onFieldChange: (name: string, value: string) => void
+  onFieldChange: (blockId: string, name: string, value: string) => void
   onHtmlChange: (html: string) => void
   previewHtml: string
 }
@@ -208,110 +220,3 @@ export function OutputPanel({ activeTab, generated, project, messages, previewRe
   )
 }
 
-// ── Block Node ────────────────────────────────────────────────────────────────
-
-interface BlockNodeProps {
-  block: Block
-  selectedBlockId: string | null
-  onSelect: (id: string) => void
-  onAddBlock: (type: BlockType, parentId?: string | null) => void
-  onDeleteBlock: (id: string) => void
-  onMoveBlock: (id: string, dir: 'up' | 'down') => void
-  onUpdateField: (name: string, value: string) => void
-}
-
-function BlockNode({ block, selectedBlockId, onSelect, onAddBlock, onDeleteBlock, onMoveBlock, onUpdateField }: BlockNodeProps) {
-  const def = blockDefinition(block.type)
-  const childOptions = childOptionsFor(block.type)
-  const isSelected = selectedBlockId === block.id
-
-  return (
-    <article
-      className={`${styles.stackBlock} ${isSelected ? styles.stackBlockActive : ''}`}
-      data-category={block.category}
-      onClick={e => { e.stopPropagation(); onSelect(block.id) }}
-    >
-      <div className={styles.blockTopline}>
-        <div className={styles.blockTopLeft}>
-          <span className={styles.blockCategoryDot} data-category={block.category} />
-          <span className={styles.blockName}>{def?.label ?? block.type}</span>
-        </div>
-        <div className={styles.blockActions}>
-          <button type="button" className={styles.iconButton} title="Move up" onClick={e => { e.stopPropagation(); onMoveBlock(block.id, 'up') }}>
-            <ArrowUp size={13} />
-          </button>
-          <button type="button" className={styles.iconButton} title="Move down" onClick={e => { e.stopPropagation(); onMoveBlock(block.id, 'down') }}>
-            <ArrowDown size={13} />
-          </button>
-          <button type="button" className={styles.iconButton} title="Delete" onClick={e => { e.stopPropagation(); onDeleteBlock(block.id) }}>
-            <Trash2 size={13} />
-          </button>
-        </div>
-      </div>
-
-      <code className={styles.blockSummary}>{summarizeBlock(block)}</code>
-
-      {/* Inline field editor when selected */}
-      {isSelected && def?.fields?.length ? (
-        <div className={styles.inlineEditor} onClick={e => e.stopPropagation()}>
-          <div className={styles.inlineEditorLabel}>Edit</div>
-          {def.fields.map(field => <FieldInput key={field.name} field={field} block={block} onChange={onUpdateField} />)}
-        </div>
-      ) : null}
-
-      {/* Concept hint strip shown when not selected */}
-      {!isSelected && def?.concept?.summary && (
-        <span className={styles.blockConceptHint}>{def.concept.summary}</span>
-      )}
-
-      {canContainChildren(block.type) && (
-        <div className={styles.childSlot}>
-          {(block.children ?? []).map(child => (
-            <BlockNode
-              key={child.id}
-              block={child}
-              selectedBlockId={selectedBlockId}
-              onSelect={onSelect}
-              onDeleteBlock={onDeleteBlock}
-              onMoveBlock={onMoveBlock}
-              onAddBlock={onAddBlock}
-              onUpdateField={onUpdateField}
-            />
-          ))}
-          <div className={styles.childActions}>
-            {childOptions.map(option => (
-              <button
-                key={option.type}
-                type="button"
-                className={styles.button}
-                onClick={e => { e.stopPropagation(); onAddBlock(option.type as BlockType, block.id) }}
-              >
-                <Plus size={13} /> {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </article>
-  )
-}
-
-// ── Field Input ───────────────────────────────────────────────────────────────
-
-function FieldInput({ field, block, onChange }: { field: FieldSpec; block: Block; onChange: (name: string, value: string) => void }) {
-  const value = block.fields?.[field.name] ?? ''
-  return (
-    <label className={styles.field}>
-      <span>{field.label}</span>
-      {field.kind === 'select' ? (
-        <select className={styles.select} value={value} onChange={e => onChange(field.name, e.target.value)}>
-          {(field.options ?? []).map(opt => <option key={opt} value={opt}>{opt}</option>)}
-        </select>
-      ) : field.kind === 'code' ? (
-        <textarea className={styles.textarea} value={value} onChange={e => onChange(field.name, e.target.value)} />
-      ) : (
-        <input className={styles.input} value={value} onChange={e => onChange(field.name, e.target.value)} />
-      )}
-    </label>
-  )
-}
