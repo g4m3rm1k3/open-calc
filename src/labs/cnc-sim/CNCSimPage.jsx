@@ -1,4 +1,4 @@
-import CNCSimPro from "./cnc/CNCSim.jsx";
+import CNCSimPro from "./cnc/CNCSim";
 
 export default function CNCSimPage() {
   return <CNCSimPro />;

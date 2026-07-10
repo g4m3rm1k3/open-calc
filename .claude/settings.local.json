@@ -66,7 +66,14 @@
       "Bash(node -e ' *)",
       "Bash(npx vite *)",
       "Bash(curl -s http://localhost:5174)",
-      "Bash(node --input-type=module)"
+      "Bash(node --input-type=module)",
+      "Bash(grep -n \"\\\\/\\\\/ ─\\\\{3,\\\\}\\\\|\\\\/\\\\*\\\\s*─\\\\{3,\\\\}\" /Users/michaelmclean/Testing/open-calc/src/labs/cnc-sim/cnc/CNCSim.jsx)",
+      "Bash(npx vitest *)",
+      "Bash(node -e \"import\\('/Users/michaelmclean/Testing/open-calc/src/engines/cnc/CNCEngine.ts'\\).then\\(m => console.log\\(Object.keys\\(m.MACHINE_DEFINITIONS\\)\\)\\)\")",
+      "Bash(npm install *)",
+      "Bash(node -e \"require\\('@testing-library/react'\\)\")",
+      "Bash(cp /tmp/smoke-test.ts /Users/michaelmclean/Testing/open-calc/src/smoke-test.test.ts)",
+      "Bash(grep -E \"\\\\.\\(js|md\\)$\")"
     ]
   }
 }

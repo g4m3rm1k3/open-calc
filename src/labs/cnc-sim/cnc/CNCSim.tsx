@@ -1,6 +1,8 @@
+// @ts-nocheck
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { CNCEngine, MACHINE_DEFINITIONS, TOOL_TEMPLATES } from "../../../engines/cnc/CNCEngine.js";
-import CNCBackplot from "./CNCBackplot.jsx";
+import { CNCEngine, MACHINE_DEFINITIONS, TOOL_TEMPLATES } from "../../../engines/cnc/CNCEngine";
+import type { MachineDefinition, ChannelSnapshot, PathPoint, ToolDefinition } from "../../../engines/cnc/types";
+import CNCBackplot from "./CNCBackplot";
 import {
   applyCoordinateSystemToOffsets,
   coordinateSystemsToBackplotFrames,
@@ -1779,7 +1781,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;heigh
 `;
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
-export default function CNCSimPro({ importedGCode = null } = {}) {
+interface CNCSimProProps {
+  importedGCode?: string | null;
+}
+
+export default function CNCSimPro({ importedGCode = null }: CNCSimProProps = {}) {
   const isDarkFn = useCallback(
     () =>
       typeof document !== "undefined" &&

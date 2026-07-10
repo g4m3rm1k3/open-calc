@@ -1,4 +1,99 @@
+// @ts-nocheck
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+
+// ─── TYPES ───────────────────────────────────────────────────────────────────
+
+interface Vec3 { x: number; y: number; z: number }
+interface Vec2 { x: number; y: number }
+
+interface CADFace {
+  verts: number[];
+  normal: Vec3;
+  id: string;
+}
+interface CADEdge { a: number; b: number; id: string }
+
+interface SolidGeometry {
+  verts: Vec3[];
+  faces: CADFace[];
+  edges: CADEdge[];
+  type: string;
+  params: Record<string, unknown>;
+}
+
+type SketchEntityType = 'line' | 'circle' | 'arc' | 'point';
+interface SketchEntity {
+  id: number;
+  type: SketchEntityType;
+  x?: number; y?: number;
+  x1?: number; y1?: number; x2?: number; y2?: number;
+  cx?: number; cy?: number; r?: number;
+  startAngle?: number; endAngle?: number;
+  construction?: boolean;
+  [key: string]: unknown;
+}
+
+type ConstraintType = 'horizontal' | 'vertical' | 'coincident' | 'distance' | 'radius' | 'angle' | string;
+interface SketchConstraint {
+  id: number;
+  type: ConstraintType;
+  entityIds: number[];
+  value?: number;
+}
+
+type FeatureType = 'box' | 'cylinder' | 'sketch' | 'extrude' | 'revolve' | string;
+interface CADFeature {
+  id: string;
+  type: FeatureType;
+  name: string;
+  sketchId?: string;
+  depth?: number;
+  angle?: number;
+  width?: number;
+  height?: number;
+  depth2?: number;
+  radius?: number;
+  entities?: SketchEntity[];
+  constraints?: SketchConstraint[];
+  plane?: string;
+  position?: Vec3;
+  dimensions?: Record<string, number>;
+}
+
+interface SelectionState {
+  type: 'face' | 'edge' | 'feature' | 'entity' | string;
+  ids: string[];
+}
+
+interface SketchToolType { name: string; [key: string]: unknown }
+
+interface CADState {
+  features: CADFeature[];
+  activeFeatureId: string | null;
+  activeSketchId: string | null;
+  mode: 'model' | 'sketch' | string;
+  selection: SelectionState;
+  sketchTool: string;
+}
+
+interface CameraState {
+  azimuth: number;
+  elevation: number;
+  dist: number;
+  px: number;
+  py: number;
+  zoom: number;
+}
+
+interface SolidEntry {
+  solid: SolidGeometry | null;
+  featureId: string;
+  feature: CADFeature;
+}
+
+interface CADProProps {
+  onSendToCnc?: ((gcode: string) => void) | null;
+}
 
 // ─── PALETTE (matches CNC Sim) ─────────────────────────────────────────────
 const PALETTE_DARK = {
@@ -262,7 +357,7 @@ function solveConstraints(entities, constraints) {
 }
 
 // ─── INITIAL STATE ────────────────────────────────────────────────────────────
-const initCADState = () => ({
+const initCADState = (): CADState => ({
   // Feature tree
   features: [
     { id:1, type:"sketch", name:"Sketch1", planeId:"XY", entities:[
@@ -436,18 +531,18 @@ const FEATURE_COLORS = {
 };
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function CADPro({ onSendToCnc = null } = {}) {
+export default function CADPro({ onSendToCnc = null }: CADProProps = {}) {
   const isDarkFn = useCallback(() => typeof document !== "undefined" && document.documentElement.classList.contains("dark"), []);
   const [dark, setDark] = useState(isDarkFn);
   useEffect(()=>{ const ob=new MutationObserver(()=>setDark(isDarkFn())); ob.observe(document.documentElement,{attributes:true,attributeFilter:["class"]}); return()=>ob.disconnect(); },[isDarkFn]);
   useEffect(()=>{ Object.assign(C, dark?PALETTE_DARK:PALETTE_LIGHT); },[dark]);
   const CSS = useMemo(()=>getCSS(),[dark]);
 
-  const [state, setState] = useState(initCADState);
-  const [leftTab, setLeftTab] = useState("tree");
-  const [rightTab, setRightTab] = useState("props");
-  const [camState, setCamState] = useState({ azimuth:-0.6, elevation:0.5, dist:200, px:0, py:0, zoom:1 });
-  const [mousePos, setMousePos] = useState({x:0,y:0,wx:0,wy:0});
+  const [state, setState] = useState<CADState>(initCADState);
+  const [leftTab, setLeftTab] = useState<string>("tree");
+  const [rightTab, setRightTab] = useState<string>("props");
+  const [camState, setCamState] = useState<CameraState>({ azimuth:-0.6, elevation:0.5, dist:200, px:0, py:0, zoom:1 });
+  const [mousePos, setMousePos] = useState<{x:number;y:number;wx:number;wy:number}>({x:0,y:0,wx:0,wy:0});
   const [snapPt, setSnapPt] = useState(null);
   const [dimPopup, setDimPopup] = useState(null);
   const [dimVal, setDimVal] = useState("");

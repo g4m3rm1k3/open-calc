@@ -34,6 +34,7 @@ const LogicSimPage = lazy(() => import("./labs/logic-sim/LogicSimPage.jsx"));
 const ChemistryPage = lazy(() => import("./labs/chemistry/ChemistryPage.tsx"));
 const PhysicsPage = lazy(() => import("./labs/physics/PhysicsPage.jsx"));
 const CadProPage = lazy(() => import("./labs/cad-pro/CadProPage.jsx"));
+const CadCncPage = lazy(() => import("./labs/cad-cnc/CadCncPage.jsx"));
 const MarkdownHub = lazy(() => import("./components/docs/MarkdownHub.jsx"));
 const HealthTrackerPage = lazy(() => import("./games/HealthTrackerPage.jsx"));
 const RPGWorkoutPage = lazy(() => import("./features/rpg/RPGWorkoutPage.jsx"));
@@ -174,6 +175,7 @@ export default function App() {
                               element={<Navigate to="/" replace />}
                             />
                             <Route path="cad-pro" element={<CadProPage />} />
+                            <Route path="cad-cnc" element={<CadCncPage />} />
                             <Route path="studio" element={<MarkdownHub />} />
                             <Route
                               path="docs"
