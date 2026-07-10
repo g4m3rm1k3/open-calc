@@ -221,6 +221,45 @@ function parseStmt(raw: string): Block | null {
     if (readVarM) return mkBlock('readValue', { name: readVarM[1], targetKind: 'variable', variableName: readVarM[2] })
   }
 
+  // ── Promise chain: source.then((data) => {...}).then(...).catch((error) => {...}) ──
+  // Best-effort: matches any number of chained .then()/.catch() calls with an
+  // arrow-function-with-block-body argument. Anything that doesn't fit this
+  // exact shape (e.g. a .then(fn) passing an already-declared function by
+  // name, not an inline arrow) falls through to the generic matchers below —
+  // same graceful-fallback behavior every other unmatched pattern already gets.
+  if (/\.(then|catch)\(\s*\(?[\w$]*\)?\s*=>\s*\{/.test(s)) {
+    const stepMatches = [...s.matchAll(/\.(then|catch)\(\s*\(?(\w*)\)?\s*=>\s*\{/g)]
+    const source = stepMatches.length ? s.slice(0, stepMatches[0].index).trim() : ''
+    if (source) {
+      const steps: Block[] = []
+      let ok = true
+      for (const m of stepMatches) {
+        const kind = m[1] as 'then' | 'catch'
+        const paramName = m[2] || (kind === 'catch' ? 'error' : 'data')
+        const braceOpen = m.index! + m[0].length - 1
+        const braceClose = matchBrace(s, braceOpen)
+        if (s.slice(braceClose + 1).trimStart()[0] !== ')') { ok = false; break }
+        steps.push(mkBlock('chainStep', { kind, paramName }, parseJsToBlocks(s.slice(braceOpen + 1, braceClose))))
+      }
+      if (ok && steps.length) return mkBlock('whenReady', { value: source }, steps)
+    }
+  }
+
+  // ── forEach / map / filter with an inline arrow-with-block-body callback ──
+  const arrMethodM = s.match(/^(?:(?:const|let|var)\s+(\w+)\s*=\s*)?([A-Za-z_$][\w$]*)\.(forEach|map|filter)\(\s*\(?(\w*)\)?\s*=>\s*\{/)
+  if (arrMethodM) {
+    const [, outputName, list, method, itemParam] = arrMethodM
+    const braceOpen = s.indexOf('{', s.indexOf(`.${method}(`))
+    const braceClose = matchBrace(s, braceOpen)
+    if (s.slice(braceClose + 1).trimStart()[0] === ')') {
+      const children = parseJsToBlocks(s.slice(braceOpen + 1, braceClose))
+      const param = itemParam || 'item'
+      if (method === 'forEach') return mkBlock('forEachItem', { list, itemParam: param }, children)
+      if (method === 'map') return mkBlock('transformList', { list, itemParam: param, outputName: outputName || 'result' }, children)
+      return mkBlock('filterList', { list, itemParam: param, outputName: outputName || 'filtered' }, children)
+    }
+  }
+
   // ── Variable declaration ─────────────────────────────────────────────────
   const varM = s.match(/^(const|let|var)\s+(\w+)(?:\s*:\s*[\w<>[\]| ,]+)?\s*=\s*([\s\S]+)/)
   if (varM) return mkBlock('variable', { kind: varM[1], name: varM[2], value: varM[3].trim() })

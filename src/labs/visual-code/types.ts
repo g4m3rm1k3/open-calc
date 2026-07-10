@@ -13,6 +13,10 @@ export type BlockType =
   | 'log'
   // HTML
   | 'event' | 'htmlText' | 'readValue' | 'addClass' | 'removeClass' | 'toggleClass' | 'setStyle'
+  // Callbacks & chaining — every one of these holds its callback body as real
+  // child blocks (see 'event' above, the pattern they all generalize), never
+  // as a typed function string.
+  | 'forEachItem' | 'transformList' | 'filterList' | 'whenReady' | 'chainStep' | 'callWithCallback'
   // TypeScript-only
   | 'interface' | 'interfaceField' | 'typeAlias' | 'enum' | 'enumMember'
 
@@ -35,6 +39,12 @@ export interface BlockDefinition {
   fields: FieldSpec[]
   childTypes: BlockType[]
   tsOnly?: boolean
+  /** True for a block that only ever makes sense as another block's child
+   *  (e.g. 'chainStep' inside 'whenReady') — hidden from the top-level
+   *  palette, but still addable via its parent's own "+ add child" button,
+   *  which resolves it through `childOptionsFor`/`blockDefinition`, not the
+   *  palette list. */
+  childOnly?: boolean
 }
 
 // Explanation of what a block teaches — the "how code goes together" layer

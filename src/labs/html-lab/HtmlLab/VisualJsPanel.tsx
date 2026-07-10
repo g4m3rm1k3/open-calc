@@ -200,7 +200,7 @@ export default function VisualJsPanel({ elements, html, css = '', jsFiles, activ
   }, [tabVisitCount, activeJsFileId, jsFiles])
 
   const visibleInPalette = BLOCK_LIBRARY.filter(b => {
-    if (b.tsOnly) return false
+    if (b.tsOnly || b.childOnly) return false
     if (!query) return true
     return `${b.label} ${b.category} ${b.description}`.toLowerCase().includes(query.toLowerCase())
   })
@@ -414,6 +414,16 @@ const CSS_PROP_GROUPS = [
   { label: 'Effects',    props: ['overflow','opacity','transform','transition','cursor','visibility','pointerEvents','objectFit'] },
 ]
 
+// DOM element properties a beginner actually reaches for — same idea as
+// CSS_PROP_GROUPS above, for JS property access/assignment instead of CSS.
+// Doesn't try to cover every DOM property; "type manually" is always the
+// escape hatch, same as every other picker in this file.
+const DOM_PROPERTY_GROUPS = [
+  { label: 'Content',    props: ['textContent', 'innerHTML', 'innerText'] },
+  { label: 'Value & state', props: ['value', 'checked', 'disabled', 'required', 'selected'] },
+  { label: 'Attributes', props: ['id', 'className', 'href', 'src', 'alt', 'title'] },
+]
+
 const CSS_PROP_VALUES: Record<string, string[]> = {
   display:        ['block','flex','grid','inline','inline-block','inline-flex','none'],
   flexDirection:  ['row','column','row-reverse','column-reverse'],
@@ -459,9 +469,19 @@ function FieldInput({ field, block, onChange, onChangeMulti, domHints, classHint
   if (field.name === 'value' && block.type === 'setStyle') {
     return <CssValueField value={value} property={block.fields?.property ?? ''} onChange={v => onChange(field.name, v)} />
   }
+  // A list-typed field (For Each Item / Transform / Filter's source list) —
+  // a variable picker, not a DOM selector picker: these act on an array
+  // already held in a variable, never on a page element directly.
+  if (field.name === 'list') {
+    return <ListVariableField value={value} variableHints={variableHints} onChange={v => onChange(field.name, v)} />
+  }
   // Any general-purpose JS expression field — offers the curated pattern
   // library, but the raw text stays a normal, always-editable input either way.
-  if (['value', 'expression', 'condition'].includes(field.name) || (field.name === 'text' && block.type === 'htmlText')) {
+  // `target` (Assign's left-hand side) is included: assigning to an element's
+  // property (e.g. `element.disabled`) is exactly the "Get an element's
+  // property" pattern below, just used as an assignment target instead of a
+  // read — same expression, no separate mechanism needed.
+  if (['value', 'expression', 'condition', 'target'].includes(field.name) || (field.name === 'text' && block.type === 'htmlText')) {
     return <ExpressionField label={field.label} value={value} domHints={domHints} variableHints={variableHints} onChange={v => onChange(field.name, v)} depth={1} />
   }
 
@@ -674,6 +694,13 @@ function ExpressionParamInput({ param, value, domHints, variableHints, onChange,
     )
   }
 
+  // A DOM element property, picked from a curated list instead of typed —
+  // same dropdown-plus-custom-fallback shape as CssPropertyField, just for
+  // JS property access (element.checked) instead of CSS (style.display).
+  if (param.kind === 'domProperty') {
+    return <DomPropertyParamInput label={param.label} value={value} onChange={onChange} />
+  }
+
   const hints = param.kind === 'selector' ? domHints : param.kind === 'variable' ? variableHints : []
   const known = hints.includes(value)
   const [custom, setCustom] = useState(hints.length > 0 ? (!known && value !== '') : true)
@@ -703,6 +730,35 @@ function ExpressionParamInput({ param, value, domHints, variableHints, onChange,
       </select>
       {custom && (
         <input className={styles.propInput} value={value} onChange={e => onChange(e.target.value)} placeholder={param.placeholder} autoFocus />
+      )}
+    </label>
+  )
+}
+
+function DomPropertyParamInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const inGroups = DOM_PROPERTY_GROUPS.some(g => g.props.includes(value))
+  const [custom, setCustom] = useState(!inGroups && value !== '')
+
+  const handleSelect = (v: string) => {
+    if (v === '__custom__') { setCustom(true); return }
+    setCustom(false); onChange(v)
+  }
+
+  return (
+    <label className={styles.propRow}>
+      <span className={styles.propLabel}>{label}</span>
+      <select className={styles.propInput} aria-label={label} value={custom ? '__custom__' : (value || '__empty__')} onChange={e => handleSelect(e.target.value)}>
+        <option value="__empty__" disabled>— pick a property —</option>
+        {DOM_PROPERTY_GROUPS.map(group => (
+          <optgroup key={group.label} label={group.label}>
+            {group.props.map(prop => <option key={prop} value={prop}>{prop}</option>)}
+          </optgroup>
+        ))}
+        {!inGroups && value && <option value={value}>{value}</option>}
+        <option value="__custom__">✏ type manually…</option>
+      </select>
+      {custom && (
+        <input className={styles.propInput} value={value} onChange={e => onChange(e.target.value)} placeholder="e.g. dataset.count" autoFocus />
       )}
     </label>
   )
@@ -777,6 +833,37 @@ function ClassNameField({ value, classHints, onChange }: { value: string; classH
           placeholder="active"
           autoFocus
         />
+      )}
+    </div>
+  )
+}
+
+// ── List Variable Field ───────────────────────────────────────────────────────
+// The "source list" for For Each Item / Transform / Filter — a plain
+// variable-name picker, not TargetField's element-selector concept, since
+// these blocks act on an array already sitting in a variable.
+
+function ListVariableField({ value, variableHints, onChange }: { value: string; variableHints: string[]; onChange: (v: string) => void }) {
+  const known = variableHints.includes(value)
+  const [custom, setCustom] = useState(variableHints.length > 0 ? (!known && value !== '') : true)
+
+  const handleSelect = (v: string) => {
+    if (v === '__custom__') { setCustom(true); return }
+    setCustom(false); onChange(v)
+  }
+
+  return (
+    <div className={styles.propRow}>
+      <span className={styles.propLabel}>List</span>
+      {variableHints.length > 0 && (
+        <select className={styles.propInput} aria-label="List variable" value={custom ? '__custom__' : (value || '__empty__')} onChange={e => handleSelect(e.target.value)}>
+          <option value="__empty__" disabled>— pick a variable —</option>
+          {variableHints.map(v => <option key={v} value={v}>{v}</option>)}
+          <option value="__custom__">✏ type manually…</option>
+        </select>
+      )}
+      {(custom || variableHints.length === 0) && (
+        <input className={styles.propInput} aria-label="List variable" value={value} onChange={e => onChange(e.target.value)} placeholder="e.g. players" autoFocus />
       )}
     </div>
   )

@@ -229,6 +229,51 @@ function renderBlock(item: Block, depth: number, diags: Diagnostic[], lang: 'jav
       return `${pad}${wrapped}.style.${prop} = ${JSON.stringify(f.value || '')};`
     }
 
+    // ── Callbacks & chaining ─────────────────────────────────────────────────
+    case 'forEachItem': {
+      const list = safeId(f.list, 'list', diags, item)
+      const itemParam = safeId(f.itemParam, 'item', diags, item)
+      const body = renderChildren(item, depth + 1, diags, lang) || indent('', depth + 1)
+      return `${pad}${list}.forEach((${itemParam}) => {\n${body}\n${pad}});`
+    }
+    case 'transformList': {
+      const list = safeId(f.list, 'list', diags, item)
+      const itemParam = safeId(f.itemParam, 'item', diags, item)
+      const outputName = safeId(f.outputName, 'result', diags, item)
+      const body = renderChildren(item, depth + 1, diags, lang) || indent(`return ${itemParam};`, depth + 1)
+      return `${pad}const ${outputName} = ${list}.map((${itemParam}) => {\n${body}\n${pad}});`
+    }
+    case 'filterList': {
+      const list = safeId(f.list, 'list', diags, item)
+      const itemParam = safeId(f.itemParam, 'item', diags, item)
+      const outputName = safeId(f.outputName, 'filtered', diags, item)
+      const body = renderChildren(item, depth + 1, diags, lang) || indent('return true;', depth + 1)
+      return `${pad}const ${outputName} = ${list}.filter((${itemParam}) => {\n${body}\n${pad}});`
+    }
+    case 'whenReady': {
+      const source = val(f.value, 'Promise.resolve()')
+      const steps = (item.children ?? []).filter((c) => c.type === 'chainStep')
+      if (!steps.length) {
+        diags.push(diag('warning', 'A "When It\'s Ready" block needs at least one Then/Catch step underneath it.', item.id))
+        return `${pad}${source};`
+      }
+      const chainPad = INDENT.repeat(depth + 1)
+      const chain = steps.map((step) => {
+        const sf = step.fields ?? {}
+        const kind = sf.kind === 'catch' ? 'catch' : 'then'
+        const paramName = safeId(sf.paramName, kind === 'catch' ? 'error' : 'data', diags, step)
+        const body = renderChildren(step, depth + 2, diags, lang) || indent('', depth + 2)
+        return `\n${chainPad}.${kind}((${paramName}) => {\n${body}\n${chainPad}})`
+      }).join('')
+      return `${pad}${source}${chain};`
+    }
+    case 'callWithCallback': {
+      const fn = val(f.fn, 'fn')
+      const paramName = safeId(f.paramName, 'value', diags, item)
+      const body = renderChildren(item, depth + 1, diags, lang) || indent('', depth + 1)
+      return `${pad}${fn}((${paramName}) => {\n${body}\n${pad}});`
+    }
+
     // TypeScript-only blocks
     case 'interface': {
       if (!ts) return ''

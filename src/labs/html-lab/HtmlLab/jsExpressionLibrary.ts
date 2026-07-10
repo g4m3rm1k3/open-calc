@@ -15,7 +15,7 @@
 // of bottoming out at "type the rest by hand" the moment there's more than
 // one operator in play.
 
-export type ExpressionParamKind = 'selector' | 'variable' | 'expression' | 'text'
+export type ExpressionParamKind = 'selector' | 'variable' | 'expression' | 'text' | 'domProperty'
 
 export interface ExpressionParam {
   name: string
@@ -75,6 +75,12 @@ export const EXPRESSION_LIBRARY: ExpressionTemplate[] = [
     description: 'element.closest(selector)',
     params: [p('value', 'Element', 'variable'), p('selector', 'Ancestor', 'selector')],
     build: v => `${v.value || 'element'}.closest(${JSON.stringify(v.selector || '')})`,
+  },
+  {
+    id: 'getElementProperty', group: 'dom', label: "Get an element's property",
+    description: "element.property — e.g. a checkbox's checked state, an input's value, a link's href. Pick the element (nest another DOM pattern, or type a variable name), then pick which property.",
+    params: [p('object', 'Element', 'expression'), p('property', 'Property', 'domProperty')],
+    build: v => `${v.object || 'element'}.${v.property || 'textContent'}`,
   },
 
   // ── Calls & properties ──────────────────────────────────────────────────

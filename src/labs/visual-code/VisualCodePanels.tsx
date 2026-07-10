@@ -18,6 +18,7 @@ export function BlockPalette({ query, onQueryChange, onAddBlock, targetId }: Blo
   const isTs = targetId === 'typescript'
   const filtered = BLOCK_LIBRARY.filter(item => {
     if (item.tsOnly && !isTs) return false
+    if (item.childOnly) return false
     const text = `${item.label} ${item.category} ${item.description}`.toLowerCase()
     return text.includes(query.toLowerCase())
   })

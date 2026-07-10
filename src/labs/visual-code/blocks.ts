@@ -123,6 +123,42 @@ const CONCEPTS: Record<string, BlockConcept> = {
     connects: ['event', 'variable'],
     example: 'document.querySelector("#score").textContent = String(player.score)',
   },
+  forEachItem: {
+    summary: 'Runs the same code once for every item in a list.',
+    why: 'Without this you\'d write one line per item by hand. A list of 3 or 3,000 items is handled by the exact same block — the code inside runs once per item, automatically.',
+    connects: ['variable', 'if', 'transformList'],
+    example: 'names.forEach((name) => {\n  console.log(name)\n})',
+  },
+  transformList: {
+    summary: 'Builds a brand-new list by running the same transformation on every item of an existing one.',
+    why: 'The original list is never changed — a new one is created alongside it. This is how you turn a list of prices into a list of prices-with-tax, or a list of names into a list of greetings, without a loop and a manually-managed counter.',
+    connects: ['forEachItem', 'filterList', 'return'],
+    example: 'const withTax = prices.map((price) => {\n  return price * 1.08\n})',
+  },
+  filterList: {
+    summary: 'Builds a new, shorter list containing only the items that pass a test.',
+    why: 'The original list is never changed. This is how you go from "every player" to "just the players still in the game," using a condition instead of manually checking and copying items one at a time.',
+    connects: ['transformList', 'forEachItem', 'if'],
+    example: 'const active = players.filter((player) => {\n  return player.score > 0\n})',
+  },
+  whenReady: {
+    summary: 'Runs code once a value that takes time to arrive (like data from a server) actually shows up.',
+    why: 'Network requests don\'t finish instantly — this is how you say "when that\'s actually ready, do this" instead of trying to use a value before it exists. Add a "Catch" step underneath for what happens if it fails instead.',
+    connects: ['chainStep', 'callWithCallback'],
+    example: 'fetch(url)\n  .then((data) => {\n    console.log(data)\n  })\n  .catch((error) => {\n    console.log(error)\n  })',
+  },
+  chainStep: {
+    summary: 'One link in a "When It\'s Ready" chain — either what to do when it succeeds (Then), or what to do if it fails (Catch).',
+    why: 'A chain reads top to bottom, one link at a time, in the exact order they\'ll actually run — add another step below to keep the chain going.',
+    connects: ['whenReady'],
+    example: '.then((data) => {\n  console.log(data)\n})',
+  },
+  callWithCallback: {
+    summary: 'Calls a function and hands it a block of code to run later, instead of running it immediately.',
+    why: 'Some functions (setTimeout, animation frames, custom functions you\'ve written) don\'t run their effect right away — they take a callback and run it themselves, on their own schedule. This covers those cases when there isn\'t a more specific block for what you\'re doing.',
+    connects: ['event', 'whenReady', 'forEachItem'],
+    example: 'setTimeout(() => {\n  console.log("done waiting")\n}, 1000)',
+  },
   interface: {
     summary: 'Describes the shape of an object — what fields and methods it must have — without implementing any behaviour.',
     why: 'Interfaces are TypeScript\'s way of defining contracts. Any object or class that has the right fields satisfies the interface, enabling polymorphism without inheritance.',
@@ -155,6 +191,7 @@ function def(
     fields: FieldSpec[]
     childTypes?: BlockType[]
     tsOnly?: boolean
+    childOnly?: boolean
   },
 ): BlockDefinition {
   return {
@@ -164,12 +201,24 @@ function def(
     fields: options.fields,
     childTypes: options.childTypes ?? [],
     tsOnly: options.tsOnly,
+    childOnly: options.childOnly,
   }
 }
 
 function f(name: string, label: string, kind: FieldSpec['kind'] = 'text', options?: string[]): FieldSpec {
   return { name, label, kind, options }
 }
+
+// The statement types usable inside any "callback body" container — a
+// callback's body is just an ordinary list of statements, the same shape
+// as an if/loop/event's body, so this is deliberately the same set 'event'
+// already uses (see below) plus the 5 new callback-taking blocks themselves,
+// so e.g. a "For Each Item" body can itself contain a "When It's Ready".
+const CALLBACK_BODY_TYPES: BlockType[] = [
+  'variable', 'assign', 'call', 'log', 'if', 'loop', 'htmlText', 'readValue',
+  'addClass', 'removeClass', 'toggleClass', 'setStyle',
+  'forEachItem', 'transformList', 'filterList', 'whenReady', 'callWithCallback',
+]
 
 export const BLOCK_LIBRARY: BlockDefinition[] = [
   // ── OOP ──────────────────────────────────────────────────────────────────
@@ -201,7 +250,7 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
   def('function', 'Function', 'oop', 'A reusable block of code outside any class.', {
     defaults: { name: 'makePlayer', params: 'name: string', returnType: '', async: 'false' },
     fields: [f('name', 'Name'), f('params', 'Parameters'), f('returnType', 'Return type'), f('async', 'Async', 'select', ['false', 'true'])],
-    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'loop', 'return', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle'],
+    childTypes: [...CALLBACK_BODY_TYPES, 'return'],
   }),
   def('call', 'Call', 'oop', 'Execute a function or method.', {
     defaults: { expression: 'player.greet()' },
@@ -258,12 +307,14 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
   // ── Flow ─────────────────────────────────────────────────────────────────
   def('if', 'If', 'flow', 'Run code only when a condition is true.', {
     defaults: { condition: 'player.score > 5', body: '' },
-    childTypes: ['variable', 'assign', 'call', 'log', 'loop', 'return', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle'],
+    // No 'if' in its own children (no nested if-in-if) — same restriction as before these 5 additions.
+    childTypes: ['variable', 'assign', 'call', 'log', 'loop', 'return', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle', 'forEachItem', 'transformList', 'filterList', 'whenReady', 'callWithCallback'],
     fields: [f('condition', 'Condition'), f('body', 'Raw body (fallback)', 'code')],
   }),
   def('loop', 'Repeat', 'flow', 'Run code a set number of times.', {
     defaults: { count: '3', iterator: 'i', body: '' },
-    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'return', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle'],
+    // No 'loop' in its own children (no nested loop-in-loop) — same restriction as before these 5 additions.
+    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'return', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle', 'forEachItem', 'transformList', 'filterList', 'whenReady', 'callWithCallback'],
     fields: [f('count', 'Count'), f('iterator', 'Iterator name'), f('body', 'Raw body (fallback)', 'code')],
   }),
 
@@ -283,7 +334,7 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
   // explicit data on the block, not inferred from the selector string.
   def('event', 'Event Listener', 'html', 'Run code when the user interacts with an element.', {
     defaults: { targetKind: 'selector', selector: '#scoreButton', variableName: '', event: 'click' },
-    childTypes: ['variable', 'assign', 'call', 'log', 'if', 'loop', 'htmlText', 'readValue', 'addClass', 'removeClass', 'toggleClass', 'setStyle'],
+    childTypes: CALLBACK_BODY_TYPES,
     fields: [f('selector', 'Target (element or variable)'), f('event', 'Event type')],
   }),
   def('htmlText', 'HTML Text', 'html', 'Write a value into an element the user can see.', {
@@ -309,6 +360,41 @@ export const BLOCK_LIBRARY: BlockDefinition[] = [
   def('setStyle', 'Set Style', 'html', 'Set a CSS style property directly on an element.', {
     defaults: { targetKind: 'selector', selector: '', variableName: '', property: 'display', value: 'none' },
     fields: [f('selector', 'Target (element or variable)'), f('property', 'CSS property'), f('value', 'Value')],
+  }),
+
+  // ── Callbacks & chaining ─────────────────────────────────────────────────
+  // Every block below holds its callback body as real children — same shape
+  // as 'event' above — never a typed function string.
+  def('forEachItem', 'For Each Item', 'flow', 'Run the same code once for every item in a list.', {
+    defaults: { list: '', itemParam: 'item' },
+    fields: [f('list', 'List (a variable holding an array)'), f('itemParam', 'Name for each item (e.g. item)')],
+    childTypes: CALLBACK_BODY_TYPES,
+  }),
+  def('transformList', 'Transform Each Item', 'flow', 'Build a new list by transforming every item of an existing one.', {
+    defaults: { list: '', outputName: 'result', itemParam: 'item' },
+    fields: [f('list', 'List (a variable holding an array)'), f('outputName', 'New list name'), f('itemParam', 'Name for each item (e.g. item)')],
+    childTypes: [...CALLBACK_BODY_TYPES, 'return'],
+  }),
+  def('filterList', 'Keep Matching Items', 'flow', 'Build a new, shorter list containing only the items that pass a test.', {
+    defaults: { list: '', outputName: 'filtered', itemParam: 'item' },
+    fields: [f('list', 'List (a variable holding an array)'), f('outputName', 'New list name'), f('itemParam', 'Name for each item (e.g. item)')],
+    childTypes: [...CALLBACK_BODY_TYPES, 'return'],
+  }),
+  def('whenReady', 'When It\'s Ready', 'flow', 'Run code once a value that takes time to arrive actually shows up.', {
+    defaults: { value: '' },
+    fields: [f('value', 'Promise (e.g. a Fetch pattern)')],
+    childTypes: ['chainStep'],
+  }),
+  def('chainStep', 'Then / Catch', 'flow', 'One link in a "When It\'s Ready" chain.', {
+    defaults: { kind: 'then', paramName: 'data' },
+    fields: [f('kind', 'Step type', 'select', ['then', 'catch']), f('paramName', 'Parameter name (e.g. data, or error for a catch step)')],
+    childTypes: CALLBACK_BODY_TYPES,
+    childOnly: true,
+  }),
+  def('callWithCallback', 'Call, With a Callback', 'flow', 'Call a function and hand it a block of code to run later.', {
+    defaults: { fn: '', paramName: 'value' },
+    fields: [f('fn', 'Function / method (e.g. setTimeout, myArray.forEach)'), f('paramName', 'Callback parameter name (optional)')],
+    childTypes: CALLBACK_BODY_TYPES,
   }),
 ]
 
@@ -375,6 +461,12 @@ export function summarizeBlock(block: Block): string {
     case 'removeClass':  return `${targetSummary(f)}.classList.remove('${f.className || ''}')`
     case 'toggleClass':  return `${targetSummary(f)}.classList.toggle('${f.className || ''}')`
     case 'setStyle':     return `${targetSummary(f)}.style.${f.property || 'display'} = '${f.value || ''}'`
+    case 'forEachItem':  return `for each ${f.itemParam || 'item'} in ${f.list || '?'}`
+    case 'transformList': return `const ${f.outputName || 'result'} = ${f.list || '?'}.map(${f.itemParam || 'item'} => ...)`
+    case 'filterList':   return `const ${f.outputName || 'filtered'} = ${f.list || '?'}.filter(${f.itemParam || 'item'} => ...)`
+    case 'whenReady':    return `${f.value || '?'} …`
+    case 'chainStep':    return `.${f.kind || 'then'}(${f.paramName || 'data'} => ...)`
+    case 'callWithCallback': return `${f.fn || 'fn'}(${f.paramName || 'value'} => ...)`
     default:             return Object.values(f).filter(Boolean).join(' ')
   }
 }
