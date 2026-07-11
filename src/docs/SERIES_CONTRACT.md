@@ -20,6 +20,71 @@ A learner who completes the series should understand how the subject works, not 
 
 ---
 
+## Series Classification
+
+Every series belongs to exactly one of three types. The type determines what the series focuses on.
+
+| Type | Focus | Examples |
+|---|---|---|
+| **Language** | Syntax, semantics, execution model, idioms | Python Fundamentals, JavaScript Fundamentals, Java Fundamentals, SQL Fundamentals |
+| **Platform** | APIs, runtime behaviour, platform integration | HTML & DOM, Browser APIs, HTTP, POSIX Filesystems |
+| **Discipline** | Mental models, patterns, trade-offs, engineering decisions | CSS Layout, Data Structures, Algorithms, Software Design |
+
+Classification matters because each type has a different internal structure:
+- Language series teach *how the language behaves*
+- Platform series teach *how to work with an external system*
+- Discipline series teach *how to make good decisions*
+
+---
+
+## Organise by Dependency, Not by Technology
+
+Do not create one large "CSS" series or one large "JavaScript" series.
+Identify the **dependency graph** of the subject and make each node its own series.
+
+**Why:** A smaller, cohesive series is easier to write to the contract, easier to learn in one sitting,
+and produces a clean prerequisite chain that the learner can follow.
+
+**Example — CSS dependency graph:**
+```
+CSS Fundamentals
+      │
+      ├──────────────┐
+      ▼              ▼
+CSS Selectors    CSS Box Model
+      │              │
+      └──────┬───────┘
+             ▼
+     CSS Layout Fundamentals
+             │
+     ┌───────┴───────┐
+     ▼               ▼
+CSS Flexbox       CSS Grid
+     │               │
+     └───────┬───────┘
+             ▼
+   CSS Responsive Design
+             │
+     ┌───────┴────────┐
+     ▼                ▼
+CSS Animation    CSS Visual Design
+             └──────────┘
+                   ▼
+          CSS Professional
+```
+
+**Example — JavaScript dependency graph:**
+```
+JavaScript Fundamentals → Functions → Objects → Arrays
+                                                  ↓
+                         DOM Manipulation → Events → Async JavaScript → Modules
+```
+
+Each series in the graph has its own `series.ts` entry, its own folder in `content/`,
+and explicit prerequisites listed in its description.
+
+---
+
 ## Scope
 
 A series teaches only concepts that belong to its subject.

@@ -67,7 +67,10 @@ function extractLenses(prose: string): { prose: string; lenses: { cs?: string; s
 
 // ── Step builder ──────────────────────────────────────────────────────────────
 
-function buildStep(raw: string, idx: number): LessonStep {
+// Langs that should not be inferred as challenge lang — they're context/display fences
+const NON_CHALLENGE_LANGS = new Set(['html', 'text', 'plaintext'])
+
+function buildStep(raw: string, idx: number, metaLang: string): LessonStep {
   const lines = raw.split('\n')
   const titleLine = lines[0] ?? ''
   const title = titleLine.replace(/^##\s*/, '').trim()
@@ -83,18 +86,17 @@ function buildStep(raw: string, idx: number): LessonStep {
   for (let i = 0; i < fences.length; i++) {
     const f = fences[i]
     if (f.lang === 'challenge') {
-      challenge = { lang: fences[i - 1]?.lang ?? 'python', code: f.code }
-      // infer lang from the challenge fence name or nearest prior example
+      // Infer lang from the previous runnable fence, skipping display/context fences.
+      // Fall back to the lesson's meta.lang so CSS challenges get lang:'css' even
+      // when the previous fence is the HTML structure context.
+      const prev = fences[i - 1]?.lang
+      const inferredLang = (prev && !NON_CHALLENGE_LANGS.has(prev)) ? prev : metaLang
+      challenge = { lang: inferredLang, code: f.code }
     } else if (f.lang === 'test') {
       tests = f.code
     } else {
       examples.push({ lang: f.lang, code: f.code })
     }
-  }
-
-  // If challenge has no lang, inherit from examples in this step
-  if (challenge && challenge.lang === 'python' && examples.length > 0) {
-    challenge = { ...challenge, lang: examples[examples.length - 1].lang }
   }
 
   return { id: `step-${idx}`, title, prose, lenses, examples, challenge, tests }
@@ -112,10 +114,12 @@ export function parseLesson(markdown: string): ParsedLesson {
   const steps: LessonStep[] = []
   let introProse = ''
 
+  const metaLang = meta.lang ?? 'python'
+
   for (let i = 0; i < rawSteps.length; i++) {
     const chunk = rawSteps[i].trim()
     if (chunk.startsWith('## ')) {
-      steps.push(buildStep(chunk, i))
+      steps.push(buildStep(chunk, i, metaLang))
     } else {
       // intro section — extract the # title and remaining prose
       introProse = chunk.replace(/^#[^#][^\n]*\n?/, '').trim()

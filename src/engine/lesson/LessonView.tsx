@@ -33,6 +33,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
   const [traceCode, setTraceCode] = useState<string>('')
   const [output, setOutput] = useState<{ text: string; kind: string }[] | null>(null)
   const [testResults, setTestResults] = useState<TestResult[] | null>(null)
+  const [challengesPassed, setChallengesPassed] = useState<Set<number>>(new Set())
 
   // Reset all state when a new lesson is loaded
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
     setHeap(null)
     setOutput(null)
     setTestResults(null)
+    setChallengesPassed(new Set())
     setRightTab('lesson')
   }, [lesson])
 
@@ -93,8 +95,17 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
 
   function handleResults(results: TestResult[]) {
     setTestResults(results)
-    if (results.length > 0) setRightTab(prev => prev === 'debug' ? prev : 'output')
+    if (results.length > 0) {
+      setRightTab(prev => prev === 'debug' ? prev : 'output')
+      if (results.every(r => r.passed)) {
+        setChallengesPassed(prev => new Set([...prev, safeIdx]))
+      }
+    }
   }
+
+  // Lesson is completable only when every challenge step has been passed
+  const challengeStepIndices = lesson.steps.reduce<number[]>((acc, s, i) => s.challenge ? [...acc, i] : acc, [])
+  const allChallengesDone = challengeStepIndices.length === 0 || challengeStepIndices.every(i => challengesPassed.has(i))
 
   const hasTrace = events.length > 0
   const hasOutput = output !== null && output.some(l => l.kind !== 'preview')
@@ -171,11 +182,18 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
 
         {/* Next / Complete */}
         {stepIdx === total - 1 ? (
-          <button
-            type="button"
-            onClick={onComplete ?? onBack}
-            className={`text-xs font-medium px-3 py-1.5 rounded border border-brand-500/40 bg-brand-500/10 text-brand-500 hover:bg-brand-500/20 hover:border-brand-500/60 transition-all cursor-pointer shrink-0`}
-          >Next Lesson →</button>
+          allChallengesDone ? (
+            <button
+              type="button"
+              onClick={onComplete ?? onBack}
+              className={`text-xs font-medium px-3 py-1.5 rounded border border-brand-500/40 bg-brand-500/10 text-brand-500 hover:bg-brand-500/20 hover:border-brand-500/60 transition-all cursor-pointer shrink-0`}
+            >Next Lesson →</button>
+          ) : (
+            <span
+              title={`Pass ${challengeStepIndices.filter(i => !challengesPassed.has(i)).length} remaining challenge${challengeStepIndices.filter(i => !challengesPassed.has(i)).length !== 1 ? 's' : ''} to continue`}
+              className={`text-xs font-medium px-3 py-1.5 rounded border ${ui.border} ${ui.bg1} ${ui.txt2} opacity-50 cursor-not-allowed shrink-0 select-none`}
+            >🔒 Complete challenges</span>
+          )
         ) : (
           <button
             type="button"

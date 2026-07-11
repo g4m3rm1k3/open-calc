@@ -69,6 +69,17 @@ import jsLevel7 from './content/javascript-fundamentals/level-7.md?raw'
 import jsLevel8 from './content/javascript-fundamentals/level-8.md?raw'
 import jsLevel9 from './content/javascript-fundamentals/level-9.md?raw'
 
+import cssLevel0 from './content/css-fundamentals/level-0.md?raw'
+import cssLevel1 from './content/css-fundamentals/level-1.md?raw'
+import cssLevel2 from './content/css-fundamentals/level-2.md?raw'
+import cssLevel3 from './content/css-fundamentals/level-3.md?raw'
+import cssLevel4 from './content/css-fundamentals/level-4.md?raw'
+import cssLevel5 from './content/css-fundamentals/level-5.md?raw'
+import cssLevel6 from './content/css-fundamentals/level-6.md?raw'
+import cssLevel7 from './content/css-fundamentals/level-7.md?raw'
+import cssLevel8 from './content/css-fundamentals/level-8.md?raw'
+import cssLevel9 from './content/css-fundamentals/level-9.md?raw'
+
 import cppLevel0 from './content/cpp-fundamentals/level-0.md?raw'
 import cppLevel1 from './content/cpp-fundamentals/level-1.md?raw'
 import cppLevel2 from './content/cpp-fundamentals/level-2.md?raw'
@@ -160,6 +171,16 @@ const LESSON_FILES: Record<string, string> = {
   'javascript-fundamentals/level-7.md': jsLevel7,
   'javascript-fundamentals/level-8.md': jsLevel8,
   'javascript-fundamentals/level-9.md': jsLevel9,
+  'css-fundamentals/level-0.md': cssLevel0,
+  'css-fundamentals/level-1.md': cssLevel1,
+  'css-fundamentals/level-2.md': cssLevel2,
+  'css-fundamentals/level-3.md': cssLevel3,
+  'css-fundamentals/level-4.md': cssLevel4,
+  'css-fundamentals/level-5.md': cssLevel5,
+  'css-fundamentals/level-6.md': cssLevel6,
+  'css-fundamentals/level-7.md': cssLevel7,
+  'css-fundamentals/level-8.md': cssLevel8,
+  'css-fundamentals/level-9.md': cssLevel9,
   'cpp-fundamentals/level-0.md': cppLevel0,
   'cpp-fundamentals/level-1.md': cppLevel1,
   'cpp-fundamentals/level-2.md': cppLevel2,

@@ -1,5 +1,4 @@
-import type { TestResult } from './types'
-import type { Executor } from './types'
+import type { TestResult, Executor } from './types'
 
 const OC_PREFIX = '__OC_TEST__'
 
@@ -86,4 +85,72 @@ export async function runTests(
     return [{ label: errors[0].text, passed: false, detail: 'Runtime error' }]
   }
   return parseTestResults(stdout)
+}
+
+// ── CSS test runner ──────────────────────────────────────────────────────────
+// Injects the student's CSS into an iframe alongside the provided HTML structure,
+// then runs test assertions using getComputedStyle. Tests outcomes, not implementation.
+
+export function runCSSTests(
+  userCSS: string,
+  htmlStructure: string,
+  testCode: string,
+): Promise<TestResult[]> {
+  return new Promise(resolve => {
+    const assertions = testCode
+      .split('\n')
+      .map(l => l.trim())
+      .filter(l => l && !l.startsWith('//'))
+
+    const blocks = assertions.map(a => {
+      const expr = a.replace(/^assert\s+/, '')
+      const label = JSON.stringify(a)
+      return `try {
+  var __ok = Boolean(${expr});
+  results.push({label:${label},passed:__ok,detail:__ok?undefined:'Expected true'});
+} catch(e) {
+  results.push({label:${label},passed:false,detail:e.message});
+}`
+    }).join('\n')
+
+    const doc = `<!DOCTYPE html>
+<html>
+<head><style>${userCSS}</style></head>
+<body>
+${htmlStructure}
+<script>
+var results = [];
+${blocks}
+window.parent.postMessage({type:'__OC_CSS__',results:results},'*');
+</script>
+</body>
+</html>`
+
+    let done = false
+    const timer = setTimeout(() => {
+      if (done) return
+      done = true
+      window.removeEventListener('message', onMsg)
+      try { document.body.removeChild(frame) } catch {}
+      resolve([{ label: 'Tests timed out', passed: false, detail: 'No response from iframe after 5s' }])
+    }, 5000)
+
+    function onMsg(e: MessageEvent) {
+      if (e.data?.type !== '__OC_CSS__') return
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      window.removeEventListener('message', onMsg)
+      try { document.body.removeChild(frame) } catch {}
+      resolve(e.data.results as TestResult[])
+    }
+
+    window.addEventListener('message', onMsg)
+
+    const frame = document.createElement('iframe')
+    frame.setAttribute('sandbox', 'allow-scripts')
+    frame.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:600px;height:400px;visibility:hidden;pointer-events:none'
+    frame.srcdoc = doc
+    document.body.appendChild(frame)
+  })
 }

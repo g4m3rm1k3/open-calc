@@ -4,7 +4,7 @@ import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import type { LessonStep, Executor, UiTheme, TestResult } from './types'
 import type { TraceEvent } from '../../labs/codelens/codelens/types'
-import { runTests, buildTestHarness } from './testRunner'
+import { runTests, runCSSTests, buildTestHarness } from './testRunner'
 import { runPython } from '../../labs/codelens/codelens/interpreter/pythonTracer'
 import { run as runJS } from '../../engines/js/interpreter/interpreter.js'
 
@@ -89,7 +89,14 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
     setTraceEvents([])
     setTraceStep(0)
 
-    const testResults = await runTests(code, tests, lang, executor)
+    const isCSSChallenge = lang.toLowerCase() === 'css'
+    const htmlStructure = isCSSChallenge
+      ? (step.examples.find(e => e.lang.toLowerCase() === 'html')?.code ?? '')
+      : ''
+
+    const testResults = isCSSChallenge
+      ? await runCSSTests(code, htmlStructure, tests)
+      : await runTests(code, tests, lang, executor)
     if (onResults) onResults(testResults)
 
     if (debugOn) {
