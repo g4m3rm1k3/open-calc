@@ -137,7 +137,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
           type="button"
           onClick={() => navigate(Math.max(0, stepIdx - 1))}
           disabled={stepIdx === 0}
-          className={`text-xs font-medium px-2.5 py-1 rounded border ${ui.border} ${ui.bg0} ${ui.txt2} hover:text-brand-500 disabled:opacity-30 bg-transparent cursor-pointer shrink-0`}
+          className={`text-xs font-medium px-3 py-1.5 rounded border ${ui.border} ${ui.bg1} ${ui.txt2} hover:text-brand-400 hover:border-brand-500/30 hover:bg-brand-500/5 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-current disabled:hover:border-current transition-all cursor-pointer shrink-0`}
         >← Prev</button>
 
         {/* Step dots */}
@@ -163,13 +163,13 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
           <button
             type="button"
             onClick={onComplete ?? onBack}
-            className="text-xs font-bold px-2.5 py-1 rounded bg-brand-500 text-white hover:bg-brand-600 cursor-pointer border-none shrink-0"
+            className={`text-xs font-medium px-3 py-1.5 rounded border border-brand-500/40 bg-brand-500/10 text-brand-500 hover:bg-brand-500/20 hover:border-brand-500/60 transition-all cursor-pointer shrink-0`}
           >Next Lesson →</button>
         ) : (
           <button
             type="button"
             onClick={() => navigate(stepIdx + 1)}
-            className="text-xs font-bold px-2.5 py-1 rounded bg-brand-500 text-white hover:bg-brand-600 cursor-pointer border-none shrink-0"
+            className={`text-xs font-medium px-3 py-1.5 rounded border border-brand-500/40 bg-brand-500/10 text-brand-500 hover:bg-brand-500/20 hover:border-brand-500/60 transition-all cursor-pointer shrink-0`}
           >Next →</button>
         )}
       </div>
@@ -196,7 +196,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
         <div className={`w-[42%] shrink-0 flex flex-col`}>
 
           {/* Tab bar */}
-          <div className={`flex items-center px-2 pt-1.5 border-b ${ui.border} ${ui.bg1} shrink-0 gap-0.5`}>
+          <div className={`flex items-center px-2 pt-2 border-b ${ui.border} ${ui.bg1} shrink-0 gap-1`}>
             {(['lesson', 'output', 'debug', 'tutor'] as RightTab[]).map(tab => {
               const label = tab === 'lesson' ? 'Lesson'
                 : tab === 'output' ? (isChallenge ? 'Tests' : 'Output')
@@ -211,15 +211,16 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
                   key={tab}
                   type="button"
                   onClick={() => setRightTab(tab)}
-                  className={`relative px-3 py-1.5 text-[12px] font-semibold border-b-2 transition-colors bg-transparent cursor-pointer shrink-0 ${
+                  className={`relative px-4 py-1.5 text-[12px] font-medium rounded-t-lg border-t border-l border-r transition-colors cursor-pointer shrink-0 ${
                     isActive
-                      ? 'border-brand-500 text-brand-600 dark:text-brand-400'
-                      : `border-transparent ${ui.txt2} hover:text-brand-500`
+                      ? `border-brand-500/30 ${ui.bg0} text-brand-500 shadow-[inset_0_1px_0_rgba(59,130,246,0.2)]`
+                      : `${ui.border} bg-transparent ${ui.txt2} hover:${ui.bg0} hover:text-brand-400`
                   }`}
+                  style={{ marginBottom: isActive ? '-1px' : '0' }}
                 >
                   {label}
                   {hasBadge && (
-                    <span className="absolute top-1 right-0.5 w-1.5 h-1.5 rounded-full bg-brand-500" />
+                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand-500 shadow-[0_0_4px_rgba(59,130,246,0.8)]" />
                   )}
                 </button>
               )
@@ -228,7 +229,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
 
           {/* Lesson tab — prose + lenses */}
           {rightTab === 'lesson' && step && (
-            <div className="flex-1 overflow-y-auto">
+            <div className={`flex-1 overflow-y-auto ${styles.animateFadeIn}`}>
               {/* Step header */}
               <div className={`px-5 pt-6 pb-3 shrink-0`}>
                 {stepIdx === 0 && !step.title && (
@@ -268,17 +269,25 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
 
                 {/* CS / SE lenses as callout cards */}
                 {(step.lenses?.cs || step.lenses?.se) && (
-                  <div className="flex flex-col gap-3 mt-5 pt-5 border-t border-current/10">
+                  <div className="flex flex-col gap-4 mt-6 pt-6 border-t border-brand-500/10">
                     {step.lenses?.cs && (
-                      <div className={`rounded-lg p-3 border ${ui.border} ${ui.bg1}`}>
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-brand-500 mb-1.5">CS Concept</div>
-                        <p className={`text-sm leading-relaxed ${ui.txt1} m-0`}>{step.lenses.cs}</p>
+                      <div className={`relative rounded-xl p-4 border border-brand-500/30 bg-gradient-to-br from-brand-500/5 to-transparent shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] overflow-hidden`}>
+                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-brand-400 to-sky-400" />
+                        <div className="text-[10px] font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-sky-400 mb-2 flex items-center gap-2">
+                          <span className="w-4 h-4 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 text-[10px]">⚛</span>
+                          CS Concept
+                        </div>
+                        <p className={`text-[13.5px] leading-relaxed ${ui.txt1} m-0`}>{step.lenses.cs}</p>
                       </div>
                     )}
                     {step.lenses?.se && (
-                      <div className={`rounded-lg p-3 border ${ui.border} ${ui.bg1}`}>
-                        <div className="text-[10px] font-bold uppercase tracking-widest text-brand-500 mb-1.5">SE Insight</div>
-                        <p className={`text-sm leading-relaxed ${ui.txt1} m-0`}>{step.lenses.se}</p>
+                      <div className={`relative rounded-xl p-4 border border-sky-500/30 bg-gradient-to-br from-sky-500/5 to-transparent shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] overflow-hidden`}>
+                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-sky-400 to-indigo-400" />
+                        <div className="text-[10px] font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400 mb-2 flex items-center gap-2">
+                          <span className="w-4 h-4 rounded-full bg-sky-500/20 flex items-center justify-center text-sky-400 text-[10px]">⚙</span>
+                          SE Insight
+                        </div>
+                        <p className={`text-[13.5px] leading-relaxed ${ui.txt1} m-0`}>{step.lenses.se}</p>
                       </div>
                     )}
                   </div>
