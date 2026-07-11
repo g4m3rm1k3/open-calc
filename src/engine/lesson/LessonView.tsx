@@ -18,13 +18,14 @@ interface Props {
   executor: Executor
   ui: UiTheme
   onBack?: () => void
+  onBackToSeriesList?: () => void
   onComplete?: () => void
   seriesLabel?: string
 }
 
 type RightTab = 'lesson' | 'output' | 'dom' | 'tree' | 'css' | 'debug' | 'tutor'
 
-export default function LessonView({ lesson, executor, ui, onBack, onComplete, seriesLabel }: Props) {
+export default function LessonView({ lesson, executor, ui, onBack, onBackToSeriesList, onComplete, seriesLabel }: Props) {
   const [stepIdx, setStepIdx] = useState(0)
   const [rightTab, setRightTab] = useState<RightTab>('lesson')
   const [events, setEvents] = useState<TraceEvent[]>([])
@@ -140,18 +141,28 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
       {/* Top bar — pl-20 clears macOS traffic-light buttons */}
       <div className={`flex items-center gap-2 pl-20 pr-3 py-2 border-b ${ui.border} ${ui.bg1} shrink-0`}>
         {/* Breadcrumb */}
-        {seriesLabel && (
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={onBack}
-              className={`text-sm font-medium ${ui.txt2} hover:text-brand-500 transition-colors bg-transparent border-none cursor-pointer`}
-            >
-              {seriesLabel}
-            </button>
-            <span className={`text-sm ${ui.txt2} opacity-40`}>›</span>
-          </div>
-        )}
+        <div className="flex items-center gap-1 shrink-0">
+          {onBackToSeriesList && (
+            <>
+              <button
+                type="button"
+                onClick={onBackToSeriesList}
+                className={`text-xs font-medium ${ui.txt2} hover:text-brand-500 transition-colors bg-transparent border-none cursor-pointer`}
+              >All Series</button>
+              <span className={`text-xs ${ui.txt2} opacity-40`}>›</span>
+            </>
+          )}
+          {seriesLabel && onBack && (
+            <>
+              <button
+                type="button"
+                onClick={onBack}
+                className={`text-xs font-medium ${ui.txt2} hover:text-brand-500 transition-colors bg-transparent border-none cursor-pointer`}
+              >{seriesLabel}</button>
+              <span className={`text-xs ${ui.txt2} opacity-40`}>›</span>
+            </>
+          )}
+        </div>
         <span className={`text-[13px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-sky-400 truncate flex-1 min-w-0`}>{lesson.title}</span>
 
         {/* Prev */}
@@ -210,7 +221,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
         <div className={`flex flex-col flex-1 min-w-0 border-r ${ui.border}`}>
           {step && (
             isChallenge
-              ? <ChallengeStep step={step} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onResults={handleResults} />
+              ? <ChallengeStep step={step} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onResults={handleResults} onOutput={handleOutput} />
               : step.examples[0]
                 ? <RunExample snippet={step.examples[0]} snippets={step.examples} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onOutput={handleOutput} />
                 : (

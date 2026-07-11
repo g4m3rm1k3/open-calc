@@ -97,12 +97,17 @@ export function runCSSTests(
   testCode: string,
 ): Promise<TestResult[]> {
   return new Promise(resolve => {
-    const assertions = testCode
+    const lines = testCode
       .split('\n')
       .map(l => l.trim())
       .filter(l => l && !l.startsWith('//'))
 
-    const blocks = assertions.map(a => {
+    // Lines NOT starting with `assert` are preamble/setup — run once in shared scope.
+    // Lines starting with `assert` are individual checks — wrapped in try/catch.
+    const preamble = lines.filter(l => !l.startsWith('assert '))
+    const asserts  = lines.filter(l =>  l.startsWith('assert '))
+
+    const assertBlocks = asserts.map(a => {
       const expr = a.replace(/^assert\s+/, '')
       const label = JSON.stringify(a)
       return `try {
@@ -120,7 +125,12 @@ export function runCSSTests(
 ${htmlStructure}
 <script>
 var results = [];
-${blocks}
+try {
+${preamble.join('\n')}
+${assertBlocks}
+} catch(e) {
+  results.push({label:'Setup error',passed:false,detail:e.message});
+}
 window.parent.postMessage({type:'__OC_CSS__',results:results},'*');
 </script>
 </body>

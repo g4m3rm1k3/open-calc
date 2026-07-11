@@ -69,6 +69,33 @@ import jsLevel7 from './content/javascript-fundamentals/level-7.md?raw'
 import jsLevel8 from './content/javascript-fundamentals/level-8.md?raw'
 import jsLevel9 from './content/javascript-fundamentals/level-9.md?raw'
 
+import cssSelLevel0 from './content/css-selectors/level-0.md?raw'
+import cssSelLevel1 from './content/css-selectors/level-1.md?raw'
+import cssSelLevel2 from './content/css-selectors/level-2.md?raw'
+import cssSelLevel3 from './content/css-selectors/level-3.md?raw'
+import cssSelLevel4 from './content/css-selectors/level-4.md?raw'
+import cssSelLevel5 from './content/css-selectors/level-5.md?raw'
+import cssSelLevel6 from './content/css-selectors/level-6.md?raw'
+import cssSelLevel7 from './content/css-selectors/level-7.md?raw'
+
+import cssBmLevel0 from './content/css-box-model/level-0.md?raw'
+import cssBmLevel1 from './content/css-box-model/level-1.md?raw'
+import cssBmLevel2 from './content/css-box-model/level-2.md?raw'
+import cssBmLevel3 from './content/css-box-model/level-3.md?raw'
+import cssBmLevel4 from './content/css-box-model/level-4.md?raw'
+import cssBmLevel5 from './content/css-box-model/level-5.md?raw'
+import cssBmLevel6 from './content/css-box-model/level-6.md?raw'
+import cssBmLevel7 from './content/css-box-model/level-7.md?raw'
+
+import cssLayoutLevel0 from './content/css-layout/level-0.md?raw'
+import cssLayoutLevel1 from './content/css-layout/level-1.md?raw'
+import cssLayoutLevel2 from './content/css-layout/level-2.md?raw'
+import cssLayoutLevel3 from './content/css-layout/level-3.md?raw'
+import cssLayoutLevel4 from './content/css-layout/level-4.md?raw'
+import cssLayoutLevel5 from './content/css-layout/level-5.md?raw'
+import cssLayoutLevel6 from './content/css-layout/level-6.md?raw'
+import cssLayoutLevel7 from './content/css-layout/level-7.md?raw'
+
 import cssLevel0 from './content/css-fundamentals/level-0.md?raw'
 import cssLevel1 from './content/css-fundamentals/level-1.md?raw'
 import cssLevel2 from './content/css-fundamentals/level-2.md?raw'
@@ -171,6 +198,30 @@ const LESSON_FILES: Record<string, string> = {
   'javascript-fundamentals/level-7.md': jsLevel7,
   'javascript-fundamentals/level-8.md': jsLevel8,
   'javascript-fundamentals/level-9.md': jsLevel9,
+  'css-selectors/level-0.md': cssSelLevel0,
+  'css-selectors/level-1.md': cssSelLevel1,
+  'css-selectors/level-2.md': cssSelLevel2,
+  'css-selectors/level-3.md': cssSelLevel3,
+  'css-selectors/level-4.md': cssSelLevel4,
+  'css-selectors/level-5.md': cssSelLevel5,
+  'css-selectors/level-6.md': cssSelLevel6,
+  'css-selectors/level-7.md': cssSelLevel7,
+  'css-box-model/level-0.md': cssBmLevel0,
+  'css-box-model/level-1.md': cssBmLevel1,
+  'css-box-model/level-2.md': cssBmLevel2,
+  'css-box-model/level-3.md': cssBmLevel3,
+  'css-box-model/level-4.md': cssBmLevel4,
+  'css-box-model/level-5.md': cssBmLevel5,
+  'css-box-model/level-6.md': cssBmLevel6,
+  'css-box-model/level-7.md': cssBmLevel7,
+  'css-layout/level-0.md': cssLayoutLevel0,
+  'css-layout/level-1.md': cssLayoutLevel1,
+  'css-layout/level-2.md': cssLayoutLevel2,
+  'css-layout/level-3.md': cssLayoutLevel3,
+  'css-layout/level-4.md': cssLayoutLevel4,
+  'css-layout/level-5.md': cssLayoutLevel5,
+  'css-layout/level-6.md': cssLayoutLevel6,
+  'css-layout/level-7.md': cssLayoutLevel7,
   'css-fundamentals/level-0.md': cssLevel0,
   'css-fundamentals/level-1.md': cssLevel1,
   'css-fundamentals/level-2.md': cssLevel2,
@@ -271,6 +322,7 @@ export default function LessonEngineLab({ onBack }: Props) {
             ui={ui}
             seriesLabel={view.series.label}
             onBack={() => setView({ kind: 'level-list', series: view.series })}
+            onBackToSeriesList={() => setView({ kind: 'series-list' })}
             onComplete={() => {
               markComplete(view.series.id, view.lesson.level)
               if (nextLevel) openLesson(nextLevel.file, view.series)
@@ -352,19 +404,23 @@ function LevelListView({ ui, series, completed, available, onBack, onSelectLevel
         <h1 className={`text-2xl font-bold mb-1 ${ui.txt1}`}>{series.label}</h1>
         <p className={`text-sm mb-6 ${ui.txt2}`}>{series.description}</p>
         <div className="flex flex-col gap-2">
-          {series.levels.map(lvl => {
-            const isDone = completed.has(`${series.id}:${lvl.level}`)
-            const isReady = !!available[lvl.file]
+          {series.levels.map((lvl, idx) => {
+            const isDone     = completed.has(`${series.id}:${lvl.level}`)
+            const isReady    = !!available[lvl.file]
+            const prevLevel  = series.levels[idx - 1]
+            const prevDone   = idx === 0 || completed.has(`${series.id}:${prevLevel.level}`)
+            const isUnlocked = isReady && prevDone
             return (
               <button
                 key={lvl.level}
                 type="button"
-                onClick={() => isReady && onSelectLevel(lvl.file)}
-                disabled={!isReady}
+                onClick={() => isUnlocked && onSelectLevel(lvl.file)}
+                disabled={!isUnlocked}
                 className={`text-left px-5 py-4 rounded-xl border transition-all flex items-center gap-4
-                  ${!isReady ? `opacity-40 cursor-not-allowed ${ui.border} ${ui.bg1}` :
-                    isDone  ? 'cursor-pointer border-emerald-500/40 bg-emerald-500/5' :
-                              `cursor-pointer ${ui.border} ${ui.bg1} ${ui.hoverBg}`}`}
+                  ${!isReady    ? `opacity-40 cursor-not-allowed ${ui.border} ${ui.bg1}` :
+                    !isUnlocked ? `opacity-50 cursor-not-allowed ${ui.border} ${ui.bg1}` :
+                    isDone      ? 'cursor-pointer border-emerald-500/40 bg-emerald-500/5' :
+                                  `cursor-pointer ${ui.border} ${ui.bg1} ${ui.hoverBg}`}`}
               >
                 <span className={`text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded
                   ${isDone ? 'bg-emerald-500/20 text-emerald-400' : `${ui.bg2} ${ui.txt2}`}`}>
@@ -373,9 +429,11 @@ function LevelListView({ ui, series, completed, available, onBack, onSelectLevel
                 <span className={`font-medium ${ui.txt1}`}>{lvl.title}</span>
                 {!isReady
                   ? <span className={`ml-auto text-xs ${ui.txt2}`}>Coming soon</span>
-                  : isDone
-                    ? <span className="ml-auto text-emerald-400 text-base font-bold">✓</span>
-                    : <span className={`ml-auto text-lg ${ui.txt2}`}>→</span>
+                  : !isUnlocked
+                    ? <span className={`ml-auto text-base ${ui.txt2} opacity-50`}>🔒</span>
+                    : isDone
+                      ? <span className="ml-auto text-emerald-400 text-base font-bold">✓</span>
+                      : <span className={`ml-auto text-lg ${ui.txt2}`}>→</span>
                 }
               </button>
             )
