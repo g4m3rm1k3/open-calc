@@ -8,7 +8,7 @@
 
 ## 0. What This Project Is
 
-UpSkillOS (`/Users/michaelmclean/Testing/open-calc`) is a React 18 + Vite 5 interactive STEM learning platform.
+UpSkillOS is a React 18 + Vite 5 interactive STEM learning platform.
 
 - **30 courses**, each with lessons defined as JavaScript ES module objects
 - **Lesson content = JS files** in `src/content/{course-folder}/`
