@@ -2,6 +2,9 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# Auto-generated at build time
+src/data/codebaseGraph.js
 incomplete ideas/
 .claude/settings.local.json
 

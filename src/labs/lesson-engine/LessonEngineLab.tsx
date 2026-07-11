@@ -158,6 +158,58 @@ import htmlDomLevel9  from './content/html-dom/level-9.md?raw'
 import htmlDomLevel10 from './content/html-dom/level-10.md?raw'
 import htmlDomLevel11 from './content/html-dom/level-11.md?raw'
 
+import cssRespLevel0 from './content/css-responsive/level-0.md?raw'
+import cssRespLevel1 from './content/css-responsive/level-1.md?raw'
+import cssRespLevel2 from './content/css-responsive/level-2.md?raw'
+import cssRespLevel3 from './content/css-responsive/level-3.md?raw'
+import cssRespLevel4 from './content/css-responsive/level-4.md?raw'
+import cssRespLevel5 from './content/css-responsive/level-5.md?raw'
+import cssRespLevel6 from './content/css-responsive/level-6.md?raw'
+import cssRespLevel7 from './content/css-responsive/level-7.md?raw'
+
+import cssAnimLevel0 from './content/css-animation/level-0.md?raw'
+import cssAnimLevel1 from './content/css-animation/level-1.md?raw'
+import cssAnimLevel2 from './content/css-animation/level-2.md?raw'
+import cssAnimLevel3 from './content/css-animation/level-3.md?raw'
+import cssAnimLevel4 from './content/css-animation/level-4.md?raw'
+import cssAnimLevel5 from './content/css-animation/level-5.md?raw'
+import cssAnimLevel6 from './content/css-animation/level-6.md?raw'
+
+import tsLevel0 from './content/typescript-fundamentals/level-0.md?raw'
+import tsLevel1 from './content/typescript-fundamentals/level-1.md?raw'
+import tsLevel2 from './content/typescript-fundamentals/level-2.md?raw'
+import tsLevel3 from './content/typescript-fundamentals/level-3.md?raw'
+import tsLevel4 from './content/typescript-fundamentals/level-4.md?raw'
+import tsLevel5 from './content/typescript-fundamentals/level-5.md?raw'
+import tsLevel6 from './content/typescript-fundamentals/level-6.md?raw'
+import tsLevel7 from './content/typescript-fundamentals/level-7.md?raw'
+
+import sqlLevel0 from './content/sql-fundamentals/level-0.md?raw'
+import sqlLevel1 from './content/sql-fundamentals/level-1.md?raw'
+import sqlLevel2 from './content/sql-fundamentals/level-2.md?raw'
+import sqlLevel3 from './content/sql-fundamentals/level-3.md?raw'
+import sqlLevel4 from './content/sql-fundamentals/level-4.md?raw'
+import sqlLevel5 from './content/sql-fundamentals/level-5.md?raw'
+import sqlLevel6 from './content/sql-fundamentals/level-6.md?raw'
+import sqlLevel7 from './content/sql-fundamentals/level-7.md?raw'
+
+import beLevel0 from './content/backend-fundamentals/level-0.md?raw'
+import beLevel1 from './content/backend-fundamentals/level-1.md?raw'
+import beLevel2 from './content/backend-fundamentals/level-2.md?raw'
+import beLevel3 from './content/backend-fundamentals/level-3.md?raw'
+import beLevel4 from './content/backend-fundamentals/level-4.md?raw'
+import beLevel5 from './content/backend-fundamentals/level-5.md?raw'
+import beLevel6 from './content/backend-fundamentals/level-6.md?raw'
+import beLevel7 from './content/backend-fundamentals/level-7.md?raw'
+
+import gitLevel0 from './content/git-version-control/level-0.md?raw'
+import gitLevel1 from './content/git-version-control/level-1.md?raw'
+import gitLevel2 from './content/git-version-control/level-2.md?raw'
+import gitLevel3 from './content/git-version-control/level-3.md?raw'
+import gitLevel4 from './content/git-version-control/level-4.md?raw'
+import gitLevel5 from './content/git-version-control/level-5.md?raw'
+import gitLevel6 from './content/git-version-control/level-6.md?raw'
+
 const LESSON_FILES: Record<string, string> = {
   'python-fundamentals/level-0.md':  pfLevel0,
   'python-fundamentals/level-1.md':  pfLevel1,
@@ -296,6 +348,52 @@ const LESSON_FILES: Record<string, string> = {
   'html-dom/level-9.md':  htmlDomLevel9,
   'html-dom/level-10.md': htmlDomLevel10,
   'html-dom/level-11.md': htmlDomLevel11,
+  'css-responsive/level-0.md': cssRespLevel0,
+  'css-responsive/level-1.md': cssRespLevel1,
+  'css-responsive/level-2.md': cssRespLevel2,
+  'css-responsive/level-3.md': cssRespLevel3,
+  'css-responsive/level-4.md': cssRespLevel4,
+  'css-responsive/level-5.md': cssRespLevel5,
+  'css-responsive/level-6.md': cssRespLevel6,
+  'css-responsive/level-7.md': cssRespLevel7,
+  'css-animation/level-0.md': cssAnimLevel0,
+  'css-animation/level-1.md': cssAnimLevel1,
+  'css-animation/level-2.md': cssAnimLevel2,
+  'css-animation/level-3.md': cssAnimLevel3,
+  'css-animation/level-4.md': cssAnimLevel4,
+  'css-animation/level-5.md': cssAnimLevel5,
+  'css-animation/level-6.md': cssAnimLevel6,
+  'typescript-fundamentals/level-0.md': tsLevel0,
+  'typescript-fundamentals/level-1.md': tsLevel1,
+  'typescript-fundamentals/level-2.md': tsLevel2,
+  'typescript-fundamentals/level-3.md': tsLevel3,
+  'typescript-fundamentals/level-4.md': tsLevel4,
+  'typescript-fundamentals/level-5.md': tsLevel5,
+  'typescript-fundamentals/level-6.md': tsLevel6,
+  'typescript-fundamentals/level-7.md': tsLevel7,
+  'sql-fundamentals/level-0.md': sqlLevel0,
+  'sql-fundamentals/level-1.md': sqlLevel1,
+  'sql-fundamentals/level-2.md': sqlLevel2,
+  'sql-fundamentals/level-3.md': sqlLevel3,
+  'sql-fundamentals/level-4.md': sqlLevel4,
+  'sql-fundamentals/level-5.md': sqlLevel5,
+  'sql-fundamentals/level-6.md': sqlLevel6,
+  'sql-fundamentals/level-7.md': sqlLevel7,
+  'backend-fundamentals/level-0.md': beLevel0,
+  'backend-fundamentals/level-1.md': beLevel1,
+  'backend-fundamentals/level-2.md': beLevel2,
+  'backend-fundamentals/level-3.md': beLevel3,
+  'backend-fundamentals/level-4.md': beLevel4,
+  'backend-fundamentals/level-5.md': beLevel5,
+  'backend-fundamentals/level-6.md': beLevel6,
+  'backend-fundamentals/level-7.md': beLevel7,
+  'git-version-control/level-0.md': gitLevel0,
+  'git-version-control/level-1.md': gitLevel1,
+  'git-version-control/level-2.md': gitLevel2,
+  'git-version-control/level-3.md': gitLevel3,
+  'git-version-control/level-4.md': gitLevel4,
+  'git-version-control/level-5.md': gitLevel5,
+  'git-version-control/level-6.md': gitLevel6,
 }
 
 interface Props {
