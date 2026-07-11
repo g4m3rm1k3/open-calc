@@ -7,88 +7,96 @@ lang: css
 
 # Cascade Layers
 
-The cascade determines which CSS rule wins when multiple rules target the same element with the same property. Until recently, the tools were specificity and source order — and managing them at scale meant careful naming conventions and constant specificity battles. `@layer` gives you a third tool: **explicit ordering**.
+`@layer` gives you explicit control over the cascade. Rules in a higher-priority layer always win — regardless of specificity. This ends specificity battles at scale.
 
-## What @layer Does
+## The problem — specificity fights
 
-A cascade layer is a named bucket for CSS rules. Layers are ordered; rules in a higher-priority layer always win, regardless of specificity.
+Without layers, a class selector in a library can lose to an ID in your code, or win unexpectedly when you least want it. See the specificity battle play out and imagine managing hundreds of these.
+
+```html
+<p id="msg" class="highlight">Who wins? ID (#msg) vs class (.highlight)?</p>
+<p id="note">Higher specificity always wins without layers — even if it is the wrong rule.</p>
+```
 
 ```css
-@layer reset, base, components, utilities;
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
+.highlight { color: #10b981; font-weight: 600; }
+#msg { color: #ef4444; }  /* ID beats class — specificity 1-0-0 vs 0-1-0 */
+#note { color: #94a3b8; font-size: 13px; margin-top: 8px; }
+```
 
-@layer reset {
-  *, *::before, *::after { box-sizing: border-box; margin: 0; }
-}
+**CS lens:** `@layer` is explicit prioritisation. You define the cascade order once at the top; the rest of the file respects it. No more counting IDs to figure out why a rule wins.
+
+## @layer — declare order, rules always follow
+
+Layers declared last have highest priority. `theme` wins over `base` even when `base` uses an ID and `theme` uses a class. Edit the layer order declaration and see the winner change.
+
+```html
+<p id="layered" class="message">I am styled by layers. Theme (class) wins over Base (ID).</p>
+```
+
+```css
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
+@layer base, theme;
 
 @layer base {
-  p { font-size: 1rem; color: #94a3b8; }
+  #layered { color: #ef4444; font-size: 14px; }  /* ID selector — high specificity */
 }
 
-@layer components {
-  .card p { font-size: 0.875rem; color: #64748b; }
-}
-
-@layer utilities {
-  .text-white { color: white; }
+@layer theme {
+  .message { color: #3b82f6; font-weight: 700; } /* class — lower specificity but higher LAYER */
 }
 ```
 
-```text
-Layers are prioritised in the DECLARATION ORDER (last = highest priority).
-utilities > components > base > reset, regardless of specificity.
+## Framework layers — your code always wins
+
+Put a third-party library in a lower layer so your styles always override it, regardless of its selectors' specificity.
+
+```html
+<button class="btn">
+  Button — framework sets grey, app layer overrides to blue
+</button>
+<p class="text-muted">Muted text — framework base sets grey, unchanged</p>
 ```
-
-**CS lens:** This is explicit prioritisation — you define the cascade order once at the top of your stylesheet, and the rest of the file respects it. No more counting IDs to figure out why a rule wins.
-
-## The Problem @layer Solves
-
-Without layers, a third-party CSS library can accidentally override your styles because its selectors have higher specificity. With layers, you put the library in a lower-priority layer and your code always wins:
 
 ```css
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
 @layer framework, app;
 
 @layer framework {
-  @import url('bootstrap.css');  /* all bootstrap rules go here */
+  .btn        { background: #334155; color: #94a3b8; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+  .text-muted { color: #64748b; }
 }
 
 @layer app {
-  /* Your styles ALWAYS win over framework — even with low specificity */
-  .btn { background: #3b82f6; }
+  .btn { background: #3b82f6; color: white; font-weight: 600; } /* always wins over framework */
 }
 ```
 
-## Unlayered Styles Always Win
+## Unlayered styles always beat all layers
 
-CSS that is not in any layer sits above all layers in the cascade. This makes it easy to write emergency overrides:
+CSS not inside any `@layer` sits above all layers. Use it for emergency overrides or critical rules.
 
-```css
-@layer base { p { color: red; } }
-
-/* This is NOT in a layer — it ALWAYS wins */
-p { color: blue; }
+```html
+<p id="el" class="styled">This element is styled by a layer, but the unlayered rule wins.</p>
 ```
 
-## Nesting Layers
-
-Layers can be nested for further organisation:
-
 ```css
-@layer components {
-  @layer button {
-    .btn { padding: 8px 16px; }
-  }
-  @layer card {
-    .card { border-radius: 8px; }
-  }
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
+@layer base {
+  .styled { color: #ef4444; font-size: 18px; }  /* inside a layer */
 }
+
+/* NOT in any layer — always wins regardless of specificity */
+#el { color: #10b981; }
 ```
 
 **SE lens:** `@layer` is the CSS equivalent of import ordering in module bundlers. Just as webpack resolves module conflicts by controlling which import runs last, `@layer` controls which CSS rule wins by controlling layer order.
 
 **Common mistakes:**
-- Declaring layers with `@layer base, components` at the top but then writing rules *before* the declaration — the declaration order in the `@layer base, components` statement sets priority, not the physical position of rules in the file.
-- Forgetting that unlayered CSS always beats layered CSS — if you add a rule outside any `@layer`, it wins over everything inside a layer, regardless of specificity.
-- Confusing layer order with layer priority: the *last* declared layer in `@layer a, b, c` has the *highest* priority (`c` wins over `b` wins over `a`).
+- Declaring layers with `@layer base, components` then writing rules before the declaration — the declaration order in the `@layer` statement sets priority.
+- Forgetting that unlayered CSS always beats layered CSS — if you add a rule outside any `@layer`, it wins over everything inside a layer.
+- Confusing layer order with priority: the *last* declared layer has the *highest* priority (`@layer a, b, c` — `c` wins).
 
 **Debug tip:** Chrome DevTools (as of 2022) shows cascade layers in the Styles panel — each rule is grouped under its layer name. You can see exactly which layer a rule belongs to and why it wins or loses.
 
@@ -96,15 +104,13 @@ Layers can be nested for further organisation:
 
 ## Challenge: layers
 
-Define two layers — `base` and `theme` — so that `theme` rules always win, even when `base` rules have higher specificity.
+Define two layers — `base` and `theme` — so that `theme` rules always win even when `base` rules have higher specificity.
 
-1. Declare layers in order: `base`, `theme` (so `theme` is higher priority)
-2. In `@layer base`: set `color` of `#msg` to `rgb(148, 163, 184)` using an ID selector (`#msg`)
+1. Declare layers in order: `base`, `theme`
+2. In `@layer base`: set `color` of `#msg` to `rgb(148, 163, 184)` using an ID selector
 3. In `@layer base`: set `font-size` of `#msg` to `14px`
 4. In `@layer theme`: set `color` of `.message` to `rgb(59, 130, 246)` using a class selector
 5. In `@layer theme`: set `font-weight` of `.message` to `700`
-
-The computed `color` must be blue (theme wins despite lower specificity) and `font-weight` must be `700`.
 
 ```html
 <p id="msg" class="message">Which layer wins?</p>

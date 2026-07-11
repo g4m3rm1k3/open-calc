@@ -7,107 +7,73 @@ lang: css
 
 # position: absolute
 
-`position: absolute` removes an element completely from normal flow and places it at an exact position relative to its **containing block** — which is the nearest ancestor with a `position` value other than `static`. It is the tool for overlapping elements, tooltips, badges, dropdowns, and any element that must be placed precisely without affecting surrounding layout.
+`position: absolute` removes an element completely from normal flow and places it at an exact position relative to its **containing block** — the nearest ancestor with a `position` value other than `static`. It is the tool for badges, tooltips, dropdowns, and any element that must be placed precisely without affecting surrounding layout.
 
-## Removed from Flow
+## Removed from flow entirely
 
-When an element is absolutely positioned, the document behaves as if it does not exist:
+When an element is absolutely positioned, the document behaves as if it does not exist. Other elements reflow as if the absolutely positioned element was never there. Run this and notice how `#content` jumps up to fill the space `#badge` would have occupied.
+
+```html
+<div id="card">
+  <span id="badge">New</span>
+  <p id="content">This content ignores the badge entirely — the badge is out of flow.</p>
+</div>
+```
 
 ```css
-.badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-}
+#card    { position: relative; background: #1e293b; color: #e2e8f0; padding: 16px; width: 280px; }
+#badge   { position: absolute; top: 8px; right: 8px; background: #ef4444; color: white; font-size: 11px; padding: 2px 8px; border-radius: 12px; }
+#content { margin: 0; }
 ```
 
-```text
-Before (in flow):
-  ┌────────────────────────────┐
-  │  [badge]                   │
-  │  Normal content here       │
-  └────────────────────────────┘
+**CS lens:** Absolutely positioned elements form their own layer in the layout tree. They are excluded from the block formatting context of their parent. Their coordinates are computed in a separate pass relative to the containing block, then painted at the specified position.
 
-After (position: absolute):
-  ┌────────────────────────────┐
-  │  Normal content here       │  ← content moves up, fills where badge was
-  └────────────────────────────┘
-  [badge floating at top: 8px, right: 8px of its containing block]
+## The containing block
+
+The **containing block** of an absolutely positioned element is the **nearest ancestor with `position` set to anything other than `static`**. Remove `position: relative` from `#card` below and watch the badge jump to the top-right of the page (the `<body>` becomes the containing block).
+
+```html
+<div id="outer" style="padding: 40px; background: #0f172a;">
+  <div id="card">
+    Card content here
+    <span id="badge">Badge</span>
+  </div>
+</div>
 ```
-
-Other elements reflow as if the absolutely positioned element was never there.
-
-**CS lens:** Absolutely positioned elements form their own layer in the layout tree. They are excluded from the block formatting context of their parent. Their coordinates are computed in a separate pass relative to the containing block, then painted at the specified position — on top of (or behind, depending on z-index) the normal flow content.
-
-## The Containing Block
-
-The **containing block** of an absolutely positioned element is the **nearest ancestor with `position` set to anything other than `static`**.
 
 ```css
-.card {
-  position: relative; /* ← this element is the containing block */
-}
-
-.badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  /* "top: 8px from .card's top edge, right: 8px from .card's right edge" */
-}
-```
-
-```text
-If no positioned ancestor exists, the containing block is the initial containing
-block — effectively the <html> element. The badge jumps to the top-right of the page.
-
-If .card has position: relative, the badge stays in the top-right of the card.
+#card  { position: relative; background: #1e293b; color: #e2e8f0; padding: 24px 16px; width: 220px; }
+#badge { position: absolute; top: 8px; right: 8px; background: #6366f1; color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; }
 ```
 
 This is why `position: relative` (with no offsets) is so common — it exists solely to establish a containing block for absolutely positioned children.
 
-## Sizing Absolute Elements
+## Filling the containing block with inset
 
-Absolutely positioned elements shrink to their content width by default (they no longer inherit 100% width from the flow). You can set explicit dimensions or use the offset properties to stretch them:
+Absolutely positioned elements shrink to their content width by default. Use the offset properties to stretch them, or use the `inset` shorthand to fill the containing block completely.
+
+```html
+<div id="card">
+  <img src="https://picsum.photos/300/180" style="display:block;width:100%;" />
+  <div id="overlay">Hover overlay pattern</div>
+</div>
+```
 
 ```css
-/* Explicit size */
-.tooltip {
-  position: absolute;
-  width: 200px;
-  top: 40px;
-  left: 0;
-}
-
-/* Stretch to fill the containing block */
-.overlay {
-  position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
-  /* equivalent to: inset: 0 (modern shorthand) */
-}
+#card    { position: relative; width: 300px; overflow: hidden; }
+#overlay { position: absolute; inset: 0; background: rgba(99,102,241,0.85); color: white; display: flex; align-items: center; justify-content: center; font-family: system-ui; font-weight: 600; }
 ```
 
-```text
-inset: 0 is shorthand for top: 0; right: 0; bottom: 0; left: 0.
-An absolutely positioned element with inset: 0 fills its containing block exactly.
-```
+`inset: 0` is shorthand for `top: 0; right: 0; bottom: 0; left: 0`. An absolutely positioned element with `inset: 0` fills its containing block exactly.
 
-## Stacking with z-index
-
-Absolutely positioned elements accept `z-index` to control paint order. Elements with higher `z-index` are painted on top within the same stacking context (covered in CSS Box Model, level 7).
-
-```css
-.dropdown { position: absolute; z-index: 10; }
-.tooltip  { position: absolute; z-index: 20; } /* painted above dropdown */
-```
-
-**SE lens:** Absolute positioning is the right tool for UI overlays — badges, tooltips, dropdown menus, modal close buttons, floating action buttons — anywhere the element logically belongs to a parent but visually appears on top of or overlapping normal content. The pattern is always: `position: relative` on the parent, `position: absolute` on the overlay.
+**SE lens:** Absolute positioning is the right tool for UI overlays — badges, tooltips, dropdown menus, modal close buttons — anywhere the element logically belongs to a parent but visually appears on top of normal content. The pattern is always: `position: relative` on the parent, `position: absolute` on the overlay.
 
 **Common mistakes:**
-- Forgetting to set `position: relative` on the intended parent — the element jumps to the nearest positioned ancestor higher up (often `<body>`), appearing completely out of place.
-- Setting `position: absolute` and expecting `width: 100%` to mean the parent width — it means 100% of the **containing block** width, not the nearest block ancestor. These are the same only when the parent has `position: relative`.
-- Using absolute positioning for layout (placing multiple content columns) — absolute elements are outside normal flow, so they do not push content aside. Use flexbox or grid for layout; use absolute positioning for overlays.
+- Forgetting to set `position: relative` on the intended parent — the element jumps to the nearest positioned ancestor higher up (often `<body>`).
+- Setting `position: absolute` and expecting `width: 100%` to mean the parent width — it means 100% of the **containing block** width.
+- Using absolute positioning for layout (placing multiple content columns) — absolute elements are outside normal flow and do not push content aside. Use flexbox or grid for layout.
 
-**Debug tip:** In DevTools, select an absolutely positioned element. The Layout tab (Chrome) shows a purple dashed border around its containing block — this immediately reveals which ancestor is acting as the reference. If the containing block is not what you expected, check the ancestor chain for unexpected `position` values.
+**Debug tip:** In DevTools, select an absolutely positioned element. The Layout tab (Chrome) shows a purple dashed border around its containing block — this immediately reveals which ancestor is acting as the reference.
 
 **Next:** `position: fixed` — like absolute, but positioned relative to the viewport and unaffected by scrolling.
 

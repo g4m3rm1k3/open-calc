@@ -9,90 +9,77 @@ lang: css
 
 When elements overlap, the browser needs rules for which element is painted on top. `z-index` controls paint order, but only within a **stacking context** — an isolated layer in the paint tree. Understanding stacking contexts explains every case where `z-index: 9999` still appears behind another element.
 
-## Paint Order Without z-index
+## z-index controls paint order
 
-Without any positioning, the browser paints elements in document order — elements later in the HTML are painted on top of earlier ones.
+`z-index` applies to positioned elements and controls their paint order within a stacking context. Higher values paint on top. Run this and change the `z-index` values to see which element wins.
 
-```text
-Document order:
-  1. Background / borders
-  2. Block elements (non-positioned)
-  3. Float elements
-  4. Inline elements (text, images)
-  5. Positioned elements (z-index: auto)
-  6. Positioned elements (positive z-index, ascending)
+```html
+<div id="container">
+  <div id="a">A — z-index: 1</div>
+  <div id="b">B — z-index: 2</div>
+  <div id="c">C — z-index: 3</div>
+</div>
 ```
-
-Positioned elements (`position: relative/absolute/fixed/sticky`) are painted above non-positioned elements, even without a `z-index` value.
-
-## z-index and Stacking Order
-
-`z-index` applies to positioned elements (and flex/grid items) and controls their paint order within a **stacking context**:
 
 ```css
-.below { position: relative; z-index: 1; }
-.above { position: relative; z-index: 2; } /* painted on top */
-.modal { position: fixed;    z-index: 100; }
+#container { position: relative; height: 120px; }
+#a { position: absolute; top: 10px;  left: 10px;  width: 160px; height: 80px; background: #3b82f6; color: white; z-index: 1; display: flex; align-items: center; justify-content: center; font-family: system-ui; border-radius: 6px; }
+#b { position: absolute; top: 30px;  left: 60px;  width: 160px; height: 80px; background: #6366f1; color: white; z-index: 2; display: flex; align-items: center; justify-content: center; font-family: system-ui; border-radius: 6px; }
+#c { position: absolute; top: 50px;  left: 110px; width: 160px; height: 80px; background: #ec4899; color: white; z-index: 3; display: flex; align-items: center; justify-content: center; font-family: system-ui; border-radius: 6px; }
 ```
 
-```text
-Paint order (bottom to top):
-  ──────────────────  non-positioned elements
-  ──────────────────  z-index: 1  (.below)
-  ──────────────────  z-index: 2  (.above)
-  ──────────────────  z-index: 100 (.modal)
+Without positioning, elements in the same stacking context are painted in document order — later elements on top. Positioned elements (any value other than `static`) are painted above non-positioned elements even without an explicit `z-index`.
+
+**CS lens:** The browser builds a stacking context tree before painting. Each stacking context is flattened and composited onto its parent as a single bitmap. `z-index` comparisons only happen within the same stacking context.
+
+## What creates a stacking context
+
+Many CSS properties create a new stacking context. Once created, the z-index of children inside is scoped to that context — children can never appear above elements in a higher context regardless of their z-index value.
+
+```html
+<div id="page" style="font-family:system-ui;position:relative;">
+  <div id="low-parent">
+    <div id="high-child">z-index: 9999 inside low-parent</div>
+  </div>
+  <div id="high-other">z-index: 10 — but wins because parent context is higher</div>
+</div>
 ```
-
-Negative `z-index` values place elements below their stacking context (even below the background of their parent).
-
-**CS lens:** The browser builds a stacking context tree before painting. Each stacking context is flattened and composited onto its parent as a single bitmap. `z-index` comparisons only happen within the same stacking context — a child in a low-z-index stacking context can never appear above an element in a higher stacking context, regardless of the child's own `z-index` value.
-
-## What Creates a Stacking Context
-
-Many CSS properties create a new stacking context:
 
 ```css
-/* All of these create a new stacking context */
-.sc-1 { position: relative; z-index: 1; }     /* z-index ≠ auto on positioned elem */
-.sc-2 { position: fixed; }                     /* fixed/sticky always create one */
-.sc-3 { opacity: 0.99; }                       /* opacity < 1 */
-.sc-4 { transform: translateX(0); }            /* any transform */
-.sc-5 { filter: blur(0); }                     /* any filter */
-.sc-6 { will-change: transform; }              /* will-change for compositing props */
-.sc-7 { isolation: isolate; }                  /* explicit isolation */
+#low-parent  { position: relative; z-index: 1;    background: #1e293b; padding: 16px; width: 280px; color: #e2e8f0; }
+#high-child  { position: relative; z-index: 9999; background: #3b82f6; color: white; padding: 8px; margin-top: 8px; }
+#high-other  { position: relative; z-index: 10;   background: #ec4899; color: white; padding: 24px; width: 240px; margin-top: -20px; margin-left: 20px; }
 ```
 
-```text
-Stacking context tree:
-  Root stacking context
-  ├── .wrapper (z-index: 1, creates SC)
-  │   ├── .child (z-index: 9999)   ← CANNOT be above .modal below
-  │   └── .other (z-index: 1)
-  └── .modal (z-index: 10)         ← entire .wrapper SC paints below .modal
+Other properties that create a stacking context: `opacity < 1`, `transform`, `filter`, `will-change: transform`, `isolation: isolate`.
+
+## isolation: isolate — scope without side effects
+
+`isolation: isolate` creates a stacking context with no visual side effects — no transform, no opacity change. Use it to scope z-index values to a component so they don't interact with the rest of the page.
+
+```html
+<div id="component">
+  <div id="tooltip">I am z-index: 100 but scoped to #component</div>
+  <div id="content">Component content</div>
+</div>
+<div id="outside">Outside element at z-index: 50 — isolation means the tooltip can't bleed above me if I were in a higher stacking context</div>
 ```
-
-This is why `z-index: 9999` inside a low-z-index parent still appears behind other elements — the parent's stacking context is compared, not the child's.
-
-## isolation: isolate
-
-`isolation: isolate` creates a stacking context without any visible side effects — no transform, no opacity change, just a new paint boundary:
 
 ```css
-.component {
-  isolation: isolate; /* children's z-index is now scoped to this component */
-}
+#component { isolation: isolate; background: #1e293b; padding: 16px; color: #e2e8f0; font-family: system-ui; position: relative; margin-bottom: 8px; }
+#tooltip   { position: absolute; top: -10px; right: 8px; background: #6366f1; color: white; padding: 4px 8px; font-size: 12px; z-index: 100; border-radius: 4px; }
+#content   { padding-top: 8px; }
+#outside   { background: #0f172a; color: #94a3b8; padding: 12px; font-family: system-ui; font-size: 13px; }
 ```
 
-This is the clean way to scope z-index values to a component so they don't interact with the rest of the page.
-
-**SE lens:** Stacking context bugs are among the most confusing in CSS. The symptoms are always the same: "Why is my `z-index: 9999` element appearing below that other element?" The diagnosis is always the same: find the stacking context ancestor of both elements and compare *those* z-index values. Tools like `stacking-context-helper` browser extensions or the DevTools Layer panel visualise the stacking context tree directly.
+**SE lens:** Stacking context bugs are among the most confusing in CSS. The symptom is always: "Why is my `z-index: 9999` element appearing below that other element?" The diagnosis is always: find the stacking context ancestor of both elements and compare *those* z-index values. Fix the context, not the value.
 
 **Common mistakes:**
-- Setting `z-index` on a non-positioned element and expecting it to work — `z-index` is ignored on `position: static` elements. Add `position: relative` to make it apply.
-- Applying `opacity`, `transform`, or `filter` to a container and not realising it creates a stacking context that caps the z-index of all children.
-- Trying to solve z-index problems by increasing the value — if two elements are in different stacking contexts, the child's z-index is irrelevant. Fix the context, not the value.
+- Setting `z-index` on a non-positioned element and expecting it to work — `z-index` is ignored on `position: static` elements. Add `position: relative`.
+- Applying `opacity`, `transform`, or `filter` to a container without realising it creates a stacking context that caps the z-index of all children.
+- Trying to solve z-index problems by increasing the value — if two elements are in different stacking contexts, the child's z-index is irrelevant.
 
-**Debug tip:** Open DevTools → Layers panel (or in the Elements panel, look for the "Stacking context" indicator). Select the element that isn't appearing correctly and find its stacking context root. Then find the competing element's stacking context root and compare their z-index values — that comparison is what actually determines paint order.
+**Debug tip:** Open DevTools → Layers panel (or in Elements panel, look for the "Stacking context" indicator). Select the element that isn't appearing correctly and find its stacking context root. Then compare that z-index to the competing element's stacking context root.
 
 **Next:** CSS Flexbox — now that you understand the layout foundation (normal flow, BFCs, positioning, stacking), flexbox builds a clean one-dimensional layout system on top of it.
 

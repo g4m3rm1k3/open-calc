@@ -7,103 +7,114 @@ lang: css
 
 # Attribute Selectors
 
-Element types and class names cover most cases, but sometimes you need to select by an element's attribute — its `href`, `type`, `data-*`, `disabled` state, or any other HTML attribute. Attribute selectors let you do this without adding extra classes to your markup.
+Sometimes you need to select by an element's attribute — its `href`, `type`, `data-*`, `disabled` state — without adding extra classes to your markup.
 
-## The Presence Selector [attr]
+## Presence selector `[attr]` — has the attribute
 
-Square brackets target elements that have an attribute, regardless of its value.
+Square brackets target elements that have an attribute, regardless of its value. `a[href]` styles only links that go somewhere. `input[disabled]` styles only disabled inputs.
+
+```html
+<a href="https://example.com">Real link — has href, styled</a>
+<a>Anchor with no href — not styled</a>
+<br><br>
+<input type="text" value="Enabled input">
+<input type="text" value="Disabled" disabled>
+```
 
 ```css
-a[href] {
-  color: #3b82f6;
-  text-decoration: underline;
-}
-
-input[disabled] {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+body { background: #0f172a; font-family: system-ui; padding: 16px; color: #e2e8f0; }
+a[href]       { color: #3b82f6; font-weight: 600; }
+a             { color: #64748b; }
+input         { display: block; margin: 8px 0; padding: 8px; background: #1e293b; border: 1px solid #334155; color: #e2e8f0; border-radius: 4px; }
+input[disabled] { opacity: 0.4; cursor: not-allowed; }
 ```
 
-```text
-a[href]       — any <a> that has an href attribute
-input[disabled] — any <input> with a disabled attribute present
+**CS lens:** This is equality matching — the equivalent of `if (element.hasAttribute('href'))`.
+
+## Exact value `[attr="value"]` — precise match
+
+Matches elements where the attribute equals exactly the string. Style different input types differently with no extra classes.
+
+```html
+<input type="text" placeholder="Text input">
+<input type="email" placeholder="Email input">
+<input type="submit" value="Submit button">
+<br>
+<a href="https://example.com" target="_blank">Opens in new tab ↗</a>
+<a href="/about">Internal link</a>
 ```
-
-This is more precise than `a {}` — it only styles links that actually go somewhere.
-
-## Exact Value [attr="value"]
 
 ```css
-input[type="text"] { border: 1px solid #64748b; }
-input[type="submit"] { background: #3b82f6; color: white; }
-a[target="_blank"]::after { content: " ↗"; }
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
+input { display: block; margin: 8px 0; padding: 8px 12px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; }
+input[type="email"]  { border-color: #3b82f6; }
+input[type="submit"] { background: #3b82f6; color: white; cursor: pointer; border: none; font-weight: 600; }
+a[target="_blank"]::after { content: " ↗"; font-size: 0.8em; opacity: 0.6; }
+a { display: block; margin: 8px 0; color: #94a3b8; }
 ```
 
-```text
-Targets elements where the attribute value exactly matches the string.
+## Pattern matching — starts, ends, contains
+
+Three substring matchers. Edit the href values in the HTML to see which selector picks them up.
+
+```html
+<ul>
+  <li><a href="https://example.com">https link — green (starts with https)</a></li>
+  <li><a href="http://legacy.com">http link — not green</a></li>
+  <li><a href="/report.pdf">PDF download (ends with .pdf)</a></li>
+  <li><a href="https://github.com/user/repo">GitHub link (contains github)</a></li>
+</ul>
 ```
-
-**CS lens:** This is equality matching — the equivalent of `if element.getAttribute('type') === 'text'`.
-
-## Pattern Matching
-
-CSS attribute selectors include three substring matchers:
 
 ```css
-/* Starts with */
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
+ul   { list-style: none; padding: 0; }
+li   { margin: 8px 0; }
+a    { color: #94a3b8; text-decoration: none; }
 a[href^="https"] { color: #10b981; }
-
-/* Ends with */
-a[href$=".pdf"] { padding-right: 20px; }
-
-/* Contains anywhere */
-a[href*="github"] { font-weight: bold; }
+a[href$=".pdf"]::after  { content: " [PDF]"; font-size: 0.75em; background: #ef4444; color: white; padding: 1px 5px; border-radius: 3px; margin-left: 4px; }
+a[href*="github"] { font-weight: 700; }
 ```
 
-```text
-^=   starts with the value
-$=   ends with the value
-*=   contains the value anywhere
+## Data attributes — state without JS class toggling
+
+`data-*` attributes carry custom state. CSS reads them directly — no JavaScript class toggling needed to reflect state visually.
+
+```html
+<div class="job" data-status="running">▶ Build running</div>
+<div class="job" data-status="passed">✓ Tests passed</div>
+<div class="job" data-status="failed">✗ Deploy failed</div>
+<div class="job" data-status="queued">⋯ Job queued</div>
 ```
-
-These map to the same logic as `startsWith()`, `endsWith()`, and `includes()` in JavaScript.
-
-## Data Attributes
-
-HTML allows `data-*` attributes for storing custom data. Attribute selectors target them directly.
 
 ```css
-[data-status="active"]  { background: #10b981; color: white; }
-[data-status="pending"] { background: #f59e0b; color: white; }
-[data-status="error"]   { background: #ef4444; color: white; }
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
+.job { padding: 10px 16px; margin: 6px 0; border-radius: 6px; font-weight: 500; background: #1e293b; color: #e2e8f0; }
+[data-status="running"] { border-left: 4px solid #3b82f6; }
+[data-status="passed"]  { border-left: 4px solid #10b981; color: #10b981; }
+[data-status="failed"]  { border-left: 4px solid #ef4444; color: #ef4444; }
+[data-status="queued"]  { border-left: 4px solid #475569; opacity: 0.6; }
 ```
 
-```text
-<div data-status="active">Running</div>   → green background
-<div data-status="pending">Queued</div>   → yellow background
-<div data-status="error">Failed</div>     → red background
-```
-
-**SE lens:** Using `data-*` + attribute selectors decouples state from styling class names. JavaScript updates `el.dataset.status = 'error'`; CSS applies the visual. No JS class toggling needed.
+**SE lens:** Using `data-*` + attribute selectors decouples state from styling class names. JavaScript updates `el.dataset.status = 'failed'`; CSS applies the visual. No JS class toggling needed.
 
 **Common mistakes:**
-- `[type=text]` vs `[type="text"]` — both are valid; quotes are optional for simple values but required if the value contains spaces or special characters. Always quote for consistency.
-- `a[href]` matches any `<a>` with *any* href value, including `href=""` (empty string) and `href="#"`. If you want only non-empty, real links, use `a[href]:not([href=""])`.
+- `[type=text]` vs `[type="text"]` — both work; quotes are optional for simple values but required if the value contains spaces or special characters.
+- `a[href]` also matches `href=""` and `href="#"`. Use `a[href]:not([href=""])` for only real links.
 - `[href*="github"]` is case-sensitive by default. Add `i` for case-insensitive: `[href*="github" i]`.
 
-**Debug tip:** In DevTools Styles panel, hover over a rule — the matched selector highlights in blue. For attribute selectors that aren't firing, inspect the element's attributes in the Elements panel: the attribute name or value may differ from what you expect (e.g., `data-Status` vs `data-status`).
+**Debug tip:** In DevTools Elements panel, inspect the element's attributes — the attribute name or value may differ from what you expect (e.g., `data-Status` vs `data-status`).
 
-**Next:** Structural pseudo-classes — selecting by position in the document tree (first child, nth child, last child) without adding position classes to the HTML.
+**Next:** Structural pseudo-classes — selecting by position in the document tree (first child, nth child) without adding position classes to the HTML.
 
 ## Challenge: attributes
 
-The HTML below has inputs with different types, links with different href patterns, and status badges with `data-status`. Style them using attribute selectors only.
+Style the elements using attribute selectors only.
 
 1. Set `opacity` of any `input[disabled]` to `0.4`
-2. Set `color` of links starting with `https` to `rgb(16, 185, 129)` (green)
-3. Set `background-color` of `[data-status="error"]` to `rgb(239, 68, 68)` (red)
-4. Set `background-color` of `[data-status="ok"]` to `rgb(16, 185, 129)` (green)
+2. Set `color` of links starting with `https` to `rgb(16, 185, 129)`
+3. Set `background-color` of `[data-status="error"]` to `rgb(239, 68, 68)`
+4. Set `background-color` of `[data-status="ok"]` to `rgb(16, 185, 129)`
 
 ```html
 <input id="txt" type="text" value="Editable">
@@ -127,7 +138,6 @@ var err = document.querySelector('#err')
 var ok = document.querySelector('#ok')
 var sOff = getComputedStyle(off)
 var sSecure = getComputedStyle(secure)
-var sPlain = getComputedStyle(plain)
 var sErr = getComputedStyle(err)
 var sOk = getComputedStyle(ok)
 assert sOff.opacity === '0.4'

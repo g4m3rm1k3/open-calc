@@ -100,6 +100,8 @@ export default function RunExample({ snippet, snippets, executor, ui, onTrace, o
   const editorRef = useRef<any>(null)
   const monacoRef = useRef<any>(null)
   const decorationsRef = useRef<string[]>([])
+  const allSnippetsRef = useRef(allSnippets)
+  allSnippetsRef.current = allSnippets
 
   useEffect(() => {
     setCodes(allSnippets.map(s => s.code))
@@ -108,6 +110,13 @@ export default function RunExample({ snippet, snippets, executor, ui, onTrace, o
     setTraceEvents([])
     setTraceStep(0)
   }, [snippets, snippet.code])
+
+  // Auto-render web examples (html+css) immediately — no Run click needed
+  useEffect(() => {
+    const snips = allSnippetsRef.current
+    if (!snips.some(s => s.lang.toLowerCase() === 'html') || !onOutput) return
+    onOutput([{ kind: 'preview', text: buildWebPreview(snips.map((s, i) => ({ ...s, code: codes[i] ?? s.code }))) }])
+  }, [codes])
 
   // Highlight current line in Monaco via decorations — no view swap needed
   useEffect(() => {

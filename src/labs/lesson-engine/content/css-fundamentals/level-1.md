@@ -11,123 +11,132 @@ A selector identifies which HTML elements a CSS rule applies to. The three funda
 
 ## Type Selectors
 
-A type selector targets every element of a given HTML tag name:
+A type selector targets every element of a given HTML tag name. Here one rule sets all `<p>` elements grey, another sets all `<h2>` blue, and another sets all `<a>` purple. Edit any rule to change every element of that type at once.
+
+```html
+<h2>Section heading</h2>
+<p>First paragraph — grey text, 1.6× line height.</p>
+<p>Second paragraph — same rule applies to both.</p>
+<a href="#">A link — purple</a>
+```
 
 ```css
+body { background: #0f172a; padding: 24px; }
 p {
-  color: #374151;
+  color: #94a3b8;
   line-height: 1.6;
+  font-family: system-ui;
 }
-
 h2 {
-  color: #1d4ed8;
-  font-size: 24px;
+  color: #60a5fa;
+  font-size: 1.5rem;
+  font-family: system-ui;
 }
-
 a {
-  color: #7c3aed;
+  color: #a78bfa;
+  font-family: system-ui;
 }
 ```
 
-```text
-Every <p> — grey text, 1.6× line height
-Every <h2> — blue text, 24px
-Every <a> — purple text
-```
-
-Type selectors are broad. They apply to **all** elements of that type in the document. Use them for global baseline styles — the font used everywhere, the default colour of links, the margin on paragraphs.
+Type selectors are broad — they apply to **all** elements of that type. Use them for global baseline styles: the font everywhere, the default colour of links, the margin on paragraphs.
 
 ## Class Selectors
 
-A class selector targets every element that has a given `class` attribute. Classes start with `.`:
+A class selector targets every element that has a given `class` attribute. Classes start with `.`. An element can have multiple classes and the same class can appear on any number of elements — this is what makes classes the primary tool for component-level styling.
+
+```html
+<p class="highlight">This paragraph is highlighted.</p>
+<p>This paragraph is normal — no class, no highlight.</p>
+<span class="error-text">Invalid input</span>
+<p class="highlight error-text">Both classes applied at once.</p>
+```
 
 ```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+p, span { color: #e2e8f0; margin: 8px 0; }
 .highlight {
-  background-color: #fef08a;
-  border-left: 4px solid #ca8a04;
+  background-color: #713f12;
+  border-left: 4px solid #f59e0b;
   padding: 12px 16px;
+  border-radius: 4px;
 }
-
 .error-text {
-  color: #dc2626;
+  color: #fca5a5;
   font-weight: bold;
 }
 ```
 
-```html
-<p class="highlight">This paragraph is highlighted.</p>
-<p>This paragraph is normal.</p>
-<span class="error-text">Invalid input</span>
-```
-
-```text
-Only the first <p> gets the yellow highlight.
-Only the <span> gets the red bold text.
-The second <p> is unstyled.
-```
-
-An element can have multiple classes: `class="highlight error-text"` applies both rules.
-
-Classes are **reusable** — the same class can appear on any number of elements across the page. They are the primary tool for component-level styling.
-
 ## ID Selectors
 
-An ID selector targets the single element with a given `id` attribute. IDs start with `#`:
-
-```css
-#site-header {
-  background-color: #0f172a;
-  color: white;
-  padding: 24px;
-}
-
-#main-content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-```
+An ID selector targets the single element with a given `id` attribute. IDs start with `#`. An `id` must be unique per page — only one element should ever have a given ID. Because of this, ID selectors are high-specificity but low-reusability.
 
 ```html
 <header id="site-header">UpskillOS</header>
-<main id="main-content">...</main>
+<main id="main-content">
+  <p>Content here is constrained to 600px wide and centred.</p>
+</main>
 ```
 
-An `id` must be unique per page — only one element should ever have a given ID. Because of this, ID selectors are high-specificity but low-reusability.
+```css
+body { background: #0f172a; padding: 0; font-family: system-ui; margin: 0; }
+#site-header {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  padding: 24px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+#main-content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px;
+  color: #94a3b8;
+}
+```
 
 **SE lens:** In modern CSS, most developers avoid ID selectors for styling (preferring classes) because IDs have very high specificity, making them hard to override later. Reserve `id` attributes for JavaScript targeting and page anchors.
 
 ## Combining Selectors
 
-Multiple selectors can share the same declarations using a comma:
+Multiple selectors can share the same declarations using a comma. All three headings get the same font-family and colour with one rule instead of three.
+
+```html
+<h1>H1 heading</h1>
+<h2>H2 heading</h2>
+<h3>H3 heading</h3>
+<p>A paragraph — not targeted by the heading rule</p>
+```
 
 ```css
+body { background: #0f172a; padding: 24px; }
 h1, h2, h3 {
-  font-family: 'Georgia', serif;
-  color: #1e3a5f;
+  font-family: Georgia, serif;
+  color: #c7d2fe;
+}
+p {
+  font-family: system-ui;
+  color: #94a3b8;
 }
 ```
 
-This is identical to three separate rules with the same declarations — just shorter.
-
 ## Specificity Intro
 
-When two rules target the same element and set the same property, the one with higher **specificity** wins:
-
-```css
-p            { color: black; }   /* type selector — lowest specificity */
-.note        { color: blue;  }   /* class selector — medium specificity */
-#intro       { color: red;   }   /* ID selector — high specificity */
-```
+When two rules target the same element and set the same property, the one with higher **specificity** wins. Here three rules compete for the same `<p>` — the ID selector wins because ID specificity outranks class, which outranks type.
 
 ```html
-<p id="intro" class="note">What colour am I?</p>
+<p id="intro" class="note">What colour am I? — Red, because #intro wins.</p>
+<p class="note">I have only class="note" — so I am blue.</p>
+<p>I have no class or ID — so I am black.</p>
 ```
 
-```text
-Red — #intro wins because ID specificity outranks class, which outranks type.
+```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+p            { color: #e2e8f0; }   /* type selector — lowest */
+.note        { color: #60a5fa; }   /* class selector — medium */
+#intro       { color: #f87171; }   /* ID selector — highest */
 ```
 
-The specificity ranking: **ID > class > type**. The full specificity system is covered in its own lesson (Level 8). For now: if a style isn't applying, a more specific rule is probably overriding it.
+The specificity ranking: **ID > class > type**. The full specificity system is covered in its own lesson (Level 7). For now: if a style isn't applying, a more specific rule is probably overriding it.
 
 **CS lens:** Specificity is a sorting function the browser's CSS cascade applies before choosing which declaration to use. It computes a three-part score (a, b, c) where `a` counts IDs, `b` counts classes and attributes, and `c` counts type selectors. Higher scores beat lower scores. This is deterministic — given the same stylesheet, every browser produces the same result.
 

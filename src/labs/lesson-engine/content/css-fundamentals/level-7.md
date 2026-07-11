@@ -7,131 +7,176 @@ lang: css
 
 # Specificity Deep Dive
 
-Specificity is the most misunderstood part of CSS. Level 6 introduced the basics. This lesson covers the full system: how to calculate specificity precisely, what the `:is()`, `:not()`, `:has()`, and `:where()` pseudo-classes contribute, why the "specificity war" is a design smell, and how to write CSS that does not fight itself.
+Specificity is the most misunderstood part of CSS. Level 6 introduced the basics. This lesson covers the full system: how to calculate specificity precisely, what `:is()`, `:not()`, `:has()`, and `:where()` contribute, and how to write CSS that does not fight itself.
 
 ## The Full Calculation
 
-Specificity is a three-column score: **(a, b, c)** where:
+Specificity is a three-column score **(a, b, c)**: `a` = ID selectors, `b` = class/attribute/pseudo-class selectors, `c` = type selectors/pseudo-elements. The universal selector `*` and combinators contribute zero. See how the scores change as selectors grow more complex.
 
-```text
-a = ID selectors                  #header → (1,0,0)
-b = class, attribute, pseudo-class .card, [type="text"], :hover → (0,1,0) each
-c = type selector, pseudo-element  div, p, ::before → (0,0,1) each
+```html
+<div id="outer" class="container">
+  <p class="text" id="para">Which rule wins on me? — The last one with (1,1,1).</p>
+  <span class="text">I only match the class rule — (0,1,0).</span>
+</div>
 ```
 
-The universal selector `*` and combinators (`>`, `+`, `~`, ` `) contribute **zero** to specificity.
-
 ```css
-*                  /* (0,0,0) */
-p                  /* (0,0,1) */
-div p              /* (0,0,2) — two type selectors */
-.card              /* (0,1,0) */
-.card p            /* (0,1,1) */
-.card .title       /* (0,2,0) */
-#header            /* (1,0,0) */
-#header .nav a     /* (1,1,1) */
-a:hover            /* (0,1,1) — :hover is a pseudo-class (b) */
-::before           /* (0,0,1) — pseudo-element (c) */
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+/* (0,0,1) — type */
+p             { color: #94a3b8; }
+/* (0,1,0) — class */
+.text         { color: #60a5fa; }
+/* (0,1,1) — class + type */
+p.text        { color: #6ee7b7; }
+/* (1,0,0) — ID */
+#para         { color: #f59e0b; }
+/* (1,1,1) — ID + class + type — wins */
+p#para.text   { color: #818cf8; font-weight: 700; }
+span          { font-size: 15px; }
 ```
 
 Comparison is lexicographic: `(1,0,0)` beats `(0,99,99)`. There is no overflow — 256 class selectors do not add up to one ID.
 
 ## Pseudo-Classes and Specificity
 
-Most pseudo-classes count as class selectors (b=1):
+Most pseudo-classes count as class selectors (b=1). Compare how `:hover` and `:nth-child` add to the score and how that affects which rule wins.
+
+```html
+<ul class="nav">
+  <li class="item">Item 1 — class (0,1,0)</li>
+  <li class="item">Item 2 — :nth-child adds (0,1,0) each</li>
+  <li class="item active">Item 3 — .active is (0,1,0); combined: (0,2,1)</li>
+  <li class="item">Item 4 — hover me to see :hover add (0,1,0)</li>
+</ul>
+```
 
 ```css
-:hover          /* (0,1,0) */
-:focus          /* (0,1,0) */
-:nth-child(2)   /* (0,1,0) */
-:not(.active)   /* (0,1,0) — the :not() itself is 0; .active inside adds (0,1,0) */
-:is(.nav, a)    /* takes the highest specificity of its argument list */
-:where(.nav, a) /* always (0,0,0) — specificity escape hatch */
-:has(> img)     /* (0,0,1) — img is a type selector inside :has() */
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+.nav { list-style: none; padding: 0; margin: 0; }
+.item          { padding: 10px 16px; color: #94a3b8; border-bottom: 1px solid #1e293b; }
+.item:nth-child(2) { color: #60a5fa; }   /* (0,2,1) — class + pseudo-class + type */
+.item.active   { color: #6ee7b7; font-weight: 600; }  /* (0,2,1) — two classes + type */
+.item:hover    { color: #f59e0b; background: #1e293b; }  /* (0,2,1) */
 ```
 
 ## :is(), :not(), :has() — They Take Their Argument's Specificity
 
-These three "functional pseudo-classes" use the **specificity of the most specific argument** inside them:
+These three functional pseudo-classes use the **specificity of the most specific argument** inside them — a common surprise. Try changing `:is(#header, .nav)` to `:is(.nav)` to see the specificity drop from (1,0,0) to (0,1,0).
+
+```html
+<nav id="header" class="nav">
+  <a href="#" class="link">Link inside #header.nav — :is(#header, .nav) a has specificity (1,0,1)</a>
+</nav>
+<div class="nav">
+  <a href="#" class="link">Link inside .nav only — same :is() rule still applies with ID-level specificity</a>
+</div>
+```
 
 ```css
-:is(#header, .nav, p) a  /* (1,0,1) — #header gives a=1 */
-:not(#header)            /* (1,0,0) — #header contributes a=1 */
-:has(#logo)              /* (1,0,0) — #logo contributes a=1 */
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+.nav { background: #1e293b; padding: 16px; border-radius: 8px; margin-bottom: 12px; }
+/* (1,0,1) — #header inside :is() contributes a=1, `a` type selector adds c=1 */
+:is(#header, .nav) a { color: #818cf8; text-decoration: none; font-weight: 600; }
+/* Try overriding with a plain class — it loses to the ID-level specificity above */
+.link { color: #f87171; }
 ```
 
 This is a common surprise: `:is(h1, #title)` has specificity `(1,0,0)` everywhere it is used, even when matching an `h1`.
 
 ## :where() — Zero Specificity
 
-`:where()` matches the same elements as `:is()` but contributes **zero** specificity:
+`:where()` matches the same elements as `:is()` but contributes **zero** specificity — making it trivially easy to override. This is the standard tool for library and framework base styles.
 
-```css
-:where(#header, .nav, p) a  /* (0,0,1) — only the `a` counts */
+```html
+<section>
+  <h1>Heading styled by :where() — (0,0,0) specificity</h1>
+  <h2>Also :where() — any class overrides it</h2>
+  <h2 class="special">Override with .special (0,1,0) — easily beats :where()</h2>
+</section>
 ```
 
-This is the standard tool for library and framework CSS. If you write a utility class library and want users to easily override your styles, wrap your selectors in `:where()`:
-
 ```css
-/* Easy to override — (0,0,0) specificity */
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+/* Zero specificity — any other selector beats this */
 :where(h1, h2, h3) {
   font-weight: bold;
+  color: #64748b;
+  margin: 8px 0;
 }
-
-/* Hard to override — (0,0,3) */
-h1, h2, h3 {
-  font-weight: bold;
+/* (0,1,0) — easily overrides :where() */
+.special {
+  color: #818cf8;
+  font-size: 1.25rem;
 }
 ```
+
+`:where()` is the standard tool for library and framework CSS. Wrap your selectors in `:where()` and users can always override your styles without fighting specificity.
 
 ## !important Revisited
 
-`!important` is not a specificity score — it is a separate flag that takes priority over all non-`!important` declarations. When two `!important` declarations compete, specificity breaks the tie between them. This is the only time specificity matters inside the `!important` layer.
+`!important` is not a specificity score — it is a separate flag. When two `!important` declarations compete, specificity breaks the tie between them. Here both rules use `!important`, so the class `(0,1,0)` beats the type `(0,0,1)` within the `!important` layer.
+
+```html
+<p class="note">I match both rules — both !important. Class (0,1,0) beats type (0,0,1) within !important layer.</p>
+<p>I only match the type rule — red !important.</p>
+```
 
 ```css
-p { color: blue !important; }       /* wins over any non-!important rule */
-.note { color: red !important; }    /* .note (0,1,0) vs p (0,0,1): .note wins */
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+p     { color: #f87171 !important; margin: 8px 0; }       /* !important + (0,0,1) */
+.note { color: #60a5fa !important; font-weight: 600; }    /* !important + (0,1,0) — wins */
 ```
 
 ## The Specificity War — A Design Smell
 
-When you find yourself writing `#main #content .card .title span` to override a style, something has gone wrong:
+When you find yourself writing `#main #content .card .title span` to override a style, something has gone wrong. Each override requires a more specific selector. The fix is to flatten the selectors and use classes.
 
-```css
-/* The war starts here */
-.card .title { color: blue; }       /* (0,2,0) */
-.featured .card .title { color: red; } /* (0,3,0) */
-#hero .featured .card .title { color: green; } /* (1,2,0) */
+```html
+<div id="hero">
+  <div class="featured">
+    <div class="card">
+      <span class="card-title war-title">Specificity war — deeply nested selectors</span>
+    </div>
+  </div>
+</div>
+<span class="card-title--flat">Flat BEM class — no nesting needed</span>
 ```
 
-Each override requires a more specific selector. The fix is to flatten the selectors and use classes:
-
 ```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+/* The war starts */
+.card .card-title              { color: #60a5fa; }   /* (0,2,0) */
+.featured .card .card-title    { color: #f59e0b; }   /* (0,3,0) */
+#hero .featured .card .card-title { color: #f87171; } /* (1,2,0) — wins the war */
+.war-title                     { display: block; margin-bottom: 16px; font-weight: 600; }
 /* Flat and manageable */
-.card-title        { color: blue; }
-.card-title--featured { color: red; }
-.card-title--hero  { color: green; }
+.card-title--flat { display: block; color: #6ee7b7; font-weight: 600; }
 ```
 
-**SE lens:** High-specificity selectors create coupling between HTML structure and CSS. If you rename or restructure the HTML, the CSS breaks. Flat class selectors are independent of structure. This is the core motivation behind BEM (Block–Element–Modifier) naming, covered in the Professional CSS series.
+**SE lens:** High-specificity selectors create coupling between HTML structure and CSS. If you rename or restructure the HTML, the CSS breaks. Flat class selectors are independent of structure — the core motivation behind BEM naming.
 
 ## Layers — The Modern Specificity Solution
 
-CSS `@layer` (2022) lets you group rules into named layers with controlled priority:
+CSS `@layer` (2022) lets you group rules into named layers with controlled priority. Rules in a later-declared layer win over earlier layers **regardless of specificity**. A class in `utilities` beats an ID in `base`.
+
+```html
+<p id="output" class="text-red">I am styled by two @layer rules — which wins?</p>
+<p class="text-red">Same class, no ID — utilities (later layer) wins.</p>
+```
 
 ```css
-@layer base, components, utilities;
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+@layer base, utilities;
 
 @layer base {
-  p { color: black; }          /* (0,0,1) inside 'base' layer */
+  #output { color: #64748b; }     /* ID selector (1,0,0) inside 'base' */
+  p       { font-size: 15px; margin: 8px 0; }
 }
 
 @layer utilities {
-  .text-red { color: red; }   /* wins over 'base' even at (0,1,0) */
+  .text-red { color: #f87171; }   /* class (0,1,0) inside 'utilities' — later layer wins */
 }
 ```
-
-Rules in a later-declared layer win over earlier layers, **regardless of specificity**. A class in `utilities` beats an ID in `base`. Cascade layers are covered in depth in the Professional CSS series.
 
 ## Challenge: specificity_calculation
 

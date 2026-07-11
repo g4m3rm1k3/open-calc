@@ -11,113 +11,139 @@ Colour is the most immediate visual property in CSS. There are five ways to spec
 
 ## Named Keywords
 
-CSS defines 140+ named colour keywords:
+CSS defines 140+ named colour keywords. Named colours are readable but imprecise — `tomato` is not the same as `red`, and there is no programmatic relationship between related names. Edit any keyword to try a different named colour.
+
+```html
+<div class="swatch" id="s1">tomato</div>
+<div class="swatch" id="s2">steelblue</div>
+<div class="swatch" id="s3">gold</div>
+<div class="swatch" id="s4">mediumorchid</div>
+```
 
 ```css
-.box {
-  background-color: tomato;
-  color: white;
-  border: 2px solid darkred;
-}
+body { background: #0f172a; padding: 24px; display: flex; gap: 12px; flex-wrap: wrap; font-family: system-ui; }
+.swatch { padding: 24px 16px; border-radius: 8px; color: white; font-size: 13px; font-weight: 600; text-align: center; min-width: 100px; text-shadow: 0 1px 2px rgba(0,0,0,0.4); }
+#s1 { background-color: tomato; }
+#s2 { background-color: steelblue; }
+#s3 { background-color: gold; color: #333; }
+#s4 { background-color: mediumorchid; }
 ```
 
-```text
-background-color: tomato   → rgb(255, 99, 71)
-color: white               → rgb(255, 255, 255)
-border: 2px solid darkred  → rgb(139, 0, 0)
-```
-
-Named colours are readable but imprecise — `tomato` is not the same as `red`, and there is no programmatic relationship between related names. Use them for quick experiments and prototypes, not design systems.
-
-Special keywords that always work: `transparent` (fully invisible), `currentColor` (inherits the element's text colour), `inherit`, `initial`, `unset`.
+Special keywords: `transparent` (fully invisible), `currentColor` (inherits the element's text colour), `inherit`, `initial`, `unset`.
 
 ## Hexadecimal
 
-Hex is the most common format in web development:
+Hex is the most common format in web development. Format: `#RRGGBB` where each pair is 0–9, a–f (hexadecimal, base 16). These three boxes show dark navy, near-white, and brand blue.
+
+```html
+<div id="navy">color: #1e3a5f — dark navy text</div>
+<div id="light">background-color: #f8fafc — near-white background</div>
+<div id="blue">border-color: #3b82f6 — brand blue border</div>
+```
 
 ```css
-.palette {
-  color: #1e3a5f;           /* dark navy */
-  background-color: #f8fafc; /* near-white */
-  border-color: #3b82f6;    /* brand blue */
-}
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+div { padding: 16px; margin: 8px 0; border-radius: 6px; font-size: 14px; }
+#navy  { color: #1e3a5f; background: #e2e8f0; }
+#light { color: #334155; background-color: #f8fafc; }
+#blue  { color: #e2e8f0; background: #1e293b; border: 3px solid #3b82f6; }
 ```
 
-```text
-Format: #RRGGBB
-Each pair is 0–9, a–f (hexadecimal, base 16)
-Range: #000000 (black) to #ffffff (white)
-```
+**Short form:** `#rgb` expands each digit — `#f0a` → `#ff00aa`. **With alpha:** `#RRGGBBAA` adds an opacity byte — `#3b82f680` is brand blue at 50% opacity.
 
-**Short form:** `#rgb` expands each digit: `#f0a` → `#ff00aa`. Only valid when both digits are the same.
-
-**With alpha:** `#RRGGBBAA` adds an opacity byte. `#1e3a5f80` is navy at 50% opacity.
-
-**CS lens:** Each hex pair is an 8-bit integer (0–255). `#3b82f6` is `R=59, G=130, B=246`. The browser converts hex to rgb() internally before painting. Understanding this makes colour arithmetic easier — mixing `#ff0000` (R=255) and `#0000ff` (B=255) at equal weight gives `#800080` (`R=128, B=128`), which is purple.
+**CS lens:** Each hex pair is an 8-bit integer (0–255). `#3b82f6` is `R=59, G=130, B=246`. The browser converts hex to rgb() internally before painting.
 
 ## rgb() and rgba()
 
-`rgb()` uses decimal values (0–255) and is more readable for programmatic colours:
+`rgb()` uses decimal values (0–255) and is more readable for programmatic colours. The fourth argument (0–1) controls **alpha** (opacity). Edit the last number in `rgb(59, 130, 246, 0.5)` to see the transparency change.
 
-```css
-.rgb-examples {
-  color: rgb(30, 58, 95);         /* same as #1e3a5f */
-  background-color: rgb(248, 250, 252);
-  border-color: rgb(59, 130, 246, 0.5); /* 50% opacity */
-}
+```html
+<div id="r1">rgb(30, 58, 95) — same as #1e3a5f</div>
+<div id="r2">rgb(248, 250, 252) — near-white</div>
+<div id="r3">rgb(59, 130, 246, 0.5) — brand blue at 50% opacity</div>
+<div id="r4">rgb(0, 0, 0, 0) — fully transparent (invisible)</div>
 ```
 
-The fourth argument (0–1 or 0%–100%) controls **alpha** (opacity). `rgb(0, 0, 0, 0)` is fully transparent; `rgb(0, 0, 0, 1)` is fully opaque black.
+```css
+body { background: #334155; padding: 24px; font-family: system-ui; }
+div { padding: 16px; margin: 8px 0; border-radius: 6px; font-size: 14px; font-weight: 500; }
+#r1 { background: rgb(30, 58, 95); color: #e2e8f0; }
+#r2 { background: rgb(248, 250, 252); color: #334155; }
+#r3 { background: rgb(59, 130, 246, 0.5); color: white; }
+#r4 { background: rgb(0, 0, 0, 0); color: #e2e8f0; border: 1px dashed #64748b; }
+```
 
-Modern CSS merges `rgb()` and `rgba()` — all four values work in a single `rgb()` function. Both forms are valid; new code should use `rgb()`.
+Modern CSS merges `rgb()` and `rgba()` — all four values work in a single `rgb()` function.
 
 ## hsl()
 
-`hsl()` is the most human-readable format for creating and adjusting colours:
+`hsl()` is the most human-readable format for creating and adjusting colours. The real power: all three boxes share the same **hue (213) and saturation (52%)** — only lightness changes. This is impossible to do intuitively with hex.
+
+```html
+<div id="h1">hsl(213, 52%, 24%) — dark blue, same hue family</div>
+<div id="h2">hsl(213, 52%, 50%) — mid blue, same hue family</div>
+<div id="h3">hsl(213, 52%, 85%) — light blue, same hue family</div>
+<p id="info">Change the hue (0–360) and all three stay in the same family</p>
+```
 
 ```css
-.hsl-examples {
-  /* hsl(hue, saturation, lightness) */
-  color: hsl(213, 52%, 24%);         /* dark blue */
-  background-color: hsl(213, 52%, 97%); /* same hue, almost white */
-  border-color: hsl(213, 52%, 50%);     /* same hue, mid blue */
-}
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+div { padding: 16px; margin: 8px 0; border-radius: 6px; font-size: 14px; font-weight: 600; }
+#h1 { background-color: hsl(213, 52%, 24%); color: hsl(213, 52%, 85%); }
+#h2 { background-color: hsl(213, 52%, 50%); color: white; }
+#h3 { background-color: hsl(213, 52%, 85%); color: hsl(213, 52%, 24%); }
+#info { color: #64748b; font-size: 13px; margin-top: 12px; }
 ```
 
-```text
-Hue:        0–360° on the colour wheel (0/360=red, 120=green, 240=blue)
-Saturation: 0% (grey) to 100% (vivid)
-Lightness:  0% (black) to 100% (white); 50% is the "pure" colour
-```
-
-The power of `hsl()`: all three values in the example above share the same hue (`213`) and saturation (`52%`). To create a colour palette — dark, mid, and light variants of one colour — just vary the lightness. This is impossible to do intuitively with hex.
-
-**SE lens:** Design systems store colour palettes as HSL families. A button might be `hsl(213, 52%, 45%)` at rest, `hsl(213, 52%, 38%)` on hover, and `hsl(213, 52%, 30%)` when active — the same hue and saturation, just darker.
+**SE lens:** Design systems store colour palettes as HSL families. A button might be `hsl(213, 52%, 45%)` at rest, `hsl(213, 52%, 38%)` on hover — same hue and saturation, just darker.
 
 ## oklch() — The Modern Choice
 
-`oklch()` is a newer format designed for perceptually uniform colour (equal numerical changes produce visually equal changes):
+`oklch()` is a newer format designed for perceptually uniform colour — equal numerical changes produce visually equal changes. The three colours below all differ by the same amount of lightness but look like genuinely equal steps.
 
-```css
-.oklch {
-  color: oklch(45% 0.15 250);  /* lightness, chroma, hue */
-  background-color: oklch(97% 0.01 250);
-}
+```html
+<div id="ok1">oklch(40% 0.18 250) — deep blue</div>
+<div id="ok2">oklch(60% 0.18 250) — mid blue</div>
+<div id="ok3">oklch(80% 0.18 250) — light blue</div>
+<p id="ok-note">Try changing the hue (250) to 140 for green or 30 for orange</p>
 ```
 
-`oklch` is better for generating accessible colour palettes automatically and for colour mixing. Browser support is strong (all modern browsers). For a first pass, `hsl()` is more intuitive; `oklch` matters when you need perceptual uniformity.
+```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+div { padding: 16px; margin: 8px 0; border-radius: 6px; font-size: 14px; font-weight: 600; }
+#ok1 { background-color: oklch(40% 0.18 250); color: oklch(90% 0.05 250); }
+#ok2 { background-color: oklch(60% 0.18 250); color: white; }
+#ok3 { background-color: oklch(80% 0.18 250); color: oklch(30% 0.18 250); }
+#ok-note { color: #64748b; font-size: 13px; }
+```
 
 ## The opacity Property
 
-`opacity` sets the transparency of the **entire element** (including its children), not just one colour:
+`opacity` sets the transparency of the **entire element** (including its children). The left card uses `opacity: 0.4` — notice the text fades too. The right card uses `background-color` with alpha, keeping the text fully opaque.
 
-```css
-.faded {
-  opacity: 0.5; /* 0 = invisible, 1 = fully opaque */
-}
+```html
+<div style="display:flex;gap:16px;">
+  <div id="op-all">
+    <strong>opacity: 0.4</strong>
+    <p>Both box AND text fade together</p>
+  </div>
+  <div id="op-bg">
+    <strong>background alpha</strong>
+    <p>Only the background fades — text stays crisp</p>
+  </div>
+</div>
 ```
 
-`opacity: 0.5` on a box with text makes both the box AND the text 50% transparent. If you only want the background to be transparent (keeping text fully opaque), use `background-color: rgb(0, 0, 0, 0.5)` instead.
+```css
+body { background: #334155; padding: 24px; font-family: system-ui; }
+#op-all, #op-bg { padding: 20px; border-radius: 8px; flex: 1; }
+#op-all { background-color: #3b82f6; color: white; opacity: 0.4; }
+#op-bg  { background-color: rgb(59, 130, 246, 0.4); color: white; }
+strong  { display: block; font-size: 14px; margin-bottom: 8px; }
+p       { margin: 0; font-size: 13px; }
+```
+
+Use `opacity` when you want to fade everything. Use `background-color: rgb(..., alpha)` when you want only the background to be transparent.
 
 ## Challenge: color_palette
 

@@ -7,100 +7,104 @@ lang: css
 
 # :not(), :is(), :where()
 
-Three functional pseudo-classes that let you write complex selector logic concisely — negation, grouping, and zero-specificity grouping.
+Three functional pseudo-classes for negation and grouping that eliminate repetitive selectors and specificity problems.
 
-## :not() — Negation
+## :not() — style everything except
 
-`:not(selector)` matches every element that does NOT match the argument.
+Add a border between list items without a double border at the bottom. Remove `li:not(:last-child)` and see the double border appear.
 
-```css
-/* Every li except the last one */
-li:not(:last-child) {
-  border-bottom: 1px solid #334155;
-}
-
-/* Every button except disabled ones */
-button:not(:disabled) {
-  cursor: pointer;
-  background: #3b82f6;
-}
-
-/* Every p not inside .sidebar */
-p:not(.sidebar p) {
-  max-width: 65ch;
-}
-```
-
-```text
-:not() accepts any valid selector, including compound selectors.
-It negates whatever matches inside the parentheses.
-```
-
-**CS lens:** `:not()` is logical negation in a selector. The set of matched elements is "everything this selector would match, minus what `:not()` says to exclude."
-
-## :is() — Selector Grouping
-
-`:is()` lets you pass a **list** of selectors and match any of them. It eliminates repetition.
-
-```css
-/* Without :is() — repetitive */
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* With :is() — concise */
-:is(h1, h2, h3, h4, h5, h6) a {
-  color: inherit;
-  text-decoration: none;
-}
-```
-
-```text
-:is(h1, h2, h3) a   →   matches an <a> inside any heading
-```
-
-The specificity of `:is()` is the specificity of its **most specific argument** — so `:is(#id, .class, p)` has ID-level specificity because `#id` is in the list.
-
-## :where() — Zero-Specificity Grouping
-
-`:where()` works identically to `:is()` but always has **zero specificity**.
-
-```css
-/* Reset link styles anywhere in these containers */
-:where(header, footer, nav) a {
-  text-decoration: none;
-}
-```
-
-```text
-:where() is useful for base styles and resets — styles you want to be
-easy to override without needing higher-specificity selectors.
+```html
+<ul id="list">
+  <li>Dashboard</li>
+  <li>Projects</li>
+  <li>Reports</li>
+  <li>Settings — no border below me</li>
+</ul>
 ```
 
 ```css
-/* :is() — high specificity, harder to override */
-:is(.card, .panel) p { color: #94a3b8; }
-
-/* :where() — zero specificity, easy to override */
-:where(.card, .panel) p { color: #94a3b8; }
-.card p { color: red; }  /* wins over :where() even with same specificity */
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
+#list { list-style: none; padding: 0; background: #1e293b; border-radius: 8px; overflow: hidden; }
+#list li { padding: 12px 16px; color: #e2e8f0; }
+#list li:not(:last-child) { border-bottom: 1px solid #334155; }
 ```
 
-**SE lens:** `:where()` is the tool for writing design system base styles that downstream components can always override. Libraries like Tailwind's preflight use it so their resets never fight with your actual styles.
+`:not()` accepts any valid selector. Use it to exclude classes, states, types:
+
+```html
+<div class="toolbar">
+  <button>Save</button>
+  <button disabled>Delete</button>
+  <button>Export</button>
+  <button disabled>Publish</button>
+</div>
+```
+
+```css
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
+.toolbar { display: flex; gap: 8px; }
+button { padding: 8px 16px; border-radius: 6px; border: none; font-size: 14px; font-weight: 500; }
+button:not(:disabled) { background: #3b82f6; color: white; cursor: pointer; }
+button:disabled       { background: #1e293b; color: #475569; cursor: not-allowed; }
+```
+
+**CS lens:** `:not()` is logical negation. The set of matched elements is "everything this selector would match, minus what `:not()` says to exclude."
+
+## :is() — group selectors without repetition
+
+Without `:is()`: `h1 a, h2 a, h3 a, h4 a { }` — four selectors for one rule. With `:is()`: one selector, same result. Change the heading colour in one place.
+
+```html
+<article>
+  <h1>H1 with <a href="#">link</a></h1>
+  <h2>H2 with <a href="#">link</a></h2>
+  <h3>H3 with <a href="#">link</a></h3>
+  <p>Paragraph with <a href="#">link</a> — not matched by heading rule</p>
+</article>
+```
+
+```css
+body { background: #0f172a; font-family: system-ui; padding: 16px; }
+article { background: #1e293b; padding: 16px; border-radius: 8px; }
+h1, h2, h3 { color: #e2e8f0; margin: 8px 0; }
+p { color: #94a3b8; }
+a { color: #94a3b8; text-decoration: none; }
+:is(h1, h2, h3) a { color: #6366f1; text-decoration: underline; }
+```
+
+## :where() — same as :is() but zero specificity
+
+`:where()` groups selectors like `:is()` but contributes **zero specificity** — making it easy to override. Use it for base styles and design system resets that downstream components should always win against.
+
+```html
+<header><a href="#">Header link</a></header>
+<footer><a href="#">Footer link</a></footer>
+<main>
+  <a href="#">Main link — override works here</a>
+  <div class="card"><a href="#">Card link — overridden to orange</a></div>
+</main>
+```
+
+```css
+body { background: #0f172a; font-family: system-ui; padding: 16px; color: #e2e8f0; }
+header, footer, main { background: #1e293b; padding: 12px; margin-bottom: 8px; border-radius: 6px; }
+:where(header, footer, main) a { color: #3b82f6; text-decoration: none; }
+.card a { color: #f59e0b; } /* overrides :where() because .card a has higher specificity */
+```
+
+**SE lens:** `:where()` is the tool for writing design system base styles that downstream components can always override. Libraries like Tailwind's preflight use it so their resets never fight your actual styles.
 
 **Common mistakes:**
-- Thinking `:not(.foo)` means "not an element with class foo" — it means "any element that doesn't match `.foo`", which includes elements with other classes AND elements of other types. `p:not(.foo)` is "a `<p>` element that does not have class `foo`" — much more specific.
-- Using `:not()` with a complex selector in older browsers — `:not()` only accepted simple selectors before CSS Selectors Level 4. Compound selectors in `:not()` like `:not(.card p)` are modern CSS; check browser support if you need IE11.
-- Forgetting that `:is()` takes the specificity of its most specific argument — `:is(#id, .class)` has ID-level specificity even when matching a class. Use `:where()` to avoid this.
+- `:is()` takes the specificity of its most specific argument — `:is(#id, .class)` has ID-level specificity even when matching a class. Use `:where()` to avoid this.
+- Thinking `:not(.foo)` means "not an element with class foo" — it means any element that doesn't match `.foo`, including elements of other types. `p:not(.foo)` is a `<p>` without class `foo`.
 
-**Debug tip:** Run `document.querySelectorAll('li:not(:last-child)')` in the Console to see which elements match before applying CSS. For `:is()` and `:where()`, the same approach works — the Selectors API supports all three.
+**Debug tip:** Run `document.querySelectorAll('li:not(:last-child)')` in the Console to see which elements match before applying CSS.
 
-**Next:** `:has()` — the parent selector. Select an element based on what its descendants contain — the feature CSS was missing for 25 years.
+**Next:** `:has()` — the parent selector. Select an element based on what its descendants contain.
 
 ## Challenge: not-is-where
 
-The HTML below has a list with a special `.skip` item and several headings with links. Apply styles using `:not()` and `:is()`.
+Style the elements using `:not()` and `:is()`.
 
 1. Set `border-bottom` of every `<li>` **except** `.skip` to `1px solid rgb(51, 65, 85)`
 2. Set `color` of `<a>` inside any heading (`h1`, `h2`, `h3`) to `rgb(148, 163, 184)`

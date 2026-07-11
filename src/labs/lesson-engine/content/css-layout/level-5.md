@@ -7,101 +7,81 @@ lang: css
 
 # Floats
 
-`float` was the first CSS mechanism for placing elements side by side. Introduced in CSS 1 to replicate magazine-style text wrapping around images, it became the dominant multi-column layout tool before flexbox and grid existed. Understanding floats is essential for reading legacy code, understanding how browsers resolve float + block interactions, and knowing why BFCs exist.
+`float` was the first CSS mechanism for placing elements side by side. Introduced in CSS 1 to replicate magazine-style text wrapping around images, it became the dominant multi-column layout tool before flexbox and grid existed. Understanding floats is essential for reading legacy code, understanding BFC behaviour, and knowing why clearfix patterns exist.
 
-## What Float Does
+## Text wraps around a float
 
-A floated element is shifted to the left or right of its line box and allows inline content (text, inline elements) to wrap around it. It is **partially** removed from normal flow: block elements ignore it, but inline content wraps around it.
+A floated element is shifted to the left or right of its line box and allows inline content to wrap around it. Block elements ignore it (their backgrounds can underlap it), but inline content wraps around the float's edge. Run this and see how the text wraps around the image.
+
+```html
+<div id="article">
+  <div id="image">Image</div>
+  <p>This text wraps around the floated element just like text wraps around an image in a magazine layout. The block background of this paragraph underlaps the float, but the text lines clear it.</p>
+  <p>This second paragraph also wraps if there is room, then continues below once the float is cleared.</p>
+</div>
+```
 
 ```css
-.image {
-  float: left;
-  margin-right: 16px;
-}
+#article { background: #1e293b; color: #e2e8f0; padding: 16px; font-family: system-ui; }
+#image   { float: left; width: 100px; height: 80px; background: #6366f1; color: white; margin: 0 16px 8px 0; display: flex; align-items: center; justify-content: center; }
 ```
 
-```text
-Without float:
-  ┌─────────────────────────────┐
-  │  ┌────────┐                 │
-  │  │ image  │                 │
-  │  └────────┘                 │
-  │  Text starts here...        │
-  └─────────────────────────────┘
+**CS lens:** The browser runs a two-pass layout for floats. In the first pass (block layout), floated elements are skipped. In the second pass (inline layout), the browser checks for active floats and adjusts each line box's available width to avoid overlapping the float. This is why block backgrounds underlap a float while text wraps.
 
-With float: left:
-  ┌─────────────────────────────┐
-  │  ┌────────┐  Text wraps     │
-  │  │ image  │  around the     │
-  │  └────────┘  floated image  │
-  │  like a magazine layout.    │
-  └─────────────────────────────┘
+## Clearing floats
+
+`clear: left`, `clear: right`, or `clear: both` forces an element to start below any active float on the specified side. Remove `clear: both` from `#footer` below and watch it slide up next to the float.
+
+```html
+<div id="container">
+  <div id="sidebar">Sidebar</div>
+  <p>Main content that flows next to the sidebar.</p>
+  <div id="footer">Footer — clear: both keeps me below all floats</div>
+</div>
 ```
-
-Block siblings behave as if the float is not there — they overlap with the float's space. But inline content inside those blocks wraps around the float's edge.
-
-**CS lens:** The browser runs a two-pass layout for floats. In the first pass (block layout), floated elements are skipped. In the second pass (inline layout), the browser checks for active floats and adjusts each line box's available width to avoid overlapping the float. This is why block backgrounds can underlap a float while text wraps around it.
-
-## Clearing Floats
-
-`clear: left`, `clear: right`, or `clear: both` forces an element to start below any active float on the specified side.
 
 ```css
-.footer {
-  clear: both; /* will start below all preceding floats */
-}
+#container { background: #0f172a; color: #e2e8f0; padding: 16px; font-family: system-ui; }
+#sidebar   { float: left; width: 120px; height: 100px; background: #6366f1; margin-right: 16px; padding: 8px; color: white; }
+#footer    { clear: both; background: #1e293b; padding: 12px; margin-top: 8px; }
 ```
 
-```text
-Without clear:         With clear: both:
-  [float left]           [float left]
-  [footer text]    →     
-  overlaps float         [footer]     ← starts below float
-```
+When you need to clear floats without a visible element, the clearfix pseudo-element is the old pattern:
+`container::after { content: ''; display: table; clear: both; }` — before `display: flow-root` was added in 2017.
 
-When you need an element to clear floats without adding a visible element, the micro-clearfix technique uses a pseudo-element:
+## BFC avoidance of floats
+
+A block that establishes a BFC will not overlap a sibling float — it shrinks its width to sit beside the float. Remove `display: flow-root` from `#main` and watch it slide under the sidebar.
+
+```html
+<div id="page">
+  <div id="sidebar">Sidebar</div>
+  <div id="main">
+    <p>With display: flow-root, I create a BFC and avoid overlapping the sidebar. Remove it and my background slides underneath.</p>
+  </div>
+</div>
+```
 
 ```css
-.container::after {
-  content: '';
-  display: table;
-  clear: both;
-}
+#page    { background: #0f172a; color: #e2e8f0; padding: 16px; font-family: system-ui; overflow: hidden; }
+#sidebar { float: left; width: 140px; background: #6366f1; padding: 12px; color: white; margin-right: 12px; height: 100px; }
+#main    { display: flow-root; background: #1e293b; padding: 12px; }
 ```
 
-This was the dominant clearfix pattern from ~2010–2017, before `display: flow-root` provided a cleaner alternative (as covered in level-1).
-
-## float and Block Formatting Contexts
-
-A floated element creates its own BFC. A block element that also creates a BFC will not overlap a sibling float — it shrinks its width to avoid the float.
-
-```css
-.sidebar { float: left; width: 200px; }
-.main    { display: flow-root; } /* creates BFC — avoids overlapping .sidebar */
-```
-
-```text
-Without flow-root on .main:         With flow-root on .main:
-  ┌──────┬─────────────────┐          ┌──────┬────────────────┐
-  │sidebar│ .main background│          │side  │ .main fills    │
-  │      │ underlaps sidebar│          │bar   │ remaining width│
-  └──────┴─────────────────┘          └──────┴────────────────┘
-```
-
-**SE lens:** Float-based layouts are legacy code. Flexbox replaced floats for layout in ~2015; grid largely replaced both by 2020. You will encounter floats extensively in older codebases and CSS frameworks like Bootstrap 3. When maintaining legacy float layouts, understand `clear` and the BFC-avoidance behaviour before modifying structure. When writing new code, use flexbox or grid.
+**SE lens:** Float-based layouts are legacy code. Flexbox replaced floats for layout in ~2015; grid largely replaced both by 2020. You will encounter floats extensively in older codebases and CSS frameworks like Bootstrap 3. When writing new code, use flexbox or grid.
 
 **Common mistakes:**
-- Applying `float` for layout and being confused when the parent collapses to zero height — the parent is not a BFC and does not contain floated children. Add `display: flow-root` to the parent.
+- Applying `float` for layout and being confused when the parent collapses to zero height — add `display: flow-root` to the parent.
 - Using `clear: both` on the wrong element — `clear` must be on the element you want to appear *below* the float, not on the float itself.
-- Expecting floated elements to respect `vertical-align` — vertical-align only applies within inline formatting contexts. Floats are partially removed from flow and do not participate in inline alignment.
+- Expecting floated elements to respect `vertical-align` — vertical-align only applies within inline formatting contexts.
 
-**Debug tip:** In DevTools, select a parent that should contain floats — if its height is `0` or smaller than you expect, it is not a BFC. Look for `display: flow-root` or the old `::after` clearfix. If neither is present, the parent is not containing its floats.
+**Debug tip:** In DevTools, select a parent that should contain floats — if its height is `0` or smaller than expected, it is not a BFC. Look for `display: flow-root` or an `::after` clearfix. If neither is present, the parent is not containing its floats.
 
-**Next:** The containing block — the full ruleset for which ancestor determines an element's position origin, which depends on both the element's `position` value and its ancestor chain.
+**Next:** The containing block — the full ruleset for which ancestor determines an element's position origin, depending on both the element's `position` value and its ancestor chain.
 
 ## Challenge: float
 
-Float `#sidebar` left so that text in `#main` wraps around it.
+Float `#sidebar` left so that text in `#main` wraps around it, and contain the float with a BFC.
 
 1. Set `float` of `#sidebar` to `left`
 2. Set `width` of `#sidebar` to `120px` and `height` to `80px`

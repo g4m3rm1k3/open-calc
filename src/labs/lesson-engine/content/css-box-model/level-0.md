@@ -7,90 +7,77 @@ lang: css
 
 # The Box Model
 
-Every element in CSS is a rectangular box. Understanding what that box is made of — and how its dimensions are calculated — is the foundation of all CSS layout work.
+Every element in CSS is a rectangular box with four layers: content, padding, border, and margin. The example below shows all four on screen — edit the values and watch the box change.
 
-## The Four Layers
+## The four layers
 
-Each element's box has four layers, from inside to outside:
+Try changing `padding`, `border`, and `margin` to see exactly what each layer does. The blue area is the element background — it covers content and padding but not margin.
 
-```text
-┌─────────────────────────────────────┐
-│              MARGIN                 │  ← transparent space outside the border
-│  ┌───────────────────────────────┐  │
-│  │           BORDER              │  │  ← the visible edge (can have width/colour)
-│  │  ┌─────────────────────────┐  │  │
-│  │  │        PADDING          │  │  │  ← space between border and content
-│  │  │  ┌───────────────────┐  │  │  │
-│  │  │  │      CONTENT      │  │  │  │  ← text, images, child elements
-│  │  │  └───────────────────┘  │  │  │
-│  │  └─────────────────────────┘  │  │
-│  └───────────────────────────────┘  │
-└─────────────────────────────────────┘
+```html
+<div id="box">Content</div>
+<div id="neighbour">Neighbour element</div>
 ```
 
 ```css
-div {
-  content: /* controlled by width and height */;
-  padding: 16px;       /* inside the border */
-  border: 2px solid #334155;
-  margin: 24px;        /* outside the border */
+#box {
+  width: 200px;
+  padding: 24px;
+  border: 4px solid #3b82f6;
+  margin: 32px;
+  background: #1e293b;
+  color: #e2e8f0;
+  font-family: system-ui;
+}
+#neighbour {
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 12px;
+  font-family: system-ui;
+  font-size: 13px;
 }
 ```
+
+Notice: the margin area is transparent — you can see the page background through it. The padding area has the same blue-grey background as the content. That is the defining difference between them.
 
 **CS lens:** This is a compositional data structure. Each box nests inside the next. The browser lays out the page by computing these four values for every element and placing the resulting rectangles in space.
 
-## Default Box Sizing
+## The content-box sizing trap
 
-By default, `width` and `height` set the size of the **content box only**. Padding and border are added on top.
+By default, `width` sets the content area only. Padding and border are added on top — so your box ends up wider than declared. Change `width` to `200px` and calculate what actually renders.
+
+```html
+<div id="trap">I declared width: 200px</div>
+<div id="ruler" style="display:flex;margin-top:4px;">
+  <div style="width:200px;height:4px;background:#3b82f6;"></div>
+  <div style="width:48px;height:4px;background:#ef4444;"></div>
+</div>
+<p id="label">Blue = 200px declared. Red = 48px added by padding+border.</p>
+```
 
 ```css
-.box {
-  width: 300px;
+#trap {
+  width: 200px;
   padding: 20px;
-  border: 2px solid #3b82f6;
+  border: 4px solid #6366f1;
+  background: #1e293b;
+  color: #e2e8f0;
+  font-family: system-ui;
 }
+#label { color: #94a3b8; font-family: system-ui; font-size: 13px; margin: 4px 0; }
 ```
 
-```text
-Total rendered width:
-  300px (content)
-+ 20px left padding + 20px right padding
-+ 2px left border  + 2px right border
-= 344px
-```
+Total rendered width: 200 + 20 + 20 + 4 + 4 = **248px**. This surprises every developer the first time.
 
-This surprises nearly every developer the first time. You say `width: 300px` but the element is 344px wide.
-
-## Margin vs Padding
-
-Both create space, but in different places:
-
-```css
-.card {
-  padding: 24px;  /* space INSIDE the card — part of the card's background */
-  margin: 16px;   /* space OUTSIDE the card — transparent, shows parent background */
-}
-```
-
-```text
-padding: 24px  → background-color fills the padded area
-margin: 16px   → always transparent (shows parent/body background)
-```
-
-## The DevTools Box Model Inspector
-
-Every browser's DevTools has a visual box model inspector. Select an element, look at the "Computed" tab (Chrome/Edge) or "Box Model" panel (Firefox), and you see the actual content/padding/border/margin values as a diagram.
-
-**SE lens:** When a layout behaves unexpectedly, the first step is always to open DevTools and inspect the box model. Wrong element size almost always means unexpected padding, border, or margin — not a CSS logic error.
+**SE lens:** When a layout behaves unexpectedly, the first step is always to open DevTools and inspect the box model. Wrong element size almost always means unexpected padding, border, or margin. Open DevTools now, select `#trap`, and look at the box model diagram in the Computed tab.
 
 **Common mistakes:**
-- Thinking `width: 300px` means the element is 300px on screen — by default it is 300px *content* plus padding plus border.
-- Confusing padding and margin: padding has the element's background-color; margin is always transparent. If a space has the background color, it is padding. If it is transparent, it is margin.
+- Thinking `width: 200px` means the element is 200px on screen — by default it is 200px *content* plus padding plus border.
+- Confusing padding and margin: padding has the element's background-color; margin is always transparent.
 - Forgetting that `background-color` fills the padding area but NOT the margin area.
 
-**Debug tip:** Open DevTools → Elements → select any element → look at the box at the bottom of the Computed tab. It shows the exact pixel values for content, padding, border, and margin in the classic nested-box diagram. Hover over each box to highlight that layer on the page.
+**Debug tip:** Open DevTools → Elements → select any element → look at the box at the bottom of the Computed tab. It shows exact pixel values for content, padding, border, and margin. Hover over each region to highlight that layer on the page.
 
-**Next:** `box-sizing: border-box` — a single line that makes the width and height properties mean what you actually want them to mean.
+**Next:** `box-sizing: border-box` — a single line that makes `width` and `height` mean what you actually want.
 
 ## Challenge: box_model
 
@@ -98,7 +85,7 @@ Apply box model properties to `#box` so the tests pass.
 
 1. Set `width` to `200px`
 2. Set `padding` to `20px` on all sides
-3. Set `border` width to `4px` solid `rgb(59, 130, 246)`
+3. Set `border` to `4px solid rgb(59, 130, 246)`
 4. Set `margin` to `32px` on all sides
 
 ```html

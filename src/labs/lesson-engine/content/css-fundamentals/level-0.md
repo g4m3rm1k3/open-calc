@@ -11,90 +11,96 @@ HTML describes **what** is on the page — headings, paragraphs, links, images. 
 
 ## A Rule
 
-CSS is made of **rules**. Each rule says: "find these elements, and apply these styles to them."
+CSS is made of **rules**. Each rule says: "find these elements, and apply these styles to them." Here a single rule turns every `<p>` blue at 18px. Edit the values and watch the paragraph update live.
 
-```css
-p {
-  color: blue;
-  font-size: 18px;
-}
+```html
+<p>Every paragraph on the page now has blue text at 18 pixels.</p>
+<p>This paragraph gets the same rule — selectors are broad.</p>
 ```
 
-```text
-Every <p> element on the page now has blue text at 18 pixels.
+```css
+body { background: #0f172a; padding: 24px; }
+p {
+  color: #60a5fa;
+  font-size: 18px;
+  font-family: system-ui;
+}
 ```
 
 A rule has two parts:
 - **Selector** — `p` — identifies which elements to target
-- **Declaration block** — `{ color: blue; font-size: 18px; }` — the styles to apply
+- **Declaration block** — `{ color: #60a5fa; font-size: 18px; }` — the styles to apply
 
-Inside the block, each line is a **declaration**:
-- `color: blue;` — the **property** (`color`) and the **value** (`blue`), separated by a colon, ended with a semicolon
-- `font-size: 18px;` — another declaration
+Inside the block, each line is a **declaration**: a **property** and a **value**, separated by a colon, ended with a semicolon.
 
-**CS lens:** CSS is declarative — you describe the desired outcome, not the steps to achieve it. The browser's rendering engine (layout engine) reads your rules and decides how to apply them. You never tell the browser "loop through all paragraphs and set their color" — you describe the end state and the browser handles the rest.
+**CS lens:** CSS is declarative — you describe the desired outcome, not the steps to achieve it. The browser's rendering engine reads your rules and decides how to apply them. You never tell the browser "loop through all paragraphs and set their color" — you describe the end state and the browser handles the rest.
 
 ## Connecting CSS to HTML
 
-There are three ways to deliver CSS to a browser:
+There are three ways to deliver CSS to a browser. The `<style>` block in the `<head>` is the most common approach for demos. Edit the colour below and see all three headings respond.
 
 ```html
-<!-- 1. External stylesheet (recommended) -->
-<link rel="stylesheet" href="styles.css">
-
-<!-- 2. Style block in the document -->
-<style>
-  p { color: blue; }
-</style>
-
-<!-- 3. Inline style on an element -->
-<p style="color: blue;">Hello</p>
+<h1>External stylesheet would load from styles.css</h1>
+<h2>Style block in the &lt;head&gt; — most common for demos</h2>
+<p style="color: #f59e0b; font-family: system-ui;">Inline style — only affects this element</p>
 ```
 
-The external stylesheet (`<link>`) is what professional projects use. The styles live in a separate `.css` file, so one stylesheet can control thousands of pages. The `<style>` block is common in small demos and prototypes. Inline styles are the last resort — they mix presentation with structure and are hard to maintain.
+```css
+body { background: #0f172a; padding: 24px; }
+h1 { color: #818cf8; font-family: system-ui; font-size: 1.5rem; }
+h2 { color: #6ee7b7; font-family: system-ui; font-size: 1.2rem; }
+```
 
-**SE lens:** Separating CSS from HTML is the same principle as separating concerns in any software system. The HTML file describes content (what); the CSS file describes presentation (how). You can redesign the entire look of a site by swapping one CSS file without touching a single HTML file.
+The external stylesheet (`<link rel="stylesheet" href="styles.css">`) is what professional projects use — one stylesheet controls thousands of pages. Inline styles are the last resort: they mix presentation with structure and can't be reused.
+
+**SE lens:** Separating CSS from HTML is the same principle as separating concerns in any software system. You can redesign the entire look of a site by swapping one CSS file without touching a single HTML file.
 
 ## Properties and Values
 
-A property is a visual attribute the browser understands. A value is a valid setting for that property.
+A property is a visual attribute the browser understands. A value is a valid setting for that property. This single `h1` rule uses six properties simultaneously — edit any value to see it change.
+
+```html
+<h1>CSS Controls Everything</h1>
+```
 
 ```css
+body { background: #0f172a; padding: 24px; }
 h1 {
   color: crimson;
-  background-color: #f0f4ff;
-  font-size: 32px;
+  background-color: #1e293b;
+  font-size: 2rem;
   font-weight: bold;
   text-align: center;
   padding: 16px;
+  border-radius: 8px;
+  font-family: system-ui;
 }
-```
-
-```text
-color: crimson          — text colour (named colour)
-background-color: #f0f4ff — background fill (hex colour)
-font-size: 32px         — text height in pixels
-font-weight: bold       — thickness of the text strokes
-text-align: center      — horizontal alignment within the element
-padding: 16px           — space between the text and the element's edges
 ```
 
 CSS has hundreds of properties. Learning CSS is not memorising them all — it is building a mental model of which category of property to reach for, then looking up the exact syntax.
 
 ## The Browser's Default Stylesheet
 
-Before you write a single line of CSS, the browser already applies its own styles. These are called **user-agent styles** or **browser defaults**.
+Before you write a single line of CSS, the browser already applies its own styles. Below shows the browser defaults for common elements — the `<h1>` is large and bold, the `<a>` is blue and underlined. Add your own overrides to beat those defaults.
 
-```text
-<h1>  → font-size: 2em; font-weight: bold; margin: 0.67em 0
-<p>   → display: block; margin-top: 1em; margin-bottom: 1em
-<a>   → color: #0000ee; text-decoration: underline
-<ul>  → list-style-type: disc; padding-left: 40px
+```html
+<h1>Browser gives me bold and 2em size</h1>
+<p>Browser gives me block display and 1em top/bottom margins.</p>
+<a href="#">Browser gives me blue colour and underline</a>
+<ul>
+  <li>Browser gives me disc bullets and left padding</li>
+  <li>Override any of these with your own rules</li>
+</ul>
 ```
 
-Every style you write either adds to or **overrides** these defaults. When a CSS property behaves unexpectedly, checking the browser's DevTools "Computed" panel shows you which rule is actually applying — your rule, a browser default, or something inherited.
+```css
+body { background: #0f172a; color: #e2e8f0; padding: 24px; font-family: system-ui; }
+/* Try adding: h1 { color: #818cf8; } to override the default */
+```
 
-**CS lens:** The browser's default stylesheet is a real CSS file. In Chromium it is called `html.css`; in Firefox, `html.css` and `forms.css`. Many professional projects start by applying a **CSS reset** — a short stylesheet that zeroes out browser defaults so every browser starts from the same baseline.
+Every style you write either adds to or **overrides** these defaults. When a CSS property behaves unexpectedly, checking the browser's DevTools "Computed" panel shows which rule is actually applying — your rule, a browser default, or something inherited.
+
+**CS lens:** The browser's default stylesheet is a real CSS file. In Chromium it is called `html.css`. Many professional projects start by applying a **CSS reset** — a short stylesheet that zeroes out browser defaults so every browser starts from the same baseline.
 
 ## Challenge: first_rule
 

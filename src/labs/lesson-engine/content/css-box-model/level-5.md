@@ -7,93 +7,89 @@ lang: css
 
 # Display — Block, Inline, Inline-Block
 
-The `display` property controls how an element participates in the document flow. It determines whether the element takes up full width, flows with text, or sits somewhere in between.
+The `display` property controls how an element participates in document flow. It determines whether the element takes up full width, flows with text, or sits somewhere in between.
 
-## Block Elements
+## Block vs inline — see the difference
+
+Same content, different `display` values. Change `display` between `block` and `inline` on `#b` to see the layout shift.
+
+```html
+<div id="a">Block A — full width, stacks vertically</div>
+<div id="b">Block B — stacks below A even though there's room beside it</div>
+<br>
+<span id="c">Inline C</span>
+<span id="d">Inline D — flows right beside C</span>
+<span id="e">Inline E — wraps when the line fills</span>
+```
 
 ```css
-div, p, h1, section { display: block; }
+#a, #b { background: #3b82f6; color: white; padding: 10px; margin-bottom: 4px; font-family: system-ui; }
+#c, #d, #e { background: #10b981; color: white; padding: 4px 8px; font-family: system-ui; }
 ```
 
-```text
-Block elements:
-• Take up the FULL width of their parent by default
-• Start on a NEW LINE (they stack vertically)
-• Accept width, height, margin, and padding on ALL sides
+**CS lens:** A block element generates a block-level box. The block formatting context means block boxes stack vertically. Their width defaults to 100% of the containing block. Inline elements generate inline-level boxes that flow in a line box.
+
+## Width and height are ignored on inline elements
+
+Try setting `width: 200px` and `height: 60px` on the `span` — nothing changes. Inline elements size to their content only.
+
+```html
+<p>Text before <span id="tag">I am inline — width and height do nothing</span> text after continues here without a break.</p>
 ```
-
-`div`, `p`, `h1`–`h6`, `ul`, `li`, `header`, `footer`, `section` are block by default.
-
-**CS lens:** A block element generates a **block-level box** in the normal flow. The block formatting context means block boxes stack vertically, each on its own line. Their width defaults to 100% of the containing block.
-
-## Inline Elements
 
 ```css
-span, a, strong, em { display: inline; }
+p    { color: #e2e8f0; font-family: system-ui; background: #1e293b; padding: 12px; }
+#tag { background: #6366f1; color: white; padding: 4px 8px; width: 300px; height: 60px; /* these have no effect */ }
 ```
 
-```text
-Inline elements:
-• Flow WITH text — they do not break to a new line
-• Width and height have NO EFFECT
-• Top/bottom margin and padding are applied but do not push adjacent lines apart
-• Left/right margin and padding work normally
-```
+## inline-block — flows like text, sizes like a block
 
-`span`, `a`, `strong`, `em`, `img`, `button` are inline by default (with some caveats for `img` and `button`).
+`inline-block` combines both: sits in a line like inline, but accepts `width`, `height`, and all sides of `margin`/`padding` like block. This is how badge and tag components work.
+
+```html
+<p id="prose">
+  Status: <span class="tag green">Active</span>
+  Role: <span class="tag blue">Admin</span>
+  Plan: <span class="tag purple">Pro</span>
+  These sit inline with the text and wrap naturally.
+</p>
+```
 
 ```css
-/* This does nothing for inline elements */
-span {
-  width: 200px;  /* ignored */
-  height: 50px;  /* ignored */
-}
+#prose   { color: #e2e8f0; font-family: system-ui; background: #1e293b; padding: 16px; line-height: 2; }
+.tag     { display: inline-block; padding: 2px 10px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
+.green   { background: #10b981; color: white; }
+.blue    { background: #3b82f6; color: white; }
+.purple  { background: #6366f1; color: white; }
 ```
 
-## Inline-Block
+## display: none vs visibility: hidden
 
-`display: inline-block` combines the best of both:
+`none` removes the element from layout entirely. `visibility: hidden` hides it but keeps its space. Edit both and watch what happens to the surrounding elements.
+
+```html
+<div id="a">Box A</div>
+<div id="b">Box B — I am hidden but my space is reserved</div>
+<div id="c">Box C — watch where I end up depending on how B is hidden</div>
+```
 
 ```css
-.tag {
-  display: inline-block;
-  padding: 4px 12px;
-  background: #334155;
-  border-radius: 4px;
-}
+#a, #b, #c { padding: 16px; margin-bottom: 8px; font-family: system-ui; color: white; }
+#a { background: #3b82f6; }
+#b { background: #6366f1; visibility: hidden; /* try: display: none */ }
+#c { background: #10b981; }
 ```
 
-```text
-Inline-block elements:
-• Flow with text (like inline)
-• Accept width, height, and ALL margin/padding (like block)
-```
-
-This is how you make little badges, tags, and pill buttons that sit in a line but have height and padding.
-
-## none vs hidden
-
-```css
-.hidden-element   { display: none; }    /* removed from layout entirely */
-.invisible-element { visibility: hidden; } /* invisible but KEEPS its space */
-```
-
-```text
-display: none         → element takes up NO space, other elements fill the gap
-visibility: hidden    → element is invisible but its box STILL OCCUPIES SPACE
-opacity: 0            → element is invisible but STILL INTERACTABLE (pointer events, focus)
-```
-
-**SE lens:** `display: none` is the standard toggle for showing/hiding UI. Frameworks like React use it under the hood (or unmount the node entirely). `visibility: hidden` is useful when you want to hide content without causing layout shifts — e.g., hiding a loading skeleton that is replaced by real content at the same size.
+**SE lens:** `display: none` is the standard toggle for showing/hiding UI. `visibility: hidden` is useful when you want to hide content without causing layout shifts — e.g., hiding a placeholder at the same size as content that will load in.
 
 **Common mistakes:**
-- Setting `width` and `height` on an `inline` element and expecting them to apply — they are ignored. Switch to `display: inline-block` or `block`.
-- Using `display: inline-block` for navigation items and getting unexpected gaps between them — whitespace in the HTML source (newlines, spaces) creates a small gap between inline-block elements. Fix with `font-size: 0` on the parent, flexbox, or by removing the HTML whitespace.
-- Thinking `display: none` is for accessibility hiding — screen readers also ignore `display: none`. Use `visually-hidden` utility classes (position absolute, 1px clip) to hide content visually while keeping it accessible to screen readers.
+- Setting `width` and `height` on an `inline` element expecting them to apply — switch to `display: inline-block` or `block`.
+- Using `inline-block` for nav items and getting unexpected gaps — whitespace in HTML source creates small gaps. Fix with flexbox or `font-size: 0` on the parent.
+- Using `display: none` for accessibility hiding — screen readers also ignore it. Use a visually-hidden class for content that should be hidden visually but read by screen readers.
 
-**Debug tip:** In DevTools, elements with `display: none` appear dimmed in the Elements panel. The Computed tab shows `display: none` for the element. To temporarily reveal a hidden element, select it and uncheck the `display` property in the Styles panel.
+**Debug tip:** In DevTools, elements with `display: none` appear dimmed in the Elements panel. To temporarily reveal a hidden element, select it and uncheck the `display` property in the Styles panel.
 
-**Next:** Sizing constraints — `min-width`, `max-width`, `clamp()`, and `aspect-ratio` — making elements responsive without media queries.
+**Next:** Sizing constraints — `min-width`, `max-width`, `clamp()` — making elements responsive without media queries.
 
 ## Challenge: display
 

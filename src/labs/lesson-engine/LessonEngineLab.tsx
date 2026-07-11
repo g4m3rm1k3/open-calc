@@ -96,6 +96,25 @@ import cssLayoutLevel5 from './content/css-layout/level-5.md?raw'
 import cssLayoutLevel6 from './content/css-layout/level-6.md?raw'
 import cssLayoutLevel7 from './content/css-layout/level-7.md?raw'
 
+import cssGridLevel0 from './content/css-grid/level-0.md?raw'
+import cssGridLevel1 from './content/css-grid/level-1.md?raw'
+import cssGridLevel2 from './content/css-grid/level-2.md?raw'
+import cssGridLevel3 from './content/css-grid/level-3.md?raw'
+import cssGridLevel4 from './content/css-grid/level-4.md?raw'
+import cssGridLevel5 from './content/css-grid/level-5.md?raw'
+import cssGridLevel6 from './content/css-grid/level-6.md?raw'
+import cssGridLevel7 from './content/css-grid/level-7.md?raw'
+
+import cssFlexLevel0 from './content/css-flexbox/level-0.md?raw'
+import cssFlexLevel1 from './content/css-flexbox/level-1.md?raw'
+import cssFlexLevel2 from './content/css-flexbox/level-2.md?raw'
+import cssFlexLevel3 from './content/css-flexbox/level-3.md?raw'
+import cssFlexLevel4 from './content/css-flexbox/level-4.md?raw'
+import cssFlexLevel5 from './content/css-flexbox/level-5.md?raw'
+import cssFlexLevel6 from './content/css-flexbox/level-6.md?raw'
+import cssFlexLevel7 from './content/css-flexbox/level-7.md?raw'
+import cssFlexLevel8 from './content/css-flexbox/level-8.md?raw'
+
 import cssLevel0 from './content/css-fundamentals/level-0.md?raw'
 import cssLevel1 from './content/css-fundamentals/level-1.md?raw'
 import cssLevel2 from './content/css-fundamentals/level-2.md?raw'
@@ -222,6 +241,23 @@ const LESSON_FILES: Record<string, string> = {
   'css-layout/level-5.md': cssLayoutLevel5,
   'css-layout/level-6.md': cssLayoutLevel6,
   'css-layout/level-7.md': cssLayoutLevel7,
+  'css-grid/level-0.md': cssGridLevel0,
+  'css-grid/level-1.md': cssGridLevel1,
+  'css-grid/level-2.md': cssGridLevel2,
+  'css-grid/level-3.md': cssGridLevel3,
+  'css-grid/level-4.md': cssGridLevel4,
+  'css-grid/level-5.md': cssGridLevel5,
+  'css-grid/level-6.md': cssGridLevel6,
+  'css-grid/level-7.md': cssGridLevel7,
+  'css-flexbox/level-0.md': cssFlexLevel0,
+  'css-flexbox/level-1.md': cssFlexLevel1,
+  'css-flexbox/level-2.md': cssFlexLevel2,
+  'css-flexbox/level-3.md': cssFlexLevel3,
+  'css-flexbox/level-4.md': cssFlexLevel4,
+  'css-flexbox/level-5.md': cssFlexLevel5,
+  'css-flexbox/level-6.md': cssFlexLevel6,
+  'css-flexbox/level-7.md': cssFlexLevel7,
+  'css-flexbox/level-8.md': cssFlexLevel8,
   'css-fundamentals/level-0.md': cssLevel0,
   'css-fundamentals/level-1.md': cssLevel1,
   'css-fundamentals/level-2.md': cssLevel2,

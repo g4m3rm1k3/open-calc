@@ -7,62 +7,62 @@ lang: css
 
 # The Cascade
 
-When two CSS rules target the same element and set the same property, something has to decide which one wins. That something is the **cascade** — the algorithm the browser uses to sort competing declarations and choose one. Cascade is not random; it is a deterministic priority system with four layers. Understanding it means never again wondering "why isn't my style applying?"
+When two CSS rules target the same element and set the same property, something has to decide which one wins. That something is the **cascade** — the algorithm the browser uses to sort competing declarations and choose one. Cascade is not random; it is a deterministic priority system. Understanding it means never again wondering "why isn't my style applying?"
 
 ## The Four Cascade Layers (in priority order)
 
-The cascade resolves conflicts by checking, in order:
+The cascade resolves conflicts by checking in order: origin & importance, specificity, then source order. Here two rules compete for the same `<p>` — they are from the same origin so specificity decides. `.note` (class, b=1) beats `p` (type, c=1).
 
-```text
-1. Origin & importance   — where did the rule come from, and is it !important?
-2. Specificity           — how targeted is the selector?
-3. Source order          — which rule comes later in the stylesheet?
-4. Inheritance           — (only if no rule wins in 1–3)
+```html
+<p class="note">I have class="note" — the class rule wins over the type rule.</p>
+<p>No class — only the type rule applies. Colour is slate.</p>
 ```
 
-Higher layers override lower layers completely. A more specific selector does not matter if a `!important` from a different origin already won.
+```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+/* Type selector — lowest specificity */
+p { color: #94a3b8; font-size: 16px; margin: 8px 0; }
+/* Class selector — beats type when both apply */
+.note { color: #818cf8; font-weight: 600; }
+```
+
+Higher cascade layers override lower layers completely. A more specific selector does not matter if `!important` from a different origin already won.
 
 ## Layer 1 — Origin
 
-CSS rules come from three origins, in priority order from lowest to highest (for normal rules):
+CSS rules come from three origins. Author styles (your stylesheet) beat browser defaults (user-agent). Here `.paragraph` overrides the browser's built-in `p { color: black; margin: 1em 0 }` without any special tricks — author rules simply win.
 
-```text
-1. User-agent (browser defaults)  — lowest
-2. User styles                    — middle (user's browser preferences)
-3. Author (your stylesheet)       — highest
+```html
+<p class="paragraph">Author rule wins — overrides browser default black and margin.</p>
+<h1 class="heading">Author rule also wins over browser's bold/2em default.</h1>
+<a href="#" class="link">Author rule overrides browser's blue underline default.</a>
 ```
 
-For `!important` rules, the order **reverses** (user-agent `!important` beats author `!important`). This protects accessibility settings — if a user forces large fonts via their browser, no author stylesheet can override that preference.
+```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+.paragraph { color: #6ee7b7; margin: 0 0 12px; font-size: 15px; }
+.heading   { color: #818cf8; font-size: 1.5rem; font-weight: 500; margin: 0 0 12px; }
+.link      { color: #f59e0b; text-decoration: none; font-size: 15px; }
+```
 
-In practice, you write author styles. The browser default's lower priority is why your `color: red` on `p` beats the browser's built-in `p { color: black }`.
+For `!important` rules, the origin order **reverses** — user-agent `!important` beats author `!important`. This protects accessibility settings — if a user forces large fonts via their browser, no author stylesheet can override that preference.
 
 ## Layer 2 — Specificity
 
-Within the same origin, specificity determines which selector wins. Specificity is a three-part score (a, b, c):
-
-```text
-a = number of ID selectors (#)
-b = number of class selectors (.), attribute selectors ([attr]), pseudo-classes (:hover)
-c = number of type selectors (p, div), pseudo-elements (::before)
-```
-
-Examples:
-
-```css
-p                { color: black; }   /* (0,0,1) — type */
-.note            { color: blue;  }   /* (0,1,0) — class */
-p.note           { color: green; }   /* (0,1,1) — type + class */
-#intro           { color: red;   }   /* (1,0,0) — ID */
-#intro.note      { color: orange;}   /* (1,1,0) — ID + class */
-```
+Within the same origin, specificity determines which selector wins. Specificity is a three-part score (a, b, c): `a` = IDs, `b` = classes/attributes/pseudo-classes, `c` = type selectors. The `#intro` rule here has a=1 and wins over all others.
 
 ```html
-<p id="intro" class="note">What colour am I?</p>
+<p id="intro" class="note">What colour am I? — Orange, because #intro.note (1,1,0) wins.</p>
+<p class="note">I have class="note" but no ID — green (0,1,0).</p>
+<p>I have no class or ID — black type selector (0,0,1).</p>
 ```
 
-```text
-Competing: (0,0,1)=black, (0,1,0)=blue, (0,1,1)=green, (1,0,0)=red, (1,1,0)=orange
-Highest a-count wins: (1,1,0) orange. Colour is orange.
+```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+p              { color: #e2e8f0; margin: 8px 0; }     /* (0,0,1) */
+.note          { color: #6ee7b7; }                     /* (0,1,0) */
+#intro         { color: #f59e0b; }                     /* (1,0,0) */
+#intro.note    { color: #fb923c; }                     /* (1,1,0) — wins */
 ```
 
 Comparison is done left-to-right: a higher `a` always beats any `b` or `c`. Only if `a` is equal do you compare `b`, and only if both are equal do you compare `c`.
@@ -71,41 +71,55 @@ Comparison is done left-to-right: a higher `a` always beats any `b` or `c`. Only
 
 ## Layer 3 — Source Order
 
-When origin and specificity are equal, the **later** rule wins:
+When origin and specificity are equal, the **later** rule wins. Both rules below are type selectors (`p`) with the same specificity — the second one wins because it appears later in the stylesheet.
 
-```css
-p { color: red;  }   /* declared first */
-p { color: blue; }   /* declared second — wins */
+```html
+<p>Both rules target me. The second one (blue) wins because it appears last.</p>
+<p class="override">But a class selector beats both — specificity wins over source order.</p>
 ```
 
-This is why the order of your CSS rules matters. In a large stylesheet, rules for specific components at the bottom of the file will override general rules at the top, which is usually what you want.
+```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+p { color: #f87171; margin: 8px 0; }  /* declared first — loses */
+p { color: #60a5fa; }                  /* declared later — wins on source order */
+.override { color: #6ee7b7; }          /* class > type — specificity beats source order */
+```
+
+This is why the order of your CSS rules matters. Rules for specific components at the bottom of the file will override general rules at the top — which is usually what you want.
 
 ## !important — Escaping the Cascade
 
-`!important` bypasses the normal cascade priority and promotes a declaration to the highest priority within its origin:
+`!important` bypasses the normal cascade priority and promotes a declaration to the highest priority within its origin. Here the `.error !important` rule wins even though `#special` has higher specificity normally.
 
-```css
-.error {
-  color: red !important; /* wins over any non-!important rule, regardless of specificity */
-}
-
-#special-case {
-  color: green; /* loses to .error's !important, even though ID > class normally */
-}
+```html
+<p id="special" class="error">I should be red because .error uses !important — even though #special normally wins.</p>
+<p class="error">Normal case — !important works here too.</p>
+<p id="special">ID wins normally here — no !important to beat it.</p>
 ```
 
-`!important` is not a tool to use regularly. It signals "this must always win" — a decision that creates future maintenance problems when you need to override it (you'd need another `!important` with equal or higher origin). Reserve it for utility classes that must always apply, and accessibility overrides.
+```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+p { color: #e2e8f0; margin: 8px 0; }
+#special { color: #6ee7b7; }                  /* (1,0,0) — normally wins */
+.error   { color: #f87171 !important; }        /* !important — beats ID */
+```
+
+`!important` is not a tool to use regularly. It signals "this must always win" — a decision that creates future maintenance problems. Reserve it for utility classes that must always apply, and accessibility overrides.
 
 ## Practical Debugging
 
-When a style is not applying:
+When a style is not applying, open DevTools → Elements → Styles. Losing rules appear struck through. Here three rules compete — look at the one that would be struck through in DevTools.
 
-```text
-1. Open browser DevTools → Elements → Computed
-2. Find the property that is wrong
-3. Look at which rule is shown with strikethrough — that rule lost the cascade
-4. Click the rule to see its selector and specificity
-5. Find what is overriding it and why
+```html
+<p id="debug-me" class="info">Open DevTools and select me to see which rules win and which are struck through.</p>
+```
+
+```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+/* These three all target #debug-me — only one can win per property */
+p        { color: #94a3b8; font-size: 14px; }        /* lowest — struck through */
+.info    { color: #60a5fa; font-size: 16px; }        /* medium — font-size wins here */
+#debug-me { color: #6ee7b7; }                         /* highest — color wins here */
 ```
 
 The Computed panel shows the winning value; the Styles panel shows all competing rules, with losing ones struck through. This is the fastest path from "why isn't this working?" to "oh, that's why."

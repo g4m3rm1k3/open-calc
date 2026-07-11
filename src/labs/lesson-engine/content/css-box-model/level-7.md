@@ -9,104 +9,94 @@ lang: css
 
 When elements overlap on screen, the browser needs rules to decide which one appears on top. `z-index` controls the stacking order — but it only works within a **stacking context**, which is where most z-index bugs come from.
 
-## z-index Basics
+## z-index controls paint order
 
-```css
-.modal   { z-index: 1000; }
-.overlay { z-index: 999; }
-.content { z-index: 1; }
-```
+Higher z-index paints on top. But z-index only works on positioned elements. Change the z-index values on `#a`, `#b`, `#c` and watch the stack order change.
 
-```text
-Higher z-index → closer to the viewer (painted on top)
-z-index only works on POSITIONED elements (position: relative/absolute/fixed/sticky)
-z-index has NO EFFECT on position: static (the default)
-```
-
-```css
-/* This does nothing — element is not positioned */
-div { z-index: 999; }
-
-/* This works */
-div { position: relative; z-index: 999; }
-```
-
-## Stacking Contexts
-
-A stacking context is an isolated group of elements that stack relative to each other. A child's `z-index` only competes within its own stacking context — never against elements in a parent or sibling context.
-
-```text
-Stacking context is created by:
-• position: relative/absolute/fixed/sticky + z-index (other than auto)
-• opacity < 1
-• transform, filter, perspective
-• isolation: isolate
-• will-change: transform (or other composited properties)
+```html
+<div id="stage">
+  <div id="a">A — z-index: 1</div>
+  <div id="b">B — z-index: 3 (on top)</div>
+  <div id="c">C — z-index: 2</div>
+</div>
 ```
 
 ```css
-.parent {
-  position: relative;
-  z-index: 10;  /* creates a stacking context */
-}
-
-.child {
-  position: relative;
-  z-index: 9999;  /* only stacks within .parent — cannot exceed .parent's z-index */
-}
-
-.sibling {
-  position: relative;
-  z-index: 11;  /* beats .parent AND everything in it, regardless of child z-index */
-}
+#stage { position: relative; height: 120px; background: #0f172a; }
+#a { position: absolute; top: 10px; left: 10px; width: 160px; height: 80px; background: #3b82f6; color: white; z-index: 1; display: flex; align-items: center; justify-content: center; font-family: system-ui; border-radius: 6px; }
+#b { position: absolute; top: 30px; left: 80px; width: 160px; height: 80px; background: #6366f1; color: white; z-index: 3; display: flex; align-items: center; justify-content: center; font-family: system-ui; border-radius: 6px; }
+#c { position: absolute; top: 50px; left: 150px; width: 160px; height: 80px; background: #ec4899; color: white; z-index: 2; display: flex; align-items: center; justify-content: center; font-family: system-ui; border-radius: 6px; }
 ```
 
-**CS lens:** Stacking contexts form a tree that mirrors the DOM hierarchy. A child's `z-index: 9999` means "9999 within my parent context." It cannot escape its parent context. This is why a tooltip inside a transformed parent can appear beneath an unrelated modal.
+**CS lens:** Stacking contexts form a tree that mirrors the DOM hierarchy. A child's `z-index: 9999` means "9999 within my parent context." It cannot escape its parent context.
 
-## The z-index Bug Pattern
+## The z-index 9999 trap — why it still loses
 
-The classic bug: "I set `z-index: 9999` and my dropdown still appears under the header."
+The classic bug. `#dropdown` is inside `#header` which has its own stacking context. The dropdown's z-index is compared within that context, not against `#modal`. Change `#header`'s `z-index` to `20` and watch the dropdown win.
+
+```html
+<div id="header">
+  Header
+  <div id="dropdown">Dropdown — z-index: 9999 but trapped inside header</div>
+</div>
+<div id="modal">Modal — z-index: 10 but wins because it's outside header's context</div>
+```
 
 ```css
-/* header accidentally creates a stacking context */
-header {
-  position: relative;
-  z-index: 2;     /* ← creates a context with z-index 2 */
-  transform: translateZ(0); /* also creates a context */
-}
-
-/* dropdown is in a different section */
-.dropdown {
-  position: absolute;
-  z-index: 9999;  /* ← 9999 within its own context, not compared to header */
-}
+#header   { position: relative; z-index: 5; background: #1e293b; color: #e2e8f0; font-family: system-ui; padding: 12px; height: 40px; }
+#dropdown { position: absolute; top: 40px; left: 8px; z-index: 9999; background: #334155; color: #e2e8f0; padding: 8px 16px; border-radius: 4px; font-size: 13px; width: 200px; }
+#modal    { position: relative; z-index: 10; background: #6366f1; color: white; font-family: system-ui; padding: 16px; margin-top: 48px; border-radius: 8px; }
 ```
 
-```text
-Fix options:
-1. Remove the stacking context from the ancestor
-2. Move the dropdown outside the ancestor (e.g., to document root — React portals)
-3. Give the ancestor a higher z-index than the competing element
+## What creates a stacking context
+
+Many properties trigger a new stacking context. `opacity < 1` is the most surprising one — it silently traps all descendants. Remove `opacity: 0.99` from `#parent` to see `#child` rise above `#outside`.
+
+```html
+<div id="container">
+  <div id="parent">
+    Parent (opacity creates a stacking context)
+    <div id="child">z-index: 100 — trapped by parent's stacking context</div>
+  </div>
+  <div id="outside">z-index: 50 — outside parent, in root context</div>
+</div>
 ```
-
-## isolation: isolate
-
-`isolation: isolate` creates a stacking context without any other visual effect — useful when you want to contain the z-index of children without changing appearance:
 
 ```css
-.card {
-  isolation: isolate; /* children z-index stays inside the card */
-}
+#container { position: relative; height: 120px; background: #0f172a; padding: 8px; font-family: system-ui; }
+#parent    { position: relative; z-index: 1; opacity: 0.99; /* remove this to free #child */ background: #1e293b; color: #e2e8f0; padding: 12px; width: 200px; font-size: 13px; }
+#child     { position: relative; z-index: 100; background: #3b82f6; color: white; padding: 6px; margin-top: 4px; font-size: 12px; }
+#outside   { position: absolute; top: 20px; left: 180px; z-index: 50; background: #ec4899; color: white; padding: 12px; border-radius: 6px; font-size: 13px; }
 ```
 
-**SE lens:** The practical rule: always work with the lowest z-index that solves the problem. High z-index values (`9999`, `99999`) are a sign of fighting the stacking model rather than understanding it. Audit stacking contexts first, then choose the minimal z-index.
+## isolation: isolate — scope without side effects
+
+Creates a stacking context with no visual effect. Use it to contain a component's z-index values so they don't interact with the rest of the page.
+
+```html
+<div id="card-a">
+  Card A (isolated — internal z-index stays inside)
+  <div id="tooltip-a">Tooltip z-index: 100</div>
+</div>
+<div id="card-b">
+  Card B — z-index: 2, beats card-a's context
+</div>
+```
+
+```css
+#card-a    { isolation: isolate; position: relative; background: #1e293b; color: #e2e8f0; padding: 20px; font-family: system-ui; margin-bottom: 4px; z-index: 1; }
+#tooltip-a { position: absolute; top: 0; right: 0; background: #6366f1; color: white; padding: 4px 8px; font-size: 12px; z-index: 100; border-radius: 4px; }
+#card-b    { position: relative; z-index: 2; background: #0f172a; color: #94a3b8; padding: 20px; font-family: system-ui; font-size: 13px; }
+```
+
+**SE lens:** The practical rule: always use the lowest z-index that solves the problem. High values (`9999`, `99999`) are a sign of fighting the stacking model. Audit stacking contexts first, then choose a minimal z-index.
 
 **Common mistakes:**
-- Setting `z-index` on a non-positioned element (`position: static`) and expecting it to work — it has no effect. Position must be `relative`, `absolute`, `fixed`, or `sticky`.
-- Setting `opacity < 1` on a parent and then wondering why the child's z-index can't beat a sibling — `opacity < 1` creates a stacking context that contains the child's z-index.
-- Using high z-index values across many components without a system — when every component uses `z-index: 9999`, nothing works. Use a named z-index scale: `z-dropdown: 100`, `z-modal: 200`, `z-toast: 300`.
+- Setting `z-index` on a non-positioned element (`position: static`) — it has no effect. Position must be `relative`, `absolute`, `fixed`, or `sticky`.
+- Setting `opacity < 1` on a parent and then wondering why the child's z-index can't beat a sibling — `opacity < 1` silently creates a stacking context.
+- Using high z-index values across all components with no system — use a named scale: `--z-dropdown: 100; --z-modal: 200; --z-toast: 300`.
 
-**Debug tip:** Chrome DevTools has a "3D View" in the Layers panel that visualises stacking contexts as literal layers in 3D space. Open DevTools → More Tools → Layers to see which elements create contexts and in what order. It instantly reveals z-index conflicts.
+**Debug tip:** Chrome DevTools has a "3D View" in the Layers panel that visualises stacking contexts as literal 3D layers. Open DevTools → More Tools → Layers to see which elements create contexts and in what order.
 
 **Next series:** CSS Layout — normal flow, positioning (relative/absolute/fixed/sticky), and how elements decide where to place themselves on the page.
 

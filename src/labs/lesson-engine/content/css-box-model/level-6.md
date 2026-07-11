@@ -9,109 +9,89 @@ lang: css
 
 Fixed pixel sizes break on different screen sizes. Percentage sizes can become too small or too large. CSS gives you three functions — `min()`, `max()`, and `clamp()` — that express constraints instead of fixed values.
 
-## min-width, max-width, min-height, max-height
+## max-width — cap growth on large screens
 
-Start with the constraint properties:
+The most common sizing pattern: `width: 100%` so the element fills small screens, `max-width` so it stops growing on wide ones. Resize the browser window and see `#container` stop at 600px.
+
+```html
+<div id="outer">
+  <div id="container">
+    I grow to fill the screen but never exceed 600px
+  </div>
+</div>
+```
 
 ```css
-.container {
-  width: 100%;
-  max-width: 1200px;  /* never wider than 1200px */
-}
-
-.sidebar {
-  width: 300px;
-  min-width: 200px;   /* never narrower than 200px */
-  max-width: 400px;   /* never wider than 400px */
-}
-
-.card {
-  min-height: 120px;  /* tall enough for content minimums */
-  /* no max-height — grows with content */
-}
+#outer     { background: #0f172a; padding: 16px; }
+#container { width: 100%; max-width: 600px; margin: 0 auto; background: #1e293b; color: #e2e8f0; padding: 16px; font-family: system-ui; box-sizing: border-box; }
 ```
 
-```text
-max-width  — sets an upper bound (good for containers on wide screens)
-min-width  — sets a lower bound (good for preventing too-narrow components)
-max-height — use carefully: it can cause overflow if content is taller
+**CS lens:** These functions move sizing from absolute values to relational constraints — the same mental model as min/max in algorithms. `clamp` is equivalent to `max(min, min(preferred, max))`.
+
+## min() and max() — pick from a set of values
+
+`min(a, b)` picks the smaller, `max(a, b)` picks the larger. `min(100%, 600px)` means "use 100% of parent, but never more than 600px" — the same as `width: 100%; max-width: 600px` in one value. Edit the values and see the column resize.
+
+```html
+<div id="page">
+  <div id="col-left">min(100%, 200px)</div>
+  <div id="col-right">min(100%, 400px)</div>
+</div>
 ```
-
-## The min() and max() Functions
-
-CSS functions that pick from a set of values:
 
 ```css
-.column {
-  width: min(100%, 600px);  /* whichever is SMALLER */
-}
-
-.hero {
-  font-size: max(1rem, 2vw); /* whichever is LARGER */
-}
+#page      { display: flex; gap: 8px; background: #0f172a; padding: 12px; }
+#col-left  { width: min(100%, 200px); background: #3b82f6; color: white; padding: 12px; font-family: system-ui; font-size: 13px; box-sizing: border-box; }
+#col-right { width: min(100%, 400px); background: #6366f1; color: white; padding: 12px; font-family: system-ui; font-size: 13px; box-sizing: border-box; }
 ```
 
-```text
-min(a, b)  → takes the smaller value
-max(a, b)  → takes the larger value
+## clamp() — fluid sizing between a min and max
+
+`clamp(min, preferred, max)` grows with the preferred value but clamps to the min/max bounds. The heading below scales with the viewport — resize the window and watch the font size float between 1.25rem and 3rem.
+
+```html
+<div id="hero">
+  <h1 id="title">Fluid Heading</h1>
+  <p id="body-text">Body text also scales fluidly between 14px and 18px.</p>
+</div>
 ```
-
-`min(100%, 600px)` means: "use 100% of the parent, but never more than 600px." This replaces the common `max-width: 600px; width: 100%;` pattern in a single value.
-
-## clamp() — Fluid Sizing
-
-`clamp(minimum, preferred, maximum)` constrains a value within a range:
 
 ```css
-h1 {
-  font-size: clamp(1.5rem, 5vw, 3rem);
-}
-
-.card {
-  padding: clamp(16px, 4%, 32px);
-}
+#hero      { background: #1e293b; padding: clamp(16px, 4vw, 48px); }
+#title     { color: #e2e8f0; font-family: system-ui; margin: 0 0 8px; font-size: clamp(1.25rem, 4vw, 3rem); }
+#body-text { color: #94a3b8; font-family: system-ui; margin: 0; font-size: clamp(14px, 2vw, 18px); }
 ```
 
-```text
-clamp(MIN, PREFERRED, MAX)
-  → if preferred < min: use min
-  → if preferred > max: use max
-  → otherwise: use preferred
+## aspect-ratio — maintain proportions
+
+Set `aspect-ratio: 16 / 9` and the height automatically tracks the width. The old approach required a padding-top hack. Change the width and watch the height follow.
+
+```html
+<div id="video-wrap">
+  <div id="video">16:9 video placeholder — height tracks width automatically</div>
+</div>
+<div id="avatars">
+  <div class="avatar">A</div>
+  <div class="avatar">B</div>
+  <div class="avatar">C</div>
+</div>
 ```
-
-`clamp(1.5rem, 5vw, 3rem)` means: "font-size grows with the viewport (`5vw`), but never below `1.5rem` or above `3rem`." One declaration covers all screen sizes.
-
-**CS lens:** These functions move sizing from absolute values to **relational constraints** — the same mental model as min/max in algorithms. `clamp` is equivalent to `max(min, min(preferred, max))`.
-
-## aspect-ratio
-
-Maintains a width-to-height ratio as the element resizes:
 
 ```css
-.video-embed {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-}
-
-.avatar {
-  width: 48px;
-  aspect-ratio: 1 / 1; /* square */
-}
+#video-wrap { background: #0f172a; padding: 12px; margin-bottom: 12px; }
+#video      { width: 100%; aspect-ratio: 16 / 9; background: #1e293b; color: #94a3b8; font-family: system-ui; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+#avatars    { display: flex; gap: 8px; padding: 4px; }
+.avatar     { width: 48px; aspect-ratio: 1 / 1; background: #6366f1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: system-ui; font-weight: 700; }
 ```
 
-```text
-aspect-ratio: 16 / 9  → height = width × (9/16)
-As width changes, height automatically tracks.
-```
-
-**SE lens:** Before `aspect-ratio`, making a responsive 16:9 video container required a padding-top hack. `aspect-ratio` replaces that pattern entirely and makes intent obvious.
+**SE lens:** Before `aspect-ratio`, making a responsive 16:9 video container required a padding-top hack (padding-top: 56.25%). `aspect-ratio` replaces that entirely and makes intent obvious.
 
 **Common mistakes:**
-- Using `min()` and `max()` with the wrong mental model — `min(100%, 600px)` means "the smaller of 100% and 600px", which caps at 600px. People sometimes confuse it with `max-width` semantics.
-- Passing unitless numbers to `clamp()` — all three values must have compatible units. `clamp(16, 5vw, 32)` is invalid; use `clamp(16px, 5vw, 32px)`.
-- Using `max-height` to constrain growing content — `max-height` can cause overflow if the content is taller. Use `overflow: hidden` or `auto` alongside it.
+- Confusing `min()` mental model — `min(100%, 600px)` picks the *smaller* of the two, capping at 600px. People sometimes read it as "minimum 600px."
+- Passing unitless numbers to `clamp()` — `clamp(16, 5vw, 32)` is invalid; units must be compatible: `clamp(16px, 5vw, 32px)`.
+- Using `max-height` to constrain growing content without handling overflow — if content is taller, it overflows. Add `overflow: hidden` or `auto` alongside it.
 
-**Debug tip:** In DevTools Computed tab, the resolved value of `clamp(1rem, 5vw, 3rem)` is shown as a plain pixel number (e.g., `24px`). Resize the browser window and watch the value update in real time to verify the clamp behaviour.
+**Debug tip:** In DevTools Computed tab, the resolved value of `clamp(1rem, 5vw, 3rem)` shows as a plain pixel number. Resize the browser and watch the value update in real time to verify clamp behaviour.
 
 **Next:** Stacking contexts and `z-index` — why some elements appear above others, and why `z-index: 9999` sometimes does nothing.
 
@@ -119,9 +99,9 @@ As width changes, height automatically tracks.
 
 Apply fluid sizing to make the elements responsive.
 
-1. Set `width: 100%` and `max-width: 500px` on `#container` (the `min(100%, 500px)` pattern)
+1. Set `width: 100%` and `max-width: 500px` on `#container`
 2. Set `min-height` of `#card` to `120px`
-3. Set `padding` of `#card` to `clamp(12px, 3%, 24px)` — test verifies padding is between 12px and 24px inclusive
+3. Set `padding` of `#card` to `clamp(12px, 3%, 24px)`
 4. Set `aspect-ratio` of `#video` to `16 / 9` and `width` to `100%`
 
 ```html

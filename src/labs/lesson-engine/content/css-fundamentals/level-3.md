@@ -11,132 +11,196 @@ Every numeric value in CSS needs a unit. `font-size: 16` is invalid; `font-size:
 
 ## Absolute Units — px
 
-Pixels (`px`) are the only absolute unit you need in everyday CSS. One CSS pixel is not necessarily one physical screen pixel — on a retina display, one CSS pixel maps to 4 physical pixels. The browser handles this conversion.
+Pixels (`px`) are the only absolute unit you need in everyday CSS. One CSS pixel is not necessarily one physical screen pixel — on a retina display, one CSS pixel maps to 4 physical pixels. The browser handles this conversion. Edit `width: 300px` and watch the box resize precisely.
+
+```html
+<div id="box">
+  <p>300px wide, 120px tall, 2px border, 16px padding, 18px text</p>
+</div>
+```
 
 ```css
-.box {
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+#box {
   width: 300px;
-  height: 200px;
+  height: 120px;
   border: 2px solid #3b82f6;
   padding: 16px;
   font-size: 18px;
+  color: #e2e8f0;
+  background: #1e293b;
+  border-radius: 6px;
+  box-sizing: border-box;
 }
 ```
 
-```text
-width: 300px  — always 300 CSS pixels wide, regardless of screen or zoom level
-font-size: 18px — 18px, regardless of the user's browser font preference
-```
+`px` is correct for borders, shadows, and elements that must remain a fixed size. It is **wrong** for font sizes and spacing — those should scale with user preferences.
 
-`px` is predictable and maps directly to your mental model of size. It is correct for borders, shadows, and elements that must remain a fixed size. It is **wrong** for font sizes and spacing — those should scale with user preferences.
-
-**CS lens:** The browser has a "device pixel ratio" (DPR). On a standard screen DPR=1; on retina DPR=2 or 3. When you write `border: 2px`, the browser multiplies by DPR to determine physical pixels. This is why CSS pixel measurements feel consistent across devices even though screen densities vary enormously.
+**CS lens:** The browser has a "device pixel ratio" (DPR). On a standard screen DPR=1; on retina DPR=2 or 3. When you write `border: 2px`, the browser multiplies by DPR to determine physical pixels — so CSS measurements feel consistent across devices even though screen densities vary enormously.
 
 ## Relative Units — em
 
-`em` is relative to the **font size of the current element**:
+`em` is relative to the **font size of the current element**. Here `.parent` is 20px and `.child` is `0.8em` — that means 80% of 20px = 16px. The padding is `1em` which is relative to the child's own resolved font size (16px).
+
+```html
+<div class="parent">
+  Parent: font-size 20px
+  <div class="child">
+    Child: 0.8em = 16px · padding 1em = 16px · margin 0.5em = 8px
+  </div>
+</div>
+```
 
 ```css
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
 .parent {
   font-size: 20px;
+  color: #94a3b8;
+  background: #1e293b;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #334155;
 }
-
 .child {
   font-size: 0.8em;   /* 80% of 20px = 16px */
-  padding: 1em;       /* 1 × 16px = 16px (based on child's own font-size) */
+  padding: 1em;       /* 1 × 16px = 16px */
   margin: 0.5em;      /* 0.5 × 16px = 8px */
+  color: #e2e8f0;
+  background: #0f172a;
+  border-radius: 6px;
 }
 ```
 
-```text
-.parent font-size: 20px
-.child  font-size: 16px   (0.8 × 20)
-.child  padding:   16px   (1 × 16 — child's own font size)
-.child  margin:    8px    (0.5 × 16)
-```
-
-`em` compounds when nested: a `.child` at `0.8em` inside a `.parent` at `0.8em` inside a `body` at `16px` is `16 × 0.8 × 0.8 = 10.24px`. This compounding is the main reason `em` is tricky.
-
-Use `em` for spacing that should scale proportionally with the element's own text size — button padding, icon sizes inside text.
+`em` compounds when nested — a child at `0.8em` inside a parent at `0.8em` is already at 64% of root. Use `em` for spacing that should scale proportionally with the element's own text size.
 
 ## Relative Units — rem
 
-`rem` (root em) is relative to the **root element's** (`<html>`) font size, not the current element's. This eliminates the compounding problem:
+`rem` (root em) is relative to the **root element's** (`<html>`) font size, not the current element's. This eliminates the compounding problem. All three headings compute from the same root — 16px — regardless of where they are in the DOM.
+
+```html
+<div class="outer">
+  Outer div: font-size 24px
+  <h1>h1: 2rem = 32px (always, regardless of parent)</h1>
+  <p>p: 1rem = 16px</p>
+  <div class="inner">
+    Inner div: font-size 12px
+    <h2>h2: 1.5rem = 24px (still from root, not inner)</h2>
+  </div>
+</div>
+```
 
 ```css
-html {
-  font-size: 16px;  /* the root — 1rem = 16px everywhere */
-}
-
-h1 { font-size: 2rem; }    /* 32px */
-p  { font-size: 1rem; }    /* 16px */
-.small { font-size: 0.875rem; } /* 14px */
+html { font-size: 16px; }
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+.outer { font-size: 24px; color: #64748b; background: #1e293b; padding: 16px; border-radius: 8px; }
+.inner { font-size: 12px; color: #64748b; background: #0f172a; padding: 12px; border-radius: 6px; margin-top: 8px; }
+h1 { font-size: 2rem; color: #818cf8; margin: 4px 0; }   /* 32px — always */
+h2 { font-size: 1.5rem; color: #6ee7b7; margin: 4px 0; } /* 24px — always */
+p  { font-size: 1rem; color: #e2e8f0; margin: 4px 0; }   /* 16px — always */
 ```
 
-```text
-2rem is always 2 × root font size — not affected by nesting.
-```
-
-`rem` is the preferred unit for **font sizes and spacing** in modern CSS. If the user changes their browser's base font size (accessibility setting), `rem` values scale proportionally — `px` values do not.
-
-**SE lens:** A common professional pattern: set `html { font-size: 62.5%; }` which makes `1rem = 10px` (62.5% of the browser default 16px). Then `1.6rem = 16px`, `2.4rem = 24px` — the mental arithmetic becomes simple. Many teams instead use a CSS custom property for scale.
+`rem` is the preferred unit for **font sizes and spacing** in modern CSS. If the user changes their browser's base font size, `rem` values scale proportionally — `px` values do not.
 
 ## Percentage — %
 
-Percentage is relative to the **parent element's** corresponding property:
+Percentage is relative to the **parent element's** corresponding property. The two columns are each `50%` of their parent — they always add up to 100% no matter the parent's width.
+
+```html
+<div class="container">
+  <div class="col left">Left: 50% of 500px = 250px</div>
+  <div class="col right">Right: 50% = 250px</div>
+</div>
+<div class="container narrow">
+  <div class="col left">Left: 50% of 300px = 150px</div>
+  <div class="col right">Right: 50% = 150px</div>
+</div>
+```
 
 ```css
-.container {
-  width: 800px;
-}
-
-.column {
-  width: 50%;  /* 50% of 800px = 400px */
-  padding: 5%; /* 5% of parent width = 40px */
-}
+body { background: #0f172a; padding: 24px; font-family: system-ui; font-size: 13px; }
+.container { display: flex; margin-bottom: 12px; border: 1px solid #334155; border-radius: 6px; overflow: hidden; }
+.container.narrow { width: 300px; }
+.col { width: 50%; padding: 16px; color: #e2e8f0; box-sizing: border-box; }
+.left  { background: #1e3a5f; }
+.right { background: #1e293b; }
 ```
 
-```text
-50% width means half the parent's width.
-Padding percentage is always relative to the parent's WIDTH, even for top/bottom padding.
-```
-
-That last point is important and surprising: `padding-top: 10%` is 10% of the **parent's width**, not its height. This is specified behaviour used to create responsive aspect ratios.
+Padding percentage is always relative to the parent's **width**, even for `padding-top` and `padding-bottom` — a quirk used to create responsive aspect ratios.
 
 ## Viewport Units — vw, vh
 
-`vw` (viewport width) and `vh` (viewport height) are relative to the browser's visible area:
+`vw` (viewport width) and `vh` (viewport height) are relative to the browser's visible area. The hero below fills 100% of the iframe's width and 40% of its height — resize the iframe to see it adapt.
+
+```html
+<div id="hero">
+  100vw wide · 40vh tall — always fills the viewport
+</div>
+<div id="sidebar">25vw wide sidebar</div>
+```
 
 ```css
-.hero {
-  width: 100vw;   /* 100% of the viewport width */
-  height: 60vh;   /* 60% of the viewport height */
+body { background: #0f172a; margin: 0; font-family: system-ui; }
+#hero {
+  width: 100vw;
+  height: 40vh;
+  background: linear-gradient(135deg, #1e3a5f, #1e1b4b);
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-sizing: border-box;
 }
-
-.sidebar {
+#sidebar {
   width: 25vw;
+  background: #1e293b;
+  color: #94a3b8;
+  padding: 16px;
+  font-size: 13px;
+  min-height: 60px;
+  box-sizing: border-box;
 }
 ```
-
-```text
-100vw = the full width of the browser window
-100vh = the full height of the browser window
-```
-
-Viewport units are the right choice for full-page layouts, hero sections, and elements that should fill or proportion the screen regardless of content. They are covered in depth in the Responsive Design series.
 
 ## Choosing the Right Unit
 
-```text
-Borders, shadows, icons         → px
-Font sizes                      → rem
-Spacing (margin/padding)        → rem or em
-Layout widths                   → % or vw
-Layout heights                  → % or vh
-Component-relative spacing      → em
+A quick comparison showing what breaks when you use `px` for font size vs `rem`. The left column uses `px` — it ignores browser preferences. The right uses `rem` — it scales.
+
+```html
+<div style="display:flex;gap:16px;">
+  <div id="px-col">
+    <p class="label">px — ignores user prefs</p>
+    <p class="body-px">Body text: 16px</p>
+    <h2 class="head-px">Heading: 24px</h2>
+    <small class="sm-px">Small: 12px</small>
+  </div>
+  <div id="rem-col">
+    <p class="label">rem — scales with prefs</p>
+    <p class="body-rem">Body text: 1rem</p>
+    <h2 class="head-rem">Heading: 1.5rem</h2>
+    <small class="sm-rem">Small: 0.75rem</small>
+  </div>
+</div>
 ```
 
-The rule of thumb: anything that should scale with user font preferences → `rem`. Anything that should scale with the viewport → `vw`/`vh`. Anything that should scale with the parent element → `%`.
+```css
+html { font-size: 16px; }
+body { background: #0f172a; padding: 24px; font-family: system-ui; }
+#px-col, #rem-col { flex: 1; background: #1e293b; padding: 16px; border-radius: 8px; }
+.label { color: #64748b; font-size: 11px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+.body-px, .body-rem { color: #e2e8f0; margin: 4px 0; }
+.head-px, .head-rem { color: #818cf8; margin: 4px 0; }
+.sm-px, .sm-rem { color: #94a3b8; }
+.body-px { font-size: 16px; }
+.head-px { font-size: 24px; }
+.sm-px   { font-size: 12px; }
+.body-rem { font-size: 1rem; }
+.head-rem { font-size: 1.5rem; }
+.sm-rem   { font-size: 0.75rem; }
+```
+
+Rule of thumb: font sizes → `rem`. Viewport fills → `vw`/`vh`. Parent-relative widths → `%`. Component-relative spacing → `em`. Borders and shadows → `px`.
 
 ## Challenge: units_mix
 
