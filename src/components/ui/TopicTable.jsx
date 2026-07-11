@@ -30,6 +30,7 @@ function resolveEntry(entry) {
     if (!meta) return null
     return {
       kind: 'course',
+      badgeKind: 'course',
       key: entry.key,
       label: meta.label,
       emoji: meta.icon,
@@ -45,6 +46,9 @@ function resolveEntry(entry) {
   if (!reg) return null
   return {
     kind: entry.kind,
+    // Labs carry their own kind (lab/lesson/builder/visualizer) — surface
+    // that on the badge instead of the generic registry-selector kind.
+    badgeKind: entry.kind === 'lab' ? (reg.kind ?? 'lab') : entry.kind,
     key: entry.key,
     label: reg.label,
     emoji: reg.emoji,
@@ -61,7 +65,7 @@ const TINT = {
   slate: 'bg-slate-50/50 dark:bg-slate-900/20 border-slate-200/70 dark:border-slate-700/50',
 }
 
-const KIND_LABEL = { course: 'COURSE', lesson: 'LESSON', lab: 'LAB', game: 'GAME' }
+const KIND_LABEL = { course: 'COURSE', lesson: 'LESSON', lab: 'LAB', builder: 'BUILDER', visualizer: 'VISUALIZER', game: 'GAME' }
 
 // (SubGroup removed for flat grid rendering)
 
@@ -117,7 +121,7 @@ export default function TopicTable({ group, query, matchItem }) {
             const meta = GLASS_META[r.cardItem.color] ?? GLASS_META.slate;
             return (
               <div
-                key={r.key}
+                key={`${r.kind}-${r.key}`}
                 onClickCapture={(e) => { e.preventDefault(); e.stopPropagation(); setOpenItem(r) }}
                 className="h-[110px] cursor-pointer min-w-0"
               >
@@ -128,7 +132,7 @@ export default function TopicTable({ group, query, matchItem }) {
                   onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.05)' }}
                 >
                   <legend className={`px-2 mx-4 text-[10px] font-black uppercase tracking-wider ${meta.text} relative z-20 bg-[#f8fafc] dark:bg-[#0b0f19] rounded-full`}>
-                    {KIND_LABEL[r.kind] ?? r.kind.toUpperCase()}
+                    {KIND_LABEL[r.badgeKind] ?? r.badgeKind.toUpperCase()}
                   </legend>
 
                   {/* Wrap content in a rounded overflow-hidden container to clip PremiumHeaderBackground */}

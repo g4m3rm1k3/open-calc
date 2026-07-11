@@ -1,151 +1,507 @@
-// Curated cross-registry topic groups for the home page's "Explore by Topic"
-// section. Only `kind`/`key`/`differentiator` are stored here — cosmetic
+// Curated topic → subtopic tree for the home page's "Explore" section.
+// Two-level nav: pick a topic (Mathematics, Science, ...), then a subtopic
+// within it (Linear Algebra, Calculus, ...) — see TopicFilterHeader.jsx.
+//
+// This is a GRAPH, not a tree: the same course/lab/game key can appear
+// under more than one subtopic when it genuinely teaches more than one
+// thing (e.g. `asteroids-la` is real Linear Algebra practice AND real
+// Physics practice — listing it once and hiding the other half is the
+// same "no visible structure" problem the audit flagged in the first
+// place). Only `kind`/`key`/`differentiator` are stored here — cosmetic
 // fields (emoji, color, tags, description) are resolved live from
 // courseLoader.js / labs/registry.js / games/registry.js at render time
 // (see TopicTable.jsx), so this file can never go stale relative to those
-// registries. Keyed to match the existing discipline pill labels in
-// HomePage.jsx (slugified) so clicking a pill finds its group directly —
-// see src/docs/UpSkillOS work/ux-audit-heuristics-linear-algebra.md for the
-// diagnosis the linear-algebra entry answers.
-export const TOPIC_GROUPS = {
-  'linear-algebra': {
-    label: 'Linear Algebra',
-    items: [
-      { kind: 'course', key: 'linear-algebra',
-        differentiator: 'Structured, sequential curriculum — start here for the full path from vectors to eigenvalues.' },
-      { kind: 'lab', key: 'matrix-lab',
-        differentiator: 'Code the algorithms yourself — row ops, elimination, determinants, inverse, Gram-Schmidt in JS, Python, or MATLAB.' },
-      { kind: 'lab', key: 'matrix-3d-lab',
-        differentiator: 'Visual, geometric 3D intuition — manipulate a live 4×4 transform and watch every entry update.' },
-      { kind: 'lab', key: 'openmat',
-        differentiator: 'A general computation engine — matrices are one small part of a bigger symbolic + numeric CAS.' },
-      { kind: 'game', key: 'matrix-game',
-        differentiator: 'Seven gamified interactive lessons — vectors, transforms, determinants, eigenvectors.' },
-      { kind: 'game', key: 'asteroids-la',
-        differentiator: 'Arcade application — velocity, dot products, and matrix transforms through ten waves of gameplay.' },
-      { kind: 'game', key: 'vector-command',
-        differentiator: '3D mission campaign — RREF, cross products, and integrals used to intercept targets.' },
-    ],
+// registries. Standalone tools (calculator, grapher-2d, terminal-hub, ...)
+// are deliberately excluded — see ux-audit-plan.md Phase 4.
+//
+// Every course/lab/game in the app has a home here (verified against
+// src/courses/*, src/labs/registry.js, src/games/registry.js 2026-07-11)
+// except two orphans with no real subject to anchor them: `arkanoid`
+// (generic math Q&A) and `stem-quest` (multi-subject adventure map) — both
+// live under the `general` topic instead of being forced into a subject
+// they don't actually teach.
+export const TOPICS = {
+  mathematics: {
+    label: 'Mathematics',
+    icon: '∑',
+    subtopics: {
+      precalculus: {
+        label: 'Precalculus',
+        items: [
+          { kind: 'course', key: 'precalculus',
+            differentiator: 'Structured curriculum — algebra, trigonometry, exponentials, and the foundations everything after this builds on.' },
+        ],
+      },
+      calculus: {
+        label: 'Calculus',
+        items: [
+          { kind: 'course', key: 'calculus',
+            differentiator: 'Structured curriculum — limits, derivatives, integrals, and the mathematics of change, in order.' },
+          { kind: 'lab', key: 'openmat',
+            differentiator: 'General computation engine — symbolic differentiation/integration alongside its matrix and 3D graphing tools.' },
+          { kind: 'lab', key: 'universal-calc',
+            differentiator: 'Numerical methods and constants for when you need an answer, not a full symbolic derivation.' },
+          { kind: 'game', key: 'basketball',
+            differentiator: 'Apply trajectory and calculus to perfect your shot arc.' },
+          { kind: 'game', key: 'football',
+            differentiator: 'Integration and optimization applied to real routes and trajectories.' },
+          { kind: 'game', key: 'vector-command',
+            differentiator: 'Its 3D missions lean on integrals as much as linear algebra to intercept moving targets.' },
+        ],
+      },
+      geometry: {
+        label: 'Geometry',
+        items: [
+          { kind: 'course', key: 'geometry',
+            differentiator: 'Structured curriculum — angles, proofs, circles, transformations, and geometric reasoning, in order.' },
+          { kind: 'lab', key: 'universal-calc',
+            differentiator: 'Unit conversion and geometric constants on tap — the calculator you keep open while working proofs.' },
+          { kind: 'game', key: 'golf',
+            differentiator: 'Geometry and projectile motion, one putt at a time.' },
+          { kind: 'game', key: 'vector-command',
+            differentiator: '3D missions built on real spatial geometry — reading position, distance, and intercept courses in space.' },
+        ],
+      },
+      'linear-algebra': {
+        label: 'Linear Algebra',
+        items: [
+          { kind: 'course', key: 'linear-algebra',
+            differentiator: 'Structured, sequential curriculum — start here for the full path from vectors to eigenvalues.' },
+          { kind: 'lab', key: 'matrix-lab',
+            differentiator: 'Code the algorithms yourself — row ops, elimination, determinants, inverse, Gram-Schmidt in JS, Python, or MATLAB.' },
+          { kind: 'lab', key: 'matrix-3d-lab',
+            differentiator: 'Visual, geometric 3D intuition — manipulate a live 4×4 transform and watch every entry update.' },
+          { kind: 'lab', key: 'decomp-lab',
+            differentiator: 'See SVD and least squares actually do something — compress a real image, fit a curve to noisy data.' },
+          { kind: 'lab', key: 'openmat',
+            differentiator: 'A general computation engine — matrices are one part of a bigger symbolic + numeric CAS.' },
+          { kind: 'game', key: 'matrix-game',
+            differentiator: 'Seven gamified interactive lessons — vectors, transforms, determinants, eigenvectors.' },
+          { kind: 'game', key: 'asteroids-la',
+            differentiator: 'Arcade application — velocity, dot products, and matrix transforms through ten waves of gameplay.' },
+          { kind: 'game', key: 'vector-command',
+            differentiator: '3D mission campaign — RREF, cross products, and integrals used to intercept targets.' },
+          { kind: 'game', key: 'stem-tetris',
+            differentiator: 'Classic Tetris wearing a matrix-ops lens — 2×2 transforms fall with the pieces.' },
+          { kind: 'game', key: 'card-quest',
+            differentiator: "Cards and dice double as a linear-algebra workout alongside the probability it's primarily about." },
+          { kind: 'game', key: 'rubiks-cube',
+            differentiator: 'Permutation groups are matrices in disguise — the cube is a hands-on intro to the algebra of transformations.' },
+        ],
+      },
+      'discrete-math': {
+        label: 'Discrete Mathematics',
+        items: [
+          { kind: 'course', key: 'discrete-math',
+            differentiator: 'Structured curriculum — logic, sets, graphs, and the mathematics of computing, in order.' },
+          { kind: 'game', key: 'rubiks-cube',
+            differentiator: "Group theory, permutations, and non-commutativity through the world's most famous puzzle." },
+        ],
+      },
+      statistics: {
+        label: 'Statistics & Probability',
+        items: [
+          { kind: 'course', key: 'applied-statistics',
+            differentiator: 'Structured curriculum — statistical thinking, probability, inference, and regression analysis, in order.' },
+          { kind: 'course', key: 'discrete-math',
+            differentiator: 'Covers discrete probability as part of the broader logic/sets/graphs curriculum — the theory side of the odds you practice elsewhere here.' },
+          { kind: 'lab', key: 'odds-lab',
+            differentiator: 'Probability and card-counting practice with cards, dice, and blackjack decisions.' },
+          { kind: 'game', key: 'card-quest',
+            differentiator: 'Counting, probability, permutations, and stats — through cards and dice.' },
+          { kind: 'game', key: 'card-academy',
+            differentiator: 'Five card games teaching probability, statistics, and neuroscience through play.' },
+          { kind: 'game', key: 'stem-tetris',
+            differentiator: 'One of its six STEM lenses is straight probability distributions falling in real time.' },
+        ],
+      },
+    },
   },
-  'physics': {
-    label: 'Physics',
-    items: [
-      { kind: 'course', key: 'physics',
-        differentiator: 'Structured curriculum — kinematics, Newtonian mechanics, energy, momentum, and waves, in order.' },
-      { kind: 'lab', key: 'sim-lab',
-        differentiator: 'Build your own physics simulations from scratch — code it yourself in a Monaco editor with a live 3D sandbox.' },
-      { kind: 'game', key: 'reality-runner',
-        differentiator: 'Arcade runner — dodge and react to physics simulations in real time.' },
-      { kind: 'game', key: 'basketball',
-        differentiator: 'Apply trajectory and calculus to perfect your shot arc.' },
-      { kind: 'game', key: 'pool',
-        differentiator: 'Collision physics and bank angles, played out on the felt.' },
-      { kind: 'game', key: 'golf',
-        differentiator: 'Geometry and projectile motion, one putt at a time.' },
-      { kind: 'game', key: 'football',
-        differentiator: 'Integration and optimization applied to real routes and trajectories.' },
-    ],
+
+  science: {
+    label: 'Science',
+    icon: '⚛',
+    subtopics: {
+      physics: {
+        label: 'Physics',
+        items: [
+          { kind: 'course', key: 'physics',
+            differentiator: 'Structured curriculum — kinematics, Newtonian mechanics, energy, momentum, and waves, in order.' },
+          { kind: 'course', key: 'simulation',
+            differentiator: 'Physics simulations, 3D scenes, and real-time interactive systems — the engineering side of "build your own physics."' },
+          { kind: 'lab', key: 'sim-lab',
+            differentiator: 'Build your own physics simulations from scratch — code it yourself in a Monaco editor with a live 3D sandbox.' },
+          { kind: 'lab', key: 'physics',
+            differentiator: 'Rigid body dynamics, springs, pendulums, and wave mechanics — a dedicated simulation lab, no code required.' },
+          { kind: 'lab', key: 'universal-calc',
+            differentiator: 'Physical constants and unit conversion on tap while you work a problem.' },
+          { kind: 'game', key: 'reality-runner',
+            differentiator: 'Arcade runner — dodge and react to physics simulations in real time.' },
+          { kind: 'game', key: 'basketball',
+            differentiator: 'Trajectory and arc, framed as a shot you have to make.' },
+          { kind: 'game', key: 'pool',
+            differentiator: 'Collision physics and bank angles, played out on the felt.' },
+          { kind: 'game', key: 'golf',
+            differentiator: 'Projectile motion, one putt at a time.' },
+          { kind: 'game', key: 'football',
+            differentiator: 'Routes and trajectories, framed as a play you have to read.' },
+          { kind: 'game', key: 'asteroids-la',
+            differentiator: 'Velocity and momentum through arcade dogfighting, matrix transforms included.' },
+          { kind: 'game', key: 'open-craft',
+            differentiator: 'A physics-based voxel sandbox — build and break things and watch the physics engine react.' },
+          { kind: 'game', key: 'vector-command',
+            differentiator: 'Missions play out as real physics — intercept courses, velocity, and 3D space navigation.' },
+        ],
+      },
+      chemistry: {
+        label: 'Chemistry',
+        items: [
+          { kind: 'course', key: 'chemistry',
+            differentiator: 'Structured curriculum — atomic structure, bonding, reactions, and chemical systems, in order.' },
+          { kind: 'lab', key: 'chemistry',
+            differentiator: 'Hands-on reactions, periodic table data, and molecular structure — no code required.' },
+        ],
+      },
+    },
   },
-  // Keyed to the existing "Computer Science" pill — Data Structures &
-  // Algorithms is the first populated CS example, not the only one planned.
+
+  programming: {
+    label: 'Programming',
+    icon: '⌨',
+    subtopics: {
+      python: {
+        label: 'Python',
+        items: [
+          { kind: 'course', key: 'python',
+            differentiator: 'Structured curriculum — core syntax through data science, OOP, and vectorization, in order.' },
+          { kind: 'lab', key: 'notebook-lab',
+            differentiator: 'Real Python notebooks in the browser — write code, see output, import/export .ipynb.' },
+          { kind: 'lab', key: 'lesson-engine',
+            differentiator: 'Runs a full narrated Python lesson series inside its prediction-challenge/checkpoint format.' },
+          { kind: 'lab', key: 'visual-code',
+            differentiator: 'Drag-and-drop blocks that generate real, runnable Python — see the code as you build it.' },
+          { kind: 'lab', key: 'dsa-arrays-lab',
+            differentiator: 'Array operations with a live memory visualizer — dual-language, Python included.' },
+          { kind: 'lab', key: 'dsa-linked-lists-lab',
+            differentiator: 'Linked-list operations with animated pointer tracing — dual-language, Python included.' },
+        ],
+      },
+      javascript: {
+        label: 'JavaScript',
+        items: [
+          { kind: 'course', key: 'javascript',
+            differentiator: 'Structured curriculum — runtime model, async, closures, OOP, and browser APIs, in order.' },
+          { kind: 'lab', key: 'codelens',
+            differentiator: 'Paste real JavaScript and watch it execute — token stream, AST, heap, call stack, scope chain.' },
+          { kind: 'lab', key: 'visual-code',
+            differentiator: 'Drag-and-drop blocks that generate real, runnable JavaScript — see the code as you build it.' },
+          { kind: 'lab', key: 'lesson-engine',
+            differentiator: 'Narrated JavaScript lessons with prediction challenges and live checkpoints.' },
+          { kind: 'lab', key: 'abstraction-viz',
+            differentiator: 'Step through JavaScript callbacks, HOFs, closures, and DI and watch the abstraction build live.' },
+          { kind: 'lab', key: 'sicp-js',
+            differentiator: 'SICP, condensed into an interactive JavaScript lesson with narrated checkpoints.' },
+        ],
+      },
+      typescript: {
+        label: 'TypeScript',
+        items: [
+          { kind: 'lab', key: 'ts-lab',
+            differentiator: 'Build a real social platform frontend from scratch in vanilla TypeScript against a live REST API — no framework.' },
+          { kind: 'lab', key: 'dsa-patterns',
+            differentiator: 'Data structures and classic design patterns, written in TypeScript throughout.' },
+        ],
+      },
+      cpp: {
+        label: 'C++',
+        items: [
+          { kind: 'course', key: 'c-plus-plus',
+            differentiator: 'Structured curriculum — foundations through the standard library to advanced techniques, in order.' },
+          { kind: 'lab', key: 'visual-code',
+            differentiator: 'Block-based programming that can generate real, runnable C++ alongside JS and Python.' },
+          { kind: 'lab', key: 'lesson-engine',
+            differentiator: 'Runs narrated lessons in this general-purpose teaching runtime — usable for C++ content too.' },
+        ],
+      },
+      'web-development': {
+        label: 'Web Development',
+        items: [
+          { kind: 'course', key: 'web',
+            differentiator: 'Structured curriculum — HTML and CSS through async JavaScript, ending in a capstone project.' },
+          { kind: 'lab', key: 'html-lab',
+            differentiator: 'Drag, drop, and style real HTML elements on a live canvas — the code panel syncs both ways as you go.' },
+          { kind: 'lab', key: 'html-lessons',
+            differentiator: 'Guided step series building one real page — semantic HTML first, then styling, then DOM scripting.' },
+          { kind: 'lab', key: 'css-mastery',
+            differentiator: "Deep-dive into the browser's layout engine — Box Model, Flexbox, Grid, and Stacking Contexts through interactive challenges." },
+          { kind: 'lab', key: 'react-mastery',
+            differentiator: '27 narrated lessons — JSX through hooks, context, reducers, and Suspense with live sandboxes.' },
+          { kind: 'lab', key: 'ts-lab',
+            differentiator: 'A real frontend build, in TypeScript, against a live REST API — the "put it together" project for this topic.' },
+          { kind: 'lab', key: 'vue-studio',
+            differentiator: 'Build a real Vue 3 project from scratch — real .vue files, live component tree as you write.' },
+          { kind: 'lab', key: 'backend-lab',
+            differentiator: 'Build a real backend from scratch — routes, middleware, services, a database — test your own endpoints.' },
+        ],
+      },
+      'graphics-programming': {
+        label: 'Canvas & Graphics Programming',
+        items: [
+          { kind: 'course', key: 'canvas',
+            differentiator: 'Structured curriculum — 2D graphics programming with the HTML Canvas API, in order.' },
+          { kind: 'course', key: 'three-js',
+            differentiator: 'Structured curriculum — 3D graphics from WebGL fundamentals to Three.js scenes and shaders.' },
+          { kind: 'lab', key: 'svg-studio',
+            differentiator: 'Browser-based vector drawing tool — draw, transform, and export as SVG or PNG, no boilerplate.' },
+        ],
+      },
+      'command-line': {
+        label: 'Command Line & Git',
+        items: [
+          { kind: 'course', key: 'command-line-interface',
+            differentiator: 'Structured curriculum — command line fundamentals and terminal mastery, in order.' },
+          { kind: 'course', key: 'git',
+            differentiator: 'Structured curriculum — version control with Git from fundamentals to internals and logic.' },
+        ],
+      },
+    },
+  },
+
   'computer-science': {
-    label: 'Data Structures & Algorithms',
-    items: [
-      { kind: 'course', key: 'data-structures-and-algorithms',
-        differentiator: 'Structured curriculum covering arrays through graphs, in order.' },
-      { kind: 'lesson', key: 'dsa-patterns',
-        differentiator: 'Data structures and classic design patterns taught together as one guided lesson series.' },
-      { kind: 'lab', key: 'dsa-arrays-lab',
-        differentiator: 'Implement array operations yourself — get/insert/delete/search — with live memory visualization and a step tracer.' },
-      { kind: 'lab', key: 'dsa-linked-lists-lab',
-        differentiator: 'Build linked-list operations yourself — nodes, reverse, cycle detection — with animated pointer visualization.' },
-    ],
+    label: 'Computer Science',
+    icon: '⊕',
+    subtopics: {
+      dsa: {
+        label: 'Data Structures & Algorithms',
+        items: [
+          { kind: 'course', key: 'data-structures-and-algorithms',
+            differentiator: 'Structured curriculum covering arrays through graphs, in order.' },
+          { kind: 'course', key: 'dynamic-programming',
+            differentiator: 'Structured curriculum focused entirely on DP patterns and algorithmic problem solving.' },
+          { kind: 'lab', key: 'dsa-arrays-lab',
+            differentiator: 'Implement array operations yourself — get/insert/delete/search — with live memory visualization and a step tracer.' },
+          { kind: 'lab', key: 'dsa-linked-lists-lab',
+            differentiator: 'Build linked-list operations yourself — nodes, reverse, cycle detection — with animated pointer visualization.' },
+          { kind: 'lab', key: 'dsa-patterns',
+            differentiator: 'Data structures and classic design patterns taught together as one guided lesson series.' },
+          { kind: 'lab', key: 'lesson-engine',
+            differentiator: 'Runs a narrated DSA-in-Python lesson series inside its prediction-challenge/checkpoint format.' },
+        ],
+      },
+      'logic-digital': {
+        label: 'Logic & Digital Fundamentals',
+        items: [
+          { kind: 'course', key: 'logic',
+            differentiator: 'Boolean logic and combinational circuit design, applied through problem sets rather than a linear course arc.' },
+          { kind: 'course', key: 'digital-fundamentals',
+            differentiator: 'Structured curriculum — binary, logic gates, boolean algebra, and digital circuits, in order.' },
+          { kind: 'lab', key: 'logic-sim',
+            differentiator: 'Design and simulate digital logic circuits gate-by-gate with truth tables — build what the courses describe.' },
+        ],
+      },
+      runtime: {
+        label: 'Runtime & Program Execution',
+        items: [
+          { kind: 'lab', key: 'abstraction-viz',
+            differentiator: 'Step through callbacks, higher-order functions, closures, and DI and watch the abstraction build in the editor.' },
+          { kind: 'lab', key: 'codelens',
+            differentiator: 'Paste any JavaScript and watch AST, heap, call stack, and scope chain execute step by step.' },
+          { kind: 'lab', key: 'visual-code',
+            differentiator: 'Block-based programming — see how blocks compile down to real, runnable code.' },
+          { kind: 'lab', key: 'lesson-engine',
+            differentiator: 'General-purpose interactive teaching runtime — prediction challenges, concept labs, quizzes, checkpoints.' },
+          { kind: 'lab', key: 'sicp-js',
+            differentiator: 'Structure and Interpretation of Computer Programs, condensed into an interactive, narrated lesson.' },
+        ],
+      },
+    },
   },
-  // Keyed to the existing "Mathematics" pill — Probability/Statistics is
-  // the first populated Math example (Linear Algebra already has its own
-  // dedicated pill).
-  'mathematics': {
-    label: 'Probability & Statistics',
-    items: [
-      { kind: 'course', key: 'applied-statistics',
-        differentiator: 'Structured curriculum — statistical thinking, probability, inference, and regression analysis, in order.' },
-      { kind: 'lab', key: 'odds-lab',
-        differentiator: 'Probability and card-counting practice with cards, dice, and blackjack decisions.' },
-      { kind: 'game', key: 'card-quest',
-        differentiator: 'Counting, probability, permutations, and stats — through cards and dice.' },
-      { kind: 'game', key: 'card-academy',
-        differentiator: 'Five card games teaching probability, statistics, and neuroscience through play.' },
-    ],
+
+  engineering: {
+    label: 'Engineering',
+    icon: '⚙',
+    subtopics: {
+      cnc: {
+        label: 'CNC',
+        items: [
+          { kind: 'course', key: 'cnc',
+            differentiator: 'Structured curriculum — CNC macro programming, G-code systems, and toolpath math, in order.' },
+          { kind: 'course', key: 'gcode-parser',
+            differentiator: 'Math and geometry foundations underneath CNC toolpaths — for understanding what the G-code numbers mean, not just running the simulator.' },
+          { kind: 'lab', key: 'cnc-sim',
+            differentiator: 'Program and simulate CNC toolpaths on their own — live 3D backplot and fixture management.' },
+          { kind: 'lab', key: 'five-axis',
+            differentiator: '5-axis kinematics visualizer — homogeneous transforms, surface normals, lead/lag angles on parametric shapes.' },
+          { kind: 'lab', key: 'cad-cnc',
+            differentiator: 'CAD and CNC combined — draw geometry and send it straight to the simulator as G-code, both panels live side by side.' },
+        ],
+      },
+      cad: {
+        label: 'CAD',
+        items: [
+          { kind: 'lab', key: 'cad-pro',
+            differentiator: 'Design the part first — parametric 3D modelling with constraint-based tools, no machining involved.' },
+          { kind: 'lab', key: 'cad-cnc',
+            differentiator: 'Draw geometry and immediately see it as a toolpath — CAD with the CNC step built in.' },
+        ],
+      },
+      'plc-automation': {
+        label: 'PLC & Automation',
+        items: [
+          { kind: 'course', key: 'programmable-logic-controllers',
+            differentiator: 'Structured curriculum — PLC programming fundamentals and industrial automation systems, in order.' },
+          { kind: 'lab', key: 'plc-lab',
+            differentiator: 'Hands-on ladder logic simulator — 8 exercises from motor start/stop to full FSM state machines, Allen-Bradley naming.' },
+        ],
+      },
+      robotics: {
+        label: 'Robotics',
+        items: [
+          { kind: 'lab', key: 'robot-arm-sim',
+            differentiator: 'Robot programming from zero — trig, FK/IK, 4×4 transforms, obstacle avoidance, 19 missions on a 2D and 6-DOF 3D arm.' },
+          { kind: 'lab', key: 'drone-lab',
+            differentiator: 'Program a self-flying drone — 10 missions on displacement vectors, rotation matrices, Bézier paths, and PID control.' },
+        ],
+      },
+      electronics: {
+        label: 'Electronics',
+        items: [
+          { kind: 'course', key: 'electronics',
+            differentiator: 'Structured curriculum — electrical fundamentals through semiconductors, RF, and systems integration.' },
+          { kind: 'course', key: 'digital-fundamentals',
+            differentiator: 'Binary, logic gates, and boolean algebra — the digital-logic prerequisite underneath analog/RF electronics.' },
+          { kind: 'lab', key: 'logic-sim',
+            differentiator: 'Gate-level circuit simulation — the hardware layer underneath the electronics course.' },
+        ],
+      },
+      metrology: {
+        label: 'Metrology',
+        items: [
+          { kind: 'lab', key: 'cmm-lab',
+            differentiator: 'Simulate a coordinate measuring machine — probe circles, planes, cylinders, and read a real GD&T report.' },
+          { kind: 'lab', key: 'universal-calc',
+            differentiator: 'Unit conversion and constants for the numbers a GD&T report actually needs.' },
+        ],
+      },
+    },
   },
-  'cnc-cad': {
-    label: 'CNC & CAD',
-    items: [
-      { kind: 'course', key: 'cnc',
-        differentiator: 'Structured curriculum — CNC macro programming, G-code systems, and toolpath math, in order.' },
-      { kind: 'course', key: 'gcode-parser',
-        differentiator: 'Math and geometry foundations underneath CNC toolpaths — for understanding what the G-code numbers mean, not just running the simulator.' },
-      { kind: 'lab', key: 'cad-pro',
-        differentiator: 'Design the part first — parametric 3D modelling with constraint-based tools, no machining involved.' },
-      { kind: 'lab', key: 'cnc-sim',
-        differentiator: 'Program and simulate CNC toolpaths on their own — live 3D backplot and fixture management.' },
-      { kind: 'lab', key: 'cad-cnc',
-        differentiator: 'CAD and CNC combined — draw geometry and send it straight to the simulator as G-code, both panels live side by side.' },
-      { kind: 'lab', key: 'five-axis',
-        differentiator: '5-axis kinematics visualizer — homogeneous transforms, surface normals, lead/lag angles on parametric shapes.' },
-    ],
+
+  'data-ai': {
+    label: 'Data & AI',
+    icon: '⟁',
+    subtopics: {
+      'data-science': {
+        label: 'Data Science',
+        items: [
+          { kind: 'course', key: 'data-science',
+            differentiator: 'Structured curriculum — computational methods for data analysis and scientific exploration, in order.' },
+          { kind: 'lab', key: 'notebook-lab',
+            differentiator: 'Real Python notebooks in the browser — the actual environment data science work happens in.' },
+        ],
+      },
+      ai: {
+        label: 'AI & Machine Learning',
+        items: [
+          { kind: 'course', key: 'ai-engineering',
+            differentiator: 'Structured curriculum — machine learning, LLMs, and AI systems from foundations to deployment.' },
+          { kind: 'lab', key: 'notebook-lab',
+            differentiator: 'Run real ML code in a notebook — the same format most model training actually happens in.' },
+        ],
+      },
+      sql: {
+        label: 'SQL',
+        items: [
+          { kind: 'course', key: 'sql',
+            differentiator: 'Structured curriculum — SQL mastery from zero to advanced queries and Python integration.' },
+        ],
+      },
+      nosql: {
+        label: 'NoSQL',
+        items: [
+          { kind: 'course', key: 'nosql',
+            differentiator: 'Structured curriculum — NoSQL database systems and document-oriented data design.' },
+        ],
+      },
+    },
   },
-  'web-dev': {
-    label: 'Web Development',
-    items: [
-      { kind: 'course', key: 'web',
-        differentiator: 'Structured curriculum — HTML and CSS through async JavaScript, ending in a capstone project.' },
-      { kind: 'lab', key: 'html-lab',
-        differentiator: 'Drag, drop, and style real HTML elements on a live canvas — the code panel syncs both ways as you go.' },
-      { kind: 'lab', key: 'html-lessons',
-        differentiator: 'Guided step series building one real page — semantic HTML first, then styling, then DOM scripting.' },
-      { kind: 'lab', key: 'css-mastery',
-        differentiator: "Deep-dive into the browser's layout engine — Box Model, Flexbox, Grid, and Stacking Contexts through interactive challenges." },
-      { kind: 'lab', key: 'react-mastery',
-        differentiator: '27 narrated lessons — JSX through hooks, context, reducers, and Suspense with live sandboxes.' },
-      { kind: 'lab', key: 'ts-lab',
-        differentiator: 'Build a real social platform frontend in vanilla TypeScript against a live REST API — no framework.' },
-      { kind: 'lab', key: 'vue-studio',
-        differentiator: 'Build a real Vue 3 project from scratch — real .vue files, live component tree as you write.' },
-      { kind: 'lab', key: 'backend-lab',
-        differentiator: 'Build a real backend from scratch — routes, middleware, services, a database — test your own endpoints.' },
-    ],
+
+  creative: {
+    label: 'Creative',
+    icon: '∇',
+    subtopics: {
+      design: {
+        label: 'Design',
+        items: [
+          { kind: 'course', key: 'design',
+            differentiator: 'Structured curriculum — interface design systems, typography, and visual hierarchy.' },
+        ],
+      },
+      music: {
+        label: 'Music',
+        items: [
+          { kind: 'lab', key: 'music-lab',
+            differentiator: 'Beat machine meets DAW — sequencer, synth, FX chain, mixer, and piano roll, powered by Tone.js.' },
+        ],
+      },
+      'vector-graphics': {
+        label: 'SVG & Vector Graphics',
+        items: [
+          { kind: 'lab', key: 'svg-studio',
+            differentiator: 'Freehand pencil, shape tools, layers, and SVG/PNG export — a real drawing tool, not just a code panel.' },
+        ],
+      },
+      'game-dev': {
+        label: 'Game Development',
+        items: [
+          { kind: 'course', key: 'tetris',
+            differentiator: 'Build Tetris from scratch — game loop, collision, and polish, structured as a course.' },
+        ],
+      },
+      'creative-tools': {
+        label: 'Build Your Own Tools',
+        items: [
+          { kind: 'lab', key: 'lesson-builder',
+            differentiator: 'Build and preview interactive lessons yourself — code cells, prose, visualizations, checkpoints.' },
+          { kind: 'lab', key: 'viz-builder',
+            differentiator: 'Build custom data visualizations and interactive diagrams for lessons and labs.' },
+        ],
+      },
+    },
   },
-  'plc-automation': {
-    label: 'PLC & Automation',
-    items: [
-      { kind: 'course', key: 'programmable-logic-controllers',
-        differentiator: 'Structured curriculum — PLC programming fundamentals and industrial automation systems, in order.' },
-      { kind: 'lab', key: 'plc-lab',
-        differentiator: 'Hands-on ladder logic simulator — 8 exercises from motor start/stop to full FSM state machines, Allen-Bradley naming.' },
-    ],
-  },
-  'robotics': {
-    label: 'Robotics',
-    items: [
-      { kind: 'lab', key: 'robot-arm-sim',
-        differentiator: 'Robot programming from zero — trig, FK/IK, 4×4 transforms, obstacle avoidance, 19 missions on a 2D and 6-DOF 3D arm.' },
-      { kind: 'lab', key: 'drone-lab',
-        differentiator: 'Program a self-flying drone — 10 missions on displacement vectors, rotation matrices, Bézier paths, and PID control.' },
-    ],
-  },
-  'digital-logic': {
-    label: 'Digital Logic',
-    items: [
-      { kind: 'course', key: 'digital-fundamentals',
-        differentiator: 'Structured curriculum — binary, logic gates, boolean algebra, and digital circuits, in order.' },
-      { kind: 'course', key: 'logic',
-        differentiator: 'Boolean logic and combinational circuit design, applied through problem sets rather than a linear course arc.' },
-      { kind: 'lab', key: 'logic-sim',
-        differentiator: 'Design and simulate digital logic circuits gate-by-gate with truth tables — build what the courses describe.' },
-    ],
+
+  general: {
+    label: 'General & Multi-Subject',
+    icon: '✦',
+    subtopics: {
+      'arcade-practice': {
+        label: 'Arcade & Practice',
+        items: [
+          { kind: 'game', key: 'arkanoid',
+            differentiator: "Break bricks by answering math questions — general practice, not tied to one subject." },
+          { kind: 'game', key: 'stem-quest',
+            differentiator: 'An adventure map packed with challenges pulled from every subject at once.' },
+        ],
+      },
+    },
   },
 }
 
-export function getTopicGroup(topicId) {
-  return TOPIC_GROUPS[topicId] ?? null
+export const TOPIC_ORDER = [
+  'mathematics', 'science', 'programming', 'computer-science',
+  'engineering', 'data-ai', 'creative', 'general',
+]
+
+export function getTopic(topicId) {
+  return TOPICS[topicId] ?? null
+}
+
+export function getSubtopicGroup(topicId, subtopicId) {
+  const topic = TOPICS[topicId]
+  const subtopic = topic?.subtopics?.[subtopicId]
+  return subtopic ? { label: subtopic.label, items: subtopic.items } : null
+}
+
+export function firstSubtopicId(topicId) {
+  const topic = TOPICS[topicId]
+  return topic ? Object.keys(topic.subtopics)[0] ?? null : null
 }
