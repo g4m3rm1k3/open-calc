@@ -203,6 +203,14 @@ function TopBar() {
           <Search className="w-[18px] h-[18px]" />
         </button>
 
+        <button
+          onClick={openSearch}
+          className="lg:hidden nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+          title="Search lessons"
+        >
+          <Search className="w-[18px] h-[18px]" />
+        </button>
+
         <ThemePicker />
 
         <div className="hidden lg:block">
