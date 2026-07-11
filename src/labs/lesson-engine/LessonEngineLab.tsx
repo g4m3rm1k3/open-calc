@@ -70,9 +70,36 @@ import jsLevel8 from './content/javascript-fundamentals/level-8.md?raw'
 import jsLevel9 from './content/javascript-fundamentals/level-9.md?raw'
 
 import cppLevel0 from './content/cpp-fundamentals/level-0.md?raw'
+import cppLevel1 from './content/cpp-fundamentals/level-1.md?raw'
+import cppLevel2 from './content/cpp-fundamentals/level-2.md?raw'
+import cppLevel3 from './content/cpp-fundamentals/level-3.md?raw'
+import cppLevel4 from './content/cpp-fundamentals/level-4.md?raw'
+import cppLevel5 from './content/cpp-fundamentals/level-5.md?raw'
+import cppLevel6 from './content/cpp-fundamentals/level-6.md?raw'
+import cppLevel7 from './content/cpp-fundamentals/level-7.md?raw'
+
 import csharpLevel0 from './content/csharp-fundamentals/level-0.md?raw'
+import csharpLevel1 from './content/csharp-fundamentals/level-1.md?raw'
+import csharpLevel2 from './content/csharp-fundamentals/level-2.md?raw'
+import csharpLevel3 from './content/csharp-fundamentals/level-3.md?raw'
+
 import javaLevel0 from './content/java-fundamentals/level-0.md?raw'
-import htmlDomLevel0 from './content/html-dom/level-0.md?raw'
+import javaLevel1 from './content/java-fundamentals/level-1.md?raw'
+import javaLevel2 from './content/java-fundamentals/level-2.md?raw'
+import javaLevel3 from './content/java-fundamentals/level-3.md?raw'
+
+import htmlDomLevel0  from './content/html-dom/level-0.md?raw'
+import htmlDomLevel1  from './content/html-dom/level-1.md?raw'
+import htmlDomLevel2  from './content/html-dom/level-2.md?raw'
+import htmlDomLevel3  from './content/html-dom/level-3.md?raw'
+import htmlDomLevel4  from './content/html-dom/level-4.md?raw'
+import htmlDomLevel5  from './content/html-dom/level-5.md?raw'
+import htmlDomLevel6  from './content/html-dom/level-6.md?raw'
+import htmlDomLevel7  from './content/html-dom/level-7.md?raw'
+import htmlDomLevel8  from './content/html-dom/level-8.md?raw'
+import htmlDomLevel9  from './content/html-dom/level-9.md?raw'
+import htmlDomLevel10 from './content/html-dom/level-10.md?raw'
+import htmlDomLevel11 from './content/html-dom/level-11.md?raw'
 
 const LESSON_FILES: Record<string, string> = {
   'python-fundamentals/level-0.md':  pfLevel0,
@@ -134,9 +161,33 @@ const LESSON_FILES: Record<string, string> = {
   'javascript-fundamentals/level-8.md': jsLevel8,
   'javascript-fundamentals/level-9.md': jsLevel9,
   'cpp-fundamentals/level-0.md': cppLevel0,
+  'cpp-fundamentals/level-1.md': cppLevel1,
+  'cpp-fundamentals/level-2.md': cppLevel2,
+  'cpp-fundamentals/level-3.md': cppLevel3,
+  'cpp-fundamentals/level-4.md': cppLevel4,
+  'cpp-fundamentals/level-5.md': cppLevel5,
+  'cpp-fundamentals/level-6.md': cppLevel6,
+  'cpp-fundamentals/level-7.md': cppLevel7,
   'csharp-fundamentals/level-0.md': csharpLevel0,
+  'csharp-fundamentals/level-1.md': csharpLevel1,
+  'csharp-fundamentals/level-2.md': csharpLevel2,
+  'csharp-fundamentals/level-3.md': csharpLevel3,
   'java-fundamentals/level-0.md': javaLevel0,
-  'html-dom/level-0.md': htmlDomLevel0,
+  'java-fundamentals/level-1.md': javaLevel1,
+  'java-fundamentals/level-2.md': javaLevel2,
+  'java-fundamentals/level-3.md': javaLevel3,
+  'html-dom/level-0.md':  htmlDomLevel0,
+  'html-dom/level-1.md':  htmlDomLevel1,
+  'html-dom/level-2.md':  htmlDomLevel2,
+  'html-dom/level-3.md':  htmlDomLevel3,
+  'html-dom/level-4.md':  htmlDomLevel4,
+  'html-dom/level-5.md':  htmlDomLevel5,
+  'html-dom/level-6.md':  htmlDomLevel6,
+  'html-dom/level-7.md':  htmlDomLevel7,
+  'html-dom/level-8.md':  htmlDomLevel8,
+  'html-dom/level-9.md':  htmlDomLevel9,
+  'html-dom/level-10.md': htmlDomLevel10,
+  'html-dom/level-11.md': htmlDomLevel11,
 }
 
 interface Props {
