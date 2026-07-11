@@ -88,7 +88,7 @@ function SeriesNav({ currentSlug, navigate }) {
             }`}
           >
             <span className="text-xs text-slate-400 dark:text-slate-500 w-5 shrink-0 text-right">{i + 1}.</span>
-            <span className="flex-1 min-w-0 truncate">{post.title}</span>
+            <span className="flex-1 min-w-0 whitespace-normal break-words leading-snug">{post.title}</span>
             {post.slug === currentSlug && (
               <span className="text-[11px] text-indigo-400 dark:text-indigo-500 shrink-0">you are here</span>
             )}
