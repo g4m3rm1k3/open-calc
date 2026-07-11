@@ -74,7 +74,10 @@
       "Bash(node -e \"require\\('@testing-library/react'\\)\")",
       "Bash(cp /tmp/smoke-test.ts /Users/michaelmclean/Testing/open-calc/src/smoke-test.test.ts)",
       "Bash(grep -E \"\\\\.\\(js|md\\)$\")",
-      "Bash(python3 -c \"print\\(\\(37 * 9/5\\) + 32\\)\")"
+      "Bash(python3 -c \"print\\(\\(37 * 9/5\\) + 32\\)\")",
+      "Bash(grep -v \"\\\\.md$\")",
+      "Bash(awk -F/ '{print $NF, $\\(NF-1\\)}')",
+      "Bash(sort -t'/' -k2)"
     ]
   }
 }

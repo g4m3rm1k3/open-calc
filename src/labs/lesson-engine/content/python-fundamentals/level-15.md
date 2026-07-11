@@ -84,6 +84,8 @@ Without `break`, the loop would continue to 100. `break` exits the loop at the f
 
 ## continue — Skip to the Next Iteration
 
+Without `continue`, skipping an item in a loop requires wrapping the remaining body in an `if` block — adding a level of nesting for every case you want to skip. `continue` solves this by jumping back to the condition check immediately, without nesting.
+
 `continue` skips the rest of the current iteration and goes back to the condition check:
 
 ```python
@@ -104,7 +106,15 @@ while number < 10:
 9
 ```
 
-When `number` is even (`number % 2 == 0`), `continue` skips `print(number)` and goes back to the condition. Only odd numbers get printed.
+When `number` is even (`number % 2 == 0`), Python executes `continue`. The remaining code in the body — `print(number)` — is skipped entirely. Python jumps directly back to `while number < 10:`, evaluates the condition, and starts the next iteration. Only odd numbers reach `print`.
+
+Without `continue`, the same logic would require nesting:
+```python
+    if number % 2 != 0:
+        print(number)
+```
+
+Both are correct. `continue` is preferred when the condition you are skipping would push the main logic further right — keeping the happy path at the same indent level.
 
 ## Accumulator Pattern
 

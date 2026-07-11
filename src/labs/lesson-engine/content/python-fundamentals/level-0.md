@@ -100,7 +100,11 @@ def function_name(parameter):
 - `return` — keyword that sends a value back to whoever called the function
 - `result` — the value returned
 
-You will use this shape in every challenge. You are not expected to understand all of it yet — that understanding comes in Level 19. For now: `def` defines, `return` sends the answer back.
+You will use this shape in every challenge. You are not expected to understand all of it yet — that understanding comes in Level 18. For now: `def` defines, `return` sends the answer back.
+
+A new atom appears in the example below:
+
+`+` — when used between two strings, **concatenates** (joins) them into one. `"Hello, " + "Ada"` produces `"Hello, Ada"`. This is different from `+` between numbers, which adds them. The type of the operands determines what `+` does.
 
 ```python
 def greet(name):
@@ -125,7 +129,7 @@ The function takes two strings and returns one string. The returned string must 
 
 ```challenge
 def introduce(name, language):
-    pass
+    pass  # pass is a placeholder — it means "do nothing yet". Replace this line with your return statement.
 ```
 
 ```test

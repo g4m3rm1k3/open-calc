@@ -64,7 +64,7 @@ print(add_years("1906", 100))
 
 ## What Happens When Conversion Fails
 
-`int("hello")` raises a `ValueError` — the string does not represent a valid integer. This is expected and normal. In Level 28 (Exceptions) you will learn how to handle this gracefully. For now, assume the input is always valid.
+`int("hello")` raises a `ValueError` — the string does not represent a valid integer. This is expected and normal. In Level 26 (Exceptions) you will learn how to handle this gracefully. For now, assume the input is always valid.
 
 ```python
 def safe_convert_demo(text_value):

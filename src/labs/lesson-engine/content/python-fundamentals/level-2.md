@@ -104,7 +104,7 @@ Step 9:  reading_two = 212.0
 Step 10: print(32.0, 212.0)
 ```
 
-Notice: `celsius` and `fahrenheit` exist only while the function is running. When the function returns, those variables disappear from the panel. This is **scope** — variables only exist inside the function that created them. Scope is covered fully in Level 20.
+Notice: `celsius` and `fahrenheit` exist only while the function is running. When the function returns, those variables disappear from the panel. This is **scope** — variables only exist inside the function that created them. Scope is covered fully in Level 19.
 
 **SE lens:** Stepping through a function call manually is the first debugging technique every professional uses when a function returns the wrong answer. You do not guess which line is wrong — you step into the function, watch every variable, and find the exact step where the value diverges from what you expected. That precision turns hours of guessing into minutes of observation.
 

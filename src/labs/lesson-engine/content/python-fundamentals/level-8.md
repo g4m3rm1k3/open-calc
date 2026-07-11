@@ -169,7 +169,7 @@ Hello
 
 `word[1:]` — all characters from index 1 to the end, which is `"ello"`. Prepend `"H"` to get `"Hello"`.
 
-**CS lens:** Immutability makes strings safe to share between parts of a program — you never have to worry that passing a string to a function will change the original. It also makes strings **hashable**, which is why they can be used as dictionary keys (Level 24).
+**CS lens:** Immutability makes strings safe to share between parts of a program — you never have to worry that passing a string to a function will change the original. It also makes strings **hashable**, which is why they can be used as dictionary keys (Level 23).
 
 ## in — Membership Testing
 

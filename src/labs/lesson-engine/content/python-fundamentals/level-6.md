@@ -141,7 +141,7 @@ True
 False
 ```
 
-**Falsy values in Python:** `0`, `0.0`, `""` (empty string), `[]` (empty list), `{}` (empty dict), `None`. Everything else is truthy. This matters when you learn `if` in Level 15.
+**Falsy values in Python:** `0`, `0.0`, `""` (empty string), `[]` (empty list), `{}` (empty dict), `None`. Everything else is truthy. This matters when you learn `if` in Level 14.
 
 ## Challenge: describe_value
 

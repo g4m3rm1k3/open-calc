@@ -5,6 +5,8 @@ import type { ParsedLesson, Executor, UiTheme, TestResult } from './types'
 import type { TraceEvent, HeapSnapshot } from '../../labs/codelens/codelens/types'
 import { buildHeapSnapshot } from '../../labs/codelens/codelens/renderer/heapSnapshot'
 import LessonDebugPanel from './LessonDebugPanel'
+import DomTreePanel from './DomTreePanel'
+import CssSpecificityPanel from './CssSpecificityPanel'
 import RunExample from './RunExample'
 import ChallengeStep from './ChallengeStep'
 import DeltaTutor from './DeltaTutor'
@@ -20,7 +22,7 @@ interface Props {
   seriesLabel?: string
 }
 
-type RightTab = 'lesson' | 'output' | 'debug' | 'tutor'
+type RightTab = 'lesson' | 'output' | 'dom' | 'tree' | 'css' | 'debug' | 'tutor'
 
 export default function LessonView({ lesson, executor, ui, onBack, onComplete, seriesLabel }: Props) {
   const [stepIdx, setStepIdx] = useState(0)
@@ -83,7 +85,10 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
 
   function handleOutput(lines: { text: string; kind: string }[]) {
     setOutput(lines)
-    if (lines.length > 0) setRightTab(prev => prev === 'debug' ? prev : 'output')
+    if (lines.length > 0) {
+      const hasPreview = lines.some(l => l.kind === 'preview')
+      setRightTab(prev => prev === 'debug' ? prev : hasPreview ? 'dom' : 'output')
+    }
   }
 
   function handleResults(results: TestResult[]) {
@@ -92,8 +97,14 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
   }
 
   const hasTrace = events.length > 0
-  const hasOutput = output !== null && output.length > 0
+  const hasOutput = output !== null && output.some(l => l.kind !== 'preview')
+  const hasPreview = output !== null && output.some(l => l.kind === 'preview')
   const hasResults = testResults !== null && testResults.length > 0
+
+  // Web-step detection — determines which extra tabs appear
+  const htmlSnippet = step?.examples?.find(s => s.lang.toLowerCase() === 'html')
+  const cssSnippet  = step?.examples?.find(s => s.lang.toLowerCase() === 'css')
+  const isWebStep   = !!htmlSnippet
 
   // Progressive output: when tracing, only show print lines that have already executed
   const visibleOutput = (() => {
@@ -195,16 +206,20 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
         {/* Right — tabbed panel */}
         <div className={`w-[42%] shrink-0 flex flex-col`}>
 
-          {/* Tab bar */}
-          <div className={`flex items-center px-2 pt-2 border-b ${ui.border} ${ui.bg1} shrink-0 gap-1`}>
-            {(['lesson', 'output', 'debug', 'tutor'] as RightTab[]).map(tab => {
+          {/* Tab bar — context-sensitive: Tree/CSS tabs only appear for web steps */}
+          <div className={`flex items-center px-2 pt-2 border-b ${ui.border} ${ui.bg1} shrink-0 gap-1 overflow-x-auto`}>
+            {((['lesson', 'output', 'dom', ...(isWebStep ? ['tree'] : []), ...(cssSnippet ? ['css'] : []), 'debug', 'tutor']) as RightTab[]).map(tab => {
               const label = tab === 'lesson' ? 'Lesson'
                 : tab === 'output' ? (isChallenge ? 'Tests' : 'Output')
-                : tab === 'debug' ? 'Debug'
+                : tab === 'dom'    ? 'DOM'
+                : tab === 'tree'   ? 'Tree'
+                : tab === 'css'    ? 'Specificity'
+                : tab === 'debug'  ? 'Debug'
                 : 'Tutor (Δ)'
               const isActive = rightTab === tab
               const hasBadge =
                 (tab === 'debug' && hasTrace) ||
+                (tab === 'dom' && hasPreview) ||
                 (tab === 'output' && (hasOutput || hasResults))
               return (
                 <button
@@ -296,7 +311,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
             </div>
           )}
 
-          {/* Output tab */}
+          {/* Output tab — console text only */}
           {rightTab === 'output' && (
             isChallenge ? (
               hasResults ? (
@@ -326,26 +341,14 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
               hasOutput ? (
                 <div className="flex-1 overflow-y-auto">
                   <div className={`p-4 ${styles.codeFont} ${ui.bg0}`}>
-                    {(visibleOutput ?? []).map((line, i) => (
-                      line.kind === 'preview'
-                        ? (
-                          <iframe
-                            key={i}
-                            title="HTML preview"
-                            srcDoc={line.text}
-                            sandbox="allow-scripts"
-                            className={`w-full min-h-[420px] rounded-lg border ${ui.border} bg-white`}
-                          />
-                        )
-                        : (
-                          <div key={i} className={`whitespace-pre-wrap break-all ${
-                            line.kind === 'error' ? 'text-red-500'
-                            : line.kind === 'stderr' ? 'text-orange-400'
-                            : ui.txt1
-                          }`}>{line.text}</div>
-                        )
+                    {(visibleOutput ?? []).filter(l => l.kind !== 'preview').map((line, i) => (
+                      <div key={i} className={`whitespace-pre-wrap break-all ${
+                        line.kind === 'error' ? 'text-red-500'
+                        : line.kind === 'stderr' ? 'text-orange-400'
+                        : ui.txt1
+                      }`}>{line.text}</div>
                     ))}
-                    {hasTrace && (visibleOutput?.length ?? 0) === 0 && (
+                    {hasTrace && (visibleOutput?.filter(l => l.kind !== 'preview').length ?? 0) === 0 && (
                       <p className={`text-xs ${ui.txt2} mt-2`}>Step through the code — output appears as print statements execute.</p>
                     )}
                   </div>
@@ -357,6 +360,38 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
                 </div>
               )
             )
+          )}
+
+          {/* DOM tab — HTML/CSS/JS iframe preview */}
+          {rightTab === 'dom' && (
+            hasPreview ? (
+              <div className="flex-1 overflow-auto">
+                {output!.filter(l => l.kind === 'preview').map((line, i) => (
+                  <iframe
+                    key={i}
+                    title="DOM preview"
+                    srcDoc={line.text}
+                    sandbox="allow-scripts"
+                    className="w-full h-full border-0"
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className={`flex-1 flex flex-col items-center justify-center text-center px-6 ${ui.txt2}`}>
+                <div className="text-2xl mb-3">◻</div>
+                <p className="text-sm">Run an HTML example to see the rendered page here.</p>
+              </div>
+            )
+          )}
+
+          {/* Tree tab — DOM tree parsed from the HTML snippet */}
+          {rightTab === 'tree' && htmlSnippet && (
+            <DomTreePanel html={htmlSnippet.code} ui={ui} />
+          )}
+
+          {/* CSS Specificity tab */}
+          {rightTab === 'css' && cssSnippet && (
+            <CssSpecificityPanel css={cssSnippet.code} ui={ui} />
           )}
 
           {/* Debug tab */}

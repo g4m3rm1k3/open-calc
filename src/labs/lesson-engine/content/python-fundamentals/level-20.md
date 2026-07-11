@@ -7,9 +7,11 @@ lang: python
 
 # Lists
 
-A list is an ordered, mutable sequence of values. "Ordered" means the values have positions (indices). "Mutable" means the list can be changed after creation — values can be added, removed, or replaced. This makes lists the opposite of strings, which are immutable sequences.
+Imagine tracking five quiz scores without a list: `score1 = 88`, `score2 = 92`, `score3 = 75`, `score4 = 95`, `score5 = 83`. To compute the average, you write `(score1 + score2 + score3 + score4 + score5) / 5`. To support six scores, you add `score6` everywhere. To support any number of scores, the approach breaks completely — you cannot write a loop over five separate variable names.
 
-Lists are the workhorse data structure of Python. You will use them in nearly every program.
+A list solves this. It stores any number of values under a single name, in order, and lets you process all of them with a single loop. That is why lists exist: to turn "five separate things" into "one collection of things."
+
+A list is an ordered, mutable sequence of values. "Ordered" means the values have positions (indices). "Mutable" means the list can be changed after creation — values can be added, removed, or replaced. This makes lists the opposite of strings, which are immutable sequences.
 
 ## Creating Lists
 

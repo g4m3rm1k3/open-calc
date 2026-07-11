@@ -106,7 +106,7 @@ Cause 2: Used before assigned
     print(count)        ← count hasn't been assigned yet
     count = 0
 
-Cause 3: Wrong scope (Level 20 covers this)
+Cause 3: Wrong scope (Level 19 covers this)
     def calculate():
         answer = 42
     print(answer)       ← answer only exists inside calculate()

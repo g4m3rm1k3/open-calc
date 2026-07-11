@@ -96,7 +96,7 @@ Ada
 1815
 ```
 
-You get a **list** — covered fully in Level 21. For now: a list is an ordered collection in square brackets, and you can index it the same way you index a string.
+You get a **list** — covered fully in Level 20. For now: a list is an ordered collection in square brackets, and you can index it the same way you index a string.
 
 `separator.join(list_of_strings)` — the inverse of split. Joins a list of strings with the separator between each one.
 

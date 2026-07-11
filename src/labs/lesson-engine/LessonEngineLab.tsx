@@ -58,6 +58,17 @@ import dsaLevel8  from './content/dsa-python/level-8.md?raw'
 import dsaLevel9  from './content/dsa-python/level-9.md?raw'
 import dsaLevel10 from './content/dsa-python/level-10.md?raw'
 
+import jsLevel0 from './content/javascript-fundamentals/level-0.md?raw'
+import jsLevel1 from './content/javascript-fundamentals/level-1.md?raw'
+import jsLevel2 from './content/javascript-fundamentals/level-2.md?raw'
+import jsLevel3 from './content/javascript-fundamentals/level-3.md?raw'
+import jsLevel4 from './content/javascript-fundamentals/level-4.md?raw'
+import jsLevel5 from './content/javascript-fundamentals/level-5.md?raw'
+import jsLevel6 from './content/javascript-fundamentals/level-6.md?raw'
+import jsLevel7 from './content/javascript-fundamentals/level-7.md?raw'
+import jsLevel8 from './content/javascript-fundamentals/level-8.md?raw'
+import jsLevel9 from './content/javascript-fundamentals/level-9.md?raw'
+
 import cppLevel0 from './content/cpp-fundamentals/level-0.md?raw'
 import csharpLevel0 from './content/csharp-fundamentals/level-0.md?raw'
 import javaLevel0 from './content/java-fundamentals/level-0.md?raw'
@@ -112,6 +123,16 @@ const LESSON_FILES: Record<string, string> = {
   'dsa-python/level-8.md':  dsaLevel8,
   'dsa-python/level-9.md':  dsaLevel9,
   'dsa-python/level-10.md': dsaLevel10,
+  'javascript-fundamentals/level-0.md': jsLevel0,
+  'javascript-fundamentals/level-1.md': jsLevel1,
+  'javascript-fundamentals/level-2.md': jsLevel2,
+  'javascript-fundamentals/level-3.md': jsLevel3,
+  'javascript-fundamentals/level-4.md': jsLevel4,
+  'javascript-fundamentals/level-5.md': jsLevel5,
+  'javascript-fundamentals/level-6.md': jsLevel6,
+  'javascript-fundamentals/level-7.md': jsLevel7,
+  'javascript-fundamentals/level-8.md': jsLevel8,
+  'javascript-fundamentals/level-9.md': jsLevel9,
   'cpp-fundamentals/level-0.md': cppLevel0,
   'csharp-fundamentals/level-0.md': csharpLevel0,
   'java-fundamentals/level-0.md': javaLevel0,

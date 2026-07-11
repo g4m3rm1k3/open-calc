@@ -60,6 +60,8 @@ print("Hi" + "!")
 
 When Python encounters a complex expression, it evaluates it from the inside out — innermost parentheses first — then left to right at each level.
 
+A new atom: `*` is the **multiplication operator**. `3 * 4` evaluates to `12`. Python uses `*` instead of `×` because `×` is not on a standard keyboard. Division is `/`: `10 / 2` evaluates to `5.0`. Both are covered fully in Level 7.
+
 ```text
 print(2 + (3 * 4))
 

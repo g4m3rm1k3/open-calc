@@ -86,8 +86,7 @@ Two methods you will need:
 - `char.isalnum()` — returns `True` if the character is a letter or digit
 - `char.lower()` — returns the lowercased character
 
-Filter the string into a clean list of characters first, then apply the same
-closing-in logic from the step above. The empty string is a palindrome.
+Both `char.isalnum()` and `char.lower()` can be applied in one expression. The empty string is a palindrome. Do not reverse the string — apply the closing-in logic from the step above.
 
 ```challenge
 def is_palindrome(s):
@@ -163,38 +162,25 @@ search into a series of single-variable decisions.
 pointer to move. The algorithm's correctness depends on the precondition — that is why
 `pair_sum_exists` only works on sorted input and why callers must sort first.
 
-## Challenge: find the duplicate
+## Challenge: sorted_squares
 
-You are given a list of `n + 1` integers where each integer is between `1` and `n`
-inclusive. Exactly one value appears twice. Find it using O(1) extra space — no
-visited set, no sorting.
+Write `sorted_squares(arr)` that takes a **sorted** list of integers (which may include negative numbers) and returns a new list of their squares in ascending order.
 
-Treat the array as an implicit graph: position `i` points to position `arr[i]`. Because
-one value appears twice, two positions point to the same place — creating a cycle.
-Floyd's cycle detection (the fast/slow pointer pattern) finds where the cycle begins,
-which is the duplicate.
+`sorted_squares([-4, -1, 0, 3, 10])` → `[0, 1, 9, 16, 100]`
 
-Phase 1 — find a meeting point inside the cycle:
-- `slow` advances by 1 each step: `slow = arr[slow]`
-- `fast` advances by 2 each step: `fast = arr[arr[fast]]`
-- When `slow == fast` they are inside the cycle
+`abs(x)` — returns the absolute value of `x`. `abs(-4)` → `4`.
 
-Phase 2 — find the cycle entry (the duplicate):
-- Reset `slow = 0` (back to the start of the array)
-- Advance both by 1 each step
-- Where they meet is the duplicate value
-
-**Enable Debug on your solution** and step through both phases. Watch `slow` and
-`fast` converge in phase 1, then watch `slow` catch up from index 0 in phase 2.
+The input is already sorted. The constraint: do not call `.sort()` or `sorted()` on the output — use the sorted structure of the input to produce a sorted result in O(n) time.
 
 ```challenge
-def find_duplicate(arr):
+def sorted_squares(arr):
     pass
 ```
 
 ```test
-assert find_duplicate([1, 3, 4, 2, 2]) == 2
-assert find_duplicate([3, 1, 3, 4, 2]) == 3
-assert find_duplicate([1, 1]) == 1
-assert find_duplicate([2, 2, 2, 2, 2]) == 2
+assert sorted_squares([-4, -1, 0, 3, 10]) == [0, 1, 9, 16, 100]
+assert sorted_squares([-7, -3, 2, 3, 11]) == [4, 9, 9, 49, 121]
+assert sorted_squares([0]) == [0]
+assert sorted_squares([-5, -3, -1]) == [1, 9, 25]
+assert sorted_squares([1, 2, 3]) == [1, 4, 9]
 ```

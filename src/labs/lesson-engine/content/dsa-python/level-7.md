@@ -141,7 +141,7 @@ sequence starts `0, 1, 1, 2, 3, 5, 8, 13, ...` — `fib(0) = 0`, `fib(1) = 1`,
 in under a second — naive recursion will not.
 
 ```challenge
-def fib(n, cache={}):
+def fib(n):
     pass
 ```
 
