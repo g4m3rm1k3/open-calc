@@ -10,6 +10,7 @@ import { runTests, buildTestHarness } from './testRunner'
 import { runPython } from '../../labs/codelens/codelens/interpreter/pythonTracer'
 import { run as runJS } from '../../engines/js/interpreter/interpreter.js'
 import styles from './LessonEngine.module.css'
+import { CodeBlockPre, CodeBlockCode } from '../../components/math/CodeBlock.jsx'
 
 interface Props {
   step: LessonStep
@@ -96,7 +97,22 @@ export default function ChallengeStep({ step, executor, ui, onTrace }: Props) {
     <div className="flex flex-col gap-3 h-full">
       {prose && (
         <div className={`${styles.prose} ${ui.txt1} text-sm`}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{prose}</ReactMarkdown>
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]}
+            components={{
+              pre: CodeBlockPre,
+              code: ({ className, children }: any) => (
+                <CodeBlockCode
+                  className={className}
+                  inlineClassName={`px-1.5 py-0.5 rounded-md ${ui.bg1} font-mono text-[0.85em] text-brand-500 border ${ui.border}`}
+                >
+                  {children}
+                </CodeBlockCode>
+              )
+            }}
+          >
+            {prose}
+          </ReactMarkdown>
         </div>
       )}
 

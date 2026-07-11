@@ -4,6 +4,7 @@ import type { LessonStep, Executor, UiTheme } from './types'
 import type { TraceEvent } from '../../labs/codelens/codelens/types'
 import RunExample from './RunExample'
 import styles from './LessonEngine.module.css'
+import { CodeBlockPre, CodeBlockCode } from '../../components/math/CodeBlock.jsx'
 
 interface Props {
   step: LessonStep
@@ -17,7 +18,22 @@ export default function ReadingStep({ step, executor, ui, onTrace }: Props) {
     <div className="flex flex-col gap-4">
       {step.prose && (
         <div className={`${styles.prose} ${ui.txt1}`}>
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{step.prose}</ReactMarkdown>
+          <ReactMarkdown 
+            remarkPlugins={[remarkGfm]}
+            components={{
+              pre: CodeBlockPre,
+              code: ({ className, children }: any) => (
+                <CodeBlockCode
+                  className={className}
+                  inlineClassName={`px-1.5 py-0.5 rounded-md ${ui.bg1} font-mono text-[0.85em] text-brand-500 border ${ui.border}`}
+                >
+                  {children}
+                </CodeBlockCode>
+              )
+            }}
+          >
+            {step.prose}
+          </ReactMarkdown>
         </div>
       )}
       {step.examples.map((ex, i) => (

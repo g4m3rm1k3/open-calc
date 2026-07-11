@@ -60,34 +60,41 @@ export default function LessonView({ lesson, executor, ui, onBack, seriesLabel }
     <div className={`flex flex-col h-full ${ui.bg0}`}>
 
       {/* Top bar — pl-20 clears macOS traffic-light buttons */}
-      <div className={`flex items-center gap-2 pl-20 pr-4 py-2.5 border-b ${ui.border} ${ui.bg1} shrink-0`}>
+      <div className={`relative flex items-center gap-3 pl-20 pr-5 py-3 border-b ${ui.border} ${ui.bg1} shrink-0 shadow-sm overflow-hidden`}>
+        {/* Subtle gradient overlay to make the top bar pop */}
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-transparent to-transparent pointer-events-none" />
+        
         {seriesLabel && (
-          <>
+          <div className="flex items-center gap-2 z-10">
             <button
               type="button"
               onClick={onBack}
-              className={`text-sm ${ui.txt2} ${ui.hoverTx} transition-colors bg-transparent border-none cursor-pointer shrink-0`}
+              className={`text-sm font-medium ${ui.txt2} hover:text-brand-500 transition-colors bg-transparent border-none cursor-pointer shrink-0`}
             >
               {seriesLabel}
             </button>
-            <span className={`text-sm ${ui.txt2} shrink-0`}>›</span>
-          </>
+            <span className={`text-sm ${ui.txt2} opacity-50 shrink-0`}>›</span>
+          </div>
         )}
-        <span className={`text-sm font-semibold ${ui.txt1} truncate flex-1`}>{lesson.title}</span>
+        <span className={`text-[15px] font-bold ${ui.txt1} truncate flex-1 tracking-tight z-10`}>{lesson.title}</span>
 
         {/* Step dots */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5 z-10 bg-black/5 dark:bg-white/5 px-3 py-1.5 rounded-full border border-black/5 dark:border-white/5 shadow-inner">
           {lesson.steps.map((_, i) => (
             <div
               key={i}
               onClick={() => navigate(i)}
-              className={`w-1.5 h-1.5 rounded-full cursor-pointer transition-all ${
-                i === stepIdx ? 'bg-brand-500' : i < stepIdx ? 'bg-brand-500 opacity-40' : ui.bg2
+              className={`w-2 h-2 rounded-full cursor-pointer transition-all duration-300 ${
+                i === stepIdx 
+                  ? 'bg-brand-500 scale-125 shadow-[0_0_8px_rgba(var(--tw-custom-brand-500),0.6)]' 
+                  : i < stepIdx 
+                    ? 'bg-brand-500/40 hover:bg-brand-500/60' 
+                    : `${ui.bg2} hover:opacity-80`
               }`}
             />
           ))}
         </div>
-        <span className={`text-xs ${ui.txt2} shrink-0`}>{stepIdx + 1} / {total}</span>
+        <span className={`text-xs font-semibold ${ui.txt2} shrink-0 z-10 tabular-nums ml-1`}>{stepIdx + 1} / {total}</span>
       </div>
 
       {/* Split content */}
@@ -96,10 +103,13 @@ export default function LessonView({ lesson, executor, ui, onBack, seriesLabel }
         {/* Left — current step */}
         <div className={`flex flex-col flex-1 min-w-0 border-r ${ui.border}`}>
           {step?.title && (
-            <div className={`px-6 pt-5 pb-2 shrink-0 border-b ${ui.border}`}>
-              <h2 className={`text-xl font-bold ${ui.txt1}`}>{step.title}</h2>
+            <div className={`px-8 pt-8 pb-4 shrink-0 border-b ${ui.border} relative overflow-hidden`}>
+              {/* Decorative accent */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-500/10 to-purple-500/5 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/3" />
+              
+              <h2 className={`relative text-2xl font-black tracking-tight ${ui.txt1} mb-1 z-10`}>{step.title}</h2>
               {isChallenge && (
-                <span className={`inline-block mt-1 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${ui.bg2} ${ui.txt2}`}>
+                <span className={`relative inline-flex items-center mt-2 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md bg-gradient-to-r from-brand-500/20 to-brand-500/5 text-brand-600 dark:text-brand-400 border border-brand-500/20 shadow-sm z-10`}>
                   Challenge
                 </span>
               )}
@@ -113,12 +123,12 @@ export default function LessonView({ lesson, executor, ui, onBack, seriesLabel }
             )}
           </div>
           {/* Prev / Next */}
-          <div className={`flex items-center justify-between px-6 py-3 border-t ${ui.border} ${ui.bg1} shrink-0`}>
+          <div className={`flex items-center justify-between px-8 py-4 border-t ${ui.border} ${ui.bg1} shrink-0`}>
             <button
               type="button"
               onClick={() => navigate(Math.max(0, stepIdx - 1))}
               disabled={stepIdx === 0}
-              className={`text-sm ${ui.txt2} ${ui.hoverTx} disabled:opacity-30 bg-transparent border-none cursor-pointer`}
+              className={`text-sm font-medium px-4 py-2 rounded-lg border ${ui.border} ${ui.bg0} ${ui.txt2} hover:text-brand-500 disabled:opacity-30 disabled:hover:text-inherit bg-transparent cursor-pointer transition-all shadow-sm hover:shadow`}
             >
               ← Previous
             </button>
@@ -126,7 +136,7 @@ export default function LessonView({ lesson, executor, ui, onBack, seriesLabel }
               type="button"
               onClick={() => navigate(Math.min(total - 1, stepIdx + 1))}
               disabled={stepIdx === total - 1}
-              className={`text-sm font-semibold ${ui.txt1} ${ui.hoverTx} disabled:opacity-30 bg-transparent border-none cursor-pointer`}
+              className={`text-sm font-bold px-5 py-2 rounded-lg bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md hover:shadow-lg hover:from-brand-400 hover:to-brand-500 disabled:opacity-30 disabled:hover:shadow-md cursor-pointer transition-all border-none`}
             >
               Next →
             </button>
@@ -137,7 +147,7 @@ export default function LessonView({ lesson, executor, ui, onBack, seriesLabel }
         <div className={`w-[42%] shrink-0 flex flex-col`}>
 
           {/* Tab bar */}
-          <div className={`flex items-center gap-0 border-b ${ui.border} ${ui.bg1} shrink-0`}>
+          <div className={`flex items-center gap-2 px-3 pt-2 border-b ${ui.border} ${ui.bg1} shrink-0`}>
             {(['explore', 'debug', 'tutor'] as RightTab[]).map(tab => {
               const label = tab === 'explore' ? 'Explore' : tab === 'debug' ? 'Debug' : 'Tutor (Δ)'
               const isActive = rightTab === tab
@@ -147,15 +157,15 @@ export default function LessonView({ lesson, executor, ui, onBack, seriesLabel }
                   key={tab}
                   type="button"
                   onClick={() => setRightTab(tab)}
-                  className={`relative px-4 py-2 text-xs font-semibold border-b-2 transition-colors bg-transparent cursor-pointer ${
+                  className={`relative px-4 py-2 text-[13px] font-semibold border-b-2 transition-colors bg-transparent cursor-pointer ${
                     isActive
-                      ? `border-brand-500 ${ui.txt1}`
-                      : `border-transparent ${ui.txt2} ${ui.hoverTx}`
+                      ? `border-brand-500 text-brand-600 dark:text-brand-400`
+                      : `border-transparent ${ui.txt2} hover:text-brand-500`
                   }`}
                 >
                   {label}
                   {hasBadge && (
-                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand-500" />
+                    <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-brand-500 shadow-[0_0_4px_rgba(var(--tw-custom-brand-500),0.8)]" />
                   )}
                 </button>
               )
