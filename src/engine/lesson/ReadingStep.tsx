@@ -21,7 +21,7 @@ export default function ReadingStep({ step, executor, ui, onTrace }: Props) {
           <ReactMarkdown 
             remarkPlugins={[remarkGfm]}
             components={{
-              pre: CodeBlockPre,
+              pre: (({ children }: any) => <CodeBlockPre>{children}</CodeBlockPre>) as any,
               code: ({ className, children }: any) => (
                 <CodeBlockCode
                   className={className}

@@ -4,7 +4,7 @@ import remarkGfm from 'remark-gfm'
 import type { ParsedLesson, Executor, UiTheme, TestResult } from './types'
 import type { TraceEvent, HeapSnapshot } from '../../labs/codelens/codelens/types'
 import { buildHeapSnapshot } from '../../labs/codelens/codelens/renderer/heapSnapshot'
-import VariableWatch from '../../labs/codelens/codelens/renderer/VariableWatch'
+import LessonDebugPanel from './LessonDebugPanel'
 import RunExample from './RunExample'
 import ChallengeStep from './ChallengeStep'
 import DeltaTutor from './DeltaTutor'
@@ -339,37 +339,12 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
 
           {/* Debug tab */}
           {rightTab === 'debug' && (
-            hasTrace ? (
-              <>
-                {(() => {
-                  const ln = events[traceStep]?.line ?? events[traceStep]?.sourceLocation?.line
-                  const srcLine = ln != null ? traceCode.split('\n')[ln - 1]?.trim() : null
-                  return srcLine ? (
-                    <div className={`px-3 py-2 border-b ${ui.border} ${ui.bg1} shrink-0 flex items-center gap-2`}>
-                      <span className="text-[10px] font-mono font-bold text-brand-400">line {ln}</span>
-                      <code className="text-[11px] font-mono text-brand-300 whitespace-pre truncate">→ {srcLine}</code>
-                    </div>
-                  ) : null
-                })()}
-                <div className="flex-1 overflow-y-auto">
-                  <VariableWatch
-                    currentEvent={events[traceStep] ?? null}
-                    prevEvent={events[traceStep - 1] ?? null}
-                    heapSnapshot={heap ?? { objects: new Map() } as HeapSnapshot}
-                    events={events}
-                    step={traceStep}
-                    onSeek={seekTo}
-                    onShowEnvModel={() => {}}
-                    heapDelta={events[traceStep]?.heapDelta}
-                  />
-                </div>
-              </>
-            ) : (
-              <div className={`flex-1 flex flex-col items-center justify-center text-center px-6 ${ui.txt2}`}>
-                <div className="text-2xl mb-3">⬡</div>
-                <p className="text-sm">Enable Debug on the code editor and run to step through execution here.</p>
-              </div>
-            )
+            <LessonDebugPanel
+              events={events}
+              step={traceStep}
+              heap={heap}
+              ui={ui}
+            />
           )}
 
           {/* Tutor tab */}
