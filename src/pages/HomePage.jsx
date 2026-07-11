@@ -79,50 +79,6 @@ export default function HomePage() {
       <div className="relative z-10">
 
         {/* ── HERO ─────────────────────────────────────────────────────────── */}
-        <section className="min-h-[88vh] flex flex-col items-center justify-center text-center px-4 py-20">
-          <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black tracking-tight leading-none mb-5">
-            <span
-              className="bg-gradient-to-r from-indigo-500 via-cyan-400 to-violet-500 dark:from-indigo-300 dark:via-cyan-200 dark:to-violet-300 bg-clip-text text-transparent"
-              style={{ filter:'drop-shadow(0 0 40px rgba(99,102,241,0.45))' }}
-            >
-              UpSkillOS
-            </span>
-          </h1>
-
-          <p className="text-slate-700 dark:text-slate-300 text-xl sm:text-2xl font-light max-w-3xl leading-relaxed mb-3">
-            Master the universe of human knowledge.
-          </p>
-          <p className="text-slate-500 text-base sm:text-lg max-w-2xl leading-relaxed mb-10">
-            Calculus → Quantum Mechanics · Python → AI Systems · Chemistry → Molecular Biology ·
-            C++ → Robotics. Built in your browser. Free forever.
-          </p>
-
-          <div className="flex flex-wrap justify-center gap-2 mb-8">
-            {['Free Forever','Open Source','Runs in Browser','No Install Required','MIT License'].map(b => (
-              <span key={b} className="rounded-full border border-slate-200 bg-white/40 dark:border-white/10 dark:bg-white/5 px-3 py-1 text-[11px] font-medium text-slate-500 dark:text-slate-400 backdrop-blur-md">{b}</span>
-            ))}
-          </div>
-
-          {completedLessons > 0 && (
-            <div className="group relative inline-flex items-center gap-3 rounded-full border border-emerald-500/30 bg-emerald-500/10 dark:border-emerald-400/20 dark:bg-emerald-400/10 backdrop-blur-xl px-6 py-3 text-sm mb-10 overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(52,211,153,0.3)] hover:scale-105 cursor-default">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/0 via-emerald-400/20 to-emerald-400/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-              <div className="relative flex items-center gap-3 z-10">
-                <div className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></span>
-                </div>
-                <span className="font-bold text-emerald-800 dark:text-emerald-200 tracking-wide">
-                  <span className="text-emerald-600 dark:text-emerald-400 text-base">{completedLessons}</span> / {totalLessons} LESSONS COMPLETED
-                </span>
-              </div>
-            </div>
-          )}
-
-          <div className="flex flex-col items-center gap-1 text-slate-600 animate-bounce">
-            <span className="text-xs tracking-widest uppercase">Explore</span>
-            <span className="text-xl">↓</span>
-          </div>
-        </section>
 
         {/* ── FILTER + TOPIC TABLE ─────────────────────────────────────────── */}
         <section ref={exploreRef} className="px-4 pt-4 pb-10 scroll-mt-6">
