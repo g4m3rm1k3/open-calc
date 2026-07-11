@@ -233,6 +233,63 @@ export const EXAMPLES: ExampleMeta[] = [
   },
 
   {
+    id: 'py-animals',
+    name: 'Animal Kingdom (Python)',
+    description: 'Python classes with __init__, methods, and inheritance. The same OOP concepts as JS but with Python syntax.',
+    tags: ['Python', 'OOP', 'Beginner'],
+    emoji: '🐍',
+    project: normalizeProject({
+      schemaVersion: 2,
+      id: 'ex-py-animals',
+      name: 'Animal Kingdom',
+      target: 'python',
+      files: [{
+        id: 'file_main',
+        name: 'main.py',
+        blocks: [
+          {
+            id: 'py_animal',
+            type: 'class',
+            category: 'oop',
+            fields: { name: 'Animal', extendsName: '', accessModifier: 'none' },
+            children: [
+              { id: 'py_a_name', type: 'field', category: 'state', fields: { name: 'name', value: 'None', static: 'false' }, children: [] },
+              { id: 'py_a_ctor', type: 'constructor', category: 'oop', fields: { params: 'name', body: 'self.name = name' }, children: [] },
+              { id: 'py_a_speak', type: 'method', category: 'oop', fields: { name: 'speak', params: '', body: 'return self.name + " makes a sound."' }, children: [] },
+            ],
+          },
+          {
+            id: 'py_dog',
+            type: 'class',
+            category: 'oop',
+            fields: { name: 'Dog', extendsName: 'Animal', accessModifier: 'none' },
+            children: [
+              { id: 'py_d_ctor', type: 'constructor', category: 'oop', fields: { params: 'name', body: 'self.name = name' }, children: [] },
+              { id: 'py_d_speak', type: 'method', category: 'oop', fields: { name: 'speak', params: '', body: 'return self.name + " says: Woof!"' }, children: [] },
+            ],
+          },
+          {
+            id: 'py_cat',
+            type: 'class',
+            category: 'oop',
+            fields: { name: 'Cat', extendsName: 'Animal', accessModifier: 'none' },
+            children: [
+              { id: 'py_c_ctor', type: 'constructor', category: 'oop', fields: { params: 'name', body: 'self.name = name' }, children: [] },
+              { id: 'py_c_speak', type: 'method', category: 'oop', fields: { name: 'speak', params: '', body: 'return self.name + " says: Meow!"' }, children: [] },
+            ],
+          },
+          { id: 'py_dog_inst', type: 'variable', category: 'state', fields: { name: 'dog', value: 'Dog("Rex")' }, children: [] },
+          { id: 'py_cat_inst', type: 'variable', category: 'state', fields: { name: 'cat', value: 'Cat("Luna")' }, children: [] },
+          { id: 'py_log1', type: 'log', category: 'output', fields: { expression: 'dog.speak()' }, children: [] },
+          { id: 'py_log2', type: 'log', category: 'output', fields: { expression: 'cat.speak()' }, children: [] },
+        ],
+      }],
+      activeFileId: 'file_main',
+      html: '<main id="app"></main>',
+    }),
+  },
+
+  {
     id: 'ts-types',
     name: 'TypeScript Types',
     description: 'Interfaces, type aliases, and enums — the TypeScript type system in one project.',

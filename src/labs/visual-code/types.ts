@@ -73,7 +73,7 @@ export interface Project {
   schemaVersion: 2
   id: string
   name: string
-  target: 'javascript' | 'typescript'
+  target: 'javascript' | 'typescript' | 'python'
   files: ProjectFile[]
   activeFileId: string
   html: string

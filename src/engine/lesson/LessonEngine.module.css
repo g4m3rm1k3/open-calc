@@ -1,0 +1,59 @@
+/* Structural only — no colors. Colors via ui.* Tailwind tokens. */
+
+
+.codeFont {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.codeEditor {
+  composes: codeFont;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: none;
+  outline: none;
+  resize: none;
+  tab-size: 4;
+  background: transparent;
+  min-height: 160px;
+}
+
+.codeDisplay {
+  composes: codeFont;
+  margin: 0;
+  padding: 14px 16px;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.traceView {
+  min-height: 100px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.outputPanel {
+  composes: codeFont;
+  padding: 8px 14px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 12.5px;
+}
+
+.prose {
+  line-height: 1.7;
+  font-size: 15px;
+}
+.prose h1 { font-size: 1.75rem; font-weight: 700; margin-bottom: 8px; }
+.prose h2 { font-size: 1.2rem; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+.prose h3 { font-size: 1rem; font-weight: 600; margin-top: 16px; margin-bottom: 6px; }
+.prose p  { margin-bottom: 12px; }
+.prose ul, .prose ol { padding-left: 1.4em; margin-bottom: 12px; }
+.prose li { margin-bottom: 4px; }
+.prose pre { border-radius: 8px; padding: 14px 16px; overflow-x: auto; margin-bottom: 16px; }
+.prose pre code { background: none; padding: 0; }
+.prose hr { margin: 16px 0; border: none; border-top: 1px solid; opacity: 0.15; }
+.prose table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+.prose th, .prose td { border: 1px solid; padding: 6px 10px; }

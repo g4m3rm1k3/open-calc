@@ -1,5 +1,6 @@
 import { blockDefinition } from './blocks'
 import type { Block, Diagnostic, GeneratedOutput, Project, ProjectFile, TargetDefinition } from './types'
+import { transpilePython } from './pythonTranspiler'
 
 const INDENT = '  '
 
@@ -20,7 +21,7 @@ export function normalizeProject(raw: Partial<Project>): Project {
     schemaVersion: 2,
     id: raw.id || `proj_${Date.now().toString(36)}`,
     name: raw.name || 'Visual Code Project',
-    target: raw.target === 'javascript' ? 'javascript' : 'typescript',
+    target: raw.target === 'javascript' ? 'javascript' : raw.target === 'python' ? 'python' : 'typescript',
     files,
     activeFileId,
     html: raw.html ?? '<main id="app"><button id="scoreButton">Add score</button><p id="message"></p></main>',
@@ -120,6 +121,12 @@ export const TARGETS: Record<string, TargetDefinition> = {
     label: 'TypeScript',
     fileExtension: 'ts',
     transpile: (project, fileId) => transpileBlocks(project, fileId, 'typescript'),
+  },
+  python: {
+    id: 'python',
+    label: 'Python',
+    fileExtension: 'py',
+    transpile: (project, fileId) => transpilePython(project, fileId),
   },
 }
 

@@ -1127,3 +1127,15 @@
 }
 .jsImportConfirm:disabled { opacity: 0.4; cursor: default; }
 .jsImportConfirm:not(:disabled):hover { opacity: 0.88; }
+
+.switchConfirm {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #dc2626;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.switchConfirm:hover { background: #b91c1c; }

@@ -12,7 +12,7 @@ import { useState } from 'react'
 import {
   BLOCK_GROUPS, BLOCK_LIBRARY, blockDefinition, canContainChildren, childOptionsFor, summarizeBlock,
 } from './blocks.ts'
-import type { Block, BlockType, FieldSpec } from './types.ts'
+import type { Block, BlockDefinition, BlockType, FieldSpec } from './types.ts'
 // EXPRESSION_GROUPS/EXPRESSION_LIBRARY/detectTemplate/ExpressionParam currently
 // live in HTML Lab's jsExpressionLibrary.ts. That file has no HTML-Lab-specific
 // dependency (it's pure data + string composition) but wasn't moved in this
@@ -185,22 +185,25 @@ export interface BlockPaletteProps {
    *  HTML Lab's Visual JS is always JS, so it omits this; Visual Code Studio
    *  passes `project.target === 'typescript'`. */
   allowTsOnly?: boolean
+  /** If provided, called for each block definition; return false to hide the block from the palette. */
+  filterBlock?: (b: BlockDefinition) => boolean
 }
 
 /** Shared by `BlockPalette` internally and by a host that wants to show its
  *  own "N blocks" count in its own header chrome, without duplicating the
  *  filter predicate. */
-export function filterPaletteBlocks(query: string, allowTsOnly = false) {
+export function filterPaletteBlocks(query: string, allowTsOnly = false, filterBlock?: (b: BlockDefinition) => boolean) {
   return BLOCK_LIBRARY.filter(b => {
     if (b.childOnly) return false
     if (b.tsOnly && !allowTsOnly) return false
+    if (filterBlock && !filterBlock(b)) return false
     if (!query) return true
     return `${b.label} ${b.category} ${b.description}`.toLowerCase().includes(query.toLowerCase())
   })
 }
 
-export function BlockPalette({ query, onQueryChange, onAddBlock, classNames: cls, allowTsOnly = false }: BlockPaletteProps) {
-  const visible = filterPaletteBlocks(query, allowTsOnly)
+export function BlockPalette({ query, onQueryChange, onAddBlock, classNames: cls, allowTsOnly = false, filterBlock }: BlockPaletteProps) {
+  const visible = filterPaletteBlocks(query, allowTsOnly, filterBlock)
 
   return (
     <>
@@ -269,11 +272,13 @@ export interface BlockProgramProps {
    *  top-level import flow and passes nothing. */
   headerActions?: React.ReactNode
   emptyMessage?: React.ReactNode
+  /** If provided, called for each field spec before rendering. Return false to hide the field. */
+  filterField?: (field: FieldSpec, block: Block) => boolean
 }
 
 export function BlockProgram({
   blocks, selectedBlockId, onSelect, onDelete, onMove, onAddChild, onUpdateField, onUpdateFields,
-  domHints, classHints, variableHints, classNames: cls, headerActions, emptyMessage,
+  domHints, classHints, variableHints, classNames: cls, headerActions, emptyMessage, filterField,
 }: BlockProgramProps) {
   return (
     <>
@@ -300,6 +305,7 @@ export function BlockProgram({
               classHints={classHints}
               variableHints={variableHints}
               classNames={cls}
+              filterField={filterField}
             />
           ))
         )}
@@ -324,9 +330,10 @@ interface BlockRowProps {
   variableHints: string[]
   classNames: BlockEditorClassNames
   depth?: number
+  filterField?: (field: FieldSpec, block: Block) => boolean
 }
 
-function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChild, onUpdateField, onUpdateFields, domHints, classHints, variableHints, classNames: cls, depth = 0 }: BlockRowProps) {
+function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChild, onUpdateField, onUpdateFields, domHints, classHints, variableHints, classNames: cls, depth = 0, filterField }: BlockRowProps) {
   const def = blockDefinition(block.type)
   const childOptions = childOptionsFor(block.type)
   const isSelected = selectedBlockId === block.id
@@ -351,7 +358,7 @@ function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChi
         <code className={cls.blockSummary}>{summarizeBlock(block)}</code>
         {isSelected && def?.fields?.length ? (
           <div className={cls.fieldEditor} onClick={e => e.stopPropagation()}>
-            {def.fields.map(field => (
+            {def.fields.filter(field => !filterField || filterField(field, block)).map(field => (
               <FieldInput
                 key={field.name}
                 field={field}
@@ -388,6 +395,7 @@ function BlockRow({ block, selectedBlockId, onSelect, onDelete, onMove, onAddChi
               variableHints={variableHints}
               classNames={cls}
               depth={depth + 1}
+              filterField={filterField}
             />
           ))}
           <div className={cls.childActions}>

@@ -3,7 +3,7 @@ import { ExternalLink, Plus } from 'lucide-react'
 import { serializeProject } from './transpiler.ts'
 import {
   BlockPalette as SharedBlockPalette, BlockProgram as SharedBlockProgram, filterPaletteBlocks,
-  type BlockEditorClassNames,
+  type BlockEditorClassNames, type BlockProgramProps, type BlockPaletteProps as SharedBlockPaletteProps,
 } from './BlockEditor.tsx'
 import styles from './VisualCodeStudio.module.css'
 import type { Block, BlockType, GeneratedOutput, Project } from './types.ts'
@@ -58,11 +58,12 @@ interface BlockPaletteProps {
   onQueryChange: (q: string) => void
   onAddBlock: (type: BlockType) => void
   targetId: string
+  filterBlock?: SharedBlockPaletteProps['filterBlock']
 }
 
-export function BlockPalette({ query, onQueryChange, onAddBlock, targetId }: BlockPaletteProps) {
+export function BlockPalette({ query, onQueryChange, onAddBlock, targetId, filterBlock }: BlockPaletteProps) {
   const isTs = targetId === 'typescript'
-  const count = filterPaletteBlocks(query, isTs).length
+  const count = filterPaletteBlocks(query, isTs, filterBlock).length
 
   return (
     <>
@@ -77,6 +78,7 @@ export function BlockPalette({ query, onQueryChange, onAddBlock, targetId }: Blo
         onQueryChange={onQueryChange}
         onAddBlock={onAddBlock}
         allowTsOnly={isTs}
+        filterBlock={filterBlock}
         classNames={BLOCK_EDITOR_CLASSNAMES}
       />
     </>
@@ -98,11 +100,12 @@ interface ProgramPanelProps {
   classHints: string[]
   variableHints: string[]
   project: Project
+  filterField?: BlockProgramProps['filterField']
 }
 
 export function ProgramPanel({
   blocks, selectedBlockId, onSelect, onAddBlock, onDeleteBlock, onMoveBlock, onUpdateField, onUpdateFields,
-  domHints, classHints, variableHints,
+  domHints, classHints, variableHints, filterField,
 }: ProgramPanelProps) {
   return (
     <>
@@ -127,6 +130,7 @@ export function ProgramPanel({
         classHints={classHints}
         variableHints={variableHints}
         classNames={BLOCK_EDITOR_CLASSNAMES}
+        filterField={filterField}
         emptyMessage={
           <div className={styles.emptyProgram}>
             <strong>Your program is empty</strong>

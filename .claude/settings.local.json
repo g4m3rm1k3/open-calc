@@ -73,7 +73,8 @@
       "Bash(npm install *)",
       "Bash(node -e \"require\\('@testing-library/react'\\)\")",
       "Bash(cp /tmp/smoke-test.ts /Users/michaelmclean/Testing/open-calc/src/smoke-test.test.ts)",
-      "Bash(grep -E \"\\\\.\\(js|md\\)$\")"
+      "Bash(grep -E \"\\\\.\\(js|md\\)$\")",
+      "Bash(python3 -c \"print\\(\\(37 * 9/5\\) + 32\\)\")"
     ]
   }
 }

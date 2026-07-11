@@ -18,6 +18,7 @@ import {
 } from './transpiler.ts'
 import { EMPTY_PROJECT, EXAMPLES } from './examples.ts'
 import { buildRunnableHtml } from './runJavaScript.ts'
+import { buildRunnablePythonHtml } from './runPython.ts'
 import { BlockPalette, ProgramPanel, OutputPanel } from './VisualCodePanels.tsx'
 import { computeDomHints, computeClassHints, computeVariableHints } from './BlockEditor.tsx'
 import ConceptPanel from './ConceptPanel.tsx'
@@ -48,6 +49,16 @@ interface Props {
 
 type RightTab = 'concept' | 'code' | 'run' | 'preview' | 'data'
 
+// Fields that only exist in JavaScript/TypeScript — hidden when target is Python
+const PYTHON_HIDDEN_FIELDS = new Set(['accessModifier', 'kind', 'type', 'returnType', 'access', 'async'])
+const PYTHON_FIELD_FILTER = (field: { name: string }) => !PYTHON_HIDDEN_FIELDS.has(field.name)
+
+// Block categories and types that don't apply to Python
+const PYTHON_HIDDEN_CATEGORIES = new Set(['html'])
+const PYTHON_HIDDEN_BLOCK_TYPES = new Set(['whenReady', 'callWithCallback', 'chainStep'])
+const PYTHON_BLOCK_FILTER = (b: { category: string; type: string }) =>
+  !PYTHON_HIDDEN_CATEGORIES.has(b.category) && !PYTHON_HIDDEN_BLOCK_TYPES.has(b.type)
+
 export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onProjectChange, onCodeChange, onBack }: Props) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { openWindow } = useDesktop() as any
@@ -61,13 +72,19 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
   const [showExamples, setShowExamples] = useState(false)
   const [showJsImport, setShowJsImport] = useState(false)
   const [jsImportCode, setJsImportCode] = useState('')
+  const [pendingTarget, setPendingTarget] = useState<Project['target'] | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
   const jsFileRef = useRef<HTMLInputElement>(null)
   const previewRef = useRef<HTMLIFrameElement>(null)
 
   const file = activeFile(project)
   const generated = useMemo(() => transpileProject(project, project.activeFileId), [project])
-  const previewHtml = useMemo(() => buildRunnableHtml({ html: project.html, code: generated.code }), [project.html, generated.code])
+  const previewHtml = useMemo(
+    () => project.target === 'python'
+      ? buildRunnablePythonHtml(generated.code)
+      : buildRunnableHtml({ html: project.html, code: generated.code }),
+    [project.target, project.html, generated.code],
+  )
   const selectedBlock = useMemo(() => findBlock(file?.blocks ?? [], selectedBlockId), [file, selectedBlockId])
   const targetList = Object.values(TARGETS)
 
@@ -77,6 +94,9 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
   // get a correct, smaller subset (see BlockEditor.tsx's own doc comment).
   const domHints = useMemo(() => computeDomHints([], project.html), [project.html])
   const classHints = useMemo(() => computeClassHints(domHints, ''), [domHints])
+
+  const pythonFilterField = project.target === 'python' ? PYTHON_FIELD_FILTER : undefined
+  const pythonFilterBlock = project.target === 'python' ? PYTHON_BLOCK_FILTER : undefined
   const variableHints = useMemo(() => computeVariableHints(file?.blocks ?? []), [file])
 
   useEffect(() => { onProjectChange?.(project) }, [project, onProjectChange])
@@ -97,7 +117,7 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
 
   // ── File management ──────────────────────────────────────────────────────
   function addFile() {
-    const name = `module_${Date.now().toString(36)}.${project.target === 'typescript' ? 'ts' : 'js'}`
+    const name = `module_${Date.now().toString(36)}.${project.target === 'python' ? 'py' : project.target === 'typescript' ? 'ts' : 'js'}`
     const newFile: ProjectFile = { id: `file_${Date.now().toString(36)}`, name, blocks: [] }
     commit(p => ({ ...p, files: [...p.files, newFile], activeFileId: newFile.id }))
     setSelectedBlockId(null)
@@ -160,7 +180,7 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
   }
 
   function openInCodeLens() {
-    const lang = project.target === 'typescript' ? 'ts' : 'js'
+    const lang = project.target === 'python' ? 'py' : project.target === 'typescript' ? 'ts' : 'js'
     try {
       localStorage.setItem('codelens-handoff', JSON.stringify({ code: generated.code, lang }))
     } catch {}
@@ -181,6 +201,23 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
     setSelectedBlockId(null)
     setSaveState('idle')
     setShowExamples(false)
+  }
+
+  function confirmSwitchTarget() {
+    if (!pendingTarget) return
+    const ext = TARGETS[pendingTarget]?.fileExtension ?? 'js'
+    setProject(normalizeProject({
+      schemaVersion: 2,
+      id: project.id,
+      name: project.name,
+      target: pendingTarget,
+      files: [{ id: 'file_main', name: `main.${ext}`, blocks: [] }],
+      activeFileId: 'file_main',
+      html: '<main id="app"></main>',
+    } as Partial<Project>))
+    setSelectedBlockId(null)
+    setSaveState('idle')
+    setPendingTarget(null)
   }
 
   function applyJsImport(code: string) {
@@ -258,9 +295,17 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
                 key={t.id}
                 type="button"
                 className={`${styles.langPill} ${project.target === t.id ? styles.langActive : ''}`}
-                onClick={() => commit(p => ({ ...p, target: t.id as Project['target'] }))}
+                onClick={() => {
+                  if (t.id === project.target) return
+                  const hasBlocks = project.files.some(f => f.blocks.length > 0)
+                  if (hasBlocks) {
+                    setPendingTarget(t.id as Project['target'])
+                  } else {
+                    commit(p => ({ ...p, target: t.id as Project['target'] }))
+                  }
+                }}
               >
-                {t.id === 'typescript' ? 'TS' : 'JS'}
+                {t.id === 'typescript' ? 'TS' : t.id === 'python' ? 'PY' : 'JS'}
               </button>
             ))}
           </div>
@@ -322,12 +367,16 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
                 <button type="button" className={styles.moreItem} onClick={() => { importRef.current?.click(); setShowMore(false) }}>
                   <FolderOpen size={14} /> Import project
                 </button>
-                <button type="button" className={styles.moreItem} onClick={() => { jsFileRef.current?.click(); setShowMore(false) }}>
-                  <FileCode size={14} /> Upload .js file → blocks
-                </button>
-                <button type="button" className={styles.moreItem} onClick={() => { setShowJsImport(true); setShowMore(false) }}>
-                  <FileCode size={14} /> Paste JS → blocks
-                </button>
+                {project.target !== 'python' && (
+                  <button type="button" className={styles.moreItem} onClick={() => { jsFileRef.current?.click(); setShowMore(false) }}>
+                    <FileCode size={14} /> Upload .js file → blocks
+                  </button>
+                )}
+                {project.target !== 'python' && (
+                  <button type="button" className={styles.moreItem} onClick={() => { setShowJsImport(true); setShowMore(false) }}>
+                    <FileCode size={14} /> Paste JS → blocks
+                  </button>
+                )}
                 <button type="button" className={styles.moreItem} onClick={() => { clearProject(); setShowMore(false) }}>
                   <Trash2 size={14} /> Clear project
                 </button>
@@ -385,6 +434,7 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
             onQueryChange={setQuery}
             onAddBlock={addBlock}
             targetId={project.target}
+            filterBlock={pythonFilterBlock}
           />
         </aside>
 
@@ -403,6 +453,7 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
             classHints={classHints}
             variableHints={variableHints}
             project={project}
+            filterField={pythonFilterField}
           />
         </main>
 
@@ -410,7 +461,7 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
         <aside className={styles.panel}>
           <div className={styles.panelHeader}>
             <div className={styles.tabs}>
-              {(['learn', 'code', 'run', 'preview'] as const).map(id => {
+              {(['learn', 'code', 'run', 'preview'] as const).filter(id => !(id === 'preview' && project.target === 'python')).map(id => {
                 const active = id === 'learn' ? rightTab === 'concept' : rightTab === id
                 return (
                   <button
@@ -453,6 +504,29 @@ export default function VisualCodeStudio({ initialProject = EMPTY_PROJECT, onPro
           </div>
         </aside>
       </div>
+
+      {/* ── Switch language confirmation modal ── */}
+      {pendingTarget && (
+        <div className={styles.jsImportOverlay} onClick={() => setPendingTarget(null)}>
+          <div className={styles.jsImportModal} onClick={e => e.stopPropagation()}>
+            <h3 className={styles.jsImportTitle}>
+              Switch to {TARGETS[pendingTarget]?.label ?? pendingTarget}?
+            </h3>
+            <p className={styles.jsImportHint}>
+              Your current blocks will be cleared — this language switch starts a fresh project.
+              Exported projects and saved work are not affected.
+            </p>
+            <div className={styles.jsImportActions}>
+              <button type="button" className={styles.jsImportCancel} onClick={() => setPendingTarget(null)}>
+                Cancel
+              </button>
+              <button type="button" className={styles.switchConfirm} onClick={confirmSwitchTarget}>
+                Switch &amp; reset
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Paste JS → blocks modal ── */}
       {showJsImport && (

@@ -161,7 +161,7 @@ async function* callGoogle(key, model, sysPrompt, msgs) {
   if (text) yield text;
 }
 
-async function* callProvider(settings, msgs, sysPrompt = "") {
+export async function* callProvider(settings, msgs, sysPrompt = "") {
   const p = getProvider(settings.provider);
   const allMsgs = sysPrompt
     ? [{ role: "system", content: sysPrompt }, ...msgs]
@@ -535,7 +535,7 @@ function TutorMessage({ content, isUser, onApplyCode }) {
 }
 
 // ─── Settings persistence ─────────────────────────────────────────────────────
-function loadSettings() {
+export function loadSettings() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw
