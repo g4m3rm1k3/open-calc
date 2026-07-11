@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { getAllCourses, getChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
@@ -11,8 +11,10 @@ import { usePins } from '../context/PinsContext.jsx'
 import { usePinLauncher } from '../hooks/usePinLauncher.js'
 import { GLASS_META } from '../styles/courseColors.js'
 import HomeTopicSearch from '../components/ui/HomeTopicSearch.jsx'
+import TopicTable from '../components/ui/TopicTable.jsx'
+import { getTopicGroup, TOPIC_GROUPS } from '../data/topicGroups.js'
 
-function matchItem(item, query) {
+export function matchItem(item, query) {
   if (!query) return true;
   const q = query.toLowerCase().trim();
   
@@ -102,14 +104,21 @@ const LABS_BY_KIND = {
 }
 
 // ── Discipline pills ──────────────────────────────────────────────────────────
+// Biology and Astronomy removed 2026-07-11: verified (grep across
+// src/courses, src/labs/registry.js, src/games/registry.js) that neither
+// corresponds to any real course, lab, or game anywhere in the app — they
+// were decorative hero copy only, not real filterable categories. Every
+// entry remaining here has been confirmed to have real content behind it.
 const DISCIPLINES_ROW1 = [
   { label:'Mathematics',  emoji:'∫',  col:'border-indigo-200 text-indigo-700 bg-indigo-50 dark:border-indigo-400/40 dark:text-indigo-200 dark:bg-indigo-900/30'   },
   { label:'Physics',      emoji:'Φ',  col:'border-blue-200 text-blue-700 bg-blue-50 dark:border-blue-400/40 dark:text-blue-200 dark:bg-blue-900/30'         },
   { label:'Chemistry',    emoji:'⚗', col:'border-cyan-200 text-cyan-700 bg-cyan-50 dark:border-cyan-400/40 dark:text-cyan-200 dark:bg-cyan-900/30'         },
-  { label:'Biology',      emoji:'🧬', col:'border-emerald-200 text-emerald-700 bg-emerald-50 dark:border-emerald-400/40 dark:text-emerald-200 dark:bg-emerald-900/30'},
   { label:'Robotics',     emoji:'🤖', col:'border-orange-200 text-orange-700 bg-orange-50 dark:border-orange-400/40 dark:text-orange-200 dark:bg-orange-900/30'   },
-  { label:'Astronomy',    emoji:'🔭', col:'border-violet-200 text-violet-700 bg-violet-50 dark:border-violet-400/40 dark:text-violet-200 dark:bg-violet-900/30'   },
 ]
+function topicIdFromLabel(label) {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+}
+
 const DISCIPLINES_ROW2 = [
   { label:'Computer Science',       emoji:'⊕',  col:'border-purple-200 text-purple-700 bg-purple-50 dark:border-purple-400/40 dark:text-purple-200 dark:bg-purple-900/30'   },
   { label:'Data Science',           emoji:'Σ',  col:'border-sky-200 text-sky-700 bg-sky-50 dark:border-sky-400/40 dark:text-sky-200 dark:bg-sky-900/30'            },
@@ -176,6 +185,13 @@ export default function HomePage() {
   const { pins, removePin } = usePins()
   const { openPin } = usePinLauncher()
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeTopicId, setActiveTopicId] = useState('linear-algebra')
+  const exploreRef = useRef(null)
+
+  function selectTopic(topicId) {
+    setActiveTopicId(topicId)
+    exploreRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
   const totalLessons     = COURSE_ENTRIES.reduce((s, { chapters }) => s + chapters.reduce((n, ch) => n + ch.lessons.length, 0), 0)
   const completedLessons = COURSE_ENTRIES.reduce((s, { course, chapters }) =>
     s + chapters.reduce((n, ch) =>
@@ -189,21 +205,6 @@ export default function HomePage() {
 
         {/* ── HERO ─────────────────────────────────────────────────────────── */}
         <section className="min-h-[88vh] flex flex-col items-center justify-center text-center px-4 py-20">
-          <div className="flex flex-wrap justify-center gap-2 mb-3">
-            {DISCIPLINES_ROW1.map(d => (
-              <span key={d.label} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold backdrop-blur-sm ${d.col}`}>
-                <span className="text-sm leading-none">{d.emoji}</span>{d.label}
-              </span>
-            ))}
-          </div>
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {DISCIPLINES_ROW2.map(d => (
-              <span key={d.label} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold backdrop-blur-sm ${d.col}`}>
-                <span className="text-sm leading-none">{d.emoji}</span>{d.label}
-              </span>
-            ))}
-          </div>
-
           <h1 className="text-7xl sm:text-8xl lg:text-9xl font-black tracking-tight leading-none mb-5">
             <span
               className="bg-gradient-to-r from-indigo-500 via-cyan-400 to-violet-500 dark:from-indigo-300 dark:via-cyan-200 dark:to-violet-300 bg-clip-text text-transparent"
@@ -256,6 +257,51 @@ export default function HomePage() {
             </span>
           </div>
           <HomeTopicSearch onSearch={setSearchQuery} />
+
+          <div className="flex flex-wrap justify-center gap-2 mt-5">
+            {Object.entries(TOPIC_GROUPS).map(([id, g]) => {
+              const active = activeTopicId === id
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => selectTopic(id)}
+                  className={`h-8 inline-flex items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold transition-colors ${
+                    active
+                      ? 'border-indigo-400 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300'
+                      : 'border-slate-200 dark:border-slate-700 bg-white/40 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
+                  }`}
+                >
+                  {g.label}
+                </button>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ── EXPLORE BY TOPIC ─────────────────────────────────────────────── */}
+        <section ref={exploreRef} className="px-4 pb-10 scroll-mt-6">
+          <div className="max-w-3xl mx-auto text-center mb-6">
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-1">Explore by Topic</h2>
+            <p className="text-slate-500 text-sm">Click a filter above — every real way in, one place, grouped honestly.</p>
+          </div>
+          {(() => {
+            const group = getTopicGroup(activeTopicId)
+            if (!group) {
+              return (
+                <div className="max-w-lg mx-auto text-center rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/30 p-8">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Pick a filter above to see everything real for that subject.
+                  </p>
+                </div>
+              )
+            }
+            return (
+              <div className="w-[90vw] max-w-none mx-auto">
+                <TopicTable group={group} query={searchQuery} matchItem={matchItem} />
+              </div>
+            )
+          })()}
         </section>
 
         {/* ── FAVOURITES ───────────────────────────────────────────────────── */}

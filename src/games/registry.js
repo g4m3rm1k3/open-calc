@@ -11,7 +11,7 @@ export const GAMES = [
   },
   {
     key: 'matrix-game',
-    label: 'Linear Algebra',
+    label: 'Linear Algebra Arcade',
     emoji: 'λ',
     color: 'cyan',
     desc: 'Seven interactive lessons — vectors, transforms, determinants & eigenvectors.',

@@ -75,17 +75,17 @@ function GameBody({ item }) {
   )
 }
 
-function CourseCard({ item, chapters, getLessonStatus, meta, innerRef }) {
+function CourseCard({ item, chapters, getLessonStatus, meta, innerRef, compact }) {
   const total = chapters.reduce((s, ch) => s + ch.lessons.length, 0)
   const done  = chapters.reduce((s, ch) =>
     s + ch.lessons.filter(l => getLessonStatus(buildProgressKey(item.key, l), 1) === 'complete').length, 0)
   const pct = total > 0 ? done / total : 0
   
   return (
-    <div ref={innerRef} className="flex flex-col h-full overflow-hidden rounded-[24px] border border-slate-200/60 dark:border-white/10 bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.04)] group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:-translate-y-2">
+    <div ref={innerRef} className={`flex flex-col h-full overflow-hidden ${compact ? 'rounded-[16px]' : 'rounded-[24px] border border-slate-200/60 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] group-hover:-translate-y-2'} bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-2xl transition-all duration-500`}>
       
       {/* Sleek Header */}
-      <div className={`relative px-5 pt-6 pb-6 overflow-hidden border-b-2 ${meta.border}`}>
+      <div className={`relative px-5 pt-6 pb-6 overflow-hidden h-full ${compact ? '' : 'border-b-2'} ${meta.border}`}>
         <PremiumHeaderBackground meta={meta} />
         
         {/* Large faded background icon */}
@@ -100,8 +100,9 @@ function CourseCard({ item, chapters, getLessonStatus, meta, innerRef }) {
       </div>
       
       {/* Body */}
-      <div className="flex-1 flex flex-col bg-white/80 dark:bg-[#0d0d18]/50 px-5 pt-5 pb-5 relative">
-        <p className="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed flex-1 mb-6">{item.description}</p>
+      {!compact && (
+        <div className="flex-1 flex flex-col bg-white/80 dark:bg-[#0d0d18]/50 px-5 pt-5 pb-5 relative">
+          <p className="text-[13px] text-slate-600 dark:text-slate-300 leading-relaxed flex-1 mb-6">{item.description}</p>
         
         <div className="mt-auto">
           <div className="flex justify-between items-end mb-2.5">
@@ -126,11 +127,12 @@ function CourseCard({ item, chapters, getLessonStatus, meta, innerRef }) {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }
 
-export default function AppCard({ item, variant = 'course', chapters, getLessonStatus }) {
+export default function AppCard({ item, variant = 'course', chapters, getLessonStatus, compact = false }) {
   const ref = useRef(null)
   const meta = GLASS_META[item.color] ?? GLASS_META.slate
 
@@ -139,10 +141,10 @@ export default function AppCard({ item, variant = 'course', chapters, getLessonS
       <Link
         to={item.path}
         className="group block h-full"
-        onMouseEnter={() => { if (ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = meta.glow }}
-        onMouseLeave={() => { if (ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = '' }}
+        onMouseEnter={() => { if (!compact && ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = meta.glow }}
+        onMouseLeave={() => { if (!compact && ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = '' }}
       >
-        <CourseCard innerRef={ref} item={item} chapters={chapters} getLessonStatus={getLessonStatus} meta={meta} />
+        <CourseCard innerRef={ref} item={item} chapters={chapters} getLessonStatus={getLessonStatus} meta={meta} compact={compact} />
       </Link>
     )
   }
@@ -150,12 +152,12 @@ export default function AppCard({ item, variant = 'course', chapters, getLessonS
   const inner = (
     <div
       ref={ref}
-      className="group flex flex-col h-full overflow-hidden rounded-[24px] border border-slate-200/60 dark:border-white/10 bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-2xl transition-all duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:-translate-y-2 cursor-pointer"
-      onMouseEnter={() => { if (ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = GLASS_META.indigo.glow }}
-      onMouseLeave={() => { if (ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = '' }}
+      className={`group flex flex-col h-full overflow-hidden ${compact ? 'rounded-[16px]' : 'rounded-[24px] border border-slate-200/60 dark:border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] hover:-translate-y-2'} bg-white/60 dark:bg-[#0b0f19]/80 backdrop-blur-2xl transition-all duration-500 cursor-pointer`}
+      onMouseEnter={() => { if (!compact && ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = GLASS_META.indigo.glow }}
+      onMouseLeave={() => { if (!compact && ref.current && document.documentElement.classList.contains('dark')) ref.current.style.boxShadow = '' }}
     >
       {variant === 'lab' ? <LabHeader item={item} /> : <GameHeader item={item} />}
-      {variant === 'lab' ? <LabBody item={item} /> : <GameBody item={item} />}
+      {!compact && (variant === 'lab' ? <LabBody item={item} /> : <GameBody item={item} />)}
     </div>
   )
 
