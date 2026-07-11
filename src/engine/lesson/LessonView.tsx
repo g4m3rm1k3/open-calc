@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import type { ParsedLesson, Executor, UiTheme, TestResult } from './types'
@@ -25,8 +25,14 @@ type RightTab = 'lesson' | 'output' | 'debug' | 'tutor'
 export default function LessonView({ lesson, executor, ui, onBack, onComplete, seriesLabel }: Props) {
   const [stepIdx, setStepIdx] = useState(0)
   const [rightTab, setRightTab] = useState<RightTab>('lesson')
+  const [events, setEvents] = useState<TraceEvent[]>([])
+  const [traceStep, setTraceStep] = useState(0)
+  const [heap, setHeap] = useState<HeapSnapshot | null>(null)
+  const [traceCode, setTraceCode] = useState<string>('')
+  const [output, setOutput] = useState<{ text: string; kind: string }[] | null>(null)
+  const [testResults, setTestResults] = useState<TestResult[] | null>(null)
 
-  // Reset all state when a new lesson is loaded (lesson prop reference changes)
+  // Reset all state when a new lesson is loaded
   useEffect(() => {
     setStepIdx(0)
     setEvents([])
@@ -38,17 +44,9 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
     setRightTab('lesson')
   }, [lesson])
 
-  // Trace state
-  const [events, setEvents] = useState<TraceEvent[]>([])
-  const [traceStep, setTraceStep] = useState(0)
-  const [heap, setHeap] = useState<HeapSnapshot | null>(null)
-  const [traceCode, setTraceCode] = useState<string>('')
-
-  // Output state
-  const [output, setOutput] = useState<{ text: string; kind: string }[] | null>(null)
-  const [testResults, setTestResults] = useState<TestResult[] | null>(null)
-
-  const step = lesson.steps[stepIdx]
+  // Guard: clamp stepIdx in case lesson changes before effect fires
+  const safeIdx = Math.min(stepIdx, lesson.steps.length - 1)
+  const step = lesson.steps[Math.max(0, safeIdx)]
   const total = lesson.steps.length
   const isChallenge = !!step?.challenge
 
@@ -63,12 +61,19 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
     setRightTab('lesson')
   }
 
+  // Called when a fresh trace is loaded — switches to Debug tab
   function handleTrace(newEvents: TraceEvent[], code: string, traceIdx: number) {
     setEvents(newEvents)
     setTraceCode(code)
     setTraceStep(traceIdx)
     setHeap(newEvents.length ? buildHeapSnapshot(newEvents, traceIdx) : null)
     setRightTab('debug')
+  }
+
+  // Called when stepping through an existing trace — no tab switch
+  function handleSeek(step: number) {
+    setTraceStep(step)
+    setHeap(buildHeapSnapshot(events, step))
   }
 
   function seekTo(idx: number) {
@@ -176,9 +181,9 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
         <div className={`flex flex-col flex-1 min-w-0 border-r ${ui.border}`}>
           {step && (
             isChallenge
-              ? <ChallengeStep step={step} executor={executor} ui={ui} onTrace={handleTrace} onResults={handleResults} />
+              ? <ChallengeStep step={step} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onResults={handleResults} />
               : step.examples[0]
-                ? <RunExample snippet={step.examples[0]} executor={executor} ui={ui} onTrace={handleTrace} onOutput={handleOutput} />
+                ? <RunExample snippet={step.examples[0]} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onOutput={handleOutput} />
                 : (
                   <div className={`flex-1 flex items-center justify-center ${ui.txt2} text-sm`}>
                     No code for this step — read the Lesson tab.

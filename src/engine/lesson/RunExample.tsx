@@ -12,6 +12,7 @@ interface Props {
   executor: Executor
   ui: UiTheme
   onTrace?: (events: TraceEvent[], code: string, step: number) => void
+  onSeek?: (step: number) => void
   onOutput?: (lines: { text: string; kind: string }[]) => void
 }
 
@@ -25,7 +26,7 @@ function toMonacoLang(lang: string): string {
   return n
 }
 
-export default function RunExample({ snippet, executor, ui, onTrace, onOutput }: Props) {
+export default function RunExample({ snippet, executor, ui, onTrace, onSeek, onOutput }: Props) {
   const { themeStyles } = useGlobalTheme() as any
   const monacoTheme = themeStyles?.monaco ?? 'vs-dark'
 
@@ -73,7 +74,7 @@ export default function RunExample({ snippet, executor, ui, onTrace, onOutput }:
 
   function seek(step: number) {
     setTraceStep(step)
-    if (onTrace) onTrace(traceEvents, code, step)
+    if (onSeek) onSeek(step)
   }
 
   async function run() {

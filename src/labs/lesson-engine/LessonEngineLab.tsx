@@ -46,11 +46,30 @@ type View =
   | { kind: 'level-list'; series: SeriesMeta }
   | { kind: 'lesson'; lesson: ParsedLesson; series: SeriesMeta }
 
+const PROGRESS_KEY = 'oc-lesson-progress'
+
 export default function LessonEngineLab({ onBack }: Props) {
   const { themeStyles, studioTheme } = useGlobalTheme()
   const ui = (themeStyles as any).ui
 
   const [view, setView] = useState<View>({ kind: 'series-list' })
+
+  const [completed, setCompleted] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem(PROGRESS_KEY)
+      return new Set(raw ? JSON.parse(raw) : [])
+    } catch { return new Set() }
+  })
+
+  function markComplete(seriesId: string, level: number) {
+    const key = `${seriesId}:${level}`
+    setCompleted(prev => {
+      const next = new Set(prev)
+      next.add(key)
+      try { localStorage.setItem(PROGRESS_KEY, JSON.stringify([...next])) } catch {}
+      return next
+    })
+  }
 
   function openLesson(file: string, series: SeriesMeta) {
     const raw = LESSON_FILES[file]
@@ -66,7 +85,7 @@ export default function LessonEngineLab({ onBack }: Props) {
         <SeriesListView ui={ui} onBack={onBack} onSelectSeries={s => setView({ kind: 'level-list', series: s })} />
       )}
       {view.kind === 'level-list' && (
-        <LevelListView ui={ui} series={view.series} onBack={() => setView({ kind: 'series-list' })} onSelectLevel={file => openLesson(file, view.series)} />
+        <LevelListView ui={ui} series={view.series} completed={completed} onBack={() => setView({ kind: 'series-list' })} onSelectLevel={file => openLesson(file, view.series)} />
       )}
       {view.kind === 'lesson' && (() => {
         const currentIdx = view.series.levels.findIndex(l => l.level === view.lesson.level)
@@ -78,9 +97,11 @@ export default function LessonEngineLab({ onBack }: Props) {
             ui={ui}
             seriesLabel={view.series.label}
             onBack={() => setView({ kind: 'level-list', series: view.series })}
-            onComplete={nextLevel
-              ? () => openLesson(nextLevel.file, view.series)
-              : () => setView({ kind: 'level-list', series: view.series })}
+            onComplete={() => {
+              markComplete(view.series.id, view.lesson.level)
+              if (nextLevel) openLesson(nextLevel.file, view.series)
+              else setView({ kind: 'level-list', series: view.series })
+            }}
           />
         )
       })()}
@@ -132,12 +153,14 @@ function SeriesListView({ ui, onBack, onSelectSeries }: {
 
 // ── Level list ────────────────────────────────────────────────────────────────
 
-function LevelListView({ ui, series, onBack, onSelectLevel }: {
+function LevelListView({ ui, series, completed, onBack, onSelectLevel }: {
   ui: any
   series: SeriesMeta
+  completed: Set<string>
   onBack: () => void
   onSelectLevel: (file: string) => void
 }) {
+  const doneCount = series.levels.filter(l => completed.has(`${series.id}:${l.level}`)).length
   return (
     <div className="flex flex-col h-full">
       <div className={`flex items-center gap-3 px-4 py-2.5 border-b ${ui.border} ${ui.bg1} shrink-0`}>
@@ -145,26 +168,35 @@ function LevelListView({ ui, series, onBack, onSelectLevel }: {
           ← Series
         </button>
         <span className={`text-sm font-bold ${ui.txt1}`}>{series.label}</span>
+        {doneCount > 0 && (
+          <span className="ml-auto text-xs font-semibold text-emerald-400">{doneCount} / {series.levels.length} complete</span>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto p-6">
         <div className="text-4xl mb-3">{series.emoji}</div>
         <h1 className={`text-2xl font-bold mb-1 ${ui.txt1}`}>{series.label}</h1>
         <p className={`text-sm mb-6 ${ui.txt2}`}>{series.description}</p>
         <div className="flex flex-col gap-2">
-          {series.levels.map(lvl => (
-            <button
-              key={lvl.level}
-              type="button"
-              onClick={() => onSelectLevel(lvl.file)}
-              className={`text-left px-5 py-4 rounded-xl border ${ui.border} ${ui.bg1} ${ui.hoverBg} transition-all cursor-pointer flex items-center gap-4`}
-            >
-              <span className={`text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded ${ui.bg2} ${ui.txt2}`}>
-                Level {lvl.level}
-              </span>
-              <span className={`font-medium ${ui.txt1}`}>{lvl.title}</span>
-              <span className={`ml-auto text-lg ${ui.txt2}`}>→</span>
-            </button>
-          ))}
+          {series.levels.map(lvl => {
+            const isDone = completed.has(`${series.id}:${lvl.level}`)
+            return (
+              <button
+                key={lvl.level}
+                type="button"
+                onClick={() => onSelectLevel(lvl.file)}
+                className={`text-left px-5 py-4 rounded-xl border transition-all cursor-pointer flex items-center gap-4 ${isDone ? 'border-emerald-500/40 bg-emerald-500/5' : `${ui.border} ${ui.bg1}`} ${ui.hoverBg}`}
+              >
+                <span className={`text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded ${isDone ? 'bg-emerald-500/20 text-emerald-400' : `${ui.bg2} ${ui.txt2}`}`}>
+                  Level {lvl.level}
+                </span>
+                <span className={`font-medium ${ui.txt1}`}>{lvl.title}</span>
+                {isDone
+                  ? <span className="ml-auto text-emerald-400 text-base font-bold">✓</span>
+                  : <span className={`ml-auto text-lg ${ui.txt2}`}>→</span>
+                }
+              </button>
+            )
+          })}
         </div>
       </div>
     </div>
