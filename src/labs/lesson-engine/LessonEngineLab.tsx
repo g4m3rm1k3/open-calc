@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import { parseLesson } from '../../engine/lesson/parser'
 import { executeCode } from '../../engine/lesson/executor'
@@ -8,7 +8,10 @@ import type { SeriesMeta } from './series'
 import type { ParsedLesson } from '../../engine/lesson/types'
 
 // Vite ?raw imports for all lesson markdown files
-import level0PythonFundamentals from './content/python-fundamentals/level-0.md?raw'
+import pfLevel0  from './content/python-fundamentals/level-0.md?raw'
+import pfLevel1  from './content/python-fundamentals/level-1.md?raw'
+import pfLevel2  from './content/python-fundamentals/level-2.md?raw'
+import pfLevel3  from './content/python-fundamentals/level-3.md?raw'
 
 import dsaLevel0  from './content/dsa-python/level-0.md?raw'
 import dsaLevel1  from './content/dsa-python/level-1.md?raw'
@@ -23,7 +26,10 @@ import dsaLevel9  from './content/dsa-python/level-9.md?raw'
 import dsaLevel10 from './content/dsa-python/level-10.md?raw'
 
 const LESSON_FILES: Record<string, string> = {
-  'python-fundamentals/level-0.md': level0PythonFundamentals,
+  'python-fundamentals/level-0.md': pfLevel0,
+  'python-fundamentals/level-1.md': pfLevel1,
+  'python-fundamentals/level-2.md': pfLevel2,
+  'python-fundamentals/level-3.md': pfLevel3,
   'dsa-python/level-0.md':  dsaLevel0,
   'dsa-python/level-1.md':  dsaLevel1,
   'dsa-python/level-2.md':  dsaLevel2,
@@ -85,7 +91,7 @@ export default function LessonEngineLab({ onBack }: Props) {
         <SeriesListView ui={ui} onBack={onBack} onSelectSeries={s => setView({ kind: 'level-list', series: s })} />
       )}
       {view.kind === 'level-list' && (
-        <LevelListView ui={ui} series={view.series} completed={completed} onBack={() => setView({ kind: 'series-list' })} onSelectLevel={file => openLesson(file, view.series)} />
+        <LevelListView ui={ui} series={view.series} completed={completed} available={LESSON_FILES} onBack={() => setView({ kind: 'series-list' })} onSelectLevel={file => openLesson(file, view.series)} />
       )}
       {view.kind === 'lesson' && (() => {
         const currentIdx = view.series.levels.findIndex(l => l.level === view.lesson.level)
@@ -153,10 +159,11 @@ function SeriesListView({ ui, onBack, onSelectSeries }: {
 
 // ── Level list ────────────────────────────────────────────────────────────────
 
-function LevelListView({ ui, series, completed, onBack, onSelectLevel }: {
+function LevelListView({ ui, series, completed, available, onBack, onSelectLevel }: {
   ui: any
   series: SeriesMeta
   completed: Set<string>
+  available: Record<string, string>
   onBack: () => void
   onSelectLevel: (file: string) => void
 }) {
@@ -179,20 +186,28 @@ function LevelListView({ ui, series, completed, onBack, onSelectLevel }: {
         <div className="flex flex-col gap-2">
           {series.levels.map(lvl => {
             const isDone = completed.has(`${series.id}:${lvl.level}`)
+            const isReady = !!available[lvl.file]
             return (
               <button
                 key={lvl.level}
                 type="button"
-                onClick={() => onSelectLevel(lvl.file)}
-                className={`text-left px-5 py-4 rounded-xl border transition-all cursor-pointer flex items-center gap-4 ${isDone ? 'border-emerald-500/40 bg-emerald-500/5' : `${ui.border} ${ui.bg1}`} ${ui.hoverBg}`}
+                onClick={() => isReady && onSelectLevel(lvl.file)}
+                disabled={!isReady}
+                className={`text-left px-5 py-4 rounded-xl border transition-all flex items-center gap-4
+                  ${!isReady ? `opacity-40 cursor-not-allowed ${ui.border} ${ui.bg1}` :
+                    isDone  ? 'cursor-pointer border-emerald-500/40 bg-emerald-500/5' :
+                              `cursor-pointer ${ui.border} ${ui.bg1} ${ui.hoverBg}`}`}
               >
-                <span className={`text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded ${isDone ? 'bg-emerald-500/20 text-emerald-400' : `${ui.bg2} ${ui.txt2}`}`}>
+                <span className={`text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded
+                  ${isDone ? 'bg-emerald-500/20 text-emerald-400' : `${ui.bg2} ${ui.txt2}`}`}>
                   Level {lvl.level}
                 </span>
                 <span className={`font-medium ${ui.txt1}`}>{lvl.title}</span>
-                {isDone
-                  ? <span className="ml-auto text-emerald-400 text-base font-bold">✓</span>
-                  : <span className={`ml-auto text-lg ${ui.txt2}`}>→</span>
+                {!isReady
+                  ? <span className={`ml-auto text-xs ${ui.txt2}`}>Coming soon</span>
+                  : isDone
+                    ? <span className="ml-auto text-emerald-400 text-base font-bold">✓</span>
+                    : <span className={`ml-auto text-lg ${ui.txt2}`}>→</span>
                 }
               </button>
             )

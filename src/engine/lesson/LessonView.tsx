@@ -130,7 +130,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
             <span className={`text-sm ${ui.txt2} opacity-40`}>›</span>
           </div>
         )}
-        <span className={`text-[13px] font-bold ${ui.txt1} truncate flex-1 min-w-0`}>{lesson.title}</span>
+        <span className={`text-[13px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-sky-400 truncate flex-1 min-w-0`}>{lesson.title}</span>
 
         {/* Prev */}
         <button
@@ -230,32 +230,33 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
           {rightTab === 'lesson' && step && (
             <div className="flex-1 overflow-y-auto">
               {/* Step header */}
-              {(step.title || isChallenge) && (
-                <div className={`px-5 pt-5 pb-3 shrink-0`}>
-                  {step.title && (
-                    <h2 className={`text-lg font-black tracking-tight ${ui.txt1} leading-tight`}>{step.title}</h2>
-                  )}
+              <div className={`px-5 pt-6 pb-3 shrink-0`}>
+                {stepIdx === 0 && !step.title && (
+                  <h1 className="text-3xl font-black tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-br from-brand-400 via-sky-400 to-brand-600 mb-2">
+                    {lesson.title}
+                  </h1>
+                )}
+                {step.title && (
+                  <h2 className="text-2xl font-black tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-sky-500">
+                    {step.title}
+                  </h2>
+                )}
                   {isChallenge && (
                     <span className={`inline-flex items-center mt-2 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/20`}>
                       Challenge
                     </span>
                   )}
                 </div>
-              )}
               {/* Prose */}
               <div className={`px-5 pb-6 ${styles.prose} ${ui.txt1} text-sm`}>
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    pre: ({ children }: any) => (
-                      <pre className={`my-4 p-3 rounded-lg overflow-x-auto text-xs leading-relaxed font-mono ${ui.bg1} border ${ui.border} ${styles.noLigatures}`}>
-                        {children}
-                      </pre>
-                    ),
+                    pre: (({ children }: any) => <CodeBlockPre>{children}</CodeBlockPre>) as any,
                     code: ({ className, children }: any) => (
                       <CodeBlockCode
                         className={className}
-                        inlineClassName={`px-1.5 py-0.5 rounded-md ${ui.bg1} font-mono text-[0.85em] text-brand-500 border ${ui.border}`}
+                        inlineClassName={`px-1.5 py-0.5 rounded border font-mono text-[0.85em] bg-brand-500/10 text-brand-600 dark:text-brand-400 border-brand-500/20 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]`}
                       >
                         {children}
                       </CodeBlockCode>

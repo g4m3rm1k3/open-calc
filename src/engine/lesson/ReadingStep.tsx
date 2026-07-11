@@ -25,7 +25,7 @@ export default function ReadingStep({ step, executor, ui, onTrace }: Props) {
               code: ({ className, children }: any) => (
                 <CodeBlockCode
                   className={className}
-                  inlineClassName={`px-1.5 py-0.5 rounded-md ${ui.bg1} font-mono text-[0.85em] text-brand-500 border ${ui.border}`}
+                  inlineClassName={`px-1.5 py-0.5 rounded border font-mono text-[0.85em] bg-brand-500/10 text-brand-600 dark:text-brand-400 border-brand-500/20 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]`}
                 >
                   {children}
                 </CodeBlockCode>
