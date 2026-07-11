@@ -19,16 +19,29 @@ import 'prismjs/components/prism-javascript'
 // react-markdown wraps fenced code in its own <pre> automatically — don't
 // add a second one here, just style it via the `pre` component override
 // below and keep this one focused on the inner <code> + highlighting.
+
+import { createContext, useContext } from 'react'
+
+const InPreContext = createContext(false)
 export function CodeBlockPre({ children }) {
   return (
-    <pre className="my-6 p-4 rounded-xl overflow-x-auto text-sm leading-relaxed bg-[#2d2d2d] border border-slate-700 max-w-[75ch]">
-      {children}
-    </pre>
+    <InPreContext.Provider value={true}>
+      <pre className="my-6 p-4 rounded-xl overflow-x-auto text-sm leading-relaxed bg-slate-900/40 dark:bg-slate-950/60 border border-slate-800/60 dark:border-slate-800 shadow-inner max-w-[75ch] sidebar-scroll">
+        {children}
+      </pre>
+    </InPreContext.Provider>
   )
 }
 
 export function CodeBlockCode({ className, children, inlineClassName }) {
+  const inPre = useContext(InPreContext)
+  
   if (!className?.startsWith('language-')) {
+    if (inPre) {
+      // Plain text code block (no language specified)
+      return <code className="font-mono text-slate-600 dark:text-slate-300">{children}</code>
+    }
+    // True inline code (`code`)
     return <code className={inlineClassName}>{children}</code>
   }
   const lang = className.replace('language-', '').toLowerCase()
