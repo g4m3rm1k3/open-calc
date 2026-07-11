@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
 
 const ALL_TOPICS = [
@@ -22,39 +22,10 @@ const ALL_TOPICS = [
   "explore molecular chemistry", "learn advanced calculus", "master linear transformations"
 ];
 
-const PILL_COLORS = [
-  'from-indigo-500/20 to-blue-500/20 border-indigo-500/30 text-indigo-700 dark:text-indigo-300',
-  'from-emerald-500/20 to-teal-500/20 border-emerald-500/30 text-emerald-700 dark:text-emerald-300',
-  'from-rose-500/20 to-pink-500/20 border-rose-500/30 text-rose-700 dark:text-rose-300',
-  'from-amber-500/20 to-orange-500/20 border-amber-500/30 text-amber-700 dark:text-amber-300',
-  'from-violet-500/20 to-purple-500/20 border-violet-500/30 text-violet-700 dark:text-violet-300',
-  'from-cyan-500/20 to-sky-500/20 border-cyan-500/30 text-cyan-700 dark:text-cyan-300',
-];
-
-function getPillColor(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return PILL_COLORS[Math.abs(hash) % PILL_COLORS.length];
-}
-
-function shuffle(array) {
-  const arr = [...array];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
 export default function HomeTopicSearch({ onSearch }) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
-  
-  // Select 4 random topics on mount
-  const randomTopics = useMemo(() => shuffle(ALL_TOPICS).slice(0, 4), []);
-  
+
   const [topicIndex, setTopicIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -89,35 +60,8 @@ export default function HomeTopicSearch({ onSearch }) {
     onSearch(e.target.value);
   };
 
-  const handleTopicClick = (topic) => {
-    // Strip conversational filler for the actual search term
-    let keyword = topic.toLowerCase();
-    
-    // An aggressive list of prefixes to remove to get to the meat of the topic
-    const prefixes = [
-      "i want to learn ", "i want to build a ", "i want to build ", "show me how to make ",
-      "show me ", "i need to learn ", "help me understand ", "how do ", "how does a ",
-      "simulate a ", "teach me ", "learn to calculate ", "learn to code in ",
-      "build a ", "build ", "learn ", "master ", "simulate ", "explore ", "design ",
-      "visualise ", "visualize "
-    ];
-    
-    for (const p of prefixes) {
-      if (keyword.startsWith(p)) {
-        keyword = keyword.substring(p.length);
-        break;
-      }
-    }
-    
-    // Also remove suffix noise like " work?", " from scratch"
-    keyword = keyword.replace(" work?", "").replace(" from scratch", "");
-    
-    setQuery(keyword);
-    onSearch(keyword);
-  };
-
   return (
-    <div className="w-full max-w-3xl mx-auto flex flex-col items-center my-10">
+    <div className="w-full max-w-3xl flex flex-col items-start my-6">
       <form onSubmit={(e) => e.preventDefault()} className="relative w-full group">
         <div className="relative p-[3px] rounded-[2rem] bg-gradient-to-r from-indigo-500/30 via-fuchsia-500/30 to-cyan-500/30 hover:from-indigo-500/50 hover:via-fuchsia-500/50 hover:to-cyan-500/50 transition-all duration-500 shadow-lg hover:shadow-[0_0_40px_rgba(139,92,246,0.3)]">
           <div className="relative w-full bg-white/90 dark:bg-slate-900/90 rounded-[29px] backdrop-blur-xl">
@@ -158,18 +102,6 @@ export default function HomeTopicSearch({ onSearch }) {
           </div>
         </div>
       </form>
-      
-      <div className="flex flex-wrap justify-center gap-3 mt-8">
-        {randomTopics.map((topic) => (
-          <button
-            key={topic}
-            onClick={() => handleTopicClick(topic)}
-            className={`px-5 py-2.5 rounded-full text-sm font-bold bg-gradient-to-r border transition-all hover:-translate-y-1 hover:shadow-[0_8px_20px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_8px_20px_rgb(0,0,0,0.3)] active:translate-y-0 backdrop-blur-md shadow-sm ${getPillColor(topic)}`}
-          >
-            {topic}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }

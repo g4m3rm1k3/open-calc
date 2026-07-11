@@ -10,7 +10,7 @@ import { GAMES } from '../games/registry.js'
 import { usePins } from '../context/PinsContext.jsx'
 import { usePinLauncher } from '../hooks/usePinLauncher.js'
 import { GLASS_META } from '../styles/courseColors.js'
-import HomeTopicSearch from '../components/ui/HomeTopicSearch.jsx'
+import TopicFilterHeader from '../components/ui/TopicFilterHeader.jsx'
 import TopicTable from '../components/ui/TopicTable.jsx'
 import { getTopicGroup, TOPIC_GROUPS } from '../data/topicGroups.js'
 
@@ -249,42 +249,15 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── FILTER SECTION ───────────────────────────────────────────────── */}
-        <section className="px-4 pb-12 pt-4">
-          <div className="max-w-3xl mx-auto text-center mb-2">
-            <span className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 dark:border-indigo-500/30 dark:bg-indigo-900/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-300 backdrop-blur-sm">
-              <span className="text-base leading-none">🔍</span> Filter the Universe
-            </span>
-          </div>
-          <HomeTopicSearch onSearch={setSearchQuery} />
-
-          <div className="flex flex-wrap justify-center gap-2 mt-5">
-            {Object.entries(TOPIC_GROUPS).map(([id, g]) => {
-              const active = activeTopicId === id
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => selectTopic(id)}
-                  className={`h-8 inline-flex items-center gap-1.5 rounded-full border px-3.5 text-xs font-bold transition-colors ${
-                    active
-                      ? 'border-indigo-400 bg-indigo-500/15 text-indigo-600 dark:text-indigo-300'
-                      : 'border-slate-200 dark:border-slate-700 bg-white/40 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600'
-                  }`}
-                >
-                  {g.label}
-                </button>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* ── EXPLORE BY TOPIC ─────────────────────────────────────────────── */}
-        <section ref={exploreRef} className="px-4 pb-10 scroll-mt-6">
-          <div className="max-w-3xl mx-auto text-center mb-6">
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-1">Explore by Topic</h2>
-            <p className="text-slate-500 text-sm">Click a filter above — every real way in, one place, grouped honestly.</p>
-          </div>
+        {/* ── FILTER + TOPIC TABLE ─────────────────────────────────────────── */}
+        <section ref={exploreRef} className="px-4 pt-4 pb-10 scroll-mt-6">
+          <TopicFilterHeader
+            query={searchQuery}
+            onQueryChange={setSearchQuery}
+            groups={TOPIC_GROUPS}
+            activeTopicId={activeTopicId}
+            onSelectTopic={selectTopic}
+          />
           {(() => {
             const group = getTopicGroup(activeTopicId)
             if (!group) {
