@@ -68,15 +68,22 @@ export default function LessonEngineLab({ onBack }: Props) {
       {view.kind === 'level-list' && (
         <LevelListView ui={ui} series={view.series} onBack={() => setView({ kind: 'series-list' })} onSelectLevel={file => openLesson(file, view.series)} />
       )}
-      {view.kind === 'lesson' && (
-        <LessonView
-          lesson={view.lesson}
-          executor={executeCode}
-          ui={ui}
-          seriesLabel={view.series.label}
-          onBack={() => setView({ kind: 'level-list', series: view.series })}
-        />
-      )}
+      {view.kind === 'lesson' && (() => {
+        const currentIdx = view.series.levels.findIndex(l => l.level === view.lesson.level)
+        const nextLevel = view.series.levels[currentIdx + 1]
+        return (
+          <LessonView
+            lesson={view.lesson}
+            executor={executeCode}
+            ui={ui}
+            seriesLabel={view.series.label}
+            onBack={() => setView({ kind: 'level-list', series: view.series })}
+            onComplete={nextLevel
+              ? () => openLesson(nextLevel.file, view.series)
+              : () => setView({ kind: 'level-list', series: view.series })}
+          />
+        )
+      })()}
     </div>
   )
 }

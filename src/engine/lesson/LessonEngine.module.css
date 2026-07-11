@@ -29,9 +29,24 @@
 }
 
 .traceView {
-  min-height: 100px;
-  max-height: 360px;
   overflow-y: auto;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+
+.noLigatures {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+
+/* Monaco decoration classes — must be global so Monaco's DOM injection finds them */
+:global(.oc-trace-line) {
+  background-color: rgba(99, 102, 241, 0.18) !important;
+  border-left: 2px solid rgba(99, 102, 241, 0.7) !important;
+}
+:global(.oc-trace-line-number) {
+  color: #818cf8 !important;
+  font-weight: 700 !important;
 }
 
 .outputPanel {

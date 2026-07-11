@@ -18,11 +18,20 @@ function parseFrontmatter(md: string): { meta: Record<string, string>; body: str
 
 interface Fence { lang: string; code: string; raw: string }
 
+// Only these langs are extracted as runnable examples or special blocks.
+// All other fences (text, plaintext, no lang) stay in the prose for markdown rendering.
+const RUNNABLE_LANGS = new Set(['python', 'py', 'javascript', 'js', 'typescript', 'ts', 'sql', 'bash', 'sh'])
+const SPECIAL_LANGS  = new Set(['challenge', 'test'])
+
 function extractFences(text: string): { fences: Fence[]; prose: string } {
   const fences: Fence[] = []
   const prose = text.replace(/```(\w*)\n([\s\S]*?)```/g, (raw, lang, code) => {
-    fences.push({ lang: lang || 'plaintext', code: code.replace(/\n$/, ''), raw })
-    return ''
+    const l = lang || 'plaintext'
+    if (RUNNABLE_LANGS.has(l) || SPECIAL_LANGS.has(l)) {
+      fences.push({ lang: l, code: code.replace(/\n$/, ''), raw })
+      return ''   // remove from prose — rendered by RunExample / ChallengeStep
+    }
+    return raw    // keep in prose — rendered as display-only by ReactMarkdown
   }).replace(/\n{3,}/g, '\n\n').trim()
   return { fences, prose }
 }

@@ -1,410 +1,215 @@
-# Lesson Engine Contract
+# UpskillOS Lesson Engine Contract
 
-Every lesson written for the interactive lesson engine — whether authored by a human or
-an agent — must meet this contract. It is not a style guide. It is a definition of what
-teaching means in this format. A lesson that does not meet this contract is not a lesson.
-It is a wall of text with a text box at the end.
-
-This contract extends the core teaching principles in [LESSON_CONTRACT.md](LESSON_CONTRACT.md).
-Read that document first. Everything in it applies here — this document only adds or
-overrides what is specific to the lesson engine format: the markdown structure, the
-runnable examples, and the challenge–test system.
+Every lesson written for the interactive lesson engine must meet this contract.
+It is not a style guide. It is a definition of what teaching means in this format.
+A lesson that does not follow this contract is not a lesson — it is a wall of text
+with a text box at the end.
 
 ---
 
-## The Format in One Sentence
-
-A lesson engine file is a markdown document where `##` headers create navigable steps,
-regular code fences create runnable examples, `challenge` fences create editable starter
-code, and `test` fences contain assertions that run against what the learner wrote.
-
----
-
-## File Structure
+## File Format
 
 Every lesson file starts with a frontmatter block:
 
 ```
 ---
-series: python-fundamentals
-level: 0
-title: Variables & Types
+series: dsa-python
+level: 1
+title: Two Pointers
 lang: python
 ---
 ```
 
 Fields:
-- `series` — the series identifier. Must match an entry in `series.ts`.
-- `level` — integer. Level 0 is the first level. Levels within a series build on each other.
-- `title` — shown in the UI header. State the concept, not the activity. "Variables & Types"
-  not "Learning About Variables."
-- `lang` — the default language for code fences that do not specify one. Must be a
-  language the executor supports (`python`, `javascript`, `typescript`, `sql`).
+- `series` — series identifier. Must match an entry in `series.ts`.
+- `level` — integer. Level 0 is first. Levels within a series build on each other.
+- `title` — names the concept, not the activity. "Two Pointers" not "Learning About Two Pointers."
+- `lang` — default language for code fences (`python`, `javascript`, `typescript`, `sql`).
 
-Anything before the first `##` header is the intro paragraph. It is automatically merged
-into the first step. Use it to state what concept group the lesson covers, why it matters,
-and what the learner will be able to do after finishing. Keep it to two to four sentences.
-Do not waste it on "In this lesson we will learn about...".
+Everything before the first `##` header is the intro paragraph. It merges into the
+first step automatically. State what the lesson covers, why it matters, and what the
+learner will be able to do. Do not waste it on "In this lesson we will learn about..."
 
----
+Each `##` header creates one navigable step. Every step is either a **concept step**
+or a **challenge step** — never a mix of both.
 
-## Step Structure
-
-Each `##` header creates one step in the UI. The learner navigates step by step.
-
-A step is either a **concept step** or a **challenge step**.
-
-A **concept step** contains:
-- Prose explaining the concept (required)
-- One or more runnable code examples (required unless the concept is purely definitional)
-- No `challenge` fence
-
-A **challenge step** contains:
-- Prose describing the problem to solve (required — see Challenge Writing below)
-- Exactly one `challenge` fence
-- Exactly one `test` fence
-- No runnable examples
-
-A step must not mix runnable examples and a challenge fence. Separate them.
+Fence types the engine recognises:
+- `` ```python `` / `` ```js `` / `` ```ts `` / `` ```sql `` — runnable code example
+- `` ```text `` — display-only block (execution traces, tables, diagrams) — no Run button
+- `` ```challenge `` — editable editor pre-filled with the starter code
+- `` ```test `` — assertions run against the learner's code
 
 ---
 
-## Pairing Rule
-
-Every concept group is immediately followed by its challenge. The structure is:
+## Lesson Generation Algorithm
 
 ```
-## Concept Group Name
-...prose + examples...
-
-## Challenge: [task name]
-...prose + challenge fence + test fence...
+START LESSON
+      │
+      ▼
+Select the next concept to teach
+      │
+      ▼
+Has this concept already been taught?
+      │
+      ├─── YES ──► Reference briefly if needed, do not re-explain
+      │
+      ▼
+NO
+      │
+      ▼
+Does the learner need prerequisite knowledge first?
+      │
+      ├─── YES ──► Teach the prerequisite (return to top of algorithm for that concept)
+      │
+      ▼
+NO
+      │
+      ▼
+Explain WHY the concept exists
+      │
+      ▼
+Explain WHAT the concept does
+      │
+      ▼
+Would a trace, table, analogy, comparison, or diagram improve understanding?
+      │
+      ├─── YES ──► Add the instructional element
+      │
+      ▼
+Present a runnable code example
+      │
+      ▼
+Is every important part of the code understood?
+      │
+      ├─── NO ───► Add more explanation
+      │             Add another example if necessary
+      │             Add another trace or table if helpful
+      │             Repeat until understood
+      │
+      ▼
+Would a CS Lens deepen understanding?
+      │
+      ├─── YES ──► Add CS Lens
+      │
+      ▼
+Would an SE Lens deepen understanding?
+      │
+      ├─── YES ──► Add SE Lens
+      │
+      ▼
+Can the learner solve a challenge using ONLY concepts already taught?
+      │
+      ├─── NO ───► Return to top — teach the missing concept first
+      │
+      ▼
+YES
+      │
+      ▼
+Create Challenge
+      │
+      ▼
+Create Tests
+      │
+      ▼
+More concepts remaining in this lesson?
+      │
+      ├─── YES ──► Repeat entire algorithm for the next concept
+      │
+      ▼
+NO
+      │
+      ▼
+END LESSON
 ```
 
-Challenges are not collected at the end of the lesson. A challenge that appears three
-steps after the concept it tests does not reinforce the concept — it tests recall.
-
-The number of challenge steps equals the number of concept groups. If a lesson has two
-challenges, it covers two concept groups. Not four. Not one. Two.
-
-A concept group is a cluster of ideas that are best understood together. "Variables
-and primitive types" is one group — the ideas are interdependent and need each other
-to make sense. "Arithmetic" and "type conversion" may be separate groups if the
-challenge for each tests a genuinely different skill, or the same group if the challenge
-requires both.
-
 ---
 
-## Runnable Examples
-
-A runnable example is a code fence with a real language identifier:
-
-````
-```python
-x = 10
-y = 3
-print(x / y)
-print(x // y)
-```
-````
-
-Rules for every runnable example:
-
-1. **One concept per example.** Do not teach `//`, `%`, and type conversion in one block.
-   Show `//` and `%` together (they are a pair), then type conversion in a separate block.
-
-2. **The example is self-contained.** It runs without any prior state. No imports from
-   other examples, no variables defined in a previous block.
-
-3. **State the output in the prose.** Before the code block, say what it prints or
-   produces. After the code block, explain what that output demonstrates. The learner
-   should be able to predict the output from the prose before they click Run.
-
-4. **Vary one thing at a time.** If you want to show a concept with two inputs, use two
-   separate blocks — or tell the learner to change one thing and run again. "Change
-   `True` to `False` on line 2 and re-run — notice what `bool()` returns" is a teaching
-   instruction. Two side-by-side code blocks that look the same except one character
-   is not.
-
-5. **No placeholder names.** Every variable name describes what it holds. No `x = 42`
-   unless `x` is genuinely a mathematical unknown. Use `age = 42`, `temperature = 37.5`,
-   `is_complete = False`. Students learn to name things by seeing good names modelled.
-
-6. **No comments that restate the code.** `# int` next to `x = 42` says nothing. A
-   comment is only worth writing if it states something the name and code cannot: why
-   this value, why this structure, what breaks if it changes.
-
-7. **Keep examples short.** Four to twelve lines. Longer examples lose the concept in
-   the surrounding code. If a concept needs more than twelve lines to demonstrate, split
-   it into two sequential examples with prose between them.
-
----
-
-## The Runnable Example Is the Concept Lab
-
-The original [LESSON_CONTRACT.md](LESSON_CONTRACT.md) requires a concept lab before every
-new construct. In the lesson engine, the runnable example _is_ the concept lab.
-
-The same rules apply:
-- Strip the example of every complexity that is not the concept itself
-- Name what the example demonstrates, not just what it does
-- State exactly what output to expect and what that output proves
-- Vary the input at least once to show the concept in two lights
-
-The difference from the original contract: the code is not deleted. The learner runs it,
-modifies it, and runs it again. The examples are interactive, not disposable. Write them
-accordingly — they should reward modification.
-
----
-
-## Challenge Writing
-
-A challenge step tests whether the learner can apply the concept just taught in a new
-context. The challenge is not a repetition of an example. It is a new problem whose
-solution requires the concept.
-
-### The prose
-
-The challenge prose must contain:
-
-1. **The task, stated clearly.** What function to write, what it should do, what it
-   takes as input, and what it returns. Do not describe the algorithm. Describe the
-   contract.
-
-2. **One clarifying detail that prevents a wrong interpretation.** "Returns a float,
-   not an int." "The format is `type: value`, not `value (type)`." This should be
-   the one piece of information that the tests do not make obvious.
-
-3. **Nothing else.** Do not hint at the solution. Do not describe the approach. The
-   learner should be able to read the prose, understand what is needed, and begin.
-
-### The starter code
-
-The `challenge` fence contains the function signature with a `pass` body:
-
-````
-```challenge
-def celsius_to_fahrenheit(c):
-    pass
-```
-````
-
-Rules:
-
-- **Always include the function signature.** Never leave the challenge fence empty.
-  The learner should not have to figure out the function name or argument names.
-- **Use `pass` for Python, `return null` or `// TODO` for JavaScript.** The body must
-  be syntactically valid but semantically empty.
-- **Argument names must be descriptive.** `(c)` only if `c` is a conventionally accepted
-  abbreviation (e.g., `c` for Celsius). Otherwise use full words.
-- **If the challenge requires a helper or class, include its stub too.** The learner
-  should start from code that runs (even if it returns wrong answers) not from code
-  that throws a syntax error.
-
-### The tests
-
-The `test` fence contains assertion lines:
-
-````
-```test
-assert celsius_to_fahrenheit(0) == 32.0
-assert celsius_to_fahrenheit(100) == 212.0
-assert celsius_to_fahrenheit(-40) == -40.0
-assert celsius_to_fahrenheit(37) == 98.6
-```
-````
-
-Rules:
-
-1. **Four to six assertions per challenge.** Fewer than four does not adequately specify
-   the contract. More than six tests peripheral behaviour instead of the concept.
-
-2. **Cover the zero/identity case.** The input that produces the simplest or "default"
-   output. `celsius_to_fahrenheit(0) == 32.0`. `describe(42) == "int: 42"`.
-
-3. **Cover at least one typical case.** Representative input from the middle of the domain.
-
-4. **Cover at least one boundary or edge case.** Negative numbers. Empty strings.
-   Zero. The value where behaviour changes. `celsius_to_fahrenheit(-40) == -40.0`
-   (the one temperature where Celsius and Fahrenheit coincide) is a good edge case
-   because it reveals whether the formula is correct.
-
-5. **Each assertion is one line, one `assert`, no logic.** No `for` loops over test
-   data. No helper functions. Each assertion is independently readable.
-
-6. **Floating point: only assert exact equality when the result is mathematically exact.**
-   `0 × 9/5 + 32 = 32.0` exactly. `37 × 9/5 + 32 = 98.6` exactly in IEEE 754.
-   When the result is not exact, use `round(result, N) == expected` or restructure
-   the test to avoid the precision hazard.
-
-7. **Test the contract, not the implementation.** If two different implementations
-   both produce the correct output, both should pass. Do not write tests that pass
-   only for one particular algorithm.
-
-8. **The tests fully specify the function's behaviour** for the inputs they cover. A
-   learner who makes all tests pass should have understood the concept — not just
-   reverse-engineered the assertions.
-
----
-
-## What the Learner Sees Per Step
-
-Before writing a step, describe what the learner will read and do:
-
-**Concept step:** Read prose. Read the code examples before running them. Predict the
-output from the prose. Click Run and verify. Optionally enable Debug to watch the
-execution line by line and see variables in the right panel.
-
-**Challenge step:** Read the prose. Understand the contract. Open the editor. Write the
-function. Click Run Tests. Read the pass/fail results. Enable Debug to trace execution
-through the tests if stuck.
-
-Write every step to serve those two flows. Prose that would be skipped by a learner
-who just wants to write code is prose that is not doing its job.
-
----
-
-## Explanation Standards (adapted from LESSON_CONTRACT.md)
-
-These rules from the original contract apply without modification. They are restated here
-in brief to keep this document self-contained.
-
-### Describing vs Teaching
-
-A description tells you what something does. A lesson explains why it works, what it
-connects to, and what breaks without it.
-
-**Description:** `type()` returns the type of a value.
-
-**Teaching:** `type()` is how Python exposes its type system at runtime. Every value in
-Python has a type — `int`, `float`, `str`, `bool` — and Python stores that type
-information alongside the value in memory. `type(x)` reads that stored type and returns
-it as a type object. This is what makes dynamic typing work: Python does not know the
-type of `x` when it compiles your file; it reads the type at the moment `type(x)` runs.
-
-### The Two Lenses
-
-Every significant code block — example or challenge — is explained through two lenses:
-
-**The CS lens:** What computational concept does this code embody? Name it.
-Symbol table. Dispatch table. Coercion. Type system. First-class function. Do not let
-a concept be implicit.
-
-**The SE lens:** Why is it designed this way? What principle does it follow?
-Separation of concerns. Single responsibility. Encapsulation. The principle is named
-and connected to the specific code in the lesson.
-
-Both lenses apply to every significant block. Neither is optional.
-
-### Explain Before You Show
-
-Before every code block, state the problem it solves. After every code block, state
-what decision it embodies and what it connects to.
-
-Within a concept step, each new code block follows this structure:
-
-1. The problem — what are we trying to show?
-2. The code — the smallest example that shows it
-3. The walkthrough — what the code actually does
-4. The CS explanation — what concept this embodies
-5. The SE explanation — why this design, not another
-6. What breaks without it — concrete and specific
-
-Not every item needs to be long. A sentence each is often enough. All six must be present
-for any code block that introduces something the learner has not seen before.
-
----
-
-## Define at Use
+## Rule: Concept Introduction
 
 Every concept, construct, built-in function, operator, or syntax the learner may not
-know must be defined at the exact point it appears — not in a glossary, not in a prior
-step. The first appearance carries the definition. After that, the term is used freely.
+know must be defined at the exact point it first appears — not in a glossary, not in
+a later step, not assumed from prior experience unless it is in the prerequisite series.
 
-**Example — `//` first appearance:**
-"`//` is floor division. It divides and then rounds down to the nearest integer,
-regardless of the sign of the inputs. `10 // 3` gives `3`, not `3.33...`. `10 / 3`
-always gives `3.33...` — `/` in Python 3 always returns a float even when both
-operands are integers. `//` gives an integer when both operands are integers."
+A lesson must never use a concept that has not been taught in:
+- the current lesson,
+- an earlier level in the current series, or
+- a declared prerequisite series.
 
-Every built-in function follows the same rule: state what it does, what it accepts,
-what it returns, and what it does on unusual input.
+If a concept is required but has not been taught, the algorithm routes back to the
+top and teaches it first.
+
+**Defining a built-in at first use:**
 
 ```
-type(value) — returns the type of value as a type object. type(42) returns <class 'int'>.
-int(x) — converts x to an integer. int("25") returns 25. int(3.9) returns 3 (truncates, does not round).
-str(x) — converts x to its string representation. str(42) returns "42".
-bool(x) — converts x to True or False. bool(0) is False. bool(any nonzero number) is True.
+char.isalnum() — returns True if the character is a letter or digit, False otherwise.
+                 "A".isalnum() → True.  " ".isalnum() → False.
+char.lower()   — returns the lowercased version of the character. "A".lower() → "a".
+                 Has no effect on digits or punctuation.
 ```
 
-Names must be descriptive. The exception is established mathematical notation where
-the single letter is the concept (`c` for Celsius, `x` and `y` for coordinates). In
-those cases the meaning is stated explicitly.
+Names must be descriptive. Single-letter names are only acceptable when they are
+established mathematical convention (`c` for Celsius, `x` and `y` for coordinates),
+and even then the meaning is stated explicitly on first use.
 
 ---
 
-## The Aha Moment
+## Rule: Explanations
 
-When a concept from a previous step or a previous lesson appears in a new context,
-name the connection explicitly. One sentence is enough.
+Explanations are not limited in number or position. Add as many as the concept
+requires. Explanations may appear:
 
-**Without the connection:**
-"We use `type(value).__name__` to get the type string."
+- before code (to set up what the learner is about to see)
+- after code (to walk through what just happened)
+- between examples (to connect one example to the next)
+- anywhere they improve learning
 
-**With the connection:**
-"`type(value).__name__` — the same `type()` built-in from the previous step,
-but now we go one level further: `.\_\_name\_\_` extracts the type's name as a plain
-string (`'int'`, `'str'`) instead of the type object itself. Every Python type object
-has a `__name__` attribute for exactly this purpose."
+**Describing vs Teaching**
 
----
+A description tells you what something does. Teaching explains why it works, what it
+connects to, and what breaks without it.
 
-## Repetition Rule (adapted)
+| Describing | Teaching |
+|---|---|
+| `type()` returns the type of a value. | `type()` reads the type Python stored alongside the value in memory. Python does not know the type of `x` when it compiles your file — it reads the type at the moment `type(x)` runs. This is what makes dynamic typing work. |
 
-Basic syntax is explained once. After its first appearance in the curriculum, a `for`
-loop or an `if` statement is used without comment.
+Every explanation should answer: why does this exist, what does it connect to, and
+what breaks if it is wrong or missing?
 
-Hard concepts are named at every appearance:
-- Named CS concepts (recursion, symbol table, hash map, state machine, type coercion)
+**The Aha Moment**
+
+When a previously taught concept reappears in a new context, name the connection
+explicitly. One sentence is enough:
+
+> "`type(value).__name__` — the same `type()` from the previous step, but `.\_\_name\_\_`
+> extracts the name as a plain string instead of the type object itself."
+
+**Connections**
+
+- Connect backwards: open by linking to what the learner already knows.
+- Connect forwards: hint at what the current concept makes possible.
+- Connect to the real world: every concept exists in production software — name where.
+
+**Repetition**
+
+Basic syntax is explained once. After its first appearance, a `for` loop or `if`
+statement is used without comment.
+
+Hard concepts are named at every reappearance — one or two sentences connecting the
+named concept to the specific code in front of the learner:
+- Named CS concepts (recursion, symbol table, hash map, type coercion)
 - Named SE principles (separation of concerns, single responsibility, encapsulation)
 - Named patterns (dispatch table, factory, observer)
 - Mathematical ideas (modular arithmetic, floating-point representation)
 
-The restatement is short — one or two sentences connecting the concept to the code in
-front of the learner. The goal is reinforcement through repeated encounter in different
-contexts.
+**Maximum Extraction**
 
----
+A code block about `//` is also a block about integer semantics, the difference
+between mathematical and integer division, and the historical reason Python 3 changed
+`/` to always return a float. Teach as many of those as the step can hold without
+losing focus on the primary concept.
 
-## Connection Standards
-
-### Connect backwards
-Open each concept step by connecting to what the learner already knows from previous
-steps or levels. "We used `type()` in the last step to inspect primitive types — here
-we use `type().__name__` to turn that type information into a string we can work with."
-
-### Connect forwards
-When appropriate, preview what the current concept makes possible. Not a promise —
-a hint. "Once you can convert between types reliably, you can accept input from a user
-as a string and convert it to a number before computing with it."
-
-### Connect to the real world
-Every concept taught exists in production software. Name where.
-
-"Python's type system is what tools like `mypy` and IDEs use for type checking — they
-read the type annotations and the type() system together to flag mismatches before your
-code runs."
-
----
-
-## Maximum Extraction
-
-A code block about `//` is also a block about integer semantics, the difference between
-mathematical division and integer division, and the historical reason Python 3 changed
-`/` to always return a float. Teach as many of those as the step can hold without losing
-focus on the primary concept.
-
-The learner should finish each step knowing:
+The learner should finish each concept knowing:
 - What the concept is
 - Why it exists
 - What it connects to in the language or discipline
@@ -412,70 +217,255 @@ The learner should finish each step knowing:
 
 ---
 
-## Structure
+## Rule: Instructional Elements
 
-Every lesson file must contain:
+At any point, use whatever element best serves understanding:
 
-1. **Frontmatter** — `series`, `level`, `title`, `lang`
-2. **Intro paragraph** — what the lesson covers, why it matters, what the learner will
-   be able to do. Merged into the first step.
-3. **Concept steps** — one per concept group. Each has prose and runnable examples.
-4. **Challenge steps** — one per concept group, immediately following its concept step.
+| Element | When to use |
+|---|---|
+| Prose | Always — the primary vehicle for WHY |
+| `text` code block | Execution traces, before-and-after tables, diagrams, step sequences |
+| Runnable example | When the concept needs to be seen executing |
+| Comparison table | When contrasting two approaches or values |
+| Analogy | When the concept maps to something familiar |
+| Debug callout | When the concept is best understood by stepping through it |
 
-The minimum viable lesson is: one concept step + one challenge step. Two concepts = two
-concept steps + two challenge steps. The lesson ends when the concept group is complete —
-not when a word count is reached.
+**Execution Traces**
+
+Write traces as `text` fenced blocks before the runnable code. This lets the learner
+predict the output before clicking Run:
+
+```text
+left=0 → 'r'   right=6 → 'r'   match → move both inward
+left=1 → 'a'   right=5 → 'a'   match → move both inward
+left=3           right=3         left < right is False → exit → True
+```
+
+**Debug Callouts**
+
+When a concept is best understood by watching variables change during execution, say
+so explicitly in the prose:
+
+> **Enable Debug and step through this** — watch `left`, `right`, and `current_sum`
+> in the variables panel on the right as each line executes.
+
+Add local variables to the example deliberately when they surface values the debugger
+would otherwise hide:
+
+```python
+left_char = s[left]    # named so the debugger shows the character, not just the index
+right_char = s[right]
+```
+
+---
+
+## Rule: Code Examples
+
+A concept may have one example or many. Use as many as understanding requires.
+
+**Quality rules for every runnable example:**
+
+1. **One concept per example.** Do not teach `//`, `%`, and type conversion in one block.
+   If they are closely related (a natural pair), they may share a block — but only if
+   understanding either one requires the other.
+
+2. **Self-contained.** The example runs without any prior state. No imports from
+   other examples, no variables defined in a previous block.
+
+3. **State what it will print before showing the code.** The learner should be able to
+   predict the output from the prose before clicking Run. After the code, explain what
+   the output demonstrates.
+
+4. **Descriptive variable names.** No `x = 42` unless `x` is a genuine mathematical
+   unknown. Use `age = 42`, `temperature = 37.5`, `is_complete = False`. Learners
+   acquire naming conventions by seeing them modelled.
+
+5. **Comments only for non-obvious decisions.** `# int` next to `x = 42` adds nothing.
+   A comment earns its place by stating something the name and code cannot: why this
+   value, why this structure, what breaks if it changes.
+
+6. **4–12 lines.** Longer examples bury the concept in surrounding code. If a concept
+   needs more than 12 lines, split it into two sequential examples with prose between them.
+
+7. **Design for the debugger.** If Debug mode would help the learner understand the
+   example, add local variables that surface intermediate state so the variables panel
+   shows meaningful values at each step.
+
+---
+
+## Rule: CS Lens
+
+Add a CS Lens when algorithmic depth benefits understanding. Topics include:
+
+- Runtime and memory complexity (O(n), O(1), O(n²))
+- Correctness proofs and invariants
+- Data structure properties (sorted order, contiguous memory, hash tables)
+- Computational tradeoffs (time vs space, exact vs approximate)
+- Why one algorithm is better than another for this problem
+
+Format: `**CS lens:** ...` in the markdown prose. The parser extracts this into the
+Explore tab of the right panel — it does not appear inline in the reading step.
+
+Skip the CS Lens if it adds little value for the concept being taught. It is not
+mandatory; it is conditional.
+
+---
+
+## Rule: SE Lens
+
+Add an SE Lens when software engineering considerations are relevant. Topics include:
+
+- Readability and clarity
+- API design and naming
+- Invariants and preconditions callers must satisfy
+- Mutating vs returning (in-place vs copy)
+- Testing, debugging, and observability
+- When to reach for a different data structure or abstraction
+- Production patterns and idioms
+
+Format: `**SE lens:** ...` in the markdown prose. Extracted to the Explore tab.
+
+Skip the SE Lens if it adds little value. Conditional, not mandatory.
+
+---
+
+## Rule: Challenge Generation
+
+A challenge tests whether the learner can apply the concept just taught in a new
+context. It is not a repetition of an example. It is a new problem whose solution
+requires the concept.
+
+**The challenge must only use concepts already taught in this lesson or prior levels.**
+If the intended challenge requires a concept not yet taught, the algorithm routes back
+to teaching that concept first.
+
+**Challenge prose must contain:**
+
+1. **The task, stated as a contract.** What function to write, what inputs it takes,
+   what it returns. Do not describe the algorithm — describe the behaviour.
+
+2. **Any built-ins or methods the learner will need**, defined the same way as in
+   concept steps (name, what it accepts, what it returns, unusual input behaviour).
+
+3. **One clarifying constraint** that prevents a wrong interpretation. "Returns a
+   float, not an int." "The empty string is a palindrome."
+
+4. **Nothing else.** No algorithm hints. No step-by-step guidance. The learner reads
+   the prose, understands the contract, and writes the code.
+
+**Starter code:**
+
+```challenge
+def function_name(descriptive_arg):
+    pass
+```
+
+- Always include the function signature. Never leave the fence empty.
+- Use `pass` for Python, `return null` or `// TODO` for JavaScript/TypeScript.
+- Argument names must be descriptive. `c` only if it is accepted mathematical convention.
+- If the challenge requires a helper class or stub, include it.
+- The starter code must be syntactically valid (runs without error, returns wrong answer).
+
+---
+
+## Rule: Tests
+
+Every challenge has a `test` fence with assertion lines.
+
+**Quality rules:**
+
+1. **4–6 assertions.** Fewer than four under-specifies the contract. More than six
+   tests peripheral behaviour.
+
+2. **Cover the zero/identity case.** The input producing the simplest output.
+   `rotate_left([], 0)`, `celsius_to_fahrenheit(0) == 32.0`.
+
+3. **Cover at least one typical case.** Representative input from the middle of the domain.
+
+4. **Cover at least one boundary or edge case.** Empty input. Negative numbers.
+   The value where behaviour changes.
+
+5. **One assertion per line, no control flow.** No `for` loops, no helper functions.
+   Each assertion is independently readable.
+
+6. **No ambiguous floating-point equality** unless the result is mathematically exact
+   in IEEE 754. When in doubt, use `round(result, N) == expected`.
+
+7. **Test the contract, not the implementation.** Two different correct implementations
+   must both pass all assertions.
+
+8. **The assertions fully specify the function's behaviour** for the inputs they cover.
+   A learner who passes all tests should have understood the concept — not reverse-engineered
+   the assertions.
+
+---
+
+## Lesson Progression
+
+Lessons move from left to right across this arc. The exact presentation may shift
+whenever a different order produces a better educational outcome:
+
+```
+Motivation → Introduction → Understanding → Examples → Execution → Analysis → Practice → Verification
+```
+
+- **Motivation** — why does this concept exist? What problem does it solve?
+- **Introduction** — what is the concept? Name it precisely.
+- **Understanding** — how does it work? Traces, tables, walkthroughs.
+- **Examples** — see it execute. Predict first, then run, then debug.
+- **Execution** — step through it with the debugger. Watch variables change.
+- **Analysis** — CS and SE lenses. What does this connect to?
+- **Practice** — the challenge. Write code that applies the concept.
+- **Verification** — run the tests. Debug if failing.
 
 ---
 
 ## Checklist
 
-Before a lesson is published:
-
-**Format**
-- [ ] Frontmatter is present and all four fields are correct
-- [ ] Intro paragraph states the concept and why it matters in 2–4 sentences
-- [ ] Every `##` step is either a concept step or a challenge step — never mixed
-- [ ] Challenge steps immediately follow their concept step — none collected at the end
-- [ ] Number of challenge steps equals the number of concept groups
+**File format**
+- [ ] Frontmatter present — all four fields correct
+- [ ] Intro paragraph states the concept, why it matters, and what the learner will be able to do
+- [ ] Every `##` step is a concept step or a challenge step — never a mix
 
 **Concept Steps**
-- [ ] Every runnable example is self-contained — runs without state from any prior block
-- [ ] Every example demonstrates exactly one concept or one closely related pair
-- [ ] Output is stated in the prose before the code block, not discovered by running
-- [ ] All variable names are descriptive — no single letters except mathematical convention
-- [ ] Every new syntax construct, built-in function, or operator is defined at first use
-- [ ] Both CS and SE lenses are present for every significant block
-- [ ] Examples are 4–12 lines
+- [ ] Every new concept, built-in, or syntax is defined at first use
+- [ ] Prose explains WHY the concept exists, not just what it does
+- [ ] Execution trace written as a `text` block before the runnable code where helpful
+- [ ] Debug callout present when stepping through would aid understanding
+- [ ] Every runnable example is self-contained (runs without prior state)
+- [ ] Every runnable example is 4–12 lines
+- [ ] All variable names are descriptive
+- [ ] Comments only appear where the WHY is not obvious from the code
+- [ ] Local variables added to examples where they surface useful debugger state
+- [ ] Connections backwards, forwards, and to the real world are present
+- [ ] CS Lens present where algorithmic depth adds value (in `**CS lens:**` format)
+- [ ] SE Lens present where engineering considerations add value (in `**SE lens:**` format)
 
 **Challenge Steps**
+- [ ] Challenge uses only concepts already taught in this lesson or prior levels
 - [ ] Prose describes the contract (what to build), not the algorithm (how to build it)
-- [ ] Prose includes exactly one clarifying constraint that prevents misinterpretation
+- [ ] Any built-ins the learner needs are defined in the challenge prose
+- [ ] One clarifying constraint prevents misinterpretation
 - [ ] Starter code includes the function signature and a valid empty body
 - [ ] Argument names in the starter code are descriptive
 - [ ] 4–6 assertions, no more, no fewer
-- [ ] Zero/identity case is covered
-- [ ] At least one typical case is covered
-- [ ] At least one boundary or edge case is covered
+- [ ] Zero/identity case covered
+- [ ] At least one typical case covered
+- [ ] At least one boundary or edge case covered
 - [ ] Each assertion is one line, one `assert`, no control flow
-- [ ] No floating-point equality assertion unless the result is mathematically exact
-- [ ] Tests specify the contract, not the implementation — multiple correct implementations pass
+- [ ] No ambiguous floating-point equality
+- [ ] Multiple correct implementations would pass all tests
 
-**Teaching**
-- [ ] Every significant code block has a walkthrough (not just a lens)
-- [ ] Describing vs Teaching: prose explains why, not just what
-- [ ] Connections backwards (to prior steps/lessons) are made explicit
-- [ ] Connections forwards (what this makes possible) are present where they exist
-- [ ] At least one real-world connection is named
-- [ ] Hard concepts (CS concepts, SE principles) are named, not implied
-
-**Names**
+**Teaching quality**
+- [ ] Describing vs Teaching: every explanation answers WHY, not just WHAT
+- [ ] Aha Moments: reused concepts are named and connected when they reappear
+- [ ] Maximum Extraction: secondary insights are surfaced without losing focus
 - [ ] Every lesson title names the concept, not the activity
 - [ ] Every step title (`##`) describes what the learner will understand after reading it
 - [ ] Every challenge title (`## Challenge: ...`) names the task, not the concept
 
 ---
 
-_This contract governs every lesson file in the lesson engine, regardless of language,
-series, or author. The test: could a learner complete the challenge using only what the
-concept step taught, without looking anything up? If not, the concept step is incomplete._
+_The test: could a learner complete every challenge using only what was taught in this
+lesson and prior levels, without looking anything up? If not, the concept step is
+incomplete or the challenge arrived too early._

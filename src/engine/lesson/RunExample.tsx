@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Editor from '@monaco-editor/react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
@@ -6,13 +6,13 @@ import type { CodeSnippet, Executor, UiTheme } from './types'
 import { runPython } from '../../labs/codelens/codelens/interpreter/pythonTracer'
 import { run as runJS } from '../../engines/js/interpreter/interpreter.js'
 import type { TraceEvent } from '../../labs/codelens/codelens/types'
-import styles from './LessonEngine.module.css'
 
 interface Props {
   snippet: CodeSnippet
   executor: Executor
   ui: UiTheme
   onTrace?: (events: TraceEvent[], code: string, step: number) => void
+  onOutput?: (lines: { text: string; kind: string }[]) => void
 }
 
 function toMonacoLang(lang: string): string {
@@ -25,24 +25,51 @@ function toMonacoLang(lang: string): string {
   return n
 }
 
-export default function RunExample({ snippet, executor, ui, onTrace }: Props) {
+export default function RunExample({ snippet, executor, ui, onTrace, onOutput }: Props) {
   const { themeStyles } = useGlobalTheme() as any
   const monacoTheme = themeStyles?.monaco ?? 'vs-dark'
 
   const [code, setCode] = useState(snippet.code)
   const [running, setRunning] = useState(false)
-  const [output, setOutput] = useState<{ text: string; kind: string }[] | null>(null)
   const [debugOn, setDebugOn] = useState(false)
   const [traceEvents, setTraceEvents] = useState<TraceEvent[]>([])
   const [traceStep, setTraceStep] = useState(0)
 
+  const editorRef = useRef<any>(null)
+  const monacoRef = useRef<any>(null)
+  const decorationsRef = useRef<string[]>([])
+
   useEffect(() => {
     setCode(snippet.code)
-    setOutput(null)
     setDebugOn(false)
     setTraceEvents([])
     setTraceStep(0)
   }, [snippet.code])
+
+  // Highlight current line in Monaco via decorations — no view swap needed
+  useEffect(() => {
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+    if (!editor || !monaco) return
+
+    if (traceEvents.length === 0) {
+      decorationsRef.current = editor.deltaDecorations(decorationsRef.current, [])
+      return
+    }
+
+    const ln = traceEvents[traceStep]?.line ?? traceEvents[traceStep]?.sourceLocation?.line
+    if (ln == null) return
+
+    decorationsRef.current = editor.deltaDecorations(decorationsRef.current, [{
+      range: new monaco.Range(ln, 1, ln, 1),
+      options: {
+        isWholeLine: true,
+        className: 'oc-trace-line',
+        lineNumberClassName: 'oc-trace-line-number',
+      }
+    }])
+    editor.revealLineInCenter(ln)
+  }, [traceStep, traceEvents])
 
   function seek(step: number) {
     setTraceStep(step)
@@ -51,9 +78,9 @@ export default function RunExample({ snippet, executor, ui, onTrace }: Props) {
 
   async function run() {
     setRunning(true)
-    setOutput(null)
     setTraceEvents([])
     setTraceStep(0)
+    if (onOutput) onOutput([])
 
     const norm = snippet.lang.toLowerCase()
     const isPython = norm === 'python' || norm === 'py'
@@ -65,12 +92,12 @@ export default function RunExample({ snippet, executor, ui, onTrace }: Props) {
           ...traced.output.map(t => ({ text: t, kind: 'stdout' })),
           ...(traced.error ? [{ text: traced.error.message, kind: 'error' }] : []),
         ]
-        setOutput(lines.length ? lines : [{ text: '(no output)', kind: 'stdout' }])
+        if (onOutput) onOutput(lines.length ? lines : [{ text: '(no output)', kind: 'stdout' }])
         setTraceEvents(traced.events)
         setTraceStep(0)
         if (onTrace && traced.events.length > 0) onTrace(traced.events, code, 0)
       } catch (e) {
-        setOutput([{ text: String(e), kind: 'error' }])
+        if (onOutput) onOutput([{ text: String(e), kind: 'error' }])
       }
     } else if (debugOn && !isPython) {
       try {
@@ -80,16 +107,16 @@ export default function RunExample({ snippet, executor, ui, onTrace }: Props) {
           ...outputLines.map((t: string) => ({ text: t, kind: 'stdout' })),
           ...(traced.error ? [{ text: traced.error.message, kind: 'error' }] : []),
         ]
-        setOutput(lines.length ? lines : [{ text: '(no output)', kind: 'stdout' }])
+        if (onOutput) onOutput(lines.length ? lines : [{ text: '(no output)', kind: 'stdout' }])
         setTraceEvents(traced.events)
         setTraceStep(0)
         if (onTrace && traced.events.length > 0) onTrace(traced.events, code, 0)
       } catch (e) {
-        setOutput([{ text: String(e), kind: 'error' }])
+        if (onOutput) onOutput([{ text: String(e), kind: 'error' }])
       }
     } else {
       const r = await executor(code, snippet.lang)
-      setOutput(r.lines)
+      if (onOutput) onOutput(r.lines)
     }
 
     setRunning(false)
@@ -97,26 +124,26 @@ export default function RunExample({ snippet, executor, ui, onTrace }: Props) {
 
   const isTracing = traceEvents.length > 0
   const currentLine = traceEvents[traceStep]?.line ?? traceEvents[traceStep]?.sourceLocation?.line ?? null
-  const codeLines = code.split('\n')
-  const editorHeight = Math.max(100, Math.min(360, codeLines.length * 20 + 16))
 
   return (
-    <div className={`rounded-xl overflow-hidden border ${ui.border} mb-4`}>
-
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className={`flex items-center gap-2 px-3 py-1.5 ${ui.bg1} border-b ${ui.border}`}>
+      <div className={`flex items-center gap-2 px-3 py-1.5 ${ui.bg1} border-b ${ui.border} shrink-0`}>
         <span className={`text-[11px] font-bold uppercase tracking-wide ${ui.txt2}`}>{snippet.lang}</span>
+        {isTracing && currentLine != null && (
+          <span className={`text-[10px] font-mono text-brand-400`}>line {currentLine}</span>
+        )}
         <div className="flex items-center gap-2 ml-auto">
           {isTracing && (
             <>
               <button type="button" onClick={() => seek(Math.max(0, traceStep - 1))} disabled={traceStep === 0}
-                className={`text-sm font-bold w-6 h-6 flex items-center justify-center rounded border ${ui.border} ${ui.bg0} ${ui.txt1} disabled:opacity-30 cursor-pointer bg-transparent`}>‹</button>
-              <span className={`text-[11px] tabular-nums ${ui.txt2}`}>{traceStep + 1} / {traceEvents.length}</span>
+                className="text-sm font-bold w-6 h-6 flex items-center justify-center rounded bg-brand-500/15 border border-brand-500/40 text-brand-400 disabled:opacity-30 cursor-pointer">‹</button>
+              <span className="text-[11px] tabular-nums font-semibold text-brand-400">{traceStep + 1} / {traceEvents.length}</span>
               <button type="button" onClick={() => seek(Math.min(traceEvents.length - 1, traceStep + 1))} disabled={traceStep === traceEvents.length - 1}
-                className={`text-sm font-bold w-6 h-6 flex items-center justify-center rounded border ${ui.border} ${ui.bg0} ${ui.txt1} disabled:opacity-30 cursor-pointer bg-transparent`}>›</button>
+                className="text-sm font-bold w-6 h-6 flex items-center justify-center rounded bg-brand-500/15 border border-brand-500/40 text-brand-400 disabled:opacity-30 cursor-pointer">›</button>
               <div className={`w-px h-4 ${ui.border} border-l mx-1`} />
               <button type="button" onClick={() => { setTraceEvents([]); setTraceStep(0) }}
-                className={`text-[11px] ${ui.txt2} hover:text-red-400 bg-transparent border-none cursor-pointer`}>✕ exit debug</button>
+                className={`text-[11px] ${ui.txt2} hover:text-red-400 bg-transparent border-none cursor-pointer`}>✕ exit</button>
             </>
           )}
           {!isTracing && (
@@ -133,44 +160,32 @@ export default function RunExample({ snippet, executor, ui, onTrace }: Props) {
         </div>
       </div>
 
-      {/* Code — Monaco when editing, line-highlighted when tracing */}
-      {isTracing ? (
-        <div className={`${styles.traceView} ${ui.bg0} overflow-x-auto`}>
-          {codeLines.map((line, i) => {
-            const lineNum = i + 1
-            const isActive = lineNum === currentLine
-            return (
-              <div key={i} className={`flex items-start gap-3 px-3 py-0.5 font-mono text-[13px] leading-relaxed ${isActive ? 'bg-brand-500/20' : ''}`}>
-                <span className={`select-none w-5 text-right shrink-0 text-[11px] mt-[1px] ${isActive ? 'text-brand-400 font-bold' : ui.txt2} opacity-60`}>{lineNum}</span>
-                <span className={isActive ? 'text-brand-300' : ui.txt1}>{line || ' '}</span>
-                {isActive && <span className="ml-auto text-brand-400 text-[11px] shrink-0">←</span>}
-              </div>
-            )
-          })}
-        </div>
-      ) : (
+      {/* Monaco — always mounted; decorations drive the trace highlight */}
+      <div className="flex-1 min-h-0">
         <Editor
-          key={snippet.code}
-          height={`${editorHeight}px`}
+          height="100%"
           language={toMonacoLang(snippet.lang)}
           value={code}
           theme={monacoTheme}
           beforeMount={setupOpenCalcMonaco}
-          onChange={v => setCode(v ?? '')}
-          options={{ fontSize: 13, minimap: { enabled: false }, scrollBeyondLastLine: false, automaticLayout: true, lineNumbers: 'on', padding: { top: 8, bottom: 8 } }}
+          onChange={v => { if (!isTracing) setCode(v ?? '') }}
+          onMount={(editor, monaco) => {
+            editorRef.current = editor
+            monacoRef.current = monaco
+          }}
+          options={{
+            fontSize: 13,
+            minimap: { enabled: false },
+            scrollBeyondLastLine: false,
+            automaticLayout: true,
+            lineNumbers: 'on',
+            padding: { top: 8, bottom: 8 },
+            fontLigatures: false,
+            readOnly: isTracing,
+            domReadOnly: isTracing,
+          }}
         />
-      )}
-
-      {/* Output */}
-      {output && (
-        <div className={`${styles.outputPanel} ${ui.bg1} border-t ${ui.border}`}>
-          {output.map((line, i) => (
-            <div key={i} className={`${styles.codeFont} whitespace-pre-wrap break-all ${line.kind === 'error' ? 'text-red-500' : line.kind === 'stderr' ? 'text-orange-400' : ui.txt1}`}>
-              {line.text}
-            </div>
-          ))}
-        </div>
-      )}
+      </div>
     </div>
   )
 }
