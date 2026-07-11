@@ -12,6 +12,39 @@ import pfLevel0  from './content/python-fundamentals/level-0.md?raw'
 import pfLevel1  from './content/python-fundamentals/level-1.md?raw'
 import pfLevel2  from './content/python-fundamentals/level-2.md?raw'
 import pfLevel3  from './content/python-fundamentals/level-3.md?raw'
+import pfLevel4  from './content/python-fundamentals/level-4.md?raw'
+import pfLevel5  from './content/python-fundamentals/level-5.md?raw'
+import pfLevel6  from './content/python-fundamentals/level-6.md?raw'
+import pfLevel7  from './content/python-fundamentals/level-7.md?raw'
+import pfLevel8  from './content/python-fundamentals/level-8.md?raw'
+import pfLevel9  from './content/python-fundamentals/level-9.md?raw'
+import pfLevel10 from './content/python-fundamentals/level-10.md?raw'
+import pfLevel11 from './content/python-fundamentals/level-11.md?raw'
+import pfLevel12 from './content/python-fundamentals/level-12.md?raw'
+import pfLevel13 from './content/python-fundamentals/level-13.md?raw'
+import pfLevel14 from './content/python-fundamentals/level-14.md?raw'
+import pfLevel15 from './content/python-fundamentals/level-15.md?raw'
+import pfLevel16 from './content/python-fundamentals/level-16.md?raw'
+import pfLevel17 from './content/python-fundamentals/level-17.md?raw'
+import pfLevel18 from './content/python-fundamentals/level-18.md?raw'
+import pfLevel19 from './content/python-fundamentals/level-19.md?raw'
+import pfLevel20 from './content/python-fundamentals/level-20.md?raw'
+import pfLevel21 from './content/python-fundamentals/level-21.md?raw'
+import pfLevel22 from './content/python-fundamentals/level-22.md?raw'
+import pfLevel23 from './content/python-fundamentals/level-23.md?raw'
+import pfLevel24 from './content/python-fundamentals/level-24.md?raw'
+import pfLevel25 from './content/python-fundamentals/level-25.md?raw'
+import pfLevel26 from './content/python-fundamentals/level-26.md?raw'
+import pfLevel27 from './content/python-fundamentals/level-27.md?raw'
+import pfLevel28 from './content/python-fundamentals/level-28.md?raw'
+import pfLevel29 from './content/python-fundamentals/level-29.md?raw'
+import pfLevel30 from './content/python-fundamentals/level-30.md?raw'
+import pfLevel31 from './content/python-fundamentals/level-31.md?raw'
+import pfLevel32 from './content/python-fundamentals/level-32.md?raw'
+import pfLevel33 from './content/python-fundamentals/level-33.md?raw'
+import pfLevel34 from './content/python-fundamentals/level-34.md?raw'
+import pfLevel35 from './content/python-fundamentals/level-35.md?raw'
+import pfLevel36 from './content/python-fundamentals/level-36.md?raw'
 
 import dsaLevel0  from './content/dsa-python/level-0.md?raw'
 import dsaLevel1  from './content/dsa-python/level-1.md?raw'
@@ -26,10 +59,43 @@ import dsaLevel9  from './content/dsa-python/level-9.md?raw'
 import dsaLevel10 from './content/dsa-python/level-10.md?raw'
 
 const LESSON_FILES: Record<string, string> = {
-  'python-fundamentals/level-0.md': pfLevel0,
-  'python-fundamentals/level-1.md': pfLevel1,
-  'python-fundamentals/level-2.md': pfLevel2,
-  'python-fundamentals/level-3.md': pfLevel3,
+  'python-fundamentals/level-0.md':  pfLevel0,
+  'python-fundamentals/level-1.md':  pfLevel1,
+  'python-fundamentals/level-2.md':  pfLevel2,
+  'python-fundamentals/level-3.md':  pfLevel3,
+  'python-fundamentals/level-4.md':  pfLevel4,
+  'python-fundamentals/level-5.md':  pfLevel5,
+  'python-fundamentals/level-6.md':  pfLevel6,
+  'python-fundamentals/level-7.md':  pfLevel7,
+  'python-fundamentals/level-8.md':  pfLevel8,
+  'python-fundamentals/level-9.md':  pfLevel9,
+  'python-fundamentals/level-10.md': pfLevel10,
+  'python-fundamentals/level-11.md': pfLevel11,
+  'python-fundamentals/level-12.md': pfLevel12,
+  'python-fundamentals/level-13.md': pfLevel13,
+  'python-fundamentals/level-14.md': pfLevel14,
+  'python-fundamentals/level-15.md': pfLevel15,
+  'python-fundamentals/level-16.md': pfLevel16,
+  'python-fundamentals/level-17.md': pfLevel17,
+  'python-fundamentals/level-18.md': pfLevel18,
+  'python-fundamentals/level-19.md': pfLevel19,
+  'python-fundamentals/level-20.md': pfLevel20,
+  'python-fundamentals/level-21.md': pfLevel21,
+  'python-fundamentals/level-22.md': pfLevel22,
+  'python-fundamentals/level-23.md': pfLevel23,
+  'python-fundamentals/level-24.md': pfLevel24,
+  'python-fundamentals/level-25.md': pfLevel25,
+  'python-fundamentals/level-26.md': pfLevel26,
+  'python-fundamentals/level-27.md': pfLevel27,
+  'python-fundamentals/level-28.md': pfLevel28,
+  'python-fundamentals/level-29.md': pfLevel29,
+  'python-fundamentals/level-30.md': pfLevel30,
+  'python-fundamentals/level-31.md': pfLevel31,
+  'python-fundamentals/level-32.md': pfLevel32,
+  'python-fundamentals/level-33.md': pfLevel33,
+  'python-fundamentals/level-34.md': pfLevel34,
+  'python-fundamentals/level-35.md': pfLevel35,
+  'python-fundamentals/level-36.md': pfLevel36,
   'dsa-python/level-0.md':  dsaLevel0,
   'dsa-python/level-1.md':  dsaLevel1,
   'dsa-python/level-2.md':  dsaLevel2,
