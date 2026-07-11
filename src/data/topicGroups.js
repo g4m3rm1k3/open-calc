@@ -77,6 +77,73 @@ export const TOPIC_GROUPS = {
         differentiator: 'Five card games teaching probability, statistics, and neuroscience through play.' },
     ],
   },
+  'cnc-cad': {
+    label: 'CNC & CAD',
+    items: [
+      { kind: 'course', key: 'cnc',
+        differentiator: 'Structured curriculum — CNC macro programming, G-code systems, and toolpath math, in order.' },
+      { kind: 'course', key: 'gcode-parser',
+        differentiator: 'Math and geometry foundations underneath CNC toolpaths — for understanding what the G-code numbers mean, not just running the simulator.' },
+      { kind: 'lab', key: 'cad-pro',
+        differentiator: 'Design the part first — parametric 3D modelling with constraint-based tools, no machining involved.' },
+      { kind: 'lab', key: 'cnc-sim',
+        differentiator: 'Program and simulate CNC toolpaths on their own — live 3D backplot and fixture management.' },
+      { kind: 'lab', key: 'cad-cnc',
+        differentiator: 'CAD and CNC combined — draw geometry and send it straight to the simulator as G-code, both panels live side by side.' },
+      { kind: 'lab', key: 'five-axis',
+        differentiator: '5-axis kinematics visualizer — homogeneous transforms, surface normals, lead/lag angles on parametric shapes.' },
+    ],
+  },
+  'web-dev': {
+    label: 'Web Development',
+    items: [
+      { kind: 'course', key: 'web',
+        differentiator: 'Structured curriculum — HTML and CSS through async JavaScript, ending in a capstone project.' },
+      { kind: 'lab', key: 'html-lab',
+        differentiator: 'Drag, drop, and style real HTML elements on a live canvas — the code panel syncs both ways as you go.' },
+      { kind: 'lab', key: 'html-lessons',
+        differentiator: 'Guided step series building one real page — semantic HTML first, then styling, then DOM scripting.' },
+      { kind: 'lab', key: 'css-mastery',
+        differentiator: "Deep-dive into the browser's layout engine — Box Model, Flexbox, Grid, and Stacking Contexts through interactive challenges." },
+      { kind: 'lab', key: 'react-mastery',
+        differentiator: '27 narrated lessons — JSX through hooks, context, reducers, and Suspense with live sandboxes.' },
+      { kind: 'lab', key: 'ts-lab',
+        differentiator: 'Build a real social platform frontend in vanilla TypeScript against a live REST API — no framework.' },
+      { kind: 'lab', key: 'vue-studio',
+        differentiator: 'Build a real Vue 3 project from scratch — real .vue files, live component tree as you write.' },
+      { kind: 'lab', key: 'backend-lab',
+        differentiator: 'Build a real backend from scratch — routes, middleware, services, a database — test your own endpoints.' },
+    ],
+  },
+  'plc-automation': {
+    label: 'PLC & Automation',
+    items: [
+      { kind: 'course', key: 'programmable-logic-controllers',
+        differentiator: 'Structured curriculum — PLC programming fundamentals and industrial automation systems, in order.' },
+      { kind: 'lab', key: 'plc-lab',
+        differentiator: 'Hands-on ladder logic simulator — 8 exercises from motor start/stop to full FSM state machines, Allen-Bradley naming.' },
+    ],
+  },
+  'robotics': {
+    label: 'Robotics',
+    items: [
+      { kind: 'lab', key: 'robot-arm-sim',
+        differentiator: 'Robot programming from zero — trig, FK/IK, 4×4 transforms, obstacle avoidance, 19 missions on a 2D and 6-DOF 3D arm.' },
+      { kind: 'lab', key: 'drone-lab',
+        differentiator: 'Program a self-flying drone — 10 missions on displacement vectors, rotation matrices, Bézier paths, and PID control.' },
+    ],
+  },
+  'digital-logic': {
+    label: 'Digital Logic',
+    items: [
+      { kind: 'course', key: 'digital-fundamentals',
+        differentiator: 'Structured curriculum — binary, logic gates, boolean algebra, and digital circuits, in order.' },
+      { kind: 'course', key: 'logic',
+        differentiator: 'Boolean logic and combinational circuit design, applied through problem sets rather than a linear course arc.' },
+      { kind: 'lab', key: 'logic-sim',
+        differentiator: 'Design and simulate digital logic circuits gate-by-gate with truth tables — build what the courses describe.' },
+    ],
+  },
 }
 
 export function getTopicGroup(topicId) {
