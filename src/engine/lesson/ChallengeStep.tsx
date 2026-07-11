@@ -22,6 +22,8 @@ function toMonacoLang(lang: string): string {
   if (n === 'py') return 'python'
   if (n === 'js') return 'javascript'
   if (n === 'ts') return 'typescript'
+  if (n === 'cpp' || n === 'c++') return 'cpp'
+  if (n === 'csharp' || n === 'cs') return 'csharp'
   if (n === 'sqlite') return 'sql'
   if (n === 'sh' || n === 'shell') return 'shell'
   return n
@@ -93,6 +95,10 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
     if (debugOn) {
       try {
         const norm = lang.toLowerCase()
+        if (!['python', 'py', 'javascript', 'js'].includes(norm)) {
+          setRunning(false)
+          return
+        }
         const harness = buildTestHarness(code, tests, lang)
         const traced = (norm === 'python' || norm === 'py')
           ? await runPython(harness)
@@ -108,6 +114,7 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
 
   const isTracing = traceEvents.length > 0
   const currentLine = traceEvents[traceStep]?.line ?? traceEvents[traceStep]?.sourceLocation?.line ?? null
+  const canDebug = ['python', 'py', 'javascript', 'js'].includes(lang.toLowerCase())
 
   return (
     <div className="flex flex-col h-full">
@@ -132,7 +139,7 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
           )}
           {!isTracing && (
             <label className={`flex items-center gap-1 text-[11px] cursor-pointer select-none ${debugOn ? 'text-brand-400' : ui.txt2}`}>
-              <input type="checkbox" checked={debugOn} onChange={e => setDebugOn(e.target.checked)} className="w-3 h-3 accent-brand-500" />
+              <input type="checkbox" checked={debugOn && canDebug} disabled={!canDebug} onChange={e => setDebugOn(e.target.checked)} className="w-3 h-3 accent-brand-500 disabled:opacity-40" />
               Debug
             </label>
           )}

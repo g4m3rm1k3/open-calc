@@ -78,6 +78,46 @@ export const SERIES: SeriesMeta[] = [
       { level: 10, title: 'Graphs',                 file: 'dsa-python/level-10.md' },
     ],
   },
+  {
+    id: 'cpp-fundamentals',
+    label: 'C++ Fundamentals',
+    lang: 'cpp',
+    emoji: 'C++',
+    description: 'Learn C++ with the lesson engine: syntax-highlighted examples, runnable C/C++ subset demos, and debug-oriented explanations of stack, heap, values, and references.',
+    levels: [
+      { level: 0, title: 'Hello, Types, and Memory', file: 'cpp-fundamentals/level-0.md' },
+    ],
+  },
+  {
+    id: 'csharp-fundamentals',
+    label: 'C# Fundamentals',
+    lang: 'csharp',
+    emoji: 'C#',
+    description: 'Teach C# syntax, classes, methods, and debugging mental models in the lesson engine while compiler execution is prepared for a later backend.',
+    levels: [
+      { level: 0, title: 'Hello, Types, and Methods', file: 'csharp-fundamentals/level-0.md' },
+    ],
+  },
+  {
+    id: 'java-fundamentals',
+    label: 'Java Fundamentals',
+    lang: 'java',
+    emoji: 'Java',
+    description: 'Teach Java structure, types, objects, and runtime thinking with editor support and lesson-engine debugging vocabulary.',
+    levels: [
+      { level: 0, title: 'Hello, Classes, and main()', file: 'java-fundamentals/level-0.md' },
+    ],
+  },
+  {
+    id: 'html-dom',
+    label: 'HTML, DOM, and JavaScript',
+    lang: 'html',
+    emoji: 'DOM',
+    description: 'Teach browser programming with separate HTML, CSS, and JavaScript tabs plus a live preview for DOM manipulation lessons.',
+    levels: [
+      { level: 0, title: 'Change the Page with JavaScript', file: 'html-dom/level-0.md' },
+    ],
+  },
 ]
 
 export function getSeries(id: string): SeriesMeta | undefined {

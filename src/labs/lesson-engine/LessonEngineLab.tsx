@@ -58,6 +58,11 @@ import dsaLevel8  from './content/dsa-python/level-8.md?raw'
 import dsaLevel9  from './content/dsa-python/level-9.md?raw'
 import dsaLevel10 from './content/dsa-python/level-10.md?raw'
 
+import cppLevel0 from './content/cpp-fundamentals/level-0.md?raw'
+import csharpLevel0 from './content/csharp-fundamentals/level-0.md?raw'
+import javaLevel0 from './content/java-fundamentals/level-0.md?raw'
+import htmlDomLevel0 from './content/html-dom/level-0.md?raw'
+
 const LESSON_FILES: Record<string, string> = {
   'python-fundamentals/level-0.md':  pfLevel0,
   'python-fundamentals/level-1.md':  pfLevel1,
@@ -107,6 +112,10 @@ const LESSON_FILES: Record<string, string> = {
   'dsa-python/level-8.md':  dsaLevel8,
   'dsa-python/level-9.md':  dsaLevel9,
   'dsa-python/level-10.md': dsaLevel10,
+  'cpp-fundamentals/level-0.md': cppLevel0,
+  'csharp-fundamentals/level-0.md': csharpLevel0,
+  'java-fundamentals/level-0.md': javaLevel0,
+  'html-dom/level-0.md': htmlDomLevel0,
 }
 
 interface Props {

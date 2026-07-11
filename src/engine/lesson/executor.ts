@@ -12,8 +12,9 @@ async function getRunner() {
     runJSInline: (code: string) => { output: string; error: string | null }
     runTSInline: (code: string) => Promise<{ output: string; error: string | null }>
     runPythonInline: (code: string, onLine?: (l: { type: string; text?: string; src?: string }) => void) => Promise<{ error: string | null }>
-    runSQLInline: (code: string, onLine: (l: string) => void) => Promise<{ error: string | null }>
+    runSQLInline: (code: string, onLine: (l: { type: string; text?: string }) => void) => Promise<{ error: string | null }>
     runShellInline: (code: string) => { output: string; error: string | null }
+    runCInline: (code: string, onLine: (l: { type: string; text?: string }) => void) => Promise<{ error: string | null }>
     RUNNABLE_LANGS: Set<string>
   }>
 }
@@ -42,14 +43,32 @@ export async function executeCode(code: string, lang: Lang): Promise<ExecutionRe
       const r = await runner.runTSInline(code)
       if (r.output && r.output !== '(no output)') out(r.output)
       if (r.error) err(r.error)
+    } else if (norm === 'html') {
+      lines.push({ kind: 'preview', text: code })
+    } else if (norm === 'css') {
+      err('CSS runs with an HTML tab. Add an `html` fence to preview this style.')
     } else if (norm === 'sql' || norm === 'sqlite') {
-      await runner.runSQLInline(code, out)
+      const result = await runner.runSQLInline(code, (line: { type: string; text?: string }) => {
+        if (!line.text) return
+        lines.push({ kind: line.type === 'error' ? 'error' : 'stdout', text: line.text })
+      })
+      if (result?.error) err(result.error)
     } else if (norm === 'bash' || norm === 'shell' || norm === 'sh') {
       const r = runner.runShellInline(code)
       if (r.output && r.output !== '(no output)') out(r.output)
       if (r.error) err(r.error)
+    } else if (norm === 'c' || norm === 'cpp' || norm === 'c++') {
+      const result = await runner.runCInline(code, (line: { type: string; text?: string }) => {
+        if (!line.text) return
+        lines.push({ kind: line.type === 'error' ? 'error' : 'stdout', text: line.text })
+      })
+      if (result?.error) err(result.error)
+    } else if (norm === 'csharp' || norm === 'cs') {
+      err('C# editing is supported, but the browser lesson engine does not bundle a C# compiler yet.')
+    } else if (norm === 'java') {
+      err('Java editing is supported, but the browser lesson engine does not bundle a JVM/compiler yet.')
     } else {
-      err(`Run not supported for '${lang}'.  Supported: python, javascript, typescript, sql, bash.`)
+      err(`Run not supported for '${lang}'. Supported: python, javascript, typescript, html/css/js, sql, bash, and C/C++ subset.`)
     }
   } catch (e) {
     err(e instanceof Error ? e.message : String(e))
@@ -61,5 +80,13 @@ export async function executeCode(code: string, lang: Lang): Promise<ExecutionRe
 
 export function isRunnable(lang: Lang): boolean {
   const norm = lang.toLowerCase()
-  return ['python', 'py', 'javascript', 'js', 'typescript', 'ts', 'sql', 'sqlite', 'bash', 'shell', 'sh'].includes(norm)
+  return [
+    'python', 'py',
+    'javascript', 'js',
+    'typescript', 'ts',
+    'html', 'css',
+    'sql', 'sqlite',
+    'bash', 'shell', 'sh',
+    'c', 'cpp', 'c++',
+  ].includes(norm)
 }

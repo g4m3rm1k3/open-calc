@@ -15,7 +15,7 @@ interface Props {
   lesson: ParsedLesson
   executor: Executor
   ui: UiTheme
-  onBack: () => void
+  onBack?: () => void
   onComplete?: () => void
   seriesLabel?: string
 }
@@ -183,7 +183,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
             isChallenge
               ? <ChallengeStep step={step} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onResults={handleResults} />
               : step.examples[0]
-                ? <RunExample snippet={step.examples[0]} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onOutput={handleOutput} />
+                ? <RunExample snippet={step.examples[0]} snippets={step.examples} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onOutput={handleOutput} />
                 : (
                   <div className={`flex-1 flex items-center justify-center ${ui.txt2} text-sm`}>
                     No code for this step — read the Lesson tab.
@@ -327,11 +327,23 @@ export default function LessonView({ lesson, executor, ui, onBack, onComplete, s
                 <div className="flex-1 overflow-y-auto">
                   <div className={`p-4 ${styles.codeFont} ${ui.bg0}`}>
                     {(visibleOutput ?? []).map((line, i) => (
-                      <div key={i} className={`whitespace-pre-wrap break-all ${
-                        line.kind === 'error' ? 'text-red-500'
-                        : line.kind === 'stderr' ? 'text-orange-400'
-                        : ui.txt1
-                      }`}>{line.text}</div>
+                      line.kind === 'preview'
+                        ? (
+                          <iframe
+                            key={i}
+                            title="HTML preview"
+                            srcDoc={line.text}
+                            sandbox="allow-scripts"
+                            className={`w-full min-h-[420px] rounded-lg border ${ui.border} bg-white`}
+                          />
+                        )
+                        : (
+                          <div key={i} className={`whitespace-pre-wrap break-all ${
+                            line.kind === 'error' ? 'text-red-500'
+                            : line.kind === 'stderr' ? 'text-orange-400'
+                            : ui.txt1
+                          }`}>{line.text}</div>
+                        )
                     ))}
                     {hasTrace && (visibleOutput?.length ?? 0) === 0 && (
                       <p className={`text-xs ${ui.txt2} mt-2`}>Step through the code — output appears as print statements execute.</p>

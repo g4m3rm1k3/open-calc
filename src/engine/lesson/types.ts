@@ -15,7 +15,7 @@ export interface CodeSnippet {
 }
 
 export interface OutputLine {
-  kind: 'stdout' | 'stderr' | 'error'
+  kind: 'stdout' | 'stderr' | 'error' | 'preview'
   text: string
 }
 

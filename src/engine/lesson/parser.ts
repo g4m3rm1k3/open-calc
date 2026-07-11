@@ -20,13 +20,23 @@ interface Fence { lang: string; code: string; raw: string }
 
 // Only these langs are extracted as runnable examples or special blocks.
 // All other fences (text, plaintext, no lang) stay in the prose for markdown rendering.
-const RUNNABLE_LANGS = new Set(['python', 'py', 'javascript', 'js', 'typescript', 'ts', 'sql', 'bash', 'sh'])
+const RUNNABLE_LANGS = new Set([
+  'python', 'py',
+  'javascript', 'js',
+  'typescript', 'ts',
+  'html', 'css',
+  'sql', 'sqlite',
+  'bash', 'shell', 'sh',
+  'c', 'cpp', 'c++',
+  'csharp', 'cs',
+  'java',
+])
 const SPECIAL_LANGS  = new Set(['challenge', 'test'])
 
 function extractFences(text: string): { fences: Fence[]; prose: string } {
   const fences: Fence[] = []
-  const prose = text.replace(/```(\w*)\n([\s\S]*?)```/g, (raw, lang, code) => {
-    const l = lang || 'plaintext'
+  const prose = text.replace(/```([^\n`]*)\n([\s\S]*?)```/g, (raw, lang, code) => {
+    const l = (lang || 'plaintext').trim().split(/\s+/)[0].toLowerCase()
     if (RUNNABLE_LANGS.has(l) || SPECIAL_LANGS.has(l)) {
       fences.push({ lang: l, code: code.replace(/\n$/, ''), raw })
       return ''   // remove from prose — rendered by RunExample / ChallengeStep

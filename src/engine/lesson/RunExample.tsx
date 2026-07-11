@@ -9,6 +9,7 @@ import type { TraceEvent } from '../../labs/codelens/codelens/types'
 
 interface Props {
   snippet: CodeSnippet
+  snippets?: CodeSnippet[]
   executor: Executor
   ui: UiTheme
   onTrace?: (events: TraceEvent[], code: string, step: number) => void
@@ -21,16 +22,76 @@ function toMonacoLang(lang: string): string {
   if (n === 'py') return 'python'
   if (n === 'js') return 'javascript'
   if (n === 'ts') return 'typescript'
+  if (n === 'cpp' || n === 'c++') return 'cpp'
+  if (n === 'csharp' || n === 'cs') return 'csharp'
   if (n === 'sqlite') return 'sql'
   if (n === 'sh' || n === 'shell') return 'shell'
   return n
 }
 
-export default function RunExample({ snippet, executor, ui, onTrace, onSeek, onOutput }: Props) {
+function labelFor(snippet: CodeSnippet, index: number): string {
+  const n = snippet.lang.toLowerCase()
+  if (n === 'js') return 'JavaScript'
+  if (n === 'ts') return 'TypeScript'
+  if (n === 'cpp' || n === 'c++') return 'C++'
+  if (n === 'csharp' || n === 'cs') return 'C#'
+  return snippet.lang.toUpperCase() || `File ${index + 1}`
+}
+
+function safeScript(code: string): string {
+  return code.replace(/<\/script/gi, '<\\/script')
+}
+
+function buildWebPreview(codes: CodeSnippet[]): string {
+  const html = codes.find(s => s.lang.toLowerCase() === 'html')?.code ?? '<main id="app"></main>'
+  const css = codes.filter(s => s.lang.toLowerCase() === 'css').map(s => s.code).join('\n\n')
+  const js = codes
+    .filter(s => ['javascript', 'js'].includes(s.lang.toLowerCase()))
+    .map(s => s.code)
+    .join('\n\n')
+
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; color: #0f172a; background: #f8fafc; }
+    #__oc_console { margin-top: 16px; padding: 10px; border-radius: 8px; background: #0f172a; color: #e2e8f0; font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
+    #__oc_console:empty { display: none; }
+    ${css}
+  </style>
+</head>
+<body>
+${html}
+<pre id="__oc_console"></pre>
+<script>
+(() => {
+  const out = document.getElementById('__oc_console');
+  const write = (kind, values) => {
+    out.textContent += values.map(v => typeof v === 'string' ? v : JSON.stringify(v)).join(' ') + "\\n";
+  };
+  ['log', 'warn', 'error'].forEach(kind => {
+    const original = console[kind];
+    console[kind] = (...values) => { write(kind, values); original.apply(console, values); };
+  });
+})();
+try {
+${safeScript(js)}
+} catch (error) {
+  console.error(error?.message || String(error));
+}
+</script>
+</body>
+</html>`
+}
+
+export default function RunExample({ snippet, snippets, executor, ui, onTrace, onSeek, onOutput }: Props) {
   const { themeStyles } = useGlobalTheme() as any
   const monacoTheme = themeStyles?.monaco ?? 'vs-dark'
 
-  const [code, setCode] = useState(snippet.code)
+  const allSnippets = snippets?.length ? snippets : [snippet]
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [codes, setCodes] = useState(() => allSnippets.map(s => s.code))
   const [running, setRunning] = useState(false)
   const [debugOn, setDebugOn] = useState(false)
   const [traceEvents, setTraceEvents] = useState<TraceEvent[]>([])
@@ -41,11 +102,12 @@ export default function RunExample({ snippet, executor, ui, onTrace, onSeek, onO
   const decorationsRef = useRef<string[]>([])
 
   useEffect(() => {
-    setCode(snippet.code)
+    setCodes(allSnippets.map(s => s.code))
+    setActiveIdx(0)
     setDebugOn(false)
     setTraceEvents([])
     setTraceStep(0)
-  }, [snippet.code])
+  }, [snippets, snippet.code])
 
   // Highlight current line in Monaco via decorations — no view swap needed
   useEffect(() => {
@@ -83,10 +145,17 @@ export default function RunExample({ snippet, executor, ui, onTrace, onSeek, onO
     setTraceStep(0)
     if (onOutput) onOutput([])
 
-    const norm = snippet.lang.toLowerCase()
+    const activeSnippet = allSnippets[Math.min(activeIdx, allSnippets.length - 1)] ?? snippet
+    const code = codes[Math.min(activeIdx, codes.length - 1)] ?? ''
+    const currentSnippets = allSnippets.map((s, i) => ({ ...s, code: codes[i] ?? s.code }))
+    const isWebExample = currentSnippets.some(s => s.lang.toLowerCase() === 'html')
+    const norm = activeSnippet.lang.toLowerCase()
     const isPython = norm === 'python' || norm === 'py'
+    const isJavaScript = norm === 'javascript' || norm === 'js'
 
-    if (debugOn && isPython) {
+    if (isWebExample) {
+      if (onOutput) onOutput([{ kind: 'preview', text: buildWebPreview(currentSnippets) }])
+    } else if (debugOn && isPython) {
       try {
         const traced = await runPython(code)
         const lines = [
@@ -100,7 +169,7 @@ export default function RunExample({ snippet, executor, ui, onTrace, onSeek, onO
       } catch (e) {
         if (onOutput) onOutput([{ text: String(e), kind: 'error' }])
       }
-    } else if (debugOn && !isPython) {
+    } else if (debugOn && isJavaScript) {
       try {
         const traced = runJS(code)
         const outputLines: string[] = 'output' in traced ? (traced as any).output : []
@@ -115,8 +184,10 @@ export default function RunExample({ snippet, executor, ui, onTrace, onSeek, onO
       } catch (e) {
         if (onOutput) onOutput([{ text: String(e), kind: 'error' }])
       }
+    } else if (debugOn) {
+      if (onOutput) onOutput([{ text: `Step-through debug is available for Python and JavaScript in this browser engine.`, kind: 'error' }])
     } else {
-      const r = await executor(code, snippet.lang)
+      const r = await executor(code, activeSnippet.lang)
       if (onOutput) onOutput(r.lines)
     }
 
@@ -125,14 +196,36 @@ export default function RunExample({ snippet, executor, ui, onTrace, onSeek, onO
 
   const isTracing = traceEvents.length > 0
   const currentLine = traceEvents[traceStep]?.line ?? traceEvents[traceStep]?.sourceLocation?.line ?? null
+  const activeSnippet = allSnippets[Math.min(activeIdx, allSnippets.length - 1)] ?? snippet
+  const activeCode = codes[Math.min(activeIdx, codes.length - 1)] ?? ''
+  const isWebExample = allSnippets.some(s => s.lang.toLowerCase() === 'html')
+  const canDebug = !isWebExample && ['python', 'py', 'javascript', 'js'].includes(activeSnippet.lang.toLowerCase())
 
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className={`flex items-center gap-2 px-3 py-1.5 ${ui.bg1} border-b ${ui.border} shrink-0`}>
-        <span className={`text-[11px] font-bold uppercase tracking-wide ${ui.txt2}`}>{snippet.lang}</span>
+        <span className={`text-[11px] font-bold uppercase tracking-wide ${ui.txt2}`}>{activeSnippet.lang}</span>
         {isTracing && currentLine != null && (
           <span className={`text-[10px] font-mono text-brand-400`}>line {currentLine}</span>
+        )}
+        {allSnippets.length > 1 && (
+          <div className={`flex items-center gap-1 ml-2 border-l ${ui.border} pl-2`}>
+            {allSnippets.map((s, i) => (
+              <button
+                key={`${s.lang}-${i}`}
+                type="button"
+                onClick={() => !isTracing && setActiveIdx(i)}
+                className={`text-[10px] font-semibold px-2 py-0.5 rounded border transition-colors ${
+                  i === activeIdx
+                    ? 'border-brand-500/40 bg-brand-500/15 text-brand-400'
+                    : `${ui.btnBorder} ${ui.txt2} bg-transparent hover:text-brand-400`
+                }`}
+              >
+                {labelFor(s, i)}
+              </button>
+            ))}
+          </div>
         )}
         <div className="flex items-center gap-2 ml-auto">
           {isTracing && (
@@ -149,7 +242,7 @@ export default function RunExample({ snippet, executor, ui, onTrace, onSeek, onO
           )}
           {!isTracing && (
             <label className={`flex items-center gap-1 text-[11px] cursor-pointer select-none ${debugOn ? 'text-brand-400' : ui.txt2}`}>
-              <input type="checkbox" checked={debugOn} onChange={e => setDebugOn(e.target.checked)} className="w-3 h-3 accent-brand-500" />
+              <input type="checkbox" checked={debugOn && canDebug} disabled={!canDebug} onChange={e => setDebugOn(e.target.checked)} className="w-3 h-3 accent-brand-500 disabled:opacity-40" />
               Debug
             </label>
           )}
@@ -165,11 +258,14 @@ export default function RunExample({ snippet, executor, ui, onTrace, onSeek, onO
       <div className="flex-1 min-h-0">
         <Editor
           height="100%"
-          language={toMonacoLang(snippet.lang)}
-          value={code}
+          language={toMonacoLang(activeSnippet.lang)}
+          value={activeCode}
           theme={monacoTheme}
           beforeMount={setupOpenCalcMonaco}
-          onChange={v => { if (!isTracing) setCode(v ?? '') }}
+          onChange={v => {
+            if (isTracing) return
+            setCodes(prev => prev.map((code, i) => i === activeIdx ? (v ?? '') : code))
+          }}
           onMount={(editor, monaco) => {
             editorRef.current = editor
             monacoRef.current = monaco
