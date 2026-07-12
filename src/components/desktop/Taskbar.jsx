@@ -5,7 +5,6 @@ import StartMenu from './StartMenu.jsx'
 import ChapterNavigator from './ChapterNavigator.jsx'
 import PinsNotesPopup from './PinsNotesPopup.jsx'
 import { useDesktop } from './DesktopProvider.jsx'
-import ReportBugButton from '../ui/ReportBugButton.jsx'
 import { useMontyContext } from '../../features/compass/MontyContext.tsx'
 import { useProgress } from '../../hooks/useProgress.js'
 import { computeXp, xpToLevel } from '../../features/compass/montyStatus.ts'
@@ -199,8 +198,6 @@ export default function Taskbar({ windows, onFocus }) {
           </motion.button>
 
           <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1 flex-shrink-0 rounded-full" />
-
-          <ReportBugButton iconOnly data-tour="report-bug" />
 
           <motion.button
             data-tour="stem-tutor"

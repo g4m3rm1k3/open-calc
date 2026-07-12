@@ -225,9 +225,15 @@ function TopBar() {
 
         <ReferencesMenu />
 
+        {/* Not hidden on mobile like most of this row — the Help modal's
+            Feedback & Bugs section (default tab) is now the one place to
+            report a bug or leave a suggestion. It used to have its own
+            icon here plus one in the Taskbar plus a Start Menu entry —
+            three doors to the same room. One door now. */}
         <button
+          data-tour="report-bug"
           onClick={() => window.dispatchEvent(new CustomEvent('oc-toggle-help'))}
-          className="hidden lg:flex nav-tool-btn text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+          className="nav-tool-btn text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
           title="Contributor Docs"
         >
           <span className="text-[15px] font-black leading-none">?</span>

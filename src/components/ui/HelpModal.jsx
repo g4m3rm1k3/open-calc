@@ -29,7 +29,12 @@ import {
   Heart,
   Shield,
   Github,
+  Bug,
 } from "lucide-react";
+import ReportBugButton from "./ReportBugButton.jsx";
+import SuggestionBoxButton from "./SuggestionBoxButton.jsx";
+import { useFeedbackBoard } from "../../hooks/useFeedbackBoard.js";
+import { buildBugLessonPrompt } from "../../utils/bugLessonPrompt.js";
 
 // ─── TEMPLATE STRINGS ────────────────────────────────────────────────────────
 
@@ -950,6 +955,138 @@ function HoverLessonPreview() {
       </div>
     </div>
   );
+}
+
+// ─── SECTION: FEEDBACK & BUGS ─────────────────────────────────────────────────
+
+function feedbackTimeAgo(ts) {
+  if (!ts?.toDate) return ''
+  const diffMs = Date.now() - ts.toDate().getTime()
+  const mins = Math.floor(diffMs / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days < 30) return `${days}d ago`
+  return ts.toDate().toLocaleDateString()
+}
+
+function FeedbackRow({ item }) {
+  const isBug = item.kind === 'bug'
+  const [downloaded, setDownloaded] = useState(false)
+
+  const downloadPrompt = () => {
+    downloadFile(`bug-${item.id}-agent-prompt.md`, buildBugLessonPrompt(item))
+    setDownloaded(true)
+    setTimeout(() => setDownloaded(false), 2000)
+  }
+
+  return (
+    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3.5 mb-2.5">
+      <div className="flex items-start justify-between gap-3 mb-1">
+        <div className="flex items-center gap-2 min-w-0">
+          {isBug ? (
+            <Bug className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+          ) : (
+            <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+          )}
+          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-snug truncate">
+            {item.title}
+          </h4>
+        </div>
+        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full whitespace-nowrap bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+          {item.status === 'closed' ? 'Closed' : 'Open'}
+        </span>
+      </div>
+      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap mb-2">
+        {item.description}
+      </p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] text-slate-400 dark:text-slate-500">
+          {item.displayName || 'Anonymous'} · {feedbackTimeAgo(item.createdAt)}
+        </p>
+        {isBug && (
+          <button
+            onClick={downloadPrompt}
+            className={`flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg transition-colors ${downloaded ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+            title="Download a prompt for an AI coding agent: understand this bug and write a lesson on fixing it"
+          >
+            {downloaded ? <Check className="w-3 h-3" /> : <Download className="w-3 h-3" />}
+            {downloaded ? 'Downloaded' : 'Agent prompt'}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function SectionFeedback() {
+  const { open, closed } = useFeedbackBoard()
+  const [tab, setTab] = useState('open')
+  const items = tab === 'open' ? open : closed
+
+  return (
+    <div>
+      <SectionHeading sub="Found a bug, have an idea, or want to fix something yourself?">
+        Feedback & Bugs
+      </SectionHeading>
+
+      <Para>
+        Every bug and idea reported here is public — anyone can see what's
+        been flagged and what's already been dealt with, signed in or not.
+        Filing one takes an account; browsing doesn't.
+      </Para>
+
+      <div className="flex flex-wrap gap-3 my-5">
+        <ReportBugButton />
+        <SuggestionBoxButton />
+      </div>
+
+      <Note color="blue">
+        <strong>Want to fix it yourself instead?</strong> The{' '}
+        <strong>How to Contribute</strong> lessons cover Markdown, Git,
+        branches &amp; PRs, reading unfamiliar code, and making your first
+        pull request — no prior experience assumed.{' '}
+        <a href="#/lab/lesson-engine" className="font-bold underline">
+          → Open the lessons
+        </a>
+      </Note>
+
+      <H3>What's been reported</H3>
+
+      <div className="flex gap-2 mb-4">
+        {[
+          { id: 'open', label: 'Open' },
+          { id: 'closed', label: 'Closed' },
+        ].map(t => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
+              tab === t.id
+                ? 'bg-brand-600 text-white'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {items === null && (
+        <p className="text-sm text-slate-400 text-center py-8">Loading…</p>
+      )}
+      {items !== null && items.length === 0 && (
+        <p className="text-sm text-slate-400 text-center py-8">
+          {tab === 'open' ? 'Nothing open right now.' : 'Nothing closed yet.'}
+        </p>
+      )}
+      {items?.map(item => (
+        <FeedbackRow key={`${item.kind}-${item.id}`} item={item} />
+      ))}
+    </div>
+  )
 }
 
 // ─── SECTION: OVERVIEW ───────────────────────────────────────────────────────
@@ -3258,6 +3395,10 @@ function SectionAbout() {
 
 const NAV = [
   {
+    group: "Feedback & Bugs",
+    items: [{ id: "feedback", label: "Feedback & Bugs", Icon: Bug }],
+  },
+  {
     group: "Start Here",
     items: [
       { id: "overview", label: "How to Contribute", Icon: BookOpen },
@@ -3301,6 +3442,7 @@ const NAV = [
 ];
 
 const SECTION_MAP = {
+  feedback: SectionFeedback,
   overview: SectionOverview,
   "first-lesson": SectionFirstLesson,
   anatomy: SectionAnatomy,
@@ -3318,7 +3460,7 @@ const SECTION_MAP = {
 // ─── MAIN MODAL ──────────────────────────────────────────────────────────────
 
 export default function HelpModal({ isOpen, onClose }) {
-  const [activeSection, setActiveSection] = useState("overview");
+  const [activeSection, setActiveSection] = useState("feedback");
 
   useEffect(() => {
     if (!isOpen) return;

@@ -27,19 +27,16 @@ function buildSteps(isMobile) {
         ? 'Tap Explore to browse every course — pre-calc through CNC machining.'
         : 'Click Start to browse Courses, Labs, and Games. Labs are hands-on sandboxes (CNC sim, circuits, chemistry); Courses are structured lessons.',
     },
-    isMobile
-      ? {
-          id: 'mobile-tools',
-          target: '[data-tour="mobile-tools-btn"]',
-          title: 'Report a bug, or help build a lesson',
-          body: "Tap Tools any time to report something broken, or open the Lesson Builder — anyone can write a lesson and submit it as a real GitHub pull request, no setup required.",
-        }
-      : {
-          id: 'report-bug',
-          target: '[data-tour="report-bug"]',
-          title: 'See something broken?',
-          body: 'Report it right here — it goes straight into the tracker, no email needed.',
-        },
+    // Same target on mobile and desktop now — the Help ("?") button is
+    // visible at every breakpoint and Feedback & Bugs is its default
+    // section, so there's one real door to report a bug or leave an idea,
+    // not a different one per device size.
+    {
+      id: 'report-bug',
+      target: '[data-tour="report-bug"]',
+      title: 'See something broken?',
+      body: "Click here — Feedback & Bugs is the first thing you'll see. Report a bug, leave a suggestion, or browse what's already been reported.",
+    },
   ]
 
   if (!isMobile) {

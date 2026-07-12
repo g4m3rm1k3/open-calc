@@ -8,6 +8,18 @@ touch them, not pre-planned in one pass. See `reference-notes.md`'s
 not on this list gets taught (now or deferred) before Claude uses it
 unsupervised; a pattern already on this list just gets built.
 
+**The real foundation is the `flutter-playground-lab/` series plus its five
+companion fundamentals installments** (`useeffect-and-useref-fundamentals/`,
+`context-from-scratch/`, `routing-fundamentals/`, `async-and-promises/`,
+`testing-fundamentals/`) — built together, deliberately, to close the gap
+between "knows nothing" and "can work anywhere in this app." Everything
+earlier in this folder (`git-fundamentals`, `lesson-engine-autofind`,
+`matrix-reducer-copy-button`, `favoriting-a-lesson`) is real and still
+correct, but incidental — built one real bug/feature at a time, not as a
+planned curriculum. Treat this six-set foundation as the actual concept
+map's backbone; everything below is still tracked the same way, just no
+longer assumed to be the primary path.
+
 **Status legend:**
 - ✅ **Taught** — full lesson exists, linked below
 - 🟡 **Touched, not taught** — used/explained inline while building
@@ -46,10 +58,38 @@ unsupervised; a pattern already on this list just gets built.
   `lesson-engine-autofind/01-how-content-loading-works-today.md`
 - ✅ **Guard clauses / validation at a state transition** —
   `matrix-reducer-copy-button/02-fixing-the-silent-invalid-input-bug.md`
-- ⬜ **`useRef` + `useEffect` for imperative drag handling** — used in
-  `MatrixReducer.jsx`'s draggable panel (`dragging`, `dragOrigin` refs,
-  the `mousemove`/`mouseup` window listeners in `useEffect`). Read while
-  in that file for Lesson 1 of the copy-button set, never taught.
+- ✅ **`useRef` + `useEffect` for imperative drag handling** — used in
+  `MatrixReducer.jsx`'s draggable panel (`dragging`, `dragOrigin` refs, the
+  `mousemove`/`mouseup` window listeners in `useEffect`, cleanup-on-unmount)
+  and the identical pattern in `FloatingWindow.jsx` —
+  `useeffect-and-useref-fundamentals/01-useref-and-useeffect.md`
+- ✅ **Building a Context from scratch** (`createContext`, `.Provider`, a
+  custom consuming hook with a guard clause for "no Provider present") —
+  `context-from-scratch/01-building-a-context-provider.md`, real code at
+  `src/context/RecentLabsContext.tsx`
+- ✅ **Client-side routing** (`HashRouter` vs `BrowserRouter` and why this
+  app uses the former, dynamic `:param` segments, `useParams`,
+  `useNavigate` vs `<Link>`) — real code traced in `App.jsx`'s route table
+  and `LessonPage.jsx` — `routing-fundamentals/01-react-router-and-this-apps-url-structure.md`
+- ✅ **Promises and `async`/`await`** (the event loop, non-blocking I/O,
+  `try`/`catch` around a rejected `await`) — traced through the real
+  `pushToFirestore`/`syncOnSignIn` functions in `AuthContext.jsx` —
+  `async-and-promises/01-promises-async-await-and-real-sync-code.md`
+- ✅ **Automated testing with vitest** (`describe`/`it`/`expect`, `.toBe`
+  vs `.toEqual`, watching a real assertion fail before trusting it) — real
+  test added for previously-untested `parseXYText` in
+  `src/labs/decomp-lab/mathHelpers.js` —
+  `testing-fundamentals/01-writing-your-first-real-tests.md`
+- ✅ **Derived state vs. stored state** (compute a value fresh from
+  existing state every render instead of giving it its own `useState`
+  and manually keeping the two in sync) —
+  `flutter-playground-lab/04-matching-the-apps-theme.md`
+- ✅ **Controlled form inputs** (`<select value={...} onChange={...}>`,
+  and why an uncontrolled input plus external state mutation causes
+  drift) — `flutter-playground-lab/05-typed-starter-examples.md`
+- ✅ **Chained ternaries as if/else-if/else, and mutually-exclusive UI
+  states** (`hasError ? ... : isLoading ? ... : null`) —
+  `flutter-playground-lab/06-shipping-it.md`
 
 ## Math / Domain Modeling
 
@@ -86,6 +126,17 @@ unsupervised; a pattern already on this list just gets built.
   grid because two different consumers (`HomePage`/`StartMenu` vs.
   `UtilityPanel`/`PinsNotesPopup`) read different field names off the same
   pin objects, and `PinsContext.jsx` enforces neither shape.
+- ✅ **Consuming an existing Context via a custom hook** (`useGlobalTheme()`
+  from `ThemeContext.jsx` — the observer-pattern shape of Context, read
+  without building one from scratch) —
+  `flutter-playground-lab/04-matching-the-apps-theme.md`
+
+## Third-Party Embeds & Browser Security
+
+- ✅ **`<iframe>` isolation, same-origin policy, and the `sandbox`/`allow`
+  attributes** (least-privilege embedding of a third-party app — DartPad —
+  including deliberately breaking the sandbox to observe the enforced
+  failure) — `flutter-playground-lab/02-the-iframe-and-the-trust-boundary.md`
 
 ## App Structure & Registries
 
