@@ -7,7 +7,11 @@ lang: typescript
 
 # Narrowing and Type Guards
 
-TypeScript knows more about a variable's type inside conditional blocks than it does outside them. When you check `typeof value === "string"`, TypeScript narrows the type to `string` for the rest of that branch. This is **control flow analysis** — the compiler tracks what's possible at each point in the code.
+A value of type `string | number | null` cannot be used as a string until you have verified that it actually is one. TypeScript enforces this — trying to call `.toUpperCase()` on `string | number` is a compile error.
+
+**Narrowing** is the process of reducing a union type to one of its members inside a conditional branch. TypeScript's control flow analysis tracks the type at every point in your code — after an `if (typeof x === 'string')` check, TypeScript knows `x` is `string` inside that branch without you having to cast.
+
+By the end of this lesson you will understand the forms of narrowing TypeScript recognises, how to write custom type guards with `is`, and why exhaustiveness checking catches missing cases in switch statements.
 
 ## typeof narrowing
 

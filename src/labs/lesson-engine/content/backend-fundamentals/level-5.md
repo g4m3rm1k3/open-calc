@@ -7,7 +7,13 @@ lang: javascript
 
 # Environment Variables and Configuration
 
-Never hardcode secrets (database passwords, API keys, JWT secrets) in source code. Environment variables separate configuration from code, and `.env` files make local development manageable.
+In Level 3, the JWT secret was hardcoded as `'dev-secret-change-in-production'`. That comment is a warning — but warnings get forgotten. If the secret ends up in a public repository, every token ever signed with it can be forged by anyone who reads your commit history.
+
+The same problem applies to every piece of configuration that changes between environments: database passwords, API keys, hostnames, port numbers. Hardcoding them creates three problems: secrets leak into version control, you need code changes to move between dev/staging/prod, and every developer needs to find and edit the same strings in the same files.
+
+**Environment variables** solve all three: configuration lives outside the code, in the operating system's environment. Different deployments have different variables. The code reads from one place.
+
+By the end of this lesson you will be able to read configuration from environment variables, write a config module that validates required variables at startup, and understand what CORS is and why you need it.
 
 ## process.env and .env files
 
@@ -130,31 +136,39 @@ CORS errors in the browser console = missing CORS headers on the server.
 
 ## Challenge: env_config
 
-Build a config object from environment variables.
+Write a `buildConfig(env)` function that reads configuration from an `env` object (simulating `process.env`). It must throw if required variables are missing.
+
+Return an object with:
+- `port` — number, parsed from `env.PORT`. Default `3000` if not set.
+- `jwtSecret` — string from `env.JWT_SECRET`. Required — throw `Error('JWT_SECRET is required')` if missing.
+- `isProd` — boolean, `true` if `env.NODE_ENV === 'production'`.
+- `corsOrigin` — string from `env.CORS_ORIGIN`. Default `'http://localhost:5173'` if not set.
+
+`parseInt(str)` — parses a string to an integer. `parseInt('4000')` → `4000`.
 
 ```javascript
-// Simulate process.env for this exercise:
-const env = {
-  PORT: '4000',
-  JWT_SECRET: 'my-secret-key',
-  NODE_ENV: 'production',
-};
-
 function buildConfig(env) {
-  // Return an object with:
-  // port: number (parsed from env.PORT, default 3000)
-  // jwtSecret: string (from env.JWT_SECRET)
-  // isProd: boolean (true if env.NODE_ENV === 'production')
+  // implement
 }
 
-const config = buildConfig(env);
+const config = buildConfig({
+  PORT: '4000',
+  JWT_SECRET: 'my-secret',
+  NODE_ENV: 'production',
+  CORS_ORIGIN: 'https://app.example.com',
+});
 ```
 
 ```test
 assert config.port === 4000
-assert config.jwtSecret === 'my-secret-key'
+assert config.jwtSecret === 'my-secret'
 assert config.isProd === true
-var config2 = buildConfig({ PORT: '3000', JWT_SECRET: 'x', NODE_ENV: 'development' })
-assert config2.isProd === false
-assert config2.port === 3000
+assert config.corsOrigin === 'https://app.example.com'
+const devConfig = buildConfig({ JWT_SECRET: 'x', NODE_ENV: 'development' })
+assert devConfig.port === 3000
+assert devConfig.isProd === false
+assert devConfig.corsOrigin === 'http://localhost:5173'
+let threw = false
+try { buildConfig({ NODE_ENV: 'production' }) } catch(e) { threw = true }
+assert threw === true
 ```

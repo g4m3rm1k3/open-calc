@@ -7,7 +7,11 @@ lang: css
 
 # Media Queries
 
-A media query tells the browser: "apply this CSS only when a condition is true." The most common condition is viewport width — different CSS for narrow screens, wider screens, and large screens.
+In Level 0 you learned that a CSS pixel is not a screen pixel, and that the viewport determines how wide the browser thinks it is. Now you can use that information to apply different CSS at different widths.
+
+A **media query** tells the browser "apply this CSS only when a condition is true." The most common condition is viewport width — different CSS for narrow screens, wider screens, and large screens. Media queries are how layouts transform from a single column on mobile to a multi-column grid on desktop.
+
+By the end of this lesson you will be able to write `@media` rules, choose between `min-width` and `max-width` strategies, pick appropriate breakpoints, and target dark mode and other user preferences with media features.
 
 ## The @media syntax
 

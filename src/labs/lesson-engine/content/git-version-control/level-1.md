@@ -7,7 +7,11 @@ lang: bash
 
 # The Core Workflow
 
-Every Git session follows the same pattern: make changes, stage them, commit them. This level covers the commands you'll use dozens of times every day.
+In Level 0 you learned Git's three states — working directory, staging area, repository — and how files move between them. This lesson is about the commands that move them: the five you will use dozens of times every day.
+
+`git init`, `git status`, `git add`, `git commit`, `git log`. This sequence is the heartbeat of Git development. Everything else — branches, remotes, rebasing — is built on top of these.
+
+By the end of this lesson you will be able to initialise a repository, stage and commit changes, write commit messages that communicate intent, view history with `git log`, inspect changes with `git diff`, and configure `.gitignore` correctly.
 
 ## init, add, commit
 

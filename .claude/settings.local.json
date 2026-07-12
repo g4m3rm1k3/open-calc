@@ -80,7 +80,12 @@
       "Bash(sort -t'/' -k2)",
       "Bash(git merge *)",
       "Bash(grep -n '```text' /Users/michaelmclean/Testing/open-calc/src/labs/lesson-engine/content/python-fundamentals/level-4.md)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(git switch *)",
+      "Bash(awk '/^## Challenge/,0' /Users/michaelmclean/Testing/open-calc/src/labs/lesson-engine/content/git-version-control/level-0.md)",
+      "Bash(awk '/^## Challenge/,0' /Users/michaelmclean/Testing/open-calc/src/labs/lesson-engine/content/css-responsive/level-3.md)",
+      "Bash(awk '/^## Challenge/,0' /Users/michaelmclean/Testing/open-calc/src/labs/lesson-engine/content/css-responsive/level-6.md)",
+      "Bash(awk '/^## Challenge/,0' /Users/michaelmclean/Testing/open-calc/src/labs/lesson-engine/content/css-animation/level-1.md)"
     ]
   }
 }

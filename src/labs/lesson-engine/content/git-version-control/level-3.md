@@ -7,7 +7,11 @@ lang: bash
 
 # Remote Repositories and GitHub
 
-A remote repository is a copy of your repo hosted on a server. GitHub, GitLab, and Bitbucket host them. Remotes enable collaboration (multiple developers push to the same repo) and backup (your history is stored offsite).
+A local Git repository lives entirely on your machine. That means no backup, no way for others to see your work, and no way to collaborate. A **remote** repository is a copy of the repo hosted on a server. `git push` sends your commits there; `git pull` fetches commits others have pushed.
+
+GitHub is the largest host for public and private Git repositories. Understanding how remotes work — not just the commands, but what actually happens — is essential for working on any team.
+
+By the end of this lesson you will be able to add a remote, push and pull branches, understand the difference between `fetch` and `pull`, and recover from common remote-related errors like "rejected — non-fast-forward."
 
 ## Adding a remote
 
@@ -127,6 +131,8 @@ const commands = {
 
 ```test
 assert commands.pushNewBranch.includes('push') && commands.pushNewBranch.includes('origin') && commands.pushNewBranch.includes('feature/auth')
-assert commands.pullMain.includes('pull')
+assert commands.pushNewBranch.includes('-u') || commands.pushNewBranch.includes('--set-upstream')
+assert commands.pullMain.includes('pull') && (commands.pullMain.includes('origin') || commands.pullMain.includes('main'))
 assert commands.clone.includes('clone') && commands.clone.includes('myapp')
+assert commands.clone.includes('github') || commands.clone.includes('.git') || commands.clone.includes('https')
 ```

@@ -7,7 +7,11 @@ lang: sql
 
 # Schema Design and Indexes
 
-Schema design determines how easy your queries are to write, how fast they run, and how reliably they enforce data correctness. Indexes are the primary tool for query performance. Both decisions, made at the start of a project, are hard to change later.
+The schema is the highest-leverage decision in a web application. A good schema makes queries straightforward and fast. A bad schema means complex queries, slow performance, and data that gets out of sync. Unlike application code, which can be refactored freely, schema changes on a table with millions of rows require careful migration planning and often downtime.
+
+The two most important tools: **normalisation** (storing each fact in exactly one place) and **indexes** (data structures that make lookups fast without reading every row).
+
+By the end of this lesson you will understand why normalisation prevents data inconsistency, how database constraints enforce invariants even when application code has bugs, and when and how to create indexes.
 
 ## Normalisation — avoiding redundancy
 
@@ -119,22 +123,26 @@ CREATE UNIQUE INDEX idx_users_email_unique ON users(email);
 
 ## Challenge: schema_design
 
-Write CREATE TABLE statements for a simple blog.
+Write two `CREATE TABLE` statements for a simple blog:
 
-1. `CREATE TABLE authors (id INTEGER PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL)`
-2. `CREATE TABLE posts (id INTEGER PRIMARY KEY, title TEXT NOT NULL, author_id INTEGER NOT NULL REFERENCES authors(id))`
+1. `authors` table with columns: `id INTEGER PRIMARY KEY`, `name TEXT NOT NULL`, `email TEXT UNIQUE NOT NULL`.
+2. `posts` table with columns: `id INTEGER PRIMARY KEY`, `title TEXT NOT NULL`, `body TEXT`, `author_id INTEGER NOT NULL REFERENCES authors(id)`.
+
+The `REFERENCES authors(id)` makes `author_id` a foreign key — the database will reject any post with an `author_id` that doesn't exist in `authors`.
 
 ```sql
 -- Your CREATE TABLE statements:
 ```
 
 ```test
-var q = code.trim().toLowerCase()
-assert q.includes('create table')
-assert q.includes('authors')
-assert q.includes('posts')
+var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
+assert q.includes('create table authors')
+assert q.includes('create table posts')
+assert (q.match(/create table/g) || []).length >= 2
 assert q.includes('primary key')
 assert q.includes('not null')
-assert q.includes('references')
+assert q.includes('unique')
+assert q.includes('references authors')
 assert q.includes('author_id')
+assert q.includes('email')
 ```

@@ -7,7 +7,11 @@ lang: typescript
 
 # Classes and Access Modifiers
 
-TypeScript extends JavaScript classes with access modifiers (`public`, `private`, `protected`, `readonly`) and parameter shorthand that eliminates constructor boilerplate. Classes in TypeScript are both a runtime construct (they produce JavaScript classes) and a type construct (they define a type).
+JavaScript classes added syntactic sugar for constructor functions and prototypes in ES2015. TypeScript builds on this with access modifiers that control which code can read or write each property, and shorthand syntax that eliminates constructor boilerplate.
+
+TypeScript classes are unique in that they serve two roles at once: they are a **runtime construct** (produce real JavaScript class code) and a **type construct** (define a type that describes instances). A class named `CourseRepo` both creates the `CourseRepo` constructor function and introduces a type named `CourseRepo`.
+
+By the end of this lesson you will be able to use `public`, `private`, `protected`, and `readonly` access modifiers, write the parameter shorthand to declare and assign properties in one line, and understand when to use a class versus an interface.
 
 ## Access modifiers
 

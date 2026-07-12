@@ -7,7 +7,11 @@ lang: css
 
 # CSS Transitions
 
-A CSS transition smoothly animates a property from one value to another when that property changes — usually on `:hover`, `:focus`, or a class toggle. No JavaScript needed for the most common animations in UI.
+A UI without animation feels abrupt — elements appear and disappear instantly, state changes happen with no visual acknowledgment. A UI with overdone animation feels slow and distracting. The right amount of motion communicates change clearly and quickly.
+
+CSS transitions are the simplest form of animation: when a property changes (on hover, on focus, when a class is toggled), the browser smoothly interpolates from the old value to the new one. No JavaScript needed.
+
+By the end of this lesson you will be able to write transition declarations, control duration, easing, and delay, and know which properties are safe to animate versus which ones cause layout thrash.
 
 ## The transition property
 

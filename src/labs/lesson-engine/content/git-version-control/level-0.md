@@ -7,7 +7,11 @@ lang: bash
 
 # What Git Is
 
-Git is a version control system — it records every change made to a project. You can see who changed what, when, and why. You can return to any previous state. You can work on two different changes in parallel and merge them. For a developer working alone or on a team, Git is not optional.
+Every developer, at some point before discovering Git, has had a folder called `project_FINAL_v2_ACTUALLY_FINAL/`. Copying folders to "save" a state of working code is the pre-Git instinct. It fails because there is no history, no way to understand what changed between versions, and no safe way for two people to work on the same project simultaneously.
+
+Git is a **version control system** — it records every change made to a project as a sequence of snapshots called commits. You can see who changed what, when, and why. You can return to any previous state instantly. You can work on two different features in parallel and merge them. For any serious software project, Git is not optional.
+
+By the end of this lesson you will understand the three states files live in (working directory, staging area, repository), know why the staging area exists, and be able to configure Git on your machine.
 
 ## Why version control exists
 
@@ -120,10 +124,10 @@ const gitCommands = {
 ```
 
 ```test
-gitCommands['git add file.js'] = 'staging area'
-gitCommands['git commit -m "msg"'] = 'repository'
-gitCommands['git status'] = 'all three'
-assert gitCommands['git add file.js'] === 'staging area'
-assert gitCommands['git commit -m "msg"'] === 'repository'
-assert gitCommands['git status'] === 'all three'
+assert gitCommands['git add file.js'] !== ''
+assert gitCommands['git commit -m "msg"'] !== ''
+assert gitCommands['git status'] !== ''
+assert gitCommands['git add file.js'].toLowerCase().includes('staging')
+assert gitCommands['git commit -m "msg"'].toLowerCase().includes('repositor')
+assert gitCommands['git status'].toLowerCase().includes('three') || gitCommands['git status'].toLowerCase().includes('all')
 ```

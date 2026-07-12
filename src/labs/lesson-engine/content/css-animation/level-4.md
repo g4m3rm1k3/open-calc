@@ -7,7 +7,11 @@ lang: css
 
 # UI Micro-animations
 
-Micro-animations are the small, purposeful animations that communicate feedback. A button that confirms a click. A checkbox that fills with a checkmark. A notification that slides in. These animations answer questions users are asking ("did that work?", "what just happened?").
+Micro-animations are the details that make an interface feel responsive and alive. Without them, clicking a button feels like nothing happened — the user is left wondering if the action registered. With them, every interaction has immediate, clear feedback.
+
+The key distinction: micro-animations communicate purpose. They are not decorative. A button press animation says "I received your click." A checkbox checkmark says "this is now active." A slide-in notification says "something just happened that requires your attention."
+
+By the end of this lesson you will be able to build button press feedback, animated checkboxes, slide-in notifications, and loading states — all using CSS transitions and keyframes without JavaScript.
 
 ## Button feedback animations
 

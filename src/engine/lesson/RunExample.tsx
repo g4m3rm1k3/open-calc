@@ -15,6 +15,8 @@ interface Props {
   onTrace?: (events: TraceEvent[], code: string, step: number) => void
   onSeek?: (step: number) => void
   onOutput?: (lines: { text: string; kind: string }[]) => void
+  /** Called for background auto-renders — does NOT trigger a tab switch in the parent */
+  onAutoPreview?: (html: string) => void
 }
 
 function toMonacoLang(lang: string): string {
@@ -85,7 +87,7 @@ ${safeScript(js)}
 </html>`
 }
 
-export default function RunExample({ snippet, snippets, executor, ui, onTrace, onSeek, onOutput }: Props) {
+export default function RunExample({ snippet, snippets, executor, ui, onTrace, onSeek, onOutput, onAutoPreview }: Props) {
   const { themeStyles } = useGlobalTheme() as any
   const monacoTheme = themeStyles?.monaco ?? 'vs-dark'
 
@@ -111,11 +113,18 @@ export default function RunExample({ snippet, snippets, executor, ui, onTrace, o
     setTraceStep(0)
   }, [snippets, snippet.code])
 
-  // Auto-render web examples (html+css) immediately — no Run click needed
+  // Auto-render web examples (html+css) immediately — no Run click needed.
+  // Uses onAutoPreview when available so the parent can update preview content
+  // without switching away from the Lesson tab.
   useEffect(() => {
     const snips = allSnippetsRef.current
-    if (!snips.some(s => s.lang.toLowerCase() === 'html') || !onOutput) return
-    onOutput([{ kind: 'preview', text: buildWebPreview(snips.map((s, i) => ({ ...s, code: codes[i] ?? s.code }))) }])
+    if (!snips.some(s => s.lang.toLowerCase() === 'html')) return
+    const html = buildWebPreview(snips.map((s, i) => ({ ...s, code: codes[i] ?? s.code })))
+    if (onAutoPreview) {
+      onAutoPreview(html)
+    } else if (onOutput) {
+      onOutput([{ kind: 'preview', text: html }])
+    }
   }, [codes])
 
   // Highlight current line in Monaco via decorations — no view swap needed

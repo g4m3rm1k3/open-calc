@@ -158,6 +158,33 @@ import htmlDomLevel9  from './content/html-dom/level-9.md?raw'
 import htmlDomLevel10 from './content/html-dom/level-10.md?raw'
 import htmlDomLevel11 from './content/html-dom/level-11.md?raw'
 
+import contrLevel0 from './content/contributor-series/level-0.md?raw'
+import contrLevel1 from './content/contributor-series/level-1.md?raw'
+import contrLevel2 from './content/contributor-series/level-2.md?raw'
+import contrLevel3 from './content/contributor-series/level-3.md?raw'
+import contrLevel4 from './content/contributor-series/level-4.md?raw'
+import contrLevel5 from './content/contributor-series/level-5.md?raw'
+import contrLevel6 from './content/contributor-series/level-6.md?raw'
+import contrLevel7 from './content/contributor-series/level-7.md?raw'
+
+import cssProfLevel0 from './content/css-professional/level-0.md?raw'
+import cssProfLevel1 from './content/css-professional/level-1.md?raw'
+import cssProfLevel2 from './content/css-professional/level-2.md?raw'
+import cssProfLevel3 from './content/css-professional/level-3.md?raw'
+import cssProfLevel4 from './content/css-professional/level-4.md?raw'
+import cssProfLevel5 from './content/css-professional/level-5.md?raw'
+import cssProfLevel6 from './content/css-professional/level-6.md?raw'
+import cssProfLevel7 from './content/css-professional/level-7.md?raw'
+
+import cssVdLevel0 from './content/css-visual-design/level-0.md?raw'
+import cssVdLevel1 from './content/css-visual-design/level-1.md?raw'
+import cssVdLevel2 from './content/css-visual-design/level-2.md?raw'
+import cssVdLevel3 from './content/css-visual-design/level-3.md?raw'
+import cssVdLevel4 from './content/css-visual-design/level-4.md?raw'
+import cssVdLevel5 from './content/css-visual-design/level-5.md?raw'
+import cssVdLevel6 from './content/css-visual-design/level-6.md?raw'
+import cssVdLevel7 from './content/css-visual-design/level-7.md?raw'
+
 import cssRespLevel0 from './content/css-responsive/level-0.md?raw'
 import cssRespLevel1 from './content/css-responsive/level-1.md?raw'
 import cssRespLevel2 from './content/css-responsive/level-2.md?raw'
@@ -348,6 +375,30 @@ const LESSON_FILES: Record<string, string> = {
   'html-dom/level-9.md':  htmlDomLevel9,
   'html-dom/level-10.md': htmlDomLevel10,
   'html-dom/level-11.md': htmlDomLevel11,
+  'contributor-series/level-0.md': contrLevel0,
+  'contributor-series/level-1.md': contrLevel1,
+  'contributor-series/level-2.md': contrLevel2,
+  'contributor-series/level-3.md': contrLevel3,
+  'contributor-series/level-4.md': contrLevel4,
+  'contributor-series/level-5.md': contrLevel5,
+  'contributor-series/level-6.md': contrLevel6,
+  'contributor-series/level-7.md': contrLevel7,
+  'css-professional/level-0.md': cssProfLevel0,
+  'css-professional/level-1.md': cssProfLevel1,
+  'css-professional/level-2.md': cssProfLevel2,
+  'css-professional/level-3.md': cssProfLevel3,
+  'css-professional/level-4.md': cssProfLevel4,
+  'css-professional/level-5.md': cssProfLevel5,
+  'css-professional/level-6.md': cssProfLevel6,
+  'css-professional/level-7.md': cssProfLevel7,
+  'css-visual-design/level-0.md': cssVdLevel0,
+  'css-visual-design/level-1.md': cssVdLevel1,
+  'css-visual-design/level-2.md': cssVdLevel2,
+  'css-visual-design/level-3.md': cssVdLevel3,
+  'css-visual-design/level-4.md': cssVdLevel4,
+  'css-visual-design/level-5.md': cssVdLevel5,
+  'css-visual-design/level-6.md': cssVdLevel6,
+  'css-visual-design/level-7.md': cssVdLevel7,
   'css-responsive/level-0.md': cssRespLevel0,
   'css-responsive/level-1.md': cssRespLevel1,
   'css-responsive/level-2.md': cssRespLevel2,

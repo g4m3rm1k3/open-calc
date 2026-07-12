@@ -7,7 +7,11 @@ lang: css
 
 # A Complete Responsive Page
 
-Every technique from this series combines in a real page layout: mobile-first base, media query for the two-column layout, fluid typography with `clamp()`, responsive images with `aspect-ratio`, an auto-fit grid, and container queries on the cards. This is what production responsive CSS looks like.
+The previous levels taught each responsive technique in isolation. Real production CSS uses all of them together: mobile-first base styles, a media query for the desktop layout, `clamp()` for fluid typography, `aspect-ratio` for images, `auto-fit/minmax` for the card grid, and container queries for the cards themselves.
+
+This final level shows how these techniques compose — each one handling the problem it is best suited for, with no technique doing another's job.
+
+By the end of this lesson you will be able to read and write production-quality responsive CSS that uses multiple techniques together, and understand which problem each technique is solving in context.
 
 ## The page structure — mobile first
 

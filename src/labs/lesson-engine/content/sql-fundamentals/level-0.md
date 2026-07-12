@@ -7,7 +7,11 @@ lang: sql
 
 # What SQL Is
 
-SQL (Structured Query Language) is the language for working with relational databases. Every web application that stores data uses a relational database — user accounts, products, orders, posts. SQL is how you create, read, update, and delete that data.
+Instagram has 2 billion user accounts. Amazon has hundreds of millions of products. Every message you send, every order you place, every post you see is stored somewhere and retrieved based on your specific query. The system that stores all that data and answers those queries is a **relational database**. The language for working with it is **SQL**.
+
+SQL (Structured Query Language) has been the standard for relational databases since the 1970s. Every major web backend uses one: PostgreSQL, MySQL, SQLite, SQL Server. The core syntax you learn here works in all of them.
+
+By the end of this lesson you will understand what a relational database is and how it organizes data, be able to describe the four SQL data operations (CRUD), and understand the difference between SQL databases and when to use each.
 
 ## What a relational database is
 
@@ -109,21 +113,20 @@ advanced syntax and functions, not in SELECT/FROM/WHERE/JOIN.
 
 ## Challenge: sql_basics
 
-Write a SQL SELECT statement.
-
-Write a SQL statement that selects `name` and `email` from a table called `students` where `active = 1`.
+Write a SQL SELECT statement that retrieves `name` and `email` from a table called `students` where `active = 1`. Do not use `SELECT *` — name the columns explicitly.
 
 ```sql
 -- Write your SELECT statement:
 ```
 
 ```test
-var q = code.trim().toLowerCase()
+var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
 assert q.startsWith('select')
+assert !q.includes('select *')
 assert q.includes('name')
 assert q.includes('email')
-assert q.includes('from')
-assert q.includes('students')
+assert q.includes('from students')
 assert q.includes('where')
 assert q.includes('active')
+assert q.includes('= 1') || q.includes('=1')
 ```

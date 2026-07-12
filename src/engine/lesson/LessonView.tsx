@@ -94,6 +94,12 @@ export default function LessonView({ lesson, executor, ui, onBack, onBackToSerie
     }
   }
 
+  // Background auto-render from RunExample — update preview content without switching tabs.
+  // The user can click the DOM tab to see the preview whenever they're ready.
+  function handleAutoPreview(html: string) {
+    setOutput([{ kind: 'preview', text: html }])
+  }
+
   function handleResults(results: TestResult[]) {
     setTestResults(results)
     if (results.length > 0) {
@@ -223,7 +229,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onBackToSerie
             isChallenge
               ? <ChallengeStep step={step} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onResults={handleResults} onOutput={handleOutput} />
               : step.examples[0]
-                ? <RunExample snippet={step.examples[0]} snippets={step.examples} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onOutput={handleOutput} />
+                ? <RunExample snippet={step.examples[0]} snippets={step.examples} executor={executor} ui={ui} onTrace={handleTrace} onSeek={handleSeek} onOutput={handleOutput} onAutoPreview={handleAutoPreview} />
                 : (
                   <div className={`flex-1 flex items-center justify-center ${ui.txt2} text-sm`}>
                     No code for this step — read the Lesson tab.

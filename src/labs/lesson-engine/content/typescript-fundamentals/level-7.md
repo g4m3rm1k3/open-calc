@@ -7,7 +7,11 @@ lang: typescript
 
 # Modules and Declaration Files
 
-TypeScript modules are JavaScript modules with type information. Every file is a module if it has an `import` or `export` statement. Declaration files (`.d.ts`) add type information to JavaScript packages that weren't written in TypeScript.
+TypeScript's type system is only useful at scale if types can flow between files. A `Course` interface defined in one file needs to be importable in ten others without re-declaring it. And when you install a third-party JavaScript package (like Express), TypeScript needs to know what types its functions accept and return.
+
+TypeScript uses the same ESModule `import`/`export` syntax as JavaScript, extended with type-only imports and exports. **Declaration files** (`.d.ts`) carry type information for JavaScript packages that were not written in TypeScript — installed from `@types/...` packages on npm.
+
+By the end of this lesson you will be able to import and export values and types, understand the difference between `import` and `import type`, read a `.d.ts` file, and know when to write your own declaration file versus finding one on DefinitelyTyped.
 
 ## Export and import
 

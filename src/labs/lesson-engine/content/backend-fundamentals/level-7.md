@@ -7,7 +7,11 @@ lang: javascript
 
 # Deployment
 
-A local Node.js server isn't the internet. Deployment means running your app on a server that's always on, accessible by a public URL, secured with HTTPS, and monitored so crashes are detected.
+A server running on `localhost:3000` is only accessible on your machine. Deployment means running the same code on a remote machine that is publicly reachable, always on, protected by HTTPS, and monitored so you know when it crashes.
+
+The configuration you deploy to differs from your development environment in four important ways: the port comes from the platform (not hardcoded), HTTPS is handled by the platform (not your code), environment variables are set in a dashboard (not a `.env` file), and `NODE_ENV=production` must be set.
+
+By the end of this lesson you will understand what a PaaS platform does for you, how to structure a Node.js app for deployment, how PM2 keeps a process running, and what graceful shutdown means and why it matters.
 
 ## Preparing for production
 
@@ -119,25 +123,34 @@ Railway is a platform-as-a-service (PaaS) — it manages the server infrastructu
 
 **Congratulations — Backend Fundamentals complete!** You've covered HTTP, Express, async handlers, authentication, database integration, environment variables, testing, and deployment.
 
-## Challenge: graceful_shutdown
+## Challenge: startup_checks
 
-Implement graceful shutdown logic.
+Write a `validateDeployment(env)` function that checks whether an environment is ready to deploy. It should return an object with `{ ready: boolean, errors: string[] }`.
+
+It is ready (`ready: true`, `errors: []`) only when all of these are true:
+- `env.NODE_ENV` is `'production'`
+- `env.PORT` is present
+- `env.JWT_SECRET` is present and has length >= 32 characters
+- `env.DATABASE_URL` is present
+
+For each missing or invalid variable, add a descriptive string to `errors`. `ready` is `false` if `errors.length > 0`.
 
 ```javascript
-function createShutdownHandler(server, onShutdown) {
-  // Return a function that:
-  // 1. Logs 'Shutting down...'
-  // 2. Calls server.close() with a callback
-  // 3. In the callback, calls onShutdown()
+function validateDeployment(env) {
+  const errors = []
+  // check each requirement, push to errors if violated
+  return { ready: errors.length === 0, errors }
 }
 ```
 
 ```test
-var closed = false
-var callbackCalled = false
-var mockServer = { close(cb) { closed = true; cb(); } }
-var handler = createShutdownHandler(mockServer, () => { callbackCalled = true; })
-handler()
-assert closed === true
-assert callbackCalled === true
+const good = validateDeployment({ NODE_ENV:'production', PORT:'3000', JWT_SECRET:'a'.repeat(32), DATABASE_URL:'postgres://...' })
+assert good.ready === true
+assert good.errors.length === 0
+const bad = validateDeployment({ NODE_ENV:'development', PORT:'3000', JWT_SECRET:'short', DATABASE_URL:'postgres://...' })
+assert bad.ready === false
+assert bad.errors.length >= 2
+const missing = validateDeployment({})
+assert missing.ready === false
+assert missing.errors.length >= 4
 ```

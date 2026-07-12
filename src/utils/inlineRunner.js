@@ -64,15 +64,118 @@ function makeInlineRequire() {
     sep: '/',
   }
 
+  // ── http shim ─────────────────────────────────────────────────────────────
+  // Enough for lesson examples: createServer registers handlers the same way
+  // express.listen does so runExpressOutput can display registered routes.
+  const httpShim = {
+    createServer(handler) {
+      const app = createApp()
+      // Wrap the raw (req,res) handler as a catch-all route so runExpressOutput
+      // picks it up and can show it was registered.
+      app._rawHandler = handler
+      app.listen = (port, cb) => {
+        expressApps.push({ port, routes: app._routes, rawHandler: handler })
+        if (typeof cb === 'function') cb()
+        return { close() {}, address() { return { port } } }
+      }
+      return app
+    },
+    STATUS_CODES: { 200: 'OK', 201: 'Created', 400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found', 500: 'Internal Server Error' },
+  }
+
+  // ── bcrypt shim ───────────────────────────────────────────────────────────
+  // Synchronous-style stubs so lesson examples run without async Wasm loading.
+  const bcryptShim = {
+    hash: async (pw, _rounds) => `$2b$10$SIMULATED.${btoa(pw).slice(0, 22)}`,
+    compare: async (pw, hash) => hash.endsWith(btoa(pw).slice(0, 22)),
+    hashSync: (pw, _rounds) => `$2b$10$SIMULATED.${btoa(pw).slice(0, 22)}`,
+    compareSync: (pw, hash) => hash.endsWith(btoa(pw).slice(0, 22)),
+    genSalt: async (rounds = 10) => `$2b$${rounds}$SIMULATEDSALT`,
+    genSaltSync: (rounds = 10) => `$2b$${rounds}$SIMULATEDSALT`,
+  }
+
+  // ── jsonwebtoken shim ─────────────────────────────────────────────────────
+  const jwtShim = {
+    sign(payload, _secret, opts = {}) {
+      const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+      const body   = btoa(JSON.stringify({ ...payload, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + (opts.expiresIn || 3600) }))
+      return `${header}.${body}.SIMULATED_SIGNATURE`
+    },
+    verify(token, _secret) {
+      try { return JSON.parse(atob(token.split('.')[1])) }
+      catch { throw new Error('invalid token') }
+    },
+    decode(token) {
+      try { return JSON.parse(atob(token.split('.')[1])) }
+      catch { return null }
+    },
+  }
+
+  // ── pg shim ───────────────────────────────────────────────────────────────
+  // Mimics the pg Pool API with an in-memory store so lesson examples run.
+  const pgShim = (() => {
+    const store = { users: [{ id: 1, name: 'Alice', email: 'alice@example.com' }, { id: 2, name: 'Bob', email: 'bob@example.com' }] }
+    let nextId = 3
+    class Pool {
+      async query(sql, params = []) {
+        const s = sql.trim().toUpperCase()
+        if (s.startsWith('SELECT')) return { rows: store.users, rowCount: store.users.length }
+        if (s.startsWith('INSERT')) {
+          const row = { id: nextId++, name: params[0] ?? 'User', email: params[1] ?? 'user@example.com' }
+          store.users.push(row)
+          return { rows: [row], rowCount: 1 }
+        }
+        if (s.startsWith('UPDATE')) return { rows: [], rowCount: 1 }
+        if (s.startsWith('DELETE')) return { rows: [], rowCount: 1 }
+        return { rows: [], rowCount: 0 }
+      }
+      async connect() { return { query: (...a) => this.query(...a), release() {} } }
+      end() {}
+    }
+    return { Pool }
+  })()
+
+  // ── crypto shim ───────────────────────────────────────────────────────────
+  const cryptoShim = {
+    randomBytes: (n) => ({ toString: () => Array.from({ length: n }, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join('') }),
+    createHash: (alg) => ({ update(d) { this._d = d; return this }, digest: () => btoa(this._d ?? alg).replace(/[^a-z0-9]/gi, '').slice(0, 64) }),
+    randomUUID: () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16) }),
+  }
+
+  // ── supertest shim ────────────────────────────────────────────────────────
+  const supertestShim = (app) => {
+    const make = (method) => (path) => ({
+      set() { return this }, send() { return this }, expect() { return this },
+      then(resolve) {
+        const route = app?._routes?.find(r => r.method === method && r.path === path)
+        const res = { status: 200, body: {}, text: '' }
+        const resMock = { json(d) { res.body = d; res.status = 200 }, send(d) { res.text = String(d) }, status(c) { res.status = c; return this } }
+        if (route) try { route.handlers[route.handlers.length - 1]({}, resMock) } catch {}
+        resolve(res)
+      }
+    })
+    return { get: make('GET'), post: make('POST'), put: make('PUT'), delete: make('DELETE'), patch: make('PATCH') }
+  }
+
   const MODS = {
     express, path: pathShim,
+    http: httpShim,
+    bcrypt: bcryptShim,
+    jsonwebtoken: jwtShim,
+    pg: pgShim,
+    crypto: cryptoShim,
+    supertest: supertestShim,
     'body-parser': { json: noop, urlencoded: noop, text: noop, raw: noop },
     cors: noop, morgan: noop, helmet: noop, compression: noop,
     dotenv: { config: () => ({}) },
+    jest: { fn: () => { const f = (...a) => f._result; f.mockReturnValue = v => { f._result = v; return f }; f.mockResolvedValue = v => { f._result = Promise.resolve(v); return f }; return f } },
   }
 
   function requireFn(mod) {
     if (mod in MODS) return MODS[mod]
+    // Relative requires (./app, ./config, etc.) return an empty object stub
+    // so destructuring patterns like const { pool } = require('./db') don't throw.
+    if (mod.startsWith('./') || mod.startsWith('../')) return {}
     throw new Error(`Module '${mod}' is not available in the browser sandbox.`)
   }
   requireFn._apps = expressApps

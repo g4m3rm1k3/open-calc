@@ -7,7 +7,11 @@ lang: css
 
 # Mobile-First Design
 
-Mobile-first is a strategy, not just a breakpoint direction. You write all base CSS for the smallest screen, then add CSS to expand the layout for larger screens. The result is simpler CSS, smaller payloads for mobile, and layouts that degrade gracefully.
+In Level 1 you saw `@media (max-width: 768px)` — applying CSS only when the screen is small. That is **desktop-first**: write CSS for large screens, then override it for small ones. Every mobile override fights against desktop defaults.
+
+**Mobile-first** reverses this: write CSS for the smallest screen, then progressively enhance for larger ones. Use `min-width` queries instead of `max-width`. The result is simpler, more maintainable CSS — mobile gets no overrides, and desktop gets additions.
+
+By the end of this lesson you will understand why mobile-first produces simpler CSS, be able to convert a desktop-first stylesheet to mobile-first, and know how to choose breakpoints based on content rather than device sizes.
 
 ## The mobile-first principle
 

@@ -7,7 +7,9 @@ lang: sql
 
 # SELECT and FROM
 
-`SELECT` is the most-used SQL statement. It reads data from one or more tables without modifying anything. Every analytics report, API endpoint, and dashboard ultimately runs a `SELECT`.
+Every piece of data you retrieve from a database starts with a `SELECT` statement. The dashboards that show business metrics, the API endpoints that return JSON to apps, the reports that run every night — they all use `SELECT`. It is the most-used SQL statement by a wide margin.
+
+By the end of this lesson you will be able to write SELECT statements that retrieve specific columns, filter rows with WHERE, use comparison operators and pattern matching, and handle NULL values correctly.
 
 ## Basic SELECT syntax
 
@@ -120,22 +122,20 @@ SELECT * FROM courses WHERE created_at BETWEEN '2026-01-01' AND '2026-06-30';
 
 ## Challenge: select_where
 
-Write a SELECT with a WHERE clause.
-
-Select `title` and `author_id` from `courses` where `author_id = 1`.
+Write a SELECT statement that retrieves `title` and `author_id` from `courses` where `author_id = 1`. Use only those two columns — do not use `SELECT *`.
 
 ```sql
 -- Your SELECT statement:
 ```
 
 ```test
-var q = code.trim().toLowerCase()
+var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
 assert q.startsWith('select')
+assert !q.includes('select *')
 assert q.includes('title')
 assert q.includes('author_id')
-assert q.includes('from')
-assert q.includes('courses')
+assert q.includes('from courses')
 assert q.includes('where')
-assert q.includes('author_id')
-assert q.includes('= 1') || q.includes('=1')
+assert (q.includes('author_id = 1') || q.includes('author_id=1'))
+assert !q.includes('name') && !q.includes('email')
 ```

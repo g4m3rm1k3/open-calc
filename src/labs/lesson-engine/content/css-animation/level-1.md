@@ -7,7 +7,11 @@ lang: css
 
 # CSS Transform
 
-`transform` moves, scales, rotates, or skews an element in 2D or 3D — without affecting the document flow. Other elements don't shift. It's GPU-accelerated, making it the preferred property for smooth animations.
+Moving an element by changing `top` or `left` triggers a layout recalculation — the browser has to recompute positions for the entire affected region. On low-end devices this causes visible stuttering.
+
+`transform` moves, scales, rotates, or skews an element without affecting document flow at all. Other elements don't shift. The browser can hand transform work to the GPU compositor, which runs independently of the main thread. This is why transform-based animations are smooth even when JavaScript is busy.
+
+By the end of this lesson you will be able to use `translate`, `scale`, `rotate`, and `skew`, combine multiple transforms in one declaration, understand the transform origin, and know why `transform` is the right tool for smooth animation.
 
 ## The four transform functions
 
@@ -177,8 +181,10 @@ body { background: #0f172a; padding: 40px; font-family: system-ui; display: flex
 ```test
 var card = getComputedStyle(document.querySelector('.card'))
 assert card.transition.includes('transform') || card.transitionProperty.includes('transform')
+assert parseFloat(card.transitionDuration) > 0
 var rules = Array.from(document.styleSheets[0].cssRules)
 var cssText = rules.map(r => r.cssText || '').join(' ')
 assert cssText.includes('translateY')
 assert cssText.includes('scale')
+assert getComputedStyle(document.querySelector('.card')).borderRadius !== '0px'
 ```

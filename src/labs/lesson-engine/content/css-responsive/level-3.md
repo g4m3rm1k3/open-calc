@@ -7,7 +7,11 @@ lang: css
 
 # Responsive Typography
 
-Text should be comfortable to read at every screen size. Too small on mobile, too large on desktop, or text that jumps suddenly at a breakpoint — all signal that typography hasn't been thought through. CSS gives you two tools: `rem`-based sizing and the `clamp()` function for truly fluid type.
+Text that reads comfortably on a desktop can be too small to read on a phone, or a headline that fits on one line at 1280px wraps awkwardly on a 390px screen. Typography that works at every size requires deliberate sizing decisions, not just scaling everything down.
+
+CSS provides two complementary tools: `rem` for sizing that respects the user's browser preference, and `clamp()` for font sizes that scale fluidly between a minimum and maximum without any `@media` query.
+
+By the end of this lesson you will understand the difference between `px`, `em`, and `rem` for typography, be able to write fluid type scales using `clamp()`, and know how line-length and line-height interact with readability across screen sizes.
 
 ## rem — root-relative sizing
 
@@ -151,7 +155,9 @@ var h1Size = parseFloat(h1Style.fontSize)
 var pSize  = parseFloat(pStyle.fontSize)
 assert h1Size >= 24
 assert pSize >= 13
+assert h1Size > pSize
 var sheets = Array.from(document.styleSheets[0].cssRules)
 var cssText = sheets.map(r => r.cssText).join(' ')
 assert cssText.includes('clamp')
+assert (cssText.match(/clamp/g) || []).length >= 2
 ```

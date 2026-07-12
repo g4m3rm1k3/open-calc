@@ -7,7 +7,11 @@ lang: css
 
 # The Viewport and CSS Pixels
 
-Responsive design is about making layouts that work at any screen size — from a 320px phone to a 2560px monitor. Before you can write responsive CSS, you need to understand how browsers measure screen space.
+A layout that looks perfect on your laptop becomes unreadable on a phone — text is too small, elements overlap, columns don't fit. Responsive design is the practice of writing CSS that works at any screen size: from a 320px phone to a 2560px monitor, without separate stylesheets for each device.
+
+Before writing responsive CSS, you need to understand a non-obvious fact: a pixel in CSS is not the same as a pixel on the screen, and mobile browsers lie about how wide they are.
+
+By the end of this lesson you will understand the viewport, know why the viewport meta tag is mandatory, and be able to choose the right CSS unit (`px`, `%`, `vw`, `vh`, `rem`) for each situation.
 
 ## The problem: mobile browsers lie about their width
 

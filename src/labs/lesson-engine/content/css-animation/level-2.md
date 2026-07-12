@@ -7,7 +7,11 @@ lang: css
 
 # @keyframes Animations
 
-Transitions animate between two states when a property changes. `@keyframes` animations run on their own timeline — they start automatically, can loop, can pause, and can define as many steps as needed. They're the tool for loaders, reveals, and continuous motion.
+Transitions need a trigger — a hover, a focus, a class added by JavaScript. They animate from one state to another once. For animations that run continuously (a loading spinner), repeat on a schedule, or define multiple intermediate states (a bounce that goes up, then down further, then settles), `@keyframes` is the right tool.
+
+`@keyframes` defines a named animation timeline. You describe what the element looks like at 0%, 50%, 100% (or any percentage). Then `animation` applies that timeline to an element with duration, iteration count, and direction.
+
+By the end of this lesson you will be able to define `@keyframes` blocks, apply them with the `animation` shorthand, control iteration, direction, and fill mode, and combine multiple animations on one element.
 
 ## Defining a keyframe animation
 

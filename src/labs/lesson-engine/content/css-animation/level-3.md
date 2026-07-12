@@ -7,7 +7,11 @@ lang: css
 
 # Easing Functions
 
-The same animation with different easing feels completely different. `ease-in-out` feels natural and physical. `linear` feels mechanical. `cubic-bezier()` gives you precise control. Easing is what separates polished UI animation from amateur motion.
+Two buttons with the same duration and the same keyframes can feel completely different based on one property: easing. A button that eases in feels like it's gathering speed — appropriate for something leaving the screen. One that eases out feels like it's settling — appropriate for something arriving.
+
+Easing functions describe how a property changes over time: does it accelerate at the start, decelerate at the end, bounce, or move at constant speed? This is the difference between animation that feels physical and animation that feels like a slideshow.
+
+By the end of this lesson you will understand how easing functions work mathematically, be able to use the built-in keywords, write custom `cubic-bezier()` curves, and choose the right easing for different UI scenarios.
 
 ## The built-in easing keywords
 

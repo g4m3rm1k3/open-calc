@@ -7,7 +7,11 @@ lang: bash
 
 # Git Workflows
 
-A Git workflow is a team agreement about how branches are named, when to merge, and what `main` means. The most productive teams use simple workflows. More complex workflows add ceremony without adding safety.
+Knowing Git commands is necessary but not sufficient. Teams need an agreement about how those commands are used: which branch is always deployable, how features are isolated, how releases are tagged, when to merge versus rebase. Without this agreement, different developers' mental models of the repo diverge and conflicts multiply.
+
+A **Git workflow** is exactly this agreement — a convention for branching, naming, and merging that the whole team follows. Simpler is better. The most productive teams use workflows that minimize the overhead between writing code and shipping it.
+
+By the end of this lesson you will understand trunk-based development and GitHub Flow, know how to use tags for releases, understand when CI/CD pipelines trigger on Git events, and be able to make the argument for simpler workflows over complex branching strategies.
 
 ## Trunk-based development — the professional standard
 
@@ -173,7 +177,9 @@ const decisions = {
 ```
 
 ```test
+assert decisions.interruptWork !== '' && decisions.cleanupHistory !== '' && decisions.findBugCommit !== ''
 assert decisions.interruptWork.includes('stash')
+assert !decisions.interruptWork.includes('commit')
 assert decisions.cleanupHistory.includes('rebase') && decisions.cleanupHistory.includes('-i')
 assert decisions.findBugCommit.includes('bisect')
 ```

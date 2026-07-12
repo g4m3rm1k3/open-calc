@@ -7,7 +7,11 @@ lang: sql
 
 # Aggregates and GROUP BY
 
-Aggregates compute a single value from a set of rows: total count, sum, average, min, max. `GROUP BY` partitions rows into groups so aggregates are computed per group. Together they power dashboards, reports, and analytics.
+Every dashboard, report, and analytics feature relies on aggregate queries. "How many users signed up this month?" "What is the average order value?" "Which course has the most enrollments?" None of these can be answered with a plain SELECT — they need values computed across multiple rows.
+
+**Aggregate functions** reduce a set of rows to a single computed value. **GROUP BY** partitions rows into groups so aggregates are computed per group instead of across all rows at once.
+
+By the end of this lesson you will be able to use COUNT, SUM, AVG, MIN, and MAX, group results with GROUP BY, and filter groups with HAVING.
 
 ## Aggregate functions
 
@@ -103,21 +107,19 @@ ORDER BY avg_price DESC;
 
 ## Challenge: group_by
 
-Write a GROUP BY query.
-
-Count users per role. Select `role` and `COUNT(*) AS count` from `users`, grouped by `role`.
+Write a query that counts users per role. Select `role` and `COUNT(*) AS user_count` from `users`, grouped by `role`, ordered by `user_count` descending.
 
 ```sql
 -- Your query:
 ```
 
 ```test
-var q = code.trim().toLowerCase()
+var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
 assert q.includes('select')
 assert q.includes('role')
-assert q.includes('count')
-assert q.includes('from')
-assert q.includes('users')
-assert q.includes('group by')
-assert q.includes('role')
+assert q.includes('count(*)')
+assert q.includes('as user_count')
+assert q.includes('from users')
+assert q.includes('group by role')
+assert q.includes('order by user_count desc') || q.includes('order by 2 desc')
 ```

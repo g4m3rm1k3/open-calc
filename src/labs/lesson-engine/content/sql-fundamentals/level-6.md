@@ -7,7 +7,11 @@ lang: sql
 
 # INSERT, UPDATE, DELETE
 
-Reading data with SELECT is the most common operation, but databases exist to persist changes. INSERT adds new rows, UPDATE modifies existing ones, DELETE removes them. All three operations must be used carefully — there is no "undo" without a transaction.
+SELECT reads data without changing anything. The operations that actually change state — creating new records, modifying existing ones, removing them — are INSERT, UPDATE, and DELETE.
+
+These operations are irreversible without a backup or a transaction. A missing `WHERE` clause on an UPDATE or DELETE affects every row in the table. Before every write operation on production data, experienced engineers run the equivalent SELECT first to confirm exactly which rows will be affected.
+
+By the end of this lesson you will be able to write INSERT, UPDATE, and DELETE statements, wrap multiple statements in a transaction so they succeed or fail atomically, and understand the ACID guarantees that relational databases provide.
 
 ## INSERT
 
@@ -142,26 +146,26 @@ ROLLBACK;  -- both updates are undone
 
 ## Challenge: insert_update
 
-Write an INSERT and an UPDATE.
+Write two statements:
 
-1. Write an INSERT into `products (name, price)` with values `('Widget', 9.99)`.
-2. Write an UPDATE on `products` setting `price = 12.99` where `name = 'Widget'`.
+1. An `INSERT INTO products (name, price)` adding a row with `name = 'Widget'` and `price = 9.99`.
+2. An `UPDATE products` that sets `price = 12.99` where `name = 'Widget'` — include a WHERE clause.
 
 ```sql
 -- Your INSERT:
 
--- Your UPDATE:
+-- Your UPDATE (include WHERE):
 ```
 
 ```test
-var q = code.trim().toLowerCase()
-assert q.includes('insert')
-assert q.includes('products')
-assert q.includes('widget')
-assert q.includes('9.99') || q.includes("'widget'")
-assert q.includes('update')
-assert q.includes('set')
-assert q.includes('price')
+var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
+assert q.includes('insert into products')
+assert q.includes('name') && q.includes('price')
+assert q.includes("'widget'")
+assert q.includes('9.99')
+assert q.includes('update products')
+assert q.includes('set price')
 assert q.includes('12.99')
-assert q.includes('where')
+assert q.includes('where name') || q.includes("where name =")
+assert q.includes("'widget'") && q.split("'widget'").length >= 2
 ```

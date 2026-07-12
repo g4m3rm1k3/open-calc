@@ -7,7 +7,11 @@ lang: typescript
 
 # Interfaces and Type Aliases
 
-A raw object type like `{ name: string; level: number }` can only be used in one place. Interfaces and type aliases give the shape a name, so it can be reused across files. They also make intent explicit — `User` communicates far more than `{ id: number; email: string }`.
+In Level 0 you annotated primitive values: `let name: string`, `let level: number`. But most real data is structured — a course has an id, a title, a language, and an array of levels. Writing the object type inline every time it is used — `{ id: string; title: string; lang: string }` — means updating three places when the shape changes.
+
+**Type aliases** and **interfaces** give a type a name. Write the shape once, use it everywhere. When it changes, update one declaration.
+
+By the end of this lesson you will be able to define interfaces and type aliases, extend interfaces, mark properties as optional or readonly, and choose between `interface` and `type` for the right reasons.
 
 ## Type aliases — naming any type
 

@@ -7,7 +7,11 @@ lang: sql
 
 # Sorting, Limiting, and Distinct
 
-Raw query results come back in arbitrary order. `ORDER BY` sorts them. `LIMIT` caps the number of rows — essential for pagination and performance. `DISTINCT` removes duplicate values.
+A SELECT without ORDER BY returns rows in an unspecified order. The database picks whatever is most convenient internally — often insertion order, but that is never guaranteed. For user-facing features (sorted lists, leaderboards, newest-first feeds), you must be explicit about order.
+
+For large tables, returning thousands of rows when the user sees twenty is wasteful. LIMIT is not just a convenience — it is a performance tool.
+
+By the end of this lesson you will be able to sort results with ORDER BY, paginate them with LIMIT/OFFSET, and remove duplicates with DISTINCT.
 
 ## ORDER BY
 
@@ -100,21 +104,18 @@ SELECT DISTINCT role, name FROM users;
 
 ## Challenge: order_limit
 
-Write a query with ORDER BY and LIMIT.
-
-Select `title` from `courses`, ordered by `title` alphabetically, limited to 5 results.
+Select `title` from `courses`, ordered alphabetically by title ascending, limited to 5 results. Do not add `OFFSET`.
 
 ```sql
 -- Your query:
 ```
 
 ```test
-var q = code.trim().toLowerCase()
+var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
 assert q.includes('select')
 assert q.includes('title')
-assert q.includes('from')
-assert q.includes('courses')
-assert q.includes('order by')
-assert q.includes('limit')
-assert q.includes('5')
+assert q.includes('from courses')
+assert q.includes('order by title')
+assert q.includes('limit 5') || q.includes('limit  5')
+assert !q.includes('offset')
 ```

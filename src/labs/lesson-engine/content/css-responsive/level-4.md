@@ -7,7 +7,11 @@ lang: css
 
 # Responsive Images and Media
 
-Images are the most common cause of layout overflow on mobile. A `600px` image in a `320px` container will break your layout unless you tell it to respect its container. Understanding `max-width`, `object-fit`, and `aspect-ratio` is essential.
+A `<img src="photo.jpg">` with no CSS will render at the image's intrinsic size. On a 320px mobile screen, a 1200px photo will overflow the viewport and break the layout. Images need explicit CSS to behave responsibly.
+
+This lesson covers three problems: making images fit their containers without distorting, preserving aspect ratios so layouts don't jump as images load, and serving different image resolutions for different screen densities.
+
+By the end of this lesson you will be able to write the essential image CSS reset, use `object-fit` to control how images fill a container, use `aspect-ratio` to reserve space before images load, and use `srcset` and `sizes` to serve the right resolution to each device.
 
 ## The essential image reset
 

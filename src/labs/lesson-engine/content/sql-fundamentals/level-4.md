@@ -7,7 +7,11 @@ lang: sql
 
 # JOINs
 
-A JOIN combines rows from two or more tables based on a related column. Without JOINs, relational databases would just be separate flat files. JOINs are what make the "relational" in relational database.
+Normalisation (which you will cover in Level 7) means storing each piece of data in exactly one place. Author names go in `users`. Course titles go in `courses`. But when you need to display "Python Fundamentals by Alice", you need data from both tables.
+
+A **JOIN** combines rows from two or more tables based on a shared column value. It is the operation that makes normalisation practical — you keep data separate for correctness and combine it with JOINs for display.
+
+By the end of this lesson you will understand INNER JOIN and LEFT JOIN, be able to join multiple tables in one query, and know when to use a JOIN versus a subquery.
 
 ## INNER JOIN — matching rows only
 
@@ -127,22 +131,20 @@ For large tables, the optimizer usually handles both well — but INNER JOIN is 
 
 ## Challenge: join_query
 
-Write an INNER JOIN.
-
-Select `courses.title` and `users.name AS author` from `courses` joined to `users` on `courses.author_id = users.id`.
+Write an INNER JOIN query that selects `courses.title` and `users.name AS author` from `courses`, joined to `users` on `courses.author_id = users.id`. Results should be ordered by `courses.title` ascending.
 
 ```sql
 -- Your JOIN query:
 ```
 
 ```test
-var q = code.trim().toLowerCase()
+var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
 assert q.includes('select')
-assert q.includes('title')
-assert q.includes('from')
-assert q.includes('courses')
-assert q.includes('join')
-assert q.includes('users')
-assert q.includes('on')
-assert q.includes('author_id')
+assert q.includes('courses.title') || (q.includes('title') && q.includes('courses'))
+assert q.includes('users.name') || q.includes('name')
+assert q.includes('as author')
+assert q.includes('from courses')
+assert q.includes('inner join users') || q.includes('join users')
+assert q.includes('on') && q.includes('author_id') && q.includes('users.id')
+assert q.includes('order by')
 ```

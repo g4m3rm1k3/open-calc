@@ -7,7 +7,11 @@ lang: typescript
 
 # Utility Types
 
-TypeScript ships with built-in generic types that transform other types. They eliminate the need to manually define common type variations. Understanding them is essential for reading TypeScript library code and writing expressive types.
+A form that edits a user allows changing name or email, but not id or createdAt. Without utility types, you would write a separate `EditableUser` interface manually — and update it every time `User` changes.
+
+TypeScript ships with built-in generic types that transform existing types: make all properties optional, remove some, keep only some, make them all readonly. These are called **utility types** and they are used in virtually every TypeScript codebase.
+
+By the end of this lesson you will be able to use `Partial`, `Required`, `Readonly`, `Pick`, `Omit`, and `Record`, and understand that these are implemented using mapped types — giving you the vocabulary to understand advanced TypeScript library code.
 
 ## Partial and Required
 

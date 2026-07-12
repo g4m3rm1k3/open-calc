@@ -7,7 +7,11 @@ lang: css
 
 # Container Queries
 
-Media queries respond to the viewport width. Container queries respond to a component's parent container width. This unlocks truly reusable components — a card that shows a compact layout in a sidebar and a full layout in the main content area, with no duplicated CSS.
+Media queries have a fundamental limitation: they respond to the viewport, not to where a component is placed. A card component inside a narrow sidebar should look different from the same card in a wide main column — but a `@media` query cannot know where the card is. So developers write separate CSS for each context, duplicating code.
+
+**Container queries** (`@container`) respond to the component's parent container width. The card can style itself based on how much space its container gives it, regardless of viewport size. This makes truly reusable components possible for the first time.
+
+By the end of this lesson you will be able to set up container query contexts with `container-type`, write `@container` rules, and understand when to use container queries versus media queries.
 
 ## The problem with media queries for components
 
@@ -212,4 +216,7 @@ var hasContainer = rules.some(r => r.constructor.name === 'CSSContainerRule')
 assert hasContainer
 var containerRule = rules.find(r => r.constructor.name === 'CSSContainerRule')
 assert containerRule.conditionText.includes('400')
+var innerRules = Array.from(containerRule.cssRules || [])
+assert innerRules.length > 0
+assert innerRules.some(r => r.selectorText && r.selectorText.includes('.card'))
 ```

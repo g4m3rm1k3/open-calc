@@ -7,7 +7,11 @@ lang: sql
 
 # Subqueries and CTEs
 
-Complex queries often need intermediate results. Subqueries nest a query inside another. CTEs (Common Table Expressions — `WITH` clauses) name those intermediate results, making complex queries readable.
+Some questions cannot be answered by querying a single table with a single WHERE clause. "Find users who have more enrollments than the average" requires first computing the average, then filtering. "Show admin-authored courses with over 100 enrollments" requires filtering users by role and filtering courses by enrollment count.
+
+**Subqueries** embed one query inside another. **CTEs** (Common Table Expressions, written with the `WITH` keyword) give intermediate query results names, making complex logic readable and reusable.
+
+By the end of this lesson you will be able to write subqueries in WHERE clauses, compose complex queries with named CTEs, and recognize when to use a recursive CTE for hierarchical data.
 
 ## Subqueries in WHERE
 
@@ -131,25 +135,24 @@ SELECT name, depth FROM category_tree ORDER BY depth, name;
 
 ## Challenge: cte_query
 
-Write a CTE query.
-
-Write a CTE called `active_users` that selects `id` and `name` from `users` where `active = 1`. Then SELECT `name` from `active_users`.
+Write a CTE called `recent_courses` that selects `id` and `title` from `courses` where `created_at >= '2026-01-01'`. Then write the outer SELECT that retrieves `title` from `recent_courses`, ordered by `title` ascending.
 
 ```sql
--- Your CTE:
-WITH active_users AS (
-  -- your subquery
+WITH recent_courses AS (
+  -- select id and title from courses where created_at >= '2026-01-01'
 )
-SELECT name FROM active_users;
+-- select title from recent_courses, ordered by title
 ```
 
 ```test
-var q = code.trim().toLowerCase()
+var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
 assert q.includes('with')
-assert q.includes('active_users')
-assert q.includes('as')
-assert q.includes('users')
-assert q.includes('active')
-assert q.includes('select')
-assert q.includes('name')
+assert q.includes('recent_courses')
+assert q.includes('as (')
+assert q.includes('from courses')
+assert q.includes('created_at')
+assert q.includes("'2026-01-01'")
+assert q.includes('select title')
+assert q.includes('from recent_courses')
+assert q.includes('order by title')
 ```

@@ -7,7 +7,11 @@ lang: bash
 
 # Branches and Merging
 
-A branch is a parallel line of development. You create one to work on a feature or fix without affecting the `main` branch. When the work is done, you merge it back. Branches are how teams work on multiple things simultaneously without blocking each other.
+In Level 1 you committed to `main` directly. In a solo project with a clean history, that works. The moment you have a half-finished feature, a bug fix that needs to ship before the feature is done, or a second developer working on the same repo, committing to `main` directly creates problems — half-finished work blocks everything else.
+
+**Branches** solve this. A branch is a pointer to a commit — a lightweight label that tracks a parallel line of work. Creating a branch costs nothing. Switching between them is instant. Merging brings the changes together.
+
+By the end of this lesson you will be able to create and switch branches, understand what `HEAD` points to, merge branches and resolve conflicts, and use `git log --graph` to visualize branch history.
 
 ## Creating and switching branches
 

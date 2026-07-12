@@ -7,7 +7,11 @@ lang: bash
 
 # Pull Requests and Code Review
 
-A pull request (PR) is a proposal to merge a branch into another branch. On GitHub it's the primary interface for code review — team members read the diff, leave inline comments, request changes, approve, and merge.
+In Level 2 you merged branches locally. In professional teams, code does not merge directly — it goes through a **pull request** (PR) first. A PR is a proposal to merge a branch. It shows the diff, provides a thread for discussion, and requires at least one reviewer to approve before the code can be merged.
+
+Pull requests are how professional software teams catch bugs before they reach production, share knowledge about what changed and why, and maintain code quality without requiring everyone to be in the same room.
+
+By the end of this lesson you will understand the full pull request lifecycle, know how to write a PR description that reviewers can actually act on, understand what makes code review effective for both authors and reviewers, and know how to respond to review comments.
 
 ## The pull request workflow
 

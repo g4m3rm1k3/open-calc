@@ -7,7 +7,9 @@ lang: javascript
 
 # Database Integration
 
-Connecting Node.js to a database, running queries safely, managing schema changes with migrations, and organizing database code with the repository pattern.
+Route handlers ultimately exist to read and write data. That data lives in a database. Connecting Node.js to a database introduces three separate problems: establishing and reusing connections efficiently, changing the database schema safely over time, and keeping SQL out of route handlers so code stays maintainable.
+
+By the end of this lesson you will understand connection pooling and why it matters, how database migrations track schema changes the same way Git tracks code changes, and how the repository pattern separates SQL from HTTP logic.
 
 ## Connecting to PostgreSQL
 
@@ -154,20 +156,29 @@ Benefits:
 
 ## Challenge: repository
 
-Implement a simple in-memory repository.
+Implement an in-memory `CourseRepo` with three methods. `findAll()` — returns all courses. `findById(id)` — returns the course with matching id, or `null` if not found. `create(course)` — adds the course to the store and returns it. The `id` field is already set on the object passed to `create`.
+
+`Array.prototype.find(fn)` — returns the first element where `fn(element)` is truthy, or `undefined` if none match.
 
 ```javascript
-const store = [
-  { id: 1, title: 'Python Fundamentals' },
-  { id: 2, title: 'CSS Mastery' },
-];
-
 class CourseRepo {
+  constructor() {
+    this.store = [
+      { id: 1, title: 'Python Fundamentals', lang: 'python' },
+      { id: 2, title: 'SQL Fundamentals', lang: 'sql' },
+    ];
+  }
+
   findAll() {
     // return all courses
   }
+
   findById(id) {
     // return course with matching id, or null
+  }
+
+  create(course) {
+    // add to store, return it
   }
 }
 
@@ -178,6 +189,9 @@ const repo = new CourseRepo();
 assert Array.isArray(repo.findAll())
 assert repo.findAll().length === 2
 assert repo.findById(1).title === 'Python Fundamentals'
-assert repo.findById(2).title === 'CSS Mastery'
 assert repo.findById(99) === null
+const newCourse = repo.create({ id: 3, title: 'CSS Fundamentals', lang: 'css' })
+assert newCourse.title === 'CSS Fundamentals'
+assert repo.findAll().length === 3
+assert repo.findById(3).lang === 'css'
 ```

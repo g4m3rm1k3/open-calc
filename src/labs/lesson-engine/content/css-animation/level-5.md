@@ -7,7 +7,11 @@ lang: css
 
 # Animation Patterns
 
-Real production UIs use a small set of recurring animation patterns. This level covers the patterns you'll build most often: staggered list reveals, progress indicators, pulsing badges, and page transition scaffolding.
+Individual animation techniques — transitions, keyframes, transforms, easing — combine into a small set of patterns that appear across virtually every production UI. Learning to recognize and build these patterns means being able to implement most UI animation from first principles.
+
+This level is a pattern library: see the pattern, understand how it's built, modify it for your context.
+
+By the end of this lesson you will be able to build staggered list reveals with CSS animation delays, indeterminate progress bars, pulsing notification badges, and the CSS scaffolding for page transitions.
 
 ## Staggered list reveal
 

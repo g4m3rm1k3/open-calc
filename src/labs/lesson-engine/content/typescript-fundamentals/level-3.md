@@ -7,7 +7,11 @@ lang: typescript
 
 # Generics
 
-Generics let you write functions and types that work with any type while still being type-safe. Without generics, you'd either duplicate code for each type or use `any` and lose all type checking. Generics are the solution to both problems.
+A function that returns the first element of an array should work whether the array holds strings, numbers, or objects. Without generics, you would either write a separate function for each type (duplication), or use `any` as the return type (losing all type safety). Neither is acceptable.
+
+**Generics** let you parameterize a function or type by another type. Write once, type-check correctly for every type it's called with. They are the foundation of every collection, API response wrapper, and utility type in TypeScript.
+
+By the end of this lesson you will understand what type parameters are and how TypeScript infers them, write generic functions and interfaces, and constrain type parameters with `extends` to limit what types are accepted.
 
 ## The problem generics solve
 

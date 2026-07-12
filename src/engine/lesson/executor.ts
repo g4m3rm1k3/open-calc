@@ -19,6 +19,12 @@ async function getRunner() {
   }>
 }
 
+async function getCodeRunner() {
+  return import('../../utils/codeRunner.js') as Promise<{
+    runCode: (language: string, code: string) => Promise<string>
+  }>
+}
+
 export async function executeCode(code: string, lang: Lang): Promise<ExecutionResult> {
   const start = Date.now()
   const lines: OutputLine[] = []
@@ -58,17 +64,31 @@ export async function executeCode(code: string, lang: Lang): Promise<ExecutionRe
       if (r.output && r.output !== '(no output)') out(r.output)
       if (r.error) err(r.error)
     } else if (norm === 'c' || norm === 'cpp' || norm === 'c++') {
-      const result = await runner.runCInline(code, (line: { type: string; text?: string }) => {
-        if (!line.text) return
-        lines.push({ kind: line.type === 'error' ? 'error' : 'stdout', text: line.text })
-      })
-      if (result?.error) err(result.error)
+      try {
+        const { runCode } = await getCodeRunner()
+        const output = await runCode(norm === 'c' ? 'c' : 'cpp', code)
+        if (output.startsWith('Compile error:') || output.startsWith('No runner')) err(output)
+        else out(output || '(no output)')
+      } catch {
+        // Wandbox unavailable — fall back to in-browser JSCPP
+        const result = await runner.runCInline(code, (line: { type: string; text?: string }) => {
+          if (!line.text) return
+          lines.push({ kind: line.type === 'error' ? 'error' : 'stdout', text: line.text })
+        })
+        if (result?.error) err(result.error)
+      }
     } else if (norm === 'csharp' || norm === 'cs') {
-      err('C# editing is supported, but the browser lesson engine does not bundle a C# compiler yet.')
+      const { runCode } = await getCodeRunner()
+      const output = await runCode('csharp', code)
+      if (output.startsWith('Compile error:') || output.startsWith('No runner')) err(output)
+      else out(output || '(no output)')
     } else if (norm === 'java') {
-      err('Java editing is supported, but the browser lesson engine does not bundle a JVM/compiler yet.')
+      const { runCode } = await getCodeRunner()
+      const output = await runCode('java', code)
+      if (output.startsWith('Compile error:') || output.startsWith('No runner')) err(output)
+      else out(output || '(no output)')
     } else {
-      err(`Run not supported for '${lang}'. Supported: python, javascript, typescript, html/css/js, sql, bash, and C/C++ subset.`)
+      err(`Run not supported for '${lang}'. Supported: python, javascript, typescript, html/css/js, sql, bash, C/C++, C#, and Java.`)
     }
   } catch (e) {
     err(e instanceof Error ? e.message : String(e))
@@ -88,5 +108,7 @@ export function isRunnable(lang: Lang): boolean {
     'sql', 'sqlite',
     'bash', 'shell', 'sh',
     'c', 'cpp', 'c++',
+    'csharp', 'cs',
+    'java',
   ].includes(norm)
 }

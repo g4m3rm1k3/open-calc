@@ -7,7 +7,11 @@ lang: bash
 
 # Rebase, Stash, and Fixing Mistakes
 
-Git's real power is in recovering from mistakes — amending commits, undoing changes, and keeping history clean. These commands are what separate a confident Git user from one who "copies the folder to be safe."
+The commands in this lesson are what separate a confident Git user from one who copies folders before making changes "just in case." They cover three categories: temporarily shelving uncommitted work, rewriting history to keep it clean, and recovering from mistakes.
+
+These operations are powerful. Some of them — `git reset --hard`, `git push --force` — can destroy work if used carelessly. Understanding exactly what each command does, not just the command itself, is the prerequisite for using them safely.
+
+By the end of this lesson you will be able to use `git stash` to save and restore work in progress, amend commits and rebase interactively, and safely undo mistakes with `git reset`, `git revert`, and `git restore`.
 
 ## git stash — temporarily save work
 
@@ -158,7 +162,9 @@ const scenarios = {
 ```
 
 ```test
+assert scenarios.undoKeepStaged !== '' && scenarios.undoUnstage !== '' && scenarios.discardAll !== ''
 assert scenarios.undoKeepStaged.includes('reset') && scenarios.undoKeepStaged.includes('--soft')
+assert !scenarios.undoKeepStaged.includes('--hard')
 assert scenarios.undoUnstage.includes('reset') && (scenarios.undoUnstage.includes('--mixed') || (!scenarios.undoUnstage.includes('--soft') && !scenarios.undoUnstage.includes('--hard')))
 assert scenarios.discardAll.includes('restore') || (scenarios.discardAll.includes('reset') && scenarios.discardAll.includes('--hard'))
 ```

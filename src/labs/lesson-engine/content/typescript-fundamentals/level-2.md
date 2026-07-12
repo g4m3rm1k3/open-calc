@@ -7,7 +7,11 @@ lang: typescript
 
 # Union and Intersection Types
 
-Union types express "this value is one of these types." Intersection types express "this value is all of these types combined." They are the primary tools for modelling flexible data in TypeScript.
+A function that accepts either a string slug or a numeric database ID needs to handle both. A database record that always has timestamps and author info is the combination of multiple shapes. TypeScript handles both cases without `any`.
+
+**Union types** (`A | B`) express "this value is one of these types." **Intersection types** (`A & B`) express "this value satisfies all of these types simultaneously." Together they cover the two fundamental ways types can be combined.
+
+By the end of this lesson you will be able to write union types for values that take multiple forms, use type narrowing to work safely within union branches, model state machines with discriminated unions, and compose types with intersections.
 
 ## Union types — one of
 

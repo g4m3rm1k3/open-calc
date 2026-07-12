@@ -7,7 +7,11 @@ lang: typescript
 
 # Types and Type Annotations
 
-TypeScript is JavaScript with a type system bolted on. Every `.ts` file compiles to plain `.js` — TypeScript only exists at development time. Its job is to catch bugs before the code runs by checking that values are used in ways consistent with their declared types.
+JavaScript is a great language for getting things done quickly. It is a poor language for maintaining a large codebase safely. The problem is dynamic typing — a variable can hold any value, and mistakes (passing a number where a string is expected, calling a method that does not exist) are only discovered when that specific code path runs. In production, that might be months after the bug was introduced.
+
+**TypeScript** adds a type system on top of JavaScript. Every `.ts` file compiles to plain `.js` — TypeScript types are completely erased at compile time and add zero runtime overhead. The type system's entire job is to find bugs before the code runs, by verifying that every value is used in a way consistent with its type.
+
+By the end of this lesson you will be able to write TypeScript type annotations on variables and function signatures, understand how TypeScript infers types from initial values, and know why `any` is a last resort rather than a shortcut.
 
 ## Why types catch bugs
 

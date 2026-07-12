@@ -7,7 +7,11 @@ lang: javascript
 
 # Testing APIs
 
-A tested API is one you can change safely. Unit tests verify individual functions. Integration tests send real HTTP requests to a real server. Both are necessary.
+Code without tests is code you cannot safely change. You make a fix in one route and accidentally break another. You refactor the database layer and have no way to know what broke until a user reports it.
+
+Tests give you two things: the confidence to change code, and a precise description of what the code is supposed to do. When a test fails after a change, it tells you exactly what broke and what the expected behavior was.
+
+By the end of this lesson you will understand the difference between unit tests and integration tests, know how to write each kind for a Node.js API, and understand why keeping business logic in pure functions is a design choice that makes testing practical.
 
 ## Unit testing with Jest
 
@@ -145,23 +149,33 @@ npx jest app.test.js
 
 **Next:** Deployment — environment setup, process managers (PM2), and deploying to Railway/Heroku.
 
-## Challenge: pure_function_test
+## Challenge: pure_business_logic
 
-Write a testable pure function.
+Write two pure business-logic functions suitable for unit testing — the kind you would extract from route handlers.
+
+`calculateProgress(completedLessons, totalLessons)` — returns the completion percentage as a rounded integer. If `totalLessons` is `0`, return `0`.
+
+`Math.round(n)` — rounds `n` to the nearest integer. `Math.round(49.6)` → `50`.
+
+`formatCourseTitle(title)` — trims leading/trailing whitespace and collapses multiple internal spaces into one.
+
+`str.trim()` — removes leading and trailing whitespace. `str.replace(/\s+/g, ' ')` — replaces any run of whitespace characters with a single space.
 
 ```javascript
-// Write isPalindrome(str) — returns true if str reads the same forwards and backwards
-// Ignore case. "racecar" → true, "hello" → false, "Racecar" → true
-function isPalindrome(str) {
+function calculateProgress(completedLessons, totalLessons) {
+  // implement
+}
+
+function formatCourseTitle(title) {
   // implement
 }
 ```
 
 ```test
-assert isPalindrome('racecar') === true
-assert isPalindrome('hello') === false
-assert isPalindrome('Racecar') === true
-assert isPalindrome('A man a plan a canal Panama'.replace(/ /g, '').toLowerCase()) === true
-assert isPalindrome('abc') === false
-assert isPalindrome('a') === true
+assert calculateProgress(0, 0) === 0
+assert calculateProgress(18, 36) === 50
+assert calculateProgress(36, 36) === 100
+assert calculateProgress(1, 3) === 33
+assert formatCourseTitle('  Python  ') === 'Python'
+assert formatCourseTitle('Python   Fundamentals') === 'Python Fundamentals'
 ```

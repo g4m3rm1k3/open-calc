@@ -7,7 +7,11 @@ lang: css
 
 # Responsive Layouts Without Media Queries
 
-The best responsive layout often needs zero media queries. CSS Grid and Flexbox have built-in mechanisms that react to available space automatically — `auto-fit`, `auto-fill`, `minmax()`, and `flex-wrap` let layouts reshape themselves without you writing a single `@media` rule.
+Every `@media` query you write is a maintenance burden — a specific breakpoint you have chosen that may not match the content's natural break points, and a threshold that must be tested every time the layout changes.
+
+CSS Grid and Flexbox have built-in mechanisms that react to available space automatically, with no breakpoints needed. `auto-fit`, `auto-fill`, `minmax()`, and `flex-wrap` create layouts that reshape themselves based on actual container width — no `@media` rules required.
+
+By the end of this lesson you will be able to create card grids that automatically adjust their column count, build navigation bars that wrap gracefully without breakpoints, and understand when to use intrinsic layout techniques versus explicit media queries.
 
 ## CSS Grid with auto-fit and minmax()
 

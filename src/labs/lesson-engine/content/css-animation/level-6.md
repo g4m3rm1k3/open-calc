@@ -7,7 +7,11 @@ lang: css
 
 # Performance and Accessibility
 
-Animation that looks great but causes frame drops or ignores user preferences is broken. This level covers the two non-negotiable constraints: keeping animations on the GPU compositor, and respecting `prefers-reduced-motion`.
+Beautiful animation that causes frame drops is worse than no animation — it makes the UI feel broken. Animation that ignores user preferences for reduced motion is an accessibility failure. Both are production bugs.
+
+This level covers the two non-negotiable constraints on any animation you ship: performance (keeping the browser's compositor happy) and accessibility (respecting `prefers-reduced-motion` for users who experience motion sickness or vertigo from animations).
+
+By the end of this lesson you will understand what triggers layout, paint, and composite in the browser, know which CSS properties are safe to animate, use `will-change` correctly, and implement `prefers-reduced-motion` so your animations degrade gracefully for all users.
 
 ## What the browser does to render animation
 
@@ -128,6 +132,8 @@ body { background: #0f172a; padding: 24px; font-family: system-ui; }
 
 `prefers-reduced-motion: reduce` fires when the user has enabled "Reduce Motion" in their OS. The CSS above sets all animation durations to `0.01ms` (effectively instant) with `!important` as a global override. This is the recommended approach from the Web Content Accessibility Guidelines (WCAG 2.1, criterion 2.3.3).
 
+**CS lens:** The browser rendering pipeline (Style → Layout → Paint → Composite) is a **pipeline architecture** — each stage consumes the output of the previous stage. `transform` and `opacity` skip to the final stage because they only affect how the compositor reorders pre-painted layers, not what gets painted. This is analogous to instruction pipelining in CPUs: operations that avoid data hazards (dependencies on earlier stages) can execute independently on dedicated hardware. The GPU compositor is that dedicated hardware.
+
 **SE lens:** Animation accessibility was ignored for a decade in web development. WCAG 2.1 (2018) formalized `prefers-reduced-motion` support as a guideline. Major companies now require it: Apple's Human Interface Guidelines, Google's Material Design, and GitHub's Primer design system all mandate checking this preference. The two lines of CSS above are not nice-to-have — they are the difference between a site that works for everyone and one that makes some users sick.
 
 **Common mistakes:**
@@ -177,8 +183,10 @@ body { background: #0f172a; padding: 40px; font-family: system-ui; display: flex
 var box = getComputedStyle(document.querySelector('.box'))
 assert box.animationName === 'spin'
 var rules = Array.from(document.styleSheets[0].cssRules)
+var hasKeyframe = rules.some(r => r.constructor.name === 'CSSKeyframesRule')
+assert hasKeyframe
 var hasMedia = rules.some(r => r.constructor.name === 'CSSMediaRule' && (r.conditionText || '').includes('reduced-motion'))
 assert hasMedia
 var mediaRule = rules.find(r => r.constructor.name === 'CSSMediaRule' && (r.conditionText || '').includes('reduced-motion'))
-assert mediaRule !== undefined
+assert Array.from(mediaRule.cssRules || []).length > 0
 ```
