@@ -1,7 +1,6 @@
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ProgressProvider } from "./context/ProgressContext.jsx";
-import { SearchProvider } from "./context/SearchContext.jsx";
 import { PinsProvider } from "./context/PinsContext.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import AppShell from "./components/layout/AppShell.jsx";
@@ -21,7 +20,6 @@ const DesktopPage = lazy(() => import("./pages/DesktopPage.jsx"));
 const ChapterPage = lazy(() => import("./pages/ChapterPage.jsx"));
 const LessonPage = lazy(() => import("./pages/LessonPage.jsx"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage.jsx"));
-const SearchPage = lazy(() => import("./pages/SearchPage.jsx"));
 const AboutPage = lazy(() => import("./pages/AboutPage.jsx"));
 const ReferencePage = lazy(() => import("./pages/ReferencePage.jsx"));
 const UniversalCalcPage = lazy(
@@ -101,7 +99,6 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
       <ProgressProvider>
-        <SearchProvider>
           <PinsProvider>
             <VideoPlayerProvider>
               <HashRouter
@@ -140,7 +137,6 @@ export default function App() {
                               path="chapter/:chapterId/:lessonSlug/*"
                               element={<LessonPage />}
                             />
-                            <Route path="search" element={<SearchPage />} />
                             <Route path="profile" element={<ProfilePage />} />
                             <Route path="about" element={<AboutPage />} />
                             <Route
@@ -427,7 +423,6 @@ export default function App() {
               </HashRouter>
             </VideoPlayerProvider>
           </PinsProvider>
-        </SearchProvider>
       </ProgressProvider>
     </AuthProvider>
     </ThemeProvider>

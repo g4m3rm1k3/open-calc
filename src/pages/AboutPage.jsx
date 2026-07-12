@@ -425,14 +425,6 @@ const PLATFORM_FEATURES = [
     desc: "An integrated health and wellness tracker. Log workouts, nutrition, sleep, and recovery. Connects to an RPG workout system that turns fitness into a leveling mechanic.",
   },
   {
-    icon: "🔍",
-    title: "Full-Text Search",
-    color: "from-amber-500 to-orange-500",
-    border: "border-amber-500/25",
-    glow: "rgba(245,158,11,0.1)",
-    desc: "Global search across every lesson, lab, game, and reference formula — powered by Fuse.js with instant fuzzy results. Find anything in the entire platform in under 200ms.",
-  },
-  {
     icon: "📐",
     title: "Formula Atlas",
     color: "from-teal-500 to-emerald-500",
@@ -514,7 +506,6 @@ const STACK = [
     role: "Utility-first styling with full dark mode",
     icon: "🎨",
   },
-  { name: "Fuse.js", role: "Full-text search across all lessons", icon: "🔍" },
   { name: "Firebase", role: "Auth & cross-device progress sync", icon: "☁️" },
   {
     name: "Framer Motion",

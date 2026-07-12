@@ -8,16 +8,13 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { LESSON_MAP, CURRICULUM, COURSES } from "../../courses/index.js";
-const SearchModal = lazy(() => import("../ui/SearchModal.jsx"));
 const GlobalGrapher = lazy(() => import("../../tools/grapher-2d/index.jsx"));
 const GlobalGrapher3D = lazy(() => import("../../tools/grapher-3d/index.jsx"));
 const GlobalGrapherJSX = lazy(() => import("../../tools/grapher-jsx/index.jsx"));
 const ScratchPad = lazy(() => import("../../tools/scratchpad/index.jsx"));
 import { TOOLS, toolsByGroup } from "../../tools/toolLoader.js";
-import { useSearchContext } from "../../context/SearchContext.jsx";
 import GrapherContext from "../../context/GrapherContext.jsx";
 import {
-  Search,
   PlayCircle,
   Sun,
   Moon,
@@ -122,7 +119,6 @@ function NavSep({ className = "" }) {
 }
 
 function TopBar() {
-  const { openSearch } = useSearchContext();
   const location = useLocation();
   const isCompassActive = location.pathname.startsWith('/compass');
 
@@ -179,7 +175,7 @@ function TopBar() {
       {/* RIGHT — tools + utilities + clock */}
       <div className="flex items-center gap-1 flex-shrink-0">
         {/* Math/engine tool shortcuts and video/fullscreen are desktop-only —
-            on mobile they'd overflow the bar, and Search/Tools already cover
+            on mobile they'd overflow the bar, and Tools already covers
             the same ground via the bottom nav. */}
         <div className="hidden lg:flex items-center gap-1">
           {toolsByGroup("math").map((tool) => <ToolButton key={tool.key} tool={tool} />)}
@@ -195,22 +191,6 @@ function TopBar() {
         >
           <PlayCircle className="w-[18px] h-[18px]" />
         </button>
-        <button
-          onClick={openSearch}
-          className="hidden lg:flex nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-          title="Search"
-        >
-          <Search className="w-[18px] h-[18px]" />
-        </button>
-
-        <button
-          onClick={openSearch}
-          className="lg:hidden nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
-          title="Search lessons"
-        >
-          <Search className="w-[18px] h-[18px]" />
-        </button>
-
         <ThemePicker />
 
         <div className="hidden lg:block">
@@ -360,7 +340,6 @@ export default function AppShell({ children }) {
     setFootballOpen(false);
   }, []);
   const [grapherLaunchConfig, setGrapherLaunchConfig] = useState(null);
-  const { openSearch } = useSearchContext();
   const { isDarkGlobal: dark } = useGlobalTheme();
 
   // openGrapher — called by any lesson/component via GrapherContext
@@ -465,7 +444,6 @@ export default function AppShell({ children }) {
             {children ?? <Outlet />}
           </div>
           <Suspense fallback={null}>
-            <SearchModal />
             <GlobalGrapher
               isOpen={graphOpen}
               launchConfig={graphOpen ? grapherLaunchConfig : null}
@@ -687,7 +665,6 @@ export default function AppShell({ children }) {
               />
             )}
             <WhatsNewModal />
-            <SearchModal />
             <GlobalGrapher
               isOpen={graphOpen}
               launchConfig={graphOpen ? grapherLaunchConfig : null}
