@@ -51,7 +51,7 @@ export default function DeltaTutor({ lesson, step, ui }: Props) {
   const [status, setStatus] = useState<'idle' | 'thinking' | 'error'>('idle')
   const [streaming, setStreaming] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
-  const bottomRef = useRef<HTMLDivElement>(null)
+  const messagesRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Reset conversation when step changes
@@ -63,8 +63,14 @@ export default function DeltaTutor({ lesson, step, ui }: Props) {
     setErrorMsg('')
   }, [step.id])
 
+  // Scroll the message list's own scrollTop directly rather than
+  // bottomRef.scrollIntoView() — scrollIntoView walks up the DOM for the
+  // nearest scrollable ancestor, and when this panel is embedded inside a
+  // floating window, that search can escape the window entirely and
+  // scroll the whole page instead of just this list.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const el = messagesRef.current
+    if (el) el.scrollTop = el.scrollHeight
   }, [messages, streaming])
 
   async function send() {
@@ -119,7 +125,7 @@ export default function DeltaTutor({ lesson, step, ui }: Props) {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3">
+      <div ref={messagesRef} className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3">
         {messages.length === 0 && !streaming && (
           <div className={`text-xs ${ui.txt2} text-center pt-6`}>
             {isChallenge
@@ -154,7 +160,6 @@ export default function DeltaTutor({ lesson, step, ui }: Props) {
         {errorMsg && (
           <div className="text-xs text-red-400 text-center px-2">{errorMsg}</div>
         )}
-        <div ref={bottomRef} />
       </div>
 
       {/* Input */}
