@@ -322,7 +322,7 @@ export default function SimLabPage() {
 
         {/* Back to Labs */}
         <button
-          onClick={() => navigate('/labs')}
+          onClick={() => navigate('/')}
           className={`flex items-center gap-1 px-2 py-1.5 rounded-md text-xs font-semibold transition-colors ${btnBase} ${muted} hover:${text}`}
         >
           <ArrowLeft className="h-3.5 w-3.5" />

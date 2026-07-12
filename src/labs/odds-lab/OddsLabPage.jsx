@@ -12,7 +12,7 @@ export default function OddsLabPage() {
 
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-slate-950">
-      <CardDiceLab fullPage onBack={() => navigate('/labs')} />
+      <CardDiceLab fullPage onBack={() => navigate('/')} />
     </div>
   )
 }

@@ -143,7 +143,7 @@ export default function RobotArmLabPage() {
     }}>
       <CircuitBg />
       <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1300px', height: '100%' }}>
-        <RobotArmLab onBack={() => navigate('/labs')} />
+        <RobotArmLab onBack={() => navigate('/')} />
       </div>
     </div>
   )

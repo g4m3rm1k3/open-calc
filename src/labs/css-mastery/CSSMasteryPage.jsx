@@ -58,7 +58,7 @@ export default function CSSMasteryPage() {
     <WebLessonPlayer
       key={lesson.id}
       lesson={lesson}
-      onBack={() => navigate('/labs')}
+      onBack={() => navigate('/')}
       onNext={nextId ? () => navigate(`/web-learn/css-mastery/${nextId}`) : null}
       nextTitle={nextId ? LESSONS[nextId]?.title : null}
       seriesLessons={seriesLessons}

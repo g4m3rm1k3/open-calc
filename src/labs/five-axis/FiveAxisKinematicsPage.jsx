@@ -12,7 +12,7 @@ export default function FiveAxisKinematicsPage() {
 
   return (
     <div style={{ position:'fixed', inset:0, background:'#0e0e12', overflow:'hidden', zIndex:50 }}>
-      <FiveAxisKinematics onBack={() => navigate('/labs')} />
+      <FiveAxisKinematics onBack={() => navigate('/')} />
     </div>
   )
 }

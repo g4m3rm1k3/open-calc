@@ -11,7 +11,7 @@ export default function DecompLabPage() {
 
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 50 }}>
-      <DecompLab onBack={() => navigate('/labs')} />
+      <DecompLab onBack={() => navigate('/')} />
     </div>
   )
 }

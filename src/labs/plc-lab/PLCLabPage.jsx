@@ -482,7 +482,7 @@ export default function PLCLabPage() {
     }}>
       {/* Top bar */}
       <div style={{ height: 48, background: '#111827', borderBottom: '1px solid #1e293b', display: 'flex', alignItems: 'center', padding: '0 16px', gap: 16, flexShrink: 0 }}>
-        <button onClick={() => navigate('/labs')}
+        <button onClick={() => navigate('/')}
           style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 8, background: 'transparent', border: '1px solid #334155', color: '#94a3b8', fontSize: 12, cursor: 'pointer' }}>
           ← Back
         </button>

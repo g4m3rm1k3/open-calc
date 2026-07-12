@@ -11,7 +11,7 @@ export default function CmmLabPage() {
 
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 50 }}>
-      <CmmLab onBack={() => navigate('/labs')} />
+      <CmmLab onBack={() => navigate('/')} />
     </div>
   )
 }

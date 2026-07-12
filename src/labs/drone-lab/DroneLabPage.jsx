@@ -89,7 +89,7 @@ export default function DroneLabPage() {
         style={{ backgroundImage: 'repeating-linear-gradient(0deg,transparent,transparent 39px,currentColor 39px,currentColor 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,currentColor 39px,currentColor 40px)' }} />
       <SkyBg />
       <div className="relative z-10 w-full max-w-[1600px] h-full shadow-2xl">
-        <DroneLab onBack={() => navigate('/labs')} />
+        <DroneLab onBack={() => navigate('/')} />
       </div>
     </div>
   )

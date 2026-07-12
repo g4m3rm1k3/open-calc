@@ -66,7 +66,7 @@ export default function SICPPage() {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-[#08111f] text-slate-400 gap-4">
         <p className="text-lg">Lesson not found: sicp/{lessonId}</p>
-        <button onClick={() => navigate('/labs')} className="text-cyan-400 hover:text-cyan-300 text-sm underline">
+        <button onClick={() => navigate('/')} className="text-cyan-400 hover:text-cyan-300 text-sm underline">
           Back to Labs
         </button>
       </div>
@@ -87,7 +87,7 @@ export default function SICPPage() {
       <LessonPlayer
         key={lesson.id}
         lesson={lesson}
-        onBack={() => navigate('/labs')}
+        onBack={() => navigate('/')}
         onNext={nextId ? () => navigate(`/learn/sicp/${nextId}`) : null}
         nextTitle={nextId ? (LESSONS[nextId]?.title ?? null) : null}
         seriesLessons={seriesLessons}

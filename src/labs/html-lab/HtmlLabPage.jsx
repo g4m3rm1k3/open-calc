@@ -12,7 +12,7 @@ export default function HtmlLabPage() {
 
   return (
     <div style={{ width: '100%', height: '100vh', overflow: 'hidden' }}>
-      <HtmlLab onBack={() => navigate('/labs')} />
+      <HtmlLab onBack={() => navigate('/')} />
     </div>
   )
 }

@@ -11,7 +11,7 @@ export default function Matrix3DLabPage() {
 
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 50 }}>
-      <Matrix3DLab onBack={() => navigate('/labs')} />
+      <Matrix3DLab onBack={() => navigate('/')} />
     </div>
   )
 }
