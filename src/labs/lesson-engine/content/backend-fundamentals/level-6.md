@@ -161,7 +161,7 @@ Write two pure business-logic functions suitable for unit testing — the kind y
 
 `str.trim()` — removes leading and trailing whitespace. `str.replace(/\s+/g, ' ')` — replaces any run of whitespace characters with a single space.
 
-```javascript
+```challenge
 function calculateProgress(completedLessons, totalLessons) {
   // implement
 }

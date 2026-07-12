@@ -163,7 +163,7 @@ By the end of this lesson you will understand the project's CSS custom property 
 
 Answer questions about the theming system.
 
-```javascript
+```challenge
 const answers = {
   // What CSS feature does the theming system use to define theme values?
   cssFeature: '',

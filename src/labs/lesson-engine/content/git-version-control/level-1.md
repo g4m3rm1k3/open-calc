@@ -156,7 +156,7 @@ When creating a repo on GitHub, select the appropriate template.
 
 Write good commit messages.
 
-```javascript
+```challenge
 // For each bad commit message, write a better one:
 const messages = {
   bad1: 'fix',

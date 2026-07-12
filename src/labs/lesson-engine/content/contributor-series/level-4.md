@@ -126,7 +126,7 @@ Good opening:
 
 Write the parts of a lesson section.
 
-```javascript
+```challenge
 const lessonSection = {
   // One sentence: what does Array.filter() do?
   whatItIs: '',

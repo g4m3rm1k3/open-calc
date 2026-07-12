@@ -138,7 +138,7 @@ git push   # pushes to the same branch — the PR updates automatically
 
 Plan your first contribution.
 
-```javascript
+```challenge
 const myFirstContribution = {
   // What type of contribution will you make? (fix/add-level/new-series/other)
   type: '',

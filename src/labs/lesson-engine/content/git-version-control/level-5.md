@@ -149,7 +149,7 @@ Only use on commits not yet pushed to shared branches.
 
 Choose the right reset type.
 
-```javascript
+```challenge
 // Match the scenario to the correct git reset command:
 const scenarios = {
   // Undo last commit but keep changes staged for a different commit message:

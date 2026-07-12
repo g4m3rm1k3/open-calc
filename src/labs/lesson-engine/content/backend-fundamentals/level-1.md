@@ -219,7 +219,7 @@ Request pipeline for GET /public:
 
 Complete the route definitions for a products REST API. Use the HTTP methods and patterns from the lesson — method plus path, e.g. `'GET /products'`.
 
-```javascript
+```challenge
 const routes = {
   listAll: 'GET /products',
   getOne: '',       // retrieve the product with id 7

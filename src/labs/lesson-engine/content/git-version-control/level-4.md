@@ -129,7 +129,7 @@ Bad review feedback:
 
 Write a good pull request description.
 
-```javascript
+```challenge
 // Context: you added password hashing to the user registration endpoint
 // The change: import bcrypt, hash password before storing, add bcrypt to package.json
 

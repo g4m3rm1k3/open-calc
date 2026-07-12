@@ -58,6 +58,18 @@ CREATE TABLE courses (
 SQL has four core data operations called **CRUD**: Create (INSERT), Read (SELECT), Update (UPDATE), Delete (DELETE). Plus DDL (Data Definition Language) statements for creating tables.
 
 ```sql
+-- Setup: create table and seed rows so the examples below can run
+CREATE TABLE users (
+  id    INTEGER PRIMARY KEY,
+  name  TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  role  TEXT DEFAULT 'student'
+);
+INSERT INTO users (name, email, role) VALUES
+  ('Alice', 'alice@example.com', 'admin'),
+  ('Bob',   'bob@example.com',   'student'),
+  ('Carol', 'carol@example.com', 'student');
+
 -- CREATE: add a row
 INSERT INTO users (name, email, role)
 VALUES ('Diana', 'diana@example.com', 'student');

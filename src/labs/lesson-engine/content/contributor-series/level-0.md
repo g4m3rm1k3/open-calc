@@ -102,7 +102,7 @@ The most common mistake: forgetting to close a code block.
 
 Complete the Markdown examples.
 
-```javascript
+```challenge
 const markdown = {
   // Write a Markdown H2 heading that says "Introduction":
   h2Heading: '',

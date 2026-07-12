@@ -129,7 +129,7 @@ Strategy:
 
 Practice reading the import structure.
 
-```javascript
+```challenge
 // Given this import block from LessonEngineLab.tsx:
 const importBlock = `
 import { parseLesson } from '../../engine/lesson/parser'
