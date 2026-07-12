@@ -17,3 +17,6 @@ release/
 *.AppImage
 *.deb
 *.rpm
+
+# Auto-generated on every dev/build run (scripts/generate-graph.mjs) - pure noise to track
+src/data/codebaseGraph.js

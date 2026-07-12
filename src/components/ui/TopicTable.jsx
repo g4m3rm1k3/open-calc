@@ -35,7 +35,7 @@ function resolveEntry(entry) {
       label: meta.label,
       emoji: meta.icon,
       differentiator: entry.differentiator,
-      cardItem: { ...meta, description: entry.differentiator },
+      cardItem: { ...meta, description: entry.differentiator ?? meta.description },
       chapters: getChapters(entry.key),
       path: meta.path,
     }
@@ -53,7 +53,7 @@ function resolveEntry(entry) {
     label: reg.label,
     emoji: reg.emoji,
     differentiator: entry.differentiator,
-    cardItem: { ...reg, desc: entry.differentiator },
+    cardItem: { ...reg, desc: entry.differentiator ?? reg.desc },
     path: reg.path,
     event: reg.event,
     color: reg.color,

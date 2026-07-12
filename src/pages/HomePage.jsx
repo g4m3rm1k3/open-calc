@@ -1,17 +1,14 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getAllCourses, getChapters } from '../courses/courseLoader.js'
-import { useProgress } from '../hooks/useProgress.js'
-import { buildProgressKey } from '../context/progressMigration.ts'
 import UniverseBackground from '../components/backgrounds/UniverseBackground.jsx'
 import TopicFilterHeader from '../components/ui/TopicFilterHeader.jsx'
 import TopicTable from '../components/ui/TopicTable.jsx'
-import { TOPICS, TOPIC_ORDER, getSubtopicGroup, firstSubtopicId } from '../data/topicGroups.js'
+import { TOPICS, TOPIC_ORDER, getSubtopicGroup, firstSubtopicId, ALL_ITEMS } from '../data/topicGroups.js'
 
 export function matchItem(item, query) {
   if (!query) return true;
   const q = query.toLowerCase().trim();
-  
+
   const searchableText = [
     item.label,
     item.desc,
@@ -28,49 +25,44 @@ export function matchItem(item, query) {
   const stopWords = [
     'a', 'an', 'the', 'in', 'on', 'with', 'to', 'and', 'or', 'for', 'of', 'at', 'by', 'from',
     'learn', 'master', 'build', 'explore', 'simulate', 'design', 'visualise', 'visualize', 'create', 'make', 'do',
-    'lesson', 'lessons', 'lab', 'labs', 'game', 'games', 'app', 'apps', 'course', 'courses', 
+    'lesson', 'lessons', 'lab', 'labs', 'game', 'games', 'app', 'apps', 'course', 'courses',
     'topic', 'topics', 'how', 'what', 'why', 'who', 'where', 'when', 'is', 'are', 'am', 'be', 'been',
     'i', 'you', 'he', 'she', 'it', 'we', 'they', 'my', 'your', 'his', 'her', 'our', 'their',
     'want', 'need', 'like', 'would', 'could', 'should', 'can', 'will', 'show', 'me', 'find', 'search',
     'about', 'some', 'any', 'all', 'this', 'that', 'these', 'those', 'there', 'here', 'so', 'if', 'then',
     'teach', 'help', 'understand', 'work', 'scratch', 'from'
   ];
-  
+
   // Also keep terms that might be short but very specific
   const terms = q.split(/[\s,]+/)
     .filter(t => !stopWords.includes(t))
     .filter(t => t.length > 2 || ['3d', 'js', 'ai', 'ui', 'ux', 'c', 'ml', 'vr', 'ar', 'g0', 'fk', 'ik', 'qr'].includes(t));
-  
+
   if (terms.length > 0) {
     return terms.some(term => searchableText.includes(term));
   }
-  
+
   return false;
 }
 
-// ── Course entries, kept only for the hero's lesson-completion count ────────
-const ALL_COURSES = getAllCourses()
-const COURSE_ENTRIES = ALL_COURSES
-  .map(course => ({ course, chapters: getChapters(course.key) }))
-  .filter(({ chapters }) => chapters.length > 0)
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const { getLessonStatus } = useProgress()
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTopicId, setActiveTopicId] = useState('mathematics')
   const [activeSubtopicId, setActiveSubtopicId] = useState('linear-algebra')
-  const exploreRef = useRef(null)
 
   function selectTopic(topicId) {
     setActiveTopicId(topicId)
     setActiveSubtopicId(firstSubtopicId(topicId))
-    exploreRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
-  const totalLessons     = COURSE_ENTRIES.reduce((s, { chapters }) => s + chapters.reduce((n, ch) => n + ch.lessons.length, 0), 0)
-  const completedLessons = COURSE_ENTRIES.reduce((s, { course, chapters }) =>
-    s + chapters.reduce((n, ch) =>
-      n + ch.lessons.filter(l => getLessonStatus(buildProgressKey(course.key, l), 1) === 'complete').length, 0), 0)
+
+  // A query bypasses the topic/subtopic filter entirely and searches every
+  // course/lab/game — a search box that only searches the currently
+  // selected bucket defeats the point of a search box.
+  const isSearching = searchQuery.trim().length > 0
+  const group = isSearching
+    ? { label: `Search results for "${searchQuery}"`, items: ALL_ITEMS }
+    : getSubtopicGroup(activeTopicId, activeSubtopicId)
 
   return (
     <div className="relative min-h-screen">
@@ -78,10 +70,8 @@ export default function HomePage() {
 
       <div className="relative z-10">
 
-        {/* ── HERO ─────────────────────────────────────────────────────────── */}
-
-        {/* ── FILTER + TOPIC TABLE ─────────────────────────────────────────── */}
-        <section ref={exploreRef} className="px-4 pt-4 pb-10 scroll-mt-6">
+        {/* ── SEARCH + FILTER ──────────────────────────────────────────────── */}
+        <section className="px-4 pt-6 pb-2">
           <TopicFilterHeader
             query={searchQuery}
             onQueryChange={setSearchQuery}
@@ -92,23 +82,21 @@ export default function HomePage() {
             onSelectTopic={selectTopic}
             onSelectSubtopic={setActiveSubtopicId}
           />
-          {(() => {
-            const group = getSubtopicGroup(activeTopicId, activeSubtopicId)
-            if (!group) {
-              return (
-                <div className="max-w-lg mx-auto text-center rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/30 p-8">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Pick a filter above to see everything real for that subject.
-                  </p>
-                </div>
-              )
-            }
-            return (
-              <div className="w-[90vw] max-w-none mx-auto">
-                <TopicTable group={group} query={searchQuery} matchItem={matchItem} />
-              </div>
-            )
-          })()}
+        </section>
+
+        {/* ── RESULTS ──────────────────────────────────────────────────────── */}
+        <section className="px-4 pb-10">
+          {group ? (
+            <div className="w-[90vw] max-w-none mx-auto">
+              <TopicTable group={group} query={isSearching ? searchQuery : ''} matchItem={matchItem} />
+            </div>
+          ) : (
+            <div className="max-w-lg mx-auto text-center rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/30 p-8">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Pick a filter above to see everything real for that subject.
+              </p>
+            </div>
+          )}
         </section>
 
         {/* ── FOOTER ───────────────────────────────────────────────────────── */}

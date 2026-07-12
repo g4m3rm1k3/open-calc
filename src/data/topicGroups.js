@@ -1,3 +1,7 @@
+import { getAllCourses } from '../courses/courseLoader.js'
+import { LABS } from '../labs/registry.js'
+import { GAMES } from '../games/registry.js'
+
 // Curated topic → subtopic tree for the home page's "Explore" section.
 // Two-level nav: pick a topic (Mathematics, Science, ...), then a subtopic
 // within it (Linear Algebra, Calculus, ...) — see TopicFilterHeader.jsx.
@@ -505,3 +509,15 @@ export function firstSubtopicId(topicId) {
   const topic = TOPICS[topicId]
   return topic ? Object.keys(topic.subtopics)[0] ?? null : null
 }
+
+// Every course/lab/game, undifferentiated — used for global search, which
+// deliberately bypasses the topic/subtopic filter entirely (a filter that
+// only searches its own bucket defeats the point of a search box: you
+// should be able to find "Drone Lab" by name even while looking at Physics).
+// No `differentiator` field — TopicTable falls back to each item's own
+// real description when one isn't provided.
+export const ALL_ITEMS = [
+  ...getAllCourses().map(c => ({ kind: 'course', key: c.key })),
+  ...LABS.map(l => ({ kind: 'lab', key: l.key })),
+  ...GAMES.map(g => ({ kind: 'game', key: g.key })),
+]
