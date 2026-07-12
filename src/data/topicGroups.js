@@ -28,9 +28,11 @@ export const TOPICS = {
   mathematics: {
     label: 'Mathematics',
     icon: '∑',
+    color: 'indigo',
     subtopics: {
       precalculus: {
         label: 'Precalculus',
+        color: 'sky',
         items: [
           { kind: 'course', key: 'precalculus',
             differentiator: 'Structured curriculum — algebra, trigonometry, exponentials, and the foundations everything after this builds on.' },
@@ -38,6 +40,7 @@ export const TOPICS = {
       },
       calculus: {
         label: 'Calculus',
+        color: 'emerald',
         items: [
           { kind: 'course', key: 'calculus',
             differentiator: 'Structured curriculum — limits, derivatives, integrals, and the mathematics of change, in order.' },
@@ -55,6 +58,7 @@ export const TOPICS = {
       },
       geometry: {
         label: 'Geometry',
+        color: 'amber',
         items: [
           { kind: 'course', key: 'geometry',
             differentiator: 'Structured curriculum — angles, proofs, circles, transformations, and geometric reasoning, in order.' },
@@ -68,6 +72,7 @@ export const TOPICS = {
       },
       'linear-algebra': {
         label: 'Linear Algebra',
+        color: 'indigo',
         items: [
           { kind: 'course', key: 'linear-algebra',
             differentiator: 'Structured, sequential curriculum — start here for the full path from vectors to eigenvalues.' },
@@ -95,6 +100,7 @@ export const TOPICS = {
       },
       'discrete-math': {
         label: 'Discrete Mathematics',
+        color: 'violet',
         items: [
           { kind: 'course', key: 'discrete-math',
             differentiator: 'Structured curriculum — logic, sets, graphs, and the mathematics of computing, in order.' },
@@ -104,6 +110,7 @@ export const TOPICS = {
       },
       statistics: {
         label: 'Statistics & Probability',
+        color: 'rose',
         items: [
           { kind: 'course', key: 'applied-statistics',
             differentiator: 'Structured curriculum — statistical thinking, probability, inference, and regression analysis, in order.' },
@@ -125,9 +132,11 @@ export const TOPICS = {
   science: {
     label: 'Science',
     icon: '⚛',
+    color: 'emerald',
     subtopics: {
       physics: {
         label: 'Physics',
+        color: 'sky',
         items: [
           { kind: 'course', key: 'physics',
             differentiator: 'Structured curriculum — kinematics, Newtonian mechanics, energy, momentum, and waves, in order.' },
@@ -159,6 +168,7 @@ export const TOPICS = {
       },
       chemistry: {
         label: 'Chemistry',
+        color: 'fuchsia',
         items: [
           { kind: 'course', key: 'chemistry',
             differentiator: 'Structured curriculum — atomic structure, bonding, reactions, and chemical systems, in order.' },
@@ -172,9 +182,11 @@ export const TOPICS = {
   programming: {
     label: 'Programming',
     icon: '⌨',
+    color: 'orange',
     subtopics: {
       python: {
         label: 'Python',
+        color: 'yellow',
         items: [
           { kind: 'course', key: 'python',
             differentiator: 'Structured curriculum — core syntax through data science, OOP, and vectorization, in order.' },
@@ -192,6 +204,7 @@ export const TOPICS = {
       },
       javascript: {
         label: 'JavaScript',
+        color: 'amber',
         items: [
           { kind: 'course', key: 'javascript',
             differentiator: 'Structured curriculum — runtime model, async, closures, OOP, and browser APIs, in order.' },
@@ -209,6 +222,7 @@ export const TOPICS = {
       },
       typescript: {
         label: 'TypeScript',
+        color: 'blue',
         items: [
           { kind: 'lab', key: 'ts-lab',
             differentiator: 'Build a real social platform frontend from scratch in vanilla TypeScript against a live REST API — no framework.' },
@@ -218,6 +232,7 @@ export const TOPICS = {
       },
       cpp: {
         label: 'C++',
+        color: 'indigo',
         items: [
           { kind: 'course', key: 'c-plus-plus',
             differentiator: 'Structured curriculum — foundations through the standard library to advanced techniques, in order.' },
@@ -229,6 +244,7 @@ export const TOPICS = {
       },
       'web-development': {
         label: 'Web Development',
+        color: 'rose',
         items: [
           { kind: 'course', key: 'web',
             differentiator: 'Structured curriculum — HTML and CSS through async JavaScript, ending in a capstone project.' },
@@ -250,6 +266,7 @@ export const TOPICS = {
       },
       'graphics-programming': {
         label: 'Canvas & Graphics Programming',
+        color: 'purple',
         items: [
           { kind: 'course', key: 'canvas',
             differentiator: 'Structured curriculum — 2D graphics programming with the HTML Canvas API, in order.' },
@@ -261,6 +278,7 @@ export const TOPICS = {
       },
       'command-line': {
         label: 'Command Line & Git',
+        color: 'slate',
         items: [
           { kind: 'course', key: 'command-line-interface',
             differentiator: 'Structured curriculum — command line fundamentals and terminal mastery, in order.' },
@@ -274,9 +292,11 @@ export const TOPICS = {
   'computer-science': {
     label: 'Computer Science',
     icon: '⊕',
+    color: 'blue',
     subtopics: {
       dsa: {
         label: 'Data Structures & Algorithms',
+        color: 'emerald',
         items: [
           { kind: 'course', key: 'data-structures-and-algorithms',
             differentiator: 'Structured curriculum covering arrays through graphs, in order.' },
@@ -294,6 +314,7 @@ export const TOPICS = {
       },
       'logic-digital': {
         label: 'Logic & Digital Fundamentals',
+        color: 'cyan',
         items: [
           { kind: 'course', key: 'logic',
             differentiator: 'Boolean logic and combinational circuit design, applied through problem sets rather than a linear course arc.' },
@@ -305,6 +326,7 @@ export const TOPICS = {
       },
       runtime: {
         label: 'Runtime & Program Execution',
+        color: 'amber',
         items: [
           { kind: 'lab', key: 'abstraction-viz',
             differentiator: 'Step through callbacks, higher-order functions, closures, and DI and watch the abstraction build in the editor.' },
@@ -324,9 +346,11 @@ export const TOPICS = {
   engineering: {
     label: 'Engineering',
     icon: '⚙',
+    color: 'amber',
     subtopics: {
       cnc: {
         label: 'CNC',
+        color: 'slate',
         items: [
           { kind: 'course', key: 'cnc',
             differentiator: 'Structured curriculum — CNC macro programming, G-code systems, and toolpath math, in order.' },
@@ -342,6 +366,7 @@ export const TOPICS = {
       },
       cad: {
         label: 'CAD',
+        color: 'blue',
         items: [
           { kind: 'lab', key: 'cad-pro',
             differentiator: 'Design the part first — parametric 3D modelling with constraint-based tools, no machining involved.' },
@@ -351,6 +376,7 @@ export const TOPICS = {
       },
       'plc-automation': {
         label: 'PLC & Automation',
+        color: 'lime',
         items: [
           { kind: 'course', key: 'programmable-logic-controllers',
             differentiator: 'Structured curriculum — PLC programming fundamentals and industrial automation systems, in order.' },
@@ -360,6 +386,7 @@ export const TOPICS = {
       },
       robotics: {
         label: 'Robotics',
+        color: 'orange',
         items: [
           { kind: 'lab', key: 'robot-arm-sim',
             differentiator: 'Robot programming from zero — trig, FK/IK, 4×4 transforms, obstacle avoidance, 19 missions on a 2D and 6-DOF 3D arm.' },
@@ -369,6 +396,7 @@ export const TOPICS = {
       },
       electronics: {
         label: 'Electronics',
+        color: 'amber',
         items: [
           { kind: 'course', key: 'electronics',
             differentiator: 'Structured curriculum — electrical fundamentals through semiconductors, RF, and systems integration.' },
@@ -380,6 +408,7 @@ export const TOPICS = {
       },
       metrology: {
         label: 'Metrology',
+        color: 'teal',
         items: [
           { kind: 'lab', key: 'cmm-lab',
             differentiator: 'Simulate a coordinate measuring machine — probe circles, planes, cylinders, and read a real GD&T report.' },
@@ -393,9 +422,11 @@ export const TOPICS = {
   'data-ai': {
     label: 'Data & AI',
     icon: '⟁',
+    color: 'teal',
     subtopics: {
       'data-science': {
         label: 'Data Science',
+        color: 'blue',
         items: [
           { kind: 'course', key: 'data-science',
             differentiator: 'Structured curriculum — computational methods for data analysis and scientific exploration, in order.' },
@@ -405,6 +436,7 @@ export const TOPICS = {
       },
       ai: {
         label: 'AI & Machine Learning',
+        color: 'violet',
         items: [
           { kind: 'course', key: 'ai-engineering',
             differentiator: 'Structured curriculum — machine learning, LLMs, and AI systems from foundations to deployment.' },
@@ -414,6 +446,7 @@ export const TOPICS = {
       },
       sql: {
         label: 'SQL',
+        color: 'sky',
         items: [
           { kind: 'course', key: 'sql',
             differentiator: 'Structured curriculum — SQL mastery from zero to advanced queries and Python integration.' },
@@ -421,6 +454,7 @@ export const TOPICS = {
       },
       nosql: {
         label: 'NoSQL',
+        color: 'emerald',
         items: [
           { kind: 'course', key: 'nosql',
             differentiator: 'Structured curriculum — NoSQL database systems and document-oriented data design.' },
@@ -432,9 +466,11 @@ export const TOPICS = {
   creative: {
     label: 'Creative',
     icon: '∇',
+    color: 'pink',
     subtopics: {
       design: {
         label: 'Design',
+        color: 'pink',
         items: [
           { kind: 'course', key: 'design',
             differentiator: 'Structured curriculum — interface design systems, typography, and visual hierarchy.' },
@@ -442,6 +478,7 @@ export const TOPICS = {
       },
       music: {
         label: 'Music',
+        color: 'indigo',
         items: [
           { kind: 'lab', key: 'music-lab',
             differentiator: 'Beat machine meets DAW — sequencer, synth, FX chain, mixer, and piano roll, powered by Tone.js.' },
@@ -449,6 +486,7 @@ export const TOPICS = {
       },
       'vector-graphics': {
         label: 'SVG & Vector Graphics',
+        color: 'amber',
         items: [
           { kind: 'lab', key: 'svg-studio',
             differentiator: 'Freehand pencil, shape tools, layers, and SVG/PNG export — a real drawing tool, not just a code panel.' },
@@ -456,6 +494,7 @@ export const TOPICS = {
       },
       'game-dev': {
         label: 'Game Development',
+        color: 'purple',
         items: [
           { kind: 'course', key: 'tetris',
             differentiator: 'Build Tetris from scratch — game loop, collision, and polish, structured as a course.' },
@@ -463,6 +502,7 @@ export const TOPICS = {
       },
       'creative-tools': {
         label: 'Build Your Own Tools',
+        color: 'teal',
         items: [
           { kind: 'lab', key: 'lesson-builder',
             differentiator: 'Build and preview interactive lessons yourself — code cells, prose, visualizations, checkpoints.' },
@@ -476,9 +516,11 @@ export const TOPICS = {
   general: {
     label: 'General & Multi-Subject',
     icon: '✦',
+    color: 'slate',
     subtopics: {
       'arcade-practice': {
         label: 'Arcade & Practice',
+        color: 'rose',
         items: [
           { kind: 'game', key: 'arkanoid',
             differentiator: "Break bricks by answering math questions — general practice, not tied to one subject." },

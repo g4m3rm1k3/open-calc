@@ -23,7 +23,7 @@
 
 UpSkillOS is a complete STEM learning environment that runs entirely in the browser — no account, no subscription, no install required. It is the only open-source platform that combines university-level curriculum, real interactive coding environments, physics and CNC simulations, a built-in AI tutor, and a WYSIWYG lesson authoring system in a single free application.
 
-**982 lessons. 31 courses. 25+ interactive labs and simulators. 15 games built on real math and physics. All free. All open source.**
+**784 lessons. 31 courses. 38 interactive labs and simulators. 15 games built on real math and physics. All free. All open source.**
 
 ---
 
@@ -67,7 +67,7 @@ Every lesson follows the same contract — **Hook → Intuition → Math → Rig
 7. **Checkpoints** — progress tracking so nothing gets skipped
 8. **Quiz** — spaced retrieval at the end of every lesson
 
-This structure is not cosmetic. It is the architecture of every lesson file in the codebase, enforced consistently across all 982 lessons.
+This structure is not cosmetic. It is the architecture of every lesson file in the codebase, enforced consistently across all 784 lessons.
 
 ---
 
@@ -75,9 +75,9 @@ This structure is not cosmetic. It is the architecture of every lesson file in t
 
 | | Count |
 |---|---|
-| Lessons | **982** |
+| Lessons | **784** |
 | Courses | **31** |
-| Interactive labs & simulators | **25+** |
+| Interactive labs & simulators | **38** |
 | Games built on real math & physics | **15** |
 | Code environments (Python, JS, C++, SQL, React) | **5** |
 | Lesson-aware AI tutor interactions | Unlimited |
@@ -129,7 +129,7 @@ This structure is not cosmetic. It is the architecture of every lesson file in t
 
 </details>
 
-### 25+ Interactive Labs and Simulators
+### 38 Interactive Labs and Simulators
 
 - **Python Notebook** — Pyodide-powered, fully offline, runs numpy/scipy/matplotlib in the browser
 - **CNC Simulator** — write G-Code, watch real toolpaths, verify programs before touching a machine
@@ -222,7 +222,7 @@ export default {
 }
 ```
 
-This format is what makes the Lesson Builder work — and what makes 982 lessons parseable, searchable, and exportable without a database.
+This format is what makes the Lesson Builder work — and what makes 784 lessons parseable, searchable, and exportable without a database.
 
 ### Stack
 
@@ -234,14 +234,14 @@ This format is what makes the Lesson Builder work — and what makes 982 lessons
 | Math rendering | KaTeX |
 | Python runtime | Pyodide (WebAssembly) |
 | Styling | Tailwind CSS + full dark mode |
-| Full-text search | Fuse.js (982 lessons, client-side) |
+| Discovery search | Client-side keyword search across every course, lab, and game (Explore section) |
 | P2P study chat | Trystero + WebRTC (no server) |
 | Desktop app | Electron |
 | Code editor | Monaco Editor |
 
 ### How It Runs Offline
 
-Python runs via Pyodide — the CPython interpreter compiled to WebAssembly. NumPy, SciPy, Pandas, Matplotlib, scikit-learn are all available in the browser with no server. The search index (982 lessons) is built at compile time and served as a static file. P2P chat uses WebRTC negotiated over Nostr/BitTorrent DHT — no signaling server required.
+Python runs via Pyodide — the CPython interpreter compiled to WebAssembly. NumPy, SciPy, Pandas, Matplotlib, scikit-learn are all available in the browser with no server. Lesson titles are extracted from every lesson file at compile time into a static JSON map, so the app can show real titles without eager-loading lesson content. P2P chat uses WebRTC negotiated over Nostr/BitTorrent DHT — no signaling server required.
 
 ### Self-Hosting
 
@@ -302,13 +302,13 @@ src/
     layout/              # AppShell, TopBar, MobileBottomNav
     math/                # KaTeX wrappers, MarkdownProse
     viz/                 # VizFrame registry (maps string IDs to components)
-  labs/                  # 25+ standalone labs and simulators
+  labs/                  # 38 standalone labs and simulators
   games/                 # 15 math and physics games
   pages/                 # top-level route components
   courses/               # courseLoader — lazy-loads lesson content
-  context/               # progress, theme, pins, search
-public/
-  search-index.json      # 982 lessons, generated at build time
+  context/               # progress, theme, pins
+  data/
+    lessonTitles.json    # real lesson titles, generated at build time
 desktop/
   app/                   # Electron main process
 ```
@@ -347,7 +347,7 @@ Access to high-quality, interactive STEM education is not equally distributed. T
 ### What We've Already Built
 
 Without institutional funding, one developer has shipped:
-- **982 lessons** across **31 courses** covering the full STEM-to-employability pipeline
+- **784 lessons** across **31 courses** covering the full STEM-to-employability pipeline
 - A **live Python execution environment** (Pyodide) that runs numpy, scipy, pandas, matplotlib, and scikit-learn with no server
 - A **CNC programming simulator** — one of the most in-demand industrial skills in the country, fully learnable without access to a physical machine
 - A **PLC ladder logic simulator** for industrial automation training
@@ -398,6 +398,16 @@ UpSkillOS is a strong match for organizations funding:
 **Bug fixes** — check open issues.
 
 Full technical reference: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## Contributors
+
+Thanks to everyone who has sent a pull request:
+
+<a href="https://github.com/natural-mess"><img src="https://github.com/natural-mess.png" width="56" height="56" alt="natural-mess" style="border-radius:50%; vertical-align:middle"></a> **[natural-mess](https://github.com/natural-mess)**
+&nbsp;&nbsp;&nbsp;
+<a href="https://github.com/John-Swindell"><img src="https://github.com/John-Swindell.png" width="56" height="56" alt="John-Swindell" style="border-radius:50%; vertical-align:middle"></a> **[John-Swindell](https://github.com/John-Swindell)**
 
 ---
 

@@ -8,10 +8,77 @@ Thanks for helping improve open-calc. This guide covers everything you need to a
 
 ## Development workflow
 
-1. Fork the repository and create a feature branch from `main`.
-2. Make focused changes with clear commit messages.
-3. Run `npm run build` locally — a clean build confirms content indexing and no import errors.
-4. Open a pull request with a clear summary. For UI or visualization changes, include a screenshot or GIF.
+### One-time setup
+
+1. **Fork** the repository on GitHub (the button, top-right of the repo page) — this creates your own copy at `github.com/your-username/upskillos`.
+2. **Clone your fork** to your machine:
+   ```bash
+   git clone https://github.com/your-username/upskillos.git
+   cd upskillos
+   npm install
+   ```
+   Cloning your fork automatically sets up a remote named `origin` pointing at *your* copy — not the original project.
+3. **Add the original repository as a second remote**, named `upstream`:
+   ```bash
+   git remote add upstream https://github.com/g4m3rm1k3/upskillos.git
+   git remote -v   # confirm: origin = your fork, upstream = the real project
+   ```
+   This is the step that makes staying in sync possible at all — without it, `git pull` only ever talks to your fork, which doesn't move on its own when the real project gets new commits.
+
+### Before you start any change — sync first
+
+```bash
+git checkout main
+git fetch upstream
+git merge --ff-only upstream/main
+git push origin main   # keeps your fork's main up to date too, optional but tidy
+```
+
+**This answers "do I just pull changes?" — not quite.** A plain `git pull` on your fork's `main` only fetches from `origin` (your fork), and your fork doesn't automatically track the real project. You have to `fetch upstream` explicitly. `merge --ff-only` (rather than a plain `merge`) is a safety check: it only succeeds if your `main` hasn't drifted, and refuses loudly instead of silently creating a merge commit if it has — if you haven't touched your fork's `main` directly (you shouldn't; always work on branches), this should always succeed.
+
+### Make your change
+
+```bash
+git checkout -b fix-golf-tolerance     # branch BEFORE editing anything, off an up-to-date main
+# ...make focused changes...
+git add <files>
+git commit -m "clear message explaining why, not just what"
+```
+
+One concern per PR — a bug fix and an unrelated refactor in the same PR make it slower to review and harder to revert if something's wrong. Run `npm run build` locally before opening a PR — a clean build catches most import errors and broken references before a reviewer ever sees them.
+
+### Before opening (or updating) your PR — sync again
+
+If any time has passed since you branched, `upstream/main` may have moved. Check and reconcile before pushing:
+
+```bash
+git fetch upstream
+git merge-base --is-ancestor upstream/main HEAD && echo "you're current, nothing to do"
+```
+
+If that doesn't print "you're current," bring the new commits into your branch (a plain `merge` here is the simplest, safest default — it adds one merge commit rather than rewriting your branch's history, which matters once a PR is open and someone may have already reviewed or pulled your branch):
+
+```bash
+git merge upstream/main
+# resolve any conflicts if git reports them, then:
+git push origin fix-golf-tolerance
+```
+
+A concrete cautionary example from this repo's own history: PR #7 sat for a while before merging, and its branch ended up 41 commits behind `upstream/main` by the time it was reviewed — which made its diff look far larger and scarier than the actual change really was. Syncing regularly while a PR is open (or right before opening it) avoids that entirely.
+
+### Open the pull request
+
+Push your branch to **your fork** (`origin`, not `upstream` — you don't have push access to the real repo, and don't need it):
+
+```bash
+git push -u origin fix-golf-tolerance
+```
+
+Then open the PR on GitHub — it'll offer to compare `your-username:fix-golf-tolerance` against `g4m3rm1k3:main` automatically. Give it a clear summary; for UI or visualization changes, include a screenshot or short screen recording.
+
+### Want the *why*, not just the steps?
+
+The commands above are the practical minimum. For a from-scratch, hands-on explanation of what a branch, a fetch, and a merge actually *are* underneath these commands — including a disposable practice repo where you can experiment risk-free — see the lesson series in [`src/docs/UpSkillOS work/git-fundamentals/`](src/docs/UpSkillOS%20work/git-fundamentals/01-branch-before-you-change-anything.md), written from this project's own real git sessions, mistakes included.
 
 ---
 

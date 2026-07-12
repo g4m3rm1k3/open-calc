@@ -68,7 +68,7 @@ const STATS = [
     glow: "rgba(99,102,241,0.1)",
   },
   {
-    value: "27",
+    value: "38",
     label: "Interactive Labs",
     icon: "🔬",
     color: "text-cyan-300",
@@ -90,6 +90,20 @@ const STATS = [
     color: "text-rose-300",
     border: "border-rose-500/25",
     glow: "rgba(244,63,94,0.1)",
+  },
+];
+
+// Real GitHub contributors — add to this list as more PRs land
+const CONTRIBUTORS = [
+  {
+    username: "natural-mess",
+    url: "https://github.com/natural-mess",
+    avatar: "https://github.com/natural-mess.png",
+  },
+  {
+    username: "John-Swindell",
+    url: "https://github.com/John-Swindell",
+    avatar: "https://github.com/John-Swindell.png",
   },
 ];
 
@@ -121,7 +135,6 @@ const COURSES_BY_DOMAIN = [
       "Physics — kinematics, forces, waves, energy, electromagnetism",
       "Chemistry — periodic table, reactions, molecular structure",
       "Electronics — circuits, Ohm's law, components, analysis",
-      "Logic & Digital Fundamentals — gates, flip-flops, ALUs",
     ],
   },
   {
@@ -135,7 +148,6 @@ const COURSES_BY_DOMAIN = [
       "JavaScript — language internals, async, closures, prototypes",
       "C++ — from zero to systems programmer (standard library, STL)",
       "Web Development — HTML, DOM, APIs, reactivity",
-      "CSS 0 to Mastery — box model, flex, grid, stacking contexts",
       "Canvas — 2D graphics, animation, game loops",
       "Three.js — 3D graphics, shaders, geometries, WebGL",
       "Command Line — shell, bash, scripting, file systems",
@@ -523,10 +535,10 @@ const ROADMAP_DONE = [
   "31 courses across math, science, CS, engineering, data, and creative domains",
   "Python runtime in the browser — no install, real NumPy, Pandas, and opencalc",
   "JavaScript notebooks, Monaco editor, and a full code playground",
-  "27 interactive labs — simulations, simulators, visualizers, and full environments",
+  "38 interactive labs — simulations, simulators, visualizers, and full environments",
   "15 STEM games — arcade, puzzle, sports, and adventure formats",
   "AI Tutor (Delta) with lesson-aware context in every page",
-  "Full-text search, calendar, brain workspace, health tracker",
+  "Global course/lab/game search, calendar, brain workspace, health tracker",
   "Formula Atlas for math and science reference",
   "CodeLens — JavaScript AST and execution visualizer",
   "React and CSS mastery interactive learning environments",
@@ -572,7 +584,7 @@ export default function AboutPage() {
             </p>
             <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg max-w-3xl leading-relaxed mb-10">
               From Pre-Calculus to AI Engineering, from CNC Machining to Digital
-              Logic, from CSS to C++ — 31 courses, 27 interactive labs, 15 STEM
+              Logic, from CSS to C++ — 31 courses, 38 interactive labs, 15 STEM
               games, a built-in AI tutor, and an entire suite of tools. Runs
               entirely in your browser.{" "}
               <em className="text-indigo-300 not-italic font-semibold">
@@ -661,6 +673,52 @@ export default function AboutPage() {
                   >
                     <span>⭐</span> github.com/g4m3rm1k3/open-calc
                   </a>
+                </div>
+              </div>
+            </div>
+          </FadeSection>
+        </section>
+
+        {/* ── CONTRIBUTORS ──────────────────────────────────────────────────── */}
+        <section className="px-4 pb-12 max-w-4xl mx-auto">
+          <FadeSection>
+            <div
+              className="relative rounded-3xl border border-indigo-200 dark:border-indigo-500/20 bg-gradient-to-br from-indigo-50 via-white to-cyan-50 dark:from-indigo-950/50 dark:via-slate-950/80 dark:to-cyan-950/50 backdrop-blur-sm p-8 sm:p-12 overflow-hidden shadow-xl shadow-indigo-500/5 dark:shadow-[0_0_60px_rgba(99,102,241,0.06)]"
+            >
+              <div className="absolute top-0 right-0 w-72 h-72 bg-indigo-500/8 rounded-full blur-[80px] pointer-events-none" />
+              <div className="relative z-10 grid sm:grid-cols-[auto_1fr] gap-6 items-start">
+                <div className="text-5xl">🙌</div>
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-widest text-indigo-400 mb-1">
+                    Community Contributors
+                  </div>
+                  <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-3">
+                    Built with help from real contributors
+                  </h2>
+                  <p className="text-slate-700 dark:text-slate-300 text-base leading-relaxed mb-4">
+                    UpSkillOS is open source, and people outside the core
+                    project have already sent real pull requests. Thank you.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {CONTRIBUTORS.map((c) => (
+                      <a
+                        key={c.username}
+                        href={c.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 rounded-full border border-indigo-200 dark:border-indigo-500/25 bg-white/60 dark:bg-white/5 pl-1.5 pr-4 py-1.5 hover:border-indigo-400 dark:hover:border-indigo-400/50 transition-colors"
+                      >
+                        <img
+                          src={c.avatar}
+                          alt={c.username}
+                          className="w-7 h-7 rounded-full"
+                        />
+                        <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                          {c.username}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -762,7 +820,7 @@ export default function AboutPage() {
         <section className="px-4 py-20">
           <div className="max-w-7xl mx-auto">
             <FadeSection className="text-center mb-12">
-              <SectionBadge color="cyan">🔬 27 Interactive Labs</SectionBadge>
+              <SectionBadge color="cyan">🔬 38 Interactive Labs</SectionBadge>
               <h2 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                 Hands-On Environments
               </h2>

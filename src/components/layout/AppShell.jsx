@@ -118,9 +118,33 @@ function NavSep({ className = "" }) {
   return <div className={`w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1.5 flex-shrink-0 rounded-full ${className}`} />
 }
 
+import { GLASS_META } from '../../styles/courseColors.js';
+
 function TopBar() {
   const location = useLocation();
   const isCompassActive = location.pathname.startsWith('/compass');
+  const pathParts = location.pathname.split('/').filter(Boolean);
+  
+  let activeTopic = null;
+  if (pathParts[0] === 'course' && pathParts[1]) {
+    const course = Object.values(COURSES).find(c => c.id === pathParts[1]);
+    if (course) activeTopic = course.topic;
+  } else if (pathParts[0] === 'chapter' && pathParts[1]) {
+    const chapterId = pathParts[1];
+    const chapter = CURRICULUM.find(c => String(c.number) === String(chapterId));
+    if (chapter && chapter.course) {
+       activeTopic = COURSES[chapter.course]?.topic;
+    }
+  }
+
+  const activeMeta = activeTopic && GLASS_META[activeTopic]
+    ? GLASS_META[activeTopic]
+    : {
+        header: "from-brand-500 to-indigo-500",
+        glow: "0 0 12px rgba(99, 102, 241, 0.5)",
+        text: "text-brand-500",
+        stop2: "text-indigo-600"
+      };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] h-[52px] flex items-center px-4 gap-3 bg-white/70 dark:bg-slate-950/70 backdrop-blur-2xl border-b border-slate-200/50 dark:border-slate-800/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]">
@@ -130,12 +154,13 @@ function TopBar() {
         <Link to="/" className="flex items-center gap-2 group select-none" aria-label="Home">
           <svg
             viewBox="0 0 256 256"
-            className="w-8 h-8 rounded-[7px] shadow-sm group-hover:shadow-brand-500/25 group-hover:scale-105 transition-all duration-300"
+            className="w-8 h-8 rounded-[7px] transition-all duration-300 group-hover:scale-105"
+            style={{ filter: `drop-shadow(${activeMeta.glow})` }}
           >
             <defs>
               <linearGradient id="logoBgGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" className="text-brand-500" stopColor="currentColor" />
-                <stop offset="100%" className="text-indigo-600" stopColor="currentColor" />
+                <stop offset="0%" className={activeMeta.text || "text-brand-500"} stopColor="currentColor" />
+                <stop offset="100%" className={activeMeta.stop2 || "text-slate-800 dark:text-slate-100"} stopColor="currentColor" />
               </linearGradient>
               <linearGradient id="logoCaretGrad" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" className="text-white" stopColor="currentColor" />
@@ -154,7 +179,7 @@ function TopBar() {
               </text>
             </g>
           </svg>
-          <span className="text-[15px] font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 hidden sm:block tracking-tight">
+          <span className={`text-[17px] font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r ${activeMeta.header} hidden sm:block filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]`}>
             UpSkillOS
           </span>
         </Link>
