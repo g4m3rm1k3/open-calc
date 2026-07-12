@@ -197,7 +197,7 @@ If the response times out at 5 seconds, a handler is not calling `next()` or sen
 
 Write an async handler using the pattern from this lesson. `fetchCourse(id)` is already defined — it returns a Promise that resolves to a course object or `null`. Call it, return 404 if null, 200 with the course if found. Pass errors to `next`.
 
-```javascript
+```challenge
 async function fetchCourse(id) {
   if (id === 1) return { id: 1, title: 'Python Fundamentals' }
   if (id === 2) return { id: 2, title: 'SQL Fundamentals' }

@@ -194,11 +194,16 @@ async function retry(asyncOperation, maxAttempts) {
 ```
 
 ```test
-let calls = 0
-const alwaysSucceeds = () => Promise.resolve("ok")
-const failsTwice = () => { calls++; return calls < 3 ? Promise.reject(new Error("fail")) : Promise.resolve("success") }
-retry(alwaysSucceeds, 3).then(r => { assert r === "ok" })
-calls = 0
-retry(failsTwice, 3).then(r => { assert r === "success" })
 assert typeof retry === "function"
+const alwaysSucceeds = () => Promise.resolve("ok")
+const r1 = await retry(alwaysSucceeds, 3)
+assert r1 === "ok"
+let calls = 0
+const failsTwice = () => { calls++; return calls < 3 ? Promise.reject(new Error("fail")) : Promise.resolve("success") }
+const r2 = await retry(failsTwice, 3)
+assert r2 === "success"
+let threw = false
+const alwaysFails = () => Promise.reject(new Error("always fails"))
+try { await retry(alwaysFails, 2) } catch (e) { threw = true }
+assert threw
 ```

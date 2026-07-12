@@ -40,8 +40,9 @@ function buildJSHarness(userCode: string, testCode: string): string {
   for (const assertion of assertions) {
     const escaped = assertion.replace(/`/g, '\\`')
     lines.push(`try {`)
-    lines.push(`  const __ok = (${assertion.replace(/^assert\s+/, '')});`)
-    lines.push(`  console.log(\`${OC_PREFIX}PASS|${escaped}\`)`)
+    lines.push(`  const __ok = !!(${assertion.replace(/^assert\s+/, '')});`)
+    lines.push(`  if (__ok) console.log(\`${OC_PREFIX}PASS|${escaped}\`)`)
+    lines.push(`  else      console.log(\`${OC_PREFIX}FAIL|${escaped}|\`)`)
     lines.push(`} catch(__e) {`)
     lines.push(`  console.log(\`${OC_PREFIX}FAIL|${escaped}|\` + __e.message)`)
     lines.push(`}`)

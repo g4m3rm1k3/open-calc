@@ -146,7 +146,7 @@ Return an object with:
 
 `parseInt(str)` — parses a string to an integer. `parseInt('4000')` → `4000`.
 
-```javascript
+```challenge
 function buildConfig(env) {
   // implement
 }

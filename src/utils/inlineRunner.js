@@ -202,35 +202,10 @@ function runExpressOutput(apps) {
   return lines
 }
 
-const BABEL_URL = 'https://unpkg.com/@babel/standalone@7/babel.min.js'
 let _babelPromise = null
 function loadBabel() {
-  if (window.Babel) return Promise.resolve(window.Babel)
   if (_babelPromise) return _babelPromise
-  _babelPromise = new Promise((resolve, reject) => {
-    // If WorkspaceTerminal already added the script tag, just wait for window.Babel
-    // rather than adding a duplicate. Poll for up to 15 s.
-    if (document.querySelector(`script[src="${BABEL_URL}"]`)) {
-      let n = 0
-      const t = setInterval(() => {
-        if (window.Babel) { clearInterval(t); resolve(window.Babel) }
-        else if (++n > 150) { clearInterval(t); reject(new Error('Babel load timed out')) }
-      }, 100)
-      return
-    }
-    const s = document.createElement('script')
-    s.src = BABEL_URL
-    s.onload = () => {
-      if (window.Babel) { resolve(window.Babel); return }
-      let n = 0
-      const t = setInterval(() => {
-        if (window.Babel) { clearInterval(t); resolve(window.Babel) }
-        else if (++n > 50) { clearInterval(t); reject(new Error('Babel did not initialize after load')) }
-      }, 100)
-    }
-    s.onerror = () => reject(new Error('Babel CDN unreachable'))
-    document.head.appendChild(s)
-  })
+  _babelPromise = import('@babel/standalone').then(m => m.default ?? m)
   _babelPromise.catch(() => { _babelPromise = null })
   return _babelPromise
 }
@@ -824,6 +799,17 @@ const _SQL_CDN  = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm
 const _SQL_WASM = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.wasm'
 let _sqlJsPromise = null
 
+// Shared in-memory database that persists across steps within a lesson session.
+// Call resetSQLDatabase() when opening a new lesson to start fresh.
+let _sharedDb = null
+
+export function resetSQLDatabase() {
+  if (_sharedDb) {
+    try { _sharedDb.close() } catch {}
+    _sharedDb = null
+  }
+}
+
 function _loadSqlJs() {
   if (window.initSqlJs) return Promise.resolve(window.initSqlJs)
   if (_sqlJsPromise) return _sqlJsPromise
@@ -850,7 +836,8 @@ export async function runSQLInline(code, onLine) {
   try {
     const init = await _loadSqlJs()
     const SQL = await init({ locateFile: () => _SQL_WASM })
-    const db = new SQL.Database()
+    if (!_sharedDb) _sharedDb = new SQL.Database()
+    const db = _sharedDb
     // Split into statements by ; (skipping ; inside strings)
     const stmts = []; let buf = '', inStr = false, q = ''
     for (const c of code) {
@@ -876,7 +863,7 @@ export async function runSQLInline(code, onLine) {
         }
       } catch (e) { onLine({ type: 'error', text: `ERROR: ${e.message}` }) }
     }
-    db.close()
+    // db is shared across steps — do not close it here
     return { error: null }
   } catch (e) {
     onLine({ type: 'error', text: `sql.js: ${e.message}` })

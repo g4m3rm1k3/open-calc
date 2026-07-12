@@ -135,7 +135,7 @@ It is ready (`ready: true`, `errors: []`) only when all of these are true:
 
 For each missing or invalid variable, add a descriptive string to `errors`. `ready` is `false` if `errors.length > 0`.
 
-```javascript
+```challenge
 function validateDeployment(env) {
   const errors = []
   // check each requirement, push to errors if violated

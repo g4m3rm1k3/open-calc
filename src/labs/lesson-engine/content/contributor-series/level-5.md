@@ -128,7 +128,7 @@ function LevelListView({ ui, series, ... }) { ... }
 
 Answer questions about React components.
 
-```javascript
+```challenge
 const answers = {
   // What is the name for the data passed into a React component?
   dataPassedIn: '',

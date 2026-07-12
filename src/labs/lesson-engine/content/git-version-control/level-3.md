@@ -118,7 +118,7 @@ After cloning:
 
 Fill in the correct git commands.
 
-```javascript
+```challenge
 const commands = {
   // Push local 'feature/auth' branch to remote 'origin' for the first time:
   pushNewBranch: '',

@@ -6,6 +6,7 @@ import LessonView from '../../engine/lesson/LessonView'
 import { SERIES } from './series'
 import type { SeriesMeta } from './series'
 import type { ParsedLesson } from '../../engine/lesson/types'
+import { resetSQLDatabase } from '../../utils/inlineRunner.js'
 
 // Vite ?raw imports for all lesson markdown files
 import pfLevel0  from './content/python-fundamentals/level-0.md?raw'
@@ -481,9 +482,18 @@ export default function LessonEngineLab({ onBack }: Props) {
     })
   }
 
+  function resetSeriesProgress(seriesId: string) {
+    setCompleted(prev => {
+      const next = new Set([...prev].filter(k => !k.startsWith(`${seriesId}:`)))
+      try { localStorage.setItem(PROGRESS_KEY, JSON.stringify([...next])) } catch {}
+      return next
+    })
+  }
+
   function openLesson(file: string, series: SeriesMeta) {
     const raw = LESSON_FILES[file]
     if (!raw) return
+    resetSQLDatabase()
     setView({ kind: 'lesson', lesson: parseLesson(raw), series })
   }
 
@@ -495,7 +505,7 @@ export default function LessonEngineLab({ onBack }: Props) {
         <SeriesListView ui={ui} onBack={onBack} onSelectSeries={s => setView({ kind: 'level-list', series: s })} />
       )}
       {view.kind === 'level-list' && (
-        <LevelListView ui={ui} series={view.series} completed={completed} available={LESSON_FILES} onBack={() => setView({ kind: 'series-list' })} onSelectLevel={file => openLesson(file, view.series)} />
+        <LevelListView ui={ui} series={view.series} completed={completed} available={LESSON_FILES} onBack={() => setView({ kind: 'series-list' })} onSelectLevel={file => openLesson(file, view.series)} onResetProgress={() => resetSeriesProgress(view.series.id)} />
       )}
       {view.kind === 'lesson' && (() => {
         const currentIdx = view.series.levels.findIndex(l => l.level === view.lesson.level)
@@ -564,13 +574,14 @@ function SeriesListView({ ui, onBack, onSelectSeries }: {
 
 // ── Level list ────────────────────────────────────────────────────────────────
 
-function LevelListView({ ui, series, completed, available, onBack, onSelectLevel }: {
+function LevelListView({ ui, series, completed, available, onBack, onSelectLevel, onResetProgress }: {
   ui: any
   series: SeriesMeta
   completed: Set<string>
   available: Record<string, string>
   onBack: () => void
   onSelectLevel: (file: string) => void
+  onResetProgress: () => void
 }) {
   const doneCount = series.levels.filter(l => completed.has(`${series.id}:${l.level}`)).length
   return (
@@ -581,7 +592,14 @@ function LevelListView({ ui, series, completed, available, onBack, onSelectLevel
         </button>
         <span className={`text-sm font-bold ${ui.txt1}`}>{series.label}</span>
         {doneCount > 0 && (
-          <span className="ml-auto text-xs font-semibold text-emerald-400">{doneCount} / {series.levels.length} complete</span>
+          <>
+            <span className="ml-auto text-xs font-semibold text-emerald-400">{doneCount} / {series.levels.length} complete</span>
+            <button
+              type="button"
+              onClick={() => { if (window.confirm('Reset all progress for this series?')) onResetProgress() }}
+              className={`text-xs ${ui.txt2} hover:text-red-400 bg-transparent border-none cursor-pointer transition-colors`}
+            >Reset</button>
+          </>
         )}
       </div>
       <div className="flex-1 overflow-y-auto p-6">

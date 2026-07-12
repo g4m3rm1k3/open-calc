@@ -249,7 +249,7 @@ Decode a JWT payload manually without any library.
 
 A JWT is three dot-separated base64url-encoded parts: `header.payload.signature`. The payload segment is the middle one. `atob(str)` — decodes a base64 string to plain text. `JSON.parse(str)` — parses a JSON string to an object. Base64url uses `-` and `_` instead of `+` and `/`; replace them before calling `atob`.
 
-```javascript
+```challenge
 function decodeJwtPayload(token) {
   // Split token on '.', take the middle segment,
   // replace '-' with '+' and '_' with '/',

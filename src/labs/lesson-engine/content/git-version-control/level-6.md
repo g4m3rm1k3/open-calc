@@ -165,7 +165,7 @@ src/database/  @bob     # Bob reviews all database changes
 
 Choose the right workflow action for each scenario.
 
-```javascript
+```challenge
 const decisions = {
   // You need to interrupt your work to fix an urgent bug on another branch:
   interruptWork: '',

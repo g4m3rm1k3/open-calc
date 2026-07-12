@@ -137,7 +137,7 @@ When a request arrives:
 
 Fill in the correct HTTP status code and method for each scenario.
 
-```javascript
+```challenge
 const scenarios = {
   // A GET request to /users succeeded and returned a list.
   listUsers: { method: '', status: 0 },

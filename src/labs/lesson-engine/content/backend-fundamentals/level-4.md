@@ -160,7 +160,7 @@ Implement an in-memory `CourseRepo` with three methods. `findAll()` — returns 
 
 `Array.prototype.find(fn)` — returns the first element where `fn(element)` is truthy, or `undefined` if none match.
 
-```javascript
+```challenge
 class CourseRepo {
   constructor() {
     this.store = [
