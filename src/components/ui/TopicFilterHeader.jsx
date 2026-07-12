@@ -5,6 +5,7 @@ export default function TopicFilterHeader({
   query, onQueryChange,
   topics, topicOrder, activeTopicId, activeSubtopicId,
   onSelectTopic, onSelectSubtopic,
+  hasInProgress,
 }) {
   const activeTopic = topics[activeTopicId]
   const activeMeta = activeTopic ? (GLASS_META[activeTopic.color] ?? GLASS_META.slate) : GLASS_META.slate
@@ -14,6 +15,22 @@ export default function TopicFilterHeader({
       <HomeTopicSearch onSearch={onQueryChange} />
 
       <div className="flex flex-wrap items-end gap-x-8 gap-y-2 border-b-[2px] border-slate-300/50 dark:border-slate-700/50 pb-2">
+        {/* Only shown once the learner actually has something to resume —
+            an empty "In Progress" pill would just be a dead click. */}
+        {hasInProgress && (
+          <button
+            type="button"
+            onClick={() => onSelectTopic('in-progress')}
+            className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider pb-2 -mb-[10px] border-b-[3px] transition-all duration-300 ${
+              activeTopicId === 'in-progress'
+                ? 'border-amber-500 bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]'
+                : 'border-transparent text-amber-600 dark:text-amber-400 opacity-[0.8] hover:opacity-100 hover:border-slate-300 dark:hover:border-slate-700'
+            }`}
+          >
+            <span className={`font-mono text-[15px] leading-none mb-[1px] ${activeTopicId === 'in-progress' ? 'text-transparent' : ''}`}>◐</span>
+            In Progress
+          </button>
+        )}
         {topicOrder.map((id) => {
           const topic = topics[id]
           if (!topic) return null

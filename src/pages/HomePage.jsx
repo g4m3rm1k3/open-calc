@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getAllCourses, getChapters } from '../courses/courseLoader.js'
+import { useProgress } from '../hooks/useProgress.js'
+import { buildProgressKey } from '../context/progressMigration.ts'
 import UniverseBackground from '../components/backgrounds/UniverseBackground.jsx'
 import TopicFilterHeader from '../components/ui/TopicFilterHeader.jsx'
 import TopicTable from '../components/ui/TopicTable.jsx'
@@ -72,8 +75,19 @@ export function matchItem(item, query, kinds) {
   return Boolean(kinds) && namedCategories.length > 0;
 }
 
+// Real course/chapter data, used only to compute which courses have partial
+// progress — see inProgressItems below. Real progress data (via oc-progress,
+// see useProgress) currently only exists for courses and the html-lessons
+// lab; labs/games have no completion tracking to honestly show "in progress"
+// for yet, so this stays courses-only until that's built out.
+const ALL_COURSES = getAllCourses()
+const COURSE_ENTRIES = ALL_COURSES
+  .map(course => ({ course, chapters: getChapters(course.key) }))
+  .filter(({ chapters }) => chapters.length > 0)
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function HomePage() {
+  const { getLessonStatus } = useProgress()
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTopicId, setActiveTopicId] = useState('mathematics')
   const [activeSubtopicId, setActiveSubtopicId] = useState('linear-algebra')
@@ -83,13 +97,26 @@ export default function HomePage() {
     setActiveSubtopicId(firstSubtopicId(topicId))
   }
 
+  // Courses with at least one completed lesson but not all of them.
+  const inProgressItems = COURSE_ENTRIES.reduce((acc, { course, chapters }) => {
+    const total = chapters.reduce((n, ch) => n + ch.lessons.length, 0)
+    if (total === 0) return acc
+    const completed = chapters.reduce((n, ch) =>
+      n + ch.lessons.filter(l => getLessonStatus(buildProgressKey(course.key, l), 1) === 'complete').length, 0)
+    if (completed > 0 && completed < total) acc.push({ kind: 'course', key: course.key })
+    return acc
+  }, [])
+  const hasInProgress = inProgressItems.length > 0
+
   // A query bypasses the topic/subtopic filter entirely and searches every
   // course/lab/game — a search box that only searches the currently
   // selected bucket defeats the point of a search box.
   const isSearching = searchQuery.trim().length > 0
   const group = isSearching
     ? { label: `Search results for "${searchQuery}"`, items: ALL_ITEMS }
-    : getSubtopicGroup(activeTopicId, activeSubtopicId)
+    : activeTopicId === 'in-progress'
+      ? { label: 'In Progress', items: inProgressItems }
+      : getSubtopicGroup(activeTopicId, activeSubtopicId)
 
   return (
     <div className="relative min-h-screen">
@@ -108,6 +135,7 @@ export default function HomePage() {
             activeSubtopicId={activeSubtopicId}
             onSelectTopic={selectTopic}
             onSelectSubtopic={setActiveSubtopicId}
+            hasInProgress={hasInProgress}
           />
         </section>
 
