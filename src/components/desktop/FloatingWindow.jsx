@@ -62,9 +62,15 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
         style={{ zIndex }}
         onMouseDown={onFocus}
       >
-        {/* Always at least dimly visible — fully hidden-until-hover made the only way
-            to close a maximized game/lab undiscoverable. */}
-        <div className="absolute top-2 left-3 z-10 flex items-center gap-[6px] bg-black/20 rounded-full px-2 py-1 opacity-60 hover:opacity-100 transition-opacity duration-200">
+        {/* A real row (not absolute-over-content) — reserves actual height so
+            every lab's own top-left UI (back buttons, headers, ...) gets
+            pushed below the dots instead of colliding with them. Absolute
+            positioning here used to overlap whatever a lab drew in that same
+            corner, on every lab, every time — fixed once here rather than
+            padding each lab individually. Solid background, not translucent —
+            this bar sits at z-1800 above the app's own top bar (z-100), and a
+            translucent fill let that page chrome show through underneath it. */}
+        <div className="flex-shrink-0 h-7 flex items-center px-3 bg-[#e8e8e8] dark:bg-[#2c2c2e]">
           <MacDots onClose={onClose} onMinimize={undefined} onMaximize={onMaximize} isMaximized />
         </div>
         <div className="flex-1 overflow-hidden" style={{ transform: 'translate(0,0)' }}>
