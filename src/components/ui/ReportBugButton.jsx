@@ -60,8 +60,8 @@ export default function ReportBugButton({ className = '', iconOnly = false, tile
           onClick={() => { setOpen(true); onOpen?.() }}
           className={
             iconOnly
-              ? `group relative flex items-center justify-center w-10 h-10 rounded-2xl text-slate-500 dark:text-slate-400 hover:text-white dark:hover:text-white hover:bg-gradient-to-br hover:from-rose-500 hover:to-red-600 shadow-sm hover:shadow-lg hover:shadow-rose-500/40 hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-none overflow-hidden ${open ? 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-lg shadow-rose-500/40 ring-2 ring-rose-400 ring-offset-2 dark:ring-offset-slate-950 scale-110' : ''} ${className}`
-              : `group relative flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full text-slate-500 dark:text-slate-400 hover:text-white dark:hover:text-white hover:bg-gradient-to-br hover:from-rose-500 hover:to-red-600 shadow-sm hover:shadow-md hover:shadow-rose-500/30 hover:scale-105 active:scale-95 transition-all duration-300 overflow-hidden ${open ? 'bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/30' : ''} ${className}`
+              ? `group relative flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/30 hover:shadow-lg hover:shadow-rose-500/50 hover:scale-110 active:scale-95 transition-all duration-300 focus:outline-none overflow-hidden ${open ? 'ring-2 ring-rose-400 ring-offset-2 dark:ring-offset-slate-950 scale-110' : ''} ${className}`
+              : `group relative flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full bg-gradient-to-r from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/20 hover:shadow-lg hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all duration-300 overflow-hidden ${open ? 'ring-2 ring-rose-400 ring-offset-2 dark:ring-offset-slate-950' : ''} ${className}`
           }
           title="Report a bug"
         >
