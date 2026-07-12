@@ -76,7 +76,7 @@ export default function TopicTable({ group, query, matchItem }) {
   const [openItem, setOpenItem] = useState(null)
 
   const resolved = group.items.map(resolveEntry).filter(Boolean)
-  const filtered = query ? resolved.filter((r) => matchItem(r.cardItem, query)) : resolved
+  const filtered = query ? resolved.filter((r) => matchItem(r.cardItem, query, { kind: r.kind, badgeKind: r.badgeKind })) : resolved
 
   const courses = filtered.filter((r) => r.kind === 'course')
   const labs = filtered.filter((r) => r.kind === 'lab')

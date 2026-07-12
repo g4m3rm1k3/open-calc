@@ -24,10 +24,17 @@ export default function ItemInfoModal({ item, onClose, onLaunch, getLessonStatus
           ✕
         </button>
 
-        {item.kind === 'course' 
-          ? <AppCard item={item.cardItem} variant="course" chapters={item.chapters} getLessonStatus={getLessonStatus} />
-          : <AppCard item={item.cardItem} variant={item.kind === 'game' ? 'game' : 'lab'} />
-        }
+        {/* AppCard renders its own internal <Link to={item.path}> for labs/games
+            (and courses) — without this capture-phase intercept, that Link fires
+            a raw route navigation to the standalone page before onLaunch ever
+            runs, skipping the pin/window system entirely (no floating window,
+            no backTo, lands on whatever bare route that path resolves to). */}
+        <div onClickCapture={(e) => { e.preventDefault(); e.stopPropagation(); onLaunch() }}>
+          {item.kind === 'course'
+            ? <AppCard item={item.cardItem} variant="course" chapters={item.chapters} getLessonStatus={getLessonStatus} />
+            : <AppCard item={item.cardItem} variant={item.kind === 'game' ? 'game' : 'lab'} />
+          }
+        </div>
       </div>
     </div>
   )

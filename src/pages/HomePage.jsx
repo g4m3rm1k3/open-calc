@@ -5,9 +5,34 @@ import TopicFilterHeader from '../components/ui/TopicFilterHeader.jsx'
 import TopicTable from '../components/ui/TopicTable.jsx'
 import { TOPICS, TOPIC_ORDER, getSubtopicGroup, firstSubtopicId, ALL_ITEMS } from '../data/topicGroups.js'
 
-export function matchItem(item, query) {
+// Category words ("games", "labs", "courses") are deliberately stripped as
+// filler further down, so "show me some games about probability" searches
+// on "probability" instead of literal-matching the word "games". But a BARE
+// category query ("games") then has zero keywords left and matches nothing
+// — checked here instead, against the item's actual kind, before that
+// stripping happens. `kind`/`badgeKind` come from the caller (see
+// TopicTable.jsx's resolveEntry) since cardItem alone doesn't carry them.
+const CATEGORY_KEYWORDS = {
+  course: ['course', 'courses'],
+  lab: ['lab', 'labs'],
+  lesson: ['lesson', 'lessons'],
+  builder: ['builder', 'builders'],
+  visualizer: ['visualizer', 'visualizers'],
+  game: ['game', 'games'],
+}
+
+export function matchItem(item, query, kinds) {
   if (!query) return true;
   const q = query.toLowerCase().trim();
+  const words = q.split(/[\s,]+/).filter(Boolean)
+
+  const namedCategories = Object.entries(CATEGORY_KEYWORDS)
+    .filter(([, kws]) => kws.some(w => words.includes(w)))
+    .map(([cat]) => cat)
+  if (namedCategories.length > 0 && kinds) {
+    const itemCategories = [kinds.kind, kinds.badgeKind].filter(Boolean)
+    if (!namedCategories.some(cat => itemCategories.includes(cat))) return false
+  }
 
   const searchableText = [
     item.label,
@@ -42,7 +67,9 @@ export function matchItem(item, query) {
     return terms.some(term => searchableText.includes(term));
   }
 
-  return false;
+  // Nothing left after stripping filler/category words — a real match only
+  // if the query was a recognized category and this item belongs to it.
+  return Boolean(kinds) && namedCategories.length > 0;
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -106,8 +133,6 @@ export default function HomePage() {
             <Link to="/about" className="text-indigo-400 hover:text-indigo-300 hover:underline">Learn more</Link>
             {' · '}
             <Link to="/reference" className="text-indigo-400 hover:text-indigo-300 hover:underline">Formula Atlas</Link>
-            {' · '}
-            <Link to="/search" className="text-indigo-400 hover:text-indigo-300 hover:underline">Search</Link>
           </p>
         </footer>
 
