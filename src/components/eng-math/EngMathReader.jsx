@@ -11,7 +11,7 @@ function saveQuizResults(slug, results) {
   try { localStorage.setItem(`em-results:${slug}`, JSON.stringify(results)) } catch {}
 }
 
-export default function EngMathReader({ content, title, slug, seriesNav, lessons = [] }) {
+export default function EngMathReader({ content, title, slug, seriesNav, lessons = [], onClose }) {
   const [activeScene, setActiveScene] = useState('WelcomeScene')
   const [quizResults, setQuizResults] = useState(() => loadQuizResults(slug))
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -52,12 +52,16 @@ export default function EngMathReader({ content, title, slug, seriesNav, lessons
   const totalCorrect = Object.values(quizResults).filter(Boolean).length
 
   return (
-    <div className="fixed inset-0 z-[110] bg-white dark:bg-slate-900 flex flex-col overflow-hidden">
+    // Embedded (onClose provided, i.e. opened via the References overlay)
+    // fills its actual container instead of escaping to the viewport —
+    // `fixed inset-0` here would paint over the overlay's own header/close
+    // button, since fixed positioning ignores the flex layout around it.
+    <div className={onClose ? "h-full w-full bg-white dark:bg-slate-900 flex flex-col overflow-hidden" : "fixed inset-0 z-[110] bg-white dark:bg-slate-900 flex flex-col overflow-hidden"}>
       {/* Top bar */}
       <div className="shrink-0 flex items-center justify-between px-4 h-11 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-10">
         <div className="flex items-center gap-3 min-w-0">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => (onClose ? onClose() : navigate('/'))}
             className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors shrink-0"
           >
             ← Back

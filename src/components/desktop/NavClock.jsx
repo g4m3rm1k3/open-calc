@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 function getTodayEventCount() {
   try {
@@ -23,6 +23,7 @@ export default function NavClock() {
   const [todayCount, setTodayCount] = useState(() => getTodayEventCount())
   const [hasNew, setHasNew] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000)
@@ -51,7 +52,13 @@ export default function NavClock() {
 
   return (
     <button
-      onClick={() => { navigate('/calendar'); setHasNew(false) }}
+      onClick={() => {
+        // navigate() pushes a new history entry even for the current route —
+        // clicking this while already on /calendar stacked a duplicate entry
+        // per click, so "back" needed one press per click to actually leave.
+        if (location.pathname !== '/calendar') navigate('/calendar')
+        setHasNew(false)
+      }}
       title="Open Calendar"
       className="relative flex flex-col items-end leading-none select-none cursor-pointer hover:opacity-75 transition-opacity"
     >

@@ -46,17 +46,22 @@ const STRIPES_OVL = {
 
 const GRID_TEXTURE = 'repeating-linear-gradient(0deg,transparent,transparent 11px,rgba(255,255,255,0.8) 11px,rgba(255,255,255,0.8) 12px),repeating-linear-gradient(90deg,transparent,transparent 11px,rgba(255,255,255,0.8) 11px,rgba(255,255,255,0.8) 12px)'
 
+// Reference/lookup pages (reference, linear-algebra, la-explorer, eng-math,
+// game-rules) open via the shared 'oc-open-reference' overlay (refKey) —
+// same lookup-in-place pattern as the References button — instead of
+// navigating away, since these are meant to be visited mid-lesson/mid-lab
+// and dismissed back to exactly where the user was.
 const NAV_LINKS = [
-  { id: 'reference',      label: 'Reference Library',          emoji: '📐', path: '/reference', color: 'slate' },
-  { id: 'linear-algebra', label: 'Linear Algebra',             emoji: '∑',  path: '/linear-algebra', color: 'cyan' },
-  { id: 'la-explorer',    label: 'LA Concept Explorer',        emoji: '🔍', path: '/la-explorer', color: 'violet' },
+  { id: 'reference',      label: 'Reference Library',          emoji: '📐', refKey: 'reference', color: 'slate' },
+  { id: 'linear-algebra', label: 'Linear Algebra',             emoji: '∑',  refKey: 'linear-algebra', color: 'cyan' },
+  { id: 'la-explorer',    label: 'LA Concept Explorer',        emoji: '🔍', refKey: 'la-explorer', color: 'violet' },
   { id: 'studio',         label: 'Studio / Docs',              emoji: '✏️', path: '/studio', color: 'fuchsia' },
   { id: 'health',         label: 'Health Tracker',             emoji: '❤️', path: '/health', color: 'rose' },
   { id: 'compass',        label: 'Compass',                    emoji: '🧭', path: '/compass', color: 'sky' },
-  { id: 'eng-math',       label: 'Engineering Mathematics',    emoji: '∫',  path: '/eng-math',        color: 'indigo' },
+  { id: 'eng-math',       label: 'Engineering Mathematics',    emoji: '∫',  refKey: 'eng-math', color: 'indigo' },
   { id: 'lesson-builder', label: 'Lesson Builder · Contribute',emoji: '🔨', path: '/lesson-builder', color: 'amber' },
   { id: 'about',          label: 'About',                      emoji: 'ℹ️', path: '/about', color: 'indigo' },
-  { id: 'game-rules',     label: 'Game Reference',             emoji: '♠️', action: 'game-rules', color: 'violet' },
+  { id: 'game-rules',     label: 'Game Reference',             emoji: '♠️', refKey: 'game-rules', color: 'violet' },
 ]
 
 // Converts any item in the menu to a serialisable pin shape.
@@ -150,7 +155,7 @@ export default function StartMenu({ onClose }) {
 
   const handleNav = (link) => {
     onClose()
-    if (link.action === 'game-rules') window.dispatchEvent(new CustomEvent('oc-game-rules'))
+    if (link.refKey) window.dispatchEvent(new CustomEvent('oc-open-reference', { detail: { key: link.refKey } }))
     else navigate(link.path)
   }
 

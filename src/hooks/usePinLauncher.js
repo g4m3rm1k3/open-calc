@@ -12,7 +12,7 @@ export function usePinLauncher() {
 
   const openPin = async (pin) => {
     if (pin.type === 'course' || pin.type === 'nav') {
-      if (pin.action === 'game-rules') { window.dispatchEvent(new CustomEvent('oc-game-rules')); return }
+      if (pin.action === 'game-rules') { window.dispatchEvent(new CustomEvent('oc-open-reference', { detail: { key: 'game-rules' } })); return }
       if (pin.path) navigate(pin.path)
       return
     }
