@@ -7,9 +7,23 @@ import { LABS } from '../../labs/registry.js'
 import { GAMES } from '../../games/registry.js'
 import { usePinLauncher } from '../../hooks/usePinLauncher.js'
 import { useProgress } from '../../hooks/useProgress.js'
+import { buildProgressKey } from '../../context/progressMigration.ts'
 import { GLASS_META } from '../../styles/courseColors.js'
 
 const ALL_COURSES = getAllCourses()
+
+// Real progress only exists for courses right now (see HomePage.jsx's
+// in-progress computation for why) — null for anything else, including
+// courses with 0% or 100% (nothing useful to show either way).
+function courseProgressPct(r, getLessonStatus) {
+  if (r.kind !== 'course' || !r.chapters) return null
+  const total = r.chapters.reduce((n, ch) => n + ch.lessons.length, 0)
+  if (total === 0) return null
+  const completed = r.chapters.reduce((n, ch) =>
+    n + ch.lessons.filter(l => getLessonStatus(buildProgressKey(r.key, l), 1) === 'complete').length, 0)
+  const pct = completed / total
+  return pct > 0 && pct < 1 ? { pct, completed, total } : null
+}
 
 function PremiumHeaderBackground({ meta }) {
   return (
@@ -119,6 +133,7 @@ export default function TopicTable({ group, query, matchItem }) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 relative z-10 mt-2">
           {filtered.map((r) => {
             const meta = GLASS_META[r.cardItem.color] ?? GLASS_META.slate;
+            const progressPct = courseProgressPct(r, getLessonStatus)
             return (
               <div
                 key={`${r.kind}-${r.key}`}
@@ -134,6 +149,14 @@ export default function TopicTable({ group, query, matchItem }) {
                   <legend className={`px-2 mx-4 text-[10px] font-black uppercase tracking-wider ${meta.text} relative z-20 bg-[#f8fafc] dark:bg-[#0b0f19] rounded-full`}>
                     {KIND_LABEL[r.badgeKind] ?? r.badgeKind.toUpperCase()}
                   </legend>
+
+                  {progressPct !== null && (
+                    <div className="absolute top-2.5 right-3 z-20">
+                      <span className={`text-[10px] font-bold ${meta.text} bg-white/40 dark:bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm border border-black/5 dark:border-white/5 shadow-sm`}>
+                        {progressPct.completed} / {progressPct.total}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Wrap content in a rounded overflow-hidden container to clip PremiumHeaderBackground */}
                   <div className="absolute inset-0 z-0 overflow-hidden rounded-[18px] pointer-events-none">
@@ -154,6 +177,11 @@ export default function TopicTable({ group, query, matchItem }) {
                       <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium block truncate mt-1">
                         {r.cardItem.description || r.cardItem.desc}
                       </span>
+                      {progressPct !== null && (
+                        <div className="mt-2.5 w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                          <div className={`h-full ${meta.bar} transition-all duration-500`} style={{ width: `${progressPct.pct * 100}%` }} />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </fieldset>

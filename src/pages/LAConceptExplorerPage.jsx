@@ -10,7 +10,7 @@ import { CATEGORY_STYLES } from '../components/concept-explorer/categoryStyles.j
 
 const STACK_STORAGE_KEY = 'la-explorer-stack';
 
-export default function LAConceptExplorerPage() {
+export default function LAConceptExplorerPage({ onClose }) {
   const navigate = useNavigate();
   const topics = graphData.topics;
 
@@ -63,7 +63,7 @@ export default function LAConceptExplorerPage() {
       <aside className="w-72 sm:w-80 shrink-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-r border-slate-200 dark:border-slate-800/60 flex flex-col z-10 relative shadow-xl dark:shadow-2xl transition-colors duration-500">
         <div className={`px-5 py-5 border-b border-slate-200 dark:border-slate-800/60 flex items-center gap-3 bg-gradient-to-br ${c.gradientBg} transition-colors duration-500`}>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => (onClose ? onClose() : navigate('/'))}
             title="Close Concept Explorer"
             className="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors text-lg leading-none"
           >

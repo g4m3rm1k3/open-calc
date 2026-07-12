@@ -29,7 +29,14 @@ import {
   Heart,
   Shield,
   Github,
+  Bug,
 } from "lucide-react";
+import ReportBugButton from "./ReportBugButton.jsx";
+import SuggestionBoxButton from "./SuggestionBoxButton.jsx";
+import { useFeedbackBoard } from "../../hooks/useFeedbackBoard.js";
+import { buildLessonPrompt, BUG_LESSON_CONTRACT } from "../../utils/lessonPrompt.js";
+import { useDesktop } from "../desktop/DesktopProvider.jsx";
+import { getLabEntry } from "../../labs/labLoader.js";
 
 // ─── TEMPLATE STRINGS ────────────────────────────────────────────────────────
 
@@ -950,6 +957,244 @@ function HoverLessonPreview() {
       </div>
     </div>
   );
+}
+
+// ─── SECTION: FEEDBACK & BUGS ─────────────────────────────────────────────────
+
+function feedbackTimeAgo(ts) {
+  if (!ts?.toDate) return ''
+  const diffMs = Date.now() - ts.toDate().getTime()
+  const mins = Math.floor(diffMs / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins}m ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days < 30) return `${days}d ago`
+  return ts.toDate().toLocaleDateString()
+}
+
+function FeedbackRow({ item, onOpenPrompt }) {
+  const isBug = item.kind === 'bug'
+
+  return (
+    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3.5 mb-2.5">
+      <div className="flex items-start justify-between gap-3 mb-1">
+        <div className="flex items-center gap-2 min-w-0">
+          {isBug ? (
+            <Bug className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+          ) : (
+            <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+          )}
+          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-snug truncate">
+            {item.title}
+          </h4>
+        </div>
+        <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full whitespace-nowrap bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+          {item.status === 'closed' ? 'Closed' : 'Open'}
+        </span>
+      </div>
+      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap mb-2">
+        {item.description}
+      </p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-[11px] text-slate-400 dark:text-slate-500">
+          {item.displayName || 'Anonymous'} · {feedbackTimeAgo(item.createdAt)}
+        </p>
+        <button
+          onClick={() => onOpenPrompt(item)}
+          className="flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+          title="Get a prompt for an AI coding agent to turn this into a lesson"
+        >
+          <Bot className="w-3 h-3" />
+          Lesson Prompt
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function LessonPromptModal({ item, onClose }) {
+  const [downloaded, setDownloaded] = useState(false)
+  if (!item) return null
+
+  const handleDownload = () => {
+    const prefix = item.kind === 'suggestion' ? 'suggestion' : 'bug'
+    downloadFile(`${prefix}-${item.id}-lesson-prompt.md`, buildLessonPrompt(item))
+    setDownloaded(true)
+    setTimeout(() => setDownloaded(false), 2000)
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-[0_16px_64px_rgba(0,0,0,0.3)] border border-slate-200 dark:border-slate-800 overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-100 dark:border-white/10 bg-gradient-to-r from-brand-50/80 to-white/80 dark:from-brand-500/10 dark:to-slate-900/40">
+          <div className="bg-brand-500/20 p-1.5 rounded-lg shrink-0">
+            <Bot className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+          </div>
+          <h2 className="flex-1 text-sm font-black text-slate-800 dark:text-slate-100 tracking-wide uppercase">
+            Lesson Prompt
+          </h2>
+          <button onClick={onClose} aria-label="Close" className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-800 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="px-5 py-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-1">
+            for: {item.title}
+          </p>
+
+          <H3>What this is</H3>
+          <Para>
+            A text file that turns{' '}
+            {item.kind === 'suggestion' ? 'this idea' : 'this bug'} into a{' '}
+            <strong>lesson</strong> — not a fix, not a feature PR — with an
+            AI's help. Built for a <strong>free</strong> chat AI (ChatGPT,
+            Claude.ai), not a paid coding agent — no repo access or tools
+            required on the AI's side, just you copying files back and
+            forth.
+          </Para>
+
+          <H3>Why it exists</H3>
+          <Para>
+            UpSkillOS teaches by showing real work. Every bug and every
+            feature idea is real material for the{' '}
+            <strong>How to Contribute</strong> lessons — this turns the
+            app's own maintenance into content instead of throwing it away
+            once it's fixed.
+          </Para>
+
+          <Note color="amber">
+            <strong>Do the "How to Contribute" lessons first</strong> if you
+            haven't — this only works if you can find your way around an
+            unfamiliar file and know basic Git. The prompt says so too, but
+            it's worth knowing before you start.
+          </Note>
+
+          <H3>How to use it</H3>
+          <ol className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed list-decimal list-inside space-y-1 mb-3">
+            <li>Download the file below.</li>
+            <li>Paste its full contents into any free AI chat.</li>
+            <li>It'll ask for the real code it needs — that part is brief.</li>
+            <li>Then it teaches: what each piece is, why it exists, how it connects — the actual contract, not a summary.</li>
+            <li>Review the lesson it writes, then open a PR.</li>
+          </ol>
+
+          <button
+            onClick={handleDownload}
+            className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-colors ${downloaded ? 'bg-emerald-500 text-white' : 'bg-brand-600 hover:bg-brand-700 text-white'}`}
+          >
+            {downloaded ? <Check className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+            {downloaded ? 'Downloaded!' : 'Download Lesson Prompt'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SectionFeedback() {
+  const { open, closed } = useFeedbackBoard()
+  const [tab, setTab] = useState('open')
+  const [promptItem, setPromptItem] = useState(null)
+  const items = tab === 'open' ? open : closed
+  const { openWindow } = useDesktop()
+
+  // Opens the same way every lab does from the Start Menu — a floating
+  // window over the desktop, not a route change. A plain <a href="#/lab/...">
+  // here would navigate the whole app away from wherever the learner was,
+  // with no way back except guessing. This keeps them exactly where they were.
+  const openContributorLessons = async () => {
+    const entry = await getLabEntry('lesson-engine')
+    if (entry?.component) {
+      openWindow({ id: 'lesson-engine', label: 'Lesson Engine', emoji: '📖', Component: entry.component, backTo: '/' })
+    }
+  }
+
+  return (
+    <div>
+      <div className="mb-5">
+        <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-amber-500 leading-tight mb-2 flex items-center gap-3">
+          <Bug className="w-8 h-8 text-rose-500" />
+          Feedback & Bugs
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Found a bug, have an idea, or want to fix something yourself?
+        </p>
+      </div>
+
+      <Para>
+        Every bug and idea reported here is public — anyone can see what's
+        been flagged and what's already been dealt with, signed in or not.
+        Filing one takes an account; browsing doesn't.
+      </Para>
+
+      <div className="flex flex-wrap gap-3 my-5">
+        <ReportBugButton />
+        <SuggestionBoxButton />
+      </div>
+
+      <Note color="blue">
+        <strong>Want to fix it yourself instead?</strong> The{' '}
+        <strong>How to Contribute</strong> lessons cover Markdown, Git,
+        branches &amp; PRs, reading unfamiliar code, and making your first
+        pull request — no prior experience assumed.{' '}
+        <button onClick={openContributorLessons} className="font-bold underline">
+          → Open the lessons
+        </button>
+        {' · '}
+        <button
+          onClick={() => downloadFile('BUG_LESSON_CONTRACT.md', BUG_LESSON_CONTRACT)}
+          className="font-bold underline"
+          title="The teaching contract itself, on its own — no specific bug or suggestion attached"
+        >
+          → Download the contract
+        </button>
+      </Note>
+
+      <H3>What's been reported</H3>
+
+      <div className="flex gap-2 mb-4">
+        {[
+          { id: 'open', label: 'Open' },
+          { id: 'closed', label: 'Closed' },
+        ].map(t => (
+          <button
+            key={t.id}
+            onClick={() => setTab(t.id)}
+            className={`px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
+              tab === t.id
+                ? 'bg-brand-600 text-white'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {items === null && (
+        <p className="text-sm text-slate-400 text-center py-8">Loading…</p>
+      )}
+      {items !== null && items.length === 0 && (
+        <p className="text-sm text-slate-400 text-center py-8">
+          {tab === 'open' ? 'Nothing open right now.' : 'Nothing closed yet.'}
+        </p>
+      )}
+      {items?.map(item => (
+        <FeedbackRow key={`${item.kind}-${item.id}`} item={item} onOpenPrompt={setPromptItem} />
+      ))}
+
+      <LessonPromptModal item={promptItem} onClose={() => setPromptItem(null)} />
+    </div>
+  )
 }
 
 // ─── SECTION: OVERVIEW ───────────────────────────────────────────────────────
@@ -3256,51 +3501,123 @@ function SectionAbout() {
   );
 }
 
+const SIDEBAR_COLORS = {
+  rose: {
+    bg: "bg-gradient-to-r from-rose-50 to-orange-50/50 dark:from-rose-500/15 dark:to-orange-500/10",
+    text: "text-rose-700 dark:text-rose-300",
+    border: "border-rose-200/50 dark:border-rose-700/30",
+    iconBg: "bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400",
+    groupHover: "hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-300",
+    activeGradient: 'bg-gradient-to-r from-rose-500 to-orange-600 shadow-rose-500/20',
+  },
+  emerald: {
+    bg: "bg-gradient-to-r from-emerald-50 to-teal-50/50 dark:from-emerald-500/15 dark:to-teal-500/10",
+    text: "text-emerald-700 dark:text-emerald-300",
+    border: "border-emerald-200/50 dark:border-emerald-700/30",
+    iconBg: "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400",
+    groupHover: "hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-700 dark:hover:text-emerald-300",
+    activeGradient: 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-emerald-500/20',
+  },
+  violet: {
+    bg: "bg-gradient-to-r from-violet-50 to-purple-50/50 dark:from-violet-500/15 dark:to-purple-500/10",
+    text: "text-violet-700 dark:text-violet-300",
+    border: "border-violet-200/50 dark:border-violet-700/30",
+    iconBg: "bg-violet-100 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400",
+    groupHover: "hover:bg-violet-50 dark:hover:bg-violet-500/10 hover:text-violet-700 dark:hover:text-violet-300",
+    activeGradient: 'bg-gradient-to-r from-violet-500 to-purple-600 shadow-violet-500/20',
+  },
+  sky: {
+    bg: "bg-gradient-to-r from-sky-50 to-blue-50/50 dark:from-sky-500/15 dark:to-blue-500/10",
+    text: "text-sky-700 dark:text-sky-300",
+    border: "border-sky-200/50 dark:border-sky-700/30",
+    iconBg: "bg-sky-100 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400",
+    groupHover: "hover:bg-sky-50 dark:hover:bg-sky-500/10 hover:text-sky-700 dark:hover:text-sky-300",
+    activeGradient: 'bg-gradient-to-r from-sky-500 to-blue-600 shadow-sky-500/20',
+  },
+  fuchsia: {
+    bg: "bg-gradient-to-r from-fuchsia-50 to-pink-50/50 dark:from-fuchsia-500/15 dark:to-pink-500/10",
+    text: "text-fuchsia-700 dark:text-fuchsia-300",
+    border: "border-fuchsia-200/50 dark:border-fuchsia-700/30",
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-400",
+    groupHover: "hover:bg-fuchsia-50 dark:hover:bg-fuchsia-500/10 hover:text-fuchsia-700 dark:hover:text-fuchsia-300",
+    activeGradient: 'bg-gradient-to-r from-fuchsia-500 to-pink-600 shadow-fuchsia-500/20',
+  },
+  indigo: {
+    bg: "bg-gradient-to-r from-indigo-50 to-blue-50/50 dark:from-indigo-500/15 dark:to-blue-500/10",
+    text: "text-indigo-700 dark:text-indigo-300",
+    border: "border-indigo-200/50 dark:border-indigo-700/30",
+    iconBg: "bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400",
+    groupHover: "hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-700 dark:hover:text-indigo-300",
+    activeGradient: 'bg-gradient-to-r from-indigo-500 to-blue-600 shadow-indigo-500/20',
+  },
+  amber: {
+    bg: "bg-gradient-to-r from-amber-50 to-yellow-50/50 dark:from-amber-500/15 dark:to-yellow-500/10",
+    text: "text-amber-700 dark:text-amber-300",
+    border: "border-amber-200/50 dark:border-amber-700/30",
+    iconBg: "bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400",
+    groupHover: "hover:bg-amber-50 dark:hover:bg-amber-500/10 hover:text-amber-700 dark:hover:text-amber-300",
+    activeGradient: 'bg-gradient-to-r from-amber-500 to-yellow-600 shadow-amber-500/20',
+  },
+  brand: {
+    bg: "bg-gradient-to-r from-brand-50 to-indigo-50/50 dark:from-brand-500/10 dark:to-indigo-500/5",
+    text: "text-brand-700 dark:text-brand-300",
+    border: "border-brand-200/50 dark:border-brand-700/30",
+    iconBg: "bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400",
+    groupHover: "hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200",
+    activeGradient: 'bg-gradient-to-r from-brand-500 to-indigo-600 shadow-brand-500/20',
+  }
+};
+
 const NAV = [
+  {
+    group: "Feedback & Bugs",
+    items: [{ id: "feedback", label: "Feedback & Bugs", Icon: Bug, color: 'rose' }],
+  },
   {
     group: "Start Here",
     items: [
-      { id: "overview", label: "How to Contribute", Icon: BookOpen },
-      { id: "first-lesson", label: "Your First Lesson", Icon: Play },
-      { id: "anatomy", label: "Cell Types", Icon: Eye },
+      { id: "overview", label: "How to Contribute", Icon: BookOpen, color: 'emerald' },
+      { id: "first-lesson", label: "Your First Lesson", Icon: Play, color: 'emerald' },
+      { id: "anatomy", label: "Cell Types", Icon: Eye, color: 'emerald' },
     ],
   },
   {
     group: "Content",
     items: [
-      { id: "types", label: "Lesson Types", Icon: Layers },
-      { id: "formatting", label: "Formatting Guide", Icon: FileText },
+      { id: "types", label: "Lesson Types", Icon: Layers, color: 'violet' },
+      { id: "formatting", label: "Formatting Guide", Icon: FileText, color: 'violet' },
     ],
   },
   {
     group: "Code & Python",
-    items: [{ id: "opencalc", label: "opencalc Library", Icon: Terminal }],
+    items: [{ id: "opencalc", label: "opencalc Library", Icon: Terminal, color: 'sky' }],
   },
   {
     group: "Visualizations",
     items: [
-      { id: "use-viz", label: "Using Vizs", Icon: Zap },
-      { id: "build-viz", label: "Building Vizs", Icon: Code2 },
+      { id: "use-viz", label: "Using Vizs", Icon: Zap, color: 'fuchsia' },
+      { id: "build-viz", label: "Building Vizs", Icon: Code2, color: 'fuchsia' },
     ],
   },
   {
     group: "Quality",
-    items: [{ id: "standards", label: "Content Standards", Icon: CheckSquare }],
+    items: [{ id: "standards", label: "Content Standards", Icon: CheckSquare, color: 'emerald' }],
   },
   {
     group: "AI Generation",
-    items: [{ id: "ai-prompts", label: "AI Prompts", Icon: Bot }],
+    items: [{ id: "ai-prompts", label: "AI Prompts", Icon: Bot, color: 'indigo' }],
   },
   {
     group: "Help",
     items: [
-      { id: "troubleshooting", label: "Troubleshooting", Icon: Wrench },
-      { id: "about", label: "About", Icon: Heart },
+      { id: "troubleshooting", label: "Troubleshooting", Icon: Wrench, color: 'amber' },
+      { id: "about", label: "About", Icon: Heart, color: 'rose' },
     ],
   },
 ];
 
 const SECTION_MAP = {
+  feedback: SectionFeedback,
   overview: SectionOverview,
   "first-lesson": SectionFirstLesson,
   anatomy: SectionAnatomy,
@@ -3318,7 +3635,7 @@ const SECTION_MAP = {
 // ─── MAIN MODAL ──────────────────────────────────────────────────────────────
 
 export default function HelpModal({ isOpen, onClose }) {
-  const [activeSection, setActiveSection] = useState("overview");
+  const [activeSection, setActiveSection] = useState("feedback");
 
   useEffect(() => {
     if (!isOpen) return;
@@ -3381,22 +3698,23 @@ export default function HelpModal({ isOpen, onClose }) {
                 <div className="space-y-1">
                   {group.items.map((item) => {
                     const isActive = activeSection === item.id;
+                    const c = SIDEBAR_COLORS[item.color || 'brand'];
                     return (
                       <button
                         key={item.id}
                         onClick={() => setActiveSection(item.id)}
                         className={`group flex items-center gap-3 w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                           isActive
-                            ? "bg-gradient-to-r from-brand-50 to-indigo-50/50 dark:from-brand-500/10 dark:to-indigo-500/5 text-brand-700 dark:text-brand-300 shadow-sm border border-brand-200/50 dark:border-brand-700/30"
-                            : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200 border border-transparent"
+                            ? `${c.bg} ${c.text} shadow-sm border ${c.border}`
+                            : `text-slate-600 dark:text-slate-400 border border-transparent ${c.groupHover}`
                         }`}
                       >
-                        <div className={`p-1.5 rounded-lg transition-colors ${isActive ? "bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400" : "bg-transparent text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"}`}>
+                        <div className={`p-1.5 rounded-lg transition-colors ${isActive ? c.iconBg : "bg-transparent text-slate-400 group-hover:text-inherit"}`}>
                           <item.Icon className="w-4 h-4 shrink-0" />
                         </div>
                         <span className="tracking-tight">{item.label}</span>
                         {isActive && (
-                          <ChevronRight className="w-4 h-4 ml-auto text-brand-400 dark:text-brand-500 opacity-50" />
+                          <ChevronRight className="w-4 h-4 ml-auto opacity-50" />
                         )}
                       </button>
                     );
@@ -3408,20 +3726,23 @@ export default function HelpModal({ isOpen, onClose }) {
 
           {/* Mobile tabs */}
           <div className="sm:hidden w-full shrink-0 flex gap-2 overflow-x-auto px-4 py-3 border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md absolute top-0 left-0 z-40 shadow-sm sidebar-scroll">
-            {NAV.flatMap((g) => g.items).map((item) => (
+            {NAV.flatMap((g) => g.items).map((item) => {
+              const c = SIDEBAR_COLORS[item.color || 'brand'];
+              const isActive = activeSection === item.id;
+              return (
               <button
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 border ${
-                  activeSection === item.id 
-                    ? "bg-gradient-to-r from-brand-500 to-indigo-600 text-white border-transparent shadow-md shadow-brand-500/20" 
-                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700"
+                  isActive 
+                    ? `${c.activeGradient} text-white border-transparent shadow-md` 
+                    : `bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 ${c.groupHover}`
                 }`}
               >
                 <item.Icon className="w-3.5 h-3.5" />
                 {item.label}
               </button>
-            ))}
+            )})}
           </div>
 
           {/* Content */}

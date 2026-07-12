@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import type { CalendarEvent } from './types'
 import { EVENT_COLORS } from './types'
 
@@ -12,6 +12,7 @@ interface ToastItem {
 export default function NotificationToast() {
   const [toasts, setToasts] = useState<ToastItem[]>([])
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -64,7 +65,7 @@ export default function NotificationToast() {
               </p>
               <button
                 type="button"
-                onClick={() => navigate('/calendar')}
+                onClick={() => { if (location.pathname !== '/calendar') navigate('/calendar') }}
                 className="text-[11px] font-semibold mt-1"
                 style={{ color }}
               >

@@ -431,17 +431,21 @@ export default function LessonView({ lesson, executor, ui, onBack, onBackToSerie
 
           {/* Debug tab */}
           {rightTab === 'debug' && (
-            <LessonDebugPanel
-              events={events}
-              step={traceStep}
-              heap={heap}
-              ui={ui}
-            />
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <LessonDebugPanel
+                events={events}
+                step={traceStep}
+                heap={heap}
+                ui={ui}
+              />
+            </div>
           )}
 
           {/* Tutor tab */}
           {rightTab === 'tutor' && step && (
-            <DeltaTutor lesson={lesson} step={step} ui={ui} />
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <DeltaTutor lesson={lesson} step={step} ui={ui} />
+            </div>
           )}
 
         </div>

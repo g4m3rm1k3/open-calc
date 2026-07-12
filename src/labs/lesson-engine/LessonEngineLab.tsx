@@ -7,6 +7,31 @@ import { SERIES } from './series'
 import type { SeriesMeta } from './series'
 import type { ParsedLesson } from '../../engine/lesson/types'
 import { resetSQLDatabase } from '../../utils/inlineRunner.js'
+import { GLASS_META } from '../../styles/courseColors.js'
+import CircularProgress from '../../components/ui/CircularProgress.jsx'
+
+function getSeriesMeta(series: SeriesMeta) {
+  const langColorMap: Record<string, keyof typeof GLASS_META> = {
+    python: 'emerald',
+    javascript: 'yellow',
+    html: 'orange',
+    css: 'sky',
+    cpp: 'blue',
+    csharp: 'purple',
+    java: 'red',
+    typescript: 'blue',
+    sql: 'teal',
+    bash: 'slate'
+  }
+
+  if (series.id === 'dsa-python') return GLASS_META['indigo'];
+  if (series.id === 'css-professional') return GLASS_META['violet'];
+  if (series.id === 'css-visual-design') return GLASS_META['pink'];
+  if (series.id === 'contributor-series') return GLASS_META['slate'];
+
+  const color = langColorMap[series.lang] || 'slate';
+  return GLASS_META[color] || GLASS_META['slate'];
+}
 
 // Vite ?raw imports for all lesson markdown files
 import pfLevel0  from './content/python-fundamentals/level-0.md?raw'
@@ -499,10 +524,10 @@ export default function LessonEngineLab({ onBack }: Props) {
 
   return (
     <div
-      className={`w-full h-screen flex flex-col overflow-hidden ${ui.bg0} ${ui.txt1}`}
+      className={`w-full h-full flex flex-col overflow-hidden ${ui.bg0} ${ui.txt1}`}
     >
       {view.kind === 'series-list' && (
-        <SeriesListView ui={ui} onBack={onBack} onSelectSeries={s => setView({ kind: 'level-list', series: s })} />
+        <SeriesListView ui={ui} onBack={onBack} onSelectSeries={s => setView({ kind: 'level-list', series: s })} completed={completed} />
       )}
       {view.kind === 'level-list' && (
         <LevelListView ui={ui} series={view.series} completed={completed} available={LESSON_FILES} onBack={() => setView({ kind: 'series-list' })} onSelectLevel={file => openLesson(file, view.series)} onResetProgress={() => resetSeriesProgress(view.series.id)} />
@@ -532,40 +557,63 @@ export default function LessonEngineLab({ onBack }: Props) {
 
 // ── Series list ───────────────────────────────────────────────────────────────
 
-function SeriesListView({ ui, onBack, onSelectSeries }: {
+function SeriesListView({ ui, onBack, onSelectSeries, completed }: {
   ui: any
   onBack?: () => void
   onSelectSeries: (s: SeriesMeta) => void
+  completed: Set<string>
 }) {
   return (
     <div className="flex flex-col h-full">
-      <div className={`flex items-center gap-3 px-4 py-2.5 border-b ${ui.border} ${ui.bg1} shrink-0`}>
+      <div className={`flex items-center gap-3 px-4 py-2.5 border-b ${ui.border} ${ui.bg1} shrink-0 shadow-sm z-10 relative`}>
         {onBack && (
-          <button type="button" onClick={onBack} className={`text-sm ${ui.txt2} ${ui.hoverTx} bg-transparent border-none cursor-pointer`}>
+          <button type="button" onClick={onBack} className={`text-sm ${ui.txt2} ${ui.hoverTx} bg-transparent border-none cursor-pointer flex items-center gap-1`}>
             ← Labs
           </button>
         )}
         <span className={`text-sm font-bold ${ui.txt1}`}>Learn to Code</span>
       </div>
-      <div className="flex-1 overflow-y-auto p-6">
-        <h1 className={`text-2xl font-bold mb-1 ${ui.txt1}`}>Choose a series</h1>
-        <p className={`text-sm mb-6 ${ui.txt2}`}>Write real code. Run it against real tests. See what's happening inside.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {SERIES.map(s => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => onSelectSeries(s)}
-              className={`text-left p-5 rounded-2xl border ${ui.border} ${ui.bg1} ${ui.hoverBg} transition-all cursor-pointer`}
-            >
-              <div className="text-3xl mb-3">{s.emoji}</div>
-              <div className={`font-semibold text-base mb-1 ${ui.txt1}`}>{s.label}</div>
-              <div className={`text-xs mb-3 ${ui.txt2}`}>{s.description}</div>
-              <div className={`text-xs font-semibold uppercase tracking-wide ${ui.txt2}`}>
-                {s.levels.length} {s.levels.length === 1 ? 'level' : 'levels'}
-              </div>
-            </button>
-          ))}
+      <div className={`flex-1 overflow-y-auto p-6 lg:p-12 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5`}>
+        <div className="max-w-7xl mx-auto">
+          <h1 className={`text-4xl font-black tracking-tight mb-2 ${ui.txt1}`}>Choose a series</h1>
+          <p className={`text-lg mb-10 ${ui.txt2} max-w-2xl`}>Write real code. Run it against real tests. See what's happening inside.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {SERIES.map(s => {
+              const meta = getSeriesMeta(s);
+              const doneCount = s.levels.filter(l => completed.has(`${s.id}:${l.level}`)).length;
+              const progress = s.levels.length > 0 ? (doneCount / s.levels.length) * 100 : 0;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => onSelectSeries(s)}
+                  className={`relative flex flex-col text-left p-6 rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden group 
+                    ${ui.border} ${ui.bg1} hover:-translate-y-1 hover:shadow-xl`}
+                >
+                  <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 ${meta.bar}`} />
+                  <div className={`text-4xl mb-4 w-14 h-14 flex items-center justify-center rounded-2xl bg-white/50 dark:bg-black/20 backdrop-blur-sm border ${meta.border} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                    <span style={{ filter: `drop-shadow(${meta.glow})` }}>{s.emoji}</span>
+                  </div>
+                  <div className={`font-black text-xl mb-2 bg-clip-text text-transparent bg-gradient-to-r ${meta.header}`}>
+                    {s.label}
+                  </div>
+                  <div className={`text-sm mb-6 leading-relaxed ${ui.txt2} opacity-80 group-hover:opacity-100 transition-opacity`}>
+                    {s.description}
+                  </div>
+                  
+                  <div className="mt-auto pt-4 flex w-full">
+                    <CircularProgress
+                      progress={progress}
+                      label={doneCount === s.levels.length ? "Completed" : (doneCount === 0 ? "Not started" : "In progress")}
+                      subLabel={`${doneCount}/${s.levels.length} complete`}
+                      colorClass={meta.text.split(' ')[0]} // Get the non-dark class for the stroke
+                      glow={meta.glow}
+                    />
+                  </div>
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -584,63 +632,108 @@ function LevelListView({ ui, series, completed, available, onBack, onSelectLevel
   onResetProgress: () => void
 }) {
   const doneCount = series.levels.filter(l => completed.has(`${series.id}:${l.level}`)).length
+  const meta = getSeriesMeta(series)
+  const progress = series.levels.length > 0 ? (doneCount / series.levels.length) * 100 : 0
+
   return (
     <div className="flex flex-col h-full">
-      <div className={`flex items-center gap-3 px-4 py-2.5 border-b ${ui.border} ${ui.bg1} shrink-0`}>
-        <button type="button" onClick={onBack} className={`text-sm ${ui.txt2} ${ui.hoverTx} bg-transparent border-none cursor-pointer`}>
+      <div className={`flex items-center gap-3 px-4 py-2.5 border-b ${ui.border} ${ui.bg1} shrink-0 shadow-sm z-10 relative`}>
+        <button type="button" onClick={onBack} className={`text-sm ${ui.txt2} ${ui.hoverTx} bg-transparent border-none cursor-pointer flex items-center gap-1`}>
           ← Series
         </button>
         <span className={`text-sm font-bold ${ui.txt1}`}>{series.label}</span>
         {doneCount > 0 && (
-          <>
-            <span className="ml-auto text-xs font-semibold text-emerald-400">{doneCount} / {series.levels.length} complete</span>
-            <button
-              type="button"
-              onClick={() => { if (window.confirm('Reset all progress for this series?')) onResetProgress() }}
-              className={`text-xs ${ui.txt2} hover:text-red-400 bg-transparent border-none cursor-pointer transition-colors`}
-            >Reset</button>
-          </>
+          <button
+            type="button"
+            onClick={() => { if (window.confirm('Reset all progress for this series?')) onResetProgress() }}
+            className={`ml-auto text-xs ${ui.txt2} hover:text-red-400 bg-transparent border-none cursor-pointer transition-colors`}
+          >Reset progress</button>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="text-4xl mb-3">{series.emoji}</div>
-        <h1 className={`text-2xl font-bold mb-1 ${ui.txt1}`}>{series.label}</h1>
-        <p className={`text-sm mb-6 ${ui.txt2}`}>{series.description}</p>
-        <div className="flex flex-col gap-2">
-          {series.levels.map((lvl, idx) => {
-            const isDone     = completed.has(`${series.id}:${lvl.level}`)
-            const isReady    = !!available[lvl.file]
-            const prevLevel  = series.levels[idx - 1]
-            const prevDone   = idx === 0 || completed.has(`${series.id}:${prevLevel.level}`)
-            const isUnlocked = isReady && prevDone
-            return (
-              <button
-                key={lvl.level}
-                type="button"
-                onClick={() => isUnlocked && onSelectLevel(lvl.file)}
-                disabled={!isUnlocked}
-                className={`text-left px-5 py-4 rounded-xl border transition-all flex items-center gap-4
-                  ${!isReady    ? `opacity-40 cursor-not-allowed ${ui.border} ${ui.bg1}` :
-                    !isUnlocked ? `opacity-50 cursor-not-allowed ${ui.border} ${ui.bg1}` :
-                    isDone      ? 'cursor-pointer border-emerald-500/40 bg-emerald-500/5' :
-                                  `cursor-pointer ${ui.border} ${ui.bg1} ${ui.hoverBg}`}`}
-              >
-                <span className={`text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded
-                  ${isDone ? 'bg-emerald-500/20 text-emerald-400' : `${ui.bg2} ${ui.txt2}`}`}>
-                  Level {lvl.level}
+      <div className={`flex-1 overflow-y-auto p-6 lg:p-12 bg-gradient-to-br from-transparent to-black/5 dark:to-white/5`}>
+        <div className="max-w-4xl mx-auto">
+          {/* Hero Section */}
+          <div className="flex flex-col md:flex-row gap-8 items-start mb-12">
+            <div className={`text-6xl w-24 h-24 flex items-center justify-center rounded-3xl bg-white/50 dark:bg-black/20 backdrop-blur-md border ${meta.border} shadow-lg shrink-0`}>
+              <span style={{ filter: `drop-shadow(${meta.glow})` }}>{series.emoji}</span>
+            </div>
+            <div>
+              <h1 className={`text-4xl md:text-5xl font-black tracking-tight mb-3 bg-clip-text text-transparent bg-gradient-to-r ${meta.header}`}>
+                {series.label}
+              </h1>
+              <p className={`text-lg mb-6 ${ui.txt2} max-w-2xl leading-relaxed`}>{series.description}</p>
+              
+              {/* Progress bar */}
+              <div className="flex items-center gap-4 max-w-md">
+                <div className={`flex-1 h-3 rounded-full ${ui.bg2} overflow-hidden border ${ui.border}`}>
+                  <div className={`h-full ${meta.bar} transition-all duration-500`} style={{ width: `${progress}%` }} />
+                </div>
+                <span className={`text-sm font-bold ${doneCount === series.levels.length ? 'text-emerald-500' : ui.txt2}`}>
+                  {doneCount} / {series.levels.length} complete
                 </span>
-                <span className={`font-medium ${ui.txt1}`}>{lvl.title}</span>
-                {!isReady
-                  ? <span className={`ml-auto text-xs ${ui.txt2}`}>Coming soon</span>
-                  : !isUnlocked
-                    ? <span className={`ml-auto text-base ${ui.txt2} opacity-50`}>🔒</span>
-                    : isDone
-                      ? <span className="ml-auto text-emerald-400 text-base font-bold">✓</span>
-                      : <span className={`ml-auto text-lg ${ui.txt2}`}>→</span>
-                }
-              </button>
-            )
-          })}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 relative">
+            {/* Connecting line */}
+            <div className={`absolute left-7 top-6 bottom-6 w-0.5 ${ui.bg2} -z-10 rounded-full`} />
+            
+            {series.levels.map((lvl, idx) => {
+              const isDone     = completed.has(`${series.id}:${lvl.level}`)
+              const isReady    = !!available[lvl.file]
+              const prevLevel  = series.levels[idx - 1]
+              const prevDone   = idx === 0 || completed.has(`${series.id}:${prevLevel.level}`)
+              const isUnlocked = isReady && prevDone
+              
+              return (
+                <button
+                  key={lvl.level}
+                  type="button"
+                  onClick={() => isUnlocked && onSelectLevel(lvl.file)}
+                  disabled={!isUnlocked}
+                  className={`relative text-left px-6 py-5 rounded-2xl border transition-all duration-300 flex items-center gap-5 group
+                    ${!isReady    ? `opacity-40 cursor-not-allowed ${ui.border} ${ui.bg1}` :
+                      !isUnlocked ? `opacity-60 cursor-not-allowed ${ui.border} ${ui.bg1}` :
+                      isDone      ? `cursor-pointer ${meta.border} bg-white/40 dark:bg-black/20 hover:scale-[1.01] hover:shadow-md` :
+                                    `cursor-pointer ${meta.border} ${ui.bg1} hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/10`}`}
+                >
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 border-2 shadow-sm transition-colors duration-300
+                    ${isDone ? `border-emerald-500 bg-emerald-500/10 text-emerald-500` : 
+                      isUnlocked ? `${meta.border} ${meta.bar} text-white` : 
+                      `${ui.border} ${ui.bg2} ${ui.txt2}`}`}>
+                    {isDone ? (
+                      <span className="text-xl font-black">✓</span>
+                    ) : !isUnlocked ? (
+                      <span className="text-lg">🔒</span>
+                    ) : (
+                      <span className="text-xl font-black">{lvl.level}</span>
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <span className={`block text-xs font-bold uppercase tracking-widest mb-1
+                      ${isDone ? 'text-emerald-500' : isUnlocked ? meta.text : ui.txt2}`}>
+                      Level {lvl.level}
+                    </span>
+                    <span className={`block text-lg font-bold truncate ${isUnlocked ? ui.txt1 : ui.txt2}`}>
+                      {lvl.title}
+                    </span>
+                  </div>
+
+                  {!isReady ? (
+                    <span className={`shrink-0 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${ui.bg2} ${ui.txt2}`}>
+                      Coming soon
+                    </span>
+                  ) : !isUnlocked ? null : isDone ? null : (
+                    <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${meta.bar} text-white opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-1 shadow-sm`}>
+                      <span className="font-bold text-lg">→</span>
+                    </div>
+                  )}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>

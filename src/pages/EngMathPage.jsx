@@ -32,7 +32,7 @@ const ALL_POSTS = Object.entries(POST_MODULES)
     return num(a) - num(b)
   })
 
-export default function EngMathPage() {
+export default function EngMathPage({ onClose }) {
   const { slug } = useParams()
   const navigate = useNavigate()
 
@@ -56,7 +56,7 @@ export default function EngMathPage() {
         <p className="text-5xl mb-4">📐</p>
         <p className="text-lg font-semibold text-slate-200 mb-2">No lesson found</p>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => (onClose ? onClose() : navigate('/'))}
           className="mt-4 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm hover:bg-indigo-500 transition-colors"
         >
           ← Home
@@ -73,6 +73,7 @@ export default function EngMathPage() {
       slug={post.slug}
       seriesNav={seriesNav}
       lessons={ALL_POSTS.map((p) => ({ slug: p.slug, title: p.title }))}
+      onClose={onClose}
     />
   )
 }

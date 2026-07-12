@@ -1,10 +1,11 @@
 rules_version = '2';
 
-// Covers the only two collections the app actually writes to (see
+// Covers the collections the app actually writes to (see
 // src/context/AuthContext.jsx, src/features/rpg/hooks/useRPGData.js,
-// src/components/ui/ReportBugButton.jsx). No rules existed at all before
-// this — the project was relying on whatever the Firebase console default
-// happened to be. Deploy with: firebase deploy --only firestore:rules
+// src/components/ui/ReportBugButton.jsx, src/hooks/useSuggestions.js).
+// No rules existed at all before this — the project was relying on whatever
+// the Firebase console default happened to be. Deploy with:
+// firebase deploy --only firestore:rules
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -28,6 +29,51 @@ service cloud.firestore {
         && request.resource.data.description.size() > 0
         && request.resource.data.description.size() <= 2000;
       allow read, update, delete: if false;
+    }
+
+    // Suggestion Box (SuggestionBoxButton): public feature ideas — unlike
+    // bugReports above, these ARE meant to be visible to everyone, signed
+    // in or not. Bug reports stay entirely separate and private; this
+    // collection is suggestions only. Only signed-in users can post one;
+    // the profanity check happens client-side before this write, so the
+    // length/shape caps here are the real backstop since client JS can be
+    // bypassed. Status is exactly two values: every doc is created 'open'
+    // here; a maintainer flips it to 'closed' by hand in the console when
+    // it's resolved — that's the only status change this app makes, and
+    // it's what the Feedback & Bugs section's Open/Closed tabs read.
+    match /suggestions/{suggestionId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'open'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.description is string
+        && request.resource.data.description.size() > 0
+        && request.resource.data.description.size() <= 2000;
+      allow update, delete: if false;
+    }
+
+    // Sanitized public copy of a bug report — written alongside the private
+    // bugReports doc above (see useReportBug.js) with title/description/
+    // category only, never the email or userAgent that bugReports carries.
+    // Same status convention as suggestions: created 'open', flipped to
+    // 'closed' by hand in the console once fixed.
+    match /bugs/{bugId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'open'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.description is string
+        && request.resource.data.description.size() > 0
+        && request.resource.data.description.size() <= 2000;
+      allow update, delete: if false;
     }
 
     // Default deny — anything not explicitly allowed above stays closed,

@@ -30,28 +30,28 @@ export default function ConceptNode({ topic, topicMap, onNavigate }) {
 
   return (
     <div className={`flex flex-col h-full bg-slate-50 dark:bg-slate-950 transition-all duration-300`}>
-      {/* Sticky Header */}
-      <div className={`shrink-0 relative bg-gradient-to-br ${c.cover} overflow-hidden px-10 py-8 flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-white/10 dark:border-black/50 z-20 shadow-lg`}>
-        <div className="absolute inset-0 bg-gradient-to-b from-white/20 dark:from-white/10 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
-          style={{ backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,255,255,1) 8px,rgba(255,255,255,1) 9px)' }} />
-        
-        <div className="relative z-10 flex-1">
-          <h2 className="font-black text-[32px] text-white leading-tight drop-shadow-md mb-2">{topic.title}</h2>
-          <div className="text-white/90 text-[15px] leading-relaxed max-w-3xl font-medium drop-shadow-sm">
-            {topic.summary}
-          </div>
-        </div>
-        <div className="relative z-10 flex-shrink-0 mt-1 sm:mt-2">
-          <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm ${c.badge}`}>
-            {topic.category}
-          </span>
-        </div>
-      </div>
-
       {/* Scrollable Body */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth custom-scrollbar">
-        <div className="px-10 py-10 max-w-4xl mx-auto pb-32">
+        {/* Header (Scrolls with content) */}
+        <div className={`relative bg-gradient-to-br ${c.cover} overflow-hidden px-10 py-4 flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-white/10 dark:border-black/50 z-20`}>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/20 dark:from-white/10 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
+            style={{ backgroundImage: 'repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,255,255,1) 8px,rgba(255,255,255,1) 9px)' }} />
+          
+          <div className="relative z-10 flex-1">
+            <h2 className="font-black text-2xl text-white leading-tight drop-shadow-sm mb-1">{topic.title}</h2>
+            <div className="text-white/90 text-[14px] leading-relaxed max-w-3xl font-medium drop-shadow-sm">
+              {topic.summary}
+            </div>
+          </div>
+          <div className="relative z-10 flex-shrink-0 mt-0 sm:mt-0.5">
+            <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border shadow-sm ${c.badge}`}>
+              {topic.category}
+            </span>
+          </div>
+        </div>
+
+        <div className="px-10 py-8 max-w-4xl mx-auto pb-32">
           {/* Intuition */}
           <Section label="In Plain English" color="text-slate-500 dark:text-slate-400">
             <p className="text-slate-800 dark:text-slate-200 text-[15px] leading-relaxed">{topic.intuition}</p>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -103,13 +103,20 @@ function SignInModal({ onClose }) {
   )
 }
 
-function UserMenu({ user, syncing, signOut, onClose }) {
+function UserMenu({ user, syncing, signOut, onClose, anchorRect }) {
+  // Anchored to the actual avatar button's position instead of a hardcoded
+  // screen corner — AuthButton lives on the left of the top bar (right after
+  // the logo), so a hardcoded `right-4` popped the menu up on the opposite
+  // side of the screen from the button that opened it.
+  const style = anchorRect
+    ? { zIndex: 9999, left: Math.round(anchorRect.left), top: Math.round(anchorRect.bottom + 8) }
+    : { zIndex: 9999, left: 16, top: 64 }
   return createPortal(
     <>
       <div className="fixed inset-0" style={{ zIndex: 9998 }} onClick={onClose} />
       <div
-        className="fixed right-4 top-16 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl p-3"
-        style={{ zIndex: 9999 }}
+        className="fixed w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl p-3"
+        style={style}
       >
         <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate mb-1 px-1">
           {user.displayName || user.email}
@@ -140,7 +147,9 @@ export default function AuthButton() {
   const { user, syncing, signOut } = useAuth()
   const [showSignIn, setShowSignIn] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [anchorRect, setAnchorRect] = useState(null)
   const [failedPhotoURL, setFailedPhotoURL] = useState(null)
+  const avatarBtnRef = useRef(null)
 
   if (user === undefined) return null
 
@@ -160,7 +169,11 @@ export default function AuthButton() {
 
   return (
     <>
-      <button onClick={() => setMenuOpen(o => !o)} className="flex items-center rounded-full focus:outline-none flex-shrink-0">
+      <button
+        ref={avatarBtnRef}
+        onClick={() => { setAnchorRect(avatarBtnRef.current?.getBoundingClientRect() ?? null); setMenuOpen(o => !o) }}
+        className="flex items-center rounded-full focus:outline-none flex-shrink-0"
+      >
         {syncing ? (
           <div className="w-7 h-7 rounded-full bg-slate-700 flex items-center justify-center animate-pulse">
             <span className="text-[10px] text-slate-400">…</span>
@@ -178,7 +191,7 @@ export default function AuthButton() {
           </div>
         )}
       </button>
-      {menuOpen && <UserMenu user={user} syncing={syncing} signOut={signOut} onClose={() => setMenuOpen(false)} />}
+      {menuOpen && <UserMenu user={user} syncing={syncing} signOut={signOut} anchorRect={anchorRect} onClose={() => setMenuOpen(false)} />}
     </>
   )
 }

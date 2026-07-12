@@ -61,6 +61,18 @@ export function useReportBug() {
     setSubmitting(true)
     try {
       await addDoc(collection(db, 'bugReports'), report)
+      // Sanitized public copy — title/description/category only, never the
+      // email or userAgent above — so anyone can see what's been reported
+      // without exposing anything from the private triage record.
+      await addDoc(collection(db, 'bugs'), {
+        uid: report.uid,
+        displayName: user.displayName || 'Anonymous',
+        title: report.title,
+        description: report.description,
+        category: report.category,
+        status: 'open',
+        createdAt: serverTimestamp(),
+      })
       await sendWebhook(report)
     } finally {
       setSubmitting(false)

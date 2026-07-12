@@ -1253,7 +1253,7 @@ export default function GameRules({ onClose }) {
   }, {});
 
   return (
-    <div style={{ display:"flex", height:"100vh", background:DARK_BG, fontFamily:"'Inter', sans-serif", overflow:"hidden" }}>
+    <div style={{ display:"flex", height:"100%", background:DARK_BG, fontFamily:"'Inter', sans-serif", overflow:"hidden" }}>
 
       {/* ── SIDEBAR ── */}
       <aside style={{ width:260, flexShrink:0, background:"rgba(15,23,42,0.95)", borderRight:"1px solid rgba(6,182,212,0.2)", display:"flex", flexDirection:"column", overflow:"hidden", backdropFilter:"blur(10px)", zIndex:10 }}>

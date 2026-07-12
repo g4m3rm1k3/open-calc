@@ -54,7 +54,8 @@ export const meta = {
   concept: 'Layout Composition',
   conceptDetail: 'Separating shared chrome (nav, modals, overlays) from page content means pages stay focused. The shell can change structure without touching any page component.',
 }
-const GameRules = lazy(() => import("../../games/GameRules.jsx"));
+import ReferenceOverlay from "../ui/ReferenceOverlay.jsx";
+import ReferencesMenu from "../ui/ReferencesMenu.jsx";
 import FullscreenButton from "../desktop/FullscreenButton.jsx";
 import NavClock from "../desktop/NavClock.jsx";
 const TutorPanel = lazy(() => import("../tutor/TutorPanel.jsx"));
@@ -222,9 +223,17 @@ function TopBar() {
           <FullscreenButton className="nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 [&>svg]:w-[18px] [&>svg]:h-[18px]" />
         </div>
 
+        <ReferencesMenu />
+
+        {/* Not hidden on mobile like most of this row — the Help modal's
+            Feedback & Bugs section (default tab) is now the one place to
+            report a bug or leave a suggestion. It used to have its own
+            icon here plus one in the Taskbar plus a Start Menu entry —
+            three doors to the same room. One door now. */}
         <button
+          data-tour="report-bug"
           onClick={() => window.dispatchEvent(new CustomEvent('oc-toggle-help'))}
-          className="hidden lg:flex nav-tool-btn text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+          className="nav-tool-btn text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
           title="Contributor Docs"
         >
           <span className="text-[15px] font-black leading-none">?</span>
@@ -325,7 +334,7 @@ export default function AppShell({ children }) {
   const [polyOpen, setPolyOpen] = useState(false);
   const [laOpen, setLaOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [gameRulesOpen, setGameRulesOpen] = useState(false);
+  const [referenceKey, setReferenceKey] = useState(null);
   const [scratchSnap, setScratchSnap] = useState(null);
   const [scratchSnapW, setScratchSnapW] = useState(680);
   const handleScratchSnap = useCallback((side, w) => {
@@ -394,9 +403,14 @@ export default function AppShell({ children }) {
   }, []);
 
   useEffect(() => {
-    const handler = () => setGameRulesOpen(g => !g);
-    window.addEventListener('oc-game-rules', handler);
-    return () => window.removeEventListener('oc-game-rules', handler);
+    // Generic entry point for every reference/lookup overlay (formulas, LA
+    // reference, concept explorer, eng math, universal calc, game rules) —
+    // ReferencesMenu, StartMenu, and usePinLauncher all dispatch this instead
+    // of navigating, so opening one never leaves whatever page the user was
+    // actually on.
+    const handler = (e) => setReferenceKey(e.detail?.key ?? null);
+    window.addEventListener('oc-open-reference', handler);
+    return () => window.removeEventListener('oc-open-reference', handler);
   }, []);
 
   useEffect(() => {
@@ -760,9 +774,9 @@ export default function AppShell({ children }) {
             {sigmaOpen && <SigmaCalc onClose={() => setSigmaOpen(false)} />}
             {polyOpen && <PolyCalc onClose={() => setPolyOpen(false)} />}
             {laOpen && <LinearAlgebraCalc onClose={() => setLaOpen(false)} />}
-            {gameRulesOpen && (
+            {referenceKey && (
               <div style={{ position: "fixed", inset: 0, zIndex: 300 }}>
-                <GameRules onClose={() => setGameRulesOpen(false)} />
+                <ReferenceOverlay activeKey={referenceKey} onClose={() => setReferenceKey(null)} />
               </div>
             )}
             {poolOpen && <PhysicsPoolLab onClose={() => setPoolOpen(false)} />}

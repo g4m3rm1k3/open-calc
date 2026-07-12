@@ -13,6 +13,25 @@ const SWATCHES = [
   "#639922","#1d9e75","#378ade","#7f77dd","#d4537e",
 ]
 
+// The app's own logo (same shape as the AppShell tile, colors baked in since
+// this gets parsed outside the app's live Tailwind CSS) — loaded onto the
+// canvas by default so opening SVG Studio always gives you a real starting
+// point to edit and re-export (e.g. as a favicon), not a blank page.
+const DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="logoBgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#logoBgGrad)"/>
+  <g transform="matrix(4.8069 0 0 3.7957 126.0017 180)">
+    <text font-family="'Montserrat','Helvetica Neue',Helvetica,Arial,sans-serif" font-size="75" font-weight="900" fill="#ffffff">
+      <tspan x="-24.7559" y="23.5605">^</tspan>
+    </text>
+  </g>
+</svg>`
+
 const TOOLS = [
   { id: "select",   label: "Select",    icon: "↖" },
   { id: "pen",      label: "Freehand",  icon: "✎" },
@@ -138,8 +157,25 @@ export default function SvgStudioPage({ onBack, onClose }) {
     canvas.on("path:created",    pushHistory)
     canvas.on("path:created",    refreshCodeFromCanvas)
 
-    setHistory({ stack: [JSON.stringify(canvas.toDatalessJSON(["__id","__name"]))], idx: 0 })
-    refreshCodeFromCanvas()
+    // Load the app's own logo by default — same code path as a normal SVG
+    // import (fabric.loadSVGFromString + groupSVGElements) — so opening SVG
+    // Studio always gives you a real starting point to edit and re-export
+    // (e.g. as a favicon) instead of a blank canvas. isRestoring suppresses
+    // pushHistory while this loads so it becomes history entry zero, not a
+    // separate undo-able step on top of an empty canvas.
+    ;(async () => {
+      const result = await fabric.loadSVGFromString(DEFAULT_SVG)
+      const objects = result.objects.filter(Boolean)
+      const group = fabric.util.groupSVGElements(objects, result.options)
+      group.__id = uid(); group.__name = "Logo"
+      group.set({ left: (CANVAS_W-group.width)/2, top: (CANVAS_H-group.height)/2 })
+      isRestoring.current = true
+      canvas.add(group)
+      canvas.requestRenderAll()
+      setHistory({ stack: [JSON.stringify(canvas.toDatalessJSON(["__id","__name"]))], idx: 0 })
+      isRestoring.current = false
+      refreshCodeFromCanvas()
+    })()
     return () => canvas.dispose()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
