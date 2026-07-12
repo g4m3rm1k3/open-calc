@@ -1,10 +1,11 @@
 // Builds the downloadable "Lesson Prompt" behind the Help modal's Feedback
 // & Bugs rows — for BOTH bugs and suggestions. The contract itself lives at
 // src/docs/BUG_LESSON_CONTRACT.md as a real, standalone document (not a
-// condensed paraphrase) — it embeds the actual src/docs/LESSON_ENGINE_CONTRACT.md
-// in full, plus what changes when the source is a real bug/suggestion taught
-// by an AI with no file access. This file just appends the specific report's
-// details to that contract; it does not restate or thin it.
+// condensed paraphrase) — it's src/docs/LESSON_CONTRACT.md (the real teaching
+// contract used across this app's curriculum), adapted for a bug/suggestion
+// as the case study instead of a planned topic, plus what changes when the
+// teacher is an AI with no file access. This file just appends the specific
+// report's details to that contract; it does not restate or thin it.
 import BUG_LESSON_CONTRACT from '../docs/BUG_LESSON_CONTRACT.md?raw'
 
 export { BUG_LESSON_CONTRACT }
@@ -18,8 +19,9 @@ Reported: ${item.createdAt?.toDate ? item.createdAt.toDate().toISOString() : 'un
 Description:
 ${item.description || '(no description)'}
 
-Apply "Applying this to a bug report" from the contract above to this
-specific report.`
+Apply "What changes for a bug or suggestion, specifically" from the
+contract above to this specific report — the root cause is the concept;
+this bug is the case study, not the point.`
 }
 
 function suggestionTask(item) {
@@ -30,8 +32,9 @@ Suggested: ${item.createdAt?.toDate ? item.createdAt.toDate().toISOString() : 'u
 Description:
 ${item.description || '(no description)'}
 
-Apply "Applying this to a suggestion" from the contract above to this
-specific idea.`
+Apply "What changes for a bug or suggestion, specifically" from the
+contract above to this specific idea — the design decision is the
+concept; this feature is the case study, not the point.`
 }
 
 export function buildLessonPrompt(item) {

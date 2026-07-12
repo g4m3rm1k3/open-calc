@@ -1,557 +1,318 @@
 # Bug & Suggestion → Lesson Contract
 
-This is the [Lesson Engine Contract](LESSON_ENGINE_CONTRACT.md) — the real one, unedited below —
-plus what changes when the source material is a real bug report or feature suggestion from
-this app's Feedback & Bugs board, taught by an AI that does not have direct access to this
-codebase. Everything in the Lesson Engine Contract section still applies in full. Nothing in
-it is softened, shortened, or optional here.
+This is [`LESSON_CONTRACT.md`](LESSON_CONTRACT.md) — the real one, adapted below only where it
+names the Cammastah/C# project specifically, since a bug or suggestion here isn't from that
+project. Every rule, every standard, every checklist item carries over unchanged. This is not a
+thinner version. Nothing below is softened, shortened, or optional.
 
-A lesson produced from this document that only describes a fix or summarizes a feature has not
-met this contract. Description is not teaching. See "The Difference Between Describing and
-Teaching" logic embedded in "What Taught Means" below — the test is the same one this whole
-platform holds every lesson to.
+A lesson produced from this document that only describes a fix or hands over a file to add has
+not met this contract. That is documentation, not teaching — see "The Difference Between
+Describing and Teaching" below.
 
 ---
 
-## What changes for a bug or suggestion
+## The bug or feature is the laboratory, not the goal
 
-A normal lesson-engine lesson starts from a planned curriculum topic — the author already knows
-which concepts they're teaching before they write a line. A bug or suggestion lesson starts from
-the opposite direction: real code broke, or someone wants a real feature, and the concept worth
-teaching has to be *found* — it's whatever the actual root cause is, or whatever the actual
-design decision is, not a topic chosen in advance.
+This is the single most important rule for this use case, and the one most likely to get missed:
+**the specific bug or feature is not what the lesson is for.** It's the concrete situation that
+puts the learner in a position where some real engineering or CS idea *has* to come up — not
+because a curriculum scheduled it, but because this real, reported thing needed it.
 
-That changes two things, and only two things:
+A lesson that only explains how to fix *this* bug or build *this* feature has not succeeded, no
+matter how clearly it's written — because that lesson becomes worthless the moment the bug is
+fixed or the feature ships. Nobody will ever need to fix this exact, already-fixed bug again.
 
-1. **Concept selection is discovery, not planning.** Before the Concept Loop can run, the
-   teacher (the AI) has to identify what the root cause or design decision actually is, from
-   real code — not guess, not pattern-match against a similar bug it has seen in training data.
-2. **The teacher has no file access.** Most contributors will paste this into a free chat AI
-   (ChatGPT, Claude.ai) with no tools, no repo attached. Getting real code in front of it is a
-   short, practical, one-time step — not a substitute for teaching, and not something to pad out
-   into a long back-and-forth. See "Getting Real Code In Front Of The AI" below.
+Every lesson here is a **case study**, and must be introduced as one. Not "today we add a help
+button to mobile" — "today we study how this app controls what's visible at which screen size;
+our case study is adding a help button to mobile." State the engineering idea before the feature
+name. The feature is disposable. The idea is not.
 
-Everything after that — the actual teaching — runs the exact same Concept Loop, the exact same
-"What Taught Means" seven-item bar, the exact same atom classification, the exact same
-Define-at-Use rule, on whatever concept the bug or suggestion turned out to require.
+---
+
+## The Silent Knowledge Problem
+
+Tutorials have a structural flaw: they teach the topic and skip everything around it. A learner
+who fixes a bug but doesn't know what the terminal command they ran actually did, or why the fix
+lives in the file it lives in, has absorbed nothing that transfers to the next bug.
+
+**If something appears in the lesson — regardless of what domain it comes from — it is taught at
+the moment it appears.** No concept earns a pass by being "obvious," "just tooling," or "not the
+point of this lesson." A terminal command is not "just how you run things." A prop being passed
+down three components is not "just how React works." These are concepts with reasons, and they
+are taught the same way the actual bug's root cause is taught: from first principles, at the
+moment they appear, why before what.
+
+First use, then assume: explain a concept fully once. After that, reference it by name.
+
+---
+
+## The Difference Between Describing and Teaching
+
+A description tells you what something does. A lesson explains why it works, what it connects
+to, and what breaks without it.
+
+**Description:** The bug was that `useEffect` didn't have `userId` in its dependency array, so
+it ran stale.
+
+**Teaching:** React re-runs an effect only when a value in its dependency array changes between
+renders. `userId` was read inside the effect but left out of the array, so React had no way to
+know the effect depended on it — from React's point of view, nothing it was watching had
+changed, so it never re-ran. This is the same closure-over-stale-value problem that shows up
+anywhere a callback captures a variable and is expected to see it change later without being
+told to re-subscribe.
+
+The test: could the learner explain not just what the fix does, but why it was broken and what
+else in this codebase could break the same way?
+
+---
+
+## The Two Lenses
+
+Every non-trivial piece of code in the lesson is explained through two lenses.
+
+**The CS lens** — What is this computationally? Name the concept: closure, hash lookup,
+recursion, event loop, race condition, memoization. Do not leave a concept implicit.
+
+**The SE lens** — How does this fit the system? Name the principle: separation of concerns,
+single responsibility, prop drilling vs. context, controlled vs. uncontrolled component. Explain
+why the decision was made, not just what it is.
+
+Both lenses apply to every significant piece of code involved in the fix or feature. Neither is
+optional.
+
+---
+
+## Concept Labs
+
+Before a construct or pattern the learner hasn't seen is used in the real fix or feature, it
+gets an isolated, disposable demonstration first — stripped of every surrounding complexity from
+this codebase.
+
+**The shape of a concept lab:**
+1. Invent a disposable example — a name and context that means nothing and won't appear in the
+   real code. Never reuse this app's actual component/variable names for a lab.
+2. Write the smallest runnable snippet that demonstrates the concept. A handful of lines.
+3. State exactly what to run (or trace) and what output to expect.
+4. State what that output proves about the concept.
+5. Say explicitly that this snippet is disposable and won't appear in the real fix.
+6. Only then show the real code, and name the connection directly: "this is the same closure
+   behavior you just saw, now happening inside the actual `useEffect` that broke."
+
+Not every bug needs a concept lab — only constructs the learner may not already know. Use
+judgment; the point is isolating the unfamiliar part before it's tangled up with this app's
+specific complexity, not padding the lesson.
+
+---
+
+## Code Standards
+
+**Break to the smallest runnable unit.** Do not present the whole fix and then explain it. Build
+it piece by piece; each piece explained before the next appears.
+
+**No code is in a bubble.** Every snippet connects to something explicit: "this is the state
+variable from the component above," "this is the file the bug report pointed at."
+
+**Names are always descriptive.** No single-letter variables, no unexplained abbreviations. If a
+name needs a comment to make sense, it's a bad name.
+
+**Comments explain the non-obvious.** Never restate the code. A comment that could be deleted
+without losing understanding should be deleted.
+
+---
+
+## Explanation Standards
+
+**Explain before you show.** Structure for every significant piece of code:
+1. **The problem** — what are we solving right now?
+2. **The code** — the smallest piece that solves it
+3. **The walkthrough** — what it actually does, mechanically, when it runs
+4. **The CS explanation** — what concept does this embody?
+5. **The SE explanation** — why designed this way, what it connects to?
+6. **What breaks without it** — concretely, what goes wrong if this is missing or wrong?
+
+Not every step needs to be long — a sentence is enough when a sentence is enough. All six must
+be present for every significant piece of code.
+
+**Walk through the code.** The lenses explain why. The walkthrough explains what, mechanically —
+what values come in, what decisions get made, what comes out. A student should be able to trace
+the execution in their head after reading it.
+
+**Name the concept.** Don't say "we store it in an object." Say "this is a lookup table — direct
+key access, O(1), the standard structure whenever you need name-to-value binding."
+
+**Nothing is assumed.** Every concept the lesson needs is taught in the lesson or briefly
+recapped, regardless of whether an earlier lesson covered it. A reader who's never seen this
+codebase before must be able to follow it end to end.
+
+---
+
+## Define at Use
+
+Every construct, tool, command, or term that appears for the first time is defined at the exact
+point it appears — not in a glossary, not "explained later." After the first definition, use it
+freely. This applies to every domain that shows up, not just the code itself: language syntax,
+imports (what module, what's imported, why this and not something else), data types and why this
+one was chosen, terminal commands (what program, what each flag means, what success/failure
+output looks like), tooling (Vite, npm — what it does, what problem it solves), config file
+fields actually touched, file/directory structure and why it lives where it does, package
+management concepts, git operations, browser/runtime APIs, security (any lesson handling user
+input names the threat and shows the safe pattern), debugging (which tool reveals this class of
+error, how to read the message), and performance where relevant (hot paths, what's expensive and
+why). Only cover the domains that actually appear in this specific fix or feature — the point is
+never silently skipping one that did appear, not force-fitting all of them into every lesson.
+
+---
+
+## The Aha Moment & Repetition
+
+When code or a concept from earlier in the lesson (or from this codebase generally) reappears,
+name the connection explicitly — one sentence is enough: "this is the same pattern the
+`SuggestionBoxButton` modal already uses for its lock-when-signed-out state."
+
+Basic syntax is explained once, then used without comment. Hard concepts — named patterns, SE
+principles, CS ideas — are briefly renamed and reconnected every time they reappear, even late in
+the lesson.
+
+---
+
+## Maximum Extraction
+
+Every piece of code involved is a teaching opportunity beyond just "this fixes the bug" or "this
+builds the feature." If the code embodies more than one concept, teach more than one. If an
+engineering decision was made, explain it. If the same pattern showed up earlier in this
+codebase, name it.
+
+The learner should finish knowing: what was built/fixed, what data structure or pattern was used
+and why, the CS lens, the SE lens, what it connects to elsewhere in this codebase, and where this
+same idea shows up in software generally.
+
+---
+
+## Connection Standards
+
+**Connect backwards** — state what the lesson builds on ("this file already had X; the bug/
+feature touches it because Y").
+
+**Connect forwards** — what does understanding this make possible next.
+
+**Connect to the real world** — name where this exact idea shows up in production software
+generally, not just in this app. "This is the same stale-closure problem every framework with a
+dependency-array-style effect system has to solve."
+
+**Recognition** — for genuinely hard concepts, list several unrelated places the same idea
+recurs, not just one. This is what turns "I saw this once" into "I now notice this pattern."
+
+---
+
+## Structure
+
+Every lesson has these six sections, in this order:
+
+1. **What you will build** — one paragraph naming the general concept as a case study, with the
+   specific bug/feature as the vehicle. Not just "we fix the mobile help bug."
+2. **What you need to know first** — explicit prerequisites (link to the "How to Contribute"
+   lessons if this assumes basics like Git or reading an unfamiliar file).
+3. **The lesson** — the actual teaching, in smallest-runnable-unit steps, each with a walkthrough
+   and both lenses, grounded in this codebase's real code.
+4. **Connect the pieces** — after all the code is shown, map it back to the whole system.
+5. **What breaks without this** — one concrete failure mode. Show the actual bug, or the actual
+   gap the missing feature leaves.
+6. **Definition of done** — a checklist the learner verifies themselves, including a git commit
+   message in the format taught in the "How to Contribute" lessons.
+
+No YAML frontmatter, no special file format — this is a Markdown document following the
+structure above. Where it eventually lives (a blog post, contributor docs, a course lesson) is
+the maintainer's call once it exists, not something to guess at up front.
+
+---
+
+## What changes for a bug or suggestion, specifically
+
+1. **The concept isn't chosen in advance — it has to be found.** Before anything above can run,
+   determine what the actual root cause is (for a bug) or what the actual design decision is
+   (for a suggestion), from real code.
+2. **The teacher — the AI reading this — very likely has no file access.** Most contributors
+   paste this into a free chat AI (ChatGPT, Claude.ai), not a tool-using coding agent. Getting
+   real code in front of it is a short, practical, one-time step, not the task itself:
+   - Based on the app context below and the report, name the specific file(s) most likely
+     involved and ask the contributor to paste their contents (or a targeted search result).
+   - No invented code, ever. A lesson built on code the AI made up teaches the wrong thing,
+     silently, and there's no way for anyone reading it later to know that.
+   - Once real code is in front of you, this step is done — don't keep collecting files past
+     what the lesson actually needs.
+3. **The DEMONSTRATE / walkthrough code must be the real, specific fix or feature** — not a
+   similar bug, not a generic version of the feature. Grounding is what makes the lesson
+   trustworthy. But the *point being taught* — per "The bug or feature is the laboratory, not
+   the goal" above — is the general concept the specific case makes concrete. Both are required:
+   real code, general lesson. A lesson that's generic in its code has failed. A lesson that never
+   rises above "here's what I did for this one bug" has also failed.
 
 ---
 
 ## Before you start
 
 If you haven't completed the **"How to Contribute"** lessons yet (Help button → Feedback & Bugs
-→ "Open the lessons"), do that first. This contract assumes you can find your way around an
-unfamiliar file, read a React component, and know basic Git.
+→ "Open the lessons"), do that first — this assumes you can find your way around an unfamiliar
+file, read a React component, and know basic Git.
 
-**App orientation**, so the AI teaching you isn't guessing at the codebase either:
+**App orientation:**
 
 UpSkillOS (repo folder name: `open-calc`) is a free, open-source, browser-native STEM learning
-platform — 784 lessons across 31 courses, plus interactive labs, simulators, and games. Stack:
-React 18 + Vite + Tailwind CSS, Firebase for auth and cross-device sync, no paid backend. Runs
-entirely client-side; Python runs in-browser via Pyodide.
+platform — React 18 + Vite + Tailwind CSS, Firebase for auth and cross-device sync, no paid
+backend.
 
-Where things live:
-- `src/courses/{course-id}/{N}-{chapter-slug}/{NNN}-{lesson-slug}.js` — the main curriculum
-  (calculus, physics, etc). A different JS-object schema from the lesson-engine format below —
-  not what this contract produces, but useful to recognize if you land there while searching.
-- `src/labs/lesson-engine/` — the short-form lesson runtime this contract's output targets.
-- `src/labs/lesson-engine/series.ts` — registers every series (id, label, ordered list of
-  `{level, title, file}`).
-- `src/labs/lesson-engine/content/{series-id}/level-{N}.md` — the actual lesson files.
-- `src/components/`, `src/context/`, `src/hooks/` — shared UI, React context providers (auth,
-  theme, progress), and hooks respectively.
-- `src/pages/` — top-level routed pages. `src/App.jsx` wires routes to pages.
+Where things live: `src/courses/` is the main curriculum (784 lessons, 31 courses) — a JS-object
+format, separate from this document. `src/labs/lesson-engine/` is a newer, much smaller runtime
+for short code-forward series (Git, CSS, the "How to Contribute" series) — also a different,
+narrower format, and not what this document's output should be forced into. `src/components/`,
+`src/context/`, `src/hooks/` — shared UI, React context, hooks. `src/pages/` — routed pages,
+wired up in `src/App.jsx`.
 
-Local dev: `npm install` then `npm run dev` (Vite, hot reload). `npm run build` before opening a
-PR — catches import/reference errors. Contribution workflow: fork the repo, branch off main,
-make focused changes, run `npm run build`, push to your fork, open a PR against
-`g4m3rm1k3/upskillos`.
+Local dev: `npm install` then `npm run dev`. `npm run build` before a PR. Workflow: fork, branch
+off main, focused changes, PR against `g4m3rm1k3/upskillos`.
 
 ---
 
-## Getting real code in front of the AI
+## Checklist
 
-This is the only part of the process that is not teaching, and it should be kept brief:
+**Framing**
+- [ ] The lesson is introduced as a case study of a general concept, not as "how to fix/build
+      this one thing"
+- [ ] The general concept is named explicitly, before the specific feature/bug name
 
-1. Based on the app orientation above and the bug/suggestion report, the AI names the specific
-   file(s) most likely involved and asks you to paste their contents (or the output of a
-   targeted search — grep for a keyword from the title/description).
-2. You paste it back. No invented code, ever — a lesson built on code the AI made up teaches
-   the wrong thing, silently, and there is no way for a learner reading it later to know that.
-3. Once real code is in front of the AI, this step is done. It should not keep negotiating for
-   more files unless the Concept Loop below genuinely requires something it doesn't have —
-   that's a sign of a missing prerequisite concept, not a reason to keep collecting files.
+**Teaching**
+- [ ] Every significant piece of code has a walkthrough, not just lenses
+- [ ] Every significant piece of code has both the CS lens and the SE lens
+- [ ] No concept is left implicit — every pattern is named
+- [ ] No concept is assumed — everything used is explained here
+- [ ] "What breaks without this" is concrete, using this bug/feature's real failure mode
 
-Everything from here on is the Lesson Engine Contract, unmodified.
+**Concept Labs**
+- [ ] Every unfamiliar construct gets an isolated lab before appearing in the real code
+- [ ] Every lab uses a disposable name, never this app's real identifiers
+- [ ] Every lab states what to run/expect and what that proves
+- [ ] Every lab is immediately followed by the real code, connection named directly
+
+**Define at Use**
+- [ ] Every domain that actually appears (syntax, imports, terminal commands, tooling, config,
+      file structure, git, security, debugging) is explained at first appearance in this lesson
+
+**Grounding**
+- [ ] Every code example is the real, specific fix or feature — not a generic stand-in
+- [ ] The contributor provided the real code; none of it was invented or guessed
+
+**Connection**
+- [ ] Connects backwards to what already exists in this codebase
+- [ ] Connects forwards to what this makes possible
+- [ ] Names at least one real-world production-software connection
+- [ ] Hard concepts get a "recognition" list of several other places they recur
+
+**Structure**
+- [ ] All six sections present, in order
+- [ ] Definition of done is specific and verifiable, including a real git commit message
 
 ---
 
-## The Lesson Engine Contract (binding, unedited)
-
-### File Format
-
-Every lesson file starts with a frontmatter block:
-
-```
----
-series: dsa-python
-level: 1
-title: Two Pointers
-lang: python
----
-```
-
-Fields:
-- `series` — series identifier. Must match an entry in `series.ts`.
-- `level` — integer. Level 0 is first. Levels within a series build on each other.
-- `title` — names the concept, not the activity. "Two Pointers" not "Learning About Two Pointers."
-- `lang` — default language for code fences (`python`, `javascript`, `typescript`, `sql`).
-
-Everything before the first `##` header is the intro paragraph. It merges into the first step
-automatically. State what the lesson covers, why it matters, and what the learner will be able
-to do. Do not waste it on "In this lesson we will learn about..."
-
-Each `##` header creates one navigable step. Every step is either a **concept step** or a
-**challenge step** — never a mix of both.
-
-Fence types the engine recognises:
-- ` ```python ` / ` ```js ` / ` ```ts ` / ` ```sql ` — runnable code example
-- ` ```text ` — display-only block (execution traces, tables, diagrams) — no Run button
-- ` ```challenge ` — editable editor pre-filled with the starter code
-- ` ```test ` — assertions run against the learner's code
-
-### What "Taught" Means
-
-A concept is considered **taught** only when the learner has been shown all of the following:
-
-1. **What it is** — a precise name and definition
-2. **Why it exists** — the problem it solves; what you would do without it
-3. **How it behaves** — including edge cases, failure cases, and surprising behaviour
-4. **Where it appears** — in the current code, at the exact line
-5. **How it connects** — to concepts already taught in this or prior lessons
-6. **What comes next** — a forward hint: what this concept makes possible
-7. **At least one concrete example** — runnable, with predicted output
-
-Only after all seven are satisfied may the lesson rely on that concept without reintroducing it.
-
-### The Teaching Atom
-
-Every piece of code — however short — is composed of **atoms**: the smallest units of
-understanding a learner must have before the code makes sense.
-
-For a line like `print(total + tax)`, the atoms are:
-
-```text
-print()         — built-in function, what it does, what it writes to
-variable        — name bound to a value
-+               — addition operator, operand types, result type
-expression      — a combination of values and operators that evaluates to one value
-function call   — syntax: name(arguments), evaluation order
-parentheses     — delimit the argument list; not grouping here
-stdout          — where print() sends output
-```
-
-The lesson loop runs over atoms, not over lines of code.
-
-**Atom classification:**
-
-Every atom in every example falls into one of three tiers:
-
-| Tier | Definition | Required action |
-|---|---|---|
-| **Language atom** | Syntax, keyword, operator, built-in, method, control flow | Teach at first use; reference briefly on reuse |
-| **CS atom** | Algorithm, data structure, complexity, invariant, design decision | Teach at first use; name and connect on every reuse |
-| **SE atom** | Naming, readability, API design, testability, production patterns | Add as SE Lens when it deepens understanding |
-
-Language and CS atoms are separate teaching obligations. A line like `left += 1` contains `+=`
-(language atom) and "pointer movement preserving an invariant" (CS atom). They are taught
-separately.
-
-### Concept Scope
-
-Every concept taught in a lesson has exactly three tiers of scope:
-
-**Primary objectives** — must be fully taught before the learner continues. The challenge tests
-these. The checklist verifies these.
-
-**Secondary objectives** — may be introduced briefly when they genuinely deepen understanding of
-the primary concept. Not tested. Not required for the challenge.
-
-**Out-of-scope** — acknowledged with one sentence if they arise naturally ("stdout is the output
-stream — we cover streams in a later lesson"), then deferred. Never expanded into a full
-teaching sequence.
-
-This prevents a lesson about `print()` from becoming a lesson about operating systems, and a
-lesson about two pointers from becoming a lesson about memory layout. State the scope at the top
-of each step if it is not obvious.
-
-### The Concept Loop
-
-This is the core algorithm. Run it once per concept. Do not advance to the next concept until
-every step is complete.
-
-```
-─────────────────────────────────────────────────────────────────
-CONCEPT LOOP
-─────────────────────────────────────────────────────────────────
-
-  SELECT the next concept to teach.
-
-  ├── Already taught in this lesson or a prior level?
-  │       YES → Reference briefly if useful. Do not re-explain.
-  │              Language atoms: one sentence.
-  │              CS atoms: one sentence naming the concept and connecting it to
-  │              the current code.
-  │       NO  → Continue.
-  │
-  ├── Does the learner need prerequisite knowledge?
-  │       YES → Run the CONCEPT LOOP for the prerequisite first.
-  │              Return here when complete.
-  │       NO  → Continue.
-  │
-  ├── INTRODUCE
-  │     Name the concept precisely.
-  │     State the primary learning objective.
-  │     State the scope (primary / secondary / out-of-scope).
-  │
-  ├── EXPLAIN
-  │     Explain WHY the concept exists.
-  │     Explain WHAT it does, including edge cases and failure cases.
-  │     Add instructional elements that improve understanding:
-  │       traces, tables, comparisons, analogies, diagrams, callouts.
-  │     Connect backwards to what the learner already knows.
-  │
-  ├── DEMONSTRATE
-  │     Present a runnable code example.
-  │
-  │     ┌── ATOM CHECK ───────────────────────────────────────────┐
-  │     │                                                         │
-  │     │  Identify every atom in the example.                    │
-  │     │                                                         │
-  │     │  For each atom:                                         │
-  │     │    Taught? → Reference if CS atom. Skip if language.    │
-  │     │    Not taught? → Teach it now (run CONCEPT LOOP).       │
-  │     │                                                         │
-  │     │  Repeat until every significant atom is accounted for.  │
-  │     │                                                         │
-  │     └─────────────────────────────────────────────────────────┘
-  │
-  │     Does the example leave anything important unclear?
-  │       YES → Add another example. Run ATOM CHECK again.
-  │       NO  → Continue.
-  │
-  ├── ANALYZE
-  │     Would a CS Lens deepen understanding?
-  │       YES → Add CS Lens (format: **CS lens:** ...).
-  │     Would an SE Lens deepen understanding?
-  │       YES → Add SE Lens (format: **SE lens:** ...).
-  │
-  ├── CONNECT
-  │     Connect forwards: what does this concept make possible?
-  │     Connect to the real world: where does this appear in production software?
-  │
-  ├── INSTRUCTIONAL SATURATION CHECK
-  │
-  │     For every primary learning objective:
-  │       □ Named and defined
-  │       □ WHY explained
-  │       □ HOW it behaves shown (including edge cases)
-  │       □ WHERE in the current code it appears
-  │       □ Connected to prior concepts
-  │       □ Forward hint given
-  │       □ At least one concrete example run
-  │
-  │     All boxes checked?
-  │       NO  → Return to EXPLAIN. Add what is missing.
-  │       YES → Continue.
-  │
-  ├── APPLY
-  │     Can the learner solve a challenge using ONLY concepts already taught?
-  │       NO  → A concept is missing. Return to SELECT. Teach it. Come back.
-  │       YES → Create Challenge. Create Tests.
-  │
-  └── More concepts remaining in this lesson?
-          YES → Return to SELECT.
-          NO  → END LESSON.
-```
-
-### Rule: Code Completeness
-
-A runnable example is not complete simply because it executes correctly.
-
-An example is complete only when every significant atom has either:
-
-- been taught previously (language atoms may be used silently; CS atoms are named),
-- been introduced in the current step, or
-- been explicitly scoped out with one sentence of deferral.
-
-Significant atoms include: syntax and keywords, operators and their operand types, built-in
-functions and methods, control flow, algorithms and data structures, design decisions visible in
-the code, naming decisions worth noting.
-
-No significant atom may remain silently unexplained.
-
-### Rule: Concept Introduction
-
-Every atom the learner may not know must be defined at the exact point it first appears — not in
-a glossary, not in a later step, not assumed from prior experience unless it is in the
-prerequisite series.
-
-**Defining a built-in at first use:**
-
-```
-char.isalnum() — returns True if the character is a letter or digit, False otherwise.
-                 "A".isalnum() → True.  " ".isalnum() → False.
-char.lower()   — returns the lowercased version of the character. "A".lower() → "a".
-                 Has no effect on digits or punctuation.
-```
-
-Names must be descriptive. Single-letter names are only acceptable when they are established
-mathematical convention (`c` for Celsius, `x` and `y` for coordinates), and even then the meaning
-is stated explicitly on first use.
-
-### Rule: Instructional Saturation
-
-The stopping condition for explanation is not "enough prose has been written." It is "no primary
-learning objective remains unmet."
-
-Continue adding explanations, examples, traces, comparisons, and debugger walkthroughs until
-every primary objective satisfies all seven items in the "What Taught Means" definition above.
-
-When in doubt, ask: could the learner complete the challenge without looking anything up, using
-only what this step provided? If not, the step is not done.
-
-### Rule: Explanations
-
-Explanations are not limited in number or position. Add as many as the concept requires.
-Explanations may appear before code, after code, between examples, or anywhere they improve
-learning. There is no required alternating pattern.
-
-**Describing vs Teaching**
-
-| Describing | Teaching |
-|---|---|
-| `type()` returns the type of a value. | `type()` reads the type Python stored alongside the value in memory. Python does not know the type of `x` when it compiles your file — it reads the type at the moment `type(x)` runs. This is what makes dynamic typing work. |
-
-**The Aha Moment**
-
-When a previously taught concept reappears in a new context, name the connection explicitly. One
-sentence is enough:
-
-> "`type(value).__name__` — the same `type()` from the previous step, but `.__name__` extracts
-> the name as a plain string instead of the type object itself."
-
-**Repetition**
-
-Language atoms are explained once. After first appearance, a `for` loop or `if` statement is
-used without comment.
-
-CS atoms are named at every reappearance — one or two sentences connecting the concept to the
-specific code in front of the learner. Named CS concepts include: recursion, symbol tables, hash
-maps, type coercion, invariants, complexity classes, and any named design pattern or SE
-principle.
-
-### Rule: Instructional Elements
-
-At any point, use whatever element best serves understanding:
-
-| Element | When to use |
-|---|---|
-| Prose | Always — the primary vehicle for WHY |
-| `text` code block | Execution traces, before-and-after tables, diagrams, step sequences |
-| Runnable example | When the concept needs to be seen executing |
-| Comparison table | When contrasting two approaches or values |
-| Analogy | When the concept maps to something familiar |
-| Debug callout | When the concept is best understood by stepping through it |
-
-**Execution Traces**
-
-Write traces as `text` fenced blocks before the runnable code. This lets the learner predict the
-output before clicking Run:
-
-```text
-left=0 → 'r'   right=6 → 'r'   match → move both inward
-left=1 → 'a'   right=5 → 'a'   match → move both inward
-left=3           right=3         left < right is False → exit → True
-```
-
-**Debug Callouts**
-
-When a concept is best understood by watching variables change during execution:
-
-> **Enable Debug and step through this** — watch `left`, `right`, and `current_sum` in the
-> variables panel on the right as each line executes.
-
-Add local variables to the example deliberately when they surface values the debugger would
-otherwise hide:
-
-```python
-left_char = s[left]    # named so the debugger shows the character, not just the index
-right_char = s[right]
-```
-
-### Rule: Code Examples
-
-A concept may have one example or many. Use as many as understanding requires. Examples should
-increase understanding, not repeat identical information.
-
-1. **One concept per example.** Closely related atoms may share a block only if understanding
-   one requires the other.
-2. **Self-contained.** The example runs without any prior state.
-3. **State what it will print before showing the code.** After the code, explain what the
-   output demonstrates.
-4. **Descriptive variable names.** `age = 42`, not `x = 42`.
-5. **Comments only for non-obvious decisions.** A comment earns its place by stating something
-   the name and code cannot.
-6. **4–12 lines.** If a concept needs more, split into two examples with prose between them.
-7. **Design for the debugger.** Add local variables that surface intermediate state so the
-   variables panel shows meaningful values at each step.
-
-### Rule: CS Lens
-
-Add a CS Lens when algorithmic depth benefits understanding: runtime and memory complexity
-(O(n), O(1), O(n²)); correctness proofs and invariants; data structure properties; computational
-tradeoffs (time vs space, exact vs approximate); why one algorithm is better than another for
-this problem.
-
-Format: `**CS lens:** ...` in the markdown prose. Skip if it adds little value. Conditional, not
-mandatory.
-
-### Rule: SE Lens
-
-Add an SE Lens when software engineering considerations are relevant: readability and naming;
-API design and invariants callers must satisfy; mutating vs returning; testing, debugging,
-observability; when to reach for a different abstraction; production patterns and idioms.
-
-Format: `**SE lens:** ...` in the markdown prose. Skip if it adds little value. Conditional, not
-mandatory.
-
-### Rule: Challenge Generation
-
-A challenge tests whether the learner can apply the concept in a new context. It is not a
-repetition of an example.
-
-**The challenge must only use concepts already taught in this lesson or prior levels.** The
-concept loop gates this: if a concept is missing, the loop routes back to teach it before
-creating the challenge.
-
-**Challenge prose must contain:**
-
-1. **The task, stated as a contract.** What function to write, what inputs it takes, what it
-   returns. Do not describe the algorithm.
-2. **Any built-ins the learner will need**, defined the same way as in concept steps.
-3. **One clarifying constraint** that prevents wrong interpretation.
-4. **Nothing else.** No algorithm hints. No step-by-step guidance.
-
-**Starter code rules:**
-
-- Always include the function signature. Never leave the fence empty.
-- Use `pass` for Python, `// TODO` for JavaScript/TypeScript.
-- Argument names must be descriptive.
-- The starter code must be syntactically valid (runs without error, returns wrong answer).
-
-### Rule: Tests
-
-Every challenge has a `test` fence with assertion lines.
-
-1. **4–6 assertions.** Fewer under-specifies; more tests peripheral behaviour.
-2. **Cover the zero/identity case.**
-3. **Cover at least one typical case.**
-4. **Cover at least one boundary or edge case.**
-5. **One assertion per line, no control flow.**
-6. **No ambiguous floating-point equality** — use `round(result, N) == expected`.
-7. **Test the contract, not the implementation.** Two different correct implementations must
-   both pass all assertions.
-8. **The assertions fully specify the function's behaviour** for the inputs they cover.
-
-### Lesson Progression
-
-```
-Motivation → Introduction → Understanding → Examples → Execution → Analysis → Practice → Verification
-```
-
-The exact order may shift when a different order produces a better educational outcome. The
-concept loop enforces completeness regardless of order.
-
-### Checklist
-
-**File format**
-- [ ] Frontmatter present — all four fields correct
-- [ ] Intro paragraph states the concept, why it matters, and what the learner will be able to do
-- [ ] Every `##` step is a concept step or a challenge step — never a mix
-
-**Concept Steps**
-- [ ] Scope declared (primary / secondary / out-of-scope) for each concept
-- [ ] Every atom in every example is either taught, referenced, or explicitly deferred
-- [ ] Language atoms defined at first use; CS atoms named at every appearance
-- [ ] Prose explains WHY, not just WHAT
-- [ ] Instructional saturation check passed: every primary objective meets all 7 criteria
-- [ ] Execution trace written as a `text` block where helpful
-- [ ] Debug callout present when stepping through would aid understanding
-- [ ] Every runnable example is self-contained (4–12 lines, descriptive names)
-- [ ] Connections backwards, forwards, and to the real world are present
-- [ ] CS Lens added where algorithmic depth adds value
-- [ ] SE Lens added where engineering considerations add value
-
-**Challenge Steps**
-- [ ] Challenge uses only concepts already taught in this lesson or prior levels
-- [ ] Prose describes the contract, not the algorithm
-- [ ] Any built-ins the learner needs are defined in the challenge prose
-- [ ] One clarifying constraint present
-- [ ] Starter code includes the function signature and a valid empty body
-- [ ] Argument names in the starter code are descriptive
-- [ ] 4–6 assertions
-- [ ] Zero/identity case, typical case, and boundary/edge case covered
-- [ ] Each assertion is one line, no control flow
-- [ ] No ambiguous floating-point equality
-- [ ] Multiple correct implementations pass all tests
-
-**Teaching quality**
-- [ ] Every explanation answers WHY, not just WHAT
-- [ ] Reused concepts are named and connected (Aha Moment rule)
-- [ ] Secondary insights surfaced without losing primary focus
-- [ ] Every step title describes what the learner will understand after reading it
-- [ ] Every challenge title names the task, not the concept
-
----
-
-## Applying this to a bug report
-
-The concept to teach is whatever the **real root cause** turns out to be — not "here's the fix."
-Once real code is in front of you (see "Getting Real Code In Front Of The AI"):
-
-1. Determine the actual root cause. Not the symptom the reporter described — the mechanism.
-2. Identify what concept(s) that root cause embodies (a language atom? a CS atom — a race
-   condition, a stale closure, an off-by-one, a missing null check as a symbol-table lookup
-   failure? an SE atom — a violated invariant, a leaky abstraction?).
-3. Run the Concept Loop on that concept, using the real broken code and the real fixed code as
-   the DEMONSTRATE examples. The fix itself becomes the worked example.
-4. The challenge (if the lesson includes one) should be a different, small instance of the same
-   class of bug — not the exact same bug restated.
-
-## Applying this to a suggestion
-
-The concept to teach is the **design decision** — which existing pattern in this codebase the
-feature should follow or reuse, and why that pattern fits.
-
-1. Determine how this would actually be built here — which files it would touch, which existing
-   component/hook/pattern is the closest analog.
-2. Identify the concept(s) that decision embodies (an SE atom, usually — API design, composition,
-   where state should live; sometimes a CS atom if the feature has real algorithmic content).
-3. Run the Concept Loop on that decision, using a real or realistic implementation as the
-   DEMONSTRATE example — grounded in actual patterns from this codebase, not invented from
-   scratch.
-4. The challenge (if included) asks the learner to apply the same pattern to a small, different
-   feature — not to implement the original suggestion verbatim.
-
----
-
-## Deliverable
-
-One lesson-engine Markdown file (frontmatter + body) that satisfies every rule above in full,
-built from real code, plus a one-line note on where to register it in `series.ts` (an existing
-series, or a proposed new one) and why.
-
-*The test, same as the original: could a person who has never worked on this codebase read this
-lesson and explain — in their own words — what the code does, why it is written that way, what
-it connects to, and where they will see this concept again? If not, the lesson is not finished.*
+*The test, same as the original: could someone who has never worked on this codebase read this
+lesson and explain — in their own words — what the code does, why it's written that way, what it
+connects to, and where they'll recognize this concept again? If not, the lesson isn't finished.*
