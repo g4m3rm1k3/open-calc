@@ -7,6 +7,7 @@ import { SERIES } from './series'
 import type { SeriesMeta } from './series'
 import type { ParsedLesson } from '../../engine/lesson/types'
 import { GLASS_META } from '../../styles/courseColors.js'
+import CircularProgress from '../../components/ui/CircularProgress.jsx'
 
 function getSeriesMeta(series: SeriesMeta) {
   const langColorMap: Record<string, keyof typeof GLASS_META> = {
@@ -516,7 +517,7 @@ export default function LessonEngineLab({ onBack }: Props) {
       className={`w-full h-full flex flex-col overflow-hidden ${ui.bg0} ${ui.txt1}`}
     >
       {view.kind === 'series-list' && (
-        <SeriesListView ui={ui} onBack={onBack} onSelectSeries={s => setView({ kind: 'level-list', series: s })} />
+        <SeriesListView ui={ui} onBack={onBack} onSelectSeries={s => setView({ kind: 'level-list', series: s })} completed={completed} />
       )}
       {view.kind === 'level-list' && (
         <LevelListView ui={ui} series={view.series} completed={completed} available={LESSON_FILES} onBack={() => setView({ kind: 'series-list' })} onSelectLevel={file => openLesson(file, view.series)} />
@@ -546,10 +547,11 @@ export default function LessonEngineLab({ onBack }: Props) {
 
 // ── Series list ───────────────────────────────────────────────────────────────
 
-function SeriesListView({ ui, onBack, onSelectSeries }: {
+function SeriesListView({ ui, onBack, onSelectSeries, completed }: {
   ui: any
   onBack?: () => void
   onSelectSeries: (s: SeriesMeta) => void
+  completed: Set<string>
 }) {
   return (
     <div className="flex flex-col h-full">
@@ -568,12 +570,14 @@ function SeriesListView({ ui, onBack, onSelectSeries }: {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {SERIES.map(s => {
               const meta = getSeriesMeta(s);
+              const doneCount = s.levels.filter(l => completed.has(`${s.id}:${l.level}`)).length;
+              const progress = s.levels.length > 0 ? (doneCount / s.levels.length) * 100 : 0;
               return (
                 <button
                   key={s.id}
                   type="button"
                   onClick={() => onSelectSeries(s)}
-                  className={`relative text-left p-6 rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden group 
+                  className={`relative flex flex-col text-left p-6 rounded-3xl border transition-all duration-300 cursor-pointer overflow-hidden group 
                     ${ui.border} ${ui.bg1} hover:-translate-y-1 hover:shadow-xl`}
                 >
                   <div className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 ${meta.bar}`} />
@@ -583,11 +587,18 @@ function SeriesListView({ ui, onBack, onSelectSeries }: {
                   <div className={`font-black text-xl mb-2 bg-clip-text text-transparent bg-gradient-to-r ${meta.header}`}>
                     {s.label}
                   </div>
-                  <div className={`text-sm mb-4 leading-relaxed ${ui.txt2} opacity-80 group-hover:opacity-100 transition-opacity`}>
+                  <div className={`text-sm mb-6 leading-relaxed ${ui.txt2} opacity-80 group-hover:opacity-100 transition-opacity`}>
                     {s.description}
                   </div>
-                  <div className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full inline-block ${ui.bg2} ${ui.txt2} group-hover:${meta.text.split(' ')[0]} ${meta.text.includes('dark:') ? `dark:group-hover:${meta.text.split('dark:')[1]}` : ''} group-hover:border-transparent transition-colors`}>
-                    {s.levels.length} {s.levels.length === 1 ? 'level' : 'levels'}
+                  
+                  <div className="mt-auto pt-4 flex w-full">
+                    <CircularProgress
+                      progress={progress}
+                      label={doneCount === s.levels.length ? "Completed" : (doneCount === 0 ? "Not started" : "In progress")}
+                      subLabel={`${doneCount}/${s.levels.length} complete`}
+                      colorClass={meta.text.split(' ')[0]} // Get the non-dark class for the stroke
+                      glow={meta.glow}
+                    />
                   </div>
                 </button>
               )

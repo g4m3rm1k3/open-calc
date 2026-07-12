@@ -3,6 +3,8 @@ import LabErrorBoundary from '../ui/LabErrorBoundary.jsx'
 
 const PANEL_W = 960
 const PANEL_H = 640
+const MIN_W = 420
+const MIN_H = 320
 
 function MacDots({ onClose, onMinimize, onMaximize, isMaximized }) {
   return (
@@ -26,8 +28,11 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
     x: Math.max(0, (window.innerWidth - PANEL_W) / 2 + offset),
     y: Math.max(44, 80 + offset),
   }))
+  const [size, setSize] = useState(() => ({ w: win.width ?? PANEL_W, h: win.height ?? PANEL_H }))
   const dragging = useRef(false)
   const origin = useRef({ mx: 0, my: 0, wx: 0, wy: 0 })
+  const resizing = useRef(false)
+  const resizeOrigin = useRef({ mx: 0, my: 0, sw: 0, sh: 0 })
   const isMax = win.state === 'maximized'
   const Component = win.Component
 
@@ -38,15 +43,32 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
     origin.current = { mx: e.clientX, my: e.clientY, wx: pos.x, wy: pos.y }
   }
 
+  function startResize(e) {
+    if (isMax || e.button !== 0) return
+    e.preventDefault()
+    e.stopPropagation()
+    resizing.current = true
+    resizeOrigin.current = { mx: e.clientX, my: e.clientY, sw: size.w, sh: size.h }
+  }
+
   useEffect(() => {
     const move = (e) => {
-      if (!dragging.current) return
-      setPos({
-        x: origin.current.wx + e.clientX - origin.current.mx,
-        y: origin.current.wy + e.clientY - origin.current.my,
-      })
+      if (dragging.current) {
+        setPos({
+          x: origin.current.wx + e.clientX - origin.current.mx,
+          y: origin.current.wy + e.clientY - origin.current.my,
+        })
+      }
+      if (resizing.current) {
+        const maxW = window.innerWidth - 40
+        const maxH = window.innerHeight - 80
+        setSize({
+          w: Math.min(maxW, Math.max(MIN_W, resizeOrigin.current.sw + (e.clientX - resizeOrigin.current.mx))),
+          h: Math.min(maxH, Math.max(MIN_H, resizeOrigin.current.sh + (e.clientY - resizeOrigin.current.my))),
+        })
+      }
     }
-    const up = () => { dragging.current = false }
+    const up = () => { dragging.current = false; resizing.current = false }
     window.addEventListener('mousemove', move)
     window.addEventListener('mouseup', up)
     return () => {
@@ -90,7 +112,7 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
   return (
     <div
       className="fixed flex flex-col rounded-xl overflow-hidden shadow-2xl border border-black/15 dark:border-white/[0.08]"
-      style={{ left: pos.x, top: pos.y, width: PANEL_W, height: PANEL_H, zIndex }}
+      style={{ left: pos.x, top: pos.y, width: size.w, height: size.h, zIndex }}
       onMouseDown={onFocus}
     >
       <div
@@ -107,6 +129,15 @@ export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMax
         <LabErrorBoundary label={win.label} backTo={win.backTo}>
           <Component onBack={onClose} onClose={onClose} />
         </LabErrorBoundary>
+      </div>
+      <div
+        onMouseDown={startResize}
+        title="Resize"
+        className="absolute bottom-0 right-0 w-4 h-4 cursor-nwse-resize z-10 group"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" className="absolute bottom-0.5 right-0.5 pointer-events-none text-slate-400 dark:text-slate-500 opacity-60 group-hover:opacity-100 transition-opacity">
+          <path d="M12 2L2 12M12 7L7 12M12 12L12 12" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+        </svg>
       </div>
     </div>
   )

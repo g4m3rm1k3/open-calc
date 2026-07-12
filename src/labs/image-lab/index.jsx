@@ -1,12 +1,12 @@
 import ImageLab from './ImageLab.jsx'
 
 export const meta = {
-  label: 'Image Lab',
+  label: 'Image Lab Junior',
   emoji: '▧',
   color: 'cyan',
   kind: 'lab',
   subject: 'Math',
-  desc: 'A MATLAB-like image workspace for seeing what matrix operations do to real pixels: inspect RGB values, split channels, tune histograms, design kernels, compare errors, and log reproducible experiments.',
+  desc: 'The simpler, proven image workspace for seeing what matrix operations do to real pixels: inspect RGB values, split channels, tune histograms, design kernels, compare errors, and log reproducible experiments.',
   tags: ['Math', 'Images', 'Linear Algebra', 'Computer Vision', 'Matrices', 'OpenMAT', 'FFT'],
   cover: { grad: 'from-cyan-700 via-teal-800 to-slate-950', mark: 'px=Aij', sub: 'Pixels · Kernels · OpenMAT' },
 }

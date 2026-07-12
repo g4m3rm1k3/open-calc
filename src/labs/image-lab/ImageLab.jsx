@@ -772,7 +772,7 @@ export default function ImageLab({ onBack, onClose }) {
           )}
           <div className="flex items-center gap-2 font-black tracking-wide">
             <FileImage className="h-4 w-4 text-cyan-500" />
-            <span>IMAGE LAB</span>
+            <span>IMAGE LAB JUNIOR</span>
           </div>
           <div className="hidden text-[10px] uppercase tracking-[0.22em] text-slate-400 md:block">Matrix workspace for pixels</div>
           <div className="min-w-0 flex-1" />

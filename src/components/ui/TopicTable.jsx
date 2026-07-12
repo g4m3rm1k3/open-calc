@@ -22,7 +22,7 @@ function courseProgressPct(r, getLessonStatus) {
   const completed = r.chapters.reduce((n, ch) =>
     n + ch.lessons.filter(l => getLessonStatus(buildProgressKey(r.key, l), 1) === 'complete').length, 0)
   const pct = completed / total
-  return pct > 0 && pct < 1 ? pct : null
+  return pct > 0 && pct < 1 ? { pct, completed, total } : null
 }
 
 function PremiumHeaderBackground({ meta }) {
@@ -151,20 +151,10 @@ export default function TopicTable({ group, query, matchItem }) {
                   </legend>
 
                   {progressPct !== null && (
-                    <div
-                      className="absolute top-2 right-2 z-20"
-                      title={`${Math.round(progressPct * 100)}% complete`}
-                    >
-                      <svg width="22" height="22" viewBox="0 0 24 24" className="drop-shadow-sm">
-                        <circle cx="12" cy="12" r="10" fill="rgba(15,23,42,0.85)" />
-                        <circle cx="12" cy="12" r="9" fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="2" />
-                        <circle
-                          cx="12" cy="12" r="9" fill="none" stroke="#f59e0b" strokeWidth="2"
-                          strokeDasharray={`${progressPct * 2 * Math.PI * 9} ${2 * Math.PI * 9}`}
-                          strokeLinecap="round"
-                          transform="rotate(-90 12 12)"
-                        />
-                      </svg>
+                    <div className="absolute top-2.5 right-3 z-20">
+                      <span className={`text-[10px] font-bold ${meta.text} bg-white/40 dark:bg-black/30 px-2 py-1 rounded-full backdrop-blur-sm border border-black/5 dark:border-white/5 shadow-sm`}>
+                        {progressPct.completed} / {progressPct.total}
+                      </span>
                     </div>
                   )}
 
@@ -187,6 +177,11 @@ export default function TopicTable({ group, query, matchItem }) {
                       <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium block truncate mt-1">
                         {r.cardItem.description || r.cardItem.desc}
                       </span>
+                      {progressPct !== null && (
+                        <div className="mt-2.5 w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                          <div className={`h-full ${meta.bar} transition-all duration-500`} style={{ width: `${progressPct.pct * 100}%` }} />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </fieldset>
