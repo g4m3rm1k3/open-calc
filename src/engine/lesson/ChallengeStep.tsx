@@ -4,7 +4,7 @@ import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import type { LessonStep, Executor, UiTheme, TestResult } from './types'
 import type { TraceEvent } from '../../labs/codelens/codelens/types'
-import { runTests, runCSSTests, buildTestHarness } from './testRunner'
+import { runTests, runCSSTests, runJSXTests, buildTestHarness } from './testRunner'
 import { runPython } from '../../labs/codelens/codelens/interpreter/pythonTracer'
 import { run as runJS } from '../../engines/js/interpreter/interpreter.js'
 
@@ -92,18 +92,25 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
     setTraceEvents([])
     setTraceStep(0)
 
-    const isCSSChallenge = lang.toLowerCase() === 'css'
+    const norm = lang.toLowerCase()
+    const isCSSChallenge = norm === 'css'
+    const isJSXChallenge = norm === 'jsx' || norm === 'react'
+    const isVueChallenge = norm === 'vue'
     const htmlStructure = isCSSChallenge
       ? (step.examples.find(e => e.lang.toLowerCase() === 'html')?.code ?? '')
       : ''
 
     const testResults = isCSSChallenge
       ? await runCSSTests(code, htmlStructure, tests)
-      : await runTests(code, tests, lang, executor)
+      : isJSXChallenge
+        ? await runJSXTests(code, tests, 'react')
+        : isVueChallenge
+          ? await runJSXTests(code, tests, 'vue')
+          : await runTests(code, tests, lang, executor)
     if (onResults) onResults(testResults)
 
     // For CSS challenges: emit a live DOM preview so the DOM tab shows the result
-    if (isCSSChallenge && onOutput && htmlStructure) {
+    if ((isCSSChallenge || isJSXChallenge || isVueChallenge) && onOutput && htmlStructure) {
       const previewDoc = `<!DOCTYPE html><html><head><style>${code}</style></head><body>${htmlStructure}</body></html>`
       onOutput([{ text: previewDoc, kind: 'preview' }])
     }
@@ -132,6 +139,8 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
   const currentLine = traceEvents[traceStep]?.line ?? traceEvents[traceStep]?.sourceLocation?.line ?? null
   const canDebug = ['python', 'py', 'javascript', 'js'].includes(lang.toLowerCase())
   const isCSSChallenge = lang.toLowerCase() === 'css'
+  const isJSXChallenge = lang.toLowerCase() === 'jsx' || lang.toLowerCase() === 'react'
+  const isVueChallenge = lang.toLowerCase() === 'vue'
   const htmlStructure = isCSSChallenge
     ? (step.examples.find(e => e.lang.toLowerCase() === 'html')?.code ?? '')
     : ''

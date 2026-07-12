@@ -262,6 +262,159 @@ import gitLevel3 from './content/git-version-control/level-3.md?raw'
 import gitLevel4 from './content/git-version-control/level-4.md?raw'
 import gitLevel5 from './content/git-version-control/level-5.md?raw'
 import gitLevel6 from './content/git-version-control/level-6.md?raw'
+import gitLevel7 from './content/git-version-control/level-7.md?raw'
+
+import gitAdvLevel0 from './content/git-advanced/level-0.md?raw'
+import gitAdvLevel1 from './content/git-advanced/level-1.md?raw'
+import gitAdvLevel2 from './content/git-advanced/level-2.md?raw'
+import gitAdvLevel3 from './content/git-advanced/level-3.md?raw'
+import gitAdvLevel4 from './content/git-advanced/level-4.md?raw'
+import gitAdvLevel5 from './content/git-advanced/level-5.md?raw'
+import gitAdvLevel6 from './content/git-advanced/level-6.md?raw'
+import gitAdvLevel7 from './content/git-advanced/level-7.md?raw'
+
+import scLevel0  from './content/software-construction/level-0.md?raw'
+import scLevel1  from './content/software-construction/level-1.md?raw'
+import scLevel2  from './content/software-construction/level-2.md?raw'
+import scLevel3  from './content/software-construction/level-3.md?raw'
+import scLevel4  from './content/software-construction/level-4.md?raw'
+import scLevel5  from './content/software-construction/level-5.md?raw'
+import scLevel6  from './content/software-construction/level-6.md?raw'
+import scLevel7  from './content/software-construction/level-7.md?raw'
+import scLevel8  from './content/software-construction/level-8.md?raw'
+import scLevel9  from './content/software-construction/level-9.md?raw'
+import scLevel10 from './content/software-construction/level-10.md?raw'
+import scLevel11 from './content/software-construction/level-11.md?raw'
+import scLevel12 from './content/software-construction/level-12.md?raw'
+import scLevel13 from './content/software-construction/level-13.md?raw'
+import scLevel14 from './content/software-construction/level-14.md?raw'
+
+import csfLevel0 from './content/cs-foundations/level-0.md?raw'
+import csfLevel1 from './content/cs-foundations/level-1.md?raw'
+import csfLevel2 from './content/cs-foundations/level-2.md?raw'
+import csfLevel3 from './content/cs-foundations/level-3.md?raw'
+import csfLevel4 from './content/cs-foundations/level-4.md?raw'
+import csfLevel5 from './content/cs-foundations/level-5.md?raw'
+import csfLevel6 from './content/cs-foundations/level-6.md?raw'
+import csfLevel7 from './content/cs-foundations/level-7.md?raw'
+import csfLevel8 from './content/cs-foundations/level-8.md?raw'
+
+import dbgLevel0 from './content/debugging-fundamentals/level-0.md?raw'
+import dbgLevel1 from './content/debugging-fundamentals/level-1.md?raw'
+import dbgLevel2 from './content/debugging-fundamentals/level-2.md?raw'
+import dbgLevel3 from './content/debugging-fundamentals/level-3.md?raw'
+import dbgLevel4 from './content/debugging-fundamentals/level-4.md?raw'
+import dbgLevel5 from './content/debugging-fundamentals/level-5.md?raw'
+import dbgLevel6 from './content/debugging-fundamentals/level-6.md?raw'
+import dbgLevel7 from './content/debugging-fundamentals/level-7.md?raw'
+
+import fpLevel0 from './content/functional-programming/level-0.md?raw'
+import fpLevel1 from './content/functional-programming/level-1.md?raw'
+import fpLevel2 from './content/functional-programming/level-2.md?raw'
+import fpLevel3 from './content/functional-programming/level-3.md?raw'
+import fpLevel4 from './content/functional-programming/level-4.md?raw'
+import fpLevel5 from './content/functional-programming/level-5.md?raw'
+
+import dbdLevel0 from './content/database-design/level-0.md?raw'
+import dbdLevel1 from './content/database-design/level-1.md?raw'
+import dbdLevel2 from './content/database-design/level-2.md?raw'
+import dbdLevel3 from './content/database-design/level-3.md?raw'
+import dbdLevel4 from './content/database-design/level-4.md?raw'
+import dbdLevel5 from './content/database-design/level-5.md?raw'
+
+import bapiLevel0 from './content/browser-apis/level-0.md?raw'
+import bapiLevel1 from './content/browser-apis/level-1.md?raw'
+import bapiLevel2 from './content/browser-apis/level-2.md?raw'
+import bapiLevel3 from './content/browser-apis/level-3.md?raw'
+import bapiLevel4 from './content/browser-apis/level-4.md?raw'
+
+import doLevel0 from './content/devops-concepts/level-0.md?raw'
+import doLevel1 from './content/devops-concepts/level-1.md?raw'
+import doLevel2 from './content/devops-concepts/level-2.md?raw'
+import doLevel3 from './content/devops-concepts/level-3.md?raw'
+import doLevel4 from './content/devops-concepts/level-4.md?raw'
+import doLevel5 from './content/devops-concepts/level-5.md?raw'
+
+import ccLevel0 from './content/clean-code/level-0.md?raw'
+import ccLevel1 from './content/clean-code/level-1.md?raw'
+import ccLevel2 from './content/clean-code/level-2.md?raw'
+import ccLevel3 from './content/clean-code/level-3.md?raw'
+import ccLevel4 from './content/clean-code/level-4.md?raw'
+import ccLevel5 from './content/clean-code/level-5.md?raw'
+
+import oopLevel0 from './content/oop-design/level-0.md?raw'
+import oopLevel1 from './content/oop-design/level-1.md?raw'
+import oopLevel2 from './content/oop-design/level-2.md?raw'
+import oopLevel3 from './content/oop-design/level-3.md?raw'
+import oopLevel4 from './content/oop-design/level-4.md?raw'
+
+import testLevel0 from './content/testing-fundamentals/level-0.md?raw'
+import testLevel1 from './content/testing-fundamentals/level-1.md?raw'
+import testLevel2 from './content/testing-fundamentals/level-2.md?raw'
+import testLevel3 from './content/testing-fundamentals/level-3.md?raw'
+import testLevel4 from './content/testing-fundamentals/level-4.md?raw'
+
+import asyncLevel0 from './content/async-programming/level-0.md?raw'
+import asyncLevel1 from './content/async-programming/level-1.md?raw'
+import asyncLevel2 from './content/async-programming/level-2.md?raw'
+import asyncLevel3 from './content/async-programming/level-3.md?raw'
+import asyncLevel4 from './content/async-programming/level-4.md?raw'
+
+import perfLevel0 from './content/performance-engineering/level-0.md?raw'
+import perfLevel1 from './content/performance-engineering/level-1.md?raw'
+import perfLevel2 from './content/performance-engineering/level-2.md?raw'
+import perfLevel3 from './content/performance-engineering/level-3.md?raw'
+
+import feLevel0 from './content/frontend-engineering/level-0.md?raw'
+import feLevel1 from './content/frontend-engineering/level-1.md?raw'
+import feLevel2 from './content/frontend-engineering/level-2.md?raw'
+import feLevel3 from './content/frontend-engineering/level-3.md?raw'
+
+import wsLevel0 from './content/web-security/level-0.md?raw'
+import wsLevel1 from './content/web-security/level-1.md?raw'
+import wsLevel2 from './content/web-security/level-2.md?raw'
+import wsLevel3 from './content/web-security/level-3.md?raw'
+
+import dpLevel0 from './content/design-patterns/level-0.md?raw'
+import dpLevel1 from './content/design-patterns/level-1.md?raw'
+import dpLevel2 from './content/design-patterns/level-2.md?raw'
+import dpLevel3 from './content/design-patterns/level-3.md?raw'
+import dpLevel4 from './content/design-patterns/level-4.md?raw'
+
+import restLevel0 from './content/rest-apis/level-0.md?raw'
+import restLevel1 from './content/rest-apis/level-1.md?raw'
+import restLevel2 from './content/rest-apis/level-2.md?raw'
+import restLevel3 from './content/rest-apis/level-3.md?raw'
+import restLevel4 from './content/rest-apis/level-4.md?raw'
+
+import reactLevel0 from './content/react-fundamentals/level-0.md?raw'
+import reactLevel1 from './content/react-fundamentals/level-1.md?raw'
+import reactLevel2 from './content/react-fundamentals/level-2.md?raw'
+import reactLevel3 from './content/react-fundamentals/level-3.md?raw'
+import reactLevel4 from './content/react-fundamentals/level-4.md?raw'
+
+import rustLevel0 from './content/rust-fundamentals/level-0.md?raw'
+import rustLevel1 from './content/rust-fundamentals/level-1.md?raw'
+import rustLevel2 from './content/rust-fundamentals/level-2.md?raw'
+import rustLevel3 from './content/rust-fundamentals/level-3.md?raw'
+import rustLevel4 from './content/rust-fundamentals/level-4.md?raw'
+
+import goLevel0 from './content/go-fundamentals/level-0.md?raw'
+import goLevel1 from './content/go-fundamentals/level-1.md?raw'
+import goLevel2 from './content/go-fundamentals/level-2.md?raw'
+import goLevel3 from './content/go-fundamentals/level-3.md?raw'
+import goLevel4 from './content/go-fundamentals/level-4.md?raw'
+
+import saLevel0 from './content/software-architecture/level-0.md?raw'
+import saLevel1 from './content/software-architecture/level-1.md?raw'
+import saLevel2 from './content/software-architecture/level-2.md?raw'
+import saLevel3 from './content/software-architecture/level-3.md?raw'
+
+import peLevel0 from './content/professional-engineering/level-0.md?raw'
+import peLevel1 from './content/professional-engineering/level-1.md?raw'
+import peLevel2 from './content/professional-engineering/level-2.md?raw'
+import peLevel3 from './content/professional-engineering/level-3.md?raw'
+import peLevel4 from './content/professional-engineering/level-4.md?raw'
 
 const LESSON_FILES: Record<string, string> = {
   'python-fundamentals/level-0.md':  pfLevel0,
@@ -471,6 +624,137 @@ const LESSON_FILES: Record<string, string> = {
   'git-version-control/level-4.md': gitLevel4,
   'git-version-control/level-5.md': gitLevel5,
   'git-version-control/level-6.md': gitLevel6,
+  'git-version-control/level-7.md': gitLevel7,
+  'git-advanced/level-0.md': gitAdvLevel0,
+  'git-advanced/level-1.md': gitAdvLevel1,
+  'git-advanced/level-2.md': gitAdvLevel2,
+  'git-advanced/level-3.md': gitAdvLevel3,
+  'git-advanced/level-4.md': gitAdvLevel4,
+  'git-advanced/level-5.md': gitAdvLevel5,
+  'git-advanced/level-6.md': gitAdvLevel6,
+  'git-advanced/level-7.md': gitAdvLevel7,
+  'software-construction/level-0.md':  scLevel0,
+  'software-construction/level-1.md':  scLevel1,
+  'software-construction/level-2.md':  scLevel2,
+  'software-construction/level-3.md':  scLevel3,
+  'software-construction/level-4.md':  scLevel4,
+  'software-construction/level-5.md':  scLevel5,
+  'software-construction/level-6.md':  scLevel6,
+  'software-construction/level-7.md':  scLevel7,
+  'software-construction/level-8.md':  scLevel8,
+  'software-construction/level-9.md':  scLevel9,
+  'software-construction/level-10.md': scLevel10,
+  'software-construction/level-11.md': scLevel11,
+  'software-construction/level-12.md': scLevel12,
+  'software-construction/level-13.md': scLevel13,
+  'software-construction/level-14.md': scLevel14,
+  'cs-foundations/level-0.md': csfLevel0,
+  'cs-foundations/level-1.md': csfLevel1,
+  'cs-foundations/level-2.md': csfLevel2,
+  'cs-foundations/level-3.md': csfLevel3,
+  'cs-foundations/level-4.md': csfLevel4,
+  'cs-foundations/level-5.md': csfLevel5,
+  'cs-foundations/level-6.md': csfLevel6,
+  'cs-foundations/level-7.md': csfLevel7,
+  'cs-foundations/level-8.md': csfLevel8,
+  'debugging-fundamentals/level-0.md': dbgLevel0,
+  'debugging-fundamentals/level-1.md': dbgLevel1,
+  'debugging-fundamentals/level-2.md': dbgLevel2,
+  'debugging-fundamentals/level-3.md': dbgLevel3,
+  'debugging-fundamentals/level-4.md': dbgLevel4,
+  'debugging-fundamentals/level-5.md': dbgLevel5,
+  'debugging-fundamentals/level-6.md': dbgLevel6,
+  'debugging-fundamentals/level-7.md': dbgLevel7,
+  'functional-programming/level-0.md': fpLevel0,
+  'functional-programming/level-1.md': fpLevel1,
+  'functional-programming/level-2.md': fpLevel2,
+  'functional-programming/level-3.md': fpLevel3,
+  'functional-programming/level-4.md': fpLevel4,
+  'functional-programming/level-5.md': fpLevel5,
+  'database-design/level-0.md': dbdLevel0,
+  'database-design/level-1.md': dbdLevel1,
+  'database-design/level-2.md': dbdLevel2,
+  'database-design/level-3.md': dbdLevel3,
+  'database-design/level-4.md': dbdLevel4,
+  'database-design/level-5.md': dbdLevel5,
+  'browser-apis/level-0.md': bapiLevel0,
+  'browser-apis/level-1.md': bapiLevel1,
+  'browser-apis/level-2.md': bapiLevel2,
+  'browser-apis/level-3.md': bapiLevel3,
+  'browser-apis/level-4.md': bapiLevel4,
+  'devops-concepts/level-0.md': doLevel0,
+  'devops-concepts/level-1.md': doLevel1,
+  'devops-concepts/level-2.md': doLevel2,
+  'devops-concepts/level-3.md': doLevel3,
+  'devops-concepts/level-4.md': doLevel4,
+  'devops-concepts/level-5.md': doLevel5,
+  'clean-code/level-0.md': ccLevel0,
+  'clean-code/level-1.md': ccLevel1,
+  'clean-code/level-2.md': ccLevel2,
+  'clean-code/level-3.md': ccLevel3,
+  'clean-code/level-4.md': ccLevel4,
+  'clean-code/level-5.md': ccLevel5,
+  'oop-design/level-0.md': oopLevel0,
+  'oop-design/level-1.md': oopLevel1,
+  'oop-design/level-2.md': oopLevel2,
+  'oop-design/level-3.md': oopLevel3,
+  'oop-design/level-4.md': oopLevel4,
+  'testing-fundamentals/level-0.md': testLevel0,
+  'testing-fundamentals/level-1.md': testLevel1,
+  'testing-fundamentals/level-2.md': testLevel2,
+  'testing-fundamentals/level-3.md': testLevel3,
+  'testing-fundamentals/level-4.md': testLevel4,
+  'async-programming/level-0.md': asyncLevel0,
+  'async-programming/level-1.md': asyncLevel1,
+  'async-programming/level-2.md': asyncLevel2,
+  'async-programming/level-3.md': asyncLevel3,
+  'async-programming/level-4.md': asyncLevel4,
+  'performance-engineering/level-0.md': perfLevel0,
+  'performance-engineering/level-1.md': perfLevel1,
+  'performance-engineering/level-2.md': perfLevel2,
+  'performance-engineering/level-3.md': perfLevel3,
+  'frontend-engineering/level-0.md': feLevel0,
+  'frontend-engineering/level-1.md': feLevel1,
+  'frontend-engineering/level-2.md': feLevel2,
+  'frontend-engineering/level-3.md': feLevel3,
+  'web-security/level-0.md': wsLevel0,
+  'web-security/level-1.md': wsLevel1,
+  'web-security/level-2.md': wsLevel2,
+  'web-security/level-3.md': wsLevel3,
+  'design-patterns/level-0.md': dpLevel0,
+  'design-patterns/level-1.md': dpLevel1,
+  'design-patterns/level-2.md': dpLevel2,
+  'design-patterns/level-3.md': dpLevel3,
+  'design-patterns/level-4.md': dpLevel4,
+  'rest-apis/level-0.md': restLevel0,
+  'rest-apis/level-1.md': restLevel1,
+  'rest-apis/level-2.md': restLevel2,
+  'rest-apis/level-3.md': restLevel3,
+  'rest-apis/level-4.md': restLevel4,
+  'react-fundamentals/level-0.md': reactLevel0,
+  'react-fundamentals/level-1.md': reactLevel1,
+  'react-fundamentals/level-2.md': reactLevel2,
+  'react-fundamentals/level-3.md': reactLevel3,
+  'react-fundamentals/level-4.md': reactLevel4,
+  'rust-fundamentals/level-0.md': rustLevel0,
+  'rust-fundamentals/level-1.md': rustLevel1,
+  'rust-fundamentals/level-2.md': rustLevel2,
+  'rust-fundamentals/level-3.md': rustLevel3,
+  'rust-fundamentals/level-4.md': rustLevel4,
+  'go-fundamentals/level-0.md': goLevel0,
+  'go-fundamentals/level-1.md': goLevel1,
+  'go-fundamentals/level-2.md': goLevel2,
+  'go-fundamentals/level-3.md': goLevel3,
+  'go-fundamentals/level-4.md': goLevel4,
+  'software-architecture/level-0.md': saLevel0,
+  'software-architecture/level-1.md': saLevel1,
+  'software-architecture/level-2.md': saLevel2,
+  'software-architecture/level-3.md': saLevel3,
+  'professional-engineering/level-0.md': peLevel0,
+  'professional-engineering/level-1.md': peLevel1,
+  'professional-engineering/level-2.md': peLevel2,
+  'professional-engineering/level-3.md': peLevel3,
+  'professional-engineering/level-4.md': peLevel4,
 }
 
 interface Props {

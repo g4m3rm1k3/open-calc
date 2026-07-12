@@ -88,6 +88,98 @@ export async function runTests(
   return parseTestResults(stdout)
 }
 
+// ── JSX/React/Vue test runner ─────────────────────────────────────────────────
+// Transpiles JSX with @babel/standalone (runtime: classic → React.createElement),
+// injects React/Vue UMD from CDN, runs assertions via postMessage from the iframe.
+// Same iframe/postMessage pattern as runCSSTests.
+
+export function runJSXTests(
+  userCode: string,
+  testCode: string,
+  framework: 'react' | 'vue' = 'react',
+): Promise<TestResult[]> {
+  return new Promise(async resolve => {
+    const lines = testCode
+      .split('\n')
+      .map(l => l.trim())
+      .filter(l => l && !l.startsWith('//'))
+
+    const preamble = lines.filter(l => !l.startsWith('assert '))
+    const asserts  = lines.filter(l =>  l.startsWith('assert '))
+
+    const assertBlocks = asserts.map(a => {
+      const expr = a.replace(/^assert\s+/, '')
+      const label = JSON.stringify(a)
+      return `try {
+  var __ok = Boolean(${expr});
+  results.push({label:${label},passed:__ok,detail:__ok?undefined:'Expected true'});
+} catch(e) {
+  results.push({label:${label},passed:false,detail:e.message});
+}`
+    }).join('\n')
+
+    // Transpile JSX → plain JS using @babel/standalone (already a local dep)
+    let transpiledCode = userCode
+    try {
+      const Babel = await import('@babel/standalone').then(m => m.default ?? m) as any
+      const presets: any[] = [['react', { runtime: 'classic' }]]
+      transpiledCode = Babel.transform(userCode, { presets, filename: 'challenge.jsx' }).code ?? userCode
+    } catch (e) {
+      resolve([{ label: 'JSX transpile error', passed: false, detail: (e as Error).message }])
+      return
+    }
+
+    const cdnScripts = framework === 'vue'
+      ? `<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>`
+      : `<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+         <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>`
+
+    const doc = `<!DOCTYPE html>
+<html>
+<head>${cdnScripts}</head>
+<body><div id="root"></div>
+<script>
+var results = [];
+try {
+${transpiledCode}
+${preamble.join('\n')}
+${assertBlocks}
+} catch(e) {
+  results.push({label:'Runtime error',passed:false,detail:e.message});
+}
+window.parent.postMessage({type:'__OC_JSX__',results:results},'*');
+</script>
+</body>
+</html>`
+
+    let done = false
+    const timer = setTimeout(() => {
+      if (done) return
+      done = true
+      window.removeEventListener('message', onMsg)
+      try { document.body.removeChild(frame) } catch {}
+      resolve([{ label: 'Tests timed out', passed: false, detail: 'No response from iframe after 8s' }])
+    }, 8000)
+
+    function onMsg(e: MessageEvent) {
+      if (e.data?.type !== '__OC_JSX__') return
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      window.removeEventListener('message', onMsg)
+      try { document.body.removeChild(frame) } catch {}
+      resolve(e.data.results as TestResult[])
+    }
+
+    window.addEventListener('message', onMsg)
+    const frame = document.createElement('iframe')
+    frame.setAttribute('sandbox', 'allow-scripts')
+    frame.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:800px;height:600px;visibility:hidden;pointer-events:none'
+    frame.srcdoc = doc
+    document.body.appendChild(frame)
+  })
+}
+
 // ── CSS test runner ──────────────────────────────────────────────────────────
 // Injects the student's CSS into an iframe alongside the provided HTML structure,
 // then runs test assertions using getComputedStyle. Tests outcomes, not implementation.

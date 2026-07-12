@@ -691,6 +691,61 @@ export const SERIES: SeriesMeta[] = [
       { level: 4, title: 'React — Putting It Together',          file: 'react-fundamentals/level-4.md' },
     ],
   },
+  {
+    id: 'rust-fundamentals',
+    label: 'Rust Fundamentals',
+    lang: 'javascript',
+    emoji: '🦀',
+    description: 'Learn Rust\'s ownership model through simulation in JavaScript: ownership and move semantics, borrowing and references, structs and enums with pattern matching, error handling with Result, and traits with generics.',
+    levels: [
+      { level: 0, title: 'Ownership — Why Rust Exists',      file: 'rust-fundamentals/level-0.md' },
+      { level: 1, title: 'Borrowing and References',          file: 'rust-fundamentals/level-1.md' },
+      { level: 2, title: 'Structs, Enums, and Pattern Matching', file: 'rust-fundamentals/level-2.md' },
+      { level: 3, title: 'Error Handling with Result',        file: 'rust-fundamentals/level-3.md' },
+      { level: 4, title: 'Traits and Generics',               file: 'rust-fundamentals/level-4.md' },
+    ],
+  },
+  {
+    id: 'go-fundamentals',
+    label: 'Go Fundamentals',
+    lang: 'javascript',
+    emoji: '🐹',
+    description: 'Learn Go\'s concurrency model and simplicity philosophy: implicit interfaces, goroutines and channels, error handling as values, concurrency patterns (pipeline, fan-out, timeout, worker pool), and the table-driven test pattern.',
+    levels: [
+      { level: 0, title: 'What Go Is and Why It Exists', file: 'go-fundamentals/level-0.md' },
+      { level: 1, title: 'Goroutines and Channels',       file: 'go-fundamentals/level-1.md' },
+      { level: 2, title: 'Error Handling and Packages',   file: 'go-fundamentals/level-2.md' },
+      { level: 3, title: 'Concurrency Patterns',          file: 'go-fundamentals/level-3.md' },
+      { level: 4, title: 'Testing and the Go Philosophy', file: 'go-fundamentals/level-4.md' },
+    ],
+  },
+  {
+    id: 'software-architecture',
+    label: 'Software Architecture',
+    lang: 'javascript',
+    emoji: '🏛️',
+    description: 'Architectural decision-making from first principles: what architecture is and why it matters, the major architectural styles (layered, event-driven, microservices, modular monolith), component design and the stable dependencies principle, and API design for evolution.',
+    levels: [
+      { level: 0, title: 'What Architecture Is',              file: 'software-architecture/level-0.md' },
+      { level: 1, title: 'Architectural Styles',              file: 'software-architecture/level-1.md' },
+      { level: 2, title: 'Component Design and Boundaries',   file: 'software-architecture/level-2.md' },
+      { level: 3, title: 'API Design',                        file: 'software-architecture/level-3.md' },
+    ],
+  },
+  {
+    id: 'professional-engineering',
+    label: 'Professional Engineering',
+    lang: 'javascript',
+    emoji: '🎓',
+    description: 'The synthesis series: the four properties of production code, technical debt at scale, incident response and postmortems, team patterns and Conway\'s Law, and systems thinking for scalability — everything needed to work as a professional software engineer.',
+    levels: [
+      { level: 0, title: 'How Professional Software is Built',      file: 'professional-engineering/level-0.md' },
+      { level: 1, title: 'Technical Debt and Code Quality at Scale', file: 'professional-engineering/level-1.md' },
+      { level: 2, title: 'Incident Response and Operational Excellence', file: 'professional-engineering/level-2.md' },
+      { level: 3, title: 'Team Patterns and Engineering Culture',    file: 'professional-engineering/level-3.md' },
+      { level: 4, title: 'Scalability and Systems Thinking',         file: 'professional-engineering/level-4.md' },
+    ],
+  },
 ]
 
 export function getSeries(id: string): SeriesMeta | undefined {
