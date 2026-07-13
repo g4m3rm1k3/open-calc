@@ -13,7 +13,7 @@ This lesson covers how to define props with validation, how to emit typed events
 
 ## Props: data flowing down
 
-```html
+```html noplay
 <!-- ProductCard.vue -->
 <template>
   <div class="product-card" :class="{ 'out-of-stock': !product.inStock }">
@@ -70,7 +70,7 @@ PROP VALIDATION:
 
 ## Emits: events flowing up
 
-```html
+```html noplay
 <!-- SearchBar.vue -->
 <template>
   <div class="search-bar">
@@ -101,7 +101,7 @@ defineProps({
 </script>
 ```
 
-```html
+```html noplay
 <!-- PARENT USING SearchBar -->
 <template>
   <div>

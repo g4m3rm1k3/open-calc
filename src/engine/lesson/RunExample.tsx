@@ -45,9 +45,12 @@ function safeScript(code: string): string {
 }
 
 function buildWebPreview(codes: CodeSnippet[]): string {
-  const html = codes.find(s => s.lang.toLowerCase() === 'html')?.code ?? '<main id="app"></main>'
-  const css = codes.filter(s => s.lang.toLowerCase() === 'css').map(s => s.code).join('\n\n')
-  const js = codes
+  const playable = codes.filter(s => !s.noRender)
+  const htmlSnippet = playable.find(s => s.lang.toLowerCase() === 'html')
+  const html = htmlSnippet?.code ?? '<main id="app"></main>'
+  const needsVue = !!htmlSnippet?.vueMount
+  const css = playable.filter(s => s.lang.toLowerCase() === 'css').map(s => s.code).join('\n\n')
+  const js = playable
     .filter(s => ['javascript', 'js'].includes(s.lang.toLowerCase()))
     .map(s => s.code)
     .join('\n\n')
@@ -56,6 +59,7 @@ function buildWebPreview(codes: CodeSnippet[]): string {
 <html>
 <head>
   <meta charset="utf-8" />
+  ${needsVue ? '<script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>' : ''}
   <style>
     body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; color: #0f172a; background: #f8fafc; }
     #__oc_console { margin-top: 16px; padding: 10px; border-radius: 8px; background: #0f172a; color: #e2e8f0; font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
@@ -118,7 +122,7 @@ export default function RunExample({ snippet, snippets, executor, ui, onTrace, o
   // without switching away from the Lesson tab.
   useEffect(() => {
     const snips = allSnippetsRef.current
-    if (!snips.some(s => s.lang.toLowerCase() === 'html')) return
+    if (!snips.some(s => s.lang.toLowerCase() === 'html' && !s.noRender)) return
     const html = buildWebPreview(snips.map((s, i) => ({ ...s, code: codes[i] ?? s.code })))
     if (onAutoPreview) {
       onAutoPreview(html)
@@ -166,7 +170,7 @@ export default function RunExample({ snippet, snippets, executor, ui, onTrace, o
     const activeSnippet = allSnippets[Math.min(activeIdx, allSnippets.length - 1)] ?? snippet
     const code = codes[Math.min(activeIdx, codes.length - 1)] ?? ''
     const currentSnippets = allSnippets.map((s, i) => ({ ...s, code: codes[i] ?? s.code }))
-    const isWebExample = currentSnippets.some(s => s.lang.toLowerCase() === 'html')
+    const isWebExample = currentSnippets.some(s => s.lang.toLowerCase() === 'html' && !s.noRender)
     const norm = activeSnippet.lang.toLowerCase()
     const isPython = norm === 'python' || norm === 'py'
     const isJavaScript = norm === 'javascript' || norm === 'js'
@@ -216,7 +220,7 @@ export default function RunExample({ snippet, snippets, executor, ui, onTrace, o
   const currentLine = traceEvents[traceStep]?.line ?? traceEvents[traceStep]?.sourceLocation?.line ?? null
   const activeSnippet = allSnippets[Math.min(activeIdx, allSnippets.length - 1)] ?? snippet
   const activeCode = codes[Math.min(activeIdx, codes.length - 1)] ?? ''
-  const isWebExample = allSnippets.some(s => s.lang.toLowerCase() === 'html')
+  const isWebExample = allSnippets.some(s => s.lang.toLowerCase() === 'html' && !s.noRender)
   const canDebug = !isWebExample && ['python', 'py', 'javascript', 'js'].includes(activeSnippet.lang.toLowerCase())
 
   return (

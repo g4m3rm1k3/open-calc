@@ -204,7 +204,7 @@ export function useFetch(urlSource) {
 }
 ```
 
-```html
+```html noplay
 <!-- Using both composables in a component -->
 <template>
   <div>

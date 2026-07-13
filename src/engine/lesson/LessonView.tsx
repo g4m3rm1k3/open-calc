@@ -121,7 +121,7 @@ export default function LessonView({ lesson, executor, ui, onBack, onBackToSerie
   const hasResults = testResults !== null && testResults.length > 0
 
   // Web-step detection — determines which extra tabs appear
-  const htmlSnippet = step?.examples?.find(s => s.lang.toLowerCase() === 'html')
+  const htmlSnippet = step?.examples?.find(s => s.lang.toLowerCase() === 'html' && !s.noRender)
   const cssSnippet  = step?.examples?.find(s => s.lang.toLowerCase() === 'css')
   const isWebStep   = !!htmlSnippet
 

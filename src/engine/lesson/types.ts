@@ -12,6 +12,10 @@ export interface UiTheme {
 export interface CodeSnippet {
   lang: Lang
   code: string
+  /** Reference-only fence (e.g. a full .vue SFC listing) — never auto-rendered/previewed. */
+  noRender?: boolean
+  /** Explicit opt-in: mount this html fence with a real Vue 3 runtime in the preview. */
+  vueMount?: boolean
 }
 
 export interface OutputLine {

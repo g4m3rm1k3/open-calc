@@ -89,7 +89,7 @@ export default {
 // Everything declared at the top level is automatically available in the template
 ```
 
-```html
+```html noplay
 <!-- UserCounter.vue — Single File Component with <script setup> -->
 <template>
   <div>

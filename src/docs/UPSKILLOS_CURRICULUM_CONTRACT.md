@@ -672,6 +672,24 @@ right_char = s[right]
 6. **4–12 lines.** If a concept needs more, split into two examples with prose between them.
 7. **Design for the debugger.** Add local variables that surface intermediate state so
    the variables panel shows meaningful values at each step.
+8. **Must produce visible evidence when run — not silent.** Clicking Run has to show
+   something that proves the concept, not "(no output)". A corpus audit found ~49% of
+   runnable examples print nothing at all — reading the comments and trusting they're
+   accurate is not the same as seeing it work. Two ways to satisfy this:
+   - **Non-UI concepts:** the example must contain a real `print`/`console.log`/etc. call
+     whose output demonstrates the specific behavior the prose describes (rule 3's
+     "state what it will print" only works if there's something to print).
+   - **DOM/UI/CSS/framework concepts:** pair the example with a companion `` ```html ``
+     (and `` ```css ``/`` ```javascript `` as needed) fence in the *same step* — the
+     engine already renders multi-file steps as tabs and auto-previews them live (see
+     Engine Capabilities Reference below). If the markup is a real, mountable fragment,
+     let it render normally; if it's reference material that can't actually run (e.g. a
+     framework's file-listing syntax that uses compiler-only macros), tag the html fence
+     `` ```html noplay `` so it displays with syntax highlighting but doesn't
+     auto-render a misleading/broken preview. A companion JS fence may request a
+     framework runtime in the preview via an explicit tag on the html fence (e.g.
+     `` ```html vue-mount `` loads real Vue 3 for that preview) — never rely on sniffing
+     the JS body's content to decide this; the tag must be explicit.
 
 ## Rule: CS Lens / SE Lens
 
@@ -804,6 +822,31 @@ fence would pick the wrong language (see Part 3, File Format):
 ```challenge javascript
 ```
 ```
+
+## Example Fence Flags (`` ```html <flag> ``)
+
+Any `` ```html `` *example* (not challenge) in a step is auto-rendered into a live DOM
+preview the instant the step is viewed — no click needed (`RunExample.tsx`). Two
+explicit, opt-in second-token flags control this, same convention as Challenge Language
+above:
+
+- `` ```html noplay `` — reference-only markup that was never meant to run (e.g. a
+  framework's `.vue`/`.svelte` file listing showing `<script setup>`/compiler-only
+  macros that don't exist at runtime). Keeps full syntax highlighting, suppresses
+  auto-render and the DOM/Tree tabs entirely.
+- `` ```html vue-mount `` — the fragment is real, mountable Vue template syntax. The
+  preview loads actual Vue 3 from CDN and mounts the fragment for real; pair it with a
+  companion `` ```javascript `` fence in the same step that calls
+  `Vue.createApp({ data() {...}, methods: {...} }).mount('#id')` so the template's
+  `{{ }}`/`v-if`/`v-model` bindings have real values to work with (see
+  `vue-fundamentals/level-0.md`, "Vue template syntax" step, for a worked example).
+  Never approximate this by scanning the JS body for `Vue.createApp` — the flag must be
+  on the fence explicitly, so unrelated html/css/js lessons can never trigger it by
+  accident.
+
+Without a flag, an `` ```html `` example renders as plain literal markup (correct for
+genuine HTML/CSS/JS demos; wrong for any templating language whose syntax a raw browser
+doesn't understand).
 
 ## Test Grading, by Language
 

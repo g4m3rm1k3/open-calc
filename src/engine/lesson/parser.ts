@@ -101,7 +101,13 @@ function buildStep(raw: string, idx: number, metaLang: string): LessonStep {
     } else if (f.lang === 'test') {
       tests = f.code
     } else {
-      examples.push({ lang: f.lang, code: f.code })
+      const flags = f.info.split(/\s+/).slice(1)
+      examples.push({
+        lang: f.lang,
+        code: f.code,
+        noRender: flags.includes('noplay'),
+        vueMount: flags.includes('vue-mount'),
+      })
     }
   }
 

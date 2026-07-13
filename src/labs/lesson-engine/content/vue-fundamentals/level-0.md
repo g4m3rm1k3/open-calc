@@ -21,10 +21,13 @@ The core difference between Vue and React is how state changes trigger UI update
 function useState(initial) { let value = initial; return [value, next => { value = next }] }
 
 const [count, setCount] = useState(0)
-setCount(count + 1)   // you call the setter; React re-renders
+console.log('React before:', count)   // 0
+setCount(count + 1)                   // you call the setter; React re-renders
+console.log('React after: ', count)   // still 0! this local `count` is a snapshot —
+                                       // only a fresh render gives you the new value
 
 // VUE: you mutate data; Vue detects the change automatically
-export default {
+const vueComponent = {
   data() {
     return { count: 0 }  // count is a reactive property
   },
@@ -35,6 +38,12 @@ export default {
     }
   }
 }
+
+// Simulate one Vue instance to see the mutation model actually happen:
+const vueState = vueComponent.data()
+console.log('Vue before:', vueState.count)   // 0
+vueComponent.methods.increment.call(vueState)
+console.log('Vue after: ', vueState.count)   // 1 — mutated in place, no setter needed
 ```
 
 ```text
@@ -163,42 +172,72 @@ COMPUTED vs METHODS:
 
 Vue templates are HTML with special directives (attributes prefixed with `v-`) and interpolation (`{{ }}`).
 
-```html
-<!-- INTERPOLATION: display reactive data -->
-<p>{{ message }}</p>
-<p>{{ user.name.toUpperCase() }}</p>
-<p>{{ count > 0 ? count + ' items' : 'empty' }}</p>
+```html vue-mount
+<div id="app">
+  <!-- INTERPOLATION: display reactive data -->
+  <p>{{ message }}</p>
+  <p>{{ user.name.toUpperCase() }}</p>
+  <p>{{ count > 0 ? count + ' items' : 'empty' }}</p>
 
-<!-- v-bind: bind an attribute to reactive data -->
-<img :src="user.avatar" :alt="user.name">
-<button :disabled="isLoading">Submit</button>
-<!-- :attr is shorthand for v-bind:attr -->
+  <!-- v-bind: bind an attribute to reactive data -->
+  <img :src="user.avatar" :alt="user.name">
+  <button :disabled="isLoading">Submit</button>
+  <!-- :attr is shorthand for v-bind:attr -->
 
-<!-- v-on: attach event handlers -->
-<button @click="handleClick">Click me</button>
-<input @input="handleInput" @keydown.enter="handleEnter">
-<!-- @event is shorthand for v-on:event -->
-<!-- .enter is a key modifier: only fires on Enter key -->
+  <!-- v-on: attach event handlers -->
+  <button @click="handleClick">Click me</button>
+  <input @input="handleInput" @keydown.enter="handleEnter">
+  <!-- @event is shorthand for v-on:event -->
+  <!-- .enter is a key modifier: only fires on Enter key -->
 
-<!-- v-if / v-else-if / v-else: conditional rendering -->
-<div v-if="isLoading">Loading...</div>
-<div v-else-if="error">Error: {{ error }}</div>
-<div v-else>{{ content }}</div>
+  <!-- v-if / v-else-if / v-else: conditional rendering -->
+  <div v-if="isLoading">Loading...</div>
+  <div v-else-if="error">Error: {{ error }}</div>
+  <div v-else>{{ content }}</div>
 
-<!-- v-show: toggles CSS display (keeps DOM element; v-if removes it) -->
-<div v-show="isVisible">Always in DOM, sometimes hidden</div>
+  <!-- v-show: toggles CSS display (keeps DOM element; v-if removes it) -->
+  <div v-show="isVisible">Always in DOM, sometimes hidden</div>
 
-<!-- v-for: list rendering (always include :key) -->
-<ul>
-  <li v-for="item in items" :key="item.id">
-    {{ item.name }} — {{ item.price }}
-  </li>
-</ul>
+  <!-- v-for: list rendering (always include :key) -->
+  <ul>
+    <li v-for="item in items" :key="item.id">
+      {{ item.name }} — {{ item.price }}
+    </li>
+  </ul>
 
-<!-- v-model: two-way binding (input ↔ data) -->
-<input v-model="searchQuery" placeholder="Search...">
-<p>You typed: {{ searchQuery }}</p>
-<!-- v-model = :value="searchQuery" @input="searchQuery = $event.target.value" -->
+  <!-- v-model: two-way binding (input ↔ data) -->
+  <input v-model="searchQuery" placeholder="Search...">
+  <p>You typed: {{ searchQuery }}</p>
+  <!-- v-model = :value="searchQuery" @input="searchQuery = $event.target.value" -->
+</div>
+```
+
+```javascript
+// Real reactive data behind the template above — mounted with actual Vue 3,
+// so every directive here does what the comments say, not just illustrates it.
+Vue.createApp({
+  data() {
+    return {
+      message: 'Hello from Vue!',
+      user: { name: 'Alice', avatar: 'https://placehold.co/32' },
+      count: 3,
+      isLoading: true,   // only the "Loading..." branch is shown below — v-if/v-else-if/v-else are mutually exclusive
+      error: null,
+      content: '',
+      isVisible: true,
+      items: [
+        { id: 1, name: 'Widget', price: 9.99 },
+        { id: 2, name: 'Gadget', price: 19.99 },
+      ],
+      searchQuery: '',
+    }
+  },
+  methods: {
+    handleClick() { this.count++ },
+    handleInput(e) { /* fires on every keystroke */ },
+    handleEnter(e) { /* fires only on Enter, via the .enter modifier */ },
+  },
+}).mount('#app')
 ```
 
 ```text
