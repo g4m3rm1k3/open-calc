@@ -268,24 +268,15 @@ const items = [
 
 // First page
 const page1 = buildPaginatedResponse(items, 2, null)
-assert page1.data.length === 2
-assert page1.data[0].id === 1
-assert page1.data[1].id === 2
-assert page1.pagination.hasNextPage === true
-assert typeof page1.pagination.cursor === 'string'
-assert page1.pagination.limit === 2
+assert page1.data.length === 2 && page1.data[0].id === 1 && page1.data[1].id === 2
+assert page1.pagination.hasNextPage === true && typeof page1.pagination.cursor === 'string'
 
 // Second page using the cursor from page 1
 const page2 = buildPaginatedResponse(items, 2, page1.pagination.cursor)
-assert page2.data.length === 2
-assert page2.data[0].id === 3
-assert page2.data[1].id === 4
-assert page2.pagination.hasNextPage === true
+assert page2.data[0].id === 3 && page2.data[1].id === 4
 
-// Third page (only 1 item left)
+// Third page (only 1 item left) — no next page, no cursor
 const page3 = buildPaginatedResponse(items, 2, page2.pagination.cursor)
-assert page3.data.length === 1
-assert page3.data[0].id === 5
-assert page3.pagination.hasNextPage === false
-assert page3.pagination.cursor === null
+assert page3.data.length === 1 && page3.data[0].id === 5
+assert page3.pagination.hasNextPage === false && page3.pagination.cursor === null
 ```

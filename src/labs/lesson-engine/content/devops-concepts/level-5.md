@@ -211,24 +211,22 @@ const server = createProductionServer(
 )
 
 const result = await server.start()
-assert result.port === 8080
-assert result.nodeEnv === 'production'
-assert startLog.includes('listen:8080')
+assert result.port === 8080 && result.nodeEnv === 'production' && startLog.includes('listen:8080')
 
-const health = server.getHealth()
-assert health.status === 'ok'
+assert server.getHealth().status === 'ok'
 
 await server.stop()
 assert startLog.includes('close')
 
-// Missing DATABASE_URL throws:
-let threw = false
+// Missing DATABASE_URL throws
+let threw = false, errMsg = ''
 try {
   const bad = createProductionServer({ PORT: '3000' }, deps)
   await bad.start()
 } catch (e) {
   threw = true
-  assert e.message === 'DATABASE_URL is required'
+  errMsg = e.message
 }
 assert threw
+assert errMsg === 'DATABASE_URL is required'
 ```

@@ -168,47 +168,20 @@ int factorial(int n) {
 
 ## Challenge: is_prime
 
-Write a function `bool isPrime(int n)` that returns `true` if `n` is a prime number and `false` otherwise. A prime is an integer greater than 1 with no divisors other than 1 and itself. Write `main` to call `isPrime` with several values and print the results.
+Write a function `bool isPrime(int n)` that returns `true` if `n` is a prime number and `false` otherwise. A prime is an integer greater than 1 with no divisors other than 1 and itself.
 
 A number `n` is prime if no integer from `2` to `n-1` divides it evenly. `n % divisor == 0` means `divisor` divides `n`.
 
 ```challenge
-#include <iostream>
-using namespace std;
-
 bool isPrime(int n) {
     // TODO
-}
-
-int main() {
-    cout << isPrime(2)  << endl;
-    cout << isPrime(7)  << endl;
-    cout << isPrime(10) << endl;
-    cout << isPrime(1)  << endl;
-    return 0;
 }
 ```
 
 ```test
-#include <iostream>
-#include <cassert>
-using namespace std;
-
-bool isPrime(int n) {
-    if (n <= 1) return false;
-    for (int i = 2; i < n; i++) {
-        if (n % i == 0) return false;
-    }
-    return true;
-}
-
-int main() {
-    assert(isPrime(2)  == true);
-    assert(isPrime(7)  == true);
-    assert(isPrime(10) == false);
-    assert(isPrime(1)  == false);
-    assert(isPrime(13) == true);
-    cout << "ok" << endl;
-    return 0;
-}
+assert isPrime(2) == true
+assert isPrime(7) == true
+assert isPrime(10) == false
+assert isPrime(1) == false
+assert isPrime(13) == true
 ```

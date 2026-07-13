@@ -174,5 +174,6 @@ var g = getComputedStyle(document.querySelector('.grid'))
 assert g.display === 'grid'
 var cols = g.gridTemplateColumns.split(' ')
 assert cols.length === 3
+assert cols[0] === cols[1] && cols[1] === cols[2]   // equal columns
 assert g.gap === '16px' || g.columnGap === '16px'
 ```

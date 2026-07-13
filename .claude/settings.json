@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(*)"
+      "Bash(*)",
+      "Bash(grep -n '^```test' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\browser-apis\\\\level-4.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\css-flexbox\\\\level-0.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\css-flexbox\\\\level-2.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\css-fundamentals\\\\level-0.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\css-fundamentals\\\\level-1.md')",
+      "Bash(grep -n '^```test' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\css-fundamentals\\\\level-6.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\css-fundamentals\\\\level-7.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\css-fundamentals\\\\level-9.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\css-grid\\\\level-0.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\css-grid\\\\level-1.md')",
+      "Bash(grep -n '^```test' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\html-dom\\\\level-2.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\html-dom\\\\level-5.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\html-dom\\\\level-6.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\html-dom\\\\level-7.md' 'c:\\\\Users\\\\g4m3r\\\\Documents\\\\testing tutorials\\\\open-calc\\\\src\\\\labs\\\\lesson-engine\\\\content\\\\html-dom\\\\level-8.md')"
     ],
     "deny": []
   }

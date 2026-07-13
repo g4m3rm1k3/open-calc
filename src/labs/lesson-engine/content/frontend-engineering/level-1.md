@@ -260,16 +260,10 @@ function selectVisibleTodos(state) {
 
 ```test
 const reducer = createTodoReducer()
-const INIT = { todos: [], nextId: 1, filter: 'all' }
-
-let state = INIT
+let state = { todos: [], nextId: 1, filter: 'all' }
 
 state = reducer(state, { type: 'ADD_TODO', text: 'Buy milk' })
-assert state.todos.length === 1
-assert state.todos[0].text === 'Buy milk'
-assert state.todos[0].done === false
-assert state.todos[0].id === 1
-assert state.nextId === 2
+assert state.todos.length === 1 && state.todos[0].done === false && state.nextId === 2
 
 state = reducer(state, { type: 'ADD_TODO', text: 'Read book' })
 state = reducer(state, { type: 'TOGGLE_TODO', id: 1 })
@@ -277,13 +271,11 @@ assert state.todos[0].done === true
 
 state = reducer(state, { type: 'SET_FILTER', filter: 'active' })
 const visible = selectVisibleTodos(state)
-assert visible.length === 1
-assert visible[0].text === 'Read book'
+assert visible.length === 1 && visible[0].text === 'Read book'
 
 state = reducer(state, { type: 'DELETE_TODO', id: 2 })
 assert state.todos.length === 1
 
-// Unknown action → unchanged
-const same = reducer(state, { type: 'UNKNOWN' })
-assert same === state   // same reference (no change)
+// Unknown action → unchanged, same reference
+assert reducer(state, { type: 'UNKNOWN' }) === state
 ```

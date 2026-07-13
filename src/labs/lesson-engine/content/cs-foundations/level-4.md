@@ -187,8 +187,6 @@ assert s.scenario1_structure === 'Set' || s.scenario1_structure === 'Map'
 assert s.scenario1_why.length > 15
 assert s.scenario2_structure === 'linked-list'
 assert s.scenario2_why.toLowerCase().includes('o(1)') || s.scenario2_why.toLowerCase().includes('prepend') || s.scenario2_why.toLowerCase().includes('front')
-assert s.scenario3_structure === 'Map'
-assert s.scenario3_why.length > 15
-assert s.scenario4_structure === 'array'
-assert s.scenario4_why.length > 15
+assert s.scenario3_structure === 'Map' && s.scenario3_why.length > 15
+assert s.scenario4_structure === 'array' && s.scenario4_why.length > 15
 ```

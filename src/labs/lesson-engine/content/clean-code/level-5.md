@@ -210,14 +210,10 @@ const products = [
 ]
 
 const report = buildProductReport(products)
-assert report.length === 2
-assert report[0].id === 1   // sorted by price: 50 first
-assert report[1].id === 2
+assert report.length === 2 && report[0].id === 1 && report[1].id === 2   // filtered, deduped, sorted by price
 assert report.every(p => p.discounted === false)
 
 const discounted = buildProductReport(products, { applyLoyaltyDiscount: true })
-assert discounted.length === 2
 assert discounted[0].discounted === false   // price 50 < threshold 100
-assert discounted[1].discounted === true    // price 150 >= threshold 100
-assert Math.abs(discounted[1].price - 127.50) < 0.01   // 150 * 0.85
+assert discounted[1].discounted === true && Math.abs(discounted[1].price - 127.50) < 0.01
 ```

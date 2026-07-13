@@ -254,13 +254,8 @@ Style the elements below so that:
 var h = getComputedStyle(document.querySelector('#heading'))
 var b = getComputedStyle(document.querySelector('#body-text'))
 var l = getComputedStyle(document.querySelector('#label'))
-assert h.fontSize === '32px'
-assert h.fontWeight === '700'
+assert h.fontSize === '32px' && h.fontWeight === '700'
 assert h.lineHeight === '38.4px'
-assert b.fontSize === '16px'
-assert b.lineHeight === '25.6px'
-assert b.fontWeight === '400'
-assert l.fontSize === '12px'
-assert l.fontWeight === '600'
-assert l.textTransform === 'uppercase'
+assert b.fontSize === '16px' && b.fontWeight === '400' && b.lineHeight === '25.6px'
+assert l.fontSize === '12px' && l.fontWeight === '600' && l.textTransform === 'uppercase'
 ```

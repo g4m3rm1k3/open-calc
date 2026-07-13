@@ -171,4 +171,4 @@ var cta = document.querySelector('#cta')
 assert getComputedStyle(h1).color === 'rgb(29, 78, 216)'
 assert getComputedStyle(card).backgroundColor === 'rgb(240, 249, 255)'
 assert getComputedStyle(cta).backgroundColor === 'rgb(14, 165, 233)'
-```
+assert getComputedStyle(card).backgroundColor !== getComputedStyle(cta).backgroundColor   // targeted independently

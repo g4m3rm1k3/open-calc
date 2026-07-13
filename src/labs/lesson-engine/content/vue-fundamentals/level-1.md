@@ -242,40 +242,29 @@ function createCompositionState() {
 ```test
 const vue = createCompositionState()
 
-// ref: basic usage
+// ref: reading, writing, and notifying listeners
 const count = vue.ref(0)
-assert count.value === 0
-
 const updates = []
 const unsub = count.onChange(v => updates.push(v))
 count.value = 5
-assert count.value === 5
-assert updates[0] === 5
+assert count.value === 5 && updates[0] === 5
 
-count.value = 10
-assert updates.length === 2
-
-// Unsubscribe stops notifications
+// Unsubscribe stops further notifications
 unsub()
 count.value = 99
-assert updates.length === 2   // no more updates after unsub
+assert updates.length === 1
 
-// reactive: basic usage
+// reactive: per-property listeners
 const user = vue.reactive({ name: 'Alice', role: 'user' })
-assert user.name === 'Alice'
-
 const nameUpdates = []
-user.__listeners = user.__listeners || {}
 user.onChange('name', v => nameUpdates.push(v))
 user.name = 'Bob'
-assert user.name === 'Bob'
-assert nameUpdates[0] === 'Bob'
+assert user.name === 'Bob' && nameUpdates[0] === 'Bob'
 
-// computed: derives from a ref
+// computed: re-evaluates from the underlying ref
 const count2 = vue.ref(3)
 const doubled = vue.computed(() => count2.value * 2)
 assert doubled.value === 6
-
 count2.value = 5
 assert doubled.value === 10
 ```

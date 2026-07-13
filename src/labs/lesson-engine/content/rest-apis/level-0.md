@@ -164,25 +164,18 @@ function designEndpoints(scenario) {
 
 ```test
 const userEndpoints = designEndpoints('user-crud')
-assert Array.isArray(userEndpoints)
-assert userEndpoints.length >= 4
+assert Array.isArray(userEndpoints) && userEndpoints.length >= 4
 
 const methods = userEndpoints.map(e => e.method)
-assert methods.includes('POST')
-assert methods.includes('GET')
-assert methods.includes('DELETE')
+assert methods.includes('POST') && methods.includes('GET') && methods.includes('DELETE')
 
 const paths = userEndpoints.map(e => e.path)
-assert paths.some(p => p === '/users' || p === '/users/')
-assert paths.some(p => p.includes('/users/') && p.includes(':id'))
+assert paths.some(p => p === '/users' || p === '/users/') && paths.some(p => p.includes('/users/') && p.includes(':id'))
 
 const statuses = userEndpoints.map(e => e.statusCode)
-assert statuses.includes(201)
-assert statuses.includes(200)
-assert statuses.includes(204)
+assert statuses.includes(201) && statuses.includes(200) && statuses.includes(204)
 
 const orderEndpoints = designEndpoints('order-with-items')
-assert orderEndpoints.length >= 4
-assert orderEndpoints.some(e => e.path.includes('/orders/') && e.path.includes('/items'))
+assert orderEndpoints.length >= 4 && orderEndpoints.some(e => e.path.includes('/orders/') && e.path.includes('/items'))
 assert orderEndpoints.some(e => e.method === 'POST' && e.path.includes('/items'))
 ```

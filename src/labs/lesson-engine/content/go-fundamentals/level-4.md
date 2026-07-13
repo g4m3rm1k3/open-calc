@@ -294,11 +294,8 @@ fw.test('addition', t => { t.ok(1 + 1 === 2, '1+1 should be 2') })
 fw.test('strings',  t => { t.equals('hello', 'hello', 'strings match') })
 fw.test('failing',  t => { t.ok(false, 'this should fail') })
 const result = fw.run()
-assert result.passed === 2
-assert result.failed === 1
-assert result.results.length === 3
-assert result.results[0].name === 'addition'
-assert result.results[0].passed === true
+assert result.passed === 2 && result.failed === 1 && result.results.length === 3
+assert result.results[0].name === 'addition' && result.results[0].passed === true
 assert result.results[2].passed === false
 assert result.results[2].errors.length > 0
 ```

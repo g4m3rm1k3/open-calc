@@ -195,18 +195,14 @@ function commentAudit(scenario) {
 
 ```test
 const t = commentAudit('translation')
-assert t.keep === false
-assert t.reason.length > 10
+assert t.keep === false && t.reason.length > 10
 
 const w = commentAudit('why-needed')
-assert w.keep === true
-assert w.reason.length > 10
+assert w.keep === true && w.reason.length > 10
 
 const o = commentAudit('outdated')
-assert o.keep === false
-assert o.reason.length > 10
+assert o.keep === false && o.reason.length > 10
 
 const wr = commentAudit('workaround')
-assert wr.keep === true
-assert wr.reason.length > 10
+assert wr.keep === true && wr.reason.length > 10
 ```

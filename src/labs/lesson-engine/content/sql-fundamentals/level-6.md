@@ -159,13 +159,8 @@ Write two statements:
 
 ```test
 var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
-assert q.includes('insert into products')
-assert q.includes('name') && q.includes('price')
-assert q.includes("'widget'")
-assert q.includes('9.99')
-assert q.includes('update products')
-assert q.includes('set price')
-assert q.includes('12.99')
-assert q.includes('where name') || q.includes("where name =")
-assert q.includes("'widget'") && q.split("'widget'").length >= 2
+assert q.includes('insert into products') && q.includes('name') && q.includes('price')
+assert q.includes("'widget'") && q.includes('9.99')
+assert q.includes('update products') && q.includes('set price') && q.includes('12.99')
+assert q.includes('where name') && q.split("'widget'").length >= 2
 ```

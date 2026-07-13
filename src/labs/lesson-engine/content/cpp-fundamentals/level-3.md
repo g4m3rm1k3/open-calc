@@ -158,41 +158,18 @@ int main() {
 Write a function `int arrayMax(int arr[], int size)` that returns the largest element in the array. Assume `size >= 1`.
 
 ```challenge
-#include <iostream>
-using namespace std;
-
 int arrayMax(int arr[], int size) {
     // TODO
-}
-
-int main() {
-    int a[] = {3, 7, 1, 9, 4};
-    cout << arrayMax(a, 5) << endl;
-    return 0;
 }
 ```
 
 ```test
-#include <iostream>
-#include <cassert>
-using namespace std;
-
-int arrayMax(int arr[], int size) {
-    int max = arr[0];
-    for (int i = 1; i < size; i++) {
-        if (arr[i] > max) max = arr[i];
-    }
-    return max;
-}
-
-int main() {
-    int a[] = {3, 7, 1, 9, 4};
-    int b[] = {-5, -1, -3};
-    int c[] = {42};
-    assert(arrayMax(a, 5) == 9);
-    assert(arrayMax(b, 3) == -1);
-    assert(arrayMax(c, 1) == 42);
-    cout << "ok" << endl;
-    return 0;
-}
+int a[] = {3, 7, 1, 9, 4};
+int b[] = {-5, -1, -3};
+int c[] = {42};
+int d[] = {5, 5, 5};
+assert arrayMax(a, 5) == 9
+assert arrayMax(b, 3) == -1
+assert arrayMax(c, 1) == 42
+assert arrayMax(d, 3) == 5
 ```

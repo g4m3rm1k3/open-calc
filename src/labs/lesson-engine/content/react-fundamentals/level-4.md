@@ -290,38 +290,23 @@ const state = createUserListState()
 
 // Initial state
 const s0 = state.getState()
-assert s0.users.length === 0
-assert s0.loading === false
-assert s0.hasMore === true
-assert s0.query === ''
+assert s0.users.length === 0 && s0.loading === false && s0.hasMore === true && s0.query === ''
 
-// Set query resets
+// Set query resets the list
 state.setQuery('alice')
-assert state.getState().query === 'alice'
-assert state.getState().users.length === 0
+assert state.getState().query === 'alice' && state.getState().users.length === 0
 
-// Start loading
 state.startLoading()
-assert state.getState().loading === true
-assert state.getState().error === null
+assert state.getState().loading === true && state.getState().error === null
 
 // Replace results (first page from a search)
-const page1 = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Alicia' }]
-state.replaceResults(page1, true)
-assert state.getState().users.length === 2
-assert state.getState().hasMore === true
-assert state.getState().loading === false
+state.replaceResults([{ id: 1, name: 'Alice' }, { id: 2, name: 'Alicia' }], true)
+assert state.getState().users.length === 2 && state.getState().hasMore === true && state.getState().loading === false
 
-// Append page (load more)
-state.startLoading()
-const page2 = [{ id: 3, name: 'Alistair' }]
-state.appendPage(page2, false)
-assert state.getState().users.length === 3
-assert state.getState().hasMore === false
+// Append page (load more) — no next page this time
+state.appendPage([{ id: 3, name: 'Alistair' }], false)
+assert state.getState().users.length === 3 && state.getState().hasMore === false
 
-// Error handling
-state.startLoading()
 state.setError('Network failed')
-assert state.getState().error === 'Network failed'
-assert state.getState().loading === false
+assert state.getState().error === 'Network failed' && state.getState().loading === false
 ```

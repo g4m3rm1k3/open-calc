@@ -162,11 +162,9 @@ Set the three items to grow proportionally: the sidebar stays fixed, the main co
 var sb = getComputedStyle(document.querySelector('#sidebar'))
 var main = getComputedStyle(document.querySelector('#main'))
 var aside = getComputedStyle(document.querySelector('#aside'))
-assert sb.flexGrow === '0'
-assert sb.flexShrink === '0'
+assert sb.flexGrow === '0' && sb.flexShrink === '0'
 assert sb.flexBasis === '200px'
 assert main.flexGrow === '1'
-assert aside.flexGrow === '0'
-assert aside.flexShrink === '0'
+assert aside.flexGrow === '0' && aside.flexShrink === '0'
 assert aside.flexBasis === '160px'
 ```

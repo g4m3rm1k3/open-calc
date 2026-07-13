@@ -198,9 +198,6 @@ var content = getComputedStyle(document.querySelector('.content'))
 assert layout.display === 'grid'
 var cols = layout.gridTemplateColumns.split(' ')
 assert cols.length === 2
-assert header.display === 'flex'
-assert header.justifyContent === 'space-between'
-assert header.alignItems === 'center'
-assert content.display === 'flex'
-assert content.flexDirection === 'column'
+assert header.display === 'flex' && header.justifyContent === 'space-between' && header.alignItems === 'center'
+assert content.display === 'flex' && content.flexDirection === 'column'
 ```

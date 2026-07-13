@@ -73,8 +73,8 @@ describe('lesson corpus — wiring parity', () => {
 
 // ── Per-lesson structural checks (UPSKILLOS_CURRICULUM_CONTRACT.md, Part 3) ────────
 
-const SUPPORTED_TEST_LANGS = new Set(['python', 'py', 'javascript', 'js', 'typescript', 'ts', 'css', 'jsx', 'react', 'vue', 'sql', 'sqlite'])
-const KNOWN_UNSUPPORTED_TEST_LANGS = new Set(['c', 'cpp', 'c++', 'csharp', 'cs', 'java', 'bash', 'shell', 'sh'])
+const SUPPORTED_TEST_LANGS = new Set(['python', 'py', 'javascript', 'js', 'typescript', 'ts', 'css', 'jsx', 'react', 'vue', 'sql', 'sqlite', 'cpp', 'c', 'c++', 'cpp-program', 'csharp', 'cs', 'c#', 'java'])
+const KNOWN_UNSUPPORTED_TEST_LANGS = new Set(['bash', 'shell', 'sh'])
 
 describe.each(registeredFiles.filter(f => filesOnDisk.includes(f)))('lesson: %s', file => {
   // Vite's `?raw` loader (confirmed by fetching it from a running dev server) serves
@@ -104,12 +104,16 @@ describe.each(registeredFiles.filter(f => filesOnDisk.includes(f)))('lesson: %s'
     })
 
     if (step.tests !== null && step.challenge !== null) {
-      const intendedLang = step.challenge.lang.toLowerCase()
+      const rawLang = step.challenge.lang.toLowerCase()
+      // `<lang>-program` challenges (runProgramOutputTest) grade captured stdout with
+      // plain JS assertions, same shape as every other supported language once the
+      // `-program` suffix is stripped for this check.
+      const intendedLang = rawLang.endsWith('-program') ? rawLang.slice(0, -'-program'.length) : rawLang
 
       it(`step "${stepLabel}": test fence only present for a language the engine can grade`, () => {
         if (KNOWN_UNSUPPORTED_TEST_LANGS.has(intendedLang)) {
           throw new Error(
-            `lang '${intendedLang}' has no working test harness (see UPSKILLOS_CURRICULUM_CONTRACT.md Part 4). ` +
+            `lang '${rawLang}' has no working test harness (see UPSKILLOS_CURRICULUM_CONTRACT.md Part 4). ` +
             `Remove the test fence or wait for engine support before shipping this challenge.`
           )
         }
@@ -124,6 +128,22 @@ describe.each(registeredFiles.filter(f => filesOnDisk.includes(f)))('lesson: %s'
         it(`step "${stepLabel}": has 4-6 assertions`, () => {
           expect(assertionLines.length, `found ${assertionLines.length} assertions:\n${step.tests}`).toBeGreaterThanOrEqual(4)
           expect(assertionLines.length, `found ${assertionLines.length} assertions:\n${step.tests}`).toBeLessThanOrEqual(6)
+        })
+      }
+
+      // Language inference (see UPSKILLOS_CURRICULUM_CONTRACT.md Part 3) can land on a
+      // technically-"supported" language that still doesn't match the challenge's real
+      // content — e.g. a JS scenario-quiz object inferred as `css` because the lesson's
+      // own frontmatter lang is css. That's not caught by the checks above (css IS
+      // supported) and routes the getComputedStyle harness at plain JS, which is a
+      // silent no-op, not an error. This is deliberately narrow — only JS declaration
+      // keywords a real CSS rule could never start with, chosen to avoid false
+      // positives on legitimate CSS (`#id { }`, `.class { }`, `:root { }` etc.).
+      if (intendedLang === 'css') {
+        const firstLine = step.challenge.code.split('\n').find(l => l.trim())?.trim() ?? ''
+        it(`step "${stepLabel}": css challenge content is not actually a JS object/function`, () => {
+          expect(firstLine, `challenge is tagged css but starts with JS syntax:\n${firstLine}`)
+            .not.toMatch(/^(const |let |var |function |async function )/)
         })
       }
     }

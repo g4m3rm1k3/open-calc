@@ -160,13 +160,10 @@ const config = buildConfig({
 ```
 
 ```test
-assert config.port === 4000
-assert config.jwtSecret === 'my-secret'
-assert config.isProd === true
+assert config.port === 4000 && config.jwtSecret === 'my-secret' && config.isProd === true
 assert config.corsOrigin === 'https://app.example.com'
 const devConfig = buildConfig({ JWT_SECRET: 'x', NODE_ENV: 'development' })
-assert devConfig.port === 3000
-assert devConfig.isProd === false
+assert devConfig.port === 3000 && devConfig.isProd === false
 assert devConfig.corsOrigin === 'http://localhost:5173'
 let threw = false
 try { buildConfig({ NODE_ENV: 'production' }) } catch(e) { threw = true }

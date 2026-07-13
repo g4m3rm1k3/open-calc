@@ -157,13 +157,9 @@ const scenarios = {
 ```
 
 ```test
-assert scenarios.listUsers.method === 'GET'
-assert scenarios.listUsers.status === 200
-assert scenarios.createUser.method === 'POST'
-assert scenarios.createUser.status === 201
-assert scenarios.deleteNotFound.method === 'DELETE'
-assert scenarios.deleteNotFound.status === 404
-assert scenarios.forbidden.status === 403
-assert scenarios.badRequest.method === 'POST'
-assert scenarios.badRequest.status === 400
+assert scenarios.listUsers.method === 'GET' && scenarios.listUsers.status === 200
+assert scenarios.createUser.method === 'POST' && scenarios.createUser.status === 201
+assert scenarios.deleteNotFound.method === 'DELETE' && scenarios.deleteNotFound.status === 404
+assert scenarios.forbidden.method === 'GET' && scenarios.forbidden.status === 403
+assert scenarios.badRequest.method === 'POST' && scenarios.badRequest.status === 400
 ```

@@ -220,9 +220,7 @@ const queries = {
 
 ```test
 const q = queries
-assert q.query1.toUpperCase().includes('JOIN')
-assert q.query1.toUpperCase().includes('AUTHOR')
-assert q.query1.toUpperCase().includes('BOOK')
+assert q.query1.toUpperCase().includes('JOIN') && q.query1.toUpperCase().includes('AUTHOR') && q.query1.toUpperCase().includes('BOOK')
 assert q.query2.toUpperCase().includes('LEFT') || q.query2.toUpperCase().includes('COUNT')
 assert q.query2.toUpperCase().includes('GROUP BY')
 assert q.query3.toUpperCase().includes('HAVING')

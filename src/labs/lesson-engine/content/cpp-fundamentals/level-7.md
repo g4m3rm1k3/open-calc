@@ -145,44 +145,15 @@ Write a function `int wordCount(const string& sentence)` that counts the number 
 Use `string::find` and `string::substr` to scan through the sentence, or a range-based for loop that counts when you see a transition.
 
 ```challenge
-#include <iostream>
-#include <string>
-using namespace std;
-
 int wordCount(const string& sentence) {
     // TODO
-}
-
-int main() {
-    cout << wordCount("Hello World") << endl;
-    cout << wordCount("one") << endl;
-    cout << wordCount("") << endl;
-    return 0;
 }
 ```
 
 ```test
-#include <iostream>
-#include <string>
-#include <cassert>
-using namespace std;
-
-int wordCount(const string& sentence) {
-    if (sentence.empty()) return 0;
-    int count = 1;
-    for (int i = 0; i < (int)sentence.length(); i++) {
-        if (sentence[i] == ' ') count++;
-    }
-    return count;
-}
-
-int main() {
-    assert(wordCount("Hello World")        == 2);
-    assert(wordCount("one")                == 1);
-    assert(wordCount("")                   == 0);
-    assert(wordCount("a b c d e")          == 5);
-    assert(wordCount("the quick brown fox") == 4);
-    cout << "ok" << endl;
-    return 0;
-}
+assert wordCount("Hello World") == 2
+assert wordCount("one") == 1
+assert wordCount("") == 0
+assert wordCount("a b c d e") == 5
+assert wordCount("the quick brown fox") == 4
 ```

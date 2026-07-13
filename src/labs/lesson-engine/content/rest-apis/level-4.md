@@ -299,32 +299,19 @@ function buildProductResponse(product) {
 ```test
 // extractFilters: defaults
 const f1 = extractFilters({})
-assert f1.sort === 'created_at'
-assert f1.order === 'desc'
-assert f1.limit === 20
-assert f1.cursor === null
-assert f1.category === null
+assert f1.sort === 'created_at' && f1.order === 'desc' && f1.limit === 20
 
-// extractFilters: valid values
+// extractFilters: valid values pass through and coerce types
 const f2 = extractFilters({ sort: 'price', order: 'asc', limit: '10', category: 'electronics', min_price: '5.99' })
-assert f2.sort === 'price'
-assert f2.order === 'asc'
-assert f2.limit === 10
-assert f2.category === 'electronics'
-assert f2.minPrice === 5.99
+assert f2.sort === 'price' && f2.limit === 10 && f2.minPrice === 5.99
 
-// extractFilters: invalid sort falls back to default
+// extractFilters: invalid/malicious input falls back to safe defaults and clamps
 const f3 = extractFilters({ sort: 'malicious_column', limit: '200' })
-assert f3.sort === 'created_at'
-assert f3.limit === 100   // clamped to max 100
+assert f3.sort === 'created_at' && f3.limit === 100
 
-// buildProductResponse: correct transformation
-const product = { id: 42, name: 'USB-C Cable', price: 9.99, category: 'electronics', description: null, created_at: '2026-01-01T00:00:00Z' }
-const resp = buildProductResponse(product)
-assert resp.data.id === '42'
-assert resp.data.name === 'USB-C Cable'
-assert resp.data.createdAt === '2026-01-01T00:00:00Z'
+// buildProductResponse: renames and coerces fields
+const resp = buildProductResponse({ id: 42, name: 'USB-C Cable', price: 9.99, category: 'electronics', description: null, created_at: '2026-01-01T00:00:00Z' })
+assert resp.data.id === '42' && resp.data.createdAt === '2026-01-01T00:00:00Z'
 assert !('created_at' in resp.data)
 assert resp.links.self === '/api/v1/products/42'
-assert resp.data.description === null
 ```

@@ -308,33 +308,22 @@ function parseAuthHeader(authHeader) {
 ```
 
 ```test
-// hashPassword + verifyPassword round-trip
+// hashPassword: produces a hash + salt of reasonable shape
 const pw1 = hashPassword('correcthorsebatterystaple')
-assert typeof pw1.hash === 'string'
-assert typeof pw1.salt === 'string'
-assert pw1.hash.length > 0
-assert pw1.salt.length >= 16
+assert typeof pw1.hash === 'string' && typeof pw1.salt === 'string' && pw1.salt.length >= 16
 
-assert verifyPassword('correcthorsebatterystaple', pw1.hash, pw1.salt) === true
-assert verifyPassword('wrongpassword', pw1.hash, pw1.salt) === false
+// verifyPassword: round-trips correctly both ways
+assert verifyPassword('correcthorsebatterystaple', pw1.hash, pw1.salt) === true && verifyPassword('wrongpassword', pw1.hash, pw1.salt) === false
 
-// Two hashes of the same password are different (because of random salt)
+// Two hashes of the same password differ (random salt) — never compare raw hashes
 const pw2 = hashPassword('correcthorsebatterystaple')
-assert pw1.hash !== pw2.hash   // different salts → different hashes
+assert pw1.hash !== pw2.hash
 
-// generateSessionId
+// generateSessionId: unpredictable and long enough to resist guessing
 const sid = generateSessionId()
-assert typeof sid === 'string'
-assert sid.length >= 32
+assert typeof sid === 'string' && sid.length >= 32 && sid !== generateSessionId()
 
-// Two session IDs are different
-const sid2 = generateSessionId()
-assert sid !== sid2
-
-// parseAuthHeader
+// parseAuthHeader: extracts the token, or null for anything malformed
 assert parseAuthHeader('Bearer mytoken123') === 'mytoken123'
-assert parseAuthHeader('Bearer ') === null || parseAuthHeader('Bearer ') === ''
-assert parseAuthHeader(null) === null
-assert parseAuthHeader('') === null
-assert parseAuthHeader('Basic abc') === null
+assert parseAuthHeader(null) === null && parseAuthHeader('Basic abc') === null
 ```

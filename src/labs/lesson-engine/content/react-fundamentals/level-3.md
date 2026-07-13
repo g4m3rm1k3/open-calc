@@ -276,37 +276,23 @@ function createFormState(fields) {
 
 ```test
 const form = createFormState({ name: '', email: '', age: '0' })
-
-// Initial state
-assert form.values.name === ''
-assert form.values.email === ''
-assert form.isDirty === false
+assert form.values.name === '' && form.isDirty === false
 
 // Set a value
 form.setValue('name', 'Alice')
-assert form.values.name === 'Alice'
-assert form.isDirty === true
+assert form.values.name === 'Alice' && form.isDirty === true
 
-// Field-level dirty
-const nameField = form.getField('name')
-assert nameField.value === 'Alice'
-assert nameField.isDirty === true
+// Field-level dirty tracking
+assert form.getField('name').isDirty === true && form.getField('email').isDirty === false
 
-const emailField = form.getField('email')
-assert emailField.isDirty === false   // email not changed
-
-// Set error
+// Set then clear an error
 form.setError('email', 'Email is required')
 assert form.errors.email === 'Email is required'
-
-// Clear error
 form.setError('email', null)
 assert form.errors.email === null
 
-// Reset
+// Reset restores initial values and clears dirty
 form.setValue('email', 'alice@example.com')
 form.reset()
-assert form.values.name === ''
-assert form.values.email === ''
-assert form.isDirty === false
+assert form.values.name === '' && form.values.email === '' && form.isDirty === false
 ```

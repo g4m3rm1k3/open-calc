@@ -178,28 +178,20 @@ Implement a `Stack` class that works with integers:
 - `int peek()` — returns the top value without removing it
 - `int size()` — returns the number of elements
 
-In `main`, push 3 values, print `peek()`, call `pop()`, then print `size()`.
-
 ```challenge
 class Stack {
     // TODO
 }
-
-public class Main {
-    public static void main(String[] args) {
-        Stack s = new Stack();
-        s.push(10);
-        s.push(20);
-        s.push(30);
-        System.out.println(s.peek());
-        s.pop();
-        System.out.println(s.size());
-    }
-}
 ```
 
 ```test
-// Expected output:
-// 30
-// 2
+Stack s = new Stack();
+s.push(10);
+s.push(20);
+s.push(30);
+assert s.peek() == 30
+assert s.size() == 3
+assert s.pop() == 30
+assert s.size() == 2
+assert s.peek() == 20
 ```

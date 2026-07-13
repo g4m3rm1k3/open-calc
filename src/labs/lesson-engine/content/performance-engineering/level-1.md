@@ -246,38 +246,32 @@ function memoize(fn, options = {}) {
 ```
 
 ```test
-// Sync function
+// Sync function: identical args hit the cache, only one real call
 let callCount = 0
 const expensiveFn = (n) => { callCount++; return n * n }
 const memoised = memoize(expensiveFn)
+assert memoised(4) === 16 && memoised(4) === 16 && callCount === 1
 
-assert memoised(4) === 16
-assert memoised(4) === 16   // cached
-assert callCount === 1      // only called once
+// Different args are a cache miss
+assert memoised(5) === 25 && callCount === 2
 
-assert memoised(5) === 25
-assert callCount === 2
-
-// Async function
+// Async function: caches the resolved value, only fetches once
 let asyncCalls = 0
-const asyncFn = async (id) => { asyncCalls++; return { id, name: 'item' + id } }
-const memoAsync = memoize(asyncFn)
-
+const memoAsync = memoize(async (id) => { asyncCalls++; return { id, name: 'item' + id } })
 const r1 = await memoAsync('a')
-const r2 = await memoAsync('a')
-assert r1.name === 'itema'
-assert asyncCalls === 1   // only fetched once
+await memoAsync('a')
+assert r1.name === 'itema' && asyncCalls === 1
 
-// TTL expiry
+// TTL expiry: recomputes once the cached entry goes stale
 const shortCache = memoize((x) => x * 2, { ttlMs: 50 })
-assert shortCache(7) === 14
-await new Promise(r => setTimeout(r, 100))   // wait for TTL to expire
-shortCache(7)   // should recompute (TTL expired)
-assert shortCache.cache.get('7').value === 14   // re-cached with fresh value
+shortCache(7)
+await new Promise(r => setTimeout(r, 100))
+shortCache(7)
+assert shortCache.cache.get('7').value === 14
 
-// invalidate
+// Explicit invalidation forces a recompute
 memoised.invalidate('4')
 callCount = 0
 memoised(4)
-assert callCount === 1   // recomputed after invalidation
+assert callCount === 1
 ```

@@ -168,4 +168,8 @@ var l = getComputedStyle(document.querySelector('#last'))
 assert c.alignItems === 'flex-start' || c.alignItems === 'start'
 assert m.alignSelf === 'center'
 assert l.alignSelf === 'flex-end' || l.alignSelf === 'end'
+var firstTop = document.querySelector('#first').getBoundingClientRect().top
+var middleTop = document.querySelector('#middle').getBoundingClientRect().top
+var lastTop = document.querySelector('#last').getBoundingClientRect().top
+assert middleTop > firstTop && lastTop > middleTop   // center/end sit lower than flex-start on the cross axis
 ```

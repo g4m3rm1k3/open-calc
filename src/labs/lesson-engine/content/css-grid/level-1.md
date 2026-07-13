@@ -177,4 +177,6 @@ assert g.display === 'grid'
 assert g.gap === '16px' || g.columnGap === '16px'
 var cols = g.gridTemplateColumns
 assert cols !== 'none' && cols !== ''
+var cardWidth = document.querySelector('#c1').getBoundingClientRect().width
+assert cardWidth >= 160   // minmax(160px, ...) enforces a minimum column width
 ```

@@ -153,6 +153,8 @@ p {
 
 ```test
 var el = getComputedStyle(document.querySelector('#message'))
-assert el.color === 'rgb(0, 128, 0)'
-assert el.fontSize === '16px'
+assert el.color === 'rgb(0, 128, 0)'   // #message (ID) wins over p and .info
+assert el.color !== 'rgb(0, 0, 0)' && el.color !== 'rgb(0, 0, 255)'   // p's and .info's color lost
+assert el.fontSize === '16px'   // .info (class) wins over p for font-size
+assert el.fontSize !== '14px'   // p's font-size lost
 ```

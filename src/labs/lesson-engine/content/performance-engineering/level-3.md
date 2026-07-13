@@ -226,29 +226,19 @@ const cache = { get: k => store.get(k), set: (k,v) => store.set(k,v) }
 
 const stats = await getUserStats(['1', '2', '3'], db, cache)
 
-assert stats['1'].name === 'User1'
-assert stats['1'].orderCount === 2
-assert stats['1'].totalSpent === 150
-assert Math.abs(stats['1'].averageOrderValue - 75) < 0.01
+assert stats['1'].orderCount === 2 && stats['1'].totalSpent === 150 && Math.abs(stats['1'].averageOrderValue - 75) < 0.01
+assert stats['2'].orderCount === 1 && stats['2'].totalSpent === 200
+assert stats['3'].orderCount === 0 && stats['3'].totalSpent === 0
 
-assert stats['2'].orderCount === 1
-assert stats['2'].totalSpent === 200
+// Only ONE db call each, in parallel — not one call per user
+assert dbCalls.users.length === 1 && dbCalls.orders.length === 1
 
-assert stats['3'].orderCount === 0
-assert stats['3'].totalSpent === 0
-
-// Only ONE db call each:
-assert dbCalls.users.length === 1
-assert dbCalls.orders.length === 1
-
-// Results cached:
-assert store.has('stats:1')
-assert store.has('stats:2')
+// Results cached
+assert store.has('stats:1') && store.has('stats:2')
 
 // Second call: use cache (no new db calls)
 dbCalls.users.length = 0
 dbCalls.orders.length = 0
 await getUserStats(['1', '2'], db, cache)
-assert dbCalls.users.length === 0
-assert dbCalls.orders.length === 0
+assert dbCalls.users.length === 0 && dbCalls.orders.length === 0
 ```

@@ -139,12 +139,8 @@ var h  = getComputedStyle(document.querySelector('#header'))
 var sb = getComputedStyle(document.querySelector('#sidebar'))
 var m  = getComputedStyle(document.querySelector('#main'))
 var f  = getComputedStyle(document.querySelector('#footer'))
-assert h.gridColumnStart === '1'
-assert h.gridColumnEnd === '-1' || h.gridColumnEnd === '4'
-assert sb.gridColumnStart === '1'
-assert sb.gridColumnEnd === '2'
-assert m.gridColumnStart === '2'
-assert m.gridColumnEnd === '4'
-assert f.gridColumnStart === '1'
-assert f.gridColumnEnd === '-1' || f.gridColumnEnd === '4'
+assert h.gridColumnStart === '1' && (h.gridColumnEnd === '-1' || h.gridColumnEnd === '4')
+assert sb.gridColumnStart === '1' && sb.gridColumnEnd === '2'
+assert m.gridColumnStart === '2' && m.gridColumnEnd === '4'
+assert f.gridColumnStart === '1' && (f.gridColumnEnd === '-1' || f.gridColumnEnd === '4')
 ```

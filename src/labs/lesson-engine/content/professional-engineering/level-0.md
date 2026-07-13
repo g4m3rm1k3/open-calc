@@ -225,13 +225,10 @@ function createQualityAnalyser() {
 ```test
 const qa = createQualityAnalyser()
 const r1 = qa.evaluate({ name: 'add unit tests', improvesCorrectness: true, improvesMaintainability: true, improvesReliability: true, improvesEvolvability: true, cost: 'medium' })
-assert r1.score === 3
-assert r1.recommendation === 'do'
+assert r1.score === 3 && r1.recommendation === 'do'
 const r2 = qa.evaluate({ name: 'rewrite in Haskell', improvesCorrectness: false, improvesMaintainability: false, improvesReliability: false, improvesEvolvability: false, cost: 'high' })
-assert r2.score === -2
-assert r2.recommendation === 'skip'
+assert r2.score === -2 && r2.recommendation === 'skip'
 const r3 = qa.evaluate({ name: 'extract interface', improvesCorrectness: false, improvesMaintainability: true, improvesReliability: false, improvesEvolvability: true, cost: 'low' })
-assert r3.score === 2
-assert r3.recommendation === 'consider'
+assert r3.score === 2 && r3.recommendation === 'consider'
 assert typeof r3.reason === 'string'
 ```

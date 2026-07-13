@@ -308,28 +308,17 @@ function createApiMiddleware(options) {
 const limited = createApiMiddleware({ rateLimitPerMinute: 2, requireAuth: false })
 const req = { path: '/users', method: 'GET', headers: {}, body: null, ip: '1.2.3.4' }
 
-const r1 = await limited(req)
-assert r1.status === 200
-const r2 = await limited(req)
-assert r2.status === 200
+assert (await limited(req)).status === 200
+assert (await limited(req)).status === 200
 const r3 = await limited(req)
-assert r3.status === 429
-assert r3.body.error.code === 'RATE_LIMIT_EXCEEDED'
+assert r3.status === 429 && r3.body.error.code === 'RATE_LIMIT_EXCEEDED'
 
 // Different IP is not rate-limited
-const r4 = await limited({ ...req, ip: '5.6.7.8' })
-assert r4.status === 200
+assert (await limited({ ...req, ip: '5.6.7.8' })).status === 200
 
-// Auth required: no token
+// Auth required: no token is rejected, valid Bearer token is accepted
 const authed = createApiMiddleware({ rateLimitPerMinute: 100, requireAuth: true })
 const noAuth = await authed({ ...req, ip: '9.9.9.9', headers: {} })
-assert noAuth.status === 401
-assert noAuth.body.error.code === 'AUTHENTICATION_REQUIRED'
-
-// Auth required: valid Bearer token
-const withAuth = await authed({
-  ...req, ip: '10.0.0.1',
-  headers: { authorization: 'Bearer valid-token-123' }
-})
-assert withAuth.status === 200
+assert noAuth.status === 401 && noAuth.body.error.code === 'AUTHENTICATION_REQUIRED'
+assert (await authed({ ...req, ip: '10.0.0.1', headers: { authorization: 'Bearer valid-token-123' } })).status === 200
 ```

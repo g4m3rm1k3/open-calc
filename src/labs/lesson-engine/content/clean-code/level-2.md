@@ -243,17 +243,12 @@ const subtotal = calculateSubtotal(order.items)
 assert subtotal === 81.00   // (10*3) + (25.5*2)
 
 const discount = calculateDiscount(subtotal, 'SAVE10')
-assert discount === 8.10   // 81 * 0.1
-
-const noDiscount = calculateDiscount(subtotal, null)
-assert noDiscount === 0
+assert discount === 8.10 && calculateDiscount(subtotal, null) === 0
 
 const tax = calculateTax(subtotal - discount)
 assert Math.abs(tax - 5.83) < 0.01   // (81 - 8.1) * 0.08 = 5.832
 
 const summary = calculateOrderSummary(order)
-assert summary.subtotal === 81.00
-assert summary.discount === 8.10
-assert Math.abs(summary.tax - 5.83) < 0.01
-assert Math.abs(summary.total - (81.00 - 8.10 + 5.832)) < 0.01
+assert summary.subtotal === 81.00 && summary.discount === 8.10
+assert Math.abs(summary.tax - 5.83) < 0.01 && Math.abs(summary.total - (81.00 - 8.10 + 5.832)) < 0.01
 ```

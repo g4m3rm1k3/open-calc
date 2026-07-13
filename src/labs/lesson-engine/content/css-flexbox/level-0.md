@@ -143,4 +143,7 @@ var c = getComputedStyle(document.querySelector('.container'))
 assert c.display === 'flex'
 assert c.flexDirection === 'column'
 assert c.gap === '12px'
+var b1 = document.querySelector('#b1').getBoundingClientRect()
+var b2 = document.querySelector('#b2').getBoundingClientRect()
+assert b2.top > b1.top   // column direction stacks boxes vertically
 ```

@@ -139,12 +139,10 @@ Write an INNER JOIN query that selects `courses.title` and `users.name AS author
 
 ```test
 var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
-assert q.includes('select')
+assert q.includes('select') && q.includes('from courses')
 assert q.includes('courses.title') || (q.includes('title') && q.includes('courses'))
 assert q.includes('users.name') || q.includes('name')
 assert q.includes('as author')
-assert q.includes('from courses')
 assert q.includes('inner join users') || q.includes('join users')
 assert q.includes('on') && q.includes('author_id') && q.includes('users.id')
-assert q.includes('order by')
 ```

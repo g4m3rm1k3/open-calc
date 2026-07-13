@@ -213,16 +213,13 @@ function registerUser(email, password) {
 
 ```test
 const ok = registerUser('user@example.com', 'securepassword123')
-assert ok.ok === true
-assert ok.value.email === 'user@example.com'
+assert ok.ok === true && ok.value.email === 'user@example.com'
 
 const badEmail = registerUser('not-an-email', 'securepassword123')
-assert badEmail.ok === false
-assert badEmail.error === 'invalid email'
+assert badEmail.ok === false && badEmail.error === 'invalid email'
 
 const shortPass = registerUser('user@example.com', 'short')
-assert shortPass.ok === false
-assert shortPass.error === 'password too short'
+assert shortPass.ok === false && shortPass.error === 'password too short'
 
 const both = registerUser('bad', 'pw')
 assert both.ok === false   // first failure wins — email fails first

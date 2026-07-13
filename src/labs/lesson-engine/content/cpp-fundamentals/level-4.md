@@ -169,49 +169,24 @@ Use a reference when the alias will always refer to a valid object and will neve
 Write a function `void swap(int& a, int& b)` that exchanges the values of `a` and `b`. After calling `swap(x, y)`, the caller's `x` and `y` must be swapped. No temporary variable hint is given — figure out the mechanics from what you know about references.
 
 ```challenge
-#include <iostream>
-using namespace std;
-
 void swap(int& a, int& b) {
     // TODO
-}
-
-int main() {
-    int x = 3, y = 7;
-    swap(x, y);
-    cout << x << " " << y << endl;
-    return 0;
 }
 ```
 
 ```test
-#include <iostream>
-#include <cassert>
-using namespace std;
+int x = 3, y = 7;
+swap(x, y);
+assert x == 7
+assert y == 3
 
-void swap(int& a, int& b) {
-    int tmp = a;
-    a = b;
-    b = tmp;
-}
+int p = 0, q = 0;
+swap(p, q);
+assert p == 0
+assert q == 0
 
-int main() {
-    int x = 3, y = 7;
-    swap(x, y);
-    assert(x == 7);
-    assert(y == 3);
-
-    int p = 0, q = 0;
-    swap(p, q);
-    assert(p == 0);
-    assert(q == 0);
-
-    int a = -5, b = 5;
-    swap(a, b);
-    assert(a == 5);
-    assert(b == -5);
-
-    cout << "ok" << endl;
-    return 0;
-}
+int m = -5, n = 5;
+swap(m, n);
+assert m == 5
+assert n == -5
 ```

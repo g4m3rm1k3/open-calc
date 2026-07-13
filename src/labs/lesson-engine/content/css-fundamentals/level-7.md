@@ -206,5 +206,8 @@ p {
 
 ```test
 var el = getComputedStyle(document.querySelector('#output'))
-assert el.color === 'rgb(220, 38, 38)'
+assert el.color === 'rgb(220, 38, 38)'   // #output rule wins
+assert el.color !== 'rgb(0, 0, 255)'   // p's blue lost
+assert el.color !== 'rgb(0, 128, 0)'   // .info's green lost
+assert el.fontSize === '15px'   // unrelated cascade-layer rule still applies
 ```

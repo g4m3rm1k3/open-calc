@@ -195,4 +195,8 @@ const remaining = document.querySelectorAll("#tasks li")
 assert remaining.length === 1
 assert remaining[0].textContent === "Pending"
 assert document.querySelectorAll("#tasks .done").length === 0
+
+document.body.innerHTML = '<ul id="empty"><li class="done">All done</li></ul>'
+removeCompleted("empty")
+assert document.querySelectorAll("#empty li").length === 0
 ```

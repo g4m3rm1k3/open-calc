@@ -180,16 +180,10 @@ function describePipeline(projectType) {
 
 ```test
 const api = describePipeline('node-api')
-assert api.trigger.includes('push')
-assert api.trigger.includes('pull_request')
-assert api.steps.includes('lint') || api.steps.some(s => s.includes('lint'))
-assert api.steps.includes('test') || api.steps.some(s => s.includes('test'))
-assert api.steps.includes('build') || api.steps.some(s => s.includes('build'))
-assert api.secretsNeeded.includes('DATABASE_URL')
-assert api.nodeVersion === '20'
+assert api.trigger.includes('push') && api.trigger.includes('pull_request')
+assert api.steps.some(s => s.includes('lint')) && api.steps.some(s => s.includes('test')) && api.steps.some(s => s.includes('build'))
+assert api.secretsNeeded.includes('DATABASE_URL') && api.nodeVersion === '20'
 
 const app = describePipeline('react-app')
-assert app.secretsNeeded.length === 0
-assert app.nodeVersion === '20'
-assert app.steps.some(s => s.includes('test') || s.includes('build'))
+assert app.secretsNeeded.length === 0 && app.steps.some(s => s.includes('test') || s.includes('build'))
 ```

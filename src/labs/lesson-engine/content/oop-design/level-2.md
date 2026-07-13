@@ -280,18 +280,14 @@ function identifyViolation(scenario) {
 
 ```test
 const g = identifyViolation('god-class')
-assert g.principle === 'SRP'
-assert g.description.length > 15
+assert g.principle === 'SRP' && g.description.length > 15
 
 const t = identifyViolation('throws-not-supported')
-assert t.principle === 'LSP'
-assert t.description.length > 15
+assert t.principle === 'LSP' && t.description.length > 15
 
 const h = identifyViolation('hardcoded-new')
-assert h.principle === 'DIP'
-assert h.description.length > 15
+assert h.principle === 'DIP' && h.description.length > 15
 
 const s = identifyViolation('switch-on-type')
-assert s.principle === 'OCP'
-assert s.description.length > 15
+assert s.principle === 'OCP' && s.description.length > 15
 ```

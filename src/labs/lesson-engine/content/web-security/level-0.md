@@ -177,9 +177,8 @@ function auditTrustBoundary(scenario) {
 
 ```test
 const login = auditTrustBoundary('user-login-request')
-assert login.trustLevel === 'zero-trust'
+assert login.trustLevel === 'zero-trust' && login.mustValidate.length >= 2
 assert login.mustValidate.some(v => v.toLowerCase().includes('email') || v.toLowerCase().includes('format'))
-assert login.mustValidate.length >= 2
 
 const db = auditTrustBoundary('database-query-result')
 assert db.trustLevel === 'trusted'

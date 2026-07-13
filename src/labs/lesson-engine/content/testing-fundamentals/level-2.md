@@ -247,35 +247,18 @@ function createInMemoryProductRepository() {
 ```test
 const repo = createInMemoryProductRepository()
 
-// insert
 const p1 = await repo.insert({ name: 'Widget', price: 9.99, category: 'tools' })
-assert p1.id !== undefined
-assert p1.name === 'Widget'
-assert p1.price === 9.99
-
 const p2 = await repo.insert({ name: 'Gadget', price: 24.99, category: 'tech' })
-assert p2.id !== p1.id   // different ids
+assert p1.id !== undefined && p1.name === 'Widget' && p2.id !== p1.id
 
-// findById
-const found = await repo.findById(p1.id)
-assert found.name === 'Widget'
+assert (await repo.findById(p1.id)).name === 'Widget' && (await repo.findById(99999)) === null
 
-const notFound = await repo.findById(99999)
-assert notFound === null
-
-// findByCategory
 const tools = await repo.findByCategory('tools')
-assert tools.length === 1
-assert tools[0].name === 'Widget'
+assert tools.length === 1 && tools[0].name === 'Widget'
 
-// update
 const updated = await repo.update(p1.id, { price: 12.99 })
-assert updated.price === 12.99
-assert updated.name === 'Widget'   // unchanged fields preserved
+assert updated.price === 12.99 && updated.name === 'Widget'   // unchanged fields preserved
+assert (await repo.update(99999, { price: 5 })) === null
 
-const notUpdated = await repo.update(99999, { price: 5 })
-assert notUpdated === null
-
-// count
 assert await repo.count() === 2
 ```

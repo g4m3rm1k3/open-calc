@@ -198,34 +198,18 @@ Write a `Temperature` class with:
 - A `Fahrenheit` property (get only) that returns `Celsius * 9.0 / 5.0 + 32.0`
 - A constructor that takes a `double celsius` parameter
 
-Then in `Main`, create a `Temperature` with `100.0`, print both `Celsius` and `Fahrenheit`, then set `Celsius = 0.0` and print both again.
-
 ```challenge
-using System;
-
 class Temperature
 {
     // TODO
 }
-
-class Program
-{
-    static void Main()
-    {
-        var t = new Temperature(100.0);
-        Console.WriteLine(t.Celsius);
-        Console.WriteLine(t.Fahrenheit);
-        t.Celsius = 0.0;
-        Console.WriteLine(t.Celsius);
-        Console.WriteLine(t.Fahrenheit);
-    }
-}
 ```
 
 ```test
-// Expected output:
-// 100
-// 212
-// 0
-// 32
+var t = new Temperature(100.0);
+assert t.Celsius == 100.0
+assert Math.Abs(t.Fahrenheit - 212.0) < 0.01
+t.Celsius = 0.0;
+assert t.Celsius == 0.0
+assert Math.Abs(t.Fahrenheit - 32.0) < 0.01
 ```

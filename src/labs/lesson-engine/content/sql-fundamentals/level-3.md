@@ -115,10 +115,8 @@ Write a query that counts users per role. Select `role` and `COUNT(*) AS user_co
 
 ```test
 var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
-assert q.includes('select')
-assert q.includes('role')
-assert q.includes('count(*)')
-assert q.includes('as user_count')
+assert q.includes('select') && q.includes('role')
+assert q.includes('count(*)') && q.includes('as user_count')
 assert q.includes('from users')
 assert q.includes('group by role')
 assert q.includes('order by user_count desc') || q.includes('order by 2 desc')

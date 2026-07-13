@@ -143,30 +143,18 @@ Hello, Bob!
 
 ## Challenge: fahrenheit_to_celsius
 
-Write a `static double FahrenheitToCelsius(double f)` method that converts Fahrenheit to Celsius using the formula `(f - 32) × 5 / 9`. Then write `Main` to print the result for 32°F, 212°F, and 98.6°F.
+Write a `static double FahrenheitToCelsius(double f)` method that converts Fahrenheit to Celsius using the formula `(f - 32) × 5 / 9`.
 
 ```challenge
-using System;
-
-class Program
+static double FahrenheitToCelsius(double f)
 {
-    static double FahrenheitToCelsius(double f)
-    {
-        // TODO
-    }
-
-    static void Main()
-    {
-        Console.WriteLine(FahrenheitToCelsius(32));
-        Console.WriteLine(FahrenheitToCelsius(212));
-        Console.WriteLine(FahrenheitToCelsius(98.6));
-    }
+    // TODO
 }
 ```
 
 ```test
-// Expected output (approximate):
-// 0
-// 100
-// 37
+assert Math.Abs(FahrenheitToCelsius(32) - 0) < 0.01
+assert Math.Abs(FahrenheitToCelsius(212) - 100) < 0.01
+assert Math.Abs(FahrenheitToCelsius(98.6) - 37) < 0.1
+assert Math.Abs(FahrenheitToCelsius(-40) - (-40)) < 0.01
 ```

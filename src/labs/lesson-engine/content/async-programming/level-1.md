@@ -211,34 +211,26 @@ async function loadDashboard(userId, fetchFn) {
 ```
 
 ```test
+// All three load successfully, in parallel
 const successFetch = async (url) => ({ url, data: 'ok' })
 const result = await loadDashboard('u1', successFetch)
-assert result.profile.url.includes('u1')
-assert result.orders.data === 'ok'
-assert result.inventory.data === 'ok'
-assert result.errors.length === 0
+assert result.profile.url.includes('u1') && result.orders.data === 'ok' && result.errors.length === 0
 
-// Profile failure: should throw
+// Profile failure: required, must throw
 let threw = false
 const failProfile = async (url) => {
   if (url.includes('/users/')) throw new Error('user not found')
   return { url, data: 'ok' }
 }
-try { await loadDashboard('u1', failProfile) } catch(e) {
-  threw = true
-  assert e.message === 'user not found'
-}
+try { await loadDashboard('u1', failProfile) } catch(e) { threw = true; assert e.message === 'user not found' }
 assert threw
 
-// Optional failures: should return partial results
+// Optional failures: return partial results, don't throw
 const failOrders = async (url) => {
   if (url.includes('/orders')) throw new Error('orders unavailable')
   return { url, data: 'ok' }
 }
 const partial = await loadDashboard('u1', failOrders)
-assert partial.profile.data === 'ok'
-assert partial.orders === null
-assert partial.inventory.data === 'ok'
-assert partial.errors.length === 1
-assert partial.errors[0].includes('orders unavailable')
+assert partial.profile.data === 'ok' && partial.orders === null && partial.inventory.data === 'ok'
+assert partial.errors.length === 1 && partial.errors[0].includes('orders unavailable')
 ```

@@ -248,29 +248,20 @@ const loadItem = createBatchLoader(async (keys) => {
   return keys.map(k => ({ id: k, name: 'item-' + k }))
 })
 
-// All three called before any microtask runs → should batch
-const [a, b, c] = await Promise.all([
-  loadItem('1'),
-  loadItem('2'),
-  loadItem('3'),
-])
-
-assert a.name === 'item-1'
-assert b.name === 'item-2'
-assert c.name === 'item-3'
-assert batchLog.length === 1          // only ONE batch call
-assert batchLog[0].length === 3       // all 3 keys in one batch
+// All three called before any microtask runs → batched into ONE call
+const [a, b, c] = await Promise.all([loadItem('1'), loadItem('2'), loadItem('3')])
+assert a.name === 'item-1' && b.name === 'item-2' && c.name === 'item-3'
+assert batchLog.length === 1 && batchLog[0].length === 3
 
 // Duplicate keys should not cause duplicate batch entries
 batchLog.length = 0
 const [d, e] = await Promise.all([loadItem('x'), loadItem('x')])
-assert d.name === 'item-x'
-assert e.name === 'item-x'
+assert d.name === 'item-x' && e.name === 'item-x'
 assert batchLog[0].filter(k => k === 'x').length === 1   // deduplicated
 
-// Sequential awaits → separate batch calls
+// Sequential awaits → separate batch calls, one per tick
 batchLog.length = 0
 await loadItem('p')
 await loadItem('q')
-assert batchLog.length === 2   // two separate batches (one per tick)
+assert batchLog.length === 2
 ```

@@ -264,9 +264,7 @@ g.addDependency('UI', 'Application')
 g.addDependency('Application', 'Domain')
 g.addDependency('Domain', 'Database')
 const v = g.violations()
-assert v.length === 1
-assert v[0].from === 'Domain'
-assert v[0].to === 'Database'
+assert v.length === 1 && v[0].from === 'Domain' && v[0].to === 'Database'
 assert typeof v[0].reason === 'string'
 assert g.dependents('Domain').includes('Application')
 assert g.dependents('Database').includes('Domain')

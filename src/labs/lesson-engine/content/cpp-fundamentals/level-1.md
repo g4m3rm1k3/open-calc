@@ -170,7 +170,7 @@ When `i == 7`, `break` exits. Even numbers hit `continue` and skip `cout`. Only 
 
 Write a program that uses a `for` loop from `1` to `100` (inclusive) and prints the sum of all odd numbers in that range. An odd number satisfies `n % 2 != 0`.
 
-```challenge
+```challenge cpp-program
 #include <iostream>
 using namespace std;
 
@@ -181,17 +181,9 @@ int main() {
 ```
 
 ```test
-#include <iostream>
-#include <cassert>
-using namespace std;
-
-int main() {
-    int sum = 0;
-    for (int i = 1; i <= 100; i++) {
-        if (i % 2 != 0) sum += i;
-    }
-    assert(sum == 2500);
-    cout << sum << endl;
-    return 0;
-}
+assert output.trim() === '2500'
+var n = parseInt(output.trim(), 10)
+assert n === 2500
+assert n !== 5050   // not the sum of ALL numbers 1-100 (forgot the odd filter)
+assert n !== 2550   // not the sum of the EVEN numbers (wrong parity check)
 ```

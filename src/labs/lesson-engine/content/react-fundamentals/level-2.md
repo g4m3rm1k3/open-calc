@@ -266,36 +266,22 @@ function createDataFetcher() {
 
 ```test
 const fetcher = createDataFetcher()
-
-// Initial state
-assert fetcher.getState().data === null
-assert fetcher.getState().loading === false
-assert fetcher.getState().error === null
+assert fetcher.getState().data === null && fetcher.getState().loading === false
 
 // Successful fetch
 const result = await fetcher.fetch(async () => ({ id: 1, name: 'Alice' }))
-assert result.id === 1
-assert fetcher.getState().data.name === 'Alice'
-assert fetcher.getState().loading === false
-assert fetcher.getState().error === null
+assert result.id === 1 && fetcher.getState().data.name === 'Alice' && fetcher.getState().error === null
 
 // Failed fetch
-try {
-  await fetcher.fetch(async () => { throw new Error('Network error') })
-} catch (e) {}
-assert fetcher.getState().error === 'Network error'
-assert fetcher.getState().loading === false
+try { await fetcher.fetch(async () => { throw new Error('Network error') }) } catch (e) {}
+assert fetcher.getState().error === 'Network error' && fetcher.getState().loading === false
 
-// Cancelled fetch: data should not update
-fetcher.cancel()
+// Cancelled fetch: data should not update after cancellation
 const fetcher2 = createDataFetcher()
 let stateAfterCancel = null
-const cancelledFetch = fetcher2.fetch(async () => {
+await fetcher2.fetch(async () => {
   fetcher2.cancel()   // cancel mid-flight
   return { id: 2, name: 'Bob' }
-}).then(() => {
-  stateAfterCancel = fetcher2.getState()
-})
-await cancelledFetch
-assert stateAfterCancel.data === null   // cancelled — data not set
+}).then(() => { stateAfterCancel = fetcher2.getState() })
+assert stateAfterCancel.data === null
 ```

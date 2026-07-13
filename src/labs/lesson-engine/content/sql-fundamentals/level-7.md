@@ -136,13 +136,8 @@ The `REFERENCES authors(id)` makes `author_id` a foreign key — the database wi
 
 ```test
 var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
-assert q.includes('create table authors')
-assert q.includes('create table posts')
-assert (q.match(/create table/g) || []).length >= 2
-assert q.includes('primary key')
-assert q.includes('not null')
-assert q.includes('unique')
-assert q.includes('references authors')
-assert q.includes('author_id')
+assert q.includes('create table authors') && q.includes('create table posts')
+assert q.includes('primary key') && q.includes('not null') && q.includes('unique')
+assert q.includes('references authors') && q.includes('author_id')
 assert q.includes('email')
 ```

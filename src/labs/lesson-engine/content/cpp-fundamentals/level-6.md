@@ -208,55 +208,23 @@ Implement a `Counter` class with:
 - A `void reset()` method that sets `count` to 0
 
 ```challenge
-#include <iostream>
-using namespace std;
-
 class Counter {
     // TODO
 };
-
-int main() {
-    Counter c;
-    c.increment();
-    c.increment();
-    c.increment();
-    c.decrement();
-    cout << c.getCount() << endl;
-    return 0;
-}
 ```
 
 ```test
-#include <iostream>
-#include <cassert>
-using namespace std;
-
-class Counter {
-private:
-    int count;
-public:
-    Counter() { count = 0; }
-    void increment() { count++; }
-    void decrement() { if (count > 0) count--; }
-    int getCount() { return count; }
-    void reset() { count = 0; }
-};
-
-int main() {
-    Counter c;
-    assert(c.getCount() == 0);
-    c.increment();
-    c.increment();
-    assert(c.getCount() == 2);
-    c.decrement();
-    assert(c.getCount() == 1);
-    c.decrement();
-    c.decrement();
-    assert(c.getCount() == 0);
-    c.increment();
-    c.reset();
-    assert(c.getCount() == 0);
-    cout << "ok" << endl;
-    return 0;
-}
+Counter c;
+assert c.getCount() == 0
+c.increment();
+c.increment();
+assert c.getCount() == 2
+c.decrement();
+assert c.getCount() == 1
+c.decrement();
+c.decrement();
+assert c.getCount() == 0   // decrement never goes below 0
+c.increment();
+c.reset();
+assert c.getCount() == 0
 ```

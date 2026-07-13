@@ -268,17 +268,13 @@ const unsub = emitter.on('data', (value) => received.push(value))
 emitter.on('data', (value) => received.push(value * 2))
 
 emitter.emit('data', 5)
-assert received[0] === 5
-assert received[1] === 10
+assert received[0] === 5 && received[1] === 10
 assert emitter.listenerCount('data') === 2
 
 unsub()
 emitter.emit('data', 7)
-assert received.length === 3   // only the second handler fired
-assert received[2] === 14
+assert received.length === 3 && received[2] === 14   // only the second handler fired
 
 emitter.emit('unknown', 99)   // no listeners — no error
-
-assert emitter.listenerCount('data') === 1
-assert emitter.listenerCount('unknown') === 0
+assert emitter.listenerCount('data') === 1 && emitter.listenerCount('unknown') === 0
 ```

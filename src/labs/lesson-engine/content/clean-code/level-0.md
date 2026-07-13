@@ -153,16 +153,13 @@ function readabilityAudit(codeSnippet) {
 
 ```test
 const a = readabilityAudit('snippet-a')
-assert Array.isArray(a.issues) && a.issues.length >= 1
-assert Array.isArray(a.fixes) && a.fixes.length === a.issues.length
+assert Array.isArray(a.issues) && a.issues.length >= 1 && a.fixes.length === a.issues.length
 assert a.issues.some(i => i.toLowerCase().includes('name') || i.toLowerCase().includes('unclear'))
 
 const b = readabilityAudit('snippet-b')
-assert b.issues.length >= 1
-assert b.fixes.length === b.issues.length
+assert b.issues.length >= 1 && b.fixes.length === b.issues.length
 
 const c = readabilityAudit('snippet-c')
-assert c.issues.length >= 2
-assert c.fixes.length === c.issues.length
+assert c.issues.length >= 2 && c.fixes.length === c.issues.length
 assert c.issues.some(i => i.toLowerCase().includes('magic') || i.toLowerCase().includes('100') || i.toLowerCase().includes('abbreviat'))
 ```

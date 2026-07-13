@@ -278,19 +278,17 @@ function createArchitectureAnalyser() {
 ```test
 const analyser = createArchitectureAnalyser()
 const d1 = analyser.classify({ name: 'microservices', affects: ['scalability','deployability'], reversalCost: 'high' })
-assert d1.significant === true
 const d2 = analyser.classify({ name: 'variable naming', affects: ['readability'], reversalCost: 'low' })
-assert d2.significant === false
 const d3 = analyser.classify({ name: 'auth approach', affects: ['security'], reversalCost: 'medium' })
-assert d3.significant === true
+assert d1.significant === true && d2.significant === false && d3.significant === true
+
 const decisions = [
   { name: 'event-driven', affects: ['reliability','scalability'], reversalCost: 'high' },
   { name: 'logging lib',  affects: [], reversalCost: 'low' },
   { name: 'sql vs nosql', affects: ['performance'], reversalCost: 'high' },
 ]
 const attrs = analyser.qualityAttributes(decisions)
-assert attrs.includes('reliability')
-assert attrs.includes('scalability')
+assert attrs.includes('reliability') && attrs.includes('scalability')
 assert attrs.includes('performance')
 assert !attrs.includes('readability')
 ```

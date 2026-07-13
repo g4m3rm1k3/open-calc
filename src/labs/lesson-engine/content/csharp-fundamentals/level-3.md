@@ -150,35 +150,21 @@ Given a list of `(name, score)` tuples, write a method `List<string> TopStudents
 Use LINQ: `Where`, `OrderBy`, `Select`, and `ToList`.
 
 ```challenge
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-class Program
+static List<string> TopStudents(List<(string Name, int Score)> students, int threshold)
 {
-    static List<string> TopStudents(List<(string Name, int Score)> students, int threshold)
-    {
-        // TODO
-    }
-
-    static void Main()
-    {
-        var students = new List<(string, int)>
-        {
-            ("Alice", 92), ("Bob", 65), ("Carol", 88),
-            ("Dave", 72), ("Eve", 95), ("Frank", 58)
-        };
-
-        var top = TopStudents(students, 70);
-        foreach (var name in top) Console.WriteLine(name);
-    }
+    // TODO
 }
 ```
 
 ```test
-// Expected output (threshold 70, sorted alphabetically):
-// Alice
-// Carol
-// Dave
-// Eve
+var students = new List<(string, int)>
+{
+    ("Alice", 92), ("Bob", 65), ("Carol", 88),
+    ("Dave", 72), ("Eve", 95), ("Frank", 58)
+};
+var top = TopStudents(students, 70);
+assert top.Count == 4
+assert top[0] == "Alice" && top[1] == "Carol"
+assert top[2] == "Dave" && top[3] == "Eve"
+assert TopStudents(students, 100).Count == 0
 ```

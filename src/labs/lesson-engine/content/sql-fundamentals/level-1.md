@@ -130,12 +130,9 @@ Write a SELECT statement that retrieves `title` and `author_id` from `courses` w
 
 ```test
 var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
-assert q.startsWith('select')
-assert !q.includes('select *')
-assert q.includes('title')
-assert q.includes('author_id')
-assert q.includes('from courses')
-assert q.includes('where')
-assert (q.includes('author_id = 1') || q.includes('author_id=1'))
+assert q.startsWith('select') && !q.includes('select *')
+assert q.includes('title') && q.includes('author_id')
+assert q.includes('from courses') && q.includes('where')
+assert q.includes('author_id = 1') || q.includes('author_id=1')
 assert !q.includes('name') && !q.includes('email')
 ```

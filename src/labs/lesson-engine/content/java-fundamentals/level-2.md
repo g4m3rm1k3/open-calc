@@ -181,7 +181,7 @@ Define an interface `Payment` with a single method `void process(double amount)`
 
 In `main`, create one of each and call `process(99.99)` on both.
 
-```challenge
+```challenge java-program
 interface Payment {
     // TODO
 }
@@ -205,7 +205,8 @@ public class Main {
 ```
 
 ```test
-// Expected output:
-// Charged $99.99 to card ending in 3456
-// Sent $99.99 to user@example.com via PayPal
+assert output.includes('Charged $99.99')
+assert output.includes('3456')
+assert output.includes('Sent $99.99')
+assert output.includes('user@example.com')
 ```

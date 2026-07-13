@@ -149,32 +149,20 @@ Given a `List<String>` of words, write a method `HashMap<String, Integer> wordFr
 `getOrDefault(key, defaultValue)` — returns the value for the key, or `defaultValue` if the key is absent.
 
 ```challenge
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-public class Main {
-    static HashMap<String, Integer> wordFrequency(List<String> words) {
-        // TODO
-    }
-
-    public static void main(String[] args) {
-        List<String> words = new ArrayList<>();
-        words.add("the"); words.add("quick"); words.add("brown");
-        words.add("fox"); words.add("the"); words.add("quick");
-        words.add("the");
-
-        HashMap<String, Integer> freq = wordFrequency(words);
-        System.out.println(freq.get("the"));
-        System.out.println(freq.get("quick"));
-        System.out.println(freq.get("fox"));
-    }
+static HashMap<String, Integer> wordFrequency(List<String> words) {
+    // TODO
 }
 ```
 
 ```test
-// Expected output:
-// 3
-// 2
-// 1
+List<String> words = new ArrayList<>();
+words.add("the"); words.add("quick"); words.add("brown");
+words.add("fox"); words.add("the"); words.add("quick");
+words.add("the");
+HashMap<String, Integer> freq = wordFrequency(words);
+assert freq.get("the") == 3
+assert freq.get("quick") == 2
+assert freq.get("fox") == 1
+assert freq.get("brown") == 1
+assert freq.getOrDefault("missing", 0) == 0
 ```

@@ -180,9 +180,6 @@ int main() {
 Define a struct `TempRecord` with two fields: `double high` and `double low`. Write a function `TempRecord weekStats(double highs[], double lows[], int days)` that computes the overall highest high and lowest low across all days and returns them as a `TempRecord`.
 
 ```challenge
-#include <iostream>
-using namespace std;
-
 struct TempRecord {
     double high;
     double low;
@@ -191,52 +188,18 @@ struct TempRecord {
 TempRecord weekStats(double highs[], double lows[], int days) {
     // TODO
 }
-
-int main() {
-    double highs[] = {22.5, 19.0, 25.3, 18.7, 23.1};
-    double lows[]  = { 8.1,  5.5, 10.2,  3.9,  7.8};
-    TempRecord result = weekStats(highs, lows, 5);
-    cout << "High: " << result.high << endl;
-    cout << "Low: "  << result.low  << endl;
-    return 0;
-}
 ```
 
 ```test
-#include <iostream>
-#include <cassert>
-using namespace std;
+double highs[] = {22.5, 19.0, 25.3, 18.7, 23.1};
+double lows[]  = { 8.1,  5.5, 10.2,  3.9,  7.8};
+TempRecord r = weekStats(highs, lows, 5);
+assert r.high > 25.0 && r.high < 25.5
+assert r.low  > 3.5  && r.low  < 4.5
 
-struct TempRecord {
-    double high;
-    double low;
-};
-
-TempRecord weekStats(double highs[], double lows[], int days) {
-    TempRecord r;
-    r.high = highs[0];
-    r.low  = lows[0];
-    for (int i = 1; i < days; i++) {
-        if (highs[i] > r.high) r.high = highs[i];
-        if (lows[i]  < r.low)  r.low  = lows[i];
-    }
-    return r;
-}
-
-int main() {
-    double highs[] = {22.5, 19.0, 25.3, 18.7, 23.1};
-    double lows[]  = { 8.1,  5.5, 10.2,  3.9,  7.8};
-    TempRecord r = weekStats(highs, lows, 5);
-    assert(r.high > 25.0 && r.high < 25.5);
-    assert(r.low  > 3.5  && r.low  < 4.5);
-
-    double h2[] = {10.0};
-    double l2[] = {-2.0};
-    TempRecord r2 = weekStats(h2, l2, 1);
-    assert(r2.high == 10.0);
-    assert(r2.low  == -2.0);
-
-    cout << "ok" << endl;
-    return 0;
-}
+double h2[] = {10.0};
+double l2[] = {-2.0};
+TempRecord r2 = weekStats(h2, l2, 1);
+assert r2.high == 10.0
+assert r2.low  == -2.0
 ```

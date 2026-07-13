@@ -192,6 +192,8 @@ You can add, change, or remove any rule — but you must use at least one select
 
 ```test
 var el = getComputedStyle(document.querySelector('.message'))
-assert el.color === 'rgb(22, 163, 74)'
+assert el.color === 'rgb(22, 163, 74)'   // green wins
+assert el.color !== 'rgb(220, 38, 38)'   // the buggy red rule no longer applies
 assert el.fontSize === '16px'
+assert el.fontSize !== '14px'   // the buggy 0.875rem no longer applies
 ```

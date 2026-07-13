@@ -186,12 +186,10 @@ const repo = new CourseRepo();
 ```
 
 ```test
-assert Array.isArray(repo.findAll())
-assert repo.findAll().length === 2
+assert Array.isArray(repo.findAll()) && repo.findAll().length === 2
 assert repo.findById(1).title === 'Python Fundamentals'
 assert repo.findById(99) === null
 const newCourse = repo.create({ id: 3, title: 'CSS Fundamentals', lang: 'css' })
 assert newCourse.title === 'CSS Fundamentals'
-assert repo.findAll().length === 3
-assert repo.findById(3).lang === 'css'
+assert repo.findAll().length === 3 && repo.findById(3).lang === 'css'
 ```

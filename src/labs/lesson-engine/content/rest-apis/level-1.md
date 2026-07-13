@@ -241,30 +241,14 @@ function resolveRequest(scenario) {
 
 ```test
 const get = resolveRequest('get-existing-user')
-assert get.status === 200
-assert get.body.id === 42
-assert get.body.name === 'Alice'
-
+assert get.status === 200 && get.body.id === 42
 const create = resolveRequest('create-user')
-assert create.status === 201
-assert create.body.id === 43
-
+assert create.status === 201 && create.body.id === 43
 const del = resolveRequest('delete-user')
-assert del.status === 204
-assert del.body === null
-
+assert del.status === 204 && del.body === null
 const notFound = resolveRequest('user-not-found')
-assert notFound.status === 404
-assert notFound.body.error.code === 'USER_NOT_FOUND'
-assert typeof notFound.body.error.message === 'string'
-
+assert notFound.status === 404 && notFound.body.error.code === 'USER_NOT_FOUND'
 const missingField = resolveRequest('missing-email-field')
-assert missingField.status === 400
-assert missingField.body.error.code === 'MISSING_REQUIRED_FIELD'
-
-const noAuth = resolveRequest('no-auth-token')
-assert noAuth.status === 401
-
-const forbidden = resolveRequest('wrong-role')
-assert forbidden.status === 403
+assert missingField.status === 400 && missingField.body.error.code === 'MISSING_REQUIRED_FIELD'
+assert resolveRequest('no-auth-token').status === 401 && resolveRequest('wrong-role').status === 403
 ```

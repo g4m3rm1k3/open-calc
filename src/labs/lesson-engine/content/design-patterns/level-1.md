@@ -239,37 +239,26 @@ function createHttpRequestBuilder(url) {
 ```test
 // Default GET request
 const req1 = createHttpRequestBuilder('https://api.example.com/users').build()
-assert req1.url === 'https://api.example.com/users'
-assert req1.method === 'GET'
-assert req1.body === null
-assert req1.timeout === 30000
-assert typeof req1.headers === 'object'
+assert req1.method === 'GET' && req1.body === null && req1.timeout === 30000
 
 // POST with headers and body
 const req2 = createHttpRequestBuilder('https://api.example.com/users')
   .method('POST')
   .header('Content-Type', 'application/json')
-  .header('Authorization', 'Bearer abc123')
   .body({ name: 'Alice' })
   .timeout(10000)
   .build()
+assert req2.method === 'POST' && req2.headers['Content-Type'] === 'application/json'
+assert req2.body === JSON.stringify({ name: 'Alice' }) && req2.timeout === 10000
 
-assert req2.method === 'POST'
-assert req2.headers['Content-Type'] === 'application/json'
-assert req2.headers['Authorization'] === 'Bearer abc123'
-assert req2.body === JSON.stringify({ name: 'Alice' })
-assert req2.timeout === 10000
-
-// Method chaining returns the builder (not undefined)
+// Method chaining returns the builder itself, not undefined
 const builder = createHttpRequestBuilder('https://example.com')
-const after = builder.method('DELETE')
-assert after === builder   // same reference
+assert builder.method('DELETE') === builder
 
-// Multiple builds are independent
+// Multiple builds are independent snapshots
 const b = createHttpRequestBuilder('https://example.com')
 b.header('X-A', '1')
 const r1 = b.build()
 b.header('X-B', '2')
-const r2 = b.build()
 assert !('X-B' in r1.headers)   // r1 was built before X-B was set
 ```

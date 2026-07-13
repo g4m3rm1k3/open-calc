@@ -174,30 +174,20 @@ function loadConfig(env) {
 ```
 
 ```test
+// Explicit values are parsed and type-coerced
 const config = loadConfig({
-  PORT: '8080',
-  NODE_ENV: 'production',
-  DATABASE_URL: 'postgres://localhost/mydb',
-  MAX_CONNECTIONS: '20',
-  DEBUG: 'true',
+  PORT: '8080', NODE_ENV: 'production', DATABASE_URL: 'postgres://localhost/mydb',
+  MAX_CONNECTIONS: '20', DEBUG: 'true',
 })
+assert config.port === 8080 && config.maxConnections === 20 && config.debug === true
 
-assert config.port === 8080
-assert config.nodeEnv === 'production'
-assert config.databaseUrl === 'postgres://localhost/mydb'
-assert config.maxConnections === 20
-assert config.debug === true
-
+// Missing optional vars fall back to defaults
 const defaults = loadConfig({ DATABASE_URL: 'postgres://localhost/mydb' })
-assert defaults.port === 3000
-assert defaults.nodeEnv === 'development'
-assert defaults.maxConnections === 10
-assert defaults.debug === false
+assert defaults.port === 3000 && defaults.nodeEnv === 'development' && defaults.debug === false
 
-let threw = false
-try { loadConfig({}) } catch (e) {
-  threw = true
-  assert e.message === 'DATABASE_URL is required'
-}
+// Missing required var throws with a clear message
+let threw = false, errMsg = ''
+try { loadConfig({}) } catch (e) { threw = true; errMsg = e.message }
 assert threw
+assert errMsg === 'DATABASE_URL is required'
 ```

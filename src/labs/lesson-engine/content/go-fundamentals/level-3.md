@@ -291,12 +291,9 @@ function createConcurrencySimulator() {
 ```test
 const sim = createConcurrencySimulator()
 const pipeResult = await sim.pipeline([1, 2, 3], [x => x * 2, x => x + 1])
-assert pipeResult[0] === 3
-assert pipeResult[2] === 7
+assert pipeResult[0] === 3 && pipeResult[2] === 7
 const fanResult = await sim.fanOut([1, 4, 9], 2, async x => Math.sqrt(x))
-assert fanResult[0] === 1
-assert fanResult[1] === 2
-assert fanResult[2] === 3
+assert fanResult[0] === 1 && fanResult[1] === 2 && fanResult[2] === 3
 const fast = await sim.withTimeout(Promise.resolve(42), 100)
 assert fast === 42
 let threw = false

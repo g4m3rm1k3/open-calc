@@ -169,14 +169,9 @@ const usersExports = []   // array of function name strings, e.g. ['getUser', 'c
 ```
 
 ```test
-assert reorganised['users/'].includes('user-controller.js')
-assert reorganised['users/'].includes('user-service.js')
-assert reorganised['users/'].includes('user-model.js')
-assert reorganised['orders/'].includes('order-controller.js')
-assert reorganised['orders/'].includes('order-service.js')
-assert reorganised['orders/'].includes('order-model.js')
-assert reorganised['shared/'].includes('email-utils.js')
-assert reorganised['shared/'].includes('date-utils.js')
+assert reorganised['users/'].includes('user-controller.js') && reorganised['users/'].includes('user-service.js') && reorganised['users/'].includes('user-model.js')
+assert reorganised['orders/'].includes('order-controller.js') && reorganised['orders/'].includes('order-service.js') && reorganised['orders/'].includes('order-model.js')
+assert reorganised['shared/'].includes('email-utils.js') && reorganised['shared/'].includes('date-utils.js')
 assert usersPublicApiFile.includes('users') && usersPublicApiFile.includes('index')
 assert Array.isArray(usersExports) && usersExports.length > 0
 ```

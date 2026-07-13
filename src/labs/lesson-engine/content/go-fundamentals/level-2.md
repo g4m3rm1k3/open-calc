@@ -287,10 +287,7 @@ const db   = chain.wrap('connectDB', root)
 const api  = chain.wrap('handleRequest', db)
 assert api.message() === 'handleRequest: connectDB: connection refused'
 const all = chain.unwrapAll(api)
-assert all.length === 3
-assert all[0] === 'handleRequest: connectDB: connection refused'
-assert all[2] === 'connection refused'
-assert chain.is(api, root) === true
-assert chain.is(api, db) === true
+assert all.length === 3 && all[2] === 'connection refused'
+assert chain.is(api, root) === true && chain.is(api, db) === true
 assert chain.rootCause(api).message() === 'connection refused'
 ```

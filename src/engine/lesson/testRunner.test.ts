@@ -102,6 +102,33 @@ assert v2 == 2`
   })
 })
 
+describe('buildTestHarness (cpp) — per-assertion grading instead of <cassert> abort-on-first-failure', () => {
+  it('wraps each assertion in try/catch so a failure does not abort the remaining checks', () => {
+    const userCode = 'bool isPrime(int n) {\n  if (n <= 1) return false;\n  for (int i = 2; i < n; i++) if (n % i == 0) return false;\n  return true;\n}'
+    const testCode = 'assert isPrime(7) == true\nassert isPrime(10) == false\nassert isPrime(1) == false'
+    const harness = buildTestHarness(userCode, testCode, 'cpp')
+
+    expect(harness).toContain('#include <iostream>')
+    expect(harness).toContain('bool isPrime(int n)')
+    expect(harness).toContain('int main() {')
+    // Every assertion gets its own try/catch, not a bare assert() that aborts on failure
+    expect((harness.match(/try \{/g) || []).length).toBe(3)
+    expect(harness).not.toContain('#include <cassert>')
+    expect(harness).toContain('__OC_TEST__" << (__ok ? "PASS" : "FAIL")')
+  })
+
+  it('preserves preamble/assertion interleaving for stateful class-based challenges', () => {
+    const userCode = 'class Counter {\npublic:\n  int count = 0;\n  void increment() { count++; }\n};'
+    const testCode = 'Counter c;\nc.increment();\nc.increment();\nassert c.count == 2'
+    const harness = buildTestHarness(userCode, testCode, 'cpp')
+    const lines = harness.split('\n')
+    const counterIdx = lines.findIndex(l => l.trim() === 'Counter c;')
+    const tryIdx = lines.findIndex(l => l.includes('try {') && lines.indexOf(l) > counterIdx)
+    expect(counterIdx).toBeGreaterThan(-1)
+    expect(tryIdx).toBeGreaterThan(counterIdx)
+  })
+})
+
 describe('runSqlTests — grades raw query text via the JS runtime, no database needed', () => {
   const executor: Executor = async (code) => {
     const r = await runJSInline(code)

@@ -326,19 +326,20 @@ function createCircuitBreaker(threshold, resetMs) {
 
 ```test
 const cb = createCircuitBreaker(3, 100)
-assert cb.state() === 'closed'
-assert cb.failures() === 0
+assert cb.state() === 'closed' && cb.failures() === 0
+
 try { cb.call(() => { throw new Error('down') }) } catch {}
 try { cb.call(() => { throw new Error('down') }) } catch {}
 try { cb.call(() => { throw new Error('down') }) } catch {}
 assert cb.state() === 'open'
+
 let rejected = false
 try { cb.call(() => 'ok') } catch (e) { rejected = e.message === 'circuit open' }
 assert rejected === true
+
 await new Promise(r => setTimeout(r, 110))
 assert cb.state() === 'half-open'
+
 const result = cb.call(() => 'recovered')
-assert result === 'recovered'
-assert cb.state() === 'closed'
-assert cb.failures() === 0
+assert result === 'recovered' && cb.state() === 'closed' && cb.failures() === 0
 ```

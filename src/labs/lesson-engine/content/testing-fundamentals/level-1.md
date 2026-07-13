@@ -212,32 +212,23 @@ function applyCartDiscount(cart, coupon) {
 ```
 
 ```test
-// Happy path: percentage coupon
 const cart1 = { items: [], total: 100 }
-const pct = { code: 'SAVE10', type: 'percentage', value: 10 }
-const r1 = applyCartDiscount(cart1, pct)
-assert r1.discountApplied === 10
-assert r1.total === 90
 
-// Happy path: flat coupon
-const flat = { code: 'FLAT5', type: 'flat', value: 5 }
-const r2 = applyCartDiscount(cart1, flat)
-assert r2.discountApplied === 5
-assert r2.total === 95
+// Percentage and flat coupons
+const r1 = applyCartDiscount(cart1, { code: 'SAVE10', type: 'percentage', value: 10 })
+assert r1.discountApplied === 10 && r1.total === 90
+const r2 = applyCartDiscount(cart1, { code: 'FLAT5', type: 'flat', value: 5 })
+assert r2.discountApplied === 5 && r2.total === 95
 
-// No coupon
+// No coupon: unchanged
 const r3 = applyCartDiscount(cart1, null)
-assert r3.discountApplied === 0
-assert r3.total === 100
+assert r3.discountApplied === 0 && r3.total === 100
 
-// Flat coupon larger than total (should not go negative)
-const bigFlat = { code: 'BIG', type: 'flat', value: 200 }
-const r4 = applyCartDiscount({ items: [], total: 50 }, bigFlat)
-assert r4.discountApplied === 50
-assert r4.total === 0
+// Flat coupon larger than total must not go negative
+const r4 = applyCartDiscount({ items: [], total: 50 }, { code: 'BIG', type: 'flat', value: 200 })
+assert r4.discountApplied === 50 && r4.total === 0
 
 // Zero total
-const r5 = applyCartDiscount({ items: [], total: 0 }, pct)
-assert r5.discountApplied === 0
-assert r5.total === 0
+const r5 = applyCartDiscount({ items: [], total: 0 }, { code: 'SAVE10', type: 'percentage', value: 10 })
+assert r5.discountApplied === 0 && r5.total === 0
 ```

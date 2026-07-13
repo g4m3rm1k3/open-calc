@@ -4,7 +4,7 @@ import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import type { LessonStep, Executor, UiTheme, TestResult } from './types'
 import type { TraceEvent } from '../../labs/codelens/codelens/types'
-import { runTests, runCSSTests, runJSXTests, runSqlTests, buildTestHarness } from './testRunner'
+import { runTests, runCSSTests, runJSXTests, runSqlTests, runProgramOutputTest, buildTestHarness } from './testRunner'
 import { runPython } from '../../labs/codelens/codelens/interpreter/pythonTracer'
 import { run as runJS } from '../../engines/js/interpreter/interpreter.js'
 
@@ -19,7 +19,7 @@ interface Props {
 }
 
 function toMonacoLang(lang: string): string {
-  const n = lang.toLowerCase()
+  const n = lang.toLowerCase().replace(/-program$/, '')
   if (n === 'py') return 'python'
   if (n === 'js') return 'javascript'
   if (n === 'ts') return 'typescript'
@@ -97,6 +97,7 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
     const isJSXChallenge = norm === 'jsx' || norm === 'react'
     const isVueChallenge = norm === 'vue'
     const isSqlChallenge = norm === 'sql' || norm === 'sqlite'
+    const programOutputLang = norm.endsWith('-program') ? norm.slice(0, -'-program'.length) : null
     const htmlStructure = isCSSChallenge
       ? (step.examples.find(e => e.lang.toLowerCase() === 'html')?.code ?? '')
       : ''
@@ -109,7 +110,9 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
           ? await runJSXTests(code, tests, 'vue')
           : isSqlChallenge
             ? await runSqlTests(code, tests, executor)
-            : await runTests(code, tests, lang, executor)
+            : programOutputLang
+              ? await runProgramOutputTest(code, tests, programOutputLang, executor)
+              : await runTests(code, tests, lang, executor)
     if (onResults) onResults(testResults)
 
     // For CSS challenges: emit a live DOM preview so the DOM tab shows the result

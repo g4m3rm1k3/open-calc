@@ -216,7 +216,9 @@ const p3 = fetcher('abc')
 const r3 = await p3
 await new Promise(r => setTimeout(r, 100))   // wait for debounce to settle
 
-assert callLog.length === 1   // only one actual fetch
-assert callLog[0] === 'abc'   // the last query
+assert callLog.length === 1   // only one actual fetch — the rapid calls were debounced
+assert callLog[0] === 'abc'   // the last query wins
 assert r3.result === 'ABC'
+const r1 = await p1
+assert r1.result === 'ABC'   // earlier callers resolve to the same debounced result
 ```

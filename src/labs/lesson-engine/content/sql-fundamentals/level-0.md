@@ -133,12 +133,8 @@ Write a SQL SELECT statement that retrieves `name` and `email` from a table call
 
 ```test
 var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
-assert q.startsWith('select')
-assert !q.includes('select *')
-assert q.includes('name')
-assert q.includes('email')
-assert q.includes('from students')
-assert q.includes('where')
-assert q.includes('active')
-assert q.includes('= 1') || q.includes('=1')
+assert q.startsWith('select') && !q.includes('select *')
+assert q.includes('name') && q.includes('email')
+assert q.includes('from students') && q.includes('where')
+assert q.includes('active') && (q.includes('= 1') || q.includes('=1'))
 ```

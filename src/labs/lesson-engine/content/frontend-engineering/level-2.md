@@ -201,77 +201,46 @@ function closeModal(modal, opener) {
 
 ## Challenge: accessible_tabs
 
-Implement a keyboard-accessible tab component.
+A real `createAccessibleTabs` renders DOM (tablist, panels, ARIA attributes) that a
+keyboard handler drives — but DOM rendering isn't testable in this engine, and the
+part that actually determines correctness is the **state machine** underneath the
+keyboard handler, not the markup. Implement that state machine directly.
+
+Implement the focus/selection state logic behind a keyboard-accessible tab component.
+
+`tabIds` is an ordered array of tab identifiers. In a real implementation, ArrowLeft/
+ArrowRight would call `focusPrev`/`focusNext`, Home/End would call `focusFirst`/
+`focusLast`, and Enter/Space would call `select(getFocused())` — moving focus never
+changes the selection by itself.
 
 ```challenge
-function createAccessibleTabs(container, tabs) {
-  // container: a DOM element to render into
-  // tabs: [{ id, label, content }]
-  //
-  // Creates a tab panel with:
-  //   - A tablist with one button per tab (role="tab", aria-selected, aria-controls)
-  //   - One panel per tab (role="tabpanel", id, aria-labelledby)
-  //   - Only the selected tab's panel is visible (others have hidden attribute)
-  //
-  // Keyboard behaviour:
-  //   ArrowLeft/ArrowRight: move focus to previous/next tab
-  //   Enter/Space: select the focused tab
-  //   Home/End: move to first/last tab
-  //
-  // Returns: { select(tabId): programmatically select a tab }
-
-  const VALID_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'Home', 'End', 'Enter', ' '])
+function createTabState(tabIds) {
+  // Returns: { getSelected(), getFocused(), select(id), focusNext(), focusPrev(), focusFirst(), focusLast() }
+  //   getSelected() / getFocused(): current selected/focused tab id (both start as tabIds[0])
+  //   select(id): sets both selected AND focused to id
+  //   focusNext() / focusPrev(): move focus only (not selection), wrapping at the ends
+  //   focusFirst() / focusLast(): move focus only, to tabIds[0] / tabIds[tabIds.length - 1]
 }
 ```
 
 ```test
-// Minimal DOM simulation for the challenge
-const container = { innerHTML: '', children: [], querySelector: () => null }
-
-// Because real DOM isn't available in the lesson engine,
-// test the state logic instead:
-
-function createTabState(tabIds) {
-  // Implement state logic for tab selection
-  let selected = tabIds[0]
-  let focused = tabIds[0]
-  return {
-    getSelected: () => selected,
-    getFocused:  () => focused,
-    select: (id) => { selected = id; focused = id },
-    focusNext: () => {
-      const i = tabIds.indexOf(focused)
-      focused = tabIds[(i + 1) % tabIds.length]
-    },
-    focusPrev: () => {
-      const i = tabIds.indexOf(focused)
-      focused = tabIds[(i - 1 + tabIds.length) % tabIds.length]
-    },
-    focusFirst: () => { focused = tabIds[0] },
-    focusLast:  () => { focused = tabIds[tabIds.length - 1] },
-  }
-}
-
 const tabs = createTabState(['tab-a', 'tab-b', 'tab-c'])
-assert tabs.getSelected() === 'tab-a'
-assert tabs.getFocused() === 'tab-a'
+assert tabs.getSelected() === 'tab-a' && tabs.getFocused() === 'tab-a'
 
+// Moving focus does not change the selection until select() is called
 tabs.focusNext()
-assert tabs.getFocused() === 'tab-b'
-assert tabs.getSelected() === 'tab-a'   // focus ≠ selection until Enter
+assert tabs.getFocused() === 'tab-b' && tabs.getSelected() === 'tab-a'
 
 tabs.select('tab-b')
 assert tabs.getSelected() === 'tab-b'
 
+// focusPrev/focusNext wrap around at the ends
+tabs.focusFirst()
 tabs.focusPrev()
+assert tabs.getFocused() === 'tab-c'
+tabs.focusNext()
 assert tabs.getFocused() === 'tab-a'
 
 tabs.focusLast()
 assert tabs.getFocused() === 'tab-c'
-
-tabs.focusNext()
-assert tabs.getFocused() === 'tab-a'   // wraps around
-
-tabs.focusFirst()
-assert tabs.getFocused() === 'tab-a'
 ```

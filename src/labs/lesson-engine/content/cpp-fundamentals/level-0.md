@@ -150,7 +150,7 @@ Write a program that declares a `const double` named `PI` equal to `3.14159`, de
 - `Area: ` followed by `PI * radius * radius` (no newline formatting needed)
 - `Circumference: ` followed by `2 * PI * radius`
 
-```challenge
+```challenge cpp-program
 #include <iostream>
 using namespace std;
 
@@ -161,18 +161,10 @@ int main() {
 ```
 
 ```test
-#include <iostream>
-#include <cassert>
-using namespace std;
-
-int main() {
-    const double PI = 3.14159;
-    const double radius = 7.0;
-    double area = PI * radius * radius;
-    double circ = 2 * PI * radius;
-    assert(area > 153.0 && area < 154.0);
-    assert(circ > 43.0 && circ < 44.5);
-    cout << "ok" << endl;
-    return 0;
-}
+assert output.includes('Area:')
+assert output.includes('Circumference:')
+var areaMatch = output.match(/Area:\s*([\d.]+)/)
+assert areaMatch && Math.abs(parseFloat(areaMatch[1]) - 153.938) < 0.1
+var circMatch = output.match(/Circumference:\s*([\d.]+)/)
+assert circMatch && Math.abs(parseFloat(circMatch[1]) - 43.982) < 0.1
 ```

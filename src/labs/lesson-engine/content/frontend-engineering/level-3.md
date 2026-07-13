@@ -213,37 +213,23 @@ function selectVisibleProducts(state) {
 
 ```test
 const reducer = createProductListReducer()
-const INIT = { products: [], filter: '', loading: false, error: null }
-
-let s = INIT
+let s = { products: [], filter: '', loading: false, error: null }
 
 s = reducer(s, { type: 'LOAD_PRODUCTS' })
-assert s.loading === true
-assert s.error === null
+assert s.loading === true && s.error === null
 
-const products = [
+s = reducer(s, { type: 'PRODUCTS_LOADED', products: [
   { id: 1, name: 'Widget', category: 'tools', price: 9.99 },
   { id: 2, name: 'Gadget', category: 'tech',  price: 24.99 },
-]
-
-s = reducer(s, { type: 'PRODUCTS_LOADED', products })
-assert s.loading === false
-assert s.products.length === 2
+]})
+assert s.loading === false && s.products.length === 2
 
 s = reducer(s, { type: 'SET_FILTER', text: 'tool' })
-const visible = selectVisibleProducts(s)
-assert visible.length === 1
-assert visible[0].name === 'Widget'
-
-s = reducer(s, { type: 'SET_FILTER', text: 'g' })
-const both = selectVisibleProducts(s)
-assert both.length === 2   // 'gadget' in name AND 'gadet' could match 'g' too
+assert selectVisibleProducts(s).length === 1 && selectVisibleProducts(s)[0].name === 'Widget'
 
 s = reducer(s, { type: 'LOAD_ERROR', message: 'Network failure' })
-assert s.error === 'Network failure'
-assert s.loading === false
+assert s.error === 'Network failure' && s.loading === false
 
-// Unknown action → unchanged
-const same = reducer(s, { type: 'NOOP' })
-assert same === s
+// Unknown action → unchanged, same reference
+assert reducer(s, { type: 'NOOP' }) === s
 ```

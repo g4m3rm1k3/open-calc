@@ -197,4 +197,5 @@ assert document.querySelector("#error").textContent === "Invalid email"
 document.querySelector("#email").value = "ada@example.com"
 form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }))
 assert document.querySelector("#result").textContent === "Submitted: ada / ada@example.com"
+assert document.querySelector("#error").textContent === ""   // error cleared on successful submit
 ```

@@ -244,16 +244,14 @@ function createIncidentManager() {
 ```test
 const im = createIncidentManager()
 const i1 = im.report({ description: 'login broken', affectedUsers: 5000, coreFeatureBroken: true })
-assert i1.severity === 'P0'
-assert i1.action === 'page-oncall'
-assert typeof i1.id === 'string'
+assert i1.severity === 'P0' && i1.action === 'page-oncall' && typeof i1.id === 'string'
 const i2 = im.report({ description: 'slow search', affectedUsers: 2000, coreFeatureBroken: false })
-assert i2.severity === 'P1'
-assert i2.action === 'page-oncall'
-const i3 = im.report({ description: 'missing avatar', affectedUsers: 50, coreFeatureBroken: false })
-assert i3.severity === 'P3'
-assert i3.action === 'create-ticket'
-assert im.openIncidents().length === 3
+assert i2.severity === 'P1' && i2.action === 'page-oncall'
+const i3 = im.report({ description: 'checkout errors', affectedUsers: 300, coreFeatureBroken: false })
+assert i3.severity === 'P2' && i3.action === 'create-ticket'
+const i4 = im.report({ description: 'missing avatar', affectedUsers: 50, coreFeatureBroken: false })
+assert i4.severity === 'P3'
+assert im.openIncidents().length === 4
 im.resolve(i1.id)
-assert im.openIncidents().length === 2
+assert im.openIncidents().length === 3
 ```

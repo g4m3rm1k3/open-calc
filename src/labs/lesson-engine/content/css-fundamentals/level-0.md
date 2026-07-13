@@ -126,4 +126,5 @@ var s = getComputedStyle(el)
 assert s.backgroundColor === 'rgb(70, 130, 180)'
 assert s.color === 'rgb(255, 255, 255)'
 assert s.paddingTop === '20px'
+assert s.paddingLeft === '20px'
 ```

@@ -250,12 +250,9 @@ const bugClassifications = {
 
 ```test
 const b = bugClassifications
-assert b.bug1_category === 'boundary'
-assert b.bug1_why.length > 10
-assert b.bug2_category === 'reference'
-assert b.bug2_why.length > 10
-assert b.bug3_category === 'concurrency'
-assert b.bug3_why.length > 10
+assert b.bug1_category === 'boundary' && b.bug1_why.length > 10
+assert b.bug2_category === 'reference' && b.bug2_why.length > 10
+assert b.bug3_category === 'concurrency' && b.bug3_why.length > 10
 assert b.bug4_category === 'boundary' || b.bug4_category === 'logic'
 assert b.bug4_why.length > 10
 ```

@@ -187,10 +187,8 @@ async function processOrder(orderId) {
 ```
 
 ```test
-assert responsibilities.responsibility1 !== ''
-assert responsibilities.responsibility2 !== ''
-assert responsibilities.responsibility3 !== ''
-assert responsibilities.responsibility4 !== ''
+assert responsibilities.responsibility1 !== '' && responsibilities.responsibility2 !== ''
+assert responsibilities.responsibility3 !== '' && responsibilities.responsibility4 !== ''
 const all = Object.values(responsibilities).map(r => r.toLowerCase()).join(' ')
 assert all.includes('data') || all.includes('database') || all.includes('storage') || all.includes('persist')
 assert all.includes('discount') || all.includes('pricing') || all.includes('business') || all.includes('rule') || all.includes('calculat')

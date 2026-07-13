@@ -165,8 +165,7 @@ function cartTotal(items, discountCode = null) {
 ```test
 assert cartTotal([{ price: 10, quantity: 2 }]) === 20
 assert cartTotal([{ price: 10, quantity: 2 }, { price: 5, quantity: 1 }]) === 25
-assert cartTotal([{ price: 100, quantity: 1 }], 'SAVE10') === 90
-assert cartTotal([{ price: 100, quantity: 1 }], 'SAVE20') === 80
+assert cartTotal([{ price: 100, quantity: 1 }], 'SAVE10') === 90 && cartTotal([{ price: 100, quantity: 1 }], 'SAVE20') === 80
 assert cartTotal([{ price: 100, quantity: 1 }], 'BOGUS') === 100
 assert cartTotal([]) === 0
 assert cartTotal([{ price: 9.99, quantity: 3 }]) === 29.97

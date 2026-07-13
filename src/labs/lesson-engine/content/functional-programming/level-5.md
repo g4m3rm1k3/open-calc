@@ -257,16 +257,11 @@ function processSalesReport(rawOrders) {
 
 ```test
 const parsed = parseOrder({ order_id: 'x1', customer_id: 'c9', amount_cents: 1999, status: 'paid', region: 'US' })
-assert parsed.id === 'x1'
-assert parsed.customerId === 'c9'
-assert Math.abs(parsed.amountUsd - 19.99) < 0.01
-assert parsed.status === 'paid'
+assert parsed.id === 'x1' && parsed.customerId === 'c9' && Math.abs(parsed.amountUsd - 19.99) < 0.01
 
-assert isPaidOrder({ status: 'paid' }) === true
-assert isPaidOrder({ status: 'pending' }) === false
+assert isPaidOrder({ status: 'paid' }) === true && isPaidOrder({ status: 'pending' }) === false
 
 const report = processSalesReport(rawOrders)
-assert Math.abs(report['US'] - 70) < 0.01
-assert Math.abs(report['EU'] - 75) < 0.01
+assert Math.abs(report['US'] - 70) < 0.01 && Math.abs(report['EU'] - 75) < 0.01
 assert report['pending'] === undefined
 ```

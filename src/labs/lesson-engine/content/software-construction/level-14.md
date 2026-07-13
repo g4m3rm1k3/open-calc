@@ -184,13 +184,10 @@ const orders = [
   { id: 'B2', items: [{ price: 100, quantity: 1 }] },
 ]
 const report = computeReport(orders)
-assert report.orders.length === 2
-assert Math.abs(report.orders[0].total - 25) < 0.01
-assert Math.abs(report.orders[1].total - 100) < 0.01
-assert report.totalOrders === 2
+assert report.orders.length === 2 && report.totalOrders === 2
+assert Math.abs(report.orders[0].total - 25) < 0.01 && Math.abs(report.orders[1].total - 100) < 0.01
 const text = formatAsText(report)
-assert text.includes('A1') && text.includes('25.00')
-assert text.includes('B2') && text.includes('100.00')
+assert text.includes('A1') && text.includes('25.00') && text.includes('B2')
 const csv = formatAsCSV(report)
 assert csv.includes('orderId') && csv.includes('total')
 assert csv.includes('A1') && csv.includes('B2')

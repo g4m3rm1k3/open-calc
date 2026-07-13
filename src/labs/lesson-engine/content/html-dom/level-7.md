@@ -183,4 +183,5 @@ cells[0].click()
 assert cells[0].classList.contains("selected") === false
 cells[2].click()
 assert cells[2].classList.contains("selected") === true
+assert cells[0].classList.contains("selected") === false   // toggling one cell doesn't affect others
 ```

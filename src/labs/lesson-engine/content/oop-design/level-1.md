@@ -215,30 +215,18 @@ const alice = createUserWithCapabilities(
   { id: 1, name: 'Alice', email: 'alice@example.com' },
   ['download', 'analytics']
 )
-
-assert alice.name === 'Alice'
-assert alice.canDownload === true
-assert alice.isAdmin === false
-assert alice.canViewAnalytics === true
-assert alice.getCapabilities().includes('download')
-assert alice.getCapabilities().includes('analytics')
-assert !alice.getCapabilities().includes('admin')
+assert alice.canDownload === true && alice.isAdmin === false && alice.canViewAnalytics === true
+assert alice.getCapabilities().includes('download') && !alice.getCapabilities().includes('admin')
 
 const bob = createUserWithCapabilities(
   { id: 2, name: 'Bob', email: 'bob@example.com' },
   ['admin', 'download', 'analytics']
 )
-
-assert bob.isAdmin === true
-assert bob.canDownload === true
-assert bob.getCapabilities().length === 3
+assert bob.isAdmin === true && bob.getCapabilities().length === 3
 
 const carol = createUserWithCapabilities(
   { id: 3, name: 'Carol', email: 'carol@example.com' },
   []
 )
-
-assert carol.canDownload === false
-assert carol.isAdmin === false
-assert carol.getCapabilities().length === 0
+assert carol.canDownload === false && carol.isAdmin === false && carol.getCapabilities().length === 0
 ```

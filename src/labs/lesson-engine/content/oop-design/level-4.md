@@ -230,19 +230,14 @@ const service = createNotificationService([
 
 const notification = { to: 'user@example.com', subject: 'Hello', body: 'World' }
 const results = await service.send(notification)
+assert results.length === 2 && results.every(r => r.ok)
+assert log.includes('email:user@example.com') && log.includes('sms:user@example.com')
 
-assert results.length === 2
-assert results.every(r => r.ok)
-assert log.includes('email:user@example.com')
-assert log.includes('sms:user@example.com')
-
-// Add a failing channel
+// Add a failing channel — other channels still succeed independently
 service.addChannel(makeChannel('push', true))
 assert service.channelCount() === 3
 
 const results2 = await service.send({ to: 'other@example.com', subject: 'Test', body: 'Test' })
-assert results2.length === 3
-assert results2.find(r => r.channel === 'push').ok === false
-assert results2.find(r => r.channel === 'push').error.includes('failed')
+assert results2.find(r => r.channel === 'push').ok === false && results2.find(r => r.channel === 'push').error.includes('failed')
 assert results2.find(r => r.channel === 'email').ok === true
 ```

@@ -225,12 +225,9 @@ const childDef = {
 }
 const child = parent.createChild(childDef)
 
-// Child accesses props
+// Child accesses props and injects from parent
 assert child.props.label === 'Counter'
-
-// Child injects from parent
-assert child.inject('theme') === 'dark'
-assert child.inject('nonexistent') === null
+assert child.inject('theme') === 'dark' && child.inject('nonexistent') === null
 
 // Child emits, parent listens
 const emitted = []
@@ -240,10 +237,8 @@ parent.onEmit('increment', (value) => {
 })
 
 child.emit('increment', 1)
-assert parent.state.count === 1
-assert emitted[0] === 1
+assert parent.state.count === 1 && emitted[0] === 1
 
 child.emit('increment', 5)
-assert parent.state.count === 6
-assert emitted.length === 2
+assert parent.state.count === 6 && emitted.length === 2
 ```

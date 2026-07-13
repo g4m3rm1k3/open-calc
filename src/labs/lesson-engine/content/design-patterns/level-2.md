@@ -347,8 +347,7 @@ const logged = createLoggingDecorator(calculator, logger)
 // add: logs before and after
 const sum = logged.add(3, 4)
 assert sum === 7
-assert calls.some(c => c.method === 'add' && JSON.stringify(c.args) === JSON.stringify([3, 4]))
-assert calls.some(c => c.method === 'add' && c.result === 7)
+assert calls.some(c => c.method === 'add' && JSON.stringify(c.args) === JSON.stringify([3, 4])) && calls.some(c => c.method === 'add' && c.result === 7)
 
 // multiply: also logged
 logged.multiply(5, 6)

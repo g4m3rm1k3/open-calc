@@ -185,6 +185,11 @@ function onceCounter(buttonId, displayId, limit) {
 document.body.innerHTML = '<button id="b">Click</button><span id="d">Count: 0</span>'
 onceCounter("b", "d", 3)
 const b = document.querySelector("#b")
-b.click(); b.click(); b.click(); b.click(); b.click()
+assert document.querySelector("#d").textContent === "Count: 0"
+b.click()
+assert document.querySelector("#d").textContent === "Count: 1"
+b.click(); b.click()
 assert document.querySelector("#d").textContent === "Count: 3"
+b.click(); b.click()
+assert document.querySelector("#d").textContent === "Count: 3"   // stops at the limit
 ```

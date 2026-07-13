@@ -81,6 +81,113 @@ function buildJSHarness(userCode: string, testCode: string): string {
   return out.join('\n')
 }
 
+// C++ challenges define a free function or class (userCode) with no `main()` of its
+// own — the harness supplies one. Each `assert ` line becomes a C++ boolean expression
+// checked inside try/catch (not the `<cassert>` macro, which aborts the whole program on
+// the first failure and gives no per-assertion result). Preamble lines are emitted
+// verbatim inside main(), in order, same interleaving rule as every other language.
+function buildCppHarness(userCode: string, testCode: string): string {
+  const lines = testCode.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//'))
+
+  const body: string[] = []
+  for (const line of lines) {
+    if (!line.startsWith('assert ')) {
+      body.push(`    ${line}`)
+      continue
+    }
+    const expr = stripTrailingLineComment(line.slice('assert '.length))
+    const escaped = line.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+    body.push(`    try {`)
+    body.push(`        bool __ok = (${expr});`)
+    body.push(`        cout << "${OC_PREFIX}" << (__ok ? "PASS" : "FAIL") << "|${escaped}" << endl;`)
+    body.push(`    } catch (const exception& __e) {`)
+    body.push(`        cout << "${OC_PREFIX}ERROR|${escaped}|" << __e.what() << endl;`)
+    body.push(`    } catch (...) {`)
+    body.push(`        cout << "${OC_PREFIX}ERROR|${escaped}|unknown exception" << endl;`)
+    body.push(`    }`)
+  }
+
+  return [
+    '#include <iostream>',
+    '#include <string>',
+    '#include <vector>',
+    '#include <cmath>',
+    '#include <algorithm>',
+    '#include <stdexcept>',
+    'using namespace std;',
+    '',
+    userCode,
+    '',
+    'int main() {',
+    ...body,
+    '    return 0;',
+    '}',
+  ].join('\n')
+}
+
+// C# and Java challenges may define either a standalone class (the harness places it
+// before the generated entry point) or a bare static method (the harness nests it
+// inside the generated class, since neither language allows a free function at file
+// scope). Detected the same way `wrapCSharp`/`wrapJava` in codeRunner.js already decide
+// whether to wrap: does the userCode contain its own `class` declaration?
+function buildDotnetStyleHarness(
+  userCode: string,
+  testCode: string,
+  opts: { entryClass: string; mainSig: string; boolType: string; printStmt: (expr: string) => string; excMessageExpr: (v: string) => string },
+): string {
+  const lines = testCode.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//'))
+  const hasOwnClass = /\bclass\s+\w/.test(userCode)
+
+  const body: string[] = []
+  for (const line of lines) {
+    if (!line.startsWith('assert ')) {
+      body.push(`        ${line}`)
+      continue
+    }
+    const expr = stripTrailingLineComment(line.slice('assert '.length))
+    const escaped = line.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+    body.push(`        try {`)
+    body.push(`            ${opts.boolType} __ok = (${expr});`)
+    body.push(`            ${opts.printStmt(`"${OC_PREFIX}" + (__ok ? "PASS" : "FAIL") + "|${escaped}"`)}`)
+    body.push(`        } catch (Exception __e) {`)
+    body.push(`            ${opts.printStmt(`"${OC_PREFIX}ERROR|${escaped}|" + ${opts.excMessageExpr('__e')}`)}`)
+    body.push(`        }`)
+  }
+
+  const entry = [
+    `class ${opts.entryClass} {`,
+    ...(hasOwnClass ? [] : [`    ${userCode.split('\n').join('\n    ')}`]),
+    `    ${opts.mainSig} {`,
+    ...body,
+    `    }`,
+    `}`,
+  ].join('\n')
+
+  return hasOwnClass ? [userCode, '', entry].join('\n') : entry
+}
+
+function buildCSharpHarness(userCode: string, testCode: string): string {
+  const body = buildDotnetStyleHarness(userCode, testCode, {
+    entryClass: 'Program',
+    mainSig: 'static void Main()',
+    boolType: 'bool',
+    printStmt: expr => `Console.WriteLine(${expr});`,
+    excMessageExpr: v => `${v}.Message`,
+  })
+  return ['using System;', 'using System.Collections.Generic;', 'using System.Linq;', '', body].join('\n')
+}
+
+function buildJavaHarness(userCode: string, testCode: string): string {
+  const body = buildDotnetStyleHarness(userCode, testCode, {
+    entryClass: 'Main',
+    mainSig: 'public static void main(String[] args)',
+    boolType: 'boolean',
+    printStmt: expr => `System.out.println(${expr});`,
+    excMessageExpr: v => `${v}.getMessage()`,
+  })
+  return ['import java.util.*;', '', body].join('\n')
+}
+
 // Shared by runCSSTests and runJSXTests: same interleaving rule, but assertions report
 // into a `results` array via `results.push(...)` (read back through postMessage) rather
 // than printing OC_PREFIX-tagged stdout lines.
@@ -107,6 +214,9 @@ function buildInterleavedAssertions(testCode: string): string {
 export function buildTestHarness(userCode: string, testCode: string, lang: string): string {
   const norm = lang.toLowerCase()
   if (norm === 'python' || norm === 'py') return buildPythonHarness(userCode, testCode)
+  if (norm === 'cpp' || norm === 'c++' || norm === 'c') return buildCppHarness(userCode, testCode)
+  if (norm === 'csharp' || norm === 'cs' || norm === 'c#') return buildCSharpHarness(userCode, testCode)
+  if (norm === 'java') return buildJavaHarness(userCode, testCode)
   return buildJSHarness(userCode, testCode)
 }
 
@@ -140,6 +250,31 @@ export async function runTests(
     return [{ label: errors[0].text, passed: false, detail: 'Runtime error' }]
   }
   return parseTestResults(stdout)
+}
+
+// For challenges where there's nothing callable to test directly — either the concept
+// (early C++ levels, before functions) or the design (a Java `void process()` method
+// whose contract IS what it prints, e.g. an interface with printing implementations)
+// means the observable behaviour is stdout, not a return value. Compile and run the
+// learner's whole program for real, capture its stdout, then grade that captured text
+// with plain JS assertions — same "bind the artifact, grade it with JS" trick as
+// runSqlTests, generalised to program output instead of query text. `lang` is whichever
+// real language the program compiles as (cpp, java, csharp, ...); tag the challenge
+// fence `` ```challenge <lang>-program `` to route here instead of the per-assertion path.
+export async function runProgramOutputTest(
+  programCode: string,
+  testCode: string,
+  lang: string,
+  executor: Executor,
+): Promise<TestResult[]> {
+  const result = await executor(programCode, lang)
+  const errors = result.lines.filter(l => l.kind === 'error')
+  if (errors.length) {
+    return [{ label: errors[0].text, passed: false, detail: 'Compile/runtime error' }]
+  }
+  const stdout = result.lines.filter(l => l.kind === 'stdout').map(l => l.text).join('\n')
+  const preamble = `const output = ${JSON.stringify(stdout)};`
+  return runTests(preamble, testCode, 'javascript', executor)
 }
 
 // SQL challenges (sql-fundamentals) grade the learner's raw query TEXT, not a query

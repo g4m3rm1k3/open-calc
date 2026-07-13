@@ -315,31 +315,22 @@ const emailChannel = {
 }
 service.registerChannel('email', emailChannel)
 
-// Successful send
+// Successful send: recorded and emitted
 await service.send('email', { to: 'alice@example.com', subject: 'Hello', body: 'Hi' })
-assert emailCallCount === 1
-assert sentEvents.length === 1
-assert sentEvents[0].status === 'sent'
-assert sentEvents[0].channelName === 'email'
-assert sentEvents[0].notification.to === 'alice@example.com'
+assert emailCallCount === 1 && sentEvents.length === 1 && sentEvents[0].status === 'sent'
 
-// Failed send
+// Failed send: still throws, but records + emits the failure first
 let threw = false
 try {
   await service.send('email', { to: 'bob@example.com', subject: 'fail', body: '' })
 } catch (e) {
   threw = true
 }
-assert threw
-assert failedEvents.length === 1
-assert failedEvents[0].r.status === 'failed'
-assert failedEvents[0].e.message === 'Send failed'
+assert threw && failedEvents.length === 1 && failedEvents[0].e.message === 'Send failed'
 
-// History contains both
+// History contains both, in order
 const history = service.getHistory()
-assert history.length === 2
-assert history[0].status === 'sent'
-assert history[1].status === 'failed'
+assert history.length === 2 && history[0].status === 'sent' && history[1].status === 'failed'
 
 // Unknown channel throws
 let unknownThrew = false

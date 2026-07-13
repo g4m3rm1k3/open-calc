@@ -146,13 +146,8 @@ WITH recent_courses AS (
 
 ```test
 var q = code.trim().toLowerCase().replace(/\s+/g, ' ')
-assert q.includes('with')
-assert q.includes('recent_courses')
-assert q.includes('as (')
-assert q.includes('from courses')
-assert q.includes('created_at')
-assert q.includes("'2026-01-01'")
-assert q.includes('select title')
-assert q.includes('from recent_courses')
+assert q.includes('with') && q.includes('recent_courses') && q.includes('as (')
+assert q.includes('from courses') && q.includes('created_at') && q.includes("'2026-01-01'")
+assert q.includes('select title') && q.includes('from recent_courses')
 assert q.includes('order by title')
 ```

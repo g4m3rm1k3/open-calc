@@ -265,16 +265,13 @@ const svc = createPaymentService(repo, email, { now: () => FIXED_TIME })
 // Basic payment
 const order = { id: 'o1', amount: 100, customerEmail: 'c@test.com' }
 const txn = await svc.processPayment(order)
-assert txn.chargedAmount === 100
-assert txn.discount === 0
-assert txn.status === 'completed'
+assert txn.chargedAmount === 100 && txn.discount === 0 && txn.status === 'completed'
 assert txn.processedAt === new Date(FIXED_TIME).toISOString()
 assert calls.email.length === 1 && calls.email[0].to === 'c@test.com'
 
 // Discount
 const txn2 = await svc.processPayment({ id: 'o2', amount: 200, customerEmail: 'c@test.com' }, 'SAVE10')
-assert txn2.discount === 20
-assert txn2.chargedAmount === 180
+assert txn2.discount === 20 && txn2.chargedAmount === 180
 
 // Invalid amount
 let threw = false

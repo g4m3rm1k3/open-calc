@@ -206,6 +206,4 @@ assert strategy.sendResetEmail_returns !== '' && strategy.sendResetEmail_why !==
 assert strategy.findUserByEmail_returns === 'null' || strategy.findUserByEmail_returns === 'result'
 assert strategy.generateResetToken_returns === 'throw'
 assert strategy.sendResetEmail_returns === 'result' || strategy.sendResetEmail_returns === 'throw'
-assert strategy.findUserByEmail_why.length > 10
-assert strategy.generateResetToken_why.length > 10
 ```

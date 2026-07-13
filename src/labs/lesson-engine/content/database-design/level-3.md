@@ -183,14 +183,11 @@ const indexDecisions = {
 
 ```test
 const i = indexDecisions
-assert i.scenario1_addIndex === true
-assert i.scenario1_columns.some(c => c.toLowerCase().includes('category'))
+assert i.scenario1_addIndex === true && i.scenario1_columns.some(c => c.toLowerCase().includes('category'))
 assert i.scenario1_why.length > 15
 
-assert i.scenario2_addIndex === false
-assert i.scenario2_why.length > 15
+assert i.scenario2_addIndex === false && i.scenario2_why.length > 15
 
-assert i.scenario3_addIndex === true
-assert i.scenario3_columns.some(c => c.toLowerCase().includes('email'))
+assert i.scenario3_addIndex === true && i.scenario3_columns.some(c => c.toLowerCase().includes('email'))
 assert i.scenario3_why.length > 15
 ```

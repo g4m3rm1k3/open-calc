@@ -194,4 +194,5 @@ assert document.querySelector("#a").textContent === "Beta"
 assert document.querySelector("#b").textContent === "Alpha"
 swapContent("a", "b")
 assert document.querySelector("#a").textContent === "Alpha"
+assert document.querySelector("#b").textContent === "Beta"
 ```

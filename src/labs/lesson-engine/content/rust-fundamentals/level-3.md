@@ -264,15 +264,11 @@ const rules = [
   { check: x => x < 100, message: 'must be less than 100' },
 ]
 const r1 = v.validate(42, rules)
-assert r1.ok === true
-assert r1.value === 42
+assert r1.ok === true && r1.value === 42
 const r2 = v.validate(-5, rules)
-assert r2.ok === false
-assert r2.error === 'must be positive'
+assert r2.ok === false && r2.error === 'must be positive'
 const r3 = v.validate(200, rules)
-assert r3.ok === false
-assert r3.error === 'must be less than 100'
+assert r3.ok === false && r3.error === 'must be less than 100'
 const r4 = v.validate('hello', rules)
-assert r4.ok === false
-assert r4.error === 'must be a number'
+assert r4.ok === false && r4.error === 'must be a number'
 ```

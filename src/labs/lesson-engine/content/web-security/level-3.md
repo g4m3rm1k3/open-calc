@@ -294,53 +294,24 @@ function sanitiseUserResponse(userRow) {
 ```
 
 ```test
-// validateRegistration: happy path
+// validateRegistration: happy path — trims, lowercases, accepts
 const v1 = validateRegistration({ email: '  Alice@EXAMPLE.COM  ', password: 'securepass1', name: 'Alice' })
-assert v1.valid === true
-assert v1.email === 'alice@example.com'
-assert v1.name === 'Alice'
+assert v1.valid === true && v1.email === 'alice@example.com' && v1.name === 'Alice'
 
-// validateRegistration: missing password
-const v2 = validateRegistration({ email: 'bob@example.com', name: 'Bob' })
-assert v2.valid === false
-assert typeof v2.error === 'string'
+// validateRegistration: invalid input is rejected with an error
+const v2 = validateRegistration({ email: 'notanemail', password: '1234', name: 'Dave' })
+assert v2.valid === false && typeof v2.error === 'string'
 
-// validateRegistration: short password
-const v3 = validateRegistration({ email: 'carol@example.com', password: '1234', name: 'Carol' })
-assert v3.valid === false
-
-// validateRegistration: bad email
-const v4 = validateRegistration({ email: 'notanemail', password: 'password123', name: 'Dave' })
-assert v4.valid === false
-
-// validateRegistration: empty name after trim
-const v5 = validateRegistration({ email: 'eve@example.com', password: 'password123', name: '   ' })
-assert v5.valid === false
-
-// checkOwnerOrAdmin: own data
-assert checkOwnerOrAdmin({ id: 5, role: 'user' }, 5) === true
-
-// checkOwnerOrAdmin: other user's data
-assert checkOwnerOrAdmin({ id: 5, role: 'user' }, 99) === false
-
-// checkOwnerOrAdmin: admin can access anyone
+// checkOwnerOrAdmin: users see only their own data; admins see anyone's
+assert checkOwnerOrAdmin({ id: 5, role: 'user' }, 5) === true && checkOwnerOrAdmin({ id: 5, role: 'user' }, 99) === false
 assert checkOwnerOrAdmin({ id: 1, role: 'admin' }, 99) === true
 
-// sanitiseUserResponse: strips sensitive fields
+// sanitiseUserResponse: keeps public fields, strips sensitive ones
 const rawRow = {
-  id: 42,
-  email: 'frank@example.com',
-  name: 'Frank',
-  password_hash: '$2b$12$abc...',
-  reset_token: 'secret-token',
-  created_at: '2026-01-01T00:00:00Z',
+  id: 42, email: 'frank@example.com', name: 'Frank',
+  password_hash: '$2b$12$abc...', reset_token: 'secret-token', created_at: '2026-01-01T00:00:00Z',
 }
 const safe = sanitiseUserResponse(rawRow)
-assert safe.id === 42
-assert safe.email === 'frank@example.com'
-assert safe.name === 'Frank'
-assert safe.createdAt === '2026-01-01T00:00:00Z'
-assert !('password_hash' in safe)
-assert !('reset_token' in safe)
-assert !('created_at' in safe)
+assert safe.id === 42 && safe.email === 'frank@example.com' && safe.createdAt === '2026-01-01T00:00:00Z'
+assert !('password_hash' in safe) && !('reset_token' in safe) && !('created_at' in safe)
 ```

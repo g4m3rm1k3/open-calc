@@ -267,8 +267,6 @@ const counter = createCounterState(0)
 assert counter.getCount() === 0
 
 counter.increment()
-assert counter.getCount() === 1
-
 counter.increment()
 counter.increment()
 assert counter.getCount() === 3

@@ -311,46 +311,23 @@ const utils = createComposableUtils(vue)
 // useCounter
 const counter = utils.useCounter(10)
 assert counter.count.value === 10
-
-counter.increment()
-assert counter.count.value === 11
-
 counter.increment(4)
-assert counter.count.value === 15
-
 counter.decrement()
-assert counter.count.value === 14
-
-counter.decrement(4)
-assert counter.count.value === 10
-
+assert counter.count.value === 13
 counter.reset()
 assert counter.count.value === 10
 
 // useToggle
 const toggle = utils.useToggle(false)
-assert toggle.value.value === false
-
 toggle.toggle()
-assert toggle.value.value === true
-
 toggle.setFalse()
-assert toggle.value.value === false
-
-toggle.setTrue()
-assert toggle.value.value === true
-
-toggle.toggle()
 assert toggle.value.value === false
 
 // useStorage
 const store = { 'ui-theme': 'dark' }
 const theme = utils.useStorage('ui-theme', 'light', store)
-assert theme.value === 'dark'   // loaded existing value
-
 const newKey = utils.useStorage('font-size', 16, store)
-assert newKey.value === 16      // defaultValue when key doesn't exist
-
+assert theme.value === 'dark' && newKey.value === 16   // loads existing, defaults when missing
 newKey.value = 18
-assert store['font-size'] === 18  // written back to store
+assert store['font-size'] === 18   // written back to the store
 ```

@@ -226,19 +226,13 @@ const { results, errors } = await fetchAll(urls, fetcher, { concurrency: 2, maxR
 // All 5 URLs attempted
 assert results.length + errors.length === 5
 
-// Successes at correct positions
-assert results.find(r => r?.url === 'a')
-assert results.find(r => r?.url === 'b')
-assert results.find(r => r?.url === 'c')
+// Successes present
+assert results.find(r => r?.url === 'a') && results.find(r => r?.url === 'b') && results.find(r => r?.url === 'c')
 
 // Failures captured with correct info
 assert errors.length === 2
-assert errors.every(e => e.url.includes('fail'))
-assert errors.every(e => e.error === 'fetch failed')
+assert errors.every(e => e.url.includes('fail')) && errors.every(e => e.error === 'fetch failed')
 
-// Concurrency: max 2 start simultaneously
-const starts = log.filter(l => l.startsWith('start:'))
-// At no point should more than 2 be running at once
-// (verify via timing — hard to assert exactly, so just verify results are correct)
-assert starts.length >= 5   // at least one retry per failure = at least 5 start events (could be 7 with retries)
+// At least one retry per failure = more start events than URLs
+assert log.filter(l => l.startsWith('start:')).length >= 5
 ```

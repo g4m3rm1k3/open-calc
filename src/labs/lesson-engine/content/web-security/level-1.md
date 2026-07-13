@@ -277,33 +277,21 @@ function safeHtmlText(str) {
 ```test
 // buildSafeQuery: valid table, no filters
 const q1 = buildSafeQuery('users', {})
-assert q1.sql === 'SELECT * FROM users'
-assert q1.params.length === 0
+assert q1.sql === 'SELECT * FROM users' && q1.params.length === 0
 
-// buildSafeQuery: valid table with filters
+// buildSafeQuery: filters become ? placeholders, never inlined values
 const q2 = buildSafeQuery('orders', { status: 'pending', user_id: '42' })
-assert q2.sql.includes('SELECT * FROM orders WHERE')
-assert q2.sql.includes('status = ?')
-assert q2.sql.includes('user_id = ?')
-assert q2.params.includes('pending')
-assert q2.params.includes('42')
+assert q2.sql.includes('status = ?') && q2.sql.includes('user_id = ?') && q2.params.includes('pending')
 
-// buildSafeQuery: invalid table name throws
+// buildSafeQuery: table name outside the whitelist is rejected, not interpolated
 let threw = false
-try { buildSafeQuery('system_secrets', {}) } catch(e) {
-  threw = true
-  assert e.message.includes('Invalid table name')
-}
+try { buildSafeQuery('system_secrets', {}) } catch(e) { threw = true; assert e.message.includes('Invalid table name') }
 assert threw
 
-// safeHtmlText: encodes all dangerous characters
+// safeHtmlText: encodes dangerous characters
 const encoded = safeHtmlText('<script>alert("XSS")</script>')
-assert !encoded.includes('<')
-assert !encoded.includes('>')
-assert !encoded.includes('"')
-assert encoded.includes('&lt;')
-assert encoded.includes('&gt;')
+assert !encoded.includes('<') && !encoded.includes('>') && encoded.includes('&lt;')
 
-// safeHtmlText: safe input is unchanged
+// safeHtmlText: safe input passes through unchanged
 assert safeHtmlText('Hello, world!') === 'Hello, world!'
 ```

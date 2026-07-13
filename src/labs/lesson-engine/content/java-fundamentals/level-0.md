@@ -156,21 +156,17 @@ Return type comes before the method name. `void` for no return value. `return` e
 
 ## Challenge: bmi_calculator
 
-Write a static method `static double bmi(double weightKg, double heightM)` that computes BMI as `weightKg / (heightM * heightM)`. In `main`, compute and print the BMI for weight=70kg, height=1.75m, formatted to 1 decimal place using `printf`.
+Write a static method `static double bmi(double weightKg, double heightM)` that computes BMI as `weightKg / (heightM * heightM)`.
 
 ```challenge
-public class Main {
-    static double bmi(double weightKg, double heightM) {
-        // TODO
-    }
-
-    public static void main(String[] args) {
-        System.out.printf("BMI: %.1f%n", bmi(70, 1.75));
-    }
+static double bmi(double weightKg, double heightM) {
+    // TODO
 }
 ```
 
 ```test
-// Expected output:
-// BMI: 22.9
+assert Math.abs(bmi(70, 1.75) - 22.86) < 0.01
+assert Math.abs(bmi(50, 1.60) - 19.53) < 0.01
+assert Math.abs(bmi(100, 2.00) - 25.0) < 0.01
+assert Math.abs(bmi(1, 1) - 1.0) < 0.01
 ```

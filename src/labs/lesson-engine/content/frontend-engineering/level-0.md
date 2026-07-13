@@ -196,27 +196,17 @@ const machine = createFormStateMachine()
 assert machine.getState() === 'idle'
 
 machine.transition('submit')
-assert machine.getState() === 'submitting'
-assert machine.canTransition('resolve')
-assert machine.canTransition('reject')
-assert !machine.canTransition('submit')   // can't submit from submitting
+assert machine.getState() === 'submitting' && machine.canTransition('resolve') && !machine.canTransition('submit')
 
 machine.transition('resolve')
 assert machine.getState() === 'success'
 
 machine.transition('reset')
-assert machine.getState() === 'idle'
-
-assert machine.history.length === 3
-assert machine.history[0].from === 'idle'
-assert machine.history[0].to === 'submitting'
-assert machine.history[0].event === 'submit'
+assert machine.getState() === 'idle' && machine.history.length === 3
+assert machine.history[0].from === 'idle' && machine.history[0].to === 'submitting' && machine.history[0].event === 'submit'
 
 // Invalid transition should throw
-let threw = false
-try { machine.transition('reject') } catch (e) {
-  threw = true
-  assert e.message.includes('Invalid transition')
-}
-assert threw
+let threw = false, errMsg = ''
+try { machine.transition('reject') } catch (e) { threw = true; errMsg = e.message }
+assert threw && errMsg.includes('Invalid transition')
 ```

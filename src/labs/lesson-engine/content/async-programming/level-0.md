@@ -231,20 +231,12 @@ function eventLoopTrace(scenario) {
 
 ```test
 const basic = eventLoopTrace('basic')
-assert basic[0] === 'A'
-assert basic[1] === 'D'
-assert basic[2] === 'C'
-assert basic[3] === 'B'
+assert basic[0] === 'A' && basic[1] === 'D' && basic[2] === 'C' && basic[3] === 'B'
 
 const chain = eventLoopTrace('promise-chain')
-assert chain[0] === 'start'
-assert chain[1] === 'end'
-assert chain[2] === 'p1'
-assert chain[3] === 'p2'
+assert chain[0] === 'start' && chain[1] === 'end'
+assert chain[2] === 'p1' && chain[3] === 'p2'
 
 const mixed = eventLoopTrace('mixed')
-assert mixed[0] === 'sync'
-assert mixed[1] === 'm1'
-assert mixed[2] === 't1'
-assert mixed[3] === 't2'
+assert mixed[0] === 'sync' && mixed[1] === 'm1' && mixed[2] === 't1' && mixed[3] === 't2'
 ```

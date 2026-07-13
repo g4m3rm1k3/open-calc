@@ -192,31 +192,18 @@ Write a generic class `Pair<T, U>` that holds two values of possibly different t
 - A constructor `Pair(T first, U second)`
 - A method `string Describe()` that returns `"(first, second)"` using string interpolation
 
-In `Main`, create a `Pair<string, int>` with `("Alice", 30)` and a `Pair<double, bool>` with `(3.14, true)`, and print the result of `Describe()` for each.
-
 ```challenge
-using System;
-
 class Pair<T, U>
 {
     // TODO
 }
-
-class Program
-{
-    static void Main()
-    {
-        var p1 = new Pair<string, int>("Alice", 30);
-        Console.WriteLine(p1.Describe());
-
-        var p2 = new Pair<double, bool>(3.14, true);
-        Console.WriteLine(p2.Describe());
-    }
-}
 ```
 
 ```test
-// Expected output:
-// (Alice, 30)
-// (3.14, True)
+var p1 = new Pair<string, int>("Alice", 30);
+assert p1.First == "Alice"
+assert p1.Second == 30
+assert p1.Describe() == "(Alice, 30)"
+var p2 = new Pair<double, bool>(3.14, true);
+assert p2.Describe() == "(3.14, True)"
 ```

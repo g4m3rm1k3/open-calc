@@ -165,8 +165,7 @@ function testReasoning(scenario) {
 
 ```test
 const w = testReasoning('what-passing-means')
-assert w.bugFree === false
-assert w.reason.length > 15
+assert w.bugFree === false && w.reason.length > 15
 
 const d = testReasoning('design-pressure')
 assert d.change.length > 15
