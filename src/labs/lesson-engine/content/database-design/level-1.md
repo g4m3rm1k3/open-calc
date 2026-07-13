@@ -180,21 +180,22 @@ Why many-to-many requires a junction table:
 
 ## Challenge: design_schema
 
-Design the tables for a library system and identify the relationship types.
+A library system has:
 
-```sql
--- A library system has:
--- Books: each book has a title, author, ISBN (unique), and publication year.
--- Members: each member has a name and email (unique).
--- Loans: a member can borrow a book; the loan records when it was borrowed and when returned.
---        A book can only be on loan to one member at a time (when on loan).
---        A member can have multiple loans over time.
-
--- Write the CREATE TABLE statements in the code block below:
--- (Write as valid SQL — use INTEGER, TEXT, NOT NULL, PRIMARY KEY, REFERENCES, UNIQUE as needed)
+```text
+Books:   each book has a title, author, ISBN (unique), and publication year.
+Members: each member has a name and email (unique).
+Loans:   a member can borrow a book; the loan records when it was borrowed and
+         when returned. A book can only be on loan to one member at a time
+         (when on loan). A member can have multiple loans over time.
 ```
 
-```challenge
+Work out the relationship types before answering — Members-to-Loans, Books-to-Loans, and
+Books-to-Members (considering the full history of loans, not just current ones) are not
+all the same type. Then decide which table holds the foreign key, and whether a junction
+table is needed anywhere.
+
+```challenge javascript
 // Answer the relationship questions:
 const libraryDesign = {
   // What is the relationship type between Members and Loans?

@@ -209,7 +209,7 @@ Build a styled toggle switch.
 </label>
 ```
 
-```css
+```challenge css
 .toggle-switch { display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-family: system-ui, sans-serif; font-size: 0.9rem; color: #0f172a; }
 .toggle-switch__input { position: absolute; opacity: 0; width: 0; height: 0; }
 .toggle-switch__track {

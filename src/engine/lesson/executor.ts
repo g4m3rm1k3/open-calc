@@ -9,7 +9,7 @@ import type { ExecutionResult, Lang, OutputLine } from './types'
 // Lazy imports so the engine doesn't load heavy runtimes (Pyodide) until first run
 async function getRunner() {
   return import('../../utils/inlineRunner.js') as Promise<{
-    runJSInline: (code: string) => { output: string; error: string | null }
+    runJSInline: (code: string) => Promise<{ output: string; error: string | null }>
     runTSInline: (code: string) => Promise<{ output: string; error: string | null }>
     runPythonInline: (code: string, onLine?: (l: { type: string; text?: string; src?: string }) => void) => Promise<{ error: string | null }>
     runSQLInline: (code: string, onLine: (l: { type: string; text?: string }) => void) => Promise<{ error: string | null }>
@@ -42,7 +42,7 @@ export async function executeCode(code: string, lang: Lang): Promise<ExecutionRe
       })
       if (result?.error) err(result.error)
     } else if (norm === 'javascript' || norm === 'js') {
-      const r = runner.runJSInline(code)
+      const r = await runner.runJSInline(code)
       if (r.output && r.output !== '(no output)') out(r.output)
       if (r.error) err(r.error)
     } else if (norm === 'typescript' || norm === 'ts') {

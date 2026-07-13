@@ -1,11 +1,17 @@
 # UpskillOS Lesson Engine — Roadmap & Vision
 
-**Governing contracts:**
-- `src/docs/LESSON_ENGINE_CONTRACT.md` — how every individual lesson must be written
-- `src/docs/SERIES_CONTRACT.md` — what a series is responsible for teaching
+**Governing contract:**
+- `src/docs/UPSKILLOS_CURRICULUM_CONTRACT.md` — how a topic becomes a series becomes a
+  lesson, and what the engine can currently grade. This roadmap is project status and
+  build order, not pedagogy — it changes as work ships; the contract does not.
 
 This document captures what we are building, why, and how every part fits together.
 It is the source of truth for prioritisation, curriculum scope, and architectural decisions.
+
+**Curriculum Map accuracy:** the table below is generated from `series.ts` — as of this
+update, 44 series / 338 lesson levels exist. Regenerate it whenever series.ts changes
+significantly; a stale curriculum map here previously caused ~19 shipped series to go
+unlisted for an extended period.
 
 ---
 
@@ -27,24 +33,24 @@ A learner should be able to arrive knowing nothing and leave able to:
 
 ## Curriculum Map
 
-Series are ordered by intended learning sequence within each track.
-A series marked **[exists]** has content already wired in the engine.
-A series marked **[borrow]** has raw material in another lab that needs adapting.
-A series marked **[new]** needs to be written from scratch.
+Generated from `series.ts` (44 series, 338 lesson levels, all **[shipped]** — wired into
+`series.ts` and imported in `LessonEngineLab.tsx`). Series are grouped by track for
+readability; the grouping is informational, not a build dependency beyond what each
+series' own description states as a prerequisite.
+
+**Known issue:** `content/vue-fundamentals/` has 4 lessons written but is **not**
+registered in `series.ts` — unreachable in the running app. The JSX/Vue test harness
+(`runJSXTests` in `testRunner.ts`) already supports it; wiring it up is a queued fix.
 
 ### Track 0 — Foundation (Language-Agnostic Entry)
 
-| Series | Levels | Status | Notes |
-|---|---|---|---|
-| Python Fundamentals | 37 | **[exists]** | Level 0 – absolute beginner |
-| JavaScript Fundamentals | 10 | **[exists]** | Pure JS, no browser |
-| HTML, DOM & JavaScript | 12 | **[exists]** | Browser programming |
+| Series | Levels | Notes |
+|---|---|---|
+| Python Fundamentals | 37 | Level 0 – absolute beginner |
+| JavaScript Fundamentals | 10 | Pure JS, no browser |
+| HTML, DOM & JavaScript | 12 | Browser programming |
 
 ### Track 0b — CSS (10-series dependency graph)
-
-CSS is not one series. It is a dependency graph of 10 focused series.
-Each series in this graph has its own folder, its own `series.ts` entry, and explicit prerequisites.
-CSS challenges use `getComputedStyle` to test outcomes, not implementations.
 
 ```
 css-fundamentals
@@ -73,71 +79,84 @@ css-animation    css-visual-design
           css-professional
 ```
 
-| Series ID | Levels | Status | Prerequisites |
-|---|---|---|---|
-| css-fundamentals | ~10 | **[new]** — build first | none |
-| css-selectors | ~8 | **[borrow]** css-mastery lessons 21–24 | css-fundamentals |
-| css-box-model | ~8 | **[borrow]** css-mastery lessons 02, 05 | css-fundamentals |
-| css-layout | ~8 | **[borrow]** css-mastery lessons 01, 04 | css-selectors, css-box-model |
-| css-flexbox | ~9 | **[borrow]** css-mastery lessons 06–11 | css-layout |
-| css-grid | ~8 | **[borrow]** css-mastery lessons 09–11 | css-layout |
-| css-responsive | ~8 | **[borrow]** css-mastery lessons 12–16 | css-flexbox, css-grid |
-| css-animation | ~8 | **[borrow]** css-mastery lessons 17–20 | css-responsive |
-| css-visual-design | ~8 | **[new]** | css-animation |
-| css-professional | ~8 | **[borrow]** css-mastery lessons 22–28 | css-visual-design |
+| Series | Levels |
+|---|---|
+| css-fundamentals | 10 |
+| css-selectors | 8 |
+| css-box-model | 8 |
+| css-layout | 8 |
+| css-flexbox | 9 |
+| css-grid | 8 |
+| css-responsive | 8 |
+| css-animation | 7 |
+| css-visual-design | 8 |
+| css-professional | 8 |
 
 ### Track 1 — Typed Languages
 
-| Series | Levels | Status | Notes |
-|---|---|---|---|
-| C++ Fundamentals | 8 | **[exists]** | Level 0–7 done |
-| C# Fundamentals | 4 | **[exists]** | Level 0–3 done |
-| Java Fundamentals | 4 | **[exists]** | Level 0–3 done |
-| TypeScript Fundamentals | ~8 | **[new]** | Builds on JavaScript Fundamentals |
+| Series | Levels |
+|---|---|
+| C++ Fundamentals | 8 |
+| C# Fundamentals | 4 |
+| Java Fundamentals | 4 |
+| TypeScript Fundamentals | 8 |
+| Rust Fundamentals | 5 — taught by simulating ownership/borrowing in JavaScript, not a real Rust runtime |
+| Go Fundamentals | 5 — taught by simulating goroutines/channels in JavaScript, not a real Go runtime |
 
 ### Track 2 — Data
 
-| Series | Levels | Status | Notes |
-|---|---|---|---|
-| Data Structures & Algorithms in Python | 11 | **[exists]** | Level 0–10 done |
-| SQL Fundamentals | ~10 | **[borrow]** | backend-lab has `SqlPanel.tsx` and lessons 13 + 10 reference SQL |
+| Series | Levels |
+|---|---|
+| Data Structures & Algorithms in Python | 11 |
+| SQL Fundamentals | 8 |
+| Database Design | 6 |
 
 ### Track 3 — Backend & APIs
 
-| Series | Levels | Status | Notes |
-|---|---|---|---|
-| Backend Fundamentals | ~14 | **[borrow]** | Adapt `backend-lab/lessons/01–14.md` to contract format |
-| Node.js & Express | ~8 | **[new]** | Builds on JS Fundamentals + Backend Fundamentals |
-| REST API Design | ~6 | **[new]** | Builds on Backend Fundamentals |
-| Authentication & Security | ~6 | **[new]** | Sessions, JWT, OAuth overview |
+| Series | Levels |
+|---|---|
+| Backend Fundamentals | 8 |
+| REST APIs | 5 |
 
 ### Track 4 — Tools & Practice
 
-| Series | Levels | Status | Notes |
-|---|---|---|---|
-| Git & Version Control | ~8 | **[borrow]** | Adapt `docs/git-masterclass/GIT-LAB-01–06.md` to contract format |
-| Software Engineering Practices | ~8 | **[new]** | Testing, refactoring, code review, docs, naming |
+| Series | Levels |
+|---|---|
+| Git & Version Control | 8 |
+| Git Advanced | 8 |
+| Software Construction | 15 |
+| Clean Code | 6 |
+| Testing Fundamentals | 5 |
+| Debugging Fundamentals | 8 |
+| DevOps Concepts | 6 |
+| How to Contribute | 8 |
 
-### Track 5 — Computer Science Fundamentals
+### Track 5 — Computer Science & Software Design
 
-| Series | Levels | Status | Notes |
-|---|---|---|---|
-| How Computers Work | ~6 | **[new]** | Binary, memory, CPU, OS basics |
-| Computer Networking | ~8 | **[new]** | HTTP, DNS, TCP/IP, TLS, sockets |
-| Operating Systems | ~8 | **[new]** | Processes, threads, file systems, scheduling |
+| Series | Levels |
+|---|---|
+| CS Foundations | 9 |
+| Async Programming | 5 |
+| Functional Programming | 6 |
+| OOP Design | 5 |
+| Design Patterns | 5 |
+| Software Architecture | 4 |
+| Performance Engineering | 4 |
 
-### Track 6 — React & Modern Frontend
+### Track 6 — Frontend & Frameworks
 
-| Series | Levels | Status | Notes |
-|---|---|---|---|
-| React Fundamentals | ~10 | **[borrow]** | `react-mastery` lab exists; adapt lessons to contract |
-| State Management | ~6 | **[new]** | Context, Zustand/Redux patterns |
+| Series | Levels |
+|---|---|
+| React Fundamentals | 5 |
+| Browser APIs | 5 |
+| Frontend Engineering | 4 |
 
-### Track 7 — Contributor Series (Special)
+### Track 7 — Professional Practice
 
-| Series | Levels | Status | Notes |
-|---|---|---|---|
-| Contribute to UpskillOS | ~8 | **[new]** | See section below |
+| Series | Levels |
+|---|---|
+| Web Security | 4 |
+| Professional Engineering | 5 |
 
 ---
 
@@ -240,59 +259,47 @@ importers, and document the move in this file.
 
 ## Build Order
 
-This is the recommended sequence, designed to ship value at each step rather than
-building everything before anything works.
+### Phase 1 — Core languages + CSS root — done
+All of Track 0, 0b, and 1 shipped (see Curriculum Map above): Python, JavaScript,
+HTML/DOM, the full 10-series CSS dependency graph, C++, C#, Java, TypeScript, DSA in
+Python, Rust and Go (both taught via JS simulation, not a real runtime).
 
-### Phase 1 — Core languages + CSS root (in progress)
-- [x] Python Fundamentals — 37 levels done
-- [x] JavaScript Fundamentals — 10 levels done
-- [x] HTML, DOM & JavaScript — 12 levels done
-- [x] C++ Fundamentals — 8 levels done
-- [x] C# Fundamentals — 4 levels done
-- [x] Java Fundamentals — 4 levels done
-- [x] DSA in Python — 11 levels done
-- [ ] **css-fundamentals** — 10 levels, write from scratch (no prerequisites)
-- [ ] css-selectors — adapt css-mastery 21–24 after css-fundamentals done
-- [ ] css-box-model — adapt css-mastery 02, 05
-- [ ] css-layout — adapt css-mastery 01, 04
-- [ ] css-flexbox — adapt css-mastery 06–11
-- [ ] css-grid — adapt css-mastery 09–11
-- [ ] css-responsive — adapt css-mastery 12–16
-- [ ] css-animation — adapt css-mastery 17–20
-- [ ] css-visual-design — write from scratch
-- [ ] css-professional — adapt css-mastery 22–28
-- [ ] TypeScript Fundamentals — new
+### Phase 2 — Data and Backend — done
+SQL Fundamentals, Database Design, Backend Fundamentals, REST APIs, Git & Version
+Control, and Git Advanced all shipped.
 
-### Phase 2 — Data and Backend
-- [ ] SQL Fundamentals — borrow SqlPanel + backend-lab lesson 13
-- [ ] Backend Fundamentals — adapt backend-lab lessons 01–14
-- [ ] Git & Version Control — adapt git-masterclass lessons
-
-### Phase 3 — Tool integrations
+### Phase 3 — Tool integrations — not started
 - [ ] `open_with` metadata support in parser
 - [ ] HTML Lab launch button in LessonView
 - [ ] CodeLens launch button in LessonView
 - [ ] Abstraction Visualiser launch button in LessonView
 - [ ] SQL Panel launch button in LessonView
 
-### Phase 4 — Shared component layer
+### Phase 4 — Shared component layer — not verified
 - [ ] Audit duplication across lesson engine and labs
 - [ ] Extract shared pieces to `src/engine/shared/`
 - [ ] Update all importers
 
-### Phase 5 — Advanced series
-- [ ] Node.js & Express
-- [ ] REST API Design
-- [ ] Authentication & Security
-- [ ] Software Engineering Practices
-- [ ] Computer Networking
-- [ ] How Computers Work / OS basics
-- [ ] React Fundamentals (from react-mastery)
+### Phase 5 — Advanced series — done
+Software Construction, CS Foundations, Debugging Fundamentals, Functional Programming,
+DevOps Concepts, Clean Code, OOP Design, Testing Fundamentals, Async Programming,
+Performance Engineering, Frontend Engineering, Web Security, Design Patterns, REST
+APIs, React Fundamentals, Software Architecture, and Professional Engineering all
+shipped — a broader set than originally scoped here.
 
-### Phase 6 — Contributor Series
-- [ ] Write all 8 levels
-- [ ] Wire as a series in the engine
-- [ ] Add to series list with a distinct visual treatment (different from "learn to code")
+### Phase 6 — Contributor Series — done
+All 8 levels written and wired.
+
+### Phase 7 — Content correctness (current focus)
+Structural bugs found by `src/labs/lesson-engine/content/lessonCorpus.test.ts` — run
+`npm test` for current numbers:
+- [x] Explicit challenge-language tag support in the parser (`UPSKILLOS_CURRICULUM_CONTRACT.md` Part 3)
+- [x] Retag scenario-quiz challenges mis-inferred as bash/sql (git-advanced, git-version-control, contributor-series, database-design)
+- [x] Fix wrong-fence-tag bug (sql-fundamentals, typescript-fundamentals, css-professional, css-visual-design)
+- [ ] Real test harnesses for SQL (raw-text assertion binding), C++, C#, Java (`UPSKILLOS_CURRICULUM_CONTRACT.md` Part 4)
+- [ ] Assertion-count cleanup (outside the 4–6 range)
+- [ ] `database-design` level-1/level-4 prose/artifact mismatch and step-mixing
+- [ ] Wire `vue-fundamentals` into `series.ts` (content exists, harness exists, never registered)
 
 ---
 
@@ -399,16 +406,15 @@ but references it: "If you haven't done CSS Fundamentals, do that first."
 
 | File | Purpose |
 |---|---|
-| `src/docs/LESSON_ENGINE_CONTRACT.md` | Per-lesson writing rules |
-| `src/docs/SERIES_CONTRACT.md` | Per-series completeness rules |
+| `src/docs/UPSKILLOS_CURRICULUM_CONTRACT.md` | Decomposition, series, and per-lesson writing rules; engine capability reference |
 | `src/docs/LESSON_ENGINE_ROADMAP.md` | This file — curriculum plan and architecture |
 | `src/labs/lesson-engine/series.ts` | Series registry |
 | `src/labs/lesson-engine/LessonEngineLab.tsx` | Import map + lesson file registry |
+| `src/labs/lesson-engine/content/lessonCorpus.test.ts` | Automated corpus checks — run via `npm test` |
+| `src/engine/lesson/parser.test.ts` | Parser unit tests |
 | `src/engine/lesson/LessonView.tsx` | Lesson renderer, tab system, tool integration hooks |
 | `src/engine/lesson/parser.ts` | Markdown → ParsedLesson |
 | `src/engine/lesson/executor.ts` | Code runner dispatch |
+| `src/engine/lesson/testRunner.ts` | Per-language test harness builders |
 | `src/labs/backend-lab/SqlPanel.tsx` | SQL runner — candidate for shared extraction |
 | `src/labs/backend-lab/PostmanPanel.tsx` | HTTP client — candidate for shared extraction |
-| `src/labs/css-mastery/lessons/` | Raw CSS lesson content — adapt to contract |
-| `src/labs/backend-lab/lessons/` | Raw backend lesson content — adapt to contract |
-| `src/docs/git-masterclass/` | Raw Git lesson content — adapt to contract |

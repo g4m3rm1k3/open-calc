@@ -16,7 +16,7 @@ function parseFrontmatter(md: string): { meta: Record<string, string>; body: str
 
 // ── Code fence extraction ─────────────────────────────────────────────────────
 
-interface Fence { lang: string; code: string; raw: string }
+interface Fence { lang: string; code: string; raw: string; info: string }
 
 // Only these langs are extracted as runnable examples or special blocks.
 // All other fences (text, plaintext, no lang) stay in the prose for markdown rendering.
@@ -36,9 +36,10 @@ const SPECIAL_LANGS  = new Set(['challenge', 'test'])
 function extractFences(text: string): { fences: Fence[]; prose: string } {
   const fences: Fence[] = []
   const prose = text.replace(/```([^\n`]*)\n([\s\S]*?)```/g, (raw, lang, code) => {
-    const l = (lang || 'plaintext').trim().split(/\s+/)[0].toLowerCase()
+    const info = (lang || '').trim()
+    const l = (info || 'plaintext').split(/\s+/)[0].toLowerCase()
     if (RUNNABLE_LANGS.has(l) || SPECIAL_LANGS.has(l)) {
-      fences.push({ lang: l, code: code.replace(/\n$/, ''), raw })
+      fences.push({ lang: l, code: code.replace(/\n$/, ''), raw, info })
       return ''   // remove from prose — rendered by RunExample / ChallengeStep
     }
     return raw    // keep in prose — rendered as display-only by ReactMarkdown
@@ -86,11 +87,16 @@ function buildStep(raw: string, idx: number, metaLang: string): LessonStep {
   for (let i = 0; i < fences.length; i++) {
     const f = fences[i]
     if (f.lang === 'challenge') {
-      // Infer lang from the previous runnable fence, skipping display/context fences.
-      // Fall back to the lesson's meta.lang so CSS challenges get lang:'css' even
-      // when the previous fence is the HTML structure context.
+      // Explicit language wins: ```challenge javascript```. Written the same way every
+      // other fence declares its language, and it's the only reliable way to grade a
+      // scenario-style challenge (e.g. a JS quiz object inside a bash-topic lesson) —
+      // inferring from context guesses wrong in exactly that case.
+      const explicit = f.info.split(/\s+/)[1]?.toLowerCase()
+      // Otherwise infer lang from the previous runnable fence, skipping display/context
+      // fences. Fall back to the lesson's meta.lang so CSS challenges get lang:'css'
+      // even when the previous fence is the HTML structure context.
       const prev = fences[i - 1]?.lang
-      const inferredLang = (prev && !NON_CHALLENGE_LANGS.has(prev)) ? prev : metaLang
+      const inferredLang = explicit || ((prev && !NON_CHALLENGE_LANGS.has(prev)) ? prev : metaLang)
       challenge = { lang: inferredLang, code: f.code }
     } else if (f.lang === 'test') {
       tests = f.code

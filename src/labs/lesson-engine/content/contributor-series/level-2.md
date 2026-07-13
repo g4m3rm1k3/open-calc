@@ -118,7 +118,7 @@ Bad PR description:
 
 Answer questions about branching and PRs.
 
-```challenge
+```challenge javascript
 const answers = {
   // What command creates a branch called 'lessons/add-vue' and switches to it?
   createAndSwitch: '',

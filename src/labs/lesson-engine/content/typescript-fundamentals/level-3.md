@@ -127,7 +127,7 @@ Write a generic function.
 
 Write `wrap<T>(value: T): { value: T }` that wraps any value in an object.
 
-```typescript
+```challenge typescript
 function wrap<T>(value: T): { value: T } {
   // return the wrapped object
 }

@@ -416,6 +416,11 @@ import peLevel2 from './content/professional-engineering/level-2.md?raw'
 import peLevel3 from './content/professional-engineering/level-3.md?raw'
 import peLevel4 from './content/professional-engineering/level-4.md?raw'
 
+import vueLevel0 from './content/vue-fundamentals/level-0.md?raw'
+import vueLevel1 from './content/vue-fundamentals/level-1.md?raw'
+import vueLevel2 from './content/vue-fundamentals/level-2.md?raw'
+import vueLevel3 from './content/vue-fundamentals/level-3.md?raw'
+
 const LESSON_FILES: Record<string, string> = {
   'python-fundamentals/level-0.md':  pfLevel0,
   'python-fundamentals/level-1.md':  pfLevel1,
@@ -755,6 +760,10 @@ const LESSON_FILES: Record<string, string> = {
   'professional-engineering/level-2.md': peLevel2,
   'professional-engineering/level-3.md': peLevel3,
   'professional-engineering/level-4.md': peLevel4,
+  'vue-fundamentals/level-0.md': vueLevel0,
+  'vue-fundamentals/level-1.md': vueLevel1,
+  'vue-fundamentals/level-2.md': vueLevel2,
+  'vue-fundamentals/level-3.md': vueLevel3,
 }
 
 interface Props {

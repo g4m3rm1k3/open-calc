@@ -2,52 +2,106 @@ import type { TestResult, Executor } from './types'
 
 const OC_PREFIX = '__OC_TEST__'
 
+// Assert lines commonly carry an explanatory trailing comment ("assert x > 3   // must
+// be descriptive"), which the contract encourages. In JS the assertion expression gets
+// wrapped in `!!( ... )` — a trailing `//` there comments out the closing paren and
+// everything after it on that line, breaking the harness. Strip a trailing `//` comment
+// before using the expression, but only when the `//` is not inside a string literal
+// (a URL like 'https://example.com' must survive intact). The label shown to the
+// learner still uses the untouched original line, comment included.
+function stripTrailingLineComment(line: string): string {
+  let quote: string | null = null
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i]
+    if (quote) {
+      if (ch === '\\') { i++; continue }
+      if (ch === quote) quote = null
+      continue
+    }
+    if (ch === "'" || ch === '"' || ch === '`') { quote = ch; continue }
+    if (ch === '/' && line[i + 1] === '/') return line.slice(0, i).trimEnd()
+  }
+  return line
+}
+
+// A test fence is not always a flat list of assertions — authors legitimately write
+// setup/preamble lines between them for readability (`const i1 = im.report(...)` then
+// several `assert i1....` lines, then `const i2 = ...`). These must run in their
+// original source order, interleaved with the assertions, not bucketed into "run all
+// setup first, then all assertions" — bucketing silently reorders side effects (e.g. a
+// later `im.resolve(i1.id)` would run before an earlier `assert im.openIncidents()...`
+// that depends on it not having happened yet). Every harness below walks lines once, in
+// order, and only treats an `assert `-prefixed line specially.
+
 function buildPythonHarness(userCode: string, testCode: string): string {
-  const assertions = testCode
-    .split('\n')
-    .map(l => l.trim())
-    .filter(l => l.startsWith('assert ') || (l && !l.startsWith('#')))
+  const lines = testCode.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#'))
 
-  const lines = [
-    userCode,
-    '',
-    '__oc_results = []',
-  ]
+  const out = [userCode, '']
 
-  for (const assertion of assertions) {
-    const escaped = assertion.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
-    lines.push(`try:`)
-    lines.push(`    ${assertion}`)
-    lines.push(`    __oc_results.append('PASS|${escaped}')`)
-    lines.push(`except AssertionError:`)
-    lines.push(`    __oc_results.append('FAIL|${escaped}')`)
-    lines.push(`except Exception as __e:`)
-    lines.push(`    __oc_results.append('ERROR|${escaped}|' + str(__e))`)
+  for (const line of lines) {
+    if (!line.startsWith('assert ')) {
+      out.push(line)
+      continue
+    }
+    const escaped = line.replace(/\\/g, '\\\\').replace(/'/g, "\\'")
+    // Print immediately (not buffered) so a later preamble line that throws doesn't
+    // discard results already earned by assertions that ran before it.
+    out.push(`try:`)
+    out.push(`    ${line}`)
+    out.push(`    print('${OC_PREFIX}PASS|${escaped}')`)
+    out.push(`except AssertionError:`)
+    out.push(`    print('${OC_PREFIX}FAIL|${escaped}')`)
+    out.push(`except Exception as __e:`)
+    out.push(`    print('${OC_PREFIX}ERROR|${escaped}|' + str(__e))`)
   }
 
-  lines.push(`for __r in __oc_results: print('${OC_PREFIX}' + __r)`)
-  return lines.join('\n')
+  return out.join('\n')
 }
 
 function buildJSHarness(userCode: string, testCode: string): string {
-  const assertions = testCode
-    .split('\n')
-    .map(l => l.trim())
-    .filter(l => l && !l.startsWith('//'))
+  const lines = testCode.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//'))
 
-  const lines = [userCode, '']
+  const out = [userCode, '']
 
-  for (const assertion of assertions) {
-    const escaped = assertion.replace(/`/g, '\\`')
-    lines.push(`try {`)
-    lines.push(`  const __ok = !!(${assertion.replace(/^assert\s+/, '')});`)
-    lines.push(`  if (__ok) console.log(\`${OC_PREFIX}PASS|${escaped}\`)`)
-    lines.push(`  else      console.log(\`${OC_PREFIX}FAIL|${escaped}|\`)`)
-    lines.push(`} catch(__e) {`)
-    lines.push(`  console.log(\`${OC_PREFIX}FAIL|${escaped}|\` + __e.message)`)
-    lines.push(`}`)
+  for (const line of lines) {
+    if (!line.startsWith('assert ')) {
+      out.push(line)
+      continue
+    }
+    const expr = stripTrailingLineComment(line.slice('assert '.length))
+    const escaped = line.replace(/`/g, '\\`')
+    out.push(`try {`)
+    out.push(`  const __ok = !!(${expr});`)
+    out.push(`  if (__ok) console.log(\`${OC_PREFIX}PASS|${escaped}\`)`)
+    out.push(`  else      console.log(\`${OC_PREFIX}FAIL|${escaped}|\`)`)
+    out.push(`} catch(__e) {`)
+    out.push(`  console.log(\`${OC_PREFIX}FAIL|${escaped}|\` + __e.message)`)
+    out.push(`}`)
   }
-  return lines.join('\n')
+  return out.join('\n')
+}
+
+// Shared by runCSSTests and runJSXTests: same interleaving rule, but assertions report
+// into a `results` array via `results.push(...)` (read back through postMessage) rather
+// than printing OC_PREFIX-tagged stdout lines.
+function buildInterleavedAssertions(testCode: string): string {
+  const lines = testCode.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('//'))
+  const out: string[] = []
+  for (const line of lines) {
+    if (!line.startsWith('assert ')) {
+      out.push(line)
+      continue
+    }
+    const expr = stripTrailingLineComment(line.slice('assert '.length))
+    const label = JSON.stringify(line)
+    out.push(`try {
+  var __ok = Boolean(${expr});
+  results.push({label:${label},passed:__ok,detail:__ok?undefined:'Expected true'});
+} catch(e) {
+  results.push({label:${label},passed:false,detail:e.message});
+}`)
+  }
+  return out.join('\n')
 }
 
 export function buildTestHarness(userCode: string, testCode: string, lang: string): string {
@@ -88,6 +142,20 @@ export async function runTests(
   return parseTestResults(stdout)
 }
 
+// SQL challenges (sql-fundamentals) grade the learner's raw query TEXT, not a query
+// result set — no database execution needed. The test fence binds it via a `code`
+// variable (e.g. `var q = code.trim().toLowerCase()...; assert q.startsWith('select')`).
+// Route through the JS runtime with `code` pre-bound, instead of the (nonexistent) SQL
+// test harness — the assertions are already plain JS.
+export async function runSqlTests(
+  rawQuery: string,
+  testCode: string,
+  executor: Executor,
+): Promise<TestResult[]> {
+  const preamble = `const code = ${JSON.stringify(rawQuery)};`
+  return runTests(preamble, testCode, 'javascript', executor)
+}
+
 // ── JSX/React/Vue test runner ─────────────────────────────────────────────────
 // Transpiles JSX with @babel/standalone (runtime: classic → React.createElement),
 // injects React/Vue UMD from CDN, runs assertions via postMessage from the iframe.
@@ -99,24 +167,7 @@ export function runJSXTests(
   framework: 'react' | 'vue' = 'react',
 ): Promise<TestResult[]> {
   return new Promise(async resolve => {
-    const lines = testCode
-      .split('\n')
-      .map(l => l.trim())
-      .filter(l => l && !l.startsWith('//'))
-
-    const preamble = lines.filter(l => !l.startsWith('assert '))
-    const asserts  = lines.filter(l =>  l.startsWith('assert '))
-
-    const assertBlocks = asserts.map(a => {
-      const expr = a.replace(/^assert\s+/, '')
-      const label = JSON.stringify(a)
-      return `try {
-  var __ok = Boolean(${expr});
-  results.push({label:${label},passed:__ok,detail:__ok?undefined:'Expected true'});
-} catch(e) {
-  results.push({label:${label},passed:false,detail:e.message});
-}`
-    }).join('\n')
+    const assertBlocks = buildInterleavedAssertions(testCode)
 
     // Transpile JSX → plain JS using @babel/standalone (already a local dep)
     let transpiledCode = userCode
@@ -142,7 +193,6 @@ export function runJSXTests(
 var results = [];
 try {
 ${transpiledCode}
-${preamble.join('\n')}
 ${assertBlocks}
 } catch(e) {
   results.push({label:'Runtime error',passed:false,detail:e.message});
@@ -190,26 +240,7 @@ export function runCSSTests(
   testCode: string,
 ): Promise<TestResult[]> {
   return new Promise(resolve => {
-    const lines = testCode
-      .split('\n')
-      .map(l => l.trim())
-      .filter(l => l && !l.startsWith('//'))
-
-    // Lines NOT starting with `assert` are preamble/setup — run once in shared scope.
-    // Lines starting with `assert` are individual checks — wrapped in try/catch.
-    const preamble = lines.filter(l => !l.startsWith('assert '))
-    const asserts  = lines.filter(l =>  l.startsWith('assert '))
-
-    const assertBlocks = asserts.map(a => {
-      const expr = a.replace(/^assert\s+/, '')
-      const label = JSON.stringify(a)
-      return `try {
-  var __ok = Boolean(${expr});
-  results.push({label:${label},passed:__ok,detail:__ok?undefined:'Expected true'});
-} catch(e) {
-  results.push({label:${label},passed:false,detail:e.message});
-}`
-    }).join('\n')
+    const assertBlocks = buildInterleavedAssertions(testCode)
 
     const doc = `<!DOCTYPE html>
 <html>
@@ -219,7 +250,6 @@ ${htmlStructure}
 <script>
 var results = [];
 try {
-${preamble.join('\n')}
 ${assertBlocks}
 } catch(e) {
   results.push({label:'Setup error',passed:false,detail:e.message});

@@ -227,7 +227,7 @@ export const RUNNABLE_LANGS = new Set([
 ])
 
 /** Run JS inline. Returns { output: string, error: string|null } */
-export function runJSInline(code) {
+export async function runJSInline(code) {
   const src = transformESM(code)
   const lines = []
   const api = {
@@ -243,8 +243,12 @@ export function runJSInline(code) {
   const req = makeInlineRequire()
   const mod = { exports: {} }
   try {
-    const r = Function('console', 'require', 'module', 'exports',
-      `"use strict";\n${src}`)(api, req, mod, mod.exports)
+    // Wrapped in an async IIFE so top-level `await` works (e.g. test assertions like
+    // `const result = await loadDashboard(...)`) — the outer Function itself can't be
+    // async (the Function constructor never produces one), but it can synchronously
+    // return the promise from an async arrow function, which we await here.
+    const r = await Function('console', 'require', 'module', 'exports',
+      `"use strict";\nreturn (async () => {\n${src}\n})()`)(api, req, mod, mod.exports)
     if (r !== undefined) lines.push(fmtVal(r))
   } catch (e) {
     return { output: lines.join('\n'), error: e.message }
@@ -261,7 +265,7 @@ export async function runTSInline(code) {
     Babel = await loadBabel()
   } catch (babelErr) {
     // CDN unreachable or timed out — try running as plain JS (works for Express/Node examples)
-    const result = runJSInline(code)
+    const result = await runJSInline(code)
     const note = `⚠ TypeScript compiler unavailable (${babelErr.message}). Running as JavaScript.`
     return {
       output: result.output ? `${note}\n\n${result.output}` : note,

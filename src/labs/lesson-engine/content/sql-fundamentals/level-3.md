@@ -109,7 +109,7 @@ ORDER BY avg_price DESC;
 
 Write a query that counts users per role. Select `role` and `COUNT(*) AS user_count` from `users`, grouped by `role`, ordered by `user_count` descending.
 
-```sql
+```challenge sql
 -- Your query:
 ```
 

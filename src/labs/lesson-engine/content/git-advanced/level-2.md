@@ -170,7 +170,7 @@ git log --author="Jane Smith" v2.0.0..HEAD --oneline
 
 Answer questions about binary search debugging with git bisect.
 
-```challenge
+```challenge javascript
 const bisect = {
   // How many bisect steps (maximum) to find a bug in 1024 commits?
   stepsFor1024: '',

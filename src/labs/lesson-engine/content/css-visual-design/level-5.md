@@ -170,7 +170,7 @@ Create a card that has light and dark mode variants using custom properties.
 </div>
 ```
 
-```css
+```challenge css
 :root {
   --mc-bg: #ffffff;
   --mc-text: #0f172a;

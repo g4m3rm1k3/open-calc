@@ -167,7 +167,7 @@ Use @property to make a custom property animatable.
 <div id="prop-demo">Hover me</div>
 ```
 
-```css
+```challenge css
 @property --demo-size {
   syntax: '<percentage>';
   initial-value: 50%;

@@ -155,7 +155,7 @@ Why branching is free in Git:
 
 Answer questions about Git's object model.
 
-```challenge
+```challenge javascript
 const internals = {
   // What are the four Git object types?
   objectTypes: '',

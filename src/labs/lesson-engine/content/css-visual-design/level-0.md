@@ -119,7 +119,7 @@ Build a 3-step color scale using HSL.
 </div>
 ```
 
-```css
+```challenge css
 #scale-demo {
   display: flex;
   gap: 0.5rem;

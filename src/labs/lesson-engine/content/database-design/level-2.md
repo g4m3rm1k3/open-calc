@@ -180,7 +180,7 @@ but may never see the performance benefit if the query is rare.
 
 Identify the normal form violations in this schema and describe the fix.
 
-```challenge
+```challenge javascript
 // This flat table stores employee salary information:
 // employees: (emp_id, emp_name, dept_id, dept_name, dept_manager_name, salary, bonus_pct)
 // 

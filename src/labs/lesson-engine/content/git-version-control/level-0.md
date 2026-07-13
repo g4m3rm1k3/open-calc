@@ -115,7 +115,7 @@ These don't have to match your GitHub account, but they typically should.
 
 Match each git command to its effect.
 
-```challenge
+```challenge javascript
 const gitCommands = {
   'git add file.js':          '',  // moves file.js to ___
   'git commit -m "msg"':      '',  // moves staged changes to ___

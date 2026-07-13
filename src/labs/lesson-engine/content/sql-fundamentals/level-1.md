@@ -124,7 +124,7 @@ SELECT * FROM courses WHERE created_at BETWEEN '2026-01-01' AND '2026-06-30';
 
 Write a SELECT statement that retrieves `title` and `author_id` from `courses` where `author_id = 1`. Use only those two columns — do not use `SELECT *`.
 
-```sql
+```challenge sql
 -- Your SELECT statement:
 ```
 

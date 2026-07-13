@@ -186,7 +186,7 @@ Toggle a visible/hidden state using only a class, not style manipulation.
 </div>
 ```
 
-```css
+```challenge css
 .panel {
   padding: 1rem;
   background: #f1f5f9;

@@ -133,7 +133,7 @@ For large tables, the optimizer usually handles both well — but INNER JOIN is 
 
 Write an INNER JOIN query that selects `courses.title` and `users.name AS author` from `courses`, joined to `users` on `courses.author_id = users.id`. Results should be ordered by `courses.title` ascending.
 
-```sql
+```challenge sql
 -- Your JOIN query:
 ```
 

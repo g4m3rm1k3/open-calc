@@ -130,7 +130,7 @@ Write two `CREATE TABLE` statements for a simple blog:
 
 The `REFERENCES authors(id)` makes `author_id` a foreign key — the database will reject any post with an `author_id` that doesn't exist in `authors`.
 
-```sql
+```challenge sql
 -- Your CREATE TABLE statements:
 ```
 

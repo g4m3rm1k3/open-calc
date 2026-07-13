@@ -214,7 +214,7 @@ Build two button variants using design tokens.
 </div>
 ```
 
-```css
+```challenge css
 :root {
   --ch-primary: hsl(245, 80%, 55%);
   --ch-primary-text: white;

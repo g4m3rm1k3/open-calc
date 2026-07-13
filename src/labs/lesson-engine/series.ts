@@ -746,6 +746,19 @@ export const SERIES: SeriesMeta[] = [
       { level: 4, title: 'Scalability and Systems Thinking',         file: 'professional-engineering/level-4.md' },
     ],
   },
+  {
+    id: 'vue-fundamentals',
+    label: 'Vue Fundamentals',
+    lang: 'javascript',
+    emoji: '🟢',
+    description: 'Learn Vue\'s reactivity model through simulation in plain JavaScript: the Options API, the Composition API with ref/reactive/computed, component props and emits, and watchers and composables.',
+    levels: [
+      { level: 0, title: 'What Vue Is and the Options API',        file: 'vue-fundamentals/level-0.md' },
+      { level: 1, title: 'The Composition API and ref/reactive',   file: 'vue-fundamentals/level-1.md' },
+      { level: 2, title: 'Components, Props, and Emits',           file: 'vue-fundamentals/level-2.md' },
+      { level: 3, title: 'Watchers and Composables',               file: 'vue-fundamentals/level-3.md' },
+    ],
+  },
 ]
 
 export function getSeries(id: string): SeriesMeta | undefined {

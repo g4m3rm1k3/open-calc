@@ -191,14 +191,16 @@ HAVING SUM(orders.total_cents) > 10000;
 
 Write queries that combine data from multiple tables.
 
-```sql
--- Tables:
--- authors(id, name, country)
--- books(id, author_id, title, published_year, genre)
--- reviews(id, book_id, rating, review_text)
+```text
+Tables:
+  authors(id, name, country)
+  books(id, author_id, title, published_year, genre)
+  reviews(id, book_id, rating, review_text)
 
--- The queries are in JavaScript strings for this challenge:
+Write each query as a SQL string assigned to the matching field below.
+```
 
+```challenge javascript
 const queries = {
   // Query 1: Get all books with their author's name.
   // Columns: book_title, author_name
@@ -214,18 +216,6 @@ const queries = {
   // Hint: JOIN books and reviews, GROUP BY genre, HAVING avg_rating > 4.0
   query3: '',
 }
-```
-
-```challenge
-const q = queries
-assert q.query1.toUpperCase().includes('JOIN')
-assert q.query1.toUpperCase().includes('AUTHOR')
-assert q.query1.toUpperCase().includes('BOOK')
-assert q.query2.toUpperCase().includes('LEFT JOIN') || q.query2.toUpperCase().includes('COUNT')
-assert q.query2.toUpperCase().includes('GROUP BY')
-assert q.query3.toUpperCase().includes('HAVING')
-assert q.query3.toUpperCase().includes('AVG') || q.query3.toUpperCase().includes('ROUND')
-assert q.query3.toUpperCase().includes('GENRE')
 ```
 
 ```test

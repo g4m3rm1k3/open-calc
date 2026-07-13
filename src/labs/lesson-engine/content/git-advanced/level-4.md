@@ -167,7 +167,7 @@ git rebase -i --autosquash main
 
 Answer questions about interactive rebase.
 
-```challenge
+```challenge javascript
 const irebase = {
   // You have 5 commits. You want to combine commit 3 and 4 into commit 3,
   // keeping commit 3's message and discarding commit 4's message. Which command?

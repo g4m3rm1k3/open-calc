@@ -151,7 +151,7 @@ Write two statements:
 1. An `INSERT INTO products (name, price)` adding a row with `name = 'Widget'` and `price = 9.99`.
 2. An `UPDATE products` that sets `price = 12.99` where `name = 'Widget'` — include a WHERE clause.
 
-```sql
+```challenge sql
 -- Your INSERT:
 
 -- Your UPDATE (include WHERE):

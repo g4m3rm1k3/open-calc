@@ -127,7 +127,7 @@ advanced syntax and functions, not in SELECT/FROM/WHERE/JOIN.
 
 Write a SQL SELECT statement that retrieves `name` and `email` from a table called `students` where `active = 1`. Do not use `SELECT *` — name the columns explicitly.
 
-```sql
+```challenge sql
 -- Write your SELECT statement:
 ```
 

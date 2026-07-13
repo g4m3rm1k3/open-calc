@@ -166,7 +166,7 @@ git log --author="Jane Smith" --since="2024-01-01" --until="2024-03-01" --onelin
 
 Answer questions and commands for Git forensics.
 
-```challenge
+```challenge javascript
 const forensics = {
   // Command to find which commit first introduced the string "deleteAllUsers":
   findIntroduced: '',

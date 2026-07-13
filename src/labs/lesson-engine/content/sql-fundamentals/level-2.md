@@ -106,7 +106,7 @@ SELECT DISTINCT role, name FROM users;
 
 Select `title` from `courses`, ordered alphabetically by title ascending, limited to 5 results. Do not add `OFFSET`.
 
-```sql
+```challenge sql
 -- Your query:
 ```
 

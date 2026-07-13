@@ -173,7 +173,7 @@ Write a BEM-named navigation component.
 </nav>
 ```
 
-```css
+```challenge css
 .nav {
   display: flex;
   gap: 0.25rem;

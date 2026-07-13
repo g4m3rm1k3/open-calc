@@ -98,7 +98,7 @@ Example: add: sql-fundamentals level-5 — Subqueries and CTEs
 
 Put the git workflow steps in the right order.
 
-```challenge
+```challenge javascript
 const workflowSteps = [
   'git commit -m "add: my-series level-0"',
   'edit the file in your editor',

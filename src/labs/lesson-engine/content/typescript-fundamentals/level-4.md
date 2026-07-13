@@ -130,7 +130,7 @@ Given `interface Product { id: number; name: string; price: number; stock: numbe
 2. Create `type ProductUpdate = Partial<Product>`
 3. Create a `preview` object of type `ProductPreview`
 
-```typescript
+```challenge typescript
 interface Product {
   id: number;
   name: string;

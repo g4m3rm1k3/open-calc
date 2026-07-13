@@ -233,7 +233,7 @@ git check-attr -a src/auth/validator.js
 
 Answer questions about submodules, worktrees, rerere, and .gitattributes.
 
-```challenge
+```challenge javascript
 const advanced = {
   // What command clones a repo AND initializes all its submodules in one step?
   cloneWithSubmodules: '',

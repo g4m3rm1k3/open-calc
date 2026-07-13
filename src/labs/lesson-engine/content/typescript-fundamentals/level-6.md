@@ -169,7 +169,7 @@ Create a `Counter` class with:
 - `public decrement(): void` — decreases count by 1 (min 0)
 - `public getCount(): number` — returns current count
 
-```typescript
+```challenge typescript
 class Counter {
   // implement the class
 }

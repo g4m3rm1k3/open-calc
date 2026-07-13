@@ -146,7 +146,7 @@ After PR is merged:
 
 Answer the following Git scenarios with the exact command or concept.
 
-```challenge
+```challenge javascript
 const mastery = {
   // You pushed a bad commit to a shared branch. How do you undo it safely?
   undoPushedCommit: '',

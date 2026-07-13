@@ -203,7 +203,7 @@ Bypassing hooks:
 
 Answer questions about Git hooks.
 
-```challenge
+```challenge javascript
 const hooks = {
   // Which hook runs BEFORE the commit message editor opens and can abort the commit?
   preCommitHook: '',

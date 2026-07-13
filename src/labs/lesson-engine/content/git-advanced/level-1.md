@@ -153,7 +153,7 @@ They are your first recovery option before reaching for reflog.
 
 Answer questions about recovery with reflog.
 
-```challenge
+```challenge javascript
 const recovery = {
   // You ran git reset --hard HEAD~5 by mistake. What's your first command to recover?
   firstCommand: '',

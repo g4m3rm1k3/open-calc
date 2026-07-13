@@ -156,7 +156,7 @@ Apply consistent spacing using the scale.
 </div>
 ```
 
-```css
+```challenge css
 :root {
   --space-2: 8px;
   --space-4: 16px;

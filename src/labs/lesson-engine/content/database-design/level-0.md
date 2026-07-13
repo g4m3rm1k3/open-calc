@@ -133,7 +133,7 @@ THE MYTH of "use NoSQL for scale":
 
 Apply the ACID concepts and model-selection knowledge to concrete scenarios.
 
-```challenge
+```challenge javascript
 const databaseConcepts = {
   // ACID: A bank transfer involves two UPDATE statements. Which ACID property
   // ensures that if the second UPDATE fails, the first is rolled back?

@@ -131,7 +131,7 @@ Write a function with correct TypeScript type annotations.
 
 Write a function `describe` that takes a `name` (string) and `level` (number) and returns a string `"${name} — Level ${level}"`.
 
-```typescript
+```challenge typescript
 // Write the function with type annotations
 function describe(  ) {
 

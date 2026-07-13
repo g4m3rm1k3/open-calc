@@ -123,7 +123,7 @@ Apply a clear heading/body hierarchy.
 </div>
 ```
 
-```css
+```challenge css
 #article-demo { font-family: system-ui, sans-serif; }
 .demo-heading {
   font-size: 2rem;

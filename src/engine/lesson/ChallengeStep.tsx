@@ -4,7 +4,7 @@ import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import type { LessonStep, Executor, UiTheme, TestResult } from './types'
 import type { TraceEvent } from '../../labs/codelens/codelens/types'
-import { runTests, runCSSTests, runJSXTests, buildTestHarness } from './testRunner'
+import { runTests, runCSSTests, runJSXTests, runSqlTests, buildTestHarness } from './testRunner'
 import { runPython } from '../../labs/codelens/codelens/interpreter/pythonTracer'
 import { run as runJS } from '../../engines/js/interpreter/interpreter.js'
 
@@ -96,6 +96,7 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
     const isCSSChallenge = norm === 'css'
     const isJSXChallenge = norm === 'jsx' || norm === 'react'
     const isVueChallenge = norm === 'vue'
+    const isSqlChallenge = norm === 'sql' || norm === 'sqlite'
     const htmlStructure = isCSSChallenge
       ? (step.examples.find(e => e.lang.toLowerCase() === 'html')?.code ?? '')
       : ''
@@ -106,7 +107,9 @@ export default function ChallengeStep({ step, executor, ui, onTrace, onSeek, onR
         ? await runJSXTests(code, tests, 'react')
         : isVueChallenge
           ? await runJSXTests(code, tests, 'vue')
-          : await runTests(code, tests, lang, executor)
+          : isSqlChallenge
+            ? await runSqlTests(code, tests, executor)
+            : await runTests(code, tests, lang, executor)
     if (onResults) onResults(testResults)
 
     // For CSS challenges: emit a live DOM preview so the DOM tab shows the result

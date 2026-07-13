@@ -152,7 +152,7 @@ Use cherry-pick for targeted, intentional single-commit moves.
 
 Answer questions about cherry-pick.
 
-```challenge
+```challenge javascript
 const cherryPick = {
   // Command to apply commit a1b2c3d to the current branch AND record its origin:
   applyWithRecord: '',

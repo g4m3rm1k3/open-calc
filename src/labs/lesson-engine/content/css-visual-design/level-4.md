@@ -154,7 +154,7 @@ Make a button that passes WCAG AA contrast and has a visible focus ring.
 <button id="a11y-btn">Submit Form</button>
 ```
 
-```css
+```challenge css
 #a11y-btn {
   padding: 0.6rem 1.5rem;
   background: #1d4ed8;

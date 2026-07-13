@@ -137,7 +137,7 @@ SELECT name, depth FROM category_tree ORDER BY depth, name;
 
 Write a CTE called `recent_courses` that selects `id` and `title` from `courses` where `created_at >= '2026-01-01'`. Then write the outer SELECT that retrieves `title` from `recent_courses`, ordered by `title` ascending.
 
-```sql
+```challenge sql
 WITH recent_courses AS (
   -- select id and title from courses where created_at >= '2026-01-01'
 )

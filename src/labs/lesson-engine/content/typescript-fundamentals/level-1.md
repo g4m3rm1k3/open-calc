@@ -128,7 +128,7 @@ Define an interface and use it.
 
 Define a `Book` interface with: `title: string`, `author: string`, `pages: number`, and optional `isbn?: string`. Then create a `Book` object called `myBook`.
 
-```typescript
+```challenge typescript
 interface Book {
   // define properties
 }

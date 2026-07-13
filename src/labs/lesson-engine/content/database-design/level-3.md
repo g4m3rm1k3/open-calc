@@ -154,7 +154,7 @@ When EXPLAIN shows SCAN on a large table for a frequently-run query:
 
 For each scenario, decide whether to add an index and on which column(s).
 
-```challenge
+```challenge javascript
 const indexDecisions = {
   // Table: products (id, name, category, price_cents, in_stock, created_at)
   // 2 million rows.

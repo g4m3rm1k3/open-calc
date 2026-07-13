@@ -138,7 +138,7 @@ Set up cascade layers so utilities always win over components.
 </div>
 ```
 
-```css
+```challenge css
 @layer components, utilities;
 
 @layer components {

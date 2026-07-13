@@ -369,7 +369,7 @@ function MdCodeBlock({ language, code }) {
         setOutput(error ? [{ text: error, type: 'error' }] : [{ text: out, type: 'output' }])
       } else {
         // javascript / js (fallback)
-        const { output: out, error } = runJSInline(src)
+        const { output: out, error } = await runJSInline(src)
         setOutput(error
           ? [{ text: out || '', type: 'output' }, { text: error, type: 'error' }].filter(l => l.text)
           : [{ text: out, type: 'output' }])

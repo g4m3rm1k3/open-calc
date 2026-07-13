@@ -161,7 +161,7 @@ ALTER TABLE users ALTER COLUMN verified SET DEFAULT false;
 
 Design a safe migration for a schema change.
 
-```challenge
+```challenge javascript
 // SCENARIO:
 // The current schema has:
 //   orders(id, customer_id, amount, placed_at)

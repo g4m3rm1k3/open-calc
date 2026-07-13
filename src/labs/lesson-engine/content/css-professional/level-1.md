@@ -181,7 +181,7 @@ Style a dialog with a custom backdrop.
 </dialog>
 ```
 
-```css
+```challenge css
 .ch-open-btn {
   padding: 8px 16px;
   background: #6366f1;

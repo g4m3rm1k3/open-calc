@@ -135,7 +135,7 @@ Use a union type and handle both cases.
 
 Write a function `formatId` that accepts `id: string | number` and returns `"str:${id}"` if it's a string, or `"num:${id}"` if it's a number.
 
-```typescript
+```challenge typescript
 function formatId(id: string | number): string {
   // check the type and return the right format
 }

@@ -153,7 +153,7 @@ Apply design tokens to a button.
 <button id="token-btn">Primary Action</button>
 ```
 
-```css
+```challenge css
 :root {
   --btn-bg:      hsl(245, 80%, 55%);
   --btn-hover:   hsl(245, 80%, 42%);

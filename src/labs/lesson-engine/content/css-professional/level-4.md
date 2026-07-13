@@ -168,7 +168,7 @@ Set up a scroll-driven reveal animation for an element.
 </div>
 ```
 
-```css
+```challenge css
 .reveal-box {
   padding: 2rem;
   background: #6366f1;

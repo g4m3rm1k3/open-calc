@@ -141,7 +141,7 @@ Use import/export syntax.
 
 Create and use an exported function.
 
-```typescript
+```challenge typescript
 // In this lesson engine, we simulate exports in a single file.
 // Write a function 'formatCourse' that takes a name: string and returns 'Course: ${name}'
 // Then export it (in a real module you'd write: export function formatCourse...)

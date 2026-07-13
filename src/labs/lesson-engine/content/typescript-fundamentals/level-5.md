@@ -159,7 +159,7 @@ Write a type guard function.
 Write `isString(value: unknown): value is string` — returns `true` if the value is a string.
 Then use it in `processValue(value: unknown): string` — returns the uppercase string if it's a string, or `"not a string"` otherwise.
 
-```typescript
+```challenge typescript
 function isString(value: unknown): value is string {
   // implement the type guard
 }

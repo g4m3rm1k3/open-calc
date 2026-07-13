@@ -183,7 +183,7 @@ Write JavaScript that sets a CSS variable to change a button's color.
 ">Change my color</button>
 ```
 
-```css
+```challenge css
 :root {
   --btn-dynamic-bg: #6366f1;
   --btn-dynamic-text: white;

@@ -84,7 +84,7 @@ git push -u origin fix/typo-css-responsive-level-2
 When a maintainer reviews your PR, they check:
 
 Content quality:
-  ✓ Does the lesson follow the contract? (LESSON_ENGINE_CONTRACT.md)
+  ✓ Does the lesson follow the contract? (UPSKILLOS_CURRICULUM_CONTRACT.md)
   ✓ Is the CS lens or SE lens genuinely insightful?
   ✓ Does the challenge actually test the concept?
   ✓ Are the test assertions meaningful (not trivially passable)?
@@ -138,7 +138,7 @@ git push   # pushes to the same branch — the PR updates automatically
 
 Plan your first contribution.
 
-```challenge
+```challenge javascript
 const myFirstContribution = {
   // What type of contribution will you make? (fix/add-level/new-series/other)
   type: '',

@@ -152,7 +152,7 @@ VSCode and GitHub Desktop show conflicts visually with buttons:
 
 Answer questions about branching.
 
-```challenge
+```challenge javascript
 const answers = {
   // What command creates AND switches to a new branch called 'fix/login'?
   createAndSwitch: '',
