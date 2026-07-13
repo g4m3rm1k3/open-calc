@@ -77,10 +77,9 @@ const SUPPORTED_TEST_LANGS = new Set(['python', 'py', 'javascript', 'js', 'types
 const KNOWN_UNSUPPORTED_TEST_LANGS = new Set(['bash', 'shell', 'sh'])
 
 describe.each(registeredFiles.filter(f => filesOnDisk.includes(f)))('lesson: %s', file => {
-  // Vite's `?raw` loader (confirmed by fetching it from a running dev server) serves
-  // these files with CRLF normalized to LF. Node's fs.readFileSync does not — match
-  // what the app actually receives, or every frontmatter regex match fails on Windows
-  // checkouts (core.autocrlf=true) and this suite reports 338 false positives.
+  // Vite's `?raw` loader does NOT normalize CRLF to LF (an earlier assumption here
+  // was wrong and masked a real bug — see parseLesson's own normalization, which is
+  // now the actual fix). Match fs.readFileSync to what parseLesson does internally.
   const raw = readFileSync(join(CONTENT_DIR, file), 'utf-8').replace(/\r\n/g, '\n')
   const lesson = parseLesson(raw)
 

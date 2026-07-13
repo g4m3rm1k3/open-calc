@@ -9,6 +9,7 @@ import type { ParsedLesson } from '../../engine/lesson/types'
 import { resetSQLDatabase } from '../../utils/inlineRunner.js'
 import { GLASS_META } from '../../styles/courseColors.js'
 import CircularProgress from '../../components/ui/CircularProgress.jsx'
+import LessonSourceEditor from '../../components/lesson-builder/blocks/LessonSourceEditor.jsx'
 
 function getSeriesMeta(series: SeriesMeta) {
   const langColorMap: Record<string, keyof typeof GLASS_META> = {
@@ -782,6 +783,7 @@ export default function LessonEngineLab({ onBack }: Props) {
   const ui = (themeStyles as any).ui
 
   const [view, setView] = useState<View>({ kind: 'series-list' })
+  const [editingFile, setEditingFile] = useState<string | null>(null)
 
   const [completed, setCompleted] = useState<Set<string>>(() => {
     try {
@@ -828,6 +830,7 @@ export default function LessonEngineLab({ onBack }: Props) {
       {view.kind === 'lesson' && (() => {
         const currentIdx = view.series.levels.findIndex(l => l.level === view.lesson.level)
         const nextLevel = view.series.levels[currentIdx + 1]
+        const currentFile = view.series.levels[currentIdx]?.file
         return (
           <LessonView
             lesson={view.lesson}
@@ -841,9 +844,19 @@ export default function LessonEngineLab({ onBack }: Props) {
               if (nextLevel) openLesson(nextLevel.file, view.series)
               else setView({ kind: 'level-list', series: view.series })
             }}
+            onEdit={currentFile ? () => setEditingFile(currentFile) : undefined}
           />
         )
       })()}
+      {editingFile && (
+        <LessonSourceEditor
+          filePath={`src/labs/lesson-engine/content/${editingFile}`}
+          onClose={() => setEditingFile(null)}
+          onSaved={(newSource: string) => {
+            setView(v => v.kind === 'lesson' ? { ...v, lesson: parseLesson(newSource) } : v)
+          }}
+        />
+      )}
     </div>
   )
 }

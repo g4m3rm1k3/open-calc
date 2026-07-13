@@ -17,6 +17,9 @@ The core difference between Vue and React is how state changes trigger UI update
 
 ```javascript
 // REACT: you control state explicitly
+// (tiny stand-in for React's real useState, so this comparison can run standalone)
+function useState(initial) { let value = initial; return [value, next => { value = next }] }
+
 const [count, setCount] = useState(0)
 setCount(count + 1)   // you call the setter; React re-renders
 

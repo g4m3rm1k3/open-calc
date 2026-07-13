@@ -21,11 +21,12 @@ interface Props {
   onBackToSeriesList?: () => void
   onComplete?: () => void
   seriesLabel?: string
+  onEdit?: () => void
 }
 
 type RightTab = 'lesson' | 'output' | 'dom' | 'tree' | 'css' | 'debug' | 'tutor'
 
-export default function LessonView({ lesson, executor, ui, onBack, onBackToSeriesList, onComplete, seriesLabel }: Props) {
+export default function LessonView({ lesson, executor, ui, onBack, onBackToSeriesList, onComplete, seriesLabel, onEdit }: Props) {
   const [stepIdx, setStepIdx] = useState(0)
   const [rightTab, setRightTab] = useState<RightTab>('lesson')
   const [events, setEvents] = useState<TraceEvent[]>([])
@@ -170,6 +171,15 @@ export default function LessonView({ lesson, executor, ui, onBack, onBackToSerie
           )}
         </div>
         <span className={`text-[13px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-sky-400 truncate flex-1 min-w-0`}>{lesson.title}</span>
+
+        {onEdit && (
+          <button
+            type="button"
+            onClick={onEdit}
+            title="Edit this lesson's raw markdown"
+            className={`text-xs font-medium px-3 py-1.5 rounded border ${ui.border} ${ui.bg1} ${ui.txt2} hover:text-brand-400 hover:border-brand-500/30 hover:bg-brand-500/5 transition-all cursor-pointer shrink-0`}
+          >✎ Edit</button>
+        )}
 
         {/* Prev */}
         <button

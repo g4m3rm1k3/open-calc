@@ -275,7 +275,7 @@ export async function runTSInline(code) {
   try {
     const js = Babel.transform(code, {
       presets: [
-        ['typescript', { allExtensions: true }],
+        'typescript',
         ['env', { targets: { esmodules: true }, modules: 'commonjs' }],
       ],
       filename: 'inline.ts',

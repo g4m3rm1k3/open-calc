@@ -110,7 +110,13 @@ function buildStep(raw: string, idx: number, metaLang: string): LessonStep {
 
 // ── Public API ────────────────────────────────────────────────────────────────
 
-export function parseLesson(markdown: string): ParsedLesson {
+export function parseLesson(rawMarkdown: string): ParsedLesson {
+  // Vite's `?raw` loader does NOT normalize line endings — on a CRLF-checked-out
+  // file (Windows, core.autocrlf=true) every `\n`-anchored regex below silently
+  // fails to match (frontmatter parsing in particular), and `\r` characters leak
+  // into extracted code. Normalize once, up front, so nothing downstream needs
+  // to special-case it.
+  const markdown = rawMarkdown.replace(/\r\n/g, '\n')
   const { meta, body } = parseFrontmatter(markdown)
 
   // Split on ## headers — keep delimiter on each chunk

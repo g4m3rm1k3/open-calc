@@ -15,19 +15,28 @@ React was created at Facebook in 2013 to solve a specific problem: as web applic
 
 ```javascript
 // WITHOUT REACT: you update the DOM manually to reflect data changes
+// (built as a detached container so this demo can run standalone —
+//  in a real page these elements would already exist in the document)
+const root = document.createElement('div')
+root.innerHTML = `
+  <span id="count-display"></span>
+  <button id="increment-btn"></button>
+  <span id="status"></span>
+`
+
 let count = 0
 
 function updateDisplay() {
   // Every time data changes, you must manually find and update every DOM element
-  document.getElementById('count-display').textContent = count
-  document.getElementById('increment-btn').disabled = count >= 10
-  document.getElementById('status').textContent = count === 10 ? 'Maximum reached' : ''
+  root.querySelector('#count-display').textContent = count
+  root.querySelector('#increment-btn').disabled = count >= 10
+  root.querySelector('#status').textContent = count === 10 ? 'Maximum reached' : ''
   // As the app grows, this function grows without bound.
   // Forget to update one element → it shows stale data.
   // Data and DOM are two separate things you have to keep in sync by hand.
 }
 
-document.getElementById('increment-btn').addEventListener('click', () => {
+root.querySelector('#increment-btn').addEventListener('click', () => {
   count++
   updateDisplay()  // you must remember to call this
 })
