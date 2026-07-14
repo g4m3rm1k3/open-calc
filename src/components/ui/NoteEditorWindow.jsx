@@ -13,11 +13,11 @@ import { useThemeColors } from '../../hooks/useThemeColors.js'
 import { readUserNotes, getNote, saveNote, removeNote } from './notesStore.js'
 
 const COLORS = [
-  { id: 'yellow', dot: '#fbbf24', bg: '#fef9c3', bgDark: '#2d2500' },
-  { id: 'blue',   dot: '#60a5fa', bg: '#dbeafe', bgDark: '#0c1f3a' },
-  { id: 'green',  dot: '#4ade80', bg: '#dcfce7', bgDark: '#052e16' },
-  { id: 'pink',   dot: '#f472b6', bg: '#fce7f3', bgDark: '#3b0718' },
-  { id: 'orange', dot: '#fb923c', bg: '#ffedd5', bgDark: '#2c1500' },
+  { id: 'yellow', dot: '#fbbf24', bgLight: '#fef9c3' },
+  { id: 'blue',   dot: '#60a5fa', bgLight: '#dbeafe' },
+  { id: 'green',  dot: '#4ade80', bgLight: '#dcfce7' },
+  { id: 'pink',   dot: '#f472b6', bgLight: '#fce7f3' },
+  { id: 'orange', dot: '#fb923c', bgLight: '#ffedd5' },
 ]
 
 const FONT_SIZES = [12, 18, 24]
@@ -56,16 +56,20 @@ export default function NoteEditorWindow({ noteId, onClose }) {
     ed.focus()
   }
 
+  const activeColor = COLORS.find(c => c.id === color) ?? COLORS[0]
+  const cardBg = C.isDark ? C.surface : activeColor.bgLight
+
   function deleteAndClose() {
     removeNote(noteId)
     onClose?.()
   }
 
-  const activeColor = COLORS.find(c => c.id === color) ?? COLORS[0]
-  const cardBg = C.isDark ? activeColor.bgDark : activeColor.bg
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: cardBg }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: cardBg, position: 'relative' }}>
+      {/* Subtle top border accent to show the color in dark mode without flooding the background */}
+      {C.isDark && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: activeColor.dot, boxShadow: `0 0 8px ${activeColor.dot}` }} />
+      )}
       {/* Title */}
       <div style={{ flexShrink: 0, padding: '8px 10px 0' }}>
         <input

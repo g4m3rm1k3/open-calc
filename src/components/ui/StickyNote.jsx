@@ -68,11 +68,11 @@ const FONT_LABELS = ['1×', '1.5×', '2×']
 // ─── Colors ───────────────────────────────────────────────────────────────────
 
 const COLORS = [
-  { id: 'yellow', dot: '#fbbf24', bg: '#fef9c3', bgDark: '#2d2500', border: '#fbbf24' },
-  { id: 'blue',   dot: '#60a5fa', bg: '#dbeafe', bgDark: '#0c1f3a', border: '#60a5fa' },
-  { id: 'green',  dot: '#4ade80', bg: '#dcfce7', bgDark: '#052e16', border: '#4ade80' },
-  { id: 'pink',   dot: '#f472b6', bg: '#fce7f3', bgDark: '#3b0718', border: '#f472b6' },
-  { id: 'orange', dot: '#fb923c', bg: '#ffedd5', bgDark: '#2c1500', border: '#fb923c' },
+  { id: 'yellow', dot: '#fbbf24', headerClass: 'from-amber-200 to-yellow-100 dark:from-yellow-500/20 dark:to-amber-500/5', bgClass: 'bg-yellow-50/90 dark:bg-[#1A1814]/90', borderClass: 'border-yellow-200 dark:border-yellow-500/30', borderHex: 'rgba(251,191,36,0.3)', glow: 'shadow-[0_8px_32px_rgba(251,191,36,0.15)] dark:shadow-[0_8px_32px_rgba(251,191,36,0.15)]' },
+  { id: 'blue',   dot: '#60a5fa', headerClass: 'from-blue-200 to-blue-100 dark:from-blue-500/20 dark:to-indigo-500/5', bgClass: 'bg-blue-50/90 dark:bg-[#0C121E]/90', borderClass: 'border-blue-200 dark:border-blue-500/30', borderHex: 'rgba(96,165,250,0.3)', glow: 'shadow-[0_8px_32px_rgba(96,165,250,0.15)] dark:shadow-[0_8px_32px_rgba(96,165,250,0.15)]' },
+  { id: 'green',  dot: '#4ade80', headerClass: 'from-green-200 to-green-100 dark:from-emerald-500/20 dark:to-green-500/5', bgClass: 'bg-green-50/90 dark:bg-[#0A1610]/90', borderClass: 'border-green-200 dark:border-emerald-500/30', borderHex: 'rgba(74,222,128,0.3)', glow: 'shadow-[0_8px_32px_rgba(74,222,128,0.15)] dark:shadow-[0_8px_32px_rgba(74,222,128,0.15)]' },
+  { id: 'pink',   dot: '#f472b6', headerClass: 'from-pink-200 to-pink-100 dark:from-pink-500/20 dark:to-rose-500/5', bgClass: 'bg-pink-50/90 dark:bg-[#1C0D14]/90', borderClass: 'border-pink-200 dark:border-pink-500/30', borderHex: 'rgba(244,114,182,0.3)', glow: 'shadow-[0_8px_32px_rgba(244,114,182,0.15)] dark:shadow-[0_8px_32px_rgba(244,114,182,0.15)]' },
+  { id: 'orange', dot: '#fb923c', headerClass: 'from-orange-200 to-orange-100 dark:from-orange-500/20 dark:to-red-500/5', bgClass: 'bg-orange-50/90 dark:bg-[#1E120A]/90', borderClass: 'border-orange-200 dark:border-orange-500/30', borderHex: 'rgba(251,146,60,0.3)', glow: 'shadow-[0_8px_32px_rgba(251,146,60,0.15)] dark:shadow-[0_8px_32px_rgba(251,146,60,0.15)]' },
 ]
 
 // Bigger than the old 320×(auto) default — a real Monaco instance + toolbar
@@ -104,7 +104,7 @@ export default function StickyNote({ noteId }) {
   const stored = getNote(noteId)
   const hasNote = !!stored?.text?.trim()
   const C = COLORS.find(c => c.id === color) ?? COLORS[0]
-  const cardBg = isDark ? C.bgDark : C.bg
+  const cardBg = '' // removed in favor of tailwind class
   const textColor = isDark ? '#f1f5f9' : '#1e293b'
   const mutedColor = isDark ? '#94a3b8' : '#64748b'
 
@@ -257,7 +257,7 @@ export default function StickyNote({ noteId }) {
 
       {/* Floating card */}
       {open && pos && (
-        <div ref={cardRef} style={{
+        <div ref={cardRef} className={`border-[1.5px] rounded-[10px] backdrop-blur-xl ${C.bgClass} ${C.borderClass} ${C.glow} transition-colors duration-300`} style={{
           position: 'fixed',
           top: pos.y,
           left: pos.x,
@@ -269,10 +269,6 @@ export default function StickyNote({ noteId }) {
           flexDirection: 'column',
           resize: 'both',
           overflow: 'hidden',
-          background: cardBg,
-          border: `1.5px solid ${C.border}`,
-          borderRadius: 10,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
           zIndex: 9999,
         }}>
           {/* Drag handle */}
@@ -284,8 +280,9 @@ export default function StickyNote({ noteId }) {
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              borderBottom: `1px solid ${C.border}`,
+              borderBottom: `1px solid ${C.borderHex}`,
               userSelect: 'none',
+              background: `linear-gradient(to right, ${C.borderHex.replace('0.3', '0.05')}, transparent)`
             }}
           >
             {/* Color swatches */}

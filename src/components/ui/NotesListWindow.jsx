@@ -152,7 +152,9 @@ export default function NotesListWindow({ onClose }) {
         borderRadius: 16, overflow: 'hidden',
         boxShadow: '0 20px 50px rgba(0,0,0,0.35)',
         border: `1px solid ${C.border}`,
-        background: C.surface,
+        background: C.dark ? 'rgba(30, 41, 59, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
       }}
     >
       {/* Header */}
@@ -191,16 +193,20 @@ export default function NotesListWindow({ onClose }) {
             const { label, title } = describeNote(noteId, note)
             const dot = COLOR_DOTS[note.color] ?? COLOR_DOTS.yellow
             return (
-              <div key={noteId} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 12px', borderBottom: `1px solid ${C.border}` }}>
+              <div key={noteId} className="group relative" style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '10px 12px', borderBottom: `1px solid ${C.border}`, transition: 'background-color 0.2s' }}
+                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = C.dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'}
+                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <div className="absolute left-0 top-0 bottom-0 w-[2px] opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: dot }} />
                 <button onClick={() => openNote(noteId, title)} style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: dot, flexShrink: 0 }} />
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: dot, flexShrink: 0, boxShadow: `0 0 6px ${dot}80` }} />
                     <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: C.muted }}>{label}</span>
                   </div>
                   <div style={{ fontSize: 12, fontWeight: 600, color: C.text, marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{title}</div>
                   <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{note.text}</div>
                 </button>
-                <button onClick={() => { removeNote(noteId); refresh() }} title="Delete" style={{ flexShrink: 0, padding: 4, color: C.muted, background: 'none', border: 'none', cursor: 'pointer' }}>
+                <button onClick={() => { removeNote(noteId); refresh() }} title="Delete" className="opacity-0 group-hover:opacity-100 transition-opacity" style={{ flexShrink: 0, padding: 4, color: C.muted, background: 'none', border: 'none', cursor: 'pointer' }}>
                   <X className="w-3 h-3" />
                 </button>
               </div>

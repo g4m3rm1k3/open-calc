@@ -261,11 +261,141 @@ function wrapScala(code) {
   return `object Main extends App {\n${code.replace(/^/gm, '  ')}\n}`
 }
 
+// ── Rust ─────────────────────────────────────────────────────────────────────
+// Unlike Java, Rust doesn't require every function to live inside a class — a
+// bare `fn`/`struct`/`impl`/`enum`/`trait` is already valid at the top level, so
+// there's no need to synthesize a wrapper type. The only thing that needs a
+// home is truly loose statements, which get wrapped in `fn main() { ... }`.
+const RUST_ITEM_START = /^\s*(?:#!?\[[^\]]*\]\s*)*(?:pub(?:\([^)]*\))?\s+)?(?:fn|struct|enum|impl|trait|mod)\b/
+const RUST_USE_START = /^\s*use\s+[^;]+;/
+
+function findRustItemsEnd(code) {
+  let i = 0
+  while (i < code.length) {
+    const rest = code.slice(i)
+    const useMatch = rest.match(RUST_USE_START)
+    if (useMatch) { i += useMatch[0].length; continue }
+    if (!RUST_ITEM_START.test(rest)) break
+    const braceStart = rest.indexOf('{')
+    if (braceStart === -1) break
+    let depth = 0, j = braceStart
+    for (; j < rest.length; j++) {
+      if (rest[j] === '{') depth++
+      else if (rest[j] === '}') { depth--; if (depth === 0) break }
+    }
+    if (depth !== 0) break
+    i += j + 1
+  }
+  return i
+}
+
+function wrapRust(code) {
+  if (/\bfn\s+main\s*\(/.test(code)) return code // already self-contained
+
+  const itemsEnd = findRustItemsEnd(code)
+  const items = code.slice(0, itemsEnd).trim()
+  const trailing = code.slice(itemsEnd).trim()
+
+  if (!trailing) return code // declarations only, nothing to run
+
+  return `${items ? items + '\n\n' : ''}fn main() {\n${trailing.replace(/^/gm, '    ')}\n}`
+}
+
+// ── C++ ──────────────────────────────────────────────────────────────────────
+// Same "leave declarations alone, wrap only the loose statements" shape as
+// Rust, but C++ has two extra wrinkles: a class/struct/enum needs its required
+// trailing `;` consumed as part of the declaration, and `std::` usage needs a
+// real `#include` — there's no fully-qualified escape hatch the way Java's
+// `java.util.List` avoids needing an `import`. Headers are injected by a
+// deliberately simple usage heuristic, not a real dependency resolver.
+const CPP_ITEM_START = /^\s*(?:template\s*<[^>]*>\s*)?(?:(?:public|private|protected|static|virtual|inline|constexpr)\s+)*(?:class|struct|enum)\s+\w/
+const CPP_INCLUDE_RULES = [
+  [/\bstd::(cout|cin|cerr|endl)\b/, '<iostream>'],
+  [/\bstd::string\b/, '<string>'],
+  [/\bstd::vector\b/, '<vector>'],
+  [/\bstd::unordered_map\b/, '<unordered_map>'],
+  [/\bstd::map\b/, '<map>'],
+  [/\bstd::unordered_set\b/, '<unordered_set>'],
+  [/\bstd::set\b/, '<set>'],
+  [/\bstd::(sort|find|max|min|for_each|accumulate|count)\b/, '<algorithm>'],
+  [/\bstd::(unique_ptr|shared_ptr|make_unique|make_shared)\b/, '<memory>'],
+  [/\bstd::(pair|make_pair)\b/, '<utility>'],
+  [/\bstd::function\b/, '<functional>'],
+  [/\bstd::optional\b/, '<optional>'],
+  [/\bstd::(runtime_error|logic_error|invalid_argument|out_of_range|exception)\b/, '<stdexcept>'],
+  [/\bstd::(pow|sqrt|abs|floor|ceil|round|fmod)\s*\(/, '<cmath>'],
+  [/\bstd::(setprecision|fixed|scientific|setw|hex|oct|showpoint)\b/, '<iomanip>'],
+  [/\bstd::(istringstream|ostringstream|stringstream)\b/, '<sstream>'],
+  [/\bstd::numeric_limits\b/, '<limits>'],
+  [/\bstd::array\b/, '<array>'],
+  [/\bstd::to_string\s*\(/, '<string>'],
+]
+
+function detectCppIncludes(code) {
+  const found = []
+  for (const [pattern, header] of CPP_INCLUDE_RULES) {
+    if (pattern.test(code)) found.push(header)
+  }
+  return found
+}
+
+function findCppItemsEnd(code) {
+  let i = 0
+  while (i < code.length) {
+    const rest = code.slice(i)
+    const braceStart = rest.indexOf('{')
+    if (braceStart === -1) break
+    const header = rest.slice(0, braceStart)
+    const isClassLike = CPP_ITEM_START.test(rest)
+    const headerTail = header.trim()
+    // A free function's header ends in `)`, optionally followed by `const`/
+    // `noexcept` — not a control-flow keyword or a statement that merely
+    // contains a brace (like `std::vector<int> v = {1, 2, 3};`).
+    const isFunctionLike = !isClassLike
+      && headerTail.length > 0
+      && !/^(if|for|while|switch|do|else|try|catch)\b/.test(headerTail)
+      && /\)\s*(const)?\s*(noexcept)?\s*$/.test(headerTail)
+    if (!isClassLike && !isFunctionLike) break
+    let depth = 0, j = braceStart
+    for (; j < rest.length; j++) {
+      if (rest[j] === '{') depth++
+      else if (rest[j] === '}') { depth--; if (depth === 0) break }
+    }
+    if (depth !== 0) break
+    let end = j + 1
+    if (isClassLike) {
+      const semiMatch = rest.slice(end).match(/^\s*;/)
+      if (semiMatch) end += semiMatch[0].length
+    }
+    i += end
+  }
+  return i
+}
+
+function wrapCpp(code) {
+  if (/\bint\s+main\s*\(/.test(code)) {
+    const existing = new Set((code.match(/^#include\s*<[^>]+>/gm) || []).map(l => l.match(/<[^>]+>/)[0]))
+    const missing = detectCppIncludes(code).filter(h => !existing.has(h))
+    return missing.length ? missing.map(h => `#include ${h}`).join('\n') + '\n' + code : code
+  }
+
+  const itemsEnd = findCppItemsEnd(code)
+  const items = code.slice(0, itemsEnd).trim()
+  const trailing = code.slice(itemsEnd).trim()
+  const includes = detectCppIncludes(code).map(h => `#include ${h}`).join('\n')
+
+  if (!trailing) return (includes ? includes + '\n\n' : '') + code // declarations only
+
+  return `${includes ? includes + '\n\n' : ''}${items ? items + '\n\n' : ''}int main() {\n${trailing.replace(/^/gm, '    ')}\n    return 0;\n}`
+}
+
 function autoWrap(lang, code) {
   if (lang === 'java') return wrapJava(code)
   if (lang === 'csharp') return wrapCSharp(code)
   if (lang === 'kotlin') return wrapKotlin(code)
   if (lang === 'scala') return wrapScala(code)
+  if (lang === 'rust') return wrapRust(code)
+  if (lang === 'cpp' || lang === 'c++') return wrapCpp(code)
   return code
 }
 
