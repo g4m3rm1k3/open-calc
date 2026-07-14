@@ -19,10 +19,20 @@
 // Sections are `## Header` blocks in the body (after frontmatter) — anything whose
 // header isn't one of the fixed names above is treated as a language section.
 
+export interface CodeExample {
+  /** Null for the default single-example case. Set when a language section has
+   *  more than one example — e.g. "✕ Swallows the error" / "✓ Rethrows with
+   *  context" — via a `**Label:**` line immediately before that example's fence. */
+  label: string | null
+  code: string
+  walkthrough: string | null
+}
+
 export interface LanguageContent {
   lang: string
-  example: string
-  walkthrough: string | null
+  /** Almost always length 1. See CONCEPT_CONTRACT.md — "When a concept needs
+   *  more than one example" — for when a second, contrasting example belongs here. */
+  examples: CodeExample[]
 }
 
 export interface LensContent {
@@ -79,14 +89,36 @@ function parseLens(text: string): LensContent {
   return { text: body, tags }
 }
 
-function parseLanguageSection(text: string): { example: string; walkthrough: string | null } {
-  const m = text.match(/```(\w+)\n([\s\S]*?)```\n?/)
-  const example = m ? m[2].replace(/\n$/, '') : ''
-  const afterFence = m ? text.slice(m.index! + m[0].length).trim() : ''
-  const walkthrough = afterFence.startsWith('Walkthrough:')
-    ? afterFence.replace(/^Walkthrough:\s*/, '').trim()
-    : (afterFence || null)
-  return { example, walkthrough }
+// Almost always matches exactly one fence. When a language section legitimately
+// needs a second, contrasting example (a mistake vs. the fix — see
+// CONCEPT_CONTRACT.md), each fence may be preceded by its own `**Label:**` line;
+// everything between one example's fence and the next example's label line (or
+// end of section) is that example's Walkthrough.
+function parseLanguageSection(text: string): CodeExample[] {
+  const examples: CodeExample[] = []
+  const fenceRe = /```(\w+)\n([\s\S]*?)```\n?/g
+  const labelRe = /\*\*(.+?):?\*\*\s*:?\s*$/
+  let match: RegExpExecArray | null
+  let cursor = 0
+  while ((match = fenceRe.exec(text))) {
+    const before = text.slice(cursor, match.index).trim()
+    const labelMatch = before.match(labelRe)
+    const label = labelMatch ? labelMatch[1].trim() : null
+    const code = match[2].replace(/\n$/, '')
+    cursor = fenceRe.lastIndex
+
+    const nextFenceIdx = text.slice(cursor).search(/```/)
+    const afterEnd = nextFenceIdx === -1 ? text.length : cursor + nextFenceIdx
+    let after = text.slice(cursor, afterEnd).trim()
+    const trailingLabelMatch = after.match(labelRe)
+    if (trailingLabelMatch) after = after.slice(0, trailingLabelMatch.index).trim()
+    const walkthrough = after.startsWith('Walkthrough:')
+      ? after.replace(/^Walkthrough:\s*/, '').trim()
+      : (after || null)
+
+    examples.push({ label, code, walkthrough })
+  }
+  return examples
 }
 
 export function parseConceptFile(raw: string, fallbackId: string): ConceptFile {
@@ -122,8 +154,8 @@ export function parseConceptFile(raw: string, fallbackId: string): ConceptFile {
     else if (!FIXED_SECTIONS.has(headerKey)) {
       // Not a fixed section name — treat the header as a language key.
       const lang = headerKey.replace(/\s+/g, '')
-      const { example, walkthrough } = parseLanguageSection(text)
-      if (example) languages[lang] = { lang, example, walkthrough }
+      const examples = parseLanguageSection(text)
+      if (examples.length) languages[lang] = { lang, examples }
     }
   }
 

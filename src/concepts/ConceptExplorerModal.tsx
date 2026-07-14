@@ -131,7 +131,9 @@ export default function ConceptExplorerModal({ onClose }: Props) {
                           layoutId="activeLangTab"
                           className="absolute inset-0 bg-white dark:bg-[#161D2E] rounded-full shadow-sm dark:shadow-[0_0_15px_rgba(255,255,255,0.05)] -z-10 border border-slate-200 dark:border-indigo-500/40"
                           transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        />
+                        >
+                          <div className="absolute inset-0 rounded-full shadow-[0_0_12px_rgba(99,102,241,0.3)] dark:shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-[pulse_2.5s_ease-in-out_infinite] pointer-events-none" />
+                        </motion.div>
                       )}
                       {LANG_LABEL[l] ?? l}
                     </button>
@@ -162,7 +164,10 @@ export default function ConceptExplorerModal({ onClose }: Props) {
                     }`}
                   >
                     {isActive && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 dark:from-indigo-500/10 to-transparent pointer-events-none" />
+                      <>
+                        <div className="absolute inset-0 rounded-full shadow-[0_0_12px_rgba(99,102,241,0.3)] dark:shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-[pulse_2.5s_ease-in-out_infinite] pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 dark:from-indigo-500/10 to-transparent pointer-events-none" />
+                      </>
                     )}
                     <span className="relative z-10">{c?.name ?? id}</span>
                   </button>

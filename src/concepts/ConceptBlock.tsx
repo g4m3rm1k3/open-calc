@@ -145,24 +145,37 @@ export default function ConceptBlock({ id, lang, embedded = false, onNavigate }:
       )}
 
       {active ? (
-        <div className="flex flex-col gap-5">
-          <div className="relative group/code">
-            <div className="absolute -inset-1 bg-gradient-to-r from-brand-500/20 via-purple-500/20 to-cyan-500/20 rounded-xl blur-lg opacity-40 group-hover/code:opacity-80 transition duration-700 group-hover/code:duration-300" />
-            <div className="relative">
-              <StandardCodeBlock language={selectedLang} code={active.example} />
-            </div>
-          </div>
+        <div className="flex flex-col gap-7">
+          {active.examples.map((ex, i) => (
+            <div key={i} className="flex flex-col gap-5">
+              {active.examples.length > 1 && (
+                <h5 className={`text-xs font-bold ${
+                  ex.label?.startsWith('✕') ? 'text-red-600 dark:text-red-400'
+                  : ex.label?.startsWith('✓') ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-slate-500 dark:text-slate-400'
+                }`}>
+                  {ex.label ?? `Example ${i + 1}`}
+                </h5>
+              )}
+              <div className="relative group/code">
+                <div className="absolute -inset-1 bg-gradient-to-r from-brand-500/20 via-purple-500/20 to-cyan-500/20 rounded-xl blur-lg opacity-40 group-hover/code:opacity-80 transition duration-700 group-hover/code:duration-300" />
+                <div className="relative">
+                  <StandardCodeBlock language={selectedLang} code={ex.code} />
+                </div>
+              </div>
 
-          {active.walkthrough && (
-            <div className="bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-xl p-4 shadow-sm">
-              <h4 className="flex items-center gap-1.5 font-extrabold uppercase tracking-widest text-[10px] text-brand-600 dark:text-brand-400 mb-2">
-                <ChevronRight className="w-3.5 h-3.5" /> Walkthrough
-              </h4>
-              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                <InlineMarkdown text={active.walkthrough} />
-              </p>
+              {ex.walkthrough && (
+                <div className="bg-brand-50 dark:bg-brand-500/10 border border-brand-100 dark:border-brand-500/20 rounded-xl p-4 shadow-sm">
+                  <h4 className="flex items-center gap-1.5 font-extrabold uppercase tracking-widest text-[10px] text-brand-600 dark:text-brand-400 mb-2">
+                    <ChevronRight className="w-3.5 h-3.5" /> Walkthrough
+                  </h4>
+                  <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                    <InlineMarkdown text={ex.walkthrough} />
+                  </p>
+                </div>
+              )}
             </div>
-          )}
+          ))}
         </div>
       ) : (
         <p className="text-sm text-slate-400 italic mb-2">No example authored for this language yet.</p>

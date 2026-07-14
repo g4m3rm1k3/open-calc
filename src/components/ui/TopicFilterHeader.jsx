@@ -1,5 +1,6 @@
 import HomeTopicSearch from './HomeTopicSearch.jsx'
 import { GLASS_META } from '../../styles/courseColors.js'
+import { motion } from 'framer-motion'
 
 export default function TopicFilterHeader({
   query, onQueryChange,
@@ -21,12 +22,26 @@ export default function TopicFilterHeader({
           <button
             type="button"
             onClick={() => onSelectTopic('in-progress')}
-            className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider pb-2 -mb-[10px] border-b-[3px] transition-all duration-300 ${
+            className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider pb-2 -mb-[10px] border-b-[3px] transition-all duration-300 relative ${
               activeTopicId === 'in-progress'
-                ? 'border-amber-500 bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]'
+                ? 'border-transparent bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]'
                 : 'border-transparent text-amber-600 dark:text-amber-400 opacity-[0.8] hover:opacity-100 hover:border-slate-300 dark:hover:border-slate-700'
             }`}
           >
+            {activeTopicId === 'in-progress' && (
+              <div className="absolute -bottom-[2.5px] left-0 right-0 h-[3px] rounded-full overflow-hidden shadow-[0_0_8px_rgba(245,158,11,0.6)]">
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 opacity-80" />
+                <motion.div 
+                  className="absolute top-0 bottom-0 w-1.5 rounded-full -ml-[3px]"
+                  style={{ 
+                    backgroundColor: '#f59e0b',
+                    boxShadow: '0 0 4px 1px #f59e0b, 0 0 10px 3px #f59e0b, 0 0 16px 5px #f59e0b' 
+                  }}
+                  animate={{ left: ["0%", "100%"] }}
+                  transition={{ duration: 2.5, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+                />
+              </div>
+            )}
             <span className={`font-mono text-[15px] leading-none mb-[1px] ${activeTopicId === 'in-progress' ? 'text-transparent' : ''}`}>◐</span>
             In Progress
           </button>
@@ -41,12 +56,29 @@ export default function TopicFilterHeader({
               key={id}
               type="button"
               onClick={() => onSelectTopic(id)}
-              className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider pb-2 -mb-[10px] border-b-[3px] transition-all duration-300 ${
+              className={`flex items-center gap-2 text-xs font-bold uppercase tracking-wider pb-2 -mb-[10px] border-b-[3px] transition-all duration-300 relative ${
                 activeTopicId === id
-                  ? `${meta.border.replace('/30', '')} bg-gradient-to-r ${meta.header} bg-clip-text text-transparent filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]`
+                  ? `border-transparent bg-gradient-to-r ${meta.header} bg-clip-text text-transparent filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.1)]`
                   : `border-transparent ${meta.text} opacity-[0.55] hover:opacity-100 hover:border-slate-300 dark:hover:border-slate-700`
               }`}
             >
+              {activeTopicId === id && (
+                <div 
+                  className="absolute -bottom-[2.5px] left-0 right-0 h-[3px] bg-slate-200/50 dark:bg-slate-700/50 rounded-full overflow-hidden" 
+                  style={{ boxShadow: meta.glow.replace('32px', '8px').replace('0.50', '0.8') }}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-r ${meta.header} opacity-80`} />
+                  <motion.div 
+                    className="absolute top-0 bottom-0 w-1.5 rounded-full -ml-[3px]"
+                    style={{ 
+                      backgroundColor: 'currentColor',
+                      boxShadow: '0 0 4px 1px currentColor, 0 0 10px 3px currentColor, 0 0 16px 5px currentColor' 
+                    }}
+                    animate={{ left: ["0%", "100%"] }}
+                    transition={{ duration: 2.5, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
+                  />
+                </div>
+              )}
               <span className={`font-mono text-[15px] leading-none mb-[1px] ${activeTopicId === id ? 'text-transparent' : ''}`}>{topic.icon}</span>
               {topic.label}
             </button>
@@ -58,20 +90,36 @@ export default function TopicFilterHeader({
         <div className="flex flex-wrap items-center gap-3 mt-4">
           {Object.entries(activeTopic.subtopics).map(([id, sub]) => {
             const subMeta = sub.color ? (GLASS_META[sub.color] ?? activeMeta) : activeMeta;
+            const isActive = activeSubtopicId === id;
             
             return (
               <button
                 key={id}
                 type="button"
                 onClick={() => onSelectSubtopic(id)}
-                className={`rounded-full border px-4 py-1.5 text-xs font-bold transition-all duration-300 backdrop-blur-md ${
-                  activeSubtopicId === id
-                    ? `${subMeta.border.replace('/30', '/50')} ${subMeta.text} scale-105`
-                    : `${subMeta.border.replace('/30', '/20')} bg-slate-100/50 dark:bg-white/5 ${subMeta.text} opacity-60 hover:opacity-100 hover:scale-105`
+                className={`relative rounded-full border px-4 py-1.5 text-xs font-bold transition-all duration-300 backdrop-blur-md ${
+                  isActive
+                    ? `${subMeta.border.replace('/30', '')} bg-slate-100/20 dark:bg-[#080A11]/80 ${subMeta.text} scale-105`
+                    : `${subMeta.border.replace('/30', '/20')} bg-slate-100/50 dark:bg-[#080A11]/50 ${subMeta.text} opacity-60 hover:opacity-100 hover:scale-105`
                 }`}
-                style={activeSubtopicId === id ? { backgroundColor: 'rgba(255,255,255,0.02)', boxShadow: subMeta.glow.replace('0.50', '0.25') } : {}}
+                style={isActive ? { boxShadow: subMeta.glow.replace('0.50', '0.4') } : {}}
               >
-                {sub.label}
+                {isActive && (
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible" style={{ filter: 'drop-shadow(0 0 2px currentColor) drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor)' }}>
+                    <motion.rect
+                      x="0" y="0" width="100%" height="100%" rx="14"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      pathLength={1}
+                      strokeDasharray="0.01 0.99"
+                      initial={{ strokeDashoffset: 0 }}
+                      animate={{ strokeDashoffset: -1 }}
+                      transition={{ duration: 4, ease: "linear", repeat: Infinity }}
+                    />
+                  </svg>
+                )}
+                <span className="relative z-10">{sub.label}</span>
               </button>
             )
           })}

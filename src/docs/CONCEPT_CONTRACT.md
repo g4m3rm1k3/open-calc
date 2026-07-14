@@ -76,18 +76,41 @@ part: 1                        # optional — this file's position in the series
 
 ## When a concept needs to become a series
 
-Ask one question: **does the explanation itself genuinely differ by language, or
-only the syntax?**
+A series is separate files sharing a `series` value, in contrast with the two
+in-file examples above — reach for it when a topic needs enough room that
+cramming it into one file (even a two-example one) would either overload that
+file or blur together ideas that each deserve their own full Definition /
+Problem / CS / SE / Common Mistakes / Exercises treatment. Two independent
+triggers justify it:
 
-`slice()` — same idea everywhere, different method name. One file.
-
-How JavaScript's event loop, Python's GIL, and Java's real OS threads actually
-execute "concurrent" code — genuinely different machinery, not a syntax variant of
-one shared idea. This is a series: `async-1-the-problem.md` (shared: what blocking
-means), `async-2-promises-and-futures.md` (shared: the placeholder-value
+**1. The explanation itself genuinely differs by language, not just the syntax.**
+`slice()` — same idea everywhere, different method name. One file. How
+JavaScript's event loop, Python's GIL, and Java's real OS threads actually
+execute "concurrent" code — genuinely different machinery, not a syntax variant
+of one shared idea. This is a series: `async-1-the-problem.md` (shared: what
+blocking means), `async-2-promises-and-futures.md` (shared: the placeholder-value
 abstraction, with one real per-language divergence — eager vs. lazy — called out
-explicitly), `async-3-execution-models-compared.md` (no shared Execution section at
-all — each language's walkthrough *is* the real content).
+explicitly), `async-3-execution-models-compared.md` (no shared Execution section
+at all — each language's walkthrough *is* the real content).
+
+**2. The topic is a real progression, not a single idea** — each stage is
+correct on its own, builds on the one before it, and going from "does it" to
+"does it well" to "does it at scale" is itself the thing worth teaching, not
+just three facts that happen to be related. The Errors category is the case
+that surfaced this: catching an error and giving it a decent message (baseline),
+giving it a real custom type instead of a generic string (better), and
+collecting every failure instead of stopping at the first one (best practice at
+scale) aren't three unrelated atomic concepts and aren't a two-example contrast
+either — they're stages. That's `handling-errors-well-1-catch-and-report.md` →
+`-2-custom-error-types.md` → `-3-error-aggregation.md`, a progressive series,
+separate from the atomic mechanics files (`throw`, `try`, `catch`, `finally`,
+`Stack Traces`) that each stage's code actually uses.
+
+When in doubt between "two examples in one file" and "a series," ask: would a
+reader ever want to jump straight to stage 2 or 3 without reading stage 1, or
+reference just one stage from a lesson? If yes, they're separate concepts that
+belong in a series, each independently linkable — not one file with extra
+examples bolted on.
 
 A series is linked purely through `series`/`part` frontmatter — no separate index
 file. `getConceptSeries(id)` (`src/concepts/loader.ts`) collects and orders every
@@ -111,9 +134,50 @@ working Prev/Next navigation whenever a concept has more than one series sibling
   only runs with an assumed setup (an undefined variable, an unimported module) is
   a broken concept file, not a stylistic choice, per the same standard the Lesson
   Engine's Rule: Code Examples #8 already holds every other runnable example to.
-- **One example per language, not several.** If a language needs to show more than
-  one facet of the concept, that's a sign the concept should split into a series
-  (see above), not that one language section should grow multiple examples.
+- **One example per language, by default.** If a language needs to show more than
+  one *facet* of the concept — different execution models, different use cases —
+  that's a sign the concept should split into a series (see above), not that one
+  language section should grow multiple examples. See the next section for the one
+  narrow exception.
+
+## When a concept needs more than one example
+
+The default is still one example per language. The one exception: when the
+concept's actual teaching point *is a contrast* — a common mistake versus the fix,
+or two genuinely competing approaches with a real tradeoff (not just a style
+preference). Error Aggregation is the canonical case: fail-fast and collect-all are
+both correct, runnable programs that behave differently, and the concept *is* the
+difference between them — no bullet point can substitute for seeing both run.
+
+Ask before reaching for a second example: **is this teaching something the first
+example cannot show at all, or is it just "more thorough"?** If it's just more
+thorough, it doesn't qualify — that's what the Common Mistakes bullet list is
+for. Two examples should be two things a reader would actually want to run and
+compare side by side, not a second illustration of the same point.
+
+When a language section does need two examples, mark each one with a bold label
+line immediately before its fence:
+
+```markdown
+## java
+
+**✕ Swallows the error:**
+```java
+...
+```
+Walkthrough: ...
+
+**✓ Rethrows with context:**
+```java
+...
+```
+Walkthrough: ...
+```
+
+Each example still gets its own `Walkthrough:` paragraph. This doesn't have to be
+symmetric across every language a concept covers — one language's ceremony
+(checked exceptions in Java, say) might warrant the contrast where a more dynamic
+language's version doesn't need it to make the same point.
 
 ## Checklist
 
@@ -134,4 +198,7 @@ Before a concept file is considered done:
 - [ ] If this concept's explanation genuinely differs by language, it's split into
       a `series` instead of forcing one shared Definition/Problem to paper over
       the difference
+- [ ] If a language section has two examples, both are genuinely necessary to see
+      side by side (a mistake vs. its fix, or a real tradeoff) — not just "more
+      thorough" coverage that belongs in Common Mistakes instead
 - [ ] `name` in frontmatter is set and reads correctly as the Explorer sidebar label

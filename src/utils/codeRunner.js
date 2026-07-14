@@ -224,25 +224,26 @@ function wrapJava(code) {
   // Wandbox, which reported it as a malformed attempt at Java's "implicitly
   // declared classes" preview feature.
   const declEnd = findJavaDeclarationsEnd(normalized)
-
-  if (declEnd === 0) {
-    return `class Main {\n    public static void main(String[] args) throws Exception {\n${normalized.replace(/^/gm, '        ')}\n    }\n}`
-  }
-
   const declarations = normalized.slice(0, declEnd).trim()
   const trailing = normalized.slice(declEnd).trim()
 
-  if (!trailing) return normalized // already a complete, self-contained file
+  if (declEnd > 0 && !trailing) return normalized // already a complete, self-contained file
 
   if (/\bmain\s*\(/.test(trailing)) {
     // Trailing content already defines its own main() — just give it a home.
-    return `${declarations}\n\nclass Main {\n${trailing.replace(/^/gm, '    ')}\n}`
+    return `${declarations ? declarations + '\n\n' : ''}class Main {\n${trailing.replace(/^/gm, '    ')}\n}`
   }
 
+  // Also runs with no leading declarations at all (declEnd === 0) — bare code
+  // can itself contain a mix of top-level helper functions and loose
+  // statements (e.g. two `static` helper methods and a final call to one of
+  // them), and a helper method definition can't just be dumped as text inside
+  // main() the way a plain statement can — it has to become a real sibling
+  // method of the synthesized Main class, same as when helpers follow a class.
   const { members, remainder } = splitJavaTrailing(trailing)
   const memberBlock = members.join('\n\n')
 
-  return `${declarations}\n\nclass Main {\n${memberBlock ? memberBlock.replace(/^/gm, '    ') + '\n\n' : ''}    public static void main(String[] args) throws Exception {\n${remainder.replace(/^/gm, '        ')}\n    }\n}`
+  return `${declarations ? declarations + '\n\n' : ''}class Main {\n${memberBlock ? memberBlock.replace(/^/gm, '    ') + '\n\n' : ''}    public static void main(String[] args) throws Exception {\n${remainder.replace(/^/gm, '        ')}\n    }\n}`
 }
 
 function wrapCSharp(code) {
