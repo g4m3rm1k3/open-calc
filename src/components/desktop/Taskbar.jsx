@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import StartMenu from './StartMenu.jsx'
 import ChapterNavigator from './ChapterNavigator.jsx'
 import PinsNotesPopup from './PinsNotesPopup.jsx'
+import ConceptExplorerModal from '../../concepts/ConceptExplorerModal.tsx'
 import { useDesktop } from './DesktopProvider.jsx'
 import { useMontyContext } from '../../features/compass/MontyContext.tsx'
 import { useProgress } from '../../hooks/useProgress.js'
@@ -18,12 +19,13 @@ const PINNED_APPS = [
   { id: 'rpg-workout', label: 'RPG Workout', emoji: '⚔️', route: '/rpg-workout' },
   { id: 'brain', label: 'Brain Training', emoji: '🧠', route: '/brain' },
 ]
-import { LayoutGrid, Command, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap, Zap } from 'lucide-react'
+import { LayoutGrid, Command, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap, Zap, Lightbulb } from 'lucide-react'
 
 export default function Taskbar({ windows, onFocus }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [chapNavOpen, setChapNavOpen] = useState(false)
   const [pinsNotesOpen, setPinsNotesOpen] = useState(null) // 'pins' | 'notes' | null
+  const [conceptExplorerOpen, setConceptExplorerOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { openWindow } = useDesktop()
@@ -48,6 +50,9 @@ export default function Taskbar({ windows, onFocus }) {
       {menuOpen && <StartMenu onClose={() => setMenuOpen(false)} />}
       {chapNavOpen && <ChapterNavigator onClose={() => setChapNavOpen(false)} />}
       {pinsNotesOpen && <PinsNotesPopup initialTab={pinsNotesOpen} onClose={() => setPinsNotesOpen(null)} />}
+      <AnimatePresence>
+        {conceptExplorerOpen && <ConceptExplorerModal onClose={() => setConceptExplorerOpen(false)} />}
+      </AnimatePresence>
 
       <div className="hidden lg:flex fixed bottom-0 left-0 right-0 z-[1600] h-12 items-center gap-2 px-3 bg-white/70 dark:bg-slate-950/70 backdrop-blur-3xl border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.03)]">
 
@@ -130,6 +135,21 @@ export default function Taskbar({ windows, onFocus }) {
               <BookOpen className="w-5 h-5" />
             </motion.button>
           )}
+
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setConceptExplorerOpen(o => !o)}
+            title="Concept Explorer"
+            className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none overflow-hidden group ${
+              conceptExplorerOpen 
+                ? 'bg-gradient-to-tr from-amber-400 to-orange-500 text-white shadow-lg shadow-amber-500/40 ring-1 ring-amber-400/50' 
+                : 'bg-amber-500/10 text-amber-500 dark:text-amber-400/80 hover:bg-amber-500/20 hover:text-amber-500 dark:hover:text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.1)] hover:shadow-[0_0_12px_rgba(245,158,11,0.2)]'
+            }`}
+          >
+            {conceptExplorerOpen && <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />}
+            <Lightbulb className={`w-5 h-5 relative z-10 transition-all ${conceptExplorerOpen ? 'drop-shadow-sm' : 'drop-shadow-[0_0_2px_rgba(245,158,11,0.6)]'}`} />
+          </motion.button>
 
           <motion.button
             whileHover={{ scale: 1.1 }}
@@ -226,3 +246,4 @@ export default function Taskbar({ windows, onFocus }) {
     </>
   )
 }
+
