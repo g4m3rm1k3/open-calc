@@ -87,6 +87,13 @@ function validateInput(email, password) {
     passwordValid: isStrongPassword(password),
   }
 }
+
+console.log(validateInput('alice@example.com', 'hunter2222'))
+// { emailValid: true, passwordValid: true } — both atomic pieces passed
+
+console.log(validateInput('not-an-email', 'short'))
+// { emailValid: false, passwordValid: false } — each piece caught its own problem,
+// independently, because each was built and verified in isolation first
 ```
 
 ```text

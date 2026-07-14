@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import { parseLesson } from '../../engine/lesson/parser'
 import { executeCode } from '../../engine/lesson/executor'
@@ -857,7 +858,93 @@ export default function LessonEngineLab({ onBack }: Props) {
           }}
         />
       )}
+      <LessonJumpTool onJump={openLesson} />
     </div>
+  )
+}
+
+// ── Dev lesson-jump tool — type any series/level/file, bypasses progression locks ──
+
+function LessonJumpTool({ onJump }: { onJump: (file: string, series: SeriesMeta) => void }) {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+
+  const all = useMemo(
+    () => SERIES.flatMap(s => s.levels.map(level => ({ series: s, level }))),
+    []
+  )
+
+  const matches = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return all.slice(0, 30)
+    return all
+      .filter(({ series, level }) =>
+        series.id.toLowerCase().includes(q) ||
+        series.label.toLowerCase().includes(q) ||
+        level.title.toLowerCase().includes(q) ||
+        level.file.toLowerCase().includes(q) ||
+        `level-${level.level}` === q ||
+        String(level.level) === q
+      )
+      .slice(0, 30)
+  }, [all, query])
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        title="Jump to any lesson (dev)"
+        style={{ position: 'fixed', bottom: 8, right: 8, zIndex: 9998, opacity: 0.25, fontSize: 11 }}
+        className="px-1.5 py-0.5 rounded border border-white/20 bg-black/40 text-white hover:opacity-100 transition-opacity cursor-pointer"
+      >
+        🔧
+      </button>
+    )
+  }
+
+  return createPortal(
+    <div
+      style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: '10vh' }}
+      onClick={() => { setOpen(false); setQuery('') }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ width: 560, maxHeight: '70vh', background: '#161b22', border: '1px solid #30363d', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}
+      >
+        <input
+          autoFocus
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          placeholder="series id, level title, or file path…"
+          style={{ padding: '12px 16px', background: '#0d1117', color: '#e6edf3', border: 'none', outline: 'none', fontSize: 14, borderBottom: '1px solid #30363d' }}
+          onKeyDown={e => {
+            if (e.key === 'Escape') { setOpen(false); setQuery('') }
+            if (e.key === 'Enter' && matches[0]) {
+              onJump(matches[0].level.file, matches[0].series)
+              setOpen(false); setQuery('')
+            }
+          }}
+        />
+        <div style={{ overflowY: 'auto' }}>
+          {matches.map(({ series, level }) => (
+            <button
+              key={level.file}
+              type="button"
+              onClick={() => { onJump(level.file, series); setOpen(false); setQuery('') }}
+              style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 16px', background: 'transparent', border: 'none', borderTop: '1px solid #21262d', color: '#c9d1d9', cursor: 'pointer', fontSize: 13 }}
+            >
+              <span style={{ color: '#58a6ff' }}>{series.id}</span>{' '}
+              <span style={{ color: '#8b949e' }}>/ level-{level.level}</span> — {level.title}
+            </button>
+          ))}
+          {query && matches.length === 0 && (
+            <div style={{ padding: 16, color: '#8b949e', fontSize: 13 }}>No matches</div>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body
   )
 }
 
