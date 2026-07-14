@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getAllCourses, getChapters } from '../courses/courseLoader.js'
 import { useProgress } from '../hooks/useProgress.js'
 import { buildProgressKey } from '../context/progressMigration.ts'
+import { getLabInProgressItems } from '../data/labProgress.js'
 import UniverseBackground from '../components/backgrounds/UniverseBackground.jsx'
 import TopicFilterHeader from '../components/ui/TopicFilterHeader.jsx'
 import TopicTable from '../components/ui/TopicTable.jsx'
@@ -98,14 +99,19 @@ export default function HomePage() {
   }
 
   // Courses with at least one completed lesson but not all of them.
-  const inProgressItems = COURSE_ENTRIES.reduce((acc, { course, chapters }) => {
+  const inProgressCourses = COURSE_ENTRIES.reduce((acc, { course, chapters }) => {
     const total = chapters.reduce((n, ch) => n + ch.lessons.length, 0)
     if (total === 0) return acc
     const completed = chapters.reduce((n, ch) =>
       n + ch.lessons.filter(l => getLessonStatus(buildProgressKey(course.key, l), 1) === 'complete').length, 0)
-    if (completed > 0 && completed < total) acc.push({ kind: 'course', key: course.key })
+    if (completed > 0 && completed < total) {
+      acc.push({ kind: 'course', key: course.key, differentiator: `${completed} of ${total} lessons complete — continue where you left off.` })
+    }
     return acc
   }, [])
+  // Labs that track their own progress outside oc-progress (Lesson Engine,
+  // Vue Studio, Robot Arm Sim, Backend Lab) — see src/data/labProgress.js.
+  const inProgressItems = [...inProgressCourses, ...getLabInProgressItems()]
   const hasInProgress = inProgressItems.length > 0
 
   // A query bypasses the topic/subtopic filter entirely and searches every

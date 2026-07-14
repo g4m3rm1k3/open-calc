@@ -179,6 +179,14 @@ export function mergeMaxNumericObject(
   return merged
 }
 
+// A lone number that should never regress across devices (Vue Studio's
+// furthest-milestone-reached index) — same "never lose progress" philosophy
+// as mergeMaxNumericObject/mergeLearningTime below, just for a bare value
+// instead of a keyed object.
+export function mergeMaxNumber(local: unknown, remote: unknown): number {
+  return Math.max(Number(local) || 0, Number(remote) || 0)
+}
+
 interface LearningTimeData {
   totalMs?: number
   [key: string]: unknown
@@ -300,4 +308,6 @@ export const SYNC_MERGE_STRATEGIES: Record<string, MergeStrategy> = {
   'oc-compass': mergeKeyedObject,
   'oc-backend-lab': mergeBackendLabData,
   'oc-learning-time': mergeLearningTime,
+  'oc-lesson-progress': mergeArrayUnion,
+  'vue-studio-v3:milestone-idx': mergeMaxNumber,
 }

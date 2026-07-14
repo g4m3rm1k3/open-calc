@@ -49,6 +49,8 @@ const SYNC_KEYS = [
   'rfl-completed-v2',         // robot-arm-lab mission completions
   'oc-backend-lab',           // Backend Lab: student's code files + saved API requests
   'oc-learning-time',         // Monty: total foreground learning time
+  'oc-lesson-progress',       // Lesson Engine: completed "seriesId:level" set
+  'vue-studio-v3:milestone-idx', // Vue Studio: furthest milestone reached (code files stay local-only)
 ]
 
 // Timestamp we write to localStorage after every successful Firestore restore,
