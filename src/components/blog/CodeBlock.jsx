@@ -1,8 +1,34 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { runCode, RUNNABLE_LANGS, WANDBOX_COMPILER, IMG_SENTINEL, IMG_SENTINEL_END } from '../../utils/codeRunner.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { LANG_LABEL, THEME_BG, CopyButton, HighlightedCode } from '../markdown/codeDisplay.jsx'
+
+// ── "Open With" helpers — hand code off to a standalone lab via localStorage,
+// mirroring the pattern MarkdownHub.jsx already uses for its own code blocks.
+const CODELENS_LANG_MAP = { javascript: 'js', js: 'js', typescript: 'ts', ts: 'ts', python: 'py', py: 'py', go: 'go' }
+
+function openInCodeLens(code, lang, navigateFn) {
+  try {
+    const clLang = CODELENS_LANG_MAP[lang] ?? 'js'
+    localStorage.setItem('codelens-handoff', JSON.stringify({ code, lang: clLang, ts: Date.now() }))
+    navigateFn('/codelens')
+  } catch (e) {
+    console.error('Failed to hand off to CodeLens:', e)
+  }
+}
+
+// The Abstraction Visualizer only traces plain JavaScript (no lang param, no
+// TypeScript stripping in "Your Code" mode) — gate the button accordingly.
+function openInAbstractionViz(code, navigateFn) {
+  try {
+    localStorage.setItem('abstraction-viz-handoff', JSON.stringify({ code, ts: Date.now() }))
+    navigateFn('/lab/abstraction-viz')
+  } catch (e) {
+    console.error('Failed to hand off to Abstraction Visualizer:', e)
+  }
+}
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react').then((m) => ({ default: m.default })))
 
@@ -78,12 +104,15 @@ function OutputBody({ output, isError, isDarkGlobal }) {
 
 export default function CodeBlock({ language = '', code, cellIndex, getPriorContext, onCodeChange }) {
   const { isDarkGlobal, themeStyles } = useGlobalTheme()
+  const navigate = useNavigate()
   const trimmedCode = code.trimEnd()
   const isTerminalOutput = !language
   const lang = language.toLowerCase()
   const isRunnable = RUNNABLE_LANGS.has(lang)
   const isPiston = PISTON_LANGS.has(lang)
   const isWandbox = lang in WANDBOX_COMPILER
+  const isCodeLensable = CODELENS_LANG_MAP[lang] != null
+  const isAbstractionVizable = lang === 'javascript' || lang === 'js'
   const label = LANG_LABEL[lang] || language || 'output'
   const monacoLang = MONACO_LANG[lang] || 'plaintext'
   const monacoTheme = themeStyles?.monaco ?? (isDarkGlobal ? 'vs-dark' : 'vs')
@@ -176,6 +205,24 @@ export default function CodeBlock({ language = '', code, cellIndex, getPriorCont
               className="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors px-2 py-0.5 rounded"
             >
               Reset
+            </button>
+          )}
+          {isCodeLensable && (
+            <button
+              onClick={() => openInCodeLens(editing ? editorCode : trimmedCode, lang, navigate)}
+              title="Open in CodeLens visualizer"
+              className={`text-[11px] transition-colors px-2 py-0.5 rounded border ${isDarkGlobal ? 'text-indigo-300 hover:text-indigo-200 border-indigo-500/40 hover:border-indigo-400/60' : 'text-indigo-600 hover:text-indigo-700 border-indigo-300 hover:border-indigo-400'}`}
+            >
+              ↗ CodeLens
+            </button>
+          )}
+          {isAbstractionVizable && (
+            <button
+              onClick={() => openInAbstractionViz(editing ? editorCode : trimmedCode, navigate)}
+              title="Open in Abstraction Visualizer"
+              className={`text-[11px] transition-colors px-2 py-0.5 rounded border ${isDarkGlobal ? 'text-violet-300 hover:text-violet-200 border-violet-500/40 hover:border-violet-400/60' : 'text-violet-600 hover:text-violet-700 border-violet-300 hover:border-violet-400'}`}
+            >
+              ↗ Abstraction
             </button>
           )}
           {isRunnable && !editing && (

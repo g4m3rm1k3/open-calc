@@ -294,8 +294,26 @@ const LESSON_GROUPS = LESSONS.reduce((acc, l, i) => {
 const EMPTY_STEP = { title: '', code: '', explanation: '', active: [], connections: [], outputSoFar: [], stackSnapshot: [] }
 
 // ── Main ───────────────────────────────────────────────────────────────────────
+// Picked up code handed off from another lab/component (e.g. "Open in
+// Abstraction Visualizer" on a code block) — consumed once, at mount, so the
+// visualizer opens straight into "Your Code" mode already traced.
+function readHandoff() {
+  try {
+    const raw = localStorage.getItem('abstraction-viz-handoff')
+    if (!raw) return null
+    localStorage.removeItem('abstraction-viz-handoff')
+    const { code } = JSON.parse(raw)
+    return code && code.trim() ? code : null
+  } catch {
+    return null
+  }
+}
+
 export default function AbstractionViz({ onBack }) {
   const { themeStyles, isDarkGlobal: isDark } = useGlobalTheme()
+
+  const [handoffCode] = useState(readHandoff)
+  const [handoffTrace] = useState(() => handoffCode ? generateSteps(handoffCode) : null)
 
   const [lessonIdx, setLessonIdx] = useState(0)
   const [stepIdx,   setStepIdx]   = useState(0)
@@ -303,10 +321,12 @@ export default function AbstractionViz({ onBack }) {
   const [speed,     setSpeed]     = useState(1)
   const [laneH,     setLaneH]     = useState(600)
 
-  const [mode,         setMode]       = useState('lessons')
-  const [userCode,     setUserCode]   = useState('')
-  const [userLesson,   setUserLesson] = useState(null)
-  const [genError,     setGenError]   = useState(null)
+  const [mode,         setMode]       = useState(handoffCode ? 'user' : 'lessons')
+  const [userCode,     setUserCode]   = useState(handoffCode ?? '')
+  const [userLesson,   setUserLesson] = useState(
+    handoffTrace?.steps ? { id: 'user', title: 'Your Code', tag: 'Custom', steps: handoffTrace.steps } : null
+  )
+  const [genError,     setGenError]   = useState(handoffTrace?.error ?? null)
   const [navOpen,      setNavOpen]    = useState(true)
   const [liveOutput,   setLiveOutput]   = useState([])
   const [liveSnapshot, setLiveSnapshot] = useState([])

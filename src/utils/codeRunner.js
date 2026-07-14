@@ -138,12 +138,111 @@ export function runMatlab(code) {
 // shouldn't have to write for every snippet. If the code looks like bare
 // statements, wrap it automatically.
 
+// Matches the header of a top-level type declaration (optionally annotated/
+// modified) — used to walk past real class/interface/enum/record bodies
+// without mistaking an array initializer's `{...}` or a control-flow block's
+// `{...}` for another top-level declaration.
+const JAVA_DECL_START = /^\s*(?:@\w+(?:\([^)]*\))?\s*)*(?:(?:public|private|protected|static|final|abstract|sealed|non-sealed|strictfp)\s+)*(?:class|interface|enum|record)\s+\w/
+const JAVA_IMPORT_START = /^\s*(?:import|package)\s+[^;]+;/
+
+// Consumes whole top-level class/interface/enum/record declarations (and any
+// leading import/package statements) one at a time by matching a balanced
+// brace pair for each. Returns the index just past the last declaration —
+// everything from there on is loose code outside any type.
+function findJavaDeclarationsEnd(code) {
+  let i = 0
+  while (i < code.length) {
+    const rest = code.slice(i)
+    const importMatch = rest.match(JAVA_IMPORT_START)
+    if (importMatch) { i += importMatch[0].length; continue }
+    if (!JAVA_DECL_START.test(rest)) break
+    const braceStart = rest.indexOf('{')
+    if (braceStart === -1) break
+    let depth = 0, j = braceStart
+    for (; j < rest.length; j++) {
+      if (rest[j] === '{') depth++
+      else if (rest[j] === '}') { depth--; if (depth === 0) break }
+    }
+    if (depth !== 0) break // unbalanced — bail and let the rest fall through as-is
+    i += j + 1
+  }
+  return i
+}
+
+// Splits loose top-level code into member-like chunks (bare method
+// definitions — become sibling methods of main()) vs everything else
+// (plain statements, or statements that merely *contain* braces, like an
+// array initializer or a for-loop body — stay together, verbatim, as
+// main()'s body). Classifying by "has braces at all" isn't enough, since a
+// method signature and a for-loop header both end up owning a `{...}` block.
+function splitJavaTrailing(trailing) {
+  const members = []
+  let remainder = ''
+  let i = 0
+  const n = trailing.length
+  while (i < n) {
+    const braceStart = trailing.indexOf('{', i)
+    if (braceStart === -1) { remainder += trailing.slice(i); break }
+    const header = trailing.slice(i, braceStart)
+    let depth = 0, k = braceStart
+    for (; k < n; k++) {
+      if (trailing[k] === '{') depth++
+      else if (trailing[k] === '}') { depth--; if (depth === 0) break }
+    }
+    // Only test the part of the header after the last top-level `;` — text
+    // before that is already-complete prior statements, not part of this
+    // brace's own header (e.g. `int x = 1; for (...) {`).
+    const lastSemi = header.lastIndexOf(';')
+    const pre = header.slice(0, lastSemi + 1)
+    const headerTail = header.slice(lastSemi + 1).trim()
+    const isMember = headerTail.length > 0
+      && !/^(if|for|while|switch|try|do|synchronized|catch|finally|else)\b/.test(headerTail)
+      && !headerTail.includes('=')
+      && /\)\s*(throws\s+[\w.,\s<>]+)?$/.test(headerTail)
+    if (isMember) {
+      if (pre.trim()) remainder += pre
+      members.push(headerTail + ' ' + trailing.slice(braceStart, k + 1))
+    } else {
+      remainder += trailing.slice(i, k + 1)
+    }
+    i = k + 1
+  }
+  return { members, remainder: remainder.trim() }
+}
+
 function wrapJava(code) {
   // Wandbox compiles Java in prog.java — strip 'public' from top-level class
   // declarations so the name doesn't have to match the filename.
   const normalized = code.replace(/^public\s+(class\s)/gm, '$1')
-  if (/\bclass\s+\w/.test(normalized)) return normalized
-  return `class Main {\n    public static void main(String[] args) throws Exception {\n${code.replace(/^/gm, '        ')}\n    }\n}`
+
+  // A snippet can legitimately contain a complete class (or several) *and*
+  // bare code after them meant to exercise that class — e.g.
+  // `class Vehicle {...} class Car extends Vehicle {...}` followed by
+  // `Car car = new Car(60); System.out.println(...)`. That trailing code
+  // isn't valid Java outside a method; sending it unchanged (the old
+  // behavior whenever "class" appeared anywhere) sent that straight to
+  // Wandbox, which reported it as a malformed attempt at Java's "implicitly
+  // declared classes" preview feature.
+  const declEnd = findJavaDeclarationsEnd(normalized)
+
+  if (declEnd === 0) {
+    return `class Main {\n    public static void main(String[] args) throws Exception {\n${normalized.replace(/^/gm, '        ')}\n    }\n}`
+  }
+
+  const declarations = normalized.slice(0, declEnd).trim()
+  const trailing = normalized.slice(declEnd).trim()
+
+  if (!trailing) return normalized // already a complete, self-contained file
+
+  if (/\bmain\s*\(/.test(trailing)) {
+    // Trailing content already defines its own main() — just give it a home.
+    return `${declarations}\n\nclass Main {\n${trailing.replace(/^/gm, '    ')}\n}`
+  }
+
+  const { members, remainder } = splitJavaTrailing(trailing)
+  const memberBlock = members.join('\n\n')
+
+  return `${declarations}\n\nclass Main {\n${memberBlock ? memberBlock.replace(/^/gm, '    ') + '\n\n' : ''}    public static void main(String[] args) throws Exception {\n${remainder.replace(/^/gm, '        ')}\n    }\n}`
 }
 
 function wrapCSharp(code) {
