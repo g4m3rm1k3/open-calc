@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { getConceptFile } from './loader'
+import { getConceptFile, getConceptSeries } from './loader'
 import StandardCodeBlock from '../components/blog/CodeBlock.jsx'
-import { X, ChevronRight, Cpu, GraduationCap } from 'lucide-react'
+import InlineMarkdown from './InlineMarkdown.tsx'
+import { X, ChevronRight, ChevronLeft, Cpu, GraduationCap, Layers, HelpCircle, Activity, AlertTriangle, PenTool } from 'lucide-react'
 
 interface Props {
   /** Concept file id — matches the filename in src/concepts/ (no extension). */
@@ -17,6 +18,11 @@ interface Props {
    * collapsed-pill-that-expands-into-a-modal widget — is completely unchanged.
    */
   embedded?: boolean
+  /** Called with the next/previous concept id when this concept is part of a
+   *  series and the caller wants to handle moving between parts (e.g.
+   *  ConceptExplorerModal loading the next part into its main view). Without
+   *  this, part navigation still shows but has nothing to call. */
+  onNavigate?: (id: string) => void
 }
 
 const LANG_LABEL: Record<string, string> = {
@@ -38,12 +44,14 @@ const LANG_LABEL: Record<string, string> = {
 // imports its own data and its own execution utility — so it works the same way
 // whether it's embedded in a Lesson Engine markdown lesson or dropped directly into
 // a hand-authored course page.
-export default function ConceptBlock({ id, lang, embedded = false }: Props) {
+export default function ConceptBlock({ id, lang, embedded = false, onNavigate }: Props) {
   const [isOpen, setIsOpen] = useState(false)
   const popoverRef = useRef<HTMLDivElement>(null)
 
   const concept = useMemo(() => getConceptFile(id), [id])
   const availableLangs = useMemo(() => concept ? Object.keys(concept.languages) : [], [concept])
+  const seriesParts = useMemo(() => concept?.series ? getConceptSeries(concept.series) : [], [concept])
+  const partIndex = seriesParts.findIndex(p => p.id === id)
 
   const [selectedLang, setSelectedLang] = useState(() =>
     (lang && concept?.languages[lang]) ? lang : availableLangs[0]
@@ -68,9 +76,53 @@ export default function ConceptBlock({ id, lang, embedded = false }: Props) {
 
   const content = (
     <>
-      <p className="text-[15px] text-slate-700 dark:text-slate-300 mb-6 leading-relaxed font-medium">
-        {concept.explanation}
-      </p>
+      {concept.series && seriesParts.length > 1 && (
+        <div className="flex items-center justify-between gap-3 mb-4 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50">
+          <div className="flex items-center gap-2 min-w-0">
+            <Layers className="w-4 h-4 text-brand-500 shrink-0" />
+            <span className="text-xs font-bold text-slate-600 dark:text-slate-300 truncate">
+              {concept.seriesTitle ?? concept.series} — Part {(concept.part ?? partIndex + 1)} of {seriesParts.length}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              disabled={partIndex <= 0}
+              onClick={() => partIndex > 0 && onNavigate?.(seriesParts[partIndex - 1].id)}
+              title={partIndex > 0 ? seriesParts[partIndex - 1].name : undefined}
+              className="p-1 rounded disabled:opacity-30 disabled:cursor-not-allowed text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-white dark:hover:bg-slate-700 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              disabled={partIndex === -1 || partIndex >= seriesParts.length - 1}
+              onClick={() => partIndex < seriesParts.length - 1 && onNavigate?.(seriesParts[partIndex + 1].id)}
+              title={partIndex < seriesParts.length - 1 ? seriesParts[partIndex + 1].name : undefined}
+              className="p-1 rounded disabled:opacity-30 disabled:cursor-not-allowed text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-white dark:hover:bg-slate-700 transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-6">
+        <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1.5">Definition</h4>
+        <p className="text-[15px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium whitespace-pre-line">
+          <InlineMarkdown text={concept.definition} />
+        </p>
+      </div>
+
+      {concept.problem && (
+        <div className="mb-6 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 rounded-xl p-4 flex gap-3 items-start">
+          <HelpCircle className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1.5">Problem</h4>
+            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+              <InlineMarkdown text={concept.problem} />
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Language selector — only in standalone mode; an embedding caller (like
           ConceptExplorerModal) owns language selection itself via the `lang` prop. */}
@@ -79,7 +131,7 @@ export default function ConceptBlock({ id, lang, embedded = false }: Props) {
           {availableLangs.map(l => (
             <button
               key={l}
-              onClick={() => { setSelectedLang(l); setOutput(null) }}
+              onClick={() => setSelectedLang(l)}
               className={`text-xs font-bold px-4 py-2 rounded-lg transition-all ${
                 l === selectedLang
                   ? 'bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm'
@@ -107,7 +159,7 @@ export default function ConceptBlock({ id, lang, embedded = false }: Props) {
                 <ChevronRight className="w-3.5 h-3.5" /> Walkthrough
               </h4>
               <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                {active.walkthrough}
+                <InlineMarkdown text={active.walkthrough} />
               </p>
             </div>
           )}
@@ -116,30 +168,78 @@ export default function ConceptBlock({ id, lang, embedded = false }: Props) {
         <p className="text-sm text-slate-400 italic mb-2">No example authored for this language yet.</p>
       )}
 
-      {(concept.csLens || concept.seLens) && (
-        <div className="mt-8 flex flex-col gap-4">
-          {concept.csLens && (
+      {concept.execution && (
+        <div className="mt-6 bg-slate-900 dark:bg-black/40 border border-slate-700 rounded-xl p-4 flex gap-3 items-start">
+          <Activity className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-emerald-400 mb-1.5">Execution</h4>
+            <pre className="text-[12px] font-mono text-slate-200 leading-relaxed whitespace-pre-wrap overflow-x-auto">{concept.execution}</pre>
+          </div>
+        </div>
+      )}
+
+      {(concept.cs || concept.se) && (
+        <div className="mt-6 flex flex-col gap-4">
+          {concept.cs && (
             <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl p-4 flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow">
               <div className="bg-blue-100 dark:bg-blue-500/20 p-2.5 rounded-xl shrink-0 border border-blue-200 dark:border-blue-500/30">
                 <Cpu className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
-                <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-1.5">Computer Science Lens</h4>
-                <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium">{concept.csLens}</p>
+                <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-1.5">Computer Science</h4>
+                <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium mb-2"><InlineMarkdown text={concept.cs.text} /></p>
+                {concept.cs.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {concept.cs.tags.map(tag => (
+                      <span key={tag} className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300">{tag}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
-          {concept.seLens && (
+          {concept.se && (
             <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl p-4 flex gap-4 items-start shadow-sm hover:shadow-md transition-shadow">
               <div className="bg-amber-100 dark:bg-amber-500/20 p-2.5 rounded-xl shrink-0 border border-amber-200 dark:border-amber-500/30">
                 <GraduationCap className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div>
-                <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-1.5">Software Engineering Lens</h4>
-                <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium">{concept.seLens}</p>
+                <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-1.5">Software Engineering</h4>
+                <p className="text-[13px] text-slate-700 dark:text-slate-300 leading-relaxed font-medium mb-2"><InlineMarkdown text={concept.se.text} /></p>
+                {concept.se.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {concept.se.tags.map(tag => (
+                      <span key={tag} className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300">{tag}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {concept.commonMistakes.length > 0 && (
+        <div className="mt-6 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 rounded-xl p-4 flex gap-3 items-start">
+          <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-red-600 dark:text-red-400 mb-1.5">Common Mistakes</h4>
+            <ul className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed list-disc pl-4 space-y-1">
+              {concept.commonMistakes.map((m, i) => <li key={i}><InlineMarkdown text={m} /></li>)}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {concept.exercises.length > 0 && (
+        <div className="mt-6 bg-violet-50 dark:bg-violet-500/10 border border-violet-100 dark:border-violet-500/20 rounded-xl p-4 flex gap-3 items-start">
+          <PenTool className="w-5 h-5 text-violet-500 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-extrabold text-[10px] uppercase tracking-widest text-violet-600 dark:text-violet-400 mb-1.5">Exercises</h4>
+            <ul className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed list-disc pl-4 space-y-1">
+              {concept.exercises.map((ex, i) => <li key={i}><InlineMarkdown text={ex} /></li>)}
+            </ul>
+          </div>
         </div>
       )}
     </>

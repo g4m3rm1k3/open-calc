@@ -1,9 +1,23 @@
 // App-wide concept library — one markdown file per concept, reusable by any course
-// or lesson in the app. A concept file has generic prose (explanation, CS lens, SE
-// lens) shared across every language, plus one fenced code example + walkthrough per
-// language. This is a small, dedicated parser — not a reuse of
-// src/engine/lesson/parser.ts, which is shaped around multi-step lessons with
-// challenge/test fences, a shape concept files don't have.
+// or lesson in the app. Every concept is authored against a fixed set of teaching
+// dimensions (not a free-form document) so the same shape scales from `slice()` up
+// to dependency injection or parsers without changing structure:
+//
+//   Definition   — what is this?
+//   Problem      — why does it exist?
+//   Execution    — what actually happens when it runs (generic, language-agnostic;
+//                  use this when the runtime model doesn't differ by language —
+//                  for concepts where it genuinely does, per-language walkthroughs
+//                  below carry that instead)
+//   Computer Science / Software Engineering — short paragraph + a scannable tag
+//                  list (e.g. "Object graphs, Directed graphs") naming where this
+//                  connects, not just naming the concept itself
+//   Common Mistakes — bullet list
+//   Exercises       — bullet list, "try this yourself" prompts
+//   <language>      — one section per language: a code fence + its walkthrough
+//
+// Sections are `## Header` blocks in the body (after frontmatter) — anything whose
+// header isn't one of the fixed names above is treated as a language section.
 
 export interface LanguageContent {
   lang: string
@@ -11,14 +25,32 @@ export interface LanguageContent {
   walkthrough: string | null
 }
 
+export interface LensContent {
+  text: string
+  tags: string[]
+}
+
 export interface ConceptFile {
   id: string
   name: string
-  explanation: string
-  csLens: string | null
-  seLens: string | null
+  definition: string
+  problem: string | null
+  execution: string | null
+  cs: LensContent | null
+  se: LensContent | null
+  commonMistakes: string[]
+  exercises: string[]
   languages: Record<string, LanguageContent>
+  series: string | null
+  seriesTitle: string | null
+  part: number | null
 }
+
+const FIXED_SECTIONS = new Set([
+  'definition', 'problem', 'execution',
+  'computer science', 'software engineering',
+  'common mistakes', 'exercises',
+])
 
 function parseFrontmatter(md: string): { meta: Record<string, string>; body: string } {
   const m = md.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/)
@@ -32,45 +64,74 @@ function parseFrontmatter(md: string): { meta: Record<string, string>; body: str
   return { meta, body: m[2] }
 }
 
+function parseBulletList(text: string): string[] {
+  return text
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.startsWith('- '))
+    .map(l => l.slice(2).trim())
+}
+
+function parseLens(text: string): LensContent {
+  const tagLine = text.split('\n').find(l => l.trim().toLowerCase().startsWith('tags:'))
+  const tags = tagLine ? tagLine.replace(/^\s*Tags:\s*/i, '').split(',').map(t => t.trim()).filter(Boolean) : []
+  const body = tagLine ? text.replace(tagLine, '').trim() : text.trim()
+  return { text: body, tags }
+}
+
+function parseLanguageSection(text: string): { example: string; walkthrough: string | null } {
+  const m = text.match(/```(\w+)\n([\s\S]*?)```\n?/)
+  const example = m ? m[2].replace(/\n$/, '') : ''
+  const afterFence = m ? text.slice(m.index! + m[0].length).trim() : ''
+  const walkthrough = afterFence.startsWith('Walkthrough:')
+    ? afterFence.replace(/^Walkthrough:\s*/, '').trim()
+    : (afterFence || null)
+  return { example, walkthrough }
+}
+
 export function parseConceptFile(raw: string, fallbackId: string): ConceptFile {
   const normalized = raw.replace(/\r\n/g, '\n')
   const { meta, body } = parseFrontmatter(normalized)
   const id = meta.concept || fallbackId
   const name = meta.name || fallbackId
 
-  const fenceRe = /```(\w+)\n([\s\S]*?)```\n?/g
-  const fences: { lang: string; code: string; start: number; end: number }[] = []
-  let m: RegExpExecArray | null
-  while ((m = fenceRe.exec(body))) {
-    fences.push({ lang: m[1].toLowerCase(), code: m[2].replace(/\n$/, ''), start: m.index, end: fenceRe.lastIndex })
-  }
+  const chunks = body.split(/(?=^## )/m).filter(s => s.trim())
 
-  const genericEnd = fences.length ? fences[0].start : body.length
-  const genericText = body.slice(0, genericEnd).trim()
-  const paragraphs = genericText.split(/\n\n+/)
-  let explanation = ''
-  let csLens: string | null = null
-  let seLens: string | null = null
-  for (const para of paragraphs) {
-    const t = para.trim()
-    if (t.startsWith('**CS lens:**')) csLens = t.replace(/^\*\*CS lens:\*\*\s*/, '').trim()
-    else if (t.startsWith('**SE lens:**')) seLens = t.replace(/^\*\*SE lens:\*\*\s*/, '').trim()
-    else explanation += (explanation ? '\n\n' : '') + t
-  }
-
+  let definition = ''
+  let problem: string | null = null
+  let execution: string | null = null
+  let cs: LensContent | null = null
+  let se: LensContent | null = null
+  let commonMistakes: string[] = []
+  let exercises: string[] = []
   const languages: Record<string, LanguageContent> = {}
-  for (let i = 0; i < fences.length; i++) {
-    const f = fences[i]
-    const nextStart = i + 1 < fences.length ? fences[i + 1].start : body.length
-    const afterFenceText = body.slice(f.end, nextStart).trim()
-    const firstPara = afterFenceText.split(/\n\n+/)[0]?.trim() ?? ''
-    const walkthrough = firstPara.startsWith('Walkthrough:')
-      ? firstPara.replace(/^Walkthrough:\s*/, '').trim()
-      : null
-    languages[f.lang] = { lang: f.lang, example: f.code, walkthrough }
+
+  for (const chunk of chunks) {
+    const lines = chunk.split('\n')
+    const header = lines[0].replace(/^##\s*/, '').trim()
+    const headerKey = header.toLowerCase()
+    const text = lines.slice(1).join('\n').trim()
+
+    if (headerKey === 'definition') definition = text
+    else if (headerKey === 'problem') problem = text
+    else if (headerKey === 'execution') execution = text
+    else if (headerKey === 'computer science') cs = parseLens(text)
+    else if (headerKey === 'software engineering') se = parseLens(text)
+    else if (headerKey === 'common mistakes') commonMistakes = parseBulletList(text)
+    else if (headerKey === 'exercises') exercises = parseBulletList(text)
+    else if (!FIXED_SECTIONS.has(headerKey)) {
+      // Not a fixed section name — treat the header as a language key.
+      const lang = headerKey.replace(/\s+/g, '')
+      const { example, walkthrough } = parseLanguageSection(text)
+      if (example) languages[lang] = { lang, example, walkthrough }
+    }
   }
 
-  return { id, name, explanation, csLens, seLens, languages }
+  const series = meta.series || null
+  const seriesTitle = meta.seriesTitle || null
+  const part = meta.part ? parseInt(meta.part, 10) : null
+
+  return { id, name, definition, problem, execution, cs, se, commonMistakes, exercises, languages, series, seriesTitle, part }
 }
 
 const CONCEPT_RAW_FILES = import.meta.glob('./*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
@@ -87,4 +148,11 @@ export function getConceptFile(id: string): ConceptFile | null {
 
 export function getAvailableConceptIds(): string[] {
   return Object.keys(CONCEPTS)
+}
+
+/** All parts of a series, in order — null part numbers sort last. */
+export function getConceptSeries(seriesId: string): ConceptFile[] {
+  return Object.values(CONCEPTS)
+    .filter(c => c.series === seriesId)
+    .sort((a, b) => (a.part ?? Infinity) - (b.part ?? Infinity))
 }
