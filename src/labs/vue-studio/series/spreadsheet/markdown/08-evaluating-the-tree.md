@@ -113,11 +113,70 @@ const result = evaluate(tree)  // 20
 
 Click ▶ Run. The result is 20. Build a few more trees by hand and evaluate them to get a feel for how the recursive calls flow.
 
-**Walkthrough — recursion doing the work:**
+**Walkthrough — recursion, defined precisely, then seen doing the work:**
+
+**Recursion** means a function calling itself, directly or indirectly, to solve a
+smaller piece of the same problem it was asked to solve — here, "evaluate this whole
+tree" is solved by "evaluate this node's children, then combine their results,"
+where "evaluate this node's children" is the exact same job, just handed a smaller
+tree. Every recursive function needs a **base case** — a version of the problem small
+enough to answer directly, without recursing further, or the function would call
+itself forever and eventually crash (a real error, "Maximum call stack size
+exceeded" — each pending recursive call reserves space on the **call stack**, and
+recursion with no base case fills that space until it runs out). `evaluate`'s base
+case is the `'Number'` case: `return node.value` answers immediately, no further
+recursion, no children to evaluate. Every other case recurses toward that base case,
+never away from it — `node.left` and `node.right` are always smaller trees than
+`node` itself.
 
 `evaluate` calls itself twice in the `'BinaryExpression'` case — once for `node.left`, once for `node.right` — *before* computing the node's own result. For `10+5*2`'s tree, evaluating the outer `+` node requires first evaluating its right child, the `5*2` node. The `5*2` node evaluates both its children (both plain `Number` nodes), applies `*`, and returns `10`. The outer `+` then computes `10 + 10 = 20`.
 
 No part of `evaluate` needs to know how deep the tree is. The same handful of lines correctly evaluates a tree one level deep or twenty levels deep. This is the core property of recursive algorithms over recursive structures: the code's structure mirrors the data's structure.
+
+*Recognized elsewhere:* recursion over a tree is not a technique invented for this
+project — it is how every real compiler walks an AST (this project's own `evaluate`
+is, structurally, a tiny real compiler backend), how a file system's "calculate
+folder size" has to work (a folder's size is the sum of its contents' sizes, some of
+which are folders too), how JSON.parse and JSON.stringify handle arbitrarily nested
+objects and arrays, and how a website's comment-reply threads render nested replies
+inside replies. Any time data can contain smaller versions of itself, recursion is
+usually the natural way to process it.
+
+**SE concept — `evaluate` is a real, named design pattern: the Interpreter pattern.**
+The **Interpreter pattern** (one of the Gang of Four's original 1994 design
+patterns) describes exactly this shape: given a grammar represented as a tree of
+typed nodes, define one operation that walks the tree and evaluates it, with one
+case per node type. That is a precise description of `evaluate` — `ExpressionNode`
+is the grammar's tree representation (built by Lesson 07's parser), and `evaluate`
+is the interpret operation. This is not a coincidence of naming: this project has
+been building a real, textbook Interpreter-pattern implementation since Lesson 06,
+one stage at a time, and this lesson is the moment the pattern's namesake operation
+— actually interpreting the tree — finally exists.
+
+**CS concept — the time complexity of walking a tree once.** `evaluate` calls
+itself exactly once per node in the tree, and does a small, fixed amount of
+non-recursive work at each one (reading a field, calling `applyOperator`). This
+makes `evaluate` **O(n)** — its running time grows directly in proportion to the
+number of nodes in the tree, not the tree's depth, and not anything worse than
+linear. A formula with a thousand operators takes roughly a thousand times longer to
+evaluate than one with a single operator — not a thousand squared, not exponentially
+longer. This is worth stating explicitly rather than assuming: it is the general
+pattern for *any* algorithm that visits each element of a structure exactly once,
+whether that structure is a tree, an array, or a list — visiting each item once,
+doing constant work per item, is the definition of linear time.
+
+**Honest scope note on recursion depth:** each recursive call to `evaluate` waits
+for its children's calls to return before it can finish (`applyOperator` needs both
+`left` and `right` first) — this is **non-tail recursion**: work happens *after* the
+recursive call returns, not as the very last action. Each pending call reserves a
+frame on the call stack (the same call stack named in Lesson 07's closures
+discussion), so a formula nested a thousand levels deep — vanishingly unlikely for
+anything a person would type by hand into a spreadsheet cell, but not impossible for
+generated formulas — could in principle exhaust it. This project accepts that limit
+deliberately, the same "simplest thing that could possibly work" reasoning Lesson 11
+names explicitly: converting `evaluate` to an iterative, explicit-stack version
+would remove the limit at the cost of real readability, for a scenario this
+project's actual formulas will never approach.
 
 **Walkthrough — `{ }` braces around the `'BinaryExpression'` case:**
 
@@ -216,6 +275,16 @@ Click ▶ Run. Type `=10+5*2` into a cell and press Enter: it shows `20`. Double
 **This is the moment lesson 04 predicted:**
 
 When `displayCell` was written for numbers and text, its walkthrough said: "That will not stay true once formulas exist in lesson 05." Two lessons later, that prediction arrived. The split was deferred until it was actually needed — not anticipated with a `forEditing` parameter added speculatively.
+
+**This deferral has a real name: YAGNI — "You Aren't Gonna Need It."** It's one of
+Extreme Programming's (an Agile methodology's) founding principles: don't build
+flexibility for a need you're only *guessing* will arrive. A `forEditing` boolean
+parameter added back in Lesson 04, "just in case," would have sat unused for two full
+lessons — extra surface area, extra cognitive load, for a guess. Waiting until Lesson
+08 actually needs the split, then building exactly the split that's needed, is not
+laziness; it's the discipline of not paying a design cost before the requirement is
+real. The cost of guessing wrong is never zero — every unused parameter is something
+a future reader has to understand and wonder about.
 
 **Why two small functions instead of one with a flag:**
 
@@ -329,6 +398,8 @@ Click ▶ Run and verify:
 - [ ] A formula with division by zero shows `Infinity` or `NaN` (not an error yet)
 - [ ] You can explain why `{ }` braces are needed in the `'BinaryExpression'` switch case
 - [ ] You can explain why `editableText` and `displayCell` had to become two separate functions at this exact lesson
+- [ ] You can explain why `evaluate` is an instance of the Interpreter pattern, and name the two prior lessons it depends on
+- [ ] You can explain why `evaluate` runs in O(n) time relative to the number of AST nodes
 - [ ] You can explain what `5/0` evaluates to and why that is not yet the final answer this project gives
 
 ---

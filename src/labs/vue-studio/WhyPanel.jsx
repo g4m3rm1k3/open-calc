@@ -1,15 +1,17 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { useThemeColors } from '../../hooks/useThemeColors.js'
 
 // The WHY panel — shown for the currently active file.
 // Answers: "Why does this file exist?" before the student opens the code.
-export default function WhyPanel({ milestone, activeFile, isDark }) {
-  const bg      = isDark ? '#0c1426' : '#f0fdf4'
-  const border  = isDark ? '#1e293b' : '#bbf7d0'
-  const text    = isDark ? '#e2e8f0' : '#1e293b'
-  const muted   = isDark ? '#64748b' : '#6b7280'
-  const accent  = '#10b981'
-  const codeBg  = isDark ? '#1e293b' : '#ecfdf5'
+export default function WhyPanel({ milestone, activeFile }) {
+  const C = useThemeColors()
+  const bg      = C.surface2
+  const border  = C.border
+  const text    = C.text
+  const muted   = C.muted
+  const accent  = C.blue
+  const codeBg  = C.surface
 
   const whyContent = milestone.why?.[activeFile]
   const filename = activeFile.split('/').pop() ?? activeFile
@@ -37,12 +39,12 @@ export default function WhyPanel({ milestone, activeFile, isDark }) {
                   <p style={{ margin: '0 0 8px', color: text }}>{children}</p>
                 ),
                 code: ({ inline, children }) => inline
-                  ? <code style={{ background: codeBg, padding: '1px 5px', borderRadius: 3, fontSize: 11, fontFamily: 'monospace', color: isDark ? '#34d399' : '#059669' }}>{children}</code>
+                  ? <code style={{ background: codeBg, padding: '1px 5px', borderRadius: 3, fontSize: 11, fontFamily: 'monospace', color: accent }}>{children}</code>
                   : <code>{children}</code>,
                 pre: ({ children }) => (
-                  <pre style={{ background: isDark ? '#0f172a' : '#d1fae5', border: `1px solid ${border}`, borderRadius: 6, padding: '8px 10px', overflowX: 'auto', fontSize: 11, fontFamily: 'monospace', margin: '6px 0', lineHeight: 1.5 }}>{children}</pre>
+                  <pre style={{ background: C.bg, border: `1px solid ${border}`, borderRadius: 6, padding: '8px 10px', overflowX: 'auto', fontSize: 11, fontFamily: 'monospace', margin: '6px 0', lineHeight: 1.5 }}>{children}</pre>
                 ),
-                strong: ({ children }) => <strong style={{ color: isDark ? '#a7f3d0' : '#065f46', fontWeight: 700 }}>{children}</strong>,
+                strong: ({ children }) => <strong style={{ color: accent, fontWeight: 700 }}>{children}</strong>,
                 ul: ({ children }) => <ul style={{ paddingLeft: 16, margin: '4px 0 8px' }}>{children}</ul>,
                 li: ({ children }) => <li style={{ marginBottom: 2, color: text }}>{children}</li>,
                 hr: () => <hr style={{ border: 'none', borderTop: `1px solid ${border}`, margin: '10px 0' }} />,

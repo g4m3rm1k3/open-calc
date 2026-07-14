@@ -39,6 +39,20 @@ const redoStack = ref<Array<Record<CellId, Cell>>>([])
 
 `history` is a stack of past states. `redoStack` holds states that were undone and can be redone. Both start empty.
 
+**Walkthrough — `Array<Record<CellId, Cell>>`, the same array type written a second, equivalent way:**
+
+Every array type so far has used the shorthand `T[]` — `Token[]`, `ExpressionNode[]`.
+`Array<Record<CellId, Cell>>` is the identical concept, written using the generic
+syntax directly (`Array` is itself a generic type, the same way `Record` is) instead
+of the shorthand. `Token[]` and `Array<Token>` mean exactly the same thing to
+TypeScript; this project uses `T[]` when `T` is a simple name and switches to
+`Array<T>` here specifically because the shorthand would read as
+`Record<CellId, Cell>[]` — legal, but the generic form makes the nesting (an array
+*of* records) easier to parse visually at a glance. `history` is a **stack**: a list
+where new items are added and removed from the same end — `.push()` adds to the end,
+`.pop()` removes from the end. A stack always gives you the most recently added item
+back first, which is exactly what "undo the last thing that happened" needs.
+
 ---
 
 ## Step 2 — Save a snapshot on every commit
@@ -203,6 +217,25 @@ Click ▶ Run. Edit a few cells, then press Ctrl+Z — each press restores the p
 
 When `history` is empty, there is nothing to undo. The `:disabled` binding greys the button and prevents clicks. In the template, `history` is the auto-unwrapped value of `history` ref — an array. `.length` reads the reactive array's length, which Vue tracks. When `commitEdit` pushes to `history.value`, Vue detects the change and re-evaluates the `:disabled` binding.
 
+**The Design lens — why a disabled button, not a hidden one, and why real `<button>` elements again:**
+
+An alternative design would hide the Undo button entirely when there's nothing to
+undo (`v-if="history.length > 0"`). This project greys it out instead
+(`:disabled`), and the difference is a real, deliberate usability choice: a disabled
+button still tells the user the feature *exists* — greyed out, in its normal
+position, communicating "this is a real capability, just not available right now."
+A hidden button removes that information entirely; a new user would have no way to
+discover Undo exists until they'd already made an edit. This is the same **affordance**
+idea from Lesson 02's selection outline, applied to a different signal: showing,
+not just doing.
+
+Note also that these are real `<button>` elements, not styled `<div>`s — the same
+non-negotiable choice Lesson 13's formatting toolbar makes later in this series, for
+the identical reason: a native `<button>` with the `disabled` HTML attribute (which
+`:disabled="..."` compiles down to) is automatically removed from the keyboard `Tab`
+order while disabled and is announced correctly by screen readers as "Undo, button,
+dimmed" — behavior you would have to hand-build yourself with any other element.
+
 **Walkthrough — why replacing `cells.value` is correct:**
 
 ```typescript
@@ -213,13 +246,67 @@ This replaces the entire `cells.value` with the snapshot. Vue detects the assign
 
 ---
 
-## CS concept — the command pattern and the stack
+## CS concept — this is the Memento pattern, not the Command pattern, and the difference matters
 
-This implementation is a simplified version of the **Command pattern**. Each edit is an action (command) that can be undone. The undo stack stores the prior state for each command; the redo stack stores the post state for each command.
+It's tempting to call any undo/redo system "the Command pattern" — the name has
+become a catch-all in casual conversation — but the two are genuinely different
+patterns, solving the same problem two different ways, and this project's design is
+precisely one of them, not the other:
 
-The pure-snapshot approach used here is correct for small data. A more memory-efficient alternative: instead of storing the full `cells` map for each snapshot, store only the *diff* — the old and new value of the one cell that changed. Undo then means applying the reverse diff. For a large spreadsheet with many cells, diffs use far less memory.
+**The Memento pattern** — what this lesson actually builds — captures and stores an
+object's entire internal *state* at a point in time, opaquely, so it can be restored
+later without the thing doing the restoring needing to understand what changed or
+why. `history.value.push({ ...cells.value })` is exactly this: a snapshot of
+everything, with zero knowledge of what the edit actually was. `undo` doesn't reverse
+an action — it doesn't even know an action happened. It just replaces the current
+state with a saved one.
 
-Both approaches are correct. The snapshot approach is simpler to implement and reason about; the diff approach scales better. This lesson chooses simplicity.
+**The Command pattern** — a genuinely different design — encapsulates a *request* as
+an object: not "here is what everything looked like," but "here is the specific
+change that happened, and here is how to undo exactly that change." A Command-based
+version of this feature would look like:
+
+```typescript
+interface EditCommand {
+  cellId: CellId
+  previousCell: Cell | undefined
+  newCell: Cell
+}
+
+function undo(command: EditCommand): void {
+  if (command.previousCell === undefined) {
+    delete cells.value[command.cellId]   // the cell didn't exist before this edit
+  } else {
+    cells.value[command.cellId] = command.previousCell
+  }
+}
+```
+
+The *diff-based alternative* already described below — storing only the one cell
+that changed, old value and new value — is not a memory optimization of Memento; it
+is the Command pattern, in this exact codebase. Memento asks "what did everything
+look like?" Command asks "what specifically happened, and how do I reverse it?"
+
+The pure-snapshot approach used here is correct for small data. Storing only the *diff* — the old and new value of the one cell that changed, the Command-pattern version above — means undo applies the reverse diff instead of restoring a whole map. For a large spreadsheet with many cells, diffs use far less memory, and this is also the approach that scales to a status bar showing *what* was undone ("Undo: changed A1 from 5 to 10") — Memento's opaque snapshots have no way to describe that, since they never recorded what changed, only what everything looked like.
+
+Both approaches are correct, solving the same problem from opposite ends: Memento is simpler to implement and reason about because it never has to model "what changed" at all; Command scales better and can describe itself. This lesson chooses Memento.
+
+*Recognized elsewhere:* Git's own commit history is much closer to Command
+(each commit records a change, reversible with `git revert`) than to Memento; a
+database's write-ahead log is Command-shaped for the same reason. Ctrl+Z in most
+text editors, by contrast, is usually Memento-shaped for exactly this project's
+reason — capturing "the text looked like this" is simpler than modeling every
+possible edit as a reversible action. Video game "save states" are pure Memento.
+
+**A real, named Agile/XP principle for exactly this kind of choice: "the simplest
+thing that could possibly work."** This is a phrase from Extreme Programming, chosen
+deliberately over its opposite failure mode — building the diff-based version now, on
+the guess that this spreadsheet will someday need it, is the same speculative
+over-engineering YAGNI (Lesson 08) warned against, just applied to performance
+instead of features. The snapshot approach is not a lesser version of "the real
+solution" — for this project's actual scale, it *is* the correct solution. Choosing
+it deliberately, with the trade-off named out loud, is different from choosing it out
+of not knowing the alternative exists.
 
 ---
 
@@ -272,7 +359,8 @@ Click ▶ Run and verify:
 - [ ] You can explain why `{ ...cells.value }` creates an independent snapshot
 - [ ] You can explain why `redoStack` must be cleared on new edits
 - [ ] You can explain why `onBeforeUnmount` is required alongside `onMounted`
+- [ ] You can explain the difference between the Memento and Command patterns, and say which one this project uses and why
 
 ---
 
-*Next: Lesson 12 — Extracting Components. The single 300-line App.vue is split into `SpreadsheetGrid`, `CellDisplay`, and `FormulaBar` — separate components that share reactive state through `provide`/`inject`, matching the pattern from the Essentials series.*
+*Next: Lesson 12 — Extracting Components. The single, now-large `App.vue` is split into `SpreadsheetGrid`, `CellDisplay`, and `FormulaBar` — separate components sharing reactive state through `provide`/`inject`, both explained from first principles the moment they're needed.*

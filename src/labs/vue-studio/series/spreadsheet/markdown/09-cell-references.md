@@ -141,6 +141,10 @@ function evaluate(
 }
 ```
 
+**Walkthrough — `lookupCell: (name: string) => number`, a type describing a function, not a function itself:**
+
+Every parameter type you've seen so far described data — `col: number`, `coordinate: Coordinate`. `(name: string) => number` is different: it describes the *shape of an acceptable function* — anything with exactly one `string` parameter and a `number` return type qualifies, regardless of what it's named or what it actually does internally. This is a **function type**. Read it the same way you'd read the arrow function values it describes: parameter list on the left of `=>`, return type on the right. `lookupCell`'s caller (Step 4, next) can hand `evaluate` any function at all, as long as it matches this shape — `evaluate` doesn't know or care whether that function reads from `cells.value`, a hardcoded test object, or something else entirely, which is exactly the point of the design decision above.
+
 Every recursive call now threads `lookupCell` through. `lookupCell` is a function passed in from the outside — `evaluate` calls it with a name and gets a number back. What that function actually does (look up `cells.value`, handle missing cells, recursively evaluate other formulas) is entirely the caller's concern.
 
 ---
@@ -234,6 +238,10 @@ const debugInfo = computed<DebugInfo | null>(() => {
 
 Click ▶ Run. Type `5` in A1, `10` in B1, `=A1+B1` in C1 — C1 shows `15`. Change A1 to `20` — C1 immediately shows `30`. Change B1 to `0` — C1 shows `20`. The reactive graph connects cell changes to formula re-evaluation automatically: `cells.value` changes → everything reading `cells` (including the template's `displayCell(cells[...], cells)` calls) is invalidated → Vue re-renders.
 
+**CS concept — this is mutual recursion, a genuinely different shape from Lesson 08's recursion.** Lesson 08's `evaluate` called only itself — **direct recursion**. Look at what's happening now: `evaluate`'s `'CellReference'` case calls `lookupCell`; `lookupCell`, when the referenced cell is itself a formula, calls `evaluate` right back (`return evaluate(refParse.ast, lookupCell)`). Neither function calls itself directly — `evaluate` calls `lookupCell`, which calls `evaluate`, which might call `lookupCell` again, back and forth, for as many chained formula references as exist. This is **mutual** (or **indirect**) **recursion**: two or more functions recursing through each other rather than any one of them recursing alone. It has the same requirements as direct recursion — a base case that stops the chain (here: a cell that is a `'number'` or `'text'`, or a formula cell that fully resolves without another cell reference) — and the same risk without one (a genuine cycle, which is exactly why Lesson 10 exists immediately after this one).
+
+**CS concept — cell references form a graph, starting right now, not in Lesson 10.** Every cell that references another cell is a directed edge: C1 referencing A1 and B1 means "C1 depends on A1" and "C1 depends on B1," drawn as arrows from C1 to each. The moment `lookupCell` can call `evaluate` on another formula's own AST, this project has a real **directed graph** of cells, built implicitly, one formula at a time, with no explicit graph data structure anywhere in the code — the graph exists structurally, as a web of function calls, rather than as a `Map` or adjacency list you could point to. Lesson 10's name ("Circular Reference Detection") is really about the first hard problem *any* directed graph raises: does it contain a cycle? That question is only askable because this lesson already built the graph — Lesson 10 doesn't introduce the dependency graph, it's the first lesson forced to reckon with the fact that one already exists.
+
 ---
 
 ## Walkthrough — why `lookupCell` is a parameter, not a closure over `cells.value`
@@ -260,7 +268,14 @@ const result = evaluate(parseResult.ast, mockLookup)
 // No Vue, no cells ref, no reactive system needed
 ```
 
-This is a general principle: separate the computation from the data source. `evaluate` is the computation; the caller provides the data source.
+This is a general principle: separate the computation from the data source. `evaluate` is the computation; the caller provides the data source. This pattern has a real, named title — **dependency injection**: instead of a function reaching out and grabbing what it depends on (`cells.value`, found by closing over it), the dependency (`lookupCell`) is handed in from outside, as a parameter. The function that receives an injected dependency doesn't need to know how to construct it, only how to use it.
+
+*Recognized elsewhere:* dependency injection is a cornerstone pattern across
+professional software — Angular's and NestJS's entire architecture is built around
+it; testing frameworks in every language lean on it to substitute real databases and
+network calls with fakes during tests; even this project's own `useSpreadsheet()`
+composable in Lesson 12 is a lighter-weight version of the same idea, handing
+components what they depend on rather than letting them reach for it directly.
 
 ---
 
@@ -317,6 +332,8 @@ Click ▶ Run and verify:
 - [ ] A formula referencing a text cell (`=A1` where A1 contains `"hello"`) returns `0`
 - [ ] You can explain why `lookupCell` is a parameter to `evaluate` rather than a closure over `cells.value`
 - [ ] You can explain what happens with `=A1` in A1 (circular reference) and why lesson 10 is needed
+- [ ] You can explain the difference between direct and mutual recursion, using `evaluate`/`lookupCell` as the example
+- [ ] You can explain why this project already has a dependency graph before Lesson 10 ever names it
 
 ---
 

@@ -74,6 +74,16 @@ Primary
 
 This lesson builds everything here. Lesson 09 extends `Primary` to include cell references.
 
+**Writing the grammar before writing a single line of parser code is a real,
+deliberate Agile practice, not a contradiction of it.** Agile is often
+misread as "skip design, start coding" — it isn't; it specifically warns against
+**BDUF (Big Design Up Front)**, exhaustively designing an entire system before
+building any of it. Sketching five grammar rules for exactly the arithmetic this
+project needs *right now* — not a grammar for every spreadsheet function that might
+ever exist — is the opposite failure mode avoided: just enough design to code with
+confidence, scoped tightly to this lesson's slice, thrown away and redone the moment
+reality (Lesson 09's cell references) demands more.
+
 **Each rule becomes exactly one function.** `parseAddition`, `parseMultiplication`, `parseUnary`, `parsePrimary`, `parseExpression` — one function per grammar rule. This is recursive descent: the grammar is not converted into any other structure. It is translated, rule by rule, directly into function calls.
 
 **Precedence through delegation:** `parseAddition` never looks at `*` or `/` directly. For each operand, it delegates to `parseMultiplication`, which handles every `*` and `/` before returning. By the time `parseAddition` sees a `+` or `-`, any multiplication touching its operands has already been fully resolved. The order of delegation — `parseAddition` calls `parseMultiplication`, which calls `parseUnary`, which calls `parsePrimary` — is the entire mechanism. Higher precedence = deeper in the call stack = resolved first.
@@ -272,7 +282,22 @@ function parse(tokens: Token[]): ParseResult {
 }
 ```
 
-**Walkthrough — `peek()` and `advance()`:**
+**Walkthrough — functions defined inside another function, and why that's what makes this work:**
+
+`peek`, `advance`, `parsePrimary`, `parseUnary`, `parseMultiplication`, `parseAddition`,
+and `parseExpression` are all declared *inside* `parse`'s body — a **nested
+function**. This is not just organization; it's what lets every one of these
+functions read and write the single `position` variable declared at the top of
+`parse`, without `position` ever being passed as a parameter or returned anywhere. A
+function defined inside another function keeps access to that outer function's
+variables even while it runs — this is a **closure**, the same underlying mechanism
+Lesson 02's closure-in-loop throwaway demonstrated with `var` and `let`, applied here
+deliberately and usefully rather than as a bug to avoid. Every nested function here
+closes over the *same* `position`, so `advance()` incrementing it is immediately
+visible to `peek()`'s next call, and to every parsing function above it on the call
+stack — one shared piece of state, safely contained inside `parse` and invisible to
+anything outside it (nothing outside `parse` can read or corrupt `position` directly,
+because `position` doesn't exist as a name anywhere outside `parse`'s body).
 
 These two inner functions are the parser's only way to read tokens. `peek()` returns the token at `position` without moving — typed as `Token | undefined` because `tokens[position]` genuinely returns `undefined` once `position` runs past the end. `advance()` reads the current token AND increments `position`. Every parsing function uses one or both; neither one reads or writes `position` directly.
 
@@ -314,6 +339,22 @@ Back in `parseAddition`, `left` is `10`. The next token is `+`. The loop body ru
 Every inner function (`parsePrimary`, `parseUnary`, etc.) throws a plain `Error` when something is wrong. They do not know about `ParseResult`. Each function only focuses on its own grammar rule.
 
 The `try/catch` inside `parse` is the one place that converts a thrown error into a typed `{ success: false, error: { message } }`. This is a deliberate boundary: threading `ParseResult` through every recursive call individually — checking failure at every step — would make each function harder to read for little benefit. One boundary at the top catches everything.
+
+**Walkthrough — `catch (error)` and `error instanceof Error`:**
+
+Unlike lesson 06's bare `catch { ... }`, this `catch (error)` names its caught value —
+`error` here holds whatever was thrown, which TypeScript can only assume is `unknown`
+(literally anything can be thrown in JavaScript, including a plain string or number,
+not just a real `Error` object). `instanceof` is an operator that checks whether a
+value was constructed from a specific class — `error instanceof Error` asks "is this
+value genuinely an `Error` object?" If the answer is `true`, TypeScript narrows
+`error`'s type to `Error` for the rest of that branch, making `.message` safe to
+read (every real `Error` has a `.message` string). The `? :` that follows is a
+**ternary expression** — a compact `if/else` that produces a value rather than
+running a statement: `condition ? valueIfTrue : valueIfFalse`. `error instanceof
+Error ? error.message : String(error)` reads as "if this is a real Error, use its
+message; otherwise, force whatever was thrown into a string some other way" — a
+defensive fallback for the rare case something other than a proper `Error` was thrown.
 
 **Walkthrough — `ParseResult` is also a discriminated union:**
 

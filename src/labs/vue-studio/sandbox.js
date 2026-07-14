@@ -157,6 +157,40 @@ function rewriteImports(code, importer, moduleMap) {
     })
 }
 
+// Local (non-'vue') import specifiers a compiled file depends on, resolved to
+// absolute paths — used to order blob-URL creation by actual dependency edges
+// rather than by path depth (two files at the same depth can still import
+// each other, e.g. a component importing a same-level composable).
+function extractLocalDeps(code, importer) {
+  const deps = []
+  const re = /from\\s+['"]([^'"]+\\.(vue|ts|js))['"]/g
+  let m
+  while ((m = re.exec(code))) deps.push(resolvePath(m[1], importer))
+  return deps
+}
+
+// Topological sort (post-order DFS): each file is only pushed after all of
+// its local dependencies, so their blob URLs already exist in moduleMap by
+// the time this file's imports are rewritten. Falls back gracefully on
+// cycles (rare for lesson code) by breaking the cycle at the revisit point.
+function topoSortByDeps(compiled) {
+  const order = []
+  const visited = new Set()
+  const visiting = new Set()
+  function visit(filename) {
+    if (visited.has(filename) || visiting.has(filename) || !compiled[filename]) return
+    visiting.add(filename)
+    for (const dep of extractLocalDeps(compiled[filename].code, filename)) {
+      visit(dep)
+    }
+    visiting.delete(filename)
+    visited.add(filename)
+    order.push(filename)
+  }
+  for (const filename of Object.keys(compiled)) visit(filename)
+  return order
+}
+
 // Sucrase: proper TypeScript stripping (loaded lazily on first Run)
 let _sucraseTransform = null
 async function getStripTS() {
@@ -257,12 +291,12 @@ async function run(files) {
   }
 
   // Phase 2: create blob URLs.
-  // Sort deeper paths first (src/components/X.vue before src/App.vue) so that
-  // leaf modules are in the map before their importers are rewritten.
+  // Order by actual import dependencies (topological sort) so that every
+  // leaf module already has a blob URL in moduleMap before the files that
+  // import it get their imports rewritten — this holds regardless of path
+  // depth, including two files at the same depth importing each other.
   const moduleMap = {}
-  const depthSorted = Object.keys(compiled).sort(
-    (a, b) => b.split('/').length - a.split('/').length
-  )
+  const depthSorted = topoSortByDeps(compiled)
 
   for (const filename of depthSorted) {
     const { code, styles } = compiled[filename]

@@ -35,22 +35,22 @@ function savePanelState(patch) {
 
 // ── Series picker ────────────────────────────────────────────────────────────
 
-function SeriesList({ onSelect, onBack }) {
+function SeriesList({ onSelect, onBack, ui }) {
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-slate-800/60 flex items-center gap-2 flex-shrink-0">
+      <div className={`px-4 py-3 border-b ${ui.border} flex items-center gap-2 flex-shrink-0`}>
         <button
           onClick={onBack}
-          className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+          className={`text-xs ${ui.txt2} ${ui.hoverTx} transition-colors`}
         >
           ← Labs
         </button>
-        <span className="text-slate-600 text-xs">·</span>
-        <span className="text-xs font-semibold text-emerald-400">Vue Studio</span>
+        <span className={`${ui.txt2} text-xs`}>·</span>
+        <span className={`text-xs font-semibold ${ui.primary}`}>Vue Studio</span>
       </div>
 
       <div className="px-4 pt-4 pb-2 flex-shrink-0">
-        <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Lesson Series</h2>
+        <h2 className={`text-[10px] font-bold uppercase tracking-widest ${ui.txt2}`}>Lesson Series</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto px-3 pb-4">
@@ -59,16 +59,16 @@ function SeriesList({ onSelect, onBack }) {
             <button
               key={s.id}
               onClick={() => onSelect(s.id)}
-              className="w-full text-left p-3 rounded-xl bg-slate-800/40 hover:bg-slate-700/50 border border-slate-700/40 hover:border-emerald-800/60 transition-all group"
+              className={`w-full text-left p-3 rounded-xl ${ui.bg1} ${ui.hoverBg} border ${ui.border} transition-all group`}
             >
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-base">{s.emoji}</span>
-                <span className="text-sm font-semibold text-slate-100 group-hover:text-emerald-300 transition-colors leading-tight">
+                <span className={`text-sm font-semibold ${ui.txt1} transition-colors leading-tight`}>
                   {s.label}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-snug ml-6">{s.sublabel}</p>
-              <p className="text-[10px] text-slate-600 mt-1 ml-6">{s.lessons.length} lessons</p>
+              <p className={`text-[11px] ${ui.txt2} leading-snug ml-6`}>{s.sublabel}</p>
+              <p className={`text-[10px] ${ui.txt2} mt-1 ml-6 opacity-70`}>{s.lessons.length} lessons</p>
             </button>
           ))}
         </div>
@@ -79,18 +79,18 @@ function SeriesList({ onSelect, onBack }) {
 
 // ── Lesson list for one series ───────────────────────────────────────────────
 
-function LessonList({ series, activeLessonIdx, onSelect, onBack }) {
+function LessonList({ series, activeLessonIdx, onSelect, onBack, ui }) {
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-slate-800/60 flex items-center gap-2 flex-shrink-0">
+      <div className={`px-4 py-3 border-b ${ui.border} flex items-center gap-2 flex-shrink-0`}>
         <button
           onClick={onBack}
-          className="text-xs text-slate-400 hover:text-emerald-400 transition-colors"
+          className={`text-xs ${ui.txt2} ${ui.hoverTx} transition-colors`}
         >
           ← Series
         </button>
-        <span className="text-slate-600 text-xs">·</span>
-        <span className="text-xs font-semibold text-slate-300 truncate">{series.label}</span>
+        <span className={`${ui.txt2} text-xs`}>·</span>
+        <span className={`text-xs font-semibold ${ui.txt1} truncate`}>{series.label}</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 pb-4 pt-2">
@@ -103,15 +103,15 @@ function LessonList({ series, activeLessonIdx, onSelect, onBack }) {
                 onClick={() => onSelect(i)}
                 className={`w-full text-left flex items-start gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   isActive
-                    ? 'bg-emerald-900/40 text-emerald-300'
-                    : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                    ? `${ui.primaryBg} ${ui.primary}`
+                    : `${ui.txt2} ${ui.hoverBg} ${ui.hoverTx}`
                 }`}
               >
-                <span className={`text-xs w-5 shrink-0 text-right mt-0.5 font-mono ${isActive ? 'text-emerald-500' : 'text-slate-600'}`}>
+                <span className={`text-xs w-5 shrink-0 text-right mt-0.5 font-mono ${isActive ? ui.primary : ui.txt2}`}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <span className="flex-1 leading-snug">{lesson.title}</span>
-                {isActive && <span className="text-emerald-500 text-xs shrink-0 mt-0.5">●</span>}
+                {isActive && <span className={`${ui.primary} text-xs shrink-0 mt-0.5`}>●</span>}
               </button>
             )
           })}
@@ -123,15 +123,15 @@ function LessonList({ series, activeLessonIdx, onSelect, onBack }) {
 
 // ── Lesson content view ──────────────────────────────────────────────────────
 
-function LessonView({ lesson, lessons, lessonIndex, seriesLabel, onBackToList, onSelectLesson }) {
+function LessonView({ lesson, lessons, lessonIndex, seriesLabel, onBackToList, onSelectLesson, ui }) {
   const nextLesson = lessonIndex < lessons.length - 1 ? lessons[lessonIndex + 1] : null
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-slate-800/60 flex items-center gap-2 flex-shrink-0">
+      <div className={`px-4 py-3 border-b ${ui.border} flex items-center gap-2 flex-shrink-0`}>
         <button
           onClick={onBackToList}
-          className="text-xs text-slate-400 hover:text-emerald-400 transition-colors flex items-center gap-1"
+          className={`text-xs ${ui.txt2} ${ui.hoverTx} transition-colors flex items-center gap-1`}
         >
           ← {seriesLabel}
         </button>
@@ -140,17 +140,17 @@ function LessonView({ lesson, lessons, lessonIndex, seriesLabel, onBackToList, o
       <div className="flex-1 overflow-y-auto px-6 py-5" style={{ userSelect: 'text', cursor: 'text' }}>
         <BlogPost content={lesson.content} />
 
-        <div className="mt-10 pt-6 border-t border-slate-700/50 flex items-center justify-between">
+        <div className={`mt-10 pt-6 border-t ${ui.border} flex items-center justify-between`}>
           <button
             onClick={onBackToList}
-            className="text-sm text-slate-400 hover:text-emerald-400 transition-colors"
+            className={`text-sm ${ui.txt2} ${ui.hoverTx} transition-colors`}
           >
             ← All lessons
           </button>
           {nextLesson && (
             <button
               onClick={() => onSelectLesson(lessonIndex + 1)}
-              className="flex items-center gap-1.5 text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+              className={`flex items-center gap-1.5 text-sm font-semibold ${ui.primary} transition-colors`}
             >
               {nextLesson.title} →
             </button>
@@ -163,7 +163,7 @@ function LessonView({ lesson, lessons, lessonIndex, seriesLabel, onBackToList, o
 
 // ── Root panel ───────────────────────────────────────────────────────────────
 
-export default function LessonPanel({ milestoneIdx, onSelectMilestone, onBack }) {
+export default function LessonPanel({ milestoneIdx, onSelectMilestone, onBack, ui }) {
   // Restore navigation state from last session
   const saved = loadPanelState()
 
@@ -210,9 +210,9 @@ export default function LessonPanel({ milestoneIdx, onSelectMilestone, onBack })
   const activeLessonHighlight = seriesId === 'intro' ? milestoneIdx : lessonIdx
 
   return (
-    <div ref={scrollRef} className="h-full overflow-y-auto bg-[#0f1729] text-slate-100">
+    <div ref={scrollRef} className={`h-full overflow-y-auto ${ui.bg0} ${ui.txt1}`}>
       {view === 'series' && (
-        <SeriesList onSelect={selectSeries} onBack={onBack} />
+        <SeriesList onSelect={selectSeries} onBack={onBack} ui={ui} />
       )}
 
       {view === 'list' && activeSeries && (
@@ -221,6 +221,7 @@ export default function LessonPanel({ milestoneIdx, onSelectMilestone, onBack })
           activeLessonIdx={activeLessonHighlight}
           onSelect={openLesson}
           onBack={backToSeries}
+          ui={ui}
         />
       )}
 
@@ -232,6 +233,7 @@ export default function LessonPanel({ milestoneIdx, onSelectMilestone, onBack })
           seriesLabel={activeSeries.label}
           onBackToList={backToList}
           onSelectLesson={openLesson}
+          ui={ui}
         />
       )}
     </div>

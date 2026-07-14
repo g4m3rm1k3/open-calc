@@ -152,6 +152,29 @@ function tokenize(expr: string): Token[] {
 }
 ```
 
+**Three pieces of syntax used above for the first time in this series, explained before the walkthrough:**
+
+**`while (condition) { ... }`** is a **loop**: unlike `if`, which runs its block at
+most once, `while` re-checks `condition` after every pass through the block and keeps
+running the block again for as long as `condition` stays `true`. `while (position <
+expr.length)` reads directly: "keep going as long as there are still characters left
+to look at." The loop body is responsible for eventually making the condition false
+(here, by incrementing `position`) — a `while` loop whose body never changes anything
+the condition depends on runs forever, which is a real, common bug called an
+**infinite loop**.
+
+**`tokens.push(...)`** is a built-in array method that appends one new item to the
+*end* of an array, growing its length by one, and modifies the array in place (unlike
+`.slice()` from Lesson 05, which returns a new value and leaves the original
+untouched). `tokens.push({ type: 'operator', value: character })` adds one more token
+to the list being built up as the scan proceeds.
+
+**`continue`** immediately jumps back to the loop's condition check, skipping
+whatever code comes after it in the current pass through the body. `if (character
+=== ' ') { position++; continue }` means: if this character is a space, advance past
+it and go straight to checking the next character — none of the `if` checks below it
+(digit, letter, operator) run for a character already known to be whitespace.
+
 **Before reading the walkthrough, run this to see the tokenizer in action:**
 
 ```vue
@@ -238,6 +261,36 @@ Whitespace is skipped — `position++` with nothing pushed — so `A1 + B2` and 
 A digit does not necessarily mean a one-digit number. `"52"` must become the single token `{ type: 'number', value: 52 }`, not two tokens `5` and `2`. The inner `while` loop keeps consuming characters — digits and a decimal point for numbers like `3.14` — for as long as they keep being part of the same number, accumulating `numberText` as a string before converting the whole thing to a real number once at the end.
 
 Cell references work the same way: one uppercase letter, then as many following digits as exist. `"A1"`, `"B12"`, `"F10"` each become one `{ type: 'cell' }` token.
+
+**Execution trace — `tokenize("A1+52")`, position by position:**
+
+```
+position 0: expr[0] = 'A'  → isUppercaseLetter → start scanning a cell name
+     inner loop: expr[1] = '1' is a digit → cellName = "A1", position → 2
+     expr[2] = '+' is not a digit → stop inner loop
+     push { type: 'cell', name: 'A1' }
+     ↓
+position 2: expr[2] = '+' → operator
+     push { type: 'operator', value: '+' }, position → 3
+     ↓
+position 3: expr[3] = '5' → isDigit → start scanning a number
+     inner loop: expr[4] = '2' is a digit → numberText = "52", position → 5
+     position 5 === expr.length → stop inner loop
+     push { type: 'number', value: 52 }
+     ↓
+position 5 === expr.length → outer while ends
+     ↓
+tokenize returns [
+  { type: 'cell', name: 'A1' },
+  { type: 'operator', value: '+' },
+  { type: 'number', value: 52 },
+]
+```
+
+Notice `position` advances by more than one on two of the three tokens — the outer
+`while`'s single step and the inner `while`'s multi-character accumulation are two
+different loops working together, exactly as the two separate `while` blocks in the
+code suggest.
 
 **Walkthrough — the `throw`:**
 
@@ -566,6 +619,32 @@ Click ▶ Run. Type `=A1+B2*5` into any cell and press Enter. Click that cell �
 
 ---
 
+## The Design lens — why the debug panel is deliberately not styled like the grid
+
+The debug panel is dark (`background: #0f172a`) against the grid's light, neutral
+background — the opposite of every other surface in this project so far. This is not
+inconsistency; it is the opposite design principle applied on purpose. **Visual
+hierarchy through contrast**: the debug panel is diagnostic information *about* the
+spreadsheet, not part of the spreadsheet itself, and giving it a completely different
+visual language — dark background, monospace type, uppercase small labels — signals
+"this is a different kind of surface, read it differently" before a user reads a
+single word of it. If the debug panel used the same white background and system font
+as the grid, a user's eye would have no fast way to tell "spreadsheet data" from
+"tool output" apart, and would have to read carefully to find the boundary every time.
+
+`font-family: monospace` on the token output specifically (rather than inheriting the
+grid's `system-ui`) is a second, smaller instance of the same idea: monospace type is
+the typographic convention for "this is code or data, not prose" — every code editor,
+terminal, and JSON viewer uses it for the same reason. Reusing that convention here
+costs nothing and tells a technically-minded user what kind of content they're
+looking at before they've parsed a single character of it.
+
+*Recognized elsewhere:* browser DevTools' own console and network panels use this
+identical dark-panel-against-light-page convention, for the identical reason — tool
+output kept visually distinct from the page it's inspecting.
+
+---
+
 ## Walkthrough — why `computed` vs calling a function from two places
 
 In the HTML Lab version:
@@ -614,6 +693,18 @@ try {
   return null
 }
 ```
+
+**What `try`/`catch` actually does, mechanically:** code inside a `try` block runs
+normally, line by line — until something inside it `throw`s (as `tokenize` already
+does, for an unrecognised character). The instant a `throw` happens, normal execution
+stops immediately: no more lines in `try` run, and control jumps straight to the
+matching `catch` block, skipping everything in between, however deeply nested inside
+function calls the `throw` happened. This works even though `tokenize` is called from
+inside the `computed`, several function calls away from the `try` itself — a `throw`
+keeps unwinding outward through every function call until it finds a `try/catch`
+somewhere in that chain, or, if it never finds one, crashes the program. `catch` here
+has no parameter (`catch { ... }`, no `catch (error) { ... }`) because this specific
+handler doesn't need to know *what* went wrong, only *that* something did.
 
 `tokenize` throws for unrecognised characters (lowercase letters, stray symbols). Inside a `computed`, an uncaught throw produces a Vue error and leaves the computed in a broken state. The `try/catch` handles the error gracefully — an invalid formula shows `null` (the panel says "select a formula cell...") instead of crashing the component.
 

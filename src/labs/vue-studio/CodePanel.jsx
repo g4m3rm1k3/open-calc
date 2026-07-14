@@ -4,6 +4,7 @@ import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import { registerVueHoverProviders } from './hoverProviders.js'
 import { registerVueLanguage, VUE_LANG } from './vueLanguage.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
+import { useThemeColors } from '../../hooks/useThemeColors.js'
 
 function extToLang(filename) {
   if (filename.endsWith('.vue'))  return VUE_LANG
@@ -18,10 +19,11 @@ function extToLang(filename) {
 export default function CodePanel({
   files, activeFile, onActiveFileChange, onFileChange,
   onDeleteFile, onNewFile, onRun, onResetFiles, onLoadSolution,
-  demos = [], onLoadDemo, activeDemo, onClearDemo, isDark,
+  demos = [], onLoadDemo, activeDemo, onClearDemo,
   reactiveHistory,
 }) {
   const { themeStyles } = useGlobalTheme()
+  const C = useThemeColors()
   const editorRef        = useRef(null)
   const monacoRef        = useRef(null)
   const hoverDisposables = useRef([])
@@ -139,14 +141,14 @@ export default function CodePanel({
     onLoadSolution?.()
   }, [confirmSolution, onLoadSolution])
 
-  const bg     = isDark ? '#0f172a' : '#ffffff'
-  const border = isDark ? '#1e293b' : '#e2e8f0'
-  const tab    = isDark ? '#1e293b' : '#f1f5f9'
-  const tabAct = isDark ? '#0f172a' : '#ffffff'
-  const text   = isDark ? '#e2e8f0' : '#1e293b'
-  const muted  = isDark ? '#475569' : '#94a3b8'
-  const accent = '#10b981'
-  const danger = '#ef4444'
+  const bg     = C.surface
+  const border = C.border
+  const tab    = C.surface2
+  const tabAct = C.surface
+  const text   = C.text
+  const muted  = C.muted
+  const accent = C.blue
+  const danger = C.red
 
   const fileNames  = Object.keys(files)
   const canDelete  = fileNames.length > 1
@@ -215,7 +217,7 @@ export default function CodePanel({
                     transition: 'opacity 0.1s, color 0.1s',
                     flexShrink: 0,
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.color = danger; e.currentTarget.style.background = isDark ? '#2d1414' : '#fee2e2' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = danger; e.currentTarget.style.background = C.redBg }}
                   onMouseLeave={e => { e.currentTarget.style.color = muted;  e.currentTarget.style.background = 'none' }}
                 >
                   ✕
@@ -239,7 +241,7 @@ export default function CodePanel({
               onBlur={commitNewFile}
               style={{
                 width: 140, padding: '4px 8px', fontSize: 12, fontFamily: 'monospace',
-                background: isDark ? '#1e293b' : '#fff', color: text,
+                background: C.surface, color: text,
                 border: `1px solid ${accent}`, borderRadius: 4, outline: 'none', marginLeft: 4,
               }}
             />
@@ -261,9 +263,9 @@ export default function CodePanel({
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 5,
                 padding: '3px 8px', borderRadius: 4,
-                background: isDark ? '#1e3a1e' : '#dcfce7',
-                border: `1px solid ${isDark ? '#2d6a2d' : '#86efac'}`,
-                fontSize: 11, color: isDark ? '#86efac' : '#166534',
+                background: C.greenBg,
+                border: `1px solid ${C.greenBd}`,
+                fontSize: 11, color: C.green,
                 whiteSpace: 'nowrap',
               }}>
                 <span>📦 {activeDemo.label}</span>
@@ -287,7 +289,7 @@ export default function CodePanel({
             {pickerOpen && !activeDemo && (
               <div style={{
                 position: 'absolute', top: 'calc(100% + 4px)', right: 0,
-                background: isDark ? '#1e293b' : '#fff',
+                background: C.surface,
                 border: `1px solid ${border}`, borderRadius: 6,
                 boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
                 zIndex: 9999, minWidth: 200, overflow: 'hidden',
@@ -297,7 +299,7 @@ export default function CodePanel({
                     key={d.id}
                     onMouseDown={() => { onLoadDemo(d); setPickerOpen(false) }}
                     style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', border: 'none', background: 'none', color: text, fontSize: 12, cursor: 'pointer' }}
-                    onMouseEnter={e => e.currentTarget.style.background = isDark ? '#334155' : '#f1f5f9'}
+                    onMouseEnter={e => e.currentTarget.style.background = C.surface2}
                     onMouseLeave={e => e.currentTarget.style.background = 'none'}
                   >
                     <div style={{ fontWeight: 600, marginBottom: 2 }}>{d.label}</div>
@@ -340,7 +342,7 @@ export default function CodePanel({
       </div>
 
       {/* Bottom bar */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 12px', borderTop: `1px solid ${border}`, flexShrink: 0, background: isDark ? '#0c1426' : '#f8fafc', gap: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 12px', borderTop: `1px solid ${border}`, flexShrink: 0, background: C.surface2, gap: 8 }}>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
           <span style={{ fontSize: 11, color: muted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -353,7 +355,7 @@ export default function CodePanel({
             style={{
               padding: '2px 8px', fontSize: 10, borderRadius: 4, cursor: 'pointer', flexShrink: 0,
               border: `1px solid ${confirmReset ? danger : border}`,
-              background: confirmReset ? (isDark ? '#2d1414' : '#fee2e2') : 'none',
+              background: confirmReset ? C.redBg : 'none',
               color: confirmReset ? danger : muted,
               transition: 'all 0.15s',
             }}
@@ -367,9 +369,9 @@ export default function CodePanel({
               title="Load the reference solution for this lesson"
               style={{
                 padding: '2px 8px', fontSize: 10, borderRadius: 4, cursor: 'pointer', flexShrink: 0,
-                border: `1px solid ${confirmSolution ? '#f59e0b' : border}`,
-                background: confirmSolution ? (isDark ? '#1c1400' : '#fffbeb') : 'none',
-                color: confirmSolution ? '#f59e0b' : muted,
+                border: `1px solid ${confirmSolution ? C.amber : border}`,
+                background: confirmSolution ? C.amberBg : 'none',
+                color: confirmSolution ? C.amber : muted,
                 transition: 'all 0.15s',
               }}
             >

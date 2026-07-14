@@ -32,6 +32,8 @@ const cells = ref<Record<CellId, Cell>>({})
 
 `Cell` is a union of two object types. Each object has a `kind` field set to one exact string — `'number'` on the first, `'text'` on the second. This tag field is what makes the union **discriminated**: given any real `Cell`, checking `kind` tells you exactly which shape you have, and therefore exactly what `value` contains.
 
+**What a `switch` statement is, mechanically, before the type-narrowing trick built on top of it:** `switch (expression) { case value1: ...; case value2: ...; }` evaluates `expression` once, then compares the result against each `case`'s value in order, top to bottom, using strict equality (the same comparison `===` performs). The first matching `case`'s block runs; `return` (used in every case below) exits the function immediately, so execution never accidentally continues into the next case. A `switch` is not a new idea — it's equivalent to a chain of `if (expression === value1) { ... } else if (expression === value2) { ... }`, written in a form that reads more clearly when there are several exact values to compare against one thing, which is exactly this project's situation: comparing `cell.kind` against each of `Cell`'s tag strings.
+
 To understand what this gains you, try this throwaway:
 
 ```vue
@@ -102,6 +104,17 @@ function parseRawInput(rawInput: string): Cell {
 }
 ```
 
+**Walkthrough — `rawInput.trim()`:**
+
+`.trim()` is a built-in string method that returns a new string with whitespace
+(spaces, tabs, newlines) removed from both the start and the end — `'  42  '.trim()`
+is `'42'`. It does not touch whitespace in the middle: `'4 2'.trim()` is still
+`'4 2'`. This matters here because a user might type a trailing space by accident
+(`'42 '`); without trimming first, `Number('42 ')` still happens to work (`Number`
+tolerates surrounding whitespace), but the raw, untrimmed `rawInput` is what gets
+stored in the `'text'` fallback branch below — trimming only the copy used for the
+numeric *check* means `' 42 '` correctly becomes the number `42`, not text.
+
 **Before reading the walkthrough, run these to see what `Number()` does:**
 
 ```vue
@@ -127,6 +140,16 @@ const tests = [
 ```
 
 Click ▶ Run. Notice the `''` row: `Number('')` is `0`, not `NaN`. That is why `parseRawInput` checks `trimmed !== ''` before the `Number.isNaN` check — clearing a cell's text should produce empty text, not the number zero.
+
+**This table of surprising inputs is what Agile calls acceptance criteria.** Before
+`parseRawInput` was written, someone had to decide, explicitly, what "correct" means
+for every one of these edge cases: an empty string, a string with trailing garbage,
+whitespace. A real team writing this same feature as a sprint story would write these
+exact cases — `''`, `'12abc'`, `' 42 '` — into the story's acceptance criteria
+*before* writing the function, precisely so "is this done?" has a checkable answer
+instead of a feeling. `parseRawInput`'s two-line guard is not obvious in hindsight; it
+exists because someone enumerated the edge cases first, the same discipline this
+table just walked through.
 
 **Walkthrough — `Number()` vs `parseFloat()`:**
 

@@ -5,6 +5,7 @@ import CodePanel from './CodePanel.jsx'
 import RuntimePanel from './RuntimePanel.jsx'
 import { SANDBOX_HTML as SANDBOX_HTML_SRC } from './sandbox.js'
 import { useGlobalTheme } from '../../context/ThemeContext.jsx'
+import { useThemeColors } from '../../hooks/useThemeColors.js'
 import { SPACE_INVADERS } from './demos/space-invaders.js'
 
 const DEMOS = [SPACE_INVADERS]
@@ -56,7 +57,8 @@ function getInitialMilestoneIdx() {
 }
 
 export default function VueStudio({ onBack }) {
-  const { isDarkGlobal: isDark } = useGlobalTheme()
+  const { themeStyles } = useGlobalTheme()
+  const C = useThemeColors()
 
   // Persisted across sessions — user resumes the lesson they were on
   const [milestoneIdx, setMilestoneIdx] = useState(getInitialMilestoneIdx)
@@ -315,18 +317,14 @@ export default function VueStudio({ onBack }) {
     setActiveFile(filename)
   }, [files])
 
-  const bg = isDark ? '#0f172a' : '#f8fafc'
-  const border = isDark ? '#1e293b' : '#e2e8f0'
-  const dividerColor = isDark ? '#334155' : '#cbd5e1'
-
   return (
-    <div style={{ display: 'flex', height: '100vh', background: bg, color: isDark ? '#f1f5f9' : '#0f172a', fontFamily: 'system-ui, sans-serif', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: '100vh', background: C.bg, color: C.text, fontFamily: 'system-ui, sans-serif', overflow: 'hidden' }}>
 
       {/* Lesson panel */}
-      <div style={{ width: lessonW, flexShrink: 0, borderRight: `1px solid ${border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <LessonPanel milestoneIdx={milestoneIdx} onSelectMilestone={goToMilestone} onBack={onBack} isDark={isDark} />
+      <div style={{ width: lessonW, flexShrink: 0, borderRight: `1px solid ${C.border}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <LessonPanel milestoneIdx={milestoneIdx} onSelectMilestone={goToMilestone} onBack={onBack} ui={themeStyles.ui} />
       </div>
-      <div onMouseDown={startResize(setLessonW, () => lessonW)} style={{ width: 4, cursor: 'col-resize', background: dividerColor, flexShrink: 0, opacity: 0.5 }} />
+      <div onMouseDown={startResize(setLessonW, () => lessonW)} style={{ width: 4, cursor: 'col-resize', background: C.border, flexShrink: 0, opacity: 0.5 }} />
 
       {/* Middle column: editor (top) + visualization (bottom) */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -347,7 +345,6 @@ export default function VueStudio({ onBack }) {
             onLoadDemo={loadDemo}
             activeDemo={activeDemo}
             onClearDemo={clearDemo}
-            isDark={isDark}
             reactiveHistory={reactiveHistory}
           />
         </div>
@@ -355,18 +352,17 @@ export default function VueStudio({ onBack }) {
         {/* Vertical resize handle */}
         <div
           onMouseDown={startResize(setBottomH, () => bottomH, 'y', 120, 480, -1)}
-          style={{ height: 4, cursor: 'row-resize', background: dividerColor, flexShrink: 0, opacity: 0.5 }}
+          style={{ height: 4, cursor: 'row-resize', background: C.border, flexShrink: 0, opacity: 0.5 }}
         />
 
         {/* Bottom visualization panel */}
-        <div style={{ height: bottomH, flexShrink: 0, overflow: 'hidden', borderTop: `1px solid ${border}` }}>
+        <div style={{ height: bottomH, flexShrink: 0, overflow: 'hidden', borderTop: `1px solid ${C.border}` }}>
           <RuntimePanel
             logs={logs}
             componentTree={componentTree}
             reactiveHistory={reactiveHistory}
             execState={execState}
             onClearLogs={() => setLogs([])}
-            isDark={isDark}
             depGraph={depGraph}
             treeChanges={treeChanges}
             timeline={timeline}
@@ -378,11 +374,11 @@ export default function VueStudio({ onBack }) {
         </div>
       </div>
 
-      <div onMouseDown={startResize(setPreviewW, () => previewW, 'x', 280, 700, -1)} style={{ width: 4, cursor: 'col-resize', background: dividerColor, flexShrink: 0, opacity: 0.5 }} />
+      <div onMouseDown={startResize(setPreviewW, () => previewW, 'x', 280, 700, -1)} style={{ width: 4, cursor: 'col-resize', background: C.border, flexShrink: 0, opacity: 0.5 }} />
 
       {/* Live preview — full height, no tabs */}
-      <div style={{ width: previewW, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderLeft: `1px solid ${border}` }}>
-        <div style={{ padding: '4px 10px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: isDark ? '#475569' : '#94a3b8', borderBottom: `1px solid ${border}`, background: isDark ? '#0c1426' : '#f8fafc', flexShrink: 0 }}>
+      <div style={{ width: previewW, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderLeft: `1px solid ${C.border}` }}>
+        <div style={{ padding: '4px 10px', fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: C.hint, borderBottom: `1px solid ${C.border}`, background: C.surface2, flexShrink: 0 }}>
           Preview
         </div>
         <iframe

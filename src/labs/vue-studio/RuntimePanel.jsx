@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import { useThemeColors } from '../../hooks/useThemeColors.js'
 
 // ── Dependency Graph ──────────────────────────────────────────────────────────
 
-function DependencyGraph({ depGraph, activeFile, isDark }) {
+function DependencyGraph({ depGraph, activeFile, C }) {
   const { nodes, edges } = depGraph
-  const border = isDark ? '#1e293b' : '#e2e8f0'
-  const muted  = isDark ? '#64748b' : '#94a3b8'
-  const accent = '#10b981'
-  const nodeBg = isDark ? '#1e293b' : '#f1f5f9'
-  const text   = isDark ? '#e2e8f0' : '#1e293b'
+  const border = C.border
+  const muted  = C.muted
+  const accent = C.blue
+  const nodeBg = C.surface2
+  const text   = C.text
 
   if (nodes.length <= 1) {
     return <div style={{ padding: '10px 14px', fontSize: 11, color: muted, fontStyle: 'italic' }}>Add more files to see the dependency graph.</div>
@@ -68,7 +69,7 @@ function DependencyGraph({ depGraph, activeFile, isDark }) {
         return (
           <g key={n.id}>
             <rect x={p.x} y={p.y} width={nodeW} height={nodeH} rx={5}
-              fill={isActive ? (isDark ? '#022c22' : '#ecfdf5') : nodeBg}
+              fill={isActive ? C.blueBg : nodeBg}
               stroke={isActive ? accent : border} strokeWidth={isActive ? 1.5 : 1} />
             <text x={p.x + nodeW / 2} y={p.y + nodeH / 2 + 1} textAnchor="middle" dominantBaseline="middle"
               fontSize={10} fontFamily="monospace" fill={isActive ? accent : text} fontWeight={n.isEntry ? 700 : 400}>
@@ -84,15 +85,15 @@ function DependencyGraph({ depGraph, activeFile, isDark }) {
 
 // ── Reactive state ────────────────────────────────────────────────────────────
 
-function ReactiveRow({ name, value, prevValue, updateCount, changed, typeLabel, isDark }) {
+function ReactiveRow({ name, value, prevValue, updateCount, changed, typeLabel, C }) {
   const [highlighted, setHighlighted] = useState(false)
   const prevValueRef = useRef(value)
-  const text   = isDark ? '#e2e8f0' : '#1e293b'
-  const muted  = isDark ? '#64748b' : '#94a3b8'
-  const accent = '#10b981'
-  const flash  = isDark ? '#064e3b' : '#d1fae5'
-  const rowBg  = isDark ? '#0f172a' : '#f8fafc'
-  const border = isDark ? '#1e293b' : '#e2e8f0'
+  const text   = C.text
+  const muted  = C.muted
+  const accent = C.blue
+  const flash  = C.greenBg
+  const rowBg  = C.bg
+  const border = C.border
 
   useEffect(() => {
     if (prevValueRef.current !== value) {
@@ -126,8 +127,8 @@ function ReactiveRow({ name, value, prevValue, updateCount, changed, typeLabel, 
   )
 }
 
-function ReactiveState({ reactiveHistory, isDark }) {
-  const muted = isDark ? '#64748b' : '#94a3b8'
+function ReactiveState({ reactiveHistory, C }) {
+  const muted = C.muted
   if (!reactiveHistory?.size) {
     return <div style={{ padding: '10px 14px', fontSize: 11, color: muted, fontStyle: 'italic' }}>Run your code — reactive values appear here.</div>
   }
@@ -136,7 +137,7 @@ function ReactiveState({ reactiveHistory, isDark }) {
       {[...reactiveHistory.entries()].map(([key, { value, prevValue, updateCount }]) => {
         const changed = updateCount > 0 && String(value) !== String(prevValue)
         const typeLabel = Array.isArray(value) ? 'Array' : value === null ? 'null' : typeof value === 'object' ? 'Object' : typeof value === 'boolean' ? 'Boolean' : typeof value === 'number' ? 'Number' : 'String'
-        return <ReactiveRow key={key} name={key} value={value} prevValue={prevValue} updateCount={updateCount} changed={changed} typeLabel={typeLabel} isDark={isDark} />
+        return <ReactiveRow key={key} name={key} value={value} prevValue={prevValue} updateCount={updateCount} changed={changed} typeLabel={typeLabel} C={C} />
       })}
     </div>
   )
@@ -227,13 +228,13 @@ function generateStepExplanation(stepId, { reactiveHistory, componentTree, parse
   }
 }
 
-function ExecutionFlow({ execState, hasRun, reactiveHistory, componentTree, parsed, lastClick, isDark }) {
+function ExecutionFlow({ execState, hasRun, reactiveHistory, componentTree, parsed, lastClick, C }) {
   const [openStep, setOpenStep] = useState(null)
-  const muted    = isDark ? '#334155' : '#cbd5e1'
-  const accent   = '#10b981'
-  const border   = isDark ? '#1e293b' : '#e2e8f0'
-  const cardBg   = isDark ? '#0a1628' : '#f0fdf4'
-  const cardText = isDark ? '#cbd5e1' : '#374151'
+  const muted    = C.hint
+  const accent   = C.blue
+  const border   = C.border
+  const cardBg   = C.greenBg
+  const cardText = C.text
 
   const displayState = execState ?? (hasRun ? 'done' : null)
   if (!displayState) return null
@@ -253,9 +254,9 @@ function ExecutionFlow({ execState, hasRun, reactiveHistory, componentTree, pars
                 title="Click for explanation"
                 style={{
                   padding: '3px 7px', borderRadius: 4, fontSize: 10, fontFamily: 'monospace',
-                  border: `1px solid ${selected ? '#f59e0b' : active ? accent : muted}`,
-                  color: selected ? '#f59e0b' : active ? accent : muted,
-                  background: selected ? (isDark ? '#1c1400' : '#fffbeb') : active ? (isDark ? '#022c22' : '#ecfdf5') : 'transparent',
+                  border: `1px solid ${selected ? C.amber : active ? accent : muted}`,
+                  color: selected ? C.amber : active ? accent : muted,
+                  background: selected ? C.amberBg : active ? C.blueBg : 'transparent',
                   transition: 'all 0.15s', cursor: 'pointer', outline: 'none', whiteSpace: 'nowrap',
                 }}>
                 {step.label}
@@ -268,7 +269,7 @@ function ExecutionFlow({ execState, hasRun, reactiveHistory, componentTree, pars
         })}
       </div>
       {explanation && (
-        <div style={{ margin: '0 14px 8px', padding: '8px 12px', background: cardBg, border: `1px solid ${isDark ? '#1e3a1e' : '#bbf7d0'}`, borderRadius: 6, fontSize: 11, color: cardText, lineHeight: 1.7 }}>
+        <div style={{ margin: '0 14px 8px', padding: '8px 12px', background: cardBg, border: `1px solid ${C.greenBd}`, borderRadius: 6, fontSize: 11, color: cardText, lineHeight: 1.7 }}>
           <span style={{ fontWeight: 700, color: accent, marginRight: 6 }}>{PIPELINE_STEPS.find(s => s.id === openStep)?.label}</span>
           {explanation}
         </div>
@@ -307,7 +308,7 @@ function buildTutorEntry(execState, reactiveHistory, componentTree) {
   return null
 }
 
-function TutorLog({ execState, reactiveHistory, componentTree, isDark }) {
+function TutorLog({ execState, reactiveHistory, componentTree, C }) {
   const [log, setLog] = useState([])
   const scrollRef = useRef(null)
   const lastKeyRef = useRef(null)
@@ -325,10 +326,10 @@ function TutorLog({ execState, reactiveHistory, componentTree, isDark }) {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
   }, [log])
 
-  const border = isDark ? '#1e293b' : '#e2e8f0'
-  const muted  = isDark ? '#64748b' : '#94a3b8'
-  const text   = isDark ? '#cbd5e1' : '#374151'
-  const tagColors = { Interaction: '#60a5fa', Handler: '#a78bfa', State: '#f59e0b', DOM: '#10b981', Mounted: '#10b981' }
+  const border = C.border
+  const muted  = C.muted
+  const text   = C.text
+  const tagColors = { Interaction: C.blue, Handler: C.purple, State: C.amber, DOM: C.green, Mounted: C.green }
 
   if (!log.length) {
     return <div style={{ padding: '10px 14px', fontSize: 11, color: muted, fontStyle: 'italic' }}>Run your code and interact with the preview — I\'ll explain what Vue does at each step.</div>
@@ -350,21 +351,24 @@ function TutorLog({ execState, reactiveHistory, componentTree, isDark }) {
 
 // ── Log colors ────────────────────────────────────────────────────────────────
 
-const LOG_COLORS = {
-  log:   { dark: '#94a3b8', light: '#475569' },
-  warn:  { dark: '#fbbf24', light: '#d97706' },
-  error: { dark: '#f87171', light: '#dc2626' },
-  info:  { dark: '#60a5fa', light: '#2563eb' },
+// Semantic per-level colors, theme-reactive via C (useThemeColors) rather
+// than a fixed light/dark pair — log follows the muted text tone, the rest
+// are the deliberately theme-invariant status colors from useThemeColors.
+function logColor(level, C) {
+  if (level === 'warn')  return C.amber
+  if (level === 'error') return C.red
+  if (level === 'info')  return C.blue
+  return C.muted
 }
 
 // ── Component tree ────────────────────────────────────────────────────────────
 
-function TreeNode({ node, isDark, depth = 0, changes = new Set(), path = '' }) {
+function TreeNode({ node, C, depth = 0, changes = new Set(), path = '' }) {
   const [open, setOpen] = useState(true)
-  const text   = isDark ? '#e2e8f0' : '#1e293b'
-  const muted  = isDark ? '#64748b' : '#94a3b8'
-  const accent = '#10b981'
-  const dataBg = isDark ? '#0f172a' : '#ecfdf5'
+  const text   = C.text
+  const muted  = C.muted
+  const accent = C.blue
+  const dataBg = C.bg
   const nodePath = path || node.name
   const didChange = changes.has(nodePath)
   const hasChildren = node.children?.length > 0
@@ -375,7 +379,7 @@ function TreeNode({ node, isDark, depth = 0, changes = new Set(), path = '' }) {
       <div onClick={() => (hasChildren || hasData) && setOpen(o => !o)}
         style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 0', cursor: (hasChildren || hasData) ? 'pointer' : 'default' }}>
         <span style={{ fontSize: 10, color: muted, width: 10 }}>{(hasChildren || hasData) ? (open ? '▾' : '▸') : '·'}</span>
-        <span style={{ fontSize: 12, fontFamily: 'monospace', fontWeight: 600, color: didChange ? '#f59e0b' : accent, background: didChange ? (isDark ? '#1c1400' : '#fffbeb') : 'transparent', padding: didChange ? '0 4px' : 0, borderRadius: 3, transition: 'all 0.3s' }}>
+        <span style={{ fontSize: 12, fontFamily: 'monospace', fontWeight: 600, color: didChange ? C.amber : accent, background: didChange ? C.amberBg : 'transparent', padding: didChange ? '0 4px' : 0, borderRadius: 3, transition: 'all 0.3s' }}>
           &lt;{node.name}&gt;{didChange && <span style={{ fontSize: 9, marginLeft: 4, opacity: 0.7 }}>updated</span>}
         </span>
       </div>
@@ -388,7 +392,7 @@ function TreeNode({ node, isDark, depth = 0, changes = new Set(), path = '' }) {
             </div>
           ))}
           {hasChildren && node.children.map((child, i) => (
-            <TreeNode key={i} node={child} isDark={isDark} depth={depth + 1} changes={changes} path={`${nodePath}/${child.name}:${i}`} />
+            <TreeNode key={i} node={child} C={C} depth={depth + 1} changes={changes} path={`${nodePath}/${child.name}:${i}`} />
           ))}
         </div>
       )}
@@ -400,17 +404,18 @@ function TreeNode({ node, isDark, depth = 0, changes = new Set(), path = '' }) {
 
 export default function RuntimePanel({
   logs, componentTree, reactiveHistory, execState,
-  onClearLogs, isDark,
+  onClearLogs,
   depGraph, treeChanges, timeline,
   milestone, files, activeFile, lastClick,
 }) {
   const [activeTab, setActiveTab] = useState('tutor')
+  const C = useThemeColors()
 
-  const bg     = isDark ? '#0f172a' : '#ffffff'
-  const border = isDark ? '#1e293b' : '#e2e8f0'
-  const muted  = isDark ? '#64748b' : '#94a3b8'
-  const accent = '#10b981'
-  const tabBg  = isDark ? '#0c1426' : '#f1f5f9'
+  const bg     = C.surface
+  const border = C.border
+  const muted  = C.muted
+  const accent = C.blue
+  const tabBg  = C.surface2
 
   const parsed = useMemo(() => parseVueFile(files?.[activeFile] ?? ''), [files, activeFile])
   const hasRun = timeline.length > 0 || !!componentTree
@@ -436,7 +441,7 @@ export default function RuntimePanel({
         componentTree={componentTree}
         parsed={parsed}
         lastClick={lastClick}
-        isDark={isDark}
+        C={C}
       />
 
       {/* Tab bar */}
@@ -452,7 +457,7 @@ export default function RuntimePanel({
         ))}
         <div style={{ flex: 1 }} />
         {/* Status */}
-        <span style={{ fontSize: 10, color: hasErrors ? LOG_COLORS.error[isDark ? 'dark' : 'light'] : componentTree ? accent : muted, alignSelf: 'center', paddingRight: 12 }}>
+        <span style={{ fontSize: 10, color: hasErrors ? C.red : componentTree ? accent : muted, alignSelf: 'center', paddingRight: 12 }}>
           {hasErrors ? `✕ ${errorCount} error${errorCount !== 1 ? 's' : ''}` : componentTree ? '● Live' : 'Run to start'}
         </span>
       </div>
@@ -460,20 +465,20 @@ export default function RuntimePanel({
       {/* Tab content */}
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
         {activeTab === 'tutor' && (
-          <TutorLog execState={execState} reactiveHistory={reactiveHistory} componentTree={componentTree} isDark={isDark} />
+          <TutorLog execState={execState} reactiveHistory={reactiveHistory} componentTree={componentTree} C={C} />
         )}
         {activeTab === 'reactive' && (
-          <ReactiveState reactiveHistory={reactiveHistory} isDark={isDark} />
+          <ReactiveState reactiveHistory={reactiveHistory} C={C} />
         )}
         {activeTab === 'deps' && (
           <div style={{ padding: '10px 14px' }}>
-            {depGraph && <DependencyGraph depGraph={depGraph} activeFile={activeFile} isDark={isDark} />}
+            {depGraph && <DependencyGraph depGraph={depGraph} activeFile={activeFile} C={C} />}
           </div>
         )}
         {activeTab === 'tree' && (
           <div style={{ padding: '8px 12px' }}>
             {componentTree
-              ? <TreeNode node={componentTree} isDark={isDark} changes={treeChanges} />
+              ? <TreeNode node={componentTree} C={C} changes={treeChanges} />
               : <div style={{ fontSize: 11, color: muted, fontStyle: 'italic' }}>Run to see the component tree.</div>}
           </div>
         )}
@@ -487,9 +492,9 @@ export default function RuntimePanel({
             {logs.length === 0
               ? <div style={{ padding: '10px 14px', color: muted, fontStyle: 'italic' }}>No output.</div>
               : logs.map((entry, i) => {
-                  const col = LOG_COLORS[entry.level]?.[isDark ? 'dark' : 'light'] ?? (isDark ? '#e2e8f0' : '#1e293b')
+                  const col = logColor(entry.level, C)
                   return (
-                    <div key={i} style={{ padding: '4px 14px', borderBottom: `1px solid ${border}`, color: col, background: entry.level === 'error' ? (isDark ? '#1c0a0a' : '#fff5f5') : entry.level === 'warn' ? (isDark ? '#1c1400' : '#fffbeb') : 'none', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                    <div key={i} style={{ padding: '4px 14px', borderBottom: `1px solid ${border}`, color: col, background: entry.level === 'error' ? C.redBg : entry.level === 'warn' ? C.amberBg : 'none', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                       <span style={{ opacity: 0.5, marginRight: 6, fontSize: 10 }}>{entry.level === 'warn' ? '⚠ ' : entry.level === 'error' ? '✕ ' : '› '}</span>
                       {entry.args.join(' ')}
                     </div>
