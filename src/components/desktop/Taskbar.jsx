@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import StartMenu from './StartMenu.jsx'
 import ChapterNavigator from './ChapterNavigator.jsx'
-import PinsNotesPopup from './PinsNotesPopup.jsx'
+import NotesListWindow from '../ui/NotesListWindow.jsx'
 import ConceptExplorerModal from '../../concepts/ConceptExplorerModal.tsx'
 import { useDesktop } from './DesktopProvider.jsx'
 import { useMontyContext } from '../../features/compass/MontyContext.tsx'
@@ -19,12 +19,12 @@ const PINNED_APPS = [
   { id: 'rpg-workout', label: 'RPG Workout', emoji: '⚔️', route: '/rpg-workout' },
   { id: 'brain', label: 'Brain Training', emoji: '🧠', route: '/brain' },
 ]
-import { LayoutGrid, Command, BookOpen, MessageSquare, Pin, StickyNote, GraduationCap, Zap, Lightbulb } from 'lucide-react'
+import { LayoutGrid, Command, BookOpen, MessageSquare, StickyNote, GraduationCap, Zap, Lightbulb } from 'lucide-react'
 
 export default function Taskbar({ windows, onFocus }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [chapNavOpen, setChapNavOpen] = useState(false)
-  const [pinsNotesOpen, setPinsNotesOpen] = useState(null) // 'pins' | 'notes' | null
+  const [notesOpen, setNotesOpen] = useState(false)
   const [conceptExplorerOpen, setConceptExplorerOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
@@ -49,7 +49,7 @@ export default function Taskbar({ windows, onFocus }) {
     <>
       {menuOpen && <StartMenu onClose={() => setMenuOpen(false)} />}
       {chapNavOpen && <ChapterNavigator onClose={() => setChapNavOpen(false)} />}
-      {pinsNotesOpen && <PinsNotesPopup initialTab={pinsNotesOpen} onClose={() => setPinsNotesOpen(null)} />}
+      {notesOpen && <NotesListWindow onClose={() => setNotesOpen(false)} />}
       <AnimatePresence>
         {conceptExplorerOpen && <ConceptExplorerModal onClose={() => setConceptExplorerOpen(false)} />}
       </AnimatePresence>
@@ -126,7 +126,7 @@ export default function Taskbar({ windows, onFocus }) {
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => { setChapNavOpen(o => !o); setPinsNotesOpen(null) }}
+              onClick={() => setChapNavOpen(o => !o)}
               title="Chapter navigator"
               className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none ${
                 chapNavOpen ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -154,22 +154,10 @@ export default function Taskbar({ windows, onFocus }) {
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => { setPinsNotesOpen(p => p === 'pins' ? null : 'pins'); setChapNavOpen(false) }}
-            title="Pins"
-            className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none ${
-              pinsNotesOpen === 'pins' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-            }`}
-          >
-            <Pin className="w-5 h-5" />
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => { setPinsNotesOpen(p => p === 'notes' ? null : 'notes'); setChapNavOpen(false) }}
+            onClick={() => { setNotesOpen(o => !o); setChapNavOpen(false) }}
             title="Notes"
             className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none ${
-              pinsNotesOpen === 'notes' ? 'bg-amber-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400'
+              notesOpen ? 'bg-amber-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400'
             }`}
           >
             <StickyNote className="w-5 h-5" />

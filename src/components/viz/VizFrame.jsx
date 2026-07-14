@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState, Component } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
-import { usePins } from "../../context/PinsContext.jsx";
 
 class VizErrorBoundary extends Component {
   state = { error: null }
@@ -111,9 +110,8 @@ export default function VizFrame({ id, initialProps = {}, title }) {
     [initialProps],
   );
   const location = useLocation();
-  const { isPinned, addPin, removePin } = usePins();
+  // Stable per-viz-per-page identity, used only as a React re-mount key below.
   const pinId = `${id}::${location.pathname}`;
-  const pinned = isPinned(pinId);
 
   useEffect(() => {
     setParams(initialProps ?? {});
@@ -194,24 +192,8 @@ export default function VizFrame({ id, initialProps = {}, title }) {
     );
   }
 
-  function togglePin() {
-    if (pinned) {
-      removePin(pinId);
-    } else {
-      addPin({
-        id: pinId,
-        title: title || id,
-        subtitle: location.pathname
-          .replace("/chapter/", "Ch. ")
-          .replace("/", " › "),
-        path: location.pathname,
-        elementId: `viz-${id}`,
-      });
-    }
-  }
-
   // PHONE_OK components own their own visual presentation — VizFrame is just
-  // a transparent overlay that provides pin/expand chrome without adding a card.
+  // a transparent overlay that provides expand chrome without adding a card.
   if (PHONE_OK.has(id)) {
     return (
       <div id={`viz-${id}`} className="viz-frame relative group w-full max-w-full overflow-hidden">
@@ -220,13 +202,6 @@ export default function VizFrame({ id, initialProps = {}, title }) {
           <span className="text-xs font-mono font-bold">{id}</span>
         </div>
         <div className="absolute top-2 right-2 z-20 hidden lg:flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={togglePin}
-            title={pinned ? "Unpin" : "Pin this visualization"}
-            className={`flex items-center gap-1 px-2 py-1 text-xs font-bold rounded shadow-md border transition-colors ${pinned ? "bg-amber-500 border-amber-400 text-white" : "bg-slate-950 border-slate-700 text-slate-200 hover:bg-amber-500 hover:border-amber-400"}`}
-          >
-            📌
-          </button>
           <button
             onClick={() => setIsExpanded(true)}
             title="Expand to Full Width"
@@ -258,14 +233,6 @@ export default function VizFrame({ id, initialProps = {}, title }) {
         </p>
       )}
       <div className="absolute top-2 right-2 z-20 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        {/* Pin button — desktop only */}
-        <button
-          onClick={togglePin}
-          title={pinned ? "Unpin" : "Pin this visualization"}
-          className={`hidden lg:flex items-center gap-1 px-2 py-1 text-xs font-bold rounded shadow-md border transition-colors ${pinned ? "bg-amber-500 border-amber-400 text-white" : "bg-slate-950 border-slate-700 text-slate-200 hover:bg-amber-500 hover:border-amber-400"}`}
-        >
-          📌
-        </button>
         <button
           onClick={() => setIsExpanded(true)}
           title="Expand to Full Width"

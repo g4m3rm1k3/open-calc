@@ -27,7 +27,6 @@ import AssessmentBlock from "./AssessmentBlock.jsx";
 import MarkdownProse from "../math/MarkdownProse.jsx";
 import KatexBlock from "../math/KatexBlock.jsx";
 import { parseProse } from "../math/parseProse.jsx";
-import StickyNote from "../ui/StickyNote.jsx";
 
 // ─── Prose utilities ───────────────────────────────────────────────────────
 
@@ -289,7 +288,6 @@ function CardHeader({ icon, kicker, label, noteId, right }) {
       <div className="flex-1 min-w-0 flex items-center gap-2">
         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 m-0">{label}</p>
       </div>
-      {noteId && <span className="flex-shrink-0" onClick={(e) => e.stopPropagation()}><StickyNote noteId={noteId} /></span>}
       {right && <div className="flex-shrink-0">{right}</div>}
     </div>
   );

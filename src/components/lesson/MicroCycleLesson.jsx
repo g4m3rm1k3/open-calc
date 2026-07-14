@@ -26,7 +26,6 @@ import { parseProse } from "../math/parseProse.jsx";
 import MarkdownProse from "../math/MarkdownProse.jsx";
 import KatexBlock from "../math/KatexBlock.jsx";
 import { useProgress } from "../../hooks/useProgress.js";
-import StickyNote from "../ui/StickyNote.jsx";
 import SVGImage from "./SVGImage.jsx";
 
 // Re-export parseProse so existing imports from IntegratedLesson still work
@@ -307,7 +306,6 @@ function SectionDivider({ icon, label, color = "slate", noteId }) {
         {label}
       </span>
       <div className="flex-1" />
-      {noteId && <StickyNote noteId={noteId} />}
     </div>
   );
 }
@@ -332,7 +330,6 @@ function VizCard({
         ) : (
           <span />
         )}
-        {noteId && <StickyNote noteId={noteId} />}
       </div>
       {viz.mathBridge && (
         <div className="px-4 py-3 bg-brand-50 dark:bg-brand-950/40 border-b border-brand-100 dark:border-brand-900/50 [&_p]:text-sm [&_p]:text-brand-900 [&_p]:dark:text-brand-200 [&_strong]:text-brand-800 [&_strong]:dark:text-brand-100">
@@ -593,7 +590,6 @@ function IntuitionBlock({ data, lesson }) {
           Conceptual Intuition
         </h2>
         <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
-        {lesson?.id && <StickyNote noteId={`${lesson.id}:intuition`} />}
       </div>
 
       <div className="py-2">
@@ -664,7 +660,6 @@ function MathBlock({ data, lessonId }) {
           Operational Mathematics
         </h2>
         <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
-        {lessonId && <StickyNote noteId={`${lessonId}:math`} />}
       </div>
       <div className="py-2 space-y-6">
           {data.processDefinition?.length > 0 && (
@@ -735,7 +730,6 @@ function RigorBlock({ data, lessonId }) {
           Formal Rigor & Proof
         </h2>
         <div className="flex-1 h-px bg-slate-200 dark:bg-slate-800" />
-        {lessonId && <StickyNote noteId={`${lessonId}:rigor`} />}
       </div>
       <div className="py-2 space-y-6">
           {hasProse || hasCallouts || isBlocksFormat ? (

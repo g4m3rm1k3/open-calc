@@ -2,7 +2,6 @@ import { useEffect, useRef, useMemo, useState } from 'react'; // useRef kept for
 import KatexBlock from '../math/KatexBlock.jsx';
 import { parseProse } from '../math/parseProse.jsx';
 import VizFrame from '../viz/VizFrame.jsx';
-import StickyNote from '../ui/StickyNote.jsx';
 import MarkdownProse from '../math/MarkdownProse.jsx';
 
 // ─── Prereq box ───────────────────────────────────────────────────────────────
@@ -239,7 +238,6 @@ export default function ScrubbableExample({ example, number, lessonId }) {
               {example.title}
             </h3>
           </div>
-          {lessonId && <StickyNote noteId={`${lessonId}:example:${example.id ?? number}`} />}
         </div>
         <div className="flex items-center gap-4 flex-shrink-0">
           <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
