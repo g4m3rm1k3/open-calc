@@ -175,6 +175,24 @@ function findJavaDeclarationsEnd(code) {
 // array initializer or a for-loop body — stay together, verbatim, as
 // main()'s body). Classifying by "has braces at all" isn't enough, since a
 // method signature and a for-loop header both end up owning a `{...}` block.
+//
+// Finds the last `;` that actually separates two top-level statements — not
+// one that's just part of a `for (init; cond; step)` header's own clauses.
+// A naive `lastIndexOf(';')` mistakes a for-loop's internal semicolons for a
+// prior-statement boundary, mangling headers like `for (int i = 0; i < n; i++) {`
+// into a bogus split at the wrong semicolon.
+function lastTopLevelSemicolon(text) {
+  let depth = 0
+  let last = -1
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
+    if (ch === '(') depth++
+    else if (ch === ')') depth--
+    else if (ch === ';' && depth <= 0) last = i
+  }
+  return last
+}
+
 function splitJavaTrailing(trailing) {
   const members = []
   let remainder = ''
@@ -192,7 +210,7 @@ function splitJavaTrailing(trailing) {
     // Only test the part of the header after the last top-level `;` — text
     // before that is already-complete prior statements, not part of this
     // brace's own header (e.g. `int x = 1; for (...) {`).
-    const lastSemi = header.lastIndexOf(';')
+    const lastSemi = lastTopLevelSemicolon(header)
     const pre = header.slice(0, lastSemi + 1)
     const headerTail = header.slice(lastSemi + 1).trim()
     const isMember = headerTail.length > 0
@@ -346,6 +364,17 @@ function findCppItemsEnd(code) {
     const braceStart = rest.indexOf('{')
     if (braceStart === -1) break
     const header = rest.slice(0, braceStart)
+    // A genuine item's header must start exactly at the current position —
+    // if there's real content before the last top-level `;` in this header,
+    // that means some loose statement (or a for-loop's own header, whose
+    // internal semicolons aren't statement boundaries at all) precedes
+    // whatever construct owns this brace, so this isn't a pure declaration
+    // starting here. Stop looking for more items entirely rather than
+    // misclassify a `switch`/`while`/`for` as a free function because an
+    // unrelated statement happened to sit in front of it.
+    const lastSemi = lastTopLevelSemicolon(header)
+    const pre = header.slice(0, lastSemi + 1)
+    if (pre.trim()) break
     const isClassLike = CPP_ITEM_START.test(rest)
     const headerTail = header.trim()
     // A free function's header ends in `)`, optionally followed by `const`/
