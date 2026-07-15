@@ -100,7 +100,7 @@ export default function TopicFilterHeader({
                 className={`relative rounded-full border px-4 py-1.5 text-xs font-bold transition-all duration-300 backdrop-blur-md ${
                   isActive
                     ? `${subMeta.border.replace('/30', '')} bg-slate-100/20 dark:bg-[#080A11]/80 ${subMeta.text} scale-105`
-                    : `${subMeta.border.replace('/30', '/20')} bg-slate-100/50 dark:bg-[#080A11]/50 ${subMeta.text} opacity-60 hover:opacity-100 hover:scale-105`
+                    : `border-slate-300/50 dark:border-slate-700/50 bg-slate-100/50 dark:bg-[#080A11]/50 ${subMeta.text} opacity-60 hover:opacity-100 hover:scale-105`
                 }`}
                 style={isActive ? { boxShadow: subMeta.glow.replace('0.50', '0.4') } : {}}
               >
