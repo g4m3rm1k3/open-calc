@@ -1,0 +1,22 @@
+import { chromium } from 'playwright'
+const BASE = 'http://localhost:5173'
+const browser = await chromium.launch()
+const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } })
+await page.goto(`${BASE}/#/five-axis`, { waitUntil: 'domcontentloaded' })
+await page.waitForTimeout(1500)
+const skipBtn = page.locator('button:has-text("Skip")')
+if (await skipBtn.count() > 0) await skipBtn.click()
+await page.locator('button:has-text("Calculator")').click()
+await page.waitForTimeout(200)
+await page.getByRole('button', { name: 'calc', exact: true }).click()
+await page.waitForTimeout(400)
+
+const plateBtn = page.locator('button:has-text("Plate")')
+const blockBtn = page.locator('button:has-text("Block")')
+console.log('Plate class before:', await plateBtn.getAttribute('class'))
+console.log('Block class before:', await blockBtn.getAttribute('class'))
+await blockBtn.click()
+await page.waitForTimeout(300)
+console.log('Plate class after:', await plateBtn.getAttribute('class'))
+console.log('Block class after:', await blockBtn.getAttribute('class'))
+await browser.close()

@@ -52,7 +52,7 @@ const ReactMasteryPage = lazy(
   () => import("./labs/react-mastery/ReactMasteryPage.jsx"),
 );
 const FiveAxisKinematicsPage = lazy(
-  () => import("./labs/five-axis/FiveAxisKinematicsPage.jsx"),
+  () => import("./labs/five-axis/FiveAxisKinematicsPage.tsx"),
 );
 const CodeLensPage = lazy(() => import("./labs/codelens/CodeLensPage.tsx"));
 const SICPPage = lazy(() => import("./labs/sicp-js/SICPPage.jsx"));
