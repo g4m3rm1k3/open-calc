@@ -1567,6 +1567,7 @@ export default function MatrixLab({ onBack }) {
                   wordWrap: "on",
                   renderWhitespace: "none",
                   overviewRulerLanes: 0,
+                  automaticLayout: true,
                 }}
               />
             </div>

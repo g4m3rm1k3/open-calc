@@ -1,4 +1,4 @@
-import Matrix3DLab from './Matrix3DLab.jsx'
+import Matrix3DLab from './Matrix3DLab.tsx'
 
 export const meta = {
   label: 'Matrix 3D Lab',
@@ -9,7 +9,11 @@ export const meta = {
   cover: { grad: 'from-cyan-700 via-blue-800 to-indigo-950', mark: '4×4', sub: 'Transforms · Eigenvalues · 3D' },
 }
 
-export default function Matrix3DLabEntry({ onBack }) {
+interface Matrix3DLabEntryProps {
+  onBack?: () => void
+}
+
+export default function Matrix3DLabEntry({ onBack }: Matrix3DLabEntryProps) {
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 50 }}>
       <Matrix3DLab onBack={onBack} />
