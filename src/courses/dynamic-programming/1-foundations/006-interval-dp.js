@@ -1027,6 +1027,12 @@ plt.show()
             {
               type: 'code',
               language: 'python',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Optimal BST + Strange Printer',
+              difficulty: 'hard',
+              prompt: 'Fill in optimal_bst(probs): the interval recurrence that tries every possible root r for each range [i,j], same split-and-combine shape as Matrix Chain above. Then fill in strange_printer(s): when s[k] == s[j] for some k, merging saves a turn. Uncomment the print/assert lines once ready.',
+              hint: 'optimal_bst: dp[i][j] = min over r of (dp[i][r-1] + dp[r+1][j] + range_sum(i,j)) — the range_sum term is the same for every r, it is the "every node here gets one deeper" cost. strange_printer: candidate = dp[i][k] + dp[k+1][j-1] (skip the empty range case when k+1 > j-1).',
               label: 'From scratch: Optimal BST + Strange Printer',
               code: `# ============================================================
 # Challenge 1: Optimal Binary Search Tree
@@ -1052,18 +1058,21 @@ def optimal_bst(probs):
             dp[i][j] = float("inf")
             s = range_sum(i, j)
             for r in range(i, j + 1):
-                left  = dp[i][r-1] if r > i else 0
-                right = dp[r+1][j] if r < j else 0
-                cost  = left + right + s
-                dp[i][j] = min(dp[i][j], cost)
+                # YOUR CODE HERE:
+                # left  = dp[i][r-1] if r > i else 0
+                # right = dp[r+1][j] if r < j else 0
+                # cost  = left + right + s
+                # dp[i][j] = min(dp[i][j], cost)
+                pass
     return dp[0][n-1]
 
 probs = [0.15, 0.10, 0.05, 0.10, 0.20, 0.25, 0.15]
-result = optimal_bst(probs)
-print(f"Optimal BST expected search cost: {result:.4f}")
-assert abs(result - 3.12) < 0.01, f"Expected ~3.12, got {result:.4f}"
-print("Assertion passed!")
-print()
+# --- Uncomment to test when ready ---
+# result = optimal_bst(probs)
+# print(f"Optimal BST expected search cost: {result:.4f}")
+# assert abs(result - 2.30) < 0.01, f"Expected ~2.30, got {result:.4f}"
+# print("Assertion passed!")
+# print()
 
 # ============================================================
 # Challenge 2: Strange Printer
@@ -1085,16 +1094,19 @@ def strange_printer(s):
             dp[i][j] = dp[i][j-1] + 1  # worst case: print s[j] separately
             for k in range(i, j):
                 if s[k] == s[j]:
+                    # YOUR CODE HERE:
                     # s[j] matches s[k]: when printing s[k], extend to s[j] for free
-                    candidate = dp[i][k] + (dp[k+1][j-1] if k+1 <= j-1 else 0)
-                    dp[i][j] = min(dp[i][j], candidate)
+                    # candidate = dp[i][k] + (dp[k+1][j-1] if k+1 <= j-1 else 0)
+                    # dp[i][j] = min(dp[i][j], candidate)
+                    pass
     return dp[0][n-1]
 
 tests = [("aaabbb", 2), ("aba", 2), ("leetcode", 6), ("a", 1), ("aab", 2)]
-for s, want in tests:
-    got = strange_printer(s)
-    status = "PASS" if got == want else "FAIL"
-    print(f"{status} strange_printer({repr(s)}) = {got} (want {want})")
+# --- Uncomment to test when ready ---
+# for s, want in tests:
+#     got = strange_printer(s)
+#     status = "PASS" if got == want else "FAIL"
+#     print(f"{status} strange_printer({repr(s)}) = {got} (want {want})")
 `,
             },
           ],

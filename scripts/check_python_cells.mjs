@@ -94,6 +94,16 @@ async function main() {
   const pyodide = await loadPyodide()
   pyodide.FS.writeFile('/home/pyodide/opencalc.py', OPENCALC_LIB_SOURCE)
   await pyodide.loadPackage(PACKAGES, { messageCallback: () => {} })
+  // Matplotlib's default backend on a fresh Pyodide is the interactive
+  // "webagg" backend, which imports `from js import document` — fine in the
+  // real browser (PythonNotebook.jsx's getPyodide() sets this up the same
+  // way before any lesson code runs), but this headless Node checker has no
+  // DOM, so any lesson's first `import matplotlib.pyplot` would otherwise
+  // fail with an ImportError that has nothing to do with the lesson itself.
+  await pyodide.runPythonAsync(`
+import matplotlib
+matplotlib.use('Agg')
+`)
   console.log('Pyodide ready.\n')
 
   let failed = false

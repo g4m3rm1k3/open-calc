@@ -886,6 +886,12 @@ plt.show()
             {
               type: 'code',
               language: 'python',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Shortest Common Supersequence + LIS in O(n log n)',
+              difficulty: 'hard',
+              prompt: 'Fill in the traceback loop in shortest_common_supersequence(s1, s2) — walk dp backward from (m,n), same style as the Edit Distance traceback from the previous cell. Then fill in lis_fast(nums)\'s core loop using bisect (patience sorting: binary-search each new value into the pile-tops array, replacing or extending). Uncomment the print/assert lines once ready.',
+              hint: 'SCS traceback: on a match, take the shared character and move both pointers; otherwise move whichever pointer the LCS table says gives the larger value. LIS: pos = bisect.bisect_left(tails, x); extend tails if pos is at the end, otherwise overwrite tails[pos].',
               label: 'From scratch: Shortest Common Supersequence + LIS O(n log n)',
               code: `# ============================================================
 # Challenge 1: Shortest Common Supersequence
@@ -898,7 +904,7 @@ def lcs_table(s1, s2):
     dp = [[0] * (n + 1) for _ in range(m + 1)]
     for i in range(1, m + 1):
         for j in range(1, n + 1):
-            dp[i][j] = dp[i-1][j-1] + 1 if s1[i-1] == s2[j-1] \
+            dp[i][j] = dp[i-1][j-1] + 1 if s1[i-1] == s2[j-1] \\
                        else max(dp[i-1][j], dp[i][j-1])
     return dp
 
@@ -908,12 +914,11 @@ def shortest_common_supersequence(s1, s2):
     result = ""
     i, j = m, n
     while i > 0 and j > 0:
-        if s1[i-1] == s2[j-1]:
-            result = s1[i-1] + result; i -= 1; j -= 1
-        elif dp[i-1][j] > dp[i][j-1]:
-            result = s1[i-1] + result; i -= 1
-        else:
-            result = s2[j-1] + result; j -= 1
+        # YOUR CODE HERE:
+        # if s1[i-1] == s2[j-1]: take the shared char, move both i and j back
+        # elif dp[i-1][j] > dp[i][j-1]: take s1[i-1], move i back
+        # else: take s2[j-1], move j back
+        pass
     result = s1[:i] + s2[:j] + result
     return result
 
@@ -922,11 +927,12 @@ def is_subseq(sub, string):
     return all(c in it for c in sub)
 
 s1, s2 = "abac", "cab"
-scs = shortest_common_supersequence(s1, s2)
-print(f"SCS('{s1}', '{s2}') = '{scs}' (length {len(scs)})")
-assert is_subseq(s1, scs) and is_subseq(s2, scs), "SCS must contain both as subsequences"
-print("  Verified both are subsequences of SCS")
-print()
+# --- Uncomment to test when ready ---
+# scs = shortest_common_supersequence(s1, s2)
+# print(f"SCS('{s1}', '{s2}') = '{scs}' (length {len(scs)})")
+# assert is_subseq(s1, scs) and is_subseq(s2, scs), "SCS must contain both as subsequences"
+# print("  Verified both are subsequences of SCS")
+# print()
 
 # ============================================================
 # Challenge 2: LIS in O(n log n) — Patience Sorting
@@ -940,20 +946,21 @@ import matplotlib.pyplot as plt
 def lis_fast(nums):
     tails = []
     for x in nums:
-        pos = bisect.bisect_left(tails, x)
-        if pos == len(tails):
-            tails.append(x)
-        else:
-            tails[pos] = x
+        # YOUR CODE HERE:
+        # pos = bisect.bisect_left(tails, x)
+        # if pos == len(tails): append x to tails
+        # else: overwrite tails[pos] with x
+        pass
     return len(tails), tails
 
 nums = [10, 9, 2, 5, 3, 7, 101, 18]
-length, tails = lis_fast(nums)
-print(f"LIS O(n log n) on {nums}")
-print(f"  Length = {length}")
-print(f"  Patience sort pile tops = {tails}")
+# --- Uncomment to test when ready ---
+# length, tails = lis_fast(nums)
+# print(f"LIS O(n log n) on {nums}")
+# print(f"  Length = {length}")
+# print(f"  Patience sort pile tops = {tails}")
 
-# Visualize piles
+# Visualize piles (self-contained — always renders regardless of lis_fast above)
 piles = []
 for x in nums:
     pos = bisect.bisect_left([p[-1] for p in piles], x)
@@ -1012,7 +1019,7 @@ plt.show()
         'The three options represent left-shift, right-shift, and no-shift of characters',
         'dp[i-1][j] is the cost if s1 is longer, dp[i][j-1] if s2 is longer, dp[i-1][j-1] if equal length',
       ],
-      correct: 1,
+      correct: 0,
     },
     {
       id: 'q3',
@@ -1023,7 +1030,7 @@ plt.show()
         'dp[n-1] could be negative if the sequence is decreasing',
         'max(dp) is the same as dp[n-1] — they always give the same result',
       ],
-      correct: 1,
+      correct: 0,
     },
     {
       id: 'q4',

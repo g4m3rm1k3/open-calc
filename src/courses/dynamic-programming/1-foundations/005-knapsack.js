@@ -1009,6 +1009,12 @@ plt.tight_layout(); plt.show()
             {
               type: 'code',
               language: 'python',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Rod Cutting + Unbounded Knapsack',
+              difficulty: 'medium',
+              prompt: 'Fill in rod_cutting(prices, n) — a 1D unbounded-knapsack sweep, forward direction. Then fill in knapsack_01 (backward sweep) and knapsack_unbounded (forward sweep), which differ only in loop direction. Uncomment the print/assert lines once ready.',
+              hint: 'rod_cutting: dp[w] = max(dp[w], price + dp[w - length]), same shape as coin change. knapsack_01 sweeps w from W down to weights[i]; knapsack_unbounded sweeps w from weights[i] up to W — that direction is the entire difference between the two.',
               label: 'From scratch: Rod Cutting + Unbounded Knapsack',
               code: `# ============================================================
 # Rod Cutting — unbounded knapsack (items reusable)
@@ -1021,17 +1027,18 @@ def rod_cutting(prices, n):
     for length in range(1, n + 1):
         price = prices[length - 1]
         for w in range(length, n + 1):   # forward = unbounded
-            dp[w] = max(dp[w], price + dp[w - length])
+            # YOUR CODE HERE: dp[w] = max(dp[w], price + dp[w - length])
+            pass
     return dp[n]
 
 prices = [1, 5, 8, 9, 10, 17, 17, 20]
 n = 8
-print(f"Rod Cutting: n={n}, max revenue = {rod_cutting(prices, n)}")  # 22
-
-assert rod_cutting([1,5,8,9,10,17,17,20], 8) == 22
-assert rod_cutting([3,5,8,9,10,17,17,20], 8) == 24
-print("All assertions passed!")
-print()
+# --- Uncomment to test when ready ---
+# print(f"Rod Cutting: n={n}, max revenue = {rod_cutting(prices, n)}")  # 22
+# assert rod_cutting([1,5,8,9,10,17,17,20], 8) == 22
+# assert rod_cutting([3,5,8,9,10,17,17,20], 8) == 24
+# print("All assertions passed!")
+# print()
 
 # ============================================================
 # 0/1 vs Unbounded — same items, same capacity
@@ -1042,24 +1049,29 @@ def knapsack_01(weights, values, W):
     dp = [0] * (W + 1)
     for i in range(len(weights)):
         for w in range(W, weights[i] - 1, -1):   # BACKWARD = 0/1
-            dp[w] = max(dp[w], values[i] + dp[w - weights[i]])
+            # YOUR CODE HERE: dp[w] = max(dp[w], values[i] + dp[w - weights[i]])
+            pass
     return dp[W]
 
 def knapsack_unbounded(weights, values, W):
     dp = [0] * (W + 1)
     for i in range(len(weights)):
         for w in range(weights[i], W + 1):        # FORWARD = unbounded
-            dp[w] = max(dp[w], values[i] + dp[w - weights[i]])
+            # YOUR CODE HERE: dp[w] = max(dp[w], values[i] + dp[w - weights[i]])
+            pass
     return dp[W]
 
 wts, vals, W = [2, 3, 4, 1], [6, 9, 5, 3], 8
-r01  = knapsack_01(wts, vals, W)
-runb = knapsack_unbounded(wts, vals, W)
-print(f"Weights={wts}  Values={vals}  W={W}")
-print(f"  0/1 knapsack:      {r01}")
-print(f"  Unbounded knapsack: {runb}")
-print(f"  Difference from reuse: {runb - r01}")
+# --- Uncomment to test when ready ---
+# r01  = knapsack_01(wts, vals, W)
+# runb = knapsack_unbounded(wts, vals, W)
+# print(f"Weights={wts}  Values={vals}  W={W}")
+# print(f"  0/1 knapsack:      {r01}")
+# print(f"  Unbounded knapsack: {runb}")
+# print(f"  Difference from reuse: {runb - r01}")
 
+# Visualization below is self-contained (recomputes its own tables), so it
+# renders regardless of whether the functions above are filled in yet.
 import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(12, 4))
@@ -1076,8 +1088,8 @@ for i in range(len(wts)):
         dpunb_all[w] = max(dpunb_all[w], vals[i] + dpunb_all[w - wts[i]])
 
 x = list(range(W + 1))
-ax.bar([i - 0.2 for i in x], dp01_all,  width=0.38, color="#3b82f6", label=f"0/1 ({r01})")
-ax.bar([i + 0.2 for i in x], dpunb_all, width=0.38, color="#8b5cf6", label=f"Unbounded ({runb})")
+ax.bar([i - 0.2 for i in x], dp01_all,  width=0.38, color="#3b82f6", label=f"0/1 ({dp01_all[W]})")
+ax.bar([i + 0.2 for i in x], dpunb_all, width=0.38, color="#8b5cf6", label=f"Unbounded ({dpunb_all[W]})")
 for i, (a, b) in enumerate(zip(dp01_all, dpunb_all)):
     if a: ax.text(i - 0.2, a + 0.2, str(a), ha="center", color="#93c5fd", fontsize=9)
     if b: ax.text(i + 0.2, b + 0.2, str(b), ha="center", color="#c4b5fd", fontsize=9)

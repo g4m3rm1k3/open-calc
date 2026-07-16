@@ -514,7 +514,7 @@ def rob_trace(nums: list[int]) -> None:
         action = "ROB" if prev2 + nums[i] >= prev1 else "SKIP"
         print(f"  i={i}  house={nums[i]}  max(prev1={prev1}, prev2+house={prev2+nums[i]}) -> {curr}  [{action}]")
         prev2, prev1 = prev1, curr
-    print(f"Answer: {prev1}\n")
+    print(f"Answer: {prev1}\\n")
 
 
 rob_trace([2, 7, 9, 3, 1])
@@ -580,7 +580,7 @@ def show_dp_table(cost: list[int]) -> None:
 
 show_dp_table([10, 15, 20, 5, 30, 8])
 assert min_cost_climbing_stairs([10, 15, 20]) == 15
-assert min_cost_climbing_stairs([1, 100, 1, 1, 1, 100, 1, 1]) == 6
+assert min_cost_climbing_stairs([1, 100, 1, 1, 1, 100, 1, 1]) == 4
 print("Assertions passed!")`,
             },
             {
@@ -635,6 +635,12 @@ print("Assertions passed!")`,
             {
               type: 'code',
               language: 'python',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Jump Game and House Robber II',
+              difficulty: 'medium',
+              prompt: 'Implement can_jump(nums) (greedy farthest-reach tracking) and rob_circular(nums) (run linear House Robber twice, excluding first then excluding last house, take the max). Uncomment the assertions at the bottom once you believe both are correct.',
+              hint: 'For can_jump: track the farthest index reachable so far; if the current index ever exceeds it, you are stuck. For rob_circular: reuse a linear rob() helper on nums[:-1] and nums[1:].',
               label: 'From Scratch: Jump Game and House Robber II',
               code: `"""
 FROM SCRATCH CHALLENGES

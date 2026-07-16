@@ -783,11 +783,17 @@ for name, grid in grids.items():
 # Assertions
 assert min_path_sum_1d([[1,3,1],[1,5,1],[4,2,1]])[0] == 7
 assert min_path_sum_1d([[1,2,3],[4,5,6]])[0] == 12
-print("\nAll assertions passed!")`,
+print("\\nAll assertions passed!")`,
             },
             {
               type: 'code',
               language: 'python',
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Triangle and Dungeon Game',
+              difficulty: 'medium',
+              prompt: 'Implement min_path_sum_triangle(triangle) working bottom-up from the second-to-last row, and calculate_minimum_hp(dungeon) working backwards from the princess. Uncomment the assertions once ready.',
+              hint: 'Triangle: dp[j] = triangle[i][j] + min(dp[j], dp[j+1]), filled from the bottom row upward. Dungeon: dp[i][j] represents the minimum health needed ENTERING cell (i,j), computed from the cell below and to the right.',
               label: 'From Scratch: Triangle and Dungeon Game',
               code: `"""
 FROM SCRATCH CHALLENGES

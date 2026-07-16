@@ -510,12 +510,18 @@ out.innerHTML += \`<div class="banner \${all?'ok':'bad'}">\${all?'✓ All tests 
           initialCells: [
             {
               id: 1,
+              challengeType: 'write',
+              challengeNumber: 1,
+              challengeTitle: 'Naive recursive Fibonacci with a call counter',
+              difficulty: 'easy',
+              prompt: 'Fill in fib_naive(n): return n directly for the two base cases (n == 0, n == 1); otherwise return fib_naive(n-1) + fib_naive(n-2). The call_count bookkeeping is already written for you.',
               cellTitle: 'Step 1 — Naive Recursion and the Call Explosion',
               prose: [
                 'Write naive recursive Fibonacci with a call counter. Watch the call count grow exponentially. This is the problem DP solves.',
                 'Python integer arithmetic is exact (no overflow), so you can compute fib(100) with memoization safely.',
               ],
-              instructions: 'Fill in fib_naive(). Then observe the call counts for small n.',
+              instructions: 'Once correct, running this prints: `fib( 5) =      5  |  total calls =     15`, `fib(10) =     55  |  total calls =    177`, `fib(15) =    610  |  total calls =   1973`, `fib(20) =   6765  |  total calls =  21891` — the call count more than triples every 5 steps, the signature of exponential growth.',
+              hint: 'The two TODO lines map directly to the two base cases and the recurrence itself — no other logic is needed.',
               code: `call_count = {}
 
 def fib_naive(n):
@@ -532,22 +538,25 @@ for n in [5, 10, 15, 20]:
     result = fib_naive(n)
     total = sum(call_count.values())
     print(f"fib({n:2d}) = {result:6d}  |  total calls = {total:6d}")`,
-              output: `fib( 5) =      5  |  total calls =     15
-fib(10) =     55  |  total calls =    177
-fib(15) =    610  |  total calls =   1973
-fib(20) =   6765  |  total calls =  21891`,
+              output: '',
               status: 'idle',
               figureJson: null,
             },
 
             {
               id: 2,
+              challengeType: 'write',
+              challengeNumber: 2,
+              challengeTitle: 'Add a manual cache dict to fib_memo()',
+              difficulty: 'easy',
+              prompt: 'Implement fib_memo(n) with a manual dict cache: check the cache first, handle the two base cases, then store and return fib_memo(n-1) + fib_memo(n-2) in the cache.',
               cellTitle: 'Step 2 — Memoization Three Ways',
               prose: [
                 'Python gives you three ways to memoize: a manual dict cache, the @lru_cache decorator (automatic, built-in), and @cache (Python 3.9+, same but unbounded).',
                 'All three produce identical results. @lru_cache is the most common in production code. Manual cache is most readable for learning.',
               ],
-              instructions: 'Implement fib_memo() with a manual cache dict. Then compare with @lru_cache.',
+              instructions: 'Once correct, this prints `fib_memo(50): 12586269025`, `fib_lru(50): 12586269025`, `fib_lru(100): 354224848179261915075`, and cache stats showing 51 entries — one per subproblem from 0 to 50.',
+              hint: 'The three TODO lines are, in order: the two base-case returns, and the recursive assignment into _cache[n]. The lookup at the top is already written.',
               code: `from functools import lru_cache
 
 # Manual cache
@@ -572,24 +581,25 @@ print("fib_lru(100):", fib_lru(100))
 # See how many subproblems were cached
 print(f"\\nCache entries in fib_memo: {len(_cache)}")
 print(f"Cache info for fib_lru: {fib_lru.cache_info()}")`,
-              output: `fib_memo(50): 12586269025
-fib_lru(50): 12586269025
-fib_lru(100): 354224848179261915075
-
-Cache entries in fib_memo: 51
-Cache info for fib_lru: CacheInfo(hits=49, misses=51, maxsize=None, currsize=51)`,
+              output: '',
               status: 'idle',
               figureJson: null,
             },
 
             {
               id: 3,
+              challengeType: 'write',
+              challengeNumber: 3,
+              challengeTitle: 'Tabulate fib_tab() and climb_stairs_opt()',
+              difficulty: 'medium',
+              prompt: 'Implement fib_tab(n) bottom-up using the dp array already started for you, then implement climb_stairs_opt(n) using only two variables (no array at all).',
               cellTitle: 'Step 3 — Tabulation and Space Optimization',
               prose: [
                 'Bottom-up tabulation: fill dp[0..n] iteratively, no recursion stack.',
                 'Space optimization: since dp[i] only depends on dp[i-1] and dp[i-2], you can discard the full array and keep just two variables.',
               ],
-              instructions: 'Implement fib_tab() and climb_stairs_opt().',
+              instructions: 'Once correct, this prints `fib_tab(10): 55`, `fib_tab(50): 12586269025`, `climb_stairs_opt(5): 8`, `climb_stairs_opt(10): 89`.',
+              hint: 'fib_tab is a straight loop filling dp[i] = dp[i-1] + dp[i-2]. climb_stairs_opt replaces the array with prev/curr, updated the same way each iteration.',
               code: `def fib_tab(n):
     if n <= 1: return n
     dp = [0] * (n + 1)
@@ -610,22 +620,25 @@ print("fib_tab(10):", fib_tab(10))
 print("fib_tab(50):", fib_tab(50))
 print("climb_stairs_opt(5):", climb_stairs_opt(5))
 print("climb_stairs_opt(10):", climb_stairs_opt(10))`,
-              output: `fib_tab(10): 55
-fib_tab(50): 12586269025
-climb_stairs_opt(5): 8
-climb_stairs_opt(10): 89`,
+              output: '',
               status: 'idle',
               figureJson: null,
             },
 
             {
               id: 4,
+              challengeType: 'write',
+              challengeNumber: 4,
+              challengeTitle: 'All four variants, from memory',
+              difficulty: 'hard',
+              prompt: 'Implement fib_memo, fib_tab, climb_stairs_opt, and climb_stairs_memo with no scaffolding this time — just the function signatures. All eight assertions below must pass.',
               cellTitle: 'From Scratch — All Variants + Call Count Visualization',
               prose: [
                 'Write all four functions from memory. When assertions pass, opencalc draws a bar chart comparing naive call counts vs memoized call counts for different values of n.',
                 'The chart makes the exponential vs linear complexity difference visceral.',
               ],
-              instructions: 'Fill in all functions. The figure contrasts naive O(2^n) vs memo O(n) call counts.',
+              instructions: 'Once correct, all eight assertions pass, "All assertions passed!" prints, and the figure contrasts naive O(2^n) vs memo O(n) call counts.',
+              hint: 'This is exactly Steps 1-3 combined: two memoized functions (dict cache) and two tabulated/O(1)-space functions, applied to Fibonacci and Climbing Stairs respectively.',
               code: `from opencalc import Figure
 import sys
 sys.setrecursionlimit(100000)
@@ -674,7 +687,7 @@ for i, n in enumerate(ns):
     fig.bar(i * 2,     naive_counts[i], label=f"naive n={n}: {naive_counts[i]}", color="#f87171")
     fig.bar(i * 2 + 1, n + 1,           label=f"memo n={n}: {n+1}",              color="#4ade80")
 fig.show()`,
-              output: `All assertions passed!`,
+              output: '',
               status: 'idle',
               figureJson: null,
             },
