@@ -880,6 +880,15 @@ export default function PythonNotebook({ params, onParamChange }) {
   const [isExecuting, setIsExecuting] = useState(false);
   const execCounterRef = useRef(0); // global execution counter — increments each time any cell runs
 
+  // ── Uploaded data files ─────────────────────────────────────────────────
+  // Written straight into Pyodide's in-memory virtual filesystem, so
+  // pd.read_csv/read_excel etc. can open them by path like any local file —
+  // nothing ever leaves the browser.
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [uploadError, setUploadError] = useState(null);
+  const dataFileInputRef = useRef(null);
+  const UPLOAD_DIR = "/home/pyodide/uploads";
+
   // Update cells if params.initialCells changes (mostly for HMR or switching lessons)
   useEffect(() => {
     if (params?.initialCells) {
@@ -1003,7 +1012,13 @@ export default function PythonNotebook({ params, onParamChange }) {
                   status: "idle",
                   executionCount: execCounterRef.current,
                   output:
-                    textOutput || (!isFigure && resultStr ? resultStr : ""),
+                    // Printed/warned text and the last expression's value are
+                    // independent — a warning (e.g. pandas' pyarrow
+                    // DeprecationWarning on every read_csv) must not hide the
+                    // actual result, like a trailing df.head().
+                    [textOutput.trimEnd(), !isFigure && resultStr ? resultStr : ""]
+                      .filter(Boolean)
+                      .join("\n"),
                   figureJson: isFigure ? resultStr : null,
                   matplotlibImages,
                   testResult: testFeedback,
@@ -1064,6 +1079,62 @@ export default function PythonNotebook({ params, onParamChange }) {
 
   const updateCode = (id, code) =>
     setCells((prev) => prev.map((c) => (c.id === id ? { ...c, code } : c)));
+
+  const addCellWithCode = (code) => {
+    const newId = cells.length > 0 ? Math.max(...cells.map((c) => c.id)) + 1 : 1;
+    setCells([
+      ...cells,
+      { id: newId, code, output: "", status: "idle", figureJson: null, matplotlibImages: [] },
+    ]);
+  };
+
+  const loadSnippetFor = (name, ext) => {
+    const path = `${UPLOAD_DIR}/${name}`;
+    if (ext === "xlsx" || ext === "xls") {
+      return `import pandas as pd\ndf = pd.read_excel("${path}")\ndf.head()`;
+    }
+    if (ext === "json") {
+      return `import pandas as pd\ndf = pd.read_json("${path}")\ndf.head()`;
+    }
+    if (ext === "tsv") {
+      return `import pandas as pd\ndf = pd.read_csv("${path}", sep="\\t")\ndf.head()`;
+    }
+    if (ext === "csv") {
+      return `import pandas as pd\ndf = pd.read_csv("${path}")\ndf.head()`;
+    }
+    return `with open("${path}") as f:\n    text = f.read()\ntext[:500]`;
+  };
+
+  const handleDataFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !pyodide) return;
+    setUploadError(null);
+    const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
+    try {
+      const buf = new Uint8Array(await file.arrayBuffer());
+      try {
+        pyodide.FS.mkdirTree(UPLOAD_DIR);
+      } catch { /* already exists */ }
+      if (ext === "xls") {
+        // Legacy .xls — xlrd is a built Pyodide package, no micropip needed.
+        await pyodide.loadPackage("xlrd");
+      } else if (ext === "xlsx") {
+        // openpyxl isn't in Pyodide's own built package set, but it's pure
+        // Python, so micropip can pull the wheel straight from PyPI.
+        await pyodide.loadPackage("micropip");
+        const micropip = pyodide.pyimport("micropip");
+        await micropip.install("openpyxl");
+      }
+      pyodide.FS.writeFile(`${UPLOAD_DIR}/${file.name}`, buf);
+      setUploadedFiles((prev) => [
+        ...prev.filter((f) => f.name !== file.name),
+        { name: file.name, ext, size: file.size },
+      ]);
+    } catch (err) {
+      setUploadError(`Could not load "${file.name}": ${err.message}`);
+    }
+  };
 
   const removeCell = (id) => {
     if (cells.length > 1) setCells((prev) => prev.filter((c) => c.id !== id));
@@ -1235,8 +1306,71 @@ export default function PythonNotebook({ params, onParamChange }) {
           >
             + Add cell
           </button>
+          <button
+            onClick={() => dataFileInputRef.current?.click()}
+            title="Upload a CSV, Excel, JSON, or text file to use in your code"
+            style={{
+              fontSize: 12,
+              padding: "6px 10px",
+              borderRadius: 8,
+              cursor: "pointer",
+              border: `0.5px solid ${C.border}`,
+              background: "transparent",
+              color: C.muted,
+            }}
+          >
+            ⇧ Upload data
+          </button>
+          <input
+            ref={dataFileInputRef}
+            type="file"
+            accept=".csv,.tsv,.xlsx,.xls,.json,.txt"
+            style={{ display: "none" }}
+            onChange={handleDataFileUpload}
+          />
         </div>
       </div>
+
+      {/* Uploaded data files */}
+      {(uploadedFiles.length > 0 || uploadError) && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 4px",
+            marginBottom: 8,
+            marginTop: -4,
+          }}
+        >
+          <span style={{ fontSize: 11, color: C.hint, marginRight: 2 }}>Files:</span>
+          {uploadedFiles.map((f) => (
+            <button
+              key={f.name}
+              onClick={() => addCellWithCode(loadSnippetFor(f.name, f.ext))}
+              title={`Insert a cell that loads ${f.name} (${UPLOAD_DIR}/${f.name})`}
+              style={{
+                fontSize: 11,
+                padding: "4px 8px",
+                borderRadius: 999,
+                cursor: "pointer",
+                border: `0.5px solid ${C.tealBd}`,
+                background: C.tealBg,
+                color: C.teal,
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              📄 {f.name} <span style={{ opacity: 0.7 }}>+ insert load code</span>
+            </button>
+          ))}
+          {uploadError && (
+            <span style={{ fontSize: 11, color: C.red }}>{uploadError}</span>
+          )}
+        </div>
+      )}
 
       {/* API Help Panel */}
       {showHelp && (

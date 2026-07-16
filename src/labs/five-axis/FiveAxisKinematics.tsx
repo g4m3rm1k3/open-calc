@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import FiveAxisHelpModal from "./FiveAxisHelpModal.tsx";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-type Vec3 = [number, number, number];
+export type Vec3 = [number, number, number];
 type Vec4 = [number, number, number, number];
-type Mat4 = [Vec4, Vec4, Vec4, Vec4];
+export type Mat4 = [Vec4, Vec4, Vec4, Vec4];
 
 interface Axes { X: number; Y: number; Z: number; B: number; C: number }
 
@@ -26,16 +27,16 @@ const mat4mul = (A: Mat4, B: Mat4): Mat4 => {
     for (let k = 0; k < 4; k++) R[i][j] += A[i][k] * B[k][j];
   return R as Mat4;
 };
-const mat4vec = (M: Mat4, v: Vec4): Vec4 => [
+export const mat4vec = (M: Mat4, v: Vec4): Vec4 => [
   M[0][0] * v[0] + M[0][1] * v[1] + M[0][2] * v[2] + M[0][3] * v[3],
   M[1][0] * v[0] + M[1][1] * v[1] + M[1][2] * v[2] + M[1][3] * v[3],
   M[2][0] * v[0] + M[2][1] * v[1] + M[2][2] * v[2] + M[2][3] * v[3],
   M[3][0] * v[0] + M[3][1] * v[1] + M[3][2] * v[2] + M[3][3] * v[3],
 ];
 const Rx = (a: number): Mat4 => { const c = Math.cos(a), s = Math.sin(a); return [[1, 0, 0, 0], [0, c, -s, 0], [0, s, c, 0], [0, 0, 0, 1]]; };
-const Ry = (a: number): Mat4 => { const c = Math.cos(a), s = Math.sin(a); return [[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]]; };
-const Rz = (a: number): Mat4 => { const c = Math.cos(a), s = Math.sin(a); return [[c, -s, 0, 0], [s, c, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]; };
-const norm3 = (v: Vec3): Vec3 => { const l = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]); return l < 1e-12 ? [0, 0, 1] : [v[0] / l, v[1] / l, v[2] / l]; };
+export const Ry = (a: number): Mat4 => { const c = Math.cos(a), s = Math.sin(a); return [[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]]; };
+export const Rz = (a: number): Mat4 => { const c = Math.cos(a), s = Math.sin(a); return [[c, -s, 0, 0], [s, c, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]; };
+export const norm3 = (v: Vec3): Vec3 => { const l = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]); return l < 1e-12 ? [0, 0, 1] : [v[0] / l, v[1] / l, v[2] / l]; };
 const cross3 = (a: Vec3, b: Vec3): Vec3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const dot3 = (a: Vec3, b: Vec3): number => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 
@@ -66,14 +67,14 @@ const dot3 = (a: Vec3, b: Vec3): number => a[0] * b[0] + a[1] * b[1] + a[2] * b[
  * signs differ from Rx's), so "reduce the tilt magnitude" means adding a
  * positive lead, not subtracting one.
  */
-function wrapDeg180(deg: number): number {
+export function wrapDeg180(deg: number): number {
   let d = deg % 360;
   if (d > 180) d -= 360;
   if (d < -180) d += 360;
   return d;
 }
 
-function ikFromNormal(nx: number, ny: number, nz: number, leadDeg = 0): { B_deg: number; C_deg: number } {
+export function ikFromNormal(nx: number, ny: number, nz: number, leadDeg = 0): { B_deg: number; C_deg: number } {
   const r = Math.sqrt(nx * nx + ny * ny);
   return {
     B_deg: (Math.atan2(-r, nz) * 180) / Math.PI + leadDeg,
@@ -1016,12 +1017,19 @@ function CalculatorPanel({
     </button>
   );
   const vecStr = (v: Vec3) => `[${v.map((x) => (x >= 0 ? " " : "") + x.toFixed(3)).join(", ")}]`;
+  const [showHelp, setShowHelp] = useState(false);
 
   return (
     <div className="p-4 overflow-y-auto h-full box-border text-slate-800 dark:text-slate-200">
+      {showHelp && <FiveAxisHelpModal onClose={() => setShowHelp(false)} targetNormal={targetNormal} />}
       <div className="flex gap-2 mb-4">
         {tabBtn("inverse", "Calculate (→ B/C)")}
         {tabBtn("forward", "Verify (B/C →)")}
+        <button onClick={() => setShowHelp(true)}
+          className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-indigo-300 dark:border-indigo-500/40 text-indigo-500 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors shrink-0"
+          title="Walk through how B and C are derived, step by step">
+          ? How
+        </button>
       </div>
 
       {mode === "inverse" ? (

@@ -642,6 +642,20 @@ const MD_COMPONENTS = {
   h3: ({ children }) => <h3 id={headingId(extractText(children))}>{children}</h3>,
   h4: ({ children }) => <h4 id={headingId(extractText(children))}>{children}</h4>,
   pre({ node }) {
+    // react-markdown re-renders `pre` in place at the same tree position when
+    // the surrounding doc changes — with no key, React treats it as an update
+    // to the SAME component instance rather than a new one. That's harmless
+    // for plain elements, but MdCodeBlock's Monaco editor uses an uncontrolled
+    // `defaultValue`, which @monaco-editor/react only applies on first mount;
+    // reusing the instance across a file change left it showing the
+    // previous file's code. Keying by (activeFile + this block's own
+    // position) forces a real remount whenever the doc changes, so
+    // `defaultValue` gets picked up fresh — the position half keeps the key
+    // unique across sibling blocks within the SAME file, so two adjacent
+    // code fences don't collide onto a single shared key.
+    const { activeFile } = useContext(DocsCtx)
+    const blockKey = `${activeFile ?? ''}::${node?.position?.start?.offset ?? node?.position?.start?.line ?? ''}`
+
     // Read directly from the hast node to avoid losing className through custom `code` processing
     const codeNode = node?.children?.[0]
     const classNames = codeNode?.properties?.className ?? []
@@ -655,11 +669,11 @@ const MD_COMPONENTS = {
     const code = rawCode.replace(/\n$/, '')
     if (match) {
       const lang = match[1]
-      if (MATH_FENCE_LANGS.has(lang)) return <MdMathBlock code={code} />
-      return <MdCodeBlock language={lang} code={code} />
+      if (MATH_FENCE_LANGS.has(lang)) return <MdMathBlock key={blockKey} code={code} />
+      return <MdCodeBlock key={blockKey} language={lang} code={code} />
     }
     // Unlanguaged fenced block — boxed plain text, see MdPlainWell above.
-    return <MdPlainWell code={code} />
+    return <MdPlainWell key={blockKey} code={code} />
   },
   code({ children }) {
     // Only inline code reaches here; block code is handled entirely by `pre` via node prop
