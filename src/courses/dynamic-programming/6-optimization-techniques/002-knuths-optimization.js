@@ -465,7 +465,7 @@ probs = [0.04, 0.06, 0.08, 0.02, 0.10, 0.12, 0.14, 0.03, 0.09, 0.32]
 # --- Uncomment to test when ready ---
 # result = optimal_bst_scratch(probs)
 # print(f"optimal_bst_scratch result: {result:.4f}")
-# assert abs(result - 2.18) < 0.01, f"got {result}"
+# assert abs(result - 2.49) < 0.01, f"got {result}"
 # print("All assertions passed!")`,
             },
           ],
