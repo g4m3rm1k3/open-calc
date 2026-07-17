@@ -204,6 +204,8 @@ export const TOPICS = {
             differentiator: 'Array operations with a live memory visualizer — dual-language, Python included.' },
           { kind: 'lab', key: 'dsa-linked-lists-lab',
             differentiator: 'Linked-list operations with animated pointer tracing — dual-language, Python included.' },
+          { kind: 'lab', key: 'dp-lab',
+            differentiator: 'Dynamic programming recurrences with a live table-fill visualizer — dual-language, Python included.' },
         ],
       },
       javascript: {
@@ -310,6 +312,8 @@ export const TOPICS = {
             differentiator: 'Implement array operations yourself — get/insert/delete/search — with live memory visualization and a step tracer.' },
           { kind: 'lab', key: 'dsa-linked-lists-lab',
             differentiator: 'Build linked-list operations yourself — nodes, reverse, cycle detection — with animated pointer visualization.' },
+          { kind: 'lab', key: 'dp-lab',
+            differentiator: 'Write six DP recurrences yourself and watch the table fill cell-by-cell — a hands-on companion to the course\'s much broader 31-lesson pattern catalogue (bitmask, tree, digit, state-machine DP).' },
           { kind: 'lab', key: 'dsa-patterns',
             differentiator: 'Data structures and classic design patterns taught together as one guided lesson series.' },
           { kind: 'lab', key: 'lesson-engine',

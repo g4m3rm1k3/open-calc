@@ -50,6 +50,7 @@ const ROUTES = [
   '/#/lab/plc-lab',
   '/#/lab/dsa-arrays-lab',
   '/#/lab/dsa-linked-lists-lab',
+  '/#/lab/dp-lab',
 
   // ── Games via /game/:key ───────────────────────────────────────────────────
   '/#/game/rubiks-cube',
