@@ -46,7 +46,7 @@ export default function RelatedTopics({ topic, topicMap, allTopics, onNavigate, 
               <button
                 key={id}
                 onClick={() => onNavigate(id)}
-                className="text-[13px] font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700/50 transition-all shadow-sm bg-white dark:bg-slate-900"
+                className="text-[13px] leading-normal font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700/50 transition-all shadow-sm bg-white dark:bg-slate-900"
               >
                 <span className="text-emerald-500 dark:text-emerald-400 font-bold">✓</span>
                 {topicMap[id]?.title ?? id}

@@ -357,34 +357,20 @@ function detectCppIncludes(code) {
   return found
 }
 
-function findCppItemsEnd(code) {
+// Consumes a leading, contiguous run of class/struct/enum declarations only —
+// mirrors findJavaDeclarationsEnd. Free functions are deliberately NOT
+// consumed here even though they're valid at file scope, because a free
+// function can legitimately appear *after* some loose statements too (e.g.
+// two variable declarations, then a helper function, then a call to it) —
+// that interleaved case is what splitCppTrailing (below) handles, the same
+// two-phase split wrapJava already uses and for the same reason.
+function findCppDeclarationsEnd(code) {
   let i = 0
   while (i < code.length) {
     const rest = code.slice(i)
+    if (!CPP_ITEM_START.test(rest)) break
     const braceStart = rest.indexOf('{')
     if (braceStart === -1) break
-    const header = rest.slice(0, braceStart)
-    // A genuine item's header must start exactly at the current position —
-    // if there's real content before the last top-level `;` in this header,
-    // that means some loose statement (or a for-loop's own header, whose
-    // internal semicolons aren't statement boundaries at all) precedes
-    // whatever construct owns this brace, so this isn't a pure declaration
-    // starting here. Stop looking for more items entirely rather than
-    // misclassify a `switch`/`while`/`for` as a free function because an
-    // unrelated statement happened to sit in front of it.
-    const lastSemi = lastTopLevelSemicolon(header)
-    const pre = header.slice(0, lastSemi + 1)
-    if (pre.trim()) break
-    const isClassLike = CPP_ITEM_START.test(rest)
-    const headerTail = header.trim()
-    // A free function's header ends in `)`, optionally followed by `const`/
-    // `noexcept` — not a control-flow keyword or a statement that merely
-    // contains a brace (like `std::vector<int> v = {1, 2, 3};`).
-    const isFunctionLike = !isClassLike
-      && headerTail.length > 0
-      && !/^(if|for|while|switch|do|else|try|catch)\b/.test(headerTail)
-      && /\)\s*(const)?\s*(noexcept)?\s*$/.test(headerTail)
-    if (!isClassLike && !isFunctionLike) break
     let depth = 0, j = braceStart
     for (; j < rest.length; j++) {
       if (rest[j] === '{') depth++
@@ -392,13 +378,54 @@ function findCppItemsEnd(code) {
     }
     if (depth !== 0) break
     let end = j + 1
-    if (isClassLike) {
-      const semiMatch = rest.slice(end).match(/^\s*;/)
-      if (semiMatch) end += semiMatch[0].length
-    }
+    const semiMatch = rest.slice(end).match(/^\s*;/) // class/struct/enum need their trailing `;`
+    if (semiMatch) end += semiMatch[0].length
     i += end
   }
   return i
+}
+
+// Splits loose top-level code into free-function definitions (hoisted out,
+// since C++ allows them at file scope — no synthesized wrapper class needed
+// the way Java requires) vs everything else, which stays inside main() in
+// its original order. Structurally identical to splitJavaTrailing; C++ just
+// never needs to nest the "members" inside anything.
+function splitCppTrailing(trailing) {
+  const members = []
+  let remainder = ''
+  let i = 0
+  const n = trailing.length
+  while (i < n) {
+    const braceStart = trailing.indexOf('{', i)
+    if (braceStart === -1) { remainder += trailing.slice(i); break }
+    const header = trailing.slice(i, braceStart)
+    let depth = 0, k = braceStart
+    for (; k < n; k++) {
+      if (trailing[k] === '{') depth++
+      else if (trailing[k] === '}') { depth--; if (depth === 0) break }
+    }
+    const lastSemi = lastTopLevelSemicolon(header)
+    const pre = header.slice(0, lastSemi + 1)
+    const headerTail = header.slice(lastSemi + 1).trim()
+    // A free function's header ends in `)`, optionally followed by `const`/
+    // `noexcept` — not a control-flow keyword or a statement that merely
+    // contains a brace, like an array initializer (`std::vector<int> v =
+    // {1, 2, 3};`) or a lambda assigned to a variable (`std::function<...> f
+    // = [](...) { ... };`, whose own `)` right before the lambda body's `{`
+    // would otherwise pass the "ends in )" check).
+    const isMember = headerTail.length > 0
+      && !/^(if|for|while|switch|do|else|try|catch)\b/.test(headerTail)
+      && !headerTail.includes('=')
+      && /\)\s*(const)?\s*(noexcept)?\s*$/.test(headerTail)
+    if (isMember) {
+      if (pre.trim()) remainder += pre
+      members.push(headerTail + ' ' + trailing.slice(braceStart, k + 1))
+    } else {
+      remainder += trailing.slice(i, k + 1)
+    }
+    i = k + 1
+  }
+  return { members, remainder: remainder.trim() }
 }
 
 function wrapCpp(code) {
@@ -408,14 +435,17 @@ function wrapCpp(code) {
     return missing.length ? missing.map(h => `#include ${h}`).join('\n') + '\n' + code : code
   }
 
-  const itemsEnd = findCppItemsEnd(code)
-  const items = code.slice(0, itemsEnd).trim()
-  const trailing = code.slice(itemsEnd).trim()
+  const declEnd = findCppDeclarationsEnd(code)
+  const declarations = code.slice(0, declEnd).trim()
+  const trailing = code.slice(declEnd).trim()
   const includes = detectCppIncludes(code).map(h => `#include ${h}`).join('\n')
 
   if (!trailing) return (includes ? includes + '\n\n' : '') + code // declarations only
 
-  return `${includes ? includes + '\n\n' : ''}${items ? items + '\n\n' : ''}int main() {\n${trailing.replace(/^/gm, '    ')}\n    return 0;\n}`
+  const { members, remainder } = splitCppTrailing(trailing)
+  const memberBlock = members.join('\n\n')
+
+  return `${includes ? includes + '\n\n' : ''}${declarations ? declarations + '\n\n' : ''}${memberBlock ? memberBlock + '\n\n' : ''}int main() {\n${remainder.replace(/^/gm, '    ')}\n    return 0;\n}`
 }
 
 function autoWrap(lang, code) {
@@ -470,11 +500,21 @@ async function runWandbox(compiler, code, stdin = '') {
   if (!res.ok) throw new Error(`Wandbox returned ${res.status}`)
   const data = await res.json()
   const compileErr = (data.compiler_error || '').trimEnd()
-  if (compileErr) return 'Compile error:\n' + compileErr
   const out = (data.program_output || '').trimEnd()
   const err = (data.program_error || '').trimEnd()
+  // Wandbox puts compiler *warnings* in compiler_error too, not just hard
+  // errors — a program that compiled fine (just with an unused-variable
+  // warning, say) still runs and produces real output. Treating any non-empty
+  // compiler_error as a failure meant a harmless warning showed as "Compile
+  // error" even though the code worked. A genuine compile failure means the
+  // program never ran at all — no program_output, no program_error either —
+  // so that combination, plus the message actually containing "error" and
+  // not just warning noise, is what actually distinguishes the two.
+  if (compileErr && !out && !err && /error/i.test(compileErr)) {
+    return 'Error: Compile error:\n' + compileErr
+  }
   if (out && err) return out + '\n⚠ stderr:\n' + err
-  return out || err || '(no output)'
+  return out || err || (compileErr ? compileErr : '(no output)')
 }
 
 // ── Piston — fallback for all Wandbox languages + Kotlin/PowerShell ──────────

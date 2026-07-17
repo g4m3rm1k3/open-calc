@@ -60,7 +60,7 @@ export default function ConceptSearch({ topics, onSelect, selected }) {
                     <button
                       key={t.id}
                       onClick={() => onSelect(t)}
-                      className={`text-left px-3 py-2 text-[13px] font-medium rounded-lg transition-all mx-1 my-0.5 border ${
+                      className={`w-full text-left px-3 py-2.5 min-h-[36px] flex items-center text-[13px] leading-relaxed font-medium rounded-lg transition-all mx-1 my-0.5 border ${
                         isSelected
                           ? `${c.pill}`
                           : `text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200`

@@ -157,7 +157,7 @@ export default function ConceptExplorerModal({ onClose }: Props) {
                   <button
                     key={id}
                     onClick={() => selectConcept(id)}
-                    className={`block w-full text-left px-5 py-3.5 text-sm rounded-full transition-all relative overflow-hidden group ${
+                    className={`flex items-center w-full text-left px-5 py-3.5 min-h-[44px] text-sm leading-relaxed rounded-full transition-all relative overflow-hidden group ${
                       isActive
                         ? 'bg-white dark:bg-[#121827] text-slate-900 dark:text-white font-semibold shadow-sm border border-slate-200 dark:border-indigo-500/40'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-white/50 dark:hover:bg-[#121827]/50 font-medium border border-transparent'
