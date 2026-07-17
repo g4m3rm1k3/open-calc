@@ -1,11 +1,9 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import StartMenu from './StartMenu.jsx'
 import ChapterNavigator from './ChapterNavigator.jsx'
 import NotesListWindow from '../ui/NotesListWindow.jsx'
-import ConceptExplorerModal from '../../concepts/ConceptExplorerModal.tsx'
-import PracticeExplorerModal from '../../practice/PracticeExplorerModal.tsx'
 import { useDesktop } from './DesktopProvider.jsx'
 import { useMontyContext } from '../../features/compass/MontyContext.tsx'
 import { useProgress } from '../../hooks/useProgress.js'
@@ -21,6 +19,12 @@ const PINNED_APPS = [
   { id: 'brain', label: 'Brain Training', emoji: '🧠', route: '/brain' },
 ]
 import { LayoutGrid, Command, BookOpen, MessageSquare, StickyNote, GraduationCap, Zap, Lightbulb, Dumbbell } from 'lucide-react'
+
+// Lazy-loaded: each pulls in its own markdown library (concepts/practice
+// content + parsing) as a separate chunk, so the always-mounted desktop
+// shell doesn't ship or eagerly parse that content until actually opened.
+const ConceptExplorerModal = lazy(() => import('../../concepts/ConceptExplorerModal.tsx'))
+const PracticeExplorerModal = lazy(() => import('../../practice/PracticeExplorerModal.tsx'))
 
 export default function Taskbar({ windows, onFocus }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -53,8 +57,16 @@ export default function Taskbar({ windows, onFocus }) {
       {chapNavOpen && <ChapterNavigator onClose={() => setChapNavOpen(false)} />}
       {notesOpen && <NotesListWindow onClose={() => setNotesOpen(false)} />}
       <AnimatePresence>
-        {conceptExplorerOpen && <ConceptExplorerModal onClose={() => setConceptExplorerOpen(false)} />}
-        {practiceOpen && <PracticeExplorerModal onClose={() => setPracticeOpen(false)} />}
+        {conceptExplorerOpen && (
+          <Suspense fallback={null}>
+            <ConceptExplorerModal onClose={() => setConceptExplorerOpen(false)} />
+          </Suspense>
+        )}
+        {practiceOpen && (
+          <Suspense fallback={null}>
+            <PracticeExplorerModal onClose={() => setPracticeOpen(false)} />
+          </Suspense>
+        )}
       </AnimatePresence>
 
       <div className="hidden lg:flex fixed bottom-0 left-0 right-0 z-[1600] h-12 items-center gap-2 px-3 bg-white/70 dark:bg-slate-950/70 backdrop-blur-3xl border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_30px_rgba(0,0,0,0.03)]">
