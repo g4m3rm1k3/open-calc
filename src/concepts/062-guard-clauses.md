@@ -17,6 +17,19 @@ gets worse with every additional precondition. A guard clause checks each
 precondition up front and exits immediately if it fails, so the main logic
 afterward can stay flat and unindented.
 
+## Computer Science
+
+Guard clauses don't change a function's control-flow graph — the same
+branches and the same set of reachable execution paths exist either way, so a
+formal measure like cyclomatic complexity (the count of linearly independent
+paths through that graph) stays identical before and after. What changes is
+nesting depth: converting nested conditionals into sequential early-exit
+checks flattens the abstract syntax tree without altering which paths are
+reachable, which is why this is a pure readability transformation rather than
+an optimization or a behavior change.
+
+Tags: Control-flow graph, Cyclomatic complexity, Nesting depth, Structured programming
+
 ## Software Engineering
 
 This is one of the highest-value, lowest-cost refactors in everyday code —

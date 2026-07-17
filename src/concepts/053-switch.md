@@ -16,6 +16,19 @@ against different possibilities is repetitive and easy to get wrong. A switch
 statement expresses "compare this one value against these several options"
 directly, without repeating the value being compared at every branch.
 
+## Execution
+
+The switch value is compared against the first case
+↓
+If it doesn't match, comparison moves to the next case, in order
+↓
+Once a case matches, its code runs
+↓
+In a C-style switch, execution then continues into the NEXT case's code too,
+unless a `break` stops it there — this is the fall-through behavior
+↓
+If no case matches and a `default` exists, its code runs instead
+
 ## Computer Science
 
 In C-style languages, a `switch` falls through to the next case by default

@@ -55,7 +55,7 @@ Tags: Development-time checks, Defensive programming, Debug builds
 ## Exercises
 
 - In the Python example, fix `average` by adding a real guard clause before the assert, and compare how the error each one produces differs.
-- In Java, change the assertion's condition to something always true, and confirm nothing observable happens — a passing assertion is silent by design.
+- In Java, change the assertion's condition to something always FALSE (e.g. `numbers.length < 0`) and confirm the program still runs to completion and prints `NaN`, with no error at all. This isn't "a passing assertion is silent" — the condition is failing, not passing — it's proof that Java's assertions are disabled by default (no `-ea`) in this environment, exactly why the Software Engineering section warns against ever depending on one in production.
 
 ## javascript
 

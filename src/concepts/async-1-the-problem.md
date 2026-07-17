@@ -21,6 +21,31 @@ it has a choice: block, or stay responsive to everything else it also needs to d
 A program that blocks on every slow operation can only ever do one thing at a time,
 even when the CPU itself was never actually busy — it was just waiting.
 
+## Execution
+
+Call getUserBlocking(1)
+↓
+Execution reaches the network call — no result is available yet
+↓
+The calling thread **suspends**: it does not spin, poll, or busy-wait checking
+for the result — the operating system parks it, using zero CPU, until the
+operation actually completes
+↓
+2 seconds pass. During this entire window, no other line of code on this
+thread runs — not because the CPU is busy, but because this thread simply
+isn't scheduled to run at all
+↓
+The network operation completes — the OS wakes the thread back up
+↓
+getUserBlocking returns the fetched result
+↓
+The next line finally executes
+
+This suspend → wait → resume shape is identical regardless of language — it's
+what `Thread.sleep`, `time.sleep`, and a real blocking network call all do
+underneath, which is why this Execution model is shared across every language
+section below rather than repeated per language.
+
 ## Computer Science
 
 A blocking call suspends the entire calling thread of execution until the
@@ -51,6 +76,7 @@ Tags: Responsiveness, Server throughput, UI freezing
 ## Exercises
 
 - Predict, before running: does adding a second blocking call double the wait, or run alongside the first? Try it in the JavaScript example by adding a second `getUserBlocking` call.
+- In the Python example, replace `time.sleep(2)` with a CPU-bound loop that takes about the same wall-clock time (e.g. counting to a large number). Is that "blocking" in the sense this concept defines, or just "slow"? Use the Common Mistakes distinction above to justify your answer.
 
 ## javascript
 
@@ -92,6 +118,11 @@ reach for a synchronous library where an async one was needed.
 ## java
 
 ```java
+class User {
+    int id;
+    User(int id) { this.id = id; }
+}
+
 class UserService {
     static User getUserBlocking(int id) throws InterruptedException {
         Thread.sleep(2000); // stands in for "waiting on the network"

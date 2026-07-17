@@ -114,6 +114,11 @@ correctness-relevant difference, not just a naming one.
 ```java
 import java.util.concurrent.CompletableFuture;
 
+class User {
+    int id;
+    User(int id) { this.id = id; }
+}
+
 CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(() -> {
     try { Thread.sleep(2000); } catch (InterruptedException e) {}
     return new User(1);

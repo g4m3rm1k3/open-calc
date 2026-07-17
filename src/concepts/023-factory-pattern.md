@@ -17,6 +17,21 @@ input, validating inputs first — repeating that logic at every call site means
 every one of those call sites has to be updated if the construction logic ever
 changes.
 
+## Execution
+
+Call createUser('Alice', 'admin')
+↓
+The factory decides what construction logic applies — here, which permission
+set matches the given role
+↓
+The factory builds the object using that decision (the permissions list, plus
+the passed-in name and role)
+↓
+The fully-constructed object is returned to the caller
+↓
+The caller receives a ready-to-use object without ever making the
+role-to-permissions decision itself
+
 ## Computer Science
 
 A factory is really just a function that returns an object — there's no special

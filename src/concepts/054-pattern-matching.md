@@ -39,7 +39,7 @@ Exhaustiveness checking, where a compiler verifies every possible shape has
 been handled, is only possible when the compiler knows the complete, closed set
 of shapes a value could take, which is exactly what a sum type guarantees.
 
-Tags: Sum types, Exhaustiveness checking, Destructuring
+Tags: Sum types, Exhaustiveness checking, Destructuring, Control flow
 
 ## Software Engineering
 

@@ -37,7 +37,7 @@ referencing each other that a running program builds up. Dependency Injection is
 about *who constructs that graph* — the object itself, or something external to it
 — and injection always means "external."
 
-Tags: Object graphs, Composition, Inversion of control
+Tags: Object graphs, Composition, Inversion of control, Object creation
 
 ## Software Engineering
 

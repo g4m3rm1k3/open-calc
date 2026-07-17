@@ -23,7 +23,7 @@ a type describing a set of method signatures. Any class that implements it can b
 used anywhere the interface type is expected (see Polymorphism), regardless of
 what other class hierarchy that implementing class belongs to.
 
-Tags: Contracts, Type signatures, Structural vs nominal typing
+Tags: Contracts, Type signatures, Structural vs nominal typing, Dynamic dispatch
 
 ## Software Engineering
 

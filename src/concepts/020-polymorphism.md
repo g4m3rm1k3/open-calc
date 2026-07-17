@@ -36,7 +36,7 @@ object's own version at the moment the call happens, a mechanism called **dynami
 dispatch**. This is different from choosing which function to call based on the
 declared type of a variable, which is fixed at compile time.
 
-Tags: Dynamic dispatch, Virtual methods, Late binding
+Tags: Dynamic dispatch, Virtual methods, Late binding, Contracts
 
 ## Software Engineering
 

@@ -15,6 +15,20 @@ Without functions, any logic used more than once has to be copy-pasted everywher
 it's needed — and every future fix has to be applied to every copy, individually,
 without missing one.
 
+## Execution
+
+Call greet('Alice')
+↓
+A new stack frame is pushed, binding the parameter name → 'Alice'
+↓
+The function body runs inside that frame, using the bound parameter
+↓
+The body reaches a return — the result value is computed
+↓
+The stack frame is popped, discarding its local bindings
+↓
+Execution resumes at the call site, with the return value in hand
+
 ## Computer Science
 
 Calling a function pushes a new **stack frame** onto the call stack — memory
