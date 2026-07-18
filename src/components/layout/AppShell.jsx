@@ -33,7 +33,6 @@ import { useMontyContext } from "../../features/compass/MontyContext.tsx";
 // Lazy: pulls in @mlc-ai/web-llm (a local LLM runtime) via useCompassAI —
 // must not be in every page's bundle just because the taskbar button exists.
 const MontyPanel = lazy(() => import("../../features/compass/components/MontyPanel.tsx"));
-import { ChatProvider } from "../../context/ChatContext.jsx";
 const ChatPanel = lazy(() => import("../tutor/ChatPanel.jsx"));
 const PhysicsPoolLab = lazy(() => import("../../games/pool/PhysicsPoolLab.jsx"));
 const BasketballLab = lazy(() => import("../../games/basketball/BasketballLab.jsx"));
@@ -570,7 +569,6 @@ export default function AppShell({ children }) {
   }
 
   return (
-    <ChatProvider>
       <GrapherContext.Provider value={grapherContextValue}>
         <div className={`min-h-screen transition-colors duration-500 relative ${isLessonRoute ? "bg-white dark:bg-slate-950" : ""}`}>
           {isDesktopRoute && !isMobile && desktopMode === "graph" && (
@@ -823,6 +821,5 @@ export default function AppShell({ children }) {
 
         </div>
       </GrapherContext.Provider>
-    </ChatProvider>
   );
 }

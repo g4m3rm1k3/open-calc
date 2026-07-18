@@ -5,6 +5,7 @@ import StartMenu from './StartMenu.jsx'
 import ChapterNavigator from './ChapterNavigator.jsx'
 import NotesListWindow from '../ui/NotesListWindow.jsx'
 import { useDesktop } from './DesktopProvider.jsx'
+import { useChat } from '../../hooks/useChat.js'
 import { useMontyContext } from '../../features/compass/MontyContext.tsx'
 import { useProgress } from '../../hooks/useProgress.js'
 import { computeXp, xpToLevel } from '../../features/compass/montyStatus.ts'
@@ -38,6 +39,7 @@ export default function Taskbar({ windows, onFocus }) {
   const monty = useMontyContext()
   const { progress } = useProgress()
   const { level, xpInLevel } = xpToLevel(computeXp(progress))
+  const { unreadCount, chatOpen } = useChat()
 
 
   const isLessonRoute = /^\/chapter\/[^/]+\/.+/.test(location.pathname)
@@ -256,7 +258,11 @@ export default function Taskbar({ windows, onFocus }) {
           >
             <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <MessageSquare className="w-4 h-4 relative z-10" />
-            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 border-2 border-white dark:border-slate-950 animate-pulse shadow-sm" />
+            {unreadCount > 0 && !chatOpen && (
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-0.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-sm">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
           </motion.button>
         </div>
       </div>

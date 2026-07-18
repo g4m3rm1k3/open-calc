@@ -74,7 +74,7 @@ export function subscribeHistory(pool, roomId, hours, onEvent, onDone) {
   const since = Math.floor(Date.now() / 1000) - hours * 3600
   const sub = pool.subscribeMany(
     RELAYS,
-    [{ kinds: [1], '#t': [roomTag(roomId)], since, limit: 200 }],
+    { kinds: [1], '#t': [roomTag(roomId)], since, limit: 200 },
     {
       onevent(event) {
         try {
@@ -96,7 +96,7 @@ export function subscribeHistory(pool, roomId, hours, onEvent, onDone) {
 export function subscribeLive(pool, roomId, since, onEvent) {
   return pool.subscribeMany(
     RELAYS,
-    [{ kinds: [1], '#t': [roomTag(roomId)], since }],
+    { kinds: [1], '#t': [roomTag(roomId)], since },
     {
       onevent(event) {
         try {

@@ -10,6 +10,7 @@ import LoadingSpinner from "./components/ui/LoadingSpinner.jsx";
 import { getLabEntry } from "./labs/labLoader.js";
 import { getGameEntry } from "./games/gameLoader.js";
 import DesktopProvider from "./components/desktop/DesktopProvider.jsx";
+import { ChatProvider } from "./context/ChatContext.jsx";
 import RootErrorBoundary from "./components/layout/RootErrorBoundary.jsx";
 import { TourProvider } from "./context/TourContext.jsx";
 import { MontyProvider } from "./features/compass/MontyContext.tsx";
@@ -110,6 +111,7 @@ export default function App() {
               >
                 <TourProvider>
                   <MontyProvider>
+                  <ChatProvider>
                   <DesktopProvider>
                     <FloatingVideoPlayer />
                     <Suspense fallback={null}>
@@ -423,6 +425,7 @@ export default function App() {
                       </AppShell>
                     </RootErrorBoundary>
                   </DesktopProvider>
+                  </ChatProvider>
                   </MontyProvider>
                 </TourProvider>
               </HashRouter>

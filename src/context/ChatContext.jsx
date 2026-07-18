@@ -79,6 +79,11 @@ export function ChatProvider({ children }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [globalHistoryLoaded, setGlobalHistoryLoaded] = useState(false);
   const [roomKey, setRoomKey] = useState(0);
+  // Whether the chat panel is open — gates the WebRTC P2P room (and the GPU/
+  // host-election machinery it carries for Lovelace). The Nostr relay layer
+  // below is NOT gated by this — it alone delivers messages/history to
+  // everyone, regardless of whether any given user has chat open.
+  const [chatOpen, setChatOpen] = useState(false);
 
   const sendGlobalRef = useRef(null);
   const usernameRef = useRef(username);
@@ -164,17 +169,14 @@ export function ChatProvider({ children }) {
     return () => { try { nostrPool.current?.close?.([], {}); } catch {} };
   }, []);
 
-  // Compute GPU score once on mount, then re-announce so peers can re-elect
+  // Track chat-panel open/closed state, via the same window event Taskbar.jsx
+  // dispatches and AppShell.jsx already listens to for the panel's own
+  // visibility — kept independent here so this provider can gate the P2P
+  // room without any prop plumbing.
   useEffect(() => {
-    getGpuScore().then(score => {
-      myGpuScoreRef.current = score;
-      reelectHost();
-      sendLovelaceChannelRef.current?.({
-        type: "announce",
-        score,
-        pk: keypair.current?.pk ?? "",
-      });
-    });
+    const handler = () => setChatOpen(o => !o);
+    window.addEventListener("oc-toggle-chat", handler);
+    return () => window.removeEventListener("oc-toggle-chat", handler);
   }, []);
 
   function makeIncomingMsg(data, peerId) {
@@ -189,8 +191,45 @@ export function ChatProvider({ children }) {
     };
   }
 
-  // Global room — re-runs when roomKey increments (manual reconnect)
+  // Nostr relay layer — ALWAYS active, regardless of chatOpen. This alone
+  // delivers live messages and history to everyone (see nostrChat.js); the
+  // WebRTC room below is additional, not required for basic chat delivery.
+  // Re-runs when roomKey increments (manual reconnect).
   useEffect(() => {
+    if (!nostrPool.current) { setGlobalHistoryLoaded(true); return; }
+
+    const nostrLiveSub = { current: null };
+    const liveFrom = Math.floor(Date.now() / 1000);
+    const myPeerId = keypair.current?.pk?.slice(0, 16);
+
+    subscribeHistory(
+      nostrPool.current, "global", HISTORY_HOURS,
+      msg => setGlobalMessages(prev => mergeMessages(prev, [msg])),
+      () => {
+        setGlobalHistoryLoaded(true);
+        // Keep listening for new Nostr events after history is loaded
+        nostrLiveSub.current = subscribeLive(
+          nostrPool.current, "global", liveFrom,
+          msg => {
+            setGlobalMessages(prev => mergeMessages(prev, [msg]));
+            // Skip the unread bump for our own message echoing back from the relay
+            if (msg.peerId !== myPeerId) setUnreadCount(n => n + 1);
+          },
+        );
+      },
+    );
+
+    return () => { try { nostrLiveSub.current?.close(); } catch {} };
+  }, [roomKey]);
+
+  // WebRTC P2P room — transport for redundant/low-latency message delivery
+  // AND for Lovelace's GPU host-election + AI query routing. Only connects
+  // while the chat panel is open; fully disconnects when it closes, so none
+  // of this network/compute activity runs unless someone is actually using
+  // chat. Re-runs when roomKey increments (manual reconnect) or chatOpen flips.
+  useEffect(() => {
+    if (!chatOpen) return;
+
     // Reset peer state on each (re)connect
     setGlobalPeers(0);
     peerScoresRef.current.clear();
@@ -199,7 +238,6 @@ export function ChatProvider({ children }) {
     setLovelaceHostId("local");
 
     let room;
-    const nostrLiveSub = { current: null };
 
     try {
       room = joinRoom(APP_CONFIG, "open-calc-global");
@@ -271,37 +309,29 @@ export function ChatProvider({ children }) {
       });
 
       setConnected(true);
+
+      // Compute + announce GPU score once per connection (i.e. once each time
+      // chat opens) — so the host election is already resolved by the time
+      // anyone actually needs it, without running continuously in the
+      // background while chat is closed.
+      getGpuScore().then(score => {
+        myGpuScoreRef.current = score;
+        reelectHost();
+        sendLv?.({ type: "announce", score, pk: keypair.current?.pk ?? "" });
+      });
     } catch (e) {
       console.warn("[Chat] Global room failed:", e);
       setConnected(false);
     }
 
-    if (nostrPool.current) {
-      const liveFrom = Math.floor(Date.now() / 1000);
-      subscribeHistory(
-        nostrPool.current, "global", HISTORY_HOURS,
-        msg => setGlobalMessages(prev => mergeMessages(prev, [msg])),
-        () => {
-          setGlobalHistoryLoaded(true);
-          // Keep listening for new Nostr events after history is loaded
-          nostrLiveSub.current = subscribeLive(
-            nostrPool.current, "global", liveFrom,
-            msg => setGlobalMessages(prev => mergeMessages(prev, [msg])),
-          );
-        },
-      );
-    } else {
-      setGlobalHistoryLoaded(true);
-    }
-
     return () => {
       try { room?.leave(); } catch {}
-      try { nostrLiveSub.current?.close(); } catch {}
       sendGlobalRef.current = null;
       sendLovelaceChannelRef.current = null;
       setConnected(false);
+      setGlobalPeers(0);
     };
-  }, [roomKey]);
+  }, [roomKey, chatOpen]);
 
   // Track lesson from URL + broadcast presence on change
   useEffect(() => {
@@ -389,6 +419,7 @@ export function ChatProvider({ children }) {
     currentLessonTitle,
     activeLessons,
     connected,
+    chatOpen,
     sendMessage,
     sendLovelaceResponse,
     unreadCount,
@@ -403,7 +434,7 @@ export function ChatProvider({ children }) {
   }), [
     username, setUsername, blockedPeers, blockedUsers, blockPeer, unblockPeer,
     globalMessages, globalPeers, currentLessonId, currentLessonTitle, activeLessons,
-    connected, sendMessage, sendLovelaceResponse, unreadCount, markAllRead,
+    connected, chatOpen, sendMessage, sendLovelaceResponse, unreadCount, markAllRead,
     globalHistoryLoaded, lovelaceHostId, pendingLovelaceQueries, sendLovelaceQuery,
     resolveLovelaceQuery, reconnect,
   ]);
