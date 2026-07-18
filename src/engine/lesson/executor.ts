@@ -25,6 +25,11 @@ async function getCodeRunner() {
   }>
 }
 
+// Routed through codeRunner.js's Wandbox-backed runCode(), same as C/C++/C#/Java
+// below — kotlin/scala deliberately excluded, no working execution backend for
+// either right now (Wandbox's scalac is broken server-side, Piston is whitelist-only).
+const WANDBOX_RUNNABLE_LANGS = new Set(['rust', 'go', 'ruby', 'php', 'haskell', 'swift', 'julia', 'r'])
+
 export async function executeCode(code: string, lang: Lang): Promise<ExecutionResult> {
   const start = Date.now()
   const lines: OutputLine[] = []
@@ -87,8 +92,13 @@ export async function executeCode(code: string, lang: Lang): Promise<ExecutionRe
       const output = await runCode('java', code)
       if (output.startsWith('Compile error:') || output.startsWith('No runner')) err(output)
       else out(output || '(no output)')
+    } else if (WANDBOX_RUNNABLE_LANGS.has(norm)) {
+      const { runCode } = await getCodeRunner()
+      const output = await runCode(norm, code)
+      if (output.startsWith('Compile error:') || output.startsWith('No runner')) err(output)
+      else out(output || '(no output)')
     } else {
-      err(`Run not supported for '${lang}'. Supported: python, javascript, typescript, html/css/js, sql, bash, C/C++, C#, and Java.`)
+      err(`Run not supported for '${lang}'. Supported: python, javascript, typescript, html/css/js, sql, bash, C/C++, C#, Java, Rust, Go, Ruby, PHP, Haskell, Swift, Julia, and R.`)
     }
   } catch (e) {
     err(e instanceof Error ? e.message : String(e))
@@ -100,6 +110,7 @@ export async function executeCode(code: string, lang: Lang): Promise<ExecutionRe
 
 export function isRunnable(lang: Lang): boolean {
   const norm = lang.toLowerCase()
+  if (WANDBOX_RUNNABLE_LANGS.has(norm)) return true
   return [
     'python', 'py',
     'javascript', 'js',
