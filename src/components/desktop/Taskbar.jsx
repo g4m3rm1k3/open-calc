@@ -254,12 +254,14 @@ export default function Taskbar({ windows, onFocus }) {
             whileTap={{ scale: 0.95 }}
             onClick={toggleChat}
             title="Study Chat"
-            className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-md hover:shadow-lg hover:shadow-indigo-500/30 transition-all focus:outline-none group overflow-hidden"
+            className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-md hover:shadow-lg hover:shadow-indigo-500/30 transition-all focus:outline-none group"
           >
-            <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
             <MessageSquare className="w-4 h-4 relative z-10" />
             {unreadCount > 0 && !chatOpen && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-0.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-sm">
+              <span className="absolute -top-1 -right-1 z-20 min-w-[16px] h-[16px] px-0.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-sm">
                 {unreadCount > 99 ? '99+' : unreadCount}
               </span>
             )}

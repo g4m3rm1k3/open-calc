@@ -1,16 +1,42 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { ChatContext } from "./chatContext.js";
-import { joinRoom } from "@trystero-p2p/nostr";
 import { useLocation } from "react-router-dom";
 import { LESSON_MAP } from "../courses/index.js";
-import {
-  getOrCreateKeypair,
-  createPool,
-  publishMessage,
-  subscribeHistory,
-  subscribeLive,
-} from "./nostrChat.js";
 import { getGpuScore } from "../utils/gpuScore.js";
+
+// ChatProvider wraps the whole app (see App.jsx), so anything imported at
+// module scope here ends up in the main entry bundle every page pays for
+// before it can render. nostr-tools (relay delivery) and trystero (P2P room)
+// are both sizable — dynamic-imported instead so they load as their own
+// chunk. Both are also *prefetched* during browser idle time (see
+// scheduleIdle below) rather than the instant they're needed — fetching them
+// eagerly on mount / on chat-open made their fetch+parse compete with the
+// user's first keystrokes and with Lovelace's P2P channel coming up, which
+// read as "typing lag" and "Lovelace lag" respectively. Idle-time prefetch
+// means both are already warm in cache by the time they're actually used, in
+// virtually every real session. Delivery to all users is unaffected — the
+// relay module load is still kicked off unconditionally, just scheduled for
+// idle time instead of blocking the main thread immediately.
+function scheduleIdle(fn) {
+  if (typeof window !== "undefined" && typeof window.requestIdleCallback === "function") {
+    const id = window.requestIdleCallback(fn, { timeout: 2000 });
+    return () => window.cancelIdleCallback(id);
+  }
+  const id = setTimeout(fn, 200);
+  return () => clearTimeout(id);
+}
+
+let nostrChatModulePromise = null;
+function loadNostrChat() {
+  if (!nostrChatModulePromise) nostrChatModulePromise = import("./nostrChat.js");
+  return nostrChatModulePromise;
+}
+
+let trysteroModulePromise = null;
+function loadTrystero() {
+  if (!trysteroModulePromise) trysteroModulePromise = import("@trystero-p2p/nostr");
+  return trysteroModulePromise;
+}
 
 const APP_CONFIG = { appId: "open-calc-v1" };
 const MAX_MESSAGES = 200;
@@ -79,6 +105,9 @@ export function ChatProvider({ children }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [globalHistoryLoaded, setGlobalHistoryLoaded] = useState(false);
   const [roomKey, setRoomKey] = useState(0);
+  // Flips true once the dynamically-imported nostrChat module has resolved
+  // and the keypair/pool are set up — gates the relay-subscription effect.
+  const [nostrLoaded, setNostrLoaded] = useState(false);
   // Whether the chat panel is open — gates the WebRTC P2P room (and the GPU/
   // host-election machinery it carries for Lovelace). The Nostr relay layer
   // below is NOT gated by this — it alone delivers messages/history to
@@ -162,11 +191,28 @@ export function ChatProvider({ children }) {
     });
   }, []);
 
-  // Init Nostr keypair + pool once
+  // Init Nostr keypair + pool once — nostrChat.js is dynamic-imported (see
+  // loadNostrChat above), scheduled for idle time so the fetch+parse doesn't
+  // compete with the user's first interactions right after page load. Also
+  // prefetches trystero here (idle, not gated on chatOpen) so that when chat
+  // is actually opened, its P2P room — and Lovelace's channel over it —
+  // comes up from a warm cache instead of a fresh network fetch.
   useEffect(() => {
-    keypair.current = getOrCreateKeypair();
-    nostrPool.current = createPool();
-    return () => { try { nostrPool.current?.close?.([], {}); } catch {} };
+    let cancelled = false;
+    const cancelIdle = scheduleIdle(() => {
+      loadTrystero();
+      loadNostrChat().then(mod => {
+        if (cancelled) return;
+        keypair.current = mod.getOrCreateKeypair();
+        nostrPool.current = mod.createPool();
+        setNostrLoaded(true);
+      });
+    });
+    return () => {
+      cancelled = true;
+      cancelIdle();
+      try { nostrPool.current?.close?.([], {}); } catch {}
+    };
   }, []);
 
   // Track chat-panel open/closed state, via the same window event Taskbar.jsx
@@ -194,33 +240,55 @@ export function ChatProvider({ children }) {
   // Nostr relay layer — ALWAYS active, regardless of chatOpen. This alone
   // delivers live messages and history to everyone (see nostrChat.js); the
   // WebRTC room below is additional, not required for basic chat delivery.
-  // Re-runs when roomKey increments (manual reconnect).
+  // Re-runs when roomKey increments (manual reconnect) or once nostrLoaded
+  // flips true after the dynamic import resolves.
   useEffect(() => {
-    if (!nostrPool.current) { setGlobalHistoryLoaded(true); return; }
+    if (!nostrLoaded || !nostrPool.current) return;
 
+    let cancelled = false;
     const nostrLiveSub = { current: null };
     const liveFrom = Math.floor(Date.now() / 1000);
     const myPeerId = keypair.current?.pk?.slice(0, 16);
 
-    subscribeHistory(
-      nostrPool.current, "global", HISTORY_HOURS,
-      msg => setGlobalMessages(prev => mergeMessages(prev, [msg])),
-      () => {
-        setGlobalHistoryLoaded(true);
-        // Keep listening for new Nostr events after history is loaded
-        nostrLiveSub.current = subscribeLive(
-          nostrPool.current, "global", liveFrom,
-          msg => {
-            setGlobalMessages(prev => mergeMessages(prev, [msg]));
-            // Skip the unread bump for our own message echoing back from the relay
-            if (msg.peerId !== myPeerId) setUnreadCount(n => n + 1);
-          },
-        );
-      },
-    );
+    loadNostrChat().then(({ subscribeHistory, subscribeLive }) => {
+      if (cancelled) return;
+      subscribeHistory(
+        nostrPool.current, "global", HISTORY_HOURS,
+        // parseNostrEvent (nostrChat.js) hardcodes isOwn: false since it has
+        // no notion of "me" — correct it here for messages we sent in a past
+        // session, so they render as "Me" (no Block button) after a reload.
+        msg => setGlobalMessages(prev =>
+          mergeMessages(prev, [msg.peerId === myPeerId ? { ...msg, isOwn: true } : msg]),
+        ),
+        () => {
+          if (cancelled) return;
+          setGlobalHistoryLoaded(true);
+          // Keep listening for new Nostr events after history is loaded
+          nostrLiveSub.current = subscribeLive(
+            nostrPool.current, "global", liveFrom,
+            msg => {
+              // This is the relay echoing back a message we just published
+              // in *this* session — sendMessage() already added it locally
+              // and instantly with the correct isOwn/id. Merging this too
+              // would add a second, distinct-id copy that (since
+              // parseNostrEvent always sets isOwn: false) rendered as a
+              // stranger's message — complete with a Block button — on our
+              // own text. Drop it; nothing is lost since the local copy
+              // already represents it.
+              if (msg.peerId === myPeerId) return;
+              setGlobalMessages(prev => mergeMessages(prev, [msg]));
+              setUnreadCount(n => n + 1);
+            },
+          );
+        },
+      );
+    });
 
-    return () => { try { nostrLiveSub.current?.close(); } catch {} };
-  }, [roomKey]);
+    return () => {
+      cancelled = true;
+      try { nostrLiveSub.current?.close(); } catch {}
+    };
+  }, [roomKey, nostrLoaded]);
 
   // WebRTC P2P room — transport for redundant/low-latency message delivery
   // AND for Lovelace's GPU host-election + AI query routing. Only connects
@@ -238,93 +306,102 @@ export function ChatProvider({ children }) {
     setLovelaceHostId("local");
 
     let room;
+    let cancelled = false;
 
-    try {
-      room = joinRoom(APP_CONFIG, "open-calc-global");
-      const [send, receive] = room.makeAction("msg");
-      sendGlobalRef.current = send;
+    // trystero is dynamic-imported (and idle-prefetched on mount above) so
+    // it isn't part of the bundle every page pays for, and is already warm
+    // by the time chat actually opens.
+    loadTrystero().then(({ joinRoom }) => {
+      if (cancelled) return;
 
-      receive((data, peerId) => {
-        if (!data?.text || !data?.username) return;
-        const msg = makeIncomingMsg(data, peerId);
-        setGlobalMessages(prev => mergeMessages(prev, [msg]));
-        setUnreadCount(n => n + 1);
-      });
-
-      let sendLv = null;
       try {
-        const [lv, receiveLv] = room.makeAction("lovelace");
-        sendLv = lv;
-        sendLovelaceChannelRef.current = lv;
+        room = joinRoom(APP_CONFIG, "open-calc-global");
+        const [send, receive] = room.makeAction("msg");
+        sendGlobalRef.current = send;
 
-        receiveLv((data, peerId) => {
-          if (data?.type === "announce") {
-            peerScoresRef.current.set(peerId, { score: data.score ?? 0, pk: data.pk ?? peerId });
-            reelectHost();
-          } else if (data?.type === "lesson-presence") {
-            peerLessonsRef.current.set(
-              peerId,
-              data.lessonId
-                ? { lessonId: data.lessonId, title: data.title, username: data.username }
-                : null,
-            );
-            rebuildActiveLessons();
-          } else if (data?.type === "query" && lovelaceHostIdRef.current === "local") {
-            setPendingLovelaceQueries(q =>
-              q.some(p => p.queryId === data.queryId)
-                ? q
-                : [...q, {
-                    queryId: data.queryId,
-                    text: data.text,
-                    recentMessages: data.recentMessages ?? [],
-                    lessonContext: data.lessonContext ?? null,
-                  }],
-            );
+        receive((data, peerId) => {
+          if (!data?.text || !data?.username) return;
+          const msg = makeIncomingMsg(data, peerId);
+          setGlobalMessages(prev => mergeMessages(prev, [msg]));
+          setUnreadCount(n => n + 1);
+        });
+
+        let sendLv = null;
+        try {
+          const [lv, receiveLv] = room.makeAction("lovelace");
+          sendLv = lv;
+          sendLovelaceChannelRef.current = lv;
+
+          receiveLv((data, peerId) => {
+            if (data?.type === "announce") {
+              peerScoresRef.current.set(peerId, { score: data.score ?? 0, pk: data.pk ?? peerId });
+              reelectHost();
+            } else if (data?.type === "lesson-presence") {
+              peerLessonsRef.current.set(
+                peerId,
+                data.lessonId
+                  ? { lessonId: data.lessonId, title: data.title, username: data.username }
+                  : null,
+              );
+              rebuildActiveLessons();
+            } else if (data?.type === "query" && lovelaceHostIdRef.current === "local") {
+              setPendingLovelaceQueries(q =>
+                q.some(p => p.queryId === data.queryId)
+                  ? q
+                  : [...q, {
+                      queryId: data.queryId,
+                      text: data.text,
+                      recentMessages: data.recentMessages ?? [],
+                      lessonContext: data.lessonContext ?? null,
+                    }],
+              );
+            }
+          });
+        } catch (lvErr) {
+          console.warn("[Chat] Lovelace P2P channel setup failed:", lvErr);
+        }
+
+        room.onPeerJoin(() => {
+          setGlobalPeers(n => n + 1);
+          sendLv?.({ type: "announce", score: myGpuScoreRef.current, pk: keypair.current?.pk ?? "" });
+          const myLesson = currentLessonRef.current;
+          if (myLesson) {
+            sendLv?.({
+              type: "lesson-presence",
+              lessonId: myLesson.id,
+              title: myLesson.title,
+              username: usernameRef.current,
+            });
           }
         });
-      } catch (lvErr) {
-        console.warn("[Chat] Lovelace P2P channel setup failed:", lvErr);
+
+        room.onPeerLeave(peerId => {
+          setGlobalPeers(n => Math.max(0, n - 1));
+          peerScoresRef.current.delete(peerId);
+          reelectHost();
+          peerLessonsRef.current.delete(peerId);
+          rebuildActiveLessons();
+        });
+
+        setConnected(true);
+
+        // Compute + announce GPU score once per connection (i.e. once each time
+        // chat opens) — so the host election is already resolved by the time
+        // anyone actually needs it, without running continuously in the
+        // background while chat is closed.
+        getGpuScore().then(score => {
+          myGpuScoreRef.current = score;
+          reelectHost();
+          sendLv?.({ type: "announce", score, pk: keypair.current?.pk ?? "" });
+        });
+      } catch (e) {
+        console.warn("[Chat] Global room failed:", e);
+        setConnected(false);
       }
-
-      room.onPeerJoin(() => {
-        setGlobalPeers(n => n + 1);
-        sendLv?.({ type: "announce", score: myGpuScoreRef.current, pk: keypair.current?.pk ?? "" });
-        const myLesson = currentLessonRef.current;
-        if (myLesson) {
-          sendLv?.({
-            type: "lesson-presence",
-            lessonId: myLesson.id,
-            title: myLesson.title,
-            username: usernameRef.current,
-          });
-        }
-      });
-
-      room.onPeerLeave(peerId => {
-        setGlobalPeers(n => Math.max(0, n - 1));
-        peerScoresRef.current.delete(peerId);
-        reelectHost();
-        peerLessonsRef.current.delete(peerId);
-        rebuildActiveLessons();
-      });
-
-      setConnected(true);
-
-      // Compute + announce GPU score once per connection (i.e. once each time
-      // chat opens) — so the host election is already resolved by the time
-      // anyone actually needs it, without running continuously in the
-      // background while chat is closed.
-      getGpuScore().then(score => {
-        myGpuScoreRef.current = score;
-        reelectHost();
-        sendLv?.({ type: "announce", score, pk: keypair.current?.pk ?? "" });
-      });
-    } catch (e) {
-      console.warn("[Chat] Global room failed:", e);
-      setConnected(false);
-    }
+    });
 
     return () => {
+      cancelled = true;
       try { room?.leave(); } catch {}
       sendGlobalRef.current = null;
       sendLovelaceChannelRef.current = null;
@@ -371,10 +448,12 @@ export function ChatProvider({ children }) {
 
     // Don't publish AI responses to Nostr — relay echo would create duplicates
     if (!isLovelace && keypair.current && nostrPool.current) {
-      publishMessage(nostrPool.current, keypair.current.sk, "global", {
-        ...payload,
-        peerId: keypair.current.pk.slice(0, 16),
-      }).catch(() => {});
+      loadNostrChat().then(({ publishMessage }) =>
+        publishMessage(nostrPool.current, keypair.current.sk, "global", {
+          ...payload,
+          peerId: keypair.current.pk.slice(0, 16),
+        }),
+      ).catch(() => {});
     }
   }, []);
 
