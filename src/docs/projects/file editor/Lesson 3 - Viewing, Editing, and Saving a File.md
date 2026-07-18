@@ -60,6 +60,21 @@ matters — only the failure actually anticipated gets handled this way;
 any other, unexpected error still crashes, which is what you want,
 because silently swallowing errors you didn't anticipate hides real bugs.
 
+### CS Lens
+
+Catching a *specific*, anticipated failure and continuing, while letting
+everything else propagate, is a pattern that recurs well beyond
+`try`/`except`. Also recognized in: HTTP's own status-code ranges (`4xx`
+handled as "the caller's problem," `5xx` as "ours," rather than one
+undifferentiated "it broke"); a circuit breaker in distributed systems,
+which trips only on the specific failure mode it watches for and lets
+everything else through; a database transaction's rollback, undoing
+exactly the failed operation without corrupting unrelated state; a
+hardware fault handler registered for one specific interrupt, not every
+possible one. The shared idea: name the exact failure you can recover
+from, handle only that, and let anything you didn't anticipate surface
+loudly instead of being silently absorbed.
+
 ### Discard
 
 This code is deleted now — `divide` never appears in the project. The
@@ -112,6 +127,19 @@ documentation the way a function's type hints have been so far — on a
 the instant an instance is constructed. Handing it a string where an
 integer was declared doesn't silently accept it or quietly convert it —
 it refuses immediately, naming exactly which field failed and why.
+
+### CS Lens
+
+A `BaseModel` subclass is a **schema** — a declared, enforced shape for
+data crossing a boundary, checked before anything else touches it. Also
+recognized in: a database column's type and `NOT NULL` constraint,
+rejecting a bad `INSERT` before it's ever stored; a `.proto` file
+defining a gRPC message's exact fields and types; JSON Schema validating
+a document against a contract before an application reads it; TypeScript
+rejecting a mismatched shape at compile time instead of runtime. All of
+them answer the same question the same way: check the shape of external
+data once, at the edge, instead of trusting it and hoping every piece of
+code downstream happens to use it correctly.
 
 ### Discard
 
@@ -252,7 +280,10 @@ def write_file(path: str, edit: FileEdit):
 
 ### The Updated Project — where this lives
 
-The import needs to land among the existing ones; see it in place:
+The new import and the new `FileEdit` class land near the top; `write_file`
+lands at the bottom, after `read_file`. Rather than guess which parts
+matter, here is the complete file as it exists after this unit — every
+line, nothing skipped, even the parts this unit didn't touch:
 
 ```python
 from pathlib import Path
@@ -269,17 +300,41 @@ class FileEdit(BaseModel):              # ← new
 
 
 CONTENT_DIR = (Path(__file__).parent / "content").resolve()
-```
 
-Everything below `CONTENT_DIR` — `app.add_middleware(...)`, `health_check`,
-`list_files`, `read_file` — is unchanged and omitted here since none of
-it is touched by this unit; `write_file` itself is a complete, freestanding
-new function, added after `read_file`, with nothing existing to show it
-enclosed inside of:
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-```python
-@app.put("/file")
-def write_file(path: str, edit: FileEdit):
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
+@app.get("/files")
+def list_files(path: str = ""):
+    target_dir = (CONTENT_DIR / path).resolve()
+
+    if not target_dir.is_relative_to(CONTENT_DIR):
+        raise HTTPException(status_code=400, detail="Invalid path")
+
+    if not target_dir.is_dir():
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    entries = []
+    for entry in sorted(target_dir.iterdir()):
+        entries.append({
+            "name": entry.name,
+            "is_directory": entry.is_dir(),
+        })
+    return {"path": path, "entries": entries}
+
+
+@app.get("/file")
+def read_file(path: str = ""):
     target_file = (CONTENT_DIR / path).resolve()
 
     if not target_file.is_relative_to(CONTENT_DIR):
@@ -288,9 +343,32 @@ def write_file(path: str, edit: FileEdit):
     if not target_file.is_file():
         raise HTTPException(status_code=404, detail="File not found")
 
-    target_file.write_text(edit.content, encoding="utf-8")
-    return {"path": path, "saved": True}
+    try:
+        content = target_file.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=400, detail="File is not readable as text")
+
+    return {"path": path, "content": content}
+
+
+@app.put("/file")                                                   # ← new
+def write_file(path: str, edit: FileEdit):                          # ← new
+    target_file = (CONTENT_DIR / path).resolve()                    # ← new
+
+    if not target_file.is_relative_to(CONTENT_DIR):                 # ← new
+        raise HTTPException(status_code=400, detail="Invalid path")  # ← new
+
+    if not target_file.is_file():                                   # ← new
+        raise HTTPException(status_code=404, detail="File not found")  # ← new
+
+    target_file.write_text(edit.content, encoding="utf-8")          # ← new
+    return {"path": path, "saved": True}                            # ← new
 ```
+
+`app.add_middleware`, `health_check`, `list_files`, and `read_file` are
+exactly what Lessons 1 through 3's earlier units already left in place —
+shown here in full because this is the real state of the file, not
+because any of it changed again.
 
 ### Mechanical Walkthrough
 

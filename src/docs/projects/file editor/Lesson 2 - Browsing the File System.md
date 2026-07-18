@@ -26,6 +26,44 @@ with `/` characters by hand breaks the moment the same code runs on an
 operating system using a different separator (`\` on Windows, `/`
 elsewhere).
 
+### Concept Lab
+
+```python
+from pathlib import Path
+
+p = Path("backend") / "content"
+print(p)
+print(type(p))
+
+q = 5
+print(q / 2)
+```
+
+Run it — actual output, this exact run, on Windows:
+
+```
+backend\content
+<class 'pathlib._local.WindowsPath'>
+2.5
+```
+
+### What This Proves
+
+`Path("backend") / "content"` was written with a forward slash, but
+printed with a *backslash* — proof this isn't string concatenation at
+all; `Path` decides how to actually join and display a path for
+whatever operating system is running, Windows here. `q / 2`, on a
+plain number two lines later, prints `2.5` — ordinary division. Same
+symbol, same file, two completely different behaviors depending on
+what's on either side of it: `Path.__truediv__` is defined to mean
+"join a path segment," `int.__truediv__` is defined to mean "divide."
+This is **operator overloading**.
+
+### Discard
+
+`p` and `q` are deleted now — neither appears in the project. The real
+code uses this exact mechanism to build `CONTENT_DIR`, next.
+
 ### Project Change
 
 - **Files affected** — `backend/main.py`, existing file (from Lesson 1).
@@ -82,16 +120,45 @@ since the whole file is still small enough to show whole.
 with its own methods, instead of a plain string. `__file__` is a
 variable Python fills in automatically — the path to `main.py` itself.
 `.parent` is a property returning the folder that contains it.
+`/ "content"` joins `"content"` onto that folder — the exact operator
+overload demonstrated in the lab above, real this time instead of a
+throwaway example. `.resolve()` collapses the result to its absolute,
+canonical form, resolving away any `..` segments along the way — this
+matters a great deal in the next unit.
 
 ### CS Lens — this `/` is not division
 
-`/ "content"` joins `"content"` onto the path. This is **operator
-overloading**: `pathlib` defines what `/` means specifically between two
-`Path`-related things — "join these," nothing to do with arithmetic — the
-same symbol doing a completely different job depending on the types on
-either side of it. `.resolve()` then collapses the result to its
-absolute, canonical form, resolving away any `..` segments — this matters
-a great deal in the next unit.
+Operator overloading — the same symbol meaning something different
+depending on the types on either side of it — isn't unique to
+`pathlib`. Also recognized in: Python's own `+` meaning numeric
+addition between two `int`s but concatenation between two `str`s
+(already relied on since Lesson 1's `entry.name + "/"`); NumPy's `*`
+meaning element-wise multiplication between two arrays instead of
+scalar multiplication; C++ and Java both allowing (Java: only for
+`String`'s own `+`) custom types to redefine what an operator does on
+them; a spreadsheet's `+` meaning cell-reference addition, not text
+concatenation, unless the cells hold text. The lesson every one of
+these teaches is the same: never assume what an operator does from the
+symbol alone — check what types it's actually operating on.
+
+### Run It
+
+```python
+from pathlib import Path
+CONTENT_DIR = (Path(".").resolve() / "content").resolve()
+print(CONTENT_DIR)
+print(CONTENT_DIR.is_dir())
+```
+
+Run against this actual project:
+
+```
+C:\Users\g4m3r\Documents\testing tutorials\Learning workspace\backend\content
+True
+```
+
+Confirms `CONTENT_DIR` resolves to a real, existing folder — not just a
+string that looks like a path.
 
 ### Connects To
 
@@ -239,7 +306,18 @@ A request for `/files?path=../../../../Windows` builds exactly that
 path, resolves to a real folder outside this project, and — without this
 check — gets listed without complaint. This class of bug has a name,
 **path traversal**, and it's one of the most common real vulnerabilities
-in software that touches a filesystem based on any external input.
+in software that touches a filesystem based on any external input. The
+underlying shape — external input allowed to influence something that
+crosses a trust boundary, checked too late or not at all — recurs far
+beyond filesystems. Also recognized in: SQL injection (a query string
+built by concatenating user input instead of parameterizing it); the
+"zip-slip" vulnerability (an archive entry named `../../etc/passwd`,
+extracted without checking where it actually lands); command injection
+(user input concatenated into a shell command instead of passed as a
+separate argument); XXE (an XML parser resolving an external entity a
+document itself points at). Different data shapes, same root failure:
+trusting where input says it wants to go instead of verifying where it
+actually ends up.
 
 ### SE Lens — why this check and not the obvious one
 
@@ -682,6 +760,32 @@ the next language will spell it a third way.
 A folder needs its name displayed with a trailing `/`; a file needs its
 name displayed as-is — a small decision made once per entry.
 
+### Concept Lab
+
+```javascript
+const age = 20;
+const label = age >= 18 ? "adult" : "minor";
+console.log(label);
+```
+
+Run it. It prints `adult`.
+
+### What This Proves
+
+`condition ? valueIfTrue : valueIfFalse` — the **ternary operator** —
+evaluates `age >= 18` and, based on whether that's `true` or `false`,
+produces one of the two values after the `?`, without ever running a
+separate `if`/`else` block. `label` ends up holding a real string, the
+same as if it had been assigned inside an `if`/`else` — the ternary's
+whole purpose is producing a *value* to assign, in one expression,
+rather than running statements across several lines.
+
+### Discard
+
+`age` and `label` are deleted now — neither appears in the project. The
+real ternary decides between two strings pulled from a real folder
+entry, not a hardcoded age.
+
 ### Project Change
 
 - **Files affected** — `index.html`, existing file.
@@ -714,9 +818,10 @@ next unit does that.
 
 ### Mechanical Walkthrough
 
-This is the **ternary operator**: `condition ? valueIfTrue : valueIfFalse`.
-It's shorthand for a full `if`/`else` that exists specifically to
-*produce a value* rather than run a block of statements — equivalent to:
+`entry.is_directory ? entry.name + "/" : entry.name` is the lab's
+ternary, real this time: `entry.is_directory` is the condition,
+`entry.name + "/"` and `entry.name` are the two possible results.
+Written the long way, for comparison, this would be:
 
 ```javascript
 if (entry.is_directory) {
@@ -726,10 +831,11 @@ if (entry.is_directory) {
 }
 ```
 
-except the ternary version fits directly into one assignment. `entry.name
-+ "/"` uses `+` to concatenate two strings. `document.createElement("li")`
-is the same DOM-construction method from Lesson 1's `getElementById`
-sibling API — it creates a new element in memory, not yet on the page.
+`entry.name + "/"` reuses `+` for string concatenation, already taught
+in Lesson 1. `document.createElement("li")` is new — the same
+DOM-construction family as Lesson 1's `getElementById`, except this
+one *creates* a new element in memory rather than finding an existing
+one; it isn't attached to the visible page yet.
 
 ---
 

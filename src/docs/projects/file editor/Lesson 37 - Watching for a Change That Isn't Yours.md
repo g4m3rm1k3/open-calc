@@ -153,8 +153,10 @@ watch(activeTabPath, () => {
 })
 ```
 
-`runFile` and `diagnoseFile` are direct ports of Lessons 5 and 9,
-`.value` added wherever the old code touched a plain global:
+`runFile` is Lesson 5's own function, ported — and it sets a real
+"Running..." loading state before the request even starts, clearing
+whatever error styling a *previous* run left behind so a stale red
+panel doesn't sit there while a new run is in flight:
 
 ```javascript
 function runFile() {
@@ -183,7 +185,17 @@ function runFile() {
             runOutput.value = 'Could not reach backend.'
         })
 }
+```
 
+`diagnoseFile` is Lesson 9's, and it deliberately skips that loading
+state — worth noticing, not just assuming it was forgotten. `/run` can
+take up to five real seconds (Lesson 5's own timeout); `/diagnose` runs
+`ast.parse`, measured in Lesson 9 at a fraction of a millisecond. A
+"Checking..." message here would flash and vanish before a person
+could read it, so there's nothing to set before the request — the
+result simply appears:
+
+```javascript
 function diagnoseFile() {
     if (activeTabPath.value === null) {
         return
@@ -343,11 +355,18 @@ output areas added directly below what Lesson 36 already had:
 applied for real: no second argument beyond the callback is used here
 (the lab's `(newValue, oldValue)` parameters aren't needed — this
 callback doesn't care *what* the new path is, only that it changed).
-`runFile`/`diagnoseFile` reuse `authenticatedFetch` (Lesson 35)
-exactly, matching Lessons 5 and 9's original response handling
-field-for-field (`data.stderr`/`data.stdout`, `data.ok`/`data.line`/
-`data.message`), confirmed directly against the real backend routes
-before writing a line of this composable. `saveFile`'s `return`
+`runFile` and `diagnoseFile` both call `authenticatedFetch` (Lesson
+35) with `method: 'POST'`, and both branch on their response inside a
+`.then()` — that much is genuinely shared. What isn't shared, named
+above: `runFile` sets a real loading message and pre-clears its error
+flag; `diagnoseFile` does neither, for the real, measured reason
+already given. Each one's success branch reads its own backend route's
+actual field names — `data.stderr`/`data.stdout` for `runFile`,
+matching Lesson 5's `/run` response exactly; `data.ok`/`data.line`/
+`data.message` for `diagnoseFile`, matching Lesson 9's `/diagnose`
+response exactly — confirmed directly against the real backend routes
+before writing a line of this composable, not assumed from memory of
+what they used to return. `saveFile`'s `return`
 keyword, added in three places, is the entire fix: JavaScript
 functions that don't explicitly `return` a value inside a `.then()`
 callback return `undefined`, which `.then()` on the *calling* side

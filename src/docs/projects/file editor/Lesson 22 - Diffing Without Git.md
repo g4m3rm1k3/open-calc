@@ -254,7 +254,9 @@ back.
 
 - **Files affected** — `index.html`, existing file.
 - **Change type** — add, a new `diffCurrent` function, placed directly
-  after `diffCommit`; a new button and panel.
+  after `diffCommit`; a new button and panel; one more clearing line
+  inside `renderEditor` (Lesson 4/9/10/11/12/20/21), alongside its
+  existing `#diff-output` clearing.
 - **Dependencies** — the `/diff-current` route above.
 
 ### The New Code — type this
@@ -307,7 +309,17 @@ And the panel it writes into, sitting after `#diff-output`:
 ```
 
 `#current-diff-output` is this project's *seventh* element using
-`.output-panel`. And the listener, alongside the existing ones:
+`.output-panel`. `renderEditor` needs one more line, clearing this new
+panel the same moment it already clears `#diff-output`:
+
+```javascript
+document.getElementById("diff-output").textContent = "";
+document.getElementById("current-diff-output").textContent = "";   // ← new
+```
+
+The same reason as every panel before it: without this, switching tabs
+would leave a previous file's unsaved-change diff on screen instead of
+a clean slate. And the listener, alongside the existing ones:
 
 ```javascript
 document.getElementById("history-button").addEventListener("click", historyFile);

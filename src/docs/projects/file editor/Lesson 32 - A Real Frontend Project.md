@@ -58,6 +58,11 @@ depends on. Running `npm install` against this lesson's real
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "vue": "^3.5.39"
   },
@@ -68,6 +73,10 @@ depends on. Running `npm install` against this lesson's real
 }
 ```
 
+`"scripts"` names the three commands this file's own later units actually
+run — `npm run dev`, `npm run build`, and `npm run preview` (serving the
+built output locally) all resolve to this block, the same way
+`package.json` itself resolves `npm install`'s target. Installing it —
 installed 35 packages, not 3 — actual output, this exact run:
 
 ```

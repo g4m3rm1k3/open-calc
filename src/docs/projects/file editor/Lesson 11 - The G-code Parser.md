@@ -378,10 +378,12 @@ returns.
 - **Files affected** — `index.html`, existing file.
 - **Change type** — add. A new `#blocks-output` element, reusing
   `.output-panel` from Lesson 10; a new `parseFile` function; a new
-  "Blocks" button.
+  "Blocks" button; one more clearing line inside `renderEditor`
+  (Lesson 4/9/10), alongside its existing `#tokens-output` clearing.
 - **Location** — the button sits after "Tokens"; `#blocks-output` sits
   after `#tokens-output`, both inside `#editor-pane`; `parseFile` is
-  placed directly after `tokenizeFile`.
+  placed directly after `tokenizeFile`; the new `renderEditor` line
+  sits right after the one it already has for `#tokens-output`.
 - **Dependencies** — the `/parse` route above.
 
 ### The New Code — type this
@@ -453,7 +455,19 @@ document.getElementById("blocks-button").addEventListener("click", parseFile);  
 
 `#blocks-output` is this project's *third* element using
 `.output-panel` — no further CSS change needed at all, which is exactly
-the payoff Lesson 10's refactor was for.
+the payoff Lesson 10's refactor was for. `renderEditor` needs one more
+line, clearing this new panel the same moment it already clears
+`#tokens-output`:
+
+```javascript
+document.getElementById("tokens-output").textContent = "";
+document.getElementById("blocks-output").textContent = "";   // ← new
+```
+
+Without it, switching from a file whose Blocks panel was showing real
+output to a brand-new tab would leave that stale output on screen —
+the same reason `renderEditor` has cleared `#run-output` since Lesson
+5, now extended to a fourth panel.
 
 ### Mechanical Walkthrough
 

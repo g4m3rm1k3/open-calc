@@ -436,10 +436,13 @@ The analyzer's findings need a place on screen, readable at a glance —
 
 - **Files affected** — `index.html`, existing file.
 - **Change type** — add. A new `#analysis-output` element, reusing
-  `.output-panel`; a new `analyzeFile` function; a new "Analyze" button.
+  `.output-panel`; a new `analyzeFile` function; a new "Analyze" button;
+  one more clearing line inside `renderEditor` (Lesson 4/9/10/11),
+  alongside its existing `#blocks-output` clearing.
 - **Location** — the button sits after "Blocks"; `#analysis-output` sits
   after `#blocks-output`, both inside `#editor-pane`; `analyzeFile` is
-  placed directly after `parseFile`.
+  placed directly after `parseFile`; the new `renderEditor` line sits
+  right after the one it already has for `#blocks-output`.
 - **Dependencies** — the `/analyze` route above.
 
 ### The New Code — type this
@@ -514,7 +517,18 @@ document.getElementById("analyze-button").addEventListener("click", analyzeFile)
 ```
 
 `#analysis-output` is this project's *fourth* element using
-`.output-panel`, still with no CSS change required.
+`.output-panel`, still with no CSS change required. `renderEditor` needs
+one more line, clearing this new panel the same moment it already
+clears `#blocks-output`:
+
+```javascript
+document.getElementById("blocks-output").textContent = "";
+document.getElementById("analysis-output").textContent = "";   // ← new
+```
+
+The same reason as every panel before it: without this, switching tabs
+would leave a previous file's analysis results on screen instead of a
+clean slate.
 
 ### Mechanical Walkthrough
 

@@ -47,6 +47,13 @@ the system-wide ones — confirmed directly, this actually changes what
 # C:\...\backend\.venv\Scripts\python.exe   (before activation: the system path instead)
 ```
 
+- **Files affected** — `requirements.txt`, new file, at the project
+  root.
+- **Change type** — create.
+- **Location** — the entire file; nothing exists yet to place this
+  relative to.
+- **Dependencies** — none.
+
 Create `requirements.txt` with the two packages this project directly
 needs — each on its own line, no version attached yet:
 
@@ -89,10 +96,12 @@ uvicorn==0.51.0
 
 `requirements.txt` originally just said `fastapi` and `uvicorn` — no
 version attached, which means "install whatever's newest right now," a
-moving target. Overwrite `requirements.txt` with the `pip freeze` output
-above so a fresh install months from now installs the *same* versions
-this project was actually built and tested against, not whatever happens
-to be current then. That's the real tradeoff: a bare package name is
+moving target. **Project Change** — files affected: `requirements.txt`,
+existing file; change type: replace (its entire contents, wholesale);
+dependencies: the `pip freeze` output just captured above. Overwrite
+`requirements.txt` with that output so a fresh install months from now
+installs the *same* versions this project was actually built and tested
+against, not whatever happens to be current then. That's the real tradeoff: a bare package name is
 convenient to write and a real reproducibility risk; a pinned version is
 one more line to maintain and a guarantee that "works on my machine" still
 means something on a different machine, or this same machine later.
@@ -359,6 +368,27 @@ something worth stealing. A deployed production system would replace
 `"*"` with the exact origin of its real frontend — an allow-list of one,
 not everyone.
 
+### CS Lens
+
+A **trust boundary** — the line past which incoming data or requests
+stop being assumed safe and start being checked — isn't specific to
+browsers or CORS; it's a boundary between two things that don't
+inherently trust each other, and something has to explicitly decide
+what's allowed to cross it. Also recognized in: a firewall deciding
+which network packets reach a machine at all, an OS kernel checking a
+process's permissions before letting a syscall through, a function
+validating its arguments before touching them, a city wall with one
+guarded gate instead of an open perimeter. `allow_origins=["*"]` is
+this project's boundary currently set to "trust everything" — a
+choice, not an absence of one.
+
+### Connects To
+
+This is the same `app` object the previous unit attached
+`@app.get("/health")` to — every response that route sends now passes
+through this middleware first, whether or not a route existed yet to
+protect.
+
 ---
 
 ## Concept Unit: a page to test from
@@ -366,6 +396,12 @@ not everyone.
 ### The Problem
 
 Something has to display whatever the backend says.
+
+No Concept Lab here — `<!DOCTYPE html>`, `<html>`/`<head>`/`<body>`,
+`<p>`, and `id` are foundational HTML structure, not a construct with
+behavior worth isolating in a throwaway first; the Mechanical
+Walkthrough below covers what each one does at its first real
+appearance instead.
 
 ### Project Change
 
@@ -405,6 +441,13 @@ tab's title), `<body>` holds everything actually shown on screen. `<p>`
 is a paragraph element. `id="status"` gives this specific element a
 unique name, `status`, that other code can look it up by — the
 JavaScript below does exactly that.
+
+### Connects To
+
+This page doesn't do anything yet on its own — opening it right now
+would show "Connecting..." and nothing else, forever. The next unit
+adds the code that actually reaches the backend and replaces that
+text with a real answer.
 
 ---
 
@@ -535,6 +578,25 @@ nested inside the last (developers actually nicknamed this "callback
 hell"). `.then()` chaining composes left-to-right instead of nesting
 deeper with each step — a direct response to that specific pain.
 
+### CS Lens
+
+Registering a callback to run later, on a single thread that keeps
+doing other work in the meantime, is **asynchronous execution** —
+"started now, finishes later, doesn't block anything in between."
+Also recognized in: Node.js's own event loop (the same mechanism
+powering this exact `fetch`), Python's `asyncio`, a GUI's event
+handlers (a click callback registered once, fired whenever the click
+actually happens), a hardware interrupt handler, a database driver's
+connection-pool callback. The specific syntax varies — plain
+callbacks, `Promise`/`.then()`, `async`/`await` — but the same
+non-blocking shape recurs everywhere a program has to wait on
+something slower than the CPU.
+
+### Connects To
+
+This fragment can't run standalone yet — it needs a real element to
+put `data.status` into, which is exactly what the next two units add.
+
 ---
 
 ## Concept Unit: looking up an element by id
@@ -591,6 +653,154 @@ Together, this unit and the previous one are the full statement inside
 the `<script>` block's second `.then()`: look the element up, then
 overwrite what it displays. Neither half means anything without the
 other.
+
+---
+
+## Concept Unit: tracking the project's own history
+
+### The Problem
+
+Every file written so far — `backend/main.py`, `requirements.txt`,
+`index.html` — exists only on disk. Overwrite a working version by
+accident, and there's no way back to what it looked like a minute ago.
+Nothing has been remembering any of this.
+
+### The Commands
+
+```powershell
+git init
+```
+
+Run in an empty folder, this prints:
+
+```
+Initialized empty Git repository in C:/.../.git/
+```
+
+`git init` creates a `.git/` folder — the repository itself, where
+every future snapshot will actually live — and nothing else; no files
+are tracked yet, confirmed directly:
+
+```powershell
+git status --short
+```
+
+Produces no output at all here — an empty repository has nothing to
+report.
+
+### Project Change
+
+- **Files affected** — `.gitignore`, new file, at the project root.
+- **Change type** — create.
+- **Location** — the entire file; nothing exists yet to place this
+  relative to.
+- **Dependencies** — none.
+
+### The New Code — type this
+
+```
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+```
+
+### Mechanical Walkthrough
+
+Each line is a **pattern** git checks every file path against before
+deciding whether to track it. `__pycache__/` and `*.pyc` are Python's
+own compiled-bytecode cache, regenerated automatically every run —
+nothing is lost by excluding them. `.venv/` is the entire virtual
+environment created earlier in this lesson: hundreds of megabytes,
+entirely reproducible from `requirements.txt` on any machine via
+`pip install -r requirements.txt`, so committing it would bloat the
+repository with something that carries no information a fresh install
+couldn't regenerate. `node_modules/` isn't needed yet — no
+JavaScript package manager exists in this project until much
+later — but it's included now because it's the exact same category of
+problem `.venv/` is, and adding it later would mean remembering to add
+it later.
+
+### Run It
+
+With `.gitignore` in place and real project files on disk —
+`backend/main.py`, `requirements.txt`, `index.html`, and a `.venv/`
+folder none of this should track:
+
+```powershell
+git add .
+git status --short
+```
+
+Actual output — confirmed with a real `.venv/`-shaped folder present
+during this exact test:
+
+```
+A  .gitignore
+A  backend/main.py
+```
+
+`.venv/` never appears in that list. `git add .` walks every file in
+the folder, but `.gitignore` is consulted *before* git ever considers
+staging a match — the exclusion happens at the walk itself, not as a
+filter applied afterward. Committing now:
+
+```powershell
+git commit -m "Add health check route"
+git status --short
+```
+
+The actual result of that exact pair of commands, run in sequence:
+
+```
+[master (root-commit) 1ec966b] Add health check route
+ 2 files changed, 7 insertions(+)
+```
+
+`git status --short` prints nothing after the commit — every change
+that was staged is now permanently recorded, and the working folder
+matches the most recent snapshot exactly. `git commit -m "..."`
+creates that snapshot; the `-m` flag supplies its message inline
+instead of opening an editor. This is the exact command every
+lesson's own "Definition of done" checklist will ask for from here
+on — a message explaining *why* a change was made, not a restatement
+of the diff itself, which `git log` can already show on its own.
+
+### CS Lens
+
+A git commit is a **snapshot**, not a diff — internally, that's the
+opposite of what most people assume, but the transferable idea here is
+narrower and more general than git's internals: a system that
+preserves every past state, addressable by a name, so nothing done
+correctly is ever silently lost by something done incorrectly
+afterward. Also recognized in: a database's write-ahead log, an
+undo stack in any editor, a filesystem snapshot (ZFS, Time Machine),
+event sourcing in distributed systems — all different mechanisms
+answering the same underlying question: *if the current state turns
+out to be wrong, what does it take to get back to a state that
+wasn't?*
+
+### SE Lens
+
+The alternative — no version control, just the current files on disk
+— isn't hypothetical; it's the state of this exact project one command
+ago. It costs nothing until the first time a change breaks something
+in a way that isn't obvious immediately, at which point the cost is
+unbounded: however much work happened since the last time a copy was
+saved by hand, if one was saved at all. `.gitignore` has its own
+smaller version of the same tradeoff: excluding `.venv/` means a
+clone of this repository on a different machine needs one extra step
+(`pip install -r requirements.txt`) before it runs — a small, one-time
+cost, paid in exchange for a repository that stays proportional to
+the actual source code, not to every dependency's full install size.
+
+### Connects To
+
+Every unit before this one produced real files worth keeping;
+`git init` and this `.gitignore` are what make keeping them durable —
+without a real repository, "Definition of done"'s closing
+`git commit` instruction, in this and every lesson from here on, would
+have nothing to commit *to*.
 
 ---
 

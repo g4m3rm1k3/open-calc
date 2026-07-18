@@ -17,11 +17,11 @@ the database itself, not application logic, is what makes that true.
 
 `Lesson 25 - A Token That Remembers Who It Belongs To.md` —
 `current_user: str = Depends(require_auth)`, used by every route in
-this lesson. `Lesson 16 - Storing Users for Real.md` (or wherever
-`sqlite3`, parameterized `?` queries, and `INSERT`/`SELECT` were first
-taught) — reused here for a second table. `Lesson 3`'s traversal-safety
-check (`.resolve()` + `.is_relative_to(CONTENT_DIR)`), repeated
-identically in every route below.
+this lesson. `Lesson 16 - A Real User Store.md` — `sqlite3`,
+parameterized `?` queries, and `INSERT`/`SELECT`, reused here for a
+second table. `Lesson 3`'s traversal-safety check (`.resolve()` +
+`.is_relative_to(CONTENT_DIR)`), repeated identically in every route
+below.
 
 ---
 
@@ -320,7 +320,12 @@ locks WHERE path = ?` — first appearance of `DELETE`; like `INSERT` and
 every row in the table, not just the one requested. `get_lock`'s body is
 a verbatim structural repeat of `get_user` — a `SELECT`, a
 parameterized `WHERE`, `.fetchone()`, close, return — reapplying an
-already-taught shape to a new table, no new mechanic.
+already-taught shape to a new table, no new mechanic. All three
+functions reuse `get_connection()`/`.close()` from Lesson 16, and the
+same asymmetry from that lesson repeats here: `checkout_file` and
+`checkin_file` both call `.commit()`, since `INSERT` and `DELETE` both
+change the database, while `get_lock`'s `SELECT` only reads and calls
+neither.
 
 ### CS Lens
 

@@ -134,7 +134,9 @@ def run_file(path: str = ""):
 
 ### The Updated Project — where this lives
 
-The import needs to land among the existing ones; see it in place:
+The new import lands at the top; `run_file` lands at the bottom, after
+`write_file`. Here is the complete file as it exists after this unit,
+every line, nothing skipped:
 
 ```python
 import subprocess          # ← new
@@ -143,17 +145,49 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-```
 
-Everything below that — `FileEdit`, `CONTENT_DIR`, `app.add_middleware(...)`,
-`health_check`, `list_files`, `read_file`, `write_file` — is unchanged and
-omitted here since none of it is touched by this unit; `run_file` itself
-is a complete, freestanding new function, added after `write_file`, with
-nothing existing to show it enclosed inside of:
+app = FastAPI()
 
-```python
-@app.post("/run")
-def run_file(path: str = ""):
+
+class FileEdit(BaseModel):
+    content: str
+
+CONTENT_DIR = (Path(__file__).parent / "content").resolve()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
+
+@app.get("/files")
+def list_files(path: str = ""):
+    target_dir = (CONTENT_DIR / path).resolve()
+
+    if not target_dir.is_relative_to(CONTENT_DIR):
+        raise HTTPException(status_code=400, detail="Invalid path")
+
+    if not target_dir.is_dir():
+        raise HTTPException(status_code=404, detail="Folder not found")
+
+    entries = []
+    for entry in sorted(target_dir.iterdir()):
+        entries.append({
+            "name": entry.name,
+            "is_directory": entry.is_dir(),
+        })
+    return {"path": path, "entries": entries}
+
+
+@app.get("/file")
+def read_file(path: str = ""):
     target_file = (CONTENT_DIR / path).resolve()
 
     if not target_file.is_relative_to(CONTENT_DIR):
@@ -162,11 +196,48 @@ def run_file(path: str = ""):
     if not target_file.is_file():
         raise HTTPException(status_code=404, detail="File not found")
 
-    if target_file.suffix != ".py":
-        raise HTTPException(status_code=400, detail="Only .py files can be run")
+    try:
+        content = target_file.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(status_code=400, detail="File is not readable as text")
+
+    return {"path": path, "content": content}
+
+
+@app.put("/file")
+def write_file(path: str, edit: FileEdit):
+    target_file = (CONTENT_DIR / path).resolve()
+
+    if not target_file.is_relative_to(CONTENT_DIR):
+        raise HTTPException(status_code=400, detail="Invalid path")
+
+    if not target_file.is_file():
+        raise HTTPException(status_code=404, detail="File not found")
+
+    target_file.write_text(edit.content, encoding="utf-8")
+    return {"path": path, "saved": True}
+
+
+@app.post("/run")                                                    # ← new
+def run_file(path: str = ""):                                        # ← new
+    target_file = (CONTENT_DIR / path).resolve()                     # ← new
+
+    if not target_file.is_relative_to(CONTENT_DIR):                  # ← new
+        raise HTTPException(status_code=400, detail="Invalid path")   # ← new
+
+    if not target_file.is_file():                                    # ← new
+        raise HTTPException(status_code=404, detail="File not found")  # ← new
+
+    if target_file.suffix != ".py":                                   # ← new
+        raise HTTPException(status_code=400, detail="Only .py files can be run")  # ← new
 ```
 
-This is a new route, but the first three checks are not new *logic* —
+`FileEdit`, `CONTENT_DIR`, `app.add_middleware`, `health_check`,
+`list_files`, `read_file`, and `write_file` are exactly what Lessons 1
+through 3 already left in place — shown here in full because this is
+the real state of the file, not because any of it changed again. This
+is a new route, but the first three checks inside it are not new
+*logic* —
 they're the identical traversal and existence checks from `read_file` and
 `write_file`, copy-pasted again (a cost already named honestly back in
 Lesson 2). The one genuinely new check, `target_file.suffix != ".py"`,
@@ -349,14 +420,58 @@ back, styled differently depending on whether it succeeded.
 ### Project Change
 
 - **Files affected** — `index.html`, existing file.
-- **Change type** — add. A new `#run-output` element in the editor pane,
-  a new `runFile` function, and a `click` listener on a new Run button.
-- **Location** — `#run-output` sits directly below the existing Save
-  button row; `runFile` is added near `saveFile`.
-- **Dependencies** — the `/run` route above, `activeTabPath` from
-  Lesson 4.
+- **Change type** — add. A new Run button and `#run-output` element in
+  the editor pane; two new CSS rules; a new `runFile` function and its
+  `click` listener; two new lines inside `renderEditor` (Lesson 4),
+  which — like every earlier tab — needs to clear the *previous* tab's
+  run output when switching, or a stale result from one file would
+  still be showing after opening a different one.
+- **Location** — the Run button sits next to Save; `#run-output` sits
+  directly below that row; `runFile` is added near `saveFile`; the two
+  new lines inside `renderEditor` go alongside its existing
+  `save-status` clearing.
+- **Dependencies** — the `/run` route above, `activeTabPath` and
+  `renderEditor` from Lesson 4.
 
 ### The New Code — type this
+
+The button and its output panel:
+
+```html
+<button id="run-button">Run</button>
+<div id="run-output"></div>
+```
+
+Styled the same way `#file-content` was in Lesson 3 — monospace, sized,
+padded — plus a distinct error color:
+
+```css
+#run-output {
+    width: 100%;
+    height: 120px;
+    box-sizing: border-box;
+    font-family: monospace;
+    font-size: 13px;
+    padding: 8px;
+    background-color: #111;
+    color: #ddd;
+    white-space: pre-wrap;
+    overflow: auto;
+}
+#run-output.has-error {
+    color: #f88;
+}
+```
+
+`renderEditor` (Lesson 4) needs two more lines, clearing this new panel
+exactly the way it already clears `save-status`:
+
+```javascript
+document.getElementById("run-output").textContent = "";
+document.getElementById("run-output").className = "";
+```
+
+And the fetch itself:
 
 ```javascript
 fetch("http://127.0.0.1:8000/run?path=" + encodeURIComponent(activeTabPath), {
@@ -375,6 +490,49 @@ fetch("http://127.0.0.1:8000/run?path=" + encodeURIComponent(activeTabPath), {
 ```
 
 ### The Updated Project — where this lives
+
+The button and output panel join Lesson 4's Save button row inside
+`#editor-pane`:
+
+```html
+<div id="editor-pane" style="display: none;">
+    <textarea id="file-content"></textarea>
+    <div>
+        <button id="save-button">Save</button>
+        <button id="run-button">Run</button>            <!-- ← new -->
+        <span id="save-status"></span>
+    </div>
+    <div id="run-output"></div>                          <!-- ← new -->
+</div>
+```
+
+`renderEditor` (Lesson 4) gains two lines, clearing the new panel the
+same moment it already clears `save-status`:
+
+```javascript
+function renderEditor() {
+    const emptyState = document.getElementById("editor-empty");
+    const editorPane = document.getElementById("editor-pane");
+
+    if (activeTabPath === null) {
+        emptyState.style.display = "block";
+        editorPane.style.display = "none";
+        return;
+    }
+
+    const activeTab = openTabs.find((tab) => tab.path === activeTabPath);
+    emptyState.style.display = "none";
+    editorPane.style.display = "block";
+    document.getElementById("file-content").value = activeTab.content;
+    document.getElementById("save-status").textContent = "";
+    document.getElementById("run-output").textContent = "";  // ← new
+    document.getElementById("run-output").className = "";    // ← new
+}
+```
+
+Without these two lines, switching from a file that just printed a
+real error to a brand-new tab would still show that error — `runFile`
+only ever writes to `#run-output`, so nothing else would clear it.
 
 `runFile` is a complete, freestanding new function — none of it existed
 before this unit. The `← new` markers below are narrower than that,

@@ -217,13 +217,33 @@ function checkinFile() {
 lockMessage.value = ''
 ```
 
-`Editor.vue` adds two buttons and a status span, showing the transient
-message if there is one, falling back to the derived status otherwise:
+`Editor.vue` needs all four new pieces added to its existing
+destructure from `useEditor()` before any of them are usable in its
+own template:
+
+```diff
+- const { activeTabPath, editedContent, saveStatus, saveFile } = useEditor()
++ const { activeTabPath, editedContent, saveStatus, lockStatus, lockMessage, saveFile, checkoutFile, checkinFile } = useEditor()
+```
+
+Two buttons and a status span, showing the transient message if there
+is one, falling back to the derived status otherwise:
 
 ```html
 <button @click="checkoutFile">Check Out</button>
 <button @click="checkinFile">Check In</button>
 <span class="lock-status">{{ lockMessage || lockStatus }}</span>
+```
+
+And the CSS the new status span needs — the same small, muted style
+`.save-status` already has, sitting right beside it:
+
+```css
+.lock-status {
+    font-size: 13px;
+    color: #666;
+    margin-left: 8px;
+}
 ```
 
 ### The Updated Project — where this lives
@@ -260,6 +280,22 @@ export function useEditor() {
   <span class="save-status">{{ saveStatus }}</span>
   <span class="lock-status">{{ lockMessage || lockStatus }}</span>  <!-- ← new -->
 </div>
+```
+
+And its `<style scoped>` block, with the new rule added directly after
+`.save-status`:
+
+```css
+.save-status {
+    font-size: 13px;
+    color: #666;
+    margin-left: 8px;
+}
+.lock-status {                /* ← new */
+    font-size: 13px;          /* ← new */
+    color: #666;               /* ← new */
+    margin-left: 8px;          /* ← new */
+}                                /* ← new */
 ```
 
 ### Mechanical Walkthrough

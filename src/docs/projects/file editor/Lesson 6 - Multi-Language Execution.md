@@ -237,7 +237,13 @@ from a key (there, a URL path; here, a file extension) to the function
 that handles it. Seeing the same underlying pattern in an invisible,
 framework-managed form and then in a plain, visible dictionary is worth
 more than either alone — it's the same tool, reached for consciously
-this time instead of hidden inside someone else's decorator.
+this time instead of hidden inside someone else's decorator. Also
+recognized in: a C++ compiler's vtable, dispatching a virtual method
+call to the right override at runtime; a bytecode interpreter's opcode
+table, mapping each instruction byte to the function that executes it;
+a plugin system mapping a file extension or MIME type to the handler
+registered for it — this project's own `RUNNERS`, structurally, is a
+tiny plugin system for languages.
 
 ### SE Lens — the alternative, and why it gets worse over time
 
@@ -400,6 +406,59 @@ clickable file next to the source that produced it, and clicking it in
 the editor would trip `read_file`'s "not readable as text" error from
 Lesson 3.
 
+### Concept Lab
+
+```python
+def risky():
+    try:
+        print("trying")
+        return "success"
+    finally:
+        print("cleanup runs no matter what")
+
+print(risky())
+
+def risky_with_error():
+    try:
+        print("trying")
+        raise ValueError("boom")
+    finally:
+        print("cleanup runs no matter what, even here")
+
+try:
+    risky_with_error()
+except ValueError:
+    print("caught it after cleanup ran")
+```
+
+Run it. Actual output, in order:
+
+```
+trying
+cleanup runs no matter what
+success
+trying
+cleanup runs no matter what, even here
+caught it after cleanup ran
+```
+
+### What This Proves
+
+In `risky()`, `finally`'s `print` runs *before* the function's `return`
+value actually reaches the caller — cleanup happens even on the
+successful path, not just when something goes wrong. In
+`risky_with_error()`, the order matters more: `finally`'s `print` runs
+*before* the `ValueError` propagates out to the `except` that catches
+it — `finally` runs on the way out regardless of whether the exit is a
+normal `return` or an exception in flight, and only after `finally`
+finishes does the exception continue on its way.
+
+### Discard
+
+`risky` and `risky_with_error` are deleted now — neither appears in the
+project. The real `finally` guarantees a compiled binary gets deleted
+regardless of whether running it succeeded, failed, or timed out.
+
 ### Project Change
 
 - **Files affected** — `backend/main.py`, existing file.
@@ -479,9 +538,14 @@ Without `finally`, a `subprocess.TimeoutExpired` raised by the second
 out of `run_rust` immediately, skipping any cleanup code written *after*
 the `return`, leaving the compiled binary behind forever. `finally` is
 specifically the language's answer to "this cleanup must happen no
-matter which of several different ways this block could end" — the same
-guarantee a database connection's `close()` or a file's `close()` needs,
-generalized.
+matter which of several different ways this block could end." Also
+recognized in: Python's own `with` statement (a context manager's
+`__exit__` is guaranteed to run, built on this same principle); Java's
+try-with-resources and C#'s `using`, both doing the identical thing with
+different syntax; C++'s RAII, where a destructor runs when an object
+goes out of scope regardless of how the enclosing function exits; a
+database connection pool releasing a connection back to the pool no
+matter whether the query that used it succeeded or threw.
 
 ### Run It
 

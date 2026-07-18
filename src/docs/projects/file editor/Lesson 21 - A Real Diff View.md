@@ -522,7 +522,9 @@ back.
 
 - **Files affected** — `index.html`, existing file.
 - **Change type** — add, a new `diffCommit` function, placed directly
-  after `historyFile`; a new `#diff-output` panel.
+  after `historyFile`; a new `#diff-output` panel; one more clearing
+  line inside `renderEditor` (Lesson 4/9/10/11/12/20), alongside its
+  existing `#history-output` clearing.
 - **Dependencies** — the `/diff` route above.
 
 ### The New Code — type this
@@ -560,7 +562,17 @@ to see. The panel it targets, sitting after `#history-output`:
 ```
 
 `#diff-output` is this project's *sixth* element using `.output-panel`
-— still no new box-styling CSS required.
+— still no new box-styling CSS required. `renderEditor` needs one more
+line, clearing this new panel the same moment it already clears
+`#history-output`:
+
+```javascript
+document.getElementById("history-output").textContent = "";
+document.getElementById("diff-output").textContent = "";   // ← new
+```
+
+The same reason as every panel before it: without this, switching tabs
+would leave a previous file's diff on screen instead of a clean slate.
 
 ### Mechanical Walkthrough
 

@@ -1,4 +1,4 @@
-# Lesson 39: History and Two Diffs, One Composable
+# Lesson 39: A Fifth Composable, No Fifth Trick
 
 ## What you will build
 
@@ -64,9 +64,16 @@ watch(activeTabPath, () => {
 })
 ```
 
-`loadHistory`, `selectCommit`, and `diffCurrent` are direct ports of
-Lessons 20, 21, and 22 — `.value` added throughout, otherwise
-unchanged:
+`loadHistory` is Lesson 20's own function, ported — and it establishes
+the skeleton the other two functions each adapt differently: a guard
+clause, a "loading..." message set before the request, `authenticatedFetch`,
+a `.then()` that parses JSON, and a `.catch()`. What's specific to this
+one function, not shared with the other two: its success handler
+branches — an empty `commits` array is a real, different case
+(`"No history found."`) from a populated one — and its `.catch()`
+resets *two* pieces of state, both `historyMessage` and `commits`,
+since a failed request should show neither a stale message nor a stale
+list.
 
 ```javascript
 function loadHistory() {
@@ -92,7 +99,20 @@ function loadHistory() {
             commits.value = []
         })
 }
+```
 
+`selectCommit` is Lesson 21's, reusing `loadHistory`'s skeleton with
+three real differences, not zero: it takes a parameter (`hash`) —
+`loadHistory` takes none; its URL needs a *second* query parameter,
+`commit`, chained onto `path` with the same `+` concatenation already
+used for one parameter, now used for two; and its success handler is a
+single, unconditional assignment — no branching at all, since a diff
+either exists or the request itself fails, with no "empty but valid"
+case the way an empty commit list is. Its `.catch()` resets only
+`diffOutput`, not a second value, because there's only one value to
+reset here.
+
+```javascript
 function selectCommit(hash) {
     if (activeTabPath.value === null) {
         return
@@ -109,7 +129,20 @@ function selectCommit(hash) {
             diffOutput.value = 'Could not load diff.'
         })
 }
+```
 
+`diffCurrent` is Lesson 22's, and it departs from the shared skeleton
+more than the other two: it's the only one of the three that's a
+`POST` with a `Content-Type` header and a JSON body, rather than a
+`GET` whose only input is the URL; and its success handler uses a
+`||` fallback (`data.diff || 'No unsaved changes.'`) instead of a
+plain assignment, because an empty diff here is a real, valid,
+expected result — "nothing has changed" — not an error the way an
+empty response would be for the other two. This is the point past
+which this composable is complete, so its own `export` closes out the
+file:
+
+```javascript
 function diffCurrent() {
     if (activeTabPath.value === null) {
         return
@@ -138,8 +171,21 @@ export function useHistory() {
 }
 ```
 
-`Editor.vue` adds three buttons, a clickable commit list, and two more
-output panels:
+`Editor.vue` needs a new import and a third composable call before any
+of `useHistory`'s state or functions are in scope:
+
+```diff
+  import { useEditor } from '../composables/useEditor.js'
+  import { useRunner } from '../composables/useRunner.js'
++ import { useHistory } from '../composables/useHistory.js'
+
+  const { activeTabPath, editedContent, saveStatus, lockStatus, lockMessage, saveFile, checkoutFile, checkinFile } = useEditor()
+  const { runOutput, runHasError, diagnosticsMessage, diagnosticsHasError, runFile, diagnoseFile } = useRunner()
++ const { commits, historyMessage, diffOutput, currentDiffOutput, loadHistory, selectCommit, diffCurrent } = useHistory()
+```
+
+Then three buttons, a clickable commit list, and two more output
+panels:
 
 ```html
 <button @click="loadHistory">History</button>
@@ -211,14 +257,53 @@ to change at all:
 
 ### Mechanical Walkthrough
 
-Every construct here — `ref()`, `watch()`, `v-for`/`:key`, `@click`,
-`v-if`, string concatenation in a template expression — was isolated
-and explained in an earlier lesson; nothing in this unit introduces a
-new one. `commit.hash.slice(0, 7)` reuses `.slice()` from Lesson 20's
-own original short-hash logic, now written inside a template
-expression instead of a JavaScript function body — Vue's `{{ }}`
-accepts any valid JavaScript expression, already implicitly relied on
-by every ternary shown since Lesson 30.
+Enumerated in order, every item given real behavioral content, not
+just a lesson number to point at — a bare citation isn't a
+restatement, and the Repetition Rule asks for both. `ref([])`/`ref('')`
+(Lesson 33) construct the four pieces of state — a `ref` that, on
+`.value`, either holds the current array/string or lets you assign a
+new one, re-rendering whatever reads it. `watch(activeTabPath, () =>
+{...})` (Lesson 37) runs its callback automatically whenever
+`activeTabPath` changes, clearing all four values so a newly-opened
+file never shows a previous file's history or diffs — Lesson 37's own
+tab-switch pattern, four resets instead of two.
+
+Inside `loadHistory`: the guard clause (Lesson 36) exits immediately
+if no tab is open, so nothing below it runs against a `null` path.
+`authenticatedFetch` (Lesson 19/35) attaches the real `Authorization`
+header and redirects to the login screen on an actual `401`, exactly
+as every other gated call in this project already does.
+`encodeURIComponent` (Lesson 2) escapes the path so a folder name
+containing `&` or a space can't corrupt the query string. `.then((response)
+=> response.json())` (Lesson 1) parses the response body into a real
+object once it arrives. `data.commits.length === 0` (Lesson 13's own
+`.length` check, reapplied) is the branch specific to this function,
+named above. `.catch()` (Lesson 1) runs only on an actual network
+failure, not a normal empty-history response — that's what the branch
+above it is for.
+
+`selectCommit` reuses all of the same pieces, with its own two
+differences already named above: the second concatenated query
+parameter, and the unconditional (non-branching) success handler.
+
+`diffCurrent` reuses the guard, the loading message, `authenticatedFetch`,
+and `.then(json)` too, but adds `JSON.stringify({ content:
+editedContent.value })` (Lesson 3) — turning the live, possibly-unsaved
+editor content into the request body — and the `Content-Type` header
+that tells the backend to expect JSON, both already-taught, applied
+here for the first time inside this composable specifically because
+this is the first of the three functions that sends anything besides a
+URL.
+
+In the template: `v-for`/`:key` (Lesson 31) renders one `<div>` per
+commit, matched by `commit.hash` across re-renders. `v-if` (Lesson 34)
+shows `historyMessage` only when it's non-empty. `@click` (Lesson 29)
+wires each commit's click to `selectCommit`, closing over that
+specific commit's hash. `commit.hash.slice(0, 7)` reuses `.slice()`
+from Lesson 20's own original short-hash logic, now written inside a
+template expression instead of a JavaScript function body — Vue's
+`{{ }}` accepts any valid JavaScript expression, already implicitly
+relied on by every ternary shown since Lesson 30.
 
 ### CS Lens — the fifth composable proves the pattern, not a new one
 

@@ -81,6 +81,211 @@ rather than reading one variable directly.
 
 ---
 
+## Concept Unit: markup for more than one tab
+
+### The Problem
+
+The editor pane, as Lesson 3 left it, assumed exactly one file: a single
+`<h1 id="file-title">` heading and one always-present `<textarea>`.
+Multiple tabs need a visible row of tabs above the editor, and a
+distinct "nothing open" state — not Lesson 3's placeholder text sitting
+inside an editable textarea, which would be saved as real file content
+if anyone clicked Save before opening anything.
+
+### Project Change
+
+- **Files affected** — `index.html`, existing file.
+- **Change type** — replace (Lesson 3's `<h1 id="file-title">`, bare
+  `<textarea>`, and always-visible Save button); add (four new CSS
+  rules, appended to the existing `<style>` block after `#file-content`).
+- **Location** — inside `.main-content`, replacing everything Lesson 3
+  put there.
+- **Dependencies** — none new.
+
+### The New Code — type this
+
+```html
+<div id="tab-bar" class="tab-bar"></div>
+<div id="editor-empty">Click a file in the sidebar to open it.</div>
+<div id="editor-pane" style="display: none;">
+    <textarea id="file-content"></textarea>
+    <div>
+        <button id="save-button">Save</button>
+        <span id="save-status"></span>
+    </div>
+</div>
+```
+
+The CSS that makes a `.tab`/`.tab-close` actually look and space out
+like tabs:
+
+```css
+.tab-bar {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 8px;
+}
+.tab {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.tab.active {
+    background-color: #eee;
+    font-weight: bold;
+}
+.tab-close {
+    cursor: pointer;
+    color: #888;
+}
+.tab-close:hover {
+    color: #000;
+}
+```
+
+### The Updated Project — where this lives
+
+The `<style>` block, in full, with the four new rules added after
+`#file-content`:
+
+```html
+<style>
+    body {
+        margin: 0;
+    }
+    .layout {
+        display: flex;
+        height: 100vh;
+    }
+    .sidebar {
+        width: 250px;
+        min-width: 150px;
+        max-width: 500px;
+        resize: horizontal;
+        overflow: auto;
+        border-right: 1px solid #ccc;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+    .sidebar ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .sidebar li {
+        padding: 4px 6px;
+        border-radius: 4px;
+    }
+    .sidebar li.clickable {
+        cursor: pointer;
+    }
+    .sidebar li.clickable:hover {
+        background-color: #eee;
+    }
+    .main-content {
+        flex: 1;
+        padding: 16px;
+    }
+    #file-content {
+        width: 100%;
+        height: 400px;
+        box-sizing: border-box;
+        font-family: monospace;
+        font-size: 14px;
+        padding: 8px;
+    }
+    .tab-bar {                          /* ← new */
+        display: flex;                  /* ← new */
+        border-bottom: 1px solid #ccc;  /* ← new */
+        margin-bottom: 8px;             /* ← new */
+    }                                    /* ← new */
+    .tab {                               /* ← new */
+        padding: 6px 10px;              /* ← new */
+        border: 1px solid #ccc;         /* ← new */
+        border-bottom: none;            /* ← new */
+        cursor: pointer;                /* ← new */
+        display: flex;                  /* ← new */
+        align-items: center;            /* ← new */
+        gap: 6px;                       /* ← new */
+    }                                    /* ← new */
+    .tab.active {                        /* ← new */
+        background-color: #eee;         /* ← new */
+        font-weight: bold;               /* ← new */
+    }                                    /* ← new */
+    .tab-close {                         /* ← new */
+        cursor: pointer;                /* ← new */
+        color: #888;                     /* ← new */
+    }                                    /* ← new */
+    .tab-close:hover {                   /* ← new */
+        color: #000;                     /* ← new */
+    }                                    /* ← new */
+</style>
+```
+
+And `.main-content`'s contents, replacing Lesson 3's heading/textarea/
+button entirely:
+
+```html
+<div class="main-content">
+    <div id="tab-bar" class="tab-bar"></div>                          <!-- ← new -->
+    <div id="editor-empty">Click a file in the sidebar to open it.</div>  <!-- ← new -->
+    <div id="editor-pane" style="display: none;">                      <!-- ← new -->
+        <textarea id="file-content"></textarea>                       <!-- ← changed: starts empty, no placeholder text -->
+        <div>
+            <button id="save-button">Save</button>                    <!-- ← changed: no longer starts hidden -->
+            <span id="save-status"></span>
+        </div>
+    </div>                                                              <!-- ← new -->
+</div>
+```
+
+Lesson 3's `<h1 id="file-title">` is gone entirely — nothing in this
+lesson replaces it; the active file's path is shown in the tab itself
+instead, built later in this lesson. The `<textarea>` now starts empty
+rather than holding placeholder text, because that text would otherwise
+be indistinguishable from real file content the moment `openFile`
+writes into it. The Save button no longer starts hidden with its own
+inline `style="display: none;"` the way Lesson 3 had it — hiding the
+*entire* `#editor-pane` around it makes an individual toggle on the
+button itself redundant.
+
+### Mechanical Walkthrough
+
+`#tab-bar` is an empty `<div>` — nothing shown yet, filled in later this
+lesson by `renderTabs`. `#editor-empty` holds the same "click a file"
+message Lesson 3 put directly in the `<p>` it replaced, now its own
+dedicated element instead of shared with the textarea's placeholder
+text. `#editor-pane`, wrapping the `<textarea>` and Save row, starts
+with an inline `style="display: none;"` — the same hide-by-default
+technique Lesson 3 used on the Save button, applied here to the whole
+pane at once. `.tab-bar { display: flex; ... }` lays tabs out
+horizontally, reusing the flex layout from Lesson 2's `.layout`.
+`.tab { border: 1px solid #ccc; border-bottom: none; ... }` gives each
+tab three sides of a border but not the fourth, which — combined with
+`.tab-bar`'s own `border-bottom` — is what makes a tab look visually
+attached to the pane below it rather than floating separately.
+`.tab.active { background-color: #eee; font-weight: bold; }` reuses the
+two-class-selector shape from nowhere yet in this project — this is its
+first appearance: a rule that only applies to an element carrying
+*both* `tab` and `active` at once, matching how Lesson 2's
+`.sidebar li.clickable` combined a base element selector with a class,
+just two classes together here instead. `.tab-close` and
+`.tab-close:hover` style the "x" icon, reusing `:hover` from Lesson 2's
+sidebar rule.
+
+### Connects To
+
+None of this is wired to anything yet — `#tab-bar` stays empty and
+`#editor-pane` stays hidden until `renderTabs` and `renderEditor`,
+built later in this lesson, actually read `openTabs` and decide what to
+show.
+
+---
+
 ## Concept Unit: finding an already-open tab
 
 ### The Problem
@@ -92,8 +297,13 @@ duplicate tab — it should just switch to the existing one.
 
 - **Files affected** — `index.html`, existing file.
 - **Change type** — replace. `loadFile` no longer exists; a new `openFile`
-  function takes its place.
-- **Location** — same position in the `<script>` block `loadFile` occupied.
+  function takes its place, and every call site that named `loadFile`
+  has to be updated to name `openFile` instead — including one inside
+  `renderFileList`, from Lesson 3, that this unit's own code doesn't
+  touch directly.
+- **Location** — same position in the `<script>` block `loadFile`
+  occupied; also, inside `renderFileList`'s `forEach`, the `else` branch
+  built in Lesson 3's "deciding which function a click should call" unit.
 - **Dependencies** — `openTabs` from the previous unit.
 
 ### The New Code — type this
@@ -144,6 +354,23 @@ record instead of overwriting a single variable. `renderTabs` and
 `renderEditor`, called in both branches, don't exist yet — the next two
 units build them; until then, `openFile` can be typed and read but not
 run standalone.
+
+Renaming a function doesn't rename its callers — `renderFileList`,
+untouched since Lesson 3, still calls `loadFile` by name, which no
+longer exists after this unit. One line, inside the `else` branch built
+in Lesson 3's click-dispatch unit, needs to change to match:
+
+```javascript
+} else {
+    item.addEventListener("click", () => {
+        openFile(entryPath);   // ← changed: was loadFile(entryPath)
+    });
+}
+```
+
+Every other line inside `renderFileList` — the `if (entry.is_directory)`
+branch, `entryPath`'s computation, `item.className` — is exactly what
+Lesson 3 left in place; only the one call this unit's rename affects.
 
 ### Mechanical Walkthrough
 
@@ -274,6 +501,21 @@ individually. `event` is an argument every event handler receives
 automatically, describing the event that happened; `.stopPropagation()`
 is a method on it that halts the bubbling — the click still fires on the
 element it happened on, but ancestors never find out.
+
+### CS Lens
+
+An event notifying every interested ancestor in turn, with an explicit
+way to stop that notification partway, isn't unique to the DOM. Also
+recognized in: Android and iOS touch events, which bubble up a view
+hierarchy the same way and offer the same kind of "stop here" call; a
+GUI toolkit like WPF or Java Swing routing an input event through
+nested containers before reaching the control that was actually
+clicked; a pub/sub system with hierarchical topics, where a message
+published to `orders.created.us` also reaches a subscriber listening on
+the broader `orders.created` or `orders`; a DOM `KeyboardEvent`
+bubbling the same way a `click` does. The shared shape: notify from the
+most specific listener outward, and give the specific one a way to
+claim the event before anything broader sees it.
 
 ### Discard
 

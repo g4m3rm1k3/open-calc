@@ -243,7 +243,8 @@ instead of writing directly to global variables.
   file.
 - **Change type** — create.
 - **Dependencies** — `useAuth()`, this lesson's own composable;
-  `v-model` (Lesson 30).
+  `v-model` (Lesson 30); the card's CSS, ported from Lesson 18's
+  `#login-screen`/`.auth-card` rules.
 
 ### The New Code — type this
 
@@ -360,19 +361,82 @@ from Lesson 30, typed against `ref()`-backed values instead of
 </template>
 ```
 
+The card styling — Lesson 18's real, designed-looking login screen,
+ported unchanged, only its selectors adjusted from IDs to classes
+since this component no longer shares a page with anything that would
+collide:
+
+```css
+<style scoped>
+.login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f4f5f7;
+}
+.auth-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 320px;
+    padding: 32px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+.auth-card h1 {
+    margin: 0 0 8px 0;
+    font-size: 20px;
+}
+.auth-card input {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.auth-card button {
+    padding: 10px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #2563eb;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+.auth-card button:hover {
+    background-color: #1d4ed8;
+}
+.auth-toggle {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+}
+.auth-toggle-link {
+    color: #2563eb;
+    cursor: pointer;
+}
+.login-status {
+    font-size: 13px;
+    color: #c00;
+}
+</style>
+```
+
 ### The Updated Project — where this lives
 
 This is a brand-new component file — every piece shown above,
 assembled in the order shown (state and `toggleMode` first, then
-`submitAuth`, `login`, `signup`, then the template), is the entire
-file, nothing left out.
+`submitAuth`, `login`, `signup`, the template, then the scoped style
+block), is the entire file, nothing left out.
 
 ### Mechanical Walkthrough
 
 Nothing in this unit is new syntax — every construct (`ref()`,
-`v-model`, `@click`, ternary-in-interpolation) was isolated and
-explained in an earlier lesson. What changed, traced directly against
-Lesson 30's version: `this.username`/`this.password` became
+`v-model`, `@click`, ternary-in-interpolation, `<style scoped>`) was
+isolated and explained in an earlier lesson (Lessons 18, 30, 33).
+What changed, traced directly against Lesson 30's version:
+`this.username`/`this.password` became
 `username.value`/`password.value`; `document.getElementById("login-screen")`
 and the manual `style.display` toggling are gone entirely — this
 component doesn't decide whether it's visible, its *parent* does (the
@@ -380,7 +444,14 @@ next unit); `authToken = data.token; currentUsername = this.username`
 — two separate assignments to global variables — became one call,
 `setAuth(data.token, username.value)`, the composable's own function
 doing both at once, plus the `sessionStorage` writes Lesson 30 wrote
-inline every single time.
+inline every single time. The CSS itself is a verbatim port of Lesson
+18's card styling — only the selectors changed, from `#login-screen`/
+`#auth-toggle`/`#login-status` (IDs, meaningful when this markup lived
+in one large shared page) to `.login-screen`/`.auth-toggle`/
+`.login-status` (classes), since `<style scoped>` already guarantees
+this rule can only ever match elements this one component rendered —
+an ID's page-wide uniqueness guarantee is redundant once scoping
+provides a stronger one.
 
 ### Run It
 

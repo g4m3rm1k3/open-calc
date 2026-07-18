@@ -13,10 +13,11 @@ enough for another request to land in between.
 ## What you need to know first
 
 `Lesson 26 - Check In, Check Out.md` — the `/checkout` route and
-`checkout_file`, both being fixed directly in this lesson.
-`Lesson 16` (or wherever `sqlite3.IntegrityError` was first surfaced) —
-the same exception class raised by the `PRIMARY KEY` constraint added
-last lesson.
+`checkout_file`, both being fixed directly in this lesson, and the
+`locks` table's `PRIMARY KEY` constraint whose violation this lesson
+catches. `Lesson 16 - A Real User Store.md` — `sqlite3.IntegrityError`,
+first surfaced there via `create_user`'s own `username UNIQUE`
+constraint.
 
 ---
 
@@ -154,11 +155,13 @@ is the thing that actually fires.
 - **Files affected** — `backend/db.py`, `backend/main.py`, both
   existing files.
 - **Change type** — replace, `checkout_file`'s body; add, a new
-  exception class in `db.py` and a `try`/`except` in `main.py`'s
-  `/checkout` route.
+  exception class in `db.py`, a `try`/`except` in `main.py`'s
+  `/checkout` route, and `LockConflictError` added to `main.py`'s
+  existing `from db import ...` line.
 - **Location** — `checkout_file`, added last lesson, directly below
   `get_user`; `/checkout`'s single `checkout_file(...)` call, added last
-  lesson.
+  lesson; the `from db import ...` line at the top of `main.py`, present
+  since Lesson 16.
 - **Dependencies** — `sqlite3.IntegrityError`, already surfaced by
   SQLite itself (no new import).
 
@@ -220,6 +223,12 @@ def checkout_file(path: str, username: str) -> None:
         raise LockConflictError(path)
     finally:
         connection.close()
+```
+
+`main.py`'s import line grows to include the new exception class:
+
+```python
+from db import init_db, create_user, get_user, checkout_file, checkin_file, get_lock, LockConflictError   # ← changed: added LockConflictError
 ```
 
 `/checkout`, in full, in `backend/main.py`, with the changed lines

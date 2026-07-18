@@ -109,7 +109,49 @@ visibly, obviously fixed everywhere at once.
 Something needs to attach the `Authorization` header the same way every
 time, *and* recognize a `401` specifically, in exactly one place — every
 gated call routed through it instead of building its own request by
-hand.
+hand. Doing that means copying an options object a caller supplies, and
+adding one more key without disturbing what's already there — a job
+JavaScript has purpose-built syntax for.
+
+### Concept Lab
+
+```javascript
+const base = { method: "GET", headers: { "X-Custom": "yes" } };
+
+const merged = {
+    ...base,
+    headers: {
+        ...base.headers,
+        "Authorization": "Bearer abc123",
+    },
+};
+
+console.log(JSON.stringify(merged));
+```
+
+Run it. Actual output:
+
+```
+{"method":"GET","headers":{"X-Custom":"yes","Authorization":"Bearer abc123"}}
+```
+
+### What This Proves
+
+`...base` inside a `{ ... }` object literal is the **spread operator**
+— it copies every key/value pair from `base` into the new object, as if
+each one had been typed out by hand. `method` came through untouched;
+`headers` was overwritten by the nested object below it, which itself
+spreads `base.headers` first (`"X-Custom": "yes"` survives) before
+adding `"Authorization"` as one more key alongside it — nothing already
+there was lost, and the new key joined it. Order matters: a later
+key with the same name would win over an earlier spread, the same rule
+a Python dictionary literal already follows.
+
+### Discard
+
+`base` and `merged` are deleted now — neither appears in the project.
+The real function spreads a caller's actual options and headers, not a
+hardcoded example.
 
 ### Project Change
 
@@ -152,17 +194,14 @@ rewritten to call this instead of `fetch` directly.
 declaration syntax, with a second parameter, `options`, that's allowed
 to be omitted entirely by any caller that needs nothing beyond
 authentication. `{ ...options, headers: { ...(options && options.headers),
-"Authorization": "Bearer " + authToken } }` uses the **spread operator**
-— `...`, this project's first use of it in JavaScript — twice: `...options`
-copies every property from whatever options object a caller passed
-(`method`, `body`, its own `headers`, if any) into a new object;
-`...(options && options.headers)` does the same for whatever headers
-that caller already wanted, *before* the `Authorization` line beneath it
-adds one more. Order matters here the same way it matters in a Python
-dictionary literal: a later key with the same name overwrites an earlier
-one, so if a caller's own `options.headers` ever happened to include an
-`Authorization` key, this line's own value would still win, listed
-last. `options && options.headers` is a **short-circuit** pattern: if
+"Authorization": "Bearer " + authToken } }` is the lab's spread operator,
+real this time: `...options` copies every property from whatever
+options object a caller passed (`method`, `body`, its own `headers`, if
+any) into a new object; `...(options && options.headers)` does the same
+for whatever headers that caller already wanted, *before* the
+`Authorization` line beneath it adds one more, exactly the "spread,
+then add one more key" shape just proven in the lab. `options &&
+options.headers` is a **short-circuit** pattern: if
 `options` is `undefined` (a caller passed nothing), the whole expression
 evaluates to `undefined` without ever trying to read `.headers` off of
 it, avoiding an error stat trying to read a property off of a value that

@@ -129,7 +129,9 @@ grouped by line.
 
 - **Files affected** — `index.html`, existing file.
 - **Change type** — add, a new `highlightFile` function, placed directly
-  after `classifyToken`; a new button and panel.
+  after `classifyToken`; a new button and panel; one more clearing line
+  inside `renderEditor` (Lesson 4/9/10/11/12/20/21/22), alongside its
+  existing `#current-diff-output` clearing.
 - **Dependencies** — the `/tokens` route (Lesson 10), `classifyToken`.
 
 ### The New Code — type this
@@ -194,8 +196,18 @@ And the panel it writes into, sitting after `#current-diff-output`:
 
 `#highlight-output` is this project's *eighth* real instance of
 `.output-panel` — still no new box-styling CSS needed; only the token
-colors, built in the next unit, are new. And the listener, alongside the
-existing ones:
+colors, built in the next unit, are new. `renderEditor` needs one more
+line, clearing this new panel the same moment it already clears
+`#current-diff-output`:
+
+```javascript
+document.getElementById("current-diff-output").textContent = "";
+document.getElementById("highlight-output").textContent = "";   // ← new
+```
+
+The same reason as every panel before it: without this, switching tabs
+would leave a previous file's highlighted view on screen instead of a
+clean slate. And the listener, alongside the existing ones:
 
 ```javascript
 document.getElementById("current-diff-button").addEventListener("click", diffCurrent);

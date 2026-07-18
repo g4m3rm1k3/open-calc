@@ -434,8 +434,11 @@ button and status line.
 - **Files affected** — `frontend/src/components/Editor.vue`, new file;
   `frontend/src/components/FileBrowser.vue`, existing file;
   `frontend/src/App.vue`, existing file.
-- **Change type** — create; add (`openFile` wired into a real file
-  click); replace (`App.vue`'s logged-in branch).
+- **Change type** — create; add (a new `useEditor()` import and
+  `openFile` wired into a real file click); replace (`App.vue`'s
+  logged-in branch).
+- **Location** — `FileBrowser.vue`'s `<script setup>` gains a second
+  composable call, alongside its existing `useFileSystem()`.
 - **Dependencies** — `useEditor()`; `v-model` (Lesson 30); `v-if`/`v-else`
   (Lesson 34).
 
@@ -481,8 +484,16 @@ rule, plus a small new status-line style:
 </style>
 ```
 
-`FileBrowser.vue`'s file click, previously a no-op, now calls the real
-`openFile`:
+`FileBrowser.vue` needs a second composable call before it can reach
+`openFile` at all:
+
+```javascript
+import { useEditor } from '../composables/useEditor.js'
+
+const { openFile } = useEditor()
+```
+
+Its file click, previously a no-op, now calls that real `openFile`:
 
 ```javascript
 } else {
@@ -492,19 +503,37 @@ rule, plus a small new status-line style:
 
 ### The Updated Project — where this lives
 
-`FileBrowser.vue`'s `handleEntryClick`, in full, with the change
+`FileBrowser.vue`'s `<script setup>`, in full, with every new line
 marked:
 
 ```javascript
+<script setup>
+import { useFileSystem } from '../composables/useFileSystem.js'
+import { useEditor } from '../composables/useEditor.js'              // ← new
+
+const { currentPath, entries, errorMessage, loadFolder } = useFileSystem()
+const { openFile } = useEditor()                                     // ← new
+
+function goUp() {
+    const parentPath = currentPath.value.split('/').slice(0, -1).join('/')
+    loadFolder(parentPath)
+}
+
 function handleEntryClick(entry) {
     const entryPath = currentPath.value === '' ? entry.name : currentPath.value + '/' + entry.name
     if (entry.is_directory) {
         loadFolder(entryPath)
     } else {
-        openFile(entryPath)                                        // ← changed: was a no-op
+        openFile(entryPath)                                          // ← changed: was a no-op
     }
 }
+
+loadFolder('')
+</script>
 ```
+
+Nothing else in `FileBrowser.vue` — the template, the sidebar's `<style
+scoped>` block from Lesson 35 — changes at all.
 
 `App.vue`, in full, with the changed lines marked — `LoginScreen`'s
 branch and `FileBrowser` are unchanged from Lesson 35:

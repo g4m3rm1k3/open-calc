@@ -601,14 +601,49 @@ makes afterward.
 ### Project Change
 
 - **Files affected** — `index.html`, existing file.
-- **Change type** — add/replace. A new `#login-screen` element wraps
-  around the existing `.layout`, which is now hidden by default; a new
-  `login()` function; every existing `fetch` call gains an `Authorization`
-  header; the automatic `loadFolder("")` call at the very end of the
-  script is removed — nothing loads until login succeeds.
+- **Change type** — add/replace. A new `#login-screen` element, and the
+  CSS that lays it out, sit *before* the existing `.layout` div, which
+  gains an `id="app-layout"` and starts hidden; a new `login()` function;
+  every existing `fetch` call gains an `Authorization` header; the
+  automatic `loadFolder("")` call at the very end of the script is
+  removed — nothing loads until login succeeds.
 - **Dependencies** — the `/login` route above.
 
 ### The New Code — type this
+
+The login screen itself:
+
+```html
+<div id="login-screen">
+    <h1>Log In</h1>
+    <input type="password" id="password-input" placeholder="Password">
+    <button id="login-button">Log In</button>
+    <span id="login-status"></span>
+</div>
+```
+
+Styled as a simple vertical stack, reusing `flex` from Lesson 2's
+`.layout`, just in the column direction instead of the row direction:
+
+```css
+#login-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 32px;
+}
+```
+
+The existing `.layout` div needs two changes to become hideable — an
+`id` to find it by, and an inline `display: none` so it starts hidden
+behind the login screen:
+
+```html
+<div class="layout" id="app-layout" style="display: none;">
+```
+
+And the script's own state and login logic:
 
 ```javascript
 let authToken = null;
@@ -642,6 +677,40 @@ function login() {
 ```
 
 ### The Updated Project — where this lives
+
+The `<style>` block gains `#login-screen`'s rule, added after
+`#run-output.has-error`:
+
+```css
+#login-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 32px;
+}
+```
+
+And the `<body>` now opens with the login screen, followed by the
+existing `.layout` div, hidden and newly identified by `id="app-layout"`:
+
+```html
+<body>
+    <div id="login-screen">                                                    <!-- ← new -->
+        <h1>Log In</h1>                                                        <!-- ← new -->
+        <input type="password" id="password-input" placeholder="Password">    <!-- ← new -->
+        <button id="login-button">Log In</button>                             <!-- ← new -->
+        <span id="login-status"></span>                                       <!-- ← new -->
+    </div>                                                                     <!-- ← new -->
+    <div class="layout" id="app-layout" style="display: none;">              <!-- ← changed: gained id and inline style -->
+        <div class="sidebar" id="sidebar">
+```
+
+Everything from `<div class="sidebar" id="sidebar">` down — the file
+list, the tab bar, the editor pane — is exactly what Lessons 2 through 5
+already left in place; only the wrapping `<div class="layout">` itself
+changed, gaining an `id` to find it by and a `display: none` to hide it
+until `login()` succeeds.
 
 `login` sits at the very top of the `<script>` block, before every other
 function — nothing else can meaningfully run until it succeeds. Shown
@@ -737,7 +806,14 @@ nothing outside the lines below actually changes in any of them:
 The script's final line, `loadFolder("")`, which used to run
 automatically the instant the page loaded, is deleted entirely —
 `login()`'s own success handler calls it instead, once there's actually
-a token to send.
+a token to send. One more line joins the existing Save/Run listeners
+from Lessons 3 and 5, wiring the new button to `login`:
+
+```javascript
+document.getElementById("save-button").addEventListener("click", saveFile);
+document.getElementById("run-button").addEventListener("click", runFile);
+document.getElementById("login-button").addEventListener("click", login);   // ← new
+```
 
 ### Mechanical Walkthrough
 

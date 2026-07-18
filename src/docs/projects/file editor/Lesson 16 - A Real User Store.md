@@ -87,10 +87,20 @@ without failing on every run after the first.
 
 ### Project Change
 
-- **Files affected** — `backend/db.py`, new file.
-- **Change type** — create.
+- **Files affected** — `backend/db.py`, new file; `.gitignore`, existing
+  file.
+- **Change type** — create; add, one line.
 - **Dependencies** — `sqlite3` and `pathlib`, both part of Python's
   standard library.
+
+`users.db` is about to hold real usernames, salts, and password hashes —
+exactly the kind of secret Lesson 8's `ADMIN_PASSWORD` was kept out of
+source control for. One more line in `.gitignore`, alongside the ones
+Lesson 1 and Lesson 7 already added:
+
+```
+backend/users.db
+```
 
 ### The New Code — type this
 
@@ -207,7 +217,12 @@ username = ?` is SQL's row-retrieval statement, the same placeholder
 mechanism protecting the one value being searched for.
 `.fetchone()` returns exactly one matching row as a tuple, or `None` if
 nothing matched — the same `None`-for-nothing-found convention already
-used by `RUNNERS.get(...)` in Lesson 6.
+used by `RUNNERS.get(...)` in Lesson 6. Both functions reuse
+`get_connection()` and `.close()` from the unit just above, opening and
+closing a connection per call rather than holding one open — but only
+`create_user` calls `.commit()`: an `INSERT` changes the database and
+that change has to be made permanent, while `get_user`'s `SELECT` only
+reads, so there is nothing for a missing `.commit()` to lose.
 
 ### CS Lens — why placeholders exist: a real injection, demonstrated
 

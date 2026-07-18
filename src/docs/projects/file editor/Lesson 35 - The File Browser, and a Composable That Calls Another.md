@@ -38,11 +38,15 @@ a global function.
 ### Project Change
 
 - **Files affected** — `frontend/src/composables/useAuth.js`, existing
+  file; `frontend/src/components/LoginScreen.vue` (Lesson 34), existing
   file.
 - **Change type** — add, `authMessage`, `clearAuth`, `authenticatedFetch`;
-  replace, `setAuth` (one new line) and `useAuth`'s own return value.
+  replace, `setAuth` (one new line) and `useAuth`'s own return value;
+  replace, `LoginScreen.vue`'s local `statusMessage` ref with the new
+  shared `authMessage`, everywhere it was used.
 - **Location** — `useAuth.js`, alongside `authToken`/`currentUsername`/
-  `setAuth` (Lesson 34).
+  `setAuth` (Lesson 34); `LoginScreen.vue`'s state declarations,
+  `toggleMode`, `login`, `signup`, and its template.
 - **Dependencies** — none new; `fetch`, unchanged since Lesson 1.
 
 ### The New Code — type this
@@ -154,7 +158,60 @@ component-local error message, and Lesson 30's old CDN-era hack of
 reaching into a mounted app instance from outside it) collapses into
 one shared piece of state, since `clearAuth` and `LoginScreen.vue` both
 just write to the same `authMessage` composables already hand out to
-anyone who calls `useAuth()`.
+anyone who calls `useAuth()`. Every line that touched the old local ref
+changes to the shared one:
+
+```diff
+- const { setAuth } = useAuth()
++ const { setAuth, authMessage } = useAuth()
+
+  const mode = ref('login')
+  const username = ref('')
+  const password = ref('')
+- const statusMessage = ref('')
+
+  function toggleMode() {
+      mode.value = mode.value === 'login' ? 'signup' : 'login'
+-     statusMessage.value = ''
++     authMessage.value = ''
+  }
+```
+
+The same rename repeats in `login`'s own `.catch()`:
+
+```diff
+      .catch(() => {
+-         statusMessage.value = 'Invalid username or password.'
++         authMessage.value = 'Invalid username or password.'
+      })
+```
+
+In `signup`'s success handler:
+
+```diff
+      .then(() => {
+          mode.value = 'login'
+-         statusMessage.value = 'Account created. Log in below.'
++         authMessage.value = 'Account created. Log in below.'
+      })
+```
+
+And `signup`'s own `.catch()`:
+
+```diff
+      .catch(() => {
+-         statusMessage.value = 'That username is already taken.'
++         authMessage.value = 'That username is already taken.'
+      })
+```
+
+The message text itself never changes in any of the three — only which
+ref each one writes to. Once more in the template:
+
+```diff
+-     <span class="login-status">{{ statusMessage }}</span>
++     <span class="login-status">{{ authMessage }}</span>
+```
 
 ### Mechanical Walkthrough
 
@@ -299,7 +356,8 @@ Lesson 31, against the old CDN-mounted version.
 - **Change type** — create; add (`FileBrowser` rendered inside
   `App.vue`'s logged-in branch).
 - **Dependencies** — `useFileSystem()`, this lesson's second unit;
-  `v-for`/`:key`/`v-if` (Lesson 31).
+  `v-for`/`:key`/`v-if` (Lesson 31); the sidebar's CSS, ported from
+  Lesson 2's `.sidebar`/`.sidebar ul`/`.sidebar li` rules.
 
 ### The New Code — type this
 
@@ -334,7 +392,43 @@ loadFolder('')
     </ul>
   </div>
 </template>
+
+<style scoped>
+.sidebar {
+    width: 250px;
+    min-width: 150px;
+    max-width: 500px;
+    resize: horizontal;
+    overflow: auto;
+    border-right: 1px solid #ccc;
+    padding: 8px;
+    box-sizing: border-box;
+}
+.file-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.file-list li {
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+.clickable {
+    cursor: pointer;
+}
+.file-list li.clickable:hover {
+    background-color: #eee;
+}
+</style>
 ```
+
+The sidebar's own CSS — Lesson 2's original `.sidebar`/`.sidebar ul`/
+`.sidebar li` rules, ported with the same ID-to-class reasoning
+Lesson 34 already used for the login card: `<style scoped>` already
+guarantees these rules can only match elements this component
+rendered, so the old page-wide `.sidebar li.clickable` selector
+narrows to a plain `.clickable` class, scoped by the compiler instead
+of by a shared ancestor selector.
 
 ### The Updated Project — where this lives
 

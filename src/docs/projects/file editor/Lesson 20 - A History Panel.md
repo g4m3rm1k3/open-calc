@@ -54,9 +54,13 @@ panel this editor pane already has.
 
 - **Files affected** — `index.html`, existing file.
 - **Change type** — add. A new `#history-output` element, reusing
-  `.output-panel`; a new "History" button.
+  `.output-panel`; a new "History" button; one more clearing line
+  inside `renderEditor` (Lesson 4/9/10/11/12), alongside its existing
+  `#analysis-output` clearing.
 - **Location** — the button sits after "Analyze"; `#history-output`
-  sits after `#analysis-output`, both inside `#editor-pane`.
+  sits after `#analysis-output`, both inside `#editor-pane`; the new
+  `renderEditor` line sits right after the one it already has for
+  `#analysis-output`.
 - **Dependencies** — none new.
 
 ### The New Code — type this
@@ -93,7 +97,18 @@ And the panel it will write into:
 
 `#history-output` is this project's *fifth* element using
 `.output-panel` — still no CSS change required, five real panels now
-resting on one rule written once, back in Lesson 10.
+resting on one rule written once, back in Lesson 10. `renderEditor`
+needs one more line, clearing this new panel the same moment it already
+clears `#analysis-output`:
+
+```javascript
+document.getElementById("analysis-output").textContent = "";
+document.getElementById("history-output").textContent = "";   // ← new
+```
+
+The same reason as every panel before it: without this, switching tabs
+would leave a previous file's commit history on screen instead of a
+clean slate.
 
 ### Mechanical Walkthrough
 

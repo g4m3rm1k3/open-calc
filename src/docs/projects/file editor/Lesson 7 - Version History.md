@@ -211,13 +211,17 @@ it to one implicitly, the same way any value dropped into an f-string's
 `{}` gets converted; exactly how that conversion happens is where this
 lesson's real bug turns out to be hiding.
 
-### CS Lens — "record every version, in order" is what a commit is
+### CS Lens — the same snapshot idea from Lesson 1, put to real use
 
-A git commit is, at its core, a snapshot of the tracked files at one
-point in time, chained to the commit before it — the exact data
-structure "remember every version, in order, and let me get back to any
-of them" needs. `commit_change` is not building that structure; it's
-triggering the one that already exists to record one more entry.
+Lesson 1's own git-basics unit already named what a commit is: a
+snapshot, addressable by name, that a later mistake can never silently
+erase. `commit_change` doesn't introduce a new idea — it's the first
+place this project *automates* that same snapshot mechanism as a
+feature, rather than the reader running `git commit` by hand.
+"Remember every version, in order, and let me get back to any of them"
+was always what a commit chain gave this project for free, since
+Lesson 1; this unit is the first to actually depend on that guarantee
+programmatically.
 
 ---
 
