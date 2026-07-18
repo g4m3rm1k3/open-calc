@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { Search, X, BookOpen } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ConceptBlock from './ConceptBlock.tsx'
-import { getAvailableConceptIds, getConceptFile } from './loader'
+import { getAvailableConceptIds, getConceptFile, getConceptMeta, type ConceptFile } from './loader'
 
 interface Props {
   onClose: () => void
@@ -31,16 +31,29 @@ export default function ConceptExplorerModal({ onClose }: Props) {
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return allIds
-    return allIds.filter(id => id.toLowerCase().includes(q) || (getConceptFile(id)?.name.toLowerCase().includes(q)))
+    return allIds.filter(id => id.toLowerCase().includes(q) || (getConceptMeta(id)?.name.toLowerCase().includes(q)))
   }, [allIds, query])
 
-  const activeConcept = activeId ? getConceptFile(activeId) : null
+  // Full content (needed for the header's language tabs) is lazy — fetched only
+  // for the currently active concept, not for every concept in the sidebar.
+  const [activeConcept, setActiveConcept] = useState<ConceptFile | null>(null)
+
+  useEffect(() => {
+    if (!activeId) { setActiveConcept(null); return }
+    let cancelled = false
+    getConceptFile(activeId).then(result => {
+      if (cancelled) return
+      setActiveConcept(result)
+      const langs = Object.keys(result?.languages ?? {})
+      setLang(prev => (prev && langs.includes(prev)) ? prev : langs[0])
+    })
+    return () => { cancelled = true }
+  }, [activeId])
+
   const activeLangs = activeConcept ? Object.keys(activeConcept.languages) : []
 
   function selectConcept(id: string) {
     setActiveId(id)
-    const langs = Object.keys(getConceptFile(id)?.languages ?? {})
-    setLang(langs[0])
   }
 
   useEffect(() => {
@@ -151,7 +164,7 @@ export default function ConceptExplorerModal({ onClose }: Props) {
           <div className="flex-1 flex min-h-0 relative z-0">
             <div className="w-72 shrink-0 border-r border-slate-200 dark:border-white/[0.05] overflow-y-auto p-4 flex flex-col gap-2 bg-slate-50/50 dark:bg-[#0A0D16]/40 backdrop-blur-sm">
               {matches.map(id => {
-                const c = getConceptFile(id)
+                const c = getConceptMeta(id)
                 const isActive = id === activeId
                 return (
                   <button

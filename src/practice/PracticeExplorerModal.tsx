@@ -4,7 +4,7 @@ import { Search, X, Dumbbell, Check } from 'lucide-react'
 import ChallengeStep from '../engine/lesson/ChallengeStep'
 import { executeCode } from '../engine/lesson/executor'
 import type { TestResult } from '../engine/lesson/types'
-import { getAvailablePracticeIds, getPracticeFile } from './loader'
+import { getAvailablePracticeIds, getPracticeFile, getPracticeMeta, type PracticeFile } from './loader'
 import { useGlobalTheme } from '../context/ThemeContext.jsx'
 import { useProgress } from '../hooks/useProgress.js'
 
@@ -49,10 +49,25 @@ export default function PracticeExplorerModal({ onClose }: Props) {
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return allIds
-    return allIds.filter(id => id.toLowerCase().includes(q) || (getPracticeFile(id)?.title.toLowerCase().includes(q)))
+    return allIds.filter(id => id.toLowerCase().includes(q) || (getPracticeMeta(id)?.title.toLowerCase().includes(q)))
   }, [allIds, query])
 
-  const activeFile = activeId ? getPracticeFile(activeId) : null
+  // Full challenge content (prompts, starters, solutions, tests) is lazy —
+  // fetched only for the currently active topic, not for every topic listed
+  // in the sidebar.
+  const [activeFile, setActiveFile] = useState<PracticeFile | null>(null)
+
+  useEffect(() => {
+    if (!activeId) { setActiveFile(null); return }
+    let cancelled = false
+    getPracticeFile(activeId).then(result => {
+      if (cancelled) return
+      setActiveFile(result)
+      setActiveLevel(result?.challenges[0]?.level ?? 1)
+    })
+    return () => { cancelled = true }
+  }, [activeId])
+
   const activeChallenge = activeFile?.challenges.find(c => c.level === activeLevel) ?? null
   const activeVariant = activeChallenge?.variants.find(v => v.lang === activeLang) ?? activeChallenge?.variants[0] ?? null
   const progressKey = activeId ? `practice::${activeId}` : null
@@ -69,7 +84,6 @@ export default function PracticeExplorerModal({ onClose }: Props) {
 
   function selectConcept(id: string) {
     setActiveId(id)
-    setActiveLevel(getPracticeFile(id)?.challenges[0]?.level ?? 1)
     setResults(null)
   }
 
@@ -140,10 +154,10 @@ export default function PracticeExplorerModal({ onClose }: Props) {
           {/* Sidebar */}
           <div className={`w-64 shrink-0 border-r ${ui.border} overflow-y-auto p-3 flex flex-col gap-1`}>
             {matches.map(id => {
-              const file = getPracticeFile(id)
-              const name = file?.title ?? id
+              const meta = getPracticeMeta(id)
+              const name = meta?.title ?? id
               const done = ((progress[`practice::${id}`]?.completedCheckpoints as string[]) ?? []).length
-              const total = file?.challenges.length ?? 0
+              const total = meta?.levelCount ?? 0
               const isActive = id === activeId
               return (
                 <button
@@ -241,6 +255,10 @@ export default function PracticeExplorerModal({ onClose }: Props) {
                   </div>
                 )}
               </>
+            ) : activeId ? (
+              <div className={`flex-1 flex items-center justify-center ${ui.txt2} text-sm`}>
+                Loading…
+              </div>
             ) : (
               <div className={`flex-1 flex items-center justify-center ${ui.txt2} text-sm`}>
                 Choose a topic from the sidebar.

@@ -9,14 +9,15 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "node scripts/generate-graph.mjs && node src/scripts/build-lesson-titles.js && node scripts/build-lesson-ids.mjs && vite",
-    "build": "node scripts/generate-graph.mjs && node src/scripts/build-lesson-titles.js && node scripts/build-lesson-ids.mjs && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
+    "dev": "node scripts/generate-graph.mjs && node scripts/build-concept-manifest.mjs && node scripts/build-practice-manifest.mjs && node src/scripts/build-lesson-titles.js && node scripts/build-lesson-ids.mjs && vite",
+    "build": "node scripts/generate-graph.mjs && node scripts/build-concept-manifest.mjs && node scripts/build-practice-manifest.mjs && node src/scripts/build-lesson-titles.js && node scripts/build-lesson-ids.mjs && cross-env NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "preview": "vite preview",
     "index": "node src/scripts/build-lesson-titles.js",
     "lesson-ids": "node scripts/build-lesson-ids.mjs",
     "backend": "node backend/server.mjs",
     "backend:lan": "node backend/server.mjs --host-lan",
     "graph": "node scripts/generate-graph.mjs",
+    "manifests": "node scripts/build-concept-manifest.mjs && node scripts/build-practice-manifest.mjs",
     "release:manifest": "node scripts/build-github-release-manifest.mjs",
     "desktop:dev": "node scripts/run-desktop-dev.mjs",
     "desktop:sync-package": "node scripts/sync-desktop-package.mjs",

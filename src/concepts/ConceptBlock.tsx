@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { getConceptFile, getConceptSeries } from './loader'
+import { getConceptFile, getConceptMeta, getConceptSeries, type ConceptFile } from './loader'
 import StandardCodeBlock from '../components/blog/CodeBlock.jsx'
 import InlineMarkdown from './InlineMarkdown.tsx'
 import { X, ChevronRight, ChevronLeft, Cpu, GraduationCap, Layers, HelpCircle, Activity, AlertTriangle, PenTool } from 'lucide-react'
@@ -48,14 +48,34 @@ export default function ConceptBlock({ id, lang, embedded = false, onNavigate }:
   const [isOpen, setIsOpen] = useState(false)
   const popoverRef = useRef<HTMLDivElement>(null)
 
-  const concept = useMemo(() => getConceptFile(id), [id])
-  const availableLangs = useMemo(() => concept ? Object.keys(concept.languages) : [], [concept])
-  const seriesParts = useMemo(() => concept?.series ? getConceptSeries(concept.series) : [], [concept])
+  // Sync, from the eagerly-loaded manifest — enough to render the collapsed
+  // pill and series navigation without fetching this (or any other) concept's
+  // full body.
+  const meta = useMemo(() => getConceptMeta(id), [id])
+  const seriesParts = useMemo(() => meta?.series ? getConceptSeries(meta.series) : [], [meta])
   const partIndex = seriesParts.findIndex(p => p.id === id)
 
-  const [selectedLang, setSelectedLang] = useState(() =>
-    (lang && concept?.languages[lang]) ? lang : availableLangs[0]
-  )
+  // Full content is lazy — fetched only once this block is actually shown
+  // (always true when embedded; gated on isOpen for the standalone popover).
+  const shouldLoadContent = embedded || isOpen
+  const [concept, setConcept] = useState<ConceptFile | null>(null)
+  const [selectedLang, setSelectedLang] = useState<string | undefined>(undefined)
+  const langInitialized = useRef(false)
+
+  useEffect(() => {
+    if (!shouldLoadContent || !meta) return
+    let cancelled = false
+    getConceptFile(id).then(result => {
+      if (cancelled) return
+      setConcept(result)
+      if (result && !langInitialized.current) {
+        langInitialized.current = true
+        const avail = Object.keys(result.languages)
+        setSelectedLang((lang && result.languages[lang]) ? lang : avail[0])
+      }
+    })
+    return () => { cancelled = true }
+  }, [id, shouldLoadContent, meta, lang])
 
   useEffect(() => {
     if (embedded) return // embedded mode has no own popover to click outside of
@@ -68,13 +88,16 @@ export default function ConceptBlock({ id, lang, embedded = false, onNavigate }:
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isOpen, embedded])
 
-  if (!concept) {
+  if (!meta) {
     return <span className="underline decoration-dashed decoration-red-500 text-red-500">Unknown concept: {id}</span>
   }
 
-  const active = concept.languages[selectedLang]
+  const availableLangs = concept ? Object.keys(concept.languages) : []
+  const active = concept && selectedLang ? concept.languages[selectedLang] : undefined
 
-  const content = (
+  const content = !concept ? (
+    <p className="text-sm text-slate-400 italic">Loading…</p>
+  ) : (
     <>
       {concept.series && seriesParts.length > 1 && (
         <div className="flex items-center justify-between gap-3 mb-4 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50">
@@ -269,7 +292,7 @@ export default function ConceptBlock({ id, lang, embedded = false, onNavigate }:
         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md font-bold transition-all shadow-sm ${isOpen ? 'bg-brand-100 text-brand-800 dark:bg-brand-500/20 dark:text-brand-300 ring-2 ring-brand-500/40' : 'bg-slate-100 border border-slate-200 text-brand-600 hover:bg-brand-50 dark:bg-slate-800 dark:border-slate-700 dark:text-brand-400 dark:hover:bg-slate-700'}`}
         aria-expanded={isOpen}
       >
-        <span className="text-[12px]">💡</span> {concept.name}
+        <span className="text-[12px]">💡</span> {meta.name}
       </button>
 
       {isOpen && typeof document !== 'undefined' && createPortal(
@@ -282,7 +305,7 @@ export default function ConceptBlock({ id, lang, embedded = false, onNavigate }:
           <div className="bg-gradient-to-r from-brand-600 to-indigo-600 text-white px-5 py-3.5 flex justify-between items-center shadow-inner shrink-0">
             <div className="flex items-center gap-2.5">
               <span className="bg-white/20 p-1 rounded-lg text-sm shadow-sm">💡</span>
-              <span className="font-extrabold text-sm tracking-widest uppercase text-white shadow-sm">{concept.name}</span>
+              <span className="font-extrabold text-sm tracking-widest uppercase text-white shadow-sm">{meta.name}</span>
             </div>
             <button onClick={() => setIsOpen(false)} className="p-1 rounded-md text-white/70 hover:text-white hover:bg-white/20 transition-colors">
               <X className="w-5 h-5" />

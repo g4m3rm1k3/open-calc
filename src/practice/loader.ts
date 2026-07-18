@@ -44,20 +44,52 @@ export interface PracticeFile {
   challenges: PracticeChallenge[]
 }
 
-const RAW_MODULES = import.meta.glob('./*.ts', { eager: true }) as Record<string, { default: PracticeChallenge[]; title?: string }>
+// PRACTICE_MANIFEST is generated (scripts/build-practice-manifest.mjs, wired into
+// `npm run dev`/`npm run build`) — id/title/levelCount for every practice file,
+// cheap enough to import eagerly so the Explorer's sidebar never needs a file's
+// full challenge content (prompts, starters, solutions, tests) just to list it.
+// Full content (below) is loaded lazily per file.
+import { PRACTICE_MANIFEST, type PracticeMeta } from './manifest'
 
-const PRACTICE: Record<string, PracticeFile> = {}
-for (const [path, mod] of Object.entries(RAW_MODULES)) {
-  if (path.endsWith('/loader.ts')) continue
+export type { PracticeMeta }
+
+const MANIFEST_BY_ID: Record<string, PracticeMeta> = {}
+for (const meta of PRACTICE_MANIFEST) MANIFEST_BY_ID[meta.id] = meta
+
+// Lazy loaders — each resolves to the module's exports only when actually
+// called, so opening one practice topic doesn't force every topic to load.
+const RAW_MODULE_LOADERS = import.meta.glob('./*.ts') as Record<string, () => Promise<{ default: PracticeChallenge[]; title?: string }>>
+
+const PATH_BY_ID: Record<string, string> = {}
+for (const path of Object.keys(RAW_MODULE_LOADERS)) {
+  if (path.endsWith('/loader.ts') || path.endsWith('/manifest.ts')) continue
   const id = path.replace(/^\.\//, '').replace(/\.ts$/, '')
-  const challenges = [...(mod.default ?? [])].sort((a, b) => a.level - b.level)
-  if (challenges.length > 0) PRACTICE[id] = { id, title: mod.title ?? id, challenges }
+  PATH_BY_ID[id] = path
 }
 
-export function getPracticeFile(id: string): PracticeFile | null {
-  return PRACTICE[id] ?? null
+// Memoized by id so concurrent callers for the same topic share one fetch, not
+// one each.
+const PRACTICE_CACHE = new Map<string, Promise<PracticeFile | null>>()
+
+export function getPracticeFile(id: string): Promise<PracticeFile | null> {
+  let cached = PRACTICE_CACHE.get(id)
+  if (cached) return cached
+  const path = PATH_BY_ID[id]
+  cached = path
+    ? RAW_MODULE_LOADERS[path]().then(mod => {
+        const challenges = [...(mod.default ?? [])].sort((a, b) => a.level - b.level)
+        return challenges.length > 0 ? { id, title: mod.title ?? id, challenges } : null
+      })
+    : Promise.resolve(null)
+  PRACTICE_CACHE.set(id, cached)
+  return cached
+}
+
+/** Sync — title/levelCount only, no fetch. Use for the sidebar list. */
+export function getPracticeMeta(id: string): PracticeMeta | null {
+  return MANIFEST_BY_ID[id] ?? null
 }
 
 export function getAvailablePracticeIds(): string[] {
-  return Object.keys(PRACTICE)
+  return PRACTICE_MANIFEST.map(p => p.id)
 }

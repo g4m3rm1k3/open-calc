@@ -166,25 +166,55 @@ export function parseConceptFile(raw: string, fallbackId: string): ConceptFile {
   return { id, name, definition, problem, execution, cs, se, commonMistakes, exercises, languages, series, seriesTitle, part }
 }
 
-const CONCEPT_RAW_FILES = import.meta.glob('./*.md', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
+// CONCEPT_MANIFEST is generated (scripts/build-concept-manifest.mjs, wired into
+// `npm run dev`/`npm run build`) — id/name/series/part for every concept, cheap
+// enough to import eagerly so sidebars and search never need a concept's full
+// body just to show its name. Full content (below) is loaded lazily per file.
+import { CONCEPT_MANIFEST, type ConceptMeta } from './manifest'
 
-const CONCEPTS: Record<string, ConceptFile> = {}
-for (const [path, raw] of Object.entries(CONCEPT_RAW_FILES)) {
+export type { ConceptMeta }
+
+const MANIFEST_BY_ID: Record<string, ConceptMeta> = {}
+for (const meta of CONCEPT_MANIFEST) MANIFEST_BY_ID[meta.id] = meta
+
+// Lazy loaders — each resolves to raw markdown text only when actually called,
+// so opening one concept doesn't force every concept's body to load/parse.
+const CONCEPT_RAW_LOADERS = import.meta.glob('./*.md', { query: '?raw', import: 'default' }) as Record<string, () => Promise<string>>
+
+const PATH_BY_ID: Record<string, string> = {}
+for (const path of Object.keys(CONCEPT_RAW_LOADERS)) {
   const id = path.replace(/^\.\//, '').replace(/\.md$/, '')
-  CONCEPTS[id] = parseConceptFile(raw, id)
+  PATH_BY_ID[id] = path
 }
 
-export function getConceptFile(id: string): ConceptFile | null {
-  return CONCEPTS[id] ?? null
+// Memoized by id so concurrent callers for the same concept (e.g. a modal's own
+// fetch plus a ConceptBlock it renders) share one fetch+parse, not one each.
+const CONCEPT_CACHE = new Map<string, Promise<ConceptFile | null>>()
+
+export function getConceptFile(id: string): Promise<ConceptFile | null> {
+  let cached = CONCEPT_CACHE.get(id)
+  if (cached) return cached
+  const path = PATH_BY_ID[id]
+  cached = path
+    ? CONCEPT_RAW_LOADERS[path]().then(raw => parseConceptFile(raw, id))
+    : Promise.resolve(null)
+  CONCEPT_CACHE.set(id, cached)
+  return cached
+}
+
+/** Sync — name/series/part only, no fetch. Use for lists, search, and pill labels. */
+export function getConceptMeta(id: string): ConceptMeta | null {
+  return MANIFEST_BY_ID[id] ?? null
 }
 
 export function getAvailableConceptIds(): string[] {
-  return Object.keys(CONCEPTS)
+  return CONCEPT_MANIFEST.map(c => c.id)
 }
 
-/** All parts of a series, in order — null part numbers sort last. */
-export function getConceptSeries(seriesId: string): ConceptFile[] {
-  return Object.values(CONCEPTS)
+/** All parts of a series, in order — null part numbers sort last. Metadata only
+ *  (id/name/part), sync — matches what every current caller actually uses. */
+export function getConceptSeries(seriesId: string): ConceptMeta[] {
+  return CONCEPT_MANIFEST
     .filter(c => c.series === seriesId)
     .sort((a, b) => (a.part ?? Infinity) - (b.part ?? Infinity))
 }
