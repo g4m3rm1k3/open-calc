@@ -1,8 +1,13 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useMemo, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import BlogPost from '../components/blog/BlogPost.jsx'
+import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
+import { BLOG_MANIFEST } from '../posts/manifest.ts'
 
-const POST_MODULES = import.meta.glob('../posts/**/*.md', { query: '?raw', import: 'default', eager: true })
+// Loader functions only (no `eager: true`) — a post's full body is fetched
+// on demand for the one slug being viewed, not inlined for all 130+ posts
+// into this page's chunk. Metadata for series nav comes from the manifest.
+const POST_RAW_LOADERS = import.meta.glob('../posts/**/*.md', { query: '?raw', import: 'default' })
 
 function pathToSlug(path) {
   return path
@@ -19,18 +24,12 @@ function pathToSlug(path) {
     .join('/')
 }
 
-function pathToFolderName(path) {
-  const rel = path.replace(/^.*\/posts\//, '')
-  const parts = rel.split('/')
-  return parts.length > 1 ? parts.slice(0, -1).join('/') : null
-}
+// slug -> loader, built once from the (unexecuted) glob keys
+const SLUG_TO_LOADER = Object.fromEntries(
+  Object.entries(POST_RAW_LOADERS).map(([path, loader]) => [pathToSlug(path), loader])
+)
 
-const ALL_POSTS_META = Object.entries(POST_MODULES).map(([path, raw]) => {
-  const slug = pathToSlug(path)
-  const h1 = raw.match(/^#\s+(.+)$/m)
-  const title = h1 ? h1[1].trim() : slug.split('/').pop().replace(/-/g, ' ')
-  return { slug, title, folderName: pathToFolderName(path) }
-})
+const ALL_POSTS_META = BLOG_MANIFEST
 
 function SeriesNav({ currentSlug, navigate }) {
   const folderSlug = currentSlug.includes('/') ? currentSlug.split('/')[0] : null
@@ -103,16 +102,32 @@ export default function BlogPostPage() {
   const { '*': slug } = useParams()
   const navigate = useNavigate()
 
-  const content = useMemo(() => {
-    for (const [path, raw] of Object.entries(POST_MODULES)) {
-      if (pathToSlug(path) === slug) return raw
+  // undefined = loading, null = not found, string = loaded content
+  const [content, setContent] = useState(undefined)
+
+  useEffect(() => {
+    const loader = SLUG_TO_LOADER[slug]
+    if (!loader) {
+      setContent(null)
+      return
     }
-    return null
+    let cancelled = false
+    setContent(undefined)
+    loader().then(raw => { if (!cancelled) setContent(raw) })
+    return () => { cancelled = true }
   }, [slug])
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [slug])
+
+  if (content === undefined) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <LoadingSpinner size="lg" />
+      </div>
+    )
+  }
 
   if (content === null) {
     return (

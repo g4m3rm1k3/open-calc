@@ -21,6 +21,7 @@ release/
 # Auto-generated on every dev/build run (scripts/generate-graph.mjs) - pure noise to track
 src/data/codebaseGraph.js
 
-# Auto-generated on every dev/build run (scripts/build-concept-manifest.mjs, scripts/build-practice-manifest.mjs)
+# Auto-generated on every dev/build run (scripts/build-concept-manifest.mjs, scripts/build-practice-manifest.mjs, scripts/build-blog-manifest.mjs)
 src/concepts/manifest.ts
 src/practice/manifest.ts
+src/posts/manifest.ts

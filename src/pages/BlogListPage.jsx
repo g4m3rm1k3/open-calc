@@ -1,65 +1,18 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { BLOG_MANIFEST } from '../posts/manifest.ts'
 
-const POST_MODULES = import.meta.glob('../posts/**/*.md', { query: '?raw', import: 'default', eager: true })
-
-function pathToSlug(path) {
-  return path
-    .replace(/^.*\/posts\//, '')
-    .replace(/\.md$/, '')
-    .split('/')
-    .map(s =>
-      s.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '')
-    )
-    .join('/')
-}
-
-function pathToFolderName(path) {
-  const rel = path.replace(/^.*\/posts\//, '')
-  const parts = rel.split('/')
-  return parts.length > 1 ? parts.slice(0, -1).join('/') : null
-}
-
-function extractMeta(raw, path) {
-  const slug = pathToSlug(path)
-  const folderName = pathToFolderName(path)
-  const lines = raw.split('\n')
-
-  const h1 = lines.find(l => l.startsWith('# '))
-  const title = h1 ? h1.replace(/^# /, '').trim() : slug.split('/').pop().replace(/-/g, ' ')
-
-  let excerpt = ''
-  for (const line of lines) {
-    const t = line.trim()
-    if (!t || t.startsWith('#') || t.startsWith('---') || t.startsWith('```')) continue
-    excerpt = t.length > 220 ? t.slice(0, 220) + '…' : t
-    break
+// Metadata for all posts comes from the build-time manifest (see
+// scripts/build-blog-manifest.mjs) instead of eager-loading every post's
+// full body — that used to inline the entire blog (2.6MB+ and growing) into
+// this page's JS chunk just to show a list of titles/excerpts.
+const ALL_POSTS = [...BLOG_MANIFEST].sort((a, b) => {
+  // Series posts sort by slug within each folder; standalone by title
+  if (a.folderName && b.folderName && a.folderName === b.folderName) {
+    return a.slug.localeCompare(b.slug)
   }
-
-  const topics = lines
-    .filter(l => l.startsWith('## '))
-    .map(l => l.replace(/^## /, '').trim())
-    .slice(0, 4)
-
-  const wordCount = raw.split(/\s+/).length
-  const readMin = Math.max(1, Math.round(wordCount / 200))
-
-  return { slug, folderName, title, excerpt, topics, readMin }
-}
-
-const ALL_POSTS = Object.entries(POST_MODULES)
-  .map(([path, raw]) => extractMeta(raw, path))
-  .sort((a, b) => {
-    // Series posts sort by slug within each folder; standalone by title
-    if (a.folderName && b.folderName && a.folderName === b.folderName) {
-      return a.slug.localeCompare(b.slug)
-    }
-    return 0
-  })
+  return 0
+})
 
 export default function BlogListPage() {
   const navigate = useNavigate()

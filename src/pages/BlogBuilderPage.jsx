@@ -3,12 +3,17 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import BlogPost from '../components/blog/BlogPost.jsx'
 import MarkdownToolbar from '../components/markdown-toolbar/MarkdownToolbar.jsx'
 import { useGlobalTheme } from '../context/ThemeContext.jsx'
+import { BLOG_MANIFEST } from '../posts/manifest.ts'
 
 const MonacoEditor = lazy(() => import('@monaco-editor/react').then(m => ({ default: m.default })))
 
 // ── Existing posts ────────────────────────────────────────────────────────────
+// Metadata (title/folder/repoPath) comes from the build-time manifest (see
+// scripts/build-blog-manifest.mjs). Full post bodies are fetched on demand —
+// only for the one post actually being loaded/edited — instead of eager-
+// loading every post's full text just to populate this picker.
 
-const POST_MODULES = import.meta.glob('../posts/**/*.md', { query: '?raw', import: 'default', eager: true })
+const POST_RAW_LOADERS = import.meta.glob('../posts/**/*.md', { query: '?raw', import: 'default' })
 
 function pathToSlug(path) {
   return path
@@ -19,22 +24,12 @@ function pathToSlug(path) {
     .join('/')
 }
 
-function pathToFolderName(path) {
-  const rel = path.replace(/^.*\/posts\//, '')
-  const parts = rel.split('/')
-  return parts.length > 1 ? parts.slice(0, -1).join('/') : null
-}
+// slug -> loader, built once from the (unexecuted) glob keys
+const SLUG_TO_LOADER = Object.fromEntries(
+  Object.entries(POST_RAW_LOADERS).map(([path, loader]) => [pathToSlug(path), loader])
+)
 
-function globToRepoPath(path) {
-  return 'src/' + path.replace(/^\.\.\//, '')
-}
-
-const ALL_POSTS = Object.entries(POST_MODULES).map(([path, raw]) => {
-  const slug = pathToSlug(path)
-  const h1 = raw.match(/^#\s+(.+)$/m)
-  const title = h1 ? h1[1].trim() : slug.split('/').pop().replace(/-/g, ' ')
-  return { slug, title, folderName: pathToFolderName(path), repoPath: globToRepoPath(path), raw }
-})
+const ALL_POSTS = BLOG_MANIFEST.map(post => ({ ...post, repoPath: post.path }))
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -358,10 +353,12 @@ export default function BlogBuilderPage() {
     const editSlug = location.state?.editSlug
     if (!editSlug) return
     const post = ALL_POSTS.find(p => p.slug === editSlug)
-    if (post) {
-      setContent(post.raw)
+    const loader = post && SLUG_TO_LOADER[post.slug]
+    if (!loader) return
+    loader().then(raw => {
+      setContent(raw)
       setSourcePost({ slug: post.slug, repoPath: post.repoPath })
-    }
+    })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const monacoTheme = isDarkGlobal ? 'vs-dark' : 'vs'
@@ -387,10 +384,14 @@ export default function BlogBuilderPage() {
   }
 
   function handleLoadPost(post) {
-    setContent(post.raw)
-    setSourcePost({ slug: post.slug, repoPath: post.repoPath })
-    setShowLoadModal(false)
-    sessionStorage.setItem(STORAGE_KEY, post.raw)
+    const loader = SLUG_TO_LOADER[post.slug]
+    if (!loader) return
+    loader().then(raw => {
+      setContent(raw)
+      setSourcePost({ slug: post.slug, repoPath: post.repoPath })
+      setShowLoadModal(false)
+      sessionStorage.setItem(STORAGE_KEY, raw)
+    })
   }
 
   function handleFileUpload(e) {
