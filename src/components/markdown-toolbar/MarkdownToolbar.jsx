@@ -483,10 +483,10 @@ function MathEditorQuickAdd({ onInsert, onClose }) {
       {ready && (
         <>
           {/* MathLive web component — styled to look like a proper input field */}
-          <div className="rounded border border-indigo-300 dark:border-indigo-600 bg-white dark:bg-slate-900 p-3 min-h-[56px] flex items-center text-lg">
+          <div className="rounded border border-indigo-300 dark:border-indigo-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 p-3 min-h-[56px] flex items-center text-lg">
             <math-field
               ref={mfRef}
-              style={{ width: '100%', minHeight: 40, outline: 'none', fontSize: 20 }}
+              style={{ width: '100%', minHeight: 40, outline: 'none', fontSize: 20, color: 'inherit' }}
             />
           </div>
 
@@ -505,10 +505,10 @@ function MathEditorQuickAdd({ onInsert, onClose }) {
 
       <button
         onClick={insert}
-        className="w-full text-xs font-bold py-1.5 rounded bg-[#238636] text-white disabled:opacity-40"
+        className="w-full text-xs font-bold py-1.5 rounded bg-[#238636] hover:bg-[#2ea043] text-white disabled:opacity-40 mt-2"
         disabled={!ready}
       >
-        Insert
+        ➕ Insert Math into Note
       </button>
     </QuickAddPopover>
   )
