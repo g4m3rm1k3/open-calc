@@ -9,15 +9,23 @@ import { useChat } from '../../hooks/useChat.js'
 import { useMontyContext } from '../../features/compass/MontyContext.tsx'
 import { useProgress } from '../../hooks/useProgress.js'
 import { computeXp, xpToLevel } from '../../features/compass/montyStatus.ts'
+import { getLabEntry } from '../../labs/labLoader.js'
 
-// RPG Workout and Brain Training are tall, scrollable content pages — not
-// fixed-size games/labs — so they route to their own dedicated pages instead
-// of opening through the floating-window manager. FloatingWindow's content
-// area uses `overflow-hidden` with no scroll, which is correct for canvas
-// games but silently clips/cuts off anything taller than the window.
+// `route` navigates the browser there — correct for RPG Workout and Brain
+// Training, which are tall, scrollable content pages meant to be their own
+// full page (FloatingWindow's content area uses `overflow-hidden` with no
+// scroll, which clips anything taller than the window). `loader` instead
+// opens the app as a floating window directly, with NO navigation at all —
+// the current page (a lesson, a course, wherever the user actually is)
+// stays exactly as it is underneath. Canvas Notes needs `loader`, not
+// `route`: navigating to `/lab/canvas-notes` would render EntryShell, which
+// opens the window but then also replaces the URL with `backTo` ("/labs")
+// — stranding the user on the Labs gallery instead of back on their course
+// the moment they close the window.
 const PINNED_APPS = [
   { id: 'rpg-workout', label: 'RPG Workout', emoji: '⚔️', route: '/rpg-workout' },
   { id: 'brain', label: 'Brain Training', emoji: '🧠', route: '/brain' },
+  { id: 'canvas-notes', label: 'Canvas Notes', emoji: '🗒️', loader: () => getLabEntry('canvas-notes').then((e) => e.component) },
 ]
 import { LayoutGrid, Command, BookOpen, MessageSquare, StickyNote, GraduationCap, Zap, Lightbulb, Dumbbell } from 'lucide-react'
 

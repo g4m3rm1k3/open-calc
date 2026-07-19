@@ -22,6 +22,8 @@ export default function EntryShell({ paramKey, loader, notFoundEmoji, notFoundLa
         label: entry.label,
         emoji: entry.emoji,
         Component: entry.component,
+        width: entry.width,
+        height: entry.height,
         backTo,
         backLabel,
       })

@@ -80,6 +80,19 @@ Then open the PR on GitHub — it'll offer to compare `your-username:fix-golf-to
 
 The commands above are the practical minimum. For a from-scratch, hands-on explanation of what a branch, a fetch, and a merge actually *are* underneath these commands — including a disposable practice repo where you can experiment risk-free — see the lesson series in [`src/docs/UpSkillOS work/git-fundamentals/`](src/docs/UpSkillOS%20work/git-fundamentals/01-branch-before-you-change-anything.md), written from this project's own real git sessions, mistakes included.
 
+### Every code change ships with a lesson
+
+This repo's standing convention: any non-trivial code change — a new
+feature, a refactor, a real bug fix — gets a paired lesson written in
+`src/docs/UpSkillOS work/<topic>/`, following the exact template in
+[`LessonSchema.md`](src/docs/UpSkillOS%20work/LessonSchema.md). The
+point isn't documentation for its own sake — it's turning every commit
+into material that teaches the software engineering and CS principles
+actually behind the diff, with real, executed output for every concept,
+not assumed or hand-waved output. See any folder under `UpSkillOS work/`
+for the format in practice (`canvas-notes-lab/` and `lab-registry-autofind/`
+are recent, complete examples).
+
 ---
 
 ## 1. Adding a new lesson

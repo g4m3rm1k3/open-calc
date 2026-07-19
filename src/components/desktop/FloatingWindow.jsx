@@ -24,11 +24,17 @@ function MacDots({ onClose, onMinimize, onMaximize, isMaximized }) {
 
 export default function FloatingWindow({ win, zIndex, onClose, onMinimize, onMaximize, onFocus }) {
   const offset = (win.offset ?? 0) * 24
+  // A lab can request a bigger-than-default window (win.width/height, from
+  // its own meta.js) — clamped against the actual screen so a request
+  // bigger than the monitor can't open partly off-screen, the same
+  // MIN_W/H-style clamp startResize below already applies to manual drags.
+  const initialW = Math.min(win.width ?? PANEL_W, window.innerWidth - 40)
+  const initialH = Math.min(win.height ?? PANEL_H, window.innerHeight - 80)
   const [pos, setPos] = useState(() => ({
-    x: Math.max(0, (window.innerWidth - PANEL_W) / 2 + offset),
+    x: Math.max(0, (window.innerWidth - initialW) / 2 + offset),
     y: Math.max(44, 80 + offset),
   }))
-  const [size, setSize] = useState(() => ({ w: win.width ?? PANEL_W, h: win.height ?? PANEL_H }))
+  const [size, setSize] = useState(() => ({ w: initialW, h: initialH }))
   const dragging = useRef(false)
   const origin = useRef({ mx: 0, my: 0, wx: 0, wy: 0 })
   const resizing = useRef(false)
