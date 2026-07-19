@@ -3,6 +3,7 @@ import * as fabric from 'fabric'
 import TextFormatToolbar from './TextFormatToolbar.jsx'
 import MarkdownNote from './MarkdownNote.jsx'
 import { getPage, putPage } from './db.js'
+import { useThemeColors } from '../../hooks/useThemeColors.js'
 
 // A real notebook page, not a box that happens to fit the window — deliberately
 // bigger than any viewport this opens in, so there's room to lay things out the
@@ -30,6 +31,54 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
+const ADAPTIVE_COLORS = ['#1e1e1e', '#1e293b', '#cbd5e1']
+function getAdaptiveColor(val, canvasText) {
+  if (!val || typeof val !== 'string') return val
+  if (ADAPTIVE_COLORS.includes(val.toLowerCase())) return canvasText
+  const m = val.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)$/)
+  if (m) {
+    const r = parseInt(m[1]), g = parseInt(m[2]), b = parseInt(m[3])
+    const isMatch = ADAPTIVE_COLORS.some(hex => {
+      const n = parseInt(hex.replace('#', ''), 16)
+      return r === ((n >> 16) & 255) && g === ((n >> 8) & 255) && b === (n & 255)
+    })
+    if (isMatch) {
+      const alpha = m[4] !== undefined ? parseFloat(m[4]) : 1
+      return hexToRgba(canvasText, alpha)
+    }
+  }
+  return val
+}
+
+function adaptCanvasColors(canvas, canvasText) {
+  let changed = false
+  canvas.getObjects().forEach((obj) => {
+    if (obj.stroke && typeof obj.stroke === 'string') {
+      const next = getAdaptiveColor(obj.stroke, canvasText)
+      if (next !== obj.stroke) { obj.set('stroke', next); changed = true }
+    }
+    if (obj.fill && typeof obj.fill === 'string') {
+      const next = getAdaptiveColor(obj.fill, canvasText)
+      if (next !== obj.fill) { obj.set('fill', next); changed = true }
+    }
+    if (obj.type === 'textbox' && obj.styles) {
+      for (const line in obj.styles) {
+        for (const char in obj.styles[line]) {
+           const charStyle = obj.styles[line][char]
+           if (charStyle.fill) {
+             const next = getAdaptiveColor(charStyle.fill, canvasText)
+             if (next !== charStyle.fill) {
+               charStyle.fill = next
+               changed = true
+             }
+           }
+        }
+      }
+    }
+  })
+  if (changed) canvas.requestRenderAll()
+}
+
 // One fabric.Canvas instance, reused across every page — never recreated
 // when the active page changes. Switching pages swaps the canvas's
 // CONTENT (via loadFromJSON), not the canvas itself.
@@ -40,6 +89,7 @@ export default function PageCanvas({ pageId, tool, onPlacementDone, strokeColor,
   const prevPageIdRef = useRef(pageId)
   const [selectedText, setSelectedText] = useState(null)
   const [noteAnchors, setNoteAnchors] = useState([])
+  const C = useThemeColors()
 
   const refreshAnchors = () => {
     const canvas = fabricRef.current
@@ -51,7 +101,7 @@ export default function PageCanvas({ pageId, tool, onPlacementDone, strokeColor,
     const canvas = new fabric.Canvas(canvasElRef.current, {
       width: CANVAS_W,
       height: CANVAS_H,
-      backgroundColor: '#ffffff',
+      backgroundColor: C.canvasSurface,
     })
     fabricRef.current = canvas
 
@@ -67,7 +117,18 @@ export default function PageCanvas({ pageId, tool, onPlacementDone, strokeColor,
     canvas.on('selection:cleared', () => setSelectedText(null))
 
     return () => canvas.dispose()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Keep background color in sync with theme changes
+  useEffect(() => {
+    const canvas = fabricRef.current
+    if (canvas) {
+      canvas.backgroundColor = C.canvasSurface
+      adaptCanvasColors(canvas, C.canvasText)
+      canvas.requestRenderAll()
+    }
+  }, [C.canvasSurface, C.canvasText])
 
   // Swap content whenever the active page changes — now backed by real
   // persistence (idb) instead of Lesson 2's in-memory-only relay through
@@ -100,10 +161,12 @@ export default function PageCanvas({ pageId, tool, onPlacementDone, strokeColor,
         // "finished loading" callback — it returns a Promise for that.
         await canvas.loadFromJSON(stored.canvasJSON)
         if (cancelled) return
+        canvas.backgroundColor = C.canvasSurface
+        adaptCanvasColors(canvas, C.canvasText)
         canvas.requestRenderAll()
         refreshAnchors() // this page's own markdown anchors, freshly loaded
       } else {
-        canvas.backgroundColor = '#ffffff'
+        canvas.backgroundColor = C.canvasSurface
         canvas.requestRenderAll()
       }
       prevPageIdRef.current = pageId

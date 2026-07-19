@@ -8,9 +8,12 @@ const TOOLS = [
   { id: 'note', label: 'Note', icon: '▤' },
 ]
 
-const SWATCHES = ['#1e1e1e', '#e24b4a', '#ef9f27', '#1d9e75', '#378ade', '#7f77dd']
+import { useThemeColors } from '../../hooks/useThemeColors.js'
 
 export default function DrawToolbar({ tool, onSelectTool, strokeColor, onSelectColor, strokeWidth, onChangeStrokeWidth }) {
+  const C = useThemeColors()
+  const SWATCHES = [C.canvasText, '#e24b4a', '#ef9f27', '#1d9e75', '#378ade', '#7f77dd']
+
   return (
     <div className="flex items-center gap-4 px-4 py-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
       <div className="flex items-center gap-1">

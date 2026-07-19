@@ -4,6 +4,7 @@ import PageTabs from './PageTabs.jsx'
 import PageCanvas from './PageCanvas.jsx'
 import DrawToolbar from './DrawToolbar.jsx'
 import { listSections, putSection, deleteSection, deletePage } from './db.js'
+import { useThemeColors } from '../../hooks/useThemeColors.js'
 
 function uid() {
   return Math.random().toString(36).slice(2, 9)
@@ -38,7 +39,22 @@ export default function CanvasNotesPage() {
   const [activeSectionId, setActiveSectionId] = useState(null)
   const [activePageId, setActivePageId] = useState(null)
   const [tool, setTool] = useState('select')
-  const [strokeColor, setStrokeColor] = useState('#1e1e1e')
+  const C = useThemeColors()
+  
+  // Initialize stroke color to canvasText, and update it if the theme changes
+  // and the user hasn't explicitly picked a different non-text color.
+  const [strokeColor, setStrokeColor] = useState(C.canvasText)
+  
+  useEffect(() => {
+    setStrokeColor(current => {
+      // If the current color is the old light or dark text color, or the hardcoded #1e1e1e, update it.
+      if (current === '#1e1e1e' || current === '#1e293b' || current === '#cbd5e1') {
+        return C.canvasText
+      }
+      return current
+    })
+  }, [C.canvasText])
+
   const [strokeWidth, setStrokeWidth] = useState(3)
 
   // Load the notebook's structure once, on mount. An empty store means this
