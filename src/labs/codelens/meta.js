@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "CodeLens",
   emoji: "🔬",
@@ -13,4 +15,6 @@ export default {
     sub: "AST · Heap · Execution"
   },
   order: 32,
+  routes: ['/codelens'],
+  component: lazy(() => import('./CodeLensPage.tsx')),
 }

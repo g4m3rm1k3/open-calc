@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "CAD Pro",
   emoji: "📐",
@@ -13,4 +15,6 @@ export default {
     sub: "Parametric Design"
   },
   order: 27,
+  routes: ['/cad-pro'],
+  component: lazy(() => import('./CadProPage.jsx')),
 }

@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "CSS 0 to Mastery",
   emoji: "🎨",
@@ -13,4 +15,6 @@ export default {
     sub: "Flex · Grid · Layout"
   },
   order: 9,
+  routes: ['/web-learn/css-mastery', '/web-learn/css-mastery/:lessonId'],
+  component: lazy(() => import('./CSSMasteryPage.jsx')),
 }

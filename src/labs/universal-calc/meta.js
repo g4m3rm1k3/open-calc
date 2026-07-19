@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "Universal Calc",
   emoji: "🧮",
@@ -13,4 +15,6 @@ export default {
     sub: "Universal Constants"
   },
   order: 29,
+  routes: ['/universal-calc'],
+  component: lazy(() => import('./UniversalCalcPage.jsx')),
 }

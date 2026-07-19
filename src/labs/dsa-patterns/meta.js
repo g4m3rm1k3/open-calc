@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "DSA + Design Patterns",
   emoji: "🧩",
@@ -13,4 +15,6 @@ export default {
     sub: "DSA · Patterns · Checkpoints"
   },
   order: 31,
+  routes: ['/learn/dsa-patterns', '/learn/dsa-patterns/:lessonId'],
+  component: lazy(() => import('./DSAPatternsPage.jsx')),
 }

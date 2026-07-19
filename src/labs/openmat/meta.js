@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "OpenMAT",
   emoji: "⚛️",
@@ -13,4 +15,6 @@ export default {
     sub: "Computation Engine"
   },
   order: 21,
+  routes: ['/openmat'],
+  component: lazy(() => import('./OpenMatPage.jsx')),
 }

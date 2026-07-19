@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "Logic Suite",
   emoji: "⚡",
@@ -13,4 +15,6 @@ export default {
     sub: "Gates · Truth Tables"
   },
   order: 24,
+  routes: ['/logic-sim'],
+  component: lazy(() => import('./LogicSimPage.jsx')),
 }

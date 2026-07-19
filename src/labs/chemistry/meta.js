@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "Chemistry Lab",
   emoji: "🧪",
@@ -13,4 +15,6 @@ export default {
     sub: "Reactions · Molecules"
   },
   order: 25,
+  routes: ['/chemistry'],
+  component: lazy(() => import('./ChemistryPage.tsx')),
 }

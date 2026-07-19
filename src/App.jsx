@@ -8,6 +8,7 @@ import { VideoPlayerProvider } from "./context/VideoPlayerContext.jsx";
 import FloatingVideoPlayer from "./components/ui/FloatingVideoPlayer.jsx";
 import LoadingSpinner from "./components/ui/LoadingSpinner.jsx";
 import { getLabEntry } from "./labs/labLoader.js";
+import { LABS } from "./labs/labRegistryLoader.js";
 import { getGameEntry } from "./games/gameLoader.js";
 import DesktopProvider from "./components/desktop/DesktopProvider.jsx";
 import { ChatProvider } from "./context/ChatContext.jsx";
@@ -23,17 +24,7 @@ const LessonPage = lazy(() => import("./pages/LessonPage.jsx"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage.jsx"));
 const AboutPage = lazy(() => import("./pages/AboutPage.jsx"));
 const ReferencePage = lazy(() => import("./pages/ReferencePage.jsx"));
-const UniversalCalcPage = lazy(
-  () => import("./labs/universal-calc/UniversalCalcPage.jsx"),
-);
-const OpenMatPage = lazy(() => import("./labs/openmat/OpenMatPage.jsx"));
-const CNCSimPage = lazy(() => import("./labs/cnc-sim/CNCSimPage.jsx"));
 const CoursePage = lazy(() => import("./pages/CoursePage.jsx"));
-const LogicSimPage = lazy(() => import("./labs/logic-sim/LogicSimPage.jsx"));
-const ChemistryPage = lazy(() => import("./labs/chemistry/ChemistryPage.tsx"));
-const PhysicsPage = lazy(() => import("./labs/physics/PhysicsPage.jsx"));
-const CadProPage = lazy(() => import("./labs/cad-pro/CadProPage.jsx"));
-const CadCncPage = lazy(() => import("./labs/cad-cnc/CadCncPage.jsx"));
 const MarkdownHub = lazy(() => import("./components/docs/MarkdownHub.jsx"));
 const HealthTrackerPage = lazy(() => import("./games/HealthTrackerPage.jsx"));
 const ConceptPreviewPage = lazy(() => import("./pages/ConceptPreviewPage.jsx"));
@@ -46,24 +37,7 @@ const LinearAlgebraReferencePage = lazy(
 const LAConceptExplorerPage = lazy(
   () => import("./pages/LAConceptExplorerPage.jsx"),
 );
-const CSSMasteryPage = lazy(
-  () => import("./labs/css-mastery/CSSMasteryPage.jsx"),
-);
-const ReactMasteryPage = lazy(
-  () => import("./labs/react-mastery/ReactMasteryPage.jsx"),
-);
-const FiveAxisKinematicsPage = lazy(
-  () => import("./labs/five-axis/FiveAxisKinematicsPage.tsx"),
-);
-const CodeLensPage = lazy(() => import("./labs/codelens/CodeLensPage.tsx"));
-const SICPPage = lazy(() => import("./labs/sicp-js/SICPPage.jsx"));
-const DSAPatternsPage = lazy(
-  () => import("./labs/dsa-patterns/DSAPatternsPage.jsx"),
-);
-const LessonBuilderPage = lazy(() => import("./pages/LessonBuilderPage.jsx"));
-const VizBuilderPage = lazy(() => import("./pages/VizBuilderPage.jsx"));
 const PlaygroundPage = lazy(() => import("./pages/PlaygroundPage.jsx"));
-const NotebookLabPage = lazy(() => import("./pages/NotebookLabPage.jsx"));
 const CalendarPage = lazy(() => import("./features/calendar/CalendarPage.tsx"));
 const CompassPage = lazy(() => import("./features/compass/CompassPage.tsx"));
 const BlogListPage = lazy(() => import("./pages/BlogListPage.jsx"));
@@ -155,26 +129,9 @@ export default function App() {
                               element={<LAConceptExplorerPage />}
                             />
                             <Route
-                              path="universal-calc"
-                              element={<UniversalCalcPage />}
-                            />
-                            <Route path="openmat" element={<OpenMatPage />} />
-                            <Route path="cnc-sim" element={<CNCSimPage />} />
-                            <Route
-                              path="logic-sim"
-                              element={<LogicSimPage />}
-                            />
-                            <Route
-                              path="chemistry"
-                              element={<ChemistryPage />}
-                            />
-                            <Route path="physics" element={<PhysicsPage />} />
-                            <Route
                               path="courses"
                               element={<Navigate to="/" replace />}
                             />
-                            <Route path="cad-pro" element={<CadProPage />} />
-                            <Route path="cad-cnc" element={<CadCncPage />} />
                             <Route path="studio" element={<MarkdownHub />} />
                             <Route
                               path="docs"
@@ -294,63 +251,23 @@ export default function App() {
                             />
 
                             <Route
-                              path="lesson-builder"
-                              element={<LessonBuilderPage />}
-                            />
-                            <Route
-                              path="lesson-builder/:chapterId/:lessonSlug"
-                              element={<LessonBuilderPage />}
-                            />
-                            <Route
-                              path="viz-builder"
-                              element={<VizBuilderPage />}
-                            />
-                            <Route
                               path="playground"
                               element={<PlaygroundPage />}
                             />
-                            <Route
-                              path="notebook-lab"
-                              element={<NotebookLabPage />}
-                            />
 
-                            <Route
-                              path="five-axis"
-                              element={<FiveAxisKinematicsPage />}
-                            />
-                            <Route path="codelens" element={<CodeLensPage />} />
-
-                            {/* Web Learn Curriculums */}
-                            <Route
-                              path="web-learn/css-mastery/:lessonId"
-                              element={<CSSMasteryPage />}
-                            />
-                            <Route
-                              path="web-learn/css-mastery"
-                              element={<CSSMasteryPage />}
-                            />
-                            <Route
-                              path="web-learn/react-mastery/:lessonId"
-                              element={<ReactMasteryPage />}
-                            />
-                            <Route
-                              path="web-learn/react-mastery"
-                              element={<ReactMasteryPage />}
-                            />
-
-                            <Route
-                              path="learn/sicp/:lessonId"
-                              element={<SICPPage />}
-                            />
-                            <Route path="learn/sicp" element={<SICPPage />} />
-                            <Route
-                              path="learn/dsa-patterns/:lessonId"
-                              element={<DSAPatternsPage />}
-                            />
-                            <Route
-                              path="learn/dsa-patterns"
-                              element={<DSAPatternsPage />}
-                            />
+                            {/* Labs with dedicated routes (css-mastery, cnc-sim, etc.) —
+                                generated from each lab's own meta.js `routes`/`component`
+                                fields, not hand-written here. See labs/labRegistryLoader.js
+                                and src/docs/UpSkillOS work/lab-registry-autofind/. */}
+                            {LABS.filter((lab) => lab.routes).flatMap((lab) =>
+                              lab.routes.map((path) => (
+                                <Route
+                                  key={path}
+                                  path={path.replace(/^\//, '')}
+                                  element={<lab.component />}
+                                />
+                              )),
+                            )}
 
                             {/* Lab auto-discovery */}
                             <Route

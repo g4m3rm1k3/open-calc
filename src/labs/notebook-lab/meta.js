@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "Notebook Lab",
   emoji: "📓",
@@ -13,4 +15,6 @@ export default {
     sub: "Python · .ipynb · Jupyter"
   },
   order: 34,
+  routes: ['/notebook-lab'],
+  component: lazy(() => import('../../pages/NotebookLabPage.jsx')),
 }

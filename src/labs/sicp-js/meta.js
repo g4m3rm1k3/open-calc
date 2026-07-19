@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "SICP — JavaScript",
   emoji: "📖",
@@ -13,4 +15,6 @@ export default {
     sub: "SICP · JS · Checkpoints"
   },
   order: 30,
+  routes: ['/learn/sicp', '/learn/sicp/:lessonId'],
+  component: lazy(() => import('./SICPPage.jsx')),
 }

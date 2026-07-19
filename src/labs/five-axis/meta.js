@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "5-Axis Kinematics",
   emoji: "⚙️",
@@ -13,4 +15,6 @@ export default {
     sub: "CNC · Transforms · 5-Axis"
   },
   order: 33,
+  routes: ['/five-axis'],
+  component: lazy(() => import('./FiveAxisKinematicsPage.tsx')),
 }

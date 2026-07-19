@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "CNC Simulator",
   emoji: "🔧",
@@ -13,4 +15,6 @@ export default {
     sub: "CNC · CAM · Toolpaths"
   },
   order: 22,
+  routes: ['/cnc-sim'],
+  component: lazy(() => import('./CNCSimPage.jsx')),
 }

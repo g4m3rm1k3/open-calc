@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "Lesson Builder",
   emoji: "🔨",
@@ -12,4 +14,6 @@ export default {
     sub: "Cells · Preview · Export"
   },
   order: 35,
+  routes: ['/lesson-builder', '/lesson-builder/:chapterId/:lessonSlug'],
+  component: lazy(() => import('../../pages/LessonBuilderPage.jsx')),
 }

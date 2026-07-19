@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "React 0 to Mastery",
   emoji: "⚛️",
@@ -13,4 +15,6 @@ export default {
     sub: "Components · Hooks · State"
   },
   order: 10,
+  routes: ['/web-learn/react-mastery', '/web-learn/react-mastery/:lessonId'],
+  component: lazy(() => import('./ReactMasteryPage.jsx')),
 }

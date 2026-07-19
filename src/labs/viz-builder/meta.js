@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "Viz Builder",
   emoji: "🔭",
@@ -12,4 +14,6 @@ export default {
     sub: "Charts · Diagrams · Interactive"
   },
   order: 36,
+  routes: ['/viz-builder'],
+  component: lazy(() => import('../../pages/VizBuilderPage.jsx')),
 }

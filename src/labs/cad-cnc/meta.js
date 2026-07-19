@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "CAD + CNC Workspace",
   emoji: "🏗",
@@ -13,4 +15,6 @@ export default {
     sub: "CAD · CAM · CNC"
   },
   order: 28,
+  routes: ['/cad-cnc'],
+  component: lazy(() => import('./CadCncPage.jsx')),
 }

@@ -1,3 +1,5 @@
+import { lazy } from 'react'
+
 export default {
   label: "Physics Engine",
   emoji: "🌌",
@@ -13,4 +15,6 @@ export default {
     sub: "Rigid Body Dynamics"
   },
   order: 26,
+  routes: ['/physics'],
+  component: lazy(() => import('./PhysicsPage.jsx')),
 }
