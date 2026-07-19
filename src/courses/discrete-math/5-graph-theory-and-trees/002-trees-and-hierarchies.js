@@ -34,6 +34,20 @@ export default {
 
       'Binary trees (at most 2 children per node) are common because they map cleanly onto yes/no decisions and comparisons, but they are not universal — file systems, org charts, and parse trees for languages with variable-argument function calls all commonly use trees where a node can have any number of children.',
     ],
+    checks: [
+      {
+        afterParagraph: 3,
+        question: 'Why does evaluating an expression tree require postorder traversal specifically?',
+        options: [
+          'Postorder is just faster than the other orders',
+          'A node\'s operator can\'t be computed until both children\'s values are known — "children before parent" is exactly what postorder guarantees',
+          'Because expression trees are always binary',
+          'Preorder would give the same result',
+        ],
+        answer: 'A node\'s operator can\'t be computed until both children\'s values are known — "children before parent" is exactly what postorder guarantees',
+        explanation: 'Postorder visits left subtree, then right subtree, then the node itself — so by the time you evaluate a node, both its children are already resolved.',
+      },
+    ],
     visualizations: [
       {
         id: 'TreeTraversalAnimator',
@@ -63,6 +77,15 @@ export default {
 
       'A **spanning tree** of a graph keeps every vertex reachable using the minimum possible edge count (|V| − 1, matching the tree edge-count identity from the graph theory lesson) — this is directly useful for network design (the cheapest way to keep every node connected) and protocol planning (broadcast/multicast trees that avoid redundant message loops).',
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'For a binary SEARCH tree specifically, what does an in-order traversal produce?',
+        options: ['A random ordering', 'Every value in sorted order', 'Only the leaf nodes', 'The tree\'s height'],
+        answer: 'Every value in sorted order',
+        explanation: 'Because every left descendant is smaller and every right descendant is larger, visiting left-node-right at each step naturally emits values from smallest to largest — sorting with no separate sort step.',
+      },
+    ],
   },
 
   rigor: {
@@ -70,6 +93,15 @@ export default {
       'Tree proofs commonly use **structural induction**, a variant of induction that recurses on the shape of the tree rather than on an integer: prove the claim for a leaf (the base case, since a leaf has no children to depend on), then assume it holds for every child of a node and prove it holds for the node itself using those assumptions (the inductive step) — the "prove every tree has at least two leaves" challenge below is a worked example of exactly this style, via a longest-path argument rather than a direct recursive one.',
 
       'When proving uniqueness claims — such as "there is exactly one simple path between any two nodes in a tree" — explicitly invoke acyclicity to rule out alternatives: if two distinct paths existed between the same pair of nodes, they would together trace out a cycle (follow one path forward, the other backward), contradicting that the graph is a tree. This is the standard proof pattern anytime a tree-uniqueness claim needs a rigorous justification rather than just an appeal to intuition.',
+    ],
+    checks: [
+      {
+        afterParagraph: 0,
+        question: 'In structural induction on trees, what serves as the "base case"?',
+        options: ['The root node', 'A leaf node (no children to depend on)', 'The tallest node', 'There is no base case for trees'],
+        answer: 'A leaf node (no children to depend on)',
+        explanation: 'A leaf has nothing beneath it, so the claim can be verified directly with no dependency on smaller cases — exactly analogous to P(0) or P(1) in ordinary induction.',
+      },
     ],
   },
 
@@ -119,6 +151,19 @@ export default {
       ],
       answer: 'Endpoints of a longest path must be leaves; otherwise path can be extended.',
     },
+    {
+      id: 'discrete-1-09-ch3',
+      difficulty: 'hard',
+      problem: 'Prove by structural induction: every full binary tree (every node has 0 or 2 children) with n leaves has exactly n − 1 internal nodes.',
+      hint: 'Base case: a single leaf (n=1). Inductive step: think about combining two smaller full binary trees under a new root.',
+      walkthrough: [
+        { expression: '\\text{Base case: } n=1 \\text{ (single leaf, no internal nodes)} \\Rightarrow 1-1=0 \\checkmark', annotation: 'A tree that is just one leaf has 0 internal nodes — matches n−1=0.' },
+        { expression: '\\text{IH: assume full binary trees with } n_1, n_2 \\text{ leaves have } n_1-1, n_2-1 \\text{ internal nodes}', annotation: 'Inductive hypothesis on two smaller full binary trees.' },
+        { expression: '\\text{New tree: root} + \\text{left subtree}(n_1 \\text{ leaves}) + \\text{right subtree}(n_2 \\text{ leaves})', annotation: 'Since every node has 0 or 2 children, combining two full binary trees under a new root gives another full binary tree.' },
+        { expression: '\\text{Leaves: } n_1+n_2. \\text{ Internal nodes: } (n_1-1)+(n_2-1)+1 = (n_1+n_2)-1', annotation: 'The new root is one more internal node; total internal nodes = (n₁+n₂) − 1, matching the formula for the combined leaf count.' },
+      ],
+      answer: 'By structural induction: base case n=1 gives 0 internal nodes; the inductive step shows combining two full binary trees under a new root preserves the formula internal = leaves − 1.',
+    },
   ],
 
   crossRefs: [
@@ -135,6 +180,7 @@ export default {
     'completed-example-2',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
   semantics: {
     core: [
@@ -214,6 +260,47 @@ export default {
       options: ['It becomes a faster tree', 'A cycle is created', 'A leaf is removed', 'The height increases'],
       answer: 'A cycle is created',
       hints: ['Trees are acyclic. Connecting two existing nodes provides a second path, creating a loop.'],
+    },
+    {
+      id: 'tree-q3',
+      type: 'choice',
+      text: 'For a binary search tree, which traversal produces every value in sorted order?',
+      options: ['Preorder', 'Inorder', 'Postorder', 'None of them'],
+      answer: 'Inorder',
+      hints: ['Left subtree, node, right subtree — exactly matching the BST invariant that left < node < right.'],
+    },
+    {
+      id: 'tree-q4',
+      type: 'input',
+      text: 'A full binary tree has 15 leaves. How many internal nodes does it have?',
+      answer: '14',
+      hints: ['For a full binary tree (every node has 0 or 2 children), internal nodes = leaves − 1.'],
+    },
+    {
+      id: 'tree-q5',
+      type: 'choice',
+      text: 'Why must you invoke acyclicity to prove there is exactly one simple path between any two nodes in a tree?',
+      options: [
+        'You don\'t need to — trees always have multiple paths',
+        'If two distinct paths existed between the same pair, they would together trace out a cycle, contradicting that the graph is a tree',
+        'Acyclicity only matters for rooted trees',
+        'Because paths are always the same length in a tree',
+      ],
+      answer: 'If two distinct paths existed between the same pair, they would together trace out a cycle, contradicting that the graph is a tree',
+      hints: ['Follow one path forward and the other backward — together they\'d trace a cycle, which trees by definition don\'t have.'],
+    },
+    {
+      id: 'tree-q6',
+      type: 'choice',
+      text: 'In structural induction on a rooted tree, what does the inductive step assume?',
+      options: [
+        'The claim holds for the root only',
+        'The claim holds for every child of a node, then proves it for the node itself',
+        'The claim holds for a random node',
+        'Nothing needs to be assumed',
+      ],
+      answer: 'The claim holds for every child of a node, then proves it for the node itself',
+      hints: ['This mirrors ordinary induction\'s "assume P(k), prove P(k+1)" — but recursing on tree structure instead of an integer.'],
     },
   ],
 }

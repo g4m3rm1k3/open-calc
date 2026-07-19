@@ -45,6 +45,20 @@ Probability theory has an unusually traceable origin: in 1654, the gambler Cheva
 
 Before touching any formula, convert the word problem into a table (for two binary events) or a tree (for sequential/conditional events). A 2×2 table with rows {disease, no disease} and columns {test+, test−} makes every quantity in a Bayes problem visible simultaneously — you can *see* why a rare disease keeps the false-positive count large relative to true positives, instead of having to trust the algebra blindly.`,
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'Why is P(heart | red) = 1/2 while the unconditioned P(heart) = 1/4?',
+        options: [
+          'They should be equal — conditioning never changes probability',
+          'Knowing "red" shrinks the sample space to just the 26 red cards, of which 13 are hearts',
+          'Because hearts are more common than clubs',
+          'Because 52 divides evenly by 4',
+        ],
+        answer: 'Knowing "red" shrinks the sample space to just the 26 red cards, of which 13 are hearts',
+        explanation: 'Conditioning restricts the sample space to only the outcomes consistent with the given information (red cards), then asks what fraction of THAT smaller space satisfies the event (heart).',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -81,6 +95,15 @@ Before touching any formula, convert the word problem into a table (for two bina
 
       '**Variance** measures how spread out X\'s values are around its own expectation: Var(X) = E[(X − E[X])²] — the average squared distance from the mean. Squaring matters because it treats being 2 below the mean the same as being 2 above it (a plain average of differences would always cancel to zero); the algebraically convenient computational form is Var(X) = E[X²] − E[X]², derived by expanding the square and using linearity of expectation.',
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'A fair six-sided die has E[X] = 3.5. Can the die ever actually land showing 3.5?',
+        options: ['Yes, on rare rolls', 'No — 3.5 is the long-run average, not a possible outcome or "most likely" value', 'Only with a loaded die', 'Yes, if you round'],
+        answer: 'No — 3.5 is the long-run average, not a possible outcome or "most likely" value',
+        explanation: 'Expectation is a probability-weighted average, not a prediction of any single outcome. Rolling millions of times and averaging the results converges to 3.5, even though no single roll can show it.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -95,6 +118,19 @@ Before touching any formula, convert the word problem into a table (for two bina
       'Bayes\' theorem follows immediately from writing P(A ∩ B) two different ways and setting them equal: by definition of conditional probability, P(A ∩ B) = P(A|B)·P(B), and symmetrically P(A ∩ B) = P(B|A)·P(A). Since both expressions equal the same quantity P(A ∩ B), they equal each other: P(A|B)·P(B) = P(B|A)·P(A). Dividing both sides by P(B) gives Bayes\' Rule directly — it is not a separate axiom, just an algebraic consequence of the definition of conditional probability applied from both directions.',
 
       'Always define the sample space and any event partition explicitly, in writing, before computing a single conditional probability. The single most common error in probability proofs (and in interview problems) is an implicit, unstated sample space — computing P(A|B) against the wrong denominator because the "restricted universe" was never precisely pinned down. State S, state the events as subsets of S, and only then start dividing.',
+    ],
+    checks: [
+      {
+        question: 'Bayes\' Rule is derived by setting two expressions for P(A ∩ B) equal to each other. What are they?',
+        options: [
+          'P(A) + P(B) and P(B) + P(A)',
+          'P(A|B)·P(B) and P(B|A)·P(A)',
+          'P(A) − P(B) and P(B) − P(A)',
+          'P(A)/P(B) and P(B)/P(A)',
+        ],
+        answer: 'P(A|B)·P(B) and P(B|A)·P(A)',
+        explanation: 'Both expressions equal P(A ∩ B) by the definition of conditional probability applied from each direction. Setting them equal and dividing by P(B) gives Bayes\' Rule — it\'s an algebraic consequence, not a separate axiom.',
+      },
     ],
   },
 
@@ -299,6 +335,47 @@ Before touching any formula, convert the word problem into a table (for two bina
       options: ['0', '0.5', '1', 'Infinity'],
       answer: '1',
       hints: ['The total probability of the entire sample space is always 100% or 1.'],
+    },
+    {
+      id: 'prob-q3',
+      type: 'input',
+      text: 'A card is drawn from a standard 52-card deck. What is P(heart | red), as a fraction in lowest terms (e.g. 1/2)?',
+      answer: '1/2',
+      hints: ['Conditioning on "red" restricts the space to 26 cards, of which 13 are hearts: 13/26 = 1/2.'],
+    },
+    {
+      id: 'prob-q4',
+      type: 'choice',
+      text: 'Which computational shortcut is Var(X) = E[X²] − E[X]² derived from?',
+      options: [
+        'Expanding E[(X−E[X])²] and using linearity of expectation',
+        'A separate axiom of probability unrelated to the definition',
+        'The Law of Total Probability',
+        'Bayes\' Rule',
+      ],
+      answer: 'Expanding E[(X−E[X])²] and using linearity of expectation',
+      hints: ['Expand the square inside the expectation, distribute using linearity, and the cross term simplifies to give this shortcut formula.'],
+    },
+    {
+      id: 'prob-q5',
+      type: 'choice',
+      text: 'Events A and B are independent. Which equation must hold?',
+      options: ['P(A∩B) = P(A) + P(B)', 'P(A∩B) = P(A)·P(B)', 'P(A|B) = P(B)', 'P(A∩B) = 0'],
+      answer: 'P(A∩B) = P(A)·P(B)',
+      hints: ['Independence means knowing B happened tells you nothing about A: P(A|B) = P(A), which rearranges to P(A∩B) = P(A)·P(B).'],
+    },
+    {
+      id: 'prob-q6',
+      type: 'choice',
+      text: 'A medical test has high sensitivity but the disease is very rare (low prevalence). Why can the posterior P(disease | positive) still be low?',
+      options: [
+        'It can\'t — high sensitivity guarantees a high posterior',
+        'With few true cases to begin with, false positives from the much larger healthy population can still outnumber true positives',
+        'Because sensitivity and specificity are the same thing',
+        'Because Bayes\' Rule only applies to common diseases',
+      ],
+      answer: 'With few true cases to begin with, false positives from the much larger healthy population can still outnumber true positives',
+      hints: ['This is the base rate fallacy in action — exactly the hook question from the start of this lesson.'],
     },
   ],
 }

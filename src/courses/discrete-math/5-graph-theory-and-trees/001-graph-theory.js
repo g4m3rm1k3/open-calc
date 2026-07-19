@@ -30,6 +30,15 @@ export default {
 
       'Modern software is graph-shaped almost everywhere you look: package dependencies form a directed graph (with cycles meaning circular dependencies — usually a build error), call graphs trace which functions invoke which, road maps are graphs with distances as edge weights, and finite-state machines are graphs where edges are labeled with the input that triggers each transition.',
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'A tree has 12 vertices. According to |E| = |V| − 1, how many edges does it have?',
+        options: ['12', '11', '13', '24'],
+        answer: '11',
+        explanation: 'Trees are minimally connected: exactly enough edges to connect every vertex with zero redundant cycles. 12 − 1 = 11.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -68,6 +77,20 @@ export default {
 
       'Graph representation is a real performance decision, not a stylistic one: an **adjacency list** (each vertex stores just its own neighbors) costs O(V+E) space — efficient for sparse graphs, where E is much smaller than V². An **adjacency matrix** (a V×V grid of 0s and 1s) costs O(V²) space regardless of how many edges actually exist, but gives O(1) lookup for "is there an edge between these two specific vertices?" — a real tradeoff between memory and lookup speed that depends entirely on how dense the graph is.',
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'Why does BFS guarantee the first path it finds to a vertex is the shortest one?',
+        options: [
+          'It doesn\'t — DFS is faster',
+          'BFS explores strictly by distance layers, so a vertex first reached at layer k cannot have a shorter path (which would place it in an earlier layer)',
+          'BFS always visits vertices in alphabetical order',
+          'Because BFS uses a stack instead of a queue',
+        ],
+        answer: 'BFS explores strictly by distance layers, so a vertex first reached at layer k cannot have a shorter path (which would place it in an earlier layer)',
+        explanation: 'Every vertex at distance 1 is visited before any at distance 2, and so on — a shorter route to a vertex would contradict it first appearing in a later layer.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -82,6 +105,19 @@ export default {
       'Proofs in graph theory often combine plain counting (as in the Handshaking Lemma) with structural induction on the number of vertices or edges — a common pattern is "remove one vertex or edge, apply the inductive hypothesis to the smaller graph, then add the removed piece back and verify the claim still holds."',
 
       'Invariants preserved under an operation (edge deletion, edge contraction, one step of a traversal) are a common proof tool: if a property holds before the operation and the operation cannot break it, the property holds after every sequence of such operations too — this is exactly how BFS\'s "layer index equals shortest-path distance" invariant is proved (each step of the algorithm preserves it) and how the tree edge-count identity |E| = |V| − 1 is proved (removing a leaf and its one edge preserves the identity, reducing to a smaller tree).',
+    ],
+    checks: [
+      {
+        question: 'The tree edge-count proof removes a leaf and its edge, then applies the inductive hypothesis. Why start with a leaf specifically?',
+        options: [
+          'Leaves are chosen arbitrarily — any vertex would work',
+          'Removing a leaf (degree-1 vertex) and its single edge always leaves a smaller tree, cleanly reducing to the inductive hypothesis',
+          'Because leaves are always the root of the tree',
+          'Because trees don\'t have leaves',
+        ],
+        answer: 'Removing a leaf (degree-1 vertex) and its single edge always leaves a smaller tree, cleanly reducing to the inductive hypothesis',
+        explanation: 'A leaf has exactly one edge, so removing it removes exactly one edge and one vertex — preserving the |E|=|V|−1 identity structure and giving a smaller tree to apply the inductive hypothesis to.',
+      },
     ],
   },
 
@@ -271,6 +307,37 @@ export default {
       options: ['It must be zero', 'It must be even', 'It must be odd', 'It must be the same as the number of edges'],
       answer: 'It must be even',
       hints: ['The sum of degrees is always even.'],
+    },
+    {
+      id: 'gt-q5',
+      type: 'choice',
+      text: 'A graph has 6 vertices, each with degree 4. How many edges does it have?',
+      options: ['24', '12', '10', '6'],
+      answer: '12',
+      hints: ['Handshaking Lemma: sum of degrees = 2|E|. 6×4=24, so |E|=24/2=12.'],
+    },
+    {
+      id: 'gt-q6',
+      type: 'choice',
+      text: 'Which algorithm is the natural choice for detecting cycles via the call stack, and for topological sorting?',
+      options: ['BFS', 'DFS', 'Dijkstra\'s Algorithm', 'Binary Search'],
+      answer: 'DFS',
+      hints: ['DFS\'s recursive call stack naturally tracks the current path, which is exactly what cycle detection and topological sort both need.'],
+    },
+    {
+      id: 'gt-q7',
+      type: 'choice',
+      text: 'For a very sparse graph (few edges relative to vertices), which representation is more space-efficient?',
+      options: ['Adjacency Matrix', 'Adjacency List', 'Both are identical', 'Neither works for sparse graphs'],
+      answer: 'Adjacency List',
+      hints: ['A matrix costs O(V²) regardless of edge count; a list costs O(V+E) — much better when E is small relative to V².'],
+    },
+    {
+      id: 'gt-q8',
+      type: 'input',
+      text: 'A connected graph has 20 vertices and forms a spanning tree with the minimum possible number of edges. How many edges does it have?',
+      answer: '19',
+      hints: ['A spanning tree connects every vertex using exactly |V| − 1 edges.'],
     },
   ],
 }

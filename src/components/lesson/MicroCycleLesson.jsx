@@ -13,6 +13,7 @@ import { useSpeech, cleanForSpeech } from "../../utils/useSpeech.js";
 import { Link } from "react-router-dom";
 import VizFrame from "../viz/VizFrame.jsx";
 import Callout from "../ui/Callout.jsx";
+import InlineCheck from "./InlineCheck.jsx";
 import StepThrough from "./StepThrough.jsx";
 import DynamicProof from "./DynamicProof.jsx";
 import ScrubbableExample from "./ScrubbableExample.jsx";
@@ -102,12 +103,29 @@ function ReadBtn({ isPlaying, onClick }) {
 const BULLET_RE = /^[•\-*]\s+/;
 const ORDERED_RE = /^\d+\.\s+/;
 
-function renderMixedProse(prose) {
+function renderMixedProse(prose, checksByIndex) {
   const out = [];
   let i = 0;
+  const pushChecksFor = (startIdx, endIdx) => {
+    if (!checksByIndex) return;
+    for (let idx = startIdx; idx <= endIdx; idx++) {
+      for (const check of checksByIndex.get(idx) ?? []) {
+        out.push(
+          <InlineCheck
+            key={`check-${idx}-${out.length}`}
+            question={check.question}
+            options={check.options}
+            answer={check.answer}
+            explanation={check.explanation}
+          />,
+        );
+      }
+    }
+  };
   while (i < prose.length) {
     const p = prose[i];
     if (BULLET_RE.test(p)) {
+      const start = i;
       const items = [];
       while (i < prose.length && BULLET_RE.test(prose[i])) {
         items.push(prose[i].replace(BULLET_RE, ""));
@@ -125,7 +143,9 @@ function renderMixedProse(prose) {
           ))}
         </ul>,
       );
+      pushChecksFor(start, i - 1);
     } else if (ORDERED_RE.test(p)) {
+      const start = i;
       const items = [];
       while (i < prose.length && ORDERED_RE.test(prose[i])) {
         items.push(prose[i].replace(ORDERED_RE, ""));
@@ -143,14 +163,30 @@ function renderMixedProse(prose) {
           ))}
         </ol>,
       );
+      pushChecksFor(start, i - 1);
     } else {
       out.push(
         <ProseParagraph key={`p-${i}`} text={p} isFirst={out.length === 0} />,
       );
+      pushChecksFor(i, i);
       i++;
     }
   }
   return out;
+}
+
+function buildChecksByIndex(checks = []) {
+  const map = new Map();
+  const trailing = [];
+  for (const check of checks) {
+    if (typeof check.afterParagraph === "number" && check.afterParagraph >= 0) {
+      if (!map.has(check.afterParagraph)) map.set(check.afterParagraph, []);
+      map.get(check.afterParagraph).push(check);
+    } else {
+      trailing.push(check);
+    }
+  }
+  return { map, trailing };
 }
 
 function normalizeProse(paragraphs = []) {
@@ -218,10 +254,24 @@ function SectionContent({ data }) {
               />
             );
           }
+          if (block.type === "check") {
+            return (
+              <InlineCheck
+                key={i}
+                question={block.question}
+                options={block.options}
+                answer={block.answer}
+                explanation={block.explanation}
+              />
+            );
+          }
           return null;
         })}
         {(data.callouts ?? []).map((c, i) => (
           <Callout key={`extra-${i}`} {...c} />
+        ))}
+        {(data.checks ?? []).map((c, i) => (
+          <InlineCheck key={`check-extra-${i}`} question={c.question} options={c.options} answer={c.answer} explanation={c.explanation} />
         ))}
       </div>
     );
@@ -229,14 +279,18 @@ function SectionContent({ data }) {
 
   // Legacy format (prose + callouts arrays, no blocks)
   const prose = normalizeProse(data.prose);
+  const { map: checksByIndex, trailing: trailingChecks } = buildChecksByIndex(data.checks);
   return (
     <div className="space-y-4">
-      {renderMixedProse(prose)}
+      {renderMixedProse(prose, checksByIndex)}
       {(data.callouts ?? []).map((c, i) => (
         <Callout key={i} {...c} />
       ))}
       {(data.images ?? []).map((img, i) => (
         <SVGImage key={`img-${i}`} src={img.src} alt={img.alt} caption={img.caption} />
+      ))}
+      {trailingChecks.map((c, i) => (
+        <InlineCheck key={`check-trailing-${i}`} question={c.question} options={c.options} answer={c.answer} explanation={c.explanation} />
       ))}
     </div>
   );

@@ -64,6 +64,15 @@ export default {
 
       "**Where this is heading.** Once you can evaluate compound propositions, you can build truth tables that exhaustively verify whether a compound statement is always true (a **tautology**, like p ∨ ¬p), always false (a **contradiction**, like p ∧ ¬p), or only sometimes true (a **contingency**). And once you understand tautologies and logical equivalence, you are ready for the three proof templates that will carry you through this entire course: direct proof, proof by contrapositive, and proof by contradiction. Each template is a controlled strategy for building a valid argument — and each one you understand deeply is a new power you carry permanently.",
     ],
+    checks: [
+      {
+        afterParagraph: 7,
+        question: 'A promise "if you get an A, I will buy you a car" is made. You get a B. Was the promise broken?',
+        options: ['Yes, you failed the condition', 'No — the condition (getting an A) was never met, so the conditional is vacuously True', 'It depends on the car', 'The statement is not a proposition'],
+        answer: 'No — the condition (getting an A) was never met, so the conditional is vacuously True',
+        explanation: 'p → q is only False when p is True and q is False. Here p ("you get an A") is False, so the conditional is automatically True regardless of what happens with the car — this is exactly vacuous truth.',
+      },
+    ],
     callouts: [
       {
         type: 'sequencing',
@@ -126,6 +135,15 @@ export default {
       "Keep this map close for the rest of the course. Every proof you meet from here on is answerable by one of these four boxes — the only real skill is reading the shape of the claim correctly before you commit to one.",
 
       "Two definitions are essential for using these proof templates on integer problems. An integer n is **even** if there exists an integer k such that n = 2k. An integer n is **odd** if there exists an integer k such that n = 2k + 1. These definitions are not just descriptions — they are the operational handles that let you do algebra on the abstract property of evenness. Without them, 'n is even' is a phrase; with them, it is an equation you can manipulate.",
+    ],
+    checks: [
+      {
+        afterParagraph: 0,
+        question: 'A compound proposition whose truth table column is all True is called a:',
+        options: ['Contradiction', 'Tautology', 'Contingency', 'Biconditional'],
+        answer: 'Tautology',
+        explanation: 'True in every possible row means true no matter what the world looks like — that\'s the definition of a tautology, like p ∨ ¬p.',
+      },
     ],
     callouts: [
       {
@@ -204,6 +222,15 @@ export default {
       "**For the programmer:** Every formal proof can, in principle, be checked by a machine. Proof assistants like Lean 4, Coq, and Agda let you write mathematics as code and have the computer verify every step. What you are learning is not just mathematics — it is the logic underlying provably correct software. When NASA writes safety-critical code for spacecraft, the gold standard is formal verification using exactly this style of reasoning.",
 
       "**For the philosopher:** The four proof techniques correspond to four different stances toward truth. Direct proof is constructive: you build the truth from the ground up. Contrapositive is transformative: you rephrase the problem into an equivalent one. Contradiction is eliminative: you rule out falsehood and conclude truth by absence. Cases is combinatorial: you don't find one universal argument at all — you accept that the universe is genuinely heterogeneous and cover it piece by piece. In intuitionistic logic (a branch of mathematical logic), Proof by Contradiction is actually considered weaker than direct proof for certain propositions — because eliminating falsehood does not always mean you can construct a witness to truth. This is deep. For most mathematics, classical logic admits all four as equally valid.",
+    ],
+    checks: [
+      {
+        afterParagraph: 7,
+        question: 'Proof by Contradiction relies fundamentally on which logical law?',
+        options: ['De Morgan\'s Law', 'The Law of Excluded Middle', 'Commutativity of AND', 'The definition of the biconditional'],
+        answer: 'The Law of Excluded Middle',
+        explanation: 'For any proposition P, exactly one of P or ¬P is True — no middle ground. Ruling out ¬P (by deriving a contradiction) therefore forces P to be True.',
+      },
     ],
 
     // Flat {expression, annotation} steps — this is what DynamicProof (the

@@ -31,6 +31,20 @@ export default {
       'Exponential-time algorithms may look fine on tiny n (2¹⁰ = 1024 is nothing) but become impossible quickly (2⁶⁴ exceeds the number of atoms worth checking in any reasonable time) — this is the concrete meaning of "combinatorial explosion" that shows up throughout Chapter 3\'s counting problems.',
       'Complexity is not just about speed. Space usage (memory an algorithm needs), communication cost (data shipped across a network in distributed systems), and parallel bottlenecks (work that can\'t be split across cores) are all separate discrete complexity questions with their own Big-O analyses — a fast algorithm that needs more RAM than exists is just as impractical as a slow one.',
     ],
+    checks: [
+      {
+        afterParagraph: 4,
+        question: 'An algorithm takes 1 millisecond for n=10. Why doesn\'t that tell you much about whether it\'s a good algorithm?',
+        options: [
+          'It does tell you everything you need — fast on small n means fast always',
+          'Small n can\'t distinguish growth classes — an O(n²) or O(2ⁿ) algorithm can look just as fast as O(n) until n gets large',
+          'Milliseconds are not a valid unit for algorithm analysis',
+          'Because n=10 is always a special edge case',
+        ],
+        answer: 'Small n can\'t distinguish growth classes — an O(n²) or O(2ⁿ) algorithm can look just as fast as O(n) until n gets large',
+        explanation: 'All six growth-rate curves start at the same origin and stay close together for small n. The real difference only becomes visible — and consequential — once n is large.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -57,6 +71,15 @@ export default {
       'Common growth hierarchy: 1 < log n < n < n log n < n^2 < n^3 < 2^n < n!. Each class eventually beats every class to its left, no matter how large the constant multiplier on the left is — this is exactly what "asymptotic" means: a statement about the tail of the sequence, not about small n.',
       'Recurrence relations model recursive algorithm cost. A divide-and-conquer algorithm that splits work into `a` subproblems of size n/b, plus f(n) extra work per call, has runtime T(n) = a·T(n/b) + f(n) — the Master Theorem (see Recurrence Relations) turns this recurrence directly into a closed-form Big-O class.',
       'Composite algorithms follow a simple accounting rule: costs of sequential steps add (so the slower step dominates and the faster one disappears asymptotically), while costs of nested loops multiply (an O(n) loop inside an O(n) loop is O(n²), not O(n) + O(n) = O(2n) = O(n)).',
+    ],
+    checks: [
+      {
+        afterParagraph: 2,
+        question: 'An algorithm runs an O(n) loop, and then — separately, one after the other — an O(n) loop nested inside another O(n) loop. What is the total complexity?',
+        options: ['O(n)', 'O(2n)', 'O(n²)', 'O(n³)'],
+        answer: 'O(n²)',
+        explanation: 'Sequential steps add: O(n) + O(n²) = O(n²) since the slower term dominates. The nested loops multiply to O(n)·O(n) = O(n²), which then dominates the standalone O(n) step.',
+      },
     ],
     callouts: [
       {
@@ -145,6 +168,20 @@ for i in range(1, len(times)):
       'Formally, f(n) = O(g(n)) means there exist positive constants c and n₀ such that f(n) ≤ c·g(n) for **all** n ≥ n₀. The "for all n ≥ n₀" is doing the real work: it says the bound has to hold forever past some point, not just for a handful of convenient values — you cannot prove f(n)=O(g(n)) by checking f(10) ≤ c·g(10) and stopping.',
       'To prove f(n) = O(g(n)) rigorously, exhibit specific witnesses: pick a candidate c, then find the n₀ past which the inequality holds (usually by algebra — isolate n and solve the resulting inequality, exactly as in the two challenges below). To prove f(n) is **not** O(g(n)), show that no matter what c is chosen, the inequality f(n) ≤ c·g(n) eventually fails for large enough n — c cannot "buy back" a difference in growth class, only a difference in constant factor.',
       'Lower bounds (Ω, "big-Omega") mirror Big-O from below: f(n) = Ω(g(n)) means f(n) ≥ c·g(n) eventually, for some c > 0. Tight bounds (Θ, "big-Theta") require both simultaneously: f(n) = Θ(g(n)) exactly when f(n) = O(g(n)) **and** f(n) = Ω(g(n)) — meaning g truly captures f\'s growth rate, sandwiched from both sides, not merely an upper ceiling that might be loose.',
+    ],
+    checks: [
+      {
+        afterParagraph: 2,
+        question: 'What does f(n) = Θ(g(n)) require that f(n) = O(g(n)) alone does not?',
+        options: [
+          'Nothing — they mean the same thing',
+          'It additionally requires f(n) = Ω(g(n)) — a lower bound as well as the upper bound, so g truly captures f\'s growth rate from both sides',
+          'That f(n) is always exactly equal to g(n)',
+          'That n₀ must equal 0',
+        ],
+        answer: 'It additionally requires f(n) = Ω(g(n)) — a lower bound as well as the upper bound, so g truly captures f\'s growth rate from both sides',
+        explanation: 'O(g(n)) alone only says f doesn\'t grow faster than g — g could be a loose overestimate. Θ requires the lower bound too, pinning down that g is a TIGHT match for f\'s actual growth rate.',
+      },
     ],
   },
 
@@ -287,6 +324,42 @@ for i in range(1, len(times)):
       options: ['Constants are always small', 'Constants depend on the specific hardware/compiler, but the growth rate is a property of the algorithm itself', 'The math is easier that way', 'Constants always cancel out in the end'],
       answer: 'Constants depend on the specific hardware/compiler, but the growth rate is a property of the algorithm itself',
       hints: ['Asymptotics focuses on how the work scales with input size, independent of hardware constants.'],
+    },
+    {
+      id: 'comp-q3',
+      type: 'choice',
+      text: 'An algorithm runs one O(n) pass, then a separate O(n²) pass. What is the overall complexity?',
+      options: ['O(n)', 'O(n²)', 'O(n³)', 'O(2n²)'],
+      answer: 'O(n²)',
+      hints: ['Sequential steps add: O(n) + O(n²). The slower term dominates and the faster one disappears asymptotically.'],
+    },
+    {
+      id: 'comp-q4',
+      type: 'input',
+      text: 'Simplify to the tightest Big-Θ: T(n) = 3n² + 100n + 5. (Answer in the form Θ(n^k), e.g. Θ(n^2))',
+      answer: 'Θ(n^2)',
+      hints: ['Keep only the highest-degree term and drop the coefficient — this is both an O and Ω bound, so it\'s Θ.'],
+    },
+    {
+      id: 'comp-q5',
+      type: 'choice',
+      text: 'What must you exhibit to rigorously prove f(n) = O(g(n))?',
+      options: [
+        'Just check f(10) ≤ g(10)',
+        'Specific constants c and n₀ such that f(n) ≤ c·g(n) for all n ≥ n₀',
+        'That f and g are the same function',
+        'A graph comparing f and g',
+      ],
+      answer: 'Specific constants c and n₀ such that f(n) ≤ c·g(n) for all n ≥ n₀',
+      hints: ['The "for all n ≥ n₀" is the load-bearing part of the definition — a single checked value is never a proof.'],
+    },
+    {
+      id: 'comp-q6',
+      type: 'choice',
+      text: 'A recursive algorithm splits into 2 subproblems of half the size, doing O(n) combine work. Which tool from the Recurrence Relations lesson directly classifies its runtime?',
+      options: ['The Pumping Lemma', 'The Master Theorem', 'The Pigeonhole Principle', 'Inclusion-Exclusion'],
+      answer: 'The Master Theorem',
+      hints: ['T(n) = 2T(n/2) + n is exactly the Master Theorem\'s form — this is the merge sort recurrence.'],
     },
   ],
 }

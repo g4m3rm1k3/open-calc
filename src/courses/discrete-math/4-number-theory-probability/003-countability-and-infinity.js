@@ -40,6 +40,20 @@ Once you accept that "same size" means "bijects with ℕ," some genuinely surpri
 
 **The positive rationals ℚ⁺** — seemingly far denser than ℕ, since between any two integers there are infinitely many fractions — are *also* countable. Arrange every fraction p/q in a grid (row p, column q), then snake through the grid diagonally: 1/1, 1/2, 2/1, 1/3, 2/2, 3/1, .... skipping any fraction not in lowest terms (to avoid listing 1/2 and 2/4 as if they were different). Every rational eventually appears at some finite position in this list — another bijection with ℕ, despite ℚ feeling "denser" than ℤ.`,
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'Hilbert\'s Hotel is completely full. A new guest arrives. What happens?',
+        options: [
+          'The guest is turned away — the hotel really is full',
+          'Every guest in room n moves to room n+1, freeing room 1 for the new guest',
+          'The hotel builds a new room',
+          'Two guests must now share a room',
+        ],
+        answer: 'Every guest in room n moves to room n+1, freeing room 1 for the new guest',
+        explanation: 'f(n) = n+1 is a bijection from ℕ to ℕ\\{1} — every existing guest still has a room, and room 1 opens up. "Full" doesn\'t mean the same thing for infinite sets as it does for finite ones.',
+      },
+    ],
     callouts: [
       {
         type: 'definition',
@@ -81,6 +95,20 @@ But the list was supposed to contain *every* real number between 0 and 1. We jus
 
 A natural objection: couldn't you run the same argument on the rationals and "prove" ℚ is uncountable too, contradicting the earlier enumeration? No — the diagonal construction produces some infinite decimal y, but there's no guarantee y is *rational*. In fact y is typically irrational (its digits were built by an arbitrary, patternless rule), so it doesn't need to appear on a list of rationals at all. The diagonal argument only breaks a supposed enumeration of the *reals*, because only for the reals does "some infinite decimal exists that isn't on the list" immediately contradict the list's claimed completeness.`,
     ],
+    checks: [
+      {
+        afterParagraph: 2,
+        question: 'Why doesn\'t Cantor\'s diagonal argument also prove ℚ (the rationals) is uncountable?',
+        options: [
+          'It does — ℚ is secretly uncountable too',
+          'The constructed number y has no guarantee of being rational, so it doesn\'t need to appear on a list of rationals',
+          'The argument only works for numbers between 0 and 1',
+          'Because ℚ has no decimal representation',
+        ],
+        answer: 'The constructed number y has no guarantee of being rational, so it doesn\'t need to appear on a list of rationals',
+        explanation: 'The diagonal construction produces some infinite decimal, but it\'s typically irrational. Missing from a list of ALL reals is a contradiction; missing from a list of just the rationals is not, since y was never claimed to be rational.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -102,6 +130,14 @@ A natural objection: couldn't you run the same argument on the rationals and "pr
       'A common error is to treat "countable" as meaning "small" or "finite-like." Countably infinite sets are still infinite — ℕ, ℤ, and ℚ are all genuinely infinite, unbounded sets. "Countable" means only that the infinity is *enumerable*, listable in a single sequence — not that it is small in any other sense.',
 
       'Another common error: assuming that because ℚ "contains" ℕ as a subset, ℚ must be strictly larger. For infinite sets, a proper subset can have the *same* cardinality as the whole set — this is precisely what Hilbert\'s Hotel demonstrates (ℕ \\ {1} is a proper subset of ℕ, yet |ℕ \\ {1}| = |ℕ|). "A proper subset must be strictly smaller" is a finite-set intuition that provably fails once sets are infinite.',
+    ],
+    checks: [
+      {
+        question: 'ℕ \\ {1} (all natural numbers except 1) is a proper subset of ℕ. What is its cardinality compared to |ℕ|?',
+        options: ['Strictly smaller than |ℕ|', 'Exactly equal to |ℕ|', 'Uncountable', 'Undefined for infinite sets'],
+        answer: 'Exactly equal to |ℕ|',
+        explanation: 'A bijection exists (shift every element down by one), so the two sets have the same cardinality — even though one is a proper subset of the other. This is exactly Hilbert\'s Hotel, and it only happens for infinite sets.',
+      },
     ],
   },
 
@@ -255,6 +291,34 @@ A natural objection: couldn't you run the same argument on the rationals and "pr
       ],
       answer: 'Because the diagonal number constructed is generally irrational, so its absence from a rationals list proves nothing',
       hints: ['The construction produces some real number with no guarantee of rationality — a rationals-only list was never required to contain it.'],
+    },
+    {
+      id: 'ci-q4',
+      type: 'choice',
+      text: 'What does it mean for two sets to have "the same cardinality"?',
+      options: [
+        'They have the same number of digits',
+        'There exists a bijection between them',
+        'They are both finite',
+        'One is a subset of the other',
+      ],
+      answer: 'There exists a bijection between them',
+      hints: ['A bijection is a perfect 1-to-1 pairing with nothing left over on either side — that\'s the entire definition of "same size" for infinite sets.'],
+    },
+    {
+      id: 'ci-q5',
+      type: 'input',
+      text: 'What symbol denotes the cardinality of ℕ (and every countably infinite set)?',
+      answer: 'ℵ₀',
+      hints: ['Read "aleph-null" — the smallest infinite cardinal number.'],
+    },
+    {
+      id: 'ci-q6',
+      type: 'choice',
+      text: 'By Cantor\'s Theorem, how does |P(S)| (the power set of S) compare to |S|, even for infinite S?',
+      options: ['They are always equal', '|P(S)| is always strictly greater than |S|', '|P(S)| is always smaller', 'It depends on whether S is countable'],
+      answer: '|P(S)| is always strictly greater than |S|',
+      hints: ['This holds for every set, finite or infinite — applied repeatedly to ℕ, it generates an infinite tower of ever-larger infinities with no single "largest infinity."'],
     },
   ],
 

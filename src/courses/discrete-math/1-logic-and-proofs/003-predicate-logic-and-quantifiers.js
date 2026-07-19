@@ -59,6 +59,15 @@ export default {
 
       "**Where this is heading.** The single biggest payoff of predicate logic is enabling proofs about infinite sets. Every theorem about all integers, all real numbers, all graphs, all programs, uses quantifiers. Understanding how to read, negate, and prove quantified statements is the engine behind every major result in this course — induction, combinatorics, graph theory, and computability all speak this language.",
     ],
+    checks: [
+      {
+        afterParagraph: 5,
+        question: 'To prove "Everyone in this room is a spy" is FALSE, what do you need?',
+        options: ['A proof that works for every person', 'Just one non-spy — a single counterexample', 'A vote from the whole room', 'Nothing — universal claims can\'t be disproven'],
+        answer: 'Just one non-spy — a single counterexample',
+        explanation: 'Disproving ∀x P(x) only requires one element where P fails. That single counterexample breaks the "for all" claim completely.',
+      },
+    ],
     callouts: [
       {
         type: 'sequencing',
@@ -118,6 +127,20 @@ export default {
 
       "**Vacuous truth.** If the domain is empty, ∀x P(x) is trivially True — there are no elements to serve as counterexamples. This is not a paradox; it is a logical convention called vacuous truth. The statement 'All my pet dragons breathe fire' is True even if you have no dragons — you cannot point to a dragon that does not breathe fire. Vacuous truth appears in program verification: 'for all inputs in this set, the program terminates' is vacuously True if the set of inputs is empty.",
     ],
+    checks: [
+      {
+        afterParagraph: 3,
+        question: 'Why is ∃y ∀x (x+y=0) False over the reals, while ∀x ∃y (x+y=0) is True?',
+        options: [
+          'They mean the same thing — this is a trick question',
+          '∃y∀x needs ONE fixed y that works for every x simultaneously; ∀x∃y lets y depend on x',
+          '∃y∀x is False because ∃ always comes second',
+          'Neither statement is actually well-formed',
+        ],
+        answer: '∃y∀x needs ONE fixed y that works for every x simultaneously; ∀x∃y lets y depend on x',
+        explanation: 'In ∀x∃y, you pick y=−x fresh for each x Nature throws at you. In ∃y∀x, you must commit to a single y before seeing x — no single number cancels every real number.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -163,6 +186,20 @@ export default {
       "**Part III: The Limit Definition — A Masterclass in Nested Quantifiers.** The formal epsilon-delta definition of a limit is the most celebrated application of nested quantifiers in all of calculus: lim(x→c) f(x) = L means ∀ε > 0, ∃δ > 0, ∀x ∈ ℝ, (0 < |x−c| < δ → |f(x)−L| < ε). Reading this as a game: Nature picks any tolerance ε > 0 (a challenge). You respond with a neighborhood δ > 0 (your move). Nature then picks any x within δ of c. You win if f(x) is within ε of L. The limit equals L if you can always win regardless of Nature's challenge. Negating this definition — finding the exact formal statement that the limit does NOT equal L — requires pushing ¬ through all three quantifiers, and produces the precise criterion for a limit failing.",
 
       "**For the programmer.** Every loop invariant in program verification is a universal statement: ∀ iterations i, property P(i) holds. Proving the invariant requires a universal generalization argument (induction). Every assertion of the form 'this function works for all inputs of type T' is a universal claim. Understanding quantifier structure helps you write and verify correct loop invariants and function contracts.",
+    ],
+    checks: [
+      {
+        afterParagraph: 3,
+        question: 'Why can\'t you prove ∀x P(x) just by checking P(1), P(2), P(3), ...?',
+        options: [
+          'You actually can — checking a few cases is sufficient',
+          'Checking finitely many cases never rules out failure at some untested value, unless the argument was general',
+          'Because ∀ statements are never provable',
+          'Because P must be tested in a random order',
+        ],
+        answer: 'Checking finitely many cases never rules out failure at some untested value, unless the argument was general',
+        explanation: 'Confirming P holds for 1, 2, and 3 says nothing about P(1000) unless the reasoning applies to an arbitrary element — that\'s exactly what universal generalization provides and example-checking doesn\'t.',
+      },
     ],
 
     // Flat {expression, annotation} steps — DynamicProof (the component that

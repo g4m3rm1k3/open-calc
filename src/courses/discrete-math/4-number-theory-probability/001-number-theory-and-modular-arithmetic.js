@@ -153,6 +153,15 @@ This "reduction at every step" is what makes RSA computable — you're raising h
 
 **Division in modular arithmetic** doesn't work like regular division. You can't just divide both sides by a number. Instead, you need the **modular inverse** — the number that "undoes" multiplication.`,
     ],
+    checks: [
+      {
+        afterParagraph: 2,
+        question: 'What is (−7) mod 3?',
+        options: ['−1', '2', '−7', '3'],
+        answer: '2',
+        explanation: 'The Division Algorithm requires 0 ≤ r < b, always non-negative. −7 = 3×(−3) + 2, so the remainder is 2, not −1 — be careful with negative dividends.',
+      },
+    ],
 
     callouts: [
       {
@@ -273,6 +282,15 @@ has a unique solution modulo N = n₁n₂...nₖ.
 
 **Number-theoretic use:** CRT tells you that the ring ℤₙ (integers mod n) behaves like a product of simpler rings when n factors into coprime parts. This structural insight powers many advanced number-theoretic algorithms.`,
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'By Fermat\'s Little Theorem, if p is prime and gcd(a,p)=1, what is aᵖ⁻¹ mod p?',
+        options: ['0', '1', 'p', 'a'],
+        answer: '1',
+        explanation: 'This is exactly the theorem statement: aᵖ⁻¹ ≡ 1 (mod p) whenever p is prime and a is not a multiple of p — the basis for fast modular inverses and primality testing.',
+      },
+    ],
 
     callouts: [
       {
@@ -344,6 +362,15 @@ To prove the Euclidean algorithm is correct, state a loop invariant:
 Let r = a' mod b', so a' = b'q + r. Any common divisor d of a' and b' also divides a' − b'q = r, so d | r. Thus d is a common divisor of b' and r. Conversely, any common divisor of b' and r divides b'q + r = a', so it's a common divisor of a' and b'. The sets of common divisors are identical, so the greatest is the same.
 
 **Termination:** The remainder r = a' mod b' satisfies 0 ≤ r < b'. So b' strictly decreases each step. The sequence of b' values is a strictly decreasing sequence of non-negative integers, which must eventually reach 0. □`,
+    ],
+    checks: [
+      {
+        afterParagraph: 0,
+        question: 'From 6 ≡ 4 (mod 2), can you conclude 3 ≡ 2 (mod 1) by dividing both sides by 2?',
+        options: ['Yes, division always works in modular arithmetic', 'No — this is illegal cancellation; division requires the divisor to be invertible (coprime to the modulus)', 'Yes, but only for even numbers', 'No, because 6 and 4 aren\'t congruent mod 2 in the first place'],
+        answer: 'No — this is illegal cancellation; division requires the divisor to be invertible (coprime to the modulus)',
+        explanation: 'Modular arithmetic doesn\'t support free division. You can only "divide" by a number that has a modular inverse — i.e., is coprime to the modulus.',
+      },
     ],
 
     callouts: [
@@ -601,6 +628,29 @@ Let r = a' mod b', so a' = b'q + r. Any common divisor d of a' and b' also divid
       ],
       answer: 'Because multiplying two large primes is easy, but factoring their product back into primes is computationally infeasible',
       hints: ['RSA security rests on the asymmetry between multiplication (fast) and factoring (hard for large primes). Without knowing the prime factors, computing φ(n) is infeasible, so the private key d cannot be recovered.'],
+    },
+    {
+      id: 'nt-q4',
+      type: 'input',
+      text: 'What is gcd(48, 18)?',
+      answer: '6',
+      hints: ['Use the Euclidean algorithm: 48 = 18(2)+12, 18 = 12(1)+6, 12 = 6(2)+0. The last non-zero remainder is 6.'],
+    },
+    {
+      id: 'nt-q5',
+      type: 'choice',
+      text: 'By Euler\'s Theorem, if gcd(a,n)=1, then a^φ(n) ≡ ? (mod n)',
+      options: ['0', '1', 'φ(n)', 'a'],
+      answer: '1',
+      hints: ['This is the direct generalization of Fermat\'s Little Theorem to any modulus n, not just primes.'],
+    },
+    {
+      id: 'nt-q6',
+      type: 'choice',
+      text: 'The Chinese Remainder Theorem requires which condition on the moduli n₁, n₂, ..., nₖ?',
+      options: ['They must all be prime', 'They must be pairwise coprime', 'They must all be equal', 'They must be powers of 2'],
+      answer: 'They must be pairwise coprime',
+      hints: ['Pairwise coprime means gcd(nᵢ, nⱼ) = 1 for every pair i ≠ j — this is what guarantees a unique solution mod the product N.'],
     },
   ],
 

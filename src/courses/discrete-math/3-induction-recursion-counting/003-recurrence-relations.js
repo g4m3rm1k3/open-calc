@@ -29,6 +29,15 @@ export default {
 
       'Before reaching for algebra, write out the first 6 to 8 terms by direct substitution. Seeing the actual numbers — 4, 7, 10, 13, ... — usually suggests the right closed form (here, obviously linear) well before any formal method would.',
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'The rule aₙ = aₙ₋₁ + 3 alone — with no initial condition — determines:',
+        options: ['A unique sequence', 'Infinitely many different sequences that all share this rule', 'Exactly two possible sequences', 'No valid sequence at all'],
+        answer: 'Infinitely many different sequences that all share this rule',
+        explanation: '4,7,10,13,... and 100,103,106,109,... both satisfy the same rule. Only the initial condition (a₁=4 vs a₁=100) picks out one specific sequence.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -57,6 +66,20 @@ export default {
 
       'Runtime recurrences are usually solved only to an **asymptotic class** (like Θ(n log n)) rather than an exact closed form with precise constants — for complexity analysis, knowing the growth rate is what actually matters for comparing algorithms, and chasing exact constants is both harder and usually beside the point.',
     ],
+    checks: [
+      {
+        afterParagraph: 2,
+        question: 'In the recursion tree for T(n) = 2T(n/2) + n, why does the total work stay exactly n at every level?',
+        options: [
+          'It doesn\'t — work decreases every level',
+          'Subproblem count doubles while subproblem size halves, so count × per-subproblem-cost cancels back to n',
+          'Because n is always a power of 2',
+          'Because the tree only has one level',
+        ],
+        answer: 'Subproblem count doubles while subproblem size halves, so count × per-subproblem-cost cancels back to n',
+        explanation: 'Level i has 2ⁱ subproblems of size n/2ⁱ, so the level cost is 2ⁱ · (n/2ⁱ) = n — constant across every level, which is exactly why the total is n · (number of levels) = n log₂n.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -78,6 +101,15 @@ export default {
       'When solving runtime recurrences, state the domain explicitly (for instance, "assume n is a power of 2" for T(n) = 2T(n/2) + n) and state the base case assumption (typically T(1) = c for some constant c). These aren\'t formalities — without them, "n/2" isn\'t even guaranteed to be an integer, and the recursion tree\'s level count depends on exactly how the size shrinks.',
 
       'If the recurrence involves floors or ceilings (like T(n) = T(⌈n/2⌉) + T(⌊n/2⌋) + n for algorithms that split unevenly-sized inputs), bound them explicitly before doing asymptotic classification: ⌊n/2⌋ ≤ n/2 ≤ ⌈n/2⌉ ≤ (n+1)/2, and carry these bounds through the recursion tree rather than silently treating n as always evenly divisible.',
+    ],
+    checks: [
+      {
+        afterParagraph: 0,
+        question: 'You guessed a closed form by spotting a pattern in the first several terms. Is that enough to call it proven?',
+        options: ['Yes, pattern-matching several terms is a valid proof', 'No — pattern-spotting only generates a hypothesis; induction is what actually proves it', 'Only if you check 10 or more terms', 'Only for linear recurrences'],
+        answer: 'No — pattern-spotting only generates a hypothesis; induction is what actually proves it',
+        explanation: 'The f(n) = n² + n + 41 example from earlier in the course (looked prime for 40 straight values, then failed) is exactly why: patterns can break. Only an inductive proof closes the gap.',
+      },
     ],
   },
 
@@ -143,6 +175,19 @@ export default {
       ],
       answer: 'c_n=n^2.',
     },
+    {
+      id: 'discrete-1-07-ch3',
+      difficulty: 'hard',
+      problem: 'Classify T(n) = 3T(n/2) + n² using the Master Theorem.',
+      hint: 'Identify a, b, f(n), then compare f(n) to n^(log_b a).',
+      walkthrough: [
+        { expression: 'a=3,\\ b=2,\\ f(n)=n^2', annotation: 'Read off the three Master Theorem parameters.' },
+        { expression: 'n^{\\log_b a} = n^{\\log_2 3} \\approx n^{1.58}', annotation: 'This is the growth rate of pure recursive splitting.' },
+        { expression: 'f(n)=n^2 \\quad \\text{grows faster than} \\quad n^{1.58}', annotation: 'The combine work dominates the recursive splitting.' },
+        { expression: '\\therefore\\; T(n) = \\Theta(f(n)) = \\Theta(n^2)', annotation: 'When f(n) dominates, the Master Theorem says T(n) = Θ(f(n)).' },
+      ],
+      answer: 'T(n) = Θ(n²) — the combine step (n²) dominates the 3-way recursive split.',
+    },
   ],
 
   crossRefs: [
@@ -160,6 +205,7 @@ export default {
     'completed-example-3',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
+    'attempted-challenge-hard',
   ],
   semantics: {
     core: [
@@ -238,6 +284,47 @@ export default {
       options: ['Integration', 'Mathematical Induction', 'Truth Tables', 'Binary Search'],
       answer: 'Mathematical Induction',
       hints: ['Proving a pattern holds for all n.'],
+    },
+    {
+      id: 'rec-q3',
+      type: 'choice',
+      text: 'For T(n) = aT(n/b) + f(n), what does the Master Theorem compare f(n) against?',
+      options: ['n!', 'n^(log_b a)', 'log(n)', '2ⁿ'],
+      answer: 'n^(log_b a)',
+      hints: ['This term captures the growth rate of the pure recursive splitting, with no combine work.'],
+    },
+    {
+      id: 'rec-q4',
+      type: 'input',
+      text: 'Given a₀ = 3 and aₙ = 2aₙ₋₁, what is a₃?',
+      answer: '24',
+      hints: ['a₁=6, a₂=12, a₃=24 — or use the closed form aₙ = 3·2ⁿ directly.'],
+    },
+    {
+      id: 'rec-q5',
+      type: 'choice',
+      text: 'T(n) = 2T(n/2) + n and T(n) = 4T(n/2) + n both have a=?, b=2. Why do they classify differently under the Master Theorem?',
+      options: [
+        'They don\'t — both are Θ(n log n)',
+        'Different a changes n^(log_b a), which changes how f(n)=n compares to it',
+        'The Master Theorem doesn\'t apply to either',
+        'b must also differ for the classification to differ',
+      ],
+      answer: 'Different a changes n^(log_b a), which changes how f(n)=n compares to it',
+      hints: ['a=2 gives n^(log_2 2)=n (matches f(n), giving Θ(n log n)). a=4 gives n^(log_2 4)=n² (dominates f(n), giving Θ(n²)).'],
+    },
+    {
+      id: 'rec-q6',
+      type: 'choice',
+      text: 'Why must you state "assume n is a power of 2" when analyzing T(n) = 2T(n/2) + n with a recursion tree?',
+      options: [
+        'It\'s just a stylistic convention with no real content',
+        'Without it, n/2 isn\'t guaranteed to be an integer, and the tree\'s level count depends on exactly how the size shrinks',
+        'Because the Master Theorem only works for powers of 2',
+        'Because merge sort only works on power-of-2 inputs',
+      ],
+      answer: 'Without it, n/2 isn\'t guaranteed to be an integer, and the tree\'s level count depends on exactly how the size shrinks',
+      hints: ['This is exactly the rigor-section point about stating domain assumptions explicitly before classifying a recurrence.'],
     },
   ],
 }

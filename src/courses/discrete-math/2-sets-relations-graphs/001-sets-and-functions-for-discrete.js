@@ -40,6 +40,15 @@ export default {
       '2. **The Sieve:** The second part (x² < 10) is the strict conditional rule. Any integer whose square is less than 10 survives the filter and drops into the final Set bag!',
       'Quick precision pass: A <span class="tooltip" data-tooltip="A set is an unordered collection of distinct elements.">set</span> has <span class="tooltip" data-tooltip="Elements are members of a set. We write x ∈ S.">elements</span>, and a <span class="tooltip" data-tooltip="A function maps each input in the domain to exactly one output in the codomain.">function</span> classifies as <span class="tooltip" data-tooltip="Injective: distinct inputs map to distinct outputs.">injective</span>, <span class="tooltip" data-tooltip="Surjective: every codomain element is hit by at least one input.">surjective</span>, or <span class="tooltip" data-tooltip="Bijective: both injective and surjective.">bijective</span>.'
     ],
+    checks: [
+      {
+        afterParagraph: 6,
+        question: 'What is the cardinality of the set {∅}?',
+        options: ['0', '1', '2', 'Undefined'],
+        answer: '1',
+        explanation: '{∅} is a box containing one item — an empty box. It is NOT empty itself, so its cardinality is 1, not 0.',
+      },
+    ],
     callouts: [
       {
         type: 'definition',
@@ -98,6 +107,15 @@ export default {
       'It has only **ONE STRICT RULE**: The machine cannot be broken. If you pump the number 5 into the machine, it must spit out a single specific answer (e.g., 25). It cannot spit out 25 sometimes and -25 other times. That breaks functional predictability!',
       'Vocabulary bridge: <span class="tooltip" data-tooltip="Cardinality |S| is the number of elements in a finite set.">cardinality</span> measures set size. The <span class="tooltip" data-tooltip="Image f(A) is the set of outputs actually produced.">image</span> is what the function actually hits, while the <span class="tooltip" data-tooltip="Preimage of b is the set of all inputs that map to b.">preimage</span> tracks which inputs produce a chosen output.'
     ],
+    checks: [
+      {
+        afterParagraph: 3,
+        question: 'A set has 5 elements. How many elements does its power set have?',
+        options: ['10', '25', '32', '5'],
+        answer: '32',
+        explanation: 'Each of the 5 elements independently flips a Keep/Drop coin: 2⁵ = 32 possible subsets.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -139,6 +157,15 @@ export default {
       'Think of an assembly line. Function **f** builds a toy. Function **g** paints the toy blue.',
       'Order matters. Run **g ∘ f** (evaluate f first) and you assemble the toy, then paint it. Run **f ∘ g** instead (evaluate g first) and you\'d be painting unassembled plastic blocks before anything is put together — a different result entirely. Function composition is **not commutative**: g ∘ f and f ∘ g are, in general, different functions.',
       'Eventually you reach the baseline case: **f(x) = x**. Whatever input x you feed the machine, it returns that same x untouched. This is the **identity function**. Run a bijective function forward, then run its inverse on the result, and you land exactly on the identity function — because you\'ve returned precisely to where you started.'
+    ],
+    checks: [
+      {
+        afterParagraph: 4,
+        question: 'A function maps 5 workers onto 4 tasks so every task gets done, but two workers share one task. Is this injective, surjective, both, or neither?',
+        options: ['Injective only', 'Surjective only', 'Both (bijective)', 'Neither'],
+        answer: 'Surjective only',
+        explanation: 'Every task (codomain element) is hit by at least one worker, so it\'s surjective — but two workers colliding on the same task breaks injectivity.',
+      },
     ],
     callouts: [
       {
@@ -353,6 +380,47 @@ export default {
       options: ['B equals the Range', 'B contains zero elements', 'B is a subset of the Domain', 'B has more elements than A'],
       answer: 'B equals the Range',
       hints: ['Surjective means every element in the codomain is hit by at least one arrow from the domain.'],
+    },
+    {
+      id: 'sf-q3',
+      type: 'choice',
+      text: 'What is |{1, 2} × {a, b, c}| (the cardinality of the Cartesian product)?',
+      options: ['5', '6', '2', '3'],
+      answer: '6',
+      hints: ['The Cartesian product pairs every element of the first set with every element of the second: |A × B| = |A| · |B|.'],
+    },
+    {
+      id: 'sf-q4',
+      type: 'choice',
+      text: 'Which statement about ⊆ and ⊂ is correct?',
+      options: [
+        'A ⊆ B means A is smaller than B',
+        'A ⊂ B allows A to equal B',
+        'A ⊆ B allows A to equal B, but A ⊂ B does not',
+        'They mean exactly the same thing',
+      ],
+      answer: 'A ⊆ B allows A to equal B, but A ⊂ B does not',
+      hints: ['⊆ mirrors "≤" (allows equality); ⊂ mirrors "<" (strictly smaller).'],
+    },
+    {
+      id: 'sf-q5',
+      type: 'input',
+      text: 'If A = {∅, {∅}}, what is |A| (the cardinality of A)?',
+      answer: '2',
+      hints: ['A contains exactly two distinct elements: the empty set, and the set containing the empty set — even though one "looks empty," they are different objects.'],
+    },
+    {
+      id: 'sf-q6',
+      type: 'choice',
+      text: 'g ∘ f means "first apply f, then apply g." Why is function composition generally NOT commutative (g ∘ f ≠ f ∘ g)?',
+      options: [
+        'It actually is always commutative',
+        'Applying operations in a different order can produce a completely different result — like painting before assembly vs. after',
+        'Composition is only defined for one function at a time',
+        'Because functions can\'t be chained',
+      ],
+      answer: 'Applying operations in a different order can produce a completely different result — like painting before assembly vs. after',
+      hints: ['Think of the assembly-line example: build-then-paint gives a different object than paint-then-build.'],
     },
   ],
 };

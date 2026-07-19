@@ -37,6 +37,15 @@ export default {
       'Vocabulary bridge: A <span class="tooltip" data-tooltip="A relation R on A is a subset of A × A.">relation</span> can become an <span class="tooltip" data-tooltip="Reflexive + symmetric + transitive.">equivalence relation</span> or a <span class="tooltip" data-tooltip="Reflexive + antisymmetric + transitive.">partial order</span> depending on which structural laws it satisfies.',
       'Intuition anchor: equivalence relations split sets into <span class="tooltip" data-tooltip="A partition is a family of disjoint non-empty subsets whose union is the whole set.">partitions</span>, while partial orders build <span class="tooltip" data-tooltip="A poset is a set equipped with a partial order relation.">posets</span> where some elements can remain incomparable.'
     ],
+    checks: [
+      {
+        afterParagraph: 10,
+        question: 'A relation R fires 3 arrows out of one input, and 0 arrows out of another input. Can R be a function?',
+        options: ['Yes, always', 'No — a function requires exactly one output per input', 'Only if R is symmetric', 'Only if R is reflexive'],
+        answer: 'No — a function requires exactly one output per input',
+        explanation: 'Functions are the strict, "loyal" special case: exactly one outward arrow per input, always. Firing 3 arrows or 0 arrows both violate that rule.',
+      },
+    ],
     callouts: [
       {
         type: 'definition',
@@ -94,6 +103,15 @@ export default {
 
       'Notice what\'s missing: there\'s no edge from 1 straight to 12, even though 1 divides 12 — that edge is implied by 1→2→4→12 (or any other path upward), so drawing it would be redundant. A Hasse diagram shows exactly the edges you need to reconstruct every other relationship by transitivity, and not one more.',
       'Definition bridge: every equivalence relation determines <span class="tooltip" data-tooltip="An equivalence class [a] is all elements related to a.">equivalence classes</span>, and these classes form a partition of the base set.'
+    ],
+    checks: [
+      {
+        afterParagraph: 5,
+        question: 'The relation "has the same birthday month" partitions people into how many equivalence classes?',
+        options: ['3', '7', '12', '365'],
+        answer: '12',
+        explanation: 'One equivalence class per possible birthday month — 12 disjoint buckets that together cover everyone.',
+      },
     ],
     callouts: [
       {
@@ -153,6 +171,15 @@ export default {
       '• **Proving Transitivity:** You cannot just use examples. You must pull three total generic variables. Assume rigidly that a R b and b R c. Then, using aggressive algebraic substitution, manually force the equation to prove that a R c MUST also mathematically be true!',
       '• **Relation Composition (Grandparent Logic):** Just like chaining functions ($g \\circ f$), you can aggressively chain relations via Matrix multiplications! If Relation $R$ is defined as "is the parent of", then chaining it exactly mapped as $R \\circ R$ structurally morphs the query to output "is the Grandparent of!"',
       '• **A Note on Transitivity Vacuous Logic:** Watch out! If there is absolutely no chain to even check in the first place (like if a R b exists, but b points to literally nothing else), the Transitive rule is technically "Vacuously True" because it was never physically violated. (No broken laws = mathematical innocence!).'
+    ],
+    checks: [
+      {
+        afterParagraph: 2,
+        question: 'To prove a relation is NOT symmetric, what do you need?',
+        options: ['A full proof covering every pair', 'Just one pair (a,b) where (b,a) is missing', 'Show the matrix is completely empty', 'Prove transitivity fails first'],
+        answer: 'Just one pair (a,b) where (b,a) is missing',
+        explanation: 'Breaking symmetry only takes one counterexample — one arrow that exists without its return arrow. Proving something IS symmetric, by contrast, needs a general argument for arbitrary a, b.',
+      },
     ],
     callouts: [
       {
@@ -338,6 +365,52 @@ export default {
       options: ['To save space', 'Because partial orders are already assumed to be reflexive', 'Because loops are illegal in partial orders', 'Because they are too hard to draw'],
       answer: 'Because partial orders are already assumed to be reflexive',
       hints: ['Hasse diagrams only show the "interesting" essential connections.'],
+    },
+    {
+      id: 'rel-q3',
+      type: 'choice',
+      text: 'Which set of properties defines a partial order?',
+      options: [
+        'Reflexive, Symmetric, Transitive',
+        'Reflexive, Antisymmetric, Transitive',
+        'Symmetric, Antisymmetric, Transitive',
+        'Reflexive, Symmetric only',
+      ],
+      answer: 'Reflexive, Antisymmetric, Transitive',
+      hints: ['Swap symmetric for antisymmetric to go from equivalence relation to partial order.'],
+    },
+    {
+      id: 'rel-q4',
+      type: 'choice',
+      text: 'A relation matrix is completely blank — no arrows at all. Which properties does it satisfy?',
+      options: [
+        'None of them',
+        'Reflexive only',
+        'Symmetric and Transitive (vacuously), but NOT Reflexive',
+        'All three: Reflexive, Symmetric, and Transitive',
+      ],
+      answer: 'Symmetric and Transitive (vacuously), but NOT Reflexive',
+      hints: ['Symmetric and Transitive are both "if X exists, then Y must exist" rules — vacuously true when there\'s nothing to check. Reflexive explicitly demands the diagonal loops be present.'],
+    },
+    {
+      id: 'rel-q5',
+      type: 'choice',
+      text: 'On positive integers, define a R b iff a divides b. Why is this relation antisymmetric rather than symmetric?',
+      options: [
+        'Because a | b and b | a can never both be true',
+        'Because a | b and b | a can both be true, but only forces a = b (not a general reversal)',
+        'Because divisibility isn\'t actually a relation',
+        'Because antisymmetric relations can\'t involve numbers',
+      ],
+      answer: 'Because a | b and b | a can both be true, but only forces a = b (not a general reversal)',
+      hints: ['Antisymmetric allows a mutual pair — but only when a and b are literally the same element.'],
+    },
+    {
+      id: 'rel-q6',
+      type: 'input',
+      text: 'The relation "same remainder mod 3" splits the integers into how many equivalence classes?',
+      answer: '3',
+      hints: ['One class per possible remainder: 0, 1, or 2.'],
     },
   ],
 }

@@ -14,6 +14,7 @@ import { Volume2, Square } from "lucide-react";
 import { useSpeech, cleanForSpeech } from "../../utils/useSpeech.js";
 import VizFrame from "../viz/VizFrame.jsx";
 import Callout from "../ui/Callout.jsx";
+import InlineCheck from "./InlineCheck.jsx";
 import SVGImage from "./SVGImage.jsx";
 import StepThrough from "./StepThrough.jsx";
 import DynamicProof from "./DynamicProof.jsx";
@@ -173,9 +174,11 @@ function SectionContent({ data }) {
               </div>
             );
           }
+          if (block.type === "check") return <InlineCheck key={i} question={block.question} options={block.options} answer={block.answer} explanation={block.explanation} />;
           return null;
         })}
         {(data.callouts ?? []).map((c, i) => <Callout key={`extra-${i}`} {...c} />)}
+        {(data.checks ?? []).map((c, i) => <InlineCheck key={`check-${i}`} question={c.question} options={c.options} answer={c.answer} explanation={c.explanation} />)}
       </div>
     );
   }
@@ -183,6 +186,7 @@ function SectionContent({ data }) {
     <div className="space-y-4">
       {renderMixedProse(normalizeProse(data.prose))}
       {(data.callouts ?? []).map((c, i) => <Callout key={i} {...c} />)}
+      {(data.checks ?? []).map((c, i) => <InlineCheck key={`check-${i}`} question={c.question} options={c.options} answer={c.answer} explanation={c.explanation} />)}
     </div>
   );
 }

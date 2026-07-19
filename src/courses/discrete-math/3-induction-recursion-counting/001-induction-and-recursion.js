@@ -121,6 +121,20 @@ Here's the argument: suppose induction establishes both the base case and the in
 
 This is why induction works. The Well-Ordering Principle guarantees a smallest counterexample must exist if any counterexample exists, and the inductive step eliminates that possibility.`,
     ],
+    checks: [
+      {
+        afterParagraph: 3,
+        question: 'A student proves the inductive step perfectly but never checks the base case. What does this show?',
+        options: [
+          'The statement is proven true for all n',
+          'Nothing — without the base case, the domino chain never starts, so the proof is invalid',
+          'The statement is proven true for n ≥ 2',
+          'The inductive step alone is sufficient for even n',
+        ],
+        answer: 'Nothing — without the base case, the domino chain never starts, so the proof is invalid',
+        explanation: 'The inductive step only shows dominoes would knock each other over IF the chain started. Skipping the base case means you never pushed the first domino — the proof is incomplete.',
+      },
+    ],
 
     callouts: [
       {
@@ -262,6 +276,20 @@ The connection between recurrences and induction:
 
 Recurrences appear everywhere in algorithms: merge sort (T(n) = 2T(n/2) + O(n)), binary search (T(n) = T(n/2) + O(1)), Towers of Hanoi (T(n) = 2T(n−1) + 1). Proving the efficiency of these algorithms means solving and verifying their recurrences — which means induction.`,
     ],
+    checks: [
+      {
+        afterParagraph: 0,
+        question: 'Why does proving F(n) = F(n−1) + F(n−2) require strong induction rather than weak induction?',
+        options: [
+          'Because Fibonacci numbers are too large for weak induction',
+          'Because P(n+1) depends on TWO previous values, not just the immediately preceding one',
+          'Strong induction is always required for any recursive sequence',
+          'Weak induction cannot handle any formula with subtraction',
+        ],
+        answer: 'Because P(n+1) depends on TWO previous values, not just the immediately preceding one',
+        explanation: 'Weak induction only gives you P(k) to work with. Fibonacci\'s recurrence needs both F(n−1) and F(n−2) — exactly the "combined weight of all fallen dominoes" that strong induction provides.',
+      },
+    ],
 
     callouts: [
       {
@@ -342,6 +370,15 @@ State what you need to prove: "We will show P(k+1)." Write out what P(k+1) says.
 "Therefore, by the Principle of Mathematical Induction, P(n) holds for all integers n ≥ 1."
 
 The conclusion is not optional or ceremonial. It's the statement that closes the logical loop: base case + inductive step + principle of induction → claim for all n.`,
+    ],
+    checks: [
+      {
+        afterParagraph: 0,
+        question: 'In Section 4 (Inductive Step), what exact phrase must appear at the moment you use the assumption from Section 3?',
+        options: ['"Obviously"', '"By the inductive hypothesis"', '"Clearly true"', 'No phrase is required'],
+        answer: '"By the inductive hypothesis"',
+        explanation: 'Explicitly flagging the substitution moment is what lets a reader verify you actually used P(k) rather than smuggling in an unjustified step.',
+      },
     ],
 
     callouts: [
@@ -883,6 +920,22 @@ The conclusion is not optional or ceremonial. It's the statement that closes the
       hints: [
         "Recursion actually unwinds top-down (from n to base case). Induction propagates bottom-up (from base case to n). They run in opposite directions.",
       ],
+    },
+    {
+      id: "ind-q5",
+      type: "choice",
+      text: "To prove a fact about F(n) = F(n-1) + F(n-2) (Fibonacci), which proof technique is required?",
+      options: ["Weak induction", "Strong induction", "Proof by contradiction only", "No proof technique works"],
+      answer: "Strong induction",
+      hints: ["The inductive step needs TWO prior values, not just one — weak induction only hands you P(k)."],
+    },
+    {
+      id: "ind-q6",
+      type: "choice",
+      text: "In the formal four-section proof blueprint, what must you write at the exact moment you use the inductive hypothesis?",
+      options: ["Nothing special", 'The explicit phrase "by the inductive hypothesis"', "The word \"obviously\"", "A footnote citing Euclid"],
+      answer: 'The explicit phrase "by the inductive hypothesis"',
+      hints: ["Flagging this moment explicitly is what lets a reader verify the proof actually used P(k) rather than skipping a step."],
     },
   ],
 };

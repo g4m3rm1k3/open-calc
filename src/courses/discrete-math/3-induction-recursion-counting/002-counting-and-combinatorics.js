@@ -165,6 +165,15 @@ Total: 11! / (1! × 4! × 4! × 2!) = 39,916,800 / (1 × 24 × 24 × 2) = 39,916
 
 This formula — dividing by the product of factorials of identical groups — is called the multinomial coefficient and it generalizes C(n,k).`,
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'A restaurant has 4 appetizers and 6 entrees. You must pick exactly one of each. How many total meal combinations are there?',
+        options: ['10 (4 + 6)', '24 (4 × 6)', '4', '6'],
+        answer: '24 (4 × 6)',
+        explanation: '"One of each" (AND) means the Multiplication Rule applies: 4 × 6 = 24, not the Addition Rule (which is for OR / mutually exclusive choices).',
+      },
+    ],
 
     callouts: [
       {
@@ -279,6 +288,20 @@ General formula: distributing n identical items into k bins = C(n+k−1, k−1).
 
 The key insight: this is equivalent to choosing the positions of the k−1 bars among n+k−1 total symbols. You're not choosing sodas — you're choosing where to put the dividers.`,
     ],
+    checks: [
+      {
+        afterParagraph: 0,
+        question: 'You want P(at least one head) in 5 coin flips. Why is it usually easier to compute 1 − P(no heads) instead?',
+        options: [
+          'It isn\'t easier — direct counting is always simpler',
+          '"At least one" has many overlapping winning cases, while its complement ("none") is a single, cleanly countable case',
+          'Complementary counting only works for coin flips',
+          'Because probabilities can\'t be added directly',
+        ],
+        answer: '"At least one" has many overlapping winning cases, while its complement ("none") is a single, cleanly countable case',
+        explanation: 'Complementary counting trades a messy union of many cases for one clean case (the complement), then subtracts from the total — much easier when "at least one" would otherwise require summing many overlapping possibilities.',
+      },
+    ],
 
     callouts: [
       {
@@ -373,6 +396,20 @@ The State Explosion Problem: in model checking, a program with n boolean variabl
 This is why exhaustive testing is impossible for most software. Combinatorics gives you the language to precisely articulate why. "Brute-force checking all states is infeasible because the state space is C(n,k) × k!" is a quantitative engineering statement, not a hand-wave.
 
 Similarly: the number of paths in a decision tree, the number of ways a hash collision could occur, the number of distinct test inputs for a function — all require combinatorial analysis. Estimation before implementation is part of engineering discipline.`,
+    ],
+    checks: [
+      {
+        afterParagraph: 0,
+        question: 'Why does |A ∪ B| = |A| + |B| − |A ∩ B|, rather than just |A| + |B|?',
+        options: [
+          'Because sets can never overlap',
+          'Because elements in A ∩ B get counted twice by |A| + |B|, so one copy must be subtracted back out',
+          'Because union is always smaller than either set',
+          'It\'s just a definition with no underlying reason',
+        ],
+        answer: 'Because elements in A ∩ B get counted twice by |A| + |B|, so one copy must be subtracted back out',
+        explanation: 'Adding |A| and |B| separately counts every overlapping element once in each sum — twice total. Subtracting |A ∩ B| removes exactly one of those duplicate counts.',
+      },
     ],
 
     callouts: [],
@@ -646,6 +683,21 @@ Similarly: the number of paths in a decision tree, the number of ways a hash col
       options: ['4⁷', 'P(7,4)', 'C(7,4)', 'C(7+4−1, 4−1) = C(10,3) = 120'],
       answer: 'C(7+4−1, 4−1) = C(10,3) = 120',
       hints: ['Identical items + distinct bins + repetition = Stars and Bars. n=7, k=4: C(7+4−1, 4−1) = C(10,3) = 120.'],
+    },
+    {
+      id: 'co-q5',
+      type: 'choice',
+      text: 'How many distinct integers from 1 to 100 are divisible by 2 or by 5?',
+      options: ['50', '60', '10', '70'],
+      answer: '60',
+      hints: ['|A|=50 (div by 2), |B|=20 (div by 5), |A∩B|=10 (div by 10). Inclusion-exclusion: 50+20−10=60.'],
+    },
+    {
+      id: 'co-q6',
+      type: 'input',
+      text: 'How many distinct arrangements does the word "LEVEL" have (5 letters, with L appearing twice and E appearing twice)?',
+      answer: '30',
+      hints: ['5!/(2!×2!) = 120/4 = 30 — divide by the factorial of each repeated-letter group.'],
     },
   ],
 

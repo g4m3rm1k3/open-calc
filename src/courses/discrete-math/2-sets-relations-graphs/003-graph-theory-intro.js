@@ -55,6 +55,15 @@ function bfs(start, end) {
 
       'One more angle before the formal definitions: model a factory floor as a graph, with machines as vertices and material-flow paths as edges. Finding the "critical path" — the longest path through the network — tells you the minimum possible time to complete production. This is literally how Critical Path Method (CPM) scheduling works in project management, and it is the exact same graph-theoretic idea as finding the longest path in any other network.',
     ],
+    checks: [
+      {
+        afterParagraph: 4,
+        question: 'Which representation gives O(1) "does this edge exist?" lookup, at the cost of wasted space on sparse graphs?',
+        options: ['Adjacency List', 'Adjacency Matrix', 'Edge List', 'Both are equally space-efficient'],
+        answer: 'Adjacency Matrix',
+        explanation: 'The matrix reserves a cell for every possible pair of vertices whether or not an edge exists — that\'s O(1) lookup but wasted space when edges are sparse.',
+      },
+    ],
     visualizations: [
       {
         id: 'GraphExplorerViz',
@@ -72,11 +81,33 @@ function bfs(start, end) {
 
       'Three theorems do most of the work in this lesson. The **Handshaking Lemma**: the sum of every vertex\'s degree equals 2|E| — because every edge has two ends, it contributes exactly 2 to the total degree count no matter which two vertices it joins. **Euler\'s Theorem**: a connected graph has an Euler circuit if and only if every vertex has even degree, and has an Euler path (not necessarily returning to the start) if and only if exactly 0 or 2 vertices have odd degree — this is the theorem that settles Königsberg, proved formally below. **Euler\'s Formula** (for connected planar graphs): V − E + F = 2, where F counts faces including the unbounded outer face.',
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'An Euler path visits every ___ exactly once; a Hamiltonian path visits every ___ exactly once.',
+        options: ['edge; vertex', 'vertex; edge', 'edge; edge', 'vertex; vertex'],
+        answer: 'edge; vertex',
+        explanation: 'Euler cares about edges (can you traverse every connection exactly once?); Hamiltonian cares about vertices (can you visit every location exactly once?). Easy to mix up since both forbid repeats.',
+      },
+    ],
   },
 
   rigor: {
     visualizationId: 'GraphExplorerViz',
     title: 'Proof: Euler Path Existence Condition',
+    checks: [
+      {
+        question: 'In the Euler circuit proof, why must every vertex have even degree?',
+        options: [
+          'Because trees have n-1 edges',
+          'Because every time the circuit passes through a vertex, it uses 2 edges (one in, one out)',
+          'Because odd degree is illegal in graph theory',
+          'It doesn\'t need to — the claim is false',
+        ],
+        answer: 'Because every time the circuit passes through a vertex, it uses 2 edges (one in, one out)',
+        explanation: 'Each pass through a vertex consumes exactly 2 edges, so the degree accumulates in pairs — forcing it to be even.',
+      },
+    ],
     proofSteps: [
       { expression: '\\text{Claim: Euler circuit} \\Rightarrow \\text{all vertices have even degree}', annotation: 'If a circuit exists, we\'ll prove every vertex has even degree.' },
       { expression: '\\text{Every time path enters a vertex, it must leave}', annotation: 'In a circuit, you pass THROUGH each vertex. Each pass uses 2 edges (one in, one out).' },
@@ -109,6 +140,17 @@ function bfs(start, end) {
   ],
 
   challenges: [
+    {
+      id: 'dm-gt-intro-c0',
+      difficulty: 'easy',
+      problem: 'A graph has vertex degrees {1, 2, 2, 3}. Does an Euler path exist?',
+      hint: 'Count how many vertices have odd degree, then apply Euler\'s Theorem for paths.',
+      walkthrough: [
+        { expression: '\\text{Odd-degree vertices: } 1 \\text{ and } 3 \\Rightarrow \\text{exactly 2}', annotation: 'Two of the four degrees (1 and 3) are odd.' },
+        { expression: '\\text{Euler path exists} \\iff \\text{exactly 0 or 2 odd-degree vertices}', annotation: 'Apply the theorem directly.' },
+      ],
+      answer: 'Yes — exactly 2 odd-degree vertices, so an Euler path exists (starting and ending at the two odd-degree vertices).',
+    },
     {
       id: 'dm-gt-intro-c1',
       difficulty: 'medium',
@@ -212,6 +254,47 @@ function bfs(start, end) {
       options: ['Adjacency Matrix', 'Adjacency List', 'Coordinate Plane', 'Array of Arrays'],
       answer: 'Adjacency List',
       hints: ['Adjacency lists only store the edges that actually exist.'],
+    },
+    {
+      id: 'gt-q3',
+      type: 'choice',
+      text: 'What does the Handshaking Lemma state?',
+      options: [
+        'The sum of all vertex degrees equals the number of vertices',
+        'The sum of all vertex degrees equals 2 times the number of edges',
+        'Every graph has an even number of edges',
+        'Every vertex has the same degree',
+      ],
+      answer: 'The sum of all vertex degrees equals 2 times the number of edges',
+      hints: ['Every edge has two endpoints, so it contributes exactly 2 to the total degree count.'],
+    },
+    {
+      id: 'gt-q4',
+      type: 'choice',
+      text: 'A connected graph has vertex degrees {2, 2, 2, 2}. Does it have an Euler circuit?',
+      options: ['Yes — all degrees are even', 'No — needs exactly 0 odd-degree vertices, and there are 4 vertices', 'Cannot be determined', 'Only if it also has an Euler path'],
+      answer: 'Yes — all degrees are even',
+      hints: ['Euler circuit exists iff the graph is connected AND every vertex has even degree — the vertex count doesn\'t matter, only the parity of each degree.'],
+    },
+    {
+      id: 'gt-q5',
+      type: 'input',
+      text: 'A tree has 15 vertices. How many edges does it have?',
+      answer: '14',
+      hints: ['Trees always have exactly n − 1 edges for n vertices.'],
+    },
+    {
+      id: 'gt-q6',
+      type: 'choice',
+      text: 'Which of these is true about a connected planar graph, according to Euler\'s Formula V − E + F = 2?',
+      options: [
+        'F counts only the bounded (inside) faces',
+        'F counts every face including the unbounded outer face',
+        'The formula only applies to trees',
+        'V, E, and F must always be equal',
+      ],
+      answer: 'F counts every face including the unbounded outer face',
+      hints: ['The "outside" of the drawing counts as one face too — forgetting it is the most common way to misapply this formula.'],
     },
   ],
 }

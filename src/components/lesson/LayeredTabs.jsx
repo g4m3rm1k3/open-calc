@@ -2,6 +2,7 @@ import { useState } from 'react'
 import VizFrame from '../viz/VizFrame.jsx'
 import Callout from '../ui/Callout.jsx'
 import DynamicProof from './DynamicProof.jsx'
+import InlineCheck from './InlineCheck.jsx'
 import { parseProse } from '../math/parseProse.jsx'
 
 const TABS = [
@@ -146,6 +147,7 @@ function buildLegacyFlowBlocks(data) {
   const paragraphs = normalizeProseParagraphs(data.prose ?? [])
   const callouts = [...(data.callouts ?? [])]
   const visualizations = collectLegacyVizBlocks(data)
+  const checks = [...(data.checks ?? [])]
   const blocks = []
 
   const slotCount = Math.max(paragraphs.length, 1)
@@ -185,6 +187,17 @@ function buildLegacyFlowBlocks(data) {
     vizBuckets[index % slotCount].push(viz)
   })
 
+  const checksByParagraph = new Map()
+  const trailingChecks = []
+  for (const check of checks) {
+    if (typeof check.afterParagraph === 'number' && check.afterParagraph >= 0 && check.afterParagraph < paragraphs.length) {
+      if (!checksByParagraph.has(check.afterParagraph)) checksByParagraph.set(check.afterParagraph, [])
+      checksByParagraph.get(check.afterParagraph).push(check)
+    } else {
+      trailingChecks.push(check)
+    }
+  }
+
   paragraphs.forEach((paragraph, idx) => {
     blocks.push({ type: 'prose', paragraphs: [paragraph] })
 
@@ -194,6 +207,10 @@ function buildLegacyFlowBlocks(data) {
 
     if ((idx + 1) % 2 === 0 && callouts.length > 0) {
       blocks.push({ type: 'callout', ...callouts.shift() })
+    }
+
+    for (const check of checksByParagraph.get(idx) ?? []) {
+      blocks.push({ type: 'check', ...check })
     }
   })
 
@@ -205,6 +222,10 @@ function buildLegacyFlowBlocks(data) {
     while (bucket.length > 0) {
       blocks.push(bucket.shift())
     }
+  }
+
+  for (const check of trailingChecks) {
+    blocks.push({ type: 'check', ...check })
   }
 
   return blocks
@@ -254,6 +275,17 @@ function SectionContent({ data }) {
             </div>
           )
         }
+        if (block.type === 'check') {
+          return (
+            <InlineCheck
+              key={i}
+              question={block.question}
+              options={block.options}
+              answer={block.answer}
+              explanation={block.explanation}
+            />
+          )
+        }
         return null
       })}
     </div>
@@ -288,6 +320,7 @@ function hasTabContent(section) {
   if (Array.isArray(section.callouts) && section.callouts.length > 0) return true
   if (Array.isArray(section.visualizations) && section.visualizations.length > 0) return true
   if (section.visualizationId) return true
+  if (Array.isArray(section.checks) && section.checks.length > 0) return true
   return false
 }
 

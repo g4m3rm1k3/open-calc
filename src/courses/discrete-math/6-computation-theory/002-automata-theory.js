@@ -31,6 +31,15 @@ export default {
       'Regular expressions and finite automata are two views of the same concept: regular languages.',
       'Automata are graph-theoretic objects with logic on transitions and set-theoretic operations on languages.',
     ],
+    checks: [
+      {
+        afterParagraph: 3,
+        question: 'For the even-number-of-1s DFA, tracing "110" starting at state E gives which final state?',
+        options: ['E (accept)', 'O (reject)', 'Neither — the DFA gets stuck', 'It depends on the order of transitions'],
+        answer: 'E (accept)',
+        explanation: 'E→(1)→O→(1)→E→(0)→E. Two 1s is an even count, so the string ends back at E, the accepting state.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -59,12 +68,39 @@ export default {
       'State minimization finds equivalent-state merges to produce a smallest DFA (up to isomorphism).',
       'Product construction is the workhorse for intersection proofs: states become ordered pairs encoding simultaneous progress in two machines.',
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'Subset construction converts an NFA to a DFA by:',
+        options: [
+          'Deleting all nondeterministic transitions',
+          'Treating each SET of possible NFA states as a single DFA state',
+          'Running the NFA twice',
+          'Adding more accepting states',
+        ],
+        answer: 'Treating each SET of possible NFA states as a single DFA state',
+        explanation: 'Since an NFA can be in multiple states at once, the equivalent DFA tracks the entire SET of currently-possible NFA states as one combined state — collapsing nondeterminism into determinism.',
+      },
+    ],
   },
 
   rigor: {
     prose: [
       'When proving language recognition, use invariant reasoning: after reading prefix w, automaton state encodes a precise property of w.',
       'For conversion proofs, define the semantic meaning of each constructed state and prove transition preservation symbol-by-symbol.',
+    ],
+    checks: [
+      {
+        question: 'To prove a DFA correctly recognizes a language, what does "invariant reasoning" require you to state?',
+        options: [
+          'That the DFA has an even number of states',
+          'A precise property that the current state encodes about the prefix read so far',
+          'The total number of accepting states',
+          'That the DFA runs in constant time',
+        ],
+        answer: 'A precise property that the current state encodes about the prefix read so far',
+        explanation: 'For the even-1s DFA, the invariant is: "state E means the prefix read so far has an even number of 1s." Proving this invariant is preserved by every transition is what makes the correctness argument rigorous.',
+      },
     ],
   },
 
@@ -244,6 +280,42 @@ export default {
       options: ['Mathematical Induction', 'The Pumping Lemma', 'De Morgan\'s Law', 'The Handshaking Lemma'],
       answer: 'The Pumping Lemma',
       hints: ['The Pumping Lemma for Regular Languages detects the lack of finite memory.'],
+    },
+    {
+      id: 'aut-q3',
+      type: 'choice',
+      text: 'A DFA has exactly one accepting state, E, which is also the start state. Reading the empty string ends at E. Is the empty string accepted?',
+      options: ['Yes — you\'re still at the start/accepting state', 'No — you must read at least one symbol', 'It depends on the alphabet', 'DFAs cannot process the empty string'],
+      answer: 'Yes — you\'re still at the start/accepting state',
+      hints: ['Acceptance only depends on which state you\'re in after reading the string — reading zero symbols still counts as "ending" at the start state.'],
+    },
+    {
+      id: 'aut-q4',
+      type: 'choice',
+      text: 'What does subset construction produce when converting an NFA with n states to a DFA?',
+      options: [
+        'A DFA with exactly n states',
+        'A DFA with up to 2ⁿ states, one per possible SET of NFA states',
+        'A DFA with n² states',
+        'A DFA with n/2 states',
+      ],
+      answer: 'A DFA with up to 2ⁿ states, one per possible SET of NFA states',
+      hints: ['Each DFA state corresponds to one subset of the NFA\'s state set — hence up to 2ⁿ possible DFA states, though in practice many are unreachable.'],
+    },
+    {
+      id: 'aut-q5',
+      type: 'choice',
+      text: 'Which construction technique builds a DFA that recognizes the INTERSECTION of two regular languages?',
+      options: ['Subset construction', 'Product construction', 'State minimization', 'The Pumping Lemma'],
+      answer: 'Product construction',
+      hints: ['Product construction pairs up states from both machines, tracking simultaneous progress — a state is accepting only if both component states are accepting.'],
+    },
+    {
+      id: 'aut-q6',
+      type: 'input',
+      text: 'For the even-number-of-1s DFA (states E, O; E accepting and start), what state does the string "111" end on?',
+      answer: 'O',
+      hints: ['Three 1s toggles parity three times: E→O→E→O. Odd count of 1s ends at O (rejected).'],
     },
   ],
 }

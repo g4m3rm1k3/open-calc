@@ -34,6 +34,20 @@ export default {
 
       'A **Karnaugh map** is a grid laid out so that any two horizontally- or vertically-adjacent cells differ in exactly one input variable — which means a rectangular block of 1s that spans two or more cells reveals a variable that "doesn\'t matter" across that block, and can be dropped. In the diagram, both cells in the P=1 row are 1 regardless of Q\'s value, so the whole row collapses from "P·Q + P·¬Q" down to simply "P" — the same simplification the absorption law gives algebraically, but found by pattern-matching on a grid instead of applying a named law.',
     ],
+    checks: [
+      {
+        afterParagraph: 4,
+        question: 'In a Karnaugh map, why does a block of adjacent 1s spanning 2 cells let you drop a variable?',
+        options: [
+          'It doesn\'t — you must always keep every variable',
+          'Adjacent cells differ in exactly one variable, so if both are 1 regardless of that variable\'s value, the variable "doesn\'t matter" and can be dropped',
+          'Because Karnaugh maps only work for 2 variables',
+          'Because the map is drawn in a circle',
+        ],
+        answer: 'Adjacent cells differ in exactly one variable, so if both are 1 regardless of that variable\'s value, the variable "doesn\'t matter" and can be dropped',
+        explanation: 'The grid is laid out specifically so adjacency = "differs in one variable." A 1-block spanning both values of a variable means that variable is irrelevant to the output.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -63,6 +77,20 @@ export default {
 
       'CNF is the form SAT solvers and formal verification tools are built around (checking "is there some assignment that makes every AND-ed clause true" is the canonical SAT problem), while DNF is often more intuitive for direct constructive reasoning ("the function is true exactly when one of these explicit combinations holds").',
     ],
+    checks: [
+      {
+        afterParagraph: 1,
+        question: 'Why is it economically significant that NAND alone is functionally complete?',
+        options: [
+          'It isn\'t significant — NAND is just one of many equally-used gate types',
+          'Chips can be built almost entirely from one uniform gate type, which is cheaper to manufacture repeatedly than several different types',
+          'NAND gates run faster than AND or OR gates',
+          'Functional completeness only matters for software, not hardware',
+        ],
+        answer: 'Chips can be built almost entirely from one uniform gate type, which is cheaper to manufacture repeatedly than several different types',
+        explanation: 'Since NOT, AND, and (via De Morgan) OR can all be built from NAND alone, a fab can mass-produce one gate type instead of several — a real manufacturing cost savings.',
+      },
+    ],
   },
 
   rigor: {
@@ -70,6 +98,19 @@ export default {
       'A symbolic simplification step is valid only if the rewrite rule applied is itself a genuine logical equivalence — provable, in principle, by checking that both sides\' truth tables match on every row. Chaining several valid rewrite steps together produces a valid overall simplification, by transitivity of logical equivalence.',
 
       'To prove two circuits compute the same function, either prove their corresponding Boolean formulas are logically equivalent via the algebraic identities (fast, but requires spotting the right sequence of rewrites), or directly compare their full truth tables row by row (slower — 2ⁿ rows for n inputs — but mechanical and guaranteed to terminate with a definite answer either way).',
+    ],
+    checks: [
+      {
+        question: 'What makes a symbolic simplification step in Boolean algebra valid?',
+        options: [
+          'It looks shorter than the original',
+          'The rewrite rule applied is itself a genuine logical equivalence, verifiable by matching truth tables on every row',
+          'A professor approved it',
+          'It uses fewer parentheses',
+        ],
+        answer: 'The rewrite rule applied is itself a genuine logical equivalence, verifiable by matching truth tables on every row',
+        explanation: 'Validity traces back to truth-table equivalence — any rewrite rule you chain together must itself be provably true on all 2ⁿ input rows.',
+      },
     ],
   },
 
@@ -212,6 +253,47 @@ export default {
       options: ['(NOT A) OR (NOT B)', '(NOT A) AND (NOT B)', 'A AND B', 'A OR B'],
       answer: '(NOT A) AND (NOT B)',
       hints: ['The negation of a disjunction is a conjunction of negations.'],
+    },
+    {
+      id: 'bool-q3',
+      type: 'choice',
+      text: 'What does the absorption law A + (A·B) = A tell you?',
+      options: [
+        'A·B is always False',
+        'The term A·B is redundant once A is already True',
+        'A and B must be equal',
+        'This law only holds for A=0',
+      ],
+      answer: 'The term A·B is redundant once A is already True',
+      hints: ['If A is True, the whole OR expression is already True regardless of B — so A·B adds nothing.'],
+    },
+    {
+      id: 'bool-q4',
+      type: 'choice',
+      text: 'CNF (conjunctive normal form) is structured as:',
+      options: ['An OR of ANDs', 'An AND of ORs', 'A single NOT applied to everything', 'A truth table'],
+      answer: 'An AND of ORs',
+      hints: ['CNF: (A∨B)·(¬A∨C) — clauses joined by AND, each clause itself an OR. This is the form SAT solvers are built around.'],
+    },
+    {
+      id: 'bool-q5',
+      type: 'input',
+      text: 'Simplify: A AND (A OR B). (Answer as a single letter.)',
+      answer: 'A',
+      hints: ['This is the dual form of absorption: A·(A+B) = A.'],
+    },
+    {
+      id: 'bool-q6',
+      type: 'choice',
+      text: 'To prove two circuits compute the same Boolean function, which two methods are valid?',
+      options: [
+        'Guessing and checking one input',
+        'Algebraic identity chains, OR direct row-by-row truth table comparison',
+        'Only algebraic identities — truth tables can\'t prove equivalence',
+        'Only truth tables — algebra can\'t prove equivalence',
+      ],
+      answer: 'Algebraic identity chains, OR direct row-by-row truth table comparison',
+      hints: ['Algebra is faster but requires spotting the right rewrites; truth tables are slower (2ⁿ rows) but mechanical and guaranteed to terminate.'],
     },
   ],
 }

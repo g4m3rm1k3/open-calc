@@ -54,6 +54,21 @@ export default {
 
       "**Where this is heading.** The Pigeonhole Principle is our warmup for the entire course. Every discrete math proof you write will identify a structure — categories, sets, graphs, logical cases — and reason about what must be true given that structure. The Pigeonhole Principle does this with the simplest possible structure: a count. As the course progresses, the structures will become more complex (propositions, sets, graphs, functions), but the logical style — rule out the impossible and conclude the necessary — will remain exactly the same.",
     ],
+    checks: [
+      {
+        afterParagraph: 2,
+        question: 'In the sock problem, what are the "pigeonholes"?',
+        options: ['The individual socks', 'The two colors (black and white)', 'The number 3', 'The drawer itself'],
+        answer: 'The two colors (black and white)',
+        explanation: 'The holes are always the categories you\'re sorting into — here, the two possible colors. The socks themselves are the "pigeons" being distributed.',
+      },
+      {
+        question: 'If 13 people are in a room, how many must share a birth month (12 months in a year)?',
+        options: ['At least 2', 'Exactly 2', 'At least 13', 'It depends on luck'],
+        answer: 'At least 2',
+        explanation: '13 people (pigeons) into 12 months (holes): 13 > 12, so at least one month must contain 2 or more people — guaranteed, not just likely.',
+      },
+    ],
     callouts: [
       {
         type: 'sequencing',
@@ -111,6 +126,15 @@ export default {
 
       "**Identifying the structure.** The skill in using the principle is mapping your problem to the pigeon-and-hole framework. Ask: what are the possible categories (holes)? What are the individual items (pigeons)? What is the total number of each? Once you have those three numbers, arithmetic does the rest. The creative challenge is always identifying the right holes — and sometimes, as in the 'Inevitable Friendship' problem, the holes involve a subtle case analysis before you can even count them.",
     ],
+    checks: [
+      {
+        afterParagraph: 4,
+        question: 'Applying the Generalized Pigeonhole Principle to 9,000,000 people and 300,001 possible hair counts, what is the minimum guaranteed number of people sharing some hair count?',
+        options: ['2', '9', '30', '300,001'],
+        answer: '30',
+        explanation: '⌈9,000,000 / 300,001⌉ = ⌈29.99...⌉ = 30. The large ratio between items and holes makes the guarantee much stronger than the basic "at least 2" case.',
+      },
+    ],
     callouts: [
       {
         type: 'theorem',
@@ -154,6 +178,20 @@ export default {
       "**Historical Note.** The Pigeonhole Principle was first stated explicitly by Peter Gustav Lejeune Dirichlet in 1834 (hence its German name: Schubfachprinzip, 'drawer principle'). Dirichlet used it to prove a theorem about rational approximation of real numbers — specifically, that for any irrational number α and any positive integer N, there exist integers p and q with 1 ≤ q ≤ N such that |α - p/q| < 1/(qN). This application, called Dirichlet's Approximation Theorem, shows the principle operating at the frontier of number theory. The 'pigeons' are the fractional parts of multiples of α; the 'holes' are N equal intervals of the unit interval [0, 1). Despite its simplicity, this technique is cited in hundreds of advanced mathematical proofs.",
 
       "**For the Computer Scientist.** The formal proof below is exactly the argument for why hash table collision is unavoidable: if you have k keys and n < k buckets, and assume every bucket has at most 1 key, you can account for at most n keys — but there are k > n. Contradiction. The math does not depend on the hash function, the data, or the order of insertion. It is a property of the numbers alone. This is why all hash table implementations must include collision handling — it is not optional engineering, it is a mathematical obligation.",
+    ],
+    checks: [
+      {
+        afterParagraph: 3,
+        question: 'Why does proof by contradiction fit the Pigeonhole Principle so naturally?',
+        options: [
+          'Because you can directly point to which container has 2 items',
+          'Because it\'s hard to identify WHICH container is overcrowded, but easy to show "every container has ≤1 item" leads to an impossible total count',
+          'Because contradiction is the only proof technique that exists',
+          'It doesn\'t fit naturally — direct proof is actually easier',
+        ],
+        answer: 'Because it\'s hard to identify WHICH container is overcrowded, but easy to show "every container has ≤1 item" leads to an impossible total count',
+        explanation: 'The principle guarantees existence without telling you which container — exactly the kind of claim contradiction handles well: assume no collision, count the maximum possible total, and show it falls short of k.',
+      },
     ],
 
     // Flat {expression, annotation} steps — DynamicProof (the component that
