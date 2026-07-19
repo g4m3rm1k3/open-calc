@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import BlogPost from '../components/blog/BlogPost.jsx'
 import LoadingSpinner from '../components/ui/LoadingSpinner.jsx'
 import { BLOG_MANIFEST } from '../posts/manifest.ts'
+import { useLocalStorage } from '../hooks/useLocalStorage.js'
 
 // Loader functions only (no `eager: true`) — a post's full body is fetched
 // on demand for the one slug being viewed, not inlined for all 130+ posts
@@ -31,9 +32,10 @@ const SLUG_TO_LOADER = Object.fromEntries(
 
 const ALL_POSTS_META = BLOG_MANIFEST
 
-function SeriesNav({ currentSlug, navigate }) {
+function SeriesNav({ currentSlug, navigate, readSlugs }) {
   const folderSlug = currentSlug.includes('/') ? currentSlug.split('/')[0] : null
   if (!folderSlug) return null
+  const readSet = new Set(readSlugs)
 
   const seriesPosts = ALL_POSTS_META
     .filter(p => p.slug.startsWith(folderSlug + '/'))
@@ -88,9 +90,11 @@ function SeriesNav({ currentSlug, navigate }) {
           >
             <span className="text-xs text-slate-400 dark:text-slate-500 w-5 shrink-0 text-right">{i + 1}.</span>
             <span className="flex-1 min-w-0 whitespace-normal break-words leading-snug">{post.title}</span>
-            {post.slug === currentSlug && (
+            {post.slug === currentSlug ? (
               <span className="text-[11px] text-indigo-400 dark:text-indigo-500 shrink-0">you are here</span>
-            )}
+            ) : readSet.has(post.slug) ? (
+              <span title="Read" className="text-emerald-600 dark:text-emerald-400 text-xs shrink-0">✓</span>
+            ) : null}
           </button>
         ))}
       </div>
@@ -104,6 +108,7 @@ export default function BlogPostPage() {
 
   // undefined = loading, null = not found, string = loaded content
   const [content, setContent] = useState(undefined)
+  const [readSlugs, setReadSlugs] = useLocalStorage('oc-blog-read', [])
 
   useEffect(() => {
     const loader = SLUG_TO_LOADER[slug]
@@ -120,6 +125,12 @@ export default function BlogPostPage() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [slug])
+
+  // Mark as read once the post actually loads (not on a 404).
+  useEffect(() => {
+    if (!content) return
+    setReadSlugs(prev => (prev.includes(slug) ? prev : [...prev, slug]))
+  }, [slug, content, setReadSlugs])
 
   if (content === undefined) {
     return (
@@ -164,7 +175,7 @@ export default function BlogPostPage() {
 
       <BlogPost key={slug} content={content} />
 
-      <SeriesNav currentSlug={slug} navigate={navigate} />
+      <SeriesNav currentSlug={slug} navigate={navigate} readSlugs={readSlugs} />
     </div>
   )
 }

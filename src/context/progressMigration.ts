@@ -310,4 +310,5 @@ export const SYNC_MERGE_STRATEGIES: Record<string, MergeStrategy> = {
   'oc-learning-time': mergeLearningTime,
   'oc-lesson-progress': mergeArrayUnion,
   'vue-studio-v3:milestone-idx': mergeMaxNumber,
+  'oc-blog-read': mergeArrayUnion,
 }

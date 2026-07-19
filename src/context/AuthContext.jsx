@@ -51,6 +51,7 @@ const SYNC_KEYS = [
   'oc-learning-time',         // Monty: total foreground learning time
   'oc-lesson-progress',       // Lesson Engine: completed "seriesId:level" set
   'vue-studio-v3:milestone-idx', // Vue Studio: furthest milestone reached (code files stay local-only)
+  'oc-blog-read',             // Blog: slugs of posts already read
 ]
 
 // Timestamp we write to localStorage after every successful Firestore restore,

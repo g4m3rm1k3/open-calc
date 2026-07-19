@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from "react";
 import AuthButton from "../ui/AuthButton.jsx";
 import {
   Link,
@@ -279,6 +279,15 @@ export default function AppShell({ children }) {
   const isDesktopRoute = location.pathname === '/';
   const pathParts = location.pathname.split('/').filter(Boolean);
   const isLessonRoute = pathParts[0] === 'chapter' && pathParts.length >= 3;
+
+  // Scrollable-full-page routes (blog, calendar) scroll an inner div, not
+  // the window — pages' own `window.scrollTo(0, 0)` on navigation (e.g.
+  // BlogPostPage's prev/next) has no effect there. Reset that container's
+  // scroll position centrally whenever the route changes instead.
+  const contentScrollRef = useRef(null);
+  useEffect(() => {
+    if (isScrollableFullPageRoute) contentScrollRef.current?.scrollTo({ top: 0 });
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
   const isMobile = useIsMobile();
   const isMobileHome = isDesktopRoute && isMobile;
 
@@ -652,6 +661,7 @@ export default function AppShell({ children }) {
             }}
           >
             <div
+              ref={isScrollableFullPageRoute ? contentScrollRef : undefined}
               className={
                 isMobileHome
                   ? "w-full"

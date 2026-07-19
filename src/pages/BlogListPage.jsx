@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BLOG_MANIFEST } from '../posts/manifest.ts'
+import { useLocalStorage } from '../hooks/useLocalStorage.js'
 
 // Metadata for all posts comes from the build-time manifest (see
 // scripts/build-blog-manifest.mjs) instead of eager-loading every post's
@@ -17,6 +18,8 @@ const ALL_POSTS = [...BLOG_MANIFEST].sort((a, b) => {
 export default function BlogListPage() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
+  const [readSlugs] = useLocalStorage('oc-blog-read', [])
+  const readSet = useMemo(() => new Set(readSlugs), [readSlugs])
 
   const { series, standalone, filtered } = useMemo(() => {
     if (query.trim()) {
@@ -85,7 +88,7 @@ export default function BlogListPage() {
           </p>
         ) : (
           <div className="space-y-4">
-            {filtered.map(post => <PostCard key={post.slug} post={post} navigate={navigate} />)}
+            {filtered.map(post => <PostCard key={post.slug} post={post} navigate={navigate} isRead={readSet.has(post.slug)} />)}
           </div>
         )
       )}
@@ -119,7 +122,12 @@ export default function BlogListPage() {
                         <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate">{post.excerpt}</p>
                       )}
                     </div>
-                    <span className="text-xs text-slate-400 dark:text-slate-500 shrink-0">{post.readMin} min</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {readSet.has(post.slug) && (
+                        <span title="Read" className="text-emerald-600 dark:text-emerald-400 text-xs">✓</span>
+                      )}
+                      <span className="text-xs text-slate-400 dark:text-slate-500">{post.readMin} min</span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -132,7 +140,7 @@ export default function BlogListPage() {
               {Object.keys(series).length > 0 && (
                 <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-1">Standalone Posts</h2>
               )}
-              {standalone.map(post => <PostCard key={post.slug} post={post} navigate={navigate} />)}
+              {standalone.map(post => <PostCard key={post.slug} post={post} navigate={navigate} isRead={readSet.has(post.slug)} />)}
             </div>
           )}
 
@@ -156,7 +164,7 @@ export default function BlogListPage() {
   )
 }
 
-function PostCard({ post, navigate }) {
+function PostCard({ post, navigate, isRead }) {
   return (
     <button
       onClick={() => navigate(`/blog/${post.slug}`)}
@@ -164,8 +172,9 @@ function PostCard({ post, navigate }) {
     >
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug mb-2">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug mb-2 flex items-center gap-2">
             {post.title}
+            {isRead && <span title="Read" className="text-emerald-600 dark:text-emerald-400 text-sm shrink-0">✓</span>}
           </h2>
           {post.excerpt && (
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-3">
