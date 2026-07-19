@@ -1,0 +1,41 @@
+<svg viewBox="0 0 560 320" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="560" height="320" rx="10" fill="#f8fafc"/>
+
+  <text x="280" y="28" font-size="13" font-weight="700" fill="#1e293b" text-anchor="middle">Four Proof Strategies</text>
+
+  <!-- Direct -->
+  <rect x="20" y="55" width="250" height="90" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="145" y="76" font-size="12" font-weight="700" fill="#1d4ed8" text-anchor="middle">Direct Proof</text>
+  <text x="35" y="95" font-size="10" fill="#1e40af">Assume p, derive q</text>
+  <text x="35" y="110" font-size="10" fill="#1e40af">step by step using</text>
+  <text x="35" y="125" font-size="10" fill="#1e40af">definitions + algebra.</text>
+  <text x="35" y="140" font-size="9" font-style="italic" fill="#3b82f6">Use when the path is clear.</text>
+
+  <!-- Contrapositive -->
+  <rect x="290" y="55" width="250" height="90" rx="10" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+  <text x="415" y="76" font-size="12" font-weight="700" fill="#065f46" text-anchor="middle">Contrapositive</text>
+  <text x="305" y="95" font-size="10" fill="#065f46">Prove &#172;q &#8594; &#172;p instead —</text>
+  <text x="305" y="110" font-size="10" fill="#065f46">logically identical to p &#8594; q,</text>
+  <text x="305" y="125" font-size="10" fill="#065f46">but often cleaner algebra.</text>
+  <text x="305" y="140" font-size="9" font-style="italic" fill="#10b981">Use when direct proof gets messy.</text>
+
+  <!-- Contradiction -->
+  <rect x="20" y="165" width="250" height="90" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="145" y="186" font-size="12" font-weight="700" fill="#92400e" text-anchor="middle">Contradiction</text>
+  <text x="35" y="205" font-size="10" fill="#92400e">Assume &#172;P, derive an</text>
+  <text x="35" y="220" font-size="10" fill="#92400e">impossibility, conclude</text>
+  <text x="35" y="235" font-size="10" fill="#92400e">P must be true.</text>
+  <text x="35" y="250" font-size="9" font-style="italic" fill="#f59e0b">Use for "there is no...", irrationality, infinitude.</text>
+
+  <!-- Cases -->
+  <rect x="290" y="165" width="250" height="90" rx="10" fill="#fdf4ff" stroke="#a855f7" stroke-width="2"/>
+  <text x="415" y="186" font-size="12" font-weight="700" fill="#6b21a8" text-anchor="middle">Cases</text>
+  <text x="305" y="205" font-size="10" fill="#6b21a8">Split into exhaustive,</text>
+  <text x="305" y="220" font-size="10" fill="#6b21a8">non-overlapping cases;</text>
+  <text x="305" y="235" font-size="10" fill="#6b21a8">prove each separately.</text>
+  <text x="305" y="250" font-size="9" font-style="italic" fill="#a855f7">Use when behavior genuinely differs (sign, parity...).</text>
+
+  <!-- Bottom decision hint -->
+  <text x="280" y="285" font-size="10" fill="#334155" text-anchor="middle">Try Direct first. If it stalls on messy algebra &#8594; Contrapositive.</text>
+  <text x="280" y="300" font-size="10" fill="#334155" text-anchor="middle">If proving impossibility &#8594; Contradiction. If the domain splits naturally &#8594; Cases.</text>
+</svg>

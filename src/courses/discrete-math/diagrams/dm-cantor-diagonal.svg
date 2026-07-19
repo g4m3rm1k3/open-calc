@@ -1,0 +1,32 @@
+<svg viewBox="0 0 460 240" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="460" height="240" rx="10" fill="#f8fafc"/>
+  <text x="230" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Cantor's Diagonal: Building a Number Not on Any List</text>
+
+  <g font-family="monospace" font-size="13">
+    <text x="30" y="48" fill="#334155">x&#8321; = 0.</text>
+    <text x="80" y="48" fill="#ef4444" font-weight="700">2</text><text x="98" y="48" fill="#475569">7 1 8 2 8 ...</text>
+
+    <text x="30" y="74" fill="#334155">x&#8322; = 0.</text>
+    <text x="80" y="74" fill="#475569">3</text><text x="98" y="74" fill="#ef4444" font-weight="700">1</text><text x="112" y="74" fill="#475569">4 1 5 9 ...</text>
+
+    <text x="30" y="100" fill="#334155">x&#8323; = 0.</text>
+    <text x="80" y="100" fill="#475569">5</text><text x="98" y="100" fill="#475569">7</text><text x="112" y="100" fill="#ef4444" font-weight="700">7</text><text x="126" y="100" fill="#475569">2 1 6 ...</text>
+
+    <text x="30" y="126" fill="#334155">x&#8324; = 0.</text>
+    <text x="80" y="126" fill="#475569">1</text><text x="98" y="126" fill="#475569">4</text><text x="112" y="126" fill="#475569">1</text><text x="126" y="126" fill="#ef4444" font-weight="700">4</text><text x="140" y="126" fill="#475569">2 1 ...</text>
+
+    <text x="30" y="152" fill="#94a3b8">x&#8325; = 0.</text>
+    <text x="80" y="152" fill="#94a3b8">...</text>
+  </g>
+
+  <!-- diagonal box highlight -->
+  <rect x="74" y="36" width="14" height="18" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <rect x="92" y="62" width="14" height="18" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <rect x="106" y="88" width="14" height="18" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <rect x="120" y="114" width="14" height="18" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+
+  <text x="230" y="165" font-size="10.5" fill="#334155" text-anchor="middle">Take the diagonal digits (2,1,7,4,...), change each one (e.g. +1), and build a new number:</text>
+  <text x="230" y="183" font-size="12" font-family="monospace" font-weight="700" fill="#7c3aed" text-anchor="middle">y = 0.3285...</text>
+  <text x="230" y="204" font-size="10" fill="#334155" text-anchor="middle">y differs from every xₙ in at least the nth digit — so y cannot be anywhere on the list.</text>
+  <text x="230" y="220" font-size="10" fill="#334155" text-anchor="middle">Any supposed complete list of reals is provably incomplete. &#8477; is uncountable.</text>
+</svg>

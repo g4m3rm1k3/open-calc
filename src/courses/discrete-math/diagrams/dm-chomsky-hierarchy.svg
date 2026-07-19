@@ -1,0 +1,18 @@
+<svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="340" height="260" rx="10" fill="#f8fafc"/>
+  <text x="170" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">The Chomsky Hierarchy — Nested Language Classes</text>
+
+  <ellipse cx="170" cy="150" rx="150" ry="90" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+  <text x="170" y="70" font-size="10" font-weight="700" fill="#92400e" text-anchor="middle">Recursively Enumerable (Turing Machines)</text>
+
+  <ellipse cx="170" cy="160" rx="115" ry="68" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+  <text x="170" y="102" font-size="10" font-weight="700" fill="#9d174d" text-anchor="middle">Context-Sensitive</text>
+
+  <ellipse cx="170" cy="170" rx="80" ry="48" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="170" y="132" font-size="10" font-weight="700" fill="#1e3a8a" text-anchor="middle">Context-Free (PDA)</text>
+
+  <ellipse cx="170" cy="185" rx="45" ry="28" fill="#d1fae5" stroke="#059669" stroke-width="1.5"/>
+  <text x="170" y="190" font-size="9.5" font-weight="700" fill="#065f46" text-anchor="middle">Regular (DFA)</text>
+
+  <text x="170" y="245" font-size="9.5" fill="#334155" text-anchor="middle">Regular &#8834; Context-Free &#8834; Context-Sensitive &#8834; Recursively Enumerable</text>
+</svg>

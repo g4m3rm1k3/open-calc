@@ -1,0 +1,45 @@
+<svg viewBox="0 0 460 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="460" height="260" rx="10" fill="#f8fafc"/>
+
+  <text x="230" y="26" font-size="13" font-weight="700" fill="#1e293b" text-anchor="middle">The Conditional p &#8594; q — "If p, then q"</text>
+  <text x="230" y="42" font-size="10" fill="#64748b" text-anchor="middle">A promise: broken only when p is kept but q is not delivered</text>
+
+  <!-- Table header -->
+  <rect x="80" y="60" width="300" height="34" fill="#1e293b"/>
+  <text x="150" y="82" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">p</text>
+  <text x="230" y="82" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">q</text>
+  <text x="330" y="82" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">p &#8594; q</text>
+
+  <!-- Row 1: T T T -->
+  <rect x="80" y="94" width="300" height="38" fill="#f0fdf4"/>
+  <text x="150" y="118" font-size="12" text-anchor="middle" fill="#065f46">T</text>
+  <text x="230" y="118" font-size="12" text-anchor="middle" fill="#065f46">T</text>
+  <text x="330" y="118" font-size="12" font-weight="700" text-anchor="middle" fill="#065f46">T</text>
+  <text x="400" y="118" font-size="9" fill="#065f46">promise kept</text>
+
+  <!-- Row 2: T F F -->
+  <rect x="80" y="132" width="300" height="38" fill="#fee2e2"/>
+  <text x="150" y="156" font-size="12" text-anchor="middle" fill="#991b1b">T</text>
+  <text x="230" y="156" font-size="12" text-anchor="middle" fill="#991b1b">F</text>
+  <text x="330" y="156" font-size="12" font-weight="700" text-anchor="middle" fill="#991b1b">F</text>
+  <text x="400" y="156" font-size="9" fill="#991b1b">broken!</text>
+
+  <!-- Row 3: F T T -->
+  <rect x="80" y="170" width="300" height="38" fill="#eff6ff"/>
+  <text x="150" y="194" font-size="12" text-anchor="middle" fill="#1d4ed8">F</text>
+  <text x="230" y="194" font-size="12" text-anchor="middle" fill="#1d4ed8">T</text>
+  <text x="330" y="194" font-size="12" font-weight="700" text-anchor="middle" fill="#1d4ed8">T</text>
+  <text x="400" y="194" font-size="9" fill="#1d4ed8">never tested</text>
+
+  <!-- Row 4: F F T -->
+  <rect x="80" y="208" width="300" height="38" fill="#eff6ff"/>
+  <text x="150" y="232" font-size="12" text-anchor="middle" fill="#1d4ed8">F</text>
+  <text x="230" y="232" font-size="12" text-anchor="middle" fill="#1d4ed8">F</text>
+  <text x="330" y="232" font-size="12" font-weight="700" text-anchor="middle" fill="#1d4ed8">T</text>
+  <text x="400" y="232" font-size="9" fill="#1d4ed8">never tested</text>
+
+  <!-- Grid lines -->
+  <rect x="80" y="60" width="300" height="186" fill="none" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="180" y1="60" x2="180" y2="246" stroke="#cbd5e1" stroke-width="1"/>
+  <line x1="280" y1="60" x2="280" y2="246" stroke="#cbd5e1" stroke-width="1"/>
+</svg>

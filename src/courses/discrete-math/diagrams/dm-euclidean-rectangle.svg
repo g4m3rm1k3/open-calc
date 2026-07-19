@@ -1,0 +1,32 @@
+<svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="460" height="220" rx="10" fill="#f8fafc"/>
+  <text x="230" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">gcd(12, 18) = 6 — The Largest Square That Tiles the Rectangle</text>
+
+  <!-- 12 x 18 rectangle, scaled: use 8px per unit -->
+  <!-- width 18*8=144 wait let's use scale 8: 12->96, 18->144 -->
+  <g transform="translate(60,40)">
+    <rect x="0" y="0" width="144" height="96" fill="none" stroke="#334155" stroke-width="2"/>
+    <!-- 6x6 tiles: 6*8=48px each -->
+    <g stroke="#3b82f6" stroke-width="1.2">
+      <!-- vertical lines every 48px -->
+      <line x1="48" y1="0" x2="48" y2="96"/>
+      <line x1="96" y1="0" x2="96" y2="96"/>
+      <!-- horizontal lines every 48px -->
+      <line x1="0" y1="48" x2="144" y2="48"/>
+    </g>
+    <g fill="#dbeafe" fill-opacity="0.5">
+      <rect x="1" y="1" width="46" height="46"/>
+      <rect x="49" y="1" width="46" height="46"/>
+      <rect x="97" y="1" width="46" height="46"/>
+      <rect x="1" y="49" width="46" height="46"/>
+      <rect x="49" y="49" width="46" height="46"/>
+      <rect x="97" y="49" width="46" height="46"/>
+    </g>
+    <text x="72" y="-8" font-size="10" fill="#475569" text-anchor="middle">18</text>
+    <text x="-12" y="52" font-size="10" fill="#475569" text-anchor="middle">12</text>
+    <text x="24" y="28" font-size="8" fill="#1e40af" text-anchor="middle">6&#215;6</text>
+  </g>
+
+  <text x="230" y="175" font-size="10" fill="#334155" text-anchor="middle">A 12&#215;18 rectangle tiles exactly with six 6&#215;6 squares — no cutting, no gaps.</text>
+  <text x="230" y="192" font-size="10" fill="#334155" text-anchor="middle">No larger square works: try 7&#215;7 or 8&#215;8 and a leftover strip is unavoidable.</text>
+</svg>

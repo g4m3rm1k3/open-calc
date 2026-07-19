@@ -1,3 +1,5 @@
+import quantifiersForallExistsUrl from '../diagrams/dm-quantifiers-forall-exists.svg?url'
+
 export default {
   id: 'discrete-1-01a',
   slug: 'predicate-logic-and-quantifiers',
@@ -33,7 +35,6 @@ export default {
   hook: {
     question: "If I say 'Someone in this room is a spy,' how many people must you check to prove it true? What if I claim 'Everyone in this room is a spy' — how many do you need to check to prove that FALSE?",
     realWorldContext: "Propositional logic is powerful but limited — it can only reason about specific, fixed statements. A database of one million users cannot be queried with one million hand-written 'AND' statements. SQL's WHERE clause, Python's 'any()' and 'all()' functions, and every mathematical proof about infinite sets all rely on predicate logic: a system that lets you make a single statement ranging over an entire domain. When a mathematician writes 'for all integers n, if n is even then n² is even,' they are using the universal quantifier to make one claim that covers infinitely many cases simultaneously. This lesson builds the language behind that power.",
-    previewVisualizationId: 'QuantifierGridLab',
   },
 
   intuition: {
@@ -49,6 +50,10 @@ export default {
       "This asymmetry in proof effort is crucial. To **prove** ∀x P(x), you cannot test every element — there may be infinitely many. You must argue for a generic, arbitrary element and show P holds without using any special property of that element. To **disprove** ∀x P(x), you only need a single counterexample — one element where P fails. Conversely, to **prove** ∃x P(x), you only need to produce one witness — one specific element where P is True. To **disprove** ∃x P(x), you must show P fails for every element — a universal proof in disguise.",
 
       "**The Spy Room.** 'Someone in this room is a spy' is ∃x Spy(x). To prove it true, you point to one spy — done. 'Everyone in this room is a spy' is ∀x Spy(x). To prove it false, you point to one non-spy — a counterexample. Notice how the effort is reversed for proof vs. disproof depending on the quantifier. This is not a trick — it is the formal manifestation of what 'for all' and 'there exists' mean.",
+
+      `![Side by side: a ∀x grid where one failure breaks the claim, and an ∃x grid where one success proves it](${quantifiersForallExistsUrl})`,
+
+      "The two grids above are the whole asymmetry in one picture. On the left, seven checkmarks and one ✗ — the single ✗ is all it takes to sink ∀x P(x). On the right, seven ✗'s and one checkmark — that lone checkmark is all it takes to establish ∃x P(x). Same eight objects, opposite verdicts, because the two quantifiers are asking fundamentally different questions of the same data.",
 
       "**Negating quantified statements.** What does it mean to deny 'Every apple in this basket is red'? You are NOT claiming 'Every apple in this basket is not red.' You are claiming 'At least one apple is not red.' Formally: ¬(∀x P(x)) ≡ ∃x ¬P(x). The negation pushes inward, flips the quantifier, and lands on the predicate. The same logic applies in reverse: ¬(∃x P(x)) ≡ ∀x ¬P(x). To deny 'There is a spy in this room,' you must show every person is not a spy. These are the De Morgan's Laws for quantifiers — exact analogues of the propositional versions, but now ranging over domains.",
 
@@ -117,12 +122,12 @@ export default {
       {
         type: 'theorem',
         title: "De Morgan's Laws for Quantifiers",
-        body: '\\neg(\\forall x\\, P(x)) \\equiv \\exists x\\, (\\neg P(x))\n\n\\neg(\\exists x\\, P(x)) \\equiv \\forall x\\, (\\neg P(x))\n\nTo push ¬ past a quantifier: flip ∀ to ∃ (or ∃ to ∀), then land ¬ on the predicate.',
+        body: '\\[\\neg(\\forall x\\, P(x)) \\equiv \\exists x\\, (\\neg P(x))\\]\n\n\\[\\neg(\\exists x\\, P(x)) \\equiv \\forall x\\, (\\neg P(x))\\]\n\nTo push ¬ past a quantifier: flip ∀ to ∃ (or ∃ to ∀), then land ¬ on the predicate.',
       },
       {
         type: 'theorem',
         title: 'Quantifier Order Is Not Commutative',
-        body: '\\forall x\\, \\exists y\\, P(x,y) \\not\\equiv \\exists y\\, \\forall x\\, P(x,y) \\quad \\text{in general}\n\nThe left is true whenever a response to each challenge exists.\nThe right requires a single fixed response that works for every challenge simultaneously.',
+        body: '\\[\\forall x\\, \\exists y\\, P(x,y) \\not\\equiv \\exists y\\, \\forall x\\, P(x,y)\\]\n\nThe left is true whenever a response to each challenge exists. The right requires a single fixed response that works for every challenge simultaneously.',
       },
       {
         type: 'insight',
@@ -160,53 +165,39 @@ export default {
       "**For the programmer.** Every loop invariant in program verification is a universal statement: ∀ iterations i, property P(i) holds. Proving the invariant requires a universal generalization argument (induction). Every assertion of the form 'this function works for all inputs of type T' is a universal claim. Understanding quantifier structure helps you write and verify correct loop invariants and function contracts.",
     ],
 
+    // Flat {expression, annotation} steps — DynamicProof (the component that
+    // renders rigor.proofSteps) reads exactly this shape per step. Four
+    // worked derivations back to back, each opening with a bold header step.
     proofSteps: [
-      {
-        title: 'Negating a Simple Universal Statement',
-        description: 'Show that ¬(∀x ∈ ℤ, x² ≥ 0) ≡ ∃x ∈ ℤ, x² < 0 — step by step.',
-        steps: [
-          { tag: 'Original', instruction: 'Start with the statement to negate.', math: '\\forall x \\in \\mathbb{Z},\\; x^2 \\geq 0' },
-          { tag: 'Apply ¬', instruction: 'Wrap in negation.', math: '\\neg(\\forall x \\in \\mathbb{Z},\\; x^2 \\geq 0)' },
-          { tag: 'Push ¬ Past ∀', instruction: 'Flip ∀ to ∃; land ¬ on predicate.', math: '\\exists x \\in \\mathbb{Z},\\; \\neg(x^2 \\geq 0)' },
-          { tag: 'Simplify Predicate', instruction: 'Negate the inequality: ¬(x² ≥ 0) becomes x² < 0.', math: '\\exists x \\in \\mathbb{Z},\\; x^2 < 0' },
-          { tag: 'Interpret', instruction: 'The negation claims there is an integer whose square is negative. Over ℤ this is False — confirming the original ∀ statement is True.', math: '\\text{No such integer exists} \\implies \\text{original } \\forall \\text{ is True.}' },
-        ],
-      },
-      {
-        title: 'Negating the Formal Definition of a Limit',
-        description: 'Push ¬ through all three quantifiers in the epsilon-delta definition.',
-        steps: [
-          { tag: 'Limit Definition', instruction: 'The formal definition: limit = L means the following holds.', math: '\\forall \\varepsilon > 0,\\; \\exists \\delta > 0,\\; \\forall x \\in \\mathbb{R},\\; (0 < |x-c| < \\delta \\implies |f(x)-L| < \\varepsilon)' },
-          { tag: 'Wrap in ¬', instruction: 'We want to negate the entire statement — the limit does NOT equal L.', math: '\\neg\\bigl(\\forall \\varepsilon > 0,\\; \\exists \\delta > 0,\\; \\forall x,\\; P(x)\\bigr)' },
-          { tag: 'Push past ∀ε', instruction: 'Flip ∀ to ∃.', math: '\\exists \\varepsilon > 0,\\; \\neg\\bigl(\\exists \\delta > 0,\\; \\forall x,\\; P(x)\\bigr)' },
-          { tag: 'Push past ∃δ', instruction: 'Flip ∃ to ∀.', math: '\\exists \\varepsilon > 0,\\; \\forall \\delta > 0,\\; \\neg\\bigl(\\forall x,\\; P(x)\\bigr)' },
-          { tag: 'Push past ∀x', instruction: 'Flip ∀ to ∃; ¬ lands on the inner conditional.', math: '\\exists \\varepsilon > 0,\\; \\forall \\delta > 0,\\; \\exists x \\in \\mathbb{R},\\; \\neg(0 < |x-c| < \\delta \\implies |f(x)-L| < \\varepsilon)' },
-          { tag: 'Negate the Conditional', instruction: '¬(A → B) ≡ A ∧ ¬B (from Lesson 01).', math: '\\exists \\varepsilon > 0,\\; \\forall \\delta > 0,\\; \\exists x \\in \\mathbb{R},\\; \\bigl(0 < |x-c| < \\delta \\;\\wedge\\; |f(x)-L| \\geq \\varepsilon\\bigr)' },
-          { tag: 'Interpret', instruction: 'The limit is NOT L means: there is a fixed tolerance ε such that no matter how small a δ you choose, there is always an x within δ of c with f(x) outside the ε-band around L.', math: '\\text{This is the classical definition of "the limit fails to equal } L\\text{."}' },
-        ],
-      },
-      {
-        title: 'Proving a Universal Statement: ∀n ∈ ℤ, if n is even then n² is even',
-        description: 'A complete proof by universal generalization — the template for all universal proofs.',
-        steps: [
-          { tag: 'State Goal', instruction: 'We want to prove: for all integers n, if n is even then n² is even.', math: '\\forall n \\in \\mathbb{Z},\\; \\text{Even}(n) \\implies \\text{Even}(n^2)' },
-          { tag: 'Introduce Arbitrary n', instruction: '"Let n be an arbitrary integer." We make no assumption about n other than n ∈ ℤ.', math: 'n \\in \\mathbb{Z} \\text{ (arbitrary)}' },
-          { tag: 'Assume n Is Even', instruction: 'We are proving a conditional, so assume the hypothesis: n is even.', math: 'n = 2k \\text{ for some } k \\in \\mathbb{Z}' },
-          { tag: 'Compute n²', instruction: 'Square both sides.', math: 'n^2 = (2k)^2 = 4k^2 = 2(2k^2)' },
-          { tag: 'Identify Structure', instruction: 'Let m = 2k². Since k ∈ ℤ, we have m ∈ ℤ. So n² = 2m — even by definition.', math: 'n^2 = 2m,\\; m \\in \\mathbb{Z} \\implies n^2 \\text{ is even}' },
-          { tag: 'Universal Generalization', instruction: 'Since n was arbitrary, the result holds for all integers n.', math: '\\therefore\\; \\forall n \\in \\mathbb{Z},\\; \\text{Even}(n) \\implies \\text{Even}(n^2). \\quad \\blacksquare' },
-        ],
-      },
-      {
-        title: 'Disproving a Universal Statement: Counterexample',
-        description: 'Disprove ∀n ∈ ℤ, n² > n by providing a counterexample.',
-        steps: [
-          { tag: 'Identify Goal', instruction: 'To disprove ∀n ∈ ℤ, n² > n, we need exactly one n where n² ≤ n.', math: '\\text{Disprove: } \\forall n \\in \\mathbb{Z},\\; n^2 > n' },
-          { tag: 'Try n = 1', instruction: 'Substitute n = 1 and check.', math: '1^2 = 1 \\not> 1' },
-          { tag: 'Counterexample Found', instruction: 'n = 1 gives n² = n, which violates n² > n (strictly greater than).', math: 'n = 1:\\; n^2 = 1 \\leq 1 = n \\quad \\checkmark \\text{ counterexample}' },
-          { tag: 'Conclude', instruction: 'Since we found one n ∈ ℤ where n² > n is False, the universal statement is False.', math: '\\therefore\\; \\forall n \\in \\mathbb{Z},\\; n^2 > n \\text{ is FALSE.} \\quad \\blacksquare' },
-        ],
-      },
+      { expression: '\\textbf{1. Negating a Simple Universal Statement}', annotation: 'Show that ¬(∀x ∈ ℤ, x² ≥ 0) ≡ ∃x ∈ ℤ, x² < 0 — step by step.' },
+      { expression: '\\forall x \\in \\mathbb{Z},\\; x^2 \\geq 0', annotation: '**Original.** Start with the statement to negate.' },
+      { expression: '\\neg(\\forall x \\in \\mathbb{Z},\\; x^2 \\geq 0)', annotation: '**Apply ¬.** Wrap the whole statement in negation.' },
+      { expression: '\\exists x \\in \\mathbb{Z},\\; \\neg(x^2 \\geq 0)', annotation: '**Push ¬ past ∀.** Flip ∀ to ∃; the ¬ lands on the predicate.' },
+      { expression: '\\exists x \\in \\mathbb{Z},\\; x^2 < 0', annotation: '**Simplify the predicate.** ¬(x² ≥ 0) becomes x² < 0.' },
+      { expression: '\\text{No such integer exists} \\implies \\text{original } \\forall \\text{ is True.}', annotation: '**Interpret.** The negation claims there is an integer whose square is negative. Over ℤ this is False — confirming the original ∀ statement is True.' },
+
+      { expression: '\\textbf{2. Negating the Formal Definition of a Limit}', annotation: 'Push ¬ through all three nested quantifiers in the epsilon-delta definition.' },
+      { expression: '\\forall \\varepsilon > 0,\\; \\exists \\delta > 0,\\; \\forall x \\in \\mathbb{R},\\; (0 < |x-c| < \\delta \\implies |f(x)-L| < \\varepsilon)', annotation: '**Limit definition.** This is the formal statement that "limit = L."' },
+      { expression: '\\neg\\bigl(\\forall \\varepsilon > 0,\\; \\exists \\delta > 0,\\; \\forall x,\\; P(x)\\bigr)', annotation: '**Wrap in ¬.** We want to negate the entire statement — the limit does NOT equal L.' },
+      { expression: '\\exists \\varepsilon > 0,\\; \\neg\\bigl(\\exists \\delta > 0,\\; \\forall x,\\; P(x)\\bigr)', annotation: '**Push past ∀ε.** Flip ∀ to ∃.' },
+      { expression: '\\exists \\varepsilon > 0,\\; \\forall \\delta > 0,\\; \\neg\\bigl(\\forall x,\\; P(x)\\bigr)', annotation: '**Push past ∃δ.** Flip ∃ to ∀.' },
+      { expression: '\\exists \\varepsilon > 0,\\; \\forall \\delta > 0,\\; \\exists x \\in \\mathbb{R},\\; \\neg(0 < |x-c| < \\delta \\implies |f(x)-L| < \\varepsilon)', annotation: '**Push past ∀x.** Flip ∀ to ∃; ¬ now lands on the inner conditional.' },
+      { expression: '\\exists \\varepsilon > 0,\\; \\forall \\delta > 0,\\; \\exists x \\in \\mathbb{R},\\; \\bigl(0 < |x-c| < \\delta \\;\\wedge\\; |f(x)-L| \\geq \\varepsilon\\bigr)', annotation: '**Negate the conditional.** ¬(A → B) ≡ A ∧ ¬B, the rule from the propositions lesson.' },
+      { expression: '\\text{This is the classical definition of "the limit fails to equal } L\\text{."}', annotation: '**Interpret.** The limit is NOT L means: there is a fixed tolerance ε such that no matter how small a δ you choose, there is always an x within δ of c with f(x) outside the ε-band around L.' },
+
+      { expression: '\\textbf{3. Proving a Universal Statement}', annotation: '∀n ∈ ℤ, if n is even then n² is even — the template for all universal proofs.' },
+      { expression: '\\forall n \\in \\mathbb{Z},\\; \\text{Even}(n) \\implies \\text{Even}(n^2)', annotation: '**State the goal.** We want to prove: for all integers n, if n is even then n² is even.' },
+      { expression: 'n \\in \\mathbb{Z} \\text{ (arbitrary)}', annotation: '**Introduce an arbitrary n.** "Let n be an arbitrary integer" — we assume nothing about n except n ∈ ℤ.' },
+      { expression: 'n = 2k \\text{ for some } k \\in \\mathbb{Z}', annotation: '**Assume n is even.** We are proving a conditional, so assume the hypothesis.' },
+      { expression: 'n^2 = (2k)^2 = 4k^2 = 2(2k^2)', annotation: '**Compute n².** Square both sides.' },
+      { expression: 'n^2 = 2m,\\; m \\in \\mathbb{Z} \\implies n^2 \\text{ is even}', annotation: '**Identify the structure.** Let m = 2k². Since k ∈ ℤ, m ∈ ℤ too. So n² = 2m — even by definition.' },
+      { expression: '\\therefore\\; \\forall n \\in \\mathbb{Z},\\; \\text{Even}(n) \\implies \\text{Even}(n^2). \\quad \\blacksquare', annotation: '**Universal generalization.** Since n was arbitrary (no special property of n was used), the result holds for all integers n.' },
+
+      { expression: '\\textbf{4. Disproving a Universal Statement}', annotation: 'A counterexample is enough — no need to check every case.' },
+      { expression: '\\text{Disprove: } \\forall n \\in \\mathbb{Z},\\; n^2 > n', annotation: '**Identify the goal.** To disprove ∀n ∈ ℤ, n² > n, we need exactly one n where n² ≤ n.' },
+      { expression: '1^2 = 1 \\not> 1', annotation: '**Try n = 1.** Substitute and check.' },
+      { expression: 'n = 1:\\; n^2 = 1 \\leq 1 = n \\quad \\checkmark \\text{ counterexample}', annotation: '**Counterexample found.** n = 1 gives n² = n, which violates the strict inequality n² > n.' },
+      { expression: '\\therefore\\; \\forall n \\in \\mathbb{Z},\\; n^2 > n \\text{ is FALSE.} \\quad \\blacksquare', annotation: '**Conclude.** Since we found one n ∈ ℤ where n² > n is False, the universal statement is False.' },
     ],
 
     callouts: [
@@ -375,19 +366,19 @@ export default {
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-01-propositions',
+        lessonId: 'discrete-1-01',
         label: 'Propositions and Proof Techniques',
         note: 'Predicate logic builds directly on propositional logic. The conditional (→), negation (¬), and De Morgan\'s Laws you learned there are used constantly here — especially when negating predicates inside quantified statements.',
       },
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-02-induction',
+        lessonId: 'discrete-1-03',
         label: 'Mathematical Induction',
         note: 'Induction is the machine for proving universal statements ∀n ∈ ℕ, P(n). Every induction proof is a proof of a universally quantified statement — you will use the universal generalization pattern from this lesson constantly.',
       },
       {
-        lessonId: 'discrete-1-03-counting',
+        lessonId: 'discrete-1-04',
         label: 'Counting and Combinatorics',
         note: 'Many combinatorial identities are stated as universal claims: ∀n ∈ ℕ, C(n,k) = n!/(k!(n−k)!). Proving them rigorously requires the universal generalization techniques from this lesson.',
       },

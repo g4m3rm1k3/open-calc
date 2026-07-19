@@ -1,4 +1,7 @@
 // FILE: src/content/discrete-math/01-propositions-and-proof-techniques.js
+import implicationTruthTableUrl from '../diagrams/dm-implication-truth-table.svg?url'
+import proofStrategiesMapUrl from '../diagrams/dm-proof-strategies-map.svg?url'
+
 export default {
   id: 'discrete-1-01',
   slug: 'propositions-and-proof-techniques',
@@ -33,7 +36,6 @@ export default {
   hook: {
     question: "If I promise you: 'If you get an A on the test, I will buy you a car.' Then you get a B — but I buy you a car anyway. Did I logically break my promise?",
     realWorldContext: "Almost everyone says yes. In everyday language, we hear 'if' and assume 'only if.' But in mathematics and software engineering, the answer is undeniably NO — and the distinction costs companies millions of dollars every year in buggy security code. Authentication logic, access control policies, and database query conditions all depend on the precise mathematical meaning of 'if-then.' A security engineer who confuses 'if authenticated then grant access' with 'if granted access then must be authenticated' creates a backdoor. Formal logic is not a philosophical game — it is the grammar of every proof you will ever write and every program that must be correct.",
-    previewVisualizationId: 'TruthTableLab',
   },
 
   intuition: {
@@ -49,6 +51,10 @@ export default {
       "The conditional 'if p then q' — written p → q — is the engine of all mathematical proof. It seems simple, but it behaves in a way that violates human intuition, and that violation causes beginners to stumble on proof problems repeatedly. Let's confront it directly now, before it becomes a mystery. The conditional p → q is False in exactly one situation: when p is True and q is False. In every other situation — including when p is False — it is True. If I promise 'if you get an A, I will buy you a car' and you get a B, I made no promise about what happens when you get a B. My promise was not broken. A promise can only be broken by fulfilling the condition and then failing to deliver.",
 
       "This single fact — the conditional is only False when the premise is True and the conclusion is False — has a name: **vacuous truth**. When the hypothesis p is False, the conditional p → q is True regardless of q. This is not a loophole or a philosophical curiosity; it is a precise engineering specification. In code, 'if (x > 100) { do something }' only executes the body when x > 100. When x is 3, the condition is False and nothing happens — but the 'if statement' was not violated. It just didn't fire.",
+
+      `![Truth table for p implies q, showing the single False row and the two vacuously-true rows](${implicationTruthTableUrl})`,
+
+      "The table makes the promise metaphor literal. Row 1: the promise was made and kept — True. Row 2: made and broken — the only False row. Rows 3 and 4: p was never True, so the promise was never invoked — vacuously True either way. Every one of the counterintuitive cases lives in rows 3 and 4, and the table shows there is nothing mysterious about them: they are just the rows where the 'if' never fired.",
 
       "**Two variations that will trick you constantly.** The **converse** of p → q is q → p. These are NOT logically equivalent. 'If it is raining, then the ground is wet' is true. Its converse, 'if the ground is wet, then it is raining,' is False — sprinklers exist. The **contrapositive** of p → q is ¬q → ¬p. These ARE equivalent — they have identical truth tables. 'If it is raining, then the ground is wet' means exactly the same thing as 'if the ground is not wet, then it is not raining.' This equivalence is the foundation of proof by contrapositive: whenever a direct proof is awkward, you can flip the statement and prove the contrapositive instead.",
 
@@ -94,10 +100,9 @@ export default {
         caption: 'Build any expression and read its truth table. Make a Tautology (all T), a Contradiction (all F), or verify two expressions are logically equivalent by comparing their final columns.',
       },
       {
-        id: 'VennDiagram',
-        title: 'Venn Diagram View of AND and OR',
-        mathBridge: 'Set p to "is a mammal" and q to "lives in water." The AND region (p ∧ q) is the overlap — whales and dolphins. The OR region (p ∨ q) is the entire shaded area — everything that satisfies at least one. NOT p is everything outside the p circle. Try toggling the connective and notice how De Morgan\'s Law shows up geometrically: NOT (p AND q) is the complement of the overlap, which is everything outside it — exactly NOT p OR NOT q.',
-        caption: 'The Venn diagram makes AND and OR geometric: AND is intersection, OR is union. NOT is complement. De Morgan\'s Law is the visual complement of an intersection.',
+        id: 'ConditionalVariantsLab',
+        title: 'Conditional Variants Lab',
+        caption: 'Toggle P and Q and watch Converse, Inverse, and Contrapositive update live — see exactly why proof by contrapositive works.',
       },
     ],
   },
@@ -108,11 +113,17 @@ export default {
 
       "Two compound propositions are **logically equivalent** — written ≡ — if they have the same truth value under every possible assignment of truth values to their variables. The most important equivalences in proof strategy are these: the contrapositive (p → q ≡ ¬q → ¬p), implication as disjunction (p → q ≡ ¬p ∨ q), and De Morgan's Laws (¬(p ∧ q) ≡ ¬p ∨ ¬q and ¬(p ∨ q) ≡ ¬p ∧ ¬q). Each one lets you substitute one form of a statement for another — which is exactly what proof techniques do.",
 
-      "Now we can state the three foundational proof templates precisely. The first is **Direct Proof**: to prove that a statement of the form p → q is true, assume p is True and deduce q using a chain of valid logical steps. Each step must follow from the previous step by a known theorem, definition, or algebraic law. The word 'assume' is not optional — you explicitly state 'Assume p' at the beginning, and then every subsequent line is constrained by that assumption and by logic.",
+      "Now we can state the four foundational proof templates precisely. The first is **Direct Proof**: to prove that a statement of the form p → q is true, assume p is True and deduce q using a chain of valid logical steps. Each step must follow from the previous step by a known theorem, definition, or algebraic law. The word 'assume' is not optional — you explicitly state 'Assume p' at the beginning, and then every subsequent line is constrained by that assumption and by logic.",
 
       "The second is **Proof by Contrapositive**: since p → q is logically equivalent to ¬q → ¬p, you can prove the contrapositive instead whenever it is easier. The key move is recognizing when a direct proof requires solving for the hypothesis (which is often algebraically messy), while the contrapositive lets you start with a clean assumption and push forward. The proof of the contrapositive is a direct proof of ¬q → ¬p — you assume ¬q and deduce ¬p.",
 
       "The third is **Proof by Contradiction**: to prove statement P, assume ¬P (the negation of what you want to prove) and derive a contradiction — any statement of the form Q ∧ ¬Q, or a statement that contradicts a known fact, definition, or the original hypothesis. Since valid logic from a True premise cannot yield a contradiction, your assumption ¬P must have been False, which means P is True. The power of this technique is that it converts an existence claim or an impossibility claim into an algebraic problem.",
+
+      "The fourth is **Proof by Cases**: when the statement you are proving doesn't yield to one clean algebraic path — because different inputs genuinely behave differently — split the universe of possibilities into an exhaustive set of non-overlapping cases, then prove the claim separately within each one. 'Exhaustive' is the load-bearing word: the cases must cover every possibility with no gaps, or the proof has a hole. Case splits typically come from a natural either/or already hiding in the statement: a number is either even or odd, a real number is positive, negative, or zero, an element either belongs to a set or it doesn't. Proving each case is usually just a direct proof restricted to that slice of the universe — the technique isn't a new kind of logical move, it's a strategy for organizing several direct proofs into one complete argument.",
+
+      `![Decision map for the four proof strategies: Direct, Contrapositive, Contradiction, and Cases](${proofStrategiesMapUrl})`,
+
+      "Keep this map close for the rest of the course. Every proof you meet from here on is answerable by one of these four boxes — the only real skill is reading the shape of the claim correctly before you commit to one.",
 
       "Two definitions are essential for using these proof templates on integer problems. An integer n is **even** if there exists an integer k such that n = 2k. An integer n is **odd** if there exists an integer k such that n = 2k + 1. These definitions are not just descriptions — they are the operational handles that let you do algebra on the abstract property of evenness. Without them, 'n is even' is a phrase; with them, it is an equation you can manipulate.",
     ],
@@ -125,7 +136,7 @@ export default {
       {
         type: 'theorem',
         title: "De Morgan's Laws",
-        body: '\\neg(p \\wedge q) \\equiv \\neg p \\vee \\neg q\n\\neg(p \\vee q) \\equiv \\neg p \\wedge \\neg q\n\nTo negate AND, flip to OR and negate each part. To negate OR, flip to AND and negate each part.',
+        body: '\\[\\neg(p \\wedge q) \\equiv \\neg p \\vee \\neg q\\]\n\n\\[\\neg(p \\vee q) \\equiv \\neg p \\wedge \\neg q\\]\n\nTo negate AND, flip to OR and negate each part. To negate OR, flip to AND and negate each part.',
       },
       {
         type: 'theorem',
@@ -166,7 +177,7 @@ export default {
 
   rigor: {
     prose: [
-      "**The full machinery of rigorous proof.** In the intuition and math sections, we built the vocabulary and identified the three proof templates. Now we execute them — slowly, with every step labelled and every justification named. Read these proofs as a craftsperson reads a master's work: not just for the answer, but for the technique.",
+      "**The full machinery of rigorous proof.** In the intuition and math sections, we built the vocabulary and identified the four proof templates. Now we execute them — slowly, with every step labelled and every justification named. Read these proofs as a craftsperson reads a master's work: not just for the answer, but for the technique.",
 
       "**Part I: Truth Tables — The Ground Truth.** Before proofs, we need to deeply understand why truth tables work as a verification tool. A truth table is an exhaustive enumeration: for n propositional variables, there are exactly 2ⁿ rows, one for each possible assignment of True/False to the variables. This exhaustion principle is what makes truth tables authoritative. If a compound proposition is True in every single row, it is True no matter what the world looks like — that is a tautology. You cannot argue with an exhaustive check.",
 
@@ -184,105 +195,48 @@ export default {
 
       "A subtle point: Proof by Contradiction is more powerful than Proof by Contrapositive in a specific sense. The contrapositive only applies when the statement has the form p → q (a conditional). Contradiction can prove any statement P — existence claims, universal claims, irrationality, infinitude of primes. This extra generality is why some of the most famous proofs in mathematics (infinite primes, irrationality of square roots, undecidability results in computer science) use contradiction.",
 
-      "**Part III: Three Full Proofs — Fully Annotated.** We now work through each technique with complete annotation. For each step, I will label: (A) what we are doing, (B) why we are allowed to do it, and (C) what it gives us.",
+      "**Why Proof by Cases Works.** This one rests on nothing more exotic than the Law of Excluded Middle applied repeatedly. If you can show that cases C₁, C₂, …, Cₙ are exhaustive — every element of the domain falls into at least one of them — and you prove the claim holds inside each case individually, then the claim holds everywhere, because 'everywhere' is nothing but the union of the cases. The logical justification is disjunction elimination: from (C₁ ∨ C₂ ∨ … ∨ Cₙ) and (C₁ → claim), (C₂ → claim), …, (Cₙ → claim), you may validly conclude claim. The entire technique lives or dies on that word 'exhaustive' — a case split that quietly skips a possibility (forgetting zero when splitting on positive/negative, say) produces a proof with an invisible hole. Always state explicitly why the cases cover everything, not just that they do.",
+
+      "**Part III: Four Full Proofs — Fully Annotated.** We now work through each technique with complete annotation. For each step, I will label: (A) what we are doing, (B) why we are allowed to do it, and (C) what it gives us.",
 
       "**Historical note: Why do we demand this level of rigor?** Throughout most of mathematics' history, proofs were written more informally — Euclid assumed things about geometry that were not explicitly stated. In the 19th century, mathematicians discovered that informal reasoning led to contradictions in areas like set theory and analysis. The response was to formalize everything: every step must cite either an axiom, a definition, or a previously proved theorem. The style of proof you are learning here is the modern standard — rigorous enough to be formalized in proof verification software like Lean or Coq, but natural enough to be read by humans.",
 
       "**For the programmer:** Every formal proof can, in principle, be checked by a machine. Proof assistants like Lean 4, Coq, and Agda let you write mathematics as code and have the computer verify every step. What you are learning is not just mathematics — it is the logic underlying provably correct software. When NASA writes safety-critical code for spacecraft, the gold standard is formal verification using exactly this style of reasoning.",
 
-      "**For the philosopher:** The three proof techniques correspond to three different stances toward truth. Direct proof is constructive: you build the truth from the ground up. Contrapositive is transformative: you rephrase the problem into an equivalent one. Contradiction is eliminative: you rule out falsehood and conclude truth by absence. In intuitionistic logic (a branch of mathematical logic), Proof by Contradiction is actually considered weaker than direct proof for certain propositions — because eliminating falsehood does not always mean you can construct a witness to truth. This is deep. For most mathematics, classical logic admits all three as equally valid.",
+      "**For the philosopher:** The four proof techniques correspond to four different stances toward truth. Direct proof is constructive: you build the truth from the ground up. Contrapositive is transformative: you rephrase the problem into an equivalent one. Contradiction is eliminative: you rule out falsehood and conclude truth by absence. Cases is combinatorial: you don't find one universal argument at all — you accept that the universe is genuinely heterogeneous and cover it piece by piece. In intuitionistic logic (a branch of mathematical logic), Proof by Contradiction is actually considered weaker than direct proof for certain propositions — because eliminating falsehood does not always mean you can construct a witness to truth. This is deep. For most mathematics, classical logic admits all four as equally valid.",
     ],
 
+    // Flat {expression, annotation} steps — this is what DynamicProof (the
+    // component that renders rigor.proofSteps) actually reads per step. The
+    // separately-worked theorems (direct/contrapositive/contradiction/cases)
+    // live in `examples` below as their own scrubbable walkthroughs, so this
+    // one continuous proof covers only what isn't duplicated there: building
+    // the two foundational truth tables, then the parity lemma the √2 proof
+    // depends on.
     proofSteps: [
-      {
-        title: 'Constructing the Truth Table for p → q',
-        description: 'Build the complete truth table for the conditional from scratch, column by column.',
-        steps: [
-          { tag: 'Setup', instruction: 'Draw a table with columns: p | q | p → q. There are 2² = 4 rows.', math: '\\begin{array}{c|c|c} p & q & p \\rightarrow q \\\\ \\hline T & T & \\\\ T & F & \\\\ F & T & \\\\ F & F & \\end{array}' },
-          { tag: 'Fill Row 1', instruction: 'Both True. The promise is made AND delivered. Conditional: True.', math: 'T \\rightarrow T = T' },
-          { tag: 'Fill Row 2', instruction: 'p True, q False. The promise is made but NOT delivered. This is the ONLY case the conditional is False.', math: 'T \\rightarrow F = F' },
-          { tag: 'Fill Row 3', instruction: 'p False, q True. The promise was never triggered. We cannot break a promise we never made. Vacuously True.', math: 'F \\rightarrow T = T' },
-          { tag: 'Fill Row 4', instruction: 'Both False. Again, the promise was never triggered. Vacuously True.', math: 'F \\rightarrow F = T' },
-          { tag: 'Complete Table', instruction: 'The full truth table. Exactly one row is False.', math: '\\begin{array}{c|c|c} p & q & p \\rightarrow q \\\\ \\hline T & T & T \\\\ T & F & F \\\\ F & T & T \\\\ F & F & T \\end{array}' },
-        ],
-      },
-      {
-        title: 'Proving Contrapositive Equivalence by Truth Table',
-        description: 'Verify that p → q and ¬q → ¬p are logically equivalent by comparing their truth tables column by column.',
-        steps: [
-          { tag: 'Build columns', instruction: 'Compute ¬p and ¬q by flipping their base columns.', math: '\\begin{array}{c|c|c|c} p & q & \\neg p & \\neg q \\\\ \\hline T & T & F & F \\\\ T & F & F & T \\\\ F & T & T & F \\\\ F & F & T & T \\end{array}' },
-          { tag: 'Compute p → q', instruction: 'Apply the conditional rule to columns p and q.', math: '\\begin{array}{c|c|c} p & q & p \\rightarrow q \\\\ \\hline T & T & T \\\\ T & F & F \\\\ F & T & T \\\\ F & F & T \\end{array}' },
-          { tag: 'Compute ¬q → ¬p', instruction: 'Apply the conditional rule to columns ¬q (new "p") and ¬p (new "q").', math: '\\begin{array}{c|c|c} \\neg q & \\neg p & \\neg q \\rightarrow \\neg p \\\\ \\hline F & F & T \\\\ T & F & F \\\\ F & T & T \\\\ T & T & T \\end{array}' },
-          { tag: 'Compare Final Columns', instruction: 'The final columns of p → q and ¬q → ¬p are T, F, T, T in both cases. They are identical — QED.', math: 'p \\rightarrow q \\equiv \\neg q \\rightarrow \\neg p \\quad \\checkmark' },
-        ],
-      },
-      {
-        title: 'Theorem 1: Direct Proof — Sum of Two Even Integers Is Even',
-        description: 'A complete direct proof with every step tagged and justified.',
-        steps: [
-          { tag: 'State Goal', instruction: 'We want to prove: if a and b are even, then a + b is even. This is a conditional p → q, so we use a direct proof.', math: 'p: \\text{a and b are even}, \\quad q: \\text{a + b is even}' },
-          { tag: 'Assume Hypothesis', instruction: 'Explicitly assume p is True. We are now working inside a universe where a and b are even.', math: '\\text{Assume: } a \\text{ is even and } b \\text{ is even.}' },
-          { tag: 'Apply Definition (a)', instruction: 'The definition of even says: an integer is even iff it equals 2 times some integer. Apply this to a.', math: 'a = 2j \\quad \\text{for some } j \\in \\mathbb{Z}' },
-          { tag: 'Apply Definition (b)', instruction: 'Apply the same definition to b. We use a different letter j vs k because a and b may not be equal.', math: 'b = 2k \\quad \\text{for some } k \\in \\mathbb{Z}' },
-          { tag: 'Compute a + b', instruction: 'Substitute the definitions into the expression we care about.', math: 'a + b = 2j + 2k' },
-          { tag: 'Factor', instruction: 'Factor out 2 using the distributive law of arithmetic.', math: 'a + b = 2(j + k)' },
-          { tag: 'Name the New Integer', instruction: 'Let m = j + k. Since we add two integers, and integers are closed under addition, m is guaranteed to be an integer.', math: 'm = j + k \\in \\mathbb{Z} \\quad \\text{(integers closed under addition)}' },
-          { tag: 'Match the Definition', instruction: 'We have a + b = 2m where m is an integer. This matches the definition of even exactly.', math: 'a + b = 2m, \\quad m \\in \\mathbb{Z} \\implies a + b \\text{ is even}' },
-          { tag: 'Conclude', instruction: 'State the conclusion and close the proof.', math: '\\therefore\\; a + b \\text{ is even.} \\quad \\blacksquare' },
-        ],
-      },
-      {
-        title: 'Theorem 2: Proof by Contrapositive — If 3n+2 Is Odd, Then n Is Odd',
-        description: 'A complete proof by contrapositive, showing why we switch techniques and every step of the chosen approach.',
-        steps: [
-          { tag: 'Identify Statement', instruction: 'Label the hypothesis and conclusion to clarify the structure.', math: 'p: \\text{"3n+2 is odd"}, \\quad q: \\text{"n is odd"}' },
-          { tag: 'Attempt Direct Proof', instruction: 'Try assuming p and solving for q. We get 3n + 2 = 2k + 1, so 3n = 2k − 1, so n = (2k−1)/3. This involves division — we cannot guarantee the result is an integer, let alone odd. Direct proof stalls.', math: '3n + 2 = 2k+1 \\implies n = \\frac{2k-1}{3} \\quad \\leftarrow \\text{not obviously an integer}' },
-          { tag: 'Switch to Contrapositive', instruction: 'Write the contrapositive ¬q → ¬p. Substituting: "if n is even, then 3n+2 is even." This is logically equivalent to the original.', math: '\\neg q \\rightarrow \\neg p:\\; \\text{"if n is even, then 3n+2 is even"}' },
-          { tag: 'Assume ¬q', instruction: 'Begin the proof of the contrapositive. Assume n is even — the hypothesis of the contrapositive.', math: '\\text{Assume: } n \\text{ is even} \\implies n = 2k \\text{ for some } k \\in \\mathbb{Z}' },
-          { tag: 'Substitute into 3n+2', instruction: 'Plug n = 2k into the expression 3n + 2.', math: '3n + 2 = 3(2k) + 2 = 6k + 2' },
-          { tag: 'Factor', instruction: 'Factor out 2 to expose the structure.', math: '6k + 2 = 2(3k + 1)' },
-          { tag: 'Verify Integer', instruction: '3k + 1 is an integer: k ∈ ℤ, so 3k ∈ ℤ (closed under multiplication), so 3k+1 ∈ ℤ (closed under addition).', math: '3k+1 \\in \\mathbb{Z} \\quad \\checkmark' },
-          { tag: 'Conclude ¬p', instruction: '3n + 2 = 2(3k+1) matches the definition of even. This is ¬p.', math: '3n+2 \\text{ is even } \\implies \\neg p \\quad \\checkmark' },
-          { tag: 'Transfer to Original', instruction: 'We proved ¬q → ¬p. By contrapositive equivalence, p → q is also true.', math: '\\neg q \\rightarrow \\neg p \\equiv p \\rightarrow q \\quad \\therefore\\; \\text{original statement is true.} \\quad \\blacksquare' },
-        ],
-      },
-      {
-        title: 'Lemma: If n² Is Even, Then n Is Even (Needed for √2 Proof)',
-        description: 'This subsidiary theorem is proved by contrapositive and is cited as a tool inside the √2 irrationality proof. Always prove your lemmas before using them.',
-        steps: [
-          { tag: 'State Lemma', instruction: 'Prove: if n² is even, then n is even. We use contrapositive: if n is odd, then n² is odd.', math: 'p: n^2 \\text{ is even}, \\quad q: n \\text{ is even}. \\quad \\text{Prove contrapositive: } \\neg q \\rightarrow \\neg p.' },
-          { tag: 'Assume n Is Odd', instruction: 'Assume n is odd, using the definition.', math: 'n = 2k + 1 \\text{ for some } k \\in \\mathbb{Z}' },
-          { tag: 'Compute n²', instruction: 'Square n using the distributive law.', math: 'n^2 = (2k+1)^2 = 4k^2 + 4k + 1' },
-          { tag: 'Factor', instruction: 'Factor out 2 from the first two terms.', math: 'n^2 = 2(2k^2 + 2k) + 1' },
-          { tag: 'Identify Structure', instruction: '2k² + 2k is an integer. So n² = 2m + 1 where m = 2k² + 2k ∈ ℤ, which matches the definition of odd.', math: 'n^2 = 2(2k^2+2k)+1 \\implies n^2 \\text{ is odd}' },
-          { tag: 'Conclude', instruction: 'We proved the contrapositive: n odd ⟹ n² odd. Therefore by contrapositive equivalence: n² even ⟹ n even.', math: '\\neg q \\rightarrow \\neg p \\equiv p \\rightarrow q \\quad \\blacksquare' },
-        ],
-      },
-      {
-        title: 'Theorem 3: Proof by Contradiction — √2 Is Irrational',
-        description: 'The most famous proof in elementary mathematics. Every step annotated, every citation named.',
-        steps: [
-          { tag: 'State Goal', instruction: 'Prove: √2 is irrational. By definition, irrational means it cannot be written as p/q with p, q integers and q ≠ 0.', math: '\\text{Goal: } \\sqrt{2} \\notin \\mathbb{Q}' },
-          { tag: 'Assume Negation', instruction: 'Suppose for contradiction that √2 IS rational. This is the negation of what we want to prove.', math: '\\text{Assume } \\sqrt{2} \\in \\mathbb{Q}: \\quad \\sqrt{2} = \\frac{a}{b},\\; a,b \\in \\mathbb{Z},\\; b \\neq 0' },
-          { tag: 'Reduce to Lowest Terms', instruction: 'Any rational number can be written in lowest terms. Assume that a/b is already reduced: gcd(a,b) = 1. This will be the fact we contradict.', math: '\\gcd(a, b) = 1 \\quad \\text{(assumption: fully reduced)}' },
-          { tag: 'Square Both Sides', instruction: 'Remove the radical by squaring both sides of √2 = a/b.', math: '2 = \\frac{a^2}{b^2} \\implies a^2 = 2b^2' },
-          { tag: 'Deduce a² Is Even', instruction: 'Since a² = 2b², a² equals 2 times an integer, so a² is even by definition.', math: 'a^2 = 2b^2 \\implies a^2 \\text{ is even}' },
-          { tag: 'Apply Lemma', instruction: 'By the Lemma (proved above): if n² is even, then n is even. Apply it with n = a.', math: 'a^2 \\text{ even} \\xRightarrow{\\text{Lemma}} a \\text{ is even}' },
-          { tag: 'Write a as 2c', instruction: 'Since a is even, write a = 2c for some integer c.', math: 'a = 2c \\text{ for some } c \\in \\mathbb{Z}' },
-          { tag: 'Substitute Back', instruction: 'Substitute a = 2c into the equation a² = 2b².', math: '(2c)^2 = 2b^2 \\implies 4c^2 = 2b^2' },
-          { tag: 'Simplify', instruction: 'Divide both sides by 2.', math: 'b^2 = 2c^2 \\implies b^2 \\text{ is even}' },
-          { tag: 'Apply Lemma Again', instruction: 'Apply the same lemma to b.', math: 'b^2 \\text{ even} \\xRightarrow{\\text{Lemma}} b \\text{ is even}' },
-          { tag: 'Identify the Contradiction', instruction: 'Both a and b are even, so both are divisible by 2, meaning gcd(a,b) ≥ 2. But we assumed gcd(a,b) = 1. This is a direct contradiction.', math: 'a \\text{ even and } b \\text{ even} \\implies \\gcd(a,b) \\geq 2 \\quad \\lightning \\text{ contradicts } \\gcd(a,b) = 1' },
-          { tag: 'Conclude', instruction: 'Our assumption (√2 is rational) led to a contradiction. By the Law of Excluded Middle, the assumption is False, so √2 is irrational.', math: '\\therefore\\; \\sqrt{2} \\text{ is irrational.} \\quad \\blacksquare' },
-        ],
-      },
+      { expression: '\\begin{array}{c|c|c} p & q & p \\rightarrow q \\\\ \\hline T & T & \\\\ T & F & \\\\ F & T & \\\\ F & F & \\end{array}', annotation: '**Setup.** Draw a table with columns p, q, p → q. There are 2² = 4 rows — one per combination of truth values.' },
+      { expression: 'T \\rightarrow T = T', annotation: '**Row 1.** Both True. The promise is made and delivered. Conditional: True.' },
+      { expression: 'T \\rightarrow F = F', annotation: '**Row 2.** p True, q False. The promise is made but not delivered — this is the only case where the conditional is False.' },
+      { expression: 'F \\rightarrow T = T', annotation: '**Row 3.** p False, q True. The promise was never triggered — vacuously True.' },
+      { expression: 'F \\rightarrow F = T', annotation: '**Row 4.** Both False. Again, never triggered — vacuously True.' },
+      { expression: '\\begin{array}{c|c|c} p & q & p \\rightarrow q \\\\ \\hline T & T & T \\\\ T & F & F \\\\ F & T & T \\\\ F & F & T \\end{array}', annotation: '**Complete table.** Exactly one row is False — this is the entire truth-functional definition of →.' },
+      { expression: '\\begin{array}{c|c|c|c} p & q & \\neg p & \\neg q \\\\ \\hline T & T & F & F \\\\ T & F & F & T \\\\ F & T & T & F \\\\ F & F & T & T \\end{array}', annotation: '**Build columns.** Now verify the contrapositive is equivalent. Compute ¬p and ¬q by flipping the base columns.' },
+      { expression: '\\begin{array}{c|c|c} p & q & p \\rightarrow q \\\\ \\hline T & T & T \\\\ T & F & F \\\\ F & T & T \\\\ F & F & T \\end{array}', annotation: '**Compute p → q.** Apply the conditional rule to columns p and q — this is the same table as above.' },
+      { expression: '\\begin{array}{c|c|c} \\neg q & \\neg p & \\neg q \\rightarrow \\neg p \\\\ \\hline F & F & T \\\\ T & F & F \\\\ F & T & T \\\\ T & T & T \\end{array}', annotation: '**Compute ¬q → ¬p.** Apply the conditional rule again, now to columns ¬q (playing the role of "p") and ¬p (playing the role of "q").' },
+      { expression: 'p \\rightarrow q \\equiv \\neg q \\rightarrow \\neg p \\quad \\checkmark', annotation: '**Compare final columns.** T, F, T, T in both cases — identical. This is the proof that contrapositive equivalence is a tautology, not an approximation.' },
+      { expression: 'p: n^2 \\text{ is even}, \\quad q: n \\text{ is even}. \\quad \\text{Prove contrapositive: } \\neg q \\rightarrow \\neg p.', annotation: '**Lemma (needed for the √2 proof below): if n² is even, then n is even.** Proved by contrapositive: assume n is odd and show n² is odd.' },
+      { expression: 'n = 2k + 1 \\text{ for some } k \\in \\mathbb{Z}', annotation: 'Assume n is odd, using the definition of odd.' },
+      { expression: 'n^2 = (2k+1)^2 = 4k^2 + 4k + 1', annotation: 'Square n and expand.' },
+      { expression: 'n^2 = 2(2k^2 + 2k) + 1', annotation: 'Factor a 2 out of the first two terms.' },
+      { expression: 'n^2 = 2(2k^2+2k)+1 \\implies n^2 \\text{ is odd}', annotation: '2k² + 2k is an integer, so n² has the form 2m + 1 — the definition of odd.' },
+      { expression: '\\neg q \\rightarrow \\neg p \\equiv p \\rightarrow q \\quad \\blacksquare', annotation: 'The contrapositive is proved, so by contrapositive equivalence, n² even ⟹ n even. This exact lemma gets used twice in the √2 irrationality proof in the examples below.' },
     ],
 
     callouts: [
       {
         type: 'proof-map',
         title: 'Which Proof Strategy Do I Use? The Decision Tree',
-        body: 'Scan the statement top-down:\n\n1. **Direct:** Can you assume p and push forward to q using definitions and algebra without hitting division or square roots? → Use Direct Proof.\n2. **Contrapositive:** Does the hypothesis p have a messy structure (like "3n+2 is odd") while the negated conclusion (like "n is even") gives you a clean formula? → Write the contrapositive and do a direct proof of it.\n3. **Contradiction:** Are you proving something is irrational, infinite, or impossible? Does the statement have NO conditional structure at all (just a standalone claim)? → Use Contradiction.\n\nIf all three seem possible, try Direct first — it is the most transparent. When Direct stalls, try Contrapositive. When neither works, Contradiction.',
+        body: 'Scan the statement top-down:\n\n1. **Direct:** Can you assume p and push forward to q using definitions and algebra without hitting division or square roots? → Use Direct Proof.\n2. **Contrapositive:** Does the hypothesis p have a messy structure (like "3n+2 is odd") while the negated conclusion (like "n is even") gives you a clean formula? → Write the contrapositive and do a direct proof of it.\n3. **Contradiction:** Are you proving something is irrational, infinite, or impossible? Does the statement have NO conditional structure at all (just a standalone claim)? → Use Contradiction.\n4. **Cases:** Does the statement genuinely behave differently on different parts of the domain (sign, parity, membership) so no single algebraic path covers all of it? → Split into exhaustive, non-overlapping cases and prove each one.\n\nIf several seem possible, try Direct first — it is the most transparent. When Direct stalls because of a genuine split in behavior, use Cases. When Direct stalls for algebraic-messiness reasons, try Contrapositive. When neither works, Contradiction.',
       },
       {
         type: 'history',
@@ -581,6 +535,58 @@ export default {
       ],
       conclusion: 'Proof by Contradiction is most powerful when proving impossibility or irrationality — situations where you cannot directly construct the answer. The key discipline: clearly state what you are assuming (¬P), relentlessly follow the logic until something breaks, identify the precise contradiction, and cite the assumption that caused it.',
     },
+    {
+      id: 'discrete-1-01-ex4',
+      title: 'Proof by Cases: |xy| = |x||y| for All Real Numbers',
+      problem: '\\text{Prove that for all real numbers } x \\text{ and } y, \\quad |xy| = |x||y|.',
+      steps: [
+        {
+          expression: '\\text{This is a standalone universal claim — no "if...then" to flip or negate.}',
+          annotation: 'Before picking a strategy, notice what kind of statement this is. It is not a conditional (no contrapositive available) and there is no obvious impossibility to chase (contradiction would be forced and unnatural here).',
+          strategyTitle: 'Rule Out the Wrong Tools',
+          checkpoint: 'Why would Direct Proof alone struggle here? What is different about x and y depending on their sign?',
+          hints: [
+            'Direct proof wants one algebraic chain from hypothesis to conclusion — but there is no hypothesis to assume, only "for all real x, y."',
+            'The absolute value function itself is defined differently depending on sign: |a| = a if a ≥ 0, and |a| = −a if a < 0. A proof about |·| almost always inherits this sign-dependence.',
+          ],
+        },
+        {
+          expression: '\\text{Split on sign: } (x{\\geq}0,y{\\geq}0),\\ (x{<}0,y{\\geq}0),\\ (x{\\geq}0,y{<}0),\\ (x{<}0,y{<}0)',
+          annotation: 'Four cases, one per combination of the two variables\' signs. By trichotomy, every real number is exactly one of "≥ 0" or "< 0" — no third option — so these four cases are exhaustive and non-overlapping.',
+          strategyTitle: 'Choose the Case Split',
+          checkpoint: 'Could you get away with fewer cases? Would splitting only on x (ignoring y) be enough?',
+          hints: [
+            'No — |xy| depends on the sign of the *product*, which depends on both signs together. Splitting on x alone leaves y\'s sign unresolved inside each case.',
+            'Two independent binary choices (sign of x, sign of y) give 2×2 = 4 cases. This is the same counting principle you\'ll formalize later as the multiplication rule.',
+          ],
+        },
+        {
+          expression: '\\text{Case 1 (}x,y\\geq0\\text{): } xy \\geq 0 \\implies |xy|=xy=|x||y|',
+          annotation: 'Both non-negative, so their product is non-negative, so |xy| = xy directly by definition. And |x| = x, |y| = y. Substitution finishes the case immediately.',
+          strategyTitle: 'Case 1 — Both Non-Negative',
+        },
+        {
+          expression: '\\text{Case 2 (}x{<}0,y\\geq0\\text{): } xy \\leq 0 \\implies |xy|=-xy=(-x)(y)=|x||y|',
+          annotation: 'Product of a negative and a non-negative is non-positive, so |xy| = −xy. Meanwhile |x| = −x (since x < 0) and |y| = y, so |x||y| = (−x)(y), which is exactly −xy.',
+          strategyTitle: 'Case 2 — Mixed Signs',
+          checkpoint: 'Why can Case 3 (x ≥ 0, y < 0) be skipped in full detail?',
+          hints: ['It is the mirror image of Case 2 with x and y\'s roles swapped — the identical algebra applies with the variable names exchanged.'],
+        },
+        {
+          expression: '\\text{Case 4 (}x,y{<}0\\text{): } xy > 0 \\implies |xy|=xy=(-x)(-y)=|x||y|',
+          annotation: 'Negative times negative is positive, so |xy| = xy directly. Meanwhile |x| = −x and |y| = −y, so |x||y| = (−x)(−y) = xy. Both sides land on xy.',
+          strategyTitle: 'Case 4 — Both Negative',
+        },
+        {
+          expression: '\\text{All four cases proven, and they exhaust } \\mathbb{R} \\times \\mathbb{R}. \\quad \\therefore |xy|=|x||y| \\text{ always.} \\quad \\blacksquare',
+          annotation: 'Every real pair (x, y) falls into exactly one of the four cases — nothing was left uncovered — and the claim held in each one. By disjunction elimination, the claim holds everywhere.',
+          strategyTitle: 'Close by Citing Exhaustiveness',
+          checkpoint: 'What would go wrong if you had only checked cases 1 and 4 (both-same-sign) and assumed mixed signs "obviously" work the same way?',
+          hints: ['That is exactly the kind of unjustified skip the contract warns against — mixed signs flip which factor is negated, and skipping the check is how sign errors slip into "obvious" proofs undetected.'],
+        },
+      ],
+      conclusion: 'Proof by Cases doesn\'t introduce a new logical move — each case is just a direct proof restricted to a slice of the domain. Its discipline is entirely about the split: the cases must be exhaustive (cover every possibility) and it must be clear why they are, or the proof has a silent gap exactly where the missing case would have gone.',
+    },
   ],
 
   challenges: [
@@ -638,19 +644,19 @@ export default {
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-00-logic-puzzles',
-        label: 'Logic Puzzles (Previous Lesson)',
-        note: 'In the logic puzzles, you already used truth or falseness to eliminate impossible scenarios. This lesson gives those intuitions a rigorous algebraic form. The connectives AND, OR, NOT are the formal names for what you were doing intuitively.',
+        lessonId: 'discrete-1-00',
+        label: 'The Pigeonhole Principle (Previous Lesson)',
+        note: 'The pigeonhole principle already showed you a proof that establishes certainty — "some drawer must hold 2 socks" — without ever constructing which drawer. This lesson gives you the formal machinery (propositions, connectives, proof techniques) to make that same kind of certainty rigorous for claims far more complex than counting socks.',
       },
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-01a-predicate-logic',
+        lessonId: 'discrete-1-01a',
         label: 'Predicate Logic and Quantifiers (Next Lesson)',
-        note: 'All three proof techniques — direct, contrapositive, contradiction — extend to predicate logic with quantifiers. You will use them constantly. The only change is that the hypotheses involve "for all x" or "there exists x," which requires new proof strategies on top of the ones you just learned.',
+        note: 'All four proof techniques — direct, contrapositive, contradiction, cases — extend to predicate logic with quantifiers. You will use them constantly. The only change is that the hypotheses involve "for all x" or "there exists x," which requires new proof strategies on top of the ones you just learned.',
       },
       {
-        lessonId: 'discrete-1-03-induction',
+        lessonId: 'discrete-1-03',
         label: 'Mathematical Induction (Two Lessons Ahead)',
         note: 'Induction is a proof technique that combines a base case (a direct proof for n = 1) and an inductive step (a direct proof of a conditional). The whole framework is built on propositional logic — specifically the transitivity of implication.',
       },
@@ -690,6 +696,7 @@ export default {
     'Direct: assume p, derive q using definitions and algebra.',
     'Contrapositive: prove ¬q → ¬p instead when direct algebra is messy.',
     'Contradiction: assume ¬P, derive an impossibility, conclude P is true.',
+    'Cases: split into exhaustive, non-overlapping cases; prove the claim in each one separately.',
     'Even = 2k, Odd = 2k+1. These are the algebraic handles for integer parity proofs.',
   ],
 
@@ -760,6 +767,15 @@ export default {
       hints: ['An odd integer leaves remainder 1 when divided by 2, which means n = 2k + 1 for some integer k.'],
       reviewSection: 'Math tab — definitions of even and odd',
     },
+    {
+      id: 'prop-q8',
+      type: 'choice',
+      text: 'A proof by cases splits the domain into pieces and proves the claim in each. What is the one thing that MUST be true of the cases for the proof to be valid?',
+      options: ['They must be equal in size', 'They must be exhaustive — cover every possibility with no gaps', 'There must be exactly two of them', 'Each case must use the same proof technique'],
+      answer: 'They must be exhaustive — cover every possibility with no gaps',
+      hints: ['A case split that quietly skips a possibility leaves an invisible hole in the proof — the number of cases and their relative size don\'t matter, only that together they cover everything.'],
+      reviewSection: 'Rigor tab — why proof by cases works',
+    },
   ],
 
   checkpoints: [
@@ -770,6 +786,7 @@ export default {
     'completed-example-2',
     'completed-example-3',
     'completed-example-4',
+    'completed-example-5',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
     'attempted-challenge-hard',

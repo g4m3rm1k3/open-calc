@@ -1,41 +1,32 @@
+import konigsbergBridgesUrl from '../diagrams/dm-konigsberg-bridges.svg?url'
+
 export default {
   id: 'graph-theory-intro',
   slug: 'graph-theory-intro',
   title: 'Graph Theory: Networks, Paths & Puzzles',
   tags: ['discrete-math', 'graph-theory', 'networks', 'algorithms'],
-  chapter: 'discrete-1',
-  order: 4.5,
+  chapter: 'discrete-2',
+  order: 2,
 
   hook: {
     question: 'Can you draw this shape without lifting your pen or retracing any line?',
-    context: `In 1736, Euler was asked whether you could walk the 7 bridges of Königsberg,
-      crossing each exactly once and returning home. He proved it was IMPOSSIBLE —
-      and in doing so, invented graph theory. Today, the same ideas power Google Maps,
-      social network analysis, circuit design, and internet routing.`,
-    realWorld: `Every time Google Maps finds the shortest route, it runs Dijkstra's algorithm on a
-      graph. When Facebook suggests friends, it measures graph distance. When a manufacturer
-      schedules jobs on machines, they solve a graph coloring problem. Graphs are everywhere.`,
+    realWorldContext: `In 1736, Euler was asked whether you could walk the seven bridges of Königsberg, crossing each exactly once and returning home. He proved it was impossible — and in doing so, invented graph theory. Today the same ideas power Google Maps' shortest-route search (Dijkstra's algorithm running on a graph), Facebook's friend suggestions (measuring graph distance), and factory job scheduling (a graph coloring problem). Every time you need to know "can I get from A to B" or "what's the shortest way," you are asking a graph theory question, whether or not you'd call it that.`,
   },
 
   intuition: {
-    summary: `A graph is just dots (vertices/nodes) connected by lines (edges). That's it.
-      The power comes from what questions you can ask: Can I get from A to B?
-      What's the shortest path? Can I color this map with 4 colors so no neighbors match?`,
-    perspectives: [
-      {
-        style: 'visual',
-        explanation: `Think of a graph as a map of connections. Vertices are places; edges are roads.
-          A "path" is a sequence of edges you traverse. A "cycle" is a path that returns to the start.
-          "Connected" means you can get from any vertex to any other.`,
-        visualizationId: 'GraphExplorerViz',
-      },
-      {
-        style: 'CS-perspective',
-        explanation: `Graphs are represented two ways in code:
-          (1) Adjacency Matrix: a 2D array where [i][j]=1 means edge between i and j.
-          (2) Adjacency List: each vertex stores a list of its neighbors.
-          Matrix is fast for "does edge exist?" — O(1). List is better for sparse graphs.`,
-        codeExample: `// Adjacency List
+    prose: [
+      'A **graph** is just dots (vertices, or nodes) connected by lines (edges). That\'s the entire idea. The power comes from what questions you can ask about that structure: Can I get from A to B? What\'s the shortest path? Can I color this map with 4 colors so no two neighboring regions match?',
+
+      'Think of a graph as a map of connections. Vertices are places; edges are roads. A **path** is a sequence of edges you traverse to get from one vertex to another. A **cycle** is a path that returns to where it started. A graph is **connected** if you can get from any vertex to any other vertex by following some path.',
+
+      `![The seven bridges of Königsberg redrawn as a graph — four vertices, each with odd degree](${konigsbergBridgesUrl})`,
+
+      'This is exactly Euler\'s original problem. Redraw the four landmasses as vertices and the seven bridges as edges, and the question "can I cross every bridge exactly once and return home?" becomes "does this graph have an Euler circuit?" We\'ll prove the general condition for that below — and it settles Königsberg immediately, without anyone lacing up their boots.',
+
+      'Graphs are represented two ways in code. An **adjacency matrix** is a 2D array where entry [i][j] = 1 means an edge connects vertex i and vertex j — checking "does this edge exist?" is O(1), but the array uses space for every possible pair whether or not an edge is there. An **adjacency list** instead has each vertex store just its own list of neighbors — better for sparse graphs (few edges relative to possible pairs), since it doesn\'t waste space recording all the non-edges.',
+
+      `\`\`\`javascript
+// Adjacency list
 const graph = {
   A: ['B', 'C'],
   B: ['A', 'D'],
@@ -43,7 +34,8 @@ const graph = {
   D: ['B', 'C']
 };
 
-// BFS to find shortest path
+// BFS finds the shortest path by exploring outward in "ripples" —
+// all of a vertex's neighbors before any of its neighbors' neighbors.
 function bfs(start, end) {
   const queue = [[start]];
   const visited = new Set([start]);
@@ -58,46 +50,27 @@ function bfs(start, end) {
       }
     }
   }
-}`,
-      },
+}
+\`\`\``,
+
+      'One more angle before the formal definitions: model a factory floor as a graph, with machines as vertices and material-flow paths as edges. Finding the "critical path" — the longest path through the network — tells you the minimum possible time to complete production. This is literally how Critical Path Method (CPM) scheduling works in project management, and it is the exact same graph-theoretic idea as finding the longest path in any other network.',
+    ],
+    visualizations: [
       {
-        style: 'physical',
-        explanation: `Model a factory floor as a graph: machines are vertices, material flow paths are edges.
-          Finding the "critical path" (longest path through the network) tells you the
-          minimum time to complete production — this is literally how CPM scheduling works.`,
+        id: 'GraphExplorerViz',
+        title: 'Build and Explore a Graph',
+        caption: 'Add vertices and edges, then check connectivity, degree, and path existence live.',
       },
     ],
   },
 
   math: {
-    formalDefinition: `A graph G = (V, E) where V is a set of vertices and E ⊆ V×V is a set of edges.
-      A directed graph (digraph) has ordered pairs for edges. An undirected graph has unordered pairs.`,
-    keyDefinitions: [
-      { term: 'Degree', def: 'Number of edges incident to a vertex. In directed graphs: in-degree and out-degree.' },
-      { term: 'Path', def: 'A sequence of vertices v₁,v₂,...,vₙ where each consecutive pair is connected by an edge.' },
-      { term: 'Cycle', def: 'A path where the first and last vertex are the same.' },
-      { term: 'Connected', def: 'A graph is connected if there exists a path between every pair of vertices.' },
-      { term: 'Tree', def: 'A connected acyclic graph. A tree on n vertices has exactly n-1 edges.' },
-      { term: 'Euler Path', def: 'A path that visits every EDGE exactly once.' },
-      { term: 'Hamiltonian Path', def: 'A path that visits every VERTEX exactly once.' },
-      { term: 'Planar Graph', def: 'A graph that can be drawn in the plane without edge crossings.' },
-    ],
-    keyTheorems: [
-      {
-        name: 'Handshaking Lemma',
-        formula: '\\sum_{v \\in V} \\deg(v) = 2|E|',
-        note: 'Every edge contributes 2 to the total degree sum.',
-      },
-      {
-        name: 'Euler\'s Theorem',
-        formula: '\\text{Euler circuit exists} \\iff \\text{connected and all vertices have even degree}',
-        note: 'Euler path exists iff exactly 0 or 2 vertices have odd degree.',
-      },
-      {
-        name: 'Euler\'s Formula (Planar)',
-        formula: 'V - E + F = 2',
-        note: 'V=vertices, E=edges, F=faces (including outer face). Always 2 for connected planar graphs.',
-      },
+    prose: [
+      'Formally, a **graph** G = (V, E) consists of a set V of vertices and a set E of edges, where each edge connects two vertices. A **directed graph** (digraph) has edges that are ordered pairs — the edge from A to B is different from the edge from B to A. An **undirected graph** has unordered pairs — a single edge between A and B works both directions.',
+
+      'A handful of terms recur constantly: **degree** is the number of edges touching a vertex (in a directed graph, split into in-degree and out-degree). A **path** is a sequence of vertices where each consecutive pair is joined by an edge. A **cycle** is a path whose first and last vertex coincide. A graph is **connected** if a path exists between every pair of vertices. A **tree** is a connected graph with no cycles — and a tree on n vertices always has exactly n − 1 edges, proved by induction in the challenges below. An **Euler path** visits every *edge* exactly once; a **Hamiltonian path** visits every *vertex* exactly once — easy to confuse, since both are "visit everything without repeating," but they count completely different things. A **planar graph** can be drawn in the plane with no edges crossing.',
+
+      'Three theorems do most of the work in this lesson. The **Handshaking Lemma**: the sum of every vertex\'s degree equals 2|E| — because every edge has two ends, it contributes exactly 2 to the total degree count no matter which two vertices it joins. **Euler\'s Theorem**: a connected graph has an Euler circuit if and only if every vertex has even degree, and has an Euler path (not necessarily returning to the start) if and only if exactly 0 or 2 vertices have odd degree — this is the theorem that settles Königsberg, proved formally below. **Euler\'s Formula** (for connected planar graphs): V − E + F = 2, where F counts faces including the unbounded outer face.',
     ],
   },
 
@@ -182,16 +155,16 @@ function bfs(start, end) {
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-02-relations-and-structures',
+        lessonId: 'discrete-1-02',
         label: 'Relations and Structures',
-        note: 'Graphs are the physical map of the abstract relations we studied previously.',
+        note: 'Graphs are the physical map of the abstract relations we studied previously — a graph is just a relation drawn as dots and arrows.',
       },
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-04-graph-theory',
+        lessonId: 'discrete-1-08',
         label: 'Graph Theory and Networks',
-        note: 'We will dive deeper into advanced graph properties, such as planarity and coloring.',
+        note: 'We will dive deeper into advanced graph properties — trees, BFS distance layers, and representation tradeoffs — once counting and recursion give us the tools to analyze them rigorously.',
       },
     ],
   },

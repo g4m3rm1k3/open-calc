@@ -1,0 +1,48 @@
+<svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="420" height="220" rx="10" fill="#f8fafc"/>
+  <text x="210" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Two Parse Trees for "id + id * id" — Ambiguous Grammar</text>
+
+  <!-- Tree 1: (id + id) * id -->
+  <g>
+    <text x="105" y="38" font-size="9.5" fill="#475569" text-anchor="middle">Tree 1: groups + first</text>
+    <line x1="105" y1="45" x2="65" y2="80" stroke="#94a3b8" stroke-width="1.3"/>
+    <line x1="105" y1="45" x2="105" y2="80" stroke="#94a3b8" stroke-width="1.3"/>
+    <line x1="105" y1="45" x2="145" y2="80" stroke="#94a3b8" stroke-width="1.3"/>
+    <circle cx="105" cy="45" r="13" fill="#3b82f6"/><text x="105" y="49" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">E</text>
+    <circle cx="65" cy="90" r="11" fill="#10b981"/><text x="65" y="94" font-size="8" font-weight="700" fill="#fff" text-anchor="middle">E</text>
+    <text x="105" y="85" font-size="10" fill="#7f1d1d" text-anchor="middle">*</text>
+    <circle cx="145" cy="90" r="11" fill="#10b981"/><text x="145" y="94" font-size="8" font-weight="700" fill="#fff" text-anchor="middle">id</text>
+
+    <line x1="65" y1="101" x2="40" y2="130" stroke="#94a3b8" stroke-width="1.1"/>
+    <line x1="65" y1="101" x2="90" y2="130" stroke="#94a3b8" stroke-width="1.1"/>
+    <text x="65" y="118" font-size="9" fill="#7f1d1d" text-anchor="middle">+</text>
+    <circle cx="40" cy="140" r="10" fill="#f59e0b"/><text x="40" y="144" font-size="7.5" font-weight="700" fill="#fff" text-anchor="middle">id</text>
+    <circle cx="90" cy="140" r="10" fill="#f59e0b"/><text x="90" y="144" font-size="7.5" font-weight="700" fill="#fff" text-anchor="middle">id</text>
+
+    <text x="105" y="175" font-size="9.5" fill="#334155" text-anchor="middle">= (id + id) &#215; id</text>
+  </g>
+
+  <line x1="215" y1="30" x2="215" y2="190" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Tree 2: id + (id * id) -->
+  <g transform="translate(100,0)">
+    <text x="215" y="38" font-size="9.5" fill="#475569" text-anchor="middle">Tree 2: groups &#215; first</text>
+    <line x1="215" y1="45" x2="175" y2="80" stroke="#94a3b8" stroke-width="1.3"/>
+    <line x1="215" y1="45" x2="215" y2="80" stroke="#94a3b8" stroke-width="1.3"/>
+    <line x1="215" y1="45" x2="255" y2="80" stroke="#94a3b8" stroke-width="1.3"/>
+    <circle cx="215" cy="45" r="13" fill="#3b82f6"/><text x="215" y="49" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">E</text>
+    <circle cx="175" cy="90" r="11" fill="#10b981"/><text x="175" y="94" font-size="8" font-weight="700" fill="#fff" text-anchor="middle">id</text>
+    <text x="215" y="85" font-size="10" fill="#7f1d1d" text-anchor="middle">+</text>
+    <circle cx="255" cy="90" r="11" fill="#10b981"/><text x="255" y="94" font-size="8" font-weight="700" fill="#fff" text-anchor="middle">E</text>
+
+    <line x1="255" y1="101" x2="230" y2="130" stroke="#94a3b8" stroke-width="1.1"/>
+    <line x1="255" y1="101" x2="280" y2="130" stroke="#94a3b8" stroke-width="1.1"/>
+    <text x="255" y="118" font-size="9" fill="#7f1d1d" text-anchor="middle">*</text>
+    <circle cx="230" cy="140" r="10" fill="#f59e0b"/><text x="230" y="144" font-size="7.5" font-weight="700" fill="#fff" text-anchor="middle">id</text>
+    <circle cx="280" cy="140" r="10" fill="#f59e0b"/><text x="280" y="144" font-size="7.5" font-weight="700" fill="#fff" text-anchor="middle">id</text>
+
+    <text x="215" y="175" font-size="9.5" fill="#334155" text-anchor="middle">= id + (id &#215; id)</text>
+  </g>
+
+  <text x="210" y="210" font-size="9.5" fill="#334155" text-anchor="middle">Same string, two structurally different trees, two different meanings — this is exactly what "ambiguous" means.</text>
+</svg>

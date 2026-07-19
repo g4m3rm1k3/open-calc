@@ -1,0 +1,50 @@
+<svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="480" height="280" rx="10" fill="#f8fafc"/>
+  <text x="240" y="24" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">The Seven Bridges of K&#246;nigsberg &#8594; a Graph</text>
+
+  <!-- Left: physical map -->
+  <g>
+    <text x="120" y="44" font-size="10" font-weight="700" fill="#475569" text-anchor="middle">The physical layout</text>
+    <!-- River -->
+    <rect x="20" y="60" width="200" height="160" fill="#dbeafe"/>
+    <!-- Landmasses -->
+    <ellipse cx="120" cy="90" rx="55" ry="20" fill="#a7f3d0" stroke="#059669" stroke-width="1.5"/>
+    <text x="120" y="94" font-size="9" font-weight="700" fill="#065f46" text-anchor="middle">North Bank (B)</text>
+    <ellipse cx="120" cy="190" rx="55" ry="20" fill="#a7f3d0" stroke="#059669" stroke-width="1.5"/>
+    <text x="120" y="194" font-size="9" font-weight="700" fill="#065f46" text-anchor="middle">South Bank (D)</text>
+    <ellipse cx="70" cy="140" rx="32" ry="20" fill="#fde68a" stroke="#b45309" stroke-width="1.5"/>
+    <text x="70" y="144" font-size="9" font-weight="700" fill="#78350f" text-anchor="middle">Island A</text>
+    <ellipse cx="170" cy="140" rx="32" ry="20" fill="#fecaca" stroke="#b91c1c" stroke-width="1.5"/>
+    <text x="170" y="144" font-size="9" font-weight="700" fill="#7f1d1d" text-anchor="middle">Island C</text>
+    <!-- Bridges as thick lines -->
+    <line x1="90" y1="105" x2="105" y2="122" stroke="#78350f" stroke-width="3"/>
+    <line x1="55" y1="105" x2="80" y2="123" stroke="#78350f" stroke-width="3"/>
+    <line x1="70" y1="160" x2="100" y2="178" stroke="#78350f" stroke-width="3"/>
+    <line x1="150" y1="122" x2="130" y2="105" stroke="#7f1d1d" stroke-width="3"/>
+    <line x1="185" y1="122" x2="150" y2="100" stroke="#7f1d1d" stroke-width="3"/>
+    <line x1="170" y1="160" x2="140" y2="178" stroke="#7f1d1d" stroke-width="3"/>
+    <line x1="100" y1="140" x2="140" y2="140" stroke="#57534e" stroke-width="3"/>
+  </g>
+
+  <!-- Right: graph abstraction -->
+  <g>
+    <text x="360" y="44" font-size="10" font-weight="700" fill="#475569" text-anchor="middle">As a graph — degrees matter</text>
+    <line x1="360" y1="80" x2="290" y2="140" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="360" y1="80" x2="290" y2="140" stroke="#94a3b8" stroke-width="2" transform="translate(4,4)"/>
+    <line x1="360" y1="80" x2="430" y2="140" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="360" y1="80" x2="430" y2="140" stroke="#94a3b8" stroke-width="2" transform="translate(-4,4)"/>
+    <line x1="290" y1="140" x2="360" y2="200" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="430" y1="140" x2="360" y2="200" stroke="#94a3b8" stroke-width="2"/>
+    <line x1="290" y1="140" x2="430" y2="140" stroke="#94a3b8" stroke-width="2"/>
+    <circle cx="360" cy="80" r="16" fill="#f59e0b"/><text x="360" y="85" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">B</text>
+    <text x="360" y="60" font-size="9" fill="#92400e" text-anchor="middle">deg 3</text>
+    <circle cx="290" cy="140" r="16" fill="#3b82f6"/><text x="290" y="145" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">A</text>
+    <text x="270" y="140" font-size="9" fill="#1e40af" text-anchor="middle">deg 3</text>
+    <circle cx="430" cy="140" r="16" fill="#ef4444"/><text x="430" y="145" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">C</text>
+    <text x="452" y="140" font-size="9" fill="#991b1b" text-anchor="middle">deg 3</text>
+    <circle cx="360" cy="200" r="16" fill="#10b981"/><text x="360" y="205" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">D</text>
+    <text x="360" y="225" font-size="9" fill="#065f46" text-anchor="middle">deg 5</text>
+  </g>
+
+  <text x="240" y="255" font-size="9.5" fill="#334155" text-anchor="middle">All four vertices have odd degree — by Euler's theorem, no Euler path can exist. Euler proved this without ever walking the bridges.</text>
+</svg>

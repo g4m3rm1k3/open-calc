@@ -1,0 +1,35 @@
+<svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="420" height="220" rx="10" fill="#f8fafc"/>
+  <text x="210" y="22" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Pascal's Triangle — Each Entry = Sum of the Two Above It</text>
+
+  <g font-size="13" font-weight="700" text-anchor="middle">
+    <text x="210" y="55" fill="#1d4ed8">1</text>
+
+    <text x="190" y="80" fill="#1d4ed8">1</text>
+    <text x="230" y="80" fill="#1d4ed8">1</text>
+
+    <text x="170" y="105" fill="#065f46">1</text>
+    <text x="210" y="105" fill="#7c2d12">2</text>
+    <text x="250" y="105" fill="#065f46">1</text>
+
+    <text x="150" y="130" fill="#1d4ed8">1</text>
+    <text x="190" y="130" fill="#7c2d12">3</text>
+    <text x="230" y="130" fill="#7c2d12">3</text>
+    <text x="270" y="130" fill="#1d4ed8">1</text>
+
+    <text x="130" y="155" fill="#065f46">1</text>
+    <text x="170" y="155" fill="#7c2d12">4</text>
+    <text x="210" y="155" fill="#a21caf">6</text>
+    <text x="250" y="155" fill="#7c2d12">4</text>
+    <text x="290" y="155" fill="#065f46">1</text>
+  </g>
+
+  <!-- Highlight the addition that produces 6 -->
+  <circle cx="190" cy="130" r="14" fill="none" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <circle cx="230" cy="130" r="14" fill="none" stroke="#a21caf" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <path d="M190 138 L210 148" stroke="#a21caf" stroke-width="1.2" stroke-dasharray="2 2"/>
+  <path d="M230 138 L210 148" stroke="#a21caf" stroke-width="1.2" stroke-dasharray="2 2"/>
+
+  <text x="210" y="185" font-size="9.5" fill="#334155" text-anchor="middle">3 + 3 = 6, because C(4,2) = C(3,1) + C(3,2) —</text>
+  <text x="210" y="200" font-size="9.5" fill="#334155" text-anchor="middle">include the new item (choose 1 more from 3) or exclude it (choose 2 from 3).</text>
+</svg>

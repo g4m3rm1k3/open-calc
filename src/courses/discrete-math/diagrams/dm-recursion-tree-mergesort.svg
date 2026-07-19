@@ -1,0 +1,43 @@
+<svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="460" height="220" rx="10" fill="#f8fafc"/>
+  <text x="230" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Recursion Tree: T(n) = 2T(n/2) + n</text>
+
+  <!-- Level 0 -->
+  <rect x="195" y="30" width="70" height="26" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="230" y="48" font-size="10" fill="#1e3a8a" text-anchor="middle">n</text>
+
+  <line x1="215" y1="56" x2="150" y2="82" stroke="#94a3b8" stroke-width="1.3"/>
+  <line x1="245" y1="56" x2="310" y2="82" stroke="#94a3b8" stroke-width="1.3"/>
+
+  <!-- Level 1 -->
+  <rect x="115" y="84" width="70" height="24" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="150" y="100" font-size="9.5" fill="#1e3a8a" text-anchor="middle">n/2</text>
+  <rect x="275" y="84" width="70" height="24" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="310" y="100" font-size="9.5" fill="#1e3a8a" text-anchor="middle">n/2</text>
+
+  <line x1="130" y1="108" x2="95" y2="132" stroke="#94a3b8" stroke-width="1.1"/>
+  <line x1="170" y1="108" x2="205" y2="132" stroke="#94a3b8" stroke-width="1.1"/>
+  <line x1="290" y1="108" x2="255" y2="132" stroke="#94a3b8" stroke-width="1.1"/>
+  <line x1="330" y1="108" x2="365" y2="132" stroke="#94a3b8" stroke-width="1.1"/>
+
+  <!-- Level 2 -->
+  <g fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2">
+    <rect x="65" y="134" width="60" height="22" rx="5"/>
+    <rect x="175" y="134" width="60" height="22" rx="5"/>
+    <rect x="225" y="134" width="60" height="22" rx="5"/>
+    <rect x="335" y="134" width="60" height="22" rx="5"/>
+  </g>
+  <g font-size="8.5" fill="#1e3a8a" text-anchor="middle">
+    <text x="95" y="149">n/4</text>
+    <text x="205" y="149">n/4</text>
+    <text x="255" y="149">n/4</text>
+    <text x="365" y="149">n/4</text>
+  </g>
+
+  <text x="415" y="46" font-size="9" fill="#475569">level 0: 1 &#215; n = n</text>
+  <text x="415" y="98" font-size="9" fill="#475569">level 1: 2 &#215; n/2 = n</text>
+  <text x="415" y="147" font-size="9" fill="#475569">level 2: 4 &#215; n/4 = n</text>
+
+  <text x="230" y="182" font-size="10" fill="#334155" text-anchor="middle">Every level does exactly n total work. There are log&#8322;n levels (halving until size 1),</text>
+  <text x="230" y="198" font-size="10" fill="#334155" text-anchor="middle">so the total is n &#215; log&#8322;n &#8594; T(n) = &#920;(n log n).</text>
+</svg>

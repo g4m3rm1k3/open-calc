@@ -1,4 +1,6 @@
 // FILE: src/content/discrete-math/00-logic-puzzles.js
+import pigeonholeBasicUrl from '../diagrams/dm-pigeonhole-basic.svg?url'
+
 export default {
   id: 'discrete-1-00',
   slug: 'pigeonhole-principle',
@@ -30,7 +32,6 @@ export default {
   hook: {
     question: "You are blindfolded next to a drawer holding 10 black socks and 10 white socks, completely mixed. How many socks must you pull out to guarantee a matching pair — not probably, not likely — but with 100% mathematical certainty?",
     realWorldContext: "Almost everyone guesses 11. The actual answer is 3 — and the reasoning behind it is not a trick. It is one of the most powerful ideas in mathematics: the Pigeonhole Principle. This principle proves, without examining a single person, that at least two people in New York City share the same birthday. It proves that no zip file algorithm can compress every possible file. It proves that any hash table with more records than buckets must have a collision. These are not probabilistic claims — they are absolute mathematical guarantees derived from pure counting. Welcome to Discrete Mathematics, where certainty is built not from measurement, but from the unavoidable logic of numbers.",
-    previewVisualizationId: 'PigeonholeViz',
   },
 
   intuition: {
@@ -42,6 +43,10 @@ export default {
       "Why? Because there are only **2 categories** of sock (black and white), and as soon as you have **3 socks**, you cannot avoid having 2 in the same category. The categories are the 'pigeonholes.' The socks are the 'pigeons.' If there are more pigeons than holes, at least one hole must contain more than one pigeon. That is the entire idea. It takes one sentence to state and a lifetime to apply.",
 
       "The name comes from a vivid image: imagine a row of pigeonhole boxes in an old English post office, each labeled for one recipient. If 11 letters arrive for 10 boxes, the postmaster cannot distribute them one per box — at least one box must receive two letters. The postmaster does not need to read any letters or look at any names. Pure counting makes the guarantee.",
+
+      `![5 pigeons distributed into 4 holes, with one hole forced to hold 2](${pigeonholeBasicUrl})`,
+
+      "Look at the diagram above: 5 pigeons, 4 holes. It doesn't matter which pigeon goes where — try every arrangement you like — some hole always ends up with at least 2. This is not a claim about *this particular* arrangement; it's a claim about *every possible* arrangement simultaneously, which is exactly why it counts as a proof rather than an observation.",
 
       "**The creative leap.** The power of the Pigeonhole Principle in practice is not in recognizing the statement — it is in recognizing *what to use as the holes*. In the sock problem, the holes are colors. In the birthday problem, the holes are dates. In the hair-count problem, the holes are possible hair counts (0 through about 300,000). The items are always the people or things you are distributing. Once you identify the right holes, the conclusion follows automatically from pure arithmetic.",
 
@@ -110,12 +115,12 @@ export default {
       {
         type: 'theorem',
         title: 'The Basic Pigeonhole Principle',
-        body: '\\text{If } k \\text{ items are distributed into } n \\text{ containers, and } k > n,\n\\text{then at least one container contains at least } 2 \\text{ items.}',
+        body: 'If k items are distributed into n containers, and k > n, then at least one container contains at least 2 items.',
       },
       {
         type: 'theorem',
         title: 'The Generalized (Strong) Pigeonhole Principle',
-        body: '\\text{If } k \\text{ items are distributed into } n \\text{ containers,}\n\\text{then at least one container contains at least } \\left\\lceil \\dfrac{k}{n} \\right\\rceil \\text{ items.}\n\n\\text{The ceiling } \\lceil x \\rceil \\text{ is the smallest integer } \\geq x.',
+        body: 'If k items are distributed into n containers, then at least one container contains at least ⌈k/n⌉ items. The ceiling ⌈x⌉ is the smallest integer ≥ x.',
       },
       {
         type: 'insight',
@@ -125,7 +130,7 @@ export default {
       {
         type: 'definition',
         title: 'The Ceiling Function',
-        body: '\\lceil x \\rceil = \\text{the smallest integer greater than or equal to } x\n\n\\lceil 3.1 \\rceil = 4, \\quad \\lceil 3 \\rceil = 3, \\quad \\lceil 9/3 \\rceil = 3, \\quad \\lceil 10/3 \\rceil = 4',
+        body: '⌈x⌉ = the smallest integer greater than or equal to x. For example: ⌈3.1⌉ = 4, ⌈3⌉ = 3, ⌈9/3⌉ = 3, ⌈10/3⌉ = 4.',
       },
     ],
     visualizations: [
@@ -151,41 +156,32 @@ export default {
       "**For the Computer Scientist.** The formal proof below is exactly the argument for why hash table collision is unavoidable: if you have k keys and n < k buckets, and assume every bucket has at most 1 key, you can account for at most n keys — but there are k > n. Contradiction. The math does not depend on the hash function, the data, or the order of insertion. It is a property of the numbers alone. This is why all hash table implementations must include collision handling — it is not optional engineering, it is a mathematical obligation.",
     ],
 
+    // Flat {expression, annotation} steps — DynamicProof (the component that
+    // renders rigor.proofSteps) reads exactly this shape per step. Three
+    // proofs back to back: basic principle, generalized principle, then a
+    // worked application — each opens with a bold header step.
     proofSteps: [
-      {
-        title: 'Proof of the Basic Pigeonhole Principle by Contradiction',
-        description: 'We prove: if k items are placed into n containers and k > n, then at least one container holds ≥ 2 items.',
-        steps: [
-          { tag: 'State Goal', instruction: 'We want to prove that at least one container has ≥ 2 items, given k items in n containers with k > n.', math: 'k > n \\;\\text{items in}\\; n \\;\\text{containers} \\implies \\exists \\text{ container with} \\geq 2 \\text{ items}' },
-          { tag: 'Assume Negation', instruction: 'Suppose for contradiction that our conclusion is false: every container holds at most 1 item.', math: '\\text{Assume: every container holds} \\leq 1 \\text{ item.}' },
-          { tag: 'Count the Maximum', instruction: 'If every container holds at most 1 item, and there are n containers, the maximum total number of items across all containers is n × 1 = n.', math: '\\text{Total items} \\leq n \\times 1 = n' },
-          { tag: 'Reach the Contradiction', instruction: 'But we placed k items in total, and k > n by hypothesis. So k ≤ n AND k > n simultaneously — a contradiction.', math: 'k \\leq n \\quad \\text{AND} \\quad k > n \\quad \\Rightarrow \\quad \\lightning \\text{ contradiction}' },
-          { tag: 'Conclude', instruction: 'Our assumption was false. Therefore at least one container must hold ≥ 2 items. QED.', math: '\\therefore \\text{ at least one container holds} \\geq 2 \\text{ items.} \\quad \\blacksquare' },
-        ],
-      },
-      {
-        title: 'Proof of the Generalized Pigeonhole Principle by Contradiction',
-        description: 'We prove: if k items go into n containers, at least one holds ≥ ⌈k/n⌉ items.',
-        steps: [
-          { tag: 'State Goal', instruction: 'Let m = ⌈k/n⌉. We want to show that at least one container holds ≥ m items.', math: 'm = \\left\\lceil \\frac{k}{n} \\right\\rceil' },
-          { tag: 'Assume Negation', instruction: 'Suppose for contradiction that every container holds ≤ m − 1 items.', math: '\\text{Assume: every container holds} \\leq m - 1 = \\left\\lceil \\frac{k}{n} \\right\\rceil - 1 \\text{ items.}' },
-          { tag: 'Count the Maximum', instruction: 'With n containers, each holding at most m − 1 items, the total is at most n(m − 1).', math: '\\text{Total items} \\leq n \\cdot (m - 1) = n\\left(\\left\\lceil \\frac{k}{n} \\right\\rceil - 1\\right)' },
-          { tag: 'Apply Ceiling Property', instruction: 'By definition of ceiling, ⌈k/n⌉ < k/n + 1, so ⌈k/n⌉ − 1 < k/n. Therefore n(⌈k/n⌉ − 1) < n · (k/n) = k.', math: 'n\\left(\\left\\lceil \\frac{k}{n} \\right\\rceil - 1\\right) < n \\cdot \\frac{k}{n} = k' },
-          { tag: 'Reach the Contradiction', instruction: 'So the total is strictly less than k — but we placed exactly k items. Contradiction.', math: '\\text{Total} < k \\quad \\text{AND} \\quad \\text{Total} = k \\quad \\Rightarrow \\quad \\lightning' },
-          { tag: 'Conclude', instruction: 'The assumption is false. At least one container holds ≥ ⌈k/n⌉ items. QED.', math: '\\therefore \\text{ at least one container holds} \\geq \\left\\lceil \\frac{k}{n} \\right\\rceil \\text{ items.} \\quad \\blacksquare' },
-        ],
-      },
-      {
-        title: 'Application Proof: Two Londoners Share the Same Hair Count',
-        description: 'A complete worked application proof using the basic principle.',
-        steps: [
-          { tag: 'Define Items (Pigeons)', instruction: 'The items are the people in London. Population: approximately 9,000,000.', math: 'k = 9{,}000{,}000' },
-          { tag: 'Define Categories (Holes)', instruction: 'The categories are possible hair counts: 0, 1, 2, ..., up to the biological maximum of about 300,000. So there are 300,001 possible counts.', math: 'n = 300{,}001 \\text{ (hair counts: } 0 \\text{ to } 300{,}000\\text{)}' },
-          { tag: 'Check the Condition', instruction: 'Is k > n? Yes: 9,000,000 ≫ 300,001.', math: 'k = 9{,}000{,}000 > 300{,}001 = n \\quad \\checkmark' },
-          { tag: 'Apply the Principle', instruction: 'By the Pigeonhole Principle, at least one hair count must be shared by at least 2 people. In fact, by the Generalized Principle:', math: '\\left\\lceil \\frac{9{,}000{,}000}{300{,}001} \\right\\rceil = \\lceil 29.999... \\rceil = 30' },
-          { tag: 'Conclude', instruction: 'At least one hair count is shared by at least 30 people in London — provably, without measuring a single head.', math: '\\therefore \\text{ at least 30 Londoners share the same hair count.} \\quad \\blacksquare' },
-        ],
-      },
+      { expression: '\\textbf{Proof 1: Basic Pigeonhole Principle, by Contradiction}', annotation: 'We prove: if k items are placed into n containers and k > n, then at least one container holds ≥ 2 items.' },
+      { expression: 'k > n \\;\\text{items in}\\; n \\;\\text{containers} \\implies \\exists \\text{ container with} \\geq 2 \\text{ items}', annotation: '**State the goal.** We want to prove that at least one container has ≥ 2 items, given k items in n containers with k > n.' },
+      { expression: '\\text{Assume: every container holds} \\leq 1 \\text{ item.}', annotation: '**Assume the negation.** Suppose for contradiction that our conclusion is false: every container holds at most 1 item.' },
+      { expression: '\\text{Total items} \\leq n \\times 1 = n', annotation: '**Count the maximum.** If every container holds at most 1 item, and there are n containers, the maximum total number of items across all containers is n × 1 = n.' },
+      { expression: 'k \\leq n \\quad \\text{AND} \\quad k > n \\quad \\Rightarrow \\quad \\lightning \\text{ contradiction}', annotation: '**Reach the contradiction.** We placed k items in total, and k > n by hypothesis. So k ≤ n and k > n simultaneously.' },
+      { expression: '\\therefore \\text{ at least one container holds} \\geq 2 \\text{ items.} \\quad \\blacksquare', annotation: '**Conclude.** Our assumption was false. Therefore at least one container must hold ≥ 2 items.' },
+
+      { expression: '\\textbf{Proof 2: Generalized Pigeonhole Principle, by Contradiction}', annotation: 'We prove: if k items go into n containers, at least one holds ≥ ⌈k/n⌉ items — the same technique, generalized beyond "≥ 2."' },
+      { expression: 'm = \\left\\lceil \\frac{k}{n} \\right\\rceil', annotation: '**State the goal.** Let m = ⌈k/n⌉. We want to show that at least one container holds ≥ m items.' },
+      { expression: '\\text{Assume: every container holds} \\leq m - 1 = \\left\\lceil \\frac{k}{n} \\right\\rceil - 1 \\text{ items.}', annotation: '**Assume the negation.** Suppose for contradiction that every container holds ≤ m − 1 items.' },
+      { expression: '\\text{Total items} \\leq n \\cdot (m - 1) = n\\left(\\left\\lceil \\frac{k}{n} \\right\\rceil - 1\\right)', annotation: '**Count the maximum.** With n containers, each holding at most m − 1 items, the total is at most n(m − 1).' },
+      { expression: 'n\\left(\\left\\lceil \\frac{k}{n} \\right\\rceil - 1\\right) < n \\cdot \\frac{k}{n} = k', annotation: '**Apply the ceiling property.** By definition of ceiling, ⌈k/n⌉ < k/n + 1, so ⌈k/n⌉ − 1 < k/n. Therefore n(⌈k/n⌉ − 1) < n·(k/n) = k.' },
+      { expression: '\\text{Total} < k \\quad \\text{AND} \\quad \\text{Total} = k \\quad \\Rightarrow \\quad \\lightning', annotation: '**Reach the contradiction.** The total is strictly less than k — but we placed exactly k items.' },
+      { expression: '\\therefore \\text{ at least one container holds} \\geq \\left\\lceil \\frac{k}{n} \\right\\rceil \\text{ items.} \\quad \\blacksquare', annotation: '**Conclude.** The assumption is false. At least one container holds ≥ ⌈k/n⌉ items.' },
+
+      { expression: '\\textbf{Application: Two Londoners Share the Same Hair Count}', annotation: 'A complete worked application using the generalized principle just proved.' },
+      { expression: 'k = 9{,}000{,}000', annotation: '**Define the items (pigeons).** The items are the people in London. Population: approximately 9,000,000.' },
+      { expression: 'n = 300{,}001 \\text{ (hair counts: } 0 \\text{ to } 300{,}000\\text{)}', annotation: '**Define the categories (holes).** The categories are possible hair counts: 0, 1, 2, ..., up to the biological maximum of about 300,000 — so 300,001 possible counts.' },
+      { expression: 'k = 9{,}000{,}000 > 300{,}001 = n \\quad \\checkmark', annotation: '**Check the condition.** Is k > n? Yes: 9,000,000 ≫ 300,001.' },
+      { expression: '\\left\\lceil \\frac{9{,}000{,}000}{300{,}001} \\right\\rceil = \\lceil 29.999... \\rceil = 30', annotation: '**Apply the generalized principle.** At least one hair count must be shared by at least ⌈k/n⌉ = 30 people.' },
+      { expression: '\\therefore \\text{ at least 30 Londoners share the same hair count.} \\quad \\blacksquare', annotation: '**Conclude.** At least 30 people in London share the exact same hair count — provably, without measuring a single head.' },
     ],
 
     callouts: [
@@ -212,9 +208,8 @@ export default {
     ],
     visualizations: [
       {
-        id: 'DominoInductionLab',
+        id: 'ContradictionBudgetLab',
         title: 'How Contradiction Proofs Work — The Impossibility Engine',
-        mathBridge: 'This visualization shows a "counting budget." Set items = 11 and holes = 10. The bar on the left shows the total budget (11) and the bar on the right shows the maximum the no-collision assumption allows (10). Run the proof: the assumption says the budget is ≤ 10 but we placed 11 — the bars visually mismatch. This mismatch is the contradiction. Now try items = 10 and holes = 10: the bars match, no contradiction, and no collision is forced. The impossibility is arithmetic.',
         caption: 'The proof visualized: the items bar always exceeds the no-collision budget when k > n. The visual mismatch is the contradiction.',
       },
     ],
@@ -433,12 +428,12 @@ export default {
     recoveryPoints: [],
     futureLinks: [
       {
-        lessonId: 'discrete-1-01-propositions',
+        lessonId: 'discrete-1-01',
         label: 'Propositions and Proof Techniques (Next)',
         note: 'The proof by contradiction used in this lesson is formalized in Lesson 01. You already used it — now you will understand its precise logical structure and be able to apply it to any statement.',
       },
       {
-        lessonId: 'discrete-1-03-counting',
+        lessonId: 'discrete-1-04',
         label: 'Counting and Combinatorics (Later)',
         note: 'The Pigeonhole Principle is a tool from combinatorics. When you study permutations, combinations, and the inclusion-exclusion principle, you will see how counting arguments grow in sophistication beyond the simple k > n case.',
       },

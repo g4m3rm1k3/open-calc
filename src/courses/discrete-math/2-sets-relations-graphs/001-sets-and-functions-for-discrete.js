@@ -1,8 +1,11 @@
+import setOperationsVennUrl from '../diagrams/dm-set-operations-venn.svg?url'
+import functionClassificationUrl from '../diagrams/dm-function-classification.svg?url'
+
 export default {
   id: 'discrete-1-02a',
   slug: 'sets-and-functions-for-discrete',
-  chapter: 'discrete-1',
-  order: 3,
+  chapter: 'discrete-2',
+  order: 0,
   title: 'Sets and Functions for Discrete Math',
   subtitle: 'The fundamental data structures of mathematical reality',
   tags: ['sets', 'subsets', 'power set', 'cartesian product', 'functions', 'injective', 'surjective', 'bijective'],
@@ -11,7 +14,6 @@ export default {
   hook: {
     question: 'Before writing an algorithm, you must explicitly define exactly what data is allowed into the system, and exactly how the system reacts to it. How do mathematicians define "valid data"?',
     realWorldContext: 'Sets and functions are the grammatical backbone of modern Computer Science. Relational databases, API endpoints, hardware pipelines, and object-oriented architectures completely rely on Set Theory (defining strict groups of data) and Function Mappings (strict rules for converting inputs into predictable outputs).',
-    previewVisualizationId: 'FunctionMappingLab',
   },
 
   intuition: {
@@ -20,7 +22,7 @@ export default {
       'A **Set** is just a bag or a box of unique objects. It is the absolute simplest data structure in existence.',
       'There is no "order" inside a set, and there are absolutely no "duplicates". The set {1, 2, 3} is mathematically completely identical to {3, 1, 2} and {1, 1, 2, 3}.',
       '### 2. The "Nothing" Box (Empty Sets)',
-      'Beginners often struggle with the concept of "Nothing" existing as an actual object. Think of a set as an Amazon shipping box.',
+      '"Nothing" existing as an actual object trips people up at first. Think of a set as a shipping box.',
       '• **∅** (The Empty Set) is an empty, folded cardboard box. It contains literally nothing. Its cardinality is 0.',
       '• **{∅}** is a box that contains an empty box stacked inside of it! It is mathematically NOT empty! Its cardinality (size) is precisely 1.',
       'In Computer Science, this is the exact same strict difference between a totally `null` variable and an empty array `[]`.',
@@ -29,8 +31,10 @@ export default {
       '• **Intersection (A ∩ B):** The Database INNER JOIN. Filtering for "Users who live in NY" AND "Users who bought a shirt" strictly extracts the data surviving in the overlap.',
       '• **Union (A ∪ B):** Matches the Logical OR (∨). Combine everything from both bags into one massive query group.',
       '• **Complement (Aᶜ):** Matches the Logical NOT (¬). Select absolutely everything in the local Universe that is NOT inside bag A.',
+      `![Three Venn diagrams side by side: union (both circles shaded), intersection (only overlap shaded), complement (everything outside A shaded)](${setOperationsVennUrl})`,
+      'Notice the shape of each operation before you memorize its symbol: union shades everything either circle touches, intersection shades only where they overlap, and complement shades everything *outside* the circle entirely — it doesn\'t reference B at all.',
       '### 4. The Math Recipe (Set-Builder Notation)',
-      'Beginners can easily handle reading {1, 2, 3}, but they instantly freeze when they see the algebraic: {x ∈ ℤ | x² < 10}.',
+      'Reading {1, 2, 3} is easy. The algebraic form {x ∈ ℤ | x² < 10} describes the same idea but tends to stall people the first time they see it.',
       'Think of it strictly as a **Filter Recipe**: ',
       '1. **The Ingredients:** The first part (x ∈ ℤ) tells you exactly what Universe of items you are allowed to test (Integers).',
       '2. **The Sieve:** The second part (x² < 10) is the strict conditional rule. Any integer whose square is less than 10 survives the filter and drops into the final Set bag!',
@@ -125,30 +129,32 @@ export default {
       '### 8. Classifying the Machine (Injective, Surjective, Bijective)',
       'Programmers and mathematicians categorize functions based on how aggressively they attack the Codomain (the target Y outputs).',
       '• **Domain vs Range vs Codomain:** This is the biggest point of confusion for beginners! The Codomain is the entire theoretical **Goalie Net** where the ball *could* go. The Range (or Image) is only the specific spots inside the net where the ball *actually* hit. A function is ONLY Surjective if the Range perfectly covers the entire Codomain net.',
-      '• **Injective (1-to-1):** Think: **Unique Database Hashing**. Every single input gets a completely unique ID output. If two users get the same exact output hash (a collision), the system breaks. Visually, this fails the horizontal line test! No two generic arrows arrive at identical targets.',
-      '• **Surjective (Onto):** Think: **Resource CPU Allocation**. You have 5 tasks and 4 worker cores. The function is strictly Surjective if every single worker core (the target) receives at least one task. No idle workers are allowed!',
-      '• **Bijective (Perfect Invertibility):** If a function is BOTH Injective and Surjective, it is Bijective. This creates a flawless 1:1 paired dance between Set X and Set Y. Because it is flawless, you can literally physically press the "Reverse" button on the machine and it will unwind backwards without throwing errors!',
+      '• **Injective (1-to-1):** Think: **unique database hashing**. Every input gets a distinct output. If two users get the same hash (a collision), the system breaks. Visually, this is what the horizontal line test checks: no two arrows arrive at the same target.',
+      '• **Surjective (Onto):** Think: **CPU task allocation**. You have 5 tasks and 4 worker cores. The assignment is surjective if every worker core receives at least one task — no core sits idle.',
+      '• **Bijective (Perfect Invertibility):** If a function is both injective and surjective, it is bijective. This gives a perfect 1-to-1 pairing between Set X and Set Y — precise enough that you can run the machine in reverse and it will unwind cleanly, with no ambiguity about which output came from which input.',
+      `![Three arrow diagrams contrasting injective-only, surjective-only, and bijective mappings between X and Y](${functionClassificationUrl})`,
+      'Read the three diagrams left to right: injective-only leaves targets in Y untouched but never doubles up; surjective-only hits every target but lets two arrows land on the same one; bijective does both simultaneously — every element of Y is hit by exactly one element of X, which is precisely what makes an inverse function possible.',
       '### 9. Composition and Identity (The Assembly Line)',
-      'Functions drastically scale in computational complexity because they can be mechanically chained perfectly together: **g ∘ f**.',
-      'Think of an industrial Assembly Line. Function **f** builds the plastic toy. Function **g** paints the toy metallic blue.',
-      'Order dictates reality! If you run **g ∘ f** (Evaluate f first), you successfully assemble the raw toy, then beautifully paint it. But if you accidentally run **f ∘ g** (Evaluate g first), you violently paint a bunch of raw unconnected plastic blocks, and *then* force them together later. Function Composition is brutally **Not Commutative**!',
-      'Eventually, you will hit the absolute baseline: **f(x) = x**. Whatever input x you feed the machine, it spits out the exact same untouched x. This is the **Identity Function**. If you run a Bijective function entirely forward, and then throw it backwards into its mathematical Inverse, you will perfectly hit the Identity Function — because you literally just returned to exactly where you started!'
+      'Functions scale because they can be chained together: **g ∘ f**.',
+      'Think of an assembly line. Function **f** builds a toy. Function **g** paints the toy blue.',
+      'Order matters. Run **g ∘ f** (evaluate f first) and you assemble the toy, then paint it. Run **f ∘ g** instead (evaluate g first) and you\'d be painting unassembled plastic blocks before anything is put together — a different result entirely. Function composition is **not commutative**: g ∘ f and f ∘ g are, in general, different functions.',
+      'Eventually you reach the baseline case: **f(x) = x**. Whatever input x you feed the machine, it returns that same x untouched. This is the **identity function**. Run a bijective function forward, then run its inverse on the result, and you land exactly on the identity function — because you\'ve returned precisely to where you started.'
     ],
     callouts: [
       {
         type: 'insight',
         title: 'Pigeonhole Intuition',
-        body: 'If Domain X is massively larger than Codomain Y (e.g., 5 pigeons flying into 3 holes), the function can NEVER be Injective, because multiple arrows are absolutely forced to collide into the same target hole!\n\nConversely, if |X| is smaller than |Y|, the function can NEVER be Surjective, because you simply do not have enough mathematical ammunition to hit every available target.'
+        body: 'If Domain X is larger than Codomain Y (e.g., 5 pigeons into 3 holes), the function can never be injective — by the Pigeonhole Principle, some hole must receive 2 or more arrows.\n\nConversely, if |X| is smaller than |Y|, the function can never be surjective — there simply aren\'t enough inputs to reach every target.'
       },
       {
         type: 'warning',
         title: '⚠️ The Absolute Beginner Pitfalls',
-        body: '• **{1, 2} ≠ (1, 2)**: A set { } is an unordered bag. A coordinate ( ) is an ordered pair. They are completely different species!\n• **0 ≠ ∅**: Zero is a mathematical number. The empty set is an actual physical container that happens to be empty.\n• **Range ⊆ Codomain**: Always remember that your function\'s Range can be smaller than the Codomain (Goalie net), but it can mathematically NEVER be larger!'
+        body: '• **{1, 2} ≠ (1, 2)**: A set { } is unordered. A coordinate ( ) is an ordered pair, where position matters. Different objects entirely.\n• **0 ≠ ∅**: Zero is a number. The empty set is a container that happens to hold nothing.\n• **Range ⊆ Codomain**: A function\'s range can be smaller than its codomain (the "goalie net"), but it can never be larger.'
       },
       {
         type: 'insight',
         title: 'Looking Ahead: Hilbert\'s Hotel & Infinity',
-        body: 'Here is a brain-teaser to prepare you for Countability later in Discrete Math:\n**Are there technically more Integers than Even Integers?**\n\nThe answer is shockingly NO! Because we can physically map $f(n) = 2n$ to permanently create a flawless Bijective bridge linking every single Integer 1:1 to every Even Integer, mathematicians correctly conclude that the two infinite sets are actually the exact identically same immense size ($\\aleph_0$)! Infinity acts deeply strange.'
+        body: 'Here is a brain-teaser to prepare you for countability later in Discrete Math:\n**Are there more integers than even integers?**\n\nThe answer is no. The map $f(n) = 2n$ is a bijection from ℤ to the even integers — proved step by step below — so the two infinite sets have exactly the same size ($\\aleph_0$). Infinity does not behave like finite intuition suggests.'
       }
     ],
     visualizations: [
@@ -165,9 +171,23 @@ export default {
       {
         id: 'FunctionCompositionLab',
         title: 'The Assembly Line Sandbox',
-        caption: 'Verify exactly why chaining mathematical operations backwards causes the algebraic output payload to violently corrupt.'
+        caption: 'See exactly why running the operations in the wrong order produces a different, incorrect result.'
       }
-    ]
+    ],
+    // Flat {expression, annotation} steps — DynamicProof (the component that
+    // renders rigor.proofSteps) reads exactly this shape per step, one at a
+    // time, with Prev/Next/Play controls.
+    proofSteps: [
+      { expression: 'f: \\mathbb{Z} \\to E, \\quad f(n) = 2n', annotation: '**State the goal.** Let f: ℤ → E be defined by f(n) = 2n, where E is the set of even integers. Prove f is bijective — both injective and surjective.' },
+      { expression: 'f(a) = f(b) \\implies 2a = 2b', annotation: '**Prove injective.** Assume f(a) = f(b) for integers a, b. By definition of f, this means 2a = 2b.' },
+      { expression: '2a = 2b \\implies a = b', annotation: '**Divide** both sides by 2 (valid since 2 ≠ 0). This gives a = b directly — exactly the injective definition.' },
+      { expression: '\\therefore f \\text{ is injective.}', annotation: 'f(a) = f(b) forced a = b, with no extra cases (unlike n² earlier in this lesson — there is no ± ambiguity here, since division by 2 is unconditionally reversible).' },
+      { expression: '\\text{Let } y \\in E \\implies y = 2k \\text{ for some } k \\in \\mathbb{Z}', annotation: '**Prove surjective.** Take an arbitrary even integer y ∈ E. By definition of even, y = 2k for some integer k.' },
+      { expression: '\\text{Let } n = k \\in \\mathbb{Z}', annotation: '**Produce a witness.** Choose n = k. Since k is an integer, n = k is a valid input to f.' },
+      { expression: 'f(n) = 2k = y \\quad \\checkmark', annotation: '**Verify.** Compute f(n) with this choice: f(n) = f(k) = 2k = y. This exact y was reached.' },
+      { expression: '\\therefore f \\text{ is surjective.}', annotation: 'Every y ∈ E has some input (namely n = k = y/2) that maps to it.' },
+      { expression: 'f \\text{ injective} \\land f \\text{ surjective} \\implies f \\text{ bijective} \\quad \\blacksquare', annotation: '**Conclude.** f is both injective and surjective, so f is bijective. A bijection between ℤ and E means the two sets are the same size, even though E looks like "half" of ℤ.' },
+    ],
   },
 
   examples: [
@@ -193,7 +213,7 @@ export default {
         { expression: '|a| = |b| \\implies a = \\pm b', annotation: 'The Explosion: Because of the absolute value rules of Algebra, a can equal positive b OR negative b!' },
         { expression: 'f(3) = 9 \\text{ and } f(-3) = 9', annotation: 'The Counterexample: We can easily fire input 3 and input -3 into the machine, and both arrows will absolutely collide on the target 9.' }
       ],
-      conclusion: 'Because two completely distinct inputs collided mathematically onto the exact same output, the function is brutally NOT Injective (Not 1-to-1).'
+      conclusion: 'Because two distinct inputs (3 and −3) collide on the same output (9), the function is not injective.'
     }
   ],
 
@@ -201,7 +221,7 @@ export default {
     {
       id: 'discrete-1-02a-qz1',
       difficulty: 'easy',
-      problem: 'Power Set Math: If an absolutely massive super-set has exactly 10 unique elements, how many possible subsets can you theoretically generate?',
+      problem: 'Power Set Math: If a set has exactly 10 unique elements, how many possible subsets can you generate?',
       hint: 'Remember the Binary Choice exponential explosion!',
       walkthrough: [
         { expression: '2^{10}', annotation: 'Every element perfectly flips a binary Keep/Drop coin 10 independent times.' }
@@ -235,7 +255,8 @@ export default {
 
   crossRefs: [
     { lessonSlug: 'propositions-and-proof-techniques', label: 'Propositions and Proof Techniques', context: 'Set operations blindly obey all underlying propositional rules you mapped earlier.' },
-    { lessonSlug: 'counting-and-combinatorics', label: 'Counting and Combinatorics', context: 'The bijective pairing and power sets are the absolute core of combinatorial analysis.' }
+    { lessonSlug: 'counting-and-combinatorics', label: 'Counting and Combinatorics', context: 'The bijective pairing and power sets are the absolute core of combinatorial analysis.' },
+    { lessonSlug: 'countability-and-infinity', label: 'Countability and Infinity', context: 'The f(n) = 2n bijection proved here is the exact technique that resolves Hilbert\'s Hotel and proves ℤ, ℚ, and ℕ are all the same size.' }
   ],
 
   checkpoints: [
@@ -270,16 +291,21 @@ export default {
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-01b-logic-and-proofs',
-        label: 'Logic and Proofs',
-        note: 'Set operations (∪, ∩,ᶜ) are the direct geometric manifestations of logical connectives (∨, ∧, ¬).',
+        lessonId: 'discrete-1-01',
+        label: 'Propositions and Proof Techniques',
+        note: 'Set operations (∪, ∩, ᶜ) are the direct set-theoretic image of the logical connectives (∨, ∧, ¬) you already proved things with.',
       },
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-02-relations-and-structures',
+        lessonId: 'discrete-1-02',
         label: 'Relations and Structures',
         note: 'We will generalize functions into relations, where one input can map to multiple outputs.',
+      },
+      {
+        lessonId: 'discrete-1-06a',
+        label: 'Countability and Infinity',
+        note: 'The Hilbert\'s Hotel teaser above gets fully resolved here, using exactly the bijection idea from this lesson.',
       },
     ],
   },

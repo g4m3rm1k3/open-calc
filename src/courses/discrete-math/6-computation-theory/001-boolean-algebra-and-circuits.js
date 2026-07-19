@@ -1,8 +1,11 @@
+import logicGatesUrl from '../diagrams/dm-logic-gates.svg?url'
+import karnaughMapUrl from '../diagrams/dm-karnaugh-map.svg?url'
+
 export default {
   id: 'discrete-1-10',
   slug: 'boolean-algebra-and-circuits',
-  chapter: 'discrete-1',
-  order: 12,
+  chapter: 'discrete-6',
+  order: 0,
   title: 'Boolean Algebra and Circuits',
   subtitle: 'Logic identities as an algebra and their hardware realization',
   tags: ['boolean algebra', 'logic circuits', 'cnf', 'dnf', 'karnaugh map'],
@@ -13,16 +16,23 @@ export default {
       'How do symbolic logic statements become actual hardware gates that compute?',
     realWorldContext:
       'Boolean algebra underlies CPU logic units, digital circuit minimization, hardware verification, and SAT-based software tooling.',
-    previewVisualizationId: 'TruthTableLab',
   },
 
   intuition: {
     prose: [
-      'Boolean algebra treats truth values as algebraic objects with operations AND, OR, and NOT.',
-      'Every propositional formula has equivalent normal-form representations such as CNF and DNF.',
-      'Circuit design is logic made physical. Gates implement Boolean operations, and algebraic simplification reduces gate count and latency.',
-      'For beginners, always validate an identity by truth table first, then learn symbolic transformation rules.',
-      'Karnaugh maps are visual tools for simplification and are especially useful before formal minimization algorithms.',
+      `![Standard schematic symbols for AND, OR, NOT, NAND, and XOR gates](${logicGatesUrl})`,
+
+      'Boolean algebra treats True/False (or 1/0) as algebraic objects with their own operations — AND, OR, and NOT — that obey precise laws, the same way ordinary algebra has + and × obeying commutativity, associativity, and distributivity. This is literally the propositional logic from the very first lesson of this course, renamed and given an algebraic treatment: ∧ becomes ·, ∨ becomes +, ¬ becomes overline or prime.',
+
+      'Every propositional formula has equivalent normal-form representations — **CNF** (conjunctive normal form: an AND of ORs, like (A∨B)·(¬A∨C)) and **DNF** (disjunctive normal form: an OR of ANDs, like A·B + ¬A·C). Any Boolean function, no matter how it was originally written, can be mechanically rewritten into either form — which matters because SAT solvers and hardware verification tools are typically built to consume one specific normal form.',
+
+      'Circuit design is Boolean logic made physical: each gate symbol above is a hardware component implementing exactly one Boolean operation, and algebraic simplification (via the identities below, or visually via a Karnaugh map) reduces gate count, chip area, and signal latency in the physical circuit that results — this is not an abstract exercise, it is literally how CPUs get faster and cheaper.',
+
+      'For beginners, always validate a proposed identity with a truth table first — check all 2ⁿ rows — before trying to manipulate it symbolically. Once you trust the identity is true, the symbolic transformation rules (De Morgan, absorption, distributivity) let you simplify expressions far faster than re-deriving a truth table every time.',
+
+      `![Karnaugh map showing P·Q + P·¬Q simplifying to just P](${karnaughMapUrl})`,
+
+      'A **Karnaugh map** is a grid laid out so that any two horizontally- or vertically-adjacent cells differ in exactly one input variable — which means a rectangular block of 1s that spans two or more cells reveals a variable that "doesn\'t matter" across that block, and can be dropped. In the diagram, both cells in the P=1 row are 1 regardless of Q\'s value, so the whole row collapses from "P·Q + P·¬Q" down to simply "P" — the same simplification the absorption law gives algebraically, but found by pattern-matching on a grid instead of applying a named law.',
     ],
     callouts: [
       {
@@ -38,25 +48,28 @@ export default {
     ],
     visualizations: [
       {
-        id: 'TruthTableLab',
-        title: 'Truth Table Studio',
-        caption: 'Test identity candidates and verify equivalence row-by-row.',
+        id: 'GateCircuitBuilder',
+        title: 'Gate Circuit Builder',
+        caption: 'Pick a gate and watch its truth table live, then switch to NAND-only mode to rebuild NOT, AND, and OR from NAND alone.',
       },
     ],
   },
 
   math: {
     prose: [
-      'Core identities include idempotent, commutative, associative, distributive, absorption, and De Morgan laws.',
-      'Functional completeness means a gate set can express every Boolean function. NAND alone and NOR alone are functionally complete.',
-      'CNF is central in SAT solving and formal verification; DNF is often intuitive for direct constructive reasoning.',
+      'The core identities are the same shape as ordinary algebra\'s, with AND playing the role of multiplication and OR playing the role of addition: **idempotent** (A·A = A, A+A = A — Boolean values don\'t "accumulate" the way numbers do), **commutative** and **associative** (order and grouping don\'t matter), **distributive** (A·(B+C) = A·B + A·C, exactly like ordinary distribution), **absorption** (A + A·B = A, the Karnaugh-map simplification above), and **De Morgan\'s laws** (¬(A·B) = ¬A+¬B and ¬(A+B) = ¬A·¬B, from the propositions lesson, now written algebraically).',
+
+      '**Functional completeness** means a set of gates can express *every* possible Boolean function using only gates from that set. Remarkably, NAND *alone* is functionally complete — the challenge below constructs NOT and AND purely from NAND gates, and once you have NOT and AND, De Morgan\'s law gives you OR for free, and having {NOT, AND, OR} is enough to build any truth table whatsoever. NOR is separately, independently also functionally complete on its own. This is why real chips are often built almost entirely out of just one gate type — manufacturing one uniform component repeatedly is cheaper than manufacturing several different ones.',
+
+      'CNF is the form SAT solvers and formal verification tools are built around (checking "is there some assignment that makes every AND-ed clause true" is the canonical SAT problem), while DNF is often more intuitive for direct constructive reasoning ("the function is true exactly when one of these explicit combinations holds").',
     ],
   },
 
   rigor: {
     prose: [
-      'A symbolic simplification is valid only if each rewrite rule is logically equivalent.',
-      'To prove two circuits equivalent, prove corresponding formulas equivalent or compare full truth tables.',
+      'A symbolic simplification step is valid only if the rewrite rule applied is itself a genuine logical equivalence — provable, in principle, by checking that both sides\' truth tables match on every row. Chaining several valid rewrite steps together produces a valid overall simplification, by transitivity of logical equivalence.',
+
+      'To prove two circuits compute the same function, either prove their corresponding Boolean formulas are logically equivalent via the algebraic identities (fast, but requires spotting the right sequence of rewrites), or directly compare their full truth tables row by row (slower — 2ⁿ rows for n inputs — but mechanical and guaranteed to terminate with a definite answer either way).',
     ],
   },
 
@@ -142,14 +155,14 @@ export default {
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-01b-logic-and-proofs',
-        label: 'Logic and Proofs',
+        lessonId: 'discrete-1-01',
+        label: 'Propositions and Proof Techniques',
         note: 'Boolean algebra is the formal symbolic system for the propositional logic we studied at the beginning.',
       },
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-11-automata-theory',
+        lessonId: 'discrete-1-11',
         label: 'Automata Theory',
         note: 'Sequential circuits use Boolean logic combined with memory (Flip-Flops) to implement state machines.',
       },

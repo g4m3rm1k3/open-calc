@@ -1,8 +1,11 @@
+import hasseDiagramUrl from '../diagrams/dm-hasse-diagram.svg?url'
+import equivalencePartitionUrl from '../diagrams/dm-equivalence-partition.svg?url'
+
 export default {
   id: 'discrete-1-02',
   slug: 'relations-and-structures',
-  chapter: 'discrete-1',
-  order: 4,
+  chapter: 'discrete-2',
+  order: 1,
   title: 'Relations, Equivalence, and Order',
   subtitle: 'How Discrete Math organizes raw unstructured data into hierarchies and partitions',
   tags: ['sets', 'relations', 'equivalence relation', 'partial order', 'functions', 'poset'],
@@ -11,7 +14,6 @@ export default {
   hook: {
     question: 'When is a relationship between objects "well-behaved" enough to let us group them cleanly or rank them reliably?',
     realWorldContext: 'Equivalence relations power modular arithmetic, database normalization, and file deduplication. Partial orders appear in task scheduling, version control (Git branches), and topological sorting of dependencies.',
-    previewVisualizationId: 'RelationsExplorer',
   },
 
   intuition: {
@@ -28,10 +30,10 @@ export default {
       'Beginners constantly confuse these two systems! Every Function is technically a Relation, but very few Relations are Functions.',
       'A **Function** is incredibly strict and "loyal"—every single input is absolutely forced to shoot exactly ONE outward arrow. A **Relation**, however, is structurally "wild"—an input can securely fire 5 arrows at once, or zero arrows!',
       '### 3. The Holy Trinity of Data Properties',
-      'To engineer complex logical machinery (like AWS Databases or Social Networks), mathematicians ruthlessly classify relations based on three fundamental structural laws:',
-      '• **Reflexive:** *Everyone trusts themselves.* Every single element physically points an arrow exactly back to itself. In a matrix, the main diagonal is perfectly illuminated.',
-      '• **Symmetric:** *If I trust you, you must trust me.* Every single arrow is flawlessly bi-directional. If a → b exists, an equally valid return edge b → a MUST exist. The data matrix is perfectly mirrored across its diagonal!',
-      '• **Transitive:** *Shortcuts are enforced! If I trust you, and you trust Bob, I automatically trust Bob.* If the path A → B exists, and B → C exists, the system mandates there MUST be a direct teleport edge A → C! If it is missing, Transitivity is radically broken.',
+      'To engineer complex logical machinery (like databases or social networks), mathematicians classify relations based on three fundamental structural laws:',
+      '• **Reflexive:** *Everyone trusts themselves.* Every element points an arrow back to itself. In a matrix, the main diagonal is fully filled in.',
+      '• **Symmetric:** *If I trust you, you must trust me.* Every arrow is bidirectional. If a → b exists, the return edge b → a must also exist. The data matrix is mirrored across its diagonal.',
+      '• **Transitive:** *Shortcuts are enforced — if I trust you, and you trust Bob, I trust Bob.* If the path A → B exists, and B → C exists, there must also be a direct edge A → C. If it\'s missing, transitivity fails.',
       'Vocabulary bridge: A <span class="tooltip" data-tooltip="A relation R on A is a subset of A × A.">relation</span> can become an <span class="tooltip" data-tooltip="Reflexive + symmetric + transitive.">equivalence relation</span> or a <span class="tooltip" data-tooltip="Reflexive + antisymmetric + transitive.">partial order</span> depending on which structural laws it satisfies.',
       'Intuition anchor: equivalence relations split sets into <span class="tooltip" data-tooltip="A partition is a family of disjoint non-empty subsets whose union is the whole set.">partitions</span>, while partial orders build <span class="tooltip" data-tooltip="A poset is a set equipped with a partial order relation.">posets</span> where some elements can remain incomparable.'
     ],
@@ -39,7 +41,7 @@ export default {
       {
         type: 'definition',
         title: 'Asymmetric vs. Antisymmetric (The Logic Trap)',
-        body: 'This is the most dangerous trap in Discrete Math! Beginners assume "Antisymmetric" just means the exact opposite of Symmetric. It DOES NOT!\n\n• **Asymmetric:** (Strictly Taller Than). If A → B exists, B → A is physically impossible! Self-loops (A → A) are also strictly BANNED.\n• **Antisymmetric:** (Greater Than or Equal To). The ONLY time mutual loops (A → B and B → A) are legally allowed to exist is if A and B are literally the exact identical node! (Self-loops are completely fine and often required).'
+        body: 'A common trap: "antisymmetric" is not simply the opposite of "symmetric."\n\n• **Asymmetric:** (Strictly Taller Than.) If A → B exists, B → A cannot. Self-loops (A → A) are also forbidden.\n• **Antisymmetric:** (Greater Than or Equal To.) A mutual pair (A → B and B → A) is only allowed when A and B are the same node. Self-loops are fine — often required.'
       },
       {
         type: 'insight',
@@ -75,21 +77,29 @@ export default {
       'A partial order ≤ on A makes (A, ≤) a <span class="tooltip" data-tooltip="A partially ordered set, or poset.">poset</span>. If every pair of elements is comparable, it becomes a total order (like the usual ≤ on numbers).',
       'What mathematically happens when a Relation is completely **Reflexive AND Symmetric AND Transitive** all at the exact same time? You achieve the legendary **Equivalence Relation**.',
       'An Equivalence Relation is so structurally flawless that it perfectly slices its Universe Set into mutually exclusive chunks called **Equivalence Classes (or Partitions).** Every single piece of data is neatly sorted into exactly one category bucket. Nothing is left resting outside, and absolutely NO data overlaps between buckets.',
-      'For example: The relation "Has the same birthday month as you" is an Equivalence Relation. It cleanly splits human civilization into exactly 12 perfect buckets. Programmers use this exact mathematical structure to categorize object equality grouping.',
+      'For example: the relation "has the same birthday month as you" is an equivalence relation. It splits people into exactly 12 buckets, one per month. Programmers use this exact structure whenever they group objects by an equality-like key.',
+
+      `![Congruence mod 3 splits the integers into three disjoint classes: [0], [1], [2]](${equivalencePartitionUrl})`,
+
+      'This is the same "same remainder" idea from the Pigeonhole Principle lesson, now formalized: congruence mod 3 is an equivalence relation, and its equivalence classes [0], [1], [2] are exactly the partition shown above. Every integer lands in exactly one bucket — nothing is left out, nothing is double-counted.',
       '### 5. Partial Orders vs. Total Orders (The Poset Hierarchy)',
       'What happens if we swap out Symmetric for **Antisymmetric**? If the relation is strictly **Reflexive AND Antisymmetric AND Transitive**, we create a **Partial Order (Poset)**.',
       'A Partial Order is the ultimate mathematical model for Prerequisites! In a Poset, some tasks run perfectly in parallel (e.g. A front-end dev and a back-end dev working at the exact same time). They are validly "Incomparable" mathematically!',
-      'However, if we ruthlessly logically force ALL elements to be physically comparable (everyone must stand in a single-file strict rank line), the Poset officially collapses into a **Total Order**. You use this every day: The integers 1, 2, 3, 4 are a flawless strictly vertical Total Order!',
+      'If instead we require every pair of elements to be comparable (everyone stands in a single-file rank), the poset collapses into a **total order**. You use this every day: 1, 2, 3, 4 under the usual ≤ is a total order.',
       '### 6. Cleaning the Spaghetti (Hasse Diagrams)',
       'Because Partial Orders have so many transitive shortcut arrows and reflexive loops naturally mandated, drawing them as a raw Directed Graph creates an absolutely unreadable mess of overlapping spaghetti wires.',
-      'To actually read them, mathematicians invented the **Hasse Diagram**. It strips away all repetitive loops (since we already know it is Reflexive), completely deletes all transitively implied shortcut arrows, and forces "larger" hierarchal elements to physically float geometricly above smaller elements. The visual result is a breathtakingly clean functional hierarchy tree!',
+      'To actually read them, mathematicians invented the **Hasse Diagram**. It strips away the reflexive loops (we already know they\'re there), removes every transitively-implied shortcut arrow, and places "larger" elements higher up than smaller ones. What remains is just the covering relations — the direct, non-redundant steps of the hierarchy.',
+
+      `![Hasse diagram of divisibility on {1, 2, 3, 4, 6, 12} — only the direct covering edges are drawn](${hasseDiagramUrl})`,
+
+      'Notice what\'s missing: there\'s no edge from 1 straight to 12, even though 1 divides 12 — that edge is implied by 1→2→4→12 (or any other path upward), so drawing it would be redundant. A Hasse diagram shows exactly the edges you need to reconstruct every other relationship by transitivity, and not one more.',
       'Definition bridge: every equivalence relation determines <span class="tooltip" data-tooltip="An equivalence class [a] is all elements related to a.">equivalence classes</span>, and these classes form a partition of the base set.'
     ],
     callouts: [
       {
         type: 'theorem',
         title: 'The Partition Theorem',
-        body: 'Every single Equivalence Relation automatically generates a mathematical Set Partition. And conversely, any time you artificially partition a Set into chunks, you automatically define an Equivalence Relation. They are two flawlessly interlocking sides of the exact same geometric coin.'
+        body: 'Every equivalence relation generates a set partition. Conversely, any partition of a set into chunks defines an equivalence relation (a R b iff a and b are in the same chunk). They are two sides of the same coin.'
       }
     ],
     visualizations: [
@@ -101,7 +111,7 @@ export default {
       {
         id: 'ModuloPartitionLab',
         title: 'Equivalence Classes (Splitting the Universe)',
-        caption: 'Watch Modulo Arithmetic ruthlessly act as an Equivalence Relation. It cleanly slices the numerical universe into strictly non-overlapping categories.'
+        caption: 'Watch modular arithmetic act as an equivalence relation, slicing the integers into non-overlapping remainder classes.'
       },
       {
         id: 'HasseTransformerLab',
@@ -155,34 +165,9 @@ export default {
 
   examples: [
     {
-      id: 'ch1-003-ex1',
-      title: 'Congruence Modulo 5 - Classic Equivalence',
-      problem: 'Define relation R on ℤ by a R b ⇔ a ≡ b (mod 5). Prove it is an equivalence relation.',
-      steps: [
-        {
-          expression: 'Reflexive: a ≡ a (mod 5). Symmetric: obvious. Transitive: if a ≡ b and b ≡ c then a ≡ c (mod 5).',
-          annotation: 'The equivalence classes are the residue classes {..., -5, 0, 5, ...}, {..., -4, 1, 6, ...}, etc.',
-        },
-      ],
-      conclusion: 'This is exactly the "same remainder" idea from the Pigeonhole Principle lesson.',
-      visualizations: [{ id: 'RelationsExplorer', props: { demo: 'mod5' } }],
-    },
-    {
-      id: 'ch1-003-ex2',
-      title: 'Divisibility as a Partial Order',
-      problem: 'On the set of positive integers, define a ≤ b ⇔ a divides b. Is this a partial order?',
-      steps: [
-        {
-          expression: 'Reflexive (every number divides itself), antisymmetric (if a|b and b|a then a=b), transitive (if a|b and b|c then a|c).',
-          annotation: '2 and 3 are incomparable - neither divides the other.',
-        },
-      ],
-      conclusion: 'Many real-world hierarchies (task dependencies, file versions) are partial orders.',
-    },
-    {
       id: 'discrete-1-02-ex1',
       title: 'Congruence Mod 3: The Ultimate Equivalence Relation',
-      problem: 'On the infinite set of Integers, define a relation **a R b** IF AND ONLY IF (a mod 3 = b mod 3). Dissect it property by property to legally prove it is an Equivalence Relation.',
+      problem: 'On the set of integers, define a relation **a R b** if and only if (a mod 3 = b mod 3). Check it property by property to prove it is an equivalence relation.',
       steps: [
         { expression: '\\text{Reflexivity: } a \\pmod 3 = a \\pmod 3', annotation: 'Every integer always equals itself. Flawlessly True.' },
         { expression: '\\text{Symmetry: If } a \\pmod 3 = b \\pmod 3 \\text{ then } b \\pmod 3 = a \\pmod 3', annotation: 'Basic equality can obviously be completely flipped. Flawlessly True.' },
@@ -207,40 +192,14 @@ export default {
       problem: 'On the set of all human beings, define **a R b** IF AND ONLY IF "a is the sister of b". Prove by contradiction that this relation completely fails to be an Equivalence Relation.',
       steps: [
         { expression: '\\text{Assume Transitivity: If } a \\text{ R } b \\text{ and } b \\text{ R } c, \\text{ then } a \\text{ R } c', annotation: 'Let\'s assume it holds True. If Alice is Bob\'s sister, and Bob is Charlie\'s sister, therefore Alice must be Charlie\'s sister.' },
-        { expression: '\\text{The Contradiction! }', annotation: 'Wait! If Bob is Charlie\'s sister, that legally requires Bob to be female. But Bob is a standard male name/identity. The premise geometrically implodes upon itself.' },
-        { expression: '\\text{Symmetry Check: If } a \\text{ R } b \\implies b \\text{ R } a', annotation: 'Let\'s try another pillar. If Alice is Bob\'s sister, must Bob be Alice\'s sister? No, Bob is her brother!' }
+        { expression: '\\text{The Contradiction}', annotation: 'If Bob is Charlie\'s sister, Bob must be female — but "Bob" is being used here as a male name. The premise contradicts itself.' },
+        { expression: '\\text{Symmetry Check: If } a \\text{ R } b \\implies b \\text{ R } a', annotation: 'Try another property. If Alice is Bob\'s sister, must Bob be Alice\'s sister? No — Bob would be her brother.' }
       ],
-      conclusion: 'It wildly fails Transitivity and Symmetry due to biological logic contradictions. By proving it breaks just one single rule, you instantly prove it is NOT an Equivalence Relation.'
+      conclusion: 'The relation fails both transitivity and symmetry. Breaking just one property is enough to prove it is not an equivalence relation.'
     }
   ],
 
   challenges: [
-    {
-      id: 'ch1-003-ch1',
-      difficulty: 'easy',
-      problem: 'On the set {1,2,3}, list all pairs that would make "is equal or greater than" a partial order.',
-      hint: 'Include reflexivity and be antisymmetric.',
-      walkthrough: [
-        {
-          expression: '(1,1), (2,2), (3,3), (1,2), (1,3), (2,3)',
-          annotation: 'This gives the usual numerical order.',
-        },
-      ],
-      answer: 'The six pairs above',
-    },
-    {
-      id: 'ch1-003-ch2',
-      difficulty: 'medium',
-      problem: 'Is the relation "has the same number of letters" on English words an equivalence relation? Why or why not?',
-      hint: 'Check the three required properties.',
-      walkthrough: [
-        {
-          expression: 'Yes - reflexive, symmetric, and transitive. The equivalence classes are words grouped by length.',
-          annotation: '',
-        },
-      ],
-      answer: 'Yes, it is an equivalence relation',
-    },
     {
       id: 'discrete-1-02-ch1',
       difficulty: 'easy',
@@ -257,13 +216,13 @@ export default {
     {
       id: 'discrete-1-02-ch2',
       difficulty: 'medium',
-      problem: 'Algebraically build a mathematical custom relation matrix on the set {1, 2, 3} that is strictly Reflexive and perfectly Symmetric, but wildly fails Transitivity.',
-      hint: 'You must deliberately insert a broken link chain. Give 1 access to 2, and 2 access to 3, but brutally delete the bridge from 1 to 3!',
+      problem: 'Build a relation matrix on the set {1, 2, 3} that is reflexive and symmetric, but fails transitivity.',
+      hint: 'Give 1 a link to 2, and 2 a link to 3, but leave out the link from 1 to 3.',
       walkthrough: [
         { expression: '\\text{Include all diagonal loops: } (1,1), (2,2), (3,3)', annotation: 'This immediately secures the Reflexive property threshold.' },
         { expression: '\\text{Include pairs: } (1,2) \\text{ and } (2,1)', annotation: 'This creates a localized symmetric bubble between 1 and 2.' },
         { expression: '\\text{Include pairs: } (2,3) \\text{ and } (3,2)', annotation: 'This creates a secondary symmetric bubble between 2 and 3.' },
-        { expression: '\\text{Ensure } (1,3) \\text{ is DELETED!}', annotation: 'Boom. The bridge from 1 to 2 exists... 2 to 3 exists... but 1 to 3 triggers a catastrophic Transitivity failure!' }
+        { expression: '\\text{Ensure } (1,3) \\text{ is left out}', annotation: 'The link 1→2 exists, and 2→3 exists, but 1→3 is missing — exactly the gap transitivity forbids.' }
       ],
       answer: 'The matrix pairs are: {(1,1), (2,2), (3,3), (1,2), (2,1), (2,3), (3,2)}. You deliberately sabotaged the transitive architecture.'
     },
@@ -285,7 +244,7 @@ export default {
       walkthrough: [
         { expression: '\\text{If } a \\to b, \\text{ then strictly } b \\to a', annotation: 'Since literally zero arrows exist, the rule is mathematically never broken.' }
       ],
-      answer: 'True! It is legally "Vacuously Symmetric." You cannot be arrested for breaking a traffic law if there are absolutely zero cars on the road.'
+      answer: 'True — it is vacuously symmetric. With no arrows present, the rule "if a→b then b→a" is never violated, the same way a traffic law can\'t be broken by a car that was never on the road.'
     },
     {
       id: 'discrete-1-02-ch5',
@@ -297,7 +256,7 @@ export default {
         { expression: '\\text{Symmetric: If } a \\to b, \\text{ then } b \\to a', annotation: 'Only a->a exists. It is perfectly symmetrical because there are no outbound arrows to test.' },
         { expression: '\\text{Transitive: If } a \\to b \\text{ and } b \\to c, \\text{ then } a \\to c', annotation: 'Only a->a exists. It formally passes transitively without any breaches.' }
       ],
-      answer: 'It successfully passes all three rules flawlessly! The Identity Matrix is theoretically the most pure, basic Equivalence Relation in existence.'
+      answer: 'It passes all three properties. The identity relation is the simplest possible equivalence relation — every element is related only to itself.'
     }
   ],
   semantics: {
@@ -322,16 +281,16 @@ export default {
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-02a-sets-and-functions-for-discrete',
+        lessonId: 'discrete-1-02a',
         label: 'Sets and Functions',
         note: 'Relations are the raw combinatorial soil (Cartesian Products) from which Functions are carefully selected.',
       },
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-04-graph-theory',
+        lessonId: 'graph-theory-intro',
         label: 'Graph Theory',
-        note: 'Every relation is a graph. We will study the structural properties of these networks in detail.',
+        note: 'Every relation is a graph. We will study the structural properties of these networks in detail, starting right after this lesson.',
       },
     ],
   },

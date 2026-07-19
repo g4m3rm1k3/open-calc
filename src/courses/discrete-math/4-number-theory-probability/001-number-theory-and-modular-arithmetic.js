@@ -1,8 +1,11 @@
+import euclideanRectangleUrl from '../diagrams/dm-euclidean-rectangle.svg?url'
+import modularClockUrl from '../diagrams/dm-modular-clock.svg?url'
+
 export default {
   id: 'discrete-1-05',
   slug: 'number-theory-and-modular-arithmetic',
-  chapter: 'discrete-1',
-  order: 7,
+  chapter: 'discrete-4',
+  order: 0,
   title: 'Number Theory and Modular Arithmetic',
   subtitle: 'Divisibility, primes, gcd, and congruences — the mathematics behind every secure system',
   tags: ['number theory', 'divisibility', 'primes', 'gcd', 'euclidean algorithm', 'modular arithmetic'],
@@ -11,7 +14,6 @@ export default {
   hook: {
     question: 'Why does modern encryption depend on arithmetic that looks like high-school remainders?',
     realWorldContext: 'RSA encryption — which secures your bank connection, your email, and your passwords — is built on a number theory problem: multiplying two large primes is easy, but factoring their product back into primes is computationally infeasible. The entire security of the internet rests on properties of integers that were studied purely for mathematical curiosity two thousand years before anyone thought to use them for cryptography.',
-    previewVisualizationId: 'ModClockViz',
   },
 
   intuition: {
@@ -82,6 +84,8 @@ Finding gcd by listing all divisors works for small numbers but is slow for larg
 
 **Geometric intuition:** gcd(a,b) is the side length of the largest square tile that perfectly fills an a × b rectangle with no waste. gcd(12, 18) = 6 means you can tile a 12 × 18 room with 6 × 6 tiles exactly.
 
+![A 12×18 rectangle exactly tiled by six 6×6 squares](${euclideanRectangleUrl})
+
 **Why gcd matters:**
 - Simplifying fractions: 18/24 = 3/4 because gcd(18,24) = 6.
 - LCM: lcm(a,b) = ab/gcd(a,b). The least common multiple is the smallest number both divide evenly.
@@ -119,6 +123,8 @@ We say a ≡ b (mod n) — "a is congruent to b modulo n" — when a and b have 
 −3 ≡ 9 (mod 12): −3 and 9 both leave remainder 9 (or equivalently, 12 divides −3 − 9 = −12). ✓
 
 The "clock" metaphor: on a 12-hour clock, adding 15 hours to 10:00 gives (10 + 15) mod 12 = 25 mod 12 = 1, so it's 1:00. The clock wraps around.
+
+![Clock diagram showing 10:00 plus 15 hours wrapping around to 1:00](${modularClockUrl})
 
 **Why modular arithmetic is an equivalence relation:**
 - Reflexive: a ≡ a (mod n) (a − a = 0, divisible by everything)
@@ -491,7 +497,7 @@ Let r = a' mod b', so a' = b'q + r. Any common divisor d of a' and b' also divid
   },
 
   crossRefs: [
-    { lessonSlug: 'logic-and-proofs', label: 'Proof Techniques', context: 'Divisibility and prime arguments use direct proof and contradiction. The infinitude of primes is proven by contradiction.' },
+    { lessonSlug: 'propositions-and-proof-techniques', label: 'Proof Techniques', context: 'Divisibility and prime arguments use direct proof and contradiction. The infinitude of primes is proven by contradiction.' },
     { lessonSlug: 'induction-and-recursion', label: 'Induction', context: 'The correctness of the Euclidean algorithm is proven with a loop invariant — which is an inductive argument.' },
     { lessonSlug: 'relations-and-structures', label: 'Relations', context: 'Congruence mod n is a canonical equivalence relation. The residue classes are its equivalence classes.' },
     { lessonSlug: 'algorithms-and-complexity', label: 'Algorithms', context: 'The Euclidean algorithm is a model of efficient computation. RSA uses modular exponentiation (O(log e) multiplications).' },
@@ -500,8 +506,8 @@ Let r = a' mod b', so a' = b'q + r. Any common divisor d of a' and b' also divid
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-01b-logic-and-proofs',
-        label: 'Logic and Proofs',
+        lessonId: 'discrete-1-01',
+        label: 'Propositions and Proof Techniques',
         note: 'The Fundamental Theorem of Arithmetic is often proven using strong induction. Infinitely many primes: proof by contradiction.',
       },
       {
@@ -512,14 +518,9 @@ Let r = a' mod b', so a' = b'q + r. Any common divisor d of a' and b' also divid
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-10-boolean-algebra-and-circuits',
+        lessonId: 'discrete-1-10',
         label: 'Boolean Algebra',
         note: 'Arithmetic mod 2 (XOR, AND) is the foundation of bitwise operations and hardware circuits.',
-      },
-      {
-        lessonId: 'discrete-2-05-cryptography',
-        label: 'Cryptography',
-        note: 'RSA, Diffie-Hellman, and elliptic curve cryptography all build directly on the modular arithmetic from this lesson.',
       },
     ],
   },
@@ -610,6 +611,7 @@ Let r = a' mod b', so a' = b'q + r. Any common divisor d of a' and b' also divid
     'completed-example-1',
     'completed-example-2',
     'completed-example-3',
+    'completed-example-4',
     'attempted-challenge-easy',
     'attempted-challenge-medium',
     'attempted-challenge-hard',

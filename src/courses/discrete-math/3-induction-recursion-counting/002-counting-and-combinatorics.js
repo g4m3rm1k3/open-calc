@@ -1,8 +1,11 @@
+import pascalsTriangleUrl from '../diagrams/dm-pascals-triangle.svg?url'
+import starsAndBarsUrl from '../diagrams/dm-stars-and-bars.svg?url'
+
 export default {
   id: 'discrete-1-04',
   slug: 'counting-and-combinatorics',
-  chapter: 'discrete-1',
-  order: 6,
+  chapter: 'discrete-3',
+  order: 1,
   title: 'Counting and Combinatorics',
   subtitle: 'The dark art of enumerating massive keyspaces before brute-force computation fails',
   tags: ['counting', 'combinatorics', 'permutations', 'combinations', 'binomial coefficient'],
@@ -11,7 +14,6 @@ export default {
   hook: {
     question: 'How do you theoretically prove that a 256-bit encryption key will take the world\'s fastest supercomputer roughly 3 million years to crack via brute-force?',
     realWorldContext: 'Combinatorics is the mathematical engine behind cryptography, database indexing efficiency, and AI game trees. If a software engineer cannot estimate branching path counts, their algorithms can become computationally impractical very quickly (the State Explosion Problem).',
-    previewVisualizationId: 'CountingTreeLab',
   },
 
   intuition: {
@@ -240,6 +242,8 @@ Row 4:      1   4   6   4   1
 
 Each entry equals the sum of the two entries above it. This is because C(n,k) = C(n−1,k−1) + C(n−1,k): you can either include the new item (choose k−1 from the remaining n−1) or exclude it (choose k from n−1).
 
+![Pascal's Triangle rows 0 through 4, with the 3+3=6 addition highlighted](${pascalsTriangleUrl})
+
 Pascal's Triangle connects combinatorics to algebra through the **Binomial Theorem**:
 
 (x + y)ⁿ = Σₖ C(n,k) xⁿ⁻ᵏ yᵏ
@@ -264,6 +268,8 @@ Use 2 "bars" (|) to divide them into 3 flavor bins. The position of the bars det
 
 ★★★|★★★★★|★★ means 3 Cokes, 5 Sprites, 2 Fantas (total = 10 ✓)
 ★★★★★★★★★★|| means 10 Cokes, 0 Sprites, 0 Fantas (total = 10 ✓)
+
+![Stars and bars picture for 10 sodas split into 3 flavors: 3 Cokes, 5 Sprites, 2 Fantas](${starsAndBarsUrl})
 
 You have 10 stars + 2 bars = 12 symbols total. The number of distinct arrangements is the number of ways to choose which 2 positions (out of 12) hold the bars:
 
@@ -532,8 +538,8 @@ Similarly: the number of paths in a decision tree, the number of ways a hash col
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-01b-logic-and-proofs',
-        label: 'Logic and Proofs',
+        lessonId: 'discrete-1-01',
+        label: 'Propositions and Proof Techniques',
         note: 'The Binomial Theorem can be proven by induction. Inclusion-Exclusion requires careful logical case analysis.',
       },
       {
@@ -544,13 +550,13 @@ Similarly: the number of paths in a decision tree, the number of ways a hash col
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-06-probability',
+        lessonId: 'discrete-1-06',
         label: 'Probability',
         note: 'Counting is the foundation of discrete probability. P(event) = (favorable outcomes)/(total outcomes) requires counting both.',
       },
       {
-        lessonId: 'discrete-2-01-algorithm-analysis',
-        label: 'Algorithm Analysis',
+        lessonId: 'discrete-1-13',
+        label: 'Algorithms and Complexity',
         note: 'Combinatorial explosion explains why certain brute-force algorithms are infeasible and why heuristics and pruning are necessary.',
       },
     ],

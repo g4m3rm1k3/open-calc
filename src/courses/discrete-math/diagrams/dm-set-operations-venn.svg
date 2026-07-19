@@ -1,0 +1,38 @@
+<svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="560" height="220" rx="10" fill="#f8fafc"/>
+
+  <!-- Union -->
+  <g>
+    <text x="90" y="24" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">A &#8746; B (Union)</text>
+    <rect x="20" y="35" width="140" height="140" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+    <circle cx="75" cy="105" r="42" fill="#3b82f6" fill-opacity="0.55" stroke="#3b82f6" stroke-width="2"/>
+    <circle cx="115" cy="105" r="42" fill="#3b82f6" fill-opacity="0.55" stroke="#3b82f6" stroke-width="2"/>
+    <text x="55" y="108" font-size="12" font-weight="700" fill="#1e3a8a">A</text>
+    <text x="130" y="108" font-size="12" font-weight="700" fill="#1e3a8a">B</text>
+    <text x="90" y="192" font-size="9" fill="#64748b" text-anchor="middle">everything in A OR B</text>
+  </g>
+
+  <!-- Intersection -->
+  <g>
+    <text x="280" y="24" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">A &#8745; B (Intersection)</text>
+    <rect x="210" y="35" width="140" height="140" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1"/>
+    <circle cx="265" cy="105" r="42" fill="none" stroke="#10b981" stroke-width="2"/>
+    <circle cx="305" cy="105" r="42" fill="none" stroke="#10b981" stroke-width="2"/>
+    <clipPath id="clip-int">
+      <circle cx="265" cy="105" r="42"/>
+    </clipPath>
+    <circle cx="305" cy="105" r="42" fill="#10b981" fill-opacity="0.6" clip-path="url(#clip-int)"/>
+    <text x="245" y="108" font-size="12" font-weight="700" fill="#065f46">A</text>
+    <text x="320" y="108" font-size="12" font-weight="700" fill="#065f46">B</text>
+    <text x="280" y="192" font-size="9" fill="#64748b" text-anchor="middle">only the overlap</text>
+  </g>
+
+  <!-- Complement -->
+  <g>
+    <text x="470" y="24" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">A&#7580; (Complement)</text>
+    <rect x="400" y="35" width="140" height="140" rx="8" fill="#f59e0b" fill-opacity="0.35" stroke="#cbd5e1" stroke-width="1"/>
+    <circle cx="470" cy="105" r="42" fill="#ffffff" stroke="#f59e0b" stroke-width="2"/>
+    <text x="460" y="108" font-size="12" font-weight="700" fill="#92400e">A</text>
+    <text x="470" y="192" font-size="9" fill="#64748b" text-anchor="middle">everything NOT in A</text>
+  </g>
+</svg>

@@ -1,0 +1,32 @@
+<svg viewBox="0 0 460 220" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="460" height="220" rx="10" fill="#f8fafc"/>
+  <text x="230" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Three Traversals of the Same Binary Tree</text>
+
+  <!-- tree structure -->
+  <g stroke="#94a3b8" stroke-width="1.5">
+    <line x1="230" y1="45" x2="150" y2="90"/>
+    <line x1="230" y1="45" x2="310" y2="90"/>
+    <line x1="150" y1="90" x2="110" y2="130"/>
+    <line x1="150" y1="90" x2="190" y2="130"/>
+    <line x1="310" y1="90" x2="350" y2="130"/>
+  </g>
+  <circle cx="230" cy="45" r="16" fill="#3b82f6"/><text x="230" y="50" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">A</text>
+  <circle cx="150" cy="90" r="14" fill="#10b981"/><text x="150" y="95" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">B</text>
+  <circle cx="310" cy="90" r="14" fill="#10b981"/><text x="310" y="95" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">C</text>
+  <circle cx="110" cy="130" r="12" fill="#f59e0b"/><text x="110" y="135" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">D</text>
+  <circle cx="190" cy="130" r="12" fill="#f59e0b"/><text x="190" y="135" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">E</text>
+  <circle cx="350" cy="130" r="12" fill="#f59e0b"/><text x="350" y="135" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">F</text>
+
+  <g font-size="11" font-family="monospace">
+    <text x="30" y="170" fill="#1e3a8a" font-weight="700">Preorder</text>
+    <text x="30" y="185" fill="#334155">(Root, Left, Right):</text>
+    <text x="150" y="170" fill="#1e3a8a">A, B, D, E, C, F</text>
+
+    <text x="30" y="200" fill="#065f46" font-weight="700">Inorder</text>
+    <text x="150" y="200" fill="#065f46">D, B, E, A, C, F</text>
+
+    <text x="290" y="170" fill="#92400e" font-weight="700">Postorder</text>
+    <text x="290" y="185" fill="#334155">(Left, Right, Root):</text>
+    <text x="290" y="200" fill="#92400e">D, E, B, F, C, A</text>
+  </g>
+</svg>

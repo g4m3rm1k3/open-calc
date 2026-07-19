@@ -1,0 +1,19 @@
+<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="300" height="200" rx="10" fill="#f8fafc"/>
+  <text x="150" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Expression Tree: (3 + 4) &#215; 2</text>
+
+  <g stroke="#94a3b8" stroke-width="1.5">
+    <line x1="150" y1="45" x2="95" y2="95"/>
+    <line x1="150" y1="45" x2="205" y2="95"/>
+    <line x1="95" y1="95" x2="65" y2="140"/>
+    <line x1="95" y1="95" x2="125" y2="140"/>
+  </g>
+
+  <circle cx="150" cy="45" r="18" fill="#ef4444"/><text x="150" y="51" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">&#215;</text>
+  <circle cx="95" cy="95" r="16" fill="#3b82f6"/><text x="95" y="101" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">+</text>
+  <circle cx="205" cy="95" r="16" fill="#10b981"/><text x="205" y="101" font-size="12" font-weight="700" fill="#fff" text-anchor="middle">2</text>
+  <circle cx="65" cy="140" r="14" fill="#10b981"/><text x="65" y="145" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">3</text>
+  <circle cx="125" cy="140" r="14" fill="#10b981"/><text x="125" y="145" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">4</text>
+
+  <text x="150" y="175" font-size="10" fill="#334155" text-anchor="middle">Postorder evaluation: 3, 4, +(=7), 2, &#215;(=14) — operands before their operator, exactly bottom-up.</text>
+</svg>

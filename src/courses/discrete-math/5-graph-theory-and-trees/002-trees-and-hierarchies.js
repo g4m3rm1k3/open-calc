@@ -1,8 +1,11 @@
+import treeTraversalOrdersUrl from '../diagrams/dm-tree-traversal-orders.svg?url'
+import expressionTreeUrl from '../diagrams/dm-expression-tree.svg?url'
+
 export default {
   id: 'discrete-1-09',
   slug: 'trees-and-hierarchies',
-  chapter: 'discrete-1',
-  order: 11,
+  chapter: 'discrete-5',
+  order: 1,
   title: 'Trees and Hierarchies',
   subtitle: 'Rooted trees, traversals, and why hierarchical structure dominates computer systems',
   tags: ['tree', 'rooted tree', 'binary tree', 'traversal', 'spanning tree'],
@@ -13,22 +16,29 @@ export default {
       'Why do file systems, parser syntax, DOM structure, and many search structures all end up as trees?',
     realWorldContext:
       'Trees are the most useful constrained graph family in computing. They support efficient indexing, parsing, scheduling, and hierarchical representation.',
-    previewVisualizationId: 'GraphNetwork3D',
   },
 
   intuition: {
     prose: [
-      'A tree is a connected acyclic graph. In rooted trees, one node is designated as root and every other node has a parent relation.',
-      'Tree language mirrors family language: ancestor, descendant, sibling, leaf, depth, and height.',
-      'Traversal order matters because it determines computation order for interpreters, compilers, and many recursive algorithms.',
-      'Expression trees make algebra executable: evaluating or differentiating an expression is a traversal problem over a rooted structure.',
-      'Binary trees are common but not universal. Many real systems use variable-arity trees.',
+      'A tree is a connected acyclic graph — the graph-theory lesson\'s definition, specialized. In a **rooted tree**, one node is designated the root, and every other node gains a well-defined parent (the neighbor one step closer to the root), which is what turns an undirected connectivity structure into a genuine hierarchy.',
+
+      'Tree vocabulary mirrors family vocabulary for a reason — it\'s the same shape: **ancestor** and **descendant** describe the chain up or down from a node, **sibling** describes nodes sharing a parent, a **leaf** is a node with no children (a dead end), **depth** is a node\'s distance from the root, and **height** is the longest depth found anywhere in the tree.',
+
+      `![Preorder, inorder, and postorder traversals of the same binary tree, producing three genuinely different sequences](${treeTraversalOrdersUrl})`,
+
+      'Traversal order is not a cosmetic choice — it determines the actual computation order for interpreters, compilers, and recursive algorithms in general. The diagram above walks the *same* tree three different ways and gets three different sequences: preorder visits a node before its children (useful for copying a tree structure, or printing a prefix expression), postorder visits children before the node (essential when you need every child\'s result *before* you can compute the parent\'s — see the expression tree below), and inorder (binary trees only) visits left child, node, right child — which, for a binary search tree specifically, produces every value in sorted order for free.',
+
+      `![Expression tree for (3 + 4) × 2, with postorder evaluation order shown](${expressionTreeUrl})`,
+
+      'Expression trees make algebra literally executable: each internal node is an operator, each leaf is a value, and evaluating the whole expression is exactly a postorder traversal — you cannot compute a node\'s operator until both of its children\'s values are already known, which is precisely what "children before parent" guarantees. The same tree structure supports symbolic differentiation, too: differentiating a node is a recursive rule applied to its children first, then combined at the node using the product rule, chain rule, or sum rule depending on the operator.',
+
+      'Binary trees (at most 2 children per node) are common because they map cleanly onto yes/no decisions and comparisons, but they are not universal — file systems, org charts, and parse trees for languages with variable-argument function calls all commonly use trees where a node can have any number of children.',
     ],
     visualizations: [
       {
-        id: 'CountingTreeLab',
-        title: 'Branching and Choice Trees',
-        caption: 'See how each node in a tree represents a brand new set of choices, leading to geometric growth.',
+        id: 'TreeTraversalAnimator',
+        title: 'Tree Traversal Animator',
+        caption: 'Step through pre-order, in-order, post-order, and level-order on the same tree and watch each order actually differ.',
       },
       {
         id: 'StrongInductionWallLab',
@@ -47,16 +57,19 @@ export default {
 
   math: {
     prose: [
-      'In rooted trees, recursive definitions are natural: size(T)=1+sum size(children).',
-      'Traversals: preorder (node then children), postorder (children then node), inorder (binary-tree specific).',
-      'Spanning trees in a graph keep all vertices with minimal edge count and support network design and protocol planning.',
+      'Rooted trees invite recursive definitions almost automatically: size(T) = 1 + Σ size(child) summed over T\'s immediate children, with size(leaf) = 1 as the base case. This single recursive equation, combined with the fact that a tree has no cycles to worry about (so no subtree ever contains its own ancestor), is what makes every tree algorithm expressible as "handle the base case, recurse on the children, combine the results."',
+
+      'To restate the three traversal orders precisely: **preorder** visits node, then left subtree, then right subtree — the node always comes before its descendants. **Postorder** visits left subtree, then right subtree, then node — the node always comes after its descendants, which is exactly the property expression evaluation needs. **Inorder** (binary trees only) visits left subtree, node, right subtree — and for a binary *search* tree specifically (where every left descendant is smaller and every right descendant is larger than the node), this produces every value in sorted order, with no separate sorting step required.',
+
+      'A **spanning tree** of a graph keeps every vertex reachable using the minimum possible edge count (|V| − 1, matching the tree edge-count identity from the graph theory lesson) — this is directly useful for network design (the cheapest way to keep every node connected) and protocol planning (broadcast/multicast trees that avoid redundant message loops).',
     ],
   },
 
   rigor: {
     prose: [
-      'Tree proofs often use structural induction: prove for leaf, then assume true for children and prove for parent.',
-      'When proving uniqueness claims (such as unique simple path in tree), explicitly use acyclicity to rule out alternatives.',
+      'Tree proofs commonly use **structural induction**, a variant of induction that recurses on the shape of the tree rather than on an integer: prove the claim for a leaf (the base case, since a leaf has no children to depend on), then assume it holds for every child of a node and prove it holds for the node itself using those assumptions (the inductive step) — the "prove every tree has at least two leaves" challenge below is a worked example of exactly this style, via a longest-path argument rather than a direct recursive one.',
+
+      'When proving uniqueness claims — such as "there is exactly one simple path between any two nodes in a tree" — explicitly invoke acyclicity to rule out alternatives: if two distinct paths existed between the same pair of nodes, they would together trace out a cycle (follow one path forward, the other backward), contradicting that the graph is a tree. This is the standard proof pattern anytime a tree-uniqueness claim needs a rigorous justification rather than just an appeal to intuition.',
     ],
   },
 
@@ -144,14 +157,14 @@ export default {
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-04-graph-theory',
+        lessonId: 'discrete-1-08',
         label: 'Graph Theory',
         note: 'Trees are the special case of graphs where connectivity is achieved with the minimum possible number of edges.',
       },
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-06-algorithms-and-complexity',
+        lessonId: 'discrete-1-13',
         label: 'Algorithms and Complexity',
         note: 'Balanced trees (like AVL or Red-Black trees) ensure O(log n) performance for search and insertion.',
       },

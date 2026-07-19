@@ -1,8 +1,10 @@
+import inductionLadderUrl from '../diagrams/dm-induction-ladder.svg?url'
+
 export default {
   id: "discrete-1-03",
   slug: "induction-and-recursion",
-  chapter: "discrete-1",
-  order: 5,
+  chapter: "discrete-3",
+  order: 0,
   title: "Induction and Recursion",
   subtitle: "Proving infinitely scaling logic with finite mechanical work",
   tags: [
@@ -60,6 +62,8 @@ If both facts are true, all dominoes fall — no matter how many there are. The 
 This is not circular logic. You're not assuming all dominoes fall — you're proving that the *mechanism* of propagation holds everywhere. Once you have the mechanism and the starter, infinity handles itself.
 
 Here's the critical insight: **you only need to prove the mechanism for a generic, arbitrary domino k.** Not domino 1. Not domino 1,000,000. An arbitrary k. If the mechanism works for any k, it works for all k.`,
+
+      `![The induction ladder: base case P(1) proved directly, then one proof of "P(k) implies P(k+1)" carries the claim up every rung to infinity](${inductionLadderUrl})`,
 
       `### The Two Common Beginner Mistakes
 
@@ -747,21 +751,21 @@ The conclusion is not optional or ceremonial. It's the statement that closes the
   spiral: {
     recoveryPoints: [
       {
-        lessonId: "discrete-1-01b-logic-and-proofs",
-        label: "Logic and Proofs",
-        note: "Induction is a specific formal proof technique used for claims involving natural numbers.",
+        lessonId: "discrete-1-01",
+        label: "Propositions and Proof Techniques",
+        note: "Induction is a specific formal proof technique built on the same conditional and direct-proof machinery from that lesson, specialized for claims about natural numbers.",
       },
     ],
     futureLinks: [
       {
-        lessonId: "discrete-1-07-recurrence-relations",
+        lessonId: "discrete-1-07",
         label: "Recurrence Relations",
         note: "We will use induction to prove the closed-form solutions of recursive sequences.",
       },
       {
-        lessonId: "discrete-2-01-algorithm-analysis",
-        label: "Algorithm Analysis",
-        note: "Loop invariants are induction in disguise. Every algorithm proof uses the techniques from this lesson.",
+        lessonId: "discrete-1-13",
+        label: "Algorithms and Complexity",
+        note: "Loop invariants are induction in disguise. Every algorithm correctness proof uses the techniques from this lesson.",
       },
     ],
   },

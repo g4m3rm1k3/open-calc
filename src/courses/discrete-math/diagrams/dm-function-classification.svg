@@ -1,0 +1,52 @@
+<svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="560" height="260" rx="10" fill="#f8fafc"/>
+
+  <!-- Injective (not surjective) -->
+  <g>
+    <text x="90" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Injective</text>
+    <text x="90" y="33" font-size="8" fill="#64748b" text-anchor="middle">(not surjective)</text>
+    <circle cx="45" cy="70" r="4" fill="#3b82f6"/><circle cx="45" cy="100" r="4" fill="#3b82f6"/><circle cx="45" cy="130" r="4" fill="#3b82f6"/>
+    <circle cx="135" cy="55" r="4" fill="#94a3b8"/><circle cx="135" cy="80" r="4" fill="#3b82f6"/><circle cx="135" cy="105" r="4" fill="#3b82f6"/><circle cx="135" cy="130" r="4" fill="#3b82f6"/><circle cx="135" cy="155" r="4" fill="#94a3b8"/>
+    <line x1="49" y1="70" x2="131" y2="80" stroke="#3b82f6" stroke-width="1.5"/>
+    <line x1="49" y1="100" x2="131" y2="105" stroke="#3b82f6" stroke-width="1.5"/>
+    <line x1="49" y1="130" x2="131" y2="130" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="45" y="175" font-size="8" fill="#64748b" text-anchor="middle">X</text>
+    <text x="135" y="175" font-size="8" fill="#64748b" text-anchor="middle">Y</text>
+    <text x="90" y="200" font-size="8.5" fill="#334155" text-anchor="middle">no collisions,</text>
+    <text x="90" y="212" font-size="8.5" fill="#334155" text-anchor="middle">but 2 targets unhit</text>
+  </g>
+
+  <!-- Surjective (not injective) -->
+  <g transform="translate(190,0)">
+    <text x="90" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Surjective</text>
+    <text x="90" y="33" font-size="8" fill="#64748b" text-anchor="middle">(not injective)</text>
+    <circle cx="45" cy="60" r="4" fill="#10b981"/><circle cx="45" cy="90" r="4" fill="#10b981"/><circle cx="45" cy="120" r="4" fill="#10b981"/><circle cx="45" cy="150" r="4" fill="#10b981"/>
+    <circle cx="135" cy="75" r="4" fill="#10b981"/><circle cx="135" cy="115" r="4" fill="#10b981"/><circle cx="135" cy="150" r="4" fill="#10b981"/>
+    <line x1="49" y1="60" x2="131" y2="75" stroke="#10b981" stroke-width="1.5"/>
+    <line x1="49" y1="90" x2="131" y2="75" stroke="#10b981" stroke-width="1.5"/>
+    <line x1="49" y1="120" x2="131" y2="115" stroke="#10b981" stroke-width="1.5"/>
+    <line x1="49" y1="150" x2="131" y2="150" stroke="#10b981" stroke-width="1.5"/>
+    <text x="45" y="175" font-size="8" fill="#64748b" text-anchor="middle">X</text>
+    <text x="135" y="175" font-size="8" fill="#64748b" text-anchor="middle">Y</text>
+    <text x="90" y="200" font-size="8.5" fill="#334155" text-anchor="middle">every target hit,</text>
+    <text x="90" y="212" font-size="8.5" fill="#334155" text-anchor="middle">but one target hit twice</text>
+  </g>
+
+  <!-- Bijective -->
+  <g transform="translate(380,0)">
+    <text x="90" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Bijective</text>
+    <text x="90" y="33" font-size="8" fill="#64748b" text-anchor="middle">(both at once)</text>
+    <circle cx="45" cy="70" r="4" fill="#a855f7"/><circle cx="45" cy="100" r="4" fill="#a855f7"/><circle cx="45" cy="130" r="4" fill="#a855f7"/>
+    <circle cx="135" cy="70" r="4" fill="#a855f7"/><circle cx="135" cy="100" r="4" fill="#a855f7"/><circle cx="135" cy="130" r="4" fill="#a855f7"/>
+    <line x1="49" y1="70" x2="131" y2="70" stroke="#a855f7" stroke-width="1.5"/>
+    <line x1="49" y1="100" x2="131" y2="100" stroke="#a855f7" stroke-width="1.5"/>
+    <line x1="49" y1="130" x2="131" y2="130" stroke="#a855f7" stroke-width="1.5"/>
+    <text x="45" y="175" font-size="8" fill="#64748b" text-anchor="middle">X</text>
+    <text x="135" y="175" font-size="8" fill="#64748b" text-anchor="middle">Y</text>
+    <text x="90" y="200" font-size="8.5" fill="#334155" text-anchor="middle">perfect 1-to-1</text>
+    <text x="90" y="212" font-size="8.5" fill="#334155" text-anchor="middle">pairing — invertible</text>
+  </g>
+
+  <line x1="185" y1="10" x2="185" y2="230" stroke="#e2e8f0" stroke-width="1"/>
+  <line x1="375" y1="10" x2="375" y2="230" stroke="#e2e8f0" stroke-width="1"/>
+</svg>

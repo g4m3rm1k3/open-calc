@@ -1,0 +1,41 @@
+<svg viewBox="0 0 460 160" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="460" height="160" rx="10" fill="#f8fafc"/>
+  <text x="230" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">Gate Symbols and Their Truth Tables</text>
+
+  <!-- AND -->
+  <g transform="translate(20,35)">
+    <path d="M0,0 L0,40 L15,40 A20,20 0 0 0 15,0 Z" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="15" y="24" font-size="9" font-weight="700" fill="#1e3a8a" text-anchor="middle">AND</text>
+    <text x="17" y="60" font-size="8.5" fill="#334155" text-anchor="middle">1 only if both 1</text>
+  </g>
+
+  <!-- OR -->
+  <g transform="translate(115,35)">
+    <path d="M0,0 Q15,20 0,40 Q25,38 35,20 Q25,2 0,0 Z" fill="#f0fdf4" stroke="#10b981" stroke-width="1.5"/>
+    <text x="15" y="24" font-size="9" font-weight="700" fill="#065f46" text-anchor="middle">OR</text>
+    <text x="17" y="60" font-size="8.5" fill="#334155" text-anchor="middle">1 if either is 1</text>
+  </g>
+
+  <!-- NOT -->
+  <g transform="translate(210,35)">
+    <path d="M0,0 L0,40 L30,20 Z" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+    <circle cx="34" cy="20" r="4" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="15" y="55" font-size="8.5" fill="#334155" text-anchor="middle">flips the input</text>
+  </g>
+
+  <!-- NAND -->
+  <g transform="translate(280,35)">
+    <path d="M0,0 L0,40 L15,40 A20,20 0 0 0 15,0 Z" fill="#fce7f3" stroke="#db2777" stroke-width="1.5"/>
+    <circle cx="39" cy="20" r="4" fill="none" stroke="#db2777" stroke-width="1.5"/>
+    <text x="15" y="24" font-size="8" font-weight="700" fill="#9d174d" text-anchor="middle">NAND</text>
+    <text x="20" y="60" font-size="8.5" fill="#334155" text-anchor="middle">AND, then flip</text>
+  </g>
+
+  <!-- XOR -->
+  <g transform="translate(370,35)">
+    <path d="M8,0 Q23,20 8,40 Q33,38 43,20 Q33,2 8,0 Z" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+    <path d="M0,0 Q10,20 0,40" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+    <text x="24" y="24" font-size="8" font-weight="700" fill="#5b21b6" text-anchor="middle">XOR</text>
+    <text x="22" y="60" font-size="8.5" fill="#334155" text-anchor="middle">1 if inputs differ</text>
+  </g>
+</svg>

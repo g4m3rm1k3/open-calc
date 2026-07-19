@@ -1,0 +1,41 @@
+<svg viewBox="0 0 360 180" xmlns="http://www.w3.org/2000/svg" style="font-family: ui-sans-serif, system-ui, sans-serif; border-radius: 10px;">
+  <rect width="360" height="180" rx="10" fill="#f8fafc"/>
+  <text x="180" y="20" font-size="12" font-weight="700" fill="#1e293b" text-anchor="middle">DFA: Accept Strings with an Even Number of 1s</text>
+
+  <!-- start arrow -->
+  <line x1="30" y1="100" x2="78" y2="100" stroke="#334155" stroke-width="1.8" marker-end="url(#dfaArrow)"/>
+  <text x="45" y="92" font-size="9" fill="#334155">start</text>
+
+  <!-- State E (accepting, double circle) -->
+  <circle cx="110" cy="100" r="30" fill="#dbeafe" stroke="#1d4ed8" stroke-width="2"/>
+  <circle cx="110" cy="100" r="24" fill="none" stroke="#1d4ed8" stroke-width="1.5"/>
+  <text x="110" y="106" font-size="15" font-weight="700" fill="#1e3a8a" text-anchor="middle">E</text>
+
+  <!-- State O -->
+  <circle cx="260" cy="100" r="30" fill="#fee2e2" stroke="#b91c1c" stroke-width="2"/>
+  <text x="260" y="106" font-size="15" font-weight="700" fill="#7f1d1d" text-anchor="middle">O</text>
+
+  <!-- E -> O on 1 -->
+  <path d="M140 88 Q 200 65 230 88" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#dfaArrow)"/>
+  <text x="185" y="68" font-size="11" fill="#334155" text-anchor="middle">1</text>
+
+  <!-- O -> E on 1 -->
+  <path d="M230 112 Q 200 135 140 112" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#dfaArrow)"/>
+  <text x="185" y="140" font-size="11" fill="#334155" text-anchor="middle">1</text>
+
+  <!-- E self loop on 0 -->
+  <path d="M95 74 A 20 20 0 1 1 125 74" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#dfaArrow)"/>
+  <text x="110" y="45" font-size="11" fill="#334155" text-anchor="middle">0</text>
+
+  <!-- O self loop on 0 -->
+  <path d="M245 74 A 20 20 0 1 1 275 74" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#dfaArrow)"/>
+  <text x="260" y="45" font-size="11" fill="#334155" text-anchor="middle">0</text>
+
+  <text x="180" y="165" font-size="9.5" fill="#334155" text-anchor="middle">E = even count of 1s so far (accepting, start state). O = odd count. Symbol 1 toggles; symbol 0 stays.</text>
+
+  <defs>
+    <marker id="dfaArrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#334155"/>
+    </marker>
+  </defs>
+</svg>

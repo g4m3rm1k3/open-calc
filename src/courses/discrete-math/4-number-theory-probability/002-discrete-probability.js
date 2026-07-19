@@ -1,8 +1,10 @@
+import bayesTreeUrl from '../diagrams/dm-bayes-tree.svg?url'
+
 export default {
   id: 'discrete-1-06',
   slug: 'discrete-probability',
-  chapter: 'discrete-1',
-  order: 8,
+  chapter: 'discrete-4',
+  order: 1,
   title: 'Discrete Probability',
   subtitle: 'Finite sample spaces, conditional probability, Bayes rule, and random variables',
   tags: ['probability', 'conditional probability', 'bayes', 'random variable', 'expectation'],
@@ -13,28 +15,46 @@ export default {
       'A test is 99% accurate. If you test positive, what is the chance you actually have the condition?',
     realWorldContext:
       'Discrete probability underlies risk estimation, medical screening interpretation, fraud detection, card-game strategy, and randomized algorithm design.',
-    previewVisualizationId: 'CardDiceLab',
   },
 
   intuition: {
     prose: [
-      'Probability on finite spaces is counting with normalization: favorable outcomes divided by total outcomes.',
-      'If you are not a math person, do not memorize formulas first. Start by naming the sample space in plain language, then define events as subsets.',
-      'Conditional probability updates context by restricting the sample space to the condition event.',
-      'Bayes rule inverts conditioning: from P(test|disease) to P(disease|test). This inversion is where many intuitions fail.',
-      'Historical arc: from Bernoulli and Laplace to modern inference, probability evolved from gambling math to scientific reasoning language.',
-      'A useful habit is to convert every conditional-probability word problem into a table or tree before touching algebra.',
+      `### Probability Is Counting With Normalization
+
+On a **finite sample space** — a finite set S of every possible outcome — probability is nothing more exotic than counting: P(event) = (number of favorable outcomes) / (total number of outcomes), *provided* every outcome is equally likely. Roll a fair six-sided die: S = {1,2,3,4,5,6}, and P(rolling a 4) = 1/6 because exactly one of the six equally-likely outcomes is a 4. Every probability formula in this lesson is ultimately a bookkeeping device built on top of this one idea — which is exactly why the counting and combinatorics lesson is the direct prerequisite here.
+
+If you're not naturally a "math person," resist memorizing formulas first. Start every problem by naming the sample space in plain language — what, concretely, are all the possible outcomes? — then define the event you care about as a subset of that space. The formula falls out once the space and event are both nailed down precisely; skipping this step is the single most common source of wrong answers.`,
+
+      `### Conditional Probability: Zooming In
+
+**Conditional probability** answers: given that we already know B happened, what's the chance A also happened? P(A|B) restricts the entire sample space down to just the outcomes where B occurred, then asks what fraction of *that* smaller space also satisfies A.
+
+Concretely: among a standard deck's 52 cards, P(heart) = 13/52 = 1/4. But P(heart | red) is different — once you're told the card is red, the sample space shrinks from all 52 cards down to just the 26 red ones, and hearts make up 13 of those 26. So P(heart | red) = 13/26 = 1/2 — a much higher probability than the unconditioned 1/4, because knowing the card is red already eliminates every black card (and half of black cards would have made "heart" impossible anyway — knowing "red" pre-filters toward exactly the cards where "heart" has decent odds).`,
+
+      `### Bayes' Rule: Inverting the Condition
+
+Bayes' Rule solves a specific, treacherous problem: you know P(evidence | hypothesis), but what you actually want is P(hypothesis | evidence) — and these are *not* the same number, even though they're easy to conflate. "If you have the disease, the test is 95% likely to come back positive" (P(test+|disease)) is a completely different statement from "if you tested positive, you're 95% likely to have the disease" (P(disease|test+)). Confusing the two is called the *base rate fallacy*, and it is one of the most consequential reasoning errors in medicine, law, and everyday risk assessment.
+
+The hook question at the top of this lesson — a 99%-accurate test comes back positive, what's the real chance you're sick? — is answered properly further down, and the answer surprises almost everyone the first time they compute it honestly.`,
+
+      `### From Gambling to Science: A Brief History
+
+Probability theory has an unusually traceable origin: in 1654, the gambler Chevalier de Méré asked Blaise Pascal a question about dice games, and Pascal's correspondence with Pierre de Fermat over that problem is generally credited as the birth of the field. For roughly a century, probability stayed tied to gambling. Pierre-Simon Laplace then generalized it into a genuine mathematical theory of uncertainty, and by the 20th century probability had become the formal language of statistics, quantum mechanics, and machine learning — a direct line from "should I bet on this dice roll" to "how confident should this medical test make me."`,
+
+      `### The Habit That Prevents Most Mistakes
+
+Before touching any formula, convert the word problem into a table (for two binary events) or a tree (for sequential/conditional events). A 2×2 table with rows {disease, no disease} and columns {test+, test−} makes every quantity in a Bayes problem visible simultaneously — you can *see* why a rare disease keeps the false-positive count large relative to true positives, instead of having to trust the algebra blindly.`,
     ],
     callouts: [
       {
         type: 'theorem',
         title: 'Conditional Probability',
-        body: 'P(A|B)=\\frac{P(A\\cap B)}{P(B)} \\quad (P(B)>0)',
+        body: 'P(A|B)=\\frac{P(A\\cap B)}{P(B)} \\quad (P(B)>0)\n\nRead the denominator as "the new, restricted universe" and the numerator as "the part of that universe where A also holds."',
       },
       {
         type: 'theorem',
         title: 'Bayes Rule',
-        body: 'P(A|B)=\\frac{P(B|A)P(A)}{P(B)}',
+        body: 'P(A|B)=\\frac{P(B|A)P(A)}{P(B)}\n\nThis is exactly the definition of conditional probability applied twice: P(A\\cap B) = P(B|A)P(A) = P(A|B)P(B), then solve for P(A|B).',
       },
     ],
     visualizations: [
@@ -53,22 +73,28 @@ export default {
 
   math: {
     prose: [
-      'A discrete random variable X maps outcomes to numbers. Expectation is weighted average: E[X]=sum x p(x).',
-      'Variance captures spread: Var(X)=E[(X-E[X])^2]=E[X^2]-E[X]^2.',
+      `![Probability tree for the disease test: prevalence branches into disease/no-disease, each branching again into test+/test−](${bayesTreeUrl})`,
+
+      'A **discrete random variable** X is a function that maps each outcome in the sample space to a number — turning "the outcome was heads" into "X = 1," for instance, so that outcomes can be added, averaged, and compared numerically. **Expectation** E[X] is the probability-weighted average of every value X can take: E[X] = Σ x·p(x), summed over every possible value x. It is not "the most likely outcome" — for a fair die, E[X] = 3.5, a value the die can never actually show, but it is exactly the long-run average if you rolled the die millions of times and averaged the results.',
+
+      'The tree diagram above makes the disease-test problem completely mechanical: the prevalence branches into "has disease" (1%) and "no disease" (99%); each of those branches again into "tests positive" and "tests negative" using the sensitivity and specificity rates. Every path from root to leaf is one multiplication of branch probabilities, and P(disease | positive) is just (the one path through "disease AND positive") divided by (the sum of every path that ends in "positive"). This is the Law of Total Probability and Bayes\' Rule, made completely visible instead of memorized as symbols.',
+
+      '**Variance** measures how spread out X\'s values are around its own expectation: Var(X) = E[(X − E[X])²] — the average squared distance from the mean. Squaring matters because it treats being 2 below the mean the same as being 2 above it (a plain average of differences would always cancel to zero); the algebraically convenient computational form is Var(X) = E[X²] − E[X]², derived by expanding the square and using linearity of expectation.',
     ],
     callouts: [
       {
         type: 'theorem',
         title: 'Law of Total Probability',
-        body: 'If {B_i} partitions sample space, P(A)=\\sum_i P(A|B_i)P(B_i).',
+        body: 'If {B_i} partitions the sample space (the B_i are disjoint and their union is everything), then P(A)=\\sum_i P(A|B_i)P(B_i).\n\nThis is exactly what the tree diagram computes: sum, over every path that ends the way you care about, the product of probabilities along that path.',
       },
     ],
   },
 
   rigor: {
     prose: [
-      'Bayes theorem follows immediately by equating two expressions for P(A intersection B).',
-      'Always define the sample space and event partition explicitly before computing conditionals.',
+      'Bayes\' theorem follows immediately from writing P(A ∩ B) two different ways and setting them equal: by definition of conditional probability, P(A ∩ B) = P(A|B)·P(B), and symmetrically P(A ∩ B) = P(B|A)·P(A). Since both expressions equal the same quantity P(A ∩ B), they equal each other: P(A|B)·P(B) = P(B|A)·P(A). Dividing both sides by P(B) gives Bayes\' Rule directly — it is not a separate axiom, just an algebraic consequence of the definition of conditional probability applied from both directions.',
+
+      'Always define the sample space and any event partition explicitly, in writing, before computing a single conditional probability. The single most common error in probability proofs (and in interview problems) is an implicit, unstated sample space — computing P(A|B) against the wrong denominator because the "restricted universe" was never precisely pinned down. State S, state the events as subsets of S, and only then start dividing.',
     ],
   },
 
@@ -124,7 +150,7 @@ export default {
       difficulty: 'easy',
       problem: 'For independent A,B with P(A)=0.4, P(B)=0.5, find P(A intersection B).',
       walkthrough: [
-        { expression: 'Independence => P(A\cap B)=P(A)P(B)', annotation: 'Use independence definition directly.' },
+        { expression: '\\text{Independence} \\implies P(A \\cap B)=P(A)P(B)', annotation: 'Use independence definition directly.' },
         { expression: '0.4*0.5=0.2', annotation: 'Multiply marginals.' },
       ],
       answer: '0.2',
@@ -180,13 +206,14 @@ export default {
 
   crossRefs: [
     { lessonSlug: 'counting-and-combinatorics', label: 'Counting and Combinatorics', context: 'Finite probability depends on accurate counting.' },
-    { lessonSlug: 'sets-and-logic', label: 'Sets and Logic', context: 'Events are sets and probability laws mirror set identities.' },
+    { lessonSlug: 'sets-and-functions-for-discrete', label: 'Sets and Functions', context: 'Events are sets and probability laws mirror set identities (union, intersection, complement).' },
     { lessonSlug: 'algorithms-and-complexity', label: 'Algorithms and Complexity', context: 'Randomized algorithms require probabilistic reasoning about outcomes.' },
   ],
 
   checkpoints: [
     'read-intuition',
     'read-math',
+    'read-rigor',
     'completed-example-1',
     'completed-example-2',
     'completed-example-3',
@@ -215,14 +242,14 @@ export default {
   spiral: {
     recoveryPoints: [
       {
-        lessonId: 'discrete-1-03-counting-and-combinatorics',
+        lessonId: 'discrete-1-04',
         label: 'Counting and Combinatorics',
-        note: 'Discrete probability is essentially counting favorite outcomes and dividing by total outcomes. Combinatorial tools like C(n,k) are your primary calculation engine.',
+        note: 'Discrete probability is essentially counting favorable outcomes and dividing by total outcomes. Combinatorial tools like C(n,k) are your primary calculation engine.',
       },
     ],
     futureLinks: [
       {
-        lessonId: 'discrete-1-06-algorithms-and-complexity',
+        lessonId: 'discrete-1-13',
         label: 'Algorithms and Complexity',
         note: 'Randomized algorithms (like Quicksort) use expectation to prove average-case efficiency.',
       },
