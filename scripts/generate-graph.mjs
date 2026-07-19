@@ -169,10 +169,15 @@ const adjSet = new Set(edges.map(([a, b]) => `${a}:${b}`))
 const hasEdge = (a, b) => adjSet.has(`${a}:${b}`) || adjSet.has(`${b}:${a}`)
 
 const ITERATIONS = 180
-const K_REP  = 4.0    // repulsion strength
-const K_SPR  = 0.05   // spring attraction
-const DAMP   = 0.80   // velocity damping
-const CENTER = 0.002  // gentle pull toward origin
+// K_REP is scaled inversely with N so the *total* repulsion force per node
+// stays constant regardless of graph size. Without this, a 1400-node graph
+// blows up in the first few iterations because each node receives N×K_REP
+// force — causing exponential velocity growth and NaN positions.
+const K_REP  = (2.0 * 800) / N   // repulsion strength (N-normalised)
+const K_SPR  = 0.04               // spring attraction
+const DAMP   = 0.88               // velocity damping (higher = more stable)
+const CENTER = 0.003              // gentle pull toward origin
+const MAX_F  = 2.0                // per-axis force clamp (prevents NaN from node overlap)
 
 console.log('Running force simulation...')
 const tick = Math.floor(ITERATIONS / 4)
@@ -185,12 +190,14 @@ for (let iter = 0; iter < ITERATIONS; iter++) {
   const fz = new Float64Array(N)
 
   // Repulsion between all pairs — O(N²)
+  // Each force contribution is clamped to MAX_F per axis so that two nodes
+  // which start at nearly-identical positions can't inject infinite energy.
   for (let i = 0; i < N; i++) {
     for (let j = i + 1; j < N; j++) {
       const dx = px[i] - px[j], dy = py[i] - py[j], dz = pz[i] - pz[j]
-      const dist2 = dx*dx + dy*dy + dz*dz + 0.25
+      const dist2 = dx*dx + dy*dy + dz*dz + 0.5   // +0.5 softens close-range
       const dist  = Math.sqrt(dist2)
-      const f     = K_REP / dist2
+      const f     = Math.min(K_REP / dist2, MAX_F) // clamp prevents explosion
       const ux = dx/dist, uy = dy/dist, uz = dz/dist
       fx[i] += ux*f; fy[i] += uy*f; fz[i] += uz*f
       fx[j] -= ux*f; fy[j] -= uy*f; fz[j] -= uz*f
@@ -214,11 +221,12 @@ for (let iter = 0; iter < ITERATIONS; iter++) {
     fz[i] -= pz[i] * CENTER
   }
 
-  // Integrate
+  // Integrate — clamp velocity to prevent compounding blowup across iterations
+  const MAX_V = 1.5
   for (let i = 0; i < N; i++) {
-    vx[i] = (vx[i] + fx[i]) * DAMP
-    vy[i] = (vy[i] + fy[i]) * DAMP
-    vz[i] = (vz[i] + fz[i]) * DAMP
+    vx[i] = Math.max(-MAX_V, Math.min(MAX_V, (vx[i] + fx[i]) * DAMP))
+    vy[i] = Math.max(-MAX_V, Math.min(MAX_V, (vy[i] + fy[i]) * DAMP))
+    vz[i] = Math.max(-MAX_V, Math.min(MAX_V, (vz[i] + fz[i]) * DAMP))
     px[i] += vx[i]
     py[i] += vy[i]
     pz[i] += vz[i]
@@ -237,6 +245,15 @@ for (const [a, b] of edges) { degree[a]++; degree[b]++ }
 const maxDeg = Math.max(...degree, 1)
 
 // ── 9. Write output ──────────────────────────────────────────────────────────
+// Guard: if simulation diverged to NaN or Inf, abort rather than silently
+// writing a file full of nulls (JSON.stringify(NaN) === 'null').
+const nanCount = Array.from(px).filter(v => !isFinite(v)).length
+if (nanCount > 0) {
+  console.error(`ERROR: ${nanCount} nodes have non-finite x positions after simulation.`)
+  console.error('The force constants may be unstable for this graph size. Aborting.')
+  process.exit(1)
+}
+
 const nodesOut = nodes.map((n, i) => {
   const node = {
     id:    n.id,

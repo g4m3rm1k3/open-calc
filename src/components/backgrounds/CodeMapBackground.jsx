@@ -13,9 +13,16 @@ const ADJ = Array.from({ length: NODES.length }, () => [])
 for (const [a, b] of EDGES) { ADJ[a].push(b); ADJ[b].push(a) }
 
 // Import/export counts per node (directed)
-const IMPORTED_BY = new Array(NODES.length).fill(0)
-const IMPORTS_CNT = new Array(NODES.length).fill(0)
-for (const [a, b] of EDGES) { IMPORTS_CNT[a]++; IMPORTED_BY[b]++ }
+const IMPORTED_BY  = new Array(NODES.length).fill(0)
+const IMPORTS_CNT  = new Array(NODES.length).fill(0)
+// Directed neighbour lists — who does node[i] import, and who imports it
+const IMPORTS_FROM    = Array.from({ length: NODES.length }, () => []) // i → outgoing
+const IMPORTED_BY_IDX = Array.from({ length: NODES.length }, () => []) // i → incoming
+for (const [a, b] of EDGES) {
+  IMPORTS_CNT[a]++; IMPORTED_BY[b]++
+  IMPORTS_FROM[a].push(b)
+  IMPORTED_BY_IDX[b].push(a)
+}
 
 // App.jsx is the hub — start view centred on it
 const APP_IDX = NODES.findIndex(n => n.id === 'App.jsx')
@@ -112,10 +119,15 @@ export default function CodeMapBackground({ dark, onNodeClick }) {
       if (isOverUI(e.target)) return
       if (st.didDrag) return  // don't open panel after a rotate/pan
       if (st.hovered >= 0) {
+        const idx = st.hovered
         onNodeClickRef.current?.({
-          ...NODES[st.hovered],
-          importedBy: IMPORTED_BY[st.hovered],
-          importsCnt: IMPORTS_CNT[st.hovered],
+          ...NODES[idx],
+          idx,
+          importedBy:      IMPORTED_BY[idx],
+          importsCnt:      IMPORTS_CNT[idx],
+          importsFromIdxs: IMPORTS_FROM[idx].slice(0, 12),     // up to 12 outgoing
+          importedByIdxs:  IMPORTED_BY_IDX[idx].slice(0, 12),  // up to 12 incoming
+          allNodes:        NODES,   // panel needs labels for neighbour ids
         })
       } else {
         onNodeClickRef.current?.(null)
