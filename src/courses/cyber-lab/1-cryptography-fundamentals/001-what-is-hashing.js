@@ -117,6 +117,21 @@ const lesson = {
       answer:
         'SHA-256 being cryptographically un-broken (no known collisions) has nothing to do with this specific vulnerability. Unsalted means a precomputed table (or cross-account password reuse) instantly cracks any common password, for every account at once. Single-round SHA-256 is also extremely fast to compute — billions of guesses per second on ordinary hardware — so even a brute-force attack against one specific salted hash would be cheap. Both problems need fixing separately: add a random per-account salt (defeats precomputation/reuse), and replace plain SHA-256 with a real password-hashing function like bcrypt, scrypt, Argon2, or PBKDF2 with a high iteration count (makes each individual guess expensive).',
     },
+    {
+      id: 'cyber-lab-1-001-ch4',
+      difficulty: 'medium',
+      problem:
+        'Run the Python notebook\'s first cell below. Type the exact same text into the "Hash Anything" demo above (in JavaScript) and switch it to SHA-256. Compare the two hex digests character by character. What do you expect, and why — given that one is running in your browser via the Web Crypto API and the other is running in a completely separate Python interpreter (compiled to WebAssembly)?',
+      hint: 'SHA-256 is a published, standardized algorithm, not something owned by one specific library or language.',
+      walkthrough: [
+        {
+          expression: 'JS Web Crypto SHA-256(x) === Python hashlib SHA-256(x)',
+          annotation: 'Two totally independent implementations, in two different languages, produce byte-for-byte identical output for the same input — because both are implementing the same public specification, not their own private notion of "a hash."',
+        },
+      ],
+      answer:
+        'The two hex digests match exactly, character for character. This isn\'t a coincidence or a shared implementation under the hood — SHA-256 is a public, standardized algorithm (part of the SHA-2 family, published by NIST). Any correct implementation, in any language, must produce identical output for identical input, or it isn\'t actually implementing SHA-256. This is exactly what makes hashing useful for real-world verification across completely different systems: a file\'s SHA-256 checksum computed on one machine, in one language, means something to a completely different machine running different software, because both are computing the same defined function.',
+    },
   ],
 
   assessment: {
@@ -168,6 +183,67 @@ const lesson = {
           'MD5 requires a secret key that has been leaked',
         ],
         answer: 'Two different inputs have been found that produce the identical MD5 hash',
+      },
+    ],
+  },
+
+  python: {
+    cells: [
+      {
+        id: 'py1',
+        cellTitle: 'Same Real Algorithm, Different Language — Verify It Yourself',
+        prose: `Python's \`hashlib\` is standard library — no install needed. Run this, then type the exact same text into the "Hash Anything" demo above and switch it to SHA-256. The two hex digests should match exactly.`,
+        code: `import hashlib
+
+text = "password123"
+
+md5_hash = hashlib.md5(text.encode()).hexdigest()
+sha1_hash = hashlib.sha1(text.encode()).hexdigest()
+sha256_hash = hashlib.sha256(text.encode()).hexdigest()
+
+print(f"Input: {text!r}")
+print(f"MD5:     {md5_hash}")
+print(f"SHA-1:   {sha1_hash}")
+print(f"SHA-256: {sha256_hash}")
+print()
+print("Copy this same text into the 'Hash Anything' demo above (real JavaScript,")
+print("via the browser's Web Crypto API) and switch it to SHA-256 — the hex digest")
+print("shown there should match the SHA-256 line above exactly, character for")
+print("character. Two separate implementations, two different languages, running")
+print("in two different places — identical output, because SHA-256 is a public,")
+print("standardized algorithm, not something tied to one specific implementation.")
+`,
+      },
+      {
+        id: 'py2',
+        cellTitle: 'Real PBKDF2 Cost, From Python',
+        prose: `Python's \`hashlib\` (at least in this WebAssembly build) doesn't expose \`pbkdf2_hmac\` — so this cell uses \`pycryptodome\`'s real PBKDF2 instead, installed live via micropip. Same real cost-factor idea as the "A Real Cost Factor" demo above, timed from the Python side.`,
+        code: `import micropip
+await micropip.install("pycryptodome")
+
+import time
+from Crypto.Protocol.KDF import PBKDF2
+from Crypto.Hash import SHA256
+
+password = "password123"
+salt = b"fixed-demo-salt"
+
+def derive(iterations):
+    start = time.perf_counter()
+    key = PBKDF2(password, salt, dkLen=32, count=iterations, hmac_hash_module=SHA256)
+    elapsed_ms = (time.perf_counter() - start) * 1000
+    return key.hex(), elapsed_ms
+
+for iterations in [1_000, 10_000, 100_000]:
+    key_hex, elapsed = derive(iterations)
+    print(f"{iterations:>7,} iterations -> {elapsed:7.1f} ms  key={key_hex[:32]}...")
+
+print()
+print("Real, measured time — not a fake delay. Compare the shape of this curve")
+print("to the JavaScript demo above: more iterations costs real, proportionally")
+print("more time in Python too, because both are running the same real algorithm,")
+print("just in two different language runtimes.")
+`,
       },
     ],
   },

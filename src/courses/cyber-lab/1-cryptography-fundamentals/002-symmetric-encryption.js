@@ -102,6 +102,21 @@ const lesson = {
       answer:
         "With a fixed IV, the very first ciphertext block is entirely determined by the first plaintext block (since `P1 XOR IV` is now just a fixed transformation of P1). Any two messages that happen to start with identical content produce an identical first ciphertext block — leaking, to an observer who never decrypts anything, that two specific messages begin the same way. That's a real, meaningful leak (it can reveal shared greetings, shared headers, or repeated message templates across totally different conversations). Generating a fresh, unpredictable random IV for every single encryption — exactly what this lesson's demo does with `crypto.getRandomValues()` — means `P1 XOR IV` is different every time even for identical plaintext, so the first ciphertext block gives an outside observer no information at all about whether two messages start the same way.",
     },
+    {
+      id: 'cyber-lab-1-002-ch4',
+      difficulty: 'medium',
+      problem:
+        'In the Python notebook\'s second cell below, `block` is repeated three times to build the plaintext. Change it so the three chunks are not all identical — for example, three genuinely different 16-character strings concatenated together — and re-run the cell. What happens to "All identical?" for the ECB blocks now, and why does that same change do nothing interesting to the CBC blocks (which were already all different)?',
+      hint: 'ECB\'s "All identical?" check was only ever true because the *input* blocks were identical. What is it actually comparing?',
+      walkthrough: [
+        {
+          expression: 'ECB: identical output only when input was identical. CBC: different output regardless.',
+          annotation: 'ECB never "detects" repetition on purpose — it just has no mechanism to hide it. Once the three input blocks stop being identical, there is nothing left for ECB to (accidentally) reveal, because the thing it exposes is exactly "were these specific 16 bytes seen before," and now they weren\'t.',
+        },
+      ],
+      answer:
+        'With three different 16-byte chunks, the ECB ciphertext blocks come out different too — "All identical?" flips to False. This proves ECB isn\'t doing anything clever with repetition: it simply encrypts each block on its own, so identical input happens to produce identical output, and different input produces different output, exactly like any other deterministic function of one argument. CBC\'s blocks were already all different even when the plaintext blocks were identical, because each block\'s output depends on everything chained in before it, not just its own content — changing the input here doesn\'t reveal anything new about CBC, because CBC was never comparing blocks to each other in the first place.',
+    },
   ],
 
   assessment: {
@@ -200,6 +215,48 @@ try:
     print("This line should never print.")
 except ValueError as e:
     print(f"Rejected, as expected: {e}")
+`,
+      },
+      {
+        id: 'py2',
+        cellTitle: 'Real AES-ECB Pattern Leakage — From Python, No Canvas Needed',
+        prose: `The browser's Web Crypto API refuses to expose raw AES-ECB directly (Concept Unit note above) — but a general-purpose library like \`pycryptodome\` does, since it trusts the developer to know when not to use it. This cell proves the same "identical plaintext blocks in → identical ciphertext blocks out" leak the image demo showed, just as raw hex instead of pixels.`,
+        code: `import micropip
+await micropip.install("pycryptodome")
+
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+
+key = get_random_bytes(32)
+
+block = b"REPEATEDBLOCK!!!"  # exactly 16 bytes — one real AES block
+plaintext = block + block + block  # three identical blocks back to back
+
+# Real AES-ECB — pycryptodome exposes this directly, unlike the browser
+ecb_cipher = AES.new(key, AES.MODE_ECB)
+ecb_ciphertext = ecb_cipher.encrypt(plaintext)
+ecb_blocks = [ecb_ciphertext[i:i+16].hex() for i in range(0, len(ecb_ciphertext), 16)]
+print("ECB ciphertext blocks:")
+for b in ecb_blocks:
+    print(" ", b)
+print("All identical?", len(set(ecb_blocks)) == 1)
+
+# Same key, same plaintext, real AES-CBC with a random IV this time
+iv = get_random_bytes(16)
+cbc_cipher = AES.new(key, AES.MODE_CBC, iv=iv)
+cbc_ciphertext = cbc_cipher.encrypt(plaintext)
+cbc_blocks = [cbc_ciphertext[i:i+16].hex() for i in range(0, len(cbc_ciphertext), 16)]
+print()
+print("CBC ciphertext blocks:")
+for b in cbc_blocks:
+    print(" ", b)
+print("All identical?", len(set(cbc_blocks)) == 1)
+
+print()
+print("Same key, same real AES, same repeated plaintext — ECB's three ciphertext")
+print("blocks are byte-for-byte identical because each block is encrypted with")
+print("zero memory of any other block. CBC's three blocks are all different,")
+print("because each one is chained into the next.")
 `,
       },
     ],

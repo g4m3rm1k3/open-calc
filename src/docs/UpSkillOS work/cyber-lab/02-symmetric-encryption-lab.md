@@ -264,6 +264,25 @@ correctly" and "I tested that *this lesson's actual Run button* does."
 
 ---
 
+## Addendum: A Second Python Cell, No New Pattern
+
+A follow-up request asked for more Python content in this lesson too. A
+second cell (`py2`) was added to the same `python.cells` array —
+`AES.MODE_ECB` and `AES.MODE_CBC` from `pycryptodome`, encrypting a
+plaintext built from three identical 16-byte blocks and printing each
+mode's ciphertext blocks as hex, so the same "identical plaintext blocks
+→ identical ciphertext blocks under ECB, not under CBC" fact
+`ECBPatternLeak.jsx` shows visually gets reproduced as plain hex from the
+Python side. This uses exactly the same `python.cells[]` shape and the
+same `micropip.install("pycryptodome")` pattern the first cell (and
+Concept Units 6–7) already established — nothing new to teach about the
+mechanism itself. A new challenge (`cyber-lab-1-002-ch4`) asks the
+learner to break the three-identical-blocks setup on purpose and predict
+what changes (only ECB's output, not CBC's) — verified live, both before
+and after that edit, before being written into the lesson.
+
+---
+
 ## A Note on What's Deliberately Not Its Own Unit
 
 Per the Repetition Rule, the following reuse patterns Lesson 1 already
@@ -341,6 +360,10 @@ by any verification step performed before shipping (see Concept Unit 7).
       the lesson's cell was re-verified live, via an actual click on its
       real "▶ Run" button in the running app, after this fix (not just
       via the standalone Node script from Concept Unit 6)
+- [x] The second Python cell (`py2`, real AES-ECB vs. AES-CBC hex
+      comparison) runs live with no errors, and its "All identical?"
+      output matches what the JavaScript `ECBPatternLeak` demo shows
+      visually — verified by actually clicking "▶ Run" on it
 - [ ] You can explain, without notes, why `crypto.subtle.encrypt({name:'AES-CBC', iv: zero16}, key, oneBlock)`
       is mathematically identical to raw ECB block encryption
 - [ ] You can explain why `003-correlation.js`'s existing Python

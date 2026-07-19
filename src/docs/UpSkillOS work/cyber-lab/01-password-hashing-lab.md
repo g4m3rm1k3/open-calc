@@ -824,6 +824,35 @@ no opinion about which curated tab a course sits under; that's
 `topicGroups.js`'s job alone, and it only reflects entries someone
 adds by hand.
 
+## Addendum 2: A Second Language, and a Real Gap in Pyodide's `hashlib`
+
+A follow-up request asked for more hands-on Python practice in this
+lesson. Two cells were added under a new `python: { cells: [...] }`
+field (the exact shape `002-symmetric-encryption.js` already
+established — no new pattern here, per the Repetition Rule): one
+hashing the same string with `hashlib.md5`/`sha1`/`sha256` so it can be
+compared directly against the "Hash Anything" demo's JavaScript output,
+and one computing real PBKDF2.
+
+The one genuinely new thing found while building the second cell: this
+app's Pyodide build's `hashlib` module has **no `pbkdf2_hmac`** —
+`AttributeError: module 'hashlib' has no attribute 'pbkdf2_hmac'`,
+confirmed live before it ever reached the lesson. CPython's real
+`hashlib.pbkdf2_hmac` normally exists, but Pyodide's WebAssembly build
+of `hashlib` doesn't include it — a real constraint of *this specific
+runtime*, not of Python or PBKDF2 in general. The fix was to use
+`pycryptodome`'s `Crypto.Protocol.KDF.PBKDF2` instead (already a
+dependency of this course via `002-symmetric-encryption.js`'s AES
+cells), verified with the same real, measured `time.perf_counter()`
+timing this lesson's JavaScript demo already uses. A new challenge
+(`cyber-lab-1-001-ch4`) asks the learner to run the hashing cell and
+manually cross-check its output against the JavaScript demo above,
+character for character — the same cross-language SHA-256 match
+confirmed live while building this addendum
+(`ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f` for
+`"password123"`, identical in both the browser's Web Crypto output and
+this new Python cell's output).
+
 ## Exercises
 
 - Add a second lesson to `cyber-lab-1` (a new numbered file in the
@@ -877,6 +906,13 @@ adds by hand.
 - [ ] You can explain, without notes, why `{...someString}` doesn't do
       what it looks like it should, and why that specific mistake is
       dangerous precisely because it doesn't throw
+- [ ] Both new Python cells (hashlib cross-check, real PBKDF2 via
+      pycryptodome) run live in the actual notebook with no errors —
+      verified by actually clicking "▶ Run" on each, not assumed from a
+      standalone script
+- [ ] You can explain why Pyodide's `hashlib` is missing
+      `pbkdf2_hmac` even though real CPython has it, and what was used
+      instead
 - [ ] `git commit` with a message explaining why — for example: "Add
       Cyber Lab's first lesson (password hashing) with six real,
       independently-reusable viz primitives — no simulated
