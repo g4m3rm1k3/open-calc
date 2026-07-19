@@ -348,6 +348,14 @@ export const TOPICS = {
             differentiator: 'Structure and Interpretation of Computer Programs, condensed into an interactive, narrated lesson.' },
         ],
       },
+      security: {
+        label: 'Security',
+        color: 'rose',
+        items: [
+          { kind: 'course', key: 'cyber-lab',
+            differentiator: 'Interactive security labs — hash real passwords, attack a precomputed table, reproduce a real MD5 collision, and feel a real password-hashing cost factor, all live in the browser.' },
+        ],
+      },
     },
   },
 

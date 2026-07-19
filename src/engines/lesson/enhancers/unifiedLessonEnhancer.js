@@ -127,9 +127,17 @@ function addConnectorCallouts(intuition, math, rigor, topicMessage) {
 }
 
 function ensureHook(lesson, topicMessage) {
-  const hook = {
-    ...(lesson.hook ?? {}),
-  };
+  // A plain string is real authored hook prose (114 lessons across this repo
+  // still use this older format) — `{...aString}` spreads it character-by-
+  // character into a numeric-keyed object (`{0:'a',1:'b',...}`), which has
+  // neither `.question` nor `.realWorldContext`, so both fallbacks below used
+  // to fire and silently replace the author's real text with generic filler.
+  // Treating the string as `realWorldContext` keeps it as the visible prose.
+  const rawHook = lesson.hook;
+  const hook =
+    typeof rawHook === "string"
+      ? { realWorldContext: rawHook }
+      : { ...(rawHook ?? {}) };
 
   if (!hook.question || !String(hook.question).trim()) {
     hook.question = `Why does ${lesson.title ?? "this concept"} matter when solving real problems?`;
