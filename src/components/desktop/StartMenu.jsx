@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LABS } from '../../labs/registry.js'
+import { LABS } from '../../labs/labRegistryLoader.js'
 import { GAMES } from '../../games/registry.js'
 import { COURSES } from '../../courses/index.js'
 import { getLabEntry } from '../../labs/labLoader.js'

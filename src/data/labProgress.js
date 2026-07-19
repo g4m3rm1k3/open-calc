@@ -3,7 +3,7 @@
 // independent localStorage key. This module reads those keys directly and
 // normalizes them into the same {kind:'lab', key, differentiator} shape
 // HomePage.jsx already uses for courses, so both can share one "In Progress"
-// grid via TopicTable's existing LABS-registry lookup (src/labs/registry.js).
+// grid via TopicTable's existing LABS-registry lookup (src/labs/labRegistryLoader.js).
 //
 // Scope note: this covers the 4 labs with an unambiguous total count and
 // completion signal today. Several other labs (css-mastery, react-mastery,

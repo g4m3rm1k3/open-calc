@@ -1,5 +1,5 @@
 import { getAllCourses } from '../courses/courseLoader.js'
-import { LABS } from '../labs/registry.js'
+import { LABS } from '../labs/labRegistryLoader.js'
 import { GAMES } from '../games/registry.js'
 
 // Curated topic → subtopic tree for the home page's "Explore" section.
@@ -13,13 +13,13 @@ import { GAMES } from '../games/registry.js'
 // same "no visible structure" problem the audit flagged in the first
 // place). Only `kind`/`key`/`differentiator` are stored here — cosmetic
 // fields (emoji, color, tags, description) are resolved live from
-// courseLoader.js / labs/registry.js / games/registry.js at render time
+// courseLoader.js / labs/labRegistryLoader.js / games/registry.js at render time
 // (see TopicTable.jsx), so this file can never go stale relative to those
 // registries. Standalone tools (calculator, grapher-2d, terminal-hub, ...)
 // are deliberately excluded — see ux-audit-plan.md Phase 4.
 //
 // Every course/lab/game in the app has a home here (verified against
-// src/courses/*, src/labs/registry.js, src/games/registry.js 2026-07-11)
+// src/courses/*, src/labs/labRegistryLoader.js, src/games/registry.js 2026-07-11)
 // except two orphans with no real subject to anchor them: `arkanoid`
 // (generic math Q&A) and `stem-quest` (multi-subject adventure map) — both
 // live under the `general` topic instead of being forced into a subject
