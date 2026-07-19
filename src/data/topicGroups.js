@@ -268,6 +268,8 @@ export const TOPICS = {
             differentiator: 'Build a real Vue 3 project from scratch — real .vue files, live component tree as you write.' },
           { kind: 'lab', key: 'backend-lab',
             differentiator: 'Build a real backend from scratch — routes, middleware, services, a database — test your own endpoints.' },
+          { kind: 'course', key: 'cyber-lab',
+            differentiator: 'The security half of web development — real Web Crypto API hashing, salting, and cost factors, live in the browser.' },
         ],
       },
       'graphics-programming': {

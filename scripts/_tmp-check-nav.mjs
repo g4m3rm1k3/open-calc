@@ -1,0 +1,15 @@
+import { chromium } from 'playwright'
+const browser = await chromium.launch()
+const page = await browser.newPage()
+const errors = []
+page.on('pageerror', (e) => errors.push(e.message))
+await page.goto('http://localhost:5173/#/', { waitUntil: 'domcontentloaded', timeout: 20000 })
+await page.waitForTimeout(1500)
+const bodyText = await page.evaluate(() => document.body.innerText)
+console.log('Home page mentions Cyber Lab:', bodyText.includes('Cyber Lab'))
+console.log('Home page mentions Security:', bodyText.includes('Security'))
+console.log('Home page mentions Programming:', bodyText.includes('Programming'))
+console.log('---first 2000 chars---')
+console.log(bodyText.slice(0, 2000))
+console.log('Errors:', errors)
+await browser.close()

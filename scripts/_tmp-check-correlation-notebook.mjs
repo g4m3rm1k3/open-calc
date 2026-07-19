@@ -1,0 +1,10 @@
+import { chromium } from 'playwright'
+const browser = await chromium.launch()
+const page = await browser.newPage()
+page.setDefaultTimeout(30000)
+await page.goto('http://localhost:5173/#/chapter/applied-statistics-7/correlation', { waitUntil: 'domcontentloaded', timeout: 20000 })
+await page.waitForTimeout(2500)
+const bodyText = await page.evaluate(() => document.body.innerText)
+console.log('mentions "Python Lab" section:', bodyText.includes('Python Lab'))
+console.log('mentions the actual cell title "Pearson r, Spearman":', bodyText.includes('Pearson r, Spearman'))
+await browser.close()

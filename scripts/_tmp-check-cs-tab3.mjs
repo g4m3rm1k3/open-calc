@@ -1,0 +1,16 @@
+import { chromium } from 'playwright'
+const browser = await chromium.launch()
+const page = await browser.newPage()
+await page.goto('http://localhost:5173/#/', { waitUntil: 'domcontentloaded', timeout: 20000 })
+await page.waitForTimeout(1200)
+await page.evaluate(() => {
+  const all = Array.from(document.querySelectorAll('button'))
+  const btn = all.find(b => b.innerText && b.innerText.includes('COMPUTER SCIENCE'))
+  btn.click()
+})
+await page.waitForTimeout(1000)
+const bodyText = await page.evaluate(() => document.body.innerText)
+console.log('mentions Security:', bodyText.includes('Security'))
+console.log('mentions Cyber Lab:', bodyText.includes('Cyber Lab'))
+console.log(bodyText.slice(1200, 4000))
+await browser.close()

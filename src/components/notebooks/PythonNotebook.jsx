@@ -224,10 +224,13 @@ async function getPyodide() {
     // 3. Setup filesystem
     py.FS.writeFile("/home/pyodide/opencalc.py", OPENCALC_LIB_SOURCE);
 
-    // 4. Pre-load only strictly necessary heavy packages
-    // Small ones like micropip are core and don't need explicit loadPackage usually,
-    // but we can ensure they are ready.
+    // 4. Pre-load necessary packages. micropip is NOT auto-available just
+    // because Pyodide ships it — `import micropip` in a cell throws
+    // ModuleNotFoundError unless `loadPackage("micropip")` has already run
+    // once (confirmed live: a lesson cell doing `import micropip` with no
+    // JS-side preload failed this way in production).
     await py.loadPackage([
+      "micropip",
       "numpy",
       "pandas",
       "matplotlib",

@@ -783,6 +783,47 @@ two different hashes side by side — the exact opposite of what "A Real
 MD5 Collision" claims to prove, with no error to flag it — this one
 *was* actually caught live, this session, exactly as narrated above.
 
+## Addendum: One Curated Entry Wasn't Enough
+
+A follow-up, live, after the lesson above was already considered done:
+the course was reachable via direct URL and Start Menu search, and
+*was* present on the home page's Explore view — but only under the
+**Computer Science** top-level tab, in its **Security** subtopic. A
+live click-through confirmed the entry renders correctly there. The
+actual gap was navigational, not technical: someone looking for
+security/cryptography content has no particular reason to expect it
+filed under "Computer Science" rather than "Programming" — those read,
+to a browsing user, as near-synonyms, and `topicGroups.js`'s own
+top-level tabs treat them as two separate categories (Programming =
+languages; Computer Science = DSA, logic, runtime, security).
+
+This isn't a new pattern — it's the exact same `{kind, key,
+differentiator}` entry insertion into a curated `items` array this
+lesson's "Connect the Pieces" section already covered, applied a
+second time to a different subtopic (`programming.web-development`
+instead of `computer-science.security`). It's also the specific case
+`topicGroups.js`'s own header comment names directly: this is a
+*graph*, not a tree — the same course is meant to appear under every
+subtopic it genuinely fits, not just the one it was first filed under,
+precisely so a user browsing from a different, equally reasonable
+starting point still finds it. `cyber-lab` now cross-lists under both
+`computer-science.security` and `programming.web-development`, each
+with its own differentiator text angled at that subtopic's framing
+(general security concept vs. "the security half of web development"),
+matching how `dsa-arrays-lab` already cross-lists under both `dsa` and
+`python` with two different differentiator strings rather than one
+reused verbatim.
+
+**What breaks without this, verified live:** with only the
+`computer-science.security` entry, clicking through Programming →
+every one of its subtopics (Python, JavaScript, TypeScript, C++, Web
+Development, Canvas & Graphics, Command Line & Git) never surfaces
+`cyber-lab` — confirmed by the exact browsing path a user actually
+took. Auto-discovery of the lesson *content* (`courseLoader.js`) has
+no opinion about which curated tab a course sits under; that's
+`topicGroups.js`'s job alone, and it only reflects entries someone
+adds by hand.
+
 ## Exercises
 
 - Add a second lesson to `cyber-lab-1` (a new numbered file in the
@@ -818,6 +859,10 @@ MD5 Collision" claims to prove, with no error to flag it — this one
 - [ ] `cyber-lab` added to `topicGroups.js` under Computer Science →
       Security; verified live, reachable both via direct URL/Start
       Menu search and via the home page's Explore browsing view
+- [ ] `cyber-lab` cross-listed a second time under Programming → Web
+      Development, with its own differentiator text; verified live by
+      clicking through every Programming subtopic before the fix (not
+      found) and after (found under Web Development)
 - [ ] `DictionaryAttack`'s `cancelRef` actually gets set to `true`
       somewhere (the unmount-cleanup effect) — not just declared,
       reset, and checked with nothing ever triggering it
