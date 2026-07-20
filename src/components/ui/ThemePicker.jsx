@@ -382,16 +382,16 @@ export default function ThemePicker() {
     <>
       <button
         onClick={() => setIsOpen(o => !o)}
-        className={`relative flex items-center gap-1.5 nav-tool-btn transition-colors ${
+        className={`relative flex items-center justify-center nav-tool-btn transition-colors ${
           isOpen
             ? 'text-indigo-500 dark:text-indigo-400'
             : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
         }`}
         title="Appearance & Themes"
       >
-        {/* Live accent dot */}
+        {/* Live accent dot (absolute overlay) */}
         <span
-          className="w-2 h-2 rounded-full border border-white/40 shadow-sm transition-colors duration-300"
+          className="absolute top-1 right-1 w-2 h-2 rounded-full border border-white dark:border-slate-800 shadow-sm transition-colors duration-300"
           style={{ background: currentTheme?.accentHex || '#0ea5e9' }}
         />
         <Icon className="w-[18px] h-[18px]" />

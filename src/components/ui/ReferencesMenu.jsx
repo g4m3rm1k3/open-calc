@@ -39,7 +39,7 @@ export default function ReferencesMenu() {
       <button
         ref={btnRef}
         onClick={toggle}
-        className="hidden lg:flex nav-tool-btn text-slate-500 hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-400"
+        className="hidden lg:flex nav-tool-btn text-violet-500 hover:text-violet-600 dark:text-violet-400 dark:hover:text-violet-300"
         title="Reference Library"
       >
         <span className="text-[16px] leading-none">📚</span>

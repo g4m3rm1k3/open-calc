@@ -211,7 +211,7 @@ function TopBar() {
 
         <button
           onClick={() => window.dispatchEvent(new CustomEvent("oc-toggle-video"))}
-          className="hidden lg:flex nav-tool-btn text-slate-500 hover:text-sky-600 dark:text-slate-400 dark:hover:text-sky-400"
+          className="hidden lg:flex nav-tool-btn text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300"
           title="Video Player"
         >
           <PlayCircle className="w-[18px] h-[18px]" />
@@ -219,7 +219,7 @@ function TopBar() {
         <ThemePicker />
 
         <div className="hidden lg:block">
-          <FullscreenButton className="nav-tool-btn text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 [&>svg]:w-[18px] [&>svg]:h-[18px]" />
+          <FullscreenButton className="nav-tool-btn text-emerald-500 hover:text-emerald-600 dark:text-emerald-400 dark:hover:text-emerald-300 [&>svg]:w-[18px] [&>svg]:h-[18px]" />
         </div>
 
         <ReferencesMenu />
@@ -232,7 +232,7 @@ function TopBar() {
         <button
           data-tour="report-bug"
           onClick={() => window.dispatchEvent(new CustomEvent('oc-toggle-help'))}
-          className="nav-tool-btn text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+          className="nav-tool-btn text-amber-500 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-300"
           title="Contributor Docs"
         >
           <span className="text-[15px] font-black leading-none">?</span>

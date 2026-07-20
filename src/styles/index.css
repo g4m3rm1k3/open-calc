@@ -169,21 +169,22 @@
   }
 
   .nav-tool-btn {
-    @apply flex items-center justify-center w-[34px] h-[34px] flex-shrink-0 rounded-[10px] 
-           border border-slate-200 dark:border-slate-700/80 
+    @apply flex items-center justify-center w-[36px] h-[36px] flex-shrink-0 rounded-[12px] 
+           border border-slate-200/90 dark:border-slate-600/60 
            bg-white dark:bg-slate-800/90
-           bg-gradient-to-b from-white/60 to-transparent dark:from-white/10 dark:to-transparent
-           shadow-[0_1px_2px_rgba(0,0,0,0.05),inset_0_1px_0_rgba(255,255,255,0.6)] 
-           dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)]
-           active:scale-[0.96] active:shadow-inner transition-all;
+           bg-gradient-to-b from-white to-slate-50 dark:from-slate-700/50 dark:to-slate-800/80
+           shadow-[0_4px_10px_-2px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,1)] 
+           dark:shadow-[0_5px_15px_-3px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.15)]
+           hover:-translate-y-0.5
+           active:translate-y-0 active:scale-[0.96] active:shadow-inner transition-all duration-200;
   }
   .nav-tool-btn:hover {
     border-color: rgb(var(--tw-custom-brand-300));
-    box-shadow: 0 4px 12px -2px rgb(var(--tw-custom-brand-500) / 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
+    box-shadow: 0 8px 20px -4px rgb(var(--tw-custom-brand-500) / 0.25), inset 0 1px 0 rgba(255, 255, 255, 1);
   }
   .dark .nav-tool-btn:hover {
     border-color: rgb(var(--tw-custom-brand-600));
-    box-shadow: 0 4px 12px -2px rgb(var(--tw-custom-brand-400) / 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 20px -4px rgb(var(--tw-custom-brand-400) / 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   /* Plain CSS, not @apply with bracket arbitrary-values: complex multi-part
