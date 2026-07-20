@@ -203,11 +203,14 @@ export default function Taskbar({ windows, onFocus }) {
             whileTap={{ scale: 0.95 }}
             onClick={() => { setNotesOpen(o => !o); setChapNavOpen(false) }}
             title="Notes"
-            className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none ${
-              notesOpen ? 'bg-amber-500 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400'
+            className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none overflow-hidden group ${
+              notesOpen
+                ? 'bg-gradient-to-tr from-yellow-400 to-amber-500 text-white shadow-lg shadow-yellow-500/40 ring-1 ring-yellow-400/50'
+                : 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/20 shadow-[0_0_8px_rgba(234,179,8,0.1)] hover:shadow-[0_0_12px_rgba(234,179,8,0.2)]'
             }`}
           >
-            <StickyNote className="w-5 h-5" />
+            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <StickyNote className="w-5 h-5 relative z-10" />
           </motion.button>
 
           <div className="w-px h-5 bg-slate-200 dark:bg-slate-700/50 mx-1 flex-shrink-0 rounded-full" />
@@ -220,7 +223,7 @@ export default function Taskbar({ windows, onFocus }) {
             whileTap={{ scale: 0.95 }}
             onClick={monty.openMonty}
             title={`Monty — Lv ${level}, ${xpInLevel}/100 XP`}
-            className={`relative flex items-center justify-center w-10 h-10 rounded-2xl transition-all duration-300 focus:outline-none overflow-hidden group ${
+            className={`relative flex items-center justify-center w-10 h-10 rounded-2xl transition-all duration-300 focus:outline-none group ${
               monty.montyOpen
                 ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/40 ring-2 ring-cyan-400 ring-offset-2 dark:ring-offset-slate-950'
                 : 'bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 hover:text-cyan-500 dark:hover:text-cyan-400 shadow hover:shadow-cyan-500/20'
@@ -229,23 +232,26 @@ export default function Taskbar({ windows, onFocus }) {
               filter: `drop-shadow(0 0 ${4 + (xpInLevel / 100) * 12}px rgba(6,182,212,${0.3 + (xpInLevel / 100) * 0.6}))`,
             }}
           >
-            {/* Glass glare effect inside button */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+              {/* Glass glare effect inside button */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 40 40">
+                <defs>
+                  <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#22d3ee" />
+                    <stop offset="100%" stopColor="#3b82f6" />
+                  </linearGradient>
+                </defs>
+                <circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" strokeOpacity={monty.montyOpen ? "0.2" : "0.1"} strokeWidth="2.5" />
+                <circle
+                  cx="20" cy="20" r="17.5" fill="none" stroke="url(#cyanGlow)" strokeWidth="2.5" strokeLinecap="round"
+                  strokeDasharray={`${(xpInLevel / 100) * (2 * Math.PI * 17.5)} ${2 * Math.PI * 17.5}`}
+                  style={{ transition: 'stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                />
+              </svg>
+            </div>
             
-            <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 40 40">
-              <defs>
-                <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#22d3ee" />
-                  <stop offset="100%" stopColor="#3b82f6" />
-                </linearGradient>
-              </defs>
-              <circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" strokeOpacity={monty.montyOpen ? "0.2" : "0.1"} strokeWidth="2.5" />
-              <circle
-                cx="20" cy="20" r="17.5" fill="none" stroke="url(#cyanGlow)" strokeWidth="2.5" strokeLinecap="round"
-                strokeDasharray={`${(xpInLevel / 100) * (2 * Math.PI * 17.5)} ${2 * Math.PI * 17.5}`}
-                style={{ transition: 'stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }}
-              />
-            </svg>
             <Zap className={`w-5 h-5 relative z-10 ${monty.montyOpen ? 'drop-shadow-md' : 'group-hover:drop-shadow-sm'}`} fill={monty.montyOpen ? 'currentColor' : 'none'} />
             <span className="absolute -bottom-1 -right-1 text-[9px] font-black leading-none bg-gradient-to-r from-cyan-500 to-blue-500 text-white rounded-full w-4 h-4 flex items-center justify-center border-2 border-white dark:border-slate-900 shadow-sm z-20">
               {level}
@@ -260,9 +266,10 @@ export default function Taskbar({ windows, onFocus }) {
             whileTap={{ scale: 0.95 }}
             onClick={toggleTutor}
             title="Delta — your STEM tutor"
-            className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors focus:outline-none"
+            className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none overflow-hidden group bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 dark:text-sky-400 shadow-[0_0_8px_rgba(14,165,233,0.1)] hover:shadow-[0_0_12px_rgba(14,165,233,0.2)]`}
           >
-            <GraduationCap className="w-5 h-5" />
+            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <GraduationCap className="w-5 h-5 relative z-10" />
           </motion.button>
 
           <motion.button
@@ -270,11 +277,13 @@ export default function Taskbar({ windows, onFocus }) {
             whileTap={{ scale: 0.95 }}
             onClick={toggleChat}
             title="Study Chat"
-            className="relative flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-md hover:shadow-lg hover:shadow-indigo-500/30 transition-all focus:outline-none group"
+            className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none overflow-hidden group ${
+              chatOpen
+                ? 'bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/40 ring-1 ring-indigo-400/50'
+                : 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-500/20 shadow-[0_0_8px_rgba(99,102,241,0.1)] hover:shadow-[0_0_12px_rgba(99,102,241,0.2)]'
+            }`}
           >
-            <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </div>
+            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <MessageSquare className="w-4 h-4 relative z-10" />
             {unreadCount > 0 && !chatOpen && (
               <span className="absolute -top-1 -right-1 z-20 min-w-[16px] h-[16px] px-0.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-sm">
