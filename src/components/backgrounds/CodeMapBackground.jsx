@@ -157,12 +157,19 @@ export default function CodeMapBackground({ dark, onNodeClick }) {
     window.addEventListener('wheel', onWheel, { passive: false })
 
     let raf = null
+    let tLast = performance.now()
 
     const draw = () => {
+      raf = requestAnimationFrame(draw)
+      if (document.hidden) return
+
       const ctx  = canvas.getContext('2d')
       const W    = canvas.width, H = canvas.height
       const dpr  = devicePixelRatio
       const isDark = darkRef.current
+      
+      const now = performance.now()
+      tLast = now
       ctx.clearRect(0, 0, W, H)
 
       const BASE  = Math.min(W, H) * 0.22
@@ -327,7 +334,7 @@ export default function CodeMapBackground({ dark, onNodeClick }) {
         }
       }
 
-      raf = requestAnimationFrame(draw)
+
     }
 
     raf = requestAnimationFrame(draw)

@@ -899,7 +899,7 @@ export default function AboutPage() {
               {PLATFORM_FEATURES.map((f, i) => (
                 <FadeSection key={f.title} delay={i * 50}>
                   <div
-                    className={`relative rounded-2xl border ${f.border} bg-slate-950/60 backdrop-blur-sm p-6 h-full flex flex-col gap-3 group hover:scale-[1.02] transition-transform duration-300`}
+                    className={`relative rounded-2xl border ${f.border} bg-slate-900/5 dark:bg-slate-950/60 backdrop-blur-sm p-6 h-full flex flex-col gap-3 group hover:scale-[1.02] transition-transform duration-300`}
                     style={{ boxShadow: `0 0 20px ${f.glow}` }}
                   >
                     <div
@@ -955,7 +955,7 @@ export default function AboutPage() {
         <section className="px-4 py-16 max-w-6xl mx-auto">
           <FadeSection>
             <div
-              className="relative rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/50 via-slate-950/80 to-cyan-950/50 backdrop-blur-sm p-10 sm:p-14 overflow-hidden text-center"
+              className="relative rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-50/80 via-slate-50/90 to-cyan-50/80 dark:from-emerald-950/50 dark:via-slate-950/80 dark:to-cyan-950/50 backdrop-blur-sm p-10 sm:p-14 overflow-hidden text-center"
               style={{ boxShadow: "0 0 80px rgba(16,185,129,0.07)" }}
             >
               <div className="absolute top-0 left-1/4 w-64 h-64 bg-emerald-500/8 rounded-full blur-[80px] pointer-events-none" />
@@ -967,12 +967,12 @@ export default function AboutPage() {
                 </h2>
                 <p className="text-slate-700 dark:text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mb-2">
                   Powered by{" "}
-                  <span className="text-emerald-300 font-semibold">
+                  <span className="text-emerald-600 dark:text-emerald-300 font-semibold">
                     Pyodide
                   </span>{" "}
                   (WebAssembly), students run real Python — with NumPy, Pandas,
                   and a built-in{" "}
-                  <code className="font-mono text-sm bg-white/10 px-2 py-0.5 rounded text-emerald-300">
+                  <code className="font-mono text-sm bg-slate-900/5 dark:bg-white/10 px-2 py-0.5 rounded text-emerald-600 dark:text-emerald-300">
                     opencalc
                   </code>{" "}
                   visualization library — with a single click. No install. No

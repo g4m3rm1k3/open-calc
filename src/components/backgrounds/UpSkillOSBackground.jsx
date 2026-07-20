@@ -65,6 +65,9 @@ export default function UpSkillOSBackground({ dark }) {
     const gridPane = root.querySelector('[data-grid-pane]')
 
     const tick = () => {
+      rafId = requestAnimationFrame(tick)
+      if (document.hidden) return
+
       cx += (tx - cx) * 0.055
       cy += (ty - cy) * 0.055
 
@@ -81,8 +84,6 @@ export default function UpSkillOSBackground({ dark }) {
         const p = 14 + i * 8
         el.style.transform = `translate(-50%,-50%) translate(${cx * p}px,${cy * p * 0.65}px)`
       })
-
-      rafId = requestAnimationFrame(tick)
     }
     rafId = requestAnimationFrame(tick)
 
