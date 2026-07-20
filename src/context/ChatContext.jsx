@@ -257,9 +257,13 @@ export function ChatProvider({ children }) {
         // parseNostrEvent (nostrChat.js) hardcodes isOwn: false since it has
         // no notion of "me" — correct it here for messages we sent in a past
         // session, so they render as "Me" (no Block button) after a reload.
-        msg => setGlobalMessages(prev =>
-          mergeMessages(prev, [msg.peerId === myPeerId ? { ...msg, isOwn: true } : msg]),
-        ),
+        // _canonKey lets mergeMessages deduplicate against P2P-first deliveries.
+        msg => {
+          const withKey = { ...msg, _canonKey: `${msg.username}-${msg.timestamp}` };
+          setGlobalMessages(prev =>
+            mergeMessages(prev, [msg.peerId === myPeerId ? { ...withKey, isOwn: true } : withKey]),
+          );
+        },
         () => {
           if (cancelled) return;
           setGlobalHistoryLoaded(true);
@@ -276,7 +280,13 @@ export function ChatProvider({ children }) {
               // own text. Drop it; nothing is lost since the local copy
               // already represents it.
               if (msg.peerId === myPeerId) return;
-              setGlobalMessages(prev => mergeMessages(prev, [msg]));
+              // Attach canonical key for cross-transport deduplication
+              const withKey = { ...msg, _canonKey: `${msg.username}-${msg.timestamp}` };
+              setGlobalMessages(prev => {
+                // Drop if already delivered via P2P (same canonKey)
+                if (prev.some(m => m._canonKey === withKey._canonKey && m._canonKey)) return prev;
+                return mergeMessages(prev, [withKey]);
+              });
               setUnreadCount(n => n + 1);
             },
           );
@@ -291,12 +301,11 @@ export function ChatProvider({ children }) {
   }, [roomKey, nostrLoaded]);
 
   // WebRTC P2P room — transport for redundant/low-latency message delivery
-  // AND for Lovelace's GPU host-election + AI query routing. Only connects
-  // while the chat panel is open; fully disconnects when it closes, so none
-  // of this network/compute activity runs unless someone is actually using
-  // chat. Re-runs when roomKey increments (manual reconnect) or chatOpen flips.
+  // AND for Lovelace's GPU host-election + AI query routing. Connects as soon
+  // as nostr is loaded (so peers are discovered and visible before you even
+  // open the chat panel). Re-runs when roomKey increments (manual reconnect).
   useEffect(() => {
-    if (!chatOpen) return;
+    if (!nostrLoaded) return;
 
     // Reset peer state on each (re)connect
     setGlobalPeers(0);
@@ -322,7 +331,15 @@ export function ChatProvider({ children }) {
         receive((data, peerId) => {
           if (!data?.text || !data?.username) return;
           const msg = makeIncomingMsg(data, peerId);
-          setGlobalMessages(prev => mergeMessages(prev, [msg]));
+          // Only add if not already present from Nostr delivery (same content,
+          // similar timestamp). Nostr uses "nostr-{eventId}"; P2P uses
+          // "{peerId}-{ts}". To deduplicate across transports we store a
+          // canonical key on each message and check that too.
+          setGlobalMessages(prev => {
+            const canonKey = `${data.username}-${data.ts}`;
+            if (prev.some(m => m._canonKey === canonKey)) return prev;
+            return mergeMessages(prev, [{ ...msg, _canonKey: canonKey }]);
+          });
           setUnreadCount(n => n + 1);
         });
 
@@ -408,7 +425,7 @@ export function ChatProvider({ children }) {
       setConnected(false);
       setGlobalPeers(0);
     };
-  }, [roomKey, chatOpen]);
+  }, [roomKey, nostrLoaded]);
 
   // Track lesson from URL + broadcast presence on change
   useEffect(() => {
@@ -437,21 +454,29 @@ export function ChatProvider({ children }) {
     const uname = isLovelace ? "Lovelace" : usernameRef.current;
     const peerId = isLovelace ? "lovelace-ai" : "local";
     const payload = { text: filtered, username: uname, ts, isLovelace };
+    // Canonical dedup key matches what the P2P receive handler checks
+    const canonKey = `${uname}-${ts}`;
     const msg = {
       id: `${peerId}-${ts}`,
       peerId, username: uname, text: filtered,
       timestamp: ts, isOwn: !isLovelace, isLovelace,
+      _canonKey: canonKey,
     };
 
     try { sendGlobalRef.current?.(payload); } catch {}
     setGlobalMessages(prev => mergeMessages(prev, [msg]));
 
-    // Don't publish AI responses to Nostr — relay echo would create duplicates
-    if (!isLovelace && keypair.current && nostrPool.current) {
+    // Publish ALL messages (including Lovelace AI responses) to Nostr so every
+    // user in the room sees them, regardless of whether they're in the P2P room.
+    // The live-subscription handler already drops our own echoes (peerId match),
+    // so Lovelace echoes won't duplicate — they use a fixed "lovelace-ai" peerId
+    // which is never equal to any user's real pubkey slice.
+    if (keypair.current && nostrPool.current) {
+      const publishPeerId = isLovelace ? "lovelace-ai" : keypair.current.pk.slice(0, 16);
       loadNostrChat().then(({ publishMessage }) =>
         publishMessage(nostrPool.current, keypair.current.sk, "global", {
           ...payload,
-          peerId: keypair.current.pk.slice(0, 16),
+          peerId: publishPeerId,
         }),
       ).catch(() => {});
     }

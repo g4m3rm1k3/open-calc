@@ -277,13 +277,13 @@ export default function Taskbar({ windows, onFocus }) {
             whileTap={{ scale: 0.95 }}
             onClick={toggleChat}
             title="Study Chat"
-            className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none overflow-hidden group ${
+            className={`relative flex items-center justify-center w-9 h-9 rounded-xl transition-all focus:outline-none group ${
               chatOpen
                 ? 'bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/40 ring-1 ring-indigo-400/50'
                 : 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-500/20 shadow-[0_0_8px_rgba(99,102,241,0.1)] hover:shadow-[0_0_12px_rgba(99,102,241,0.2)]'
             }`}
           >
-            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+            <div className="absolute inset-0 rounded-xl bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <MessageSquare className="w-4 h-4 relative z-10" />
             {unreadCount > 0 && !chatOpen && (
               <span className="absolute -top-1 -right-1 z-20 min-w-[16px] h-[16px] px-0.5 rounded-full bg-red-500 border-2 border-white dark:border-slate-950 text-white text-[9px] font-bold flex items-center justify-center leading-none shadow-sm">
