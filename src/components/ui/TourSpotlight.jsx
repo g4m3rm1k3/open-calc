@@ -56,16 +56,19 @@ export default function TourSpotlight() {
         zIndex: 9990,
       }
 
-  // Card placement: prefer above the target (most anchors live in a bottom
-  // bar), fall back to centered if there's no real target to anchor to.
+  // Card placement: prefer above the target when it's in the bottom half of
+  // the screen (Taskbar buttons), below it when it's in the top half (search
+  // bar). Fall back to centered if there's no real target to anchor to.
+  const isBottomHalf = rect ? rect.top > window.innerHeight / 2 : false
   const cardStyle = rect
     ? {
         position: 'fixed',
         zIndex: 9991,
         left: Math.min(Math.max(rect.left + rect.width / 2 - 160, 12), window.innerWidth - 332),
-        top: rect.top > window.innerHeight / 2 ? rect.top - pad - 12 : undefined,
-        bottom: rect.top > window.innerHeight / 2 ? undefined : window.innerHeight - rect.top + pad + 12,
-        transform: rect.top > window.innerHeight / 2 ? 'translateY(-100%)' : undefined,
+        // Bottom-half target → card floats above: pin by "bottom" from viewport
+        ...(isBottomHalf
+          ? { bottom: window.innerHeight - rect.top + pad + 12 }
+          : { top: rect.bottom + pad + 12 }),
         width: 320,
       }
     : {

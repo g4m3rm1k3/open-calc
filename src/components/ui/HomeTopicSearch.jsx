@@ -61,7 +61,7 @@ export default function HomeTopicSearch({ onSearch }) {
   };
 
   return (
-    <div className="w-full max-w-3xl flex flex-col items-start my-6">
+    <div data-tour="home-search" className="w-full max-w-3xl flex flex-col items-start my-6">
       <form onSubmit={(e) => e.preventDefault()} className="relative w-full group">
         <div className="relative p-[3px] rounded-[2rem] bg-gradient-to-r from-indigo-500/30 via-fuchsia-500/30 to-cyan-500/30 hover:from-indigo-500/50 hover:via-fuchsia-500/50 hover:to-cyan-500/50 transition-all duration-500 shadow-lg hover:shadow-[0_0_40px_rgba(139,92,246,0.3)]">
           <div className="relative w-full bg-white/90 dark:bg-slate-900/90 rounded-[29px] backdrop-blur-xl">

@@ -16,8 +16,14 @@ function buildSteps(isMobile) {
       id: 'greeting',
       target: tutorTarget,
       title: "Hi, I'm Delta!",
-      body: 'Welcome to UpSkillOS — want me to show you around?',
+      body: 'Welcome to UpSkillOS — your open-source STEM learning platform. Want me to show you around?',
       greeting: true, // renders the 3-way greeting UI instead of Next/Skip
+    },
+    {
+      id: 'search',
+      target: '[data-tour="home-search"]',
+      title: 'Find anything, instantly',
+      body: 'Type in plain English — "teach me calculus", "show me robotics games", or "I want to build a website" — and every course, lab, and game is filtered live.',
     },
     {
       id: 'explore',
@@ -25,7 +31,9 @@ function buildSteps(isMobile) {
       title: 'Courses, Labs, and Games',
       body: isMobile
         ? 'Tap Explore to browse every course — pre-calc through CNC machining.'
-        : 'Click Start to browse Courses, Labs, and Games. Labs are hands-on sandboxes (CNC sim, circuits, chemistry); Courses are structured lessons.',
+        : 'Click Start to browse Courses, Labs, and Games. Labs are hands-on sandboxes; Courses are structured lessons with exercises.',
+      // On desktop, open the start menu so the user can see it
+      onAction: isMobile ? null : () => window.dispatchEvent(new CustomEvent('oc-open-start-menu')),
     },
     // Same target on mobile and desktop now — the Help ("?") button is
     // visible at every breakpoint and Feedback & Bugs is its default
@@ -68,6 +76,7 @@ export function TourProvider({ children }) {
   const steps = useMemo(() => buildSteps(isMobile), [isMobile])
 
   const startTour = useCallback(() => {
+    localStorage.removeItem(TOUR_SEEN_KEY)
     setStepIndex(0)
     setActive(true)
   }, [])
@@ -79,13 +88,19 @@ export function TourProvider({ children }) {
 
   const next = useCallback(() => {
     setStepIndex((i) => {
+      const currentStep = steps[i]
+      // Fire the step's onAction (if any) as we leave it, so the user can
+      // see the thing being described (e.g. open the Start Menu)
+      if (currentStep?.onAction) {
+        try { currentStep.onAction() } catch { /* ignore */ }
+      }
       if (i + 1 >= steps.length) {
         endTour()
         return i
       }
       return i + 1
     })
-  }, [steps.length, endTour])
+  }, [steps, endTour])
 
   // Quick-reply branch from the greeting step: simple keyword match against
   // real course labels rather than a full NLU round-trip for what's really

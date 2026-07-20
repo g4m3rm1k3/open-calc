@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import StartMenu from './StartMenu.jsx'
@@ -54,6 +54,14 @@ export default function Taskbar({ windows, onFocus }) {
 
   const toggleChat = () => window.dispatchEvent(new CustomEvent('oc-toggle-chat'))
   const toggleTutor = () => window.dispatchEvent(new CustomEvent('oc-toggle-tutor'))
+
+  // Allow the intro tour (TourContext) to open the Start Menu programmatically
+  // when the tour step describing it fires onAction.
+  useEffect(() => {
+    const handler = () => setMenuOpen(true)
+    window.addEventListener('oc-open-start-menu', handler)
+    return () => window.removeEventListener('oc-open-start-menu', handler)
+  }, [])
 
   const openPinnedApp = async (app) => {
     if (app.route) { navigate(app.route); return }

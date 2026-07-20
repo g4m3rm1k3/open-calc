@@ -59,8 +59,9 @@ export default function MobileBottomNav({ onSearchOpen }) {
           activeColor="text-indigo-600 dark:text-indigo-400"
         />
 
-        {/* Compass — center prominent button */}
+        {/* Compass — center prominent button, also the mobile Delta/tutor entry */}
         <motion.button
+          data-tour="stem-tutor-mobile"
           whileTap={{ scale: 0.9 }}
           onClick={() => navigate('/compass')}
           className={`relative flex flex-col items-center justify-center flex-1 h-16 ${isCompassActive ? 'text-sky-500' : 'text-slate-400 dark:text-slate-500'}`}
