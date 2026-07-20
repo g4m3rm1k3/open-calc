@@ -22,18 +22,18 @@ listed after a `—` so you can see what got folded in.
 | # | Lesson | Folds in |
 |---|--------|----------|
 | 1 | Mini shell — read a command, run it, loop (`subprocess`, argv parsing) | — |
-| 2 | Environment variables & PATH — how the OS finds a program at all | PATH explorer |
-| 3 | Bash vs. PowerShell, same task twice — list files, filter by size/date | — |
-| 4 | Process manager / task manager — list, inspect, kill a process | Process killer, task manager |
-| 5 | CPU / memory usage viewer | Memory usage viewer, CPU monitor |
-| 6 | Command history & a `.bashrc`/`$PROFILE` intro | Command history |
-| 7 | Disk usage analyzer + directory tree printer | Directory tree printer |
-| 8 | Symbolic links, explained and explored | Symbolic link explorer |
+| 2 | ✅ Environment variables & PATH — how the OS finds a program at all | **Built — Lesson 2** |
+| 3 | ✅ Bash vs. PowerShell, same task twice — list files, filter by size/date | **Built — Lesson 3** |
+| 4 | ✅ Process manager / task manager — list, inspect, kill a process | **Built — Lesson 4** |
+| 5 | ✅ CPU / memory usage viewer | **Built — Lesson 5** |
+| 6 | ✅ Command history & a `.bashrc`/`$PROFILE` intro | **Built — Lesson 6** |
+| 7 | ✅ Disk usage analyzer + directory tree printer | **Built — Lesson 7** |
+| 8 | ✅ Symbolic links, explained and explored | **Built — Lesson 8** |
 
 ## Track 2 — File System
 | # | Lesson | Folds in |
 |---|--------|----------|
-| 9 | Build your own `ls` | — |
+| 9 | ✅ Build your own `ls` | **Built — Lesson 9** |
 | 10 | Build your own `cat` | — |
 | 11 | Build your own `cp` / `mv` / `rm` (recycle-bin style, not permanent delete) | Recycle bin |
 | 12 | Search every file in a folder (recursive walk + pattern match) | — |
@@ -109,7 +109,7 @@ listed after a `—` so you can see what got folded in.
 ## Track 8 — Compression & Binary Formats
 | # | Lesson | Folds in |
 |---|--------|----------|
-| 61 | Hex/binary viewer | Binary file inspector |
+| 61 | ✅ Hex/binary viewer | **Built — Lesson 61** |
 | 62 | Run-length encoding | — |
 | 63 | Huffman coding | — |
 | 64 | Read a BMP file byte-by-byte (real binary format, no library) | Read PNG headers |
@@ -152,7 +152,44 @@ listed after a `—` so you can see what got folded in.
 
 ---
 
-## Suggested pacing
+## Track 13 — Systems Programming (C & Rust)
+*(New track, added on request. Covers memory, pointers, and manual
+allocation — concepts Python deliberately hides. Verified buildable:
+`gcc` is preinstalled in this environment, and `rustc` installs cleanly
+via `apt` from Ubuntu's own repos, so — unlike Lesson 3's PowerShell
+half — everything in this track can be fully compiled and run for real,
+not predicted.)*
+
+| # | Lesson | Notes |
+|---|--------|-------|
+| 81 | Compiling and running C — the step Python skips entirely | source → object code → binary |
+| 82 | Variables and memory addresses — pointers, `&` and `*` | — |
+| 83 | Manual memory management — `malloc`/`free`, a real leak shown on purpose | — |
+| 84 | Arrays, pointers, and C strings — a string is just bytes + a null terminator | ties back to Lesson 61 |
+| 85 | Structs — bundling data without a class | — |
+| 86 | The stack vs. the heap — where variables actually live, shown via real addresses | — |
+| 87 | Undefined behavior — a real buffer overflow, shown safely and explained | — |
+| 88 | Use-after-free — a dangling pointer bug, triggered on purpose | — |
+| 89 | Rust: the same memory task, no garbage collector, no manual `free` — ownership | mirrors Lesson 3's side-by-side format |
+| 90 | Rust: borrowing and the borrow checker catching a real bug at compile time | — |
+| 91 | C vs. Rust vs. Python, side by side — the same use-after-free bug attempted in all three | closing/capstone comparison |
+| 92 | (optional) Calling real C from Python with `ctypes` | ties this track back to the main curriculum |
+
+**Suggested placement:** do this track *after* a solid chunk of Track 1
+(you already have it) — the OS-level comfort there (processes, memory,
+signals) makes C's pointer/memory model land as "the same ideas, less
+protection," not a cold start. Not otherwise dependent on Tracks 2–12.
+
+**On scope:** GPU/graphics/CUDA is explicitly deferred, not added —
+revisit if/when you want it; it's a big enough domain to deserve its
+own planning pass rather than being squeezed in here.
+
+**On shell lessons:** no more dedicated bash/PowerShell lessons planned
+beyond Lesson 3 — future lessons will use shell commands naturally
+where needed (as most already do) rather than teaching the shell itself
+again.
+
+
 Rough order: **Track 1 → interleave Track 3 with Track 10 → Track 4 →
 Track 5 → pick freely from 6/7/8/9 → Track 11 → Track 12 as capstones.**
 Not a hard rule — pick lesson-by-lesson each session; I'll flag if
