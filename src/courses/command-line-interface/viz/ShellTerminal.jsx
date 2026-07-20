@@ -68,6 +68,90 @@ function initFs(initialFiles) {
   return fs;
 }
 
+// ── Permission modes ──────────────────────────────────────────────────────────
+// A parallel Map (path -> 3-digit octal string, e.g. "644") alongside `fs`.
+// Kept separate from `fs`'s own Map (rather than wrapping every entry in
+// `{content, mode}`) so this stays a small, additive change to a component
+// three courses already depend on — every existing command that reads `fs`
+// directly is completely unaffected. Only the owner digit is ever checked:
+// this simulation has exactly one user ("user"), so there is no real
+// group/other distinction to enforce, but all three digits are still stored
+// and displayed so `ls -l`/`stat` read like a real permission string.
+function initModes(fs, initialModes) {
+  const modes = new Map();
+  for (const [path, val] of fs.entries()) {
+    modes.set(path, val === "DIR" ? "755" : "644");
+  }
+  if (initialModes) {
+    for (const [rawPath, mode] of Object.entries(initialModes)) {
+      const path = rawPath.replace(/\/$/, "") || "/";
+      if (/^[0-7]{3,4}$/.test(mode)) modes.set(path, mode.slice(-3));
+    }
+  }
+  return modes;
+}
+
+// Accepts either numeric ("755", "0644") or simple symbolic ("+x", "-w",
+// "u+x", "a-w") mode strings — the same two forms this shell's own `help
+// chmod` text already advertises ("chmod 755 script.sh", "chmod +x program").
+function parseMode(modeStr, currentMode = "644") {
+  if (/^[0-7]{3,4}$/.test(modeStr)) return modeStr.slice(-3);
+  const m = modeStr.match(/^[ugoa]*([+-])([rwx]+)$/);
+  if (m) {
+    const [, sign, bits] = m;
+    const bitVal =
+      (bits.includes("r") ? 4 : 0) +
+      (bits.includes("w") ? 2 : 0) +
+      (bits.includes("x") ? 1 : 0);
+    const apply = (n) => (sign === "+" ? n | bitVal : n & ~bitVal);
+    const digits = [...currentMode].map((d) => apply(parseInt(d, 10) || 0));
+    return digits.join("");
+  }
+  return currentMode;
+}
+
+function modeToRwx(mode) {
+  return [...mode]
+    .map((d) => {
+      const n = Number(d);
+      return (n & 4 ? "r" : "-") + (n & 2 ? "w" : "-") + (n & 1 ? "x" : "-");
+    })
+    .join("");
+}
+
+// The single source of truth for "what mode does this path have right now,
+// whether or not anyone ever ran chmod on it." Used by `ls -l`, `stat`,
+// `chmod`'s own before-value, and every read/write/execute check, so all
+// four always agree — earlier drafts of this fix computed the "unset"
+// default differently in different places (chmod's own fallback vs. the
+// permission checks' fallback), which happened to produce the same answer
+// in simple cases but would have silently diverged in others. A path never
+// explicitly `chmod`'d defaults to executable (755) for directories and
+// compiled/symlinked binaries, or readable/writable-but-not-executable
+// (644) for everything else — matching real Unix defaults closely enough
+// that every existing lesson's plain files and compiled binaries keep
+// working exactly as before. Restriction is opt-in, only for paths someone
+// actually ran `chmod` on (or seeded via `initialModes`).
+function defaultModeFor(fs, path) {
+  const entry = fs.get(path);
+  if (entry === "DIR") return "755";
+  if (typeof entry === "string" && (entry.startsWith("__ELF__:") || entry.startsWith("__SYMLINK__:")))
+    return "755";
+  return "644";
+}
+function effectiveMode(fs, modes, path) {
+  return modes.get(path) ?? defaultModeFor(fs, path);
+}
+function canRead(mode) {
+  return (parseInt(mode[0], 10) & 4) === 4;
+}
+function canWrite(mode) {
+  return (parseInt(mode[0], 10) & 2) === 2;
+}
+function canExecute(mode) {
+  return (parseInt(mode[0], 10) & 1) === 1;
+}
+
 function resolvePath(cwd, input) {
   if (!input || input === "~") return "/home/user";
   if (input.startsWith("~/")) return "/home/user" + input.slice(1);
@@ -285,13 +369,14 @@ const MAN_PAGES = {
 };
 
 // ── Main command executor ─────────────────────────────────────────────────────
-function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
+function runCommand(raw, { fs, modes, cwd, env, aliases, cmdHistory, programs = {} }) {
   const trimmed = raw.trim();
   if (!trimmed)
     return {
       output: [],
       newCwd: cwd,
       newFs: fs,
+      newModes: modes,
       newEnv: env,
       newAliases: aliases,
     };
@@ -315,6 +400,7 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
   expandedRaw = expandedRaw.replace(/\$\(([^)]+)\)/g, (_, inner) => {
     const sub = runCommand(inner.trim(), {
       fs: new Map(fs),
+      modes: new Map(modes),
       cwd,
       env: { ...env },
       aliases: { ...aliases },
@@ -418,7 +504,8 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
             const size = isDir
               ? "4096"
               : String(typeof content === "string" ? content.length : 0);
-            const perm = isDir ? "drwxr-xr-x" : "-rw-r--r--";
+            const mode = effectiveMode(fs, modes, full);
+            const perm = (isDir ? "d" : "-") + modeToRwx(mode);
             segPush([
               col(`${perm}  1 user user `, C.dim),
               col(size.padStart(6) + " ", C.yellow),
@@ -522,6 +609,10 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
           }
           if (entry === "DIR") {
             segErr(`cat: ${a}: Is a directory`);
+            continue;
+          }
+          if (!canRead(effectiveMode(fs, modes, target))) {
+            segErr(`cat: ${a}: Permission denied`);
             continue;
           }
           for (const line of entry.split("\n")) segPlain(line);
@@ -1133,6 +1224,10 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         for (const f of fileArgs2) {
           const tp = resolvePath(cwd, f);
           const existing = fs.get(tp);
+          if (existing !== undefined && !canWrite(effectiveMode(fs, modes, tp))) {
+            segErr(`tee: ${f}: Permission denied`);
+            continue;
+          }
           fs.set(
             tp,
             hasA && existing && existing !== "DIR"
@@ -1211,9 +1306,10 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
           col(String(statInode), C.white),
           col("  Links: 1", C.dim),
         ]);
+        const statMode = effectiveMode(fs, modes, statPath);
         segPush([
           col("Access: ", C.dim),
-          plain(statIsDir ? "drwxr-xr-x" : "-rw-r--r--"),
+          plain(`(0${statMode}/${(statIsDir ? "d" : "-") + modeToRwx(statMode)})`),
         ]);
         segPush([
           col("Modify: ", C.dim),
@@ -1419,16 +1515,26 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
       }
 
       case "chmod": {
-        const chmodPaths = args.filter((a) => !a.startsWith("-"));
-        if (chmodPaths.length < 2) {
+        // No real flags are simulated for chmod, so args are never filtered
+        // by a leading "-" here — unlike every other command in this file,
+        // chmod's own mode argument can legitimately start with "-" (e.g.
+        // "-x" to remove the execute bit), which a naive `!a.startsWith("-")`
+        // filter would incorrectly strip as if it were a flag.
+        if (args.length < 2) {
           segErr("chmod: missing operand");
           break;
         }
-        const [modeStr, ...chmodTargets] = chmodPaths;
+        const [modeStr, ...chmodTargets] = args;
         for (const t of chmodTargets) {
-          if (!fs.has(resolvePath(cwd, t)))
+          const tp = resolvePath(cwd, t);
+          if (!fs.has(tp)) {
             segErr(`chmod: ${t}: No such file or directory`);
-          else segPush([col(`mode of '${t}' changed to ${modeStr}`, C.dim)]);
+            continue;
+          }
+          const current = effectiveMode(fs, modes, tp);
+          const next = parseMode(modeStr, current);
+          modes.set(tp, next);
+          segPush([col(`mode of '${t}' changed to ${next} (${modeToRwx(next)})`, C.dim)]);
         }
         break;
       }
@@ -1665,6 +1771,7 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
           segPush([col(`  ${recipe}`, C.dim)]);
           const rr = runCommand(recipe, {
             fs,
+            modes,
             cwd,
             env,
             aliases,
@@ -1673,6 +1780,7 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
           });
           lines.push(...rr.output);
           for (const [k, v] of rr.newFs) fs.set(k, v);
+          for (const [k, v] of rr.newModes) modes.set(k, v);
           Object.assign(env, rr.newEnv);
         }
         segPush([col(`make: '${makeTarget}' built successfully`, C.green)]);
@@ -1713,6 +1821,7 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         for (const sl of scriptLines2) {
           const sr = runCommand(sl, {
             fs,
+            modes,
             cwd,
             env,
             aliases,
@@ -1721,6 +1830,7 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
           });
           lines.push(...sr.output);
           for (const [k, v] of sr.newFs) fs.set(k, v);
+          for (const [k, v] of sr.newModes) modes.set(k, v);
           cwd = sr.newCwd;
           Object.assign(env, sr.newEnv);
           Object.assign(aliases, sr.newAliases);
@@ -1738,6 +1848,12 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
         const execPath = resolvePath(cwd, execName);
         const execEntry = fs.get(execPath);
         if (execEntry && typeof execEntry === "string") {
+          if (execEntry.startsWith("__ELF__:") || execEntry.startsWith("__SYMLINK__:")) {
+            if (!canExecute(effectiveMode(fs, modes, execPath))) {
+              segErr(`bash: ${cmd}: Permission denied`);
+              break;
+            }
+          }
           if (execEntry.startsWith("__ELF__:")) {
             for (const l of execEntry.slice(8).split("\n")) segPlain(l);
             break;
@@ -1768,20 +1884,30 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
     // Handle redirection for this segment
     if (redirect && redirect.file) {
       const destPath = resolvePath(cwd, redirect.file);
-      const textContent = segLines
-        .map((l) => l.parts.map((p) => p.text).join(""))
-        .join("\n");
-      if (redirect.op === ">") {
-        fs.set(destPath, textContent);
+      const existingBeforeWrite = fs.get(destPath);
+      if (
+        existingBeforeWrite !== undefined &&
+        existingBeforeWrite !== "DIR" &&
+        !canWrite(effectiveMode(fs, modes, destPath))
+      ) {
+        lines.push({ parts: [col(`bash: ${redirect.file}: Permission denied`, C.red)] });
+        pipeInput = "";
       } else {
-        const existing = fs.get(destPath);
-        fs.set(
-          destPath,
-          (existing && existing !== "DIR" ? existing + "\n" : "") + textContent,
-        );
+        const textContent = segLines
+          .map((l) => l.parts.map((p) => p.text).join(""))
+          .join("\n");
+        if (redirect.op === ">") {
+          fs.set(destPath, textContent);
+        } else {
+          const existing = fs.get(destPath);
+          fs.set(
+            destPath,
+            (existing && existing !== "DIR" ? existing + "\n" : "") + textContent,
+          );
+        }
+        // Don't add segment lines to output (they went to file)
+        pipeInput = textContent;
       }
-      // Don't add segment lines to output (they went to file)
-      pipeInput = textContent;
     } else {
       // pipeInput for next segment = text of this segment's output
       pipeInput = segLines
@@ -1802,6 +1928,7 @@ function runCommand(raw, { fs, cwd, env, aliases, cmdHistory, programs = {} }) {
     output: lines,
     newCwd: cwd,
     newFs: fs,
+    newModes: modes,
     newEnv: env,
     newAliases: aliases,
     success: !lines.some((l) => l.parts.some((p) => p.color === C.red)),
@@ -1813,6 +1940,7 @@ export default function ShellTerminal({ params = {} }) {
   const {
     instanceId,
     initialFiles,
+    initialModes,
     initialCwd = "/home/user",
     welcomeMessage,
     prompt: promptLabel = "user",
@@ -1823,6 +1951,9 @@ export default function ShellTerminal({ params = {} }) {
 
   const T = useThemeColors();
   const [fsMap, setFsMap] = useState(() => initFs(initialFiles));
+  const [modesMap, setModesMap] = useState(() =>
+    initModes(initFs(initialFiles), initialModes),
+  );
   const [cwd, setCwd] = useState(initialCwd);
   const [env, setEnv] = useState({
     HOME: "/home/user",
@@ -1894,12 +2025,14 @@ export default function ShellTerminal({ params = {} }) {
       }
 
       const newFs = new Map(fsMap);
+      const newModes = new Map(modesMap);
       const newEnv = { ...env };
       const newAliases = { ...aliases };
 
       // Support ; && || multi-statement chaining
       const stmts = splitStatements(cmd);
       let currentFs = newFs;
+      let currentModes = newModes;
       let currentCwd = cwd;
       let currentEnv = newEnv;
       let currentAliases = newAliases;
@@ -1920,6 +2053,7 @@ export default function ShellTerminal({ params = {} }) {
 
         const result = runCommand(stmt, {
           fs: currentFs,
+          modes: currentModes,
           cwd: currentCwd,
           env: currentEnv,
           aliases: currentAliases,
@@ -1929,6 +2063,7 @@ export default function ShellTerminal({ params = {} }) {
 
         allOutput.push(...result.output);
         currentFs = result.newFs;
+        currentModes = result.newModes;
         currentCwd = result.newCwd;
         currentEnv = result.newEnv;
         currentAliases = result.newAliases;
@@ -1943,6 +2078,7 @@ export default function ShellTerminal({ params = {} }) {
 
       setHistory(newHistory);
       setFsMap(currentFs);
+      setModesMap(currentModes);
       setCwd(currentCwd);
       setEnv(currentEnv);
       setAliases(currentAliases);
