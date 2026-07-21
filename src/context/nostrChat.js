@@ -64,6 +64,7 @@ function parseNostrEvent(event) {
     timestamp: event.created_at * 1000,
     isOwn: false,
     isLovelace: !!payload.isLovelace,
+    mentions: Array.isArray(payload.mentions) ? payload.mentions : [],
     fromNostr: true,
   }
 }

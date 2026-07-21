@@ -101,6 +101,8 @@ export function ChatProvider({ children }) {
   const [currentLessonTitle, setCurrentLessonTitle] = useState(null);
   // activeLessons: Map<lessonId, { title: string, users: string[] }>
   const [activeLessons, setActiveLessons] = useState(new Map());
+  // peers: P2P-connected users { peerId, username, lessonId, lessonTitle }
+  const [peers, setPeers] = useState([]);
   const [connected, setConnected] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [globalHistoryLoaded, setGlobalHistoryLoaded] = useState(false);
@@ -150,9 +152,17 @@ export function ChatProvider({ children }) {
 
   function rebuildActiveLessons() {
     const map = new Map();
+    const peerList = [];
     // Include peers
-    for (const [, info] of peerLessonsRef.current) {
-      if (!info?.lessonId) continue;
+    for (const [peerId, info] of peerLessonsRef.current) {
+      if (!info) continue;
+      peerList.push({
+        peerId,
+        username: info.username,
+        lessonId: info.lessonId || null,
+        lessonTitle: info.title || null,
+      });
+      if (!info.lessonId) continue;
       if (!map.has(info.lessonId)) map.set(info.lessonId, { title: info.title || info.lessonId, users: [] });
       map.get(info.lessonId).users.push(info.username);
     }
@@ -163,6 +173,7 @@ export function ChatProvider({ children }) {
       map.get(myLesson.id).users.unshift("You");
     }
     setActiveLessons(new Map(map));
+    setPeers(peerList);
   }
 
   const markAllRead = useCallback(() => setUnreadCount(0), []);
@@ -290,6 +301,12 @@ export function ChatProvider({ children }) {
                 return mergeMessages(prev, [withKey]);
               });
               setUnreadCount(n => n + 1);
+              // Notify if we were @mentioned in a Nostr-delivered message
+              if (Array.isArray(msg.mentions) && msg.mentions.includes(usernameRef.current)) {
+                window.dispatchEvent(new CustomEvent('oc-mention', {
+                  detail: { from: msg.username, text: msg.text },
+                }));
+              }
             },
           );
         },
@@ -332,17 +349,28 @@ export function ChatProvider({ children }) {
 
         receive((data, peerId) => {
           if (!data?.text || !data?.username) return;
+          // Keep this peer's username in the map so they show in the users list
+          // even if they haven't sent a lesson-presence event.
+          const peerInfo = peerLessonsRef.current.get(peerId);
+          if (peerInfo === undefined || peerInfo?.username !== data.username) {
+            peerLessonsRef.current.set(peerId, peerInfo
+              ? { ...peerInfo, username: data.username }
+              : { username: data.username, lessonId: null, title: null });
+            rebuildActiveLessons();
+          }
           const msg = makeIncomingMsg(data, peerId);
-          // Only add if not already present from Nostr delivery (same content,
-          // similar timestamp). Nostr uses "nostr-{eventId}"; P2P uses
-          // "{peerId}-{ts}". To deduplicate across transports we store a
-          // canonical key on each message and check that too.
           setGlobalMessages(prev => {
             const canonKey = `${data.username}-${data.ts}`;
             if (prev.some(m => m._canonKey === canonKey)) return prev;
             return mergeMessages(prev, [{ ...msg, _canonKey: canonKey }]);
           });
           setUnreadCount(n => n + 1);
+          // Notify if we were @mentioned
+          if (Array.isArray(data.mentions) && data.mentions.includes(usernameRef.current)) {
+            window.dispatchEvent(new CustomEvent('oc-mention', {
+              detail: { from: data.username, text: data.text },
+            }));
+          }
         });
 
         let sendLv = null;
@@ -455,7 +483,17 @@ export function ChatProvider({ children }) {
     const ts = Date.now();
     const uname = isLovelace ? "Lovelace" : usernameRef.current;
     const peerId = isLovelace ? "lovelace-ai" : "local";
-    const payload = { text: filtered, username: uname, ts, isLovelace };
+    // Extract @username mentions against known P2P peers so recipients get notified
+    const mentions = [];
+    if (!isLovelace) {
+      const mentionTokens = (filtered.match(/@(\w+)/g) || []).map(m => m.slice(1).toLowerCase());
+      for (const [, info] of peerLessonsRef.current) {
+        if (info?.username && mentionTokens.includes(info.username.toLowerCase())) {
+          mentions.push(info.username);
+        }
+      }
+    }
+    const payload = { text: filtered, username: uname, ts, isLovelace, ...(mentions.length ? { mentions } : {}) };
     // Canonical dedup key matches what the P2P receive handler checks
     const canonKey = `${uname}-${ts}`;
     const msg = {
@@ -521,6 +559,7 @@ export function ChatProvider({ children }) {
     unblockPeer,
     globalMessages,
     globalPeers,
+    peers,
     currentLessonId,
     currentLessonTitle,
     activeLessons,
@@ -539,7 +578,7 @@ export function ChatProvider({ children }) {
     reconnect,
   }), [
     username, setUsername, blockedPeers, blockedUsers, blockPeer, unblockPeer,
-    globalMessages, globalPeers, currentLessonId, currentLessonTitle, activeLessons,
+    globalMessages, globalPeers, peers, currentLessonId, currentLessonTitle, activeLessons,
     connected, chatOpen, sendMessage, sendLovelaceResponse, unreadCount, markAllRead,
     globalHistoryLoaded, lovelaceHostId, pendingLovelaceQueries, sendLovelaceQuery,
     resolveLovelaceQuery, reconnect,

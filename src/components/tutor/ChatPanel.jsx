@@ -12,6 +12,7 @@ import {
   ChevronDown,
   ChevronUp,
   RefreshCw,
+  AtSign,
 } from "lucide-react";
 import { useChat } from "../../hooks/useChat.js";
 import {
@@ -40,6 +41,128 @@ function formatTime(ts) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+// ── Mention notification toast ────────────────────────────────────────────────
+// Shown when another user @mentions us — even if the chat panel is closed.
+function MentionModal() {
+  const [notification, setNotification] = useState(null);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      setNotification(e.detail);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setNotification(null), 8000);
+    };
+    window.addEventListener("oc-mention", handler);
+    return () => {
+      window.removeEventListener("oc-mention", handler);
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {notification && (
+        <motion.div
+          key="mention-toast"
+          initial={{ opacity: 0, y: -16, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          transition={{ type: "spring", damping: 24, stiffness: 380 }}
+          className="fixed top-14 right-4 z-[9999] w-80"
+        >
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-indigo-500/25 dark:border-indigo-400/20 p-4 flex items-start gap-3">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30">
+              <AtSign className="w-4 h-4 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+                  You were mentioned
+                </span>
+                <button
+                  onClick={() => setNotification(null)}
+                  className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors shrink-0"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 leading-snug">
+                <span className="text-indigo-500 dark:text-indigo-400">{notification.from}</span>
+                {" "}mentioned you
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                {notification.text}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ── Online users panel ────────────────────────────────────────────────────────
+const AVATAR_COLORS = [
+  "bg-violet-500", "bg-blue-500", "bg-emerald-500",
+  "bg-rose-500", "bg-amber-500", "bg-cyan-500", "bg-pink-500", "bg-orange-500",
+];
+function avatarColor(name = "?") {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+function UsersPanel({ peers, username, onMention }) {
+  const all = [
+    { peerId: "local", username, lessonId: null, lessonTitle: null, isMe: true },
+    ...peers,
+  ];
+  return (
+    <div className="border-b border-slate-200 dark:border-slate-800 shrink-0">
+      <div className="px-3 py-2 flex flex-col gap-1 max-h-[180px] overflow-y-auto">
+        {all.map((peer) => (
+          <div
+            key={peer.peerId}
+            className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors group"
+          >
+            <div
+              className={`w-6 h-6 rounded-full ${avatarColor(peer.username)} flex items-center justify-center shrink-0 text-[10px] font-black text-white shadow-sm`}
+            >
+              {(peer.username || "?")[0].toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate leading-none">
+                {peer.isMe ? `${peer.username} (you)` : peer.username}
+              </p>
+              {peer.lessonTitle ? (
+                <div className="flex items-center gap-1 mt-0.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 truncate">
+                    {peer.lessonTitle}
+                  </span>
+                </div>
+              ) : (
+                <p className="text-[10px] text-slate-400 dark:text-slate-600 mt-0.5">Browsing</p>
+              )}
+            </div>
+            {!peer.isMe && (
+              <button
+                onClick={() => onMention(peer.username)}
+                title={`Mention ${peer.username}`}
+                className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-bold text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 px-1.5 py-0.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/50 shrink-0"
+              >
+                <AtSign className="w-2.5 h-2.5" />
+                mention
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 // ── Block confirmation modal ──────────────────────────────────────────────────
@@ -333,11 +456,36 @@ function MessageList({
 }
 
 // ── Chat input ─────────────────────────────────────────────────────────────────
-function ChatInput({ onSend, disabled, lovelaceActive }) {
+function ChatInput({ onSend, disabled, lovelaceActive, peers }) {
   const [text, setText] = useState("");
   const inputRef = useRef(null);
   const hasLovelace = isLovelaceMention(text);
   const isAiMode = hasLovelace || lovelaceActive;
+
+  // @mention autocomplete: detect "@partial" at end of current text
+  const atMatch = text.match(/@(\w*)$/);
+  const atPartial = atMatch ? atMatch[1].toLowerCase() : null;
+  const suggestions =
+    atPartial !== null && peers.length > 0
+      ? peers
+          .filter((p) => p.username.toLowerCase().startsWith(atPartial))
+          .slice(0, 5)
+      : [];
+
+  const handleSelectSuggestion = (uname) => {
+    setText((prev) => prev.replace(/@\w*$/, `@${uname} `));
+    inputRef.current?.focus();
+  };
+
+  // Listen for external mention inserts (from the UsersPanel @mention button)
+  useEffect(() => {
+    const handler = (e) => {
+      setText((prev) => `${prev.trimEnd()} @${e.detail} `.trimStart());
+      inputRef.current?.focus();
+    };
+    window.addEventListener("oc-insert-mention", handler);
+    return () => window.removeEventListener("oc-insert-mention", handler);
+  }, []);
 
   const submit = () => {
     const t = text.trim();
@@ -350,6 +498,31 @@ function ChatInput({ onSend, disabled, lovelaceActive }) {
   return (
     <div className="relative flex flex-col gap-2 p-4 pt-3 bg-gradient-to-t from-white/80 to-white/40 dark:from-[#1c1c1e]/90 dark:to-[#1c1c1e]/50 backdrop-blur-xl border-t border-indigo-500/10 dark:border-indigo-500/20 shrink-0">
       <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-indigo-500/20 dark:via-indigo-400/20 to-transparent" />
+
+      {/* @mention autocomplete dropdown */}
+      {suggestions.length > 0 && (
+        <div className="absolute bottom-full left-4 right-4 mb-1.5 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 overflow-hidden z-20">
+          <div className="px-3 py-1.5 border-b border-slate-100 dark:border-slate-800">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Mention a user</span>
+          </div>
+          {suggestions.map((peer) => (
+            <button
+              key={peer.peerId}
+              onMouseDown={(e) => { e.preventDefault(); handleSelectSuggestion(peer.username); }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors text-left"
+            >
+              <div className={`w-5 h-5 rounded-full ${avatarColor(peer.username)} flex items-center justify-center shrink-0 text-[9px] font-black text-white`}>
+                {peer.username[0].toUpperCase()}
+              </div>
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">@{peer.username}</span>
+              {peer.lessonTitle && (
+                <span className="text-xs text-slate-400 dark:text-slate-500 truncate ml-auto">{peer.lessonTitle}</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
       {isAiMode && (
         <div className="flex items-center gap-2 text-[10px] text-indigo-600 dark:text-indigo-400 px-2 py-1 bg-indigo-50/50 dark:bg-indigo-950/30 rounded-lg border border-indigo-200/30 dark:border-indigo-400/10">
           <Sparkles className="w-3 h-3 animate-pulse" />
@@ -364,9 +537,17 @@ function ChatInput({ onSend, disabled, lovelaceActive }) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
+            if (e.key === "Escape" && suggestions.length > 0) {
+              setText((prev) => prev.replace(/@\w*$/, ""));
+              return;
+            }
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              submit();
+              if (suggestions.length > 0) {
+                handleSelectSuggestion(suggestions[0].username);
+              } else {
+                submit();
+              }
             }
           }}
           placeholder={
@@ -374,7 +555,7 @@ function ChatInput({ onSend, disabled, lovelaceActive }) {
               ? "Synchronizing…"
               : lovelaceActive
                 ? "Reply to Lovelace…"
-                : "Message @Lovelace…"
+                : "Message or @username…"
           }
           disabled={disabled}
           maxLength={500}
@@ -407,6 +588,7 @@ export default function ChatPanel({ isOpen, onClose }) {
     blockPeer,
     globalMessages,
     globalPeers,
+    peers,
     currentLessonId,
     currentLessonTitle,
     activeLessons,
@@ -458,10 +640,17 @@ export default function ChatPanel({ isOpen, onClose }) {
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(username);
   const [showSettings, setShowSettings] = useState(false);
+  const [showUsers, setShowUsers] = useState(false);
   const [blockTarget, setBlockTarget] = useState(null);
   const [lovelaceActive, setLovelaceActive] = useState(false);
   const lovelaceTimeoutRef = useRef(null);
   const nameRef = useRef(null);
+
+  // Insert @mention into the input from the UsersPanel
+  const handleMentionInsert = useCallback((uname) => {
+    setShowUsers(false);
+    window.dispatchEvent(new CustomEvent("oc-insert-mention", { detail: uname }));
+  }, []);
 
   useEffect(() => {
     if (editingName) nameRef.current?.focus();
@@ -571,6 +760,7 @@ export default function ChatPanel({ isOpen, onClose }) {
 
   return (
     <>
+      <MentionModal />
       <BlockConfirmModal
         target={blockTarget}
         onConfirm={() => {
@@ -686,11 +876,28 @@ export default function ChatPanel({ isOpen, onClose }) {
                       </span>
                     </button>
                   )}
-                  <div className="ml-auto flex items-center gap-1 text-[10px] text-slate-400 dark:text-slate-500">
+                  <button
+                    onClick={() => setShowUsers((v) => !v)}
+                    title="Online users"
+                    className={`ml-auto flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-lg transition-colors ${
+                      showUsers
+                        ? "text-indigo-500 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40"
+                        : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    }`}
+                  >
                     <Users className="w-3 h-3" />
-                    <span>{globalPeers + 1}</span>
-                  </div>
+                    <span className="font-semibold">{globalPeers + 1}</span>
+                  </button>
                 </div>
+
+                {/* Online users panel */}
+                {showUsers && (
+                  <UsersPanel
+                    peers={peers}
+                    username={username}
+                    onMention={handleMentionInsert}
+                  />
+                )}
 
                 {/* Disconnected banner */}
                 {!connected && (
@@ -768,7 +975,12 @@ export default function ChatPanel({ isOpen, onClose }) {
                   onBlockRequest={setBlockTarget}
                   lovelaceStatus={lovelaceStatus}
                 />
-                <ChatInput onSend={handleSend} disabled={!connected} lovelaceActive={lovelaceActive} />
+                <ChatInput
+                  onSend={handleSend}
+                  disabled={!connected}
+                  lovelaceActive={lovelaceActive}
+                  peers={peers}
+                />
               </>
             )}
           </motion.div>
