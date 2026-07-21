@@ -1,18 +1,5 @@
-import { useState, useRef, useCallback } from 'react'
-import { CreateMLCEngine } from '@mlc-ai/web-llm'
-
-const MODEL_ID = 'Llama-3.2-1B-Instruct-q4f16_1-MLC'
-
-// Module-level singleton so multiple components share one engine instance
-let _engine = null
-let _enginePromise = null
-async function getSharedEngine(onProgress) {
-  if (_engine) return _engine
-  if (_enginePromise) return _enginePromise
-  _enginePromise = CreateMLCEngine(MODEL_ID, { initProgressCallback: ({ text }) => onProgress?.(text || 'Loading…') })
-    .then(e => { _engine = e; _enginePromise = null; return e })
-  return _enginePromise
-}
+import { useState, useCallback } from 'react'
+import { getSharedEngine } from './webLLMSingleton.js'
 
 const SYSTEM_PROMPT = `You are Lovelace, an open-source STEM tutor named after Ada Lovelace — the pioneering mathematician and first computer programmer. You help students understand mathematics, physics, chemistry, computer science, and related subjects.
 

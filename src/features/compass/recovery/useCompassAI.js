@@ -1,7 +1,5 @@
-import { useState, useRef, useCallback } from 'react'
-import { CreateMLCEngine } from '@mlc-ai/web-llm'
-
-const MODEL_ID = 'Llama-3.2-1B-Instruct-q4f16_1-MLC'
+import { useState, useCallback } from 'react'
+import { getSharedEngine } from '../../hooks/webLLMSingleton.js'
 
 const SYSTEM_PROMPT = `You are the Compass Coach — a personal operating system architect built into UpSkillOS.
 Your job is to help the user build science-backed systems (using principles from Atomic Habits, Deep Work, and Systems Thinking) to achieve their goals.
@@ -16,20 +14,14 @@ Rules:
 - Do not use motivational fluff or emojis. Be direct and analytical.`
 
 export function useCompassAI() {
-  const engineRef = useRef(null)
   const [isThinking, setIsThinking] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState('')
 
   const ensureEngine = useCallback(async () => {
-    if (engineRef.current) return engineRef.current
     setIsDownloading(true)
     try {
-      const engine = await CreateMLCEngine(MODEL_ID, {
-        initProgressCallback: ({ text }) => setDownloadProgress(text || 'Loading Compass Coach…'),
-      })
-      engineRef.current = engine
-      return engine
+      return await getSharedEngine(p => setDownloadProgress(p))
     } finally {
       setIsDownloading(false)
       setDownloadProgress('')

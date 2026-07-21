@@ -14,8 +14,16 @@ import { useTour } from "../../context/TourContext.jsx";
 let _engine = null;
 let _engineModelId = null;
 
+const WEBLLM_CACHE_PREFIX = "webllm/";
+
 async function loadWebLLMEngine(modelId, onProgress) {
   if (_engine && _engineModelId === modelId) return _engine;
+
+  // Delete the previously loaded model's cache before fetching the new one
+  if (_engineModelId && _engineModelId !== modelId) {
+    caches.delete(WEBLLM_CACHE_PREFIX + _engineModelId).catch(() => {});
+  }
+
   _engine = null;
   _engineModelId = null;
   const { CreateMLCEngine } = await import("@mlc-ai/web-llm");

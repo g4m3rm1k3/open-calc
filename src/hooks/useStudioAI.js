@@ -1,7 +1,5 @@
-import { useState, useRef, useCallback } from 'react'
-import { CreateMLCEngine } from '@mlc-ai/web-llm'
-
-const MODEL_ID = 'Llama-3.2-1B-Instruct-q4f16_1-MLC'
+import { useState, useCallback } from 'react'
+import { getSharedEngine } from './webLLMSingleton.js'
 
 const SYSTEM_PROMPT = `You are Ada, a friendly code tutor inside Open-Calc Studio. You are named after Ada Lovelace, the first computer programmer.
 
@@ -25,22 +23,16 @@ Browser sandbox facts (mention only when relevant):
 
 Tone: friendly, direct, specific. Always reference the actual code.`
 
-// Each call to useStudioAI gets its OWN engine ref — isolated from Lovelace chat, Hippocrates, RPG Coach
 export function useStudioAI() {
-  const engineRef = useRef(null)
   const [isThinking, setIsThinking] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState('')
 
   const ensureEngine = useCallback(async () => {
-    if (engineRef.current) return engineRef.current
+    if (_engine) return _engine
     setIsDownloading(true)
     try {
-      const engine = await CreateMLCEngine(MODEL_ID, {
-        initProgressCallback: ({ text }) => setDownloadProgress(text || 'Loading model…'),
-      })
-      engineRef.current = engine
-      return engine
+      return await getSharedEngine(p => setDownloadProgress(p))
     } finally {
       setIsDownloading(false)
       setDownloadProgress('')

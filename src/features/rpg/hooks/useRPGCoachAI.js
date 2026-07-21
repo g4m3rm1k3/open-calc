@@ -1,9 +1,8 @@
-import { useState, useRef, useCallback } from 'react';
-import { CreateMLCEngine } from '@mlc-ai/web-llm';
+import { useState, useCallback } from 'react';
+import { getSharedEngine } from '../../../hooks/webLLMSingleton.js';
 import { PREBUILT_PLANS } from '../data/rpgPrebuiltPlans';
 import { getExerciseDetails, EXERCISE_TYPES } from '../data/rpgExercises';
 
-const MODEL_ID = 'Llama-3.2-1B-Instruct-q4f16_1-MLC';
 
 // Used when the user has no active plan — establishes basic movement baselines
 // before assigning anything plan-specific
@@ -133,20 +132,14 @@ function buildTask(planEx, workoutLogs) {
 }
 
 export function useRPGCoachAI() {
-  const engineRef = useRef(null);
   const [isThinking, setIsThinking] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState('');
 
   const ensureEngine = useCallback(async () => {
-    if (engineRef.current) return engineRef.current;
     setIsDownloading(true);
     try {
-      const engine = await CreateMLCEngine(MODEL_ID, {
-        initProgressCallback: ({ text }) => setDownloadProgress(text || 'Loading Coach AI…'),
-      });
-      engineRef.current = engine;
-      return engine;
+      return await getSharedEngine(p => setDownloadProgress(p));
     } finally {
       setIsDownloading(false);
       setDownloadProgress('');

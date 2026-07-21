@@ -1,7 +1,5 @@
-import { useState, useRef, useCallback } from 'react'
-import { CreateMLCEngine } from '@mlc-ai/web-llm'
-
-const MODEL_ID = 'Llama-3.2-1B-Instruct-q4f16_1-MLC'
+import { useState, useCallback } from 'react'
+import { getSharedEngine } from './webLLMSingleton.js'
 
 const SYSTEM_PROMPT = `You are Hippocrates, a health education and wellness assistant inspired by the father of medicine. You help people understand nutrition, preventive health, lifestyle patterns, biomarkers, and evidence-based wellness practices.
 
@@ -18,20 +16,15 @@ Rules:
 - For nutrition questions, reference RDA/AI/UL values and food sources where helpful`
 
 export function useHippocratesAI() {
-  const engineRef = useRef(null)
   const [isThinking, setIsThinking] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadProgress, setDownloadProgress] = useState('')
 
   const ensureEngine = useCallback(async () => {
-    if (engineRef.current) return engineRef.current
+    if (_engine) return _engine
     setIsDownloading(true)
     try {
-      const engine = await CreateMLCEngine(MODEL_ID, {
-        initProgressCallback: ({ text }) => setDownloadProgress(text || 'Loading model…'),
-      })
-      engineRef.current = engine
-      return engine
+      return await getSharedEngine(p => setDownloadProgress(p))
     } finally {
       setIsDownloading(false)
       setDownloadProgress('')

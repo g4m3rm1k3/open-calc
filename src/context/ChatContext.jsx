@@ -271,15 +271,17 @@ export function ChatProvider({ children }) {
           nostrLiveSub.current = subscribeLive(
             nostrPool.current, "global", liveFrom,
             msg => {
-              // This is the relay echoing back a message we just published
-              // in *this* session — sendMessage() already added it locally
-              // and instantly with the correct isOwn/id. Merging this too
-              // would add a second, distinct-id copy that (since
-              // parseNostrEvent always sets isOwn: false) rendered as a
-              // stranger's message — complete with a Block button — on our
-              // own text. Drop it; nothing is lost since the local copy
-              // already represents it.
-              if (msg.peerId === myPeerId) return;
+              // Drop relay echoes of our own messages and all Lovelace responses.
+              // Our own: peerId matches our pubkey slice.
+              // Lovelace: the host that ran the AI already added it locally via
+              //   sendLovelaceResponse() → sendMessage(text, true), which sets
+              //   id "lovelace-ai-{ts}". The Nostr echo comes back as
+              //   "nostr-{eventId}" — a different id — so mergeMessages misses
+              //   it; _canonKey also races the local state commit. Simplest
+              //   correct fix: every client drops Lovelace Nostr echoes because
+              //   all clients receive the canonical copy via the P2P channel or
+              //   their own local sendMessage call.
+              if (msg.peerId === myPeerId || msg.peerId === "lovelace-ai") return;
               // Attach canonical key for cross-transport deduplication
               const withKey = { ...msg, _canonKey: `${msg.username}-${msg.timestamp}` };
               setGlobalMessages(prev => {
