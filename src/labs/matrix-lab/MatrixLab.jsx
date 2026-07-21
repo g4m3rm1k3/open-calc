@@ -265,7 +265,7 @@ const LESSONS = [
     solutions: ["[A[pivotRow], A[maxRow]] = [A[maxRow], A[pivotRow]];", "-A[r][col] / A[pivotRow][col]"],
     testMatrix: [[2,1,-1],[4,3,1],[-2,1,5]],
     testFn: (fn) => {
-      const helpers = `const rowSwap=(M,a,b)=>{const N=M.map(r=>[...r]);[N[a],N[b]]=[N[b],N[a]];return N;};const rowAdd=(M,t,s,k)=>{const N=M.map(r=>[...r]);N[t]=N[t].map((v,c)=>v+k*M[s][c]);return N;};`;
+      const helpers = `function rowSwap(M,a,b){const N=M.map(r=>[...r]);[N[a],N[b]]=[N[b],N[a]];return N;};function rowAdd=(M,t,s,k){const N=M.map(r=>[...r]);N[t]=N[t].map((v,c)=>v+k*M[s][c]);return N;};`;
       const M = [[2,1,-1],[4,3,1],[-2,1,5]];
       const ref = ref_fwdElim(M, false).result;
       try {
@@ -318,7 +318,7 @@ const LESSONS = [
     solutions: ["1 / A[r][pivotCol]", "-A[above][pivotCol]"],
     testMatrix: [[2,1,-1],[4,3,1],[-2,1,5]],
     testFn: (fn) => {
-      const helpers = `const rowScale=(M,r,k)=>{const N=M.map(r=>[...r]);N[r]=N[r].map(v=>v*k);return N;};const rowAdd=(M,t,s,k)=>{const N=M.map(r=>[...r]);N[t]=N[t].map((v,c)=>v+k*M[s][c]);return N;};`;
+      const helpers = `function rowScale(M,r,k){const N=M.map(r=>[...r]);N[r]=N[r].map(v=>v*k);return N;};function rowAdd(M,t,s,k){const N=M.map(r=>[...r]);N[t]=N[t].map((v,c)=>v+k*M[s][c]);return N;};`;
       const M = [[2,1,-1],[4,3,1],[-2,1,5]];
       const upper = ref_fwdElim(M, false).result;
       const ref = ref_backSub(upper, false).result;
@@ -570,9 +570,9 @@ const LESSONS = [
 //  JS RUNNER
 // ─────────────────────────────────────────────────────────────────────────────
 const HELPERS = `
-const rowSwap=(M,a,b)=>{const N=M.map(r=>[...r]);[N[a],N[b]]=[N[b],N[a]];return N;};
-const rowScale=(M,r,k)=>{const N=M.map(r=>[...r]);N[r]=N[r].map(v=>v*k);return N;};
-const rowAdd=(M,t,s,k)=>{const N=M.map(r=>[...r]);N[t]=N[t].map((v,c)=>v+k*M[s][c]);return N;};
+function rowSwap(M,a,b){const N=M.map(r=>[...r]);[N[a],N[b]]=[N[b],N[a]];return N;};
+function rowScale(M,r,k){const N=M.map(r=>[...r]);N[r]=N[r].map(v=>v*k);return N;};
+function rowAdd(M,t,s,k){const N=M.map(r=>[...r]);N[t]=N[t].map((v,c)=>v+k*M[s][c]);return N;};
 `;
 
 const runCode = (lesson, code) => {
