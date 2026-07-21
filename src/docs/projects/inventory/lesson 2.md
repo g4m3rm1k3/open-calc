@@ -1,178 +1,99 @@
-# Lesson 1: Connecting to SQLite and Enforcing Data Boundaries
+# Lesson 2: Querying Hierarchies and Text
 
 **What you will build**
-You will build the foundational database connection engine for NexusInventory and execute the first schema definitions. The actual problem we are solving is establishing *database integrity at the engine level*. Before we add Python ORMs or validation libraries, the raw storage layer itself must be configured to reject bad data and handle concurrent operations efficiently.
+You will design a self-referential location tree to model warehouse zones, aisles, and bins, query that tree efficiently using a Recursive Common Table Expression (CTE), and build a high-performance text search engine for the product catalog. The core problem we are solving is escaping the limitations of flat relational rows — physical inventory is deeply nested, and product search is inherently unstructured.
 
 **What you need to know first**
-Nothing. This is the first lesson in the curriculum.
+From Lesson 1: SQLite connection factories, `STRICT` mode, and executing raw SQL strings.
 
 **The Pipeline**
-Our ultimate backend architecture follows this data flow:
-`Client Request → Pydantic (Validation) → SQLAlchemy (ORM) → SQLite (Storage)`
-
-In this lesson, we are working exclusively at the final stage: **SQLite (Storage)**. A SKU name like `"Widget"` will eventually pass through all four stages, but today we are building the vault where `"Widget"` is permanently recorded.
+`Client Request → Pydantic (Validation) → SQLAlchemy (ORM) → [ SQLite (Storage) ]`
+We remain strictly in the Storage stage. A search query like `"find all M5 bolts in the NY Warehouse"` requires the storage layer to traverse a location tree and perform an indexed text match before returning bytes up the chain to the ORM.
 
 ---
 
-## Concept Unit: The In-Process Database Connection
+## Concept Unit: Self-Referential Foreign Keys
 
 ### The Problem
 
-We need Python to communicate with a database to persist our inventory records. Traditional databases (like PostgreSQL) run as separate background servers you connect to over a network. We are using SQLite, which requires a fundamentally different mental model: the database engine runs directly inside your Python process.
+A `location` isn't just a building. A building contains zones, a zone contains aisles, and an aisle contains bins. If we create separate tables for `buildings`, `zones`, `aisles`, and `bins`, our schema becomes rigid — adding a "shelf" level breaks the database. We need a single `locations` table where a location can securely point to another location as its container.
 
 ### Introduce the concept in isolation
 
-Create a temporary file named `lab_connection.py` to see how Python's built-in `sqlite3` library communicates with SQLite.
-
-```python
-import sqlite3
-
-# Connect to an entirely in-memory, temporary database
-connection = sqlite3.connect(":memory:")
-
-# Execute a query asking SQLite for its internal version number
-cursor = connection.execute("SELECT sqlite_version();")
-version = cursor.fetchone()
-
-print(f"SQLite Engine Version: {version[0]}")
-
-```
-
-Run this in your terminal:
-
-```bash
-python lab_connection.py
-
-```
-
-Output:
-
-```text
-SQLite Engine Version: 3.43.2
-
-```
-
-*What this proves:* There is no external server running. By simply importing the library and calling `connect()`, Python booted up a complete SQL engine within its own memory space, executed a query, and returned the result.
-
-### Discard the throwaway example
-
-Delete `lab_connection.py`. We will not use an ephemeral in-memory database for our real inventory system.
-
-### Project Change
-
-We are starting the NexusInventory project.
-
-* **Files affected:** Create a new directory `nexus/` and a new file inside it named `db.py`.
-* **Change type:** Add.
-* **Location:** A brand-new file.
-* **Dependencies:** Built-in `sqlite3` module.
-
-### The New Code
-
-```python
-import sqlite3
-import pathlib
-
-DB_PATH = pathlib.Path(__file__).parent / "nexus.db"
-
-def get_connection() -> sqlite3.Connection:
-    return sqlite3.connect(
-        database=DB_PATH,
-        isolation_level=None
-    )
-
-```
-
-### The Updated Project
-
-Because this is a brand-new file, the code block above represents the entire file `nexus/db.py`. This module now serves as a dedicated factory for generating configured database connections pointing to a persistent file on disk.
-
-### Mechanical walkthrough
-
-1. `import sqlite3`: (First appearance). Python's standard library module for SQLite. It provides a DB-API 2.0 compliant interface.
-2. `import pathlib`: (First appearance). An object-oriented way to handle file paths across different operating systems.
-3. `pathlib.Path(__file__).parent / "nexus.db"`: (First appearance). `__file__` is a special Python variable representing the current script's path. `.parent` gets the directory containing it (`nexus/`). The `/` operator is overloaded by `pathlib` to join paths safely, resulting in a target database file named `nexus.db` in the same folder.
-4. `def get_connection() -> sqlite3.Connection:`: (First appearance). A function definition with a type hint indicating it returns a connection object.
-5. `sqlite3.connect()`: (First appearance). Bootstraps the SQLite engine and opens the database file. If the file doesn't exist, SQLite creates it.
-6. `database=DB_PATH`: Passes our constructed file path.
-7. `isolation_level=None`: (First appearance). By default, Python's `sqlite3` module tries to implicitly start transactions for you, which often conflicts with advanced usage and ORMs like SQLAlchemy. Setting this to `None` enables "autocommit mode," getting Python out of the way so the database handles transactions strictly according to our raw SQL commands.
-
-### CS Lens
-
-**Embedded vs. Client-Server Architecture.** You just utilized an embedded database. In client-server models (PostgreSQL, MySQL), your application sends a string over a TCP/IP network socket to a separate server process. The server parses it, executes it, and sends bytes back. In embedded models (SQLite), `connect()` loads the database engine's C-compiled binary directly into Python's execution thread. A query is just a local function call. The latency is practically zero, which completely changes how you can query it.
-
-### SE Lens
-
-Why wrap this in a `get_connection()` function instead of just calling `sqlite3.connect()` wherever we need data? **Dependency Injection and Centralization.** Later, we will need to add custom configuration (Pragmas) to every single connection. If we scatter `sqlite3.connect()` throughout our codebase, we would have to update it in 50 places. By centralizing it, we control the exact state of every connection from a single chokepoint.
-
-### Commands needed to make this unit real
-
-No commands needed to run this specifically yet, as it's just a definition. We will execute it in the next unit.
-
-### One sentence connecting this unit to what came immediately before.
-
-Now that Python can talk to the SQLite engine, we need to instruct that engine on how strictly it should treat our inventory data.
-
----
-
-## Concept Unit: SQLite STRICT Tables
-
-### The Problem
-
-By default, SQLite uses "Flexible Typing" (also called Type Affinity). If you define a column as `INTEGER`, but accidentally insert the string `"Warehouse A"`, SQLite will happily save the string. For financial and inventory systems, silently corrupting data types is catastrophic.
-
-### Introduce the concept in isolation
-
-Create `lab_strict.py` to see flexible typing fail, and `STRICT` mode succeed.
+Create `lab_foreign_key.py` to see a table referencing itself.
 
 ```python
 import sqlite3
 
 conn = sqlite3.connect(":memory:")
+conn.execute("PRAGMA foreign_keys = ON;")
 
-# Normal SQLite table (Flexible)
-conn.execute("CREATE TABLE flexible_inventory (qty INTEGER);")
-conn.execute("INSERT INTO flexible_inventory (qty) VALUES ('five');") 
+conn.execute("""
+    CREATE TABLE folders (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        parent_id INTEGER REFERENCES folders(id)
+    );
+""")
 
-# STRICT SQLite table
-conn.execute("CREATE TABLE strict_inventory (qty INTEGER) STRICT;")
+conn.execute("INSERT INTO folders (id, name, parent_id) VALUES (1, 'root', NULL);")
+conn.execute("INSERT INTO folders (id, name, parent_id) VALUES (2, 'documents', 1);")
+
 try:
-    conn.execute("INSERT INTO strict_inventory (qty) VALUES ('five');")
+    # Attempting to put a folder inside a parent that doesn't exist (ID 99)
+    conn.execute("INSERT INTO folders (id, name, parent_id) VALUES (3, 'secrets', 99);")
 except sqlite3.IntegrityError as e:
-    print(f"STRICT mode caught the error: {e}")
+    print(f"Foreign key blocked the insert: {e}")
 
 ```
 
 Run it:
 
 ```bash
-python lab_strict.py
+python lab_foreign_key.py
 
 ```
 
 Output:
 
 ```text
-STRICT mode caught the error: datatype mismatch
+Foreign key blocked the insert: FOREIGN KEY constraint failed
 
 ```
 
-*What this proves:* The first insert silently allowed text into a math column. The second insert, using the `STRICT` keyword, aborted the operation and threw an `IntegrityError` at the database level, refusing the bad data.
+*What this proves:* By adding a `parent_id` column that `REFERENCES` the `id` column of the *same* table, SQLite enforces a strict hierarchy. You cannot insert a child record if its designated parent does not exist.
 
 ### Discard the throwaway example
 
-Delete `lab_strict.py`. We will now apply this constraint to our real project schema.
+Delete `lab_foreign_key.py`. We will now apply this adjacency list pattern to NexusInventory.
 
 ### Project Change
 
-We need to execute our first table creation against our real database.
+We need to redefine our `locations` table. Since we are in the early stages, we will modify the initialization script and recreate the database file.
 
-* **Files affected:** Create a new file `nexus/init_db.py`.
-* **Change type:** Add.
-* **Location:** Brand-new file.
-* **Dependencies:** Depends on `get_connection` from `nexus.db`.
+* **Files affected:** `nexus/init_db.py`, and delete the existing `nexus/nexus.db` file from Lesson 1.
+* **Change type:** Replace/Modify.
+* **Location:** Inside `setup_database()`, replacing the `create_table_sql` string.
+* **Dependencies:** None.
 
 ### The New Code
+
+```python
+    create_table_sql = """
+    CREATE TABLE IF NOT EXISTS locations (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        region TEXT NOT NULL,
+        parent_id INTEGER,
+        FOREIGN KEY(parent_id) REFERENCES locations(id)
+    ) STRICT;
+    """
+
+```
+
+### The Updated Project
+
+Here is the updated structure in `nexus/init_db.py`. The SQL string has been replaced.
 
 ```python
 from db import get_connection
@@ -180,11 +101,14 @@ from db import get_connection
 def setup_database():
     conn = get_connection()
     
+    # ← new: Modified table definition with parent_id and FOREIGN KEY
     create_table_sql = """
     CREATE TABLE IF NOT EXISTS locations (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
-        region TEXT NOT NULL
+        region TEXT NOT NULL,
+        parent_id INTEGER,
+        FOREIGN KEY(parent_id) REFERENCES locations(id)
     ) STRICT;
     """
     
@@ -196,34 +120,386 @@ if __name__ == "__main__":
 
 ```
 
-### The Updated Project
-
-This is the complete `nexus/init_db.py` file. It imports our connection factory and executes a raw SQL Data Definition Language (DDL) statement to create our first table, mandating strict typing on the `locations` table.
+The `setup_database` function now creates a table capable of representing an infinitely deep tree of physical storage locations.
 
 ### Mechanical walkthrough
 
-1. `from db import get_connection`: (First appearance). Standard Python relative import pulling our factory function into this script.
-2. `def setup_database():`: A function to encapsulate our initialization logic.
-3. `conn = get_connection()`: Invokes our factory, returning a live `sqlite3.Connection` object pointing to `nexus.db`.
-4. `""" ... """`: Python multi-line string literal, allowing us to format SQL readably.
-5. `CREATE TABLE IF NOT EXISTS locations`: (First appearance). SQL command to define a new table only if it hasn't been created yet.
-6. `id INTEGER PRIMARY KEY`: (First appearance). Defines an integer column that uniquely identifies the row. In SQLite, this automatically behaves as an auto-incrementing ID.
-7. `name TEXT NOT NULL`: (First appearance). Defines a text string column. `NOT NULL` prevents inserting empty/missing values.
-8. `STRICT`: (First appearance). An SQLite-specific table option (added in SQLite 3.37.0) that disables flexible typing, forcing the engine to strictly enforce `INTEGER` and `TEXT` declarations.
-9. `conn.execute(create_table_sql)`: Sends the string to the SQLite engine for execution.
-10. `if __name__ == "__main__":`: (First appearance). Python idiom ensuring `setup_database()` only runs if this script is executed directly from the terminal, not if it's imported by another file.
+1. `parent_id INTEGER,`: (First appearance). A new column storing an integer. It does not have `NOT NULL` because top-level locations (like a Region or a Building) will have no parent, so this value will be `NULL`.
+2. `FOREIGN KEY(parent_id)`: (First appearance). A table constraint declaring that `parent_id` is a relational pointer.
+3. `REFERENCES`: (First appearance). The SQL keyword that defines the target of the foreign key pointer.
+4. `locations(id)`: (First appearance). The target table and column. Here, it points back to the `id` column of its own `locations` table.
+5. `id INTEGER PRIMARY KEY`, `name TEXT NOT NULL`, `region TEXT NOT NULL`, `STRICT`: (Already established syntax).
 
 ### CS Lens
 
-**Schema vs. Application Logic.** By using `STRICT` and `NOT NULL`, we are pushing invariants (rules that must always be true) as far down the stack as possible. You could write a Python `if` statement to check if a name is a string, but Python code can be bypassed, refactored poorly, or hit via a different script. A database-level constraint cannot be bypassed by a buggy application.
+**The Adjacency List Pattern.** Storing trees in a relational database is a classic computer science problem. This approach is called an Adjacency List: every node knows exactly who its parent is, but it knows nothing about its children or its total depth.
+*Also recognized in:* Graph data structures, filesystem directory pointers (the `..` entry), and DOM nodes (`parentNode`).
 
 ### SE Lens
 
-Why didn't SQLite just use strict typing from the beginning? **Backwards compatibility.** SQLite was created in 2000, heavily mimicking the dynamic typing of languages like Tcl. To change the default now would break millions of legacy applications. `STRICT` is an opt-in feature for modern software engineering practices. We opt in to pay a slight mental overhead in exchange for the guarantee that our data is exactly the shape we expect.
+What is the tradeoff of the Adjacency List? Inserts and moves are incredibly cheap — moving an entire aisle to a different warehouse is an O(1) operation (just update `parent_id` on the aisle). The cost is paid during querying. Finding "all bins inside this warehouse" is difficult because you don't know how deep the tree goes. A standard `SELECT` cannot dynamically join a table to itself an unknown number of times.
 
 ### Commands needed to make this unit real
 
-Execute the initialization script to create the database file and table.
+First, delete the old database, then run the script to create the new one.
+
+```bash
+rm nexus/nexus.db
+python nexus/init_db.py
+
+```
+
+### Run it. Show the real output.
+
+```text
+Database schema initialized.
+
+```
+
+### One sentence connecting this unit to what came immediately before.
+
+We have successfully modeled a physical tree structure in our schema, but to solve the query tradeoff we just identified, we must bypass standard `SELECT` statements and use a recursive engine.
+
+---
+
+## Concept Unit: Recursive Common Table Expressions (CTEs)
+
+### The Problem
+
+If we want to find all inventory within "Warehouse A", we need the warehouse, all its zones, all aisles in those zones, and all bins in those aisles. Writing a query with a fixed number of `LEFT JOIN`s limits us to a hardcoded depth. We need a query that loops dynamically until it finds the bottom of the tree.
+
+### Introduce the concept in isolation
+
+Create `lab_recursive.py` to see a query loop over itself.
+
+```python
+import sqlite3
+
+conn = sqlite3.connect(":memory:")
+
+cursor = conn.execute("""
+    WITH RECURSIVE count(x) AS (
+        VALUES(1)
+        UNION ALL
+        SELECT x+1 FROM count WHERE x < 5
+    )
+    SELECT x FROM count;
+""")
+
+for row in cursor.fetchall():
+    print(row[0])
+
+```
+
+Run it:
+
+```bash
+python lab_recursive.py
+
+```
+
+Output:
+
+```text
+1
+2
+3
+4
+5
+
+```
+
+*What this proves:* `WITH RECURSIVE` allows a query to reference its own output. It establishes an initial state (`VALUES(1)`), and then repeatedly executes the second half (`SELECT x+1`) against the results of the previous step, appending rows until the `WHERE` condition fails.
+
+### Discard the throwaway example
+
+Delete `lab_recursive.py`. We will build a real recursive CTE to traverse our warehouse tree.
+
+### Project Change
+
+We will create a new script dedicated to data traversal, seed it with a small tree, and write the recursive query.
+
+* **Files affected:** Create a new file `nexus/tree_query.py`.
+* **Change type:** Add.
+* **Location:** Brand-new file.
+* **Dependencies:** Depends on `get_connection` from `nexus.db`.
+
+### The New Code
+
+```python
+from db import get_connection
+
+def query_sublocations(parent_id: int):
+    conn = get_connection()
+    
+    query = """
+    WITH RECURSIVE location_tree AS (
+        SELECT id, name, parent_id FROM locations WHERE id = ?
+        UNION ALL
+        SELECT loc.id, loc.name, loc.parent_id 
+        FROM locations loc
+        JOIN location_tree tree ON loc.parent_id = tree.id
+    )
+    SELECT id, name FROM location_tree;
+    """
+    
+    cursor = conn.execute(query, (parent_id,))
+    for row in cursor.fetchall():
+        print(f"Found: {row[1]} (ID: {row[0]})")
+
+```
+
+### The Updated Project
+
+Because this is a new file, we will also add a temporary seeding function at the top to give us data to query. Here is the full `nexus/tree_query.py`.
+
+```python
+from db import get_connection
+
+def seed_data():
+    conn = get_connection()
+    conn.executescript("""
+        INSERT OR IGNORE INTO locations (id, name, region, parent_id) VALUES (1, 'Northeast HQ', 'NE', NULL);
+        INSERT OR IGNORE INTO locations (id, name, region, parent_id) VALUES (2, 'Zone A', 'NE', 1);
+        INSERT OR IGNORE INTO locations (id, name, region, parent_id) VALUES (3, 'Aisle 1', 'NE', 2);
+        INSERT OR IGNORE INTO locations (id, name, region, parent_id) VALUES (4, 'Bin 1A', 'NE', 3);
+        INSERT OR IGNORE INTO locations (id, name, region, parent_id) VALUES (5, 'West Coast HQ', 'WC', NULL);
+    """)
+
+# ← new: Recursive traversal function
+def query_sublocations(parent_id: int):
+    conn = get_connection()
+    
+    query = """
+    WITH RECURSIVE location_tree AS (
+        SELECT id, name, parent_id FROM locations WHERE id = ?
+        UNION ALL
+        SELECT loc.id, loc.name, loc.parent_id 
+        FROM locations loc
+        JOIN location_tree tree ON loc.parent_id = tree.id
+    )
+    SELECT id, name FROM location_tree;
+    """
+    
+    cursor = conn.execute(query, (parent_id,))
+    for row in cursor.fetchall():
+        print(f"Found: {row[1]} (ID: {row[0]})")
+
+if __name__ == "__main__":
+    seed_data()
+    print("--- Searching inside Northeast HQ (ID 1) ---")
+    query_sublocations(1)
+
+```
+
+The script seeds a 4-level deep hierarchy and an unrelated warehouse, then recursively finds everything inside ID 1.
+
+### Mechanical walkthrough
+
+1. `conn.executescript(""" ... """)`: (First appearance). A convenience method in the `sqlite3` module to execute multiple SQL statements separated by semicolons in one go.
+2. `WITH RECURSIVE location_tree AS (`: (First appearance). The start of the Common Table Expression. It defines a temporary, virtual table named `location_tree` that exists only for the duration of this query.
+3. `SELECT id, name, parent_id FROM locations WHERE id = ?`: (First appearance). The **Anchor Member**. This runs exactly once to find the root node (in our case, `id = 1`). The `?` is SQLite's parameter placeholder.
+4. `UNION ALL`: (First appearance). An operator that combines the results of the top query with the results of the bottom query, keeping duplicates. In a recursive CTE, it acts as the bridge separating the anchor from the loop.
+5. `SELECT loc.id, loc.name, loc.parent_id FROM locations loc`: (First appearance). The **Recursive Member**. `loc` is a table alias to save typing.
+6. `JOIN location_tree tree ON loc.parent_id = tree.id`: (First appearance). The magic step. It joins the physical `locations` table against the virtual `location_tree` table. Specifically, it joins against *only the rows produced in the previous step of the recursion*.
+7. `) SELECT id, name FROM location_tree;`: Closes the CTE definition and then runs a standard `SELECT` against the completely built virtual table.
+8. `conn.execute(query, (parent_id,))`: (Already established). Executes the query, passing a single-item tuple `(parent_id,)` to safely replace the `?` placeholder, preventing SQL injection.
+
+**Execution trace for `query_sublocations(1)`:**
+
+```text
+Iteration 1 (Anchor): Runs `WHERE id = 1`. 
+  Yields: [id: 1, name: 'Northeast HQ', parent_id: NULL].
+Iteration 2 (Recursive): Joins `locations` where `parent_id` == 1. 
+  Yields: [id: 2, name: 'Zone A', parent_id: 1].
+Iteration 3 (Recursive): Joins `locations` where `parent_id` == 2. 
+  Yields: [id: 3, name: 'Aisle 1', parent_id: 2].
+Iteration 4 (Recursive): Joins `locations` where `parent_id` == 3. 
+  Yields: [id: 4, name: 'Bin 1A', parent_id: 3].
+Iteration 5 (Recursive): Joins `locations` where `parent_id` == 4. 
+  Yields: Zero rows. Recursion halts.
+Final Result: All rows yielded in iterations 1 through 4 are combined and returned.
+
+```
+
+### CS Lens
+
+**Breadth-First Search (BFS) in SQL.** The SQL engine is internally executing a graph traversal algorithm. The anchor member pushes the starting node into a queue. The recursive member dequeues nodes, finds their children, and enqueues those children. It finishes when the queue is empty.
+*Also recognized in:* Pathfinding algorithms, garbage collection tracing, and network routing protocols.
+
+### SE Lens
+
+Why use `?` parameterization instead of Python f-strings like `f"... WHERE id = {parent_id}"`? **Security and Caching.** F-strings expose you to SQL Injection attacks if `parent_id` ever comes from user input. Furthermore, database engines cache query execution plans based on the raw SQL string. If you use f-strings, `WHERE id = 1` and `WHERE id = 2` look like entirely different queries to the parser. By using `?`, the SQL string remains identical (`WHERE id = ?`), allowing SQLite to reuse the optimized execution plan.
+
+### Commands needed to make this unit real
+
+Run the query script.
+
+```bash
+python nexus/tree_query.py
+
+```
+
+### Run it. Show the real output.
+
+```text
+--- Searching inside Northeast HQ (ID 1) ---
+Found: Northeast HQ (ID: 1)
+Found: Zone A (ID: 2)
+Found: Aisle 1 (ID: 3)
+Found: Bin 1A (ID: 4)
+
+```
+
+### One sentence connecting this unit to what came immediately before.
+
+We can now pinpoint exact bins dynamically, but to know *what* to put in those bins, we need a product catalog that workers can search quickly without knowing exact spelling.
+
+---
+
+## Concept Unit: Full-Text Search (FTS5)
+
+### The Problem
+
+If a user searches the catalog for "hex bolt", a standard SQL query `SELECT * FROM skus WHERE description LIKE '%hex bolt%'` forces the database to perform a "full table scan" — reading every single row from disk and doing string math. If you have 500,000 SKUs, this is disastrously slow.
+
+### Introduce the concept in isolation
+
+Create `lab_fts.py` to see a virtual indexed text table in action.
+
+```python
+import sqlite3
+
+conn = sqlite3.connect(":memory:")
+
+conn.execute("""
+    CREATE VIRTUAL TABLE text_docs USING fts5(title, body);
+""")
+
+conn.execute("INSERT INTO text_docs VALUES ('Manual', 'Use a 10mm hex bolt here.');")
+conn.execute("INSERT INTO text_docs VALUES ('Memo', 'Meeting at noon.');")
+
+# Use the MATCH operator specific to FTS tables
+cursor = conn.execute("SELECT title FROM text_docs WHERE text_docs MATCH 'hex';")
+
+print(cursor.fetchall())
+
+```
+
+Run it:
+
+```bash
+python lab_fts.py
+
+```
+
+Output:
+
+```text
+[('Manual',)]
+
+```
+
+*What this proves:* By defining a table as `USING fts5`, SQLite does not just store the string. It parses the string, splits it into individual words (tokens), and builds an inverted index map (e.g., the word "hex" exists in row 1). The `MATCH` operator uses this index to find rows instantly, regardless of table size.
+
+### Discard the throwaway example
+
+Delete `lab_fts.py`. We will now define our SKU catalog and an accompanying FTS engine.
+
+### Project Change
+
+We will add the `skus` table and an attached FTS5 virtual table to our schema initialization.
+
+* **Files affected:** `nexus/init_db.py`.
+* **Change type:** Add.
+* **Location:** Inside `setup_database()`, directly beneath the existing `locations` table creation.
+
+### The New Code
+
+```python
+    create_skus_sql = """
+    CREATE TABLE IF NOT EXISTS skus (
+        sku_id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT
+    ) STRICT;
+    
+    CREATE VIRTUAL TABLE IF NOT EXISTS skus_fts USING fts5(
+        sku_id, name, description,
+        content='skus', content_rowid='rowid'
+    );
+    """
+    conn.executescript(create_skus_sql)
+
+```
+
+### The Updated Project
+
+Here is the complete `nexus/init_db.py` showing both tables initialized sequentially.
+
+```python
+from db import get_connection
+
+def setup_database():
+    conn = get_connection()
+    
+    create_table_sql = """
+    CREATE TABLE IF NOT EXISTS locations (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        region TEXT NOT NULL,
+        parent_id INTEGER,
+        FOREIGN KEY(parent_id) REFERENCES locations(id)
+    ) STRICT;
+    """
+    conn.execute(create_table_sql)
+    
+    # ← new: The product catalog and its search index
+    create_skus_sql = """
+    CREATE TABLE IF NOT EXISTS skus (
+        sku_id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT
+    ) STRICT;
+    
+    CREATE VIRTUAL TABLE IF NOT EXISTS skus_fts USING fts5(
+        sku_id, name, description,
+        content='skus', content_rowid='rowid'
+    );
+    """
+    conn.executescript(create_skus_sql)
+    
+    print("Database schema initialized.")
+
+if __name__ == "__main__":
+    setup_database()
+
+```
+
+We now have a rigorous product catalog (`skus`) backed by an externalized search index (`skus_fts`) that watches the same data.
+
+### Mechanical walkthrough
+
+1. `sku_id TEXT PRIMARY KEY`: (First appearance). A primary key that is a string instead of an auto-incrementing integer. Real-world SKUs are usually alphanumeric (e.g., `HDW-BLT-10MM`).
+2. `CREATE VIRTUAL TABLE`: (First appearance). An SQLite mechanism that creates an interface that *looks* like a table to `SELECT` and `INSERT` commands, but relies on hidden, custom C-code behind the scenes.
+3. `USING fts5(...)`: (First appearance). Invokes the Full-Text Search version 5 extension module built into modern SQLite.
+4. `sku_id, name, description`: The columns we want the FTS engine to parse and index.
+5. `content='skus'`: (First appearance). An advanced optimization called an "External Content" FTS table. FTS indexes are huge. By default, FTS copies and stores the text *again*. By pointing `content` at our real `skus` table, FTS5 only stores the index map, and queries the original table for the actual text, cutting disk usage in half.
+6. `content_rowid='rowid'`: (First appearance). Tells the FTS engine how to map its index back to the source table's internal row identifier.
+7. `conn.executescript(create_skus_sql)`: (Already established). Executes the batch of SQL.
+
+### CS Lens
+
+**The Inverted Index.** The core concept of FTS5 is the Inverted Index. A normal table maps a Row ID to text data (`Row 1 -> "10mm hex bolt"`). An inverted index maps individual words back to Row IDs (`"hex" -> [Row 1, Row 42]; "bolt" -> [Row 1, Row 8]`). To find "hex bolt", the database looks up the list for "hex", the list for "bolt", and calculates the intersection of the two arrays.
+*Also recognized in:* Elasticsearch, Apache Lucene, Google's core web search engine architecture, and book indexes.
+
+### SE Lens
+
+What is the cost of External Content FTS? **Maintenance.** Because `skus_fts` doesn't own the data, if you `UPDATE` or `DELETE` a row in the `skus` table, the `skus_fts` index does *not* automatically know about it. The index becomes "stale", returning hits for deleted items. In a production system, we must write SQLite Triggers that listen for `UPDATE` events on the `skus` table and manually sync the `skus_fts` index. We will cover database triggers later in the curriculum.
+
+### Commands needed to make this unit real
+
+Re-run the initialization script to add the new tables.
 
 ```bash
 python nexus/init_db.py
@@ -237,158 +513,28 @@ Database schema initialized.
 
 ```
 
-*Note: If you look in your `nexus/` folder, you will now see a physical file named `nexus.db`.*
-
 ### One sentence connecting this unit to what came immediately before.
 
-We now have a strict table inside a permanent file, but if multiple warehouse workers try to write to this file simultaneously, SQLite's default locking mechanism will bottleneck the system.
-
----
-
-## Concept Unit: Production Pragmas (WAL Mode)
-
-### The Problem
-
-By default, when SQLite writes data, it locks the *entire database file*. If a background script is inserting 10,000 new inventory items, any API request trying to simply read a warehouse location will freeze and timeout waiting for the lock to release.
-
-### Introduce the concept in isolation
-
-Create `lab_pragma.py` to ask SQLite what its current journaling mode is.
-
-```python
-import sqlite3
-
-conn = sqlite3.connect(":memory:")
-cursor = conn.execute("PRAGMA journal_mode;")
-print(f"Default mode: {cursor.fetchone()[0]}")
-
-conn.execute("PRAGMA journal_mode = WAL;")
-cursor = conn.execute("PRAGMA journal_mode;")
-print(f"New mode: {cursor.fetchone()[0]}")
-
-```
-
-Run it:
-
-```bash
-python lab_pragma.py
-
-```
-
-Output:
-
-```text
-Default mode: memory
-New mode: wal
-
-```
-
-*What this proves:* We can intercept the SQLite engine using a `PRAGMA` command to change its fundamental operational behavior dynamically.
-
-### Discard the throwaway example
-
-Delete `lab_pragma.py`. We will now bake this setting into our central connection factory.
-
-### Project Change
-
-We need to update our connection factory so that every single connection explicitly turns on Write-Ahead Logging (WAL) and enforces Foreign Keys (which SQLite ignores by default).
-
-* **Files affected:** `nexus/db.py`.
-* **Change type:** Modify.
-* **Location:** Inside `get_connection()`, right before returning the connection.
-
-### The New Code
-
-```python
-    conn = sqlite3.connect(
-        database=DB_PATH,
-        isolation_level=None
-    )
-    
-    conn.execute("PRAGMA journal_mode = WAL;")
-    conn.execute("PRAGMA foreign_keys = ON;")
-    
-    return conn
-
-```
-
-### The Updated Project
-
-Here is the fully reconstructed `nexus/db.py`, showing exactly where the new lines live inside the factory function.
-
-```python
-import sqlite3
-import pathlib
-
-DB_PATH = pathlib.Path(__file__).parent / "nexus.db"
-
-def get_connection() -> sqlite3.Connection:
-    conn = sqlite3.connect(
-        database=DB_PATH,
-        isolation_level=None
-    )
-    
-    # ← new: Configure engine behavior for production
-    conn.execute("PRAGMA journal_mode = WAL;")
-    conn.execute("PRAGMA foreign_keys = ON;")
-    
-    return conn
-
-```
-
-The `get_connection()` function now returns a connection that is fully armed for concurrency and relationship enforcement.
-
-### Mechanical walkthrough
-
-1. `conn = sqlite3.connect(...)`: Captures the connection object into a variable instead of returning it immediately.
-2. `conn.execute(...)`: Calls our execution method.
-3. `PRAGMA`: (First appearance). An SQL extension specific to SQLite used to modify the operation of the SQLite library itself, rather than querying table data.
-4. `journal_mode = WAL`: (First appearance). Sets the logging strategy to Write-Ahead Logging.
-5. `foreign_keys = ON`: (First appearance). Forces SQLite to actually check foreign key constraints (e.g., ensuring you don't add an item to a warehouse location ID that doesn't exist). For historical reasons, SQLite parses foreign keys but ignores enforcing them unless this Pragma is active.
-6. `return conn`: Returns the configured connection to the caller.
-
-### CS Lens
-
-**Write-Ahead Logging (WAL).** In SQLite's default "rollback journal" mode, writing requires copying the original file, editing the main file, and holding an exclusive lock. In `WAL` mode, SQLite appends new changes to a separate file (named `nexus.db-wal`). Because writes go to a side-file, readers can continue reading from the main file uninterrupted. **Readers do not block writers, and writers do not block readers.** This single command transforms SQLite from a single-user toy into a highly concurrent production engine.
-*Also recognized in:* PostgreSQL, MySQL (InnoDB Redo Logs), file systems (ext4 journaling), and Kafka's append-only logs.
-
-### SE Lens
-
-What is the tradeoff of WAL? It leaves behind trailing `-wal` and `-shm` (shared memory) files on your filesystem next to your main `.db` file. If you are zipping up your database to email it or back it up, grabbing just `nexus.db` will result in a corrupted or out-of-date backup if you forget the `-wal` file. Additionally, WAL mode does not work over networked file systems (like NFS or SMB drives) due to lack of shared memory primitives — it requires a direct local disk.
-
-### Commands needed to make this unit real
-
-No commands needed; we modified a factory function used by other scripts.
-
-### One sentence connecting this unit to what came immediately before.
-
-With our database configured for strict typing and high concurrency, we have established a rock-solid foundation that we can now confidently load complex inventory hierarchies into.
+With hierarchy traversals and fast text search established at the raw storage layer, our database engine is fully equipped.
 
 ---
 
 ## Closing
 
 **Connect the pieces**
-If we were to pass the data `"East Coast Warehouse"` into our system today, the pipeline looks like this: Python calls `get_connection()`, which opens `nexus.db` and immediately activates `WAL` mode and `foreign_keys`. We then execute an `INSERT` statement containing `"East Coast Warehouse"`. The SQLite engine intercepts this, checks its internal schema, verifies that the `locations` table was created with `STRICT` mode, confirms that `"East Coast Warehouse"` satisfies the `TEXT` requirement, appends the bytes to the `nexus.db-wal` file safely without blocking other readers, and successfully completes the transaction.
+If an API request asks to "find all 'hex bolts' in the Northeast Region", the flow relies entirely on what we built today. First, `query_sublocations(1)` executes its Recursive CTE to dynamically compile a list of all location IDs within the Northeast Region. Second, a query against `skus_fts MATCH 'hex bolt'` utilizes the inverted index to instantly return a list of SKU IDs. Finally, we would intersect these two sets against the `items` table (which we will build soon) to locate the exact serial numbers without ever performing a slow, full-table scan.
 
 **What breaks without this**
-Let's intentionally sabotage our connection factory. Open `nexus/db.py` and comment out the foreign keys Pragma:
-
-```python
-    # conn.execute("PRAGMA foreign_keys = ON;")
-
-```
-
-If you were to create an `items` table that references a `location_id`, and then insert an item pointing to Location ID 9999 (which doesn't exist), **it would succeed.** SQLite would silently accept orphaned data, completely destroying the integrity of our inventory tracking. (Un-comment the line to restore safety).
+If you delete the `FOREIGN KEY` declaration in the `locations` table, `query_sublocations` will still run without error initially. However, without the database enforcing the adjacency list strictly, a developer could easily insert an aisle pointing to a `parent_id` of `999` (a typo). Because that parent does not exist, that entire aisle and all the stock inside it will instantly vanish from the recursive CTE traversal — creating thousands of dollars of "lost" inventory that is physically present but digitally untraceable.
 
 **Exercises**
 
-1. Modify `lab_pragma.py` to also print out the default value of `PRAGMA foreign_keys;`. You will see it is `0` (off) by default.
-2. In `init_db.py`, try changing the `region TEXT NOT NULL` to `region JSON STRICT`. Run it. Note the error. SQLite `STRICT` mode only supports `INT, INTEGER, REAL, TEXT, BLOB, ANY`. You cannot invent types in `STRICT` mode.
+1. Modify `nexus/tree_query.py` to add `INSERT OR IGNORE INTO locations (id, name, region, parent_id) VALUES (6, 'Secret Bin', 'NE', 99);` before querying. Notice that it inserts successfully. Why? (Hint: Lesson 1 taught us that Foreign Keys are off by default unless enforced by our factory PRAGMA, but `seed_data` didn't use the PRAGMA on a fresh connection... wait, yes it did via `get_connection()`. If the insert fails, congratulations, the PRAGMA is working!)
+2. Write a `SELECT` statement against `skus_fts` using the `MATCH` operator to find items containing the word "bracket".
 
 **Definition of Done**
 
-* [x] A central database connection factory exists.
-* [x] Connections are configured for `WAL` concurrency and strict foreign keys.
-* [x] A `locations` table is created using `STRICT` mode.
-* [x] You can commit these changes with the message: `chore: establish strict, WAL-enabled sqlite connection factory and initial schema`.
+* [x] A self-referencing `locations` table exists in `init_db.py`.
+* [x] A recursive CTE query successfully traverses the data in `tree_query.py`.
+* [x] A product catalog (`skus`) and an external-content FTS index (`skus_fts`) are initialized.
+* [x] You can commit these changes with the message: `feat: implement location adjacency tree and FTS5 sku search`.
