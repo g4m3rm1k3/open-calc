@@ -10,6 +10,7 @@ import 'katex/dist/katex.min.css'
 import Editor from '@monaco-editor/react'
 import { setupOpenCalcMonaco } from '../../utils/monacoThemes.js'
 import MarkdownToolbar from '../markdown-toolbar/MarkdownToolbar.jsx'
+import { LANG_LABEL } from '../markdown/codeDisplay.jsx'
 import {
   X,
   ChevronDown,
@@ -61,6 +62,8 @@ const MONACO_LANG = {
   py: 'python', js: 'javascript', ts: 'typescript', sh: 'shell', zsh: 'shell',
   xml: 'html', markup: 'html', bash: 'shell', rb: 'ruby', sqlite: 'sql',
   'c++': 'cpp', bf: 'brainfuck', brainfuck: 'brainfuck',
+  jsx: 'javascript', tsx: 'typescript', 'c#': 'csharp', ps1: 'powershell',
+  m: 'matlab'
 }
 const WORKSPACE_LANG = { python: 'python', javascript: 'javascript', typescript: 'typescript', html: 'html', css: 'javascript', shell: 'javascript', json: 'javascript', plaintext: 'javascript', matlab: 'openmat', openmat: 'openmat' }
 
@@ -288,6 +291,7 @@ function MdCodeBlock({ language, code }) {
   }, [output !== null]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const monacoLang = MONACO_LANG[language] || language
+  const displayLang = LANG_LABEL[language] || monacoLang
   const runnable   = RUNNABLE_LANGS.has(language)
 
   const onResizeStart = useCallback((e) => {
@@ -400,7 +404,7 @@ function MdCodeBlock({ language, code }) {
   return (
     <div className="md-code-block">
       <div className="md-code-header">
-        <span className="md-code-lang">{monacoLang}</span>
+        <span className="md-code-lang">{displayLang}</span>
         <div className="md-code-actions">
           {runnable && (
             <button
