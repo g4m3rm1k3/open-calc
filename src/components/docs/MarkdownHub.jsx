@@ -502,7 +502,19 @@ function MdCodeBlock({ language, code }) {
 }
 
 function MdInlineCode({ children }) {
+  const { activeFile } = useContext(DocsCtx)
   const text = String(children)
+
+  const isTddLesson = activeFile?.includes('/projects/inventory/tdd/lessons/')
+  const isConcept = text.startsWith('../concepts/') && text.endsWith('.md')
+  if (isTddLesson && isConcept) {
+    const docPath = resolveDocPath(activeFile, text)
+    if (docPath) {
+      const title = text.split('/').pop().replace('.md', '').replace(/[-_]/g, ' ')
+      return <ConceptEmbed docPath={docPath} title={title} />
+    }
+  }
+
   const ref = TERM_REFS[text]
   return (
     <>
@@ -554,6 +566,49 @@ function resolveDocPath(currentFilePath, href) {
   return resolvedPath in DOCS_MODULES ? resolvedPath : null
 }
 
+function ConceptEmbed({ docPath, title }) {
+  const [content, setContent] = useState(null)
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (open && !content && DOCS_MODULES[docPath]) {
+      DOCS_MODULES[docPath]().then((res) => setContent(res))
+    }
+  }, [open, docPath, content])
+
+  return (
+    <span className="my-6 border rounded-xl overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm block w-full">
+      <button 
+        onClick={(e) => { e.preventDefault(); setOpen(!open); }}
+        className="w-full flex items-center justify-between px-5 py-4 bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left"
+      >
+        <span className="flex items-center gap-3">
+          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400">
+            📚
+          </span>
+          <span className="font-bold text-slate-800 dark:text-slate-200 text-base">
+            Concept: {title}
+          </span>
+        </span>
+        <span className="text-slate-400 dark:text-slate-500 text-xs">
+          {open ? '▼' : '▶'}
+        </span>
+      </button>
+      {open && (
+        <span className="block p-6 border-t border-slate-200 dark:border-slate-800 w-full overflow-x-auto bg-white dark:bg-slate-900 cursor-auto" onClick={(e) => e.stopPropagation()}>
+          {content === null ? (
+            <span className="text-slate-500 animate-pulse text-sm">Loading concept...</span>
+          ) : (
+            <span className="block w-full">
+              <SectionedMarkdown content={content} />
+            </span>
+          )}
+        </span>
+      )}
+    </span>
+  )
+}
+
 function MdLink({ href, children }) {
   const { activeFile, onDocLink, scrollToHeading } = useContext(DocsCtx)
 
@@ -571,6 +626,13 @@ function MdLink({ href, children }) {
   const isRelativeMd = hrefBase.endsWith('.md') && !href.startsWith('http') && !href.startsWith('//')
   if (isRelativeMd) {
     const docPath = resolveDocPath(activeFile, href)
+
+    const isTddLesson = activeFile?.includes('/projects/inventory/tdd/lessons/')
+    const isConcept = hrefBase.startsWith('../concepts/')
+    if (isTddLesson && isConcept && docPath) {
+      return <ConceptEmbed docPath={docPath} title={extractText(children)} />
+    }
+
     return (
       <a
         href="#"
