@@ -506,11 +506,12 @@ function MdInlineCode({ children }) {
   const text = String(children)
 
   const isTddLesson = activeFile?.includes('/projects/inventory/tdd/lessons/')
-  const isConcept = text.startsWith('../concepts/') && text.endsWith('.md')
-  if (isTddLesson && isConcept) {
-    const docPath = resolveDocPath(activeFile, text)
+  if (isTddLesson && text.endsWith('.md')) {
+    const filename = text.split('/').pop()
+    const forcedHref = `../concepts/${filename}`
+    const docPath = resolveDocPath(activeFile, forcedHref)
     if (docPath) {
-      const title = text.split('/').pop().replace('.md', '').replace(/[-_]/g, ' ')
+      const title = filename.replace('.md', '').replace(/[-_]/g, ' ')
       return <ConceptEmbed docPath={docPath} title={title} />
     }
   }
