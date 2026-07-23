@@ -184,3 +184,39 @@ The YouTube IFrame Player API, `localStorage`, the HTML5 Drag and Drop API,
 `FileReader` and `Blob` downloads, loading third-party libraries from a CDN at
 runtime (KaTeX, optionally Monaco), and XSS — the first time this project
 renders user-typed text as real HTML instead of plain text.
+
+---
+
+### 7. Pocket Inventory (WPF) — C#, XAML, and SQLite
+**Folder:** `pocket-inventory-wpf/` — [Full lesson plan](pocket-inventory-wpf/README.md)
+
+Build a desktop inventory manager in WPF: a real application shell, data-bound
+screens backed by a real SQLite database, search and filtering, relational
+suppliers, undo/redo, and a published, installable Windows executable. The
+deliberate desktop sibling to [`track/`](track/) — the same "name it, save it,
+find it again" product idea, built on Android there and WPF here, so the
+platform-specific ceremony and the universal software-engineering ideas
+underneath it become visible by contrast.
+
+Code-behind is used first and MVVM is introduced only once the pain of
+manually wiring click handlers is actually felt (Lesson 23) — not assumed
+from lesson one. Persistence starts with raw `Microsoft.Data.Sqlite` and
+hand-written SQL, the same choice this curriculum's Python/FastAPI sibling
+([`inventory/`](inventory/)) made, before any ORM is discussed.
+
+**Software engineering taught:**
+Separation of concerns via MVVM, the Command pattern (and its Memento-backed
+undo/redo extension), the soft-delete pattern, boundary validation, DRY
+applied to XAML via styles and resource dictionaries, composable predicate
+filtering, the dev/production gap in a published desktop build.
+
+**Computer science taught:**
+The Observer pattern (data binding), finite state machines (borrow/return
+status), relational joins and aggregate queries, shallow vs. deep copy,
+stack-based undo history, UI virtualization and the frame-time budget.
+
+**C# and .NET taught:**
+Static typing and `var` vs. Python's dynamic assignment, nullable value
+types, `decimal` vs. floating point, enums, LINQ-adjacent collection types,
+`ICommand`, and the .NET publishing pipeline (`dotnet publish`,
+self-contained deployment).
